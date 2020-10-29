@@ -1,0 +1,13 @@
+aniso8601==7.0.0
+asgiref==3.3.0
+Django==3.0.10
+djangorestframework==3.11.1
+graphene==2.1.8
+graphql-core==2.3.2
+graphql-relay==2.0.1
+promise==2.3
+psycopg2==2.8.6
+pytz==2020.1
+Rx==1.6.1
+six==1.15.0
+sqlparse==0.4.1
