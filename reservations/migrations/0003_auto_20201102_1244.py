@@ -6,18 +6,22 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('reservations', '0002_auto_20201102_1059'),
+        ("reservations", "0002_auto_20201102_1059"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='reservation',
-            name='buffer_time_after',
-            field=models.DurationField(blank=True, null=True, verbose_name='Buffer time after'),
+            model_name="reservation",
+            name="buffer_time_after",
+            field=models.DurationField(
+                blank=True, null=True, verbose_name="Buffer time after"
+            ),
         ),
         migrations.AddField(
-            model_name='reservation',
-            name='buffer_time_before',
-            field=models.DurationField(blank=True, null=True, verbose_name='Buffer time before'),
+            model_name="reservation",
+            name="buffer_time_before",
+            field=models.DurationField(
+                blank=True, null=True, verbose_name="Buffer time before"
+            ),
         ),
     ]

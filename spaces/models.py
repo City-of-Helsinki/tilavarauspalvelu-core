@@ -5,6 +5,9 @@ from django.utils.translation import ugettext_lazy as _
 class District(models.Model):
     name = models.CharField(verbose_name=_("Name"), max_length=255)
 
+    def __str__(self):
+        return "{}".format(self.name)
+
 
 class Building(models.Model):
     name = models.CharField(verbose_name=_("Name"), max_length=255)

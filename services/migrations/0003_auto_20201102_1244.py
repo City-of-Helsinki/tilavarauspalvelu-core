@@ -6,18 +6,27 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('services', '0002_auto_20201102_1059'),
+        ("services", "0002_auto_20201102_1059"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='service',
-            name='name',
-            field=models.CharField(max_length=255, verbose_name='Name'),
+            model_name="service",
+            name="name",
+            field=models.CharField(max_length=255, verbose_name="Name"),
         ),
         migrations.AlterField(
-            model_name='service',
-            name='service_type',
-            field=models.CharField(choices=[('introduction', 'Introduction'), ('catering', 'Catering'), ('configuration', 'Configuration')], default='introduction', max_length=50, verbose_name='Service type'),
+            model_name="service",
+            name="service_type",
+            field=models.CharField(
+                choices=[
+                    ("introduction", "Introduction"),
+                    ("catering", "Catering"),
+                    ("configuration", "Configuration"),
+                ],
+                default="introduction",
+                max_length=50,
+                verbose_name="Service type",
+            ),
         ),
     ]
