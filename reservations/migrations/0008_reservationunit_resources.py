@@ -6,14 +6,19 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('reservations', '0007_auto_20201104_0840'),
-        ('resources', '0003_auto_20201104_0840'),
+        ("reservations", "0007_auto_20201104_0840"),
+        ("resources", "0003_auto_20201104_0840"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='reservationunit',
-            name='resources',
-            field=models.ManyToManyField(blank=True, related_name='reservation_units', to='resources.Resource', verbose_name='Resources'),
+            model_name="reservationunit",
+            name="resources",
+            field=models.ManyToManyField(
+                blank=True,
+                related_name="reservation_units",
+                to="resources.Resource",
+                verbose_name="Resources",
+            ),
         ),
     ]

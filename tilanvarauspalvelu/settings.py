@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "spaces",
     "reservations",
     "services",
+    "reservation_units",
     "django_extensions",
 ]
 
