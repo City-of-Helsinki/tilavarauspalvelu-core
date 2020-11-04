@@ -200,6 +200,6 @@ class Reservation(models.Model):
         verbose_name=_("Buffer time after"), blank=True, null=True
     )
 
-    reservation_unit = models.ForeignKey(
-        ReservationUnit, verbose_name=_("Reservation unit"), on_delete=models.CASCADE
+    reservation_unit = models.ManyToManyField(
+        ReservationUnit, verbose_name=_("Reservation unit")
     )
