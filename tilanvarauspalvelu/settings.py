@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "spaces",
     "reservations",
     "services",
+    "django_extensions",
 ]
 
 MIDDLEWARE = [

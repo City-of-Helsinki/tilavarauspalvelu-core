@@ -6,17 +6,19 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('reservations', '0005_daypart_day'),
+        ("reservations", "0005_daypart_day"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='reservation',
-            name='reservation_unit',
+            model_name="reservation",
+            name="reservation_unit",
         ),
         migrations.AddField(
-            model_name='reservation',
-            name='reservation_unit',
-            field=models.ManyToManyField(to='reservations.ReservationUnit', verbose_name='Reservation unit'),
+            model_name="reservation",
+            name="reservation_unit",
+            field=models.ManyToManyField(
+                to="reservations.ReservationUnit", verbose_name="Reservation unit"
+            ),
         ),
     ]

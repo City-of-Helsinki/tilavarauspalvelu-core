@@ -3,7 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import User
 
 from spaces.models import Space
-from resources.models import FixedResource, MovableResource
+from resources.models import Resource
 from services.models import Service
 
 Q = models.Q
@@ -15,15 +15,9 @@ class ReservationUnit(models.Model):
     spaces = models.ManyToManyField(
         Space, verbose_name=_("Spaces"), related_name="reservation_units", blank=True
     )
-    fixed_resources = models.ManyToManyField(
-        FixedResource,
-        verbose_name=_("Fixed resources"),
-        related_name="reservation_units",
-        blank=True,
-    )
-    movable_resources = models.ManyToManyField(
-        MovableResource,
-        verbose_name=_("Movable resources"),
+    resources = models.ManyToManyField(
+        Resource,
+        verbose_name=_("Resources"),
         related_name="reservation_units",
         blank=True,
     )
@@ -46,9 +40,7 @@ class ReservationUnit(models.Model):
 
     def check_reservation_overlap(self, start_time, end_time):
         reservation_units_with_same_components = ReservationUnit.objects.filter(
-            Q(fixed_resources__in=self.fixed_resources.all())
-            | Q(spaces__in=self.spaces.all())
-            | Q(movable_resources__in=self.movable_resources.all())
+            Q(resources=self.resources.all()) | Q(spaces__in=self.spaces.all())
         )
 
         return Reservation.objects.filter(

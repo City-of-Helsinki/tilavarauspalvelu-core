@@ -7,14 +7,19 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('reservations', '0004_day_daypart_period'),
+        ("reservations", "0004_day_daypart_period"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='daypart',
-            name='day',
-            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.CASCADE, to='reservations.Day', verbose_name='Day'),
+            model_name="daypart",
+            name="day",
+            field=models.ForeignKey(
+                default=1,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="reservations.Day",
+                verbose_name="Day",
+            ),
             preserve_default=False,
         ),
     ]
