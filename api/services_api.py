@@ -1,26 +1,25 @@
 from api.base import BaseNestedSerializer
 from rest_framework import viewsets
-from resources.models import Resource
+from services.models import Service
 
 
-class ResourceSerializer(BaseNestedSerializer):
+class ServiceSerializer(BaseNestedSerializer):
     class Meta:
-        model = Resource
+        model = Service
         fields = [
             "id",
-            "location_type",
             "name",
-            "space",
+            "service_type",
             "buffer_time_before",
             "buffer_time_after",
         ]
         detail_only_fields = [
-            "space",
+            "service_type",
             "buffer_time_before",
             "buffer_time_after",
         ]
 
 
-class ResourceViewSet(viewsets.ModelViewSet):
-    serializer_class = ResourceSerializer
-    queryset = Resource.objects.all()
+class ServiceViewSet(viewsets.ModelViewSet):
+    serializer_class = ServiceSerializer
+    queryset = Service.objects.all()
