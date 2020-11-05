@@ -5,3 +5,5 @@ Tilanvarauspalvelu-core
 ===================
 This repository contains core of the new reservation platform for city of Helsinki.
 
+
+![Tietokantakuvaus](tilanvarauspalvelu_visualized.png)

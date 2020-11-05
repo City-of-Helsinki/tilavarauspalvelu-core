@@ -7,7 +7,6 @@ from spaces.models import Space
 from resources.models import Resource
 from services.models import Service
 
-Reservation = apps.get_model(app_label='reservations', model_name='Reservation')
 Q = models.Q
 
 
@@ -41,6 +40,8 @@ class ReservationUnit(models.Model):
         return Introduction.objects.filter(reservation_unit=self, user=user).exists()
 
     def check_reservation_overlap(self, start_time, end_time):
+        from reservations.models import Reservation
+
         reservation_units_with_same_components = ReservationUnit.objects.filter(
             Q(resources=self.resources.all()) | Q(spaces__in=self.spaces.all())
         )

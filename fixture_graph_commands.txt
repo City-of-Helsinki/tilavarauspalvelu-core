@@ -1,0 +1,2 @@
+python manage.py graph_models resources reservations spaces services reservation_units -g -o tilanvarauspalvelu_visualized.png
+python manage.py dumpdata reservations resources spaces services reservation_units > fixtures/cases.json

@@ -1,10 +1,5 @@
 from django.contrib import admin
-from .models import Reservation, ReservationUnit, Introduction, Period, Day, DayPart
-
-
-@admin.register(ReservationUnit)
-class ReservationUnitAdmin(admin.ModelAdmin):
-    model = ReservationUnit
+from .models import Reservation, RecurringReservation, ReservationPurpose
 
 
 @admin.register(Reservation)
@@ -12,16 +7,11 @@ class ReservationAdmin(admin.ModelAdmin):
     model = Reservation
 
 
-@admin.register(Period)
-class PeriodAdmin(admin.ModelAdmin):
-    model = Period
+@admin.register(RecurringReservation)
+class RecurringReservationAdmin(admin.ModelAdmin):
+    model = RecurringReservation
 
 
-@admin.register(Day)
-class DayAdmin(admin.ModelAdmin):
-    model = Day
-
-
-@admin.register(DayPart)
-class DayPartAdmin(admin.ModelAdmin):
-    model = DayPart
+@admin.register(ReservationPurpose)
+class ReservationPurposeAdmin(admin.ModelAdmin):
+    model = ReservationPurpose
