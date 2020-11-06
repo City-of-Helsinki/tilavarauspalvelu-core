@@ -12,4 +12,4 @@ class SpaceSerializer(BaseNestedSerializer):
 
 class SpaceViewSet(viewsets.ModelViewSet):
     serializer_class = SpaceSerializer
-    queryset = Space.objects.all()
+    queryset = Space.objects.all().select_related("parent", "building")

@@ -1,6 +1,7 @@
 from api.services_api import ServiceViewSet
 from rest_framework import routers
-from .reservations_api import ReservationViewSet, ReservationUnitViewSet
+from .reservations_api import ReservationViewSet
+from .reservation_units_api import ReservationUnitViewSet
 from .space_api import SpaceViewSet
 from .services_api import ServiceViewSet
 from .resources_api import ResourceViewSet
