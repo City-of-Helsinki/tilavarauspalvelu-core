@@ -11,39 +11,145 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('reservation_units', '0001_initial'),
+        ("reservation_units", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='RecurringReservation',
+            name="RecurringReservation",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('user', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL, verbose_name='User')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="User",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Reservation',
+            name="Reservation",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('state', models.CharField(choices=[('created', 'created'), ('cancelled', 'cancelled'), ('confirmed', 'confirmed'), ('denied', 'denied'), ('requested', 'requested'), ('waiting_for_payment', 'waiting for payment')], default='created', max_length=32, verbose_name='State')),
-                ('priority', models.IntegerField(choices=[(100, 'Low'), (200, 'Medium'), (300, 'High')], default=200)),
-                ('begin', models.DateTimeField(verbose_name='Begin time')),
-                ('end', models.DateTimeField(verbose_name='End time')),
-                ('buffer_time_before', models.DurationField(blank=True, null=True, verbose_name='Buffer time before')),
-                ('buffer_time_after', models.DurationField(blank=True, null=True, verbose_name='Buffer time after')),
-                ('recurring_reservation', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='reservations', to='reservations.RecurringReservation', verbose_name='Recurring reservation')),
-                ('reservation_unit', models.ManyToManyField(to='reservation_units.ReservationUnit', verbose_name='Reservation unit')),
-                ('user', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL, verbose_name='User')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "state",
+                    models.CharField(
+                        choices=[
+                            ("created", "created"),
+                            ("cancelled", "cancelled"),
+                            ("confirmed", "confirmed"),
+                            ("denied", "denied"),
+                            ("requested", "requested"),
+                            ("waiting_for_payment", "waiting for payment"),
+                        ],
+                        default="created",
+                        max_length=32,
+                        verbose_name="State",
+                    ),
+                ),
+                (
+                    "priority",
+                    models.IntegerField(
+                        choices=[(100, "Low"), (200, "Medium"), (300, "High")],
+                        default=200,
+                    ),
+                ),
+                ("begin", models.DateTimeField(verbose_name="Begin time")),
+                ("end", models.DateTimeField(verbose_name="End time")),
+                (
+                    "buffer_time_before",
+                    models.DurationField(
+                        blank=True, null=True, verbose_name="Buffer time before"
+                    ),
+                ),
+                (
+                    "buffer_time_after",
+                    models.DurationField(
+                        blank=True, null=True, verbose_name="Buffer time after"
+                    ),
+                ),
+                (
+                    "recurring_reservation",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="reservations",
+                        to="reservations.RecurringReservation",
+                        verbose_name="Recurring reservation",
+                    ),
+                ),
+                (
+                    "reservation_unit",
+                    models.ManyToManyField(
+                        to="reservation_units.ReservationUnit",
+                        verbose_name="Reservation unit",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="User",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='ReservationPurpose',
+            name="ReservationPurpose",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('custom_purpose', models.TextField(blank=True, verbose_name='Custom purpose')),
-                ('purpose', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='reservation_units.Purpose', verbose_name='Reservation purpose')),
-                ('reservation', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='reservations.Reservation', verbose_name='Reservation')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "custom_purpose",
+                    models.TextField(blank=True, verbose_name="Custom purpose"),
+                ),
+                (
+                    "purpose",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to="reservation_units.Purpose",
+                        verbose_name="Reservation purpose",
+                    ),
+                ),
+                (
+                    "reservation",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="reservations.Reservation",
+                        verbose_name="Reservation",
+                    ),
+                ),
             ],
         ),
     ]

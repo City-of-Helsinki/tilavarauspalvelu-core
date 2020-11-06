@@ -9,19 +9,53 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('spaces', '0001_initial'),
+        ("spaces", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Resource',
+            name="Resource",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('location_type', models.CharField(choices=[('fixed', 'Fixed'), ('movable', 'Movable')], default='fixed', max_length=20)),
-                ('name', models.CharField(max_length=255, verbose_name='Name')),
-                ('buffer_time_before', models.DurationField(blank=True, null=True, verbose_name='Buffer time before')),
-                ('buffer_time_after', models.DurationField(blank=True, null=True, verbose_name='Buffer time after')),
-                ('space', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='spaces.Space', verbose_name='Space')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "location_type",
+                    models.CharField(
+                        choices=[("fixed", "Fixed"), ("movable", "Movable")],
+                        default="fixed",
+                        max_length=20,
+                    ),
+                ),
+                ("name", models.CharField(max_length=255, verbose_name="Name")),
+                (
+                    "buffer_time_before",
+                    models.DurationField(
+                        blank=True, null=True, verbose_name="Buffer time before"
+                    ),
+                ),
+                (
+                    "buffer_time_after",
+                    models.DurationField(
+                        blank=True, null=True, verbose_name="Buffer time after"
+                    ),
+                ),
+                (
+                    "space",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to="spaces.Space",
+                        verbose_name="Space",
+                    ),
+                ),
             ],
         ),
     ]
