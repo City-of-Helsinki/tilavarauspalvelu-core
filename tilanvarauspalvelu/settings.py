@@ -128,6 +128,8 @@ USE_TZ = True
 
 STATIC_URL = "/static/"
 
+GRAPHENE = {"SCHEMA": "api.graphql.schema.schema"}
+
 # local_settings.py can be used to override environment-specific settings
 # like database and email that differ between development and production.
 local_settings_path = os.path.join(BASE_DIR, "local_settings.py")
