@@ -5,5 +5,10 @@ Tilanvarauspalvelu-core
 ===================
 This repository contains core of the new reservation platform for city of Helsinki.
 
+# Installation
+
+## Installation with docker
+
+`docker-compose up --build`
 
 ![Tietokantakuvaus](tilanvarauspalvelu_visualized.png)

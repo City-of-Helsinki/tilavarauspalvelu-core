@@ -7,6 +7,7 @@ dataclasses==0.7
 Django==3.0.10
 django-extensions==3.0.9
 djangorestframework==3.11.1
+django-environ==0.4.5
 graphene==2.1.8
 graphene-django==2.13.0
 graphql-core==2.3.2
