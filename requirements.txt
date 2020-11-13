@@ -3,7 +3,6 @@ appdirs==1.4.4
 asgiref==3.3.0
 black==20.8b1
 click==7.1.2
-dataclasses==0.7
 Django==3.0.10
 django-extensions==3.0.9
 djangorestframework==3.11.1
