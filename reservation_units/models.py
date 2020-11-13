@@ -43,7 +43,7 @@ class ReservationUnit(models.Model):
         from reservations.models import Reservation
 
         reservation_units_with_same_components = ReservationUnit.objects.filter(
-            Q(resources=self.resources.all()) | Q(spaces__in=self.spaces.all())
+            Q(resources__in=self.resources.all()) | Q(spaces__in=self.spaces.all())
         )
 
         return Reservation.objects.filter(

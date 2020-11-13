@@ -1,12 +1,10 @@
 from rest_framework import viewsets, serializers
-from api.base import BaseNestedSerializer
+from rest_framework import serializers
 from reservations.models import Reservation
 from .reservation_units_api import ReservationUnitSerializer
 
 
-class ReservationSerializer(BaseNestedSerializer):
-    # reservation_unit = ReservationUnitSerializer(many=True, exclude_detail_fields=True)
-
+class ReservationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Reservation
         fields = [
@@ -21,15 +19,14 @@ class ReservationSerializer(BaseNestedSerializer):
             "reservation_unit",
             "recurring_reservation",
         ]
-        read_only_fields = ["state", "priority", "user"]
 
-    # def validate(self, data):
-    #     for reservation_unit in data["reservation_unit"]:
-    #         if reservation_unit.check_reservation_overlap(data["begin"], data["end"]):
-    #             raise serializers.ValidationError(
-    #                 "Overlapping reservations are not allowed"
-    #             )
-    #     return data
+    def validate(self, data):
+        for reservation_unit in data["reservation_unit"]:
+            if reservation_unit.check_reservation_overlap(data["begin"], data["end"]):
+                raise serializers.ValidationError(
+                    "Overlapping reservations are not allowed"
+                )
+        return data
 
 
 class ReservationViewSet(viewsets.ModelViewSet):

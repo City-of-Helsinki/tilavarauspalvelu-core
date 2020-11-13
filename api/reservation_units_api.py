@@ -1,17 +1,15 @@
 from rest_framework import viewsets
 from reservation_units.models import ReservationUnit
-from api.base import BaseNestedSerializer
+from rest_framework import serializers
 from api.space_api import SpaceSerializer
 from api.resources_api import ResourceSerializer
 from api.services_api import ServiceSerializer
 
 
-class ReservationUnitSerializer(BaseNestedSerializer):
-    spaces = SpaceSerializer(read_only=True, many=True, exclude_detail_fields=True)
-    resources = ResourceSerializer(
-        read_only=True, many=True, exclude_detail_fields=True
-    )
-    services = ServiceSerializer(read_only=True, many=True, exclude_detail_fields=True)
+class ReservationUnitSerializer(serializers.ModelSerializer):
+    spaces = SpaceSerializer(read_only=True, many=True)
+    resources = ResourceSerializer(read_only=True, many=True)
+    services = ServiceSerializer(read_only=True, many=True)
 
     class Meta:
         model = ReservationUnit
@@ -23,7 +21,6 @@ class ReservationUnitSerializer(BaseNestedSerializer):
             "services",
             "require_introduction",
         ]
-        detail_only_fields = ["spaces", "resources", "services", "require_introduction"]
 
 
 class ReservationUnitViewSet(viewsets.ModelViewSet):
