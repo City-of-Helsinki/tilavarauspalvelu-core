@@ -22,6 +22,14 @@ class RealEstate(models.Model):
     area = models.DecimalField(
         verbose_name=_("Area"), max_digits=10, decimal_places=2, blank=True, null=True
     )
+    location = models.OneToOneField(
+        "Location",
+        verbose_name=_("Location"),
+        null=True,
+        blank=True,
+        related_name="real_estate",
+        on_delete=models.CASCADE,
+    )
 
     def __str__(self):
         return "{}".format(self.name)
@@ -47,6 +55,14 @@ class Building(models.Model):
 
     area = models.DecimalField(
         verbose_name=_("Area"), max_digits=10, decimal_places=2, blank=True, null=True
+    )
+    location = models.OneToOneField(
+        "Location",
+        verbose_name=_("Location"),
+        null=True,
+        blank=True,
+        related_name="building",
+        on_delete=models.CASCADE,
     )
 
     def __str__(self):
@@ -74,6 +90,26 @@ class Space(models.Model):
     area = models.DecimalField(
         verbose_name=_("Area"), max_digits=10, decimal_places=2, blank=True, null=True
     )
+    location = models.OneToOneField(
+        "Location",
+        verbose_name=_("Location"),
+        null=True,
+        blank=True,
+        related_name="space",
+        on_delete=models.CASCADE,
+    )
 
     def __str__(self):
         return "{} ({})".format(self.name, self.building.name if self.building else "")
+
+
+class Location(models.Model):
+    address_street = models.CharField(
+        verbose_name=_("Address street"), max_length=100, blank=True
+    )
+    address_zip = models.CharField(
+        verbose_name=_("Address zip"), max_length=30, blank=True
+    )
+    address_city = models.CharField(
+        verbose_name=_("Address city"), max_length=100, blank=True
+    )

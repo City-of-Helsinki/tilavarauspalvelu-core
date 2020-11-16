@@ -7,18 +7,47 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Service',
+            name="Service",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255, verbose_name='Name')),
-                ('service_type', models.CharField(choices=[('introduction', 'Introduction'), ('catering', 'Catering'), ('configuration', 'Configuration')], default='introduction', max_length=50, verbose_name='Service type')),
-                ('buffer_time_before', models.DurationField(blank=True, null=True, verbose_name='Buffer time before')),
-                ('buffer_time_after', models.DurationField(blank=True, null=True, verbose_name='Buffer time after')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=255, verbose_name="Name")),
+                (
+                    "service_type",
+                    models.CharField(
+                        choices=[
+                            ("introduction", "Introduction"),
+                            ("catering", "Catering"),
+                            ("configuration", "Configuration"),
+                        ],
+                        default="introduction",
+                        max_length=50,
+                        verbose_name="Service type",
+                    ),
+                ),
+                (
+                    "buffer_time_before",
+                    models.DurationField(
+                        blank=True, null=True, verbose_name="Buffer time before"
+                    ),
+                ),
+                (
+                    "buffer_time_after",
+                    models.DurationField(
+                        blank=True, null=True, verbose_name="Buffer time after"
+                    ),
+                ),
             ],
         ),
     ]

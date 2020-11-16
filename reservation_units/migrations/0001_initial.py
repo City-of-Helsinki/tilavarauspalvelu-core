@@ -10,76 +10,269 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('services', '0001_initial'),
-        ('resources', '0001_initial'),
-        ('spaces', '0001_initial'),
+        ("services", "0001_initial"),
+        ("resources", "0001_initial"),
+        ("spaces", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Day',
+            name="Day",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('weekday', models.IntegerField(choices=[(0, 'Monday'), (1, 'Tuesday'), (2, 'Wednesday'), (3, 'Thursday'), (4, 'Friday'), (5, 'Saturday'), (6, 'Sunday')], verbose_name='Weekday')),
-                ('opens', models.TimeField(blank=True, null=True, verbose_name='Time when opens')),
-                ('closes', models.TimeField(blank=True, null=True, verbose_name='Time when closes')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "weekday",
+                    models.IntegerField(
+                        choices=[
+                            (0, "Monday"),
+                            (1, "Tuesday"),
+                            (2, "Wednesday"),
+                            (3, "Thursday"),
+                            (4, "Friday"),
+                            (5, "Saturday"),
+                            (6, "Sunday"),
+                        ],
+                        verbose_name="Weekday",
+                    ),
+                ),
+                (
+                    "opens",
+                    models.TimeField(
+                        blank=True, null=True, verbose_name="Time when opens"
+                    ),
+                ),
+                (
+                    "closes",
+                    models.TimeField(
+                        blank=True, null=True, verbose_name="Time when closes"
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='ReservationUnit',
+            name="ReservationUnit",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255, verbose_name='Name')),
-                ('require_introduction', models.BooleanField(default=False, verbose_name='Require introduction')),
-                ('resources', models.ManyToManyField(blank=True, related_name='reservation_units', to='resources.Resource', verbose_name='Resources')),
-                ('services', models.ManyToManyField(blank=True, related_name='reservation_units', to='services.Service', verbose_name='Services')),
-                ('spaces', models.ManyToManyField(blank=True, related_name='reservation_units', to='spaces.Space', verbose_name='Spaces')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=255, verbose_name="Name")),
+                (
+                    "require_introduction",
+                    models.BooleanField(
+                        default=False, verbose_name="Require introduction"
+                    ),
+                ),
+                (
+                    "resources",
+                    models.ManyToManyField(
+                        blank=True,
+                        related_name="reservation_units",
+                        to="resources.Resource",
+                        verbose_name="Resources",
+                    ),
+                ),
+                (
+                    "services",
+                    models.ManyToManyField(
+                        blank=True,
+                        related_name="reservation_units",
+                        to="services.Service",
+                        verbose_name="Services",
+                    ),
+                ),
+                (
+                    "spaces",
+                    models.ManyToManyField(
+                        blank=True,
+                        related_name="reservation_units",
+                        to="spaces.Space",
+                        verbose_name="Spaces",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Purpose',
+            name="Purpose",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=200)),
-                ('reservation_unit', models.ManyToManyField(to='reservation_units.ReservationUnit', verbose_name='Purpose')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=200)),
+                (
+                    "reservation_unit",
+                    models.ManyToManyField(
+                        to="reservation_units.ReservationUnit", verbose_name="Purpose"
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Period',
+            name="Period",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('reservation_length_type', models.CharField(choices=[('within_day', 'within day'), ('whole_day', 'whole day'), ('over_night', 'over night')], default='within_day', max_length=16, verbose_name='Reservations length type')),
-                ('start', models.DateField(verbose_name='Start date')),
-                ('end', models.DateField(verbose_name='End date')),
-                ('name', models.CharField(blank=True, default='', max_length=200, verbose_name='Name')),
-                ('description', models.CharField(blank=True, max_length=500, null=True, verbose_name='Description')),
-                ('closed', models.BooleanField(default=False, editable=False, verbose_name='Closed')),
-                ('reservation_unit', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='periods', to='reservation_units.ReservationUnit', verbose_name='Reservation unit')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "reservation_length_type",
+                    models.CharField(
+                        choices=[
+                            ("within_day", "within day"),
+                            ("whole_day", "whole day"),
+                            ("over_night", "over night"),
+                        ],
+                        default="within_day",
+                        max_length=16,
+                        verbose_name="Reservations length type",
+                    ),
+                ),
+                ("start", models.DateField(verbose_name="Start date")),
+                ("end", models.DateField(verbose_name="End date")),
+                (
+                    "name",
+                    models.CharField(
+                        blank=True, default="", max_length=200, verbose_name="Name"
+                    ),
+                ),
+                (
+                    "description",
+                    models.CharField(
+                        blank=True,
+                        max_length=500,
+                        null=True,
+                        verbose_name="Description",
+                    ),
+                ),
+                (
+                    "closed",
+                    models.BooleanField(
+                        default=False, editable=False, verbose_name="Closed"
+                    ),
+                ),
+                (
+                    "reservation_unit",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="periods",
+                        to="reservation_units.ReservationUnit",
+                        verbose_name="Reservation unit",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Introduction',
+            name="Introduction",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('completed_at', models.DateTimeField(verbose_name='Completed at')),
-                ('reservation_unit', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='reservation_units.ReservationUnit', verbose_name='Reservation unit')),
-                ('user', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL, verbose_name='User')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("completed_at", models.DateTimeField(verbose_name="Completed at")),
+                (
+                    "reservation_unit",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="reservation_units.ReservationUnit",
+                        verbose_name="Reservation unit",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="User",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='DayPart',
+            name="DayPart",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('allowed_group', models.CharField(choices=[('allowed_everyone', 'Everyone allowed'), ('allowed_public', 'Public allowed'), ('allowed_staff', 'Staff allowed')], max_length=255)),
-                ('begin', models.TimeField(blank=True, null=True, verbose_name='Begin time of day part')),
-                ('end', models.TimeField(blank=True, null=True, verbose_name='End time of day part')),
-                ('day', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='reservation_units.Day', verbose_name='Day')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "allowed_group",
+                    models.CharField(
+                        choices=[
+                            ("allowed_everyone", "Everyone allowed"),
+                            ("allowed_public", "Public allowed"),
+                            ("allowed_staff", "Staff allowed"),
+                        ],
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "begin",
+                    models.TimeField(
+                        blank=True, null=True, verbose_name="Begin time of day part"
+                    ),
+                ),
+                (
+                    "end",
+                    models.TimeField(
+                        blank=True, null=True, verbose_name="End time of day part"
+                    ),
+                ),
+                (
+                    "day",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="reservation_units.Day",
+                        verbose_name="Day",
+                    ),
+                ),
             ],
         ),
         migrations.AddField(
-            model_name='day',
-            name='period',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='days', to='reservation_units.Period', verbose_name='Period'),
+            model_name="day",
+            name="period",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="days",
+                to="reservation_units.Period",
+                verbose_name="Period",
+            ),
         ),
     ]
