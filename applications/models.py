@@ -12,6 +12,7 @@ from applications.base_models import ContactInformation
 from recurrence.fields import RecurrenceField
 
 from spaces.models import District
+from reservation_units.models import ReservationUnit, Purpose
 
 
 def year_not_in_future(year: Optional[int]):
@@ -83,6 +84,44 @@ class Organisation(models.Model):
     )
 
 
+class ApplicationPeriod(models.Model):
+    name = models.CharField(
+        verbose_name=_("Name"),
+        max_length=255,
+    )
+    reservation_units = models.ManyToManyField(
+        ReservationUnit,
+        verbose_name=_("Reservation units"),
+        related_name="application_periods",
+    )
+
+    application_period_begin = models.DateField(
+        verbose_name=_("Application period begin"),
+    )
+    application_period_end = models.DateField(
+        verbose_name=_("Application period end"),
+    )
+
+    reservation_period_begin = models.DateField(
+        verbose_name=_("Reservation period begin"),
+    )
+    reservation_period_end = models.DateField(
+        verbose_name=_("Reservation period end"),
+    )
+
+    purposes = models.ManyToManyField(
+        Purpose,
+        verbose_name=_("Purposes"),
+        related_name="application_periods",
+        blank=True,
+    )
+
+    def __str__(self):
+        return "{} ({} - {})".format(
+            self.name, self.reservation_period_begin, self.reservation_period_end
+        )
+
+
 class Application(models.Model):
 
     description = models.fields.TextField(
@@ -116,6 +155,14 @@ class Application(models.Model):
     user = models.ForeignKey(
         User,
         verbose_name=_("Applicant"),
+        null=False,
+        blank=False,
+        on_delete=models.PROTECT,
+    )
+
+    application_period = models.ForeignKey(
+        ApplicationPeriod,
+        verbose_name=_("Applicantion period"),
         null=False,
         blank=False,
         on_delete=models.PROTECT,
