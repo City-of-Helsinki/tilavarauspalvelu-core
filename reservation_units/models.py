@@ -1,5 +1,5 @@
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import User
 from django.apps import apps
 
@@ -43,7 +43,7 @@ class ReservationUnit(models.Model):
         from reservations.models import Reservation
 
         reservation_units_with_same_components = ReservationUnit.objects.filter(
-            Q(resources=self.resources.all()) | Q(spaces__in=self.spaces.all())
+            Q(resources__in=self.resources.all()) | Q(spaces__in=self.spaces.all())
         )
 
         return Reservation.objects.filter(

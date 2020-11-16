@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "reservations",
     "services",
     "reservation_units",
+    "api",
     "django_extensions",
 ]
 
@@ -137,6 +138,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = "/static/"
+
+GRAPHENE = {"SCHEMA": "api.graphql.schema.schema"}
 
 # local_settings.py can be used to override environment-specific settings
 # like database and email that differ between development and production.
