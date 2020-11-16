@@ -7,32 +7,76 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('spaces', '0001_initial'),
+        ("spaces", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Location',
+            name="Location",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('address_street', models.CharField(blank=True, max_length=100, verbose_name='Address street')),
-                ('address_zip', models.CharField(blank=True, max_length=30, verbose_name='Address zip')),
-                ('address_city', models.CharField(blank=True, max_length=100, verbose_name='Address city')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "address_street",
+                    models.CharField(
+                        blank=True, max_length=100, verbose_name="Address street"
+                    ),
+                ),
+                (
+                    "address_zip",
+                    models.CharField(
+                        blank=True, max_length=30, verbose_name="Address zip"
+                    ),
+                ),
+                (
+                    "address_city",
+                    models.CharField(
+                        blank=True, max_length=100, verbose_name="Address city"
+                    ),
+                ),
             ],
         ),
         migrations.AddField(
-            model_name='building',
-            name='location',
-            field=models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='building', to='spaces.Location', verbose_name='Location'),
+            model_name="building",
+            name="location",
+            field=models.OneToOneField(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="building",
+                to="spaces.Location",
+                verbose_name="Location",
+            ),
         ),
         migrations.AddField(
-            model_name='realestate',
-            name='location',
-            field=models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='real_estate', to='spaces.Location', verbose_name='Location'),
+            model_name="realestate",
+            name="location",
+            field=models.OneToOneField(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="real_estate",
+                to="spaces.Location",
+                verbose_name="Location",
+            ),
         ),
         migrations.AddField(
-            model_name='space',
-            name='location',
-            field=models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='space', to='spaces.Location', verbose_name='Location'),
+            model_name="space",
+            name="location",
+            field=models.OneToOneField(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="space",
+                to="spaces.Location",
+                verbose_name="Location",
+            ),
         ),
     ]
