@@ -20,7 +20,7 @@ jobs:
         with:
           python-version: 3.8
       - name: psycopg2 prerequisites
-        run: apt install python-dev libpq-dev -y
+        run: sudo apt install python-dev libpq-dev -y
       - name: Install dependencies
         run: |
           python3 -m pip install --upgrade pip
