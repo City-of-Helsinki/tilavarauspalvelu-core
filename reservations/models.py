@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import User
 
+from applications.models import Application
 from spaces.models import Space
 from resources.models import Resource
 from services.models import Service
@@ -10,12 +11,55 @@ from reservation_units.models import ReservationUnit, Purpose
 Q = models.Q
 
 
+class AgeGroup(models.Model):
+
+    minimum = models.fields.PositiveIntegerField(
+        verbose_name=_("Number of persons"), null=False, blank=False
+    )
+
+    maximum = models.fields.PositiveIntegerField(
+        verbose_name=_("Number of persons"), null=True, blank=True
+    )
+
+
+class AbilityGroup(models.Model):
+
+    name = models.fields.TextField(
+        verbose_name=_("Name"), null=False, blank=False, unique=True
+    )
+
+
 class RecurringReservation(models.Model):
     user = models.ForeignKey(
         User,
         verbose_name=_("User"),
         on_delete=models.SET_NULL,
         null=True,
+    )
+
+    application = models.ForeignKey(
+        Application,
+        verbose_name=_("Application"),
+        related_name="recurring_reservation",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+    )
+
+    age_group = models.ForeignKey(
+        AgeGroup,
+        verbose_name=_("Age group"),
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+    )
+
+    ability_group = models.ForeignKey(
+        AbilityGroup,
+        verbose_name=_("Ability group"),
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
     )
 
 
@@ -79,6 +123,10 @@ class Reservation(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
+    )
+
+    num_persons = models.fields.PositiveIntegerField(
+        verbose_name=_("Number of persons"), null=True, blank=True
     )
 
 
