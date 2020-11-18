@@ -2,7 +2,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import User
 
-from applications.models import Application
+from applications.models import Application, PRIORITIES
 from spaces.models import Space
 from resources.models import Resource
 from services.models import Service
@@ -84,17 +84,9 @@ class Reservation(models.Model):
         max_length=32, choices=STATE_CHOICES, verbose_name=_("State"), default=CREATED
     )
 
-    PRIORITY_LOW = 100
-    PRIORITY_MEDIUM = 200
-    PRIORITY_HIGH = 300
-
-    PRIORITY_CHOICES = (
-        (PRIORITY_LOW, _("Low")),
-        (PRIORITY_MEDIUM, _("Medium")),
-        (PRIORITY_HIGH, _("High")),
+    priority = models.IntegerField(
+        choices=PRIORITIES.PRIORITY_CHOICES, default=PRIORITIES.PRIORITY_MEDIUM
     )
-
-    priority = models.IntegerField(choices=PRIORITY_CHOICES, default=PRIORITY_MEDIUM)
 
     user = models.ForeignKey(
         User,
