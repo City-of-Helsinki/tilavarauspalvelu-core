@@ -9,6 +9,10 @@ from rest_framework.exceptions import ValidationError
 
 from applications.base_models import ContactInformation
 
+from recurrence.fields import RecurrenceField
+
+from spaces.models import District
+
 
 def year_not_in_future(year: Optional[int]):
     if year is None:
@@ -115,4 +119,79 @@ class Application(models.Model):
         null=False,
         blank=False,
         on_delete=models.PROTECT,
+    )
+
+
+class ApplicationEvent(models.Model):
+
+    num_persons = models.PositiveIntegerField(
+        verbose_name=_("Number of persons"),
+        null=True,
+        blank=True,
+    )
+
+    age_group = models.ForeignKey(
+        verbose_name=_("Age group"),
+        to="reservations.AgeGroup",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+    )
+
+    ability_group = models.ForeignKey(
+        verbose_name=_("Ability group"),
+        to="reservations.AbilityGroup",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+    )
+
+    num_events = models.PositiveIntegerField(
+        verbose_name=_("Number of events"), null=False, blank=False
+    )
+
+    duration = models.DurationField(verbose_name=_("Duration"), null=False, blank=False)
+
+    application = models.ForeignKey(
+        Application,
+        verbose_name=_("Application"),
+        on_delete=models.CASCADE,
+        null=False,
+        related_name="application_events",
+    )
+
+    district = models.ForeignKey(
+        District, verbose_name="Area", on_delete=models.SET_NULL, null=True, blank=True
+    )
+
+
+class PRIORITY_CONST(object):
+    __slots__ = ()
+
+    PRIORITY_LOW = 100
+    PRIORITY_MEDIUM = 200
+    PRIORITY_HIGH = 300
+    PRIORITY_CHOICES = (
+        (PRIORITY_LOW, _("Low")),
+        (PRIORITY_MEDIUM, _("Medium")),
+        (PRIORITY_HIGH, _("High")),
+    )
+
+
+PRIORITIES = PRIORITY_CONST()
+
+
+class Recurrence(models.Model):
+    recurrence = RecurrenceField()
+
+    priority = models.IntegerField(
+        choices=PRIORITIES.PRIORITY_CHOICES, default=PRIORITIES.PRIORITY_MEDIUM
+    )
+
+    application_event = models.ForeignKey(
+        ApplicationEvent,
+        null=False,
+        blank=False,
+        on_delete=models.CASCADE,
+        related_name="recurrences",
     )

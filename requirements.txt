@@ -7,8 +7,8 @@ click==7.1.2
 Django==3.0.10
 django-environ==0.4.5
 django-extensions==3.0.9
+django-recurrence==1.10.3
 djangorestframework==3.11.1
-django-environ==0.4.5
 flake8==3.8.4
 graphene==2.1.8
 graphene-django==2.13.0
@@ -30,6 +30,8 @@ pydot==1.4.1
 pyflakes==2.2.0
 pyparsing==2.4.7
 pytest==6.1.2
+pytest-django==4.1.0
+python-dateutil==2.8.1
 pytz==2020.1
 regex==2020.10.28
 Rx==1.6.1
@@ -40,6 +42,4 @@ toml==0.10.1
 typed-ast==1.4.1
 typing-extensions==3.7.4.3
 Unidecode==1.1.1
-pytest==6.1.2
-pytest-django==4.1.0
 zipp==3.4.0
