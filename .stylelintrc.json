@@ -1,0 +1,14 @@
+{
+  "extends": "stylelint-config-standard",
+  "plugins": ["stylelint-value-no-unknown-custom-properties"],
+  "rules": {
+    "csstools/value-no-unknown-custom-properties": [
+      true,
+      {
+        "importFrom": [
+          "node_modules/hds-core/lib/base.css"
+        ]
+      }
+    ]
+  }
+}
