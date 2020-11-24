@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import './App.css';
-import Home from './frontpage/Home';
+import Home from './home/Home';
 import PageWrapper from './component/PageWrapper';
 
 function App(): JSX.Element {
