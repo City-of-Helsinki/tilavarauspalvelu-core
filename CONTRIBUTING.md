@@ -11,6 +11,7 @@ Name your branches in format {jira_issue_code}/{short_description}. Eg. `TILA-74
 5. After PR has been approved and CI-pipeline has passed it can be merged to develop by anyone.
 
 ## Unit tests
+To guarantee that software is working as it supposed to, we obey the following unit testing principles. These principles are based on [Helsinki Testing requirements](https://dev.hel.fi/testing-requirements).
 
 - By default, everything should be unit tested. We use `pytest` for unit testing.
 - Single unit test should only cover a single feature/function/method. When a test breaks, it should be as obvious as possible to detect where the problem lies.
