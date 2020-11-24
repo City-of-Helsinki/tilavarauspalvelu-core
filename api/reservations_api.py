@@ -1,10 +1,17 @@
 from rest_framework import viewsets, serializers
-from rest_framework import serializers
 from reservations.models import Reservation
+from reservation_units.models import ReservationUnit
 from .reservation_units_api import ReservationUnitSerializer
+from drf_extra_fields.relations import PresentablePrimaryKeyRelatedField
 
 
 class ReservationSerializer(serializers.ModelSerializer):
+    reservation_unit = PresentablePrimaryKeyRelatedField(
+        presentation_serializer=ReservationUnitSerializer,
+        many=True,
+        queryset=ReservationUnit.objects.all(),
+    )
+
     class Meta:
         model = Reservation
         fields = [
