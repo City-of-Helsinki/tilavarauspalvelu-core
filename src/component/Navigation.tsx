@@ -21,10 +21,10 @@ export default (): JSX.Element => {
     <Navigation
       theme={{
         '--header-background-color':
-          'var(--tilanvaraus-header-background-color)',
-        '--header-color': 'var(--tilanvaraus-header-color)',
+          'var(--tilavaraus-header-background-color)',
+        '--header-color': 'var(--tilavaraus-header-color)',
       }}
-      title="Tilanvarauskäsittely"
+      title="Tilavarauskäsittely"
       menuToggleAriaLabel="Menu"
       skipTo="#main"
       skipToContentLabel="Siirry pääsisältöön">

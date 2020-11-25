@@ -10,11 +10,11 @@ body,
 }
 
 html {
-  background-color: var(--tilanvaraus-background-color);
+  background-color: var(--tilavaraus-background-color);
 }
 
 body {
-  color: var(--tilanvaraus-content-text-color);
+  color: var(--tilavaraus-content-text-color);
   font-family: var(--font-default);
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
