@@ -1,6 +1,9 @@
-# Getting Started with Create React App
-
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+
+## Prerequisites
+
+1. Node lts/fermium (```nvm use```)
+1. Yarn
 
 ## Available Scripts
 
