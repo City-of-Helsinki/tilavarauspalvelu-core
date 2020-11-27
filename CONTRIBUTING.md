@@ -16,3 +16,13 @@ To keep serializers consistent, we obey the following principles. These principl
 - By default, define relations in `fields = []` Meta attribute, which uses `PrimaryKeyRelatedField`.
 - If you need to represent relations as nested objects, use `PresentablePrimaryKeyRelatedField`, which is from `drf-extra-fields` library. This represents relations as nested objects when reading, and uses foreign key when writing.
 - Do not create nested writing operations
+
+## Testing
+To guarantee that software is working as it supposed to, we obey the following testing principles. These principles are based on [Helsinki Testing requirements](https://dev.hel.fi/testing-requirements).
+
+- By default, everything should be tested. We use `pytest` for testing.
+- Single unit test should only cover a single feature/function/method. When a test breaks, it should be as obvious as possible to detect where the problem lies.
+- Use clear and descriptive naming, such as `test_authenticated_user_can_make_reservation` or `test_order_cannot_be_modified`.
+- Readability is important. Avoid loops in tests.
+- Tests are located under their respective apps, for example tests for Space-models should be in `spaces/tests.py`. API-related tests are under `api` application, postfixed by related endpoint, such as `api/test_reservation_api.py`.
+- Abstract reusable test data in fixtures (`conftest.py`). Sometimes creating or manipulating objects during a test is necessary, but if the data could be used in another test, put it in fixtures.
