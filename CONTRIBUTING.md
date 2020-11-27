@@ -9,3 +9,13 @@ Name your branches in format {jira_issue_code}/{short_description}. Eg. `TILA-74
 3. Always write a description for your pull request unless the title already describes the PR unambiguously.
 4. Select other active developers of the project as reviewers for your pull request. At least 1 approving review is required for a PR before merge.
 5. After PR has been approved and CI-pipeline has passed it can be merged to develop by anyone.
+
+## Testing
+To guarantee that software is working as it supposed to, we obey the following testing principles. These principles are based on [Helsinki Testing requirements](https://dev.hel.fi/testing-requirements).
+
+- By default, everything should be tested. We use `pytest` for testing.
+- Single unit test should only cover a single feature/function/method. When a test breaks, it should be as obvious as possible to detect where the problem lies.
+- Use clear and descriptive naming, such as `test_authenticated_user_can_make_reservation` or `test_order_cannot_be_modified`.
+- Readability is important. Avoid loops in tests.
+- Tests are located under their respective apps, for example tests for Space-models should be in `spaces/tests.py`. API-related tests are under `api` application, postfixed by related endpoint, such as `api/test_reservation_api.py`.
+- Abstract reusable test data in fixtures (`conftest.py`). Sometimes creating or manipulating objects during a test is necessary, but if the data could be used in another test, put it in fixtures.
