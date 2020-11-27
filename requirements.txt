@@ -43,3 +43,4 @@ typed-ast==1.4.1
 typing-extensions==3.7.4.3
 Unidecode==1.1.1
 zipp==3.4.0
+django-extra-fields==3.0.2

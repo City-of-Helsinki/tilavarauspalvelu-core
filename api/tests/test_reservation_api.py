@@ -1,4 +1,3 @@
-from api.tests.conftest import valid_reservation_data
 import pytest
 import datetime
 from django.urls import reverse
