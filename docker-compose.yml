@@ -1,30 +1,46 @@
-version: '3'
+version: '3.7'
+
 services:
-  db:
-    container_name: tilanvarauspalvelu-db
-    build: ./docker/postgres/
-    restart: on-failure
-    environment:
-      POSTGRES_USER: tvp
-      POSTGRES_PASSWORD: tvp
-      POSTGRES_DB: tvp
-    volumes:
-      - db_data:/var/lib/postgresql/data
-  api:
-    container_name: tilanvarauspalvelu
-    build:
-      context: ./
-      dockerfile: ./docker/api/Dockerfile
-    command: python manage.py runserver 0:8000
-    volumes:
-      - .:/usr/src/app
-    environment:
-      - DEBUG=1
-      - DATABASE_URL=postgis://tvp:tvp@db/tvp
-    ports:
-      - "8000:8000"
-    depends_on:
-      - db
+
+    db:
+        image: "postgis/postgis:11-3.0-alpine"
+        environment:
+            POSTGRES_USER: tvp
+            POSTGRES_PASSWORD: tvp
+            POSTGRES_DB: tvp
+        ports:
+            - "127.0.0.1:5555:5432"
+        volumes:
+            - postgres-data-volume:/var/lib/postgresql/data
+
+    dev:
+        image: tilavarauspalvelu_dev
+        depends_on:
+            - db
+        build:
+            context: ./
+            dockerfile: ./Dockerfile
+            target: development
+        environment:
+            - DEBUG=true
+            - DATABASE_URL=postgis://tvp:tvp@db/tvp
+            - WAIT_FOR_IT_ADDRESS=postgres:5432
+        command: ["start_django_development_server"]
+        ports:
+            - "127.0.0.1:8000:8000"
+
+    deploy:
+        image: tilavarauspalvelu
+        build:
+            context: ./
+            dockerfile: ./Dockerfile
+            target: production
+        command: "e echo Not running deploy image from compose"
+
 
 volumes:
-    db_data:
+        postgres-data-volume:
+
+networks:
+    default:
+        name: helsinki

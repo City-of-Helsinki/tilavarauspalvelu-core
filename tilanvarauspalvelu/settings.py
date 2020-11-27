@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
+    "whitenoise.runserver_nostatic",
     "django.contrib.staticfiles",
     "graphene_django",
     "rest_framework",
@@ -59,6 +60,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = "tilanvarauspalvelu.urls"
@@ -82,7 +84,10 @@ TEMPLATES = [
 WSGI_APPLICATION = "tilanvarauspalvelu.wsgi.application"
 
 
-env = environ.Env(DEBUG=(bool, False))
+root = environ.Path(__file__)
+
+env = environ.Env(DEBUG=(bool, False),
+                  STATIC_ROOT=(environ.Path(), root("static")))
 environ.Env.read_env()
 
 # Database
@@ -97,7 +102,7 @@ if "DATABASE_URL" in os.environ:
     database = env.db()
 
 DATABASES = {"default": database}
-
+STATIC_ROOT = env("STATIC_ROOT")
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
@@ -134,7 +139,6 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
-
 STATIC_URL = "/static/"
 
 GRAPHENE = {"SCHEMA": "api.graphql.schema.schema"}
