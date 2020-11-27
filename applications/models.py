@@ -22,7 +22,7 @@ def year_not_in_future(year: Optional[int]):
     current_date = datetime.datetime.now()
 
     if current_date.year < year:
-        msg = _("is before current year")
+        msg = _("is after current year")
         raise ValidationError(format_lazy("{year} {msg}", year=year, msg=msg))
 
 
@@ -70,13 +70,11 @@ class Organisation(models.Model):
         unique=True,
     )
 
-    year_established = (
-        models.PositiveIntegerField(
-            verbose_name=_("Year established"),
-            validators=[year_not_in_future],
-            null=True,
-            blank=True,
-        ),
+    year_established = models.PositiveIntegerField(
+        verbose_name=_("Year established"),
+        validators=[year_not_in_future],
+        null=True,
+        blank=True,
     )
 
     address = models.ForeignKey(
