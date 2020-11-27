@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     "api",
     "applications",
     "django_extensions",
+    "mptt",
 ]
 
 MIDDLEWARE = [

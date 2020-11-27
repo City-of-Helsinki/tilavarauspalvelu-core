@@ -1,8 +1,9 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from mptt.models import MPTTModel, TreeForeignKey
 
 
-class District(models.Model):
+class District(MPTTModel):
     TYPE_MAJOR_DISTRICT = "major_district"
     TYPE_DISTRICT = "district"
     TYPE_SUB_DISTRICT = "sub_district"
@@ -22,7 +23,7 @@ class District(models.Model):
         default=TYPE_DISTRICT,
     )
     name = models.CharField(verbose_name=_("Name"), max_length=255)
-    parent = models.ForeignKey(
+    parent = TreeForeignKey(
         "self",
         verbose_name=_("Parent"),
         on_delete=models.SET_NULL,
@@ -106,9 +107,9 @@ class Building(models.Model):
         return "{}".format(self.name)
 
 
-class Space(models.Model):
+class Space(MPTTModel):
     name = models.CharField(verbose_name=_("Name"), max_length=255)
-    parent = models.ForeignKey(
+    parent = TreeForeignKey(
         "self",
         verbose_name=_("Parent space"),
         related_name="children",
