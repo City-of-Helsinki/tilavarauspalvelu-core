@@ -20,11 +20,10 @@ jobs:
       uses: actions/setup-node@v2-beta
       with:
         node-version: '14'
-    - name: Install dependencies
-      run: yarn install --frozen-lockfile
-    - name: Lint application
-      run: yarn lint
-    - name: Build application
-      run: yarn build
-    - name: Run tests
-      run: yarn test
+    - name: Run CI checks
+      run: |
+        yarn install --frozen-lockfile
+        yarn lint
+        yarn build
+        yarn test
+        docker build -t tilavaraus-ui .
