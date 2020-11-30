@@ -7,18 +7,25 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('applications', '0003_application_periods'),
+        ("applications", "0003_application_periods"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='organisation',
-            name='year_established',
-            field=models.PositiveIntegerField(blank=True, null=True, validators=[applications.models.year_not_in_future], verbose_name='Year established'),
+            model_name="organisation",
+            name="year_established",
+            field=models.PositiveIntegerField(
+                blank=True,
+                null=True,
+                validators=[applications.models.year_not_in_future],
+                verbose_name="Year established",
+            ),
         ),
         migrations.AlterField(
-            model_name='organisation',
-            name='identifier',
-            field=models.TextField(max_length=255, unique=True, verbose_name='Organisation identifier'),
+            model_name="organisation",
+            name="identifier",
+            field=models.TextField(
+                max_length=255, unique=True, verbose_name="Organisation identifier"
+            ),
         ),
     ]

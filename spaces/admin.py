@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import District, Building, Space
+
+from .models import Building, District, Space
 
 
 @admin.register(District)

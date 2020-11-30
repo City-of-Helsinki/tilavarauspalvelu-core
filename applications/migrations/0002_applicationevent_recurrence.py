@@ -8,32 +8,104 @@ import recurrence.fields
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('reservations', '0002_add_recurring_reservation_fields'),
-        ('spaces', '0003_hierarchy_and_type_for_districts'),
-        ('applications', '0001_initial'),
+        ("reservations", "0002_add_recurring_reservation_fields"),
+        ("spaces", "0003_hierarchy_and_type_for_districts"),
+        ("applications", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='ApplicationEvent',
+            name="ApplicationEvent",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('num_persons', models.PositiveIntegerField(blank=True, null=True, verbose_name='Number of persons')),
-                ('num_events', models.PositiveIntegerField(verbose_name='Number of events')),
-                ('duration', models.DurationField(verbose_name='Duration')),
-                ('ability_group', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='reservations.AbilityGroup', verbose_name='Ability group')),
-                ('age_group', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='reservations.AgeGroup', verbose_name='Age group')),
-                ('application', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='application_events', to='applications.Application', verbose_name='Application')),
-                ('district', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='spaces.District', verbose_name='Area')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "num_persons",
+                    models.PositiveIntegerField(
+                        blank=True, null=True, verbose_name="Number of persons"
+                    ),
+                ),
+                (
+                    "num_events",
+                    models.PositiveIntegerField(verbose_name="Number of events"),
+                ),
+                ("duration", models.DurationField(verbose_name="Duration")),
+                (
+                    "ability_group",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to="reservations.AbilityGroup",
+                        verbose_name="Ability group",
+                    ),
+                ),
+                (
+                    "age_group",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to="reservations.AgeGroup",
+                        verbose_name="Age group",
+                    ),
+                ),
+                (
+                    "application",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="application_events",
+                        to="applications.Application",
+                        verbose_name="Application",
+                    ),
+                ),
+                (
+                    "district",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to="spaces.District",
+                        verbose_name="Area",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Recurrence',
+            name="Recurrence",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('recurrence', recurrence.fields.RecurrenceField()),
-                ('priority', models.IntegerField(choices=[(100, 'Low'), (200, 'Medium'), (300, 'High')], default=200)),
-                ('application_event', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='recurrences', to='applications.ApplicationEvent')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("recurrence", recurrence.fields.RecurrenceField()),
+                (
+                    "priority",
+                    models.IntegerField(
+                        choices=[(100, "Low"), (200, "Medium"), (300, "High")],
+                        default=200,
+                    ),
+                ),
+                (
+                    "application_event",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="recurrences",
+                        to="applications.ApplicationEvent",
+                    ),
+                ),
             ],
         ),
     ]

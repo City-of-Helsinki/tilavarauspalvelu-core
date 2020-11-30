@@ -1,15 +1,13 @@
-from rest_framework.serializers import Serializer
-from services.models import Service
 import graphene
 from graphene_django import DjangoObjectType
 from graphene_django.forms.mutation import DjangoModelFormMutation
 
 from reservation_units.models import ReservationUnit
-from spaces.models import Space, Building, District, RealEstate
-from resources.models import Resource
-from reservations.models import Reservation
 from reservations.forms import ReservationForm
-from api.reservations_api import ReservationSerializer
+from reservations.models import Reservation
+from resources.models import Resource
+from services.models import Service
+from spaces.models import Building, District, RealEstate, Space
 
 
 class ServiceType(DjangoObjectType):

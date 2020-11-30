@@ -9,6 +9,7 @@ This repository contains core of the new reservation platform for city of Helsin
 
 ## Installation with docker
 
-`docker-compose up --build`
+`docker-compose up`
+
 
 ![Tietokantakuvaus](tilanvarauspalvelu_visualized.png)

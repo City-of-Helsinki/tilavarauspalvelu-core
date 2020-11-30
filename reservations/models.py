@@ -1,12 +1,9 @@
+from django.contrib.auth.models import User
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from django.contrib.auth.models import User
 
-from applications.models import Application, PRIORITIES
-from spaces.models import Space
-from resources.models import Resource
-from services.models import Service
-from reservation_units.models import ReservationUnit, Purpose
+from applications.models import PRIORITIES, Application
+from reservation_units.models import Purpose, ReservationUnit
 
 Q = models.Q
 

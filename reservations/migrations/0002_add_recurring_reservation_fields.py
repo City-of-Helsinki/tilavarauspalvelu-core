@@ -7,44 +7,89 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('applications', '0001_initial'),
-        ('reservations', '0001_initial'),
+        ("applications", "0001_initial"),
+        ("reservations", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='AbilityGroup',
+            name="AbilityGroup",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.TextField(unique=True, verbose_name='Name')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.TextField(unique=True, verbose_name="Name")),
             ],
         ),
         migrations.CreateModel(
-            name='AgeGroup',
+            name="AgeGroup",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('minimum', models.PositiveIntegerField(verbose_name='Number of persons')),
-                ('maximum', models.PositiveIntegerField(blank=True, null=True, verbose_name='Number of persons')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "minimum",
+                    models.PositiveIntegerField(verbose_name="Number of persons"),
+                ),
+                (
+                    "maximum",
+                    models.PositiveIntegerField(
+                        blank=True, null=True, verbose_name="Number of persons"
+                    ),
+                ),
             ],
         ),
         migrations.AddField(
-            model_name='recurringreservation',
-            name='application',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='recurring_reservation', to='applications.Application', verbose_name='Application'),
+            model_name="recurringreservation",
+            name="application",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="recurring_reservation",
+                to="applications.Application",
+                verbose_name="Application",
+            ),
         ),
         migrations.AddField(
-            model_name='reservation',
-            name='num_persons',
-            field=models.PositiveIntegerField(blank=True, null=True, verbose_name='Number of persons'),
+            model_name="reservation",
+            name="num_persons",
+            field=models.PositiveIntegerField(
+                blank=True, null=True, verbose_name="Number of persons"
+            ),
         ),
         migrations.AddField(
-            model_name='recurringreservation',
-            name='ability_group',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='reservations.AbilityGroup', verbose_name='Ability group'),
+            model_name="recurringreservation",
+            name="ability_group",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to="reservations.AbilityGroup",
+                verbose_name="Ability group",
+            ),
         ),
         migrations.AddField(
-            model_name='recurringreservation',
-            name='age_group',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='reservations.AgeGroup', verbose_name='Age group'),
+            model_name="recurringreservation",
+            name="age_group",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to="reservations.AgeGroup",
+                verbose_name="Age group",
+            ),
         ),
     ]

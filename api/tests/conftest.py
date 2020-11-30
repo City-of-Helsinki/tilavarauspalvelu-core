@@ -1,8 +1,8 @@
-import pytest
 import datetime
-from rest_framework.test import APIClient
 
+import pytest
 from django.contrib.auth import get_user_model
+from rest_framework.test import APIClient
 
 from reservation_units.models import ReservationUnit
 from reservations.models import Reservation
