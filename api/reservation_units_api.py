@@ -1,6 +1,6 @@
 from rest_framework import viewsets
 from reservation_units.models import ReservationUnit, Purpose
-from applications.models import ApplicationPeriod
+from applications.models import ApplicationPeriod, Purpose
 from rest_framework import serializers
 from api.space_api import SpaceSerializer
 from api.resources_api import ResourceSerializer
@@ -46,3 +46,17 @@ class ReservationUnitViewSet(viewsets.ModelViewSet):
             "spaces", "resources", "services"
         )
         return qs
+
+
+class PurposeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Purpose
+        fields = [
+            "id",
+            "name",
+        ]
+
+
+class PurposeViewSet(viewsets.ModelViewSet):
+    serializer_class = PurposeSerializer
+    queryset = Purpose.objects.all()

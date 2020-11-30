@@ -9,7 +9,7 @@ from .applications_api import (
     PersonViewSet,
 )
 from .reservations_api import ReservationViewSet
-from .reservation_units_api import ReservationUnitViewSet
+from .reservation_units_api import PurposeViewSet, ReservationUnitViewSet
 from .space_api import SpaceViewSet
 from .services_api import ServiceViewSet
 from .resources_api import ResourceViewSet
@@ -25,3 +25,4 @@ router.register(r"applicationevents", ApplicationEventViewSet, "applicationevent
 router.register(r"organisations", OrganisationViewSet, "organisation")
 router.register(r"addresses", AddressViewSet, "address")
 router.register(r"persons", PersonViewSet, "person")
+router.register(r"purposes", PurposeViewSet, "purpose")
