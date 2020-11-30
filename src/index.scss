@@ -1,6 +1,6 @@
 @import '~hds-core/lib/base.css';
 @import 'font';
-@import 'variables';
+@import './variables';
 
 html,
 body,
@@ -9,12 +9,10 @@ body,
   margin: 0;
 }
 
-html {
-  background-color: var(--tilavaraus-background-color);
-}
-
 body {
-  color: var(--tilavaraus-content-text-color);
+  display: flex;
+  flex-direction: column;
+  background-color: var(--tilavaraus-background-color);
   font-family: var(--font-default);
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
@@ -22,9 +20,9 @@ body {
 
 #root {
   padding: 0;
-  display: flex;
   flex-direction: row;
   justify-content: center;
+
 }
 
 h1,
