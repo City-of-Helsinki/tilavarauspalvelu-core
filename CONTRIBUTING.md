@@ -26,3 +26,6 @@ To guarantee that software is working as it supposed to, we obey the following t
 - Readability is important. Avoid loops in tests.
 - Tests are located under their respective apps, for example tests for Space-models should be in `spaces/tests.py`. API-related tests are under `api` application, postfixed by related endpoint, such as `api/test_reservation_api.py`.
 - Abstract reusable test data in fixtures (`conftest.py`). Sometimes creating or manipulating objects during a test is necessary, but if the data could be used in another test, put it in fixtures.
+
+## Branches
+Format your code with format.sh script to conform to style checks, and fix possible flake8 errors in your code. 
