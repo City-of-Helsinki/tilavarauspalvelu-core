@@ -1,18 +1,13 @@
 .mainLayout {
   display: flex;
   flex-direction: row;
-  height: 100%;
   background-color: white;
-}
-
-.page {
-  max-width: 1440px;
-  height: 100%;
-  flex-grow: 1;
+  justify-content: center;
 }
 
 .main {
-  height: 100%;
+  flex-grow: 1;
+  max-width: 1440px;
   margin: 1rem 3rem;
   width: 100%;
 }

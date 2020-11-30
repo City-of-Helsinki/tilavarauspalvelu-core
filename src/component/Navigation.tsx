@@ -26,7 +26,7 @@ export default (): JSX.Element => {
           'var(--tilavaraus-header-background-color)',
         '--header-color': 'var(--tilavaraus-header-color)',
       }}
-      title={t('navigation.applicationName')}
+      title={t('common.applicationName')}
       menuToggleAriaLabel="Menu"
       skipTo="#main"
       skipToContentLabel={t('navigation.skipToMainContent')}>
