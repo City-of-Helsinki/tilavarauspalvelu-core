@@ -34,3 +34,23 @@ def test_reservation_unit_purpose_filter(
     filtered_response = user_api_client.get(url_with_filter)
     assert filtered_response.status_code == 200
     assert len(filtered_response.data) == 2
+
+
+@pytest.mark.django_db
+def test_reservation_unit_application_period_filter(
+    user_api_client, reservation_unit, reservation_unit2, application_period
+):
+    # GET without query paremeters should return all (2) reservation units
+    reservation_unit.application_periods.set([application_period])
+    response = user_api_client.get(reverse("reservationunit-list"))
+    assert response.status_code == 200
+    assert len(response.data) == 2
+
+    # GET with application_period pk as a query paremeter should return one reservation unit
+    url = (
+        f"{reverse('reservationunit-list')}?application_period={application_period.pk}"
+    )
+    response = user_api_client.get(url)
+    assert response.status_code == 200
+    assert len(response.data) == 1
+    assert response.data[0]["name"] == reservation_unit.name

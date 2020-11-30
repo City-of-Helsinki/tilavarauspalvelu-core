@@ -1,5 +1,6 @@
 from rest_framework import viewsets
 from reservation_units.models import ReservationUnit, Purpose
+from applications.models import ApplicationPeriod
 from rest_framework import serializers
 from api.space_api import SpaceSerializer
 from api.resources_api import ResourceSerializer
@@ -10,6 +11,9 @@ from django_filters import rest_framework as filters
 class ReservationUnitFilter(filters.FilterSet):
     purpose = filters.ModelMultipleChoiceFilter(
         field_name="purposes", queryset=Purpose.objects.all()
+    )
+    application_period = filters.ModelMultipleChoiceFilter(
+        field_name="application_periods", queryset=ApplicationPeriod.objects.all()
     )
 
 

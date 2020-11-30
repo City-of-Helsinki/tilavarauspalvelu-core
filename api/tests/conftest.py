@@ -7,6 +7,7 @@ from django.contrib.auth import get_user_model
 from reservation_units.models import ReservationUnit, Purpose
 from reservations.models import Reservation
 from resources.models import Resource
+from applications.models import ApplicationPeriod
 
 
 @pytest.mark.django_db
@@ -84,3 +85,14 @@ def purpose():
 @pytest.fixture
 def purpose2():
     return Purpose.objects.create(name="bar")
+
+
+@pytest.fixture
+def application_period():
+    return ApplicationPeriod.objects.create(
+        name="Hakemuskausi",
+        application_period_begin=datetime.datetime(2020, 11, 1),
+        application_period_end=datetime.datetime(2020, 12, 1),
+        reservation_period_begin=datetime.datetime(2020, 11, 1),
+        reservation_period_end=datetime.datetime(2020, 12, 1),
+    )
