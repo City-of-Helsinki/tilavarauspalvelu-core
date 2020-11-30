@@ -4,7 +4,7 @@ from rest_framework.test import APIClient
 
 from django.contrib.auth import get_user_model
 
-from reservation_units.models import ReservationUnit
+from reservation_units.models import ReservationUnit, Purpose
 from reservations.models import Reservation
 from resources.models import Resource
 
@@ -47,6 +47,15 @@ def reservation_unit(resource):
 
 
 @pytest.fixture
+def reservation_unit2(resource):
+    reservation_unit = ReservationUnit.objects.create(
+        name="testi2", require_introduction=False
+    )
+    reservation_unit.resources.set([resource])
+    return reservation_unit
+
+
+@pytest.fixture
 def reservation(reservation_unit):
     begin_time = datetime.datetime(2020, 12, 1)
     end_time = begin_time + datetime.timedelta(hours=1)
@@ -65,3 +74,13 @@ def valid_reservation_data(reservation_unit):
         "buffer_time_after": "10",
         "reservation_unit": [reservation_unit.id],
     }
+
+
+@pytest.fixture
+def purpose():
+    return Purpose.objects.create(name="foo")
+
+
+@pytest.fixture
+def purpose2():
+    return Purpose.objects.create(name="bar")
