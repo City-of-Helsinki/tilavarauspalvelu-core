@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Navigation } from 'hds-react';
+import { useTranslation } from 'react-i18next';
 
 export default (): JSX.Element => {
   interface LanguageOption {
@@ -14,6 +15,7 @@ export default (): JSX.Element => {
   ];
 
   const [language, setLanguage] = useState(languageOptions[0]);
+  const { t } = useTranslation();
   const formatSelectedValue = ({ value }: LanguageOption): string =>
     value.toUpperCase();
 
@@ -24,10 +26,10 @@ export default (): JSX.Element => {
           'var(--tilavaraus-header-background-color)',
         '--header-color': 'var(--tilavaraus-header-color)',
       }}
-      title="Tilavarauskäsittely"
+      title={t('navigation.applicationName')}
       menuToggleAriaLabel="Menu"
       skipTo="#main"
-      skipToContentLabel="Siirry pääsisältöön">
+      skipToContentLabel={t('navigation.skipToMainContent')}>
       <Navigation.Actions>
         <Navigation.Search searchLabel="" searchPlaceholder="placeholderi" />
         <Navigation.User authenticated label="Kirjaudu">

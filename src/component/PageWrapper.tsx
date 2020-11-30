@@ -13,7 +13,7 @@ export default function NavigationAndFooterWrapper(props: Props): JSX.Element {
       <Navigation />
       <div className={styles.mainLayout}>
         <SideNavigation />
-        <main className={styles.main}>{props.children}</main>
+        <main className={`${styles.main} main`}>{props.children}</main>
       </div>
     </div>
   );
