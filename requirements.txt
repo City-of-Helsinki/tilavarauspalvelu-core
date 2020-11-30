@@ -44,5 +44,6 @@ toml==0.10.1
 typed-ast==1.4.1
 typing-extensions==3.7.4.3
 Unidecode==1.1.1
+whitenoise==5.2.0
 zipp==3.4.0
 django-extra-fields==3.0.2
