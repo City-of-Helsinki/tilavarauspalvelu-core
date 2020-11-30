@@ -54,3 +54,28 @@ def test_reservation_unit_application_period_filter(
     assert response.status_code == 200
     assert len(response.data) == 1
     assert response.data[0]["name"] == reservation_unit.name
+
+
+@pytest.mark.django_db
+def test_reservation_unit_search_filter(
+    user_api_client, reservation_unit, reservation_unit2
+):
+    response = user_api_client.get(reverse("reservationunit-list"))
+    assert len(response.data) == 2
+
+    reservation_unit.name = "Lorem ipsum"
+    reservation_unit.save()
+    reservation_unit2.name = "Dolor amet"
+    reservation_unit2.save()
+
+    url = f"{reverse('reservationunit-list')}?search=lorem"
+    response = user_api_client.get(url)
+    assert response.status_code == 200
+    assert len(response.data) == 1
+    assert response.data[0]["name"] == reservation_unit.name
+
+    url = f"{reverse('reservationunit-list')}?search=DOLOR"
+    response = user_api_client.get(url)
+    assert response.status_code == 200
+    assert len(response.data) == 1
+    assert response.data[0]["name"] == reservation_unit2.name

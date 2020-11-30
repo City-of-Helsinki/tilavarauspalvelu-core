@@ -6,6 +6,7 @@ from api.space_api import SpaceSerializer
 from api.resources_api import ResourceSerializer
 from api.services_api import ServiceSerializer
 from django_filters import rest_framework as filters
+from rest_framework import filters as drf_filters
 
 
 class ReservationUnitFilter(filters.FilterSet):
@@ -36,8 +37,9 @@ class ReservationUnitSerializer(serializers.ModelSerializer):
 
 class ReservationUnitViewSet(viewsets.ModelViewSet):
     serializer_class = ReservationUnitSerializer
-    filter_backends = (filters.DjangoFilterBackend,)
+    filter_backends = [filters.DjangoFilterBackend, drf_filters.SearchFilter]
     filterset_class = ReservationUnitFilter
+    search_fields = ["name"]
 
     def get_queryset(self):
         qs = ReservationUnit.objects.all().prefetch_related(
