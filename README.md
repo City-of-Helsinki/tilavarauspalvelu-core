@@ -25,6 +25,4 @@ Locally:
 
 `deploy/entrypoint.sh test`
 
-## Installation with docker
-
 ![Tietokantakuvaus](tilanvarauspalvelu_visualized.png)
