@@ -95,3 +95,23 @@ def test_reservation_unit_location_filter(
     assert response.status_code == 200
     assert len(response.data) == 1
     assert response.data[0]["name"] == reservation_unit.name
+
+
+@pytest.mark.django_db
+def test_reservation_unit_max_persons_filter(
+    user_api_client, reservation_unit, reservation_unit2
+):
+    response = user_api_client.get(reverse("reservationunit-list"))
+    assert response.status_code == 200
+    assert len(response.data) == 2
+
+    space = reservation_unit.spaces.all()[0]
+    space.max_persons = 10
+    space.save()
+
+    url = f"{reverse('reservationunit-list')}?max_persons=10"
+    response = user_api_client.get(url)
+
+    assert response.status_code == 200
+    assert len(response.data) == 1
+    assert response.data[0]["name"] == reservation_unit.name

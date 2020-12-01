@@ -1,6 +1,6 @@
 from rest_framework import viewsets
 from reservation_units.models import ReservationUnit, Purpose
-from applications.models import ApplicationPeriod, Purpose
+from applications.models import ApplicationPeriod
 from spaces.models import Location
 from rest_framework import serializers
 from api.space_api import SpaceSerializer
@@ -19,6 +19,9 @@ class ReservationUnitFilter(filters.FilterSet):
     )
     location = filters.ModelChoiceFilter(
         field_name="spaces__location", queryset=Location.objects.all()
+    )
+    max_persons = filters.NumberFilter(
+        field_name="spaces__max_persons", lookup_expr="lte"
     )
 
 
