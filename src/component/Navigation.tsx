@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { SyntheticEvent, useState } from 'react';
 import { Navigation } from 'hds-react';
 import { useTranslation } from 'react-i18next';
 
@@ -30,8 +30,15 @@ export default (): JSX.Element => {
       menuToggleAriaLabel="Menu"
       skipTo="#main"
       skipToContentLabel={t('navigation.skipToMainContent')}>
+      <Navigation.Row variant="inline">
+        <Navigation.Item
+          href="#"
+          label={t('navigation.link.spaceReservation')}
+          onClick={(e: SyntheticEvent) => e.preventDefault()}
+          active
+        />
+      </Navigation.Row>
       <Navigation.Actions>
-        <Navigation.Search searchLabel="" searchPlaceholder="placeholderi" />
         <Navigation.User authenticated label="Kirjaudu">
           <Navigation.Item
             label="Profiili"

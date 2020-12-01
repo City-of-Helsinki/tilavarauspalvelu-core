@@ -1,14 +1,15 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Section } from 'hds-react';
+import Head from '../component/Head';
 
 const Home = (): JSX.Element => {
   const { t } = useTranslation();
 
   return (
-    <Section>
-      <h1>{t('home.title')}</h1>
-    </Section>
+    <>
+      <Head heading={t('home.head.heading')} text={t('home.head.text')} />
+      <div style={{ height: '70%' }} />
+    </>
   );
 };
 

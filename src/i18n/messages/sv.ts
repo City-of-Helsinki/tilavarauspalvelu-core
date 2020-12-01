@@ -1,8 +1,11 @@
 export default {
   translation: {
     'common.applicationName': 'Varaamo',
+    'navigation.link.spaceReservation': 'Vakiovuorot sv',
     'navigation.skipToMainContent': 'SHoppa till huvudnavigeringen',
-    'home.title': 'Framsida',
+    'home.title': 'Hakeminen',
+    'home.head.heading': 'Vakiovuoron hakeminen sv',
+    'home.head.text': 'Hae säännöllisiä vuoroja sv',
     'footer.navigation.recurringShift.label': 'Säännölliset vuorot sv',
     'footer.navigation.recurringShift.href': '#',
     'footer.navigation.reservation.label': 'Varaus sv',
