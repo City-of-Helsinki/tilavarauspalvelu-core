@@ -13,7 +13,7 @@ const Head = (): JSX.Element => {
       theme={{
         '--footer-background': 'var(--tilavaraus-footer-background-color)',
         '--footer-color': 'var(--tilavaraus-footer-color)',
-        '--footer-divider-color': 'var(--color-black-90)',
+        '--footer-divider-color': 'var(--tilavaraus-footer-color)',
         '--footer-focus-outline-color': 'var(--color-primary-90)',
       }}>
       <Footer.Navigation navigationAriaLabel={t('footer.navigationAriaLabel')}>
