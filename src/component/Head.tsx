@@ -1,20 +1,20 @@
 import React from 'react';
-import { useTranslation } from 'react-i18next';
-import { Section } from 'hds-react';
+import { Koros } from 'hds-react';
+import styles from './Head.module.css';
 
-require('./Head.scss');
+interface HeadProps {
+  heading: string;
+  text: string;
+}
 
-const Head = (): JSX.Element => {
-  const { t } = useTranslation();
-
-  return (
-    <div id="head">
-      <Section color="secondary" korosType="wave">
-        <h1>{t('heading')}</h1>
-        {t('subheading')}
-      </Section>
+const Head = (props: HeadProps): JSX.Element => (
+  <div className={styles.container}>
+    <div className={styles.content}>
+      <h1>{props.heading}</h1>
+      <span>{props.text}</span>
     </div>
-  );
-};
+    <Koros className={styles.koros} type="wave" />
+  </div>
+);
 
 export default Head;
