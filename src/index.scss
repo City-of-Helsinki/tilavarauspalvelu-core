@@ -1,6 +1,6 @@
 @import '~hds-core/lib/base.css';
 @import 'font';
-@import './variables';
+@import 'variables';
 
 html,
 body,
@@ -22,17 +22,4 @@ body {
   padding: 0;
   flex-direction: row;
   justify-content: center;
-
-}
-
-h1,
-h2,
-h3,
-h4,
-h5 {
-  font-family: HelsinkiGrotesk-Bold, Arial, sans-serif;
-}
-
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
