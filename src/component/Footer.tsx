@@ -26,8 +26,8 @@ const Head = (): JSX.Element => {
         ))}
       </Footer.Navigation>
       <Footer.Base
-        copyrightHolder="Helsingin kaupunki"
-        copyrightText="Kaikki oikeudet pidetään">
+        copyrightHolder={t('footer.copyrightHolder')}
+        copyrightText={t('footer.copyrightText')}>
         <Footer.Item
           href={t(`footer.base.navigation.privacyStatement.href`)}
           label={t(`footer.base.navigation.privacyStatement.label`)}

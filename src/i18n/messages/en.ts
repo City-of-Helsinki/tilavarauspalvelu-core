@@ -6,6 +6,8 @@ export default {
     'home.title': 'Hakeminen en',
     'home.head.heading': 'Vakiovuoron hakeminen en',
     'home.head.text': 'Hae säännöllisiä vuoroja en',
+    'footer.copyrightHolder': 'Helsingin kaupunki en',
+    'footer.copyrightText': 'Kaikki oikeudet pidetään en',
     'footer.navigation.recurringShift.label': 'Säännölliset vuorot en',
     'footer.navigation.recurringShift.href': '#',
     'footer.navigation.reservation.label': 'Varaus en',
