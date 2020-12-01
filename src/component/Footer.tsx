@@ -19,6 +19,7 @@ const Head = (): JSX.Element => {
       <Footer.Navigation navigationAriaLabel={t('footer.navigationAriaLabel')}>
         {linkIds.map((id) => (
           <Footer.Item
+            key={id}
             href={t(`footer.navigation.${id}.href`)}
             label={t(`footer.navigation.${id}.label`)}
           />
