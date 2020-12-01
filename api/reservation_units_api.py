@@ -1,6 +1,7 @@
 from rest_framework import viewsets
 from reservation_units.models import ReservationUnit, Purpose
 from applications.models import ApplicationPeriod, Purpose
+from spaces.models import Location
 from rest_framework import serializers
 from api.space_api import SpaceSerializer
 from api.resources_api import ResourceSerializer
@@ -15,6 +16,9 @@ class ReservationUnitFilter(filters.FilterSet):
     )
     application_period = filters.ModelMultipleChoiceFilter(
         field_name="application_periods", queryset=ApplicationPeriod.objects.all()
+    )
+    location = filters.ModelChoiceFilter(
+        field_name="spaces__location", queryset=Location.objects.all()
     )
 
 

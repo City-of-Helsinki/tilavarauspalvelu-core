@@ -79,3 +79,19 @@ def test_reservation_unit_search_filter(
     assert response.status_code == 200
     assert len(response.data) == 1
     assert response.data[0]["name"] == reservation_unit2.name
+
+
+@pytest.mark.django_db
+def test_reservation_unit_location_filter(
+    user_api_client, reservation_unit, reservation_unit2, location
+):
+    response = user_api_client.get(reverse("reservationunit-list"))
+    assert response.status_code == 200
+    assert len(response.data) == 2
+
+    # We assume only reservation_unit has location
+    url = f"{reverse('reservationunit-list')}?location={location.pk}"
+    response = user_api_client.get(url)
+    assert response.status_code == 200
+    assert len(response.data) == 1
+    assert response.data[0]["name"] == reservation_unit.name

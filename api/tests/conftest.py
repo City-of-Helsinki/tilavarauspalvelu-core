@@ -8,6 +8,7 @@ from reservation_units.models import ReservationUnit, Purpose
 from reservations.models import Reservation
 from resources.models import Resource
 from applications.models import ApplicationPeriod
+from spaces.models import Space, Location
 
 
 @pytest.mark.django_db
@@ -39,12 +40,25 @@ def resource():
 
 
 @pytest.fixture
-def reservation_unit(resource):
+def space(location):
+    return Space.objects.create(name="Space", location=location)
+
+
+@pytest.fixture
+def reservation_unit(resource, space):
     reservation_unit = ReservationUnit.objects.create(
         name="testi", require_introduction=False
     )
     reservation_unit.resources.set([resource])
+    reservation_unit.spaces.set([space])
     return reservation_unit
+
+
+@pytest.fixture
+def location():
+    return Location.objects.create(
+        address_street="Osoitetienkatu 13b", address_zip="33540", address_city="Tampere"
+    )
 
 
 @pytest.fixture
