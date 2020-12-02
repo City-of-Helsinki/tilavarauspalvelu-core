@@ -61,8 +61,7 @@ class ContactPersonSerializerField(serializers.Field):
 
     def to_representation(self, obj):
         values = [obj.contact_first_name, obj.contact_last_name, obj.contact_email, obj.contact_phone_number]
-        print("fock me")
-        print(obj)
+
         if all(v is None for v in values):
             return None
 
