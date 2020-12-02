@@ -6,7 +6,6 @@ from .applications_api import (
     ApplicationEventViewSet,
     ApplicationViewSet,
     OrganisationViewSet,
-    PersonViewSet,
 )
 from .reservation_units_api import ReservationUnitViewSet
 from .reservations_api import ReservationViewSet
@@ -24,5 +23,4 @@ router.register(r"applications", ApplicationViewSet, "application")
 router.register(r"applicationevents", ApplicationEventViewSet, "applicationevent")
 router.register(r"organisations", OrganisationViewSet, "organisation")
 router.register(r"addresses", AddressViewSet, "address")
-router.register(r"persons", PersonViewSet, "person")
 router.register(r"application_periods", ApplicationPeriodViewSet, "application_period")

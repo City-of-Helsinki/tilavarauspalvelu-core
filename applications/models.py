@@ -40,15 +40,31 @@ class Address(models.Model):
     )
 
 
-class Person(ContactInformation):
+class Person(models.Model):
 
-    first_name = models.TextField(
-        verbose_name=_("First name"), null=False, blank=False, max_length=50
+    contact_first_name = models.TextField(
+        verbose_name=_("First name"), null=True, blank=True, max_length=50
     )
 
-    last_name = models.TextField(
-        verbose_name=_("Last name"), null=False, blank=False, max_length=50
+    contact_last_name = models.TextField(
+        verbose_name=_("Last name"), null=True, blank=True, max_length=50
     )
+
+    contact_email = models.EmailField(
+        verbose_name=_("Email"),
+        null=True,
+        blank=True,
+    )
+
+    contact_phone_number = models.TextField(
+        verbose_name=_("Phone number"),
+        null=True,
+        blank=True,
+        max_length=50,
+    )
+
+    class Meta:
+        abstract = True
 
 
 class Organisation(models.Model):
@@ -118,7 +134,7 @@ class ApplicationPeriod(models.Model):
         )
 
 
-class Application(models.Model):
+class Application(Person):
 
     description = models.fields.TextField(
         verbose_name=_("Description"), max_length=1000, blank=True, null=True
@@ -135,14 +151,6 @@ class Application(models.Model):
     organisation = models.ForeignKey(
         Organisation,
         verbose_name=_("Organisation"),
-        null=False,
-        blank=False,
-        on_delete=models.PROTECT,
-    )
-
-    contact_person = models.ForeignKey(
-        Person,
-        verbose_name=_("Contact person"),
         null=False,
         blank=False,
         on_delete=models.PROTECT,

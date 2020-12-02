@@ -20,11 +20,6 @@ class OrganisationAdmin(admin.ModelAdmin):
     model = Organisation
 
 
-@admin.register(Person)
-class PersonAdmin(admin.ModelAdmin):
-    model = Person
-
-
 @admin.register(ApplicationEvent)
 class ApplicationEventAdmin(admin.ModelAdmin):
     model = ApplicationEvent
