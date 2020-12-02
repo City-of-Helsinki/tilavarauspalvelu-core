@@ -5,7 +5,6 @@ from .models import (
     ApplicationEvent,
     ApplicationPeriod,
     Organisation,
-    Person,
     Recurrence,
 )
 

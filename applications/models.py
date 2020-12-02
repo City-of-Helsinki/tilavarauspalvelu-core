@@ -8,7 +8,6 @@ from django.utils.translation import gettext_lazy as _
 from recurrence.fields import RecurrenceField
 from rest_framework.exceptions import ValidationError
 
-from applications.base_models import ContactInformation
 from reservation_units.models import Purpose, ReservationUnit
 from spaces.models import District
 

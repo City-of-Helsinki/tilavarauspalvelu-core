@@ -1,5 +1,4 @@
 from datetime import datetime
-from operator import itemgetter
 
 from dateutil.parser import parse
 from django.utils import timezone
@@ -10,7 +9,6 @@ from applications.models import (
     Application,
     ApplicationEvent,
     Organisation,
-    Person,
     Recurrence,
 )
 
@@ -21,6 +19,7 @@ MINIMUM_TIME = timezone.datetime(
 MAXIMUM_TIME = timezone.datetime(
     2099, 1, 1, 0, 0, 0, 3, timezone.get_default_timezone()
 )
+
 
 class AddressSerializer(serializers.ModelSerializer):
     class Meta:
@@ -57,10 +56,13 @@ class OrganisationViewSet(viewsets.ModelViewSet):
 
 
 class ContactPersonSerializerField(serializers.Field):
-
-
     def to_representation(self, obj):
-        values = [obj.contact_first_name, obj.contact_last_name, obj.contact_email, obj.contact_phone_number]
+        values = [
+            obj.contact_first_name,
+            obj.contact_last_name,
+            obj.contact_email,
+            obj.contact_phone_number,
+        ]
 
         if all(v is None for v in values):
             return None
@@ -69,17 +71,18 @@ class ContactPersonSerializerField(serializers.Field):
             "first_name": obj.contact_first_name,
             "last_name": obj.contact_last_name,
             "email": obj.contact_email,
-            "phone_number": obj.contact_phone_number
+            "phone_number": obj.contact_phone_number,
         }
 
     def to_internal_value(self, data):
-        internal_value = {"contact_first_name": None,
-                "contact_last_name": None,
-                "contact_email": None,
-                "contact_phone_number": None
-                }
+        internal_value = {
+            "contact_first_name": None,
+            "contact_last_name": None,
+            "contact_email": None,
+            "contact_phone_number": None,
+        }
 
-        if(data is not None):
+        if data is not None:
             internal_value["contact_first_name"] = data.get("first_name")
             internal_value["contact_last_name"] = data.get("last_name")
             internal_value["contact_email"] = data.get("email")
@@ -89,7 +92,7 @@ class ContactPersonSerializerField(serializers.Field):
 
 class ApplicationSerializer(serializers.ModelSerializer):
 
-    contact_person = ContactPersonSerializerField(source='*', allow_null=True)
+    contact_person = ContactPersonSerializerField(source="*", allow_null=True)
 
     class Meta:
         model = Application
@@ -100,7 +103,7 @@ class ApplicationSerializer(serializers.ModelSerializer):
             "organisation",
             "application_period",
             "user",
-            "contact_person"
+            "contact_person",
         ]
         read_only_fields = ["user"]
 
