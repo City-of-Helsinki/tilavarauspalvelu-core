@@ -4,6 +4,7 @@ import pytest
 from django.contrib.auth import get_user_model
 from rest_framework.test import APIClient
 
+from applications.models import ApplicationPeriod
 from reservation_units.models import ReservationUnit
 from reservations.models import Reservation
 from resources.models import Resource
@@ -44,6 +45,21 @@ def reservation_unit(resource):
     )
     reservation_unit.resources.set([resource])
     return reservation_unit
+
+
+@pytest.fixture
+def application_period(reservation_unit):
+    application_period = ApplicationPeriod.objects.create(
+        name="Nuorten liikuntavuorot kevät 2021",
+        application_period_begin="2021-01-01",
+        application_period_end="2021-01-31",
+        reservation_period_begin="2021-01-01",
+        reservation_period_end="2021-06-01",
+    )
+
+    application_period.reservation_units.set([reservation_unit])
+
+    return application_period
 
 
 @pytest.fixture
