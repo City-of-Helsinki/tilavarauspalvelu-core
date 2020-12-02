@@ -1,0 +1,6 @@
+# Unit test / coverage reports
+.coverage
+coverage.xml
+.pytest_cache/
+
+.mypy_cache/

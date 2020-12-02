@@ -1,6 +1,8 @@
-import pytest
 import datetime
+
+import pytest
 from django.urls import reverse
+
 from reservations.models import Reservation
 
 

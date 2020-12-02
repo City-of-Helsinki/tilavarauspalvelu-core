@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import ReservationUnit, Period, Day, DayPart
+
+from .models import Day, DayPart, Period, ReservationUnit
 
 
 @admin.register(ReservationUnit)

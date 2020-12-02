@@ -1,11 +1,12 @@
 from django.contrib import admin
+
 from .models import (
     Application,
+    ApplicationEvent,
+    ApplicationPeriod,
     Organisation,
     Person,
-    ApplicationEvent,
     Recurrence,
-    ApplicationPeriod,
 )
 
 

@@ -1,11 +1,11 @@
-from api.services_api import ServiceViewSet
 from rest_framework import routers
 
+from .application_period_api import ApplicationPeriodViewSet
 from .applications_api import (
-    ApplicationViewSet,
-    ApplicationEventViewSet,
-    OrganisationViewSet,
     AddressViewSet,
+    ApplicationEventViewSet,
+    ApplicationViewSet,
+    OrganisationViewSet,
     PersonViewSet,
 )
 from .reservations_api import ReservationViewSet
@@ -15,7 +15,7 @@ from .services_api import ServiceViewSet
 from .resources_api import ResourceViewSet
 
 router = routers.DefaultRouter()
-router.register(r"reservationunits", ReservationUnitViewSet, "reservationunit")
+router.register(r"reservation_units", ReservationUnitViewSet, "reservationunit")
 router.register(r"spaces", SpaceViewSet, "space")
 router.register(r"services", ServiceViewSet, "service")
 router.register(r"resources", ResourceViewSet, "resource")
@@ -26,3 +26,4 @@ router.register(r"organisations", OrganisationViewSet, "organisation")
 router.register(r"addresses", AddressViewSet, "address")
 router.register(r"persons", PersonViewSet, "person")
 router.register(r"purposes", PurposeViewSet, "purpose")
+router.register(r"application_periods", ApplicationPeriodViewSet, "application_period")

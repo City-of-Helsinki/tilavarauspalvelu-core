@@ -1,8 +1,8 @@
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import include, path
 from graphene_django.views import GraphQLView
-from api.urls import router as api_router
 
+from api.urls import router as api_router
 
 urlpatterns = [
     path("admin/", admin.site.urls),

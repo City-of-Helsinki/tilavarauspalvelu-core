@@ -1,13 +1,22 @@
-import pytest
 import datetime
+
+import pytest
+import recurrence
+from django.contrib.auth import get_user_model
+from django.utils import timezone
 from rest_framework.test import APIClient
 
-from django.contrib.auth import get_user_model
-
 from reservation_units.models import ReservationUnit, Purpose
-from reservations.models import Reservation
+from reservations.models import Reservation, ReservationPurpose
+from applications.models import (
+    Application,
+    ApplicationEvent,
+    ApplicationPeriod,
+    Organisation,
+    Person,
+    Recurrence,
+)
 from resources.models import Resource
-from applications.models import ApplicationPeriod
 from spaces.models import Space, Location, District
 
 
@@ -71,6 +80,21 @@ def reservation_unit2(resource):
 
 
 @pytest.fixture
+def application_period(reservation_unit):
+    application_period = ApplicationPeriod.objects.create(
+        name="Nuorten liikuntavuorot kevät 2021",
+        application_period_begin="2021-01-01",
+        application_period_end="2021-01-31",
+        reservation_period_begin="2021-01-01",
+        reservation_period_end="2021-06-01",
+    )
+
+    application_period.reservation_units.set([reservation_unit])
+
+    return application_period
+
+
+@pytest.fixture
 def reservation(reservation_unit):
     begin_time = datetime.datetime(2020, 12, 1)
     end_time = begin_time + datetime.timedelta(hours=1)
@@ -92,27 +116,6 @@ def valid_reservation_data(reservation_unit):
 
 
 @pytest.fixture
-def purpose():
-    return Purpose.objects.create(name="Holding a meeting")
-
-
-@pytest.fixture
-def purpose2():
-    return Purpose.objects.create(name="Playing sports")
-
-
-@pytest.fixture
-def application_period():
-    return ApplicationPeriod.objects.create(
-        name="Hakemuskausi",
-        application_period_begin=datetime.datetime(2020, 11, 1),
-        application_period_end=datetime.datetime(2020, 12, 1),
-        reservation_period_begin=datetime.datetime(2020, 11, 1),
-        reservation_period_end=datetime.datetime(2020, 12, 1),
-    )
-
-
-@pytest.fixture
 def district():
     return District.objects.create(name="Tapaninkylä")
 
@@ -120,3 +123,72 @@ def district():
 @pytest.fixture
 def sub_district(district):
     return District.objects.create(name="Tapanila", parent=district)
+
+
+@pytest.fixture
+def purpose() -> Purpose:
+    return Purpose.objects.create(name="Exercise")
+
+
+@pytest.fixture
+def purpose2() -> Purpose:
+    return Purpose.objects.create(name="Playing sports")
+
+
+@pytest.fixture
+def reservation_purpose(purpose, reservation) -> ReservationPurpose:
+    return ReservationPurpose.objects.create(purpose=purpose, reservation=reservation)
+
+
+@pytest.fixture
+def organisation() -> Organisation:
+    return Organisation.objects.create(name="Exercise organisation")
+
+
+@pytest.fixture
+def person() -> Person:
+    return Person.objects.create(first_name="John", last_name="Legend")
+
+
+@pytest.fixture
+def application(
+    purpose, reservation_purpose, organisation, person, application_period, user
+) -> Application:
+    application = Application.objects.create(
+        description="Application for exercise spaces",
+        reservation_purpose=reservation_purpose,
+        organisation=organisation,
+        contact_person=person,
+        application_period=application_period,
+        user=user,
+    )
+    return application
+
+
+@pytest.fixture
+def application_event(application) -> ApplicationEvent:
+    return ApplicationEvent.objects.create(
+        application=application,
+        num_persons=10,
+        num_events=2,
+        duration=datetime.timedelta(hours=1),
+    )
+
+
+@pytest.fixture
+def weekly_recurring_mondays_and_tuesdays_2021(application_event) -> ApplicationEvent:
+
+    return Recurrence.objects.create(
+        application_event=application_event,
+        recurrence=recurrence.Recurrence(
+            include_dtstart=False,
+            dtstart=timezone.datetime(2021, 1, 4, 0, 0, 0),
+            dtend=timezone.datetime(2021, 12, 28, 0, 0, 0),
+            rrules=[
+                recurrence.Rule(
+                    recurrence.WEEKLY, byday=[recurrence.MONDAY, recurrence.TUESDAY]
+                )
+            ],
+        ),
+        priority=200,
+    )

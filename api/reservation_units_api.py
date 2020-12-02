@@ -1,8 +1,7 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, serializers
 from reservation_units.models import ReservationUnit, Purpose
 from applications.models import ApplicationPeriod
 from spaces.models import District
-from rest_framework import serializers
 from api.space_api import SpaceSerializer
 from api.resources_api import ResourceSerializer
 from api.services_api import ServiceSerializer

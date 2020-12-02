@@ -1,8 +1,10 @@
-from rest_framework import viewsets, serializers
-from reservations.models import Reservation
-from reservation_units.models import ReservationUnit
-from .reservation_units_api import ReservationUnitSerializer
 from drf_extra_fields.relations import PresentablePrimaryKeyRelatedField
+from rest_framework import serializers, viewsets
+
+from reservation_units.models import ReservationUnit
+from reservations.models import Reservation
+
+from .reservation_units_api import ReservationUnitSerializer
 
 
 class ReservationSerializer(serializers.ModelSerializer):
