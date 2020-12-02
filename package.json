@@ -16,6 +16,7 @@
     "hds-core": "^0.16.1",
     "hds-design-tokens": "^0.16.1",
     "hds-react": "^0.16.1",
+    "http-proxy-middleware": "^1.0.6",
     "i18next": "^19.8.4",
     "node-sass": "4.14.1",
     "react": "^17.0.1",
