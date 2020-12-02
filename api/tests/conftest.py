@@ -1,12 +1,21 @@
 import datetime
 
 import pytest
+import recurrence
 from django.contrib.auth import get_user_model
+from django.utils import timezone
 from rest_framework.test import APIClient
 
-from applications.models import ApplicationPeriod
-from reservation_units.models import ReservationUnit
-from reservations.models import Reservation
+from applications.models import (
+    Application,
+    ApplicationEvent,
+    ApplicationPeriod,
+    Organisation,
+    Person,
+    Recurrence,
+)
+from reservation_units.models import Purpose, ReservationUnit
+from reservations.models import Reservation, ReservationPurpose
 from resources.models import Resource
 
 
@@ -81,3 +90,67 @@ def valid_reservation_data(reservation_unit):
         "buffer_time_after": "10",
         "reservation_unit": [reservation_unit.id],
     }
+
+
+@pytest.fixture
+def purpose() -> Purpose:
+    return Purpose.objects.create(name="Exercise")
+
+
+@pytest.fixture
+def reservation_purpose(purpose, reservation) -> ReservationPurpose:
+    return ReservationPurpose.objects.create(purpose=purpose, reservation=reservation)
+
+
+@pytest.fixture
+def organisation() -> Organisation:
+    return Organisation.objects.create(name="Exercise organisation")
+
+
+@pytest.fixture
+def person() -> Person:
+    return Person.objects.create(first_name="John", last_name="Legend")
+
+
+@pytest.fixture
+def application(
+    purpose, reservation_purpose, organisation, person, application_period, user
+) -> Application:
+    application = Application.objects.create(
+        description="Application for exercise spaces",
+        reservation_purpose=reservation_purpose,
+        organisation=organisation,
+        contact_person=person,
+        application_period=application_period,
+        user=user,
+    )
+    return application
+
+
+@pytest.fixture
+def application_event(application) -> ApplicationEvent:
+    return ApplicationEvent.objects.create(
+        application=application,
+        num_persons=10,
+        num_events=2,
+        duration=datetime.timedelta(hours=1),
+    )
+
+
+@pytest.fixture
+def weekly_recurring_mondays_and_tuesdays_2021(application_event) -> ApplicationEvent:
+
+    return Recurrence.objects.create(
+        application_event=application_event,
+        recurrence=recurrence.Recurrence(
+            include_dtstart=False,
+            dtstart=timezone.datetime(2021, 1, 4, 0, 0, 0),
+            dtend=timezone.datetime(2021, 12, 28, 0, 0, 0),
+            rrules=[
+                recurrence.Rule(
+                    recurrence.WEEKLY, byday=[recurrence.MONDAY, recurrence.TUESDAY]
+                )
+            ],
+        ),
+        priority=200,
+    )

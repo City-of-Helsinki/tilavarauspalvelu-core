@@ -82,9 +82,11 @@ class ApplicationSerializer(serializers.ModelSerializer):
             "reservation_purpose",
             "organisation",
             "contact_person",
-            "user",
             "organisation",
+            "application_period",
+            "user",
         ]
+        read_only_fields = ["user"]
 
     def validate(self, data):
         return data
