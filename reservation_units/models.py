@@ -34,6 +34,12 @@ class ReservationUnit(models.Model):
         related_name="reservation_units",
         blank=True,
     )
+    purposes = models.ManyToManyField(
+        "Purpose",
+        verbose_name=_("Purposes"),
+        related_name="reservation_units",
+        blank=True,
+    )
 
     reservation_unit_type = models.ForeignKey(
         ReservationUnitType,
@@ -113,9 +119,6 @@ class ReservationUnitImage(models.Model):
 
 class Purpose(models.Model):
     name = models.CharField(max_length=200)
-    reservation_unit = models.ManyToManyField(
-        ReservationUnit, verbose_name=_("Purpose"), related_name="purposes"
-    )
 
     def __str__(self):
         return self.name

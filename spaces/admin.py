@@ -1,4 +1,5 @@
 from django.contrib import admin
+from mptt.admin import MPTTModelAdmin
 
 from .models import Building, District, Location, RealEstate, Space
 
@@ -8,9 +9,18 @@ class LocationInline(admin.TabularInline):
     fields = ["address_street", "address_zip", "address_city"]
 
 
-@admin.register(District)
-class DistrictAdmin(admin.ModelAdmin):
+class DistrictInline(admin.TabularInline):
     model = District
+
+
+class SpaceInline(admin.TabularInline):
+    model = Space
+
+
+@admin.register(District)
+class DistrictAdmin(MPTTModelAdmin):
+    model = District
+    inlines = [DistrictInline]
 
 
 @admin.register(RealEstate)
@@ -26,6 +36,6 @@ class BuildingAdmin(admin.ModelAdmin):
 
 
 @admin.register(Space)
-class SpaceAdmin(admin.ModelAdmin):
+class SpaceAdmin(MPTTModelAdmin):
     model = Space
-    inlines = [LocationInline]
+    inlines = [LocationInline, SpaceInline]

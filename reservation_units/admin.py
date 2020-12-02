@@ -11,9 +11,14 @@ from .models import (
 )
 
 
+class ReservationUnitImageInline(admin.TabularInline):
+    model = ReservationUnitImage
+
+
 @admin.register(ReservationUnit)
 class ReservationUnitAdmin(admin.ModelAdmin):
     model = ReservationUnit
+    inlines = [ReservationUnitImageInline]
 
 
 @admin.register(ReservationUnitImage)
