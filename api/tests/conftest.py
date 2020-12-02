@@ -36,7 +36,7 @@ def user_api_client(user):
 
 @pytest.fixture
 def resource():
-    return Resource.objects.create(name="testiresurssi")
+    return Resource.objects.create(name="Test resource")
 
 
 @pytest.fixture
@@ -47,7 +47,7 @@ def space(location):
 @pytest.fixture
 def reservation_unit(resource, space):
     reservation_unit = ReservationUnit.objects.create(
-        name="testi", require_introduction=False
+        name="Test reservation unit", require_introduction=False
     )
     reservation_unit.resources.set([resource])
     reservation_unit.spaces.set([space])
@@ -64,7 +64,7 @@ def location():
 @pytest.fixture
 def reservation_unit2(resource):
     reservation_unit = ReservationUnit.objects.create(
-        name="testi2", require_introduction=False
+        name="Test reservation unit no. 2", require_introduction=False
     )
     reservation_unit.resources.set([resource])
     return reservation_unit
@@ -93,12 +93,12 @@ def valid_reservation_data(reservation_unit):
 
 @pytest.fixture
 def purpose():
-    return Purpose.objects.create(name="foo")
+    return Purpose.objects.create(name="Holding a meeting")
 
 
 @pytest.fixture
 def purpose2():
-    return Purpose.objects.create(name="bar")
+    return Purpose.objects.create(name="Playing sports")
 
 
 @pytest.fixture

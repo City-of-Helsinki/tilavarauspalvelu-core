@@ -4,11 +4,11 @@ from django.urls import reverse
 
 @pytest.mark.django_db
 def test_reservation_unit_exists(user_api_client, reservation_unit):
-    reservation_unit.name = "Studiokompleksi"
+    reservation_unit.name = "Studio complex"
     reservation_unit.save()
     response = user_api_client.get(reverse("reservationunit-list"))
     assert response.status_code == 200
-    assert response.data[0]["name"] == "Studiokompleksi"
+    assert response.data[0]["name"] == "Studio complex"
 
 
 @pytest.mark.django_db
