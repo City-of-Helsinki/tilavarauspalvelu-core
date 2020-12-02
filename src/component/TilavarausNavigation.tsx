@@ -2,7 +2,7 @@ import React, { SyntheticEvent, useState } from 'react';
 import { Navigation } from 'hds-react';
 import { useTranslation } from 'react-i18next';
 
-export default (): JSX.Element => {
+const TilavarausNavigation = (): JSX.Element => {
   interface LanguageOption {
     label: string;
     value: string;
@@ -65,3 +65,5 @@ export default (): JSX.Element => {
     </Navigation>
   );
 };
+
+export default TilavarausNavigation;

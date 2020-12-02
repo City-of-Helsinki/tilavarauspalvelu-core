@@ -1,4 +1,4 @@
-export default {
+const translations =  {
   translation: {
     'common.applicationName': 'Varaamo',
     'navigation.link.spaceReservation': 'Vakiovuorot',
@@ -20,3 +20,5 @@ export default {
     'footer.base.navigation.accessibilityStatement.href': '#',
   },
 };
+
+export default translations;

@@ -1,5 +1,5 @@
 import React from 'react';
-import Navigation from './Navigation';
+import TilavarausNavigation from './TilavarausNavigation';
 import Footer from './Footer';
 
 interface Props {
@@ -9,7 +9,7 @@ interface Props {
 export default function NavigationAndFooterWrapper(props: Props): JSX.Element {
   return (
     <>
-      <Navigation />
+      <TilavarausNavigation />
       {props.children}
       <Footer />
     </>
