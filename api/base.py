@@ -1,4 +1,6 @@
+from itertools import chain
 from rest_framework import serializers
+from django_filters import rest_framework as filters
 
 
 class BaseNestedSerializer(serializers.ModelSerializer):
@@ -34,3 +36,20 @@ class BaseNestedSerializer(serializers.ModelSerializer):
         if exclude_detail_fields:
             for field in detail_only_fields:
                 del self.fields[field]
+
+
+class HierarchyModelMultipleChoiceFilter(filters.ModelMultipleChoiceFilter):
+    """ Filters using the given object and it's children. Use with MPTT models. """
+
+    def filter(self, qs, value):
+        # qs is the initial list of objects to be filtered
+        # value is a list of objects to be used for filtering
+        values_with_children = chain.from_iterable(
+            [
+                obj.get_descendants(include_self=True)
+                if hasattr(obj, "get_descendants")
+                else [obj]
+                for obj in value
+            ]
+        )
+        return super().filter(qs, list(values_with_children))

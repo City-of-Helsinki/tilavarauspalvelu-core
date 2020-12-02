@@ -8,7 +8,7 @@ from reservation_units.models import ReservationUnit, Purpose
 from reservations.models import Reservation
 from resources.models import Resource
 from applications.models import ApplicationPeriod
-from spaces.models import Space, Location
+from spaces.models import Space, Location, District
 
 
 @pytest.mark.django_db
@@ -110,3 +110,13 @@ def application_period():
         reservation_period_begin=datetime.datetime(2020, 11, 1),
         reservation_period_end=datetime.datetime(2020, 12, 1),
     )
+
+
+@pytest.fixture
+def district():
+    return District.objects.create(name="Tapaninkylä")
+
+
+@pytest.fixture
+def sub_district(district):
+    return District.objects.create(name="Tapanila", parent=district)

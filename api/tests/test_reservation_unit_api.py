@@ -82,15 +82,25 @@ def test_reservation_unit_search_filter(
 
 
 @pytest.mark.django_db
-def test_reservation_unit_location_filter(
-    user_api_client, reservation_unit, reservation_unit2, location
+def test_reservation_unit_district_filter(
+    user_api_client, reservation_unit, reservation_unit2, district, sub_district
 ):
     response = user_api_client.get(reverse("reservationunit-list"))
     assert response.status_code == 200
     assert len(response.data) == 2
 
-    # We assume only reservation_unit has location
-    url = f"{reverse('reservationunit-list')}?location={location.pk}"
+    space = reservation_unit.spaces.all()[0]
+    space.district = sub_district
+    space.save()
+    url = f"{reverse('reservationunit-list')}?district={sub_district.pk}"
+    response = user_api_client.get(url)
+    assert response.status_code == 200
+    assert len(response.data) == 1
+    assert response.data[0]["name"] == reservation_unit.name
+
+    # We should also get the result by querying for district ID,
+    # as sub_district is a subset of the actual district
+    url = f"{reverse('reservationunit-list')}?district={district.pk}"
     response = user_api_client.get(url)
     assert response.status_code == 200
     assert len(response.data) == 1

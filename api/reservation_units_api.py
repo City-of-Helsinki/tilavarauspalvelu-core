@@ -1,13 +1,14 @@
 from rest_framework import viewsets
 from reservation_units.models import ReservationUnit, Purpose
 from applications.models import ApplicationPeriod
-from spaces.models import Location
+from spaces.models import District
 from rest_framework import serializers
 from api.space_api import SpaceSerializer
 from api.resources_api import ResourceSerializer
 from api.services_api import ServiceSerializer
 from django_filters import rest_framework as filters
 from rest_framework import filters as drf_filters
+from api.base import HierarchyModelMultipleChoiceFilter
 
 
 class ReservationUnitFilter(filters.FilterSet):
@@ -17,8 +18,8 @@ class ReservationUnitFilter(filters.FilterSet):
     application_period = filters.ModelMultipleChoiceFilter(
         field_name="application_periods", queryset=ApplicationPeriod.objects.all()
     )
-    location = filters.ModelChoiceFilter(
-        field_name="spaces__location", queryset=Location.objects.all()
+    district = HierarchyModelMultipleChoiceFilter(
+        field_name="spaces__district", queryset=District.objects.all()
     )
     max_persons = filters.NumberFilter(
         field_name="spaces__max_persons", lookup_expr="lte"
