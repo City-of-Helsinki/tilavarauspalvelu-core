@@ -12,6 +12,7 @@
     "@types/react": "^16.9.53",
     "@types/react-dom": "^16.9.8",
     "@types/react-router-dom": "^5.1.6",
+    "axios": "^0.21.0",
     "hds-core": "^0.16.1",
     "hds-design-tokens": "^0.16.1",
     "hds-react": "^0.16.1",
