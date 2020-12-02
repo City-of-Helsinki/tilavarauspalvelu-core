@@ -1,7 +1,8 @@
 :root {
-  --tilavaraus-header-background-color: #000078;
-  --tilavaraus-header-color: white;
-  --tilavaraus-background-color: #f0f2f4;
-  --tilavaraus-content-background-color: gray;
-  --tilavaraus-content-text-color: #010101;
+  --tilavaraus-header-background-color:#ffe977;
+  --tilavaraus-header-color: rgb(26, 26, 26);
+  --tilavaraus-background-color: white;
+  --tilavaraus-content-text-color: rgb(26, 26, 26);
+  --tilavaraus-footer-background-color: #00005e;
+  --tilavaraus-footer-color: #f0f0f0;
 }
