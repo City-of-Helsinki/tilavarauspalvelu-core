@@ -1,4 +1,5 @@
-from django.forms import ModelForm, ValidationError, CharField
+from django.forms import CharField, ModelForm, ValidationError
+
 from reservations.models import Reservation
 
 

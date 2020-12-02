@@ -1,9 +1,9 @@
-from rest_framework import viewsets
-from reservation_units.models import ReservationUnit
-from rest_framework import serializers
-from api.space_api import SpaceSerializer
+from rest_framework import serializers, viewsets
+
 from api.resources_api import ResourceSerializer
 from api.services_api import ServiceSerializer
+from api.space_api import SpaceSerializer
+from reservation_units.models import ReservationUnit
 
 
 class ReservationUnitSerializer(serializers.ModelSerializer):

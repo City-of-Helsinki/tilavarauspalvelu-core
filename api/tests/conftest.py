@@ -1,13 +1,13 @@
-import pytest
 import datetime
+
+import pytest
+from django.contrib.auth import get_user_model
 from rest_framework.test import APIClient
 
-from django.contrib.auth import get_user_model
-
+from applications.models import ApplicationPeriod
 from reservation_units.models import ReservationUnit
 from reservations.models import Reservation
 from resources.models import Resource
-from applications.models import ApplicationPeriod
 
 
 @pytest.mark.django_db

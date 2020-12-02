@@ -1,16 +1,17 @@
 from datetime import datetime
+
 from dateutil.parser import parse
 from django.utils import timezone
-from rest_framework import viewsets, serializers
-from applications.models import (
-    Application,
-    Organisation,
-    ApplicationEvent,
-    Recurrence,
-    Address,
-    Person,
-)
+from rest_framework import serializers, viewsets
 
+from applications.models import (
+    Address,
+    Application,
+    ApplicationEvent,
+    Organisation,
+    Person,
+    Recurrence,
+)
 
 MINIMUM_TIME = timezone.datetime(
     1970, 1, 1, 0, 0, 0, 3, timezone.get_default_timezone()

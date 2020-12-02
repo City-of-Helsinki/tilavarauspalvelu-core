@@ -28,7 +28,7 @@ elif [ "$1" = "test" ]; then
         exit $exitcode
     fi
     _log_boxed "Running black"
-    black --check .
+    black --check --config black.toml .
     exitcode=$?
     if [ $exitcode -ne 0 ]; then
         exit $exitcode
@@ -40,7 +40,7 @@ elif [ "$1" = "test" ]; then
         exit $exitcode
     fi
     _log_boxed "Running tests"
-    pytest
+    pytest --cov-report= --cov=tilavaraus
     exitcode=$?
     if [ $exitcode -ne 0 ]; then
         exit $exitcode

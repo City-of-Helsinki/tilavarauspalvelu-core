@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+
 import environ
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -60,7 +61,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware",
 ]
 
 ROOT_URLCONF = "tilanvarauspalvelu.urls"
@@ -86,8 +87,7 @@ WSGI_APPLICATION = "tilanvarauspalvelu.wsgi.application"
 
 root = environ.Path(__file__)
 
-env = environ.Env(DEBUG=(bool, False),
-                  STATIC_ROOT=(environ.Path(), root("static")))
+env = environ.Env(DEBUG=(bool, False), STATIC_ROOT=(environ.Path(), root("static")))
 environ.Env.read_env()
 
 # Database
