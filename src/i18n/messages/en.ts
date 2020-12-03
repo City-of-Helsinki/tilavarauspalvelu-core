@@ -1,4 +1,4 @@
-const translations =  {
+const translations = {
   translation: {
     'common.applicationName': 'Varaamo',
     'navigation.link.spaceReservation': 'Vakiovuorot en',
