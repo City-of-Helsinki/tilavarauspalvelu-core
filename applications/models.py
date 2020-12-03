@@ -222,7 +222,7 @@ class ApplicationEvent(models.Model):
         verbose_name=_("Time frame start"), null=False, blank=False
     )
 
-    timeframe_start = models.TimeField(
+    timeframe_end = models.TimeField(
         verbose_name=_("Time frame end"), null=False, blank=False
     )
 

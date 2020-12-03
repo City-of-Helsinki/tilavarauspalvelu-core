@@ -158,6 +158,8 @@ class ApplicationEventSerializer(serializers.ModelSerializer):
             "num_events",
             "duration",
             "application",
+            "timeframe_start",
+            "timeframe_end"
         ]
 
 
