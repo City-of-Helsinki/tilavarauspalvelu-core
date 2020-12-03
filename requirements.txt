@@ -50,3 +50,5 @@ Unidecode==1.1.1
 uWSGI==2.0.19.1
 whitenoise==5.2.0
 zipp==3.4.0
+django-extra-fields==3.0.2
+django-filter==2.4.0

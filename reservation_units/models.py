@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.contrib.auth.models import User
 
 from resources.models import Resource
 from services.models import Service
@@ -55,7 +56,7 @@ class ReservationUnit(models.Model):
 class Purpose(models.Model):
     name = models.CharField(max_length=200)
     reservation_unit = models.ManyToManyField(
-        ReservationUnit, verbose_name=_("Purpose")
+        ReservationUnit, verbose_name=_("Purpose"), related_name="purposes"
     )
 
 

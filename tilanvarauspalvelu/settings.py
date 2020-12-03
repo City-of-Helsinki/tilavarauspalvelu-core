@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     "applications",
     "django_extensions",
     "mptt",
+    "django_filters",
 ]
 
 MIDDLEWARE = [

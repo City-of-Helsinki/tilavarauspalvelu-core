@@ -6,6 +6,8 @@ from django.contrib.auth import get_user_model
 from django.utils import timezone
 from rest_framework.test import APIClient
 
+from reservation_units.models import ReservationUnit, Purpose
+from reservations.models import Reservation, ReservationPurpose
 from applications.models import (
     Application,
     ApplicationEvent,
@@ -14,9 +16,8 @@ from applications.models import (
     Person,
     Recurrence,
 )
-from reservation_units.models import Purpose, ReservationUnit
-from reservations.models import Reservation, ReservationPurpose
 from resources.models import Resource
+from spaces.models import Space, Location, District
 
 
 @pytest.mark.django_db
@@ -44,13 +45,35 @@ def user_api_client(user):
 
 @pytest.fixture
 def resource():
-    return Resource.objects.create(name="testiresurssi")
+    return Resource.objects.create(name="Test resource")
 
 
 @pytest.fixture
-def reservation_unit(resource):
+def space(location):
+    return Space.objects.create(name="Space", location=location)
+
+
+@pytest.fixture
+def reservation_unit(resource, space):
     reservation_unit = ReservationUnit.objects.create(
-        name="testi", require_introduction=False
+        name="Test reservation unit", require_introduction=False
+    )
+    reservation_unit.resources.set([resource])
+    reservation_unit.spaces.set([space])
+    return reservation_unit
+
+
+@pytest.fixture
+def location():
+    return Location.objects.create(
+        address_street="Osoitetienkatu 13b", address_zip="33540", address_city="Tampere"
+    )
+
+
+@pytest.fixture
+def reservation_unit2(resource):
+    reservation_unit = ReservationUnit.objects.create(
+        name="Test reservation unit no. 2", require_introduction=False
     )
     reservation_unit.resources.set([resource])
     return reservation_unit
@@ -93,8 +116,23 @@ def valid_reservation_data(reservation_unit):
 
 
 @pytest.fixture
+def district():
+    return District.objects.create(name="Tapaninkylä")
+
+
+@pytest.fixture
+def sub_district(district):
+    return District.objects.create(name="Tapanila", parent=district)
+
+
+@pytest.fixture
 def purpose() -> Purpose:
     return Purpose.objects.create(name="Exercise")
+
+
+@pytest.fixture
+def purpose2() -> Purpose:
+    return Purpose.objects.create(name="Playing sports")
 
 
 @pytest.fixture
