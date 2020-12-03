@@ -3,6 +3,7 @@ from typing import Optional
 
 from django.contrib.auth.models import User
 from django.db import models
+from django.utils import timezone
 from django.utils.text import format_lazy
 from django.utils.translation import gettext_lazy as _
 from recurrence.fields import RecurrenceField
@@ -94,6 +95,21 @@ class Organisation(models.Model):
         Address, null=True, blank=True, on_delete=models.SET_NULL
     )
 
+
+class PRIORITY_CONST(object):
+    __slots__ = ()
+
+    PRIORITY_LOW = 100
+    PRIORITY_MEDIUM = 200
+    PRIORITY_HIGH = 300
+    PRIORITY_CHOICES = (
+        (PRIORITY_LOW, _("Low")),
+        (PRIORITY_MEDIUM, _("Medium")),
+        (PRIORITY_HIGH, _("High")),
+    )
+
+
+PRIORITIES = PRIORITY_CONST()
 
 class ApplicationPeriod(models.Model):
     name = models.CharField(
@@ -202,6 +218,14 @@ class ApplicationEvent(models.Model):
 
     duration = models.DurationField(verbose_name=_("Duration"), null=False, blank=False)
 
+    timeframe_start = models.TimeField(
+        verbose_name=_("Time frame start"), null=False, blank=False
+    )
+
+    timeframe_start = models.TimeField(
+        verbose_name=_("Time frame end"), null=False, blank=False
+    )
+
     application = models.ForeignKey(
         Application,
         verbose_name=_("Application"),
@@ -214,21 +238,41 @@ class ApplicationEvent(models.Model):
         District, verbose_name="Area", on_delete=models.SET_NULL, null=True, blank=True
     )
 
+    def clean(self):
+        cleaned_data = super().clean()
+        start = cleaned_data["timeframe_start"]
+        end = cleaned_data["timeframe_end"]
 
-class PRIORITY_CONST(object):
-    __slots__ = ()
+        timeframe_duration: int
 
-    PRIORITY_LOW = 100
-    PRIORITY_MEDIUM = 200
-    PRIORITY_HIGH = 300
-    PRIORITY_CHOICES = (
-        (PRIORITY_LOW, _("Low")),
-        (PRIORITY_MEDIUM, _("Medium")),
-        (PRIORITY_HIGH, _("High")),
+        if end < start:
+            midnight = timezone.datetime.now().replace(hour=0, minute=0, second=0).time()
+            timeframe_duration = abs(midnight - start) + end
+        else:
+            timeframe_duration = end - start
+
+        if timeframe_duration < cleaned_data["duration"]:
+            raise ValidationError("Duration is longer than timeframe")
+
+
+class ApplicationReservationUnit(models.Model):
+
+    priority = models.IntegerField(
+        choices=PRIORITIES.PRIORITY_CHOICES, default=PRIORITIES.PRIORITY_MEDIUM
     )
 
+    units = models.ForeignKey(
+        ApplicationEvent,
+        verbose_name=_("Application event"),
+        related_name="units",
+        on_delete=models.CASCADE
+    )
 
-PRIORITIES = PRIORITY_CONST()
+    reservation_unit = models.ForeignKey(
+        ReservationUnit,
+        verbose_name=_("Reservation unit"),
+        on_delete=models.PROTECT
+    )
 
 
 class Recurrence(models.Model):

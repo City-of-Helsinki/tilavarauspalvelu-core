@@ -9,7 +9,7 @@ from applications.models import (
     Application,
     ApplicationEvent,
     Organisation,
-    Recurrence,
+    Recurrence, Person,
 )
 
 MINIMUM_TIME = timezone.datetime(
