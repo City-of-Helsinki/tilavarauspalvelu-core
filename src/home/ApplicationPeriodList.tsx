@@ -1,22 +1,28 @@
 import React, { useEffect, useState } from 'react';
 import { ApplicationPeriod } from '../common/types';
 import { getapplicationPeriods } from '../common/api';
+import ApplicationPeriodCard from './ApplicationPeriodCard';
 
-const Head = (): JSX.Element => {
+const ApplicationPeriodList = (): JSX.Element => {
   const [applicationPeriods, setApplicationPeriods] = useState<
     ApplicationPeriod[]
-  >([] as ApplicationPeriod[]);
+  >([]);
 
   useEffect(() => {
     async function fetchData() {
       const periods = await getapplicationPeriods();
       setApplicationPeriods(periods);
     }
-
     fetchData();
   }, []);
 
-  return (<ul>{applicationPeriods.map((p) => (<li>{p.applicationPeriodBegin}</li>))}</ul>);
+  return (
+    <>
+      {applicationPeriods.map((p) => (
+        <ApplicationPeriodCard applicationPeriod={p} />
+      ))}
+    </>
+  );
 };
 
-export default Head;
+export default ApplicationPeriodList;
