@@ -52,3 +52,4 @@ whitenoise==5.2.0
 zipp==3.4.0
 django-extra-fields==3.0.2
 django-filter==2.4.0
+django-modeltranslation==0.16.1

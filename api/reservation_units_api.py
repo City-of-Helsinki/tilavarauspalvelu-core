@@ -35,6 +35,9 @@ class ReservationUnitSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "name",
+            "name_fi",
+            "name_en",
+            "name_sv",
             "spaces",
             "resources",
             "services",
