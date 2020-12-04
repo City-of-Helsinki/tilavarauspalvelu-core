@@ -1,5 +1,9 @@
 const translations = {
   translation: {
+    'ApplicatiopPeriodCard.button.reminder': 'Tilaa muistutus sv',
+    'ApplicatiopPeriodCard.button.apply': 'Hae tilaa sv',
+    'ApplicationPeriodCard.criteria': 'Hakukiriteerit sv',
+    'ApplicationPeriodCard.open': 'Haku auki {{until}} saakka sv',
     'common.applicationName': 'Varaamo',
     'navigation.link.spaceReservation': 'Vakiovuorot sv',
     'navigation.skipToMainContent': 'SHoppa till huvudnavigeringen',
