@@ -5,7 +5,6 @@ import { ApplicationPeriod } from './types';
 const axiosclient = applyCaseMiddleware(axios.create());
 
 const apiBaseUrl: string = process.env.REACT_APP_TILANVARAUS_API_URL || '';
-console.log('apiBaseUrl', apiBaseUrl);
 
 const applicationPeriodsBasePath = 'application_periods';
 
@@ -39,9 +38,10 @@ async function request<T>(requestConfig: AxiosRequestConfig): Promise<T> {
   const config: AxiosRequestConfig = requestConfig;
 
   try {
-    const response: AxiosResponse<T> = await axiosclient.request<T, AxiosResponse<T>>(
-      config
-    );
+    const response: AxiosResponse<T> = await axiosclient.request<
+      T,
+      AxiosResponse<T>
+    >(config);
     return response.data;
   } catch (error) {
     const errorMessage: string | undefined = error.response?.data?.detail;
@@ -72,5 +72,11 @@ async function apiGet<T>({ path, parameters = {} }: GetParameters): Promise<T> {
 export function getapplicationPeriods(): Promise<ApplicationPeriod[]> {
   return apiGet<ApplicationPeriod[]>({
     path: `v1/${applicationPeriodsBasePath}`,
-  })
+  });
+}
+
+export function anotherFuntion(): Promise<ApplicationPeriod[]> {
+  return apiGet<ApplicationPeriod[]>({
+    path: `v1/${applicationPeriodsBasePath}`,
+  });
 }

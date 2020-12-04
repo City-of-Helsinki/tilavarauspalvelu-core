@@ -1,0 +1,3191 @@
+openapi: 3.0.2
+info:
+  title: ''
+  version: ''
+paths:
+  /v1/reservation_units/:
+    get:
+      operationId: listReservationUnits
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  properties:
+                    id:
+                      type: integer
+                      readOnly: true
+                    name:
+                      type: string
+                      maxLength: 255
+                    spaces:
+                      type: array
+                      items:
+                        properties:
+                          id:
+                            type: integer
+                            readOnly: true
+                          name:
+                            type: string
+                            maxLength: 255
+                          parent:
+                            type: integer
+                            nullable: true
+                          building:
+                            type: integer
+                            nullable: true
+                          surface_area:
+                            type: number
+                            multipleOf: 0.01
+                            maximum: 100000000
+                            minimum: -100000000
+                            nullable: true
+                        required:
+                        - name
+                      readOnly: true
+                    resources:
+                      type: array
+                      items:
+                        properties:
+                          id:
+                            type: integer
+                            readOnly: true
+                          location_type:
+                            enum:
+                            - fixed
+                            - movable
+                          name:
+                            type: string
+                            maxLength: 255
+                          space:
+                            type: integer
+                            nullable: true
+                          buffer_time_before:
+                            type: string
+                            nullable: true
+                          buffer_time_after:
+                            type: string
+                            nullable: true
+                        required:
+                        - name
+                      readOnly: true
+                    services:
+                      type: array
+                      items:
+                        properties:
+                          id:
+                            type: integer
+                            readOnly: true
+                          name:
+                            type: string
+                            maxLength: 255
+                          service_type:
+                            enum:
+                            - introduction
+                            - catering
+                            - configuration
+                          buffer_time_before:
+                            type: string
+                            nullable: true
+                          buffer_time_after:
+                            type: string
+                            nullable: true
+                        required:
+                        - name
+                      readOnly: true
+                    require_introduction:
+                      type: boolean
+                  required:
+                  - name
+          description: ''
+    post:
+      operationId: createReservationUnit
+      description: ''
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema: &id001
+              properties:
+                name:
+                  type: string
+                  maxLength: 255
+                require_introduction:
+                  type: boolean
+              required:
+              - name
+          application/x-www-form-urlencoded:
+            schema: *id001
+          multipart/form-data:
+            schema: *id001
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    type: integer
+                    readOnly: true
+                  name:
+                    type: string
+                    maxLength: 255
+                  spaces:
+                    type: array
+                    items:
+                      properties:
+                        id:
+                          type: integer
+                          readOnly: true
+                        name:
+                          type: string
+                          maxLength: 255
+                        parent:
+                          type: integer
+                          nullable: true
+                        building:
+                          type: integer
+                          nullable: true
+                        surface_area:
+                          type: number
+                          multipleOf: 0.01
+                          maximum: 100000000
+                          minimum: -100000000
+                          nullable: true
+                      required:
+                      - name
+                    readOnly: true
+                  resources:
+                    type: array
+                    items:
+                      properties:
+                        id:
+                          type: integer
+                          readOnly: true
+                        location_type:
+                          enum:
+                          - fixed
+                          - movable
+                        name:
+                          type: string
+                          maxLength: 255
+                        space:
+                          type: integer
+                          nullable: true
+                        buffer_time_before:
+                          type: string
+                          nullable: true
+                        buffer_time_after:
+                          type: string
+                          nullable: true
+                      required:
+                      - name
+                    readOnly: true
+                  services:
+                    type: array
+                    items:
+                      properties:
+                        id:
+                          type: integer
+                          readOnly: true
+                        name:
+                          type: string
+                          maxLength: 255
+                        service_type:
+                          enum:
+                          - introduction
+                          - catering
+                          - configuration
+                        buffer_time_before:
+                          type: string
+                          nullable: true
+                        buffer_time_after:
+                          type: string
+                          nullable: true
+                      required:
+                      - name
+                    readOnly: true
+                  require_introduction:
+                    type: boolean
+                required:
+                - name
+          description: ''
+  /v1/reservation_units/{id}/:
+    get:
+      operationId: retrieveReservationUnit
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: ''
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    type: integer
+                    readOnly: true
+                  name:
+                    type: string
+                    maxLength: 255
+                  spaces:
+                    type: array
+                    items:
+                      properties:
+                        id:
+                          type: integer
+                          readOnly: true
+                        name:
+                          type: string
+                          maxLength: 255
+                        parent:
+                          type: integer
+                          nullable: true
+                        building:
+                          type: integer
+                          nullable: true
+                        surface_area:
+                          type: number
+                          multipleOf: 0.01
+                          maximum: 100000000
+                          minimum: -100000000
+                          nullable: true
+                      required:
+                      - name
+                    readOnly: true
+                  resources:
+                    type: array
+                    items:
+                      properties:
+                        id:
+                          type: integer
+                          readOnly: true
+                        location_type:
+                          enum:
+                          - fixed
+                          - movable
+                        name:
+                          type: string
+                          maxLength: 255
+                        space:
+                          type: integer
+                          nullable: true
+                        buffer_time_before:
+                          type: string
+                          nullable: true
+                        buffer_time_after:
+                          type: string
+                          nullable: true
+                      required:
+                      - name
+                    readOnly: true
+                  services:
+                    type: array
+                    items:
+                      properties:
+                        id:
+                          type: integer
+                          readOnly: true
+                        name:
+                          type: string
+                          maxLength: 255
+                        service_type:
+                          enum:
+                          - introduction
+                          - catering
+                          - configuration
+                        buffer_time_before:
+                          type: string
+                          nullable: true
+                        buffer_time_after:
+                          type: string
+                          nullable: true
+                      required:
+                      - name
+                    readOnly: true
+                  require_introduction:
+                    type: boolean
+                required:
+                - name
+          description: ''
+    put:
+      operationId: updateReservationUnit
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: ''
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema: &id002
+              properties:
+                name:
+                  type: string
+                  maxLength: 255
+                require_introduction:
+                  type: boolean
+              required:
+              - name
+          application/x-www-form-urlencoded:
+            schema: *id002
+          multipart/form-data:
+            schema: *id002
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    type: integer
+                    readOnly: true
+                  name:
+                    type: string
+                    maxLength: 255
+                  spaces:
+                    type: array
+                    items:
+                      properties:
+                        id:
+                          type: integer
+                          readOnly: true
+                        name:
+                          type: string
+                          maxLength: 255
+                        parent:
+                          type: integer
+                          nullable: true
+                        building:
+                          type: integer
+                          nullable: true
+                        surface_area:
+                          type: number
+                          multipleOf: 0.01
+                          maximum: 100000000
+                          minimum: -100000000
+                          nullable: true
+                      required:
+                      - name
+                    readOnly: true
+                  resources:
+                    type: array
+                    items:
+                      properties:
+                        id:
+                          type: integer
+                          readOnly: true
+                        location_type:
+                          enum:
+                          - fixed
+                          - movable
+                        name:
+                          type: string
+                          maxLength: 255
+                        space:
+                          type: integer
+                          nullable: true
+                        buffer_time_before:
+                          type: string
+                          nullable: true
+                        buffer_time_after:
+                          type: string
+                          nullable: true
+                      required:
+                      - name
+                    readOnly: true
+                  services:
+                    type: array
+                    items:
+                      properties:
+                        id:
+                          type: integer
+                          readOnly: true
+                        name:
+                          type: string
+                          maxLength: 255
+                        service_type:
+                          enum:
+                          - introduction
+                          - catering
+                          - configuration
+                        buffer_time_before:
+                          type: string
+                          nullable: true
+                        buffer_time_after:
+                          type: string
+                          nullable: true
+                      required:
+                      - name
+                    readOnly: true
+                  require_introduction:
+                    type: boolean
+                required:
+                - name
+          description: ''
+    patch:
+      operationId: partial_updateReservationUnit
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: ''
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema: &id003
+              properties:
+                name:
+                  type: string
+                  maxLength: 255
+                require_introduction:
+                  type: boolean
+          application/x-www-form-urlencoded:
+            schema: *id003
+          multipart/form-data:
+            schema: *id003
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    type: integer
+                    readOnly: true
+                  name:
+                    type: string
+                    maxLength: 255
+                  spaces:
+                    type: array
+                    items:
+                      properties:
+                        id:
+                          type: integer
+                          readOnly: true
+                        name:
+                          type: string
+                          maxLength: 255
+                        parent:
+                          type: integer
+                          nullable: true
+                        building:
+                          type: integer
+                          nullable: true
+                        surface_area:
+                          type: number
+                          multipleOf: 0.01
+                          maximum: 100000000
+                          minimum: -100000000
+                          nullable: true
+                      required:
+                      - name
+                    readOnly: true
+                  resources:
+                    type: array
+                    items:
+                      properties:
+                        id:
+                          type: integer
+                          readOnly: true
+                        location_type:
+                          enum:
+                          - fixed
+                          - movable
+                        name:
+                          type: string
+                          maxLength: 255
+                        space:
+                          type: integer
+                          nullable: true
+                        buffer_time_before:
+                          type: string
+                          nullable: true
+                        buffer_time_after:
+                          type: string
+                          nullable: true
+                      required:
+                      - name
+                    readOnly: true
+                  services:
+                    type: array
+                    items:
+                      properties:
+                        id:
+                          type: integer
+                          readOnly: true
+                        name:
+                          type: string
+                          maxLength: 255
+                        service_type:
+                          enum:
+                          - introduction
+                          - catering
+                          - configuration
+                        buffer_time_before:
+                          type: string
+                          nullable: true
+                        buffer_time_after:
+                          type: string
+                          nullable: true
+                      required:
+                      - name
+                    readOnly: true
+                  require_introduction:
+                    type: boolean
+                required:
+                - name
+          description: ''
+    delete:
+      operationId: destroyReservationUnit
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: ''
+        schema:
+          type: string
+      responses:
+        '204':
+          description: ''
+  /v1/spaces/:
+    get:
+      operationId: listSpaces
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  properties:
+                    id:
+                      type: integer
+                      readOnly: true
+                    name:
+                      type: string
+                      maxLength: 255
+                    parent:
+                      type: integer
+                      nullable: true
+                    building:
+                      type: integer
+                      nullable: true
+                    surface_area:
+                      type: number
+                      multipleOf: 0.01
+                      maximum: 100000000
+                      minimum: -100000000
+                      nullable: true
+                  required:
+                  - name
+          description: ''
+    post:
+      operationId: createSpace
+      description: ''
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema: &id004
+              properties:
+                name:
+                  type: string
+                  maxLength: 255
+                parent:
+                  type: integer
+                  nullable: true
+                building:
+                  type: integer
+                  nullable: true
+                surface_area:
+                  type: number
+                  multipleOf: 0.01
+                  maximum: 100000000
+                  minimum: -100000000
+                  nullable: true
+              required:
+              - name
+          application/x-www-form-urlencoded:
+            schema: *id004
+          multipart/form-data:
+            schema: *id004
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    type: integer
+                    readOnly: true
+                  name:
+                    type: string
+                    maxLength: 255
+                  parent:
+                    type: integer
+                    nullable: true
+                  building:
+                    type: integer
+                    nullable: true
+                  surface_area:
+                    type: number
+                    multipleOf: 0.01
+                    maximum: 100000000
+                    minimum: -100000000
+                    nullable: true
+                required:
+                - name
+          description: ''
+  /v1/spaces/{id}/:
+    get:
+      operationId: retrieveSpace
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this space.
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    type: integer
+                    readOnly: true
+                  name:
+                    type: string
+                    maxLength: 255
+                  parent:
+                    type: integer
+                    nullable: true
+                  building:
+                    type: integer
+                    nullable: true
+                  surface_area:
+                    type: number
+                    multipleOf: 0.01
+                    maximum: 100000000
+                    minimum: -100000000
+                    nullable: true
+                required:
+                - name
+          description: ''
+    put:
+      operationId: updateSpace
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this space.
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema: &id005
+              properties:
+                name:
+                  type: string
+                  maxLength: 255
+                parent:
+                  type: integer
+                  nullable: true
+                building:
+                  type: integer
+                  nullable: true
+                surface_area:
+                  type: number
+                  multipleOf: 0.01
+                  maximum: 100000000
+                  minimum: -100000000
+                  nullable: true
+              required:
+              - name
+          application/x-www-form-urlencoded:
+            schema: *id005
+          multipart/form-data:
+            schema: *id005
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    type: integer
+                    readOnly: true
+                  name:
+                    type: string
+                    maxLength: 255
+                  parent:
+                    type: integer
+                    nullable: true
+                  building:
+                    type: integer
+                    nullable: true
+                  surface_area:
+                    type: number
+                    multipleOf: 0.01
+                    maximum: 100000000
+                    minimum: -100000000
+                    nullable: true
+                required:
+                - name
+          description: ''
+    patch:
+      operationId: partial_updateSpace
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this space.
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema: &id006
+              properties:
+                name:
+                  type: string
+                  maxLength: 255
+                parent:
+                  type: integer
+                  nullable: true
+                building:
+                  type: integer
+                  nullable: true
+                surface_area:
+                  type: number
+                  multipleOf: 0.01
+                  maximum: 100000000
+                  minimum: -100000000
+                  nullable: true
+          application/x-www-form-urlencoded:
+            schema: *id006
+          multipart/form-data:
+            schema: *id006
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    type: integer
+                    readOnly: true
+                  name:
+                    type: string
+                    maxLength: 255
+                  parent:
+                    type: integer
+                    nullable: true
+                  building:
+                    type: integer
+                    nullable: true
+                  surface_area:
+                    type: number
+                    multipleOf: 0.01
+                    maximum: 100000000
+                    minimum: -100000000
+                    nullable: true
+                required:
+                - name
+          description: ''
+    delete:
+      operationId: destroySpace
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this space.
+        schema:
+          type: string
+      responses:
+        '204':
+          description: ''
+  /v1/services/:
+    get:
+      operationId: listServices
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  properties:
+                    id:
+                      type: integer
+                      readOnly: true
+                    name:
+                      type: string
+                      maxLength: 255
+                    service_type:
+                      enum:
+                      - introduction
+                      - catering
+                      - configuration
+                    buffer_time_before:
+                      type: string
+                      nullable: true
+                    buffer_time_after:
+                      type: string
+                      nullable: true
+                  required:
+                  - name
+          description: ''
+    post:
+      operationId: createService
+      description: ''
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema: &id007
+              properties:
+                name:
+                  type: string
+                  maxLength: 255
+                service_type:
+                  enum:
+                  - introduction
+                  - catering
+                  - configuration
+                buffer_time_before:
+                  type: string
+                  nullable: true
+                buffer_time_after:
+                  type: string
+                  nullable: true
+              required:
+              - name
+          application/x-www-form-urlencoded:
+            schema: *id007
+          multipart/form-data:
+            schema: *id007
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    type: integer
+                    readOnly: true
+                  name:
+                    type: string
+                    maxLength: 255
+                  service_type:
+                    enum:
+                    - introduction
+                    - catering
+                    - configuration
+                  buffer_time_before:
+                    type: string
+                    nullable: true
+                  buffer_time_after:
+                    type: string
+                    nullable: true
+                required:
+                - name
+          description: ''
+  /v1/services/{id}/:
+    get:
+      operationId: retrieveService
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this service.
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    type: integer
+                    readOnly: true
+                  name:
+                    type: string
+                    maxLength: 255
+                  service_type:
+                    enum:
+                    - introduction
+                    - catering
+                    - configuration
+                  buffer_time_before:
+                    type: string
+                    nullable: true
+                  buffer_time_after:
+                    type: string
+                    nullable: true
+                required:
+                - name
+          description: ''
+    put:
+      operationId: updateService
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this service.
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema: &id008
+              properties:
+                name:
+                  type: string
+                  maxLength: 255
+                service_type:
+                  enum:
+                  - introduction
+                  - catering
+                  - configuration
+                buffer_time_before:
+                  type: string
+                  nullable: true
+                buffer_time_after:
+                  type: string
+                  nullable: true
+              required:
+              - name
+          application/x-www-form-urlencoded:
+            schema: *id008
+          multipart/form-data:
+            schema: *id008
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    type: integer
+                    readOnly: true
+                  name:
+                    type: string
+                    maxLength: 255
+                  service_type:
+                    enum:
+                    - introduction
+                    - catering
+                    - configuration
+                  buffer_time_before:
+                    type: string
+                    nullable: true
+                  buffer_time_after:
+                    type: string
+                    nullable: true
+                required:
+                - name
+          description: ''
+    patch:
+      operationId: partial_updateService
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this service.
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema: &id009
+              properties:
+                name:
+                  type: string
+                  maxLength: 255
+                service_type:
+                  enum:
+                  - introduction
+                  - catering
+                  - configuration
+                buffer_time_before:
+                  type: string
+                  nullable: true
+                buffer_time_after:
+                  type: string
+                  nullable: true
+          application/x-www-form-urlencoded:
+            schema: *id009
+          multipart/form-data:
+            schema: *id009
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    type: integer
+                    readOnly: true
+                  name:
+                    type: string
+                    maxLength: 255
+                  service_type:
+                    enum:
+                    - introduction
+                    - catering
+                    - configuration
+                  buffer_time_before:
+                    type: string
+                    nullable: true
+                  buffer_time_after:
+                    type: string
+                    nullable: true
+                required:
+                - name
+          description: ''
+    delete:
+      operationId: destroyService
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this service.
+        schema:
+          type: string
+      responses:
+        '204':
+          description: ''
+  /v1/resources/:
+    get:
+      operationId: listResources
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  properties:
+                    id:
+                      type: integer
+                      readOnly: true
+                    location_type:
+                      enum:
+                      - fixed
+                      - movable
+                    name:
+                      type: string
+                      maxLength: 255
+                    space:
+                      type: integer
+                      nullable: true
+                    buffer_time_before:
+                      type: string
+                      nullable: true
+                    buffer_time_after:
+                      type: string
+                      nullable: true
+                  required:
+                  - name
+          description: ''
+    post:
+      operationId: createResource
+      description: ''
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema: &id010
+              properties:
+                location_type:
+                  enum:
+                  - fixed
+                  - movable
+                name:
+                  type: string
+                  maxLength: 255
+                space:
+                  type: integer
+                  nullable: true
+                buffer_time_before:
+                  type: string
+                  nullable: true
+                buffer_time_after:
+                  type: string
+                  nullable: true
+              required:
+              - name
+          application/x-www-form-urlencoded:
+            schema: *id010
+          multipart/form-data:
+            schema: *id010
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    type: integer
+                    readOnly: true
+                  location_type:
+                    enum:
+                    - fixed
+                    - movable
+                  name:
+                    type: string
+                    maxLength: 255
+                  space:
+                    type: integer
+                    nullable: true
+                  buffer_time_before:
+                    type: string
+                    nullable: true
+                  buffer_time_after:
+                    type: string
+                    nullable: true
+                required:
+                - name
+          description: ''
+  /v1/resources/{id}/:
+    get:
+      operationId: retrieveResource
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this resource.
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    type: integer
+                    readOnly: true
+                  location_type:
+                    enum:
+                    - fixed
+                    - movable
+                  name:
+                    type: string
+                    maxLength: 255
+                  space:
+                    type: integer
+                    nullable: true
+                  buffer_time_before:
+                    type: string
+                    nullable: true
+                  buffer_time_after:
+                    type: string
+                    nullable: true
+                required:
+                - name
+          description: ''
+    put:
+      operationId: updateResource
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this resource.
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema: &id011
+              properties:
+                location_type:
+                  enum:
+                  - fixed
+                  - movable
+                name:
+                  type: string
+                  maxLength: 255
+                space:
+                  type: integer
+                  nullable: true
+                buffer_time_before:
+                  type: string
+                  nullable: true
+                buffer_time_after:
+                  type: string
+                  nullable: true
+              required:
+              - name
+          application/x-www-form-urlencoded:
+            schema: *id011
+          multipart/form-data:
+            schema: *id011
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    type: integer
+                    readOnly: true
+                  location_type:
+                    enum:
+                    - fixed
+                    - movable
+                  name:
+                    type: string
+                    maxLength: 255
+                  space:
+                    type: integer
+                    nullable: true
+                  buffer_time_before:
+                    type: string
+                    nullable: true
+                  buffer_time_after:
+                    type: string
+                    nullable: true
+                required:
+                - name
+          description: ''
+    patch:
+      operationId: partial_updateResource
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this resource.
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema: &id012
+              properties:
+                location_type:
+                  enum:
+                  - fixed
+                  - movable
+                name:
+                  type: string
+                  maxLength: 255
+                space:
+                  type: integer
+                  nullable: true
+                buffer_time_before:
+                  type: string
+                  nullable: true
+                buffer_time_after:
+                  type: string
+                  nullable: true
+          application/x-www-form-urlencoded:
+            schema: *id012
+          multipart/form-data:
+            schema: *id012
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    type: integer
+                    readOnly: true
+                  location_type:
+                    enum:
+                    - fixed
+                    - movable
+                  name:
+                    type: string
+                    maxLength: 255
+                  space:
+                    type: integer
+                    nullable: true
+                  buffer_time_before:
+                    type: string
+                    nullable: true
+                  buffer_time_after:
+                    type: string
+                    nullable: true
+                required:
+                - name
+          description: ''
+    delete:
+      operationId: destroyResource
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this resource.
+        schema:
+          type: string
+      responses:
+        '204':
+          description: ''
+  /v1/reservations/:
+    get:
+      operationId: listReservations
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  properties:
+                    id:
+                      type: integer
+                      readOnly: true
+                    state:
+                      enum:
+                      - created
+                      - cancelled
+                      - confirmed
+                      - denied
+                      - requested
+                      - waiting_for_payment
+                    priority:
+                      enum:
+                      - 100
+                      - 200
+                      - 300
+                    user:
+                      type: integer
+                      nullable: true
+                    begin:
+                      type: string
+                      format: date-time
+                    end:
+                      type: string
+                      format: date-time
+                    buffer_time_before:
+                      type: string
+                      nullable: true
+                    buffer_time_after:
+                      type: string
+                      nullable: true
+                    reservation_unit:
+                      type: array
+                      items:
+                        type: integer
+                    recurring_reservation:
+                      type: integer
+                      nullable: true
+                  required:
+                  - begin
+                  - end
+                  - reservation_unit
+          description: ''
+    post:
+      operationId: createReservation
+      description: ''
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema: &id013
+              properties:
+                state:
+                  enum:
+                  - created
+                  - cancelled
+                  - confirmed
+                  - denied
+                  - requested
+                  - waiting_for_payment
+                priority:
+                  enum:
+                  - 100
+                  - 200
+                  - 300
+                user:
+                  type: integer
+                  nullable: true
+                begin:
+                  type: string
+                  format: date-time
+                end:
+                  type: string
+                  format: date-time
+                buffer_time_before:
+                  type: string
+                  nullable: true
+                buffer_time_after:
+                  type: string
+                  nullable: true
+                reservation_unit:
+                  type: array
+                  items:
+                    type: integer
+                recurring_reservation:
+                  type: integer
+                  nullable: true
+              required:
+              - begin
+              - end
+              - reservation_unit
+          application/x-www-form-urlencoded:
+            schema: *id013
+          multipart/form-data:
+            schema: *id013
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    type: integer
+                    readOnly: true
+                  state:
+                    enum:
+                    - created
+                    - cancelled
+                    - confirmed
+                    - denied
+                    - requested
+                    - waiting_for_payment
+                  priority:
+                    enum:
+                    - 100
+                    - 200
+                    - 300
+                  user:
+                    type: integer
+                    nullable: true
+                  begin:
+                    type: string
+                    format: date-time
+                  end:
+                    type: string
+                    format: date-time
+                  buffer_time_before:
+                    type: string
+                    nullable: true
+                  buffer_time_after:
+                    type: string
+                    nullable: true
+                  reservation_unit:
+                    type: array
+                    items:
+                      type: integer
+                  recurring_reservation:
+                    type: integer
+                    nullable: true
+                required:
+                - begin
+                - end
+                - reservation_unit
+          description: ''
+  /v1/reservations/{id}/:
+    get:
+      operationId: retrieveReservation
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this reservation.
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    type: integer
+                    readOnly: true
+                  state:
+                    enum:
+                    - created
+                    - cancelled
+                    - confirmed
+                    - denied
+                    - requested
+                    - waiting_for_payment
+                  priority:
+                    enum:
+                    - 100
+                    - 200
+                    - 300
+                  user:
+                    type: integer
+                    nullable: true
+                  begin:
+                    type: string
+                    format: date-time
+                  end:
+                    type: string
+                    format: date-time
+                  buffer_time_before:
+                    type: string
+                    nullable: true
+                  buffer_time_after:
+                    type: string
+                    nullable: true
+                  reservation_unit:
+                    type: array
+                    items:
+                      type: integer
+                  recurring_reservation:
+                    type: integer
+                    nullable: true
+                required:
+                - begin
+                - end
+                - reservation_unit
+          description: ''
+    put:
+      operationId: updateReservation
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this reservation.
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema: &id014
+              properties:
+                state:
+                  enum:
+                  - created
+                  - cancelled
+                  - confirmed
+                  - denied
+                  - requested
+                  - waiting_for_payment
+                priority:
+                  enum:
+                  - 100
+                  - 200
+                  - 300
+                user:
+                  type: integer
+                  nullable: true
+                begin:
+                  type: string
+                  format: date-time
+                end:
+                  type: string
+                  format: date-time
+                buffer_time_before:
+                  type: string
+                  nullable: true
+                buffer_time_after:
+                  type: string
+                  nullable: true
+                reservation_unit:
+                  type: array
+                  items:
+                    type: integer
+                recurring_reservation:
+                  type: integer
+                  nullable: true
+              required:
+              - begin
+              - end
+              - reservation_unit
+          application/x-www-form-urlencoded:
+            schema: *id014
+          multipart/form-data:
+            schema: *id014
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    type: integer
+                    readOnly: true
+                  state:
+                    enum:
+                    - created
+                    - cancelled
+                    - confirmed
+                    - denied
+                    - requested
+                    - waiting_for_payment
+                  priority:
+                    enum:
+                    - 100
+                    - 200
+                    - 300
+                  user:
+                    type: integer
+                    nullable: true
+                  begin:
+                    type: string
+                    format: date-time
+                  end:
+                    type: string
+                    format: date-time
+                  buffer_time_before:
+                    type: string
+                    nullable: true
+                  buffer_time_after:
+                    type: string
+                    nullable: true
+                  reservation_unit:
+                    type: array
+                    items:
+                      type: integer
+                  recurring_reservation:
+                    type: integer
+                    nullable: true
+                required:
+                - begin
+                - end
+                - reservation_unit
+          description: ''
+    patch:
+      operationId: partial_updateReservation
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this reservation.
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema: &id015
+              properties:
+                state:
+                  enum:
+                  - created
+                  - cancelled
+                  - confirmed
+                  - denied
+                  - requested
+                  - waiting_for_payment
+                priority:
+                  enum:
+                  - 100
+                  - 200
+                  - 300
+                user:
+                  type: integer
+                  nullable: true
+                begin:
+                  type: string
+                  format: date-time
+                end:
+                  type: string
+                  format: date-time
+                buffer_time_before:
+                  type: string
+                  nullable: true
+                buffer_time_after:
+                  type: string
+                  nullable: true
+                reservation_unit:
+                  type: array
+                  items:
+                    type: integer
+                recurring_reservation:
+                  type: integer
+                  nullable: true
+          application/x-www-form-urlencoded:
+            schema: *id015
+          multipart/form-data:
+            schema: *id015
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    type: integer
+                    readOnly: true
+                  state:
+                    enum:
+                    - created
+                    - cancelled
+                    - confirmed
+                    - denied
+                    - requested
+                    - waiting_for_payment
+                  priority:
+                    enum:
+                    - 100
+                    - 200
+                    - 300
+                  user:
+                    type: integer
+                    nullable: true
+                  begin:
+                    type: string
+                    format: date-time
+                  end:
+                    type: string
+                    format: date-time
+                  buffer_time_before:
+                    type: string
+                    nullable: true
+                  buffer_time_after:
+                    type: string
+                    nullable: true
+                  reservation_unit:
+                    type: array
+                    items:
+                      type: integer
+                  recurring_reservation:
+                    type: integer
+                    nullable: true
+                required:
+                - begin
+                - end
+                - reservation_unit
+          description: ''
+    delete:
+      operationId: destroyReservation
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this reservation.
+        schema:
+          type: string
+      responses:
+        '204':
+          description: ''
+  /v1/applications/:
+    get:
+      operationId: listApplications
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  properties:
+                    id:
+                      type: integer
+                      readOnly: true
+                    description:
+                      type: string
+                      nullable: true
+                      maxLength: 1000
+                    reservation_purpose:
+                      type: integer
+                      nullable: true
+                    organisation:
+                      type: integer
+                    contact_person:
+                      type: integer
+                    application_period:
+                      type: integer
+                    user:
+                      type: string
+                      readOnly: true
+                  required:
+                  - organisation
+                  - contact_person
+                  - application_period
+          description: ''
+    post:
+      operationId: createApplication
+      description: ''
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema: &id016
+              properties:
+                description:
+                  type: string
+                  nullable: true
+                  maxLength: 1000
+                reservation_purpose:
+                  type: integer
+                  nullable: true
+                organisation:
+                  type: integer
+                contact_person:
+                  type: integer
+                application_period:
+                  type: integer
+              required:
+              - organisation
+              - contact_person
+              - application_period
+          application/x-www-form-urlencoded:
+            schema: *id016
+          multipart/form-data:
+            schema: *id016
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    type: integer
+                    readOnly: true
+                  description:
+                    type: string
+                    nullable: true
+                    maxLength: 1000
+                  reservation_purpose:
+                    type: integer
+                    nullable: true
+                  organisation:
+                    type: integer
+                  contact_person:
+                    type: integer
+                  application_period:
+                    type: integer
+                  user:
+                    type: string
+                    readOnly: true
+                required:
+                - organisation
+                - contact_person
+                - application_period
+          description: ''
+  /v1/applications/{id}/:
+    get:
+      operationId: retrieveApplication
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this application.
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    type: integer
+                    readOnly: true
+                  description:
+                    type: string
+                    nullable: true
+                    maxLength: 1000
+                  reservation_purpose:
+                    type: integer
+                    nullable: true
+                  organisation:
+                    type: integer
+                  contact_person:
+                    type: integer
+                  application_period:
+                    type: integer
+                  user:
+                    type: string
+                    readOnly: true
+                required:
+                - organisation
+                - contact_person
+                - application_period
+          description: ''
+    put:
+      operationId: updateApplication
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this application.
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema: &id017
+              properties:
+                description:
+                  type: string
+                  nullable: true
+                  maxLength: 1000
+                reservation_purpose:
+                  type: integer
+                  nullable: true
+                organisation:
+                  type: integer
+                contact_person:
+                  type: integer
+                application_period:
+                  type: integer
+              required:
+              - organisation
+              - contact_person
+              - application_period
+          application/x-www-form-urlencoded:
+            schema: *id017
+          multipart/form-data:
+            schema: *id017
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    type: integer
+                    readOnly: true
+                  description:
+                    type: string
+                    nullable: true
+                    maxLength: 1000
+                  reservation_purpose:
+                    type: integer
+                    nullable: true
+                  organisation:
+                    type: integer
+                  contact_person:
+                    type: integer
+                  application_period:
+                    type: integer
+                  user:
+                    type: string
+                    readOnly: true
+                required:
+                - organisation
+                - contact_person
+                - application_period
+          description: ''
+    patch:
+      operationId: partial_updateApplication
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this application.
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema: &id018
+              properties:
+                description:
+                  type: string
+                  nullable: true
+                  maxLength: 1000
+                reservation_purpose:
+                  type: integer
+                  nullable: true
+                organisation:
+                  type: integer
+                contact_person:
+                  type: integer
+                application_period:
+                  type: integer
+          application/x-www-form-urlencoded:
+            schema: *id018
+          multipart/form-data:
+            schema: *id018
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    type: integer
+                    readOnly: true
+                  description:
+                    type: string
+                    nullable: true
+                    maxLength: 1000
+                  reservation_purpose:
+                    type: integer
+                    nullable: true
+                  organisation:
+                    type: integer
+                  contact_person:
+                    type: integer
+                  application_period:
+                    type: integer
+                  user:
+                    type: string
+                    readOnly: true
+                required:
+                - organisation
+                - contact_person
+                - application_period
+          description: ''
+    delete:
+      operationId: destroyApplication
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this application.
+        schema:
+          type: string
+      responses:
+        '204':
+          description: ''
+  /v1/applicationevents/:
+    get:
+      operationId: listApplicationEvents
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  properties:
+                    id:
+                      type: integer
+                      readOnly: true
+                    recurrences:
+                      type: array
+                      items:
+                        properties:
+                          id:
+                            type: integer
+                            readOnly: true
+                          priority:
+                            enum:
+                            - 100
+                            - 200
+                            - 300
+                          recurrence:
+                            type: string
+                            readOnly: true
+                      readOnly: true
+                    num_persons:
+                      type: integer
+                      nullable: true
+                    age_group:
+                      type: integer
+                      nullable: true
+                    ability_group:
+                      type: integer
+                      nullable: true
+                    num_events:
+                      type: integer
+                    duration:
+                      type: string
+                    application:
+                      type: integer
+                  required:
+                  - num_events
+                  - duration
+                  - application
+          description: ''
+    post:
+      operationId: createApplicationEvent
+      description: ''
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema: &id019
+              properties:
+                num_persons:
+                  type: integer
+                  nullable: true
+                age_group:
+                  type: integer
+                  nullable: true
+                ability_group:
+                  type: integer
+                  nullable: true
+                num_events:
+                  type: integer
+                duration:
+                  type: string
+                application:
+                  type: integer
+              required:
+              - num_events
+              - duration
+              - application
+          application/x-www-form-urlencoded:
+            schema: *id019
+          multipart/form-data:
+            schema: *id019
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    type: integer
+                    readOnly: true
+                  recurrences:
+                    type: array
+                    items:
+                      properties:
+                        id:
+                          type: integer
+                          readOnly: true
+                        priority:
+                          enum:
+                          - 100
+                          - 200
+                          - 300
+                        recurrence:
+                          type: string
+                          readOnly: true
+                    readOnly: true
+                  num_persons:
+                    type: integer
+                    nullable: true
+                  age_group:
+                    type: integer
+                    nullable: true
+                  ability_group:
+                    type: integer
+                    nullable: true
+                  num_events:
+                    type: integer
+                  duration:
+                    type: string
+                  application:
+                    type: integer
+                required:
+                - num_events
+                - duration
+                - application
+          description: ''
+  /v1/applicationevents/{id}/:
+    get:
+      operationId: retrieveApplicationEvent
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this application event.
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    type: integer
+                    readOnly: true
+                  recurrences:
+                    type: array
+                    items:
+                      properties:
+                        id:
+                          type: integer
+                          readOnly: true
+                        priority:
+                          enum:
+                          - 100
+                          - 200
+                          - 300
+                        recurrence:
+                          type: string
+                          readOnly: true
+                    readOnly: true
+                  num_persons:
+                    type: integer
+                    nullable: true
+                  age_group:
+                    type: integer
+                    nullable: true
+                  ability_group:
+                    type: integer
+                    nullable: true
+                  num_events:
+                    type: integer
+                  duration:
+                    type: string
+                  application:
+                    type: integer
+                required:
+                - num_events
+                - duration
+                - application
+          description: ''
+    put:
+      operationId: updateApplicationEvent
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this application event.
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema: &id020
+              properties:
+                num_persons:
+                  type: integer
+                  nullable: true
+                age_group:
+                  type: integer
+                  nullable: true
+                ability_group:
+                  type: integer
+                  nullable: true
+                num_events:
+                  type: integer
+                duration:
+                  type: string
+                application:
+                  type: integer
+              required:
+              - num_events
+              - duration
+              - application
+          application/x-www-form-urlencoded:
+            schema: *id020
+          multipart/form-data:
+            schema: *id020
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    type: integer
+                    readOnly: true
+                  recurrences:
+                    type: array
+                    items:
+                      properties:
+                        id:
+                          type: integer
+                          readOnly: true
+                        priority:
+                          enum:
+                          - 100
+                          - 200
+                          - 300
+                        recurrence:
+                          type: string
+                          readOnly: true
+                    readOnly: true
+                  num_persons:
+                    type: integer
+                    nullable: true
+                  age_group:
+                    type: integer
+                    nullable: true
+                  ability_group:
+                    type: integer
+                    nullable: true
+                  num_events:
+                    type: integer
+                  duration:
+                    type: string
+                  application:
+                    type: integer
+                required:
+                - num_events
+                - duration
+                - application
+          description: ''
+    patch:
+      operationId: partial_updateApplicationEvent
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this application event.
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema: &id021
+              properties:
+                num_persons:
+                  type: integer
+                  nullable: true
+                age_group:
+                  type: integer
+                  nullable: true
+                ability_group:
+                  type: integer
+                  nullable: true
+                num_events:
+                  type: integer
+                duration:
+                  type: string
+                application:
+                  type: integer
+          application/x-www-form-urlencoded:
+            schema: *id021
+          multipart/form-data:
+            schema: *id021
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    type: integer
+                    readOnly: true
+                  recurrences:
+                    type: array
+                    items:
+                      properties:
+                        id:
+                          type: integer
+                          readOnly: true
+                        priority:
+                          enum:
+                          - 100
+                          - 200
+                          - 300
+                        recurrence:
+                          type: string
+                          readOnly: true
+                    readOnly: true
+                  num_persons:
+                    type: integer
+                    nullable: true
+                  age_group:
+                    type: integer
+                    nullable: true
+                  ability_group:
+                    type: integer
+                    nullable: true
+                  num_events:
+                    type: integer
+                  duration:
+                    type: string
+                  application:
+                    type: integer
+                required:
+                - num_events
+                - duration
+                - application
+          description: ''
+    delete:
+      operationId: destroyApplicationEvent
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this application event.
+        schema:
+          type: string
+      responses:
+        '204':
+          description: ''
+  /v1/organisations/:
+    get:
+      operationId: listOrganisations
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  properties:
+                    id:
+                      type: integer
+                      readOnly: true
+                    name:
+                      type: string
+                      maxLength: 255
+                    identifier:
+                      type: string
+                      maxLength: 255
+                    year_established:
+                      type: integer
+                      nullable: true
+                  required:
+                  - name
+                  - identifier
+          description: ''
+    post:
+      operationId: createOrganisation
+      description: ''
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema: &id022
+              properties:
+                name:
+                  type: string
+                  maxLength: 255
+                identifier:
+                  type: string
+                  maxLength: 255
+                year_established:
+                  type: integer
+                  nullable: true
+              required:
+              - name
+              - identifier
+          application/x-www-form-urlencoded:
+            schema: *id022
+          multipart/form-data:
+            schema: *id022
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    type: integer
+                    readOnly: true
+                  name:
+                    type: string
+                    maxLength: 255
+                  identifier:
+                    type: string
+                    maxLength: 255
+                  year_established:
+                    type: integer
+                    nullable: true
+                required:
+                - name
+                - identifier
+          description: ''
+  /v1/organisations/{id}/:
+    get:
+      operationId: retrieveOrganisation
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this organisation.
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    type: integer
+                    readOnly: true
+                  name:
+                    type: string
+                    maxLength: 255
+                  identifier:
+                    type: string
+                    maxLength: 255
+                  year_established:
+                    type: integer
+                    nullable: true
+                required:
+                - name
+                - identifier
+          description: ''
+    put:
+      operationId: updateOrganisation
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this organisation.
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema: &id023
+              properties:
+                name:
+                  type: string
+                  maxLength: 255
+                identifier:
+                  type: string
+                  maxLength: 255
+                year_established:
+                  type: integer
+                  nullable: true
+              required:
+              - name
+              - identifier
+          application/x-www-form-urlencoded:
+            schema: *id023
+          multipart/form-data:
+            schema: *id023
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    type: integer
+                    readOnly: true
+                  name:
+                    type: string
+                    maxLength: 255
+                  identifier:
+                    type: string
+                    maxLength: 255
+                  year_established:
+                    type: integer
+                    nullable: true
+                required:
+                - name
+                - identifier
+          description: ''
+    patch:
+      operationId: partial_updateOrganisation
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this organisation.
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema: &id024
+              properties:
+                name:
+                  type: string
+                  maxLength: 255
+                identifier:
+                  type: string
+                  maxLength: 255
+                year_established:
+                  type: integer
+                  nullable: true
+          application/x-www-form-urlencoded:
+            schema: *id024
+          multipart/form-data:
+            schema: *id024
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    type: integer
+                    readOnly: true
+                  name:
+                    type: string
+                    maxLength: 255
+                  identifier:
+                    type: string
+                    maxLength: 255
+                  year_established:
+                    type: integer
+                    nullable: true
+                required:
+                - name
+                - identifier
+          description: ''
+    delete:
+      operationId: destroyOrganisation
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this organisation.
+        schema:
+          type: string
+      responses:
+        '204':
+          description: ''
+  /v1/addresses/:
+    get:
+      operationId: listAddress
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  properties:
+                    id:
+                      type: integer
+                      readOnly: true
+                    street_address:
+                      type: string
+                      maxLength: 80
+                    post_code:
+                      type: integer
+                    city:
+                      type: string
+                      maxLength: 80
+                  required:
+                  - street_address
+                  - post_code
+                  - city
+          description: ''
+    post:
+      operationId: createAddress
+      description: ''
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema: &id025
+              properties:
+                street_address:
+                  type: string
+                  maxLength: 80
+                post_code:
+                  type: integer
+                city:
+                  type: string
+                  maxLength: 80
+              required:
+              - street_address
+              - post_code
+              - city
+          application/x-www-form-urlencoded:
+            schema: *id025
+          multipart/form-data:
+            schema: *id025
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    type: integer
+                    readOnly: true
+                  street_address:
+                    type: string
+                    maxLength: 80
+                  post_code:
+                    type: integer
+                  city:
+                    type: string
+                    maxLength: 80
+                required:
+                - street_address
+                - post_code
+                - city
+          description: ''
+  /v1/addresses/{id}/:
+    get:
+      operationId: retrieveAddress
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this address.
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    type: integer
+                    readOnly: true
+                  street_address:
+                    type: string
+                    maxLength: 80
+                  post_code:
+                    type: integer
+                  city:
+                    type: string
+                    maxLength: 80
+                required:
+                - street_address
+                - post_code
+                - city
+          description: ''
+    put:
+      operationId: updateAddress
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this address.
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema: &id026
+              properties:
+                street_address:
+                  type: string
+                  maxLength: 80
+                post_code:
+                  type: integer
+                city:
+                  type: string
+                  maxLength: 80
+              required:
+              - street_address
+              - post_code
+              - city
+          application/x-www-form-urlencoded:
+            schema: *id026
+          multipart/form-data:
+            schema: *id026
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    type: integer
+                    readOnly: true
+                  street_address:
+                    type: string
+                    maxLength: 80
+                  post_code:
+                    type: integer
+                  city:
+                    type: string
+                    maxLength: 80
+                required:
+                - street_address
+                - post_code
+                - city
+          description: ''
+    patch:
+      operationId: partial_updateAddress
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this address.
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema: &id027
+              properties:
+                street_address:
+                  type: string
+                  maxLength: 80
+                post_code:
+                  type: integer
+                city:
+                  type: string
+                  maxLength: 80
+          application/x-www-form-urlencoded:
+            schema: *id027
+          multipart/form-data:
+            schema: *id027
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    type: integer
+                    readOnly: true
+                  street_address:
+                    type: string
+                    maxLength: 80
+                  post_code:
+                    type: integer
+                  city:
+                    type: string
+                    maxLength: 80
+                required:
+                - street_address
+                - post_code
+                - city
+          description: ''
+    delete:
+      operationId: destroyAddress
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this address.
+        schema:
+          type: string
+      responses:
+        '204':
+          description: ''
+  /v1/persons/:
+    get:
+      operationId: listPersons
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  properties:
+                    id:
+                      type: integer
+                      readOnly: true
+                    first_name:
+                      type: string
+                      maxLength: 50
+                    last_name:
+                      type: string
+                      maxLength: 50
+                  required:
+                  - first_name
+                  - last_name
+          description: ''
+    post:
+      operationId: createPerson
+      description: ''
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema: &id028
+              properties:
+                first_name:
+                  type: string
+                  maxLength: 50
+                last_name:
+                  type: string
+                  maxLength: 50
+              required:
+              - first_name
+              - last_name
+          application/x-www-form-urlencoded:
+            schema: *id028
+          multipart/form-data:
+            schema: *id028
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    type: integer
+                    readOnly: true
+                  first_name:
+                    type: string
+                    maxLength: 50
+                  last_name:
+                    type: string
+                    maxLength: 50
+                required:
+                - first_name
+                - last_name
+          description: ''
+  /v1/persons/{id}/:
+    get:
+      operationId: retrievePerson
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this person.
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    type: integer
+                    readOnly: true
+                  first_name:
+                    type: string
+                    maxLength: 50
+                  last_name:
+                    type: string
+                    maxLength: 50
+                required:
+                - first_name
+                - last_name
+          description: ''
+    put:
+      operationId: updatePerson
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this person.
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema: &id029
+              properties:
+                first_name:
+                  type: string
+                  maxLength: 50
+                last_name:
+                  type: string
+                  maxLength: 50
+              required:
+              - first_name
+              - last_name
+          application/x-www-form-urlencoded:
+            schema: *id029
+          multipart/form-data:
+            schema: *id029
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    type: integer
+                    readOnly: true
+                  first_name:
+                    type: string
+                    maxLength: 50
+                  last_name:
+                    type: string
+                    maxLength: 50
+                required:
+                - first_name
+                - last_name
+          description: ''
+    patch:
+      operationId: partial_updatePerson
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this person.
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema: &id030
+              properties:
+                first_name:
+                  type: string
+                  maxLength: 50
+                last_name:
+                  type: string
+                  maxLength: 50
+          application/x-www-form-urlencoded:
+            schema: *id030
+          multipart/form-data:
+            schema: *id030
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    type: integer
+                    readOnly: true
+                  first_name:
+                    type: string
+                    maxLength: 50
+                  last_name:
+                    type: string
+                    maxLength: 50
+                required:
+                - first_name
+                - last_name
+          description: ''
+    delete:
+      operationId: destroyPerson
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this person.
+        schema:
+          type: string
+      responses:
+        '204':
+          description: ''
+  /v1/application_periods/:
+    get:
+      operationId: listApplicationPeriods
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  properties:
+                    id:
+                      type: integer
+                      readOnly: true
+                    name:
+                      type: string
+                      maxLength: 255
+                    reservation_units:
+                      type: array
+                      items:
+                        type: integer
+                    application_period_begin:
+                      type: string
+                      format: date
+                    application_period_end:
+                      type: string
+                      format: date
+                    reservation_period_begin:
+                      type: string
+                      format: date
+                    reservation_period_end:
+                      type: string
+                      format: date
+                    purposes:
+                      type: array
+                      items:
+                        type: integer
+                  required:
+                  - name
+                  - reservation_units
+                  - application_period_begin
+                  - application_period_end
+                  - reservation_period_begin
+                  - reservation_period_end
+          description: ''
+  /v1/application_periods/{id}/:
+    get:
+      operationId: retrieveApplicationPeriod
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this application period.
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    type: integer
+                    readOnly: true
+                  name:
+                    type: string
+                    maxLength: 255
+                  reservation_units:
+                    type: array
+                    items:
+                      type: integer
+                  application_period_begin:
+                    type: string
+                    format: date
+                  application_period_end:
+                    type: string
+                    format: date
+                  reservation_period_begin:
+                    type: string
+                    format: date
+                  reservation_period_end:
+                    type: string
+                    format: date
+                  purposes:
+                    type: array
+                    items:
+                      type: integer
+                required:
+                - name
+                - reservation_units
+                - application_period_begin
+                - application_period_end
+                - reservation_period_begin
+                - reservation_period_end
+          description: ''
