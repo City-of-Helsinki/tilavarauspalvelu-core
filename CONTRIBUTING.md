@@ -13,9 +13,9 @@ Name your branches in format {jira_issue_code}/{short_description}. Eg. `TILA-74
 ## Serializers
 To keep serializers consistent, we obey the following principles. These principles may change in future.
 
-- By default, define relations in `fields = []` Meta attribute, which uses `PrimaryKeyRelatedField`.
-- If you need to represent relations as nested objects, use `PresentablePrimaryKeyRelatedField`, which is from `drf-extra-fields` library. This represents relations as nested objects when reading, and uses foreign key when writing.
-- Do not create nested writing operations
+- We want to easily determine if related field contains id or whole object. Always use `_id` at end of the field name if it is a foreign key id field.
+- If related models are exposed in their own API endpoint, use it to CRUD them. Use nested objects only if they are not used separately.
+- Check examples in `api/examples.py` for samples how to do different implementations using above rules.
 
 ## Testing
 To guarantee that software is working as it supposed to, we obey the following testing principles. These principles are based on [Helsinki Testing requirements](https://dev.hel.fi/testing-requirements).
@@ -28,4 +28,4 @@ To guarantee that software is working as it supposed to, we obey the following t
 - Abstract reusable test data in fixtures (`conftest.py`). Sometimes creating or manipulating objects during a test is necessary, but if the data could be used in another test, put it in fixtures.
 
 ## Branches
-Format your code with format.sh script to conform to style checks, and fix possible flake8 errors in your code. 
+Format your code with format.sh script to conform to style checks, and fix possible flake8 errors in your code.
