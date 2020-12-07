@@ -13,7 +13,7 @@ const Head = (props: HeadProps): JSX.Element => (
       <h1 className={styles.heading}>{props.heading}</h1>
       <span>{props.text}</span>
     </div>
-    <Koros className={styles.koros} type="wave" />
+    <Koros className={`${styles.koros} koros`} type="wave" />
   </div>
 );
 

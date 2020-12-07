@@ -23,6 +23,13 @@ body {
   font-size: $fontsize-heading-l;
 }
 
+.koros > svg {
+  left: 50%;
+  position: relative;
+  transform: translateX(-50%);
+  width: 4028px;
+}
+
 #root {
   padding: 0;
   flex-direction: row;

@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, IconSearch } from 'hds-react';
 import { useHistory } from 'react-router-dom';
-import MainContainer from '../component/MainContainer';
+import Container from '../component/Container';
 import Head from './Head';
 import ApplicationPeriods from './ApplicationPeriodList';
 import styles from './Home.module.scss';
@@ -14,7 +14,7 @@ const Home = (): JSX.Element => {
   return (
     <>
       <Head heading={t('home.head.heading')} text={t('home.head.text')} />
-      <MainContainer>
+      <Container>
         <h2 className="heading-l">Hakeminen</h2>
         <p className="text-lg">
           Vakiovuoroja haetaan yleisen haun kautta. Voit selata tiloja, mutta
@@ -38,7 +38,7 @@ const Home = (): JSX.Element => {
           tuleviin hakuihin.
         </p>
         <ApplicationPeriods />
-      </MainContainer>
+      </Container>
     </>
   );
 };
