@@ -11,7 +11,7 @@ const ApplicationPeriodList = (): JSX.Element => {
   useEffect(() => {
     async function fetchData() {
       const periods = await getapplicationPeriods();
-      setApplicationPeriods(periods);
+      setApplicationPeriods(periods.concat(periods));
     }
     fetchData();
   }, []);

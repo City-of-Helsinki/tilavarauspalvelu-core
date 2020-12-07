@@ -7,6 +7,7 @@
   grid-gap: $spacing-m;
   align-items: start;
   padding: $spacing-m;
+  margin-bottom: $spacing-s;
 }
 
 .button {
@@ -26,6 +27,18 @@
     font-size: $fontsize-body-xl;
     font-weight: 500;
   }
+}
+
+.linkContainer {
+  line-height: 1;
+  color: $color-bus;
+}
+
+.linkIcon,
+.linkText {
+  vertical-align: middle;
+  display: inline-block;
+  margin: $spacing-s $spacing-xs 0 0;
 
 }
 

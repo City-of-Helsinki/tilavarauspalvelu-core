@@ -22,7 +22,7 @@ const formatDate = (startDate: string) => {
 const ApplicationPeriodCard = ({ applicationPeriod }: Props): JSX.Element => {
   const { t } = useTranslation();
 
-  const active = !isActive(
+  const active = isActive(
     applicationPeriod.applicationPeriodBegin,
     applicationPeriod.applicationPeriodEnd
   );
@@ -34,13 +34,23 @@ const ApplicationPeriodCard = ({ applicationPeriod }: Props): JSX.Element => {
       <Container className={styles.container}>
         <div className={styles.name}>{applicationPeriod.name}</div>
         <div>
-          {t('ApplicationPeriodCard.open', {
-            until: formatDate(applicationPeriod.applicationPeriodEnd),
-          })}
+          {active
+            ? t('ApplicationPeriodCard.open', {
+                until: formatDate(applicationPeriod.applicationPeriodEnd),
+              })
+            : t('ApplicationPeriodCard.closed', {
+                openingDateTime: formatDate(
+                  applicationPeriod.applicationPeriodBegin
+                ),
+              })}
         </div>
-        <div>
-          <IconArrowRight />
-          {t('ApplicationPeriodCard.criteria')}
+        <div className={styles.linkContainer}>
+          <span className={styles.linkIcon}>
+            <IconArrowRight />
+          </span>
+          <span className={styles.linkText}>
+            {t('ApplicationPeriodCard.criteria')}
+          </span>
         </div>
       </Container>
       {active ? (

@@ -3,6 +3,7 @@ const translations = {
     'ApplicatiopPeriodCard.button.reminder': 'Tilaa muistutus',
     'ApplicatiopPeriodCard.button.apply': 'Hae tilaa',
     'ApplicationPeriodCard.criteria': 'Hakukiriteerit',
+    'ApplicationPeriodCard.closed': 'Haku avautuu {{openingDateTime}}',
     'ApplicationPeriodCard.open': 'Haku auki {{until}} saakka',
     'common.applicationName': 'Varaamo',
     'navigation.link.spaceReservation': 'Vakiovuorot',
