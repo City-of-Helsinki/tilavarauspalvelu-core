@@ -1,0 +1,36 @@
+import { Button, IconHeart, IconPlus } from 'hds-react';
+import React from 'react';
+import { ReservationUnit } from '../common/types';
+import styles from './ReservationUnitCard.module.scss';
+
+interface Props {
+  reservationUnit: ReservationUnit;
+}
+
+const ReservationUnitCard = ({ reservationUnit }: Props): JSX.Element => {
+  // const { t } = useTranslation();
+  return (
+    <div className={styles.container}>
+      <img
+        width="240"
+        height="156"
+        src="https://api.hel.fi/respa/resource_image/671?dim=250x156"
+      />
+      <div className={styles.mainContent}>
+        <span className={styles.name}>{reservationUnit.name}</span>
+        <span className={styles.description}>
+          {reservationUnit.spaces[0]?.name}
+        </span>
+      </div>
+      <div className={styles.actions}>
+        <IconHeart />
+        <div style={{ flexGrow: 1 }} />
+        <Button iconLeft={<IconPlus />} variant="secondary">
+          Valitse tila
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+export default ReservationUnitCard;

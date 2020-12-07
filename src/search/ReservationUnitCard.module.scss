@@ -1,0 +1,30 @@
+@import '~hds-design-tokens/lib/all.scss';
+
+.container {
+  display: grid;
+  background-color: $color-white;
+  margin-top: $spacing-s;
+  grid-template-columns: 250px 3fr 1fr;
+}
+
+.mainContent {
+  display: flex;
+  flex-direction: column;
+  margin: $spacing-m;
+}
+
+.name {
+  font-size: $fontsize-heading-m;
+  font-weight: 700;
+}
+
+.description {
+  font-size: $fontsize-body-l;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  padding: $spacing-s $spacing-m;
+  align-items: flex-end;
+}

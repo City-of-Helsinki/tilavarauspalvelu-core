@@ -1,21 +1,32 @@
-import React from 'react';
+import React, { useState } from 'react';
 // import { useTranslation } from 'react-i18next';
 import { Checkbox, Select, TextInput, Button, IconSearch } from 'hds-react';
 
 import styles from './SearchForm.module.scss';
 
+interface Props {
+  // only text search is now implemented!
+  onSearch: (text: string) => void;
+}
 interface OptionType {
   label: string;
 }
 
 const options = [] as OptionType[];
 
-const Home = (): JSX.Element => {
+const SearchForm = ({ onSearch }: Props): JSX.Element => {
   // const { t } = useTranslation();
+  const [q, setQ] = useState<string>();
   return (
     <>
       <div className={styles.container}>
-        <TextInput label="&nbsp;" placeholder="Hae sanalla" id="search" />
+        <TextInput
+          label="&nbsp;"
+          placeholder="Hae sanalla"
+          id="search"
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+        />
         <Select placeholder="Valitse" disabled options={options} label="Haku" />
         <div className={styles.showL} />
         <Select
@@ -42,10 +53,16 @@ const Home = (): JSX.Element => {
       </div>
       <hr className={styles.hr} />
       <div className={styles.buttonContainer}>
-        <Button iconLeft={<IconSearch />}>Hae tilaa</Button>
+        <Button
+          onClick={() => {
+            onSearch(q || '');
+          }}
+          iconLeft={<IconSearch />}>
+          Hae tilaa
+        </Button>
       </div>
     </>
   );
 };
 
-export default Home;
+export default SearchForm;

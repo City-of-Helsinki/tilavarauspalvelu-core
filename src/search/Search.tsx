@@ -1,15 +1,18 @@
-import React from 'react';
-// import { useTranslation } from 'react-i18next';
-import MainContainer from '../component/MainContainer';
+import React, { useState } from 'react';
+import { Koros } from 'hds-react';
+import Container from '../component/Container';
 import Breadcrumb from '../component/Breadcrumb';
 import SearchForm from './SearchForm';
+import SearchResultList from './SearchResultList';
 import { PageTitle } from '../component/PageTitle';
 
 const Search = (): JSX.Element => {
   // const { t } = useTranslation();
+
+  const [search, setSearch] = useState<string>('');
   return (
     <>
-      <MainContainer>
+      <Container>
         <Breadcrumb
           current={{ label: 'breadcrumb.search', linkTo: '/search' }}
         />
@@ -17,8 +20,14 @@ const Search = (): JSX.Element => {
         <span className="text-lg">
           Valitse tilat joihin haluat hakea vakiovuoroja.
         </span>
-        <SearchForm />
-      </MainContainer>
+        <SearchForm onSearch={setSearch} />
+      </Container>
+      <Koros type="wave" className="koros" style={{ fill: '#f5f6f8' }} />
+      <div style={{ backgroundColor: '#f5f6f8' }}>
+        <Container main>
+          <SearchResultList search={search} />
+        </Container>
+      </div>
     </>
   );
 };
