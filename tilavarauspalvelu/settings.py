@@ -176,7 +176,6 @@ USE_X_FORWARDED_HOST = env("TRUST_X_FORWARDED_HOST")
 # Configure cors
 CORS_ALLOWED_ORIGINS = env("CORS_ALLOWED_ORIGINS")
 
-
 # Configure sentry
 if env("SENTRY_DSN"):
     sentry_sdk.init(
