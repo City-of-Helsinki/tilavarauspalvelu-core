@@ -1,14 +1,14 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Footer } from 'hds-react';
+import { Footer as HDSFooter } from 'hds-react';
 
 const linkIds: string[] = ['reservation', 'recurringShift', 'infoAboutService'];
 
-const Head = (): JSX.Element => {
+const Footer = (): JSX.Element => {
   const { t } = useTranslation();
 
   return (
-    <Footer
+    <HDSFooter
       title={t('common.applicationName')}
       theme={{
         '--footer-background': 'var(--tilavaraus-footer-background-color)',
@@ -16,29 +16,30 @@ const Head = (): JSX.Element => {
         '--footer-divider-color': 'var(--tilavaraus-footer-color)',
         '--footer-focus-outline-color': 'var(--color-primary-90)',
       }}>
-      <Footer.Navigation navigationAriaLabel={t('footer.navigationAriaLabel')}>
+      <HDSFooter.Navigation
+        navigationAriaLabel={t('footer.navigationAriaLabel')}>
         {linkIds.map((id) => (
-          <Footer.Item
+          <HDSFooter.Item
             key={id}
             href={t(`footer.navigation.${id}.href`)}
             label={t(`footer.navigation.${id}.label`)}
           />
         ))}
-      </Footer.Navigation>
-      <Footer.Base
+      </HDSFooter.Navigation>
+      <HDSFooter.Base
         copyrightHolder={t('footer.copyrightHolder')}
         copyrightText={t('footer.copyrightText')}>
-        <Footer.Item
+        <HDSFooter.Item
           href={t(`footer.base.navigation.privacyStatement.href`)}
           label={t(`footer.base.navigation.privacyStatement.label`)}
         />
-        <Footer.Item
+        <HDSFooter.Item
           href={t(`footer.base.navigation.accessibilityStatement.href`)}
           label={t(`footer.base.navigation.accessibilityStatement.label`)}
         />
-      </Footer.Base>
-    </Footer>
+      </HDSFooter.Base>
+    </HDSFooter>
   );
 };
 
-export default Head;
+export default Footer;
