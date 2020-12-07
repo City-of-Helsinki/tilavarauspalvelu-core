@@ -5,6 +5,8 @@ const translations = {
     'ApplicationPeriodCard.criteria': 'Hakukiriteerit sv',
     'ApplicationPeriodCard.closed': 'Haku avautuu {{openingDateTime}} sv',
     'ApplicationPeriodCard.open': 'Haku auki {{until}} saakka sv',
+    'breadcrumb.home': 'Vakiovuorot sv',
+    'breadcrumb.search': 'Haku sv',
     'common.applicationName': 'Varaamo',
     'navigation.link.spaceReservation': 'Vakiovuorot sv',
     'navigation.skipToMainContent': 'SHoppa till huvudnavigeringen',
