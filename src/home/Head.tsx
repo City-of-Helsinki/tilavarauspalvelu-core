@@ -10,7 +10,7 @@ interface HeadProps {
 const Head = (props: HeadProps): JSX.Element => (
   <div className={styles.container}>
     <div className={styles.content}>
-      <h1>{props.heading}</h1>
+      <h1 className={styles.heading}>{props.heading}</h1>
       <span>{props.text}</span>
     </div>
     <Koros className={styles.koros} type="wave" />

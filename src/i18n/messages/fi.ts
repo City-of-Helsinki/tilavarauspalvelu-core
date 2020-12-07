@@ -1,5 +1,10 @@
-export default {
+const translations = {
   translation: {
+    'ApplicatiopPeriodCard.button.reminder': 'Tilaa muistutus',
+    'ApplicatiopPeriodCard.button.apply': 'Hae tilaa',
+    'ApplicationPeriodCard.criteria': 'Hakukiriteerit',
+    'ApplicationPeriodCard.closed': 'Haku avautuu {{openingDateTime}}',
+    'ApplicationPeriodCard.open': 'Haku auki {{until}} saakka',
     'common.applicationName': 'Varaamo',
     'navigation.link.spaceReservation': 'Vakiovuorot',
     'navigation.skipToMainContent': 'Siirry sivun pääsisältöön',
@@ -20,3 +25,5 @@ export default {
     'footer.base.navigation.accessibilityStatement.href': '#',
   },
 };
+
+export default translations;
