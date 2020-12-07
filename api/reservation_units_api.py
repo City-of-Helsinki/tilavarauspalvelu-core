@@ -34,7 +34,6 @@ class ReservationUnitSerializer(serializers.ModelSerializer):
         model = ReservationUnit
         fields = [
             "id",
-            "name",
             "name_fi",
             "name_en",
             "name_sv",
@@ -63,7 +62,9 @@ class PurposeSerializer(serializers.ModelSerializer):
         model = Purpose
         fields = [
             "id",
-            "name",
+            "name_fi",
+            "name_en",
+            "name_sv",
         ]
 
 

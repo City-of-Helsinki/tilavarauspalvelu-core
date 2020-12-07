@@ -9,7 +9,6 @@ class ResourceSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "location_type",
-            "name",
             "name_fi",
             "name_en",
             "name_sv",

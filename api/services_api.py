@@ -8,7 +8,9 @@ class ServiceSerializer(serializers.ModelSerializer):
         model = Service
         fields = [
             "id",
-            "name",
+            "name_fi",
+            "name_en",
+            "name_sv",
             "service_type",
             "buffer_time_before",
             "buffer_time_after",
