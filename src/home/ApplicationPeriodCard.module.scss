@@ -20,7 +20,7 @@
 }
 
 .container {
-  line-height: 2;
+  line-height: $lineheight-xl;
   max-width: 100%;
 
   & .name {
@@ -30,7 +30,7 @@
 }
 
 .linkContainer {
-  line-height: 1;
+  line-height: $lineheight-s;
   color: $color-bus;
 }
 
