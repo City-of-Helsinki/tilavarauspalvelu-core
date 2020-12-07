@@ -1,13 +1,14 @@
-from rest_framework import viewsets, serializers
-from reservation_units.models import ReservationUnit, Purpose
-from applications.models import ApplicationPeriod
-from spaces.models import District
-from api.space_api import SpaceSerializer
-from api.resources_api import ResourceSerializer
-from api.services_api import ServiceSerializer
 from django_filters import rest_framework as filters
 from rest_framework import filters as drf_filters
+from rest_framework import serializers, viewsets
+
 from api.base import HierarchyModelMultipleChoiceFilter
+from api.resources_api import ResourceSerializer
+from api.services_api import ServiceSerializer
+from api.space_api import SpaceSerializer
+from applications.models import ApplicationPeriod
+from reservation_units.models import Purpose, ReservationUnit, ReservationUnitImage
+from spaces.models import District
 
 
 class ReservationUnitFilter(filters.FilterSet):
@@ -25,10 +26,17 @@ class ReservationUnitFilter(filters.FilterSet):
     )
 
 
+class ReservationUnitImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ReservationUnitImage
+        fields = ["image_url", "image_type"]
+
+
 class ReservationUnitSerializer(serializers.ModelSerializer):
     spaces = SpaceSerializer(read_only=True, many=True)
     resources = ResourceSerializer(read_only=True, many=True)
     services = ServiceSerializer(read_only=True, many=True)
+    images = ReservationUnitImageSerializer(read_only=True, many=True)
 
     class Meta:
         model = ReservationUnit
@@ -39,6 +47,7 @@ class ReservationUnitSerializer(serializers.ModelSerializer):
             "resources",
             "services",
             "require_introduction",
+            "images",
         ]
 
 

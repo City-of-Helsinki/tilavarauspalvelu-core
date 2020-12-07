@@ -1,7 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from django.contrib.auth.models import User
 
 from resources.models import Resource
 from services.models import Service
@@ -51,6 +50,30 @@ class ReservationUnit(models.Model):
             end__gt=start_time,
             begin__lt=end_time,
         ).exists()
+
+
+class ReservationUnitImage(models.Model):
+    TYPES = (
+        ("main", _("Main image")),
+        ("ground_plan", _("Ground plan")),
+        ("map", _("Map")),
+        ("other", _("Other")),
+    )
+
+    image_type = models.CharField(max_length=20, verbose_name=_("Type"), choices=TYPES)
+
+    reservation_unit = models.ForeignKey(
+        ReservationUnit,
+        verbose_name=_("Reservation unit image"),
+        related_name="images",
+        on_delete=models.CASCADE,
+    )
+    image_url = models.URLField(verbose_name=_("Image url"), max_length=255)
+
+    def __str__(self):
+        return "{} ({})".format(
+            self.reservation_unit.name, self.get_image_type_display()
+        )
 
 
 class Purpose(models.Model):
