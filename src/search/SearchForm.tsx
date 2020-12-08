@@ -50,10 +50,10 @@ const SearchForm = ({ onSearch }: Props): JSX.Element => {
         <div className={styles.showM} />
         <Checkbox
           disabled
-          id="checkbox"
+          id="checkbox1"
           label="Sopiva liikuntarajoitteisille"
         />
-        <Checkbox disabled id="checkbox" label="Lähimmät paikat ensin" />
+        <Checkbox disabled id="checkbox2" label="Lähimmät paikat ensin" />
       </div>
       <hr className={styles.hr} />
       <div className={styles.buttonContainer}>

@@ -12,6 +12,7 @@ const ReservationUnitCard = ({ reservationUnit }: Props): JSX.Element => {
   return (
     <div className={styles.container}>
       <img
+        alt={`Kuva tilasta ${reservationUnit.name}`}
         width="240"
         height="156"
         src="https://api.hel.fi/respa/resource_image/671?dim=250x156"
