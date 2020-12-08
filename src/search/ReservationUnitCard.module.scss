@@ -20,6 +20,21 @@
 
 .description {
   font-size: $fontsize-body-l;
+  flex-grow: 1;
+}
+
+.bottom {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+
+  > svg {
+    margin-right: $spacing-xs;
+  }
+
+  > span:not(:first-child) {
+    margin-right: $spacing-layout-m;
+  }
 }
 
 .actions {

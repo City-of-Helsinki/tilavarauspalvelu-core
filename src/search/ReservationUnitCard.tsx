@@ -1,4 +1,11 @@
-import { Button, IconHeart, IconPlus } from 'hds-react';
+import {
+  Button,
+  IconGroup,
+  IconHeart,
+  IconInfoCircle,
+  IconLocation,
+  IconPlus,
+} from 'hds-react';
 import React from 'react';
 import { ReservationUnit } from '../common/types';
 import styles from './ReservationUnitCard.module.scss';
@@ -21,6 +28,12 @@ const ReservationUnitCard = ({ reservationUnit }: Props): JSX.Element => {
         <span className={styles.name}>{reservationUnit.name}</span>
         <span className={styles.description}>
           {reservationUnit.spaces[0]?.name}
+        </span>
+        <span className={styles.bottom}>
+          <IconInfoCircle />
+          <span>Nuorisotalo</span>
+          <IconGroup /> <span>10</span>
+          <IconLocation /> <span>Linnanrakentajantie 2</span>
         </span>
       </div>
       <div className={styles.actions}>
