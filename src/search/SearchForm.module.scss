@@ -1,6 +1,7 @@
 @import '~hds-design-tokens/lib/all.scss';
 
 .container {
+  margin-top: $spacing-s;
   max-width: 100%;
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
@@ -38,7 +39,6 @@
   .showM {
     display: block;
   }
-
 }
 
 @media (max-width: $breakpoint-s) {
