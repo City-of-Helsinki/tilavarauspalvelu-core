@@ -4,11 +4,11 @@ from django.urls import reverse
 
 @pytest.mark.django_db
 def test_reservation_unit_exists(user_api_client, reservation_unit):
-    reservation_unit.name = "Studio complex"
+    reservation_unit.name_en = "Studio complex"
     reservation_unit.save()
     response = user_api_client.get(reverse("reservationunit-list"))
     assert response.status_code == 200
-    assert response.data[0]["name"] == "Studio complex"
+    assert response.data[0]["name_en"] == "Studio complex"
 
 
 @pytest.mark.django_db
@@ -25,7 +25,7 @@ def test_reservation_unit_purpose_filter(
     filtered_response = user_api_client.get(url_with_filter)
     assert filtered_response.status_code == 200
     assert len(filtered_response.data) == 1
-    assert filtered_response.data[0]["name"] == reservation_unit.name
+    assert filtered_response.data[0]["id"] == reservation_unit.pk
 
     # Filter should work with multiple query parameters
     url_with_filter = (
@@ -53,7 +53,7 @@ def test_reservation_unit_application_period_filter(
     response = user_api_client.get(url)
     assert response.status_code == 200
     assert len(response.data) == 1
-    assert response.data[0]["name"] == reservation_unit.name
+    assert response.data[0]["id"] == reservation_unit.pk
 
 
 @pytest.mark.django_db
@@ -72,13 +72,13 @@ def test_reservation_unit_search_filter(
     response = user_api_client.get(url)
     assert response.status_code == 200
     assert len(response.data) == 1
-    assert response.data[0]["name"] == reservation_unit.name
+    assert response.data[0]["id"] == reservation_unit.pk
 
     url = f"{reverse('reservationunit-list')}?search=DOLOR"
     response = user_api_client.get(url)
     assert response.status_code == 200
     assert len(response.data) == 1
-    assert response.data[0]["name"] == reservation_unit2.name
+    assert response.data[0]["id"] == reservation_unit2.pk
 
 
 @pytest.mark.django_db
@@ -96,7 +96,7 @@ def test_reservation_unit_district_filter(
     response = user_api_client.get(url)
     assert response.status_code == 200
     assert len(response.data) == 1
-    assert response.data[0]["name"] == reservation_unit.name
+    assert response.data[0]["id"] == reservation_unit.pk
 
     # We should also get the result by querying for district ID,
     # as sub_district is a subset of the actual district
@@ -104,7 +104,7 @@ def test_reservation_unit_district_filter(
     response = user_api_client.get(url)
     assert response.status_code == 200
     assert len(response.data) == 1
-    assert response.data[0]["name"] == reservation_unit.name
+    assert response.data[0]["id"] == reservation_unit.pk
 
 
 @pytest.mark.django_db
@@ -124,4 +124,4 @@ def test_reservation_unit_max_persons_filter(
 
     assert response.status_code == 200
     assert len(response.data) == 1
-    assert response.data[0]["name"] == reservation_unit.name
+    assert response.data[0]["id"] == reservation_unit.pk
