@@ -31,8 +31,8 @@ const translations: Translations = {
   common: {
     applicationName: ['Varaamo'],
   },
-  navigation: {
-    link: {
+  Navigation: {
+    Item: {
       spaceReservation: ['Vakiovuorot'],
     },
     skipToMainContent: [
