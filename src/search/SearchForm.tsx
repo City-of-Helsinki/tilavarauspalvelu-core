@@ -48,8 +48,12 @@ const SearchForm = ({ onSearch }: Props): JSX.Element => {
           label="Hinta"
         />
         <div className={styles.showM} />
-        <Checkbox id="checkbox" label="Sopiva liikuntarajoitteisille" />
-        <Checkbox id="checkbox" label="Lähimmät paikat ensin" />
+        <Checkbox
+          disabled
+          id="checkbox"
+          label="Sopiva liikuntarajoitteisille"
+        />
+        <Checkbox disabled id="checkbox" label="Lähimmät paikat ensin" />
       </div>
       <hr className={styles.hr} />
       <div className={styles.buttonContainer}>
