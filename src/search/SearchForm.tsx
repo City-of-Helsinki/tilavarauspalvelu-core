@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-// import { useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import { Checkbox, Select, TextInput, Button, IconSearch } from 'hds-react';
 
 import styles from './SearchForm.module.scss';
@@ -15,14 +15,14 @@ interface OptionType {
 const options = [] as OptionType[];
 
 const SearchForm = ({ onSearch }: Props): JSX.Element => {
-  // const { t } = useTranslation();
+  const { t } = useTranslation();
   const [q, setQ] = useState<string>();
   return (
     <>
       <div className={styles.container}>
         <TextInput
           label="&nbsp;"
-          placeholder="Hae sanalla"
+          placeholder={t('SearchForm.searchTermPlaceholder')}
           id="search"
           value={q}
           onChange={(e) => setQ(e.target.value)}
@@ -62,7 +62,7 @@ const SearchForm = ({ onSearch }: Props): JSX.Element => {
             onSearch(q || '');
           }}
           iconLeft={<IconSearch />}>
-          Hae tilaa
+          {t('SearchForm.searchButton')}
         </Button>
       </div>
     </>

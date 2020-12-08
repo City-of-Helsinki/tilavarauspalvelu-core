@@ -17,25 +17,25 @@ const Footer = (): JSX.Element => {
         '--footer-focus-outline-color': 'var(--color-primary-90)',
       }}>
       <HDSFooter.Navigation
-        navigationAriaLabel={t('footer.navigationAriaLabel')}>
+        navigationAriaLabel={t('Footer.Navigation.navigationAriaLabel')}>
         {linkIds.map((id) => (
           <HDSFooter.Item
             key={id}
-            href={t(`footer.navigation.${id}.href`)}
-            label={t(`footer.navigation.${id}.label`)}
+            href={t(`Footer.Navigation.${id}.href`)}
+            label={t(`Footer.Navigation.${id}.label`)}
           />
         ))}
       </HDSFooter.Navigation>
       <HDSFooter.Base
-        copyrightHolder={t('footer.copyrightHolder')}
-        copyrightText={t('footer.copyrightText')}>
+        copyrightHolder={t('Footer.Base.copyrightHolder')}
+        copyrightText={t('Footer.Base.copyrightText')}>
         <HDSFooter.Item
-          href={t(`footer.base.navigation.privacyStatement.href`)}
-          label={t(`footer.base.navigation.privacyStatement.label`)}
+          href={t(`Footer.Base.Item.privacyStatement.href`)}
+          label={t(`Footer.Base.Item.privacyStatement.label`)}
         />
         <HDSFooter.Item
-          href={t(`footer.base.navigation.accessibilityStatement.href`)}
-          label={t(`footer.base.navigation.accessibilityStatement.label`)}
+          href={t(`Footer.Base.Item.accessibilityStatement.href`)}
+          label={t(`Footer.Base.Item.accessibilityStatement.label`)}
         />
       </HDSFooter.Base>
     </HDSFooter>

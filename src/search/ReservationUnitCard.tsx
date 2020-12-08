@@ -7,6 +7,7 @@ import {
   IconPlus,
 } from 'hds-react';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { ReservationUnit } from '../common/types';
 import styles from './ReservationUnitCard.module.scss';
 
@@ -15,7 +16,7 @@ interface Props {
 }
 
 const ReservationUnitCard = ({ reservationUnit }: Props): JSX.Element => {
-  // const { t } = useTranslation();
+  const { t } = useTranslation();
   return (
     <div className={styles.container}>
       <img
@@ -40,7 +41,7 @@ const ReservationUnitCard = ({ reservationUnit }: Props): JSX.Element => {
         <IconHeart />
         <div style={{ flexGrow: 1 }} />
         <Button iconLeft={<IconPlus />} variant="secondary">
-          Valitse tila
+          {t('ReservationUnitCard.selectButton')}
         </Button>
       </div>
     </div>

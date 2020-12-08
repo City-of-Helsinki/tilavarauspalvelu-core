@@ -1,10 +1,10 @@
 import { Button, IconMap, IconMenuHamburger, Select } from 'hds-react';
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { getReservationUnits } from '../common/api';
 import { ReservationUnit } from '../common/types';
 import ReservationUnitCard from './ReservationUnitCard';
 import styles from './SearchResultList.module.scss';
-// import { useTranslation } from 'react-i18next';
 
 interface Props {
   // only text search is now implemented!
@@ -18,7 +18,7 @@ interface OptionType {
 const options = [] as OptionType[];
 
 const SearchResultList = ({ search }: Props): JSX.Element => {
-  // const { t } = useTranslation();
+  const { t } = useTranslation();
 
   const [reservationUnits, setReservationUnits] = useState<ReservationUnit[]>(
     []
@@ -34,23 +34,23 @@ const SearchResultList = ({ search }: Props): JSX.Element => {
   return (
     <>
       <div className={styles.hitCount}>
-        {reservationUnits.length} Hakutulosta
+        {t('SearchResultList.count', { count: reservationUnits.length })}
       </div>
       <div className={styles.buttonContainer}>
         <Button className={styles.button} iconLeft={<IconMenuHamburger />}>
-          Näytä listassa
+          {t('SearchResultList.listButton')}
         </Button>
         <Button
           disabled
           className={styles.buttonSecondary}
           variant="secondary"
           iconLeft={<IconMap />}>
-          Näytä kartalla
+          {t('SearchResultList.mapButton')}
         </Button>
         <div className={styles.order}>
-          <span>Järjestä:</span>
+          <span>{t('SearchResultList.sortButtonLabel')}:</span>
           <Select
-            placeholder="Sijainnin mukaan"
+            placeholder={t('SearchResultList.sortButtonPlaceholder')}
             disabled
             options={options}
             label=""

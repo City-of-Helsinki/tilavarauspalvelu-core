@@ -15,28 +15,21 @@ const Home = (): JSX.Element => {
     <>
       <Head heading={t('home.head.heading')} text={t('home.head.text')} />
       <Container>
-        <h2 className="heading-l">Hakeminen</h2>
-        <p className="text-lg">
-          Vakiovuoroja haetaan yleisen haun kautta. Voit selata tiloja, mutta
-          hakemuksen voi ainoastaan jättää silloin kun hakuaika on käynnissä.
-        </p>
+        <h2 className="heading-l">{t('home.info.heading')}</h2>
+        <p className="text-lg">{t('home.info.text')}</p>
         <div className={styles.buttonContainer}>
           <Button
             variant="secondary"
             onClick={() => history.push('/search')}
             iconLeft={<IconSearch />}>
-            Selaa kaikkia tiloja
+            {t('home.browseAllButton')}
           </Button>
-          <Button variant="secondary">Lue lisää hakuprosessista</Button>
+          <Button variant="secondary">{t('home.infoButton')}</Button>
         </div>
         <h2 className="heading-l" style={{ marginTop: 'var(--spacing-xl)' }}>
-          Hakuajat
+          {t('home.applicationTimes.heading')}
         </h2>
-        <p className="text-lg">
-          Vakiovuoroihin on hakuaika kaksi kertaa vuodessa. Ajankohta vaihtelee
-          palvelusta ja toimialasta riippuen. Voit tilata sähköpostimuistutuksen
-          tuleviin hakuihin.
-        </p>
+        <p className="text-lg">{t('home.applicationTimes.text')}</p>
         <ApplicationPeriods />
       </Container>
     </>
