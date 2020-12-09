@@ -55,14 +55,14 @@ const ApplicationPeriodCard = ({ applicationPeriod }: Props): JSX.Element => {
       </Container>
       {active ? (
         <Button className={styles.button}>
-          {t('ApplicatiopPeriodCard.button.apply')}
+          {t('ApplicationPeriodCard.applyButton')}
         </Button>
       ) : (
         <Button
           iconLeft={<IconClock />}
           variant="secondary"
           className={styles.button}>
-          {t('ApplicatiopPeriodCard.button.reminder')}
+          {t('ApplicationPeriodCard.reminderButton')}
         </Button>
       )}
     </Card>

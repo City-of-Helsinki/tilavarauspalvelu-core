@@ -29,11 +29,11 @@ const Navigation = (): JSX.Element => {
       title={t('common.applicationName')}
       menuToggleAriaLabel="Menu"
       skipTo="#main"
-      skipToContentLabel={t('navigation.skipToMainContent')}>
+      skipToContentLabel={t('Navigation.skipToMainContent')}>
       <HDSNavigation.Row variant="inline">
         <HDSNavigation.Item
           href="#"
-          label={t('navigation.link.spaceReservation')}
+          label={t('Navigation.Item.spaceReservation')}
           onClick={(e: SyntheticEvent) => e.preventDefault()}
           active
         />

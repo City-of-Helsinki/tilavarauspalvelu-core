@@ -1,0 +1,54 @@
+@import '~hds-design-tokens/lib/all.scss';
+
+.hitCount {
+  font-weight: 700;
+  font-size: $fontsize-heading-m;
+}
+
+.buttonContainer {
+  display: flex;
+  margin-top: $spacing-m;
+
+  & > :last-child {
+    margin-left: auto;
+  }
+}
+
+.button {
+  --background-color: #{$color-black-90};
+  --border-color: #{$color-black-90};
+  --background-color-hover: #{$color-black};
+  --background-color-focus: #{$color-black};
+  --background-color-hover-focus: #{$color-black};
+
+  margin-right: $spacing-m;
+}
+
+.buttonSecondary {
+  --background-color: transparent;
+  --border-color: #{$color-black-90};
+  --background-color-hover: #{$color-black-10};
+  --background-color-hover-focus: #{$color-black-10};
+  --color: #{$color-black};
+  --color-focus: #{$color-black-90};
+
+  margin-right: $spacing-l;
+}
+
+.listContainer {
+  margin-top: $spacing-layout-s;
+}
+
+.order {
+  display: flex;
+  align-items: center;
+
+  & button {
+    min-width: 11em;
+  }
+
+  & > div {
+    margin-left: $spacing-m;
+  }
+
+}

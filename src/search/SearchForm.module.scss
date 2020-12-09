@@ -1,0 +1,52 @@
+@import '~hds-design-tokens/lib/all.scss';
+
+.container {
+  margin-top: $spacing-s;
+  max-width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-gap: $spacing-m;
+  font-size: $fontsize-body-m;
+}
+
+.hr {
+  margin-top: $spacing-l;
+}
+
+.buttonContainer {
+  margin-top: $spacing-l;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.showL {
+  display: block;
+}
+
+.showM {
+  display: none;
+}
+
+@media (max-width: $breakpoint-m) {
+  .container {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .showL {
+    display: none;
+  }
+
+  .showM {
+    display: block;
+  }
+}
+
+@media (max-width: $breakpoint-s) {
+  .container {
+    grid-template-columns: 1fr;
+  }
+
+  .showM {
+    display: none;
+  }
+}

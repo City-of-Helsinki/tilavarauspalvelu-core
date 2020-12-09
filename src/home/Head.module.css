@@ -16,10 +16,3 @@
 .koros {
   fill: white;
 }
-
-.koros > svg {
-  left: 50%;
-  position: relative;
-  transform: translateX(-50%);
-  width: 4028px;
-}
