@@ -2,8 +2,30 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 ## Prerequisites
 
-1. Node lts/fermium (```nvm use```)
+1. Node lts/fermium (`nvm use`)
 1. Yarn
+
+## Developing locally
+
+First check out the latest version of the backend/api project from https://github.com/City-of-Helsinki/tilavarauspalvelu-core and change current directory to backend project and start it:
+
+```
+docker-compose up --build
+
+```
+
+Start UI
+
+```
+yarn start
+```
+
+### Access with browser
+
+UI is at http://127.0.0.1:3000/
+Backend is at http://127.0.0.1:8000/v1/
+
+The UI development server exposes the proxied backend at http://127.0.0.1:3000/api/ which the UI uses.
 
 ## Available Scripts
 
@@ -45,5 +67,3 @@ You don’t have to ever use `eject`. The curated feature set is suitable for sm
 ## Learn More
 
 You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
