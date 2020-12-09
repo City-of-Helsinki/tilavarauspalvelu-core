@@ -27,6 +27,14 @@ Backend is at http://127.0.0.1:8000/v1/
 
 The UI development server exposes the proxied backend at http://127.0.0.1:3000/api/ which the UI uses.
 
+### Test data
+
+Some test data can be loaded to the backend with following command:
+
+```
+docker exec -ti tilavarauspalvelu-core_dev_1 python manage.py loaddata fixtures/cases.json
+```
+
 ## Available Scripts
 
 In the project directory, you can run:
