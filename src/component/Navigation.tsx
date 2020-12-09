@@ -1,8 +1,8 @@
 import React, { SyntheticEvent, useState } from 'react';
-import { Navigation } from 'hds-react';
+import { Navigation as HDSNavigation } from 'hds-react';
 import { useTranslation } from 'react-i18next';
 
-export default (): JSX.Element => {
+const Navigation = (): JSX.Element => {
   interface LanguageOption {
     label: string;
     value: string;
@@ -20,7 +20,7 @@ export default (): JSX.Element => {
     value.toUpperCase();
 
   return (
-    <Navigation
+    <HDSNavigation
       theme={{
         '--header-background-color':
           'var(--tilavaraus-header-background-color)',
@@ -29,27 +29,27 @@ export default (): JSX.Element => {
       title={t('common.applicationName')}
       menuToggleAriaLabel="Menu"
       skipTo="#main"
-      skipToContentLabel={t('navigation.skipToMainContent')}>
-      <Navigation.Row variant="inline">
-        <Navigation.Item
+      skipToContentLabel={t('Navigation.skipToMainContent')}>
+      <HDSNavigation.Row variant="inline">
+        <HDSNavigation.Item
           href="#"
-          label={t('navigation.link.spaceReservation')}
+          label={t('Navigation.Item.spaceReservation')}
           onClick={(e: SyntheticEvent) => e.preventDefault()}
           active
         />
-      </Navigation.Row>
-      <Navigation.Actions>
-        <Navigation.User authenticated label="Kirjaudu">
-          <Navigation.Item
+      </HDSNavigation.Row>
+      <HDSNavigation.Actions>
+        <HDSNavigation.User authenticated label="Kirjaudu">
+          <HDSNavigation.Item
             label="Profiili"
             href="https://hel.fi"
             target="_blank"
             variant="primary"
           />
-        </Navigation.User>
-        <Navigation.LanguageSelector label={formatSelectedValue(language)}>
+        </HDSNavigation.User>
+        <HDSNavigation.LanguageSelector label={formatSelectedValue(language)}>
           {languageOptions.map((languageOption) => (
-            <Navigation.Item
+            <HDSNavigation.Item
               key={languageOption.value}
               label={languageOption.label}
               onClick={(
@@ -60,8 +60,10 @@ export default (): JSX.Element => {
               }}
             />
           ))}
-        </Navigation.LanguageSelector>
-      </Navigation.Actions>
-    </Navigation>
+        </HDSNavigation.LanguageSelector>
+      </HDSNavigation.Actions>
+    </HDSNavigation>
   );
 };
+
+export default Navigation;

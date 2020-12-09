@@ -1,0 +1,19 @@
+@import '~hds-design-tokens/lib/all.scss';
+
+.buttonContainer {
+  & > button {
+    margin-right: $spacing-m;
+  }
+}
+
+@media (max-width: $breakpoint-s) {
+  .buttonContainer {
+    display: flex;
+    flex-direction: column;
+
+    & > button {
+      margin-bottom: $spacing-m;
+      margin-right: 0;
+    }
+  }
+}

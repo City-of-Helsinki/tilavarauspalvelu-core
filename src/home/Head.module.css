@@ -1,11 +1,4 @@
-.content {
-  padding: var(--spacing-s) var(--spacing-s);
-  max-width: var(--container-width-xl);
-  margin: 0 auto var(--spacing-2-xl) auto;
-  font-size: var(--fontsize-body-xl);
-}
-
-.content h1 {
+.heading {
   font-size: var(--fontsize-heading-xl);
 }
 
@@ -13,13 +6,13 @@
   background-color: var(--tilavaraus-header-background-color);
 }
 
-.koros {
-  fill: white;
+.content {
+  padding: var(--spacing-l) var(--spacing-m) var(--spacing-m);
+  max-width: var(--container-width-xl);
+  margin: 0 auto var(--spacing-2-xl) auto;
+  font-size: var(--fontsize-body-xl);
 }
 
-.koros > svg {
-  left: 50%;
-  position: relative;
-  transform: translateX(-50%);
-  width: 4028px;
+.koros {
+  fill: white;
 }

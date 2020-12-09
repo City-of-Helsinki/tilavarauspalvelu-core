@@ -1,14 +1,14 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Footer } from 'hds-react';
+import { Footer as HDSFooter } from 'hds-react';
 
 const linkIds: string[] = ['reservation', 'recurringShift', 'infoAboutService'];
 
-const Head = (): JSX.Element => {
+const Footer = (): JSX.Element => {
   const { t } = useTranslation();
 
   return (
-    <Footer
+    <HDSFooter
       title={t('common.applicationName')}
       theme={{
         '--footer-background': 'var(--tilavaraus-footer-background-color)',
@@ -16,29 +16,30 @@ const Head = (): JSX.Element => {
         '--footer-divider-color': 'var(--tilavaraus-footer-color)',
         '--footer-focus-outline-color': 'var(--color-primary-90)',
       }}>
-      <Footer.Navigation navigationAriaLabel={t('footer.navigationAriaLabel')}>
+      <HDSFooter.Navigation
+        navigationAriaLabel={t('Footer.Navigation.navigationAriaLabel')}>
         {linkIds.map((id) => (
-          <Footer.Item
+          <HDSFooter.Item
             key={id}
-            href={t(`footer.navigation.${id}.href`)}
-            label={t(`footer.navigation.${id}.label`)}
+            href={t(`Footer.Navigation.${id}.href`)}
+            label={t(`Footer.Navigation.${id}.label`)}
           />
         ))}
-      </Footer.Navigation>
-      <Footer.Base
-        copyrightHolder={t('footer.copyrightHolder')}
-        copyrightText={t('footer.copyrightText')}>
-        <Footer.Item
-          href={t(`footer.base.navigation.privacyStatement.href`)}
-          label={t(`footer.base.navigation.privacyStatement.label`)}
+      </HDSFooter.Navigation>
+      <HDSFooter.Base
+        copyrightHolder={t('Footer.Base.copyrightHolder')}
+        copyrightText={t('Footer.Base.copyrightText')}>
+        <HDSFooter.Item
+          href={t(`Footer.Base.Item.privacyStatement.href`)}
+          label={t(`Footer.Base.Item.privacyStatement.label`)}
         />
-        <Footer.Item
-          href={t(`footer.base.navigation.accessibilityStatement.href`)}
-          label={t(`footer.base.navigation.accessibilityStatement.label`)}
+        <HDSFooter.Item
+          href={t(`Footer.Base.Item.accessibilityStatement.href`)}
+          label={t(`Footer.Base.Item.accessibilityStatement.label`)}
         />
-      </Footer.Base>
-    </Footer>
+      </HDSFooter.Base>
+    </HDSFooter>
   );
 };
 
-export default Head;
+export default Footer;
