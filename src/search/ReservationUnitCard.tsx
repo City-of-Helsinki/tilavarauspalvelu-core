@@ -8,6 +8,7 @@ import {
 } from 'hds-react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import { ReservationUnit } from '../common/types';
 import styles from './ReservationUnitCard.module.scss';
 
@@ -26,7 +27,11 @@ const ReservationUnitCard = ({ reservationUnit }: Props): JSX.Element => {
         src="https://api.hel.fi/respa/resource_image/671?dim=250x156"
       />
       <div className={styles.mainContent}>
-        <span className={styles.name}>{reservationUnit.name}</span>
+        <span className={styles.name}>
+          <Link to={`../reservation-unit/${reservationUnit.id}`}>
+            {reservationUnit.name}
+          </Link>
+        </span>
         <span className={styles.description}>
           {reservationUnit.spaces[0]?.name}
         </span>
