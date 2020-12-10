@@ -70,7 +70,8 @@ const translations: Translations = {
     searchButton: ['Hae tilaa'],
   },
   SearchResultList: {
-    count: ['{{count}} Hakutulosta'],
+    count_plural: ['{{count}} Hakutulosta'],
+    count: ['{{count}} Hakutulos'],
     listButton: ['Näytä listassa'],
     mapButton: ['Näytä kartalla'],
     sortButtonLabel: ['Järjestä'],
