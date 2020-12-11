@@ -43,8 +43,9 @@ class ReservationUnit(models.Model):
         )
 
     def get_max_persons(self):
+        # Sum of max persons for all spaces because group can be divided to different spaces
         spaces = self.spaces.all()
-        return max(space.max_persons for space in spaces)
+        return sum(filter(None, (space.max_persons for space in spaces))) or None
 
     def check_required_introduction(self, user):
         return Introduction.objects.filter(reservation_unit=self, user=user).exists()
