@@ -38,10 +38,9 @@ class ReservationUnit(models.Model):
     def get_location(self):
         # For now we assume that if reservation has multiple spaces they all have same location
         spaces = self.spaces.all()
-        if len(spaces) > 0 and hasattr(spaces[0], "location"):
-            return spaces[0].location
-
-        return None
+        return next(
+            (space.location for space in spaces if hasattr(space, "location")), None
+        )
 
     def get_max_persons(self):
         spaces = self.spaces.all()
@@ -93,6 +92,9 @@ class Purpose(models.Model):
     reservation_unit = models.ManyToManyField(
         ReservationUnit, verbose_name=_("Purpose"), related_name="purposes"
     )
+
+    def __str__(self):
+        return self.name
 
 
 class Period(models.Model):
