@@ -6,8 +6,6 @@ from django.contrib.auth import get_user_model
 from django.utils import timezone
 from rest_framework.test import APIClient
 
-from reservation_units.models import ReservationUnit, Purpose
-from reservations.models import Reservation, ReservationPurpose
 from applications.models import (
     Application,
     ApplicationEvent,
@@ -16,8 +14,10 @@ from applications.models import (
     Person,
     Recurrence,
 )
+from reservation_units.models import Purpose, ReservationUnit
+from reservations.models import Reservation, ReservationPurpose
 from resources.models import Resource
-from spaces.models import Space, Location, District
+from spaces.models import District, Location, Space
 
 
 @pytest.mark.django_db

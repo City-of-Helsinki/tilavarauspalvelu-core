@@ -35,6 +35,18 @@ class ReservationUnit(models.Model):
     def __str__(self):
         return "{}".format(self.name)
 
+    def get_location(self):
+        # For now we assume that if reservation has multiple spaces they all have same location
+        spaces = self.spaces.all()
+        if len(spaces) > 0 and hasattr(spaces[0], "location"):
+            return spaces[0].location
+
+        return None
+
+    def get_max_persons(self):
+        spaces = self.spaces.all()
+        return max(space.max_persons for space in spaces)
+
     def check_required_introduction(self, user):
         return Introduction.objects.filter(reservation_unit=self, user=user).exists()
 
