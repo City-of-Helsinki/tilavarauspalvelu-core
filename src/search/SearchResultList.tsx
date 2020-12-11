@@ -47,7 +47,7 @@ const SearchResultList = ({ search }: Props): JSX.Element => {
           iconLeft={<IconMap />}>
           {t('SearchResultList.mapButton')}
         </Button>
-        <div className={styles.order}>
+        <div className={`${styles.order} align-vertically`}>
           <span>{t('SearchResultList.sortButtonLabel')}:</span>
           <Select
             placeholder={t('SearchResultList.sortButtonPlaceholder')}
