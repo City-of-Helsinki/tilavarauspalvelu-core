@@ -30,6 +30,7 @@ const translations: Translations = {
   },
   common: {
     applicationName: ['Varaamo'],
+    selectReservationUnit: ['Valitse tila'],
   },
   Navigation: {
     Item: {
@@ -76,9 +77,6 @@ const translations: Translations = {
     mapButton: ['Näytä kartalla'],
     sortButtonLabel: ['Järjestä'],
     sortButtonPlaceholder: ['Sijainnin mukaan'],
-  },
-  ReservationUnitCard: {
-    selectButton: ['Valitse tila'],
   },
   Footer: {
     Navigation: {

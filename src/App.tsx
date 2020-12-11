@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import Home from './home/Home';
 import Search from './search/Search';
+import ReservationUnit from './reservation-unit/ReservationUnit';
 import PageWrapper from './component/PageWrapper';
 import './i18n';
 
@@ -15,6 +16,9 @@ function App(): JSX.Element {
           </Route>
           <Route path="/search">
             <Search />
+          </Route>
+          <Route path="/reservation-unit">
+            <ReservationUnit />
           </Route>
         </Switch>
       </PageWrapper>

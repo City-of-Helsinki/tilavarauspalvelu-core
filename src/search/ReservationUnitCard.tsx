@@ -46,7 +46,7 @@ const ReservationUnitCard = ({ reservationUnit }: Props): JSX.Element => {
         <IconHeart />
         <div style={{ flexGrow: 1 }} />
         <Button iconLeft={<IconPlus />} variant="secondary">
-          {t('ReservationUnitCard.selectButton')}
+          {t('common.selectReservationUnit')}
         </Button>
       </div>
     </div>
