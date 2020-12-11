@@ -35,6 +35,18 @@ class ReservationUnit(models.Model):
     def __str__(self):
         return "{}".format(self.name)
 
+    def get_location(self):
+        # For now we assume that if reservation has multiple spaces they all have same location
+        spaces = self.spaces.all()
+        return next(
+            (space.location for space in spaces if hasattr(space, "location")), None
+        )
+
+    def get_max_persons(self):
+        # Sum of max persons for all spaces because group can be divided to different spaces
+        spaces = self.spaces.all()
+        return sum(filter(None, (space.max_persons for space in spaces))) or None
+
     def check_required_introduction(self, user):
         return Introduction.objects.filter(reservation_unit=self, user=user).exists()
 
@@ -81,6 +93,9 @@ class Purpose(models.Model):
     reservation_unit = models.ManyToManyField(
         ReservationUnit, verbose_name=_("Purpose"), related_name="purposes"
     )
+
+    def __str__(self):
+        return self.name
 
 
 class Period(models.Model):

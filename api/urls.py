@@ -8,11 +8,11 @@ from .applications_api import (
     OrganisationViewSet,
     PersonViewSet,
 )
-from .reservations_api import ReservationViewSet
 from .reservation_units_api import PurposeViewSet, ReservationUnitViewSet
-from .space_api import SpaceViewSet
-from .services_api import ServiceViewSet
+from .reservations_api import ReservationViewSet
 from .resources_api import ResourceViewSet
+from .services_api import ServiceViewSet
+from .space_api import SpaceViewSet
 
 router = routers.DefaultRouter()
 router.register(r"reservation_unit", ReservationUnitViewSet, "reservationunit")

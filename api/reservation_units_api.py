@@ -5,7 +5,7 @@ from rest_framework import serializers, viewsets
 from api.base import HierarchyModelMultipleChoiceFilter
 from api.resources_api import ResourceSerializer
 from api.services_api import ServiceSerializer
-from api.space_api import SpaceSerializer
+from api.space_api import LocationSerializer, SpaceSerializer
 from applications.models import ApplicationPeriod
 from reservation_units.models import Purpose, ReservationUnit, ReservationUnitImage
 from spaces.models import District
@@ -37,6 +37,8 @@ class ReservationUnitSerializer(serializers.ModelSerializer):
     resources = ResourceSerializer(read_only=True, many=True)
     services = ServiceSerializer(read_only=True, many=True)
     images = ReservationUnitImageSerializer(read_only=True, many=True)
+    location = serializers.SerializerMethodField()
+    max_persons = serializers.SerializerMethodField()
 
     class Meta:
         model = ReservationUnit
@@ -48,7 +50,19 @@ class ReservationUnitSerializer(serializers.ModelSerializer):
             "services",
             "require_introduction",
             "images",
+            "location",
+            "max_persons",
         ]
+
+    def get_location(self, reservation_unit):
+        location = reservation_unit.get_location()
+        if location:
+            return LocationSerializer(location).data
+
+        return None
+
+    def get_max_persons(self, reservation_unit):
+        return reservation_unit.get_max_persons()
 
 
 class ReservationUnitViewSet(viewsets.ModelViewSet):

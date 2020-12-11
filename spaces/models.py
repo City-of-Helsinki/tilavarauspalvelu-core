@@ -54,14 +54,6 @@ class RealEstate(models.Model):
         blank=True,
         null=True,
     )
-    location = models.OneToOneField(
-        "Location",
-        verbose_name=_("Location"),
-        null=True,
-        blank=True,
-        related_name="real_estate",
-        on_delete=models.CASCADE,
-    )
 
     def __str__(self):
         return "{}".format(self.name)
@@ -93,14 +85,6 @@ class Building(models.Model):
         decimal_places=2,
         blank=True,
         null=True,
-    )
-    location = models.OneToOneField(
-        "Location",
-        verbose_name=_("Location"),
-        null=True,
-        blank=True,
-        related_name="building",
-        on_delete=models.CASCADE,
     )
 
     def __str__(self):
@@ -141,14 +125,6 @@ class Space(MPTTModel):
         blank=True,
         null=True,
     )
-    location = models.OneToOneField(
-        "Location",
-        verbose_name=_("Location"),
-        null=True,
-        blank=True,
-        related_name="space",
-        on_delete=models.CASCADE,
-    )
     max_persons = models.fields.PositiveIntegerField(
         verbose_name=_("Maximum number of persons"), null=True, blank=True
     )
@@ -167,3 +143,32 @@ class Location(models.Model):
     address_city = models.CharField(
         verbose_name=_("Address city"), max_length=100, blank=True
     )
+    space = models.OneToOneField(
+        "Space",
+        verbose_name=_("Space"),
+        null=True,
+        blank=True,
+        related_name="location",
+        on_delete=models.CASCADE,
+    )
+    building = models.OneToOneField(
+        "Building",
+        verbose_name=_("Building"),
+        null=True,
+        blank=True,
+        related_name="location",
+        on_delete=models.CASCADE,
+    )
+    real_estate = models.OneToOneField(
+        "RealEstate",
+        verbose_name=_("RealEstate"),
+        null=True,
+        blank=True,
+        related_name="location",
+        on_delete=models.CASCADE,
+    )
+
+    def __str__(self):
+        return "{}, {} {}".format(
+            self.address_street, self.address_city, self.address_zip
+        )

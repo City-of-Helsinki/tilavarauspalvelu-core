@@ -1,6 +1,7 @@
 from itertools import chain
-from rest_framework import serializers
+
 from django_filters import rest_framework as filters
+from rest_framework import serializers
 
 
 class BaseNestedSerializer(serializers.ModelSerializer):
