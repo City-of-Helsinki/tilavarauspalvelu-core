@@ -17,7 +17,7 @@ function App(): JSX.Element {
           <Route path="/search">
             <Search />
           </Route>
-          <Route path="/reservation-unit">
+          <Route path="/reservation-unit/:id">
             <ReservationUnit />
           </Route>
         </Switch>

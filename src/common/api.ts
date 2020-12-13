@@ -82,3 +82,15 @@ export function getReservationUnits(
     path: `v1/${reservationUnitsBasePath}`,
   });
 }
+
+interface IDParameter {
+  id: string;
+}
+
+export function getReservationUnit(
+  params: IDParameter
+): Promise<ReservationUnit> {
+  return apiGet<ReservationUnit>({
+    path: `v1/${reservationUnitsBasePath}/${params.id}`,
+  });
+}

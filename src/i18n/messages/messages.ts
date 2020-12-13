@@ -31,6 +31,7 @@ const translations: Translations = {
   common: {
     applicationName: ['Varaamo'],
     selectReservationUnit: ['Valitse tila'],
+    favourite: ['Suosikki'],
   },
   Navigation: {
     Item: {
