@@ -1,19 +1,15 @@
 import React from 'react';
-import { format, parseISO, isBefore, isAfter } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { Button, Container, IconArrowRight, IconClock } from 'hds-react';
 import { useTranslation } from 'react-i18next';
 import Card from '../component/Card';
 import { ApplicationPeriod } from '../common/types';
 import styles from './ApplicationPeriodCard.module.scss';
+import { isActive } from '../common/util';
 
 interface Props {
   applicationPeriod: ApplicationPeriod;
 }
-
-const isActive = (startDate: string, endDate: string) => {
-  const now = new Date();
-  return isAfter(parseISO(startDate), now) && isBefore(parseISO(endDate), now);
-};
 
 const formatDate = (startDate: string) => {
   return format(parseISO(startDate), 'd. M. yyyy');
