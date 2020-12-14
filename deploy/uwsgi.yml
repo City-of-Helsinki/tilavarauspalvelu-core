@@ -2,7 +2,7 @@ uwsgi:
   # Needed plugins if running against Debian uwsgi-package
   # python docker image cannot use that due to linker mishaps
   # plugins: python3,http
-  wsgi-file: tilanvarauspalvelu/wsgi.py
+  wsgi-file: tilavarauspalvelu/wsgi.py
   processes: 12
   threads: 1
   master: true

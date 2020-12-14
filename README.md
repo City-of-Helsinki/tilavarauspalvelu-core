@@ -1,7 +1,7 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 
-Tilanvarauspalvelu-core
+Tilavarauspalvelu-core
 ===================
 This repository contains core of the new reservation platform for city of Helsinki.
 
@@ -25,4 +25,4 @@ Locally:
 
 `deploy/entrypoint.sh test`
 
-![Tietokantakuvaus](tilanvarauspalvelu_visualized.png)
+![Tietokantakuvaus](tilavarauspalvelu_visualized.png)
