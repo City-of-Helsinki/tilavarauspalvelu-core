@@ -6,7 +6,7 @@ import ReservationUnit from './reservation-unit/ReservationUnit';
 import PageWrapper from './component/PageWrapper';
 import './i18n';
 import SelectionsListContextProvider from './context/SelectionsListContext';
-import StartApplicationBar from './search/StartApplicationBar';
+import StartApplicationBar from './component/StartApplicationBar';
 
 function App(): JSX.Element {
   return (

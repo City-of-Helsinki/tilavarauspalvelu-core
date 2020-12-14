@@ -1,6 +1,6 @@
 import { Button, IconArrowRight } from 'hds-react';
 import React from 'react';
-import Container from '../component/Container';
+import Container from './Container';
 import {
   SelectionsListContext,
   SelectionsListContextType,
