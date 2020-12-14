@@ -6,8 +6,8 @@ const axiosclient = applyCaseMiddleware(axios.create());
 
 const apiBaseUrl: string = process.env.REACT_APP_TILANVARAUS_API_URL || '';
 
-const applicationPeriodsBasePath = 'application_periods';
-const reservationUnitsBasePath = 'reservation_units';
+const applicationPeriodsBasePath = 'application_period';
+const reservationUnitsBasePath = 'reservation_unit';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface RequestParameters extends ReservationUnitsParameters {}
