@@ -5,7 +5,7 @@ interface Props {
 }
 
 const style = {
-  'font-size': '$fontsize-heading-l',
+  'font-size': 'var(--fontsize-heading-l)',
 } as React.CSSProperties;
 
 export const PageTitle = ({ children }: Props): JSX.Element => {

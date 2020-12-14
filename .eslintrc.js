@@ -23,6 +23,7 @@ module.exports = {
     'react/destructuring-assignment': 0,
     'react/static-property-placement': 0,
     'jsx-a11y/alt-text': 0,
+    'react/require-default-props': 0,
     'react/jsx-props-no-spreading': 0,
     '@typescript-eslint/camelcase': ['off'], // There seems to be no other way to override this than disabling it and rewriting the rules in the naming-convention
     '@typescript-eslint/naming-convention': [

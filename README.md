@@ -32,7 +32,7 @@ The UI development server exposes the proxied backend at http://127.0.0.1:3000/a
 Some test data can be loaded to the backend with following command:
 
 ```
-docker exec -ti tilavarauspalvelu-core_dev_1 python manage.py loaddata fixtures/cases.json
+docker exec tilavarauspalvelu-core_dev_1 python manage.py loaddata fixtures/cases.json
 ```
 
 ## Available Scripts

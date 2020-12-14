@@ -6,8 +6,8 @@ const axiosclient = applyCaseMiddleware(axios.create());
 
 const apiBaseUrl: string = process.env.REACT_APP_TILANVARAUS_API_URL || '';
 
-const applicationPeriodsBasePath = 'application_periods';
-const reservationUnitsBasePath = 'reservation_units';
+const applicationPeriodsBasePath = 'application_period';
+const reservationUnitsBasePath = 'reservation_unit';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface RequestParameters extends ReservationUnitsParameters {}
@@ -80,5 +80,17 @@ export function getReservationUnits(
   return apiGet<ReservationUnit[]>({
     parameters: params,
     path: `v1/${reservationUnitsBasePath}`,
+  });
+}
+
+interface IDParameter {
+  id: string;
+}
+
+export function getReservationUnit(
+  params: IDParameter
+): Promise<ReservationUnit> {
+  return apiGet<ReservationUnit>({
+    path: `v1/${reservationUnitsBasePath}/${params.id}`,
   });
 }

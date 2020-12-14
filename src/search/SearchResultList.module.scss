@@ -40,9 +40,6 @@
 }
 
 .order {
-  display: flex;
-  align-items: center;
-
   & button {
     min-width: 11em;
   }
@@ -50,5 +47,4 @@
   & > div {
     margin-left: $spacing-m;
   }
-
 }

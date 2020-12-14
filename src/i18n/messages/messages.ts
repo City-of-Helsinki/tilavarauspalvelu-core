@@ -30,6 +30,8 @@ const translations: Translations = {
   },
   common: {
     applicationName: ['Varaamo'],
+    selectReservationUnit: ['Valitse tila'],
+    favourite: ['Suosikki'],
   },
   Navigation: {
     Item: {
@@ -70,14 +72,12 @@ const translations: Translations = {
     searchButton: ['Hae tilaa'],
   },
   SearchResultList: {
-    count: ['{{count}} Hakutulosta'],
+    count_plural: ['{{count}} Hakutulosta'],
+    count: ['{{count}} Hakutulos'],
     listButton: ['Näytä listassa'],
     mapButton: ['Näytä kartalla'],
     sortButtonLabel: ['Järjestä'],
     sortButtonPlaceholder: ['Sijainnin mukaan'],
-  },
-  ReservationUnitCard: {
-    selectButton: ['Valitse tila'],
   },
   Footer: {
     Navigation: {

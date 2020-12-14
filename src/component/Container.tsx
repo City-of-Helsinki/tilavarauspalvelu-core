@@ -2,7 +2,7 @@ import React from 'react';
 import styles from './Container.module.scss';
 
 interface Props {
-  children: JSX.Element | JSX.Element[];
+  children: React.ReactNode;
   // eslint-disable-next-line react/require-default-props
   main?: boolean;
   // eslint-disable-next-line react/require-default-props

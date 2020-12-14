@@ -23,6 +23,15 @@ body {
   font-size: $fontsize-heading-l;
 }
 
+#root {
+  padding: 0;
+  flex-direction: row;
+  justify-content: center;
+}
+
+// utils
+
+// adjust svg similary to footer
 .koros > svg {
   left: 50%;
   position: relative;
@@ -30,8 +39,16 @@ body {
   width: 4028px;
 }
 
-#root {
-  padding: 0;
-  flex-direction: row;
-  justify-content: center;
+// align items for example icon + text vertically
+.align-vertically {
+  display: flex;
+  align-items: center;
+}
+
+.margin-left-s {
+  margin-left: var(--spacing-s);
+}
+
+.margin-top {
+  margin-top: var(--spacing-s);
 }

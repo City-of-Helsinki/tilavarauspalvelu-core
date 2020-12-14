@@ -6124,27 +6124,27 @@ hash.js@^1.0.0, hash.js@^1.0.3:
     inherits "^2.0.3"
     minimalistic-assert "^1.0.1"
 
-hds-core@0.17.0, hds-core@^0.17.0:
-  version "0.17.0"
-  resolved "https://registry.yarnpkg.com/hds-core/-/hds-core-0.17.0.tgz#f6b4378f1b1aa8679faae9b2cfe6a0bd687f417a"
-  integrity sha512-WjaTqp3PB+Aq1eZXX+sAnmUHweHrClEJ2wucVC92SEzBc2kyTFZPRVDDfeG+P+K9hPfwLI53df3XrcxvOvdd6A==
+hds-core@0.18.0, hds-core@^0.18.0:
+  version "0.18.0"
+  resolved "https://registry.yarnpkg.com/hds-core/-/hds-core-0.18.0.tgz#91859dcc4f98a26626db8906bd88f49e1310b361"
+  integrity sha512-UB47uFvTLpBVJMzaEVhN3WEh7b2MW7FDowjEYjqvjqB8zMijHFLQWHAaaoVdyzYZYQP9nXr/mYz1o16LbD664w==
 
-hds-design-tokens@^0.17.0:
-  version "0.17.0"
-  resolved "https://registry.yarnpkg.com/hds-design-tokens/-/hds-design-tokens-0.17.0.tgz#1fd4e80dd7e5d3a9af0790c3f8cfd66834298e15"
-  integrity sha512-eG23sNmSA7qL3Vy/PF8hDC7/BRIQMID3SsDgxPoUFTSxSRGTiCRI9+nlWUsES8SdTa7JdtHwm6L4tJ5yS+RwGA==
+hds-design-tokens@^0.18.0:
+  version "0.18.0"
+  resolved "https://registry.yarnpkg.com/hds-design-tokens/-/hds-design-tokens-0.18.0.tgz#c55382f0826f61cfd8bbec535adf29d4edb4dadd"
+  integrity sha512-pvHAsFfInBX9Zz5I42kQuLe8XszeVGh+acIJWFCLqkQHjKaHaoceni/gUxwJVxhCGjQ9j+VcB0Iqrm1VV7kt0Q==
 
-hds-react@^0.17.0:
-  version "0.17.0"
-  resolved "https://registry.yarnpkg.com/hds-react/-/hds-react-0.17.0.tgz#bca440a68afcca36404af7902a4e1c49a4b8403d"
-  integrity sha512-T61xV9h5gylwiq027GSWebYMsybQRv+KQLEjkbXGco9w7Us4iracRJiG4epKVlqXTLRCqyXt1amzaxdhju8FVw==
+hds-react@^0.18.0:
+  version "0.18.0"
+  resolved "https://registry.yarnpkg.com/hds-react/-/hds-react-0.18.0.tgz#3abcb1a3e328e2d26ba430e3d8a5be04a59cf268"
+  integrity sha512-Bp6SEM+xJJSgys+gRW50jlxHoS93cFdhSg+IPBNGp+VBM8B6w9Gc4j5BqOv1GM9QE8uwEFG6QpxM2JiNgwmuBg==
   dependencies:
     "@babel/runtime" "7.11.2"
     "@juggle/resize-observer" "3.2.0"
     "@popperjs/core" "2.5.3"
     "@react-aria/visually-hidden" "3.2.0"
     downshift "6.0.6"
-    hds-core "0.17.0"
+    hds-core "0.18.0"
     lodash.isequal "4.5.0"
     lodash.uniqueid "4.0.1"
     react-merge-refs "1.1.0"
