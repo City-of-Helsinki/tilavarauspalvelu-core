@@ -6,6 +6,7 @@ import ReservationUnit from './reservation-unit/ReservationUnit';
 import PageWrapper from './component/PageWrapper';
 import './i18n';
 import SelectionsListContextProvider from './context/SelectionsListContext';
+import StartApplicationBar from './search/StartApplicationBar';
 
 function App(): JSX.Element {
   return (
@@ -25,6 +26,7 @@ function App(): JSX.Element {
           </Switch>
         </PageWrapper>
       </Router>
+      <StartApplicationBar />
     </SelectionsListContextProvider>
   );
 }
