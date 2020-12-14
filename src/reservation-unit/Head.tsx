@@ -14,12 +14,20 @@ import { ReservationUnit as ReservationUnitType } from '../common/types';
 import IconWithText from './IconWithText';
 
 import styles from './Head.module.scss';
+import {
+  SelectionsListContext,
+  SelectionsListContextType,
+} from '../context/SelectionsListContext';
 
 interface Props {
   reservationUnit: ReservationUnitType;
 }
 
 const Head = ({ reservationUnit }: Props): JSX.Element => {
+  const { addReservationUnit, containsReservationUnit } = React.useContext(
+    SelectionsListContext
+  ) as SelectionsListContextType;
+
   const { t } = useTranslation();
 
   return (
@@ -53,6 +61,8 @@ const Head = ({ reservationUnit }: Props): JSX.Element => {
             {t('common.favourite')}
           </Button>
           <Button
+            disabled={containsReservationUnit(reservationUnit)}
+            onClick={() => addReservationUnit(reservationUnit)}
             iconLeft={<IconPlus />}
             className="margin-left-s margin-top-s"
             variant="secondary">

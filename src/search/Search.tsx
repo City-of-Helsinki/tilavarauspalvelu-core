@@ -6,6 +6,7 @@ import Breadcrumb from '../component/Breadcrumb';
 import SearchForm from './SearchForm';
 import SearchResultList from './SearchResultList';
 import { PageTitle } from '../component/PageTitle';
+import StartApplicationBar from './StartApplicationBar';
 
 const Search = (): JSX.Element => {
   const { t } = useTranslation();
@@ -31,6 +32,7 @@ const Search = (): JSX.Element => {
           <SearchResultList search={search} />
         </Container>
       </div>
+      <StartApplicationBar />
     </>
   );
 };
