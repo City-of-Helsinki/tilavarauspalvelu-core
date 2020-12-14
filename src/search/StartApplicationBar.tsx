@@ -23,7 +23,7 @@ const StartApplicationBar = (): JSX.Element | null => {
         width: '100%',
         zIndex: 2,
       }}>
-      <Container style={{ padding: '1em var(--spacing-m)' }}>
+      <Container style={{ padding: 'var(--spacing-m) var(--spacing-m)' }}>
         <div
           style={{
             display: 'flex',
