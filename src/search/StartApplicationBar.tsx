@@ -37,7 +37,11 @@ const StartApplicationBar = (): JSX.Element | null => {
             {reservationUnits.length} tilaa valittuna
           </span>
           <Button
-            style={{ marginLeft: 'var(--spacing-m)' }}
+            style={{
+              fontWeight: 'bold',
+              backgroundColor: 'white',
+              marginLeft: 'var(--spacing-m)',
+            }}
             variant="secondary"
             iconRight={<IconArrowRight />}>
             Jatka seuraavaan
