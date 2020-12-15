@@ -86,9 +86,9 @@ TEMPLATES = [
 WSGI_APPLICATION = "tilavarauspalvelu.wsgi.application"
 
 
-root = environ.Path(__file__)
+root = environ.Path(BASE_DIR)
 
-env = environ.Env(DEBUG=(bool, False), STATIC_ROOT=(environ.Path(), root("static")))
+env = environ.Env(DEBUG=(bool, False), STATIC_ROOT=(environ.Path(), root("staticroot")))
 environ.Env.read_env()
 
 # Database
