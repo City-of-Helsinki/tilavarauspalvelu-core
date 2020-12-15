@@ -15,7 +15,7 @@ from applications.models import (
     Recurrence,
 )
 from reservation_units.models import Purpose, ReservationUnit
-from reservations.models import Reservation, ReservationPurpose
+from reservations.models import AbilityGroup, AgeGroup, Reservation, ReservationPurpose
 from resources.models import Resource
 from spaces.models import District, Location, Space
 
@@ -142,7 +142,9 @@ def reservation_purpose(purpose, reservation) -> ReservationPurpose:
 
 @pytest.fixture
 def organisation() -> Organisation:
-    return Organisation.objects.create(name="Exercise organisation")
+    return Organisation.objects.create(
+        name="Exercise organisation", identifier="ex-org-id"
+    )
 
 
 @pytest.fixture
@@ -151,12 +153,8 @@ def person() -> Person:
 
 
 @pytest.fixture
-def application(
-    purpose, reservation_purpose, organisation, person, application_period, user
-) -> Application:
+def application(purpose, organisation, person, application_period, user) -> Application:
     application = Application.objects.create(
-        description="Application for exercise spaces",
-        reservation_purpose=reservation_purpose,
         organisation=organisation,
         contact_person=person,
         application_period=application_period,
@@ -166,12 +164,23 @@ def application(
 
 
 @pytest.fixture
-def application_event(application) -> ApplicationEvent:
+def application_event(
+    application, purpose, ten_to_15_age_group, hobbyist_ability_group
+) -> ApplicationEvent:
     return ApplicationEvent.objects.create(
         application=application,
         num_persons=10,
         num_events=2,
-        duration=datetime.timedelta(hours=1),
+        min_duration=datetime.timedelta(hours=1),
+        max_duration=datetime.timedelta(hours=2),
+        purpose=purpose,
+        name="Football",
+        age_group=ten_to_15_age_group,
+        ability_group=hobbyist_ability_group,
+        events_per_week=2,
+        begin=datetime.date(year=2020, month=1, day=1),
+        end=datetime.date(year=2020, month=6, day=1),
+        biweekly=False,
     )
 
 
@@ -192,3 +201,35 @@ def weekly_recurring_mondays_and_tuesdays_2021(application_event) -> Application
         ),
         priority=200,
     )
+
+
+@pytest.fixture
+def ten_to_15_age_group() -> AgeGroup:
+    return AgeGroup.objects.create(minimum=10, maximum=15)
+
+
+@pytest.fixture
+def hobbyist_ability_group() -> AbilityGroup:
+    return AbilityGroup.objects.create(name="Hobbyist level")
+
+
+@pytest.fixture
+def valid_application_event_data(
+    reservation_unit, ten_to_15_age_group, hobbyist_ability_group, application, purpose
+):
+    """ Valid JSON data for creating a new ApplicationEvent """
+    return {
+        "name": "Football event",
+        "num_persons": 12,
+        "age_group_id": ten_to_15_age_group.id,
+        "ability_group_id": hobbyist_ability_group.id,
+        "num_events": 12,
+        "min_duration": "01:15:00",
+        "max_duration": "02:00:00",
+        "application_id": application.id,
+        "events_per_week": 1,
+        "biweekly": False,
+        "begin": "2020-01-01",
+        "end": "2021-01-01",
+        "purpose_id": purpose.id,
+    }

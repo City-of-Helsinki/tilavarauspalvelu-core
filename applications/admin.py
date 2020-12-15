@@ -5,7 +5,6 @@ from .models import (
     ApplicationEvent,
     ApplicationPeriod,
     Organisation,
-    Person,
     Recurrence,
 )
 
@@ -18,11 +17,6 @@ class ApplicationAdmin(admin.ModelAdmin):
 @admin.register(Organisation)
 class OrganisationAdmin(admin.ModelAdmin):
     model = Organisation
-
-
-@admin.register(Person)
-class PersonAdmin(admin.ModelAdmin):
-    model = Person
 
 
 @admin.register(ApplicationEvent)

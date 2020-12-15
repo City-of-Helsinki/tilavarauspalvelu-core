@@ -65,7 +65,7 @@ class Organisation(models.Model):
         null=False,
         blank=False,
         max_length=255,
-        unique=True,
+        unique=False,
     )
 
     year_established = models.PositiveIntegerField(
@@ -78,6 +78,22 @@ class Organisation(models.Model):
     address = models.ForeignKey(
         Address, null=True, blank=True, on_delete=models.SET_NULL
     )
+
+
+class PRIORITY_CONST(object):
+    __slots__ = ()
+
+    PRIORITY_LOW = 100
+    PRIORITY_MEDIUM = 200
+    PRIORITY_HIGH = 300
+    PRIORITY_CHOICES = (
+        (PRIORITY_LOW, _("Low")),
+        (PRIORITY_MEDIUM, _("Medium")),
+        (PRIORITY_HIGH, _("High")),
+    )
+
+
+PRIORITIES = PRIORITY_CONST()
 
 
 class ApplicationPeriod(models.Model):
@@ -120,39 +136,27 @@ class ApplicationPeriod(models.Model):
 
 class Application(models.Model):
 
-    description = models.fields.TextField(
-        verbose_name=_("Description"), max_length=1000, blank=True, null=True
-    )
-
-    reservation_purpose = models.ForeignKey(
-        to="reservations.ReservationPurpose",
-        verbose_name=_("Purpose"),
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
-    )
-
     organisation = models.ForeignKey(
         Organisation,
         verbose_name=_("Organisation"),
-        null=False,
-        blank=False,
+        null=True,
+        blank=True,
         on_delete=models.PROTECT,
     )
 
     contact_person = models.ForeignKey(
         Person,
         verbose_name=_("Contact person"),
-        null=False,
-        blank=False,
+        null=True,
+        blank=True,
         on_delete=models.PROTECT,
     )
 
     user = models.ForeignKey(
         User,
         verbose_name=_("Applicant"),
-        null=False,
-        blank=False,
+        null=True,
+        blank=True,
         on_delete=models.PROTECT,
     )
 
@@ -166,6 +170,12 @@ class Application(models.Model):
 
 
 class ApplicationEvent(models.Model):
+    name = models.TextField(
+        max_length=100,
+        verbose_name=_("Name"),
+        null=True,
+        blank=True,
+    )
 
     num_persons = models.PositiveIntegerField(
         verbose_name=_("Number of persons"),
@@ -177,7 +187,7 @@ class ApplicationEvent(models.Model):
         verbose_name=_("Age group"),
         to="reservations.AgeGroup",
         null=True,
-        blank=True,
+        blank=False,
         on_delete=models.SET_NULL,
     )
 
@@ -185,7 +195,7 @@ class ApplicationEvent(models.Model):
         verbose_name=_("Ability group"),
         to="reservations.AbilityGroup",
         null=True,
-        blank=True,
+        blank=False,
         on_delete=models.SET_NULL,
     )
 
@@ -193,7 +203,25 @@ class ApplicationEvent(models.Model):
         verbose_name=_("Number of events"), null=False, blank=False
     )
 
-    duration = models.DurationField(verbose_name=_("Duration"), null=False, blank=False)
+    min_duration = models.DurationField(
+        verbose_name=_("Minimum duration"), null=False, blank=False
+    )
+
+    max_duration = models.DurationField(
+        verbose_name=_("Maximum duration"), null=True, blank=True
+    )
+
+    events_per_week = models.PositiveIntegerField(
+        verbose_name=_("Events per week"), null=False, blank=False
+    )
+
+    biweekly = models.BooleanField(
+        verbose_name=_("Every second week only"), default=False, null=False, blank=True
+    )
+
+    begin = models.DateField(verbose_name=_("Start date"), null=False, blank=False)
+
+    end = models.DateField(verbose_name=_("End date"), null=False, blank=False)
 
     application = models.ForeignKey(
         Application,
@@ -207,21 +235,33 @@ class ApplicationEvent(models.Model):
         District, verbose_name="Area", on_delete=models.SET_NULL, null=True, blank=True
     )
 
-
-class PRIORITY_CONST(object):
-    __slots__ = ()
-
-    PRIORITY_LOW = 100
-    PRIORITY_MEDIUM = 200
-    PRIORITY_HIGH = 300
-    PRIORITY_CHOICES = (
-        (PRIORITY_LOW, _("Low")),
-        (PRIORITY_MEDIUM, _("Medium")),
-        (PRIORITY_HIGH, _("High")),
+    purpose = models.ForeignKey(
+        Purpose,
+        verbose_name=_("Purpose"),
+        on_delete=models.PROTECT,
+        null=True,
+        blank=False,
     )
 
 
-PRIORITIES = PRIORITY_CONST()
+class EventReservationUnit(models.Model):
+
+    priority = models.IntegerField(
+        verbose_name=_("Priority"),
+        null=True,
+        blank=True,
+    )
+
+    application_event = models.ForeignKey(
+        ApplicationEvent,
+        verbose_name=_("Application event"),
+        related_name="event_reservation_units",
+        on_delete=models.CASCADE,
+    )
+
+    reservation_unit = models.ForeignKey(
+        ReservationUnit, verbose_name=_("Reservation unit"), on_delete=models.PROTECT
+    )
 
 
 class Recurrence(models.Model):

@@ -2,7 +2,7 @@ from drf_extra_fields.relations import PresentablePrimaryKeyRelatedField
 from rest_framework import serializers, viewsets
 
 from reservation_units.models import ReservationUnit
-from reservations.models import Reservation
+from reservations.models import AbilityGroup, AgeGroup, Reservation
 
 from .reservation_units_api import ReservationUnitSerializer
 
@@ -48,3 +48,42 @@ class ReservationViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+
+class AgeGroupSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AgeGroup
+        fields = [
+            "id",
+            "minimum",
+            "maximum",
+        ]
+
+    def validate(self, data):
+        min_age = data["minimum"]
+        max_age = data["maximum"]
+
+        if max_age is not None and max_age <= min_age:
+            raise serializers.ValidationError(
+                "Maximum age should be larger than minimum age"
+            )
+        return data
+
+
+class AgeGroupViewSet(viewsets.ModelViewSet):
+    serializer_class = AgeGroupSerializer
+    queryset = AgeGroup.objects.all()
+
+
+class AbilityGroupSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AbilityGroup
+        fields = [
+            "id",
+            "name",
+        ]
+
+
+class AbilityGroupViewSet(viewsets.ModelViewSet):
+    serializer_class = AbilityGroupSerializer
+    queryset = AbilityGroup.objects.all()

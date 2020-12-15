@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Union
 
 from dateutil.parser import parse
 from django.utils import timezone
@@ -8,10 +9,13 @@ from applications.models import (
     Address,
     Application,
     ApplicationEvent,
+    ApplicationPeriod,
     Organisation,
     Person,
     Recurrence,
 )
+from reservation_units.models import Purpose
+from reservations.models import AbilityGroup, AgeGroup
 
 MINIMUM_TIME = timezone.datetime(
     1970, 1, 1, 0, 0, 0, 3, timezone.get_default_timezone()
@@ -20,23 +24,6 @@ MINIMUM_TIME = timezone.datetime(
 MAXIMUM_TIME = timezone.datetime(
     2099, 1, 1, 0, 0, 0, 3, timezone.get_default_timezone()
 )
-
-
-class PersonSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Person
-
-        fields = ["id", "first_name", "last_name"]
-
-
-class PersonViewSet(viewsets.ModelViewSet):
-
-    queryset = Person.objects.all()
-
-    serializer_class = PersonSerializer
-
-    def perform_create(self, serializer):
-        serializer.save()
 
 
 class AddressSerializer(serializers.ModelSerializer):
@@ -57,39 +44,109 @@ class AddressViewSet(viewsets.ModelViewSet):
 
 
 class OrganisationSerializer(serializers.ModelSerializer):
+
+    id = serializers.IntegerField(allow_null=True, required=False)
+
     class Meta:
         model = Organisation
 
         fields = ["id", "name", "identifier", "year_established"]
 
 
-class OrganisationViewSet(viewsets.ModelViewSet):
+class PersonSerializer(serializers.ModelSerializer):
 
-    queryset = Organisation.objects.all()
+    id = serializers.IntegerField(allow_null=True, required=False)
 
-    serializer_class = OrganisationSerializer
+    class Meta:
+        model = Person
+        fields = ["id", "first_name", "last_name", "email", "phone_number"]
 
-    def perform_create(self, serializer):
-        serializer.save()
+
+# TODO: Should move to using serializers.CurrentUserDefault when we have actual security in place.
+#  Now you can call stuff without authenticating and it'll fail with nasty AnonymousUser error,
+#  if not setting user to None instead.
+class NullableCurrentUserDefault(object):
+    def __init__(self):
+        self.user = None
+
+    def set_context(self, serializer_field):
+        user = self.user = serializer_field.context["request"].user
+
+        if user.is_authenticated:
+            self.user = user
+        else:
+            self.user = None
+
+    def __call__(self):
+        return self.user
+
+    def __repr__(self):
+        return "%s()" % self.__class__.__name__
 
 
 class ApplicationSerializer(serializers.ModelSerializer):
+
+    contact_person = PersonSerializer(read_only=False, allow_null=True)
+
+    organisation = OrganisationSerializer(read_only=False, allow_null=True)
+
+    application_period_id = serializers.PrimaryKeyRelatedField(
+        queryset=ApplicationPeriod.objects.all(), source="application_period"
+    )
+
+    user = serializers.HiddenField(default=NullableCurrentUserDefault())
+
     class Meta:
         model = Application
         fields = [
             "id",
-            "description",
-            "reservation_purpose",
             "organisation",
+            "application_period_id",
             "contact_person",
-            "organisation",
-            "application_period",
             "user",
         ]
-        read_only_fields = ["user"]
 
-    def validate(self, data):
-        return data
+    @staticmethod
+    def handle_person(contact_person_data) -> Union[Person, None]:
+        person = None
+        if contact_person_data is not None:
+            person = Person(**contact_person_data)
+            person.save()
+        return person
+
+    @staticmethod
+    def handle_organisation(organisation_data) -> Union[Organisation, None]:
+        organisation = None
+        if organisation_data is not None:
+            organisation = Organisation(**organisation_data)
+            organisation.save()
+        return organisation
+
+    def create(self, validated_data):
+        contact_person_data = validated_data.pop("contact_person")
+        validated_data["contact_person"] = self.handle_person(
+            contact_person_data=contact_person_data
+        )
+
+        organisation_data = validated_data.pop("organisation")
+        validated_data["organisation"] = self.handle_organisation(
+            organisation_data=organisation_data
+        )
+
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        contact_person_data = validated_data.pop("contact_person")
+        validated_data["contact_person"] = self.handle_person(
+            contact_person_data=contact_person_data
+        )
+
+        organisation_data = validated_data.pop("organisation")
+        validated_data["organisation"] = self.handle_organisation(
+            organisation_data=organisation_data
+        )
+
+        return super().update(instance, validated_data)
 
 
 class ApplicationViewSet(viewsets.ModelViewSet):
@@ -97,9 +154,6 @@ class ApplicationViewSet(viewsets.ModelViewSet):
     queryset = Application.objects.all()
 
     serializer_class = ApplicationSerializer
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
 
 
 class DateAwareRecurrenceReadSerializer(serializers.ModelSerializer):
@@ -128,18 +182,51 @@ class ApplicationEventSerializer(serializers.ModelSerializer):
 
     recurrences = DateAwareRecurrenceReadSerializer(many=True, read_only=True)
 
+    application_id = serializers.PrimaryKeyRelatedField(
+        queryset=Application.objects.all(), source="application"
+    )
+
+    age_group_id = serializers.PrimaryKeyRelatedField(
+        queryset=AgeGroup.objects.all(), source="age_group"
+    )
+
+    ability_group_id = serializers.PrimaryKeyRelatedField(
+        queryset=AbilityGroup.objects.all(), source="ability_group"
+    )
+
+    purpose_id = serializers.PrimaryKeyRelatedField(
+        queryset=Purpose.objects.all(), source="purpose"
+    )
+
     class Meta:
         model = ApplicationEvent
         fields = [
             "id",
+            "name",
             "recurrences",
             "num_persons",
-            "age_group",
-            "ability_group",
+            "age_group_id",
+            "ability_group_id",
             "num_events",
-            "duration",
-            "application",
+            "min_duration",
+            "max_duration",
+            "application_id",
+            "events_per_week",
+            "biweekly",
+            "begin",
+            "end",
+            "purpose_id",
         ]
+
+    def validate(self, data):
+        min_duration = data["min_duration"]
+        max_duration = data["max_duration"]
+
+        if max_duration is not None and max_duration <= min_duration:
+            raise serializers.ValidationError(
+                "Maximum duration should be larger than minimum duration"
+            )
+        return data
 
 
 class ApplicationEventViewSet(viewsets.ModelViewSet):
