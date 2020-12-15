@@ -9,6 +9,13 @@ from spaces.models import Space
 Q = models.Q
 
 
+class ReservationUnitType(models.Model):
+    name = models.CharField(verbose_name=_("Name"), max_length=255)
+
+    def __str__(self):
+        return self.name
+
+
 class ReservationUnit(models.Model):
     name = models.CharField(verbose_name=_("Name"), max_length=255)
 
@@ -28,6 +35,15 @@ class ReservationUnit(models.Model):
         blank=True,
     )
 
+    reservation_unit_type = models.ForeignKey(
+        ReservationUnitType,
+        verbose_name=_("Type"),
+        related_name="reservation_units",
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+    )
+
     require_introduction = models.BooleanField(
         verbose_name=_("Require introduction"), default=False
     )
@@ -40,6 +56,13 @@ class ReservationUnit(models.Model):
         spaces = self.spaces.all()
         return next(
             (space.location for space in spaces if hasattr(space, "location")), None
+        )
+
+    def get_building(self):
+        # For now we assume that if reservation has multiple spaces they all have same building
+        spaces = self.spaces.all()
+        return next(
+            (space.building for space in spaces if hasattr(space, "building")), None
         )
 
     def get_max_persons(self):

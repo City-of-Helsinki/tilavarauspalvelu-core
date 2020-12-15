@@ -1,6 +1,14 @@
 from django.contrib import admin
 
-from .models import Day, DayPart, Period, Purpose, ReservationUnit, ReservationUnitImage
+from .models import (
+    Day,
+    DayPart,
+    Period,
+    Purpose,
+    ReservationUnit,
+    ReservationUnitImage,
+    ReservationUnitType,
+)
 
 
 @admin.register(ReservationUnit)
@@ -11,6 +19,11 @@ class ReservationUnitAdmin(admin.ModelAdmin):
 @admin.register(ReservationUnitImage)
 class ReservationUnitImageAdmin(admin.ModelAdmin):
     model = ReservationUnitImage
+
+
+@admin.register(ReservationUnitType)
+class ReservationUnitTypeAdmin(admin.ModelAdmin):
+    model = ReservationUnitType
 
 
 @admin.register(Period)
