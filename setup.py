@@ -1,6 +1,6 @@
 from setuptools import find_packages, setup
 
-from tilanvarauspalvelu import __version__
+from tilavarauspalvelu import __version__
 
 setup(
     name="tilavarauspalvelu",
