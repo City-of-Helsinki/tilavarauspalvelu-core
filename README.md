@@ -13,7 +13,7 @@ This repository contains core of the new reservation platform for city of Helsin
 
 # Running tests and formatting
 
-Tests are run with pytest. You can just run pytest to run all the test. 
+Tests are run with pytest. Use `pytest` to run all tests. Use `pytest -W default` to show third party warnings ignored in `pytest.ini`.
 
 To run static code checks and tests with coverage:
 
