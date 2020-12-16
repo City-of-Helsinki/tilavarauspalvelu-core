@@ -47,8 +47,13 @@ const ReservationUnitCard = ({ reservationUnit }: Props): JSX.Element => {
         </span>
         <span className={styles.bottom}>
           <IconInfoCircle /> <span>Nuorisotalo</span>
-          <IconGroup /> <span>10</span>
-          <IconLocation /> <span>Linnanrakentajantie 2</span>
+          <IconGroup /> <span>{reservationUnit.maxPersons}</span>
+          <IconLocation />{' '}
+          <span>
+            {reservationUnit.location?.addressStreet},{' '}
+            {reservationUnit.location?.addressZip}{' '}
+            {reservationUnit.location?.addressCity}
+          </span>
         </span>
       </div>
       <div className={styles.actions}>
