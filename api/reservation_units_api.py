@@ -1,4 +1,4 @@
-from rest_framework import viewsets, serializers
+from rest_framework import viewsets
 from reservation_units.models import ReservationUnit, Purpose
 from applications.models import ApplicationPeriod
 from spaces.models import District
@@ -7,7 +7,7 @@ from api.resources_api import ResourceSerializer
 from api.services_api import ServiceSerializer
 from django_filters import rest_framework as filters
 from rest_framework import filters as drf_filters
-from api.base import HierarchyModelMultipleChoiceFilter
+from api.base import HierarchyModelMultipleChoiceFilter, TranslatedModelSerializer
 
 
 class ReservationUnitFilter(filters.FilterSet):
@@ -25,7 +25,7 @@ class ReservationUnitFilter(filters.FilterSet):
     )
 
 
-class ReservationUnitSerializer(serializers.ModelSerializer):
+class ReservationUnitSerializer(TranslatedModelSerializer):
     spaces = SpaceSerializer(read_only=True, many=True)
     resources = ResourceSerializer(read_only=True, many=True)
     services = ServiceSerializer(read_only=True, many=True)
@@ -34,9 +34,7 @@ class ReservationUnitSerializer(serializers.ModelSerializer):
         model = ReservationUnit
         fields = [
             "id",
-            "name_fi",
-            "name_en",
-            "name_sv",
+            "name",
             "spaces",
             "resources",
             "services",
@@ -57,14 +55,12 @@ class ReservationUnitViewSet(viewsets.ModelViewSet):
         return qs
 
 
-class PurposeSerializer(serializers.ModelSerializer):
+class PurposeSerializer(TranslatedModelSerializer):
     class Meta:
         model = Purpose
         fields = [
             "id",
-            "name_fi",
-            "name_en",
-            "name_sv",
+            "name",
         ]
 
 

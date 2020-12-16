@@ -1,16 +1,15 @@
-from rest_framework import serializers, viewsets
+from rest_framework import viewsets
 
+from api.base import TranslatedModelSerializer
 from services.models import Service
 
 
-class ServiceSerializer(serializers.ModelSerializer):
+class ServiceSerializer(TranslatedModelSerializer):
     class Meta:
         model = Service
         fields = [
             "id",
-            "name_fi",
-            "name_en",
-            "name_sv",
+            "name",
             "service_type",
             "buffer_time_before",
             "buffer_time_after",
