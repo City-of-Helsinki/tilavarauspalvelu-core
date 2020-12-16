@@ -24,8 +24,9 @@
 // ReservationUnitCard
 
 .circle {
-  height: 3em;
-  width: 3em;
+  margin-left: var(--spacing-xs);
+  height: var(--spacing-layout-m);
+  width: var(--spacing-layout-m);
   background-color: var(--color-bus);
   color: white;
   border-radius: 50%;

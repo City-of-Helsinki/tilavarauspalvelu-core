@@ -41,7 +41,6 @@ const ReservationUnitCard = ({
       </div>
       <div
         style={{
-          gap: 'var(--spacing-l)',
           display: 'grid',
           gridTemplateColumns: '5fr 1fr',
           marginTop: 'var(--spacing-s)',
