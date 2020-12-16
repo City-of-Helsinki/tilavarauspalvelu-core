@@ -1,27 +1,35 @@
 import { Button, Checkbox, IconArrowRight, Select, TextInput } from 'hds-react';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import styles from '../Application.module.scss';
 import ReservationUnitList from './ReservationUnitList';
-import { ApplicationPeriod } from '../../common/types';
+import { ApplicationPeriod, Parameter } from '../../common/types';
 import { formatDate } from '../../common/util';
+import { getParameters } from '../../common/api';
+
+type Props = {
+  applicationPeriod: ApplicationPeriod;
+};
 
 type OptionType = {
   label: string;
   value: string;
 };
 
-const options = [
-  { label: 'foo', value: 'foo-value' },
-  { label: 'bar', value: 'bar-value' },
-] as OptionType[];
+const mapOptions = (src: Parameter[]): OptionType[] =>
+  src.map((v) => ({
+    label: v.name,
+    value: String(v.id),
+  }));
 
-const Page1 = ({
-  applicationPeriod,
-}: {
-  applicationPeriod: ApplicationPeriod;
-}): JSX.Element => {
+const Page1 = ({ applicationPeriod }: Props): JSX.Element => {
+  const [ageGroupOptions, setAgeGroupOptions] = useState<OptionType[]>([]);
+  const [purposeOptions, setPurposeOptions] = useState<OptionType[]>([]);
+  const [abilityGroupOptions, setAbilityGroupOptions] = useState<OptionType[]>(
+    []
+  );
+
   const periodStartDate = formatDate(applicationPeriod.applicationPeriodBegin);
   const periodEndDate = formatDate(applicationPeriod.applicationPeriodEnd);
 
@@ -43,10 +51,23 @@ const Page1 = ({
 
   useEffect(() => {
     // register form fields (the ones that don't have 'ref')
-    register({ name: 'ageGroup' });
-    register({ name: 'abilityGroup' });
-    register({ name: 'purpose' });
+    register({ name: 'ageGroup', required: true });
+    register({ name: 'abilityGroup', required: true });
+    register({ name: 'purpose', required: true });
   });
+
+  useEffect(() => {
+    async function fetchData() {
+      const fetchedAbilityGroupOptions = await getParameters('ability_group');
+      const fetchedAgeGroupOptions = await getParameters('age_group');
+      const fetchedPurposeOptions = await getParameters('purpose');
+
+      setAbilityGroupOptions(mapOptions(fetchedAbilityGroupOptions));
+      setAgeGroupOptions(mapOptions(fetchedAgeGroupOptions));
+      setPurposeOptions(mapOptions(fetchedPurposeOptions));
+    }
+    fetchData();
+  }, []);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -70,7 +91,7 @@ const Page1 = ({
         <Select
           id="ageGroup"
           placeholder="Valitse"
-          options={options}
+          options={ageGroupOptions}
           label="Ikäryhmä"
           required
           onChange={(selection: OptionType): void => {
@@ -79,7 +100,7 @@ const Page1 = ({
         />
         <Select
           placeholder="Valitse"
-          options={options}
+          options={abilityGroupOptions}
           label="Tasoryhmä"
           required
           onChange={(selection: OptionType): void => {
@@ -90,7 +111,7 @@ const Page1 = ({
           className={styles.fullWidth}
           placeholder="Valitse"
           required
-          options={options}
+          options={purposeOptions}
           label="Vuoron käyttötarkoitus / Toiminnan sisältö"
           onChange={(selection: OptionType): void => {
             setValue('purpose', selection.value);

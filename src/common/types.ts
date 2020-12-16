@@ -58,3 +58,8 @@ export type ReservationUnit = {
   images: Image[];
   location: Location;
 };
+
+export type Parameter = {
+  id: number;
+  name: string;
+};
