@@ -6,7 +6,10 @@ Tilavarauspalvelu-core
 This repository contains core of the new reservation platform for city of Helsinki.
 
 # Installation
+To run tilavarauspalvelu locally you need to have DEBUG=True in your .env file. 
 
+Easiest way is to copy and rename .env.example to .env and make sure DEBUG=True is set. 
+ 
 ## Installation with docker
 
 `docker-compose up`
@@ -24,5 +27,18 @@ In docker
 Locally:
 
 `deploy/entrypoint.sh test`
+
+# Environments
+
+## Environmental variables
+
+See [.env.example](.env.example) for environment variable documentation
+
+## Database requirements
+
+Postgresql 11 database with postgis extension.
+ 
+
+
 
 ![Tietokantakuvaus](tilavarauspalvelu_visualized.png)
