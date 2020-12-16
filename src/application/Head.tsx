@@ -24,7 +24,11 @@ const Head = ({ text, heading, korosType }: HeadProps): JSX.Element => {
         <h1 className={styles.heading}>{heading}</h1>
         <span>{text}</span>
       </div>
-      <Koros flipHorizontal className={`${styles.koros} koros`} type={korosType} />
+      <Koros
+        flipHorizontal
+        className={`${styles.koros} koros`}
+        type={korosType}
+      />
     </div>
   );
 };
