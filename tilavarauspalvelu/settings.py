@@ -10,9 +10,37 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
+import logging
 import os
+import subprocess
 
 import environ
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
+
+
+def get_git_revision_hash() -> str:
+    """
+    Retrieve the git hash for the underlying git repository or die trying
+    We need a way to retrieve git revision hash for sentry reports
+    I assume that if we have a git repository available we will
+    have git-the-comamand as well
+    """
+    try:
+        # We are not interested in gits complaints
+        git_hash = subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], stderr=subprocess.DEVNULL, encoding="utf8"
+        )
+    # ie. "git" was not found
+    # should we return a more generic meta hash here?
+    # like "undefined"?
+    except FileNotFoundError:
+        git_hash = "git_not_available"
+    except subprocess.CalledProcessError:
+        # Ditto
+        git_hash = "no_repository"
+    return git_hash.rstrip()
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -20,14 +48,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "foo"
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
 
 # Application definition
 
@@ -51,9 +71,11 @@ INSTALLED_APPS = [
     "django_extensions",
     "mptt",
     "django_filters",
+    "corsheaders",
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -87,22 +109,81 @@ WSGI_APPLICATION = "tilavarauspalvelu.wsgi.application"
 
 root = environ.Path(BASE_DIR)
 
-env = environ.Env(DEBUG=(bool, False), STATIC_ROOT=(environ.Path(), root("staticroot")))
+env = environ.Env(
+    DEBUG=(bool, False),
+    DJANGO_LOG_LEVEL=(str, "DEBUG"),
+    CONN_MAX_AGE=(int, 0),
+    DATABASE_URL=(str, "sqlite:../db.sqlite3"),
+    TOKEN_AUTH_ACCEPTED_AUDIENCE=(str, ""),
+    TOKEN_AUTH_SHARED_SECRET=(str, ""),
+    SECRET_KEY=(str, ""),
+    ALLOWED_HOSTS=(list, []),
+    ADMINS=(list, []),
+    SECURE_PROXY_SSL_HEADER=(tuple, None),
+    MEDIA_ROOT=(environ.Path(BASE_DIR), root("media")),
+    STATIC_ROOT=(environ.Path(BASE_DIR), root("staticroot")),
+    MEDIA_URL=(str, "/media/"),
+    STATIC_URL=(str, "/static/"),
+    TRUST_X_FORWARDED_HOST=(bool, False),
+    SENTRY_DSN=(str, ""),
+    SENTRY_ENVIRONMENT=(str, "development"),
+    MAIL_MAILGUN_KEY=(str, ""),
+    MAIL_MAILGUN_DOMAIN=(str, ""),
+    MAIL_MAILGUN_API=(str, ""),
+    RESOURCE_DEFAULT_TIMEZONE=(str, "Europe/Helsinki"),
+    CORS_ALLOWED_ORIGINS=(list, []),
+)
 environ.Env.read_env()
 
-# Database
-# https://docs.djangoproject.com/en/3.0/ref/settings/#databases
+ALLOWED_HOSTS = env("ALLOWED_HOSTS")
+DEBUG = env("DEBUG")
 
-database = {
-    "ENGINE": "django.db.backends.sqlite3",
-    "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
-}
+# Database configuration
+DATABASES = {"default": env.db()}
+DATABASES["default"]["CONN_MAX_AGE"] = env("CONN_MAX_AGE")
 
-if "DATABASE_URL" in os.environ:
-    database = env.db()
+# SECURITY WARNING: keep the secret key used in production secret!
+# Using hard coded in dev environments if not defined.
+if DEBUG is True and env("SECRET_KEY") == "":
+    logger = logging.getLogger("settings")
+    logger.warning(
+        "Running in debug mode without proper secret key. Fix if not intentional"
+    )
+    SECRET_KEY = "example_secret"
+else:
+    SECRET_KEY = env("SECRET_KEY")
 
-DATABASES = {"default": database}
+ADMINS = env("ADMINS")
+
+SECURE_PROXY_SSL_HEADER = env("SECURE_PROXY_SSL_HEADER")
+
+# Static files (CSS, JavaScript, Images) and media uploads
+# https://docs.djangoproject.com/en/3.0/howto/static-files/
 STATIC_ROOT = env("STATIC_ROOT")
+MEDIA_ROOT = env("MEDIA_ROOT")
+
+STATIC_URL = env("STATIC_URL")
+MEDIA_URL = env("MEDIA_URL")
+
+
+# Whether to trust X-Forwarded-Host headers for all purposes
+# where Django would need to make use of its own hostname
+# fe. generating absolute URLs pointing to itself
+# Most often used in reverse proxy setups
+USE_X_FORWARDED_HOST = env("TRUST_X_FORWARDED_HOST")
+
+# Configure cors
+CORS_ALLOWED_ORIGINS = env("CORS_ALLOWED_ORIGINS")
+
+
+# Configure sentry
+if env("SENTRY_DSN"):
+    sentry_sdk.init(
+        dsn=env("SENTRY_DSN"),
+        environment=env("SENTRY_ENVIRONMENT"),
+        release=get_git_revision_hash(),
+        integrations=[DjangoIntegration()],
+    )
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
@@ -136,10 +217,6 @@ USE_L10N = True
 
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/3.0/howto/static-files/
-STATIC_URL = "/static/"
 
 GRAPHENE = {"SCHEMA": "api.graphql.schema.schema"}
 
