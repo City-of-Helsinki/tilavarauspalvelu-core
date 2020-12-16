@@ -1,6 +1,11 @@
 from itertools import chain
-from rest_framework import serializers
+
+from django.conf import settings
 from django_filters import rest_framework as filters
+from modeltranslation.translator import NotRegistered, translator
+from rest_framework import serializers
+
+USED_LANGUAGE_CODES = [x[0] for x in settings.LANGUAGES]
 
 
 class BaseNestedSerializer(serializers.ModelSerializer):
@@ -53,3 +58,27 @@ class HierarchyModelMultipleChoiceFilter(filters.ModelMultipleChoiceFilter):
             ]
         )
         return super().filter(qs, list(values_with_children))
+
+
+class TranslatedModelSerializer(serializers.ModelSerializer):
+    """ A serializer that automatically registers translated model fields """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        model = self.Meta.model
+        fields = self.Meta.fields
+
+        try:
+            self.translated_fields = translator.get_options_for_model(
+                model
+            ).fields.keys()
+        except NotRegistered:
+            self.translated_fields = []
+            return
+
+        for translated_field_name in self.translated_fields:
+            for language_code in USED_LANGUAGE_CODES:
+                field_name = f"{translated_field_name}_{language_code}"
+                model_has_field = bool(getattr(model, field_name))
+                if model_has_field and field_name not in fields:
+                    fields.append(f"{translated_field_name}_{language_code}")

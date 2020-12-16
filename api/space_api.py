@@ -1,16 +1,15 @@
-from rest_framework import serializers, viewsets
+from rest_framework import viewsets
 
 from spaces.models import Space
+from api.base import TranslatedModelSerializer
 
 
-class SpaceSerializer(serializers.ModelSerializer):
+class SpaceSerializer(TranslatedModelSerializer):
     class Meta:
         model = Space
         fields = [
             "id",
-            "name_fi",
-            "name_en",
-            "name_sv",
+            "name",
             "parent",
             "building",
             "surface_area",
