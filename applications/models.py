@@ -107,10 +107,10 @@ class ApplicationPeriod(models.Model):
         related_name="application_periods",
     )
 
-    application_period_begin = models.DateField(
+    application_period_begin = models.DateTimeField(
         verbose_name=_("Application period begin"),
     )
-    application_period_end = models.DateField(
+    application_period_end = models.DateTimeField(
         verbose_name=_("Application period end"),
     )
 

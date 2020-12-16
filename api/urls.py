@@ -6,7 +6,11 @@ from .applications_api import (
     ApplicationEventViewSet,
     ApplicationViewSet,
 )
-from .reservation_units_api import PurposeViewSet, ReservationUnitViewSet
+from .reservation_units_api import (
+    PurposeViewSet,
+    ReservationUnitTypeViewSet,
+    ReservationUnitViewSet,
+)
 from .reservations_api import AbilityGroupViewSet, AgeGroupViewSet, ReservationViewSet
 from .resources_api import ResourceViewSet
 from .services_api import ServiceViewSet
@@ -26,3 +30,8 @@ router.register(r"application_period", ApplicationPeriodViewSet, "application_pe
 router.register(r"parameters/purpose", PurposeViewSet, "purpose")
 router.register(r"parameters/age_group", AgeGroupViewSet, "age_group")
 router.register(r"parameters/ability_group", AbilityGroupViewSet, "ability_group")
+router.register(
+    r"parameters/reservation_unit_type",
+    ReservationUnitTypeViewSet,
+    "reservation_unit_type",
+)
