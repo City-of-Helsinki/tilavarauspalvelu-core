@@ -26,7 +26,7 @@ const Page1 = ({
   const periodEndDate = formatDate(applicationPeriod.applicationPeriodEnd);
 
   const { t } = useTranslation();
-  const { register, handleSubmit, setValue, errors } = useForm({
+  const { register, handleSubmit, setValue } = useForm({
     defaultValues: {
       name: 'Vakiovuoro 1.',
       ageGroup: '',
@@ -36,6 +36,7 @@ const Page1 = ({
       periodEndDate,
       minDuration: 1,
       maxDuration: 1,
+      turnsPerWeek: 1,
     },
   });
   const onSubmit = (data: any) => alert(JSON.stringify(data));
@@ -57,7 +58,6 @@ const Page1 = ({
           id="name"
           name="name"
           required
-          invalid={!!errors.name?.message}
         />
         <TextInput
           required
@@ -72,6 +72,7 @@ const Page1 = ({
           placeholder="Valitse"
           options={options}
           label="Ikäryhmä"
+          required
           onChange={(selection: OptionType): void => {
             setValue('ageGroup', selection.value);
           }}
@@ -80,6 +81,7 @@ const Page1 = ({
           placeholder="Valitse"
           options={options}
           label="Tasoryhmä"
+          required
           onChange={(selection: OptionType): void => {
             setValue('abilityGroup', selection.value);
           }}
@@ -87,6 +89,7 @@ const Page1 = ({
         <Select
           className={styles.fullWidth}
           placeholder="Valitse"
+          required
           options={options}
           label="Vuoron käyttötarkoitus / Toiminnan sisältö"
           onChange={(selection: OptionType): void => {
@@ -112,12 +115,14 @@ const Page1 = ({
           label="Kauden aloituspäivä"
           name="periodStartDate"
           id="periodStartDate"
+          required
         />
         <TextInput
           ref={register()}
           label="Kauden päätöspäivä"
           name="periodEndDate"
           id="periodEndDate"
+          required
         />
         <div style={{ display: 'flex' }}>
           <Checkbox id="defaultPeriod" checked />
@@ -130,12 +135,14 @@ const Page1 = ({
           label="Vuoron minimikesto"
           name="minDuration"
           id="minDuration"
+          required
         />
         <TextInput
           ref={register()}
           label="Vuoren maksimikesto"
           name="maxDuration"
           id="maxDuration"
+          required
         />
         <div style={{ display: 'flex' }}>
           <Checkbox id="durationCheckbox" checked />
@@ -147,7 +154,8 @@ const Page1 = ({
           label="Vuorojen määrä/viikko"
           name="turnsPerWeek"
           id="turnsPerWeek"
-          disabled
+          type="number"
+          required
         />
         <div style={{ display: 'flex' }}>
           <Checkbox id="everyTwoWeekCheckboxs" checked />
