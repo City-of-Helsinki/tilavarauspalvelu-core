@@ -34,7 +34,7 @@ const Application = (): JSX.Element | null => {
       <Switch>
         <Route exact path={`${match.url}/page1`}>
           <ApplicationPage
-            heading="1. Vakiovuoron luominen"
+            heading={t('Application.heading.page1')}
             text={applicationPeriod.name}
             match={match}>
             <Page1 applicationPeriod={applicationPeriod} />
@@ -42,21 +42,21 @@ const Application = (): JSX.Element | null => {
         </Route>
         <Route exact path={`${match.url}/page2`}>
           <ApplicationPage
-            heading={t('2. Vakiovuoron ajankohta')}
+            heading={t('Application.heading.page2')}
             text={applicationPeriod.name}
             match={match}
           />
         </Route>
         <Route exact path={`${match.url}/page3`}>
           <ApplicationPage
-            heading="3. Varaajan perustiedot"
+            heading={t('Application.heading.page3')}
             text={applicationPeriod.name}
             match={match}
           />
         </Route>
         <Route exact path={`${match.url}/page4`}>
           <ApplicationPage
-            heading="4. Lähetä käsiteltäväksi"
+            heading={t('Application.heading.page4')}
             text={applicationPeriod.name}
             match={match}
           />

@@ -3,8 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { NavLink } from 'react-router-dom';
 import Container from '../component/Container';
 import Head from './Head';
-
-const activeStyle = { backgroundColor: 'green' } as React.CSSProperties;
+import styles from './ApplicationPage.module.scss';
 
 type ApplicationPageProps = {
   heading: string;
@@ -24,32 +23,31 @@ const ApplicationPage = ({
   return (
     <>
       <Head korosType="storm" heading={heading} text={text} />
-
       <Container main>
-        <div style={{ display: 'grid', gridTemplateColumns: '4fr 6fr' }}>
-          <nav style={{ fontSize: 'var(--fontsize-body-l)', fontWeight: 500 }}>
-            <ol>
-              <li>
-                <NavLink activeStyle={activeStyle} to={`${match.url}/page1`}>
-                  {t('Vakiovuoron perustiedot')}
-                </NavLink>
-              </li>
-              <li>
-                <NavLink activeStyle={activeStyle} to={`${match.url}/page2`}>
-                  Vakiovuoron ajankohta
-                </NavLink>
-              </li>
-              <li>
-                <NavLink activeStyle={activeStyle} to={`${match.url}/page3`}>
-                  Varaajan perustiedot
-                </NavLink>
-              </li>
-              <li>
-                <NavLink activeStyle={activeStyle} to={`${match.url}/page4`}>
-                  Lähetä käsiteltäväksi
-                </NavLink>
-              </li>
-            </ol>
+        <div className={styles.container}>
+          <nav className={styles.navigationContainer}>
+            <ul>
+              <NavLink
+                activeClassName={styles.activeClass}
+                to={`${match.url}/page1`}>
+                <li>{t('ApplicationPage.navigation.page1')}</li>
+              </NavLink>
+              <NavLink
+                activeClassName={styles.activeClass}
+                to={`${match.url}/page2`}>
+                <li>{t('ApplicationPage.navigation.page2')}</li>
+              </NavLink>
+              <NavLink
+                activeClassName={styles.activeClass}
+                to={`${match.url}/page3`}>
+                <li>{t('ApplicationPage.navigation.page3')}</li>
+              </NavLink>
+              <NavLink
+                activeClassName={styles.activeClass}
+                to={`${match.url}/page4`}>
+                <li>{t('ApplicationPage.navigation.page4')}</li>
+              </NavLink>
+            </ul>
           </nav>
           <div>{children}</div>
         </div>

@@ -17,6 +17,37 @@ interface Translations {
 }
 
 const translations: Translations = {
+  Application: {
+    heading: {
+      page1: ['1. Vakiovuoron luominen'],
+      page2: ['2. Vakiovuoron ajankohta'],
+      page3: ['3. Varaajan perustiedot'],
+      page4: ['4. Lähetä käsiteltäväksi'],
+    },
+    Page1: {
+      basicInformationSubHeading: ['Perustiedot'],
+      name: ['Vakiovuoron nimi'],
+      groupSize: ['Ryhmän koko'],
+      ageGroup: ['Ikäryhmä'],
+      abilityGroup: ['Tasoryhmä'],
+      purpose: ['Vuoron käyttötarkoitus / toiminnan sisältö'],
+      spacesSubHeading: ['Toivotut tilat'],
+      applicationPeriodSubHeading: ['Vakiovuoron kausi'],
+      periodStartDate: ['Kauden aloituspäivä'],
+      periodEndDate: ['Kauden päätöspäivä'],
+      minDuration: ['Vuoron minimikesto'],
+      maxDuration: ['Vuoron maksimikesto'],
+      eventsPerWeek: ['Vuorojen määrä/viikko'],
+    },
+  },
+  ApplicationPage: {
+    navigation: {
+      page1: ['1. Vakiovuoron perustiedot'],
+      page2: ['2. Vakiovuoron ajankohta'],
+      page3: ['3. Varaajan perustiedot'],
+      page4: ['4. Lähetä käsiteltäväksi'],
+    },
+  },
   ApplicationPeriodCard: {
     reminderButton: ['Tilaa muistutus'],
     applyButton: ['Hae Tilaa'],
@@ -30,9 +61,10 @@ const translations: Translations = {
     application: ['Vakiovuorohakemus'],
   },
   common: {
-    applicationName: ['Varaamo'],
+    applicationName: ['Varaamo', 'Varaamo', 'Varaamo'],
     selectReservationUnit: ['Valitse tila'],
-    favourite: ['Suosikki'],
+    favourite: ['Suosikki', 'Favourite', 'Favorit'],
+    next: ['Seuraava', 'Next', 'Nästa'],
   },
   Navigation: {
     Item: {

@@ -13,7 +13,7 @@ import {
   SelectionsListContextType,
 } from '../../context/SelectionsListContext';
 
-import styles from '../Application.module.scss';
+import styles from './ReservationUnitList.module.scss';
 
 const ReservationUnitCard = ({
   reservationUnit,
@@ -35,60 +35,35 @@ const ReservationUnitCard = ({
   t: (n: string) => string;
 }): JSX.Element => {
   return (
-    <div style={{ marginTop: 'var(--spacing-l)' }}>
-      <div style={{ fontSize: 'var(--fontsize-heading-xs)', fontWeight: 700 }}>
+    <div className={styles.nameCardContainer}>
+      <div className={styles.preCardLabel}>
         {t('ReservationUnitList.option')} {order + 1}.
       </div>
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: '5fr 1fr',
-          marginTop: 'var(--spacing-s)',
-          alignItems: 'center',
-        }}>
-        <div
-          style={{
-            gap: 'var(--spacing-l)',
-            backgroundColor: 'white',
-            display: 'grid',
-            gridTemplateColumns: '1fr 4fr 1fr 1fr',
-            alignItems: 'center',
-          }}>
+      <div className={styles.cardButtonContainer}>
+        <div className={styles.cardContainer}>
           <img
-            style={{ objectFit: 'cover' }}
+            className={styles.image}
             src={reservationUnit.images[0]?.imageUrl}
             width="76"
             height="99"
           />
           <div>
-            <div
-              style={{
-                fontSize: 'var(--fontsize-heading-m)',
-                fontWeight: 'bold',
-              }}>
-              {reservationUnit.name}
-            </div>
-            <div style={{ fontSize: 'var(--fontsize-heading-xs)' }}>
+            <div className={styles.title}>{reservationUnit.name}</div>
+            <div className={styles.address}>
               {reservationUnit.location?.addressStreet},
               {reservationUnit.location?.addressZip}{' '}
               {reservationUnit.location?.addressCity}
             </div>
           </div>
-          <div
-            style={{
-              display: 'flex',
-              justifyItems: 'center',
-              fontSize: 'var(--fontsize-body-l)',
-              fontWeight: 'bold',
-            }}>
+          <div className={styles.maxPersonsContainer}>
             <IconGroup />
-            <span style={{ marginLeft: 'var(--spacing-xs)' }}>
+            <span className={styles.maxPersonsCountContainer}>
               {reservationUnit.maxPersons}
             </span>
           </div>
           <div>
             <Button
-              style={{ '--border-color': 'transparent' } as React.CSSProperties}
+              className={styles.deleteButton}
               variant="secondary"
               iconLeft={<IconTrash />}
               onClick={() => {
@@ -98,7 +73,7 @@ const ReservationUnitCard = ({
             </Button>
           </div>
         </div>
-        <div style={{ display: 'flex' }}>
+        <div className={styles.arrowContainer}>
           <div
             className={`${styles.circle} ${first ? styles.passiveCircle : ''}`}>
             <button
@@ -135,7 +110,7 @@ const ReservationUnitList = (): JSX.Element => {
   } = React.useContext(SelectionsListContext) as SelectionsListContextType;
 
   return (
-    <div style={{ marginTop: 'var(--spacing-l)' }}>
+    <div className={styles.mainContainer}>
       {reservationUnits.map((ru, index, all) => {
         return (
           <ReservationUnitCard

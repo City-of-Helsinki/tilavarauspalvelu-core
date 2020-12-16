@@ -35,22 +35,3 @@
 .ruler {
   margin-top: var(--spacing-layout-m);
 }
-
-// ReservationUnitCard
-
-.circle {
-  margin-left: var(--spacing-xs);
-  height: var(--spacing-layout-m);
-  width: var(--spacing-layout-m);
-  background-color: var(--color-bus);
-  color: white;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.passiveCircle {
-  background-color: var(--color-black-90);
-  color: #e5e5e5;
-}

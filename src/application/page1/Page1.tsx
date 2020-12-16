@@ -72,11 +72,13 @@ const Page1 = ({ applicationPeriod }: Props): JSX.Element => {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <div className={styles.subHeadLine}>{t('Perustiedot')}</div>
+      <div className={styles.subHeadLine}>
+        {t('Application.Page1.basicInformationSubHeading')}
+      </div>
       <div className={styles.basicInfoContainer}>
         <TextInput
           ref={register({ required: true })}
-          label="Vakiovuoron nimi"
+          label={t('Application.Page1.name')}
           id="name"
           name="name"
           required
@@ -84,7 +86,7 @@ const Page1 = ({ applicationPeriod }: Props): JSX.Element => {
         <TextInput
           required
           ref={register({ required: true })}
-          label="Ryhmän koko"
+          label={t('Application.Page1.groupSize')}
           id="groupSize"
           name="groupSize"
           type="number"
@@ -93,7 +95,7 @@ const Page1 = ({ applicationPeriod }: Props): JSX.Element => {
           id="ageGroup"
           placeholder="Valitse"
           options={ageGroupOptions}
-          label="Ikäryhmä"
+          label={t('Application.Page1.ageGroup')}
           required
           onChange={(selection: OptionType): void => {
             setValue('ageGroup', selection.value);
@@ -102,7 +104,7 @@ const Page1 = ({ applicationPeriod }: Props): JSX.Element => {
         <Select
           placeholder="Valitse"
           options={abilityGroupOptions}
-          label="Tasoryhmä"
+          label={t('Application.Page1.abilityGroup')}
           required
           onChange={(selection: OptionType): void => {
             setValue('abilityGroup', selection.value);
@@ -113,35 +115,32 @@ const Page1 = ({ applicationPeriod }: Props): JSX.Element => {
           placeholder="Valitse"
           required
           options={purposeOptions}
-          label="Vuoron käyttötarkoitus / Toiminnan sisältö"
+          label={t('Application.Page1.purpose')}
           onChange={(selection: OptionType): void => {
             setValue('purpose', selection.value);
           }}
         />
-        <TextInput
-          ref={register()}
-          className={styles.fullWidth}
-          label="Lisätietoja vakiovuoroon liittyen"
-          name="additionalInformation"
-          id="additionalInformation"
-        />
       </div>
       <hr className={styles.ruler} />
-      <div className={styles.subHeadLine}>{t('Toivotut tilat')}</div>
+      <div className={styles.subHeadLine}>
+        {t('Application.Page1.spacesSubHeading')}
+      </div>
       <ReservationUnitList />
       <hr className={styles.ruler} />
-      <div className={styles.subHeadLine}>{t('Vakiovuorn kausi')}</div>
+      <div className={styles.subHeadLine}>
+        {t('Application.Page1.applicationPeriodSubHeading')}
+      </div>
       <div className={styles.periodContainer}>
         <TextInput
           ref={register()}
-          label="Kauden aloituspäivä"
+          label={t('Application.Page1.periodStartDate')}
           name="periodStartDate"
           id="periodStartDate"
           required
         />
         <TextInput
           ref={register()}
-          label="Kauden päätöspäivä"
+          label={t('Application.Page1.periodEndDate')}
           name="periodEndDate"
           id="periodEndDate"
           required
@@ -154,14 +153,14 @@ const Page1 = ({ applicationPeriod }: Props): JSX.Element => {
         </div>
         <TextInput
           ref={register()}
-          label="Vuoron minimikesto"
+          label={t('Application.Page1.minDuration')}
           name="minDuration"
           id="minDuration"
           required
         />
         <TextInput
           ref={register()}
-          label="Vuoren maksimikesto"
+          label={t('Application.Page1.maxDuration')}
           name="maxDuration"
           id="maxDuration"
           required
@@ -173,9 +172,9 @@ const Page1 = ({ applicationPeriod }: Props): JSX.Element => {
         <TextInput
           ref={register()}
           className={styles.fullWidth}
-          label="Vuorojen määrä/viikko"
-          name="turnsPerWeek"
-          id="turnsPerWeek"
+          label={t('Application.Page1.eventsPerWeek')}
+          name="eventsPerWeek"
+          id="eventsPerWeek"
           type="number"
           required
         />
@@ -188,7 +187,7 @@ const Page1 = ({ applicationPeriod }: Props): JSX.Element => {
         <Button
           iconRight={<IconArrowRight />}
           onClick={() => handleSubmit(onSubmit)()}>
-          Seuraava
+          {t('common.next')}
         </Button>
       </div>
     </form>
