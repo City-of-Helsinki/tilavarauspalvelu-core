@@ -1,11 +1,29 @@
 from django.contrib import admin
 
-from .models import Day, DayPart, Period, ReservationUnit
+from .models import (
+    Day,
+    DayPart,
+    Period,
+    Purpose,
+    ReservationUnit,
+    ReservationUnitImage,
+    ReservationUnitType,
+)
 
 
 @admin.register(ReservationUnit)
 class ReservationUnitAdmin(admin.ModelAdmin):
     model = ReservationUnit
+
+
+@admin.register(ReservationUnitImage)
+class ReservationUnitImageAdmin(admin.ModelAdmin):
+    model = ReservationUnitImage
+
+
+@admin.register(ReservationUnitType)
+class ReservationUnitTypeAdmin(admin.ModelAdmin):
+    model = ReservationUnitType
 
 
 @admin.register(Period)
@@ -21,3 +39,9 @@ class DayAdmin(admin.ModelAdmin):
 @admin.register(DayPart)
 class DayPartAdmin(admin.ModelAdmin):
     model = DayPart
+
+
+@admin.register(Purpose)
+class PurposeAdmin(admin.ModelAdmin):
+    model = Purpose
+    fields = ["name"]

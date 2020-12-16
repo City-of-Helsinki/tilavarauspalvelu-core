@@ -9,6 +9,13 @@ from spaces.models import Space
 Q = models.Q
 
 
+class ReservationUnitType(models.Model):
+    name = models.CharField(verbose_name=_("Name"), max_length=255)
+
+    def __str__(self):
+        return self.name
+
+
 class ReservationUnit(models.Model):
     name = models.CharField(verbose_name=_("Name"), max_length=255)
 
@@ -28,12 +35,40 @@ class ReservationUnit(models.Model):
         blank=True,
     )
 
+    reservation_unit_type = models.ForeignKey(
+        ReservationUnitType,
+        verbose_name=_("Type"),
+        related_name="reservation_units",
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+    )
+
     require_introduction = models.BooleanField(
         verbose_name=_("Require introduction"), default=False
     )
 
     def __str__(self):
         return f"{self.name}"
+
+    def get_location(self):
+        # For now we assume that if reservation has multiple spaces they all have same location
+        spaces = self.spaces.all()
+        return next(
+            (space.location for space in spaces if hasattr(space, "location")), None
+        )
+
+    def get_building(self):
+        # For now we assume that if reservation has multiple spaces they all have same building
+        spaces = self.spaces.all()
+        return next(
+            (space.building for space in spaces if hasattr(space, "building")), None
+        )
+
+    def get_max_persons(self):
+        # Sum of max persons for all spaces because group can be divided to different spaces
+        spaces = self.spaces.all()
+        return sum(filter(None, (space.max_persons for space in spaces))) or None
 
     def check_required_introduction(self, user):
         return Introduction.objects.filter(reservation_unit=self, user=user).exists()
@@ -52,11 +87,38 @@ class ReservationUnit(models.Model):
         ).exists()
 
 
+class ReservationUnitImage(models.Model):
+    TYPES = (
+        ("main", _("Main image")),
+        ("ground_plan", _("Ground plan")),
+        ("map", _("Map")),
+        ("other", _("Other")),
+    )
+
+    image_type = models.CharField(max_length=20, verbose_name=_("Type"), choices=TYPES)
+
+    reservation_unit = models.ForeignKey(
+        ReservationUnit,
+        verbose_name=_("Reservation unit image"),
+        related_name="images",
+        on_delete=models.CASCADE,
+    )
+    image_url = models.URLField(verbose_name=_("Image url"), max_length=255)
+
+    def __str__(self):
+        return "{} ({})".format(
+            self.reservation_unit.name, self.get_image_type_display()
+        )
+
+
 class Purpose(models.Model):
     name = models.CharField(max_length=200)
     reservation_unit = models.ManyToManyField(
         ReservationUnit, verbose_name=_("Purpose"), related_name="purposes"
     )
+
+    def __str__(self):
+        return self.name
 
 
 class Period(models.Model):

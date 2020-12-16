@@ -3,12 +3,15 @@ appdirs==1.4.4
 asgiref==3.3.0
 attrs==20.3.0
 black==20.8b1
+certifi==2020.12.5
 click==7.1.2
 coverage==5.3
 Django==3.0.10
+django-cors-headers==3.6.0
 django-environ==0.4.5
 django-extensions==3.0.9
 django-extra-fields==3.0.2
+django-filter==2.4.0
 django-js-asset==1.2.2
 django-mptt==0.11.0
 django-recurrence==1.10.3
@@ -40,6 +43,7 @@ python-dateutil==2.8.1
 pytz==2020.1
 regex==2020.10.28
 Rx==1.6.1
+sentry-sdk==0.19.5
 singledispatch==3.4.0.3
 six==1.15.0
 sqlparse==0.4.1
@@ -47,6 +51,7 @@ toml==0.10.1
 typed-ast==1.4.1
 typing-extensions==3.7.4.3
 Unidecode==1.1.1
+urllib3==1.26.2
 uWSGI==2.0.19.1
 whitenoise==5.2.0
 zipp==3.4.0
