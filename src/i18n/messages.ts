@@ -27,6 +27,7 @@ const translations: Translations = {
   breadcrumb: {
     home: ['Vakiovuorot'],
     search: ['Haku'],
+    application: ['Vakiovuorohakemus'],
   },
   common: {
     applicationName: ['Varaamo'],
@@ -79,6 +80,12 @@ const translations: Translations = {
     sortButtonLabel: ['Järjestä'],
     sortButtonPlaceholder: ['Sijainnin mukaan'],
   },
+  shoppingCart: {
+    next: ['Jatka seuraavaa'],
+    count_plural: ['{{count}} tilaa valittuna'],
+    count: ['{{count}} tila valittuna'],
+  },
+
   Footer: {
     Navigation: {
       recurringShift: {

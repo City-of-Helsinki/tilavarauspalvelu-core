@@ -1,0 +1,40 @@
+.subHeadLine {
+  margin-top: var(--spacing-layout-m);
+  font-weight: 700;
+  font-size: var(--fontsize-heading-m);
+}
+
+// page 1
+.basicInfoContainer {
+  margin-top: var(--spacing-m);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-m);
+}
+
+.fullWidth {
+  grid-column-start: 1;
+  grid-column-end: 3;
+}
+
+.ruler {
+  margin-top: var(--spacing-layout-m);
+}
+
+// ReservationUnitCard
+
+.circle {
+  height: 3em;
+  width: 3em;
+  background-color: var(--color-bus);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.passiveCircle {
+  background-color: var(--color-black-90);
+  color: #e5e5e5;
+}
