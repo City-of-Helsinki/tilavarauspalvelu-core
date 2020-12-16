@@ -25,6 +25,13 @@
   align-items: center;
 }
 
+.buttonContainer {
+  display: flex;
+  flex-direction: row;
+  margin-top: var(--spacing-layout-l);
+  justify-content: flex-end;
+}
+
 .ruler {
   margin-top: var(--spacing-layout-m);
 }

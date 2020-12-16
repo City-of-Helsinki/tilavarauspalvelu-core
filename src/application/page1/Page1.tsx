@@ -1,4 +1,4 @@
-import { Button, Checkbox, Select, TextInput } from 'hds-react';
+import { Button, Checkbox, IconArrowRight, Select, TextInput } from 'hds-react';
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
@@ -147,7 +147,13 @@ const Page1 = ({
           <span>Vuoro vain joka toinen viikko</span>
         </div>
       </div>
-      <Button onClick={() => handleSubmit(onSubmit)()}>Seuraava</Button>
+      <div className={styles.buttonContainer}>
+        <Button
+          iconRight={<IconArrowRight />}
+          onClick={() => handleSubmit(onSubmit)()}>
+          Seuraava
+        </Button>
+      </div>
     </form>
   );
 };
