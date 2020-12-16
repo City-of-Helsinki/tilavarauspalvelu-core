@@ -64,6 +64,10 @@ const translations: Translations = {
       ],
     },
   },
+  ReservationUnitList: {
+    option: ['Vaihtoehto'],
+    buttonRemove: ['Poista'],
+  },
   search: {
     heading: ['Vakiovuorojen tilat'],
     text: ['Valitse tilat joihin haluat hakea vakiovuoroja.'],

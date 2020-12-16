@@ -23,6 +23,7 @@ const ReservationUnitCard = ({
   last,
   onMoveUp,
   onMoveDown,
+  t,
 }: {
   order: number;
   reservationUnit: ReservationUnit;
@@ -31,11 +32,12 @@ const ReservationUnitCard = ({
   last: boolean;
   onMoveUp: (reservationUnit: ReservationUnit) => void;
   onMoveDown: (reservationUnit: ReservationUnit) => void;
+  t: (n: string) => string;
 }): JSX.Element => {
   return (
     <div style={{ marginTop: 'var(--spacing-l)' }}>
       <div style={{ fontSize: 'var(--fontsize-heading-xs)', fontWeight: 700 }}>
-        Vaihtoehto {order + 1}.
+        {t('ReservationUnitList.option')} {order + 1}.
       </div>
       <div
         style={{
@@ -93,7 +95,7 @@ const ReservationUnitCard = ({
               onClick={() => {
                 onDelete(reservationUnit);
               }}>
-              Poista
+              {t('ReservationUnitList.buttonRemove')}
             </Button>
           </div>
         </div>
@@ -138,6 +140,7 @@ const ReservationUnitList = (): JSX.Element => {
       {reservationUnits.map((ru, index, all) => {
         return (
           <ReservationUnitCard
+            t={t}
             onDelete={removeReservationUnit}
             reservationUnit={ru}
             order={index}
@@ -148,7 +151,6 @@ const ReservationUnitList = (): JSX.Element => {
           />
         );
       })}
-      {t('hehe')}
     </div>
   );
 };
