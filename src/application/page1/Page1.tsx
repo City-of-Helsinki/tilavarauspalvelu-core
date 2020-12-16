@@ -47,6 +47,7 @@ const Page1 = ({ applicationPeriod }: Props): JSX.Element => {
       turnsPerWeek: 1,
     },
   });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any, no-alert
   const onSubmit = (data: any) => alert(JSON.stringify(data));
 
   useEffect(() => {
