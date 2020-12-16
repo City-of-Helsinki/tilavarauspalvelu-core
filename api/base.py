@@ -5,7 +5,7 @@ from django_filters import rest_framework as filters
 from modeltranslation.manager import get_translatable_fields_for_model
 from rest_framework import serializers
 
-USED_LANGUAGE_CODES = [x[0] for x in settings.LANGUAGES]
+LANGUAGE_CODES = [x[0] for x in settings.LANGUAGES]
 
 
 class BaseNestedSerializer(serializers.ModelSerializer):
@@ -69,7 +69,7 @@ class TranslatedModelSerializer(serializers.ModelSerializer):
         translatable_fields = get_translatable_fields_for_model(model)
 
         for original_field_name in translatable_fields:
-            for language_code in USED_LANGUAGE_CODES:
+            for language_code in LANGUAGE_CODES:
                 translated_field_name = f"{original_field_name}_{language_code}"
                 model_has_field = bool(getattr(model, translated_field_name, False))
                 if (
