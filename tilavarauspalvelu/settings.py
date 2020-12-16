@@ -18,6 +18,8 @@ import environ
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 
+logger = logging.getLogger("settings")
+
 
 def get_git_revision_hash() -> str:
     """
@@ -145,7 +147,6 @@ DATABASES["default"]["CONN_MAX_AGE"] = env("CONN_MAX_AGE")
 # SECURITY WARNING: keep the secret key used in production secret!
 # Using hard coded in dev environments if not defined.
 if DEBUG is True and env("SECRET_KEY") == "":
-    logger = logging.getLogger("settings")
     logger.warning(
         "Running in debug mode without proper secret key. Fix if not intentional"
     )
@@ -227,3 +228,22 @@ if os.path.exists(local_settings_path):
     with open(local_settings_path) as fp:
         code = compile(fp.read(), local_settings_path, "exec")
     exec(code, globals(), locals())
+
+# TODO: Very simple basic authentication for the initial testing phase.
+if "TMP_PERMISSIONS_DISABLED" in os.environ:
+    TMP_PERMISSIONS_DISABLED = (
+        True if env("TMP_PERMISSIONS_DISABLED").lower() in ["true", "1"] else False
+    )
+    if TMP_PERMISSIONS_DISABLED and not DEBUG:
+        logging.error("Running with permissions disabled in production environment.")
+
+
+REST_FRAMEWORK = {
+    "DEFAULT_PERMISSION_CLASSES": [
+        "api.permissions.AuthenticationOffOrAuthenticatedForWrite"
+    ],
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.BasicAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
+    ],
+}
