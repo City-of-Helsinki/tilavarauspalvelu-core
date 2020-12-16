@@ -30,10 +30,7 @@ async function request<T>(requestConfig: AxiosRequestConfig): Promise<T> {
   const config: AxiosRequestConfig = requestConfig;
 
   try {
-    const response: AxiosResponse<T> = await axiosclient.request<
-      T,
-      AxiosResponse<T>
-    >(config);
+    const response: AxiosResponse<T> = await axiosclient.request<T, AxiosResponse<T>>(config);
     return response.data;
   } catch (error) {
     const errorMessage: string | undefined = error.response?.data?.detail;
@@ -45,10 +42,7 @@ async function request<T>(requestConfig: AxiosRequestConfig): Promise<T> {
   }
 }
 
-async function apiGet<T>({
-  path,
-  parameters = {} as RequestParameters,
-}: GetParameters): Promise<T> {
+async function apiGet<T>({ path, parameters = {} as RequestParameters }: GetParameters): Promise<T> {
   const apiParameters: ApiParameters = {
     ...parameters,
     format: ApiResponseFormat.json,
@@ -64,9 +58,15 @@ async function apiGet<T>({
   });
 }
 
-export function getapplicationPeriods(): Promise<ApplicationPeriod[]> {
+export function getApplicationPeriods(): Promise<ApplicationPeriod[]> {
   return apiGet<ApplicationPeriod[]>({
     path: `v1/${applicationPeriodsBasePath}`,
+  });
+}
+
+export function getApplicationPeriod(params: IDParameter): Promise<ApplicationPeriod> {
+  return apiGet<ApplicationPeriod>({
+    path: `v1/${applicationPeriodsBasePath}/${params.id}`,
   });
 }
 
@@ -74,9 +74,7 @@ export interface ReservationUnitsParameters {
   search: string | undefined;
 }
 
-export function getReservationUnits(
-  params: ReservationUnitsParameters
-): Promise<ReservationUnit[]> {
+export function getReservationUnits(params: ReservationUnitsParameters): Promise<ReservationUnit[]> {
   return apiGet<ReservationUnit[]>({
     parameters: params,
     path: `v1/${reservationUnitsBasePath}`,
@@ -87,9 +85,7 @@ interface IDParameter {
   id: string;
 }
 
-export function getReservationUnit(
-  params: IDParameter
-): Promise<ReservationUnit> {
+export function getReservationUnit(params: IDParameter): Promise<ReservationUnit> {
   return apiGet<ReservationUnit>({
     path: `v1/${reservationUnitsBasePath}/${params.id}`,
   });
