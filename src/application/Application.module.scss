@@ -17,6 +17,14 @@
   grid-column-end: 3;
 }
 
+.periodContainer {
+  margin-top: var(--spacing-m);
+  display: grid;
+  grid-template-columns: 2fr 2fr 3fr;
+  gap: var(--spacing-m);
+  align-items: center;
+}
+
 .ruler {
   margin-top: var(--spacing-layout-m);
 }

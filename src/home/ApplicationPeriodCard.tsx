@@ -1,19 +1,14 @@
 import React from 'react';
-import { format, parseISO } from 'date-fns';
 import { Button, Container, IconArrowRight, IconClock } from 'hds-react';
 import { useTranslation } from 'react-i18next';
 import Card from '../component/Card';
 import { ApplicationPeriod } from '../common/types';
 import styles from './ApplicationPeriodCard.module.scss';
-import { isActive } from '../common/util';
+import { isActive, formatDate } from '../common/util';
 
 interface Props {
   applicationPeriod: ApplicationPeriod;
 }
-
-const formatDate = (startDate: string) => {
-  return format(parseISO(startDate), 'd. M. yyyy');
-};
 
 const ApplicationPeriodCard = ({ applicationPeriod }: Props): JSX.Element => {
   const { t } = useTranslation();

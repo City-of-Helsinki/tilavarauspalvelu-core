@@ -10,22 +10,26 @@ type ParamTypes = {
   id: string;
 };
 
-const Application = (): JSX.Element => {
+const Application = (): JSX.Element | null => {
   const match = useRouteMatch();
   const { id } = useParams<ParamTypes>();
   const { t } = useTranslation();
+  const [ready, setReady] = useState(true);
 
-  const [applicationPeriod, setApplicationPeriod] = useState<ApplicationPeriod>({} as ApplicationPeriod);
+  const [applicationPeriod, setApplicationPeriod] = useState<ApplicationPeriod>(
+    {} as ApplicationPeriod
+  );
 
   useEffect(() => {
     async function fetchData() {
       const unit = await getApplicationPeriod({ id });
       setApplicationPeriod(unit);
+      setReady(true);
     }
     fetchData();
   }, [id]);
 
-  return (
+  return ready ? (
     <>
       <Switch>
         <Route exact path={`${match.url}/page1`}>
@@ -34,7 +38,7 @@ const Application = (): JSX.Element => {
             text={applicationPeriod.name}
             applicationPeriod={applicationPeriod}
             match={match}>
-            <Page1 />
+            <Page1 applicationPeriod={applicationPeriod} />
           </ApplicationPage>
         </Route>
         <Route exact path={`${match.url}/page2`}>
@@ -63,7 +67,7 @@ const Application = (): JSX.Element => {
         </Route>
       </Switch>
     </>
-  );
+  ) : null;
 };
 
 export default Application;
