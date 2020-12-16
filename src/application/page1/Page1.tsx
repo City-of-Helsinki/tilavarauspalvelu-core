@@ -22,27 +22,30 @@ const Page1 = ({
 }: {
   applicationPeriod: ApplicationPeriod;
 }): JSX.Element => {
+  const periodStartDate = formatDate(applicationPeriod.applicationPeriodBegin);
+  const periodEndDate = formatDate(applicationPeriod.applicationPeriodEnd);
+
   const { t } = useTranslation();
-  const { register, handleSubmit, setValue } = useForm({
+  const { register, handleSubmit, setValue, errors } = useForm({
     defaultValues: {
-      name: 'niimiii',
+      name: 'Vakiovuoro 1.',
       ageGroup: '',
       abilityGroup: '',
       purpose: '',
-      periodStartDate: applicationPeriod.applicationPeriodBegin,
+      periodStartDate,
+      periodEndDate,
+      minDuration: 1,
+      maxDuration: 1,
     },
   });
   const onSubmit = (data: any) => alert(JSON.stringify(data));
 
   useEffect(() => {
-    // register form fields (the ones that don't have 'ref'
+    // register form fields (the ones that don't have 'ref')
     register({ name: 'ageGroup' });
     register({ name: 'abilityGroup' });
     register({ name: 'purpose' });
   });
-
-  const periodStartDate = formatDate(applicationPeriod.applicationPeriodBegin);
-  const periodEndDate = formatDate(applicationPeriod.applicationPeriodEnd);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -53,9 +56,12 @@ const Page1 = ({
           label="Vakiovuoron nimi"
           id="name"
           name="name"
+          required
+          invalid={!!errors.name?.message}
         />
         <TextInput
-          ref={register()}
+          required
+          ref={register({ required: true })}
           label="Ryhmän koko"
           id="groupSize"
           name="groupSize"
@@ -141,6 +147,7 @@ const Page1 = ({
           label="Vuorojen määrä/viikko"
           name="turnsPerWeek"
           id="turnsPerWeek"
+          disabled
         />
         <div style={{ display: 'flex' }}>
           <Checkbox id="everyTwoWeekCheckboxs" checked />

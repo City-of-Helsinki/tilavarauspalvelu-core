@@ -45,7 +45,6 @@ const SelectionsListContextProvider: React.FC = (props) => {
   const moveUp = (reservationUnit: ReservationUnit) => {
     const from = reservationUnits.indexOf(reservationUnit);
     const to = from - 1;
-    console.log('moving', from, to);
     setReservationUnits(move(reservationUnits, from, to));
   };
 

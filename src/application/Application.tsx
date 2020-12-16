@@ -14,7 +14,7 @@ const Application = (): JSX.Element | null => {
   const match = useRouteMatch();
   const { id } = useParams<ParamTypes>();
   const { t } = useTranslation();
-  const [ready, setReady] = useState(true);
+  const [ready, setReady] = useState(false);
 
   const [applicationPeriod, setApplicationPeriod] = useState<ApplicationPeriod>(
     {} as ApplicationPeriod
@@ -36,7 +36,6 @@ const Application = (): JSX.Element | null => {
           <ApplicationPage
             heading="1. Vakiovuoron luominen"
             text={applicationPeriod.name}
-            applicationPeriod={applicationPeriod}
             match={match}>
             <Page1 applicationPeriod={applicationPeriod} />
           </ApplicationPage>
@@ -45,7 +44,6 @@ const Application = (): JSX.Element | null => {
           <ApplicationPage
             heading={t('2. Vakiovuoron ajankohta')}
             text={applicationPeriod.name}
-            applicationPeriod={applicationPeriod}
             match={match}
           />
         </Route>
@@ -53,7 +51,6 @@ const Application = (): JSX.Element | null => {
           <ApplicationPage
             heading="3. Varaajan perustiedot"
             text={applicationPeriod.name}
-            applicationPeriod={applicationPeriod}
             match={match}
           />
         </Route>
@@ -61,7 +58,6 @@ const Application = (): JSX.Element | null => {
           <ApplicationPage
             heading="4. Lähetä käsiteltäväksi"
             text={applicationPeriod.name}
-            applicationPeriod={applicationPeriod}
             match={match}
           />
         </Route>
