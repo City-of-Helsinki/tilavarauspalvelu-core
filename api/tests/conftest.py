@@ -170,7 +170,6 @@ def application_event(
     return ApplicationEvent.objects.create(
         application=application,
         num_persons=10,
-        num_events=2,
         min_duration=datetime.timedelta(hours=1),
         max_duration=datetime.timedelta(hours=2),
         purpose=purpose,
@@ -223,7 +222,6 @@ def valid_application_event_data(
         "num_persons": 12,
         "age_group_id": ten_to_15_age_group.id,
         "ability_group_id": hobbyist_ability_group.id,
-        "num_events": 12,
         "min_duration": "01:15:00",
         "max_duration": "02:00:00",
         "application_id": application.id,

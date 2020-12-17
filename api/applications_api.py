@@ -207,7 +207,6 @@ class ApplicationEventSerializer(serializers.ModelSerializer):
             "num_persons",
             "age_group_id",
             "ability_group_id",
-            "num_events",
             "min_duration",
             "max_duration",
             "application_id",

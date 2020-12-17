@@ -199,10 +199,6 @@ class ApplicationEvent(models.Model):
         on_delete=models.SET_NULL,
     )
 
-    num_events = models.PositiveIntegerField(
-        verbose_name=_("Number of events"), null=False, blank=False
-    )
-
     min_duration = models.DurationField(
         verbose_name=_("Minimum duration"), null=False, blank=False
     )
