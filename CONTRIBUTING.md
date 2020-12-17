@@ -17,6 +17,9 @@ To keep serializers consistent, we obey the following principles. These principl
 - If related models are exposed in their own API endpoint, use it to CRUD them. Use nested objects only if they are not used separately.
 - Check examples in `api/examples.py` for samples how to do different implementations using above rules.
 
+## Translations
+We use `django-modeltranslation` to deal with translations. Use `TranslatedModelSerializer` located in `api/base.py` to automatically register translated fields in API. Note: You still need to register the original field, such as `fields = ["name"]`. This will automatically register translated fields `name_fi`, `name_en`, `name_sv`.
+
 ## Testing
 To guarantee that software is working as it supposed to, we obey the following testing principles. These principles are based on [Helsinki Testing requirements](https://dev.hel.fi/testing-requirements).
 

@@ -16,6 +16,7 @@ import subprocess
 
 import environ
 import sentry_sdk
+from django.utils.translation import ugettext_lazy as _
 from sentry_sdk.integrations.django import DjangoIntegration
 
 from tilavarauspalvelu.loggers import LOGGING_CONSOLE, LOGGING_ELASTIC
@@ -78,6 +79,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "auditlog",
     "elasticapm.contrib.django",
+    "modeltranslation",
 ]
 
 MIDDLEWARE = [
@@ -145,6 +147,9 @@ env = environ.Env(
     AUDIT_LOGGING_ENABLED=(bool, False),
 )
 environ.Env.read_env()
+
+LANGUAGE_CODE = "fi"
+LANGUAGES = (("fi", _("Finnish")), ("en", _("English")), ("sv", _("Swedish")))
 
 ALLOWED_HOSTS = env("ALLOWED_HOSTS")
 DEBUG = env("DEBUG")

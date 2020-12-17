@@ -3,7 +3,7 @@ from django_filters import rest_framework as filters
 from rest_framework import filters as drf_filters
 from rest_framework import serializers, viewsets
 
-from api.base import HierarchyModelMultipleChoiceFilter
+from api.base import HierarchyModelMultipleChoiceFilter, TranslatedModelSerializer
 from api.resources_api import ResourceSerializer
 from api.services_api import ServiceSerializer
 from api.space_api import BuildingSerializer, LocationSerializer, SpaceSerializer
@@ -49,7 +49,7 @@ class ReservationUnitTypeSerializer(serializers.ModelSerializer):
         fields = ["id", "name"]
 
 
-class ReservationUnitSerializer(serializers.ModelSerializer):
+class ReservationUnitSerializer(TranslatedModelSerializer):
     spaces = SpaceSerializer(read_only=True, many=True)
     resources = ResourceSerializer(read_only=True, many=True)
     services = ServiceSerializer(read_only=True, many=True)
