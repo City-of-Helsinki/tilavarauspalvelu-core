@@ -7,27 +7,32 @@ import PageWrapper from './component/PageWrapper';
 import './i18n';
 import SelectionsListContextProvider from './context/SelectionsListContext';
 import StartApplicationBar from './component/StartApplicationBar';
+import Application from './application/Application';
 
 function App(): JSX.Element {
   return (
-    <SelectionsListContextProvider>
-      <Router>
-        <PageWrapper>
-          <Switch>
+    <Router>
+      <PageWrapper>
+        <Switch>
+          <SelectionsListContextProvider>
             <Route exact path="/">
               <Home />
             </Route>
             <Route path="/search">
               <Search />
+              <StartApplicationBar />
             </Route>
             <Route path="/reservation-unit/:id">
               <ReservationUnit />
+              <StartApplicationBar />
             </Route>
-          </Switch>
-        </PageWrapper>
-      </Router>
-      <StartApplicationBar />
-    </SelectionsListContextProvider>
+            <Route path="/application/:id">
+              <Application />
+            </Route>
+          </SelectionsListContextProvider>
+        </Switch>
+      </PageWrapper>
+    </Router>
   );
 }
 

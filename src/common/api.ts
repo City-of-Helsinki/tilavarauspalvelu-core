@@ -1,6 +1,6 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import applyCaseMiddleware from 'axios-case-converter';
-import { ApplicationPeriod, ReservationUnit } from './types';
+import { ApplicationPeriod, ReservationUnit, Parameter } from './types';
 
 const axiosclient = applyCaseMiddleware(axios.create());
 
@@ -8,6 +8,7 @@ const apiBaseUrl: string = process.env.REACT_APP_TILANVARAUS_API_URL || '';
 
 const applicationPeriodsBasePath = 'application_period';
 const reservationUnitsBasePath = 'reservation_unit';
+const parameterBasePath = 'parameters';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface RequestParameters extends ReservationUnitsParameters {}
@@ -64,9 +65,17 @@ async function apiGet<T>({
   });
 }
 
-export function getapplicationPeriods(): Promise<ApplicationPeriod[]> {
+export function getApplicationPeriods(): Promise<ApplicationPeriod[]> {
   return apiGet<ApplicationPeriod[]>({
     path: `v1/${applicationPeriodsBasePath}`,
+  });
+}
+
+export function getApplicationPeriod(
+  params: IDParameter
+): Promise<ApplicationPeriod> {
+  return apiGet<ApplicationPeriod>({
+    path: `v1/${applicationPeriodsBasePath}/${params.id}`,
   });
 }
 
@@ -92,5 +101,13 @@ export function getReservationUnit(
 ): Promise<ReservationUnit> {
   return apiGet<ReservationUnit>({
     path: `v1/${reservationUnitsBasePath}/${params.id}`,
+  });
+}
+
+export function getParameters(
+  name: 'purpose' | 'age_group' | 'ability_group'
+): Promise<Parameter[]> {
+  return apiGet<Parameter[]>({
+    path: `v1/${parameterBasePath}/${name}`,
   });
 }

@@ -1,0 +1,20 @@
+.heading {
+  font-size: var(--fontsize-heading-l);
+}
+
+.container {
+  background-color: var(--tilavaraus-header-background-color);
+}
+
+.content {
+  padding: var(--spacing-l) var(--spacing-m) var(--spacing-m);
+  max-width: var(--container-width-xl);
+  margin: 0 auto;
+  font-size: var(--fontsize-heading-m);
+  font-weight: 500;
+}
+
+.koros {
+  background-color: var(--tilavaraus-gray);
+  fill: var(--tilavaraus-header-background-color);
+}

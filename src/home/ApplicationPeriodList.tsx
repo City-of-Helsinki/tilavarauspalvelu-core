@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ApplicationPeriod } from '../common/types';
-import { getapplicationPeriods } from '../common/api';
+import { getApplicationPeriods } from '../common/api';
 import ApplicationPeriodCard from './ApplicationPeriodCard';
 
 const ApplicationPeriodList = (): JSX.Element => {
@@ -10,7 +10,7 @@ const ApplicationPeriodList = (): JSX.Element => {
 
   useEffect(() => {
     async function fetchData() {
-      const periods = await getapplicationPeriods();
+      const periods = await getApplicationPeriods();
       setApplicationPeriods(periods);
     }
     fetchData();

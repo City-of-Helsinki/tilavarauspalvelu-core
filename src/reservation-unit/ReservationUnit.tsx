@@ -7,9 +7,9 @@ import Head from './Head';
 import Back from './Back';
 import Notification from './Notification';
 
-interface ParamTypes {
+type ParamTypes = {
   id: string;
-}
+};
 
 const ReservationUnit = (): JSX.Element => {
   const { id } = useParams<ParamTypes>();

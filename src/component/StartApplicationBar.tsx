@@ -1,5 +1,7 @@
 import { Button, IconArrowRight } from 'hds-react';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { useHistory } from 'react-router-dom';
 import Container from './Container';
 import {
   SelectionsListContext,
@@ -7,9 +9,11 @@ import {
 } from '../context/SelectionsListContext';
 
 const StartApplicationBar = (): JSX.Element | null => {
+  const { t } = useTranslation();
   const { reservationUnits } = React.useContext(
     SelectionsListContext
   ) as SelectionsListContextType;
+  const history = useHistory();
   if (reservationUnits.length === 0) {
     return null;
   }
@@ -34,7 +38,7 @@ const StartApplicationBar = (): JSX.Element | null => {
           }}>
           <span
             style={{ fontSize: 'var(--fontsize-body-xl)', fontWeight: 500 }}>
-            {reservationUnits.length} tilaa valittuna
+            {t('shoppingCart.count', { count: reservationUnits.length })}
           </span>
           <Button
             style={{
@@ -43,8 +47,9 @@ const StartApplicationBar = (): JSX.Element | null => {
               marginLeft: 'var(--spacing-m)',
             }}
             variant="secondary"
-            iconRight={<IconArrowRight />}>
-            Jatka seuraavaan
+            iconRight={<IconArrowRight />}
+            onClick={() => history.push(`/application/1/page1`)}>
+            {t('shoppingCart.next')}
           </Button>
         </div>
       </Container>

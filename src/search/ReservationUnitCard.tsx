@@ -31,7 +31,10 @@ const ReservationUnitCard = ({ reservationUnit }: Props): JSX.Element => {
         alt={`Kuva tilasta ${reservationUnit.name}`}
         width="240"
         height="156"
-        src="https://api.hel.fi/respa/resource_image/671?dim=250x156"
+        src={
+          reservationUnit.images[0]?.imageUrl ||
+          'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='
+        }
       />
       <div className={styles.mainContent}>
         <span className={styles.name}>
@@ -44,8 +47,13 @@ const ReservationUnitCard = ({ reservationUnit }: Props): JSX.Element => {
         </span>
         <span className={styles.bottom}>
           <IconInfoCircle /> <span>Nuorisotalo</span>
-          <IconGroup /> <span>10</span>
-          <IconLocation /> <span>Linnanrakentajantie 2</span>
+          <IconGroup /> <span>{reservationUnit.maxPersons}</span>
+          <IconLocation />{' '}
+          <span>
+            {reservationUnit.location?.addressStreet},{' '}
+            {reservationUnit.location?.addressZip}{' '}
+            {reservationUnit.location?.addressCity}
+          </span>
         </span>
       </div>
       <div className={styles.actions}>
