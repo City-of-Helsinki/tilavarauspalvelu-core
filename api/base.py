@@ -61,23 +61,31 @@ class HierarchyModelMultipleChoiceFilter(filters.ModelMultipleChoiceFilter):
 
 
 class TranslatedModelSerializer(serializers.ModelSerializer):
-    """ A serializer that automatically registers translated model fields """
+    """
+    A serializer that automatically registers translated model fields
+    and nests them in an object under the original field name
+    """
 
-    def get_field_names(self, declared_fields, info):
+    def to_representation(self, obj):
+        ret = super().to_representation(obj)
         model = self.Meta.model
-        fields = super().get_field_names(declared_fields, info)
+
         translatable_fields = get_translatable_fields_for_model(model) or []
 
-        for original_field_name in translatable_fields:
+        if obj is None:
+            return ret
+
+        for field_name in translatable_fields:
+            if field_name not in self.fields:
+                continue
+            translations_dict = {}
+
             for language_code in LANGUAGE_CODES:
-                translated_field_name = f"{original_field_name}_{language_code}"
-                model_has_field = bool(getattr(model, translated_field_name, False))
-                if (
-                    model_has_field
-                    and original_field_name in fields
-                    and translated_field_name not in fields
-                ):
-                    original_field_index = fields.index(original_field_name)
-                    fields.insert(original_field_index + 1, translated_field_name)
-                    # fields.append(translated_field_name)
-        return fields
+                key = f"{field_name}_{language_code}"
+                val = getattr(obj, key, None)
+                translations_dict[language_code] = val
+
+            # If no text provided, leave the field as null
+            translations_dict = translations_dict or None
+            ret[field_name] = translations_dict
+        return ret

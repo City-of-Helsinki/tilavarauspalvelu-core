@@ -18,7 +18,17 @@ To keep serializers consistent, we obey the following principles. These principl
 - Check examples in `api/examples.py` for samples how to do different implementations using above rules.
 
 ## Translations
-We use `django-modeltranslation` to deal with translations. Use `TranslatedModelSerializer` located in `api/base.py` to automatically register translated fields in API. Note: You still need to register the original field, such as `fields = ["name"]`. This will automatically register translated fields `name_fi`, `name_en`, `name_sv`.
+We use `django-modeltranslation` to deal with translations. Use `TranslatedModelSerializer` located in `api/base.py` to automatically register translated fields in API. Note: You still need to register the original field, such as `fields = ["name"]`. This will automatically register translated fields `name_fi`, `name_en`, `name_sv`, which will be nested in an object under the original field name as a key, by their respective language codes as field keys:
+
+```
+{
+    "name": {
+        "fi": "foo",
+        "en": "bar",
+        "sv": "baz",
+    }
+}
+```
 
 ## Testing
 To guarantee that software is working as it supposed to, we obey the following testing principles. These principles are based on [Helsinki Testing requirements](https://dev.hel.fi/testing-requirements).
