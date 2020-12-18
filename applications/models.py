@@ -260,6 +260,44 @@ class EventReservationUnit(models.Model):
     )
 
 
+class ApplicationEventSchedule(models.Model):
+
+    DATE_CHOISES = (
+        (0, _("Monday")),
+        (1, _("Tuesday")),
+        (2, _("Wednesday")),
+        (3, _("Thursday")),
+        (4, _("Friday")),
+        (5, _("Saturday")),
+        (6, _("Sunday")),
+    )
+    day = models.IntegerField(verbose_name=_("Day"), choices=DATE_CHOISES, null=False)
+
+    begin = models.TimeField(
+        verbose_name=_("Start"),
+        null=False,
+        blank=False,
+    )
+
+    end = models.TimeField(
+        verbose_name=_("End"),
+        null=False,
+        blank=False,
+    )
+
+    priority = models.IntegerField(
+        choices=PRIORITIES.PRIORITY_CHOICES, default=PRIORITIES.PRIORITY_MEDIUM
+    )
+
+    application_event = models.ForeignKey(
+        ApplicationEvent,
+        null=False,
+        blank=False,
+        on_delete=models.CASCADE,
+        related_name="application_event_schedules",
+    )
+
+
 class Recurrence(models.Model):
     recurrence = RecurrenceField()
 

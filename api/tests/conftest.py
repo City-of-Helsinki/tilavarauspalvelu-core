@@ -213,8 +213,24 @@ def hobbyist_ability_group() -> AbilityGroup:
 
 
 @pytest.fixture
+def valid_application_event_schedule_data():
+    return {"day": 1, "begin": "10:40", "end": "16:30"}
+
+
+@pytest.fixture
+def valid_event_reservation_unit_data(reservation_unit):
+    return {"priority": 22, "reservation_unit": reservation_unit.id}
+
+
+@pytest.fixture
 def valid_application_event_data(
-    reservation_unit, ten_to_15_age_group, hobbyist_ability_group, application, purpose
+    reservation_unit,
+    ten_to_15_age_group,
+    hobbyist_ability_group,
+    application,
+    purpose,
+    valid_application_event_schedule_data,
+    valid_event_reservation_unit_data,
 ):
     """ Valid JSON data for creating a new ApplicationEvent """
     return {
@@ -230,4 +246,6 @@ def valid_application_event_data(
         "begin": "2020-01-01",
         "end": "2021-01-01",
         "purpose_id": purpose.id,
+        "application_event_schedules": [valid_application_event_schedule_data],
+        "event_reservation_units": [valid_event_reservation_unit_data],
     }
