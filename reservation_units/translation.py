@@ -1,5 +1,6 @@
-from modeltranslation.translator import translator, TranslationOptions
-from .models import ReservationUnit, Purpose
+from modeltranslation.translator import TranslationOptions, translator
+
+from .models import Purpose, ReservationUnit
 
 
 class ReservationUnitTranslationOptions(TranslationOptions):
