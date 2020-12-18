@@ -27,6 +27,7 @@ def test_application_create(
         },
         "application_period_id": application_period.id,
         "application_events": [],
+        "status": "draft",
     }
     response = user_api_client.post(reverse("application-list"), data, format="json")
     assert response.status_code == 201
@@ -58,6 +59,7 @@ def test_application_update_should_update_organisation_and_contact_person(
         },
         "application_period_id": application_period.id,
         "application_events": [],
+        "status": "draft",
     }
 
     response = user_api_client.put(
@@ -85,6 +87,7 @@ def test_application_update_should_null_organisation_and_contact_person(
         "contact_person": None,
         "application_period_id": application_period.id,
         "application_events": [],
+        "status": "draft",
     }
 
     response = user_api_client.put(
@@ -139,3 +142,70 @@ def test_application_event_invalid_durations(
         "Maximum duration should be larger than minimum duration"
         in response.data["non_field_errors"]
     )
+
+
+@pytest.mark.django_db
+def test_application_update_review_valid(
+    user_api_client,
+    application,
+    organisation,
+    person,
+    purpose,
+    application_period,
+    valid_application_event_data,
+):
+    assert Application.objects.count() == 1
+
+    data = {
+        "id": application.id,
+        "organisation": {
+            "id": organisation.id,
+            "identifier": organisation.identifier,
+            "name": "Super organisation modified",
+        },
+        "contact_person": {
+            "id": person.id,
+            "first_name": person.first_name,
+            "last_name": "The modified",
+            "email": person.email,
+            "phone_number": person.phone_number,
+        },
+        "application_period_id": application_period.id,
+        "application_events": [valid_application_event_data],
+        "status": "review",
+    }
+
+    response = user_api_client.put(
+        reverse("application-detail", kwargs={"pk": application.id}),
+        data=data,
+        format="json",
+    )
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_application_review_invalid(
+    purpose,
+    application_period,
+    user_api_client,
+    user,
+):
+    data = {
+        "organisation": {
+            "id": None,
+            "identifier": "123-identifier",
+            "name": "Super organisation",
+        },
+        "contact_person": {
+            "id": None,
+            "first_name": "John",
+            "last_name": "Wayne",
+            "email": "john@test.com",
+            "phone_number": "123-123",
+        },
+        "application_period_id": application_period.id,
+        "application_events": [],
+        "status": "review",
+    }
+    response = user_api_client.post(reverse("application-list"), data, format="json")
+    assert response.status_code == 400

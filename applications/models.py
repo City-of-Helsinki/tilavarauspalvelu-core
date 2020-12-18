@@ -41,6 +41,7 @@ class Address(models.Model):
 
 
 class Person(ContactInformation):
+    REQUIRED_FOR_REVIEW = ["first_name", "last_name"]
 
     first_name = models.TextField(
         verbose_name=_("First name"), null=False, blank=False, max_length=50
@@ -134,8 +135,44 @@ class ApplicationPeriod(models.Model):
         )
 
 
-class Application(models.Model):
+class ApplicationStatus(models.Model):
+    DRAFT = "draft"
+    REVIEW = "review"
+    FINISHED = "finished"
 
+    STATUS_CHOICES = (
+        (DRAFT, _("Draft")),
+        (REVIEW, _("Review")),
+        (FINISHED, _("Finished")),
+    )
+
+    status = models.CharField(
+        max_length=20, verbose_name=_("Status"), choices=STATUS_CHOICES
+    )
+
+    application = models.ForeignKey(
+        "Application",
+        verbose_name=_("Application"),
+        on_delete=models.CASCADE,
+        null=False,
+        related_name="statuses",
+    )
+
+    user = models.ForeignKey(
+        User,
+        verbose_name=_("User"),
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+    )
+
+    timestamp = models.DateTimeField(verbose_name=_("Timestamp"), auto_now_add=True)
+
+    def __str__(self):
+        return "{} ({})".format(self.get_status_display(), self.application.id)
+
+
+class Application(models.Model):
     organisation = models.ForeignKey(
         Organisation,
         verbose_name=_("Organisation"),
@@ -168,8 +205,46 @@ class Application(models.Model):
         on_delete=models.PROTECT,
     )
 
+    @property
+    def status(self):
+        return self.get_status().status
+
+    @status.setter
+    def status(self, status):
+        self.set_status(status)
+
+    @status.getter
+    def status(self):
+        return self.get_status().status
+
+    def set_status(self, status, user=None):
+        if status not in [
+            ApplicationStatus.DRAFT,
+            ApplicationStatus.REVIEW,
+            ApplicationStatus.FINISHED,
+        ]:
+            raise ValidationError(_("Invalid status"))
+        ApplicationStatus.objects.create(application=self, status=status, user=user)
+
+    def get_status(self):
+        return self.statuses.last()
+
+    def validate_review(self):
+        if not hasattr(self, "contact_person"):
+            raise ValidationError(_("Application must have contact person"))
+
 
 class ApplicationEvent(models.Model):
+    REQUIRED_FOR_REVIEW = [
+        "num_persons",
+        "age_group",
+        "min_duration",
+        "events_per_week",
+        "biweekly",
+        "begin",
+        "end",
+    ]
+
     name = models.TextField(
         max_length=100,
         verbose_name=_("Name"),

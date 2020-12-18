@@ -4,14 +4,24 @@ from .models import (
     Application,
     ApplicationEvent,
     ApplicationPeriod,
+    ApplicationStatus,
     Organisation,
     Recurrence,
 )
 
 
+class ApplicationEventInline(admin.TabularInline):
+    model = ApplicationEvent
+
+
+class ApplicationStatusInline(admin.TabularInline):
+    model = ApplicationStatus
+
+
 @admin.register(Application)
 class ApplicationAdmin(admin.ModelAdmin):
     model = Application
+    inlines = [ApplicationStatusInline]
 
 
 @admin.register(Organisation)

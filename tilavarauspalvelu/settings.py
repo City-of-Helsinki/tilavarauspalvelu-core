@@ -221,6 +221,16 @@ USE_TZ = True
 
 GRAPHENE = {"SCHEMA": "api.graphql.schema.schema"}
 
+REST_FRAMEWORK = {
+    "DEFAULT_PERMISSION_CLASSES": [
+        "api.permissions.AuthenticationOffOrAuthenticatedForWrite"
+    ],
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.BasicAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
+    ],
+}
+
 # local_settings.py can be used to override environment-specific settings
 # like database and email that differ between development and production.
 local_settings_path = os.path.join(BASE_DIR, "local_settings.py")
@@ -236,14 +246,3 @@ if "TMP_PERMISSIONS_DISABLED" in os.environ:
     )
     if TMP_PERMISSIONS_DISABLED and not DEBUG:
         logging.error("Running with permissions disabled in production environment.")
-
-
-REST_FRAMEWORK = {
-    "DEFAULT_PERMISSION_CLASSES": [
-        "api.permissions.AuthenticationOffOrAuthenticatedForWrite"
-    ],
-    "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework.authentication.BasicAuthentication",
-        "rest_framework.authentication.SessionAuthentication",
-    ],
-}

@@ -11,12 +11,15 @@ Q = models.Q
 class AgeGroup(models.Model):
 
     minimum = models.fields.PositiveIntegerField(
-        verbose_name=_("Number of persons"), null=False, blank=False
+        verbose_name=_("Minimum"), null=False, blank=False
     )
 
     maximum = models.fields.PositiveIntegerField(
-        verbose_name=_("Number of persons"), null=True, blank=True
+        verbose_name=_("Maximum"), null=True, blank=True
     )
+
+    def __str__(self):
+        return "{} - {}".format(self.minimum, self.maximum)
 
 
 class AbilityGroup(models.Model):
@@ -24,6 +27,9 @@ class AbilityGroup(models.Model):
     name = models.fields.TextField(
         verbose_name=_("Name"), null=False, blank=False, unique=True
     )
+
+    def __str__(self):
+        return self.name
 
 
 class RecurringReservation(models.Model):

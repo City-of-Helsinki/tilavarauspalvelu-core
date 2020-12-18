@@ -1,6 +1,12 @@
 from django.contrib import admin
 
-from .models import RecurringReservation, Reservation, ReservationPurpose
+from .models import (
+    AbilityGroup,
+    AgeGroup,
+    RecurringReservation,
+    Reservation,
+    ReservationPurpose,
+)
 
 
 class ReservationInline(admin.TabularInline):
@@ -21,3 +27,13 @@ class RecurringReservationAdmin(admin.ModelAdmin):
 @admin.register(ReservationPurpose)
 class ReservationPurposeAdmin(admin.ModelAdmin):
     model = ReservationPurpose
+
+
+@admin.register(AgeGroup)
+class AgeGroupAdmin(admin.ModelAdmin):
+    model = AgeGroup
+
+
+@admin.register(AbilityGroup)
+class AbilityGroupAdmin(admin.ModelAdmin):
+    model = AbilityGroup
