@@ -37,7 +37,10 @@ const Head = ({ reservationUnit }: Props): JSX.Element => {
         <h2 className="heading-m">{reservationUnit.spaces?.[0]?.name}</h2>
         <div className={styles.props}>
           <div>
-            <IconWithText icon={<IconInfoCircle />} text="Nuorisotalo" />
+            <IconWithText
+              icon={<IconInfoCircle />}
+              text={reservationUnit.reservationUnitType?.name}
+            />
             <IconWithText icon={<IconGroup />} text="10 henkilöä" />
             <IconWithText icon={<IconClock />} text="Max. 2 tuntia" />
           </div>
