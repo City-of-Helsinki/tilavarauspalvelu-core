@@ -11,6 +11,8 @@
 
 .ruler {
   margin-top: var(--spacing-layout-m);
+  border-left: none;
+  border-right: none;
 }
 
 .subHeadLine {
@@ -18,6 +20,13 @@
   margin-top: var(--spacing-layout-m);
   font-weight: 700;
   font-size: var(--fontsize-heading-m);
+}
+
+.smallSubHeadLine {
+  font-family: HelsinkiGrotesk-Bold, var(--font-default);
+  margin-top: var(--spacing-layout-m);
+  font-weight: 700;
+  font-size: var(--fontsize-heading-s);
 }
 
 .twoColumnContainer {
@@ -33,11 +42,14 @@
 }
 
 .label {
+  margin-top: var(--spacing-3-xs);
   font-family: HelsinkiGrotesk-Bold, var(--font-default);
-  font-size: var(--fontsize-m);
+  font-size: var(--fontsize-body-l);
+  font-weight: bold;
 }
 
 .value {
+  margin-top: var(--spacing-2-xs);
   font-family: HelsinkiGrotesk-Regular, var(--font-default);
   font-size: var(--fontsize-body-m);
 }
