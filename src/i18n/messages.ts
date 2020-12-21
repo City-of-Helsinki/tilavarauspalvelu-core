@@ -158,7 +158,7 @@ const translations: Translations = {
     sortButtonPlaceholder: ['Sijainnin mukaan'],
   },
   shoppingCart: {
-    next: ['Jatka seuraavaa'],
+    next: ['Jatka seuraavaan'],
     count_plural: ['{{count}} tilaa valittuna'],
     count: ['{{count}} tila valittuna'],
   },
