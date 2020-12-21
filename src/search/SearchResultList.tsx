@@ -37,7 +37,7 @@ const SearchResultList = ({ search }: Props): JSX.Element => {
         {t('SearchResultList.count', { count: reservationUnits.length })}
       </div>
       <div className={styles.buttonContainer}>
-        <Button className={styles.button} iconLeft={<IconMenuHamburger />}>
+        <Button theme="black" iconLeft={<IconMenuHamburger />}>
           {t('SearchResultList.listButton')}
         </Button>
         <Button
