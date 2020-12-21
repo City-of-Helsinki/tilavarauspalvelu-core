@@ -3,7 +3,9 @@ from typing import Union
 
 from dateutil.parser import parse
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers, viewsets
+from rest_framework.exceptions import ValidationError
 
 from applications.models import (
     Address,
@@ -11,6 +13,7 @@ from applications.models import (
     ApplicationEvent,
     ApplicationEventSchedule,
     ApplicationPeriod,
+    ApplicationStatus,
     EventReservationUnit,
     Organisation,
     Person,
@@ -249,6 +252,8 @@ class ApplicationSerializer(serializers.ModelSerializer):
 
     application_events = ApplicationEventSerializer(many=True)
 
+    status = serializers.CharField()
+
     class Meta:
         model = Application
         fields = [
@@ -258,6 +263,7 @@ class ApplicationSerializer(serializers.ModelSerializer):
             "contact_person",
             "user",
             "application_events",
+            "status",
         ]
 
     @staticmethod
@@ -275,6 +281,44 @@ class ApplicationSerializer(serializers.ModelSerializer):
             organisation = Organisation(**organisation_data)
             organisation.save()
         return organisation
+
+    def validate(self, data):
+        # Validations when user submits application for review
+        if "status" in data and data["status"] == ApplicationStatus.REVIEW:
+            data = self.validate_for_review(data)
+
+        return data
+
+    def validate_for_review(self, data):
+        application_events = data.get("application_events", [])
+        if not len(application_events):
+            raise ValidationError(_("Application must have application events"))
+        else:
+            for event in application_events:
+                if not len(event["application_event_schedules"]):
+                    raise ValidationError(_("Application events must have schedules"))
+
+                for field in ApplicationEvent.REQUIRED_FOR_REVIEW:
+                    if event.get(field, None) in [None, ""]:
+                        raise ValidationError(
+                            _(
+                                'Field "{field}" is required for application event.'
+                            ).format(field=field)
+                        )
+
+        contact_person = data.get("contact_person", None)
+        if not contact_person:
+            raise ValidationError(_("Application must have contact person"))
+        else:
+            for field in Person.REQUIRED_FOR_REVIEW:
+                if contact_person.get(field, None) in [None, ""]:
+                    raise ValidationError(
+                        _('Field "{field}" is required for contact person.').format(
+                            field=field
+                        )
+                    )
+
+        return data
 
     def handle_events(self, appliction_instance, event_data):
         event_ids = []
@@ -300,6 +344,13 @@ class ApplicationSerializer(serializers.ModelSerializer):
         ).delete()
 
     def create(self, validated_data):
+        request = self.context["request"] if "request" in self.context else None
+        request_user = (
+            request.user if request and request.user.is_authenticated else None
+        )
+
+        status = validated_data.pop("status")
+
         contact_person_data = validated_data.pop("contact_person")
         validated_data["contact_person"] = self.handle_person(
             contact_person_data=contact_person_data
@@ -316,9 +367,18 @@ class ApplicationSerializer(serializers.ModelSerializer):
 
         self.handle_events(appliction_instance=app, event_data=event_data)
 
+        app.set_status(status, request_user)
+
         return app
 
     def update(self, instance, validated_data):
+        request = self.context["request"] if "request" in self.context else None
+        request_user = (
+            request.user if request and request.user.is_authenticated else None
+        )
+
+        status = validated_data.pop("status")
+
         contact_person_data = validated_data.pop("contact_person")
         validated_data["contact_person"] = self.handle_person(
             contact_person_data=contact_person_data
@@ -333,7 +393,11 @@ class ApplicationSerializer(serializers.ModelSerializer):
 
         self.handle_events(appliction_instance=instance, event_data=event_data)
 
-        return super().update(instance, validated_data)
+        app = super().update(instance, validated_data)
+
+        app.set_status(status, request_user)
+
+        return app
 
 
 class ApplicationViewSet(viewsets.ModelViewSet):
