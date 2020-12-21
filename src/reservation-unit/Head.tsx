@@ -57,7 +57,8 @@ const Head = ({ reservationUnit }: Props): JSX.Element => {
           <Button
             iconLeft={<IconHeart />}
             className="margin-top-s"
-            variant="secondary">
+            variant="secondary"
+            disabled>
             {t('common.favourite')}
           </Button>
           <Button
