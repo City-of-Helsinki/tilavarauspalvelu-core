@@ -34,5 +34,6 @@
 @media (max-width: $breakpoint-l) {
   .container {
     grid-template-columns: 2fr;
+    gap: 0;
   }
 }

@@ -1,3 +1,5 @@
+@import '~hds-design-tokens/lib/all.scss';
+
 .subHeadLine {
   font-family: HelsinkiGrotesk-Bold, var(--font-default);
   margin-top: var(--spacing-layout-m);
@@ -26,4 +28,15 @@
 .fullWidth {
   grid-column-start: 1;
   grid-column-end: 3;
+}
+
+@media (max-width: $breakpoint-m) {
+  .twoColumnContainer {
+    grid-template-columns: 1fr;
+  }
+
+  .fullWidth {
+    grid-column-start: 1;
+    grid-column-end: 2;
+  }
 }
