@@ -24,7 +24,9 @@ const Home = (): JSX.Element => {
             iconLeft={<IconSearch />}>
             {t('home.browseAllButton')}
           </Button>
-          <Button variant="secondary">{t('home.infoButton')}</Button>
+          <Button disabled variant="secondary">
+            {t('home.infoButton')}
+          </Button>
         </div>
         <h2 className="heading-l" style={{ marginTop: 'var(--spacing-xl)' }}>
           {t('home.applicationTimes.heading')}
