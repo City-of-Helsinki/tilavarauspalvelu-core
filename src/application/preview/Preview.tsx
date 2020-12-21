@@ -69,7 +69,8 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
   const { t } = useTranslation();
 
   const onSubmit = () => {
-    Object.assign(application.status, 'review');
+    // eslint-disable-next-line no-param-reassign
+    application.status = 'review';
     onNext();
   };
 
