@@ -182,7 +182,7 @@ export type ApplicationEventSchedule = {
 
 export type Action = {
   type: 'load' | 'ensureContactPersonExists';
-  data?: any;
+  data?: Application;
 };
 
 export type ApplicationEditor = {

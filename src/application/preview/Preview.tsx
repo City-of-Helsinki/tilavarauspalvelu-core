@@ -16,7 +16,7 @@ const LabelValue = ({
   value,
 }: {
   label: string;
-  value: any;
+  value: string | undefined | null | number | JSX.Element[];
 }): JSX.Element | null => (
   <div>
     <div className={styles.label}>{label}</div>
@@ -24,12 +24,14 @@ const LabelValue = ({
   </div>
 );
 
-const mapArrayById = (array: { id: number }[]): { [key: number]: any } => {
+const mapArrayById = (
+  array: { id: number }[]
+): { [key: number]: { id: number } } => {
   return array.reduce((prev, current) => {
     // eslint-disable-next-line no-param-reassign
     prev[current.id] = current;
     return prev;
-  }, {} as { [key: number]: any });
+  }, {} as { [key: number]: Parameter | ReservationUnit });
 };
 
 const Preview = ({ onNext, application }: Props): JSX.Element | null => {
@@ -53,7 +55,9 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
     async function fetchData() {
       // there's no api to get reservation units with multiple ids so we're getting them all :)  a.k.a. FIXME
       const units = await getReservationUnits({ search: undefined });
-      setReservationUnits(mapArrayById(units));
+      setReservationUnits(
+        mapArrayById(units) as { [key: number]: ReservationUnit }
+      );
 
       const fetchedAbilityGroupOptions = await getParameters('ability_group');
       setAbilityGroupOptions(mapArrayById(fetchedAbilityGroupOptions));
@@ -139,7 +143,7 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
             />
             <LabelValue
               label={t('Application.preview.applicationEvent.biweekly')}
-              value={t(`common.${applicationEvent.biweekly}`)}
+              value={t(`common.${applicationEvent.biweekly}`) as string}
             />
             {applicationEvent.eventReservationUnits.map(
               (reservationUnit, index) => (

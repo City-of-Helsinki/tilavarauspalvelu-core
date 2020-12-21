@@ -27,7 +27,7 @@ const Page1 = ({
     },
   });
 
-  const onSubmit = (data: any) => {
+  const onSubmit = (data: ApplicationType) => {
     Object.assign(application.contactPerson, data);
     onNext();
   };

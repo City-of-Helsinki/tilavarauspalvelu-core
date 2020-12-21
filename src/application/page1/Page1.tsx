@@ -78,7 +78,7 @@ const Page1 = ({
     fetchData();
   }, []);
 
-  const onSubmit = (data: any) => {
+  const onSubmit = (data: ApplicationType) => {
     Object.assign(applicationEvent, data);
     setReady(false);
 
