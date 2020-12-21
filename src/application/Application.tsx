@@ -23,6 +23,11 @@ import Preview from './preview/Preview';
 import applicationReducer from './applicationReducer';
 import applicationInitializer from './applicationInitializer';
 
+import {
+  SelectionsListContext,
+  SelectionsListContextType,
+} from '../context/SelectionsListContext';
+
 type ParamTypes = {
   applicationPeriodId: string;
   applicationId: string;
@@ -32,7 +37,6 @@ const Application = (): JSX.Element | null => {
   const history = useHistory();
   const match = useRouteMatch();
   const { applicationId, applicationPeriodId } = useParams<ParamTypes>();
-  console.log('in Application', applicationId, applicationPeriodId);
 
   const [ready, setReady] = useState(false);
   const [applicationPeriod, setApplicationPeriod] = useState<ApplicationPeriod>(
@@ -60,34 +64,50 @@ const Application = (): JSX.Element | null => {
     fetchData();
   }, [applicationPeriodId, applicationId]);
 
-  const saveWithEffect = async (postSave: () => void) => {
-    let loadedApplication;
+  const { reservationUnits } = React.useContext(
+    SelectionsListContext
+  ) as SelectionsListContextType;
+
+  const saveWithEffect = async (postSave: (string?: number) => void) => {
+    let loadedApplication: ApplicationType;
 
     if (applicationId === 'new') {
       // because applicationEvent needs applicationId we need to save application first
       const tmpApplication = { ...application };
       const applicationEvent = tmpApplication.applicationEvents.pop();
       const savedApplication = await saveApplication(tmpApplication);
+
       if (!savedApplication.id) {
-        throw new Error('cannot proceed');
+        throw new Error('cannot proceed, saved application does not have id');
       }
       if (applicationEvent) {
         applicationEvent.applicationId = savedApplication.id;
         savedApplication.applicationEvents.push(applicationEvent);
       }
       loadedApplication = await saveApplication(savedApplication);
+
+      if (savedApplication.id) {
+        const replaceUrl = match.url.replace(
+          'new',
+          String(savedApplication.id)
+        );
+
+        history.replace(`${replaceUrl}/page1`);
+      }
     } else {
-      // normal save
       loadedApplication = await saveApplication(application);
     }
 
-    postSave();
     dispatch({ type: 'load', data: loadedApplication });
+
+    postSave(loadedApplication.id);
   };
 
   const saveAndNavigate = async (path: string) => {
-    saveWithEffect(() => {
-      history.push(`${match.url}/${path}`);
+    saveWithEffect((id) => {
+      const prefix = id ? match.url.replace('new', String(id)) : match.url;
+      const target = `${prefix}/${path}`;
+      history.push(target);
     });
   };
 
@@ -100,6 +120,7 @@ const Application = (): JSX.Element | null => {
           translationKeyPrefix="Application.Page1"
           match={match}>
           <Page1
+            reservationUnits={reservationUnits}
             applicationPeriod={applicationPeriod}
             application={application}
             onNext={() => saveAndNavigate('page2')}

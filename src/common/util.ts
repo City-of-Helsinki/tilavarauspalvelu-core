@@ -14,6 +14,13 @@ export const formatDate = (date: string): string => {
   return format(parseISO(date), 'd. M. yyyy');
 };
 
+export const formatApiDate = (date: string): string => {
+  if (!date) {
+    return 'undefined || null';
+  }
+  return format(parseISO(date), 'yyyy-MM-dd');
+};
+
 // for Selector
 export type OptionType = {
   label: string;

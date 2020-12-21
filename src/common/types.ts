@@ -181,13 +181,7 @@ export type ApplicationEventSchedule = {
 // editor context
 
 export type Action = {
-  type:
-    | 'updateReservationUnit'
-    | 'load'
-    | 'updateContactInfo'
-    | 'updateEventSchedule'
-    | 'addApplicationEvent'
-    | 'ensureContactPersonExists';
+  type: 'load' | 'ensureContactPersonExists';
   data?: any;
 };
 

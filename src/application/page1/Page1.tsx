@@ -7,22 +7,21 @@ import ReservationUnitList from './ReservationUnitList';
 import {
   Application as ApplicationType,
   ApplicationPeriod,
+  EventReservationUnit,
+  ReservationUnit,
 } from '../../common/types';
 import {
-  formatDate,
+  formatApiDate,
   getSelectedOption,
   mapOptions,
   OptionType,
 } from '../../common/util';
 import { getParameters } from '../../common/api';
-import {
-  SelectionsListContext,
-  SelectionsListContextType,
-} from '../../context/SelectionsListContext';
 
 type Props = {
   applicationPeriod: ApplicationPeriod;
   application: ApplicationType;
+  reservationUnits: ReservationUnit[];
   onNext: () => void;
 };
 
@@ -30,6 +29,7 @@ const Page1 = ({
   onNext,
   applicationPeriod,
   application,
+  reservationUnits,
 }: Props): JSX.Element | null => {
   const [ready, setReady] = useState<boolean>(false);
   const [ageGroupOptions, setAgeGroupOptions] = useState<OptionType[]>([]);
@@ -38,8 +38,10 @@ const Page1 = ({
     []
   );
 
-  const periodStartDate = formatDate(applicationPeriod.applicationPeriodBegin);
-  const periodEndDate = formatDate(applicationPeriod.applicationPeriodEnd);
+  const periodStartDate = formatApiDate(
+    applicationPeriod.applicationPeriodBegin
+  );
+  const periodEndDate = formatApiDate(applicationPeriod.applicationPeriodEnd);
 
   const { t } = useTranslation();
 
@@ -49,12 +51,10 @@ const Page1 = ({
   const { register, handleSubmit, setValue } = useForm({
     defaultValues: {
       ...applicationEvent,
+      end: applicationEvent?.end ? applicationEvent.end : periodEndDate,
+      begin: applicationEvent?.begin ? applicationEvent.begin : periodStartDate,
     },
   });
-
-  const { reservationUnits } = React.useContext(
-    SelectionsListContext
-  ) as SelectionsListContextType;
 
   useEffect(() => {
     // register form fields (the ones that don't have 'ref')
@@ -78,17 +78,25 @@ const Page1 = ({
     fetchData();
   }, []);
 
-  if (reservationUnits.length > 0) {
-    console.log('!');
-  }
-
   const onSubmit = (data: any) => {
     Object.assign(applicationEvent, data);
+    setReady(false);
+
+    // reservation units
+    if (applicationEvent.eventReservationUnits.length === 0) {
+      reservationUnits.forEach((ru, index) =>
+        applicationEvent.eventReservationUnits.push({
+          reservationUnit: ru.id,
+          priority: index,
+        } as EventReservationUnit)
+      );
+    }
+
     onNext();
   };
 
   return ready ? (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form>
       <div className={styles.subHeadLine}>
         {t('Application.Page1.basicInformationSubHeading')}
       </div>
@@ -102,7 +110,7 @@ const Page1 = ({
         />
         <TextInput
           required
-          ref={register({ required: true, min: 0 })}
+          ref={register({ required: true, min: 1 })}
           label={t('Application.Page1.groupSize')}
           id="numPersons"
           name="numPersons"

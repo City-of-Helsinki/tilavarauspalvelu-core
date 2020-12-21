@@ -1,10 +1,7 @@
 import { Action, Application, ContactPerson } from '../common/types';
 
 const reducer = (state: Application, action: Action): Application => {
-  console.log('action', action.type, 'data', JSON.stringify(action.data));
   switch (action.type) {
-    case 'addApplicationEvent':
-      return { ...state, applicationEvents: [action.data] };
     case 'ensureContactPersonExists': {
       const nextState = { ...state };
       if (nextState.contactPerson == null) {
@@ -36,15 +33,6 @@ const reducer = (state: Application, action: Action): Application => {
         ];
       }
       return application;
-    }
-    case 'updateReservationUnit':
-      return { ...action.data };
-    case 'updateEventSchedule': {
-      const { index, schedule } = action.data;
-
-      const nextState = { ...state };
-      nextState.applicationEvents[index].applicationEventSchedules = schedule;
-      return nextState;
     }
 
     default:

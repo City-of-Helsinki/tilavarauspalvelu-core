@@ -22,7 +22,7 @@ const LabelValue = ({
   </div>
 );
 
-const Page1 = ({ onNext, application }: Props): JSX.Element | null => {
+const Preview = ({ onNext, application }: Props): JSX.Element | null => {
   const { t } = useTranslation();
 
   const onSubmit = () => {
@@ -51,7 +51,7 @@ const Page1 = ({ onNext, application }: Props): JSX.Element | null => {
         />
       </div>
       {application.applicationEvents.map((applicationEvent) => (
-        <>
+        <div key={applicationEvent.id}>
           <div className={styles.subHeadLine}>{applicationEvent.name}</div>
           <div className={styles.twoColumnContainer}>
             <LabelValue
@@ -96,6 +96,7 @@ const Page1 = ({ onNext, application }: Props): JSX.Element | null => {
             />
             {applicationEvent.eventReservationUnits.map((reservationUnit) => (
               <LabelValue
+                key={reservationUnit.reservationUnit}
                 label={t(
                   'Application.preview.applicationEvent.reeservationUnit'
                 )}
@@ -103,7 +104,7 @@ const Page1 = ({ onNext, application }: Props): JSX.Element | null => {
               />
             ))}
           </div>
-        </>
+        </div>
       ))}
 
       <div className={styles.buttonContainer}>
@@ -118,4 +119,4 @@ const Page1 = ({ onNext, application }: Props): JSX.Element | null => {
   ) : null;
 };
 
-export default Page1;
+export default Preview;
