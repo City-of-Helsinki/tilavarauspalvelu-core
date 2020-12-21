@@ -158,14 +158,14 @@ const Page1 = ({
       </div>
       <div className={styles.periodContainer}>
         <TextInput
-          ref={register()}
+          ref={register({ required: true })}
           label={t('Application.Page1.periodStartDate')}
           name="begin"
           id="begin"
           required
         />
         <TextInput
-          ref={register()}
+          ref={register({ required: true })}
           label={t('Application.Page1.periodEndDate')}
           name="end"
           id="end"
@@ -177,14 +177,14 @@ const Page1 = ({
           label={`${periodStartDate} - ${periodEndDate}`}
         />
         <TextInput
-          ref={register()}
+          ref={register({ required: true })}
           label={t('Application.Page1.minDuration')}
           name="minDuration"
           id="minDuration"
           required
         />
         <TextInput
-          ref={register()}
+          ref={register({ required: true })}
           label={t('Application.Page1.maxDuration')}
           name="maxDuration"
           id="maxDuration"
