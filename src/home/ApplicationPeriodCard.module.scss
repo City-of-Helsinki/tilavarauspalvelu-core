@@ -16,7 +16,9 @@
 
 .active {
   border-color: var(tilavaraus-application-period-card-active-border-color);
-  background-color: var(--tilavaraus-application-period-card-active-background-color);
+  background-color: var(
+    --tilavaraus-application-period-card-active-background-color
+  );
 }
 
 .container {
@@ -29,18 +31,14 @@
   }
 }
 
-.linkContainer {
-  line-height: $lineheight-s;
-  color: $color-bus;
-  font-weight: 500;
-}
+#noLeftMargin {
+  margin-left: 0;
+  padding-left: 0;
+  border-left: none;
 
-.linkIcon,
-.linkText {
-  vertical-align: middle;
-  display: inline-block;
-  margin: $spacing-s $spacing-xs 0 0;
-
+  & > div {
+    margin-left: 0;
+  }
 }
 
 @media (max-width: $breakpoint-s) {
