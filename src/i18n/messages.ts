@@ -18,13 +18,8 @@ interface Translations {
 
 const translations: Translations = {
   Application: {
-    heading: {
-      page1: ['1. Vakiovuoron luominen'],
-      page2: ['2. Vakiovuoron ajankohta'],
-      page3: ['3. Varaajan perustiedot'],
-      page4: ['4. Lähetä käsiteltäväksi'],
-    },
     Page1: {
+      heading: ['1. Vakiovuoron luominen'],
       basicInformationSubHeading: ['Perustiedot'],
       name: ['Vakiovuoron nimi'],
       groupSize: ['Ryhmän koko'],
@@ -39,13 +34,30 @@ const translations: Translations = {
       maxDuration: ['Vuoron maksimikesto'],
       eventsPerWeek: ['Vuorojen määrä/viikko'],
     },
+    Page2: {
+      heading: ['2. Vakiovuoron ajankohta'],
+      text: ['Anna toivomasi ajankohta jokaiselle luomallesi vakiovuorolle.'],
+    },
+    Page3: {
+      heading: ['3. Varaajan perustiedot'],
+      text: ['Varaavan yhteisön ja yhteyshenkilön perustiedot.'],
+      asPrivatePersonSubHeading: ['Varaan yksityishenkilönä'],
+      firstName: ['Etunimi'],
+      lastName: ['Sukunimi'],
+      email: ['Hakemukselle liitettävä sähköpostiosoite'],
+    },
+    preview: {
+      heading: ['4. Hakemuksen lähettäminen'],
+      text: ['Ohessa yhteenveto hakemuksestasi.'],
+      basicInfoSubHeading: ['Varaajan perustiedot'],
+    },
   },
   ApplicationPage: {
     navigation: {
       page1: ['1. Vakiovuoron perustiedot'],
       page2: ['2. Vakiovuoron ajankohta'],
       page3: ['3. Varaajan perustiedot'],
-      page4: ['4. Lähetä käsiteltäväksi'],
+      preview: ['4. Lähetä käsiteltäväksi'],
     },
   },
   ApplicationPeriodCard: {
@@ -60,11 +72,21 @@ const translations: Translations = {
     search: ['Haku'],
     application: ['Vakiovuorohakemus'],
   },
+  calendar: {
+    monday: ['Maanantai'],
+    tuesday: ['Tiistai'],
+    wednesday: ['Keskiviikko'],
+    thursday: ['Torstai'],
+    friday: ['Perjantai'],
+    saturday: ['Lauantai'],
+    sunday: ['Sunnuntai'],
+  },
   common: {
     applicationName: ['Varaamo', 'Varaamo', 'Varaamo'],
     selectReservationUnit: ['Valitse tila'],
     favourite: ['Suosikki', 'Favourite', 'Favorit'],
     next: ['Seuraava', 'Next', 'Nästa'],
+    prev: ['Takaisin'],
   },
   Navigation: {
     Item: {
