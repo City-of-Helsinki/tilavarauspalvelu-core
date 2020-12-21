@@ -1,0 +1,43 @@
+.buttonContainer {
+  display: flex;
+  flex-direction: row;
+  margin-top: var(--spacing-layout-l);
+  justify-content: flex-end;
+
+  button {
+    margin-left: var(--spacing-layout-xs);
+  }
+}
+
+.ruler {
+  margin-top: var(--spacing-layout-m);
+}
+
+.subHeadLine {
+  font-family: HelsinkiGrotesk-Bold, var(--font-default);
+  margin-top: var(--spacing-layout-m);
+  font-weight: 700;
+  font-size: var(--fontsize-heading-m);
+}
+
+.twoColumnContainer {
+  margin-top: var(--spacing-m);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-m);
+}
+
+.fullWidth {
+  grid-column-start: 1;
+  grid-column-end: 3;
+}
+
+.label {
+  font-family: HelsinkiGrotesk-Bold, var(--font-default);
+  font-size: var(--fontsize-m);
+}
+
+.value {
+  font-family: HelsinkiGrotesk-Regular, var(--font-default);
+  font-size: var(--fontsize-body-m);
+}
