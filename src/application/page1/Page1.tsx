@@ -2,28 +2,36 @@ import { Button, Checkbox, IconArrowRight, Select, TextInput } from 'hds-react';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
-import styles from '../Application.module.scss';
+import styles from './Page1.module.scss';
 import ReservationUnitList from './ReservationUnitList';
-import { ApplicationPeriod, Parameter } from '../../common/types';
-import { formatDate } from '../../common/util';
+import {
+  Application as ApplicationType,
+  ApplicationPeriod,
+} from '../../common/types';
+import {
+  formatDate,
+  getSelectedOption,
+  mapOptions,
+  OptionType,
+} from '../../common/util';
 import { getParameters } from '../../common/api';
+import {
+  SelectionsListContext,
+  SelectionsListContextType,
+} from '../../context/SelectionsListContext';
 
 type Props = {
   applicationPeriod: ApplicationPeriod;
+  application: ApplicationType;
+  onNext: () => void;
 };
 
-type OptionType = {
-  label: string;
-  value: string;
-};
-
-const mapOptions = (src: Parameter[]): OptionType[] =>
-  src.map((v) => ({
-    label: v.name,
-    value: String(v.id),
-  }));
-
-const Page1 = ({ applicationPeriod }: Props): JSX.Element => {
+const Page1 = ({
+  onNext,
+  applicationPeriod,
+  application,
+}: Props): JSX.Element | null => {
+  const [ready, setReady] = useState<boolean>(false);
   const [ageGroupOptions, setAgeGroupOptions] = useState<OptionType[]>([]);
   const [purposeOptions, setPurposeOptions] = useState<OptionType[]>([]);
   const [abilityGroupOptions, setAbilityGroupOptions] = useState<OptionType[]>(
@@ -34,28 +42,26 @@ const Page1 = ({ applicationPeriod }: Props): JSX.Element => {
   const periodEndDate = formatDate(applicationPeriod.applicationPeriodEnd);
 
   const { t } = useTranslation();
+
+  // todo only single is handled
+  const applicationEvent = application.applicationEvents[0];
+
   const { register, handleSubmit, setValue } = useForm({
     defaultValues: {
-      name: 'Vakiovuoro 1.',
-      ageGroup: '',
-      abilityGroup: '',
-      purpose: '',
-      periodStartDate,
-      periodEndDate,
-      minDuration: 1,
-      maxDuration: 1,
-      turnsPerWeek: 1,
+      ...applicationEvent,
     },
   });
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any, no-alert
-  const onSubmit = (data: any) => alert(JSON.stringify(data));
+
+  const { reservationUnits } = React.useContext(
+    SelectionsListContext
+  ) as SelectionsListContextType;
 
   useEffect(() => {
     // register form fields (the ones that don't have 'ref')
-    register({ name: 'ageGroup', required: true });
-    register({ name: 'abilityGroup', required: true });
-    register({ name: 'purpose', required: true });
-  });
+    register({ name: 'ageGroupId', required: true });
+    register({ name: 'abilityGroupId', required: true });
+    register({ name: 'purposeId', required: true });
+  }, [register]);
 
   useEffect(() => {
     async function fetchData() {
@@ -66,16 +72,27 @@ const Page1 = ({ applicationPeriod }: Props): JSX.Element => {
       setAbilityGroupOptions(mapOptions(fetchedAbilityGroupOptions));
       setAgeGroupOptions(mapOptions(fetchedAgeGroupOptions));
       setPurposeOptions(mapOptions(fetchedPurposeOptions));
+
+      setReady(true);
     }
     fetchData();
   }, []);
 
-  return (
+  if (reservationUnits.length > 0) {
+    console.log('!');
+  }
+
+  const onSubmit = (data: any) => {
+    Object.assign(applicationEvent, data);
+    onNext();
+  };
+
+  return ready ? (
     <form onSubmit={handleSubmit(onSubmit)}>
       <div className={styles.subHeadLine}>
         {t('Application.Page1.basicInformationSubHeading')}
       </div>
-      <div className={styles.basicInfoContainer}>
+      <div className={styles.twoColumnContainer}>
         <TextInput
           ref={register({ required: true })}
           label={t('Application.Page1.name')}
@@ -85,21 +102,25 @@ const Page1 = ({ applicationPeriod }: Props): JSX.Element => {
         />
         <TextInput
           required
-          ref={register({ required: true })}
+          ref={register({ required: true, min: 0 })}
           label={t('Application.Page1.groupSize')}
-          id="groupSize"
-          name="groupSize"
+          id="numPersons"
+          name="numPersons"
           type="number"
         />
         <Select
-          id="ageGroup"
+          id="ageGroupId"
           placeholder="Valitse"
           options={ageGroupOptions}
           label={t('Application.Page1.ageGroup')}
           required
           onChange={(selection: OptionType): void => {
-            setValue('ageGroup', selection.value);
+            setValue('ageGroupId', selection.value);
           }}
+          value={getSelectedOption(
+            applicationEvent.ageGroupId,
+            ageGroupOptions
+          )}
         />
         <Select
           placeholder="Valitse"
@@ -107,8 +128,12 @@ const Page1 = ({ applicationPeriod }: Props): JSX.Element => {
           label={t('Application.Page1.abilityGroup')}
           required
           onChange={(selection: OptionType): void => {
-            setValue('abilityGroup', selection.value);
+            setValue('abilityGroupId', selection.value);
           }}
+          value={getSelectedOption(
+            applicationEvent.abilityGroupId,
+            abilityGroupOptions
+          )}
         />
         <Select
           className={styles.fullWidth}
@@ -117,8 +142,9 @@ const Page1 = ({ applicationPeriod }: Props): JSX.Element => {
           options={purposeOptions}
           label={t('Application.Page1.purpose')}
           onChange={(selection: OptionType): void => {
-            setValue('purpose', selection.value);
+            setValue('purposeId', selection.value);
           }}
+          value={getSelectedOption(applicationEvent.purposeId, purposeOptions)}
         />
       </div>
       <hr className={styles.ruler} />
@@ -134,15 +160,15 @@ const Page1 = ({ applicationPeriod }: Props): JSX.Element => {
         <TextInput
           ref={register()}
           label={t('Application.Page1.periodStartDate')}
-          name="periodStartDate"
-          id="periodStartDate"
+          name="begin"
+          id="begin"
           required
         />
         <TextInput
           ref={register()}
           label={t('Application.Page1.periodEndDate')}
-          name="periodEndDate"
-          id="periodEndDate"
+          name="end"
+          id="end"
           required
         />
         <div style={{ display: 'flex' }}>
@@ -191,7 +217,7 @@ const Page1 = ({ applicationPeriod }: Props): JSX.Element => {
         </Button>
       </div>
     </form>
-  );
+  ) : null;
 };
 
 export default Page1;
