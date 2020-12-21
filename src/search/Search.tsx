@@ -5,6 +5,7 @@ import Container from '../component/Container';
 import Breadcrumb from '../component/Breadcrumb';
 import SearchForm from './SearchForm';
 import SearchResultList from './SearchResultList';
+import styles from './Search.module.scss';
 
 const style = {
   fontSize: 'var(--fontsize-heading-l)',
@@ -16,7 +17,7 @@ const Search = (): JSX.Element => {
   const [search, setSearch] = useState<string>('');
   return (
     <>
-      <div style={{ background: 'white' }}>
+      <div className={styles.headContainer}>
         <Container>
           <Breadcrumb
             current={{ label: 'breadcrumb.search', linkTo: '/search' }}

@@ -1,10 +1,19 @@
 @import '~hds-design-tokens/lib/all.scss';
 
+.topContainer {
+  background-color: white;
+}
+
 .container {
+  margin-top: $spacing-m;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: $spacing-s;
   font-weight: 500;
+
+  div > h1 {
+    margin-top: 0;
+  }
 }
 
 .props {
@@ -15,4 +24,34 @@
   & > div > div {
     margin-top: $spacing-s;
   }
+}
+
+.backContainer {
+  //  font-family: HelsinkiGrotesk-Bold, var(--font-default);
+  padding-top: 1em;
+  display: flex;
+  align-items: center;
+}
+
+.backLabel {
+  font-size: var(--fontsize-body-s);
+  margin-left: var(--spacing-2-xs);
+}
+
+.buttonContainer {
+  margin-top: var(--spacing-layout-xs);
+}
+
+.imageContainer {
+  position: relative;
+
+  img {
+    position: absolute;
+    z-index: 3;
+  }
+}
+
+.koros {
+  margin-top: $spacing-l;
+  fill: var(--tilavaraus-gray);
 }

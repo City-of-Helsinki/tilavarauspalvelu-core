@@ -141,6 +141,10 @@ const translations: Translations = {
     option: ['Vaihtoehto'],
     buttonRemove: ['Poista'],
   },
+  ReservationUnit: {
+    backToSearch: ['Takaisin hakutuloksiin'],
+    maxPersons: ['{{maxPersons}} henkilöä'],
+  },
   search: {
     heading: ['Vakiovuorojen tilat'],
     text: ['Valitse tilat joihin haluat hakea vakiovuoroja.'],
