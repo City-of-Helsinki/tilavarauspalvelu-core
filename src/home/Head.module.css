@@ -14,5 +14,5 @@
 }
 
 .koros {
-  fill: white;
+  fill: var(--tilavaraus-gray);
 }
