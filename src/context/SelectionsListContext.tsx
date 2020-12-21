@@ -55,7 +55,7 @@ const SelectionsListContextProvider: React.FC = (props) => {
   };
 
   const containsReservationUnit = (reservationUnit: ReservationUnit): boolean =>
-    reservationUnits.find((ru) => ru.id === reservationUnit.id) !== undefined;
+    reservationUnits.some((ru) => ru.id === reservationUnit.id);
 
   return (
     <SelectionsListContext.Provider
