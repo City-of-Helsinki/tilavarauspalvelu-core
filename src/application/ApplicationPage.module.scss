@@ -5,6 +5,7 @@
 }
 
 .navigationContainer {
+  font-family: HelsinkiGrotesk-Bold, var(--font-default);
   font-size: var(--fontsize-body-l);
   font-weight: 500;
   & ul {

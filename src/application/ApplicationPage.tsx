@@ -6,15 +6,17 @@ import Head from './Head';
 import styles from './ApplicationPage.module.scss';
 
 type ApplicationPageProps = {
-  heading: string;
-  text: string;
+  translationKeyPrefix: string;
   match: { url: string };
+  breadCrumbText: string;
+  overrideText?: string;
   children?: React.ReactNode;
 };
 
 const ApplicationPage = ({
-  heading,
-  text,
+  translationKeyPrefix,
+  breadCrumbText,
+  overrideText,
   children,
   match,
 }: ApplicationPageProps): JSX.Element => {
@@ -22,7 +24,12 @@ const ApplicationPage = ({
 
   return (
     <>
-      <Head korosType="storm" heading={heading} text={text} />
+      <Head
+        korosType="storm"
+        heading={t(`${translationKeyPrefix}.heading`)}
+        text={overrideText || t(`${translationKeyPrefix}.text`)}
+        breadCrumbText={breadCrumbText}
+      />
       <Container main>
         <div className={styles.container}>
           <nav className={styles.navigationContainer}>
@@ -44,8 +51,8 @@ const ApplicationPage = ({
               </NavLink>
               <NavLink
                 activeClassName={styles.activeClass}
-                to={`${match.url}/page4`}>
-                <li>{t('ApplicationPage.navigation.page4')}</li>
+                to={`${match.url}/preview`}>
+                <li>{t('ApplicationPage.navigation.preview')}</li>
               </NavLink>
             </ul>
           </nav>

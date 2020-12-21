@@ -26,7 +26,7 @@ function App(): JSX.Element {
               <ReservationUnit />
               <StartApplicationBar />
             </Route>
-            <Route path="/application/:id">
+            <Route path="/application/:applicationPeriodId/:applicationId">
               <Application />
             </Route>
           </SelectionsListContextProvider>

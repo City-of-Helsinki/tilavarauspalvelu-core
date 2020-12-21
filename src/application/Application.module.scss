@@ -3,35 +3,3 @@
   font-weight: 700;
   font-size: var(--fontsize-heading-m);
 }
-
-// page 1
-.basicInfoContainer {
-  margin-top: var(--spacing-m);
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--spacing-m);
-}
-
-.fullWidth {
-  grid-column-start: 1;
-  grid-column-end: 3;
-}
-
-.periodContainer {
-  margin-top: var(--spacing-m);
-  display: grid;
-  grid-template-columns: 2fr 2fr 3fr;
-  gap: var(--spacing-m);
-  align-items: center;
-}
-
-.buttonContainer {
-  display: flex;
-  flex-direction: row;
-  margin-top: var(--spacing-layout-l);
-  justify-content: flex-end;
-}
-
-.ruler {
-  margin-top: var(--spacing-layout-m);
-}

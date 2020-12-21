@@ -1,4 +1,5 @@
 import { isAfter, parseISO, isBefore, format } from 'date-fns';
+import { Parameter } from './types';
 
 // eslint-disable-next-line import/prefer-default-export
 export const isActive = (startDate: string, endDate: string): boolean => {
@@ -11,4 +12,34 @@ export const formatDate = (date: string): string => {
     return 'undefined || null';
   }
   return format(parseISO(date), 'd. M. yyyy');
+};
+
+// for Selector
+export type OptionType = {
+  label: string;
+  value: number;
+};
+
+export const getLabel = (parameter: Parameter): string => {
+  if (parameter.name) {
+    return parameter.name;
+  }
+  if (parameter.minimum && parameter.maximum) {
+    return `${parameter.minimum} - ${parameter.maximum}`;
+  }
+  return 'no label';
+};
+
+export const mapOptions = (src: Parameter[]): OptionType[] =>
+  src.map((v) => ({
+    label: getLabel(v),
+    value: v.id,
+  }));
+
+export const getSelectedOption = (
+  selectedId: number | null,
+  options: OptionType[]
+): OptionType | undefined => {
+  const option = options.find((o) => o.value === selectedId);
+  return option;
 };
