@@ -14,8 +14,14 @@
 }
 
 .name {
+  font-family: HelsinkiGrotesk-Bold, var(--font-default);
   font-size: $fontsize-heading-m;
-  font-weight: 700;
+  font-weight: bold;
+
+  a {
+    text-decoration: none;
+    color: $color-black-90;
+  }
 }
 
 .description {
