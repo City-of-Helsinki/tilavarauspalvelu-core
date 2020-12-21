@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Checkbox, Select, TextInput, Button, IconSearch } from 'hds-react';
+import { Checkbox, Select, Button, IconSearch, SearchInput } from 'hds-react';
 
 import styles from './SearchForm.module.scss';
 
@@ -20,12 +20,13 @@ const SearchForm = ({ onSearch }: Props): JSX.Element => {
   return (
     <>
       <div className={styles.container}>
-        <TextInput
+        <SearchInput
           label="&nbsp;"
-          placeholder={t('SearchForm.searchTermPlaceholder')}
-          id="search"
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
+          helperText={t('SearchForm.searchTermPlaceholder')}
+          onSubmit={(e) => {
+            setQ(e);
+            onSearch(e);
+          }}
         />
         <Select placeholder="Valitse" disabled options={options} label="Haku" />
         <div className={styles.showL} />
