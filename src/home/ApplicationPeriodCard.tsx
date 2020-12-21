@@ -38,7 +38,8 @@ const ApplicationPeriodCard = ({ applicationPeriod }: Props): JSX.Element => {
         <Button
           id={styles.noLeftMargin}
           variant="supplementary"
-          iconLeft={<IconArrowRight />}>
+          iconLeft={<IconArrowRight />}
+          disabled>
           {t('ApplicationPeriodCard.criteria')}
         </Button>
       </Container>
