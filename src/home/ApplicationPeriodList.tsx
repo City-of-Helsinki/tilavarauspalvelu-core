@@ -19,7 +19,7 @@ const ApplicationPeriodList = (): JSX.Element => {
   return (
     <>
       {applicationPeriods.map((p) => (
-        <ApplicationPeriodCard applicationPeriod={p} />
+        <ApplicationPeriodCard key={p.id} applicationPeriod={p} />
       ))}
     </>
   );

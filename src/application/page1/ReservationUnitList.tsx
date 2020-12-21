@@ -114,6 +114,7 @@ const ReservationUnitList = (): JSX.Element => {
       {reservationUnits.map((ru, index, all) => {
         return (
           <ReservationUnitCard
+            key={ru.id}
             t={t}
             onDelete={removeReservationUnit}
             reservationUnit={ru}

@@ -59,7 +59,7 @@ const SearchResultList = ({ search }: Props): JSX.Element => {
       </div>
       <div className={styles.listContainer}>
         {reservationUnits.map((ru) => (
-          <ReservationUnitCard reservationUnit={ru} />
+          <ReservationUnitCard key={ru.id} reservationUnit={ru} />
         ))}
       </div>
     </>
