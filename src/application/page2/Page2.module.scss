@@ -54,12 +54,14 @@
   }
 }
 
-@media (max-width: $breakpoint-l) {
+@media (max-width: $breakpoint-m) {
   .calendarContainer {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
   }
+}
 
-  .timeSelectionButton {
-    max-width: 80%;
+@media (max-width: $breakpoint-s) {
+  .calendarContainer {
+    grid-template-columns: 1fr 1fr;
   }
 }

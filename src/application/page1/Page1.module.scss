@@ -1,3 +1,5 @@
+@import '~hds-design-tokens/lib/all.scss';
+
 .twoColumnContainer {
   margin-top: var(--spacing-m);
   display: grid;
@@ -34,4 +36,29 @@
   margin-top: var(--spacing-layout-m);
   font-weight: 700;
   font-size: var(--fontsize-heading-m);
+}
+
+@media (max-width: $breakpoint-m) {
+  .twoColumnContainer {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .periodContainer {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+
+@media (max-width: $breakpoint-s) {
+  .twoColumnContainer {
+    grid-template-columns: 1fr;
+  }
+
+  .fullWidth {
+    grid-column-start: 1;
+    grid-column-end: 2;
+  }
+
+  .periodContainer {
+    grid-template-columns: 1fr;
+  }
 }

@@ -1,3 +1,5 @@
+@import '~hds-design-tokens/lib/all.scss';
+
 .container {
   display: grid;
   gap: 6em;
@@ -26,5 +28,11 @@
 .activeClass {
   & > li {
     background-color: #e8f3fc;
+  }
+}
+
+@media (max-width: $breakpoint-l) {
+  .container {
+    grid-template-columns: 2fr;
   }
 }
