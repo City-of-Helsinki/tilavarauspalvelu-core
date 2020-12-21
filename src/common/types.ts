@@ -166,7 +166,7 @@ export type ApplicationEvent = {
 
 export type EventReservationUnit = {
   priority: number;
-  reservationUnitId: number;
+  reservationUnit: number;
 };
 
 type DAY = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;

@@ -99,7 +99,7 @@ const Page1 = ({ onNext, application }: Props): JSX.Element | null => {
                 label={t(
                   'Application.preview.applicationEvent.reeservationUnit'
                 )}
-                value={reservationUnit.reservationUnitId}
+                value={reservationUnit.reservationUnit}
               />
             ))}
           </div>
