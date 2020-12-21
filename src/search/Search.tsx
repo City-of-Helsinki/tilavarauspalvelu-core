@@ -16,18 +16,21 @@ const Search = (): JSX.Element => {
   const [search, setSearch] = useState<string>('');
   return (
     <>
-      <Container>
-        <Breadcrumb
-          current={{ label: 'breadcrumb.search', linkTo: '/search' }}
-        />
-        <h1 style={style}>{t('search.heading')}</h1>
-        <span className="text-lg">{t('search.text')}</span>
-        <SearchForm onSearch={setSearch} />
-      </Container>
+      <div style={{ background: 'white' }}>
+        <Container>
+          <Breadcrumb
+            current={{ label: 'breadcrumb.search', linkTo: '/search' }}
+          />
+          <h1 style={style}>{t('search.heading')}</h1>
+          <span className="text-lg">{t('search.text')}</span>
+          <SearchForm onSearch={setSearch} />
+        </Container>
+      </div>
       <Koros
         type="wave"
         className="koros"
-        style={{ fill: 'var(--tilavaraus-gray)' }}
+        style={{ fill: 'white' }}
+        flipHorizontal
       />
       <div style={{ backgroundColor: 'var(--tilavaraus-gray)' }}>
         <Container main>
