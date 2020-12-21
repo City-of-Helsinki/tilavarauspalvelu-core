@@ -1,3 +1,5 @@
+@import '~hds-design-tokens/lib/all.scss';
+
 .buttonContainer {
   display: flex;
   flex-direction: row;
@@ -52,4 +54,15 @@
   margin-top: var(--spacing-2-xs);
   font-family: HelsinkiGrotesk-Regular, var(--font-default);
   font-size: var(--fontsize-body-m);
+}
+
+@media (max-width: $breakpoint-s) {
+  .twoColumnContainer {
+    grid-template-columns: 1fr;
+  }
+
+  .fullWidth {
+    grid-column-start: 1;
+    grid-column-end: 2;
+  }
 }
