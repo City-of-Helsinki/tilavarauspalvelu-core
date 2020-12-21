@@ -5,7 +5,6 @@ import { Application, ApplicationEventSchedule } from '../../common/types';
 import styles from './Page2.module.scss';
 
 type Props = {
-  //  applicationPeriod: ApplicationPeriod;
   application: Application;
   onNext: () => void;
 };
@@ -43,7 +42,7 @@ const getCells = (
     cells.push(day);
   }
 
-  // mark selected
+  // mark selected states
   applicationEventSchedules.forEach((applicationEventSchedule) => {
     const { day } = applicationEventSchedule;
     const hour =
@@ -57,7 +56,7 @@ const getCells = (
 
 const formatNumber = (n: number): string => `0${n > 23 ? 0 : n}`.slice(-2);
 
-/** vaive impl just uses 1 hour slots */
+// naive impl that just uses 1 hour slots
 const cellsToApplicationEventSchedules = (
   cells: Cell[][]
 ): ApplicationEventSchedule[] => {

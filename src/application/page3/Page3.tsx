@@ -28,7 +28,6 @@ const Page1 = ({
   });
 
   const onSubmit = (data: any) => {
-    console.log(data);
     Object.assign(application.contactPerson, data);
     onNext();
   };

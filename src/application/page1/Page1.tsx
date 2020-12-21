@@ -43,7 +43,7 @@ const Page1 = ({
 
   const { t } = useTranslation();
 
-  // todo only single is handled
+  // todo only single event is handled
   const applicationEvent = application.applicationEvents[0];
 
   const { register, handleSubmit, setValue } = useForm({
@@ -171,12 +171,11 @@ const Page1 = ({
           id="end"
           required
         />
-        <div style={{ display: 'flex' }}>
-          <Checkbox id="defaultPeriod" checked />
-          <span>
-            {periodStartDate} - {periodEndDate}
-          </span>
-        </div>
+        <Checkbox
+          id="defaultPeriod"
+          checked
+          label={`${periodStartDate} - ${periodEndDate}`}
+        />
         <TextInput
           ref={register()}
           label={t('Application.Page1.minDuration')}
@@ -191,10 +190,7 @@ const Page1 = ({
           id="maxDuration"
           required
         />
-        <div style={{ display: 'flex' }}>
-          <Checkbox id="durationCheckbox" checked />
-          <span>1 t</span>
-        </div>
+        <Checkbox id="durationCheckbox" checked label="1t" />
         <TextInput
           ref={register()}
           className={styles.fullWidth}
@@ -204,10 +200,13 @@ const Page1 = ({
           type="number"
           required
         />
-        <div style={{ display: 'flex' }}>
-          <Checkbox id="everyTwoWeekCheckboxs" checked />
-          <span>Vuoro vain joka toinen viikko</span>
-        </div>
+        <Checkbox
+          ref={register()}
+          name="biweekly"
+          id="biweekly"
+          checked={applicationEvent.biweekly}
+          label={t('Application.Page1.biweekly')}
+        />
       </div>
       <div className={styles.buttonContainer}>
         <Button
