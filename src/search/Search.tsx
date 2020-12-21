@@ -5,7 +5,10 @@ import Container from '../component/Container';
 import Breadcrumb from '../component/Breadcrumb';
 import SearchForm from './SearchForm';
 import SearchResultList from './SearchResultList';
-import { PageTitle } from '../component/PageTitle';
+
+const style = {
+  fontSize: 'var(--fontsize-heading-l)',
+} as React.CSSProperties;
 
 const Search = (): JSX.Element => {
   const { t } = useTranslation();
@@ -17,7 +20,7 @@ const Search = (): JSX.Element => {
         <Breadcrumb
           current={{ label: 'breadcrumb.search', linkTo: '/search' }}
         />
-        <PageTitle>{t('search.heading')}</PageTitle>
+        <h1 style={style}>{t('search.heading')}</h1>
         <span className="text-lg">{t('search.text')}</span>
         <SearchForm onSearch={setSearch} />
       </Container>

@@ -15,7 +15,7 @@ const Home = (): JSX.Element => {
     <>
       <Head heading={t('home.head.heading')} text={t('home.head.text')} />
       <Container>
-        <h2 className="heading-l">{t('home.info.heading')}</h2>
+        <h2 className={styles.heading}>{t('home.info.heading')}</h2>
         <p className="text-lg">{t('home.info.text')}</p>
         <div className={styles.buttonContainer}>
           <Button
@@ -28,9 +28,7 @@ const Home = (): JSX.Element => {
             {t('home.infoButton')}
           </Button>
         </div>
-        <h2 className="heading-l" style={{ marginTop: 'var(--spacing-xl)' }}>
-          {t('home.applicationTimes.heading')}
-        </h2>
+        <h2 className={styles.heading}>{t('home.applicationTimes.heading')}</h2>
         <p className="text-lg">{t('home.applicationTimes.text')}</p>
         <ApplicationPeriods />
       </Container>

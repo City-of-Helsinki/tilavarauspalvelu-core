@@ -6,6 +6,11 @@
   }
 }
 
+.heading {
+  font-size: var(--fontsize-heading-l);
+  margin-top: var(--spacing-xl);
+}
+
 @media (max-width: $breakpoint-s) {
   .buttonContainer {
     display: flex;
