@@ -63,7 +63,7 @@ const translations: Translations = {
       'applicationEvent.begin': ['Kauden aloituspäivä'],
       'applicationEvent.end': ['Kauden päätöspäivä'],
       'applicationEvent.eventsPerWeek': ['Vuorojen määrä viikossa'],
-      'applicationEvent.biweekly': ['Vakiovuoprot vain joka toinen viikko'],
+      'applicationEvent.biweekly': ['Vakiovuorot vain joka toinen viikko'],
       'applicationEvent.reservationUnit': ['Vaihtoehto {{order}}.'],
       applicationEventSchedules: ['Toivotut ajat'],
     },
