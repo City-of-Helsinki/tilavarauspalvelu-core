@@ -27,17 +27,10 @@ const Search = (): JSX.Element => {
           <SearchForm onSearch={setSearch} />
         </Container>
       </div>
-      <Koros
-        type="wave"
-        className="koros"
-        style={{ fill: 'white' }}
-        flipHorizontal
-      />
-      <div style={{ backgroundColor: 'var(--tilavaraus-gray)' }}>
-        <Container main>
-          <SearchResultList search={search} />
-        </Container>
-      </div>
+      <Koros type="wave" className={`koros ${styles.koros}`} flipHorizontal />
+      <Container main>
+        <SearchResultList search={search} />
+      </Container>
     </>
   );
 };
