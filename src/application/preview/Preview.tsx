@@ -1,4 +1,4 @@
-import { Button, IconArrowLeft, IconArrowRight } from 'hds-react';
+import { Button, IconArrowLeft } from 'hds-react';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styles from './Preview.module.scss';
@@ -194,9 +194,7 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
         <Button variant="secondary" iconLeft={<IconArrowLeft />} disabled>
           {t('common.prev')}
         </Button>
-        <Button iconRight={<IconArrowRight />} onClick={() => onSubmit()}>
-          {t('common.submit')}
-        </Button>
+        <Button onClick={() => onSubmit()}>{t('common.submit')}</Button>
       </div>
     </>
   ) : null;
