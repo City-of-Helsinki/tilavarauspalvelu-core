@@ -4,7 +4,7 @@ import { Parameter } from './types';
 // eslint-disable-next-line import/prefer-default-export
 export const isActive = (startDate: string, endDate: string): boolean => {
   const now = new Date();
-  return isAfter(parseISO(startDate), now) && isBefore(parseISO(endDate), now);
+  return isAfter(now, parseISO(startDate)) && isBefore(now, parseISO(endDate));
 };
 
 export const formatDate = (date: string): string => {
