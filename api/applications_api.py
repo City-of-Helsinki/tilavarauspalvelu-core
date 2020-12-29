@@ -181,7 +181,7 @@ class ApplicationEventSerializer(serializers.ModelSerializer):
         min_duration = data["min_duration"]
         max_duration = data["max_duration"]
 
-        if max_duration is not None and max_duration <= min_duration:
+        if max_duration is not None and max_duration < min_duration:
             raise serializers.ValidationError(
                 "Maximum duration should be larger than minimum duration"
             )

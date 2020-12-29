@@ -12,7 +12,19 @@ Easiest way is to copy and rename .env.example to .env and make sure DEBUG=True 
  
 ## Installation with docker
 
-`docker-compose up`
+You'll need a redhat developer account to gain access to redhat subsriptions
+needed to run the docker image. 
+
+Register at https://developers.redhat.com/register and confirm your email address. 
+
+Set following environment variables in .env file or pass them to docker compose
+- BUILD_MODE=local
+- REDHAT_USERNAME=your redhat account username 
+- REDHAT_PASSWORD=your redhat account password
+
+Then you can run docker image with
+
+`docker-compose up dev`
 
 # Running tests and formatting
 
