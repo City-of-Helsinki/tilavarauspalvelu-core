@@ -19,6 +19,8 @@ type Cell = {
 const firstSlotStart = 7;
 const lastSlotStart = 23;
 
+const isTouchDevice = 'ontouchstart' in window;
+
 const cellLabel = (row: number): string => {
   return `${row} - ${row + 1}`;
 };
@@ -81,11 +83,19 @@ const cellsToApplicationEventSchedules = (
 const Day = ({
   head,
   cells,
-  toggle,
+  setCellValue,
+  paintState,
+  setPaintState,
+  painting,
+  setPainting,
 }: {
   head: string;
   cells: Cell[];
-  toggle: (selection: Cell) => void;
+  setCellValue: (selection: Cell, mode: boolean) => void;
+  setPaintState: (state: boolean) => void;
+  paintState: boolean;
+  painting: boolean;
+  setPainting: (state: boolean) => void;
 }): JSX.Element => {
   return (
     <div>
@@ -93,12 +103,30 @@ const Day = ({
       {cells.map((cell, cellIndex) => (
         <button
           key={cell.key}
-          className={`button-reset ${styles.timeSelectionButton} ${
+          className={`${styles.timeSelectionButton} ${
             cell.state ? styles.selectedTime : ''
-          } ${cellIndex < 7 ? styles.firstRow : ''}
+          } ${cellIndex === 0 ? styles.firstRow : ''}
               `}
           type="button"
-          onClick={() => toggle(cell)}>
+          onMouseDown={() => {
+            if (isTouchDevice) {
+              return;
+            }
+            setPaintState(!cell.state);
+            setCellValue(cell, !cell.state);
+            setPainting(true);
+          }}
+          onMouseUp={() => {
+            setPainting(false);
+          }}
+          onKeyPress={() => {
+            setCellValue(cell, !cell.state);
+          }}
+          onMouseEnter={() => {
+            if (painting) {
+              setCellValue(cell, paintState);
+            }
+          }}>
           {cell.label}
         </button>
       ))}
@@ -115,11 +143,17 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
   const schedules = applicationEvent.applicationEventSchedules;
 
   const [cells, setCells] = useState(getCells(schedules));
+  const [paintState, setPaintState] = useState(false); // toggle value true = set, false = clear
+  const [painting, setPainting] = useState(false); // is painting 'on'
 
-  const toggle = (selection: { state: boolean }): void => {
-    // eslint-disable-next-line no-param-reassign
-    selection.state = !selection.state;
-    setCells([...cells]);
+  const setCellValue = (selection: Cell, value: boolean): void => {
+    setCells(
+      cells.map((day) => [
+        ...day.map((h) =>
+          h.key === selection.key ? { ...h, state: value } : h
+        ),
+      ])
+    );
   };
 
   const next = () => {
@@ -128,10 +162,14 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
     onNext();
   };
 
-  return (
+  const r = (
     <>
       <span className={styles.eventName}>{applicationEvent.name}</span>
-      <div className={styles.calendarContainer}>
+      <div
+        className={styles.calendarContainer}
+        onMouseLeave={() => {
+          setPainting(false);
+        }}>
         {[
           'monday',
           'tuesday',
@@ -142,10 +180,14 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
           'sunday',
         ].map((c, index) => (
           <Day
+            paintState={paintState}
+            setPaintState={setPaintState}
+            painting={painting}
+            setPainting={setPainting}
             key={`day-${c}`}
             head={t(`calendar.${c}`)}
             cells={cells[index]}
-            toggle={toggle}
+            setCellValue={setCellValue}
           />
         ))}
       </div>
@@ -160,6 +202,8 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
       </div>
     </>
   );
+
+  return r;
 };
 
 export default Page2;
