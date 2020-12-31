@@ -125,13 +125,13 @@ const translations: Translations = {
     info: {
       heading: ['Hakeminen'],
       text: [
-        'Vakiovuoroja haetaan yleisen haun kautta. Voit selata tiloja, mutta hakemuksen voi ainoastaan jättää silloin kun hakuaika on käynnissä.',
+        'Vakiovuoroja haetaan yleisen haun kautta. Voit selata tiloja valmiiksi, mutta hakemuksen voi ainoastaan jättää silloin kun hakuaika on käynnissä.',
       ],
     },
     browseAllButton: ['Selaa kaikkia tiloja'],
     infoButton: ['Lue lisää hakuprosessista'],
     applicationTimes: {
-      heading: ['Hakuajat'],
+      heading: ['Vakiovuorojen hakuajat'],
       text: [
         'Vakiovuoroihin on hakuaika kaksi kertaa vuodessa. Ajankohta vaihtelee palvelusta ja toimialasta riippuen. Voit tilata sähköpostimuistutuksen tuleviin hakuihin.',
       ],

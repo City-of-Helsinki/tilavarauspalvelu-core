@@ -13,7 +13,6 @@ export default function NavigationAndFooterWrapper(props: Props): JSX.Element {
       {props.children}
       <div
         style={{
-          backgroundColor: 'green',
           marginTop: 'var(--spacing-layout-xl)',
         }}
       />

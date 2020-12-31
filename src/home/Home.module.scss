@@ -1,14 +1,25 @@
 @import '~hds-design-tokens/lib/all.scss';
 
 .buttonContainer {
+  margin-top: $spacing-xl;
+
   & > button {
-    margin-right: $spacing-m;
+    margin-top: $spacing-m;
   }
+}
+
+.topContainer {
+  margin-right: 30%;
+}
+
+.infoContainer {
+  margin-top: $spacing-s;
+  margin-bottom: $spacing-m;
 }
 
 .heading {
   font-size: var(--fontsize-heading-l);
-  margin-top: var(--spacing-xl);
+  margin-top: var(--spacing-s);
 }
 
 @media (max-width: $breakpoint-s) {
@@ -20,5 +31,15 @@
       margin-bottom: $spacing-m;
       margin-right: 0;
     }
+  }
+}
+
+.imageWithCard {
+  margin-top: var(--spacing-layout-xl);
+  width: 75rem;
+
+  & > :nth-child(2) {
+    height: auto;
+    margin: 1em;
   }
 }

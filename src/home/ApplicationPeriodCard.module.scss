@@ -1,7 +1,7 @@
 @import '~hds-design-tokens/lib/all.scss';
 
 .card {
-  max-width: $container-width-m;
+  margin-right: 30%;
   display: grid;
   grid-template-columns: 2fr 1fr;
   grid-gap: $spacing-m;
