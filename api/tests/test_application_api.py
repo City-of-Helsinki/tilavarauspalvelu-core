@@ -101,6 +101,92 @@ def test_application_update_should_null_organisation_and_contact_person(
 
 
 @pytest.mark.django_db
+def test_application_update_updating_and_adding_application_events(
+    user_api_client,
+    application,
+    organisation,
+    person,
+    purpose,
+    application_period,
+    application_event,
+    valid_application_event_data,
+):
+    assert Application.objects.count() == 1
+    application_event.num_persons = 20
+
+    existing_event = dict(valid_application_event_data)
+    existing_event["id"] = application_event.id
+    existing_event["name"] = "Updated name"
+    existing_event["num_persons"] = 112
+    existing_event["application_event_schedules"] = [
+        {"day": 3, "begin": "10:40", "end": "16:30"}
+    ]
+
+    valid_application_event_data["name"] = "New event name"
+    data = {
+        "id": application.id,
+        "organisation": None,
+        "contact_person": None,
+        "application_period_id": application_period.id,
+        "application_events": [existing_event, valid_application_event_data],
+        "status": "draft",
+    }
+
+    response = user_api_client.put(
+        reverse("application-detail", kwargs={"pk": application.id}),
+        data=data,
+        format="json",
+    )
+    assert response.status_code == 200
+    assert len(response.data.get("application_events")) == 2
+    assert response.data.get("application_events")[0].get("num_persons") == 112
+    assert response.data.get("application_events")[0].get("name") == "Updated name"
+    assert (
+        response.data.get("application_events")[0]
+        .get("application_event_schedules")[0]
+        .get("day")
+        == 3
+    )
+
+    assert response.data.get("application_events")[1].get("name") == "New event name"
+
+
+@pytest.mark.django_db
+def test_application_update_should_remove_application_events_if_no_longer_in_data(
+    user_api_client,
+    application,
+    organisation,
+    person,
+    purpose,
+    application_period,
+    application_event,
+    valid_application_event_data,
+):
+    assert Application.objects.count() == 1
+    application_event.num_persons = 20
+
+    valid_application_event_data["name"] = "New event name"
+    data = {
+        "id": application.id,
+        "organisation": None,
+        "contact_person": None,
+        "application_period_id": application_period.id,
+        "application_events": [valid_application_event_data],
+        "status": "draft",
+    }
+
+    response = user_api_client.put(
+        reverse("application-detail", kwargs={"pk": application.id}),
+        data=data,
+        format="json",
+    )
+    assert response.status_code == 200
+    assert len(response.data.get("application_events")) == 1
+
+    assert response.data.get("application_events")[0].get("name") == "New event name"
+
+
+@pytest.mark.django_db
 def test_application_fetch(user_api_client, application):
     response = user_api_client.get(reverse("application-list"))
     assert response.status_code == 200
