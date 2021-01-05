@@ -80,13 +80,13 @@ def reservation_unit2(resource):
 
 
 @pytest.fixture
-def application_period(reservation_unit):
+def application_period(reservation_unit) -> ApplicationPeriod:
     application_period = ApplicationPeriod.objects.create(
         name="Nuorten liikuntavuorot kevät 2021",
-        application_period_begin="2021-01-01",
-        application_period_end="2021-01-31",
-        reservation_period_begin="2021-01-01",
-        reservation_period_end="2021-06-01",
+        application_period_begin=timezone.datetime(2021, 1, 1, 0, 0, 0).astimezone(),
+        application_period_end=timezone.datetime(2021, 1, 31, 0, 0, 0).astimezone(),
+        reservation_period_begin=timezone.datetime(2021, 1, 1, 0, 0, 0).astimezone(),
+        reservation_period_end=timezone.datetime(2021, 6, 1, 0, 0, 0).astimezone(),
     )
 
     application_period.reservation_units.set([reservation_unit])
@@ -95,8 +95,8 @@ def application_period(reservation_unit):
 
 
 @pytest.fixture
-def reservation(reservation_unit):
-    begin_time = datetime.datetime(2020, 12, 1)
+def reservation(reservation_unit) -> Reservation:
+    begin_time = timezone.datetime(2021, 12, 1, 0, 0, 0).astimezone()
     end_time = begin_time + datetime.timedelta(hours=1)
     reservation = Reservation.objects.create(begin=begin_time, end=end_time)
     reservation.reservation_unit.set([reservation_unit])
