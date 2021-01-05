@@ -5,4 +5,4 @@ class ApplicationsConfig(AppConfig):
     name = "applications"
 
     def ready(self):
-        import applications.signals
+        import applications.signals  # noqa: F401
