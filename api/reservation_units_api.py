@@ -9,6 +9,8 @@ from api.services_api import ServiceSerializer
 from api.space_api import BuildingSerializer, LocationSerializer, SpaceSerializer
 from applications.models import ApplicationPeriod
 from reservation_units.models import (
+    Equipment,
+    EquipmentCategory,
     Purpose,
     ReservationUnit,
     ReservationUnitImage,
@@ -57,6 +59,10 @@ class ReservationUnitSerializer(serializers.ModelSerializer):
     building = serializers.SerializerMethodField()
     reservation_unit_type = ReservationUnitTypeSerializer(read_only=True)
 
+    equipment_ids = serializers.PrimaryKeyRelatedField(
+        queryset=Equipment.objects.all(), source="equipments", many=True
+    )
+
     class Meta:
         model = ReservationUnit
         fields = [
@@ -71,6 +77,8 @@ class ReservationUnitSerializer(serializers.ModelSerializer):
             "max_persons",
             "reservation_unit_type",
             "building",
+            "terms_of_use",
+            "equipment_ids",
         ]
 
     def get_building(self, reservation_unit):
@@ -128,3 +136,32 @@ class PurposeViewSet(viewsets.ModelViewSet):
 class ReservationUnitTypeViewSet(viewsets.ModelViewSet):
     serializer_class = ReservationUnitTypeSerializer
     queryset = ReservationUnitType.objects.all()
+
+
+class EquipmentCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EquipmentCategory
+        fields = [
+            "id",
+            "name",
+        ]
+
+
+class EquipmentCategoryViewSet(viewsets.ModelViewSet):
+    serializer_class = EquipmentCategorySerializer
+    queryset = EquipmentCategory.objects.all()
+
+
+class EquipmentSerializer(serializers.ModelSerializer):
+    category_id = serializers.PrimaryKeyRelatedField(
+        queryset=EquipmentCategory.objects.all(), source="category"
+    )
+
+    class Meta:
+        model = Equipment
+        fields = ["id", "name", "category_id"]
+
+
+class EquipmentViewSet(viewsets.ModelViewSet):
+    serializer_class = EquipmentSerializer
+    queryset = Equipment.objects.all()

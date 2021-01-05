@@ -31,6 +31,80 @@ def test_reservation_overlapping(user_api_client, reservation, valid_reservation
 
 
 @pytest.mark.django_db
+def test_reservation_fetch_should_filter_by_status(user_api_client, reservation):
+
+    url = f"{reverse('reservation-list')}?state=created&state=cancelled"
+
+    response = user_api_client.get(url, format="json")
+    assert response.status_code == 200
+    assert len(response.data) == 1
+    assert response.data[0].get("state") == "created"
+
+    url = f"{reverse('reservation-list')}?state=cancelled&state=denied"
+
+    response = user_api_client.get(url, format="json")
+    assert response.status_code == 200
+    assert len(response.data) == 0
+
+
+@pytest.mark.django_db
+def test_reservation_fetch_effectively_active_reservations(
+    user_api_client, reservation, confirmed_reservation
+):
+
+    url = f"{reverse('reservation-list')}?active=true"
+
+    response = user_api_client.get(url, format="json")
+    assert response.status_code == 200
+    assert len(response.data) == 1
+    assert response.data[0].get("state") == "confirmed"
+
+    url = f"{reverse('reservation-list')}?active=false"
+
+    response = user_api_client.get(url, format="json")
+    assert response.status_code == 200
+    assert len(response.data) == 1
+    assert response.data[0].get("state") == "created"
+
+
+@pytest.mark.django_db
+def test_reservation_fetch_filtering_by_reservation_unit(
+    user_api_client,
+    reservation_unit,
+    reservation_unit2,
+    reservation,
+    confirmed_reservation,
+    reservation_in_second_unit,
+):
+    def to_reservation_unit_ids(data: [Reservation]) -> [int]:
+        unit_ids = []
+        for res in data:
+            for unit in res["reservation_unit"]:
+                unit_ids.append(unit["id"])
+        return unit_ids
+
+    url = f"{reverse('reservation-list')}?reservation_unit={reservation_unit.id}"
+
+    response = user_api_client.get(url, format="json")
+    assert response.status_code == 200
+    assert len(response.data) == 2
+
+    assert to_reservation_unit_ids(response.data) == [
+        reservation_unit.id,
+        reservation_unit.id,
+    ]
+
+    url = f"{reverse('reservation-list')}?reservation_unit={reservation_unit2.id}"
+
+    response = user_api_client.get(url, format="json")
+    assert response.status_code == 200
+    assert len(response.data) == 1
+    assert response.data[0].get("state") == "created"
+
+    assert to_reservation_unit_ids(response.data) == [reservation_unit2.id]
+
+
+@pytest.mark.django_db
 def test_age_group_create(user_api_client):
     assert AgeGroup.objects.count() == 0
     response = user_api_client.post(

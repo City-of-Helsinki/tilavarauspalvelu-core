@@ -9,6 +9,21 @@ from spaces.models import Space
 Q = models.Q
 
 
+class EquipmentCategory(models.Model):
+    name = models.CharField(verbose_name=_("Name"), max_length=200)
+
+
+class Equipment(models.Model):
+    name = models.CharField(verbose_name=_("Name"), max_length=200)
+    category = models.ForeignKey(
+        EquipmentCategory,
+        verbose_name=_("Category"),
+        related_name="equipment",
+        on_delete=models.CASCADE,
+        null=False,
+    )
+
+
 class ReservationUnitType(models.Model):
     name = models.CharField(verbose_name=_("Name"), max_length=255)
 
@@ -52,6 +67,16 @@ class ReservationUnit(models.Model):
 
     require_introduction = models.BooleanField(
         verbose_name=_("Require introduction"), default=False
+    )
+
+    equipments = models.ManyToManyField(
+        Equipment,
+        verbose_name=_("Equipments"),
+        blank=True,
+    )
+
+    terms_of_use = models.TextField(
+        verbose_name=_("Terms of use"), blank=True, max_length=2000
     )
 
     def __str__(self):
