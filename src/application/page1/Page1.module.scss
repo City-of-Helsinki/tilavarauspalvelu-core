@@ -25,6 +25,15 @@
   flex-direction: row;
   margin-top: var(--spacing-layout-l);
   justify-content: flex-end;
+
+  & > button {
+    margin-left: var(--spacing-m);
+  }
+
+  :nth-child(1) {
+    margin-right: auto;
+    margin-left: 0;
+  }
 }
 
 .ruler {
@@ -45,6 +54,21 @@
 
   .periodContainer {
     grid-template-columns: 1fr 1fr 1fr;
+  }
+
+  .buttonContainer {
+    flex-direction: column;
+
+    & > button {
+      margin-top: var(--spacing-m);
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    :nth-child(1) {
+      margin-left: auto;
+      margin-right: auto;
+    }
   }
 }
 

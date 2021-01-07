@@ -1,5 +1,22 @@
 import { Action, Application, ContactPerson } from '../common/types';
 
+const applicationEvent = (applicationId?: number) => ({
+  name: 'Vakiovuoro 1.',
+  minDuration: 1,
+  maxDuration: 1,
+  eventsPerWeek: 1,
+  numPersons: null,
+  ageGroupId: null,
+  purposeId: null,
+  abilityGroupId: null,
+  applicationId: applicationId || 0,
+  begin: '',
+  end: '',
+  biweekly: false,
+  eventReservationUnits: [],
+  applicationEventSchedules: [],
+});
+
 const reducer = (state: Application, action: Action): Application => {
   switch (action.type) {
     case 'ensureContactPersonExists': {
@@ -9,28 +26,17 @@ const reducer = (state: Application, action: Action): Application => {
       }
       return nextState;
     }
+    case 'addNewApplicationEvent': {
+      console.log('adding new event');
+      const nextState = { ...state };
+      nextState.applicationEvents.push(applicationEvent(state.id));
+      return nextState;
+    }
     case 'load': {
       const application = { ...action.data } as Application;
       if (application.applicationEvents.length === 0) {
         // new application add event to edit
-        application.applicationEvents = [
-          {
-            name: 'Vakiovuoro 1.',
-            minDuration: 1,
-            maxDuration: 1,
-            eventsPerWeek: 1,
-            numPersons: null,
-            ageGroupId: null,
-            purposeId: null,
-            abilityGroupId: null,
-            applicationId: application.id || 0,
-            begin: '',
-            end: '',
-            biweekly: false,
-            eventReservationUnits: [],
-            applicationEventSchedules: [],
-          },
-        ];
+        application.applicationEvents = [applicationEvent(application.id)];
       }
       return application;
     }

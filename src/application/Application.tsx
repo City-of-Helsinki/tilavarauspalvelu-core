@@ -36,6 +36,7 @@ type ParamTypes = {
 const Application = (): JSX.Element | null => {
   const history = useHistory();
   const match = useRouteMatch();
+
   const { applicationId, applicationPeriodId } = useParams<ParamTypes>();
 
   const [ready, setReady] = useState(false);
@@ -68,7 +69,7 @@ const Application = (): JSX.Element | null => {
     SelectionsListContext
   ) as SelectionsListContextType;
 
-  const saveWithEffect = async (postSave: (string?: number) => void) => {
+  const saveWithEffect = async (postSave?: (string?: number) => void) => {
     let loadedApplication: ApplicationType;
 
     if (applicationId === 'new') {
@@ -100,7 +101,9 @@ const Application = (): JSX.Element | null => {
 
     dispatch({ type: 'load', data: loadedApplication });
 
-    postSave(loadedApplication.id);
+    if (postSave) {
+      postSave(loadedApplication.id);
+    }
   };
 
   const saveAndNavigate = async (path: string) => {
@@ -109,6 +112,10 @@ const Application = (): JSX.Element | null => {
       const target = `${prefix}/${path}`;
       history.push(target);
     });
+  };
+
+  const addNewApplicationEvent = async () => {
+    dispatch({ type: 'addNewApplicationEvent', data: application });
   };
 
   return ready ? (
@@ -124,6 +131,7 @@ const Application = (): JSX.Element | null => {
             applicationPeriod={applicationPeriod}
             application={application}
             onNext={() => saveAndNavigate('page2')}
+            addNewApplicationEvent={addNewApplicationEvent}
           />
         </ApplicationPage>
       </Route>

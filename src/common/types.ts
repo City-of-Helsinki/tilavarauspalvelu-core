@@ -181,7 +181,7 @@ export type ApplicationEventSchedule = {
 // editor context
 
 export type Action = {
-  type: 'load' | 'ensureContactPersonExists';
+  type: 'load' | 'ensureContactPersonExists' | 'addNewApplicationEvent';
   data?: Application;
 };
 

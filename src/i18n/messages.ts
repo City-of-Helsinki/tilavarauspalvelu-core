@@ -34,6 +34,7 @@ const translations: Translations = {
       maxDuration: ['Vuoron maksimikesto'],
       eventsPerWeek: ['Vuorojen määrä/viikko'],
       biweekly: ['Vuoro vain joka toinen viikko'],
+      createNew: ['Luo uusi vakiovuoro'],
     },
     Page2: {
       heading: ['2. Vakiovuoron ajankohta'],
