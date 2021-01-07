@@ -7,6 +7,8 @@ from .applications_api import (
     ApplicationViewSet,
 )
 from .reservation_units_api import (
+    EquipmentCategoryViewSet,
+    EquipmentViewSet,
     PurposeViewSet,
     ReservationUnitTypeViewSet,
     ReservationUnitViewSet,
@@ -34,4 +36,15 @@ router.register(
     r"parameters/reservation_unit_type",
     ReservationUnitTypeViewSet,
     "reservation_unit_type",
+)
+router.register(
+    r"parameters/equipment_category",
+    EquipmentCategoryViewSet,
+    "equipment_category",
+)
+
+router.register(
+    r"parameters/equipment",
+    EquipmentViewSet,
+    "equipment",
 )

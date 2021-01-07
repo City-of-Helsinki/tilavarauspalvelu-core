@@ -14,7 +14,12 @@ from applications.models import (
     Person,
     Recurrence,
 )
-from reservation_units.models import Purpose, ReservationUnit
+from reservation_units.models import (
+    Equipment,
+    EquipmentCategory,
+    Purpose,
+    ReservationUnit,
+)
 from reservations.models import AbilityGroup, AgeGroup, Reservation, ReservationPurpose
 from resources.models import Resource
 from spaces.models import District, Location, Space
@@ -98,8 +103,32 @@ def application_period(reservation_unit) -> ApplicationPeriod:
 def reservation(reservation_unit) -> Reservation:
     begin_time = timezone.datetime(2021, 12, 1, 0, 0, 0).astimezone()
     end_time = begin_time + datetime.timedelta(hours=1)
-    reservation = Reservation.objects.create(begin=begin_time, end=end_time)
+    reservation = Reservation.objects.create(
+        begin=begin_time, end=end_time, state="created"
+    )
     reservation.reservation_unit.set([reservation_unit])
+    return reservation
+
+
+@pytest.fixture
+def confirmed_reservation(reservation_unit) -> Reservation:
+    begin_time = timezone.datetime(2020, 12, 1, 0, 0, 0).astimezone()
+    end_time = begin_time + datetime.timedelta(hours=1)
+    reservation = Reservation.objects.create(
+        begin=begin_time, end=end_time, state="confirmed"
+    )
+    reservation.reservation_unit.set([reservation_unit])
+    return reservation
+
+
+@pytest.fixture
+def reservation_in_second_unit(reservation_unit2) -> Reservation:
+    begin_time = timezone.datetime(2020, 12, 1, 0, 0, 0).astimezone()
+    end_time = begin_time + datetime.timedelta(hours=1)
+    reservation = Reservation.objects.create(
+        begin=begin_time, end=end_time, state="created"
+    )
+    reservation.reservation_unit.set([reservation_unit2])
     return reservation
 
 
@@ -249,3 +278,13 @@ def valid_application_event_data(
         "application_event_schedules": [valid_application_event_schedule_data],
         "event_reservation_units": [valid_event_reservation_unit_data],
     }
+
+
+@pytest.fixture
+def tools_equipment_category() -> EquipmentCategory:
+    return EquipmentCategory.objects.create(name="Household tools")
+
+
+@pytest.fixture
+def equipment_hammer(tools_equipment_category) -> Equipment:
+    return Equipment.objects.create(name="Hammer", category=tools_equipment_category)

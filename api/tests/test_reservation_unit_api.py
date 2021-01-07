@@ -1,6 +1,8 @@
 import pytest
 from django.urls import reverse
 
+from reservation_units.models import Equipment, EquipmentCategory, ReservationUnit
+
 
 @pytest.mark.django_db
 def test_reservation_unit_exists(user_api_client, reservation_unit):
@@ -125,3 +127,62 @@ def test_reservation_unit_max_persons_filter(
     assert response.status_code == 200
     assert len(response.data) == 1
     assert response.data[0]["name"] == reservation_unit.name
+
+
+@pytest.mark.django_db
+def test_reservation_unit_create(user_api_client, equipment_hammer):
+    assert ReservationUnit.objects.count() == 0
+
+    data = {
+        "name": "New reservation unit",
+        "require_introduction": False,
+        "terms_of_use": "Do not mess it up",
+        "equipment_ids": [equipment_hammer.id],
+    }
+    response = user_api_client.post(
+        reverse("reservationunit-list"), data=data, format="json"
+    )
+    assert response.status_code == 201
+    assert ReservationUnit.objects.count() == 1
+
+    unit = ReservationUnit.objects.all()[0]
+    assert unit.name == "New reservation unit"
+    assert list(map(lambda x: x.id, unit.equipments.all())) == [equipment_hammer.id]
+
+
+@pytest.mark.django_db
+def test_equipment_category_create(user_api_client):
+    assert EquipmentCategory.objects.count() == 0
+    response = user_api_client.post(
+        reverse("equipment_category-list"), data={"name": "New category"}, format="json"
+    )
+    assert response.status_code == 201
+    assert EquipmentCategory.objects.count() == 1
+
+
+@pytest.mark.django_db
+def test_equipment_category_fetch(user_api_client, tools_equipment_category):
+    response = user_api_client.get(reverse("equipment_category-list"), format="json")
+    assert response.status_code == 200
+    assert len(response.data) == 1
+    assert response.data[0].get("name") == "Household tools"
+
+
+@pytest.mark.django_db
+def test_equipment_create(user_api_client, tools_equipment_category):
+    assert Equipment.objects.count() == 0
+    response = user_api_client.post(
+        reverse("equipment-list"),
+        data={"name": "Crowbar", "category_id": tools_equipment_category.id},
+        format="json",
+    )
+    assert response.status_code == 201
+    assert Equipment.objects.count() == 1
+
+
+@pytest.mark.django_db
+def test_equipment_fetch(user_api_client, equipment_hammer):
+    response = user_api_client.get(reverse("equipment-list"), format="json")
+    assert response.status_code == 200
+    assert len(response.data) == 1
+    assert response.data[0].get("name") == "Hammer"

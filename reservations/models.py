@@ -66,14 +66,15 @@ class RecurringReservation(models.Model):
     )
 
 
-class Reservation(models.Model):
+class STATE_CHOISE_CONST(object):
+    __slots__ = ()
+
     CREATED = "created"
     CANCELLED = "cancelled"
     CONFIRMED = "confirmed"
     DENIED = "denied"
     REQUESTED = "requested"
     WAITING_FOR_PAYMENT = "waiting_for_payment"
-
     STATE_CHOICES = (
         (CREATED, _("created")),
         (CANCELLED, _("cancelled")),
@@ -83,8 +84,17 @@ class Reservation(models.Model):
         (WAITING_FOR_PAYMENT, _("waiting for payment")),
     )
 
+
+STATE_CHOICES = STATE_CHOISE_CONST()
+
+
+class Reservation(models.Model):
+
     state = models.CharField(
-        max_length=32, choices=STATE_CHOICES, verbose_name=_("State"), default=CREATED
+        max_length=32,
+        choices=STATE_CHOICES.STATE_CHOICES,
+        verbose_name=_("State"),
+        default=STATE_CHOICES.CREATED,
     )
 
     priority = models.IntegerField(

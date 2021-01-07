@@ -1,8 +1,10 @@
+from django_filters import rest_framework as filters
 from drf_extra_fields.relations import PresentablePrimaryKeyRelatedField
+from rest_framework import filters as drf_filters
 from rest_framework import serializers, viewsets
 
 from reservation_units.models import ReservationUnit
-from reservations.models import AbilityGroup, AgeGroup, Reservation
+from reservations.models import STATE_CHOICES, AbilityGroup, AgeGroup, Reservation
 
 from .reservation_units_api import ReservationUnitSerializer
 
@@ -38,8 +40,40 @@ class ReservationSerializer(serializers.ModelSerializer):
         return data
 
 
+class ReservationFilter(filters.FilterSet):
+    state = filters.MultipleChoiceFilter(
+        field_name="state",
+        choices=STATE_CHOICES.STATE_CHOICES,
+    )
+
+    # Effectively active or inactive only reservations
+    active = filters.BooleanFilter(method="is_active")
+
+    reservation_unit = filters.ModelMultipleChoiceFilter(
+        field_name="reservation_unit", queryset=ReservationUnit.objects.all()
+    )
+
+    def is_active(self, queryset, value, *args, **kwargs):
+        active_only = bool(args[0])
+        if active_only:
+            return queryset.filter(state="confirmed")
+        return queryset.exclude(state="confirmed")
+
+    class Meta:
+        model = Reservation
+        fields = ["state"]
+
+
 class ReservationViewSet(viewsets.ModelViewSet):
     serializer_class = ReservationSerializer
+
+    filter_backends = [
+        drf_filters.OrderingFilter,
+        filters.DjangoFilterBackend,
+        drf_filters.SearchFilter,
+    ]
+
+    filterset_class = ReservationFilter
     queryset = (
         Reservation.objects.all()
         .prefetch_related("reservation_unit")
