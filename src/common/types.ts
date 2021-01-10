@@ -181,8 +181,13 @@ export type ApplicationEventSchedule = {
 // editor context
 
 export type Action = {
-  type: 'load' | 'ensureContactPersonExists' | 'addNewApplicationEvent';
+  type:
+    | 'load'
+    | 'ensureContactPersonExists'
+    | 'addNewApplicationEvent'
+    | 'copyTimesToAllEvents';
   data?: Application;
+  params?: { [key: string]: string };
 };
 
 export type ApplicationEditor = {

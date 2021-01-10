@@ -52,7 +52,7 @@ const Page1 = ({
   const i = 0;
   const applicationEvent = application.applicationEvents[i];
 
-  const { register, handleSubmit, setValue, watch } = useForm({
+  const form = useForm<any>({
     defaultValues: { applicationEvents: application.applicationEvents },
   });
 
@@ -92,7 +92,7 @@ const Page1 = ({
   const onSubmit = (data: ApplicationType) => {
     prepareSave(data);
 
-    setReady(false);
+    //    setReady(false);
 
     if (onNext) {
       onNext();
@@ -109,15 +109,17 @@ const Page1 = ({
     addNewApplicationEvent();
   };
 
-  return ready ? (
+  if (!ready) {
+    return null;
+  }
+
+  return (
     <form>
       {application.applicationEvents.map((event, index) => {
         return (
           <ApplicationEvent
             key={event.id || 'NEW'}
-            register={register}
-            setValue={setValue}
-            watch={watch}
+            form={form}
             applicationEvent={event}
             index={index}
             applicationPeriod={applicationPeriod}
@@ -129,7 +131,7 @@ const Page1 = ({
       <div className={styles.buttonContainer}>
         <Button
           iconLeft={<IconPlusCircleFill />}
-          onClick={() => handleSubmit(onAddApplicationEvent)()}>
+          onClick={() => form.handleSubmit(onAddApplicationEvent)()}>
           {t('Application.Page1.createNew')}
         </Button>
         <Button disabled iconLeft={<IconArrowLeft />}>
@@ -137,12 +139,12 @@ const Page1 = ({
         </Button>
         <Button
           iconRight={<IconArrowRight />}
-          onClick={() => handleSubmit(onSubmit)()}>
+          onClick={() => form.handleSubmit(onSubmit)()}>
           {t('common.next')}
         </Button>
       </div>
     </form>
-  ) : null;
+  );
 };
 
 export default Page1;

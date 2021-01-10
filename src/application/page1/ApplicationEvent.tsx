@@ -1,7 +1,7 @@
 import { Accordion, Checkbox, Select, TextInput } from 'hds-react';
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import styles from './Page1.module.scss';
 import ReservationUnitList from './ReservationUnitList';
 import {
@@ -24,9 +24,7 @@ type Props = {
   applicationEvent: ApplicationEventType;
   index: number;
   applicationPeriod: ApplicationPeriod;
-  register: ReturnType<typeof useForm>['register'];
-  setValue: ReturnType<typeof useForm>['setValue'];
-  watch: ReturnType<typeof useForm>['watch'];
+  form: ReturnType<typeof useForm>;
   optionTypes: OptionTypes;
 };
 
@@ -34,9 +32,7 @@ const ApplicationEvent = ({
   applicationEvent,
   index,
   applicationPeriod,
-  register,
-  setValue,
-  watch,
+  form,
   optionTypes,
 }: Props): JSX.Element => {
   const periodStartDate = formatApiDate(
@@ -51,13 +47,16 @@ const ApplicationEvent = ({
   const fieldName = (nameField: string) =>
     `applicationEvents[${index}].${nameField}`;
 
-  const name = watch(fieldName('name'));
+  const name = form.watch(fieldName('name'));
 
   useEffect(() => {
-    // register form fields (the ones that don't have 'ref')
-    register({ name: fieldName('ageGroupId'), required: true });
-    register({ name: fieldName('abilityGroupId'), required: true });
-    register({ name: fieldName('purposeId'), required: true });
+    form.register({
+      name: fieldName('ageGroupId'),
+      type: 'custom',
+      required: true,
+    });
+    form.register({ name: fieldName('abilityGroupId'), required: true });
+    form.register({ name: fieldName('purposeId'), required: true });
   });
 
   return (
@@ -67,7 +66,7 @@ const ApplicationEvent = ({
       </div>
       <div className={styles.twoColumnContainer}>
         <TextInput
-          ref={register({ required: true })}
+          ref={form.register({ required: true })}
           label={t('Application.Page1.name')}
           id={fieldName('name')}
           name={fieldName('name')}
@@ -75,11 +74,10 @@ const ApplicationEvent = ({
         />
         <TextInput
           required
-          ref={register({ required: true, min: 1 })}
+          ref={form.register({ required: true })}
           label={t('Application.Page1.groupSize')}
           id={fieldName('numPersons')}
           name={fieldName('numPersons')}
-          type="number"
         />
         <Select
           id="ageGroupId"
@@ -88,9 +86,9 @@ const ApplicationEvent = ({
           label={t('Application.Page1.ageGroup')}
           required
           onChange={(selection: OptionType): void => {
-            setValue(fieldName('ageGroupId'), selection.value);
+            form.setValue(fieldName('ageGroupId'), selection.value);
           }}
-          value={getSelectedOption(
+          defaultValue={getSelectedOption(
             applicationEvent.ageGroupId,
             ageGroupOptions
           )}
@@ -101,9 +99,9 @@ const ApplicationEvent = ({
           label={t('Application.Page1.abilityGroup')}
           required
           onChange={(selection: OptionType): void => {
-            setValue(fieldName('abilityGroupId'), selection.value);
+            form.setValue(fieldName('abilityGroupId'), selection.value);
           }}
-          value={getSelectedOption(
+          defaultValue={getSelectedOption(
             applicationEvent.abilityGroupId,
             abilityGroupOptions
           )}
@@ -115,9 +113,12 @@ const ApplicationEvent = ({
           options={purposeOptions}
           label={t('Application.Page1.purpose')}
           onChange={(selection: OptionType): void => {
-            setValue(fieldName('purposeId'), selection.value);
+            form.setValue(fieldName('purposeId'), selection.value);
           }}
-          value={getSelectedOption(applicationEvent.purposeId, purposeOptions)}
+          defaultValue={getSelectedOption(
+            applicationEvent.purposeId,
+            purposeOptions
+          )}
         />
       </div>
       <hr className={styles.ruler} />
@@ -131,14 +132,16 @@ const ApplicationEvent = ({
       </div>
       <div className={styles.periodContainer}>
         <TextInput
-          ref={register({ required: true })}
+          type="date"
+          ref={form.register({ required: true })}
           label={t('Application.Page1.periodStartDate')}
           id={fieldName('begin')}
           name={fieldName('begin')}
           required
         />
         <TextInput
-          ref={register({ required: true })}
+          type="date"
+          ref={form.register({ required: true })}
           label={t('Application.Page1.periodEndDate')}
           id={fieldName('end')}
           name={fieldName('end')}
@@ -150,14 +153,14 @@ const ApplicationEvent = ({
           label={`${periodStartDate} - ${periodEndDate}`}
         />
         <TextInput
-          ref={register({ required: true })}
+          ref={form.register({ required: true })}
           label={t('Application.Page1.minDuration')}
           id={fieldName('minDuration')}
           name={fieldName('minDuration')}
           required
         />
         <TextInput
-          ref={register({ required: true })}
+          ref={form.register({ required: true })}
           label={t('Application.Page1.maxDuration')}
           id={fieldName('maxduration')}
           name={fieldName('maxDuration')}
@@ -165,7 +168,7 @@ const ApplicationEvent = ({
         />
         <Checkbox id="durationCheckbox" checked label="1t" />
         <TextInput
-          ref={register()}
+          ref={form.register()}
           className={styles.fullWidth}
           label={t('Application.Page1.eventsPerWeek')}
           id={fieldName('eventsPerWeek')}
@@ -173,12 +176,20 @@ const ApplicationEvent = ({
           type="number"
           required
         />
-        <Checkbox
-          ref={register()}
-          name="biweekly"
-          id="biweekly"
-          checked={applicationEvent.biweekly}
-          label={t('Application.Page1.biweekly')}
+        <Controller
+          control={form.control}
+          name={fieldName('biweekly')}
+          render={(props) => {
+            return (
+              <Checkbox
+                {...props}
+                id={fieldName('biweekly')}
+                checked={props.value}
+                onChange={() => props.onChange(!props.value)}
+                label={t('Application.Page1.biweekly')}
+              />
+            );
+          }}
         />
       </div>
     </Accordion>

@@ -1,0 +1,36 @@
+.calendarContainer {
+  margin-top: var(--spacing-layout-s);
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  column-gap: 6px;
+}
+
+.calendarHead {
+  font-family: HelsinkiGrotesk-Bold, var(--font-default);
+  font-size: var(--fontsize-body-l);
+  text-align: center;
+  padding: var(--spacing-2-xs) 0;
+}
+
+.timeSelectionButton {
+  --border-color: var(--color-black-50);
+
+  display: block;
+  width: 100%;
+  font-family: HelsinkiGrotesk-Bold, var(--font-default);
+  font-size: var(--fontsize-heading-m);
+  font-weight: bold;
+  padding: 0.3em 0;
+  background: #e5e5e5;
+  border: 1px solid var(--border-color);
+  border-top: none;
+
+  &.selectedTime {
+    border-color: #0022a6;
+    background: #0072c6;
+  }
+
+  &.firstRow {
+    border-top: 1px solid var(--border-color);
+  }
+}

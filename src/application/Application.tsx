@@ -1,4 +1,5 @@
-import React, { useEffect, useState, useReducer } from 'react';
+import React, { useReducer, useState } from 'react';
+import { useAsync } from 'react-use';
 import {
   Route,
   Switch,
@@ -6,6 +7,8 @@ import {
   useParams,
   useRouteMatch,
 } from 'react-router-dom';
+import { Notification } from 'hds-react';
+import { useTranslation } from 'react-i18next';
 import {
   saveApplication,
   getApplication,
@@ -34,15 +37,17 @@ type ParamTypes = {
 };
 
 const Application = (): JSX.Element | null => {
+  const { t } = useTranslation();
+
   const history = useHistory();
   const match = useRouteMatch();
 
+  const [error, setError] = useState<string | null>();
+
   const { applicationId, applicationPeriodId } = useParams<ParamTypes>();
 
-  const [ready, setReady] = useState(false);
-  const [applicationPeriod, setApplicationPeriod] = useState<ApplicationPeriod>(
-    {} as ApplicationPeriod
-  );
+  const [applicationInitialized, setApplicationInitialized] = useState(false);
+
   const [application, dispatch] = useReducer(
     applicationReducer,
     {
@@ -52,18 +57,27 @@ const Application = (): JSX.Element | null => {
     applicationInitializer
   );
 
-  useEffect(() => {
-    async function fetchData() {
-      const unit = await getApplicationPeriod({ id: applicationPeriodId });
-      setApplicationPeriod(unit);
-      if (applicationId !== 'new') {
-        const loadedApplication = await getApplication(Number(applicationId));
-        dispatch({ type: 'load', data: loadedApplication });
-      }
-      setReady(true);
+  const applicationPeriod = useAsync(async () => {
+    return getApplicationPeriod({ id: applicationPeriodId });
+  }, [applicationPeriodId]);
+
+  const applicationLoading = useAsync(async () => {
+    let loadedApplication = null;
+    if (applicationId !== 'new') {
+      loadedApplication = await getApplication(Number(applicationId));
+      dispatch({ type: 'load', data: loadedApplication });
     }
-    fetchData();
-  }, [applicationPeriodId, applicationId]);
+    setApplicationInitialized(true);
+    return loadedApplication;
+  }, [applicationId]);
+
+  const ready =
+    [applicationPeriod, applicationLoading].some((r) => !r.loading) &&
+    applicationInitialized;
+
+  //  setError(
+  // [applicationPeriod, applicationLoading].find((r) => r.error)?.error?.message
+  // );
 
   const { reservationUnits } = React.useContext(
     SelectionsListContext
@@ -72,37 +86,45 @@ const Application = (): JSX.Element | null => {
   const saveWithEffect = async (postSave?: (string?: number) => void) => {
     let loadedApplication: ApplicationType;
 
-    if (applicationId === 'new') {
-      // because applicationEvent needs applicationId we need to save application first
-      const tmpApplication = { ...application };
-      const applicationEvent = tmpApplication.applicationEvents.pop();
-      const savedApplication = await saveApplication(tmpApplication);
+    try {
+      if (applicationId === 'new') {
+        // because applicationEvent needs applicationId we need to save application first
+        const tmpApplication = { ...application }; // shallow copy!
+        tmpApplication.applicationEvents = [];
+        const savedApplication = await saveApplication(tmpApplication);
 
-      if (!savedApplication.id) {
-        throw new Error('cannot proceed, saved application does not have id');
+        if (!savedApplication.id) {
+          throw new Error('cannot proceed, saved application does not have id');
+        }
+
+        savedApplication.applicationEvents = [
+          ...application.applicationEvents.map((ae) => ({
+            ...ae,
+            applicationId: savedApplication.id || 0,
+          })),
+        ];
+
+        loadedApplication = await saveApplication(savedApplication);
+
+        if (savedApplication.id) {
+          const replaceUrl = match.url.replace(
+            'new',
+            String(savedApplication.id)
+          );
+
+          history.replace(`${replaceUrl}/page1`);
+        }
+      } else {
+        loadedApplication = await saveApplication(application);
       }
-      if (applicationEvent) {
-        applicationEvent.applicationId = savedApplication.id;
-        savedApplication.applicationEvents.push(applicationEvent);
+
+      dispatch({ type: 'load', data: loadedApplication });
+
+      if (postSave) {
+        postSave(loadedApplication.id);
       }
-      loadedApplication = await saveApplication(savedApplication);
-
-      if (savedApplication.id) {
-        const replaceUrl = match.url.replace(
-          'new',
-          String(savedApplication.id)
-        );
-
-        history.replace(`${replaceUrl}/page1`);
-      }
-    } else {
-      loadedApplication = await saveApplication(application);
-    }
-
-    dispatch({ type: 'load', data: loadedApplication });
-
-    if (postSave) {
-      postSave(loadedApplication.id);
+    } catch (e) {
+      setError(`${t('Application.error.saveFailed')}:${e.message}`);
     }
   };
 
@@ -118,59 +140,80 @@ const Application = (): JSX.Element | null => {
     dispatch({ type: 'addNewApplicationEvent', data: application });
   };
 
-  return ready ? (
-    <Switch>
-      <Route exact path={`${match.url}/page1`}>
-        <ApplicationPage
-          breadCrumbText={applicationPeriod.name}
-          overrideText={applicationPeriod.name}
-          translationKeyPrefix="Application.Page1"
-          match={match}>
-          <Page1
-            reservationUnits={reservationUnits}
-            applicationPeriod={applicationPeriod}
-            application={application}
-            onNext={() => saveAndNavigate('page2')}
-            addNewApplicationEvent={addNewApplicationEvent}
-          />
-        </ApplicationPage>
-      </Route>
-      <Route exact path={`${match.url}/page2`}>
-        <ApplicationPage
-          translationKeyPrefix="Application.Page2"
-          match={match}
-          breadCrumbText={applicationPeriod.name}>
-          <Page2
-            application={application}
-            onNext={() => saveAndNavigate('page3')}
-          />
-        </ApplicationPage>
-      </Route>
-      <Route exact path={`${match.url}/page3`}>
-        <ApplicationPage
-          translationKeyPrefix="Application.Page3"
-          match={match}
-          breadCrumbText={applicationPeriod.name}>
-          <Page3
-            dispatch={dispatch}
-            application={application}
-            onNext={() => saveAndNavigate('preview')}
-          />
-        </ApplicationPage>
-      </Route>
-      <Route exact path={`${match.url}/preview`}>
-        <ApplicationPage
-          translationKeyPrefix="Application.preview"
-          match={match}
-          breadCrumbText={applicationPeriod.name}>
-          <Preview
-            application={application}
-            onNext={() => saveAndNavigate('preview')}
-          />
-        </ApplicationPage>
-      </Route>
-    </Switch>
-  ) : null;
+  const applicationPeriodName = applicationPeriod.value?.name || '';
+
+  if (!ready) {
+    return null;
+  }
+
+  return (
+    <>
+      <Switch>
+        <Route exact path={`${match.url}/page1`}>
+          <ApplicationPage
+            breadCrumbText={applicationPeriodName}
+            overrideText={applicationPeriodName}
+            translationKeyPrefix="Application.Page1"
+            match={match}>
+            <Page1
+              reservationUnits={reservationUnits}
+              applicationPeriod={
+                applicationPeriod.value || ({} as ApplicationPeriod)
+              }
+              application={application}
+              onNext={() => saveAndNavigate('page2')}
+              addNewApplicationEvent={addNewApplicationEvent}
+            />
+          </ApplicationPage>
+        </Route>
+        <Route exact path={`${match.url}/page2`}>
+          <ApplicationPage
+            translationKeyPrefix="Application.Page2"
+            match={match}
+            breadCrumbText={applicationPeriodName}>
+            <Page2
+              application={application}
+              onNext={() => saveAndNavigate('page3')}
+            />
+          </ApplicationPage>
+        </Route>
+        <Route exact path={`${match.url}/page3`}>
+          <ApplicationPage
+            translationKeyPrefix="Application.Page3"
+            match={match}
+            breadCrumbText={applicationPeriodName}>
+            <Page3
+              dispatch={dispatch}
+              application={application}
+              onNext={() => saveAndNavigate('preview')}
+            />
+          </ApplicationPage>
+        </Route>
+        <Route exact path={`${match.url}/preview`}>
+          <ApplicationPage
+            translationKeyPrefix="Application.preview"
+            match={match}
+            breadCrumbText={applicationPeriodName}>
+            <Preview
+              application={application}
+              onNext={() => saveAndNavigate('preview')}
+            />
+          </ApplicationPage>
+        </Route>
+      </Switch>
+      {error ? (
+        <Notification
+          type="error"
+          label="With progress bar"
+          position="top-center"
+          autoClose
+          displayAutoCloseProgress={false}
+          onClose={() => setError(null)}>
+          {error}
+        </Notification>
+      ) : null}
+    </>
+  );
 };
 
 export default Application;
