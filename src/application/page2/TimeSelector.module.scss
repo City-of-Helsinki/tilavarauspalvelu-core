@@ -34,3 +34,10 @@
     border-top: 1px solid var(--border-color);
   }
 }
+
+.buttonContainer {
+  display: flex;
+  flex-direction: row;
+  margin-top: var(--spacing-layout-l);
+  margin-bottom: var(--spacing-layout-s);
+}

@@ -2,7 +2,7 @@ import { Accordion, Button, IconArrowLeft } from 'hds-react';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ApplicationEvent } from '../../common/types';
-import styles from './Page2.module.scss';
+import styles from './TimeSelector.module.scss';
 
 type Props = {
   applicationEvent: ApplicationEvent;
@@ -128,12 +128,14 @@ const TimeSelector = ({
         ))}
       </div>
 
-      <Button
-        variant="secondary"
-        iconLeft={<IconArrowLeft />}
-        onClick={() => copyCells(index)}>
-        {t('common.copyTimesToOtherEvents')}
-      </Button>
+      <div className={styles.buttonContainer}>
+        <Button
+          variant="secondary"
+          iconLeft={<IconArrowLeft />}
+          onClick={() => copyCells(index)}>
+          {t('Application.Page2.copyTimes')}
+        </Button>
+      </div>
     </Accordion>
   );
 

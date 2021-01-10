@@ -52,8 +52,11 @@ const Page1 = ({
   const i = 0;
   const applicationEvent = application.applicationEvents[i];
 
-  const form = useForm<any>({
-    defaultValues: { applicationEvents: application.applicationEvents },
+  const form = useForm({
+    defaultValues: {
+      applicationEvents: application.applicationEvents,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as Record<string, any>,
   });
 
   useEffect(() => {

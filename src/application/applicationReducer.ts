@@ -31,20 +31,6 @@ const reducer = (state: Application, action: Action): Application => {
       nextState.applicationEvents.push(applicationEvent(state.id));
       return nextState;
     }
-    case 'copyTimesToAllEvents': {
-      const nextState = { ...state };
-      const fromIndex = Number(action.params?.fromIndex);
-      const srcTimes = [
-        ...state.applicationEvents[fromIndex].applicationEventSchedules,
-      ];
-
-      for (let i = 0; i < nextState.applicationEvents.length; i += 1) {
-        nextState.applicationEvents[i].applicationEventSchedules = [
-          ...srcTimes,
-        ];
-      }
-      return nextState;
-    }
     case 'load': {
       const application = { ...action.data } as Application;
       if (application.applicationEvents.length === 0) {
