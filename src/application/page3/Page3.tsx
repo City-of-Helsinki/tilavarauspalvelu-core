@@ -11,7 +11,7 @@ type Props = {
   onNext: () => void;
 };
 
-const Page1 = ({
+const Page3 = ({
   dispatch,
   onNext,
   application,
@@ -75,4 +75,4 @@ const Page1 = ({
   ) : null;
 };
 
-export default Page1;
+export default Page3;
