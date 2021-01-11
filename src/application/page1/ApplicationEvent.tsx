@@ -7,6 +7,7 @@ import ReservationUnitList from './ReservationUnitList';
 import {
   ApplicationEvent as ApplicationEventType,
   ApplicationPeriod,
+  ReservationUnit,
 } from '../../common/types';
 import {
   formatApiDate,
@@ -25,6 +26,7 @@ type Props = {
   index: number;
   applicationPeriod: ApplicationPeriod;
   form: ReturnType<typeof useForm>;
+  selectedReservationUnits: ReservationUnit[];
   optionTypes: OptionTypes;
 };
 
@@ -33,6 +35,7 @@ const ApplicationEvent = ({
   index,
   applicationPeriod,
   form,
+  selectedReservationUnits,
   optionTypes,
 }: Props): JSX.Element => {
   const periodStartDate = formatApiDate(
@@ -50,13 +53,10 @@ const ApplicationEvent = ({
   const name = form.watch(fieldName('name'));
 
   useEffect(() => {
-    form.register({
-      name: fieldName('ageGroupId'),
-      type: 'custom',
-      required: true,
-    });
+    form.register({ name: fieldName('ageGroupId'), required: true });
     form.register({ name: fieldName('abilityGroupId'), required: true });
     form.register({ name: fieldName('purposeId'), required: true });
+    form.register({ name: fieldName('eventReservationUnits') });
   });
 
   return (
@@ -125,7 +125,13 @@ const ApplicationEvent = ({
       <div className={styles.subHeadLine}>
         {t('Application.Page1.spacesSubHeading')}
       </div>
-      <ReservationUnitList />
+      <ReservationUnitList
+        selectedReservationUnits={selectedReservationUnits}
+        applicationEvent={applicationEvent}
+        applicationPeriod={applicationPeriod}
+        form={form}
+        fieldName={fieldName('eventReservationUnits')}
+      />
       <hr className={styles.ruler} />
       <div className={styles.subHeadLine}>
         {t('Application.Page1.applicationPeriodSubHeading')}

@@ -142,6 +142,10 @@ const translations: Translations = {
   ReservationUnitList: {
     option: ['Vaihtoehto'],
     buttonRemove: ['Poista'],
+    add: ['Lisää tila'],
+  },
+  ReservationUnitModal: {
+    selectReservationUnit: ['Lisää hakemukselle'],
   },
   ReservationUnit: {
     backToSearch: ['Takaisin hakutuloksiin'],

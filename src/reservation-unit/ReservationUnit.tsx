@@ -19,7 +19,7 @@ const ReservationUnit = (): JSX.Element | null => {
 
   useEffect(() => {
     async function fetchData() {
-      const unit = await getReservationUnit({ id });
+      const unit = await getReservationUnit(Number(id));
       setReservationUnit(unit);
     }
     fetchData();

@@ -129,11 +129,9 @@ interface IDParameter {
   id: string;
 }
 
-export function getReservationUnit(
-  params: IDParameter
-): Promise<ReservationUnit> {
+export function getReservationUnit(id: number): Promise<ReservationUnit> {
   return apiGet<ReservationUnit>({
-    path: `v1/${reservationUnitsBasePath}/${params.id}`,
+    path: `v1/${reservationUnitsBasePath}/${id}`,
   });
 }
 

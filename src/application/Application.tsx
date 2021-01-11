@@ -156,7 +156,7 @@ const Application = (): JSX.Element | null => {
             translationKeyPrefix="Application.Page1"
             match={match}>
             <Page1
-              reservationUnits={reservationUnits}
+              selectedReservationUnits={reservationUnits}
               applicationPeriod={
                 applicationPeriod.value || ({} as ApplicationPeriod)
               }

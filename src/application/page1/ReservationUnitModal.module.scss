@@ -1,0 +1,65 @@
+@import '~hds-design-tokens/lib/all.scss';
+
+.container {
+  display: grid;
+  background-color: $color-white;
+  margin-top: $spacing-s;
+  grid-template-columns: 250px 3fr 1fr;
+}
+
+.mainContent {
+  display: flex;
+  flex-direction: column;
+  margin: $spacing-m;
+}
+
+.name {
+  font-family: HelsinkiGrotesk-Bold, var(--font-default);
+  font-size: $fontsize-heading-m;
+  font-weight: bold;
+
+  a {
+    text-decoration: none;
+    color: $color-black-90;
+  }
+}
+
+.description {
+  font-size: $fontsize-body-l;
+  flex-grow: 1;
+}
+
+.bottom {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+
+  > svg {
+    margin-right: $spacing-xs;
+  }
+
+  > span:not(:first-child) {
+    margin-right: $spacing-layout-m;
+  }
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  padding: $spacing-s $spacing-m;
+  align-items: flex-end;
+}
+
+.mainContainer {
+  background-color: white;
+  margin: 2em 4em;
+}
+
+.results {
+  height: 60vh;
+  overflow-y: auto;
+}
+
+.searchInput {
+  margin-top: 2em;
+}

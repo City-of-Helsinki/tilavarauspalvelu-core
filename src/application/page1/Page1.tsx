@@ -12,7 +12,6 @@ import ApplicationEvent from './ApplicationEvent';
 import {
   Application as ApplicationType,
   ApplicationPeriod,
-  EventReservationUnit,
   ReservationUnit,
 } from '../../common/types';
 import { mapOptions, OptionType } from '../../common/util';
@@ -21,7 +20,7 @@ import { getParameters } from '../../common/api';
 type Props = {
   applicationPeriod: ApplicationPeriod;
   application: ApplicationType;
-  reservationUnits: ReservationUnit[];
+  selectedReservationUnits: ReservationUnit[];
   onNext?: () => void;
   addNewApplicationEvent: () => void;
 };
@@ -31,7 +30,7 @@ const Page1 = ({
   addNewApplicationEvent,
   applicationPeriod,
   application,
-  reservationUnits,
+  selectedReservationUnits,
 }: Props): JSX.Element | null => {
   const [ready, setReady] = useState<boolean>(false);
   const [ageGroupOptions, setAgeGroupOptions] = useState<OptionType[]>([]);
@@ -47,10 +46,6 @@ const Page1 = ({
   };
 
   const { t } = useTranslation();
-
-  // todo only single event is handled
-  const i = 0;
-  const applicationEvent = application.applicationEvents[i];
 
   const form = useForm({
     defaultValues: {
@@ -78,17 +73,6 @@ const Page1 = ({
     application.applicationEvents.forEach((event, index) =>
       Object.assign(event, data.applicationEvents[index])
     );
-
-    // reservation units
-    // todo this is temporary solution
-    if (applicationEvent.eventReservationUnits.length === 0) {
-      reservationUnits.forEach((ru, index) =>
-        applicationEvent.eventReservationUnits.push({
-          reservationUnit: ru.id,
-          priority: index,
-        } as EventReservationUnit)
-      );
-    }
   };
 
   // todo rename this function
@@ -127,6 +111,7 @@ const Page1 = ({
             index={index}
             applicationPeriod={applicationPeriod}
             optionTypes={optionTypes}
+            selectedReservationUnits={selectedReservationUnits}
           />
         );
       })}
