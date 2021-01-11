@@ -18,6 +18,8 @@ import environ
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 
+from tilavarauspalvelu.loggers import LOGGING_CONSOLE, LOGGING_ELASTIC
+
 logger = logging.getLogger("settings")
 
 
@@ -74,6 +76,8 @@ INSTALLED_APPS = [
     "mptt",
     "django_filters",
     "corsheaders",
+    "auditlog",
+    "elasticapm.contrib.django",
 ]
 
 MIDDLEWARE = [
@@ -86,6 +90,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
+    "auditlog.middleware.AuditlogMiddleware",
 ]
 
 ROOT_URLCONF = "tilavarauspalvelu.urls"
@@ -134,11 +139,17 @@ env = environ.Env(
     MAIL_MAILGUN_API=(str, ""),
     RESOURCE_DEFAULT_TIMEZONE=(str, "Europe/Helsinki"),
     CORS_ALLOWED_ORIGINS=(list, []),
+    ELASTIC_APM_SERVER_URL=(str, None),
+    ELASTIC_APM_SERVICE_NAME=(str, None),
+    ELASTIC_APM_SECRET_TOKEN=(str, None),
+    AUDIT_LOGGING_ENABLED=(bool, False),
 )
 environ.Env.read_env()
 
 ALLOWED_HOSTS = env("ALLOWED_HOSTS")
 DEBUG = env("DEBUG")
+
+LOGGING = LOGGING_ELASTIC if env("ELASTIC_APM_SERVER_URL") else LOGGING_CONSOLE
 
 # Database configuration
 DATABASES = {"default": env.db()}
@@ -175,6 +186,8 @@ USE_X_FORWARDED_HOST = env("TRUST_X_FORWARDED_HOST")
 
 # Configure cors
 CORS_ALLOWED_ORIGINS = env("CORS_ALLOWED_ORIGINS")
+
+AUDIT_LOGGING_ENABLED = env("AUDIT_LOGGING_ENABLED")
 
 # Configure sentry
 if env("SENTRY_DSN"):

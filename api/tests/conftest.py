@@ -25,6 +25,11 @@ from resources.models import Resource
 from spaces.models import District, Location, Space
 
 
+@pytest.fixture(autouse=True)
+def setup_audit_log(settings):
+    settings.AUDIT_LOGGING_ENABLED = False
+
+
 @pytest.mark.django_db
 @pytest.fixture
 def user():
