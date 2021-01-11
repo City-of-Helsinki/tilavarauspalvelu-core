@@ -108,6 +108,7 @@ const translations: Translations = {
     submit: ['Lähetä'],
     false: ['ei'],
     true: ['kyllä'],
+    close: ['Sulje'],
   },
   Navigation: {
     Item: {
@@ -146,6 +147,9 @@ const translations: Translations = {
   },
   ReservationUnitModal: {
     selectReservationUnit: ['Lisää hakemukselle'],
+    okButton: ['Lisää valitut'],
+    heading: ['Hae tiloja hakemukselle'],
+    searchTermLabel: ['Sanahaku'],
   },
   ReservationUnit: {
     backToSearch: ['Takaisin hakutuloksiin'],

@@ -212,6 +212,7 @@ const ReservationUnitList = ({
         </Button>
       </div>
       <Modal
+        okLabel={t('ReservationUnitModal.okButton')}
         handleClose={(add: boolean) => {
           setShowModal(false);
           if (add) {

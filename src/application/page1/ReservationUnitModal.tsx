@@ -91,8 +91,8 @@ const ReservationUnitModal = ({
 
   return (
     <div className={styles.mainContainer}>
-      <h2>{t('ReservationUnitModal.title')}</h2>
-      <span>{applicationPeriod.name}</span>
+      <div className={styles.heading}>{t('ReservationUnitModal.heading')}</div>
+      <span className={styles.text}>{applicationPeriod.name}</span>
       <SearchInput
         className={styles.searchInput}
         label={t('ReservationUnitModal.searchTermLabel')}

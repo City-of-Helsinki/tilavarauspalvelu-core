@@ -7,9 +7,15 @@ type Props = {
   handleClose: (ok: boolean) => void;
   show: boolean;
   children: React.ReactNode;
+  okLabel: string;
 };
 
-const Modal = ({ handleClose, show, children }: Props): JSX.Element | null => {
+const Modal = ({
+  handleClose,
+  show,
+  okLabel,
+  children,
+}: Props): JSX.Element | null => {
   const { t } = useTranslation();
 
   if (!show) {
@@ -27,10 +33,10 @@ const Modal = ({ handleClose, show, children }: Props): JSX.Element | null => {
       <div className={`${styles.modal}`}>
         <section className={styles.mainContainer}>{children}</section>
         <div className={styles.buttonContainer}>
-          <Button onClick={() => handleClose(false)}>
+          <Button variant="secondary" onClick={() => handleClose(false)}>
             {t('common.close')}
           </Button>
-          <Button onClick={() => handleClose(true)}>{t('common.ok')}</Button>
+          <Button onClick={() => handleClose(true)}>{okLabel}</Button>
         </div>
       </div>
     </>
