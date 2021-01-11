@@ -142,7 +142,6 @@ const ReservationUnitList = ({
   const [selected, setSelected] = useState<ReservationUnit[]>([]);
 
   const handleAdd = (ru: ReservationUnit) => {
-    console.log('handling add!!', ru);
     setSelected([...selected, ru]);
   };
 
@@ -215,8 +214,6 @@ const ReservationUnitList = ({
       <Modal
         handleClose={(add: boolean) => {
           setShowModal(false);
-          console.log('handling close', add, reservationUnits);
-          console.log('handling close', add, selected);
           if (add) {
             setReservationUnits([...reservationUnits, ...selected]);
           }
