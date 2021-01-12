@@ -89,6 +89,8 @@ const ReservationUnitModal = ({
     return getReservationUnits({ search: q });
   }, [q]);
 
+  const filtered = currentReservationUnits.concat(selected).map((ru) => ru.id);
+
   return (
     <div className={styles.mainContainer}>
       <div className={styles.heading}>{t('ReservationUnitModal.heading')}</div>
@@ -102,9 +104,7 @@ const ReservationUnitModal = ({
       />
       <div className={styles.results}>
         {results.value
-          ?.filter(
-            (ru) => !currentReservationUnits.concat(selected).includes(ru)
-          )
+          ?.filter((ru) => !filtered.includes(ru.id))
           .map((ru) => {
             return (
               <ReservationUnitCard

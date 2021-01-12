@@ -126,17 +126,6 @@ const ReservationUnitList = ({
   const [reservationUnits, setReservationUnits] = useState(
     [] as ReservationUnit[]
   );
-  const move = (
-    units: ReservationUnit[],
-    from: number,
-    to: number
-  ): ReservationUnit[] => {
-    const copy = [...units];
-    const i = units[from];
-    copy.splice(from, 1);
-    copy.splice(to, 0, i);
-    return copy;
-  };
 
   // selected in dialog
   const [selected, setSelected] = useState<ReservationUnit[]>([]);
@@ -168,6 +157,18 @@ const ReservationUnitList = ({
     setReservationUnits(data);
     return data;
   }, [applicationEvent.eventReservationUnits]);
+
+  const move = (
+    units: ReservationUnit[],
+    from: number,
+    to: number
+  ): ReservationUnit[] => {
+    const copy = [...units];
+    const i = units[from];
+    copy.splice(from, 1);
+    copy.splice(to, 0, i);
+    return copy;
+  };
 
   const remove = (reservationUnit: ReservationUnit) => {
     setReservationUnits([
