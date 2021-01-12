@@ -178,7 +178,7 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
                   value={applicationEvent.applicationEventSchedules
                     .filter((s) => s.day === index)
                     .map((s, i) => (
-                      <span>
+                      <span key={s.id}>
                         {i !== 0 ? ', ' : ''}
                         {s.begin.substring(0, 5)} - {s.end.substring(0, 5)}
                       </span>
