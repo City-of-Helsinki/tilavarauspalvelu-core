@@ -52,6 +52,7 @@ const Day = ({
           type="button"
           onMouseDown={() => {
             if (isTouchDevice) {
+              setCellValue(cell, !cell.state);
               return;
             }
             setPaintState(!cell.state);

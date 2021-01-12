@@ -6,13 +6,6 @@
   font-weight: bold;
 }
 
-.calendarContainer {
-  margin-top: var(--spacing-layout-s);
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  column-gap: 6px;
-}
-
 .calendarHead {
   font-family: HelsinkiGrotesk-Bold, var(--font-default);
   font-size: var(--fontsize-body-l);
@@ -51,17 +44,5 @@
 
   button {
     margin-left: var(--spacing-layout-xs);
-  }
-}
-
-@media (max-width: $breakpoint-m) {
-  .calendarContainer {
-    grid-template-columns: 1fr 1fr 1fr 1fr;
-  }
-}
-
-@media (max-width: $breakpoint-s) {
-  .calendarContainer {
-    grid-template-columns: 1fr 1fr;
   }
 }

@@ -1,3 +1,5 @@
+@import '~hds-design-tokens/lib/all.scss';
+
 .calendarContainer {
   margin-top: var(--spacing-layout-s);
   display: grid;
@@ -40,4 +42,16 @@
   flex-direction: row;
   margin-top: var(--spacing-layout-l);
   margin-bottom: var(--spacing-layout-s);
+}
+
+@media (max-width: $breakpoint-m) {
+  .calendarContainer {
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+  }
+}
+
+@media (max-width: $breakpoint-xs) {
+  .calendarContainer {
+    grid-template-columns: 1fr;
+  }
 }
