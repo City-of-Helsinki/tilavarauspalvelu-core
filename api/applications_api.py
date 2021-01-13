@@ -144,18 +144,20 @@ class ApplicationEventSerializer(serializers.ModelSerializer):
     )
 
     age_group_id = serializers.PrimaryKeyRelatedField(
-        queryset=AgeGroup.objects.all(), source="age_group"
+        queryset=AgeGroup.objects.all(), source="age_group", allow_null=True
     )
 
     ability_group_id = serializers.PrimaryKeyRelatedField(
-        queryset=AbilityGroup.objects.all(), source="ability_group"
+        queryset=AbilityGroup.objects.all(), source="ability_group", allow_null=True
     )
 
     purpose_id = serializers.PrimaryKeyRelatedField(
-        queryset=Purpose.objects.all(), source="purpose"
+        queryset=Purpose.objects.all(), source="purpose", allow_null=True
     )
 
-    event_reservation_units = EventReservationUnitSerializer(many=True, read_only=False)
+    event_reservation_units = EventReservationUnitSerializer(
+        many=True, read_only=False, required=False
+    )
 
     class Meta:
         model = ApplicationEvent
