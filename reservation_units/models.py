@@ -134,7 +134,7 @@ class ReservationUnitImage(models.Model):
         related_name="images",
         on_delete=models.CASCADE,
     )
-    image_url = models.URLField(verbose_name=_("Image url"), max_length=255)
+    image = models.ImageField(null=True, blank=True, verbose_name=_("Image file"))
 
     def __str__(self):
         return "{} ({})".format(
