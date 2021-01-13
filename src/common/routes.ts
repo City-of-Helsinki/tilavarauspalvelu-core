@@ -1,7 +1,12 @@
+import Application from '../application/Application';
 import Home from '../home/Home';
 import ReservationUnit from '../reservation-unit/ReservationUnit';
 import Search from '../search/Search';
-import { getapplicationPeriods, getReservationUnit } from './api';
+import {
+  getApplicationPeriod,
+  getApplicationPeriods,
+  getReservationUnit,
+} from './api';
 import {
   ApplicationPeriod as ApplicationPeriodType,
   ReservationUnit as ReservationUnitType,
@@ -16,7 +21,7 @@ const Routes = [
     path: '/',
     exact: true,
     component: Home,
-    loadData: (): Promise<ApplicationPeriodType[]> => getapplicationPeriods(),
+    loadData: (): Promise<ApplicationPeriodType[]> => getApplicationPeriods(),
     dataKey: 'applicationPeriods',
   },
   {
@@ -29,6 +34,13 @@ const Routes = [
     loadData: (params: IDParameter): Promise<ReservationUnitType> =>
       getReservationUnit(params),
     dataKey: 'reservationUnit',
+  },
+  {
+    path: '/application/:id',
+    component: Application,
+    loadData: (params: IDParameter): Promise<ApplicationPeriodType> =>
+      getApplicationPeriod(params),
+    dataKey: 'applicationPeriod',
   },
 ];
 

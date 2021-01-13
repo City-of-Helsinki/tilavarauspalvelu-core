@@ -1,19 +1,14 @@
 import React from 'react';
-import { format, parseISO } from 'date-fns';
 import { Button, Container, IconArrowRight, IconClock } from 'hds-react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import Card from '../component/Card';
 import { ApplicationPeriod } from '../common/types';
-import { isActive } from '../common/util';
+import { isActive, formatDate } from '../common/util';
 
 interface Props {
   applicationPeriod: ApplicationPeriod;
 }
-
-const formatDate = (startDate: string) => {
-  return format(parseISO(startDate), 'd. M. yyyy');
-};
 
 const StyledCard = styled(Card)<{ act?: boolean }>`
   @media (max-width: var(--breakpoint-s)) {

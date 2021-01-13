@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ApplicationPeriod } from '../common/types';
-import { getapplicationPeriods } from '../common/api';
+import { getApplicationPeriods } from '../common/api';
 import ApplicationPeriodCard from './ApplicationPeriodCard';
 
 interface IProps {
@@ -21,7 +21,7 @@ const ApplicationPeriodList = ({ data }: IProps): JSX.Element => {
         // eslint-disable-next-line
         window.__ROUTE_DATA__.applicationPeriods = undefined;
       } else {
-        const periods = await getapplicationPeriods();
+        const periods = await getApplicationPeriods();
         setApplicationPeriods(periods);
       }
     }

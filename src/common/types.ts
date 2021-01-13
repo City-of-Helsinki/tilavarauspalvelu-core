@@ -35,6 +35,13 @@ export type Service = {
   bufferTimeAfter: string;
 };
 
+export type Location = {
+  id: number;
+  addressStreet: string;
+  addressZip: string;
+  addressCity: string;
+};
+
 export type Image = {
   imageUrl: string;
   imageType: 'main' | 'map' | 'ground_plan' | 'other';
@@ -43,9 +50,16 @@ export type Image = {
 export type ReservationUnit = {
   id: number;
   name: string;
+  maxPersons: number;
+  requireIntroduction: boolean;
   spaces: Space[];
   resources: Resource[];
   services: Service[];
-  requireIntroduction: boolean;
   images: Image[];
+  location: Location;
+};
+
+export type Parameter = {
+  id: number;
+  name: string;
 };
