@@ -7,7 +7,7 @@
       {
         "importFrom": [
           "node_modules/hds-core/lib/base.css",
-          "src/variables.css"
+          "src/variables.scss"
         ]
       }
     ]

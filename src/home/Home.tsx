@@ -2,12 +2,37 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, IconSearch } from 'hds-react';
 import { useHistory } from 'react-router-dom';
+import styled from 'styled-components';
 import Container from '../component/Container';
 import Head from './Head';
 import ApplicationPeriods from './ApplicationPeriodList';
-import styles from './Home.module.scss';
+import { ApplicationPeriod } from '../common/types';
 
-const Home = (): JSX.Element => {
+type StaticContext = {
+  data: ApplicationPeriod[];
+};
+
+interface IProps {
+  staticContext?: StaticContext;
+}
+
+const ButtonContainer = styled.div`
+  @media (max-width: var(--breakpoint-s)) {
+    display: flex;
+    flex-direction: column;
+
+    & > button {
+      margin-bottom: var(--spacing-m);
+      margin-right: 0;
+    }
+  }
+
+  & > button {
+    margin-right: var(--spacing-m);
+  }
+`;
+
+const Home = ({ staticContext }: IProps): JSX.Element => {
   const { t } = useTranslation();
   const history = useHistory();
 
@@ -17,7 +42,7 @@ const Home = (): JSX.Element => {
       <Container>
         <h2 className="heading-l">{t('home.info.heading')}</h2>
         <p className="text-lg">{t('home.info.text')}</p>
-        <div className={styles.buttonContainer}>
+        <ButtonContainer>
           <Button
             variant="secondary"
             onClick={() => history.push('/search')}
@@ -25,12 +50,12 @@ const Home = (): JSX.Element => {
             {t('home.browseAllButton')}
           </Button>
           <Button variant="secondary">{t('home.infoButton')}</Button>
-        </div>
+        </ButtonContainer>
         <h2 className="heading-l" style={{ marginTop: 'var(--spacing-xl)' }}>
           {t('home.applicationTimes.heading')}
         </h2>
         <p className="text-lg">{t('home.applicationTimes.text')}</p>
-        <ApplicationPeriods />
+        <ApplicationPeriods data={staticContext?.data} />
       </Container>
     </>
   );

@@ -1,17 +1,21 @@
 import React from 'react';
+import styled from 'styled-components';
 
 interface Props {
   children: React.ReactNode;
 }
 
-const style = {
-  'font-size': 'var(--fontsize-heading-l)',
-} as React.CSSProperties;
+const Heading = styled.h1`
+  font-size: 'var(--fontsize-heading-l)';
+`;
+const Subheading = styled.h1`
+  font-size: 'var(--fontsize-heading-l)';
+`;
 
 export const PageTitle = ({ children }: Props): JSX.Element => {
-  return <h1 style={style}>{children}</h1>;
+  return <Heading>{children}</Heading>;
 };
 
 export const PageSubTitle = ({ children }: Props): JSX.Element => {
-  return <h2 style={style}>{children}</h2>;
+  return <Subheading>{children}</Subheading>;
 };

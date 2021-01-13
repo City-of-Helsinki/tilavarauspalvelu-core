@@ -9,12 +9,16 @@
 !public*
 !src*
 !nginx*
+!server
 
 #################################################
 # Whitelisted files
 #################################################
-!.env
+!.env*
 !package.json
 !yarn.lock
 !tsconfig.json
 !LICENSE
+!webpack.server*
+!.babel*
+!tsconfig.server*

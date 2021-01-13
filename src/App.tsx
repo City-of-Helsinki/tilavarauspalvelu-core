@@ -1,31 +1,31 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-import Home from './home/Home';
-import Search from './search/Search';
-import ReservationUnit from './reservation-unit/ReservationUnit';
+import { Route, Switch } from 'react-router-dom';
 import PageWrapper from './component/PageWrapper';
 import './i18n';
 import SelectionsListContextProvider from './context/SelectionsListContext';
 import StartApplicationBar from './component/StartApplicationBar';
+import './index.scss';
+import './variables.scss';
+import Routes from './common/routes';
 
 function App(): JSX.Element {
   return (
     <SelectionsListContextProvider>
-      <Router>
-        <PageWrapper>
-          <Switch>
-            <Route exact path="/">
-              <Home />
-            </Route>
-            <Route path="/search">
-              <Search />
-            </Route>
-            <Route path="/reservation-unit/:id">
-              <ReservationUnit />
-            </Route>
-          </Switch>
-        </PageWrapper>
-      </Router>
+      <PageWrapper>
+        <Switch>
+          {Routes.map((route) => (
+            <Route
+              key={route.path}
+              exact={route.exact}
+              path={route.path}
+              render={() => {
+                const Component = route.component;
+                return <Component />;
+              }}
+            />
+          ))}
+        </Switch>
+      </PageWrapper>
       <StartApplicationBar />
     </SelectionsListContextProvider>
   );

@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Checkbox, Select, TextInput, Button, IconSearch } from 'hds-react';
-
-import styles from './SearchForm.module.scss';
+import styled from 'styled-components';
 
 interface Props {
   // only text search is now implemented!
@@ -14,12 +13,56 @@ interface OptionType {
 
 const options = [] as OptionType[];
 
+const Container = styled.div`
+  @media (max-width: $breakpoint-m) {
+    grid-template-columns: 1fr 1fr;
+  }
+  @media (max-width: $breakpoint-s) {
+    grid-template-columns: 1fr;
+  }
+
+  margin-top: var(--spacing-s);
+  max-width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-gap: var(--spacing-m);
+  font-size: var(--fontsize-body-m);
+`;
+
+const ShowL = styled.div`
+  @media (max-width: $breakpoint-m) {
+    display: none;
+  }
+  display: block;
+`;
+
+const ShowM = styled.div`
+  @media (max-width: $breakpoint-m) {
+    display: block;
+  }
+  @media (max-width: $breakpoint-s) {
+    display: none;
+  }
+
+  display: none;
+`;
+
+const Hr = styled.hr`
+  margin-top: var(--spacing-l);
+`;
+
+const ButtonContainer = styled.div`
+  margin-top: var(--spacing-l);
+  display: flex;
+  justify-content: flex-end;
+`;
+
 const SearchForm = ({ onSearch }: Props): JSX.Element => {
   const { t } = useTranslation();
   const [q, setQ] = useState<string>();
   return (
     <>
-      <div className={styles.container}>
+      <Container>
         <TextInput
           label="&nbsp;"
           placeholder={t('SearchForm.searchTermPlaceholder')}
@@ -28,7 +71,7 @@ const SearchForm = ({ onSearch }: Props): JSX.Element => {
           onChange={(e) => setQ(e.target.value)}
         />
         <Select placeholder="Valitse" disabled options={options} label="Haku" />
-        <div className={styles.showL} />
+        <ShowL />
         <Select
           placeholder="Valitse"
           disabled
@@ -47,16 +90,16 @@ const SearchForm = ({ onSearch }: Props): JSX.Element => {
           options={options}
           label="Hinta"
         />
-        <div className={styles.showM} />
+        <ShowM />
         <Checkbox
           disabled
           id="checkbox1"
           label="Sopiva liikuntarajoitteisille"
         />
         <Checkbox disabled id="checkbox2" label="Lähimmät paikat ensin" />
-      </div>
-      <hr className={styles.hr} />
-      <div className={styles.buttonContainer}>
+      </Container>
+      <Hr />
+      <ButtonContainer>
         <Button
           onClick={() => {
             onSearch(q || '');
@@ -64,7 +107,7 @@ const SearchForm = ({ onSearch }: Props): JSX.Element => {
           iconLeft={<IconSearch />}>
           {t('SearchForm.searchButton')}
         </Button>
-      </div>
+      </ButtonContainer>
     </>
   );
 };

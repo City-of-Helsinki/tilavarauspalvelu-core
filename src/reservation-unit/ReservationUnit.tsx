@@ -20,8 +20,16 @@ const ReservationUnit = (): JSX.Element => {
 
   useEffect(() => {
     async function fetchData() {
-      const unit = await getReservationUnit({ id });
-      setReservationUnit(unit);
+      // eslint-disable-next-line
+      const backendData = window.__ROUTE_DATA__?.reservationUnit;
+      if (backendData) {
+        setReservationUnit(backendData);
+        // eslint-disable-next-line
+        window.__ROUTE_DATA__.reservationUnit = undefined;
+      } else {
+        const unit = await getReservationUnit({ id });
+        setReservationUnit(unit);
+      }
     }
     fetchData();
   }, [id]);

@@ -3,25 +3,42 @@ import { ApplicationPeriod } from '../common/types';
 import { getapplicationPeriods } from '../common/api';
 import ApplicationPeriodCard from './ApplicationPeriodCard';
 
-const ApplicationPeriodList = (): JSX.Element => {
+interface IProps {
+  data?: ApplicationPeriod[];
+}
+
+const ApplicationPeriodList = ({ data }: IProps): JSX.Element => {
   const [applicationPeriods, setApplicationPeriods] = useState<
     ApplicationPeriod[]
-  >([]);
+  >(data || []);
 
   useEffect(() => {
     async function fetchData() {
-      const periods = await getapplicationPeriods();
-      setApplicationPeriods(periods);
+      // eslint-disable-next-line
+      const backendData = window.__ROUTE_DATA__?.applicationPeriods;
+      if (backendData) {
+        setApplicationPeriods(backendData);
+        // eslint-disable-next-line
+        window.__ROUTE_DATA__.applicationPeriods = undefined;
+      } else {
+        const periods = await getapplicationPeriods();
+        setApplicationPeriods(periods);
+      }
     }
     fetchData();
   }, []);
 
   return (
-    <>
-      {applicationPeriods.map((p) => (
-        <ApplicationPeriodCard applicationPeriod={p} />
-      ))}
-    </>
+    applicationPeriods && (
+      <>
+        {applicationPeriods.map((p) => (
+          <ApplicationPeriodCard
+            applicationPeriod={p}
+            key={`${p.id}${p.name}`}
+          />
+        ))}
+      </>
+    )
   );
 };
 

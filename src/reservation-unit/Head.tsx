@@ -10,10 +10,10 @@ import {
 } from 'hds-react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
 import { ReservationUnit as ReservationUnitType } from '../common/types';
 import IconWithText from './IconWithText';
 
-import styles from './Head.module.scss';
 import {
   SelectionsListContext,
   SelectionsListContextType,
@@ -23,6 +23,23 @@ interface Props {
   reservationUnit: ReservationUnitType;
 }
 
+const Container = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-s);
+  font-weight: 500;
+`;
+
+const Props = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-s);
+`;
+
+const StyledIcon = styled(IconWithText)`
+  margin-top: var(--spacing-s);
+`;
+
 const Head = ({ reservationUnit }: Props): JSX.Element => {
   const { addReservationUnit, containsReservationUnit } = React.useContext(
     SelectionsListContext
@@ -31,19 +48,19 @@ const Head = ({ reservationUnit }: Props): JSX.Element => {
   const { t } = useTranslation();
 
   return (
-    <div className={styles.container}>
+    <Container>
       <div>
         <h1 className="heading-l">{reservationUnit.name}</h1>
         <h2 className="heading-m">{reservationUnit.spaces?.[0]?.name}</h2>
-        <div className={styles.props}>
+        <Props>
           <div>
-            <IconWithText icon={<IconInfoCircle />} text="Nuorisotalo" />
-            <IconWithText icon={<IconGroup />} text="10 henkilöä" />
-            <IconWithText icon={<IconClock />} text="Max. 2 tuntia" />
+            <StyledIcon icon={<IconInfoCircle />} text="Nuorisotalo" />
+            <StyledIcon icon={<IconGroup />} text="10 henkilöä" />
+            <StyledIcon icon={<IconClock />} text="Max. 2 tuntia" />
           </div>
           <div>
-            <IconWithText icon={<IconCalendar />} text="7€ -10€/tunti" />
-            <IconWithText
+            <StyledIcon icon={<IconCalendar />} text="7€ -10€/tunti" />
+            <StyledIcon
               icon={<IconGlyphEuro />}
               texts={[
                 ['Ma-Pe', '10:00 - 20:00'],
@@ -52,7 +69,7 @@ const Head = ({ reservationUnit }: Props): JSX.Element => {
               ]}
             />
           </div>
-        </div>
+        </Props>
         <div style={{ marginTop: 'var(--spacing-layout-xs)' }}>
           <Button
             iconLeft={<IconHeart />}
@@ -75,7 +92,7 @@ const Head = ({ reservationUnit }: Props): JSX.Element => {
         height="406"
         src="https://api.hel.fi/respa/resource_image/671?dim=588x406"
       />
-    </div>
+    </Container>
   );
 };
 
