@@ -54,8 +54,28 @@ def resource():
 
 
 @pytest.fixture
-def space(location):
-    return Space.objects.create(name="Space", location=location)
+def parent_space(location):
+    return Space.objects.create(name="Parent space", location=location)
+
+
+@pytest.fixture
+def space(location, parent_space):
+    return Space.objects.create(name="Space", location=location, parent=parent_space)
+
+
+@pytest.fixture
+def child_space(location, space):
+    return Space.objects.create(name="Child space", location=location, parent=space)
+
+
+@pytest.fixture
+def reservation_unit_with_parent_space(resource, parent_space):
+    reservation_unit = ReservationUnit.objects.create(
+        name="Parent space test reservation unit", require_introduction=False
+    )
+    reservation_unit.resources.set([resource])
+    reservation_unit.spaces.set([parent_space])
+    return reservation_unit
 
 
 @pytest.fixture
@@ -65,6 +85,24 @@ def reservation_unit(resource, space):
     )
     reservation_unit.resources.set([resource])
     reservation_unit.spaces.set([space])
+    return reservation_unit
+
+
+@pytest.fixture
+def reservation_unit_with_child_space(resource, child_space):
+    reservation_unit = ReservationUnit.objects.create(
+        name="Child space test reservation unit", require_introduction=False
+    )
+    reservation_unit.spaces.set([child_space])
+    return reservation_unit
+
+
+@pytest.fixture
+def reservation_unit_with_resource(resource, space):
+    reservation_unit = ReservationUnit.objects.create(
+        name="Test reservation unit with resource", require_introduction=False
+    )
+    reservation_unit.resources.set([resource])
     return reservation_unit
 
 

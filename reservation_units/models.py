@@ -105,17 +105,26 @@ class ReservationUnit(models.Model):
         return Introduction.objects.filter(reservation_unit=self, user=user).exists()
 
     def check_reservation_overlap(self, start_time, end_time):
-        from reservations.models import Reservation
+        from reservations.models import STATE_CHOICES, Reservation
+
+        spaces = []
+
+        for space in self.spaces.all():
+            spaces += list(space.get_family())
 
         reservation_units_with_same_components = ReservationUnit.objects.filter(
-            Q(resources__in=self.resources.all()) | Q(spaces__in=self.spaces.all())
-        )
+            Q(resources__in=self.resources.all()) | Q(spaces__in=spaces)
+        ).distinct()
 
-        return Reservation.objects.filter(
-            reservation_unit__in=reservation_units_with_same_components,
-            end__gt=start_time,
-            begin__lt=end_time,
-        ).exists()
+        return (
+            Reservation.objects.filter(
+                reservation_unit__in=reservation_units_with_same_components,
+                end__gt=start_time,
+                begin__lt=end_time,
+            )
+            .exclude(state__in=[STATE_CHOICES.CANCELLED, STATE_CHOICES.DENIED])
+            .exists()
+        )
 
 
 class ReservationUnitImage(models.Model):
