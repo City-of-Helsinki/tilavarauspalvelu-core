@@ -45,6 +45,7 @@
     "webpack-node-externals": "^2.5.2"
   },
   "scripts": {
+    "start": "react-scripts start",
     "build": "yarn build:prod",
     "build:dev": "env-cmd -f ./.env.development react-scripts build",
     "build:prod": "env-cmd -f ./.env.production react-scripts build && yarn build-server:prod",
