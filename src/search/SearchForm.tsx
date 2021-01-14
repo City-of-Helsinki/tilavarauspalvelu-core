@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Checkbox, Select, Button, IconSearch, SearchInput } from 'hds-react';
+import { Checkbox, Select, Button, IconSearch, TextInput } from 'hds-react';
 
 import styles from './SearchForm.module.scss';
 
@@ -17,15 +17,23 @@ const options = [] as OptionType[];
 const SearchForm = ({ onSearch }: Props): JSX.Element => {
   const { t } = useTranslation();
   const [q, setQ] = useState<string>();
+
+  const search = () => {
+    onSearch(q || '');
+  };
+
   return (
     <>
       <div className={styles.container}>
-        <SearchInput
+        <TextInput
+          id="search"
           label="&nbsp;"
           helperText={t('SearchForm.searchTermPlaceholder')}
-          onSubmit={(e) => {
-            setQ(e);
-            onSearch(e);
+          onChange={(e) => setQ(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              search();
+            }
           }}
         />
         <Select placeholder="Valitse" disabled options={options} label="Haku" />
@@ -58,11 +66,7 @@ const SearchForm = ({ onSearch }: Props): JSX.Element => {
       </div>
       <hr className={styles.hr} />
       <div className={styles.buttonContainer}>
-        <Button
-          onClick={() => {
-            onSearch(q || '');
-          }}
-          iconLeft={<IconSearch />}>
+        <Button onClick={search} iconLeft={<IconSearch />}>
           {t('SearchForm.searchButton')}
         </Button>
       </div>
