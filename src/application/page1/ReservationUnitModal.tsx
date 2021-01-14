@@ -8,7 +8,6 @@ import {
 } from 'hds-react';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
 import { useAsync } from 'react-use';
 import { getReservationUnits } from '../../common/api';
 import { ApplicationPeriod, ReservationUnit } from '../../common/types';
