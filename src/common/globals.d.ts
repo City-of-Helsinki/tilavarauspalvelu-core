@@ -1,2 +1,3 @@
-// eslint-disable-next-line
-declare const __ROUTE_DATA__: any;
+interface Window {
+  __ROUTE_DATA__: any;
+}
