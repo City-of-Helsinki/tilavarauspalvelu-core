@@ -5,6 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from resources.models import Resource
 from services.models import Service
 from spaces.models import Space
+from tilavarauspalvelu.utils.auditlog_util import AuditLogger
 
 Q = models.Q
 
@@ -272,3 +273,6 @@ class Introduction(models.Model):
     )
 
     completed_at = models.DateTimeField(verbose_name=_("Completed at"))
+
+
+AuditLogger.register(ReservationUnit)
