@@ -11,7 +11,6 @@ import setupProxy from '../src/setupProxy';
 import { ServerStyleSheet } from 'styled-components';
 
 const PORT = process.env.PORT || 3000;
-console.log('port', PORT, process.env.PORT);
 const app = express();
 
 app.use(express.static('build', { index: false }));

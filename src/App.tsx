@@ -5,7 +5,7 @@ import './i18n';
 import SelectionsListContextProvider from './context/SelectionsListContext';
 import StartApplicationBar from './component/StartApplicationBar';
 import './index.scss';
-import './variables.scss';
+import './variables.css';
 import Routes from './common/routes';
 
 function App(): JSX.Element {
