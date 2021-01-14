@@ -7,22 +7,28 @@ import Breadcrumb from '../component/Breadcrumb';
 type HeadProps = {
   heading: string;
   text: string;
+  breadCrumbText: string;
   korosType: KorosType;
 };
 
-const Head = ({ text, heading, korosType }: HeadProps): JSX.Element => {
+const Head = ({
+  text,
+  heading,
+  korosType,
+  breadCrumbText,
+}: HeadProps): JSX.Element => {
   const { t } = useTranslation();
   return (
     <div className={styles.container}>
       <div className={styles.content}>
         <Breadcrumb
           current={{
-            label: `${t('breadcrumb.application')} - ${text}`,
+            label: `${t('breadcrumb.application')} - ${breadCrumbText}`,
             linkTo: '#',
           }}
         />
         <h1 className={styles.heading}>{heading}</h1>
-        <span>{text}</span>
+        <span className={styles.text}>{text}</span>
       </div>
       <Koros
         flipHorizontal

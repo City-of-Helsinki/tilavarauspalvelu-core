@@ -46,7 +46,8 @@ const ReservationUnitCard = ({ reservationUnit }: Props): JSX.Element => {
           {reservationUnit.spaces[0]?.name}
         </span>
         <span className={styles.bottom}>
-          <IconInfoCircle /> <span>Nuorisotalo</span>
+          <IconInfoCircle />{' '}
+          <span>{reservationUnit.reservationUnitType.name}</span>
           <IconGroup /> <span>{reservationUnit.maxPersons}</span>
           <IconLocation />{' '}
           <span>

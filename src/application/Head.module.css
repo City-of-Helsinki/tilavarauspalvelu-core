@@ -1,5 +1,10 @@
 .heading {
+  font-family: HelsinkiGrotesk-Bold, var(--font-default);
   font-size: var(--fontsize-heading-l);
+}
+
+.text {
+  font-family: HelsinkiGrotesk-Bold, var(--font-default);
 }
 
 .container {

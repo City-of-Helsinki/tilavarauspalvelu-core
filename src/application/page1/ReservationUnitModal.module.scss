@@ -49,3 +49,27 @@
   padding: $spacing-s $spacing-m;
   align-items: flex-end;
 }
+
+.mainContainer {
+  background-color: white;
+  margin: 2em 4em;
+}
+
+.results {
+  height: 60vh;
+  overflow-y: auto;
+}
+
+.searchInput {
+  margin-top: 2em;
+}
+
+.text {
+  font-family: HelsinkiGrotesk-Bold;
+  font-size: var(--fontsize-heading-s);
+}
+
+.heading {
+  font-family: HelsinkiGrotesk-Bold;
+  font-size: var(--fontsize-heading-l);
+}

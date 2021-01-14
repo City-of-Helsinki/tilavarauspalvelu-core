@@ -1,3 +1,5 @@
+@import '~hds-design-tokens/lib/all.scss';
+
 .container {
   display: grid;
   gap: 6em;
@@ -5,6 +7,7 @@
 }
 
 .navigationContainer {
+  font-family: HelsinkiGrotesk-Bold, var(--font-default);
   font-size: var(--fontsize-body-l);
   font-weight: 500;
   & ul {
@@ -25,5 +28,12 @@
 .activeClass {
   & > li {
     background-color: #e8f3fc;
+  }
+}
+
+@media (max-width: $breakpoint-l) {
+  .container {
+    grid-template-columns: 2fr;
+    gap: 0;
   }
 }

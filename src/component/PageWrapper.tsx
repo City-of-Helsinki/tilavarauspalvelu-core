@@ -11,6 +11,11 @@ export default function NavigationAndFooterWrapper(props: Props): JSX.Element {
     <>
       <Navigation />
       {props.children}
+      <div
+        style={{
+          marginTop: 'var(--spacing-layout-xl)',
+        }}
+      />
       <Footer />
     </>
   );

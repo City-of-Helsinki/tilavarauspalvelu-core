@@ -21,7 +21,7 @@ const Breadcrumb = ({ current }: Props): JSX.Element => {
   return (
     <nav aria-label="breadcrumbs" className={styles.container}>
       {breadcrumbs.map((bc, i) => (
-        <>
+        <span key={bc.label}>
           {i > 0 && ' › '}
           <NavLink
             isActive={() => i === breadcrumbs.length - 1}
@@ -29,7 +29,7 @@ const Breadcrumb = ({ current }: Props): JSX.Element => {
             to={bc.linkTo || ''}>
             {t(bc.label)}
           </NavLink>
-        </>
+        </span>
       ))}
     </nav>
   );

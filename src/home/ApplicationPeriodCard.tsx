@@ -35,24 +35,24 @@ const ApplicationPeriodCard = ({ applicationPeriod }: Props): JSX.Element => {
                 ),
               })}
         </div>
-        <div className={styles.linkContainer}>
-          <span className={styles.linkIcon}>
-            <IconArrowRight />
-          </span>
-          <span className={styles.linkText}>
-            {t('ApplicationPeriodCard.criteria')}
-          </span>
-        </div>
+        <Button
+          id={styles.noLeftMargin}
+          variant="supplementary"
+          iconLeft={<IconArrowRight />}
+          disabled>
+          {t('ApplicationPeriodCard.criteria')}
+        </Button>
       </Container>
       {active ? (
-        <Button className={styles.button}>
+        <Button className={styles.button} disabled>
           {t('ApplicationPeriodCard.applyButton')}
         </Button>
       ) : (
         <Button
           iconLeft={<IconClock />}
           variant="secondary"
-          className={styles.button}>
+          className={styles.button}
+          disabled>
           {t('ApplicationPeriodCard.reminderButton')}
         </Button>
       )}

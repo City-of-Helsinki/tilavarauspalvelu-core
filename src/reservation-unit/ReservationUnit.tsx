@@ -4,34 +4,31 @@ import Container from '../component/Container';
 import { ReservationUnit as ReservationUnitType } from '../common/types';
 import { getReservationUnit } from '../common/api';
 import Head from './Head';
-import Back from './Back';
-import Notification from './Notification';
 
 type ParamTypes = {
   id: string;
 };
 
-const ReservationUnit = (): JSX.Element => {
+const ReservationUnit = (): JSX.Element | null => {
   const { id } = useParams<ParamTypes>();
 
-  const [reservationUnit, setReservationUnit] = useState<ReservationUnitType>(
-    {} as ReservationUnitType
-  );
+  const [
+    reservationUnit,
+    setReservationUnit,
+  ] = useState<ReservationUnitType | null>(null);
 
   useEffect(() => {
     async function fetchData() {
-      const unit = await getReservationUnit({ id });
+      const unit = await getReservationUnit(Number(id));
       setReservationUnit(unit);
     }
     fetchData();
   }, [id]);
 
-  return (
+  return reservationUnit ? (
     <>
-      <Notification applicationPeriod={null} />
+      <Head reservationUnit={reservationUnit} />
       <Container>
-        <Back />
-        <Head reservationUnit={reservationUnit} />
         <div
           style={{
             display: 'grid',
@@ -51,7 +48,7 @@ const ReservationUnit = (): JSX.Element => {
         </div>
       </Container>
     </>
-  );
+  ) : null;
 };
 
 export default ReservationUnit;

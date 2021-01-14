@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, IconSearch } from 'hds-react';
+import { Button, IconSearch, ImageWithCard } from 'hds-react';
 import { useHistory } from 'react-router-dom';
 import Container from '../component/Container';
 import Head from './Head';
@@ -15,22 +15,36 @@ const Home = (): JSX.Element => {
     <>
       <Head heading={t('home.head.heading')} text={t('home.head.text')} />
       <Container>
-        <h2 className="heading-l">{t('home.info.heading')}</h2>
-        <p className="text-lg">{t('home.info.text')}</p>
-        <div className={styles.buttonContainer}>
-          <Button
-            variant="secondary"
-            onClick={() => history.push('/search')}
-            iconLeft={<IconSearch />}>
-            {t('home.browseAllButton')}
-          </Button>
-          <Button variant="secondary">{t('home.infoButton')}</Button>
+        <div className={styles.topContainer}>
+          <h2 className={styles.heading}>
+            {t('home.applicationTimes.heading')}
+          </h2>
+          <p className="text-lg">{t('home.applicationTimes.text')}</p>
         </div>
-        <h2 className="heading-l" style={{ marginTop: 'var(--spacing-xl)' }}>
-          {t('home.applicationTimes.heading')}
-        </h2>
-        <p className="text-lg">{t('home.applicationTimes.text')}</p>
         <ApplicationPeriods />
+        <ImageWithCard
+          className={`${styles.imageWithCard}`}
+          cardAlignment="right"
+          cardLayout="hover"
+          color="secondary"
+          src="https://hds.hel.fi/storybook/react/static/media/placeholder_1920x1080.4c706998.jpg">
+          <div className={styles.infoContainer}>
+            <h2 className={styles.heading}>{t('home.info.heading')}</h2>
+            <p>{t('home.info.text')}</p>
+            <div className={styles.buttonContainer}>
+              <Button
+                variant="secondary"
+                theme="black"
+                onClick={() => history.push('/search')}
+                iconLeft={<IconSearch />}>
+                {t('home.browseAllButton')}
+              </Button>
+              <Button disabled variant="secondary" theme="black">
+                {t('home.infoButton')}
+              </Button>
+            </div>
+          </div>
+        </ImageWithCard>
       </Container>
     </>
   );

@@ -35,6 +35,12 @@ Some test data can be loaded to the backend with following command:
 docker exec tilavarauspalvelu-core_dev_1 python manage.py loaddata fixtures/cases.json
 ```
 
+You can also manually add test data by visiting the django admin at http://127.0.0.1:8000/admin after you create admin user:
+
+```
+docker exec -ti tilavarauspalvelu-core_dev_1 python manage.py createsuperuser
+```
+
 ## Available Scripts
 
 In the project directory, you can run:
