@@ -74,8 +74,9 @@ const Circle = styled.div<{ passive: boolean }>`
   margin-left: var(--spacing-xs);
   height: var(--spacing-layout-m);
   width: var(--spacing-layout-m);
-  background-color: ${props => props.passive ? 'var(--color-black-50)' : 'var(--color-bus)'};
-  color: ${(props) => props.passive ? 'var(--color-black-50)' : 'white'};
+  background-color: ${(props) =>
+    props.passive ? 'var(--color-black-50)' : 'var(--color-bus)'};
+  color: ${(props) => (props.passive ? 'var(--color-black-50)' : 'white')};
   border-radius: 50%;
   display: flex;
   justify-content: center;
@@ -147,7 +148,7 @@ const ReservationUnitCard = ({
               onClick={() => onMoveUp(reservationUnit)}>
               <IconArrowUp size="m" />
             </button>
-          </div>
+          </Circle>
           <Circle passive={last}>
             <button
               className="button-reset"
@@ -156,7 +157,7 @@ const ReservationUnitCard = ({
               onClick={() => onMoveDown(reservationUnit)}>
               <IconArrowDown size="m" />
             </button>
-          </div>
+          </Circle>
         </ArrowContainer>
       </CardButtonContainer>
     </NameCardContainer>
