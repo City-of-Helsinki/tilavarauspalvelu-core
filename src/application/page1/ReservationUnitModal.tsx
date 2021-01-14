@@ -35,11 +35,7 @@ const ReservationUnitCard = ({
         }
       />
       <div className={styles.mainContent}>
-        <span className={styles.name}>
-          <Link to={`../reservation-unit/${reservationUnit.id}`}>
-            {reservationUnit.name}
-          </Link>
-        </span>
+        <span className={styles.name}>{reservationUnit.name}</span>
         <span className={styles.description}>
           {reservationUnit.spaces[0]?.name}
         </span>
