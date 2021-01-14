@@ -44,11 +44,11 @@ class Person(ContactInformation):
     REQUIRED_FOR_REVIEW = ["first_name", "last_name"]
 
     first_name = models.TextField(
-        verbose_name=_("First name"), null=False, blank=False, max_length=50
+        verbose_name=_("First name"), null=False, blank=True, max_length=50
     )
 
     last_name = models.TextField(
-        verbose_name=_("Last name"), null=False, blank=False, max_length=50
+        verbose_name=_("Last name"), null=False, blank=True, max_length=50
     )
 
 
@@ -248,7 +248,7 @@ class ApplicationEvent(models.Model):
     name = models.TextField(
         max_length=100,
         verbose_name=_("Name"),
-        null=True,
+        null=False,
         blank=True,
     )
 
@@ -262,7 +262,7 @@ class ApplicationEvent(models.Model):
         verbose_name=_("Age group"),
         to="reservations.AgeGroup",
         null=True,
-        blank=False,
+        blank=True,
         on_delete=models.SET_NULL,
     )
 
@@ -270,12 +270,12 @@ class ApplicationEvent(models.Model):
         verbose_name=_("Ability group"),
         to="reservations.AbilityGroup",
         null=True,
-        blank=False,
+        blank=True,
         on_delete=models.SET_NULL,
     )
 
     min_duration = models.DurationField(
-        verbose_name=_("Minimum duration"), null=False, blank=False
+        verbose_name=_("Minimum duration"), null=True, blank=True
     )
 
     max_duration = models.DurationField(
@@ -283,16 +283,16 @@ class ApplicationEvent(models.Model):
     )
 
     events_per_week = models.PositiveIntegerField(
-        verbose_name=_("Events per week"), null=False, blank=False
+        verbose_name=_("Events per week"), null=True, blank=True
     )
 
     biweekly = models.BooleanField(
         verbose_name=_("Every second week only"), default=False, null=False, blank=True
     )
 
-    begin = models.DateField(verbose_name=_("Start date"), null=False, blank=False)
+    begin = models.DateField(verbose_name=_("Start date"), null=True, blank=True)
 
-    end = models.DateField(verbose_name=_("End date"), null=False, blank=False)
+    end = models.DateField(verbose_name=_("End date"), null=True, blank=True)
 
     application = models.ForeignKey(
         Application,
