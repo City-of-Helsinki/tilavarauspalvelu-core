@@ -1,5 +1,6 @@
 import { Button, IconArrowLeft } from 'hds-react';
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import styles from './Preview.module.scss';
 import { Application, ReservationUnit, Parameter } from '../../common/types';
@@ -77,6 +78,16 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
     application.status = 'review';
     onNext();
   };
+
+  // application not saved yet
+  if (!application.id) {
+    return (
+      <>
+        <h1>{t('Application.preview.noData.heading')}</h1>
+        <Link to="page1">{t('Application.preview.noData.text')}</Link>
+      </>
+    );
+  }
 
   return ready ? (
     <>

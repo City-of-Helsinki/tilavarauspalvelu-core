@@ -68,6 +68,10 @@ const translations: Translations = {
       'applicationEvent.biweekly': ['Vakiovuorot vain joka toinen viikko'],
       'applicationEvent.reservationUnit': ['Vaihtoehto {{order}}.'],
       applicationEventSchedules: ['Toivotut ajat'],
+      noData: {
+        heading: ['Lomakkeen tietoja ei ole vielä olemassa'],
+        text: ['Täytä ensin lomake.'],
+      },
     },
   },
   ApplicationPage: {
