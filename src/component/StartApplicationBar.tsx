@@ -48,7 +48,7 @@ const StartApplicationBar = (): JSX.Element | null => {
             }}
             variant="secondary"
             iconRight={<IconArrowRight />}
-            onClick={() => history.push(`/application/1/page1`)}>
+            onClick={() => history.push(`/application/1/new/page1`)}>
             {t('shoppingCart.next')}
           </Button>
         </div>

@@ -7,6 +7,7 @@ import Breadcrumb from '../component/Breadcrumb';
 type HeadProps = {
   heading: string;
   text: string;
+  breadCrumbText: string;
   korosType: KorosType;
 };
 
@@ -31,14 +32,19 @@ const StyledKoros = styled(Koros)`
   fill: var(--tilavaraus-header-background-color);
 `;
 
-const Head = ({ text, heading, korosType }: HeadProps): JSX.Element => {
+const Head = ({
+  text,
+  heading,
+  korosType,
+  breadCrumbText,
+}: HeadProps): JSX.Element => {
   const { t } = useTranslation();
   return (
     <Container>
       <Content>
         <Breadcrumb
           current={{
-            label: `${t('breadcrumb.application')} - ${text}`,
+            label: `${t('breadcrumb.application')} - ${breadCrumbText}`,
             linkTo: '#',
           }}
         />

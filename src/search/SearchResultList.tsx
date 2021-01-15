@@ -86,7 +86,7 @@ const SearchResultList = ({ search }: Props): JSX.Element => {
         {t('SearchResultList.count', { count: reservationUnits.length })}
       </HitCount>
       <ButtonContainer>
-        <StyledButton iconLeft={<IconMenuHamburger />}>
+        <StyledButton theme="black" iconLeft={<IconMenuHamburger />}>
           {t('SearchResultList.listButton')}
         </StyledButton>
         <StyledSecondaryButton

@@ -40,24 +40,25 @@ const Name = styled.div`
   font-weight: 500;
 `;
 
-const LinkContainer = styled.div`
-  line-height: var(--lineheight-s);
-  color: var(--color-bus);
-  font-weight: 500;
-`;
-
-const LinkToken = styled.span`
-  vertical-align: middle;
-  display: inline-block;
-  margin: var(--spacing-s) var(--spacing-xs) 0 0;
-`;
-
-const CardButton = styled(Button)`
+const CardButton = styled(Button)<{ noLeftMargin?: boolean }>`
   @media (max-width: var(--breakpoint-s)) {
     justify-self: center;
   }
 
-  justify-self: right;
+  ${(props) =>
+    props.noLeftMargin
+      ? `
+        margin-left: 0;
+        padding-left: 0;
+        border-left: none;
+
+        & > div {
+           margin-left: 0;
+        }
+    `
+      : `
+        justify-self: right;
+  `}
 `;
 
 const ApplicationPeriodCard = ({ applicationPeriod }: Props): JSX.Element => {
@@ -83,17 +84,20 @@ const ApplicationPeriodCard = ({ applicationPeriod }: Props): JSX.Element => {
                 ),
               })}
         </div>
-        <LinkContainer>
-          <LinkToken>
-            <IconArrowRight />
-          </LinkToken>
-          <LinkToken>{t('ApplicationPeriodCard.criteria')}</LinkToken>
-        </LinkContainer>
+        <CardButton
+          noLeftMargin
+          variant="supplementary"
+          iconLeft={<IconArrowRight />}
+          disabled>
+          {t('ApplicationPeriodCard.criteria')}
+        </CardButton>
       </StyledContainer>
       {active ? (
-        <CardButton>{t('ApplicationPeriodCard.applyButton')}</CardButton>
+        <CardButton disabled>
+          {t('ApplicationPeriodCard.applyButton')}
+        </CardButton>
       ) : (
-        <CardButton iconLeft={<IconClock />} variant="secondary">
+        <CardButton iconLeft={<IconClock />} variant="secondary" disabled>
           {t('ApplicationPeriodCard.reminderButton')}
         </CardButton>
       )}

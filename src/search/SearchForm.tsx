@@ -14,10 +14,10 @@ interface OptionType {
 const options = [] as OptionType[];
 
 const Container = styled.div`
-  @media (max-width: $breakpoint-m) {
+  @media (max-width: var(--breakpoint-m)) {
     grid-template-columns: 1fr 1fr;
   }
-  @media (max-width: $breakpoint-s) {
+  @media (max-width: var(--breakpoint-s)) {
     grid-template-columns: 1fr;
   }
 
@@ -30,17 +30,17 @@ const Container = styled.div`
 `;
 
 const ShowL = styled.div`
-  @media (max-width: $breakpoint-m) {
+  @media (max-width: var(--breakpoint-m)) {
     display: none;
   }
   display: block;
 `;
 
 const ShowM = styled.div`
-  @media (max-width: $breakpoint-m) {
+  @media (max-width: var(--breakpoint-m)) {
     display: block;
   }
-  @media (max-width: $breakpoint-s) {
+  @media (max-width: var(--breakpoint-s)) {
     display: none;
   }
 
@@ -60,15 +60,24 @@ const ButtonContainer = styled.div`
 const SearchForm = ({ onSearch }: Props): JSX.Element => {
   const { t } = useTranslation();
   const [q, setQ] = useState<string>();
+
+  const search = () => {
+    onSearch(q || '');
+  };
+
   return (
     <>
       <Container>
         <TextInput
-          label="&nbsp;"
-          placeholder={t('SearchForm.searchTermPlaceholder')}
           id="search"
-          value={q}
+          label="&nbsp;"
+          helperText={t('SearchForm.searchTermPlaceholder')}
           onChange={(e) => setQ(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              search();
+            }
+          }}
         />
         <Select placeholder="Valitse" disabled options={options} label="Haku" />
         <ShowL />
@@ -100,11 +109,7 @@ const SearchForm = ({ onSearch }: Props): JSX.Element => {
       </Container>
       <Hr />
       <ButtonContainer>
-        <Button
-          onClick={() => {
-            onSearch(q || '');
-          }}
-          iconLeft={<IconSearch />}>
+        <Button onClick={search} iconLeft={<IconSearch />}>
           {t('SearchForm.searchButton')}
         </Button>
       </ButtonContainer>

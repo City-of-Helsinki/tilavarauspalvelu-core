@@ -6,9 +6,10 @@ import Container from '../component/Container';
 import Head from './Head';
 
 type ApplicationPageProps = {
-  heading: string;
-  text: string;
+  translationKeyPrefix: string;
   match: { url: string };
+  breadCrumbText: string;
+  overrideText?: string;
   children?: React.ReactNode;
 };
 
@@ -48,8 +49,9 @@ const StyledNavLink = styled(NavLink).attrs({
 `;
 
 const ApplicationPage = ({
-  heading,
-  text,
+  translationKeyPrefix,
+  breadCrumbText,
+  overrideText,
   children,
   match,
 }: ApplicationPageProps): JSX.Element => {
@@ -57,7 +59,12 @@ const ApplicationPage = ({
 
   return (
     <>
-      <Head korosType="storm" heading={heading} text={text} />
+      <Head
+        korosType="storm"
+        heading={t(`${translationKeyPrefix}.heading`)}
+        text={overrideText || t(`${translationKeyPrefix}.text`)}
+        breadCrumbText={breadCrumbText}
+      />
       <Container main>
         <InnerContainer>
           <NavigationContainer>
@@ -79,8 +86,8 @@ const ApplicationPage = ({
               </StyledNavLink>
               <StyledNavLink
                 activeClassName={activeClassName}
-                to={`${match.url}/page4`}>
-                <li>{t('ApplicationPage.navigation.page4')}</li>
+                to={`${match.url}/preview`}>
+                <li>{t('ApplicationPage.navigation.preview')}</li>
               </StyledNavLink>
             </ul>
           </NavigationContainer>

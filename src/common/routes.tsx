@@ -2,17 +2,13 @@ import Application from '../application/Application';
 import Home from '../home/Home';
 import ReservationUnit from '../reservation-unit/ReservationUnit';
 import Search from '../search/Search';
-import {
-  getApplicationPeriod,
-  getApplicationPeriods,
-  getReservationUnit,
-} from './api';
+import { getApplicationPeriods, getReservationUnit } from './api';
 import {
   ApplicationPeriod as ApplicationPeriodType,
   ReservationUnit as ReservationUnitType,
 } from './types';
 
-interface IDParameter {
+interface ReservationUnitParams {
   id: string;
 }
 
@@ -27,20 +23,19 @@ const Routes = [
   {
     path: '/search',
     component: Search,
+    startApplicationBar: true,
   },
   {
     path: '/reservation-unit/:id',
     component: ReservationUnit,
-    loadData: (params: IDParameter): Promise<ReservationUnitType> =>
-      getReservationUnit(params),
+    loadData: (params: ReservationUnitParams): Promise<ReservationUnitType> =>
+      getReservationUnit(Number(params.id)),
     dataKey: 'reservationUnit',
+    startApplicationBar: true,
   },
   {
-    path: '/application/:id',
+    path: '/application/:applicationPeriodId/:applicationId',
     component: Application,
-    loadData: (params: IDParameter): Promise<ApplicationPeriodType> =>
-      getApplicationPeriod(params),
-    dataKey: 'applicationPeriod',
   },
 ];
 

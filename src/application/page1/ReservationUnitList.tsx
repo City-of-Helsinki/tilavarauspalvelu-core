@@ -5,14 +5,30 @@ import {
   IconGroup,
   IconTrash,
 } from 'hds-react';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import { ReservationUnit } from '../../common/types';
+import { useAsync } from 'react-use';
+import { getReservationUnit } from '../../common/api';
 import {
-  SelectionsListContext,
-  SelectionsListContextType,
-} from '../../context/SelectionsListContext';
+  ApplicationEvent,
+  ApplicationPeriod,
+  ReservationUnit,
+} from '../../common/types';
+import Modal from '../../component/Modal';
+import ReservationUnitModal from './ReservationUnitModal';
+
+type CardProps = {
+  order: number;
+  reservationUnit: ReservationUnit;
+  onDelete: (reservationUnit: ReservationUnit) => void;
+  first: boolean;
+  last: boolean;
+  onMoveUp: (reservationUnit: ReservationUnit) => void;
+  onMoveDown: (reservationUnit: ReservationUnit) => void;
+  t: (n: string) => string;
+};
 
 const NameCardContainer = styled.div`
   margin-top: var(--spacing-l);
@@ -75,7 +91,7 @@ const Circle = styled.div<{ passive: boolean }>`
   height: var(--spacing-layout-m);
   width: var(--spacing-layout-m);
   background-color: ${(props) =>
-    props.passive ? 'var(--color-black-50)' : 'var(--color-bus)'};
+    props.passive ? 'var(--color-black-10)' : 'var(--color-bus)'};
   color: ${(props) => (props.passive ? 'var(--color-black-50)' : 'white')};
   border-radius: 50%;
   display: flex;
@@ -92,16 +108,7 @@ const ReservationUnitCard = ({
   onMoveUp,
   onMoveDown,
   t,
-}: {
-  order: number;
-  reservationUnit: ReservationUnit;
-  onDelete: (reservationUnit: ReservationUnit) => void;
-  first: boolean;
-  last: boolean;
-  onMoveUp: (reservationUnit: ReservationUnit) => void;
-  onMoveDown: (reservationUnit: ReservationUnit) => void;
-  t: (n: string) => string;
-}): JSX.Element => {
+}: CardProps): JSX.Element => {
   return (
     <NameCardContainer>
       <PreCardLabel>
@@ -164,26 +171,105 @@ const ReservationUnitCard = ({
   );
 };
 
+type Props = {
+  selectedReservationUnits: ReservationUnit[];
+  applicationEvent: ApplicationEvent;
+  fieldName: string;
+  form: ReturnType<typeof useForm>;
+  applicationPeriod: ApplicationPeriod;
+};
+
 const MainContainer = styled.div`
   margin-top: var(--spacing-l);
 `;
 
-const ReservationUnitList = (): JSX.Element => {
+const ButtonContainer = styled.div`
+  margin-top: var(--spacing-layout-m);
+`;
+
+const ReservationUnitList = ({
+  selectedReservationUnits,
+  applicationEvent,
+  form,
+  fieldName,
+  applicationPeriod,
+}: Props): JSX.Element => {
+  const [showModal, setShowModal] = useState(false);
+  const [reservationUnits, setReservationUnits] = useState(
+    [] as ReservationUnit[]
+  );
+
+  // selected in dialog
+  const [selected, setSelected] = useState<ReservationUnit[]>([]);
+
+  const handleAdd = (ru: ReservationUnit) => {
+    setSelected([...selected, ru]);
+  };
+
+  useEffect(() => {
+    form.setValue(
+      fieldName,
+      reservationUnits.map((ru, index) => ({
+        reservationUnit: ru.id,
+        priority: index,
+      }))
+    );
+  }, [reservationUnits, fieldName, form]);
+
+  useAsync(async () => {
+    let data;
+    if (applicationEvent.eventReservationUnits.length === 0) {
+      data = selectedReservationUnits;
+    } else {
+      const promises = applicationEvent.eventReservationUnits.map((id) =>
+        getReservationUnit(id.reservationUnit)
+      );
+      data = await Promise.all(promises);
+    }
+    setReservationUnits(data);
+    return data;
+  }, [applicationEvent.eventReservationUnits]);
+
+  const move = (
+    units: ReservationUnit[],
+    from: number,
+    to: number
+  ): ReservationUnit[] => {
+    const copy = [...units];
+    const i = units[from];
+    copy.splice(from, 1);
+    copy.splice(to, 0, i);
+    return copy;
+  };
+
+  const remove = (reservationUnit: ReservationUnit) => {
+    setReservationUnits([
+      ...reservationUnits.filter((ru) => ru.id !== reservationUnit.id),
+    ]);
+  };
+
+  const moveUp = (reservationUnit: ReservationUnit) => {
+    const from = reservationUnits.indexOf(reservationUnit);
+    const to = from - 1;
+    setReservationUnits(move(reservationUnits, from, to));
+  };
+
+  const moveDown = (reservationUnit: ReservationUnit) => {
+    const from = reservationUnits.indexOf(reservationUnit);
+    const to = from + 1;
+    setReservationUnits(move(reservationUnits, from, to));
+  };
+
   const { t } = useTranslation();
-  const {
-    reservationUnits,
-    removeReservationUnit,
-    moveUp,
-    moveDown,
-  } = React.useContext(SelectionsListContext) as SelectionsListContextType;
 
   return (
     <MainContainer>
       {reservationUnits.map((ru, index, all) => {
         return (
           <ReservationUnitCard
+            key={ru.id}
             t={t}
-            onDelete={removeReservationUnit}
+            onDelete={remove}
             reservationUnit={ru}
             order={index}
             first={index === 0}
@@ -193,6 +279,27 @@ const ReservationUnitList = (): JSX.Element => {
           />
         );
       })}
+      <ButtonContainer>
+        <Button onClick={() => setShowModal(true)}>
+          {t('ReservationUnitList.add')}
+        </Button>
+      </ButtonContainer>
+      <Modal
+        okLabel={t('ReservationUnitModal.okButton')}
+        handleClose={(add: boolean) => {
+          setShowModal(false);
+          if (add) {
+            setReservationUnits([...reservationUnits, ...selected]);
+          }
+          setSelected([]);
+        }}
+        show={showModal}>
+        <ReservationUnitModal
+          currentReservationUnits={reservationUnits}
+          applicationPeriod={applicationPeriod}
+          handleAdd={handleAdd}
+        />
+      </Modal>
     </MainContainer>
   );
 };

@@ -20,13 +20,19 @@ function App(): JSX.Element {
               path={route.path}
               render={() => {
                 const Component = route.component;
-                return <Component />;
+                return route.startApplicationBar ? (
+                  <>
+                    <StartApplicationBar />
+                    <Component />
+                  </>
+                ) : (
+                  <Component />
+                );
               }}
             />
           ))}
         </Switch>
       </PageWrapper>
-      <StartApplicationBar />
     </SelectionsListContextProvider>
   );
 }
