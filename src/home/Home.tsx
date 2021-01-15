@@ -2,10 +2,52 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, IconSearch, ImageWithCard } from 'hds-react';
 import { useHistory } from 'react-router-dom';
+import styled from 'styled-components';
 import Container from '../component/Container';
 import Head from './Head';
 import ApplicationPeriods from './ApplicationPeriodList';
-import styles from './Home.module.scss';
+
+const TopContainer = styled.div`
+  margin-right: 30%;
+`;
+
+const Heading = styled.h2`
+  font-size: var(--fontsize-heading-l);
+  margin-top: var(--spacing-s);
+`;
+
+const StyledImageWithCard = styled(ImageWithCard)`
+  margin-top: var(--spacing-layout-xl);
+  width: 75rem;
+
+  & > :nth-child(2) {
+    height: auto;
+    margin: 1em;
+  }
+`;
+
+const InfoContainer = styled.div`
+  margin-top: var(--spacing-s);
+  margin-bottom: var(--spacing-m);
+`;
+
+const ButtonContainer = styled.div`
+  @media (max-width: var(--breakpoint-s)) {
+    display: flex;
+    flex-direction: column;
+
+    & > button {
+      margin-bottom: var(--spacing-m);
+      margin-right: 0;
+    }
+  }
+
+  margin-top: var(--spacing-xl);
+
+  & > button {
+    margin-top: var(--spacing-m);
+  }
+`;
 
 const Home = (): JSX.Element => {
   const { t } = useTranslation();
@@ -15,23 +57,20 @@ const Home = (): JSX.Element => {
     <>
       <Head heading={t('home.head.heading')} text={t('home.head.text')} />
       <Container>
-        <div className={styles.topContainer}>
-          <h2 className={styles.heading}>
-            {t('home.applicationTimes.heading')}
-          </h2>
+        <TopContainer>
+          <Heading>{t('home.applicationTimes.heading')}</Heading>
           <p className="text-lg">{t('home.applicationTimes.text')}</p>
-        </div>
+        </TopContainer>
         <ApplicationPeriods />
-        <ImageWithCard
-          className={`${styles.imageWithCard}`}
+        <StyledImageWithCard
           cardAlignment="right"
           cardLayout="hover"
           color="secondary"
           src="https://hds.hel.fi/storybook/react/static/media/placeholder_1920x1080.4c706998.jpg">
-          <div className={styles.infoContainer}>
-            <h2 className={styles.heading}>{t('home.info.heading')}</h2>
+          <InfoContainer>
+            <Heading>{t('home.info.heading')}</Heading>
             <p>{t('home.info.text')}</p>
-            <div className={styles.buttonContainer}>
+            <ButtonContainer>
               <Button
                 variant="secondary"
                 theme="black"
@@ -42,9 +81,9 @@ const Home = (): JSX.Element => {
               <Button disabled variant="secondary" theme="black">
                 {t('home.infoButton')}
               </Button>
-            </div>
-          </div>
-        </ImageWithCard>
+            </ButtonContainer>
+          </InfoContainer>
+        </StyledImageWithCard>
       </Container>
     </>
   );

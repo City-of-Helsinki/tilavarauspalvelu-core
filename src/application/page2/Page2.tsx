@@ -1,8 +1,8 @@
 import { Button, IconArrowLeft, IconArrowRight } from 'hds-react';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
 import { Application, ApplicationEventSchedule } from '../../common/types';
-import styles from './Page2.module.scss';
 import TimeSelector, { Cell } from './TimeSelector';
 
 type Props = {
@@ -13,6 +13,17 @@ type Props = {
 const cellLabel = (row: number): string => {
   return `${row} - ${row + 1}`;
 };
+
+const ButtonContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  margin-top: var(--spacing-layout-l);
+  justify-content: flex-end;
+
+  button {
+    margin-left: var(--spacing-layout-xs);
+  }
+`;
 
 const Page2 = ({ application, onNext }: Props): JSX.Element => {
   const firstSlotStart = 7;
@@ -130,14 +141,14 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
         );
       })}
 
-      <div className={styles.buttonContainer}>
+      <ButtonContainer>
         <Button variant="secondary" iconLeft={<IconArrowLeft />} disabled>
           {t('common.prev')}
         </Button>
         <Button iconRight={<IconArrowRight />} onClick={() => next()}>
           {t('common.next')}
         </Button>
-      </div>
+      </ButtonContainer>
     </>
   );
 

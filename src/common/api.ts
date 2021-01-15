@@ -7,7 +7,7 @@ import {
   Parameter,
 } from './types';
 
-const axiosclient = applyCaseMiddleware(axios.create());
+const axiosClient = applyCaseMiddleware(axios.create());
 
 const apiBaseUrl: string = process.env.REACT_APP_TILANVARAUS_API_URL || '';
 
@@ -38,7 +38,7 @@ async function request<T>(requestConfig: AxiosRequestConfig): Promise<T> {
   const config: AxiosRequestConfig = requestConfig;
 
   try {
-    const response: AxiosResponse<T> = await axiosclient.request<
+    const response: AxiosResponse<T> = await axiosClient.request<
       T,
       AxiosResponse<T>
     >(config);

@@ -13,11 +13,9 @@ import {
 import { useHistory } from 'react-router-dom';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-
+import styled from 'styled-components';
 import { ReservationUnit as ReservationUnitType } from '../common/types';
 import IconWithText from './IconWithText';
-
-import styles from './Head.module.scss';
 import {
   SelectionsListContext,
   SelectionsListContextType,
@@ -29,6 +27,58 @@ interface Props {
   reservationUnit: ReservationUnitType;
 }
 
+const TopContainer = styled.div`
+  background-color: white;
+`;
+
+const BackContainer = styled.div`
+  //  font-family: HelsinkiGrotesk-Bold, var(--font-default);
+  padding-top: 1em;
+  display: flex;
+  align-items: center;
+`;
+
+const BackLabel = styled.span`
+  font-size: var(--fontsize-body-s);
+  margin-left: var(--spacing-2-xs);
+`;
+
+const RightContainer = styled.div`
+  margin-top: var(--spacing-m);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-s);
+  font-weight: 500;
+
+  div > h1 {
+    margin-top: 0;
+  }
+`;
+
+const Props = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-s);
+`;
+
+const ButtonContainer = styled.div`
+  margin-top: var(--spacing-layout-xs);
+`;
+
+const ImageContainer = styled.div`
+  position: relative;
+
+  img {
+    position: absolute;
+    z-index: 3;
+  }
+`;
+
+const StyledKoros = styled(Koros)`
+  margin-top: var(--spacing-l);
+  fill: var(--tilavaraus-gray);
+`;
+
 const Head = ({ reservationUnit }: Props): JSX.Element => {
   const { addReservationUnit, containsReservationUnit } = React.useContext(
     SelectionsListContext
@@ -38,10 +88,10 @@ const Head = ({ reservationUnit }: Props): JSX.Element => {
   const history = useHistory();
 
   return (
-    <div className={styles.topContainer}>
+    <TopContainer>
       <Notification applicationPeriod={null} />
       <Container>
-        <div className={styles.backContainer}>
+        <BackContainer>
           <IconArrowLeft />
           <button
             type="button"
@@ -49,16 +99,14 @@ const Head = ({ reservationUnit }: Props): JSX.Element => {
               history.goBack();
             }}
             className="button-reset">
-            <span className={styles.backLabel}>
-              {t('ReservationUnit.backToSearch')}
-            </span>
+            <BackLabel>{t('ReservationUnit.backToSearch')}</BackLabel>
           </button>
-        </div>
-        <div className={styles.container}>
+        </BackContainer>
+        <RightContainer>
           <div>
             <h1 className="heading-l">{reservationUnit.name}</h1>
             <h2 className="heading-m">{reservationUnit.spaces?.[0]?.name}</h2>
-            <div className={styles.props}>
+            <Props>
               <div>
                 <IconWithText
                   icon={<IconInfoCircle />}
@@ -83,8 +131,8 @@ const Head = ({ reservationUnit }: Props): JSX.Element => {
                   ]}
                 />
               </div>
-            </div>
-            <div className={styles.buttonContainer}>
+            </Props>
+            <ButtonContainer>
               <Button
                 iconLeft={<IconHeart />}
                 className="margin-top-s"
@@ -100,9 +148,9 @@ const Head = ({ reservationUnit }: Props): JSX.Element => {
                 variant="secondary">
                 {t('common.selectReservationUnit')}
               </Button>
-            </div>
+            </ButtonContainer>
           </div>
-          <div className={styles.imageContainer}>
+          <ImageContainer>
             <img
               width="588"
               height="406"
@@ -111,11 +159,11 @@ const Head = ({ reservationUnit }: Props): JSX.Element => {
                 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='
               }
             />
-          </div>
-        </div>
+          </ImageContainer>
+        </RightContainer>
       </Container>
-      <Koros className={`${styles.koros} koros`} type="wave" />
-    </div>
+      <StyledKoros className="koros" type="wave" />
+    </TopContainer>
   );
 };
 

@@ -8,6 +8,7 @@ import {
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
 import { useAsync } from 'react-use';
 import { getReservationUnit } from '../../common/api';
 import {
@@ -16,8 +17,6 @@ import {
   ReservationUnit,
 } from '../../common/types';
 import Modal from '../../component/Modal';
-
-import styles from './ReservationUnitList.module.scss';
 import ReservationUnitModal from './ReservationUnitModal';
 
 type CardProps = {
@@ -31,6 +30,75 @@ type CardProps = {
   t: (n: string) => string;
 };
 
+const NameCardContainer = styled.div`
+  margin-top: var(--spacing-l);
+`;
+
+const PreCardLabel = styled.div`
+  font-size: var(--fontsize-heading-xs);
+  font-weight: 700;
+`;
+
+const CardButtonContainer = styled.div`
+  display: grid;
+  grid-template-columns: 5fr 1fr;
+  margin-top: var(--spacing-s);
+  align-items: center;
+`;
+
+const CardContainer = styled.div`
+  gap: var(--spacing-l);
+  background-color: white;
+  display: grid;
+  grid-template-columns: 1fr 4fr 1fr 1fr;
+  align-items: center;
+`;
+
+const Image = styled.img`
+  object-fit: cover;
+`;
+
+const Title = styled.div`
+  font-size: var(--fontsize-heading-m);
+  font-weight: bold;
+`;
+
+const Address = styled.div`
+  font-size: var(--fontsize-body-xs);
+`;
+
+const MaxPersonsContainer = styled.div`
+  display: flex;
+  justify-items: center;
+  font-size: var(--fontsize-body-l);
+  font-weight: bold;
+`;
+
+const MaxPersonsCountContainer = styled.span`
+  margin-left: var(--spacing-xs);
+`;
+
+const DeleteButton = styled(Button)`
+  --border-color: transparent;
+`;
+
+const ArrowContainer = styled.div`
+  display: flex;
+`;
+
+const Circle = styled.div<{ passive: boolean }>`
+  margin-left: var(--spacing-xs);
+  height: var(--spacing-layout-m);
+  width: var(--spacing-layout-m);
+  background-color: ${(props) =>
+    props.passive ? 'var(--color-black-10)' : 'var(--color-bus)'};
+  color: ${(props) => (props.passive ? 'var(--color-black-50)' : 'white')};
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
 const ReservationUnitCard = ({
   reservationUnit,
   order,
@@ -42,47 +110,44 @@ const ReservationUnitCard = ({
   t,
 }: CardProps): JSX.Element => {
   return (
-    <div className={styles.nameCardContainer}>
-      <div className={styles.preCardLabel}>
+    <NameCardContainer>
+      <PreCardLabel>
         {t('ReservationUnitList.option')} {order + 1}.
-      </div>
-      <div className={styles.cardButtonContainer}>
-        <div className={styles.cardContainer}>
-          <img
-            className={styles.image}
+      </PreCardLabel>
+      <CardButtonContainer>
+        <CardContainer>
+          <Image
             src={reservationUnit.images[0]?.imageUrl}
             width="76"
             height="99"
           />
           <div>
-            <div className={styles.title}>{reservationUnit.name}</div>
-            <div className={styles.address}>
+            <Title>{reservationUnit.name}</Title>
+            <Address>
               {reservationUnit.location?.addressStreet},
               {reservationUnit.location?.addressZip}{' '}
               {reservationUnit.location?.addressCity}
-            </div>
+            </Address>
           </div>
-          <div className={styles.maxPersonsContainer}>
+          <MaxPersonsContainer>
             <IconGroup />
-            <span className={styles.maxPersonsCountContainer}>
+            <MaxPersonsCountContainer>
               {reservationUnit.maxPersons}
-            </span>
-          </div>
+            </MaxPersonsCountContainer>
+          </MaxPersonsContainer>
           <div>
-            <Button
-              className={styles.deleteButton}
+            <DeleteButton
               variant="secondary"
               iconLeft={<IconTrash />}
               onClick={() => {
                 onDelete(reservationUnit);
               }}>
               {t('ReservationUnitList.buttonRemove')}
-            </Button>
+            </DeleteButton>
           </div>
-        </div>
-        <div className={styles.arrowContainer}>
-          <div
-            className={`${styles.circle} ${first ? styles.passiveCircle : ''}`}>
+        </CardContainer>
+        <ArrowContainer>
+          <Circle passive={first}>
             <button
               className="button-reset"
               disabled={first}
@@ -90,9 +155,8 @@ const ReservationUnitCard = ({
               onClick={() => onMoveUp(reservationUnit)}>
               <IconArrowUp size="m" />
             </button>
-          </div>
-          <div
-            className={`${styles.circle} ${last ? styles.passiveCircle : ''}`}>
+          </Circle>
+          <Circle passive={last}>
             <button
               className="button-reset"
               type="button"
@@ -100,10 +164,10 @@ const ReservationUnitCard = ({
               onClick={() => onMoveDown(reservationUnit)}>
               <IconArrowDown size="m" />
             </button>
-          </div>
-        </div>
-      </div>
-    </div>
+          </Circle>
+        </ArrowContainer>
+      </CardButtonContainer>
+    </NameCardContainer>
   );
 };
 
@@ -114,6 +178,14 @@ type Props = {
   form: ReturnType<typeof useForm>;
   applicationPeriod: ApplicationPeriod;
 };
+
+const MainContainer = styled.div`
+  margin-top: var(--spacing-l);
+`;
+
+const ButtonContainer = styled.div`
+  margin-top: var(--spacing-layout-m);
+`;
 
 const ReservationUnitList = ({
   selectedReservationUnits,
@@ -191,7 +263,7 @@ const ReservationUnitList = ({
   const { t } = useTranslation();
 
   return (
-    <div className={styles.mainContainer}>
+    <MainContainer>
       {reservationUnits.map((ru, index, all) => {
         return (
           <ReservationUnitCard
@@ -207,11 +279,11 @@ const ReservationUnitList = ({
           />
         );
       })}
-      <div className={styles.buttonContainer}>
+      <ButtonContainer>
         <Button onClick={() => setShowModal(true)}>
           {t('ReservationUnitList.add')}
         </Button>
-      </div>
+      </ButtonContainer>
       <Modal
         okLabel={t('ReservationUnitModal.okButton')}
         handleClose={(add: boolean) => {
@@ -228,7 +300,7 @@ const ReservationUnitList = ({
           handleAdd={handleAdd}
         />
       </Modal>
-    </div>
+    </MainContainer>
   );
 };
 

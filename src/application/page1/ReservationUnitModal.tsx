@@ -9,10 +9,59 @@ import {
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAsync } from 'react-use';
+import styled from 'styled-components';
 import { getReservationUnits } from '../../common/api';
 import { ApplicationPeriod, ReservationUnit } from '../../common/types';
 
-import styles from './ReservationUnitModal.module.scss';
+const Container = styled.div`
+  display: grid;
+  background-color: var(--color-white);
+  margin-top: var(--spacing-s);
+  grid-template-columns: 250px 3fr 1fr;
+`;
+
+const MainContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin: var(--spacing-m);
+`;
+
+const Actions = styled.div`
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-s) var(--spacing-m);
+  align-items: flex-end;
+`;
+
+const Name = styled.span`
+  font-family: HelsinkiGrotesk-Bold, var(--font-default);
+  font-size: var(--fontsize-heading-m);
+  font-weight: bold;
+
+  a {
+    text-decoration: none;
+    color: var(--color-black-90);
+  }
+`;
+
+const Description = styled.span`
+  font-size: var(--fontsize-body-l);
+  flex-grow: 1;
+`;
+
+const Bottom = styled.span`
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+
+  & > svg {
+    margin-right: var(--spacing-xs);
+  }
+
+  & > span:not(:first-child) {
+    margin-right: var(--spacing-layout-m);
+  }
+`;
 
 const ReservationUnitCard = ({
   reservationUnit,
@@ -23,7 +72,7 @@ const ReservationUnitCard = ({
 }) => {
   const { t } = useTranslation();
   return (
-    <div className={styles.container}>
+    <Container>
       <img
         alt={`Kuva tilasta ${reservationUnit.name}`}
         width="240"
@@ -33,12 +82,10 @@ const ReservationUnitCard = ({
           'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='
         }
       />
-      <div className={styles.mainContent}>
-        <span className={styles.name}>{reservationUnit.name}</span>
-        <span className={styles.description}>
-          {reservationUnit.spaces[0]?.name}
-        </span>
-        <span className={styles.bottom}>
+      <MainContent>
+        <Name>{reservationUnit.name}</Name>
+        <Description>{reservationUnit.spaces[0]?.name}</Description>
+        <Bottom>
           <IconInfoCircle />{' '}
           <span>{reservationUnit.reservationUnitType.name}</span>
           <IconGroup /> <span>{reservationUnit.maxPersons}</span>
@@ -48,9 +95,9 @@ const ReservationUnitCard = ({
             {reservationUnit.location?.addressZip}{' '}
             {reservationUnit.location?.addressCity}
           </span>
-        </span>
-      </div>
-      <div className={styles.actions}>
+        </Bottom>
+      </MainContent>
+      <Actions>
         <div style={{ flexGrow: 1 }} />
         <Button
           iconRight={<IconArrowRight />}
@@ -58,10 +105,34 @@ const ReservationUnitCard = ({
           variant="secondary">
           {t('ReservationUnitModal.selectReservationUnit')}
         </Button>
-      </div>
-    </div>
+      </Actions>
+    </Container>
   );
 };
+
+const MainContainer = styled.div`
+  background-color: white;
+  margin: 2em 4em;
+`;
+
+const Heading = styled.div`
+  font-family: HelsinkiGrotesk-Bold;
+  font-size: var(--fontsize-heading-l);
+`;
+
+const Text = styled.span`
+  font-family: HelsinkiGrotesk-Bold;
+  font-size: var(--fontsize-heading-s);
+`;
+
+const StyledSearchInput = styled(SearchInput)`
+  margin-top: 2em;
+`;
+
+const Results = styled.div`
+  height: 60vh;
+  overflow-y: auto;
+`;
 
 const ReservationUnitModal = ({
   applicationPeriod,
@@ -87,17 +158,16 @@ const ReservationUnitModal = ({
   const filtered = currentReservationUnits.concat(selected).map((ru) => ru.id);
 
   return (
-    <div className={styles.mainContainer}>
-      <div className={styles.heading}>{t('ReservationUnitModal.heading')}</div>
-      <span className={styles.text}>{applicationPeriod.name}</span>
-      <SearchInput
-        className={styles.searchInput}
+    <MainContainer>
+      <Heading>{t('ReservationUnitModal.heading')}</Heading>
+      <Text>{applicationPeriod.name}</Text>
+      <StyledSearchInput
         label={t('ReservationUnitModal.searchTermLabel')}
         onSubmit={(e) => {
           setQ(e);
         }}
       />
-      <div className={styles.results}>
+      <Results>
         {results.value
           ?.filter((ru) => !filtered.includes(ru.id))
           .map((ru) => {
@@ -112,8 +182,8 @@ const ReservationUnitModal = ({
               />
             );
           })}
-      </div>
-    </div>
+      </Results>
+    </MainContainer>
   );
 };
 

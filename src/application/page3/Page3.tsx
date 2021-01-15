@@ -2,7 +2,7 @@ import { Button, IconArrowLeft, IconArrowRight, TextInput } from 'hds-react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
-import styles from './Page3.module.scss';
+import styled from 'styled-components';
 import { Action, Application as ApplicationType } from '../../common/types';
 
 type Props = {
@@ -10,6 +10,43 @@ type Props = {
   dispatch: React.Dispatch<Action>;
   onNext: () => void;
 };
+
+const SubHeadline = styled.div`
+  font-family: HelsinkiGrotesk-Bold, var(--font-default);
+  margin-top: var(--spacing-layout-m);
+  font-weight: 700;
+  font-size: var(--fontsize-heading-m);
+`;
+const ButtonContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  margin-top: var(--spacing-layout-l);
+  justify-content: flex-end;
+
+  button {
+    margin-left: var(--spacing-layout-xs);
+  }
+`;
+const TwoColumnContainer = styled.div`
+  @media (max-width: var(--breakpoint-m)) {
+    grid-template-columns: 1fr;
+
+    .fullWidth {
+      grid-column-start: 1;
+      grid-column-end: 3;
+    }
+  }
+
+  margin-top: var(--spacing-m);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-m);
+
+  .fullWidth {
+    grid-column-start: 1;
+    grid-column-end: 3;
+  }
+`;
 
 const Page3 = ({
   dispatch,
@@ -34,10 +71,10 @@ const Page3 = ({
 
   return application.contactPerson != null ? (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <div className={styles.subHeadLine}>
+      <SubHeadline>
         {t('Application.Page3.asPrivatePersonSubHeading')}
-      </div>
-      <div className={styles.twoColumnContainer}>
+      </SubHeadline>
+      <TwoColumnContainer>
         <TextInput
           ref={register({ required: true })}
           label={t('Application.Page3.firstName')}
@@ -53,15 +90,15 @@ const Page3 = ({
           required
         />
         <TextInput
-          className={styles.fullWidth}
+          className="fullWidth"
           ref={register({ required: true, min: 0 })}
           label={t('Application.Page3.email')}
           id="email"
           name="email"
           type="email"
         />
-      </div>
-      <div className={styles.buttonContainer}>
+      </TwoColumnContainer>
+      <ButtonContainer>
         <Button variant="secondary" iconLeft={<IconArrowLeft />} disabled>
           {t('common.prev')}
         </Button>
@@ -70,7 +107,7 @@ const Page3 = ({
           onClick={() => handleSubmit(onSubmit)()}>
           {t('common.next')}
         </Button>
-      </div>
+      </ButtonContainer>
     </form>
   ) : null;
 };

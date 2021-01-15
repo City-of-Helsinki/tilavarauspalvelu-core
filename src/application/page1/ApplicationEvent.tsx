@@ -2,7 +2,7 @@ import { Accordion, Checkbox, Select, TextInput } from 'hds-react';
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useForm, Controller } from 'react-hook-form';
-import styles from './Page1.module.scss';
+import styled from 'styled-components';
 import ReservationUnitList from './ReservationUnitList';
 import {
   ApplicationEvent as ApplicationEventType,
@@ -29,6 +29,32 @@ type Props = {
   selectedReservationUnits: ReservationUnit[];
   optionTypes: OptionTypes;
 };
+
+const Ruler = styled.hr`
+  margin-top: var(--spacing-layout-m);
+`;
+
+const SubHeadLine = styled.div`
+  font-family: HelsinkiGrotesk-Bold, var(--font-default);
+  margin-top: var(--spacing-layout-m);
+  font-weight: 700;
+  font-size: var(--fontsize-heading-m);
+`;
+
+const TwoColumnContainer = styled.div`
+  margin-top: var(--spacing-m);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-m);
+`;
+
+const PeriodContainer = styled.div`
+  margin-top: var(--spacing-m);
+  display: grid;
+  grid-template-columns: 2fr 2fr 3fr;
+  gap: var(--spacing-m);
+  align-items: center;
+`;
 
 const ApplicationEvent = ({
   applicationEvent,
@@ -61,10 +87,10 @@ const ApplicationEvent = ({
 
   return (
     <Accordion heading={`${name}` || ''}>
-      <div className={styles.subHeadLine}>
+      <SubHeadLine>
         {t('Application.Page1.basicInformationSubHeading')}
-      </div>
-      <div className={styles.twoColumnContainer}>
+      </SubHeadLine>
+      <TwoColumnContainer>
         <TextInput
           ref={form.register({ required: true })}
           label={t('Application.Page1.name')}
@@ -107,7 +133,7 @@ const ApplicationEvent = ({
           )}
         />
         <Select
-          className={styles.fullWidth}
+          style={{ gridColumnStart: 1, gridColumnEnd: 3 }}
           placeholder="Valitse"
           required
           options={purposeOptions}
@@ -120,11 +146,9 @@ const ApplicationEvent = ({
             purposeOptions
           )}
         />
-      </div>
-      <hr className={styles.ruler} />
-      <div className={styles.subHeadLine}>
-        {t('Application.Page1.spacesSubHeading')}
-      </div>
+      </TwoColumnContainer>
+      <Ruler />
+      <SubHeadLine>{t('Application.Page1.spacesSubHeading')}</SubHeadLine>
       <ReservationUnitList
         selectedReservationUnits={selectedReservationUnits}
         applicationEvent={applicationEvent}
@@ -132,11 +156,11 @@ const ApplicationEvent = ({
         form={form}
         fieldName={fieldName('eventReservationUnits')}
       />
-      <hr className={styles.ruler} />
-      <div className={styles.subHeadLine}>
+      <Ruler />
+      <SubHeadLine>
         {t('Application.Page1.applicationPeriodSubHeading')}
-      </div>
-      <div className={styles.periodContainer}>
+      </SubHeadLine>
+      <PeriodContainer>
         <TextInput
           type="date"
           ref={form.register({ required: true })}
@@ -175,7 +199,7 @@ const ApplicationEvent = ({
         <Checkbox id="durationCheckbox" checked label="1t" />
         <TextInput
           ref={form.register()}
-          className={styles.fullWidth}
+          style={{ gridColumnStart: 1, gridColumnEnd: 3 }}
           label={t('Application.Page1.eventsPerWeek')}
           id={fieldName('eventsPerWeek')}
           name={fieldName('eventsPerWeek')}
@@ -197,7 +221,7 @@ const ApplicationEvent = ({
             );
           }}
         />
-      </div>
+      </PeriodContainer>
     </Accordion>
   );
 };

@@ -4,6 +4,9 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@babel/core": "^7.12.10",
+    "@babel/preset-env": "^7.12.11",
+    "@babel/preset-react": "^7.12.10",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
@@ -12,9 +15,15 @@
     "@types/react": "^16.9.53",
     "@types/react-dom": "^16.9.8",
     "@types/react-router-dom": "^5.1.6",
+    "@types/styled-components": "^5.1.7",
     "axios": "^0.21.0",
     "axios-case-converter": "^0.6.0",
+    "babel-loader": "8.1.0",
     "date-fns": "^2.16.1",
+    "dotenv-webpack": "^6.0.0",
+    "env-cmd": "^10.1.0",
+    "eslint-config-airbnb-typescript-prettier": "^4.1.0",
+    "express": "^4.17.1",
     "hds-core": "^0.19.0",
     "hds-design-tokens": "^0.19.0",
     "hds-react": "^0.19.0",
@@ -28,17 +37,29 @@
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.1",
     "react-use": "^15.3.6",
+    "serialize-javascript": "^5.0.1",
+    "styled-components": "^5.2.1",
+    "ts-loader": "^8.0.12",
     "typescript": "4.0.3",
-    "web-vitals": "^0.2.4"
+    "web-vitals": "^0.2.4",
+    "webpack-cli": "^4.2.0",
+    "webpack-node-externals": "^2.5.2"
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "yarn build:prod",
+    "build:dev": "env-cmd -f ./.env.development react-scripts build",
+    "build:prod": "env-cmd -f ./.env.production react-scripts build && yarn build-server:prod",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "lint": "eslint --ext ts,tsx src",
     "lint:css": "stylelint 'src/**/*.scss'",
-    "ts-check": "tsc --noEmit --project tsconfig.json"
+    "ts-check": "tsc --noEmit --project tsconfig.json",
+    "build-server:prod": "NODE_ENV=production webpack --config webpack.server.production.js --mode=production",
+    "build-server:dev": "NODE_ENV=development webpack --config webpack.server.development.js --mode=development -w",
+    "start-server:prod": "nodemon ./server-prod/index.js",
+    "start-server:dev": "nodemon ./server-build/index.js",
+    "start:dev": "yarn build:dev && npm-run-all --parallel build-server:dev start-server:dev"
   },
   "eslintConfig": {
     "extends": [
@@ -59,7 +80,9 @@
     ]
   },
   "devDependencies": {
-    "eslint-config-airbnb-typescript-prettier": "^4.1.0",
+    "autoprefixer": "^10.1.0",
+    "npm-run-all": "4.1.5",
+    "nodemon": "2.0.4",
     "prettier": "^2.2.0",
     "stylelint": "^13.8.0",
     "stylelint-config-standard": "^20.0.0",

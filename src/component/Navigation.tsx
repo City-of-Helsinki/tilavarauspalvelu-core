@@ -2,18 +2,18 @@ import React, { SyntheticEvent, useState } from 'react';
 import { Navigation as HDSNavigation } from 'hds-react';
 import { useTranslation } from 'react-i18next';
 
+interface LanguageOption {
+  label: string;
+  value: string;
+}
+
+const languageOptions: LanguageOption[] = [
+  { label: 'Suomeksi', value: 'fi' },
+  { label: 'Svenska', value: 'sv' },
+  { label: 'English', value: 'en' },
+];
+
 const Navigation = (): JSX.Element => {
-  interface LanguageOption {
-    label: string;
-    value: string;
-  }
-
-  const languageOptions: LanguageOption[] = [
-    { label: 'Suomeksi', value: 'fi' },
-    { label: 'Svenska', value: 'sv' },
-    { label: 'English', value: 'en' },
-  ];
-
   const [language, setLanguage] = useState(languageOptions[0]);
   const { t } = useTranslation();
   const formatSelectedValue = ({ value }: LanguageOption): string =>

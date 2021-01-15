@@ -58,12 +58,20 @@ const Application = (): JSX.Element | null => {
   );
 
   const applicationPeriod = useAsync(async () => {
+    // eslint-disable-next-line
+    const backendData = window.__ROUTE_DATA__?.applicationPeriod;
+    if (backendData) {
+      // eslint-disable-next-line
+      window.__ROUTE_DATA__.applicationPeriod = undefined;
+      return backendData;
+    }
+
     return getApplicationPeriod({ id: applicationPeriodId });
   }, [applicationPeriodId]);
 
   const applicationLoading = useAsync(async () => {
     let loadedApplication = null;
-    if (applicationId !== 'new') {
+    if (applicationId && applicationId !== 'new') {
       loadedApplication = await getApplication(Number(applicationId));
       dispatch({ type: 'load', data: loadedApplication });
     }

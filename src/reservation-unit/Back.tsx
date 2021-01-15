@@ -2,19 +2,26 @@ import { IconArrowLeft } from 'hds-react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
+import styled from 'styled-components';
 
-const Head = (): JSX.Element => {
+const Container = styled.div`
+  margin-top: 1em;
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+`;
+
+const ButtonText = styled.span`
+  font-size: var(--fontsize-body-s);
+  margin-left: var(--spacing-2-xs);
+`;
+
+const Back = (): JSX.Element => {
   const { t } = useTranslation();
   const history = useHistory();
 
   return (
-    <div
-      style={{
-        marginTop: '1em',
-        display: 'flex',
-        alignItems: 'center',
-        fontWeight: 500,
-      }}>
+    <Container>
       <IconArrowLeft />
       <button
         type="button"
@@ -22,16 +29,10 @@ const Head = (): JSX.Element => {
           history.goBack();
         }}
         className="button-reset">
-        <span
-          style={{
-            fontSize: 'var(--fontsize-body-s)',
-            marginLeft: 'var(--spacing-2-xs)',
-          }}>
-          {t('Takaisin hakutuloksiin')}
-        </span>
+        <ButtonText>{t('Takaisin hakutuloksiin')}</ButtonText>
       </button>
-    </div>
+    </Container>
   );
 };
 
-export default Head;
+export default Back;

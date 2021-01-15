@@ -7,7 +7,7 @@ import {
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
-import styles from './Page1.module.scss';
+import styled from 'styled-components';
 import ApplicationEvent from './ApplicationEvent';
 import {
   Application as ApplicationType,
@@ -25,6 +25,37 @@ type Props = {
   addNewApplicationEvent: () => void;
 };
 
+const ButtonContainer = styled.div`
+  @media (max-width: var(--breakpoint-m)) {
+    flex-direction: column;
+
+    & > button {
+      margin-top: var(--spacing-m);
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    & :nth-child(1) {
+      margin-left: auto;
+      margin-right: auto;
+    }
+  }
+
+  display: flex;
+  flex-direction: row;
+  margin-top: var(--spacing-layout-l);
+  justify-content: flex-end;
+
+  & > button {
+    margin-left: var(--spacing-m);
+  }
+
+  & :nth-child(1) {
+    margin-right: auto;
+    margin-left: 0;
+  }
+`;
+
 const Page1 = ({
   onNext,
   addNewApplicationEvent,
@@ -33,6 +64,7 @@ const Page1 = ({
   selectedReservationUnits,
 }: Props): JSX.Element | null => {
   const [ready, setReady] = useState<boolean>(false);
+
   const [ageGroupOptions, setAgeGroupOptions] = useState<OptionType[]>([]);
   const [purposeOptions, setPurposeOptions] = useState<OptionType[]>([]);
   const [abilityGroupOptions, setAbilityGroupOptions] = useState<OptionType[]>(
@@ -116,7 +148,7 @@ const Page1 = ({
         );
       })}
 
-      <div className={styles.buttonContainer}>
+      <ButtonContainer>
         <Button
           iconLeft={<IconPlusCircleFill />}
           onClick={() => form.handleSubmit(onAddApplicationEvent)()}>
@@ -130,7 +162,7 @@ const Page1 = ({
           onClick={() => form.handleSubmit(onSubmit)()}>
           {t('common.next')}
         </Button>
-      </div>
+      </ButtonContainer>
     </form>
   );
 };

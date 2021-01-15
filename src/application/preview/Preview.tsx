@@ -2,7 +2,7 @@ import { Button, IconArrowLeft } from 'hds-react';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import styles from './Preview.module.scss';
+import styled from 'styled-components';
 import { Application, ReservationUnit, Parameter } from '../../common/types';
 import { formatDate } from '../../common/util';
 import { getParameters, getReservationUnits } from '../../common/api';
@@ -12,6 +12,18 @@ type Props = {
   onNext: () => void;
 };
 
+const LabelElelemt = styled.div`
+  margin-top: var(--spacing-3-xs);
+  font-family: HelsinkiGrotesk-Bold, var(--font-default);
+  font-size: var(--fontsize-body-l);
+  font-weight: bold;
+`;
+const ValueElement = styled.div`
+  margin-top: var(--spacing-2-xs);
+  font-family: HelsinkiGrotesk-Regular, var(--font-default);
+  font-size: var(--fontsize-body-m);
+`;
+
 const LabelValue = ({
   label,
   value,
@@ -20,8 +32,8 @@ const LabelValue = ({
   value: string | undefined | null | number | JSX.Element[];
 }): JSX.Element | null => (
   <div>
-    <div className={styles.label}>{label}</div>
-    <div className={styles.value}>{value}</div>
+    <LabelElelemt>{label}</LabelElelemt>
+    <ValueElement>{value}</ValueElement>
   </div>
 );
 
@@ -34,6 +46,48 @@ const mapArrayById = (
     return prev;
   }, {} as { [key: number]: Parameter | ReservationUnit });
 };
+
+const ButtonContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  margin-top: var(--spacing-layout-l);
+  justify-content: flex-end;
+
+  button {
+    margin-left: var(--spacing-layout-xs);
+  }
+`;
+
+const Ruler = styled.hr`
+  margin-top: var(--spacing-layout-m);
+  border-left: none;
+  border-right: none;
+`;
+
+const SubHeadline = styled.div`
+  font-family: HelsinkiGrotesk-Bold, var(--font-default);
+  margin-top: var(--spacing-layout-m);
+  font-weight: 700;
+  font-size: var(--fontsize-heading-m);
+`;
+
+const SmallSubHeadline = styled.div`
+  font-family: HelsinkiGrotesk-Bold, var(--font-default);
+  margin-top: var(--spacing-layout-m);
+  font-weight: 700;
+  font-size: var(--fontsize-heading-s);
+`;
+
+const TwoColumnContainer = styled.div`
+  @media (max-width: var(--breakpoint-s)) {
+    grid-template-columns: 1fr;
+  }
+
+  margin-top: var(--spacing-m);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-m);
+`;
 
 const Preview = ({ onNext, application }: Props): JSX.Element | null => {
   const [ready, setReady] = useState(false);
@@ -91,10 +145,8 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
 
   return ready ? (
     <>
-      <div className={styles.subHeadLine}>
-        {t('Application.preview.basicInfoSubHeading')}
-      </div>
-      <div className={styles.twoColumnContainer}>
+      <SubHeadline>{t('Application.preview.basicInfoSubHeading')}</SubHeadline>
+      <TwoColumnContainer>
         <LabelValue
           label={t('Application.preview.firstName')}
           value={application.contactPerson?.firstName}
@@ -107,11 +159,11 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
           label={t('Application.preview.email')}
           value={application.contactPerson?.email}
         />
-      </div>
+      </TwoColumnContainer>
       {application.applicationEvents.map((applicationEvent) => (
         <div key={applicationEvent.id}>
-          <div className={styles.subHeadLine}>{applicationEvent.name}</div>
-          <div className={styles.twoColumnContainer}>
+          <SubHeadline>{applicationEvent.name}</SubHeadline>
+          <TwoColumnContainer>
             <LabelValue
               label={t('Application.preview.applicationEvent.name')}
               value={applicationEvent.name}
@@ -168,12 +220,12 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
                 />
               )
             )}
-          </div>
-          <hr className={styles.ruler} />
-          <div className={styles.smallSubHeadLine}>
+          </TwoColumnContainer>
+          <Ruler />
+          <SmallSubHeadline>
             {t('Application.preview.applicationEventSchedules')}
-          </div>
-          <div className={styles.twoColumnContainer}>
+          </SmallSubHeadline>
+          <TwoColumnContainer>
             {[
               'monday',
               'tuesday',
@@ -197,16 +249,16 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
                 />
               </div>
             ))}
-          </div>
+          </TwoColumnContainer>
         </div>
       ))}
 
-      <div className={styles.buttonContainer}>
+      <ButtonContainer>
         <Button variant="secondary" iconLeft={<IconArrowLeft />} disabled>
           {t('common.prev')}
         </Button>
         <Button onClick={() => onSubmit()}>{t('common.submit')}</Button>
-      </div>
+      </ButtonContainer>
     </>
   ) : null;
 };

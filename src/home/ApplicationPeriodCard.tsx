@@ -1,14 +1,65 @@
 import React from 'react';
 import { Button, Container, IconArrowRight, IconClock } from 'hds-react';
 import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
 import Card from '../component/Card';
 import { ApplicationPeriod } from '../common/types';
-import styles from './ApplicationPeriodCard.module.scss';
 import { isActive, formatDate } from '../common/util';
 
 interface Props {
   applicationPeriod: ApplicationPeriod;
 }
+
+const StyledCard = styled(Card)<{ act?: boolean }>`
+  @media (max-width: var(--breakpoint-s)) {
+    grid-template-columns: 2fr;
+  }
+
+  max-width: var(--container-width-m);
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  grid-gap: var(--spacing-m);
+  align-items: start;
+  padding: var(--spacing-m);
+  margin-bottom: var(--spacing-s);
+  border-color: ${(props) =>
+    props.act &&
+    'var(--tilavaraus-application-period-card-active-border-color)'};
+  background-color: ${(props) =>
+    props.act &&
+    'var(--tilavaraus-application-period-card-active-background-color)'};
+`;
+
+const StyledContainer = styled(Container)`
+  line-height: var(--lineheight-xl);
+  max-width: 100%;
+`;
+
+const Name = styled.div`
+  font-size: var(--fontsize-body-xl);
+  font-weight: 500;
+`;
+
+const CardButton = styled(Button)<{ noLeftMargin?: boolean }>`
+  @media (max-width: var(--breakpoint-s)) {
+    justify-self: center;
+  }
+
+  ${(props) =>
+    props.noLeftMargin
+      ? `
+        margin-left: 0;
+        padding-left: 0;
+        border-left: none;
+
+        & > div {
+           margin-left: 0;
+        }
+    `
+      : `
+        justify-self: right;
+  `}
+`;
 
 const ApplicationPeriodCard = ({ applicationPeriod }: Props): JSX.Element => {
   const { t } = useTranslation();
@@ -19,11 +70,9 @@ const ApplicationPeriodCard = ({ applicationPeriod }: Props): JSX.Element => {
   );
 
   return (
-    <Card
-      border
-      className={`${styles.card} ${active ? styles.active : styles.passive}`}>
-      <Container className={styles.container}>
-        <div className={styles.name}>{applicationPeriod.name}</div>
+    <StyledCard border act={active ? true : undefined}>
+      <StyledContainer>
+        <Name>{applicationPeriod.name}</Name>
         <div>
           {active
             ? t('ApplicationPeriodCard.open', {
@@ -35,28 +84,24 @@ const ApplicationPeriodCard = ({ applicationPeriod }: Props): JSX.Element => {
                 ),
               })}
         </div>
-        <Button
-          id={styles.noLeftMargin}
+        <CardButton
+          noLeftMargin
           variant="supplementary"
           iconLeft={<IconArrowRight />}
           disabled>
           {t('ApplicationPeriodCard.criteria')}
-        </Button>
-      </Container>
+        </CardButton>
+      </StyledContainer>
       {active ? (
-        <Button className={styles.button} disabled>
+        <CardButton disabled>
           {t('ApplicationPeriodCard.applyButton')}
-        </Button>
+        </CardButton>
       ) : (
-        <Button
-          iconLeft={<IconClock />}
-          variant="secondary"
-          className={styles.button}
-          disabled>
+        <CardButton iconLeft={<IconClock />} variant="secondary" disabled>
           {t('ApplicationPeriodCard.reminderButton')}
-        </Button>
+        </CardButton>
       )}
-    </Card>
+    </StyledCard>
   );
 };
 
