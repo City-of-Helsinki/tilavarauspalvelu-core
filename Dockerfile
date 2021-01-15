@@ -3,10 +3,21 @@
 FROM registry.access.redhat.com/ubi8/python-38 as appbase
 
 USER root
-RUN rpm -Uvh https://yum.postgresql.org/11/redhat/rhel-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
-RUN yum -y install postgresql11
+
+COPY ./etc-pki-entitlement /etc/pki/entitlement
+
+RUN rm /etc/rhsm-host
+
+RUN yum -y update
+RUN subscription-manager register --username ${REDHAT_USERNAME} --password ${REDHAT_PASSWORD} --auto-attach 
+RUN subscription-manager repos --enable codeready-builder-for-rhel-8-x86_64-rpms
+
+
+#RUN rpm -Uvh https://yum.postgresql.org/11/redhat/rhel-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+#RUN yum -y install postgresql11
 RUN rpm -Uvh https://download.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
 RUN yum -y install epel-release
+
 
 RUN useradd -ms /bin/bash -d /tvp tvp
 # Statics are kept inside container image for serving using whitenoise
@@ -30,12 +41,13 @@ COPY deploy/* ./deploy/
 RUN if [ "x$BUILD_MODE" = "xlocal" ] ; then ./deploy/local_deps.sh ${REDHAT_USERNAME} ${REDHAT_PASSWORD}; fi
 
 RUN dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
-RUN yum install -y gdal
+RUN yum install -y gdal 
+
+RUN subscription-manager remove --all
 
 RUN if [ "x$BUILD_MODE" = "xlocal" ] ; then ./deploy/unregister_local.sh ; fi
 
 RUN npm install @sentry/cli
-
 
 # Can be used to inquire about running app
 # eg. by running `echo $APP_NAME`
@@ -59,7 +71,10 @@ ENV DEBUG=True
 
 RUN python manage.py collectstatic --noinput
 
-ENTRYPOINT ["deploy/entrypoint.sh"]
+RUN chgrp -R 0 /tvp
+RUN chmod g=u -R /tvp
+
+ENTRYPOINT ["/tvp/deploy/entrypoint.sh"]
 
 EXPOSE 8000
 
