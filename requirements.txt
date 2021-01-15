@@ -19,7 +19,7 @@ django-jsonfield==1.4.1
 django-mptt==0.11.0
 django-recurrence==1.10.3
 djangorestframework==3.12.2
-drf-spectacular==0.12.0
+drf-spectacular==0.13.0
 elastic-apm==5.10.0
 flake8==3.8.4
 graphene==2.1.8

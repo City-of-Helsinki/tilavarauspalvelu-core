@@ -251,6 +251,52 @@ SPECTACULAR_SETTINGS = {
     "TITLE": "Tilavaraus API",
     "DESCRIPTION": "",
     "VERSION": "1.0.0",
+    "TAGS": [
+        {
+            "name": "openapi",
+            "description": "",
+        },
+        {
+            "name": "address",
+            "description": "",
+        },
+        {
+            "name": "application",
+            "description": "",
+        },
+        {
+            "name": "application_event",
+            "description": "",
+        },
+        {
+            "name": "application_period",
+            "description": "",
+        },
+        {
+            "name": "parameters",
+            "description": "",
+        },
+        {
+            "name": "reservation",
+            "description": "",
+        },
+        {
+            "name": "reservation_unit",
+            "description": "",
+        },
+        {
+            "name": "resource",
+            "description": "",
+        },
+        {
+            "name": "service",
+            "description": "",
+        },
+        {
+            "name": "space",
+            "description": "",
+        },
+    ],
 }
 
 # local_settings.py can be used to override environment-specific settings
