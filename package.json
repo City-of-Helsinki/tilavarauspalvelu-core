@@ -53,7 +53,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "lint": "eslint --ext ts,tsx src",
-    "lint:css": "stylelint 'src/**/*.scss'",
+    "lint:css": "stylelint './src/**/*.tsx'",
     "ts-check": "tsc --noEmit --project tsconfig.json",
     "build-server:prod": "NODE_ENV=production webpack --config webpack.server.production.js --mode=production",
     "build-server:dev": "NODE_ENV=development webpack --config webpack.server.development.js --mode=development -w",
@@ -85,7 +85,10 @@
     "nodemon": "2.0.4",
     "prettier": "^2.2.0",
     "stylelint": "^13.8.0",
+    "stylelint-config-recommended": "^3.0.0",
     "stylelint-config-standard": "^20.0.0",
+    "stylelint-config-styled-components": "^0.1.1",
+    "stylelint-processor-styled-components": "^1.10.0",
     "stylelint-value-no-unknown-custom-properties": "^3.0.0"
   }
 }
