@@ -64,7 +64,7 @@ const Title = styled.div`
 `;
 
 const Address = styled.div`
-  font-size: var(--fontsize-body-xs);
+  font-size: var(--fontsize-body-s);
 `;
 
 const MaxPersonsContainer = styled.div`

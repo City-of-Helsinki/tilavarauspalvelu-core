@@ -17,6 +17,7 @@ const Container = styled.div`
   @media (max-width: var(--breakpoint-m)) {
     grid-template-columns: 1fr 1fr;
   }
+
   @media (max-width: var(--breakpoint-s)) {
     grid-template-columns: 1fr;
   }
@@ -33,6 +34,7 @@ const ShowL = styled.div`
   @media (max-width: var(--breakpoint-m)) {
     display: none;
   }
+
   display: block;
 `;
 
@@ -40,6 +42,7 @@ const ShowM = styled.div`
   @media (max-width: var(--breakpoint-m)) {
     display: block;
   }
+
   @media (max-width: var(--breakpoint-s)) {
     display: none;
   }
@@ -71,7 +74,7 @@ const SearchForm = ({ onSearch }: Props): JSX.Element => {
         <TextInput
           id="search"
           label="&nbsp;"
-          helperText={t('SearchForm.searchTermPlaceholder')}
+          placeholder={t('SearchForm.searchTermPlaceholder')}
           onChange={(e) => setQ(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === 'Enter') {

@@ -32,22 +32,22 @@ const ButtonContainer = styled.div`
 `;
 
 const StyledButton = styled(Button)`
-  --background-color: #{$color-black-90};
-  --border-color: #{$color-black-90};
-  --background-color-hover: #{$color-black};
-  --background-color-focus: #{$color-black};
-  --background-color-hover-focus: #{$color-black};
+  --background-color: var(--color-black-90);
+  --border-color: var(color-black-90);
+  --background-color-hover: var(--color-black);
+  --background-color-focus: var(--color-black);
+  --background-color-hover-focus: var(--color-black-90);
 
   margin-right: var(--spacing-m);
 `;
 
 const StyledSecondaryButton = styled(Button)`
   --background-color: transparent;
-  --border-color: #{$color-black-90};
-  --background-color-hover: #{$color-black-10};
-  --background-color-hover-focus: #{$color-black-10};
-  --color: #{$color-black};
-  --color-focus: #{$color-black-90};
+  --border-color: var(--color-black);
+  --background-color-hover: var(--color-black-10);
+  --background-color-hover-focus: var(--color-black-10);
+  --color: var(--color-black);
+  --color-focus: var(--color-black-10);
 
   margin-right: var(--spacing-l);
 `;

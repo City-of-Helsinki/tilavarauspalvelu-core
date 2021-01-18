@@ -32,7 +32,6 @@ const TopContainer = styled.div`
 `;
 
 const BackContainer = styled.div`
-  //  font-family: HelsinkiGrotesk-Bold, var(--font-default);
   padding-top: 1em;
   display: flex;
   align-items: center;

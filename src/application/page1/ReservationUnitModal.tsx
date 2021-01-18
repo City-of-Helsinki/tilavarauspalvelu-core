@@ -116,12 +116,12 @@ const MainContainer = styled.div`
 `;
 
 const Heading = styled.div`
-  font-family: HelsinkiGrotesk-Bold;
+  font-family: HelsinkiGrotesk-Bold, var(--font-default);
   font-size: var(--fontsize-heading-l);
 `;
 
 const Text = styled.span`
-  font-family: HelsinkiGrotesk-Bold;
+  font-family: HelsinkiGrotesk-Bold, var(--font-default);
   font-size: var(--fontsize-heading-s);
 `;
 
