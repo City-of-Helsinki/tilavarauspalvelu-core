@@ -29,3 +29,45 @@ To guarantee that software is working as it supposed to, we obey the following t
 
 ## Branches
 Format your code with format.sh script to conform to style checks, and fix possible flake8 errors in your code.
+
+## OpenAPI documentation
+To improve automatic OpenAPI schema introspection, we obey the following principles.
+
+- API endpoint groups, or `tags` in OpenAPI jargon, are given a description in `settings.SPECTACULAR_SETTINGS['TAGS']`.
+- `ModelSerializer`'s model fields defined in `Meta.fields` are given a description using `help_text` via `extra_kwargs`.
+  ```python
+  class Meta:
+      extra_kwargs = {
+          "field_name": {
+              "help_text": "Field description.",
+          }
+      }
+  ```
+- Non-model fields are given a description using `help_text` kwarg on the field.
+  ```python
+  field_name = serializers.SerializerMethodField(help_text="Field description.")
+  ```
+- Filters are given a description using `help_text` kwarg on the filter.
+  ```python
+  filter_name = filters.NumberFilter(help_text="Filter description.")
+  ```
+- ViewSets are given a description either by giving the class a docstring or by using the `extend_schema` decorator on the class.
+  ```python
+  @extend_schema(description="ViewSet description.")
+  ```
+  `extend_schema` overrides docstring, if both are used.
+- View specific descriptions within a ViewSet can be given using the `extend_schema_view` decorator on the ViewSet class.
+  ```python
+  @extend_schema_view(
+      list=extend_schema(description="list description."),
+      create=extend_schema(description="create description."),
+  )
+  ```
+  View specific descriptions override ViewSet description.
+- `SerializerMethodField`s are given a type using type hinting.
+  ```python
+  max_persons = serializers.SerializerMethodField()
+
+  def get_max_persons(self, reservation_unit) -> int:
+      return reservation_unit.get_max_persons()
+  ```

@@ -65,6 +65,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "graphene_django",
     "rest_framework",
+    "drf_spectacular",
     "resources",
     "spaces",
     "reservations",
@@ -240,6 +241,61 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.BasicAuthentication",
         "rest_framework.authentication.SessionAuthentication",
+    ],
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+SPECTACULAR_SETTINGS = {
+    # path prefix is used for tagging the discovered operations.
+    # use '/api/v[0-9]' for tagging apis like '/api/v1/albums' with ['albums']
+    "SCHEMA_PATH_PREFIX": r"/v[^/]",
+    "TITLE": "Tilavaraus API",
+    "DESCRIPTION": "",
+    "VERSION": "1.0.0",
+    "TAGS": [
+        {
+            "name": "openapi",
+            "description": "",
+        },
+        {
+            "name": "address",
+            "description": "",
+        },
+        {
+            "name": "application",
+            "description": "",
+        },
+        {
+            "name": "application_event",
+            "description": "",
+        },
+        {
+            "name": "application_period",
+            "description": "",
+        },
+        {
+            "name": "parameters",
+            "description": "",
+        },
+        {
+            "name": "reservation",
+            "description": "",
+        },
+        {
+            "name": "reservation_unit",
+            "description": "",
+        },
+        {
+            "name": "resource",
+            "description": "",
+        },
+        {
+            "name": "service",
+            "description": "",
+        },
+        {
+            "name": "space",
+            "description": "",
+        },
     ],
 }
 

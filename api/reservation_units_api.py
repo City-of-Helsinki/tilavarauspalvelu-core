@@ -24,13 +24,15 @@ class ReservationUnitFilter(filters.FilterSet):
         field_name="purposes", queryset=Purpose.objects.all()
     )
     application_period = filters.ModelMultipleChoiceFilter(
-        field_name="application_periods", queryset=ApplicationPeriod.objects.all()
+        field_name="application_periods",
+        queryset=ApplicationPeriod.objects.all(),
     )
     district = HierarchyModelMultipleChoiceFilter(
         field_name="spaces__district", queryset=District.objects.all()
     )
     max_persons = filters.NumberFilter(
-        field_name="spaces__max_persons", lookup_expr="lte"
+        field_name="spaces__max_persons",
+        lookup_expr="lte",
     )
     reservation_unit_type = filters.ModelChoiceFilter(
         field_name="reservation_unit_type", queryset=ReservationUnitType.objects.all()
@@ -95,7 +97,7 @@ class ReservationUnitSerializer(serializers.ModelSerializer):
 
         return None
 
-    def get_max_persons(self, reservation_unit):
+    def get_max_persons(self, reservation_unit) -> int:
         return reservation_unit.get_max_persons()
 
 
