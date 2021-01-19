@@ -3,6 +3,7 @@ from django.urls import reverse
 
 from resources.models import Resource
 
+
 @pytest.mark.django_db
 def test_resource_create(user_api_client, valid_resource_data):
     assert Resource.objects.count() == 0
@@ -11,6 +12,7 @@ def test_resource_create(user_api_client, valid_resource_data):
     )
     assert response.status_code == 201
     assert Resource.objects.count() == 1
+
 
 @pytest.mark.django_db
 def test_translatedmodelserializer(user_api_client, valid_resource_data):

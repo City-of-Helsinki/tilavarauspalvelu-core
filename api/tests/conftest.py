@@ -148,6 +148,7 @@ def valid_reservation_data(reservation_unit):
         "reservation_unit": [reservation_unit.id],
     }
 
+
 @pytest.fixture
 def valid_resource_data(space):
     """ Valid JSON data for creating a new Resource """

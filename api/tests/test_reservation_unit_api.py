@@ -190,4 +190,3 @@ def test_equipment_fetch(user_api_client, equipment_hammer):
     assert response.status_code == 200
     assert len(response.data) == 1
     assert response.data[0].get("name") == "Hammer"
-

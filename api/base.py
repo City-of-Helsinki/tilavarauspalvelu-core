@@ -65,6 +65,7 @@ class TranslatedModelSerializer(serializers.ModelSerializer):
     A serializer that automatically registers translated model fields
     and nests them in an object under the original field name
     """
+
     def get_field_names(self, declared_fields, info):
         model = self.Meta.model
         fields = super().get_field_names(declared_fields, info)
@@ -87,7 +88,6 @@ class TranslatedModelSerializer(serializers.ModelSerializer):
             if original_field_name in fields:
                 fields.remove(original_field_name)
         return fields
-
 
     def to_representation(self, obj):
         ret = super().to_representation(obj)
@@ -114,7 +114,6 @@ class TranslatedModelSerializer(serializers.ModelSerializer):
             translations_dict = translations_dict or None
             ret[field_name] = translations_dict
         return ret
-
 
     def to_internal_value(self, data):
         model = self.Meta.model
