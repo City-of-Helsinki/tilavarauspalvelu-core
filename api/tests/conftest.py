@@ -148,6 +148,21 @@ def valid_reservation_data(reservation_unit):
         "reservation_unit": [reservation_unit.id],
     }
 
+@pytest.fixture
+def valid_resource_data(space):
+    """ Valid JSON data for creating a new Resource """
+    return {
+        "location_type": "fixed",
+        "name": {
+            "fi": "Testiresurssi",
+            "en": "Test resource",
+            "sv": "Test resursen",
+        },
+        "space": space.pk,
+        "buffer_time_before": "00:05:00",
+        "buffer_time_after": "00:05:00",
+    }
+
 
 @pytest.fixture
 def district():

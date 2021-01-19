@@ -68,6 +68,8 @@ class TranslatedModelSerializer(serializers.ModelSerializer):
     def get_field_names(self, declared_fields, info):
         model = self.Meta.model
         fields = super().get_field_names(declared_fields, info)
+        # We make a copy to avoid mutating original fields
+        fields = fields.copy()
         self._original_translation_fields = []
         translatable_fields = get_translatable_fields_for_model(model) or []
         for original_field_name in translatable_fields:
@@ -118,7 +120,7 @@ class TranslatedModelSerializer(serializers.ModelSerializer):
         model = self.Meta.model
         translatable_fields = get_translatable_fields_for_model(model) or []
         for key in self.Meta.fields:
-            if key in translatable_fields:
+            if key in translatable_fields and key in data:
                 for language_code in data[key]:
                     field_name = f"{key}_{language_code}"
                     data[field_name] = data[key][language_code]

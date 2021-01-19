@@ -134,7 +134,11 @@ def test_reservation_unit_create(user_api_client, equipment_hammer):
     assert ReservationUnit.objects.count() == 0
 
     data = {
-        "name_en": "New reservation unit",
+        "name": {
+            "fi": "Uusi varausyksikkö",
+            "en": "New reservation unit",
+            "sv": "Nya reservation sak",
+        },
         "require_introduction": False,
         "terms_of_use": "Do not mess it up",
         "equipment_ids": [equipment_hammer.id],
