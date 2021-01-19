@@ -66,7 +66,7 @@ def space(location):
 @pytest.fixture
 def reservation_unit(resource, space):
     reservation_unit = ReservationUnit.objects.create(
-        name="Test reservation unit", require_introduction=False
+        name_en="Test reservation unit", require_introduction=False
     )
     reservation_unit.resources.set([resource])
     reservation_unit.spaces.set([space])
