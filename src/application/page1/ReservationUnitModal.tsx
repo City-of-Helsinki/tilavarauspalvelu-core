@@ -214,16 +214,27 @@ const ReservationUnitModal = ({
     };
 
     const reservationUnits = await getReservationUnits(searchCriteria);
-    setRes(reservationUnits);
+    const filteredReservationUnits = reservationUnits?.filter((ru) => {
+      // include only reservation units made available in the current application period
+      const applicationPeriodFilter = applicationPeriod.reservationUnits.includes(
+        ru.id
+      );
+      // include only items not already selected
+      const selectedFilter = !selected.map((n) => n.id).includes(ru.id);
+
+      return applicationPeriodFilter && selectedFilter;
+    });
+    setRes(filteredReservationUnits);
     setSearching(false);
   };
 
+  const filtered = currentReservationUnits.concat(selected).map((ru) => ru.id);
+  const filteredResults = results?.filter((ru) => !filtered.includes(ru.id));
+
   if (results === undefined && searching === false) searchResults();
-  const emptyResult = results?.length === 0 && (
+  const emptyResult = filteredResults?.length === 0 && (
     <div>{t('common.noResults')}</div>
   );
-
-  const filtered = currentReservationUnits.concat(selected).map((ru) => ru.id);
 
   return (
     <MainContainer>
@@ -259,28 +270,30 @@ const ReservationUnitModal = ({
         />
       </Filters>
       <ButtonContainer>
-        <SearchButton onClick={() => searchResults()}>
+        <SearchButton
+          onClick={(e) => {
+            e.preventDefault();
+            searchResults();
+          }}>
           {t('common.search')}
         </SearchButton>
         {searching && <StyledLoadingSpinner />}
       </ButtonContainer>
       <Ruler />
       <Results>
-        {results?.length
-          ? results
-              .filter((ru) => !filtered.includes(ru.id))
-              .map((ru) => {
-                return (
-                  <ReservationUnitCard
-                    handleAdd={() => {
-                      handleAdd(ru);
-                      setSelected([...selected, ru]);
-                    }}
-                    reservationUnit={ru}
-                    key={ru.id}
-                  />
-                );
-              })
+        {filteredResults?.length
+          ? filteredResults.map((ru) => {
+              return (
+                <ReservationUnitCard
+                  handleAdd={() => {
+                    handleAdd(ru);
+                    setSelected([...selected, ru]);
+                  }}
+                  reservationUnit={ru}
+                  key={ru.id}
+                />
+              );
+            })
           : emptyResult}
       </Results>
     </MainContainer>
