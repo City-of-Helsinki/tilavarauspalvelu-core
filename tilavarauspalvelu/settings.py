@@ -148,9 +148,6 @@ env = environ.Env(
 )
 environ.Env.read_env()
 
-LANGUAGE_CODE = "fi"
-LANGUAGES = (("fi", _("Finnish")), ("en", _("English")), ("sv", _("Swedish")))
-
 ALLOWED_HOSTS = env("ALLOWED_HOSTS")
 DEBUG = env("DEBUG")
 
@@ -225,7 +222,8 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
-LANGUAGE_CODE = "en-us"
+LANGUAGE_CODE = "fi"
+LANGUAGES = (("fi", _("Finnish")), ("en", _("English")), ("sv", _("Swedish")))
 
 TIME_ZONE = "UTC"
 
