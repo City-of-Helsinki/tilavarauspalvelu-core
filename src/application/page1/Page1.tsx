@@ -70,11 +70,15 @@ const Page1 = ({
   const [abilityGroupOptions, setAbilityGroupOptions] = useState<OptionType[]>(
     []
   );
+  const [reservationUnitTypeOptions, setReservationUnitTypeOptions] = useState<
+    OptionType[]
+  >([]);
 
   const optionTypes = {
     ageGroupOptions,
     purposeOptions,
     abilityGroupOptions,
+    reservationUnitTypeOptions,
   };
 
   const { t } = useTranslation();
@@ -91,10 +95,14 @@ const Page1 = ({
       const fetchedAbilityGroupOptions = await getParameters('ability_group');
       const fetchedAgeGroupOptions = await getParameters('age_group');
       const fetchedPurposeOptions = await getParameters('purpose');
+      const fetchedReservationUnitType = await getParameters(
+        'reservation_unit_type'
+      );
 
       setAbilityGroupOptions(mapOptions(fetchedAbilityGroupOptions));
       setAgeGroupOptions(mapOptions(fetchedAgeGroupOptions));
       setPurposeOptions(mapOptions(fetchedPurposeOptions));
+      setReservationUnitTypeOptions(mapOptions(fetchedReservationUnitType));
 
       setReady(true);
     }
