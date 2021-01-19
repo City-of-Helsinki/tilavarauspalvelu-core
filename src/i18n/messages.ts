@@ -72,6 +72,13 @@ const translations: Translations = {
         heading: ['Lomakkeen tietoja ei ole vielä olemassa'],
         text: ['Täytä ensin lomake.'],
       },
+      notification: {
+        processing: ['Käsittely'],
+        body: [
+          'Hakemusten käsittely aloitetaan kun hakuaika on päättynyt. Ilmoitamme sinulle, sekä järjestöllesi tai yrityksellesi hakemuksen eri vaiheista sähköpostitse.',
+        ],
+      },
+      userAcceptsTerms: ['Hyväksyn palvelun käyttöehdot'],
     },
   },
   ApplicationPage: {
