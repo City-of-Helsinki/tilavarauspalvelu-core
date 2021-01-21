@@ -1,7 +1,7 @@
 from django.db.models import Sum
 from django_filters import rest_framework as filters
 from rest_framework import filters as drf_filters
-from rest_framework import serializers, viewsets
+from rest_framework import mixins, serializers, viewsets
 
 from api.base import HierarchyModelMultipleChoiceFilter, TranslatedModelSerializer
 from api.resources_api import ResourceSerializer
@@ -52,17 +52,43 @@ class ReservationUnitTypeSerializer(serializers.ModelSerializer):
 
 
 class ReservationUnitSerializer(TranslatedModelSerializer):
-    spaces = SpaceSerializer(read_only=True, many=True)
-    resources = ResourceSerializer(read_only=True, many=True)
-    services = ServiceSerializer(read_only=True, many=True)
-    images = ReservationUnitImageSerializer(read_only=True, many=True)
-    location = serializers.SerializerMethodField()
-    max_persons = serializers.SerializerMethodField()
+    spaces = SpaceSerializer(
+        read_only=True,
+        many=True,
+        help_text="Spaces included in the reservation unit as nested related objects.",
+    )
+    resources = ResourceSerializer(
+        read_only=True,
+        many=True,
+        help_text="Resources included in the reservation unit as nested related objects.",
+    )
+    services = ServiceSerializer(
+        read_only=True,
+        many=True,
+        help_text="Services included in the reservation unit as nested related objects.",
+    )
+    images = ReservationUnitImageSerializer(
+        read_only=True,
+        many=True,
+        help_text="Images of the reservation unit as nested related objects. ",
+    )
+    location = serializers.SerializerMethodField(
+        help_text="Location of this reservation unit. Dynamically determined from spaces of the reservation unit."
+    )
+    max_persons = serializers.SerializerMethodField(
+        help_text="Max persons that are allowed in this reservation unit simultaneously."
+    )
     building = serializers.SerializerMethodField()
-    reservation_unit_type = ReservationUnitTypeSerializer(read_only=True)
+    reservation_unit_type = ReservationUnitTypeSerializer(
+        read_only=True,
+        help_text="Type of the reservation unit as nested related object.",
+    )
 
     equipment_ids = serializers.PrimaryKeyRelatedField(
-        queryset=Equipment.objects.all(), source="equipments", many=True
+        queryset=Equipment.objects.all(),
+        source="equipments",
+        many=True,
+        help_text="Ids of equipment available in this reservation unit.",
     )
 
     class Meta:
@@ -82,15 +108,26 @@ class ReservationUnitSerializer(TranslatedModelSerializer):
             "terms_of_use",
             "equipment_ids",
         ]
+        extra_kwargs = {
+            "name": {
+                "help_text": "Name that describes this reservation unit.",
+            },
+            "require_introduction": {
+                "help_text": "Determines if introduction is required in order to reserve this reservation unit.",
+            },
+            "terms_of_use": {
+                "help_text": "Terms of use that needs to be accepted in order to reserve this reservation unit.",
+            },
+        }
 
-    def get_building(self, reservation_unit):
+    def get_building(self, reservation_unit) -> dict:
         building = reservation_unit.get_building()
         if building:
             return BuildingSerializer(building).data
 
         return None
 
-    def get_location(self, reservation_unit):
+    def get_location(self, reservation_unit) -> dict:
         location = reservation_unit.get_location()
         if location:
             return LocationSerializer(location).data
@@ -130,12 +167,16 @@ class PurposeSerializer(serializers.ModelSerializer):
         ]
 
 
-class PurposeViewSet(viewsets.ModelViewSet):
+class PurposeViewSet(
+    viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin
+):
     serializer_class = PurposeSerializer
     queryset = Purpose.objects.all()
 
 
-class ReservationUnitTypeViewSet(viewsets.ModelViewSet):
+class ReservationUnitTypeViewSet(
+    viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin
+):
     serializer_class = ReservationUnitTypeSerializer
     queryset = ReservationUnitType.objects.all()
 

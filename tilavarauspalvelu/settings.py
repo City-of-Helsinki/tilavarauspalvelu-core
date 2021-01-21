@@ -261,20 +261,17 @@ SPECTACULAR_SETTINGS = {
             "description": "",
         },
         {
-            "name": "address",
-            "description": "",
-        },
-        {
             "name": "application",
-            "description": "",
+            "description": "Applications for recurring reservations for individuals and organisations.",
         },
         {
             "name": "application_event",
-            "description": "",
+            "description": "Single recurring events related to a certain application.",
         },
         {
             "name": "application_period",
-            "description": "",
+            "description": "Information of past, current and future application periods "
+            "to where applications are targeted to.",
         },
         {
             "name": "parameters",
@@ -282,23 +279,12 @@ SPECTACULAR_SETTINGS = {
         },
         {
             "name": "reservation",
-            "description": "",
+            "description": "Reservation for single or multiple reservation units.",
         },
         {
             "name": "reservation_unit",
-            "description": "",
-        },
-        {
-            "name": "resource",
-            "description": "",
-        },
-        {
-            "name": "service",
-            "description": "",
-        },
-        {
-            "name": "space",
-            "description": "",
+            "description": "A single unit that can be reserved. "
+            "Wrapper for combinations of spaces, resources and services.",
         },
     ],
 }
