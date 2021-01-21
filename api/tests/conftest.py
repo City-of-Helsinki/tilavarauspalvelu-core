@@ -86,7 +86,7 @@ def reservation_unit_with_parent_space(resource, parent_space):
 @pytest.fixture
 def reservation_unit(resource, space):
     reservation_unit = ReservationUnit.objects.create(
-        name="Test reservation unit", require_introduction=False
+        name_en="Test reservation unit", require_introduction=False
     )
     reservation_unit.resources.set([resource])
     reservation_unit.spaces.set([space])
@@ -184,6 +184,22 @@ def valid_reservation_data(reservation_unit):
         "buffer_time_before": "10",
         "buffer_time_after": "10",
         "reservation_unit": [reservation_unit.id],
+    }
+
+
+@pytest.fixture
+def valid_resource_data(space):
+    """ Valid JSON data for creating a new Resource """
+    return {
+        "location_type": "fixed",
+        "name": {
+            "fi": "Testiresurssi",
+            "en": "Test resource",
+            "sv": "Test resursen",
+        },
+        "space": space.pk,
+        "buffer_time_before": "00:05:00",
+        "buffer_time_after": "00:05:00",
     }
 
 

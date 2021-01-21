@@ -16,6 +16,7 @@ import subprocess
 
 import environ
 import sentry_sdk
+from django.utils.translation import gettext_lazy as _
 from sentry_sdk.integrations.django import DjangoIntegration
 
 from tilavarauspalvelu.loggers import LOGGING_CONSOLE, LOGGING_ELASTIC
@@ -79,6 +80,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "auditlog",
     "elasticapm.contrib.django",
+    "modeltranslation",
 ]
 
 MIDDLEWARE = [
@@ -221,7 +223,8 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
-LANGUAGE_CODE = "en-us"
+LANGUAGE_CODE = "fi"
+LANGUAGES = (("fi", _("Finnish")), ("en", _("English")), ("sv", _("Swedish")))
 
 TIME_ZONE = "UTC"
 

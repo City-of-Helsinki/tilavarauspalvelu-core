@@ -1,21 +1,22 @@
-from rest_framework import serializers, viewsets
+from rest_framework import viewsets
 
+from api.base import TranslatedModelSerializer
 from spaces.models import Building, Location, Space
 
 
-class BuildingSerializer(serializers.ModelSerializer):
+class BuildingSerializer(TranslatedModelSerializer):
     class Meta:
         model = Building
         fields = ["id", "name", "district", "real_estate", "surface_area"]
 
 
-class LocationSerializer(serializers.ModelSerializer):
+class LocationSerializer(TranslatedModelSerializer):
     class Meta:
         model = Location
         fields = ["address_street", "address_zip", "address_city"]
 
 
-class SpaceSerializer(serializers.ModelSerializer):
+class SpaceSerializer(TranslatedModelSerializer):
     class Meta:
         model = Space
         fields = ["id", "name", "parent", "building", "surface_area"]

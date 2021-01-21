@@ -6,11 +6,11 @@ from reservation_units.models import Equipment, EquipmentCategory, ReservationUn
 
 @pytest.mark.django_db
 def test_reservation_unit_exists(user_api_client, reservation_unit):
-    reservation_unit.name = "Studio complex"
+    reservation_unit.name_en = "Studio complex"
     reservation_unit.save()
     response = user_api_client.get(reverse("reservationunit-list"))
     assert response.status_code == 200
-    assert response.data[0]["name"] == "Studio complex"
+    assert response.data[0]["name"]["en"] == "Studio complex"
 
 
 @pytest.mark.django_db
@@ -27,7 +27,7 @@ def test_reservation_unit_purpose_filter(
     filtered_response = user_api_client.get(url_with_filter)
     assert filtered_response.status_code == 200
     assert len(filtered_response.data) == 1
-    assert filtered_response.data[0]["name"] == reservation_unit.name
+    assert filtered_response.data[0]["name"]["en"] == reservation_unit.name_en
 
     # Filter should work with multiple query parameters
     url_with_filter = (
@@ -55,7 +55,7 @@ def test_reservation_unit_application_period_filter(
     response = user_api_client.get(url)
     assert response.status_code == 200
     assert len(response.data) == 1
-    assert response.data[0]["name"] == reservation_unit.name
+    assert response.data[0]["name"]["en"] == reservation_unit.name_en
 
 
 @pytest.mark.django_db
@@ -65,22 +65,22 @@ def test_reservation_unit_search_filter(
     response = user_api_client.get(reverse("reservationunit-list"))
     assert len(response.data) == 2
 
-    reservation_unit.name = "Lorem ipsum"
+    reservation_unit.name_fi = "Lorem ipsum"
     reservation_unit.save()
-    reservation_unit2.name = "Dolor amet"
+    reservation_unit2.name_fi = "Dolor amet"
     reservation_unit2.save()
 
     url = f"{reverse('reservationunit-list')}?search=lorem"
     response = user_api_client.get(url)
     assert response.status_code == 200
     assert len(response.data) == 1
-    assert response.data[0]["name"] == reservation_unit.name
+    assert response.data[0]["name"]["fi"] == reservation_unit.name_fi
 
     url = f"{reverse('reservationunit-list')}?search=DOLOR"
     response = user_api_client.get(url)
     assert response.status_code == 200
     assert len(response.data) == 1
-    assert response.data[0]["name"] == reservation_unit2.name
+    assert response.data[0]["name"]["fi"] == reservation_unit2.name
 
 
 @pytest.mark.django_db
@@ -98,7 +98,7 @@ def test_reservation_unit_district_filter(
     response = user_api_client.get(url)
     assert response.status_code == 200
     assert len(response.data) == 1
-    assert response.data[0]["name"] == reservation_unit.name
+    assert response.data[0]["name"]["en"] == reservation_unit.name_en
 
     # We should also get the result by querying for district ID,
     # as sub_district is a subset of the actual district
@@ -106,7 +106,7 @@ def test_reservation_unit_district_filter(
     response = user_api_client.get(url)
     assert response.status_code == 200
     assert len(response.data) == 1
-    assert response.data[0]["name"] == reservation_unit.name
+    assert response.data[0]["name"]["en"] == reservation_unit.name_en
 
 
 @pytest.mark.django_db
@@ -126,7 +126,7 @@ def test_reservation_unit_max_persons_filter(
 
     assert response.status_code == 200
     assert len(response.data) == 1
-    assert response.data[0]["name"] == reservation_unit.name
+    assert response.data[0]["name"]["en"] == reservation_unit.name_en
 
 
 @pytest.mark.django_db
@@ -134,7 +134,11 @@ def test_reservation_unit_create(user_api_client, equipment_hammer):
     assert ReservationUnit.objects.count() == 0
 
     data = {
-        "name": "New reservation unit",
+        "name": {
+            "fi": "Uusi varausyksikkö",
+            "en": "New reservation unit",
+            "sv": "Nya reservation sak",
+        },
         "require_introduction": False,
         "terms_of_use": "Do not mess it up",
         "equipment_ids": [equipment_hammer.id],
@@ -146,7 +150,7 @@ def test_reservation_unit_create(user_api_client, equipment_hammer):
     assert ReservationUnit.objects.count() == 1
 
     unit = ReservationUnit.objects.all()[0]
-    assert unit.name == "New reservation unit"
+    assert unit.name_en == "New reservation unit"
     assert list(map(lambda x: x.id, unit.equipments.all())) == [equipment_hammer.id]
 
 

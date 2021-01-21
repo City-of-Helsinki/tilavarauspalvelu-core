@@ -1,9 +1,10 @@
-from rest_framework import serializers, viewsets
+from rest_framework import viewsets
 
+from api.base import TranslatedModelSerializer
 from resources.models import Resource
 
 
-class ResourceSerializer(serializers.ModelSerializer):
+class ResourceSerializer(TranslatedModelSerializer):
     class Meta:
         model = Resource
         fields = [
