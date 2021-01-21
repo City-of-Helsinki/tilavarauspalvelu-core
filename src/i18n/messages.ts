@@ -72,6 +72,13 @@ const translations: Translations = {
         heading: ['Lomakkeen tietoja ei ole vielä olemassa'],
         text: ['Täytä ensin lomake.'],
       },
+      notification: {
+        processing: ['Käsittely'],
+        body: [
+          'Hakemusten käsittely aloitetaan kun hakuaika on päättynyt. Ilmoitamme sinulle, sekä järjestöllesi tai yrityksellesi hakemuksen eri vaiheista sähköpostitse.',
+        ],
+      },
+      userAcceptsTerms: ['Hyväksyn palvelun käyttöehdot'],
     },
   },
   ApplicationPage: {
@@ -113,6 +120,9 @@ const translations: Translations = {
     false: ['ei'],
     true: ['kyllä'],
     close: ['Sulje'],
+    search: ['Hae'],
+    noResults: ['Ei tuloksia'],
+    select: ['Valitse'],
   },
   Navigation: {
     Item: {
@@ -154,6 +164,8 @@ const translations: Translations = {
     okButton: ['Lisää valitut'],
     heading: ['Hae tiloja hakemukselle'],
     searchTermLabel: ['Sanahaku'],
+    searchPurposeLabel: ['Käyttötarkoitus'],
+    searchReservationUnitTypeLabel: ['Tilan tyyppi'],
   },
   ReservationUnit: {
     backToSearch: ['Takaisin hakutuloksiin'],

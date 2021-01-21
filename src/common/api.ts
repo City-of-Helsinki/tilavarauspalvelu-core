@@ -113,7 +113,10 @@ export function getApplicationPeriod(
 }
 
 export interface ReservationUnitsParameters {
-  search: string | undefined;
+  applicationPeriod?: number;
+  search?: string;
+  purpose?: number;
+  reservationUnitType?: number;
 }
 
 export function getReservationUnits(

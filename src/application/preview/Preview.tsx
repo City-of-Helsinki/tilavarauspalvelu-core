@@ -1,4 +1,4 @@
-import { Button, IconArrowLeft } from 'hds-react';
+import { Button, Checkbox, IconArrowLeft, Notification } from 'hds-react';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -89,6 +89,22 @@ const TwoColumnContainer = styled.div`
   gap: var(--spacing-m);
 `;
 
+const CheckboxContainer = styled.div`
+  margin-top: 60px;
+  display: flex;
+  align-items: center;
+`;
+
+const StyledNotification = styled(Notification)`
+  line-height: var(--fontsize-heading-m);
+  margin-top: var(--spacing-m);
+
+  svg {
+    position: relative;
+    top: -2px;
+  }
+`;
+
 const Preview = ({ onNext, application }: Props): JSX.Element | null => {
   const [ready, setReady] = useState(false);
 
@@ -101,10 +117,11 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
   const [abilityGroupOptions, setAbilityGroupOptions] = useState<{
     [key: number]: Parameter;
   }>({});
-
   const [reservationUnits, setReservationUnits] = useState<{
     [key: number]: ReservationUnit;
   }>({});
+
+  const [acceptTermsOfUse, setAcceptTermsOfUse] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
@@ -250,6 +267,20 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
               </div>
             ))}
           </TwoColumnContainer>
+          <CheckboxContainer>
+            <Checkbox
+              id="preview.acceptTermsOfUse"
+              checked={acceptTermsOfUse}
+              onChange={(e) => setAcceptTermsOfUse(e.target.checked)}
+            />
+            <label htmlFor="preview.acceptTermsOfUse">
+              {t('Application.preview.userAcceptsTerms')}
+            </label>
+          </CheckboxContainer>
+          <StyledNotification
+            label={t('Application.preview.notification.processing')}>
+            {t('Application.preview.notification.body')}
+          </StyledNotification>
         </div>
       ))}
 
@@ -257,7 +288,9 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
         <Button variant="secondary" iconLeft={<IconArrowLeft />} disabled>
           {t('common.prev')}
         </Button>
-        <Button onClick={() => onSubmit()}>{t('common.submit')}</Button>
+        <Button onClick={() => onSubmit()} disabled={!acceptTermsOfUse}>
+          {t('common.submit')}
+        </Button>
       </ButtonContainer>
     </>
   ) : null;

@@ -18,6 +18,7 @@ import {
 } from '../../common/types';
 import Modal from '../../component/Modal';
 import ReservationUnitModal from './ReservationUnitModal';
+import { OptionType } from '../../common/util';
 
 type CardProps = {
   order: number;
@@ -171,12 +172,18 @@ const ReservationUnitCard = ({
   );
 };
 
+type OptionTypes = {
+  purposeOptions: OptionType[];
+  reservationUnitTypeOptions: OptionType[];
+};
+
 type Props = {
   selectedReservationUnits: ReservationUnit[];
   applicationEvent: ApplicationEvent;
   fieldName: string;
   form: ReturnType<typeof useForm>;
   applicationPeriod: ApplicationPeriod;
+  options: OptionTypes;
 };
 
 const MainContainer = styled.div`
@@ -193,6 +200,7 @@ const ReservationUnitList = ({
   form,
   fieldName,
   applicationPeriod,
+  options,
 }: Props): JSX.Element => {
   const [showModal, setShowModal] = useState(false);
   const [reservationUnits, setReservationUnits] = useState(
@@ -298,6 +306,7 @@ const ReservationUnitList = ({
           currentReservationUnits={reservationUnits}
           applicationPeriod={applicationPeriod}
           handleAdd={handleAdd}
+          options={options}
         />
       </Modal>
     </MainContainer>

@@ -4,14 +4,16 @@ import {
   IconGroup,
   IconInfoCircle,
   IconLocation,
-  SearchInput,
+  TextInput,
+  Select,
+  LoadingSpinner,
 } from 'hds-react';
-import React, { useState } from 'react';
+import React, { ChangeEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useAsync } from 'react-use';
 import styled from 'styled-components';
 import { getReservationUnits } from '../../common/api';
 import { ApplicationPeriod, ReservationUnit } from '../../common/types';
+import { OptionType } from '../../common/util';
 
 const Container = styled.div`
   display: grid;
@@ -110,9 +112,14 @@ const ReservationUnitCard = ({
   );
 };
 
+const containerYMargin = '2em';
 const MainContainer = styled.div`
+  height: calc(100% - (2 * ${containerYMargin}));
   background-color: white;
-  margin: 2em 4em;
+  margin: ${containerYMargin} 0;
+  padding: 0 4em;
+  overflow-x: hidden;
+  overflow-y: auto;
 `;
 
 const Heading = styled.div`
@@ -125,63 +132,164 @@ const Text = styled.span`
   font-size: var(--fontsize-heading-s);
 `;
 
-const StyledSearchInput = styled(SearchInput)`
-  margin-top: 2em;
+const Filters = styled.div`
+  @media (max-width: var(--breakpoint-s)) {
+    grid-template-columns: 1fr;
+  }
+
+  margin-top: var(--spacing-m);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-m);
+`;
+
+const ButtonContainer = styled.div`
+  margin-top: var(--spacing-m);
+  display: flex;
+  align-items: center;
+`;
+
+const SearchButton = styled(Button).attrs({
+  type: 'submit',
+})`
+  margin-right: var(--spacing-m);
+`;
+
+const Ruler = styled.hr`
+  margin-top: var(--spacing-layout-m);
 `;
 
 const Results = styled.div`
-  height: 60vh;
-  overflow-y: auto;
+  margin-bottom: 112px;
 `;
+
+const StyledLoadingSpinner = styled(LoadingSpinner).attrs({ small: true })``;
+
+type OptionsType = {
+  purposeOptions: OptionType[];
+  reservationUnitTypeOptions: OptionType[];
+};
+
+const emptyOption = {
+  label: '',
+};
 
 const ReservationUnitModal = ({
   applicationPeriod,
   handleAdd,
   currentReservationUnits,
+  options,
 }: {
   applicationPeriod: ApplicationPeriod;
   handleAdd: (ru: ReservationUnit) => void;
   currentReservationUnits: ReservationUnit[];
+  options: OptionsType;
 }): JSX.Element => {
-  const [q, setQ] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState<string | undefined>(undefined);
   const [selected, setSelected] = useState<ReservationUnit[]>([]);
+  const [purpose, setPurpose] = useState<OptionType | undefined>(undefined);
+  const [reservationUnitType, setReservationUnitType] = useState<
+    OptionType | undefined
+  >(undefined);
+  const [results, setRes] = useState<ReservationUnit[] | [] | undefined>(
+    undefined
+  );
+  const [searching, setSearching] = useState<boolean>(false);
+
+  const purposeOptions = [emptyOption].concat(options.purposeOptions);
+  const reservationUnitTypeOptions = [emptyOption].concat(
+    options.reservationUnitTypeOptions
+  );
 
   const { t } = useTranslation();
 
-  const results = useAsync(async () => {
-    if (q === null) {
-      return [];
-    }
-    return getReservationUnits({ search: q });
-  }, [q]);
+  const searchResults = async () => {
+    setSearching(true);
+    const searchCriteria = {
+      applicationPeriod: applicationPeriod.id,
+      ...(searchTerm && { search: searchTerm }),
+      ...(purpose && { purpose: purpose.value }),
+      ...(reservationUnitType && {
+        reservationUnitType: reservationUnitType.value,
+      }),
+    };
+
+    const reservationUnits = await getReservationUnits(searchCriteria);
+    const filteredReservationUnits = reservationUnits?.filter((ru) => {
+      // include only items not already selected
+      return !selected.map((n) => n.id).includes(ru.id);
+    });
+    setRes(filteredReservationUnits);
+    setSearching(false);
+  };
 
   const filtered = currentReservationUnits.concat(selected).map((ru) => ru.id);
+  const filteredResults = results?.filter((ru) => !filtered.includes(ru.id));
+
+  if (results === undefined && searching === false) searchResults();
+  const emptyResult = filteredResults?.length === 0 && (
+    <div>{t('common.noResults')}</div>
+  );
 
   return (
     <MainContainer>
       <Heading>{t('ReservationUnitModal.heading')}</Heading>
       <Text>{applicationPeriod.name}</Text>
-      <StyledSearchInput
-        label={t('ReservationUnitModal.searchTermLabel')}
-        onSubmit={(e) => {
-          setQ(e);
-        }}
-      />
+      <Filters>
+        <TextInput
+          id="reservationUnitSearch.search"
+          label={t('ReservationUnitModal.searchTermLabel')}
+          onChange={(e: ChangeEvent<HTMLInputElement>): void => {
+            setSearchTerm(e.target.value);
+          }}
+        />
+        <Select
+          id="reservationUnitSearch.purpose"
+          placeholder={t('common.select')}
+          options={purposeOptions}
+          label={t('ReservationUnitModal.searchPurposeLabel')}
+          onChange={(selection: OptionType): void => {
+            setPurpose(selection);
+          }}
+          defaultValue={emptyOption}
+        />
+        <Select
+          id="reservationUnitSearch.reservationUnitType"
+          placeholder={t('common.select')}
+          options={reservationUnitTypeOptions}
+          label={t('ReservationUnitModal.searchReservationUnitTypeLabel')}
+          onChange={(selection: OptionType): void => {
+            setReservationUnitType(selection);
+          }}
+          defaultValue={emptyOption}
+        />
+      </Filters>
+      <ButtonContainer>
+        <SearchButton
+          onClick={(e) => {
+            e.preventDefault();
+            searchResults();
+          }}>
+          {t('common.search')}
+        </SearchButton>
+        {searching && <StyledLoadingSpinner />}
+      </ButtonContainer>
+      <Ruler />
       <Results>
-        {results.value
-          ?.filter((ru) => !filtered.includes(ru.id))
-          .map((ru) => {
-            return (
-              <ReservationUnitCard
-                handleAdd={() => {
-                  handleAdd(ru);
-                  setSelected([...selected, ru]);
-                }}
-                reservationUnit={ru}
-                key={ru.id}
-              />
-            );
-          })}
+        {filteredResults?.length
+          ? filteredResults.map((ru) => {
+              return (
+                <ReservationUnitCard
+                  handleAdd={() => {
+                    handleAdd(ru);
+                    setSelected([...selected, ru]);
+                  }}
+                  reservationUnit={ru}
+                  key={ru.id}
+                />
+              );
+            })
+          : emptyResult}
       </Results>
     </MainContainer>
   );
