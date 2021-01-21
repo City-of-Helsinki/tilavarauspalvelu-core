@@ -162,6 +162,11 @@ class Space(MPTTModel):
 
 
 class Location(models.Model):
+    """
+    Location is used for classes needing for location data. E.g address or coordinates.
+    Relations are defined in OneToOne relations and can be added when needed.
+    """
+
     address_street = models.CharField(
         verbose_name=_("Address street"), max_length=100, blank=True
     )
