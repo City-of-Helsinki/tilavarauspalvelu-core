@@ -24,6 +24,7 @@ jobs:
       run: |
         yarn install --frozen-lockfile
         yarn lint
+        yarn lint:css
         yarn build
         yarn test
         docker build -t tilavaraus-ui .
