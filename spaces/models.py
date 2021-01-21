@@ -1,3 +1,4 @@
+from django.contrib.gis.db.models import PointField
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from mptt.models import MPTTModel, TreeForeignKey
@@ -34,6 +35,33 @@ class District(MPTTModel):
 
     def __str__(self):
         return "{} ({})".format(self.name, self.parent.name if self.parent else "")
+
+
+class Unit(models.Model):
+    """
+    Model representation of Unit as in "office" or "premises" that could contain
+    separate building etc.
+    """
+
+    service_map_id = models.CharField(
+        verbose_name=_("Service map id"),
+        max_length=255,
+        unique=True,
+        blank=True,
+        null=True,  # If some units needs to be created manually.
+    )
+    name = models.CharField(verbose_name=_("Name"), max_length=255)
+    description = models.TextField(
+        verbose_name=_("Description"), max_length=255, blank=True, default=""
+    )
+    short_description = models.CharField(
+        verbose_name=_("Short description"), max_length=255, blank=True, default=""
+    )
+    web_page = models.URLField(
+        verbose_name=_("Homepage for the unit"), max_length=255, blank=True, default=""
+    )
+    email = models.EmailField(verbose_name=_("Email"), blank=True, max_length=255)
+    phone = models.CharField(verbose_name=_("Telephone"), blank=True, max_length=255)
 
 
 class RealEstate(models.Model):
