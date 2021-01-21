@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { Application, ReservationUnit, Parameter } from '../../common/types';
 import { formatDate } from '../../common/util';
-import { getParameters, getReservationUnits } from '../../common/api';
+import { getParameters, getReservationUnit } from '../../common/api';
 
 type Props = {
   application: Application;
@@ -125,10 +125,22 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
 
   useEffect(() => {
     async function fetchData() {
-      // there's no api to get reservation units with multiple ids so we're getting them all :)  a.k.a. FIXME
-      const units = await getReservationUnits({ search: undefined });
+      const reservationUnitIds = Array.from(
+        new Set(
+          application.applicationEvents.flatMap(
+            (ae) => ae.eventReservationUnits
+          )
+        )
+      );
+
+      const fetchedReservationUnits = await Promise.all(
+        reservationUnitIds.map((ru) => getReservationUnit(ru.reservationUnit))
+      );
+
       setReservationUnits(
-        mapArrayById(units) as { [key: number]: ReservationUnit }
+        mapArrayById(fetchedReservationUnits) as {
+          [key: number]: ReservationUnit;
+        }
       );
 
       const fetchedAbilityGroupOptions = await getParameters('ability_group');
@@ -140,7 +152,7 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
       setReady(true);
     }
     fetchData();
-  }, []);
+  }, [application]);
 
   const { t } = useTranslation();
 
