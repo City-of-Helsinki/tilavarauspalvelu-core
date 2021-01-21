@@ -22,6 +22,7 @@ const Overlay = styled.div`
 
 const ModalElement = styled.div`
   background: white;
+  max-width: var(--breakpoint-l);
   position: fixed;
   top: 50%;
   left: 50%;
@@ -37,11 +38,18 @@ const MainContainer = styled.section`
   display: flex;
   flex-direction: column;
   flex-grow: 1;
+  height: 100%;
 `;
 
 const ButtonContainer = styled.div`
-  margin-bottom: var(--spacing-layout-l);
-  margin-left: var(--spacing-layout-xl);
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: white;
+  padding-top: var(--spacing-layout-xs);
+  padding-bottom: var(--spacing-layout-s);
+  padding-left: var(--spacing-layout-l);
 
   & > button {
     margin-right: var(--spacing-layout-s);

@@ -24,7 +24,7 @@ export const formatApiDate = (date: string): string => {
 // for Selector
 export type OptionType = {
   label: string;
-  value: number;
+  value?: number;
 };
 
 export const getLabel = (parameter: Parameter): string => {
