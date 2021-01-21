@@ -1,11 +1,11 @@
 from django.contrib import admin
 from django.urls import include, path
-from graphene_django.views import GraphQLView
 from drf_spectacular.views import (
     SpectacularAPIView,
     SpectacularRedocView,
     SpectacularSwaggerView,
 )
+from graphene_django.views import GraphQLView
 
 from api.urls import router as api_router
 
