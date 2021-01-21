@@ -121,6 +121,9 @@ const translations: Translations = {
     false: ['ei'],
     true: ['kyllä'],
     close: ['Sulje'],
+    search: ['Hae'],
+    noResults: ['Ei tuloksia'],
+    select: ['Valitse'],
   },
   Navigation: {
     Item: {
@@ -162,6 +165,8 @@ const translations: Translations = {
     okButton: ['Lisää valitut'],
     heading: ['Hae tiloja hakemukselle'],
     searchTermLabel: ['Sanahaku'],
+    searchPurposeLabel: ['Käyttötarkoitus'],
+    searchReservationUnitTypeLabel: ['Tilan tyyppi'],
   },
   ReservationUnit: {
     backToSearch: ['Takaisin hakutuloksiin'],

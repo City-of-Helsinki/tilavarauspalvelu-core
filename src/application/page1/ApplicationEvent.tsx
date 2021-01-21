@@ -19,6 +19,7 @@ type OptionTypes = {
   ageGroupOptions: OptionType[];
   purposeOptions: OptionType[];
   abilityGroupOptions: OptionType[];
+  reservationUnitTypeOptions: OptionType[];
 };
 
 type Props = {
@@ -69,7 +70,12 @@ const ApplicationEvent = ({
   );
   const periodEndDate = formatApiDate(applicationPeriod.applicationPeriodEnd);
 
-  const { ageGroupOptions, abilityGroupOptions, purposeOptions } = optionTypes;
+  const {
+    ageGroupOptions,
+    abilityGroupOptions,
+    purposeOptions,
+    reservationUnitTypeOptions,
+  } = optionTypes;
 
   const { t } = useTranslation();
 
@@ -155,6 +161,7 @@ const ApplicationEvent = ({
         applicationPeriod={applicationPeriod}
         form={form}
         fieldName={fieldName('eventReservationUnits')}
+        options={{ purposeOptions, reservationUnitTypeOptions }}
       />
       <Ruler />
       <SubHeadLine>
