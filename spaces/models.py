@@ -195,6 +195,18 @@ class Location(models.Model):
         related_name="location",
         on_delete=models.CASCADE,
     )
+    unit = models.OneToOneField(
+        "Unit",
+        verbose_name=_("Unit"),
+        null=True,
+        blank=True,
+        related_name="location",
+        on_delete=models.CASCADE,
+    )
+    coordinates = PointField(
+        verbose_name=_("Coordinates"),
+        null=True,
+    )
 
     def __str__(self):
         return "{}, {} {}".format(
