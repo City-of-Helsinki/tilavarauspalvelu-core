@@ -191,19 +191,29 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
             />
             <LabelValue
               label={t('Application.preview.applicationEvent.ageGroup')}
-              value={`${
-                ageGroupOptions[applicationEvent.ageGroupId || 0].minimum
-              } - ${ageGroupOptions[applicationEvent.ageGroupId || 0].maximum}`}
+              value={
+                applicationEvent.ageGroupId
+                  ? `${
+                      ageGroupOptions[applicationEvent.ageGroupId].minimum
+                    } - ${ageGroupOptions[applicationEvent.ageGroupId].maximum}`
+                  : ''
+              }
             />
             <LabelValue
               label={t('Application.preview.applicationEvent.abilityGroup')}
               value={
-                abilityGroupOptions[applicationEvent.abilityGroupId || 0].name
+                applicationEvent.abilityGroupId != null
+                  ? abilityGroupOptions[applicationEvent.abilityGroupId].name
+                  : ''
               }
             />
             <LabelValue
               label={t('Application.preview.applicationEvent.purpose')}
-              value={purposeOptions[applicationEvent.purposeId || 0].name}
+              value={
+                applicationEvent.purposeId != null
+                  ? purposeOptions[applicationEvent.purposeId].name
+                  : ''
+              }
             />
             <LabelValue
               label={t('Application.preview.applicationEvent.additionalInfo')}
