@@ -1,10 +1,13 @@
 module.exports = {
-  extends: ['airbnb-typescript-prettier', 'plugin:jsx-a11y/recommended'],
+  extends: [
+    'airbnb-typescript-prettier',
+    'plugin:jsx-a11y/recommended',
+  ],
   parser: '@typescript-eslint/parser',
   parserOptions: {
-    project: './tsconfig.eslint.json',
     tsconfigRootDir: __dirname,
     sourceType: 'module',
+    createDefaultProgram: true,
   },
   overrides: [
     {
@@ -19,6 +22,7 @@ module.exports = {
     node: true,
   },
   rules: {
+    'import/no-extraneous-dependencies': ['error', { 'devDependencies': ['e2e/**/*.ts'] }],
     'react/prop-types': 0,
     'react/destructuring-assignment': 0,
     'react/static-property-placement': 0,
@@ -66,8 +70,7 @@ module.exports = {
       },
     ],
   },
-  globals: {
-    cy: true,
-  },
-  plugins: ['jsx-a11y'],
+  plugins: [
+    'jsx-a11y',
+  ],
 };
