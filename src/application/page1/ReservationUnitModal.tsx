@@ -206,6 +206,7 @@ const ReservationUnitModal = ({
   const searchResults = async () => {
     setSearching(true);
     const searchCriteria = {
+      applicationPeriod: applicationPeriod.id,
       ...(searchTerm && { search: searchTerm }),
       ...(purpose && { purpose: purpose.value }),
       ...(reservationUnitType && {
@@ -215,14 +216,8 @@ const ReservationUnitModal = ({
 
     const reservationUnits = await getReservationUnits(searchCriteria);
     const filteredReservationUnits = reservationUnits?.filter((ru) => {
-      // include only reservation units made available in the current application period
-      const applicationPeriodFilter = applicationPeriod.reservationUnits.includes(
-        ru.id
-      );
       // include only items not already selected
-      const selectedFilter = !selected.map((n) => n.id).includes(ru.id);
-
-      return applicationPeriodFilter && selectedFilter;
+      return !selected.map((n) => n.id).includes(ru.id);
     });
     setRes(filteredReservationUnits);
     setSearching(false);

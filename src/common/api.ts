@@ -113,6 +113,7 @@ export function getApplicationPeriod(
 }
 
 export interface ReservationUnitsParameters {
+  applicationPeriod?: number;
   search?: string;
   purpose?: number;
   reservationUnitType?: number;
