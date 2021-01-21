@@ -72,6 +72,7 @@ const Home = (): JSX.Element => {
             <p>{t('home.info.text')}</p>
             <ButtonContainer>
               <Button
+                id="browseAllButton"
                 variant="secondary"
                 theme="black"
                 onClick={() => history.push('/search')}
