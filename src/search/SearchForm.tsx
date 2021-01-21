@@ -72,7 +72,7 @@ const SearchForm = ({ onSearch }: Props): JSX.Element => {
     <>
       <Container>
         <TextInput
-          id="search"
+          id="searchText"
           label="&nbsp;"
           placeholder={t('SearchForm.searchTermPlaceholder')}
           onChange={(e) => setQ(e.target.value)}
@@ -112,7 +112,7 @@ const SearchForm = ({ onSearch }: Props): JSX.Element => {
       </Container>
       <Hr />
       <ButtonContainer>
-        <Button onClick={search} iconLeft={<IconSearch />}>
+        <Button id="searchButton" onClick={search} iconLeft={<IconSearch />}>
           {t('SearchForm.searchButton')}
         </Button>
       </ButtonContainer>
