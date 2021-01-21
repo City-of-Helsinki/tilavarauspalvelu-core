@@ -6,36 +6,13 @@ import styled from 'styled-components';
 import { Application, ReservationUnit, Parameter } from '../../common/types';
 import { formatDate } from '../../common/util';
 import { getParameters, getReservationUnits } from '../../common/api';
+import LabelValue from '../../component/LabelValue';
+import TimePreview from '../TimePreview';
 
 type Props = {
   application: Application;
   onNext: () => void;
 };
-
-const LabelElelemt = styled.div`
-  margin-top: var(--spacing-3-xs);
-  font-family: HelsinkiGrotesk-Bold, var(--font-default);
-  font-size: var(--fontsize-body-l);
-  font-weight: bold;
-`;
-const ValueElement = styled.div`
-  margin-top: var(--spacing-2-xs);
-  font-family: HelsinkiGrotesk-Regular, var(--font-default);
-  font-size: var(--fontsize-body-m);
-`;
-
-const LabelValue = ({
-  label,
-  value,
-}: {
-  label: string;
-  value: string | undefined | null | number | JSX.Element[];
-}): JSX.Element | null => (
-  <div>
-    <LabelElelemt>{label}</LabelElelemt>
-    <ValueElement>{value}</ValueElement>
-  </div>
-);
 
 const mapArrayById = (
   array: { id: number }[]
@@ -87,6 +64,12 @@ const TwoColumnContainer = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--spacing-m);
+`;
+
+const TimePreviewContainer = styled(TwoColumnContainer)`
+  svg {
+    margin-top: 2px;
+  }
 `;
 
 const CheckboxContainer = styled.div`
@@ -242,31 +225,13 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
           <SmallSubHeadline>
             {t('Application.preview.applicationEventSchedules')}
           </SmallSubHeadline>
-          <TwoColumnContainer>
-            {[
-              'monday',
-              'tuesday',
-              'wednesday',
-              'thursday',
-              'friday',
-              'saturday',
-              'sunday',
-            ].map((day, index) => (
-              <div key={day}>
-                <LabelValue
-                  label={t(`calendar.${day}`)}
-                  value={applicationEvent.applicationEventSchedules
-                    .filter((s) => s.day === index)
-                    .map((s, i) => (
-                      <span key={s.id}>
-                        {i !== 0 ? ', ' : ''}
-                        {s.begin.substring(0, 5)} - {s.end.substring(0, 5)}
-                      </span>
-                    ))}
-                />
-              </div>
-            ))}
-          </TwoColumnContainer>
+          <TimePreviewContainer>
+            <TimePreview
+              applicationEventSchedules={
+                applicationEvent.applicationEventSchedules
+              }
+            />
+          </TimePreviewContainer>
           <CheckboxContainer>
             <Checkbox
               id="preview.acceptTermsOfUse"

@@ -40,6 +40,7 @@ const translations: Translations = {
       heading: ['2. Vakiovuoron ajankohta'],
       text: ['Anna toivomasi ajankohta jokaiselle luomallesi vakiovuorolle.'],
       copyTimes: ['Kopioi valinnat kaikille vakiovuoroille'],
+      summary: ['Yhteenveto'],
     },
     Page3: {
       heading: ['3. Varaajan perustiedot'],

@@ -8,4 +8,6 @@
   --tilavaraus-application-period-card-active-background-color: #9ef0de;
   --tilavaraus-application-period-card-active-border-color: #007a64;
   --tilavaraus-gray: #f5f6f8;
+  --tilavaraus-blue: #0072c6;
+  --tilavaraus-calendar-selected: var(--tilavaraus-blue);
 }

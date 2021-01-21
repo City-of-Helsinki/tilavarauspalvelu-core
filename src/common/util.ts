@@ -50,3 +50,13 @@ export const getSelectedOption = (
   const option = options.find((o) => o.value === selectedId);
   return option;
 };
+
+export const weekdays = [
+  'monday',
+  'tuesday',
+  'wednesday',
+  'thursday',
+  'friday',
+  'saturday',
+  'sunday',
+];
