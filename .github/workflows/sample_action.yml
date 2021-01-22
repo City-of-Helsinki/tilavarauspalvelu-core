@@ -1,7 +1,9 @@
 name: Build
 
 on:
-  workflow_dispatch:
+  push:
+    branches: [master, develop]
+  pull_request:
 
 jobs:
   build:
@@ -13,6 +15,10 @@ jobs:
           POSTGRES_USER: tvp
           POSTGRES_PASSWORD: tvp
           POSTGRES_DB: tvp
+          DEBUG: true
+          SECRET_KEY: build_secret
+        ports:
+          - 5432:5432
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python 3.8
@@ -20,7 +26,7 @@ jobs:
         with:
           python-version: 3.8
       - name: psycopg2 prerequisites
-        run: sudo apt install python-dev libpq-dev -y
+        run: sudo apt install python-dev libpq-dev gdal-bin -y
       - name: Install dependencies
         run: |
           python3 -m pip install --upgrade pip
@@ -35,5 +41,9 @@ jobs:
           black --check --config black.toml .
           isort --check-only .
       - name: Test with pytest
+        env:
+          DATABASE_URL: postgis://tvp:tvp@localhost/tvp
+          DEBUG: true
+          SECRET_KEY: build_secret
         run: |
           pytest
