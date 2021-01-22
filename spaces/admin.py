@@ -6,7 +6,7 @@ from .models import Building, District, Location, RealEstate, Space
 
 class LocationInline(admin.TabularInline):
     model = Location
-    fields = ["address_street", "address_zip", "address_city"]
+    fields = ["address_street", "address_zip", "address_city", "coordinates"]
 
 
 class DistrictInline(admin.TabularInline):
