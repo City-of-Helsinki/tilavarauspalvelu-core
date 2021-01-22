@@ -15,7 +15,7 @@ const Wrapper = styled.div`
 `;
 
 const StyledIconClock = styled(IconClock)`
-  min-width: 20px;
+  min-width: 24px;
   margin: 5px 6px 0 0;
 `;
 
