@@ -81,6 +81,7 @@ INSTALLED_APPS = [
     "auditlog",
     "elasticapm.contrib.django",
     "modeltranslation",
+    "django.contrib.gis",
 ]
 
 MIDDLEWARE = [
