@@ -8,7 +8,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('spaces', '0006_unit'),
+        ('spaces', '0007_unit'),
     ]
 
     operations = [

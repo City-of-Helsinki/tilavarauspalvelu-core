@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('spaces', '0005_location_relations_to_location_model'),
+        ('spaces', '0006_spaces_modeltranslation'),
     ]
 
     operations = [
