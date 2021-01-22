@@ -1,6 +1,7 @@
 import { Button, IconArrowLeft, IconArrowRight } from 'hds-react';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useDebounce } from 'use-debounce';
 import styled from 'styled-components';
 import { Application, ApplicationEventSchedule } from '../../common/types';
 import TimeSelector, { Cell } from './TimeSelector';
@@ -66,6 +67,8 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
     )
   );
 
+  const [debouncedSelectorData] = useDebounce(selectorData, 500);
+
   const updateCells = (index: number, newCells: Cell[][]) => {
     const updated = [...selectorData];
     updated[index] = newCells;
@@ -126,7 +129,7 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
     onNext();
   };
 
-  const r = (
+  return (
     <>
       {application.applicationEvents.map((event, index) => {
         return (
@@ -137,7 +140,9 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
             cells={selectorData[index]}
             updateCells={updateCells}
             copyCells={copyCells}
-            summaryData={cellsToApplicationEventSchedules(selectorData[index])}
+            summaryData={cellsToApplicationEventSchedules(
+              debouncedSelectorData[index]
+            )}
           />
         );
       })}
@@ -152,8 +157,6 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
       </ButtonContainer>
     </>
   );
-
-  return r;
 };
 
 export default Page2;

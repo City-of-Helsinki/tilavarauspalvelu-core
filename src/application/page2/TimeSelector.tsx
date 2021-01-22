@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { ApplicationEvent, ApplicationEventSchedule } from '../../common/types';
 import TimePreview from '../TimePreview';
-import { weekdays } from '../../common/util';
+import { weekdays } from '../../common/const';
 
 type Props = {
   applicationEvent: ApplicationEvent;
@@ -162,7 +162,7 @@ const LegendBox = styled.div<{ type: string }>`
 `;
 
 const LegendLabel = styled.div`
-  font-family: 'HelsinkiGrotesk-Bold';
+  font-family: HelsinkiGrotesk-Bold, var(--font-default);
 `;
 
 const TimePreviewContainer = styled.div`

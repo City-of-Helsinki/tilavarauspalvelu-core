@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { IconClock } from 'hds-react';
 import styled from 'styled-components';
-import { weekdays } from '../common/util';
+import { weekdays } from '../common/const';
 import LabelValue from '../component/LabelValue';
 import { ApplicationEventSchedule } from '../common/types';
 
@@ -15,7 +15,7 @@ const Wrapper = styled.div`
 `;
 
 const StyledIconClock = styled(IconClock)`
-  min-width: var(--icon-size);
+  min-width: 20px;
   margin: 5px 6px 0 0;
 `;
 
