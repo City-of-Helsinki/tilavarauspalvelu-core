@@ -122,6 +122,7 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
   }>({});
 
   const [acceptTermsOfUse, setAcceptTermsOfUse] = useState(false);
+  const { i18n } = useTranslation();
 
   useEffect(() => {
     async function fetchData() {
@@ -233,7 +234,11 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
                     'Application.preview.applicationEvent.reservationUnit',
                     { order: index + 1 }
                   )}
-                  value={reservationUnits[reservationUnit.reservationUnit].name}
+                  value={
+                    reservationUnits[reservationUnit.reservationUnit].name[
+                      i18n.language
+                    ]
+                  }
                 />
               )
             )}

@@ -110,6 +110,8 @@ const ReservationUnitCard = ({
   onMoveDown,
   t,
 }: CardProps): JSX.Element => {
+  const { i18n } = useTranslation();
+
   return (
     <NameCardContainer>
       <PreCardLabel>
@@ -123,7 +125,7 @@ const ReservationUnitCard = ({
             height="99"
           />
           <div>
-            <Title>{reservationUnit.name}</Title>
+            <Title>{reservationUnit.name[i18n.language]}</Title>
             <Address>
               {reservationUnit.location?.addressStreet},
               {reservationUnit.location?.addressZip}{' '}

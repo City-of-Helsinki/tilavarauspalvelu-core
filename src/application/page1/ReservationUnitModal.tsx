@@ -72,11 +72,12 @@ const ReservationUnitCard = ({
   reservationUnit: ReservationUnit;
   handleAdd: (ru: ReservationUnit) => void;
 }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+
   return (
     <Container>
       <img
-        alt={`Kuva tilasta ${reservationUnit.name}`}
+        alt={`Kuva tilasta ${reservationUnit.name[i18n.language]}`}
         width="240"
         height="156"
         src={
@@ -85,8 +86,10 @@ const ReservationUnitCard = ({
         }
       />
       <MainContent>
-        <Name>{reservationUnit.name}</Name>
-        <Description>{reservationUnit.spaces[0]?.name}</Description>
+        <Name>{reservationUnit.name[i18n.language]}</Name>
+        <Description>
+          {reservationUnit.spaces[0]?.name[i18n.language]}
+        </Description>
         <Bottom>
           <IconInfoCircle />{' '}
           <span>{reservationUnit.reservationUnitType.name}</span>
