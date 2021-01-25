@@ -1,11 +1,17 @@
-import { Button, Checkbox, IconArrowLeft, Notification } from 'hds-react';
+import {
+  Button,
+  Checkbox,
+  IconArrowLeft,
+  Notification,
+  Accordion,
+} from 'hds-react';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { Application, ReservationUnit, Parameter } from '../../common/types';
 import { formatDate } from '../../common/util';
-import { getParameters, getReservationUnits } from '../../common/api';
+import { getParameters, getReservationUnit } from '../../common/api';
 import LabelValue from '../../component/LabelValue';
 import TimePreview from '../TimePreview';
 
@@ -39,13 +45,6 @@ const Ruler = styled.hr`
   margin-top: var(--spacing-layout-m);
   border-left: none;
   border-right: none;
-`;
-
-const SubHeadline = styled.div`
-  font-family: HelsinkiGrotesk-Bold, var(--font-default);
-  margin-top: var(--spacing-layout-m);
-  font-weight: 700;
-  font-size: var(--fontsize-heading-m);
 `;
 
 const SmallSubHeadline = styled.div`
@@ -109,10 +108,22 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
 
   useEffect(() => {
     async function fetchData() {
-      // there's no api to get reservation units with multiple ids so we're getting them all :)  a.k.a. FIXME
-      const units = await getReservationUnits({ search: undefined });
+      const reservationUnitIds = Array.from(
+        new Set(
+          application.applicationEvents.flatMap(
+            (ae) => ae.eventReservationUnits
+          )
+        )
+      );
+
+      const fetchedReservationUnits = await Promise.all(
+        reservationUnitIds.map((ru) => getReservationUnit(ru.reservationUnit))
+      );
+
       setReservationUnits(
-        mapArrayById(units) as { [key: number]: ReservationUnit }
+        mapArrayById(fetchedReservationUnits) as {
+          [key: number]: ReservationUnit;
+        }
       );
 
       const fetchedAbilityGroupOptions = await getParameters('ability_group');
@@ -124,7 +135,7 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
       setReady(true);
     }
     fetchData();
-  }, []);
+  }, [application]);
 
   const { t } = useTranslation();
 
@@ -146,112 +157,128 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
 
   return ready ? (
     <>
-      <SubHeadline>{t('Application.preview.basicInfoSubHeading')}</SubHeadline>
-      <TwoColumnContainer>
-        <LabelValue
-          label={t('Application.preview.firstName')}
-          value={application.contactPerson?.firstName}
-        />
-        <LabelValue
-          label={t('Application.preview.lastName')}
-          value={application.contactPerson?.lastName}
-        />
-        <LabelValue
-          label={t('Application.preview.email')}
-          value={application.contactPerson?.email}
-        />
-      </TwoColumnContainer>
+      <Accordion heading={t('Application.preview.basicInfoSubHeading')}>
+        <TwoColumnContainer>
+          <LabelValue
+            label={t('Application.preview.firstName')}
+            value={application.contactPerson?.firstName}
+          />
+          <LabelValue
+            label={t('Application.preview.lastName')}
+            value={application.contactPerson?.lastName}
+          />
+          <LabelValue
+            label={t('Application.preview.email')}
+            value={application.contactPerson?.email}
+          />
+        </TwoColumnContainer>
+      </Accordion>
       {application.applicationEvents.map((applicationEvent) => (
-        <div key={applicationEvent.id}>
-          <SubHeadline>{applicationEvent.name}</SubHeadline>
-          <TwoColumnContainer>
-            <LabelValue
-              label={t('Application.preview.applicationEvent.name')}
-              value={applicationEvent.name}
-            />
-            <LabelValue
-              label={t('Application.preview.applicationEvent.numPersons')}
-              value={applicationEvent.numPersons}
-            />
-            <LabelValue
-              label={t('Application.preview.applicationEvent.ageGroup')}
-              value={`${
-                ageGroupOptions[applicationEvent.ageGroupId || 0].minimum
-              } - ${ageGroupOptions[applicationEvent.ageGroupId || 0].maximum}`}
-            />
-            <LabelValue
-              label={t('Application.preview.applicationEvent.abilityGroup')}
-              value={
-                abilityGroupOptions[applicationEvent.abilityGroupId || 0].name
-              }
-            />
-            <LabelValue
-              label={t('Application.preview.applicationEvent.purpose')}
-              value={purposeOptions[applicationEvent.purposeId || 0].name}
-            />
-            <LabelValue
-              label={t('Application.preview.applicationEvent.additionalInfo')}
-              value=""
-            />
-            <LabelValue
-              label={t('Application.preview.applicationEvent.begin')}
-              value={formatDate(applicationEvent.begin || '')}
-            />
-            <LabelValue
-              label={t('Application.preview.applicationEvent.end')}
-              value={formatDate(applicationEvent.end || '')}
-            />
-            <LabelValue
-              label={t('Application.preview.applicationEvent.eventsPerWeek')}
-              value={applicationEvent.eventsPerWeek}
-            />
-            <LabelValue
-              label={t('Application.preview.applicationEvent.biweekly')}
-              value={t(`common.${applicationEvent.biweekly}`) as string}
-            />
-            {applicationEvent.eventReservationUnits.map(
-              (reservationUnit, index) => (
-                <LabelValue
-                  key={reservationUnit.reservationUnit}
-                  label={t(
-                    'Application.preview.applicationEvent.reservationUnit',
-                    { order: index + 1 }
-                  )}
-                  value={
-                    reservationUnits[reservationUnit.reservationUnit].name[
-                      i18n.language
-                    ]
-                  }
-                />
-              )
-            )}
-          </TwoColumnContainer>
-          <Ruler />
-          <SmallSubHeadline>
-            {t('Application.preview.applicationEventSchedules')}
-          </SmallSubHeadline>
-          <TimePreviewContainer>
-            <TimePreview
-              applicationEventSchedules={
-                applicationEvent.applicationEventSchedules
-              }
-            />
-          </TimePreviewContainer>
-          <CheckboxContainer>
-            <Checkbox
-              id="preview.acceptTermsOfUse"
-              checked={acceptTermsOfUse}
-              onChange={(e) => setAcceptTermsOfUse(e.target.checked)}
-            />
-            <label htmlFor="preview.acceptTermsOfUse">
-              {t('Application.preview.userAcceptsTerms')}
-            </label>
-          </CheckboxContainer>
-          <StyledNotification
-            label={t('Application.preview.notification.processing')}>
-            {t('Application.preview.notification.body')}
-          </StyledNotification>
-        </div>
+        <>
+          <Accordion
+            key={applicationEvent.id}
+            heading={applicationEvent.name || ''}>
+            <TwoColumnContainer>
+              <LabelValue
+                label={t('Application.preview.applicationEvent.name')}
+                value={applicationEvent.name}
+              />
+              <LabelValue
+                label={t('Application.preview.applicationEvent.numPersons')}
+                value={applicationEvent.numPersons}
+              />
+              <LabelValue
+                label={t('Application.preview.applicationEvent.ageGroup')}
+                value={
+                  applicationEvent.ageGroupId
+                    ? `${
+                        ageGroupOptions[applicationEvent.ageGroupId].minimum
+                      } - ${
+                        ageGroupOptions[applicationEvent.ageGroupId].maximum
+                      }`
+                    : ''
+                }
+              />{' '}
+              <LabelValue
+                label={t('Application.preview.applicationEvent.abilityGroup')}
+                value={
+                  applicationEvent.abilityGroupId != null
+                    ? abilityGroupOptions[applicationEvent.abilityGroupId].name
+                    : ''
+                }
+              />{' '}
+              <LabelValue
+                label={t('Application.preview.applicationEvent.purpose')}
+                value={
+                  applicationEvent.purposeId != null
+                    ? purposeOptions[applicationEvent.purposeId].name
+                    : ''
+                }
+              />{' '}
+              <LabelValue
+                label={t('Application.preview.applicationEvent.additionalInfo')}
+                value=""
+              />
+              <LabelValue
+                label={t('Application.preview.applicationEvent.begin')}
+                value={formatDate(applicationEvent.begin || '')}
+              />
+              <LabelValue
+                label={t('Application.preview.applicationEvent.end')}
+                value={formatDate(applicationEvent.end || '')}
+              />
+              <LabelValue
+                label={t('Application.preview.applicationEvent.eventsPerWeek')}
+                value={applicationEvent.eventsPerWeek}
+              />
+              <LabelValue
+                label={t('Application.preview.applicationEvent.biweekly')}
+                value={t(`common.${applicationEvent.biweekly}`) as string}
+              />
+              {applicationEvent.eventReservationUnits.map(
+                (reservationUnit, index) => (
+                  <LabelValue
+                    key={reservationUnit.reservationUnit}
+                    label={t(
+                      'Application.preview.applicationEvent.reservationUnit',
+                      { order: index + 1 }
+                    )}
+                    value={
+                      reservationUnits[reservationUnit.reservationUnit].name[
+                        i18n.language
+                      ]
+                    }
+                  />
+                )
+              )}
+            </TwoColumnContainer>
+            <Ruler />
+            <SmallSubHeadline>
+              {t('Application.preview.applicationEventSchedules')}
+            </SmallSubHeadline>
+            <TimePreviewContainer>
+              <TimePreview
+                applicationEventSchedules={
+                  applicationEvent.applicationEventSchedules
+                }
+              />
+            </TimePreviewContainer>
+            <CheckboxContainer>
+              <Checkbox
+                id="preview.acceptTermsOfUse"
+                checked={acceptTermsOfUse}
+                onChange={(e) => setAcceptTermsOfUse(e.target.checked)}
+              />
+              <label htmlFor="preview.acceptTermsOfUse">
+                {t('Application.preview.userAcceptsTerms')}
+              </label>
+            </CheckboxContainer>
+            <StyledNotification
+              label={t('Application.preview.notification.processing')}>
+              {t('Application.preview.notification.body')}
+            </StyledNotification>
+          </Accordion>
+        </>
       ))}
 
       <ButtonContainer>
