@@ -14,18 +14,27 @@ import styled from 'styled-components';
 import { getReservationUnits } from '../../common/api';
 import { ApplicationPeriod, ReservationUnit } from '../../common/types';
 import { OptionType } from '../../common/util';
+import { breakpoint } from '../../common/style';
 
 const Container = styled.div`
-  display: grid;
-  background-color: var(--color-white);
-  margin-top: var(--spacing-s);
-  grid-template-columns: 250px 3fr 1fr;
-`;
+  @media (max-width: ${breakpoint.l}) {
+    gap: 1em;
+    grid-template-areas:
+      'i n'
+      'i d'
+      'p p'
+      'a a';
+    grid-template-columns: 180px auto;
+  }
 
-const MainContent = styled.div`
-  display: flex;
-  flex-direction: column;
-  margin: var(--spacing-m);
+  grid-template:
+    'i n a'
+    'i d a'
+    'i p a';
+  grid-template-columns: 180px auto 4em;
+
+  display: grid;
+  margin-top: var(--spacing-s);
 `;
 
 const Actions = styled.div`
@@ -36,6 +45,7 @@ const Actions = styled.div`
 `;
 
 const Name = styled.span`
+  grid-area: n;
   font-family: HelsinkiGrotesk-Bold, var(--font-default);
   font-size: var(--fontsize-heading-m);
   font-weight: bold;
@@ -47,79 +57,91 @@ const Name = styled.span`
 `;
 
 const Description = styled.span`
+  background-color: yellow;
+  grid-area: d;
   font-size: var(--fontsize-body-l);
   flex-grow: 1;
 `;
 
-const Bottom = styled.span`
+const Props = styled.span`
+  grid-area: p;
   display: flex;
   font-weight: 500;
   align-items: center;
 
-  & > svg {
+  svg {
     margin-right: var(--spacing-xs);
   }
 
-  & > span:not(:first-child) {
+  span:not(:first-child) {
     margin-right: var(--spacing-layout-m);
   }
+`;
+
+const Image = styled.img`
+  grid-area: i;
+  width: 178px;
+  height: 185px;
 `;
 
 const ReservationUnitCard = ({
   reservationUnit,
   handleAdd,
+  handleRemove,
+  isSelected,
 }: {
   reservationUnit: ReservationUnit;
+  isSelected: boolean;
   handleAdd: (ru: ReservationUnit) => void;
+  handleRemove: (ru: ReservationUnit) => void;
 }) => {
   const { t, i18n } = useTranslation();
 
+  const handle = () =>
+    isSelected ? handleRemove(reservationUnit) : handleAdd(reservationUnit);
+  const buttonText = isSelected
+    ? t('ReservationUnitModal.unSelectReservationUnit')
+    : t('ReservationUnitModal.selectReservationUnit');
+
   return (
     <Container>
-      <img
+      <Image
         alt={`Kuva tilasta ${reservationUnit.name[i18n.language]}`}
-        width="240"
-        height="156"
         src={
           reservationUnit.images[0]?.imageUrl ||
           'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='
         }
       />
-      <MainContent>
-        <Name>{reservationUnit.name[i18n.language]}</Name>
-        <Description>
-          {reservationUnit.spaces[0]?.name[i18n.language]}
-        </Description>
-        <Bottom>
-          <IconInfoCircle />{' '}
-          <span>{reservationUnit.reservationUnitType.name}</span>
-          <IconGroup /> <span>{reservationUnit.maxPersons}</span>
-          <IconLocation />{' '}
-          <span>
-            {reservationUnit.location?.addressStreet},{' '}
-            {reservationUnit.location?.addressZip}{' '}
-            {reservationUnit.location?.addressCity}
-          </span>
-        </Bottom>
-      </MainContent>
+      <Name>{reservationUnit.name[i18n.language]}</Name>
+      <Description>
+        {reservationUnit.spaces[0]?.name[i18n.language]}
+      </Description>
+      <Props>
+        <IconInfoCircle />{' '}
+        <span>{reservationUnit.reservationUnitType.name}</span>
+        <IconGroup /> <span>{reservationUnit.maxPersons}</span>
+        <IconLocation />{' '}
+        <span>
+          {reservationUnit.location?.addressStreet},{' '}
+          {reservationUnit.location?.addressZip}{' '}
+          {reservationUnit.location?.addressCity}
+        </span>
+      </Props>
       <Actions>
         <div style={{ flexGrow: 1 }} />
         <Button
           iconRight={<IconArrowRight />}
-          onClick={() => handleAdd(reservationUnit)}
-          variant="secondary">
-          {t('ReservationUnitModal.selectReservationUnit')}
+          onClick={handle}
+          variant={isSelected ? 'secondary' : 'primary'}>
+          {buttonText}
         </Button>
       </Actions>
     </Container>
   );
 };
 
-const containerYMargin = '2em';
 const MainContainer = styled.div`
-  height: calc(100% - (2 * ${containerYMargin}));
-  background-color: white;
-  margin: ${containerYMargin} 0;
+  margin: var(--spacing-m) 0;
   padding: 0 4em;
   overflow-x: hidden;
   overflow-y: auto;
@@ -136,7 +158,7 @@ const Text = styled.span`
 `;
 
 const Filters = styled.div`
-  @media (max-width: var(--breakpoint-s)) {
+  @media (max-width: ${breakpoint.m}) {
     grid-template-columns: 1fr;
   }
 
@@ -180,23 +202,22 @@ const emptyOption = {
 const ReservationUnitModal = ({
   applicationPeriod,
   handleAdd,
+  handleRemove,
   currentReservationUnits,
   options,
 }: {
   applicationPeriod: ApplicationPeriod;
   handleAdd: (ru: ReservationUnit) => void;
+  handleRemove: (ru: ReservationUnit) => void;
   currentReservationUnits: ReservationUnit[];
   options: OptionsType;
 }): JSX.Element => {
   const [searchTerm, setSearchTerm] = useState<string | undefined>(undefined);
-  const [selected, setSelected] = useState<ReservationUnit[]>([]);
   const [purpose, setPurpose] = useState<OptionType | undefined>(undefined);
   const [reservationUnitType, setReservationUnitType] = useState<
     OptionType | undefined
   >(undefined);
-  const [results, setRes] = useState<ReservationUnit[] | [] | undefined>(
-    undefined
-  );
+  const [results, setResults] = useState<ReservationUnit[]>([]);
   const [searching, setSearching] = useState<boolean>(false);
 
   const purposeOptions = [emptyOption].concat(options.purposeOptions);
@@ -218,19 +239,12 @@ const ReservationUnitModal = ({
     };
 
     const reservationUnits = await getReservationUnits(searchCriteria);
-    const filteredReservationUnits = reservationUnits?.filter((ru) => {
-      // include only items not already selected
-      return !selected.map((n) => n.id).includes(ru.id);
-    });
-    setRes(filteredReservationUnits);
+    setResults(reservationUnits);
     setSearching(false);
   };
 
-  const filtered = currentReservationUnits.concat(selected).map((ru) => ru.id);
-  const filteredResults = results?.filter((ru) => !filtered.includes(ru.id));
-
   if (results === undefined && searching === false) searchResults();
-  const emptyResult = filteredResults?.length === 0 && (
+  const emptyResult = results?.length === 0 && (
     <div>{t('common.noResults')}</div>
   );
 
@@ -279,14 +293,20 @@ const ReservationUnitModal = ({
       </ButtonContainer>
       <Ruler />
       <Results>
-        {filteredResults?.length
-          ? filteredResults.map((ru) => {
+        {results?.length
+          ? results.map((ru) => {
               return (
                 <ReservationUnitCard
                   handleAdd={() => {
                     handleAdd(ru);
-                    setSelected([...selected, ru]);
                   }}
+                  handleRemove={() => {
+                    handleRemove(ru);
+                  }}
+                  isSelected={
+                    currentReservationUnits.find((i) => i.id === ru.id) !==
+                    undefined
+                  }
                   reservationUnit={ru}
                   key={ru.id}
                 />

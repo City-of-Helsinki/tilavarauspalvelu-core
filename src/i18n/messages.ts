@@ -121,9 +121,9 @@ const translations: Translations = {
     false: ['ei'],
     true: ['kyllä'],
     close: ['Sulje'],
-    search: ['Hae'],
-    noResults: ['Ei tuloksia'],
-    select: ['Valitse'],
+    search: ['Hae', 'Search', 'Sök'],
+    noResults: ['Ei tuloksia', 'No results', 'Inga resultat'],
+    select: ['Valitse', 'Choose', 'Välja'],
   },
   Navigation: {
     Item: {
@@ -161,8 +161,8 @@ const translations: Translations = {
     add: ['Lisää tila'],
   },
   ReservationUnitModal: {
-    selectReservationUnit: ['Lisää hakemukselle'],
-    okButton: ['Lisää valitut'],
+    selectReservationUnit: ['Lisää hakemukselle', 'Add to application'],
+    unSelectReservationUnit: ['Poista hakemukselta', 'Remove from application'],
     heading: ['Hae tiloja hakemukselle'],
     searchTermLabel: ['Sanahaku'],
     searchPurposeLabel: ['Käyttötarkoitus'],
@@ -177,7 +177,7 @@ const translations: Translations = {
     text: ['Valitse tilat joihin haluat hakea vakiovuoroja.'],
   },
   SearchForm: {
-    searchTermPlaceholder: ['Hae sanalla'],
+    searchTermPlaceholder: ['Hae sanalla', 'Search with words', 'Sök med ord'],
     searchButton: ['Hae tilaa'],
   },
   SearchResultList: {

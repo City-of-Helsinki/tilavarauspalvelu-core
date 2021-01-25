@@ -4,10 +4,9 @@ import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 type Props = {
-  handleClose: (ok: boolean) => void;
+  handleClose: () => void;
   show: boolean;
   children: React.ReactNode;
-  okLabel: string;
 };
 
 const Overlay = styled.div`
@@ -22,7 +21,7 @@ const Overlay = styled.div`
 
 const ModalElement = styled.div`
   background: white;
-  max-width: var(--container-width-l);
+  max-width: var(--container-width-xl);
   position: fixed;
   top: 50%;
   left: 50%;
@@ -56,12 +55,7 @@ const ButtonContainer = styled.div`
   }
 `;
 
-const Modal = ({
-  handleClose,
-  show,
-  okLabel,
-  children,
-}: Props): JSX.Element | null => {
+const Modal = ({ handleClose, show, children }: Props): JSX.Element | null => {
   const { t } = useTranslation();
 
   if (!show) {
@@ -70,18 +64,13 @@ const Modal = ({
 
   return (
     <>
-      <Overlay
-        role="none"
-        onClick={() => handleClose(false)}
-        onKeyDown={() => handleClose(false)}
-      />
+      <Overlay role="none" onClick={handleClose} onKeyDown={handleClose} />
       <ModalElement>
         <MainContainer>{children}</MainContainer>
         <ButtonContainer>
-          <Button variant="secondary" onClick={() => handleClose(false)}>
+          <Button variant="secondary" onClick={handleClose}>
             {t('common.close')}
           </Button>
-          <Button onClick={() => handleClose(true)}>{okLabel}</Button>
         </ButtonContainer>
       </ModalElement>
     </>
