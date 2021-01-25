@@ -22,7 +22,7 @@ const Overlay = styled.div`
 
 const ModalElement = styled.div`
   background: white;
-  max-width: var(--breakpoint-l);
+  max-width: var(--container-width-l);
   position: fixed;
   top: 50%;
   left: 50%;

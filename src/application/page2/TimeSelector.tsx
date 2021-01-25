@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { ApplicationEvent, ApplicationEventSchedule } from '../../common/types';
 import TimePreview from '../TimePreview';
 import { weekdays } from '../../common/const';
+import { breakpoint } from '../../common/style';
 
 type Props = {
   applicationEvent: ApplicationEvent;
@@ -122,10 +123,10 @@ const Day = ({
 };
 
 const CalendarContainer = styled.div`
-  @media (max-width: var(--breakpoint-m)) {
+  @media (max-width: ${breakpoint.m}) {
     grid-template-columns: 1fr 1fr 1fr 1fr;
   }
-  @media (max-width: var(--breakpoint-xs)) {
+  @media (max-width: ${breakpoint.xs}) {
     grid-template-columns: 1fr;
   }
 
@@ -166,7 +167,7 @@ const LegendLabel = styled.div`
 `;
 
 const TimePreviewContainer = styled.div`
-  @media (max-width: var(--breakpoint-s)) {
+  @media (max-width: ${breakpoint.s}) {
     grid-template-columns: 1fr;
   }
 

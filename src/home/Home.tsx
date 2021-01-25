@@ -6,6 +6,7 @@ import styled from 'styled-components';
 import Container from '../component/Container';
 import Head from './Head';
 import ApplicationPeriods from './ApplicationPeriodList';
+import { breakpoint } from '../common/style';
 
 const TopContainer = styled.div`
   margin-right: 30%;
@@ -32,7 +33,7 @@ const InfoContainer = styled.div`
 `;
 
 const ButtonContainer = styled.div`
-  @media (max-width: var(--breakpoint-s)) {
+  @media (max-width: ${breakpoint.s}) {
     display: flex;
     flex-direction: column;
 
