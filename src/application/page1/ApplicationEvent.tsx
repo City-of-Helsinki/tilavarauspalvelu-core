@@ -14,6 +14,7 @@ import {
   getSelectedOption,
   OptionType,
 } from '../../common/util';
+import { breakpoint } from '../../common/style';
 
 type OptionTypes = {
   ageGroupOptions: OptionType[];
@@ -47,14 +48,31 @@ const TwoColumnContainer = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--spacing-m);
+  @media (max-width: ${breakpoint.m}) {
+    grid-template-columns: 1fr;
+  }
 `;
 
 const PeriodContainer = styled.div`
   margin-top: var(--spacing-m);
   display: grid;
+  grid-template: auto;
   grid-template-columns: 2fr 2fr 3fr;
   gap: var(--spacing-m);
   align-items: center;
+  @media (max-width: ${breakpoint.m}) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const SpanTwoColumns = styled.span`
+  grid-column-start: 1;
+  grid-column-end: 3;
+
+  @media (max-width: ${breakpoint.m}) {
+    grid-column-start: 1;
+    grid-column-end: 2;
+  }
 `;
 
 const ApplicationEvent = ({
@@ -138,20 +156,21 @@ const ApplicationEvent = ({
             abilityGroupOptions
           )}
         />
-        <Select
-          style={{ gridColumnStart: 1, gridColumnEnd: 3 }}
-          placeholder="Valitse"
-          required
-          options={purposeOptions}
-          label={t('Application.Page1.purpose')}
-          onChange={(selection: OptionType): void => {
-            form.setValue(fieldName('purposeId'), selection.value);
-          }}
-          defaultValue={getSelectedOption(
-            applicationEvent.purposeId,
-            purposeOptions
-          )}
-        />
+        <SpanTwoColumns>
+          <Select
+            placeholder="Valitse"
+            required
+            options={purposeOptions}
+            label={t('Application.Page1.purpose')}
+            onChange={(selection: OptionType): void => {
+              form.setValue(fieldName('purposeId'), selection.value);
+            }}
+            defaultValue={getSelectedOption(
+              applicationEvent.purposeId,
+              purposeOptions
+            )}
+          />
+        </SpanTwoColumns>
       </TwoColumnContainer>
       <Ruler />
       <SubHeadLine>{t('Application.Page1.spacesSubHeading')}</SubHeadLine>
@@ -204,15 +223,17 @@ const ApplicationEvent = ({
           required
         />
         <Checkbox id="durationCheckbox" checked label="1t" />
-        <TextInput
-          ref={form.register()}
-          style={{ gridColumnStart: 1, gridColumnEnd: 3 }}
-          label={t('Application.Page1.eventsPerWeek')}
-          id={fieldName('eventsPerWeek')}
-          name={fieldName('eventsPerWeek')}
-          type="number"
-          required
-        />
+        <SpanTwoColumns>
+          {' '}
+          <TextInput
+            ref={form.register()}
+            label={t('Application.Page1.eventsPerWeek')}
+            id={fieldName('eventsPerWeek')}
+            name={fieldName('eventsPerWeek')}
+            type="number"
+            required
+          />
+        </SpanTwoColumns>
         <Controller
           control={form.control}
           name={fieldName('biweekly')}
