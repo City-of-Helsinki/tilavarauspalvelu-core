@@ -162,11 +162,20 @@ const translations: Translations = {
   },
   ReservationUnitModal: {
     selectReservationUnit: ['Lisää hakemukselle', 'Add to application'],
-    unSelectReservationUnit: ['Poista hakemukselta', 'Remove from application'],
+    unSelectReservationUnit: [
+      'Poista hakemukselta',
+      'Remove from application',
+      'Ta bort från applikationen',
+    ],
     heading: ['Hae tiloja hakemukselle'],
     searchTermLabel: ['Sanahaku'],
     searchPurposeLabel: ['Käyttötarkoitus'],
     searchReservationUnitTypeLabel: ['Tilan tyyppi'],
+    openLinkToNewTab: [
+      'Avaa välilehdellä',
+      'Open in new tab',
+      'Öppna i ny flik',
+    ],
   },
   ReservationUnit: {
     backToSearch: ['Takaisin hakutuloksiin'],

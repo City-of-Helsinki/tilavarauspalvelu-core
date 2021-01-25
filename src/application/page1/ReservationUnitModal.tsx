@@ -150,7 +150,7 @@ const ReservationUnitCard = ({
         <Link to={reservationUnitPath(reservationUnit.id)} target="_blank">
           <LinkContent>
             <IconLinkExternal />
-            <LinkText>Avaa välilehdellä</LinkText>
+            <LinkText>{t('ReservationUnitModal.openLinkToNewTab')}</LinkText>
           </LinkContent>
         </Link>
       </Main>
