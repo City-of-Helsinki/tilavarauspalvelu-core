@@ -65,6 +65,7 @@ module.exports = {
         depth: 25,
       },
     ],
+    'import/prefer-default-export': 0,
   },
   globals: {
     cy: true,

@@ -1,47 +1,18 @@
-import {
-  Button,
-  Checkbox,
-  IconArrowLeft,
-  Notification,
-  Accordion,
-} from 'hds-react';
+import { Button, Checkbox, IconArrowLeft, Notification } from 'hds-react';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { Application, ReservationUnit, Parameter } from '../../common/types';
 import { formatDate } from '../../common/util';
-import { getParameters, getReservationUnit } from '../../common/api';
+import { getParameters, getReservationUnits } from '../../common/api';
+import LabelValue from '../../component/LabelValue';
+import TimePreview from '../TimePreview';
 
 type Props = {
   application: Application;
   onNext: () => void;
 };
-
-const LabelElelemt = styled.div`
-  margin-top: var(--spacing-3-xs);
-  font-family: HelsinkiGrotesk-Bold, var(--font-default);
-  font-size: var(--fontsize-body-l);
-  font-weight: bold;
-`;
-const ValueElement = styled.div`
-  margin-top: var(--spacing-2-xs);
-  font-family: HelsinkiGrotesk-Regular, var(--font-default);
-  font-size: var(--fontsize-body-m);
-`;
-
-const LabelValue = ({
-  label,
-  value,
-}: {
-  label: string;
-  value: string | undefined | null | number | JSX.Element[];
-}): JSX.Element | null => (
-  <div>
-    <LabelElelemt>{label}</LabelElelemt>
-    <ValueElement>{value}</ValueElement>
-  </div>
-);
 
 const mapArrayById = (
   array: { id: number }[]
@@ -70,6 +41,13 @@ const Ruler = styled.hr`
   border-right: none;
 `;
 
+const SubHeadline = styled.div`
+  font-family: HelsinkiGrotesk-Bold, var(--font-default);
+  margin-top: var(--spacing-layout-m);
+  font-weight: 700;
+  font-size: var(--fontsize-heading-m);
+`;
+
 const SmallSubHeadline = styled.div`
   font-family: HelsinkiGrotesk-Bold, var(--font-default);
   margin-top: var(--spacing-layout-m);
@@ -86,6 +64,12 @@ const TwoColumnContainer = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--spacing-m);
+`;
+
+const TimePreviewContainer = styled(TwoColumnContainer)`
+  svg {
+    margin-top: 2px;
+  }
 `;
 
 const CheckboxContainer = styled.div`
@@ -121,25 +105,14 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
   }>({});
 
   const [acceptTermsOfUse, setAcceptTermsOfUse] = useState(false);
+  const { i18n } = useTranslation();
 
   useEffect(() => {
     async function fetchData() {
-      const reservationUnitIds = Array.from(
-        new Set(
-          application.applicationEvents.flatMap(
-            (ae) => ae.eventReservationUnits
-          )
-        )
-      );
-
-      const fetchedReservationUnits = await Promise.all(
-        reservationUnitIds.map((ru) => getReservationUnit(ru.reservationUnit))
-      );
-
+      // there's no api to get reservation units with multiple ids so we're getting them all :)  a.k.a. FIXME
+      const units = await getReservationUnits({ search: undefined });
       setReservationUnits(
-        mapArrayById(fetchedReservationUnits) as {
-          [key: number]: ReservationUnit;
-        }
+        mapArrayById(units) as { [key: number]: ReservationUnit }
       );
 
       const fetchedAbilityGroupOptions = await getParameters('ability_group');
@@ -151,7 +124,7 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
       setReady(true);
     }
     fetchData();
-  }, [application]);
+  }, []);
 
   const { t } = useTranslation();
 
@@ -173,129 +146,97 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
 
   return ready ? (
     <>
-      <Accordion heading={t('Application.preview.basicInfoSubHeading')}>
-        <TwoColumnContainer>
-          <LabelValue
-            label={t('Application.preview.firstName')}
-            value={application.contactPerson?.firstName}
-          />
-          <LabelValue
-            label={t('Application.preview.lastName')}
-            value={application.contactPerson?.lastName}
-          />
-          <LabelValue
-            label={t('Application.preview.email')}
-            value={application.contactPerson?.email}
-          />
-        </TwoColumnContainer>
-      </Accordion>
+      <SubHeadline>{t('Application.preview.basicInfoSubHeading')}</SubHeadline>
+      <TwoColumnContainer>
+        <LabelValue
+          label={t('Application.preview.firstName')}
+          value={application.contactPerson?.firstName}
+        />
+        <LabelValue
+          label={t('Application.preview.lastName')}
+          value={application.contactPerson?.lastName}
+        />
+        <LabelValue
+          label={t('Application.preview.email')}
+          value={application.contactPerson?.email}
+        />
+      </TwoColumnContainer>
       {application.applicationEvents.map((applicationEvent) => (
-        <>
-          <Accordion
-            key={applicationEvent.id}
-            heading={applicationEvent.name || ''}>
-            <TwoColumnContainer>
-              <LabelValue
-                label={t('Application.preview.applicationEvent.name')}
-                value={applicationEvent.name}
-              />
-              <LabelValue
-                label={t('Application.preview.applicationEvent.numPersons')}
-                value={applicationEvent.numPersons}
-              />
-              <LabelValue
-                label={t('Application.preview.applicationEvent.ageGroup')}
-                value={
-                  applicationEvent.ageGroupId
-                    ? `${
-                        ageGroupOptions[applicationEvent.ageGroupId].minimum
-                      } - ${
-                        ageGroupOptions[applicationEvent.ageGroupId].maximum
-                      }`
-                    : ''
-                }
-              />
-              <LabelValue
-                label={t('Application.preview.applicationEvent.abilityGroup')}
-                value={
-                  applicationEvent.abilityGroupId != null
-                    ? abilityGroupOptions[applicationEvent.abilityGroupId].name
-                    : ''
-                }
-              />
-              <LabelValue
-                label={t('Application.preview.applicationEvent.purpose')}
-                value={
-                  applicationEvent.purposeId != null
-                    ? purposeOptions[applicationEvent.purposeId].name
-                    : ''
-                }
-              />
-              <LabelValue
-                label={t('Application.preview.applicationEvent.additionalInfo')}
-                value=""
-              />
-              <LabelValue
-                label={t('Application.preview.applicationEvent.begin')}
-                value={formatDate(applicationEvent.begin || '')}
-              />
-              <LabelValue
-                label={t('Application.preview.applicationEvent.end')}
-                value={formatDate(applicationEvent.end || '')}
-              />
-              <LabelValue
-                label={t('Application.preview.applicationEvent.eventsPerWeek')}
-                value={applicationEvent.eventsPerWeek}
-              />
-              <LabelValue
-                label={t('Application.preview.applicationEvent.biweekly')}
-                value={t(`common.${applicationEvent.biweekly}`) as string}
-              />
-              {applicationEvent.eventReservationUnits.map(
-                (reservationUnit, index) => (
-                  <LabelValue
-                    key={reservationUnit.reservationUnit}
-                    label={t(
-                      'Application.preview.applicationEvent.reservationUnit',
-                      { order: index + 1 }
-                    )}
-                    value={
-                      reservationUnits[reservationUnit.reservationUnit].name
-                    }
-                  />
-                )
-              )}
-            </TwoColumnContainer>
-            <Ruler />
-            <SmallSubHeadline>
-              {t('Application.preview.applicationEventSchedules')}
-            </SmallSubHeadline>
-            <TwoColumnContainer>
-              {[
-                'monday',
-                'tuesday',
-                'wednesday',
-                'thursday',
-                'friday',
-                'saturday',
-                'sunday',
-              ].map((day, index) => (
-                <div key={day}>
-                  <LabelValue
-                    label={t(`calendar.${day}`)}
-                    value={applicationEvent.applicationEventSchedules
-                      .filter((s) => s.day === index)
-                      .map((s, i) => (
-                        <span key={s.id}>
-                          {i !== 0 ? ', ' : ''}
-                          {s.begin.substring(0, 5)} - {s.end.substring(0, 5)}
-                        </span>
-                      ))}
-                  />
-                </div>
-              ))}
-            </TwoColumnContainer>
-          </Accordion>
+        <div key={applicationEvent.id}>
+          <SubHeadline>{applicationEvent.name}</SubHeadline>
+          <TwoColumnContainer>
+            <LabelValue
+              label={t('Application.preview.applicationEvent.name')}
+              value={applicationEvent.name}
+            />
+            <LabelValue
+              label={t('Application.preview.applicationEvent.numPersons')}
+              value={applicationEvent.numPersons}
+            />
+            <LabelValue
+              label={t('Application.preview.applicationEvent.ageGroup')}
+              value={`${
+                ageGroupOptions[applicationEvent.ageGroupId || 0].minimum
+              } - ${ageGroupOptions[applicationEvent.ageGroupId || 0].maximum}`}
+            />
+            <LabelValue
+              label={t('Application.preview.applicationEvent.abilityGroup')}
+              value={
+                abilityGroupOptions[applicationEvent.abilityGroupId || 0].name
+              }
+            />
+            <LabelValue
+              label={t('Application.preview.applicationEvent.purpose')}
+              value={purposeOptions[applicationEvent.purposeId || 0].name}
+            />
+            <LabelValue
+              label={t('Application.preview.applicationEvent.additionalInfo')}
+              value=""
+            />
+            <LabelValue
+              label={t('Application.preview.applicationEvent.begin')}
+              value={formatDate(applicationEvent.begin || '')}
+            />
+            <LabelValue
+              label={t('Application.preview.applicationEvent.end')}
+              value={formatDate(applicationEvent.end || '')}
+            />
+            <LabelValue
+              label={t('Application.preview.applicationEvent.eventsPerWeek')}
+              value={applicationEvent.eventsPerWeek}
+            />
+            <LabelValue
+              label={t('Application.preview.applicationEvent.biweekly')}
+              value={t(`common.${applicationEvent.biweekly}`) as string}
+            />
+            {applicationEvent.eventReservationUnits.map(
+              (reservationUnit, index) => (
+                <LabelValue
+                  key={reservationUnit.reservationUnit}
+                  label={t(
+                    'Application.preview.applicationEvent.reservationUnit',
+                    { order: index + 1 }
+                  )}
+                  value={
+                    reservationUnits[reservationUnit.reservationUnit].name[
+                      i18n.language
+                    ]
+                  }
+                />
+              )
+            )}
+          </TwoColumnContainer>
+          <Ruler />
+          <SmallSubHeadline>
+            {t('Application.preview.applicationEventSchedules')}
+          </SmallSubHeadline>
+          <TimePreviewContainer>
+            <TimePreview
+              applicationEventSchedules={
+                applicationEvent.applicationEventSchedules
+              }
+            />
+          </TimePreviewContainer>
           <CheckboxContainer>
             <Checkbox
               id="preview.acceptTermsOfUse"
@@ -310,7 +251,7 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
             label={t('Application.preview.notification.processing')}>
             {t('Application.preview.notification.body')}
           </StyledNotification>
-        </>
+        </div>
       ))}
 
       <ButtonContainer>

@@ -1,3 +1,7 @@
+export type TranslationObject = {
+  [key: string]: string;
+};
+
 export type ApplicationPeriod = {
   id: number;
   name: string;
@@ -12,7 +16,7 @@ export type ApplicationPeriod = {
 export type Space = {
   id: number;
   locationType: 'fixed';
-  name: string;
+  name: TranslationObject;
   parent: number;
   building: number;
   surfaceArea: null;
@@ -20,7 +24,7 @@ export type Space = {
 
 export type Resource = {
   id: number;
-  name: string;
+  name: TranslationObject;
   locationType: 'fixed';
   space: number;
   bufferTimeBefore: string;
@@ -29,7 +33,7 @@ export type Resource = {
 
 export type Service = {
   id: number;
-  name: string;
+  name: TranslationObject;
   serviceType: 'introduction';
   bufferTimeBefore: string;
   bufferTimeAfter: string;
@@ -49,7 +53,7 @@ export type Image = {
 
 export type ReservationUnit = {
   id: number;
-  name: string;
+  name: TranslationObject;
   maxPersons: number;
   requireIntroduction: boolean;
   spaces: Space[];

@@ -9,10 +9,19 @@ import {
 } from './types';
 
 interface ReservationUnitParams {
-  id: string;
+  id?: string;
 }
 
-const Routes = [
+type Route = {
+  path: string;
+  exact?: boolean;
+  component: React.FC;
+  loadData?: (params: ReservationUnitParams) => any; // eslint-disable-line
+  dataKey?: string;
+  startApplicationBar?: boolean;
+};
+
+const Routes: Route[] = [
   {
     path: '/',
     exact: true,

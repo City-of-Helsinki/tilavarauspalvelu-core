@@ -24,7 +24,12 @@ const Head = ({ applicationPeriod }: Props): JSX.Element | null => {
   }
 
   return (
-    <div style={{ padding: '1em', backgroundColor: '#0072c6', color: 'white' }}>
+    <div
+      style={{
+        padding: '1em',
+        backgroundColor: 'var(--tilavaraus-blue)',
+        color: 'white',
+      }}>
       <Container>
         <span>
           {t(

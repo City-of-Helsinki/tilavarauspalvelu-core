@@ -68,11 +68,12 @@ const ReservationUnitCard = ({ reservationUnit }: Props): JSX.Element => {
   const { addReservationUnit, containsReservationUnit } = React.useContext(
     SelectionsListContext
   ) as SelectionsListContextType;
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+
   return (
     <Container>
       <img
-        alt={`Kuva tilasta ${reservationUnit.name}`}
+        alt={`Kuva tilasta ${reservationUnit.name[i18n.language]}`}
         width="240"
         height="156"
         src={
@@ -83,10 +84,12 @@ const ReservationUnitCard = ({ reservationUnit }: Props): JSX.Element => {
       <MainContent>
         <Name>
           <Link to={`../reservation-unit/${reservationUnit.id}`}>
-            {reservationUnit.name}
+            {reservationUnit.name[i18n.language]}
           </Link>
         </Name>
-        <Description>{reservationUnit.spaces[0]?.name}</Description>
+        <Description>
+          {reservationUnit.spaces[0]?.name[i18n.language]}
+        </Description>
         <Bottom>
           <IconInfoCircle />{' '}
           <span>{reservationUnit.reservationUnitType.name}</span>

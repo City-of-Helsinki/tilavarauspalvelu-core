@@ -83,7 +83,7 @@ const Head = ({ reservationUnit }: Props): JSX.Element => {
     SelectionsListContext
   ) as SelectionsListContextType;
 
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const history = useHistory();
 
   return (
@@ -103,8 +103,10 @@ const Head = ({ reservationUnit }: Props): JSX.Element => {
         </BackContainer>
         <RightContainer>
           <div>
-            <h1 className="heading-l">{reservationUnit.name}</h1>
-            <h2 className="heading-m">{reservationUnit.spaces?.[0]?.name}</h2>
+            <h1 className="heading-l">{reservationUnit.name[i18n.language]}</h1>
+            <h2 className="heading-m">
+              {reservationUnit.spaces?.[0]?.name[i18n.language]}
+            </h2>
             <Props>
               <div>
                 <IconWithText
