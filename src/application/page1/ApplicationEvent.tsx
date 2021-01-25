@@ -70,7 +70,10 @@ const ApplicationEvent = ({
     applicationPeriod.applicationPeriodBegin
   );
   const periodEndDate = formatApiDate(applicationPeriod.applicationPeriodEnd);
+  const defaultDuration = '1';
+
   const [defaultPeriodSelected, setDefaultPeriodSelected] = useState(false);
+  const [defaultDurationSelected, setDefaultDurationSelected] = useState(false);
 
   const {
     ageGroupOptions,
@@ -87,6 +90,8 @@ const ApplicationEvent = ({
   const name = form.watch(fieldName('name'));
   const applicationPeriodBegin = form.watch(fieldName('begin'));
   const applicationPeriodEnd = form.watch(fieldName('end'));
+  const durationMin = form.watch(fieldName('minDuration'));
+  const durationMax = form.watch(fieldName('maxDuration'));
 
   useEffect(() => {
     form.register({ name: fieldName('ageGroupId'), required: true });
@@ -108,12 +113,28 @@ const ApplicationEvent = ({
     periodEndDate,
   ]);
 
+  useEffect(() => {
+    const selectionIsDefaultDuration =
+      durationMin === defaultDuration && durationMax === defaultDuration;
+
+    setDefaultDurationSelected(selectionIsDefaultDuration);
+  }, [durationMin, durationMax]);
+
   const selectDefaultPeriod = (e: ChangeEvent<HTMLInputElement>): void => {
     const { checked } = e.target;
     setDefaultPeriodSelected(checked);
     if (checked) {
       form.setValue(fieldName('begin'), periodStartDate);
       form.setValue(fieldName('end'), periodEndDate);
+    }
+  };
+
+  const selectDefaultDuration = (e: ChangeEvent<HTMLInputElement>): void => {
+    const { checked } = e.target;
+    setDefaultDurationSelected(checked);
+    if (checked) {
+      form.setValue(fieldName('minDuration'), defaultDuration);
+      form.setValue(fieldName('maxDuration'), defaultDuration);
     }
   };
 
@@ -233,7 +254,13 @@ const ApplicationEvent = ({
           name={fieldName('maxDuration')}
           required
         />
-        <Checkbox id="durationCheckbox" checked label="1t" />
+        <Checkbox
+          id="durationCheckbox"
+          checked={defaultDurationSelected}
+          label={`${defaultDuration}${t('common.abbreviations.hour')}`}
+          onChange={selectDefaultDuration}
+          disabled={defaultDurationSelected}
+        />
         <TextInput
           ref={form.register()}
           style={{ gridColumnStart: 1, gridColumnEnd: 3 }}
