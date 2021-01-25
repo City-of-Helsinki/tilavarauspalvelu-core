@@ -7,3 +7,8 @@ export const weekdays = [
   'saturday',
   'sunday',
 ];
+
+export const reservationUnitPrefix = '/reservation-unit';
+
+export const reservationUnitPath = (id: number): string =>
+  `${reservationUnitPrefix}/${id}`;

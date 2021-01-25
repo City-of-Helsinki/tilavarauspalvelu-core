@@ -7,7 +7,9 @@ import {
   TextInput,
   Select,
   LoadingSpinner,
+  IconLinkExternal,
 } from 'hds-react';
+import { Link } from 'react-router-dom';
 import React, { ChangeEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -15,37 +17,43 @@ import { getReservationUnits } from '../../common/api';
 import { ApplicationPeriod, ReservationUnit } from '../../common/types';
 import { OptionType } from '../../common/util';
 import { breakpoint } from '../../common/style';
+import { reservationUnitPath } from '../../common/const';
 
 const Container = styled.div`
+  width: 100%;
+  display: grid;
+  margin-top: var(--spacing-l);
+  gap: var(--spacing-m);
+  align-items: start;
+
   @media (max-width: ${breakpoint.l}) {
-    gap: 1em;
     grid-template-areas:
-      'i n'
-      'i d'
-      'p p'
-      'a a';
+      'image name'
+      'image a'
+      'props props';
     grid-template-columns: 180px auto;
   }
 
-  grid-template:
-    'i n a'
-    'i d a'
-    'i p a';
-  grid-template-columns: 180px auto 4em;
+  @media (max-width: ${breakpoint.m}) {
+    grid-template-areas:
+      'image'
+      'name'
+      'props'
+      'a';
+    grid-template-columns: auto;
+  }
 
-  display: grid;
-  margin-top: var(--spacing-s);
+  grid-template:
+    'image name a'
+    'image props props';
+  grid-template-columns: 180px auto 230px;
 `;
 
 const Actions = styled.div`
   display: flex;
-  flex-direction: column;
-  padding: var(--spacing-s) var(--spacing-m);
-  align-items: flex-end;
 `;
 
 const Name = styled.span`
-  grid-area: n;
   font-family: HelsinkiGrotesk-Bold, var(--font-default);
   font-size: var(--fontsize-heading-m);
   font-weight: bold;
@@ -56,15 +64,16 @@ const Name = styled.span`
   }
 `;
 
-const Description = styled.span`
-  background-color: yellow;
-  grid-area: d;
+const Description = styled.div`
   font-size: var(--fontsize-body-l);
-  flex-grow: 1;
+`;
+
+const Main = styled.span`
+  grid-area: name;
 `;
 
 const Props = styled.span`
-  grid-area: p;
+  grid-area: props;
   display: flex;
   font-weight: 500;
   align-items: center;
@@ -76,12 +85,33 @@ const Props = styled.span`
   span:not(:first-child) {
     margin-right: var(--spacing-layout-m);
   }
+
+  @media (max-width: ${breakpoint.m}) {
+    flex-direction: column;
+    align-items: flex-start;
+    span:not(:first-child) {
+      margin-right: 0;
+    }
+  }
 `;
 
 const Image = styled.img`
-  grid-area: i;
+  grid-area: image;
   width: 178px;
   height: 185px;
+`;
+
+const LinkContent = styled.span`
+  margin-top: var(--spacing-xs);
+  display: flex;
+  flex-direction: row;
+  align-items: middle;
+  font-family: HelsinkiGrotesk-Bold, var(--font-default);
+  font-size: var(--fontsize-body-m);
+`;
+
+const LinkText = styled.span`
+  margin-left: var(--spacing-xs);
 `;
 
 const ReservationUnitCard = ({
@@ -112,27 +142,40 @@ const ReservationUnitCard = ({
           'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='
         }
       />
-      <Name>{reservationUnit.name[i18n.language]}</Name>
-      <Description>
-        {reservationUnit.spaces[0]?.name[i18n.language]}
-      </Description>
+      <Main>
+        <Name>{reservationUnit.name[i18n.language]}</Name>
+        <Description>
+          {reservationUnit.spaces[0]?.name[i18n.language]}
+        </Description>
+        <Link to={reservationUnitPath(reservationUnit.id)} target="_blank">
+          <LinkContent>
+            <IconLinkExternal />
+            <LinkText>Avaa välilehdellä</LinkText>
+          </LinkContent>
+        </Link>
+      </Main>
       <Props>
-        <IconInfoCircle />{' '}
-        <span>{reservationUnit.reservationUnitType.name}</span>
-        <IconGroup /> <span>{reservationUnit.maxPersons}</span>
-        <IconLocation />{' '}
         <span>
-          {reservationUnit.location?.addressStreet},{' '}
-          {reservationUnit.location?.addressZip}{' '}
-          {reservationUnit.location?.addressCity}
+          <IconInfoCircle />{' '}
+          <span>{reservationUnit.reservationUnitType.name}</span>
+        </span>
+        <span>
+          <IconGroup /> <span>{reservationUnit.maxPersons}</span>
+        </span>
+        <span>
+          <IconLocation />{' '}
+          <span>
+            {reservationUnit.location?.addressStreet},{' '}
+            {reservationUnit.location?.addressZip}{' '}
+            {reservationUnit.location?.addressCity}
+          </span>
         </span>
       </Props>
       <Actions>
-        <div style={{ flexGrow: 1 }} />
         <Button
           iconRight={<IconArrowRight />}
           onClick={handle}
-          variant={isSelected ? 'secondary' : 'primary'}>
+          variant="secondary">
           {buttonText}
         </Button>
       </Actions>
