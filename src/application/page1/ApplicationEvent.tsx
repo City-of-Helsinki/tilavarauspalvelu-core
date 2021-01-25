@@ -1,5 +1,5 @@
 import { Accordion, Checkbox, Select, TextInput } from 'hds-react';
-import React, { useEffect } from 'react';
+import React, { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useForm, Controller } from 'react-hook-form';
 import styled from 'styled-components';
@@ -11,6 +11,7 @@ import {
 } from '../../common/types';
 import {
   formatApiDate,
+  formatDate,
   getSelectedOption,
   OptionType,
 } from '../../common/util';
@@ -69,6 +70,7 @@ const ApplicationEvent = ({
     applicationPeriod.applicationPeriodBegin
   );
   const periodEndDate = formatApiDate(applicationPeriod.applicationPeriodEnd);
+  const [defaultPeriodSelected, setDefaultPeriodSelected] = useState(false);
 
   const {
     ageGroupOptions,
@@ -83,6 +85,8 @@ const ApplicationEvent = ({
     `applicationEvents[${index}].${nameField}`;
 
   const name = form.watch(fieldName('name'));
+  const applicationPeriodBegin = form.watch(fieldName('begin'));
+  const applicationPeriodEnd = form.watch(fieldName('end'));
 
   useEffect(() => {
     form.register({ name: fieldName('ageGroupId'), required: true });
@@ -90,6 +94,28 @@ const ApplicationEvent = ({
     form.register({ name: fieldName('purposeId'), required: true });
     form.register({ name: fieldName('eventReservationUnits') });
   });
+
+  useEffect(() => {
+    const selectionIsDefaultPeriod =
+      applicationPeriodBegin === periodStartDate &&
+      applicationPeriodEnd === periodEndDate;
+
+    setDefaultPeriodSelected(selectionIsDefaultPeriod);
+  }, [
+    applicationPeriodBegin,
+    applicationPeriodEnd,
+    periodStartDate,
+    periodEndDate,
+  ]);
+
+  const selectDefaultPeriod = (e: ChangeEvent<HTMLInputElement>): void => {
+    const { checked } = e.target;
+    setDefaultPeriodSelected(checked);
+    if (checked) {
+      form.setValue(fieldName('begin'), periodStartDate);
+      form.setValue(fieldName('end'), periodEndDate);
+    }
+  };
 
   return (
     <Accordion heading={`${name}` || ''}>
@@ -186,8 +212,12 @@ const ApplicationEvent = ({
         />
         <Checkbox
           id="defaultPeriod"
-          checked
-          label={`${periodStartDate} - ${periodEndDate}`}
+          checked={defaultPeriodSelected}
+          label={`${formatDate(
+            applicationPeriod.applicationPeriodBegin
+          )} - ${formatDate(applicationPeriod.applicationPeriodEnd)}`}
+          onChange={selectDefaultPeriod}
+          disabled={defaultPeriodSelected}
         />
         <TextInput
           ref={form.register({ required: true })}
@@ -199,7 +229,7 @@ const ApplicationEvent = ({
         <TextInput
           ref={form.register({ required: true })}
           label={t('Application.Page1.maxDuration')}
-          id={fieldName('maxduration')}
+          id={fieldName('maxDuration')}
           name={fieldName('maxDuration')}
           required
         />
