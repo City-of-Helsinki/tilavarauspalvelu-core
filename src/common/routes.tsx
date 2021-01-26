@@ -7,6 +7,7 @@ import {
   ApplicationPeriod as ApplicationPeriodType,
   ReservationUnit as ReservationUnitType,
 } from './types';
+import { reservationUnitPrefix } from './const';
 
 interface ReservationUnitParams {
   id?: string;
@@ -35,7 +36,7 @@ const Routes: Route[] = [
     startApplicationBar: true,
   },
   {
-    path: '/reservation-unit/:id',
+    path: `${reservationUnitPrefix}/:id`,
     component: ReservationUnit,
     loadData: (params: ReservationUnitParams): Promise<ReservationUnitType> =>
       getReservationUnit(Number(params.id)),

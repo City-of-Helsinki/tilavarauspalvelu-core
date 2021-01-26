@@ -14,6 +14,7 @@ import { formatDate } from '../../common/util';
 import { getParameters, getReservationUnit } from '../../common/api';
 import LabelValue from '../../component/LabelValue';
 import TimePreview from '../TimePreview';
+import { breakpoint } from '../../common/style';
 
 type Props = {
   application: Application;
@@ -55,7 +56,7 @@ const SmallSubHeadline = styled.div`
 `;
 
 const TwoColumnContainer = styled.div`
-  @media (max-width: var(--breakpoint-s)) {
+  @media (max-width: ${breakpoint.s}) {
     grid-template-columns: 1fr;
   }
 

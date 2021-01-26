@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Checkbox, Select, TextInput, Button, IconSearch } from 'hds-react';
 import styled from 'styled-components';
+import { breakpoint } from '../common/style';
 
 interface Props {
   // only text search is now implemented!
@@ -14,11 +15,11 @@ interface OptionType {
 const options = [] as OptionType[];
 
 const Container = styled.div`
-  @media (max-width: var(--breakpoint-m)) {
+  @media (max-width: ${breakpoint.m}) {
     grid-template-columns: 1fr 1fr;
   }
 
-  @media (max-width: var(--breakpoint-s)) {
+  @media (max-width: ${breakpoint.s}) {
     grid-template-columns: 1fr;
   }
 
@@ -31,7 +32,7 @@ const Container = styled.div`
 `;
 
 const ShowL = styled.div`
-  @media (max-width: var(--breakpoint-m)) {
+  @media (max-width: ${breakpoint.m}) {
     display: none;
   }
 
@@ -39,11 +40,11 @@ const ShowL = styled.div`
 `;
 
 const ShowM = styled.div`
-  @media (max-width: var(--breakpoint-m)) {
+  @media (max-width: ${breakpoint.m}) {
     display: block;
   }
 
-  @media (max-width: var(--breakpoint-s)) {
+  @media (max-width: ${breakpoint.s}) {
     display: none;
   }
 

@@ -5,13 +5,14 @@ import styled from 'styled-components';
 import Card from '../component/Card';
 import { ApplicationPeriod } from '../common/types';
 import { isActive, formatDate } from '../common/util';
+import { breakpoint } from '../common/style';
 
 interface Props {
   applicationPeriod: ApplicationPeriod;
 }
 
 const StyledCard = styled(Card)<{ act?: boolean }>`
-  @media (max-width: var(--breakpoint-s)) {
+  @media (max-width: ${breakpoint.s}) {
     grid-template-columns: 2fr;
   }
 
@@ -41,7 +42,7 @@ const Name = styled.div`
 `;
 
 const CardButton = styled(Button)<{ noLeftMargin?: boolean }>`
-  @media (max-width: var(--breakpoint-s)) {
+  @media (max-width: ${breakpoint.s}) {
     justify-self: center;
   }
 

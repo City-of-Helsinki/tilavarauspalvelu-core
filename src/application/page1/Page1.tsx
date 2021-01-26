@@ -16,6 +16,7 @@ import {
 } from '../../common/types';
 import { mapOptions, OptionType } from '../../common/util';
 import { getParameters } from '../../common/api';
+import { breakpoint } from '../../common/style';
 
 type Props = {
   applicationPeriod: ApplicationPeriod;
@@ -26,7 +27,7 @@ type Props = {
 };
 
 const ButtonContainer = styled.div`
-  @media (max-width: var(--breakpoint-m)) {
+  @media (max-width: ${breakpoint.m}) {
     flex-direction: column;
 
     & > button {

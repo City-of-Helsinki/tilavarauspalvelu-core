@@ -121,12 +121,12 @@ const translations: Translations = {
     false: ['ei'],
     true: ['kyllä'],
     close: ['Sulje'],
-    search: ['Hae'],
-    noResults: ['Ei tuloksia'],
-    select: ['Valitse'],
+    search: ['Hae', 'Search', 'Sök'],
+    noResults: ['Ei tuloksia', 'No results', 'Inga resultat'],
+    select: ['Valitse', 'Choose', 'Välja'],
     hour: ['Tunti'],
     abbreviations: {
-      hour: ['t'],
+      hour: ['t', 'h', 'h'],
     },
   },
   Navigation: {
@@ -165,12 +165,21 @@ const translations: Translations = {
     add: ['Lisää tila'],
   },
   ReservationUnitModal: {
-    selectReservationUnit: ['Lisää hakemukselle'],
-    okButton: ['Lisää valitut'],
+    selectReservationUnit: ['Lisää hakemukselle', 'Add to application'],
+    unSelectReservationUnit: [
+      'Poista hakemukselta',
+      'Remove from application',
+      'Ta bort från applikationen',
+    ],
     heading: ['Hae tiloja hakemukselle'],
     searchTermLabel: ['Sanahaku'],
     searchPurposeLabel: ['Käyttötarkoitus'],
     searchReservationUnitTypeLabel: ['Tilan tyyppi'],
+    openLinkToNewTab: [
+      'Avaa välilehdellä',
+      'Open in new tab',
+      'Öppna i ny flik',
+    ],
   },
   ReservationUnit: {
     backToSearch: ['Takaisin hakutuloksiin'],
@@ -181,7 +190,7 @@ const translations: Translations = {
     text: ['Valitse tilat joihin haluat hakea vakiovuoroja.'],
   },
   SearchForm: {
-    searchTermPlaceholder: ['Hae sanalla'],
+    searchTermPlaceholder: ['Hae sanalla', 'Search with words', 'Sök med ord'],
     searchButton: ['Hae tilaa'],
   },
   SearchResultList: {
