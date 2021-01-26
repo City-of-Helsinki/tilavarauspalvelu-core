@@ -1,5 +1,5 @@
 import { Accordion, Checkbox, Select, TextInput } from 'hds-react';
-import React, { useEffect } from 'react';
+import React, { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useForm, Controller } from 'react-hook-form';
 import styled from 'styled-components';
@@ -11,6 +11,7 @@ import {
 } from '../../common/types';
 import {
   formatApiDate,
+  formatDate,
   getSelectedOption,
   OptionType,
 } from '../../common/util';
@@ -87,6 +88,10 @@ const ApplicationEvent = ({
     applicationPeriod.applicationPeriodBegin
   );
   const periodEndDate = formatApiDate(applicationPeriod.applicationPeriodEnd);
+  const defaultDuration = '1';
+
+  const [defaultPeriodSelected, setDefaultPeriodSelected] = useState(false);
+  const [defaultDurationSelected, setDefaultDurationSelected] = useState(false);
 
   const {
     ageGroupOptions,
@@ -101,6 +106,10 @@ const ApplicationEvent = ({
     `applicationEvents[${index}].${nameField}`;
 
   const name = form.watch(fieldName('name'));
+  const applicationPeriodBegin = form.watch(fieldName('begin'));
+  const applicationPeriodEnd = form.watch(fieldName('end'));
+  const durationMin = form.watch(fieldName('minDuration'));
+  const durationMax = form.watch(fieldName('maxDuration'));
 
   useEffect(() => {
     form.register({ name: fieldName('ageGroupId'), required: true });
@@ -108,6 +117,44 @@ const ApplicationEvent = ({
     form.register({ name: fieldName('purposeId'), required: true });
     form.register({ name: fieldName('eventReservationUnits') });
   });
+
+  useEffect(() => {
+    const selectionIsDefaultPeriod =
+      applicationPeriodBegin === periodStartDate &&
+      applicationPeriodEnd === periodEndDate;
+
+    setDefaultPeriodSelected(selectionIsDefaultPeriod);
+  }, [
+    applicationPeriodBegin,
+    applicationPeriodEnd,
+    periodStartDate,
+    periodEndDate,
+  ]);
+
+  useEffect(() => {
+    const selectionIsDefaultDuration =
+      durationMin === defaultDuration && durationMax === defaultDuration;
+
+    setDefaultDurationSelected(selectionIsDefaultDuration);
+  }, [durationMin, durationMax]);
+
+  const selectDefaultPeriod = (e: ChangeEvent<HTMLInputElement>): void => {
+    const { checked } = e.target;
+    setDefaultPeriodSelected(checked);
+    if (checked) {
+      form.setValue(fieldName('begin'), periodStartDate);
+      form.setValue(fieldName('end'), periodEndDate);
+    }
+  };
+
+  const selectDefaultDuration = (e: ChangeEvent<HTMLInputElement>): void => {
+    const { checked } = e.target;
+    setDefaultDurationSelected(checked);
+    if (checked) {
+      form.setValue(fieldName('minDuration'), defaultDuration);
+      form.setValue(fieldName('maxDuration'), defaultDuration);
+    }
+  };
 
   return (
     <Accordion heading={`${name}` || ''}>
@@ -205,8 +252,12 @@ const ApplicationEvent = ({
         />
         <Checkbox
           id="defaultPeriod"
-          checked
-          label={`${periodStartDate} - ${periodEndDate}`}
+          checked={defaultPeriodSelected}
+          label={`${formatDate(
+            applicationPeriod.applicationPeriodBegin
+          )} - ${formatDate(applicationPeriod.applicationPeriodEnd)}`}
+          onChange={selectDefaultPeriod}
+          disabled={defaultPeriodSelected}
         />
         <TextInput
           ref={form.register({ required: true })}
@@ -218,13 +269,18 @@ const ApplicationEvent = ({
         <TextInput
           ref={form.register({ required: true })}
           label={t('Application.Page1.maxDuration')}
-          id={fieldName('maxduration')}
+          id={fieldName('maxDuration')}
           name={fieldName('maxDuration')}
           required
         />
-        <Checkbox id="durationCheckbox" checked label="1t" />
+        <Checkbox
+          id="durationCheckbox"
+          checked={defaultDurationSelected}
+          label={`${defaultDuration}${t('common.abbreviations.hour')}`}
+          onChange={selectDefaultDuration}
+          disabled={defaultDurationSelected}
+        />
         <SpanTwoColumns>
-          {' '}
           <TextInput
             ref={form.register()}
             label={t('Application.Page1.eventsPerWeek')}

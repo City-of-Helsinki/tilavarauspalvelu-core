@@ -124,6 +124,10 @@ const translations: Translations = {
     search: ['Hae', 'Search', 'Sök'],
     noResults: ['Ei tuloksia', 'No results', 'Inga resultat'],
     select: ['Valitse', 'Choose', 'Välja'],
+    hour: ['Tunti'],
+    abbreviations: {
+      hour: ['t', 'h', 'h'],
+    },
   },
   Navigation: {
     Item: {
