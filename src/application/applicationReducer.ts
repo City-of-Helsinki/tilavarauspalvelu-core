@@ -1,7 +1,7 @@
 import { Action, Application, ContactPerson } from '../common/types';
 
-const applicationEvent = (applicationId?: number) => ({
-  name: 'Vakiovuoro 1.',
+const applicationEvent = (applicationId?: number, name?: string) => ({
+  name: name || 'Nimetön vakiovuoro',
   minDuration: 1,
   maxDuration: 1,
   eventsPerWeek: 1,
@@ -28,7 +28,9 @@ const reducer = (state: Application, action: Action): Application => {
     }
     case 'addNewApplicationEvent': {
       const nextState = { ...state };
-      nextState.applicationEvents.push(applicationEvent(state.id));
+      nextState.applicationEvents.push(
+        applicationEvent(state.id, action.params?.name)
+      );
       return nextState;
     }
     case 'load': {

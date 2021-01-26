@@ -1,23 +1,4 @@
-import { Application, ApplicationEvent } from '../common/types';
-
-export const emptyApplicationEvent = (
-  applicationId: number
-): ApplicationEvent => ({
-  name: 'Vakiovuoro 1.',
-  minDuration: 1,
-  maxDuration: 1,
-  eventsPerWeek: 1,
-  numPersons: null,
-  ageGroupId: null,
-  purposeId: null,
-  abilityGroupId: null,
-  applicationId: applicationId || 0,
-  begin: '',
-  end: '',
-  biweekly: false,
-  eventReservationUnits: [],
-  applicationEventSchedules: [],
-});
+import { Application } from '../common/types';
 
 export const minimalApplicationForInitialSave = (
   applicationPeriodId: number
@@ -36,7 +17,6 @@ const applicationInitializer = ({
   if (!id) {
     return {
       ...minimalApplicationForInitialSave(applicationPeriodId),
-      applicationEvents: [emptyApplicationEvent(0)],
     };
   }
   return {} as Application;
