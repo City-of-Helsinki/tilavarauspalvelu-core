@@ -16,6 +16,29 @@ class ApplicationPeriodSerializer(serializers.ModelSerializer):
             "reservation_period_end",
             "purposes",
         ]
+        extra_kwargs = {
+            "name": {
+                "help_text": "Name that describes this event.",
+            },
+            "reservation_units": {
+                "help_text": "Ids of reservation units that can be applied during this period.",
+            },
+            "application_period_begin": {
+                "help_text": "Begin date and time of the period when applications can be sent.",
+            },
+            "application_period_end": {
+                "help_text": "End date and time of the period when applications can be sent.",
+            },
+            "reservation_period_begin": {
+                "help_text": "Begin date and time of the period where applied reservation are allocated.",
+            },
+            "reservation_period_end": {
+                "help_text": "End date and time of the period where applied reservation are allocated.",
+            },
+            "purposes": {
+                "help_text": "Ids of purposes that are allowed for events applied for this application period.",
+            },
+        }
 
 
 class ApplicationPeriodViewSet(viewsets.ReadOnlyModelViewSet):

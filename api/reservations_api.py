@@ -1,7 +1,8 @@
 from django_filters import rest_framework as filters
 from drf_extra_fields.relations import PresentablePrimaryKeyRelatedField
+from drf_spectacular.utils import extend_schema
 from rest_framework import filters as drf_filters
-from rest_framework import serializers, viewsets
+from rest_framework import mixins, serializers, viewsets
 
 from reservation_units.models import ReservationUnit
 from reservations.models import STATE_CHOICES, AbilityGroup, AgeGroup, Reservation
@@ -14,6 +15,7 @@ class ReservationSerializer(serializers.ModelSerializer):
         presentation_serializer=ReservationUnitSerializer,
         many=True,
         queryset=ReservationUnit.objects.all(),
+        help_text="Reservation units that are reserved by the reservation",
     )
 
     class Meta:
@@ -30,6 +32,31 @@ class ReservationSerializer(serializers.ModelSerializer):
             "reservation_unit",
             "recurring_reservation",
         ]
+        extra_kwargs = {
+            "state": {
+                "help_text": "State of the reservation. Default is 'created'.",
+            },
+            "priority": {
+                "help_text": "Priority of this reservation. Higher priority reservations replaces lower ones.",
+            },
+            "buffer_time_before": {
+                "help_text": "Buffer time while reservation unit is unreservable before the reservation. "
+                "Dynamically calculated from spaces and resources.",
+            },
+            "buffer_time_after": {
+                "help_text": "Buffer time while reservation unit is unreservable after the reservation. "
+                "Dynamically calculated from spaces and resources.",
+            },
+            "begin": {
+                "help_text": "Begin date and time of the reservation.",
+            },
+            "end": {
+                "help_text": "End date and time of the reservation.",
+            },
+            "recurring_reservation": {
+                "help_text": "Id relation to recurring reservation object if the reservation is part of recurrence.",
+            },
+        }
 
     def validate(self, data):
         for reservation_unit in data["reservation_unit"]:
@@ -47,10 +74,14 @@ class ReservationFilter(filters.FilterSet):
     )
 
     # Effectively active or inactive only reservations
-    active = filters.BooleanFilter(method="is_active")
+    active = filters.BooleanFilter(
+        method="is_active", help_text="Show only confirmed and active reservations."
+    )
 
     reservation_unit = filters.ModelMultipleChoiceFilter(
-        field_name="reservation_unit", queryset=ReservationUnit.objects.all()
+        field_name="reservation_unit",
+        queryset=ReservationUnit.objects.all(),
+        help_text="Show only reservations to certain reservation units.",
     )
 
     def is_active(self, queryset, value, *args, **kwargs):
@@ -92,6 +123,14 @@ class AgeGroupSerializer(serializers.ModelSerializer):
             "minimum",
             "maximum",
         ]
+        extra_kwargs = {
+            "minimum": {
+                "help_text": "Minimum age of persons included in the age group.",
+            },
+            "maximum": {
+                "help_text": "Maximum age of persons included in the age group.",
+            },
+        }
 
     def validate(self, data):
         min_age = data["minimum"]
@@ -104,6 +143,7 @@ class AgeGroupSerializer(serializers.ModelSerializer):
         return data
 
 
+@extend_schema(description="Age group of attendees for application events.")
 class AgeGroupViewSet(viewsets.ModelViewSet):
     serializer_class = AgeGroupSerializer
     queryset = AgeGroup.objects.all()
@@ -116,8 +156,14 @@ class AbilityGroupSerializer(serializers.ModelSerializer):
             "id",
             "name",
         ]
+        extra_kwargs = {
+            "name": {
+                "help_text": "Name of the ability group.",
+            },
+        }
 
 
+@extend_schema(description="Ability group of attendees for application events.")
 class AbilityGroupViewSet(viewsets.ModelViewSet):
     serializer_class = AbilityGroupSerializer
     queryset = AbilityGroup.objects.all()

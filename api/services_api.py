@@ -1,4 +1,4 @@
-from rest_framework import viewsets
+from rest_framework import mixins, serializers, viewsets
 
 from api.base import TranslatedModelSerializer
 from services.models import Service
@@ -14,8 +14,24 @@ class ServiceSerializer(TranslatedModelSerializer):
             "buffer_time_before",
             "buffer_time_after",
         ]
+        extra_kwargs = {
+            "name": {
+                "help_text": "Name of the service.",
+            },
+            "service_type": {
+                "help_text": "Type of the service.",
+            },
+            "buffer_time_before": {
+                "help_text": "Buffer time required before reservation if this service is used.",
+            },
+            "buffer_time_after": {
+                "help_text": "Buffer time required after reservation if this service is used.",
+            },
+        }
 
 
-class ServiceViewSet(viewsets.ModelViewSet):
+class ServiceViewSet(
+    viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin
+):
     serializer_class = ServiceSerializer
     queryset = Service.objects.all()

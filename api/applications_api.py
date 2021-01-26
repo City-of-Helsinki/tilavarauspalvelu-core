@@ -54,8 +54,18 @@ class OrganisationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Organisation
-
         fields = ["id", "name", "identifier", "year_established"]
+        extra_kwargs = {
+            "name": {
+                "help_text": "Official name of the organisation",
+            },
+            "identifier": {
+                "help_text": "Identifier of the organisation. Finnish y-tunnus.",
+            },
+            "year_established": {
+                "help_text": "Year when the organisation was established.",
+            },
+        }
 
 
 class PersonSerializer(serializers.ModelSerializer):
@@ -96,6 +106,18 @@ class ApplicationEventScheduleSerializer(serializers.ModelSerializer):
     class Meta:
         model = ApplicationEventSchedule
         fields = ["id", "day", "begin", "end"]
+        extra_kwargs = {
+            "day": {
+                "help_text": "Day of requested reservation allocation time slot for event represented as number. "
+                "0 = monday, 6 = sunday.",
+            },
+            "begin": {
+                "help_text": "Begin time of requested reservation allocation slot.",
+            },
+            "end": {
+                "help_text": "End time of requested reservation allocation slot.",
+            },
+        }
 
 
 class DateAwareRecurrenceReadSerializer(serializers.ModelSerializer):
@@ -130,6 +152,14 @@ class EventReservationUnitSerializer(serializers.ModelSerializer):
             "priority",
             "reservation_unit",
         ]
+        extra_kwargs = {
+            "priority": {
+                "help_text": "Priority of this reservation unit for the event. Lower the number, higher the priority.",
+            },
+            "reservation_unit": {
+                "help_text": "Id of the reservation unit requested for the event.",
+            },
+        }
 
 
 class ApplicationEventSerializer(serializers.ModelSerializer):
@@ -140,23 +170,37 @@ class ApplicationEventSerializer(serializers.ModelSerializer):
     )
 
     application_id = serializers.PrimaryKeyRelatedField(
-        queryset=Application.objects.all(), source="application"
+        queryset=Application.objects.all(),
+        source="application",
+        help_text="Id of the applications to which this single application event is targeted to.",
     )
 
     age_group_id = serializers.PrimaryKeyRelatedField(
-        queryset=AgeGroup.objects.all(), source="age_group", allow_null=True
+        queryset=AgeGroup.objects.all(),
+        source="age_group",
+        allow_null=True,
+        help_text="Id of the age group for this event.",
     )
 
     ability_group_id = serializers.PrimaryKeyRelatedField(
-        queryset=AbilityGroup.objects.all(), source="ability_group", allow_null=True
+        queryset=AbilityGroup.objects.all(),
+        source="ability_group",
+        allow_null=True,
+        help_text="Id of the ability group for this event.",
     )
 
     purpose_id = serializers.PrimaryKeyRelatedField(
-        queryset=Purpose.objects.all(), source="purpose", allow_null=True
+        queryset=Purpose.objects.all(),
+        source="purpose",
+        allow_null=True,
+        help_text="Id of the usa purpose for this event.",
     )
 
     event_reservation_units = EventReservationUnitSerializer(
-        many=True, read_only=False, required=False
+        many=True,
+        read_only=False,
+        required=False,
+        help_text="List of reservation units applied for this event with priority included.",
     )
 
     class Meta:
@@ -178,6 +222,34 @@ class ApplicationEventSerializer(serializers.ModelSerializer):
             "purpose_id",
             "event_reservation_units",
         ]
+        extra_kwargs = {
+            "name": {
+                "help_text": "Name that describes this event.",
+            },
+            "num_persons": {
+                "help_text": "Number of persons that are excepted to attend this event.",
+            },
+            "min_duration": {
+                "help_text": "Minimum duration of reservations allocated for this event.",
+            },
+            "max_duration": {
+                "help_text": "Maximum duration of reservations allocated for this event.",
+            },
+            "events_per_week": {
+                "help_text": "Number of reservations requested for each week "
+                "(or every other week if biweekly is true).",
+            },
+            "biweekly": {
+                "help_text": "False if recurring reservations are wished for every week. "
+                "True if only every other week.",
+            },
+            "begin": {
+                "help_text": "Requested begin date of the recurring reservation for this event.",
+            },
+            "end": {
+                "help_text": "Requested end date of the recurring reservation for this event.",
+            },
+        }
 
     def validate(self, data):
         min_duration = data["min_duration"]
@@ -242,19 +314,31 @@ class ApplicationEventSerializer(serializers.ModelSerializer):
 
 class ApplicationSerializer(serializers.ModelSerializer):
 
-    contact_person = PersonSerializer(read_only=False, allow_null=True)
+    contact_person = PersonSerializer(
+        help_text="Contact person information for the application",
+        read_only=False,
+        allow_null=True,
+    )
 
-    organisation = OrganisationSerializer(read_only=False, allow_null=True)
+    organisation = OrganisationSerializer(
+        help_text="Organisation information for the application",
+        read_only=False,
+        allow_null=True,
+    )
 
     application_period_id = serializers.PrimaryKeyRelatedField(
-        queryset=ApplicationPeriod.objects.all(), source="application_period"
+        queryset=ApplicationPeriod.objects.all(),
+        source="application_period",
+        help_text="Id of the application period for which this application is targeted to",
     )
 
     user = serializers.HiddenField(default=NullableCurrentUserDefault())
 
-    application_events = ApplicationEventSerializer(many=True)
+    application_events = ApplicationEventSerializer(
+        help_text="List of applications events", many=True
+    )
 
-    status = serializers.CharField()
+    status = serializers.CharField(help_text="Status of this application")
 
     class Meta:
         model = Application
