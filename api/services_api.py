@@ -1,4 +1,4 @@
-from rest_framework import mixins, serializers, viewsets
+from rest_framework import mixins, viewsets
 
 from api.base import TranslatedModelSerializer
 from services.models import Service

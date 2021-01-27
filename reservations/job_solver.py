@@ -4,6 +4,7 @@ from random import randrange
 from ortools.sat.python import cp_model
 
 
+# flake8: noqa
 def solve_assignment():
     # Data.
     num_spaces = 5
