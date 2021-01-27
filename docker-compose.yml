@@ -32,6 +32,8 @@ services:
         command: ["start_django_development_server"]
         ports:
             - "127.0.0.1:8000:8000"
+        volumes:
+            - .:/tvp
 
     deploy:
         image: tilavarauspalvelu

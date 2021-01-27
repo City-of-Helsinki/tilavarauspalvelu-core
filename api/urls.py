@@ -9,8 +9,8 @@ from .reservation_units_api import (
     ReservationUnitTypeViewSet,
     ReservationUnitViewSet,
 )
-from .resources_api import ResourceViewSet
 from .reservations_api import AbilityGroupViewSet, AgeGroupViewSet, ReservationViewSet
+from .resources_api import ResourceViewSet
 
 router = routers.DefaultRouter()
 
