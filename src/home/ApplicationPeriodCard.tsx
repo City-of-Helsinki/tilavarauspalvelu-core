@@ -11,7 +11,8 @@ interface Props {
   applicationPeriod: ApplicationPeriod;
 }
 
-const StyledCard = styled(Card)<{ act?: boolean }>`
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const StyledCard = styled(({ act, ...rest }) => <Card {...rest} />)`
   @media (max-width: ${breakpoint.s}) {
     grid-template-columns: 2fr;
   }
@@ -41,7 +42,8 @@ const Name = styled.div`
   font-weight: 500;
 `;
 
-const CardButton = styled(Button)<{ noLeftMargin?: boolean }>`
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const CardButton = styled(({ noLeftMargin, ...rest }) => <Button {...rest} />)`
   @media (max-width: ${breakpoint.s}) {
     justify-self: center;
   }
