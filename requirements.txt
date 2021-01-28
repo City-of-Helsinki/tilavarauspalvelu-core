@@ -47,6 +47,7 @@ pytest-django==4.1.0
 python-dateutil==2.6.0      # resolved version due to django-auditlog, probably not safe to update
 pytz==2020.1
 regex==2020.10.28
+requests==2.25.1
 Rx==1.6.1
 sentry-sdk==0.19.5
 singledispatch==3.4.0.3
