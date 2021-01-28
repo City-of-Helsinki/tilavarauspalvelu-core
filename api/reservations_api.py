@@ -2,7 +2,7 @@ from django_filters import rest_framework as filters
 from drf_extra_fields.relations import PresentablePrimaryKeyRelatedField
 from drf_spectacular.utils import extend_schema
 from rest_framework import filters as drf_filters
-from rest_framework import mixins, serializers, viewsets
+from rest_framework import serializers, viewsets
 
 from reservation_units.models import ReservationUnit
 from reservations.models import STATE_CHOICES, AbilityGroup, AgeGroup, Reservation
