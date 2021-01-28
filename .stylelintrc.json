@@ -1,0 +1,21 @@
+{
+	"processors": [
+	  "stylelint-processor-styled-components"
+	],
+	"extends": [
+	  "stylelint-config-recommended",
+	  "stylelint-config-styled-components"
+	],
+	"plugins": ["stylelint-value-no-unknown-custom-properties"],
+	"rules": {
+	  "csstools/value-no-unknown-custom-properties": [
+		true,
+		{
+		  "importFrom": [
+			  "node_modules/hds-core/lib/base.css",
+			  "src/variables.css"
+		  ]
+		}
+	  ]
+	}
+}

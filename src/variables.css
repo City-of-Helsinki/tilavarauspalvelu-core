@@ -1,0 +1,11 @@
+:root {
+  --tilavaraus-admin-header-background-color: #00005e;
+  --tilavaraus-admin-header-color: white;
+  --tilavaraus-admin-background-color: white;
+  --tilavaraus-admin-content-text-color: rgb(26, 26, 26);
+  --tilavaraus-admin-gray: #f5f6f8;
+  --tilavaraus-breakpoint-xs: 320px;
+  --tilavaraus-breakpoint-s: 520px;
+  --tilavaraus-breakpoint-m: 768px;
+  --tilavaraus-breakpoint-l: 1024px;
+}
