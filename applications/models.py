@@ -1,6 +1,7 @@
 import datetime
 from typing import Optional
 
+import recurrence
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils.text import format_lazy
@@ -11,6 +12,10 @@ from rest_framework.exceptions import ValidationError
 from applications.base_models import ContactInformation
 from reservation_units.models import Purpose, ReservationUnit
 from spaces.models import District
+from tilavarauspalvelu.utils.date_util import (
+    next_or_current_matching_weekday,
+    previous_or_current_matching_weekday,
+)
 
 
 def year_not_in_future(year: Optional[int]):
@@ -313,6 +318,45 @@ class ApplicationEvent(models.Model):
         null=True,
         blank=False,
     )
+
+    def get_occurrences(self):
+
+        occurences = []
+        for event_shedule in self.application_event_schedules.all():
+            first_matching_day = next_or_current_matching_weekday(
+                self.begin, event_shedule.day
+            )
+            previous_match = previous_or_current_matching_weekday(
+                self.end, event_shedule.day
+            )
+            myrule = recurrence.Rule(
+                recurrence.WEEKLY,
+                interval=1 if not self.biweekly else 2,
+                byday=event_shedule.day,
+                until=datetime.datetime(
+                    year=previous_match.year,
+                    month=previous_match.month,
+                    day=previous_match.day,
+                    hour=event_shedule.end.hour,
+                    minute=event_shedule.end.minute,
+                    second=0,
+                ),
+            )
+            pattern = recurrence.Recurrence(
+                dtstart=datetime.datetime(
+                    year=first_matching_day.year,
+                    month=first_matching_day.month,
+                    day=first_matching_day.day,
+                    hour=event_shedule.begin.hour,
+                    minute=event_shedule.begin.minute,
+                    second=0,
+                ),
+                rrules=[
+                    myrule,
+                ],
+            )
+            occurences.extend(list(pattern.occurrences()))
+        return occurences
 
 
 class EventReservationUnit(models.Model):
