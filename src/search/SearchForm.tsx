@@ -4,7 +4,7 @@ import { Checkbox, Select, TextInput, Button, IconSearch } from 'hds-react';
 import { useForm } from 'react-hook-form';
 import styled from 'styled-components';
 import { breakpoint } from '../common/style';
-import { getParameters } from '../common/api';
+import { getApplicationPeriods, getParameters } from '../common/api';
 import { mapOptions, OptionType } from '../common/util';
 
 export type Criteria = {
@@ -66,25 +66,39 @@ const ButtonContainer = styled.div`
 `;
 
 const SearchForm = ({ onSearch }: Props): JSX.Element | null => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [ready, setReady] = useState<boolean>(false);
 
   const [purposeOptions, setPurposeOptions] = useState<OptionType[]>([]);
+  const [districtOptions, setDistrictOptions] = useState<OptionType[]>([]);
+  const [applicationPeriodOptions, setApplicationPeriodOptions] = useState<
+    OptionType[]
+  >([]);
 
   const { register, handleSubmit, setValue } = useForm();
 
   useEffect(() => {
     register({ name: 'purpose' });
+    register({ name: 'district' });
+    register({ name: 'application_period' });
   }, [register]);
 
   useEffect(() => {
     async function fetchData() {
+      const fetchedApplicationPeriods = await getApplicationPeriods();
+      setApplicationPeriodOptions(
+        mapOptions(fetchedApplicationPeriods, t('common.select'), i18n.language)
+      );
       const fetchedPurposeOptions = await getParameters('purpose');
       setPurposeOptions(mapOptions(fetchedPurposeOptions, t('common.select')));
+      const fetchedDistrictOptions = await getParameters('district');
+      setDistrictOptions(
+        mapOptions(fetchedDistrictOptions, t('common.select'), i18n.language)
+      );
       setReady(true);
     }
     fetchData();
-  }, [t]);
+  }, [t, i18n.language]);
   const search = (criteria: Criteria) => {
     onSearch(criteria);
   };
@@ -109,9 +123,13 @@ const SearchForm = ({ onSearch }: Props): JSX.Element | null => {
           }}
         />
         <Select
+          id="application_period"
           placeholder={t('common.select')}
-          disabled
-          options={options}
+          options={applicationPeriodOptions}
+          onChange={(selection: OptionType): void => {
+            setValue('application_period', selection.value);
+          }}
+          defaultValue={applicationPeriodOptions[0]}
           label="Haku"
         />
         <ShowL />
@@ -126,9 +144,13 @@ const SearchForm = ({ onSearch }: Props): JSX.Element | null => {
           label="Käyttötarkoitus"
         />
         <Select
+          id="district"
           placeholder={t('common.select')}
-          disabled
-          options={options}
+          onChange={(selection: OptionType): void => {
+            setValue('district', selection.value);
+          }}
+          options={districtOptions}
+          defaultValue={districtOptions[0]}
           label="Kaupunginosa"
         />
         <Select

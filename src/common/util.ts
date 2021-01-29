@@ -1,5 +1,5 @@
 import { isAfter, parseISO, isBefore, format } from 'date-fns';
-import { Parameter } from './types';
+import { Parameter, TranslationObject } from './types';
 
 // eslint-disable-next-line import/prefer-default-export
 export const isActive = (startDate: string, endDate: string): boolean => {
@@ -27,9 +27,12 @@ export type OptionType = {
   value?: number;
 };
 
-export const getLabel = (parameter: Parameter): string => {
+export const getLabel = (parameter: Parameter, lang = 'fi'): string => {
   if (parameter.name) {
-    return parameter.name;
+    if (typeof parameter.name === 'string') {
+      return parameter.name;
+    }
+    return parameter.name[lang];
   }
   if (parameter.minimum && parameter.maximum) {
     return `${parameter.minimum} - ${parameter.maximum}`;
@@ -40,18 +43,35 @@ export const getLabel = (parameter: Parameter): string => {
 const emptyOption = (label: string) =>
   ({ label, value: undefined } as OptionType);
 
+export const localizedValue = (
+  name: string | TranslationObject | undefined,
+  lang: string
+): string => {
+  if (!name) {
+    return '???';
+  }
+  // needed until api stabilizes
+  if (typeof name === 'string') {
+    return name;
+  }
+  return name[lang] || name.fi || name.en || name.sv;
+};
+
 export const mapOptions = (
   src: Parameter[],
-  emptyOptionLabel?: string
-): OptionType[] =>
-  (<OptionType[]>[])
+  emptyOptionLabel?: string,
+  lang = 'fi'
+): OptionType[] => {
+  const r = (<OptionType[]>[])
     .concat(emptyOptionLabel ? [emptyOption(emptyOptionLabel)] : [])
     .concat(
       src.map((v) => ({
-        label: getLabel(v),
+        label: localizedValue(v.name, lang),
         value: v.id,
       }))
     );
+  return r;
+};
 
 export const getSelectedOption = (
   selectedId: number | null,

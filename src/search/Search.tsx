@@ -32,7 +32,6 @@ const Search = (): JSX.Element => {
   );
 
   useEffect(() => {
-    console.log('searching', search);
     async function fetchData() {
       const units = await getReservationUnits(search);
       setReservationUnits(units);
