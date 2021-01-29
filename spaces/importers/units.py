@@ -1,8 +1,12 @@
+from logging import getLogger
+
 import requests
 from django.contrib.gis.geos import Point
 from django.db import transaction
 
 from spaces.models import Location, Unit
+
+logger = getLogger(__name__)
 
 
 class UnitImporter:
@@ -65,14 +69,29 @@ class UnitImporter:
 
     @transaction.atomic
     def import_units(self):
+        self.creation_counter = 0
+        self.update_counter = 0
+
         resp = requests.get(self.url)
         resp.raise_for_status()
         unit_data = resp.json()
 
         for row in unit_data:
-            self.create_unit(row)
+            created = self.create_unit(row)
+            self._update_counters(created)
 
-    def create_unit(self, importer_data: dict):
+        logger.info(
+            "Created %s\nUpdated %s" % (self.creation_counter, self.update_counter)
+        )
+
+    def _update_counters(self, created: bool):
+        if created:
+            self.creation_counter += 1
+            return
+
+        self.update_counter += 1
+
+    def create_unit(self, importer_data: dict) -> bool:
         """Creates or updates an Unit object"""
         unit_data = {}
         for model_field, data_field in self.field_map["unit"].items():
@@ -80,7 +99,7 @@ class UnitImporter:
                 data_field, self.field_map["defaults"].get(model_field)
             )
 
-        unit, _ = Unit.objects.update_or_create(
+        unit, unit_created = Unit.objects.update_or_create(
             service_map_id=importer_data.get("id"), defaults=unit_data
         )
 
@@ -102,3 +121,5 @@ class UnitImporter:
         location, _ = Location.objects.update_or_create(
             unit=unit, defaults=location_data
         )
+
+        return unit_created
