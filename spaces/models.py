@@ -169,6 +169,14 @@ class Space(MPTTModel):
         null=True,
         blank=True,
     )
+    unit = models.ForeignKey(
+        Unit,
+        verbose_name=_("Unit"),
+        related_name="spaces",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
     surface_area = models.DecimalField(
         verbose_name=_("Surface area"),
         max_digits=10,
