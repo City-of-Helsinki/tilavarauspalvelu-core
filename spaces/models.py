@@ -37,6 +37,26 @@ class District(MPTTModel):
         return "{} ({})".format(self.name, self.parent.name if self.parent else "")
 
 
+class ServiceSector(models.Model):
+    """
+    Model representation of Service Sector that contains and manages
+    units and application periods.
+    """
+
+    name = models.CharField(verbose_name=_("Name"), max_length=255)
+    units = models.ManyToManyField(
+        "Unit", verbose_name=_("Units"), related_name="service_sectors"
+    )
+    purposes = models.ManyToManyField(
+        "reservation_units.Purpose",
+        verbose_name=_("Purposes"),
+        related_name="service_sectors",
+    )
+
+    def __str__(self):
+        return self.name
+
+
 class Unit(models.Model):
     """
     Model representation of Unit as in "office" or "premises" that could contain
@@ -62,6 +82,9 @@ class Unit(models.Model):
     )
     email = models.EmailField(verbose_name=_("Email"), blank=True, max_length=255)
     phone = models.CharField(verbose_name=_("Telephone"), blank=True, max_length=255)
+
+    def __str__(self):
+        return self.name
 
 
 class RealEstate(models.Model):

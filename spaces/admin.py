@@ -1,7 +1,7 @@
 from django.contrib import admin
 from mptt.admin import MPTTModelAdmin
 
-from .models import Building, District, Location, RealEstate, Space, Unit
+from .models import Building, District, Location, RealEstate, ServiceSector, Space, Unit
 
 
 class LocationInline(admin.TabularInline):
@@ -45,3 +45,8 @@ class SpaceAdmin(MPTTModelAdmin):
 class UnitAdmin(admin.ModelAdmin):
     model = Unit
     inlines = [LocationInline]
+
+
+@admin.register(ServiceSector)
+class ServiceSectorAdmin(admin.ModelAdmin):
+    model = ServiceSector

@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 
 from resources.models import Resource
 from services.models import Service
-from spaces.models import Space
+from spaces.models import Space, Unit
 from tilavarauspalvelu.utils.auditlog_util import AuditLogger
 
 Q = models.Q
@@ -78,6 +78,14 @@ class ReservationUnit(models.Model):
 
     terms_of_use = models.TextField(
         verbose_name=_("Terms of use"), blank=True, max_length=2000
+    )
+
+    unit = models.ForeignKey(
+        Unit,
+        verbose_name=_("Unit"),
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
     )
 
     def __str__(self):
