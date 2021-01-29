@@ -1,16 +1,20 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Checkbox, Select, TextInput, Button, IconSearch } from 'hds-react';
+import { useForm } from 'react-hook-form';
 import styled from 'styled-components';
 import { breakpoint } from '../common/style';
+import { getParameters } from '../common/api';
+import { mapOptions, OptionType } from '../common/util';
 
-interface Props {
-  // only text search is now implemented!
-  onSearch: (text: string) => void;
-}
-interface OptionType {
-  label: string;
-}
+export type Criteria = {
+  text: string;
+  purpose: number;
+};
+
+type Props = {
+  onSearch: (search: Criteria) => void;
+};
 
 const options = [] as OptionType[];
 
@@ -61,44 +65,74 @@ const ButtonContainer = styled.div`
   justify-content: flex-end;
 `;
 
-const SearchForm = ({ onSearch }: Props): JSX.Element => {
+const SearchForm = ({ onSearch }: Props): JSX.Element | null => {
   const { t } = useTranslation();
-  const [q, setQ] = useState<string>();
+  const [ready, setReady] = useState<boolean>(false);
 
-  const search = () => {
-    onSearch(q || '');
+  const [purposeOptions, setPurposeOptions] = useState<OptionType[]>([]);
+
+  const { register, handleSubmit, setValue } = useForm();
+
+  useEffect(() => {
+    register({ name: 'purpose' });
+  }, [register]);
+
+  useEffect(() => {
+    async function fetchData() {
+      const fetchedPurposeOptions = await getParameters('purpose');
+      setPurposeOptions(mapOptions(fetchedPurposeOptions, t('common.select')));
+      setReady(true);
+    }
+    fetchData();
+  }, [t]);
+  const search = (criteria: Criteria) => {
+    onSearch(criteria);
   };
+
+  if (!ready) {
+    return null;
+  }
 
   return (
     <>
       <Container>
         <TextInput
           id="search"
+          name="search"
+          ref={register}
           label="&nbsp;"
           placeholder={t('SearchForm.searchTermPlaceholder')}
-          onChange={(e) => setQ(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
-              search();
+              handleSubmit(search)();
             }
           }}
         />
-        <Select placeholder="Valitse" disabled options={options} label="Haku" />
-        <ShowL />
         <Select
-          placeholder="Valitse"
+          placeholder={t('common.select')}
           disabled
           options={options}
+          label="Haku"
+        />
+        <ShowL />
+        <Select
+          id="purpose"
+          placeholder={t('common.select')}
+          options={purposeOptions}
+          onChange={(selection: OptionType): void => {
+            setValue('purpose', selection.value);
+          }}
+          defaultValue={purposeOptions[0]}
           label="Käyttötarkoitus"
         />
         <Select
-          placeholder="Valitse"
+          placeholder={t('common.select')}
           disabled
           options={options}
           label="Kaupunginosa"
         />
         <Select
-          placeholder="Valitse"
+          placeholder={t('common.select')}
           disabled
           options={options}
           label="Hinta"
@@ -113,7 +147,7 @@ const SearchForm = ({ onSearch }: Props): JSX.Element => {
       </Container>
       <Hr />
       <ButtonContainer>
-        <Button onClick={search} iconLeft={<IconSearch />}>
+        <Button onClick={handleSubmit(search)} iconLeft={<IconSearch />}>
           {t('SearchForm.searchButton')}
         </Button>
       </ButtonContainer>

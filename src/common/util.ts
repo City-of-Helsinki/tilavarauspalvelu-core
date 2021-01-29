@@ -37,11 +37,21 @@ export const getLabel = (parameter: Parameter): string => {
   return 'no label';
 };
 
-export const mapOptions = (src: Parameter[]): OptionType[] =>
-  src.map((v) => ({
-    label: getLabel(v),
-    value: v.id,
-  }));
+const emptyOption = (label: string) =>
+  ({ label, value: undefined } as OptionType);
+
+export const mapOptions = (
+  src: Parameter[],
+  emptyOptionLabel?: string
+): OptionType[] =>
+  (<OptionType[]>[])
+    .concat(emptyOptionLabel ? [emptyOption(emptyOptionLabel)] : [])
+    .concat(
+      src.map((v) => ({
+        label: getLabel(v),
+        value: v.id,
+      }))
+    );
 
 export const getSelectedOption = (
   selectedId: number | null,

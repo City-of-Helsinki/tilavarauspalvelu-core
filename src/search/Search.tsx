@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Koros } from 'hds-react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import Container from '../component/Container';
 import Breadcrumb from '../component/Breadcrumb';
-import SearchForm from './SearchForm';
+import SearchForm, { Criteria } from './SearchForm';
 import SearchResultList from './SearchResultList';
+import { getReservationUnits } from '../common/api';
+import { ReservationUnit } from '../common/types';
 
 const style = {
   fontSize: 'var(--fontsize-heading-l)',
@@ -23,7 +25,21 @@ const StyledKoros = styled(Koros)`
 const Search = (): JSX.Element => {
   const { t } = useTranslation();
 
-  const [search, setSearch] = useState<string>('');
+  const [search, setSearch] = useState<Criteria>({} as Criteria);
+
+  const [reservationUnits, setReservationUnits] = useState<ReservationUnit[]>(
+    []
+  );
+
+  useEffect(() => {
+    console.log('searching', search);
+    async function fetchData() {
+      const units = await getReservationUnits(search);
+      setReservationUnits(units);
+    }
+    fetchData();
+  }, [search]);
+
   return (
     <>
       <HeadContainer>
@@ -38,7 +54,7 @@ const Search = (): JSX.Element => {
       </HeadContainer>
       <StyledKoros type="wave" className="koros" flipHorizontal />
       <Container main>
-        <SearchResultList search={search} />
+        <SearchResultList reservationUnits={reservationUnits} />
       </Container>
     </>
   );
