@@ -1,10 +1,28 @@
 import { isAfter, parseISO, isBefore, format } from 'date-fns';
 import { Parameter, TranslationObject } from './types';
 
-// eslint-disable-next-line import/prefer-default-export
 export const isActive = (startDate: string, endDate: string): boolean => {
   const now = new Date();
   return isAfter(now, parseISO(startDate)) && isBefore(now, parseISO(endDate));
+};
+
+const isPast = (endDate: string): boolean => {
+  const now = new Date();
+  return isAfter(now, parseISO(endDate));
+};
+
+export const uiState = (
+  startDate: string,
+  endDate: string
+): 'pending' | 'active' | 'past' => {
+  if (isPast(endDate)) {
+    return 'past';
+  }
+  if (isActive(startDate, endDate)) {
+    return 'active';
+  }
+
+  return 'pending';
 };
 
 export const formatDate = (date: string): string => {

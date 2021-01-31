@@ -93,9 +93,11 @@ const translations: Translations = {
   ApplicationPeriodCard: {
     reminderButton: ['Tilaa muistutus'],
     applyButton: ['Hae Tilaa'],
+    displayPastButton: ['Näytä tilat'],
     criteria: ['Hakukriteerit'],
-    closed: ['Haku avautuu {{openingDateTime}}'],
+    pending: ['Haku avautuu {{openingDateTime}}'],
     open: ['Haku auki {{until}} saakka'],
+    past: ['Haku sulkeutui {{closingDate}}'],
   },
   breadcrumb: {
     home: ['Vakiovuorot'],
