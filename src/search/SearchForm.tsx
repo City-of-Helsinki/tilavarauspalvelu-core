@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import styled from 'styled-components';
 import { breakpoint } from '../common/style';
 import { getApplicationPeriods, getParameters } from '../common/api';
-import { mapOptions, OptionType } from '../common/util';
+import { mapOptions, OptionType, getSelectedOption } from '../common/util';
 
 export type Criteria = {
   text: string;
@@ -14,6 +14,7 @@ export type Criteria = {
 
 type Props = {
   onSearch: (search: Criteria) => void;
+  formValues: { [key: string]: string };
 };
 
 const options = [] as OptionType[];
@@ -65,7 +66,7 @@ const ButtonContainer = styled.div`
   justify-content: flex-end;
 `;
 
-const SearchForm = ({ onSearch }: Props): JSX.Element | null => {
+const SearchForm = ({ onSearch, formValues }: Props): JSX.Element | null => {
   const { t, i18n } = useTranslation();
   const [ready, setReady] = useState<boolean>(false);
 
@@ -75,7 +76,7 @@ const SearchForm = ({ onSearch }: Props): JSX.Element | null => {
     OptionType[]
   >([]);
 
-  const { register, handleSubmit, setValue } = useForm();
+  const { register, handleSubmit, setValue, getValues } = useForm();
 
   useEffect(() => {
     register({ name: 'purpose' });
@@ -99,6 +100,11 @@ const SearchForm = ({ onSearch }: Props): JSX.Element | null => {
     }
     fetchData();
   }, [t, i18n.language]);
+
+  useEffect(() => {
+    Object.keys(formValues).forEach((p) => setValue(p, formValues[p]));
+  }, [formValues, setValue]);
+
   const search = (criteria: Criteria) => {
     onSearch(criteria);
   };
@@ -113,14 +119,15 @@ const SearchForm = ({ onSearch }: Props): JSX.Element | null => {
         <TextInput
           id="search"
           name="search"
-          ref={register}
           label="&nbsp;"
+          ref={register()}
           placeholder={t('SearchForm.searchTermPlaceholder')}
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
               handleSubmit(search)();
             }
           }}
+          defaultValue={formValues.search}
         />
         <Select
           id="application_period"
@@ -129,7 +136,10 @@ const SearchForm = ({ onSearch }: Props): JSX.Element | null => {
           onChange={(selection: OptionType): void => {
             setValue('application_period', selection.value);
           }}
-          defaultValue={applicationPeriodOptions[0]}
+          defaultValue={getSelectedOption(
+            getValues('application_period'),
+            applicationPeriodOptions
+          )}
           label="Haku"
         />
         <ShowL />
@@ -140,7 +150,7 @@ const SearchForm = ({ onSearch }: Props): JSX.Element | null => {
           onChange={(selection: OptionType): void => {
             setValue('purpose', selection.value);
           }}
-          defaultValue={purposeOptions[0]}
+          defaultValue={getSelectedOption(getValues('purpose'), purposeOptions)}
           label="Käyttötarkoitus"
         />
         <Select
@@ -150,7 +160,10 @@ const SearchForm = ({ onSearch }: Props): JSX.Element | null => {
             setValue('district', selection.value);
           }}
           options={districtOptions}
-          defaultValue={districtOptions[0]}
+          defaultValue={getSelectedOption(
+            getValues('district'),
+            districtOptions
+          )}
           label="Kaupunginosa"
         />
         <Select

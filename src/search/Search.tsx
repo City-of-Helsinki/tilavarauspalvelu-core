@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Koros } from 'hds-react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
+import queryString, { stringify } from 'query-string';
+import { useHistory } from 'react-router-dom';
 import Container from '../component/Container';
 import Breadcrumb from '../component/Breadcrumb';
 import SearchForm, { Criteria } from './SearchForm';
@@ -25,19 +27,39 @@ const StyledKoros = styled(Koros)`
 const Search = (): JSX.Element => {
   const { t } = useTranslation();
 
-  const [search, setSearch] = useState<Criteria>({} as Criteria);
+  const [values, setValues] = useState({} as Record<string, string>);
 
   const [reservationUnits, setReservationUnits] = useState<ReservationUnit[]>(
     []
   );
 
+  const searchParams = useHistory().location.search;
+
   useEffect(() => {
-    async function fetchData() {
-      const units = await getReservationUnits(search);
-      setReservationUnits(units);
+    if (searchParams) {
+      const parsed = queryString.parse(searchParams);
+
+      const newValues = Object.keys(parsed).reduce((p, key) => {
+        if (parsed[key]) {
+          return { ...p, [key]: parsed[key]?.toString() } as Record<
+            string,
+            string
+          >;
+        }
+        return p;
+      }, {} as Record<string, string>);
+
+      setValues(newValues);
     }
-    fetchData();
-  }, [search]);
+  }, [searchParams]);
+
+  const history = useHistory();
+
+  const onSearch = async (criteria: Criteria) => {
+    history.replace(`${history.location.pathname}?${stringify(criteria)}`);
+    const units = await getReservationUnits(criteria);
+    setReservationUnits(units);
+  };
 
   return (
     <>
@@ -48,7 +70,7 @@ const Search = (): JSX.Element => {
           />
           <h1 style={style}>{t('search.heading')}</h1>
           <span className="text-lg">{t('search.text')}</span>
-          <SearchForm onSearch={setSearch} />
+          <SearchForm onSearch={onSearch} formValues={values} />
         </Container>
       </HeadContainer>
       <StyledKoros type="wave" className="koros" flipHorizontal />

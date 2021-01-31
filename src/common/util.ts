@@ -77,6 +77,7 @@ export const getSelectedOption = (
   selectedId: number | null,
   options: OptionType[]
 ): OptionType | undefined => {
-  const option = options.find((o) => o.value === selectedId);
+  const selected = Number(selectedId);
+  const option = options.find((o) => o.value === selected);
   return option;
 };
