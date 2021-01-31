@@ -50,15 +50,14 @@ const Search = (): JSX.Element => {
       }, {} as Record<string, string>);
 
       setValues(newValues);
+      getReservationUnits(newValues).then((v) => setReservationUnits(v));
     }
-  }, [searchParams]);
+  }, [searchParams, setReservationUnits]);
 
   const history = useHistory();
 
   const onSearch = async (criteria: Criteria) => {
     history.replace(`${history.location.pathname}?${stringify(criteria)}`);
-    const units = await getReservationUnits(criteria);
-    setReservationUnits(units);
   };
 
   return (
