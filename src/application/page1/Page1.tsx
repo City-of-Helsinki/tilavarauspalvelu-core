@@ -120,20 +120,19 @@ const Page1 = ({
   const onSubmit = (data: ApplicationType) => {
     prepareSave(data);
 
-    //    setReady(false);
-
     if (onNext) {
       onNext();
     }
   };
 
   const onAddApplicationEvent = (data: ApplicationType) => {
-    if (data.applicationEvents.some((e) => Boolean(e.id))) {
+    if (
+      data.applicationEvents &&
+      data.applicationEvents.some((e) => Boolean(e.id))
+    ) {
       return;
     }
     prepareSave(data);
-    // first save?
-    // add data
     addNewApplicationEvent();
   };
 

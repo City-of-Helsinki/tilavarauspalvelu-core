@@ -45,22 +45,6 @@ export type OptionType = {
   value?: number;
 };
 
-export const getLabel = (parameter: Parameter, lang = 'fi'): string => {
-  if (parameter.name) {
-    if (typeof parameter.name === 'string') {
-      return parameter.name;
-    }
-    return parameter.name[lang];
-  }
-  if (parameter.minimum && parameter.maximum) {
-    return `${parameter.minimum} - ${parameter.maximum}`;
-  }
-  return 'no label';
-};
-
-const emptyOption = (label: string) =>
-  ({ label, value: undefined } as OptionType);
-
 export const localizedValue = (
   name: string | TranslationObject | undefined,
   lang: string
@@ -75,6 +59,19 @@ export const localizedValue = (
   return name[lang] || name.fi || name.en || name.sv;
 };
 
+const getLabel = (parameter: Parameter, lang = 'fi'): string => {
+  if (parameter.name) {
+    return localizedValue(parameter.name, lang);
+  }
+  if (parameter.minimum && parameter.maximum) {
+    return `${parameter.minimum} - ${parameter.maximum}`;
+  }
+  return 'no label';
+};
+
+const emptyOption = (label: string) =>
+  ({ label, value: undefined } as OptionType);
+
 export const mapOptions = (
   src: Parameter[],
   emptyOptionLabel?: string,
@@ -84,7 +81,7 @@ export const mapOptions = (
     .concat(emptyOptionLabel ? [emptyOption(emptyOptionLabel)] : [])
     .concat(
       src.map((v) => ({
-        label: localizedValue(v.name, lang),
+        label: getLabel(v, lang),
         value: v.id,
       }))
     );
