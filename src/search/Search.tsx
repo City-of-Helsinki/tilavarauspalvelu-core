@@ -6,7 +6,7 @@ import queryString, { stringify } from 'query-string';
 import { useHistory } from 'react-router-dom';
 import Container from '../component/Container';
 import Breadcrumb from '../component/Breadcrumb';
-import SearchForm, { Criteria } from './SearchForm';
+import SearchForm from './SearchForm';
 import SearchResultList from './SearchResultList';
 import { getReservationUnits } from '../common/api';
 import { ReservationUnit } from '../common/types';
@@ -56,7 +56,7 @@ const Search = (): JSX.Element => {
 
   const history = useHistory();
 
-  const onSearch = async (criteria: Criteria) => {
+  const onSearch = async (criteria: Record<string, string>) => {
     history.replace(`${history.location.pathname}?${stringify(criteria)}`);
   };
 

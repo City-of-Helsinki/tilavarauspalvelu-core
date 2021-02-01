@@ -7,13 +7,8 @@ import { breakpoint } from '../common/style';
 import { getApplicationPeriods, getParameters } from '../common/api';
 import { mapOptions, OptionType, getSelectedOption } from '../common/util';
 
-export type Criteria = {
-  text: string;
-  purpose: number;
-};
-
 type Props = {
-  onSearch: (search: Criteria) => void;
+  onSearch: (search: Record<string, string>) => void;
   formValues: { [key: string]: string };
 };
 
@@ -105,7 +100,7 @@ const SearchForm = ({ onSearch, formValues }: Props): JSX.Element | null => {
     Object.keys(formValues).forEach((p) => setValue(p, formValues[p]));
   }, [formValues, setValue]);
 
-  const search = (criteria: Criteria) => {
+  const search = (criteria: Record<string, string>) => {
     onSearch(criteria);
   };
 
