@@ -5,7 +5,7 @@ import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import Card from '../component/Card';
 import { ApplicationPeriod } from '../common/types';
-import { uiState, formatDate } from '../common/util';
+import { applicationPeriodState, formatDate } from '../common/util';
 import { breakpoint } from '../common/style';
 
 interface Props {
@@ -69,7 +69,7 @@ const ApplicationPeriodCard = ({ applicationPeriod }: Props): JSX.Element => {
   const { t } = useTranslation();
   const history = useHistory();
 
-  const state = uiState(
+  const state = applicationPeriodState(
     applicationPeriod.applicationPeriodEnd,
     applicationPeriod.applicationPeriodEnd
   );
