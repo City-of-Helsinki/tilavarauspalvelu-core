@@ -67,14 +67,18 @@ def application_with_reservation_units(
 
 
 @pytest.fixture
-def application_with_application_events(application_period) -> Application:
-    return Application.objects.create(application_period_id=application_period.id)
+def application_with_application_events(
+    application_with_reservation_units,
+) -> Application:
+    return Application.objects.create(
+        application_period_id=application_with_reservation_units.id
+    )
 
 
 @pytest.fixture
-def recurring_application_event(minimal_application) -> ApplicationEvent:
+def recurring_application_event(application_with_reservation_units) -> ApplicationEvent:
     return ApplicationEvent.objects.create(
-        application=minimal_application,
+        application=application_with_reservation_units,
         num_persons=10,
         min_duration=datetime.timedelta(hours=1),
         max_duration=datetime.timedelta(hours=2),

@@ -319,43 +319,11 @@ class ApplicationEvent(models.Model):
         blank=False,
     )
 
-    def get_occurrences(self):
+    def get_all_occurrences(self):
 
-        occurences = []
+        occurences = {}
         for event_shedule in self.application_event_schedules.all():
-            first_matching_day = next_or_current_matching_weekday(
-                self.begin, event_shedule.day
-            )
-            previous_match = previous_or_current_matching_weekday(
-                self.end, event_shedule.day
-            )
-            myrule = recurrence.Rule(
-                recurrence.WEEKLY,
-                interval=1 if not self.biweekly else 2,
-                byday=event_shedule.day,
-                until=datetime.datetime(
-                    year=previous_match.year,
-                    month=previous_match.month,
-                    day=previous_match.day,
-                    hour=event_shedule.end.hour,
-                    minute=event_shedule.end.minute,
-                    second=0,
-                ),
-            )
-            pattern = recurrence.Recurrence(
-                dtstart=datetime.datetime(
-                    year=first_matching_day.year,
-                    month=first_matching_day.month,
-                    day=first_matching_day.day,
-                    hour=event_shedule.begin.hour,
-                    minute=event_shedule.begin.minute,
-                    second=0,
-                ),
-                rrules=[
-                    myrule,
-                ],
-            )
-            occurences.extend(list(pattern.occurrences()))
+            occurences[event_shedule.id] = event_shedule.get_occurences()
         return occurences
 
 
@@ -377,6 +345,12 @@ class EventReservationUnit(models.Model):
     reservation_unit = models.ForeignKey(
         ReservationUnit, verbose_name=_("Reservation unit"), on_delete=models.PROTECT
     )
+
+
+class EventOccurence(object):
+    def __init__(self, weekday: int, occurrences: [datetime.datetime]):
+        self.weekday = weekday
+        self.occurrences = occurrences
 
 
 class ApplicationEventSchedule(models.Model):
@@ -415,6 +389,42 @@ class ApplicationEventSchedule(models.Model):
         on_delete=models.CASCADE,
         related_name="application_event_schedules",
     )
+
+    def get_occurences(self) -> [EventOccurence]:
+        self.day
+        first_matching_day = next_or_current_matching_weekday(
+            self.application_event.begin, self.day
+        )
+        previous_match = previous_or_current_matching_weekday(
+            self.application_event.end, self.day
+        )
+        myrule = recurrence.Rule(
+            recurrence.WEEKLY,
+            interval=1 if not self.application_event.biweekly else 2,
+            byday=self.day,
+            until=datetime.datetime(
+                year=previous_match.year,
+                month=previous_match.month,
+                day=previous_match.day,
+                hour=self.end.hour,
+                minute=self.end.minute,
+                second=0,
+            ),
+        )
+        pattern = recurrence.Recurrence(
+            dtstart=datetime.datetime(
+                year=first_matching_day.year,
+                month=first_matching_day.month,
+                day=first_matching_day.day,
+                hour=self.begin.hour,
+                minute=self.begin.minute,
+                second=0,
+            ),
+            rrules=[
+                myrule,
+            ],
+        )
+        return EventOccurence(weekday=self.day, occurrences=list(pattern.occurrences()))
 
 
 class Recurrence(models.Model):
