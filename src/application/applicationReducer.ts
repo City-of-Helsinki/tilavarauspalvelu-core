@@ -1,7 +1,8 @@
+import i18next from 'i18next';
 import { Action, Application, ContactPerson } from '../common/types';
 
 const applicationEvent = (applicationId?: number) => ({
-  name: 'Vakiovuoro 1.',
+  name: i18next.t('Application.Page1.applicationEventName'),
   minDuration: 1,
   maxDuration: 1,
   eventsPerWeek: 1,

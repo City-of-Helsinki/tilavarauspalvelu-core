@@ -145,7 +145,10 @@ const Application = (): JSX.Element | null => {
   };
 
   const addNewApplicationEvent = async () => {
-    dispatch({ type: 'addNewApplicationEvent', data: application });
+    dispatch({
+      type: 'addNewApplicationEvent',
+      data: application,
+    });
   };
 
   const applicationPeriodName = applicationPeriod.value?.name || '';

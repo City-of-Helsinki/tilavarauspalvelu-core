@@ -35,6 +35,7 @@ const translations: Translations = {
       eventsPerWeek: ['Vuorojen määrä/viikko'],
       biweekly: ['Vuoro vain joka toinen viikko'],
       createNew: ['Luo uusi vakiovuoro'],
+      applicationEventName: ['Nimetön vakiovuoro'],
     },
     Page2: {
       heading: ['2. Vakiovuoron ajankohta'],
