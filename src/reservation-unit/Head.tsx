@@ -22,6 +22,7 @@ import {
 } from '../context/SelectionsListContext';
 import Notification from './Notification';
 import Container from '../component/Container';
+import { localizedValue } from '../common/util';
 
 interface Props {
   reservationUnit: ReservationUnitType;
@@ -111,7 +112,10 @@ const Head = ({ reservationUnit }: Props): JSX.Element => {
               <div>
                 <IconWithText
                   icon={<IconInfoCircle />}
-                  text={reservationUnit.reservationUnitType?.name}
+                  text={localizedValue(
+                    reservationUnit.reservationUnitType?.name,
+                    i18n.language
+                  )}
                 />
                 <IconWithText
                   icon={<IconGroup />}

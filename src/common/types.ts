@@ -66,7 +66,7 @@ export type ReservationUnit = {
 
 export type Parameter = {
   id: number;
-  name?: string;
+  name?: TranslationObject | string;
   minimum?: number;
   maximum?: number;
 };
@@ -173,7 +173,7 @@ export type EventReservationUnit = {
   reservationUnit: number;
 };
 
-type DAY = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
+type DAY = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
 export type ApplicationEventSchedule = {
   id?: number;

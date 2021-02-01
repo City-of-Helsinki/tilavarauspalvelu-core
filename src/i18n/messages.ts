@@ -35,6 +35,7 @@ const translations: Translations = {
       eventsPerWeek: ['Vuorojen määrä/viikko'],
       biweekly: ['Vuoro vain joka toinen viikko'],
       createNew: ['Luo uusi vakiovuoro'],
+      applicationEventName: ['Nimetön vakiovuoro'],
     },
     Page2: {
       heading: ['2. Vakiovuoron ajankohta'],
@@ -93,9 +94,11 @@ const translations: Translations = {
   ApplicationPeriodCard: {
     reminderButton: ['Tilaa muistutus'],
     applyButton: ['Hae Tilaa'],
+    displayPastButton: ['Näytä tilat'],
     criteria: ['Hakukriteerit'],
-    closed: ['Haku avautuu {{openingDateTime}}'],
+    pending: ['Haku avautuu {{openingDateTime}}'],
     open: ['Haku auki {{until}} saakka'],
+    past: ['Haku sulkeutui {{closingDate}}'],
   },
   breadcrumb: {
     home: ['Vakiovuorot'],
