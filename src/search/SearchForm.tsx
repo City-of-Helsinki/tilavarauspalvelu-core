@@ -1,16 +1,16 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Checkbox, Select, TextInput, Button, IconSearch } from 'hds-react';
+import { useForm } from 'react-hook-form';
 import styled from 'styled-components';
 import { breakpoint } from '../common/style';
+import { getApplicationPeriods, getParameters } from '../common/api';
+import { mapOptions, OptionType, getSelectedOption } from '../common/util';
 
-interface Props {
-  // only text search is now implemented!
-  onSearch: (text: string) => void;
-}
-interface OptionType {
-  label: string;
-}
+type Props = {
+  onSearch: (search: Record<string, string>) => void;
+  formValues: { [key: string]: string };
+};
 
 const options = [] as OptionType[];
 
@@ -61,44 +61,108 @@ const ButtonContainer = styled.div`
   justify-content: flex-end;
 `;
 
-const SearchForm = ({ onSearch }: Props): JSX.Element => {
-  const { t } = useTranslation();
-  const [q, setQ] = useState<string>();
+const SearchForm = ({ onSearch, formValues }: Props): JSX.Element | null => {
+  const { t, i18n } = useTranslation();
+  const [ready, setReady] = useState<boolean>(false);
 
-  const search = () => {
-    onSearch(q || '');
+  const [purposeOptions, setPurposeOptions] = useState<OptionType[]>([]);
+  const [districtOptions, setDistrictOptions] = useState<OptionType[]>([]);
+  const [applicationPeriodOptions, setApplicationPeriodOptions] = useState<
+    OptionType[]
+  >([]);
+
+  const { register, handleSubmit, setValue, getValues } = useForm();
+
+  useEffect(() => {
+    register({ name: 'purpose' });
+    register({ name: 'district' });
+    register({ name: 'application_period' });
+  }, [register]);
+
+  useEffect(() => {
+    async function fetchData() {
+      const fetchedApplicationPeriods = await getApplicationPeriods();
+      setApplicationPeriodOptions(
+        mapOptions(fetchedApplicationPeriods, t('common.select'), i18n.language)
+      );
+      const fetchedPurposeOptions = await getParameters('purpose');
+      setPurposeOptions(mapOptions(fetchedPurposeOptions, t('common.select')));
+      const fetchedDistrictOptions = await getParameters('district');
+      setDistrictOptions(
+        mapOptions(fetchedDistrictOptions, t('common.select'), i18n.language)
+      );
+      setReady(true);
+    }
+    fetchData();
+  }, [t, i18n.language]);
+
+  useEffect(() => {
+    Object.keys(formValues).forEach((p) => setValue(p, formValues[p]));
+  }, [formValues, setValue]);
+
+  const search = (criteria: Record<string, string>) => {
+    onSearch(criteria);
   };
+
+  if (!ready) {
+    return null;
+  }
 
   return (
     <>
       <Container>
         <TextInput
           id="search"
+          name="search"
           label="&nbsp;"
+          ref={register()}
           placeholder={t('SearchForm.searchTermPlaceholder')}
-          onChange={(e) => setQ(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
-              search();
+              handleSubmit(search)();
             }
           }}
+          defaultValue={formValues.search}
         />
-        <Select placeholder="Valitse" disabled options={options} label="Haku" />
+        <Select
+          id="application_period"
+          placeholder={t('common.select')}
+          options={applicationPeriodOptions}
+          onChange={(selection: OptionType): void => {
+            setValue('application_period', selection.value);
+          }}
+          defaultValue={getSelectedOption(
+            getValues('application_period'),
+            applicationPeriodOptions
+          )}
+          label="Haku"
+        />
         <ShowL />
         <Select
-          placeholder="Valitse"
-          disabled
-          options={options}
+          id="purpose"
+          placeholder={t('common.select')}
+          options={purposeOptions}
+          onChange={(selection: OptionType): void => {
+            setValue('purpose', selection.value);
+          }}
+          defaultValue={getSelectedOption(getValues('purpose'), purposeOptions)}
           label="Käyttötarkoitus"
         />
         <Select
-          placeholder="Valitse"
-          disabled
-          options={options}
+          id="district"
+          placeholder={t('common.select')}
+          onChange={(selection: OptionType): void => {
+            setValue('district', selection.value);
+          }}
+          options={districtOptions}
+          defaultValue={getSelectedOption(
+            getValues('district'),
+            districtOptions
+          )}
           label="Kaupunginosa"
         />
         <Select
-          placeholder="Valitse"
+          placeholder={t('common.select')}
           disabled
           options={options}
           label="Hinta"
@@ -113,7 +177,7 @@ const SearchForm = ({ onSearch }: Props): JSX.Element => {
       </Container>
       <Hr />
       <ButtonContainer>
-        <Button onClick={search} iconLeft={<IconSearch />}>
+        <Button onClick={handleSubmit(search)} iconLeft={<IconSearch />}>
           {t('SearchForm.searchButton')}
         </Button>
       </ButtonContainer>

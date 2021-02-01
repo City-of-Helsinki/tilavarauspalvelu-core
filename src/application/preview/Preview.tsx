@@ -10,7 +10,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { Application, ReservationUnit, Parameter } from '../../common/types';
-import { formatDate } from '../../common/util';
+import { formatDate, localizedValue } from '../../common/util';
 import { getParameters, getReservationUnit } from '../../common/api';
 import LabelValue from '../../component/LabelValue';
 import TimePreview from '../TimePreview';
@@ -201,7 +201,10 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
               label={t('Application.preview.applicationEvent.abilityGroup')}
               value={
                 applicationEvent.abilityGroupId != null
-                  ? abilityGroupOptions[applicationEvent.abilityGroupId].name
+                  ? localizedValue(
+                      abilityGroupOptions[applicationEvent.abilityGroupId].name,
+                      i18n.language
+                    )
                   : ''
               }
             />{' '}
@@ -209,7 +212,10 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
               label={t('Application.preview.applicationEvent.purpose')}
               value={
                 applicationEvent.purposeId != null
-                  ? purposeOptions[applicationEvent.purposeId].name
+                  ? localizedValue(
+                      purposeOptions[applicationEvent.purposeId].name,
+                      i18n.language
+                    )
                   : ''
               }
             />{' '}
@@ -261,6 +267,20 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
               }
             />
           </TimePreviewContainer>
+          <CheckboxContainer>
+            <Checkbox
+              id="preview.acceptTermsOfUse"
+              checked={acceptTermsOfUse}
+              onChange={(e) => setAcceptTermsOfUse(e.target.checked)}
+            />
+            <label htmlFor="preview.acceptTermsOfUse">
+              {t('Application.preview.userAcceptsTerms')}
+            </label>
+          </CheckboxContainer>
+          <StyledNotification
+            label={t('Application.preview.notification.processing')}>
+            {t('Application.preview.notification.body')}
+          </StyledNotification>
         </Accordion>
       ))}
       <CheckboxContainer>

@@ -66,7 +66,7 @@ export type ReservationUnit = {
 
 export type Parameter = {
   id: number;
-  name?: string;
+  name?: TranslationObject | string;
   minimum?: number;
   maximum?: number;
 };
