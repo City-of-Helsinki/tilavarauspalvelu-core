@@ -1,26 +1,21 @@
 from datetime import datetime
 
 from dateutil.parser import parse
+from django.db.models import Q
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets
 
 from api.applications_api.filters import ApplicationFilter
 from api.applications_api.serializers import (
-    AddressSerializer,
     ApplicationEventSerializer,
     ApplicationSerializer,
 )
-from applications.models import Address, Application, ApplicationEvent
-
-
-class AddressViewSet(viewsets.ModelViewSet):
-
-    queryset = Address.objects.all()
-
-    serializer_class = AddressSerializer
-
-    def perform_create(self, serializer):
-        serializer.save()
+from applications.models import Application, ApplicationEvent
+from permissions.api_permissions import (
+    ApplicationEventPermission,
+    ApplicationPermission,
+)
+from permissions.helpers import get_service_sectors_where_can_view_applications
 
 
 class ApplicationViewSet(viewsets.ModelViewSet):
@@ -28,11 +23,25 @@ class ApplicationViewSet(viewsets.ModelViewSet):
     serializer_class = ApplicationSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = ApplicationFilter
+    permission_classes = [ApplicationPermission]
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        user = self.request.user
+
+        return queryset.filter(
+            Q(
+                application_round__service_sector__in=get_service_sectors_where_can_view_applications(
+                    user
+                )
+            )
+            | Q(user=user)
+        )
 
 
 class ApplicationEventViewSet(viewsets.ModelViewSet):
     serializer_class = ApplicationEventSerializer
-
+    permission_classes = [ApplicationEventPermission]
     queryset = ApplicationEvent.objects.all()
 
     def get_serializer_context(self):
@@ -43,3 +52,16 @@ class ApplicationEventViewSet(viewsets.ModelViewSet):
         if end is not None:
             end = parse(end)
         return {"start": start, "end": end}
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        user = self.request.user
+
+        return queryset.filter(
+            Q(
+                application__application_round__service_sector__in=get_service_sectors_where_can_view_applications(
+                    user
+                )
+            )
+            | Q(application__user=user)
+        )

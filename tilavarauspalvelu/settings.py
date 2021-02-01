@@ -82,6 +82,7 @@ INSTALLED_APPS = [
     "elasticapm.contrib.django",
     "modeltranslation",
     "django.contrib.gis",
+    "permissions",
 ]
 
 MIDDLEWARE = [
@@ -239,9 +240,7 @@ USE_TZ = True
 GRAPHENE = {"SCHEMA": "api.graphql.schema.schema"}
 
 REST_FRAMEWORK = {
-    "DEFAULT_PERMISSION_CLASSES": [
-        "api.permissions.AuthenticationOffOrAuthenticatedForWrite"
-    ],
+    "DEFAULT_PERMISSION_CLASSES": ["permissions.api_permissions.AllowNonePermission"],
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.BasicAuthentication",
         "rest_framework.authentication.SessionAuthentication",

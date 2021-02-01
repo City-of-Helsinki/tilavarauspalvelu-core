@@ -5,9 +5,16 @@ from resources.models import Resource
 
 
 @pytest.mark.django_db
-def test_resource_create(user_api_client, valid_resource_data):
+def test_resource_create(
+    general_admin_api_client, user_api_client, valid_resource_data
+):
     assert Resource.objects.count() == 0
     response = user_api_client.post(
+        reverse("resource-list"), data=valid_resource_data, format="json"
+    )
+    assert response.status_code == 403
+
+    response = general_admin_api_client.post(
         reverse("resource-list"), data=valid_resource_data, format="json"
     )
     assert response.status_code == 201
@@ -15,16 +22,16 @@ def test_resource_create(user_api_client, valid_resource_data):
 
 
 @pytest.mark.django_db
-def test_translatedmodelserializer(user_api_client, valid_resource_data):
+def test_translatedmodelserializer(general_admin_api_client, valid_resource_data):
     assert Resource.objects.count() == 0
     # POST should be able to create a resource with nested name structure from valid_resource_data
-    response = user_api_client.post(
+    response = general_admin_api_client.post(
         reverse("resource-list"), data=valid_resource_data, format="json"
     )
     assert response.status_code == 201
     assert Resource.objects.count() == 1
 
-    response = user_api_client.get(reverse("resource-list"))
+    response = general_admin_api_client.get(reverse("resource-list"))
     # Translated fields should not exist in flat structure
     assert "name_fi" not in response.data
     assert "name_en" not in response.data

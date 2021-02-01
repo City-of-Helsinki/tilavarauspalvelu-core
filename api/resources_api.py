@@ -1,6 +1,7 @@
 from rest_framework import serializers, viewsets
 
 from api.base import TranslatedModelSerializer
+from permissions.api_permissions import ResourcePermission
 from resources.models import Resource, Space
 
 
@@ -41,3 +42,4 @@ class ResourceSerializer(TranslatedModelSerializer):
 class ResourceViewSet(viewsets.ModelViewSet):
     serializer_class = ResourceSerializer
     queryset = Resource.objects.all()
+    permission_classes = [ResourcePermission]

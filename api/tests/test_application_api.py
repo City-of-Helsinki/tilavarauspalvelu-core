@@ -6,39 +6,14 @@ from applications.models import Application, ApplicationEvent
 
 @pytest.mark.django_db
 def test_application_create(
-    application_round,
+    valid_application_data,
     user_api_client,
 ):
     assert Application.objects.count() == 0
-    data = {
-        "applicant_type": "company",
-        "organisation": {
-            "id": None,
-            "identifier": "123-identifier",
-            "name": "Super organisation",
-            "address": {
-                "street_address": "Testikatu 28",
-                "post_code": 33540,
-                "city": "Tampere",
-            },
-        },
-        "contact_person": {
-            "id": None,
-            "first_name": "John",
-            "last_name": "Wayne",
-            "email": "john@test.com",
-            "phone_number": "123-123",
-        },
-        "application_round_id": application_round.id,
-        "application_events": [],
-        "status": "draft",
-        "billing_address": {
-            "street_address": "Laskukatu 1c",
-            "post_code": 33540,
-            "city": "Tampere",
-        },
-    }
-    response = user_api_client.post(reverse("application-list"), data, format="json")
+
+    response = user_api_client.post(
+        reverse("application-list"), valid_application_data, format="json"
+    )
     assert response.status_code == 201
 
     assert response.data["organisation"]["identifier"] == "123-identifier"
@@ -323,3 +298,203 @@ def test_application_review_invalid(
     }
     response = user_api_client.post(reverse("application-list"), data, format="json")
     assert response.status_code == 400
+
+
+@pytest.mark.django_db
+def test_unauthenticated_cannot_create_application(
+    unauthenticated_api_client, valid_application_data
+):
+    response = unauthenticated_api_client.post(
+        reverse("application-list"), valid_application_data, format="json"
+    )
+    assert response.status_code == 401
+
+
+@pytest.mark.django_db
+def test_user_can_create_application(user_api_client, valid_application_data):
+    response = user_api_client.post(
+        reverse("application-list"), valid_application_data, format="json"
+    )
+    assert response.status_code == 201
+
+
+@pytest.mark.django_db
+def test_user_can_update_own_application(
+    user_api_client, application, valid_application_data
+):
+    response = user_api_client.put(
+        reverse("application-detail", kwargs={"pk": application.id}),
+        data=valid_application_data,
+        format="json",
+    )
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_user_cannot_see_or_update_other_users_application(
+    user_2_api_client, application, valid_application_data
+):
+    response = user_2_api_client.get(
+        reverse("application-detail", kwargs={"pk": application.id}),
+        format="json",
+    )
+    assert response.status_code == 404
+
+    response = user_2_api_client.put(
+        reverse("application-detail", kwargs={"pk": application.id}),
+        data=valid_application_data,
+        format="json",
+    )
+    assert response.status_code == 404
+
+
+@pytest.mark.django_db
+def test_general_admin_can_update_users_application(
+    general_admin_api_client, application, valid_application_data
+):
+    response = general_admin_api_client.put(
+        reverse("application-detail", kwargs={"pk": application.id}),
+        data=valid_application_data,
+        format="json",
+    )
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_service_sector_admin_can_update_users_application(
+    service_sector_admin_api_client, application, valid_application_data
+):
+    response = service_sector_admin_api_client.put(
+        reverse("application-detail", kwargs={"pk": application.id}),
+        data=valid_application_data,
+        format="json",
+    )
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_service_sector_application_manager_can_update_users_application(
+    service_sector_application_manager_api_client, application, valid_application_data
+):
+    response = service_sector_application_manager_api_client.put(
+        reverse("application-detail", kwargs={"pk": application.id}),
+        data=valid_application_data,
+        format="json",
+    )
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_wrong_service_sector_admin_cannot_create_or_update_application(
+    service_sector_2_admin_api_client, application, valid_application_data
+):
+    response = service_sector_2_admin_api_client.get(
+        reverse("application-detail", kwargs={"pk": application.id}),
+        format="json",
+    )
+    assert response.status_code == 404
+
+    response = service_sector_2_admin_api_client.put(
+        reverse("application-detail", kwargs={"pk": application.id}),
+        data=valid_application_data,
+        format="json",
+    )
+    assert response.status_code == 404
+
+
+@pytest.mark.django_db
+def test_user_can_create_application_event(
+    user_api_client, valid_application_event_data
+):
+    response = user_api_client.post(
+        reverse("application_event-list"),
+        data=valid_application_event_data,
+        format="json",
+    )
+    assert response.status_code == 201
+
+
+@pytest.mark.django_db
+def test_user_can_update_application_event(
+    user_api_client, valid_application_event_data, application_event
+):
+    response = user_api_client.put(
+        reverse("application_event-detail", kwargs={"pk": application_event.id}),
+        data=valid_application_event_data,
+        format="json",
+    )
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_user_cannot_view_other_users_application_event(
+    user_2_api_client, application_event
+):
+    response = user_2_api_client.get(
+        reverse("application_event-detail", kwargs={"pk": application_event.id}),
+        format="json",
+    )
+    assert response.status_code == 404
+
+
+@pytest.mark.django_db
+def test_user_cannot_update_other_users_application_event(
+    user_2_api_client, application_event, valid_application_event_data
+):
+    response = user_2_api_client.put(
+        reverse("application_event-detail", kwargs={"pk": application_event.id}),
+        data=valid_application_event_data,
+        format="json",
+    )
+    assert response.status_code == 404
+
+
+@pytest.mark.django_db
+def test_general_admin_can_update_users_application_event(
+    general_admin_api_client, application_event, valid_application_event_data
+):
+    response = general_admin_api_client.put(
+        reverse("application_event-detail", kwargs={"pk": application_event.id}),
+        data=valid_application_event_data,
+        format="json",
+    )
+
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_service_sector_admin_can_update_users_application_event(
+    service_sector_admin_api_client, application_event, valid_application_event_data
+):
+    response = service_sector_admin_api_client.put(
+        reverse("application_event-detail", kwargs={"pk": application_event.id}),
+        data=valid_application_event_data,
+        format="json",
+    )
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_service_sector_application_manager_can_update_users_application_event(
+    service_sector_application_manager_api_client,
+    application_event,
+    valid_application_event_data,
+):
+    response = service_sector_application_manager_api_client.put(
+        reverse("application_event-detail", kwargs={"pk": application_event.id}),
+        data=valid_application_event_data,
+        format="json",
+    )
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_wrong_service_sector_admin_cannot_view_or_update_users_application_event(
+    service_sector_2_admin_api_client, application_event, valid_application_event_data
+):
+    response = service_sector_2_admin_api_client.put(
+        reverse("application_event-detail", kwargs={"pk": application_event.id}),
+        data=valid_application_event_data,
+        format="json",
+    )
+    assert response.status_code == 404

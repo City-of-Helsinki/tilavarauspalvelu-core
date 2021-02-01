@@ -13,22 +13,30 @@ def test_application_round_fetch(user_api_client, application_round):
 
 
 @pytest.mark.django_db
-def test_create_application_round(user, user_api_client, valid_application_round_data):
+def test_create_application_round(
+    user_api_client, service_sector_admin_api_client, valid_application_round_data
+):
     response = user_api_client.post(
         reverse("application_round-list"),
         data=valid_application_round_data,
         format="json",
     )
 
-    assert response.status_code == 201
+    assert response.status_code == 403
+
+    response = service_sector_admin_api_client.post(
+        reverse("application_round-list"),
+        data=valid_application_round_data,
+        format="json",
+    )
+
     assert response.data["status"] == ApplicationRoundStatus.DRAFT
     assert response.data["name"] == valid_application_round_data["name"]
 
 
 @pytest.mark.django_db
 def test_application_round_should_not_allow_order_number_overlap(
-    user,
-    user_api_client,
+    service_sector_admin_api_client,
     valid_application_round_data,
     valid_application_round_basket_data,
 ):
@@ -39,7 +47,7 @@ def test_application_round_should_not_allow_order_number_overlap(
         baskets.append(data)
 
     valid_application_round_data["application_round_baskets"] = baskets
-    response = user_api_client.post(
+    response = service_sector_admin_api_client.post(
         reverse("application_round-list"),
         data=valid_application_round_data,
         format="json",
@@ -51,8 +59,7 @@ def test_application_round_should_not_allow_order_number_overlap(
 
 @pytest.mark.django_db
 def test_application_round_when_basket_orders_dont_overlap(
-    user,
-    user_api_client,
+    service_sector_admin_api_client,
     valid_application_round_data,
     valid_application_round_basket_data,
 ):
@@ -63,7 +70,7 @@ def test_application_round_when_basket_orders_dont_overlap(
         baskets.append(data)
 
     valid_application_round_data["application_round_baskets"] = baskets
-    response = user_api_client.post(
+    response = service_sector_admin_api_client.post(
         reverse("application_round-list"),
         data=valid_application_round_data,
         format="json",
@@ -79,10 +86,23 @@ def test_application_round_when_basket_orders_dont_overlap(
 
 @pytest.mark.django_db
 def test_update_application_round(
-    user, user_api_client, application_round, valid_application_round_data
+    user_api_client,
+    service_sector_admin_api_client,
+    application_round,
+    valid_application_round_data,
 ):
     data = {**valid_application_round_data, "status": ApplicationRoundStatus.PUBLISHED}
+
+    # Normal user not allowed to edit application round
     response = user_api_client.put(
+        reverse("application_round-detail", kwargs={"pk": application_round.id}),
+        data=data,
+        format="json",
+    )
+    assert response.status_code == 403
+
+    # Service Sector admin can edit application round
+    response = service_sector_admin_api_client.put(
         reverse("application_round-detail", kwargs={"pk": application_round.id}),
         data=data,
         format="json",
@@ -93,3 +113,127 @@ def test_update_application_round(
 
     assert application_round.status == ApplicationRoundStatus.PUBLISHED
     assert application_round.name == valid_application_round_data["name"]
+
+
+@pytest.mark.django_db
+def test_normal_user_cannot_create_application_rounds(
+    user_api_client, valid_application_round_data
+):
+    response = user_api_client.post(
+        reverse("application_round-list"),
+        data=valid_application_round_data,
+        format="json",
+    )
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_normal_user_cannot_edit_application_rounds(
+    user_api_client, application_round, valid_application_round_data
+):
+    response = user_api_client.put(
+        reverse("application_round-detail", kwargs={"pk": application_round.id}),
+        data=valid_application_round_data,
+        format="json",
+    )
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_normal_user_can_see_application_rounds(user_api_client, application_round):
+    response = user_api_client.get(reverse("application_round-list"), format="json")
+    assert application_round.id in map(lambda x: x["id"], response.data)
+
+
+@pytest.mark.django_db
+def test_general_admin_can_create_application_rounds(
+    general_admin_api_client, valid_application_round_data
+):
+    response = general_admin_api_client.post(
+        reverse("application_round-list"),
+        data=valid_application_round_data,
+        format="json",
+    )
+
+    assert response.status_code == 201
+
+
+@pytest.mark.django_db
+def test_general_admin_can_update_application_rounds(
+    application_round, valid_application_round_data, general_admin_api_client
+):
+    response = general_admin_api_client.put(
+        reverse("application_round-detail", kwargs={"pk": application_round.id}),
+        data=valid_application_round_data,
+        format="json",
+    )
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_service_sector_admin_can_create_application_rounds(
+    service_sector_admin_api_client, valid_application_round_data
+):
+    response = service_sector_admin_api_client.post(
+        reverse("application_round-list"),
+        data=valid_application_round_data,
+        format="json",
+    )
+    assert response.status_code == 201
+
+
+@pytest.mark.django_db
+def test_service_sector_admin_can_update_application_rounds(
+    service_sector_admin_api_client, application_round, valid_application_round_data
+):
+    response = service_sector_admin_api_client.put(
+        reverse("application_round-detail", kwargs={"pk": application_round.id}),
+        data=valid_application_round_data,
+        format="json",
+    )
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_application_manager_can_create_application_rounds(
+    service_sector_application_manager_api_client, valid_application_round_data
+):
+    response = service_sector_application_manager_api_client.post(
+        reverse("application_round-list"),
+        data=valid_application_round_data,
+        format="json",
+    )
+    assert response.status_code == 201
+
+
+@pytest.mark.django_db
+def test_application_manager_can_update_application_rounds(
+    service_sector_application_manager_api_client,
+    application_round,
+    valid_application_round_data,
+):
+    response = service_sector_application_manager_api_client.put(
+        reverse("application_round-detail", kwargs={"pk": application_round.id}),
+        data=valid_application_round_data,
+        format="json",
+    )
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_wrong_service_sector_admin_cannot_manage_application_rounds(
+    service_sector_2_admin_api_client, valid_application_round_data, application_round
+):
+    response = service_sector_2_admin_api_client.post(
+        reverse("application_round-list"),
+        data=valid_application_round_data,
+        format="json",
+    )
+    assert response.status_code == 403
+
+    response = service_sector_2_admin_api_client.put(
+        reverse("application_round-detail", kwargs={"pk": application_round.id}),
+        data=valid_application_round_data,
+        format="json",
+    )
+    assert response.status_code == 403

@@ -17,6 +17,29 @@ To keep serializers consistent, we obey the following principles. These principl
 - If related models are exposed in their own API endpoint, use it to CRUD them. Use nested objects only if they are not used separately.
 - Check examples in `api/examples.py` for samples how to do different implementations using above rules.
 
+## Permissions
+When implementing new API endpoints or new methods for existing ones permissions should always be checked and modified as needed.
+Permissions are implemented in tilavarauspalvelu as following.
+
+### Role models
+- Permissions are currently role based. There are currently general roles, service sector roles and unit roles.
+- Roles are dynamic and they can be modified or created without changing code. You can manage role choices and their permissions in Django Admin.
+- Roles can be assigned to users from Django Admin or through API.
+- Role models are located in `permissions/models.py`.
+
+### Helpers
+- To make code more readable helpers are implemented for checking if user has roles that has permissions for certain actions. 
+- For example there is helper `can_manage_service_sectors_applications` that takes user and service sector as parameters and it then checks if user has roles required for that action. 
+- New helpers should be created any time there is need for these kind of checks rather than directly accessing users roles. 
+- Helpers are located in `permissions/helpers.py`.
+
+### API permissions
+
+- API permissions are permission classes that are assigned to each viewsets `permission_classes` attribute. They are inherited from rest frameworks `BasePermission` class.
+- API permission class should be implemented for each viewset. By default everything is restricted.
+- API permissions uses helpers to determine if user has permission for certain actions.
+- API permission classes can be found from `permissions/api_permissions.py`. 
+
 ## Translations
 We use `django-modeltranslation` to deal with translations. Use `TranslatedModelSerializer` located in `api/base.py` to automatically register translated fields in API. Note: You still need to register the original field, such as `fields = ["name"]`. This will automatically register translated fields `name_fi`, `name_en`, `name_sv`, which will be nested in an object under the original field name as a key, by their respective language codes as field keys:
 
