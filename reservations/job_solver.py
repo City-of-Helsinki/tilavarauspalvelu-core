@@ -3,6 +3,8 @@ from random import randrange
 
 from ortools.sat.python import cp_model
 
+from applications.models import Application
+
 
 # flake8: noqa
 def solve_assignment():
