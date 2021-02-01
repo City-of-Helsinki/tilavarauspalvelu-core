@@ -148,7 +148,6 @@ const Application = (): JSX.Element | null => {
     dispatch({
       type: 'addNewApplicationEvent',
       data: application,
-      params: { name: t('Application.Page1.applicationEventName') },
     });
   };
 

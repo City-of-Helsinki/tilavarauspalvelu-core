@@ -1,7 +1,8 @@
+import i18next from 'i18next';
 import { Action, Application, ContactPerson } from '../common/types';
 
-const applicationEvent = (applicationId?: number, name?: string) => ({
-  name: name || 'Nimetön vakiovuoro',
+const applicationEvent = (applicationId?: number) => ({
+  name: i18next.t('Application.Page1.applicationEventName'),
   minDuration: 1,
   maxDuration: 1,
   eventsPerWeek: 1,
@@ -28,9 +29,7 @@ const reducer = (state: Application, action: Action): Application => {
     }
     case 'addNewApplicationEvent': {
       const nextState = { ...state };
-      nextState.applicationEvents.push(
-        applicationEvent(state.id, action.params?.name)
-      );
+      nextState.applicationEvents.push(applicationEvent(state.id));
       return nextState;
     }
     case 'load': {
