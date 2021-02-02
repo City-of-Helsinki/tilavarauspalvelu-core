@@ -20,3 +20,10 @@ test('Search page', async (t) => {
   await t.typeText(search.searchText, 'Studio').click(search.searchButton);
   await runAxeCheck(t);
 });
+
+test('Reservation unit page', async (t) => {
+  await t.click(home.browseAllButton);
+  await t.click(search.searchButton);
+  await t.click(search.reservationUnitPageLink);
+  await runAxeCheck(t);
+});

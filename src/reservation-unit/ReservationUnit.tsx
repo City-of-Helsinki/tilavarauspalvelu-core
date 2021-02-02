@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import styled from 'styled-components';
 import Container from '../component/Container';
 import { ReservationUnit as ReservationUnitType } from '../common/types';
 import { getReservationUnit } from '../common/api';
@@ -8,6 +9,12 @@ import Head from './Head';
 type ParamTypes = {
   id: string;
 };
+
+const TwoColoumnLayout = styled.div`
+  display: grid;
+  gap: var(--spacing-m);
+  grid-template-columns: 7fr 3fr;
+`;
 
 const ReservationUnit = (): JSX.Element | null => {
   const { id } = useParams<ParamTypes>();
@@ -37,12 +44,7 @@ const ReservationUnit = (): JSX.Element | null => {
     <>
       <Head reservationUnit={reservationUnit} />
       <Container>
-        <div
-          style={{
-            display: 'grid',
-            gap: '1em',
-            gridTemplateColumns: '7fr 3fr',
-          }}>
+        <TwoColoumnLayout>
           <div>
             <h2>Kuvaus</h2>
             <h2>Ehdot ja käyttössäännöt</h2>
@@ -53,7 +55,7 @@ const ReservationUnit = (): JSX.Element | null => {
           <div>
             <h2>Osoite</h2>
           </div>
-        </div>
+        </TwoColoumnLayout>
       </Container>
     </>
   ) : null;

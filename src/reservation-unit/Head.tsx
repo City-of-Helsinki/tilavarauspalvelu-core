@@ -92,7 +92,7 @@ const Head = ({ reservationUnit }: Props): JSX.Element => {
       <Notification applicationPeriod={null} />
       <Container>
         <BackContainer>
-          <IconArrowLeft />
+          <IconArrowLeft aria-hidden />
           <button
             type="button"
             onClick={() => {
@@ -111,24 +111,42 @@ const Head = ({ reservationUnit }: Props): JSX.Element => {
             <Props>
               <div>
                 <IconWithText
-                  icon={<IconInfoCircle />}
+                  icon={
+                    <IconInfoCircle aria-label={t('reservationUnit.type')} />
+                  }
                   text={localizedValue(
                     reservationUnit.reservationUnitType?.name,
                     i18n.language
                   )}
                 />
                 <IconWithText
-                  icon={<IconGroup />}
+                  icon={
+                    <IconGroup aria-label={t('reservationUnit.maxPersons')} />
+                  }
                   text={t('ReservationUnit.maxPersons', {
                     maxPersons: reservationUnit.maxPersons,
                   })}
                 />
-                <IconWithText icon={<IconClock />} text="Max. 2 tuntia" />
+                <IconWithText
+                  icon={
+                    <IconClock aria-label={t('reservationUnit.maxDuration')} />
+                  }
+                  text="Max. 2 tuntia"
+                />
               </div>
               <div>
-                <IconWithText icon={<IconCalendar />} text="7€ -10€/tunti" />
                 <IconWithText
-                  icon={<IconGlyphEuro />}
+                  icon={
+                    <IconCalendar aria-label={t('reservationUnit.price')} />
+                  }
+                  text="7€ -10€/tunti"
+                />
+                <IconWithText
+                  icon={
+                    <IconGlyphEuro
+                      aria-label={t('reservationUnit.billableHours')}
+                    />
+                  }
                   texts={[
                     ['Ma-Pe', '10:00 - 20:00'],
                     ['La', '12:00 - 20:00'],

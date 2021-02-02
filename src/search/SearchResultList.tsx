@@ -3,6 +3,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { ReservationUnit } from '../common/types';
+import Container from '../component/Container';
 import ReservationUnitCard from './ReservationUnitCard';
 
 interface Props {
@@ -67,7 +68,7 @@ const ListContainer = styled.div`
 const SearchResultList = ({ reservationUnits }: Props): JSX.Element => {
   const { t } = useTranslation();
   return (
-    <>
+    <Container id="searchResultList">
       <HitCount>
         {t('SearchResultList.count', { count: reservationUnits.length })}
       </HitCount>
@@ -96,7 +97,7 @@ const SearchResultList = ({ reservationUnits }: Props): JSX.Element => {
           <ReservationUnitCard reservationUnit={ru} key={ru.id} />
         ))}
       </ListContainer>
-    </>
+    </Container>
   );
 };
 

@@ -3,10 +3,9 @@ import styled from 'styled-components';
 
 interface Props {
   children: React.ReactNode;
-  // eslint-disable-next-line react/require-default-props
   main?: boolean;
-  // eslint-disable-next-line react/require-default-props
   style?: React.CSSProperties;
+  id?: string;
 }
 
 const styles = `

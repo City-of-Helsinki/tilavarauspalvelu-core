@@ -138,6 +138,9 @@ const translations: Translations = {
     type: ['Tyyppi', 'Type', 'Typ'],
     maxPersons: ['Suurin sallittu henkilömäärä', 'Max persons', 'Max personer'],
     address: ['Osoite', 'Address', 'Adress'],
+    maxDuration: ['Varauksen kesto', 'Duration of reservation', 'Bokningstid'],
+    price: ['Hinta', 'Price', 'Pris'],
+    billableHours: ['Maksulliset tunnit', 'Billable hours', 'Betalda timmar'],
   },
 
   Navigation: {
