@@ -193,6 +193,48 @@ class ApplicationStatus(models.Model):
         return "{} ({})".format(self.get_status_display(), self.application.id)
 
 
+class ApplicationEventStatus(models.Model):
+    CREATED = "created"
+    ALLOCATING = "allocating"
+    ALLOCATED = "allocated"
+    VALIDATED = "validated"
+    APPROVED = "approved"
+    DECLINED = "declined"
+    CANCELLED = "cancelled"
+
+    STATUS_CHOICES = (
+        (CREATED, _("Created")),
+        (ALLOCATING, _("Allocating")),
+        (ALLOCATED, _("Allocated")),
+        (VALIDATED, _("Validated")),
+        (APPROVED, _("Approved")),
+        (DECLINED, _("Declined")),
+        (CANCELLED, _("Cancelled")),
+    )
+
+    status = models.CharField(
+        max_length=20, verbose_name=_("Status"), choices=STATUS_CHOICES
+    )
+
+    application_event = models.ForeignKey(
+        "ApplicationEvent",
+        verbose_name=_("Application event"),
+        on_delete=models.CASCADE,
+        null=False,
+        related_name="statuses",
+    )
+
+    user = models.ForeignKey(
+        User,
+        verbose_name=_("User"),
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+    )
+
+    timestamp = models.DateTimeField(verbose_name=_("Timestamp"), auto_now_add=True)
+
+
 class Application(models.Model):
     organisation = models.ForeignKey(
         Organisation,
