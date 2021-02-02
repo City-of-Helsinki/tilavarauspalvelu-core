@@ -142,13 +142,25 @@ class ApplicationPeriod(models.Model):
 
 class ApplicationStatus(models.Model):
     DRAFT = "draft"
-    REVIEW = "review"
-    FINISHED = "finished"
+    IN_REVIEW = "in_review"
+    REVIEW_DONE = "review done"
+    ALLOCATING = "allocating"
+    ALLOCATED = "allocated"
+    VALIDATED = "validated"
+    APPROVED = "approved"
+    DECLINED = "declined"
+    CANCELLED = "cancelled"
 
     STATUS_CHOICES = (
         (DRAFT, _("Draft")),
-        (REVIEW, _("Review")),
-        (FINISHED, _("Finished")),
+        (IN_REVIEW, _("In review")),
+        (REVIEW_DONE, _("Review done")),
+        (ALLOCATING, _("Allocating")),
+        (ALLOCATED, _("Allocated")),
+        (VALIDATED, _("Validated")),
+        (APPROVED, _("Approved")),
+        (DECLINED, _("Declined")),
+        (CANCELLED, _("Cancelled")),
     )
 
     status = models.CharField(
@@ -172,6 +184,10 @@ class ApplicationStatus(models.Model):
     )
 
     timestamp = models.DateTimeField(verbose_name=_("Timestamp"), auto_now_add=True)
+
+    @classmethod
+    def get_statuses(cls):
+        return [s[0] for s in cls.STATUS_CHOICES]
 
     def __str__(self):
         return "{} ({})".format(self.get_status_display(), self.application.id)
@@ -223,11 +239,7 @@ class Application(models.Model):
         return self.get_status().status
 
     def set_status(self, status, user=None):
-        if status not in [
-            ApplicationStatus.DRAFT,
-            ApplicationStatus.REVIEW,
-            ApplicationStatus.FINISHED,
-        ]:
+        if status not in ApplicationStatus.get_statuses():
             raise ValidationError(_("Invalid status"))
         ApplicationStatus.objects.create(application=self, status=status, user=user)
 

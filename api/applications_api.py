@@ -370,7 +370,7 @@ class ApplicationSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         # Validations when user submits application for review
-        if "status" in data and data["status"] == ApplicationStatus.REVIEW:
+        if "status" in data and data["status"] == ApplicationStatus.IN_REVIEW:
             data = self.validate_for_review(data)
 
         return data
