@@ -18,7 +18,7 @@ const Wrapper = styled.div`
   ${styles}
 `;
 
-const WrapperMain = styled.main`
+const WrapperMain = styled.div`
   ${styles}
 `;
 

@@ -131,6 +131,7 @@ const translations: Translations = {
     abbreviations: {
       hour: ['t', 'h', 'h'],
     },
+    login: ['Kirjaudu', 'Login', 'Logga in'],
     imgAltForSpace: ['Kuva tilasta {{name}}'],
   },
   Navigation: {

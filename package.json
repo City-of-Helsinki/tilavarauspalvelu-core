@@ -22,9 +22,9 @@
     "hds-react": "^0.21.0",
     "i18next": "^19.8.4",
     "node-sass": "4.14.1",
+    "query-string": "^6.13.8",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
-    "query-string": "^6.13.8",
     "react-hook-form": "^6.13.0",
     "react-i18next": "^11.7.3",
     "react-router-dom": "^5.2.0",
@@ -34,8 +34,8 @@
     "styled-components": "^5.2.1",
     "ts-loader": "^8.0.12",
     "typescript": "4.0.3",
-    "web-vitals": "^0.2.4",
-    "use-debounce": "^5.2.0"
+    "use-debounce": "^5.2.0",
+    "web-vitals": "^0.2.4"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -52,7 +52,8 @@
     "start-server:prod": "nodemon ./server-prod/index.js",
     "start-server:dev": "nodemon ./server-build/index.js",
     "start:dev": "yarn build:dev && npm-run-all --parallel build-server:dev start-server:dev",
-    "test:e2e-local": "testcafe --skip-js-errors \"chrome --window-size='1920,1080'\" e2e/tests"
+    "test:e2e-local": "testcafe --skip-js-errors \"chrome --window-size='1920,1080'\" e2e/tests",
+    "test:axe-local": "testcafe --skip-js-errors \"chrome --window-size='1920,1080'\" e2e/accessibility"
   },
   "browserslist": {
     "production": [
@@ -67,21 +68,24 @@
     ]
   },
   "devDependencies": {
-    "http-proxy-middleware": "^1.0.6",
-    "node-sass": "4.14.1",
     "@babel/core": "^7.12.10",
     "@babel/preset-env": "^7.12.11",
     "@babel/preset-react": "^7.12.10",
-    "babel-loader": "8.1.0",
     "autoprefixer": "^10.1.0",
-    "web-vitals": "^0.2.4",
-    "eslint-plugin-testcafe": "^0.2.1",
-    "eslint-config-airbnb-typescript-prettier": "^4.1.0",
-    "nodemon": "2.0.4",
+    "axe-core": "^4.1.1",
+    "axe-testcafe": "^3.0.0",
+    "babel-loader": "8.1.0",
     "dotenv-webpack": "^6.0.0",
     "env-cmd": "^10.1.0",
+    "eslint-config-airbnb-typescript-prettier": "^4.1.0",
+    "eslint-plugin-testcafe": "^0.2.1",
+    "http-proxy-middleware": "^1.0.6",
     "husky": ">=4",
+    "install": "^0.13.0",
     "lint-staged": ">=10",
+    "node-sass": "4.14.1",
+    "nodemon": "2.0.4",
+    "npm": "^6.14.11",
     "npm-run-all": "4.1.5",
     "prettier": "^2.2.0",
     "stylelint": "^13.8.0",
@@ -91,6 +95,7 @@
     "stylelint-processor-styled-components": "^1.10.0",
     "stylelint-value-no-unknown-custom-properties": "^3.0.0",
     "testcafe": "^1.10.1",
+    "web-vitals": "^0.2.4",
     "webpack-cli": "^4.2.0",
     "webpack-node-externals": "^2.5.2"
   },

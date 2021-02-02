@@ -75,7 +75,10 @@ const ApplicationPeriodCard = ({ applicationPeriod }: Props): JSX.Element => {
   );
 
   return (
-    <StyledCard border act={state === 'active' ? true : undefined}>
+    <StyledCard
+      aria-label={applicationPeriod.name}
+      border
+      act={state === 'active' ? true : undefined}>
       <StyledContainer>
         <Name>{applicationPeriod.name}</Name>
         <div>

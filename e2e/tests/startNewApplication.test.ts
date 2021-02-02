@@ -1,7 +1,7 @@
 import home from './model/home';
 import search from './model/search';
 import application from './model/application';
-import config from './config';
+import config from '../config';
 
 fixture('e2e test poc').page(config.BASE_URL);
 
