@@ -1,7 +1,7 @@
 from rest_framework import viewsets
 
 from api.base import TranslatedModelSerializer
-from spaces.models import Building, Location, Space
+from spaces.models import Building, District, Location, Space
 
 
 class BuildingSerializer(TranslatedModelSerializer):
@@ -50,6 +50,22 @@ class SpaceSerializer(TranslatedModelSerializer):
                 "help_text": "Id of the district where this space is located.",
             },
         }
+
+
+class DistrictSerializer(TranslatedModelSerializer):
+    class Meta:
+        model = District
+        fields = ["id", "district_type", "name", "parent"]
+        extra_kwargs = {
+            "parent": {
+                "help_text": "Id of parent district for this district.",
+            },
+        }
+
+
+class DistrictViewSet(viewsets.ModelViewSet):
+    serializer_class = DistrictSerializer
+    queryset = District.objects.all().select_related("parent")
 
 
 class SpaceViewSet(viewsets.ModelViewSet):
