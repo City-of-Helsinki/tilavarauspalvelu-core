@@ -93,10 +93,11 @@ const ReservationUnitCard = ({ reservationUnit }: Props): JSX.Element => {
           {reservationUnit.spaces[0]?.name[i18n.language]}
         </Description>
         <Bottom>
-          <IconInfoCircle />{' '}
+          <IconInfoCircle aria-label={t('reservationUnit.type')} />{' '}
           <span>{reservationUnit.reservationUnitType.name}</span>
-          <IconGroup /> <span>{reservationUnit.maxPersons}</span>
-          <IconLocation />{' '}
+          <IconGroup aria-label={t('reservationUnit.maxPersons')} />{' '}
+          <span>{reservationUnit.maxPersons}</span>
+          <IconLocation aria-label={t('reservationUnit.address')} />{' '}
           <span>
             {reservationUnit.location?.addressStreet},{' '}
             {reservationUnit.location?.addressZip}{' '}
@@ -105,7 +106,7 @@ const ReservationUnitCard = ({ reservationUnit }: Props): JSX.Element => {
         </Bottom>
       </MainContent>
       <Actions>
-        <IconHeart />
+        <IconHeart aria-hidden />
         <div style={{ flexGrow: 1 }} />
         <Button
           disabled={containsReservationUnit(reservationUnit)}

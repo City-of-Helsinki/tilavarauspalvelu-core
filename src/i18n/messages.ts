@@ -134,6 +134,12 @@ const translations: Translations = {
     login: ['Kirjaudu', 'Login', 'Logga in'],
     imgAltForSpace: ['Kuva tilasta {{name}}'],
   },
+  reservationUnit: {
+    type: ['Tyyppi', 'Type', 'Typ'],
+    maxPersons: ['Suurin sallittu henkilömäärä', 'Max persons', 'Max personer'],
+    address: ['Osoite', 'Address', 'Adress'],
+  },
+
   Navigation: {
     Item: {
       spaceReservation: ['Vakiovuorot'],
