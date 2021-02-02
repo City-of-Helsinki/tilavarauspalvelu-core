@@ -1,4 +1,4 @@
-import React, { SyntheticEvent, useState } from 'react';
+import React, { SyntheticEvent, useEffect, useState } from 'react';
 import { Navigation as HDSNavigation } from 'hds-react';
 import { useTranslation } from 'react-i18next';
 
@@ -15,9 +15,13 @@ const languageOptions: LanguageOption[] = [
 
 const Navigation = (): JSX.Element => {
   const [language, setLanguage] = useState(languageOptions[0]);
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const formatSelectedValue = ({ value }: LanguageOption): string =>
     value.toUpperCase();
+
+  useEffect(() => {
+    i18n.changeLanguage(language.value);
+  }, [language, i18n]);
 
   return (
     <HDSNavigation

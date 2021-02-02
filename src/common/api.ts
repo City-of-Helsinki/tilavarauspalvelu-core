@@ -139,7 +139,12 @@ export function getReservationUnit(id: number): Promise<ReservationUnit> {
 }
 
 export function getParameters(
-  name: 'purpose' | 'age_group' | 'ability_group' | 'reservation_unit_type'
+  name:
+    | 'purpose'
+    | 'age_group'
+    | 'ability_group'
+    | 'reservation_unit_type'
+    | 'district'
 ): Promise<Parameter[]> {
   return apiGet<Parameter[]>({
     path: `v1/${parameterBasePath}/${name}`,

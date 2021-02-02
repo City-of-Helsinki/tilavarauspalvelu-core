@@ -1,14 +1,12 @@
 import { Button, IconMap, IconMenuHamburger, Select } from 'hds-react';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import { getReservationUnits } from '../common/api';
 import { ReservationUnit } from '../common/types';
 import ReservationUnitCard from './ReservationUnitCard';
 
 interface Props {
-  // only text search is now implemented!
-  search: string;
+  reservationUnits: ReservationUnit[];
 }
 
 interface OptionType {
@@ -66,20 +64,8 @@ const ListContainer = styled.div`
   margin-top: var(--spacing-layout-s);
 `;
 
-const SearchResultList = ({ search }: Props): JSX.Element => {
+const SearchResultList = ({ reservationUnits }: Props): JSX.Element => {
   const { t } = useTranslation();
-
-  const [reservationUnits, setReservationUnits] = useState<ReservationUnit[]>(
-    []
-  );
-
-  useEffect(() => {
-    async function fetchData() {
-      const units = await getReservationUnits({ search });
-      setReservationUnits(units);
-    }
-    fetchData();
-  }, [search]);
   return (
     <>
       <HitCount>

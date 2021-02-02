@@ -16,6 +16,7 @@ import {
 } from '../../common/types';
 import { mapOptions, OptionType } from '../../common/util';
 import { getParameters } from '../../common/api';
+import { breakpoint } from '../../common/style';
 
 type Props = {
   applicationPeriod: ApplicationPeriod;
@@ -26,7 +27,7 @@ type Props = {
 };
 
 const ButtonContainer = styled.div`
-  @media (max-width: var(--breakpoint-m)) {
+  @media (max-width: ${breakpoint.m}) {
     flex-direction: column;
 
     & > button {
@@ -119,20 +120,19 @@ const Page1 = ({
   const onSubmit = (data: ApplicationType) => {
     prepareSave(data);
 
-    //    setReady(false);
-
     if (onNext) {
       onNext();
     }
   };
 
   const onAddApplicationEvent = (data: ApplicationType) => {
-    if (data.applicationEvents.some((e) => Boolean(e.id))) {
+    if (
+      data.applicationEvents &&
+      data.applicationEvents.some((e) => Boolean(e.id))
+    ) {
       return;
     }
     prepareSave(data);
-    // first save?
-    // add data
     addNewApplicationEvent();
   };
 
@@ -158,6 +158,7 @@ const Page1 = ({
 
       <ButtonContainer>
         <Button
+          id="addApplicationEvent"
           iconLeft={<IconPlusCircleFill />}
           onClick={() => form.handleSubmit(onAddApplicationEvent)()}>
           {t('Application.Page1.createNew')}

@@ -1,20 +1,20 @@
 import React from 'react';
 import { Button, Container, IconArrowRight, IconClock } from 'hds-react';
 import { useTranslation } from 'react-i18next';
+import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import Card from '../component/Card';
 import { ApplicationPeriod } from '../common/types';
-import { isActive, formatDate } from '../common/util';
+import { applicationPeriodState, formatDate } from '../common/util';
+import { breakpoint } from '../common/style';
 
 interface Props {
   applicationPeriod: ApplicationPeriod;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const StyledCard = styled(({ act, ...rest }) => <Card {...rest} />)<{
-  act: string;
-}>`
-  @media (max-width: var(--breakpoint-s)) {
+const StyledCard = styled(({ act, ...rest }) => <Card {...rest} />)`
+  @media (max-width: ${breakpoint.s}) {
     grid-template-columns: 2fr;
   }
 
@@ -44,10 +44,8 @@ const Name = styled.div`
 `;
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const CardButton = styled(({ noLeftMargin, ...rest }) => <Button {...rest} />)<{
-  noLeftMargin?: boolean;
-}>`
-  @media (max-width: var(--breakpoint-s)) {
+const CardButton = styled(({ noLeftMargin, ...rest }) => <Button {...rest} />)`
+  @media (max-width: ${breakpoint.s}) {
     justify-self: center;
   }
 
@@ -69,26 +67,32 @@ const CardButton = styled(({ noLeftMargin, ...rest }) => <Button {...rest} />)<{
 
 const ApplicationPeriodCard = ({ applicationPeriod }: Props): JSX.Element => {
   const { t } = useTranslation();
+  const history = useHistory();
 
-  const active = isActive(
-    applicationPeriod.applicationPeriodBegin,
+  const state = applicationPeriodState(
+    applicationPeriod.applicationPeriodEnd,
     applicationPeriod.applicationPeriodEnd
   );
 
   return (
-    <StyledCard border act={active}>
+    <StyledCard border act={state === 'active' ? true : undefined}>
       <StyledContainer>
         <Name>{applicationPeriod.name}</Name>
         <div>
-          {active
-            ? t('ApplicationPeriodCard.open', {
-                until: formatDate(applicationPeriod.applicationPeriodEnd),
-              })
-            : t('ApplicationPeriodCard.closed', {
-                openingDateTime: formatDate(
-                  applicationPeriod.applicationPeriodBegin
-                ),
-              })}
+          {state === 'pending' &&
+            t('ApplicationPeriodCard.pending', {
+              openingDateTime: formatDate(
+                applicationPeriod.applicationPeriodBegin
+              ),
+            })}
+          {state === 'active' &&
+            t('ApplicationPeriodCard.open', {
+              until: formatDate(applicationPeriod.applicationPeriodEnd),
+            })}
+          {state === 'past' &&
+            t('ApplicationPeriodCard.past', {
+              closingDate: formatDate(applicationPeriod.applicationPeriodEnd),
+            })}
         </div>
         <CardButton
           noLeftMargin
@@ -98,13 +102,25 @@ const ApplicationPeriodCard = ({ applicationPeriod }: Props): JSX.Element => {
           {t('ApplicationPeriodCard.criteria')}
         </CardButton>
       </StyledContainer>
-      {active ? (
-        <CardButton disabled>
-          {t('ApplicationPeriodCard.applyButton')}
-        </CardButton>
-      ) : (
+      {state === 'pending' && (
         <CardButton iconLeft={<IconClock />} variant="secondary" disabled>
           {t('ApplicationPeriodCard.reminderButton')}
+        </CardButton>
+      )}
+      {state === 'active' && (
+        <CardButton
+          onClick={() =>
+            history.push(`/search?application_period=${applicationPeriod.id}`)
+          }>
+          {t('ApplicationPeriodCard.applyButton')}
+        </CardButton>
+      )}
+      {state === 'past' && (
+        <CardButton
+          onClick={() =>
+            history.push(`/search?application_period=${applicationPeriod.id}`)
+          }>
+          {t('ApplicationPeriodCard.displayPastButton')}
         </CardButton>
       )}
     </StyledCard>

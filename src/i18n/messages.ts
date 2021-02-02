@@ -35,11 +35,13 @@ const translations: Translations = {
       eventsPerWeek: ['Vuorojen määrä/viikko'],
       biweekly: ['Vuoro vain joka toinen viikko'],
       createNew: ['Luo uusi vakiovuoro'],
+      applicationEventName: ['Nimetön vakiovuoro'],
     },
     Page2: {
       heading: ['2. Vakiovuoron ajankohta'],
       text: ['Anna toivomasi ajankohta jokaiselle luomallesi vakiovuorolle.'],
       copyTimes: ['Kopioi valinnat kaikille vakiovuoroille'],
+      summary: ['Yhteenveto'],
     },
     Page3: {
       heading: ['3. Varaajan perustiedot'],
@@ -92,9 +94,11 @@ const translations: Translations = {
   ApplicationPeriodCard: {
     reminderButton: ['Tilaa muistutus'],
     applyButton: ['Hae Tilaa'],
+    displayPastButton: ['Näytä tilat'],
     criteria: ['Hakukriteerit'],
-    closed: ['Haku avautuu {{openingDateTime}}'],
+    pending: ['Haku avautuu {{openingDateTime}}'],
     open: ['Haku auki {{until}} saakka'],
+    past: ['Haku sulkeutui {{closingDate}}'],
   },
   breadcrumb: {
     home: ['Vakiovuorot'],
@@ -120,9 +124,13 @@ const translations: Translations = {
     false: ['ei'],
     true: ['kyllä'],
     close: ['Sulje'],
-    search: ['Hae'],
-    noResults: ['Ei tuloksia'],
-    select: ['Valitse'],
+    search: ['Hae', 'Search', 'Sök'],
+    noResults: ['Ei tuloksia', 'No results', 'Inga resultat'],
+    select: ['Valitse', 'Choose', 'Välja'],
+    hour: ['Tunti'],
+    abbreviations: {
+      hour: ['t', 'h', 'h'],
+    },
   },
   Navigation: {
     Item: {
@@ -160,12 +168,21 @@ const translations: Translations = {
     add: ['Lisää tila'],
   },
   ReservationUnitModal: {
-    selectReservationUnit: ['Lisää hakemukselle'],
-    okButton: ['Lisää valitut'],
+    selectReservationUnit: ['Lisää hakemukselle', 'Add to application'],
+    unSelectReservationUnit: [
+      'Poista hakemukselta',
+      'Remove from application',
+      'Ta bort från applikationen',
+    ],
     heading: ['Hae tiloja hakemukselle'],
     searchTermLabel: ['Sanahaku'],
     searchPurposeLabel: ['Käyttötarkoitus'],
     searchReservationUnitTypeLabel: ['Tilan tyyppi'],
+    openLinkToNewTab: [
+      'Avaa välilehdellä',
+      'Open in new tab',
+      'Öppna i ny flik',
+    ],
   },
   ReservationUnit: {
     backToSearch: ['Takaisin hakutuloksiin'],
@@ -176,7 +193,7 @@ const translations: Translations = {
     text: ['Valitse tilat joihin haluat hakea vakiovuoroja.'],
   },
   SearchForm: {
-    searchTermPlaceholder: ['Hae sanalla'],
+    searchTermPlaceholder: ['Hae sanalla', 'Search with words', 'Sök med ord'],
     searchButton: ['Hae tilaa'],
   },
   SearchResultList: {

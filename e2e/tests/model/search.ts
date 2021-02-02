@@ -12,7 +12,7 @@ class Home {
   startApplicationButton: Selector;
 
   constructor() {
-    this.searchText = Selector('#searchText');
+    this.searchText = Selector('#search');
     this.searchButton = Selector('#searchButton');
     this.selectReservationUnitButton = Selector(
       'main > div > div:nth-child(1) > div > button'

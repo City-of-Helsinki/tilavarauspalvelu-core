@@ -2,7 +2,10 @@ import { Accordion, Button, IconArrowLeft } from 'hds-react';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
-import { ApplicationEvent } from '../../common/types';
+import { ApplicationEvent, ApplicationEventSchedule } from '../../common/types';
+import TimePreview from '../TimePreview';
+import { weekdays } from '../../common/const';
+import { breakpoint } from '../../common/style';
 
 type Props = {
   applicationEvent: ApplicationEvent;
@@ -10,6 +13,7 @@ type Props = {
   cells: Cell[][];
   updateCells: (i: number, cells: Cell[][]) => void;
   copyCells: (i: number) => void;
+  summaryData: ApplicationEventSchedule[];
 };
 
 // todo rename 'timeslot'?
@@ -39,12 +43,24 @@ const TimeSelectionButton = styled.button<{
   font-family: HelsinkiGrotesk-Bold, var(--font-default);
   font-size: var(--fontsize-heading-m);
   font-weight: bold;
-  padding: 0.3em 0;
-  background: ${(props) => (props.selected ? '#0022a6' : '#e5e5e5')};
+  padding: 0.3em 0.5em;
+  background: ${(props) =>
+    props.selected ? 'var(--tilavaraus-calendar-selected)' : '#e5e5e5'};
   border: 1px solid
-    ${(props) => (props.selected ? '#0022a6' : 'var(--border-color)')};
+    ${(props) =>
+      props.selected
+        ? 'var(--tilavaraus-calendar-selected)'
+        : 'var(--border-color)'};
   border-top: ${(props) =>
     props.firstRow ? '1px solid var(--border-color)' : 'none'};
+  white-space: nowrap;
+`;
+
+const SubHeadline = styled.div`
+  font-family: HelsinkiGrotesk-Bold, var(--font-default);
+  margin-top: var(--spacing-layout-m);
+  font-weight: 700;
+  font-size: var(--fontsize-heading-m);
 `;
 
 const Day = ({
@@ -107,10 +123,10 @@ const Day = ({
 };
 
 const CalendarContainer = styled.div`
-  @media (max-width: var(--breakpoint-m)) {
+  @media (max-width: ${breakpoint.m}) {
     grid-template-columns: 1fr 1fr 1fr 1fr;
   }
-  @media (max-width: var(--breakpoint-xs)) {
+  @media (max-width: ${breakpoint.xs}) {
     grid-template-columns: 1fr;
   }
 
@@ -120,6 +136,47 @@ const CalendarContainer = styled.div`
   column-gap: 6px;
 `;
 
+const LegendContainer = styled.div`
+  display: flex;
+  margin-top: var(--spacing-m);
+`;
+
+const Legend = styled.div`
+  display: flex;
+  margin-right: 3em;
+`;
+
+const LegendBox = styled.div<{ type: string }>`
+  ${(props) =>
+    props.type === 'unavailable' &&
+    `
+    background-image: repeating-linear-gradient(135deg, currentColor 0, currentColor 1px, transparent 0, transparent 10%);
+  `}
+  ${(props) =>
+    props.type === 'selected' &&
+    `
+    background-color: var(--tilavaraus-calendar-selected);
+  `}
+  margin-right: 1em;
+  width: 20px;
+  height: 20px;
+`;
+
+const LegendLabel = styled.div`
+  font-family: HelsinkiGrotesk-Bold, var(--font-default);
+`;
+
+const TimePreviewContainer = styled.div`
+  @media (max-width: ${breakpoint.s}) {
+    grid-template-columns: 1fr;
+  }
+
+  margin-top: var(--spacing-m);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-m);
+`;
+
 const ButtonContainer = styled.div`
   display: flex;
   flex-direction: row;
@@ -127,12 +184,24 @@ const ButtonContainer = styled.div`
   margin-bottom: var(--spacing-layout-s);
 `;
 
+const cellTypes = [
+  {
+    type: 'unavailable',
+    label: 'Ei varattavissa',
+  },
+  {
+    type: 'selected',
+    label: 'Toivomuksesi',
+  },
+];
+
 const TimeSelector = ({
   applicationEvent,
   cells,
   updateCells,
   copyCells,
   index,
+  summaryData,
 }: Props): JSX.Element => {
   const { t } = useTranslation();
 
@@ -156,15 +225,7 @@ const TimeSelector = ({
         onMouseLeave={() => {
           setPainting(false);
         }}>
-        {[
-          'monday',
-          'tuesday',
-          'wednesday',
-          'thursday',
-          'friday',
-          'saturday',
-          'sunday',
-        ].map((c, i) => (
+        {weekdays.map((c, i) => (
           <Day
             paintState={paintState}
             setPaintState={setPaintState}
@@ -177,6 +238,20 @@ const TimeSelector = ({
           />
         ))}
       </CalendarContainer>
+
+      <LegendContainer>
+        {cellTypes.map((cell) => (
+          <Legend key={cell.label}>
+            <LegendBox type={cell.type} />
+            <LegendLabel>{cell.label}</LegendLabel>
+          </Legend>
+        ))}
+      </LegendContainer>
+
+      <SubHeadline>{t('Application.Page2.summary')}</SubHeadline>
+      <TimePreviewContainer>
+        <TimePreview applicationEventSchedules={summaryData} />
+      </TimePreviewContainer>
 
       <ButtonContainer>
         <Button

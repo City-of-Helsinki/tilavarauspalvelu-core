@@ -4,10 +4,10 @@ import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
-const start =
+const boot =
   process.env.NODE_ENV === 'development' ? ReactDOM.render : ReactDOM.hydrate;
 
-start(
+boot(
   <React.StrictMode>
     <BrowserRouter>
       <App />

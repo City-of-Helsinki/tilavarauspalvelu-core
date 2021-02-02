@@ -110,6 +110,8 @@ const ReservationUnitCard = ({
   onMoveDown,
   t,
 }: CardProps): JSX.Element => {
+  const { i18n } = useTranslation();
+
   return (
     <NameCardContainer>
       <PreCardLabel>
@@ -123,7 +125,7 @@ const ReservationUnitCard = ({
             height="99"
           />
           <div>
-            <Title>{reservationUnit.name}</Title>
+            <Title>{reservationUnit.name[i18n.language]}</Title>
             <Address>
               {reservationUnit.location?.addressStreet},
               {reservationUnit.location?.addressZip}{' '}
@@ -207,11 +209,8 @@ const ReservationUnitList = ({
     [] as ReservationUnit[]
   );
 
-  // selected in dialog
-  const [selected, setSelected] = useState<ReservationUnit[]>([]);
-
   const handleAdd = (ru: ReservationUnit) => {
-    setSelected([...selected, ru]);
+    setReservationUnits([...reservationUnits, ru]);
   };
 
   useEffect(() => {
@@ -293,19 +292,15 @@ const ReservationUnitList = ({
         </Button>
       </ButtonContainer>
       <Modal
-        okLabel={t('ReservationUnitModal.okButton')}
-        handleClose={(add: boolean) => {
+        handleClose={() => {
           setShowModal(false);
-          if (add) {
-            setReservationUnits([...reservationUnits, ...selected]);
-          }
-          setSelected([]);
         }}
         show={showModal}>
         <ReservationUnitModal
           currentReservationUnits={reservationUnits}
           applicationPeriod={applicationPeriod}
           handleAdd={handleAdd}
+          handleRemove={remove}
           options={options}
         />
       </Modal>

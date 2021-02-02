@@ -7,12 +7,22 @@ import {
   ApplicationPeriod as ApplicationPeriodType,
   ReservationUnit as ReservationUnitType,
 } from './types';
+import { reservationUnitPrefix } from './const';
 
 interface ReservationUnitParams {
-  id: string;
+  id?: string;
 }
 
-const Routes = [
+type Route = {
+  path: string;
+  exact?: boolean;
+  component: React.FC;
+  loadData?: (params: ReservationUnitParams) => any; // eslint-disable-line
+  dataKey?: string;
+  startApplicationBar?: boolean;
+};
+
+const Routes: Route[] = [
   {
     path: '/',
     exact: true,
@@ -26,7 +36,7 @@ const Routes = [
     startApplicationBar: true,
   },
   {
-    path: '/reservation-unit/:id',
+    path: `${reservationUnitPrefix}/:id`,
     component: ReservationUnit,
     loadData: (params: ReservationUnitParams): Promise<ReservationUnitType> =>
       getReservationUnit(Number(params.id)),

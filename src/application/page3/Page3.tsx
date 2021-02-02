@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import styled from 'styled-components';
 import { Action, Application as ApplicationType } from '../../common/types';
+import { breakpoint } from '../../common/style';
 
 type Props = {
   application: ApplicationType;
@@ -28,7 +29,7 @@ const ButtonContainer = styled.div`
   }
 `;
 const TwoColumnContainer = styled.div`
-  @media (max-width: var(--breakpoint-m)) {
+  @media (max-width: ${breakpoint.m}) {
     grid-template-columns: 1fr;
 
     .fullWidth {

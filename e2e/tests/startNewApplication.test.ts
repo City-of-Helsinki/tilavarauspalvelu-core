@@ -13,6 +13,7 @@ test('Start new application', async (t) => {
     .click(search.searchButton)
     .click(search.selectReservationUnitButton)
     .click(search.startApplicationButton)
+    .click(application.addApplicationEventButton)
     .expect(application.applicationTemplateName.textContent)
-    .eql('Vakiovuoro 1.');
+    .eql('Nimetön vakiovuoro');
 });
