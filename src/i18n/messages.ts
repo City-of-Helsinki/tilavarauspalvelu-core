@@ -115,6 +115,7 @@ const translations: Translations = {
     sunday: ['Sunnuntai'],
   },
   common: {
+    applicationNavigationName: ['Hakemus', 'Application', 'Ansökan'],
     applicationName: ['Varaamo', 'Varaamo', 'Varaamo'],
     selectReservationUnit: ['Valitse tila'],
     favourite: ['Suosikki', 'Favourite', 'Favorit'],
