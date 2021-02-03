@@ -16,6 +16,10 @@ class AvailableTime(object):
 ALLOCATION_PRECISION = 15
 
 
+def time_delta_to_integer_with_precision(delta: datetime.timedelta):
+    return round(delta.total_seconds() // 60 // ALLOCATION_PRECISION)
+
+
 class AllocationSpace(object):
     def __init__(
         self,
@@ -30,7 +34,7 @@ class AllocationSpace(object):
         self.available_times: [AvailableTime] = times
 
     def add_time(self, start: datetime, end: datetime):
-        start_delta = round(
+        start_delta = time_delta_to_integer_with_precision(
             (
                 start
                 - datetime.datetime(
@@ -42,11 +46,9 @@ class AllocationSpace(object):
                     second=0,
                     tzinfo=timezone.get_default_timezone(),
                 )
-            ).total_seconds()
-            // 60
-            // ALLOCATION_PRECISION
+            )
         )
-        end_delta = round(
+        end_delta = time_delta_to_integer_with_precision(
             (
                 end
                 - datetime.datetime(
@@ -58,17 +60,32 @@ class AllocationSpace(object):
                     second=0,
                     tzinfo=timezone.get_default_timezone(),
                 )
-            ).total_seconds()
-            // 60
-            // ALLOCATION_PRECISION
+            )
         )
         self.available_times.append(AvailableTime(start_delta, end_delta))
 
 
 class AllocationEvent(object):
-    def __init__(self, application_event: ApplicationEvent):
+    def __init__(
+        self,
+        application_event: ApplicationEvent,
+        period_start: datetime.date,
+        period_end: datetime.date,
+    ):
         self.id = application_event.id
-        self.occurrences = application_event.get_occurrences()
+        self.occurrences = application_event.get_all_occurrences()
+        self.begin = application_event.begin
+        self.end = application_event.begin
+        self.period_start = period_start
+        self.period_end = period_end
+        self.min_duration = time_delta_to_integer_with_precision(
+            application_event.min_duration
+        )
+        self.max_duration = time_delta_to_integer_with_precision(
+            application_event.max_duration
+            if application_event.max_duration is not None
+            else application_event.min_duration
+        )
 
 
 class AllocationData(object):
@@ -85,7 +102,9 @@ class AllocationData(object):
 
         self.allocation_events = []
         for application_event in application.application_events.all():
-            self.allocation_events.append(AllocationEvent(application_event))
+            self.allocation_events.append(
+                AllocationEvent(application_event, self.period_start, self.period_end)
+            )
 
     def get_all_dates(self):
         dates = []
