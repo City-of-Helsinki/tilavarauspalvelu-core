@@ -234,6 +234,10 @@ class ApplicationEventStatus(models.Model):
 
     timestamp = models.DateTimeField(verbose_name=_("Timestamp"), auto_now_add=True)
 
+    @classmethod
+    def get_statuses(cls):
+        return [s[0] for s in cls.STATUS_CHOICES]
+
 
 class Application(models.Model):
     organisation = models.ForeignKey(
@@ -372,6 +376,28 @@ class ApplicationEvent(models.Model):
         null=True,
         blank=False,
     )
+
+    @property
+    def status(self):
+        return self.get_status().status
+
+    @status.setter
+    def status(self, status):
+        self.set_status(status)
+
+    @status.getter
+    def status(self):
+        return self.get_status().status
+
+    def set_status(self, status, user=None):
+        if status not in ApplicationEventStatus.get_statuses():
+            raise ValidationError(_("Invalid status"))
+        ApplicationEventStatus.objects.create(
+            application_event=self, status=status, user=user
+        )
+
+    def get_status(self):
+        return self.statuses.last()
 
     def get_all_occurrences(self):
 
