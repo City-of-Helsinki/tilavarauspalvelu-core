@@ -21,7 +21,7 @@ class ReservationSerializer(serializers.ModelSerializer):
         help_text="Reservation units that are reserved by the reservation",
     )
     user_id = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.all(),
+        read_only=True,
         source="user",
         help_text="Id of user for this reservation.",
     )
@@ -120,7 +120,7 @@ class ReservationViewSet(viewsets.ModelViewSet):
     )
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        serializer.save(user_id=self.request.user.pk)
 
 
 class AgeGroupSerializer(serializers.ModelSerializer):

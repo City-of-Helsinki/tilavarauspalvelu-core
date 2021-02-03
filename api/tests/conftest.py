@@ -197,7 +197,7 @@ def valid_resource_data(space):
             "en": "Test resource",
             "sv": "Test resursen",
         },
-        "space": space.pk,
+        "space_id": space.pk,
         "buffer_time_before": "00:05:00",
         "buffer_time_after": "00:05:00",
     }

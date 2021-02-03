@@ -7,12 +7,13 @@ from reservations.models import AbilityGroup, AgeGroup, Reservation
 
 
 @pytest.mark.django_db
-def test_reservation_create(user_api_client, valid_reservation_data):
+def test_reservation_create(user_api_client, valid_reservation_data, user):
     assert Reservation.objects.count() == 0
     response = user_api_client.post(
         reverse("reservation-list"), data=valid_reservation_data, format="json"
     )
     assert response.status_code == 201
+    assert Reservation.objects.all()[0].user == user
     assert Reservation.objects.count() == 1
 
 
