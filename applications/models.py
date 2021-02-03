@@ -44,6 +44,9 @@ class Address(models.Model):
         verbose_name=_("City"), null=False, blank=False, max_length=80
     )
 
+    def __str__(self):
+        return f"{self.street_address}, {self.post_code}, {self.city}"
+
 
 class Person(ContactInformation):
     REQUIRED_FOR_REVIEW = ["first_name", "last_name"]
@@ -55,6 +58,12 @@ class Person(ContactInformation):
     last_name = models.TextField(
         verbose_name=_("Last name"), null=False, blank=True, max_length=50
     )
+
+    def __str__(self):
+        value = super().__str__()
+        if all([self.first_name, self.last_name]):
+            value = f"{self.first_name} {self.last_name}"
+        return value
 
 
 class Organisation(models.Model):
@@ -84,6 +93,9 @@ class Organisation(models.Model):
     address = models.ForeignKey(
         Address, null=True, blank=True, on_delete=models.SET_NULL
     )
+
+    def __str__(self):
+        return self.name
 
 
 class PRIORITY_CONST(object):
@@ -399,6 +411,9 @@ class ApplicationEvent(models.Model):
 
     def get_status(self):
         return self.statuses.last()
+
+    def __str__(self):
+        return self.name if self.name else super().__str__()
 
     def get_all_occurrences(self):
 
