@@ -336,6 +336,7 @@ def valid_application_event_data(
         "purpose_id": purpose.id,
         "application_event_schedules": [valid_application_event_schedule_data],
         "event_reservation_units": [valid_event_reservation_unit_data],
+        "status": "created",
     }
 
 
