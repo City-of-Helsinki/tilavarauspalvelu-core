@@ -24,4 +24,10 @@ export default {
     },
     nextButton: Selector('#next'),
   },
+  page3: {
+    firstName: Selector('#firstName'),
+    lastName: Selector('#lastName'),
+    email: Selector('#email'),
+    nextButton: Selector('#next'),
+  },
 };

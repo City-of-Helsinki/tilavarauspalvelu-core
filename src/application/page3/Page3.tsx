@@ -104,6 +104,7 @@ const Page3 = ({
           {t('common.prev')}
         </Button>
         <Button
+          id="next"
           iconRight={<IconArrowRight />}
           onClick={() => handleSubmit(onSubmit)()}>
           {t('common.next')}

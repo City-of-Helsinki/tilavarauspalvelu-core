@@ -267,20 +267,6 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
               }
             />
           </TimePreviewContainer>
-          <CheckboxContainer>
-            <Checkbox
-              id="preview.acceptTermsOfUse"
-              checked={acceptTermsOfUse}
-              onChange={(e) => setAcceptTermsOfUse(e.target.checked)}
-            />
-            <label htmlFor="preview.acceptTermsOfUse">
-              {t('Application.preview.userAcceptsTerms')}
-            </label>
-          </CheckboxContainer>
-          <StyledNotification
-            label={t('Application.preview.notification.processing')}>
-            {t('Application.preview.notification.body')}
-          </StyledNotification>
         </Accordion>
       ))}
       <CheckboxContainer>
