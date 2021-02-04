@@ -38,6 +38,7 @@ test('Reservation unit page', async (t) => {
 });
 
 test.only('Application', async (t) => {
+  // start filling application
   await t
     .click(home.browseAllButton)
     .typeText(search.searchText, 'Studio')
@@ -46,15 +47,29 @@ test.only('Application', async (t) => {
     .click(search.startApplicationButton);
   await runAxeCheck(t);
   await t.expect(violations.length === 0).ok(createReport(violations));
+  // add application event
   await t.click(application.addApplicationEventButton);
   await runAxeCheck(t);
   await t.expect(violations.length === 0).ok(createReport(violations));
+  // fill and submit page 1
   await t
     .click(application.page1.applicationEventAccordion)
     .typeText(application.page1.numPersonsInput, '12')
     .click(application.page1.defaultPeriodCheckbox)
-    .click(application.page1.nextButton)
-    .wait(5000);
+    .click(application.page1.nextButton);
   await runAxeCheck(t);
   await t.expect(violations.length === 0).ok(createReport(violations));
+  // fill times
+  await t.click(application.page2.applicationEventAccordion);
+  await t
+    .click(application.page2.randomApplicationEventScheduleButton())
+    .click(application.page2.randomApplicationEventScheduleButton())
+    .click(application.page2.randomApplicationEventScheduleButton())
+    .click(application.page2.randomApplicationEventScheduleButton())
+    .click(application.page2.randomApplicationEventScheduleButton());
+  await runAxeCheck(t);
+  await t.expect(violations.length === 0).ok(createReport(violations));
+  // next page
+
+  await t.wait(5000);
 });

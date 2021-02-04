@@ -151,7 +151,7 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
         <Button variant="secondary" iconLeft={<IconArrowLeft />} disabled>
           {t('common.prev')}
         </Button>
-        <Button iconRight={<IconArrowRight />} onClick={() => next()}>
+        <Button id="next" iconRight={<IconArrowRight />} onClick={() => next()}>
           {t('common.next')}
         </Button>
       </ButtonContainer>

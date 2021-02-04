@@ -26,7 +26,7 @@ const TimePreview = ({ applicationEventSchedules }: IProps): JSX.Element => {
     <>
       {weekdays.map((day, index) => (
         <Wrapper key={day}>
-          <StyledIconClock />
+          <StyledIconClock aria-hidden="true" />
           <LabelValue
             label={t(`calendar.${day}`)}
             value={
