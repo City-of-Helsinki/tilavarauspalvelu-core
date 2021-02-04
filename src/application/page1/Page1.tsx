@@ -167,6 +167,7 @@ const Page1 = ({
           {t('common.prev')}
         </Button>
         <Button
+          id="next"
           iconRight={<IconArrowRight />}
           onClick={() => form.handleSubmit(onSubmit)()}>
           {t('common.next')}

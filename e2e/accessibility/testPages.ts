@@ -37,7 +37,7 @@ test('Reservation unit page', async (t) => {
   await t.expect(violations.length === 0).ok(createReport(violations));
 });
 
-test('Application', async (t) => {
+test.only('Application', async (t) => {
   await t
     .click(home.browseAllButton)
     .typeText(search.searchText, 'Studio')
@@ -47,6 +47,14 @@ test('Application', async (t) => {
   await runAxeCheck(t);
   await t.expect(violations.length === 0).ok(createReport(violations));
   await t.click(application.addApplicationEventButton);
+  await runAxeCheck(t);
+  await t.expect(violations.length === 0).ok(createReport(violations));
+  await t
+    .click(application.page1.applicationEventAccordion)
+    .typeText(application.page1.numPersonsInput, '12')
+    .click(application.page1.defaultPeriodCheckbox)
+    .click(application.page1.nextButton)
+    .wait(5000);
   await runAxeCheck(t);
   await t.expect(violations.length === 0).ok(createReport(violations));
 });
