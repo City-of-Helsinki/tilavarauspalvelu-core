@@ -118,7 +118,7 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
       );
 
       const fetchedReservationUnits = await Promise.all(
-        reservationUnitIds.map((ru) => getReservationUnit(ru.reservationUnit))
+        reservationUnitIds.map((ru) => getReservationUnit(ru.reservationUnitId))
       );
 
       setReservationUnits(
@@ -242,13 +242,13 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
             {applicationEvent.eventReservationUnits.map(
               (reservationUnit, index) => (
                 <LabelValue
-                  key={reservationUnit.reservationUnit}
+                  key={reservationUnit.reservationUnitId}
                   label={t(
                     'Application.preview.applicationEvent.reservationUnit',
                     { order: index + 1 }
                   )}
                   value={
-                    reservationUnits[reservationUnit.reservationUnit].name[
+                    reservationUnits[reservationUnit.reservationUnitId].name[
                       i18n.language
                     ]
                   }
