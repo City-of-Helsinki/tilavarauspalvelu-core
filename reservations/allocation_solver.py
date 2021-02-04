@@ -104,6 +104,7 @@ class AllocationSolver(object):
 
         self.constraint_allocation(model=model, selected=selected)
 
+        self.contraint_by_events_per_week(model=model, selected=selected)
         self.constraint_by_capacity(model=model, selected=selected)
         self.maximize(model=model, selected=selected)
 
@@ -130,6 +131,20 @@ class AllocationSolver(object):
             # Now this is hard coded to each space being open for 10 hours daily
             <= round(10 * 60 // ALLOCATION_PRECISION)
         )
+
+    def contraint_by_events_per_week(self, model: cp_model.CpModel, selected: Dict):
+        # No more than requested events per week is allocated
+        for event in self.allocation_events:
+            for space_id, space in suitable_spaces_for_event(
+                event, self.spaces
+            ).items():
+                model.Add(
+                    sum(
+                        selected[(space_id, event.id, event_occurence_id)]
+                        for event_occurence_id, occurrence in event.occurrences.items()
+                    )
+                    <= event.events_per_week
+                )
 
     def constraint_allocation(self, model: cp_model.CpModel, selected: Dict):
         # Each event is assigned to at most one space.

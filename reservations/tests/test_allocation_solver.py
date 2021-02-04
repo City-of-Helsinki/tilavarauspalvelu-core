@@ -58,9 +58,33 @@ def test_non_matching_unit_in_application_and_application_period_can_not_be_allo
         [
             {
                 "applications": [
-                    {"events": [{"events_per_week": 1, "duration": 300, "schedules": [{"day": 0}]}]},
-                    {"events": [{"events_per_week": 1, "duration": 300, "schedules": [{"day": 0}]}]},
-                    {"events": [{"events_per_week": 1, "duration": 300, "schedules": [{"day": 0}]}]},
+                    {
+                        "events": [
+                            {
+                                "events_per_week": 1,
+                                "duration": 300,
+                                "schedules": [{"day": 0}],
+                            }
+                        ]
+                    },
+                    {
+                        "events": [
+                            {
+                                "events_per_week": 1,
+                                "duration": 300,
+                                "schedules": [{"day": 0}],
+                            }
+                        ]
+                    },
+                    {
+                        "events": [
+                            {
+                                "events_per_week": 1,
+                                "duration": 300,
+                                "schedules": [{"day": 0}],
+                            }
+                        ]
+                    },
                 ]
             }
         ]
@@ -89,7 +113,15 @@ def test_should_only_allocate_events_which_fit_within_capacity(
         [
             {
                 "applications": [
-                    {"events": [{"duration": 15, "events_per_week": 1, "schedules": [{"day": 0}, {"day": 1}, {"day": 2}]}]}
+                    {
+                        "events": [
+                            {
+                                "duration": 15,
+                                "events_per_week": 1,
+                                "schedules": [{"day": 0}, {"day": 1}, {"day": 2}],
+                            }
+                        ]
+                    }
                 ]
             }
         ]
@@ -105,7 +137,6 @@ def test_should_only_give_requested_number_of_events(
 
     solution = solver.solve()
 
-    # Open 10 hours each day, we have three events to allocate with 300 minutes= 5 hours duration each
+    # Requested 1 event per week with 3 possible times
     assert len(solution) == 1
-    assert solution[0].duration == datetime.timedelta(hours=5)
-    assert solution[1].duration == datetime.timedelta(hours=5)
+    assert solution[0].duration == datetime.timedelta(minutes=15)

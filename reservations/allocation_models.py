@@ -92,6 +92,7 @@ class AllocationEvent(object):
             if application_event.max_duration is not None
             else application_event.min_duration
         )
+        self.events_per_week = application_event.events_per_week
 
 
 class AllocationData(object):
