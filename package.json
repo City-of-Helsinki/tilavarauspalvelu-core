@@ -35,7 +35,8 @@
     "ts-loader": "^8.0.12",
     "typescript": "4.0.3",
     "web-vitals": "^0.2.4",
-    "use-debounce": "^5.2.0"
+    "use-debounce": "^5.2.0",
+    "env-cmd": "^10.1.0"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -46,7 +47,6 @@
     "eject": "react-scripts eject",
     "lint": "eslint --ext ts,tsx src",
     "lint:css": "stylelint './src/**/*.tsx'",
-    "env-cmd": "^10.1.0",
     "ts-check": "tsc --noEmit --project tsconfig.json",
     "build-server:prod": "NODE_ENV=production webpack --config webpack.server.production.js --mode=production",
     "build-server:dev": "NODE_ENV=development webpack --config webpack.server.development.js --mode=development -w",
