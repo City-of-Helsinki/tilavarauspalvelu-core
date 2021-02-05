@@ -7,13 +7,6 @@ module.exports = {
     createDefaultProgram: true,
     project: './tsconfig.eslint.json',
   },
-  overrides: [
-    {
-      files: ['*.js'],
-      parser: 'babel-eslint',
-      rules: {},
-    },
-  ],
   env: {
     browser: true,
     jest: true,

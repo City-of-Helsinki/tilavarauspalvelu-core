@@ -4,6 +4,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@sentry/react": "^5.29.2",
     "@babel/core": "^7.12.10",
     "@babel/preset-env": "^7.12.11",
     "@babel/preset-react": "^7.12.10",
@@ -106,6 +107,6 @@
   },
   "lint-staged": {
     "src/**/*.tsx": "stylelint",
-    "*.{js,jsx,ts,tsx}": "eslint --cache"
+    "*.{ts,tsx}": "eslint --cache"
   }
 }

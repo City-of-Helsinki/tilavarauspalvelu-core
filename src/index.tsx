@@ -1,8 +1,23 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';
+import * as Sentry from '@sentry/react';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+
+if (process.env.NODE_ENV === 'production' && process.env.REACT_APP_SENTRY_DSN) {
+  Sentry.init({
+    dsn: process.env.REACT_APP_SENTRY_DSN,
+    environment: process.env.NODE_ENV,
+    release: `tilavarauspalvelu-ui@${process.env.npm_package_version}`,
+    integrations: [
+      new Sentry.Integrations.GlobalHandlers({
+        onunhandledrejection: true,
+        onerror: true,
+      }),
+    ],
+  });
+}
 
 const boot =
   process.env.NODE_ENV === 'development' ? ReactDOM.render : ReactDOM.hydrate;
