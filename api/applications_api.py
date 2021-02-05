@@ -203,6 +203,8 @@ class ApplicationEventSerializer(serializers.ModelSerializer):
         help_text="List of reservation units applied for this event with priority included.",
     )
 
+    status = serializers.CharField(help_text="Status of this application")
+
     class Meta:
         model = ApplicationEvent
         fields = [
@@ -221,6 +223,7 @@ class ApplicationEventSerializer(serializers.ModelSerializer):
             "end",
             "purpose_id",
             "event_reservation_units",
+            "status",
         ]
         extra_kwargs = {
             "name": {
@@ -286,8 +289,13 @@ class ApplicationEventSerializer(serializers.ModelSerializer):
         ).exclude(id__in=event_unit_ids).delete()
 
     def create(self, validated_data):
+        request = self.context["request"] if "request" in self.context else None
+        request_user = (
+            request.user if request and request.user.is_authenticated else None
+        )
         schedule_data = validated_data.pop("application_event_schedules")
         unit_data = validated_data.pop("event_reservation_units")
+        status = validated_data.pop("status")
 
         event = super().create(validated_data)
         self.handle_event_schedules(
@@ -295,20 +303,25 @@ class ApplicationEventSerializer(serializers.ModelSerializer):
         )
 
         self.handle_units(event_unit_data=unit_data, application_event=event)
+        event.set_status(status, request_user)
 
         return event
 
     def update(self, instance, validated_data):
-
+        request = self.context["request"] if "request" in self.context else None
+        request_user = (
+            request.user if request and request.user.is_authenticated else None
+        )
         schedule_data = validated_data.pop("application_event_schedules")
-
         unit_data = validated_data.pop("event_reservation_units")
+        status = validated_data.pop("status")
 
-        super().update(instance, validated_data)
+        event = super().update(instance, validated_data)
         self.handle_event_schedules(schedule_data, instance)
 
         self.handle_units(event_unit_data=unit_data, application_event=instance)
 
+        event.set_status(status, request_user)
         return instance
 
 
@@ -370,7 +383,7 @@ class ApplicationSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         # Validations when user submits application for review
-        if "status" in data and data["status"] == ApplicationStatus.REVIEW:
+        if "status" in data and data["status"] == ApplicationStatus.IN_REVIEW:
             data = self.validate_for_review(data)
 
         return data

@@ -258,7 +258,7 @@ def test_application_update_review_valid(
         },
         "application_period_id": application_period.id,
         "application_events": [valid_application_event_data],
-        "status": "review",
+        "status": "in_review",
     }
 
     response = user_api_client.put(
