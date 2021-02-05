@@ -158,6 +158,7 @@ const Page1 = ({
 
       <ButtonContainer>
         <Button
+          id="addApplicationEvent"
           iconLeft={<IconPlusCircleFill />}
           onClick={() => form.handleSubmit(onAddApplicationEvent)()}>
           {t('Application.Page1.createNew')}

@@ -136,7 +136,9 @@ const ReservationUnitCard = ({
   return (
     <Container>
       <Image
-        alt={`Kuva tilasta ${reservationUnit.name[i18n.language]}`}
+        alt={t('common.imgAltForSpace', {
+          name: reservationUnit.name[i18n.language],
+        })}
         src={
           reservationUnit.images[0]?.imageUrl ||
           'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='

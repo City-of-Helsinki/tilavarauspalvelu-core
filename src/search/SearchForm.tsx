@@ -177,7 +177,10 @@ const SearchForm = ({ onSearch, formValues }: Props): JSX.Element | null => {
       </Container>
       <Hr />
       <ButtonContainer>
-        <Button onClick={handleSubmit(search)} iconLeft={<IconSearch />}>
+        <Button
+          id="searchButton"
+          onClick={handleSubmit(search)}
+          iconLeft={<IconSearch />}>
           {t('SearchForm.searchButton')}
         </Button>
       </ButtonContainer>

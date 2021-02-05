@@ -157,6 +157,9 @@ const Head = ({ reservationUnit }: Props): JSX.Element => {
           </div>
           <ImageContainer>
             <img
+              alt={t('common.imgAltForSpace', {
+                name: reservationUnit.name[i18n.language],
+              })}
               width="588"
               height="406"
               src={

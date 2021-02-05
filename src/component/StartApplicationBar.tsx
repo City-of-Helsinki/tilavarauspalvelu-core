@@ -1,12 +1,41 @@
-import { Button, IconArrowRight } from 'hds-react';
+import { Button as HDSButton, IconArrowRight } from 'hds-react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
+import styled from 'styled-components';
 import Container from './Container';
+
 import {
   SelectionsListContext,
   SelectionsListContextType,
 } from '../context/SelectionsListContext';
+
+const BackgroundContainer = styled.div`
+  background-color: var(--color-bus);
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  z-index: 2;
+`;
+
+const ReservationUnitCount = styled.div`
+  font-size: var(--fontsize-body-xl);
+  font-weight: 500;
+`;
+
+const Button = styled(HDSButton)`
+  font-family: HelsinkiGrotesk-Bold, var(--font-default);
+  background-color: white;
+  margin-left: var(--spacing-m);
+`;
+
+const InnerContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+  color: var(--color-white);
+`;
 
 const StartApplicationBar = (): JSX.Element | null => {
   const { t } = useTranslation();
@@ -19,41 +48,22 @@ const StartApplicationBar = (): JSX.Element | null => {
   }
 
   return (
-    <div
-      style={{
-        backgroundColor: 'var(--color-bus)',
-        position: 'fixed',
-        bottom: '0',
-        width: '100%',
-        zIndex: 2,
-      }}>
+    <BackgroundContainer>
       <Container style={{ padding: 'var(--spacing-m) var(--spacing-m)' }}>
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'flex-end',
-            alignItems: 'center',
-            color: 'white',
-          }}>
-          <span
-            style={{ fontSize: 'var(--fontsize-body-xl)', fontWeight: 500 }}>
+        <InnerContainer>
+          <ReservationUnitCount id="reservationUnitCount">
             {t('shoppingCart.count', { count: reservationUnits.length })}
-          </span>
+          </ReservationUnitCount>
           <Button
-            style={{
-              fontWeight: 'bold',
-              backgroundColor: 'white',
-              marginLeft: 'var(--spacing-m)',
-            }}
-            variant="secondary"
+            id="startApplicationButton"
+            variant="supplementary"
             iconRight={<IconArrowRight />}
             onClick={() => history.push(`/application/1/new/page1`)}>
             {t('shoppingCart.next')}
           </Button>
-        </div>
+        </InnerContainer>
       </Container>
-    </div>
+    </BackgroundContainer>
   );
 };
 

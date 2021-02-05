@@ -73,7 +73,9 @@ const ReservationUnitCard = ({ reservationUnit }: Props): JSX.Element => {
   return (
     <Container>
       <img
-        alt={`Kuva tilasta ${reservationUnit.name[i18n.language]}`}
+        alt={t('common.imgAltForSpace', {
+          name: reservationUnit.name[i18n.language],
+        })}
         width="240"
         height="156"
         src={

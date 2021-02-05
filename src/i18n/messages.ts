@@ -131,6 +131,7 @@ const translations: Translations = {
     abbreviations: {
       hour: ['t', 'h', 'h'],
     },
+    imgAltForSpace: ['Kuva tilasta {{name}}'],
   },
   Navigation: {
     Item: {
