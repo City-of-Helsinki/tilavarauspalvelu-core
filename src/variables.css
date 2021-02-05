@@ -5,7 +5,9 @@
   --tilavaraus-content-text-color: rgb(26, 26, 26);
   --tilavaraus-footer-background-color: #00005e;
   --tilavaraus-footer-color: #f0f0f0;
-  --tilavaraus-application-period-card-active-background-color: #e2f5f3;
+  --tilavaraus-application-period-card-active-background-color: #9ef0de;
   --tilavaraus-application-period-card-active-border-color: #007a64;
   --tilavaraus-gray: #f5f6f8;
+  --tilavaraus-blue: #0072c6;
+  --tilavaraus-calendar-selected: var(--tilavaraus-blue);
 }

@@ -19,10 +19,6 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-.heading-l {
-  font-size: $fontsize-heading-l;
-}
-
 #root {
   padding: 0;
   flex-direction: row;
@@ -36,7 +32,16 @@ body {
   left: 50%;
   position: relative;
   transform: translateX(-50%);
-  width: 4028px;
+  // width: 4028px;
+}
+
+.koros {
+  overflow-x: hidden;
+}
+
+h1,
+h2 {
+  font-family: HelsinkiGrotesk-Bold, var(--font-default);
 }
 
 // align items for example icon + text vertically

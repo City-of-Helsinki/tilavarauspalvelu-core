@@ -1,20 +1,28 @@
 import React from 'react';
-import styles from './Container.module.scss';
+import styled from 'styled-components';
 
 interface Props {
   children: React.ReactNode;
-  // eslint-disable-next-line react/require-default-props
   main?: boolean;
-  // eslint-disable-next-line react/require-default-props
   style?: React.CSSProperties;
+  id?: string;
 }
 
+const styles = `
+  max-width: 75rem;
+  margin: 0 auto;
+  padding: 0 var(--spacing-m) var(--spacing-m) var(--spacing-m);
+`;
+const Wrapper = styled.div`
+  ${styles}
+`;
+
+const WrapperMain = styled.div`
+  ${styles}
+`;
+
 const Container = ({ main = false, ...rest }: Props): JSX.Element => {
-  return main ? (
-    <main {...rest} className={styles.mainContainer} />
-  ) : (
-    <div {...rest} className={styles.mainContainer} />
-  );
+  return main ? <WrapperMain {...rest} /> : <Wrapper {...rest} />;
 };
 
 export default Container;

@@ -1,14 +1,13 @@
 import { Button, IconMap, IconMenuHamburger, Select } from 'hds-react';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { getReservationUnits } from '../common/api';
+import styled from 'styled-components';
 import { ReservationUnit } from '../common/types';
+import Container from '../component/Container';
 import ReservationUnitCard from './ReservationUnitCard';
-import styles from './SearchResultList.module.scss';
 
 interface Props {
-  // only text search is now implemented!
-  search: string;
+  reservationUnits: ReservationUnit[];
 }
 
 interface OptionType {
@@ -17,37 +16,73 @@ interface OptionType {
 
 const options = [] as OptionType[];
 
-const SearchResultList = ({ search }: Props): JSX.Element => {
+const HitCount = styled.div`
+  font-weight: 700;
+  font-size: var(--fontsize-heading-m);
+`;
+
+const ButtonContainer = styled.div`
+  display: flex;
+  margin-top: var(--spacing-m);
+
+  & > :last-child {
+    margin-left: auto;
+  }
+`;
+
+const StyledButton = styled(Button)`
+  --background-color: var(--color-black-90);
+  --border-color: var(color-black-90);
+  --background-color-hover: var(--color-black);
+  --background-color-focus: var(--color-black);
+  --background-color-hover-focus: var(--color-black-90);
+
+  margin-right: var(--spacing-m);
+`;
+
+const StyledSecondaryButton = styled(Button)`
+  --background-color: transparent;
+  --border-color: var(--color-black);
+  --background-color-hover: var(--color-black-10);
+  --background-color-hover-focus: var(--color-black-10);
+  --color: var(--color-black);
+  --color-focus: var(--color-black-10);
+
+  margin-right: var(--spacing-l);
+`;
+
+const Order = styled.div`
+  & button {
+    min-width: 11em;
+  }
+
+  & > div {
+    margin-left: var(--spacing-m);
+  }
+`;
+
+const ListContainer = styled.div`
+  margin-top: var(--spacing-layout-s);
+`;
+
+const SearchResultList = ({ reservationUnits }: Props): JSX.Element => {
   const { t } = useTranslation();
-
-  const [reservationUnits, setReservationUnits] = useState<ReservationUnit[]>(
-    []
-  );
-
-  useEffect(() => {
-    async function fetchData() {
-      const units = await getReservationUnits({ search });
-      setReservationUnits(units);
-    }
-    fetchData();
-  }, [search]);
   return (
-    <>
-      <div className={styles.hitCount}>
+    <Container id="searchResultList">
+      <HitCount>
         {t('SearchResultList.count', { count: reservationUnits.length })}
-      </div>
-      <div className={styles.buttonContainer}>
-        <Button className={styles.button} iconLeft={<IconMenuHamburger />}>
+      </HitCount>
+      <ButtonContainer>
+        <StyledButton theme="black" iconLeft={<IconMenuHamburger />}>
           {t('SearchResultList.listButton')}
-        </Button>
-        <Button
+        </StyledButton>
+        <StyledSecondaryButton
           disabled
-          className={styles.buttonSecondary}
           variant="secondary"
           iconLeft={<IconMap />}>
           {t('SearchResultList.mapButton')}
-        </Button>
-        <div className={`${styles.order} align-vertically`}>
+        </StyledSecondaryButton>
+        <Order className="align-vertically">
           <span>{t('SearchResultList.sortButtonLabel')}:</span>
           <Select
             placeholder={t('SearchResultList.sortButtonPlaceholder')}
@@ -55,14 +90,14 @@ const SearchResultList = ({ search }: Props): JSX.Element => {
             options={options}
             label=""
           />
-        </div>
-      </div>
-      <div className={styles.listContainer}>
+        </Order>
+      </ButtonContainer>
+      <ListContainer>
         {reservationUnits.map((ru) => (
-          <ReservationUnitCard reservationUnit={ru} />
+          <ReservationUnitCard reservationUnit={ru} key={ru.id} />
         ))}
-      </div>
-    </>
+      </ListContainer>
+    </Container>
   );
 };
 

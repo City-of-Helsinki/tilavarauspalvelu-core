@@ -1,7 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.scss';
-import './variables.css';
+import { BrowserRouter } from 'react-router-dom';
 import * as Sentry from '@sentry/react';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
@@ -11,12 +10,23 @@ if (process.env.NODE_ENV === 'production' && process.env.REACT_APP_SENTRY_DSN) {
     dsn: process.env.REACT_APP_SENTRY_DSN,
     environment: process.env.NODE_ENV,
     release: `tilavarauspalvelu-ui@${process.env.npm_package_version}`,
+    integrations: [
+      new Sentry.Integrations.GlobalHandlers({
+        onunhandledrejection: true,
+        onerror: true,
+      }),
+    ],
   });
 }
 
-ReactDOM.render(
+const boot =
+  process.env.NODE_ENV === 'development' ? ReactDOM.render : ReactDOM.hydrate;
+
+boot(
   <React.StrictMode>
-    <App />
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
   </React.StrictMode>,
   document.getElementById('root')
 );

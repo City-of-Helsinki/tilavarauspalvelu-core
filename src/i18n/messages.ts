@@ -18,13 +18,8 @@ interface Translations {
 
 const translations: Translations = {
   Application: {
-    heading: {
-      page1: ['1. Vakiovuoron luominen'],
-      page2: ['2. Vakiovuoron ajankohta'],
-      page3: ['3. Varaajan perustiedot'],
-      page4: ['4. Lähetä käsiteltäväksi'],
-    },
     Page1: {
+      heading: ['1. Vakiovuoron luominen'],
       basicInformationSubHeading: ['Perustiedot'],
       name: ['Vakiovuoron nimi'],
       groupSize: ['Ryhmän koko'],
@@ -38,6 +33,54 @@ const translations: Translations = {
       minDuration: ['Vuoron minimikesto'],
       maxDuration: ['Vuoron maksimikesto'],
       eventsPerWeek: ['Vuorojen määrä/viikko'],
+      biweekly: ['Vuoro vain joka toinen viikko'],
+      createNew: ['Luo uusi vakiovuoro'],
+      applicationEventName: ['Nimetön vakiovuoro'],
+    },
+    Page2: {
+      heading: ['2. Vakiovuoron ajankohta'],
+      text: ['Anna toivomasi ajankohta jokaiselle luomallesi vakiovuorolle.'],
+      copyTimes: ['Kopioi valinnat kaikille vakiovuoroille'],
+      summary: ['Yhteenveto'],
+    },
+    Page3: {
+      heading: ['3. Varaajan perustiedot'],
+      text: ['Varaavan yhteisön ja yhteyshenkilön perustiedot.'],
+      asPrivatePersonSubHeading: ['Varaan yksityishenkilönä'],
+      firstName: ['Etunimi'],
+      lastName: ['Sukunimi'],
+      email: ['Hakemukselle liitettävä sähköpostiosoite'],
+    },
+    preview: {
+      heading: ['4. Hakemuksen lähettäminen'],
+      text: ['Ohessa yhteenveto hakemuksestasi.'],
+      basicInfoSubHeading: ['Varaajan perustiedot'],
+      firstName: ['Yhteyshenkilön etunimi'],
+      lastName: ['Yhteyshenkilön sukunimi'],
+      email: ['Sähköpostiosoite'],
+      'applicationEvent.name': ['Vakiovuoron nimi'],
+      'applicationEvent.numPersons': ['Ryhmän koko'],
+      'applicationEvent.ageGroup': ['Ikäryhmä'],
+      'applicationEvent.abilityGroup': ['Tasoryhmä'],
+      'applicationEvent.purpose': ['Vuoron käyttötarkoitus'],
+      'applicationEvent.additionalInfo': ['Lisätietoja vuoroon liittyen'],
+      'applicationEvent.begin': ['Kauden aloituspäivä'],
+      'applicationEvent.end': ['Kauden päätöspäivä'],
+      'applicationEvent.eventsPerWeek': ['Vuorojen määrä viikossa'],
+      'applicationEvent.biweekly': ['Vakiovuorot vain joka toinen viikko'],
+      'applicationEvent.reservationUnit': ['Vaihtoehto {{order}}.'],
+      applicationEventSchedules: ['Toivotut ajat'],
+      noData: {
+        heading: ['Lomakkeen tietoja ei ole vielä olemassa'],
+        text: ['Täytä ensin lomake.'],
+      },
+      notification: {
+        processing: ['Käsittely'],
+        body: [
+          'Hakemusten käsittely aloitetaan kun hakuaika on päättynyt. Ilmoitamme sinulle, sekä järjestöllesi tai yrityksellesi hakemuksen eri vaiheista sähköpostitse.',
+        ],
+      },
+      userAcceptsTerms: ['Hyväksyn palvelun käyttöehdot'],
     },
   },
   ApplicationPage: {
@@ -45,27 +88,62 @@ const translations: Translations = {
       page1: ['1. Vakiovuoron perustiedot'],
       page2: ['2. Vakiovuoron ajankohta'],
       page3: ['3. Varaajan perustiedot'],
-      page4: ['4. Lähetä käsiteltäväksi'],
+      preview: ['4. Lähetä käsiteltäväksi'],
     },
   },
   ApplicationPeriodCard: {
     reminderButton: ['Tilaa muistutus'],
     applyButton: ['Hae Tilaa'],
+    displayPastButton: ['Näytä tilat'],
     criteria: ['Hakukriteerit'],
-    closed: ['Haku avautuu {{openingDateTime}}'],
+    pending: ['Haku avautuu {{openingDateTime}}'],
     open: ['Haku auki {{until}} saakka'],
+    past: ['Haku sulkeutui {{closingDate}}'],
   },
   breadcrumb: {
     home: ['Vakiovuorot'],
     search: ['Haku'],
     application: ['Vakiovuorohakemus'],
   },
+  calendar: {
+    monday: ['Maanantai'],
+    tuesday: ['Tiistai'],
+    wednesday: ['Keskiviikko'],
+    thursday: ['Torstai'],
+    friday: ['Perjantai'],
+    saturday: ['Lauantai'],
+    sunday: ['Sunnuntai'],
+  },
   common: {
+    applicationNavigationName: ['Hakemus', 'Application', 'Ansökan'],
     applicationName: ['Varaamo', 'Varaamo', 'Varaamo'],
     selectReservationUnit: ['Valitse tila'],
     favourite: ['Suosikki', 'Favourite', 'Favorit'],
     next: ['Seuraava', 'Next', 'Nästa'],
+    prev: ['Takaisin'],
+    submit: ['Lähetä'],
+    false: ['ei'],
+    true: ['kyllä'],
+    close: ['Sulje'],
+    search: ['Hae', 'Search', 'Sök'],
+    noResults: ['Ei tuloksia', 'No results', 'Inga resultat'],
+    select: ['Valitse', 'Choose', 'Välja'],
+    hour: ['Tunti'],
+    abbreviations: {
+      hour: ['t', 'h', 'h'],
+    },
+    login: ['Kirjaudu', 'Login', 'Logga in'],
+    imgAltForSpace: ['Kuva tilasta {{name}}'],
   },
+  reservationUnit: {
+    type: ['Tyyppi', 'Type', 'Typ'],
+    maxPersons: ['Suurin sallittu henkilömäärä', 'Max persons', 'Max personer'],
+    address: ['Osoite', 'Address', 'Adress'],
+    maxDuration: ['Varauksen kesto', 'Duration of reservation', 'Bokningstid'],
+    price: ['Hinta', 'Price', 'Pris'],
+    billableHours: ['Maksulliset tunnit', 'Billable hours', 'Betalda timmar'],
+  },
+
   Navigation: {
     Item: {
       spaceReservation: ['Vakiovuorot'],
@@ -84,13 +162,13 @@ const translations: Translations = {
     info: {
       heading: ['Hakeminen'],
       text: [
-        'Vakiovuoroja haetaan yleisen haun kautta. Voit selata tiloja, mutta hakemuksen voi ainoastaan jättää silloin kun hakuaika on käynnissä.',
+        'Vakiovuoroja haetaan yleisen haun kautta. Voit selata tiloja valmiiksi, mutta hakemuksen voi ainoastaan jättää silloin kun hakuaika on käynnissä.',
       ],
     },
     browseAllButton: ['Selaa kaikkia tiloja'],
     infoButton: ['Lue lisää hakuprosessista'],
     applicationTimes: {
-      heading: ['Hakuajat'],
+      heading: ['Vakiovuorojen hakuajat'],
       text: [
         'Vakiovuoroihin on hakuaika kaksi kertaa vuodessa. Ajankohta vaihtelee palvelusta ja toimialasta riippuen. Voit tilata sähköpostimuistutuksen tuleviin hakuihin.',
       ],
@@ -99,13 +177,35 @@ const translations: Translations = {
   ReservationUnitList: {
     option: ['Vaihtoehto'],
     buttonRemove: ['Poista'],
+    add: ['Lisää tila'],
+  },
+  ReservationUnitModal: {
+    selectReservationUnit: ['Lisää hakemukselle', 'Add to application'],
+    unSelectReservationUnit: [
+      'Poista hakemukselta',
+      'Remove from application',
+      'Ta bort från applikationen',
+    ],
+    heading: ['Hae tiloja hakemukselle'],
+    searchTermLabel: ['Sanahaku'],
+    searchPurposeLabel: ['Käyttötarkoitus'],
+    searchReservationUnitTypeLabel: ['Tilan tyyppi'],
+    openLinkToNewTab: [
+      'Avaa välilehdellä',
+      'Open in new tab',
+      'Öppna i ny flik',
+    ],
+  },
+  ReservationUnit: {
+    backToSearch: ['Takaisin hakutuloksiin'],
+    maxPersons: ['{{maxPersons}} henkilöä'],
   },
   search: {
     heading: ['Vakiovuorojen tilat'],
     text: ['Valitse tilat joihin haluat hakea vakiovuoroja.'],
   },
   SearchForm: {
-    searchTermPlaceholder: ['Hae sanalla'],
+    searchTermPlaceholder: ['Hae sanalla', 'Search with words', 'Sök med ord'],
     searchButton: ['Hae tilaa'],
   },
   SearchResultList: {
@@ -117,7 +217,7 @@ const translations: Translations = {
     sortButtonPlaceholder: ['Sijainnin mukaan'],
   },
   shoppingCart: {
-    next: ['Jatka seuraavaa'],
+    next: ['Jatka seuraavaan'],
     count_plural: ['{{count}} tilaa valittuna'],
     count: ['{{count}} tila valittuna'],
   },

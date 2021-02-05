@@ -1,60 +1,94 @@
-import { Button, Checkbox, IconArrowRight, Select, TextInput } from 'hds-react';
+import {
+  Button,
+  IconArrowLeft,
+  IconArrowRight,
+  IconPlusCircleFill,
+} from 'hds-react';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
-import styles from '../Application.module.scss';
-import ReservationUnitList from './ReservationUnitList';
-import { ApplicationPeriod, Parameter } from '../../common/types';
-import { formatDate } from '../../common/util';
+import styled from 'styled-components';
+import ApplicationEvent from './ApplicationEvent';
+import {
+  Application as ApplicationType,
+  ApplicationPeriod,
+  ReservationUnit,
+} from '../../common/types';
+import { mapOptions, OptionType } from '../../common/util';
 import { getParameters } from '../../common/api';
+import { breakpoint } from '../../common/style';
 
 type Props = {
   applicationPeriod: ApplicationPeriod;
+  application: ApplicationType;
+  selectedReservationUnits: ReservationUnit[];
+  onNext?: () => void;
+  addNewApplicationEvent: () => void;
 };
 
-type OptionType = {
-  label: string;
-  value: string;
-};
+const ButtonContainer = styled.div`
+  @media (max-width: ${breakpoint.m}) {
+    flex-direction: column;
 
-const mapOptions = (src: Parameter[]): OptionType[] =>
-  src.map((v) => ({
-    label: v.name,
-    value: String(v.id),
-  }));
+    & > button {
+      margin-top: var(--spacing-m);
+      margin-left: auto;
+      margin-right: auto;
+    }
 
-const Page1 = ({ applicationPeriod }: Props): JSX.Element => {
+    & :nth-child(1) {
+      margin-left: auto;
+      margin-right: auto;
+    }
+  }
+
+  display: flex;
+  flex-direction: row;
+  margin-top: var(--spacing-layout-l);
+  justify-content: flex-end;
+
+  & > button {
+    margin-left: var(--spacing-m);
+  }
+
+  & :nth-child(1) {
+    margin-right: auto;
+    margin-left: 0;
+  }
+`;
+
+const Page1 = ({
+  onNext,
+  addNewApplicationEvent,
+  applicationPeriod,
+  application,
+  selectedReservationUnits,
+}: Props): JSX.Element | null => {
+  const [ready, setReady] = useState<boolean>(false);
+
   const [ageGroupOptions, setAgeGroupOptions] = useState<OptionType[]>([]);
   const [purposeOptions, setPurposeOptions] = useState<OptionType[]>([]);
   const [abilityGroupOptions, setAbilityGroupOptions] = useState<OptionType[]>(
     []
   );
+  const [reservationUnitTypeOptions, setReservationUnitTypeOptions] = useState<
+    OptionType[]
+  >([]);
 
-  const periodStartDate = formatDate(applicationPeriod.applicationPeriodBegin);
-  const periodEndDate = formatDate(applicationPeriod.applicationPeriodEnd);
+  const optionTypes = {
+    ageGroupOptions,
+    purposeOptions,
+    abilityGroupOptions,
+    reservationUnitTypeOptions,
+  };
 
   const { t } = useTranslation();
-  const { register, handleSubmit, setValue } = useForm({
-    defaultValues: {
-      name: 'Vakiovuoro 1.',
-      ageGroup: '',
-      abilityGroup: '',
-      purpose: '',
-      periodStartDate,
-      periodEndDate,
-      minDuration: 1,
-      maxDuration: 1,
-      turnsPerWeek: 1,
-    },
-  });
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any, no-alert
-  const onSubmit = (data: any) => alert(JSON.stringify(data));
 
-  useEffect(() => {
-    // register form fields (the ones that don't have 'ref')
-    register({ name: 'ageGroup', required: true });
-    register({ name: 'abilityGroup', required: true });
-    register({ name: 'purpose', required: true });
+  const form = useForm({
+    defaultValues: {
+      applicationEvents: application.applicationEvents,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as Record<string, any>,
   });
 
   useEffect(() => {
@@ -62,134 +96,83 @@ const Page1 = ({ applicationPeriod }: Props): JSX.Element => {
       const fetchedAbilityGroupOptions = await getParameters('ability_group');
       const fetchedAgeGroupOptions = await getParameters('age_group');
       const fetchedPurposeOptions = await getParameters('purpose');
+      const fetchedReservationUnitType = await getParameters(
+        'reservation_unit_type'
+      );
 
       setAbilityGroupOptions(mapOptions(fetchedAbilityGroupOptions));
       setAgeGroupOptions(mapOptions(fetchedAgeGroupOptions));
       setPurposeOptions(mapOptions(fetchedPurposeOptions));
+      setReservationUnitTypeOptions(mapOptions(fetchedReservationUnitType));
+
+      setReady(true);
     }
     fetchData();
   }, []);
 
+  const prepareSave = (data: ApplicationType) => {
+    application.applicationEvents.forEach((event, index) =>
+      Object.assign(event, data.applicationEvents[index])
+    );
+  };
+
+  // todo rename this function
+  const onSubmit = (data: ApplicationType) => {
+    prepareSave(data);
+
+    if (onNext) {
+      onNext();
+    }
+  };
+
+  const onAddApplicationEvent = (data: ApplicationType) => {
+    if (
+      data.applicationEvents &&
+      data.applicationEvents.some((e) => Boolean(e.id))
+    ) {
+      return;
+    }
+    prepareSave(data);
+    addNewApplicationEvent();
+  };
+
+  if (!ready) {
+    return null;
+  }
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <div className={styles.subHeadLine}>
-        {t('Application.Page1.basicInformationSubHeading')}
-      </div>
-      <div className={styles.basicInfoContainer}>
-        <TextInput
-          ref={register({ required: true })}
-          label={t('Application.Page1.name')}
-          id="name"
-          name="name"
-          required
-        />
-        <TextInput
-          required
-          ref={register({ required: true })}
-          label={t('Application.Page1.groupSize')}
-          id="groupSize"
-          name="groupSize"
-          type="number"
-        />
-        <Select
-          id="ageGroup"
-          placeholder="Valitse"
-          options={ageGroupOptions}
-          label={t('Application.Page1.ageGroup')}
-          required
-          onChange={(selection: OptionType): void => {
-            setValue('ageGroup', selection.value);
-          }}
-        />
-        <Select
-          placeholder="Valitse"
-          options={abilityGroupOptions}
-          label={t('Application.Page1.abilityGroup')}
-          required
-          onChange={(selection: OptionType): void => {
-            setValue('abilityGroup', selection.value);
-          }}
-        />
-        <Select
-          className={styles.fullWidth}
-          placeholder="Valitse"
-          required
-          options={purposeOptions}
-          label={t('Application.Page1.purpose')}
-          onChange={(selection: OptionType): void => {
-            setValue('purpose', selection.value);
-          }}
-        />
-      </div>
-      <hr className={styles.ruler} />
-      <div className={styles.subHeadLine}>
-        {t('Application.Page1.spacesSubHeading')}
-      </div>
-      <ReservationUnitList />
-      <hr className={styles.ruler} />
-      <div className={styles.subHeadLine}>
-        {t('Application.Page1.applicationPeriodSubHeading')}
-      </div>
-      <div className={styles.periodContainer}>
-        <TextInput
-          ref={register()}
-          label={t('Application.Page1.periodStartDate')}
-          name="periodStartDate"
-          id="periodStartDate"
-          required
-        />
-        <TextInput
-          ref={register()}
-          label={t('Application.Page1.periodEndDate')}
-          name="periodEndDate"
-          id="periodEndDate"
-          required
-        />
-        <div style={{ display: 'flex' }}>
-          <Checkbox id="defaultPeriod" checked />
-          <span>
-            {periodStartDate} - {periodEndDate}
-          </span>
-        </div>
-        <TextInput
-          ref={register()}
-          label={t('Application.Page1.minDuration')}
-          name="minDuration"
-          id="minDuration"
-          required
-        />
-        <TextInput
-          ref={register()}
-          label={t('Application.Page1.maxDuration')}
-          name="maxDuration"
-          id="maxDuration"
-          required
-        />
-        <div style={{ display: 'flex' }}>
-          <Checkbox id="durationCheckbox" checked />
-          <span>1 t</span>
-        </div>
-        <TextInput
-          ref={register()}
-          className={styles.fullWidth}
-          label={t('Application.Page1.eventsPerWeek')}
-          name="eventsPerWeek"
-          id="eventsPerWeek"
-          type="number"
-          required
-        />
-        <div style={{ display: 'flex' }}>
-          <Checkbox id="everyTwoWeekCheckboxs" checked />
-          <span>Vuoro vain joka toinen viikko</span>
-        </div>
-      </div>
-      <div className={styles.buttonContainer}>
+    <form>
+      {application.applicationEvents.map((event, index) => {
+        return (
+          <ApplicationEvent
+            key={event.id || 'NEW'}
+            form={form}
+            applicationEvent={event}
+            index={index}
+            applicationPeriod={applicationPeriod}
+            optionTypes={optionTypes}
+            selectedReservationUnits={selectedReservationUnits}
+          />
+        );
+      })}
+
+      <ButtonContainer>
         <Button
+          id="addApplicationEvent"
+          iconLeft={<IconPlusCircleFill />}
+          onClick={() => form.handleSubmit(onAddApplicationEvent)()}>
+          {t('Application.Page1.createNew')}
+        </Button>
+        <Button disabled iconLeft={<IconArrowLeft />}>
+          {t('common.prev')}
+        </Button>
+        <Button
+          id="next"
           iconRight={<IconArrowRight />}
-          onClick={() => handleSubmit(onSubmit)()}>
+          onClick={() => form.handleSubmit(onSubmit)()}>
           {t('common.next')}
         </Button>
-      </div>
+      </ButtonContainer>
     </form>
   );
 };

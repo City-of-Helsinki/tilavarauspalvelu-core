@@ -1,70 +1,189 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Checkbox, Select, TextInput, Button, IconSearch } from 'hds-react';
+import { useForm } from 'react-hook-form';
+import styled from 'styled-components';
+import { breakpoint } from '../common/style';
+import { getApplicationPeriods, getParameters } from '../common/api';
+import { mapOptions, OptionType, getSelectedOption } from '../common/util';
 
-import styles from './SearchForm.module.scss';
-
-interface Props {
-  // only text search is now implemented!
-  onSearch: (text: string) => void;
-}
-interface OptionType {
-  label: string;
-}
+type Props = {
+  onSearch: (search: Record<string, string>) => void;
+  formValues: { [key: string]: string };
+};
 
 const options = [] as OptionType[];
 
-const SearchForm = ({ onSearch }: Props): JSX.Element => {
-  const { t } = useTranslation();
-  const [q, setQ] = useState<string>();
+const Container = styled.div`
+  @media (max-width: ${breakpoint.m}) {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  @media (max-width: ${breakpoint.s}) {
+    grid-template-columns: 1fr;
+  }
+
+  margin-top: var(--spacing-s);
+  max-width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-gap: var(--spacing-m);
+  font-size: var(--fontsize-body-m);
+`;
+
+const ShowL = styled.div`
+  @media (max-width: ${breakpoint.m}) {
+    display: none;
+  }
+
+  display: block;
+`;
+
+const ShowM = styled.div`
+  @media (max-width: ${breakpoint.m}) {
+    display: block;
+  }
+
+  @media (max-width: ${breakpoint.s}) {
+    display: none;
+  }
+
+  display: none;
+`;
+
+const Hr = styled.hr`
+  margin-top: var(--spacing-l);
+`;
+
+const ButtonContainer = styled.div`
+  margin-top: var(--spacing-l);
+  display: flex;
+  justify-content: flex-end;
+`;
+
+const SearchForm = ({ onSearch, formValues }: Props): JSX.Element | null => {
+  const { t, i18n } = useTranslation();
+  const [ready, setReady] = useState<boolean>(false);
+
+  const [purposeOptions, setPurposeOptions] = useState<OptionType[]>([]);
+  const [districtOptions, setDistrictOptions] = useState<OptionType[]>([]);
+  const [applicationPeriodOptions, setApplicationPeriodOptions] = useState<
+    OptionType[]
+  >([]);
+
+  const { register, handleSubmit, setValue, getValues } = useForm();
+
+  useEffect(() => {
+    register({ name: 'purpose' });
+    register({ name: 'district' });
+    register({ name: 'application_period' });
+  }, [register]);
+
+  useEffect(() => {
+    async function fetchData() {
+      const fetchedApplicationPeriods = await getApplicationPeriods();
+      setApplicationPeriodOptions(
+        mapOptions(fetchedApplicationPeriods, t('common.select'), i18n.language)
+      );
+      const fetchedPurposeOptions = await getParameters('purpose');
+      setPurposeOptions(mapOptions(fetchedPurposeOptions, t('common.select')));
+      const fetchedDistrictOptions = await getParameters('district');
+      setDistrictOptions(
+        mapOptions(fetchedDistrictOptions, t('common.select'), i18n.language)
+      );
+      setReady(true);
+    }
+    fetchData();
+  }, [t, i18n.language]);
+
+  useEffect(() => {
+    Object.keys(formValues).forEach((p) => setValue(p, formValues[p]));
+  }, [formValues, setValue]);
+
+  const search = (criteria: Record<string, string>) => {
+    onSearch(criteria);
+  };
+
+  if (!ready) {
+    return null;
+  }
+
   return (
     <>
-      <div className={styles.container}>
+      <Container>
         <TextInput
-          label="&nbsp;"
-          placeholder={t('SearchForm.searchTermPlaceholder')}
           id="search"
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
+          name="search"
+          label="&nbsp;"
+          ref={register()}
+          placeholder={t('SearchForm.searchTermPlaceholder')}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              handleSubmit(search)();
+            }
+          }}
+          defaultValue={formValues.search}
         />
-        <Select placeholder="Valitse" disabled options={options} label="Haku" />
-        <div className={styles.showL} />
         <Select
-          placeholder="Valitse"
-          disabled
-          options={options}
+          id="application_period"
+          placeholder={t('common.select')}
+          options={applicationPeriodOptions}
+          onChange={(selection: OptionType): void => {
+            setValue('application_period', selection.value);
+          }}
+          defaultValue={getSelectedOption(
+            getValues('application_period'),
+            applicationPeriodOptions
+          )}
+          label="Haku"
+        />
+        <ShowL />
+        <Select
+          id="purpose"
+          placeholder={t('common.select')}
+          options={purposeOptions}
+          onChange={(selection: OptionType): void => {
+            setValue('purpose', selection.value);
+          }}
+          defaultValue={getSelectedOption(getValues('purpose'), purposeOptions)}
           label="Käyttötarkoitus"
         />
         <Select
-          placeholder="Valitse"
-          disabled
-          options={options}
+          id="district"
+          placeholder={t('common.select')}
+          onChange={(selection: OptionType): void => {
+            setValue('district', selection.value);
+          }}
+          options={districtOptions}
+          defaultValue={getSelectedOption(
+            getValues('district'),
+            districtOptions
+          )}
           label="Kaupunginosa"
         />
         <Select
-          placeholder="Valitse"
+          placeholder={t('common.select')}
           disabled
           options={options}
           label="Hinta"
         />
-        <div className={styles.showM} />
+        <ShowM />
         <Checkbox
           disabled
           id="checkbox1"
           label="Sopiva liikuntarajoitteisille"
         />
         <Checkbox disabled id="checkbox2" label="Lähimmät paikat ensin" />
-      </div>
-      <hr className={styles.hr} />
-      <div className={styles.buttonContainer}>
+      </Container>
+      <Hr />
+      <ButtonContainer>
         <Button
-          onClick={() => {
-            onSearch(q || '');
-          }}
+          id="searchButton"
+          onClick={handleSubmit(search)}
           iconLeft={<IconSearch />}>
           {t('SearchForm.searchButton')}
         </Button>
-      </div>
+      </ButtonContainer>
     </>
   );
 };

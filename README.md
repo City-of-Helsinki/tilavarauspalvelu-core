@@ -35,6 +35,12 @@ Some test data can be loaded to the backend with following command:
 docker exec tilavarauspalvelu-core_dev_1 python manage.py loaddata fixtures/cases.json
 ```
 
+You can also manually add test data by visiting the django admin at http://127.0.0.1:8000/admin after you create admin user:
+
+```
+docker exec -ti tilavarauspalvelu-core_dev_1 python manage.py createsuperuser
+```
+
 ## Available Scripts
 
 In the project directory, you can run:
@@ -51,6 +57,14 @@ You will also see any lint errors in the console.
 
 Launches the test runner in the interactive watch mode.\
 See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+
+### `yarn test:e2e-local`
+
+Runs end to end tests against local setup. Both ui and api must be running before running this script.
+
+### `yarn test:axe-local`
+
+Runs accessibility tests against local setup. Both ui and api must be running before running this script.
 
 ### `yarn build`
 

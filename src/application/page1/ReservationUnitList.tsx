@@ -5,15 +5,100 @@ import {
   IconGroup,
   IconTrash,
 } from 'hds-react';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { ReservationUnit } from '../../common/types';
+import styled from 'styled-components';
+import { useAsync } from 'react-use';
+import { getReservationUnit } from '../../common/api';
 import {
-  SelectionsListContext,
-  SelectionsListContextType,
-} from '../../context/SelectionsListContext';
+  ApplicationEvent,
+  ApplicationPeriod,
+  ReservationUnit,
+} from '../../common/types';
+import Modal from '../../component/Modal';
+import ReservationUnitModal from './ReservationUnitModal';
+import { OptionType } from '../../common/util';
 
-import styles from './ReservationUnitList.module.scss';
+type CardProps = {
+  order: number;
+  reservationUnit: ReservationUnit;
+  onDelete: (reservationUnit: ReservationUnit) => void;
+  first: boolean;
+  last: boolean;
+  onMoveUp: (reservationUnit: ReservationUnit) => void;
+  onMoveDown: (reservationUnit: ReservationUnit) => void;
+  t: (n: string) => string;
+};
+
+const NameCardContainer = styled.div`
+  margin-top: var(--spacing-l);
+`;
+
+const PreCardLabel = styled.div`
+  font-size: var(--fontsize-heading-xs);
+  font-weight: 700;
+`;
+
+const CardButtonContainer = styled.div`
+  display: grid;
+  grid-template-columns: 5fr 1fr;
+  margin-top: var(--spacing-s);
+  align-items: center;
+`;
+
+const CardContainer = styled.div`
+  gap: var(--spacing-l);
+  background-color: white;
+  display: grid;
+  grid-template-columns: 1fr 4fr 1fr 1fr;
+  align-items: center;
+`;
+
+const Image = styled.img`
+  object-fit: cover;
+`;
+
+const Title = styled.div`
+  font-size: var(--fontsize-heading-m);
+  font-weight: bold;
+`;
+
+const Address = styled.div`
+  font-size: var(--fontsize-body-s);
+`;
+
+const MaxPersonsContainer = styled.div`
+  display: flex;
+  justify-items: center;
+  font-size: var(--fontsize-body-l);
+  font-weight: bold;
+`;
+
+const MaxPersonsCountContainer = styled.span`
+  margin-left: var(--spacing-xs);
+`;
+
+const DeleteButton = styled(Button)`
+  --border-color: transparent;
+`;
+
+const ArrowContainer = styled.div`
+  display: flex;
+`;
+
+const Circle = styled.div<{ passive: boolean }>`
+  margin-left: var(--spacing-xs);
+  height: var(--spacing-layout-m);
+  width: var(--spacing-layout-m);
+  background-color: ${(props) =>
+    props.passive ? 'var(--color-black-10)' : 'var(--color-bus)'};
+  color: ${(props) => (props.passive ? 'var(--color-black-50)' : 'white')};
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
 
 const ReservationUnitCard = ({
   reservationUnit,
@@ -24,58 +109,48 @@ const ReservationUnitCard = ({
   onMoveUp,
   onMoveDown,
   t,
-}: {
-  order: number;
-  reservationUnit: ReservationUnit;
-  onDelete: (reservationUnit: ReservationUnit) => void;
-  first: boolean;
-  last: boolean;
-  onMoveUp: (reservationUnit: ReservationUnit) => void;
-  onMoveDown: (reservationUnit: ReservationUnit) => void;
-  t: (n: string) => string;
-}): JSX.Element => {
+}: CardProps): JSX.Element => {
+  const { i18n } = useTranslation();
+
   return (
-    <div className={styles.nameCardContainer}>
-      <div className={styles.preCardLabel}>
+    <NameCardContainer>
+      <PreCardLabel>
         {t('ReservationUnitList.option')} {order + 1}.
-      </div>
-      <div className={styles.cardButtonContainer}>
-        <div className={styles.cardContainer}>
-          <img
-            className={styles.image}
+      </PreCardLabel>
+      <CardButtonContainer>
+        <CardContainer>
+          <Image
             src={reservationUnit.images[0]?.imageUrl}
             width="76"
             height="99"
           />
           <div>
-            <div className={styles.title}>{reservationUnit.name}</div>
-            <div className={styles.address}>
+            <Title>{reservationUnit.name[i18n.language]}</Title>
+            <Address>
               {reservationUnit.location?.addressStreet},
               {reservationUnit.location?.addressZip}{' '}
               {reservationUnit.location?.addressCity}
-            </div>
+            </Address>
           </div>
-          <div className={styles.maxPersonsContainer}>
+          <MaxPersonsContainer>
             <IconGroup />
-            <span className={styles.maxPersonsCountContainer}>
+            <MaxPersonsCountContainer>
               {reservationUnit.maxPersons}
-            </span>
-          </div>
+            </MaxPersonsCountContainer>
+          </MaxPersonsContainer>
           <div>
-            <Button
-              className={styles.deleteButton}
+            <DeleteButton
               variant="secondary"
               iconLeft={<IconTrash />}
               onClick={() => {
                 onDelete(reservationUnit);
               }}>
               {t('ReservationUnitList.buttonRemove')}
-            </Button>
+            </DeleteButton>
           </div>
-        </div>
-        <div className={styles.arrowContainer}>
-          <div
-            className={`${styles.circle} ${first ? styles.passiveCircle : ''}`}>
+        </CardContainer>
+        <ArrowContainer>
+          <Circle passive={first}>
             <button
               className="button-reset"
               disabled={first}
@@ -83,9 +158,8 @@ const ReservationUnitCard = ({
               onClick={() => onMoveUp(reservationUnit)}>
               <IconArrowUp size="m" />
             </button>
-          </div>
-          <div
-            className={`${styles.circle} ${last ? styles.passiveCircle : ''}`}>
+          </Circle>
+          <Circle passive={last}>
             <button
               className="button-reset"
               type="button"
@@ -93,29 +167,116 @@ const ReservationUnitCard = ({
               onClick={() => onMoveDown(reservationUnit)}>
               <IconArrowDown size="m" />
             </button>
-          </div>
-        </div>
-      </div>
-    </div>
+          </Circle>
+        </ArrowContainer>
+      </CardButtonContainer>
+    </NameCardContainer>
   );
 };
 
-const ReservationUnitList = (): JSX.Element => {
+type OptionTypes = {
+  purposeOptions: OptionType[];
+  reservationUnitTypeOptions: OptionType[];
+};
+
+type Props = {
+  selectedReservationUnits: ReservationUnit[];
+  applicationEvent: ApplicationEvent;
+  fieldName: string;
+  form: ReturnType<typeof useForm>;
+  applicationPeriod: ApplicationPeriod;
+  options: OptionTypes;
+};
+
+const MainContainer = styled.div`
+  margin-top: var(--spacing-l);
+`;
+
+const ButtonContainer = styled.div`
+  margin-top: var(--spacing-layout-m);
+`;
+
+const ReservationUnitList = ({
+  selectedReservationUnits,
+  applicationEvent,
+  form,
+  fieldName,
+  applicationPeriod,
+  options,
+}: Props): JSX.Element => {
+  const [showModal, setShowModal] = useState(false);
+  const [reservationUnits, setReservationUnits] = useState(
+    [] as ReservationUnit[]
+  );
+
+  const handleAdd = (ru: ReservationUnit) => {
+    setReservationUnits([...reservationUnits, ru]);
+  };
+
+  useEffect(() => {
+    form.setValue(
+      fieldName,
+      reservationUnits.map((ru, index) => ({
+        reservationUnit: ru.id,
+        priority: index,
+      }))
+    );
+  }, [reservationUnits, fieldName, form]);
+
+  useAsync(async () => {
+    let data;
+    if (applicationEvent.eventReservationUnits.length === 0) {
+      data = selectedReservationUnits;
+    } else {
+      const promises = applicationEvent.eventReservationUnits.map((id) =>
+        getReservationUnit(id.reservationUnit)
+      );
+      data = await Promise.all(promises);
+    }
+    setReservationUnits(data);
+    return data;
+  }, [applicationEvent.eventReservationUnits]);
+
+  const move = (
+    units: ReservationUnit[],
+    from: number,
+    to: number
+  ): ReservationUnit[] => {
+    const copy = [...units];
+    const i = units[from];
+    copy.splice(from, 1);
+    copy.splice(to, 0, i);
+    return copy;
+  };
+
+  const remove = (reservationUnit: ReservationUnit) => {
+    setReservationUnits([
+      ...reservationUnits.filter((ru) => ru.id !== reservationUnit.id),
+    ]);
+  };
+
+  const moveUp = (reservationUnit: ReservationUnit) => {
+    const from = reservationUnits.indexOf(reservationUnit);
+    const to = from - 1;
+    setReservationUnits(move(reservationUnits, from, to));
+  };
+
+  const moveDown = (reservationUnit: ReservationUnit) => {
+    const from = reservationUnits.indexOf(reservationUnit);
+    const to = from + 1;
+    setReservationUnits(move(reservationUnits, from, to));
+  };
+
   const { t } = useTranslation();
-  const {
-    reservationUnits,
-    removeReservationUnit,
-    moveUp,
-    moveDown,
-  } = React.useContext(SelectionsListContext) as SelectionsListContextType;
 
   return (
-    <div className={styles.mainContainer}>
+    <MainContainer>
       {reservationUnits.map((ru, index, all) => {
         return (
           <ReservationUnitCard
+            key={ru.id}
             t={t}
-            onDelete={removeReservationUnit}
+            onDelete={remove}
             reservationUnit={ru}
             order={index}
             first={index === 0}
@@ -125,7 +286,25 @@ const ReservationUnitList = (): JSX.Element => {
           />
         );
       })}
-    </div>
+      <ButtonContainer>
+        <Button onClick={() => setShowModal(true)}>
+          {t('ReservationUnitList.add')}
+        </Button>
+      </ButtonContainer>
+      <Modal
+        handleClose={() => {
+          setShowModal(false);
+        }}
+        show={showModal}>
+        <ReservationUnitModal
+          currentReservationUnits={reservationUnits}
+          applicationPeriod={applicationPeriod}
+          handleAdd={handleAdd}
+          handleRemove={remove}
+          options={options}
+        />
+      </Modal>
+    </MainContainer>
   );
 };
 
