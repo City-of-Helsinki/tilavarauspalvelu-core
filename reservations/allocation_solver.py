@@ -1,5 +1,6 @@
 import datetime
 import logging
+from typing import Dict
 
 from ortools.sat.python import cp_model
 
@@ -11,6 +12,16 @@ from reservations.allocation_models import (
 )
 
 logger = logging.getLogger(__name__)
+
+
+def suitable_spaces_for_event(
+    allocation_event: AllocationEvent, spaces: Dict[int, AllocationSpace]
+) -> Dict[int, AllocationSpace]:
+    suitable_spaces = {}
+    for space_id, space in spaces.items():
+        if space_id in allocation_event.space_ids:
+            suitable_spaces[space_id] = space
+    return suitable_spaces
 
 
 class AllocatedEvent(object):
@@ -40,9 +51,12 @@ class AllocationSolutionPrinter(object):
         solution = []
         if status == cp_model.OPTIMAL:
             logger.info("Total cost = %i" % solver.ObjectiveValue())
-            for space in self.spaces:
-                for event in self.allocation_events:
-                    for occurrence_id, occurrence in event.occurrences.items():
+
+            for event in self.allocation_events:
+                for occurrence_id, occurrence in event.occurrences.items():
+                    for space_id, space in suitable_spaces_for_event(
+                        event, self.spaces
+                    ).items():
                         if solver.BooleanValue(
                             self.selected[(space.id, event.id, occurrence_id)]
                         ):
@@ -72,27 +86,31 @@ class AllocationSolutionPrinter(object):
 
 class AllocationSolver(object):
     def __init__(self, allocation_data: AllocationData):
-        self.spaces = allocation_data.spaces
+        self.spaces: Dict[int, AllocationSpace] = allocation_data.spaces
         self.allocation_events = allocation_data.allocation_events
 
     def solve(self):
         model = cp_model.CpModel()
 
         selected = {}
-        for space in self.spaces:
-            for allocation_event in self.allocation_events:
-                for occurence_id, occurence in allocation_event.occurrences.items():
+        for allocation_event in self.allocation_events:
+            for occurence_id, occurence in allocation_event.occurrences.items():
+                for space_id, space in suitable_spaces_for_event(
+                    allocation_event, self.spaces
+                ).items():
                     selected[
                         (space.id, allocation_event.id, occurence_id)
-                    ] = model.NewBoolVar("x[%i,%i]" % (space.id, occurence_id))
+                    ] = model.NewBoolVar("x[%i,%i]" % (space_id, occurence_id))
 
         # Each event is assigned to at most one space.
         for event in self.allocation_events:
             for occurrence_id, occurence in event.occurrences.items():
                 model.Add(
                     sum(
-                        selected[(space.id, event.id, occurence_id)]
-                        for space in self.spaces
+                        selected[(space_id, event.id, occurence_id)]
+                        for space_id, space in suitable_spaces_for_event(
+                            event, self.spaces
+                        ).items()
                     )
                     <= 1
                 )
@@ -100,10 +118,12 @@ class AllocationSolver(object):
         # Objective
         model.Maximize(
             sum(
-                selected[(space.id, event.id, occurrence_id)] * event.min_duration
+                selected[(space_id, event.id, occurrence_id)] * event.min_duration
                 for occurrence_id, occurrence in event.occurrences.items()
                 for event in self.allocation_events
-                for space in self.spaces
+                for space_id, space in suitable_spaces_for_event(
+                    event, self.spaces
+                ).items()
             )
         )
 

@@ -2,7 +2,7 @@ import datetime
 
 from django.utils import timezone
 
-from applications.models import Application, ApplicationEvent
+from applications.models import ApplicationEvent, ApplicationPeriod
 from reservation_units.models import ReservationUnit
 
 
@@ -72,6 +72,12 @@ class AllocationEvent(object):
         period_start: datetime.date,
         period_end: datetime.date,
     ):
+        self.space_ids = list(
+            map(
+                lambda x: x.reservation_unit.id,
+                application_event.event_reservation_units.all(),
+            )
+        )
         self.id = application_event.id
         self.occurrences = application_event.get_all_occurrences()
         self.begin = application_event.begin
@@ -89,22 +95,21 @@ class AllocationEvent(object):
 
 
 class AllocationData(object):
-    def __init__(self, application: Application):
-        self.spaces: [AllocationSpace] = []
-        self.period_start: datetime.date = (
-            application.application_period.reservation_period_begin
-        )
-        self.period_end: datetime.date = (
-            application.application_period.reservation_period_end
-        )
-        for unit in application.application_period.reservation_units.all():
+    def __init__(self, application_period: ApplicationPeriod):
+        self.spaces: dict[int, AllocationSpace] = {}
+        self.period_start: datetime.date = application_period.reservation_period_begin
+        self.period_end: datetime.date = application_period.reservation_period_end
+        for unit in application_period.reservation_units.all():
             self.add_space(unit=unit)
 
         self.allocation_events = []
-        for application_event in application.application_events.all():
-            self.allocation_events.append(
-                AllocationEvent(application_event, self.period_start, self.period_end)
-            )
+        for application in application_period.applications.all():
+            for application_event in application.application_events.all():
+                self.allocation_events.append(
+                    AllocationEvent(
+                        application_event, self.period_start, self.period_end
+                    )
+                )
 
     def get_all_dates(self):
         dates = []
@@ -142,4 +147,4 @@ class AllocationData(object):
                     tzinfo=timezone.get_default_timezone(),
                 ),
             )
-        self.spaces.append(space)
+        self.spaces[space.id] = space
