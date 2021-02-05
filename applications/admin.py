@@ -5,7 +5,9 @@ from .models import (
     Application,
     ApplicationEvent,
     ApplicationEventStatus,
-    ApplicationPeriod,
+    ApplicationRound,
+    ApplicationRoundBasket,
+    ApplicationRoundStatus,
     ApplicationStatus,
     EventReservationUnit,
     Organisation,
@@ -20,6 +22,14 @@ class ApplicationEventInline(admin.TabularInline):
 
 class ApplicationStatusInline(admin.TabularInline):
     model = ApplicationStatus
+
+
+class ApplicationRoundStatusInline(admin.TabularInline):
+    model = ApplicationRoundStatus
+
+
+class ApplicationRoundBasketInline(admin.TabularInline):
+    model = ApplicationRoundBasket
 
 
 @admin.register(Application)
@@ -48,11 +58,6 @@ class RecurrenceAdmin(admin.ModelAdmin):
     model = Recurrence
 
 
-@admin.register(ApplicationPeriod)
-class ApplicationPeriodAdmin(admin.ModelAdmin):
-    model = ApplicationPeriod
-
-
 @admin.register(Address)
 class AddressAdmin(admin.ModelAdmin):
     model = Address
@@ -66,3 +71,9 @@ class PersonAdmin(admin.ModelAdmin):
 @admin.register(EventReservationUnit)
 class EventReservationUnitAdmin(admin.ModelAdmin):
     model = EventReservationUnit
+
+
+@admin.register(ApplicationRound)
+class ApplicationRoundAdmin(admin.ModelAdmin):
+    model = ApplicationRound
+    inlines = [ApplicationRoundStatusInline, ApplicationRoundBasketInline]

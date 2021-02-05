@@ -7,7 +7,7 @@ from applications.models import (
     Application,
     ApplicationEvent,
     ApplicationEventSchedule,
-    ApplicationPeriod,
+    ApplicationRound,
     EventReservationUnit,
 )
 from reservation_units.models import ReservationUnit
@@ -27,12 +27,14 @@ def get_default_end() -> datetime.date:
 
 
 @pytest.fixture
-def default_application_period() -> ApplicationPeriod:
-    return ApplicationPeriod.objects.create(
+def default_application_round() -> ApplicationRound:
+    return ApplicationRound.objects.create(
         application_period_begin=get_default_start(),
         application_period_end=get_default_end(),
         reservation_period_begin=get_default_start(),
         reservation_period_end=get_default_end(),
+        public_display_begin=get_default_start(),
+        public_display_end=get_default_end(),
     )
 
 
@@ -53,26 +55,24 @@ def second_reservation_unit():
 
 
 @pytest.fixture
-def application_period_with_reservation_units(
-    reservation_unit, default_application_period
-) -> ApplicationPeriod:
-    default_application_period.reservation_units.set([reservation_unit])
-    return default_application_period
+def application_round_with_reservation_units(
+    reservation_unit, default_application_round
+) -> ApplicationRound:
+    default_application_round.reservation_units.set([reservation_unit])
+    return default_application_round
 
 
 @pytest.fixture
-def minimal_application(default_application_period) -> Application:
-    return Application.objects.create(
-        application_period_id=default_application_period.id
-    )
+def minimal_application(default_application_round) -> Application:
+    return Application.objects.create(application_round_id=default_application_round.id)
 
 
 @pytest.fixture
 def application_with_reservation_units(
-    application_period_with_reservation_units,
+    application_round_with_reservation_units,
 ) -> Application:
     return Application.objects.create(
-        application_period_id=application_period_with_reservation_units.id
+        application_round_id=application_round_with_reservation_units.id
     )
 
 
@@ -81,7 +81,7 @@ def application_with_application_events(
     application_with_reservation_units,
 ) -> Application:
     return Application.objects.create(
-        application_period_id=application_with_reservation_units.id
+        application_round_id=application_with_reservation_units.id
     )
 
 
@@ -131,7 +131,7 @@ def not_matching_event_reservation_unit(
 
 @pytest.fixture
 def multiple_applications(
-    application_period_with_reservation_units, request, reservation_unit
+    application_round_with_reservation_units, request, reservation_unit
 ) -> Dict[str, list]:
     applications = []
     created_events = []
@@ -139,7 +139,7 @@ def multiple_applications(
 
     for application in request.param["applications"]:
         created_application = Application.objects.create(
-            application_period_id=application_period_with_reservation_units.id
+            application_round_id=application_round_with_reservation_units.id
         )
         applications.append(created_application)
         for event in application["events"]:

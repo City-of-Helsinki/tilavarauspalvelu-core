@@ -7,8 +7,8 @@ from reservations.tests.conftest import get_default_end, get_default_start
 
 
 @pytest.mark.django_db
-def test_should_map_application_period_dates(application_period_with_reservation_units):
-    data = AllocationData(application_period=application_period_with_reservation_units)
+def test_should_map_application_round_dates(application_round_with_reservation_units):
+    data = AllocationData(application_round=application_round_with_reservation_units)
 
     assert data.period_start == get_default_start()
     assert data.period_end == get_default_end()
@@ -16,15 +16,15 @@ def test_should_map_application_period_dates(application_period_with_reservation
 
 @pytest.mark.django_db
 def test_should_map_reservation_unit_open_times(
-    application_with_reservation_units, application_period_with_reservation_units
+    application_with_reservation_units, application_round_with_reservation_units
 ):
 
-    data = AllocationData(application_period=application_period_with_reservation_units)
+    data = AllocationData(application_round=application_round_with_reservation_units)
 
     times = [
         [available.start, available.end]
         for available in data.spaces[
-            application_period_with_reservation_units.reservation_units.all()[0].id
+            application_round_with_reservation_units.reservation_units.all()[0].id
         ].available_times
     ]
 
@@ -41,13 +41,13 @@ def test_should_map_reservation_unit_open_times(
 
 @pytest.mark.django_db
 def test_should_map_application_events(
-    application_period_with_reservation_units,
+    application_round_with_reservation_units,
     application_with_reservation_units,
     recurring_application_event,
     scheduled_for_monday,
 ):
 
-    data = AllocationData(application_period=application_period_with_reservation_units)
+    data = AllocationData(application_round=application_round_with_reservation_units)
 
     dates = []
     start = datetime.datetime(2020, 1, 6, 10, 0)
@@ -70,7 +70,7 @@ def test_should_map_application_events(
 
 @pytest.mark.django_db
 def test_should_handle_none_max_duration(
-    application_period_with_reservation_units,
+    application_round_with_reservation_units,
     application_with_reservation_units,
     recurring_application_event,
     scheduled_for_monday,
@@ -79,7 +79,7 @@ def test_should_handle_none_max_duration(
     recurring_application_event.max_duration = None
 
     recurring_application_event.save()
-    data = AllocationData(application_period=application_period_with_reservation_units)
+    data = AllocationData(application_round=application_round_with_reservation_units)
 
     hour = 60 // ALLOCATION_PRECISION
     assert data.allocation_events[0].min_duration == hour
@@ -87,20 +87,20 @@ def test_should_handle_none_max_duration(
 
 
 @pytest.mark.django_db
-def test_should_map_period_start_and_end_from_application_period(
-    application_period_with_reservation_units,
+def test_should_map_period_start_and_end_from_application_round(
+    application_round_with_reservation_units,
     application_with_reservation_units,
     recurring_application_event,
     scheduled_for_monday,
 ):
 
-    data = AllocationData(application_period=application_period_with_reservation_units)
+    data = AllocationData(application_round=application_round_with_reservation_units)
 
     assert (
         data.allocation_events[0].period_start
-        == application_with_reservation_units.application_period.reservation_period_begin
+        == application_with_reservation_units.application_round.reservation_period_begin
     )
     assert (
         data.allocation_events[0].period_end
-        == application_with_reservation_units.application_period.reservation_period_end
+        == application_with_reservation_units.application_round.reservation_period_end
     )

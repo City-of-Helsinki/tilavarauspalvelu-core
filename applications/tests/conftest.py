@@ -6,25 +6,25 @@ from applications.models import (
     Application,
     ApplicationEvent,
     ApplicationEventSchedule,
-    ApplicationPeriod,
+    ApplicationRound,
 )
 
 
 @pytest.fixture
-def default_application_period() -> ApplicationPeriod:
-    return ApplicationPeriod.objects.create(
+def default_application_round() -> ApplicationRound:
+    return ApplicationRound.objects.create(
         application_period_begin=datetime.date(year=2020, month=1, day=1),
         application_period_end=datetime.date(year=2020, month=8, day=30),
         reservation_period_begin=datetime.date(year=2020, month=1, day=1),
         reservation_period_end=datetime.date(year=2020, month=8, day=30),
+        public_display_begin=datetime.date(year=2020, month=1, day=1),
+        public_display_end=datetime.date(year=2020, month=8, day=30),
     )
 
 
 @pytest.fixture
-def minimal_application(default_application_period) -> Application:
-    return Application.objects.create(
-        application_period_id=default_application_period.id
-    )
+def minimal_application(default_application_round) -> Application:
+    return Application.objects.create(application_round_id=default_application_round.id)
 
 
 @pytest.fixture

@@ -3,6 +3,7 @@ from typing import Optional
 
 import recurrence
 from django.contrib.auth.models import User
+from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.utils.text import format_lazy
 from django.utils.translation import gettext_lazy as _
@@ -114,22 +115,76 @@ class PRIORITY_CONST(object):
 PRIORITIES = PRIORITY_CONST()
 
 
-class ApplicationPeriod(models.Model):
+class ApplicationRoundStatus(models.Model):
+    DRAFT = "draft"
+    PUBLISHED = "published"
+
+    STATUS_CHOICES = (
+        (DRAFT, _("Draft")),
+        (PUBLISHED, _("Published")),
+    )
+
+    status = models.CharField(
+        max_length=20, verbose_name=_("Status"), choices=STATUS_CHOICES
+    )
+
+    application_round = models.ForeignKey(
+        "ApplicationRound",
+        verbose_name=_("Application round"),
+        on_delete=models.CASCADE,
+        null=False,
+        related_name="statuses",
+    )
+
+    user = models.ForeignKey(
+        User,
+        verbose_name=_("User"),
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+    )
+
+    timestamp = models.DateTimeField(verbose_name=_("Timestamp"), auto_now_add=True)
+
+    @classmethod
+    def get_statuses(cls):
+        return [s[0] for s in cls.STATUS_CHOICES]
+
+    def __str__(self):
+        return "{} ({})".format(self.get_status_display(), self.application.id)
+
+
+class ApplicationRound(models.Model):
+    TARGET_GROUP_INTERNAL = "internal"
+    TARGET_GROUP_PUBLIC = "public"
+    TARGET_GROUP_ALL = "all"
+
+    TARGET_GROUP_CHOICES = (
+        (TARGET_GROUP_INTERNAL, _("Internal")),
+        (TARGET_GROUP_PUBLIC, _("Public")),
+        (TARGET_GROUP_ALL, _("All")),
+    )
+
     name = models.CharField(
         verbose_name=_("Name"),
         max_length=255,
     )
+
+    target_group = models.CharField(
+        max_length=50, verbose_name=_("Target group"), choices=TARGET_GROUP_CHOICES
+    )
+
     reservation_units = models.ManyToManyField(
         ReservationUnit,
         verbose_name=_("Reservation units"),
-        related_name="application_periods",
+        related_name="application_rounds",
     )
 
     application_period_begin = models.DateTimeField(
-        verbose_name=_("Application period begin"),
+        verbose_name=_("Application round begin"),
     )
     application_period_end = models.DateTimeField(
-        verbose_name=_("Application period end"),
+        verbose_name=_("Application round end"),
     )
 
     reservation_period_begin = models.DateField(
@@ -139,17 +194,100 @@ class ApplicationPeriod(models.Model):
         verbose_name=_("Reservation period end"),
     )
 
+    public_display_begin = models.DateTimeField(
+        verbose_name=_("Public display begin"),
+    )
+    public_display_end = models.DateTimeField(
+        verbose_name=_("Public display end"),
+    )
+
     purposes = models.ManyToManyField(
         Purpose,
         verbose_name=_("Purposes"),
-        related_name="application_periods",
+        related_name="application_rounds",
         blank=True,
     )
+
+    service_sector = models.ForeignKey(
+        "spaces.ServiceSector",
+        verbose_name=_("Service sector"),
+        null=True,
+        blank=False,
+        on_delete=models.SET_NULL,
+    )
+
+    @property
+    def status(self):
+        return self.get_status().status
+
+    @status.setter
+    def status(self, status):
+        self.set_status(status)
+
+    @status.getter
+    def status(self):
+        return self.get_status().status
+
+    def set_status(self, status, user=None):
+        if status not in ApplicationRoundStatus.get_statuses():
+            raise ValidationError(_("Invalid status"))
+        ApplicationRoundStatus.objects.create(
+            application_round=self, status=status, user=user
+        )
+
+    def get_status(self):
+        return self.statuses.last()
 
     def __str__(self):
         return "{} ({} - {})".format(
             self.name, self.reservation_period_begin, self.reservation_period_end
         )
+
+
+class ApplicationRoundBasket(models.Model):
+    CUSTOMER_TYPE_BUSINESS = "business"
+    CUSTOMER_TYPE_NONPROFIT = "nonprofit"
+    CUSTOMER_TYPE_INDIVIDUAL = "individual"
+
+    CUSTOMER_TYPE_CHOICES = (
+        (CUSTOMER_TYPE_BUSINESS, _("Business")),
+        (CUSTOMER_TYPE_NONPROFIT, _("Nonprofit")),
+        (CUSTOMER_TYPE_INDIVIDUAL, _("Individual")),
+    )
+
+    name = models.CharField(
+        verbose_name=_("Name"),
+        max_length=255,
+    )
+    application_round = models.ForeignKey(
+        ApplicationRound,
+        verbose_name=_("Application round"),
+        on_delete=models.CASCADE,
+        related_name="application_round_baskets",
+    )
+
+    purpose = models.ForeignKey(
+        "reservation_units.Purpose",
+        verbose_name=_("Purpose"),
+        related_name="application_round_baskets",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+    )
+    must_be_main_purpose_of_applicant = models.BooleanField(
+        verbose_name=_("Must be main purpose of the applicant"), default=False
+    )
+    customer_type = ArrayField(
+        models.CharField(max_length=50, choices=CUSTOMER_TYPE_CHOICES),
+    )
+    age_groups = models.ManyToManyField("reservations.AgeGroup")
+    home_city = models.CharField(max_length=255)
+    allocation_percentage = models.PositiveSmallIntegerField(
+        verbose_name=_("Allocation percentage"), default=0
+    )
+
+    def __str__(self):
+        return "{} ({})".format(self.name, self.application_round.name)
 
 
 class ApplicationStatus(models.Model):
@@ -276,8 +414,8 @@ class Application(models.Model):
         on_delete=models.PROTECT,
     )
 
-    application_period = models.ForeignKey(
-        ApplicationPeriod,
+    application_round = models.ForeignKey(
+        ApplicationRound,
         verbose_name=_("Applicantion period"),
         null=False,
         blank=False,

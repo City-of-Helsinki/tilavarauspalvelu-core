@@ -5,6 +5,8 @@ from .models import (
     Application,
     ApplicationEvent,
     ApplicationEventStatus,
+    ApplicationRound,
+    ApplicationRoundStatus,
     ApplicationStatus,
 )
 
@@ -27,5 +29,18 @@ def create_application_event_status(sender, instance, **kwargs):
             ApplicationEventStatus.objects.create(
                 application_event=instance,
                 status=ApplicationEventStatus.CREATED,
+                user=None,
+            )
+
+
+@receiver(
+    post_save, sender=ApplicationRound, dispatch_uid="create_application_round_status"
+)
+def create_application_round_status(sender, instance, **kwargs):
+    if kwargs.get("created", False):
+        if not instance.statuses.all().exists():
+            ApplicationRoundStatus.objects.create(
+                application_round=instance,
+                status=ApplicationRoundStatus.DRAFT,
                 user=None,
             )

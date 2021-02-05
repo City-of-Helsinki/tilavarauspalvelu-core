@@ -1,6 +1,6 @@
 from rest_framework import routers
 
-from .application_period_api import ApplicationPeriodViewSet
+from .application_round_api import ApplicationRoundViewSet
 from .applications_api import ApplicationEventViewSet, ApplicationViewSet
 from .reservation_units_api import (
     EquipmentCategoryViewSet,
@@ -20,7 +20,7 @@ router.register(r"resource", ResourceViewSet, "resource")
 router.register(r"reservation", ReservationViewSet, "reservation")
 router.register(r"application", ApplicationViewSet, "application")
 router.register(r"application_event", ApplicationEventViewSet, "application_event")
-router.register(r"application_period", ApplicationPeriodViewSet, "application_period")
+router.register(r"application_round", ApplicationRoundViewSet, "application_round")
 router.register(r"parameters/district", DistrictViewSet, "district")
 router.register(r"parameters/purpose", PurposeViewSet, "purpose")
 router.register(r"parameters/age_group", AgeGroupViewSet, "age_group")

@@ -9,7 +9,8 @@ from rest_framework.test import APIClient
 from applications.models import (
     Application,
     ApplicationEvent,
-    ApplicationPeriod,
+    ApplicationRound,
+    ApplicationRoundBasket,
     Organisation,
     Person,
     Recurrence,
@@ -22,7 +23,7 @@ from reservation_units.models import (
 )
 from reservations.models import AbilityGroup, AgeGroup, Reservation, ReservationPurpose
 from resources.models import Resource
-from spaces.models import District, Location, Space
+from spaces.models import District, Location, ServiceSector, Space
 
 
 @pytest.fixture(autouse=True)
@@ -71,6 +72,11 @@ def space(location, parent_space):
 @pytest.fixture
 def child_space(location, space):
     return Space.objects.create(name="Child space", location=location, parent=space)
+
+
+@pytest.fixture
+def service_sector():
+    return ServiceSector.objects.create(name="Test service sector")
 
 
 @pytest.fixture
@@ -128,18 +134,22 @@ def reservation_unit2(resource):
 
 
 @pytest.fixture
-def application_period(reservation_unit) -> ApplicationPeriod:
-    application_period = ApplicationPeriod.objects.create(
+def application_round(reservation_unit, purpose, service_sector) -> ApplicationRound:
+    application_round = ApplicationRound.objects.create(
         name="Nuorten liikuntavuorot kevät 2021",
         application_period_begin=timezone.datetime(2021, 1, 1, 0, 0, 0).astimezone(),
         application_period_end=timezone.datetime(2021, 1, 31, 0, 0, 0).astimezone(),
         reservation_period_begin=timezone.datetime(2021, 1, 1, 0, 0, 0).astimezone(),
         reservation_period_end=timezone.datetime(2021, 6, 1, 0, 0, 0).astimezone(),
+        public_display_begin=timezone.datetime(2021, 6, 1, 0, 0, 0).astimezone(),
+        public_display_end=timezone.datetime(2021, 6, 1, 0, 0, 0).astimezone(),
+        service_sector=service_sector,
     )
 
-    application_period.reservation_units.set([reservation_unit])
+    application_round.reservation_units.set([reservation_unit])
+    application_round.purposes.set([purpose])
 
-    return application_period
+    return application_round
 
 
 @pytest.fixture
@@ -184,6 +194,42 @@ def valid_reservation_data(reservation_unit):
         "buffer_time_before": "10",
         "buffer_time_after": "10",
         "reservation_unit": [reservation_unit.id],
+    }
+
+
+@pytest.fixture
+def valid_application_round_data(
+    reservation_unit,
+    reservation_unit2,
+    service_sector,
+    purpose,
+    purpose2,
+    ten_to_15_age_group,
+):
+    """ Valid JSON data for creating a new application round """
+    return {
+        "name": "Kevään nuorten säännöllisten vuorojen haku 2021",
+        "reservation_unit_ids": [reservation_unit.id, reservation_unit2.id],
+        "application_period_begin": "2020-01-01T08:00",
+        "application_period_end": "2020-01-31T09:00",
+        "reservation_period_begin": "2021-02-01",
+        "reservation_period_end": "2021-06-01",
+        "public_display_begin": "2020-11-10T08:00",
+        "public_display_end": "2021-11-10T08:00",
+        "purpose_ids": [purpose.id, purpose2.id],
+        "service_sector_id": service_sector.id,
+        "status": "draft",
+        "application_round_baskets": [
+            {
+                "name": "Yleishyödylliset yhdistykset",
+                "purpose_id": purpose.id,
+                "must_be_main_purpose_of_applicant": False,
+                "customer_type": [ApplicationRoundBasket.CUSTOMER_TYPE_NONPROFIT],
+                "age_group_ids": [ten_to_15_age_group.id],
+                "home_city": "Helsinki",
+                "allocation_percentage": 100,
+            }
+        ],
     }
 
 
@@ -241,11 +287,11 @@ def person() -> Person:
 
 
 @pytest.fixture
-def application(purpose, organisation, person, application_period, user) -> Application:
+def application(purpose, organisation, person, application_round, user) -> Application:
     application = Application.objects.create(
         organisation=organisation,
         contact_person=person,
-        application_period=application_period,
+        application_round=application_round,
         user=user,
     )
     return application
