@@ -62,7 +62,8 @@
     "start-server:prod": "nodemon ./server-prod/index.js",
     "start-server:dev": "nodemon ./server-build/index.js",
     "start:dev": "yarn build:dev && npm-run-all --parallel build-server:dev start-server:dev",
-    "test:e2e-local": "testcafe --skip-js-errors \"chrome --window-size='1920,1080'\" e2e/tests"
+    "test:e2e-local": "testcafe --skip-js-errors \"chrome --window-size='1920,1080'\" e2e/tests",
+    "test:axe-local": "testcafe --skip-js-errors \"chrome --window-size='1920,1080'\" e2e/accessibility"
   },
   "eslintConfig": {
     "extends": [
@@ -83,12 +84,12 @@
     ]
   },
   "devDependencies": {
-    "nodemon": "2.0.4",
     "autoprefixer": "^10.1.0",
+    "axe-testcafe": "^3.0.0",
     "eslint-plugin-testcafe": "^0.2.1",
     "husky": ">=4",
     "lint-staged": ">=10",
-    "npm-run-all": "4.1.5",
+    "nodemon": "2.0.4",
     "prettier": "^2.2.0",
     "stylelint": "^13.8.0",
     "stylelint-config-recommended": "^3.0.0",

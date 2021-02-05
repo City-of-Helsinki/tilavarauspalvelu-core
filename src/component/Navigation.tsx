@@ -43,9 +43,12 @@ const Navigation = (): JSX.Element => {
         />
       </HDSNavigation.Row>
       <HDSNavigation.Actions>
-        <HDSNavigation.User authenticated label="Kirjaudu">
+        <HDSNavigation.User
+          authenticated
+          label={t('common.login')}
+          buttonAriaLabel="kirjaudu">
           <HDSNavigation.Item
-            label="Profiili"
+            label={t('common.login')}
             href="https://hel.fi"
             target="_blank"
             variant="primary"

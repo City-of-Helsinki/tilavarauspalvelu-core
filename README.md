@@ -60,7 +60,11 @@ See the section about [running tests](https://facebook.github.io/create-react-ap
 
 ### `yarn test:e2e-local`
 
-Runs end to end tests againt local setup. Both ui and api must be running before running the tests.
+Runs end to end tests against local setup. Both ui and api must be running before running this script.
+
+### `yarn test:axe-local`
+
+Runs accessibility tests against local setup. Both ui and api must be running before running this script.
 
 ### `yarn build`
 

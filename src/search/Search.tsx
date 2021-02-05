@@ -73,9 +73,7 @@ const Search = (): JSX.Element => {
         </Container>
       </HeadContainer>
       <StyledKoros type="wave" className="koros" flipHorizontal />
-      <Container main>
-        <SearchResultList reservationUnits={reservationUnits} />
-      </Container>
+      <SearchResultList reservationUnits={reservationUnits} />
     </>
   );
 };

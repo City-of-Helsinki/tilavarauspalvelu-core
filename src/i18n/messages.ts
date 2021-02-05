@@ -115,6 +115,7 @@ const translations: Translations = {
     sunday: ['Sunnuntai'],
   },
   common: {
+    applicationNavigationName: ['Hakemus', 'Application', 'Ansökan'],
     applicationName: ['Varaamo', 'Varaamo', 'Varaamo'],
     selectReservationUnit: ['Valitse tila'],
     favourite: ['Suosikki', 'Favourite', 'Favorit'],
@@ -131,8 +132,18 @@ const translations: Translations = {
     abbreviations: {
       hour: ['t', 'h', 'h'],
     },
+    login: ['Kirjaudu', 'Login', 'Logga in'],
     imgAltForSpace: ['Kuva tilasta {{name}}'],
   },
+  reservationUnit: {
+    type: ['Tyyppi', 'Type', 'Typ'],
+    maxPersons: ['Suurin sallittu henkilömäärä', 'Max persons', 'Max personer'],
+    address: ['Osoite', 'Address', 'Adress'],
+    maxDuration: ['Varauksen kesto', 'Duration of reservation', 'Bokningstid'],
+    price: ['Hinta', 'Price', 'Pris'],
+    billableHours: ['Maksulliset tunnit', 'Billable hours', 'Betalda timmar'],
+  },
+
   Navigation: {
     Item: {
       spaceReservation: ['Vakiovuorot'],

@@ -67,28 +67,37 @@ const ApplicationPage = ({
       />
       <Container main>
         <InnerContainer>
-          <NavigationContainer>
+          <NavigationContainer
+            aria-label={t('common.applicationNavigationName')}>
             <ul>
-              <StyledNavLink
-                activeClassName={activeClassName}
-                to={`${match.url}/page1`}>
-                <li>{t('ApplicationPage.navigation.page1')}</li>
-              </StyledNavLink>
-              <StyledNavLink
-                activeClassName={activeClassName}
-                to={`${match.url}/page2`}>
-                <li>{t('ApplicationPage.navigation.page2')}</li>
-              </StyledNavLink>
-              <StyledNavLink
-                activeClassName={activeClassName}
-                to={`${match.url}/page3`}>
-                <li>{t('ApplicationPage.navigation.page3')}</li>
-              </StyledNavLink>
-              <StyledNavLink
-                activeClassName={activeClassName}
-                to={`${match.url}/preview`}>
-                <li>{t('ApplicationPage.navigation.preview')}</li>
-              </StyledNavLink>
+              <li>
+                <StyledNavLink
+                  activeClassName={activeClassName}
+                  to={`${match.url}/page1`}>
+                  {t('ApplicationPage.navigation.page1')}
+                </StyledNavLink>
+              </li>
+              <li>
+                <StyledNavLink
+                  activeClassName={activeClassName}
+                  to={`${match.url}/page2`}>
+                  {t('ApplicationPage.navigation.page2')}
+                </StyledNavLink>
+              </li>
+              <li>
+                <StyledNavLink
+                  activeClassName={activeClassName}
+                  to={`${match.url}/page3`}>
+                  {t('ApplicationPage.navigation.page3')}
+                </StyledNavLink>
+              </li>
+              <li>
+                <StyledNavLink
+                  activeClassName={activeClassName}
+                  to={`${match.url}/preview`}>
+                  {t('ApplicationPage.navigation.preview')}
+                </StyledNavLink>
+              </li>
             </ul>
           </NavigationContainer>
           <div>{children}</div>
