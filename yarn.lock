@@ -2976,6 +2976,13 @@ axe-core@^4.0.2:
   resolved "https://registry.yarnpkg.com/axe-core/-/axe-core-4.1.1.tgz#70a7855888e287f7add66002211a423937063eaf"
   integrity sha512-5Kgy8Cz6LPC9DJcNb3yjAXTu3XihQgEdnIg50c//zOC/MyLP0Clg+Y8Sh9ZjjnvBrDZU4DgXS9C3T9r4/scGZQ==
 
+axe-testcafe@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/axe-testcafe/-/axe-testcafe-3.0.0.tgz#6bd0c6db10c45437fc29d1aba2e0fa64410b2dac"
+  integrity sha512-zcDXA5oDYQSWRJHD/WTy9P79RkrO2m/N81x3eL158/GFzLbqUW/aRE538MwoSknmglh73SXs/ChRUwxDx6AgkA==
+  dependencies:
+    chalk "^2.4.1"
+
 axios-case-converter@^0.6.0:
   version "0.6.0"
   resolved "https://registry.yarnpkg.com/axios-case-converter/-/axios-case-converter-0.6.0.tgz#7a99120138046ad6faaf1fc2b638fea0fe63f26f"

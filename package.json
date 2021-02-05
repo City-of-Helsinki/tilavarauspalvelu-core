@@ -85,6 +85,7 @@
   },
   "devDependencies": {
     "autoprefixer": "^10.1.0",
+    "axe-testcafe": "^3.0.0",
     "eslint-plugin-testcafe": "^0.2.1",
     "husky": ">=4",
     "lint-staged": ">=10",
