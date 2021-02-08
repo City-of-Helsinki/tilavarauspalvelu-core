@@ -19,7 +19,7 @@ from applications.models import (
     Person,
     Recurrence,
 )
-from reservation_units.models import Purpose
+from reservation_units.models import Purpose, ReservationUnit
 from reservations.models import AbilityGroup, AgeGroup
 
 MINIMUM_TIME = timezone.datetime(
@@ -145,7 +145,7 @@ class DateAwareRecurrenceReadSerializer(serializers.ModelSerializer):
 class EventReservationUnitSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(allow_null=True, required=False)
     reservation_unit_id = serializers.PrimaryKeyRelatedField(
-        read_only=True,
+        queryset=ReservationUnit.objects.all(),
         source="reservation_unit",
         help_text="Id of the reservation unit requested for the event.",
     )
