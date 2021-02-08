@@ -182,7 +182,7 @@ export type ApplicationEvent = {
     | 'validated'
     | 'approved'
     | 'declined'
-    | 'cacelled';
+    | 'cancelled';
 };
 
 export type EventReservationUnit = {
