@@ -443,9 +443,17 @@ class EventReservationUnit(models.Model):
     )
 
 
-class EventOccurence(object):
-    def __init__(self, weekday: int, occurrences: [datetime.datetime]):
+class EventOccurrence(object):
+    def __init__(
+        self,
+        weekday: int,
+        begin: datetime.time,
+        end: datetime.time,
+        occurrences: [datetime.datetime],
+    ):
         self.weekday = weekday
+        self.begin = begin
+        self.end = end
         self.occurrences = occurrences
 
 
@@ -486,7 +494,7 @@ class ApplicationEventSchedule(models.Model):
         related_name="application_event_schedules",
     )
 
-    def get_occurences(self) -> [EventOccurence]:
+    def get_occurences(self) -> [EventOccurrence]:
         self.day
         first_matching_day = next_or_current_matching_weekday(
             self.application_event.begin, self.day
@@ -520,7 +528,12 @@ class ApplicationEventSchedule(models.Model):
                 myrule,
             ],
         )
-        return EventOccurence(weekday=self.day, occurrences=list(pattern.occurrences()))
+        return EventOccurrence(
+            weekday=self.day,
+            begin=self.begin,
+            end=self.end,
+            occurrences=list(pattern.occurrences()),
+        )
 
 
 class Recurrence(models.Model):

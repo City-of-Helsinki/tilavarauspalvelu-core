@@ -157,8 +157,8 @@ def multiple_applications(
             for schedule in event["schedules"]:
                 created_schedule = ApplicationEventSchedule.objects.create(
                     day=schedule["day"],
-                    begin="10:00",
-                    end="12:00",
+                    begin=schedule["start"] if "start" in schedule else "10:00",
+                    end=schedule["end"] if "end" in schedule else "22:00",
                     application_event=created_event,
                 )
 

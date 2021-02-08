@@ -1,8 +1,10 @@
 import datetime
+import math
+from typing import Dict
 
 from django.utils import timezone
 
-from applications.models import ApplicationEvent, ApplicationPeriod
+from applications.models import ApplicationEvent, ApplicationPeriod, EventOccurrence
 from reservation_units.models import ReservationUnit
 
 
@@ -17,7 +19,7 @@ ALLOCATION_PRECISION = 15
 
 
 def time_delta_to_integer_with_precision(delta: datetime.timedelta):
-    return round(delta.total_seconds() // 60 // ALLOCATION_PRECISION)
+    return math.ceil(delta.total_seconds() / 60 / ALLOCATION_PRECISION)
 
 
 class AllocationSpace(object):
@@ -65,6 +67,20 @@ class AllocationSpace(object):
         self.available_times.append(AvailableTime(start_delta, end_delta))
 
 
+class AllocationOccurrence(object):
+    def __init__(self, occurrence: EventOccurrence):
+        self.weekday = occurrence.weekday
+        self.begin = time_delta_to_integer_with_precision(
+            datetime.datetime.combine(datetime.date.min, occurrence.begin)
+            - datetime.datetime.min
+        )
+        self.end = time_delta_to_integer_with_precision(
+            datetime.datetime.combine(datetime.date.min, occurrence.end)
+            - datetime.datetime.min
+        )
+        self.occurrences = occurrence.occurrences
+
+
 class AllocationEvent(object):
     def __init__(
         self,
@@ -79,7 +95,9 @@ class AllocationEvent(object):
             )
         )
         self.id = application_event.id
-        self.occurrences = application_event.get_all_occurrences()
+        self.occurrences = self.occurrences_to_integers_with_precision(
+            application_event.get_all_occurrences()
+        )
         self.begin = application_event.begin
         self.end = application_event.begin
         self.period_start = period_start
@@ -93,6 +111,15 @@ class AllocationEvent(object):
             else application_event.min_duration
         )
         self.events_per_week = application_event.events_per_week
+
+    @staticmethod
+    def occurrences_to_integers_with_precision(
+        occurrences: Dict[int, EventOccurrence]
+    ) -> Dict[int, int]:
+        allocation_occurrences = {}
+        for occurrence_id, occurrence in occurrences.items():
+            allocation_occurrences[occurrence_id] = AllocationOccurrence(occurrence)
+        return allocation_occurrences
 
 
 class AllocationData(object):

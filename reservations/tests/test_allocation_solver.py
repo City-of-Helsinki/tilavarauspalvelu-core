@@ -2,6 +2,7 @@ import datetime
 
 import pytest
 
+from applications.models import EventReservationUnit
 from reservations.allocation_models import AllocationData
 from reservations.allocation_solver import AllocationSolver
 
@@ -140,3 +141,299 @@ def test_should_only_give_requested_number_of_events(
     # Requested 1 event per week with 3 possible times
     assert len(solution) == 1
     assert solution[0].duration == datetime.timedelta(minutes=15)
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "multiple_applications",
+    (
+        [
+            {
+                "applications": [
+                    {
+                        "events": [
+                            {
+                                "duration": 60,
+                                "events_per_week": 1,
+                                "schedules": [
+                                    {"day": 0, "start": "10:00", "end": "10:30"}
+                                ],
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    ),
+    indirect=True,
+)
+def test_should_not_allocate_if_given_timeframe_cant_contain_duration(
+    application_period_with_reservation_units, multiple_applications
+):
+    data = AllocationData(application_period=application_period_with_reservation_units)
+
+    solver = AllocationSolver(allocation_data=data)
+
+    solution = solver.solve()
+
+    assert len(solution) == 0
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "multiple_applications",
+    (
+        [
+            {
+                "applications": [
+                    {
+                        "events": [
+                            {
+                                "duration": 60,
+                                "events_per_week": 1,
+                                "schedules": [
+                                    {"day": 0, "start": "10:00", "end": "10:30"},
+                                    {"day": 0, "start": "18:00", "end": "20:00"},
+                                ],
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    ),
+    indirect=True,
+)
+def test_should_be_able_to_allocate_if_long_enough_slot_with_too_small_slot(
+    application_period_with_reservation_units, multiple_applications
+):
+    data = AllocationData(application_period=application_period_with_reservation_units)
+
+    solver = AllocationSolver(allocation_data=data)
+
+    solution = solver.solve()
+
+    assert len(solution) == 1
+    assert len(solution) == 1
+    start_times = []
+    for sol in solution:
+        start_times.append(sol.begin)
+
+    assert start_times == [datetime.time(hour=18, minute=0)]
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "multiple_applications",
+    (
+        [
+            {
+                "applications": [
+                    {
+                        "events": [
+                            {
+                                "duration": 60,
+                                "events_per_week": 1,
+                                "schedules": [
+                                    {"day": 0, "start": "10:00", "end": "12:00"}
+                                ],
+                            },
+                            {
+                                "duration": 60,
+                                "events_per_week": 1,
+                                "schedules": [
+                                    {"day": 0, "start": "10:00", "end": "12:00"}
+                                ],
+                            },
+                        ]
+                    }
+                ]
+            }
+        ]
+    ),
+    indirect=True,
+)
+def test_should_start_and_end_between_requested_times_and_not_overlap_in_space(
+    application_period_with_reservation_units, multiple_applications
+):
+    data = AllocationData(application_period=application_period_with_reservation_units)
+
+    solver = AllocationSolver(allocation_data=data)
+
+    solution = solver.solve()
+
+    assert len(solution) == 2
+    start_times = []
+    end_times = []
+    for sol in solution:
+        start_times.append(sol.begin)
+        end_times.append(sol.end)
+
+    assert start_times == [
+        datetime.time(hour=10, minute=0),
+        datetime.time(hour=11, minute=0),
+    ]
+    assert end_times == [
+        datetime.time(hour=11, minute=0),
+        datetime.time(hour=12, minute=0),
+    ]
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "multiple_applications",
+    (
+        [
+            {
+                "applications": [
+                    {
+                        "events": [
+                            {
+                                "duration": 60,
+                                "events_per_week": 1,
+                                "schedules": [
+                                    {"day": 0, "start": "10:00", "end": "11:00"}
+                                ],
+                            },
+                            {
+                                "duration": 60,
+                                "events_per_week": 1,
+                                "schedules": [
+                                    {"day": 0, "start": "10:00", "end": "11:00"}
+                                ],
+                            },
+                        ]
+                    }
+                ]
+            }
+        ]
+    ),
+    indirect=True,
+)
+def test_should_not_allocate_if_events_need_to_overlap(
+    application_period_with_reservation_units, multiple_applications
+):
+    data = AllocationData(application_period=application_period_with_reservation_units)
+
+    solver = AllocationSolver(allocation_data=data)
+
+    solution = solver.solve()
+
+    assert len(solution) == 1
+    start_times = []
+    for sol in solution:
+        start_times.append(sol.begin)
+
+    assert start_times == [datetime.time(hour=10, minute=0)]
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "multiple_applications",
+    (
+        [
+            {
+                "applications": [
+                    {
+                        "events": [
+                            {
+                                "duration": 60,
+                                "events_per_week": 1,
+                                "schedules": [
+                                    {"day": 0, "start": "10:00", "end": "11:00"}
+                                ],
+                            },
+                            {
+                                "duration": 60,
+                                "events_per_week": 1,
+                                "schedules": [
+                                    {"day": 0, "start": "10:00", "end": "11:00"}
+                                ],
+                            },
+                        ]
+                    }
+                ]
+            }
+        ]
+    ),
+    indirect=True,
+)
+def test_events_can_overlap_in_different_units(
+    application_period_with_reservation_units,
+    multiple_applications,
+    second_reservation_unit,
+    reservation_unit,
+):
+    application_period_with_reservation_units.reservation_units.set(
+        [reservation_unit, second_reservation_unit]
+    )
+
+    for application in application_period_with_reservation_units.applications.all():
+
+        for event in application.application_events.all():
+            unit_one = event.event_reservation_units.all()[0]
+            unit_two = EventReservationUnit.objects.create(
+                priority=100,
+                application_event=event,
+                reservation_unit=second_reservation_unit,
+            )
+            event.event_reservation_units.set([unit_one, unit_two])
+            event.save()
+
+        application_period_with_reservation_units.save()
+
+    data = AllocationData(application_period=application_period_with_reservation_units)
+
+    solver = AllocationSolver(allocation_data=data)
+
+    solution = solver.solve()
+
+    assert len(solution) == 2
+    start_times = []
+    end_times = []
+    for sol in solution:
+        start_times.append(sol.begin)
+        end_times.append(sol.end)
+
+    assert start_times == [
+        datetime.time(hour=10, minute=0),
+        datetime.time(hour=10, minute=0),
+    ]
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "multiple_applications",
+    (
+        [
+            {
+                "applications": [
+                    {
+                        "events": [
+                            {
+                                "duration": 60,
+                                "events_per_week": 1,
+                                "schedules": [
+                                    {"day": 0, "start": "10:18", "end": "12:00"}
+                                ],
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    ),
+    indirect=True,
+)
+def test_should_allocate_with_15_minutes_precision_rounded_up(
+    application_period_with_reservation_units, multiple_applications
+):
+    data = AllocationData(application_period=application_period_with_reservation_units)
+
+    solver = AllocationSolver(allocation_data=data)
+
+    solution = solver.solve()
+
+    assert len(solution) == 1
+    assert solution[0].begin == datetime.time(hour=10, minute=30)
+    assert solution[0].end == datetime.time(hour=11, minute=30)
