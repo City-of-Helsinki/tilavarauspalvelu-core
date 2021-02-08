@@ -1,7 +1,12 @@
 import i18next from 'i18next';
-import { Action, Application, ContactPerson } from '../common/types';
+import {
+  Action,
+  Application,
+  ApplicationEvent,
+  ContactPerson,
+} from '../common/types';
 
-const applicationEvent = (applicationId?: number) => ({
+const applicationEvent = (applicationId?: number): ApplicationEvent => ({
   name: i18next.t('Application.Page1.applicationEventName'),
   minDuration: 1,
   maxDuration: 1,
@@ -16,6 +21,7 @@ const applicationEvent = (applicationId?: number) => ({
   biweekly: false,
   eventReservationUnits: [],
   applicationEventSchedules: [],
+  status: 'created',
 });
 
 const reducer = (state: Application, action: Action): Application => {

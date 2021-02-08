@@ -142,7 +142,7 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
 
   const onSubmit = () => {
     // eslint-disable-next-line no-param-reassign
-    application.status = 'review';
+    application.status = 'in_review';
     onNext();
   };
 

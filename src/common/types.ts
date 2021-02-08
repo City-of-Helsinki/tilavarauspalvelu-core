@@ -128,7 +128,16 @@ export type Parameter = {
 
 export type Application = {
   id?: number;
-  status: 'draft' | 'review';
+  status:
+    | 'draft'
+    | 'in_review'
+    | 'review done'
+    | 'allocating'
+    | 'allocated'
+    | 'validated'
+    | 'approved'
+    | 'declined'
+    | 'cancelled';
   applicationPeriodId: number;
   organisation: Organisation | null;
   contactPerson: ContactPerson | null;
@@ -166,6 +175,14 @@ export type ApplicationEvent = {
   applicationId: number;
   eventReservationUnits: EventReservationUnit[];
   applicationEventSchedules: ApplicationEventSchedule[];
+  status:
+    | 'created'
+    | 'allocating'
+    | 'allocated'
+    | 'validated'
+    | 'approved'
+    | 'declined'
+    | 'cacelled';
 };
 
 export type EventReservationUnit = {
