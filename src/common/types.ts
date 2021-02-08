@@ -5,28 +5,29 @@ export type TranslationObject = {
 export type ApplicationPeriod = {
   id: number;
   name: string;
-  reservationUnits: number[];
+  reservationUnitsIds: number[];
   applicationPeriodBegin: string;
   applicationPeriodEnd: string;
   reservationPeriodBegin: string;
   reservationPeriodEnd: string;
-  purposes: number[];
+  purposeIds: number[];
 };
 
 export type Space = {
   id: number;
   locationType: 'fixed';
   name: TranslationObject;
-  parent: number;
-  building: number;
+  parentId: number;
+  buildingId: number;
   surfaceArea: null;
+  districtId: number;
 };
 
 export type Resource = {
   id: number;
   name: TranslationObject;
   locationType: 'fixed';
-  space: number;
+  spaceId: number;
   bufferTimeBefore: string;
   bufferTimeAfter: string;
 };
@@ -70,61 +71,6 @@ export type Parameter = {
   minimum?: number;
   maximum?: number;
 };
-
-/*
-{
-  "id": 45,
-  "organisation": {
-    "id": null,
-    "name": "123",
-    "identifier": "123",
-    "year_established": null
-  },
-  "application_period_id": 1,
-  "contact_person": {
-    "id": null,
-    "first_name": "123",
-    "last_name": "333",
-    "email": "",
-    "phone_number": ""
-  },
-  "application_events": [
-    {
-      "name": "sss433",
-      "application_event_schedules": [
-        {
-          "id": 38,
-          "day": 1,
-          "begin": "10:40",
-          "end": "16:30"
-        },
-        {
-          "day": 1,
-          "begin": "10:40",
-          "end": "16:30"
-        }
-      ],
-      "num_persons": null,
-      "age_group_id": 1,
-      "ability_group_id": 1,
-      "min_duration": 123,
-      "max_duration": 4444,
-      "application_id": 1,
-      "events_per_week": 1,
-      "biweekly": false,
-      "begin": "2015-01-1",
-      "end": "2020-01-01",
-      "purpose_id": 1,
-      "event_reservation_units": [
-        {
-          "priority": 22,
-          "reservation_unit": 1
-        }
-      ]
-    }
-  ]
-}
-*/
 
 export type Application = {
   id?: number;
@@ -187,7 +133,7 @@ export type ApplicationEvent = {
 
 export type EventReservationUnit = {
   priority: number;
-  reservationUnit: number;
+  reservationUnitId: number;
 };
 
 type DAY = 0 | 1 | 2 | 3 | 4 | 5 | 6;

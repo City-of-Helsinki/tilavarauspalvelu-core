@@ -229,7 +229,7 @@ const ReservationUnitList = ({
       data = selectedReservationUnits;
     } else {
       const promises = applicationEvent.eventReservationUnits.map((id) =>
-        getReservationUnit(id.reservationUnit)
+        getReservationUnit(id.reservationUnitId)
       );
       data = await Promise.all(promises);
     }
