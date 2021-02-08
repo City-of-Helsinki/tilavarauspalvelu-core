@@ -102,30 +102,11 @@ class AllocationSolver(object):
                         (space.id, allocation_event.id, occurence_id)
                     ] = model.NewBoolVar("x[%i,%i]" % (space_id, occurence_id))
 
-        # Each event is assigned to at most one space.
-        for event in self.allocation_events:
-            for occurrence_id, occurence in event.occurrences.items():
-                model.Add(
-                    sum(
-                        selected[(space_id, event.id, occurence_id)]
-                        for space_id, space in suitable_spaces_for_event(
-                            event, self.spaces
-                        ).items()
-                    )
-                    <= 1
-                )
+        self.constraint_allocation(model=model, selected=selected)
 
-        # Objective
-        model.Maximize(
-            sum(
-                selected[(space_id, event.id, occurrence_id)] * event.min_duration
-                for occurrence_id, occurrence in event.occurrences.items()
-                for event in self.allocation_events
-                for space_id, space in suitable_spaces_for_event(
-                    event, self.spaces
-                ).items()
-            )
-        )
+        self.contraint_by_events_per_week(model=model, selected=selected)
+        self.constraint_by_capacity(model=model, selected=selected)
+        self.maximize(model=model, selected=selected)
 
         printer = AllocationSolutionPrinter(
             model=model,
@@ -134,3 +115,60 @@ class AllocationSolver(object):
             selected=selected,
         )
         return printer.print_solution()
+
+    def constraint_by_capacity(self, model: cp_model.CpModel, selected: Dict):
+        # Event durations in each space do not exceed the capacity
+        model.Add(
+            sum(
+                selected[(space_id, event.id, event_occurrence_id)] * event.min_duration
+                for event in self.allocation_events
+                for event_occurrence_id, occurrence in event.occurrences.items()
+                for space_id, space in suitable_spaces_for_event(
+                    event, self.spaces
+                ).items()
+            )
+            # TODO: When we have opening times from hauki and/or model structure in place, replace with opening hours
+            # Now this is hard coded to each space being open for 10 hours daily
+            <= round(10 * 60 // ALLOCATION_PRECISION)
+        )
+
+    def contraint_by_events_per_week(self, model: cp_model.CpModel, selected: Dict):
+        # No more than requested events per week is allocated
+        for event in self.allocation_events:
+            for space_id, space in suitable_spaces_for_event(
+                event, self.spaces
+            ).items():
+                model.Add(
+                    sum(
+                        selected[(space_id, event.id, event_occurence_id)]
+                        for event_occurence_id, occurrence in event.occurrences.items()
+                    )
+                    <= event.events_per_week
+                )
+
+    def constraint_allocation(self, model: cp_model.CpModel, selected: Dict):
+        # Each event is assigned to at most one space.
+        for event in self.allocation_events:
+            for event_occurrence_id, occurence in event.occurrences.items():
+                model.Add(
+                    sum(
+                        selected[(space_id, event.id, event_occurrence_id)]
+                        for space_id, space in suitable_spaces_for_event(
+                            event, self.spaces
+                        ).items()
+                    )
+                    <= 1
+                )
+
+    # Objective
+    def maximize(self, model: cp_model.CpModel, selected: Dict):
+        model.Maximize(
+            sum(
+                selected[(space_id, event.id, event_occurrence_id)] * event.min_duration
+                for event in self.allocation_events
+                for event_occurrence_id, occurrence in event.occurrences.items()
+                for space_id, space in suitable_spaces_for_event(
+                    event, self.spaces
+                ).items()
+            )
+        )

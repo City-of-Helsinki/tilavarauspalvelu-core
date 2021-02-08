@@ -1,4 +1,5 @@
 import datetime
+from typing import Dict
 
 import pytest
 
@@ -126,3 +127,52 @@ def not_matching_event_reservation_unit(
         application_event=recurring_application_event,
         reservation_unit=second_reservation_unit,
     )
+
+
+@pytest.fixture
+def multiple_applications(
+    application_period_with_reservation_units, request, reservation_unit
+) -> Dict[str, list]:
+    applications = []
+    created_events = []
+    schedules = []
+
+    for application in request.param["applications"]:
+        created_application = Application.objects.create(
+            application_period_id=application_period_with_reservation_units.id
+        )
+        applications.append(created_application)
+        for event in application["events"]:
+            created_event = ApplicationEvent.objects.create(
+                application=created_application,
+                num_persons=10,
+                min_duration=datetime.timedelta(minutes=event["duration"]),
+                max_duration=datetime.timedelta(minutes=event["duration"]),
+                name="Football",
+                events_per_week=event["events_per_week"],
+                begin=datetime.date(year=2020, month=1, day=1),
+                end=datetime.date(year=2020, month=2, day=28),
+                biweekly=False,
+            )
+            for schedule in event["schedules"]:
+                created_schedule = ApplicationEventSchedule.objects.create(
+                    day=schedule["day"],
+                    begin="10:00",
+                    end="12:00",
+                    application_event=created_event,
+                )
+
+                schedules.append(created_schedule)
+            created_events.append(created_event)
+
+            EventReservationUnit.objects.create(
+                priority=100,
+                application_event=created_event,
+                reservation_unit=reservation_unit,
+            )
+
+    return {
+        "applications": applications,
+        "created_events": created_events,
+        "schedules": schedules,
+    }
