@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from django_filters import rest_framework as filters
 from drf_extra_fields.relations import PresentablePrimaryKeyRelatedField
 from drf_spectacular.utils import extend_schema
@@ -9,6 +10,8 @@ from reservations.models import STATE_CHOICES, AbilityGroup, AgeGroup, Reservati
 
 from .reservation_units_api import ReservationUnitSerializer
 
+User = get_user_model()
+
 
 class ReservationSerializer(serializers.ModelSerializer):
     reservation_unit = PresentablePrimaryKeyRelatedField(
@@ -17,6 +20,11 @@ class ReservationSerializer(serializers.ModelSerializer):
         queryset=ReservationUnit.objects.all(),
         help_text="Reservation units that are reserved by the reservation",
     )
+    user_id = serializers.PrimaryKeyRelatedField(
+        read_only=True,
+        source="user",
+        help_text="Id of user for this reservation.",
+    )
 
     class Meta:
         model = Reservation
@@ -24,7 +32,7 @@ class ReservationSerializer(serializers.ModelSerializer):
             "id",
             "state",
             "priority",
-            "user",
+            "user_id",
             "begin",
             "end",
             "buffer_time_before",
@@ -112,7 +120,7 @@ class ReservationViewSet(viewsets.ModelViewSet):
     )
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        serializer.save(user_id=self.request.user.pk)
 
 
 class AgeGroupSerializer(serializers.ModelSerializer):

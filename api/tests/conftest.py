@@ -197,7 +197,7 @@ def valid_resource_data(space):
             "en": "Test resource",
             "sv": "Test resursen",
         },
-        "space": space.pk,
+        "space_id": space.pk,
         "buffer_time_before": "00:05:00",
         "buffer_time_after": "00:05:00",
     }
@@ -307,7 +307,7 @@ def valid_application_event_schedule_data():
 
 @pytest.fixture
 def valid_event_reservation_unit_data(reservation_unit):
-    return {"priority": 22, "reservation_unit": reservation_unit.id}
+    return {"priority": 22, "reservation_unit_id": reservation_unit.id}
 
 
 @pytest.fixture

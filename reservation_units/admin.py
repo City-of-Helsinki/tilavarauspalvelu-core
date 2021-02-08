@@ -3,6 +3,8 @@ from django.contrib import admin
 from .models import (
     Day,
     DayPart,
+    Equipment,
+    EquipmentCategory,
     Period,
     Purpose,
     ReservationUnit,
@@ -50,3 +52,13 @@ class DayPartAdmin(admin.ModelAdmin):
 class PurposeAdmin(admin.ModelAdmin):
     model = Purpose
     fields = ["name"]
+
+
+@admin.register(Equipment)
+class EquipmentAdmin(admin.ModelAdmin):
+    model = Equipment
+
+
+@admin.register(EquipmentCategory)
+class EquipmentCategoryAdmin(admin.ModelAdmin):
+    model = EquipmentCategory

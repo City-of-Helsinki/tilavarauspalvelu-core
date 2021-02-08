@@ -1,11 +1,14 @@
 from django.contrib import admin
 
 from .models import (
+    Address,
     Application,
     ApplicationEvent,
     ApplicationPeriod,
     ApplicationStatus,
+    EventReservationUnit,
     Organisation,
+    Person,
     Recurrence,
 )
 
@@ -42,3 +45,18 @@ class RecurrenceAdmin(admin.ModelAdmin):
 @admin.register(ApplicationPeriod)
 class ApplicationPeriodAdmin(admin.ModelAdmin):
     model = ApplicationPeriod
+
+
+@admin.register(Address)
+class AddressAdmin(admin.ModelAdmin):
+    model = Address
+
+
+@admin.register(Person)
+class PersonAdmin(admin.ModelAdmin):
+    model = Person
+
+
+@admin.register(EventReservationUnit)
+class EventReservationUnitAdmin(admin.ModelAdmin):
+    model = EventReservationUnit

@@ -1,4 +1,4 @@
-from rest_framework import viewsets
+from rest_framework import serializers, viewsets
 
 from api.base import TranslatedModelSerializer
 from spaces.models import Building, District, Location, Space
@@ -28,39 +28,52 @@ class LocationSerializer(TranslatedModelSerializer):
 
 
 class SpaceSerializer(TranslatedModelSerializer):
+    parent_id = serializers.PrimaryKeyRelatedField(
+        queryset=Space.objects.all(),
+        source="parent",
+        help_text="Id of parent space for this space.",
+    )
+    building_id = serializers.PrimaryKeyRelatedField(
+        queryset=Building.objects.all(),
+        source="building",
+        help_text="Id of building for this space.",
+    )
+    district_id = serializers.PrimaryKeyRelatedField(
+        queryset=District.objects.all(),
+        source="district",
+        help_text="Id of district for this space.",
+    )
+
     class Meta:
         model = Space
-        fields = ["id", "name", "parent", "building", "surface_area", "district"]
+        fields = [
+            "id",
+            "name",
+            "parent_id",
+            "building_id",
+            "surface_area",
+            "district_id",
+        ]
         extra_kwargs = {
             "name": {
                 "help_text": "Name of the space.",
             },
-            "parent": {
-                "help_text": "Id of parent space for this space. "
-                "Spaces are represented as a tree hierarchy in this system.",
-            },
-            "building": {
-                "help_text": "Buffer time while reservation unit is unreservable before the reservation. "
-                "Dynamically calculated from spaces and resources.",
-            },
             "surface_area": {
                 "help_text": "Surface area of the space as square meters",
-            },
-            "district": {
-                "help_text": "Id of the district where this space is located.",
             },
         }
 
 
 class DistrictSerializer(TranslatedModelSerializer):
+    parent_id = serializers.PrimaryKeyRelatedField(
+        queryset=District.objects.all(),
+        source="parent",
+        help_text="Id of parent district for this district.",
+    )
+
     class Meta:
         model = District
-        fields = ["id", "district_type", "name", "parent"]
-        extra_kwargs = {
-            "parent": {
-                "help_text": "Id of parent district for this district.",
-            },
-        }
+        fields = ["id", "district_type", "name", "parent_id"]
 
 
 class DistrictViewSet(viewsets.ModelViewSet):

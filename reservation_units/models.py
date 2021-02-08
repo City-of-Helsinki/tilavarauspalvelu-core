@@ -13,6 +13,9 @@ Q = models.Q
 class EquipmentCategory(models.Model):
     name = models.CharField(verbose_name=_("Name"), max_length=200)
 
+    def __str__(self):
+        return self.name
+
 
 class Equipment(models.Model):
     name = models.CharField(verbose_name=_("Name"), max_length=200)
@@ -23,6 +26,9 @@ class Equipment(models.Model):
         on_delete=models.CASCADE,
         null=False,
     )
+
+    def __str__(self):
+        return self.name
 
 
 class ReservationUnitType(models.Model):
