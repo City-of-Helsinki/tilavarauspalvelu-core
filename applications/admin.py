@@ -4,6 +4,7 @@ from .models import (
     Address,
     Application,
     ApplicationEvent,
+    ApplicationEventStatus,
     ApplicationPeriod,
     ApplicationStatus,
     EventReservationUnit,
@@ -32,9 +33,14 @@ class OrganisationAdmin(admin.ModelAdmin):
     model = Organisation
 
 
+class ApplicationEventStatusInline(admin.TabularInline):
+    model = ApplicationEventStatus
+
+
 @admin.register(ApplicationEvent)
 class ApplicationEventAdmin(admin.ModelAdmin):
     model = ApplicationEvent
+    inlines = [ApplicationEventStatusInline]
 
 
 @admin.register(Recurrence)
