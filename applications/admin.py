@@ -6,6 +6,7 @@ from .models import (
     ApplicationEvent,
     ApplicationPeriod,
     ApplicationStatus,
+    EventReservationUnit,
     Organisation,
     Person,
     Recurrence,
@@ -54,3 +55,8 @@ class AddressAdmin(admin.ModelAdmin):
 @admin.register(Person)
 class PersonAdmin(admin.ModelAdmin):
     model = Person
+
+
+@admin.register(EventReservationUnit)
+class EventReservationUnitAdmin(admin.ModelAdmin):
+    model = EventReservationUnit

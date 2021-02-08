@@ -144,20 +144,22 @@ class DateAwareRecurrenceReadSerializer(serializers.ModelSerializer):
 
 class EventReservationUnitSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(allow_null=True, required=False)
+    reservation_unit_id = serializers.PrimaryKeyRelatedField(
+        read_only=True,
+        source="reservation_unit",
+        help_text="Id of the reservation unit requested for the event.",
+    )
 
     class Meta:
         model = EventReservationUnit
         fields = [
             "id",
             "priority",
-            "reservation_unit",
+            "reservation_unit_id",
         ]
         extra_kwargs = {
             "priority": {
                 "help_text": "Priority of this reservation unit for the event. Lower the number, higher the priority.",
-            },
-            "reservation_unit": {
-                "help_text": "Id of the reservation unit requested for the event.",
             },
         }
 
