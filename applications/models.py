@@ -293,13 +293,13 @@ class ApplicationRoundBasket(models.Model):
 class ApplicationStatus(models.Model):
     DRAFT = "draft"
     IN_REVIEW = "in_review"
-    REVIEW_DONE = "review done"
+    REVIEW_DONE = "review_done"
     ALLOCATING = "allocating"
     ALLOCATED = "allocated"
     VALIDATED = "validated"
-    APPROVED = "approved"
     DECLINED = "declined"
     CANCELLED = "cancelled"
+    HANDLED = "handled"
 
     STATUS_CHOICES = (
         (DRAFT, _("Draft")),
@@ -308,9 +308,9 @@ class ApplicationStatus(models.Model):
         (ALLOCATING, _("Allocating")),
         (ALLOCATED, _("Allocated")),
         (VALIDATED, _("Validated")),
-        (APPROVED, _("Approved")),
         (DECLINED, _("Declined")),
         (CANCELLED, _("Cancelled")),
+        (HANDLED, _("Handled")),
     )
 
     status = models.CharField(
@@ -437,7 +437,7 @@ class Application(models.Model):
 
     def set_status(self, status, user=None):
         if status not in ApplicationStatus.get_statuses():
-            raise ValidationError(_("Invalid status"))
+            raise ValidationError(_("Invalid application status"))
         ApplicationStatus.objects.create(application=self, status=status, user=user)
 
     def get_status(self):
@@ -542,7 +542,7 @@ class ApplicationEvent(models.Model):
 
     def set_status(self, status, user=None):
         if status not in ApplicationEventStatus.get_statuses():
-            raise ValidationError(_("Invalid status"))
+            raise ValidationError(_("Invalid application event status"))
         ApplicationEventStatus.objects.create(
             application_event=self, status=status, user=user
         )
