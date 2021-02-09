@@ -4,7 +4,7 @@ from typing import Dict
 
 from django.utils import timezone
 
-from applications.models import ApplicationEvent, ApplicationPeriod, EventOccurrence
+from applications.models import ApplicationEvent, ApplicationRound, EventOccurrence
 from reservation_units.models import ReservationUnit
 
 
@@ -123,15 +123,15 @@ class AllocationEvent(object):
 
 
 class AllocationData(object):
-    def __init__(self, application_period: ApplicationPeriod):
+    def __init__(self, application_round: ApplicationRound):
         self.spaces: dict[int, AllocationSpace] = {}
-        self.period_start: datetime.date = application_period.reservation_period_begin
-        self.period_end: datetime.date = application_period.reservation_period_end
-        for unit in application_period.reservation_units.all():
+        self.period_start: datetime.date = application_round.reservation_period_begin
+        self.period_end: datetime.date = application_round.reservation_period_end
+        for unit in application_round.reservation_units.all():
             self.add_space(unit=unit)
 
         self.allocation_events = []
-        for application in application_period.applications.all():
+        for application in application_round.applications.all():
             for application_event in application.application_events.all():
                 self.allocation_events.append(
                     AllocationEvent(

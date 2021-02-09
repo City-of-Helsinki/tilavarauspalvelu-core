@@ -12,7 +12,7 @@ from applications.models import (
     Application,
     ApplicationEvent,
     ApplicationEventSchedule,
-    ApplicationPeriod,
+    ApplicationRound,
     ApplicationStatus,
     EventReservationUnit,
     Organisation,
@@ -341,9 +341,9 @@ class ApplicationSerializer(serializers.ModelSerializer):
         allow_null=True,
     )
 
-    application_period_id = serializers.PrimaryKeyRelatedField(
-        queryset=ApplicationPeriod.objects.all(),
-        source="application_period",
+    application_round_id = serializers.PrimaryKeyRelatedField(
+        queryset=ApplicationRound.objects.all(),
+        source="application_round",
         help_text="Id of the application period for which this application is targeted to",
     )
 
@@ -360,7 +360,7 @@ class ApplicationSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "organisation",
-            "application_period_id",
+            "application_round_id",
             "contact_person",
             "user",
             "application_events",

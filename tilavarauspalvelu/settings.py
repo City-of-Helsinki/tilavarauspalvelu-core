@@ -269,7 +269,7 @@ SPECTACULAR_SETTINGS = {
             "description": "Single recurring events related to a certain application.",
         },
         {
-            "name": "application_period",
+            "name": "application_round",
             "description": "Information of past, current and future application periods "
             "to where applications are targeted to.",
         },

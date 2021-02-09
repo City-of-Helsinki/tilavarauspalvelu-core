@@ -8,15 +8,15 @@ from reservations.allocation_solver import AllocationSolver
 
 
 @pytest.mark.django_db
-def test_when_matching_unit_in_application_and_application_period_can_be_allocated(
-    application_period_with_reservation_units,
+def test_when_matching_unit_in_application_and_application_round_can_be_allocated(
+    application_round_with_reservation_units,
     application_with_reservation_units,
     recurring_application_event,
     scheduled_for_monday,
     matching_event_reservation_unit,
 ):
 
-    data = AllocationData(application_period=application_period_with_reservation_units)
+    data = AllocationData(application_round=application_round_with_reservation_units)
 
     solver = AllocationSolver(allocation_data=data)
 
@@ -25,7 +25,7 @@ def test_when_matching_unit_in_application_and_application_period_can_be_allocat
     assert len(solution) == 1
     assert (
         solution[0].space_id
-        == application_with_reservation_units.application_period.reservation_units.all()[
+        == application_with_reservation_units.application_round.reservation_units.all()[
             0
         ].id
     )
@@ -35,15 +35,15 @@ def test_when_matching_unit_in_application_and_application_period_can_be_allocat
 
 
 @pytest.mark.django_db
-def test_non_matching_unit_in_application_and_application_period_can_not_be_allocated(
-    application_period_with_reservation_units,
+def test_non_matching_unit_in_application_and_application_round_can_not_be_allocated(
+    application_round_with_reservation_units,
     application_with_reservation_units,
     recurring_application_event,
     scheduled_for_monday,
     not_matching_event_reservation_unit,
 ):
 
-    data = AllocationData(application_period=application_period_with_reservation_units)
+    data = AllocationData(application_round=application_round_with_reservation_units)
 
     solver = AllocationSolver(allocation_data=data)
 
@@ -93,9 +93,9 @@ def test_non_matching_unit_in_application_and_application_period_can_not_be_allo
     indirect=True,
 )
 def test_should_only_allocate_events_which_fit_within_capacity(
-    application_period_with_reservation_units, multiple_applications
+    application_round_with_reservation_units, multiple_applications
 ):
-    data = AllocationData(application_period=application_period_with_reservation_units)
+    data = AllocationData(application_round=application_round_with_reservation_units)
 
     solver = AllocationSolver(allocation_data=data)
 
@@ -130,9 +130,9 @@ def test_should_only_allocate_events_which_fit_within_capacity(
     indirect=True,
 )
 def test_should_only_give_requested_number_of_events(
-    application_period_with_reservation_units, multiple_applications
+    application_round_with_reservation_units, multiple_applications
 ):
-    data = AllocationData(application_period=application_period_with_reservation_units)
+    data = AllocationData(application_round=application_round_with_reservation_units)
 
     solver = AllocationSolver(allocation_data=data)
 
@@ -168,9 +168,9 @@ def test_should_only_give_requested_number_of_events(
     indirect=True,
 )
 def test_should_not_allocate_if_given_timeframe_cant_contain_duration(
-    application_period_with_reservation_units, multiple_applications
+    application_round_with_reservation_units, multiple_applications
 ):
-    data = AllocationData(application_period=application_period_with_reservation_units)
+    data = AllocationData(application_round=application_round_with_reservation_units)
 
     solver = AllocationSolver(allocation_data=data)
 
@@ -205,9 +205,9 @@ def test_should_not_allocate_if_given_timeframe_cant_contain_duration(
     indirect=True,
 )
 def test_should_be_able_to_allocate_if_long_enough_slot_with_too_small_slot(
-    application_period_with_reservation_units, multiple_applications
+    application_round_with_reservation_units, multiple_applications
 ):
-    data = AllocationData(application_period=application_period_with_reservation_units)
+    data = AllocationData(application_round=application_round_with_reservation_units)
 
     solver = AllocationSolver(allocation_data=data)
 
@@ -254,9 +254,9 @@ def test_should_be_able_to_allocate_if_long_enough_slot_with_too_small_slot(
     indirect=True,
 )
 def test_should_start_and_end_between_requested_times_and_not_overlap_in_space(
-    application_period_with_reservation_units, multiple_applications
+    application_round_with_reservation_units, multiple_applications
 ):
-    data = AllocationData(application_period=application_period_with_reservation_units)
+    data = AllocationData(application_round=application_round_with_reservation_units)
 
     solver = AllocationSolver(allocation_data=data)
 
@@ -311,9 +311,9 @@ def test_should_start_and_end_between_requested_times_and_not_overlap_in_space(
     indirect=True,
 )
 def test_should_not_allocate_if_events_need_to_overlap(
-    application_period_with_reservation_units, multiple_applications
+    application_round_with_reservation_units, multiple_applications
 ):
-    data = AllocationData(application_period=application_period_with_reservation_units)
+    data = AllocationData(application_round=application_round_with_reservation_units)
 
     solver = AllocationSolver(allocation_data=data)
 
@@ -359,16 +359,16 @@ def test_should_not_allocate_if_events_need_to_overlap(
     indirect=True,
 )
 def test_events_can_overlap_in_different_units(
-    application_period_with_reservation_units,
+    application_round_with_reservation_units,
     multiple_applications,
     second_reservation_unit,
     reservation_unit,
 ):
-    application_period_with_reservation_units.reservation_units.set(
+    application_round_with_reservation_units.reservation_units.set(
         [reservation_unit, second_reservation_unit]
     )
 
-    for application in application_period_with_reservation_units.applications.all():
+    for application in application_round_with_reservation_units.applications.all():
 
         for event in application.application_events.all():
             unit_one = event.event_reservation_units.all()[0]
@@ -380,9 +380,9 @@ def test_events_can_overlap_in_different_units(
             event.event_reservation_units.set([unit_one, unit_two])
             event.save()
 
-        application_period_with_reservation_units.save()
+        application_round_with_reservation_units.save()
 
-    data = AllocationData(application_period=application_period_with_reservation_units)
+    data = AllocationData(application_round=application_round_with_reservation_units)
 
     solver = AllocationSolver(allocation_data=data)
 
@@ -426,9 +426,9 @@ def test_events_can_overlap_in_different_units(
     indirect=True,
 )
 def test_should_allocate_with_15_minutes_precision_rounded_up(
-    application_period_with_reservation_units, multiple_applications
+    application_round_with_reservation_units, multiple_applications
 ):
-    data = AllocationData(application_period=application_period_with_reservation_units)
+    data = AllocationData(application_round=application_round_with_reservation_units)
 
     solver = AllocationSolver(allocation_data=data)
 

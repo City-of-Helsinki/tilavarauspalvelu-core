@@ -7,7 +7,7 @@ from applications.models import Application, ApplicationEvent
 @pytest.mark.django_db
 def test_application_create(
     purpose,
-    application_period,
+    application_round,
     user_api_client,
     user,
 ):
@@ -25,7 +25,7 @@ def test_application_create(
             "email": "john@test.com",
             "phone_number": "123-123",
         },
-        "application_period_id": application_period.id,
+        "application_round_id": application_round.id,
         "application_events": [],
         "status": "draft",
     }
@@ -39,7 +39,7 @@ def test_application_create(
 
 @pytest.mark.django_db
 def test_application_update_should_update_organisation_and_contact_person(
-    user_api_client, application, organisation, person, purpose, application_period
+    user_api_client, application, organisation, person, purpose, application_round
 ):
     assert Application.objects.count() == 1
 
@@ -57,7 +57,7 @@ def test_application_update_should_update_organisation_and_contact_person(
             "email": person.email,
             "phone_number": person.phone_number,
         },
-        "application_period_id": application_period.id,
+        "application_round_id": application_round.id,
         "application_events": [],
         "status": "draft",
     }
@@ -77,7 +77,7 @@ def test_application_update_should_update_organisation_and_contact_person(
 
 @pytest.mark.django_db
 def test_application_update_should_null_organisation_and_contact_person(
-    user_api_client, application, organisation, person, purpose, application_period
+    user_api_client, application, organisation, person, purpose, application_round
 ):
     assert Application.objects.count() == 1
 
@@ -85,7 +85,7 @@ def test_application_update_should_null_organisation_and_contact_person(
         "id": application.id,
         "organisation": None,
         "contact_person": None,
-        "application_period_id": application_period.id,
+        "application_round_id": application_round.id,
         "application_events": [],
         "status": "draft",
     }
@@ -107,7 +107,7 @@ def test_application_update_updating_and_adding_application_events(
     organisation,
     person,
     purpose,
-    application_period,
+    application_round,
     application_event,
     valid_application_event_data,
 ):
@@ -127,7 +127,7 @@ def test_application_update_updating_and_adding_application_events(
         "id": application.id,
         "organisation": None,
         "contact_person": None,
-        "application_period_id": application_period.id,
+        "application_round_id": application_round.id,
         "application_events": [existing_event, valid_application_event_data],
         "status": "draft",
     }
@@ -158,7 +158,7 @@ def test_application_update_should_remove_application_events_if_no_longer_in_dat
     organisation,
     person,
     purpose,
-    application_period,
+    application_round,
     application_event,
     valid_application_event_data,
 ):
@@ -170,7 +170,7 @@ def test_application_update_should_remove_application_events_if_no_longer_in_dat
         "id": application.id,
         "organisation": None,
         "contact_person": None,
-        "application_period_id": application_period.id,
+        "application_round_id": application_round.id,
         "application_events": [valid_application_event_data],
         "status": "draft",
     }
@@ -237,7 +237,7 @@ def test_application_update_review_valid(
     organisation,
     person,
     purpose,
-    application_period,
+    application_round,
     valid_application_event_data,
 ):
     assert Application.objects.count() == 1
@@ -256,7 +256,7 @@ def test_application_update_review_valid(
             "email": person.email,
             "phone_number": person.phone_number,
         },
-        "application_period_id": application_period.id,
+        "application_round_id": application_round.id,
         "application_events": [valid_application_event_data],
         "status": "in_review",
     }
@@ -272,7 +272,7 @@ def test_application_update_review_valid(
 @pytest.mark.django_db
 def test_application_review_invalid(
     purpose,
-    application_period,
+    application_round,
     user_api_client,
     user,
 ):
@@ -289,7 +289,7 @@ def test_application_review_invalid(
             "email": "john@test.com",
             "phone_number": "123-123",
         },
-        "application_period_id": application_period.id,
+        "application_round_id": application_round.id,
         "application_events": [],
         "status": "review",
     }

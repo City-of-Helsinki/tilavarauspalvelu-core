@@ -7,7 +7,7 @@ from api.base import HierarchyModelMultipleChoiceFilter, TranslatedModelSerializ
 from api.resources_api import ResourceSerializer
 from api.services_api import ServiceSerializer
 from api.space_api import BuildingSerializer, LocationSerializer, SpaceSerializer
-from applications.models import ApplicationPeriod
+from applications.models import ApplicationRound
 from reservation_units.models import (
     Equipment,
     EquipmentCategory,
@@ -23,9 +23,9 @@ class ReservationUnitFilter(filters.FilterSet):
     purpose = filters.ModelMultipleChoiceFilter(
         field_name="purposes", queryset=Purpose.objects.all()
     )
-    application_period = filters.ModelMultipleChoiceFilter(
-        field_name="application_periods",
-        queryset=ApplicationPeriod.objects.all(),
+    application_round = filters.ModelMultipleChoiceFilter(
+        field_name="application_rounds",
+        queryset=ApplicationRound.objects.all(),
     )
     district = HierarchyModelMultipleChoiceFilter(
         field_name="spaces__district", queryset=District.objects.all()
