@@ -205,7 +205,7 @@ class ApplicationEventSerializer(serializers.ModelSerializer):
         help_text="List of reservation units applied for this event with priority included.",
     )
 
-    status = serializers.CharField(help_text="Status of this application")
+    status = serializers.CharField(help_text="Status of this application event")
 
     class Meta:
         model = ApplicationEvent

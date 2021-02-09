@@ -437,7 +437,7 @@ class Application(models.Model):
 
     def set_status(self, status, user=None):
         if status not in ApplicationStatus.get_statuses():
-            raise ValidationError(_("Invalid status"))
+            raise ValidationError(_("Invalid application status"))
         ApplicationStatus.objects.create(application=self, status=status, user=user)
 
     def get_status(self):
@@ -542,7 +542,7 @@ class ApplicationEvent(models.Model):
 
     def set_status(self, status, user=None):
         if status not in ApplicationEventStatus.get_statuses():
-            raise ValidationError(_("Invalid status"))
+            raise ValidationError(_("Invalid application event status"))
         ApplicationEventStatus.objects.create(
             application_event=self, status=status, user=user
         )
