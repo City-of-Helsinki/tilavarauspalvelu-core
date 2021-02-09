@@ -12,6 +12,7 @@ from applications.models import (
     Application,
     ApplicationEvent,
     ApplicationEventSchedule,
+    ApplicationEventStatus,
     ApplicationRound,
     ApplicationStatus,
     EventReservationUnit,
@@ -205,7 +206,10 @@ class ApplicationEventSerializer(serializers.ModelSerializer):
         help_text="List of reservation units applied for this event with priority included.",
     )
 
-    status = serializers.CharField(help_text="Status of this application event")
+    status = serializers.ChoiceField(
+        help_text="Status of this application event",
+        choices=ApplicationEventStatus.STATUS_CHOICES,
+    )
 
     class Meta:
         model = ApplicationEvent
@@ -353,7 +357,9 @@ class ApplicationSerializer(serializers.ModelSerializer):
         help_text="List of applications events", many=True
     )
 
-    status = serializers.CharField(help_text="Status of this application")
+    status = serializers.ChoiceField(
+        help_text="Status of this application", choices=ApplicationStatus.STATUS_CHOICES
+    )
 
     class Meta:
         model = Application
