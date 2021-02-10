@@ -11,7 +11,7 @@ const axiosClient = applyCaseMiddleware(axios.create());
 
 const apiBaseUrl: string = process.env.REACT_APP_TILANVARAUS_API_URL || '';
 
-const applicationPeriodsBasePath = 'application_period';
+const applicationRoundBasePath = 'application_round';
 const reservationUnitsBasePath = 'reservation_unit';
 const parameterBasePath = 'parameters';
 const applicationBasePath = 'application';
@@ -100,7 +100,7 @@ async function apiPost<T>({ path, data }: RequestParameters): Promise<T> {
 
 export function getApplicationPeriods(): Promise<ApplicationPeriod[]> {
   return apiGet<ApplicationPeriod[]>({
-    path: `v1/${applicationPeriodsBasePath}`,
+    path: `v1/${applicationRoundBasePath}`,
   });
 }
 
@@ -108,12 +108,12 @@ export function getApplicationPeriod(
   params: IDParameter
 ): Promise<ApplicationPeriod> {
   return apiGet<ApplicationPeriod>({
-    path: `v1/${applicationPeriodsBasePath}/${params.id}`,
+    path: `v1/${applicationRoundBasePath}/${params.id}`,
   });
 }
 
 export interface ReservationUnitsParameters {
-  applicationPeriod?: number;
+  applicationRound?: number;
   search?: string;
   purpose?: number;
   reservationUnitType?: number;

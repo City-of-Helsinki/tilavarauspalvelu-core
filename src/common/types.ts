@@ -84,7 +84,7 @@ export type Application = {
     | 'approved'
     | 'declined'
     | 'cancelled';
-  applicationPeriodId: number;
+  applicationRoundId: number;
   organisation: Organisation | null;
   contactPerson: ContactPerson | null;
   applicationEvents: ApplicationEvent[];

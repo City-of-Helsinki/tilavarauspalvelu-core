@@ -1,10 +1,10 @@
 import { Application } from '../common/types';
 
 export const minimalApplicationForInitialSave = (
-  applicationPeriodId: number
+  applicationRoundId: number
 ): Application => ({
   status: 'draft',
-  applicationPeriodId,
+  applicationRoundId,
   organisation: null,
   applicationEvents: [],
   contactPerson: null,
@@ -12,11 +12,11 @@ export const minimalApplicationForInitialSave = (
 
 const applicationInitializer = ({
   id,
-  applicationPeriodId,
+  applicationRoundId,
 }: Application): Application => {
   if (!id) {
     return {
-      ...minimalApplicationForInitialSave(applicationPeriodId),
+      ...minimalApplicationForInitialSave(applicationRoundId),
     };
   }
   return {} as Application;

@@ -1,4 +1,6 @@
 import { isAfter, parseISO, isBefore, format } from 'date-fns';
+import { stringify } from 'query-string';
+import { ReservationUnitsParameters } from './api';
 import { Parameter, TranslationObject } from './types';
 
 export const isActive = (startDate: string, endDate: string): boolean => {
@@ -96,3 +98,6 @@ export const getSelectedOption = (
   const option = options.find((o) => o.value === selected);
   return option;
 };
+
+export const searchUrl = (params: ReservationUnitsParameters): string =>
+  `/search?${stringify(params)}`;
