@@ -2,14 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { Koros } from 'hds-react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import queryString, { stringify } from 'query-string';
+import queryString from 'query-string';
 import { useHistory } from 'react-router-dom';
 import Container from '../component/Container';
 import Breadcrumb from '../component/Breadcrumb';
 import SearchForm from './SearchForm';
 import SearchResultList from './SearchResultList';
-import { getReservationUnits } from '../common/api';
+import { getReservationUnits, ReservationUnitsParameters } from '../common/api';
 import { ReservationUnit } from '../common/types';
+import { searchUrl } from '../common/util';
 
 const style = {
   fontSize: 'var(--fontsize-heading-l)',
@@ -56,8 +57,8 @@ const Search = (): JSX.Element => {
 
   const history = useHistory();
 
-  const onSearch = async (criteria: Record<string, string>) => {
-    history.replace(`${history.location.pathname}?${stringify(criteria)}`);
+  const onSearch = async (criteria: ReservationUnitsParameters) => {
+    history.replace(searchUrl(criteria));
   };
 
   return (

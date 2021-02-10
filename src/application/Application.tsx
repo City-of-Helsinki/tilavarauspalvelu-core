@@ -52,7 +52,7 @@ const Application = (): JSX.Element | null => {
     applicationReducer,
     {
       id: Number.isNaN(applicationId) ? Number(applicationId) : undefined,
-      applicationPeriodId: Number(applicationPeriodId),
+      applicationRoundId: Number(applicationPeriodId),
     } as ApplicationType,
     applicationInitializer
   );

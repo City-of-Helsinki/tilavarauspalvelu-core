@@ -5,7 +5,7 @@ import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import Card from '../component/Card';
 import { ApplicationPeriod } from '../common/types';
-import { applicationPeriodState, formatDate } from '../common/util';
+import { applicationPeriodState, formatDate, searchUrl } from '../common/util';
 import { breakpoint } from '../common/style';
 
 interface Props {
@@ -113,7 +113,7 @@ const ApplicationPeriodCard = ({ applicationPeriod }: Props): JSX.Element => {
       {state === 'active' && (
         <CardButton
           onClick={() =>
-            history.push(`/search?application_period=${applicationPeriod.id}`)
+            history.push(searchUrl({ applicationRound: applicationPeriod.id }))
           }>
           {t('ApplicationPeriodCard.applyButton')}
         </CardButton>
@@ -121,7 +121,7 @@ const ApplicationPeriodCard = ({ applicationPeriod }: Props): JSX.Element => {
       {state === 'past' && (
         <CardButton
           onClick={() =>
-            history.push(`/search?application_period=${applicationPeriod.id}`)
+            history.push(searchUrl({ applicationRound: applicationPeriod.id }))
           }>
           {t('ApplicationPeriodCard.displayPastButton')}
         </CardButton>

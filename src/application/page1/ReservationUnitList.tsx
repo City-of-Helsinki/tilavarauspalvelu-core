@@ -217,7 +217,7 @@ const ReservationUnitList = ({
     form.setValue(
       fieldName,
       reservationUnits.map((ru, index) => ({
-        reservationUnit: ru.id,
+        reservationUnitId: ru.id,
         priority: index,
       }))
     );
@@ -228,8 +228,8 @@ const ReservationUnitList = ({
     if (applicationEvent.eventReservationUnits.length === 0) {
       data = selectedReservationUnits;
     } else {
-      const promises = applicationEvent.eventReservationUnits.map((id) =>
-        getReservationUnit(id.reservationUnitId)
+      const promises = applicationEvent.eventReservationUnits.map((eventUnit) =>
+        getReservationUnit(eventUnit.reservationUnitId)
       );
       data = await Promise.all(promises);
     }

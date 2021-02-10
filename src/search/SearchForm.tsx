@@ -76,7 +76,7 @@ const SearchForm = ({ onSearch, formValues }: Props): JSX.Element | null => {
   useEffect(() => {
     register({ name: 'purpose' });
     register({ name: 'district' });
-    register({ name: 'application_period' });
+    register({ name: 'application_round' });
   }, [register]);
 
   useEffect(() => {
@@ -125,14 +125,14 @@ const SearchForm = ({ onSearch, formValues }: Props): JSX.Element | null => {
           defaultValue={formValues.search}
         />
         <Select
-          id="application_period"
+          id="application_round"
           placeholder={t('common.select')}
           options={applicationPeriodOptions}
           onChange={(selection: OptionType): void => {
-            setValue('application_period', selection.value);
+            setValue('application_round', selection.value);
           }}
           defaultValue={getSelectedOption(
-            getValues('application_period'),
+            getValues('application_round'),
             applicationPeriodOptions
           )}
           label="Haku"
