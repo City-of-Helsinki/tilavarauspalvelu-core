@@ -77,11 +77,11 @@ export type Application = {
   status:
     | 'draft'
     | 'in_review'
-    | 'review done'
+    | 'review_done'
     | 'allocating'
     | 'allocated'
     | 'validated'
-    | 'approved'
+    | 'handled'
     | 'declined'
     | 'cancelled';
   applicationRoundId: number;
