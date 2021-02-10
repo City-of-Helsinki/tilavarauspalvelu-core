@@ -13,7 +13,10 @@ import { Link } from 'react-router-dom';
 import React, { ChangeEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import { getReservationUnits } from '../../common/api';
+import {
+  getReservationUnits,
+  ReservationUnitsParameters,
+} from '../../common/api';
 import { ApplicationPeriod, ReservationUnit } from '../../common/types';
 import { OptionType } from '../../common/util';
 import { breakpoint } from '../../common/style';
@@ -275,13 +278,13 @@ const ReservationUnitModal = ({
   const searchResults = async () => {
     setSearching(true);
     const searchCriteria = {
-      applicationPeriod: applicationPeriod.id,
+      applicationRound: applicationPeriod.id,
       ...(searchTerm && { search: searchTerm }),
       ...(purpose && { purpose: purpose.value }),
       ...(reservationUnitType && {
         reservationUnitType: reservationUnitType.value,
       }),
-    };
+    } as ReservationUnitsParameters;
 
     const reservationUnits = await getReservationUnits(searchCriteria);
     setResults(reservationUnits);
