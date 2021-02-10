@@ -278,12 +278,19 @@ class ApplicationRoundBasket(models.Model):
         verbose_name=_("Must be main purpose of the applicant"), default=False
     )
     customer_type = ArrayField(
-        models.CharField(max_length=50, choices=CUSTOMER_TYPE_CHOICES),
+        models.CharField(
+            max_length=50, choices=CUSTOMER_TYPE_CHOICES, null=True, blank=True
+        ),
     )
+
     age_groups = models.ManyToManyField("reservations.AgeGroup")
     home_city = models.CharField(max_length=255)
     allocation_percentage = models.PositiveSmallIntegerField(
         verbose_name=_("Allocation percentage"), default=0
+    )
+
+    order_number = models.PositiveSmallIntegerField(
+        verbose_name=_("Order number"), default=1, null=False, blank=True
     )
 
     def __str__(self):
