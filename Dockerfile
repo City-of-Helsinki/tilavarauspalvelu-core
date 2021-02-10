@@ -4,8 +4,6 @@ FROM registry.access.redhat.com/ubi8/python-38 as appbase
 
 USER root
 
-COPY ./etc-pki-entitlement /etc/pki/entitlement
-
 RUN rm /etc/rhsm-host
 
 RUN yum -y update
