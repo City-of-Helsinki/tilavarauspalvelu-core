@@ -53,16 +53,15 @@ class AddressViewSet(viewsets.ModelViewSet):
 class OrganisationSerializer(serializers.ModelSerializer):
 
     id = serializers.IntegerField(allow_null=True, required=False)
+    address = AddressSerializer(
+        help_text="Address object of this organisation",
+        read_only=False,
+        allow_null=True,
+    )
 
     class Meta:
         model = Organisation
-        fields = [
-            "id",
-            "name",
-            "identifier",
-            "year_established",
-            "active_members",
-        ]
+        fields = ["id", "name", "identifier", "year_established", "address", "active_members"]
         extra_kwargs = {
             "name": {
                 "help_text": "Official name of the organisation",
@@ -77,6 +76,32 @@ class OrganisationSerializer(serializers.ModelSerializer):
                 "help_text": "Number of active persons in the organization.",
             },
         }
+
+    def handle_address(self, address_data) -> Union[Address, None]:
+        if address_data is None:
+            return None
+        elif "id" not in address_data or address_data["id"] is None:
+            address = AddressSerializer(data=address_data).create(
+                validated_data=address_data
+            )
+        else:
+            address = AddressSerializer(data=address_data).update(
+                instance=Address.objects.get(pk=address_data["id"]),
+                validated_data=address_data,
+            )
+        return address
+
+    def create(self, validated_data):
+        address_data = validated_data.pop("address")
+        validated_data["address"] = self.handle_address(address_data=address_data)
+        organisation = super().create(validated_data)
+        return organisation
+
+    def update(self, instance, validated_data):
+        address_data = validated_data.pop("address")
+        validated_data["address"] = self.handle_address(address_data=address_data)
+        organisation = super().update(instance, validated_data)
+        return organisation
 
 
 class PersonSerializer(serializers.ModelSerializer):
@@ -410,12 +435,18 @@ class ApplicationSerializer(serializers.ModelSerializer):
             person.save()
         return person
 
-    @staticmethod
-    def handle_organisation(organisation_data) -> Union[Organisation, None]:
-        organisation = None
-        if organisation_data is not None:
-            organisation = Organisation(**organisation_data)
-            organisation.save()
+    def handle_organisation(self, organisation_data) -> Union[Organisation, None]:
+        if organisation_data is None:
+            return None
+        elif "id" not in organisation_data or organisation_data["id"] is None:
+            organisation = OrganisationSerializer(data=organisation_data).create(
+                validated_data=organisation_data
+            )
+        else:
+            organisation = OrganisationSerializer(data=organisation_data).update(
+                instance=Organisation.objects.get(pk=organisation_data["id"]),
+                validated_data=organisation_data,
+            )
         return organisation
 
     def validate(self, data):
@@ -460,7 +491,7 @@ class ApplicationSerializer(serializers.ModelSerializer):
         event_ids = []
         for event in event_data:
             event["application"] = appliction_instance
-            if "id" not in event or ["id"] is None:
+            if "id" not in event or event["id"] is None:
                 event_ids.append(
                     ApplicationEventSerializer(data=event)
                     .create(validated_data=event)

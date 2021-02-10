@@ -6,10 +6,8 @@ from applications.models import Application, ApplicationEvent
 
 @pytest.mark.django_db
 def test_application_create(
-    purpose,
     application_round,
     user_api_client,
-    user,
 ):
     assert Application.objects.count() == 0
     data = {
@@ -17,6 +15,11 @@ def test_application_create(
             "id": None,
             "identifier": "123-identifier",
             "name": "Super organisation",
+            "address": {
+                "street_address": "Testikatu 28",
+                "post_code": 33540,
+                "city": "Tampere",
+            },
         },
         "contact_person": {
             "id": None,
@@ -32,8 +35,9 @@ def test_application_create(
     response = user_api_client.post(reverse("application-list"), data, format="json")
     assert response.status_code == 201
 
-    assert response.data.get("organisation")["identifier"] == "123-identifier"
-    assert response.data.get("contact_person")["email"] == "john@test.com"
+    assert response.data["organisation"]["identifier"] == "123-identifier"
+    assert response.data["contact_person"]["email"] == "john@test.com"
+    assert response.data["organisation"]["address"]["street_address"] == "Testikatu 28"
     assert Application.objects.count() == 1
 
 
@@ -49,6 +53,7 @@ def test_application_update_should_update_organisation_and_contact_person(
             "id": organisation.id,
             "identifier": organisation.identifier,
             "name": "Super organisation modified",
+            "address": None,
         },
         "contact_person": {
             "id": person.id,
@@ -248,6 +253,11 @@ def test_application_update_review_valid(
             "id": organisation.id,
             "identifier": organisation.identifier,
             "name": "Super organisation modified",
+            "address": {
+                "street_address": "Osoitetie 11b",
+                "post_code": 33540,
+                "city": "Tampere",
+            },
         },
         "contact_person": {
             "id": person.id,
