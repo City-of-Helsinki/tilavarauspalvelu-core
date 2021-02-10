@@ -151,7 +151,7 @@ class ApplicationRoundStatus(models.Model):
         return [s[0] for s in cls.STATUS_CHOICES]
 
     def __str__(self):
-        return "{} ({})".format(self.get_status_display(), self.application.id)
+        return "{} ({})".format(self.get_status_display(), self.application_round.id)
 
 
 class ApplicationRound(models.Model):
