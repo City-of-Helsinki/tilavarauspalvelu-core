@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { render } from "@testing-library/react";
 import endOfYesterday from "date-fns/endOfYesterday";
 import endOfTomorrow from "date-fns/endOfTomorrow";
 import TimeframeStatus from "./TimeframeStatus";
@@ -20,35 +20,36 @@ jest.mock("react-i18next", () => ({
 }));
 
 test("Past times ok", () => {
-  render(
+  const component = render(
     <TimeframeStatus
       applicationPeriodBegin={pastDate}
       applicationPeriodEnd={pastDate}
     />
   );
 
-  expect(screen.getByText("Application.timeframePast")).toBeTruthy;
+  expect(component.getByText("Application.timeframePast")).toBeTruthy();
 });
 
 test("Today ending time ok", () => {
-  render(
+  const component = render(
     <TimeframeStatus
       applicationPeriodBegin={pastDate}
       applicationPeriodEnd={today}
     />
   );
 
-  expect(screen.getByText("Application.timeframePast (common.today)"))
-    .toBeTruthy;
+  expect(
+    component.getByText("Application.timeframePast (common.today)")
+  ).toBeTruthy();
 });
 
 test("Future times ok", () => {
-  render(
+  const component = render(
     <TimeframeStatus
       applicationPeriodBegin={futureDate}
       applicationPeriodEnd={futureDate}
     />
   );
 
-  expect(screen.getByText("Application.timeframeFuture")).toBeTruthy;
+  expect(component.getByText("Application.timeframeFuture")).toBeTruthy();
 });
