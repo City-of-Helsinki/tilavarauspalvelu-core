@@ -1,11 +1,19 @@
 :root {
-  --tilavaraus-admin-header-background-color: #00005e;
+  --tilavaraus-admin-brand: #00005e;
+  --tilavaraus-admin-blue: #0000bf;
+  --tilavaraus-admin-header-background-color: var(--tilavaraus-admin-brand);
   --tilavaraus-admin-header-color: white;
   --tilavaraus-admin-background-color: white;
-  --tilavaraus-admin-content-text-color: rgb(26, 26, 26);
+  --tilavaraus-admin-content-text-color: #1a1a1a;
   --tilavaraus-admin-gray: #f5f6f8;
-  --tilavaraus-breakpoint-xs: 320px;
-  --tilavaraus-breakpoint-s: 520px;
-  --tilavaraus-breakpoint-m: 768px;
-  --tilavaraus-breakpoint-l: 1024px;
+  --container-width-xxl: 1440px;
+  --main-menu-width: 255px;
+  --ingress-container-width: 1080px;
+  --tilavaraus-admin-font: "HelsinkiGrotesk", var(--font-default);
+  --tilavaraus-admin-font-medium: "HelsinkiGrotesk-Medium", var(--font-default);
+  --tilavaraus-admin-font-bold: "HelsinkiGrotesk-Bold", var(--font-default);
+  --tilavaraus-admin-stack-modal: 1000;
+  --tilavaraus-admin-stack-seranwrap: 900;
+  --tilavaraus-admin-stack-dialog: 800;
+  --tilavaraus-admin-stack-main-menu: 500;
 }

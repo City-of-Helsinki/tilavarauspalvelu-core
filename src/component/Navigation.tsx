@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { useHistory } from "react-router-dom";
 import MainMenu from "./MainMenu";
-import { breakpoints } from "../util/styles";
+import { breakpoints } from "../styles/util";
 
 interface ILanguageOption {
   label: string;
@@ -17,8 +17,12 @@ const languageOptions: ILanguageOption[] = [
   { label: "English", value: "en" },
 ];
 
+const StyledHDSNavigation = styled(HDSNavigation)`
+  --breakpoint-xl: 9000px;
+`;
+
 const MobileNavigation = styled.div`
-  @media (min-width: ${breakpoints.s}) {
+  @media (min-width: ${breakpoints.m}) {
     display: none;
   }
 `;
@@ -36,7 +40,7 @@ const Navigation = (): JSX.Element => {
   }, [language, i18n]);
 
   return (
-    <HDSNavigation
+    <StyledHDSNavigation
       theme={{
         "--header-background-color":
           "var(--tilavaraus-admin-header-background-color)",
@@ -83,7 +87,7 @@ const Navigation = (): JSX.Element => {
           ))}
         </HDSNavigation.LanguageSelector>
       </HDSNavigation.Actions>
-    </HDSNavigation>
+    </StyledHDSNavigation>
   );
 };
 

@@ -19,12 +19,23 @@ module.exports = {
     node: true,
   },
   rules: {
-    "react/prop-types": 0,
-    "react/destructuring-assignment": 0,
-    "react/static-property-placement": 0,
+    "import/prefer-default-export": 0,
     "jsx-a11y/alt-text": 1,
-    "react/require-default-props": 0,
+    "jsx-a11y/label-has-associated-control": [
+      "error",
+      {
+        labelComponents: [],
+        labelAttributes: [],
+        controlComponents: [],
+        assert: "htmlFor",
+        depth: 25,
+      },
+    ],
+    "react/destructuring-assignment": 0,
     "react/jsx-props-no-spreading": 0,
+    "react/prop-types": 0,
+    "react/require-default-props": 0,
+    "react/static-property-placement": 0,
     "@typescript-eslint/camelcase": ["off"], // There seems to be no other way to override this than disabling it and rewriting the rules in the naming-convention
     "@typescript-eslint/naming-convention": [
       "error",
@@ -55,17 +66,7 @@ module.exports = {
         format: ["camelCase", "snake_case", "UPPER_CASE"],
       },
     ],
-    "jsx-a11y/label-has-associated-control": [
-      "error",
-      {
-        labelComponents: [],
-        labelAttributes: [],
-        controlComponents: [],
-        assert: "htmlFor",
-        depth: 25,
-      },
-    ],
-    "import/prefer-default-export": 0,
+    "@typescript-eslint/no-empty-function": 0,
   },
   globals: {
     cy: true,
