@@ -6,13 +6,20 @@ USER root
 
 RUN rm /etc/rhsm-host
 
+ARG LOCAL_REDHAT_USERNAME
+ARG LOCAL_REDHAT_PASSWORD
+ARG BUILD_MODE
+
 RUN yum -y update
-RUN subscription-manager register --username ${REDHAT_USERNAME} --password ${REDHAT_PASSWORD} --auto-attach 
+RUN if [ "x$BUILD_MODE" = "xlocal" ] ;\
+    then \
+        subscription-manager register --username $LOCAL_REDHAT_USERNAME --password $LOCAL_REDHAT_PASSWORD --auto-attach; \
+    else \
+        subscription-manager register --username ${REDHAT_USERNAME} --password ${REDHAT_PASSWORD} --auto-attach; \
+    fi
 RUN subscription-manager repos --enable codeready-builder-for-rhel-8-x86_64-rpms
 
 
-#RUN rpm -Uvh https://yum.postgresql.org/11/redhat/rhel-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
-#RUN yum -y install postgresql11
 RUN rpm -Uvh https://download.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
 RUN yum -y install epel-release
 
@@ -25,25 +32,16 @@ RUN chown tvp /opt/app-root/lib/python3.8/site-packages
 RUN chown tvp /opt/app-root/lib/python3.8/site-packages/*
 RUN pip install --upgrade pip
 
-ARG BUILD_MODE
-
-ARG REDHAT_USERNAME
-ARG REDHAT_PASSWORD
-
 ENV APP_NAME tilavarauspalvelu
 
 WORKDIR /tvp
 
 COPY deploy/* ./deploy/
 
-RUN if [ "x$BUILD_MODE" = "xlocal" ] ; then ./deploy/local_deps.sh ${REDHAT_USERNAME} ${REDHAT_PASSWORD}; fi
-
 RUN dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
 RUN yum install -y gdal 
 
 RUN subscription-manager remove --all
-
-RUN if [ "x$BUILD_MODE" = "xlocal" ] ; then ./deploy/unregister_local.sh ; fi
 
 RUN npm install @sentry/cli
 
