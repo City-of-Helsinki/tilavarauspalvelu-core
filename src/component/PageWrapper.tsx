@@ -26,7 +26,7 @@ export default class PageWrapper extends React.Component<IProps, IState> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
-    console.error(error, errorInfo);
+    console.error(error, errorInfo); // eslint-disable-line no-console
   }
 
   render(): JSX.Element {

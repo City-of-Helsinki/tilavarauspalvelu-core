@@ -212,7 +212,7 @@ function DataTable({ data, cellConfig, className }: IProps): JSX.Element {
   return (
     <Wrapper className={className}>
       <Filters>
-        <FilterBtn iconLeft={<IconSliders />} onClick={() => alert("todo")}>
+        <FilterBtn iconLeft={<IconSliders />} onClick={() => {}}>
           {t("common.filter")}
         </FilterBtn>
       </Filters>

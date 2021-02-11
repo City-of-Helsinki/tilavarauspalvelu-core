@@ -242,7 +242,7 @@ function ApplicationRound(): JSX.Element {
                 <div>
                   <SubmitButton
                     disabled={!isApplicationChecked}
-                    onClick={() => alert("TODO")}
+                    onClick={() => alert("TODO")} // eslint-disable-line no-alert
                   >
                     {t("Application.gotoSplitPreparation")}
                   </SubmitButton>
