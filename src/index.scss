@@ -11,12 +11,16 @@ body,
 }
 
 body {
+  &.noScroll {
+    overflow: hidden;
+  }
+
   display: flex;
   flex-direction: column;
-  background-color: var(--tilavaraus-admin-gray);
+  background-color: var(--color-white);
   font-family: var(--font-default);
   font-size: 16px;
-  min-width: var(--tilavaraus-breakpoint-xs);
+  min-width: 320px;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
 }
@@ -25,4 +29,5 @@ body {
   display: flex;
   padding: 0;
   flex-direction: column;
+  align-items: flex-start;
 }

@@ -16,6 +16,7 @@
 			  "src/variables.css"
 		  ]
 		}
-	  ]
+	  ],
+    "no-descending-specificity": null
 	}
 }

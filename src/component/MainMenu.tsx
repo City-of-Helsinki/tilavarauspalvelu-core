@@ -3,71 +3,78 @@ import { IconAngleDown, IconAngleUp } from "hds-react";
 import { useTranslation } from "react-i18next";
 import { Link, RouteProps } from "react-router-dom";
 import styled from "styled-components";
-import iconApplications from "../images/icon_applications.png";
-import iconPeople from "../images/icon_people.png";
-import { breakpoints } from "../util/styles";
+import { breakpoints } from "../styles/util";
+import { ReactComponent as PremiseApplications } from "../images/icon_premise-applications.svg";
+import { ReactComponent as IconCustomers } from "../images/icon_customers.svg";
+import { ReactComponent as IconPremises } from "../images/icon_premises.svg";
+import { ReactComponent as IconTwoArrows } from "../images/icon_two-arrows.svg";
+import { truncatedText } from "../styles/typography";
 
 const Wrapper = styled.ul<{ placement: string }>`
   display: flex;
   flex-direction: column;
   background-color: white;
   margin: 0;
-  padding: 1.5em 1.375em 1.5em 3.25em;
+  padding: 1.5rem 1.375rem 1.5rem 1.25rem;
   list-style: none;
+  z-index: var(--tilavaraus-admin-stack-main-menu);
   ${({ placement }) =>
     placement === "default" &&
     `
-      @media (min-width: ${breakpoints.s}) {
+      @media (min-width: ${breakpoints.m}) {
         display: flex;
       }
 
       display: none;
       box-shadow: 8px 0px 12px 0px rgba(0, 0, 0, 0.05);
-      width: 13.75em;
+      width: var(--main-menu-width);
   `}
 `;
 
 const MenuItem = styled.li`
   position: relative;
   display: flex;
+  align-items: center;
   flex-wrap: wrap;
-  justify-content: space-between;
-  margin-bottom: 1.25em;
+  margin-bottom: 1.25rem;
 `;
 
 const Icon = styled.span`
-  position: absolute;
-  top: 0.1em;
-  left: -2em;
+  display: flex;
+  justify-content: center;
+  width: 1.125rem;
+  margin-right: var(--spacing-xs);
 `;
 
 const Heading = styled(Link)`
-  font-family: HelsinkiGrotesk, var(--font-default);
-  font-weight: bold;
+  ${truncatedText}
+  font-family: var(--tilavaraus-admin-font-bold);
   font-size: 14px;
   line-height: 1.85em;
   text-decoration: none;
   color: var(--tilavaraus-admin-content-text-color);
-  max-width: var(--tilavaraus-breakpoint-s);
+  max-width: 9.5rem;
 `;
 
 const SubItemList = styled.ul`
   flex-basis: 100%;
   margin: 0;
-  padding: 0;
+  padding: 0 0 0 calc(1.125rem + var(--spacing-xs));
   list-style: none;
-  margin-top: 0.685em;
+  margin-top: 0.685rem;
 `;
 
 const SubItemHeading = styled(Heading)`
+  font-family: var(--tilavaraus-admin-font);
   font-weight: normal;
 `;
 
 const Toggler = styled.button`
-  position: absolute;
-  right: 0;
   border: none;
   background: transparent;
+  position: absolute;
+  top: 0;
+  right: -12px;
 `;
 
 interface IMenuChild {
@@ -125,19 +132,47 @@ const SubItems = ({
 const menuTree = [
   {
     title: "MainMenu.applications",
-    icon: <img src={iconApplications} alt="" />,
-    route: "foo",
+    icon: <PremiseApplications />,
+    route: "/applications",
   },
   {
     title: "MainMenu.clients",
-    icon: <img src={iconPeople} alt="" />,
-    route: "baz",
+    icon: <IconCustomers />,
+    route: "/baz",
     items: [
       {
         title: "MainMenu.archive",
-        route: "bar",
+        route: "/bar",
       },
     ],
+  },
+  {
+    title: "MainMenu.premisesAndSettings",
+    icon: <IconPremises />,
+    route: "",
+    items: [
+      {
+        title: "MainMenu.services",
+        route: "",
+      },
+      {
+        title: "MainMenu.spaceAndHobbyTypes",
+        route: "",
+      },
+      {
+        title: "MainMenu.applicationRounds",
+        route: "",
+      },
+      {
+        title: "MainMenu.conditionsAndAttachments",
+        route: "",
+      },
+    ],
+  },
+  {
+    title: "MainMenu.userManagement",
+    icon: <IconTwoArrows />,
+    route: "",
   },
 ];
 
@@ -165,7 +200,7 @@ function MainMenu({
       {menuTree.map((menuItem: IMenuItem) =>
         menuItem ? (
           <MenuItem key={menuItem.title}>
-            {menuItem.icon && <Icon>{menuItem.icon}</Icon>}
+            <Icon>{menuItem.icon}</Icon>
             <Heading
               to={menuItem.route}
               onClick={() => onItemSelection && onItemSelection()}
