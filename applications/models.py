@@ -455,6 +455,19 @@ class Application(models.Model):
             raise ValidationError(_("Application must have contact person"))
 
 
+class ApplicationAggregateData(models.Model):
+    """Model to store aggregated data from application events.
+
+    Overall hour counts, application event counts etc.
+    """
+
+    name = models.CharField(max_length=255, verbose_name=_("Name"))
+    value = models.FloatField(max_length=255, verbose_name=_("Value"))
+    application = models.ForeignKey(
+        Application, on_delete=models.CASCADE, related_name="aggregated_data"
+    )
+
+
 class ApplicationEvent(models.Model):
     REQUIRED_FOR_REVIEW = [
         "num_persons",
