@@ -11,6 +11,7 @@ from applications.models import (
     EventReservationUnit,
 )
 from reservation_units.models import ReservationUnit
+from spaces.models import Space
 
 
 @pytest.fixture(autouse=True)
@@ -39,18 +40,31 @@ def default_application_round() -> ApplicationRound:
 
 
 @pytest.fixture
-def reservation_unit() -> ReservationUnit:
+def space_for_15_persons():
+    return Space.objects.create(name="Space", max_persons=15)
+
+
+@pytest.fixture
+def space_for_5_persons():
+    return Space.objects.create(name="Space", max_persons=5)
+
+
+@pytest.fixture
+def reservation_unit(space_for_15_persons) -> ReservationUnit:
     reservation_unit = ReservationUnit.objects.create(
         name_en="Test reservation unit", require_introduction=False
     )
+    reservation_unit.spaces.set([space_for_15_persons])
     return reservation_unit
 
 
 @pytest.fixture
-def second_reservation_unit():
+def second_reservation_unit(space_for_5_persons):
     reservation_unit = ReservationUnit.objects.create(
-        name_en="Second test reservation unit", require_introduction=False
+        name_en="Second test reservation unit",
+        require_introduction=False,
     )
+    reservation_unit.spaces.set([space_for_5_persons])
     return reservation_unit
 
 
@@ -145,7 +159,7 @@ def multiple_applications(
         for event in application["events"]:
             created_event = ApplicationEvent.objects.create(
                 application=created_application,
-                num_persons=10,
+                num_persons=15,
                 min_duration=datetime.timedelta(minutes=event["duration"]),
                 max_duration=datetime.timedelta(minutes=event["duration"]),
                 name="Football",

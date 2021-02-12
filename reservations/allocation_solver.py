@@ -15,12 +15,22 @@ from reservations.allocation_models import (
 logger = logging.getLogger(__name__)
 
 
+def has_room_for_persons(space: AllocationSpace, event: AllocationEvent):
+    return (
+        space.max_persons is None
+        or event.num_persons is None
+        or space.max_persons >= event.num_persons
+    )
+
+
 def suitable_spaces_for_event(
     allocation_event: AllocationEvent, spaces: Dict[int, AllocationSpace]
 ) -> Dict[int, AllocationSpace]:
     suitable_spaces = {}
     for space_id, space in spaces.items():
-        if space_id in allocation_event.space_ids:
+        if space_id in allocation_event.space_ids and has_room_for_persons(
+            space, allocation_event
+        ):
             suitable_spaces[space_id] = space
     return suitable_spaces
 

@@ -25,15 +25,16 @@ def time_delta_to_integer_with_precision(delta: datetime.timedelta):
 class AllocationSpace(object):
     def __init__(
         self,
-        id: int,
+        unit: ReservationUnit,
         period_start: datetime.date,
         period_end: datetime.date,
         times: [AvailableTime],
     ):
-        self.id = id
+        self.id = unit.id
         self._period_start = period_start
         self._period_end = period_end
         self.available_times: [AvailableTime] = times
+        self.max_persons = unit.get_max_persons()
 
     def add_time(self, start: datetime, end: datetime):
         start_delta = time_delta_to_integer_with_precision(
@@ -111,6 +112,7 @@ class AllocationEvent(object):
             else application_event.min_duration
         )
         self.events_per_week = application_event.events_per_week
+        self.num_persons = application_event.num_persons
 
     @staticmethod
     def occurrences_to_integers_with_precision(
@@ -151,7 +153,7 @@ class AllocationData(object):
     def add_space(self, unit: ReservationUnit):
         all_dates = self.get_all_dates()
         space = AllocationSpace(
-            id=unit.id,
+            unit=unit,
             period_start=self.period_start,
             period_end=self.period_end,
             times=[],
