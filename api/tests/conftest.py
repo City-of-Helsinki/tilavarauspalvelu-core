@@ -198,13 +198,27 @@ def valid_reservation_data(reservation_unit):
 
 
 @pytest.fixture
+def valid_application_round_basket_data(purpose, ten_to_15_age_group):
+    return {
+        "name": "Yleishyödylliset yhdistykset",
+        "purpose_id": purpose.id,
+        "must_be_main_purpose_of_applicant": False,
+        "customer_type": [ApplicationRoundBasket.CUSTOMER_TYPE_NONPROFIT],
+        "age_group_ids": [ten_to_15_age_group.id],
+        "home_city": "Helsinki",
+        "allocation_percentage": 100,
+        "order_number": 1,
+    }
+
+
+@pytest.fixture
 def valid_application_round_data(
     reservation_unit,
     reservation_unit2,
     service_sector,
     purpose,
     purpose2,
-    ten_to_15_age_group,
+    valid_application_round_basket_data,
 ):
     """ Valid JSON data for creating a new application round """
     return {
@@ -219,17 +233,7 @@ def valid_application_round_data(
         "purpose_ids": [purpose.id, purpose2.id],
         "service_sector_id": service_sector.id,
         "status": "draft",
-        "application_round_baskets": [
-            {
-                "name": "Yleishyödylliset yhdistykset",
-                "purpose_id": purpose.id,
-                "must_be_main_purpose_of_applicant": False,
-                "customer_type": [ApplicationRoundBasket.CUSTOMER_TYPE_NONPROFIT],
-                "age_group_ids": [ten_to_15_age_group.id],
-                "home_city": "Helsinki",
-                "allocation_percentage": 100,
-            }
-        ],
+        "application_round_baskets": [valid_application_round_basket_data],
     }
 
 
