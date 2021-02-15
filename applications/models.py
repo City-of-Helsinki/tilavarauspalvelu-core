@@ -5,6 +5,7 @@ import recurrence
 from django.contrib.auth.models import User
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
+from django.db.models import DurationField, ExpressionWrapper, F
 from django.utils.text import format_lazy
 from django.utils.translation import gettext_lazy as _
 from recurrence.fields import RecurrenceField
@@ -453,6 +454,56 @@ class Application(models.Model):
     def validate_review(self):
         if not hasattr(self, "contact_person"):
             raise ValidationError(_("Application must have contact person"))
+
+    def create_aggregate_data(self):
+        # Base queries
+        base_query = self.application_events.values(
+            "id", "begin", "end", "events_per_week", "min_duration", "max_duration"
+        ).annotate(
+            events_count=ExpressionWrapper(
+                (F("end") - F("begin")) / 7 * F("events_per_week"),
+                output_field=DurationField(),
+            )
+        )
+
+        weekly_query = base_query.filter(biweekly=False)
+
+        bi_weekly_query = base_query.filter(biweekly=True).annotate(
+            events_count=ExpressionWrapper(
+                F("events_count") / 2, output_field=DurationField()
+            )
+        )
+
+        total_min_duration = 0
+        events_count = 0
+        for duration in weekly_query.union(bi_weekly_query):
+            total_min_duration += (
+                duration["events_count"].days * duration["min_duration"].total_seconds()
+            )
+            events_count += duration["events_count"].days
+
+        name = "min_duration_total"
+        ApplicationAggregateData.objects.update_or_create(
+            application=self, name=name, defaults={"value": total_min_duration}
+        )
+
+        name = "reservations_total"
+        ApplicationAggregateData.objects.update_or_create(
+            application=self, name=name, defaults={"value": events_count}
+        )
+
+
+class ApplicationAggregateData(models.Model):
+    """Model to store aggregated data from application events.
+
+    Overall hour counts, application event counts etc.
+    """
+
+    name = models.CharField(max_length=255, verbose_name=_("Name"))
+    value = models.FloatField(max_length=255, verbose_name=_("Value"))
+    application = models.ForeignKey(
+        Application, on_delete=models.CASCADE, related_name="aggregated_data"
+    )
 
 
 class ApplicationEvent(models.Model):

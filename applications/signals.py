@@ -44,3 +44,14 @@ def create_application_round_status(sender, instance, **kwargs):
                 status=ApplicationRoundStatus.DRAFT,
                 user=None,
             )
+
+
+@receiver(
+    post_save,
+    sender=ApplicationStatus,
+    dispatch_uid="create_aggregate_date_for_application",
+)
+def create_aggregate_date_for_application(sender, instance, **kwargs):
+    if kwargs.get("created", False):
+        if instance.status == ApplicationStatus.IN_REVIEW:
+            instance.application.create_aggregate_data()
