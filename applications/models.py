@@ -96,6 +96,12 @@ class Organisation(models.Model):
         Address, null=True, blank=True, on_delete=models.SET_NULL
     )
 
+    active_members = models.PositiveIntegerField(
+        verbose_name=_("Active members"),
+        null=True,
+        blank=True,
+    )
+
     def __str__(self):
         return self.name
 
