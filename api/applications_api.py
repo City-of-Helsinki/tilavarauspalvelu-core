@@ -10,6 +10,7 @@ from rest_framework.exceptions import ValidationError
 from applications.models import (
     Address,
     Application,
+    ApplicationAggregateData,
     ApplicationEvent,
     ApplicationEventSchedule,
     ApplicationEventStatus,
@@ -163,6 +164,18 @@ class EventReservationUnitSerializer(serializers.ModelSerializer):
                 "help_text": "Priority of this reservation unit for the event. Lower the number, higher the priority.",
             },
         }
+
+
+class ApplicationAggregateDataSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(help_text="Name of the aggregated data")
+    value = serializers.FloatField(help_text="Computed value")
+
+    class Meta:
+        model = ApplicationAggregateData
+        fields = [
+            "name",
+            "value",
+        ]
 
 
 class ApplicationEventSerializer(serializers.ModelSerializer):
@@ -361,6 +374,12 @@ class ApplicationSerializer(serializers.ModelSerializer):
         help_text="Status of this application", choices=ApplicationStatus.STATUS_CHOICES
     )
 
+    aggregated_data = ApplicationAggregateDataSerializer(
+        help_text="Summary data for application after it is in review",
+        read_only=True,
+        many=True,
+    )
+
     class Meta:
         model = Application
         fields = [
@@ -371,6 +390,7 @@ class ApplicationSerializer(serializers.ModelSerializer):
             "user",
             "application_events",
             "status",
+            "aggregated_data",
         ]
 
     @staticmethod
