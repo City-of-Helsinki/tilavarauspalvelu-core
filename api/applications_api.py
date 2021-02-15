@@ -570,11 +570,11 @@ class ApplicationSerializer(serializers.ModelSerializer):
         status = validated_data.pop("status")
 
         contact_person_data = validated_data.pop("contact_person")
-        
+
         validated_data["contact_person"] = self.handle_person(
             contact_person_data=contact_person_data
         )
-        
+
         organisation_data = validated_data.pop("organisation")
         validated_data["organisation"] = self.handle_organisation(
             organisation_data=organisation_data
