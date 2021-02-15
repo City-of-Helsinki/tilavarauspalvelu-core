@@ -31,6 +31,11 @@ def test_application_create(
         "application_round_id": application_round.id,
         "application_events": [],
         "status": "draft",
+        "billing_address": {
+            "street_address": "Laskukatu 1c",
+            "post_code": 33540,
+            "city": "Tampere",
+        },
     }
     response = user_api_client.post(reverse("application-list"), data, format="json")
     assert response.status_code == 201
@@ -38,6 +43,7 @@ def test_application_create(
     assert response.data["organisation"]["identifier"] == "123-identifier"
     assert response.data["contact_person"]["email"] == "john@test.com"
     assert response.data["organisation"]["address"]["street_address"] == "Testikatu 28"
+    assert response.data["billing_address"]["street_address"] == "Laskukatu 1c"
     assert Application.objects.count() == 1
 
 
@@ -65,6 +71,7 @@ def test_application_update_should_update_organisation_and_contact_person(
         "application_round_id": application_round.id,
         "application_events": [],
         "status": "draft",
+        "billing_address": None,
     }
 
     response = user_api_client.put(
@@ -93,6 +100,7 @@ def test_application_update_should_null_organisation_and_contact_person(
         "application_round_id": application_round.id,
         "application_events": [],
         "status": "draft",
+        "billing_address": None,
     }
 
     response = user_api_client.put(
@@ -135,6 +143,7 @@ def test_application_update_updating_and_adding_application_events(
         "application_round_id": application_round.id,
         "application_events": [existing_event, valid_application_event_data],
         "status": "draft",
+        "billing_address": None,
     }
 
     response = user_api_client.put(
@@ -178,6 +187,7 @@ def test_application_update_should_remove_application_events_if_no_longer_in_dat
         "application_round_id": application_round.id,
         "application_events": [valid_application_event_data],
         "status": "draft",
+        "billing_address": None,
     }
 
     response = user_api_client.put(
@@ -269,6 +279,7 @@ def test_application_update_review_valid(
         "application_round_id": application_round.id,
         "application_events": [valid_application_event_data],
         "status": "in_review",
+        "billing_address": None,
     }
 
     response = user_api_client.put(

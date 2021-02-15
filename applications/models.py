@@ -464,6 +464,10 @@ class Application(models.Model):
         related_name="applications",
     )
 
+    billing_address = models.ForeignKey(
+        Address, null=True, blank=True, on_delete=models.SET_NULL
+    )
+
     @property
     def status(self):
         return self.get_status().status

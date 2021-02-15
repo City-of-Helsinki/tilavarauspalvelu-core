@@ -412,6 +412,9 @@ class ApplicationSerializer(serializers.ModelSerializer):
         help_text="Summary data for application after it is in review",
         read_only=True,
         many=True,
+    billing_address = AddressSerializer(
+        help_text="Billing address for the application",
+        allow_null=True,
     )
 
     class Meta:
@@ -425,6 +428,7 @@ class ApplicationSerializer(serializers.ModelSerializer):
             "application_events",
             "status",
             "aggregated_data",
+            "billing_address",
         ]
 
     @staticmethod
@@ -516,6 +520,10 @@ class ApplicationSerializer(serializers.ModelSerializer):
             request.user if request and request.user.is_authenticated else None
         )
 
+        billing_address_data = validated_data.pop("billing_address")
+        billing_address = Address.objects.create(**billing_address_data)
+        validated_data["billing_address"] = billing_address
+
         status = validated_data.pop("status")
 
         contact_person_data = validated_data.pop("contact_person")
@@ -543,6 +551,10 @@ class ApplicationSerializer(serializers.ModelSerializer):
         request_user = (
             request.user if request and request.user.is_authenticated else None
         )
+
+        billing_address_data = validated_data.pop("billing_address")
+        billing_address = Address.objects.create(**billing_address_data)
+        validated_data["billing_address"] = billing_address
 
         status = validated_data.pop("status")
 
