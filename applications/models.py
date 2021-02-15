@@ -99,6 +99,9 @@ class Organisation(models.Model):
     active_members = models.PositiveIntegerField(
         verbose_name=_("Active members"),
         null=True,
+    )
+    core_business = models.TextField(
+        verbose_name=_("Core business of this organization"),
         blank=True,
     )
 

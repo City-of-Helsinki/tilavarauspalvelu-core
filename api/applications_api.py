@@ -61,7 +61,15 @@ class OrganisationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Organisation
-        fields = ["id", "name", "identifier", "year_established", "address", "active_members"]
+        fields = [
+            "id",
+            "name",
+            "identifier",
+            "year_established",
+            "address",
+            "core_business",
+            "active_members"
+        ]
         extra_kwargs = {
             "name": {
                 "help_text": "Official name of the organisation",
