@@ -60,68 +60,69 @@ class HierarchyModelMultipleChoiceFilter(filters.ModelMultipleChoiceFilter):
         return super().filter(qs, list(values_with_children))
 
 
+class TranslatedFieldSerializer(serializers.Serializer):
+    """
+    DRF field class for translated fields.
+    For a field called `name` this dynamically creates a class with the structure of:
+    ```
+    class TranslatedFieldSerializer:
+        fi = serializers.CharField(source='name')
+        en = serializers.CharField(source='name')
+        sv = serializers.CharField(source='name')
+    ```
+    Which, when used as a field in ModelSerializer, is represented in the API as
+    ```
+    {
+        "name": {
+            "fi": "foo",
+            "en": "foo",
+            "sv": "foo",
+        }
+    }
+    ```
+    and written to the model as `name_fi`, `name_en`, `name_sv`.
+    """
+
+    def __init__(self, **kwargs):
+        original_field_name = kwargs.pop("source", None)
+        original_field_class = kwargs.pop("field_class", None)
+        if original_field_name is None:
+            raise AssertionError(
+                "Translated fields must specify source field in kwargs"
+            )
+        for language_code in LANGUAGE_CODES:
+            translated_field_name = f"{original_field_name}_{language_code}"
+            field_kwargs = kwargs.copy()
+            field_kwargs["source"] = translated_field_name
+            if original_field_class is not None:
+                field_class = original_field_class
+            else:
+                field_class = serializers.CharField
+            translated_field = field_class(**field_kwargs)
+            setattr(self, language_code, translated_field)
+            # Serializers have a metaclass that sets _declared_fields. We must add our
+            # translated fields there as well, otherwise they're not considered declared.
+            if language_code not in self._declared_fields:
+                self._declared_fields[language_code] = translated_field
+        super().__init__(source="*")
+
+
 class TranslatedModelSerializer(serializers.ModelSerializer):
     """
     A serializer that automatically registers translated model fields
-    and nests them in an object under the original field name
+    and nests them in an object under the original field name.
     """
 
-    def get_field_names(self, declared_fields, info):
-        model = self.Meta.model
-        fields = super().get_field_names(declared_fields, info)
-        # We make a copy to avoid mutating original fields
-        fields = fields.copy()
-        self._original_translation_fields = []
-        translatable_fields = get_translatable_fields_for_model(model) or []
-        for original_field_name in translatable_fields:
-            for language_code in LANGUAGE_CODES:
-                translated_field_name = f"{original_field_name}_{language_code}"
-                model_has_field = bool(getattr(model, translated_field_name, False))
-                if (
-                    model_has_field
-                    and original_field_name in fields
-                    and translated_field_name not in fields
-                ):
-                    original_field_index = fields.index(original_field_name)
-                    fields.insert(original_field_index + 1, translated_field_name)
-            self._original_translation_fields.append(original_field_name)
-            if original_field_name in fields:
-                fields.remove(original_field_name)
-        return fields
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.model_translatable_fields = get_translatable_fields_for_model(
+            self.Meta.model
+        )
 
-    def to_representation(self, obj):
-        ret = super().to_representation(obj)
-        model = self.Meta.model
-
-        translatable_fields = get_translatable_fields_for_model(model) or []
-
-        if obj is None:
-            return ret
-
-        for field_name in translatable_fields:
-            if field_name not in self._original_translation_fields:
-                continue
-            translations_dict = {}
-
-            for language_code in LANGUAGE_CODES:
-                key = f"{field_name}_{language_code}"
-                val = getattr(obj, key, None)
-                translations_dict[language_code] = val
-                # remove flat translated fields from representation
-                del ret[key]
-
-            # If no text provided, leave the field as null
-            translations_dict = translations_dict or None
-            ret[field_name] = translations_dict
-        return ret
-
-    def to_internal_value(self, data):
-        model = self.Meta.model
-        translatable_fields = get_translatable_fields_for_model(model) or []
-        for key in self.Meta.fields:
-            if key in translatable_fields and key in data:
-                for language_code in data[key]:
-                    field_name = f"{key}_{language_code}"
-                    data[field_name] = data[key][language_code]
-                del data[key]
-        return super().to_internal_value(data)
+    def build_field(self, source, *args, **kwargs):
+        field_class, field_kwargs = super().build_field(source, *args, **kwargs)
+        if source in self.model_translatable_fields:
+            field_kwargs["source"] = source
+            field_kwargs["field_class"] = field_class
+            field_class = TranslatedFieldSerializer
+        return field_class, field_kwargs
