@@ -434,6 +434,22 @@ class ApplicationEventStatus(models.Model):
 
 
 class Application(models.Model):
+    APPLICANT_TYPE_INDIVIDUAL = "individual"
+    APPLICANT_TYPE_ASSOCIATION = "association"
+    APPLICANT_TYPE_COMMUNITY = "community"
+    APPLICANT_TYPE_COMPANY = "company"
+
+    APPLICANT_TYPE_CHOICES = (
+        (APPLICANT_TYPE_INDIVIDUAL, _("Individual")),
+        (APPLICANT_TYPE_ASSOCIATION, _("Association")),
+        (APPLICANT_TYPE_COMMUNITY, _("Community")),
+        (APPLICANT_TYPE_COMPANY, _("Company")),
+    )
+
+    applicant_type = models.CharField(
+        max_length=64, verbose_name=_("Applicant type"), choices=APPLICANT_TYPE_CHOICES
+    )
+
     organisation = models.ForeignKey(
         Organisation,
         verbose_name=_("Organisation"),

@@ -429,6 +429,7 @@ class ApplicationSerializer(serializers.ModelSerializer):
         model = Application
         fields = [
             "id",
+            "applicant_type",
             "organisation",
             "application_round_id",
             "contact_person",
@@ -529,8 +530,9 @@ class ApplicationSerializer(serializers.ModelSerializer):
         )
 
         billing_address_data = validated_data.pop("billing_address")
-        billing_address = Address.objects.create(**billing_address_data)
-        validated_data["billing_address"] = billing_address
+        if billing_address_data:
+            billing_address = Address.objects.create(**billing_address_data)
+            validated_data["billing_address"] = billing_address
 
         status = validated_data.pop("status")
 
@@ -561,16 +563,18 @@ class ApplicationSerializer(serializers.ModelSerializer):
         )
 
         billing_address_data = validated_data.pop("billing_address")
-        billing_address = Address.objects.create(**billing_address_data)
-        validated_data["billing_address"] = billing_address
+        if billing_address_data:
+            billing_address = Address.objects.create(**billing_address_data)
+            validated_data["billing_address"] = billing_address
 
         status = validated_data.pop("status")
 
         contact_person_data = validated_data.pop("contact_person")
+        
         validated_data["contact_person"] = self.handle_person(
             contact_person_data=contact_person_data
         )
-
+        
         organisation_data = validated_data.pop("organisation")
         validated_data["organisation"] = self.handle_organisation(
             organisation_data=organisation_data
