@@ -840,5 +840,45 @@
                 4
             ]
         }
+    },
+    {
+        "model": "applications.Organisation",
+        "pk": 1,
+        "fields": {
+            "name": "Kuperkeikkakamut",
+            "identifier":  "1234567-8",
+            "year_established": 1987,
+            "address": null,
+            "active_members": 20
+        }
+    },
+    {
+        "model": "applications.Application",
+        "pk": 1,
+        "fields": {
+            "organisation": 1,
+            "contact_person":  1,
+            "user": null,
+            "application_round": 1
+        }
+    },
+    {
+        "model": "applications.ApplicationEvent",
+        "pk": 1,
+        "fields": {
+            "name": "Treenivuorot",
+            "num_persons":  20,
+            "age_group": 1,
+            "ability_group": 1,
+            "min_duration": "01:00:00",
+            "max_duration": "02:00:00",
+            "events_per_week": 1,
+            "biweekly": false,
+            "begin": "2021-01-01",
+            "end": "2021-06-01",
+            "application": 1,
+            "district": 1,
+            "purpose": 1
+        }
     }
 ]
