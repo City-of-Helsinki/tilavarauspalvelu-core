@@ -47,6 +47,35 @@ def default_application_round(purpose) -> ApplicationRound:
 
 
 @pytest.fixture
+def second_application_round(purpose) -> ApplicationRound:
+    application_round = ApplicationRound.objects.create(
+        application_period_begin=datetime.datetime(
+            year=2020, month=1, day=1, tzinfo=pytz.UTC
+        ),
+        application_period_end=datetime.datetime(
+            year=2020, month=8, day=30, tzinfo=pytz.UTC
+        ),
+        reservation_period_begin=datetime.date(year=2020, month=1, day=1),
+        reservation_period_end=datetime.date(year=2020, month=8, day=30),
+        public_display_begin=datetime.datetime(
+            year=2020, month=1, day=1, tzinfo=pytz.UTC
+        ),
+        public_display_end=datetime.datetime(
+            year=2020, month=8, day=30, tzinfo=pytz.UTC
+        ),
+    )
+    application_round.purposes.set([purpose])
+    return application_round
+
+
+@pytest.fixture
+def application_in_second_application_round(
+    second_application_round,
+) -> Application:
+    return Application.objects.create(application_round_id=second_application_round.id)
+
+
+@pytest.fixture
 def five_to_ten_age_group() -> AgeGroup:
     return AgeGroup.objects.create(minimum=5, maximum=10)
 

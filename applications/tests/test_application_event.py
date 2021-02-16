@@ -93,3 +93,19 @@ def test_should_prioritize_highest_order_number_when_both_baskets_fit(
         application_round_basket_one.id: [recurring_application_event],
         application_round_basket_two.id: [],
     }
+
+
+@pytest.mark.django_db
+def test_should_exclude_events_not_matching_application_round(
+    default_application_round,
+    second_application_round,
+    application_round_basket_one,
+    recurring_application_event,
+    application_in_second_application_round,
+):
+    recurring_application_event.application = application_in_second_application_round
+    recurring_application_event.save()
+
+    events_by_baskets = default_application_round.get_application_events_by_basket()
+
+    assert events_by_baskets == {application_round_basket_one.id: []}

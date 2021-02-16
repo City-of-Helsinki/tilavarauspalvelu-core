@@ -96,20 +96,16 @@ def minimal_application(default_application_round) -> Application:
 
 @pytest.fixture
 def application_with_reservation_units(
-    application_round_with_reservation_units,
+    default_application_round,
 ) -> Application:
-    return Application.objects.create(
-        application_round_id=application_round_with_reservation_units.id
-    )
+    return Application.objects.create(application_round_id=default_application_round.id)
 
 
 @pytest.fixture
 def application_with_application_events(
-    application_with_reservation_units,
+    default_application_round,
 ) -> Application:
-    return Application.objects.create(
-        application_round_id=application_with_reservation_units.id
-    )
+    return Application.objects.create(application_round_id=default_application_round.id)
 
 
 @pytest.fixture
