@@ -49,7 +49,7 @@ const Ruler = styled.hr`
 `;
 
 const SmallSubHeadline = styled.div`
-  font-family: HelsinkiGrotesk-Bold, var(--font-default);
+  font-family: var(--font-bold);
   margin-top: var(--spacing-layout-m);
   font-weight: 700;
   font-size: var(--fontsize-heading-s);

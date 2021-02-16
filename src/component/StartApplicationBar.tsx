@@ -24,7 +24,7 @@ const ReservationUnitCount = styled.div`
 `;
 
 const Button = styled(HDSButton)`
-  font-family: HelsinkiGrotesk-Bold, var(--font-default);
+  font-family: var(--font-bold);
   background-color: white;
   margin-left: var(--spacing-m);
 `;

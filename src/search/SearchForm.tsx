@@ -1,11 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Checkbox, Select, TextInput, Button, IconSearch } from 'hds-react';
+import {
+  Checkbox,
+  Select,
+  TextInput,
+  Button as HDSButton,
+  IconSearch,
+  IconSliders,
+} from 'hds-react';
 import { useForm } from 'react-hook-form';
 import styled from 'styled-components';
 import { breakpoint } from '../common/style';
 import { getApplicationPeriods, getParameters } from '../common/api';
-import { mapOptions, OptionType, getSelectedOption } from '../common/util';
+import { mapOptions, getSelectedOption } from '../common/util';
+import { emptyOption, participantCountOptions } from '../common/const';
+import { OptionType } from '../common/types';
 
 type Props = {
   onSearch: (search: Record<string, string>) => void;
@@ -13,6 +22,10 @@ type Props = {
 };
 
 const options = [] as OptionType[];
+
+const Button = styled(HDSButton)`
+  margin-left: var(--spacing-m);
+`;
 
 const Container = styled.div`
   @media (max-width: ${breakpoint.m}) {
@@ -64,9 +77,12 @@ const ButtonContainer = styled.div`
 const SearchForm = ({ onSearch, formValues }: Props): JSX.Element | null => {
   const { t, i18n } = useTranslation();
   const [ready, setReady] = useState<boolean>(false);
-
+  const [showMoreFilters, setShowMoreFilters] = useState(false);
   const [purposeOptions, setPurposeOptions] = useState<OptionType[]>([]);
   const [districtOptions, setDistrictOptions] = useState<OptionType[]>([]);
+  const [reservationUnitTypeOptions, setReservationUnitTypeOptions] = useState<
+    OptionType[]
+  >([]);
   const [applicationPeriodOptions, setApplicationPeriodOptions] = useState<
     OptionType[]
   >([]);
@@ -77,6 +93,8 @@ const SearchForm = ({ onSearch, formValues }: Props): JSX.Element | null => {
     register({ name: 'purpose' });
     register({ name: 'district' });
     register({ name: 'application_round' });
+    register({ name: 'max_persons' });
+    register({ name: 'reservation_unit_type' });
   }, [register]);
 
   useEffect(() => {
@@ -91,6 +109,16 @@ const SearchForm = ({ onSearch, formValues }: Props): JSX.Element | null => {
       setDistrictOptions(
         mapOptions(fetchedDistrictOptions, t('common.select'), i18n.language)
       );
+      const fetchedReservationUnitTypes = await getParameters(
+        'reservation_unit_type'
+      );
+      setReservationUnitTypeOptions(
+        mapOptions(
+          fetchedReservationUnitTypes,
+          t('common.select'),
+          i18n.language
+        )
+      );
       setReady(true);
     }
     fetchData();
@@ -99,6 +127,12 @@ const SearchForm = ({ onSearch, formValues }: Props): JSX.Element | null => {
   useEffect(() => {
     Object.keys(formValues).forEach((p) => setValue(p, formValues[p]));
   }, [formValues, setValue]);
+
+  useEffect(() => {
+    if (showMoreFilters) {
+      document.getElementById('participantCountFilter-toggle-button')?.focus();
+    }
+  }, [showMoreFilters]);
 
   const search = (criteria: Record<string, string>) => {
     onSearch(criteria);
@@ -135,7 +169,7 @@ const SearchForm = ({ onSearch, formValues }: Props): JSX.Element | null => {
             getValues('application_round'),
             applicationPeriodOptions
           )}
-          label="Haku"
+          label={t('SearchForm.roundLabel')}
         />
         <ShowL />
         <Select
@@ -146,7 +180,7 @@ const SearchForm = ({ onSearch, formValues }: Props): JSX.Element | null => {
             setValue('purpose', selection.value);
           }}
           defaultValue={getSelectedOption(getValues('purpose'), purposeOptions)}
-          label="Käyttötarkoitus"
+          label={t('SearchForm.purposeLabel')}
         />
         <Select
           id="district"
@@ -159,13 +193,13 @@ const SearchForm = ({ onSearch, formValues }: Props): JSX.Element | null => {
             getValues('district'),
             districtOptions
           )}
-          label="Kaupunginosa"
+          label={t('SearchForm.districtLabel')}
         />
         <Select
           placeholder={t('common.select')}
           disabled
           options={options}
-          label="Hinta"
+          label={t('SearchForm.priceLabel')}
         />
         <ShowM />
         <Checkbox
@@ -174,9 +208,53 @@ const SearchForm = ({ onSearch, formValues }: Props): JSX.Element | null => {
           label="Sopiva liikuntarajoitteisille"
         />
         <Checkbox disabled id="checkbox2" label="Lähimmät paikat ensin" />
+        <ShowL />
+        {showMoreFilters ? (
+          <>
+            <Select
+              id="participantCountFilter"
+              placeholder={t('common.select')}
+              options={[emptyOption(t('common.select'))].concat(
+                participantCountOptions
+              )}
+              label={t('SearchForm.participantCountLabel')}
+              onChange={(selection: OptionType): void => {
+                setValue('max_persons', selection.value);
+              }}
+              defaultValue={getSelectedOption(
+                getValues('max_persons'),
+                participantCountOptions
+              )}
+            />
+            <Select
+              placeholder={t('common.select')}
+              options={reservationUnitTypeOptions}
+              label={t('SearchForm.typeLabel')}
+              onChange={(selection: OptionType): void => {
+                setValue('reservation_unit_type', selection.value);
+              }}
+              defaultValue={getSelectedOption(
+                getValues('reservation_unit_type'),
+                reservationUnitTypeOptions
+              )}
+            />
+          </>
+        ) : null}
       </Container>
       <Hr />
       <ButtonContainer>
+        <Button
+          variant="supplementary"
+          iconLeft={<IconSliders />}
+          onClick={() => {
+            setShowMoreFilters(!showMoreFilters);
+          }}>
+          {t(
+            showMoreFilters
+              ? 'SearchForm.showLessFilters'
+              : 'SearchForm.showMoreFilters'
+          )}
+        </Button>
         <Button
           id="searchButton"
           onClick={handleSubmit(search)}

@@ -11,6 +11,7 @@ import SearchResultList from './SearchResultList';
 import { getReservationUnits, ReservationUnitsParameters } from '../common/api';
 import { ReservationUnit } from '../common/types';
 import { searchUrl } from '../common/util';
+import { searchPrefix } from '../common/const';
 
 const style = {
   fontSize: 'var(--fontsize-heading-l)',
@@ -66,7 +67,7 @@ const Search = (): JSX.Element => {
       <HeadContainer>
         <Container>
           <Breadcrumb
-            current={{ label: 'breadcrumb.search', linkTo: '/search' }}
+            current={{ label: 'breadcrumb.search', linkTo: searchPrefix }}
           />
           <h1 style={style}>{t('search.heading')}</h1>
           <span className="text-lg">{t('search.text')}</span>

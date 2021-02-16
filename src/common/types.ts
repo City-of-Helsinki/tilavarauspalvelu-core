@@ -145,6 +145,12 @@ export type ApplicationEventSchedule = {
   end: string;
 };
 
+// for Selector
+export type OptionType = {
+  label: string;
+  value?: number;
+};
+
 // editor context
 
 export type Action = {

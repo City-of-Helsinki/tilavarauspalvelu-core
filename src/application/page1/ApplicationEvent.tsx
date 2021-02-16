@@ -7,13 +7,13 @@ import ReservationUnitList from './ReservationUnitList';
 import {
   ApplicationEvent as ApplicationEventType,
   ApplicationPeriod,
+  OptionType,
   ReservationUnit,
 } from '../../common/types';
 import {
   formatApiDate,
   formatDate,
   getSelectedOption,
-  OptionType,
 } from '../../common/util';
 import { breakpoint } from '../../common/style';
 
@@ -38,7 +38,7 @@ const Ruler = styled.hr`
 `;
 
 const SubHeadLine = styled.div`
-  font-family: HelsinkiGrotesk-Bold, var(--font-default);
+  font-family: var(--font-bold);
   margin-top: var(--spacing-layout-m);
   font-weight: 700;
   font-size: var(--fontsize-heading-m);

@@ -12,9 +12,10 @@ import ApplicationEvent from './ApplicationEvent';
 import {
   Application as ApplicationType,
   ApplicationPeriod,
+  OptionType,
   ReservationUnit,
 } from '../../common/types';
-import { mapOptions, OptionType } from '../../common/util';
+import { mapOptions } from '../../common/util';
 import { getParameters } from '../../common/api';
 import { breakpoint } from '../../common/style';
 

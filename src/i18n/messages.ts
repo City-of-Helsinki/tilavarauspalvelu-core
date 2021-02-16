@@ -207,6 +207,30 @@ const translations: Translations = {
   SearchForm: {
     searchTermPlaceholder: ['Hae sanalla', 'Search with words', 'Sök med ord'],
     searchButton: ['Hae tilaa'],
+    purposeLabel: [
+      'Tilan käyttötarkoitus',
+      'Purpose of use',
+      'Utrymmets användningsändamål',
+    ],
+    roundLabel: ['Hakukierros', 'Search round', 'Sökrunda'],
+    districtLabel: ['Kaupunginosa', 'District', 'Grannskap'],
+    priceLabel: ['Hinta', 'Price', 'Pris'],
+    participantCountLabel: [
+      'Henkilömäärä vähintään',
+      'Minimum number of people permitted',
+      'Minsta personantal i utrymmet',
+    ],
+    typeLabel: ['Tilan tyyppi', 'Type', 'Typ'],
+    showMoreFilters: [
+      'Tarkennettu haku',
+      'Advanced Search',
+      'Avancerad sökning',
+    ],
+    showLessFilters: [
+      'Näytä vähemmän vaihtoehtoja',
+      'Show fewer filters',
+      'Visa färre filter',
+    ],
   },
   SearchResultList: {
     count_plural: ['{{count}} Hakutulosta'],

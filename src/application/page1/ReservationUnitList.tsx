@@ -14,11 +14,11 @@ import { getReservationUnit } from '../../common/api';
 import {
   ApplicationEvent,
   ApplicationPeriod,
+  OptionType,
   ReservationUnit,
 } from '../../common/types';
 import Modal from '../../component/Modal';
 import ReservationUnitModal from './ReservationUnitModal';
-import { OptionType } from '../../common/util';
 
 type CardProps = {
   order: number;

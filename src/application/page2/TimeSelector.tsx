@@ -26,7 +26,7 @@ export type Cell = {
 };
 
 const CalendarHead = styled.div`
-  font-family: HelsinkiGrotesk-Bold, var(--font-default);
+  font-family: var(--font-bold);
   font-size: var(--fontsize-body-l);
   text-align: center;
   padding: var(--spacing-2-xs) 0;
@@ -40,7 +40,7 @@ const TimeSelectionButton = styled.button<{
 
   display: block;
   width: 100%;
-  font-family: HelsinkiGrotesk-Bold, var(--font-default);
+  font-family: var(--font-bold);
   font-size: var(--fontsize-heading-m);
   font-weight: bold;
   padding: 0.3em 0.5em;
@@ -57,7 +57,7 @@ const TimeSelectionButton = styled.button<{
 `;
 
 const SubHeadline = styled.div`
-  font-family: HelsinkiGrotesk-Bold, var(--font-default);
+  font-family: var(--font-bold);
   margin-top: var(--spacing-layout-m);
   font-weight: 700;
   font-size: var(--fontsize-heading-m);
@@ -163,7 +163,7 @@ const LegendBox = styled.div<{ type: string }>`
 `;
 
 const LegendLabel = styled.div`
-  font-family: HelsinkiGrotesk-Bold, var(--font-default);
+  font-family: var(--font-bold);
 `;
 
 const TimePreviewContainer = styled.div`

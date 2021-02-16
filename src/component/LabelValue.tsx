@@ -3,13 +3,13 @@ import styled from 'styled-components';
 
 const LabelElement = styled.div`
   margin-top: var(--spacing-3-xs);
-  font-family: HelsinkiGrotesk-Bold, var(--font-default);
+  font-family: var(--font-bold);
   font-size: var(--fontsize-body-l);
   font-weight: bold;
 `;
 const ValueElement = styled.div`
   margin-top: var(--spacing-2-xs);
-  font-family: HelsinkiGrotesk-Regular, var(--font-default);
+  font-family: var(--font-bold);
   font-size: var(--fontsize-body-m);
 `;
 

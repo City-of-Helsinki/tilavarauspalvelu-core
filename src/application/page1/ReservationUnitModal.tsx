@@ -17,8 +17,11 @@ import {
   getReservationUnits,
   ReservationUnitsParameters,
 } from '../../common/api';
-import { ApplicationPeriod, ReservationUnit } from '../../common/types';
-import { OptionType } from '../../common/util';
+import {
+  ApplicationPeriod,
+  OptionType,
+  ReservationUnit,
+} from '../../common/types';
 import { breakpoint } from '../../common/style';
 import { reservationUnitPath } from '../../common/const';
 
@@ -57,7 +60,7 @@ const Actions = styled.div`
 `;
 
 const Name = styled.span`
-  font-family: HelsinkiGrotesk-Bold, var(--font-default);
+  font-family: var(--font-bold);
   font-size: var(--fontsize-heading-m);
   font-weight: bold;
 
@@ -109,7 +112,7 @@ const LinkContent = styled.span`
   display: flex;
   flex-direction: row;
   align-items: middle;
-  font-family: HelsinkiGrotesk-Bold, var(--font-default);
+  font-family: var(--font-bold);
   font-size: var(--fontsize-body-m);
 `;
 
@@ -196,12 +199,12 @@ const MainContainer = styled.div`
 `;
 
 const Heading = styled.div`
-  font-family: HelsinkiGrotesk-Bold, var(--font-default);
+  font-family: var(--font-bold);
   font-size: var(--fontsize-heading-l);
 `;
 
 const Text = styled.span`
-  font-family: HelsinkiGrotesk-Bold, var(--font-default);
+  font-family: var(--font-bold);
   font-size: var(--fontsize-heading-s);
 `;
 

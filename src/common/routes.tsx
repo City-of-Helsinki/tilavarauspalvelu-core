@@ -7,7 +7,7 @@ import {
   ApplicationPeriod as ApplicationPeriodType,
   ReservationUnit as ReservationUnitType,
 } from './types';
-import { reservationUnitPrefix } from './const';
+import { reservationUnitPrefix, searchPrefix } from './const';
 
 interface ReservationUnitParams {
   id?: string;
@@ -31,7 +31,7 @@ const Routes: Route[] = [
     dataKey: 'applicationPeriods',
   },
   {
-    path: '/search',
+    path: searchPrefix,
     component: Search,
     startApplicationBar: true,
   },
