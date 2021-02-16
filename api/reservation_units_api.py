@@ -32,7 +32,7 @@ class ReservationUnitFilter(filters.FilterSet):
     )
     max_persons = filters.NumberFilter(
         field_name="spaces__max_persons",
-        lookup_expr="lte",
+        lookup_expr="gte",
     )
     reservation_unit_type = filters.ModelChoiceFilter(
         field_name="reservation_unit_type", queryset=ReservationUnitType.objects.all()
