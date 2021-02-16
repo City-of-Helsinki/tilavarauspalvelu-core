@@ -81,7 +81,7 @@ def test_should_test_should_exclude_if_age_group_does_not_match(
 
 
 @pytest.mark.django_db
-def test_should_prioritize_highest_order_number_when_both_baskets_fit(
+def test_event_can_belong_to_multiple_baskets(
     default_application_round,
     application_round_basket_one,
     application_round_basket_two,
@@ -91,7 +91,7 @@ def test_should_prioritize_highest_order_number_when_both_baskets_fit(
 
     assert events_by_baskets == {
         application_round_basket_one.id: [recurring_application_event],
-        application_round_basket_two.id: [],
+        application_round_basket_two.id: [recurring_application_event],
     }
 
 

@@ -1,6 +1,6 @@
 import datetime
 import math
-from typing import Dict
+from typing import Dict, List
 
 from django.utils import timezone
 
@@ -93,6 +93,7 @@ class AllocationEvent(object):
         application_event: ApplicationEvent,
         period_start: datetime.date,
         period_end: datetime.date,
+        baskets: [int] = [],
     ):
         self.space_ids = list(
             map(
@@ -118,6 +119,10 @@ class AllocationEvent(object):
         )
         self.events_per_week = application_event.events_per_week
         self.num_persons = application_event.num_persons
+        if baskets is None:
+            self.baskets = []
+        else:
+            self.baskets = baskets
 
     @staticmethod
     def occurrences_to_integers_with_precision(
@@ -134,7 +139,6 @@ class AllocationBasket(object):
         self.id = application_round_basket.id
         self.allocation_percentage = application_round_basket.allocation_percentage
         self.order_number = application_round_basket.order_number
-        self.allocation_events = []
 
 
 class AllocationData(object):
@@ -146,6 +150,9 @@ class AllocationData(object):
             self.add_space(unit=unit)
 
         self.allocation_events = []
+        self.baskets = {}
+        event_baskets = self.initialize_baskets(application_round)
+
         for application in application_round.applications.all():
             for application_event in application.application_events.all():
                 self.allocation_events.append(
@@ -153,8 +160,30 @@ class AllocationData(object):
                         application_event=application_event,
                         period_start=self.period_start,
                         period_end=self.period_end,
+                        baskets=event_baskets.get(application_event.id),
                     )
                 )
+
+    def initialize_baskets(
+        self, application_round: ApplicationRound
+    ) -> Dict[int, List[int]]:
+        event_baskets = {}
+        for (
+            basket_id,
+            application_events,
+        ) in application_round.get_application_events_by_basket().items():
+            basket = next(
+                basket
+                for basket in application_round.application_round_baskets.all()
+                if basket.id == basket_id
+            )
+            self.baskets[basket_id] = basket
+            for application_event in application_events:
+                if event_baskets.get(application_event.id):
+                    event_baskets[application_event.id].append(basket_id)
+                else:
+                    event_baskets[application_event.id] = [basket_id]
+        return event_baskets
 
     def get_all_dates(self):
         dates = []
