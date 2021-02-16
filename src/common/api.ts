@@ -1,5 +1,6 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import applyCaseMiddleware from 'axios-case-converter';
+import { apiBaseUrl } from './const';
 import {
   Application,
   ApplicationPeriod,
@@ -8,8 +9,6 @@ import {
 } from './types';
 
 const axiosClient = applyCaseMiddleware(axios.create());
-
-const apiBaseUrl: string = process.env.REACT_APP_TILANVARAUS_API_URL || '';
 
 const applicationRoundBasePath = 'application_round';
 const reservationUnitsBasePath = 'reservation_unit';

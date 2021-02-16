@@ -1,6 +1,5 @@
 const path = require('path');
 const nodeExternals = require('webpack-node-externals');
-const Dotenv = require('dotenv-webpack');
 
 const CSSLoader = {
   loader: 'css-loader',
@@ -44,9 +43,4 @@ module.exports = {
       },
     ],
   },
-  plugins: [
-    new Dotenv({
-      path: '.env.production',
-    }),
-  ],
 };

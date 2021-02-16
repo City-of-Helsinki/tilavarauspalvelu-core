@@ -4,11 +4,12 @@ import { BrowserRouter } from 'react-router-dom';
 import * as Sentry from '@sentry/react';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import { sentryDSN, sentryEnvironment } from './common/const';
 
-if (process.env.NODE_ENV === 'production' && process.env.REACT_APP_SENTRY_DSN) {
+if (sentryDSN) {
   Sentry.init({
-    dsn: process.env.REACT_APP_SENTRY_DSN,
-    environment: process.env.NODE_ENV,
+    dsn: sentryDSN,
+    environment: sentryEnvironment,
     release: `tilavarauspalvelu-ui@${process.env.npm_package_version}`,
     integrations: [
       new Sentry.Integrations.GlobalHandlers({

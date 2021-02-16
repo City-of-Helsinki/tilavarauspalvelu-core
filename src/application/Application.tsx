@@ -31,6 +31,8 @@ import {
   SelectionsListContextType,
 } from '../context/SelectionsListContext';
 
+import { routeData } from '../common/const';
+
 type ParamTypes = {
   applicationPeriodId: string;
   applicationId: string;
@@ -58,11 +60,9 @@ const Application = (): JSX.Element | null => {
   );
 
   const applicationPeriod = useAsync(async () => {
-    // eslint-disable-next-line
-    const backendData = window.__ROUTE_DATA__?.applicationPeriod;
+    const backendData = routeData()?.applicationPeriod;
     if (backendData) {
-      // eslint-disable-next-line
-      window.__ROUTE_DATA__.applicationPeriod = undefined;
+      routeData().applicationPeriod = undefined;
       return backendData;
     }
 

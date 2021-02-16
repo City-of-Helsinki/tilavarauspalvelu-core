@@ -5,6 +5,7 @@ import Container from '../component/Container';
 import { ReservationUnit as ReservationUnitType } from '../common/types';
 import { getReservationUnit } from '../common/api';
 import Head from './Head';
+import { routeData } from '../common/const';
 
 type ParamTypes = {
   id: string;
@@ -26,12 +27,10 @@ const ReservationUnit = (): JSX.Element | null => {
 
   useEffect(() => {
     async function fetchData() {
-      // eslint-disable-next-line
-      const backendData = window.__ROUTE_DATA__?.reservationUnit;
+      const backendData = routeData()?.reservationUnit;
       if (backendData) {
         setReservationUnit(backendData);
-        // eslint-disable-next-line
-        window.__ROUTE_DATA__.reservationUnit = undefined;
+        routeData().reservationUnit = undefined;
       } else {
         const unit = await getReservationUnit(Number(id));
         setReservationUnit(unit);

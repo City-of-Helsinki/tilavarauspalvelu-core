@@ -3,6 +3,7 @@ import { parseISO } from 'date-fns';
 import { ApplicationPeriod } from '../common/types';
 import { getApplicationPeriods } from '../common/api';
 import ApplicationPeriodCard from './ApplicationPeriodCard';
+import { routeData } from '../common/const';
 
 interface IProps {
   data?: ApplicationPeriod[];
@@ -15,13 +16,11 @@ const ApplicationPeriodList = ({ data }: IProps): JSX.Element => {
 
   useEffect(() => {
     async function fetchData() {
-      // eslint-disable-next-line
-      const backendData = window.__ROUTE_DATA__?.applicationPeriods;
+      const backendData = routeData()?.applicationPeriods;
       let periods;
       if (backendData) {
         periods = backendData;
-        // eslint-disable-next-line
-        window.__ROUTE_DATA__.applicationPeriods = undefined;
+        routeData().applicationPeriods = undefined;
       } else {
         periods = await getApplicationPeriods();
       }
