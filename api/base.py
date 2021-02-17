@@ -115,8 +115,8 @@ class TranslatedModelSerializer(serializers.ModelSerializer):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.model_translatable_fields = get_translatable_fields_for_model(
-            self.Meta.model
+        self.model_translatable_fields = (
+            get_translatable_fields_for_model(self.Meta.model) or []
         )
 
     def build_field(self, source, *args, **kwargs):
