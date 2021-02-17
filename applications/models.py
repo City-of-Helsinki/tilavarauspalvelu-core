@@ -80,7 +80,7 @@ class Organisation(models.Model):
 
     identifier = models.TextField(
         verbose_name=_("Organisation identifier"),
-        null=False,
+        null=True,
         blank=False,
         max_length=255,
         unique=False,
