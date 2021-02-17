@@ -133,6 +133,7 @@ class AllocationBasket(object):
     def __init__(self, application_round_basket: ApplicationRoundBasket):
         self.id = application_round_basket.id
         self.allocation_percentage = application_round_basket.allocation_percentage
+        self.order_number = application_round_basket.order_number
         self.allocation_events = []
 
 

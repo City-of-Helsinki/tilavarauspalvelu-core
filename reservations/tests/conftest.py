@@ -2,6 +2,7 @@ import datetime
 from typing import Dict
 
 import pytest
+from django.utils import timezone
 
 from applications.models import (
     Application,
@@ -27,15 +28,27 @@ def get_default_end() -> datetime.date:
     return datetime.date(year=2020, month=1, day=31)
 
 
+def get_default_start_datetime() -> datetime.date:
+    return timezone.datetime.combine(
+        get_default_start(), datetime.datetime.min.time()
+    ).astimezone()
+
+
+def get_default_end_datetime() -> datetime.date:
+    return timezone.datetime.combine(
+        get_default_end(), datetime.datetime.max.time()
+    ).astimezone()
+
+
 @pytest.fixture
 def default_application_round() -> ApplicationRound:
     return ApplicationRound.objects.create(
-        application_period_begin=get_default_start(),
-        application_period_end=get_default_end(),
+        application_period_begin=get_default_start_datetime(),
+        application_period_end=get_default_end_datetime(),
         reservation_period_begin=get_default_start(),
         reservation_period_end=get_default_end(),
-        public_display_begin=get_default_start(),
-        public_display_end=get_default_end(),
+        public_display_begin=get_default_start_datetime(),
+        public_display_end=get_default_end_datetime(),
     )
 
 
@@ -83,20 +96,16 @@ def minimal_application(default_application_round) -> Application:
 
 @pytest.fixture
 def application_with_reservation_units(
-    application_round_with_reservation_units,
+    default_application_round,
 ) -> Application:
-    return Application.objects.create(
-        application_round_id=application_round_with_reservation_units.id
-    )
+    return Application.objects.create(application_round_id=default_application_round.id)
 
 
 @pytest.fixture
 def application_with_application_events(
-    application_with_reservation_units,
+    default_application_round,
 ) -> Application:
-    return Application.objects.create(
-        application_round_id=application_with_reservation_units.id
-    )
+    return Application.objects.create(application_round_id=default_application_round.id)
 
 
 @pytest.fixture
