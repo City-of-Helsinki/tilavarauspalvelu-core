@@ -59,6 +59,7 @@ class OrganisationSerializer(serializers.ModelSerializer):
         allow_null=True,
     )
     identifier = serializers.CharField(allow_null=True)
+
     class Meta:
         model = Organisation
         fields = [
@@ -424,6 +425,8 @@ class ApplicationSerializer(serializers.ModelSerializer):
         help_text="Billing address for the application",
         allow_null=True,
     )
+
+    applicant_type = serializers.CharField(allow_null=True)
 
     class Meta:
         model = Application

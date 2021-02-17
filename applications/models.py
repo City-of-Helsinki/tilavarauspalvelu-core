@@ -448,7 +448,10 @@ class Application(models.Model):
     )
 
     applicant_type = models.CharField(
-        max_length=64, verbose_name=_("Applicant type"), choices=APPLICANT_TYPE_CHOICES
+        max_length=64,
+        verbose_name=_("Applicant type"),
+        choices=APPLICANT_TYPE_CHOICES,
+        null=True,
     )
 
     organisation = models.ForeignKey(
