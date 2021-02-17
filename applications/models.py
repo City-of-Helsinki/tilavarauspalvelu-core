@@ -36,8 +36,9 @@ class Address(models.Model):
         verbose_name=_("Street address"), null=False, blank=False, max_length=80
     )
 
-    post_code = models.PositiveIntegerField(
+    post_code = models.CharField(
         verbose_name=_("Post code"),
+        max_length=5,
         null=False,
         blank=False,
     )
