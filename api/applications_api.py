@@ -58,7 +58,7 @@ class OrganisationSerializer(serializers.ModelSerializer):
         read_only=False,
         allow_null=True,
     )
-
+    identifier = serializers.CharField(allow_null=True)
     class Meta:
         model = Organisation
         fields = [
