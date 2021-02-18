@@ -7,7 +7,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('applications', '0016_add_order_number_to_application_round_basket'),
+        ('applications', '0017_application_billing_address'),
     ]
 
     operations = [

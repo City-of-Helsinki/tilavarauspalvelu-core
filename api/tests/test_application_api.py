@@ -6,17 +6,21 @@ from applications.models import Application, ApplicationEvent
 
 @pytest.mark.django_db
 def test_application_create(
-    purpose,
     application_round,
     user_api_client,
-    user,
 ):
     assert Application.objects.count() == 0
     data = {
+        "applicant_type": "company",
         "organisation": {
             "id": None,
             "identifier": "123-identifier",
             "name": "Super organisation",
+            "address": {
+                "street_address": "Testikatu 28",
+                "post_code": 33540,
+                "city": "Tampere",
+            },
         },
         "contact_person": {
             "id": None,
@@ -28,12 +32,19 @@ def test_application_create(
         "application_round_id": application_round.id,
         "application_events": [],
         "status": "draft",
+        "billing_address": {
+            "street_address": "Laskukatu 1c",
+            "post_code": 33540,
+            "city": "Tampere",
+        },
     }
     response = user_api_client.post(reverse("application-list"), data, format="json")
     assert response.status_code == 201
 
-    assert response.data.get("organisation")["identifier"] == "123-identifier"
-    assert response.data.get("contact_person")["email"] == "john@test.com"
+    assert response.data["organisation"]["identifier"] == "123-identifier"
+    assert response.data["contact_person"]["email"] == "john@test.com"
+    assert response.data["organisation"]["address"]["street_address"] == "Testikatu 28"
+    assert response.data["billing_address"]["street_address"] == "Laskukatu 1c"
     assert Application.objects.count() == 1
 
 
@@ -45,10 +56,12 @@ def test_application_update_should_update_organisation_and_contact_person(
 
     data = {
         "id": application.id,
+        "applicant_type": "company",
         "organisation": {
             "id": organisation.id,
             "identifier": organisation.identifier,
             "name": "Super organisation modified",
+            "address": None,
         },
         "contact_person": {
             "id": person.id,
@@ -60,6 +73,7 @@ def test_application_update_should_update_organisation_and_contact_person(
         "application_round_id": application_round.id,
         "application_events": [],
         "status": "draft",
+        "billing_address": None,
     }
 
     response = user_api_client.put(
@@ -67,6 +81,7 @@ def test_application_update_should_update_organisation_and_contact_person(
         data=data,
         format="json",
     )
+
     assert response.status_code == 200
     assert response.data.get("contact_person")["id"] == person.id
     assert response.data.get("contact_person")["last_name"] == "The modified"
@@ -83,11 +98,13 @@ def test_application_update_should_null_organisation_and_contact_person(
 
     data = {
         "id": application.id,
+        "applicant_type": Application.APPLICANT_TYPE_INDIVIDUAL,
         "organisation": None,
         "contact_person": None,
         "application_round_id": application_round.id,
         "application_events": [],
         "status": "draft",
+        "billing_address": None,
     }
 
     response = user_api_client.put(
@@ -125,11 +142,13 @@ def test_application_update_updating_and_adding_application_events(
     valid_application_event_data["name"] = "New event name"
     data = {
         "id": application.id,
+        "applicant_type": Application.APPLICANT_TYPE_INDIVIDUAL,
         "organisation": None,
         "contact_person": None,
         "application_round_id": application_round.id,
         "application_events": [existing_event, valid_application_event_data],
         "status": "draft",
+        "billing_address": None,
     }
 
     response = user_api_client.put(
@@ -168,11 +187,13 @@ def test_application_update_should_remove_application_events_if_no_longer_in_dat
     valid_application_event_data["name"] = "New event name"
     data = {
         "id": application.id,
+        "applicant_type": Application.APPLICANT_TYPE_INDIVIDUAL,
         "organisation": None,
         "contact_person": None,
         "application_round_id": application_round.id,
         "application_events": [valid_application_event_data],
         "status": "draft",
+        "billing_address": None,
     }
 
     response = user_api_client.put(
@@ -244,10 +265,16 @@ def test_application_update_review_valid(
 
     data = {
         "id": application.id,
+        "applicant_type": Application.APPLICANT_TYPE_COMPANY,
         "organisation": {
             "id": organisation.id,
             "identifier": organisation.identifier,
             "name": "Super organisation modified",
+            "address": {
+                "street_address": "Osoitetie 11b",
+                "post_code": 33540,
+                "city": "Tampere",
+            },
         },
         "contact_person": {
             "id": person.id,
@@ -259,6 +286,7 @@ def test_application_update_review_valid(
         "application_round_id": application_round.id,
         "application_events": [valid_application_event_data],
         "status": "in_review",
+        "billing_address": None,
     }
 
     response = user_api_client.put(

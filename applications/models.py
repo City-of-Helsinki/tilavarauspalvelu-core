@@ -36,8 +36,9 @@ class Address(models.Model):
         verbose_name=_("Street address"), null=False, blank=False, max_length=80
     )
 
-    post_code = models.PositiveIntegerField(
+    post_code = models.CharField(
         verbose_name=_("Post code"),
+        max_length=5,
         null=False,
         blank=False,
     )
@@ -79,7 +80,7 @@ class Organisation(models.Model):
 
     identifier = models.TextField(
         verbose_name=_("Organisation identifier"),
-        null=False,
+        null=True,
         blank=False,
         max_length=255,
         unique=False,
@@ -99,6 +100,9 @@ class Organisation(models.Model):
     active_members = models.PositiveIntegerField(
         verbose_name=_("Active members"),
         null=True,
+    )
+    core_business = models.TextField(
+        verbose_name=_("Core business of this organization"),
         blank=True,
     )
 
@@ -431,6 +435,25 @@ class ApplicationEventStatus(models.Model):
 
 
 class Application(models.Model):
+    APPLICANT_TYPE_INDIVIDUAL = "individual"
+    APPLICANT_TYPE_ASSOCIATION = "association"
+    APPLICANT_TYPE_COMMUNITY = "community"
+    APPLICANT_TYPE_COMPANY = "company"
+
+    APPLICANT_TYPE_CHOICES = (
+        (APPLICANT_TYPE_INDIVIDUAL, _("Individual")),
+        (APPLICANT_TYPE_ASSOCIATION, _("Association")),
+        (APPLICANT_TYPE_COMMUNITY, _("Community")),
+        (APPLICANT_TYPE_COMPANY, _("Company")),
+    )
+
+    applicant_type = models.CharField(
+        max_length=64,
+        verbose_name=_("Applicant type"),
+        choices=APPLICANT_TYPE_CHOICES,
+        null=True,
+    )
+
     organisation = models.ForeignKey(
         Organisation,
         verbose_name=_("Organisation"),
@@ -462,6 +485,10 @@ class Application(models.Model):
         blank=False,
         on_delete=models.PROTECT,
         related_name="applications",
+    )
+
+    billing_address = models.ForeignKey(
+        Address, null=True, blank=True, on_delete=models.SET_NULL
     )
 
     @property

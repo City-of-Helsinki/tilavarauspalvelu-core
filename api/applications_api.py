@@ -53,6 +53,12 @@ class AddressViewSet(viewsets.ModelViewSet):
 class OrganisationSerializer(serializers.ModelSerializer):
 
     id = serializers.IntegerField(allow_null=True, required=False)
+    address = AddressSerializer(
+        help_text="Address object of this organisation",
+        read_only=False,
+        allow_null=True,
+    )
+    identifier = serializers.CharField(allow_null=True)
 
     class Meta:
         model = Organisation
@@ -61,6 +67,8 @@ class OrganisationSerializer(serializers.ModelSerializer):
             "name",
             "identifier",
             "year_established",
+            "address",
+            "core_business",
             "active_members",
         ]
         extra_kwargs = {
@@ -77,6 +85,32 @@ class OrganisationSerializer(serializers.ModelSerializer):
                 "help_text": "Number of active persons in the organization.",
             },
         }
+
+    def handle_address(self, address_data) -> Union[Address, None]:
+        if address_data is None:
+            return None
+        elif "id" not in address_data or address_data["id"] is None:
+            address = AddressSerializer(data=address_data).create(
+                validated_data=address_data
+            )
+        else:
+            address = AddressSerializer(data=address_data).update(
+                instance=Address.objects.get(pk=address_data["id"]),
+                validated_data=address_data,
+            )
+        return address
+
+    def create(self, validated_data):
+        address_data = validated_data.pop("address")
+        validated_data["address"] = self.handle_address(address_data=address_data)
+        organisation = super().create(validated_data)
+        return organisation
+
+    def update(self, instance, validated_data):
+        address_data = validated_data.pop("address")
+        validated_data["address"] = self.handle_address(address_data=address_data)
+        organisation = super().update(instance, validated_data)
+        return organisation
 
 
 class PersonSerializer(serializers.ModelSerializer):
@@ -389,10 +423,18 @@ class ApplicationSerializer(serializers.ModelSerializer):
         many=True,
     )
 
+    billing_address = AddressSerializer(
+        help_text="Billing address for the application",
+        allow_null=True,
+    )
+
+    applicant_type = serializers.CharField(allow_null=True)
+
     class Meta:
         model = Application
         fields = [
             "id",
+            "applicant_type",
             "organisation",
             "application_round_id",
             "contact_person",
@@ -400,6 +442,7 @@ class ApplicationSerializer(serializers.ModelSerializer):
             "application_events",
             "status",
             "aggregated_data",
+            "billing_address",
         ]
 
     @staticmethod
@@ -410,12 +453,18 @@ class ApplicationSerializer(serializers.ModelSerializer):
             person.save()
         return person
 
-    @staticmethod
-    def handle_organisation(organisation_data) -> Union[Organisation, None]:
-        organisation = None
-        if organisation_data is not None:
-            organisation = Organisation(**organisation_data)
-            organisation.save()
+    def handle_organisation(self, organisation_data) -> Union[Organisation, None]:
+        if organisation_data is None:
+            return None
+        elif "id" not in organisation_data or organisation_data["id"] is None:
+            organisation = OrganisationSerializer(data=organisation_data).create(
+                validated_data=organisation_data
+            )
+        else:
+            organisation = OrganisationSerializer(data=organisation_data).update(
+                instance=Organisation.objects.get(pk=organisation_data["id"]),
+                validated_data=organisation_data,
+            )
         return organisation
 
     def validate(self, data):
@@ -460,7 +509,7 @@ class ApplicationSerializer(serializers.ModelSerializer):
         event_ids = []
         for event in event_data:
             event["application"] = appliction_instance
-            if "id" not in event or ["id"] is None:
+            if "id" not in event or event["id"] is None:
                 event_ids.append(
                     ApplicationEventSerializer(data=event)
                     .create(validated_data=event)
@@ -484,6 +533,11 @@ class ApplicationSerializer(serializers.ModelSerializer):
         request_user = (
             request.user if request and request.user.is_authenticated else None
         )
+
+        billing_address_data = validated_data.pop("billing_address")
+        if billing_address_data:
+            billing_address = Address.objects.create(**billing_address_data)
+            validated_data["billing_address"] = billing_address
 
         status = validated_data.pop("status")
 
@@ -513,9 +567,15 @@ class ApplicationSerializer(serializers.ModelSerializer):
             request.user if request and request.user.is_authenticated else None
         )
 
+        billing_address_data = validated_data.pop("billing_address")
+        if billing_address_data:
+            billing_address = Address.objects.create(**billing_address_data)
+            validated_data["billing_address"] = billing_address
+
         status = validated_data.pop("status")
 
         contact_person_data = validated_data.pop("contact_person")
+
         validated_data["contact_person"] = self.handle_person(
             contact_person_data=contact_person_data
         )
