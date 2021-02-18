@@ -16,7 +16,7 @@ from reservation_units.models import (
     ReservationUnitImage,
     ReservationUnitType,
 )
-from spaces.models import District
+from spaces.models import District, Unit
 
 
 class ReservationUnitFilter(filters.FilterSet):
@@ -37,6 +37,7 @@ class ReservationUnitFilter(filters.FilterSet):
     reservation_unit_type = filters.ModelChoiceFilter(
         field_name="reservation_unit_type", queryset=ReservationUnitType.objects.all()
     )
+    unit = filters.ModelChoiceFilter(field_name="unit", queryset=Unit.objects.all())
 
 
 class ReservationUnitImageSerializer(serializers.ModelSerializer):
