@@ -175,18 +175,6 @@ class EventReservationUnitSerializer(serializers.ModelSerializer):
         }
 
 
-class ApplicationAggregateDataSerializer(serializers.ModelSerializer):
-    name = serializers.CharField(help_text="Name of the aggregated data")
-    value = serializers.FloatField(help_text="Computed value")
-
-    class Meta:
-        model = ApplicationAggregateData
-        fields = [
-            "name",
-            "value",
-        ]
-
-
 class ApplicationEventSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(allow_null=True, required=False)
 
