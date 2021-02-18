@@ -525,6 +525,13 @@ class Application(models.Model):
             application=self, name=name, defaults={"value": events_count}
         )
 
+    @property
+    def aggregated_data_dict(self):
+        ret_dict = {}
+        for row in self.aggregated_data.all():
+            ret_dict[row.name] = row.value
+        return ret_dict
+
 
 class ApplicationAggregateData(models.Model):
     """Model to store aggregated data from application events.

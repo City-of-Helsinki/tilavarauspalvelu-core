@@ -10,7 +10,6 @@ from rest_framework.exceptions import ValidationError
 from applications.models import (
     Address,
     Application,
-    ApplicationAggregateData,
     ApplicationEvent,
     ApplicationEventSchedule,
     ApplicationEventStatus,
@@ -371,10 +370,8 @@ class ApplicationSerializer(serializers.ModelSerializer):
         help_text="Status of this application", choices=ApplicationStatus.STATUS_CHOICES
     )
 
-    aggregated_data = ApplicationAggregateDataSerializer(
-        help_text="Summary data for application after it is in review",
-        read_only=True,
-        many=True,
+    aggregated_data = serializers.DictField(
+        source="aggregated_data_dict", read_only=True
     )
 
     class Meta:
