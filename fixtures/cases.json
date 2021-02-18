@@ -853,11 +853,53 @@
         }
     },
     {
+        "model": "applications.Organisation",
+        "pk": 2,
+        "fields": {
+            "name": "Ninjat",
+            "identifier":  "5346456-8",
+            "year_established": 1950,
+            "address": null,
+            "active_members": 42
+        }
+    },
+    {
+        "model": "applications.Organisation",
+        "pk": 3,
+        "fields": {
+            "name": "Merihaan shakkikerho",
+            "identifier":  "2354524-2",
+            "year_established": 1980,
+            "address": null,
+            "active_members": 3
+        }
+    },
+    {
         "model": "applications.Application",
         "pk": 1,
         "fields": {
             "organisation": 1,
+            "contact_person":  2,
+            "user": null,
+            "application_round": 1
+        }
+    },
+    {
+        "model": "applications.Application",
+        "pk": 2,
+        "fields": {
+            "organisation": 2,
             "contact_person":  1,
+            "user": null,
+            "application_round": 1
+        }
+    },
+    {
+        "model": "applications.Application",
+        "pk": 3,
+        "fields": {
+            "organisation": 3,
+            "contact_person":  3,
             "user": null,
             "application_round": 1
         }
@@ -880,5 +922,73 @@
             "district": 1,
             "purpose": 1
         }
-    }
+    },
+    {
+        "model": "applications.ApplicationEvent",
+        "pk": 2,
+        "fields": {
+            "name": "Trampoliinivuoro",
+            "num_persons":  30,
+            "age_group": 1,
+            "ability_group": 1,
+            "min_duration": "01:00:00",
+            "max_duration": "02:00:00",
+            "events_per_week": 1,
+            "biweekly": false,
+            "begin": "2021-01-01",
+            "end": "2021-06-01",
+            "application": 2,
+            "district": 1,
+            "purpose": 1
+        }
+    },
+    {
+        "model": "applications.ApplicationEvent",
+        "pk": 3,
+        "fields": {
+            "name": "Viikkomatti",
+            "num_persons":  120,
+            "age_group": 1,
+            "ability_group": 1,
+            "min_duration": "01:00:00",
+            "max_duration": "02:00:00",
+            "events_per_week": 1,
+            "biweekly": false,
+            "begin": "2021-01-01",
+            "end": "2021-06-01",
+            "application": 3,
+            "district": 1,
+            "purpose": 1
+        }
+    },
+	{
+		"model": "applications.ApplicationEventSchedule",
+		"pk": 1,
+		"fields": {
+			"application_event": 1,
+			"day": 3,
+			"begin":"15:00",
+			"end":"18:00"
+		}
+    },
+	{
+		"model": "applications.ApplicationEventSchedule",
+		"pk": 2,
+		"fields": {
+			"application_event": 2,
+			"day": 3,
+			"begin":"15:00",
+			"end":"18:00"
+		}
+    },
+	{
+		"model": "applications.ApplicationEventSchedule",
+		"pk": 3,
+		"fields": {
+			"application_event": 3,
+			"day": 3,
+			"begin":"15:00",
+			"end":"18:00"
+		}
+	}
 ]
