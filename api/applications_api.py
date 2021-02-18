@@ -69,7 +69,7 @@ class OrganisationSerializer(serializers.ModelSerializer):
             "year_established",
             "address",
             "core_business",
-            "active_members"
+            "active_members",
         ]
         extra_kwargs = {
             "name": {
@@ -421,6 +421,8 @@ class ApplicationSerializer(serializers.ModelSerializer):
         help_text="Summary data for application after it is in review",
         read_only=True,
         many=True,
+    )
+
     billing_address = AddressSerializer(
         help_text="Billing address for the application",
         allow_null=True,
