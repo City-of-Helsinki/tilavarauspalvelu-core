@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { IconAngleDown, IconAngleUp } from "hds-react";
 import { useTranslation } from "react-i18next";
-import { Link, RouteProps } from "react-router-dom";
+import { RouteProps } from "react-router-dom";
 import styled from "styled-components";
-import { breakpoints } from "../styles/util";
+import { breakpoints, BasicLink } from "../styles/util";
 import { ReactComponent as PremiseApplications } from "../images/icon_premise-applications.svg";
 import { ReactComponent as IconCustomers } from "../images/icon_customers.svg";
 import { ReactComponent as IconPremises } from "../images/icon_premises.svg";
@@ -13,6 +13,7 @@ import { truncatedText } from "../styles/typography";
 const Wrapper = styled.ul<{ placement: string }>`
   display: flex;
   flex-direction: column;
+  flex-shrink: 0;
   background-color: white;
   margin: 0;
   padding: 1.5rem 1.375rem 1.5rem 1.25rem;
@@ -28,6 +29,7 @@ const Wrapper = styled.ul<{ placement: string }>`
       display: none;
       box-shadow: 8px 0px 12px 0px rgba(0, 0, 0, 0.05);
       width: var(--main-menu-width);
+      min-height: calc(100vh - 72px - 3rem);
   `}
 `;
 
@@ -46,13 +48,11 @@ const Icon = styled.span`
   margin-right: var(--spacing-xs);
 `;
 
-const Heading = styled(Link)`
+const Heading = styled(BasicLink)`
   ${truncatedText}
   font-family: var(--tilavaraus-admin-font-bold);
   font-size: 14px;
   line-height: 1.85em;
-  text-decoration: none;
-  color: var(--tilavaraus-admin-content-text-color);
   max-width: 9.5rem;
 `;
 
@@ -82,6 +82,7 @@ interface IMenuChild {
   icon?: JSX.Element;
   route: string;
   routeParams?: RouteProps;
+  items?: IMenuChild[];
 }
 
 interface SubItemProps {
@@ -129,7 +130,7 @@ const SubItems = ({
   ) : null;
 };
 
-const menuTree = [
+const menuTree: IMenuChild[] = [
   {
     title: "MainMenu.applications",
     icon: <PremiseApplications />,

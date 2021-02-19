@@ -31,6 +31,7 @@ module.exports = {
         depth: 25,
       },
     ],
+    "no-nested-ternary": 0,
     "react/destructuring-assignment": 0,
     "react/jsx-props-no-spreading": 0,
     "react/prop-types": 0,

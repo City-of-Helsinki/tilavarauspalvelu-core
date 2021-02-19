@@ -8,7 +8,7 @@ import {
 } from "./types";
 
 const axiosClient = applyCaseMiddleware(axios.create());
-const apiBaseUrl: string = process.env.REACT_APP_TILANVARAUS_API_URL || "";
+const apiBaseUrl: string = process.env.REACT_APP_TILAVARAUS_API_URL || "";
 
 const applicationRoundsBasePath = "application_round";
 const reservationUnitsBasePath = "reservation_unit";
@@ -144,6 +144,7 @@ export function getApplication(id: number): Promise<Application> {
 
 export interface ApplicationParameters {
   applicationRound?: number;
+  status?: string;
 }
 
 export function getApplications(

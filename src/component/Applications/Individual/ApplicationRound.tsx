@@ -1,24 +1,28 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import { Link, useParams } from "react-router-dom";
-import { Button, Checkbox, ErrorSummary } from "hds-react";
+import { TFunction } from "i18next";
+import { useParams } from "react-router-dom";
+import { Button, Checkbox, Notification } from "hds-react";
+import uniq from "lodash/uniq";
+import trim from "lodash/trim";
 import withMainMenu from "../../withMainMenu";
 import Heading from "../Heading";
-import { H1, H2 } from "../../../styles/typography";
-import { breakpoints } from "../../../styles/util";
+import { ContentHeading, H2 } from "../../../styles/typography";
+import { breakpoints, BasicLink } from "../../../styles/util";
 import { IngressContainer } from "../../../styles/layout";
-import InfoBubble from "../../InfoBubble";
 import DataTable, { CellConfig } from "../../DataTable";
-import { useModal } from "../../../context/UIContext";
 import { getApplicationRound, getApplications } from "../../../common/api";
 import {
-  Application,
+  Application as ApplicationType,
   ApplicationRound as ApplicationRoundType,
+  DataFilterConfig,
 } from "../../../common/types";
 import TimeframeStatus from "../TimeframeStatus";
 import Loader from "../../../common/Loader";
-import LinkCell from "../../LinkCell";
+import StatusCell from "../../StatusCell";
+import { formatNumber, processApplications } from "../../../common/util";
+import StatusRecommendation from "../StatusRecommendation";
 
 interface IRouteParams {
   applicationRoundId: string;
@@ -38,25 +42,15 @@ const ApplicationNavi = styled.div`
   }
 `;
 
-const NaviItem = styled(Link)`
+const NaviItem = styled(BasicLink)`
   &:first-of-type {
     margin-left: 0;
   }
 
-  color: var(--tilavaraus-admin-content-text-color);
-  text-decoration: none;
   margin-left: 2rem;
 `;
 
 const Content = styled.div``;
-
-const ApplicationTitle = styled(H1)`
-  @media (min-width: ${breakpoints.l}) {
-    width: 60%;
-  }
-
-  padding-right: var(--spacing-l);
-`;
 
 const Details = styled.div`
   & > div {
@@ -95,10 +89,6 @@ const RecommendationValue = styled.div`
   margin-top: var(--spacing-3-xs);
 `;
 
-const StyledInfoBubble = styled(InfoBubble)`
-  margin-left: var(--spacing-2-xs);
-`;
-
 const SubmitButton = styled(Button)`
   margin-bottom: var(--spacing-s);
 `;
@@ -107,10 +97,81 @@ const ApplicationCount = styled(H2)`
   text-transform: lowercase;
 `;
 
-const StyledErrorSummary = styled(ErrorSummary)`
-  margin: var(--spacing-l);
-  width: 40%;
-`;
+const getFilterConfig = (
+  applications: ApplicationType[]
+): DataFilterConfig[] => {
+  const statuses = uniq(applications.map((app) => app.status));
+
+  return [
+    {
+      title: "Application.headings.customerType",
+    },
+    { title: "Application.headings.coreActivity" },
+    {
+      title: "Application.headings.applicationStatus",
+      filters: statuses.map((status) => ({
+        title: `Application.statuses.${status}`,
+        key: "status",
+        value: status,
+      })),
+    },
+  ];
+};
+
+const getCellConfig = (t: TFunction): CellConfig => {
+  return {
+    cols: [
+      { title: "Application.headings.customer", key: "organisation.name" },
+      {
+        title: "Application.headings.participants",
+        key: "organisation.activeMembers",
+        transform: ({ organisation }: ApplicationType) => (
+          <>{`${formatNumber(
+            organisation?.activeMembers,
+            t("common.volumeUnit")
+          )}`}</>
+        ),
+      },
+      {
+        title: "Application.headings.customerType",
+        key: "organisation.customerType",
+      },
+      {
+        title: "Application.headings.coreActivity",
+        key: "organisation.coreBusiness",
+      },
+      {
+        title: "Application.headings.applicationCount",
+        key: "aggregatedData.reservationsTotal",
+        transform: ({ processedData }: ApplicationType) => (
+          <>
+            {trim(
+              `${formatNumber(
+                processedData?.reservationsTotal,
+                t("common.volumeUnit")
+              )} / ${formatNumber(
+                processedData?.minDurationTotal,
+                t("common.hoursUnit")
+              )}`,
+              " / "
+            )}
+          </>
+        ),
+      },
+      {
+        title: "Application.headings.applicationStatus",
+        key: "status",
+        transform: ({ status }: ApplicationType) => (
+          <StatusCell status={status} text={`Application.statuses.${status}`} />
+        ),
+      },
+    ],
+    index: "id",
+    sorting: "organisation.name",
+    order: "asc",
+    rowLink: (id) => `/application/${id}`,
+  };
+};
 
 function ApplicationRound(): JSX.Element {
   const [isLoading, setIsLoading] = useState(true);
@@ -118,13 +179,16 @@ function ApplicationRound(): JSX.Element {
     applicationRound,
     setApplicationRound,
   ] = useState<ApplicationRoundType | null>(null);
-  const [applications, setApplications] = useState<Application[]>([]);
+  const [applications, setApplications] = useState<ApplicationType[]>([]);
+  const [cellConfig, setCellConfig] = useState<CellConfig | null>(null);
+  const [filterConfig, setFilterConfig] = useState<DataFilterConfig[] | null>(
+    null
+  );
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isApplicationChecked, toggleIsApplicationChecked] = useState(false);
 
   const { applicationRoundId } = useParams<IRouteParams>();
   const { t } = useTranslation();
-  const { setModalContent } = useModal();
 
   useEffect(() => {
     const fetchApplicationRound = async () => {
@@ -154,8 +218,11 @@ function ApplicationRound(): JSX.Element {
       try {
         const result = await getApplications({
           applicationRound: applicationId,
+          status: "in_review,draft",
         });
-        setApplications(result);
+        setCellConfig(getCellConfig(t));
+        setFilterConfig(getFilterConfig(result));
+        setApplications(processApplications(result));
       } catch (error) {
         setErrorMsg("errors.errorFetchingApplications");
       } finally {
@@ -166,42 +233,16 @@ function ApplicationRound(): JSX.Element {
     if (typeof applicationRound?.id === "number") {
       fetchApplications(applicationRound.id);
     }
-  }, [applicationRound]);
+  }, [applicationRound, t]);
 
-  const exception = isLoading ? (
-    <Loader />
-  ) : (
-    errorMsg && <StyledErrorSummary label={t(errorMsg)} />
-  );
-
-  const cellConfig: CellConfig = {
-    cols: [
-      { title: t("Application.headings.customer"), key: "organisation" },
-      { title: t("Application.headings.participants"), key: "" },
-      { title: t("Application.headings.customerType"), key: "" },
-      { title: t("Application.headings.coreActivity"), key: "" },
-      { title: t("Application.headings.applicationCount"), key: "" },
-      {
-        title: t("Application.headings.applicationStatus"),
-        key: "status",
-        transform: ({ id, status }: Application) => (
-          <LinkCell
-            status={status}
-            text={t(`Application.statuses.${status}`)}
-            link={`/application/${id}`}
-          />
-        ),
-      },
-    ],
-    index: "id",
-    sorting: "id",
-    order: "asc",
-  };
+  if (isLoading) {
+    return <Loader />;
+  }
 
   return (
     <Wrapper>
       <Heading />
-      {exception || (
+      {applicationRound && cellConfig && filterConfig && (
         <>
           <IngressContainer>
             <ApplicationNavi>
@@ -213,29 +254,21 @@ function ApplicationRound(): JSX.Element {
               </NaviItem>
             </ApplicationNavi>
             <Content>
-              <ApplicationTitle>{applicationRound?.name}</ApplicationTitle>
+              <ContentHeading>{applicationRound?.name}</ContentHeading>
               <Details>
                 <div>
                   <TimeframeStatus
                     applicationPeriodBegin={
-                      applicationRound?.applicationPeriodBegin
+                      applicationRound.applicationPeriodBegin
                     }
-                    applicationPeriodEnd={
-                      applicationRound?.applicationPeriodEnd
-                    }
+                    applicationPeriodEnd={applicationRound.applicationPeriodEnd}
                   />
                   <Recommendation>
                     <RecommendationLabel>
                       {t("Application.recommendedStage")}:
                     </RecommendationLabel>
                     <RecommendationValue>
-                      TODO
-                      <StyledInfoBubble
-                        onClick={() =>
-                          setModalContent &&
-                          setModalContent(<div>modal content</div>)
-                        }
-                      />
+                      <StatusRecommendation status={applicationRound.status} />
                     </RecommendationValue>
                   </Recommendation>
                 </div>
@@ -264,8 +297,26 @@ function ApplicationRound(): JSX.Element {
               </ApplicationCount>
             </Content>
           </IngressContainer>
-          <DataTable data={applications} cellConfig={cellConfig} />
+          <DataTable
+            data={applications}
+            cellConfig={cellConfig}
+            filterConfig={filterConfig}
+          />
         </>
+      )}
+      {errorMsg && (
+        <Notification
+          type="error"
+          label={t("errors.errorFetchingData")}
+          position="top-center"
+          autoClose={false}
+          dismissible
+          closeButtonLabelText={t("common.close")}
+          displayAutoCloseProgress={false}
+          onClose={() => setErrorMsg(null)}
+        >
+          {t(errorMsg)}
+        </Notification>
       )}
     </Wrapper>
   );

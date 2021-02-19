@@ -1,4 +1,6 @@
+import { ErrorSummary } from "hds-react";
 import styled from "styled-components";
+import { Link } from "react-router-dom";
 import { ApplicationStatus } from "../common/types";
 
 export const breakpoints = {
@@ -10,30 +12,52 @@ export const breakpoints = {
 };
 
 export const getGridFraction = (space: number, columns = 12): number => {
-  return (space / columns) * 100;
+  const fraction = (space / columns) * 100;
+  return fraction > 0 ? fraction : 0;
 };
 
-const getStatusColor = (status: ApplicationStatus): string => {
+export const getStatusColor = (status: ApplicationStatus): string => {
   let color = "";
   switch (status) {
     case "draft":
-      color = "var(--color-engel)";
+    case "in_review":
+      color = "var(--color-info)";
+      break;
+    case "review_done":
+    case "allocating":
+    case "allocated":
+    case "validated":
+    case "handled":
+      color = "var(--color-success)";
       break;
     case "declined":
     case "cancelled":
       color = "var(--color-brick)";
       break;
     default:
-      color = "var(--color-coat-of-arms)";
   }
 
   return color;
 };
 
-export const Dot = styled.div<{ status: ApplicationStatus }>`
+export const StatusDot = styled.div<{
+  status: ApplicationStatus;
+  size: number;
+}>`
   display: inline-block;
-  width: 12px;
-  height: 12px;
+  width: ${({ size }) => size && `${size}px`};
+  height: ${({ size }) => size && `${size}px`};
   border-radius: 50%;
   background-color: ${({ status }) => getStatusColor(status)};
+`;
+
+export const InlineErrorSummary = styled(ErrorSummary)`
+  margin: var(--spacing-l);
+  width: 40%;
+`;
+
+export const BasicLink = styled(Link)`
+  color: var(--tilavaraus-admin-content-text-color);
+  text-decoration: none;
+  user-select: none;
 `;
