@@ -67,6 +67,8 @@
   "devDependencies": {
     "eslint-config-airbnb-typescript-prettier": "^4.1.0",
     "eslint-plugin-jsx-a11y": "^6.4.1",
+    "husky": "^5.0.9",
+    "lint-staged": "^10.5.4",
     "prettier": "^2.2.1",
     "stylelint": "^13.9.0",
     "stylelint-config-recommended": "^3.0.0",
@@ -74,5 +76,14 @@
     "stylelint-config-styled-components": "^0.1.1",
     "stylelint-processor-styled-components": "^1.10.0",
     "stylelint-value-no-unknown-custom-properties": "^3.0.0"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "src/**/*.tsx": "stylelint",
+    "*.{ts,tsx}": "eslint --cache"
   }
 }
