@@ -98,7 +98,6 @@ export type ProcessedData = {
 };
 
 export type Application = {
-  [key: string]: any;
   id: number;
   status: ApplicationStatus;
   applicationRoundId: number;

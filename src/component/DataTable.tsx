@@ -236,7 +236,8 @@ const processData = (
   if (filters.length > 0) {
     const filteredData = data.filter((row) => {
       return (
-        filters.filter((filter) => row[filter.key] === filter.value).length > 0
+        filters.filter((filter) => get(row, filter.key) === filter.value)
+          .length > 0
       );
     });
 
