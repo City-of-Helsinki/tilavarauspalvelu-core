@@ -40,13 +40,21 @@ const translations: ITranslations = {
     noResults: ["Ei tuloksia"],
     select: ["Valitse"],
     filter: ["Suodata"],
+    filtered: ["Suodatettu"],
     closeModal: ["Sulje modaali-ikkuna"],
     today: ["Tänään"],
+    agesSuffix: ["{{range}}-vuotiaita"],
+    resetFilters: ["Tyhjennä suodattimet"],
+    apply: ["Käytä"],
+    volumeUnit: [" kpl", " ", " "],
+    hoursUnit: [" h", " h", " h"],
   },
   errors: {
     applicationRoundNotFound: ["Haettua hakukierrosta ei löydy"],
     errorFetchingData: ["Virhe haettaessa tietoja"],
+    errorFetchingApplication: ["Virhe haettaessa hakemusta"],
     errorFetchingApplications: ["Virhe haettaessa hakemuksia"],
+    errorSavingApplication: ["Virhe tallennettaessa hakemusta"],
   },
   MainMenu: {
     applications: ["Hakemukset"],
@@ -97,13 +105,27 @@ const translations: ITranslations = {
     statuses: {
       draft: ["Luonnos"],
       in_review: ["Tarkastuksessa"],
-      review_done: ["Tarkastettu"],
+      review_done: ["Etenee jatkoon"],
       allocating: ["Varauksessa"],
       allocated: ["Varattu"],
       validated: ["Hyvaksytty"],
       handled: ["Käsitelty"],
       declined: ["Hylätty"],
       cancelled: ["Peruutettu"],
+    },
+    actions: {
+      returnAsPartOfAllocation: ["Palauta hakemus osaksi jakoa"],
+      declineApplication: ["Hylkää hakemus"],
+    },
+    saveNotification: {
+      in_review: {
+        heading: ["Hakemus on merkitty jatkoon eteneväksi"],
+        body: ["Hakemus on mukana tulevassa tilanjaossa."],
+      },
+      declined: {
+        heading: ["Hakemus on merkitty hylätyksi"],
+        body: ["Hakemus ei ole mukana tulevassa tilanjaossa."],
+      },
     },
   },
   ApplicationRound: {
@@ -112,6 +134,21 @@ const translations: ITranslations = {
     roundsOpenForApplication: ["Haku avoinna"],
     futureRounds: ["Tulevat"],
     expandSearch: ["Laajenna hakujen koontinäkymä"],
+    showClientApplication: ["Näytä asiakkaan koko hakemus"],
+    infoGivenByCustomer: ["Asiakkaan ilmoittamat tiedot"],
+    recommendedAid: ["Suositeltu tila-avustus"],
+    appliedReservations: ["Haetut vuorot"],
+    totalReservationTime: ["Kokonaiskesto"],
+    recommendedSpaceAid: ["Tilankäyttönä suositeltava avustus"],
+    recommendations: {
+      draft: [
+        "Tarkasta lista ja neuvottele esihenkilösi kanssa mahdollisista hylkäyksistä",
+      ],
+    },
+  },
+  Organisation: {
+    organisationType: ["Asiakastyyppi"],
+    activeParticipants: ["Aktiiviharrastajat"],
   },
 };
 

@@ -1,13 +1,14 @@
 :root {
   --tilavaraus-admin-brand: #00005e;
   --tilavaraus-admin-blue: #0000bf;
+  --tilavaraus-admin-blue-dark: #040091;
   --tilavaraus-admin-header-background-color: var(--tilavaraus-admin-brand);
   --tilavaraus-admin-header-color: white;
   --tilavaraus-admin-background-color: white;
   --tilavaraus-admin-content-text-color: #1a1a1a;
   --tilavaraus-admin-gray: #f5f6f8;
   --container-width-xxl: 1440px;
-  --main-menu-width: 255px;
+  --main-menu-width: 240px;
   --ingress-container-width: 1080px;
   --tilavaraus-admin-font: "HelsinkiGrotesk", var(--font-default);
   --tilavaraus-admin-font-medium: "HelsinkiGrotesk-Medium", var(--font-default);

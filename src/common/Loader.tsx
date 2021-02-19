@@ -18,7 +18,11 @@ function Loader({ delay = 2000 }: IProps): JSX.Element {
   const [isVisible, setIsVisible] = useState(false);
 
   useLayoutEffect(() => {
-    setTimeout(() => setIsVisible(true), delay);
+    const timer = setTimeout(() => setIsVisible(true), delay);
+
+    return () => {
+      clearTimeout(timer);
+    };
   }, [delay]);
 
   return (
