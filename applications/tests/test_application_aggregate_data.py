@@ -78,3 +78,110 @@ def test_application_aggregate_data_contains_reservations_total(
     # Second, every week two times for eight weeks
     # 8 weeks * two times per week = 16 reservations
     assert res_tot.value == (12) + (16)
+
+
+@pytest.mark.django_db
+def test_aggregate_data_creates_data_per_application(
+    recurring_application_event, application_in_second_application_round
+):
+    ApplicationEvent.objects.create(
+        application=application_in_second_application_round,
+        num_persons=5,
+        min_duration=datetime.timedelta(hours=1),
+        max_duration=datetime.timedelta(hours=2),
+        name="Football",
+        events_per_week=2,
+        begin=datetime.date(year=2020, month=1, day=1),
+        end=datetime.date(year=2020, month=2, day=28),
+        biweekly=False,
+    )
+
+    recurring_application_event.application.set_status(ApplicationStatus.IN_REVIEW)
+    application_in_second_application_round.set_status(ApplicationStatus.IN_REVIEW)
+
+    assert (
+        recurring_application_event.application
+        is not application_in_second_application_round
+    )
+
+    assert (
+        ApplicationAggregateData.objects.filter(
+            application=recurring_application_event.application
+        ).count()
+        == 2
+    )
+
+    assert (
+        ApplicationAggregateData.objects.filter(
+            application=application_in_second_application_round
+        ).count()
+        == 2
+    )
+
+
+@pytest.mark.django_db
+def test_aggregate_data_creates_data_per_application_reservations_total(
+    recurring_application_event, application_in_second_application_round
+):
+    ApplicationEvent.objects.create(
+        application=application_in_second_application_round,
+        num_persons=5,
+        min_duration=datetime.timedelta(hours=1),
+        max_duration=datetime.timedelta(hours=2),
+        name="Football",
+        events_per_week=1,
+        begin=datetime.date(year=2020, month=1, day=1),
+        end=datetime.date(year=2020, month=2, day=28),
+        biweekly=False,
+    )
+
+    recurring_application_event.application.set_status(ApplicationStatus.IN_REVIEW)
+    application_in_second_application_round.set_status(ApplicationStatus.IN_REVIEW)
+
+    aggregate_datas_one = ApplicationAggregateData.objects.filter(
+        application=recurring_application_event.application
+    )
+
+    aggregate_datas_two = ApplicationAggregateData.objects.filter(
+        application=application_in_second_application_round
+    )
+
+    one_res = aggregate_datas_one.get(name="reservations_total")
+    assert one_res.value == 16
+
+    two_res = aggregate_datas_two.get(name="reservations_total")
+    assert two_res.value == 8
+
+
+@pytest.mark.django_db
+def test_aggregate_data_creates_data_per_application_min_duration_total(
+    recurring_application_event, application_in_second_application_round
+):
+    ApplicationEvent.objects.create(
+        application=application_in_second_application_round,
+        num_persons=5,
+        min_duration=datetime.timedelta(hours=1),
+        max_duration=datetime.timedelta(hours=2),
+        name="Football",
+        events_per_week=1,
+        begin=datetime.date(year=2020, month=1, day=1),
+        end=datetime.date(year=2020, month=2, day=28),
+        biweekly=False,
+    )
+
+    recurring_application_event.application.set_status(ApplicationStatus.IN_REVIEW)
+    application_in_second_application_round.set_status(ApplicationStatus.IN_REVIEW)
+
+    aggregate_datas_one = ApplicationAggregateData.objects.filter(
+        application=recurring_application_event.application
+    )
+
+    aggregate_datas_two = ApplicationAggregateData.objects.filter(
+        application=application_in_second_application_round
+    )
+
+    one_res = aggregate_datas_one.get(name="min_duration_total")
+    assert one_res.value == 16 * 3600
+
+    two_res = aggregate_datas_two.get(name="min_duration_total")
+    assert two_res.value == 8 * 3600
