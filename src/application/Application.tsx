@@ -31,8 +31,6 @@ import {
   SelectionsListContextType,
 } from '../context/SelectionsListContext';
 
-import { routeData } from '../common/const';
-
 type ParamTypes = {
   applicationPeriodId: string;
   applicationId: string;
@@ -48,8 +46,6 @@ const Application = (): JSX.Element | null => {
 
   const { applicationId, applicationPeriodId } = useParams<ParamTypes>();
 
-  const [applicationInitialized, setApplicationInitialized] = useState(false);
-
   const [application, dispatch] = useReducer(
     applicationReducer,
     {
@@ -59,33 +55,21 @@ const Application = (): JSX.Element | null => {
     applicationInitializer
   );
 
-  const applicationPeriod = useAsync(async () => {
-    const backendData = routeData()?.applicationPeriod;
-    if (backendData) {
-      routeData().applicationPeriod = undefined;
-      return backendData;
-    }
-
-    return getApplicationPeriod({ id: applicationPeriodId });
+  const applicationPeriodLoadingStatus = useAsync(async () => {
+    const loadedApplicationPeriod = await getApplicationPeriod({
+      id: applicationPeriodId,
+    });
+    return loadedApplicationPeriod;
   }, [applicationPeriodId]);
 
-  const applicationLoading = useAsync(async () => {
+  const applicationLoadingStatus = useAsync(async () => {
     let loadedApplication = null;
     if (applicationId && applicationId !== 'new') {
       loadedApplication = await getApplication(Number(applicationId));
       dispatch({ type: 'load', data: loadedApplication });
     }
-    setApplicationInitialized(true);
     return loadedApplication;
   }, [applicationId]);
-
-  const ready =
-    [applicationPeriod, applicationLoading].some((r) => !r.loading) &&
-    applicationInitialized;
-
-  //  setError(
-  // [applicationPeriod, applicationLoading].find((r) => r.error)?.error?.message
-  // );
 
   const { reservationUnits } = React.useContext(
     SelectionsListContext
@@ -151,7 +135,13 @@ const Application = (): JSX.Element | null => {
     });
   };
 
-  const applicationPeriodName = applicationPeriod.value?.name || '';
+  const applicationPeriodName =
+    applicationPeriodLoadingStatus.value?.name || '';
+
+  const ready =
+    ![applicationPeriodLoadingStatus, applicationLoadingStatus].some(
+      (r) => r.loading
+    ) && application;
 
   if (!ready) {
     return null;
@@ -169,7 +159,8 @@ const Application = (): JSX.Element | null => {
             <Page1
               selectedReservationUnits={reservationUnits}
               applicationPeriod={
-                applicationPeriod.value || ({} as ApplicationPeriod)
+                applicationPeriodLoadingStatus.value ||
+                ({} as ApplicationPeriod)
               }
               application={application}
               onNext={() => saveAndNavigate('page2')}
@@ -194,7 +185,6 @@ const Application = (): JSX.Element | null => {
             match={match}
             breadCrumbText={applicationPeriodName}>
             <Page3
-              dispatch={dispatch}
               application={application}
               onNext={() => saveAndNavigate('preview')}
             />
@@ -215,7 +205,7 @@ const Application = (): JSX.Element | null => {
       {error ? (
         <Notification
           type="error"
-          label="With progress bar"
+          label="Unexpected error"
           position="top-center"
           autoClose
           displayAutoCloseProgress={false}

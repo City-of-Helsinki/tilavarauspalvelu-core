@@ -1,0 +1,41 @@
+import styled from 'styled-components';
+import { Notification as HDSNotification } from 'hds-react';
+import { breakpoint } from '../common/style';
+
+export const TwoColumnContainer = styled.div`
+  @media (max-width: ${breakpoint.l}) {
+    grid-template-columns: 1fr;
+  }
+
+  margin-top: var(--spacing-m);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-m);
+  align-items: center;
+`;
+
+export const SpanTwoColumns = styled.span`
+  grid-column-start: 1;
+  grid-column-end: 3;
+
+  @media (max-width: ${breakpoint.l}) {
+    grid-column-start: 1;
+    grid-column-end: 2;
+  }
+`;
+
+export const Notification = styled(HDSNotification)`
+  margin-top: var(--spacing-s);
+  margin-bottom: var(--spacing-m);
+`;
+
+export const ButtonContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  margin-top: var(--spacing-layout-l);
+  justify-content: flex-end;
+
+  button {
+    margin-left: var(--spacing-layout-xs);
+  }
+`;

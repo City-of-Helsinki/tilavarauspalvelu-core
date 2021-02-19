@@ -57,7 +57,6 @@ const TwoColumnContainer = styled.div`
 const PeriodContainer = styled.div`
   margin-top: var(--spacing-m);
   display: grid;
-  grid-template: auto;
   grid-template-columns: 2fr 2fr 3fr;
   gap: var(--spacing-m);
   align-items: center;
@@ -177,7 +176,7 @@ const ApplicationEvent = ({
           name={fieldName('numPersons')}
         />
         <Select
-          id="ageGroupId"
+          id="ageGroup"
           placeholder="Valitse"
           options={ageGroupOptions}
           label={t('Application.Page1.ageGroup')}
@@ -191,6 +190,7 @@ const ApplicationEvent = ({
           )}
         />
         <Select
+          id="abilityGroup"
           placeholder="Valitse"
           options={abilityGroupOptions}
           label={t('Application.Page1.abilityGroup')}
@@ -205,6 +205,7 @@ const ApplicationEvent = ({
         />
         <SpanTwoColumns>
           <Select
+            id="purpose"
             placeholder="Valitse"
             required
             options={purposeOptions}

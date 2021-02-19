@@ -47,9 +47,86 @@ const translations: Translations = {
       heading: ['3. Varaajan perustiedot'],
       text: ['Varaavan yhteisön ja yhteyshenkilön perustiedot.'],
       asPrivatePersonSubHeading: ['Varaan yksityishenkilönä'],
-      firstName: ['Etunimi'],
-      lastName: ['Sukunimi'],
-      email: ['Hakemukselle liitettävä sähköpostiosoite'],
+      firstName: ['Etunimi', 'First name', 'Förnamn'],
+      lastName: ['Sukunimi', 'Last name', 'Efternamn'],
+      phoneNumber: ['Puhelinumero', 'Phone number', 'Telefonnummer'],
+      email: [
+        'Hakemukselle liitettävä sähköpostiosoite',
+        'Email address',
+        'E-postadress',
+      ],
+      emailNotification: [
+        'Kaikki hakemukseen liittyvät viestit lähetetään tähän sähköpostiin',
+      ],
+      as: {
+        type: {
+          organisation: [
+            'Luon hakemuksen yhdistyksen, seuran tai yhteisön puolesta',
+            'Create Application for association',
+            'Skapa ansökan om associering',
+          ],
+          company: [
+            'Luon hakemuksen yrityksen puolesta',
+            'Create application for company',
+            'Skapa applikation för företag',
+          ],
+          individual: [
+            'Luon hakemuksen yksityishenkilönä',
+            'Create Application as private person',
+            'Skapa ansökan som privatperson',
+          ],
+        },
+      },
+
+      contactPerson: {
+        firstName: ['Yhteyshenkilön etunimi', 'Firt name', 'Förnamn'],
+        lastName: ['Yhteyshenkilön sukunimi', 'Last name', 'Efternamn'],
+        phoneNumber: [
+          'Yhteyshenkilön puhelinumero',
+          'Phone number',
+          'Telefonnummer',
+        ],
+      },
+      billingAddress: {
+        streetAddress: ['Katuosoite', 'Street address', 'Adress'],
+        postCode: ['Postinumero', 'ZIP code', ' Postnummer'],
+        city: ['Postitoimipaikka', 'City', 'Postdistrikt'],
+      },
+      company: {
+        name: [
+          'Yrityksen virallinen nimi',
+          'The official name of the company',
+          'företagets officiella namn',
+        ],
+        coreBusiness: [
+          'Yrityksen ydintoiminta',
+          'The core business of the company',
+          'Företagets kärnverksamhet',
+        ],
+        registrationNumber: ['Y-tunnus', 'Business ID', 'FO-nummer'],
+      },
+      organisation: {
+        name: ['Yhdistyksen, seuran tai järjestön virallinen nimi'],
+        coreBusiness: ['Yhdistyksem tai seuran ydintoiminta'],
+        registrationNumber: [
+          'Rekisterinumero',
+          'Registration number',
+          'Registreringsnummer',
+        ],
+        streetAddress: ['Katuosoite', 'Street address', 'Adress'],
+        postCode: ['Postinumero', 'ZIP code', ' Postnummer'],
+        city: ['Postitoimipaikka', 'City', 'Postdistrikt'],
+        notRegistered: [
+          'Seuraa ei ole rekisteröity',
+          'Organisation is not registered',
+          'Organisationen är inte registrerad',
+        ],
+        separateInvoicingAddress: [
+          'Laskutusosoite on eri kuin tämä',
+          'Has additional invoicing address',
+          'Har ytterligare faktureringsadress',
+        ],
+      },
     },
     preview: {
       heading: ['4. Hakemuksen lähettäminen'],
@@ -57,7 +134,12 @@ const translations: Translations = {
       basicInfoSubHeading: ['Varaajan perustiedot'],
       firstName: ['Yhteyshenkilön etunimi'],
       lastName: ['Yhteyshenkilön sukunimi'],
-      email: ['Sähköpostiosoite'],
+      email: ['Sähköpostiosoite', 'Email address', ''],
+      phoneNumber: ['Puhelinumero', 'Phone number', 'Telefonnummer'],
+      organisation: {
+        name: ['Hakijan nimi', 'Name of the applicant', 'Sökandens namn'],
+        coreBusiness: ['Ydintoiminta', 'Core business', 'Kärnverksamhet'],
+      },
       'applicationEvent.name': ['Vakiovuoron nimi'],
       'applicationEvent.numPersons': ['Ryhmän koko'],
       'applicationEvent.ageGroup': ['Ikäryhmä'],
@@ -134,6 +216,16 @@ const translations: Translations = {
     },
     login: ['Kirjaudu', 'Login', 'Logga in'],
     imgAltForSpace: ['Kuva tilasta {{name}}'],
+    address: {
+      streetAddress: ['Katuosoite', 'Street address', 'Adress'],
+      postCode: ['Postinumero', 'ZIP code', ' Postnummer'],
+      city: ['Postitoimipaikka', 'City', 'Postdistrikt'],
+    },
+    billingAddress: {
+      streetAddress: ['Laskutusosoite', 'Street address', 'Adress'],
+      postCode: ['Postinumero', 'ZIP code', ' Postnummer'],
+      city: ['Postitoimipaikka', 'City', 'Postdistrikt'],
+    },
   },
   reservationUnit: {
     type: ['Tyyppi', 'Type', 'Typ'],

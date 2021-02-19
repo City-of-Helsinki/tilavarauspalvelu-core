@@ -92,9 +92,9 @@ const SearchForm = ({ onSearch, formValues }: Props): JSX.Element | null => {
   useEffect(() => {
     register({ name: 'purpose' });
     register({ name: 'district' });
-    register({ name: 'application_round' });
+    register({ name: 'applicationRound' });
     register({ name: 'max_persons' });
-    register({ name: 'reservation_unit_type' });
+    register({ name: 'reservationUnitType' });
   }, [register]);
 
   useEffect(() => {
@@ -159,14 +159,14 @@ const SearchForm = ({ onSearch, formValues }: Props): JSX.Element | null => {
           defaultValue={formValues.search}
         />
         <Select
-          id="application_round"
+          id="applicationRound"
           placeholder={t('common.select')}
           options={applicationPeriodOptions}
           onChange={(selection: OptionType): void => {
-            setValue('application_round', selection.value);
+            setValue('applicationRound', selection.value);
           }}
           defaultValue={getSelectedOption(
-            getValues('application_round'),
+            getValues('applicationRound'),
             applicationPeriodOptions
           )}
           label={t('SearchForm.roundLabel')}
@@ -231,10 +231,10 @@ const SearchForm = ({ onSearch, formValues }: Props): JSX.Element | null => {
               options={reservationUnitTypeOptions}
               label={t('SearchForm.typeLabel')}
               onChange={(selection: OptionType): void => {
-                setValue('reservation_unit_type', selection.value);
+                setValue('reservationUnitType', selection.value);
               }}
               defaultValue={getSelectedOption(
-                getValues('reservation_unit_type'),
+                getValues('reservationUnitType'),
                 reservationUnitTypeOptions
               )}
             />

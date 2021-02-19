@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from 'react';
 import {
   Button,
   Checkbox,
@@ -5,7 +6,6 @@ import {
   Notification,
   Accordion,
 } from 'hds-react';
-import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -14,7 +14,8 @@ import { formatDate, localizedValue } from '../../common/util';
 import { getParameters, getReservationUnit } from '../../common/api';
 import LabelValue from '../../component/LabelValue';
 import TimePreview from '../TimePreview';
-import { breakpoint } from '../../common/style';
+import ApplicantInfoPreview from './ApplicantInfoPreview';
+import { TwoColumnContainer } from '../../component/common';
 
 type Props = {
   application: Application;
@@ -55,17 +56,6 @@ const SmallSubHeadline = styled.div`
   font-size: var(--fontsize-heading-s);
 `;
 
-const TwoColumnContainer = styled.div`
-  @media (max-width: ${breakpoint.s}) {
-    grid-template-columns: 1fr;
-  }
-
-  margin-top: var(--spacing-m);
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--spacing-m);
-`;
-
 const TimePreviewContainer = styled(TwoColumnContainer)`
   svg {
     margin-top: 2px;
@@ -73,7 +63,7 @@ const TimePreviewContainer = styled(TwoColumnContainer)`
 `;
 
 const CheckboxContainer = styled.div`
-  margin-top: 60px;
+  margin-top: var(--spacing-layout-l);
   display: flex;
   align-items: center;
 `;
@@ -159,20 +149,7 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
   return ready ? (
     <>
       <Accordion heading={t('Application.preview.basicInfoSubHeading')}>
-        <TwoColumnContainer>
-          <LabelValue
-            label={t('Application.preview.firstName')}
-            value={application.contactPerson?.firstName}
-          />
-          <LabelValue
-            label={t('Application.preview.lastName')}
-            value={application.contactPerson?.lastName}
-          />
-          <LabelValue
-            label={t('Application.preview.email')}
-            value={application.contactPerson?.email}
-          />
-        </TwoColumnContainer>
+        <ApplicantInfoPreview application={application} />
       </Accordion>
       {application.applicationEvents.map((applicationEvent) => (
         <Accordion
@@ -288,7 +265,10 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
         <Button variant="secondary" iconLeft={<IconArrowLeft />} disabled>
           {t('common.prev')}
         </Button>
-        <Button onClick={() => onSubmit()} disabled={!acceptTermsOfUse}>
+        <Button
+          id="submit"
+          onClick={() => onSubmit()}
+          disabled={!acceptTermsOfUse}>
           {t('common.submit')}
         </Button>
       </ButtonContainer>

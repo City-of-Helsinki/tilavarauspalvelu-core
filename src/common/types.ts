@@ -72,8 +72,23 @@ export type Parameter = {
   maximum?: number;
 };
 
+export type Address = {
+  id?: number;
+  streetAddress: string;
+  postCode: string;
+  city: string;
+};
+
+export type ApplicantType =
+  | null
+  | 'individual'
+  | 'association'
+  | 'community'
+  | 'company';
+
 export type Application = {
   id?: number;
+  applicantType: ApplicantType;
   status:
     | 'draft'
     | 'in_review'
@@ -88,13 +103,17 @@ export type Application = {
   organisation: Organisation | null;
   contactPerson: ContactPerson | null;
   applicationEvents: ApplicationEvent[];
+  billingAddress: Address | null;
 };
 
 export type Organisation = {
   id?: number;
   name: string | null;
+  description: string;
   identifier: string | null;
   yearEstablished: number | null;
+  coreBusiness: string;
+  address: Address;
 };
 
 export type ContactPerson = {
@@ -145,16 +164,15 @@ export type ApplicationEventSchedule = {
   end: string;
 };
 
-// for Selector
+// for ui:
+
 export type OptionType = {
   label: string;
   value?: number;
 };
 
-// editor context
-
 export type Action = {
-  type: 'load' | 'ensureContactPersonExists' | 'addNewApplicationEvent';
+  type: 'load' | 'addNewApplicationEvent';
   data?: Application;
   params?: { [key: string]: string };
 };
@@ -164,4 +182,4 @@ export type ApplicationEditor = {
   reservationUnits: ReservationUnit[];
 };
 
-// /editor context
+export type FormType = undefined | 'individual' | 'organisation' | 'company';

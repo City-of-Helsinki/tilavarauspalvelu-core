@@ -1,10 +1,5 @@
 import i18next from 'i18next';
-import {
-  Action,
-  Application,
-  ApplicationEvent,
-  ContactPerson,
-} from '../common/types';
+import { Action, Application, ApplicationEvent } from '../common/types';
 
 const applicationEvent = (applicationId?: number): ApplicationEvent => ({
   name: i18next.t('Application.Page1.applicationEventName'),
@@ -26,13 +21,6 @@ const applicationEvent = (applicationId?: number): ApplicationEvent => ({
 
 const reducer = (state: Application, action: Action): Application => {
   switch (action.type) {
-    case 'ensureContactPersonExists': {
-      const nextState = { ...state };
-      if (nextState.contactPerson == null) {
-        nextState.contactPerson = {} as ContactPerson;
-      }
-      return nextState;
-    }
     case 'addNewApplicationEvent': {
       const nextState = { ...state };
       nextState.applicationEvents.push(applicationEvent(state.id));
