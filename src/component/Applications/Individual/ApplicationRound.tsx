@@ -21,7 +21,11 @@ import {
 import TimeframeStatus from "../TimeframeStatus";
 import Loader from "../../../common/Loader";
 import StatusCell from "../../StatusCell";
-import { formatNumber, processApplications } from "../../../common/util";
+import {
+  formatNumber,
+  getNormalizedStatus,
+  processApplications,
+} from "../../../common/util";
 import StatusRecommendation from "../StatusRecommendation";
 
 interface IRouteParams {
@@ -109,11 +113,14 @@ const getFilterConfig = (
     { title: "Application.headings.coreActivity" },
     {
       title: "Application.headings.applicationStatus",
-      filters: statuses.map((status) => ({
-        title: `Application.statuses.${status}`,
-        key: "status",
-        value: status,
-      })),
+      filters: statuses.map((status) => {
+        const normalizedStatus = getNormalizedStatus(status, 1);
+        return {
+          title: `Application.statuses.${normalizedStatus}`,
+          key: "status",
+          value: status,
+        };
+      }),
     },
   ];
 };
@@ -161,9 +168,15 @@ const getCellConfig = (t: TFunction): CellConfig => {
       {
         title: "Application.headings.applicationStatus",
         key: "status",
-        transform: ({ status }: ApplicationType) => (
-          <StatusCell status={status} text={`Application.statuses.${status}`} />
-        ),
+        transform: ({ status }: ApplicationType) => {
+          const normalizedStatus = getNormalizedStatus(status, 1);
+          return (
+            <StatusCell
+              status={normalizedStatus}
+              text={`Application.statuses.${normalizedStatus}`}
+            />
+          );
+        },
       },
     ],
     index: "id",

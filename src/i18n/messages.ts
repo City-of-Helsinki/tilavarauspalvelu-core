@@ -105,7 +105,7 @@ const translations: ITranslations = {
     statuses: {
       draft: ["Luonnos"],
       in_review: ["Tarkastuksessa"],
-      review_done: ["Etenee jatkoon"],
+      review_done: ["Etenee jakoon"],
       allocating: ["Varauksessa"],
       allocated: ["Varattu"],
       validated: ["Hyvaksytty"],
@@ -119,7 +119,7 @@ const translations: ITranslations = {
     },
     saveNotification: {
       in_review: {
-        heading: ["Hakemus on merkitty jatkoon eteneväksi"],
+        heading: ["Hakemus on merkitty jakoon eteneväksi"],
         body: ["Hakemus on mukana tulevassa tilanjaossa."],
       },
       declined: {

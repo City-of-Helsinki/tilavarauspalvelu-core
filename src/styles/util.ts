@@ -16,7 +16,10 @@ export const getGridFraction = (space: number, columns = 12): number => {
   return fraction > 0 ? fraction : 0;
 };
 
-export const getStatusColor = (status: ApplicationStatus): string => {
+export const getStatusColor = (
+  status: ApplicationStatus,
+  size: "s" | "l"
+): string => {
   let color = "";
   switch (status) {
     case "draft":
@@ -32,7 +35,14 @@ export const getStatusColor = (status: ApplicationStatus): string => {
       break;
     case "declined":
     case "cancelled":
-      color = "var(--color-brick)";
+      switch (size) {
+        case "s":
+          color = "var(--color-error)";
+          break;
+        case "l":
+        default:
+          color = "var(--color-error-dark)";
+      }
       break;
     default:
   }
@@ -48,7 +58,7 @@ export const StatusDot = styled.div<{
   width: ${({ size }) => size && `${size}px`};
   height: ${({ size }) => size && `${size}px`};
   border-radius: 50%;
-  background-color: ${({ status }) => getStatusColor(status)};
+  background-color: ${({ status }) => getStatusColor(status, "s")};
 `;
 
 export const InlineErrorSummary = styled(ErrorSummary)`

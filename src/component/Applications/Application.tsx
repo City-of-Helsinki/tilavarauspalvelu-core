@@ -10,12 +10,13 @@ import {
   ApplicationStatus,
 } from "../../common/types";
 import { ContentContainer, NarrowContainer } from "../../styles/layout";
-import { BasicLink, breakpoints, getStatusColor } from "../../styles/util";
+import { BasicLink, breakpoints } from "../../styles/util";
 import { ContentHeading, H2, H3 } from "../../styles/typography";
 import withMainMenu from "../withMainMenu";
 import LinkPrev from "../LinkPrev";
 import { ReactComponent as IconCustomers } from "../../images/icon_customers.svg";
 import { formatNumber, processApplication } from "../../common/util";
+import StatusBlock from "../StatusBlock";
 
 interface IRouteParams {
   applicationId: string;
@@ -73,19 +74,6 @@ const OrganisationType = styled.dl`
     display: inline-block;
     margin: 0 0 0 1em;
   }
-`;
-
-const StatusBlock = styled.div<{ color: string }>`
-  display: inline-flex;
-  align-items: center;
-  margin-bottom: var(--spacing-3-xl);
-  background-color: ${({ color }) => color};
-  height: 28px;
-  padding: 0 15px;
-  color: var(--color-white);
-  font-family: var(--tilavaraus-admin-font-bold);
-  font-weight: bold;
-  font-size: var(--fontsize-body-s);
 `;
 
 const Subheading = styled(H2)``;
@@ -221,6 +209,7 @@ function Application(): JSX.Element | null {
   };
   switch (application?.status) {
     case "in_review":
+    case "review_done":
       action = {
         text: t("Application.actions.declineApplication"),
         button: "secondary",
@@ -274,9 +263,7 @@ function Application(): JSX.Element | null {
               <dt>{t("Organisation.organisationType")}:</dt>
               <dd>todo</dd>
             </OrganisationType>
-            <StatusBlock color={getStatusColor(application.status)}>
-              <span>{t(`Application.statuses.${application.status}`)}</span>
-            </StatusBlock>
+            <StatusBlock status={application.status} view={1} />
             {notificationContent ? (
               <StyledNotification
                 type="success"
