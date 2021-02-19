@@ -2,6 +2,8 @@ export type TranslationObject = {
   [key: string]: string;
 };
 
+export type ApplicationRoundStatus = "draft";
+
 export type ApplicationRound = {
   id: number;
   name: string;
@@ -14,6 +16,7 @@ export type ApplicationRound = {
   publicDisplayEnd: string;
   purposesIds: number[];
   serviceSectorId: number;
+  status: ApplicationRoundStatus;
 };
 
 export type Space = {
@@ -85,20 +88,24 @@ export type ApplicationStatus =
   | "declined"
   | "cancelled";
 
+export type AggregatedData = {
+  [name: string]: string | number;
+};
+
+export type ProcessedData = {
+  reservationsTotal?: number;
+  minDurationTotal?: number;
+};
+
 export type Application = {
-  [key: string]:
-    | number
-    | ApplicationStatus
-    | Organisation
-    | ContactPerson
-    | ApplicationEvent[]
-    | null;
   id: number;
   status: ApplicationStatus;
   applicationRoundId: number;
   organisation: Organisation | null;
   contactPerson: ContactPerson | null;
   applicationEvents: ApplicationEvent[];
+  aggregatedData: AggregatedData[];
+  processedData: ProcessedData;
 };
 
 export type Organisation = {
@@ -106,6 +113,7 @@ export type Organisation = {
   name: string | null;
   identifier: string | null;
   yearEstablished: number | null;
+  activeMembers?: null;
 };
 
 export type ContactPerson = {
@@ -161,4 +169,14 @@ export interface ReservationUnitsParameters {
   search?: string;
   purpose?: number;
   reservationUnitType?: number;
+}
+
+export interface DataFilterOption {
+  key: string;
+  value?: string | number;
+  title: string;
+}
+export interface DataFilterConfig {
+  title: string;
+  filters?: DataFilterOption[];
 }

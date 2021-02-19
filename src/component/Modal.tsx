@@ -13,6 +13,7 @@ interface IProps {
 const modalRoot = document.getElementById("modal-root");
 
 const Seranwrap = styled.div`
+  height: 200%;
   position: absolute;
   top: 0;
   right: 0;

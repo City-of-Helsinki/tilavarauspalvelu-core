@@ -10,11 +10,12 @@ const Bubble = styled.div`
   background-color: var(--tilavaraus-admin-blue);
   border-radius: 50%;
   width: 16px;
+  min-width: 16px;
   height: 16px;
   user-select: none;
   cursor: pointer;
   color: white;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   font-size: 13px;

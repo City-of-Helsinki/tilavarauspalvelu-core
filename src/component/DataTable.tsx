@@ -2,13 +2,20 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { Button, IconArrowDown, IconArrowUp, IconSliders } from "hds-react";
 import { useTranslation } from "react-i18next";
+import { useHistory } from "react-router-dom";
 import orderBy from "lodash/orderBy";
+import get from "lodash/get";
 import classNames from "classnames";
 import { truncatedText } from "../styles/typography";
 import { breakpoints, getGridFraction } from "../styles/util";
-import { Application } from "../common/types";
+import FilterControls from "./FilterControls";
+import {
+  Application as ApplicationType,
+  DataFilterConfig,
+  DataFilterOption,
+} from "../common/types";
 
-type DataType = Application;
+type DataType = ApplicationType;
 
 type OrderTypes = "asc" | "desc";
 
@@ -23,11 +30,13 @@ export interface CellConfig {
   index: string;
   sorting: string;
   order: OrderTypes;
+  rowLink?: (arg0: string | number) => string;
 }
 
 interface IProps {
   data: DataType[];
   cellConfig: CellConfig;
+  filterConfig: DataFilterConfig[];
   className?: string;
 }
 
@@ -36,15 +45,41 @@ const Wrapper = styled.div``;
 const Filters = styled.div`
   background-color: var(--tilavaraus-admin-gray);
   padding: 0 var(--spacing-xl);
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  height: 56px;
+  position: relative;
 `;
 
-const FilterBtn = styled(Button).attrs({
-  style: {
-    "--color-bus": "transparent",
-    "--color-bus-dark": "--tilavaraus-admin-gray",
-    "--color-white": "--tilavaraus-admin-content-text-color",
-  },
-})``;
+interface IFilterBtn {
+  $filterControlsAreOpen: boolean;
+  $filtersActive: boolean;
+}
+
+const FilterBtn = styled(Button).attrs(
+  ({ $filterControlsAreOpen, $filtersActive }: IFilterBtn) => ({
+    style: {
+      "--filter-button-color": $filtersActive
+        ? "var(--tilavaraus-admin-blue-dark)"
+        : $filterControlsAreOpen
+        ? "var(--color-silver)"
+        : "transparent",
+      "--color-bus": "var(--filter-button-color)",
+      "--color-bus-dark": "var(--filter-button-color)",
+      "--color-white": $filtersActive
+        ? "white"
+        : "var(--tilavaraus-admin-content-text-color)",
+    } as React.CSSProperties,
+  })
+)<IFilterBtn>`
+  ${({ $filtersActive }) =>
+    $filtersActive &&
+    `
+    font-family: var(--tilavaraus-admin-font-bold);
+    font-weight: bold;
+  `}
+`;
 
 const tableBorder = (size = "0.5em") =>
   `${size} solid var(--tilavaraus-admin-gray)`;
@@ -66,6 +101,7 @@ const TableWrapper = styled.div`
   overflow-x: auto;
   width: 100%;
 `;
+
 const Table = styled.table`
   width: 100%;
   min-width: var(--breakpoint-m);
@@ -110,7 +146,9 @@ const Cell = styled.td`
   padding: 0 var(--spacing-xs);
 `;
 
-const Row = styled.tr``;
+const Row = styled.tr<{ $clickable?: boolean }>`
+  ${({ $clickable }) => $clickable && "cursor: pointer;"}
+`;
 
 const Heading = styled.thead`
   ${Cell} {
@@ -123,19 +161,24 @@ const Heading = styled.thead`
         position: absolute;
         top: 1.2em;
         transform: scale(0.7);
-        margin-left: 0.5em;
       }
     }
 
+    ${truncatedText}
     font-weight: normal;
     text-align: left;
-    cursor: pointer;
     user-select: none;
+    cursor: pointer;
   }
 `;
 
 const Body = styled.tbody`
   ${Row} {
+    &:hover {
+      ${Cell} {
+        background-color: var(--color-silver-light);
+      }
+    }
     &:first-of-type {
       ${Cell} {
         &:first-of-type {
@@ -187,14 +230,33 @@ function SortingArrow({ direction }: SortingProps): JSX.Element {
 const processData = (
   data: DataType[],
   sorting: string,
-  order: "asc" | "desc"
+  order: "asc" | "desc",
+  filters: DataFilterOption[]
 ): DataType[] => {
+  if (filters.length > 0) {
+    const filteredData = data.filter((row) => {
+      return (
+        filters.filter((filter) => get(row, filter.key) === filter.value)
+          .length > 0
+      );
+    });
+
+    return orderBy(filteredData, [sorting], [order]);
+  }
+
   return orderBy(data, [sorting], [order]);
 };
 
-function DataTable({ data, cellConfig, className }: IProps): JSX.Element {
+function DataTable({
+  data,
+  cellConfig,
+  filterConfig,
+  className,
+}: IProps): JSX.Element {
   const [sorting, setSorting] = useState<string>(cellConfig.sorting);
   const [order, setOrder] = useState<OrderTypes>(cellConfig.order);
+  const [filtersAreVisible, toggleFilterVisibility] = useState(false);
+  const [filters, setFilters] = useState<DataFilterOption[]>([]);
 
   const setSortingAndOrder = (colKey: string): void => {
     if (sorting === colKey) {
@@ -206,30 +268,48 @@ function DataTable({ data, cellConfig, className }: IProps): JSX.Element {
   };
 
   const { t } = useTranslation();
+  const history = useHistory();
 
-  const processedData = processData(data, sorting, order);
+  const processedData = processData(data, sorting, order, filters);
+  const sortingEnabled = processedData.length > 0;
 
   return (
     <Wrapper className={className}>
       <Filters>
-        <FilterBtn iconLeft={<IconSliders />} onClick={() => {}}>
-          {t("common.filter")}
+        <FilterBtn
+          iconLeft={<IconSliders />}
+          onClick={() => toggleFilterVisibility(!filtersAreVisible)}
+          className={classNames({ filterControlsAreOpen: filtersAreVisible })}
+          $filterControlsAreOpen={filtersAreVisible}
+          $filtersActive={filters.length > 0}
+        >
+          {t(`${filters.length > 0 ? "common.filtered" : "common.filter"}`)}
         </FilterBtn>
+        <FilterControls
+          filters={filters}
+          visible={filtersAreVisible}
+          applyFilters={setFilters}
+          config={filterConfig}
+        />
       </Filters>
       <TableWrapper>
         <Table>
           <Heading>
             <Row>
               {cellConfig.cols.map((col) => {
-                const sortingActive = col.key === sorting;
+                const sortingActive = sortingEnabled && col.key === sorting;
+                const title = t(col.title);
                 return (
                   <Cell
                     as="th"
                     key={col.key}
-                    onClick={() => setSortingAndOrder(col.key)}
+                    onClick={() =>
+                      sortingEnabled && setSortingAndOrder(col.key)
+                    }
                     className={classNames({ sortingActive })}
+                    title={title}
                   >
-                    <span>{col.title}</span>
+                    <span>{title}</span>
                     {sortingActive && <SortingArrow direction={order} />}
                   </Cell>
                 );
@@ -237,16 +317,41 @@ function DataTable({ data, cellConfig, className }: IProps): JSX.Element {
             </Row>
           </Heading>
           <Body>
-            {processedData.map((row: DataType) => (
-              <Row key={`${sorting}${order}${row[cellConfig.index]}`}>
-                {cellConfig.cols.map((col: Column) => {
-                  const value = col.transform
-                    ? col.transform(row)
-                    : row[col.key];
-                  return <Cell>{value}</Cell>;
-                })}
+            {processedData.length > 0 ? (
+              processedData.map((row: DataType) => {
+                const rowKey = `${sorting}${order}${get(
+                  row,
+                  cellConfig.index
+                )}`;
+                return (
+                  <Row
+                    key={rowKey}
+                    onClick={() => {
+                      if (cellConfig.rowLink) {
+                        const dataIndex = get(row, cellConfig.index);
+                        const link = cellConfig.rowLink(dataIndex);
+                        history.push(link);
+                      }
+                    }}
+                    $clickable={!!cellConfig.rowLink}
+                  >
+                    {cellConfig.cols.map((col: Column) => {
+                      const colKey = `${rowKey}${col.key}`;
+                      const value = col.transform
+                        ? col.transform(row)
+                        : get(row, col.key);
+                      return <Cell key={colKey}>{value}</Cell>;
+                    })}
+                  </Row>
+                );
+              })
+            ) : (
+              <Row>
+                <Cell colSpan={cellConfig.cols.length}>
+                  {t("common.noResults")}
+                </Cell>
               </Row>
-            ))}
+            )}
           </Body>
         </Table>
       </TableWrapper>
