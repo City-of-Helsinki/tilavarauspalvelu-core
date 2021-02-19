@@ -9,9 +9,10 @@ from applications.models import (
     ApplicationEvent,
     ApplicationEventSchedule,
     ApplicationRound,
+    ApplicationRoundBasket,
     EventReservationUnit,
 )
-from reservation_units.models import ReservationUnit
+from reservation_units.models import Purpose, ReservationUnit
 from spaces.models import Space
 
 
@@ -109,7 +110,9 @@ def application_with_application_events(
 
 
 @pytest.fixture
-def recurring_application_event(application_with_reservation_units) -> ApplicationEvent:
+def recurring_application_event(
+    application_with_reservation_units, purpose
+) -> ApplicationEvent:
     return ApplicationEvent.objects.create(
         application=application_with_reservation_units,
         num_persons=10,
@@ -120,6 +123,7 @@ def recurring_application_event(application_with_reservation_units) -> Applicati
         begin=datetime.date(year=2020, month=1, day=1),
         end=datetime.date(year=2020, month=2, day=28),
         biweekly=False,
+        purpose=purpose,
     )
 
 
@@ -153,8 +157,13 @@ def not_matching_event_reservation_unit(
 
 
 @pytest.fixture
+def purpose() -> Purpose:
+    return Purpose.objects.create(name="Exercise")
+
+
+@pytest.fixture
 def multiple_applications(
-    application_round_with_reservation_units, request, reservation_unit
+    application_round_with_reservation_units, request, reservation_unit, purpose
 ) -> Dict[str, list]:
     applications = []
     created_events = []
@@ -176,6 +185,7 @@ def multiple_applications(
                 begin=datetime.date(year=2020, month=1, day=1),
                 end=datetime.date(year=2020, month=2, day=28),
                 biweekly=False,
+                purpose=purpose,
             )
             for schedule in event["schedules"]:
                 created_schedule = ApplicationEventSchedule.objects.create(
@@ -199,3 +209,29 @@ def multiple_applications(
         "created_events": created_events,
         "schedules": schedules,
     }
+
+
+@pytest.fixture
+def application_round_basket_one(
+    default_application_round, purpose
+) -> ApplicationRoundBasket:
+    return ApplicationRoundBasket.objects.create(
+        name="Basket with order number one",
+        application_round=default_application_round,
+        purpose=purpose,
+        order_number=1,
+        customer_type=[ApplicationRoundBasket.CUSTOMER_TYPE_NONPROFIT],
+    )
+
+
+@pytest.fixture
+def application_round_basket_two(
+    default_application_round, purpose
+) -> ApplicationRoundBasket:
+    return ApplicationRoundBasket.objects.create(
+        name="Basket with order number two",
+        application_round=default_application_round,
+        purpose=purpose,
+        order_number=2,
+        customer_type=[],
+    )

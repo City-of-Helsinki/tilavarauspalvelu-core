@@ -104,3 +104,53 @@ def test_should_map_period_start_and_end_from_application_round(
         data.allocation_events[0].period_end
         == application_with_reservation_units.application_round.reservation_period_end
     )
+
+
+@pytest.mark.django_db
+def test_mapping_application_round_baskets(
+    application_round_with_reservation_units,
+    default_application_round,
+    application_round_basket_one,
+    application_round_basket_two,
+    recurring_application_event,
+):
+
+    data = AllocationData(application_round=application_round_with_reservation_units)
+    assert data.baskets == {
+        application_round_basket_one.id: application_round_basket_one,
+        application_round_basket_two.id: application_round_basket_two,
+    }
+
+
+@pytest.mark.django_db
+def test_should_map_application_event_baskets(
+    application_round_with_reservation_units,
+    default_application_round,
+    application_round_basket_one,
+    application_round_basket_two,
+    recurring_application_event,
+):
+
+    data = AllocationData(application_round=application_round_with_reservation_units)
+
+    assert data.allocation_events[0].baskets == [
+        application_round_basket_one.id,
+        application_round_basket_two.id,
+    ]
+
+
+@pytest.mark.django_db
+def test_should_not_map_event_baskets_if_does_not_belong_to_basket(
+    application_round_with_reservation_units,
+    default_application_round,
+    application_round_basket_one,
+    application_round_basket_two,
+    recurring_application_event,
+):
+
+    recurring_application_event.purpose = None
+    recurring_application_event.save()
+
+    data = AllocationData(application_round=application_round_with_reservation_units)
+
+    assert data.allocation_events[0].baskets == []

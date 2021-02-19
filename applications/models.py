@@ -1,5 +1,5 @@
 import datetime
-from typing import Optional
+from typing import Dict, Optional
 
 import recurrence
 from django.contrib.auth.models import User
@@ -250,16 +250,11 @@ class ApplicationRound(models.Model):
         return self.statuses.last()
 
     def get_application_events_by_basket(self):
-        handled_application_events: [ApplicationEvent] = {}
+        handled_application_events: Dict[int, [ApplicationEvent]] = {}
         for basket in self.application_round_baskets.order_by("order_number").all():
-            handled = [
-                event
-                for events in handled_application_events.values()
-                for event in events
-            ]
             handled_application_events[
                 basket.id
-            ] = basket.get_application_events_in_basket(handled)
+            ] = basket.get_application_events_in_basket()
         return handled_application_events
 
     def __str__(self):
@@ -317,7 +312,7 @@ class ApplicationRoundBasket(models.Model):
         verbose_name=_("Order number"), default=1, null=False, blank=True
     )
 
-    def get_application_events_in_basket(self, excluded_events):
+    def get_application_events_in_basket(self):
         events = ApplicationEvent.objects.filter(
             application__application_round=self.application_round
         )
@@ -326,8 +321,6 @@ class ApplicationRoundBasket(models.Model):
             events = events.filter(purpose=self.purpose)
         if len(self.age_groups.all()) > 0:
             events = events.filter(age_group__in=self.age_groups.all())
-        if len(excluded_events) > 0:
-            events = events.exclude(id__in=map(lambda x: x.id, excluded_events))
 
         return list(events.all())
 
