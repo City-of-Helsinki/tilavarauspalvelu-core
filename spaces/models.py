@@ -3,6 +3,17 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from mptt.models import MPTTModel, TreeForeignKey
 
+# SRID 4326 - Spatial Reference System Identifier number 4326.
+# EPSG:4326 - It's the same thing, but EPSG is the name of the authority maintaining an SRID reference.
+# WGS 84 - World Geodetic System from 1984. It's the coordinate system used in GPS.
+#
+# 4326 is the identifier number (SRID) for WGS 84 in the EPSG reference.
+# So in summary SRID 4326 == EPSG:4326 == WGS 84 == "GPS coordinates".
+#
+# The coordinates in this coordinate system are numbers in the range of
+# -90.0000 to 90.0000 for latitude and -180.0000 to 180.0000 for longitude.
+COORDINATE_SYSTEM_ID = 4326
+
 
 class District(MPTTModel):
     TYPE_MAJOR_DISTRICT = "major_district"
@@ -242,7 +253,16 @@ class Location(models.Model):
     coordinates = PointField(
         verbose_name=_("Coordinates"),
         null=True,
+        srid=COORDINATE_SYSTEM_ID,
     )
+
+    @property
+    def lat(self):
+        return self.coordinates.y if self.coordinates else None
+
+    @property
+    def lon(self):
+        return self.coordinates.x if self.coordinates else None
 
     def __str__(self):
         return "{}, {} {}".format(
