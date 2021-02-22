@@ -29,7 +29,7 @@ export const truncatedText = `
 `;
 
 export const ContentHeading = styled(H1)`
-  @media (min-width: ${breakpoints.l}) {
+  @media (min-width: ${breakpoints.xl}) {
     width: 60%;
   }
 

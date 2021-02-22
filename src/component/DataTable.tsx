@@ -144,6 +144,7 @@ const Cell = styled.td`
   position: relative;
   height: var(--spacing-4-xl);
   padding: 0 var(--spacing-xs);
+  user-select: none;
 `;
 
 const Row = styled.tr<{ $clickable?: boolean }>`

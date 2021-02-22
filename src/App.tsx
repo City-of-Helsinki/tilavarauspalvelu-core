@@ -7,6 +7,7 @@ import "./i18n";
 import { UIContext, UIContextType } from "./context/UIContext";
 import Modal from "./component/Modal";
 import Application from "./component/Applications/Application";
+import ApplicationDetails from "./component/Applications/ApplicationDetails";
 
 function App(): JSX.Element {
   const [modalContent, setModalContent] = useState<UIContextType | null>(null);
@@ -37,6 +38,9 @@ function App(): JSX.Element {
             </Route>
             <Route exact path="/application/:applicationId">
               <Application />
+            </Route>
+            <Route exact path="/application/:applicationId/details">
+              <ApplicationDetails />
             </Route>
             <Route path="/applicationRounds/:applicationRoundId">
               <ApplicationRound />

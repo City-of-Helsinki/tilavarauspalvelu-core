@@ -172,7 +172,7 @@ function Application(): JSX.Element | null {
   const { applicationId } = useParams<IRouteParams>();
   const { t } = useTranslation();
 
-  const fetchApplications = async (id: number) => {
+  const fetchApplication = async (id: number) => {
     try {
       const result = await getApplication(id);
       setApplication(processApplication(result));
@@ -184,7 +184,7 @@ function Application(): JSX.Element | null {
   };
 
   useEffect(() => {
-    fetchApplications(Number(applicationId));
+    fetchApplication(Number(applicationId));
   }, [applicationId]);
 
   const setApplicationStatus = async (status: ApplicationStatus) => {
@@ -193,8 +193,9 @@ function Application(): JSX.Element | null {
     try {
       setIsSaving(true);
       const result = await saveApplication(payload);
-      fetchApplications(result.id);
+      fetchApplication(result.id);
       setStatusNotification(status);
+      setErrorMsg(null);
     } catch (error) {
       setErrorMsg("errors.errorSavingApplication");
     } finally {
@@ -250,7 +251,7 @@ function Application(): JSX.Element | null {
             />
           </ContentContainer>
           <NarrowContainer>
-            <StyledLink to="/">
+            <StyledLink to={`/application/${application.id}/details`}>
               {t("ApplicationRound.showClientApplication")}
             </StyledLink>
             <Heading>

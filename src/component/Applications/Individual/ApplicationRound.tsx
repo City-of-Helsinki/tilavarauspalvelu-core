@@ -97,6 +97,12 @@ const SubmitButton = styled(Button)`
   margin-bottom: var(--spacing-s);
 `;
 
+const StyledCheckbox = styled(Checkbox)`
+  label {
+    user-select: none;
+  }
+`;
+
 const ApplicationCount = styled(H2)`
   text-transform: lowercase;
 `;
@@ -293,7 +299,7 @@ function ApplicationRound(): JSX.Element {
                     {t("Application.gotoSplitPreparation")}
                   </SubmitButton>
                   <div>
-                    <Checkbox
+                    <StyledCheckbox
                       id="applicationsChecked"
                       checked={isApplicationChecked}
                       onClick={() =>
