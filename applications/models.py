@@ -1,5 +1,5 @@
 import datetime
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 
 import recurrence
 from django.contrib.auth.models import User
@@ -249,13 +249,23 @@ class ApplicationRound(models.Model):
     def get_status(self):
         return self.statuses.last()
 
-    def get_application_events_by_basket(self):
-        handled_application_events: Dict[int, [ApplicationEvent]] = {}
+    def get_application_events_by_basket(
+        self, included_basket_ids: Optional[List[int]] = None
+    ):
+        def should_add_basket(basket_id: int):
+            return (
+                included_basket_ids is None
+                or len(included_basket_ids) == 0
+                or basket_id in included_basket_ids
+            )
+
+        matching_application_events: Dict[int, List[ApplicationEvent]] = {}
         for basket in self.application_round_baskets.order_by("order_number").all():
-            handled_application_events[
-                basket.id
-            ] = basket.get_application_events_in_basket()
-        return handled_application_events
+            if should_add_basket(basket.id):
+                matching_application_events[
+                    basket.id
+                ] = basket.get_application_events_in_basket()
+        return matching_application_events
 
     def __str__(self):
         return "{} ({} - {})".format(
