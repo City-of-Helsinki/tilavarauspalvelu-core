@@ -64,6 +64,7 @@ const translations: ITranslations = {
   errors: {
     applicationRoundNotFound: ["Haettua hakukierrosta ei löydy"],
     errorFetchingData: ["Virhe haettaessa tietoja"],
+    functionFailed: ["Toiminto epäonnistui"],
     errorFetchingApplication: ["Virhe haettaessa hakemusta"],
     errorFetchingApplications: ["Virhe haettaessa hakemuksia"],
     errorSavingApplication: ["Virhe tallennettaessa hakemusta"],

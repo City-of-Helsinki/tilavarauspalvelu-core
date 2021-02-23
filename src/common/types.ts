@@ -89,10 +89,6 @@ export type ApplicationStatus =
   | "cancelled";
 
 export type AggregatedData = {
-  [name: string]: string | number;
-};
-
-export type ProcessedData = {
   reservationsTotal?: number;
   minDurationTotal?: number;
 };
@@ -105,8 +101,7 @@ export type Application = {
   contactPerson: ContactPerson | null;
   billingAddress: BillingAddress | null;
   applicationEvents: ApplicationEvent[];
-  aggregatedData: AggregatedData[];
-  processedData: ProcessedData;
+  aggregatedData: AggregatedData;
 };
 
 export type Organisation = {

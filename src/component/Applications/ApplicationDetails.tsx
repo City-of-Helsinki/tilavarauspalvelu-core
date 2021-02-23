@@ -22,7 +22,6 @@ import {
   formatDuration,
   formatNumber,
   formatDate,
-  processApplication,
   parseApplicationEventSchedules,
 } from "../../common/util";
 import ValueBox from "../ValueBox";
@@ -89,6 +88,14 @@ const DefinitionList = styled.dl`
   }
 `;
 
+const StyledAccordion = styled(Accordion).attrs({
+  style: {
+    "--header-font-size": "var(--fontsize-heading-m)",
+    "--button-size": "var(--fontsize-heading-l)",
+    "--border-color": "var(--tilavaraus-ui-gray)",
+  } as React.CSSProperties,
+})``;
+
 const AccordionContent = styled.div`
   display: grid;
   grid-template-columns: 1fr;
@@ -121,7 +128,7 @@ function ApplicationDetails(): JSX.Element | null {
   const fetchApplication = async (id: number) => {
     try {
       const result = await getApplication(id);
-      setApplication(processApplication(result));
+      setApplication(result);
     } catch (error) {
       setErrorMsg("errors.errorFetchingApplication");
     } finally {
@@ -165,7 +172,10 @@ function ApplicationDetails(): JSX.Element | null {
             <ContentHeading>
               {t("Application.applicationDetails")}
             </ContentHeading>
-            <Accordion heading={t("Application.customerBasicInfo")} defaultOpen>
+            <StyledAccordion
+              heading={t("Application.customerBasicInfo")}
+              defaultOpen
+            >
               <AccordionContent>
                 <ValueBox
                   label={t("Application.contactForename")}
@@ -213,8 +223,8 @@ function ApplicationDetails(): JSX.Element | null {
                   value="???????????"
                 />
               </AccordionContent>
-            </Accordion>
-            <Accordion heading={t("Application.members")} defaultOpen>
+            </StyledAccordion>
+            <StyledAccordion heading={t("Application.members")} defaultOpen>
               <AccordionContent>
                 <ValueBox
                   label={t("Organisation.activeParticipants")}
@@ -224,7 +234,7 @@ function ApplicationDetails(): JSX.Element | null {
                   )}`}
                 />
               </AccordionContent>
-            </Accordion>
+            </StyledAccordion>
             {application.applicationEvents.map((applicationEvent) => {
               let duration = "";
               const minDuration =
@@ -256,7 +266,7 @@ function ApplicationDetails(): JSX.Element | null {
               duration = trim(duration, ", ");
 
               return (
-                <Accordion
+                <StyledAccordion
                   key={applicationEvent.id}
                   heading={applicationEvent.name}
                   defaultOpen
@@ -326,7 +336,7 @@ function ApplicationDetails(): JSX.Element | null {
                       />
                     ))}
                   </AccordionContent>
-                </Accordion>
+                </StyledAccordion>
               );
             })}
           </IngressContainer>
@@ -335,7 +345,7 @@ function ApplicationDetails(): JSX.Element | null {
       {errorMsg && (
         <Notification
           type="error"
-          label={t("errors.errorFetchingData")}
+          label={t("errors.functionFailed")}
           position="top-center"
           autoClose={false}
           dismissible

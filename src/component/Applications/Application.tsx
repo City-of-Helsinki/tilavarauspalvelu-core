@@ -15,7 +15,7 @@ import { ContentHeading, H2, H3 } from "../../styles/typography";
 import withMainMenu from "../withMainMenu";
 import LinkPrev from "../LinkPrev";
 import { ReactComponent as IconCustomers } from "../../images/icon_customers.svg";
-import { formatNumber, processApplication } from "../../common/util";
+import { formatNumber } from "../../common/util";
 import StatusBlock from "../StatusBlock";
 
 interface IRouteParams {
@@ -175,7 +175,7 @@ function Application(): JSX.Element | null {
   const fetchApplication = async (id: number) => {
     try {
       const result = await getApplication(id);
-      setApplication(processApplication(result));
+      setApplication(result);
     } catch (error) {
       setErrorMsg("errors.errorFetchingApplication");
     } finally {
@@ -305,14 +305,14 @@ function Application(): JSX.Element | null {
                     <tr>
                       <th>{t("ApplicationRound.appliedReservations")}</th>
                       <td>{`${formatNumber(
-                        application.processedData.reservationsTotal,
+                        application.aggregatedData.reservationsTotal,
                         t("common.volumeUnit")
                       )}`}</td>
                     </tr>
                     <tr>
                       <th>{t("ApplicationRound.totalReservationTime")}</th>
                       <td>{`${formatNumber(
-                        application.processedData.minDurationTotal,
+                        application.aggregatedData.minDurationTotal,
                         t("common.hoursUnit")
                       )}`}</td>
                     </tr>
@@ -339,7 +339,7 @@ function Application(): JSX.Element | null {
       {errorMsg && (
         <Notification
           type="error"
-          label={t("errors.errorFetchingData")}
+          label={t("errors.functionFailed")}
           position="top-center"
           autoClose={false}
           dismissible

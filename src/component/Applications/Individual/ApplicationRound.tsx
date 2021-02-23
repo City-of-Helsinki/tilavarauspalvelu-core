@@ -21,11 +21,7 @@ import {
 import TimeframeStatus from "../TimeframeStatus";
 import Loader from "../../../common/Loader";
 import StatusCell from "../../StatusCell";
-import {
-  formatNumber,
-  getNormalizedStatus,
-  processApplications,
-} from "../../../common/util";
+import { formatNumber, getNormalizedStatus } from "../../../common/util";
 import StatusRecommendation from "../StatusRecommendation";
 
 interface IRouteParams {
@@ -156,14 +152,14 @@ const getCellConfig = (t: TFunction): CellConfig => {
       {
         title: "Application.headings.applicationCount",
         key: "aggregatedData.reservationsTotal",
-        transform: ({ processedData }: ApplicationType) => (
+        transform: ({ aggregatedData }: ApplicationType) => (
           <>
             {trim(
               `${formatNumber(
-                processedData?.reservationsTotal,
+                aggregatedData?.reservationsTotal,
                 t("common.volumeUnit")
               )} / ${formatNumber(
-                processedData?.minDurationTotal,
+                aggregatedData?.minDurationTotal,
                 t("common.hoursUnit")
               )}`,
               " / "
@@ -241,7 +237,7 @@ function ApplicationRound(): JSX.Element {
         });
         setCellConfig(getCellConfig(t));
         setFilterConfig(getFilterConfig(result));
-        setApplications(processApplications(result));
+        setApplications(result);
       } catch (error) {
         setErrorMsg("errors.errorFetchingApplications");
       } finally {
@@ -326,7 +322,7 @@ function ApplicationRound(): JSX.Element {
       {errorMsg && (
         <Notification
           type="error"
-          label={t("errors.errorFetchingData")}
+          label={t("errors.functionFailed")}
           position="top-center"
           autoClose={false}
           dismissible
