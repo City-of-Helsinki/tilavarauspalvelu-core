@@ -7,6 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers, viewsets
 from rest_framework.exceptions import ValidationError
 
+from api.reservations_api import AgeGroupSerializer
 from applications.models import (
     Address,
     Application,
@@ -228,6 +229,10 @@ class ApplicationEventSerializer(serializers.ModelSerializer):
         help_text="Id of the age group for this event.",
     )
 
+    age_group_display = AgeGroupSerializer(
+        display=True, read_only=True, source="age_group"
+    )
+
     ability_group_id = serializers.PrimaryKeyRelatedField(
         queryset=AbilityGroup.objects.all(),
         source="ability_group",
@@ -261,6 +266,7 @@ class ApplicationEventSerializer(serializers.ModelSerializer):
             "name",
             "application_event_schedules",
             "num_persons",
+            "age_group_display",
             "age_group_id",
             "ability_group_id",
             "min_duration",
