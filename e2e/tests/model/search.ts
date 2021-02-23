@@ -7,7 +7,7 @@ export default {
     '#searchResultList > div > div:nth-child(1) > div > button'
   ),
   reservationUnitPageLink: Selector(
-    '#searchResultList > div > div:nth-child(1) > div > span > a'
+    '#searchResultList > div > div:nth-child(2) > div > span > a'
   ),
   startApplicationButton: Selector('#startApplicationButton'),
 };

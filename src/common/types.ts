@@ -1,5 +1,7 @@
 export type TranslationObject = {
-  [key: string]: string;
+  fi?: string;
+  en?: string;
+  sv?: string;
 };
 
 export type ApplicationPeriod = {
@@ -183,3 +185,5 @@ export type ApplicationEditor = {
 };
 
 export type FormType = undefined | 'individual' | 'organisation' | 'company';
+
+export type LocalizationLanguages = 'fi' | 'sv' | 'en';

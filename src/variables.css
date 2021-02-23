@@ -11,4 +11,5 @@
   --tilavaraus-blue: #0072c6;
   --tilavaraus-calendar-selected: var(--tilavaraus-blue);
   --font-bold: HelsinkiGrotesk-Bold, var(--font-default);
+  --font-medium: HelsinkiGrotesk-Medium, var(--font-default);
 }

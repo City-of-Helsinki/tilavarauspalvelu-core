@@ -104,9 +104,11 @@ const Head = ({ reservationUnit }: Props): JSX.Element => {
         </BackContainer>
         <RightContainer>
           <div>
-            <h1 className="heading-l">{reservationUnit.name[i18n.language]}</h1>
+            <h1 className="heading-l">
+              {localizedValue(reservationUnit.name, i18n.language)}
+            </h1>
             <h2 className="heading-m">
-              {reservationUnit.spaces?.[0]?.name[i18n.language]}
+              {localizedValue(reservationUnit.spaces?.[0]?.name, i18n.language)}
             </h2>
             <Props>
               <div>
@@ -176,7 +178,7 @@ const Head = ({ reservationUnit }: Props): JSX.Element => {
           <ImageContainer>
             <img
               alt={t('common.imgAltForSpace', {
-                name: reservationUnit.name[i18n.language],
+                name: localizedValue(reservationUnit.name, i18n.language),
               })}
               width="588"
               height="406"

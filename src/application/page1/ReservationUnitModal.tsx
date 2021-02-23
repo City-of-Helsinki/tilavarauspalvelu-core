@@ -24,6 +24,7 @@ import {
 } from '../../common/types';
 import { breakpoint } from '../../common/style';
 import { reservationUnitPath } from '../../common/const';
+import { localizedValue } from '../../common/util';
 
 const Container = styled.div`
   width: 100%;
@@ -143,7 +144,7 @@ const ReservationUnitCard = ({
     <Container>
       <Image
         alt={t('common.imgAltForSpace', {
-          name: reservationUnit.name[i18n.language],
+          name: localizedValue(reservationUnit.name, i18n.language),
         })}
         src={
           reservationUnit.images[0]?.imageUrl ||
@@ -151,9 +152,9 @@ const ReservationUnitCard = ({
         }
       />
       <Main>
-        <Name>{reservationUnit.name[i18n.language]}</Name>
+        <Name>{localizedValue(reservationUnit.name, i18n.language)}</Name>
         <Description>
-          {reservationUnit.spaces[0]?.name[i18n.language]}
+          {localizedValue(reservationUnit.spaces[0]?.name, i18n.language)}
         </Description>
         <Link to={reservationUnitPath(reservationUnit.id)} target="_blank">
           <LinkContent>

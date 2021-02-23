@@ -234,6 +234,17 @@ const translations: Translations = {
     maxDuration: ['Varauksen kesto', 'Duration of reservation', 'Bokningstid'],
     price: ['Hinta', 'Price', 'Pris'],
     billableHours: ['Maksulliset tunnit', 'Billable hours', 'Betalda timmar'],
+    linkMap: [
+      'Avaa kartta uuteen ikkunaan',
+      'Open map in a new window ',
+      'Öppna kartan i ett nytt fönster',
+    ],
+    linkHSL: ['HSL Reittiopas', 'HSL Journey Planner', 'HSL Reseplaneraren'],
+    linkGoogle: [
+      'Google reittiohjeet',
+      'Google Directions',
+      'Google Vägbeskrivning',
+    ],
   },
 
   Navigation: {

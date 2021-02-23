@@ -37,7 +37,7 @@ test('Reservation unit page', async (t) => {
   await t.expect(violations.length === 0).ok(createReport(violations));
 });
 
-test.only('Application', async (t) => {
+test('Application', async (t) => {
   // start filling application
   await t
     .click(home.browseAllButton)

@@ -6,6 +6,7 @@ import { ReservationUnit as ReservationUnitType } from '../common/types';
 import { getReservationUnit } from '../common/api';
 import Head from './Head';
 import { routeData } from '../common/const';
+import Address from './Address';
 
 type ParamTypes = {
   id: string;
@@ -51,8 +52,9 @@ const ReservationUnit = (): JSX.Element | null => {
             <h2>Poikkeusajat</h2>
             <h2>Tilan vuorot</h2>
           </div>
+          <Address reservationUnit={reservationUnit} />
           <div>
-            <h2>Osoite</h2>
+            <Address reservationUnit={reservationUnit} />
           </div>
         </TwoColoumnLayout>
       </Container>

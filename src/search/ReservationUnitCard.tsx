@@ -11,6 +11,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { ReservationUnit } from '../common/types';
+import { localizedValue } from '../common/util';
 import {
   SelectionsListContext,
   SelectionsListContextType,
@@ -74,7 +75,7 @@ const ReservationUnitCard = ({ reservationUnit }: Props): JSX.Element => {
     <Container>
       <img
         alt={t('common.imgAltForSpace', {
-          name: reservationUnit.name[i18n.language],
+          name: localizedValue(reservationUnit.name, i18n.language),
         })}
         width="240"
         height="156"
@@ -86,11 +87,11 @@ const ReservationUnitCard = ({ reservationUnit }: Props): JSX.Element => {
       <MainContent>
         <Name>
           <Link to={`../reservation-unit/${reservationUnit.id}`}>
-            {reservationUnit.name[i18n.language]}
+            {localizedValue(reservationUnit.name, i18n.language)}
           </Link>
         </Name>
         <Description>
-          {reservationUnit.spaces[0]?.name[i18n.language]}
+          {localizedValue(reservationUnit.spaces[0]?.name, i18n.language)}
         </Description>
         <Bottom>
           <IconInfoCircle aria-label={t('reservationUnit.type')} />{' '}

@@ -2,7 +2,12 @@ import { isAfter, parseISO, isBefore, format } from 'date-fns';
 import { stringify } from 'query-string';
 import { ReservationUnitsParameters } from './api';
 import { searchPrefix, emptyOption } from './const';
-import { OptionType, Parameter, TranslationObject } from './types';
+import {
+  LocalizationLanguages,
+  OptionType,
+  Parameter,
+  TranslationObject,
+} from './types';
 
 export const isActive = (startDate: string, endDate: string): boolean => {
   const now = new Date();
@@ -53,10 +58,19 @@ export const localizedValue = (
   if (typeof name === 'string') {
     return name;
   }
-  return name[lang] || name.fi || name.en || name.sv;
+  return (
+    name[lang as LocalizationLanguages] ||
+    name.fi ||
+    name.en ||
+    name.sv ||
+    '???'
+  );
 };
 
-const getLabel = (parameter: Parameter, lang = 'fi'): string => {
+const getLabel = (
+  parameter: Parameter,
+  lang: LocalizationLanguages = 'fi'
+): string => {
   if (parameter.name) {
     return localizedValue(parameter.name, lang);
   }
@@ -75,7 +89,7 @@ export const mapOptions = (
     .concat(emptyOptionLabel ? [emptyOption(emptyOptionLabel)] : [])
     .concat(
       src.map((v) => ({
-        label: getLabel(v, lang),
+        label: getLabel(v, lang as LocalizationLanguages),
         value: v.id,
       }))
     );

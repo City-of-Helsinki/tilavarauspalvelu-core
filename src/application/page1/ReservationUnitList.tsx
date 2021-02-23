@@ -19,6 +19,7 @@ import {
 } from '../../common/types';
 import Modal from '../../component/Modal';
 import ReservationUnitModal from './ReservationUnitModal';
+import { localizedValue } from '../../common/util';
 
 type CardProps = {
   order: number;
@@ -125,7 +126,7 @@ const ReservationUnitCard = ({
             height="99"
           />
           <div>
-            <Title>{reservationUnit.name[i18n.language]}</Title>
+            <Title>{localizedValue(reservationUnit.name, i18n.language)}</Title>
             <Address>
               {reservationUnit.location?.addressStreet},
               {reservationUnit.location?.addressZip}{' '}

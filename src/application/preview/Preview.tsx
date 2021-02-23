@@ -224,11 +224,10 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
                     'Application.preview.applicationEvent.reservationUnit',
                     { order: index + 1 }
                   )}
-                  value={
-                    reservationUnits[reservationUnit.reservationUnitId].name[
-                      i18n.language
-                    ]
-                  }
+                  value={localizedValue(
+                    reservationUnits[reservationUnit.reservationUnitId].name,
+                    i18n.language
+                  )}
                 />
               )
             )}
