@@ -106,13 +106,27 @@ const ApplicationCount = styled(H2)`
 const getFilterConfig = (
   applications: ApplicationType[]
 ): DataFilterConfig[] => {
+  const coreBusinessValues = uniq(
+    applications
+      .map((app) => app.organisation?.coreBusiness)
+      .filter((app) => app && app.length)
+  );
   const statuses = uniq(applications.map((app) => app.status));
 
   return [
     {
       title: "Application.headings.customerType",
     },
-    { title: "Application.headings.coreActivity" },
+    {
+      title: "Application.headings.coreActivity",
+      filters:
+        coreBusinessValues &&
+        coreBusinessValues.map((coreBusiness) => ({
+          title: coreBusiness || "",
+          key: "organisation.coreBusiness",
+          value: coreBusiness || "",
+        })),
+    },
     {
       title: "Application.headings.applicationStatus",
       filters: statuses.map((status) => {
