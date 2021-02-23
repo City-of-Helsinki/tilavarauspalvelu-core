@@ -140,6 +140,11 @@ class AgeGroupSerializer(serializers.ModelSerializer):
             },
         }
 
+    def __init__(self, display=False, *args, **kwargs):
+        super(AgeGroupSerializer, self).__init__(*args, **kwargs)
+        if display:
+            self.fields.pop("id")
+
     def validate(self, data):
         min_age = data["minimum"]
         max_age = data["maximum"]
