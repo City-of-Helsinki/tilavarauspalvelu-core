@@ -11,9 +11,14 @@ class BuildingSerializer(TranslatedModelSerializer):
 
 
 class LocationSerializer(TranslatedModelSerializer):
+    coordinates = serializers.SerializerMethodField()
+
+    def get_coordinates(self, obj):
+        return {"longitude": obj.lon, "latitude": obj.lat}
+
     class Meta:
         model = Location
-        fields = ["address_street", "address_zip", "address_city"]
+        fields = ["address_street", "address_zip", "address_city", "coordinates"]
         extra_kwargs = {
             "address_street": {
                 "help_text": "Street name and number for the location.",
