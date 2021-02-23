@@ -23,8 +23,8 @@ services:
             target: development
             args:
                 BUILD_MODE: ${BUILD_MODE}
-                REDHAT_USERNAME: ${REDHAT_USERNAME}
-                REDHAT_PASSWORD: ${REDHAT_PASSWORD}
+                LOCAL_REDHAT_USERNAME: ${REDHAT_USERNAME}
+                LOCAL_REDHAT_PASSWORD: ${REDHAT_PASSWORD}
         environment:
             - DEBUG=true
             - DATABASE_URL=postgis://tvp:tvp@db/tvp
