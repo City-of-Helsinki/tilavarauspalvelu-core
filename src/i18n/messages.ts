@@ -116,7 +116,7 @@ const translations: ITranslations = {
     headings: {
       customer: ["Asiakas"],
       participants: ["Harrastajat"],
-      customerType: ["Asiakastyyppi"],
+      applicantType: ["Asiakastyyppi"],
       coreActivity: ["Ydintoiminta"],
       applicationCount: ["Hakumäärä"],
       applicationStatus: ["Hakemuksen tila"],

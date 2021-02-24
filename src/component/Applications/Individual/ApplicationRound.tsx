@@ -115,7 +115,7 @@ const getFilterConfig = (
 
   return [
     {
-      title: "Application.headings.customerType",
+      title: "Application.headings.applicantType",
     },
     {
       title: "Application.headings.coreActivity",
@@ -156,8 +156,10 @@ const getCellConfig = (t: TFunction): CellConfig => {
         ),
       },
       {
-        title: "Application.headings.customerType",
-        key: "organisation.customerType",
+        title: "Application.headings.applicantType",
+        key: "applicantType",
+        transform: ({ applicantType }: ApplicationType) =>
+          applicantType ? t(`Application.applicantTypes.${applicantType}`) : "",
       },
       {
         title: "Application.headings.coreActivity",
@@ -247,7 +249,7 @@ function ApplicationRound(): JSX.Element {
       try {
         const result = await getApplications({
           applicationRound: applicationId,
-          status: "in_review,draft",
+          status: "in_review,review_done,declined",
         });
         setCellConfig(getCellConfig(t));
         setFilterConfig(getFilterConfig(result));
