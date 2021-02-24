@@ -1,4 +1,5 @@
 import { format, parseISO } from "date-fns";
+import i18next from "i18next";
 import { ApplicationEventSchedule, ApplicationStatus } from "./types";
 
 export const formatDate = (date: string | null): string | null => {
@@ -65,4 +66,25 @@ export const parseApplicationEventSchedules = (
         return `${prev}${divider}${begin}${rangeChar}${end}`;
       }, "") || "-"
   );
+};
+
+export const secondsToHms = (
+  duration?: number
+): { h?: number; m?: number; s?: number } => {
+  if (!duration || duration < 0) return {};
+  const h = Math.floor(duration / 3600);
+  const m = Math.floor((duration % 3600) / 60);
+  const s = Math.floor((duration % 3600) % 60);
+
+  return { h, m, s };
+};
+
+export const parseDuration = (duration?: number): string => {
+  const hms = secondsToHms(duration);
+  let output = "";
+
+  if (hms.h) output += `${hms.h} ${i18next.t("common.hoursUnit")}`;
+  if (hms.m) output += ` ${hms.m} ${i18next.t("common.minutesUnit")}`;
+
+  return output.trim();
 };

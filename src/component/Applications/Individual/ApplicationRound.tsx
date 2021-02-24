@@ -21,7 +21,11 @@ import {
 import TimeframeStatus from "../TimeframeStatus";
 import Loader from "../../../common/Loader";
 import StatusCell from "../../StatusCell";
-import { formatNumber, getNormalizedStatus } from "../../../common/util";
+import {
+  formatNumber,
+  getNormalizedStatus,
+  parseDuration,
+} from "../../../common/util";
 import StatusRecommendation from "../StatusRecommendation";
 
 interface IRouteParams {
@@ -174,10 +178,7 @@ const getCellConfig = (t: TFunction): CellConfig => {
               `${formatNumber(
                 aggregatedData?.reservationsTotal,
                 t("common.volumeUnit")
-              )} / ${formatNumber(
-                aggregatedData?.minDurationTotal,
-                t("common.hoursUnit")
-              )}`,
+              )} / ${parseDuration(aggregatedData?.minDurationTotal)}`,
               " / "
             )}
           </>
