@@ -233,7 +233,12 @@ class ApplicationEventSerializer(serializers.ModelSerializer):
         queryset=Purpose.objects.all(),
         source="purpose",
         allow_null=True,
-        help_text="Id of the usa purpose for this event.",
+        help_text="Id of the use purpose for this event.",
+    )
+
+    purpose = serializers.SerializerMethodField(
+        method_name="get_purpose_name",
+        help_text="Use purpose value of this event",
     )
 
     event_reservation_units = EventReservationUnitSerializer(
@@ -266,6 +271,7 @@ class ApplicationEventSerializer(serializers.ModelSerializer):
             "begin",
             "end",
             "purpose_id",
+            "purpose",
             "event_reservation_units",
             "status",
         ]
@@ -297,6 +303,10 @@ class ApplicationEventSerializer(serializers.ModelSerializer):
                 "help_text": "Requested end date of the recurring reservation for this event.",
             },
         }
+
+    def get_purpose_name(self, obj):
+        if obj.purpose:
+            return obj.purpose.name
 
     def validate(self, data):
         min_duration = data["min_duration"]
