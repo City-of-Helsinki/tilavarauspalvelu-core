@@ -229,6 +229,11 @@ class ApplicationEventSerializer(serializers.ModelSerializer):
         help_text="Id of the ability group for this event.",
     )
 
+    ability_group = serializers.SerializerMethodField(
+        method_name="get_ability_group_name",
+        help_text="Ability group name of this event",
+    )
+
     purpose_id = serializers.PrimaryKeyRelatedField(
         queryset=Purpose.objects.all(),
         source="purpose",
@@ -263,6 +268,7 @@ class ApplicationEventSerializer(serializers.ModelSerializer):
             "age_group_display",
             "age_group_id",
             "ability_group_id",
+            "ability_group",
             "min_duration",
             "max_duration",
             "application_id",
@@ -307,6 +313,10 @@ class ApplicationEventSerializer(serializers.ModelSerializer):
     def get_purpose_name(self, obj):
         if obj.purpose:
             return obj.purpose.name
+
+    def get_ability_group_name(self, obj):
+        if obj.ability_group:
+            return obj.ability_group.name
 
     def validate(self, data):
         min_duration = data["min_duration"]
