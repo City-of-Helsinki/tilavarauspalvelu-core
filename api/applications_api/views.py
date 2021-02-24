@@ -1,8 +1,10 @@
 from datetime import datetime
 
 from dateutil.parser import parse
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets
 
+from api.applications_api.filters import ApplicationFilter
 from api.applications_api.serializers import (
     AddressSerializer,
     ApplicationEventSerializer,
@@ -22,10 +24,10 @@ class AddressViewSet(viewsets.ModelViewSet):
 
 
 class ApplicationViewSet(viewsets.ModelViewSet):
-
     queryset = Application.objects.all()
-
     serializer_class = ApplicationSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = ApplicationFilter
 
 
 class ApplicationEventViewSet(viewsets.ModelViewSet):
