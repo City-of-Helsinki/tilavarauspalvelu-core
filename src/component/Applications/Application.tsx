@@ -263,7 +263,8 @@ function Application(): JSX.Element | null {
             <ApplicantType>
               <dt>{t("Application.applicantType")}:</dt>
               <dd>
-                {t(`Application.applicantTypes.${application.applicantType}`)}
+                {application.applicantType &&
+                  t(`Application.applicantTypes.${application.applicantType}`)}
               </dd>
             </ApplicantType>
             <StatusBlock status={application.status} view={1} />
