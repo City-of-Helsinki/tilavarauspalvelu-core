@@ -10,12 +10,13 @@ import {
   ApplicationStatus,
 } from "../../common/types";
 import { ContentContainer, NarrowContainer } from "../../styles/layout";
-import { BasicLink, breakpoints, getStatusColor } from "../../styles/util";
+import { BasicLink, breakpoints } from "../../styles/util";
 import { ContentHeading, H2, H3 } from "../../styles/typography";
 import withMainMenu from "../withMainMenu";
 import LinkPrev from "../LinkPrev";
 import { ReactComponent as IconCustomers } from "../../images/icon_customers.svg";
-import { formatNumber, processApplication } from "../../common/util";
+import { formatNumber } from "../../common/util";
+import StatusBlock from "../StatusBlock";
 
 interface IRouteParams {
   applicationId: string;
@@ -73,19 +74,6 @@ const OrganisationType = styled.dl`
     display: inline-block;
     margin: 0 0 0 1em;
   }
-`;
-
-const StatusBlock = styled.div<{ color: string }>`
-  display: inline-flex;
-  align-items: center;
-  margin-bottom: var(--spacing-3-xl);
-  background-color: ${({ color }) => color};
-  height: 28px;
-  padding: 0 15px;
-  color: var(--color-white);
-  font-family: var(--tilavaraus-admin-font-bold);
-  font-weight: bold;
-  font-size: var(--fontsize-body-s);
 `;
 
 const Subheading = styled(H2)``;
@@ -184,10 +172,10 @@ function Application(): JSX.Element | null {
   const { applicationId } = useParams<IRouteParams>();
   const { t } = useTranslation();
 
-  const fetchApplications = async (id: number) => {
+  const fetchApplication = async (id: number) => {
     try {
       const result = await getApplication(id);
-      setApplication(processApplication(result));
+      setApplication(result);
     } catch (error) {
       setErrorMsg("errors.errorFetchingApplication");
     } finally {
@@ -196,7 +184,7 @@ function Application(): JSX.Element | null {
   };
 
   useEffect(() => {
-    fetchApplications(Number(applicationId));
+    fetchApplication(Number(applicationId));
   }, [applicationId]);
 
   const setApplicationStatus = async (status: ApplicationStatus) => {
@@ -205,8 +193,9 @@ function Application(): JSX.Element | null {
     try {
       setIsSaving(true);
       const result = await saveApplication(payload);
-      fetchApplications(result.id);
+      fetchApplication(result.id);
       setStatusNotification(status);
+      setErrorMsg(null);
     } catch (error) {
       setErrorMsg("errors.errorSavingApplication");
     } finally {
@@ -221,6 +210,7 @@ function Application(): JSX.Element | null {
   };
   switch (application?.status) {
     case "in_review":
+    case "review_done":
       action = {
         text: t("Application.actions.declineApplication"),
         button: "secondary",
@@ -261,7 +251,7 @@ function Application(): JSX.Element | null {
             />
           </ContentContainer>
           <NarrowContainer>
-            <StyledLink to="/">
+            <StyledLink to={`/application/${application.id}/details`}>
               {t("ApplicationRound.showClientApplication")}
             </StyledLink>
             <Heading>
@@ -274,9 +264,7 @@ function Application(): JSX.Element | null {
               <dt>{t("Organisation.organisationType")}:</dt>
               <dd>todo</dd>
             </OrganisationType>
-            <StatusBlock color={getStatusColor(application.status)}>
-              <span>{t(`Application.statuses.${application.status}`)}</span>
-            </StatusBlock>
+            <StatusBlock status={application.status} view={1} />
             {notificationContent ? (
               <StyledNotification
                 type="success"
@@ -317,14 +305,14 @@ function Application(): JSX.Element | null {
                     <tr>
                       <th>{t("ApplicationRound.appliedReservations")}</th>
                       <td>{`${formatNumber(
-                        application.processedData.reservationsTotal,
+                        application.aggregatedData.reservationsTotal,
                         t("common.volumeUnit")
                       )}`}</td>
                     </tr>
                     <tr>
                       <th>{t("ApplicationRound.totalReservationTime")}</th>
                       <td>{`${formatNumber(
-                        application.processedData.minDurationTotal,
+                        application.aggregatedData.minDurationTotal,
                         t("common.hoursUnit")
                       )}`}</td>
                     </tr>
@@ -351,7 +339,7 @@ function Application(): JSX.Element | null {
       {errorMsg && (
         <Notification
           type="error"
-          label={t("errors.errorFetchingData")}
+          label={t("errors.functionFailed")}
           position="top-center"
           autoClose={false}
           dismissible

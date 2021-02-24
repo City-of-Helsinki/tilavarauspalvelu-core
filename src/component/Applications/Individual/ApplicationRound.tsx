@@ -21,7 +21,7 @@ import {
 import TimeframeStatus from "../TimeframeStatus";
 import Loader from "../../../common/Loader";
 import StatusCell from "../../StatusCell";
-import { formatNumber, processApplications } from "../../../common/util";
+import { formatNumber, getNormalizedStatus } from "../../../common/util";
 import StatusRecommendation from "../StatusRecommendation";
 
 interface IRouteParams {
@@ -93,6 +93,12 @@ const SubmitButton = styled(Button)`
   margin-bottom: var(--spacing-s);
 `;
 
+const StyledCheckbox = styled(Checkbox)`
+  label {
+    user-select: none;
+  }
+`;
+
 const ApplicationCount = styled(H2)`
   text-transform: lowercase;
 `;
@@ -100,20 +106,37 @@ const ApplicationCount = styled(H2)`
 const getFilterConfig = (
   applications: ApplicationType[]
 ): DataFilterConfig[] => {
+  const coreBusinessValues = uniq(
+    applications
+      .map((app) => app.organisation?.coreBusiness)
+      .filter((app) => app && app.length)
+  );
   const statuses = uniq(applications.map((app) => app.status));
 
   return [
     {
       title: "Application.headings.customerType",
     },
-    { title: "Application.headings.coreActivity" },
+    {
+      title: "Application.headings.coreActivity",
+      filters:
+        coreBusinessValues &&
+        coreBusinessValues.map((coreBusiness) => ({
+          title: coreBusiness || "",
+          key: "organisation.coreBusiness",
+          value: coreBusiness || "",
+        })),
+    },
     {
       title: "Application.headings.applicationStatus",
-      filters: statuses.map((status) => ({
-        title: `Application.statuses.${status}`,
-        key: "status",
-        value: status,
-      })),
+      filters: statuses.map((status) => {
+        const normalizedStatus = getNormalizedStatus(status, 1);
+        return {
+          title: `Application.statuses.${normalizedStatus}`,
+          key: "status",
+          value: status,
+        };
+      }),
     },
   ];
 };
@@ -143,14 +166,14 @@ const getCellConfig = (t: TFunction): CellConfig => {
       {
         title: "Application.headings.applicationCount",
         key: "aggregatedData.reservationsTotal",
-        transform: ({ processedData }: ApplicationType) => (
+        transform: ({ aggregatedData }: ApplicationType) => (
           <>
             {trim(
               `${formatNumber(
-                processedData?.reservationsTotal,
+                aggregatedData?.reservationsTotal,
                 t("common.volumeUnit")
               )} / ${formatNumber(
-                processedData?.minDurationTotal,
+                aggregatedData?.minDurationTotal,
                 t("common.hoursUnit")
               )}`,
               " / "
@@ -161,9 +184,15 @@ const getCellConfig = (t: TFunction): CellConfig => {
       {
         title: "Application.headings.applicationStatus",
         key: "status",
-        transform: ({ status }: ApplicationType) => (
-          <StatusCell status={status} text={`Application.statuses.${status}`} />
-        ),
+        transform: ({ status }: ApplicationType) => {
+          const normalizedStatus = getNormalizedStatus(status, 1);
+          return (
+            <StatusCell
+              status={normalizedStatus}
+              text={`Application.statuses.${normalizedStatus}`}
+            />
+          );
+        },
       },
     ],
     index: "id",
@@ -222,7 +251,7 @@ function ApplicationRound(): JSX.Element {
         });
         setCellConfig(getCellConfig(t));
         setFilterConfig(getFilterConfig(result));
-        setApplications(processApplications(result));
+        setApplications(result);
       } catch (error) {
         setErrorMsg("errors.errorFetchingApplications");
       } finally {
@@ -280,7 +309,7 @@ function ApplicationRound(): JSX.Element {
                     {t("Application.gotoSplitPreparation")}
                   </SubmitButton>
                   <div>
-                    <Checkbox
+                    <StyledCheckbox
                       id="applicationsChecked"
                       checked={isApplicationChecked}
                       onClick={() =>
@@ -307,7 +336,7 @@ function ApplicationRound(): JSX.Element {
       {errorMsg && (
         <Notification
           type="error"
-          label={t("errors.errorFetchingData")}
+          label={t("errors.functionFailed")}
           position="top-center"
           autoClose={false}
           dismissible

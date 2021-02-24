@@ -5,9 +5,9 @@ import { useTranslation } from "react-i18next";
 import { ApplicationStatus } from "../common/types";
 import { StatusDot } from "../styles/util";
 
-interface ILinkCellProps {
+interface IStatusCellProps {
   text: string;
-  status: ApplicationStatus;
+  status?: ApplicationStatus;
 }
 
 const Wrapper = styled.div`
@@ -22,13 +22,13 @@ const Wrapper = styled.div`
   }
 `;
 
-export default function LinkCell({
+export default function StatusCell({
   text,
   status,
-}: ILinkCellProps): JSX.Element {
+}: IStatusCellProps): JSX.Element | null {
   const { t } = useTranslation();
 
-  return (
+  return status ? (
     <Wrapper>
       <div>
         <StatusDot status={status} size={12} />
@@ -36,5 +36,5 @@ export default function LinkCell({
       </div>
       <IconArrowRight />
     </Wrapper>
-  );
+  ) : null;
 }

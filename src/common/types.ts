@@ -89,10 +89,6 @@ export type ApplicationStatus =
   | "cancelled";
 
 export type AggregatedData = {
-  [name: string]: string | number;
-};
-
-export type ProcessedData = {
   reservationsTotal?: number;
   minDurationTotal?: number;
 };
@@ -103,9 +99,9 @@ export type Application = {
   applicationRoundId: number;
   organisation: Organisation | null;
   contactPerson: ContactPerson | null;
+  billingAddress: BillingAddress | null;
   applicationEvents: ApplicationEvent[];
-  aggregatedData: AggregatedData[];
-  processedData: ProcessedData;
+  aggregatedData: AggregatedData;
 };
 
 export type Organisation = {
@@ -113,7 +109,8 @@ export type Organisation = {
   name: string | null;
   identifier: string | null;
   yearEstablished: number | null;
-  activeMembers?: null;
+  activeMembers: number | null;
+  coreBusiness: string | null;
 };
 
 export type ContactPerson = {
@@ -124,6 +121,13 @@ export type ContactPerson = {
   phoneNumber: string | null;
 };
 
+export type BillingAddress = {
+  id: number;
+  streetAddress: string | null;
+  postCode: string | null;
+  city: string | null;
+};
+
 export type ApplicationEvent = {
   id?: number;
   name: string | null;
@@ -131,8 +135,8 @@ export type ApplicationEvent = {
   ageGroupId: number | null;
   abilityGroupId: number | null;
   purposeId: number | null;
-  minDuration: number | null;
-  maxDuration: number | null;
+  minDuration: string | null;
+  maxDuration: string | null;
   eventsPerWeek: number;
   biweekly: boolean;
   begin: string | null;

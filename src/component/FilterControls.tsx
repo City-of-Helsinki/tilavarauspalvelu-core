@@ -1,9 +1,10 @@
 import React, { Dispatch, SetStateAction, useState } from "react";
 import styled from "styled-components";
-import { Accordion, Button, Checkbox, IconCross } from "hds-react";
+import { Button, Checkbox, IconCross } from "hds-react";
 import { useTranslation } from "react-i18next";
 import { isEqual } from "lodash";
 import { DataFilterConfig, DataFilterOption } from "../common/types";
+import Accordion from "./Accordion";
 
 interface IProps {
   filters: DataFilterOption[];
@@ -30,12 +31,9 @@ const FilterAccordion = styled(Accordion).attrs({
     "--header-font-size": "var(--fontsize-heading-xxs)",
     "--button-size": "var(--fontsize-heading-m)",
     "--border-color": "var(--color-silver)",
+    "--content-padding-top": 0,
   } as React.CSSProperties,
-})`
-  &:last-of-type {
-    border: 0;
-  }
-`;
+})``;
 
 const Content = styled.div`
   padding: var(--spacing-s) var(--spacing-m) 0;
