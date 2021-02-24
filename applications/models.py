@@ -495,6 +495,15 @@ class Application(models.Model):
         Address, null=True, blank=True, on_delete=models.SET_NULL
     )
 
+    # Automatically updated through signal.
+    cached_latest_status = models.CharField(
+        db_index=True,
+        max_length=20,
+        default="draft",
+        verbose_name=_("Cached latest status"),
+        blank=True,
+    )
+
     @property
     def status(self):
         return self.get_status().status

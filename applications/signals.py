@@ -21,6 +21,17 @@ def create_application_status(sender, instance, **kwargs):
 
 
 @receiver(
+    post_save, sender=ApplicationStatus, dispatch_uid="update_latest_application_status"
+)
+def update_latest_application_status(sender, instance, **kwargs):
+    if not kwargs.get("created", False):
+        return
+
+    instance.application.cached_latest_status = instance.status
+    instance.application.save()
+
+
+@receiver(
     post_save, sender=ApplicationEvent, dispatch_uid="create_application_event_status"
 )
 def create_application_event_status(sender, instance, **kwargs):
