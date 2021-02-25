@@ -100,6 +100,7 @@ class Organisation(models.Model):
     active_members = models.PositiveIntegerField(
         verbose_name=_("Active members"),
         null=True,
+        blank=True,
     )
     core_business = models.TextField(
         verbose_name=_("Core business of this organization"),
@@ -492,6 +493,15 @@ class Application(models.Model):
 
     billing_address = models.ForeignKey(
         Address, null=True, blank=True, on_delete=models.SET_NULL
+    )
+
+    # Automatically updated through signal.
+    cached_latest_status = models.CharField(
+        db_index=True,
+        max_length=20,
+        default="draft",
+        verbose_name=_("Cached latest status"),
+        blank=True,
     )
 
     @property

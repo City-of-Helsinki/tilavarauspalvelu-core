@@ -37,6 +37,8 @@ class ApplicationAdmin(admin.ModelAdmin):
     model = Application
     inlines = [ApplicationStatusInline]
 
+    exclude = ("cached_latest_status",)
+
 
 @admin.register(Organisation)
 class OrganisationAdmin(admin.ModelAdmin):

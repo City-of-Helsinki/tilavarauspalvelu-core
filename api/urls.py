@@ -1,7 +1,7 @@
 from rest_framework import routers
 
 from .application_round_api import ApplicationRoundViewSet
-from .applications_api import ApplicationEventViewSet, ApplicationViewSet
+from .applications_api.views import ApplicationEventViewSet, ApplicationViewSet
 from .reservation_units_api import (
     EquipmentCategoryViewSet,
     EquipmentViewSet,

@@ -1,10 +1,9 @@
 from datetime import datetime
 from typing import Union
 
-from dateutil.parser import parse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from rest_framework import serializers, viewsets
+from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from api.reservations_api import AgeGroupSerializer
@@ -38,16 +37,6 @@ class AddressSerializer(serializers.ModelSerializer):
         model = Address
 
         fields = ["id", "street_address", "post_code", "city"]
-
-
-class AddressViewSet(viewsets.ModelViewSet):
-
-    queryset = Address.objects.all()
-
-    serializer_class = AddressSerializer
-
-    def perform_create(self, serializer):
-        serializer.save()
 
 
 class OrganisationSerializer(serializers.ModelSerializer):
@@ -585,25 +574,3 @@ class ApplicationSerializer(serializers.ModelSerializer):
         app.set_status(status, request_user)
 
         return app
-
-
-class ApplicationViewSet(viewsets.ModelViewSet):
-
-    queryset = Application.objects.all()
-
-    serializer_class = ApplicationSerializer
-
-
-class ApplicationEventViewSet(viewsets.ModelViewSet):
-    serializer_class = ApplicationEventSerializer
-
-    queryset = ApplicationEvent.objects.all()
-
-    def get_serializer_context(self):
-        start: datetime = self.request.query_params.get("start", None)
-        end: datetime = self.request.query_params.get("end", None)
-        if start is not None:
-            start = parse(start)
-        if end is not None:
-            end = parse(end)
-        return {"start": start, "end": end}
