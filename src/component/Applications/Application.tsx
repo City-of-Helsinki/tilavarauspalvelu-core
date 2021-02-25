@@ -60,7 +60,7 @@ const CustomerIcon = styled.div`
   }
 `;
 
-const OrganisationType = styled.dl`
+const ApplicantType = styled.dl`
   font-size: var(--fontsize-body-s);
   margin-bottom: var(--spacing-3-xl);
 
@@ -260,10 +260,13 @@ function Application(): JSX.Element | null {
               </CustomerIcon>
               <span>{application.organisation?.name}</span>
             </Heading>
-            <OrganisationType>
-              <dt>{t("Organisation.organisationType")}:</dt>
-              <dd>todo</dd>
-            </OrganisationType>
+            <ApplicantType>
+              <dt>{t("Application.applicantType")}:</dt>
+              <dd>
+                {application.applicantType &&
+                  t(`Application.applicantTypes.${application.applicantType}`)}
+              </dd>
+            </ApplicantType>
             <StatusBlock status={application.status} view={1} />
             {notificationContent ? (
               <StyledNotification

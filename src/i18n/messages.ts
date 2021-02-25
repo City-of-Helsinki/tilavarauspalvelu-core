@@ -60,6 +60,7 @@ const translations: ITranslations = {
     minAmount: ["Vähintään"],
     maxAmount: ["Enintään"],
     option: ["Vaihtoehto"],
+    same: ["Sama"],
   },
   errors: {
     applicationRoundNotFound: ["Haettua hakukierrosta ei löydy"],
@@ -99,6 +100,7 @@ const translations: ITranslations = {
   Application: {
     application: ["Hakemus", "Application"],
     application_plural: ["Hakemusta", "Applications"],
+    applicantType: ["Asiakastyyppi"],
     showAllApplications: ["Näytä kaikki hakemukset"],
     settingsAndQuotas: ["Asetukset ja kiintiöt"],
     recommendedStage: ["Suositeltu vaihe"],
@@ -114,7 +116,7 @@ const translations: ITranslations = {
     headings: {
       customer: ["Asiakas"],
       participants: ["Harrastajat"],
-      customerType: ["Asiakastyyppi"],
+      applicantType: ["Asiakastyyppi"],
       coreActivity: ["Ydintoiminta"],
       applicationCount: ["Hakumäärä"],
       applicationStatus: ["Hakemuksen tila"],
@@ -151,6 +153,12 @@ const translations: ITranslations = {
     contactEmailOnApplication: ["Käytetään hakemuksella"],
     recurringReservationsForOrganisation: ["Vakiovuorot yhdistykselle"],
     organisationCoreActivity: ["Yhdistyksen tai seuran ydintoiminta"],
+    applicantTypes: {
+      individual: ["Yksityishenkilö"],
+      association: ["Yhdistys"],
+      community: ["Seura"],
+      company: ["Yritys"],
+    },
   },
   ApplicationRound: {
     pastRounds: ["Menneet"],
@@ -184,7 +192,6 @@ const translations: ITranslations = {
     requestedTimes: ["Toivotut ajat"],
   },
   Organisation: {
-    organisationType: ["Asiakastyyppi"],
     activeParticipants: ["Aktiiviharrastajat"],
   },
 };

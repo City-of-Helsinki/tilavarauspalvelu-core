@@ -4,6 +4,8 @@ import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import { IconClock, Notification } from "hds-react";
 import trim from "lodash/trim";
+import isEqual from "lodash/isEqual";
+import omit from "lodash/omit";
 import Accordion from "../Accordion";
 import { getApplication } from "../../common/api";
 import Loader from "../../common/Loader";
@@ -144,6 +146,16 @@ function ApplicationDetails(): JSX.Element | null {
     return <Loader />;
   }
 
+  const billingAddress: string = isEqual(
+    omit(application?.billingAddress, "id"),
+    omit(application?.organisation?.address, "id")
+  )
+    ? t("common.same")
+    : trim(
+        `${application?.billingAddress?.streetAddress}, ${application?.billingAddress?.postCode} ${application?.billingAddress?.city}`,
+        ", "
+      );
+
   return (
     <Wrapper>
       {application && (
@@ -160,8 +172,11 @@ function ApplicationDetails(): JSX.Element | null {
               <span>{application.organisation?.name}</span>
             </Heading>
             <DefinitionList>
-              <dt>{t("Organisation.organisationType")}:</dt>
-              <dd>todo</dd>
+              <dt>{t("Application.applicantType")}:</dt>
+              <dd>
+                {application.applicantType &&
+                  t(`Application.applicantTypes.${application.applicantType}`)}
+              </dd>
             </DefinitionList>
             <DefinitionList>
               <dt>{t("Application.applicationReceivedTime")}:</dt>
@@ -203,15 +218,15 @@ function ApplicationDetails(): JSX.Element | null {
                 />
                 <ValueBox
                   label={t("common.streetAddress")}
-                  value={application.billingAddress?.streetAddress}
+                  value={application.organisation?.address?.streetAddress}
                 />
                 <ValueBox
                   label={t("common.postalNumber")}
-                  value={application.billingAddress?.postCode}
+                  value={application.organisation?.address?.postCode}
                 />
                 <ValueBox
                   label={t("common.postalDistrict")}
-                  value={application.billingAddress?.city}
+                  value={application.organisation?.address?.city}
                 />
                 <ValueBox label={t("common.emailAddress")} value="??????????" />
                 <ValueBox
@@ -220,7 +235,7 @@ function ApplicationDetails(): JSX.Element | null {
                 />
                 <ValueBox
                   label={t("common.billingAddress")}
-                  value="???????????"
+                  value={billingAddress}
                 />
               </AccordionContent>
             </StyledAccordion>

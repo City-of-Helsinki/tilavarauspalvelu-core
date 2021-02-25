@@ -93,13 +93,20 @@ export type AggregatedData = {
   minDurationTotal?: number;
 };
 
+export type ApplicantType =
+  | "individual"
+  | "association"
+  | "community"
+  | "company";
+
 export type Application = {
   id: number;
   status: ApplicationStatus;
   applicationRoundId: number;
+  applicantType: ApplicantType | null;
   organisation: Organisation | null;
   contactPerson: ContactPerson | null;
-  billingAddress: BillingAddress | null;
+  billingAddress: Address | null;
   applicationEvents: ApplicationEvent[];
   aggregatedData: AggregatedData;
 };
@@ -111,6 +118,7 @@ export type Organisation = {
   yearEstablished: number | null;
   activeMembers: number | null;
   coreBusiness: string | null;
+  address: Address | null;
 };
 
 export type ContactPerson = {
@@ -121,7 +129,7 @@ export type ContactPerson = {
   phoneNumber: string | null;
 };
 
-export type BillingAddress = {
+export type Address = {
   id: number;
   streetAddress: string | null;
   postCode: string | null;
