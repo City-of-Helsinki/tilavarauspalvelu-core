@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 from rest_framework import permissions, serializers, viewsets
 from rest_framework.exceptions import ValidationError
@@ -12,6 +12,8 @@ from permissions.api_permissions import (
 )
 from permissions.models import GeneralRole, ServiceSectorRole, UnitRole
 from spaces.models import ServiceSector, Unit, UnitGroup
+
+User = get_user_model()
 
 
 class BaseRoleSerializer(TranslatedModelSerializer):

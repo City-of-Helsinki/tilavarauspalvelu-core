@@ -5,11 +5,17 @@ asgiref==3.3.0
 assertpy==1.1
 attrs==20.3.0
 auditlog3==1.0.1
+Authlib==0.15.3
 black==20.8b1
+cachetools==4.2.1
 certifi==2020.12.5
+cffi==1.14.5
 chardet==4.0.0
 click==7.1.2
 coverage==5.3
+cryptography==3.3.2       # resolved version due to requirement for rust in environment for newer versions
+defusedxml==0.7.0rc2
+deprecation==2.1.0
 Django==3.1.7
 django-auditlog==0.4.7
 django-cors-headers==3.6.0
@@ -17,13 +23,16 @@ django-environ==0.4.5
 django-extensions==3.0.9
 django-extra-fields==3.0.2
 django-filter==2.4.0
+django-helusers==0.6.0
 django-js-asset==1.2.2
 django-jsonfield==1.4.1
 django-modeltranslation==0.16.1
 django-mptt==0.11.0
 django-recurrence==1.10.3
 djangorestframework==3.12.2
+drf-oidc-auth==0.10.0
 drf-spectacular==0.13.0
+ecdsa==0.14.1
 elastic-apm==5.10.0
 flake8==3.8.4
 graphene==2.1.8
@@ -38,6 +47,7 @@ isort==5.6.4
 jsonschema==3.2.0
 mccabe==0.6.1
 mypy-extensions==0.4.3
+oauthlib==3.1.0
 ortools==8.1.8487
 packaging==20.4
 pathspec==0.8.0
@@ -46,9 +56,12 @@ promise==2.3
 protobuf==3.14.0
 psycopg2==2.8.6
 py==1.9.0
+pyasn1==0.4.8
 pycodestyle==2.6.0
+pycparser==2.20
 pydot==1.4.1
 pyflakes==2.2.0
+PyJWT==2.0.1
 pyparsing==2.4.7
 pyrsistent==0.17.3
 pytest==6.1.2
@@ -56,14 +69,20 @@ pytest-cov==2.10.1
 pytest-django==4.1.0
 pytest-factoryboy===2.1.0
 python-dateutil==2.6.0      # resolved version due to django-auditlog, probably not safe to update
+python-jose==3.2.0
+python3-openid==3.2.0
 pytz==2020.1
 PyYAML==5.4.1
 regex==2020.10.28
 requests==2.25.1
+requests-oauthlib==1.3.0
+rsa==4.7.2
 Rx==1.6.1
 sentry-sdk==0.19.5
 singledispatch==3.4.0.3
 six==1.15.0
+social-auth-app-django==4.0.0
+social-auth-core==4.0.3
 sqlparse==0.4.1
 toml==0.10.1
 typed-ast==1.4.1

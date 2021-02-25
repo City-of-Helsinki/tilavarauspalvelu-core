@@ -1,4 +1,4 @@
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -6,6 +6,7 @@ from applications.models import PRIORITIES, Application
 from reservation_units.models import Purpose, ReservationUnit
 
 Q = models.Q
+User = get_user_model()
 
 
 class AgeGroup(models.Model):

@@ -57,7 +57,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Application definition
 
 INSTALLED_APPS = [
-    "django.contrib.admin",
+    "helusers.apps.HelusersConfig",
+    "helusers.apps.HelusersAdminConfig",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
@@ -83,6 +84,8 @@ INSTALLED_APPS = [
     "modeltranslation",
     "django.contrib.gis",
     "permissions",
+    "users",
+    "social_django",
 ]
 
 MIDDLEWARE = [
@@ -111,6 +114,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "helusers.context_processors.settings",
             ],
         },
     },
@@ -149,7 +153,13 @@ env = environ.Env(
     ELASTIC_APM_SECRET_TOKEN=(str, None),
     AUDIT_LOGGING_ENABLED=(bool, False),
     TMP_PERMISSIONS_DISABLED=(bool, False),
+    TUNNISTAMO_JWT_AUDIENCE=(str, "https://api.hel.fi/auth/tilavarausapidev"),
+    TUNNISTAMO_JWT_ISSUER=(str, "https://api.hel.fi/sso/openid"),
+    TUNNISTAMO_ADMIN_KEY=(str, "tilanvaraus-django-admin-dev"),
+    TUNNISTAMO_ADMIN_SECRET=(str, None),
+    TUNNISTAMO_ADMIN_OIDC_ENDPOINT=(str, "https://api.hel.fi/sso/openid/"),
 )
+
 environ.Env.read_env()
 
 ALLOWED_HOSTS = env("ALLOWED_HOSTS")
@@ -238,15 +248,40 @@ USE_L10N = True
 
 USE_TZ = True
 
+AUTH_USER_MODEL = "users.User"
+
+AUTHENTICATION_BACKENDS = [
+    "helusers.tunnistamo_oidc.TunnistamoOIDCAuth",
+    "django.contrib.auth.backends.ModelBackend",
+]
+
+LOGIN_REDIRECT_URL = "/admin/"
+LOGOUT_REDIRECT_URL = "/admin/"
+
+SESSION_SERIALIZER = "django.contrib.sessions.serializers.PickleSerializer"
+
+OIDC_API_TOKEN_AUTH = {
+    "AUDIENCE": env("TUNNISTAMO_JWT_AUDIENCE"),
+    "ISSUER": env("TUNNISTAMO_JWT_ISSUER"),
+}
+
+SOCIAL_AUTH_TUNNISTAMO_KEY = env("TUNNISTAMO_ADMIN_KEY")
+SOCIAL_AUTH_TUNNISTAMO_SECRET = env("TUNNISTAMO_ADMIN_SECRET")
+SOCIAL_AUTH_TUNNISTAMO_OIDC_ENDPOINT = env("TUNNISTAMO_ADMIN_OIDC_ENDPOINT")
 
 GRAPHENE = {"SCHEMA": "api.graphql.schema.schema"}
 
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": ["permissions.api_permissions.ReadOnly"],
-    "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework.authentication.BasicAuthentication",
-        "rest_framework.authentication.SessionAuthentication",
-    ],
+    "DEFAULT_AUTHENTICATION_CLASSES": ["helusers.oidc.ApiTokenAuthentication"]
+    + (
+        [
+            "rest_framework.authentication.SessionAuthentication",
+            "rest_framework.authentication.BasicAuthentication",
+        ]
+        if DEBUG
+        else []
+    ),
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 SPECTACULAR_SETTINGS = {
@@ -300,3 +335,16 @@ if os.path.exists(local_settings_path):
 
 if TMP_PERMISSIONS_DISABLED and not DEBUG:
     logging.error("Running with permissions disabled in production environment.")
+
+if not all(
+    [
+        OIDC_API_TOKEN_AUTH["AUDIENCE"],
+        OIDC_API_TOKEN_AUTH["ISSUER"],
+        SOCIAL_AUTH_TUNNISTAMO_KEY,
+        SOCIAL_AUTH_TUNNISTAMO_SECRET,
+        SOCIAL_AUTH_TUNNISTAMO_OIDC_ENDPOINT,
+    ]
+):
+    logging.error(
+        "Some of Tunnistamo environment variables are not set. Authentication may not work properly!"
+    )

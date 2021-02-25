@@ -271,3 +271,13 @@ def can_manage_districts(user: User):
 def can_manage_resources(user: User):
     permission = "can_manage_resources"
     return is_superuser(user) or has_general_permission(user, permission)
+
+
+def can_view_users(user: User):
+    permission = "can_view_users"
+    return (
+        is_superuser(user)
+        or has_general_permission(user, permission)
+        or has_unit_permission(user, Unit.objects.all(), permission)
+        or has_service_sector_permission(user, ServiceSector.objects.all(), permission)
+    )
