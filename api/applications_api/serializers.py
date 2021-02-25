@@ -6,6 +6,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
+from api.reservation_units_api import ReservationUnitSerializer
 from api.reservations_api import AgeGroupSerializer
 from applications.models import (
     Address,
@@ -183,6 +184,9 @@ class EventReservationUnitSerializer(serializers.ModelSerializer):
         source="reservation_unit",
         help_text="Id of the reservation unit requested for the event.",
     )
+    reservation_unit_details = ReservationUnitSerializer(
+        display=True, source="reservation_unit", read_only=True
+    )
 
     class Meta:
         model = EventReservationUnit
@@ -190,6 +194,7 @@ class EventReservationUnitSerializer(serializers.ModelSerializer):
             "id",
             "priority",
             "reservation_unit_id",
+            "reservation_unit_details",
         ]
         extra_kwargs = {
             "priority": {
