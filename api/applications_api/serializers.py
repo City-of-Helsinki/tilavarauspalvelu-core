@@ -6,6 +6,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
+from api.reservation_units_api import ReservationUnitSerializer
 from api.reservations_api import AgeGroupSerializer
 from applications.models import (
     Address,
@@ -183,6 +184,9 @@ class EventReservationUnitSerializer(serializers.ModelSerializer):
         source="reservation_unit",
         help_text="Id of the reservation unit requested for the event.",
     )
+    reservation_unit_details = ReservationUnitSerializer(
+        display=True, source="reservation_unit", read_only=True
+    )
 
     class Meta:
         model = EventReservationUnit
@@ -190,6 +194,7 @@ class EventReservationUnitSerializer(serializers.ModelSerializer):
             "id",
             "priority",
             "reservation_unit_id",
+            "reservation_unit_details",
         ]
         extra_kwargs = {
             "priority": {
@@ -229,11 +234,21 @@ class ApplicationEventSerializer(serializers.ModelSerializer):
         help_text="Id of the ability group for this event.",
     )
 
+    ability_group = serializers.SerializerMethodField(
+        method_name="get_ability_group_name",
+        help_text="Ability group name of this event",
+    )
+
     purpose_id = serializers.PrimaryKeyRelatedField(
         queryset=Purpose.objects.all(),
         source="purpose",
         allow_null=True,
-        help_text="Id of the usa purpose for this event.",
+        help_text="Id of the use purpose for this event.",
+    )
+
+    purpose = serializers.SerializerMethodField(
+        method_name="get_purpose_name",
+        help_text="Use purpose value of this event",
     )
 
     event_reservation_units = EventReservationUnitSerializer(
@@ -258,6 +273,7 @@ class ApplicationEventSerializer(serializers.ModelSerializer):
             "age_group_display",
             "age_group_id",
             "ability_group_id",
+            "ability_group",
             "min_duration",
             "max_duration",
             "application_id",
@@ -266,6 +282,7 @@ class ApplicationEventSerializer(serializers.ModelSerializer):
             "begin",
             "end",
             "purpose_id",
+            "purpose",
             "event_reservation_units",
             "status",
         ]
@@ -297,6 +314,14 @@ class ApplicationEventSerializer(serializers.ModelSerializer):
                 "help_text": "Requested end date of the recurring reservation for this event.",
             },
         }
+
+    def get_purpose_name(self, obj):
+        if obj.purpose:
+            return obj.purpose.name
+
+    def get_ability_group_name(self, obj):
+        if obj.ability_group:
+            return obj.ability_group.name
 
     def validate(self, data):
         min_duration = data["min_duration"]
