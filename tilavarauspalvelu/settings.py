@@ -75,6 +75,7 @@ INSTALLED_APPS = [
     "reservation_units",
     "api",
     "applications",
+    "opening_hours",
     "django_extensions",
     "mptt",
     "django_filters",
