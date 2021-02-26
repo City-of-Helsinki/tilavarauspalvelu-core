@@ -32,6 +32,49 @@ const MobileNavigation = styled.div`
   }
 `;
 
+const UserMenu = styled(HDSNavigation.User)<{ $initials?: string }>`
+  ${({ $initials }) =>
+    $initials &&
+    `
+    &:after {
+      content: '${$initials}';
+      position: absolute;
+      top: 0;
+      left: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      pointer-events: none;
+    }
+  `}
+  color: var(--tilavaraus-admin-header-background-color);
+  background-color: var(--color-white);
+  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+
+  button {
+    svg {
+      padding-left: 4px;
+    }
+  }
+
+  svg {
+    &:last-of-type {
+      display: none;
+    }
+
+    ${({ $initials }) => $initials && "visibility: hidden;"}
+  }
+
+  #userDropdown-menu {
+    right: 0;
+    left: auto;
+  }
+`;
+
 const Navigation = ({ profile, logout }: IProps): JSX.Element => {
   const { t, i18n } = useTranslation();
 
@@ -70,20 +113,23 @@ const Navigation = ({ profile, logout }: IProps): JSX.Element => {
             onItemSelection={() => setMenuState(false)}
           />
         </MobileNavigation>
-        <HDSNavigation.User
+        <UserMenu
+          $initials={`${profile?.given_name?.charAt(0) || ""} ${
+            profile?.family_name?.charAt(0) || ""
+          }`.trim()}
           userName={`${profile?.given_name || ""} ${
             profile?.family_name || ""
           }`.trim()}
           authenticated={Boolean(profile)}
           label={t("Navigation.login")}
-          onSignIn={() => history.push("/")}
+          onSignIn={() => history.push("/applications")}
         >
           <HDSNavigation.Item
             label={t("Navigation.logout")}
             onClick={() => logout && logout()}
             variant="primary"
           />
-        </HDSNavigation.User>
+        </UserMenu>
         <HDSNavigation.LanguageSelector
           label={formatSelectedValue(language)}
           buttonAriaLabel={t("Navigation.languageSelection")}
