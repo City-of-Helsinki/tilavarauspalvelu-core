@@ -1,5 +1,7 @@
 import React from "react";
 import styled from "styled-components";
+// eslint-disable-next-line import/no-unresolved
+import { useReactOidc } from "@axa-fr/react-oidc-context";
 import { useTranslation } from "react-i18next";
 import { BrowserRouter } from "react-router-dom";
 import { Button } from "hds-react";
@@ -14,6 +16,7 @@ const Wrapper = styled(NarrowContainer)`
 
 function Login(): JSX.Element {
   const { t } = useTranslation();
+  const { login } = useReactOidc();
 
   return (
     <BrowserRouter>
@@ -27,12 +30,7 @@ function Login(): JSX.Element {
             <Button
               type="button"
               onClick={() => {
-                window.history.replaceState(
-                  null,
-                  t("common.applicationName"),
-                  "/"
-                );
-                window.location.reload();
+                login();
               }}
             >
               {t("Navigation.login")}

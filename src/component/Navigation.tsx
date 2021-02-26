@@ -13,7 +13,8 @@ import { defaultLanguage } from "../common/const";
 
 interface IProps {
   profile: Profile | null;
-  logout?: () => void;
+  login: () => void;
+  logout: () => void;
 }
 interface ILanguageOption {
   label: string;
@@ -79,7 +80,7 @@ const UserMenu = styled(HDSNavigation.User)<{ $initials?: string }>`
   }
 `;
 
-const Navigation = ({ profile, logout }: IProps): JSX.Element => {
+const Navigation = ({ profile, login, logout }: IProps): JSX.Element => {
   const { t, i18n } = useTranslation();
 
   const [isMenuOpen, setMenuState] = useState(false);
@@ -127,8 +128,7 @@ const Navigation = ({ profile, logout }: IProps): JSX.Element => {
           authenticated={Boolean(profile)}
           label={t("Navigation.login")}
           onSignIn={() => {
-            history.push("/");
-            window.location.reload();
+            login();
           }}
         >
           <HDSNavigation.Item
@@ -161,10 +161,16 @@ const Navigation = ({ profile, logout }: IProps): JSX.Element => {
 };
 
 function NavigationWithProfileAndLogout(): JSX.Element {
-  const { oidcUser, logout } = useReactOidc();
+  const { oidcUser, login, logout } = useReactOidc();
   const profile = oidcUser ? oidcUser.profile : null;
 
-  return <Navigation profile={profile} logout={() => logout()} />;
+  return (
+    <Navigation
+      profile={profile}
+      login={() => login()}
+      logout={() => logout()}
+    />
+  );
 }
 
 export default NavigationWithProfileAndLogout;
