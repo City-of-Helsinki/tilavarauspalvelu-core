@@ -93,3 +93,4 @@ You don’t have to ever use `eject`. The curated feature set is suitable for sm
 | REACT_APP_TILAVARAUS_API_URL | tilavaraus-core base url                       |
 | REACT_APP_SENTRY_DSN         | Sentry dsn                                     |
 | REACT_APP_SENTRY_ENVIRONMENT | Sentry environment, for example 'test', 'prod' |
+| REACT_APP_OIDC_CLIENT_ID     | Oidc client id                                 |

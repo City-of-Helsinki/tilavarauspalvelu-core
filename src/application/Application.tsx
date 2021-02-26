@@ -97,20 +97,9 @@ const Application = (): JSX.Element | null => {
         ];
 
         loadedApplication = await saveApplication(savedApplication);
-
-        if (savedApplication.id) {
-          const replaceUrl = match.url.replace(
-            'new',
-            String(savedApplication.id)
-          );
-
-          history.replace(`${replaceUrl}/page1`);
-        }
       } else {
         loadedApplication = await saveApplication(application);
       }
-
-      dispatch({ type: 'load', data: loadedApplication });
 
       if (postSave) {
         postSave(loadedApplication.id);

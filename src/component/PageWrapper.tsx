@@ -1,16 +1,21 @@
 import React from 'react';
+import styled from 'styled-components';
 import Navigation from './Navigation';
 import Footer from './Footer';
 
 interface Props {
   children: React.ReactNode;
 }
+const Main = styled.main`
+  font-size: var(--fontsize-body-xl);
+  flex-grow: 1;
+`;
 
-export default function NavigationAndFooterWrapper(props: Props): JSX.Element {
+const PageWrapper = (props: Props): JSX.Element => {
   return (
     <>
       <Navigation />
-      <main>{props.children}</main>
+      <Main>{props.children}</Main>
       <div
         style={{
           marginTop: 'var(--spacing-layout-xl)',
@@ -19,4 +24,6 @@ export default function NavigationAndFooterWrapper(props: Props): JSX.Element {
       <Footer />
     </>
   );
-}
+};
+
+export default PageWrapper;

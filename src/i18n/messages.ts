@@ -215,6 +215,7 @@ const translations: Translations = {
       hour: ['t', 'h', 'h'],
     },
     login: ['Kirjaudu', 'Login', 'Logga in'],
+    logout: ['Kirjaudu ulos', 'Logout', 'Logga ut'],
     imgAltForSpace: ['Kuva tilasta {{name}}'],
     address: {
       streetAddress: ['Katuosoite', 'Street address', 'Adress'],

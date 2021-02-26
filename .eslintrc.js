@@ -17,6 +17,7 @@ module.exports = {
       'error',
       { devDependencies: ['e2e/**/*.ts'] },
     ],
+    'import/no-unresolved': 0,
     'react/prop-types': 0,
     'react/destructuring-assignment': 0,
     'react/static-property-placement': 0,

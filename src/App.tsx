@@ -8,6 +8,8 @@ import './index.scss';
 import './variables.css';
 import Routes from './common/routes';
 
+const PageNotFound = () => <div>Page not found</div>;
+
 function App(): JSX.Element {
   return (
     <SelectionsListContextProvider>
@@ -31,6 +33,7 @@ function App(): JSX.Element {
               }}
             />
           ))}
+          <PageNotFound />
         </Switch>
       </PageWrapper>
     </SelectionsListContextProvider>

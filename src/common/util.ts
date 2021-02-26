@@ -1,7 +1,7 @@
 import { isAfter, parseISO, isBefore, format } from 'date-fns';
 import { stringify } from 'query-string';
 import { ReservationUnitsParameters } from './api';
-import { searchPrefix, emptyOption } from './const';
+import { searchPrefix, emptyOption, applicationsPrefix } from './const';
 import {
   LocalizationLanguages,
   OptionType,
@@ -107,3 +107,5 @@ export const getSelectedOption = (
 
 export const searchUrl = (params: ReservationUnitsParameters): string =>
   `${searchPrefix}/?${stringify(params)}`;
+
+export const applicationsUrl = `${applicationsPrefix}/`;

@@ -12,6 +12,7 @@ export const weekdays = [
 
 export const reservationUnitPrefix = '/reservation-unit';
 export const searchPrefix = '/search';
+export const applicationsPrefix = '/applications';
 
 export const reservationUnitPath = (id: number): string =>
   `${reservationUnitPrefix}/${id}`;
@@ -60,6 +61,8 @@ const getConfig = (
     | 'REACT_APP_SENTRY_DSN'
     | 'REACT_APP_SENTRY_ENVIRONMENT'
     | 'REACT_APP_TILAVARAUS_API_URL'
+    | 'REACT_APP_DISABLE_AUTH'
+    | 'REACT_APP_OIDC_CLIENT_ID'
 ) => {
   return CONFIG ? CONFIG[name] : process.env[name];
 };
@@ -69,3 +72,7 @@ export const sentryDSN = getConfig('REACT_APP_SENTRY_DSN');
 export const sentryEnvironment = getConfig('REACT_APP_SENTRY_ENVIRONMENT');
 
 export const apiBaseUrl = getConfig('REACT_APP_TILAVARAUS_API_URL');
+
+export const authEnabled = getConfig('REACT_APP_DISABLE_AUTH') !== 'true';
+
+export const oidcClientId = getConfig('REACT_APP_OIDC_CLIENT_ID');

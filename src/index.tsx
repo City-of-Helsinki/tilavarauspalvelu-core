@@ -1,10 +1,19 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';
+import {
+  oidcLog,
+  InMemoryWebStorage,
+  AuthenticationProvider,
+} from '@axa-fr/react-oidc-context';
 import * as Sentry from '@sentry/react';
+import { LoadingSpinner } from 'hds-react';
+import oidcConfiguration from './common/auth/configuration';
 import App from './App';
+
 import reportWebVitals from './reportWebVitals';
-import { sentryDSN, sentryEnvironment } from './common/const';
+import { authEnabled, sentryDSN, sentryEnvironment } from './common/const';
+import UpdateToken from './common/auth/UpdateToken';
 
 if (sentryDSN) {
   Sentry.init({
@@ -25,9 +34,17 @@ const boot =
 
 boot(
   <React.StrictMode>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
+    <AuthenticationProvider
+      authenticating={LoadingSpinner}
+      configuration={oidcConfiguration}
+      loggerLevel={oidcLog.DEBUG}
+      isEnabled={authEnabled}
+      callbackComponentOverride={UpdateToken}
+      UserStore={InMemoryWebStorage}>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </AuthenticationProvider>
   </React.StrictMode>,
   document.getElementById('root')
 );
