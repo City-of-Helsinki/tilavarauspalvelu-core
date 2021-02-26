@@ -69,6 +69,10 @@ const UserMenu = styled(HDSNavigation.User)<{ $initials?: string }>`
     ${({ $initials }) => $initials && "visibility: hidden;"}
   }
 
+  a {
+    cursor: pointer;
+  }
+
   #userDropdown-menu {
     right: 0;
     left: auto;
@@ -122,7 +126,10 @@ const Navigation = ({ profile, logout }: IProps): JSX.Element => {
           }`.trim()}
           authenticated={Boolean(profile)}
           label={t("Navigation.login")}
-          onSignIn={() => history.push("/applications")}
+          onSignIn={() => {
+            history.push("/");
+            window.location.reload();
+          }}
         >
           <HDSNavigation.Item
             label={t("Navigation.logout")}
@@ -144,6 +151,7 @@ const Navigation = ({ profile, logout }: IProps): JSX.Element => {
                 e.preventDefault();
                 setLanguage(languageOption.value);
               }}
+              style={{ cursor: "pointer" }}
             />
           ))}
         </HDSNavigation.LanguageSelector>

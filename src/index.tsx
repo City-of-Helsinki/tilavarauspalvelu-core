@@ -12,18 +12,19 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import UpdateToken from "./common/auth/UpdateToken";
 import Authenticating from "./component/Authentication/Authenticating";
-import NotAuthenticated from "./component/Authentication/NotAuthenticated";
+import Login from "./component/Authentication/Login";
+import AuthorizationNeeded from "./component/Authentication/AuthorizationNeeded";
 
 ReactDOM.render(
   <React.StrictMode>
     <AuthenticationProvider
-      notAuthenticated={NotAuthenticated}
-      notAuthorized={() => <div>not autho</div>}
-      authenticating={Authenticating}
+      notAuthenticated={() => <Login />}
+      notAuthorized={() => <AuthorizationNeeded />}
+      authenticating={() => <Authenticating noNavigation />}
       configuration={oidcConfiguration}
       loggerLevel={oidcLog.DEBUG}
       isEnabled
-      callbackComponentOverride={UpdateToken}
+      callbackComponentOverride={() => <UpdateToken />}
       UserStore={InMemoryWebStorage}
     >
       <App />
