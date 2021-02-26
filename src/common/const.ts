@@ -1,3 +1,5 @@
+export const defaultLanguage = "fi";
+
 export const weekdays = [
   "monday",
   "tuesday",

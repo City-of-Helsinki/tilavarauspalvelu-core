@@ -87,6 +87,7 @@ const translations: ITranslations = {
   },
   Navigation: {
     login: ["Kirjaudu", "Login", "Logga in"],
+    logout: ["Kirjaudu ulos", "Log out", "Logga ut"],
     profile: ["Profiili", "Profile", "Profil"],
     languageSelection: ["Kielen valinta", "Language selection", "Språkval"],
     skipToMainContent: [

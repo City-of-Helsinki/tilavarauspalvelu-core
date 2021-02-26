@@ -1,11 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { Navigation as HDSNavigation } from "hds-react";
+// eslint-disable-next-line import/no-unresolved
+import { useReactOidc } from "@axa-fr/react-oidc-context";
+import { Profile } from "oidc-client";
+import { useLocalStorage } from "react-use";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { useHistory } from "react-router-dom";
 import MainMenu from "./MainMenu";
-import { breakpoints } from "../styles/util";
+import { breakpoints, StyledHDSNavigation } from "../styles/util";
+import { defaultLanguage } from "../common/const";
 
+interface IProps {
+  profile: Profile | null;
+  logout?: () => void;
+}
 interface ILanguageOption {
   label: string;
   value: string;
@@ -17,26 +26,26 @@ const languageOptions: ILanguageOption[] = [
   { label: "English", value: "en" },
 ];
 
-const StyledHDSNavigation = styled(HDSNavigation)`
-  --breakpoint-xl: 9000px;
-`;
-
 const MobileNavigation = styled.div`
   @media (min-width: ${breakpoints.m}) {
     display: none;
   }
 `;
 
-const Navigation = (): JSX.Element => {
-  const [isMenuOpen, setMenuState] = useState(false);
-  const [language, setLanguage] = useState(languageOptions[0]);
+const Navigation = ({ profile, logout }: IProps): JSX.Element => {
   const { t, i18n } = useTranslation();
-  const formatSelectedValue = ({ value }: ILanguageOption): string =>
-    value.toUpperCase();
+
+  const [isMenuOpen, setMenuState] = useState(false);
+  const [language, setLanguage] = useLocalStorage<string>(
+    "userLocale",
+    i18n.language
+  );
+  const formatSelectedValue = (lang = defaultLanguage): string =>
+    lang.toUpperCase();
   const history = useHistory();
 
   useEffect(() => {
-    i18n.changeLanguage(language.value);
+    if (language) i18n.changeLanguage(language);
   }, [language, i18n]);
 
   return (
@@ -61,11 +70,17 @@ const Navigation = (): JSX.Element => {
             onItemSelection={() => setMenuState(false)}
           />
         </MobileNavigation>
-        <HDSNavigation.User authenticated label={t("Navigation.login")}>
+        <HDSNavigation.User
+          userName={`${profile?.given_name || ""} ${
+            profile?.family_name || ""
+          }`.trim()}
+          authenticated={Boolean(profile)}
+          label={t("Navigation.login")}
+          onSignIn={() => history.push("/")}
+        >
           <HDSNavigation.Item
-            label={t("Navigation.profile")}
-            href="https://hel.fi"
-            target="_blank"
+            label={t("Navigation.logout")}
+            onClick={() => logout && logout()}
             variant="primary"
           />
         </HDSNavigation.User>
@@ -81,7 +96,7 @@ const Navigation = (): JSX.Element => {
                 e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>
               ): void => {
                 e.preventDefault();
-                setLanguage(languageOption);
+                setLanguage(languageOption.value);
               }}
             />
           ))}
@@ -91,4 +106,11 @@ const Navigation = (): JSX.Element => {
   );
 };
 
-export default Navigation;
+function NavigationWithProfileAndLogout(): JSX.Element {
+  const { oidcUser, logout } = useReactOidc();
+  const profile = oidcUser ? oidcUser.profile : null;
+
+  return <Navigation profile={profile} logout={() => logout()} />;
+}
+
+export default NavigationWithProfileAndLogout;

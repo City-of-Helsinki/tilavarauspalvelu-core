@@ -7,13 +7,32 @@ import {
   Parameter,
 } from "./types";
 
-const axiosClient = applyCaseMiddleware(axios.create());
+const axiosOptions: AxiosRequestConfig = {
+  timeout: 5000,
+  headers: {
+    "Content-Type": "application/json",
+  },
+};
+
+let axiosClient = applyCaseMiddleware(axios.create(axiosOptions));
 const apiBaseUrl: string = process.env.REACT_APP_TILAVARAUS_API_URL || "";
 
 const applicationRoundsBasePath = "application_round";
 const reservationUnitsBasePath = "reservation_unit";
 const parameterBasePath = "parameters";
 const applicationBasePath = "application";
+
+export const setApiToken = (token: string | null): void => {
+  const newAxiosOptions: AxiosRequestConfig = {
+    ...axiosOptions,
+    headers: {
+      ...axiosOptions.headers,
+      ...(token && { Authorization: `Bearer ${token}` }),
+    },
+  };
+
+  axiosClient = applyCaseMiddleware(axios.create(newAxiosOptions));
+};
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface QueryParameters extends ReservationUnitsParameters {}

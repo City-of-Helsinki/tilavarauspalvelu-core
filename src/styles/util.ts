@@ -1,4 +1,4 @@
-import { ErrorSummary } from "hds-react";
+import { ErrorSummary, Navigation } from "hds-react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 import { ApplicationStatus } from "../common/types";
@@ -70,4 +70,8 @@ export const BasicLink = styled(Link)`
   color: var(--tilavaraus-admin-content-text-color);
   text-decoration: none;
   user-select: none;
+`;
+
+export const StyledHDSNavigation = styled(Navigation)`
+  --breakpoint-xl: 9000px;
 `;
