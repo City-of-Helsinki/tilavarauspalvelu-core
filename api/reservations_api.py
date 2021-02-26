@@ -140,7 +140,7 @@ class AgeGroupSerializer(serializers.ModelSerializer):
             },
         }
 
-    def __init__(self, display=False, *args, **kwargs):
+    def __init__(self, *args, display=False, **kwargs):
         super(AgeGroupSerializer, self).__init__(*args, **kwargs)
         if display:
             self.fields.pop("id")
