@@ -96,37 +96,6 @@ def test_event_can_belong_to_multiple_baskets(
 
 
 @pytest.mark.django_db
-def test_should_restrict_baskets_to_given_baskets(
-    default_application_round,
-    application_round_basket_one,
-    application_round_basket_two,
-    recurring_application_event,
-):
-    events_by_baskets = default_application_round.get_application_events_by_basket(
-        [application_round_basket_one.id]
-    )
-
-    assert events_by_baskets == {
-        application_round_basket_one.id: [recurring_application_event]
-    }
-
-
-@pytest.mark.django_db
-def test_empty_list_as_included_basket_ids(
-    default_application_round,
-    application_round_basket_one,
-    application_round_basket_two,
-    recurring_application_event,
-):
-    events_by_baskets = default_application_round.get_application_events_by_basket([])
-
-    assert events_by_baskets == {
-        application_round_basket_one.id: [recurring_application_event],
-        application_round_basket_two.id: [recurring_application_event],
-    }
-
-
-@pytest.mark.django_db
 def test_should_exclude_events_not_matching_application_round(
     default_application_round,
     second_application_round,

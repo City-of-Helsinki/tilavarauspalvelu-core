@@ -1,4 +1,5 @@
 import datetime
+import math
 from typing import Dict, List, Optional
 
 import recurrence
@@ -250,22 +251,13 @@ class ApplicationRound(models.Model):
     def get_status(self):
         return self.statuses.last()
 
-    def get_application_events_by_basket(
-        self, included_basket_ids: Optional[List[int]] = None
-    ):
-        def should_add_basket(basket_id: int):
-            return (
-                included_basket_ids is None
-                or len(included_basket_ids) == 0
-                or basket_id in included_basket_ids
-            )
+    def get_application_events_by_basket(self):
 
         matching_application_events: Dict[int, List[ApplicationEvent]] = {}
         for basket in self.application_round_baskets.order_by("order_number").all():
-            if should_add_basket(basket.id):
-                matching_application_events[
-                    basket.id
-                ] = basket.get_application_events_in_basket()
+            matching_application_events[
+                basket.id
+            ] = basket.get_application_events_in_basket()
         return matching_application_events
 
     def __str__(self):
@@ -334,6 +326,11 @@ class ApplicationRoundBasket(models.Model):
             events = events.filter(age_group__in=self.age_groups.all())
 
         return list(events.all())
+
+    def get_score(self):
+        # TODO: Super scoring, needs to be defined how to use this properly.
+        # Used for allocation scoring logic, so something is needed atm.
+        return math.ceil(10 / self.order_number)
 
     def __str__(self):
         return "{} ({})".format(self.name, self.application_round.name)

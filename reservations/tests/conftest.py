@@ -162,6 +162,11 @@ def purpose() -> Purpose:
 
 
 @pytest.fixture
+def purpose2() -> Purpose:
+    return Purpose.objects.create(name="Playing sports")
+
+
+@pytest.fixture
 def multiple_applications(
     application_round_with_reservation_units, request, reservation_unit, purpose
 ) -> Dict[str, list]:
