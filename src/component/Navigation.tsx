@@ -9,9 +9,9 @@ import styled from "styled-components";
 import { useHistory } from "react-router-dom";
 import MainMenu from "./MainMenu";
 import { breakpoints, StyledHDSNavigation } from "../styles/util";
-import { authEnabled, defaultLanguage } from "../common/const";
+import { defaultLanguage } from "../common/const";
 
-interface IProps {
+interface NavigationProps {
   profile: Profile | null;
   login?: () => void;
   logout?: () => void;
@@ -80,7 +80,11 @@ const UserMenu = styled(HDSNavigation.User)<{ $initials?: string }>`
   }
 `;
 
-const Navigation = ({ profile, login, logout }: IProps): JSX.Element => {
+const Navigation = ({
+  profile,
+  login,
+  logout,
+}: NavigationProps): JSX.Element => {
   const { t, i18n } = useTranslation();
 
   const [isMenuOpen, setMenuState] = useState(false);
@@ -158,19 +162,26 @@ const Navigation = ({ profile, login, logout }: IProps): JSX.Element => {
   );
 };
 
-function NavigationWithProfileAndLogout(): JSX.Element {
-  const { oidcUser, login, logout } = useReactOidc();
-  const profile = oidcUser ? oidcUser.profile : null;
+interface INavigationWithProfileAndLogoutProps {
+  authEnabled: boolean;
+}
 
-  return authEnabled ? (
-    <Navigation
-      profile={profile}
-      login={() => login()}
-      logout={() => logout()}
-    />
-  ) : (
-    <Navigation profile={null} />
-  );
+function NavigationWithProfileAndLogout({
+  authEnabled,
+}: INavigationWithProfileAndLogoutProps): JSX.Element {
+  const { oidcUser, login, logout } = useReactOidc();
+  if (authEnabled) {
+    const profile = oidcUser ? oidcUser.profile : null;
+    return (
+      <Navigation
+        profile={profile}
+        login={() => login()}
+        logout={() => logout()}
+      />
+    );
+  }
+
+  return <Navigation profile={null} />;
 }
 
 export default NavigationWithProfileAndLogout;
