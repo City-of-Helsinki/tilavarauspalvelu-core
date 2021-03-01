@@ -1,3 +1,5 @@
+# tilavarauspalvelu-admin-ui
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Prerequisites
@@ -47,7 +49,8 @@ Use `.env.local` for development.
 | Name                         | Description                                    |
 | ---------------------------- | ---------------------------------------------- |
 | REACT_APP_TILAVARAUS_API_URL | tilavaraus-core base url                       |
-| REACT_APP_OIDC_CLIENT_ID     | Oidc client id
+| REACT_APP_OIDC_CLIENT_ID     | Oidc client id                                 |
+| REACT_APP_DISABLE_AUTH       | Flag to disable authentication                 |
 |
 ## Available Scripts
 
