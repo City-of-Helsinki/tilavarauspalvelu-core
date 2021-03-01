@@ -126,11 +126,18 @@ class AllocationEvent(object):
 
 class AllocationBasket(object):
     def __init__(
-        self, id: int, order_number: int, allocation_percentage: Optional[int]
+        self,
+        id: int,
+        order_number: int,
+        allocation_percentage: Optional[int],
+        events: [AllocationEvent],
+        score: int,
     ):
         self.id = id
         self.allocation_percentage = allocation_percentage
         self.order_number = order_number
+        self.events = events
+        self.score = score
 
 
 class AllocationData(object):
@@ -138,12 +145,10 @@ class AllocationData(object):
         self,
         period_start: datetime.date,
         period_end: datetime.date,
-        events: [AllocationEvent],
         baskets: Dict[int, List[AllocationBasket]],
         spaces: Dict[int, List[AllocationSpace]],
     ):
         self.period_start = period_start
         self.period_end = period_end
-        self.allocation_events = events
         self.spaces = spaces
         self.baskets = baskets

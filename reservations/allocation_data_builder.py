@@ -1,9 +1,10 @@
 import datetime
+from itertools import chain
 from typing import Dict, List
 
 from django.utils import timezone
 
-from applications.models import ApplicationRound
+from applications.models import ApplicationEvent, ApplicationRound
 from reservation_units.models import ReservationUnit
 from reservations.allocation_models import (
     AllocationBasket,
@@ -28,43 +29,45 @@ class AllocationDataBuilder(object):
         for unit in self.application_round.reservation_units.all():
             space = self.get_space(unit=unit)
             spaces[space.id] = space
-        allocation_events = []
-        event_baskets = self.get_event_baskets()
 
-        for application in self.application_round.applications.all():
-            for application_event in application.application_events.all():
-                space_ids = list(
-                    map(
-                        lambda x: x.reservation_unit.id,
-                        application_event.event_reservation_units.all(),
-                    )
-                )
-                allocation_events.append(
-                    AllocationEvent(
-                        id=application_event.id,
-                        occurrences=application_event.get_all_occurrences(),
-                        period_start=self.period_start,
-                        period_end=self.period_end,
-                        baskets=event_baskets.get(application_event.id),
-                        space_ids=space_ids,
-                        begin=application_event.begin,
-                        end=application_event.end,
-                        min_duration=application_event.min_duration,
-                        max_duration=application_event.max_duration
-                        if application_event.max_duration is not None
-                        else application_event.min_duration,
-                        events_per_week=application_event.events_per_week,
-                        num_persons=application_event.num_persons,
-                    )
-                )
+        self.get_event_baskets()
 
         return AllocationData(
             period_start=self.period_start,
             period_end=self.period_end,
             spaces=spaces,
-            events=allocation_events,
             baskets=self.baskets,
         )
+
+    def get_allocation_events(
+        self, application_events: [ApplicationEvent]
+    ) -> [AllocationEvent]:
+        events = []
+        for application_event in application_events:
+            space_ids = list(
+                map(
+                    lambda x: x.reservation_unit.id,
+                    application_event.event_reservation_units.all(),
+                )
+            )
+            events.append(
+                AllocationEvent(
+                    id=application_event.id,
+                    occurrences=application_event.get_all_occurrences(),
+                    period_start=self.period_start,
+                    period_end=self.period_end,
+                    space_ids=space_ids,
+                    begin=application_event.begin,
+                    end=application_event.end,
+                    min_duration=application_event.min_duration,
+                    max_duration=application_event.max_duration
+                    if application_event.max_duration is not None
+                    else application_event.min_duration,
+                    events_per_week=application_event.events_per_week,
+                    num_persons=application_event.num_persons,
+                )
+            )
+        return events
 
     def get_all_dates(self):
         dates = []
@@ -109,9 +112,7 @@ class AllocationDataBuilder(object):
         for (
             basket_id,
             application_events,
-        ) in self.application_round.get_application_events_by_basket(
-            self.included_baskets
-        ).items():
+        ) in self.application_round.get_application_events_by_basket().items():
             basket = next(
                 basket
                 for basket in self.application_round.application_round_baskets.filter(
@@ -123,6 +124,8 @@ class AllocationDataBuilder(object):
                 id=basket.id,
                 allocation_percentage=basket.allocation_percentage,
                 order_number=basket.order_number,
+                events=self.get_allocation_events(application_events),
+                score=basket.get_score(),
             )
 
             self.baskets[basket_id] = allocation_basket
@@ -131,4 +134,26 @@ class AllocationDataBuilder(object):
                     event_baskets[application_event.id].append(basket_id)
                 else:
                     event_baskets[application_event.id] = [basket_id]
+
+        all_events = chain(
+            *[
+                application.application_events.all()
+                for application in self.application_round.applications.all()
+            ]
+        )
+        catchall_basket = AllocationBasket(
+            id=None,
+            allocation_percentage=None,
+            order_number=1000,
+            events=self.get_allocation_events(all_events),
+            score=1,
+        )
+        self.baskets[None] = catchall_basket
+        for application in self.application_round.applications.all():
+            for application_event in application.application_events.all():
+                if event_baskets.get(application_event.id):
+                    event_baskets[application_event.id].append(None)
+                else:
+                    event_baskets[application_event.id] = [None]
+
         return event_baskets

@@ -65,13 +65,13 @@ def test_should_map_application_events(
         start += delta
 
     assert_that(
-        data.allocation_events[0].occurrences[scheduled_for_monday.id]
+        data.baskets[None].events[0].occurrences[scheduled_for_monday.id]
     ).has_occurrences(dates).has_weekday(0)
 
-    assert_that(data.allocation_events[0]).has_id(recurring_application_event.id)
+    assert_that(data.baskets[None].events[0]).has_id(recurring_application_event.id)
 
     hour = 60 // ALLOCATION_PRECISION
-    assert_that(data.allocation_events[0]).has_min_duration(hour).has_max_duration(
+    assert_that(data.baskets[None].events[0]).has_min_duration(hour).has_max_duration(
         hour * 2
     )
 
@@ -92,7 +92,9 @@ def test_should_handle_none_max_duration(
     ).get_allocation_data()
 
     hour = 60 // ALLOCATION_PRECISION
-    assert_that(data.allocation_events[0]).has_min_duration(hour).has_max_duration(hour)
+    assert_that(data.baskets[None].events[0]).has_min_duration(hour).has_max_duration(
+        hour
+    )
 
 
 @pytest.mark.django_db
@@ -107,7 +109,7 @@ def test_should_map_period_start_and_end_from_application_round(
         application_round=application_round_with_reservation_units
     ).get_allocation_data()
 
-    assert_that(data.allocation_events[0]).has_period_start(
+    assert_that(data.baskets[None].events[0]).has_period_start(
         application_with_reservation_units.application_round.reservation_period_begin
     ).has_period_end(
         application_with_reservation_units.application_round.reservation_period_end
@@ -145,43 +147,3 @@ def test_mapping_application_round_baskets(
     ).has_allocation_percentage(
         application_round_basket_two.allocation_percentage
     )
-
-
-@pytest.mark.django_db
-def test_should_map_application_event_baskets(
-    application_round_with_reservation_units,
-    default_application_round,
-    application_round_basket_one,
-    application_round_basket_two,
-    recurring_application_event,
-):
-
-    data = AllocationDataBuilder(
-        application_round=application_round_with_reservation_units
-    ).get_allocation_data()
-
-    assert_that(data.allocation_events[0].baskets).is_equal_to(
-        [
-            application_round_basket_one.id,
-            application_round_basket_two.id,
-        ]
-    )
-
-
-@pytest.mark.django_db
-def test_should_not_map_event_baskets_if_does_not_belong_to_basket(
-    application_round_with_reservation_units,
-    default_application_round,
-    application_round_basket_one,
-    application_round_basket_two,
-    recurring_application_event,
-):
-
-    recurring_application_event.purpose = None
-    recurring_application_event.save()
-
-    data = AllocationDataBuilder(
-        application_round=application_round_with_reservation_units
-    ).get_allocation_data()
-
-    assert_that(data.allocation_events[0].baskets).is_empty()
