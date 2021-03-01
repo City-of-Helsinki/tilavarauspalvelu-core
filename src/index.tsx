@@ -14,6 +14,7 @@ import UpdateToken from "./common/auth/UpdateToken";
 import Authenticating from "./component/Authentication/Authenticating";
 import Login from "./component/Authentication/Login";
 import AuthorizationNeeded from "./component/Authentication/AuthorizationNeeded";
+import { authEnabled } from "./common/const";
 
 ReactDOM.render(
   <React.StrictMode>
@@ -23,7 +24,7 @@ ReactDOM.render(
       authenticating={() => <Authenticating noNavigation />}
       configuration={oidcConfiguration}
       loggerLevel={oidcLog.DEBUG}
-      isEnabled
+      isEnabled={authEnabled}
       callbackComponentOverride={() => <UpdateToken />}
       UserStore={InMemoryWebStorage}
     >

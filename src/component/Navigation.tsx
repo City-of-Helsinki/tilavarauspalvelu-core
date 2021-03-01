@@ -9,12 +9,12 @@ import styled from "styled-components";
 import { useHistory } from "react-router-dom";
 import MainMenu from "./MainMenu";
 import { breakpoints, StyledHDSNavigation } from "../styles/util";
-import { defaultLanguage } from "../common/const";
+import { authEnabled, defaultLanguage } from "../common/const";
 
 interface IProps {
   profile: Profile | null;
-  login: () => void;
-  logout: () => void;
+  login?: () => void;
+  logout?: () => void;
 }
 interface ILanguageOption {
   label: string;
@@ -127,9 +127,7 @@ const Navigation = ({ profile, login, logout }: IProps): JSX.Element => {
           }`.trim()}
           authenticated={Boolean(profile)}
           label={t("Navigation.login")}
-          onSignIn={() => {
-            login();
-          }}
+          onSignIn={() => login && login()}
         >
           <HDSNavigation.Item
             label={t("Navigation.logout")}
@@ -164,12 +162,14 @@ function NavigationWithProfileAndLogout(): JSX.Element {
   const { oidcUser, login, logout } = useReactOidc();
   const profile = oidcUser ? oidcUser.profile : null;
 
-  return (
+  return authEnabled ? (
     <Navigation
       profile={profile}
       login={() => login()}
       logout={() => logout()}
     />
+  ) : (
+    <Navigation profile={null} />
   );
 }
 
