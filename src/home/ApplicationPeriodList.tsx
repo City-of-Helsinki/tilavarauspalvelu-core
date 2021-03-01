@@ -1,49 +1,46 @@
 import React, { useEffect, useState } from 'react';
 import { parseISO } from 'date-fns';
-import { ApplicationPeriod } from '../common/types';
-import { getApplicationPeriods } from '../common/api';
-import ApplicationPeriodCard from './ApplicationPeriodCard';
+import { ApplicationRound } from '../common/types';
+import { getApplicationRounds } from '../common/api';
 import { routeData } from '../common/const';
+import ApplicationRoundCard from './ApplicationRoundCard';
 
-interface IProps {
-  data?: ApplicationPeriod[];
-}
+type Props = {
+  data?: ApplicationRound[];
+};
 
-const ApplicationPeriodList = ({ data }: IProps): JSX.Element => {
-  const [applicationPeriods, setApplicationPeriods] = useState<
-    ApplicationPeriod[]
+const ApplicationPeriodList = ({ data }: Props): JSX.Element => {
+  const [applicationRounds, setApplicationRounds] = useState<
+    ApplicationRound[]
   >(data || []);
 
   useEffect(() => {
     async function fetchData() {
-      const backendData = routeData()?.applicationPeriods;
+      const backendData = routeData()?.applicationRounds;
       let periods;
       if (backendData) {
         periods = backendData;
-        routeData().applicationPeriods = undefined;
+        routeData().applicationRounds = undefined;
       } else {
-        periods = await getApplicationPeriods();
+        periods = await getApplicationRounds();
       }
 
       periods.sort(
-        (ap1: ApplicationPeriod, ap2: ApplicationPeriod) =>
-          parseISO(ap1.applicationPeriodBegin).getTime() -
-          parseISO(ap2.applicationPeriodBegin).getTime()
+        (ar1: ApplicationRound, ar2: ApplicationRound) =>
+          parseISO(ar1.applicationPeriodBegin).getTime() -
+          parseISO(ar2.applicationPeriodBegin).getTime()
       );
 
-      setApplicationPeriods(periods);
+      setApplicationRounds(periods);
     }
     fetchData();
   }, []);
 
   return (
-    applicationPeriods && (
+    applicationRounds && (
       <>
-        {applicationPeriods.map((p) => (
-          <ApplicationPeriodCard
-            applicationPeriod={p}
-            key={`${p.id}${p.name}`}
-          />
+        {applicationRounds.map((p) => (
+          <ApplicationRoundCard applicationRound={p} key={`${p.id}${p.name}`} />
         ))}
       </>
     )

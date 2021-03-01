@@ -27,7 +27,7 @@ const translations: Translations = {
       abilityGroup: ['Tasoryhmä'],
       purpose: ['Vuoron käyttötarkoitus / toiminnan sisältö'],
       spacesSubHeading: ['Toivotut tilat'],
-      applicationPeriodSubHeading: ['Vakiovuoron kausi'],
+      applicationRoundSubHeading: ['Vakiovuoron kausi'],
       periodStartDate: ['Kauden aloituspäivä'],
       periodEndDate: ['Kauden päätöspäivä'],
       minDuration: ['Vuoron minimikesto'],
@@ -129,11 +129,30 @@ const translations: Translations = {
       },
     },
     preview: {
+      applicantType: {
+        community: [
+          'Rekisteröimätön yhdistys',
+          'Unregistered association',
+          'Oregistrerad förening',
+        ],
+        company: ['Yritys', 'Company', 'Företag'],
+        individual: ['Yksityishenkilö', 'Private person', 'Privatperson'],
+        association: [
+          'Rekisteröity yhdistys',
+          'Registered association',
+          'Registrerad förening',
+        ],
+      },
       heading: ['4. Hakemuksen lähettäminen'],
       text: ['Ohessa yhteenveto hakemuksestasi.'],
       basicInfoSubHeading: ['Varaajan perustiedot'],
       firstName: ['Yhteyshenkilön etunimi'],
       lastName: ['Yhteyshenkilön sukunimi'],
+      applicantTypeLabel: [
+        'Hakijan tyyppi',
+        'Applicant type',
+        'Typ av sökande',
+      ],
       email: ['Sähköpostiosoite', 'Email address', ''],
       phoneNumber: ['Puhelinumero', 'Phone number', 'Telefonnummer'],
       organisation: {
@@ -173,7 +192,7 @@ const translations: Translations = {
       preview: ['4. Lähetä käsiteltäväksi'],
     },
   },
-  ApplicationPeriodCard: {
+  ApplicationRoundCard: {
     reminderButton: ['Tilaa muistutus'],
     applyButton: ['Hae Tilaa'],
     displayPastButton: ['Näytä tilat'],

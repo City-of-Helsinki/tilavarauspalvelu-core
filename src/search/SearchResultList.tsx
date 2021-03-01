@@ -2,8 +2,10 @@ import { Button, IconMap, IconMenuHamburger, Select } from 'hds-react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
+import useReservationUnitsList from '../common/hook/useReservationUnitList';
 import { ReservationUnit } from '../common/types';
 import Container from '../component/Container';
+import StartApplicationBar from '../component/StartApplicationBar';
 import ReservationUnitCard from './ReservationUnitCard';
 
 interface Props {
@@ -66,38 +68,52 @@ const ListContainer = styled.div`
 `;
 
 const SearchResultList = ({ reservationUnits }: Props): JSX.Element => {
+  const {
+    reservationUnits: selectedReservationUnits,
+    selectReservationUnit,
+    containsReservationUnit,
+  } = useReservationUnitsList();
+
   const { t } = useTranslation();
   return (
-    <Container id="searchResultList">
-      <HitCount>
-        {t('SearchResultList.count', { count: reservationUnits.length })}
-      </HitCount>
-      <ButtonContainer>
-        <StyledButton theme="black" iconLeft={<IconMenuHamburger />}>
-          {t('SearchResultList.listButton')}
-        </StyledButton>
-        <StyledSecondaryButton
-          disabled
-          variant="secondary"
-          iconLeft={<IconMap />}>
-          {t('SearchResultList.mapButton')}
-        </StyledSecondaryButton>
-        <Order className="align-vertically">
-          <span>{t('SearchResultList.sortButtonLabel')}:</span>
-          <Select
-            placeholder={t('SearchResultList.sortButtonPlaceholder')}
+    <>
+      <Container id="searchResultList">
+        <HitCount>
+          {t('SearchResultList.count', { count: reservationUnits.length })}
+        </HitCount>
+        <ButtonContainer>
+          <StyledButton theme="black" iconLeft={<IconMenuHamburger />}>
+            {t('SearchResultList.listButton')}
+          </StyledButton>
+          <StyledSecondaryButton
             disabled
-            options={options}
-            label=""
-          />
-        </Order>
-      </ButtonContainer>
-      <ListContainer>
-        {reservationUnits.map((ru) => (
-          <ReservationUnitCard reservationUnit={ru} key={ru.id} />
-        ))}
-      </ListContainer>
-    </Container>
+            variant="secondary"
+            iconLeft={<IconMap />}>
+            {t('SearchResultList.mapButton')}
+          </StyledSecondaryButton>
+          <Order className="align-vertically">
+            <span>{t('SearchResultList.sortButtonLabel')}:</span>
+            <Select
+              placeholder={t('SearchResultList.sortButtonPlaceholder')}
+              disabled
+              options={options}
+              label=""
+            />
+          </Order>
+        </ButtonContainer>
+        <ListContainer>
+          {reservationUnits.map((ru) => (
+            <ReservationUnitCard
+              selectReservationUnit={selectReservationUnit}
+              containsReservationUnit={containsReservationUnit}
+              reservationUnit={ru}
+              key={ru.id}
+            />
+          ))}
+        </ListContainer>
+      </Container>
+      <StartApplicationBar count={selectedReservationUnits.length} />
+    </>
   );
 };
 

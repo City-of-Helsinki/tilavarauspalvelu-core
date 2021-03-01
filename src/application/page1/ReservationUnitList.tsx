@@ -13,7 +13,7 @@ import { useAsync } from 'react-use';
 import { getReservationUnit } from '../../common/api';
 import {
   ApplicationEvent,
-  ApplicationPeriod,
+  ApplicationRound,
   OptionType,
   ReservationUnit,
 } from '../../common/types';
@@ -185,7 +185,7 @@ type Props = {
   applicationEvent: ApplicationEvent;
   fieldName: string;
   form: ReturnType<typeof useForm>;
-  applicationPeriod: ApplicationPeriod;
+  applicationRound: ApplicationRound;
   options: OptionTypes;
 };
 
@@ -202,7 +202,7 @@ const ReservationUnitList = ({
   applicationEvent,
   form,
   fieldName,
-  applicationPeriod,
+  applicationRound,
   options,
 }: Props): JSX.Element => {
   const [showModal, setShowModal] = useState(false);
@@ -299,7 +299,7 @@ const ReservationUnitList = ({
         show={showModal}>
         <ReservationUnitModal
           currentReservationUnits={reservationUnits}
-          applicationPeriod={applicationPeriod}
+          applicationRound={applicationRound}
           handleAdd={handleAdd}
           handleRemove={remove}
           options={options}

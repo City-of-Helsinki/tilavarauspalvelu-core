@@ -2,24 +2,19 @@ import React, { useEffect, useState } from 'react';
 import { TextInput, Checkbox } from 'hds-react';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
-import {
-  Address,
-  Application,
-  ContactPerson,
-  FormType,
-  Organisation,
-} from '../../common/types';
+import { Application, FormType } from '../../common/types';
 import { SpanTwoColumns, TwoColumnContainer } from '../../component/common';
 import RadioButtons from './RadioButtons';
 import EmailInput from './EmailInput';
 import BillingAddress from './BillingAddress';
 import Buttons from './Buttons';
+import { deepCopy } from '../../common/util';
 
 type Props = {
   activeForm: FormType;
   setActiveForm: (id: FormType) => void;
   application: Application;
-  onNext: () => void;
+  onNext: (appToSave: Application) => void;
 };
 
 const OrganisationForm = ({
@@ -38,7 +33,9 @@ const OrganisationForm = ({
     },
   });
 
-  const [hasRegistration, setHasRegistration] = useState(true);
+  const [hasRegistration, setHasRegistration] = useState(
+    Boolean(application.organisation?.identifier) // it is registered if identifier is set
+  );
   const [hasBillingAddress, setHasBillingAddress] = useState(
     application.billingAddress !== null
   );
@@ -51,40 +48,32 @@ const OrganisationForm = ({
     }
   }, [hasRegistration, register, unregister]);
 
-  const onSubmit = (data: Application): void => {
-    // todo create copy and edit that
+  const prepareData = (data: Application): Application => {
+    const applicationCopy = deepCopy(application);
 
-    // eslint-disable-next-line
-    application.applicantType = hasRegistration ? 'association' : 'community';
+    applicationCopy.applicantType = hasRegistration
+      ? 'association'
+      : 'community';
 
-    if (!application.contactPerson) {
-      // eslint-disable-next-line
-      application.contactPerson = {} as ContactPerson;
-    }
-    Object.assign(application.contactPerson, data.contactPerson);
+    applicationCopy.contactPerson = data.contactPerson;
+    applicationCopy.organisation = data.organisation;
 
-    if (!application.organisation) {
-      // eslint-disable-next-line
-      application.organisation = {} as Organisation;
-    }
-    Object.assign(application.organisation, data.organisation);
-
-    if (!hasRegistration) {
-      // eslint-disable-next-line
-      application.organisation.identifier = null;
+    if (!hasRegistration && applicationCopy.organisation != null) {
+      applicationCopy.organisation.identifier = null;
     }
 
     if (hasBillingAddress) {
-      if (!application.billingAddress) {
-        // eslint-disable-next-line
-        application.billingAddress = {} as Address;
-      }
-      Object.assign(application.billingAddress, data.billingAddress);
+      applicationCopy.billingAddress = data.billingAddress;
     } else {
-      // eslint-disable-next-line
-      application.billingAddress = null;
+      applicationCopy.billingAddress = null;
     }
-    onNext();
+
+    return applicationCopy;
+  };
+
+  const onSubmit = (data: Application): void => {
+    const appToSave = prepareData(data);
+    onNext(appToSave);
   };
 
   return (
@@ -108,7 +97,7 @@ const OrganisationForm = ({
             />
           </SpanTwoColumns>
           <TextInput
-            ref={register({ required: true })}
+            ref={register({ required: hasRegistration })}
             label={t('Application.Page3.organisation.registrationNumber')}
             id="organisation.identifier"
             name="organisation.identifier"

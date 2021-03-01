@@ -4,7 +4,7 @@ export type TranslationObject = {
   sv?: string;
 };
 
-export type ApplicationPeriod = {
+export type ApplicationRound = {
   id: number;
   name: string;
   reservationUnitsIds: number[];

@@ -16,13 +16,11 @@ import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { ReservationUnit as ReservationUnitType } from '../common/types';
 import IconWithText from './IconWithText';
-import {
-  SelectionsListContext,
-  SelectionsListContextType,
-} from '../context/SelectionsListContext';
 import Notification from './Notification';
 import Container from '../component/Container';
 import { localizedValue } from '../common/util';
+import useReservationUnitList from '../common/hook/useReservationUnitList';
+import StartApplicationBar from '../component/StartApplicationBar';
 
 interface Props {
   reservationUnit: ReservationUnitType;
@@ -80,16 +78,18 @@ const StyledKoros = styled(Koros)`
 `;
 
 const Head = ({ reservationUnit }: Props): JSX.Element => {
-  const { addReservationUnit, containsReservationUnit } = React.useContext(
-    SelectionsListContext
-  ) as SelectionsListContextType;
+  const {
+    selectReservationUnit,
+    containsReservationUnit,
+    reservationUnits,
+  } = useReservationUnitList();
 
   const { t, i18n } = useTranslation();
   const history = useHistory();
 
   return (
     <TopContainer>
-      <Notification applicationPeriod={null} />
+      <Notification applicationRound={null} />
       <Container>
         <BackContainer>
           <IconArrowLeft aria-hidden />
@@ -167,7 +167,7 @@ const Head = ({ reservationUnit }: Props): JSX.Element => {
               </Button>
               <Button
                 disabled={containsReservationUnit(reservationUnit)}
-                onClick={() => addReservationUnit(reservationUnit)}
+                onClick={() => selectReservationUnit(reservationUnit)}
                 iconLeft={<IconPlus />}
                 className="margin-left-s margin-top-s"
                 variant="secondary">
@@ -190,6 +190,7 @@ const Head = ({ reservationUnit }: Props): JSX.Element => {
           </ImageContainer>
         </RightContainer>
       </Container>
+      <StartApplicationBar count={reservationUnits.length} />
       <StyledKoros className="koros" type="wave" />
     </TopContainer>
   );

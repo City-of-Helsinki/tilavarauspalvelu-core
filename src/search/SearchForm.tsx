@@ -11,7 +11,7 @@ import {
 import { useForm } from 'react-hook-form';
 import styled from 'styled-components';
 import { breakpoint } from '../common/style';
-import { getApplicationPeriods, getParameters } from '../common/api';
+import { getApplicationRounds, getParameters } from '../common/api';
 import { mapOptions, getSelectedOption } from '../common/util';
 import { emptyOption, participantCountOptions } from '../common/const';
 import { OptionType } from '../common/types';
@@ -99,7 +99,7 @@ const SearchForm = ({ onSearch, formValues }: Props): JSX.Element | null => {
 
   useEffect(() => {
     async function fetchData() {
-      const fetchedApplicationPeriods = await getApplicationPeriods();
+      const fetchedApplicationPeriods = await getApplicationRounds();
       setApplicationPeriodOptions(
         mapOptions(fetchedApplicationPeriods, t('common.select'), i18n.language)
       );

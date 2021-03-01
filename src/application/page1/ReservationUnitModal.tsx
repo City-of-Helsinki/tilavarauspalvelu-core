@@ -18,7 +18,7 @@ import {
   ReservationUnitsParameters,
 } from '../../common/api';
 import {
-  ApplicationPeriod,
+  ApplicationRound,
   OptionType,
   ReservationUnit,
 } from '../../common/types';
@@ -252,13 +252,13 @@ const emptyOption = {
 };
 
 const ReservationUnitModal = ({
-  applicationPeriod,
+  applicationRound,
   handleAdd,
   handleRemove,
   currentReservationUnits,
   options,
 }: {
-  applicationPeriod: ApplicationPeriod;
+  applicationRound: ApplicationRound;
   handleAdd: (ru: ReservationUnit) => void;
   handleRemove: (ru: ReservationUnit) => void;
   currentReservationUnits: ReservationUnit[];
@@ -282,7 +282,7 @@ const ReservationUnitModal = ({
   const searchResults = async () => {
     setSearching(true);
     const searchCriteria = {
-      applicationRound: applicationPeriod.id,
+      applicationRound: applicationRound.id,
       ...(searchTerm && { search: searchTerm }),
       ...(purpose && { purpose: purpose.value }),
       ...(reservationUnitType && {
@@ -303,7 +303,7 @@ const ReservationUnitModal = ({
   return (
     <MainContainer>
       <Heading>{t('ReservationUnitModal.heading')}</Heading>
-      <Text>{applicationPeriod.name}</Text>
+      <Text>{applicationRound.name}</Text>
       <Filters>
         <TextInput
           id="reservationUnitSearch.search"

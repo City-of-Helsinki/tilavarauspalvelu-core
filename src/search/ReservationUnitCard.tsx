@@ -12,13 +12,11 @@ import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { ReservationUnit } from '../common/types';
 import { localizedValue } from '../common/util';
-import {
-  SelectionsListContext,
-  SelectionsListContextType,
-} from '../context/SelectionsListContext';
 
 interface Props {
   reservationUnit: ReservationUnit;
+  selectReservationUnit: (reservationUnit: ReservationUnit) => void;
+  containsReservationUnit: (reservationUnit: ReservationUnit) => boolean;
 }
 
 const Container = styled.div`
@@ -65,10 +63,11 @@ const Actions = styled.div`
   align-items: flex-end;
 `;
 
-const ReservationUnitCard = ({ reservationUnit }: Props): JSX.Element => {
-  const { addReservationUnit, containsReservationUnit } = React.useContext(
-    SelectionsListContext
-  ) as SelectionsListContextType;
+const ReservationUnitCard = ({
+  reservationUnit,
+  selectReservationUnit,
+  containsReservationUnit,
+}: Props): JSX.Element => {
   const { t, i18n } = useTranslation();
 
   return (
@@ -112,7 +111,7 @@ const ReservationUnitCard = ({ reservationUnit }: Props): JSX.Element => {
         <Button
           disabled={containsReservationUnit(reservationUnit)}
           iconLeft={<IconPlus />}
-          onClick={() => addReservationUnit(reservationUnit)}
+          onClick={() => selectReservationUnit(reservationUnit)}
           variant="secondary">
           {t('common.selectReservationUnit')}
         </Button>

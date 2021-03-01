@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { Application as ApplicationType, FormType } from '../../common/types';
+import {
+  Application,
+  Application as ApplicationType,
+  FormType,
+} from '../../common/types';
 import CompanyForm from './CompanyForm';
 import IndividualForm from './IndividualForm';
 import OrganisationForm from './OrganisationForm';
@@ -8,7 +12,7 @@ import RadioButtons from './RadioButtons';
 
 type Props = {
   application: ApplicationType;
-  onNext: () => void;
+  onNext: (appToSave: Application) => void;
 };
 
 const typeForm = {

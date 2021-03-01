@@ -13,12 +13,13 @@ import RadioButtons from './RadioButtons';
 import EmailInput from './EmailInput';
 import BillingAddress from './BillingAddress';
 import Buttons from './Buttons';
+import { deepCopy } from '../../common/util';
 
 type Props = {
   activeForm: FormType;
   setActiveForm: (id: FormType) => void;
   application: Application;
-  onNext: () => void;
+  onNext: (appToSave: Application) => void;
 };
 
 const IndividualForm = ({
@@ -36,25 +37,29 @@ const IndividualForm = ({
     },
   });
 
+  const prepareData = (data: Application): Application => {
+    const applicationCopy = deepCopy(application);
+
+    applicationCopy.applicantType = 'individual';
+    if (!applicationCopy.contactPerson) {
+      applicationCopy.contactPerson = {} as ContactPerson;
+    }
+    applicationCopy.contactPerson = data.contactPerson;
+
+    if (!applicationCopy.billingAddress) {
+      applicationCopy.billingAddress = {} as Address;
+    }
+
+    applicationCopy.organisation = null;
+    applicationCopy.billingAddress = data.billingAddress;
+
+    return applicationCopy;
+  };
+
   const onSubmit = (data: Application): void => {
-    // todo create copy and edit that
-    // eslint-disable-next-line
-    application.applicantType = 'individual';
-    if (!application.contactPerson) {
-      // eslint-disable-next-line
-      application.contactPerson = {} as ContactPerson;
-    }
-    Object.assign(application.contactPerson, data.contactPerson);
+    const appToSave = prepareData(data);
 
-    if (!application.billingAddress) {
-      // eslint-disable-next-line
-      application.billingAddress = {} as Address;
-    }
-
-    // eslint-disable-next-line
-    application.organisation = null;
-    Object.assign(application.billingAddress, data.billingAddress);
-    onNext();
+    onNext(appToSave);
   };
 
   return (

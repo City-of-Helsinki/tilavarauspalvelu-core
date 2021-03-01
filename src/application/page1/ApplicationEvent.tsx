@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import ReservationUnitList from './ReservationUnitList';
 import {
   ApplicationEvent as ApplicationEventType,
-  ApplicationPeriod,
+  ApplicationRound,
   OptionType,
   ReservationUnit,
 } from '../../common/types';
@@ -27,7 +27,7 @@ type OptionTypes = {
 type Props = {
   applicationEvent: ApplicationEventType;
   index: number;
-  applicationPeriod: ApplicationPeriod;
+  applicationRound: ApplicationRound;
   form: ReturnType<typeof useForm>;
   selectedReservationUnits: ReservationUnit[];
   optionTypes: OptionTypes;
@@ -78,15 +78,15 @@ const SpanTwoColumns = styled.span`
 const ApplicationEvent = ({
   applicationEvent,
   index,
-  applicationPeriod,
+  applicationRound,
   form,
   selectedReservationUnits,
   optionTypes,
 }: Props): JSX.Element => {
   const periodStartDate = formatApiDate(
-    applicationPeriod.applicationPeriodBegin
+    applicationRound.applicationPeriodBegin
   );
-  const periodEndDate = formatApiDate(applicationPeriod.applicationPeriodEnd);
+  const periodEndDate = formatApiDate(applicationRound.applicationPeriodEnd);
   const defaultDuration = '1';
 
   const [defaultPeriodSelected, setDefaultPeriodSelected] = useState(false);
@@ -225,7 +225,7 @@ const ApplicationEvent = ({
       <ReservationUnitList
         selectedReservationUnits={selectedReservationUnits}
         applicationEvent={applicationEvent}
-        applicationPeriod={applicationPeriod}
+        applicationRound={applicationRound}
         form={form}
         fieldName={fieldName('eventReservationUnits')}
         options={{ purposeOptions, reservationUnitTypeOptions }}
@@ -255,8 +255,8 @@ const ApplicationEvent = ({
           id="defaultPeriod"
           checked={defaultPeriodSelected}
           label={`${formatDate(
-            applicationPeriod.applicationPeriodBegin
-          )} - ${formatDate(applicationPeriod.applicationPeriodEnd)}`}
+            applicationRound.applicationPeriodBegin
+          )} - ${formatDate(applicationRound.applicationPeriodEnd)}`}
           onChange={selectDefaultPeriod}
           disabled={defaultPeriodSelected}
         />

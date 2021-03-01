@@ -148,11 +148,14 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
 
   return ready ? (
     <>
-      <Accordion heading={t('Application.preview.basicInfoSubHeading')}>
+      <Accordion
+        id="basicInfo"
+        heading={t('Application.preview.basicInfoSubHeading')}>
         <ApplicantInfoPreview application={application} />
       </Accordion>
-      {application.applicationEvents.map((applicationEvent) => (
+      {application.applicationEvents.map((applicationEvent, i) => (
         <Accordion
+          id={`applicationEvent-${i}`}
           key={applicationEvent.id}
           heading={applicationEvent.name || ''}>
           <TwoColumnContainer>

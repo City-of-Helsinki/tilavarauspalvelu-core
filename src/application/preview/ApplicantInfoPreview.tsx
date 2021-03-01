@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Application } from '../../common/types';
-import { TwoColumnContainer } from '../../component/common';
+import { SpanTwoColumns, TwoColumnContainer } from '../../component/common';
 import LabelValue from '../../component/LabelValue';
 import Address from './AddressPreview';
 
@@ -21,9 +21,19 @@ const ApplicantInfoPreview = ({
             value={application.organisation?.name}
           />
           <LabelValue
-            label={t('Application.preview.organisation.coreBusiness')}
-            value={application.organisation?.coreBusiness}
+            label={t('Application.preview.applicantTypeLabel')}
+            value={String(
+              t(
+                `Application.preview.applicantType.${application.applicantType}`
+              )
+            )}
           />
+          <SpanTwoColumns>
+            <LabelValue
+              label={t('Application.preview.organisation.coreBusiness')}
+              value={application.organisation?.coreBusiness}
+            />
+          </SpanTwoColumns>
           <Address
             address={application.organisation?.address}
             i18nMessagePrefix="common.address"

@@ -4,12 +4,12 @@ import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import Card from '../component/Card';
-import { ApplicationPeriod } from '../common/types';
-import { applicationPeriodState, formatDate, searchUrl } from '../common/util';
+import { ApplicationRound } from '../common/types';
+import { applicationRoundState, formatDate, searchUrl } from '../common/util';
 import { breakpoint } from '../common/style';
 
 interface Props {
-  applicationPeriod: ApplicationPeriod;
+  applicationRound: ApplicationRound;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -65,36 +65,36 @@ const CardButton = styled(({ noLeftMargin, ...rest }) => <Button {...rest} />)`
   `}
 `;
 
-const ApplicationPeriodCard = ({ applicationPeriod }: Props): JSX.Element => {
+const ApplicationRoundCard = ({ applicationRound }: Props): JSX.Element => {
   const { t } = useTranslation();
   const history = useHistory();
 
-  const state = applicationPeriodState(
-    applicationPeriod.applicationPeriodEnd,
-    applicationPeriod.applicationPeriodEnd
+  const state = applicationRoundState(
+    applicationRound.applicationPeriodEnd,
+    applicationRound.applicationPeriodEnd
   );
 
   return (
     <StyledCard
-      aria-label={applicationPeriod.name}
+      aria-label={applicationRound.name}
       border
       act={state === 'active' ? true : undefined}>
       <StyledContainer>
-        <Name>{applicationPeriod.name}</Name>
+        <Name>{applicationRound.name}</Name>
         <div>
           {state === 'pending' &&
-            t('ApplicationPeriodCard.pending', {
+            t('ApplicationRoundCard.pending', {
               openingDateTime: formatDate(
-                applicationPeriod.applicationPeriodBegin
+                applicationRound.applicationPeriodBegin
               ),
             })}
           {state === 'active' &&
-            t('ApplicationPeriodCard.open', {
-              until: formatDate(applicationPeriod.applicationPeriodEnd),
+            t('ApplicationRoundCard.open', {
+              until: formatDate(applicationRound.applicationPeriodEnd),
             })}
           {state === 'past' &&
-            t('ApplicationPeriodCard.past', {
-              closingDate: formatDate(applicationPeriod.applicationPeriodEnd),
+            t('ApplicationRoundCard.past', {
+              closingDate: formatDate(applicationRound.applicationPeriodEnd),
             })}
         </div>
         <CardButton
@@ -102,32 +102,32 @@ const ApplicationPeriodCard = ({ applicationPeriod }: Props): JSX.Element => {
           variant="supplementary"
           iconLeft={<IconArrowRight />}
           disabled>
-          {t('ApplicationPeriodCard.criteria')}
+          {t('ApplicationRoundCard.criteria')}
         </CardButton>
       </StyledContainer>
       {state === 'pending' && (
         <CardButton iconLeft={<IconClock />} variant="secondary" disabled>
-          {t('ApplicationPeriodCard.reminderButton')}
+          {t('ApplicationRoundCard.reminderButton')}
         </CardButton>
       )}
       {state === 'active' && (
         <CardButton
           onClick={() =>
-            history.push(searchUrl({ applicationRound: applicationPeriod.id }))
+            history.push(searchUrl({ applicationRound: applicationRound.id }))
           }>
-          {t('ApplicationPeriodCard.applyButton')}
+          {t('ApplicationRoundCard.applyButton')}
         </CardButton>
       )}
       {state === 'past' && (
         <CardButton
           onClick={() =>
-            history.push(searchUrl({ applicationRound: applicationPeriod.id }))
+            history.push(searchUrl({ applicationRound: applicationRound.id }))
           }>
-          {t('ApplicationPeriodCard.displayPastButton')}
+          {t('ApplicationRoundCard.displayPastButton')}
         </CardButton>
       )}
     </StyledCard>
   );
 };
 
-export default ApplicationPeriodCard;
+export default ApplicationRoundCard;

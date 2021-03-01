@@ -7,6 +7,7 @@ import { getReservationUnit } from '../common/api';
 import Head from './Head';
 import { routeData } from '../common/const';
 import Address from './Address';
+import StartApplicationBar from '../component/StartApplicationBar';
 
 type ParamTypes = {
   id: string;
@@ -58,6 +59,7 @@ const ReservationUnit = (): JSX.Element | null => {
           </div>
         </TwoColoumnLayout>
       </Container>
+      <StartApplicationBar count={0} />
     </>
   ) : null;
 };

@@ -1,14 +1,15 @@
-import { Button, IconArrowLeft, IconArrowRight } from 'hds-react';
+import { Accordion, Button, IconArrowLeft, IconArrowRight } from 'hds-react';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDebounce } from 'use-debounce';
 import styled from 'styled-components';
 import { Application, ApplicationEventSchedule } from '../../common/types';
 import TimeSelector, { Cell } from './TimeSelector';
+import { deepCopy } from '../../common/util';
 
 type Props = {
   application: Application;
-  onNext: () => void;
+  onNext: (appToSave: Application) => void;
 };
 
 const cellLabel = (row: number): string => {
@@ -118,32 +119,42 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
 
   const { t } = useTranslation();
 
-  const next = () => {
-    application.applicationEvents.forEach((applicationEvent, i) => {
-      // eslint-disable-next-line no-param-reassign
-      applicationEvent.applicationEventSchedules.length = 0;
+  const prepareData = (data: Application): Application => {
+    const applicationCopy = deepCopy(data);
+
+    applicationCopy.applicationEvents.forEach((applicationEvent, i) => {
+      applicationCopy.applicationEvents[i].applicationEventSchedules.length = 0;
       cellsToApplicationEventSchedules(selectorData[i]).forEach((e) =>
         applicationEvent.applicationEventSchedules.push(e)
       );
     });
-    onNext();
+    return applicationCopy;
+  };
+
+  const onSubmit = () => {
+    const appToSave = prepareData(application);
+    onNext(appToSave);
   };
 
   return (
     <>
       {application.applicationEvents.map((event, index) => {
         return (
-          <TimeSelector
-            key={event.id || 'NEW'}
-            applicationEvent={event}
-            index={index}
-            cells={selectorData[index]}
-            updateCells={updateCells}
-            copyCells={copyCells}
-            summaryData={cellsToApplicationEventSchedules(
-              debouncedSelectorData[index]
-            )}
-          />
+          <Accordion
+            key={event.id}
+            id={`timeSelector-${index}`}
+            heading={event.name || undefined}>
+            <TimeSelector
+              key={event.id || 'NEW'}
+              index={index}
+              cells={selectorData[index]}
+              updateCells={updateCells}
+              copyCells={copyCells}
+              summaryData={cellsToApplicationEventSchedules(
+                debouncedSelectorData[index]
+              )}
+            />
+          </Accordion>
         );
       })}
 
@@ -151,7 +162,10 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
         <Button variant="secondary" iconLeft={<IconArrowLeft />} disabled>
           {t('common.prev')}
         </Button>
-        <Button id="next" iconRight={<IconArrowRight />} onClick={() => next()}>
+        <Button
+          id="next"
+          iconRight={<IconArrowRight />}
+          onClick={() => onSubmit()}>
           {t('common.next')}
         </Button>
       </ButtonContainer>

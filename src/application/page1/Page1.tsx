@@ -10,20 +10,21 @@ import { useForm } from 'react-hook-form';
 import styled from 'styled-components';
 import ApplicationEvent from './ApplicationEvent';
 import {
+  Application,
   Application as ApplicationType,
-  ApplicationPeriod,
+  ApplicationRound,
   OptionType,
   ReservationUnit,
 } from '../../common/types';
-import { mapOptions } from '../../common/util';
+import { deepCopy, mapOptions } from '../../common/util';
 import { getParameters } from '../../common/api';
 import { breakpoint } from '../../common/style';
 
 type Props = {
-  applicationPeriod: ApplicationPeriod;
+  applicationRound: ApplicationRound;
   application: ApplicationType;
   selectedReservationUnits: ReservationUnit[];
-  onNext?: () => void;
+  onNext?: (appToSave: Application) => void;
   addNewApplicationEvent: () => void;
 };
 
@@ -61,7 +62,7 @@ const ButtonContainer = styled.div`
 const Page1 = ({
   onNext,
   addNewApplicationEvent,
-  applicationPeriod,
+  applicationRound,
   application,
   selectedReservationUnits,
 }: Props): JSX.Element | null => {
@@ -111,18 +112,24 @@ const Page1 = ({
     fetchData();
   }, []);
 
-  const prepareSave = (data: ApplicationType) => {
-    application.applicationEvents.forEach((event, index) =>
-      Object.assign(event, data.applicationEvents[index])
-    );
+  const prepareData = (data: ApplicationType): ApplicationType => {
+    const applicationCopy = {
+      ...deepCopy(application),
+      applicationEvents: application.applicationEvents.map(
+        (appEvent, index) => ({
+          ...appEvent,
+          ...data.applicationEvents[index],
+        })
+      ),
+    };
+    return applicationCopy;
   };
 
-  // todo rename this function
   const onSubmit = (data: ApplicationType) => {
-    prepareSave(data);
+    const appToSave = prepareData(data);
 
     if (onNext) {
-      onNext();
+      onNext(appToSave);
     }
   };
 
@@ -133,7 +140,6 @@ const Page1 = ({
     ) {
       return;
     }
-    prepareSave(data);
     addNewApplicationEvent();
   };
 
@@ -150,7 +156,7 @@ const Page1 = ({
             form={form}
             applicationEvent={event}
             index={index}
-            applicationPeriod={applicationPeriod}
+            applicationRound={applicationRound}
             optionTypes={optionTypes}
             selectedReservationUnits={selectedReservationUnits}
           />
@@ -170,6 +176,7 @@ const Page1 = ({
         <Button
           id="next"
           iconRight={<IconArrowRight />}
+          disabled={application.applicationEvents.length === 0}
           onClick={() => form.handleSubmit(onSubmit)()}>
           {t('common.next')}
         </Button>

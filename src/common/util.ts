@@ -19,7 +19,7 @@ const isPast = (endDate: string): boolean => {
   return isAfter(now, parseISO(endDate));
 };
 
-export const applicationPeriodState = (
+export const applicationRoundState = (
   startDate: string,
   endDate: string
 ): 'pending' | 'active' | 'past' => {
@@ -35,14 +35,14 @@ export const applicationPeriodState = (
 
 export const formatDate = (date: string): string => {
   if (!date) {
-    return 'undefined || null';
+    return 'no date';
   }
   return format(parseISO(date), 'd. M. yyyy');
 };
 
 export const formatApiDate = (date: string): string => {
   if (!date) {
-    return 'undefined || null';
+    return 'no date';
   }
   return format(parseISO(date), 'yyyy-MM-dd');
 };
@@ -109,3 +109,7 @@ export const searchUrl = (params: ReservationUnitsParameters): string =>
   `${searchPrefix}/?${stringify(params)}`;
 
 export const applicationsUrl = `${applicationsPrefix}/`;
+
+export function deepCopy<T>(src: T): T {
+  return JSON.parse(JSON.stringify(src));
+}

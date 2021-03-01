@@ -5,11 +5,6 @@ import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import Container from './Container';
 
-import {
-  SelectionsListContext,
-  SelectionsListContextType,
-} from '../context/SelectionsListContext';
-
 const BackgroundContainer = styled.div`
   background-color: var(--color-bus);
   position: fixed;
@@ -37,13 +32,14 @@ const InnerContainer = styled.div`
   color: var(--color-white);
 `;
 
-const StartApplicationBar = (): JSX.Element | null => {
+type Props = {
+  count: number;
+};
+
+const StartApplicationBar = ({ count }: Props): JSX.Element | null => {
   const { t } = useTranslation();
-  const { reservationUnits } = React.useContext(
-    SelectionsListContext
-  ) as SelectionsListContextType;
   const history = useHistory();
-  if (reservationUnits.length === 0) {
+  if (count === 0) {
     return null;
   }
 
@@ -52,7 +48,7 @@ const StartApplicationBar = (): JSX.Element | null => {
       <Container style={{ padding: 'var(--spacing-m) var(--spacing-m)' }}>
         <InnerContainer>
           <ReservationUnitCount id="reservationUnitCount">
-            {t('shoppingCart.count', { count: reservationUnits.length })}
+            {t('shoppingCart.count', { count })}
           </ReservationUnitCount>
           <Button
             id="startApplicationButton"

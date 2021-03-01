@@ -1,14 +1,13 @@
-import { Accordion, Button, IconArrowLeft } from 'hds-react';
+import { Button, IconArrowLeft } from 'hds-react';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
-import { ApplicationEvent, ApplicationEventSchedule } from '../../common/types';
+import { ApplicationEventSchedule } from '../../common/types';
 import TimePreview from '../TimePreview';
 import { weekdays } from '../../common/const';
 import { breakpoint } from '../../common/style';
 
 type Props = {
-  applicationEvent: ApplicationEvent;
   index: number;
   cells: Cell[][];
   updateCells: (i: number, cells: Cell[][]) => void;
@@ -196,7 +195,6 @@ const cellTypes = [
 ];
 
 const TimeSelector = ({
-  applicationEvent,
   cells,
   updateCells,
   copyCells,
@@ -219,8 +217,8 @@ const TimeSelector = ({
     );
   };
 
-  const r = (
-    <Accordion heading={applicationEvent.name || undefined}>
+  return (
+    <>
       <CalendarContainer
         onMouseLeave={() => {
           setPainting(false);
@@ -261,10 +259,8 @@ const TimeSelector = ({
           {t('Application.Page2.copyTimes')}
         </Button>
       </ButtonContainer>
-    </Accordion>
+    </>
   );
-
-  return r;
 };
 
 export default TimeSelector;

@@ -1,23 +1,23 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { ApplicationPeriod } from '../common/types';
+import { ApplicationRound } from '../common/types';
 import { isActive } from '../common/util';
 import Container from '../component/Container';
 
 type Props = {
-  applicationPeriod: ApplicationPeriod | null;
+  applicationRound: ApplicationRound | null;
 };
 
-const Head = ({ applicationPeriod }: Props): JSX.Element | null => {
+const Head = ({ applicationRound }: Props): JSX.Element | null => {
   const { t } = useTranslation();
 
-  if (applicationPeriod === null) {
+  if (applicationRound === null) {
     return null;
   }
   if (
     isActive(
-      applicationPeriod.applicationPeriodBegin,
-      applicationPeriod.applicationPeriodEnd
+      applicationRound.applicationPeriodBegin,
+      applicationRound.applicationPeriodEnd
     ) === false
   ) {
     return null;
