@@ -9,7 +9,7 @@ import styled from "styled-components";
 import { useHistory } from "react-router-dom";
 import MainMenu from "./MainMenu";
 import { breakpoints, StyledHDSNavigation } from "../styles/util";
-import { defaultLanguage } from "../common/const";
+import { authEnabled, defaultLanguage } from "../common/const";
 
 interface NavigationProps {
   profile: Profile | null;
@@ -162,26 +162,13 @@ const Navigation = ({
   );
 };
 
-interface INavigationWithProfileAndLogoutProps {
-  authEnabled: boolean;
-}
+const NavigationWithProfileAndLogout = authEnabled
+  ? () => {
+      const { oidcUser, logout } = useReactOidc();
+      const profile = oidcUser ? oidcUser.profile : null;
 
-function NavigationWithProfileAndLogout({
-  authEnabled,
-}: INavigationWithProfileAndLogoutProps): JSX.Element {
-  const { oidcUser, login, logout } = useReactOidc();
-  if (authEnabled) {
-    const profile = oidcUser ? oidcUser.profile : null;
-    return (
-      <Navigation
-        profile={profile}
-        login={() => login()}
-        logout={() => logout()}
-      />
-    );
-  }
-
-  return <Navigation profile={null} />;
-}
+      return <Navigation profile={profile} logout={() => logout()} />;
+    }
+  : () => <Navigation profile={null} />;
 
 export default NavigationWithProfileAndLogout;

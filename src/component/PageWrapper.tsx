@@ -1,7 +1,6 @@
 import React, { ErrorInfo } from "react";
 import styled from "styled-components";
 import Navigation from "./Navigation";
-import { authEnabled } from "../common/const";
 
 interface IProps {
   children: React.ReactNode;
@@ -39,7 +38,7 @@ export default class PageWrapper extends React.Component<IProps, IState> {
 
     return (
       <>
-        <Navigation authEnabled={authEnabled} />
+        <Navigation />
         <Content>{content}</Content>
       </>
     );
