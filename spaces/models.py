@@ -258,11 +258,11 @@ class Location(models.Model):
 
     @property
     def lat(self):
-        return self.coordinates.y if self.coordinates else None
+        return self.coordinates.x if self.coordinates else None
 
     @property
     def lon(self):
-        return self.coordinates.x if self.coordinates else None
+        return self.coordinates.y if self.coordinates else None
 
     def __str__(self):
         return "{}, {} {}".format(
