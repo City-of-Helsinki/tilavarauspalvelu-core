@@ -147,8 +147,10 @@ class AllocationData(object):
         period_end: datetime.date,
         baskets: Dict[int, List[AllocationBasket]],
         spaces: Dict[int, List[AllocationSpace]],
+        output_basket_ids: [int] = [],
     ):
         self.period_start = period_start
         self.period_end = period_end
         self.spaces = spaces
         self.baskets = baskets
+        self.output_basket_ids = output_basket_ids

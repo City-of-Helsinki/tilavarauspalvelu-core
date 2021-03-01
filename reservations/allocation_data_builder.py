@@ -16,12 +16,12 @@ from reservations.allocation_models import (
 
 class AllocationDataBuilder(object):
     def __init__(
-        self, application_round: ApplicationRound, included_baskets: [int] = []
+        self, application_round: ApplicationRound, output_basket_ids: [int] = []
     ):
         self.period_start: datetime.date = application_round.reservation_period_begin
         self.period_end: datetime.date = application_round.reservation_period_end
         self.application_round = application_round
-        self.included_baskets = included_baskets
+        self.output_basket_ids = output_basket_ids
         self.baskets = {}
 
     def get_allocation_data(self):
@@ -37,6 +37,7 @@ class AllocationDataBuilder(object):
             period_end=self.period_end,
             spaces=spaces,
             baskets=self.baskets,
+            output_basket_ids=self.output_basket_ids,
         )
 
     def get_allocation_events(
