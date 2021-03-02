@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { BrowserRouter, Redirect, Route, Switch } from "react-router-dom";
+// eslint-disable-next-line import/no-unresolved
+import { withOidcSecure } from "@axa-fr/react-oidc-context";
 import Applications from "./component/Applications/Applications";
 import ApplicationRound from "./component/Applications/Individual/ApplicationRound";
 import PageWrapper from "./component/PageWrapper";
@@ -8,6 +10,16 @@ import { UIContext, UIContextType } from "./context/UIContext";
 import Modal from "./component/Modal";
 import Application from "./component/Applications/Application";
 import ApplicationDetails from "./component/Applications/ApplicationDetails";
+
+interface IPrivateRouteProps {
+  path: string;
+  component: React.FunctionComponent;
+  exact?: boolean;
+}
+
+function PrivateRoute({ component, ...rest }: IPrivateRouteProps): JSX.Element {
+  return <Route {...rest} component={withOidcSecure(component)} />;
+}
 
 function App(): JSX.Element {
   const [modalContent, setModalContent] = useState<UIContextType | null>(null);
@@ -33,18 +45,21 @@ function App(): JSX.Element {
             <Route exact path="/">
               <Redirect to="/applications" />
             </Route>
-            <Route exact path="/applications">
-              <Applications />
-            </Route>
-            <Route exact path="/application/:applicationId">
-              <Application />
-            </Route>
-            <Route exact path="/application/:applicationId/details">
-              <ApplicationDetails />
-            </Route>
-            <Route path="/applicationRounds/:applicationRoundId">
-              <ApplicationRound />
-            </Route>
+            <PrivateRoute exact path="/applications" component={Applications} />
+            <PrivateRoute
+              exact
+              path="/application/:applicationId"
+              component={Application}
+            />
+            <PrivateRoute
+              exact
+              path="/application/:applicationId/details"
+              component={ApplicationDetails}
+            />
+            <PrivateRoute
+              path="/applicationRounds/:applicationRoundId"
+              component={ApplicationRound}
+            />
           </Switch>
         </PageWrapper>
         {modalContent && <Modal>{modalContent}</Modal>}

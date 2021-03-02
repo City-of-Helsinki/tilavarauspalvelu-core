@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@axa-fr/react-oidc-context": "^3.1.6",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
@@ -27,6 +28,7 @@
     "i18next": "^19.8.4",
     "lodash": "^4.17.20",
     "node-sass": "^4.0.0",
+    "oidc-client": "^1.11.5",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-i18next": "^11.8.5",

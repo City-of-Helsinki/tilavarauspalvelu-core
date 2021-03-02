@@ -1,3 +1,5 @@
+# tilavarauspalvelu-admin-ui
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Prerequisites
@@ -40,6 +42,16 @@ You can also manually add test data by visiting the django admin at http://127.0
 docker exec -ti tilavarauspalvelu-core_dev_1 python manage.py createsuperuser
 ```
 
+## Configurable environment variables
+
+Use `.env.local` for development.
+
+| Name                         | Description                                    |
+| ---------------------------- | ---------------------------------------------- |
+| REACT_APP_TILAVARAUS_API_URL | tilavaraus-core base url                       |
+| REACT_APP_OIDC_CLIENT_ID     | Oidc client id                                 |
+| REACT_APP_DISABLE_AUTH       | Flag to disable authentication                 |
+|
 ## Available Scripts
 
 In the project directory, you can run:
