@@ -1,8 +1,8 @@
 from unittest import mock
-from unittest.case import TestCase
 from unittest.mock import MagicMock, Mock
 
 import pytest
+from django.test.testcases import TestCase
 
 from spaces.importers.units import UnitImporter
 from spaces.models import Location, Unit
@@ -48,7 +48,7 @@ class UnitImporterBaseTestCase(TestCase):
         return data
 
     @classmethod
-    def setUpClass(cls):
+    def setUpTestData(cls):
         response_mock.status_code = 200
         response_mock.json = Mock(return_value=cls.get_response_data())
         cls.importer = UnitImporter("")
@@ -92,7 +92,7 @@ class UnitImporterTestCase(UnitImporterBaseTestCase):
 
         unit_too = Unit.objects.get(service_map_id=2)
         self.check_unit_values_vs_data_values(unit_too, data[1])
-        location_too = Location.objects.get(unit=2)
+        location_too = Location.objects.get(unit=unit_too)
         self.check_location_values_vs_data_values(location_too, data[1])
 
     def test_importer_updates_existing_unit(self, mock_response):
@@ -192,7 +192,7 @@ class UnitImporterDefaultsTestCase(UnitImporterBaseTestCase):
         return field_map
 
     @classmethod
-    def setUpClass(cls):
+    def setUpTestData(cls):
         cls.data = cls.get_response_data()
         cls.data[0].pop("desc_fi")
         cls.data[0].pop("email")
