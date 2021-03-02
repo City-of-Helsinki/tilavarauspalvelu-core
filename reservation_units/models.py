@@ -40,7 +40,9 @@ class ReservationUnitType(models.Model):
 
 class ReservationUnit(models.Model):
     name = models.CharField(verbose_name=_("Name"), max_length=255)
-
+    description = models.TextField(
+        verbose_name=_("Description"), max_length=512, blank=True, default=""
+    )
     spaces = models.ManyToManyField(
         Space, verbose_name=_("Spaces"), related_name="reservation_units", blank=True
     )
@@ -62,7 +64,6 @@ class ReservationUnit(models.Model):
         related_name="reservation_units",
         blank=True,
     )
-
     reservation_unit_type = models.ForeignKey(
         ReservationUnitType,
         verbose_name=_("Type"),
@@ -71,21 +72,17 @@ class ReservationUnit(models.Model):
         null=True,
         on_delete=models.SET_NULL,
     )
-
     require_introduction = models.BooleanField(
         verbose_name=_("Require introduction"), default=False
     )
-
     equipments = models.ManyToManyField(
         Equipment,
         verbose_name=_("Equipments"),
         blank=True,
     )
-
     terms_of_use = models.TextField(
         verbose_name=_("Terms of use"), blank=True, max_length=2000
     )
-
     unit = models.ForeignKey(
         Unit,
         verbose_name=_("Unit"),
