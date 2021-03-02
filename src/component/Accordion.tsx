@@ -66,6 +66,7 @@ function Accordion({
   children,
   className,
   style,
+  ...rest
 }: IProps): JSX.Element {
   const [isAccordionOpen, toggleOpenState] = useState(defaultOpen);
 
@@ -76,8 +77,16 @@ function Accordion({
     : `${t("common.open")} ${t("common.accordion")} "${heading}"`;
 
   return (
-    <Wrapper style={style} className={className} $open={isAccordionOpen}>
-      <Heading onClick={() => toggleOpenState(!isAccordionOpen)}>
+    <Wrapper
+      style={style}
+      className={className}
+      $open={isAccordionOpen}
+      {...rest}
+    >
+      <Heading
+        onClick={() => toggleOpenState(!isAccordionOpen)}
+        data-testid="accordion__header"
+      >
         <H2>{heading}</H2>
         <ToggleButton
           type="button"

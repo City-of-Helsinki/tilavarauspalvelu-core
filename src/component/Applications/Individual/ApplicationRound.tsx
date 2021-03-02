@@ -323,7 +323,7 @@ function ApplicationRound(): JSX.Element {
                   </div>
                 </div>
               </Details>
-              <ApplicationCount>
+              <ApplicationCount data-testid="application-count">
                 {applications.length}{" "}
                 {t("Application.application", { count: applications.length })}
               </ApplicationCount>

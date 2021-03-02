@@ -26,17 +26,16 @@ interface IValueBoxProps {
   label: string;
   value: string | undefined | null;
   icon?: ReactNode;
-  className?: string;
 }
 
 function ValueBox({
   label,
   value,
   icon,
-  className,
+  ...rest
 }: IValueBoxProps): JSX.Element {
   return (
-    <Wrapper className={className} $hasIcon={!!icon}>
+    <Wrapper {...rest} $hasIcon={!!icon}>
       <Label>
         {icon}
         {label}
