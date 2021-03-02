@@ -61,6 +61,8 @@ const translations: ITranslations = {
     maxAmount: ["Enintään"],
     option: ["Vaihtoehto"],
     same: ["Sama"],
+    loginWithTunnistamo: ["Kirjaudu palveluun Tunnistamon avulla, kiitos."],
+    noAuthorization: ["Tunnuksellasi ei ole oikeuksia kyseiseen sisältöön."],
   },
   errors: {
     applicationRoundNotFound: ["Haettua hakukierrosta ei löydy"],
@@ -69,6 +71,8 @@ const translations: ITranslations = {
     errorFetchingApplication: ["Virhe haettaessa hakemusta"],
     errorFetchingApplications: ["Virhe haettaessa hakemuksia"],
     errorSavingApplication: ["Virhe tallennettaessa hakemusta"],
+    loginNeeded: ["Kirjautuminen vaaditaan"],
+    authorizationNeeded: ["Oikeudet vaaditaan"],
   },
   MainMenu: {
     applications: ["Hakemukset"],
@@ -87,6 +91,7 @@ const translations: ITranslations = {
   },
   Navigation: {
     login: ["Kirjaudu", "Login", "Logga in"],
+    logout: ["Kirjaudu ulos", "Logout", "Logga ut"],
     profile: ["Profiili", "Profile", "Profil"],
     languageSelection: ["Kielen valinta", "Language selection", "Språkval"],
     skipToMainContent: [
