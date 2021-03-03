@@ -1,10 +1,9 @@
-import { Selector } from "testcafe";
 import config from "./config";
 import application from "./model/application";
 import applicationDetails from "./model/applicationDetails";
 import DataTable from "./model/DataTable";
 import filterControls from "./model/filterControls";
-import Navigation from "./model/Navigation";
+import Navigation from "./model/navigation";
 
 fixture`ApplicationRound handling`.page(`${config.BASE_URL}/applicationRounds`);
 
