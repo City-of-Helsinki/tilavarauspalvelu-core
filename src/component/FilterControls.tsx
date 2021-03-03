@@ -119,9 +119,11 @@ function FilterControls({
           <FilterAccordion
             heading={t(filterAccordion.title)}
             key={filterAccordion.title}
+            data-testid="filter-controls__group"
           >
             {filterAccordion.filters?.map((filter) => (
               <FilterCheckbox
+                data-testid="filter-controls__filter--selector"
                 key={`${filterAccordion.title}${filter.key}${filter.value}`}
                 id={`filter.${filterAccordion.title}.${filter.key}.${filter.value}`}
                 label={t(filter.title)}
@@ -134,6 +136,7 @@ function FilterControls({
       </Content>
       <Footer>
         <ResetButton
+          data-testid="filter-controls__button--reset"
           onClick={() => {
             setPreliminaryFilters([]);
             applyFilters([]);
@@ -144,6 +147,7 @@ function FilterControls({
           {t("common.resetFilters")}
         </ResetButton>
         <ApplyButton
+          data-testid="filter-controls__button--submit"
           onClick={() => {
             applyFilters(preliminaryFilters);
           }}

@@ -69,8 +69,5 @@ module.exports = {
     ],
     "@typescript-eslint/no-empty-function": 0,
   },
-  globals: {
-    cy: true,
-  },
   plugins: ["jsx-a11y"],
 };

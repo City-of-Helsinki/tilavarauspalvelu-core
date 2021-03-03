@@ -278,6 +278,7 @@ function DataTable({
     <Wrapper className={className}>
       <Filters>
         <FilterBtn
+          data-testid="data-table__button--filter-toggle"
           iconLeft={<IconSliders />}
           onClick={() => toggleFilterVisibility(!filtersAreVisible)}
           className={classNames({ filterControlsAreOpen: filtersAreVisible })}
@@ -294,7 +295,7 @@ function DataTable({
         />
       </Filters>
       <TableWrapper>
-        <Table>
+        <Table data-testid="data-table">
           <Heading>
             <Row>
               {cellConfig.cols.map((col) => {

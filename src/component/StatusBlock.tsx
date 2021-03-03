@@ -31,6 +31,7 @@ function StatusBlock({ status, view, className }: IProps): JSX.Element {
 
   return (
     <Wrapper
+      data-testid="status-block__wrapper"
       $color={getStatusColor(normalizedStatus, "l")}
       className={className}
     >

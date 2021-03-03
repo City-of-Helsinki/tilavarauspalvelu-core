@@ -15,7 +15,7 @@ import { ContentHeading, H2, H3 } from "../../styles/typography";
 import withMainMenu from "../withMainMenu";
 import LinkPrev from "../LinkPrev";
 import { ReactComponent as IconCustomers } from "../../images/icon_customers.svg";
-import { formatNumber } from "../../common/util";
+import { formatNumber, parseDuration } from "../../common/util";
 import StatusBlock from "../StatusBlock";
 
 interface IRouteParams {
@@ -251,10 +251,13 @@ function Application(): JSX.Element | null {
             />
           </ContentContainer>
           <NarrowContainer>
-            <StyledLink to={`/application/${application.id}/details`}>
+            <StyledLink
+              to={`/application/${application.id}/details`}
+              data-testid="application__link--details"
+            >
               {t("ApplicationRound.showClientApplication")}
             </StyledLink>
-            <Heading>
+            <Heading data-testid="application__heading--main">
               <CustomerIcon>
                 <IconCustomers />
               </CustomerIcon>
@@ -262,7 +265,7 @@ function Application(): JSX.Element | null {
             </Heading>
             <ApplicantType>
               <dt>{t("Application.applicantType")}:</dt>
-              <dd>
+              <dd data-testid="application__data--applicant-type">
                 {application.applicantType &&
                   t(`Application.applicantTypes.${application.applicantType}`)}
               </dd>
@@ -289,7 +292,7 @@ function Application(): JSX.Element | null {
                   <tbody>
                     <tr>
                       <th>{t("Organisation.activeParticipants")}</th>
-                      <td>
+                      <td data-testid="application__data--participants">
                         {`${formatNumber(
                           application.organisation?.activeMembers,
                           t("common.volumeUnit")
@@ -307,16 +310,15 @@ function Application(): JSX.Element | null {
                   <tbody>
                     <tr>
                       <th>{t("ApplicationRound.appliedReservations")}</th>
-                      <td>{`${formatNumber(
+                      <td data-testid="application__data--reservations-total">{`${formatNumber(
                         application.aggregatedData.reservationsTotal,
                         t("common.volumeUnit")
                       )}`}</td>
                     </tr>
                     <tr>
                       <th>{t("ApplicationRound.totalReservationTime")}</th>
-                      <td>{`${formatNumber(
-                        application.aggregatedData.minDurationTotal,
-                        t("common.hoursUnit")
+                      <td data-testid="application__data--min-duration-total">{`${parseDuration(
+                        application.aggregatedData.minDurationTotal
                       )}`}</td>
                     </tr>
                   </tbody>
@@ -327,6 +329,7 @@ function Application(): JSX.Element | null {
           <ContentContainer>
             {action.function && (
               <ActionButton
+                data-testid="application__button--toggle-state"
                 id="submit"
                 variant={action.button}
                 onClick={() =>

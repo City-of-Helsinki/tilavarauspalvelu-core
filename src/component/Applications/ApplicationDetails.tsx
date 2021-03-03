@@ -165,7 +165,7 @@ function ApplicationDetails(): JSX.Element | null {
           </ContentContainer>
           <HeadingContainer>
             <ApplicationId>{t("Application.applicationId")} TODO</ApplicationId>
-            <Heading>
+            <Heading data-testid="application-details__heading--main">
               <CustomerIcon>
                 <IconCustomers />
               </CustomerIcon>
@@ -173,7 +173,7 @@ function ApplicationDetails(): JSX.Element | null {
             </Heading>
             <DefinitionList>
               <dt>{t("Application.applicantType")}:</dt>
-              <dd>
+              <dd data-testid="application-details__data--applicant-type">
                 {application.applicantType &&
                   t(`Application.applicantTypes.${application.applicantType}`)}
               </dd>
