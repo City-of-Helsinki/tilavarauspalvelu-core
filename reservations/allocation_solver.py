@@ -76,6 +76,7 @@ class AllocationSolutionPrinter(object):
         ends,
         baskets,
         selected={},
+        output_basket_ids: [int] = [],
     ):
         self.model = model
         self.selected = selected
@@ -83,6 +84,7 @@ class AllocationSolutionPrinter(object):
         self.starts = starts
         self.ends = ends
         self.baskets = baskets
+        self.output_basket_ids = output_basket_ids
 
     def print_solution(self):
         solver = cp_model.CpSolver()
@@ -101,6 +103,9 @@ class AllocationSolutionPrinter(object):
                                 self.selected[
                                     (space.id, basket.id, event.id, occurrence_id)
                                 ]
+                            ) and (
+                                len(self.output_basket_ids) == 0
+                                or basket.id in self.output_basket_ids
                             ):
                                 logger.info(
                                     "Space ",
@@ -147,6 +152,7 @@ class AllocationSolver(object):
         self.baskets = allocation_data.baskets
         self.starts = {}
         self.ends = {}
+        self.output_basket_ids = allocation_data.output_basket_ids
 
     def solve(self):
         model = cp_model.CpModel()
@@ -178,6 +184,7 @@ class AllocationSolver(object):
             starts=self.starts,
             ends=self.ends,
             baskets=self.baskets,
+            output_basket_ids=self.output_basket_ids,
         )
         return printer.print_solution()
 
