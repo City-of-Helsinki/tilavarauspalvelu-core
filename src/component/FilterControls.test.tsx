@@ -45,7 +45,7 @@ test("Filter Controls", async () => {
   const { getByTestId, getAllByTestId } = render(
     <FilterControls
       filters={[]}
-      visible={true}
+      visible
       applyFilters={() => {}}
       config={filterConfig}
     />
@@ -88,8 +88,7 @@ test("Filter Controls", async () => {
   await waitFor(() => {
     group1Filters.forEach((filter) => expect(filter).not.toBeVisible);
     group2Filters.forEach((filter) => {
-      expect(filter).toBeVisible;
-      expect(filter).not.toBeChecked;
+      expect(filter).not.toBeChecked();
     });
     expect(resetButton).not.toBeDisabled();
     expect(submitButton).not.toBeDisabled();

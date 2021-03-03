@@ -41,6 +41,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "start:noauth": "REACT_APP_DISABLE_AUTH=true react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "test:e2e-local": "testcafe --skip-js-errors \"chrome --window-size='1920,1080'\" e2e/tests",
