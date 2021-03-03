@@ -54,6 +54,7 @@ pyrsistent==0.17.3
 pytest==6.1.2
 pytest-cov==2.10.1
 pytest-django==4.1.0
+pytest-factoryboy===2.1.0
 python-dateutil==2.6.0      # resolved version due to django-auditlog, probably not safe to update
 pytz==2020.1
 PyYAML==5.4.1
