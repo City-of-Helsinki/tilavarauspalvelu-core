@@ -3,7 +3,7 @@ import { BrowserRouter, Redirect, Route, Switch } from "react-router-dom";
 // eslint-disable-next-line import/no-unresolved
 import { withOidcSecure } from "@axa-fr/react-oidc-context";
 import Applications from "./component/Applications/Applications";
-import ApplicationRound from "./component/Applications/Individual/ApplicationRound";
+import ApplicationRound from "./component/ApplicationRound/ApplicationRound";
 import PageWrapper from "./component/PageWrapper";
 import "./i18n";
 import { UIContext, UIContextType } from "./context/UIContext";

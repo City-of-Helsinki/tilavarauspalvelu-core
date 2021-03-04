@@ -2,7 +2,9 @@ export type TranslationObject = {
   [key: string]: string;
 };
 
-export type ApplicationRoundStatus = "draft";
+export type ApplicationRoundStatus = "draft" | "in_review" | "review_done";
+
+export type ApplicationRoundBasket = any;
 
 export type ApplicationRound = {
   id: number;
@@ -16,6 +18,7 @@ export type ApplicationRound = {
   publicDisplayEnd: string;
   purposesIds: number[];
   serviceSectorId: number;
+  applicationRoundBaskets: ApplicationRoundBasket[];
   status: ApplicationRoundStatus;
 };
 

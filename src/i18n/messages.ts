@@ -179,8 +179,21 @@ const translations: ITranslations = {
       draft: [
         "Tarkasta lista ja neuvottele esihenkilösi kanssa mahdollisista hylkäyksistä",
       ],
+      in_review: [
+        "Tarkasta lista ja neuvottele esihenkilösi kanssa mahdollisista hylkäyksistä",
+      ],
+      review_done: ["Käynnistä ehdotusten luominen"],
     },
     roundCriteria: ["Kierroksen kriteerit"],
+    allocatedBasket: ["Jaettava kori"],
+    allocatedBasketHelper: [
+      "Korit ja niiden järjestys on ennalta määritetty. Korin jakaminen tuottaa ehdotuksen, jonka voit hakemus kerrallaan tarkistaa. Jos olet tehnyt hylkäyksiä, käynnistä kori uudelleen ennen seuraavaan koriin siirtymistä.",
+    ],
+    navigateBackToReview: ["Palaa esitarkistusvaiheeseen"],
+    allocateVerb: ["Jaa"],
+    allocateLabel: [
+      "Huomaathan, että et voi enää palata esitarkistusvaiheeseen, jos olet käynnistänyt ehdotusten jakamisen.",
+    ],
   },
   ApplicationEvent: {
     name: ["Vakiovuoron nimi"],
