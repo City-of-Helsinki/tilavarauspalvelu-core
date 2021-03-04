@@ -110,26 +110,17 @@ const ApplicationCount = styled(H2)`
 const getFilterConfig = (
   applications: ApplicationType[]
 ): DataFilterConfig[] => {
-  const coreBusinessValues = uniq(
-    applications
-      .map((app) => app.organisation?.coreBusiness)
-      .filter((app) => app && app.length)
-  );
+  const applicantTypes = uniq(applications.map((app) => app.applicantType));
   const statuses = uniq(applications.map((app) => app.status));
 
   return [
     {
       title: "Application.headings.applicantType",
-    },
-    {
-      title: "Application.headings.coreActivity",
-      filters:
-        coreBusinessValues &&
-        coreBusinessValues.map((coreBusiness) => ({
-          title: coreBusiness || "",
-          key: "organisation.coreBusiness",
-          value: coreBusiness || "",
-        })),
+      filters: applicantTypes.map((value) => ({
+        title: `Application.applicantTypes.${value}`,
+        key: "applicantType",
+        value: value || "",
+      })),
     },
     {
       title: "Application.headings.applicationStatus",
@@ -164,10 +155,6 @@ const getCellConfig = (t: TFunction): CellConfig => {
         key: "applicantType",
         transform: ({ applicantType }: ApplicationType) =>
           applicantType ? t(`Application.applicantTypes.${applicantType}`) : "",
-      },
-      {
-        title: "Application.headings.coreActivity",
-        key: "organisation.coreBusiness",
       },
       {
         title: "Application.headings.applicationCount",
@@ -282,7 +269,7 @@ function ApplicationRound(): JSX.Element {
                 {t("Application.showAllApplications")} TODO
               </NaviItem>
               <NaviItem to="#">
-                {t("Application.settingsAndQuotas")} TODO
+                {t("ApplicationRound.roundCriteria")} TODO
               </NaviItem>
             </ApplicationNavi>
             <Content>

@@ -107,7 +107,6 @@ const translations: ITranslations = {
     application_plural: ["Hakemusta", "Applications"],
     applicantType: ["Asiakastyyppi"],
     showAllApplications: ["Näytä kaikki hakemukset"],
-    settingsAndQuotas: ["Asetukset ja kiintiöt"],
     recommendedStage: ["Suositeltu vaihe"],
     gotoSplitPreparation: ["Siirry valmistelemaan jakoa"],
     iHaveCheckedApplications: ["Olen tarkistanut hakemukset"],
@@ -170,7 +169,6 @@ const translations: ITranslations = {
     roundsInProcessing: ["Käsittelyssä"],
     roundsOpenForApplication: ["Haku avoinna"],
     futureRounds: ["Tulevat"],
-    expandSearch: ["Laajenna hakujen koontinäkymä"],
     showClientApplication: ["Näytä asiakkaan koko hakemus"],
     infoGivenByCustomer: ["Asiakkaan ilmoittamat tiedot"],
     recommendedAid: ["Suositeltu tila-avustus"],
@@ -182,6 +180,7 @@ const translations: ITranslations = {
         "Tarkasta lista ja neuvottele esihenkilösi kanssa mahdollisista hylkäyksistä",
       ],
     },
+    roundCriteria: ["Kierroksen kriteerit"],
   },
   ApplicationEvent: {
     name: ["Vakiovuoron nimi"],

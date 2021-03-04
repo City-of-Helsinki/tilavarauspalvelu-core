@@ -230,10 +230,6 @@ function ApplicationDetails(): JSX.Element | null {
                 />
                 <ValueBox label={t("common.emailAddress")} value="??????????" />
                 <ValueBox
-                  label={t("Application.organisationCoreActivity")}
-                  value={application.organisation?.coreBusiness}
-                />
-                <ValueBox
                   label={t("common.billingAddress")}
                   value={billingAddress}
                 />
