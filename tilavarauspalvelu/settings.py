@@ -88,6 +88,7 @@ INSTALLED_APPS = [
     "users",
     "social_django",
     "tinymce",
+    "easy_thumbnails",
 ]
 
 MIDDLEWARE = [
@@ -197,6 +198,7 @@ MEDIA_ROOT = env("MEDIA_ROOT")
 STATIC_URL = env("STATIC_URL")
 MEDIA_URL = env("MEDIA_URL")
 
+RESERVATION_UNIT_IMAGES_ROOT = "reservation_unit_images"
 
 # Whether to trust X-Forwarded-Host headers for all purposes
 # where Django would need to make use of its own hostname
