@@ -64,9 +64,8 @@ test("Active Application Round", async (t) => {
     organisation: await firstRow.child("td").nth(0).innerText,
     participants: await firstRow.child("td").nth(1).innerText,
     applicantType: await firstRow.child("td").nth(2).innerText,
-    coreBusiness: await firstRow.child("td").nth(3).innerText,
-    applicationCount: await firstRow.child("td").nth(4).innerText,
-    status: await firstRow.child("td").nth(5).innerText,
+    applicationCount: await firstRow.child("td").nth(3).innerText,
+    status: await firstRow.child("td").nth(4).innerText,
   };
 
   await t.click(firstRow);

@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, IconPlus, Select } from "hds-react";
+import { Button, Select } from "hds-react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { breakpoints } from "../../styles/util";
@@ -69,28 +69,6 @@ const Bottom = styled.div`
   }
 `;
 
-const ExpandBtn = styled.button`
-  & > svg {
-    margin-right: var(--spacing-xs);
-    position: relative;
-    top: -1px;
-  }
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
-  color: var(--tilavaraus-admin-content-text-color);
-  background: none;
-  border: 0;
-  white-space: nowrap;
-  padding: var(--spacing-s);
-
-  @media (min-width: ${breakpoints.m}) {
-    padding-right: 0;
-  }
-`;
-
 function Heading(): JSX.Element {
   const { t } = useTranslation();
 
@@ -138,10 +116,6 @@ function Heading(): JSX.Element {
             { title: t("ApplicationRound.futureRounds") },
           ]}
         />
-        <ExpandBtn>
-          <IconPlus />
-          {t("ApplicationRound.expandSearch")}
-        </ExpandBtn>
       </Bottom>
     </Wrapper>
   );
