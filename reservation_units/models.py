@@ -160,7 +160,6 @@ class ReservationUnitImage(models.Model):
         related_name="images",
         on_delete=models.CASCADE,
     )
-    image_url = models.URLField(verbose_name=_("Image url"), max_length=255)
 
     image = ThumbnailerImageField(
         upload_to=settings.RESERVATION_UNIT_IMAGES_ROOT,
