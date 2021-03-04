@@ -55,6 +55,8 @@ class ReservationUnitFilter(filters.FilterSet):
 
 
 class ReservationUnitImageSerializer(serializers.ModelSerializer):
+    image_url = serializers.ImageField(source="image", use_url=True)
+
     class Meta:
         model = ReservationUnitImage
         fields = ["image_url", "image_type"]
