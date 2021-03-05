@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { TFunction } from "i18next";
 import styled from "styled-components";
-import { useHistory } from "react-router-dom";
 import { Button, IconArrowRedo, Notification, Select } from "hds-react";
+import { useHistory } from "react-router-dom";
 import { getApplicationRound } from "../../common/api";
 import Loader from "../Loader";
 import {
@@ -11,15 +12,18 @@ import {
   OptionType,
 } from "../../common/types";
 import { IngressContainer, NarrowContainer } from "../../styles/layout";
-import { ContentHeading, RequiredLabel } from "../../styles/typography";
 import { breakpoints } from "../../styles/util";
 import Heading from "../Applications/Heading";
 import StatusRecommendation from "../Applications/StatusRecommendation";
 import withMainMenu from "../withMainMenu";
 import ApplicationRoundNavi from "./ApplicationRoundNavi";
 import TimeframeStatus from "./TimeframeStatus";
+import { ContentHeading, H3, RequiredLabel } from "../../styles/typography";
+import KorosHeading from "../KorosHeading";
+import StatusCircle from "../StatusCircle";
 import { ReactComponent as IconCustomers } from "../../images/icon_customers.svg";
 import AllocatingDialogContent from "./AllocatingDialogContent";
+import DataTable, { CellConfig } from "../DataTable";
 
 interface IProps {
   applicationRoundId: string;
@@ -29,28 +33,39 @@ const Wrapper = styled.div`
   width: 100%;
 `;
 
-const Details = styled.div`
-  & > div {
-    margin-bottom: var(--spacing-3-xl);
+const StyledKorosHeading = styled(KorosHeading)`
+  margin-bottom: var(--spacing-layout-l);
+`;
+
+const TopIngress = styled.div`
+  & > div:last-of-type {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    margin-top: var(--spacing-l);
+
+    ${H3} {
+      margin-left: var(--spacing-m);
+      width: 50px;
+      line-height: var(--lineheight-l);
+    }
   }
 
   display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--spacing-s);
+
+  ${ContentHeading} {
+    width: 100%;
+    padding: 0;
+  }
 
   @media (min-width: ${breakpoints.l}) {
-    & > div {
-      &:nth-of-type(even) {
-        justify-self: end;
-      }
-    }
-
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1.8fr 1fr;
+    grid-gap: var(--spacing-layout-m);
   }
 `;
 
 const Recommendation = styled.div`
-  margin: var(--spacing-m) 0 0 var(--spacing-xl);
+  margin: var(--spacing-m) 0 0 0;
 `;
 
 const RecommendationLabel = styled.label`
@@ -67,6 +82,8 @@ const RecommendationValue = styled.div`
 `;
 
 const SelectWrapper = styled.div`
+  margin-top: var(--spacing-l);
+
   label[for="allocatedBasket-toggle-button"] {
     ${RequiredLabel}
     font-family: var(--tilavaraus-admin-font-medium);
@@ -80,42 +97,49 @@ const SelectWrapper = styled.div`
 `;
 
 const ActionContainer = styled.div`
-  .box:last-of-type {
-    margin-top: var(--spacing-m);
+  button {
+    margin-top: var(--spacing-s);
   }
 
   display: flex;
+  justify-content: space-between;
   flex-direction: column-reverse;
 
-  button {
-    width: 100%;
-  }
-
-  .label {
-    line-height: var(--lineheight-l);
-    color: var(--color-black-60);
-    margin-top: var(--spacing-s);
-    margin-bottom: var(--spacing-l);
-  }
-
   @media (min-width: ${breakpoints.l}) {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-gap: var(--spacing-layout-m);
-    margin-top: var(--spacing-l);
-
-    button {
-      width: auto;
-    }
-
-    .box:last-of-type {
-      text-align: right;
-      margin: 0;
-    }
+    flex-direction: row;
   }
 `;
 
-function Allocation({ applicationRoundId }: IProps): JSX.Element {
+const getCellConfig = (t: TFunction): CellConfig => {
+  console.log(t);
+  return {
+    cols: [
+      { title: "Application.headings.applicantName", key: "organisation.name" },
+      {
+        title: "Application.headings.purpose",
+        key: "purpose",
+      },
+      {
+        title: "Application.headings.ageGroup",
+        key: "ageGroup",
+      },
+      {
+        title: "Application.headings.applicationCount",
+        key: "aggregatedData.reservationsTotal",
+      },
+      {
+        title: "Application.headings.applicationStatus",
+        key: "status",
+      },
+    ],
+    index: "id",
+    sorting: "organisation.name",
+    order: "asc",
+    rowLink: (id) => `/application/${id}`,
+  };
+};
+
+function Handling({ applicationRoundId }: IProps): JSX.Element {
   // const basketOptions = applicationRound?.applicationRoundBaskets.map(
   //   (basket) => ({
   //     value: basket.value,
@@ -138,6 +162,7 @@ function Allocation({ applicationRoundId }: IProps): JSX.Element {
     setApplicationRound,
   ] = useState<ApplicationRoundType | null>(null);
   const [basket, setBasket] = useState<OptionType>(basketOptions[0]);
+  const [cellConfig, setCellConfig] = useState<CellConfig | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const { t } = useTranslation();
@@ -149,7 +174,7 @@ function Allocation({ applicationRoundId }: IProps): JSX.Element {
   };
 
   const finishAllocation = (): void => {
-    history.push(`/applicationRounds/${applicationRoundId}?allocated`);
+    setIsAllocating(false);
   };
 
   useEffect(() => {
@@ -162,6 +187,7 @@ function Allocation({ applicationRoundId }: IProps): JSX.Element {
           id: applicationRoundId,
         });
         setApplicationRound(result);
+        setCellConfig(getCellConfig(t));
         setIsLoading(false);
       } catch (error) {
         const msg =
@@ -174,7 +200,7 @@ function Allocation({ applicationRoundId }: IProps): JSX.Element {
     };
 
     fetchApplicationRound();
-  }, [applicationRoundId]);
+  }, [applicationRoundId, t]);
 
   if (isLoading) {
     return <Loader />;
@@ -185,72 +211,75 @@ function Allocation({ applicationRoundId }: IProps): JSX.Element {
       <Heading />
       {applicationRound && (
         <>
+          <StyledKorosHeading
+            heading={`n${t("common.volumeUnit")}`}
+            subheading={t("ApplicationRound.suffixUnhandledSuggestions")}
+          />
           <IngressContainer>
             <ApplicationRoundNavi applicationRoundId={applicationRoundId} />
-            <div>
-              <ContentHeading>{applicationRound.name}</ContentHeading>
-              <Details>
-                <div>
-                  <TimeframeStatus
-                    applicationPeriodBegin={
-                      applicationRound.applicationPeriodBegin
-                    }
-                    applicationPeriodEnd={applicationRound.applicationPeriodEnd}
-                  />
-                  <Recommendation>
-                    <RecommendationLabel>
-                      {t("Application.recommendedStage")}:
-                    </RecommendationLabel>
-                    <RecommendationValue>
-                      <StatusRecommendation status="review_done" />
-                    </RecommendationValue>
-                  </Recommendation>
-                </div>
-              </Details>
-            </div>
+            <TopIngress>
+              <div>
+                <ContentHeading>{applicationRound.name}</ContentHeading>
+                <TimeframeStatus
+                  applicationPeriodBegin={
+                    applicationRound.applicationPeriodBegin
+                  }
+                  applicationPeriodEnd={applicationRound.applicationPeriodEnd}
+                />
+              </div>
+              <div>
+                <StatusCircle status={0} x={90} y={90} />
+                <H3>{t("ApplicationRound.amountReserved")}</H3>
+              </div>
+            </TopIngress>
           </IngressContainer>
-          <NarrowContainer>
+          <NarrowContainer style={{ marginBottom: "var(--spacing-4-xl)" }}>
+            <Recommendation>
+              <RecommendationLabel>
+                {t("Application.recommendedStage")}:
+              </RecommendationLabel>
+              <RecommendationValue>
+                <StatusRecommendation status="allocated" />
+              </RecommendationValue>
+            </Recommendation>
             <SelectWrapper>
               <Select
                 id="allocatedBasket"
                 label={t("ApplicationRound.allocatedBasket")}
                 value={basket}
                 onChange={(option: ApplicationRoundBasket) => setBasket(option)}
-                helper={t("ApplicationRound.allocatedBasketHelper")}
                 options={basketOptions}
                 icon={<IconCustomers />}
               />
             </SelectWrapper>
             <ActionContainer>
-              <div className="box">
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={() =>
-                    history.push(`/applicationRounds/${applicationRoundId}`)
-                  }
-                >
-                  {t("ApplicationRound.navigateBackToReview")}
-                </Button>
-              </div>
-              <div className="box">
-                <Button
-                  type="submit"
-                  variant="primary"
-                  disabled={!basket}
-                  onClick={() =>
-                    startAllocation(applicationRoundId, basket.value)
-                  }
-                  iconLeft={<IconArrowRedo />}
-                >
-                  {t("ApplicationRound.allocateAction")}
-                </Button>
-                <div className="label">
-                  {t("ApplicationRound.allocateLabel")}
-                </div>
-              </div>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() =>
+                  history.push(
+                    `/applicationRounds/${applicationRoundId}?approval`
+                  )
+                }
+              >
+                {t("ApplicationRound.navigateToApprovalPreparation")}
+              </Button>
+              <Button
+                type="submit"
+                variant="primary"
+                disabled={!basket}
+                onClick={() =>
+                  startAllocation(applicationRoundId, basket.value)
+                }
+                iconLeft={<IconArrowRedo />}
+              >
+                {t("ApplicationRound.allocateAction")}
+              </Button>
             </ActionContainer>
           </NarrowContainer>
+          {cellConfig && (
+            <DataTable data={[]} cellConfig={cellConfig} filterConfig={[]} />
+          )}
         </>
       )}
       {isAllocating && <AllocatingDialogContent callback={finishAllocation} />}
@@ -272,4 +301,4 @@ function Allocation({ applicationRoundId }: IProps): JSX.Element {
   );
 }
 
-export default withMainMenu(Allocation);
+export default withMainMenu(Handling);

@@ -284,6 +284,7 @@ function DataTable({
           className={classNames({ filterControlsAreOpen: filtersAreVisible })}
           $filterControlsAreOpen={filtersAreVisible}
           $filtersActive={filters.length > 0}
+          disabled={filterConfig.length < 1}
         >
           {t(`${filters.length > 0 ? "common.filtered" : "common.filter"}`)}
         </FilterBtn>

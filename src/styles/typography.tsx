@@ -19,7 +19,7 @@ export const H3 = styled.h3`
   font-size: var(--fontsize-heading-xs);
   font-family: var(--tilavaraus-admin-font-bold);
   font-weight: bold;
-  line-height: 1.85em;
+  line-height: var(--lineheight-l);
 `;
 
 export const truncatedText = css`

@@ -63,6 +63,7 @@ const translations: ITranslations = {
     same: ["Sama"],
     loginWithTunnistamo: ["Kirjaudu palveluun Tunnistamon avulla, kiitos."],
     noAuthorization: ["Tunnuksellasi ei ole oikeuksia kyseiseen sisältöön."],
+    youthServices: ["Nuorisopalvelut"],
   },
   errors: {
     applicationRoundNotFound: ["Haettua hakukierrosta ei löydy"],
@@ -94,6 +95,7 @@ const translations: ITranslations = {
     logout: ["Kirjaudu ulos", "Logout", "Logga ut"],
     profile: ["Profiili", "Profile", "Profil"],
     languageSelection: ["Kielen valinta", "Language selection", "Språkval"],
+    goBack: ["Palaa takaisin"],
     skipToMainContent: [
       "Siirry sivun pääsisältöön",
       "Skip to main content",
@@ -119,11 +121,15 @@ const translations: ITranslations = {
     organisationName: ["Yhdistyksen nimi"],
     headings: {
       customer: ["Asiakas"],
-      participants: ["Harrastajat"],
+      participants: ["Aktiiviharrastajat"],
       applicantType: ["Asiakastyyppi"],
       coreActivity: ["Ydintoiminta"],
       applicationCount: ["Hakumäärä"],
-      applicationStatus: ["Hakemuksen tila"],
+      applicationStatus: ["Hakemuksen status"],
+      resolution: ["Päätös"],
+      applicantName: ["Hakijan nimi"],
+      purpose: ["Käyttötarkoitus"],
+      ageGroup: ["Ikäluokka"],
     },
     statuses: {
       draft: ["Luonnos"],
@@ -183,6 +189,15 @@ const translations: ITranslations = {
         "Tarkasta lista ja neuvottele esihenkilösi kanssa mahdollisista hylkäyksistä",
       ],
       review_done: ["Käynnistä ehdotusten luominen"],
+      allocated: [
+        "Hyväksy tai hylkää ehdotukset ja uudelleenkäynnistä jako, kunnes kaikki ehdotukset on käsitelty.",
+      ],
+      approvalPreparation: [
+        "Lähetä koko käsittelyn lopputulos esihenkilöllesi hyväksyttäväksi.",
+      ],
+      approval: [
+        "Odota esihenkilösi hyväksyntää tai mahdollisia muutospyyntöjä.",
+      ],
     },
     roundCriteria: ["Kierroksen kriteerit"],
     allocatedBasket: ["Jaettava kori"],
@@ -190,10 +205,37 @@ const translations: ITranslations = {
       "Korit ja niiden järjestys on ennalta määritetty. Korin jakaminen tuottaa ehdotuksen, jonka voit hakemus kerrallaan tarkistaa. Jos olet tehnyt hylkäyksiä, käynnistä kori uudelleen ennen seuraavaan koriin siirtymistä.",
     ],
     navigateBackToReview: ["Palaa esitarkistusvaiheeseen"],
-    allocateVerb: ["Jaa"],
+    navigateToApprovalPreparation: [
+      "Siirry esihenkilöhyväksynnän valmisteluun",
+    ],
+    navigateBackToHandling: ["Palaa ehdotusten käsittelyyn"],
+    allocateAction: ["Jaa"],
+    deliverAction: ["Toimita"],
+    sendForApproval: ["Toimita esihenkilölle"],
     allocateLabel: [
       "Huomaathan, että et voi enää palata esitarkistusvaiheeseen, jos olet käynnistänyt ehdotusten jakamisen.",
     ],
+    allocationDialogHeading: ["Laaditaan ehdotuksia"],
+    allocationDialogBody: [
+      "Odotathan hetken, tämä voi viedä joitakin kymmeniä sekunteja tai minuutteja.",
+    ],
+    suffixUnhandledSuggestions: ["käsittelemätöntä ehdotusta"],
+    sentForApprovalDialogHeader: [
+      "Toimitetaanko alustava tilanjakoehdotus hyväksyttäväksi?",
+    ],
+    sentForApprovalDialogBody: [
+      "Esihenkilö saa listan hyväksyttäväkseen, jonka jälkeen tarjoukset tai päätökset toimitetaan asiakkaalle.",
+    ],
+    sentForApprovalNotificationHeader: [
+      "Vuorojakopaatös on toimitettu tarkistettavaksi",
+    ],
+    sentForApprovalNotificationBody: [
+      "Voit katsella alta hyväksyntää odottavaa päätöslauselmaa.",
+    ],
+    schedulesToBeGranted: ["Myönnettäviä vuoroja"],
+    orphanApplications: ["Vaille tilaa jääneet"],
+    handledApplications: ["Käsitellyt päätökset"],
+    amountReserved: ["Kapasiteetista varattu"],
   },
   ApplicationEvent: {
     name: ["Vakiovuoron nimi"],

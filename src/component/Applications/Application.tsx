@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import { Button, Notification, IconFaceSmile } from "hds-react";
 import { getApplication, saveApplication } from "../../common/api";
-import Loader from "../../common/Loader";
+import Loader from "../Loader";
 import {
   Application as ApplicationType,
   ApplicationStatus,

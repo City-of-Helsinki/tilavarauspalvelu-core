@@ -19,7 +19,7 @@ import {
   DataFilterConfig,
 } from "../../common/types";
 import TimeframeStatus from "./TimeframeStatus";
-import Loader from "../../common/Loader";
+import Loader from "../Loader";
 import StatusCell from "../StatusCell";
 import {
   formatNumber,

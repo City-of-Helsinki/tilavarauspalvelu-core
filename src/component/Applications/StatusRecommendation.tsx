@@ -1,12 +1,11 @@
 import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import { ApplicationRoundStatus } from "../../common/types";
 import { useModal } from "../../context/UIContext";
 import InfoBubble from "../InfoBubble";
 
 interface IProps {
-  status: ApplicationRoundStatus;
+  status: string;
   className?: string;
 }
 
