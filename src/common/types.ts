@@ -42,11 +42,17 @@ export type Service = {
   bufferTimeAfter: string;
 };
 
+export type Coordinates = {
+  latitude: number;
+  longitude: number;
+};
+
 export type Location = {
   id: number;
   addressStreet: string;
   addressZip: string;
   addressCity: string;
+  coordinates?: Coordinates;
 };
 
 export type Image = {
@@ -63,8 +69,9 @@ export type ReservationUnit = {
   resources: Resource[];
   services: Service[];
   images: Image[];
-  location: Location;
+  location?: Location;
   reservationUnitType: Parameter;
+  termsOfUse: string;
 };
 
 export type Parameter = {

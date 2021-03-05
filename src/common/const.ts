@@ -14,6 +14,28 @@ export const reservationUnitPrefix = '/reservation-unit';
 export const searchPrefix = '/search';
 export const applicationsPrefix = '/applications';
 
+export const mapStyle = {
+  version: 8,
+  name: 'hel-osm-light',
+  metadata: {},
+  sources: {
+    osm: {
+      type: 'raster',
+      tiles: ['https://tiles.hel.ninja/styles/hel-osm-light/{z}/{x}/{y}.png'],
+      minzoom: 0,
+      maxzoom: 20,
+    },
+  },
+  layers: [
+    {
+      id: 'osm',
+      type: 'raster',
+      source: 'osm',
+    },
+  ],
+  id: 'hel-osm-light',
+};
+
 export const reservationUnitPath = (id: number): string =>
   `${reservationUnitPrefix}/${id}`;
 

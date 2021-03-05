@@ -1,13 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
+import { Accordion } from 'hds-react';
 import Container from '../component/Container';
 import { ReservationUnit as ReservationUnitType } from '../common/types';
 import { getReservationUnit } from '../common/api';
 import Head from './Head';
 import { routeData } from '../common/const';
 import Address from './Address';
+import Map from './Map';
+import { localizedValue } from '../common/util';
+import Images from './Images';
 import StartApplicationBar from '../component/StartApplicationBar';
+import { SpanTwoColumns } from '../component/common';
 
 type ParamTypes = {
   id: string;
@@ -15,12 +21,13 @@ type ParamTypes = {
 
 const TwoColoumnLayout = styled.div`
   display: grid;
-  gap: var(--spacing-m);
+  gap: var(--spacing-layout-s);
   grid-template-columns: 7fr 3fr;
 `;
 
 const ReservationUnit = (): JSX.Element | null => {
   const { id } = useParams<ParamTypes>();
+  const { t, i18n } = useTranslation();
 
   const [
     reservationUnit,
@@ -47,16 +54,25 @@ const ReservationUnit = (): JSX.Element | null => {
       <Container>
         <TwoColoumnLayout>
           <div>
-            <h2>Kuvaus</h2>
-            <h2>Ehdot ja käyttössäännöt</h2>
-            <h2>Hakeminen</h2>
-            <h2>Poikkeusajat</h2>
-            <h2>Tilan vuorot</h2>
+            <Accordion heading={t('reservationUnit.description')}>
+              Kuvaus
+            </Accordion>
+            <Accordion heading={t('reservationUnit.termsOfUse')}>
+              {reservationUnit.termsOfUse}
+            </Accordion>
           </div>
-          <Address reservationUnit={reservationUnit} />
           <div>
             <Address reservationUnit={reservationUnit} />
+            <Images images={reservationUnit.images} />
           </div>
+          <SpanTwoColumns>
+            <Map
+              title={localizedValue(reservationUnit.name, i18n.language)}
+              latitude={reservationUnit.location?.coordinates?.latitude}
+              longitude={reservationUnit.location?.coordinates?.longitude}
+            />
+            <Address reservationUnit={reservationUnit} />
+          </SpanTwoColumns>
         </TwoColoumnLayout>
       </Container>
       <StartApplicationBar count={0} />
