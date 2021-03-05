@@ -73,6 +73,21 @@ class Person(ContactInformation):
 
 
 class Organisation(models.Model):
+    COMPANY = "company"
+    REGISTERED_ASSOCIATION = "registered_association"
+    PUBLIC_ASSOCIATION = "public_association"
+    UNREGISTERED_ASSOCIATION = "unregistered_association"
+    MUNICIPALITY_CONSORTIUM = "municipality_consortium"
+    RELIGIOUS_COMMUNITY = "religious_community"
+
+    TYPE_CHOICES = [
+        (COMPANY, _("Company")),
+        (REGISTERED_ASSOCIATION, _("Registered association")),
+        (PUBLIC_ASSOCIATION, _("Public association")),
+        (UNREGISTERED_ASSOCIATION, _("Unregistered association")),
+        (MUNICIPALITY_CONSORTIUM, _("Municipality consortium")),
+        (RELIGIOUS_COMMUNITY, _("Religious community")),
+    ]
 
     name = models.TextField(
         verbose_name=_("Name"),
@@ -108,6 +123,10 @@ class Organisation(models.Model):
     core_business = models.TextField(
         verbose_name=_("Core business of this organization"),
         blank=True,
+    )
+
+    organisation_type = models.CharField(
+        max_length=255, choices=TYPE_CHOICES, default=COMPANY
     )
 
     def __str__(self):
