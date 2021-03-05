@@ -49,6 +49,9 @@ class OrganisationSerializer(serializers.ModelSerializer):
         allow_null=True,
     )
     identifier = serializers.CharField(allow_null=True)
+    organisation_type = serializers.SerializerMethodField(
+        method_name="get_organisation_type"
+    )
 
     class Meta:
         model = Organisation
@@ -60,6 +63,7 @@ class OrganisationSerializer(serializers.ModelSerializer):
             "address",
             "core_business",
             "active_members",
+            "organisation_type",
         ]
         extra_kwargs = {
             "name": {
@@ -75,6 +79,10 @@ class OrganisationSerializer(serializers.ModelSerializer):
                 "help_text": "Number of active persons in the organization.",
             },
         }
+
+    def get_organisation_type(self, obj):
+        organisation_types = dict(Organisation.TYPE_CHOICES)
+        return organisation_types.get(obj.organisation_type)
 
     def handle_address(self, address_data) -> Union[Address, None]:
         if address_data is None:
