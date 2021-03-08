@@ -14,6 +14,7 @@ import { localizedValue } from '../common/util';
 import Images from './Images';
 import StartApplicationBar from '../component/StartApplicationBar';
 import { SpanTwoColumns } from '../component/common';
+import Sanitize from '../component/Sanitize';
 
 type ParamTypes = {
   id: string;
@@ -23,6 +24,10 @@ const TwoColoumnLayout = styled.div`
   display: grid;
   gap: var(--spacing-layout-s);
   grid-template-columns: 7fr 3fr;
+`;
+
+const Content = styled.div`
+  font-family: var(--font-regular);
 `;
 
 const ReservationUnit = (): JSX.Element | null => {
@@ -55,10 +60,12 @@ const ReservationUnit = (): JSX.Element | null => {
         <TwoColoumnLayout>
           <div>
             <Accordion heading={t('reservationUnit.description')}>
-              Kuvaus
+              <Sanitize html={reservationUnit.description} />
             </Accordion>
             <Accordion heading={t('reservationUnit.termsOfUse')}>
-              {reservationUnit.termsOfUse}
+              <Content>
+                <Sanitize html={reservationUnit.termsOfUse} />
+              </Content>
             </Accordion>
           </div>
           <div>

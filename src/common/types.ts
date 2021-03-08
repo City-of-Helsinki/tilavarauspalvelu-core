@@ -63,6 +63,7 @@ export type Image = {
 export type ReservationUnit = {
   id: number;
   name: TranslationObject;
+  description: string;
   maxPersons: number;
   requireIntroduction: boolean;
   spaces: Space[];

@@ -11,6 +11,9 @@ const Container = styled.div`
   margin-top: var(--spacing-s);
   display: flex;
   align-items: center;
+  & svg {
+    margin-left: var(--spacing-xs);
+  }
 `;
 
 const Name = styled.span`

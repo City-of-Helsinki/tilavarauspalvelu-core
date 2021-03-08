@@ -183,6 +183,12 @@ const translations: Translations = {
       },
       userAcceptsTerms: ['Hyväksyn palvelun käyttöehdot'],
     },
+    sent: {
+      heading: ['Hakemuksesi on lähetetty käsiteltäväksi'],
+      faq1Question: ['Kuinka hakemuiksen käsittely etenee?'],
+      faq2Question: ['Kuinka valitan päätöksestä?'],
+      faq3Question: ['Kuinka hakemuksen käsittely tapahtuu?'],
+    },
   },
   ApplicationPage: {
     navigation: {
@@ -219,7 +225,8 @@ const translations: Translations = {
     applicationNavigationName: ['Hakemus', 'Application', 'Ansökan'],
     applicationName: ['Varaamo', 'Varaamo', 'Varaamo'],
     selectReservationUnit: ['Valitse tila'],
-    favourite: ['Suosikki', 'Favourite', 'Favorit'],
+    removeReservationUnit: ['Lisätty hakemukselle'],
+    reservationUnitSelected: ['Lisätty hakemukselle'],
     next: ['Seuraava', 'Next', 'Nästa'],
     prev: ['Takaisin'],
     submit: ['Lähetä'],

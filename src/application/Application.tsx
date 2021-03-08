@@ -26,6 +26,7 @@ import Preview from './preview/Preview';
 import applicationReducer from './applicationReducer';
 import applicationInitializer from './applicationInitializer';
 import useReservationUnitList from '../common/hook/useReservationUnitList';
+import Sent from './sent/Sent';
 
 type ParamTypes = {
   applicationRoundId: string;
@@ -185,9 +186,12 @@ const Application = (): JSX.Element | null => {
             breadCrumbText={applicationRoundName}>
             <Preview
               application={application}
-              onNext={() => saveAndNavigate('preview')}
+              onNext={saveAndNavigate('sent')}
             />
           </ApplicationPage>
+        </Route>
+        <Route exact path={`${match.url}/sent`}>
+          <Sent breadCrumbText={applicationRoundName} />
         </Route>
       </Switch>
       {error ? (

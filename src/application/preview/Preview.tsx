@@ -10,7 +10,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { Application, ReservationUnit, Parameter } from '../../common/types';
-import { formatDate, localizedValue } from '../../common/util';
+import { deepCopy, formatDate, localizedValue } from '../../common/util';
 import { getParameters, getReservationUnit } from '../../common/api';
 import LabelValue from '../../component/LabelValue';
 import TimePreview from '../TimePreview';
@@ -19,7 +19,7 @@ import { TwoColumnContainer } from '../../component/common';
 
 type Props = {
   application: Application;
-  onNext: () => void;
+  onNext: (application: Application) => void;
 };
 
 const mapArrayById = (
@@ -130,10 +130,15 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
 
   const { t } = useTranslation();
 
-  const onSubmit = () => {
-    // eslint-disable-next-line no-param-reassign
-    application.status = 'in_review';
-    onNext();
+  const prepareData = (data: Application): Application => {
+    const applicationCopy = deepCopy(data);
+    applicationCopy.status = 'in_review';
+    return applicationCopy;
+  };
+
+  const onSubmit = (data: Application): void => {
+    const appToSave = prepareData(data);
+    onNext(appToSave);
   };
 
   // application not saved yet
@@ -269,7 +274,9 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
         </Button>
         <Button
           id="submit"
-          onClick={() => onSubmit()}
+          onClick={() => {
+            onSubmit(application);
+          }}
           disabled={!acceptTermsOfUse}>
           {t('common.submit')}
         </Button>

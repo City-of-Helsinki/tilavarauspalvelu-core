@@ -6,7 +6,7 @@ import Breadcrumb from '../component/Breadcrumb';
 
 type HeadProps = {
   heading: string;
-  text: string;
+  text?: string;
   breadCrumbText: string;
   korosType: KorosType;
 };
@@ -49,7 +49,7 @@ const Head = ({
           }}
         />
         <Heading>{heading}</Heading>
-        <span>{text}</span>
+        {text ? <span>{text}</span> : null}
       </Content>
       <StyledKoros flipHorizontal className="koros" type={korosType} />
     </Container>

@@ -19,6 +19,7 @@ const Name = styled.div`
 `;
 
 const AddressLine = styled.div`
+  font-size: var(--fontsize-body-m);
   margin-top: var(--spacing-xs);
 `;
 

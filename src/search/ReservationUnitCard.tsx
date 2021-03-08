@@ -1,9 +1,9 @@
 import {
   Button,
   IconGroup,
-  IconHeart,
   IconInfoCircle,
   IconLocation,
+  IconCheck,
   IconPlus,
 } from 'hds-react';
 import React from 'react';
@@ -17,13 +17,14 @@ interface Props {
   reservationUnit: ReservationUnit;
   selectReservationUnit: (reservationUnit: ReservationUnit) => void;
   containsReservationUnit: (reservationUnit: ReservationUnit) => boolean;
+  removeReservationUnit: (reservationUnit: ReservationUnit) => void;
 }
 
 const Container = styled.div`
   display: grid;
   background-color: var(--color-white);
   margin-top: var(--spacing-s);
-  grid-template-columns: 250px 3fr 1fr;
+  grid-template-columns: 250px 5fr 3fr;
 `;
 
 const MainContent = styled.div`
@@ -67,6 +68,7 @@ const ReservationUnitCard = ({
   reservationUnit,
   selectReservationUnit,
   containsReservationUnit,
+  removeReservationUnit,
 }: Props): JSX.Element => {
   const { t, i18n } = useTranslation();
 
@@ -106,15 +108,22 @@ const ReservationUnitCard = ({
         </Bottom>
       </MainContent>
       <Actions>
-        <IconHeart aria-hidden />
         <div style={{ flexGrow: 1 }} />
-        <Button
-          disabled={containsReservationUnit(reservationUnit)}
-          iconLeft={<IconPlus />}
-          onClick={() => selectReservationUnit(reservationUnit)}
-          variant="secondary">
-          {t('common.selectReservationUnit')}
-        </Button>
+
+        {containsReservationUnit(reservationUnit) ? (
+          <Button
+            iconLeft={<IconCheck />}
+            onClick={() => removeReservationUnit(reservationUnit)}>
+            {t('common.removeReservationUnit')}
+          </Button>
+        ) : (
+          <Button
+            iconLeft={<IconPlus />}
+            onClick={() => selectReservationUnit(reservationUnit)}
+            variant="secondary">
+            {t('common.selectReservationUnit')}
+          </Button>
+        )}
       </Actions>
     </Container>
   );

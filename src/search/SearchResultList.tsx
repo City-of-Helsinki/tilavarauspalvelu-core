@@ -71,6 +71,7 @@ const SearchResultList = ({ reservationUnits }: Props): JSX.Element => {
   const {
     reservationUnits: selectedReservationUnits,
     selectReservationUnit,
+    removeReservationUnit,
     containsReservationUnit,
   } = useReservationUnitsList();
 
@@ -106,6 +107,7 @@ const SearchResultList = ({ reservationUnits }: Props): JSX.Element => {
             <ReservationUnitCard
               selectReservationUnit={selectReservationUnit}
               containsReservationUnit={containsReservationUnit}
+              removeReservationUnit={removeReservationUnit}
               reservationUnit={ru}
               key={ru.id}
             />

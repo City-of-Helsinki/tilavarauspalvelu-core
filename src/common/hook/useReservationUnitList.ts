@@ -5,6 +5,7 @@ export type ReservationUnitList = {
   reservationUnits: ReservationUnit[];
   selectReservationUnit: (reservationUnit: ReservationUnit) => void;
   containsReservationUnit: (reservationUnit: ReservationUnit) => boolean;
+  removeReservationUnit: (reservationUnit: ReservationUnit) => void;
   clearSelections: () => void;
 };
 
@@ -21,6 +22,15 @@ const useReservationUnitsList = (): ReservationUnitList => {
     ]);
   };
 
+  const removeReservationUnit = (reservationUnit: ReservationUnit) => {
+    if (!reservationUnits) {
+      return;
+    }
+    setReservationUnits(
+      reservationUnits.filter((unit) => unit.id !== reservationUnit.id)
+    );
+  };
+
   const clearSelections = () => {
     setReservationUnits([]);
   };
@@ -34,6 +44,7 @@ const useReservationUnitsList = (): ReservationUnitList => {
     selectReservationUnit,
     containsReservationUnit,
     clearSelections,
+    removeReservationUnit,
     reservationUnits: reservationUnits || [],
   };
 };
