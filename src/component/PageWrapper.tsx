@@ -15,7 +15,7 @@ const PageWrapper = (props: Props): JSX.Element => {
   return (
     <>
       <Navigation />
-      <Main>{props.children}</Main>
+      <Main id="main">{props.children}</Main>
       <div
         style={{
           marginTop: 'var(--spacing-layout-xl)',

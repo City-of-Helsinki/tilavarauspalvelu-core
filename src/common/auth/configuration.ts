@@ -1,8 +1,7 @@
-import { isClient } from 'react-use/lib/util';
-import { oidcClientId } from '../const';
+import { isBrowser, oidcClientId } from '../const';
 
 let base = '';
-if (isClient) {
+if (isBrowser) {
   base = `${document.location.protocol}//${document.location.host}`;
 }
 

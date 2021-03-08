@@ -2,11 +2,10 @@ import React, { SyntheticEvent, useEffect } from 'react';
 import { Navigation as HDSNavigation } from 'hds-react';
 import { useTranslation } from 'react-i18next';
 import { useLocalStorage } from 'react-use';
-import { useReactOidc } from '@axa-fr/react-oidc-context';
 import { Profile } from 'oidc-client';
 import { useHistory } from 'react-router-dom';
 import { applicationsUrl } from '../common/util';
-import { authEnabled } from '../common/const';
+import { authEnabled, isBrowser } from '../common/const';
 
 interface LanguageOption {
   label: string;
@@ -95,15 +94,21 @@ const Navigation = ({ profile, logout }: Props): JSX.Element => {
   );
 };
 
-const NavigationWithProfileAndLogout = authEnabled
-  ? () => {
-      const { oidcUser, logout } = useReactOidc();
-      let profile = null;
-      if (oidcUser) {
-        profile = oidcUser.profile;
-      }
-      return <Navigation profile={profile} logout={() => logout()} />;
-    }
-  : () => <Navigation profile={null} />;
+const NavigationWithProfileAndLogout = (): JSX.Element => {
+  if (isBrowser && authEnabled) {
+    // eslint-disable-next-line
+    const WithOidc = require('./WithOidc').default;
+
+    return (
+      <WithOidc
+        render={(props: {
+          profile: Profile | null;
+          logout: (() => void) | undefined;
+        }) => <Navigation profile={props.profile} logout={props.logout} />}
+      />
+    );
+  }
+  return <Navigation profile={null} />;
+};
 
 export default NavigationWithProfileAndLogout;

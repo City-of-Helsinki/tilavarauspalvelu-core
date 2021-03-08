@@ -68,7 +68,7 @@ export const participantCountOptions = [
   100,
 ].map((v) => ({ label: `${v}`, value: v } as OptionType));
 
-const isBrowser = typeof window !== 'undefined';
+export const isBrowser = typeof window !== 'undefined';
 
 // eslint-disable-next-line
 export const routeData = (): any =>
