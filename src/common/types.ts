@@ -4,7 +4,7 @@ export type TranslationObject = {
 
 export type ApplicationRoundStatus = "draft" | "in_review" | "review_done";
 
-export type ApplicationRoundBasket = any;
+export type ApplicationRoundBasket = any; // eslint-disable-line
 
 export type ApplicationRound = {
   id: number;

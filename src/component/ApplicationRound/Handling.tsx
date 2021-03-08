@@ -111,7 +111,7 @@ const ActionContainer = styled.div`
 `;
 
 const getCellConfig = (t: TFunction): CellConfig => {
-  console.log(t);
+  console.log(t); // eslint-disable-line
   return {
     cols: [
       { title: "Application.headings.applicantName", key: "organisation.name" },
@@ -169,7 +169,7 @@ function Handling({ applicationRoundId }: IProps): JSX.Element {
   const history = useHistory();
 
   const startAllocation = (id: string, basketId: string): void => {
-    console.log(id, basketId);
+    console.log(id, basketId); // eslint-disable-line
     setIsAllocating(true);
   };
 

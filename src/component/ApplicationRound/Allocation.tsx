@@ -144,7 +144,7 @@ function Allocation({ applicationRoundId }: IProps): JSX.Element {
   const history = useHistory();
 
   const startAllocation = (id: string, basketId: string): void => {
-    console.log(id, basketId);
+    console.log(id, basketId); // eslint-disable-line
     setIsAllocating(true);
   };
 

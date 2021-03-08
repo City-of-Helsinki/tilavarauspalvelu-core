@@ -11,7 +11,7 @@ interface IProps {
 interface Button {
   key: string;
   text: string;
-  callback: () => void;
+  callback?: () => void;
   disabled?: boolean;
 }
 

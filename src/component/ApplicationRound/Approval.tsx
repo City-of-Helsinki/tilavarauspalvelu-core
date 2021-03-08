@@ -133,7 +133,7 @@ const ScheduleCount = styled.div`
 `;
 
 const getCellConfig = (t: TFunction): CellConfig => {
-  console.log(t);
+  console.log(t); // eslint-disable-line
   return {
     cols: [
       { title: "Application.headings.customer", key: "organisation.name" },
@@ -293,12 +293,10 @@ function Approval({ applicationRoundId }: IProps): JSX.Element {
                     {
                       key: "orphans",
                       text: "ApplicationRound.orphanApplications",
-                      callback: () => console.log("orphans"),
                     },
                     {
                       key: "handled",
                       text: "ApplicationRound.handledApplications",
-                      callback: () => console.log("handled"),
                     },
                   ]}
                 />
