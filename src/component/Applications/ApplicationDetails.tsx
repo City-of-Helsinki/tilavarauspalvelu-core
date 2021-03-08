@@ -8,7 +8,7 @@ import isEqual from "lodash/isEqual";
 import omit from "lodash/omit";
 import Accordion from "../Accordion";
 import { getApplication } from "../../common/api";
-import Loader from "../../common/Loader";
+import Loader from "../Loader";
 import { Application as ApplicationType } from "../../common/types";
 import {
   ContentContainer,

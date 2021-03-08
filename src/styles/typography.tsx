@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { breakpoints } from "./util";
 
 export const H1 = styled.h1`
@@ -19,10 +19,10 @@ export const H3 = styled.h3`
   font-size: var(--fontsize-heading-xs);
   font-family: var(--tilavaraus-admin-font-bold);
   font-weight: bold;
-  line-height: 1.85em;
+  line-height: var(--lineheight-l);
 `;
 
-export const truncatedText = `
+export const truncatedText = css`
   white-space: nowrap;
   overflow-x: hidden;
   text-overflow: ellipsis;
@@ -34,4 +34,14 @@ export const ContentHeading = styled(H1)`
   }
 
   padding-right: var(--spacing-l);
+`;
+
+export const RequiredLabel = css`
+  &:after {
+    content: "*";
+    position: relative;
+    margin-left: var(--spacing-2-xs);
+    font-family: var(--tilavaraus-admin-font-bold);
+    font-weight: 700;
+  }
 `;

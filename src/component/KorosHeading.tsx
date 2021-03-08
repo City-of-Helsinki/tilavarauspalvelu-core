@@ -1,25 +1,26 @@
-import React from "react";
+import React, { CSSProperties } from "react";
 import styled from "styled-components";
 import { Koros } from "hds-react";
 import { H1 } from "../styles/typography";
 
 interface IProps {
-  color: string;
   heading: string;
   subheading?: string;
   className?: string;
+  style?: CSSProperties;
 }
 
 const Wrapper = styled.div`
+  --background-color: var(--tilavaraus-admin-header-background-color);
   display: flex;
   flex-direction: column;
 `;
 
-const Content = styled.div<{ color: string }>`
+const Content = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-color: ${({ color }) => `var(${color})`};
+  background-color: var(--background-color);
   padding: 3.75rem 0 1.25rem;
   color: var(--color-white);
   width: 100%;
@@ -31,29 +32,29 @@ const Heading = styled(H1)`
 `;
 const SubHeading = styled.span`
   font-size: 20px;
-  font-family: HelsinkiGrotesk, var(--font-default);
+  font-family: HelsinkiGroteskBold, var(--font-default);
   font-weight: bold;
   line-height: 1.2em;
   margin-top: 0.5em;
 `;
 
-const StyledKoros = styled(Koros)<{ color: string }>`
-  fill: ${({ color }) => `var(${color})`};
+const StyledKoros = styled(Koros)`
+  fill: var(--background-color);
 `;
 
 function KorosHeading({
-  color,
   heading,
   subheading,
   className,
+  style,
 }: IProps): JSX.Element {
   return (
-    <Wrapper className={className}>
-      <Content color={color}>
+    <Wrapper className={className} style={style}>
+      <Content>
         <Heading>{heading}</Heading>
         <SubHeading>{subheading}</SubHeading>
       </Content>
-      <StyledKoros type="pulse" color={color} flipHorizontal />
+      <StyledKoros type="pulse" flipHorizontal />
     </Wrapper>
   );
 }

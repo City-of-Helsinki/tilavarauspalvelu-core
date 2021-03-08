@@ -4,29 +4,13 @@ import styled from "styled-components";
 import { Button, IconCross } from "hds-react";
 import { useTranslation } from "react-i18next";
 import { useModal } from "../context/UIContext";
-import { breakpoints } from "../styles/util";
+import { breakpoints, Seranwrap } from "../styles/util";
 
 interface IProps {
   children: React.ReactNode;
 }
 
 const modalRoot = document.getElementById("modal-root");
-
-const Seranwrap = styled.div`
-  height: 200%;
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  z-index: var(--tilavaraus-admin-stack-seranwrap);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  background-color: black;
-  opacity: 0.2;
-`;
 
 const Content = styled.div<{ onTransitionEnd: React.TransitionEventHandler }>`
   &:not(:focus-within) {

@@ -17,6 +17,6 @@ export const NarrowContainer = styled.div`
   padding: 0 var(--spacing-2-xl) 0 var(--spacing-4-xl);
 
   @media (min-width: ${breakpoints.xl}) {
-    padding: 0 16.666% 0 calc(var(--spacing-3-xl) * 2);
+    padding: 0 16.666% 0 calc(var(--spacing-3-xl) * 1.85);
   }
 `;

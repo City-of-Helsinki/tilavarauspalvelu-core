@@ -2,7 +2,9 @@ export type TranslationObject = {
   [key: string]: string;
 };
 
-export type ApplicationRoundStatus = "draft";
+export type ApplicationRoundStatus = "draft" | "in_review" | "review_done";
+
+export type ApplicationRoundBasket = any; // eslint-disable-line
 
 export type ApplicationRound = {
   id: number;
@@ -16,6 +18,7 @@ export type ApplicationRound = {
   publicDisplayEnd: string;
   purposesIds: number[];
   serviceSectorId: number;
+  applicationRoundBaskets: ApplicationRoundBasket[];
   status: ApplicationRoundStatus;
 };
 
@@ -192,3 +195,8 @@ export interface DataFilterConfig {
   title: string;
   filters?: DataFilterOption[];
 }
+
+export type OptionType = {
+  label: string;
+  value: string;
+};

@@ -1,8 +1,9 @@
 import React from "react";
-import { Button, Select } from "hds-react";
+import { Button } from "hds-react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { breakpoints } from "../../styles/util";
+import { H3 } from "../../styles/typography";
 import SecondaryNavigation from "../SecondaryNavigation";
 import { ReactComponent as RecurringReservation } from "../../images/icon_recurring-reservation.svg";
 import { ReactComponent as IndividualReservation } from "../../images/icon_individual-reservation.svg";
@@ -13,10 +14,8 @@ const Wrapper = styled.div`
 `;
 
 const Top = styled.div`
-  @media (min-width: ${breakpoints.m}) {
-    display: flex;
-    justify-content: space-between;
-  }
+  display: flex;
+  justify-content: space-between;
 `;
 
 const MainTabs = styled.div``;
@@ -46,16 +45,8 @@ const Tab = styled(Button).attrs({ variant: "secondary" })<{
   white-space: nowrap;
 `;
 
-const StyledSelect = styled(Select)`
-  width: 270px;
-
-  button {
-    font-weight: 700;
-
-    svg {
-      top: 6px;
-    }
-  }
+const Subheading = styled(H3)`
+  margin-top: var(--spacing-4-xs);
 `;
 
 const Bottom = styled.div`
@@ -72,21 +63,6 @@ const Bottom = styled.div`
 function Heading(): JSX.Element {
   const { t } = useTranslation();
 
-  const typeOptions = [
-    {
-      value: "1",
-      label: "Nuorisotilat",
-    },
-  ];
-
-  const selectTheme = {
-    "--dropdown-background-default": "var(--tilavaraus-admin-blue)",
-    "--dropdown-color-default": "var(--color-white)",
-    "--dropdown-border-color-default": "var(--tilavaraus-admin-blue)",
-    "--fontsize-body-l": "16px",
-    "--dropdown-height": "44px",
-  };
-
   return (
     <Wrapper>
       <Top>
@@ -98,12 +74,7 @@ function Heading(): JSX.Element {
             {t("HeadingMenu.singleReservations")}
           </Tab>
         </MainTabs>
-        <StyledSelect
-          label=""
-          options={typeOptions}
-          defaultValue={typeOptions[0]}
-          theme={selectTheme}
-        />
+        <Subheading>{t("common.youthServices")}</Subheading>
       </Top>
       <Bottom>
         <SecondaryNavigation

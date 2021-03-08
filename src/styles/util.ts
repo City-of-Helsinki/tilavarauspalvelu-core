@@ -50,6 +50,22 @@ export const getStatusColor = (
   return color;
 };
 
+export const Seranwrap = styled.div`
+  height: 200%;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: var(--tilavaraus-admin-stack-seranwrap);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background-color: black;
+  opacity: 0.2;
+`;
+
 export const StatusDot = styled.div<{
   status: ApplicationStatus;
   size: number;

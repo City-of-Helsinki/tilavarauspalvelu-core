@@ -8,7 +8,7 @@ const configuration = {
   scope: "openid profile email",
   authority: "https://api.hel.fi/sso/",
   silent_redirect_uri: `${base}/login/helsinki/return`,
-  automaticSilentRenew: false,
+  automaticSilentRenew: true,
   loadUserInfo: false,
 };
 

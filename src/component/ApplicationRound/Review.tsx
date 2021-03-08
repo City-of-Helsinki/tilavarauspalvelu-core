@@ -2,56 +2,39 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { TFunction } from "i18next";
-import { useParams } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import { Button, Checkbox, Notification } from "hds-react";
 import uniq from "lodash/uniq";
 import trim from "lodash/trim";
-import withMainMenu from "../../withMainMenu";
-import Heading from "../Heading";
-import { ContentHeading, H2 } from "../../../styles/typography";
-import { breakpoints, BasicLink } from "../../../styles/util";
-import { IngressContainer } from "../../../styles/layout";
-import DataTable, { CellConfig } from "../../DataTable";
-import { getApplicationRound, getApplications } from "../../../common/api";
+import withMainMenu from "../withMainMenu";
+import Heading from "../Applications/Heading";
+import { ContentHeading, H2 } from "../../styles/typography";
+import { breakpoints } from "../../styles/util";
+import { IngressContainer } from "../../styles/layout";
+import DataTable, { CellConfig } from "../DataTable";
+import { getApplicationRound, getApplications } from "../../common/api";
 import {
   Application as ApplicationType,
   ApplicationRound as ApplicationRoundType,
   DataFilterConfig,
-} from "../../../common/types";
-import TimeframeStatus from "../TimeframeStatus";
-import Loader from "../../../common/Loader";
-import StatusCell from "../../StatusCell";
+} from "../../common/types";
+import TimeframeStatus from "./TimeframeStatus";
+import Loader from "../Loader";
+import StatusCell from "../StatusCell";
 import {
   formatNumber,
   getNormalizedStatus,
   parseDuration,
-} from "../../../common/util";
-import StatusRecommendation from "../StatusRecommendation";
+} from "../../common/util";
+import StatusRecommendation from "../Applications/StatusRecommendation";
+import ApplicationRoundNavi from "./ApplicationRoundNavi";
 
-interface IRouteParams {
+interface IProps {
   applicationRoundId: string;
 }
 
 const Wrapper = styled.div`
   width: 100%;
-`;
-
-const ApplicationNavi = styled.div`
-  font-size: var(--fontsize-body-s);
-  margin-top: var(--spacing-m);
-
-  @media (min-width: ${breakpoints.l}) {
-    display: flex;
-    justify-content: flex-end;
-  }
-`;
-
-const NaviItem = styled(BasicLink)`
-  &:first-of-type {
-    margin-left: 0;
-  }
-
-  margin-left: 2rem;
 `;
 
 const Content = styled.div``;
@@ -192,7 +175,7 @@ const getCellConfig = (t: TFunction): CellConfig => {
   };
 };
 
-function ApplicationRound(): JSX.Element {
+function Review({ applicationRoundId }: IProps): JSX.Element {
   const [isLoading, setIsLoading] = useState(true);
   const [
     applicationRound,
@@ -206,8 +189,10 @@ function ApplicationRound(): JSX.Element {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isApplicationChecked, toggleIsApplicationChecked] = useState(false);
 
-  const { applicationRoundId } = useParams<IRouteParams>();
   const { t } = useTranslation();
+  const history = useHistory();
+
+  const setApplicationRoundAsReviewed = () => history.push("?reviewed");
 
   useEffect(() => {
     const fetchApplicationRound = async () => {
@@ -264,16 +249,9 @@ function ApplicationRound(): JSX.Element {
       {applicationRound && cellConfig && filterConfig && (
         <>
           <IngressContainer>
-            <ApplicationNavi>
-              <NaviItem to="#">
-                {t("Application.showAllApplications")} TODO
-              </NaviItem>
-              <NaviItem to="#">
-                {t("ApplicationRound.roundCriteria")} TODO
-              </NaviItem>
-            </ApplicationNavi>
+            <ApplicationRoundNavi applicationRoundId={applicationRoundId} />
             <Content>
-              <ContentHeading>{applicationRound?.name}</ContentHeading>
+              <ContentHeading>{applicationRound.name}</ContentHeading>
               <Details>
                 <div>
                   <TimeframeStatus
@@ -294,7 +272,7 @@ function ApplicationRound(): JSX.Element {
                 <div>
                   <SubmitButton
                     disabled={!isApplicationChecked}
-                    onClick={() => alert("TODO")} // eslint-disable-line no-alert
+                    onClick={setApplicationRoundAsReviewed}
                   >
                     {t("Application.gotoSplitPreparation")}
                   </SubmitButton>
@@ -341,4 +319,4 @@ function ApplicationRound(): JSX.Element {
   );
 }
 
-export default withMainMenu(ApplicationRound);
+export default withMainMenu(Review);
