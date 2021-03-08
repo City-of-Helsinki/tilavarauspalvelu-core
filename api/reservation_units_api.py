@@ -19,6 +19,10 @@ from reservation_units.models import (
 from spaces.models import District, Unit
 
 
+class NumberInFilter(filters.BaseInFilter, filters.NumberFilter):
+    pass
+
+
 class ReservationUnitFilter(filters.FilterSet):
     purpose = filters.ModelMultipleChoiceFilter(
         field_name="purposes", queryset=Purpose.objects.all()
@@ -38,6 +42,8 @@ class ReservationUnitFilter(filters.FilterSet):
         field_name="reservation_unit_type", queryset=ReservationUnitType.objects.all()
     )
     unit = filters.ModelChoiceFilter(field_name="unit", queryset=Unit.objects.all())
+
+    ids = NumberInFilter(field_name="id", lookup_expr="in")
 
 
 class ReservationUnitImageSerializer(serializers.ModelSerializer):
