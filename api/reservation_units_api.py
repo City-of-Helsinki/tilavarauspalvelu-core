@@ -97,6 +97,7 @@ class ReservationUnitSerializer(TranslatedModelSerializer):
         fields = [
             "id",
             "name",
+            "description",
             "spaces",
             "resources",
             "services",
