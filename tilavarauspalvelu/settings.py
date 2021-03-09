@@ -240,7 +240,7 @@ USE_TZ = True
 GRAPHENE = {"SCHEMA": "api.graphql.schema.schema"}
 
 REST_FRAMEWORK = {
-    "DEFAULT_PERMISSION_CLASSES": ["permissions.api_permissions.AllowNonePermission"],
+    "DEFAULT_PERMISSION_CLASSES": ["permissions.api_permissions.ReadOnly"],
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.BasicAuthentication",
         "rest_framework.authentication.SessionAuthentication",
