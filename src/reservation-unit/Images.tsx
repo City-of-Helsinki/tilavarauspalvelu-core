@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
+import { breakpoint } from '../common/style';
 import { Image } from '../common/types';
 
 type Props = {
@@ -17,13 +18,23 @@ const Container = styled.div`
 `;
 
 const ImageGrid = styled.div`
+  margin-top: var(--spacing-layout-s);
   display: grid;
+  gap: var(--spacing-xs);
   grid-template-columns: 1fr 1fr 1fr;
-  gap: var(--spacing-s);
+  @media (max-width: ${breakpoint.l}) {
+    grid-template-columns: 1fr 1fr;
+  }
 `;
 
 const ThumbnailImage = styled.img`
-  margin-top: var(--spacing-layout-s);
+  object-fit: cover;
+  width: 122px;
+  height: 122px;
+  @media (max-width: ${breakpoint.l}) {
+    width: 100%;
+    height: auto;
+  }
 `;
 
 const Images = ({ images }: Props): JSX.Element => {

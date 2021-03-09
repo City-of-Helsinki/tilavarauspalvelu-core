@@ -19,6 +19,7 @@ import Container from '../component/Container';
 import { localizedValue } from '../common/util';
 import useReservationUnitList from '../common/hook/useReservationUnitList';
 import StartApplicationBar from '../component/StartApplicationBar';
+import { breakpoint } from '../common/style';
 
 interface Props {
   reservationUnit: ReservationUnitType;
@@ -51,6 +52,10 @@ const RightContainer = styled.div`
   div > h1 {
     margin-top: 0;
   }
+
+  @media (max-width: ${breakpoint.l}) {
+    grid-template-columns: 1fr;
+  }
 `;
 
 const Props = styled.div`
@@ -82,6 +87,18 @@ const ImageContainer = styled.div`
   img {
     position: absolute;
     z-index: 3;
+  }
+  @media (max-width: ${breakpoint.l}) {
+    position: auto;
+  }
+`;
+
+const Image = styled.img`
+  width: 588px;
+  height: 406px;
+  @media (max-width: ${breakpoint.l}) {
+    width: 100%;
+    height: auto;
   }
 `;
 
@@ -179,12 +196,10 @@ const Head = ({ reservationUnit }: Props): JSX.Element => {
             </ButtonContainer>
           </div>
           <ImageContainer>
-            <img
+            <Image
               alt={t('common.imgAltForSpace', {
                 name: localizedValue(reservationUnit.name, i18n.language),
               })}
-              width="588"
-              height="406"
               src={
                 reservationUnit.images[0]?.imageUrl ||
                 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='
