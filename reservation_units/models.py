@@ -116,7 +116,7 @@ class ReservationUnit(models.Model):
     def check_required_introduction(self, user):
         return Introduction.objects.filter(reservation_unit=self, user=user).exists()
 
-    def check_reservation_overlap(self, start_time, end_time):
+    def check_reservation_overlap(self, start_time, end_time, reservation=None):
         from reservations.models import STATE_CHOICES, Reservation
 
         spaces = []
@@ -128,15 +128,17 @@ class ReservationUnit(models.Model):
             Q(resources__in=self.resources.all()) | Q(spaces__in=spaces)
         ).distinct()
 
-        return (
-            Reservation.objects.filter(
-                reservation_unit__in=reservation_units_with_same_components,
-                end__gt=start_time,
-                begin__lt=end_time,
-            )
-            .exclude(state__in=[STATE_CHOICES.CANCELLED, STATE_CHOICES.DENIED])
-            .exists()
-        )
+        qs = Reservation.objects.filter(
+            reservation_unit__in=reservation_units_with_same_components,
+            end__gt=start_time,
+            begin__lt=end_time,
+        ).exclude(state__in=[STATE_CHOICES.CANCELLED, STATE_CHOICES.DENIED])
+
+        # If updating an existing reservation, allow "overlapping" it's old time
+        if reservation:
+            qs = qs.exclude(pk=reservation.pk)
+
+        return qs.exists()
 
 
 class ReservationUnitImage(models.Model):

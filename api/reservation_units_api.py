@@ -8,6 +8,13 @@ from api.resources_api import ResourceSerializer
 from api.services_api import ServiceSerializer
 from api.space_api import BuildingSerializer, LocationSerializer, SpaceSerializer
 from applications.models import ApplicationRound
+from permissions.api_permissions import (
+    EquipmentCategoryPermission,
+    EquipmentPermission,
+    PurposePermission,
+    ReservationUnitPermission,
+    ReservationUnitTypePermission,
+)
 from reservation_units.models import (
     Equipment,
     EquipmentCategory,
@@ -92,6 +99,10 @@ class ReservationUnitSerializer(TranslatedModelSerializer):
         help_text="Ids of equipment available in this reservation unit.",
     )
 
+    unit_id = serializers.PrimaryKeyRelatedField(
+        queryset=Unit.objects.all(), source="unit"
+    )
+
     class Meta:
         model = ReservationUnit
         fields = [
@@ -109,6 +120,7 @@ class ReservationUnitSerializer(TranslatedModelSerializer):
             "building",
             "terms_of_use",
             "equipment_ids",
+            "unit_id",
         ]
         extra_kwargs = {
             "name": {
@@ -155,6 +167,7 @@ class ReservationUnitViewSet(viewsets.ModelViewSet):
     ordering_fields = ["name", "max_persons"]
     filterset_class = ReservationUnitFilter
     search_fields = ["name"]
+    permission_classes = [ReservationUnitPermission]
 
     def get_queryset(self):
         qs = (
@@ -179,6 +192,7 @@ class PurposeViewSet(
 ):
     serializer_class = PurposeSerializer
     queryset = Purpose.objects.all()
+    permission_classes = [PurposePermission]
 
 
 class ReservationUnitTypeViewSet(
@@ -186,6 +200,7 @@ class ReservationUnitTypeViewSet(
 ):
     serializer_class = ReservationUnitTypeSerializer
     queryset = ReservationUnitType.objects.all()
+    permission_classes = [ReservationUnitTypePermission]
 
 
 class EquipmentCategorySerializer(serializers.ModelSerializer):
@@ -200,6 +215,7 @@ class EquipmentCategorySerializer(serializers.ModelSerializer):
 class EquipmentCategoryViewSet(viewsets.ModelViewSet):
     serializer_class = EquipmentCategorySerializer
     queryset = EquipmentCategory.objects.all()
+    permission_classes = [EquipmentCategoryPermission]
 
 
 class EquipmentSerializer(serializers.ModelSerializer):
@@ -215,3 +231,4 @@ class EquipmentSerializer(serializers.ModelSerializer):
 class EquipmentViewSet(viewsets.ModelViewSet):
     serializer_class = EquipmentSerializer
     queryset = Equipment.objects.all()
+    permission_classes = [EquipmentPermission]

@@ -178,19 +178,26 @@ def test_reservation_fetch_filtering_by_reservation_unit(
 
 
 @pytest.mark.django_db
-def test_age_group_create(user_api_client):
+def test_age_group_create(user_api_client, general_admin_api_client):
     assert AgeGroup.objects.count() == 0
+
     response = user_api_client.post(
         reverse("age_group-list"), data={"minimum": 20, "maximum": 40}, format="json"
     )
+    assert response.status_code == 403
+
+    response = general_admin_api_client.post(
+        reverse("age_group-list"), data={"minimum": 20, "maximum": 40}, format="json"
+    )
     assert response.status_code == 201
+
     assert AgeGroup.objects.count() == 1
 
 
 @pytest.mark.django_db
-def test_age_group_create_invalid_maximum(user_api_client):
+def test_age_group_create_invalid_maximum(general_admin_api_client):
     assert AgeGroup.objects.count() == 0
-    response = user_api_client.post(
+    response = general_admin_api_client.post(
         reverse("age_group-list"), data={"minimum": 20, "maximum": 10}, format="json"
     )
     assert response.status_code == 400
@@ -210,12 +217,19 @@ def test_age_group_fetch(user_api_client, ten_to_15_age_group):
 
 
 @pytest.mark.django_db
-def test_ability_group_create(user_api_client):
+def test_ability_group_create(user_api_client, general_admin_api_client):
     assert AbilityGroup.objects.count() == 0
+
     response = user_api_client.post(
         reverse("ability_group-list"), data={"name": "new group"}, format="json"
     )
+    assert response.status_code == 403
+
+    response = general_admin_api_client.post(
+        reverse("ability_group-list"), data={"name": "new group"}, format="json"
+    )
     assert response.status_code == 201
+
     assert AbilityGroup.objects.count() == 1
 
 
@@ -225,3 +239,144 @@ def test_ability_group_fetch(user_api_client, hobbyist_ability_group):
     assert response.status_code == 200
     assert len(response.data) == 1
     assert response.data[0].get("name") == "Hobbyist level"
+
+
+@pytest.mark.django_db
+def test_unauthenticated_cannot_create_reservation(
+    unauthenticated_api_client, valid_reservation_data
+):
+    response = unauthenticated_api_client.post(
+        reverse("reservation-list"), valid_reservation_data, format="json"
+    )
+    assert response.status_code == 401
+
+
+@pytest.mark.django_db
+def test_user_can_create_reservation(user_api_client, valid_reservation_data):
+    response = user_api_client.post(
+        reverse("reservation-list"), valid_reservation_data, format="json"
+    )
+    assert response.status_code == 201
+
+
+@pytest.mark.django_db
+def test_user_can_update_own_reservation(
+    user_api_client, valid_reservation_data, reservation
+):
+    response = user_api_client.put(
+        reverse("reservation-detail", kwargs={"pk": reservation.id}),
+        data=valid_reservation_data,
+        format="json",
+    )
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_user_cannot_view_or_update_other_users_reservation(
+    user_2_api_client, valid_reservation_data, reservation
+):
+    response = user_2_api_client.get(
+        reverse("reservation-detail", kwargs={"pk": reservation.id}),
+        format="json",
+    )
+    assert response.status_code == 404
+
+    response = user_2_api_client.put(
+        reverse("reservation-detail", kwargs={"pk": reservation.id}),
+        data=valid_reservation_data,
+        format="json",
+    )
+    assert response.status_code == 404
+
+
+@pytest.mark.django_db
+def test_general_admin_can_update_users_reservation(
+    general_admin_api_client, valid_reservation_data, reservation
+):
+    response = general_admin_api_client.put(
+        reverse("reservation-detail", kwargs={"pk": reservation.id}),
+        data=valid_reservation_data,
+        format="json",
+    )
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_unit_admin_can_update_users_reservation(
+    unit_admin_api_client, valid_reservation_data, reservation
+):
+    response = unit_admin_api_client.put(
+        reverse("reservation-detail", kwargs={"pk": reservation.id}),
+        data=valid_reservation_data,
+        format="json",
+    )
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_unit_manager_can_update_users_reservation(
+    unit_manager_api_client, valid_reservation_data, reservation
+):
+    response = unit_manager_api_client.put(
+        reverse("reservation-detail", kwargs={"pk": reservation.id}),
+        data=valid_reservation_data,
+        format="json",
+    )
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_unit_viewer_cannot_update_users_reservation(
+    unit_viewer_api_client, valid_reservation_data, reservation
+):
+    response = unit_viewer_api_client.put(
+        reverse("reservation-detail", kwargs={"pk": reservation.id}),
+        data=valid_reservation_data,
+        format="json",
+    )
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_unit_viewer_can_view_users_reservation(unit_viewer_api_client, reservation):
+    response = unit_viewer_api_client.get(
+        reverse("reservation-detail", kwargs={"pk": reservation.id}),
+        format="json",
+    )
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_service_sector_admin_can_update_users_reservation(
+    service_sector_admin_api_client, valid_reservation_data, reservation
+):
+    response = service_sector_admin_api_client.put(
+        reverse("reservation-detail", kwargs={"pk": reservation.id}),
+        data=valid_reservation_data,
+        format="json",
+    )
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_service_sector_application_manager_cannot_view_or_update_users_reservation(
+    service_sector_application_manager_api_client, valid_reservation_data, reservation
+):
+    response = service_sector_application_manager_api_client.put(
+        reverse("reservation-detail", kwargs={"pk": reservation.id}),
+        data=valid_reservation_data,
+        format="json",
+    )
+    assert response.status_code == 404
+
+
+@pytest.mark.django_db
+def test_wrong_service_sectors_admin_cannot_view_or_update_users_reservation(
+    service_sector_2_admin_api_client, valid_reservation_data, reservation
+):
+    response = service_sector_2_admin_api_client.put(
+        reverse("reservation-detail", kwargs={"pk": reservation.id}),
+        data=valid_reservation_data,
+        format="json",
+    )
+    assert response.status_code == 404

@@ -68,6 +68,11 @@ class ServiceSector(models.Model):
         return self.name
 
 
+class UnitGroup(models.Model):
+    name = models.CharField(verbose_name=_("Name"), max_length=255)
+    units = models.ManyToManyField("Unit", related_name="unit_groups")
+
+
 class Unit(models.Model):
     """
     Model representation of Unit as in "office" or "premises" that could contain

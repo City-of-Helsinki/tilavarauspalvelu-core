@@ -1,10 +1,20 @@
 from django.contrib.auth import get_user_model
+from django.db.models import Q
 from django_filters import rest_framework as filters
 from drf_extra_fields.relations import PresentablePrimaryKeyRelatedField
 from drf_spectacular.utils import extend_schema
 from rest_framework import filters as drf_filters
 from rest_framework import serializers, viewsets
 
+from permissions.api_permissions import (
+    AbilityGroupPermission,
+    AgeGroupPermission,
+    ReservationPermission,
+)
+from permissions.helpers import (
+    get_service_sectors_where_can_view_reservations,
+    get_units_where_can_view_reservations,
+)
 from reservation_units.models import ReservationUnit
 from reservations.models import STATE_CHOICES, AbilityGroup, AgeGroup, Reservation
 
@@ -68,7 +78,9 @@ class ReservationSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         for reservation_unit in data["reservation_unit"]:
-            if reservation_unit.check_reservation_overlap(data["begin"], data["end"]):
+            if reservation_unit.check_reservation_overlap(
+                data["begin"], data["end"], self.instance
+            ):
                 raise serializers.ValidationError(
                     "Overlapping reservations are not allowed"
                 )
@@ -105,6 +117,7 @@ class ReservationFilter(filters.FilterSet):
 
 class ReservationViewSet(viewsets.ModelViewSet):
     serializer_class = ReservationSerializer
+    permission_classes = [ReservationPermission]
 
     filter_backends = [
         drf_filters.OrderingFilter,
@@ -121,6 +134,19 @@ class ReservationViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user_id=self.request.user.pk)
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        user = self.request.user
+        return queryset.filter(
+            Q(reservation_unit__unit__in=get_units_where_can_view_reservations(user))
+            | Q(
+                reservation_unit__unit__service_sectors__in=get_service_sectors_where_can_view_reservations(
+                    user
+                )
+            )
+            | Q(user=user)
+        )
 
 
 class AgeGroupSerializer(serializers.ModelSerializer):
@@ -160,6 +186,7 @@ class AgeGroupSerializer(serializers.ModelSerializer):
 class AgeGroupViewSet(viewsets.ModelViewSet):
     serializer_class = AgeGroupSerializer
     queryset = AgeGroup.objects.all()
+    permission_classes = [AgeGroupPermission]
 
 
 class AbilityGroupSerializer(serializers.ModelSerializer):
@@ -180,3 +207,4 @@ class AbilityGroupSerializer(serializers.ModelSerializer):
 class AbilityGroupViewSet(viewsets.ModelViewSet):
     serializer_class = AbilityGroupSerializer
     queryset = AbilityGroup.objects.all()
+    permission_classes = [AbilityGroupPermission]
