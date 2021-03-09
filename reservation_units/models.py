@@ -41,7 +41,7 @@ class ReservationUnitType(models.Model):
 class ReservationUnit(models.Model):
     name = models.CharField(verbose_name=_("Name"), max_length=255)
     description = models.TextField(
-        verbose_name=_("Description"), max_length=512, blank=True, default=""
+        verbose_name=_("Description"), blank=True, default=""
     )
     spaces = models.ManyToManyField(
         Space, verbose_name=_("Spaces"), related_name="reservation_units", blank=True
