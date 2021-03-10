@@ -297,6 +297,7 @@ if os.path.exists(local_settings_path):
     exec(code, globals(), locals())
 
 # TODO: Very simple basic authentication for the initial testing phase.
+TMP_PERMISSIONS_DISABLED = False
 if "TMP_PERMISSIONS_DISABLED" in os.environ:
     TMP_PERMISSIONS_DISABLED = (
         True if env("TMP_PERMISSIONS_DISABLED").lower() in ["true", "1"] else False

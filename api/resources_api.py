@@ -1,4 +1,5 @@
-from rest_framework import serializers, viewsets
+from django.conf import settings
+from rest_framework import permissions, serializers, viewsets
 
 from api.base import TranslatedModelSerializer
 from permissions.api_permissions import ResourcePermission
@@ -42,4 +43,8 @@ class ResourceSerializer(TranslatedModelSerializer):
 class ResourceViewSet(viewsets.ModelViewSet):
     serializer_class = ResourceSerializer
     queryset = Resource.objects.all()
-    permission_classes = [ResourcePermission]
+    permission_classes = (
+        [ResourcePermission]
+        if not settings.TMP_PERMISSIONS_DISABLED
+        else [permissions.AllowAny]
+    )

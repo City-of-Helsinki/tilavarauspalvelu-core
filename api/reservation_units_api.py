@@ -1,7 +1,8 @@
+from django.conf import settings
 from django.db.models import Sum
 from django_filters import rest_framework as filters
 from rest_framework import filters as drf_filters
-from rest_framework import mixins, serializers, viewsets
+from rest_framework import mixins, permissions, serializers, viewsets
 
 from api.base import HierarchyModelMultipleChoiceFilter, TranslatedModelSerializer
 from api.resources_api import ResourceSerializer
@@ -173,7 +174,11 @@ class ReservationUnitViewSet(viewsets.ModelViewSet):
     ordering_fields = ["name", "max_persons"]
     filterset_class = ReservationUnitFilter
     search_fields = ["name"]
-    permission_classes = [ReservationUnitPermission]
+    permission_classes = (
+        [ReservationUnitPermission]
+        if not settings.TMP_PERMISSIONS_DISABLED
+        else [permissions.AllowAny]
+    )
 
     def get_queryset(self):
         qs = (
@@ -198,7 +203,11 @@ class PurposeViewSet(
 ):
     serializer_class = PurposeSerializer
     queryset = Purpose.objects.all()
-    permission_classes = [PurposePermission]
+    permission_classes = (
+        [PurposePermission]
+        if not settings.TMP_PERMISSIONS_DISABLED
+        else [permissions.AllowAny]
+    )
 
 
 class ReservationUnitTypeViewSet(
@@ -206,7 +215,11 @@ class ReservationUnitTypeViewSet(
 ):
     serializer_class = ReservationUnitTypeSerializer
     queryset = ReservationUnitType.objects.all()
-    permission_classes = [ReservationUnitTypePermission]
+    permission_classes = (
+        [ReservationUnitTypePermission]
+        if not settings.TMP_PERMISSIONS_DISABLED
+        else [permissions.AllowAny]
+    )
 
 
 class EquipmentCategorySerializer(serializers.ModelSerializer):
@@ -221,7 +234,11 @@ class EquipmentCategorySerializer(serializers.ModelSerializer):
 class EquipmentCategoryViewSet(viewsets.ModelViewSet):
     serializer_class = EquipmentCategorySerializer
     queryset = EquipmentCategory.objects.all()
-    permission_classes = [EquipmentCategoryPermission]
+    permission_classes = (
+        [EquipmentCategoryPermission]
+        if not settings.TMP_PERMISSIONS_DISABLED
+        else [permissions.AllowAny]
+    )
 
 
 class EquipmentSerializer(serializers.ModelSerializer):
@@ -237,4 +254,8 @@ class EquipmentSerializer(serializers.ModelSerializer):
 class EquipmentViewSet(viewsets.ModelViewSet):
     serializer_class = EquipmentSerializer
     queryset = Equipment.objects.all()
-    permission_classes = [EquipmentPermission]
+    permission_classes = (
+        [EquipmentPermission]
+        if not settings.TMP_PERMISSIONS_DISABLED
+        else [permissions.AllowAny]
+    )

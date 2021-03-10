@@ -5,7 +5,6 @@ from drf_spectacular.views import (
     SpectacularRedocView,
     SpectacularSwaggerView,
 )
-from graphene_django.views import GraphQLView
 
 from api.urls import router as api_router
 
@@ -15,5 +14,4 @@ urlpatterns = [
     path("openapi/", SpectacularAPIView.as_view(), name="schema"),
     path("swagger-ui/", SpectacularSwaggerView.as_view(url_name="schema")),
     path("redoc/", SpectacularRedocView.as_view(url_name="schema")),
-    path("graphql", GraphQLView.as_view(graphiql=True)),
 ]
