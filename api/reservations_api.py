@@ -1,10 +1,11 @@
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db.models import Q
 from django_filters import rest_framework as filters
 from drf_extra_fields.relations import PresentablePrimaryKeyRelatedField
 from drf_spectacular.utils import extend_schema
 from rest_framework import filters as drf_filters
-from rest_framework import serializers, viewsets
+from rest_framework import permissions, serializers, viewsets
 
 from permissions.api_permissions import (
     AbilityGroupPermission,
@@ -117,7 +118,11 @@ class ReservationFilter(filters.FilterSet):
 
 class ReservationViewSet(viewsets.ModelViewSet):
     serializer_class = ReservationSerializer
-    permission_classes = [ReservationPermission]
+    permission_classes = (
+        [ReservationPermission]
+        if not settings.TMP_PERMISSIONS_DISABLED
+        else [permissions.AllowAny]
+    )
 
     filter_backends = [
         drf_filters.OrderingFilter,
@@ -186,7 +191,11 @@ class AgeGroupSerializer(serializers.ModelSerializer):
 class AgeGroupViewSet(viewsets.ModelViewSet):
     serializer_class = AgeGroupSerializer
     queryset = AgeGroup.objects.all()
-    permission_classes = [AgeGroupPermission]
+    permission_classes = (
+        [AgeGroupPermission]
+        if not settings.TMP_PERMISSIONS_DISABLED
+        else [permissions.AllowAny]
+    )
 
 
 class AbilityGroupSerializer(serializers.ModelSerializer):
@@ -207,4 +216,8 @@ class AbilityGroupSerializer(serializers.ModelSerializer):
 class AbilityGroupViewSet(viewsets.ModelViewSet):
     serializer_class = AbilityGroupSerializer
     queryset = AbilityGroup.objects.all()
-    permission_classes = [AbilityGroupPermission]
+    permission_classes = (
+        [AbilityGroupPermission]
+        if not settings.TMP_PERMISSIONS_DISABLED
+        else [permissions.AllowAny]
+    )

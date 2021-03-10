@@ -1,4 +1,5 @@
-from rest_framework import serializers, viewsets
+from django.conf import settings
+from rest_framework import permissions, serializers, viewsets
 
 from applications.models import ApplicationRound, ApplicationRoundBasket
 from permissions.api_permissions import ApplicationRoundPermission
@@ -199,4 +200,8 @@ class ApplicationRoundSerializer(serializers.ModelSerializer):
 class ApplicationRoundViewSet(viewsets.ModelViewSet):
     queryset = ApplicationRound.objects.all()
     serializer_class = ApplicationRoundSerializer
-    permission_classes = [ApplicationRoundPermission]
+    permission_classes = (
+        [ApplicationRoundPermission]
+        if not settings.TMP_PERMISSIONS_DISABLED
+        else [permissions.AllowAny]
+    )

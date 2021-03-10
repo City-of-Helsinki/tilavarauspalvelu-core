@@ -1,9 +1,10 @@
 from datetime import datetime
 
 from dateutil.parser import parse
+from django.conf import settings
 from django.db.models import Q
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import viewsets
+from rest_framework import permissions, viewsets
 
 from api.applications_api.filters import ApplicationFilter
 from api.applications_api.serializers import (
@@ -23,7 +24,11 @@ class ApplicationViewSet(viewsets.ModelViewSet):
     serializer_class = ApplicationSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = ApplicationFilter
-    permission_classes = [ApplicationPermission]
+    permission_classes = (
+        [ApplicationPermission]
+        if not settings.TMP_PERMISSIONS_DISABLED
+        else [permissions.AllowAny]
+    )
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -41,7 +46,11 @@ class ApplicationViewSet(viewsets.ModelViewSet):
 
 class ApplicationEventViewSet(viewsets.ModelViewSet):
     serializer_class = ApplicationEventSerializer
-    permission_classes = [ApplicationEventPermission]
+    permission_classes = (
+        [ApplicationEventPermission]
+        if not settings.TMP_PERMISSIONS_DISABLED
+        else [permissions.AllowAny]
+    )
     queryset = ApplicationEvent.objects.all()
 
     def get_serializer_context(self):
