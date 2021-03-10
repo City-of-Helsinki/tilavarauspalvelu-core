@@ -148,11 +148,13 @@ env = environ.Env(
     ELASTIC_APM_SERVICE_NAME=(str, None),
     ELASTIC_APM_SECRET_TOKEN=(str, None),
     AUDIT_LOGGING_ENABLED=(bool, False),
+    TMP_PERMISSIONS_DISABLED=(bool, False),
 )
 environ.Env.read_env()
 
 ALLOWED_HOSTS = env("ALLOWED_HOSTS")
 DEBUG = env("DEBUG")
+TMP_PERMISSIONS_DISABLED = env("TMP_PERMISSIONS_DISABLED")
 
 LOGGING = LOGGING_ELASTIC if env("ELASTIC_APM_SERVER_URL") else LOGGING_CONSOLE
 
@@ -296,11 +298,5 @@ if os.path.exists(local_settings_path):
         code = compile(fp.read(), local_settings_path, "exec")
     exec(code, globals(), locals())
 
-# TODO: Very simple basic authentication for the initial testing phase.
-TMP_PERMISSIONS_DISABLED = False
-if "TMP_PERMISSIONS_DISABLED" in os.environ:
-    TMP_PERMISSIONS_DISABLED = (
-        True if env("TMP_PERMISSIONS_DISABLED").lower() in ["true", "1"] else False
-    )
-    if TMP_PERMISSIONS_DISABLED and not DEBUG:
-        logging.error("Running with permissions disabled in production environment.")
+if TMP_PERMISSIONS_DISABLED and not DEBUG:
+    logging.error("Running with permissions disabled in production environment.")

@@ -142,6 +142,8 @@ class ReservationViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
+        if settings.TMP_PERMISSIONS_DISABLED:
+            return queryset
         user = self.request.user
         return queryset.filter(
             Q(reservation_unit__unit__in=get_units_where_can_view_reservations(user))
