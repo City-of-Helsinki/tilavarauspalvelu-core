@@ -32,6 +32,9 @@ class ApplicationViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
+        if settings.TMP_PERMISSIONS_DISABLED:
+            return queryset
+
         user = self.request.user
 
         return queryset.filter(
@@ -64,6 +67,8 @@ class ApplicationEventViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
+        if settings.TMP_PERMISSIONS_DISABLED:
+            return queryset
         user = self.request.user
 
         return queryset.filter(
