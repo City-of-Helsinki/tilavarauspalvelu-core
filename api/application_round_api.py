@@ -1,7 +1,11 @@
 from django.conf import settings
 from rest_framework import permissions, serializers, viewsets
 
-from applications.models import ApplicationRound, ApplicationRoundBasket
+from applications.models import (
+    ApplicationRound,
+    ApplicationRoundBasket,
+    ApplicationRoundStatus,
+)
 from permissions.api_permissions import ApplicationRoundPermission
 from reservation_units.models import Purpose, ReservationUnit
 from reservations.models import AgeGroup
@@ -64,10 +68,15 @@ class ApplicationRoundSerializer(serializers.ModelSerializer):
     purpose_ids = serializers.PrimaryKeyRelatedField(
         queryset=Purpose.objects.all(), source="purposes", many=True
     )
-    status = serializers.CharField(help_text="Status of this application round")
+    status = serializers.ChoiceField(
+        help_text="Status of this application round",
+        choices=ApplicationRoundStatus.get_statuses(),
+    )
     service_sector_id = serializers.PrimaryKeyRelatedField(
         queryset=ServiceSector.objects.all(), source="service_sector"
     )
+
+    allocating = serializers.BooleanField(read_only=True)
 
     class Meta:
         model = ApplicationRound
@@ -85,6 +94,7 @@ class ApplicationRoundSerializer(serializers.ModelSerializer):
             "service_sector_id",
             "status",
             "application_round_baskets",
+            "allocating",
         ]
         extra_kwargs = {
             "name": {

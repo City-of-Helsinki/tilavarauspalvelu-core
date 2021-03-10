@@ -130,11 +130,20 @@ PRIORITIES = PRIORITY_CONST()
 
 class ApplicationRoundStatus(models.Model):
     DRAFT = "draft"
-    PUBLISHED = "published"
-
+    IN_REVIEW = "in_review"
+    REVIEW_DONE = "review_done"
+    ALLOCATED = "allocated"
+    HANDLED = "handled"
+    VALIDATED = "validated"
+    APPROVED = "approved"
     STATUS_CHOICES = (
         (DRAFT, _("Draft")),
-        (PUBLISHED, _("Published")),
+        (IN_REVIEW, _("In review")),
+        (REVIEW_DONE, _("Review done")),
+        (ALLOCATED, _("Allocated")),
+        (HANDLED, _("Handled")),
+        (VALIDATED, _("Validated")),
+        (APPROVED, _("Approved")),
     )
 
     status = models.CharField(
@@ -185,6 +194,10 @@ class ApplicationRound(models.Model):
 
     target_group = models.CharField(
         max_length=50, verbose_name=_("Target group"), choices=TARGET_GROUP_CHOICES
+    )
+
+    allocating = models.BooleanField(
+        verbose_name=_("Allocating"), blank=True, default=False
     )
 
     reservation_units = models.ManyToManyField(
