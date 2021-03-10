@@ -91,7 +91,7 @@ def test_update_application_round(
     application_round,
     valid_application_round_data,
 ):
-    data = {**valid_application_round_data, "status": ApplicationRoundStatus.PUBLISHED}
+    data = {**valid_application_round_data, "status": ApplicationRoundStatus.IN_REVIEW}
 
     # Normal user not allowed to edit application round
     response = user_api_client.put(
@@ -111,7 +111,7 @@ def test_update_application_round(
 
     application_round.refresh_from_db()
 
-    assert application_round.status == ApplicationRoundStatus.PUBLISHED
+    assert application_round.status == ApplicationRoundStatus.IN_REVIEW
     assert application_round.name == valid_application_round_data["name"]
 
 
