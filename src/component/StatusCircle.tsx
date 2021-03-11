@@ -63,7 +63,9 @@ const StatusCircle = ({ status, x, y }: IProps): JSX.Element => {
         strokeWidth={size.minDimension * 0.07}
         fill="none"
         stroke={
-          statusAngles > 359.9 ? "var(--color-success)" : "var(--color-black-5)"
+          statusAngles > 359.9
+            ? "var(--color-success)"
+            : "var(--color-black-30)"
         }
         key="circle"
       />

@@ -2,7 +2,13 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { useHistory } from "react-router-dom";
-import { Button, IconArrowRedo, Notification, Select } from "hds-react";
+import {
+  Button,
+  IconArrowRedo,
+  IconGroup,
+  Notification,
+  Select,
+} from "hds-react";
 import { getApplicationRound } from "../../common/api";
 import Loader from "../Loader";
 import {
@@ -18,7 +24,6 @@ import StatusRecommendation from "../Applications/StatusRecommendation";
 import withMainMenu from "../withMainMenu";
 import ApplicationRoundNavi from "./ApplicationRoundNavi";
 import TimeframeStatus from "./TimeframeStatus";
-import { ReactComponent as IconCustomers } from "../../images/icon_customers.svg";
 import AllocatingDialogContent from "./AllocatingDialogContent";
 
 interface IProps {
@@ -218,7 +223,7 @@ function Allocation({ applicationRoundId }: IProps): JSX.Element {
                 onChange={(option: ApplicationRoundBasket) => setBasket(option)}
                 helper={t("ApplicationRound.allocatedBasketHelper")}
                 options={basketOptions}
-                icon={<IconCustomers />}
+                icon={<IconGroup />}
               />
             </SelectWrapper>
             <ActionContainer>

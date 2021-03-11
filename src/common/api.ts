@@ -8,7 +8,7 @@ import {
 } from "./types";
 
 const axiosOptions: AxiosRequestConfig = {
-  timeout: 5000,
+  timeout: 50000,
   headers: {
     "Content-Type": "application/json",
   },
@@ -147,9 +147,13 @@ export function getReservationUnit(id: number): Promise<ReservationUnit> {
   });
 }
 
-export function getParameters(
-  name: "purpose" | "age_group" | "ability_group" | "reservation_unit_type"
-): Promise<Parameter[]> {
+export type ParameterNames =
+  | "purpose"
+  | "age_group"
+  | "ability_group"
+  | "reservation_unit_type";
+
+export function getParameters(name: ParameterNames): Promise<Parameter[]> {
   return apiGet<Parameter[]>({
     path: `v1/${parameterBasePath}/${name}`,
   });

@@ -9,7 +9,7 @@ const configuration = {
   authority: "https://api.hel.fi/sso/",
   silent_redirect_uri: `${base}/login/helsinki/return`,
   automaticSilentRenew: true,
-  loadUserInfo: false,
+  loadUserInfo: true,
 };
 
 export default configuration;

@@ -22,7 +22,7 @@ type OrderTypes = "asc" | "desc";
 interface Column {
   title: string;
   key: string;
-  transform?: (arg0: DataType) => string | JSX.Element;
+  transform?: (arg0: any) => string | JSX.Element;
 }
 
 export interface CellConfig {
@@ -42,7 +42,20 @@ interface IProps {
 
 const Wrapper = styled.div``;
 
-const Filters = styled.div`
+export const Filters = styled.div`
+  & > button {
+    margin-right: var(--spacing-m);
+
+    svg {
+      display: none;
+
+      @media (min-width: ${breakpoints.s}) {
+        display: inline;
+        min-width: 20px;
+      }
+    }
+  }
+
   background-color: var(--tilavaraus-admin-gray);
   padding: 0 var(--spacing-xl);
   display: flex;
@@ -57,7 +70,7 @@ interface IFilterBtn {
   $filtersActive: boolean;
 }
 
-const FilterBtn = styled(Button).attrs(
+export const FilterBtn = styled(Button).attrs(
   ({ $filterControlsAreOpen, $filtersActive }: IFilterBtn) => ({
     style: {
       "--filter-button-color": $filtersActive
@@ -70,6 +83,9 @@ const FilterBtn = styled(Button).attrs(
       "--color-white": $filtersActive
         ? "white"
         : "var(--tilavaraus-admin-content-text-color)",
+      "--background-color-disabled": "transparent",
+      "--border-color-disabled": "transparent",
+      "--color-disabled": "var(--color-black-50)",
     } as React.CSSProperties,
   })
 )<IFilterBtn>`
@@ -84,7 +100,7 @@ const FilterBtn = styled(Button).attrs(
 const tableBorder = (size = "0.5em") =>
   `${size} solid var(--tilavaraus-admin-gray)`;
 
-const TableWrapper = styled.div`
+export const TableWrapper = styled.div`
   &:after {
     content: "";
     position: absolute;
@@ -102,7 +118,7 @@ const TableWrapper = styled.div`
   width: 100%;
 `;
 
-const Table = styled.table`
+export const Table = styled.table`
   width: 100%;
   min-width: var(--breakpoint-m);
   padding: 0 var(--spacing-m);
@@ -117,7 +133,7 @@ const Table = styled.table`
   }
 `;
 
-const Cell = styled.td`
+export const Cell = styled.td`
   &:after {
     content: "";
     position: absolute;
@@ -147,17 +163,19 @@ const Cell = styled.td`
   user-select: none;
 `;
 
-const Row = styled.tr<{ $clickable?: boolean }>`
+export const Row = styled.tr<{ $clickable?: boolean }>`
   ${({ $clickable }) => $clickable && "cursor: pointer;"}
 `;
 
-const Heading = styled.thead`
+export const Heading = styled.thead`
   ${Cell} {
     &:first-of-type {
       padding-left: calc(0.5em + var(--spacing-m));
     }
 
     &.sortingActive {
+      padding-right: var(--spacing-m);
+
       svg {
         position: absolute;
         top: 1.2em;
@@ -173,7 +191,7 @@ const Heading = styled.thead`
   }
 `;
 
-const Body = styled.tbody`
+export const Body = styled.tbody`
   ${Row} {
     &:hover {
       ${Cell} {
@@ -217,6 +235,8 @@ const Body = styled.tbody`
 
       border-bottom: ${tableBorder("0.3em")};
     }
+
+    font-size: var(--fontsize-body-s);
   }
 `;
 
@@ -271,8 +291,8 @@ function DataTable({
   const { t } = useTranslation();
   const history = useHistory();
 
-  const processedData = processData(data, sorting, order, filters);
-  const sortingEnabled = processedData.length > 0;
+  const processedData: DataType[] = processData(data, sorting, order, filters);
+  const sortingEnabled: boolean = processedData.length > 0;
 
   return (
     <Wrapper className={className}>
@@ -280,7 +300,7 @@ function DataTable({
         <FilterBtn
           data-testid="data-table__button--filter-toggle"
           iconLeft={<IconSliders />}
-          onClick={() => toggleFilterVisibility(!filtersAreVisible)}
+          onClick={(): void => toggleFilterVisibility(!filtersAreVisible)}
           className={classNames({ filterControlsAreOpen: filtersAreVisible })}
           $filterControlsAreOpen={filtersAreVisible}
           $filtersActive={filters.length > 0}
@@ -299,55 +319,62 @@ function DataTable({
         <Table data-testid="data-table">
           <Heading>
             <Row>
-              {cellConfig.cols.map((col) => {
-                const sortingActive = sortingEnabled && col.key === sorting;
-                const title = t(col.title);
-                return (
-                  <Cell
-                    as="th"
-                    key={col.key}
-                    onClick={() =>
-                      sortingEnabled && setSortingAndOrder(col.key)
-                    }
-                    className={classNames({ sortingActive })}
-                    title={title}
-                  >
-                    <span>{title}</span>
-                    {sortingActive && <SortingArrow direction={order} />}
-                  </Cell>
-                );
-              })}
+              {cellConfig.cols.map(
+                (col): JSX.Element => {
+                  const sortingActive: boolean =
+                    sortingEnabled && col.key === sorting;
+                  const title = t(col.title);
+                  return (
+                    <Cell
+                      as="th"
+                      key={col.key}
+                      onClick={(): void | false =>
+                        sortingEnabled && setSortingAndOrder(col.key)
+                      }
+                      className={classNames({ sortingActive })}
+                      title={title}
+                    >
+                      <span>{title}</span>
+                      {sortingActive && <SortingArrow direction={order} />}
+                    </Cell>
+                  );
+                }
+              )}
             </Row>
           </Heading>
           <Body>
             {processedData.length > 0 ? (
-              processedData.map((row: DataType) => {
-                const rowKey = `${sorting}${order}${get(
-                  row,
-                  cellConfig.index
-                )}`;
-                return (
-                  <Row
-                    key={rowKey}
-                    onClick={() => {
-                      if (cellConfig.rowLink) {
-                        const dataIndex = get(row, cellConfig.index);
-                        const link = cellConfig.rowLink(dataIndex);
-                        history.push(link);
-                      }
-                    }}
-                    $clickable={!!cellConfig.rowLink}
-                  >
-                    {cellConfig.cols.map((col: Column) => {
-                      const colKey = `${rowKey}${col.key}`;
-                      const value = col.transform
-                        ? col.transform(row)
-                        : get(row, col.key);
-                      return <Cell key={colKey}>{value}</Cell>;
-                    })}
-                  </Row>
-                );
-              })
+              processedData.map(
+                (row: DataType): JSX.Element => {
+                  const rowKey = `${sorting}${order}${get(
+                    row,
+                    cellConfig.index
+                  )}`;
+                  return (
+                    <Row
+                      key={rowKey}
+                      onClick={(): void => {
+                        if (cellConfig.rowLink) {
+                          const dataIndex = get(row, cellConfig.index);
+                          const link = cellConfig.rowLink(dataIndex);
+                          history.push(link);
+                        }
+                      }}
+                      $clickable={!!cellConfig.rowLink}
+                    >
+                      {cellConfig.cols.map(
+                        (col: Column): JSX.Element => {
+                          const colKey = `${rowKey}${col.key}`;
+                          const value = col.transform
+                            ? col.transform(row)
+                            : get(row, col.key);
+                          return <Cell key={colKey}>{value}</Cell>;
+                        }
+                      )}
+                    </Row>
+                  );
+                }
+              )
             ) : (
               <Row>
                 <Cell colSpan={cellConfig.cols.length}>

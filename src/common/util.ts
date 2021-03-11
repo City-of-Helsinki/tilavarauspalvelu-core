@@ -22,6 +22,8 @@ interface IFormatDurationOutput {
   minutes: number;
 }
 
+export type StatusView = "review" | "handling";
+
 export const formatDuration = (time: string): IFormatDurationOutput => {
   const [hours, minutes] = time.split(":");
   return {
@@ -32,12 +34,16 @@ export const formatDuration = (time: string): IFormatDurationOutput => {
 
 export const getNormalizedStatus = (
   status: ApplicationStatus,
-  view: number
+  view: StatusView
 ): ApplicationStatus => {
   let normalizedStatus: ApplicationStatus = status;
-  if (view === 1) {
+  if (view === "review") {
     if (status === "in_review") {
       normalizedStatus = "review_done";
+    }
+  } else if (view === "handling") {
+    if (["review_done", "in_review"].includes(status)) {
+      normalizedStatus = "allocated";
     }
   }
 

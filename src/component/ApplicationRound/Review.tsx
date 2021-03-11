@@ -108,7 +108,7 @@ const getFilterConfig = (
     {
       title: "Application.headings.applicationStatus",
       filters: statuses.map((status) => {
-        const normalizedStatus = getNormalizedStatus(status, 1);
+        const normalizedStatus = getNormalizedStatus(status, "review");
         return {
           title: `Application.statuses.${normalizedStatus}`,
           key: "status",
@@ -158,7 +158,7 @@ const getCellConfig = (t: TFunction): CellConfig => {
         title: "Application.headings.applicationStatus",
         key: "status",
         transform: ({ status }: ApplicationType) => {
-          const normalizedStatus = getNormalizedStatus(status, 1);
+          const normalizedStatus = getNormalizedStatus(status, "review");
           return (
             <StatusCell
               status={normalizedStatus}

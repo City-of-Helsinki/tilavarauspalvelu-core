@@ -1,4 +1,4 @@
-import { ErrorSummary, Navigation } from "hds-react";
+import { Checkbox, ErrorSummary, Navigation } from "hds-react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 import { ApplicationStatus } from "../common/types";
@@ -24,11 +24,10 @@ export const getStatusColor = (
   switch (status) {
     case "draft":
     case "in_review":
+    case "allocated":
       color = "var(--color-info)";
       break;
     case "review_done":
-    case "allocating":
-    case "allocated":
     case "validated":
     case "handled":
       color = "var(--color-success)";
@@ -91,3 +90,9 @@ export const BasicLink = styled(Link)`
 export const StyledHDSNavigation = styled(Navigation)`
   --breakpoint-xl: 9000px;
 `;
+
+export const SelectionCheckbox = styled(Checkbox).attrs({
+  style: {
+    "--label-padding": "0",
+  } as React.CSSProperties,
+})``;

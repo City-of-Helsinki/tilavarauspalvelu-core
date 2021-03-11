@@ -1,14 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { TFunction } from "i18next";
 import styled from "styled-components";
-import { Button, IconArrowRedo, Notification, Select } from "hds-react";
+import {
+  Button,
+  IconArrowRedo,
+  IconGroup,
+  Notification,
+  Select,
+} from "hds-react";
 import { useHistory } from "react-router-dom";
+import uniq from "lodash/uniq";
 import { getApplicationRound } from "../../common/api";
 import Loader from "../Loader";
 import {
   ApplicationRound as ApplicationRoundType,
   ApplicationRoundBasket,
+  DataFilterConfig,
   OptionType,
 } from "../../common/types";
 import { IngressContainer, NarrowContainer } from "../../styles/layout";
@@ -21,9 +28,11 @@ import TimeframeStatus from "./TimeframeStatus";
 import { ContentHeading, H3, RequiredLabel } from "../../styles/typography";
 import KorosHeading from "../KorosHeading";
 import StatusCircle from "../StatusCircle";
-import { ReactComponent as IconCustomers } from "../../images/icon_customers.svg";
 import AllocatingDialogContent from "./AllocatingDialogContent";
-import DataTable, { CellConfig } from "../DataTable";
+import { CellConfig } from "../DataTable";
+import GroupedDataTable from "../GroupedDataTable";
+import { getNormalizedStatus } from "../../common/util";
+import StatusCell from "../StatusCell";
 
 interface IProps {
   applicationRoundId: string;
@@ -110,8 +119,34 @@ const ActionContainer = styled.div`
   }
 `;
 
-const getCellConfig = (t: TFunction): CellConfig => {
-  console.log(t); // eslint-disable-line
+const getFilterConfig = (recommendations: any[]): DataFilterConfig[] => {
+  const purposes = uniq(recommendations.map((app) => app.purpose));
+  const statuses = uniq(recommendations.map((app) => app.status));
+
+  return [
+    {
+      title: "Application.headings.purpose",
+      filters: purposes.map((value) => ({
+        title: value,
+        key: "purpose",
+        value: value || "",
+      })),
+    },
+    {
+      title: "Application.headings.applicationStatus",
+      filters: statuses.map((status) => {
+        const normalizedStatus = getNormalizedStatus(status, "handling");
+        return {
+          title: `Application.statuses.${normalizedStatus}`,
+          key: "status",
+          value: status,
+        };
+      }),
+    },
+  ];
+};
+
+const getCellConfig = (): CellConfig => {
   return {
     cols: [
       { title: "Application.headings.applicantName", key: "organisation.name" },
@@ -130,6 +165,15 @@ const getCellConfig = (t: TFunction): CellConfig => {
       {
         title: "Application.headings.applicationStatus",
         key: "status",
+        transform: ({ status }: any) => {
+          const normalizedStatus = getNormalizedStatus(status, "handling");
+          return (
+            <StatusCell
+              status={normalizedStatus}
+              text={`Application.statuses.${normalizedStatus}`}
+            />
+          );
+        },
       },
     ],
     index: "id",
@@ -161,8 +205,12 @@ function Handling({ applicationRoundId }: IProps): JSX.Element {
     applicationRound,
     setApplicationRound,
   ] = useState<ApplicationRoundType | null>(null);
+  const [recommendations, setRecommendations] = useState<any[]>([]);
   const [basket, setBasket] = useState<OptionType>(basketOptions[0]);
   const [cellConfig, setCellConfig] = useState<CellConfig | null>(null);
+  const [filterConfig, setFilterConfig] = useState<DataFilterConfig[] | null>(
+    null
+  );
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const { t } = useTranslation();
@@ -187,7 +235,7 @@ function Handling({ applicationRoundId }: IProps): JSX.Element {
           id: applicationRoundId,
         });
         setApplicationRound(result);
-        setCellConfig(getCellConfig(t));
+        setCellConfig(getCellConfig());
         setIsLoading(false);
       } catch (error) {
         const msg =
@@ -200,7 +248,120 @@ function Handling({ applicationRoundId }: IProps): JSX.Element {
     };
 
     fetchApplicationRound();
-  }, [applicationRoundId, t]);
+  }, [applicationRoundId]);
+
+  useEffect(() => {
+    const fetchRecommendations = async () => {
+      try {
+        const result = [
+          {
+            id: 1,
+            space: {
+              name: "Suuri sali",
+            },
+            reservationUnit: {
+              name: "Fallkullan tila",
+            },
+            applications: [
+              {
+                id: 2,
+                purpose: "Purpose",
+                ageGroup: "4-5",
+                status: "review_done",
+                organisation: {
+                  name: "Org Name",
+                  identifier: null,
+                  yearEstablished: 1980,
+                  activeMembers: 13,
+                  coreBusiness: null,
+                  address: null,
+                },
+                aggregatedData: {},
+              },
+              {
+                id: 3,
+                purpose: "Purpose #2",
+                ageGroup: "2-3",
+                status: "review_done",
+                organisation: {
+                  name: "Org Name #2",
+                  identifier: null,
+                  yearEstablished: 1980,
+                  activeMembers: 13,
+                  coreBusiness: null,
+                  address: null,
+                },
+                aggregatedData: {},
+              },
+            ],
+          },
+          {
+            id: 2,
+            space: {
+              name: "Pieni sali",
+            },
+            reservationUnit: {
+              name: "Haltialan tila",
+            },
+            applications: [
+              {
+                id: 12,
+                purpose: "Purpose #3",
+                ageGroup: "14-15",
+                status: "review_done",
+                organisation: {
+                  name: "Org Name #3",
+                  identifier: null,
+                  yearEstablished: 1980,
+                  activeMembers: 13,
+                  coreBusiness: null,
+                  address: null,
+                },
+                aggregatedData: {},
+              },
+              {
+                id: 13,
+                purpose: "Purpose #4",
+                ageGroup: "12-13",
+                status: "review_done",
+                organisation: {
+                  name: "Org Name #4",
+                  identifier: null,
+                  yearEstablished: 1980,
+                  activeMembers: 13,
+                  coreBusiness: null,
+                  address: null,
+                },
+                aggregatedData: {},
+              },
+            ],
+          },
+        ];
+        setCellConfig(getCellConfig());
+        setFilterConfig(
+          getFilterConfig(
+            result.flatMap((n) => {
+              return n.applications;
+            })
+          )
+        );
+        setRecommendations(result);
+      } catch (error) {
+        setErrorMsg("errors.errorFetchingApplications");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (typeof applicationRound?.id === "number") {
+      fetchRecommendations();
+    }
+  }, [applicationRound]);
+
+  const unhandledRecommendationCount: number = recommendations
+    .flatMap((recommendation) => recommendation.applications)
+    .map((application) => application.status)
+    .filter((status) => ["in_review", "review_done"].includes(status)).length;
 
   if (isLoading) {
     return <Loader />;
@@ -212,7 +373,9 @@ function Handling({ applicationRoundId }: IProps): JSX.Element {
       {applicationRound && (
         <>
           <StyledKorosHeading
-            heading={`n${t("common.volumeUnit")}`}
+            heading={`${unhandledRecommendationCount} ${t(
+              "common.volumeUnit"
+            )}`}
             subheading={t("ApplicationRound.suffixUnhandledSuggestions")}
           />
           <IngressContainer>
@@ -249,7 +412,7 @@ function Handling({ applicationRoundId }: IProps): JSX.Element {
                 value={basket}
                 onChange={(option: ApplicationRoundBasket) => setBasket(option)}
                 options={basketOptions}
-                icon={<IconCustomers />}
+                icon={<IconGroup />}
               />
             </SelectWrapper>
             <ActionContainer>
@@ -278,7 +441,11 @@ function Handling({ applicationRoundId }: IProps): JSX.Element {
             </ActionContainer>
           </NarrowContainer>
           {cellConfig && (
-            <DataTable data={[]} cellConfig={cellConfig} filterConfig={[]} />
+            <GroupedDataTable
+              groups={recommendations}
+              filterConfig={filterConfig}
+              cellConfig={cellConfig}
+            />
           )}
         </>
       )}
