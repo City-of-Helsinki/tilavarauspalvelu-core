@@ -5,7 +5,7 @@ from typing import Dict
 
 from ortools.sat.python import cp_model
 
-from reservations.allocation_models import (
+from allocation.allocation_models import (
     ALLOCATION_PRECISION,
     AllocationBasket,
     AllocationData,

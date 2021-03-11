@@ -3,9 +3,9 @@ import datetime
 import pytest
 from assertpy import assert_that
 
-from reservations.allocation_data_builder import AllocationDataBuilder
-from reservations.allocation_models import ALLOCATION_PRECISION
-from reservations.tests.conftest import get_default_end, get_default_start
+from allocation.allocation_data_builder import AllocationDataBuilder
+from allocation.allocation_models import ALLOCATION_PRECISION
+from allocation.tests.conftest import get_default_end, get_default_start
 
 
 @pytest.mark.django_db

@@ -1,8 +1,8 @@
 import pytest
 from assertpy import assert_that
 
-from reservations.allocation_data_builder import AllocationDataBuilder
-from reservations.allocation_solver import AllocationSolver
+from allocation.allocation_data_builder import AllocationDataBuilder
+from allocation.allocation_solver import AllocationSolver
 
 
 @pytest.mark.django_db
