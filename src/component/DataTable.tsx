@@ -97,7 +97,7 @@ export const FilterBtn = styled(Button).attrs(
   `}
 `;
 
-const tableBorder = (size = "0.5em") =>
+export const tableBorder = (size = "0.5em") =>
   `${size} solid var(--tilavaraus-admin-gray)`;
 
 export const TableWrapper = styled.div`
@@ -159,7 +159,7 @@ export const Cell = styled.td`
   ${truncatedText}
   position: relative;
   height: var(--spacing-4-xl);
-  padding: 0 var(--spacing-xs);
+  padding: 0 var(--spacing-l) 0 var(--spacing-xs);
   user-select: none;
 `;
 
@@ -174,8 +174,6 @@ export const Heading = styled.thead`
     }
 
     &.sortingActive {
-      padding-right: var(--spacing-m);
-
       svg {
         position: absolute;
         top: 1.2em;

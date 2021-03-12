@@ -30,6 +30,7 @@ import {
   Cell,
   Filters,
   FilterBtn,
+  tableBorder,
 } from "./DataTable";
 import { breakpoints, SelectionCheckbox } from "../styles/util";
 import { ReactComponent as IconOpenAll } from "../images/icon_open-all.svg";
@@ -123,11 +124,17 @@ const SelectionCell = styled(Cell)`
   width: calc(0.5em + var(--spacing-m));
   min-width: calc(0.5em + var(--spacing-m));
   overflow-x: visible !important;
+  border-bottom: ${tableBorder()};
+  border-left: ${tableBorder()};
 
   @media (min-width: ${breakpoints.l}) {
     width: var(--spacing-m);
     min-width: var(--spacing-m);
   }
+`;
+
+const HeadingSelectionCell = styled(SelectionCell)`
+  border: 0;
 `;
 
 interface SortingProps {
@@ -246,6 +253,8 @@ function GroupedDataTable({
         );
   };
 
+  const areAllRowsSelected: boolean = isEqual(selectedRows, getRowIds());
+
   return (
     <Wrapper className={className}>
       {filterConfig && (
@@ -308,15 +317,20 @@ function GroupedDataTable({
           <Heading>
             <Row>
               {isSelectionActive && (
-                <SelectionCell as="th">
+                <HeadingSelectionCell as="th">
                   <SelectionCheckbox
                     id="recommendation-all-checkbox"
                     onChange={(e) => {
                       updateSelection(e.target.checked ? getRowIds() : []);
                     }}
-                    checked={isEqual(selectedRows, getRowIds())}
+                    checked={areAllRowsSelected}
+                    aria-label={t(
+                      `common.${
+                        areAllRowsSelected ? "deselectAllRows" : "selectAllRows"
+                      }`
+                    )}
                   />
-                </SelectionCell>
+                </HeadingSelectionCell>
               )}
               {cellConfig.cols.map(
                 (col): JSX.Element => {
@@ -359,11 +373,9 @@ function GroupedDataTable({
                         setGroupVisibility(tempGroupVisibility);
                       }}
                       isSelectionActive={isSelectionActive}
-                      isSelected={() => {
-                        return getRowIds(group.id).every((id) =>
-                          selectedRows.includes(id)
-                        );
-                      }}
+                      isSelected={getRowIds(group.id).every((id) =>
+                        selectedRows.includes(id)
+                      )}
                       toggleSelection={updateSelection}
                       getRowIds={getRowIds}
                     >
@@ -373,15 +385,12 @@ function GroupedDataTable({
                             row,
                             cellConfig.index
                           )}`;
+                          const rowId: number = get(row, cellConfig.index);
 
                           return (
                             <Row
                               key={rowKey}
                               onClick={(): void => {
-                                const rowId: number = get(
-                                  row,
-                                  cellConfig.index
-                                );
                                 if (isSelectionActive) {
                                   updateSelection(
                                     [rowId],
@@ -407,12 +416,20 @@ function GroupedDataTable({
                                     )}`}
                                     onChange={(e) => {
                                       updateSelection(
-                                        [get(row, cellConfig.index)],
+                                        [rowId],
                                         e.target.checked ? "add" : "remove"
                                       );
                                     }}
-                                    checked={selectedRows.includes(
-                                      get(row, cellConfig.index)
+                                    checked={selectedRows.includes(rowId)}
+                                    aria-label={t(
+                                      `common.${
+                                        selectedRows.includes(rowId)
+                                          ? "deselectRowX"
+                                          : "selectRowX"
+                                      }`,
+                                      {
+                                        row: rowId,
+                                      }
                                     )}
                                   />
                                 </SelectionCell>

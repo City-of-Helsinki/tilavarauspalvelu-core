@@ -18,7 +18,7 @@ interface IProps {
   isVisible: boolean;
   toggleGroupVisibility: () => void;
   isSelectionActive: boolean;
-  isSelected: () => boolean;
+  isSelected: boolean;
   toggleSelection: (arg0: number[], arg1: "add" | "remove") => void;
   getRowIds: (arg0?: number) => number[];
   children: ReactNode;
@@ -144,7 +144,13 @@ function RecommendationDataTableGroup({
                         e.target.checked ? "add" : "remove"
                       );
                     }}
-                    checked={isSelected()}
+                    checked={isSelected}
+                    aria-label={t(
+                      `common.${
+                        isSelected ? "deselectGroupX" : "selectGroupX"
+                      }`,
+                      { group: group.space.name }
+                    )}
                   />
                 )}
               </CheckboxWrapper>

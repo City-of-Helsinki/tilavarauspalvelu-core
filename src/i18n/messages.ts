@@ -70,6 +70,12 @@ const translations: ITranslations = {
     loginWithTunnistamo: ["Kirjaudu palveluun Tunnistamon avulla, kiitos."],
     noAuthorization: ["Tunnuksellasi ei ole oikeuksia kyseiseen sisältöön."],
     youthServices: ["Nuorisopalvelut"],
+    selectAllRows: ["Valitse kaikki rivit"],
+    deselectAllRows: ["Poista kaikkien rivien valinta"],
+    selectRowX: ["Valitse rivi {{row}}"],
+    deselectRowX: ["Posta rivin {{row}} valinta"],
+    selectGroupX: ["Valitse ryhmän {{group}} rivit"],
+    deselectGroupX: ["Poista ryhmän {{group}} rivien valinta"],
   },
   errors: {
     applicationRoundNotFound: ["Haettua hakukierrosta ei löydy"],
