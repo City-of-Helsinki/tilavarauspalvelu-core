@@ -4,14 +4,14 @@ from typing import Dict, List
 
 from django.utils import timezone
 
-from applications.models import ApplicationEvent, ApplicationRound
-from reservation_units.models import ReservationUnit
-from reservations.allocation_models import (
+from allocation.allocation_models import (
     AllocationBasket,
     AllocationData,
     AllocationEvent,
     AllocationSpace,
 )
+from applications.models import ApplicationEvent, ApplicationRound
+from reservation_units.models import ReservationUnit
 
 
 class AllocationDataBuilder(object):
