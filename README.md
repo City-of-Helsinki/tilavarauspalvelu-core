@@ -46,11 +46,14 @@ docker exec -ti tilavarauspalvelu-core_dev_1 python manage.py createsuperuser
 
 Use `.env.local` for development.
 
-| Name                         | Description                                    |
-| ---------------------------- | ---------------------------------------------- |
-| REACT_APP_TILAVARAUS_API_URL | tilavaraus-core base url                       |
-| REACT_APP_OIDC_CLIENT_ID     | Oidc client id                                 |
-| REACT_APP_DISABLE_AUTH       | Flag to disable authentication                 |
+| Name                           | Description                                                   |
+| -------------------------------| ------------------------------------------------------------- |
+| REACT_APP_TILAVARAUS_API_URL   | tilavaraus-core base url                                      |
+| REACT_APP_OIDC_CLIENT_ID       | Oidc client id                                                |
+| REACT_APP_OIDC_URL             | https://api.hel.fi/sso                                        |
+| REACT_APP_OIDC_SCOPE           | openid profile email https://api.hel.fi/auth/tilavarausapidev |
+| REACT_APP_TILAVARAUS_API_SCOPE | https://api.hel.fi/auth/tilavarausapidev                      |
+| REACT_APP_DISABLE_AUTH         | Flag to disable authentication                                |
 |
 ## Available Scripts
 

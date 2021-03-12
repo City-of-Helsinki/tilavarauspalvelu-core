@@ -10,6 +10,7 @@ import { UIContext, UIContextType } from "./context/UIContext";
 import Modal from "./component/Modal";
 import Application from "./component/Applications/Application";
 import ApplicationDetails from "./component/Applications/ApplicationDetails";
+import Authenticating from "./component/Authentication/Authenticating";
 
 interface IPrivateRouteProps {
   path: string;
@@ -42,6 +43,9 @@ function App(): JSX.Element {
       >
         <PageWrapper>
           <Switch>
+            <Route exact path="/foo">
+              <Authenticating noNavigation />
+            </Route>
             <Route exact path="/">
               <Redirect to="/applications" />
             </Route>

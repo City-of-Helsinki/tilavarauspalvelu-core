@@ -2988,6 +2988,11 @@ axe-core@^4.0.2:
   resolved "https://registry.yarnpkg.com/axe-core/-/axe-core-4.1.2.tgz#7cf783331320098bfbef620df3b3c770147bc224"
   integrity sha512-V+Nq70NxKhYt89ArVcaNL9FDryB3vQOd+BFXZIfO3RP6rwtj+2yqqqdHEkacutglPaZLkJeuXKCjCJDMGPtPqg==
 
+axios-auth-refresh@^3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/axios-auth-refresh/-/axios-auth-refresh-3.1.0.tgz#a48f2c914273b5c9ce4d0e9e25167cbf1afa0727"
+  integrity sha512-PLNrXDU8qYo+R4+7nUSkwtPGosTajq4EViBswr+ymJiyBzxKhPCfX2vDFuf6KfyNhsC1wub6RhB62st4wgXKOA==
+
 axios-case-converter@^0.7.0:
   version "0.7.0"
   resolved "https://registry.yarnpkg.com/axios-case-converter/-/axios-case-converter-0.7.0.tgz#e0a64aaf7201dde631d8d79087d18ee358ffa4cc"
