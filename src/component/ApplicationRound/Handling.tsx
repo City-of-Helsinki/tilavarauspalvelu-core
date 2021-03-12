@@ -119,6 +119,7 @@ const ActionContainer = styled.div`
   }
 `;
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const getFilterConfig = (recommendations: any[]): DataFilterConfig[] => {
   const purposes = uniq(recommendations.map((app) => app.purpose));
   const statuses = uniq(recommendations.map((app) => app.status));
@@ -165,6 +166,7 @@ const getCellConfig = (): CellConfig => {
       {
         title: "Application.headings.applicationStatus",
         key: "status",
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         transform: ({ status }: any) => {
           const normalizedStatus = getNormalizedStatus(status, "handling");
           return (
@@ -179,7 +181,7 @@ const getCellConfig = (): CellConfig => {
     index: "id",
     sorting: "organisation.name",
     order: "asc",
-    rowLink: (id) => `/application/${id}`,
+    rowLink: ({ id }) => `/recommendation/${id}`,
   };
 };
 
@@ -205,7 +207,7 @@ function Handling({ applicationRoundId }: IProps): JSX.Element {
     applicationRound,
     setApplicationRound,
   ] = useState<ApplicationRoundType | null>(null);
-  const [recommendations, setRecommendations] = useState<any[]>([]);
+  const [recommendations, setRecommendations] = useState<any[]>([]); // eslint-disable-line
   const [basket, setBasket] = useState<OptionType>(basketOptions[0]);
   const [cellConfig, setCellConfig] = useState<CellConfig | null>(null);
   const [filterConfig, setFilterConfig] = useState<DataFilterConfig[] | null>(

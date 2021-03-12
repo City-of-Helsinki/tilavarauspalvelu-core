@@ -44,7 +44,7 @@ type OrderTypes = "asc" | "desc";
 interface Column {
   title: string;
   key: string;
-  transform?: (arg0: any) => string | JSX.Element;
+  transform?: ({ status }: DataType) => string | JSX.Element;
 }
 
 export interface CellConfig {
@@ -52,7 +52,7 @@ export interface CellConfig {
   index: string;
   sorting: string;
   order: OrderTypes;
-  rowLink?: (arg0: string | number) => string;
+  rowLink?: ({ id }: DataType) => string;
 }
 
 interface IProps {
@@ -146,15 +146,17 @@ function SortingArrow({ direction }: SortingProps): JSX.Element {
 }
 
 const processData = (
-  groups: any[],
+  groups: any[], // eslint-disable-line @typescript-eslint/no-explicit-any
   sorting: string,
   order: "asc" | "desc",
   filters: DataFilterOption[],
   handledAreHidden: boolean
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): any[] => {
   return groups.map((group) => {
     let data;
     if (filters.length > 0) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const filteredData = group.applications.filter((row: any): boolean => {
         return (
           filters.filter(
@@ -169,6 +171,7 @@ const processData = (
     }
 
     if (handledAreHidden) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       data = data.filter((row: any): boolean => row.status !== "validated");
     }
 
@@ -247,9 +250,9 @@ function GroupedDataTable({
     return group
       ? processedData
           .find((data) => data.id === group)
-          .applications.map((data: any) => data.id)
-      : processedData.flatMap((data) =>
-          data.applications.map((application: any) => application.id)
+          .applications.map((data: any) => data.id) // eslint-disable-line @typescript-eslint/no-explicit-any
+      : processedData.flatMap(
+          (data) => data.applications.map((application: any) => application.id) // eslint-disable-line @typescript-eslint/no-explicit-any
         );
   };
 
@@ -357,6 +360,7 @@ function GroupedDataTable({
           <Body>
             {groups.length > 0 ? (
               processedData.map(
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 (group: any, groupIndex: number): JSX.Element => {
                   return (
                     <RecommendationDataTableGroup
@@ -380,6 +384,7 @@ function GroupedDataTable({
                       getRowIds={getRowIds}
                     >
                       {group.applications.map(
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         (row: any): JSX.Element => {
                           const rowKey = `${sorting}${order}${get(
                             row,
@@ -399,9 +404,7 @@ function GroupedDataTable({
                                       : "add"
                                   );
                                 } else if (cellConfig.rowLink) {
-                                  const link: string = cellConfig.rowLink(
-                                    rowId
-                                  );
+                                  const link: string = cellConfig.rowLink(row);
                                   history.push(link);
                                 }
                               }}

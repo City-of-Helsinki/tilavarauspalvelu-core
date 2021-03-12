@@ -22,7 +22,7 @@ type OrderTypes = "asc" | "desc";
 interface Column {
   title: string;
   key: string;
-  transform?: (arg0: any) => string | JSX.Element;
+  transform?: (arg0: DataType) => string | JSX.Element;
 }
 
 export interface CellConfig {
@@ -30,7 +30,7 @@ export interface CellConfig {
   index: string;
   sorting: string;
   order: OrderTypes;
-  rowLink?: (arg0: string | number) => string;
+  rowLink?: ({ id }: DataType) => string;
 }
 
 interface IProps {
@@ -97,7 +97,7 @@ export const FilterBtn = styled(Button).attrs(
   `}
 `;
 
-export const tableBorder = (size = "0.5em") =>
+export const tableBorder = (size = "0.5em"): string =>
   `${size} solid var(--tilavaraus-admin-gray)`;
 
 export const TableWrapper = styled.div`

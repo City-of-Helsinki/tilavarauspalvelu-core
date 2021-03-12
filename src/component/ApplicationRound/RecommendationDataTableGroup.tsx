@@ -26,9 +26,9 @@ interface IProps {
 
 interface Group {
   id: number;
-  space: any;
-  reservationUnit: any;
-  applications: any;
+  space: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  reservationUnit: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  applications: any; // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
 const HeadingRow = styled.tr`
@@ -118,7 +118,7 @@ function RecommendationDataTableGroup({
   const { t } = useTranslation();
 
   const unhandledReservationCount = group.applications
-    .map((application: any) => application.status)
+    .map((application: any) => application.status) // eslint-disable-line @typescript-eslint/no-explicit-any
     .filter((status: ApplicationStatus) =>
       ["in_review", "review_done"].includes(status)
     ).length;
