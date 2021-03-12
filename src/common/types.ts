@@ -165,7 +165,7 @@ export type EventReservationUnit = {
   reservationUnitId: number;
 };
 
-type DAY = 0 | 1 | 2 | 3 | 4 | 5 | 6;
+export type DAY = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
 export type ApplicationEventSchedule = {
   id?: number;
@@ -195,3 +195,10 @@ export type ApplicationEditor = {
 export type FormType = undefined | 'individual' | 'organisation' | 'company';
 
 export type LocalizationLanguages = 'fi' | 'sv' | 'en';
+
+export type Cell = {
+  hour: number;
+  label: string;
+  state: boolean;
+  key: string;
+};

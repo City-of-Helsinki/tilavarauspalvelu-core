@@ -3,6 +3,8 @@ import { stringify } from 'query-string';
 import { ReservationUnitsParameters } from './api';
 import { searchPrefix, emptyOption, applicationsPrefix } from './const';
 import {
+  ApplicationEventSchedule,
+  Cell,
   LocalizationLanguages,
   OptionType,
   Parameter,
@@ -113,3 +115,87 @@ export const applicationsUrl = `${applicationsPrefix}/`;
 export function deepCopy<T>(src: T): T {
   return JSON.parse(JSON.stringify(src));
 }
+
+const formatNumber = (n: number): string => `0${n > 23 ? 0 : n}`.slice(-2);
+
+type Timespan = { begin: number; end: number };
+
+export const cellsToApplicationEventSchedules = (
+  cells: Cell[][]
+): ApplicationEventSchedule[] => {
+  const daySchedules = [] as ApplicationEventSchedule[];
+  for (let day = 0; day < cells.length; day += 1) {
+    const dayCells = cells[day];
+    dayCells
+      .filter((cell) => cell.state)
+      .map((cell) => ({ begin: cell.hour, end: cell.hour + 1 } as Timespan))
+      .reduce((prev, current) => {
+        if (!prev.length) {
+          return [current];
+        }
+        if (prev[prev.length - 1].end === current.begin) {
+          return [
+            ...prev.slice(0, prev.length - 1),
+            {
+              begin: prev[prev.length - 1].begin,
+              end: prev[prev.length - 1].end + 1,
+            },
+          ];
+        }
+        return prev.concat([current]);
+      }, [] as Timespan[])
+      .map(
+        (cell) =>
+          ({
+            day,
+            begin: `${formatNumber(cell.begin)}:00`,
+            end: `${formatNumber(cell.end)}:00`,
+          } as ApplicationEventSchedule)
+      )
+      .forEach((e) => daySchedules.push(e));
+  }
+  return daySchedules;
+};
+
+const cellLabel = (row: number): string => {
+  return `${row} - ${row + 1}`;
+};
+
+export const applicationEventSchedulesToCells = (
+  applicationEventSchedules: ApplicationEventSchedule[]
+): Cell[][] => {
+  const firstSlotStart = 7;
+  const lastSlotStart = 23;
+
+  const cells = [] as Cell[][];
+
+  for (let j = 0; j < 7; j += 1) {
+    const day = [];
+    for (let i = firstSlotStart; i <= lastSlotStart; i += 1) {
+      day.push({
+        key: `${i}-${j}`,
+        hour: i,
+        label: cellLabel(i),
+        state: false,
+      });
+    }
+    cells.push(day);
+  }
+
+  applicationEventSchedules.forEach((applicationEventSchedule) => {
+    const { day } = applicationEventSchedule;
+    const hourBegin =
+      Number(applicationEventSchedule.begin.substring(0, 2)) - firstSlotStart;
+
+    const hourEnd =
+      (Number(applicationEventSchedule.end.substring(0, 2)) || 24) -
+      firstSlotStart;
+
+    for (let h = hourBegin; h < hourEnd; h += 1) {
+      const cell = cells[day][h];
+      cell.state = true;
+    }
+  });
+
+  return cells;
+};

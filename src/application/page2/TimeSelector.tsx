@@ -2,7 +2,7 @@ import { Button, IconArrowLeft } from 'hds-react';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
-import { ApplicationEventSchedule } from '../../common/types';
+import { ApplicationEventSchedule, Cell } from '../../common/types';
 import TimePreview from '../TimePreview';
 import { weekdays } from '../../common/const';
 import { breakpoint } from '../../common/style';
@@ -13,15 +13,6 @@ type Props = {
   updateCells: (i: number, cells: Cell[][]) => void;
   copyCells: (i: number) => void;
   summaryData: ApplicationEventSchedule[];
-};
-
-// todo rename 'timeslot'?
-export type Cell = {
-  day: number;
-  hour: number;
-  label: string;
-  state: boolean;
-  key: string;
 };
 
 const CalendarHead = styled.div`
