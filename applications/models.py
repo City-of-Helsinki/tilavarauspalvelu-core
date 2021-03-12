@@ -3,7 +3,7 @@ import math
 from typing import Dict, List, Optional
 
 import recurrence
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.db.models import DurationField, ExpressionWrapper, F
@@ -19,6 +19,8 @@ from tilavarauspalvelu.utils.date_util import (
     next_or_current_matching_weekday,
     previous_or_current_matching_weekday,
 )
+
+User = get_user_model()
 
 
 def year_not_in_future(year: Optional[int]):

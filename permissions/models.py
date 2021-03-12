@@ -1,10 +1,12 @@
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from spaces.models import ServiceSector, Unit, UnitGroup
 
 from .base_models import BaseRole
+
+User = get_user_model()
 
 GENERAL_PERMISSIONS = (
     (
@@ -73,6 +75,10 @@ GENERAL_PERMISSIONS = (
         "can_manage_application_rounds",
         _("Can create, edit and delete application rounds in the whole system"),
     ),
+    (
+        "can_view_users",
+        _("Can view users in the whole system"),
+    ),
 )
 
 
@@ -89,6 +95,10 @@ UNIT_PERMISSIONS = (
     (
         "can_view_reservations",
         _("Can view details of all reservations in the unit"),
+    ),
+    (
+        "can_view_users",
+        _("Can view users in the whole system"),
     ),
 )
 
@@ -111,6 +121,10 @@ SERVICE_SECTOR_PERMISSIONS = (
     (
         "can_view_reservations",
         _("Can view details of all reservations in the service sector"),
+    ),
+    (
+        "can_view_users",
+        _("Can view users in the whole system"),
     ),
 )
 

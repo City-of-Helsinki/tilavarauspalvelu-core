@@ -10,4 +10,5 @@ class AuthenticationOffOrAuthenticatedForWrite(IsAuthenticatedOrReadOnly):
             and settings.TMP_PERMISSIONS_DISABLED is True
         ):
             return True
+
         return super().has_permission(request, view)
