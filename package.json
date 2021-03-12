@@ -21,6 +21,7 @@
     "@types/sanitize-html": "^1.27.1",
     "@types/styled-components": "^5.1.7",
     "axios": "^0.21.0",
+    "axios-auth-refresh": "^3.1.0",
     "axios-case-converter": "^0.6.0",
     "babel-loader": "8.1.0",
     "date-fns": "^2.16.1",

@@ -1,6 +1,6 @@
-import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
-import applyCaseMiddleware from 'axios-case-converter';
+import { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { apiBaseUrl } from './const';
+import axiosClient from './auth/axiosClient';
 import {
   Application,
   ApplicationRound,
@@ -8,32 +8,10 @@ import {
   Parameter,
 } from './types';
 
-const axiosOptions = {
-  timeout: 5000,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-};
-
-let axiosClient = applyCaseMiddleware(axios.create(axiosOptions));
-
 const applicationRoundBasePath = 'application_round';
 const reservationUnitsBasePath = 'reservation_unit';
 const parameterBasePath = 'parameters';
 const applicationBasePath = 'application';
-
-export const setApiToken = (token: string | null): void => {
-  const newAxiosOptions = {
-    ...axiosOptions,
-    headers: { ...axiosOptions.headers } as { [name: string]: string },
-  };
-
-  if (token) {
-    newAxiosOptions.headers.Authorization = `Bearer ${token}`;
-  }
-
-  axiosClient = applyCaseMiddleware(axios.create(newAxiosOptions));
-};
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface QueryParameters extends ReservationUnitsParameters {}
@@ -173,6 +151,12 @@ export function getParameters(
 export function getApplication(id: number): Promise<Application> {
   return apiGet<Application>({
     path: `v1/${applicationBasePath}/${id}`,
+  });
+}
+
+export function getApplications(): Promise<Application[]> {
+  return apiGet<Application[]>({
+    path: `v1/${applicationBasePath}`,
   });
 }
 

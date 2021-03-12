@@ -1,4 +1,4 @@
-import { isBrowser, oidcClientId } from '../const';
+import { isBrowser, oidcClientId, oidcScope } from '../const';
 
 let base = '';
 if (isBrowser) {
@@ -10,7 +10,7 @@ const configuration = {
   redirect_uri: `${base}/login/helsinki/return`,
   response_type: 'id_token token',
   post_logout_redirect_uri: base,
-  scope: 'openid profile email',
+  scope: oidcScope,
   authority: 'https://api.hel.fi/sso/',
   silent_redirect_uri: `${base}/login/helsinki/return`,
   automaticSilentRenew: false,

@@ -13,6 +13,7 @@ export const weekdays = [
 export const reservationUnitPrefix = '/reservation-unit';
 export const searchPrefix = '/search';
 export const applicationsPrefix = '/applications';
+export const applicationPrefix = '/application';
 
 export const mapStyle = {
   version: 8,
@@ -78,16 +79,18 @@ export const routeData = (): any =>
 // eslint-disable-next-line
 const CONFIG = isBrowser ? window.__CONFIG__ : undefined;
 
-const getConfig = (
-  name:
-    | 'REACT_APP_SENTRY_DSN'
-    | 'REACT_APP_SENTRY_ENVIRONMENT'
-    | 'REACT_APP_TILAVARAUS_API_URL'
-    | 'REACT_APP_DISABLE_AUTH'
-    | 'REACT_APP_OIDC_CLIENT_ID'
-) => {
-  return CONFIG ? CONFIG[name] : process.env[name];
-};
+type EnvironmentVariables =
+  | 'REACT_APP_SENTRY_DSN'
+  | 'REACT_APP_SENTRY_ENVIRONMENT'
+  | 'REACT_APP_TILAVARAUS_API_URL'
+  | 'REACT_APP_DISABLE_AUTH'
+  | 'REACT_APP_OIDC_CLIENT_ID'
+  | 'REACT_APP_OIDC_URL'
+  | 'REACT_APP_OIDC_SCOPE'
+  | 'REACT_APP_TILAVARAUS_API_SCOPE';
+
+const getConfig = (name: EnvironmentVariables) =>
+  CONFIG ? CONFIG[name] : process.env[name];
 
 export const sentryDSN = getConfig('REACT_APP_SENTRY_DSN');
 
@@ -98,3 +101,9 @@ export const apiBaseUrl = getConfig('REACT_APP_TILAVARAUS_API_URL');
 export const authEnabled = getConfig('REACT_APP_DISABLE_AUTH') !== 'true';
 
 export const oidcClientId = getConfig('REACT_APP_OIDC_CLIENT_ID');
+
+export const oidcUrl = getConfig('REACT_APP_OIDC_URL');
+
+export const oidcScope = getConfig('REACT_APP_OIDC_SCOPE');
+
+export const apiScope = getConfig('REACT_APP_TILAVARAUS_API_SCOPE');
