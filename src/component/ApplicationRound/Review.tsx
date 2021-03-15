@@ -171,7 +171,7 @@ const getCellConfig = (t: TFunction): CellConfig => {
     index: "id",
     sorting: "organisation.name",
     order: "asc",
-    rowLink: (id) => `/application/${id}`,
+    rowLink: ({ id }) => `/application/${id}`,
   };
 };
 
@@ -295,7 +295,14 @@ function Review({ applicationRoundId }: IProps): JSX.Element {
             </Content>
           </IngressContainer>
           <DataTable
-            data={applications}
+            groups={[{ id: 1, applications }]}
+            hasGrouping={false}
+            config={{
+              filtering: true,
+              rowFilters: true,
+              hideHandled: false,
+              selection: false,
+            }}
             cellConfig={cellConfig}
             filterConfig={filterConfig}
           />

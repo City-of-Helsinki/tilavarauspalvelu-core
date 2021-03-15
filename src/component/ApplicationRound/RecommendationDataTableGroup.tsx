@@ -7,12 +7,13 @@ import {
   IconArrowRight,
   IconLocation,
 } from "hds-react";
-import { ApplicationStatus } from "../../common/types";
+import { ApplicationStatus, DataGroup } from "../../common/types";
 import { H3 } from "../../styles/typography";
 import { breakpoints, SelectionCheckbox } from "../../styles/util";
 
 interface IProps {
-  group: Group;
+  group: DataGroup;
+  hasGrouping: boolean;
   cols: number;
   index: number;
   isVisible: boolean;
@@ -22,13 +23,6 @@ interface IProps {
   toggleSelection: (arg0: number[], arg1: "add" | "remove") => void;
   getRowIds: (arg0?: number) => number[];
   children: ReactNode;
-}
-
-interface Group {
-  id: number;
-  space: any; // eslint-disable-line @typescript-eslint/no-explicit-any
-  reservationUnit: any; // eslint-disable-line @typescript-eslint/no-explicit-any
-  applications: any; // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
 const HeadingRow = styled.tr`
@@ -105,6 +99,7 @@ const Count = styled(H3)`
 
 function RecommendationDataTableGroup({
   group,
+  hasGrouping,
   cols,
   index,
   isVisible,
@@ -124,6 +119,10 @@ function RecommendationDataTableGroup({
     ).length;
 
   const colCount: number = isSelectionActive ? cols + 1 : cols;
+
+  if (hasGrouping === false) {
+    return <>{children}</>;
+  }
 
   return (
     <>

@@ -259,7 +259,7 @@ function Approval({ applicationRoundId }: IProps): JSX.Element {
                   variant="secondary"
                   onClick={() =>
                     history.push(
-                      `/applicationRounds/${applicationRoundId}?allocated`
+                      `/applicationRound/${applicationRoundId}?allocated`
                     )
                   }
                 >
@@ -304,7 +304,18 @@ function Approval({ applicationRoundId }: IProps): JSX.Element {
             </IngressFooter>
           </IngressContainer>
           {cellConfig && (
-            <DataTable data={[]} cellConfig={cellConfig} filterConfig={[]} />
+            <DataTable
+              groups={[]}
+              hasGrouping={false}
+              config={{
+                filtering: true,
+                rowFilters: true,
+                hideHandled: false,
+                selection: false,
+              }}
+              cellConfig={cellConfig}
+              filterConfig={[]}
+            />
           )}
         </>
       )}

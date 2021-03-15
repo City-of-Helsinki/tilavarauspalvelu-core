@@ -29,8 +29,7 @@ import { ContentHeading, H3, RequiredLabel } from "../../styles/typography";
 import KorosHeading from "../KorosHeading";
 import StatusCircle from "../StatusCircle";
 import AllocatingDialogContent from "./AllocatingDialogContent";
-import { CellConfig } from "../DataTable";
-import GroupedDataTable from "../GroupedDataTable";
+import DataTable, { CellConfig } from "../DataTable";
 import { getNormalizedStatus } from "../../common/util";
 import StatusCell from "../StatusCell";
 
@@ -147,7 +146,9 @@ const getFilterConfig = (recommendations: any[]): DataFilterConfig[] => {
   ];
 };
 
-const getCellConfig = (): CellConfig => {
+const getCellConfig = (
+  applicationRound: ApplicationRoundType | null
+): CellConfig => {
   return {
     cols: [
       { title: "Application.headings.applicantName", key: "organisation.name" },
@@ -181,7 +182,10 @@ const getCellConfig = (): CellConfig => {
     index: "id",
     sorting: "organisation.name",
     order: "asc",
-    rowLink: ({ id }) => `/recommendation/${id}`,
+    rowLink: ({ id }) =>
+      applicationRound
+        ? `/applicationRound/${applicationRound.id}/recommendation/${id}`
+        : "",
   };
 };
 
@@ -210,9 +214,7 @@ function Handling({ applicationRoundId }: IProps): JSX.Element {
   const [recommendations, setRecommendations] = useState<any[]>([]); // eslint-disable-line
   const [basket, setBasket] = useState<OptionType>(basketOptions[0]);
   const [cellConfig, setCellConfig] = useState<CellConfig | null>(null);
-  const [filterConfig, setFilterConfig] = useState<DataFilterConfig[] | null>(
-    null
-  );
+  const [filterConfig, setFilterConfig] = useState<DataFilterConfig[]>([]);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const { t } = useTranslation();
@@ -237,7 +239,7 @@ function Handling({ applicationRoundId }: IProps): JSX.Element {
           id: applicationRoundId,
         });
         setApplicationRound(result);
-        setCellConfig(getCellConfig());
+        setCellConfig(getCellConfig(result));
         setIsLoading(false);
       } catch (error) {
         const msg =
@@ -339,7 +341,7 @@ function Handling({ applicationRoundId }: IProps): JSX.Element {
             ],
           },
         ];
-        setCellConfig(getCellConfig());
+        setCellConfig(getCellConfig(applicationRound));
         setFilterConfig(
           getFilterConfig(
             result.flatMap((n) => {
@@ -423,7 +425,7 @@ function Handling({ applicationRoundId }: IProps): JSX.Element {
                 variant="secondary"
                 onClick={() =>
                   history.push(
-                    `/applicationRounds/${applicationRoundId}?approval`
+                    `/applicationRound/${applicationRoundId}?approval`
                   )
                 }
               >
@@ -443,8 +445,15 @@ function Handling({ applicationRoundId }: IProps): JSX.Element {
             </ActionContainer>
           </NarrowContainer>
           {cellConfig && (
-            <GroupedDataTable
+            <DataTable
               groups={recommendations}
+              hasGrouping
+              config={{
+                filtering: true,
+                rowFilters: true,
+                hideHandled: true,
+                selection: true,
+              }}
               filterConfig={filterConfig}
               cellConfig={cellConfig}
             />
