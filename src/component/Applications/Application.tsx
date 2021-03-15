@@ -270,7 +270,7 @@ function Application(): JSX.Element | null {
                   t(`Application.applicantTypes.${application.applicantType}`)}
               </dd>
             </ApplicantType>
-            <StatusBlock status={application.status} view={1} />
+            <StatusBlock status={application.status} view="review" />
             {notificationContent ? (
               <StyledNotification
                 type="success"

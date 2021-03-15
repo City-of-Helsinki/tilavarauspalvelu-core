@@ -2,12 +2,12 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { ApplicationStatus } from "../common/types";
-import { getNormalizedStatus } from "../common/util";
+import { getNormalizedStatus, StatusView } from "../common/util";
 import { getStatusColor } from "../styles/util";
 
 interface IProps {
   status: ApplicationStatus;
-  view?: 1;
+  view?: StatusView;
   className?: string;
 }
 
