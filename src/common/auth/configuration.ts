@@ -1,11 +1,13 @@
+import { oidcClientId, oidcScope } from "../const";
+
 const base = `${document.location.protocol}//${document.location.host}`;
 
 const configuration = {
-  client_id: process.env.REACT_APP_OIDC_CLIENT_ID,
+  client_id: oidcClientId,
   redirect_uri: `${base}/login/helsinki/return`,
   response_type: "id_token token",
   post_logout_redirect_uri: base,
-  scope: "openid profile email",
+  scope: oidcScope,
   authority: "https://api.hel.fi/sso/",
   silent_redirect_uri: `${base}/login/helsinki/return`,
   automaticSilentRenew: true,

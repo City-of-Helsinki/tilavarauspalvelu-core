@@ -2,7 +2,6 @@ import React from "react";
 import ReactDOM from "react-dom";
 import {
   oidcLog,
-  InMemoryWebStorage,
   AuthenticationProvider,
   // eslint-disable-next-line import/no-unresolved
 } from "@axa-fr/react-oidc-context";
@@ -10,7 +9,6 @@ import oidcConfiguration from "./common/auth/configuration";
 import "./index.scss";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
-import UpdateToken from "./common/auth/UpdateToken";
 import Authenticating from "./component/Authentication/Authenticating";
 import Login from "./component/Authentication/Login";
 import AuthorizationNeeded from "./component/Authentication/AuthorizationNeeded";
@@ -23,10 +21,9 @@ ReactDOM.render(
       notAuthorized={() => <AuthorizationNeeded />}
       authenticating={() => <Authenticating noNavigation />}
       configuration={oidcConfiguration}
-      loggerLevel={oidcLog.DEBUG}
+      loggerLevel={oidcLog.ERROR}
       isEnabled={authEnabled}
-      callbackComponentOverride={() => <UpdateToken />}
-      UserStore={InMemoryWebStorage}
+      callbackComponentOverride={() => <Authenticating />}
     >
       <App />
     </AuthenticationProvider>
