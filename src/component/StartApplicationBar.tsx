@@ -20,7 +20,7 @@ const ReservationUnitCount = styled.div`
 
 const Button = styled(HDSButton)`
   font-family: var(--font-bold);
-  background-color: white;
+  background-color: var(--color-white) !important;
   margin-left: var(--spacing-m);
 `;
 
