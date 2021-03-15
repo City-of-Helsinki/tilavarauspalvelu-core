@@ -154,7 +154,7 @@ function Allocation({ applicationRoundId }: IProps): JSX.Element {
   };
 
   const finishAllocation = (): void => {
-    history.push(`/applicationRounds/${applicationRoundId}?allocated`);
+    history.push(`/applicationRound/${applicationRoundId}?allocated`);
   };
 
   useEffect(() => {
@@ -232,7 +232,7 @@ function Allocation({ applicationRoundId }: IProps): JSX.Element {
                   type="button"
                   variant="secondary"
                   onClick={() =>
-                    history.push(`/applicationRounds/${applicationRoundId}`)
+                    history.push(`/applicationRound/${applicationRoundId}`)
                   }
                 >
                   {t("ApplicationRound.navigateBackToReview")}

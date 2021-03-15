@@ -61,7 +61,7 @@ function App(): JSX.Element {
               component={ApplicationDetails}
             />
             <PrivateRoute
-              path="/applicationRounds/:applicationRoundId"
+              path="/applicationRound/:applicationRoundId"
               component={ApplicationRound}
             />
           </Switch>

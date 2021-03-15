@@ -5,12 +5,12 @@ import DataTable from "./model/DataTable";
 import filterControls from "./model/filterControls";
 import Navigation from "./model/navigation";
 
-fixture`ApplicationRound handling`.page(`${config.BASE_URL}/applicationRounds`);
+fixture`ApplicationRound handling`.page(`${config.BASE_URL}/applicationRound`);
 
 test("Active Application Round", async (t) => {
   await t
     // TODO: fetch (in this case active) application rounds and navigate to detail page
-    .navigateTo("../applicationRounds/1");
+    .navigateTo("../applicationRound/1");
 
   const dataTableRowsCount = await DataTable.body.childElementCount;
 

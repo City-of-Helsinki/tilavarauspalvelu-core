@@ -200,3 +200,10 @@ export type OptionType = {
   label: string;
   value: string;
 };
+
+export interface DataGroup {
+  id: number;
+  space?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  reservationUnit?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  applications: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+}

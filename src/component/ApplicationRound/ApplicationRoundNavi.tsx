@@ -31,7 +31,7 @@ function ApplicationRoundNavi({ applicationRoundId }: IProps): JSX.Element {
   return (
     <Wrapper>
       <NaviItem to="#">{t("Application.showAllApplications")} TODO</NaviItem>
-      <NaviItem to={`/applicationRounds/${applicationRoundId}/criteria`}>
+      <NaviItem to={`/applicationRound/${applicationRoundId}/criteria`}>
         {t("ApplicationRound.roundCriteria")} TODO
       </NaviItem>
     </Wrapper>

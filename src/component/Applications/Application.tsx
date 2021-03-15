@@ -247,7 +247,7 @@ function Application(): JSX.Element | null {
         <>
           <ContentContainer>
             <LinkPrev
-              route={`/applicationRounds/${application.applicationRoundId}`}
+              route={`/applicationRound/${application.applicationRoundId}`}
             />
           </ContentContainer>
           <NarrowContainer>
