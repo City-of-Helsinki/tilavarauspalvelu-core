@@ -1,4 +1,7 @@
 from django.contrib import admin
+from django.forms.fields import CharField
+from django.forms.models import ModelForm
+from tinymce.widgets import TinyMCE
 
 from .models import (
     Address,
@@ -75,7 +78,19 @@ class EventReservationUnitAdmin(admin.ModelAdmin):
     model = EventReservationUnit
 
 
+class ApplicationRoundAdminForm(ModelForm):
+    criteria = CharField(widget=TinyMCE())
+    criteria_fi = CharField(widget=TinyMCE())
+    criteria_en = CharField(widget=TinyMCE())
+    criteria_sv = CharField(widget=TinyMCE())
+
+    class Meta:
+        model = ApplicationRound
+        fields = "__all__"
+
+
 @admin.register(ApplicationRound)
 class ApplicationRoundAdmin(admin.ModelAdmin):
+    form = ApplicationRoundAdminForm
     model = ApplicationRound
     inlines = [ApplicationRoundStatusInline, ApplicationRoundBasketInline]

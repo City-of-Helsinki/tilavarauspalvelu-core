@@ -16,4 +16,5 @@ urlpatterns = [
     path("redoc/", SpectacularRedocView.as_view(url_name="schema")),
     path("pysocial/", include("social_django.urls", namespace="social")),
     path("helauth/", include("helusers.urls")),
+    path("tinymce/", include("tinymce.urls")),
 ]

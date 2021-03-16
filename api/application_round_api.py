@@ -95,6 +95,7 @@ class ApplicationRoundSerializer(serializers.ModelSerializer):
             "status",
             "application_round_baskets",
             "allocating",
+            "criteria",
         ]
         extra_kwargs = {
             "name": {

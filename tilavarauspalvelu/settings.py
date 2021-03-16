@@ -87,6 +87,7 @@ INSTALLED_APPS = [
     "permissions",
     "users",
     "social_django",
+    "tinymce",
 ]
 
 MIDDLEWARE = [
