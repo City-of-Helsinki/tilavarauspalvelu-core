@@ -70,7 +70,8 @@
     "start-server:dev": "env-cmd -f ./.env.development nodemon ./server-build/index.js",
     "start:dev": "yarn build:dev && npm-run-all --parallel build-server:dev start-server:dev",
     "test:e2e-local": "testcafe --skip-js-errors \"chrome --window-size='1920,1080'\" e2e/tests",
-    "test:axe-local": "testcafe --skip-js-errors \"chrome --window-size='1920,1080'\" e2e/accessibility"
+    "test:axe-local": "testcafe --skip-js-errors \"chrome --window-size='1920,1080'\" e2e/accessibility",
+    "test:server": "jest ./server/"
   },
   "eslintConfig": {
     "extends": [
@@ -105,6 +106,7 @@
     "stylelint-config-styled-components": "^0.1.1",
     "stylelint-processor-styled-components": "^1.10.0",
     "stylelint-value-no-unknown-custom-properties": "^3.0.0",
+    "supertest": "^6.1.3",
     "testcafe": "^1.10.1"
   },
   "husky": {

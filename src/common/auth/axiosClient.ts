@@ -1,6 +1,7 @@
 import axios, { AxiosRequestConfig } from 'axios';
 import createAuthRefreshInterceptor from 'axios-auth-refresh';
 import applyCaseMiddleware from 'axios-case-converter';
+import { isClient } from 'react-use/lib/util';
 import { authEnabled, oidcUrl, oidcClientId, apiScope } from '../const';
 
 const axiosOptions = {
@@ -54,27 +55,26 @@ const updateApiAccessToken = async (accessToken: string) => {
 };
 
 const axiosClient = applyCaseMiddleware(axios.create(axiosOptions));
+if (isClient && authEnabled) {
+  axiosClient.interceptors.request.use((req: AxiosRequestConfig) => {
+    const apiAccessToken = getApiAccessToken();
 
-axiosClient.interceptors.request.use((req: AxiosRequestConfig) => {
-  const apiAccessToken = getApiAccessToken();
-
-  if (apiAccessToken) {
-    req.headers.Authorization = `Bearer ${apiAccessToken}`;
-  }
-  return req;
-});
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const refreshAuthLogic = (failedRequest: any) => {
-  const accessToken = getAccessToken();
-  return updateApiAccessToken(accessToken).then((apiAccessToken) => {
-    // eslint-disable-next-line no-param-reassign
-    failedRequest.response.config.headers.Authorization = `Bearer ${apiAccessToken}`;
-    return Promise.resolve();
+    if (apiAccessToken) {
+      req.headers.Authorization = `Bearer ${apiAccessToken}`;
+    }
+    return req;
   });
-};
 
-if (authEnabled) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const refreshAuthLogic = (failedRequest: any) => {
+    const accessToken = getAccessToken();
+    return updateApiAccessToken(accessToken).then((apiAccessToken) => {
+      // eslint-disable-next-line no-param-reassign
+      failedRequest.response.config.headers.Authorization = `Bearer ${apiAccessToken}`;
+      return Promise.resolve();
+    });
+  };
+
   createAuthRefreshInterceptor(axiosClient, refreshAuthLogic);
 }
 

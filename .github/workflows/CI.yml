@@ -27,4 +27,11 @@ jobs:
         yarn lint:css
         yarn build
         yarn test
+    - name: Build image
+      run: |
         docker build -t tilavaraus-ui .
+    - name: Run server tests
+      run: |
+        docker run -p 3000:3000 -d --name tilavaraus-ui-server tilavaraus-ui
+        yarn test:server
+        docker stop tilavaraus-ui-server

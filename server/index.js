@@ -30,7 +30,12 @@ app.get('/*', async (req, res) => {
     const promise = currentRoute.loadData
       ? currentRoute.loadData(routeDetails.params)
       : Promise.resolve(null);
-    routeData = await promise;
+    try {
+      routeData = await promise;
+    } catch (err) {
+      console.error(`error occured while fetching data for route ${currentRoute}`, err);
+      routeData = undefined;
+    }
     indexedData = currentRoute.dataKey
       ? { [currentRoute.dataKey]: routeData }
       : { routeData };
