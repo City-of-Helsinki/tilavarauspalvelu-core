@@ -29,6 +29,7 @@ django-jsonfield==1.4.1
 django-modeltranslation==0.16.1
 django-mptt==0.11.0
 django-recurrence==1.10.3
+django-tinymce==3.2.0
 djangorestframework==3.12.2
 drf-oidc-auth==0.10.0
 drf-spectacular==0.13.0
