@@ -75,6 +75,7 @@ INSTALLED_APPS = [
     "reservation_units",
     "api",
     "applications",
+    "opening_hours",
     "django_extensions",
     "mptt",
     "django_filters",
@@ -158,6 +159,7 @@ env = environ.Env(
     TUNNISTAMO_ADMIN_KEY=(str, "tilanvaraus-django-admin-dev"),
     TUNNISTAMO_ADMIN_SECRET=(str, None),
     TUNNISTAMO_ADMIN_OIDC_ENDPOINT=(str, "https://api.hel.fi/sso/openid/"),
+    HAUKI_API_URL=(str, None),
 )
 
 environ.Env.read_env()
