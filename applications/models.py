@@ -263,6 +263,8 @@ class ApplicationRound(models.Model):
         on_delete=models.SET_NULL,
     )
 
+    criteria = models.TextField(default="")
+
     @property
     def status(self):
         return self.get_status().status
