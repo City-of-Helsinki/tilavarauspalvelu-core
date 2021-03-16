@@ -1,3 +1,3 @@
 # Use these commands to create fixtures and db visualization
-python manage.py graph_models resources reservations spaces services reservation_units applications -g -o tilavarauspalvelu_visualized.png
+python manage.py graph_models resources reservations spaces services reservation_units applications permissions -g -o tilavarauspalvelu_visualized.png
 python manage.py dumpdata reservations resources spaces services reservation_units applications > fixtures/cases.json

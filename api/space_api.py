@@ -1,4 +1,4 @@
-from rest_framework import serializers, viewsets
+from rest_framework import mixins, serializers, viewsets
 
 from api.base import TranslatedModelSerializer
 from spaces.models import Building, District, Location, Space
@@ -81,7 +81,9 @@ class DistrictSerializer(TranslatedModelSerializer):
         fields = ["id", "district_type", "name", "parent_id"]
 
 
-class DistrictViewSet(viewsets.ModelViewSet):
+class DistrictViewSet(
+    viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin
+):
     serializer_class = DistrictSerializer
     queryset = District.objects.all().select_related("parent")
 
