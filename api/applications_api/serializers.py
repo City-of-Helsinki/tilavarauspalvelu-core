@@ -57,9 +57,10 @@ class OrganisationSerializer(serializers.ModelSerializer):
             "name",
             "identifier",
             "year_established",
-            "address",
-            "core_business",
             "active_members",
+            "organisation_type",
+            "core_business",
+            "address",
         ]
         extra_kwargs = {
             "name": {
