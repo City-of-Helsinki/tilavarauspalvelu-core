@@ -129,6 +129,12 @@ class Organisation(models.Model):
         max_length=255, choices=TYPE_CHOICES, default=COMPANY
     )
 
+    email = models.EmailField(
+        verbose_name=_("Email"),
+        default="",
+        blank=True,
+    )
+
     def __str__(self):
         return self.name
 
