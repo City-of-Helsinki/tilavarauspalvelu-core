@@ -1,4 +1,4 @@
-import { Checkbox, ErrorSummary, Navigation } from "hds-react";
+import { Button, Checkbox, ErrorSummary, Navigation } from "hds-react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 import { ApplicationStatus } from "../common/types";
@@ -95,4 +95,23 @@ export const SelectionCheckbox = styled(Checkbox).attrs({
   style: {
     "--label-padding": "0",
   } as React.CSSProperties,
+})``;
+
+export const Strong = styled.span`
+  font-family: var(--tilavaraus-admin-font-bold);
+  font-weight: 700;
+`;
+
+export const Divider = styled.hr`
+  background-color: var(--color-silver);
+  height: 1px;
+  border: 0;
+  margin: var(--spacing-3-xl) 0;
+`;
+
+export const PlainButton = styled(Button).attrs({
+  variant: "secondary",
+  style: {
+    "--color-bus": "var(--color-black)",
+  },
 })``;
