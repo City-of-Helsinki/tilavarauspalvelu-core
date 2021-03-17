@@ -587,6 +587,7 @@ function DataTable({
               processedData.map(
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 (group: any, groupIndex: number): JSX.Element => {
+                  const groupRows = getRowIds(group.id);
                   return (
                     <RecommendationDataTableGroup
                       group={group}
@@ -603,11 +604,12 @@ function DataTable({
                         setGroupVisibility(tempGroupVisibility);
                       }}
                       isSelectionActive={isSelectionActive}
-                      isSelected={getRowIds(group.id).every((id) =>
-                        selectedRows.includes(id)
-                      )}
+                      isSelected={
+                        groupRows.length > 0 &&
+                        groupRows.every((id) => selectedRows.includes(id))
+                      }
                       toggleSelection={updateSelection}
-                      getRowIds={getRowIds}
+                      groupRows={groupRows}
                     >
                       {group.applications.map(
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
