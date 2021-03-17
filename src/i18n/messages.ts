@@ -76,6 +76,14 @@ const translations: ITranslations = {
     deselectRowX: ["Posta rivin {{row}} valinta"],
     selectGroupX: ["Valitse ryhmän {{group}} rivit"],
     deselectGroupX: ["Poista ryhmän {{group}} rivien valinta"],
+    day: ["Päivä"],
+    month: ["Kuukausi"],
+    year: ["Vuosi"],
+    begins: ["Alkaa"],
+    ends: ["Päättyy"],
+    weekly: ["Viikoittain"],
+    biweekly: ["Vuoroviikoittain"],
+    timeOfDay: ["Kellonaika"],
   },
   errors: {
     applicationRoundNotFound: ["Haettua hakukierrosta ei löydy"],
@@ -181,6 +189,7 @@ const translations: ITranslations = {
       community: ["Seura"],
       company: ["Yritys"],
     },
+    contactPerson: ["Yhteyshenkilö"],
   },
   ApplicationRound: {
     pastRounds: ["Menneet"],
@@ -191,6 +200,7 @@ const translations: ITranslations = {
     infoGivenByCustomer: ["Asiakkaan ilmoittamat tiedot"],
     recommendedAid: ["Suositeltu tila-avustus"],
     appliedReservations: ["Haetut vuorot"],
+    appliedSpace: ["Haettu tila"],
     totalReservationTime: ["Kokonaiskesto"],
     recommendedSpaceAid: ["Tilankäyttönä suositeltava avustus"],
     recommendations: {
@@ -264,6 +274,19 @@ const translations: ITranslations = {
   },
   Organisation: {
     activeParticipants: ["Aktiiviharrastajat"],
+    extraInformation: ["Lisätiedot toiminnasta"],
+  },
+  Recommendation: {
+    linkToOtherRecommendations: ["Näytä asiakkaan muut ehdotukset"],
+    summary: ["Ehdotuksen tiivistelmä"],
+    recommendedSlot: ["Asiakkaalle ehdotettava jakso"],
+    thisPartsTerms: ["Tämän osan käyttöehdot"],
+    actionDecline: ["Hylkää ehdotuksen vuoro"],
+    actionApprove: ["Hyväksy ehdotuksen vuoro"],
+    actionIgnoreSpace: ["Älä ehdota tätä tilaa vuorolle"],
+    actionHelperText: [
+      "Hylkäyksen ja kiellon tarjota tätä tilaa voi purkaa tarvittaessa myöhemmin. Hyväksyminen ei lähetä myöntöpäätöstä välittömästi asiakkaalle. Esihenkilö hyväksyy kaikkien hakemusten myöntöpäätökset kerralla kierroksen käsittelyn valmistuttua.",
+    ],
   },
 };
 

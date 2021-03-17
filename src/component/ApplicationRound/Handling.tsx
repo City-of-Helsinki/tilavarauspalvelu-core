@@ -39,6 +39,7 @@ interface IProps {
 
 const Wrapper = styled.div`
   width: 100%;
+  margin-bottom: var(--spacing-layout-xl);
 `;
 
 const StyledKorosHeading = styled(KorosHeading)`
@@ -309,7 +310,7 @@ function Handling({ applicationRoundId }: IProps): JSX.Element {
             },
             applications: [
               {
-                id: 12,
+                id: 4,
                 purpose: "Purpose #3",
                 ageGroup: "14-15",
                 status: "review_done",

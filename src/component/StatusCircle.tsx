@@ -54,6 +54,9 @@ const StatusCircle = ({ status, x, y }: IProps): JSX.Element => {
   const statusPercentage = normalizePercentages(status / 100);
   const statusAngles = normalizeAngles(Math.round(statusPercentage * 360));
 
+  const bgColor =
+    statusPercentage === 0 ? "var(--color-black-40)" : "var(--color-black-5)";
+
   const Graph = (
     <Svg>
       <circle
@@ -62,11 +65,7 @@ const StatusCircle = ({ status, x, y }: IProps): JSX.Element => {
         r={size.minDimension * 0.441}
         strokeWidth={size.minDimension * 0.07}
         fill="none"
-        stroke={
-          statusAngles > 359.9
-            ? "var(--color-success)"
-            : "var(--color-black-30)"
-        }
+        stroke={statusAngles > 359.9 ? "var(--color-success)" : bgColor}
         key="circle"
       />
       {statusAngles > 359.9 ? null : (

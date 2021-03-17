@@ -21,7 +21,7 @@ interface IProps {
   isSelectionActive: boolean;
   isSelected: boolean;
   toggleSelection: (arg0: number[], arg1: "add" | "remove") => void;
-  getRowIds: (arg0?: number) => number[];
+  groupRows: number[];
   children: ReactNode;
 }
 
@@ -107,7 +107,7 @@ function RecommendationDataTableGroup({
   isSelectionActive,
   isSelected,
   toggleSelection,
-  getRowIds,
+  groupRows,
   children,
 }: IProps): JSX.Element {
   const { t } = useTranslation();
@@ -139,11 +139,12 @@ function RecommendationDataTableGroup({
                     id={`recommendation-group-checkbox-${index}`}
                     onChange={(e) => {
                       toggleSelection(
-                        getRowIds(group.id),
+                        groupRows,
                         e.target.checked ? "add" : "remove"
                       );
                     }}
                     checked={isSelected}
+                    disabled={groupRows.length < 1}
                     aria-label={t(
                       `common.${
                         isSelected ? "deselectGroupX" : "selectGroupX"
