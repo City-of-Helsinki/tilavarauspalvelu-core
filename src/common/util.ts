@@ -1,6 +1,11 @@
 import { format, parseISO } from "date-fns";
 import i18next from "i18next";
-import { ApplicationEventSchedule, ApplicationStatus } from "./types";
+import {
+  ApplicationEventSchedule,
+  ApplicationStatus,
+  LocalizationLanguages,
+  TranslationObject,
+} from "./types";
 
 export const formatDate = (date: string | null): string | null => {
   return date ? format(parseISO(date), "d.M.yyyy") : null;
@@ -134,4 +139,15 @@ export const describeArc = (
     end.x,
     end.y,
   ].join(" ");
+};
+
+export const localizedValue = (
+  name: TranslationObject | undefined,
+  lang: string
+): string => {
+  if (!name) {
+    return "???";
+  }
+
+  return name[lang as LocalizationLanguages] || "???";
 };

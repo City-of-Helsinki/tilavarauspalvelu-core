@@ -85,6 +85,8 @@ export const BasicLink = styled(Link)`
   color: var(--tilavaraus-admin-content-text-color);
   text-decoration: none;
   user-select: none;
+  display: inline-flex;
+  align-content: center;
 `;
 
 export const StyledHDSNavigation = styled(Navigation)`

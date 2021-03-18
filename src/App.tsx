@@ -11,6 +11,7 @@ import Modal from "./component/Modal";
 import Application from "./component/Applications/Application";
 import ApplicationDetails from "./component/Applications/ApplicationDetails";
 import Recommendation from "./component/ApplicationRound/Recommendation";
+import SpaceRecommendations from "./component/ApplicationRound/SpaceRecommendations";
 
 interface IPrivateRouteProps {
   path: string;
@@ -56,6 +57,10 @@ function App(): JSX.Element {
               exact
               path="/application/:applicationId/details"
               component={ApplicationDetails}
+            />
+            <PrivateRoute
+              path="/applicationRound/:applicationRoundId/space/:spaceId"
+              component={SpaceRecommendations}
             />
             <PrivateRoute
               path="/applicationRound/:applicationRoundId/recommendation/:recommendationId"
