@@ -1,10 +1,11 @@
 import React, { ReactNode } from "react";
 import styled from "styled-components";
-import { IconCalendar, IconClock } from "hds-react";
+import { IconClock } from "hds-react";
 import { useTranslation } from "react-i18next";
 import { weekdays } from "../../common/const";
 import { formatDate } from "../../common/util";
 import { Divider } from "../../styles/util";
+import { ReactComponent as IconCalendar } from "../../images/icon_calendar.svg";
 
 interface IProps {
   id: number;
@@ -62,7 +63,7 @@ function Label({ type, children }: IDateLabelProps): JSX.Element {
   return (
     <Col>
       <LabelWrapper>
-        {type === "date" ? <IconCalendar size="m" /> : <IconClock size="m" />}
+        {type === "date" ? <IconCalendar /> : <IconClock size="m" />}
         {children}
       </LabelWrapper>
     </Col>

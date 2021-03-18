@@ -9,6 +9,8 @@
 // }
 // will generate key: component.button
 
+/* eslint @typescript-eslint/naming-convention: 0 */
+
 import { Resource } from "i18next";
 
 interface ITranslations {
@@ -84,6 +86,7 @@ const translations: ITranslations = {
     weekly: ["Viikoittain"],
     biweekly: ["Vuoroviikoittain"],
     timeOfDay: ["Kellonaika"],
+    unhandledCount: ["{{count}} käsittelemättä"],
   },
   errors: {
     applicationRoundNotFound: ["Haettua hakukierrosta ei löydy"],
@@ -287,6 +290,13 @@ const translations: ITranslations = {
     actionHelperText: [
       "Hylkäyksen ja kiellon tarjota tätä tilaa voi purkaa tarvittaessa myöhemmin. Hyväksyminen ei lähetä myöntöpäätöstä välittömästi asiakkaalle. Esihenkilö hyväksyy kaikkien hakemusten myöntöpäätökset kerralla kierroksen käsittelyn valmistuttua.",
     ],
+    recommendationCount: ["{{count}} ehdotus tehty"],
+    recommendationCount_plural: ["{{count}} ehdotusta tehty"],
+  },
+  ReservationUnit: {
+    reservationStatus: ["Varaustilanne"],
+    purposeCount: ["{{count}} käyttötarkoitus"],
+    purposeCount_plural: ["{{count}} käyttötarkoitusta"],
   },
 };
 

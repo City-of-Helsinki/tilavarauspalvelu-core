@@ -55,6 +55,7 @@ export interface CellConfig {
   sorting: string;
   order: OrderTypes;
   rowLink?: ({ id }: DataType) => string;
+  groupLink?: ({ id }: DataGroup) => string;
 }
 
 interface IProps {
@@ -211,11 +212,14 @@ export const Heading = styled.thead`
       }
     }
 
+    &.actionsEnabled {
+      cursor: pointer;
+    }
+
     ${truncatedText}
     font-weight: normal;
     text-align: left;
     user-select: none;
-    cursor: pointer;
   }
 `;
 
@@ -290,6 +294,9 @@ const ToggleVisibilityBtn = styled(Button).attrs({
     "--color-bus": "var(--filter-button-color)",
     "--color-bus-dark": "var(--filter-button-color)",
     "--color-white": "var(--tilavaraus-admin-content-text-color)",
+    "--background-color-disabled": "transparent",
+    "--border-color-disabled": "transparent",
+    "--color-disabled": "var(--color-black-50)",
   } as React.CSSProperties,
 })<IToggleableButton>`
   svg {
@@ -311,9 +318,18 @@ const SelectionToggleBtn = styled(Button).attrs(
       "--color-bus": "var(--filter-button-color)",
       "--color-bus-dark": "var(--filter-button-color)",
       "--color-white": "var(--tilavaraus-admin-content-text-color)",
+      "--background-color-disabled": "transparent",
+      "--border-color-disabled": "transparent",
+      "--color-disabled": "var(--color-black-50)",
     } as React.CSSProperties,
   })
-)<IToggleableButton>``;
+)<IToggleableButton>`
+  &:disabled {
+    svg g {
+      fill: var(--color-black-50);
+    }
+  }
+`;
 
 const SelectionCell = styled(Cell)`
   &:after {
@@ -357,7 +373,7 @@ const processData = (
     let data;
     if (filters.length > 0) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const filteredData = group.applications.filter((row: any): boolean => {
+      const filteredData = group.data.filter((row: any): boolean => {
         return (
           filters.filter(
             (filter): boolean => get(row, filter.key) === filter.value
@@ -367,7 +383,7 @@ const processData = (
 
       data = filteredData;
     } else {
-      data = group.applications;
+      data = group.data;
     }
 
     if (handledAreHidden) {
@@ -377,7 +393,7 @@ const processData = (
 
     return {
       ...group,
-      applications: orderBy(data, [sorting], [order]),
+      data: orderBy(data, [sorting], [order]),
     };
   });
 };
@@ -425,7 +441,8 @@ function DataTable({
     filters,
     handledAreHidden
   );
-  const sortingEnabled: boolean = processedData.length > 0;
+  const actionsEnabled: boolean =
+    processedData.flatMap((group) => group.data).length > 0;
 
   const filterSomeGroupsAreHidden: boolean = groupVisibility.some(
     (visibility): boolean => !visibility
@@ -457,9 +474,9 @@ function DataTable({
     return group
       ? processedData
           .find((data) => data.id === group)
-          .applications.map((data: any) => data.id) // eslint-disable-line @typescript-eslint/no-explicit-any
+          .data.map((data: any) => data.id) // eslint-disable-line @typescript-eslint/no-explicit-any
       : processedData.flatMap(
-          (data) => data.applications.map((application: any) => application.id) // eslint-disable-line @typescript-eslint/no-explicit-any
+          (data) => data.data.map((application: any) => application.id) // eslint-disable-line @typescript-eslint/no-explicit-any
         );
   };
 
@@ -481,7 +498,9 @@ function DataTable({
                 $filterControlsAreOpen={filtersAreVisible}
                 $filtersActive={filters.length > 0}
                 disabled={
-                  (filterConfig && filterConfig.length < 1) || isSelectionActive
+                  !actionsEnabled ||
+                  (filterConfig && filterConfig.length < 1) ||
+                  isSelectionActive
                 }
               >
                 {t(
@@ -499,7 +518,7 @@ function DataTable({
           {config.hideHandled && (
             <HideHandledBtn
               onClick={(): void => toggleHideHandled(!handledAreHidden)}
-              disabled={isSelectionActive}
+              disabled={!actionsEnabled || isSelectionActive}
               $isActive={handledAreHidden}
             >
               {t(
@@ -518,6 +537,7 @@ function DataTable({
                 toggleSelectionActivity(!isSelectionActive);
               }}
               $isActive={isSelectionActive}
+              disabled={!actionsEnabled}
             >
               {t(
                 `common.${
@@ -531,6 +551,7 @@ function DataTable({
               onClick={(): void => {
                 toggleGroupVisibility();
               }}
+              disabled={!actionsEnabled}
               $isActive={!filterSomeGroupsAreHidden}
             >
               {t(
@@ -562,16 +583,16 @@ function DataTable({
               )}
               {cellConfig.cols.map(
                 (col): JSX.Element => {
-                  const sortingActive = sortingEnabled && col.key === sorting;
+                  const sortingActive = actionsEnabled && col.key === sorting;
                   const title = t(col.title);
                   return (
                     <Cell
                       as="th"
                       key={col.key}
                       onClick={(): void | false =>
-                        sortingEnabled && setSortingAndOrder(col.key)
+                        actionsEnabled && setSortingAndOrder(col.key)
                       }
-                      className={classNames({ sortingActive })}
+                      className={classNames({ sortingActive, actionsEnabled })}
                       title={title}
                     >
                       <span>{title}</span>
@@ -610,8 +631,9 @@ function DataTable({
                       }
                       toggleSelection={updateSelection}
                       groupRows={groupRows}
+                      groupLink={cellConfig.groupLink}
                     >
-                      {group.applications.map(
+                      {group.data.map(
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         (row: any): JSX.Element => {
                           const rowKey = `${sorting}${order}${get(

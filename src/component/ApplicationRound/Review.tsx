@@ -295,7 +295,7 @@ function Review({ applicationRoundId }: IProps): JSX.Element {
             </Content>
           </IngressContainer>
           <DataTable
-            groups={[{ id: 1, applications }]}
+            groups={[{ id: 1, data: applications }]}
             hasGrouping={false}
             config={{
               filtering: true,

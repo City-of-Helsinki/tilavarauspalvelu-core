@@ -9,7 +9,7 @@ import {
 } from "hds-react";
 import { ApplicationStatus, DataGroup } from "../../common/types";
 import { H3 } from "../../styles/typography";
-import { breakpoints, SelectionCheckbox } from "../../styles/util";
+import { BasicLink, breakpoints, SelectionCheckbox } from "../../styles/util";
 
 interface IProps {
   group: DataGroup;
@@ -22,6 +22,7 @@ interface IProps {
   isSelected: boolean;
   toggleSelection: (arg0: number[], arg1: "add" | "remove") => void;
   groupRows: number[];
+  groupLink?: ({ id }: DataGroup) => string;
   children: ReactNode;
 }
 
@@ -108,11 +109,12 @@ function RecommendationDataTableGroup({
   isSelected,
   toggleSelection,
   groupRows,
+  groupLink,
   children,
 }: IProps): JSX.Element {
   const { t } = useTranslation();
 
-  const unhandledReservationCount = group.applications
+  const unhandledReservationCount = group.data
     .map((application: any) => application.status) // eslint-disable-line @typescript-eslint/no-explicit-any
     .filter((status: ApplicationStatus) =>
       ["in_review", "review_done"].includes(status)
@@ -156,7 +158,13 @@ function RecommendationDataTableGroup({
               </CheckboxWrapper>
               <Title>
                 <H3>
-                  {group.space.name} <IconArrowRight />
+                  {groupLink ? (
+                    <BasicLink to={groupLink(group)}>
+                      {group.space.name} <IconArrowRight />
+                    </BasicLink>
+                  ) : (
+                    group.space.name
+                  )}
                 </H3>
                 <ReservationUnit>
                   <IconLocation />

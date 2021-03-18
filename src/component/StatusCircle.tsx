@@ -4,8 +4,8 @@ import { describeArc } from "../common/util";
 
 interface IProps {
   status: number;
-  x: number;
-  y: number;
+  x?: number;
+  y?: number;
 }
 
 const Wrapper = styled.div<{ $width: number; $height: number }>`
@@ -40,7 +40,7 @@ const Percent = styled.div<{ $percent: number }>`
   }
 `;
 
-const StatusCircle = ({ status, x, y }: IProps): JSX.Element => {
+const StatusCircle = ({ status, x = 90, y = 90 }: IProps): JSX.Element => {
   const size = {
     x,
     y,

@@ -54,13 +54,15 @@ const TopIngress = styled.div`
     margin-top: var(--spacing-l);
 
     ${H3} {
+      font-size: var(--fontsize-heading-s);
       margin-left: var(--spacing-m);
       width: 50px;
-      line-height: var(--lineheight-l);
+      line-height: var(--lineheight-m);
     }
   }
 
   display: grid;
+  padding-right: var(--spacing-m);
 
   ${ContentHeading} {
     width: 100%;
@@ -187,6 +189,10 @@ const getCellConfig = (
       applicationRound
         ? `/applicationRound/${applicationRound.id}/recommendation/${id}`
         : "",
+    groupLink: ({ space }) =>
+      applicationRound
+        ? `/applicationRound/${applicationRound.id}/space/${space.id}`
+        : "",
   };
 };
 
@@ -262,12 +268,13 @@ function Handling({ applicationRoundId }: IProps): JSX.Element {
           {
             id: 1,
             space: {
+              id: 23,
               name: "Suuri sali",
             },
             reservationUnit: {
               name: "Fallkullan tila",
             },
-            applications: [
+            data: [
               {
                 id: 2,
                 purpose: "Purpose",
@@ -303,12 +310,13 @@ function Handling({ applicationRoundId }: IProps): JSX.Element {
           {
             id: 2,
             space: {
+              id: 22,
               name: "Pieni sali",
             },
             reservationUnit: {
               name: "Haltialan tila",
             },
-            applications: [
+            data: [
               {
                 id: 4,
                 purpose: "Purpose #3",
@@ -343,13 +351,7 @@ function Handling({ applicationRoundId }: IProps): JSX.Element {
           },
         ];
         setCellConfig(getCellConfig(applicationRound));
-        setFilterConfig(
-          getFilterConfig(
-            result.flatMap((n) => {
-              return n.applications;
-            })
-          )
-        );
+        setFilterConfig(getFilterConfig(result.flatMap((n) => n.data)));
         setRecommendations(result);
       } catch (error) {
         setErrorMsg("errors.errorFetchingApplications");
@@ -364,8 +366,8 @@ function Handling({ applicationRoundId }: IProps): JSX.Element {
   }, [applicationRound]);
 
   const unhandledRecommendationCount: number = recommendations
-    .flatMap((recommendation) => recommendation.applications)
-    .map((application) => application.status)
+    .flatMap((recommendation) => recommendation.data)
+    .map((recommendation) => recommendation.status)
     .filter((status) => ["in_review", "review_done"].includes(status)).length;
 
   if (isLoading) {
@@ -396,7 +398,7 @@ function Handling({ applicationRoundId }: IProps): JSX.Element {
                 />
               </div>
               <div>
-                <StatusCircle status={0} x={90} y={90} />
+                <StatusCircle status={0} />
                 <H3>{t("ApplicationRound.amountReserved")}</H3>
               </div>
             </TopIngress>

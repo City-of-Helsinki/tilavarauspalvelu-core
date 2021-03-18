@@ -8,7 +8,6 @@ import {
   IconArrowRight,
   IconCheckCircle,
   IconCrossCircle,
-  IconQuestionCircle,
   Notification,
 } from "hds-react";
 import { getApplication, getApplicationRound } from "../../common/api";
@@ -36,6 +35,7 @@ import StatusBlock from "../StatusBlock";
 import withMainMenu from "../withMainMenu";
 import ApplicantBox from "./ApplicantBox";
 import RecommendedSlot from "./RecommendedSlot";
+import { ReactComponent as IconInformation } from "../../images/icon_information.svg";
 
 interface IRouteParams {
   applicationRoundId: string;
@@ -276,13 +276,13 @@ function Recommendation(): JSX.Element {
             {t("Recommendation.thisPartsTerms")}
           </H2>
           <TermButton
-            iconLeft={<IconQuestionCircle />}
+            iconLeft={<IconInformation />}
             onClick={() => console.log("TODO")} // eslint-disable-line no-console
           >
             TODO
           </TermButton>
           <TermButton
-            iconLeft={<IconQuestionCircle />}
+            iconLeft={<IconInformation />}
             onClick={() => console.log("TODO")} // eslint-disable-line no-console
           >
             TODO

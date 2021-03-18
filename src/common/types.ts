@@ -1,3 +1,5 @@
+export type LocalizationLanguages = "fi" | "sv" | "en";
+
 export type TranslationObject = {
   [key: string]: string;
 };
@@ -8,7 +10,7 @@ export type ApplicationRoundBasket = any; // eslint-disable-line
 
 export type ApplicationRound = {
   id: number;
-  name: string;
+  name: TranslationObject;
   reservationUnitIds: number[];
   applicationPeriodBegin: string;
   applicationPeriodEnd: string;
@@ -205,5 +207,5 @@ export interface DataGroup {
   id: number;
   space?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
   reservationUnit?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
-  applications: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  data: any; // eslint-disable-line @typescript-eslint/no-explicit-any
 }
