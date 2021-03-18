@@ -126,7 +126,7 @@ export function getReservationUnits(
 }
 
 interface IDParameter {
-  id: string;
+  id: number;
 }
 
 export function getReservationUnit(id: number): Promise<ReservationUnit> {

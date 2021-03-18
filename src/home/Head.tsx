@@ -20,7 +20,7 @@ const H1 = styled.h1`
   font-size: var(--fontsize-heading-xl);
 `;
 const StyledKoros = styled(Koros)`
-  fill: white;
+  fill: var(--tilavaraus-gray);
 `;
 
 const Head = (props: HeadProps): JSX.Element => (

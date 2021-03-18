@@ -2,28 +2,39 @@ import { Selector } from 'testcafe';
 import { random } from '../../config';
 
 export default {
+  intro: {
+    startApplication: Selector('#start'),
+  },
   applicationTemplateName: Selector('[role=heading]'),
   addApplicationEventButton: Selector('#addApplicationEvent'),
   page1: {
     applicationEventAccordion: Selector('form > div > div > button'),
     applicationEventNameInput: Selector('#applicationEvents[0].name'),
     numPersonsInput: Selector('#applicationEvents\\[0\\]\\.numPersons'),
-    ageGroupButton: Selector('#ageGroup-toggle-button'),
-    ageGroupOption1: Selector('#ageGroup-item-0'),
-    abilityGroupButton: Selector('#abilityGroup-toggle-button'),
-    abilityGroupOption1: Selector('#abilityGroup-item-0'),
-    purposeButton: Selector('#purpose-toggle-button'),
-    purposeOption1: Selector('#purpose-item-0'),
+    ageGroupButton: Selector(
+      '#applicationEvents\\[0\\]\\.ageGroupId-toggle-button'
+    ),
+    ageGroupOption1: Selector('#applicationEvents\\[0\\]\\.ageGroupId-item-0'),
+    abilityGroupButton: Selector(
+      '#applicationEvents\\[0\\]\\.abilityGroupId-toggle-button'
+    ),
+    abilityGroupOption1: Selector(
+      '#applicationEvents\\[0\\]\\.abilityGroupId-item-0'
+    ),
+    purposeButton: Selector(
+      '#applicationEvents\\[0\\]\\.purposeId-toggle-button'
+    ),
+    purposeOption1: Selector('#applicationEvents\\[0\\]\\.purposeId-item-0'),
     defaultPeriodCheckbox: Selector('#defaultPeriod'),
     beginInput: Selector('#applicationEvents\\[0\\]\\.begin'),
     endInput: Selector('#applicationEvents\\[0\\]\\.end'),
+    saveButton: Selector('#applicationEvents\\[0\\]\\.save'),
     nextButton: Selector('#next'),
   },
   page2: {
-    applicationEventAccordion: Selector('#timeSelector-0 > div > button'),
     randomApplicationEventScheduleButton: (): Selector => {
       const rnd = random.randomInt(7 * 17);
-      const button = Selector(`[role=region] > div > div > button`);
+      const button = Selector(`#timeSelector-0 > div > div > button`);
       return button.nth(rnd);
     },
     nextButton: Selector('#next'),
@@ -40,10 +51,6 @@ export default {
     nextButton: Selector('#next'),
   },
   preview: {
-    basicInfoAccordion: Selector('#basicInfo > div > button'),
-    firstApplicationEventAccordion: Selector(
-      '#applicationEvent-0 > div > button'
-    ),
     acceptTerms: Selector('[for="preview\\.acceptTermsOfUse"]'),
     sendButton: Selector('#submit'),
   },

@@ -1,21 +1,37 @@
-import { Accordion, Checkbox, Select, TextInput } from 'hds-react';
 import React, { ChangeEvent, useEffect, useState } from 'react';
+import {
+  Button,
+  Checkbox,
+  IconPaperclip,
+  Notification,
+  TextInput,
+} from 'hds-react';
 import { useTranslation } from 'react-i18next';
 import { useForm, Controller } from 'react-hook-form';
 import styled from 'styled-components';
 import ReservationUnitList from './ReservationUnitList';
 import {
+  AccordionState,
+  Action,
+  Application,
   ApplicationEvent as ApplicationEventType,
   ApplicationRound,
+  EditorState,
   OptionType,
   ReservationUnit,
 } from '../../common/types';
 import {
   formatApiDate,
   formatDate,
-  getSelectedOption,
+  fromApiDuration,
+  toApiDuration,
 } from '../../common/util';
 import { breakpoint } from '../../common/style';
+import { HorisontalRule } from '../../component/common';
+import ApplicationEventSummary from './ApplicationEventSummary';
+import ControlledSelect from '../../component/ControlledSelect';
+import ControlledTextInput from '../../component/ControlledTextInput';
+import Accordion from '../../component/Accordion';
 
 type OptionTypes = {
   ageGroupOptions: OptionType[];
@@ -31,13 +47,12 @@ type Props = {
   form: ReturnType<typeof useForm>;
   selectedReservationUnits: ReservationUnit[];
   optionTypes: OptionTypes;
+  editorState: EditorState;
+  dispatch: React.Dispatch<Action>;
+  onSave: () => void;
 };
 
-const Ruler = styled.hr`
-  margin-top: var(--spacing-layout-m);
-`;
-
-const SubHeadLine = styled.div`
+const SubHeadLine = styled.h2`
   font-family: var(--font-bold);
   margin-top: var(--spacing-layout-m);
   font-weight: 700;
@@ -60,6 +75,7 @@ const PeriodContainer = styled.div`
   grid-template-columns: 2fr 2fr 3fr;
   gap: var(--spacing-m);
   align-items: center;
+  margin-bottom: var(--spacing-layout-s);
   @media (max-width: ${breakpoint.m}) {
     grid-template-columns: 1fr;
   }
@@ -75,6 +91,24 @@ const SpanTwoColumns = styled.span`
   }
 `;
 
+const SaveButton = styled(Button)`
+  margin-top: var(--spacing-layout-l);
+`;
+const defaultDuration = '1';
+
+const isOpen = (
+  current: number | undefined,
+  states: AccordionState[]
+): boolean =>
+  Boolean(states.find((state) => state.applicationEventId === current)?.open);
+
+const getApplicationEventData = (
+  original: ApplicationEventType,
+  form: ApplicationEventType
+): ApplicationEventType => {
+  return { ...original, ...form };
+};
+
 const ApplicationEvent = ({
   applicationEvent,
   index,
@@ -82,12 +116,14 @@ const ApplicationEvent = ({
   form,
   selectedReservationUnits,
   optionTypes,
+  editorState,
+  dispatch,
+  onSave,
 }: Props): JSX.Element => {
   const periodStartDate = formatApiDate(
     applicationRound.applicationPeriodBegin
   );
   const periodEndDate = formatApiDate(applicationRound.applicationPeriodEnd);
-  const defaultDuration = '1';
 
   const [defaultPeriodSelected, setDefaultPeriodSelected] = useState(false);
   const [defaultDurationSelected, setDefaultDurationSelected] = useState(false);
@@ -104,18 +140,18 @@ const ApplicationEvent = ({
   const fieldName = (nameField: string) =>
     `applicationEvents[${index}].${nameField}`;
 
-  const name = form.watch(fieldName('name'));
+  const applicationName = form.watch(fieldName('name'));
   const applicationPeriodBegin = form.watch(fieldName('begin'));
   const applicationPeriodEnd = form.watch(fieldName('end'));
   const durationMin = form.watch(fieldName('minDuration'));
   const durationMax = form.watch(fieldName('maxDuration'));
+  form.watch(fieldName('numPersons'));
+  form.watch(fieldName('eventsPerWeek'));
 
   useEffect(() => {
-    form.register({ name: fieldName('ageGroupId'), required: true });
-    form.register({ name: fieldName('abilityGroupId'), required: true });
-    form.register({ name: fieldName('purposeId'), required: true });
     form.register({ name: fieldName('eventReservationUnits') });
-  });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     const selectionIsDefaultPeriod =
@@ -150,164 +186,180 @@ const ApplicationEvent = ({
     const { checked } = e.target;
     setDefaultDurationSelected(checked);
     if (checked) {
-      form.setValue(fieldName('minDuration'), defaultDuration);
-      form.setValue(fieldName('maxDuration'), defaultDuration);
+      form.setValue(fieldName('minDuration'), toApiDuration(defaultDuration));
+      form.setValue(fieldName('maxDuration'), toApiDuration(defaultDuration));
     }
   };
 
   return (
-    <Accordion heading={`${name}` || ''}>
-      <SubHeadLine>
-        {t('Application.Page1.basicInformationSubHeading')}
-      </SubHeadLine>
-      <TwoColumnContainer>
-        <TextInput
-          ref={form.register({ required: true })}
-          label={t('Application.Page1.name')}
-          id={fieldName('name')}
-          name={fieldName('name')}
-          required
-        />
-        <TextInput
-          required
-          ref={form.register({ required: true })}
-          label={t('Application.Page1.groupSize')}
-          id={fieldName('numPersons')}
-          name={fieldName('numPersons')}
-        />
-        <Select
-          id="ageGroup"
-          placeholder="Valitse"
-          options={ageGroupOptions}
-          label={t('Application.Page1.ageGroup')}
-          required
-          onChange={(selection: OptionType): void => {
-            form.setValue(fieldName('ageGroupId'), selection.value);
-          }}
-          defaultValue={getSelectedOption(
-            applicationEvent.ageGroupId,
-            ageGroupOptions
-          )}
-        />
-        <Select
-          id="abilityGroup"
-          placeholder="Valitse"
-          options={abilityGroupOptions}
-          label={t('Application.Page1.abilityGroup')}
-          required
-          onChange={(selection: OptionType): void => {
-            form.setValue(fieldName('abilityGroupId'), selection.value);
-          }}
-          defaultValue={getSelectedOption(
-            applicationEvent.abilityGroupId,
-            abilityGroupOptions
-          )}
-        />
-        <SpanTwoColumns>
-          <Select
-            id="purpose"
-            placeholder="Valitse"
-            required
-            options={purposeOptions}
-            label={t('Application.Page1.purpose')}
-            onChange={(selection: OptionType): void => {
-              form.setValue(fieldName('purposeId'), selection.value);
-            }}
-            defaultValue={getSelectedOption(
-              applicationEvent.purposeId,
-              purposeOptions
-            )}
-          />
-        </SpanTwoColumns>
-      </TwoColumnContainer>
-      <Ruler />
-      <SubHeadLine>{t('Application.Page1.spacesSubHeading')}</SubHeadLine>
-      <ReservationUnitList
-        selectedReservationUnits={selectedReservationUnits}
-        applicationEvent={applicationEvent}
-        applicationRound={applicationRound}
-        form={form}
-        fieldName={fieldName('eventReservationUnits')}
-        options={{ purposeOptions, reservationUnitTypeOptions }}
-      />
-      <Ruler />
-      <SubHeadLine>
-        {t('Application.Page1.applicationPeriodSubHeading')}
-      </SubHeadLine>
-      <PeriodContainer>
-        <TextInput
-          type="date"
-          ref={form.register({ required: true })}
-          label={t('Application.Page1.periodStartDate')}
-          id={fieldName('begin')}
-          name={fieldName('begin')}
-          required
-        />
-        <TextInput
-          type="date"
-          ref={form.register({ required: true })}
-          label={t('Application.Page1.periodEndDate')}
-          id={fieldName('end')}
-          name={fieldName('end')}
-          required
-        />
-        <Checkbox
-          id="defaultPeriod"
-          checked={defaultPeriodSelected}
-          label={`${formatDate(
-            applicationRound.applicationPeriodBegin
-          )} - ${formatDate(applicationRound.applicationPeriodEnd)}`}
-          onChange={selectDefaultPeriod}
-          disabled={defaultPeriodSelected}
-        />
-        <TextInput
-          ref={form.register({ required: true })}
-          label={t('Application.Page1.minDuration')}
-          id={fieldName('minDuration')}
-          name={fieldName('minDuration')}
-          required
-        />
-        <TextInput
-          ref={form.register({ required: true })}
-          label={t('Application.Page1.maxDuration')}
-          id={fieldName('maxDuration')}
-          name={fieldName('maxDuration')}
-          required
-        />
-        <Checkbox
-          id="durationCheckbox"
-          checked={defaultDurationSelected}
-          label={`${defaultDuration}${t('common.abbreviations.hour')}`}
-          onChange={selectDefaultDuration}
-          disabled={defaultDurationSelected}
-        />
-        <SpanTwoColumns>
+    <>
+      <Accordion
+        onToggle={() =>
+          dispatch({
+            type: 'toggleAccordionState',
+            eventId: applicationEvent.id,
+          })
+        }
+        open={isOpen(applicationEvent.id, editorState.accordionStates)}
+        heading={`${applicationName}` || ''}>
+        <SubHeadLine>
+          {t('Application.Page1.basicInformationSubHeading')}
+        </SubHeadLine>
+        <TwoColumnContainer>
           <TextInput
-            ref={form.register()}
-            label={t('Application.Page1.eventsPerWeek')}
-            id={fieldName('eventsPerWeek')}
-            name={fieldName('eventsPerWeek')}
-            type="number"
+            ref={form.register({ required: true })}
+            label={t('Application.Page1.name')}
+            id={fieldName('name')}
+            name={fieldName('name')}
             required
           />
-        </SpanTwoColumns>
-        <Controller
-          control={form.control}
-          name={fieldName('biweekly')}
-          render={(props) => {
-            return (
-              <Checkbox
-                {...props}
-                id={fieldName('biweekly')}
-                checked={props.value}
-                onChange={() => props.onChange(!props.value)}
-                label={t('Application.Page1.biweekly')}
-              />
-            );
-          }}
+          <TextInput
+            required
+            ref={form.register({ required: true })}
+            label={t('Application.Page1.groupSize')}
+            id={fieldName('numPersons')}
+            name={fieldName('numPersons')}
+          />
+          <ControlledSelect
+            name={fieldName('ageGroupId')}
+            required
+            label={t('Application.Page1.ageGroup')}
+            control={form.control}
+            options={ageGroupOptions}
+          />
+          <ControlledSelect
+            name={fieldName('abilityGroupId')}
+            required
+            label={t('Application.Page1.abilityGroup')}
+            control={form.control}
+            options={abilityGroupOptions}
+          />
+          <SpanTwoColumns>
+            <ControlledSelect
+              name={fieldName('purposeId')}
+              required
+              label={t('Application.Page1.purpose')}
+              control={form.control}
+              options={purposeOptions}
+            />
+          </SpanTwoColumns>
+        </TwoColumnContainer>
+        <HorisontalRule />
+        <SubHeadLine>{t('Application.Page1.spacesSubHeading')}</SubHeadLine>
+        <ReservationUnitList
+          selectedReservationUnits={selectedReservationUnits}
+          applicationEvent={applicationEvent}
+          applicationRound={applicationRound}
+          form={form}
+          fieldName={fieldName('eventReservationUnits')}
+          options={{ purposeOptions, reservationUnitTypeOptions }}
         />
-      </PeriodContainer>
-    </Accordion>
+        <HorisontalRule />
+        <SubHeadLine>
+          {t('Application.Page1.applicationRoundSubHeading')}
+        </SubHeadLine>
+        <PeriodContainer>
+          <TextInput
+            type="date"
+            ref={form.register({ required: true })}
+            label={t('Application.Page1.periodStartDate')}
+            id={fieldName('begin')}
+            name={fieldName('begin')}
+            required
+          />
+          <TextInput
+            type="date"
+            ref={form.register({ required: true })}
+            label={t('Application.Page1.periodEndDate')}
+            id={fieldName('end')}
+            name={fieldName('end')}
+            required
+          />
+          <Checkbox
+            id="defaultPeriod"
+            checked={defaultPeriodSelected}
+            label={`${formatDate(
+              applicationRound.applicationPeriodBegin
+            )} - ${formatDate(applicationRound.applicationPeriodEnd)}`}
+            onChange={selectDefaultPeriod}
+            disabled={defaultPeriodSelected}
+          />
+          <ControlledTextInput
+            control={form.control}
+            fromEntity={fromApiDuration}
+            toEntity={toApiDuration}
+            label={t('Application.Page1.minDuration')}
+            name={fieldName('minDuration')}
+            required
+          />
+          <ControlledTextInput
+            control={form.control}
+            fromEntity={fromApiDuration}
+            toEntity={toApiDuration}
+            label={t('Application.Page1.maxDuration')}
+            name={fieldName('maxDuration')}
+            required
+          />
+          <Checkbox
+            id="durationCheckbox"
+            checked={defaultDurationSelected}
+            label={`${defaultDuration}${t('common.abbreviations.hour')}`}
+            onChange={selectDefaultDuration}
+            disabled={defaultDurationSelected}
+          />
+          <SpanTwoColumns>
+            <TextInput
+              ref={form.register()}
+              label={t('Application.Page1.eventsPerWeek')}
+              id={fieldName('eventsPerWeek')}
+              name={fieldName('eventsPerWeek')}
+              type="number"
+              required
+            />
+          </SpanTwoColumns>
+          <Controller
+            control={form.control}
+            name={fieldName('biweekly')}
+            render={(props) => {
+              return (
+                <Checkbox
+                  {...props}
+                  id={fieldName('biweekly')}
+                  checked={props.value}
+                  onChange={() => props.onChange(!props.value)}
+                  label={t('Application.Page1.biweekly')}
+                />
+              );
+            }}
+          />
+        </PeriodContainer>
+        <HorisontalRule />
+        <SubHeadLine>
+          {t('Application.Page1.applicationEventSummary')}
+        </SubHeadLine>
+        <ApplicationEventSummary
+          applicationEvent={getApplicationEventData(
+            applicationEvent,
+            (form.getValues() as Application).applicationEvents?.[index]
+          )}
+          name={applicationName}
+        />
+        <SaveButton
+          id={`applicationEvents[${index}].save`}
+          iconLeft={<IconPaperclip />}
+          onClick={onSave}>
+          Hyväksy ja tallenna vakiovuoro
+        </SaveButton>
+      </Accordion>
+      {editorState.savedEventId === applicationEvent.id ? (
+        <Notification
+          size="small"
+          type="success"
+          label={t('Application.applicationEventSaved')}>
+          {t('Application.applicationEventSaved')}
+        </Notification>
+      ) : null}
+    </>
   );
 };
 

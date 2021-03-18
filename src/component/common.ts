@@ -39,3 +39,10 @@ export const ButtonContainer = styled.div`
     margin-left: var(--spacing-layout-xs);
   }
 `;
+
+export const HorisontalRule = styled.div`
+  border: 0;
+  height: 1px;
+  background-color: var(--color-black-60);
+  margin-top: var(--spacing-layout-m);
+`;

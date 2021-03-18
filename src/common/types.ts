@@ -141,8 +141,8 @@ export type ApplicationEvent = {
   ageGroupId: number | null;
   abilityGroupId: number | null;
   purposeId: number | null;
-  minDuration: number | null;
-  maxDuration: number | null;
+  minDuration: string | null;
+  maxDuration: string | null;
   eventsPerWeek: number;
   biweekly: boolean;
   begin: string | null;
@@ -182,8 +182,10 @@ export type OptionType = {
 };
 
 export type Action = {
-  type: 'load' | 'addNewApplicationEvent';
-  data?: Application;
+  type: 'load' | 'addNewApplicationEvent' | 'save' | 'toggleAccordionState';
+  application?: Application;
+  savedEventId?: number;
+  eventId?: number;
   params?: { [key: string]: string };
 };
 
@@ -195,6 +197,18 @@ export type ApplicationEditor = {
 export type FormType = undefined | 'individual' | 'organisation' | 'company';
 
 export type LocalizationLanguages = 'fi' | 'sv' | 'en';
+
+export type EditorState = {
+  loading: boolean;
+  application: Application;
+  savedEventId?: number;
+  accordionStates: AccordionState[];
+};
+
+export type AccordionState = {
+  applicationEventId: number;
+  open: boolean;
+};
 
 export type Cell = {
   hour: number;

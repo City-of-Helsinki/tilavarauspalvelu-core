@@ -3,13 +3,13 @@ import {
   IconArrowDown,
   IconArrowUp,
   IconGroup,
+  IconPlusCircle,
   IconTrash,
 } from 'hds-react';
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import { useAsync } from 'react-use';
 import { getReservationUnit } from '../../common/api';
 import {
   ApplicationEvent,
@@ -29,7 +29,6 @@ type CardProps = {
   last: boolean;
   onMoveUp: (reservationUnit: ReservationUnit) => void;
   onMoveDown: (reservationUnit: ReservationUnit) => void;
-  t: (n: string) => string;
 };
 
 const NameCardContainer = styled.div`
@@ -57,6 +56,8 @@ const CardContainer = styled.div`
 `;
 
 const Image = styled.img`
+  width: 76px;
+  height: 99px;
   object-fit: cover;
 `;
 
@@ -78,10 +79,6 @@ const MaxPersonsContainer = styled.div`
 
 const MaxPersonsCountContainer = styled.span`
   margin-left: var(--spacing-xs);
-`;
-
-const DeleteButton = styled(Button)`
-  --border-color: transparent;
 `;
 
 const ArrowContainer = styled.div`
@@ -109,9 +106,8 @@ const ReservationUnitCard = ({
   last,
   onMoveUp,
   onMoveDown,
-  t,
 }: CardProps): JSX.Element => {
-  const { i18n } = useTranslation();
+  const { i18n, t } = useTranslation();
 
   return (
     <NameCardContainer>
@@ -122,8 +118,9 @@ const ReservationUnitCard = ({
         <CardContainer>
           <Image
             src={reservationUnit.images[0]?.imageUrl}
-            width="76"
-            height="99"
+            alt={t('common.imgAltForSpace', {
+              name: localizedValue(reservationUnit.name, i18n.language),
+            })}
           />
           <div>
             <Title>{localizedValue(reservationUnit.name, i18n.language)}</Title>
@@ -134,20 +131,20 @@ const ReservationUnitCard = ({
             </Address>
           </div>
           <MaxPersonsContainer>
-            <IconGroup />
+            <IconGroup aria-hidden />
             <MaxPersonsCountContainer>
               {reservationUnit.maxPersons}
             </MaxPersonsCountContainer>
           </MaxPersonsContainer>
           <div>
-            <DeleteButton
-              variant="secondary"
-              iconLeft={<IconTrash />}
+            <Button
+              variant="supplementary"
+              iconLeft={<IconTrash aria-hidden />}
               onClick={() => {
                 onDelete(reservationUnit);
               }}>
               {t('ReservationUnitList.buttonRemove')}
-            </DeleteButton>
+            </Button>
           </div>
         </CardContainer>
         <ArrowContainer>
@@ -156,17 +153,19 @@ const ReservationUnitCard = ({
               className="button-reset"
               disabled={first}
               type="button"
+              aria-label={t('ReservationUnitList.buttonUp')}
               onClick={() => onMoveUp(reservationUnit)}>
-              <IconArrowUp size="m" />
+              <IconArrowUp aria-hidden size="m" />
             </button>
           </Circle>
           <Circle passive={last}>
             <button
               className="button-reset"
+              aria-label={t('ReservationUnitList.buttonDown')}
               type="button"
               disabled={last}
               onClick={() => onMoveDown(reservationUnit)}>
-              <IconArrowDown size="m" />
+              <IconArrowDown aria-hidden size="m" />
             </button>
           </Circle>
         </ArrowContainer>
@@ -224,19 +223,28 @@ const ReservationUnitList = ({
     );
   }, [reservationUnits, fieldName, form]);
 
-  useAsync(async () => {
+  useEffect(() => {
+    let isMounted = true; // note this flag denote mount status
     let data;
-    if (applicationEvent.eventReservationUnits.length === 0) {
-      data = selectedReservationUnits;
-    } else {
-      const promises = applicationEvent.eventReservationUnits.map((eventUnit) =>
-        getReservationUnit(eventUnit.reservationUnitId)
-      );
-      data = await Promise.all(promises);
-    }
-    setReservationUnits(data);
-    return data;
-  }, [applicationEvent.eventReservationUnits]);
+    const fetchData = async () => {
+      if (applicationEvent.eventReservationUnits.length === 0) {
+        data = selectedReservationUnits;
+      } else {
+        const promises = applicationEvent.eventReservationUnits.map(
+          (eventUnit) => getReservationUnit(eventUnit.reservationUnitId)
+        );
+        data = await Promise.all(promises);
+      }
+      if (isMounted) {
+        setReservationUnits(data);
+      }
+    };
+
+    fetchData();
+    return () => {
+      isMounted = false;
+    };
+  }, [selectedReservationUnits, applicationEvent.eventReservationUnits]);
 
   const move = (
     units: ReservationUnit[],
@@ -276,7 +284,6 @@ const ReservationUnitList = ({
         return (
           <ReservationUnitCard
             key={ru.id}
-            t={t}
             onDelete={remove}
             reservationUnit={ru}
             order={index}
@@ -288,7 +295,10 @@ const ReservationUnitList = ({
         );
       })}
       <ButtonContainer>
-        <Button onClick={() => setShowModal(true)}>
+        <Button
+          variant="supplementary"
+          iconLeft={<IconPlusCircle aria-hidden />}
+          onClick={() => setShowModal(true)}>
           {t('ReservationUnitList.add')}
         </Button>
       </ButtonContainer>

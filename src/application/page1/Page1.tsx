@@ -1,18 +1,15 @@
-import {
-  Button,
-  IconArrowLeft,
-  IconArrowRight,
-  IconPlusCircleFill,
-} from 'hds-react';
+import { Button, IconArrowRight, IconPlusCircleFill } from 'hds-react';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import styled from 'styled-components';
+import { useHistory } from 'react-router-dom';
 import ApplicationEvent from './ApplicationEvent';
 import {
+  Action,
   Application,
-  Application as ApplicationType,
   ApplicationRound,
+  EditorState,
   OptionType,
   ReservationUnit,
 } from '../../common/types';
@@ -22,10 +19,24 @@ import { breakpoint } from '../../common/style';
 
 type Props = {
   applicationRound: ApplicationRound;
-  application: ApplicationType;
+  editorState: EditorState;
   selectedReservationUnits: ReservationUnit[];
-  onNext?: (appToSave: Application) => void;
+  save: ({
+    application,
+    eventId,
+  }: {
+    application: Application;
+    eventId?: number;
+  }) => void;
+  dispatch: React.Dispatch<Action>;
   addNewApplicationEvent: () => void;
+};
+
+type OptionTypes = {
+  ageGroupOptions: OptionType[];
+  purposeOptions: OptionType[];
+  abilityGroupOptions: OptionType[];
+  reservationUnitTypeOptions: OptionType[];
 };
 
 const ButtonContainer = styled.div`
@@ -60,33 +71,25 @@ const ButtonContainer = styled.div`
 `;
 
 const Page1 = ({
-  onNext,
+  save,
   addNewApplicationEvent,
   applicationRound,
-  application,
+  editorState,
+  dispatch,
   selectedReservationUnits,
 }: Props): JSX.Element | null => {
-  const [ready, setReady] = useState<boolean>(false);
+  const [ready, setReady] = useState(false);
+  const [msg, setMsg] = useState('');
+  const [options, setOptions] = useState<OptionTypes>();
 
-  const [ageGroupOptions, setAgeGroupOptions] = useState<OptionType[]>([]);
-  const [purposeOptions, setPurposeOptions] = useState<OptionType[]>([]);
-  const [abilityGroupOptions, setAbilityGroupOptions] = useState<OptionType[]>(
-    []
-  );
-  const [reservationUnitTypeOptions, setReservationUnitTypeOptions] = useState<
-    OptionType[]
-  >([]);
-
-  const optionTypes = {
-    ageGroupOptions,
-    purposeOptions,
-    abilityGroupOptions,
-    reservationUnitTypeOptions,
-  };
+  const history = useHistory();
 
   const { t } = useTranslation();
 
+  const { application } = editorState;
+
   const form = useForm({
+    mode: 'onChange',
     defaultValues: {
       applicationEvents: application.applicationEvents,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -95,24 +98,35 @@ const Page1 = ({
 
   useEffect(() => {
     async function fetchData() {
-      const fetchedAbilityGroupOptions = await getParameters('ability_group');
-      const fetchedAgeGroupOptions = await getParameters('age_group');
-      const fetchedPurposeOptions = await getParameters('purpose');
-      const fetchedReservationUnitType = await getParameters(
-        'reservation_unit_type'
-      );
+      const [
+        fetchedAbilityGroupOptions,
+        fetchedAgeGroupOptions,
+        fetchedPurposeOptions,
+        fetchedReservationUnitType,
+      ] = await Promise.all([
+        getParameters('ability_group'),
+        getParameters('age_group'),
+        getParameters('purpose'),
+        getParameters('reservation_unit_type'),
+      ]);
 
-      setAbilityGroupOptions(mapOptions(fetchedAbilityGroupOptions));
-      setAgeGroupOptions(mapOptions(fetchedAgeGroupOptions));
-      setPurposeOptions(mapOptions(fetchedPurposeOptions));
-      setReservationUnitTypeOptions(mapOptions(fetchedReservationUnitType));
-
+      setOptions({
+        ageGroupOptions: mapOptions(fetchedAgeGroupOptions),
+        abilityGroupOptions: mapOptions(fetchedAbilityGroupOptions),
+        purposeOptions: mapOptions(fetchedPurposeOptions),
+        reservationUnitTypeOptions: mapOptions(fetchedReservationUnitType),
+      });
       setReady(true);
     }
     fetchData();
   }, []);
 
-  const prepareData = (data: ApplicationType): ApplicationType => {
+  useEffect(() => {
+    if (form.formState.isSubmitted && !form.formState.isSubmitSuccessful)
+      setMsg('Please fill out all required fields');
+  }, [form.formState]);
+
+  const prepareData = (data: Application): Application => {
     const applicationCopy = {
       ...deepCopy(application),
       applicationEvents: application.applicationEvents.map(
@@ -125,15 +139,13 @@ const Page1 = ({
     return applicationCopy;
   };
 
-  const onSubmit = (data: ApplicationType) => {
+  const onSubmit = (data: Application, eventId?: number) => {
     const appToSave = prepareData(data);
-
-    if (onNext) {
-      onNext(appToSave);
-    }
+    form.reset({ applicationEvents: appToSave.applicationEvents });
+    save({ application: appToSave, eventId });
   };
 
-  const onAddApplicationEvent = (data: ApplicationType) => {
+  const onAddApplicationEvent = (data: Application) => {
     if (
       data.applicationEvents &&
       data.applicationEvents.some((e) => Boolean(e.id))
@@ -148,7 +160,8 @@ const Page1 = ({
   }
 
   return (
-    <form>
+    <>
+      {msg}
       {application.applicationEvents.map((event, index) => {
         return (
           <ApplicationEvent
@@ -157,12 +170,16 @@ const Page1 = ({
             applicationEvent={event}
             index={index}
             applicationRound={applicationRound}
-            optionTypes={optionTypes}
+            optionTypes={options as OptionTypes}
             selectedReservationUnits={selectedReservationUnits}
+            onSave={form.handleSubmit((app: Application) =>
+              onSubmit(app, event.id)
+            )}
+            editorState={editorState}
+            dispatch={dispatch}
           />
         );
       })}
-
       <ButtonContainer>
         <Button
           id="addApplicationEvent"
@@ -170,18 +187,20 @@ const Page1 = ({
           onClick={() => form.handleSubmit(onAddApplicationEvent)()}>
           {t('Application.Page1.createNew')}
         </Button>
-        <Button disabled iconLeft={<IconArrowLeft />}>
-          {t('common.prev')}
-        </Button>
+      </ButtonContainer>
+      <ButtonContainer>
         <Button
           id="next"
           iconRight={<IconArrowRight />}
-          disabled={application.applicationEvents.length === 0}
-          onClick={() => form.handleSubmit(onSubmit)()}>
+          disabled={
+            application.applicationEvents.length === 0 ||
+            (form.formState.isDirty && !editorState.savedEventId)
+          }
+          onClick={() => history.push('page2')}>
           {t('common.next')}
         </Button>
       </ButtonContainer>
-    </form>
+    </>
   );
 };
 

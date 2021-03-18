@@ -34,11 +34,16 @@ const InnerContainer = styled.div`
 
 type Props = {
   count: number;
+  applicationRoundId?: number;
 };
 
-const StartApplicationBar = ({ count }: Props): JSX.Element | null => {
+const StartApplicationBar = ({
+  count,
+  applicationRoundId = 1,
+}: Props): JSX.Element | null => {
   const { t } = useTranslation();
   const history = useHistory();
+
   if (count === 0) {
     return null;
   }
@@ -54,7 +59,9 @@ const StartApplicationBar = ({ count }: Props): JSX.Element | null => {
             id="startApplicationButton"
             variant="supplementary"
             iconRight={<IconArrowRight />}
-            onClick={() => history.push(`/application/1/new/page1`)}>
+            onClick={() => {
+              history.push(`/create/${applicationRoundId}`);
+            }}>
             {t('shoppingCart.next')}
           </Button>
         </InnerContainer>

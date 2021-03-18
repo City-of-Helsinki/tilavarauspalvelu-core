@@ -11,17 +11,3 @@ export const minimalApplicationForInitialSave = (
   contactPerson: null,
   billingAddress: null,
 });
-
-const applicationInitializer = ({
-  id,
-  applicationRoundId,
-}: Application): Application => {
-  if (!id) {
-    return {
-      ...minimalApplicationForInitialSave(applicationRoundId),
-    };
-  }
-  return {} as Application;
-};
-
-export default applicationInitializer;

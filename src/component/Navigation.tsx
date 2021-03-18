@@ -69,7 +69,6 @@ const Navigation = ({ profile, logout }: Props): JSX.Element => {
           userName={`${profile?.given_name} ${profile?.family_name}`}
           authenticated={Boolean(profile)}
           label={t('common.login')}
-          buttonAriaLabel={t('common.login')}
           onSignIn={() => {
             history.push(applicationsUrl);
           }}>

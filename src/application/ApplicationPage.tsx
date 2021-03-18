@@ -1,9 +1,10 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { NavLink } from 'react-router-dom';
 import styled from 'styled-components';
+import { breakpoint } from '../common/style';
 import Container from '../component/Container';
 import Head from './Head';
+import Stepper from './Stepper';
 
 type ApplicationPageProps = {
   translationKeyPrefix: string;
@@ -17,35 +18,14 @@ const InnerContainer = styled.div`
   display: grid;
   gap: 6em;
   grid-template-columns: 2fr 5fr;
-`;
-
-const NavigationContainer = styled.nav`
-  font-size: var(--fontsize-body-l);
-  font-weight: 500;
-  & ul {
-    list-style-type: none;
-  }
-
-  & a {
-    color: var(--color-black-90);
-    text-decoration: none;
-  }
-
-  & li {
-    padding: 1em;
-    font-weight: bold;
+  @media (max-width: ${breakpoint.l}) {
+    grid-template-columns: 1fr;
+    gap: 0;
   }
 `;
 
-const activeClassName = 'active-nav-class';
-const StyledNavLink = styled(NavLink).attrs({
-  activeClassName,
-})`
-  &.${activeClassName} {
-    & > li {
-      background-color: #e8f3fc;
-    }
-  }
+const Main = styled.div`
+  margin-top: var(--spacing-s);
 `;
 
 const ApplicationPage = ({
@@ -67,40 +47,8 @@ const ApplicationPage = ({
       />
       <Container main>
         <InnerContainer>
-          <NavigationContainer
-            aria-label={t('common.applicationNavigationName')}>
-            <ul>
-              <li>
-                <StyledNavLink
-                  activeClassName={activeClassName}
-                  to={`${match.url}/page1`}>
-                  {t('ApplicationPage.navigation.page1')}
-                </StyledNavLink>
-              </li>
-              <li>
-                <StyledNavLink
-                  activeClassName={activeClassName}
-                  to={`${match.url}/page2`}>
-                  {t('ApplicationPage.navigation.page2')}
-                </StyledNavLink>
-              </li>
-              <li>
-                <StyledNavLink
-                  activeClassName={activeClassName}
-                  to={`${match.url}/page3`}>
-                  {t('ApplicationPage.navigation.page3')}
-                </StyledNavLink>
-              </li>
-              <li>
-                <StyledNavLink
-                  activeClassName={activeClassName}
-                  to={`${match.url}/preview`}>
-                  {t('ApplicationPage.navigation.preview')}
-                </StyledNavLink>
-              </li>
-            </ul>
-          </NavigationContainer>
-          <div>{children}</div>
+          <Stepper match={match} />
+          <Main>{children}</Main>
         </InnerContainer>
       </Container>
     </>

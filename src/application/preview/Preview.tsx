@@ -1,11 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
-  Button,
-  Checkbox,
-  IconArrowLeft,
-  Notification,
-  Accordion,
-} from 'hds-react';
+import { Button, Checkbox, IconArrowLeft, Notification } from 'hds-react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -16,6 +10,7 @@ import LabelValue from '../../component/LabelValue';
 import TimePreview from '../TimePreview';
 import ApplicantInfoPreview from './ApplicantInfoPreview';
 import { TwoColumnContainer } from '../../component/common';
+import { AccordionWithState as Accordion } from '../../component/Accordion';
 
 type Props = {
   application: Application;
@@ -154,12 +149,14 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
   return ready ? (
     <>
       <Accordion
+        open
         id="basicInfo"
         heading={t('Application.preview.basicInfoSubHeading')}>
         <ApplicantInfoPreview application={application} />
       </Accordion>
       {application.applicationEvents.map((applicationEvent, i) => (
         <Accordion
+          open
           id={`applicationEvent-${i}`}
           key={applicationEvent.id}
           heading={applicationEvent.name || ''}>

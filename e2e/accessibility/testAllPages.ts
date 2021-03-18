@@ -47,13 +47,14 @@ test('Application', async (t) => {
     .click(search.startApplicationButton);
   await runAxeCheck(t);
   await t.expect(violations.length === 0).ok(createReport(violations));
+  // skip intro
+  await t.click(application.intro.startApplication);
   // add application event
   await t.click(application.addApplicationEventButton);
   await runAxeCheck(t);
   await t.expect(violations.length === 0).ok(createReport(violations));
   // fill and submit page 1
   await t
-    .click(application.page1.applicationEventAccordion)
     .typeText(application.page1.numPersonsInput, '12')
     .click(application.page1.ageGroupButton)
     .click(application.page1.ageGroupOption1)
@@ -62,12 +63,13 @@ test('Application', async (t) => {
     .click(application.page1.purposeButton)
     .click(application.page1.purposeOption1)
     .click(application.page1.defaultPeriodCheckbox)
-    .click(application.page1.nextButton);
+    .click(application.page1.saveButton);
 
-  await application.page2.applicationEventAccordion;
+  await runAxeCheck(t);
+  await t.expect(violations.length === 0).ok(createReport(violations));
+  await t.click(application.page1.nextButton);
 
   // fill times
-  await t.click(application.page2.applicationEventAccordion);
   await t
     .click(application.page2.randomApplicationEventScheduleButton())
     .click(application.page2.randomApplicationEventScheduleButton())
@@ -101,9 +103,6 @@ test('Application', async (t) => {
   await runAxeCheck(t);
   await t.expect(violations.length === 0).ok(createReport(violations));
 
-  await t
-    .click(application.preview.basicInfoAccordion)
-    .click(application.preview.firstApplicationEventAccordion);
   await runAxeCheck(t);
   await t.expect(violations.length === 0).ok(createReport(violations));
 

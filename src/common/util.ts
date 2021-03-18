@@ -35,6 +35,8 @@ export const applicationRoundState = (
   return 'pending';
 };
 
+export const parseDate = (date: string): Date => parseISO(date);
+
 export const formatDate = (date: string): string => {
   if (!date) {
     return 'no date';
@@ -116,6 +118,17 @@ export function deepCopy<T>(src: T): T {
   return JSON.parse(JSON.stringify(src));
 }
 
+/** convert between api duration and editor contents */
+export const fromApiDuration = (duration: string): string => {
+  if (!duration) {
+    return '';
+  }
+  const parts = duration.split(':');
+  return `${Number(parts[1])}`;
+};
+
+export const toApiDuration = (hours: string): string =>
+  hours ? `00:${hours}:00` : '';
 const formatNumber = (n: number): string => `0${n > 23 ? 0 : n}`.slice(-2);
 
 type Timespan = { begin: number; end: number };

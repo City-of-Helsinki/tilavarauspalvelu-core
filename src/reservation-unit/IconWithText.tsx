@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { ReactElement } from 'react';
 import styled from 'styled-components';
 
 type IconWithTextProps = {
   icon: React.ReactElement;
-  text?: string;
+  text?: string | ReactElement;
   texts?: string[][];
   className?: string;
 };

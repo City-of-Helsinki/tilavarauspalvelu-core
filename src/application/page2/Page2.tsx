@@ -1,4 +1,4 @@
-import { Accordion, Button, IconArrowLeft, IconArrowRight } from 'hds-react';
+import { Button, IconArrowLeft, IconArrowRight } from 'hds-react';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDebounce } from 'use-debounce';
@@ -10,6 +10,7 @@ import {
   cellsToApplicationEventSchedules,
   applicationEventSchedulesToCells,
 } from '../../common/util';
+import { AccordionWithState as Accordion } from '../../component/Accordion';
 
 type Props = {
   application: Application;
@@ -85,6 +86,7 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
       {application.applicationEvents.map((event, index) => {
         return (
           <Accordion
+            open={index === 0}
             key={event.id}
             id={`timeSelector-${index}`}
             heading={event.name || undefined}>

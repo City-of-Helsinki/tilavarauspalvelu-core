@@ -17,9 +17,22 @@ interface Translations {
 }
 
 const translations: Translations = {
+  ApplicationEventSummary: {
+    message: [
+      'Olet hakemassa vakiovuorolle {{name}} kaudella {{startDate}} - {{endDate}} vähintään yhteensä {{hours}} tuntia vakiovuoroaikaa.',
+    ],
+    numPersons: ['Ryhmän koko on <1>{{numPersons}} henkilöä<1>'],
+    minDuration: ['Yhden vuoron kesto minimissään {{minDuration}} t'],
+    eventsPerWeek: ['<0>{{eventsPerWeek}}</0> vuoro viikossa'],
+    eventsPerWeek_plural: ['<0>{{eventsPerWeek}}</0> vuoroa viikossa'],
+  },
   Application: {
+    Intro: {
+      startNewApplication: ['Aloita hakemuksen täyttäminen'],
+    },
     Page1: {
       heading: ['1. Vakiovuoron luominen'],
+      text: ['Perustiedot'],
       basicInformationSubHeading: ['Perustiedot'],
       name: ['Vakiovuoron nimi'],
       groupSize: ['Ryhmän koko'],
@@ -34,8 +47,10 @@ const translations: Translations = {
       maxDuration: ['Vuoron maksimikesto'],
       eventsPerWeek: ['Vuorojen määrä/viikko'],
       biweekly: ['Vuoro vain joka toinen viikko'],
-      createNew: ['Luo uusi vakiovuoro'],
+      createNew: ['Lisää uusi vakiovuoro hakemukselle'],
       applicationEventName: ['Nimetön vakiovuoro'],
+      applicationEventSummary: ['Yhteenveto'],
+      applicationEventSaved: ['Vakiovuoro tallennettu hakemukselle'],
     },
     Page2: {
       heading: ['2. Vakiovuoron ajankohta'],
@@ -192,10 +207,10 @@ const translations: Translations = {
   },
   ApplicationPage: {
     navigation: {
-      page1: ['1. Vakiovuoron perustiedot'],
-      page2: ['2. Vakiovuoron ajankohta'],
-      page3: ['3. Varaajan perustiedot'],
-      preview: ['4. Lähetä käsiteltäväksi'],
+      page1: ['Vakiovuoron perustiedot'],
+      page2: ['Vakiovuoron ajankohta'],
+      page3: ['Varaajan perustiedot'],
+      preview: ['Lähetä käsiteltäväksi'],
     },
   },
   ApplicationRoundCard: {
@@ -310,6 +325,8 @@ const translations: Translations = {
   ReservationUnitList: {
     option: ['Vaihtoehto'],
     buttonRemove: ['Poista'],
+    buttonUp: ['Siirrä ylös'],
+    buttonDown: ['Siirrä alas'],
     add: ['Lisää tila'],
   },
   ReservationUnitModal: {

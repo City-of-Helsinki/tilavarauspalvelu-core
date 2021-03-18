@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import styled from 'styled-components';
 import {
   Application,
   Application as ApplicationType,
@@ -22,10 +21,6 @@ const typeForm = {
   community: 'organisation',
 };
 
-const Container = styled.div`
-  margin-top: var(--spacing-layout-m);
-`;
-
 const Page3 = ({ onNext, application }: Props): JSX.Element | null => {
   const [activeForm, setActiveForm] = useState(
     (application.applicantType
@@ -34,7 +29,7 @@ const Page3 = ({ onNext, application }: Props): JSX.Element | null => {
   );
 
   return (
-    <Container>
+    <>
       {activeForm === 'individual' ? (
         <IndividualForm
           activeForm={activeForm}
@@ -64,7 +59,7 @@ const Page3 = ({ onNext, application }: Props): JSX.Element | null => {
           {null}
         </RadioButtons>
       ) : null}
-    </Container>
+    </>
   );
 };
 

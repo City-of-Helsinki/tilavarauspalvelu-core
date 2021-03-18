@@ -12,7 +12,11 @@ test('Start new application', async (t) => {
     .typeText(search.searchText, 'Studio')
     .click(search.searchButton)
     .click(search.selectReservationUnitButton)
-    .click(search.startApplicationButton)
+    .click(search.startApplicationButton);
+  // skip intro
+  await t.click(application.intro.startApplication);
+  // add application event
+  await t
     .click(application.addApplicationEventButton)
     .expect(application.applicationTemplateName.textContent)
     .eql('Nimetön vakiovuoro');
