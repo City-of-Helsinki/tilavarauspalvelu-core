@@ -13,6 +13,8 @@ from .models import (
 
 @receiver(post_save, sender=Application, dispatch_uid="create_application_status")
 def create_application_status(sender, instance, **kwargs):
+    if kwargs.get("raw", False):
+        return
     if kwargs.get("created", False):
         if not instance.statuses.all().exists():
             ApplicationStatus.objects.create(
@@ -24,6 +26,8 @@ def create_application_status(sender, instance, **kwargs):
     post_save, sender=ApplicationStatus, dispatch_uid="update_latest_application_status"
 )
 def update_latest_application_status(sender, instance, **kwargs):
+    if kwargs.get("raw", False):
+        return
     if not kwargs.get("created", False):
         return
 
@@ -35,6 +39,8 @@ def update_latest_application_status(sender, instance, **kwargs):
     post_save, sender=ApplicationEvent, dispatch_uid="create_application_event_status"
 )
 def create_application_event_status(sender, instance, **kwargs):
+    if kwargs.get("raw", False):
+        return
     if kwargs.get("created", False):
         if not instance.statuses.all().exists():
             ApplicationEventStatus.objects.create(
@@ -48,6 +54,8 @@ def create_application_event_status(sender, instance, **kwargs):
     post_save, sender=ApplicationRound, dispatch_uid="create_application_round_status"
 )
 def create_application_round_status(sender, instance, **kwargs):
+    if kwargs.get("raw", False):
+        return
     if kwargs.get("created", False):
         if not instance.statuses.all().exists():
             ApplicationRoundStatus.objects.create(
