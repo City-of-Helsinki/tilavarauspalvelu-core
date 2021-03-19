@@ -905,24 +905,6 @@
         }
     },
     {
-        "model": "reservation_units.reservationunitimage",
-        "pk": 1,
-        "fields": {
-            "image_type": "main",
-            "reservation_unit": 2,
-            "image_url": "https://respa.koe.hel.ninja/resource_image/212"
-        }
-    },
-    {
-        "model": "reservation_units.reservationunitimage",
-        "pk": 2,
-        "fields": {
-            "image_type": "main",
-            "reservation_unit": 9,
-            "image_url": "https://respa.koe.hel.ninja/resource_image/496"
-        }
-    },
-    {
         "model": "reservation_units.purpose",
         "pk": 1,
         "fields": {
