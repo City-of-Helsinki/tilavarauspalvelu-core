@@ -1,6 +1,8 @@
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from easy_thumbnails.fields import ThumbnailerImageField
 
 from resources.models import Resource
 from services.models import Service
@@ -158,7 +160,11 @@ class ReservationUnitImage(models.Model):
         related_name="images",
         on_delete=models.CASCADE,
     )
-    image_url = models.URLField(verbose_name=_("Image url"), max_length=255)
+
+    image = ThumbnailerImageField(
+        upload_to=settings.RESERVATION_UNIT_IMAGES_ROOT,
+        null=True,
+    )
 
     def __str__(self):
         return "{} ({})".format(

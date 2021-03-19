@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.db.models import Sum
 from django_filters import rest_framework as filters
+from easy_thumbnails.files import get_thumbnailer
 from rest_framework import filters as drf_filters
 from rest_framework import mixins, permissions, serializers, viewsets
 
@@ -55,9 +56,27 @@ class ReservationUnitFilter(filters.FilterSet):
 
 
 class ReservationUnitImageSerializer(serializers.ModelSerializer):
+    image_url = serializers.ImageField(source="image", use_url=True)
+    medium_url = serializers.SerializerMethodField()
+    small_url = serializers.SerializerMethodField()
+
     class Meta:
         model = ReservationUnitImage
-        fields = ["image_url", "image_type"]
+        fields = ["image_url", "medium_url", "small_url", "image_type"]
+
+    def get_small_url(self, obj):
+        if not obj.image:
+            return None
+        url = get_thumbnailer(obj.image)["small"].url
+        request = self.context.get("request")
+        return request.build_absolute_uri(url)
+
+    def get_medium_url(self, obj):
+        if not obj.image:
+            return None
+        url = get_thumbnailer(obj.image)["small"].url
+        request = self.context.get("request")
+        return request.build_absolute_uri(url)
 
 
 class ReservationUnitTypeSerializer(serializers.ModelSerializer):

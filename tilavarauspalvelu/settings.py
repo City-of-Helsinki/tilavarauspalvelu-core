@@ -88,6 +88,7 @@ INSTALLED_APPS = [
     "users",
     "social_django",
     "tinymce",
+    "easy_thumbnails",
 ]
 
 MIDDLEWARE = [
@@ -197,6 +198,7 @@ MEDIA_ROOT = env("MEDIA_ROOT")
 STATIC_URL = env("STATIC_URL")
 MEDIA_URL = env("MEDIA_URL")
 
+RESERVATION_UNIT_IMAGES_ROOT = "reservation_unit_images"
 
 # Whether to trust X-Forwarded-Host headers for all purposes
 # where Django would need to make use of its own hostname
@@ -327,6 +329,15 @@ SPECTACULAR_SETTINGS = {
         },
     ],
 }
+
+
+THUMBNAIL_ALIASES = {
+    "": {
+        "small": {"size": (250, 250), "crop": True},
+        "medium": {"size": (384, 384), "crop": True},
+    },
+}
+
 
 # local_settings.py can be used to override environment-specific settings
 # like database and email that differ between development and production.
