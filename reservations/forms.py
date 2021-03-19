@@ -1,4 +1,5 @@
 from django.forms import CharField, ModelForm, ValidationError
+from django.utils.translation import gettext_lazy as _
 
 from reservations.models import Reservation
 
@@ -25,4 +26,4 @@ class ReservationForm(ModelForm):
         end = cleaned_data["end"]
         for reservation_unit in cleaned_data["reservation_unit"]:
             if reservation_unit.check_reservation_overlap(begin, end):
-                raise ValidationError("Overlapping reservations are not allowed")
+                raise ValidationError(_("Overlapping reservations are not allowed"))

@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.utils.translation import gettext_lazy as _
 from rest_framework import permissions, serializers, viewsets
 
 from applications.models import (
@@ -180,7 +181,7 @@ class ApplicationRoundSerializer(serializers.ModelSerializer):
         baskets = data["application_round_baskets"]
         basket_order_numbers = list(map(lambda basket: basket["order_number"], baskets))
         if len(basket_order_numbers) > len(set(basket_order_numbers)):
-            raise serializers.ValidationError("Order numbers should be unique")
+            raise serializers.ValidationError(_("Order numbers should be unique"))
 
         return data
 
