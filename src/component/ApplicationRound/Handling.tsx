@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { TFunction, useTranslation } from "react-i18next";
 import styled from "styled-components";
 import {
   Button,
@@ -10,9 +10,11 @@ import {
 } from "hds-react";
 import { useHistory } from "react-router-dom";
 import uniq from "lodash/uniq";
+import trim from "lodash/trim";
 import { getApplicationRound } from "../../common/api";
 import Loader from "../Loader";
 import {
+  Application as ApplicationType,
   ApplicationRound as ApplicationRoundType,
   ApplicationRoundBasket,
   DataFilterConfig,
@@ -30,7 +32,11 @@ import KorosHeading from "../KorosHeading";
 import StatusCircle from "../StatusCircle";
 import AllocatingDialogContent from "./AllocatingDialogContent";
 import DataTable, { CellConfig } from "../DataTable";
-import { getNormalizedStatus } from "../../common/util";
+import {
+  formatNumber,
+  getNormalizedStatus,
+  parseDuration,
+} from "../../common/util";
 import StatusCell from "../StatusCell";
 
 interface IProps {
@@ -150,6 +156,7 @@ const getFilterConfig = (recommendations: any[]): DataFilterConfig[] => {
 };
 
 const getCellConfig = (
+  t: TFunction,
   applicationRound: ApplicationRoundType | null
 ): CellConfig => {
   return {
@@ -164,8 +171,19 @@ const getCellConfig = (
         key: "ageGroup",
       },
       {
-        title: "Application.headings.applicationCount",
+        title: "Recommendation.headings.recommendationCount",
         key: "aggregatedData.reservationsTotal",
+        transform: ({ aggregatedData }: ApplicationType) => (
+          <>
+            {trim(
+              `${formatNumber(
+                aggregatedData?.reservationsTotal,
+                t("common.volumeUnit")
+              )} / ${parseDuration(aggregatedData?.minDurationTotal)}`,
+              " / "
+            )}
+          </>
+        ),
       },
       {
         title: "Application.headings.applicationStatus",
@@ -246,7 +264,7 @@ function Handling({ applicationRoundId }: IProps): JSX.Element {
           id: applicationRoundId,
         });
         setApplicationRound(result);
-        setCellConfig(getCellConfig(result));
+        setCellConfig(getCellConfig(t, result));
         setIsLoading(false);
       } catch (error) {
         const msg =
@@ -259,7 +277,7 @@ function Handling({ applicationRoundId }: IProps): JSX.Element {
     };
 
     fetchApplicationRound();
-  }, [applicationRoundId]);
+  }, [applicationRoundId, t]);
 
   useEffect(() => {
     const fetchRecommendations = async () => {
@@ -350,7 +368,6 @@ function Handling({ applicationRoundId }: IProps): JSX.Element {
             ],
           },
         ];
-        setCellConfig(getCellConfig(applicationRound));
         setFilterConfig(getFilterConfig(result.flatMap((n) => n.data)));
         setRecommendations(result);
       } catch (error) {

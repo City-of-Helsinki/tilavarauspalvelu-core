@@ -604,7 +604,7 @@ function DataTable({
             </Row>
           </Heading>
           <Body>
-            {groups.length > 0 ? (
+            {actionsEnabled ? (
               processedData.map(
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 (group: any, groupIndex: number): JSX.Element => {
