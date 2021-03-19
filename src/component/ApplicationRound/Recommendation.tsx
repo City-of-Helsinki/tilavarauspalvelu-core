@@ -179,7 +179,7 @@ function Recommendation(): JSX.Element {
     }
   }, [recommendation]);
 
-  if (isLoading) {
+  if (isLoading || !application) {
     return <Loader />;
   }
 
@@ -191,7 +191,9 @@ function Recommendation(): JSX.Element {
       <IngressContainer>
         <Top>
           <div>
-            <LinkToOthers to="/">
+            <LinkToOthers
+              to={`/applicationRound/${applicationRoundId}/applicant/${application.id}`}
+            >
               {t("Recommendation.linkToOtherRecommendations")} TODO
             </LinkToOthers>
             <div>

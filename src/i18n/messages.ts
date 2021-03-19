@@ -292,6 +292,12 @@ const translations: ITranslations = {
     ],
     recommendationCount: ["{{count}} ehdotus tehty"],
     recommendationCount_plural: ["{{count}} ehdotusta tehty"],
+    showOriginalApplication: ["Näytä alkuperäinen hakemus"],
+    headings: {
+      part: ["Osa"],
+      recommendationCount: ["Vuoroja (kpl/h)"],
+      spaceName: ["Tilan nimi"],
+    },
   },
   ReservationUnit: {
     reservationStatus: ["Varaustilanne"],

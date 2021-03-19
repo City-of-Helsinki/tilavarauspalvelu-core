@@ -31,6 +31,7 @@ import {
 } from "../../common/util";
 import StatusCell from "../StatusCell";
 import StatusCircle from "../StatusCircle";
+import RecommendationCount from "./RecommendationCount";
 
 interface IRouteParams {
   applicationRoundId: string;
@@ -106,14 +107,6 @@ const StatusContainer = styled.div`
   }
 `;
 
-const RecommendationCount = styled.div`
-  ${H3} {
-    margin-bottom: var(--spacing-xs);
-  }
-
-  margin-bottom: var(--spacing-xs);
-`;
-
 const getCellConfig = (t: TFunction): CellConfig => {
   return {
     cols: [
@@ -174,7 +167,7 @@ const getFilterConfig = (): DataFilterConfig[] => {
   return [];
 };
 
-function SpaceRecommendations(): JSX.Element {
+function RecommendationsBySpace(): JSX.Element {
   const [isLoading, setIsLoading] = useState(true);
   const [
     applicationRound,
@@ -254,12 +247,7 @@ function SpaceRecommendations(): JSX.Element {
               <H3>{t("ApplicationRound.amountReserved")}</H3>
             </StatusContainer>
           </TitleContainer>
-          <RecommendationCount>
-            <H3>
-              {t("Recommendation.recommendationCount", { count: 12 })} TODO
-            </H3>
-            <div>{t("common.unhandledCount", { count: 2 })} TODO</div>
-          </RecommendationCount>
+          <RecommendationCount recommendationCount={13} unhandledCount={3} />
         </IngressContainer>
       </ContentContainer>
       <DataTable
@@ -292,4 +280,4 @@ function SpaceRecommendations(): JSX.Element {
   );
 }
 
-export default withMainMenu(SpaceRecommendations);
+export default withMainMenu(RecommendationsBySpace);
