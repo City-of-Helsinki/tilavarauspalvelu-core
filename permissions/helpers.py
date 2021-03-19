@@ -37,7 +37,7 @@ def has_unit_permission(user: User, units: list, required_permission: str) -> bo
 
 
 def has_service_sector_permission(
-    user: User, service_sectors: list, required_permission: str
+    user: User, service_sectors: [ServiceSector], required_permission: str
 ) -> bool:
     if not service_sectors:
         return False
@@ -129,6 +129,26 @@ def can_modify_application_round(
 ) -> bool:
     return can_manage_service_sectors_application_rounds(
         user, application_round.service_sector
+    )
+
+
+def can_allocate_service_sector_allocations(
+    user: User, service_sector: ServiceSector
+) -> bool:
+    permission = "can_allocate_applications"
+    return (
+        is_superuser(user)
+        or has_service_sector_permission(user, [service_sector], permission)
+        or has_general_permission(user, permission)
+    )
+
+
+def can_allocate_allocation_request(user: User, service_sector: ServiceSector) -> bool:
+    permission = "can_allocate_applications"
+    return (
+        is_superuser(user)
+        or has_service_sector_permission(user, [service_sector], permission)
+        or has_general_permission(user, permission)
     )
 
 

@@ -100,6 +100,10 @@ UNIT_PERMISSIONS = (
         "can_view_users",
         _("Can view users in the whole system"),
     ),
+    (
+        "can_allocate_applications",
+        _("Can allocate applications"),
+    ),
 )
 
 SERVICE_SECTOR_PERMISSIONS = (
@@ -125,6 +129,10 @@ SERVICE_SECTOR_PERMISSIONS = (
     (
         "can_view_users",
         _("Can view users in the whole system"),
+    ),
+    (
+        "can_allocate_applications",
+        _("Can allocate applications in the service sector"),
     ),
 )
 

@@ -76,6 +76,7 @@ INSTALLED_APPS = [
     "api",
     "applications",
     "opening_hours",
+    "allocation",
     "django_extensions",
     "mptt",
     "django_filters",
