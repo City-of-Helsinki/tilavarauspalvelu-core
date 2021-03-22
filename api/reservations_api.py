@@ -20,6 +20,7 @@ from permissions.helpers import (
 from reservation_units.models import ReservationUnit
 from reservations.models import STATE_CHOICES, AbilityGroup, AgeGroup, Reservation
 
+from .base import TranslatedModelSerializer
 from .reservation_units_api import ReservationUnitSerializer
 
 User = get_user_model()
@@ -201,7 +202,7 @@ class AgeGroupViewSet(viewsets.ModelViewSet):
     )
 
 
-class AbilityGroupSerializer(serializers.ModelSerializer):
+class AbilityGroupSerializer(TranslatedModelSerializer):
     class Meta:
         model = AbilityGroup
         fields = [
