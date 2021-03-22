@@ -57,7 +57,13 @@ export type Location = {
 
 export type Image = {
   imageUrl: string;
+  mediumUrl: string;
+  smallUrl: string;
   imageType: 'main' | 'map' | 'ground_plan' | 'other';
+};
+
+export type Building = {
+  name: string;
 };
 
 export type ReservationUnit = {
@@ -73,6 +79,8 @@ export type ReservationUnit = {
   location?: Location;
   reservationUnitType: Parameter;
   termsOfUse: string;
+  building: Building;
+  unitId: number;
 };
 
 export type Parameter = {

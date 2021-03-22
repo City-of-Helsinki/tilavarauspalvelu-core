@@ -372,6 +372,9 @@ const translations: Translations = {
   ReservationUnit: {
     backToSearch: ['Takaisin hakutuloksiin'],
     maxPersons: ['{{maxPersons}} henkilöä'],
+    RelatedUnits: {
+      heading: ['Toimipisteen muut tilat'],
+    },
   },
   search: {
     heading: ['Vakiovuorojen tilat'],

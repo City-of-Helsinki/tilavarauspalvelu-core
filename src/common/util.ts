@@ -9,6 +9,8 @@ import {
   OptionType,
   Parameter,
   TranslationObject,
+  ReservationUnit,
+  Image,
 } from './types';
 
 export const isActive = (startDate: string, endDate: string): boolean => {
@@ -211,6 +213,29 @@ export const applicationEventSchedulesToCells = (
   });
 
   return cells;
+};
+
+const imagePriority = ['main', 'map', 'ground_plan', 'other'];
+
+export const getMainImage = (ru: ReservationUnit): Image | null => {
+  if (!ru.images || ru.images.length === 0) {
+    return null;
+  }
+  ru.images.sort((a, b) => {
+    return (
+      imagePriority.indexOf(a.imageType) - imagePriority.indexOf(b.imageType)
+    );
+  });
+
+  return ru.images[0];
+};
+
+export const getAddress = (ru: ReservationUnit): string | null => {
+  if (!ru.location) {
+    return null;
+  }
+
+  return `${ru.location.addressStreet},${ru.location.addressCity}`;
 };
 
 export const applicationUrl = (id: number): string => `/application/${id}`;

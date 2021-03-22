@@ -49,8 +49,9 @@ const Images = ({ images }: Props): JSX.Element => {
       <ImageGrid>
         {images.map((image) => (
           <ThumbnailImage
+            key={image.smallUrl}
             alt={t('common.imgAltForSpace')}
-            src={image.imageUrl}
+            src={image.smallUrl}
           />
         ))}
       </ImageGrid>

@@ -114,6 +114,7 @@ export interface ReservationUnitsParameters {
   search?: string;
   purpose?: number;
   reservationUnitType?: number;
+  unit?: number;
 }
 
 export function getReservationUnits(

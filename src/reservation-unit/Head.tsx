@@ -16,13 +16,13 @@ import { ReservationUnit as ReservationUnitType } from '../common/types';
 import IconWithText from './IconWithText';
 import Notification from './Notification';
 import Container from '../component/Container';
-import { localizedValue } from '../common/util';
+import { getMainImage, localizedValue } from '../common/util';
 import useReservationUnitList from '../common/hook/useReservationUnitList';
-import StartApplicationBar from '../component/StartApplicationBar';
 import { breakpoint } from '../common/style';
 
 interface Props {
   reservationUnit: ReservationUnitType;
+  reservationUnitList: ReturnType<typeof useReservationUnitList>;
 }
 
 const TopContainer = styled.div`
@@ -45,15 +45,14 @@ const RightContainer = styled.div`
 
   margin-top: var(--spacing-m);
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 2fr 1fr;
   gap: var(--spacing-s);
-  font-weight: 500;
 
   div > h1 {
     margin-top: 0;
   }
 
-  @media (max-width: ${breakpoint.l}) {
+  @media (max-width: ${breakpoint.m}) {
     grid-template-columns: 1fr;
   }
 `;
@@ -68,7 +67,7 @@ const ReservationUnitName = styled.h1`
   font-size: var(--fontsize-heading-l);
 `;
 
-const SpaceName = styled.div`
+const BuildingName = styled.div`
   font-size: var(--fontsize-heading-m);
   font-family: var(--font-bold);
 `;
@@ -81,22 +80,11 @@ const ButtonContainer = styled.div`
   }
 `;
 
-const ImageContainer = styled.div`
-  position: relative;
-
-  img {
-    position: absolute;
-    z-index: 3;
-  }
-  @media (max-width: ${breakpoint.l}) {
-    position: auto;
-  }
-`;
-
 const Image = styled.img`
-  width: 588px;
-  height: 406px;
-  @media (max-width: ${breakpoint.l}) {
+  width: 100%;
+  height: 259px;
+  object-fit: cover;
+  @media (max-width: ${breakpoint.m}) {
     width: 100%;
     height: auto;
   }
@@ -107,13 +95,12 @@ const StyledKoros = styled(Koros)`
   fill: var(--tilavaraus-gray);
 `;
 
-const Head = ({ reservationUnit }: Props): JSX.Element => {
+const Head = ({ reservationUnit, reservationUnitList }: Props): JSX.Element => {
   const {
     selectReservationUnit,
     containsReservationUnit,
     removeReservationUnit,
-    reservationUnits,
-  } = useReservationUnitList();
+  } = reservationUnitList;
 
   const { t, i18n } = useTranslation();
   const history = useHistory();
@@ -138,9 +125,9 @@ const Head = ({ reservationUnit }: Props): JSX.Element => {
             <ReservationUnitName>
               {localizedValue(reservationUnit.name, i18n.language)}
             </ReservationUnitName>
-            <SpaceName>
-              {localizedValue(reservationUnit.spaces?.[0]?.name, i18n.language)}
-            </SpaceName>
+            <BuildingName>
+              {localizedValue(reservationUnit.building?.name, i18n.language)}
+            </BuildingName>
             <Props>
               <div>
                 <IconWithText
@@ -195,20 +182,17 @@ const Head = ({ reservationUnit }: Props): JSX.Element => {
               )}
             </ButtonContainer>
           </div>
-          <ImageContainer>
-            <Image
-              alt={t('common.imgAltForSpace', {
-                name: localizedValue(reservationUnit.name, i18n.language),
-              })}
-              src={
-                reservationUnit.images[0]?.imageUrl ||
-                'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='
-              }
-            />
-          </ImageContainer>
+          <Image
+            alt={t('common.imgAltForSpace', {
+              name: localizedValue(reservationUnit.name, i18n.language),
+            })}
+            src={
+              getMainImage(reservationUnit)?.smallUrl ||
+              'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='
+            }
+          />
         </RightContainer>
       </Container>
-      <StartApplicationBar count={reservationUnits.length} />
       <StyledKoros className="koros" type="wave" />
     </TopContainer>
   );

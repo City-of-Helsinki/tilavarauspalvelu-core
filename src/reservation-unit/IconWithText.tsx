@@ -12,11 +12,12 @@ const Container = styled.div`
   display: grid;
   grid-auto-rows: 1fr;
   align-items: center;
-  grid-template-columns: 1fr 1fr 4fr;
-  margin-top: var(--spacing-m);
+  grid-template-columns: 1.5em 1fr 4fr;
+  margin-top: var(--spacing-s);
 `;
 
 const SpanTwoColumns = styled.span`
+  margin-left: var(--spacing-s);
   grid-column-start: 2;
   grid-column-end: 4;
 `;
