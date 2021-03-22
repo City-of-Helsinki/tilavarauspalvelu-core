@@ -26,6 +26,27 @@ const translations: Translations = {
     eventsPerWeek: ['<0>{{eventsPerWeek}}</0> vuoro viikossa'],
     eventsPerWeek_plural: ['<0>{{eventsPerWeek}}</0> vuoroa viikossa'],
   },
+  Applications: {
+    heading: ['Omat hakemukset'],
+    group: {
+      draft: ['Luonnokset'],
+      sent: ['Lähetetyt'],
+    },
+  },
+  ApplicationCard: {
+    edit: ['Muokkaa hakemusta'],
+    cancel: ['Peruuta hakemus'],
+    status: {
+      draft: ['Kesken'],
+      in_review: ['Käsittelyssä'],
+    },
+    person: ['Hakemus luotu: yksityishenkilönä'],
+    organisation: ['Hakemus luotu: {{type}} {{name}}'],
+    applicantType: {
+      community: ['yhdistykselle'],
+      company: ['yritykselle'],
+    },
+  },
   Application: {
     Intro: {
       startNewApplication: ['Aloita hakemuksen täyttäminen'],
@@ -295,6 +316,8 @@ const translations: Translations = {
   Navigation: {
     Item: {
       spaceReservation: ['Vakiovuorot'],
+      reservationUnitSearch: ['Tilahaku'],
+      applications: ['Omat hakemukset'],
     },
     skipToMainContent: [
       'Siirry sivun pääsisältöön',

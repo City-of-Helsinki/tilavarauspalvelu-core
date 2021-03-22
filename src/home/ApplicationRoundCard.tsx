@@ -25,12 +25,8 @@ const StyledCard = styled(({ act, ...rest }) => <Card {...rest} />)`
   align-items: start;
   padding: var(--spacing-m);
   margin-bottom: var(--spacing-s);
-  border-color: ${(props) =>
-    props.act &&
-    'var(--tilavaraus-application-period-card-active-border-color)'};
-  background-color: ${(props) =>
-    props.act &&
-    'var(--tilavaraus-application-period-card-active-background-color)'};
+  border-color: ${(props) => props.act && 'var(--tilavaraus-green)'};
+  background-color: ${(props) => props.act && 'var(--tilavaraus-cyan)'};
 `;
 
 const StyledContainer = styled(Container)`
@@ -70,7 +66,7 @@ const ApplicationRoundCard = ({ applicationRound }: Props): JSX.Element => {
   const history = useHistory();
 
   const state = applicationRoundState(
-    applicationRound.applicationPeriodEnd,
+    applicationRound.applicationPeriodBegin,
     applicationRound.applicationPeriodEnd
   );
 

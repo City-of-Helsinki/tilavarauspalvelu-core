@@ -212,3 +212,5 @@ export const applicationEventSchedulesToCells = (
 
   return cells;
 };
+
+export const applicationUrl = (id: number): string => `/application/${id}`;

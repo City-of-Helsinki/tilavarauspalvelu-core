@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { Notification as HDSNotification } from 'hds-react';
+import { LoadingSpinner, Notification as HDSNotification } from 'hds-react';
 import { breakpoint } from '../common/style';
 
 export const TwoColumnContainer = styled.div`
@@ -45,4 +45,7 @@ export const HorisontalRule = styled.div`
   height: 1px;
   background-color: var(--color-black-60);
   margin-top: var(--spacing-layout-m);
+`;
+export const CenterSpinner = styled(LoadingSpinner)`
+  margin: 0 auto var(--spacing-2-xl) auto;
 `;

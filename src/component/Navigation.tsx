@@ -1,4 +1,4 @@
-import React, { SyntheticEvent, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Navigation as HDSNavigation } from 'hds-react';
 import { useTranslation } from 'react-i18next';
 import { useLocalStorage } from 'react-use';
@@ -7,6 +7,7 @@ import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import { applicationsUrl } from '../common/util';
 import { authEnabled, isBrowser } from '../common/const';
+import { breakpoint } from '../common/style';
 
 interface LanguageOption {
   label: string;
@@ -24,6 +25,16 @@ const StyledNavigation = styled(HDSNavigation)`
     --tilavaraus-header-background-color
   ) !important;
   color: var(--tilavaraus-header-color);
+  @media (max-width: ${breakpoint.s}) {
+    position: fixed;
+    z-index: 10;
+  }
+`;
+
+const PreContent = styled.div`
+  @media (max-width: ${breakpoint.s}) {
+    margin-top: var(--spacing-layout-m);
+  }
 `;
 
 const DEFAULT_LANGUAGE = 'fi';
@@ -51,48 +62,61 @@ const Navigation = ({ profile, logout }: Props): JSX.Element => {
   }, [language, i18n]);
 
   return (
-    <StyledNavigation
-      title={t('common.applicationName')}
-      menuToggleAriaLabel="Menu"
-      skipTo="#main"
-      skipToContentLabel={t('Navigation.skipToMainContent')}>
-      <HDSNavigation.Row variant="inline">
-        <HDSNavigation.Item
-          href="#"
-          label={t('Navigation.Item.spaceReservation')}
-          onClick={(e: SyntheticEvent) => e.preventDefault()}
-          active
-        />
-      </HDSNavigation.Row>
-      <HDSNavigation.Actions>
-        <HDSNavigation.User
-          userName={`${profile?.given_name} ${profile?.family_name}`}
-          authenticated={Boolean(profile)}
-          label={t('common.login')}
-          onSignIn={() => {
-            history.push(applicationsUrl);
-          }}>
+    <>
+      <StyledNavigation
+        title={t('common.applicationName')}
+        menuToggleAriaLabel="Menu"
+        skipTo="#main"
+        skipToContentLabel={t('Navigation.skipToMainContent')}>
+        <HDSNavigation.Row variant="inline">
           <HDSNavigation.Item
-            label={t('common.logout')}
-            onClick={() => logout && logout()}
+            label={t('Navigation.Item.spaceReservation')}
+            onClick={() => history.push('/')}
           />
-        </HDSNavigation.User>
-        <HDSNavigation.LanguageSelector label={formatSelectedValue(language)}>
-          {languageOptions.map((languageOption) => (
+          <HDSNavigation.Item
+            label={t('Navigation.Item.reservationUnitSearch')}
+            onClick={() => history.push('/search')}
+          />
+          {profile ? (
             <HDSNavigation.Item
-              key={languageOption.value}
-              label={languageOption.label}
-              onClick={(
-                e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>
-              ): void => {
-                e.preventDefault();
-                setLanguage(languageOption.value);
-              }}
+              label={t('Navigation.Item.applications')}
+              onClick={() => history.push(applicationsUrl)}
             />
-          ))}
-        </HDSNavigation.LanguageSelector>
-      </HDSNavigation.Actions>
-    </StyledNavigation>
+          ) : (
+            <span />
+          )}
+        </HDSNavigation.Row>
+        <HDSNavigation.Actions>
+          <HDSNavigation.User
+            userName={`${profile?.given_name} ${profile?.family_name}`}
+            authenticated={Boolean(profile)}
+            label={t('common.login')}
+            onSignIn={() => {
+              history.push(applicationsUrl);
+            }}>
+            <HDSNavigation.Item
+              label={t('common.logout')}
+              onClick={() => logout && logout()}
+            />
+          </HDSNavigation.User>
+          <HDSNavigation.LanguageSelector label={formatSelectedValue(language)}>
+            {languageOptions.map((languageOption) => (
+              <HDSNavigation.Item
+                key={languageOption.value}
+                label={languageOption.label}
+                onClick={(
+                  e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>
+                ): void => {
+                  e.preventDefault();
+                  setLanguage(languageOption.value);
+                }}
+              />
+            ))}
+          </HDSNavigation.LanguageSelector>
+        </HDSNavigation.Actions>
+      </StyledNavigation>
+      <PreContent />
+    </>
   );
 };
 
