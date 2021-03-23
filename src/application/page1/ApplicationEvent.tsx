@@ -38,6 +38,7 @@ type OptionTypes = {
   purposeOptions: OptionType[];
   abilityGroupOptions: OptionType[];
   reservationUnitTypeOptions: OptionType[];
+  participantCountOptions: OptionType[];
 };
 
 type Props = {
@@ -99,8 +100,11 @@ const defaultDuration = '1';
 const isOpen = (
   current: number | undefined,
   states: AccordionState[]
-): boolean =>
-  Boolean(states.find((state) => state.applicationEventId === current)?.open);
+): boolean => {
+  return Boolean(
+    states.find((state) => state.applicationEventId === current)?.open
+  );
+};
 
 const getApplicationEventData = (
   original: ApplicationEventType,
@@ -133,6 +137,7 @@ const ApplicationEvent = ({
     abilityGroupOptions,
     purposeOptions,
     reservationUnitTypeOptions,
+    participantCountOptions,
   } = optionTypes;
 
   const { t } = useTranslation();
@@ -252,7 +257,11 @@ const ApplicationEvent = ({
           applicationRound={applicationRound}
           form={form}
           fieldName={fieldName('eventReservationUnits')}
-          options={{ purposeOptions, reservationUnitTypeOptions }}
+          options={{
+            purposeOptions,
+            reservationUnitTypeOptions,
+            participantCountOptions,
+          }}
         />
         <HorisontalRule />
         <SubHeadLine>
@@ -351,7 +360,8 @@ const ApplicationEvent = ({
           Hyväksy ja tallenna vakiovuoro
         </SaveButton>
       </Accordion>
-      {editorState.savedEventId === applicationEvent.id ? (
+      {editorState.savedEventId &&
+      editorState.savedEventId === applicationEvent.id ? (
         <Notification
           size="small"
           type="success"

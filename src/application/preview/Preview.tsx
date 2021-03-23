@@ -37,6 +37,13 @@ const ButtonContainer = styled.div`
     margin-left: var(--spacing-layout-xs);
   }
 `;
+const BuildingName = styled.div`
+  font-family: var(--font-regular);
+`;
+
+const UnitName = styled.div`
+  font-family: var(--font-bold);
+`;
 
 const Ruler = styled.hr`
   margin-top: var(--spacing-layout-m);
@@ -229,10 +236,22 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
                     'Application.preview.applicationEvent.reservationUnit',
                     { order: index + 1 }
                   )}
-                  value={localizedValue(
-                    reservationUnits[reservationUnit.reservationUnitId].name,
-                    i18n.language
-                  )}
+                  value={[
+                    <UnitName>
+                      {localizedValue(
+                        reservationUnits[reservationUnit.reservationUnitId]
+                          .name,
+                        i18n.language
+                      )}
+                    </UnitName>,
+                    <BuildingName>
+                      {localizedValue(
+                        reservationUnits[reservationUnit.reservationUnitId]
+                          .building.name,
+                        i18n.language
+                      )}
+                    </BuildingName>,
+                  ]}
                 />
               )
             )}

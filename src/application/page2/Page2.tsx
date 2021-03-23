@@ -95,7 +95,9 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
               index={index}
               cells={selectorData[index]}
               updateCells={updateCells}
-              copyCells={copyCells}
+              copyCells={
+                application.applicationEvents.length > 1 ? copyCells : null
+              }
               summaryData={cellsToApplicationEventSchedules(
                 debouncedSelectorData[index]
               )}

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import { Accordion } from 'hds-react';
 import Container from '../component/Container';
 import { ReservationUnit as ReservationUnitType } from '../common/types';
 import { getReservationUnit, getReservationUnits } from '../common/api';
@@ -18,6 +17,7 @@ import { breakpoint } from '../common/style';
 import RelatedUnits from './RelatedUnits';
 import useReservationUnitsList from '../common/hook/useReservationUnitList';
 import StartApplicationBar from '../component/StartApplicationBar';
+import { AccordionWithState as Accordion } from '../component/Accordion';
 
 type ParamTypes = {
   id: string;
@@ -79,12 +79,12 @@ const ReservationUnit = (): JSX.Element | null => {
       <Container>
         <TwoColoumnLayout>
           <div>
-            <Accordion heading={t('reservationUnit.description')}>
+            <Accordion open heading={t('reservationUnit.description')}>
               <Content>
                 <Sanitize html={reservationUnit.description} />
               </Content>
             </Accordion>
-            <Accordion heading={t('reservationUnit.termsOfUse')}>
+            <Accordion open heading={t('reservationUnit.termsOfUse')}>
               <Content>
                 <Sanitize html={reservationUnit.termsOfUse} />
               </Content>

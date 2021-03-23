@@ -7,6 +7,7 @@ type Props = {
   handleClose: () => void;
   show: boolean;
   children: React.ReactNode;
+  closeButtonKey?: string;
 };
 
 const Overlay = styled.div`
@@ -16,7 +17,7 @@ const Overlay = styled.div`
   right: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.5);
-  z-index: 10;
+  z-index: 100;
 `;
 
 const ModalElement = styled.div`
@@ -26,7 +27,7 @@ const ModalElement = styled.div`
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  z-index: 11;
+  z-index: 101;
   width: 80%;
   height: 85%;
   display: flex;
@@ -55,11 +56,25 @@ const ButtonContainer = styled.div`
   }
 `;
 
-const Modal = ({ handleClose, show, children }: Props): JSX.Element | null => {
+const Modal = ({
+  handleClose,
+  show,
+  children,
+  closeButtonKey = 'common.close',
+}: Props): JSX.Element | null => {
   const { t } = useTranslation();
 
+  const root = document.getElementById('root');
+
   if (!show) {
+    if (root) {
+      root.style.overflowY = 'auto';
+    }
     return null;
+  }
+
+  if (root) {
+    root.style.overflowY = 'hidden';
   }
 
   return (
@@ -69,7 +84,7 @@ const Modal = ({ handleClose, show, children }: Props): JSX.Element | null => {
         <MainContainer>{children}</MainContainer>
         <ButtonContainer>
           <Button variant="secondary" onClick={handleClose}>
-            {t('common.close')}
+            {t(closeButtonKey)}
           </Button>
         </ButtonContainer>
       </ModalElement>

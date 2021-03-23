@@ -51,6 +51,7 @@ const translations: Translations = {
     Intro: {
       startNewApplication: ['Aloita hakemuksen täyttäminen'],
     },
+    applicationEventSaved: ['Vakiovuoro tallennettu hakemukselle'],
     Page1: {
       heading: ['1. Vakiovuoron luominen'],
       text: ['Perustiedot'],
@@ -66,7 +67,7 @@ const translations: Translations = {
       periodEndDate: ['Kauden päätöspäivä'],
       minDuration: ['Vuoron minimikesto'],
       maxDuration: ['Vuoron maksimikesto'],
-      eventsPerWeek: ['Vuorojen määrä/viikko'],
+      eventsPerWeek: ['Vuorojen määrä viikossa'],
       biweekly: ['Vuoro vain joka toinen viikko'],
       createNew: ['Lisää uusi vakiovuoro hakemukselle'],
       applicationEventName: ['Nimetön vakiovuoro'],
@@ -76,12 +77,12 @@ const translations: Translations = {
     Page2: {
       heading: ['2. Vakiovuoron ajankohta'],
       text: ['Anna toivomasi ajankohta jokaiselle luomallesi vakiovuorolle.'],
-      copyTimes: ['Kopioi valinnat kaikille vakiovuoroille'],
+      copyTimes: ['Kopioi ajat kaikille vakiovuoroille'],
       summary: ['Yhteenveto'],
     },
     Page3: {
       heading: ['3. Varaajan perustiedot'],
-      text: ['Varaavan yhteisön ja yhteyshenkilön perustiedot.'],
+      text: ['Varaavan yhteisön ja yhteyshenkilön perustiedot'],
       asPrivatePersonSubHeading: ['Varaan yksityishenkilönä'],
       firstName: ['Etunimi', 'First name', 'Förnamn'],
       lastName: ['Sukunimi', 'Last name', 'Efternamn'],
@@ -92,12 +93,12 @@ const translations: Translations = {
         'E-postadress',
       ],
       emailNotification: [
-        'Kaikki hakemukseen liittyvät viestit lähetetään tähän sähköpostiin',
+        'Kaikki hakemukseen liittyvät viestit lähetetään alla olevaan sähköpostiin',
       ],
       as: {
         type: {
           organisation: [
-            'Luon hakemuksen yhdistyksen, seuran tai yhteisön puolesta',
+            'Luon hakemuksen yhdistyksen, järjestön, ryhmän tai yhteisön puolesta',
             'Create Application for association',
             'Skapa ansökan om associering',
           ],
@@ -118,7 +119,7 @@ const translations: Translations = {
         firstName: ['Yhteyshenkilön etunimi', 'Firt name', 'Förnamn'],
         lastName: ['Yhteyshenkilön sukunimi', 'Last name', 'Efternamn'],
         phoneNumber: [
-          'Yhteyshenkilön puhelinumero',
+          'Yhteyshenkilön puhelinnumero',
           'Phone number',
           'Telefonnummer',
         ],
@@ -142,8 +143,8 @@ const translations: Translations = {
         registrationNumber: ['Y-tunnus', 'Business ID', 'FO-nummer'],
       },
       organisation: {
-        name: ['Yhdistyksen, seuran tai järjestön virallinen nimi'],
-        coreBusiness: ['Yhdistyksem tai seuran ydintoiminta'],
+        name: ['Yhdistyksen, järjestön, ryhmän tai yhteisön virallinen nimi'],
+        coreBusiness: ['Yhdistyksen tai seuran ydintoiminta'],
         registrationNumber: [
           'Rekisterinumero',
           'Registration number',
@@ -153,7 +154,7 @@ const translations: Translations = {
         postCode: ['Postinumero', 'ZIP code', ' Postnummer'],
         city: ['Postitoimipaikka', 'City', 'Postdistrikt'],
         notRegistered: [
-          'Seuraa ei ole rekisteröity',
+          'Yhdistystä ei ole rekisteröity',
           'Organisation is not registered',
           'Organisationen är inte registrerad',
         ],
@@ -180,7 +181,7 @@ const translations: Translations = {
         ],
       },
       heading: ['4. Hakemuksen lähettäminen'],
-      text: ['Ohessa yhteenveto hakemuksestasi.'],
+      text: ['Yhteenveto hakemuksestasi'],
       basicInfoSubHeading: ['Varaajan perustiedot'],
       firstName: ['Yhteyshenkilön etunimi'],
       lastName: ['Yhteyshenkilön sukunimi'],
@@ -214,7 +215,7 @@ const translations: Translations = {
       notification: {
         processing: ['Käsittely'],
         body: [
-          'Hakemusten käsittely aloitetaan kun hakuaika on päättynyt. Ilmoitamme sinulle, sekä järjestöllesi tai yrityksellesi hakemuksen eri vaiheista sähköpostitse.',
+          'Hakemusten käsittely aloitetaan, kun hakuaika on päättynyt. Ilmoitamme antamaasi sähköpostiosoitteeseen eri vaiheista.',
         ],
       },
       userAcceptsTerms: ['Hyväksyn palvelun käyttöehdot'],
@@ -222,8 +223,8 @@ const translations: Translations = {
     sent: {
       heading: ['Hakemuksesi on lähetetty käsiteltäväksi'],
       faq1Question: ['Kuinka hakemuiksen käsittely etenee?'],
-      faq2Question: ['Kuinka valitan päätöksestä?'],
-      faq3Question: ['Kuinka hakemuksen käsittely tapahtuu?'],
+      faq2Question: ['Kuinka hakemuksen käsittely tapahtuu?'],
+      faq3Question: ['Kuinka valitan päätöksestä?'],
     },
   },
   ApplicationPage: {
@@ -231,7 +232,7 @@ const translations: Translations = {
       page1: ['Vakiovuoron perustiedot'],
       page2: ['Vakiovuoron ajankohta'],
       page3: ['Varaajan perustiedot'],
-      preview: ['Lähetä käsiteltäväksi'],
+      preview: ['Tarkista ja lähetä käsiteltäväksi'],
     },
   },
   ApplicationRoundCard: {
@@ -333,15 +334,14 @@ const translations: Translations = {
     info: {
       heading: ['Hakeminen'],
       text: [
-        'Vakiovuoroja haetaan yleisen haun kautta. Voit selata tiloja valmiiksi, mutta hakemuksen voi ainoastaan jättää silloin kun hakuaika on käynnissä.',
+        'Vakiovuoroja haetaan yleisen haun kautta. Voit selata tiloja valmiiksi, mutta hakemuksen voi jättää vain hakuajan puitteissa.',
       ],
     },
     browseAllButton: ['Selaa kaikkia tiloja'],
-    infoButton: ['Lue lisää hakuprosessista'],
     applicationTimes: {
       heading: ['Vakiovuorojen hakuajat'],
       text: [
-        'Vakiovuoroihin on hakuaika kaksi kertaa vuodessa. Ajankohta vaihtelee palvelusta ja toimialasta riippuen. Voit tilata sähköpostimuistutuksen tuleviin hakuihin.',
+        'Vakiovuoroihin on hakuaika kaksi kertaa vuodessa. Ajankohta vaihtelee palvelusta ja toimialasta riippuen.',
       ],
     },
   },
@@ -351,6 +351,9 @@ const translations: Translations = {
     buttonUp: ['Siirrä ylös'],
     buttonDown: ['Siirrä alas'],
     add: ['Lisää tila'],
+    infoReservationUnits: [
+      'Järjestä tilat haluamasi järjestykseen nuolilla. Ensisijaisin tila ylimmäiseksi. Voit lisätä tilatoiveita Lisää tila painikkeella.',
+    ],
   },
   ReservationUnitModal: {
     selectReservationUnit: ['Lisää hakemukselle', 'Add to application'],
@@ -359,7 +362,7 @@ const translations: Translations = {
       'Remove from application',
       'Ta bort från applikationen',
     ],
-    heading: ['Hae tiloja hakemukselle'],
+    heading: ['Lisää sopivia tiloja hakemukselle'],
     searchTermLabel: ['Sanahaku'],
     searchPurposeLabel: ['Käyttötarkoitus'],
     searchReservationUnitTypeLabel: ['Tilan tyyppi'],
@@ -368,6 +371,7 @@ const translations: Translations = {
       'Open in new tab',
       'Öppna i ny flik',
     ],
+    returnToApplication: ['Palaa hakemukselle'],
   },
   ReservationUnit: {
     backToSearch: ['Takaisin hakutuloksiin'],
@@ -378,7 +382,7 @@ const translations: Translations = {
   },
   search: {
     heading: ['Vakiovuorojen tilat'],
-    text: ['Valitse tilat joihin haluat hakea vakiovuoroja.'],
+    text: ['Valitse tilat, joihin haluat hakea vakiovuoroja'],
   },
   SearchForm: {
     searchTermPlaceholder: ['Hae sanalla', 'Search with words', 'Sök med ord'],
@@ -450,6 +454,12 @@ const translations: Translations = {
       },
       copyrightHolder: ['Helsingin kaupunki'],
       copyrightText: ['Kaikki oikeudet pidätetään'],
+    },
+  },
+  auth: {
+    lostSession: {
+      heading: ['Sinut on kirjattu ulos'],
+      text: ['Olet kirjautunut ulos'],
     },
   },
 };

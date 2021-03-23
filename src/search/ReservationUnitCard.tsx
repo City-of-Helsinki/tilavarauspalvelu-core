@@ -10,8 +10,10 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
+import { breakpoint } from '../common/style';
 import { ReservationUnit } from '../common/types';
-import { localizedValue } from '../common/util';
+import { getAddress, getMainImage, localizedValue } from '../common/util';
+import IconWithText from '../reservation-unit/IconWithText';
 
 interface Props {
   reservationUnit: ReservationUnit;
@@ -25,6 +27,14 @@ const Container = styled.div`
   background-color: var(--color-white);
   margin-top: var(--spacing-s);
   grid-template-columns: 250px 5fr 3fr;
+
+  @media (max-width: ${breakpoint.m}) {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  @media (max-width: ${breakpoint.s}) {
+    grid-template-columns: 1fr;
+  }
 `;
 
 const MainContent = styled.div`
@@ -47,13 +57,17 @@ const Bottom = styled.span`
   display: flex;
   font-weight: 500;
   align-items: center;
+  font-size: var(--fontsize-body-m);
 
-  > svg {
-    margin-right: var(--spacing-xs);
+  > div {
+    margin: 5px;
+    :last-child {
+      flex-grow: 1;
+    }
   }
 
-  > span:not(:first-child) {
-    margin-right: var(--spacing-layout-m);
+  @media (max-width: ${breakpoint.l}) {
+    display: block;
   }
 `;
 
@@ -62,6 +76,9 @@ const Actions = styled.div`
   flex-direction: column;
   padding: var(--spacing-s) var(--spacing-m);
   align-items: flex-end;
+  @media (max-width: ${breakpoint.m}) {
+    display: block;
+  }
 `;
 
 const ReservationUnitCard = ({
@@ -81,7 +98,7 @@ const ReservationUnitCard = ({
         width="240"
         height="156"
         src={
-          reservationUnit.images[0]?.imageUrl ||
+          getMainImage(reservationUnit)?.smallUrl ||
           'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='
         }
       />
@@ -92,19 +109,29 @@ const ReservationUnitCard = ({
           </Link>
         </Name>
         <Description>
-          {localizedValue(reservationUnit.spaces[0]?.name, i18n.language)}
+          {localizedValue(reservationUnit.building.name, i18n.language)}
         </Description>
         <Bottom>
-          <IconInfoCircle aria-label={t('reservationUnit.type')} />{' '}
-          <span>{reservationUnit.reservationUnitType.name}</span>
-          <IconGroup aria-label={t('reservationUnit.maxPersons')} />{' '}
-          <span>{reservationUnit.maxPersons}</span>
-          <IconLocation aria-label={t('reservationUnit.address')} />{' '}
-          <span>
-            {reservationUnit.location?.addressStreet},{' '}
-            {reservationUnit.location?.addressZip}{' '}
-            {reservationUnit.location?.addressCity}
-          </span>
+          <IconWithText
+            icon={<IconInfoCircle />}
+            text={localizedValue(
+              reservationUnit.reservationUnitType.name,
+              i18n.language
+            )}
+          />
+          {reservationUnit.maxPersons ? (
+            <IconWithText
+              icon={<IconGroup />}
+              text={`${reservationUnit.maxPersons}`}
+            />
+          ) : null}
+          {getAddress(reservationUnit) ? (
+            <IconWithText
+              className="grow"
+              icon={<IconLocation />}
+              text={getAddress(reservationUnit) || ''}
+            />
+          ) : null}{' '}
         </Bottom>
       </MainContent>
       <Actions>

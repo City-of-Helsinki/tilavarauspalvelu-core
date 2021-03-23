@@ -16,8 +16,8 @@ type ApplicationPageProps = {
 
 const InnerContainer = styled.div`
   display: grid;
-  gap: 6em;
-  grid-template-columns: 2fr 5fr;
+  gap: 1em;
+  grid-template-columns: 18em 1fr;
   @media (max-width: ${breakpoint.l}) {
     grid-template-columns: 1fr;
     gap: 0;

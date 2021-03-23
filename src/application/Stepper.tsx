@@ -21,6 +21,10 @@ const NavigationContainer = styled.nav`
     text-decoration: none;
     display: flex;
     align-items: center;
+
+    :focus {
+      outline: 2px solid var(--color-coat-of-arms);
+    }
   }
 `;
 

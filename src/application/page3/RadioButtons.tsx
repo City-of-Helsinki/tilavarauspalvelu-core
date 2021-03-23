@@ -23,7 +23,7 @@ const RadioButtons = ({
 
   return (
     <>
-      {['individual', 'organisation', 'company'].map((id: string) => (
+      {['organisation', 'individual', 'company'].map((id: string) => (
         <Container key={id}>
           <RadioButton
             id={id}

@@ -1,4 +1,9 @@
-import { Button, IconArrowRight, IconPlusCircleFill } from 'hds-react';
+import {
+  Button,
+  IconArrowRight,
+  IconPlusCircleFill,
+  Notification,
+} from 'hds-react';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
@@ -16,6 +21,7 @@ import {
 import { deepCopy, mapOptions } from '../../common/util';
 import { getParameters } from '../../common/api';
 import { breakpoint } from '../../common/style';
+import { participantCountOptions } from '../../common/const';
 
 type Props = {
   applicationRound: ApplicationRound;
@@ -37,6 +43,7 @@ type OptionTypes = {
   purposeOptions: OptionType[];
   abilityGroupOptions: OptionType[];
   reservationUnitTypeOptions: OptionType[];
+  participantCountOptions: OptionType[];
 };
 
 const ButtonContainer = styled.div`
@@ -115,6 +122,7 @@ const Page1 = ({
         abilityGroupOptions: mapOptions(fetchedAbilityGroupOptions),
         purposeOptions: mapOptions(fetchedPurposeOptions),
         reservationUnitTypeOptions: mapOptions(fetchedReservationUnitType),
+        participantCountOptions,
       });
       setReady(true);
     }
@@ -159,9 +167,25 @@ const Page1 = ({
     return null;
   }
 
+  const addNewEventButtonDisabled =
+    application.applicationEvents.filter((ae) => !ae.id).length > 0;
+
+  const nextButtonDisabled =
+    application.applicationEvents.filter((ae) => !ae.id).length > 0 ||
+    (form.formState.isDirty && !editorState.savedEventId);
+
   return (
     <>
-      {msg}
+      {msg ? (
+        <Notification
+          type="error"
+          size="small"
+          label=""
+          autoClose
+          onClose={() => setMsg('')}>
+          {msg}
+        </Notification>
+      ) : null}
       {application.applicationEvents.map((event, index) => {
         return (
           <ApplicationEvent
@@ -184,7 +208,8 @@ const Page1 = ({
         <Button
           id="addApplicationEvent"
           iconLeft={<IconPlusCircleFill />}
-          onClick={() => form.handleSubmit(onAddApplicationEvent)()}>
+          onClick={() => form.handleSubmit(onAddApplicationEvent)()}
+          disabled={addNewEventButtonDisabled}>
           {t('Application.Page1.createNew')}
         </Button>
       </ButtonContainer>
@@ -192,10 +217,7 @@ const Page1 = ({
         <Button
           id="next"
           iconRight={<IconArrowRight />}
-          disabled={
-            application.applicationEvents.length === 0 ||
-            (form.formState.isDirty && !editorState.savedEventId)
-          }
+          disabled={nextButtonDisabled}
           onClick={() => history.push('page2')}>
           {t('common.next')}
         </Button>

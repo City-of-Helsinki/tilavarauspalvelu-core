@@ -5,6 +5,7 @@ import {
   IconGroup,
   IconPlusCircle,
   IconTrash,
+  Notification,
 } from 'hds-react';
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -19,7 +20,7 @@ import {
 } from '../../common/types';
 import Modal from '../../component/Modal';
 import ReservationUnitModal from './ReservationUnitModal';
-import { localizedValue } from '../../common/util';
+import { getAddress, getMainImage, localizedValue } from '../../common/util';
 
 type CardProps = {
   order: number;
@@ -42,16 +43,16 @@ const PreCardLabel = styled.div`
 
 const CardButtonContainer = styled.div`
   display: grid;
-  grid-template-columns: 5fr 1fr;
+  grid-template-columns: 4fr 1fr;
   margin-top: var(--spacing-s);
   align-items: center;
 `;
 
 const CardContainer = styled.div`
-  gap: var(--spacing-l);
+  gap: var(--spacing-s);
   background-color: white;
   display: grid;
-  grid-template-columns: 1fr 4fr 1fr 1fr;
+  grid-template-columns: 76px 5fr 1fr 1fr;
   align-items: center;
 `;
 
@@ -61,9 +62,14 @@ const Image = styled.img`
   object-fit: cover;
 `;
 
-const Title = styled.div`
+const Name = styled.div`
   font-size: var(--fontsize-heading-m);
-  font-weight: bold;
+  font-family: var(--font-bold);
+`;
+
+const BuildingName = styled.div`
+  font-family: var(--font-bold);
+  font-size: var(--fontsize-body-l);
 `;
 
 const Address = styled.div`
@@ -117,18 +123,17 @@ const ReservationUnitCard = ({
       <CardButtonContainer>
         <CardContainer>
           <Image
-            src={reservationUnit.images[0]?.imageUrl}
+            src={getMainImage(reservationUnit)?.smallUrl}
             alt={t('common.imgAltForSpace', {
               name: localizedValue(reservationUnit.name, i18n.language),
             })}
           />
           <div>
-            <Title>{localizedValue(reservationUnit.name, i18n.language)}</Title>
-            <Address>
-              {reservationUnit.location?.addressStreet},
-              {reservationUnit.location?.addressZip}{' '}
-              {reservationUnit.location?.addressCity}
-            </Address>
+            <Name>{localizedValue(reservationUnit.name, i18n.language)}</Name>
+            <BuildingName>
+              {localizedValue(reservationUnit.building.name, i18n.language)}
+            </BuildingName>
+            <Address>{getAddress(reservationUnit)}</Address>
           </div>
           <MaxPersonsContainer>
             <IconGroup aria-hidden />
@@ -177,6 +182,7 @@ const ReservationUnitCard = ({
 type OptionTypes = {
   purposeOptions: OptionType[];
   reservationUnitTypeOptions: OptionType[];
+  participantCountOptions: OptionType[];
 };
 
 type Props = {
@@ -227,7 +233,7 @@ const ReservationUnitList = ({
     let isMounted = true; // note this flag denote mount status
     let data;
     const fetchData = async () => {
-      if (applicationEvent.eventReservationUnits.length === 0) {
+      if (applicationEvent.eventReservationUnits?.length === 0) {
         data = selectedReservationUnits;
       } else {
         const promises = applicationEvent.eventReservationUnits.map(
@@ -280,6 +286,9 @@ const ReservationUnitList = ({
 
   return (
     <MainContainer>
+      <Notification size="small">
+        {t('ReservationUnitList.infoReservationUnits')}
+      </Notification>
       {reservationUnits.map((ru, index, all) => {
         return (
           <ReservationUnitCard
@@ -306,7 +315,8 @@ const ReservationUnitList = ({
         handleClose={() => {
           setShowModal(false);
         }}
-        show={showModal}>
+        show={showModal}
+        closeButtonKey="ReservationUnitModal.returnToApplication">
         <ReservationUnitModal
           currentReservationUnits={reservationUnits}
           applicationRound={applicationRound}

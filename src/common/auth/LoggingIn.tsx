@@ -1,13 +1,13 @@
-import { LoadingSpinner } from 'hds-react';
 import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
+import { CenterSpinner } from '../../component/common';
 import PageWrapper from '../../component/PageWrapper';
 
 const LoggingIn = (): JSX.Element => {
   return (
     <BrowserRouter>
       <PageWrapper>
-        <LoadingSpinner />
+        <CenterSpinner />
       </PageWrapper>
     </BrowserRouter>
   );

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Checkbox,
   Select,
   TextInput,
   Button as HDSButton,
@@ -21,18 +20,16 @@ type Props = {
   formValues: { [key: string]: string };
 };
 
-const options = [] as OptionType[];
-
 const Button = styled(HDSButton)`
   margin-left: var(--spacing-m);
 `;
 
 const Container = styled.div`
-  @media (max-width: ${breakpoint.m}) {
+  @media (max-width: ${breakpoint.xl}) {
     grid-template-columns: 1fr 1fr;
   }
 
-  @media (max-width: ${breakpoint.s}) {
+  @media (max-width: ${breakpoint.m}) {
     grid-template-columns: 1fr;
   }
 
@@ -42,26 +39,6 @@ const Container = styled.div`
   grid-template-columns: 1fr 1fr 1fr;
   grid-gap: var(--spacing-m);
   font-size: var(--fontsize-body-m);
-`;
-
-const ShowL = styled.div`
-  @media (max-width: ${breakpoint.m}) {
-    display: none;
-  }
-
-  display: block;
-`;
-
-const ShowM = styled.div`
-  @media (max-width: ${breakpoint.m}) {
-    display: block;
-  }
-
-  @media (max-width: ${breakpoint.s}) {
-    display: none;
-  }
-
-  display: none;
 `;
 
 const Hr = styled.hr`
@@ -93,7 +70,7 @@ const SearchForm = ({ onSearch, formValues }: Props): JSX.Element | null => {
     register({ name: 'purpose' });
     register({ name: 'district' });
     register({ name: 'applicationRound' });
-    register({ name: 'max_persons' });
+    register({ name: 'maxPersons' });
     register({ name: 'reservationUnitType' });
   }, [register]);
 
@@ -171,7 +148,6 @@ const SearchForm = ({ onSearch, formValues }: Props): JSX.Element | null => {
           )}
           label={t('SearchForm.roundLabel')}
         />
-        <ShowL />
         <Select
           id="purpose"
           placeholder={t('common.select')}
@@ -195,20 +171,6 @@ const SearchForm = ({ onSearch, formValues }: Props): JSX.Element | null => {
           )}
           label={t('SearchForm.districtLabel')}
         />
-        <Select
-          placeholder={t('common.select')}
-          disabled
-          options={options}
-          label={t('SearchForm.priceLabel')}
-        />
-        <ShowM />
-        <Checkbox
-          disabled
-          id="checkbox1"
-          label="Sopiva liikuntarajoitteisille"
-        />
-        <Checkbox disabled id="checkbox2" label="Lähimmät paikat ensin" />
-        <ShowL />
         {showMoreFilters ? (
           <>
             <Select
@@ -219,10 +181,10 @@ const SearchForm = ({ onSearch, formValues }: Props): JSX.Element | null => {
               )}
               label={t('SearchForm.participantCountLabel')}
               onChange={(selection: OptionType): void => {
-                setValue('max_persons', selection.value);
+                setValue('maxPersons', selection.value);
               }}
               defaultValue={getSelectedOption(
-                getValues('max_persons'),
+                getValues('maxPersons'),
                 participantCountOptions
               )}
             />

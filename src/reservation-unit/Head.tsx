@@ -1,6 +1,5 @@
 import {
   Button,
-  IconGlyphEuro,
   IconGroup,
   IconInfoCircle,
   IconPlus,
@@ -148,20 +147,7 @@ const Head = ({ reservationUnit, reservationUnitList }: Props): JSX.Element => {
                   })}
                 />
               </div>
-              <div>
-                <IconWithText
-                  icon={
-                    <IconGlyphEuro
-                      aria-label={t('reservationUnit.billableHours')}
-                    />
-                  }
-                  texts={[
-                    ['Ma-Pe', '10:00 - 20:00'],
-                    ['La', '12:00 - 20:00'],
-                    ['Su', '12:00 - 20:00'],
-                  ]}
-                />
-              </div>
+              <div />
             </Props>
             <ButtonContainer>
               {containsReservationUnit(reservationUnit) ? (

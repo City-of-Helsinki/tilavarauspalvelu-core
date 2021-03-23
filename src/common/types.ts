@@ -214,7 +214,7 @@ export type EditorState = {
 };
 
 export type AccordionState = {
-  applicationEventId: number;
+  applicationEventId: number | null; // null is used for non saved event
   open: boolean;
 };
 

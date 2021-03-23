@@ -3,13 +3,14 @@ import ReactDOM from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';
 import { oidcLog, AuthenticationProvider } from '@axa-fr/react-oidc-context';
 import * as Sentry from '@sentry/react';
-import { LoadingSpinner } from 'hds-react';
 import oidcConfiguration from './common/auth/configuration';
+import SessionLost from './common/auth/SessionLost';
 import App from './App';
 
 import reportWebVitals from './reportWebVitals';
 import { authEnabled, sentryDSN, sentryEnvironment } from './common/const';
 import LoggingIn from './common/auth/LoggingIn';
+import { CenterSpinner } from './component/common';
 
 if (sentryDSN) {
   Sentry.init({
@@ -31,7 +32,8 @@ const boot =
 boot(
   <React.StrictMode>
     <AuthenticationProvider
-      authenticating={LoadingSpinner}
+      authenticating={CenterSpinner}
+      sessionLostComponent={SessionLost}
       configuration={oidcConfiguration}
       loggerLevel={oidcLog.ERROR}
       isEnabled={authEnabled}

@@ -76,12 +76,9 @@ const Home = (): JSX.Element => {
                 id="browseAllButton"
                 variant="secondary"
                 theme="black"
-                onClick={() => history.push('/search')}
+                onClick={() => history.push('/search/?search=')}
                 iconLeft={<IconSearch />}>
                 {t('home.browseAllButton')}
-              </Button>
-              <Button disabled variant="secondary" theme="black">
-                {t('home.infoButton')}
               </Button>
             </ButtonContainer>
           </InfoContainer>

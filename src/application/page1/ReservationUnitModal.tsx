@@ -24,7 +24,8 @@ import {
 } from '../../common/types';
 import { breakpoint } from '../../common/style';
 import { reservationUnitPath } from '../../common/const';
-import { localizedValue } from '../../common/util';
+import { getAddress, getMainImage, localizedValue } from '../../common/util';
+import IconWithText from '../../reservation-unit/IconWithText';
 
 const Container = styled.div`
   width: 100%;
@@ -80,9 +81,9 @@ const Main = styled.span`
 `;
 
 const Props = styled.span`
+  font-size: var(--fontsize-body-m);
   grid-area: props;
   display: flex;
-  font-weight: 500;
   align-items: center;
 
   svg {
@@ -147,7 +148,7 @@ const ReservationUnitCard = ({
           name: localizedValue(reservationUnit.name, i18n.language),
         })}
         src={
-          reservationUnit.images[0]?.imageUrl ||
+          getMainImage(reservationUnit)?.smallUrl ||
           'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='
         }
       />
@@ -164,27 +165,31 @@ const ReservationUnitCard = ({
         </Link>
       </Main>
       <Props>
-        <span>
-          <IconInfoCircle />{' '}
-          <span>{reservationUnit.reservationUnitType.name}</span>
-        </span>
-        <span>
-          <IconGroup /> <span>{reservationUnit.maxPersons}</span>
-        </span>
-        <span>
-          <IconLocation />{' '}
-          <span>
-            {reservationUnit.location?.addressStreet},{' '}
-            {reservationUnit.location?.addressZip}{' '}
-            {reservationUnit.location?.addressCity}
-          </span>
-        </span>
+        <IconWithText
+          icon={<IconInfoCircle />}
+          text={localizedValue(
+            reservationUnit.reservationUnitType.name,
+            i18n.language
+          )}
+        />
+        {reservationUnit.maxPersons ? (
+          <IconWithText
+            icon={<IconGroup />}
+            text={`${reservationUnit.maxPersons}`}
+          />
+        ) : null}
+        {getAddress(reservationUnit) ? (
+          <IconWithText
+            icon={<IconLocation />}
+            text={getAddress(reservationUnit) || ''}
+          />
+        ) : null}
       </Props>
       <Actions>
         <Button
           iconRight={<IconArrowRight />}
           onClick={handle}
-          variant="secondary">
+          variant={isSelected ? 'danger' : 'secondary'}>
           {buttonText}
         </Button>
       </Actions>
@@ -245,6 +250,7 @@ const StyledLoadingSpinner = styled(LoadingSpinner).attrs({ small: true })``;
 type OptionsType = {
   purposeOptions: OptionType[];
   reservationUnitTypeOptions: OptionType[];
+  participantCountOptions: OptionType[];
 };
 
 const emptyOption = {
@@ -270,11 +276,18 @@ const ReservationUnitModal = ({
     OptionType | undefined
   >(undefined);
   const [results, setResults] = useState<ReservationUnit[]>([]);
+  const [maxPersons, setMaxPersons] = useState<OptionType | undefined>(
+    undefined
+  );
   const [searching, setSearching] = useState<boolean>(false);
 
   const purposeOptions = [emptyOption].concat(options.purposeOptions);
   const reservationUnitTypeOptions = [emptyOption].concat(
     options.reservationUnitTypeOptions
+  );
+
+  const participantCountOptions = [emptyOption].concat(
+    options.participantCountOptions
   );
 
   const { t } = useTranslation();
@@ -285,6 +298,7 @@ const ReservationUnitModal = ({
       applicationRound: applicationRound.id,
       ...(searchTerm && { search: searchTerm }),
       ...(purpose && { purpose: purpose.value }),
+      ...(maxPersons && { maxPersons: maxPersons.value }),
       ...(reservationUnitType && {
         reservationUnitType: reservationUnitType.value,
       }),
@@ -329,6 +343,16 @@ const ReservationUnitModal = ({
           label={t('ReservationUnitModal.searchReservationUnitTypeLabel')}
           onChange={(selection: OptionType): void => {
             setReservationUnitType(selection);
+          }}
+          defaultValue={emptyOption}
+        />
+        <Select
+          id="participantCountFilter"
+          placeholder={t('common.select')}
+          options={participantCountOptions}
+          label={t('SearchForm.participantCountLabel')}
+          onChange={(selection: OptionType): void => {
+            setMaxPersons(selection);
           }}
           defaultValue={emptyOption}
         />

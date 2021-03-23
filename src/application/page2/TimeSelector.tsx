@@ -1,4 +1,4 @@
-import { Button, IconArrowLeft } from 'hds-react';
+import { Button } from 'hds-react';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
@@ -11,7 +11,7 @@ type Props = {
   index: number;
   cells: Cell[][];
   updateCells: (i: number, cells: Cell[][]) => void;
-  copyCells: (i: number) => void;
+  copyCells: ((i: number) => void) | null;
   summaryData: ApplicationEventSchedule[];
 };
 
@@ -242,14 +242,13 @@ const TimeSelector = ({
         <TimePreview applicationEventSchedules={summaryData} />
       </TimePreviewContainer>
 
-      <ButtonContainer>
-        <Button
-          variant="secondary"
-          iconLeft={<IconArrowLeft />}
-          onClick={() => copyCells(index)}>
-          {t('Application.Page2.copyTimes')}
-        </Button>
-      </ButtonContainer>
+      {copyCells ? (
+        <ButtonContainer>
+          <Button variant="secondary" onClick={() => copyCells(index)}>
+            {t('Application.Page2.copyTimes')}
+          </Button>
+        </ButtonContainer>
+      ) : null}
     </>
   );
 };
