@@ -163,6 +163,7 @@ env = environ.Env(
     TUNNISTAMO_ADMIN_SECRET=(str, None),
     TUNNISTAMO_ADMIN_OIDC_ENDPOINT=(str, "https://api.hel.fi/sso/openid/"),
     HAUKI_API_URL=(str, None),
+    CSRF_TRUSTED_ORIGINS=(list, []),
 )
 
 environ.Env.read_env()
@@ -209,6 +210,7 @@ USE_X_FORWARDED_HOST = env("TRUST_X_FORWARDED_HOST")
 
 # Configure cors
 CORS_ALLOWED_ORIGINS = env("CORS_ALLOWED_ORIGINS")
+CSRF_TRUSTED_ORIGINS = env("CSRF_TRUSTED_ORIGINS")
 
 AUDIT_LOGGING_ENABLED = env("AUDIT_LOGGING_ENABLED")
 
