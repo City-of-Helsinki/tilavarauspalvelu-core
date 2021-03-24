@@ -18,15 +18,17 @@ const StyledCard = styled(({ act, ...rest }) => <Card {...rest} />)`
     grid-template-columns: 2fr;
   }
 
-  max-width: var(--container-width-m);
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  grid-gap: var(--spacing-m);
-  align-items: start;
-  padding: var(--spacing-m);
-  margin-bottom: var(--spacing-s);
-  border-color: ${(props) => props.act && 'var(--tilavaraus-green)'};
-  background-color: ${(props) => props.act && 'var(--tilavaraus-cyan)'};
+  && {
+    max-width: var(--container-width-m);
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    grid-gap: var(--spacing-m);
+    align-items: start;
+    padding: var(--spacing-m);
+    margin-bottom: var(--spacing-s);
+    border-color: ${(props) => props.act && 'var(--tilavaraus-green)'};
+    background-color: ${(props) => props.act && 'var(--tilavaraus-cyan)'};
+  }
 `;
 
 const StyledContainer = styled(Container)`

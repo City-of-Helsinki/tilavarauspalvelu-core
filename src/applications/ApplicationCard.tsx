@@ -17,19 +17,25 @@ const Card = styled(HdsCard)`
 `;
 
 const Tag = styled(HdsTag)`
-  margin-top: var(--spacing-xs);
-  color: var(--color-white);
-  background-color: var(--tilavaraus-blue);
-  font-family: var(--font-regular);
+  && {
+    margin-top: var(--spacing-xs);
+    color: var(--color-white);
+    background-color: var(--tilavaraus-blue);
+    font-family: var(--font-regular);
+  }
 `;
 
 const GreenTag = styled(Tag)`
-  background-color: var(--tilavaraus-green);
+  && {
+    background-color: var(--tilavaraus-green);
+  }
 `;
 
 const YellowTag = styled(Tag)`
-  background-color: var(--tilavaraus-yellow);
-  color: var(--color-black);
+  && {
+    background-color: var(--tilavaraus-yellow);
+    color: var(--color-black);
+  }
 `;
 
 const Buttons = styled.div`

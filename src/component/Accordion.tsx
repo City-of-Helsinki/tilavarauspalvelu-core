@@ -12,20 +12,22 @@ const AccordionElement = styled.div`
 `;
 
 const HeadingButton = styled(Button)`
-  width: 100%;
-  padding-left: 0;
-  border-left: 0;
-  span {
-    color: var(--color-black-90);
-    font-size: var(--fontsize-heading-m);
-    font-family: var(--font-bold);
-    padding: 0;
-    margin: 0;
-    margin-right: auto;
-  }
+  && {
+    width: 100%;
+    padding-left: 0;
+    border-left: 0;
+    span {
+      color: var(--color-black-90);
+      font-size: var(--fontsize-heading-m);
+      font-family: var(--font-bold);
+      padding: 0;
+      margin: 0;
+      margin-right: auto;
+    }
 
-  :focus {
-    outline: 2px solid var(--color-coat-of-arms);
+    :focus {
+      outline: 2px solid var(--color-coat-of-arms);
+    }
   }
 `;
 

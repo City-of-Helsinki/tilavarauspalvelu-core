@@ -18,12 +18,14 @@ const Heading = styled.h2`
 `;
 
 const StyledImageWithCard = styled(ImageWithCard)`
-  margin-top: var(--spacing-layout-xl);
-  width: 75rem;
+  && {
+    margin-top: var(--spacing-layout-xl);
+    width: 75rem;
 
-  & > :nth-child(2) {
-    height: auto;
-    margin: 1em;
+    & > :nth-child(2) {
+      height: auto;
+      margin: 1em;
+    }
   }
 `;
 
