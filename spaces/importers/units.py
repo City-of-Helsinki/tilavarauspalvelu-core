@@ -62,8 +62,9 @@ class UnitImporter:
         },
     }
 
-    def __init__(self, url: str, field_map: dict = None):
+    def __init__(self, url: str, single: bool = False, field_map: dict = None):
         self.url = url
+        self.single = single
         if field_map:
             self.field_map = field_map
 
@@ -75,6 +76,9 @@ class UnitImporter:
         resp = requests.get(self.url)
         resp.raise_for_status()
         unit_data = resp.json()
+
+        if self.single:
+            unit_data = [unit_data]
 
         for row in unit_data:
             created = self.create_unit(row)
