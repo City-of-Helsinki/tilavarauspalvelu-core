@@ -8,7 +8,7 @@ class SpaceTranslationOptions(TranslationOptions):
 
 
 class UnitTranslationOptions(TranslationOptions):
-    fields = ["name", "description"]
+    fields = ["name", "description", "short_description"]
 
 
 class ServiceSectorTranslationOptions(TranslationOptions):
