@@ -79,8 +79,8 @@ class Unit(models.Model):
     separate building etc.
     """
 
-    service_map_id = models.CharField(
-        verbose_name=_("Service map id"),
+    tprek_id = models.CharField(
+        verbose_name=_("TPREK id"),
         max_length=255,
         unique=True,
         blank=True,

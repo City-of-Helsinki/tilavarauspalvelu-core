@@ -32,7 +32,7 @@ class UnitImporter:
     # Field map is used to map to django model fields to api data.
     field_map = {
         "unit": {
-            "service_map_id": "id",
+            "tprek_id": "id",
             "name": "name_fi",
             "description": "desc_fi",
             "web_page": "www_fi",
@@ -48,7 +48,7 @@ class UnitImporter:
         },
         # These values we default to.
         "defaults": {
-            "service_map_id": None,
+            "tprek_id": None,
             "name": None,
             "description": "",
             "web_page": "",
@@ -104,7 +104,7 @@ class UnitImporter:
             )
 
         unit, unit_created = Unit.objects.update_or_create(
-            service_map_id=importer_data.get("id"), defaults=unit_data
+            tprek_id=importer_data.get("id"), defaults=unit_data
         )
 
         location_data = {}

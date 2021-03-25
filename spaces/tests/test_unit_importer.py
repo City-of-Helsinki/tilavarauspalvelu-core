@@ -85,12 +85,12 @@ class UnitImporterTestCase(UnitImporterBaseTestCase):
         self.importer.import_units()
         data = self.get_response_data()
 
-        unit_one = Unit.objects.get(service_map_id=1)
+        unit_one = Unit.objects.get(tprek_id=1)
         self.check_unit_values_vs_data_values(unit_one, data[0])
         location_one = Location.objects.get(unit=unit_one)
         self.check_location_values_vs_data_values(location_one, data[0])
 
-        unit_too = Unit.objects.get(service_map_id=2)
+        unit_too = Unit.objects.get(tprek_id=2)
         self.check_unit_values_vs_data_values(unit_too, data[1])
         location_too = Location.objects.get(unit=unit_too)
         self.check_location_values_vs_data_values(location_too, data[1])
@@ -99,7 +99,7 @@ class UnitImporterTestCase(UnitImporterBaseTestCase):
         self.importer.import_units()
         self.assertEqual(2, Unit.objects.count())
 
-        unit = Unit.objects.get(service_map_id=1)
+        unit = Unit.objects.get(tprek_id=1)
         location = Location.objects.get(unit=unit)
 
         data = self.get_response_data()
@@ -161,7 +161,7 @@ class UnitImporterDefaultsTestCase(UnitImporterBaseTestCase):
     def get_field_map(self):
         field_map = {
             "unit": {
-                "service_map_id": "id",
+                "tprek_id": "id",
                 "name": "name_fi",
                 "description": "desc_fi",
                 "web_page": "www_fi",
@@ -176,7 +176,7 @@ class UnitImporterDefaultsTestCase(UnitImporterBaseTestCase):
                 "lon": "longitude",
             },
             "defaults": {
-                "service_map_id": None,
+                "tprek_id": None,
                 "name": None,
                 "description": "",
                 "web_page": "",
@@ -203,7 +203,7 @@ class UnitImporterDefaultsTestCase(UnitImporterBaseTestCase):
 
     def test_importer_uses_default_values_for_missing_fields_unit(self, mock_response):
         self.importer.import_units()
-        unit = Unit.objects.get(service_map_id=1)
+        unit = Unit.objects.get(tprek_id=1)
 
         check_values = {
             "name_fi": self.data[0]["name_fi"],
@@ -236,7 +236,7 @@ class UnitImporterCustomFieldMapTestCase(UnitImporterBaseTestCase):
             "",
             field_map={
                 "unit": {
-                    "service_map_id": "id",
+                    "tprek_id": "id",
                     "name": "name",
                     "web_page": "www",
                     "email": "mail",
@@ -250,7 +250,7 @@ class UnitImporterCustomFieldMapTestCase(UnitImporterBaseTestCase):
                     "lon": "lon",
                 },
                 "defaults": {
-                    "service_map_id": None,
+                    "tprek_id": None,
                     "name": "",
                     "web_page": "",
                     "email": "",
@@ -279,7 +279,7 @@ class UnitImporterCustomFieldMapTestCase(UnitImporterBaseTestCase):
 
         importer.import_units()
 
-        unit = Unit.objects.get(service_map_id=1)
+        unit = Unit.objects.get(tprek_id=1)
         self.assertEqual(unit.name, data[0]["name"])
         self.assertEqual(unit.web_page, data[0]["www"])
         self.assertEqual(unit.email, data[0]["mail"])
@@ -297,7 +297,7 @@ class UnitImporterCustomFieldMapTestCase(UnitImporterBaseTestCase):
             "",
             field_map={
                 "unit": {
-                    "service_map_id": "iid",
+                    "tprek_id": "iid",
                     "name": "name",  # mismatch
                     "web_page": "www",
                     "email": "mail",
@@ -311,7 +311,7 @@ class UnitImporterCustomFieldMapTestCase(UnitImporterBaseTestCase):
                     "lon": "lat",
                 },
                 "defaults": {
-                    "service_map_id": None,
+                    "tprek_id": None,
                     "name": "",
                     "web_page": "",
                     "email": "",
@@ -330,7 +330,7 @@ class UnitImporterCustomFieldMapTestCase(UnitImporterBaseTestCase):
             "",
             field_map={
                 "unit": {
-                    "service_map_id": "id",
+                    "tprek_id": "id",
                     "name": "name",
                     "web_page": "www",
                     "email": "mail",
@@ -365,7 +365,7 @@ class UnitImporterCustomFieldMapTestCase(UnitImporterBaseTestCase):
 
         importer.import_units()
 
-        unit = Unit.objects.get(service_map_id=1)
+        unit = Unit.objects.get(tprek_id=1)
         self.assertEqual(unit.name, data[0]["name"])
         self.assertEqual(unit.web_page, data[0]["www"])
         self.assertEqual(unit.email, data[0]["mail"])
