@@ -38,6 +38,9 @@ easy-thumbnails==2.7.1
 ecdsa==0.14.1
 elastic-apm==5.10.0
 flake8==3.8.4
+# A Resolved version due to the conflicting dependency for date-util with django-auditlog.
+# After that updates we can update this to latest, since this is older that old.
+freezegun==0.3.14
 graphene==2.1.8
 graphene-django==2.13.0
 graphql-core==2.3.2
