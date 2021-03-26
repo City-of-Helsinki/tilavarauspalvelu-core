@@ -32,9 +32,13 @@ class UnitImporter:
     # Field map is used to map to django model fields to api data.
     field_map = {
         "unit": {
-            "service_map_id": "id",
+            "tprek_id": "id",
             "name": "name_fi",
+            "name_fi": "name_fi",
+            "name_en": "name_en",
+            "name_sv": "name_sv",
             "description": "desc_fi",
+            "short_description": "short_desc_fi",
             "web_page": "www_fi",
             "email": "email",
             "phone": "phone",
@@ -48,9 +52,10 @@ class UnitImporter:
         },
         # These values we default to.
         "defaults": {
-            "service_map_id": None,
+            "tprek_id": None,
             "name": None,
             "description": "",
+            "short_description": "",
             "web_page": "",
             "email": "",
             "phone": "",
@@ -62,8 +67,9 @@ class UnitImporter:
         },
     }
 
-    def __init__(self, url: str, field_map: dict = None):
+    def __init__(self, url: str, single: bool = False, field_map: dict = None):
         self.url = url
+        self.single = single
         if field_map:
             self.field_map = field_map
 
@@ -75,6 +81,9 @@ class UnitImporter:
         resp = requests.get(self.url)
         resp.raise_for_status()
         unit_data = resp.json()
+
+        if self.single:
+            unit_data = [unit_data]
 
         for row in unit_data:
             created = self.create_unit(row)
@@ -100,7 +109,7 @@ class UnitImporter:
             )
 
         unit, unit_created = Unit.objects.update_or_create(
-            service_map_id=importer_data.get("id"), defaults=unit_data
+            tprek_id=importer_data.get("id"), defaults=unit_data
         )
 
         location_data = {}
