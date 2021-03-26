@@ -1,5 +1,8 @@
+from datetime import datetime
+
 from django.contrib.auth.models import User
 from django.db.models import Q
+from django.utils import timezone
 
 from applications.models import Application, ApplicationRound
 from reservation_units.models import ReservationUnit
@@ -166,7 +169,11 @@ def can_manage_service_sectors_applications(
 def can_modify_application(user: User, application: Application) -> bool:
     return (
         is_superuser(user)
-        or application.user == user
+        or (
+            application.user == user
+            and datetime.now(tz=timezone.get_default_timezone())
+            < application.application_round.application_period_end
+        )
         or can_manage_service_sectors_applications(
             user, application.application_round.service_sector
         )
