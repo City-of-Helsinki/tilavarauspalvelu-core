@@ -20,18 +20,13 @@ import {
   OptionType,
   ReservationUnit,
 } from '../../common/types';
-import {
-  formatApiDate,
-  formatDate,
-  fromApiDuration,
-  toApiDuration,
-} from '../../common/util';
+import { formatApiDate, formatDate } from '../../common/util';
 import { breakpoint } from '../../common/style';
 import { HorisontalRule } from '../../component/common';
 import ApplicationEventSummary from './ApplicationEventSummary';
 import ControlledSelect from '../../component/ControlledSelect';
-import ControlledTextInput from '../../component/ControlledTextInput';
 import Accordion from '../../component/Accordion';
+import { durationOptions } from '../../common/const';
 
 type OptionTypes = {
   ageGroupOptions: OptionType[];
@@ -95,7 +90,7 @@ const SpanTwoColumns = styled.span`
 const SaveButton = styled(Button)`
   margin-top: var(--spacing-layout-l);
 `;
-const defaultDuration = '1';
+const defaultDuration = '01:00:00';
 
 const isOpen = (
   current: number | undefined,
@@ -191,8 +186,8 @@ const ApplicationEvent = ({
     const { checked } = e.target;
     setDefaultDurationSelected(checked);
     if (checked) {
-      form.setValue(fieldName('minDuration'), toApiDuration(defaultDuration));
-      form.setValue(fieldName('maxDuration'), toApiDuration(defaultDuration));
+      form.setValue(fieldName('minDuration'), defaultDuration);
+      form.setValue(fieldName('maxDuration'), defaultDuration);
     }
   };
 
@@ -293,26 +288,24 @@ const ApplicationEvent = ({
             onChange={selectDefaultPeriod}
             disabled={defaultPeriodSelected}
           />
-          <ControlledTextInput
-            control={form.control}
-            fromEntity={fromApiDuration}
-            toEntity={toApiDuration}
-            label={t('Application.Page1.minDuration')}
+          <ControlledSelect
             name={fieldName('minDuration')}
             required
-          />
-          <ControlledTextInput
+            label={t('Application.Page1.minDuration')}
             control={form.control}
-            fromEntity={fromApiDuration}
-            toEntity={toApiDuration}
-            label={t('Application.Page1.maxDuration')}
+            options={durationOptions}
+          />
+          <ControlledSelect
             name={fieldName('maxDuration')}
             required
+            label={t('Application.Page1.maxDuration')}
+            control={form.control}
+            options={durationOptions}
           />
           <Checkbox
             id="durationCheckbox"
             checked={defaultDurationSelected}
-            label={`${defaultDuration}${t('common.abbreviations.hour')}`}
+            label={t('Application.Page1.defaultDurationLabel')}
             onChange={selectDefaultDuration}
             disabled={defaultDurationSelected}
           />
@@ -343,9 +336,6 @@ const ApplicationEvent = ({
           />
         </PeriodContainer>
         <HorisontalRule />
-        <SubHeadLine>
-          {t('Application.Page1.applicationEventSummary')}
-        </SubHeadLine>
         <ApplicationEventSummary
           applicationEvent={getApplicationEventData(
             applicationEvent,
@@ -357,7 +347,7 @@ const ApplicationEvent = ({
           id={`applicationEvents[${index}].save`}
           iconLeft={<IconPaperclip />}
           onClick={onSave}>
-          Hyväksy ja tallenna vakiovuoro
+          {t('Application.Page1.saveEvent')}
         </SaveButton>
       </Accordion>
       {editorState.savedEventId &&

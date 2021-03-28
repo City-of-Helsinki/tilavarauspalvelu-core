@@ -49,12 +49,13 @@ test('Application', async (t) => {
   await t.expect(violations.length === 0).ok(createReport(violations));
   // skip intro
   await t.click(application.intro.startApplication);
-  // add application event
-  await t.click(application.addApplicationEventButton);
   await runAxeCheck(t);
   await t.expect(violations.length === 0).ok(createReport(violations));
   // fill and submit page 1
   await t
+    .click(application.page1.applicationEventNameInput)
+    .pressKey('ctrl+a delete')
+    .typeText(application.page1.applicationEventNameInput, 'Uusi vakiovuoro')
     .typeText(application.page1.numPersonsInput, '12')
     .click(application.page1.ageGroupButton)
     .click(application.page1.ageGroupOption1)

@@ -9,8 +9,8 @@ import {
 
 const applicationEvent = (applicationId?: number): ApplicationEvent => ({
   name: i18next.t('Application.Page1.applicationEventName'),
-  minDuration: '00:01:00',
-  maxDuration: '00:01:00',
+  minDuration: '00:00:00',
+  maxDuration: '00:00:00',
   eventsPerWeek: 1,
   numPersons: null,
   ageGroupId: null,

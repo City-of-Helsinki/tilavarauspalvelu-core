@@ -69,6 +69,17 @@ export const participantCountOptions = [
   100,
 ].map((v) => ({ label: `${v}`, value: v } as OptionType));
 
+const option = (label: string, value: string): OptionType => {
+  return { label, value };
+};
+
+export const durationOptions = [
+  option('1 t', '01:00:00'),
+  option('1 t 30 min', '01:30:00'),
+  option('2 t', '02:00:00'),
+  option('2 t 30 min', '01:30:00'),
+];
+
 export const isBrowser = typeof window !== 'undefined';
 
 // eslint-disable-next-line

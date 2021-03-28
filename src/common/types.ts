@@ -186,7 +186,7 @@ export type ApplicationEventSchedule = {
 
 export type OptionType = {
   label: string;
-  value?: number;
+  value?: number | string;
 };
 
 export type Action = {

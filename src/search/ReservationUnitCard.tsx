@@ -113,7 +113,7 @@ const ReservationUnitCard = ({
         </Description>
         <Bottom>
           <IconWithText
-            icon={<IconInfoCircle />}
+            icon={<IconInfoCircle aria-label={t('ReservationUnit.type')} />}
             text={localizedValue(
               reservationUnit.reservationUnitType.name,
               i18n.language
@@ -121,14 +121,14 @@ const ReservationUnitCard = ({
           />
           {reservationUnit.maxPersons ? (
             <IconWithText
-              icon={<IconGroup />}
+              icon={<IconGroup aria-label={t('ReservationUnit.maxPersons')} />}
               text={`${reservationUnit.maxPersons}`}
             />
           ) : null}
           {getAddress(reservationUnit) ? (
             <IconWithText
               className="grow"
-              icon={<IconLocation />}
+              icon={<IconLocation aria-label={t('ReservationUnit.address')} />}
               text={getAddress(reservationUnit) || ''}
             />
           ) : null}{' '}

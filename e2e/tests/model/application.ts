@@ -9,7 +9,7 @@ export default {
   addApplicationEventButton: Selector('#addApplicationEvent'),
   page1: {
     applicationEventAccordion: Selector('form > div > div > button'),
-    applicationEventNameInput: Selector('#applicationEvents[0].name'),
+    applicationEventNameInput: Selector('#applicationEvents\\[0\\]\\.name'),
     numPersonsInput: Selector('#applicationEvents\\[0\\]\\.numPersons'),
     ageGroupButton: Selector(
       '#applicationEvents\\[0\\]\\.ageGroupId-toggle-button'

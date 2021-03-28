@@ -103,11 +103,11 @@ export const mapOptions = (
 };
 
 export const getSelectedOption = (
-  selectedId: number | null,
+  selectedId: number | string | null,
   options: OptionType[]
 ): OptionType | undefined => {
-  const selected = Number(selectedId);
-  const option = options.find((o) => o.value === selected);
+  const selected = String(selectedId);
+  const option = options.find((o) => String(o.value) === selected);
   return option;
 };
 
@@ -120,17 +120,14 @@ export function deepCopy<T>(src: T): T {
   return JSON.parse(JSON.stringify(src));
 }
 
-/** convert between api duration and editor contents */
-export const fromApiDuration = (duration: string): string => {
+export const apiDurationToMinutes = (duration: string): number => {
   if (!duration) {
-    return '';
+    return 0;
   }
   const parts = duration.split(':');
-  return `${Number(parts[1])}`;
+  return Number(parts[0]) * 60 + Number(parts[1]);
 };
 
-export const toApiDuration = (hours: string): string =>
-  hours ? `00:${hours}:00` : '';
 const formatNumber = (n: number): string => `0${n > 23 ? 0 : n}`.slice(-2);
 
 type Timespan = { begin: number; end: number };

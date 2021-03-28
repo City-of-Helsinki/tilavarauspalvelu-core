@@ -286,7 +286,9 @@ const ReservationUnitList = ({
 
   return (
     <MainContainer>
-      <Notification size="small">
+      <Notification
+        size="small"
+        label={t('ReservationUnitList.infoReservationUnits')}>
         {t('ReservationUnitList.infoReservationUnits')}
       </Notification>
       {reservationUnits.map((ru, index, all) => {

@@ -15,9 +15,7 @@ test('Start new application', async (t) => {
     .click(search.startApplicationButton);
   // skip intro
   await t.click(application.intro.startApplication);
-  // add application event
   await t
-    .click(application.addApplicationEventButton)
-    .expect(application.applicationTemplateName.textContent)
+    .expect(application.page1.applicationEventNameInput.value)
     .eql('Nimetön vakiovuoro');
 });
