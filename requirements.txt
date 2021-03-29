@@ -62,7 +62,6 @@ pluggy==0.13.1
 promise==2.3
 protobuf==3.14.0
 psycopg2==2.8.6
-py==1.9.0
 pyasn1==0.4.8
 pycodestyle==2.6.0
 pycparser==2.20
