@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { Button } from "hds-react";
+import { breakpoints } from "../styles/util";
 
 interface IProps {
   buttons: Button[];
@@ -20,7 +21,9 @@ interface IButtonProps {
 }
 
 const Wrapper = styled.div`
-  white-space: nowrap;
+  @media (min-width: ${breakpoints.m}) {
+    white-space: nowrap;
+  }
 `;
 
 const StyledButton = styled(Button).attrs(({ $active }: IButtonProps) => ({
@@ -31,9 +34,17 @@ const StyledButton = styled(Button).attrs(({ $active }: IButtonProps) => ({
     "--color-focus": $active ? "var(--color-white)" : "var(--color-black)",
   } as React.CSSProperties,
 }))<{ $active: boolean }>`
+  display: block;
+  width: 100%;
+
   span {
     padding: var(--spacing-xs);
     margin: 0;
+  }
+
+  @media (min-width: ${breakpoints.s}) {
+    display: inline-flex;
+    width: auto;
   }
 `;
 

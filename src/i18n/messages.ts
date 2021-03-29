@@ -237,6 +237,12 @@ const translations: ITranslations = {
     allocateAction: ["Jaa"],
     deliverAction: ["Toimita"],
     sendForApproval: ["Toimita esihenkilölle"],
+    allocationNotificationHeading: [
+      "Näet käsitelävät ehdotukset täällä, kun olet käynnistänyt jaon Jaa-painikkeesta.",
+    ],
+    allocationNotificationBody: [
+      "Kone tekee ehdotukset ennalta määritellyille ryhmille priorisointijärjestyksessä.\nNäet kierroksen kriteerit näkymän ylälaidasta.",
+    ],
     allocateLabel: [
       "Huomaathan, että et voi enää palata esitarkistusvaiheeseen, jos olet käynnistänyt ehdotusten jakamisen.",
     ],
