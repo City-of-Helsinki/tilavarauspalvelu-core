@@ -113,7 +113,7 @@ const IngressFooter = styled.div`
 
   .label {
     font-size: var(--fontsize-body-s);
-    margin: var(--spacing-3-xs) 0 0 0;
+    margin: var(--spacing-3-xs) 0 var(--spacing-2-xs) 0;
     color: var(--color-black-70);
   }
 
@@ -126,10 +126,25 @@ const IngressFooter = styled.div`
   }
 `;
 
-const ScheduleCount = styled.div`
+const SchedulePercentage = styled.span`
   font-family: var(--tilavaraus-admin-font-bold);
   font-weight: bold;
   font-size: 1.375rem;
+  display: block;
+
+  @media (min-width: ${breakpoints.m}) {
+    display: inline;
+  }
+`;
+
+const ScheduleCount = styled.span`
+  font-size: var(--fontsize-body-s);
+  display: block;
+
+  @media (min-width: ${breakpoints.m}) {
+    margin-left: var(--spacing-xs);
+    display: inline;
+  }
 `;
 
 const getCellConfig = (t: TFunction): CellConfig => {
@@ -157,7 +172,7 @@ const getCellConfig = (t: TFunction): CellConfig => {
   };
 };
 
-function Approval({ applicationRoundId }: IProps): JSX.Element {
+function PreApproval({ applicationRoundId }: IProps): JSX.Element {
   const [isLoading, setIsLoading] = useState(true);
   const [
     applicationRound,
@@ -200,6 +215,11 @@ function Approval({ applicationRoundId }: IProps): JSX.Element {
 
     fetchApplicationRound();
   }, [applicationRoundId, t]);
+
+  const scheduledNumbers = {
+    volume: 239048,
+    hours: 2345,
+  };
 
   if (isLoading) {
     return <Loader />;
@@ -278,14 +298,23 @@ function Approval({ applicationRoundId }: IProps): JSX.Element {
           <IngressContainer>
             <IngressFooter>
               <div>
-                <ScheduleCount>{`${formatNumber(
-                  1234,
-                  t("common.volumeUnit")
-                )} / ${formatNumber(5678, t("common.hoursUnit"))}
-                `}</ScheduleCount>
                 <p className="label">
                   {t("ApplicationRound.schedulesToBeGranted")}
-                </p>
+                </p>{" "}
+                <SchedulePercentage>
+                  {t("ApplicationRound.percentageOfCapacity", {
+                    percentage: 76,
+                  })}
+                </SchedulePercentage>
+                <ScheduleCount>
+                  {`(${formatNumber(
+                    scheduledNumbers.volume,
+                    t("common.volumeUnit")
+                  )} / ${formatNumber(
+                    scheduledNumbers.hours,
+                    t("common.hoursUnit")
+                  )})`}
+                </ScheduleCount>
               </div>
               <div>
                 <BigRadio
@@ -367,4 +396,4 @@ function Approval({ applicationRoundId }: IProps): JSX.Element {
   );
 }
 
-export default withMainMenu(Approval);
+export default withMainMenu(PreApproval);
