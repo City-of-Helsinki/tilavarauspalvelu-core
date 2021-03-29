@@ -2,23 +2,13 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { useHistory } from "react-router-dom";
-import {
-  Button,
-  IconArrowRedo,
-  IconGroup,
-  Notification,
-  Select,
-} from "hds-react";
+import { Button, IconArrowRedo, Notification } from "hds-react";
 import { getApplicationRound } from "../../common/api";
 import Loader from "../Loader";
-import {
-  ApplicationRound as ApplicationRoundType,
-  ApplicationRoundBasket,
-  OptionType,
-} from "../../common/types";
+import { ApplicationRound as ApplicationRoundType } from "../../common/types";
 import { IngressContainer, NarrowContainer } from "../../styles/layout";
-import { ContentHeading, RequiredLabel } from "../../styles/typography";
-import { breakpoints } from "../../styles/util";
+import { ContentHeading } from "../../styles/typography";
+import { breakpoints, Strong } from "../../styles/util";
 import Heading from "../Applications/Heading";
 import StatusRecommendation from "../Applications/StatusRecommendation";
 import withMainMenu from "../withMainMenu";
@@ -32,6 +22,10 @@ interface IProps {
 
 const Wrapper = styled.div`
   width: 100%;
+`;
+
+const WideContainer = styled(IngressContainer)`
+  padding-left: var(--spacing-m);
 `;
 
 const Details = styled.div`
@@ -71,17 +65,13 @@ const RecommendationValue = styled.div`
   margin-top: var(--spacing-3-xs);
 `;
 
-const SelectWrapper = styled.div`
-  label[for="allocatedBasket-toggle-button"] {
-    ${RequiredLabel}
-    font-family: var(--tilavaraus-admin-font-medium);
-    font-weight: 500;
-  }
-
-  #allocatedBasket-helper {
-    line-height: var(--lineheight-l);
-    margin-top: var(--spacing-xs);
-  }
+const NotificationBox = styled.div`
+  background-color: var(--tilavaraus-admin-gray-darker);
+  padding: 110px var(--spacing-layout-m) 100px;
+  text-align: center;
+  white-space: pre-line;
+  line-height: var(--lineheight-xl);
+  margin-bottom: var(--spacing-5-xl);
 `;
 
 const ActionContainer = styled.div`
@@ -121,35 +111,19 @@ const ActionContainer = styled.div`
 `;
 
 function Allocation({ applicationRoundId }: IProps): JSX.Element {
-  // const basketOptions = applicationRound?.applicationRoundBaskets.map(
-  //   (basket) => ({
-  //     value: basket.value,
-  //     label: basket.label,
-  //   })
-  // ) || [];
-  const basketOptions = [
-    {
-      value: "1",
-      label: "1. Helsinkiläiset lasten ja nuorten seurat",
-    },
-    { value: "2", label: "2. Muut helsinkiläiset seurat" },
-    { value: "3", label: "3. Muut" },
-  ];
-
   const [isLoading, setIsLoading] = useState(true);
   const [isAllocating, setIsAllocating] = useState(false);
   const [
     applicationRound,
     setApplicationRound,
   ] = useState<ApplicationRoundType | null>(null);
-  const [basket, setBasket] = useState<OptionType>(basketOptions[0]);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const { t } = useTranslation();
   const history = useHistory();
 
-  const startAllocation = (id: string, basketId: string): void => {
-    console.log(id, basketId); // eslint-disable-line
+  const startAllocation = (id: string): void => {
+    console.log(id); // eslint-disable-line
     setIsAllocating(true);
   };
 
@@ -214,18 +188,15 @@ function Allocation({ applicationRoundId }: IProps): JSX.Element {
               </Details>
             </div>
           </IngressContainer>
+          <WideContainer>
+            <NotificationBox>
+              <Strong>
+                {t("ApplicationRound.allocationNotificationHeading")}
+              </Strong>
+              <p>{t("ApplicationRound.allocationNotificationBody")}</p>
+            </NotificationBox>
+          </WideContainer>
           <NarrowContainer>
-            <SelectWrapper>
-              <Select
-                id="allocatedBasket"
-                label={t("ApplicationRound.allocatedBasket")}
-                value={basket}
-                onChange={(option: ApplicationRoundBasket) => setBasket(option)}
-                helper={t("ApplicationRound.allocatedBasketHelper")}
-                options={basketOptions}
-                icon={<IconGroup />}
-              />
-            </SelectWrapper>
             <ActionContainer>
               <div className="box">
                 <Button
@@ -242,10 +213,7 @@ function Allocation({ applicationRoundId }: IProps): JSX.Element {
                 <Button
                   type="submit"
                   variant="primary"
-                  disabled={!basket}
-                  onClick={() =>
-                    startAllocation(applicationRoundId, basket.value)
-                  }
+                  onClick={() => startAllocation(applicationRoundId)}
                   iconLeft={<IconArrowRedo />}
                 >
                   {t("ApplicationRound.allocateAction")}
