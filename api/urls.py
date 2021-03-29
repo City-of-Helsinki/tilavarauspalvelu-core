@@ -3,6 +3,7 @@ from rest_framework import routers
 from .allocation_api import AllocationRequestViewSet
 from .application_round_api import ApplicationRoundViewSet
 from .applications_api.views import ApplicationEventViewSet, ApplicationViewSet
+from .hauki_api import OpeningHoursViewSet
 from .permissions_api import (
     GeneralRoleViewSet,
     ServiceSectorRoleViewSet,
@@ -34,6 +35,7 @@ router.register(r"unit_role", UnitRoleViewSet, "unit_role")
 router.register(r"service_sector_role", ServiceSectorRoleViewSet, "service_sector_role")
 router.register(r"general_role", GeneralRoleViewSet, "general_role")
 router.register(r"allocation_request", AllocationRequestViewSet, "allocation_request")
+router.register(r"opening_hour", OpeningHoursViewSet, "opening_hour")
 router.register(r"parameters/purpose", PurposeViewSet, "purpose")
 router.register(r"parameters/age_group", AgeGroupViewSet, "age_group")
 router.register(r"parameters/ability_group", AbilityGroupViewSet, "ability_group")
