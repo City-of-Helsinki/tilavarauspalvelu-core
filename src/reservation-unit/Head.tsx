@@ -129,15 +129,17 @@ const Head = ({ reservationUnit, reservationUnitList }: Props): JSX.Element => {
             </BuildingName>
             <Props>
               <div>
-                <IconWithText
-                  icon={
-                    <IconInfoCircle aria-label={t('reservationUnit.type')} />
-                  }
-                  text={localizedValue(
-                    reservationUnit.reservationUnitType?.name,
-                    i18n.language
-                  )}
-                />
+                {reservationUnit.reservationUnitType ? (
+                  <IconWithText
+                    icon={
+                      <IconInfoCircle aria-label={t('reservationUnit.type')} />
+                    }
+                    text={localizedValue(
+                      reservationUnit.reservationUnitType?.name,
+                      i18n.language
+                    )}
+                  />
+                ) : null}
                 <IconWithText
                   icon={
                     <IconGroup aria-label={t('reservationUnit.maxPersons')} />

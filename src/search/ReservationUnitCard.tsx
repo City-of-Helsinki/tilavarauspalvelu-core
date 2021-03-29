@@ -112,13 +112,15 @@ const ReservationUnitCard = ({
           {localizedValue(reservationUnit.building.name, i18n.language)}
         </Description>
         <Bottom>
-          <IconWithText
-            icon={<IconInfoCircle aria-label={t('ReservationUnit.type')} />}
-            text={localizedValue(
-              reservationUnit.reservationUnitType.name,
-              i18n.language
-            )}
-          />
+          {reservationUnit.reservationUnitType ? (
+            <IconWithText
+              icon={<IconInfoCircle aria-label={t('ReservationUnit.type')} />}
+              text={localizedValue(
+                reservationUnit.reservationUnitType?.name,
+                i18n.language
+              )}
+            />
+          ) : null}
           {reservationUnit.maxPersons ? (
             <IconWithText
               icon={<IconGroup aria-label={t('ReservationUnit.maxPersons')} />}

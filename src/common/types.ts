@@ -77,7 +77,7 @@ export type ReservationUnit = {
   services: Service[];
   images: Image[];
   location?: Location;
-  reservationUnitType: Parameter;
+  reservationUnitType?: Parameter;
   termsOfUse: string;
   building: Building;
   unitId: number;

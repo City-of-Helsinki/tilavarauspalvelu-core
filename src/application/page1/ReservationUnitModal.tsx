@@ -165,13 +165,15 @@ const ReservationUnitCard = ({
         </Link>
       </Main>
       <Props>
-        <IconWithText
-          icon={<IconInfoCircle />}
-          text={localizedValue(
-            reservationUnit.reservationUnitType.name,
-            i18n.language
-          )}
-        />
+        {reservationUnit.reservationUnitType ? (
+          <IconWithText
+            icon={<IconInfoCircle />}
+            text={localizedValue(
+              reservationUnit.reservationUnitType?.name,
+              i18n.language
+            )}
+          />
+        ) : null}
         {reservationUnit.maxPersons ? (
           <IconWithText
             icon={<IconGroup />}
