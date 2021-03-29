@@ -1,13 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { TFunction, useTranslation } from "react-i18next";
 import styled from "styled-components";
-import {
-  Button,
-  IconArrowRedo,
-  IconGroup,
-  Notification,
-  Select,
-} from "hds-react";
+import { Button, IconArrowRedo, Notification } from "hds-react";
 import { useHistory } from "react-router-dom";
 import uniq from "lodash/uniq";
 import trim from "lodash/trim";
@@ -16,9 +10,7 @@ import Loader from "../Loader";
 import {
   Application as ApplicationType,
   ApplicationRound as ApplicationRoundType,
-  ApplicationRoundBasket,
   DataFilterConfig,
-  OptionType,
 } from "../../common/types";
 import { IngressContainer, NarrowContainer } from "../../styles/layout";
 import { breakpoints } from "../../styles/util";
@@ -27,7 +19,7 @@ import StatusRecommendation from "../Applications/StatusRecommendation";
 import withMainMenu from "../withMainMenu";
 import ApplicationRoundNavi from "./ApplicationRoundNavi";
 import TimeframeStatus from "./TimeframeStatus";
-import { ContentHeading, H3, RequiredLabel } from "../../styles/typography";
+import { ContentHeading, H3 } from "../../styles/typography";
 import KorosHeading from "../KorosHeading";
 import StatusCircle from "../StatusCircle";
 import AllocatingDialogContent from "./AllocatingDialogContent";
@@ -98,21 +90,6 @@ const RecommendationValue = styled.div`
   margin-top: var(--spacing-3-xs);
 `;
 
-const SelectWrapper = styled.div`
-  margin-top: var(--spacing-l);
-
-  label[for="allocatedBasket-toggle-button"] {
-    ${RequiredLabel}
-    font-family: var(--tilavaraus-admin-font-medium);
-    font-weight: 500;
-  }
-
-  #allocatedBasket-helper {
-    line-height: var(--lineheight-l);
-    margin-top: var(--spacing-xs);
-  }
-`;
-
 const ActionContainer = styled.div`
   button {
     margin-top: var(--spacing-s);
@@ -121,6 +98,7 @@ const ActionContainer = styled.div`
   display: flex;
   justify-content: space-between;
   flex-direction: column-reverse;
+  margin-top: var(--spacing-s);
 
   @media (min-width: ${breakpoints.l}) {
     flex-direction: row;
@@ -215,21 +193,6 @@ const getCellConfig = (
 };
 
 function Handling({ applicationRoundId }: IProps): JSX.Element {
-  // const basketOptions = applicationRound?.applicationRoundBaskets.map(
-  //   (basket) => ({
-  //     value: basket.value,
-  //     label: basket.label,
-  //   })
-  // ) || [];
-  const basketOptions = [
-    {
-      value: "1",
-      label: "1. Helsinkiläiset lasten ja nuorten seurat",
-    },
-    { value: "2", label: "2. Muut helsinkiläiset seurat" },
-    { value: "3", label: "3. Muut" },
-  ];
-
   const [isLoading, setIsLoading] = useState(true);
   const [isAllocating, setIsAllocating] = useState(false);
   const [
@@ -237,7 +200,6 @@ function Handling({ applicationRoundId }: IProps): JSX.Element {
     setApplicationRound,
   ] = useState<ApplicationRoundType | null>(null);
   const [recommendations, setRecommendations] = useState<any[]>([]); // eslint-disable-line
-  const [basket, setBasket] = useState<OptionType>(basketOptions[0]);
   const [cellConfig, setCellConfig] = useState<CellConfig | null>(null);
   const [filterConfig, setFilterConfig] = useState<DataFilterConfig[]>([]);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -245,8 +207,8 @@ function Handling({ applicationRoundId }: IProps): JSX.Element {
   const { t } = useTranslation();
   const history = useHistory();
 
-  const startAllocation = (id: string, basketId: string): void => {
-    console.log(id, basketId); // eslint-disable-line
+  const startAllocation = (id: string): void => {
+    console.log(id); // eslint-disable-line
     setIsAllocating(true);
   };
 
@@ -429,16 +391,6 @@ function Handling({ applicationRoundId }: IProps): JSX.Element {
                 <StatusRecommendation status="allocated" />
               </RecommendationValue>
             </Recommendation>
-            <SelectWrapper>
-              <Select
-                id="allocatedBasket"
-                label={t("ApplicationRound.allocatedBasket")}
-                value={basket}
-                onChange={(option: ApplicationRoundBasket) => setBasket(option)}
-                options={basketOptions}
-                icon={<IconGroup />}
-              />
-            </SelectWrapper>
             <ActionContainer>
               <Button
                 type="button"
@@ -454,10 +406,7 @@ function Handling({ applicationRoundId }: IProps): JSX.Element {
               <Button
                 type="submit"
                 variant="primary"
-                disabled={!basket}
-                onClick={() =>
-                  startAllocation(applicationRoundId, basket.value)
-                }
+                onClick={() => startAllocation(applicationRoundId)}
                 iconLeft={<IconArrowRedo />}
               >
                 {t("ApplicationRound.allocateAction")}
