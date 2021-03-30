@@ -41,31 +41,46 @@ const Content = styled.div<{ onTransitionEnd: React.TransitionEventHandler }>`
 
 const Inner = styled.div`
   height: calc(100% - (2 * var(--spacing-m)));
-  padding: var(--spacing-m);
+  padding: var(--spacing-m) var(--spacing-m) 0 var(--spacing-m);
   overflow-x: hidden;
   overflow-y: auto;
 `;
 
-const CloseBtn = styled(Button)`
+const FocusHolder = styled.button`
+  outline: none;
+  width: 1px;
+  height: 1px;
+  border: 0;
+`;
+
+const CloseBtn = styled(Button).attrs({
+  style: {
+    "--color-bus": "transparent",
+    "--color-white": "var(--color-black)",
+    "--background-color-hover": "transparent",
+    "--border-color-hover": "transparent",
+    "--color-hover": "rgba(0, 0, 0, 0.4)",
+  } as React.CSSProperties,
+})`
   position: absolute;
-  top: 0;
-  right: 0;
-  width: 30px;
-  height: 30px;
-  opacity: 0.7;
+  top: var(--spacing-xl);
+  right: var(--spacing-xl);
+  width: 20px;
+  height: 20px;
 `;
 
 function Modal({ children }: IProps): JSX.Element {
   const { setModalContent } = useModal();
   const { t } = useTranslation();
   const element = document.createElement("div");
+  const focusHolder = React.createRef<HTMLButtonElement>();
   const closeBtn = React.createRef<HTMLButtonElement>();
 
   useLayoutEffect(() => {
     setTimeout(() => {
-      closeBtn.current?.focus();
+      focusHolder.current?.focus();
     }, 0);
-  }, [closeBtn]);
+  }, [focusHolder]);
 
   useEffect(() => {
     if (modalRoot) modalRoot.appendChild(element);
@@ -78,7 +93,8 @@ function Modal({ children }: IProps): JSX.Element {
   return ReactDOM.createPortal(
     <>
       <Seranwrap onClick={() => setModalContent(null)} />
-      <Content onTransitionEnd={() => closeBtn.current?.focus()}>
+      <Content onTransitionEnd={() => focusHolder.current?.focus()}>
+        <FocusHolder ref={focusHolder} />
         <CloseBtn
           onClick={() => setModalContent(null)}
           aria-label={t("common.closeModal")}

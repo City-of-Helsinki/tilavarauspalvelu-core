@@ -388,7 +388,10 @@ function Handling({ applicationRoundId }: IProps): JSX.Element {
                 {t("Application.recommendedStage")}:
               </RecommendationLabel>
               <RecommendationValue>
-                <StatusRecommendation status="allocated" />
+                <StatusRecommendation
+                  status="allocated"
+                  applicationRound={applicationRound}
+                />
               </RecommendationValue>
             </Recommendation>
             <ActionContainer>

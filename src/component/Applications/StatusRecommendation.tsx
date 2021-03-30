@@ -3,9 +3,12 @@ import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { useModal } from "../../context/UIContext";
 import InfoBubble from "../InfoBubble";
+import StageInfo from "../ApplicationRound/StageInfo";
+import { ApplicationRound } from "../../common/types";
 
 interface IProps {
   status: string;
+  applicationRound: ApplicationRound;
   className?: string;
 }
 
@@ -19,16 +22,49 @@ const StyledInfoBubble = styled(InfoBubble)`
   top: -2px;
 `;
 
-function StatusRecommendation({ status, className }: IProps): JSX.Element {
+function StatusRecommendation({
+  status,
+  applicationRound,
+  className,
+}: IProps): JSX.Element {
   const { t } = useTranslation();
   const { setModalContent } = useModal();
+
+  let activeState: number;
+  switch (status) {
+    case "in_review":
+      activeState = 2;
+      break;
+    case "review_done":
+      activeState = 3;
+      break;
+    case "allocated":
+      activeState = 4;
+      break;
+    case "approvalPreparation":
+      activeState = 5;
+      break;
+    case "approval":
+      activeState = 6;
+      break;
+    case "supervisorApproval":
+      activeState = 7;
+      break;
+    default:
+  }
 
   return (
     <Wrapper className={className}>
       {t(`ApplicationRound.recommendations.${status}`)}
       <StyledInfoBubble
         onClick={() =>
-          setModalContent && setModalContent(<div>modal content</div>)
+          setModalContent &&
+          setModalContent(
+            <StageInfo
+              activeStage={activeState}
+              applicationRound={applicationRound}
+            />
+          )
         }
       />
     </Wrapper>

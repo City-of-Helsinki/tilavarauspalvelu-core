@@ -181,7 +181,10 @@ function Allocation({ applicationRoundId }: IProps): JSX.Element {
                       {t("Application.recommendedStage")}:
                     </RecommendationLabel>
                     <RecommendationValue>
-                      <StatusRecommendation status="review_done" />
+                      <StatusRecommendation
+                        status="review_done"
+                        applicationRound={applicationRound}
+                      />
                     </RecommendationValue>
                   </Recommendation>
                 </div>
