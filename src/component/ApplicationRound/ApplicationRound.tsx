@@ -3,7 +3,8 @@ import { useLocation, useParams } from "react-router-dom";
 import Review from "./Review";
 import Allocation from "./Allocation";
 import Handling from "./Handling";
-import Approval from "./Approval";
+import PreApproval from "./PreApproval";
+import SupervisorApproval from "./SupervisorApproval";
 
 interface IProps {
   applicationRoundId: string;
@@ -22,8 +23,12 @@ function ApplicationRound(): JSX.Element {
     return <Handling applicationRoundId={applicationRoundId} />;
   }
 
-  if (location.search === "?approval") {
-    return <Approval applicationRoundId={applicationRoundId} />;
+  if (location.search === "?preapproval") {
+    return <PreApproval applicationRoundId={applicationRoundId} />;
+  }
+
+  if (location.search === "?supervisorapproval") {
+    return <SupervisorApproval applicationRoundId={applicationRoundId} />;
   }
 
   return <Review applicationRoundId={applicationRoundId} />;

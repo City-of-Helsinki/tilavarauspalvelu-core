@@ -39,6 +39,8 @@ const translations: ITranslations = {
     true: ["kyllä"],
     open: ["Avaa"],
     close: ["Sulje"],
+    approve: ["Hyväksy"],
+    cancel: ["Kumoa"],
     accordion: ["sisältö"],
     search: ["Hae"],
     noResults: ["Ei tuloksia"],
@@ -160,7 +162,7 @@ const translations: ITranslations = {
       review_done: ["Etenee jakoon"],
       allocating: ["Varauksessa"],
       allocated: ["Käsittelemättä"],
-      validated: ["Hyvaksytty"],
+      validated: ["Hyväksytty"],
       handled: ["Käsitelty"],
       declined: ["Hylätty"],
       cancelled: ["Peruutettu"],
@@ -223,6 +225,9 @@ const translations: ITranslations = {
       approval: [
         "Odota esihenkilösi hyväksyntää tai mahdollisia muutospyyntöjä.",
       ],
+      supervisorApproval: [
+        "Tarkasta vuorojakopäätös (esim. suodattamalla) ja toimita päätökset asiakkaille.",
+      ],
     },
     roundCriteria: ["Kierroksen kriteerit"],
     allocatedBasket: ["Jaettava kori"],
@@ -267,6 +272,22 @@ const translations: ITranslations = {
     orphanApplications: ["Vaille tilaa jääneet"],
     handledApplications: ["Käsitellyt päätökset"],
     amountReserved: ["Kapasiteetista varattu"],
+    percentageOfCapacity: ["{{percentage}} % kapasiteetista"],
+    cancelSupervisorApproval: ["Palauta lista hyväksymättä käsittelijälle"],
+    approveAndSendToCustomers: ["Hyväksy ja toimita päätökset asiakkaille"],
+    cancelSupervisorApprovalDialogHeader: [
+      "Oletko varma, että haluat palauttaa listan käsittelyyn?",
+    ],
+    cancelSupervisorApprovalDialogBody: [
+      "Lista poistuu tällöin näkymästäsi, etkä voi nähdä tai hyväksyä listaa ennen kuin käsittelijät ovat pyytäneet hyväksyntää sinulta uudelleen.",
+    ],
+    approveRecommendationsDialogHeader: [
+      "Hyväksytäänkö ehdotus kierroksen vuorojaosta?",
+    ],
+    approveRecommendationsDialogBody: [
+      "Kaikkien toimipisteiden asiakkaat saavat myöntöpäätökset heti, kun hyväksyntä on tehty.",
+    ],
+    returnListToHandling: ["Palauta lista käsittelyyn"],
   },
   ApplicationEvent: {
     name: ["Vakiovuoron nimi"],

@@ -397,7 +397,7 @@ function Handling({ applicationRoundId }: IProps): JSX.Element {
                 variant="secondary"
                 onClick={() =>
                   history.push(
-                    `/applicationRound/${applicationRoundId}?approval`
+                    `/applicationRound/${applicationRoundId}?preapproval`
                   )
                 }
               >
