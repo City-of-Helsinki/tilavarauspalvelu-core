@@ -269,7 +269,10 @@ function SupervisorApproval({ applicationRoundId }: IProps): JSX.Element {
                 {t("Application.recommendedStage")}:
               </RecommendationLabel>
               <RecommendationValue>
-                <StatusRecommendation status="supervisorApproval" />
+                <StatusRecommendation
+                  status="supervisorApproval"
+                  applicationRound={applicationRound}
+                />
               </RecommendationValue>
             </Recommendation>
             <ActionContainer>

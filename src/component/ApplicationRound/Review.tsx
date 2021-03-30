@@ -265,7 +265,10 @@ function Review({ applicationRoundId }: IProps): JSX.Element {
                       {t("Application.recommendedStage")}:
                     </RecommendationLabel>
                     <RecommendationValue>
-                      <StatusRecommendation status={applicationRound.status} />
+                      <StatusRecommendation
+                        status="in_review"
+                        applicationRound={applicationRound}
+                      />
                     </RecommendationValue>
                   </Recommendation>
                 </div>

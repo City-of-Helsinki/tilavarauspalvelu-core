@@ -269,6 +269,7 @@ function PreApproval({ applicationRoundId }: IProps): JSX.Element {
                   status={
                     hasBeenSentForApproval ? "approval" : "approvalPreparation"
                   }
+                  applicationRound={applicationRound}
                 />
               </RecommendationValue>
             </Recommendation>
