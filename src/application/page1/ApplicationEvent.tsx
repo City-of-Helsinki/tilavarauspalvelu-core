@@ -266,19 +266,17 @@ const ApplicationEvent = ({
               form.errors.applicationEvents?.[index]?.ageGroupId?.type
             )}
           />
-          <SpanTwoColumns>
-            <ControlledSelect
-              name={fieldName('purposeId')}
-              required
-              label={t('Application.Page1.purpose')}
-              control={form.control}
-              options={purposeOptions}
-              error={errorText(
-                t,
-                form.errors.applicationEvents?.[index]?.purposeId?.type
-              )}
-            />
-          </SpanTwoColumns>
+          <ControlledSelect
+            name={fieldName('purposeId')}
+            required
+            label={t('Application.Page1.purpose')}
+            control={form.control}
+            options={purposeOptions}
+            error={errorText(
+              t,
+              form.errors.applicationEvents?.[index]?.purposeId?.type
+            )}
+          />
         </TwoColumnContainer>
         <HorisontalRule />
         <SubHeadLine>{t('Application.Page1.spacesSubHeading')}</SubHeadLine>
