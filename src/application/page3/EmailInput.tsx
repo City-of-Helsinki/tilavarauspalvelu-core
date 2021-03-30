@@ -3,12 +3,14 @@ import { useTranslation } from 'react-i18next';
 import { Notification, TextInput } from 'hds-react';
 import { useForm } from 'react-hook-form';
 import { SpanTwoColumns } from '../../component/common';
+import { errorText } from '../../common/util';
 
 type Props = {
   register: ReturnType<typeof useForm>['register'];
+  errors: ReturnType<typeof useForm>['errors'];
 };
 
-const EmailInput = ({ register }: Props): JSX.Element | null => {
+const EmailInput = ({ register, errors }: Props): JSX.Element | null => {
   const { t } = useTranslation();
   return (
     <>
@@ -27,6 +29,8 @@ const EmailInput = ({ register }: Props): JSX.Element | null => {
           name="contactPerson.email"
           type="email"
           required
+          invalid={!!errors.contactPerson?.email?.type}
+          errorText={errorText(t, errors.contactPerson?.email?.type)}
         />
       </SpanTwoColumns>
     </>

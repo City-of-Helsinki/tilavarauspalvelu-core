@@ -11,6 +11,8 @@ type Props = {
   control: ReturnType<typeof useForm>['control'];
   required: boolean;
   options: OptionType[];
+  error?: string;
+  validate?: { [key: string]: (val: string) => boolean };
 };
 const ControlledSelect = ({
   name,
@@ -18,13 +20,15 @@ const ControlledSelect = ({
   control,
   required,
   options,
+  error,
+  validate,
 }: Props): JSX.Element => {
   const { t } = useTranslation();
   return (
     <Controller
       control={control}
       name={name}
-      rules={{ required }}
+      rules={{ required, validate }}
       onFocus={() => {
         document.getElementById(`${name}-toggle-button`)?.focus();
       }}
@@ -44,6 +48,8 @@ const ControlledSelect = ({
             onChange={(selection: OptionType): void => {
               newProps.onChange(selection.value);
             }}
+            invalid={Boolean(error)}
+            error={error}
           />
         );
       }}

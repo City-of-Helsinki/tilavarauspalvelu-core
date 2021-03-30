@@ -1,12 +1,4 @@
-import {
-  Button,
-  IconArrowDown,
-  IconArrowUp,
-  IconGroup,
-  IconPlusCircle,
-  IconTrash,
-  Notification,
-} from 'hds-react';
+import { Button, IconPlusCircle, Notification } from 'hds-react';
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -20,164 +12,7 @@ import {
 } from '../../common/types';
 import Modal from '../../component/Modal';
 import ReservationUnitModal from './ReservationUnitModal';
-import { getAddress, getMainImage, localizedValue } from '../../common/util';
-
-type CardProps = {
-  order: number;
-  reservationUnit: ReservationUnit;
-  onDelete: (reservationUnit: ReservationUnit) => void;
-  first: boolean;
-  last: boolean;
-  onMoveUp: (reservationUnit: ReservationUnit) => void;
-  onMoveDown: (reservationUnit: ReservationUnit) => void;
-};
-
-const NameCardContainer = styled.div`
-  margin-top: var(--spacing-l);
-`;
-
-const PreCardLabel = styled.div`
-  font-size: var(--fontsize-heading-xs);
-  font-weight: 700;
-`;
-
-const CardButtonContainer = styled.div`
-  display: grid;
-  grid-template-columns: 4fr 1fr;
-  margin-top: var(--spacing-s);
-  align-items: center;
-`;
-
-const CardContainer = styled.div`
-  gap: var(--spacing-s);
-  background-color: white;
-  display: grid;
-  grid-template-columns: 76px 5fr 1fr 1fr;
-  align-items: center;
-`;
-
-const Image = styled.img`
-  width: 76px;
-  height: 99px;
-  object-fit: cover;
-`;
-
-const Name = styled.div`
-  font-size: var(--fontsize-heading-m);
-  font-family: var(--font-bold);
-`;
-
-const BuildingName = styled.div`
-  font-family: var(--font-bold);
-  font-size: var(--fontsize-body-l);
-`;
-
-const Address = styled.div`
-  font-size: var(--fontsize-body-s);
-`;
-
-const MaxPersonsContainer = styled.div`
-  display: flex;
-  justify-items: center;
-  font-size: var(--fontsize-body-l);
-  font-weight: bold;
-`;
-
-const MaxPersonsCountContainer = styled.span`
-  margin-left: var(--spacing-xs);
-`;
-
-const ArrowContainer = styled.div`
-  display: flex;
-`;
-
-const Circle = styled.div<{ passive: boolean }>`
-  margin-left: var(--spacing-xs);
-  height: var(--spacing-layout-m);
-  width: var(--spacing-layout-m);
-  background-color: ${(props) =>
-    props.passive ? 'var(--color-black-10)' : 'var(--color-bus)'};
-  color: ${(props) => (props.passive ? 'var(--color-black-50)' : 'white')};
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-
-const ReservationUnitCard = ({
-  reservationUnit,
-  order,
-  onDelete,
-  first,
-  last,
-  onMoveUp,
-  onMoveDown,
-}: CardProps): JSX.Element => {
-  const { i18n, t } = useTranslation();
-
-  return (
-    <NameCardContainer>
-      <PreCardLabel>
-        {t('ReservationUnitList.option')} {order + 1}.
-      </PreCardLabel>
-      <CardButtonContainer>
-        <CardContainer>
-          <Image
-            src={getMainImage(reservationUnit)?.smallUrl}
-            alt={t('common.imgAltForSpace', {
-              name: localizedValue(reservationUnit.name, i18n.language),
-            })}
-          />
-          <div>
-            <Name>{localizedValue(reservationUnit.name, i18n.language)}</Name>
-            <BuildingName>
-              {localizedValue(reservationUnit.building.name, i18n.language)}
-            </BuildingName>
-            <Address>{getAddress(reservationUnit)}</Address>
-          </div>
-          <MaxPersonsContainer>
-            <IconGroup aria-hidden />
-            <MaxPersonsCountContainer>
-              {reservationUnit.maxPersons}
-            </MaxPersonsCountContainer>
-          </MaxPersonsContainer>
-          <div>
-            <Button
-              variant="supplementary"
-              iconLeft={<IconTrash aria-hidden />}
-              onClick={() => {
-                onDelete(reservationUnit);
-              }}>
-              {t('ReservationUnitList.buttonRemove')}
-            </Button>
-          </div>
-        </CardContainer>
-        <ArrowContainer>
-          <Circle passive={first}>
-            <button
-              className="button-reset"
-              disabled={first}
-              type="button"
-              aria-label={t('ReservationUnitList.buttonUp')}
-              onClick={() => onMoveUp(reservationUnit)}>
-              <IconArrowUp aria-hidden size="m" />
-            </button>
-          </Circle>
-          <Circle passive={last}>
-            <button
-              className="button-reset"
-              aria-label={t('ReservationUnitList.buttonDown')}
-              type="button"
-              disabled={last}
-              onClick={() => onMoveDown(reservationUnit)}>
-              <IconArrowDown aria-hidden size="m" />
-            </button>
-          </Circle>
-        </ArrowContainer>
-      </CardButtonContainer>
-    </NameCardContainer>
-  );
-};
+import ReservationUnitCard from './ReservationUnitCard';
 
 type OptionTypes = {
   purposeOptions: OptionType[];
@@ -192,6 +27,7 @@ type Props = {
   form: ReturnType<typeof useForm>;
   applicationRound: ApplicationRound;
   options: OptionTypes;
+  minSize?: number;
 };
 
 const MainContainer = styled.div`
@@ -209,6 +45,7 @@ const ReservationUnitList = ({
   fieldName,
   applicationRound,
   options,
+  minSize,
 }: Props): JSX.Element => {
   const [showModal, setShowModal] = useState(false);
   const [reservationUnits, setReservationUnits] = useState(
@@ -219,18 +56,39 @@ const ReservationUnitList = ({
     setReservationUnits([...reservationUnits, ru]);
   };
 
+  const isValid = (units: ReservationUnit[]) => {
+    const error = units
+      .map((resUnit) => minSize && resUnit.maxPersons < minSize)
+      .find((a) => a);
+    return !error;
+  };
+
   useEffect(() => {
     form.setValue(
       fieldName,
-      reservationUnits.map((ru, index) => ({
-        reservationUnitId: ru.id,
-        priority: index,
-      }))
+      reservationUnits.map((resUnit, index) => {
+        return {
+          reservationUnitId: resUnit.id,
+          priority: index,
+          maxPersons: resUnit.maxPersons,
+        };
+      })
     );
-  }, [reservationUnits, fieldName, form]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reservationUnits]);
 
   useEffect(() => {
-    let isMounted = true; // note this flag denote mount status
+    const valid = isValid(reservationUnits);
+    if (valid) {
+      form.clearErrors([fieldName]);
+    } else {
+      form.setError(fieldName, { type: 'reservationUnitTooSmall' });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reservationUnits, minSize]);
+
+  useEffect(() => {
+    let isMounted = true;
     let data;
     const fetchData = async () => {
       if (applicationEvent.eventReservationUnits?.length === 0) {
@@ -295,6 +153,7 @@ const ReservationUnitList = ({
         return (
           <ReservationUnitCard
             key={ru.id}
+            invalid={(minSize && ru.maxPersons < minSize) || false}
             onDelete={remove}
             reservationUnit={ru}
             order={index}

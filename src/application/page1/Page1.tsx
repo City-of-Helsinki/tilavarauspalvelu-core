@@ -1,9 +1,4 @@
-import {
-  Button,
-  IconArrowRight,
-  IconPlusCircleFill,
-  Notification,
-} from 'hds-react';
+import { Button, IconArrowRight, IconPlusCircleFill } from 'hds-react';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
@@ -86,7 +81,6 @@ const Page1 = ({
   selectedReservationUnits,
 }: Props): JSX.Element | null => {
   const [ready, setReady] = useState(false);
-  const [msg, setMsg] = useState('');
   const [options, setOptions] = useState<OptionTypes>();
 
   const history = useHistory();
@@ -128,11 +122,6 @@ const Page1 = ({
     }
     fetchData();
   }, []);
-
-  useEffect(() => {
-    if (form.formState.isSubmitted && !form.formState.isSubmitSuccessful)
-      setMsg('Please fill out all required fields');
-  }, [form.formState]);
 
   const prepareData = (data: Application): Application => {
     const applicationCopy = {
@@ -176,16 +165,6 @@ const Page1 = ({
 
   return (
     <>
-      {msg ? (
-        <Notification
-          type="error"
-          size="small"
-          label=""
-          autoClose
-          onClose={() => setMsg('')}>
-          {msg}
-        </Notification>
-      ) : null}
       {application.applicationEvents.map((event, index) => {
         return (
           <ApplicationEvent

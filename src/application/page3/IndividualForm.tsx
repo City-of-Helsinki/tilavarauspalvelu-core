@@ -13,7 +13,7 @@ import RadioButtons from './RadioButtons';
 import EmailInput from './EmailInput';
 import BillingAddress from './BillingAddress';
 import Buttons from './Buttons';
-import { deepCopy } from '../../common/util';
+import { deepCopy, errorText } from '../../common/util';
 
 type Props = {
   activeForm: FormType;
@@ -30,10 +30,10 @@ const IndividualForm = ({
 }: Props): JSX.Element | null => {
   const { t } = useTranslation();
 
-  const { register, handleSubmit } = useForm({
+  const { register, handleSubmit, errors } = useForm({
     defaultValues: {
-      contactPerson: { ...application.contactPerson },
-      billingAddress: { ...application.billingAddress },
+      contactPerson: { ...application.contactPerson } as ContactPerson,
+      billingAddress: { ...application.billingAddress } as Address,
     },
   });
 
@@ -72,6 +72,8 @@ const IndividualForm = ({
             id="contactPerson.firstName"
             name="contactPerson.firstName"
             required
+            invalid={!!errors.contactPerson?.firstName?.type}
+            errorText={errorText(t, errors.contactPerson?.firstName?.type)}
           />
           <TextInput
             ref={register({ required: true })}
@@ -79,16 +81,20 @@ const IndividualForm = ({
             id="contactPerson.lastName"
             name="contactPerson.lastName"
             required
+            invalid={!!errors.contactPerson?.lastName?.type}
+            errorText={errorText(t, errors.contactPerson?.lastName?.type)}
           />
-          <BillingAddress register={register} />
+          <BillingAddress register={register} errors={errors} />
           <TextInput
             ref={register({ required: true })}
             label={t('Application.Page3.contactPerson.phoneNumber')}
             id="contactPerson.phoneNumber"
             name="contactPerson.phoneNumber"
             required
+            invalid={!!errors.contactPerson?.phoneNumber?.type}
+            errorText={errorText(t, errors.contactPerson?.phoneNumber?.type)}
           />
-          <EmailInput register={register} />
+          <EmailInput register={register} errors={errors} />
         </TwoColumnContainer>
       </RadioButtons>
       <Buttons onSubmit={handleSubmit(onSubmit)} />

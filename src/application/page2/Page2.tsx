@@ -1,4 +1,4 @@
-import { Button, IconArrowLeft, IconArrowRight } from 'hds-react';
+import { Button, IconArrowLeft, IconArrowRight, Notification } from 'hds-react';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDebounce } from 'use-debounce';
@@ -29,6 +29,8 @@ const ButtonContainer = styled.div`
 `;
 
 const Page2 = ({ application, onNext }: Props): JSX.Element => {
+  const [msg, setMsg] = useState('');
+
   const [selectorData, setSelectorData] = useState<Cell[][][]>(
     application.applicationEvents.map((applicationEvent) =>
       applicationEventSchedulesToCells(
@@ -78,11 +80,30 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
 
   const onSubmit = () => {
     const appToSave = prepareData(application);
+    if (
+      appToSave.applicationEvents
+        .map((ae) => ae.applicationEventSchedules.length > 0)
+        .filter((l) => l === false).length > 0
+    ) {
+      setMsg('Application.error.missingSchedule');
+      return;
+    }
     onNext(appToSave);
   };
 
   return (
     <>
+      {msg ? (
+        <Notification
+          type="error"
+          label={t(msg)}
+          position="top-center"
+          autoClose
+          displayAutoCloseProgress={false}
+          onClose={() => setMsg('')}>
+          {t(msg)}
+        </Notification>
+      ) : null}{' '}
       {application.applicationEvents.map((event, index) => {
         return (
           <Accordion
@@ -105,7 +126,6 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
           </Accordion>
         );
       })}
-
       <ButtonContainer>
         <Button variant="secondary" iconLeft={<IconArrowLeft />} disabled>
           {t('common.prev')}

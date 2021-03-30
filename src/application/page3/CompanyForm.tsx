@@ -2,13 +2,23 @@ import React, { useState } from 'react';
 import { TextInput, Checkbox } from 'hds-react';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
-import { Application, FormType } from '../../common/types';
-import { SpanTwoColumns, TwoColumnContainer } from '../../component/common';
+import {
+  Address,
+  Application,
+  ContactPerson,
+  FormType,
+  Organisation,
+} from '../../common/types';
+import {
+  CheckboxWrapper,
+  SpanTwoColumns,
+  TwoColumnContainer,
+} from '../../component/common';
 import RadioButtons from './RadioButtons';
 import EmailInput from './EmailInput';
 import BillingAddress from './BillingAddress';
 import Buttons from './Buttons';
-import { deepCopy } from '../../common/util';
+import { deepCopy, errorText } from '../../common/util';
 
 type Props = {
   activeForm: FormType;
@@ -29,11 +39,11 @@ const CompanyForm = ({
     application.billingAddress !== null
   );
 
-  const { register, handleSubmit } = useForm({
+  const { register, handleSubmit, errors } = useForm({
     defaultValues: {
-      organisation: { ...application.organisation },
-      contactPerson: { ...application.contactPerson },
-      billingAddress: { ...application.billingAddress },
+      organisation: { ...application.organisation } as Organisation,
+      contactPerson: { ...application.contactPerson } as ContactPerson,
+      billingAddress: { ...application.billingAddress } as Address,
     },
   });
 
@@ -69,6 +79,8 @@ const CompanyForm = ({
               id="organisation.name"
               name="organisation.name"
               required
+              invalid={!!errors.organisation?.name?.type}
+              errorText={errorText(t, errors.organisation?.name?.type)}
             />
             <TextInput
               ref={register({ required: true })}
@@ -76,6 +88,8 @@ const CompanyForm = ({
               id="organisation.coreBusiness"
               name="organisation.coreBusiness"
               required
+              invalid={!!errors.organisation?.coreBusiness?.type}
+              errorText={errorText(t, errors.organisation?.coreBusiness?.type)}
             />
           </SpanTwoColumns>
           <TextInput
@@ -84,6 +98,8 @@ const CompanyForm = ({
             id="organisation.identifier"
             name="organisation.identifier"
             required
+            invalid={!!errors.organisation?.identifier?.type}
+            errorText={errorText(t, errors.organisation?.identifier?.type)}
           />
           <span />
           <TextInput
@@ -92,6 +108,11 @@ const CompanyForm = ({
             id="organisation.address.streetAddress"
             name="organisation.address.streetAddress"
             required
+            invalid={!!errors.organisation?.address?.streetAddress?.type}
+            errorText={errorText(
+              t,
+              errors.organisation?.address?.streetAddress?.type
+            )}
           />
           <TextInput
             ref={register({ required: true })}
@@ -99,6 +120,11 @@ const CompanyForm = ({
             id="organisation.address.postCode"
             name="organisation.address.postCode"
             required
+            invalid={!!errors.organisation?.address?.postCode?.type}
+            errorText={errorText(
+              t,
+              errors.organisation?.address?.postCode?.type
+            )}
           />
           <TextInput
             ref={register({ required: true })}
@@ -106,21 +132,31 @@ const CompanyForm = ({
             id="organisation.address.city"
             name="organisation.address.city"
             required
+            invalid={!!errors.organisation?.address?.city?.type}
+            errorText={errorText(t, errors.organisation?.address?.city?.type)}
           />
-          <Checkbox
-            label={t('Application.Page3.organisation.separateInvoicingAddress')}
-            id="organisation.hasInvoicingAddress"
-            name="organisation.hasInvoicingAddress"
-            checked={hasBillingAddress}
-            onClick={() => setHasBillingAddress(!hasBillingAddress)}
-          />
-          {hasBillingAddress ? <BillingAddress register={register} /> : null}
+          <CheckboxWrapper>
+            <Checkbox
+              label={t(
+                'Application.Page3.organisation.separateInvoicingAddress'
+              )}
+              id="organisation.hasInvoicingAddress"
+              name="organisation.hasInvoicingAddress"
+              checked={hasBillingAddress}
+              onClick={() => setHasBillingAddress(!hasBillingAddress)}
+            />
+          </CheckboxWrapper>
+          {hasBillingAddress ? (
+            <BillingAddress register={register} errors={errors} />
+          ) : null}
           <TextInput
             ref={register({ required: true })}
             label={t('Application.Page3.contactPerson.phoneNumber')}
             id="contactPerson.phoneNumber"
             name="contactPerson.phoneNumber"
             required
+            invalid={!!errors.contactPerson?.phoneNumber?.type}
+            errorText={errorText(t, errors.contactPerson?.phoneNumber?.type)}
           />
           <TextInput
             ref={register({ required: true })}
@@ -128,6 +164,8 @@ const CompanyForm = ({
             id="contactPerson.firstName"
             name="contactPerson.firstName"
             required
+            invalid={!!errors.contactPerson?.firstName?.type}
+            errorText={errorText(t, errors.contactPerson?.firstName?.type)}
           />
           <TextInput
             ref={register({ required: true })}
@@ -135,8 +173,10 @@ const CompanyForm = ({
             id="contactPerson.lastName"
             name="contactPerson.lastName"
             required
+            invalid={!!errors.contactPerson?.lastName?.type}
+            errorText={errorText(t, errors.contactPerson?.lastName?.type)}
           />
-          <EmailInput register={register} />
+          <EmailInput register={register} errors={errors} />
         </TwoColumnContainer>
       </RadioButtons>
       <Buttons onSubmit={handleSubmit(onSubmit)} />

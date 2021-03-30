@@ -7,7 +7,7 @@ interface Props {
   children: React.ReactNode;
 }
 const Main = styled.main`
-  font-size: var(--fontsize-body-xl);
+  font-size: var(--fontsize-body-m);
   flex-grow: 1;
 `;
 

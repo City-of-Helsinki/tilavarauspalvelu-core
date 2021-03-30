@@ -48,6 +48,26 @@ const translations: Translations = {
     },
   },
   Application: {
+    error: {
+      required: ['Pakollinen', 'Required', 'Obligatorisk'],
+
+      numPersonsMin: ['Ryhmän koko virheellinen'],
+      minDurationBiggerThanMaxDuration: [
+        'Minimikesto on suurempi kuin maksimikesto',
+      ],
+      maxDurationSmallerThanMinDuration: [
+        'Maksimikesto on pienempi kuin minimikesto',
+      ],
+      eventsPerWeekMin: ['Minimissään yksi vuoro viikossa'],
+      beginAfterEnd: ['Kauden aloituspäivä myöhempi kuin lopetuspäivä'],
+      beginBeforePeriodBegin: ['Kauden aloituspäivä on liian aikainen'],
+      beginAfterPeriodEnd: ['Kauden aloituspäivä on liian myöhäinen'],
+      endAfterPeriodEnd: ['Kauden lopetuspäivä on liian myöhäinen'],
+      endBeforeBegin: ['Kauden lopetuspäivä on aikaisempi kuin aloituspäivä'],
+      endBeforePeriodBegin: ['Kauden lopetuspäivä on liian aikainen'],
+      missingSchedule: ['Lisää kaikille vakiovuoroille vähintään yksi aika'],
+      reservationUnitTooSmall: ['Tila on liian pieni ryhmän käyttöön'],
+    },
     Intro: {
       startNewApplication: ['Aloita hakemuksen täyttäminen'],
     },

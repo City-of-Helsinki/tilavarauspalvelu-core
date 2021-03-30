@@ -1,4 +1,5 @@
 import { isAfter, parseISO, isBefore, format } from 'date-fns';
+import { TFunction } from 'i18next';
 import { stringify } from 'query-string';
 import { ReservationUnitsParameters } from './api';
 import { searchPrefix, emptyOption, applicationsPrefix } from './const';
@@ -236,3 +237,6 @@ export const getAddress = (ru: ReservationUnit): string | null => {
 };
 
 export const applicationUrl = (id: number): string => `/application/${id}`;
+
+export const errorText = (t: TFunction, key: string | undefined): string =>
+  key ? t(`Application.error.${key}`) : '';

@@ -11,7 +11,7 @@ export const TwoColumnContainer = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--spacing-m);
-  align-items: center;
+  align-items: baseline;
 `;
 
 export const SpanTwoColumns = styled.span`
@@ -48,4 +48,9 @@ export const HorisontalRule = styled.div`
 `;
 export const CenterSpinner = styled(LoadingSpinner)`
   margin: 0 auto var(--spacing-2-xl) auto;
+`;
+
+export const CheckboxWrapper = styled.div`
+  margin-top: 2.5em;
+  margin-bottom: auto;
 `;
