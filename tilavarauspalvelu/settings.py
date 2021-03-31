@@ -163,6 +163,7 @@ env = environ.Env(
     TUNNISTAMO_ADMIN_SECRET=(str, None),
     TUNNISTAMO_ADMIN_OIDC_ENDPOINT=(str, "https://api.hel.fi/sso/openid/"),
     HAUKI_API_URL=(str, None),
+    HAUKI_ORIGIN_ID=(str, "tvp"),
     CSRF_TRUSTED_ORIGINS=(list, []),
 )
 
@@ -199,6 +200,10 @@ MEDIA_ROOT = env("MEDIA_ROOT")
 
 STATIC_URL = env("STATIC_URL")
 MEDIA_URL = env("MEDIA_URL")
+
+HAUKI_API_URL = env("HAUKI_API_URL")
+HAUKI_ORIGIN_ID = env("HAUKI_ORIGIN_ID")
+
 
 RESERVATION_UNIT_IMAGES_ROOT = "reservation_unit_images"
 
