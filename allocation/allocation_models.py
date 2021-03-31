@@ -22,7 +22,13 @@ def time_delta_to_integer_with_precision(delta: datetime.timedelta):
     return math.ceil(delta.total_seconds() / 60 / ALLOCATION_PRECISION)
 
 
+def integer_to_time_from_precision(integer_time: int):
+    return datetime.time.min() + integer_time * ALLOCATION_PRECISION
+
+
 class AllocationSpace(object):
+    """Would like to have some proper definition here"""
+
     def __init__(
         self,
         unit: ReservationUnit,
@@ -69,6 +75,8 @@ class AllocationSpace(object):
 
 
 class AllocationOccurrence(object):
+    """Would like to have some proper definition here"""
+
     def __init__(self, occurrence: EventOccurrence):
         self.weekday = occurrence.weekday
         self.begin = time_delta_to_integer_with_precision(
@@ -83,6 +91,8 @@ class AllocationOccurrence(object):
 
 
 class AllocationEvent(object):
+    """Would like to have some proper definition here"""
+
     def __init__(
         self,
         id: int,
@@ -125,6 +135,8 @@ class AllocationEvent(object):
 
 
 class AllocationBasket(object):
+    """Would like to have some proper definition here"""
+
     def __init__(
         self,
         id: int,
@@ -141,6 +153,8 @@ class AllocationBasket(object):
 
 
 class AllocationData(object):
+    """Would like to have some proper definition here"""
+
     def __init__(
         self,
         period_start: datetime.date,
@@ -154,3 +168,38 @@ class AllocationData(object):
         self.spaces = spaces
         self.baskets = baskets
         self.output_basket_ids = output_basket_ids
+
+
+class AllocatedEvent(object):
+    """Would like to have some proper definition here"""
+
+    def __init__(
+        self,
+        space: AllocationSpace,
+        event: AllocationEvent,
+        duration: int,
+        occurrence_id: int,
+        event_id: int,
+        start: datetime.time,
+        end: datetime.time,
+        basket: AllocationBasket,
+    ):
+        self.space_id = space.id  # Note; this is a ReservationUnit id.
+        self.event_id = event.id
+        self.duration = datetime.timedelta(minutes=duration * ALLOCATION_PRECISION)
+        self.occurrence_id = occurrence_id
+        self.begin = start
+        self.end = end
+        self.basket_id = basket.id
+        self.event_id = event_id
+
+    def __str__(self):
+        return "{} {} {} {} {} {} {}".format(
+            self.space_id,
+            self.event_id,
+            self.duration,
+            self.occurrence_id,
+            self.begin,
+            self.end,
+            self.basket_id,
+        )
