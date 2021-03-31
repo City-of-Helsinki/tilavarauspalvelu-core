@@ -1,4 +1,5 @@
 import pytest
+from freezegun import freeze_time
 from rest_framework.reverse import reverse
 
 from applications.models import Application, ApplicationEvent
@@ -24,6 +25,7 @@ def test_application_create(
 
 
 @pytest.mark.django_db
+@freeze_time("2021-01-15")
 def test_application_update_should_update_organisation_and_contact_person(
     user_api_client, application, organisation, person, purpose, application_round
 ):
@@ -66,6 +68,7 @@ def test_application_update_should_update_organisation_and_contact_person(
 
 
 @pytest.mark.django_db
+@freeze_time("2021-01-15")
 def test_application_update_should_null_organisation_and_contact_person(
     user_api_client, application, organisation, person, purpose, application_round
 ):
@@ -93,6 +96,7 @@ def test_application_update_should_null_organisation_and_contact_person(
 
 
 @pytest.mark.django_db
+@freeze_time("2021-01-15")
 def test_application_update_updating_and_adding_application_events(
     user_api_client,
     application,
@@ -146,6 +150,7 @@ def test_application_update_updating_and_adding_application_events(
 
 
 @pytest.mark.django_db
+@freeze_time("2021-01-15")
 def test_application_update_should_remove_application_events_if_no_longer_in_data(
     user_api_client,
     application,
@@ -192,6 +197,7 @@ def test_application_fetch(user_api_client, application):
 
 
 @pytest.mark.django_db
+@freeze_time("2021-01-15")
 def test_application_event_save(user_api_client, valid_application_event_data):
     assert ApplicationEvent.objects.count() == 0
     data = valid_application_event_data
@@ -208,6 +214,7 @@ def test_application_event_save(user_api_client, valid_application_event_data):
 
 
 @pytest.mark.django_db
+@freeze_time("2021-01-15")
 def test_application_event_invalid_durations(
     user_api_client, valid_application_event_data
 ):
@@ -227,6 +234,7 @@ def test_application_event_invalid_durations(
 
 
 @pytest.mark.django_db
+@freeze_time("2021-01-15")
 def test_application_update_review_valid(
     user_api_client,
     application,
@@ -273,6 +281,7 @@ def test_application_update_review_valid(
 
 
 @pytest.mark.django_db
+@freeze_time("2021-01-15")
 def test_application_review_invalid(
     purpose,
     application_round,
@@ -319,6 +328,7 @@ def test_user_can_create_application(user_api_client, valid_application_data):
 
 
 @pytest.mark.django_db
+@freeze_time("2021-01-15")
 def test_user_can_update_own_application(
     user_api_client, application, valid_application_data
 ):
@@ -328,6 +338,19 @@ def test_user_can_update_own_application(
         format="json",
     )
     assert response.status_code == 200
+
+
+@pytest.mark.django_db
+@freeze_time("2021-02-01")
+def test_user_cannot_update_own_application_after_period_end(
+    user_api_client, application, valid_application_data
+):
+    response = user_api_client.put(
+        reverse("application-detail", kwargs={"pk": application.id}),
+        data=valid_application_data,
+        format="json",
+    )
+    assert response.status_code == 403
 
 
 @pytest.mark.django_db
@@ -403,6 +426,7 @@ def test_wrong_service_sector_admin_cannot_create_or_update_application(
 
 
 @pytest.mark.django_db
+@freeze_time("2021-01-15")
 def test_user_can_create_application_event(
     user_api_client, valid_application_event_data
 ):
@@ -415,6 +439,7 @@ def test_user_can_create_application_event(
 
 
 @pytest.mark.django_db
+@freeze_time("2021-01-15")
 def test_user_can_update_application_event(
     user_api_client, valid_application_event_data, application_event
 ):
