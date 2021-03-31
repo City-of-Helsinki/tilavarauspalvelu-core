@@ -145,7 +145,7 @@ env = environ.Env(
     STATIC_ROOT=(environ.Path(BASE_DIR), root("staticroot")),
     MEDIA_URL=(str, "/media/"),
     STATIC_URL=(str, "/static/"),
-    TRUST_X_FORWARDED_HOST=(bool, True),
+    TRUST_X_FORWARDED_HOST=(bool, False),
     SENTRY_DSN=(str, ""),
     SENTRY_ENVIRONMENT=(str, "development"),
     MAIL_MAILGUN_KEY=(str, ""),
@@ -163,6 +163,7 @@ env = environ.Env(
     TUNNISTAMO_ADMIN_KEY=(str, "tilanvaraus-django-admin-dev"),
     TUNNISTAMO_ADMIN_SECRET=(str, None),
     TUNNISTAMO_ADMIN_OIDC_ENDPOINT=(str, "https://api.hel.fi/sso/openid/"),
+    IPWARE_META_PRECEDENCE_ORDER=(str, "HTTP_X_FORWARDED_FOR"),
     HAUKI_API_URL=(str, None),
     HAUKI_ORIGIN_ID=(str, "tvp"),
     CSRF_TRUSTED_ORIGINS=(list, []),
@@ -282,6 +283,7 @@ OIDC_API_TOKEN_AUTH = {
 SOCIAL_AUTH_TUNNISTAMO_KEY = env("TUNNISTAMO_ADMIN_KEY")
 SOCIAL_AUTH_TUNNISTAMO_SECRET = env("TUNNISTAMO_ADMIN_SECRET")
 SOCIAL_AUTH_TUNNISTAMO_OIDC_ENDPOINT = env("TUNNISTAMO_ADMIN_OIDC_ENDPOINT")
+IPWARE_META_PRECEDENCE_ORDER = env("IPWARE_META_PRECEDENCE_ORDER")
 
 GRAPHENE = {"SCHEMA": "api.graphql.schema.schema"}
 
