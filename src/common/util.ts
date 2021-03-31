@@ -1,5 +1,5 @@
 import { isAfter, parseISO, isBefore, format } from 'date-fns';
-import { TFunction } from 'i18next';
+import i18next, { TFunction } from 'i18next';
 import { stringify } from 'query-string';
 import { ReservationUnitsParameters } from './api';
 import { searchPrefix, emptyOption, applicationsPrefix } from './const';
@@ -42,9 +42,28 @@ export const parseDate = (date: string): Date => parseISO(date);
 
 export const formatDate = (date: string): string => {
   if (!date) {
-    return 'no date';
+    return '-';
   }
   return format(parseISO(date), 'd. M. yyyy');
+};
+
+export const formatDuration = (duration: string): string => {
+  if (!duration) {
+    return '-';
+  }
+  const time = duration.split(':');
+  if (time.length < 3) {
+    return '-';
+  }
+  return `${
+    Number(time[0])
+      ? `${`${Number(time[0])} ${i18next
+          .t('common.hour')
+          .toLocaleLowerCase()}`} `
+      : ''
+  }${
+    Number(time[1]) ? time[1] + i18next.t('common.abbreviations.minute') : ''
+  }`;
 };
 
 export const formatApiDate = (date: string): string => {

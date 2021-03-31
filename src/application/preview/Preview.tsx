@@ -4,7 +4,12 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { Application, ReservationUnit, Parameter } from '../../common/types';
-import { deepCopy, formatDate, localizedValue } from '../../common/util';
+import {
+  deepCopy,
+  formatDate,
+  formatDuration,
+  localizedValue,
+} from '../../common/util';
 import { getParameters, getReservationUnit } from '../../common/api';
 import LabelValue from '../../component/LabelValue';
 import TimePreview from '../TimePreview';
@@ -89,9 +94,6 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
   const [purposeOptions, setPurposeOptions] = useState<{
     [key: number]: Parameter;
   }>({});
-  const [abilityGroupOptions, setAbilityGroupOptions] = useState<{
-    [key: number]: Parameter;
-  }>({});
   const [reservationUnits, setReservationUnits] = useState<{
     [key: number]: ReservationUnit;
   }>({});
@@ -100,6 +102,7 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
   const { i18n } = useTranslation();
 
   useEffect(() => {
+    let mounted = true;
     async function fetchData() {
       const reservationUnitIds = Array.from(
         new Set(
@@ -113,21 +116,29 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
         reservationUnitIds.map((ru) => getReservationUnit(ru.reservationUnitId))
       );
 
-      setReservationUnits(
-        mapArrayById(fetchedReservationUnits) as {
-          [key: number]: ReservationUnit;
-        }
-      );
+      if (mounted) {
+        setReservationUnits(
+          mapArrayById(fetchedReservationUnits) as {
+            [key: number]: ReservationUnit;
+          }
+        );
+      }
 
-      const fetchedAbilityGroupOptions = await getParameters('ability_group');
-      setAbilityGroupOptions(mapArrayById(fetchedAbilityGroupOptions));
       const fetchedAgeGroupOptions = await getParameters('age_group');
-      setAgeGroupOptions(mapArrayById(fetchedAgeGroupOptions));
+      if (mounted) {
+        setAgeGroupOptions(mapArrayById(fetchedAgeGroupOptions));
+      }
       const fetchedPurposeOptions = await getParameters('purpose');
-      setPurposeOptions(mapArrayById(fetchedPurposeOptions));
-      setReady(true);
+      if (mounted) {
+        setPurposeOptions(mapArrayById(fetchedPurposeOptions));
+        setReady(true);
+      }
     }
     fetchData();
+
+    return () => {
+      mounted = false;
+    };
   }, [application]);
 
   const { t } = useTranslation();
@@ -187,17 +198,6 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
               }
             />{' '}
             <LabelValue
-              label={t('Application.preview.applicationEvent.abilityGroup')}
-              value={
-                applicationEvent.abilityGroupId != null
-                  ? localizedValue(
-                      abilityGroupOptions[applicationEvent.abilityGroupId].name,
-                      i18n.language
-                    )
-                  : ''
-              }
-            />{' '}
-            <LabelValue
               label={t('Application.preview.applicationEvent.purpose')}
               value={
                 applicationEvent.purposeId != null
@@ -209,16 +209,20 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
               }
             />{' '}
             <LabelValue
-              label={t('Application.preview.applicationEvent.additionalInfo')}
-              value=""
-            />
-            <LabelValue
               label={t('Application.preview.applicationEvent.begin')}
               value={formatDate(applicationEvent.begin || '')}
             />
             <LabelValue
               label={t('Application.preview.applicationEvent.end')}
               value={formatDate(applicationEvent.end || '')}
+            />
+            <LabelValue
+              label={t('Application.preview.applicationEvent.minDuration')}
+              value={formatDuration(applicationEvent.minDuration as string)}
+            />
+            <LabelValue
+              label={t('Application.preview.applicationEvent.maxDuration')}
+              value={formatDuration(applicationEvent.maxDuration as string)}
             />
             <LabelValue
               label={t('Application.preview.applicationEvent.eventsPerWeek')}

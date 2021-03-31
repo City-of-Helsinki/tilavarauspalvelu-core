@@ -143,7 +143,6 @@ const ApplicationEvent = ({
 
   const {
     ageGroupOptions,
-    abilityGroupOptions,
     purposeOptions,
     reservationUnitTypeOptions,
     participantCountOptions,
@@ -265,17 +264,6 @@ const ApplicationEvent = ({
             error={errorText(
               t,
               form.errors.applicationEvents?.[index]?.ageGroupId?.type
-            )}
-          />
-          <ControlledSelect
-            name={fieldName('abilityGroupId')}
-            required
-            label={t('Application.Page1.abilityGroup')}
-            control={form.control}
-            options={abilityGroupOptions}
-            error={errorText(
-              t,
-              form.errors.applicationEvents?.[index]?.abilityGroupId?.type
             )}
           />
           <SpanTwoColumns>

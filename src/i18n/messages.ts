@@ -226,6 +226,8 @@ const translations: Translations = {
       'applicationEvent.additionalInfo': ['Lisätietoja vuoroon liittyen'],
       'applicationEvent.begin': ['Kauden aloituspäivä'],
       'applicationEvent.end': ['Kauden päätöspäivä'],
+      'applicationEvent.minDuration': ['Minimikesto'],
+      'applicationEvent.maxDuration': ['Maksimikesto'],
       'applicationEvent.eventsPerWeek': ['Vuorojen määrä viikossa'],
       'applicationEvent.biweekly': ['Vakiovuorot vain joka toinen viikko'],
       'applicationEvent.reservationUnit': ['Vaihtoehto {{order}}.'],
@@ -298,7 +300,7 @@ const translations: Translations = {
     hour: ['Tunti'],
     abbreviations: {
       hour: ['t', 'h', 'h'],
-      minute: ['min'],
+      minute: ['min', 'min', 'min'],
     },
     login: ['Kirjaudu', 'Login', 'Logga in'],
     logout: ['Kirjaudu ulos', 'Logout', 'Logga ut'],
