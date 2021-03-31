@@ -121,6 +121,8 @@ class TranslatedModelSerializer(serializers.ModelSerializer):
 
     def build_field(self, source, *args, **kwargs):
         field_class, field_kwargs = super().build_field(source, *args, **kwargs)
+        print("WHATSHAPNING-------------------------------")
+        print("%s - %s" % (field_class, field_kwargs))
         if source in self.model_translatable_fields:
             field_kwargs["source"] = source
             field_kwargs["field_class"] = field_class

@@ -226,7 +226,9 @@ def test_ability_group_create(user_api_client, general_admin_api_client):
     assert response.status_code == 403
 
     response = general_admin_api_client.post(
-        reverse("ability_group-list"), data={"name": "new group"}, format="json"
+        reverse("ability_group-list"),
+        data={"name": {"fi": "uusi ryhmä", "en": "new_group", "sv": "ny grupp"}},
+        format="json",
     )
     assert response.status_code == 201
 
@@ -238,7 +240,7 @@ def test_ability_group_fetch(user_api_client, hobbyist_ability_group):
     response = user_api_client.get(reverse("ability_group-list"))
     assert response.status_code == 200
     assert len(response.data) == 1
-    assert response.data[0].get("name") == "Hobbyist level"
+    assert response.data[0].get("name").get("fi") == "Hobbyist level"
 
 
 @pytest.mark.django_db
