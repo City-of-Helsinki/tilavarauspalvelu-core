@@ -200,10 +200,15 @@ const ReservationUnitCard = ({
 };
 
 const MainContainer = styled.div`
-  margin: var(--spacing-m) 0;
-  padding: 0 4em;
-  overflow-x: hidden;
   overflow-y: auto;
+  width: 48em;
+  height: 40em;
+  @media (max-width: ${breakpoint.s}) {
+    margin: 0;
+    padding: var(--spacing-xs);
+    width: calc(100% - 2 * var(--spacing-xs));
+    height: 100%;
+  }
 `;
 
 const Heading = styled.div`

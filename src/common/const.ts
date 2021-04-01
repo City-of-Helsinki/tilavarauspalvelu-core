@@ -80,6 +80,8 @@ export const durationOptions = [
   option('2 t 30 min', '02:30:00'),
 ];
 
+export const defaultDuration = '01:00:00';
+
 export const isBrowser = typeof window !== 'undefined';
 
 // eslint-disable-next-line

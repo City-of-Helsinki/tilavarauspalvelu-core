@@ -95,7 +95,7 @@ const Application = (): JSX.Element | null => {
         postSave(loadedApplication.id);
       }
     } catch (e) {
-      setError(`${t('Application.error.saveFailed')}:${e.message}, ${e.stack}`);
+      setError(`${t('Application.error.saveFailed')}`);
     }
   };
 
@@ -163,6 +163,7 @@ const Application = (): JSX.Element | null => {
                 eventId?: number;
               }) => saveWithEffect(application, undefined, eventId)}
               addNewApplicationEvent={addNewApplicationEvent}
+              setError={setError}
             />
           </ApplicationPage>
         </Route>
@@ -206,7 +207,7 @@ const Application = (): JSX.Element | null => {
       {error ? (
         <Notification
           type="error"
-          label="Unexpected error"
+          label={error}
           position="top-center"
           autoClose
           displayAutoCloseProgress={false}

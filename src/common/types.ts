@@ -190,7 +190,12 @@ export type OptionType = {
 };
 
 export type Action = {
-  type: 'load' | 'addNewApplicationEvent' | 'save' | 'toggleAccordionState';
+  type:
+    | 'load'
+    | 'addNewApplicationEvent'
+    | 'save'
+    | 'toggleAccordionState'
+    | 'removeApplicationEvent';
   application?: Application;
   savedEventId?: number;
   eventId?: number;

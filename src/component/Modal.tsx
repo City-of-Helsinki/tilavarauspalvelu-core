@@ -2,12 +2,15 @@ import { Button } from 'hds-react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
+import { breakpoint } from '../common/style';
 
 type Props = {
+  handleOk?: () => void;
   handleClose: () => void;
   show: boolean;
   children: React.ReactNode;
   closeButtonKey?: string;
+  okButtonKey?: string;
 };
 
 const Overlay = styled.div`
@@ -21,46 +24,55 @@ const Overlay = styled.div`
 `;
 
 const ModalElement = styled.div`
+  padding: var(--spacing-layout-s);
   background: white;
-  max-width: var(--container-width-xl);
+  max-width: 100%;
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 101;
-  width: 80%;
-  height: 85%;
   display: flex;
   flex-direction: column;
+  max-height: 100%;
+  overflow-y: auto;
+  @media (max-width: ${breakpoint.s}) {
+    height: 100%;
+    width: 100%;
+    padding: 0;
+  }
 `;
 
-const MainContainer = styled.section`
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-  height: 100%;
-`;
+const MainContainer = styled.section``;
 
 const ButtonContainer = styled.div`
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  left: 0;
   background-color: white;
-  padding-top: var(--spacing-layout-xs);
-  padding-bottom: var(--spacing-layout-s);
-  padding-left: var(--spacing-layout-l);
+  bottom: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding-top: var(--spacing-layout-s);
 
-  & > button {
-    margin-right: var(--spacing-layout-s);
+  > button {
+    margin-right: var(--spacing-layout-m);
+    left: auto;
+    right: auto;
+  }
+
+  @media (max-width: ${breakpoint.s}) {
+    padding: var(--spacing-layout-xs);
+    > button {
+      margin: 0;
+    }
   }
 `;
 
 const Modal = ({
   handleClose,
+  handleOk,
   show,
   children,
   closeButtonKey = 'common.close',
+  okButtonKey = 'common.ok',
 }: Props): JSX.Element | null => {
   const { t } = useTranslation();
 
@@ -83,6 +95,11 @@ const Modal = ({
       <ModalElement>
         <MainContainer>{children}</MainContainer>
         <ButtonContainer>
+          {handleOk ? (
+            <Button variant="primary" onClick={handleOk}>
+              {t(okButtonKey)}
+            </Button>
+          ) : null}
           <Button variant="secondary" onClick={handleClose}>
             {t(closeButtonKey)}
           </Button>

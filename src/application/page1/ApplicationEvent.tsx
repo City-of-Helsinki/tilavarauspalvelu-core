@@ -1,8 +1,7 @@
 import React, { ChangeEvent, useEffect, useState } from 'react';
 import {
-  Button,
+  Button as HDSButton,
   Checkbox,
-  IconPaperclip,
   Notification,
   TextInput,
 } from 'hds-react';
@@ -31,8 +30,9 @@ import { CheckboxWrapper, HorisontalRule } from '../../component/common';
 import ApplicationEventSummary from './ApplicationEventSummary';
 import ControlledSelect from '../../component/ControlledSelect';
 import Accordion from '../../component/Accordion';
-import { durationOptions } from '../../common/const';
+import { defaultDuration, durationOptions } from '../../common/const';
 import { after, before } from './validation';
+import Modal from '../../component/Modal';
 
 type OptionTypes = {
   ageGroupOptions: OptionType[];
@@ -52,6 +52,7 @@ type Props = {
   editorState: EditorState;
   dispatch: React.Dispatch<Action>;
   onSave: () => void;
+  onDeleteEvent: () => void;
 };
 
 const SubHeadLine = styled.h2`
@@ -62,12 +63,13 @@ const SubHeadLine = styled.h2`
 `;
 
 const TwoColumnContainer = styled.div`
-  margin-top: var(--spacing-m);
+  margin-top: var(--spacing-l);
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: var(--spacing-m);
+  gap: var(--spacing-l);
   @media (max-width: ${breakpoint.m}) {
     grid-template-columns: 1fr;
+    gap: 0;
   }
 `;
 
@@ -93,11 +95,38 @@ const SpanTwoColumns = styled.span`
   }
 `;
 
-const SaveButton = styled(Button)`
-  margin-top: var(--spacing-layout-l);
+const ModalContent = styled.div`
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  max-width: 24em;
+  max-height: 100%;
+  height: 20em;
+  font-family: var(--font-bold);
+  @media (max-width: ${breakpoint.s}) {
+    margin-top: var(--spacing-layout-xs);
+    margin-left: var(--spacing-layout-xs);
+    margin-right: auto;
+  }
 `;
 
-const defaultDuration = '01:00:00';
+const ModalHeading = styled.div`
+  font-size: var(--fontsize-heading-l);
+`;
+
+const ModalText = styled.div`
+  margin-top: 2em;
+  font-size: var(--fontsize-body-l);
+`;
+
+const Button = styled(HDSButton)`
+  margin-top: var(--spacing-layout-l);
+  @media (max-width: ${breakpoint.s}) {
+    margin-top: var(--spacing-layout-s);
+    margin-left: auto;
+    margin-right: auto;
+  }
+`;
 
 const isOpen = (
   current: number | undefined,
@@ -132,6 +161,7 @@ const ApplicationEvent = ({
   editorState,
   dispatch,
   onSave,
+  onDeleteEvent,
 }: Props): JSX.Element => {
   const periodStartDate = formatApiDate(
     applicationRound.reservationPeriodBegin
@@ -140,6 +170,7 @@ const ApplicationEvent = ({
 
   const [defaultPeriodSelected, setDefaultPeriodSelected] = useState(false);
   const [defaultDurationSelected, setDefaultDurationSelected] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   const {
     ageGroupOptions,
@@ -153,7 +184,7 @@ const ApplicationEvent = ({
   const fieldName = (nameField: string) =>
     `applicationEvents[${index}].${nameField}`;
 
-  const applicationName = form.watch(fieldName('name'));
+  const eventName = form.watch(fieldName('name'));
   const applicationPeriodBegin = form.watch(fieldName('begin'));
   const applicationPeriodEnd = form.watch(fieldName('end'));
   const durationMin = form.watch(fieldName('minDuration'));
@@ -204,6 +235,15 @@ const ApplicationEvent = ({
     }
   };
 
+  const del = () => {
+    if (!applicationEvent.id) {
+      // freshly created event can just be deleted
+      dispatch({ type: 'removeApplicationEvent', eventId: undefined });
+    } else {
+      onDeleteEvent();
+    }
+  };
+
   return (
     <>
       <Accordion
@@ -214,7 +254,7 @@ const ApplicationEvent = ({
           })
         }
         open={isOpen(applicationEvent.id, editorState.accordionStates)}
-        heading={`${applicationName}` || ''}>
+        heading={`${eventName}` || ''}>
         <SubHeadLine>
           {t('Application.Page1.basicInformationSubHeading')}
         </SubHeadLine>
@@ -471,14 +511,44 @@ const ApplicationEvent = ({
             applicationEvent,
             (form.getValues() as Application).applicationEvents?.[index]
           )}
-          name={applicationName}
+          name={eventName}
         />
-        <SaveButton
-          id={`applicationEvents[${index}].save`}
-          iconLeft={<IconPaperclip />}
-          onClick={onSave}>
-          {t('Application.Page1.saveEvent')}
-        </SaveButton>
+        <TwoColumnContainer>
+          <Button
+            type="submit"
+            id={`applicationEvents[${index}].save`}
+            onClick={onSave}>
+            {t('Application.Page1.saveEvent')}
+          </Button>
+          <Button
+            type="button"
+            variant="secondary"
+            id={`applicationEvents[${index}].delete`}
+            onClick={() => {
+              setShowModal(true);
+            }}>
+            {t('Application.Page1.deleteEvent')}
+          </Button>
+          <Modal
+            handleClose={() => {
+              setShowModal(false);
+            }}
+            closeButtonKey="common.cancel"
+            handleOk={() => {
+              setShowModal(false);
+              del();
+            }}
+            okButtonKey="Application.Page1.deleteEvent"
+            show={showModal}>
+            <ModalContent>
+              <ModalHeading>{t('DeleteEvent.heading')}</ModalHeading>
+              <ModalText>
+                <p>{t('DeleteEvent.text', { name: eventName })}</p>
+                <p>{t('DeleteEvent.confirmation')}</p>
+              </ModalText>
+            </ModalContent>
+          </Modal>
+        </TwoColumnContainer>
       </Accordion>
       {editorState.savedEventId &&
       editorState.savedEventId === applicationEvent.id ? (

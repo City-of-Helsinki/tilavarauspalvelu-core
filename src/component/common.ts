@@ -53,4 +53,8 @@ export const CenterSpinner = styled(LoadingSpinner)`
 export const CheckboxWrapper = styled.div`
   margin-top: 2.5em;
   margin-bottom: auto;
+
+  @media (max-width: ${breakpoint.l}) {
+    margin-top: 0;
+  }
 `;

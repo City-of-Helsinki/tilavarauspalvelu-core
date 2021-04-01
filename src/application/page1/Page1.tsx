@@ -31,6 +31,7 @@ type Props = {
   }) => void;
   dispatch: React.Dispatch<Action>;
   addNewApplicationEvent: () => void;
+  setError: (error: string) => void;
 };
 
 type OptionTypes = {
@@ -79,6 +80,7 @@ const Page1 = ({
   editorState,
   dispatch,
   selectedReservationUnits,
+  setError,
 }: Props): JSX.Element | null => {
   const [ready, setReady] = useState(false);
   const [options, setOptions] = useState<OptionTypes>();
@@ -142,6 +144,33 @@ const Page1 = ({
     save({ application: appToSave, eventId });
   };
 
+  const onDeleteEvent = async (eventId: number | undefined, index: number) => {
+    form.trigger();
+
+    const validationErrors = [];
+    if (form.errors?.applicationEvents) {
+      for (let i = 0; i < form.errors?.applicationEvents.length; i += 1) {
+        if (i in form.errors?.applicationEvents) {
+          validationErrors.push(i);
+        }
+      }
+    }
+
+    const otherEventsAreValid =
+      validationErrors.filter((i) => i !== index).length === 0;
+
+    if (otherEventsAreValid) {
+      const appToSave = prepareData(form.getValues() as Application);
+      appToSave.applicationEvents = appToSave.applicationEvents.filter(
+        (ae) => ae.id !== eventId
+      );
+      save({ application: appToSave, eventId: -1 });
+    } else {
+      // has some validation errors that needs to be fixed before event can be removed
+      setError(t('Application.error.otherEventsHaveErrors'));
+    }
+  };
+
   const onAddApplicationEvent = (data: Application) => {
     if (
       data.applicationEvents &&
@@ -178,6 +207,7 @@ const Page1 = ({
             onSave={form.handleSubmit((app: Application) =>
               onSubmit(app, event.id)
             )}
+            onDeleteEvent={() => onDeleteEvent(event.id, index)}
             editorState={editorState}
             dispatch={dispatch}
           />

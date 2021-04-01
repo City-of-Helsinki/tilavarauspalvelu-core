@@ -1,4 +1,5 @@
 import i18next from 'i18next';
+import { defaultDuration } from '../common/const';
 import {
   AccordionState,
   Action,
@@ -9,8 +10,8 @@ import {
 
 const applicationEvent = (applicationId?: number): ApplicationEvent => ({
   name: i18next.t('Application.Page1.applicationEventName'),
-  minDuration: '00:00:00',
-  maxDuration: '00:00:00',
+  minDuration: defaultDuration,
+  maxDuration: defaultDuration,
   eventsPerWeek: 1,
   numPersons: null,
   ageGroupId: null,
@@ -31,6 +32,20 @@ const reducer = (state: EditorState, action: Action): EditorState => {
       const nextState = { ...state, savedEventId: -1 };
       nextState.application.applicationEvents.push(
         applicationEvent(state.application.id)
+      );
+      nextState.accordionStates = nextState.application.applicationEvents.map(
+        (ae) => ({
+          applicationEventId: ae.id as number,
+          open: !ae.id,
+        })
+      );
+      return nextState;
+    }
+    case 'removeApplicationEvent': {
+      const { eventId } = action;
+      const nextState = { ...state, savedEventId: -1 };
+      nextState.application.applicationEvents = nextState.application.applicationEvents.filter(
+        (ae) => ae.id !== eventId
       );
       nextState.accordionStates = nextState.application.applicationEvents.map(
         (ae) => ({

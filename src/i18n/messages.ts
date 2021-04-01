@@ -17,6 +17,11 @@ interface Translations {
 }
 
 const translations: Translations = {
+  DeleteEvent: {
+    heading: ['Poista vakiovuoro hakemukselta?'],
+    text: ['Olet poistamassa vakiovuoroa {{name}}.'],
+    confirmation: ['Oletko varma?'],
+  },
   ApplicationEventSummary: {
     message: [
       'Olet hakemassa vakiovuorolle {{name}} kaudella {{startDate}} - {{endDate}} vähintään yhteensä {{hours}} tuntia vakiovuoroaikaa.',
@@ -67,6 +72,7 @@ const translations: Translations = {
       endBeforePeriodBegin: ['Kauden lopetuspäivä on liian aikainen'],
       missingSchedule: ['Lisää kaikille vakiovuoroille vähintään yksi aika'],
       reservationUnitTooSmall: ['Tila on liian pieni ryhmän käyttöön'],
+      otherEventsHaveErrors: ['Korjaa ensin validaatiovirheet'],
     },
     Intro: {
       startNewApplication: ['Aloita hakemuksen täyttäminen'],
@@ -95,6 +101,7 @@ const translations: Translations = {
       applicationEventSummary: ['Yhteenveto'],
       applicationEventSaved: ['Vakiovuoro tallennettu hakemukselle'],
       saveEvent: ['Hyväksy ja tallenna vakiovuoro'],
+      deleteEvent: ['Poista vakiovuoro'],
     },
     Page2: {
       heading: ['2. Vakiovuoron ajankohta'],
@@ -304,6 +311,7 @@ const translations: Translations = {
     },
     login: ['Kirjaudu', 'Login', 'Logga in'],
     logout: ['Kirjaudu ulos', 'Logout', 'Logga ut'],
+    cancel: ['Peruuta', 'Cancel'],
     imgAltForSpace: ['Kuva tilasta {{name}}'],
     address: {
       streetAddress: ['Katuosoite', 'Street address', 'Adress'],
