@@ -2,16 +2,20 @@ import React from "react";
 import styled from "styled-components";
 import { Footer as HDSFooter } from "hds-react";
 import { useTranslation } from "react-i18next";
-import { breakpoints } from "../styles/util";
 
 const StyledFooter = styled(HDSFooter)`
-  display: none;
+  & > * {
+    &:first-of-type > svg {
+      fill: transparent;
+    }
 
-  @media (min-width: ${breakpoints.m}) {
-    display: block;
-    position: fixed;
-    bottom: 0;
+    max-width: unset !important;
   }
+
+  max-width: 100vw;
+  display: block;
+  position: fixed;
+  bottom: 0;
 `;
 
 function Footer(): JSX.Element {

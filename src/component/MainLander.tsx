@@ -48,6 +48,7 @@ const LoginBtn = styled(Button).attrs({
 
 const Content = styled.div`
   max-width: 44rem;
+  min-height: 30rem;
   margin: var(--spacing-3-xl) auto var(--spacing-2-xl);
   padding: 0 var(--spacing-xl);
 
