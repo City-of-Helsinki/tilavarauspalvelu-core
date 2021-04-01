@@ -48,12 +48,17 @@ const Icon = styled.span`
   margin-right: var(--spacing-xs);
 `;
 
-const Heading = styled(BasicLink)`
+const Heading = styled(BasicLink)<{ $disabled: boolean }>`
   ${truncatedText}
   font-family: var(--tilavaraus-admin-font-bold);
   font-size: 14px;
   line-height: 1.85em;
   max-width: 9.5rem;
+  ${({ $disabled }) =>
+    $disabled &&
+    `
+    pointer-events: none;
+  `}
 `;
 
 const SubItemList = styled.ul`
@@ -64,7 +69,7 @@ const SubItemList = styled.ul`
   margin-top: 0.685rem;
 `;
 
-const SubItemHeading = styled(Heading)`
+const SubItemHeading = styled(Heading)<{ $disabled: boolean }>`
   font-family: var(--tilavaraus-admin-font);
   font-weight: normal;
 `;
@@ -117,6 +122,7 @@ const SubItems = ({
           {items.map((child: IMenuChild) => (
             <li key={child.title}>
               <SubItemHeading
+                $disabled={child.route === ""}
                 to={child.route}
                 onClick={() => onItemSelection && onItemSelection()}
               >
@@ -134,16 +140,16 @@ const menuTree: IMenuChild[] = [
   {
     title: "MainMenu.applications",
     icon: <PremiseApplications />,
-    route: "/applications",
+    route: "/applicationRounds",
   },
   {
     title: "MainMenu.clients",
     icon: <IconCustomers />,
-    route: "/baz",
+    route: "",
     items: [
       {
         title: "MainMenu.archive",
-        route: "/bar",
+        route: "",
       },
     ],
   },
@@ -203,6 +209,7 @@ function MainMenu({
           <MenuItem key={menuItem.title}>
             <Icon>{menuItem.icon}</Icon>
             <Heading
+              $disabled={menuItem.route === ""}
               to={menuItem.route}
               onClick={() => onItemSelection && onItemSelection()}
             >

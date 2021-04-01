@@ -26,7 +26,7 @@ import { getApplicationRound } from "../../common/api";
 import Loader from "../Loader";
 import {
   formatNumber,
-  getNormalizedStatus,
+  getNormalizedApplicationStatus,
   parseDuration,
 } from "../../common/util";
 import StatusCell from "../StatusCell";
@@ -146,7 +146,10 @@ const getCellConfig = (t: TFunction): CellConfig => {
         title: "Application.headings.applicationStatus",
         key: "status",
         transform: ({ status }: ApplicationType) => {
-          const normalizedStatus = getNormalizedStatus(status, "review");
+          const normalizedStatus = getNormalizedApplicationStatus(
+            status,
+            "review"
+          );
           return (
             <StatusCell
               status={normalizedStatus}

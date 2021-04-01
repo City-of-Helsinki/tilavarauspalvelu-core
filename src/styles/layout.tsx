@@ -28,3 +28,7 @@ export const NarrowContainer = styled.div`
     padding: 0 16.666% 0 calc(var(--spacing-3-xl) * 1.85);
   }
 `;
+
+export const WideContainer = styled(IngressContainer)`
+  padding-left: var(--spacing-m);
+`;

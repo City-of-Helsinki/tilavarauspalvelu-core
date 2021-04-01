@@ -164,10 +164,16 @@ const Navigation = ({
 
 const NavigationWithProfileAndLogout = authEnabled
   ? () => {
-      const { oidcUser, logout } = useReactOidc();
+      const { oidcUser, login, logout } = useReactOidc();
       const profile = oidcUser ? oidcUser.profile : null;
 
-      return <Navigation profile={profile} logout={() => logout()} />;
+      return (
+        <Navigation
+          profile={profile}
+          login={() => login()}
+          logout={() => logout()}
+        />
+      );
     }
   : () => <Navigation profile={null} />;
 

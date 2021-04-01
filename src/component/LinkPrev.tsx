@@ -13,10 +13,6 @@ const StyledLink = styled(BasicLink)`
   align-items: center;
   font-size: var(--fontsize-heading-s);
   padding-right: var(--spacing-s);
-
-  svg {
-    margin-right: 0.5em;
-  }
 `;
 
 function LinkPrev({ route }: IProps): JSX.Element {

@@ -14,8 +14,8 @@ import {
 } from "../../common/types";
 import { IngressContainer, NarrowContainer } from "../../styles/layout";
 import { breakpoints } from "../../styles/util";
-import Heading from "../Applications/Heading";
-import StatusRecommendation from "../Applications/StatusRecommendation";
+import Heading from "../Application/Heading";
+import StatusRecommendation from "../Application/StatusRecommendation";
 import withMainMenu from "../withMainMenu";
 import ApplicationRoundNavi from "./ApplicationRoundNavi";
 import TimeframeStatus from "./TimeframeStatus";
@@ -26,7 +26,7 @@ import AllocatingDialogContent from "./AllocatingDialogContent";
 import DataTable, { CellConfig } from "../DataTable";
 import {
   formatNumber,
-  getNormalizedStatus,
+  getNormalizedApplicationStatus,
   parseDuration,
 } from "../../common/util";
 import StatusCell from "../StatusCell";
@@ -122,7 +122,10 @@ const getFilterConfig = (recommendations: any[]): DataFilterConfig[] => {
     {
       title: "Application.headings.applicationStatus",
       filters: statuses.map((status) => {
-        const normalizedStatus = getNormalizedStatus(status, "handling");
+        const normalizedStatus = getNormalizedApplicationStatus(
+          status,
+          "handling"
+        );
         return {
           title: `Application.statuses.${normalizedStatus}`,
           key: "status",
@@ -168,7 +171,10 @@ const getCellConfig = (
         key: "status",
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         transform: ({ status }: any) => {
-          const normalizedStatus = getNormalizedStatus(status, "handling");
+          const normalizedStatus = getNormalizedApplicationStatus(
+            status,
+            "handling"
+          );
           return (
             <StatusCell
               status={normalizedStatus}

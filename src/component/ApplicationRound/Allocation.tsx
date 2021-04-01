@@ -6,11 +6,15 @@ import { Button, IconArrowRedo, Notification } from "hds-react";
 import { getApplicationRound } from "../../common/api";
 import Loader from "../Loader";
 import { ApplicationRound as ApplicationRoundType } from "../../common/types";
-import { IngressContainer, NarrowContainer } from "../../styles/layout";
+import {
+  IngressContainer,
+  NarrowContainer,
+  WideContainer,
+} from "../../styles/layout";
 import { ContentHeading } from "../../styles/typography";
-import { breakpoints, Strong } from "../../styles/util";
-import Heading from "../Applications/Heading";
-import StatusRecommendation from "../Applications/StatusRecommendation";
+import { breakpoints, NotificationBox, Strong } from "../../styles/util";
+import Heading from "../Application/Heading";
+import StatusRecommendation from "../Application/StatusRecommendation";
 import withMainMenu from "../withMainMenu";
 import ApplicationRoundNavi from "./ApplicationRoundNavi";
 import TimeframeStatus from "./TimeframeStatus";
@@ -22,10 +26,6 @@ interface IProps {
 
 const Wrapper = styled.div`
   width: 100%;
-`;
-
-const WideContainer = styled(IngressContainer)`
-  padding-left: var(--spacing-m);
 `;
 
 const Details = styled.div`
@@ -63,15 +63,6 @@ const RecommendationValue = styled.div`
   align-items: center;
   justify-content: flex-start;
   margin-top: var(--spacing-3-xs);
-`;
-
-const NotificationBox = styled.div`
-  background-color: var(--tilavaraus-admin-gray-darker);
-  padding: 110px var(--spacing-layout-m) 100px;
-  text-align: center;
-  white-space: pre-line;
-  line-height: var(--lineheight-xl);
-  margin-bottom: var(--spacing-5-xl);
 `;
 
 const ActionContainer = styled.div`

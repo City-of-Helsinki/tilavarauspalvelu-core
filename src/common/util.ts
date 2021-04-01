@@ -2,8 +2,10 @@ import { format, parseISO } from "date-fns";
 import i18next from "i18next";
 import {
   ApplicationEventSchedule,
+  ApplicationRoundStatus,
   ApplicationStatus,
   LocalizationLanguages,
+  NormalizedApplicationRoundStatus,
   TranslationObject,
 } from "./types";
 
@@ -27,7 +29,8 @@ interface IFormatDurationOutput {
   minutes: number;
 }
 
-export type StatusView = "review" | "handling";
+export type ApplicationStatusView = "review" | "handling";
+export type ApplicationRoundStatusView = "listing";
 
 export const formatDuration = (time: string): IFormatDurationOutput => {
   const [hours, minutes] = time.split(":");
@@ -37,9 +40,9 @@ export const formatDuration = (time: string): IFormatDurationOutput => {
   };
 };
 
-export const getNormalizedStatus = (
+export const getNormalizedApplicationStatus = (
   status: ApplicationStatus,
-  view: StatusView
+  view: ApplicationStatusView
 ): ApplicationStatus => {
   let normalizedStatus: ApplicationStatus = status;
   if (view === "review") {
@@ -50,6 +53,21 @@ export const getNormalizedStatus = (
     if (["review_done", "in_review"].includes(status)) {
       normalizedStatus = "allocated";
     }
+  }
+
+  return normalizedStatus;
+};
+
+export const getNormalizedApplicationRoundStatus = (
+  status: ApplicationRoundStatus,
+  view: ApplicationRoundStatusView // eslint-disable-line @typescript-eslint/no-unused-vars
+): ApplicationRoundStatus | NormalizedApplicationRoundStatus => {
+  let normalizedStatus: NormalizedApplicationRoundStatus;
+
+  if (["in_review", "review_done", "allocated", "handled"].includes(status)) {
+    normalizedStatus = "handling";
+  } else {
+    normalizedStatus = status;
   }
 
   return normalizedStatus;
