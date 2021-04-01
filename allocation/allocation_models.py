@@ -127,7 +127,7 @@ class AllocationEvent(object):
     @staticmethod
     def occurrences_to_integers_with_precision(
         occurrences: Dict[int, EventOccurrence]
-    ) -> Dict[int, int]:
+    ) -> Dict[int, AllocationOccurrence]:
         allocation_occurrences = {}
         for occurrence_id, occurrence in occurrences.items():
             allocation_occurrences[occurrence_id] = AllocationOccurrence(occurrence)
