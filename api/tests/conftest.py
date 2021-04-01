@@ -12,6 +12,7 @@ from applications.models import (
     ApplicationEvent,
     ApplicationRound,
     ApplicationRoundBasket,
+    City,
     Organisation,
     Person,
     Recurrence,
@@ -284,7 +285,7 @@ def valid_reservation_data(reservation_unit):
 
 
 @pytest.fixture
-def valid_application_round_basket_data(purpose, ten_to_15_age_group):
+def valid_application_round_basket_data(purpose, ten_to_15_age_group, helsinki):
     return {
         "name": "Yleishyödylliset yhdistykset",
         "purpose_id": purpose.id,
@@ -453,6 +454,11 @@ def hobbyist_ability_group() -> AbilityGroup:
 
 
 @pytest.fixture
+def helsinki() -> City:
+    return City.objects.create(name="Helsinki")
+
+
+@pytest.fixture
 def valid_application_event_schedule_data():
     return {"day": 1, "begin": "10:40", "end": "16:30"}
 
@@ -463,7 +469,7 @@ def valid_event_reservation_unit_data(reservation_unit):
 
 
 @pytest.fixture
-def valid_application_data(application_round):
+def valid_application_data(application_round, helsinki):
     return {
         "applicant_type": "company",
         "organisation": {
@@ -491,6 +497,7 @@ def valid_application_data(application_round):
             "post_code": 33540,
             "city": "Tampere",
         },
+        "home_city": "Helsinki",
     }
 
 

@@ -183,6 +183,11 @@ def can_modify_application(user: User, application: Application) -> bool:
     )
 
 
+def can_modify_city(user: User):
+    permission = "can_modify_cities"
+    return is_superuser(user) or has_general_permission(user, permission)
+
+
 def get_service_sectors_where_can_view_applications(user: User) -> list:
     permission = "can_handle_applications"
     if has_general_permission(user, permission) or is_superuser(user):
