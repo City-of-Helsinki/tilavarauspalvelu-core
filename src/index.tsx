@@ -10,20 +10,21 @@ import "./index.scss";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import Authenticating from "./component/Authentication/Authenticating";
-import Login from "./component/Authentication/Login";
 import AuthorizationNeeded from "./component/Authentication/AuthorizationNeeded";
 import { authEnabled } from "./common/const";
+import MainLander from "./component/MainLander";
 
 ReactDOM.render(
   <React.StrictMode>
     <AuthenticationProvider
-      notAuthenticated={() => <Login />}
+      notAuthenticated={() => <MainLander />}
       notAuthorized={() => <AuthorizationNeeded />}
       authenticating={() => <Authenticating noNavigation />}
       configuration={oidcConfiguration}
       loggerLevel={oidcLog.ERROR}
       isEnabled={authEnabled}
       callbackComponentOverride={() => <Authenticating />}
+      sessionLostComponent={() => <MainLander />}
     >
       <App />
     </AuthenticationProvider>
