@@ -208,7 +208,7 @@ class ReservationUnitViewSet(viewsets.ModelViewSet):
         return qs
 
 
-class PurposeSerializer(serializers.ModelSerializer):
+class PurposeSerializer(TranslatedModelSerializer):
     class Meta:
         model = Purpose
         fields = [

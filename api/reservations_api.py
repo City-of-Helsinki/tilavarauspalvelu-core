@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db.models import Q
+from django.utils.translation import gettext_lazy as _
 from django_filters import rest_framework as filters
 from drf_extra_fields.relations import PresentablePrimaryKeyRelatedField
 from drf_spectacular.utils import extend_schema
@@ -19,6 +20,7 @@ from permissions.helpers import (
 from reservation_units.models import ReservationUnit
 from reservations.models import STATE_CHOICES, AbilityGroup, AgeGroup, Reservation
 
+from .base import TranslatedModelSerializer
 from .reservation_units_api import ReservationUnitSerializer
 
 User = get_user_model()
@@ -83,7 +85,7 @@ class ReservationSerializer(serializers.ModelSerializer):
                 data["begin"], data["end"], self.instance
             ):
                 raise serializers.ValidationError(
-                    "Overlapping reservations are not allowed"
+                    _("Overlapping reservations are not allowed")
                 )
         return data
 
@@ -184,7 +186,7 @@ class AgeGroupSerializer(serializers.ModelSerializer):
 
         if max_age is not None and max_age <= min_age:
             raise serializers.ValidationError(
-                "Maximum age should be larger than minimum age"
+                _("Maximum age should be larger than minimum age")
             )
         return data
 
@@ -200,7 +202,7 @@ class AgeGroupViewSet(viewsets.ModelViewSet):
     )
 
 
-class AbilityGroupSerializer(serializers.ModelSerializer):
+class AbilityGroupSerializer(TranslatedModelSerializer):
     class Meta:
         model = AbilityGroup
         fields = [

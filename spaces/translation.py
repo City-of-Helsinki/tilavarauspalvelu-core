@@ -1,6 +1,6 @@
 from modeltranslation.translator import TranslationOptions, translator
 
-from .models import District, ServiceSector, Space, Unit
+from .models import District, Location, ServiceSector, Space, Unit
 
 
 class SpaceTranslationOptions(TranslationOptions):
@@ -8,18 +8,23 @@ class SpaceTranslationOptions(TranslationOptions):
 
 
 class UnitTranslationOptions(TranslationOptions):
-    fields = ["name"]
+    fields = ["name", "description", "short_description"]
 
 
 class ServiceSectorTranslationOptions(TranslationOptions):
     fields = ["name"]
 
 
-class DistrictTranslationoptions(TranslationOptions):
+class DistrictTranslationOptions(TranslationOptions):
     fields = ["name"]
+
+
+class LocationTranslationOption(TranslationOptions):
+    fields = ["address_street"]
 
 
 translator.register(Space, SpaceTranslationOptions)
 translator.register(Unit, UnitTranslationOptions)
 translator.register(ServiceSector, SpaceTranslationOptions)
-translator.register(District, DistrictTranslationoptions)
+translator.register(District, DistrictTranslationOptions)
+translator.register(Location, LocationTranslationOption)

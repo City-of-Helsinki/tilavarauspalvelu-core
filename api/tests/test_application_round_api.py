@@ -1,7 +1,7 @@
 import pytest
 from django.urls import reverse
 
-from applications.models import ApplicationRoundStatus
+from applications.models import ApplicationRoundStatus, ApplicationRound
 
 
 @pytest.mark.django_db
@@ -16,6 +16,7 @@ def test_application_round_fetch(user_api_client, application_round):
 def test_create_application_round(
     user_api_client, service_sector_admin_api_client, valid_application_round_data
 ):
+
     response = user_api_client.post(
         reverse("application_round-list"),
         data=valid_application_round_data,
@@ -24,14 +25,19 @@ def test_create_application_round(
 
     assert response.status_code == 403
 
+    print("---REQUEST SENT DATA-------")
+    print(valid_application_round_data)
+    print("------------------------------------")
     response = service_sector_admin_api_client.post(
         reverse("application_round-list"),
         data=valid_application_round_data,
         format="json",
     )
-
+    print("RESPONSE DATA--------------------------------")
+    print(response.data)
+    print("---------------------------------------------")
     assert response.data["status"] == ApplicationRoundStatus.DRAFT
-    assert response.data["name"] == valid_application_round_data["name"]
+    assert response.data["name"]["fi"] == valid_application_round_data["name"]["fi"]
 
 
 @pytest.mark.django_db

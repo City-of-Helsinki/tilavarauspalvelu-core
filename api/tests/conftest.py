@@ -308,7 +308,11 @@ def valid_application_round_data(
 ):
     """ Valid JSON data for creating a new application round """
     return {
-        "name": "Kevään nuorten säännöllisten vuorojen haku 2021",
+        "name": {
+            "fi": "Kevään nuorten säännöllisten vuorojen haku 2021",
+            "en": "Spring youth recurring event application 2021",
+            "sv": "Vår",
+        },
         "reservation_unit_ids": [reservation_unit.id, reservation_unit2.id],
         "application_period_begin": "2020-01-01T08:00",
         "application_period_end": "2020-01-31T09:00",
@@ -320,6 +324,11 @@ def valid_application_round_data(
         "service_sector_id": service_sector.id,
         "status": "draft",
         "application_round_baskets": [valid_application_round_basket_data],
+        "criteria": {
+            "fi": "Kriteerit",
+            "en": "Criteria",
+            "sv": "Kriterier",
+        },
     }
 
 
@@ -425,7 +434,6 @@ def application_event(
 
 @pytest.fixture
 def weekly_recurring_mondays_and_tuesdays_2021(application_event) -> ApplicationEvent:
-
     return Recurrence.objects.create(
         application_event=application_event,
         recurrence=recurrence.Recurrence(

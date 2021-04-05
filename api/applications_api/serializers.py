@@ -331,7 +331,7 @@ class ApplicationEventSerializer(serializers.ModelSerializer):
 
         if max_duration is not None and max_duration < min_duration:
             raise serializers.ValidationError(
-                "Maximum duration should be larger than minimum duration"
+                _("Maximum duration should be larger than minimum duration")
             )
         return data
 

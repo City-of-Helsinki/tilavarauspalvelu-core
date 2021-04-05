@@ -1,6 +1,8 @@
 from django.conf import settings
+from django.utils.translation import gettext_lazy as _
 from rest_framework import permissions, serializers, viewsets
 
+from api.base import TranslatedModelSerializer
 from applications.models import (
     ApplicationRound,
     ApplicationRoundBasket,
@@ -60,7 +62,7 @@ class ApplicationRoundBasketSerializer(serializers.ModelSerializer):
         }
 
 
-class ApplicationRoundSerializer(serializers.ModelSerializer):
+class ApplicationRoundSerializer(TranslatedModelSerializer):
     application_round_baskets = ApplicationRoundBasketSerializer(many=True)
     reservation_unit_ids = serializers.PrimaryKeyRelatedField(
         queryset=ReservationUnit.objects.all(), source="reservation_units", many=True
@@ -146,7 +148,11 @@ class ApplicationRoundSerializer(serializers.ModelSerializer):
 
         basket_data = validated_data.pop("application_round_baskets")
 
+        print("---VALIDATED DATA----------------")
+        print(validated_data)
+
         application_round = super().create(validated_data)
+        print("----------------------------------------------------")
 
         self.handle_baskets(
             application_round_instance=application_round, basket_data=basket_data
@@ -180,7 +186,7 @@ class ApplicationRoundSerializer(serializers.ModelSerializer):
         baskets = data["application_round_baskets"]
         basket_order_numbers = list(map(lambda basket: basket["order_number"], baskets))
         if len(basket_order_numbers) > len(set(basket_order_numbers)):
-            raise serializers.ValidationError("Order numbers should be unique")
+            raise serializers.ValidationError(_("Order numbers should be unique"))
 
         return data
 
