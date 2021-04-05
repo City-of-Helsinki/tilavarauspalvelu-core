@@ -9,9 +9,11 @@ from applications.models import (
     ApplicationEventSchedule,
     ApplicationRound,
     ApplicationRoundBasket,
+    EventReservationUnit,
 )
-from reservation_units.models import Purpose
+from reservation_units.models import Purpose, ReservationUnit
 from reservations.models import AgeGroup
+from spaces.models import Space
 
 
 @pytest.fixture
@@ -22,6 +24,38 @@ def purpose() -> Purpose:
 @pytest.fixture
 def purpose_two() -> Purpose:
     return Purpose.objects.create(name="Scating")
+
+
+@pytest.fixture
+def reservation_unit(space_for_15_persons) -> ReservationUnit:
+    reservation_unit = ReservationUnit.objects.create(
+        name_en="Test reservation unit", require_introduction=False
+    )
+    reservation_unit.spaces.set([space_for_15_persons])
+    return reservation_unit
+
+
+@pytest.fixture
+def space_for_15_persons():
+    return Space.objects.create(name="Space", max_persons=15)
+
+
+@pytest.fixture
+def scheduled_for_monday(recurring_application_event) -> ApplicationEventSchedule:
+    return ApplicationEventSchedule.objects.create(
+        day=0, begin="10:00", end="12:00", application_event=recurring_application_event
+    )
+
+
+@pytest.fixture
+def matching_event_reservation_unit(
+    recurring_application_event, reservation_unit
+) -> EventReservationUnit:
+    return EventReservationUnit.objects.create(
+        priority=100,
+        application_event=recurring_application_event,
+        reservation_unit=reservation_unit,
+    )
 
 
 @pytest.fixture
@@ -66,6 +100,21 @@ def second_application_round(purpose) -> ApplicationRound:
     )
     application_round.purposes.set([purpose])
     return application_round
+
+
+@pytest.fixture
+def application_round_with_reservation_units(
+    reservation_unit, default_application_round
+) -> ApplicationRound:
+    default_application_round.reservation_units.set([reservation_unit])
+    return default_application_round
+
+
+@pytest.fixture
+def application_with_reservation_units(
+    default_application_round,
+) -> Application:
+    return Application.objects.create(application_round_id=default_application_round.id)
 
 
 @pytest.fixture
