@@ -17,6 +17,7 @@ import { deepCopy, mapOptions } from '../../common/util';
 import { getParameters } from '../../common/api';
 import { breakpoint } from '../../common/style';
 import { participantCountOptions } from '../../common/const';
+import { CenterSpinner } from '../../component/common';
 
 type Props = {
   applicationRound: ApplicationRound;
@@ -182,7 +183,7 @@ const Page1 = ({
   };
 
   if (!ready) {
-    return null;
+    return <CenterSpinner />;
   }
 
   const addNewEventButtonDisabled =

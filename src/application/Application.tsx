@@ -27,6 +27,7 @@ import Preview from './preview/Preview';
 import applicationReducer from './applicationReducer';
 import useReservationUnitList from '../common/hook/useReservationUnitList';
 import Sent from './sent/Sent';
+import { CenterSpinner } from '../component/common';
 
 type ParamTypes = {
   applicationId: string;
@@ -122,7 +123,7 @@ const Application = (): JSX.Element | null => {
     ) && state.loading === false;
 
   if (!ready) {
-    return null;
+    return <CenterSpinner />;
   }
 
   return (
