@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { breakpoint } from '../common/style';
 import { Image } from '../common/types';
+import Modal from '../component/Modal';
 
 type Props = {
   images: Image[];
@@ -23,7 +24,7 @@ const ImageGrid = styled.div`
   gap: var(--spacing-xs);
   grid-template-columns: 1fr 1fr 1fr;
   @media (max-width: ${breakpoint.l}) {
-    grid-template-columns: 1fr 1fr;
+    display: flex;
   }
 `;
 
@@ -32,13 +33,47 @@ const ThumbnailImage = styled.img`
   width: 122px;
   height: 122px;
   @media (max-width: ${breakpoint.l}) {
-    width: 100%;
+    max-width: 100%;
     height: auto;
   }
+`;
+const ModalContent = styled.div`
+  max-width: 100vw;
+
+  @media (max-width: ${breakpoint.s}) {
+    margin: 0.5em;
+  }
+`;
+
+const StyledButton = styled.button`
+  cursor: pointer;
+  border: 0;
+  background-color: transparent;
+  padding: 0;
+`;
+
+const ModalImages = styled.div`
+  margin-top: var(--spacing-layout-s);
+  display: flex;
+  button {
+    margin-right: 1em;
+  }
+
+  @media (max-width: ${breakpoint.s}) {
+    margin-top: 0.25em;
+  }
+`;
+const LargeImage = styled.img`
+  max-width: 100%;
+  width: 100%;
+  max-height: calc(100vh - 16em);
+  object-fit: cover;
 `;
 
 const Images = ({ images }: Props): JSX.Element => {
   const { t } = useTranslation();
+  const [showModal, setShowModal] = useState(false);
+  const [currentImage, setCurrentImage] = useState<Image>();
 
   if (images.length === 0) {
     return <div />;
@@ -48,12 +83,51 @@ const Images = ({ images }: Props): JSX.Element => {
       <Heading>{t('reservationUnit.images')}</Heading>
       <ImageGrid>
         {images.map((image) => (
-          <ThumbnailImage
-            key={image.smallUrl}
-            alt={t('common.imgAltForSpace')}
-            src={image.smallUrl}
-          />
+          <div>
+            <StyledButton
+              type="button"
+              onClick={() => {
+                setCurrentImage(image);
+                setShowModal(true);
+              }}>
+              <ThumbnailImage
+                key={image.smallUrl}
+                alt={t('common.imgAltForSpace')}
+                src={image.smallUrl}
+              />
+            </StyledButton>
+          </div>
         ))}
+        <Modal
+          handleClose={() => {
+            setShowModal(false);
+          }}
+          show={showModal}
+          closeButtonKey="common.close">
+          <ModalContent>
+            {currentImage ? (
+              <LargeImage
+                alt={t('common.imgAltForSpace')}
+                src={currentImage.imageUrl}
+              />
+            ) : null}
+            <ModalImages>
+              {images.map((image) => (
+                <StyledButton
+                  type="button"
+                  onClick={() => {
+                    setCurrentImage(image);
+                  }}>
+                  <ThumbnailImage
+                    key={image.smallUrl}
+                    alt={t('common.imgAltForSpace')}
+                    src={image.smallUrl}
+                  />
+                </StyledButton>
+              ))}
+            </ModalImages>
+          </ModalContent>
+        </Modal>
       </ImageGrid>
     </Container>
   );
