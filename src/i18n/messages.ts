@@ -76,6 +76,19 @@ const translations: Translations = {
     },
     Intro: {
       startNewApplication: ['Aloita hakemuksen täyttäminen'],
+      heading: ['Vakiovuorohakemus'],
+      faq1: {
+        question: [
+          'Edustan yhdistystä tai rekisteröitymätöntä ryhmää, kuinka toimin?',
+        ],
+      },
+      faq2: {
+        question: ['Kuinka hakemusten käsittely tapahtuu?'],
+      },
+
+      faq3: {
+        question: ['Kuinka täytän vakiovuorohakemuksen yksityishenkilönä?'],
+      },
     },
     applicationEventSaved: ['Vakiovuoro tallennettu hakemukselle'],
     Page1: {

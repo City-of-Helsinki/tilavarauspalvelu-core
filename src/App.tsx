@@ -8,7 +8,7 @@ import Routes from './common/routes';
 import Applications from './applications/Applications';
 import Application from './application/Application';
 import { isBrowser } from './common/const';
-import CreateApplication from './application/CreateApplication';
+import Intro from './application/intro/Intro';
 
 const OidcSecure = isBrowser
   ? // eslint-disable-next-line
@@ -32,17 +32,19 @@ function App(): JSX.Element {
         {
           // client only routes
           isBrowser ? (
-            <OidcSecure>
-              <Route path="/create/:applicationRoundId">
-                <CreateApplication />
+            <>
+              <Route path="/intro">
+                <Intro />
               </Route>
-              <Route path="/application/:applicationId">
-                <Application />
-              </Route>
-              <Route path="/applications/">
-                <Applications />
-              </Route>
-            </OidcSecure>
+              <OidcSecure>
+                <Route path="/application/:applicationId">
+                  <Application />
+                </Route>
+                <Route path="/applications/">
+                  <Applications />
+                </Route>
+              </OidcSecure>
+            </>
           ) : null
         }
       </Switch>

@@ -1,14 +1,13 @@
 import React from 'react';
-import { Koros, KorosType } from 'hds-react';
+import { Koros } from 'hds-react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import Breadcrumb from '../component/Breadcrumb';
 
 type HeadProps = {
   heading: string;
-  text?: string;
-  breadCrumbText: string;
-  korosType: KorosType;
+  breadCrumbText?: string;
+  children?: React.ReactNode;
 };
 
 const Heading = styled.h1`
@@ -33,9 +32,8 @@ const StyledKoros = styled(Koros)`
 `;
 
 const Head = ({
-  text,
+  children,
   heading,
-  korosType,
   breadCrumbText,
 }: HeadProps): JSX.Element => {
   const { t } = useTranslation();
@@ -49,9 +47,9 @@ const Head = ({
           }}
         />
         <Heading>{heading}</Heading>
-        {text ? <span>{text}</span> : null}
+        {children || null}
       </Content>
-      <StyledKoros flipHorizontal className="koros" type={korosType} />
+      <StyledKoros flipHorizontal className="koros" type="storm" />
     </Container>
   );
 };

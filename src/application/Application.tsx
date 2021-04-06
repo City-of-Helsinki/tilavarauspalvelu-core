@@ -1,7 +1,6 @@
 import React, { useReducer, useState } from 'react';
 import { useAsync } from 'react-use';
 import {
-  Link,
   Route,
   Switch,
   useHistory,
@@ -61,7 +60,7 @@ const Application = (): JSX.Element | null => {
 
   const applicationLoadingStatus = useAsync(async () => {
     let loadedApplication = null;
-    if (applicationId) {
+    if (applicationId && Number(applicationId)) {
       loadedApplication = await getApplication(Number(applicationId));
       dispatch({ type: 'load', application: loadedApplication });
     }
@@ -129,21 +128,9 @@ const Application = (): JSX.Element | null => {
   return (
     <>
       <Switch>
-        <Route exact path={`${match.url}`}>
-          <ApplicationPage
-            breadCrumbText={applicationRoundName}
-            overrideText={applicationRoundName}
-            translationKeyPrefix="Application.Page1"
-            match={match}>
-            Tähän intro page (TILA-238)
-            <br />
-            <Link id="start" to={`${applicationId}/page1`}>
-              {t('Application.Intro.startNewApplication')}
-            </Link>
-          </ApplicationPage>
-        </Route>
         <Route exact path={`${match.url}/page1`}>
           <ApplicationPage
+            application={state.application}
             breadCrumbText={applicationRoundName}
             overrideText={applicationRoundName}
             translationKeyPrefix="Application.Page1"
@@ -169,6 +156,7 @@ const Application = (): JSX.Element | null => {
         </Route>
         <Route exact path={`${match.url}/page2`}>
           <ApplicationPage
+            application={state.application}
             translationKeyPrefix="Application.Page2"
             match={match}
             breadCrumbText={applicationRoundName}>
@@ -180,6 +168,7 @@ const Application = (): JSX.Element | null => {
         </Route>
         <Route exact path={`${match.url}/page3`}>
           <ApplicationPage
+            application={state.application}
             translationKeyPrefix="Application.Page3"
             match={match}
             breadCrumbText={applicationRoundName}>
@@ -191,6 +180,7 @@ const Application = (): JSX.Element | null => {
         </Route>
         <Route exact path={`${match.url}/preview`}>
           <ApplicationPage
+            application={state.application}
             translationKeyPrefix="Application.preview"
             match={match}
             breadCrumbText={applicationRoundName}>

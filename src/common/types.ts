@@ -7,7 +7,7 @@ export type TranslationObject = {
 export type ApplicationRound = {
   id: number;
   name: string;
-  reservationUnitsIds: number[];
+  reservationUnitIds: number[];
   applicationPeriodBegin: string;
   applicationPeriodEnd: string;
   reservationPeriodBegin: string;

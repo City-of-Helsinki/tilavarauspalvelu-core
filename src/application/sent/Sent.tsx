@@ -1,6 +1,6 @@
-import { Accordion } from 'hds-react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { AccordionWithState as Accordion } from '../../component/Accordion';
 import Container from '../../component/Container';
 import Head from '../Head';
 
@@ -13,7 +13,6 @@ const Sent = ({ breadCrumbText }: Props): JSX.Element => {
   return (
     <>
       <Head
-        korosType="storm"
         heading={t('Application.sent.heading')}
         breadCrumbText={breadCrumbText}
       />

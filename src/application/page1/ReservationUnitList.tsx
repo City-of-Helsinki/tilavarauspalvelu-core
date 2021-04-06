@@ -100,7 +100,11 @@ const ReservationUnitList = ({
         data = await Promise.all(promises);
       }
       if (isMounted) {
-        setReservationUnits(data);
+        setReservationUnits(
+          data.filter((ru) =>
+            applicationRound.reservationUnitIds.includes(ru.id)
+          )
+        );
       }
     };
 
@@ -108,7 +112,11 @@ const ReservationUnitList = ({
     return () => {
       isMounted = false;
     };
-  }, [selectedReservationUnits, applicationEvent.eventReservationUnits]);
+  }, [
+    selectedReservationUnits,
+    applicationEvent.eventReservationUnits,
+    applicationRound,
+  ]);
 
   const move = (
     units: ReservationUnit[],

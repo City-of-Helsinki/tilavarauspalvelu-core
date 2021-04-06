@@ -2,16 +2,19 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { breakpoint } from '../common/style';
+import { Application } from '../common/types';
 import Container from '../component/Container';
 import Head from './Head';
 import Stepper from './Stepper';
 
 type ApplicationPageProps = {
+  application?: Application;
   translationKeyPrefix: string;
-  match: { url: string };
-  breadCrumbText: string;
+  match?: { url: string };
+  breadCrumbText?: string;
   overrideText?: string;
   children?: React.ReactNode;
+  headContent?: React.ReactNode;
 };
 
 const InnerContainer = styled.div`
@@ -29,8 +32,10 @@ const Main = styled.div`
 `;
 
 const ApplicationPage = ({
+  application,
   translationKeyPrefix,
   breadCrumbText,
+  headContent,
   overrideText,
   children,
   match,
@@ -40,14 +45,13 @@ const ApplicationPage = ({
   return (
     <>
       <Head
-        korosType="storm"
         heading={t(`${translationKeyPrefix}.heading`)}
-        text={overrideText || t(`${translationKeyPrefix}.text`)}
-        breadCrumbText={breadCrumbText}
-      />
+        breadCrumbText={breadCrumbText || ''}>
+        {headContent || overrideText || t(`${translationKeyPrefix}.text`)}
+      </Head>
       <Container main>
         <InnerContainer>
-          <Stepper match={match} />
+          <Stepper application={application} match={match} />
           <Main>{children}</Main>
         </InnerContainer>
       </Container>

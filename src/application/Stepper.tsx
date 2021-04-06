@@ -2,6 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { NavLink } from 'react-router-dom';
 import styled from 'styled-components';
+import { Application } from '../common/types';
 
 const NavigationContainer = styled.nav`
   font-size: var(--fontsize-body-l);
@@ -16,12 +17,14 @@ const NavigationContainer = styled.nav`
     }
   }
 
-  a {
+  span {
     color: var(--color-black-90);
-    text-decoration: none;
     display: flex;
     align-items: center;
+  }
 
+  a {
+    text-decoration: none;
     :focus {
       outline: 2px solid var(--color-coat-of-arms);
     }
@@ -37,30 +40,53 @@ const Number = styled.div`
   margin-right: 1em;
   text-align: center;
   line-height: 1.3;
-  align-self: start;
+  align-self: flex-end;
 `;
 
 type Props = {
-  match: { url: string };
+  match?: { url: string };
+  application?: Application;
 };
 
-const Stepper = ({ match }: Props): JSX.Element => {
+const Stepper = ({ match, application }: Props): JSX.Element => {
   const { t } = useTranslation();
-
-  const pages = ['page1', 'page2', 'page3', 'preview'].map((page) => ({
-    page,
-    path: `${match.url}/${page}`,
-  }));
+  let maxPage = -1;
+  if (application) {
+    if (
+      application.applicationEvents.length > 0 &&
+      application.applicationEvents[0].id
+    ) {
+      maxPage = 1;
+    }
+    if (
+      application.applicationEvents?.[0].applicationEventSchedules.length > 0
+    ) {
+      maxPage = 2;
+    }
+    if (application.applicantType != null) {
+      maxPage = 3;
+    }
+  }
+  const pages = ['page1', 'page2', 'page3', 'preview'];
 
   return (
     <NavigationContainer aria-label={t('common.applicationNavigationName')}>
       <ul>
         {pages.map((page, index) => (
-          <li key={page.page}>
-            <NavLink to={page.path}>
-              <Number>{index + 1}</Number>
-              {t(`ApplicationPage.navigation.${page.page}`)}
-            </NavLink>
+          <li key={page}>
+            {maxPage >= index ? (
+              <NavLink to={`${match?.url}/${page}`}>
+                <span>
+                  <Number>{index + 1}</Number>
+                  {t(`ApplicationPage.navigation.${page}`)}
+                </span>
+              </NavLink>
+            ) : (
+              <span>
+                <Number>{index + 1}</Number>
+                {t(`ApplicationPage.navigation.${page}`)}
+              </span>
+            )}
           </li>
         ))}
       </ul>

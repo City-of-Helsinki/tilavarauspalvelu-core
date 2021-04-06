@@ -15,13 +15,16 @@ import {
 } from './types';
 
 export const isActive = (startDate: string, endDate: string): boolean => {
-  const now = new Date();
-  return isAfter(now, parseISO(startDate)) && isBefore(now, parseISO(endDate));
+  const now = new Date().getTime();
+  return (
+    isAfter(now, parseISO(startDate).getTime()) &&
+    isBefore(now, parseISO(endDate).getTime())
+  );
 };
 
 const isPast = (endDate: string): boolean => {
-  const now = new Date();
-  return isAfter(now, parseISO(endDate));
+  const now = new Date().getTime();
+  return isAfter(now, parseISO(endDate).getTime());
 };
 
 export const applicationRoundState = (
@@ -44,7 +47,7 @@ export const formatDate = (date: string): string => {
   if (!date) {
     return '-';
   }
-  return format(parseISO(date), 'd. M. yyyy');
+  return format(parseISO(date), 'd.M.yyyy');
 };
 
 export const formatDuration = (duration: string): string => {
