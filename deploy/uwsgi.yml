@@ -3,7 +3,7 @@ uwsgi:
   # python docker image cannot use that due to linker mishaps
   # plugins: python3,http
   wsgi-file: tilavarauspalvelu/wsgi.py
-  processes: 12
+  processes: $(UWSGI_NUM_PROCESSES)
   threads: 1
   master: true
   #uid: tvp
