@@ -4,7 +4,19 @@ export type TranslationObject = {
   [key: string]: string;
 };
 
-export type ApplicationRoundStatus = "draft" | "in_review" | "review_done";
+export type ApplicationRoundStatus =
+  | "draft"
+  | "in_review"
+  | "review_done"
+  | "allocated"
+  | "handled"
+  | "validated"
+  | "approved";
+
+export type NormalizedApplicationRoundStatus =
+  | ApplicationRoundStatus
+  | "incoming"
+  | "handling";
 
 export type ApplicationRoundBasket = any; // eslint-disable-line
 

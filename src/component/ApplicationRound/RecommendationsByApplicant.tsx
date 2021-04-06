@@ -16,14 +16,14 @@ import { H1 } from "../../styles/typography";
 import { BasicLink, breakpoints, Strong } from "../../styles/util";
 import LinkPrev from "../LinkPrev";
 import Loader from "../Loader";
-import StatusBlock from "../StatusBlock";
+import ApplicationStatusBlock from "../Application/ApplicationStatusBlock";
 import withMainMenu from "../withMainMenu";
 import ApplicantBox from "./ApplicantBox";
 import DataTable, { CellConfig } from "../DataTable";
 import RecommendationCount from "./RecommendationCount";
 import {
   formatNumber,
-  getNormalizedStatus,
+  getNormalizedApplicationStatus,
   parseDuration,
 } from "../../common/util";
 import StatusCell from "../StatusCell";
@@ -69,7 +69,7 @@ const Heading = styled(H1)`
   margin-bottom: var(--spacing-3-xs);
 `;
 
-const StyledStatusBlock = styled(StatusBlock)`
+const StyledApplicationStatusBlock = styled(ApplicationStatusBlock)`
   margin-top: var(--spacing-xl);
 `;
 
@@ -116,7 +116,10 @@ const getCellConfig = (t: TFunction): CellConfig => {
         title: "Application.headings.applicationStatus",
         key: "status",
         transform: ({ status }: ApplicationType) => {
-          const normalizedStatus = getNormalizedStatus(status, "review");
+          const normalizedStatus = getNormalizedApplicationStatus(
+            status,
+            "review"
+          );
           return (
             <StatusCell
               status={normalizedStatus}
@@ -217,7 +220,7 @@ function RecommendationsByApplicant(): JSX.Element {
             </div>
             <Heading>{applicantName}</Heading>
             <div>{applicationRound?.name}</div>
-            <StyledStatusBlock status="allocated" />
+            <StyledApplicationStatusBlock status="allocated" />
           </div>
           <div>{application && <ApplicantBox application={application} />}</div>
         </Top>

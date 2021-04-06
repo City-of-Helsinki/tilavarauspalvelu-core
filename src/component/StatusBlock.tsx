@@ -1,13 +1,9 @@
 import React from "react";
-import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { ApplicationStatus } from "../common/types";
-import { getNormalizedStatus, StatusView } from "../common/util";
-import { getStatusColor } from "../styles/util";
 
 interface IProps {
-  status: ApplicationStatus;
-  view?: StatusView;
+  statusStr: string;
+  color: string;
   className?: string;
 }
 
@@ -18,24 +14,25 @@ const Wrapper = styled.div<{ $color: string }>`
   background-color: ${({ $color }) => $color};
   height: 28px;
   padding: 0 15px;
-  color: var(--color-white);
+  color: ${({ $color }) =>
+    $color &&
+    ["var(--color-silver)", "var(--color-alert-light)"].includes($color)
+      ? "var(--color-black-90)"
+      : "var(--color-white)"};
   font-family: var(--tilavaraus-admin-font-bold);
   font-weight: bold;
   font-size: var(--fontsize-body-s);
+  white-space: nowrap;
 `;
 
-function StatusBlock({ status, view, className }: IProps): JSX.Element {
-  const { t } = useTranslation();
-
-  const normalizedStatus = view ? getNormalizedStatus(status, view) : status;
-
+function StatusBlock({ statusStr, color, className }: IProps): JSX.Element {
   return (
     <Wrapper
       data-testid="status-block__wrapper"
-      $color={getStatusColor(normalizedStatus, "l")}
+      $color={color}
       className={className}
     >
-      <span>{t(`Application.statuses.${normalizedStatus}`)}</span>
+      <span>{statusStr}</span>
     </Wrapper>
   );
 }

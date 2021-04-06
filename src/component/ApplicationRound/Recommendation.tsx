@@ -31,7 +31,7 @@ import {
 } from "../../styles/util";
 import LinkPrev from "../LinkPrev";
 import Loader from "../Loader";
-import StatusBlock from "../StatusBlock";
+import ApplicationStatusBlock from "../Application/ApplicationStatusBlock";
 import withMainMenu from "../withMainMenu";
 import ApplicantBox from "./ApplicantBox";
 import RecommendedSlot from "./RecommendedSlot";
@@ -78,7 +78,7 @@ const Heading = styled(H1)`
   margin-bottom: var(--spacing-3-xs);
 `;
 
-const StyledStatusBlock = styled(StatusBlock)`
+const StyledApplicationStatusBlock = styled(ApplicationStatusBlock)`
   margin-top: var(--spacing-xl);
 `;
 
@@ -201,7 +201,7 @@ function Recommendation(): JSX.Element {
             </div>
             <Heading>Ehdotus, osa ??????</Heading>
             <div>{applicationRound?.name}</div>
-            <StyledStatusBlock status="allocated" />
+            <StyledApplicationStatusBlock status="allocated" />
           </div>
           <div>{application && <ApplicantBox application={application} />}</div>
         </Top>

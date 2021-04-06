@@ -1,7 +1,10 @@
 import { Button, Checkbox, ErrorSummary, Navigation } from "hds-react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
-import { ApplicationStatus } from "../common/types";
+import {
+  ApplicationStatus,
+  NormalizedApplicationRoundStatus,
+} from "../common/types";
 
 export const breakpoints = {
   xs: "320px",
@@ -16,7 +19,7 @@ export const getGridFraction = (space: number, columns = 12): number => {
   return fraction > 0 ? fraction : 0;
 };
 
-export const getStatusColor = (
+export const getApplicationStatusColor = (
   status: ApplicationStatus,
   size: "s" | "l"
 ): string => {
@@ -49,6 +52,27 @@ export const getStatusColor = (
   return color;
 };
 
+export const getApplicationRoundStatusColor = (
+  status: NormalizedApplicationRoundStatus | "incoming"
+): string => {
+  let color = "";
+  switch (status) {
+    case "handling":
+      color = "var(--color-info)";
+      break;
+    case "validated":
+      color = "var(--color-alert-light)";
+      break;
+    case "draft":
+    case "incoming":
+    case "approved":
+    default:
+      color = "var(--color-silver)";
+  }
+
+  return color;
+};
+
 export const Seranwrap = styled.div`
   height: 200%;
   position: absolute;
@@ -73,7 +97,7 @@ export const StatusDot = styled.div<{
   width: ${({ size }) => size && `${size}px`};
   height: ${({ size }) => size && `${size}px`};
   border-radius: 50%;
-  background-color: ${({ status }) => getStatusColor(status, "s")};
+  background-color: ${({ status }) => getApplicationStatusColor(status, "s")};
 `;
 
 export const InlineErrorSummary = styled(ErrorSummary)`
@@ -87,6 +111,8 @@ export const BasicLink = styled(Link)`
   user-select: none;
   display: inline-flex;
   align-content: center;
+  align-items: center;
+  gap: var(--spacing-xs);
 `;
 
 export const StyledHDSNavigation = styled(Navigation)`
@@ -117,3 +143,12 @@ export const PlainButton = styled(Button).attrs({
     "--color-bus": "var(--color-black)",
   },
 })``;
+
+export const NotificationBox = styled.div`
+  background-color: var(--tilavaraus-admin-gray-darker);
+  padding: 110px var(--spacing-layout-m) 100px;
+  text-align: center;
+  white-space: pre-line;
+  line-height: var(--lineheight-xl);
+  margin-bottom: var(--spacing-5-xl);
+`;

@@ -7,7 +7,7 @@ import { Button, Checkbox, Notification } from "hds-react";
 import uniq from "lodash/uniq";
 import trim from "lodash/trim";
 import withMainMenu from "../withMainMenu";
-import Heading from "../Applications/Heading";
+import Heading from "../Application/Heading";
 import { ContentHeading, H2 } from "../../styles/typography";
 import { breakpoints } from "../../styles/util";
 import { IngressContainer } from "../../styles/layout";
@@ -23,10 +23,10 @@ import Loader from "../Loader";
 import StatusCell from "../StatusCell";
 import {
   formatNumber,
-  getNormalizedStatus,
+  getNormalizedApplicationStatus,
   parseDuration,
 } from "../../common/util";
-import StatusRecommendation from "../Applications/StatusRecommendation";
+import StatusRecommendation from "../Application/StatusRecommendation";
 import ApplicationRoundNavi from "./ApplicationRoundNavi";
 
 interface IProps {
@@ -108,7 +108,10 @@ const getFilterConfig = (
     {
       title: "Application.headings.applicationStatus",
       filters: statuses.map((status) => {
-        const normalizedStatus = getNormalizedStatus(status, "review");
+        const normalizedStatus = getNormalizedApplicationStatus(
+          status,
+          "review"
+        );
         return {
           title: `Application.statuses.${normalizedStatus}`,
           key: "status",
@@ -158,7 +161,10 @@ const getCellConfig = (t: TFunction): CellConfig => {
         title: "Application.headings.applicationStatus",
         key: "status",
         transform: ({ status }: ApplicationType) => {
-          const normalizedStatus = getNormalizedStatus(status, "review");
+          const normalizedStatus = getNormalizedApplicationStatus(
+            status,
+            "review"
+          );
           return (
             <StatusCell
               status={normalizedStatus}

@@ -33,41 +33,11 @@ const MobileNavigation = styled.div`
   }
 `;
 
-const UserMenu = styled(HDSNavigation.User)<{ $initials?: string }>`
-  ${({ $initials }) =>
-    $initials &&
-    `
-    &:after {
-      content: '${$initials}';
-      position: absolute;
-      top: 0;
-      left: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 34px;
-      height: 34px;
-      pointer-events: none;
-    }
-  `}
-  color: var(--tilavaraus-admin-header-background-color);
-  background-color: var(--color-white);
-  border-radius: 50%;
-  width: 34px;
-  height: 34px;
-
-  button {
-    svg {
-      padding-left: 4px;
-    }
-  }
-
+const UserMenu = styled(HDSNavigation.User)`
   svg {
-    &:last-of-type {
-      display: none;
+    &:first-of-type {
+      margin-right: var(--spacing-3-xs);
     }
-
-    ${({ $initials }) => $initials && "visibility: hidden;"}
   }
 
   a {
@@ -123,9 +93,6 @@ const Navigation = ({
           />
         </MobileNavigation>
         <UserMenu
-          $initials={`${profile?.given_name?.charAt(0) || ""} ${
-            profile?.family_name?.charAt(0) || ""
-          }`.trim()}
           userName={`${profile?.given_name || ""} ${
             profile?.family_name || ""
           }`.trim()}
@@ -164,10 +131,16 @@ const Navigation = ({
 
 const NavigationWithProfileAndLogout = authEnabled
   ? () => {
-      const { oidcUser, logout } = useReactOidc();
+      const { oidcUser, login, logout } = useReactOidc();
       const profile = oidcUser ? oidcUser.profile : null;
 
-      return <Navigation profile={profile} logout={() => logout()} />;
+      return (
+        <Navigation
+          profile={profile}
+          login={() => login()}
+          logout={() => logout()}
+        />
+      );
     }
   : () => <Navigation profile={null} />;
 

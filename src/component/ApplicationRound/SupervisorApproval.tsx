@@ -13,7 +13,7 @@ import {
   NarrowContainer,
 } from "../../styles/layout";
 import { breakpoints } from "../../styles/util";
-import StatusRecommendation from "../Applications/StatusRecommendation";
+import StatusRecommendation from "../Application/StatusRecommendation";
 import withMainMenu from "../withMainMenu";
 import ApplicationRoundNavi from "./ApplicationRoundNavi";
 import TimeframeStatus from "./TimeframeStatus";
@@ -235,7 +235,7 @@ function SupervisorApproval({ applicationRoundId }: IProps): JSX.Element {
     hours: 2345,
   };
 
-  const backLink = "/applicationRoute"; // TODO: check route
+  const backLink = "/applicationRounds";
 
   if (isLoading) {
     return <Loader />;

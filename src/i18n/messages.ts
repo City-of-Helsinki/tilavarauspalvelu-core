@@ -89,6 +89,8 @@ const translations: ITranslations = {
     biweekly: ["Vuoroviikoittain"],
     timeOfDay: ["Kellonaika"],
     unhandledCount: ["{{count}} käsittelemättä"],
+    inspect: ["Tarkastele"],
+    cityOfHelsinki: ["Helsingin kaupunki"],
   },
   errors: {
     applicationRoundNotFound: ["Haettua hakukierrosta ei löydy"],
@@ -99,6 +101,17 @@ const translations: ITranslations = {
     errorSavingApplication: ["Virhe tallennettaessa hakemusta"],
     loginNeeded: ["Kirjautuminen vaaditaan"],
     authorizationNeeded: ["Oikeudet vaaditaan"],
+  },
+  MainLander: {
+    ingress: [
+      "Voit käsitellä palvelussa vastuualueellesi osoitettuja Helsingin kaupungin tilavaraushakemuksia tai hallita varattaviksi asetettavien tilojen tai resurssien tietoja.",
+    ],
+    body: [
+      "Palvelua pilotoidaan nuorison vakiovuorovarauksilla vuoden 2021 aikana. Palveluun voivat toistaiseksi kirjautua vain ne Helsingin kaupungin työntekijät, joteka edustavat pilottikohdetta.",
+    ],
+  },
+  User: {
+    welcomeUser: ["Tervetuloa, {{firstName}}!"],
   },
   MainMenu: {
     applications: ["Hakemukset"],
@@ -116,7 +129,7 @@ const translations: ITranslations = {
     singleReservations: ["Yksittäisvuorot"],
   },
   Navigation: {
-    login: ["Kirjaudu", "Login", "Logga in"],
+    login: ["Kirjaudu sisään", "Login", "Logga in"],
     logout: ["Kirjaudu ulos", "Logout", "Logga ut"],
     profile: ["Profiili", "Profile", "Profil"],
     languageSelection: ["Kielen valinta", "Language selection", "Språkval"],
@@ -197,6 +210,15 @@ const translations: ITranslations = {
     contactPerson: ["Yhteyshenkilö"],
   },
   ApplicationRound: {
+    statuses: {
+      incoming: ["Tulossa"],
+      draft: ["Haku avoinna"],
+      handling: ["Käsittelyssä"],
+      validated: ["Odottaa esihenkilöhyväksyntää"],
+      approved: ["Arkistoitu menneisiin"],
+    },
+    listApprovalTitle: ["Hyväksynnät"],
+    listHandlingTitle: ["Käsittely"],
     pastRounds: ["Menneet"],
     roundsInProcessing: ["Käsittelyssä"],
     roundsOpenForApplication: ["Haku avoinna"],
@@ -266,6 +288,7 @@ const translations: ITranslations = {
       "Voit katsella alta hyväksyntää odottavaa päätöslauselmaa.",
     ],
     schedulesToBeGranted: ["Myönnettäviä vuoroja"],
+    attachedReservationUnits: ["Liitettyä varausyksikköä"],
     orphanApplications: ["Vaille tilaa jääneet"],
     handledApplications: ["Käsitellyt päätökset"],
     amountReserved: ["Kapasiteetista varattu"],
@@ -285,6 +308,24 @@ const translations: ITranslations = {
       "Kaikkien toimipisteiden asiakkaat saavat myöntöpäätökset heti, kun hyväksyntä on tehty.",
     ],
     returnListToHandling: ["Palauta lista käsittelyyn"],
+    listHandlingIngressEmpty: [
+      "Vastuullasi ei ole tällä hetkellä ole lainkaan tulevia tai käsittelyvaiheessa olevia hakukierroksia.",
+    ],
+    listHandlingIngress: [
+      "Vastuullasi on tällä hetkellä {{count}} tuleva tai käsittelyvaiheessa oleva hakukierros.",
+    ],
+    listHandlingIngress_plural: [
+      "Vastuullasi on tällä hetkellä {{count}} tulevaa tai käsittelyvaiheessa olevaa hakukierrosta.",
+    ],
+    listHandlingPlaceholder: [
+      "Ei vielä tulevia tai käsittelyvaiheessa olevia hakukierroksia.",
+    ],
+    listApprovalIngress: [
+      "Hyväksyntääsi odottaa tällä hetkellä {{count}} päätöslauselma.",
+    ],
+    listApprovalIngress_plural: [
+      "Hyväksyntääsi odottaa tällä hetkellä {{count}} päätöslauselmaa",
+    ],
   },
   ApplicationEvent: {
     name: ["Vakiovuoron nimi"],

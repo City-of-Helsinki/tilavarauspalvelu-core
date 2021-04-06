@@ -16,7 +16,7 @@ import withMainMenu from "../withMainMenu";
 import LinkPrev from "../LinkPrev";
 import { ReactComponent as IconCustomers } from "../../images/icon_customers.svg";
 import { formatNumber, parseDuration } from "../../common/util";
-import StatusBlock from "../StatusBlock";
+import ApplicationStatusBlock from "./ApplicationStatusBlock";
 
 interface IRouteParams {
   applicationId: string;
@@ -270,7 +270,7 @@ function Application(): JSX.Element | null {
                   t(`Application.applicantTypes.${application.applicantType}`)}
               </dd>
             </ApplicantType>
-            <StatusBlock status={application.status} view="review" />
+            <ApplicationStatusBlock status={application.status} view="review" />
             {notificationContent ? (
               <StyledNotification
                 type="success"
