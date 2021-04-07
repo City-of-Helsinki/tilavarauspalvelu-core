@@ -141,8 +141,11 @@ def can_allocate_service_sector_allocations(
     permission = "can_allocate_applications"
     return (
         is_superuser(user)
-        or has_service_sector_permission(user, [service_sector], permission)
         or has_general_permission(user, permission)
+        or (
+            service_sector is not None
+            and has_service_sector_permission(user, [service_sector], permission)
+        )
     )
 
 

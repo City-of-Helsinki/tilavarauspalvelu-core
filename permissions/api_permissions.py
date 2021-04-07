@@ -170,9 +170,7 @@ class AllocationRequestPermission(permissions.BasePermission):
         application_round_id = request.data.get("application_round_id")
         try:
             application_round = ApplicationRound.objects.get(pk=application_round_id)
-            service_sector = ServiceSector.objects.get(
-                pk=application_round.service_sector.id
-            )
+            service_sector = application_round.service_sector
             return can_allocate_service_sector_allocations(request.user, service_sector)
         except (ServiceSector.DoesNotExist, ApplicationRound.DoesNotExist):
             return False
