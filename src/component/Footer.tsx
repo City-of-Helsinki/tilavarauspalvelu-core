@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Footer as HDSFooter } from 'hds-react';
 
-const linkIds: string[] = ['reservation', 'recurringShift', 'infoAboutService'];
+const linkIds: string[] = ['feedback'];
 
 const Footer = (): JSX.Element => {
   const { t } = useTranslation();

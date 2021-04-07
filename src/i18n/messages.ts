@@ -474,17 +474,11 @@ const translations: Translations = {
 
   Footer: {
     Navigation: {
-      recurringShift: {
-        label: ['Säännölliset vuorot'],
-        href: ['#'],
-      },
-      reservation: {
-        label: ['Varaus'],
-        href: ['#'],
-      },
-      infoAboutService: {
-        label: ['Tietoa palvelusta'],
-        href: ['#'],
+      feedback: {
+        label: ['Lähetä palautetta'],
+        href: [
+          'https://app.helmet-kirjasto.fi/forms/?site=varaamopalaute&ref=https://tilavaraus.hel.fi/',
+        ],
       },
     },
     Base: {
