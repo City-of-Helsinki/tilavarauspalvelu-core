@@ -1,15 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { TFunction, useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { Button, IconArrowRedo, Notification } from "hds-react";
-import { useHistory } from "react-router-dom";
 import uniq from "lodash/uniq";
 import trim from "lodash/trim";
-import { getApplicationRound } from "../../common/api";
 import Loader from "../Loader";
 import {
   Application as ApplicationType,
   ApplicationRound as ApplicationRoundType,
+  ApplicationRoundStatus,
   DataFilterConfig,
 } from "../../common/types";
 import { IngressContainer, NarrowContainer } from "../../styles/layout";
@@ -30,9 +29,12 @@ import {
   parseDuration,
 } from "../../common/util";
 import StatusCell from "../StatusCell";
+import { getApplicationRound, triggerAllocation } from "../../common/api";
 
 interface IProps {
-  applicationRoundId: string;
+  applicationRound: ApplicationRoundType;
+  setApplicationRound: Dispatch<SetStateAction<ApplicationRoundType | null>>;
+  setApplicationRoundStatus: (status: ApplicationRoundStatus) => Promise<void>;
 }
 
 const Wrapper = styled.div`
@@ -198,54 +200,38 @@ const getCellConfig = (
   };
 };
 
-function Handling({ applicationRoundId }: IProps): JSX.Element {
+function Handling({
+  applicationRound,
+  setApplicationRound,
+  setApplicationRoundStatus,
+}: IProps): JSX.Element {
   const [isLoading, setIsLoading] = useState(true);
   const [isAllocating, setIsAllocating] = useState(false);
-  const [
-    applicationRound,
-    setApplicationRound,
-  ] = useState<ApplicationRoundType | null>(null);
   const [recommendations, setRecommendations] = useState<any[]>([]); // eslint-disable-line
   const [cellConfig, setCellConfig] = useState<CellConfig | null>(null);
   const [filterConfig, setFilterConfig] = useState<DataFilterConfig[]>([]);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const { t } = useTranslation();
-  const history = useHistory();
 
-  const startAllocation = (id: string): void => {
-    console.log(id); // eslint-disable-line
-    setIsAllocating(true);
+  const startAllocation = async () => {
+    if (!applicationRound) return;
+
+    setErrorMsg(null);
+
+    try {
+      const allocation = await triggerAllocation({
+        applicationRoundId: applicationRound.id,
+        applicationRoundBasketIds: applicationRound.applicationRoundBaskets.map(
+          (n) => n.id
+        ),
+      });
+      setIsAllocating(!!allocation?.id);
+    } catch (error) {
+      const msg = "errors.errorStartingAllocation";
+      setErrorMsg(msg);
+    }
   };
-
-  const finishAllocation = (): void => {
-    setIsAllocating(false);
-  };
-
-  useEffect(() => {
-    const fetchApplicationRound = async () => {
-      setErrorMsg(null);
-      setIsLoading(true);
-
-      try {
-        const result = await getApplicationRound({
-          id: applicationRoundId,
-        });
-        setApplicationRound(result);
-        setCellConfig(getCellConfig(t, result));
-        setIsLoading(false);
-      } catch (error) {
-        const msg =
-          error.response?.status === 404
-            ? "errors.applicationRoundNotFound"
-            : "errors.errorFetchingData";
-        setErrorMsg(msg);
-        setIsLoading(false);
-      }
-    };
-
-    fetchApplicationRound();
-  }, [applicationRoundId, t]);
 
   useEffect(() => {
     const fetchRecommendations = async () => {
@@ -336,7 +322,9 @@ function Handling({ applicationRoundId }: IProps): JSX.Element {
             ],
           },
         ];
+
         setFilterConfig(getFilterConfig(result.flatMap((n) => n.data)));
+        setCellConfig(getCellConfig(t, applicationRound));
         setRecommendations(result);
       } catch (error) {
         setErrorMsg("errors.errorFetchingApplications");
@@ -348,7 +336,23 @@ function Handling({ applicationRoundId }: IProps): JSX.Element {
     if (typeof applicationRound?.id === "number") {
       fetchRecommendations();
     }
-  }, [applicationRound]);
+  }, [applicationRound, t]);
+
+  useEffect(() => {
+    const poller = setInterval(async () => {
+      if (isAllocating) {
+        const result = await getApplicationRound({ id: applicationRound.id });
+        if (result.allocating === false) {
+          setApplicationRound(result);
+          setIsAllocating(false);
+        }
+      }
+    }, 2000);
+
+    return () => {
+      clearInterval(poller);
+    };
+  }, [isAllocating, applicationRound, setApplicationRound]);
 
   const unhandledRecommendationCount: number = recommendations
     .flatMap((recommendation) => recommendation.data)
@@ -371,7 +375,7 @@ function Handling({ applicationRoundId }: IProps): JSX.Element {
             subheading={t("ApplicationRound.suffixUnhandledSuggestions")}
           />
           <IngressContainer>
-            <ApplicationRoundNavi applicationRoundId={applicationRoundId} />
+            <ApplicationRoundNavi applicationRoundId={applicationRound.id} />
             <TopIngress>
               <div>
                 <ContentHeading>{applicationRound.name}</ContentHeading>
@@ -404,18 +408,16 @@ function Handling({ applicationRoundId }: IProps): JSX.Element {
               <Button
                 type="button"
                 variant="secondary"
-                onClick={() =>
-                  history.push(
-                    `/applicationRound/${applicationRoundId}?preapproval`
-                  )
-                }
+                onClick={() => {
+                  setApplicationRoundStatus("handled");
+                }}
               >
                 {t("ApplicationRound.navigateToApprovalPreparation")}
               </Button>
               <Button
                 type="submit"
                 variant="primary"
-                onClick={() => startAllocation(applicationRoundId)}
+                onClick={() => startAllocation()}
                 iconLeft={<IconArrowRedo />}
               >
                 {t("ApplicationRound.allocateAction")}
@@ -438,7 +440,7 @@ function Handling({ applicationRoundId }: IProps): JSX.Element {
           )}
         </>
       )}
-      {isAllocating && <AllocatingDialogContent callback={finishAllocation} />}
+      {isAllocating && <AllocatingDialogContent />}
       {errorMsg && (
         <Notification
           type="error"

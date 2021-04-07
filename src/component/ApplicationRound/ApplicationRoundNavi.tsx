@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { BasicLink, breakpoints } from "../../styles/util";
 
 interface IProps {
-  applicationRoundId: string;
+  applicationRoundId: number;
 }
 
 const Wrapper = styled.div`

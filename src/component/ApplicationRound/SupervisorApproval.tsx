@@ -2,11 +2,12 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { TFunction } from "i18next";
 import styled from "styled-components";
-import { Button, Checkbox, Notification } from "hds-react";
 import { useHistory } from "react-router-dom";
-import { getApplicationRound } from "../../common/api";
-import Loader from "../Loader";
-import { ApplicationRound as ApplicationRoundType } from "../../common/types";
+import { Button, Checkbox, Notification } from "hds-react";
+import {
+  ApplicationRound as ApplicationRoundType,
+  ApplicationRoundStatus,
+} from "../../common/types";
 import {
   ContentContainer,
   IngressContainer,
@@ -23,6 +24,8 @@ import Dialog from "../Dialog";
 import { formatNumber } from "../../common/util";
 import BigRadio from "../BigRadio";
 import LinkPrev from "../LinkPrev";
+import Loader from "../Loader";
+import { getApplicationRound, saveApplicationRound } from "../../common/api";
 
 interface IProps {
   applicationRoundId: string;
@@ -205,6 +208,17 @@ function SupervisorApproval({ applicationRoundId }: IProps): JSX.Element {
   const { t } = useTranslation();
   const history = useHistory();
 
+  const setApplicationRoundStatus = async (status: ApplicationRoundStatus) => {
+    const payload = { ...applicationRound, status } as ApplicationRoundType;
+
+    try {
+      const result = await saveApplicationRound(payload);
+      setApplicationRound(result);
+    } catch (error) {
+      setErrorMsg("errors.errorSavingData");
+    }
+  };
+
   useEffect(() => {
     const fetchApplicationRound = async () => {
       setErrorMsg(null);
@@ -212,7 +226,7 @@ function SupervisorApproval({ applicationRoundId }: IProps): JSX.Element {
 
       try {
         const result = await getApplicationRound({
-          id: applicationRoundId,
+          id: Number(applicationRoundId),
         });
         setApplicationRound(result);
         setCellConfig(getCellConfig(t));
@@ -249,7 +263,7 @@ function SupervisorApproval({ applicationRoundId }: IProps): JSX.Element {
             <LinkPrev route={backLink} />
           </ContentContainer>
           <IngressContainer>
-            <ApplicationRoundNavi applicationRoundId={applicationRoundId} />
+            <ApplicationRoundNavi applicationRoundId={applicationRound.id} />
             <TopIngress>
               <div>
                 <ContentHeading>{applicationRound.name}</ContentHeading>
@@ -358,70 +372,78 @@ function SupervisorApproval({ applicationRoundId }: IProps): JSX.Element {
               filterConfig={[]}
             />
           )}
+          {isCancelDialogVisible && (
+            <Dialog
+              closeDialog={() => setCancelDialogVisibility(false)}
+              style={
+                {
+                  "--padding": "var(--spacing-layout-s)",
+                } as React.CSSProperties
+              }
+            >
+              <H3>
+                {t("ApplicationRound.cancelSupervisorApprovalDialogHeader")}
+              </H3>
+              <p>{t("ApplicationRound.cancelSupervisorApprovalDialogBody")}</p>
+              <ActionContainer>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => setCancelDialogVisibility(false)}
+                >
+                  {t("common.cancel")}
+                </Button>
+                <Button
+                  type="submit"
+                  variant="primary"
+                  onClick={() => {
+                    setApplicationRoundStatus("allocated");
+                    history.push(`/applicationRound/${applicationRound.id}`);
+                  }}
+                >
+                  {t("ApplicationRound.returnListToHandling")}
+                </Button>
+              </ActionContainer>
+            </Dialog>
+          )}
+          {isConfirmationDialogVisible && (
+            <Dialog
+              closeDialog={() => setConfirmationDialogVisibility(false)}
+              style={
+                {
+                  "--padding": "var(--spacing-layout-s)",
+                } as React.CSSProperties
+              }
+            >
+              <H3>
+                {t("ApplicationRound.approveRecommendationsDialogHeader")}
+              </H3>
+              <p>{t("ApplicationRound.approveRecommendationsDialogBody")}</p>
+              <ActionContainer>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => setConfirmationDialogVisibility(false)}
+                >
+                  {t("common.cancel")}
+                </Button>
+                <Button
+                  type="submit"
+                  variant="primary"
+                  onClick={() => {
+                    // TODO: correct routing with notification
+                    setApplicationRoundStatus("approved");
+                    setConfirmationDialogVisibility(false);
+                  }}
+                >
+                  {t("common.approve")}
+                </Button>
+              </ActionContainer>
+            </Dialog>
+          )}
         </>
       )}
-      {isCancelDialogVisible && (
-        <Dialog
-          closeDialog={() => setCancelDialogVisibility(false)}
-          style={
-            { "--padding": "var(--spacing-layout-s)" } as React.CSSProperties
-          }
-        >
-          <H3>{t("ApplicationRound.cancelSupervisorApprovalDialogHeader")}</H3>
-          <p>{t("ApplicationRound.cancelSupervisorApprovalDialogBody")}</p>
-          <ActionContainer>
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={() => setCancelDialogVisibility(false)}
-            >
-              {t("common.cancel")}
-            </Button>
-            <Button
-              type="submit"
-              variant="primary"
-              onClick={() => {
-                // TODO: correct action
-                history.push(
-                  `/applicationRound/${applicationRoundId}?allocated`
-                );
-              }}
-            >
-              {t("ApplicationRound.returnListToHandling")}
-            </Button>
-          </ActionContainer>
-        </Dialog>
-      )}
-      {isConfirmationDialogVisible && (
-        <Dialog
-          closeDialog={() => setConfirmationDialogVisibility(false)}
-          style={
-            { "--padding": "var(--spacing-layout-s)" } as React.CSSProperties
-          }
-        >
-          <H3>{t("ApplicationRound.approveRecommendationsDialogHeader")}</H3>
-          <p>{t("ApplicationRound.approveRecommendationsDialogBody")}</p>
-          <ActionContainer>
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={() => setConfirmationDialogVisibility(false)}
-            >
-              {t("common.cancel")}
-            </Button>
-            <Button
-              type="submit"
-              variant="primary"
-              onClick={() => {
-                // TODO: correct routing with notification
-                setConfirmationDialogVisibility(false);
-              }}
-            >
-              {t("common.approve")}
-            </Button>
-          </ActionContainer>
-        </Dialog>
-      )}
+
       {errorMsg && (
         <Notification
           type="error"

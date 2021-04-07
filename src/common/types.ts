@@ -34,6 +34,7 @@ export type ApplicationRound = {
   serviceSectorId: number;
   applicationRoundBaskets: ApplicationRoundBasket[];
   status: ApplicationRoundStatus;
+  allocating: boolean;
 };
 
 export type Space = {

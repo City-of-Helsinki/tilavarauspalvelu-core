@@ -4,11 +4,17 @@ import { useTranslation } from "react-i18next";
 // eslint-disable-next-line import/no-unresolved
 import { useReactOidc } from "@axa-fr/react-oidc-context";
 import { Button, IconArrowRight, IconGroup } from "hds-react";
+import { BrowserRouter } from "react-router-dom";
 import KorosHeading from "./KorosHeading";
 import HeroImage from "../images/hero-user@1x.jpg";
 import { H2 } from "../styles/typography";
 import { breakpoints } from "../styles/util";
 import Footer from "./Footer";
+import PageWrapper from "./PageWrapper";
+
+interface IProps {
+  withSiteWrapper?: boolean;
+}
 
 const Wrapper = styled.div``;
 
@@ -66,11 +72,11 @@ const Body = styled.p`
   margin-top: var(--spacing-xl);
 `;
 
-function MainLander(): JSX.Element {
+function MainLander({ withSiteWrapper = false }: IProps): JSX.Element {
   const { t } = useTranslation();
   const { login } = useReactOidc();
 
-  return (
+  const Lander = (
     <Wrapper>
       <KorosHeading
         heading={t("common.applicationName")}
@@ -85,6 +91,14 @@ function MainLander(): JSX.Element {
       </Content>
       <Footer />
     </Wrapper>
+  );
+
+  return withSiteWrapper ? (
+    <BrowserRouter>
+      <PageWrapper>{Lander}</PageWrapper>
+    </BrowserRouter>
+  ) : (
+    Lander
   );
 }
 

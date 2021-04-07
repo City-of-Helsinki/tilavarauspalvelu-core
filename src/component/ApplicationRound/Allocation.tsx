@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { useHistory } from "react-router-dom";
 import { Button, IconArrowRedo, Notification } from "hds-react";
-import { getApplicationRound } from "../../common/api";
-import Loader from "../Loader";
-import { ApplicationRound as ApplicationRoundType } from "../../common/types";
+import { getApplicationRound, triggerAllocation } from "../../common/api";
+import {
+  ApplicationRound as ApplicationRoundType,
+  ApplicationRoundStatus,
+} from "../../common/types";
 import {
   IngressContainer,
   NarrowContainer,
@@ -21,7 +22,8 @@ import TimeframeStatus from "./TimeframeStatus";
 import AllocatingDialogContent from "./AllocatingDialogContent";
 
 interface IProps {
-  applicationRoundId: string;
+  applicationRound: ApplicationRoundType;
+  setApplicationRoundStatus: (status: ApplicationRoundStatus) => Promise<void>;
 }
 
 const Wrapper = styled.div`
@@ -101,54 +103,53 @@ const ActionContainer = styled.div`
   }
 `;
 
-function Allocation({ applicationRoundId }: IProps): JSX.Element {
-  const [isLoading, setIsLoading] = useState(true);
-  const [isAllocating, setIsAllocating] = useState(false);
-  const [
-    applicationRound,
-    setApplicationRound,
-  ] = useState<ApplicationRoundType | null>(null);
+function Allocation({
+  applicationRound,
+  setApplicationRoundStatus,
+}: IProps): JSX.Element {
+  const [isAllocating, setIsAllocating] = useState<boolean>(false);
+  const [isAllocated, setIsAllocated] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const { t } = useTranslation();
-  const history = useHistory();
 
-  const startAllocation = (id: string): void => {
-    console.log(id); // eslint-disable-line
-    setIsAllocating(true);
-  };
+  const startAllocation = async () => {
+    if (!applicationRound) return;
 
-  const finishAllocation = (): void => {
-    history.push(`/applicationRound/${applicationRoundId}?allocated`);
+    setErrorMsg(null);
+
+    try {
+      const allocation = await triggerAllocation({
+        applicationRoundId: applicationRound.id,
+        applicationRoundBasketIds: applicationRound.applicationRoundBaskets.map(
+          (n) => n.id
+        ),
+      });
+      setIsAllocating(!!allocation?.id);
+    } catch (error) {
+      const msg = "errors.errorStartingAllocation";
+      setErrorMsg(msg);
+    }
   };
 
   useEffect(() => {
-    const fetchApplicationRound = async () => {
-      setErrorMsg(null);
-      setIsLoading(true);
+    if (isAllocated) {
+      setApplicationRoundStatus("allocated");
+    }
+  }, [isAllocated, setApplicationRoundStatus]);
 
-      try {
-        const result = await getApplicationRound({
-          id: applicationRoundId,
-        });
-        setApplicationRound(result);
-        setIsLoading(false);
-      } catch (error) {
-        const msg =
-          error.response?.status === 404
-            ? "errors.applicationRoundNotFound"
-            : "errors.errorFetchingData";
-        setErrorMsg(msg);
-        setIsLoading(false);
+  useEffect(() => {
+    const poller = setInterval(async () => {
+      if (isAllocating) {
+        const result = await getApplicationRound({ id: applicationRound.id });
+        setIsAllocated(!result.allocating);
       }
+    }, 2000);
+
+    return () => {
+      clearInterval(poller);
     };
-
-    fetchApplicationRound();
-  }, [applicationRoundId]);
-
-  if (isLoading) {
-    return <Loader />;
-  }
+  }, [isAllocating, applicationRound]);
 
   return (
     <Wrapper>
@@ -156,7 +157,7 @@ function Allocation({ applicationRoundId }: IProps): JSX.Element {
       {applicationRound && (
         <>
           <IngressContainer>
-            <ApplicationRoundNavi applicationRoundId={applicationRoundId} />
+            <ApplicationRoundNavi applicationRoundId={applicationRound.id} />
             <div>
               <ContentHeading>{applicationRound.name}</ContentHeading>
               <Details>
@@ -196,9 +197,9 @@ function Allocation({ applicationRoundId }: IProps): JSX.Element {
                 <Button
                   type="button"
                   variant="secondary"
-                  onClick={() =>
-                    history.push(`/applicationRound/${applicationRoundId}`)
-                  }
+                  onClick={() => {
+                    setApplicationRoundStatus("in_review");
+                  }}
                 >
                   {t("ApplicationRound.navigateBackToReview")}
                 </Button>
@@ -207,7 +208,7 @@ function Allocation({ applicationRoundId }: IProps): JSX.Element {
                 <Button
                   type="submit"
                   variant="primary"
-                  onClick={() => startAllocation(applicationRoundId)}
+                  onClick={() => startAllocation()}
                   iconLeft={<IconArrowRedo />}
                 >
                   {t("ApplicationRound.allocateAction")}
@@ -220,7 +221,7 @@ function Allocation({ applicationRoundId }: IProps): JSX.Element {
           </NarrowContainer>
         </>
       )}
-      {isAllocating && <AllocatingDialogContent callback={finishAllocation} />}
+      {isAllocating && <AllocatingDialogContent />}
       {errorMsg && (
         <Notification
           type="error"

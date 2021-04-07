@@ -158,7 +158,7 @@ function RecommendationsByApplicant(): JSX.Element {
   const { applicationRoundId, applicationId } = useParams<IRouteParams>();
 
   useEffect(() => {
-    const fetchData = async (appRoundId: string) => {
+    const fetchData = async (appRoundId: number) => {
       try {
         const result = await getApplicationRound({
           id: appRoundId,
@@ -171,7 +171,7 @@ function RecommendationsByApplicant(): JSX.Element {
       }
     };
 
-    fetchData(applicationRoundId);
+    fetchData(Number(applicationRoundId));
   }, [applicationRoundId]);
 
   useEffect(() => {
