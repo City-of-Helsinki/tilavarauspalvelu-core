@@ -206,7 +206,7 @@
         "model": "spaces.unit",
         "pk": 1,
         "fields": {
-            "service_map_id": null,
+            "tprek_id": null,
             "name": "Töölön kirjasto",
             "name_fi": "Töölön kirjasto",
             "name_en": null,
@@ -222,7 +222,7 @@
         "model": "spaces.unit",
         "pk": 2,
         "fields": {
-            "service_map_id": null,
+            "tprek_id": null,
             "name": "Helsingin keskustakirjasto Oodi",
             "name_fi": "Helsingin keskustakirjasto Oodi",
             "name_en": null,
@@ -238,7 +238,7 @@
         "model": "spaces.unit",
         "pk": 3,
         "fields": {
-            "service_map_id": null,
+            "tprek_id": null,
             "name": "Fredriksbergin talo",
             "name_fi": "Fredriksbergin talo",
             "name_en": null,
@@ -254,7 +254,7 @@
         "model": "spaces.unit",
         "pk": 4,
         "fields": {
-            "service_map_id": null,
+            "tprek_id": null,
             "name": "Ympyrätalo",
             "name_fi": "Ympyrätalo",
             "name_en": null,
