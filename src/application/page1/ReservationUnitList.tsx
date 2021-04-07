@@ -1,4 +1,8 @@
-import { Button, IconPlusCircle, Notification } from 'hds-react';
+import {
+  Button,
+  IconPlusCircle,
+  Notification as HDSNotification,
+} from 'hds-react';
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -36,6 +40,10 @@ const MainContainer = styled.div`
 
 const ButtonContainer = styled.div`
   margin-top: var(--spacing-layout-m);
+`;
+
+const Notification = styled(HDSNotification)`
+  z-index: 0;
 `;
 
 const ReservationUnitList = ({
