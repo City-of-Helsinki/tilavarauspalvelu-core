@@ -99,7 +99,7 @@ const ApplicationRoundCard = ({ applicationRound }: Props): JSX.Element => {
           noLeftMargin
           variant="supplementary"
           iconLeft={<IconArrowRight />}
-          disabled>
+          onClick={() => history.push(`/criteria/${applicationRound.id}`)}>
           {t('ApplicationRoundCard.criteria')}
         </CardButton>
       </StyledContainer>

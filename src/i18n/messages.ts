@@ -303,6 +303,9 @@ const translations: Translations = {
     sunday: ['Sunnuntai'],
   },
   common: {
+    error: {
+      dataError: ['Tietoja ei saatu haettua'],
+    },
     applicationNavigationName: ['Hakemus', 'Application', 'Ansökan'],
     applicationName: ['Varaamo', 'Varaamo', 'Varaamo'],
     selectReservationUnit: ['Valitse tila'],

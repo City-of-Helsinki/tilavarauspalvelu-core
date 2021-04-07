@@ -13,6 +13,7 @@ export type ApplicationRound = {
   reservationPeriodBegin: string;
   reservationPeriodEnd: string;
   purposeIds: number[];
+  criteria: string;
 };
 
 export type Space = {

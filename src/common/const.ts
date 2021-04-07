@@ -14,6 +14,7 @@ export const reservationUnitPrefix = '/reservation-unit';
 export const searchPrefix = '/search';
 export const applicationsPrefix = '/applications';
 export const applicationPrefix = '/application';
+export const criteriaPrefix = '/criteria';
 
 export const mapStyle = {
   version: 8,

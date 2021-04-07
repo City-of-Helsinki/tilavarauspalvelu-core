@@ -7,6 +7,7 @@ import {
   ReservationUnit,
   Parameter,
 } from './types';
+import { ApiError } from './ApiError';
 
 const applicationRoundBasePath = 'application_round';
 const reservationUnitsBasePath = 'reservation_unit';
@@ -43,9 +44,9 @@ async function request<T>(requestConfig: AxiosRequestConfig): Promise<T> {
   } catch (error) {
     const errorMessage: string | undefined = error.response?.data?.detail;
     if (errorMessage) {
-      throw new Error(errorMessage);
+      throw new ApiError(errorMessage, error.response?.status);
     } else {
-      throw new Error(error);
+      throw new ApiError("ApiError 'no message'", error.response?.status);
     }
   }
 }

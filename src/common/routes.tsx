@@ -7,7 +7,8 @@ import {
   ApplicationRound as ApplicationRoundType,
   ReservationUnit as ReservationUnitType,
 } from './types';
-import { reservationUnitPrefix, searchPrefix } from './const';
+import { reservationUnitPrefix, searchPrefix, criteriaPrefix } from './const';
+import Criteria from '../criteria/Criteria';
 
 interface ReservationUnitParams {
   id?: string;
@@ -39,6 +40,11 @@ const Routes: Route[] = [
     loadData: (params: ReservationUnitParams): Promise<ReservationUnitType> =>
       getReservationUnit(Number(params.id)),
     dataKey: 'reservationUnit',
+  },
+
+  {
+    path: `${criteriaPrefix}/:id`,
+    component: Criteria,
   },
 ];
 
