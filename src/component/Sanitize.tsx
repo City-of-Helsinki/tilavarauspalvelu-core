@@ -6,7 +6,7 @@ type Props = {
 };
 
 const config = {
-  allowedTags: ['ol', 'ul', 'li', 'b', 'i', 'p', 'em', 'strong', 'a'],
+  allowedTags: ['ol', 'ul', 'li', 'b', 'i', 'p', 'em', 'strong', 'a', 'br'],
   allowedAttributes: {
     a: ['href'],
   },
