@@ -63,7 +63,7 @@ const Criteria = (): JSX.Element => {
         <HeadContent>
           <H1>
             {state === 'done'
-              ? `${applicationRound?.name} hakukriteerit`
+              ? `${applicationRound?.name} ${t('Criteria.criteria')}`
               : t('common.error.dataError')}
           </H1>
         </HeadContent>

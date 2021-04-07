@@ -288,6 +288,10 @@ const translations: Translations = {
     open: ['Haku auki {{until}} saakka'],
     past: ['Haku sulkeutui {{closingDate}}'],
   },
+
+  Criteria: {
+    criteria: ['hakukriteerit'],
+  },
   breadcrumb: {
     home: ['Vakiovuorot'],
     search: ['Haku'],
