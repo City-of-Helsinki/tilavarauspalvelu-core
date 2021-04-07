@@ -96,6 +96,7 @@ typing-extensions==3.7.4.3
 Unidecode==1.1.1
 uritemplate==3.0.1
 urllib3==1.26.4
+uuid==1.30
 uWSGI==2.0.19.1
 whitenoise==5.2.0
 zipp==3.4.0
