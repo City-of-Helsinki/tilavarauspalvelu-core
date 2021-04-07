@@ -49,6 +49,7 @@ const translations: Translations = {
     organisation: ['Hakemus luotu: {{type}} {{name}}'],
     applicantType: {
       community: ['yhdistykselle'],
+      association: ['rekisteröidylle yhdistykselle'],
       company: ['yritykselle'],
     },
   },
