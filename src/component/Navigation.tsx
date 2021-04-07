@@ -14,11 +14,7 @@ interface LanguageOption {
   value: string;
 }
 
-const languageOptions: LanguageOption[] = [
-  { label: 'Suomeksi', value: 'fi' },
-  { label: 'Svenska', value: 'sv' },
-  { label: 'English', value: 'en' },
-];
+const languageOptions: LanguageOption[] = [{ label: 'Suomeksi', value: 'fi' }];
 
 const StyledNavigation = styled(HDSNavigation)`
   --header-background-color: var(
