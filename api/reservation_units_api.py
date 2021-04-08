@@ -129,6 +129,8 @@ class ReservationUnitSerializer(TranslatedModelSerializer):
         queryset=Unit.objects.all(), source="unit"
     )
 
+    uuid = serializers.UUIDField(read_only=True)
+
     class Meta:
         model = ReservationUnit
         fields = [
@@ -147,6 +149,7 @@ class ReservationUnitSerializer(TranslatedModelSerializer):
             "terms_of_use",
             "equipment_ids",
             "unit_id",
+            "uuid",
         ]
         extra_kwargs = {
             "name": {

@@ -21,6 +21,7 @@ class ReservationUnitImageInline(admin.TabularInline):
 class ReservationUnitAdmin(admin.ModelAdmin):
     model = ReservationUnit
     inlines = [ReservationUnitImageInline]
+    readonly_fields = ["uuid"]
 
 
 @admin.register(ReservationUnitImage)
