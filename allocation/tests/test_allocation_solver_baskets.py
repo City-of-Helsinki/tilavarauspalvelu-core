@@ -179,7 +179,7 @@ def test_used_capacity_worth_more_than_basket_score(
     purpose,
 ):
 
-    application_round_basket_two.purpose = purpose2
+    application_round_basket_two.purposes.set([purpose2])
     application_round_basket_two.save()
 
     basket_two_event = (
@@ -332,7 +332,7 @@ def test_can_allocate_from_lower_baskets_if_enough_capacity(
     purpose2,
     purpose,
 ):
-    application_round_basket_two.purpose = purpose2
+    application_round_basket_two.purposes.set([purpose2])
     application_round_basket_two.save()
 
     basket_two_event = (
@@ -405,7 +405,7 @@ def test_should_restrict_output_by_output_basket_ids(
     purpose2,
     purpose,
 ):
-    application_round_basket_two.purpose = purpose2
+    application_round_basket_two.purposes.set([purpose2])
     application_round_basket_two.save()
 
     basket_two_event = (

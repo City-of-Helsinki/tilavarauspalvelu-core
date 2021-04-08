@@ -27,9 +27,10 @@ class CitySerializerField(serializers.Field):
 
 
 class ApplicationRoundBasketSerializer(serializers.ModelSerializer):
-    purpose_id = serializers.PrimaryKeyRelatedField(
-        queryset=Purpose.objects.all(), source="purpose"
+    purpose_ids = serializers.PrimaryKeyRelatedField(
+        queryset=Purpose.objects.all(), source="purposes", many=True
     )
+
     age_group_ids = serializers.PrimaryKeyRelatedField(
         queryset=AgeGroup.objects.all(), source="age_groups", many=True
     )
@@ -45,7 +46,7 @@ class ApplicationRoundBasketSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "name",
-            "purpose_id",
+            "purpose_ids",
             "must_be_main_purpose_of_applicant",
             "customer_type",
             "age_group_ids",
@@ -57,8 +58,8 @@ class ApplicationRoundBasketSerializer(serializers.ModelSerializer):
             "name": {
                 "help_text": "Name that describes this basket.",
             },
-            "purpose_id": {
-                "help_text": "Id of the purpose for this basket.",
+            "purpose_ids": {
+                "help_text": "List of ids of the purposes for this basket.",
             },
             "must_be_main_purpose_of_applicant": {
                 "help_text": "A flag to determine if applicants main purpose must be "

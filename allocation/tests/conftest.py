@@ -220,23 +220,25 @@ def multiple_applications(
 def application_round_basket_one(
     default_application_round, purpose
 ) -> ApplicationRoundBasket:
-    return ApplicationRoundBasket.objects.create(
+    basket = ApplicationRoundBasket.objects.create(
         name="Basket with order number one",
         application_round=default_application_round,
-        purpose=purpose,
         order_number=1,
         customer_type=[ApplicationRoundBasket.CUSTOMER_TYPE_NONPROFIT],
     )
+    basket.purposes.set([purpose])
+    return basket
 
 
 @pytest.fixture
 def application_round_basket_two(
     default_application_round, purpose
 ) -> ApplicationRoundBasket:
-    return ApplicationRoundBasket.objects.create(
+    basket = ApplicationRoundBasket.objects.create(
         name="Basket with order number two",
         application_round=default_application_round,
-        purpose=purpose,
         order_number=2,
         customer_type=[],
     )
+    basket.purposes.set([purpose])
+    return basket

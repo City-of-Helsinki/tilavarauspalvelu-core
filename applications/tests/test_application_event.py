@@ -34,12 +34,29 @@ def test_should_exclude_if_purpose_does_not_match(
     recurring_application_event,
     purpose_two,
 ):
-    application_round_basket_one.purpose = purpose_two
+    application_round_basket_one.purposes.set([purpose_two])
     application_round_basket_one.save()
 
     events_by_baskets = default_application_round.get_application_events_by_basket()
 
     assert events_by_baskets == {application_round_basket_one.id: []}
+
+
+@pytest.mark.django_db
+def test_should_include_if_basket_has_no_purposes(
+    default_application_round,
+    application_round_basket_one,
+    recurring_application_event,
+    purpose_two,
+):
+    application_round_basket_one.purposes.set([])
+    application_round_basket_one.save()
+
+    events_by_baskets = default_application_round.get_application_events_by_basket()
+
+    assert events_by_baskets == {
+        application_round_basket_one.id: [recurring_application_event]
+    }
 
 
 @pytest.mark.django_db
