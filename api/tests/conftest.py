@@ -288,7 +288,7 @@ def valid_reservation_data(reservation_unit):
 def valid_application_round_basket_data(purpose, ten_to_15_age_group, helsinki):
     return {
         "name": "Yleishyödylliset yhdistykset",
-        "purpose_id": purpose.id,
+        "purpose_ids": [purpose.id],
         "must_be_main_purpose_of_applicant": False,
         "customer_type": [ApplicationRoundBasket.CUSTOMER_TYPE_NONPROFIT],
         "age_group_ids": [ten_to_15_age_group.id],

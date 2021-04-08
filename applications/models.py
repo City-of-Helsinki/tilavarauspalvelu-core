@@ -258,7 +258,6 @@ class ApplicationRound(models.Model):
         Purpose,
         verbose_name=_("Purposes"),
         related_name="application_rounds",
-        blank=True,
     )
 
     service_sector = models.ForeignKey(
@@ -334,14 +333,10 @@ class ApplicationRoundBasket(models.Model):
         related_name="application_round_baskets",
     )
 
-    purpose = models.ForeignKey(
-        "reservation_units.Purpose",
-        verbose_name=_("Purpose"),
-        related_name="application_round_baskets",
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
+    purposes = models.ManyToManyField(
+        "reservation_units.Purpose", verbose_name=_("Purposes"), blank=True
     )
+
     must_be_main_purpose_of_applicant = models.BooleanField(
         verbose_name=_("Must be main purpose of the applicant"), default=False
     )
@@ -373,8 +368,8 @@ class ApplicationRoundBasket(models.Model):
             application__application_round=self.application_round
         )
 
-        if self.purpose is not None:
-            events = events.filter(purpose=self.purpose)
+        if len(self.purposes.all()) > 0:
+            events = events.filter(purpose__in=self.purposes.all())
         if len(self.age_groups.all()) > 0:
             events = events.filter(age_group__in=self.age_groups.all())
 
