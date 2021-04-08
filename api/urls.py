@@ -3,6 +3,7 @@ from rest_framework import routers
 from .allocation_api import AllocationRequestViewSet
 from .application_round_api import ApplicationRoundViewSet
 from .applications_api.views import ApplicationEventViewSet, ApplicationViewSet
+from .city_api import CityViewSet
 from .hauki_api import OpeningHoursViewSet
 from .permissions_api import (
     GeneralRoleViewSet,
@@ -55,3 +56,4 @@ router.register(
     EquipmentViewSet,
     "equipment",
 )
+router.register(r"parameters/city", CityViewSet, "city")

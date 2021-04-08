@@ -22,6 +22,7 @@ from .helpers import (
     can_manage_units_reservation_units,
     can_modify_application,
     can_modify_application_round,
+    can_modify_city,
     can_modify_reservation,
     can_modify_reservation_unit,
     can_view_reservation,
@@ -146,6 +147,20 @@ class ApplicationRoundPermission(permissions.BasePermission):
             )
         except ServiceSector.DoesNotExist:
             return False
+
+
+class CityPermission(permissions.BasePermission):
+    def has_object_permission(self, request, view, city):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+
+        return can_modify_city(request.user)
+
+    def has_permission(self, request, view):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+
+        return can_modify_city(request.user)
 
 
 class ApplicationPermission(permissions.BasePermission):

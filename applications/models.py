@@ -308,6 +308,10 @@ class ApplicationRound(models.Model):
         )
 
 
+class City(models.Model):
+    name = models.CharField(verbose_name=_("Name"), max_length=100)
+
+
 class ApplicationRoundBasket(models.Model):
     CUSTOMER_TYPE_BUSINESS = "business"
     CUSTOMER_TYPE_NONPROFIT = "nonprofit"
@@ -348,7 +352,14 @@ class ApplicationRoundBasket(models.Model):
     )
 
     age_groups = models.ManyToManyField("reservations.AgeGroup")
-    home_city = models.CharField(max_length=255)
+
+    home_city = models.ForeignKey(
+        City,
+        verbose_name=_("Home city"),
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
     allocation_percentage = models.PositiveSmallIntegerField(
         verbose_name=_("Allocation percentage"), default=0
     )
@@ -541,6 +552,13 @@ class Application(models.Model):
         default="draft",
         verbose_name=_("Cached latest status"),
         blank=True,
+    )
+
+    home_city = models.ForeignKey(
+        City,
+        verbose_name=_("Home city"),
+        on_delete=models.SET_NULL,
+        null=True,
     )
 
     @property

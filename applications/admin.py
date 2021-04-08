@@ -13,11 +13,16 @@ from .models import (
     ApplicationRoundBasket,
     ApplicationRoundStatus,
     ApplicationStatus,
+    City,
     EventReservationUnit,
     Organisation,
     Person,
     Recurrence,
 )
+
+
+class CityInline(admin.TabularInline):
+    model = City
 
 
 class ApplicationEventInline(admin.TabularInline):
@@ -99,3 +104,8 @@ class ApplicationRoundAdmin(admin.ModelAdmin):
     form = ApplicationRoundAdminForm
     model = ApplicationRound
     inlines = [ApplicationRoundStatusInline, ApplicationRoundBasketInline]
+
+
+@admin.register(City)
+class CityAdmin(admin.ModelAdmin):
+    model = City
