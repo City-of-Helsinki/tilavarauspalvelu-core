@@ -43,7 +43,7 @@ const ButtonContainer = styled.div`
 `;
 
 const Notification = styled(HDSNotification)`
-  z-index: 0;
+  --notification-z-index: 0 !important;
 `;
 
 const ReservationUnitList = ({
