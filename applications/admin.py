@@ -7,6 +7,7 @@ from .models import (
     Address,
     Application,
     ApplicationEvent,
+    ApplicationEventSchedule,
     ApplicationEventStatus,
     ApplicationRound,
     ApplicationRoundBasket,
@@ -52,10 +53,14 @@ class ApplicationEventStatusInline(admin.TabularInline):
     model = ApplicationEventStatus
 
 
+class ApplicationEventScheduleInline(admin.TabularInline):
+    model = ApplicationEventSchedule
+
+
 @admin.register(ApplicationEvent)
 class ApplicationEventAdmin(admin.ModelAdmin):
     model = ApplicationEvent
-    inlines = [ApplicationEventStatusInline]
+    inlines = [ApplicationEventScheduleInline, ApplicationEventStatusInline]
 
 
 @admin.register(Recurrence)
