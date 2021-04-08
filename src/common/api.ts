@@ -13,15 +13,16 @@ const applicationRoundsBasePath = "application_round";
 const reservationUnitsBasePath = "reservation_unit";
 const parameterBasePath = "parameters";
 const applicationBasePath = "application";
+const allocationRequestPath = "allocation_request";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-interface QueryParameters extends ReservationUnitsParameters {}
+interface QueryParameters {}
 
 interface RequestParameters {
   path: string;
   headers?: { [key: string]: string };
   parameters?: QueryParameters;
-  data?: Application;
+  data?: unknown;
 }
 
 enum ApiResponseFormat {
@@ -101,6 +102,15 @@ export function getApplicationRound(
   });
 }
 
+export function saveApplicationRound(
+  applicationRound: ApplicationRound
+): Promise<ApplicationRound> {
+  return apiPut<ApplicationRound>({
+    data: applicationRound,
+    path: `v1/${applicationRoundsBasePath}/${applicationRound.id}/`,
+  });
+}
+
 export interface ReservationUnitsParameters {
   applicationRound?: number;
   search?: string;
@@ -118,7 +128,7 @@ export function getReservationUnits(
 }
 
 interface IDParameter {
-  id: string;
+  id: number;
 }
 
 export function getReservationUnit(id: number): Promise<ReservationUnit> {
@@ -171,5 +181,34 @@ export function saveApplication(
   return apiPut<Application>({
     data: application,
     path: `v1/${applicationBasePath}/${application.id}/`,
+  });
+}
+
+interface AllocationRequestParams {
+  applicationRoundId: number;
+  applicationRoundBasketIds: number[];
+}
+
+export interface AllocationRequest {
+  id: number;
+  applicationRoundBasketIds: number[];
+  applicationRoundId: number;
+  completed: boolean;
+  startDate: string | null;
+  endDate: string | null;
+}
+
+export function triggerAllocation(
+  params: AllocationRequestParams
+): Promise<AllocationRequest> {
+  return apiPost({
+    data: params,
+    path: `v1/${allocationRequestPath}/`,
+  });
+}
+
+export function getAllocationStatus(id: number): Promise<AllocationRequest> {
+  return apiGet({
+    path: `v1/${allocationRequestPath}/${id}`,
   });
 }

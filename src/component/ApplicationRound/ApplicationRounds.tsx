@@ -33,6 +33,10 @@ const RoundTypeIngress = styled.p`
   margin-bottom: var(--spacing-m);
 `;
 
+const Deck = styled.div`
+  margin-bottom: var(--spacing-layout-xl);
+`;
+
 function ApplicationRounds(): JSX.Element {
   const [isLoading, setIsLoading] = useState(true);
   const [applicationRounds, setApplicationRounds] = useState<
@@ -66,14 +70,15 @@ function ApplicationRounds(): JSX.Element {
     fetchApplicationRound();
   }, []);
 
-  const isApproved = (applicationRound: ApplicationRoundType): boolean =>
-    applicationRound.status === "approved";
+  const isWaitingForApproval = (
+    applicationRound: ApplicationRoundType
+  ): boolean => applicationRound.status === "validated";
 
   const approveRounds = applicationRounds?.filter((applicationRound) =>
-    isApproved(applicationRound)
+    isWaitingForApproval(applicationRound)
   );
   const handleRounds = applicationRounds?.filter(
-    (applicationRound) => !isApproved(applicationRound)
+    (applicationRound) => !isWaitingForApproval(applicationRound)
   );
 
   if (isLoading) {
@@ -88,11 +93,11 @@ function ApplicationRounds(): JSX.Element {
       />
       <Ingress>{t("MainLander.ingress")}</Ingress>
       {approveRounds && approveRounds.length > 0 && (
-        <>
+        <Deck>
           <IngressContainer>
             <Heading>{t("ApplicationRound.listApprovalTitle")}</Heading>
             <RoundTypeIngress>
-              {t("ApplicationRound.listingApprovalIngress", {
+              {t("ApplicationRound.listApprovalIngress", {
                 count: approveRounds.length,
               })}
             </RoundTypeIngress>
@@ -102,13 +107,14 @@ function ApplicationRounds(): JSX.Element {
               <ApplicationRoundCard
                 applicationRound={applicationRound}
                 key={applicationRound.id}
+                getRoute={(id) => `/applicationRound/${id}/approval`}
               />
             ))}
           </WideContainer>
-        </>
+        </Deck>
       )}
       {handleRounds && (
-        <>
+        <Deck>
           <IngressContainer>
             <Heading>{t("ApplicationRound.listHandlingTitle")}</Heading>
             <RoundTypeIngress>
@@ -128,6 +134,7 @@ function ApplicationRounds(): JSX.Element {
                 <ApplicationRoundCard
                   applicationRound={applicationRound}
                   key={applicationRound.id}
+                  getRoute={(id) => `/applicationRound/${id}`}
                 />
               ))
             ) : (
@@ -136,7 +143,7 @@ function ApplicationRounds(): JSX.Element {
               </NotificationBox>
             )}
           </WideContainer>
-        </>
+        </Deck>
       )}
       {errorMsg && (
         <Notification

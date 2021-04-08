@@ -3,10 +3,10 @@ import { useTranslation } from "react-i18next";
 import { TFunction } from "i18next";
 import styled from "styled-components";
 import { Button, IconCheckCircle, Notification } from "hds-react";
-import { useHistory } from "react-router-dom";
-import { getApplicationRound } from "../../common/api";
-import Loader from "../Loader";
-import { ApplicationRound as ApplicationRoundType } from "../../common/types";
+import {
+  ApplicationRound as ApplicationRoundType,
+  ApplicationRoundStatus,
+} from "../../common/types";
 import { IngressContainer, NarrowContainer } from "../../styles/layout";
 import { breakpoints } from "../../styles/util";
 import Heading from "../Application/Heading";
@@ -21,7 +21,8 @@ import { formatNumber } from "../../common/util";
 import BigRadio from "../BigRadio";
 
 interface IProps {
-  applicationRoundId: string;
+  applicationRound: ApplicationRoundType;
+  setApplicationRoundStatus: (status: ApplicationRoundStatus) => Promise<void>;
 }
 
 const Wrapper = styled.div`
@@ -172,58 +173,28 @@ const getCellConfig = (t: TFunction): CellConfig => {
   };
 };
 
-function PreApproval({ applicationRoundId }: IProps): JSX.Element {
-  const [isLoading, setIsLoading] = useState(true);
-  const [
-    applicationRound,
-    setApplicationRound,
-  ] = useState<ApplicationRoundType | null>(null);
+function PreApproval({
+  applicationRound,
+  setApplicationRoundStatus,
+}: IProps): JSX.Element {
   const [
     isConfirmationDialogVisible,
     setConfirmationDialogVisibility,
   ] = useState<boolean>(false);
-  const [hasBeenSentForApproval, setHasBeenSentForApproval] = useState<boolean>(
-    false
-  );
   const [cellConfig, setCellConfig] = useState<CellConfig | null>(null);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const { t } = useTranslation();
-  const history = useHistory();
+
+  const hasBeenSentForApproval = applicationRound.status === "validated";
 
   useEffect(() => {
-    const fetchApplicationRound = async () => {
-      setErrorMsg(null);
-      setIsLoading(true);
-
-      try {
-        const result = await getApplicationRound({
-          id: applicationRoundId,
-        });
-        setApplicationRound(result);
-        setCellConfig(getCellConfig(t));
-        setIsLoading(false);
-      } catch (error) {
-        const msg =
-          error.response?.status === 404
-            ? "errors.applicationRoundNotFound"
-            : "errors.errorFetchingData";
-        setErrorMsg(msg);
-        setIsLoading(false);
-      }
-    };
-
-    fetchApplicationRound();
-  }, [applicationRoundId, t]);
+    setCellConfig(getCellConfig(t));
+  }, [t]);
 
   const scheduledNumbers = {
     volume: 239048,
     hours: 2345,
   };
-
-  if (isLoading) {
-    return <Loader />;
-  }
 
   return (
     <Wrapper>
@@ -231,7 +202,7 @@ function PreApproval({ applicationRoundId }: IProps): JSX.Element {
       {applicationRound && (
         <>
           <IngressContainer>
-            <ApplicationRoundNavi applicationRoundId={applicationRoundId} />
+            <ApplicationRoundNavi applicationRoundId={applicationRound.id} />
             <TopIngress>
               <div>
                 <ContentHeading>{applicationRound.name}</ContentHeading>
@@ -278,11 +249,9 @@ function PreApproval({ applicationRoundId }: IProps): JSX.Element {
                 <Button
                   type="button"
                   variant="secondary"
-                  onClick={() =>
-                    history.push(
-                      `/applicationRound/${applicationRoundId}?allocated`
-                    )
-                  }
+                  onClick={() => {
+                    setApplicationRoundStatus("allocated");
+                  }}
                 >
                   {t("ApplicationRound.navigateBackToHandling")}
                 </Button>
@@ -370,7 +339,7 @@ function PreApproval({ applicationRoundId }: IProps): JSX.Element {
               type="submit"
               variant="primary"
               onClick={() => {
-                setHasBeenSentForApproval(true);
+                setApplicationRoundStatus("validated");
                 setConfirmationDialogVisibility(false);
               }}
             >
@@ -378,20 +347,6 @@ function PreApproval({ applicationRoundId }: IProps): JSX.Element {
             </Button>
           </ActionContainer>
         </Dialog>
-      )}
-      {errorMsg && (
-        <Notification
-          type="error"
-          label={t("errors.functionFailed")}
-          position="top-center"
-          autoClose={false}
-          dismissible
-          closeButtonLabelText={t("common.close")}
-          displayAutoCloseProgress={false}
-          onClose={() => setErrorMsg(null)}
-        >
-          {t(errorMsg)}
-        </Notification>
       )}
     </Wrapper>
   );

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { TFunction } from "i18next";
-import { useHistory } from "react-router-dom";
 import { Button, Checkbox, Notification } from "hds-react";
 import uniq from "lodash/uniq";
 import trim from "lodash/trim";
@@ -12,10 +11,11 @@ import { ContentHeading, H2 } from "../../styles/typography";
 import { breakpoints } from "../../styles/util";
 import { IngressContainer } from "../../styles/layout";
 import DataTable, { CellConfig } from "../DataTable";
-import { getApplicationRound, getApplications } from "../../common/api";
+import { getApplications } from "../../common/api";
 import {
   Application as ApplicationType,
   ApplicationRound as ApplicationRoundType,
+  ApplicationRoundStatus,
   DataFilterConfig,
 } from "../../common/types";
 import TimeframeStatus from "./TimeframeStatus";
@@ -30,7 +30,8 @@ import StatusRecommendation from "../Application/StatusRecommendation";
 import ApplicationRoundNavi from "./ApplicationRoundNavi";
 
 interface IProps {
-  applicationRoundId: string;
+  applicationRound: ApplicationRoundType;
+  setApplicationRoundStatus: (status: ApplicationRoundStatus) => Promise<void>;
 }
 
 const Wrapper = styled.div`
@@ -181,12 +182,11 @@ const getCellConfig = (t: TFunction): CellConfig => {
   };
 };
 
-function Review({ applicationRoundId }: IProps): JSX.Element {
+function Review({
+  applicationRound,
+  setApplicationRoundStatus,
+}: IProps): JSX.Element {
   const [isLoading, setIsLoading] = useState(true);
-  const [
-    applicationRound,
-    setApplicationRound,
-  ] = useState<ApplicationRoundType | null>(null);
   const [applications, setApplications] = useState<ApplicationType[]>([]);
   const [cellConfig, setCellConfig] = useState<CellConfig | null>(null);
   const [filterConfig, setFilterConfig] = useState<DataFilterConfig[] | null>(
@@ -196,32 +196,10 @@ function Review({ applicationRoundId }: IProps): JSX.Element {
   const [isApplicationChecked, toggleIsApplicationChecked] = useState(false);
 
   const { t } = useTranslation();
-  const history = useHistory();
 
-  const setApplicationRoundAsReviewed = () => history.push("?reviewed");
-
-  useEffect(() => {
-    const fetchApplicationRound = async () => {
-      setErrorMsg(null);
-      setIsLoading(true);
-
-      try {
-        const result = await getApplicationRound({
-          id: applicationRoundId,
-        });
-        setApplicationRound(result);
-      } catch (error) {
-        const msg =
-          error.response?.status === 404
-            ? "errors.applicationRoundNotFound"
-            : "errors.errorFetchingData";
-        setErrorMsg(msg);
-        setIsLoading(false);
-      }
-    };
-
-    fetchApplicationRound();
-  }, [applicationRoundId]);
+  const setApplicationRoundAsReviewed = () => {
+    setApplicationRoundStatus("review_done");
+  };
 
   useEffect(() => {
     const fetchApplications = async (applicationId: number) => {
@@ -255,7 +233,7 @@ function Review({ applicationRoundId }: IProps): JSX.Element {
       {applicationRound && cellConfig && filterConfig && (
         <>
           <IngressContainer>
-            <ApplicationRoundNavi applicationRoundId={applicationRoundId} />
+            <ApplicationRoundNavi applicationRoundId={applicationRound.id} />
             <Content>
               <ContentHeading>{applicationRound.name}</ContentHeading>
               <Details>

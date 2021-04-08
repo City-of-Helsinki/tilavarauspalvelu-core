@@ -101,6 +101,8 @@ const translations: ITranslations = {
     errorSavingApplication: ["Virhe tallennettaessa hakemusta"],
     loginNeeded: ["Kirjautuminen vaaditaan"],
     authorizationNeeded: ["Oikeudet vaaditaan"],
+    errorStartingAllocation: ["Allokoinnin käynnistys epäonnistui"],
+    errorSavingData: ["Virhe tallennettaessa tietoja"],
   },
   MainLander: {
     ingress: [

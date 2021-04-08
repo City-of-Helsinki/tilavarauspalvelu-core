@@ -15,6 +15,7 @@ import RecommendationsBySpace from "./component/ApplicationRound/Recommendations
 import RecommendationsByApplicant from "./component/ApplicationRound/RecommendationsByApplicant";
 import ApplicationRounds from "./component/ApplicationRound/ApplicationRounds";
 import MainLander from "./component/MainLander";
+import Approval from "./component/ApplicationRound/Approval";
 
 interface IPrivateRouteProps {
   path: string;
@@ -80,6 +81,10 @@ function App(): JSX.Element {
             <PrivateRoute
               path="/applicationRound/:applicationRoundId/recommendation/:recommendationId"
               component={Recommendation}
+            />
+            <PrivateRoute
+              path="/applicationRound/:applicationRoundId/approval"
+              component={Approval}
             />
             <PrivateRoute
               path="/applicationRound/:applicationRoundId"

@@ -10,14 +10,21 @@ import TimeframeStatus from "./TimeframeStatus";
 
 interface IProps {
   applicationRound: ApplicationRoundType;
+  getRoute: (arg0: number) => string;
 }
 
 const Wrapper = styled.div`
+  --border: 0.5rem solid var(--tilavaraus-admin-gray);
+
   &:first-of-type {
+    &:last-of-type {
+      border-bottom: var(--border);
+    }
+
     border-bottom: none;
   }
 
-  border: 0.5rem solid var(--tilavaraus-admin-gray);
+  border: var(--border);
   padding: var(--spacing-m) var(--spacing-l);
 `;
 
@@ -95,7 +102,10 @@ const Label = styled.div`
   }
 `;
 
-function ApplicationRoundCard({ applicationRound }: IProps): JSX.Element {
+function ApplicationRoundCard({
+  applicationRound,
+  getRoute,
+}: IProps): JSX.Element {
   const { t } = useTranslation();
 
   return (
@@ -122,7 +132,7 @@ function ApplicationRoundCard({ applicationRound }: IProps): JSX.Element {
           </div>
         </Details>
         <div>
-          <BasicLink to={`/applicationRound/${applicationRound.id}`}>
+          <BasicLink to={getRoute(applicationRound.id)}>
             {t("common.inspect")} <IconArrowRight />
           </BasicLink>
         </div>

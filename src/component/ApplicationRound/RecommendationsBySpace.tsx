@@ -192,7 +192,7 @@ function RecommendationsBySpace(): JSX.Element {
 
       try {
         const result = await getApplicationRound({
-          id: applicationRoundId,
+          id: Number(applicationRoundId),
         });
         setApplicationRound(result);
         setCellConfig(getCellConfig(t));

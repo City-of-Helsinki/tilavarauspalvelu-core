@@ -17,14 +17,14 @@ import MainLander from "./component/MainLander";
 ReactDOM.render(
   <React.StrictMode>
     <AuthenticationProvider
-      notAuthenticated={() => <MainLander />}
+      notAuthenticated={() => <MainLander withSiteWrapper />}
       notAuthorized={() => <AuthorizationNeeded />}
       authenticating={() => <Authenticating noNavigation />}
       configuration={oidcConfiguration}
       loggerLevel={oidcLog.ERROR}
       isEnabled={authEnabled}
       callbackComponentOverride={() => <Authenticating />}
-      sessionLostComponent={() => <MainLander />}
+      sessionLostComponent={() => <MainLander withSiteWrapper />}
     >
       <App />
     </AuthenticationProvider>
