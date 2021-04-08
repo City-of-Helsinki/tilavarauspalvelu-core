@@ -263,7 +263,8 @@ const translations: Translations = {
           'Hakemusten käsittely aloitetaan, kun hakuaika on päättynyt. Ilmoitamme antamaasi sähköpostiosoitteeseen eri vaiheista.',
         ],
       },
-      userAcceptsTerms: ['Hyväksyn palvelun käyttöehdot'],
+      reservationUnitTerms: ['Tilojen käyttöehdot'],
+      userAcceptsTerms: ['Hyväksyn käyttöehdot'],
     },
     sent: {
       heading: ['Hakemuksesi on lähetetty käsiteltäväksi'],

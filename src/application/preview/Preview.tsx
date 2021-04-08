@@ -16,6 +16,7 @@ import TimePreview from '../TimePreview';
 import ApplicantInfoPreview from './ApplicantInfoPreview';
 import { TwoColumnContainer } from '../../component/common';
 import { AccordionWithState as Accordion } from '../../component/Accordion';
+import Sanitize from '../../component/Sanitize';
 
 type Props = {
   application: Application;
@@ -59,8 +60,7 @@ const Ruler = styled.hr`
 const SmallSubHeadline = styled.div`
   font-family: var(--font-bold);
   margin-top: var(--spacing-layout-m);
-  font-weight: 700;
-  font-size: var(--fontsize-heading-s);
+  font-size: var(--fontsize-heading-m);
 `;
 
 const TimePreviewContainer = styled(TwoColumnContainer)`
@@ -83,6 +83,10 @@ const StyledNotification = styled(Notification)`
     position: relative;
     top: -2px;
   }
+`;
+
+const Terms = styled.div`
+  margin-top: var(--spacing-m);
 `;
 
 const Preview = ({ onNext, application }: Props): JSX.Element | null => {
@@ -273,6 +277,19 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
           </TimePreviewContainer>
         </Accordion>
       ))}
+      <SmallSubHeadline>
+        {t('Application.preview.reservationUnitTerms')}
+      </SmallSubHeadline>
+      <Terms>
+        {Object.values(reservationUnits).map((ru) => (
+          <Accordion
+            open
+            key={ru.id}
+            heading={localizedValue(ru.name, i18n.language)}>
+            <Sanitize html={ru.termsOfUse} />
+          </Accordion>
+        ))}
+      </Terms>
       <CheckboxContainer>
         <Checkbox
           id="preview.acceptTermsOfUse"
@@ -287,7 +304,6 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
         label={t('Application.preview.notification.processing')}>
         {t('Application.preview.notification.body')}
       </StyledNotification>
-
       <ButtonContainer>
         <Button variant="secondary" iconLeft={<IconArrowLeft />} disabled>
           {t('common.prev')}
