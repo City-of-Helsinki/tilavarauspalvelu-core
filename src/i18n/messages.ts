@@ -53,10 +53,12 @@ const translations: Translations = {
       company: ['yritykselle'],
     },
   },
+
   Application: {
     error: {
+      saveFailed: ['Hakemuksen tallennus ei onnistunut'],
       required: ['Pakollinen', 'Required', 'Obligatorisk'],
-
+      pattern: ['Tarkista muoto'],
       numPersonsMin: ['Ryhmän koko virheellinen'],
       minDurationBiggerThanMaxDuration: [
         'Minimikesto on suurempi kuin maksimikesto',

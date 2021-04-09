@@ -23,7 +23,10 @@ const EmailInput = ({ register, errors }: Props): JSX.Element | null => {
       </SpanTwoColumns>
       <SpanTwoColumns>
         <TextInput
-          ref={register({ required: true })}
+          ref={register({
+            required: true,
+            pattern: /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+          })}
           label={t('Application.Page3.email')}
           id="contactPerson.email"
           name="contactPerson.email"
