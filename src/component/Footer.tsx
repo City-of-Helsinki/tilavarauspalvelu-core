@@ -32,6 +32,8 @@ const Footer = (): JSX.Element => {
         <HDSFooter.Item
           href={t(`Footer.Base.Item.privacyStatement.href`)}
           label={t(`Footer.Base.Item.privacyStatement.label`)}
+          target="_blank"
+          rel="noopener noreferrer"
         />
         <HDSFooter.Item
           href={t(`Footer.Base.Item.accessibilityStatement.href`)}

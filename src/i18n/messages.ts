@@ -494,7 +494,9 @@ const translations: Translations = {
       Item: {
         privacyStatement: {
           label: ['Tietosuojaseloste'],
-          href: ['#'],
+          href: [
+            'https://www.hel.fi/static/liitteet-2019/Kaupunginkanslia/Rekisteriselosteet/Kuva/Tilanvaraus-%20ja%20tietokantarekisteri,%20Varaamo%20ja%20Respa.pdf',
+          ],
         },
         accessibilityStatement: {
           label: ['Saavutettavuus'],
