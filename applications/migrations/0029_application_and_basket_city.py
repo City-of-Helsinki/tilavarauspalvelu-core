@@ -18,14 +18,21 @@ class Migration(migrations.Migration):
                 ('name', models.CharField(max_length=100, verbose_name='Name')),
             ],
         ),
+
         migrations.AddField(
             model_name='application',
             name='home_city',
             field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='applications.city', verbose_name='Home city'),
         ),
-        migrations.AlterField(
+        migrations.RunSQL("ALTER TABLE applications_applicationroundbasket RENAME COLUMN home_city to home_city_tmp"),
+        migrations.RunSQL("INSERT INTO applications_city (name) select home_city_tmp from applications_applicationroundbasket where home_city_tmp is not null"),
+        migrations.AddField(
             model_name='applicationroundbasket',
             name='home_city',
             field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='applications.city', verbose_name='Home city'),
         ),
+        migrations.RunSQL(
+            "update applications_applicationroundbasket set home_city_id = (select id from applications_city where name = home_city_tmp)"),
+        migrations.RunSQL(
+            "ALTER TABLE applications_applicationroundbasket drop column home_city_tmp"),
     ]
