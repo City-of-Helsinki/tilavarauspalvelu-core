@@ -1410,5 +1410,16 @@
             "priority": 200,
             "application_event": 3
         }
+    },
+    {
+      "model": "applications.applicationeventscheduleresult",
+      "pk": 3,
+      "fields": {
+          "allocated_reservation_unit": 3,
+          "allocated_duration": "02:00:00",
+          "allocated_day": 3,
+          "allocated_begin": "15:00:00",
+          "allocated_end": "18:00:00"
+      }
     }
 ]
