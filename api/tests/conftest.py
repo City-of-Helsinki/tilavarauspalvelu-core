@@ -292,7 +292,7 @@ def valid_application_round_basket_data(purpose, ten_to_15_age_group, helsinki):
         "must_be_main_purpose_of_applicant": False,
         "customer_type": [ApplicationRoundBasket.CUSTOMER_TYPE_NONPROFIT],
         "age_group_ids": [ten_to_15_age_group.id],
-        "home_city": "Helsinki",
+        "home_city_id": helsinki.id,
         "allocation_percentage": 100,
         "order_number": 1,
     }
@@ -497,7 +497,7 @@ def valid_application_data(application_round, helsinki):
             "post_code": 33540,
             "city": "Tampere",
         },
-        "home_city": "Helsinki",
+        "home_city_id": helsinki.id,
     }
 
 
