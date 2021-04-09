@@ -3,6 +3,7 @@ from django.utils.datetime_safe import datetime
 from allocation.allocation_data_builder import AllocationDataBuilder
 from allocation.allocation_solver import AllocationSolver
 from allocation.models import AllocationRequest
+from applications.allocation_result_mapper import AllocationResultMapper
 
 
 def start_allocation(allocation_request: AllocationRequest):
@@ -16,7 +17,9 @@ def start_allocation(allocation_request: AllocationRequest):
     allocation_request.application_round.allocating = True
     allocation_request.application_round.save()
     try:
-        solver.solve()
+        allocation_events = solver.solve()
+        mapper = AllocationResultMapper(allocation_events)
+        mapper.to_events()
     except Exception:
         # Safeguard so we don't lock allocation on unexpected exceptions even though this shouldn't throw anything
         allocation_request.application_round.allocating = False

@@ -22,6 +22,16 @@ from tilavarauspalvelu.utils.date_util import (
 
 User = get_user_model()
 
+DAY_CHOICES = (
+    (0, _("Monday")),
+    (1, _("Tuesday")),
+    (2, _("Wednesday")),
+    (3, _("Thursday")),
+    (4, _("Friday")),
+    (5, _("Saturday")),
+    (6, _("Sunday")),
+)
+
 
 def year_not_in_future(year: Optional[int]):
     if year is None:
@@ -786,17 +796,7 @@ class EventOccurrence(object):
 
 
 class ApplicationEventSchedule(models.Model):
-
-    DATE_CHOISES = (
-        (0, _("Monday")),
-        (1, _("Tuesday")),
-        (2, _("Wednesday")),
-        (3, _("Thursday")),
-        (4, _("Friday")),
-        (5, _("Saturday")),
-        (6, _("Sunday")),
-    )
-    day = models.IntegerField(verbose_name=_("Day"), choices=DATE_CHOISES, null=False)
+    day = models.IntegerField(verbose_name=_("Day"), choices=DAY_CHOICES, null=False)
 
     begin = models.TimeField(
         verbose_name=_("Start"),
@@ -823,7 +823,6 @@ class ApplicationEventSchedule(models.Model):
     )
 
     def get_occurences(self) -> [EventOccurrence]:
-        self.day
         first_matching_day = next_or_current_matching_weekday(
             self.application_event.begin, self.day
         )
@@ -877,4 +876,33 @@ class Recurrence(models.Model):
         blank=False,
         on_delete=models.CASCADE,
         related_name="recurrences",
+    )
+
+
+class ApplicationEventScheduleResult(models.Model):
+    application_event_schedule = models.OneToOneField(
+        ApplicationEventSchedule,
+        on_delete=models.CASCADE,
+        primary_key=True,
+    )
+
+    allocated_reservation_unit = models.ForeignKey(
+        "reservation_units.ReservationUnit", on_delete=models.CASCADE
+    )
+
+    allocated_duration = models.DurationField()
+    allocated_day = models.IntegerField(
+        verbose_name=_("Day"), choices=DAY_CHOICES, null=False
+    )
+
+    allocated_begin = models.TimeField(
+        verbose_name=_("Start"),
+        null=False,
+        blank=False,
+    )
+
+    allocated_end = models.TimeField(
+        verbose_name=_("End"),
+        null=False,
+        blank=False,
     )

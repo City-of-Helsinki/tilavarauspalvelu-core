@@ -7,7 +7,7 @@ from ortools.sat.python import cp_model
 
 from allocation.allocation_models import (
     ALLOCATION_PRECISION,
-    AllocationBasket,
+    AllocatedEvent,
     AllocationData,
     AllocationEvent,
     AllocationSpace,
@@ -34,37 +34,6 @@ def suitable_spaces_for_event(
         ):
             suitable_spaces[space_id] = space
     return suitable_spaces
-
-
-class AllocatedEvent(object):
-    def __init__(
-        self,
-        space: AllocationSpace,
-        event: AllocationEvent,
-        duration: int,
-        occurrence_id: int,
-        start: int,
-        end: int,
-        basket: AllocationBasket,
-    ):
-        self.space_id = space.id
-        self.event_id = event.id
-        self.duration = datetime.timedelta(minutes=duration * ALLOCATION_PRECISION)
-        self.occurrence_id = occurrence_id
-        self.begin = start
-        self.end = end
-        self.basket_id = basket.id
-
-    def __str__(self):
-        return "{} {} {} {} {} {} {}".format(
-            self.space_id,
-            self.event_id,
-            self.duration,
-            self.occurrence_id,
-            self.begin,
-            self.end,
-            self.basket_id,
-        )
 
 
 class AllocationSolutionPrinter(object):
@@ -131,6 +100,7 @@ class AllocationSolutionPrinter(object):
                                         event=event,
                                         duration=event.min_duration,
                                         occurrence_id=occurrence_id,
+                                        event_id=event.id,
                                         start=(
                                             datetime.datetime.min + start_delta
                                         ).time(),
