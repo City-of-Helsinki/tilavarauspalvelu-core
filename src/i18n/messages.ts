@@ -509,8 +509,7 @@ const translations: Translations = {
   },
   auth: {
     lostSession: {
-      heading: ['Sinut on kirjattu ulos'],
-      text: ['Olet kirjautunut ulos'],
+      heading: ['Kirjautuminen ei ole voimassa'],
     },
   },
 };

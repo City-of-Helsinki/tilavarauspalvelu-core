@@ -33,6 +33,7 @@ boot(
   <React.StrictMode>
     <AuthenticationProvider
       authenticating={CenterSpinner}
+      notAuthenticated={SessionLost}
       sessionLostComponent={SessionLost}
       configuration={oidcConfiguration}
       loggerLevel={oidcLog.ERROR}

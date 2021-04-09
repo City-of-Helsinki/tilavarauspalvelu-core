@@ -1,10 +1,16 @@
-import { Notification } from 'hds-react';
+import { Notification as HDSNotification } from 'hds-react';
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
 import { BrowserRouter } from 'react-router-dom';
 import PageWrapper from '../../component/PageWrapper';
+import Container from '../../component/Container';
 
-const LoggingIn = (): JSX.Element => {
+const Notification = styled(HDSNotification)`
+  margin-top: 2em;
+`;
+
+const SessionLost = (): JSX.Element => {
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -18,17 +24,16 @@ const LoggingIn = (): JSX.Element => {
   });
 
   return (
-    <BrowserRouter>
+    <BrowserRouter forceRefresh>
       <PageWrapper>
-        <Notification
-          size="large"
-          type="error"
-          label={t('auth.lostSession.heading')}>
-          {t('auth.lostSession.text')}
-        </Notification>
+        <Container>
+          <Notification size="small" type="info">
+            {t('auth.lostSession.heading')}
+          </Notification>
+        </Container>
       </PageWrapper>
     </BrowserRouter>
   );
 };
 
-export default LoggingIn;
+export default SessionLost;
