@@ -2,12 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { TextInput, Checkbox } from 'hds-react';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
+import styled from 'styled-components';
 import {
   Application,
   ContactPerson,
   FormType,
   Organisation,
   Address,
+  OptionType,
 } from '../../common/types';
 import {
   CheckboxWrapper,
@@ -19,12 +21,21 @@ import EmailInput from './EmailInput';
 import BillingAddress from './BillingAddress';
 import Buttons from './Buttons';
 import { deepCopy, errorText } from '../../common/util';
+import ControlledSelect from '../../component/ControlledSelect';
+import { breakpoint } from '../../common/style';
+
+export const Placeholder = styled.span`
+  @media (max-width: ${breakpoint.m}) {
+    display: none;
+  }
+`;
 
 type Props = {
   activeForm: FormType;
   setActiveForm: (id: FormType) => void;
   application: Application;
   onNext: (appToSave: Application) => void;
+  homeCityOptions: OptionType[];
 };
 
 const OrganisationForm = ({
@@ -32,14 +43,16 @@ const OrganisationForm = ({
   setActiveForm,
   application,
   onNext,
+  homeCityOptions,
 }: Props): JSX.Element | null => {
   const { t } = useTranslation();
 
-  const { register, unregister, handleSubmit, errors } = useForm({
+  const { register, unregister, handleSubmit, control, errors } = useForm({
     defaultValues: {
       organisation: { ...application.organisation } as Organisation,
       contactPerson: { ...application.contactPerson } as ContactPerson,
       billingAddress: { ...application.billingAddress } as Address,
+      homeCityId: application.homeCityId,
     },
   });
 
@@ -78,6 +91,8 @@ const OrganisationForm = ({
       applicationCopy.billingAddress = null;
     }
 
+    applicationCopy.homeCityId = data.homeCityId;
+
     return applicationCopy;
   };
 
@@ -110,6 +125,15 @@ const OrganisationForm = ({
               errorText={errorText(t, errors.organisation?.coreBusiness?.type)}
             />
           </SpanTwoColumns>
+          <ControlledSelect
+            name="homeCityId"
+            required
+            label={t('Application.Page3.homeCity')}
+            control={control}
+            options={homeCityOptions}
+            error={errorText(t, errors.homeCityId?.type)}
+          />
+          <Placeholder />
           <TextInput
             ref={register({ required: hasRegistration })}
             label={t('Application.Page3.organisation.registrationNumber')}
@@ -181,7 +205,6 @@ const OrganisationForm = ({
             invalid={!!errors.contactPerson?.phoneNumber?.type}
             errorText={errorText(t, errors.contactPerson?.phoneNumber?.type)}
           />
-
           <TextInput
             ref={register({ required: true })}
             label={t('Application.Page3.contactPerson.firstName')}

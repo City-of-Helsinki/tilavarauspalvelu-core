@@ -101,6 +101,9 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
   const [reservationUnits, setReservationUnits] = useState<{
     [key: number]: ReservationUnit;
   }>({});
+  const [cities, setCities] = useState<{
+    [key: number]: Parameter;
+  }>({});
 
   const [acceptTermsOfUse, setAcceptTermsOfUse] = useState(false);
   const { i18n } = useTranslation();
@@ -135,6 +138,10 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
       const fetchedPurposeOptions = await getParameters('purpose');
       if (mounted) {
         setPurposeOptions(mapArrayById(fetchedPurposeOptions));
+      }
+      const fetchedCityOptions = await getParameters('city');
+      if (mounted) {
+        setCities(mapArrayById(fetchedCityOptions));
         setReady(true);
       }
     }
@@ -174,7 +181,7 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
         open
         id="basicInfo"
         heading={t('Application.preview.basicInfoSubHeading')}>
-        <ApplicantInfoPreview application={application} />
+        <ApplicantInfoPreview cities={cities} application={application} />
       </Accordion>
       {application.applicationEvents.map((applicationEvent, i) => (
         <Accordion

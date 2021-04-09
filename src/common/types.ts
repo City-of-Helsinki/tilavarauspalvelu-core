@@ -123,6 +123,7 @@ export type Application = {
   contactPerson: ContactPerson | null;
   applicationEvents: ApplicationEvent[];
   billingAddress: Address | null;
+  homeCityId: number | null;
 };
 
 export type Organisation = {

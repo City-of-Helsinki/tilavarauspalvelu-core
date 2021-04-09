@@ -10,4 +10,5 @@ export const minimalApplicationForInitialSave = (
   applicationEvents: [],
   contactPerson: null,
   billingAddress: null,
+  homeCityId: null,
 });

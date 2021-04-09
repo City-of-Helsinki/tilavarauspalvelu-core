@@ -130,6 +130,7 @@ const translations: Translations = {
       text: ['Varaavan yhteisön ja yhteyshenkilön perustiedot'],
       asPrivatePersonSubHeading: ['Varaan yksityishenkilönä'],
       firstName: ['Etunimi', 'First name', 'Förnamn'],
+      homeCity: ['Kotipaikka'],
       lastName: ['Sukunimi', 'Last name', 'Efternamn'],
       phoneNumber: ['Puhelinumero', 'Phone number', 'Telefonnummer'],
       email: [
@@ -225,6 +226,7 @@ const translations: Translations = {
           'Registrerad förening',
         ],
       },
+      homeCity: ['Kotipaikka'],
       heading: ['4. Hakemuksen lähettäminen'],
       text: ['Yhteenveto hakemuksestasi'],
       basicInfoSubHeading: ['Varaajan perustiedot'],

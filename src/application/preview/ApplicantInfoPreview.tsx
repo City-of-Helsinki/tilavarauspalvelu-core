@@ -1,14 +1,16 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Application } from '../../common/types';
+import { Application, Parameter } from '../../common/types';
 import { SpanTwoColumns, TwoColumnContainer } from '../../component/common';
 import LabelValue from '../../component/LabelValue';
 import Address from './AddressPreview';
 
 const ApplicantInfoPreview = ({
   application,
+  cities,
 }: {
   application: Application;
+  cities: { [key: number]: Parameter };
 }): JSX.Element | null => {
   const { t } = useTranslation();
 
@@ -32,6 +34,16 @@ const ApplicantInfoPreview = ({
             <LabelValue
               label={t('Application.preview.organisation.coreBusiness')}
               value={application.organisation?.coreBusiness}
+            />
+          </SpanTwoColumns>
+          <SpanTwoColumns>
+            <LabelValue
+              label={t('Application.preview.homeCity')}
+              value={
+                application.homeCityId
+                  ? (cities[application.homeCityId].name as string)
+                  : ''
+              }
             />
           </SpanTwoColumns>
           <Address
