@@ -6,7 +6,6 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from api.application_round_api import CitySerializerField
 from api.reservation_units_api import ReservationUnitSerializer
 from api.reservations_api import AgeGroupSerializer
 from applications.models import (
@@ -439,10 +438,8 @@ class ApplicationSerializer(serializers.ModelSerializer):
 
     applicant_type = serializers.CharField(allow_null=True)
 
-    home_city = CitySerializerField(
-        allow_null=True,
-        required=False,
-        help_text="Name of the home city of the application",
+    home_city_id = serializers.PrimaryKeyRelatedField(
+        queryset=City.objects.all(), source="home_city", required=False, allow_null=True
     )
 
     class Meta:
@@ -458,7 +455,7 @@ class ApplicationSerializer(serializers.ModelSerializer):
             "status",
             "aggregated_data",
             "billing_address",
-            "home_city",
+            "home_city_id",
         ]
 
     def set_home_city(self, obj: Application):

@@ -1,7 +1,5 @@
 from django.conf import settings
-from django.utils.translation import gettext_lazy as _
 from rest_framework import permissions, serializers, viewsets
-from rest_framework.exceptions import ValidationError
 
 from applications.models import (
     ApplicationRound,
@@ -15,17 +13,6 @@ from reservations.models import AgeGroup
 from spaces.models import ServiceSector
 
 
-class CitySerializerField(serializers.Field):
-    def to_representation(self, obj: City):
-        return obj.name
-
-    def to_internal_value(self, data):
-        try:
-            return City.objects.get(name=data)
-        except City.DoesNotExist:
-            raise ValidationError(_("No matching city was found"))
-
-
 class ApplicationRoundBasketSerializer(serializers.ModelSerializer):
     purpose_ids = serializers.PrimaryKeyRelatedField(
         queryset=Purpose.objects.all(), source="purposes", many=True
@@ -35,10 +22,8 @@ class ApplicationRoundBasketSerializer(serializers.ModelSerializer):
         queryset=AgeGroup.objects.all(), source="age_groups", many=True
     )
 
-    home_city = CitySerializerField(
-        allow_null=True,
-        required=False,
-        help_text="Name of the home city for the basket",
+    home_city_id = serializers.PrimaryKeyRelatedField(
+        queryset=City.objects.all(), source="home_city", required=False, allow_null=True
     )
 
     class Meta:
@@ -50,7 +35,7 @@ class ApplicationRoundBasketSerializer(serializers.ModelSerializer):
             "must_be_main_purpose_of_applicant",
             "customer_type",
             "age_group_ids",
-            "home_city",
+            "home_city_id",
             "allocation_percentage",
             "order_number",
         ]
