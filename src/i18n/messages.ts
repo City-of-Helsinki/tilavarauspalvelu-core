@@ -494,6 +494,12 @@ const translations: Translations = {
           'https://app.helmet-kirjasto.fi/forms/?site=varaamopalaute&ref=https://tilavaraus.hel.fi/',
         ],
       },
+      terms: {
+        label: ['Palvelun yleiset käyttöehdot'],
+        href: [
+          `${process.env.PUBLIC_URL}/Tilavarauspalvelu_Yleisetpalveluehdot4_21.pdf`,
+        ],
+      },
     },
     Base: {
       Item: {
