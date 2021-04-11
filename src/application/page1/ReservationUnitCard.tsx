@@ -92,6 +92,9 @@ const MaxPersonsCountContainer = styled.span`
 
 const ArrowContainer = styled.div`
   display: flex;
+  @media (max-width: ${breakpoint.s}) {
+    flex-direction: column;
+  }
 `;
 
 const Circle = styled.div<{ passive: boolean }>`
