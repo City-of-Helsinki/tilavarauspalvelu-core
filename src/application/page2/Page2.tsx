@@ -111,6 +111,9 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
             key={event.id}
             id={`timeSelector-${index}`}
             heading={event.name || undefined}>
+            <Notification size="small" type="info">
+              {t('Application.Page2.info')}
+            </Notification>{' '}
             <TimeSelector
               key={event.id || 'NEW'}
               index={index}
