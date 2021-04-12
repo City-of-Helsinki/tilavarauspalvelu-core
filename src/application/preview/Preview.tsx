@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Checkbox, IconArrowLeft, Notification } from 'hds-react';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { Application, ReservationUnit, Parameter } from '../../common/types';
@@ -123,6 +123,7 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
 
   const [acceptTermsOfUse, setAcceptTermsOfUse] = useState(false);
   const { i18n } = useTranslation();
+  const history = useHistory();
 
   useEffect(() => {
     let mounted = true;
@@ -323,7 +324,10 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
         {t('Application.preview.notification.body')}
       </StyledNotification>
       <ButtonContainer>
-        <Button variant="secondary" iconLeft={<IconArrowLeft />} disabled>
+        <Button
+          variant="secondary"
+          iconLeft={<IconArrowLeft />}
+          onClick={() => history.push('page3')}>
           {t('common.prev')}
         </Button>
         <Button

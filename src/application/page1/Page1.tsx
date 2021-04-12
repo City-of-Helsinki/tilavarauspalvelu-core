@@ -44,33 +44,34 @@ type OptionTypes = {
 };
 
 const ButtonContainer = styled.div`
-  @media (max-width: ${breakpoint.m}) {
-    flex-direction: column;
-
-    & > button {
-      margin-top: var(--spacing-m);
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    & :nth-child(1) {
-      margin-left: auto;
-      margin-right: auto;
-    }
-  }
-
   display: flex;
   flex-direction: row;
   margin-top: var(--spacing-layout-l);
   justify-content: flex-end;
 
-  & > button {
+  > button {
     margin-left: var(--spacing-m);
   }
 
-  & :nth-child(1) {
+  > :nth-child(0) {
     margin-right: auto;
     margin-left: 0;
+  }
+
+  @media (max-width: ${breakpoint.m}) {
+    flex-direction: column;
+    margin-top: var(--spacing-layout-xs);
+
+    > button {
+      margin-top: var(--spacing-m);
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    :nth-child(1) {
+      margin-left: auto;
+      margin-right: auto;
+    }
   }
 `;
 
@@ -222,8 +223,6 @@ const Page1 = ({
           disabled={addNewEventButtonDisabled}>
           {t('Application.Page1.createNew')}
         </Button>
-      </ButtonContainer>
-      <ButtonContainer>
         <Button
           id="next"
           iconRight={<IconArrowRight />}

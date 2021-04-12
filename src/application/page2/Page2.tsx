@@ -1,6 +1,7 @@
 import { Button, IconArrowLeft, IconArrowRight, Notification } from 'hds-react';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useHistory } from 'react-router-dom';
 import { useDebounce } from 'use-debounce';
 import styled from 'styled-components';
 import { Application, Cell } from '../../common/types';
@@ -30,6 +31,7 @@ const ButtonContainer = styled.div`
 
 const Page2 = ({ application, onNext }: Props): JSX.Element => {
   const [msg, setMsg] = useState('');
+  const history = useHistory();
 
   const [selectorData, setSelectorData] = useState<Cell[][][]>(
     application.applicationEvents.map((applicationEvent) =>
@@ -130,7 +132,10 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
         );
       })}
       <ButtonContainer>
-        <Button variant="secondary" iconLeft={<IconArrowLeft />} disabled>
+        <Button
+          variant="secondary"
+          iconLeft={<IconArrowLeft />}
+          onClick={() => history.push('page1')}>
           {t('common.prev')}
         </Button>
         <Button
