@@ -177,3 +177,11 @@ export function saveApplication(
     path: `v1/${applicationBasePath}/${application.id}/`,
   });
 }
+
+export const cancelApplication = async (
+  applicationId: number
+): Promise<void> => {
+  const application = await getApplication(applicationId);
+  application.status = 'cancelled';
+  await saveApplication(application);
+};

@@ -1,12 +1,20 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TFunction } from 'i18next';
 import styled from 'styled-components';
 import { useHistory } from 'react-router-dom';
-import { Button, Card as HdsCard, Tag as HdsTag } from 'hds-react';
+import {
+  Button,
+  Card as HdsCard,
+  Notification,
+  Tag as HdsTag,
+} from 'hds-react';
 import { Application, ApplicationRound } from '../common/types';
 import { isActive, applicationUrl } from '../common/util';
 import { breakpoint } from '../common/style';
+import ConfirmationModal, { ModalRef } from '../component/ConfirmationModal';
+import { CenterSpinner } from '../component/common';
+import { cancelApplication } from '../common/api';
 
 const Card = styled(HdsCard)`
   margin-bottom: var(--spacing-m);
@@ -93,6 +101,7 @@ const ApplicationCard = ({
   application,
   applicationRound,
 }: Props): JSX.Element | null => {
+  const [state, setState] = useState<'ok' | 'cancelling' | 'error'>('ok');
   const { t } = useTranslation();
   const history = useHistory();
   const editable = isActive(
@@ -108,6 +117,17 @@ const ApplicationCard = ({
     C = GreenTag;
   }
 
+  const cancel = async () => {
+    setState('cancelling');
+    try {
+      await cancelApplication(application.id as number);
+      history.go(0);
+    } catch (e) {
+      setState('error');
+    }
+  };
+
+  const modal = useRef<ModalRef>();
   return (
     <Card border key={application.id}>
       <div>
@@ -116,6 +136,11 @@ const ApplicationCard = ({
         <RoundName>{applicationRound.name}</RoundName>
         {application.applicantType !== null ? (
           <Applicant>{getApplicant(application, t)}</Applicant>
+        ) : null}
+        {state === 'error' ? (
+          <Notification size="small">
+            {t('ApplicationCard.cancelFailed')}
+          </Notification>
         ) : null}
       </div>
       <Buttons>
@@ -126,10 +151,25 @@ const ApplicationCard = ({
           }}>
           {t('ApplicationCard.edit')}
         </StyledButton>
-        <StyledButton disabled={!editable} variant="danger">
-          {t('ApplicationCard.cancel')}
-        </StyledButton>
+        {state === 'cancelling' ? (
+          <CenterSpinner />
+        ) : (
+          <StyledButton
+            disabled={!editable}
+            onClick={() => {
+              modal?.current?.open();
+            }}
+            variant="danger">
+            {t('ApplicationCard.cancel')}
+          </StyledButton>
+        )}
       </Buttons>
+      <ConfirmationModal
+        heading={t('ApplicationCard.cancelHeading')}
+        content={t('ApplicationCard.cancelContent')}
+        ref={modal}
+        onOk={cancel}
+      />
     </Card>
   );
 };

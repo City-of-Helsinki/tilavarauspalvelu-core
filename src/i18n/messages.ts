@@ -19,7 +19,7 @@ interface Translations {
 const translations: Translations = {
   DeleteEvent: {
     heading: ['Poista vakiovuoro hakemukselta?'],
-    text: ['Olet poistamassa vakiovuoroa {{name}}.'],
+    text: ['Olet poistamassa vakiovuoroa hakemukselta. Oletko varma?'],
     confirmation: ['Oletko varma?'],
   },
   ApplicationEventSummary: {
@@ -39,6 +39,11 @@ const translations: Translations = {
     },
   },
   ApplicationCard: {
+    cancelHeading: ['Oletko varma että haluat peruuttaa hakemuksesi?'],
+    cancelContent: [
+      'Jos peruutat hakemuksen et voi enää muokata tai lähettää sitä.',
+    ],
+    cancelFailed: ['Hakemuksen peruuttaminen epäonnistui.'],
     edit: ['Muokkaa hakemusta'],
     cancel: ['Peruuta hakemus'],
     status: {
@@ -328,6 +333,7 @@ const translations: Translations = {
     false: ['ei'],
     true: ['kyllä'],
     close: ['Sulje'],
+    ok: ['Kyllä'],
     search: ['Hae', 'Search', 'Sök'],
     noResults: ['Ei tuloksia', 'No results', 'Inga resultat'],
     select: ['Valitse', 'Choose', 'Välja'],

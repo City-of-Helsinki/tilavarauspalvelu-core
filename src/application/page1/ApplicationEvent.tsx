@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useEffect, useState } from 'react';
+import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
 import {
   Button as HDSButton,
   Checkbox,
@@ -32,7 +32,7 @@ import ControlledSelect from '../../component/ControlledSelect';
 import Accordion from '../../component/Accordion';
 import { defaultDuration, durationOptions } from '../../common/const';
 import { after, before } from './validation';
-import Modal from '../../component/Modal';
+import ConfirmationModal, { ModalRef } from '../../component/ConfirmationModal';
 
 type OptionTypes = {
   ageGroupOptions: OptionType[];
@@ -95,30 +95,6 @@ const SpanTwoColumns = styled.span`
   }
 `;
 
-const ModalContent = styled.div`
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  max-width: 24em;
-  max-height: 100%;
-  height: 20em;
-  font-family: var(--font-bold);
-  @media (max-width: ${breakpoint.s}) {
-    margin-top: var(--spacing-layout-xs);
-    margin-left: var(--spacing-layout-xs);
-    margin-right: auto;
-  }
-`;
-
-const ModalHeading = styled.div`
-  font-size: var(--fontsize-heading-l);
-`;
-
-const ModalText = styled.div`
-  margin-top: 2em;
-  font-size: var(--fontsize-body-l);
-`;
-
 const Button = styled(HDSButton)`
   margin-top: var(--spacing-layout-l);
   @media (max-width: ${breakpoint.s}) {
@@ -170,7 +146,6 @@ const ApplicationEvent = ({
 
   const [defaultPeriodSelected, setDefaultPeriodSelected] = useState(false);
   const [defaultDurationSelected, setDefaultDurationSelected] = useState(false);
-  const [showModal, setShowModal] = useState(false);
 
   const {
     ageGroupOptions,
@@ -209,6 +184,8 @@ const ApplicationEvent = ({
     periodStartDate,
     periodEndDate,
   ]);
+
+  const modalRef = useRef<ModalRef>();
 
   useEffect(() => {
     const selectionIsDefaultDuration =
@@ -525,29 +502,16 @@ const ApplicationEvent = ({
             variant="secondary"
             id={`applicationEvents[${index}].delete`}
             onClick={() => {
-              setShowModal(true);
+              modalRef?.current?.open();
             }}>
             {t('Application.Page1.deleteEvent')}
           </Button>
-          <Modal
-            handleClose={() => {
-              setShowModal(false);
-            }}
-            closeButtonKey="common.cancel"
-            handleOk={() => {
-              setShowModal(false);
-              del();
-            }}
-            okButtonKey="Application.Page1.deleteEvent"
-            show={showModal}>
-            <ModalContent>
-              <ModalHeading>{t('DeleteEvent.heading')}</ModalHeading>
-              <ModalText>
-                <p>{t('DeleteEvent.text', { name: eventName })}</p>
-                <p>{t('DeleteEvent.confirmation')}</p>
-              </ModalText>
-            </ModalContent>
-          </Modal>
+          <ConfirmationModal
+            heading={t('DeleteEvent.heading')}
+            content={t('DeleteEvent.text')}
+            onOk={del}
+            ref={modalRef}
+          />
         </TwoColumnContainer>
       </Accordion>
       {editorState.savedEventId &&

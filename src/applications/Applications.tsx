@@ -43,7 +43,9 @@ const Applications = (): JSX.Element | null => {
   );
 
   const status = useAsync(async () => {
-    const loadedApplications = await getApplications();
+    const loadedApplications = (await getApplications()).filter(
+      (a) => a.status !== 'cancelled'
+    );
     const groupedApplications = groupBy(loadedApplications, getGroup);
     setApplications(groupedApplications);
     const loadedRounds = await getApplicationRounds();

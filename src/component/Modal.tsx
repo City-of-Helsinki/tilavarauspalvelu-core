@@ -49,16 +49,17 @@ const ButtonContainer = styled.div`
   background-color: white;
   bottom: 0;
   display: grid;
+  gap: var(--spacing-layout-s);
   grid-template-columns: 1fr 1fr;
   padding-top: var(--spacing-layout-s);
 
   > button {
-    margin-right: var(--spacing-layout-m);
     left: auto;
     right: auto;
   }
 
   @media (max-width: ${breakpoint.s}) {
+    width: calc(100% - 2 * var(--spacing-layout-xs));
     padding: var(--spacing-layout-xs);
     > button {
       margin: 0;
