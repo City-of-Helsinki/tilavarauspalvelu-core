@@ -37,6 +37,8 @@ class ApplicationEventScheduleResultSerializer(serializers.ModelSerializer):
     unit_name = serializers.SerializerMethodField()
     allocated_reservation_unit_name = serializers.SerializerMethodField()
 
+    basket_name = serializers.CharField(source="basket.name")
+
     class Meta:
         model = ApplicationEventScheduleResult
         fields = [
@@ -54,6 +56,7 @@ class ApplicationEventScheduleResultSerializer(serializers.ModelSerializer):
             "allocated_day",
             "allocated_begin",
             "allocated_end",
+            "basket_name",
         ]
 
     def get_unit_name(self, instance):
