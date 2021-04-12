@@ -3,7 +3,7 @@ import { LoadingSpinner, Notification as HDSNotification } from 'hds-react';
 import { breakpoint } from '../common/style';
 
 export const TwoColumnContainer = styled.div`
-  @media (max-width: ${breakpoint.l}) {
+  @media (max-width: ${breakpoint.m}) {
     grid-template-columns: 1fr;
   }
 
@@ -18,7 +18,7 @@ export const SpanTwoColumns = styled.span`
   grid-column-start: 1;
   grid-column-end: 3;
 
-  @media (max-width: ${breakpoint.l}) {
+  @media (max-width: ${breakpoint.m}) {
     grid-column-start: 1;
     grid-column-end: 2;
   }
@@ -54,7 +54,7 @@ export const CheckboxWrapper = styled.div`
   margin-top: 2.5em;
   margin-bottom: auto;
 
-  @media (max-width: ${breakpoint.l}) {
+  @media (max-width: ${breakpoint.m}) {
     margin-top: 0;
   }
 `;
