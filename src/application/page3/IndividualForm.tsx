@@ -87,7 +87,7 @@ const IndividualForm = ({
           <BillingAddress register={register} errors={errors} />
           <TextInput
             ref={register({ required: true })}
-            label={t('Application.Page3.contactPerson.phoneNumber')}
+            label={t('Application.Page3.phoneNumber')}
             id="contactPerson.phoneNumber"
             name="contactPerson.phoneNumber"
             required
