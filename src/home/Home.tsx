@@ -10,6 +10,9 @@ import { breakpoint } from '../common/style';
 
 const TopContainer = styled.div`
   margin-right: 30%;
+  @media (max-width: ${breakpoint.m}) {
+    margin-right: 0%;
+  }
 `;
 
 const Heading = styled.h2`
@@ -20,11 +23,27 @@ const Heading = styled.h2`
 const StyledImageWithCard = styled(ImageWithCard)`
   && {
     margin-top: var(--spacing-layout-xl);
-    width: 75rem;
+    max-width: 75rem;
 
-    & > :nth-child(2) {
+    > :nth-child(2) {
       height: auto;
       margin: 1em;
+    }
+
+    @media (max-width: ${breakpoint.s}) {
+      margin-top: var(--spacing-layout-s);
+
+      > :nth-child(1) {
+        margin: 0;
+      }
+
+      > :nth-child(2) {
+        height: auto;
+        margin: var(--spacing-m) 0 0 0;
+        div {
+          margin: 0;
+        }
+      }
     }
   }
 `;
@@ -39,7 +58,7 @@ const ButtonContainer = styled.div`
     display: flex;
     flex-direction: column;
 
-    & > button {
+    > button {
       margin-bottom: var(--spacing-m);
       margin-right: 0;
     }
@@ -47,7 +66,7 @@ const ButtonContainer = styled.div`
 
   margin-top: var(--spacing-xl);
 
-  & > button {
+  > button {
     margin-top: var(--spacing-m);
   }
 `;

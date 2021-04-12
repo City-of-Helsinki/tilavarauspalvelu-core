@@ -14,10 +14,6 @@ interface Props {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const StyledCard = styled(({ act, ...rest }) => <Card {...rest} />)`
-  @media (max-width: ${breakpoint.s}) {
-    grid-template-columns: 2fr;
-  }
-
   && {
     max-width: var(--container-width-m);
     display: grid;
@@ -28,6 +24,10 @@ const StyledCard = styled(({ act, ...rest }) => <Card {...rest} />)`
     margin-bottom: var(--spacing-s);
     border-color: ${(props) => props.act && 'var(--tilavaraus-green)'};
     background-color: ${(props) => props.act && 'var(--tilavaraus-cyan)'};
+
+    @media (max-width: ${breakpoint.s}) {
+      grid-template-columns: 1fr;
+    }
   }
 `;
 
