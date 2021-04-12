@@ -278,7 +278,6 @@ const ReservationUnitModal = ({
   options: OptionsType;
 }): JSX.Element => {
   const [searchTerm, setSearchTerm] = useState<string | undefined>(undefined);
-  const [purpose, setPurpose] = useState<OptionType | undefined>(undefined);
   const [reservationUnitType, setReservationUnitType] = useState<
     OptionType | undefined
   >(undefined);
@@ -288,7 +287,6 @@ const ReservationUnitModal = ({
   );
   const [searching, setSearching] = useState<boolean>(false);
 
-  const purposeOptions = [emptyOption].concat(options.purposeOptions);
   const reservationUnitTypeOptions = [emptyOption].concat(
     options.reservationUnitTypeOptions
   );
@@ -304,7 +302,6 @@ const ReservationUnitModal = ({
     const searchCriteria = {
       applicationRound: applicationRound.id,
       ...(searchTerm && { search: searchTerm }),
-      ...(purpose && { purpose: purpose.value }),
       ...(maxPersons && { maxPersons: maxPersons.value }),
       ...(reservationUnitType && {
         reservationUnitType: reservationUnitType.value,
@@ -332,16 +329,6 @@ const ReservationUnitModal = ({
           onChange={(e: ChangeEvent<HTMLInputElement>): void => {
             setSearchTerm(e.target.value);
           }}
-        />
-        <Select
-          id="reservationUnitSearch.purpose"
-          placeholder={t('common.select')}
-          options={purposeOptions}
-          label={t('ReservationUnitModal.searchPurposeLabel')}
-          onChange={(selection: OptionType): void => {
-            setPurpose(selection);
-          }}
-          defaultValue={emptyOption}
         />
         <Select
           id="reservationUnitSearch.reservationUnitType"

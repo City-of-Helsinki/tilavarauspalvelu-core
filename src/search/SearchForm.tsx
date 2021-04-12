@@ -1,12 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Select,
-  TextInput,
-  Button as HDSButton,
-  IconSearch,
-  IconSliders,
-} from 'hds-react';
+import { Select, TextInput, Button as HDSButton, IconSearch } from 'hds-react';
 import { useForm } from 'react-hook-form';
 import styled from 'styled-components';
 import { breakpoint } from '../common/style';
@@ -54,9 +48,6 @@ const ButtonContainer = styled.div`
 const SearchForm = ({ onSearch, formValues }: Props): JSX.Element | null => {
   const { t, i18n } = useTranslation();
   const [ready, setReady] = useState<boolean>(false);
-  const [showMoreFilters, setShowMoreFilters] = useState(false);
-  const [purposeOptions, setPurposeOptions] = useState<OptionType[]>([]);
-  const [districtOptions, setDistrictOptions] = useState<OptionType[]>([]);
   const [reservationUnitTypeOptions, setReservationUnitTypeOptions] = useState<
     OptionType[]
   >([]);
@@ -80,12 +71,6 @@ const SearchForm = ({ onSearch, formValues }: Props): JSX.Element | null => {
       setApplicationPeriodOptions(
         mapOptions(fetchedApplicationPeriods, t('common.select'), i18n.language)
       );
-      const fetchedPurposeOptions = await getParameters('purpose');
-      setPurposeOptions(mapOptions(fetchedPurposeOptions, t('common.select')));
-      const fetchedDistrictOptions = await getParameters('district');
-      setDistrictOptions(
-        mapOptions(fetchedDistrictOptions, t('common.select'), i18n.language)
-      );
       const fetchedReservationUnitTypes = await getParameters(
         'reservation_unit_type'
       );
@@ -104,12 +89,6 @@ const SearchForm = ({ onSearch, formValues }: Props): JSX.Element | null => {
   useEffect(() => {
     Object.keys(formValues).forEach((p) => setValue(p, formValues[p]));
   }, [formValues, setValue]);
-
-  useEffect(() => {
-    if (showMoreFilters) {
-      document.getElementById('participantCountFilter-toggle-button')?.focus();
-    }
-  }, [showMoreFilters]);
 
   const search = (criteria: Record<string, string>) => {
     onSearch(criteria);
@@ -149,74 +128,35 @@ const SearchForm = ({ onSearch, formValues }: Props): JSX.Element | null => {
           label={t('SearchForm.roundLabel')}
         />
         <Select
-          id="purpose"
+          id="participantCountFilter"
           placeholder={t('common.select')}
-          options={purposeOptions}
+          options={[emptyOption(t('common.select'))].concat(
+            participantCountOptions
+          )}
+          label={t('SearchForm.participantCountLabel')}
           onChange={(selection: OptionType): void => {
-            setValue('purpose', selection.value);
+            setValue('maxPersons', selection.value);
           }}
-          defaultValue={getSelectedOption(getValues('purpose'), purposeOptions)}
-          label={t('SearchForm.purposeLabel')}
+          defaultValue={getSelectedOption(
+            getValues('maxPersons'),
+            participantCountOptions
+          )}
         />
         <Select
-          id="district"
           placeholder={t('common.select')}
+          options={reservationUnitTypeOptions}
+          label={t('SearchForm.typeLabel')}
           onChange={(selection: OptionType): void => {
-            setValue('district', selection.value);
+            setValue('reservationUnitType', selection.value);
           }}
-          options={districtOptions}
           defaultValue={getSelectedOption(
-            getValues('district'),
-            districtOptions
+            getValues('reservationUnitType'),
+            reservationUnitTypeOptions
           )}
-          label={t('SearchForm.districtLabel')}
         />
-        {showMoreFilters ? (
-          <>
-            <Select
-              id="participantCountFilter"
-              placeholder={t('common.select')}
-              options={[emptyOption(t('common.select'))].concat(
-                participantCountOptions
-              )}
-              label={t('SearchForm.participantCountLabel')}
-              onChange={(selection: OptionType): void => {
-                setValue('maxPersons', selection.value);
-              }}
-              defaultValue={getSelectedOption(
-                getValues('maxPersons'),
-                participantCountOptions
-              )}
-            />
-            <Select
-              placeholder={t('common.select')}
-              options={reservationUnitTypeOptions}
-              label={t('SearchForm.typeLabel')}
-              onChange={(selection: OptionType): void => {
-                setValue('reservationUnitType', selection.value);
-              }}
-              defaultValue={getSelectedOption(
-                getValues('reservationUnitType'),
-                reservationUnitTypeOptions
-              )}
-            />
-          </>
-        ) : null}
       </Container>
       <Hr />
       <ButtonContainer>
-        <Button
-          variant="supplementary"
-          iconLeft={<IconSliders />}
-          onClick={() => {
-            setShowMoreFilters(!showMoreFilters);
-          }}>
-          {t(
-            showMoreFilters
-              ? 'SearchForm.showLessFilters'
-              : 'SearchForm.showMoreFilters'
-          )}
-        </Button>
         <Button
           id="searchButton"
           onClick={handleSubmit(search)}
