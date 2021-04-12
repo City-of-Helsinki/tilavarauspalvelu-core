@@ -23,6 +23,8 @@ const Footer = (): JSX.Element => {
             key={id}
             href={t(`Footer.Navigation.${id}.href`)}
             label={t(`Footer.Navigation.${id}.label`)}
+            target="_blank"
+            rel="noopener noreferrer"
           />
         ))}
       </HDSFooter.Navigation>
