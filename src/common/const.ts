@@ -68,14 +68,27 @@ const option = (label: string, value: string): OptionType => {
   return { label, value };
 };
 
-export const durationOptions = [
-  option('1 t', '01:00:00'),
-  option('1 t 30 min', '01:30:00'),
-  option('2 t', '02:00:00'),
-  option('2 t 30 min', '02:30:00'),
-];
+const formatNumber = (n: number): string => `00${n}`.slice(-2);
 
-export const defaultDuration = '01:00:00';
+export const durationOptions = [] as OptionType[];
+
+let h = 1;
+let m = 30;
+
+for (let i = 0; i < 12; i += 1) {
+  durationOptions.push(
+    option(
+      `${h} ${h === 1 ? 'tunti' : 'tuntia'} ${m ? `${m} min` : ''}`,
+      `${formatNumber(h)}:${formatNumber(m)}:00`
+    )
+  );
+  m += 15;
+  if (m === 60) {
+    m = 0;
+    h += 1;
+  }
+}
+export const defaultDuration = '01:30:00';
 
 export const isBrowser = typeof window !== 'undefined';
 
