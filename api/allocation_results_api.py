@@ -37,7 +37,8 @@ class ApplicationEventScheduleResultSerializer(serializers.ModelSerializer):
     unit_name = serializers.SerializerMethodField()
     allocated_reservation_unit_name = serializers.SerializerMethodField()
 
-    basket_name = serializers.CharField(source="basket.name")
+    basket_name = serializers.SerializerMethodField()
+    basket_order_number = serializers.SerializerMethodField()
 
     class Meta:
         model = ApplicationEventScheduleResult
@@ -57,6 +58,7 @@ class ApplicationEventScheduleResultSerializer(serializers.ModelSerializer):
             "allocated_begin",
             "allocated_end",
             "basket_name",
+            "basket_order_number",
         ]
 
     def get_unit_name(self, instance):
@@ -70,6 +72,16 @@ class ApplicationEventScheduleResultSerializer(serializers.ModelSerializer):
             return (
                 instance.application_event_schedule.application_event.application.user.get_full_name()
             )
+
+    def get_basket_name(self, instance):
+        if instance.basket:
+            return instance.basket.name
+        return ""
+
+    def get_basket_order_number(self, instance):
+        if instance.basket:
+            return instance.basket.order_number
+        return ""
 
 
 class AllocationResultsFilter(filters.FilterSet):
