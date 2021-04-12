@@ -16,7 +16,9 @@ import TimePreview from '../TimePreview';
 import ApplicantInfoPreview from './ApplicantInfoPreview';
 import { TwoColumnContainer } from '../../component/common';
 import { AccordionWithState as Accordion } from '../../component/Accordion';
-import Sanitize from '../../component/Sanitize';
+import tos from './tos';
+import spaceTos from './space_tos';
+import { breakpoint } from '../../common/style';
 
 type Props = {
   application: Application;
@@ -86,7 +88,21 @@ const StyledNotification = styled(Notification)`
 `;
 
 const Terms = styled.div`
-  margin-top: var(--spacing-m);
+  margin-top: var(--spacing-s);
+  width: (--container-width-m);
+  white-space: break-spaces;
+
+  height: 20em;
+  overflow-y: scroll;
+  background-color: var(--color-white);
+  padding: var(--spacing-s);
+
+  @media (max-width: ${breakpoint.m}) {
+    height: auto;
+    background-color: transparent;
+    padding: 0;
+    overflow-y: none;
+  }
 `;
 
 const Preview = ({ onNext, application }: Props): JSX.Element | null => {
@@ -285,18 +301,13 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
         </Accordion>
       ))}
       <SmallSubHeadline>
+        {t('Application.preview.termsOfService')}
+      </SmallSubHeadline>
+      <Terms>{tos}</Terms>
+      <SmallSubHeadline>
         {t('Application.preview.reservationUnitTerms')}
       </SmallSubHeadline>
-      <Terms>
-        {Object.values(reservationUnits).map((ru) => (
-          <Accordion
-            open
-            key={ru.id}
-            heading={localizedValue(ru.name, i18n.language)}>
-            <Sanitize html={ru.termsOfUse} />
-          </Accordion>
-        ))}
-      </Terms>
+      <Terms>{spaceTos}</Terms>
       <CheckboxContainer>
         <Checkbox
           id="preview.acceptTermsOfUse"
