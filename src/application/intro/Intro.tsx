@@ -17,7 +17,7 @@ const Container = styled.div`
   font-size: var(--fontsize-body-m);
   gap: var(--spacing-l);
   display: grid;
-  grid-template-columns: 382px 382px;
+  grid-template-columns: 1fr 382px;
 
   @media (max-width: ${breakpoint.l}) {
     grid-template-columns: 1fr;
