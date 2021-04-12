@@ -1,4 +1,6 @@
 from django.contrib import admin
+from django.forms import CharField, ModelForm
+from tinymce.widgets import TinyMCE
 
 from .models import (
     Day,
@@ -13,6 +15,15 @@ from .models import (
 )
 
 
+class ReservationUnitAdminForm(ModelForm):
+    description = CharField(widget=TinyMCE())
+    terms_of_use = CharField(widget=TinyMCE())
+
+    class Meta:
+        model = ReservationUnit
+        fields = "__all__"
+
+
 class ReservationUnitImageInline(admin.TabularInline):
     model = ReservationUnitImage
 
@@ -20,6 +31,7 @@ class ReservationUnitImageInline(admin.TabularInline):
 @admin.register(ReservationUnit)
 class ReservationUnitAdmin(admin.ModelAdmin):
     model = ReservationUnit
+    form = ReservationUnitAdminForm
     inlines = [ReservationUnitImageInline]
     readonly_fields = ["uuid"]
 
