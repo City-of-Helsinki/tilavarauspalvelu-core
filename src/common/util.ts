@@ -103,8 +103,8 @@ const getLabel = (
   if (parameter.name) {
     return localizedValue(parameter.name, lang);
   }
-  if (parameter.minimum && parameter.maximum) {
-    return `${parameter.minimum} - ${parameter.maximum}`;
+  if (parameter.minimum || parameter.maximum) {
+    return `${parameter.minimum || ''} - ${parameter.maximum || ''}`;
   }
   return 'no label';
 };

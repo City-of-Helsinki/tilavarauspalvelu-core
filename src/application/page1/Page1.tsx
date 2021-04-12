@@ -115,6 +115,10 @@ const Page1 = ({
         getParameters('reservation_unit_type'),
       ]);
 
+      fetchedAgeGroupOptions.sort((a, b) => {
+        return (a.minimum || 0) - (b.minimum || 0);
+      });
+
       setOptions({
         ageGroupOptions: mapOptions(fetchedAgeGroupOptions),
         abilityGroupOptions: mapOptions(fetchedAbilityGroupOptions),
