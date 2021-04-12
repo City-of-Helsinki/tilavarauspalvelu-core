@@ -48,7 +48,7 @@ const translations: Translations = {
     cancel: ['Peruuta hakemus'],
     status: {
       draft: ['Kesken'],
-      in_review: ['Käsittelyssä'],
+      in_review: ['Lähetetty'],
     },
     person: ['Hakemus luotu: yksityishenkilönä'],
     organisation: ['Hakemus luotu: {{type}} {{name}}'],
@@ -274,7 +274,10 @@ const translations: Translations = {
         ],
       },
       reservationUnitTerms: ['Tilojen käyttöehdot'],
-      userAcceptsTerms: ['Hyväksyn käyttöehdot'],
+      termsOfService: ['Palveluehdot'],
+      userAcceptsTerms: [
+        'Olen lukenut ja hyväksyn palveluehdot ja tilojen  käyttöehdot.',
+      ],
     },
     sent: {
       heading: ['Hakemuksesi on lähetetty käsiteltäväksi'],
