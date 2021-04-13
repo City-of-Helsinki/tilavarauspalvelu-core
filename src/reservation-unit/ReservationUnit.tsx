@@ -84,7 +84,7 @@ const ReservationUnit = (): JSX.Element | null => {
                 <Sanitize html={reservationUnit.description} />
               </Content>
             </Accordion>
-            <Accordion open heading={t('reservationUnit.termsOfUse')}>
+            <Accordion heading={t('reservationUnit.termsOfUse')}>
               <Content>
                 <Sanitize html={reservationUnit.termsOfUse} />
               </Content>
