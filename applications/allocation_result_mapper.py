@@ -24,6 +24,7 @@ class AllocationResultMapper(object):
                         "allocated_duration": allocated_event.duration,
                         "allocated_begin": allocated_event.begin,
                         "allocated_end": allocated_event.end,
+                        "basket": allocated_event.basket_id,
                     },
                 )
             except ApplicationEventScheduleResult.DoesNotExist:

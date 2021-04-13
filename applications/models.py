@@ -906,3 +906,9 @@ class ApplicationEventScheduleResult(models.Model):
         null=False,
         blank=False,
     )
+
+    basket = models.ForeignKey(
+        ApplicationRoundBasket,
+        on_delete=models.SET_NULL,
+        null=True,
+    )

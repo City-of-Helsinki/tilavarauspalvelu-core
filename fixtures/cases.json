@@ -1061,6 +1061,13 @@
         }
     },
     {
+        "model": "applications.city",
+        "pk": 1,
+        "fields": {
+            "name": "Helsinki"
+        }
+    },
+    {
         "model": "applications.person",
         "pk": 1,
         "fields": {
@@ -1220,6 +1227,18 @@
                 2,
                 4
             ]
+        }
+    },
+    {
+        "model": "applications.applicationroundbasket",
+        "pk": 1,
+        "fields": {
+            "name": "Kori A",
+            "application_round_id": 1,
+            "purposes": [1],
+            "customer_type": ["nonprofit"],
+            "home_city": 1,
+            "order_number": 1
         }
     },
     {
@@ -1419,7 +1438,8 @@
           "allocated_duration": "02:00:00",
           "allocated_day": 3,
           "allocated_begin": "15:00:00",
-          "allocated_end": "18:00:00"
+          "allocated_end": "18:00:00",
+          "basket_id": 1
       }
     }
 ]
