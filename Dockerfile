@@ -27,4 +27,4 @@ RUN yarn build:prod
 USER default
 EXPOSE 3000
 
-CMD [ "yarn", "start-server:prod"]
+CMD [ "node", "server/server-no-ssr.js"]
