@@ -283,7 +283,7 @@ const translations: Translations = {
       heading: ['Hakemuksesi on lähetetty käsiteltäväksi'],
       faq1Question: ['Kuinka hakemuksen käsittely etenee?'],
       faq2Question: ['Kuinka hakemuksen käsittely tapahtuu?'],
-      faq3Question: ['Kuinka valitan päätöksestä?'],
+      faq3Question: ['Kohtuullistaminen, vuoron peruutus ja muutoksenhaku'],
     },
   },
   ApplicationPage: {
