@@ -166,6 +166,7 @@ const ApplicationEvent = ({
   const durationMax = form.watch(fieldName('maxDuration'));
   const numPersons = form.watch(fieldName('numPersons'));
   form.watch(fieldName('eventsPerWeek'));
+  form.watch(fieldName('biweekly'));
 
   useEffect(() => {
     form.register({ name: fieldName('eventReservationUnits') });

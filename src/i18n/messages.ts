@@ -24,7 +24,7 @@ const translations: Translations = {
   },
   ApplicationEventSummary: {
     message: [
-      'Olet hakemassa vakiovuorolle {{name}} kaudella {{startDate}} - {{endDate}} vähintään yhteensä {{hours}} tuntia vakiovuoroaikaa.',
+      'Olet hakemassa vakiovuoroa {{name}} kaudella {{startDate}} - {{endDate}}. Haet yhteensä vähintään {{hours}} tuntia vakiovuoroaikaa.',
     ],
     numPersons: ['Ryhmän koko on <1>{{numPersons}} henkilöä<1>'],
     minDuration: ['Yhden vuoron kesto minimissään {{minDuration}}'],
