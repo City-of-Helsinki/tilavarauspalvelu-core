@@ -505,9 +505,7 @@ const translations: Translations = {
       },
       terms: {
         label: ['Palvelun yleiset käyttöehdot'],
-        href: [
-          `${process.env.PUBLIC_URL}/Tilavarauspalvelu_Yleisetpalveluehdot4_21.pdf`,
-        ],
+        href: [`/Tilavarauspalvelu_Yleisetpalveluehdot4_21.pdf`],
       },
     },
     Base: {
