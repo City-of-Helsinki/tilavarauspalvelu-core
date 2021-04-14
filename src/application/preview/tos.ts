@@ -1,4 +1,4 @@
-export default `Täydentävät varausehdot
+export default `Nuorisotilojen yleiset varausehdot
 
 1 Soveltamisala
 
