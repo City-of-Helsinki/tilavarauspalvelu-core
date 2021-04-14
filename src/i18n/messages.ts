@@ -295,7 +295,6 @@ const translations: Translations = {
     },
   },
   ApplicationRoundCard: {
-    reminderButton: ['Tilaa muistutus'],
     applyButton: ['Hae Tilaa'],
     displayPastButton: ['Näytä tilat'],
     criteria: ['Hakukriteerit'],
@@ -322,6 +321,9 @@ const translations: Translations = {
     sunday: ['Sunnuntai'],
   },
   common: {
+    dateTime: ["{{date, dd.MM.yyyy 'klo' HH:mm}}"],
+    date: ['{{date, dd.MM.yy}}'],
+    time: ['{{date, HH:mm}}'],
     error: {
       dataError: ['Tietoja ei saatu haettua'],
     },

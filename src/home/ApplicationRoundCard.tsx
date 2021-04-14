@@ -1,8 +1,9 @@
 import React from 'react';
-import { Button, Container, IconArrowRight, IconClock } from 'hds-react';
+import { Button, Container, IconArrowRight } from 'hds-react';
 import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
+import { parseISO } from 'date-fns';
 import Card from '../component/Card';
 import { ApplicationRound } from '../common/types';
 import { applicationRoundState, formatDate, searchUrl } from '../common/util';
@@ -82,9 +83,9 @@ const ApplicationRoundCard = ({ applicationRound }: Props): JSX.Element => {
         <div>
           {state === 'pending' &&
             t('ApplicationRoundCard.pending', {
-              openingDateTime: formatDate(
-                applicationRound.applicationPeriodBegin
-              ),
+              openingDateTime: t('common.dateTime', {
+                date: parseISO(applicationRound.applicationPeriodBegin),
+              }),
             })}
           {state === 'active' &&
             t('ApplicationRoundCard.open', {
@@ -103,11 +104,6 @@ const ApplicationRoundCard = ({ applicationRound }: Props): JSX.Element => {
           {t('ApplicationRoundCard.criteria')}
         </CardButton>
       </StyledContainer>
-      {state === 'pending' && (
-        <CardButton iconLeft={<IconClock />} variant="secondary" disabled>
-          {t('ApplicationRoundCard.reminderButton')}
-        </CardButton>
-      )}
       {state === 'active' && (
         <CardButton
           onClick={() =>
