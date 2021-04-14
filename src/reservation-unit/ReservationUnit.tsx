@@ -97,8 +97,8 @@ const ReservationUnit = (): JSX.Element | null => {
           <SpanTwoColumns>
             <Map
               title={localizedValue(reservationUnit.name, i18n.language)}
-              latitude={reservationUnit.location?.coordinates?.latitude}
-              longitude={reservationUnit.location?.coordinates?.longitude}
+              latitude={reservationUnit.location?.coordinates?.longitude}
+              longitude={reservationUnit.location?.coordinates?.latitude}
             />
             {reservationUnit.location ? (
               <Address reservationUnit={reservationUnit} />
