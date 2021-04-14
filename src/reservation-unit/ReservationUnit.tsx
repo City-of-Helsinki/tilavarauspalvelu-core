@@ -8,8 +8,6 @@ import { getReservationUnit, getReservationUnits } from '../common/api';
 import Head from './Head';
 import { routeData } from '../common/const';
 import Address from './Address';
-import Map from './Map';
-import { localizedValue } from '../common/util';
 import Images from './Images';
 import { SpanTwoColumns } from '../component/common';
 import Sanitize from '../component/Sanitize';
@@ -38,7 +36,7 @@ const Content = styled.div`
 
 const ReservationUnit = (): JSX.Element | null => {
   const { id } = useParams<ParamTypes>();
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
 
   const [
     reservationUnit,
@@ -95,14 +93,6 @@ const ReservationUnit = (): JSX.Element | null => {
             <Images images={reservationUnit.images} />
           </div>
           <SpanTwoColumns>
-            <Map
-              title={localizedValue(reservationUnit.name, i18n.language)}
-              latitude={reservationUnit.location?.coordinates?.longitude}
-              longitude={reservationUnit.location?.coordinates?.latitude}
-            />
-            {reservationUnit.location ? (
-              <Address reservationUnit={reservationUnit} />
-            ) : null}
             <RelatedUnits
               reservationUnitList={reservationUnitList}
               units={relatedUnits}
