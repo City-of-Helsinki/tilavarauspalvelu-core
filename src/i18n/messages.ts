@@ -485,6 +485,7 @@ const translations: Translations = {
     count_plural: ['{{count}} Hakutulosta'],
     count: ['{{count}} Hakutulos'],
     noResults: ['Ei hakutuloksia'],
+    error: ['Tapahtui virhe haettaessa tiloja'],
     listButton: ['Näytä listassa'],
     mapButton: ['Näytä kartalla'],
     sortButtonLabel: ['Järjestä'],

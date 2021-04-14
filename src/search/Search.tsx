@@ -12,6 +12,7 @@ import { getReservationUnits, ReservationUnitsParameters } from '../common/api';
 import { ReservationUnit } from '../common/types';
 import { searchUrl } from '../common/util';
 import { searchPrefix } from '../common/const';
+import { CenterSpinner } from '../component/common';
 
 const style = {
   fontSize: 'var(--fontsize-heading-l)',
@@ -30,10 +31,11 @@ const Search = (): JSX.Element => {
   const { t } = useTranslation();
 
   const [values, setValues] = useState({} as Record<string, string>);
+  const [state, setState] = useState<'loading' | 'done' | 'error'>('done');
 
-  const [reservationUnits, setReservationUnits] = useState<ReservationUnit[]>(
-    []
-  );
+  const [reservationUnits, setReservationUnits] = useState<
+    ReservationUnit[] | null
+  >(null);
 
   const searchParams = useHistory().location.search;
 
@@ -52,7 +54,16 @@ const Search = (): JSX.Element => {
       }, {} as Record<string, string>);
 
       setValues(newValues);
-      getReservationUnits(newValues).then((v) => setReservationUnits(v));
+      setState('loading');
+      getReservationUnits(newValues)
+        .then((v) => {
+          setReservationUnits(v);
+          setState('done');
+        })
+        .catch(() => {
+          setState('error');
+          setReservationUnits(null);
+        });
     }
   }, [searchParams, setReservationUnits]);
 
@@ -75,7 +86,14 @@ const Search = (): JSX.Element => {
         </Container>
       </HeadContainer>
       <StyledKoros type="wave" className="koros" flipHorizontal />
-      <SearchResultList reservationUnits={reservationUnits} />
+      {state === 'loading' ? (
+        <CenterSpinner />
+      ) : (
+        <SearchResultList
+          error={state === 'error'}
+          reservationUnits={reservationUnits}
+        />
+      )}
     </>
   );
 };

@@ -1,3 +1,4 @@
+import { Notification as HDSNotification } from 'hds-react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -8,7 +9,8 @@ import StartApplicationBar from '../component/StartApplicationBar';
 import ReservationUnitCard from './ReservationUnitCard';
 
 interface Props {
-  reservationUnits: ReservationUnit[];
+  reservationUnits: ReservationUnit[] | null;
+  error: boolean;
 }
 
 const HitCount = styled.div`
@@ -21,7 +23,11 @@ const ListContainer = styled.div`
   margin-top: var(--spacing-layout-s);
 `;
 
-const SearchResultList = ({ reservationUnits }: Props): JSX.Element => {
+const Notification = styled(HDSNotification)`
+  margin-top: 2em;
+`;
+
+const SearchResultList = ({ error, reservationUnits }: Props): JSX.Element => {
   const {
     reservationUnits: selectedReservationUnits,
     selectReservationUnit,
@@ -33,22 +39,33 @@ const SearchResultList = ({ reservationUnits }: Props): JSX.Element => {
   return (
     <>
       <Container id="searchResultList">
-        <HitCount>
-          {reservationUnits.length
-            ? t('SearchResultList.count', { count: reservationUnits.length })
-            : t('SearchResultList.noResults')}
-        </HitCount>
-        <ListContainer>
-          {reservationUnits.map((ru) => (
-            <ReservationUnitCard
-              selectReservationUnit={selectReservationUnit}
-              containsReservationUnit={containsReservationUnit}
-              removeReservationUnit={removeReservationUnit}
-              reservationUnit={ru}
-              key={ru.id}
-            />
-          ))}
-        </ListContainer>
+        {error ? (
+          <Notification size="small" type="alert">
+            {t('SearchResultList.error')}
+          </Notification>
+        ) : null}
+        {reservationUnits !== null ? (
+          <>
+            <HitCount>
+              {reservationUnits.length
+                ? t('SearchResultList.count', {
+                    count: reservationUnits.length,
+                  })
+                : t('SearchResultList.noResults')}
+            </HitCount>
+            <ListContainer>
+              {reservationUnits.map((ru) => (
+                <ReservationUnitCard
+                  selectReservationUnit={selectReservationUnit}
+                  containsReservationUnit={containsReservationUnit}
+                  removeReservationUnit={removeReservationUnit}
+                  reservationUnit={ru}
+                  key={ru.id}
+                />
+              ))}
+            </ListContainer>
+          </>
+        ) : null}
       </Container>
       <StartApplicationBar count={selectedReservationUnits.length} />
     </>
