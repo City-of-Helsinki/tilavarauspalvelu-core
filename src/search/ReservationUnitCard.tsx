@@ -33,7 +33,7 @@ const Container = styled.div`
   }
 
   @media (max-width: ${breakpoint.s}) {
-    grid-template-columns: 1fr;
+    display: block;
   }
 `;
 
@@ -41,6 +41,9 @@ const MainContent = styled.div`
   display: flex;
   flex-direction: column;
   margin: var(--spacing-m);
+  @media (max-width: ${breakpoint.s}) {
+    margin: var(--spacing-xs);
+  }
 `;
 
 const Name = styled.span`
@@ -79,8 +82,20 @@ const Actions = styled.div`
   @media (max-width: ${breakpoint.m}) {
     display: block;
   }
+  @media (max-width: ${breakpoint.m}) {
+    padding: 0 var(--spacing-xs) var(--spacing-xs) var(--spacing-xs);
+  }
 `;
 
+const Image = styled.img`
+  width: 240px;
+  object-fit: cover;
+  height: 156px;
+  @media (max-width: ${breakpoint.s}) {
+    width: 100%;
+    height: 50vw;
+  }
+`;
 const ReservationUnitCard = ({
   reservationUnit,
   selectReservationUnit,
@@ -91,14 +106,12 @@ const ReservationUnitCard = ({
 
   return (
     <Container>
-      <img
+      <Image
         alt={t('common.imgAltForSpace', {
           name: localizedValue(reservationUnit.name, i18n.language),
         })}
-        width="240"
-        height="156"
         src={
-          getMainImage(reservationUnit)?.smallUrl ||
+          getMainImage(reservationUnit)?.mediumUrl ||
           'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='
         }
       />
