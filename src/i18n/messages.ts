@@ -273,10 +273,10 @@ const translations: Translations = {
           'Hakemusten käsittely aloitetaan, kun hakuaika on päättynyt. Ilmoitamme antamaasi sähköpostiosoitteeseen eri vaiheista.',
         ],
       },
-      reservationUnitTerms: ['Tilojen käyttöehdot'],
-      termsOfService: ['Palveluehdot'],
+      reservationUnitTerms: ['Täydentävät varausehdot'],
+      termsOfService: ['Helsingin kaupungin tilojen ja laitteiden varausehdot'],
       userAcceptsTerms: [
-        'Olen lukenut ja hyväksyn palveluehdot ja tilojen  käyttöehdot.',
+        'Olen lukenut ja hyväksyn palveluehdot ja tilojen varausehdot.',
       ],
     },
     sent: {
