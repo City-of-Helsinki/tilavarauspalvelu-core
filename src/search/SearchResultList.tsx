@@ -12,6 +12,7 @@ interface Props {
 }
 
 const HitCount = styled.div`
+  margin-top: var(--spacing-layout-s);
   font-weight: 700;
   font-size: var(--fontsize-heading-m);
 `;
@@ -33,7 +34,9 @@ const SearchResultList = ({ reservationUnits }: Props): JSX.Element => {
     <>
       <Container id="searchResultList">
         <HitCount>
-          {t('SearchResultList.count', { count: reservationUnits.length })}
+          {reservationUnits.length
+            ? t('SearchResultList.count', { count: reservationUnits.length })
+            : t('SearchResultList.noResults')}
         </HitCount>
         <ListContainer>
           {reservationUnits.map((ru) => (

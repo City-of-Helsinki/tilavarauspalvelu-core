@@ -484,6 +484,7 @@ const translations: Translations = {
   SearchResultList: {
     count_plural: ['{{count}} Hakutulosta'],
     count: ['{{count}} Hakutulos'],
+    noResults: ['Ei hakutuloksia'],
     listButton: ['Näytä listassa'],
     mapButton: ['Näytä kartalla'],
     sortButtonLabel: ['Järjestä'],
