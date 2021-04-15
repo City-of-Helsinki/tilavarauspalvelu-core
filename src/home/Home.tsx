@@ -88,7 +88,7 @@ const Home = (): JSX.Element => {
           cardAlignment="right"
           cardLayout="hover"
           color="secondary"
-          src="https://hds.hel.fi/storybook/react/static/media/placeholder_1920x1080.4c706998.jpg">
+          src="main.jpg">
           <InfoContainer>
             <Heading>{t('home.info.heading')}</Heading>
             <p>{t('home.info.text')}</p>
