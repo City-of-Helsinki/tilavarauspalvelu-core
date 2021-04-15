@@ -146,7 +146,6 @@ sinisestä KÄSITTELYSSÄ-symbolista. Paperisia käyttövuoroanomuksia tai myöh
 Päätökset vuoroista pyritään antamaan kuukauden kuluessa hakukierroksen päättymisestä. Kun hakemuksesi on käsitelty, saat viestin hakemuksella ilmoittamaasi sähköpostiosoitteeseen.Saatuasi päätöksen, ota yhteyttä siihen toimipisteeseen, josta vuoro on myönnetty. Sovi toimipisteen kanssa avainten noutamisesta ja perehdytyksestä tilojen käyttöön. Luovutamme tilat omavalvontakäyttöön vain perehdytyksen saaneelle henkilölle.
 
 Jos sinulle ei myönnetty vakiovuoroa hakemiisi tiloihin, voit tiedustella vapaaksi jääneitä aikoja suoraan muilta nuorisotaloiltamme. Muutoksenhakua ja hinnan kohtuullistamista tulee hakea kahden viikon kuluessa päätöksen antamisesta.`}</Preformatted>
-        {t('Application.Intro.faq2.answer')}
       </Accordion>
       <Accordion heading={t('Application.Intro.faq3.question')}>
         <Preformatted>
@@ -178,7 +177,6 @@ YRITYKSENÄ”. Ilmoita yhteystiedot ja sähköpostiosoite. Huomaa, että kaikki
 
 8. Tarkista hakemuksesi tiedot, lue ja hyväksy käyttöehdot ja lähetä hakemus. Hakemuksesi käsitellään hakuajan päätyttyä.`}
         </Preformatted>
-        {t('Application.Intro.faq3.answer')}
       </Accordion>
       <Container>
         <Button
