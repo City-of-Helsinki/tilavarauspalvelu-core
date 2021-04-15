@@ -111,6 +111,15 @@ Luo hakemus YHDISTYKSENÄ tai RYHMÄNÄ, jos haet vuoroa esim. järjestölle, b�
 Hakijan tulee olla varausta tehdessään 15 vuotta täyttänyt. Omavalvontakäytössä sopijaosapuolen
 tulee aina olla 18 vuotta täyttänyt ja täysivaltainen.
 
+Tarkemman käyttöohjeen löydät `}
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            href="https://www.hel.fi/static/liitteet-2019/KuVa/nuoriso/Vakiovuorojen_sahkoinen_hakuohje2021.pdf">
+            täältä
+          </a>
+          {`
+
 NÄIN HAET VUOROA RYHMÄNÄ TAI JÄRJESTÖNÄ:
 
 1. Valitse avoinna oleva haku ja tutustu hakuohjeisiin ja -ehtoihin. Yhdellä hakemuksella voit hakea useita tiloja tai vuoroja. Haettavat vuorot ja tilat valitaan kohdassa 1 ”Vakiovuoron perustiedot” ja kellonaika kohdassa 2 ” Vakiovuoron ajankohta”.
