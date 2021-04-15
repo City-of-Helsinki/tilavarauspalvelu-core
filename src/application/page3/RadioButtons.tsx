@@ -26,6 +26,7 @@ const RadioButtons = ({
       {['organisation', 'individual', 'company'].map((id: string) => (
         <Container key={id}>
           <RadioButton
+            name={id}
             id={id}
             label={t(`Application.Page3.as.type.${id}`)}
             onClick={() => {
