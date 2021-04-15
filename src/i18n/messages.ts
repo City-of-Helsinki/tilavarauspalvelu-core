@@ -128,7 +128,7 @@ const translations: Translations = {
     },
     Page2: {
       heading: ['2. Vakiovuoron ajankohta'],
-      info: ['Tarkista tilakohtaiset aukioloajat hakuohjeista'],
+      info: ['Tarkista tilakohtaiset aukioloajat <0>hakuohjeista<0>'],
       text: ['Anna toivomasi ajankohta jokaiselle luomallesi vakiovuorolle.'],
       copyTimes: ['Kopioi ajat kaikille vakiovuoroille'],
       summary: ['Yhteenveto'],

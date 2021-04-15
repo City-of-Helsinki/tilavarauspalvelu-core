@@ -1,6 +1,6 @@
 import { Button, IconArrowLeft, IconArrowRight, Notification } from 'hds-react';
 import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
 import { useDebounce } from 'use-debounce';
 import styled from 'styled-components';
@@ -113,8 +113,18 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
             key={event.id}
             id={`timeSelector-${index}`}
             heading={event.name || undefined}>
-            <Notification size="small" type="info">
-              {t('Application.Page2.info')}
+            <Notification
+              label={t('Application.Page2.info')}
+              size="small"
+              type="info">
+              <Trans i18nKey="Application.Page2.info">
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href="https://www.hel.fi/static/liitteet-2019/KuVa/nuoriso/Vakiovuorojen_sahkoinen_hakuohje2021.pdf">
+                  {' '}
+                </a>
+              </Trans>
             </Notification>{' '}
             <TimeSelector
               key={event.id || 'NEW'}
