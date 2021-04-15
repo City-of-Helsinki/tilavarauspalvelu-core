@@ -59,7 +59,7 @@ const Stepper = ({ match, application }: Props): JSX.Element => {
       maxPage = 1;
     }
     if (
-      application.applicationEvents?.[0].applicationEventSchedules.length > 0
+      application.applicationEvents?.[0]?.applicationEventSchedules.length > 0
     ) {
       maxPage = 2;
     }
