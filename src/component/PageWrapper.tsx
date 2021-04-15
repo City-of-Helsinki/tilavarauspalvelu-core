@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import Navigation from './Navigation';
 import Footer from './Footer';
+import ServiceNotification from './ServiceNotification';
 
 interface Props {
   children: React.ReactNode;
@@ -15,6 +16,7 @@ const PageWrapper = (props: Props): JSX.Element => {
   return (
     <>
       <Navigation />
+      <ServiceNotification />
       <Main id="main">{props.children}</Main>
       <div
         style={{
