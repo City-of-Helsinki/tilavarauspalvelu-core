@@ -81,6 +81,8 @@ const translations: Translations = {
       missingSchedule: ['Lisää kaikille vakiovuoroille vähintään yksi aika'],
       reservationUnitTooSmall: ['Tila on liian pieni ryhmän käyttöön'],
       otherEventsHaveErrors: ['Korjaa ensin validaatiovirheet'],
+      noReservationUnits: ['Lisää hakemukselle yksi tai useampi tila'],
+      noEvents: ['Lisää hakemukselle yksi tai useampi vakiovuoro'],
     },
     Intro: {
       startNewApplication: ['Aloita hakemuksen täyttäminen'],
@@ -295,7 +297,7 @@ const translations: Translations = {
     },
   },
   ApplicationRoundCard: {
-    applyButton: ['Hae Tilaa'],
+    applyButton: ['Hae tilaa'],
     displayPastButton: ['Näytä tilat'],
     criteria: ['Hakukriteerit'],
     pending: ['Haku avautuu {{openingDateTime}}'],

@@ -146,6 +146,19 @@ const Page1 = ({
 
   const onSubmit = (data: Application, eventId?: number) => {
     const appToSave = prepareData(data);
+    if (appToSave.applicationEvents.length === 0) {
+      setError(t('Application.error.noEvents'));
+      return;
+    }
+    if (
+      appToSave.applicationEvents.filter(
+        (ae) => ae.eventReservationUnits.length === 0
+      ).length > 0
+    ) {
+      setError(t('Application.error.noReservationUnits'));
+      return;
+    }
+
     form.reset({ applicationEvents: appToSave.applicationEvents });
     save({ application: appToSave, eventId });
   };
@@ -195,6 +208,7 @@ const Page1 = ({
     application.applicationEvents.filter((ae) => !ae.id).length > 0;
 
   const nextButtonDisabled =
+    application.applicationEvents.length === 0 ||
     application.applicationEvents.filter((ae) => !ae.id).length > 0 ||
     (form.formState.isDirty && !editorState.savedEventId);
 
