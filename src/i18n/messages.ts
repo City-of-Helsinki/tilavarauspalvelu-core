@@ -299,8 +299,8 @@ const translations: Translations = {
     displayPastButton: ['Näytä tilat'],
     criteria: ['Hakukriteerit'],
     pending: ['Haku avautuu {{openingDateTime}}'],
-    open: ['Haku auki {{until}} saakka'],
-    past: ['Haku sulkeutui {{closingDate}}'],
+    open: ["Haku auki {{until, dd.MM.yyyy 'klo' HH:mm}} saakka"],
+    past: ["Haku sulkeutui {{closingDate, dd.MM.yyyy 'klo' HH:mm}}"],
   },
 
   Criteria: {
@@ -522,7 +522,7 @@ const translations: Translations = {
         },
         accessibilityStatement: {
           label: ['Saavutettavuus'],
-          href: ['#'],
+          href: ['/Tilavarauspalvelu_saavutettavuusseloste.pdf'],
         },
       },
       copyrightHolder: ['Helsingin kaupunki'],

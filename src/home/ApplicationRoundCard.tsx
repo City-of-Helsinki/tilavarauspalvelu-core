@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import { parseISO } from 'date-fns';
 import Card from '../component/Card';
 import { ApplicationRound } from '../common/types';
-import { applicationRoundState, formatDate, searchUrl } from '../common/util';
+import { applicationRoundState, searchUrl } from '../common/util';
 import { breakpoint } from '../common/style';
 
 interface Props {
@@ -89,11 +89,11 @@ const ApplicationRoundCard = ({ applicationRound }: Props): JSX.Element => {
             })}
           {state === 'active' &&
             t('ApplicationRoundCard.open', {
-              until: formatDate(applicationRound.applicationPeriodEnd),
+              until: parseISO(applicationRound.applicationPeriodEnd),
             })}
           {state === 'past' &&
             t('ApplicationRoundCard.past', {
-              closingDate: formatDate(applicationRound.applicationPeriodEnd),
+              closingDate: parseISO(applicationRound.applicationPeriodEnd),
             })}
         </div>
         <CardButton
