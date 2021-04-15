@@ -39,6 +39,10 @@ class ApplicationEventScheduleResultSerializer(serializers.ModelSerializer):
 
     basket_name = serializers.SerializerMethodField()
     basket_order_number = serializers.SerializerMethodField()
+    application_aggregated_data = serializers.DictField(
+        source="application_event_schedule.application_event.application.aggregated_data_dict",
+        read_only=True,
+    )
 
     class Meta:
         model = ApplicationEventScheduleResult
@@ -59,6 +63,7 @@ class ApplicationEventScheduleResultSerializer(serializers.ModelSerializer):
             "allocated_end",
             "basket_name",
             "basket_order_number",
+            "application_aggregated_data",
         ]
 
     def get_unit_name(self, instance):
