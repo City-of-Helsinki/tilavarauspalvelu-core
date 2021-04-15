@@ -255,7 +255,7 @@ export const getAddress = (ru: ReservationUnit): string | null => {
     return null;
   }
 
-  return `${ru.location.addressStreet},${ru.location.addressCity}`;
+  return `${ru.location.addressStreet}, ${ru.location.addressCity}`;
 };
 
 export const applicationUrl = (id: number): string => `/application/${id}`;
