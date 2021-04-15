@@ -10,7 +10,7 @@ test('server emits react rendered html', () => {
     .end((err, res) => {
       expect(err).toBe(null);
       expect(res.text).toContain('html');
-      expect(res.text).not.toContain('<div id="root"></div>');
+      expect(res.text).toContain('<div id="root"></div>'); // ssr disabled
     });
 });
 
