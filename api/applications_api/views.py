@@ -9,12 +9,20 @@ from rest_framework import permissions, viewsets
 from api.applications_api.filters import ApplicationFilter
 from api.applications_api.serializers import (
     ApplicationEventSerializer,
+    ApplicationEventStatusSerializer,
     ApplicationSerializer,
+    ApplicationStatusSerializer,
 )
-from applications.models import Application, ApplicationEvent
+from applications.models import (
+    Application,
+    ApplicationEvent,
+    ApplicationEventStatus,
+    ApplicationStatus,
+)
 from permissions.api_permissions import (
     ApplicationEventPermission,
     ApplicationPermission,
+    GeneralRolePermission,
 )
 from permissions.helpers import get_service_sectors_where_can_view_applications
 
@@ -79,3 +87,41 @@ class ApplicationEventViewSet(viewsets.ModelViewSet):
             )
             | Q(application__user=user)
         )
+
+
+class ApplicationStatusViewSet(viewsets.ModelViewSet):
+    serializer_class = ApplicationStatusSerializer
+    permission_classes = (
+        [
+            ApplicationPermission,
+            GeneralRolePermission,
+        ]
+        if not settings.TMP_PERMISSIONS_DISABLED
+        else [permissions.AllowAny]
+    )
+    queryset = ApplicationStatus.objects.all()
+
+    def get_serializer(self, *args, **kwargs):
+        if isinstance(kwargs.get("data", {}), list):
+            kwargs["many"] = True
+
+        return super().get_serializer(*args, **kwargs)
+
+
+class ApplicationEventStatusViewSet(viewsets.ModelViewSet):
+    serializer_class = ApplicationEventStatusSerializer
+    permission_classes = (
+        [
+            ApplicationEventPermission,
+            GeneralRolePermission,
+        ]
+        if not settings.TMP_PERMISSIONS_DISABLED
+        else [permissions.AllowAny]
+    )
+    queryset = ApplicationEventStatus.objects.all()
+
+    def get_serializer(self, *args, **kwargs):
+        if isinstance(kwargs.get("data", {}), list):
+            kwargs["many"] = True
+
+        return super().get_serializer(*args, **kwargs)
