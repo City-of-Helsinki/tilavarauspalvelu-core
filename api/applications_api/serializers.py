@@ -21,6 +21,7 @@ from applications.models import (
     Organisation,
     Person,
     Recurrence,
+    User,
 )
 from reservation_units.models import Purpose, ReservationUnit
 from reservations.models import AbilityGroup, AgeGroup
@@ -617,3 +618,50 @@ class ApplicationSerializer(serializers.ModelSerializer):
         app.set_status(status, request_user)
 
         return app
+
+
+class ApplicationStatusSerializer(serializers.ModelSerializer):
+    application_id = serializers.PrimaryKeyRelatedField(
+        queryset=Application.objects.all(), source="application"
+    )
+    user_id = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(), source="user"
+    )
+
+    class Meta:
+        model = ApplicationStatus
+        fields = [
+            "status",
+            "application_id",
+            "user_id",
+            "timestamp",
+        ]
+
+    def create(self, validated_data):
+        instance = ApplicationStatus(**validated_data)
+        instance.save()
+        return instance
+
+
+class ApplicationEventStatusSerializer(serializers.ModelSerializer):
+    application_event_id = serializers.PrimaryKeyRelatedField(
+        queryset=ApplicationEvent.objects.all(), source="application_event"
+    )
+    user_id = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(), source="user"
+    )
+
+    class Meta:
+        model = ApplicationEventStatus
+        fields = [
+            "status",
+            "application_event_id",
+            "user_id",
+            "timestamp",
+        ]
+        read_only_fields = ["id", "timestamp"]
+
+    def create(self, validated_data):
+        instance = ApplicationEventStatus(**validated_data)
+        instance.save()
+        return instance
