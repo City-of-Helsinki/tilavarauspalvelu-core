@@ -4,6 +4,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import permissions, serializers, viewsets
 
 from api.applications_api.serializers import ApplicationEventSerializer
+from api.common_filters import ModelInFilter
 from applications.models import (
     Application,
     ApplicationEventScheduleResult,
@@ -92,7 +93,7 @@ class ApplicationEventScheduleResultSerializer(serializers.ModelSerializer):
 class AllocationResultsFilter(filters.FilterSet):
     application_round_id = filters.NumberFilter(method="filter_application_round")
     applicant = filters.NumberFilter(method="filter_applicant")
-    reservation_unit = filters.ModelChoiceFilter(
+    reservation_unit = ModelInFilter(
         field_name="allocated_reservation_unit", queryset=ReservationUnit.objects.all()
     )
 
