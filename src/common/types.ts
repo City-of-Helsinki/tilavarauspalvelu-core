@@ -124,6 +124,8 @@ export type Application = {
   applicationEvents: ApplicationEvent[];
   billingAddress: Address | null;
   homeCityId: number | null;
+  createdDate?: string;
+  lastModifiedDate?: string;
 };
 
 export type Organisation = {

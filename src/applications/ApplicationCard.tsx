@@ -9,6 +9,7 @@ import {
   Notification,
   Tag as HdsTag,
 } from 'hds-react';
+import { parseISO } from 'date-fns';
 import { Application, ApplicationRound } from '../common/types';
 import { isActive, applicationUrl } from '../common/util';
 import { breakpoint } from '../common/style';
@@ -67,6 +68,11 @@ const RoundName = styled.div`
   @media (max-width: ${breakpoint.s}) {
     font-size: var(--fontsize-heading-m);
   }
+`;
+
+const Modified = styled.div`
+  font-size: var(--fontsize-body-m);
+  font-family: var(--font-regular);
 `;
 
 const StyledButton = styled(Button)`
@@ -132,11 +138,19 @@ const ApplicationCard = ({
     <Card border key={application.id}>
       <div>
         <C>{t(`ApplicationCard.status.${application.status}`)}</C>
-
         <RoundName>{applicationRound.name}</RoundName>
-        {application.applicantType !== null ? (
-          <Applicant>{getApplicant(application, t)}</Applicant>
-        ) : null}
+        <Applicant>
+          {application.applicantType !== null
+            ? getApplicant(application, t)
+            : ''}
+        </Applicant>
+        <Modified>
+          {application.lastModifiedDate
+            ? t('ApplicationCard.saved', {
+                date: parseISO(application.lastModifiedDate),
+              })
+            : ''}
+        </Modified>
         {state === 'error' ? (
           <Notification size="small">
             {t('ApplicationCard.cancelFailed')}

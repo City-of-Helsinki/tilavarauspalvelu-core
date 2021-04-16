@@ -30,7 +30,7 @@ const Sent = ({ breadCrumbText }: Props): JSX.Element => {
 
 Voit halutessasi täydentää hakemustasi ennen hakuajan päättymistä. Tarvittaessa poista tarpeettomat hakemukset, sillä VIIMEKSI SAAPUNUT hakemus katsotaan voimassa olevaksi.
 
-Lähetetyn hakemuksen tunnistat sinisestä LÄHETETTY-symbolista. Paperisia käyttövuoroanomuksia tai myöhässä tulleita hakemuksia ei käsitellä.
+Lähetetyn hakemuksen tunnistat sinisestä KÄSITTELYSSÄ-symbolista. Paperisia käyttövuoroanomuksia tai myöhässä tulleita hakemuksia ei käsitellä.
 
 Päätökset vuoroista pyritään antamaan kuukauden kuluessa hakukierroksen päättymisestä. Kun hakemuksesi on käsitelty, saat viestin hakemuksella ilmoittamaasi sähköpostiosoitteeseen.
 

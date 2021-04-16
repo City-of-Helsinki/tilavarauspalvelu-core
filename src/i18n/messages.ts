@@ -35,7 +35,7 @@ const translations: Translations = {
     heading: ['Omat hakemukset'],
     group: {
       draft: ['Luonnokset'],
-      sent: ['Lähetetyt'],
+      sent: ['Käsittelyssä'],
     },
   },
   ApplicationCard: {
@@ -48,8 +48,9 @@ const translations: Translations = {
     cancel: ['Peruuta hakemus'],
     status: {
       draft: ['Kesken'],
-      in_review: ['Lähetetty'],
+      in_review: ['Käsittelyssä'],
     },
+    saved: ["Viimeksi tallennettu: {{date, dd.MM.yyyy 'klo' HH:mm}}"],
     person: ['Hakemus luotu: yksityishenkilönä'],
     organisation: ['Hakemus luotu: {{type}} {{name}}'],
     applicantType: {
