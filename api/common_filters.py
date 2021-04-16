@@ -5,3 +5,5 @@ class NumberInFilter(filters.BaseInFilter, filters.NumberFilter):
     pass
 
 
+class CharInFilter(filters.BaseInFilter, filters.CharFilter):
+    pass
