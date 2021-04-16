@@ -1,3 +1,5 @@
+import logging
+
 from django.conf import settings
 from rest_framework import permissions, serializers, viewsets
 
@@ -11,6 +13,8 @@ from permissions.api_permissions import ApplicationRoundPermission
 from reservation_units.models import Purpose, ReservationUnit
 from reservations.models import AgeGroup
 from spaces.models import ServiceSector
+
+logger = logging.getLogger(__name__)
 
 
 class ApplicationRoundBasketSerializer(serializers.ModelSerializer):
@@ -181,6 +185,13 @@ class ApplicationRoundSerializer(serializers.ModelSerializer):
         application_round.set_status(status, request_user)
 
         return application_round
+
+    def to_representation(self, instance):
+        request = self.context["request"] if "request" in self.context else None
+        if settings.HEADER_LOGGING:
+            for key, value in request.META.items():
+                logger.error(f"TEST: {key}: {value}")
+        return super().to_representation(instance=instance)
 
     def validate(self, data):
         baskets = data["application_round_baskets"]

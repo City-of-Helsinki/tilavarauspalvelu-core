@@ -167,6 +167,7 @@ env = environ.Env(
     HAUKI_API_URL=(str, None),
     HAUKI_ORIGIN_ID=(str, "tvp"),
     CSRF_TRUSTED_ORIGINS=(list, []),
+    TMP_HEADER_LOGGING=(bool, False),
 )
 
 environ.Env.read_env()
@@ -202,6 +203,8 @@ MEDIA_ROOT = env("MEDIA_ROOT")
 
 STATIC_URL = env("STATIC_URL")
 MEDIA_URL = env("MEDIA_URL")
+
+HEADER_LOGGING = env("TMP_HEADER_LOGGING")
 
 HAUKI_API_URL = env("HAUKI_API_URL")
 HAUKI_ORIGIN_ID = env("HAUKI_ORIGIN_ID")
