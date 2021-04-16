@@ -566,6 +566,9 @@ class Application(models.Model):
         null=True,
     )
 
+    created_date = models.DateTimeField(auto_now_add=True)
+    last_modified_date = models.DateTimeField(auto_now=True)
+
     @property
     def status(self):
         return self.get_status().status

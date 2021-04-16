@@ -443,6 +443,9 @@ class ApplicationSerializer(serializers.ModelSerializer):
         queryset=City.objects.all(), source="home_city", required=False, allow_null=True
     )
 
+    created_date = serializers.DateTimeField(read_only=True)
+    last_modified_date = serializers.DateTimeField(read_only=True)
+
     class Meta:
         model = Application
         fields = [
@@ -457,6 +460,8 @@ class ApplicationSerializer(serializers.ModelSerializer):
             "aggregated_data",
             "billing_address",
             "home_city_id",
+            "created_date",
+            "last_modified_date",
         ]
 
     def set_home_city(self, obj: Application):
