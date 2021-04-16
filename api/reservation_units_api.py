@@ -55,6 +55,15 @@ class ReservationUnitFilter(filters.FilterSet):
     ids = NumberInFilter(field_name="id", lookup_expr="in")
 
 
+class PurposeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Purpose
+        fields = [
+            "id",
+            "name",
+        ]
+
+
 class ReservationUnitImageSerializer(serializers.ModelSerializer):
     image_url = serializers.ImageField(source="image", use_url=True)
     medium_url = serializers.SerializerMethodField()
@@ -101,6 +110,7 @@ class ReservationUnitSerializer(TranslatedModelSerializer):
         many=True,
         help_text="Services included in the reservation unit as nested related objects.",
     )
+    purposes = PurposeSerializer(many=True, read_only=True)
     images = ReservationUnitImageSerializer(
         read_only=True,
         many=True,
@@ -141,6 +151,7 @@ class ReservationUnitSerializer(TranslatedModelSerializer):
             "resources",
             "services",
             "require_introduction",
+            "purposes",
             "images",
             "location",
             "max_persons",
@@ -209,15 +220,6 @@ class ReservationUnitViewSet(viewsets.ModelViewSet):
             .prefetch_related("spaces", "resources", "services")
         )
         return qs
-
-
-class PurposeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Purpose
-        fields = [
-            "id",
-            "name",
-        ]
 
 
 class PurposeViewSet(
