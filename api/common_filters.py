@@ -7,3 +7,7 @@ class NumberInFilter(filters.BaseInFilter, filters.NumberFilter):
 
 class CharInFilter(filters.BaseInFilter, filters.CharFilter):
     pass
+
+
+class ModelInFilter(filters.BaseInFilter, filters.ModelChoiceFilter):
+    pass
