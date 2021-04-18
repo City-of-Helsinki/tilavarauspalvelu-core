@@ -224,9 +224,11 @@ const Text = styled.span`
 const Filters = styled.div`
   @media (max-width: ${breakpoint.m}) {
     grid-template-columns: 1fr;
+    margin-left: 0px;
   }
 
   margin-top: var(--spacing-m);
+  margin-left: 5px;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--spacing-m);
@@ -234,6 +236,7 @@ const Filters = styled.div`
 
 const ButtonContainer = styled.div`
   margin-top: var(--spacing-m);
+  margin-left: 5px;
   display: flex;
   align-items: center;
 `;
@@ -250,6 +253,7 @@ const Ruler = styled.hr`
 
 const Results = styled.div`
   margin-bottom: 112px;
+  width: 99%;
 `;
 
 const StyledLoadingSpinner = styled(LoadingSpinner).attrs({ small: true })``;

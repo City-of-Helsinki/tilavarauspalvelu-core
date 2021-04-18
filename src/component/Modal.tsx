@@ -1,3 +1,4 @@
+import FocusTrap from 'focus-trap-react';
 import { Button } from 'hds-react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -24,8 +25,8 @@ const Overlay = styled.div`
 `;
 
 const ModalElement = styled.div`
-  padding: var(--spacing-layout-s);
-  background: white;
+  padding: var(--spacing-layout-xs);
+  background: var(--color-white);
   max-width: 100%;
   position: fixed;
   top: 50%;
@@ -93,19 +94,21 @@ const Modal = ({
   return (
     <>
       <Overlay role="none" onClick={handleClose} onKeyDown={handleClose} />
-      <ModalElement>
-        <MainContainer>{children}</MainContainer>
-        <ButtonContainer>
-          {handleOk ? (
-            <Button variant="primary" onClick={handleOk}>
-              {t(okButtonKey)}
+      <FocusTrap>
+        <ModalElement>
+          <MainContainer>{children}</MainContainer>
+          <ButtonContainer>
+            {handleOk ? (
+              <Button variant="primary" onClick={handleOk}>
+                {t(okButtonKey)}
+              </Button>
+            ) : null}
+            <Button variant="secondary" onClick={handleClose}>
+              {t(closeButtonKey)}
             </Button>
-          ) : null}
-          <Button variant="secondary" onClick={handleClose}>
-            {t(closeButtonKey)}
-          </Button>
-        </ButtonContainer>
-      </ModalElement>
+          </ButtonContainer>
+        </ModalElement>
+      </FocusTrap>
     </>
   );
 };
