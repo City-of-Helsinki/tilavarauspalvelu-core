@@ -1,4 +1,9 @@
-import { Button, IconArrowLeft, IconArrowRight, Notification } from 'hds-react';
+import {
+  Button,
+  IconArrowLeft,
+  IconArrowRight,
+  Notification as HDSNotification,
+} from 'hds-react';
 import React, { useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
@@ -12,17 +17,26 @@ import {
   applicationEventSchedulesToCells,
 } from '../../common/util';
 import { AccordionWithState as Accordion } from '../../component/Accordion';
+import { breakpoint } from '../../common/style';
 
 type Props = {
   application: Application;
   onNext: (appToSave: Application) => void;
 };
 
+const Notification = styled(HDSNotification)`
+  z-index: 0;
+`;
+
 const ButtonContainer = styled.div`
   display: flex;
   flex-direction: row;
   margin-top: var(--spacing-layout-l);
   justify-content: flex-end;
+
+  @media (max-width: ${breakpoint.m}) {
+    width: calc(100vw - 2 * var(--spacing-l));
+  }
 
   button {
     margin-left: var(--spacing-layout-xs);

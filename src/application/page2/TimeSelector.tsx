@@ -114,10 +114,13 @@ const Day = ({
 
 const CalendarContainer = styled.div`
   @media (max-width: ${breakpoint.m}) {
-    grid-template-columns: 1fr 1fr 1fr 1fr;
+    width: 90vw;
+    overflow-x: scroll;
   }
-  @media (max-width: ${breakpoint.xs}) {
-    grid-template-columns: 1fr;
+
+  @media (max-width: ${breakpoint.s}) {
+    width: 94vw;
+    overflow-x: scroll;
   }
 
   margin-top: var(--spacing-layout-s);
@@ -129,11 +132,19 @@ const CalendarContainer = styled.div`
 const LegendContainer = styled.div`
   display: flex;
   margin-top: var(--spacing-m);
+
+  @media (max-width: ${breakpoint.s}) {
+    display: block;
+  }
 `;
 
 const Legend = styled.div`
   display: flex;
   margin-right: 3em;
+
+  @media (max-width: ${breakpoint.s}) {
+    margin-top: var(--spacing-xs);
+  }
 `;
 
 const LegendBox = styled.div<{ type: string }>`
@@ -150,6 +161,10 @@ const LegendBox = styled.div<{ type: string }>`
   margin-right: 1em;
   width: 20px;
   height: 20px;
+
+  @media (max-width: ${breakpoint.s}) {
+    margin-right: var(spacing-xs);
+  }
 `;
 
 const LegendLabel = styled.div`

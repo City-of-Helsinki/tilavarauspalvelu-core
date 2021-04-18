@@ -29,6 +29,9 @@ const InnerContainer = styled.div`
 
 const Main = styled.div`
   margin-top: var(--spacing-s);
+  @media (max-width: ${breakpoint.s}) {
+    width: calc (100vw - 3 * var(--spacing-xs));
+  }
 `;
 
 const ApplicationPage = ({
