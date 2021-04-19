@@ -186,13 +186,6 @@ class ApplicationRoundSerializer(serializers.ModelSerializer):
 
         return application_round
 
-    def to_representation(self, instance):
-        request = self.context["request"] if "request" in self.context else None
-        if settings.HEADER_LOGGING:
-            for key, value in request.META.items():
-                logger.error(f"TEST: {key}: {value}")
-        return super().to_representation(instance=instance)
-
     def validate(self, data):
         baskets = data["application_round_baskets"]
         basket_order_numbers = list(map(lambda basket: basket["order_number"], baskets))
