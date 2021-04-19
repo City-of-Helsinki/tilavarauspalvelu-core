@@ -94,6 +94,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "tilavarauspalvelu.multi_proxy_middleware.MultipleProxyMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -167,6 +168,7 @@ env = environ.Env(
     HAUKI_API_URL=(str, None),
     HAUKI_ORIGIN_ID=(str, "tvp"),
     CSRF_TRUSTED_ORIGINS=(list, []),
+    MULTI_PROXY_HEADERS=(bool, False),
 )
 
 environ.Env.read_env()
@@ -214,6 +216,8 @@ RESERVATION_UNIT_IMAGES_ROOT = "reservation_unit_images"
 # fe. generating absolute URLs pointing to itself
 # Most often used in reverse proxy setups
 USE_X_FORWARDED_HOST = env("TRUST_X_FORWARDED_HOST")
+
+MULTI_PROXY_HEADERS = env("MULTI_PROXY_HEADERS")
 
 # Configure cors
 CORS_ALLOWED_ORIGINS = env("CORS_ALLOWED_ORIGINS")
