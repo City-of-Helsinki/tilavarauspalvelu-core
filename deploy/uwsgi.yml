@@ -10,3 +10,4 @@ uwsgi:
   umask: 022
   reload-on-rss: 300
   http: :8000
+  static-map: $(MEDIA_URL)=$(MEDIA_ROOT)
