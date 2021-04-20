@@ -731,6 +731,11 @@ class ApplicationEvent(models.Model):
         blank=False,
     )
 
+    declined_reservation_units = models.ManyToManyField(
+        ReservationUnit,
+        verbose_name=_("Declined reservation units"),
+    )
+
     @property
     def status(self):
         return self.get_status().status

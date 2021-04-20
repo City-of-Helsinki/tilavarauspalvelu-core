@@ -46,6 +46,12 @@ class ApplicationEventScheduleResultSerializer(serializers.ModelSerializer):
         read_only=True,
     )
 
+    declined_reservation_unit_ids = serializers.PrimaryKeyRelatedField(
+        source="application_event_schedule.application_event.declined_reservation_units",
+        many=True,
+        read_only=True,
+    )
+
     class Meta:
         model = ApplicationEventScheduleResult
         fields = [
@@ -66,6 +72,7 @@ class ApplicationEventScheduleResultSerializer(serializers.ModelSerializer):
             "basket_name",
             "basket_order_number",
             "application_aggregated_data",
+            "declined_reservation_unit_ids",
         ]
 
     def get_unit_name(self, instance):
