@@ -10,7 +10,7 @@ const configuration = {
   scope: oidcScope,
   authority: "https://api.hel.fi/sso/",
   silent_redirect_uri: `${base}/login/helsinki/return`,
-  automaticSilentRenew: true,
+  automaticSilentRenew: false,
   loadUserInfo: true,
 };
 

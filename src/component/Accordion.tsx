@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { H2 } from "../styles/typography";
 
 interface IProps {
-  heading: string | null;
+  heading: string | ReactNode | null;
   defaultOpen?: boolean;
   children: ReactNode;
   className?: string;
@@ -87,7 +87,7 @@ function Accordion({
         onClick={() => toggleOpenState(!isAccordionOpen)}
         data-testid="accordion__header"
       >
-        <H2>{heading}</H2>
+        <H2 className="heading">{heading}</H2>
         <ToggleButton
           type="button"
           aria-label={buttonAriaLabel}

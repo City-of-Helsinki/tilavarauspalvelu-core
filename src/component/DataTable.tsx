@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import styled from "styled-components";
 import {
   Button,
@@ -15,12 +15,7 @@ import get from "lodash/get";
 import isEqual from "lodash/isEqual";
 import classNames from "classnames";
 import FilterControls from "./FilterControls";
-import {
-  Application as ApplicationType,
-  DataFilterConfig,
-  DataFilterOption,
-  DataGroup,
-} from "../common/types";
+import { DataFilterConfig, DataFilterOption, DataGroup } from "../common/types";
 import RecommendationDataTableGroup from "./ApplicationRound/RecommendationDataTableGroup";
 import {
   breakpoints,
@@ -32,20 +27,18 @@ import { ReactComponent as IconActivateSelection } from "../images/icon_select.s
 import { ReactComponent as IconDisableSelection } from "../images/icon_unselect.svg";
 import { truncatedText } from "../styles/typography";
 
-type DataType = ApplicationType;
-
 type OrderTypes = "asc" | "desc";
 
 interface Column {
   title: string;
   key: string;
-  transform?: ({ status }: DataType) => string | JSX.Element;
+  transform?: ({ status }: any) => string | JSX.Element; // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
 interface GeneralConfig {
   filtering?: boolean;
   rowFilters?: boolean;
-  hideHandled?: boolean;
+  handledStatuses?: string[];
   selection?: boolean;
 }
 
@@ -54,7 +47,7 @@ export interface CellConfig {
   index: string;
   sorting: string;
   order: OrderTypes;
-  rowLink?: ({ id }: DataType) => string;
+  rowLink?: ({ id }: any) => string; // eslint-disable-line @typescript-eslint/no-explicit-any
   groupLink?: ({ id }: DataGroup) => string;
 }
 
@@ -64,6 +57,7 @@ interface IProps {
   config: GeneralConfig;
   cellConfig: CellConfig;
   filterConfig: DataFilterConfig[];
+  setSelections?: Dispatch<SetStateAction<number[]>>;
   className?: string;
 }
 
@@ -77,14 +71,18 @@ const Filters = styled.div`
   & > button {
     margin-right: var(--spacing-m);
 
-    svg {
+    span {
       display: none;
 
       @media (min-width: ${breakpoints.s}) {
         display: inline;
-        min-width: 20px;
       }
     }
+  }
+
+  svg {
+    display: inline;
+    min-width: 20px;
   }
 
   background-color: var(--tilavaraus-admin-gray);
@@ -299,6 +297,12 @@ const ToggleVisibilityBtn = styled(Button).attrs({
     "--color-disabled": "var(--color-black-50)",
   } as React.CSSProperties,
 })<IToggleableButton>`
+  &:disabled {
+    svg {
+      opacity: 0.5;
+    }
+  }
+
   svg {
     ${({ $isActive }): string | false =>
       $isActive && "transform: rotate(180deg);"}
@@ -366,7 +370,8 @@ const processData = (
   sorting: string,
   order: "asc" | "desc",
   filters: DataFilterOption[],
-  handledAreHidden: boolean
+  handledAreHidden: boolean,
+  handledStatuses?: string[]
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): any[] => {
   return groups.map((group) => {
@@ -387,8 +392,11 @@ const processData = (
     }
 
     if (handledAreHidden) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      data = data.filter((row: any): boolean => row.status !== "validated");
+      data = data.filter(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (row: any): boolean =>
+          !!handledStatuses && !handledStatuses.includes(row.status)
+      );
     }
 
     return {
@@ -400,11 +408,12 @@ const processData = (
 
 function DataTable({
   groups,
+  setSelections,
   hasGrouping,
   config = {
     filtering: false,
     rowFilters: false,
-    hideHandled: false,
+    handledStatuses: [],
     selection: false,
   },
   cellConfig,
@@ -421,6 +430,12 @@ function DataTable({
   );
   const [isSelectionActive, toggleSelectionActivity] = useState<boolean>(false);
   const [selectedRows, setSelectedRows] = useState<number[]>([]);
+
+  useEffect(() => {
+    if (setSelections) {
+      setSelections(selectedRows);
+    }
+  }, [setSelections, selectedRows]);
 
   const setSortingAndOrder = (colKey: string): void => {
     if (sorting === colKey) {
@@ -439,10 +454,11 @@ function DataTable({
     sorting,
     order,
     filters,
-    handledAreHidden
+    handledAreHidden,
+    config.handledStatuses
   );
   const actionsEnabled: boolean =
-    processedData.flatMap((group) => group.data).length > 0;
+    groups.flatMap((group) => group.data).length > 0;
 
   const filterSomeGroupsAreHidden: boolean = groupVisibility.some(
     (visibility): boolean => !visibility
@@ -474,9 +490,12 @@ function DataTable({
     return group
       ? processedData
           .find((data) => data.id === group)
-          .data.map((data: any) => data.id) // eslint-disable-line @typescript-eslint/no-explicit-any
-      : processedData.flatMap(
-          (data) => data.data.map((application: any) => application.id) // eslint-disable-line @typescript-eslint/no-explicit-any
+          .data.map((data: any) => get(data, cellConfig.index)) // eslint-disable-line @typescript-eslint/no-explicit-any
+      : processedData.flatMap((data) =>
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          data.data.flatMap((recommendation: any) =>
+            get(recommendation, cellConfig.index)
+          )
         );
   };
 
@@ -502,6 +521,9 @@ function DataTable({
                   (filterConfig && filterConfig.length < 1) ||
                   isSelectionActive
                 }
+                title={t(
+                  `${filters.length > 0 ? "common.filtered" : "common.filter"}`
+                )}
               >
                 {t(
                   `${filters.length > 0 ? "common.filtered" : "common.filter"}`
@@ -515,11 +537,16 @@ function DataTable({
               />
             </>
           )}
-          {config.hideHandled && (
+          {config.handledStatuses?.length && (
             <HideHandledBtn
               onClick={(): void => toggleHideHandled(!handledAreHidden)}
               disabled={!actionsEnabled || isSelectionActive}
               $isActive={handledAreHidden}
+              title={t(
+                `common.${
+                  handledAreHidden ? "filterShowHandled" : "filterHideHandled"
+                }`
+              )}
             >
               {t(
                 `common.${
@@ -534,10 +561,16 @@ function DataTable({
                 if (!isSelectionActive) {
                   toggleGroupVisibility(true);
                 }
+                setSelectedRows([]);
                 toggleSelectionActivity(!isSelectionActive);
               }}
               $isActive={isSelectionActive}
               disabled={!actionsEnabled}
+              title={t(
+                `common.${
+                  isSelectionActive ? "disableSelection" : "activateSelection"
+                }`
+              )}
             >
               {t(
                 `common.${
@@ -553,6 +586,9 @@ function DataTable({
               }}
               disabled={!actionsEnabled}
               $isActive={!filterSomeGroupsAreHidden}
+              title={t(
+                `common.${filterSomeGroupsAreHidden ? "openAll" : "closeAll"}`
+              )}
             >
               {t(
                 `common.${filterSomeGroupsAreHidden ? "openAll" : "closeAll"}`

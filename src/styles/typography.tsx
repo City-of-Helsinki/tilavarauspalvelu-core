@@ -24,7 +24,7 @@ export const H3 = styled.h3`
 
 export const truncatedText = css`
   white-space: nowrap;
-  overflow-x: hidden;
+  overflow: hidden;
   text-overflow: ellipsis;
 `;
 

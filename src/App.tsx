@@ -1,8 +1,7 @@
 import React, { useState } from "react";
-import { BrowserRouter, Redirect, Route, Switch } from "react-router-dom";
+import { BrowserRouter, Route, Switch } from "react-router-dom";
 // eslint-disable-next-line import/no-unresolved
 import { withOidcSecure, useReactOidc } from "@axa-fr/react-oidc-context";
-import Applications from "./component/Application/Applications";
 import ApplicationRound from "./component/ApplicationRound/ApplicationRound";
 import PageWrapper from "./component/PageWrapper";
 import "./i18n";
@@ -11,11 +10,14 @@ import Modal from "./component/Modal";
 import Application from "./component/Application/Application";
 import ApplicationDetails from "./component/Application/ApplicationDetails";
 import Recommendation from "./component/ApplicationRound/Recommendation";
-import RecommendationsBySpace from "./component/ApplicationRound/RecommendationsBySpace";
 import RecommendationsByApplicant from "./component/ApplicationRound/RecommendationsByApplicant";
 import ApplicationRounds from "./component/ApplicationRound/ApplicationRounds";
+import AllApplicationRounds from "./component/ApplicationRound/AllApplicationRounds";
 import MainLander from "./component/MainLander";
 import Approval from "./component/ApplicationRound/Approval";
+import Applications from "./component/Application/Applications";
+import Criteria from "./component/ApplicationRound/Criteria";
+import RecommendationsByReservationUnit from "./component/ApplicationRound/RecommendationsByReservationUnit";
 
 interface IPrivateRouteProps {
   path: string;
@@ -46,15 +48,18 @@ function App(): JSX.Element {
   return (
     <BrowserRouter>
       <UIContext.Provider
-        value={{ modalContent: null, setModalContent: toggleModal }}
+        value={{
+          modalContent: null,
+          setModalContent: toggleModal,
+        }}
       >
         <PageWrapper>
           <Switch>
-            <Route exact path="/">
-              {oidcUser && <Redirect to="/applicationRounds" />}
-              <MainLander />
-            </Route>
-            <PrivateRoute exact path="/applications" component={Applications} />
+            <Route
+              exact
+              path="/"
+              component={oidcUser ? ApplicationRounds : MainLander}
+            />
             <PrivateRoute
               exact
               path="/application/:applicationId"
@@ -68,18 +73,26 @@ function App(): JSX.Element {
             <PrivateRoute
               exact
               path="/applicationRounds"
-              component={ApplicationRounds}
+              component={AllApplicationRounds}
             />
             <PrivateRoute
-              path="/applicationRound/:applicationRoundId/space/:spaceId"
-              component={RecommendationsBySpace}
+              path="/applicationRound/:applicationRoundId/applications"
+              component={Applications}
             />
             <PrivateRoute
-              path="/applicationRound/:applicationRoundId/applicant/:applicationId"
+              path="/applicationRound/:applicationRoundId/criteria"
+              component={Criteria}
+            />
+            <PrivateRoute
+              path="/applicationRound/:applicationRoundId/reservationUnit/:reservationUnitId"
+              component={RecommendationsByReservationUnit}
+            />
+            <PrivateRoute
+              path="/applicationRound/:applicationRoundId/applicant/:applicantId"
               component={RecommendationsByApplicant}
             />
             <PrivateRoute
-              path="/applicationRound/:applicationRoundId/recommendation/:recommendationId"
+              path="/applicationRound/:applicationRoundId/recommendation/:applicationEventScheduleId"
               component={Recommendation}
             />
             <PrivateRoute

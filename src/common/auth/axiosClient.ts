@@ -4,7 +4,7 @@ import applyCaseMiddleware from "axios-case-converter";
 import { authEnabled, oidcUrl, oidcClientId, apiScope } from "../const";
 
 const axiosOptions = {
-  timeout: 5000,
+  timeout: 20000,
   headers: {
     "Content-Type": "application/json",
   },

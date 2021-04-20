@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 import { IconAngleDown, IconAngleUp } from "hds-react";
 import { useTranslation } from "react-i18next";
-import { RouteProps } from "react-router-dom";
+import { NavLink, RouteProps } from "react-router-dom";
 import styled from "styled-components";
-import { breakpoints, BasicLink } from "../styles/util";
+import { breakpoints } from "../styles/util";
 import { ReactComponent as PremiseApplications } from "../images/icon_premise-applications.svg";
-import { ReactComponent as IconCustomers } from "../images/icon_customers.svg";
-import { ReactComponent as IconPremises } from "../images/icon_premises.svg";
-import { ReactComponent as IconTwoArrows } from "../images/icon_two-arrows.svg";
 import { truncatedText } from "../styles/typography";
+// import { ReactComponent as IconCustomers } from "../images/icon_customers.svg";
+// import { ReactComponent as IconPremises } from "../images/icon_premises.svg";
+// import { ReactComponent as IconTwoArrows } from "../images/icon_two-arrows.svg";
 
 const Wrapper = styled.ul<{ placement: string }>`
   display: flex;
@@ -48,17 +48,12 @@ const Icon = styled.span`
   margin-right: var(--spacing-xs);
 `;
 
-const Heading = styled(BasicLink)<{ $disabled: boolean }>`
+const Heading = styled.div`
   ${truncatedText}
   font-family: var(--tilavaraus-admin-font-bold);
-  font-size: 14px;
+  font-size: var(--fontsize-body-s);
   line-height: 1.85em;
   max-width: 9.5rem;
-  ${({ $disabled }) =>
-    $disabled &&
-    `
-    pointer-events: none;
-  `}
 `;
 
 const SubItemList = styled.ul`
@@ -69,9 +64,21 @@ const SubItemList = styled.ul`
   margin-top: 0.685rem;
 `;
 
-const SubItemHeading = styled(Heading)<{ $disabled: boolean }>`
+const SubItemHeading = styled(NavLink)<{ $disabled: boolean }>`
+  &.active {
+    text-decoration: underline;
+  }
+
+  ${truncatedText}
+  color: var(--tilavaraus-admin-content-text-color);
+  text-decoration: none;
+  user-select: none;
+  font-size: var(--fontsize-body-s);
+  max-width: 9.5rem;
   font-family: var(--tilavaraus-admin-font);
   font-weight: normal;
+  padding-bottom: var(--spacing-2-xs);
+  display: inline-block;
 `;
 
 const Toggler = styled.button`
@@ -79,19 +86,35 @@ const Toggler = styled.button`
   background: transparent;
   position: absolute;
   top: 0;
-  right: -12px;
+  cursor: pointer;
+  width: 100%;
+  height: var(--spacing-layout-xs);
+
+  svg {
+    position: absolute;
+    top: 0;
+    right: 0;
+  }
 `;
 
 interface IMenuChild {
   title: string;
   icon?: JSX.Element;
+  route?: string;
+  routeParams?: RouteProps;
+  items?: SubItemChild[];
+}
+
+interface SubItemChild {
+  title: string;
+  icon?: JSX.Element;
   route: string;
   routeParams?: RouteProps;
-  items?: IMenuChild[];
+  items?: SubItemChild[];
 }
 
 interface SubItemProps {
-  items?: IMenuChild[];
+  items?: SubItemChild[];
   parentTitleKey: string;
   onItemSelection?: () => void;
 }
@@ -119,7 +142,7 @@ const SubItems = ({
       </Toggler>
       {isMenuOpen && (
         <SubItemList>
-          {items.map((child: IMenuChild) => (
+          {items.map((child: SubItemChild) => (
             <li key={child.title}>
               <SubItemHeading
                 $disabled={child.route === ""}
@@ -140,60 +163,58 @@ const menuTree: IMenuChild[] = [
   {
     title: "MainMenu.applications",
     icon: <PremiseApplications />,
-    route: "/applicationRounds",
-  },
-  {
-    title: "MainMenu.clients",
-    icon: <IconCustomers />,
-    route: "",
     items: [
       {
-        title: "MainMenu.archive",
-        route: "",
+        title: "MainMenu.handling",
+        route: "/applicationRounds",
+      },
+      {
+        title: "MainMenu.approvals",
+        route: "/applicationRounds/approvals",
       },
     ],
   },
-  {
-    title: "MainMenu.premisesAndSettings",
-    icon: <IconPremises />,
-    route: "",
-    items: [
-      {
-        title: "MainMenu.services",
-        route: "",
-      },
-      {
-        title: "MainMenu.spaceAndHobbyTypes",
-        route: "",
-      },
-      {
-        title: "MainMenu.applicationRounds",
-        route: "",
-      },
-      {
-        title: "MainMenu.conditionsAndAttachments",
-        route: "",
-      },
-    ],
-  },
-  {
-    title: "MainMenu.userManagement",
-    icon: <IconTwoArrows />,
-    route: "",
-  },
+  // {
+  //   title: "MainMenu.clients",
+  //   icon: <IconCustomers />,
+  //   items: [
+  //     {
+  //       title: "MainMenu.archive",
+  //       route: "",
+  //     },
+  //   ],
+  // },
+  // {
+  //   title: "MainMenu.premisesAndSettings",
+  //   icon: <IconPremises />,
+  //   items: [
+  //     {
+  //       title: "MainMenu.services",
+  //       route: "",
+  //     },
+  //     {
+  //       title: "MainMenu.spaceAndHobbyTypes",
+  //       route: "",
+  //     },
+  //     {
+  //       title: "MainMenu.applicationRounds",
+  //       route: "",
+  //     },
+  //     {
+  //       title: "MainMenu.conditionsAndAttachments",
+  //       route: "",
+  //     },
+  //   ],
+  // },
+  // {
+  //   title: "MainMenu.userManagement",
+  //   icon: <IconTwoArrows />,
+  // },
 ];
 
 interface MainMenuProps {
   placement: string;
   onItemSelection?: () => void;
-}
-
-interface IMenuItem {
-  title: string;
-  icon?: JSX.Element;
-  route: string;
-  routeParams?: RouteProps;
-  items?: IMenuChild[];
 }
 
 function MainMenu({
@@ -204,17 +225,11 @@ function MainMenu({
 
   return (
     <Wrapper placement={placement}>
-      {menuTree.map((menuItem: IMenuItem) =>
+      {menuTree.map((menuItem: IMenuChild) =>
         menuItem ? (
           <MenuItem key={menuItem.title}>
             <Icon>{menuItem.icon}</Icon>
-            <Heading
-              $disabled={menuItem.route === ""}
-              to={menuItem.route}
-              onClick={() => onItemSelection && onItemSelection()}
-            >
-              {t(menuItem.title)}
-            </Heading>
+            <Heading>{t(menuItem.title)}</Heading>
             <SubItems
               items={menuItem.items}
               parentTitleKey={menuItem.title}

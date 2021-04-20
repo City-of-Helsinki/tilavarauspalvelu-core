@@ -12,7 +12,7 @@ interface IProps {
 }
 
 const Wrapper = styled.div`
-  padding: var(--spacing-xl) var(--spacing-3-xl) var(--spacing-xl)
+  padding: var(--spacing-xl) var(--spacing-xl) var(--spacing-xl)
     var(--spacing-m);
   background-color: #f0f1f4;
   display: grid;
@@ -36,11 +36,16 @@ const IconWrapper = styled.div`
 
 const Heading = styled(H2)`
   font-size: 1.375rem;
-  margin: 0 0 var(--spacing-3-xs);
+  margin: var(--spacing-2-xs) 0 var(--spacing-m);
 `;
 
 const P = styled.div`
-  margin: var(--spacing-s) 0;
+  margin: var(--spacing-2-xs) 0 0;
+  line-height: var(--lineheight-s);
+`;
+
+const Members = styled.div`
+  margin: var(--spacing-m) 0;
   line-height: var(--lineheight-l);
 `;
 
@@ -67,14 +72,44 @@ function ApplicantBox({ application }: IProps): JSX.Element {
     application?.contactPerson?.lastName || ""
   }`.trim();
 
-  let title = "";
+  let details;
   switch (application.applicantType) {
     case "individual":
-      title = contactPerson;
-
+      details = (
+        <>
+          <Heading>{contactPerson}</Heading>
+          {t("Application.applicantType")}:{" "}
+          {t(`Application.applicantTypes.${application.applicantType}`)}
+          <P>
+            {t("Application.contactPerson")}: {contactPerson}
+          </P>
+        </>
+      );
       break;
     default:
-      title = application?.organisation?.name || "";
+      details = (
+        <>
+          <Heading>{application?.organisation?.name}</Heading>
+          {t("Application.applicantType")}:{" "}
+          {t(`Application.applicantTypes.${application.applicantType}`)}
+          <P>
+            {t("Application.contactPerson")}: {contactPerson}
+          </P>
+          {application?.organisation?.activeMembers && (
+            <Members>
+              <div>
+                <Strong>{t("Organisation.activeParticipants")}</Strong>
+              </div>
+              <div>
+                {formatNumber(
+                  application?.organisation?.activeMembers,
+                  t("common.volumeUnit")
+                )}
+              </div>
+            </Members>
+          )}
+        </>
+      );
   }
   return (
     <Wrapper>
@@ -82,31 +117,12 @@ function ApplicantBox({ application }: IProps): JSX.Element {
         <IconCustomers />
       </IconWrapper>
       <div>
-        <Heading>{title}</Heading>
-        {t("Application.applicantType")}:{" "}
-        {t(`Application.applicantTypes.${application.applicantType}`)}
-        <P>
-          <div>Hakija: ?????</div>
-          <div>
-            {t("Application.contactPerson")}: {contactPerson}
-          </div>
-        </P>
-        {application?.organisation?.activeMembers && (
-          <>
-            <div>
-              <Strong>{t("Organisation.activeParticipants")}</Strong>
-            </div>
-            <div>
-              {formatNumber(
-                application?.organisation?.activeMembers,
-                t("common.volumeUnit")
-              )}
-            </div>
-          </>
-        )}
+        {details}
         <Status>
-          <StatusDot status="allocated" size={16} />
-          <BasicLink to="/">Mukana jaossa ???</BasicLink>
+          <StatusDot status="review_done" size={16} />
+          <BasicLink to={`/application/${application.id}`}>
+            {t("Applicant.inAllocation")}
+          </BasicLink>
         </Status>
       </div>
     </Wrapper>

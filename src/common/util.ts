@@ -1,11 +1,18 @@
 import { format, parseISO } from "date-fns";
 import i18next from "i18next";
+import trim from "lodash/trim";
+import groupBy from "lodash/groupBy";
+import get from "lodash/get";
 import {
+  AllocationResult,
   ApplicationEventSchedule,
   ApplicationRoundStatus,
   ApplicationStatus,
+  GroupedAllocationResult,
   LocalizationLanguages,
+  Location,
   NormalizedApplicationRoundStatus,
+  RecommendationStatus,
   TranslationObject,
 } from "./types";
 
@@ -49,18 +56,21 @@ export const getNormalizedApplicationStatus = (
     if (status === "in_review") {
       normalizedStatus = "review_done";
     }
-  } else if (view === "handling") {
-    if (["review_done", "in_review"].includes(status)) {
-      normalizedStatus = "allocated";
-    }
   }
 
   return normalizedStatus;
 };
 
+export const getNormalizedRecommendationStatus = (
+  status: RecommendationStatus
+): RecommendationStatus => {
+  const normalizedStatus: RecommendationStatus = status;
+
+  return normalizedStatus;
+};
+
 export const getNormalizedApplicationRoundStatus = (
-  status: ApplicationRoundStatus,
-  view: ApplicationRoundStatusView // eslint-disable-line @typescript-eslint/no-unused-vars
+  status: ApplicationRoundStatus
 ): ApplicationRoundStatus | NormalizedApplicationRoundStatus => {
   let normalizedStatus: NormalizedApplicationRoundStatus;
 
@@ -168,4 +178,46 @@ export const localizedValue = (
   }
 
   return name[lang as LocalizationLanguages] || "???";
+};
+
+interface IAgeGroups {
+  minimum?: number;
+  maximum?: number;
+}
+
+export const parseAgeGroups = (ageGroups: IAgeGroups): string => {
+  return `${i18next.t("common.agesSuffix", {
+    range: trim(`${ageGroups.minimum}-${ageGroups.maximum}`, "-"),
+  })}`;
+};
+
+export const prepareAllocationResults = (
+  results: AllocationResult[]
+): GroupedAllocationResult[] => {
+  const groups = groupBy(results, (n) => n.allocatedReservationUnitName);
+  return Object.keys(groups).map(
+    (key: string, index: number): GroupedAllocationResult => {
+      const row = groups[key][0] as AllocationResult;
+      return {
+        id: index + 1,
+        space: {
+          id: row.allocatedReservationUnitId,
+          name: row.allocatedReservationUnitName,
+        },
+        reservationUnit: {
+          name: row.unitName,
+        },
+        data: get(groups, key),
+      };
+    }
+  );
+};
+
+export const parseAddress = (location: Location): string => {
+  return trim(
+    `${location.addressStreet || ""}, ${location.addressZip || ""} ${
+      location.addressCity || ""
+    }`,
+    ", "
+  );
 };

@@ -26,16 +26,18 @@ interface IValueBoxProps {
   label: string;
   value: string | undefined | null;
   icon?: ReactNode;
+  style?: React.CSSProperties;
 }
 
 function ValueBox({
   label,
-  value,
+  value = "-",
   icon,
+  style,
   ...rest
 }: IValueBoxProps): JSX.Element {
   return (
-    <Wrapper {...rest} $hasIcon={!!icon}>
+    <Wrapper style={style} {...rest} $hasIcon={!!icon}>
       <Label>
         {icon}
         {label}

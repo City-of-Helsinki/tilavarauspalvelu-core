@@ -203,6 +203,7 @@ function SupervisorApproval({ applicationRoundId }: IProps): JSX.Element {
     setConfirmationDialogVisibility,
   ] = useState<boolean>(false);
   const [cellConfig, setCellConfig] = useState<CellConfig | null>(null);
+  const [activeFilter, setActiveFilter] = useState<string>("handled");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const { t } = useTranslation();
@@ -354,6 +355,8 @@ function SupervisorApproval({ applicationRoundId }: IProps): JSX.Element {
                       text: "ApplicationRound.handledApplications",
                     },
                   ]}
+                  activeKey={activeFilter}
+                  setActiveKey={setActiveFilter}
                 />
               </div>
             </IngressFooter>
@@ -365,8 +368,6 @@ function SupervisorApproval({ applicationRoundId }: IProps): JSX.Element {
               config={{
                 filtering: true,
                 rowFilters: true,
-                hideHandled: false,
-                selection: false,
               }}
               cellConfig={cellConfig}
               filterConfig={[]}

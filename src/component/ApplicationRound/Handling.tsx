@@ -6,14 +6,16 @@ import uniq from "lodash/uniq";
 import trim from "lodash/trim";
 import Loader from "../Loader";
 import {
-  Application as ApplicationType,
+  AllocationResult,
+  ApplicationEvent,
+  ApplicationEventStatus,
   ApplicationRound as ApplicationRoundType,
   ApplicationRoundStatus,
   DataFilterConfig,
 } from "../../common/types";
 import { IngressContainer, NarrowContainer } from "../../styles/layout";
 import { breakpoints } from "../../styles/util";
-import Heading from "../Application/Heading";
+import Heading from "./Heading";
 import StatusRecommendation from "../Application/StatusRecommendation";
 import withMainMenu from "../withMainMenu";
 import ApplicationRoundNavi from "./ApplicationRoundNavi";
@@ -25,11 +27,19 @@ import AllocatingDialogContent from "./AllocatingDialogContent";
 import DataTable, { CellConfig } from "../DataTable";
 import {
   formatNumber,
-  getNormalizedApplicationStatus,
+  getNormalizedRecommendationStatus,
+  parseAgeGroups,
   parseDuration,
+  prepareAllocationResults,
 } from "../../common/util";
 import StatusCell from "../StatusCell";
-import { getApplicationRound, triggerAllocation } from "../../common/api";
+import {
+  getAllocationResults,
+  getApplicationRound,
+  setApplicationEventStatuses,
+  triggerAllocation,
+} from "../../common/api";
+import SelectionActionBar from "../SelectionActionBar";
 
 interface IProps {
   applicationRound: ApplicationRoundType;
@@ -39,7 +49,7 @@ interface IProps {
 
 const Wrapper = styled.div`
   width: 100%;
-  margin-bottom: var(--spacing-layout-xl);
+  margin-bottom: var(--spacing-layout-2-xl);
 `;
 
 const StyledKorosHeading = styled(KorosHeading)`
@@ -107,8 +117,9 @@ const ActionContainer = styled.div`
   }
 `;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const getFilterConfig = (recommendations: any[]): DataFilterConfig[] => {
+const getFilterConfig = (
+  recommendations: ApplicationEvent[]
+): DataFilterConfig[] => {
   const purposes = uniq(recommendations.map((app) => app.purpose));
   const statuses = uniq(recommendations.map((app) => app.status));
 
@@ -124,10 +135,7 @@ const getFilterConfig = (recommendations: any[]): DataFilterConfig[] => {
     {
       title: "Application.headings.applicationStatus",
       filters: statuses.map((status) => {
-        const normalizedStatus = getNormalizedApplicationStatus(
-          status,
-          "handling"
-        );
+        const normalizedStatus = getNormalizedRecommendationStatus(status);
         return {
           title: `Application.statuses.${normalizedStatus}`,
           key: "status",
@@ -144,58 +152,71 @@ const getCellConfig = (
 ): CellConfig => {
   return {
     cols: [
-      { title: "Application.headings.applicantName", key: "organisation.name" },
+      { title: "Application.headings.applicantName", key: "organisationName" },
+      {
+        title: "ApplicationRound.basket",
+        key: "basketOrderNumber",
+        transform: ({ basketName, basketOrderNumber }) => (
+          <>{trim(`${basketOrderNumber || ""}. ${basketName || ""}`, ". ")}</>
+        ),
+      },
       {
         title: "Application.headings.purpose",
-        key: "purpose",
+        key: "applicationEvent.purpose",
       },
       {
         title: "Application.headings.ageGroup",
-        key: "ageGroup",
+        key: "applicationEvent.ageGroupDisplay.minimum",
+        transform: ({ applicationEvent }: AllocationResult) => (
+          <>{parseAgeGroups(applicationEvent.ageGroupDisplay)}</>
+        ),
       },
       {
+        // TODO
         title: "Recommendation.headings.recommendationCount",
-        key: "aggregatedData.reservationsTotal",
-        transform: ({ aggregatedData }: ApplicationType) => (
+        key: "applicationAggregatedData.reservationsTotal",
+        transform: ({ applicationAggregatedData }: AllocationResult) => (
           <>
             {trim(
               `${formatNumber(
-                aggregatedData?.reservationsTotal,
+                applicationAggregatedData?.reservationsTotal,
                 t("common.volumeUnit")
-              )} / ${parseDuration(aggregatedData?.minDurationTotal)}`,
+              )} / ${parseDuration(
+                applicationAggregatedData?.minDurationTotal
+              )}`,
               " / "
             )}
           </>
         ),
       },
       {
-        title: "Application.headings.applicationStatus",
-        key: "status",
+        title: "Recommendation.headings.status",
+        key: "applicationEvent.status",
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        transform: ({ status }: any) => {
-          const normalizedStatus = getNormalizedApplicationStatus(
-            status,
-            "handling"
+        transform: ({ applicationEvent }: any) => {
+          const normalizedStatus = getNormalizedRecommendationStatus(
+            applicationEvent.status
           );
           return (
             <StatusCell
               status={normalizedStatus}
-              text={`Application.statuses.${normalizedStatus}`}
+              text={`Recommendation.statuses.${normalizedStatus}`}
             />
           );
         },
       },
     ],
-    index: "id",
+    index: "applicationEventScheduleId",
     sorting: "organisation.name",
     order: "asc",
-    rowLink: ({ id }) =>
-      applicationRound
-        ? `/applicationRound/${applicationRound.id}/recommendation/${id}`
-        : "",
+    rowLink: ({ applicationEventScheduleId }: AllocationResult) => {
+      return applicationEventScheduleId && applicationRound
+        ? `/applicationRound/${applicationRound.id}/recommendation/${applicationEventScheduleId}`
+        : "";
+    },
     groupLink: ({ space }) =>
       applicationRound
-        ? `/applicationRound/${applicationRound.id}/space/${space.id}`
+        ? `/applicationRound/${applicationRound.id}/reservationUnit/${space?.id}`
         : "",
   };
 };
@@ -206,11 +227,15 @@ function Handling({
   setApplicationRoundStatus,
 }: IProps): JSX.Element {
   const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
   const [isAllocating, setIsAllocating] = useState(false);
-  const [recommendations, setRecommendations] = useState<any[]>([]); // eslint-disable-line
+  const [recommendations, setRecommendations] = useState<AllocationResult[]>(
+    []
+  );
   const [cellConfig, setCellConfig] = useState<CellConfig | null>(null);
   const [filterConfig, setFilterConfig] = useState<DataFilterConfig[]>([]);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [selections, setSelections] = useState<number[]>([]);
 
   const { t } = useTranslation();
 
@@ -233,97 +258,132 @@ function Handling({
     }
   };
 
+  const modifyRecommendations = async (action: string) => {
+    let status: ApplicationEventStatus;
+    switch (action) {
+      case "approve":
+        status = "approved";
+        break;
+      case "decline":
+        status = "declined";
+        break;
+      case "ignore":
+      default:
+    }
+
+    try {
+      setIsSaving(true);
+      await setApplicationEventStatuses(
+        selections.map((selection) => ({
+          status,
+          applicationEventId: selection,
+        }))
+      );
+      setErrorMsg(null);
+    } catch (error) {
+      setErrorMsg("errors.errorSavingApplication");
+    } finally {
+      setTimeout(() => setIsSaving(false), 1000);
+    }
+  };
+
   useEffect(() => {
     const fetchRecommendations = async () => {
       try {
-        const result = [
-          {
-            id: 1,
-            space: {
-              id: 23,
-              name: "Suuri sali",
-            },
-            reservationUnit: {
-              name: "Fallkullan tila",
-            },
-            data: [
-              {
-                id: 2,
-                purpose: "Purpose",
-                ageGroup: "4-5",
-                status: "review_done",
-                organisation: {
-                  name: "Org Name",
-                  identifier: null,
-                  yearEstablished: 1980,
-                  activeMembers: 13,
-                  coreBusiness: null,
-                  address: null,
-                },
-                aggregatedData: {},
-              },
-              {
-                id: 3,
-                purpose: "Purpose #2",
-                ageGroup: "2-3",
-                status: "review_done",
-                organisation: {
-                  name: "Org Name #2",
-                  identifier: null,
-                  yearEstablished: 1980,
-                  activeMembers: 13,
-                  coreBusiness: null,
-                  address: null,
-                },
-                aggregatedData: {},
-              },
-            ],
-          },
-          {
-            id: 2,
-            space: {
-              id: 22,
-              name: "Pieni sali",
-            },
-            reservationUnit: {
-              name: "Haltialan tila",
-            },
-            data: [
-              {
-                id: 4,
-                purpose: "Purpose #3",
-                ageGroup: "14-15",
-                status: "review_done",
-                organisation: {
-                  name: "Org Name #3",
-                  identifier: null,
-                  yearEstablished: 1980,
-                  activeMembers: 13,
-                  coreBusiness: null,
-                  address: null,
-                },
-                aggregatedData: {},
-              },
-              {
-                id: 13,
-                purpose: "Purpose #4",
-                ageGroup: "12-13",
-                status: "review_done",
-                organisation: {
-                  name: "Org Name #4",
-                  identifier: null,
-                  yearEstablished: 1980,
-                  activeMembers: 13,
-                  coreBusiness: null,
-                  address: null,
-                },
-                aggregatedData: {},
-              },
-            ],
-          },
-        ];
+        // const result = [
+        //   {
+        //     id: 1,
+        //     space: {
+        //       id: 23,
+        //       name: "Suuri sali",
+        //     },
+        //     reservationUnit: {
+        //       name: "Fallkullan tila",
+        //     },
+        //     data: [
+        //       {
+        //         id: 2,
+        //         purpose: "Purpose",
+        //         ageGroup: "4-5",
+        //         status: "review_done",
+        //         organisation: {
+        //           name: "Org Name",
+        //           identifier: null,
+        //           yearEstablished: 1980,
+        //           activeMembers: 13,
+        //           coreBusiness: null,
+        //           address: null,
+        //         },
+        //         aggregatedData: {},
+        //       },
+        //       {
+        //         id: 3,
+        //         purpose: "Purpose #2",
+        //         ageGroup: "2-3",
+        //         status: "review_done",
+        //         organisation: {
+        //           name: "Org Name #2",
+        //           identifier: null,
+        //           yearEstablished: 1980,
+        //           activeMembers: 13,
+        //           coreBusiness: null,
+        //           address: null,
+        //         },
+        //         aggregatedData: {},
+        //       },
+        //     ],
+        //   },
+        //   {
+        //     id: 2,
+        //     space: {
+        //       id: 22,
+        //       name: "Pieni sali",
+        //     },
+        //     reservationUnit: {
+        //       name: "Haltialan tila",
+        //     },
+        //     data: [
+        //       {
+        //         id: 4,
+        //         purpose: "Purpose #3",
+        //         ageGroup: "14-15",
+        //         status: "review_done",
+        //         organisation: {
+        //           name: "Org Name #3",
+        //           identifier: null,
+        //           yearEstablished: 1980,
+        //           activeMembers: 13,
+        //           coreBusiness: null,
+        //           address: null,
+        //         },
+        //         aggregatedData: {},
+        //       },
+        //       {
+        //         id: 13,
+        //         purpose: "Purpose #4",
+        //         ageGroup: "12-13",
+        //         status: "review_done",
+        //         organisation: {
+        //           name: "Org Name #4",
+        //           identifier: null,
+        //           yearEstablished: 1980,
+        //           activeMembers: 13,
+        //           coreBusiness: null,
+        //           address: null,
+        //         },
+        //         aggregatedData: {},
+        //       },
+        //     ],
+        //   },
+        // ];
 
-        setFilterConfig(getFilterConfig(result.flatMap((n) => n.data)));
+        const result = await getAllocationResults({
+          applicationRoundId: applicationRound.id,
+        });
+
+        setFilterConfig(
+          getFilterConfig(result.flatMap((n) => n.applicationEvent))
+        );
         setCellConfig(getCellConfig(t, applicationRound));
         setRecommendations(result);
       } catch (error) {
@@ -355,9 +415,9 @@ function Handling({
   }, [isAllocating, applicationRound, setApplicationRound]);
 
   const unhandledRecommendationCount: number = recommendations
-    .flatMap((recommendation) => recommendation.data)
+    .flatMap((recommendation) => recommendation.applicationEvent)
     .map((recommendation) => recommendation.status)
-    .filter((status) => ["in_review", "review_done"].includes(status)).length;
+    .filter((status) => ["created"].includes(status)).length;
 
   if (isLoading) {
     return <Loader />;
@@ -426,12 +486,13 @@ function Handling({
           </NarrowContainer>
           {cellConfig && (
             <DataTable
-              groups={recommendations}
+              groups={prepareAllocationResults(recommendations)}
+              setSelections={setSelections}
               hasGrouping
               config={{
                 filtering: true,
                 rowFilters: true,
-                hideHandled: true,
+                handledStatuses: ["validated", "handled"],
                 selection: true,
               }}
               filterConfig={filterConfig}
@@ -454,6 +515,21 @@ function Handling({
         >
           {t(errorMsg)}
         </Notification>
+      )}
+      {selections?.length > 0 && (
+        <SelectionActionBar
+          selections={selections}
+          options={[
+            { label: t("Recommendation.actionMassApprove"), value: "approve" },
+            { label: t("Recommendation.actionMassDecline"), value: "decline" },
+            {
+              label: t("Recommendation.actionMassIgnoreSpace"),
+              value: "ignore",
+            },
+          ]}
+          callback={(option: string) => modifyRecommendations(option)}
+          isSaving={isSaving}
+        />
       )}
     </Wrapper>
   );

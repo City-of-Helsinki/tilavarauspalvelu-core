@@ -3,10 +3,15 @@ import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import { Button, Notification, IconFaceSmile } from "hds-react";
-import { getApplication, saveApplication } from "../../common/api";
+import {
+  getApplication,
+  getApplicationRound,
+  saveApplication,
+} from "../../common/api";
 import Loader from "../Loader";
 import {
   Application as ApplicationType,
+  ApplicationRound as ApplicationRoundType,
   ApplicationStatus,
 } from "../../common/types";
 import { ContentContainer, NarrowContainer } from "../../styles/layout";
@@ -164,6 +169,10 @@ function Application(): JSX.Element | null {
   const [isSaving, setIsSaving] = useState(false);
   const [application, setApplication] = useState<ApplicationType | null>(null);
   const [
+    applicationRound,
+    setApplicationRound,
+  ] = useState<ApplicationRoundType | null>(null);
+  const [
     statusNotification,
     setStatusNotification,
   ] = useState<ApplicationStatus | null>(null);
@@ -178,6 +187,16 @@ function Application(): JSX.Element | null {
       setApplication(result);
     } catch (error) {
       setErrorMsg("errors.errorFetchingApplication");
+      setIsLoading(false);
+    }
+  };
+
+  const fetchApplicationRound = async (id: number) => {
+    try {
+      const result = await getApplicationRound({ id });
+      setApplicationRound(result);
+    } catch (error) {
+      setErrorMsg("errors.errorFetchingApplicationRound");
     } finally {
       setIsLoading(false);
     }
@@ -186,6 +205,12 @@ function Application(): JSX.Element | null {
   useEffect(() => {
     fetchApplication(Number(applicationId));
   }, [applicationId]);
+
+  useEffect(() => {
+    if (application?.applicationRoundId) {
+      fetchApplicationRound(application.applicationRoundId);
+    }
+  }, [application]);
 
   const setApplicationStatus = async (status: ApplicationStatus) => {
     if (!application) return;
@@ -228,7 +253,7 @@ function Application(): JSX.Element | null {
       action = {};
   }
 
-  if (isLoading) {
+  if (isLoading || !application || !applicationRound) {
     return <Loader />;
   }
 
@@ -243,105 +268,99 @@ function Application(): JSX.Element | null {
 
   return (
     <Wrapper>
-      {application && (
-        <>
-          <ContentContainer>
-            <LinkPrev
-              route={`/applicationRound/${application.applicationRoundId}`}
-            />
-          </ContentContainer>
-          <NarrowContainer>
-            <StyledLink
-              to={`/application/${application.id}/details`}
-              data-testid="application__link--details"
-            >
-              {t("ApplicationRound.showClientApplication")}
-            </StyledLink>
-            <Heading data-testid="application__heading--main">
-              <CustomerIcon>
-                <IconCustomers />
-              </CustomerIcon>
-              <span>{application.organisation?.name}</span>
-            </Heading>
-            <ApplicantType>
-              <dt>{t("Application.applicantType")}:</dt>
-              <dd data-testid="application__data--applicant-type">
-                {application.applicantType &&
-                  t(`Application.applicantTypes.${application.applicantType}`)}
-              </dd>
-            </ApplicantType>
-            <ApplicationStatusBlock status={application.status} view="review" />
-            {notificationContent ? (
-              <StyledNotification
-                type="success"
-                dismissible
-                onClose={() => setStatusNotification(null)}
-                closeButtonLabelText={`${t("common.close")}`}
-                label={notificationContent.heading}
-              >
-                <H3>
-                  <IconFaceSmile size="m" /> {notificationContent.heading}
-                </H3>
-                <div>{notificationContent.body}</div>
-              </StyledNotification>
-            ) : null}
-            <Subheading>{t("ApplicationRound.infoGivenByCustomer")}</Subheading>
-            <DataGrid>
-              <GridCol>
-                <table>
-                  <tbody>
-                    <tr>
-                      <th>{t("Organisation.activeParticipants")}</th>
-                      <td data-testid="application__data--participants">
-                        {`${formatNumber(
-                          application.organisation?.activeMembers,
-                          t("common.volumeUnit")
-                        )}`}
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </GridCol>
-            </DataGrid>
-            <Subheading>{t("ApplicationRound.recommendedAid")}</Subheading>
-            <DataGrid>
-              <GridCol>
-                <table>
-                  <tbody>
-                    <tr>
-                      <th>{t("ApplicationRound.appliedReservations")}</th>
-                      <td data-testid="application__data--reservations-total">{`${formatNumber(
-                        application.aggregatedData.reservationsTotal,
-                        t("common.volumeUnit")
-                      )}`}</td>
-                    </tr>
-                    <tr>
-                      <th>{t("ApplicationRound.totalReservationTime")}</th>
-                      <td data-testid="application__data--min-duration-total">{`${parseDuration(
-                        application.aggregatedData.minDurationTotal
-                      )}`}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </GridCol>
-            </DataGrid>
-          </NarrowContainer>
-          <ContentContainer>
-            {action.function && (
-              <ActionButton
-                data-testid="application__button--toggle-state"
-                id="submit"
-                variant={action.button}
-                onClick={() =>
-                  action.function && !isSaving && action.function()
-                }
-              >
-                {action.text}
-              </ActionButton>
-            )}
-          </ContentContainer>
-        </>
-      )}
+      <ContentContainer>
+        <LinkPrev
+          route={`/applicationRound/${application.applicationRoundId}`}
+        />
+      </ContentContainer>
+      <NarrowContainer>
+        <StyledLink
+          to={`/application/${application.id}/details`}
+          data-testid="application__link--details"
+        >
+          {t("ApplicationRound.showClientApplication")}
+        </StyledLink>
+        <Heading data-testid="application__heading--main">
+          <CustomerIcon>
+            <IconCustomers />
+          </CustomerIcon>
+          <span>{application.organisation?.name}</span>
+        </Heading>
+        <ApplicantType>
+          <dt>{t("Application.applicantType")}:</dt>
+          <dd data-testid="application__data--applicant-type">
+            {application.applicantType &&
+              t(`Application.applicantTypes.${application.applicantType}`)}
+          </dd>
+        </ApplicantType>
+        <ApplicationStatusBlock status={application.status} view="review" />
+        {notificationContent ? (
+          <StyledNotification
+            type="success"
+            dismissible
+            onClose={() => setStatusNotification(null)}
+            closeButtonLabelText={`${t("common.close")}`}
+            label={notificationContent.heading}
+          >
+            <H3>
+              <IconFaceSmile size="m" /> {notificationContent.heading}
+            </H3>
+            <div>{notificationContent.body}</div>
+          </StyledNotification>
+        ) : null}
+        <Subheading>{t("ApplicationRound.infoGivenByCustomer")}</Subheading>
+        <DataGrid>
+          <GridCol>
+            <table>
+              <tbody>
+                <tr>
+                  <th>{t("Organisation.activeParticipants")}</th>
+                  <td data-testid="application__data--participants">
+                    {`${formatNumber(
+                      application.organisation?.activeMembers,
+                      t("common.volumeUnit")
+                    )}`}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </GridCol>
+        </DataGrid>
+        <Subheading>{t("ApplicationRound.recommendedAid")}</Subheading>
+        <DataGrid>
+          <GridCol>
+            <table>
+              <tbody>
+                <tr>
+                  <th>{t("ApplicationRound.appliedReservations")}</th>
+                  <td data-testid="application__data--reservations-total">{`${formatNumber(
+                    application.aggregatedData.reservationsTotal,
+                    t("common.volumeUnit")
+                  )}`}</td>
+                </tr>
+                <tr>
+                  <th>{t("ApplicationRound.totalReservationTime")}</th>
+                  <td data-testid="application__data--min-duration-total">{`${parseDuration(
+                    application.aggregatedData.minDurationTotal
+                  )}`}</td>
+                </tr>
+              </tbody>
+            </table>
+          </GridCol>
+        </DataGrid>
+      </NarrowContainer>
+      <ContentContainer>
+        {["in_review"].includes(applicationRound?.status) && action.function && (
+          <ActionButton
+            data-testid="application__button--toggle-state"
+            id="submit"
+            variant={action.button}
+            onClick={() => action.function && !isSaving && action.function()}
+          >
+            {action.text}
+          </ActionButton>
+        )}
+      </ContentContainer>
       {errorMsg && (
         <Notification
           type="error"

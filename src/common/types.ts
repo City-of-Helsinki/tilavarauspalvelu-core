@@ -75,6 +75,14 @@ export type Image = {
   imageType: "main" | "map" | "ground_plan" | "other";
 };
 
+type ReservationUnitBuilding = {
+  id: number;
+  district: number | null;
+  name: string | null;
+  realEstate: string | null;
+  surfaceArea: string | null;
+};
+
 export type ReservationUnit = {
   id: number;
   name: TranslationObject;
@@ -86,6 +94,8 @@ export type ReservationUnit = {
   images: Image[];
   location: Location;
   reservationUnitType: Parameter;
+  building: ReservationUnitBuilding;
+  purposes: Parameter[];
 };
 
 export type Parameter = {
@@ -137,6 +147,7 @@ export type Organisation = {
   activeMembers: number | null;
   coreBusiness: string | null;
   address: Address | null;
+  email: string | null;
 };
 
 export type ContactPerson = {
@@ -159,8 +170,10 @@ export type ApplicationEvent = {
   name: string | null;
   numPersons: number | null;
   ageGroupId: number | null;
+  ageGroupDisplay: AgeGroupDisplay;
   abilityGroupId: number | null;
   purposeId: number | null;
+  purpose: string | null;
   minDuration: string | null;
   maxDuration: string | null;
   eventsPerWeek: number;
@@ -170,25 +183,34 @@ export type ApplicationEvent = {
   applicationId: number;
   eventReservationUnits: EventReservationUnit[];
   applicationEventSchedules: ApplicationEventSchedule[];
-  status:
-    | "created"
-    | "allocating"
-    | "allocated"
-    | "validated"
-    | "approved"
-    | "declined"
-    | "cancelled";
+  status: ApplicationEventStatus;
 };
 
+export type ApplicationEventStatus =
+  | "created"
+  | "allocating"
+  | "allocated"
+  | "validated"
+  | "approved"
+  | "declined"
+  | "cancelled";
+
+interface AgeGroupDisplay {
+  minimum: number;
+  maximum: number;
+}
+
 export type EventReservationUnit = {
+  id: number;
   priority: number;
-  reservationUnit: number;
+  reservationUnitId: number;
+  reservationUnitDetails: ReservationUnit;
 };
 
 type DAY = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
 export type ApplicationEventSchedule = {
-  id?: number;
+  id: number;
   day: DAY;
   begin: string;
   end: string;
@@ -204,21 +226,95 @@ export interface ReservationUnitsParameters {
 export interface DataFilterOption {
   key: string;
   value?: string | number;
-  title: string;
+  title: string | null;
 }
 export interface DataFilterConfig {
   title: string;
-  filters?: DataFilterOption[];
+  filters: DataFilterOption[] | null;
 }
 
 export type OptionType = {
   label: string;
-  value: string;
+  value: string | number | null;
 };
 
 export interface DataGroup {
   id: number;
-  space?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
-  reservationUnit?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
-  data: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  space?: AllocatedSpace;
+  reservationUnit?: AllocatedReservationUnit;
+  data: any;
+}
+
+export interface AllocationResult {
+  applicationEvent: ApplicationEvent;
+  applicationId: number | null;
+  applicantName: string | null;
+  applicantId: number | null;
+  organisationName: string | null;
+  unitName: string | null;
+  allocatedReservationUnitId: number | null;
+  allocatedReservationUnitName: string | null;
+  applicationEventScheduleId: number | null;
+  allocatedDuration: string | null;
+  allocatedDay: string | null;
+  allocatedBegin: string | null;
+  allocatedEnd: string | null;
+  applicationAggregatedData: AggregatedData;
+  basketName: string | null;
+  basketOrderNumber: string | null;
+}
+
+export interface AllocationRequest {
+  id: number;
+  applicationRoundBasketIds: number[];
+  applicationRoundId: number;
+  completed: boolean;
+  startDate: string | null;
+  endDate: string | null;
+}
+
+export interface AllocatedSpace {
+  id: number | null;
+  name: string | null;
+}
+
+export interface AllocatedReservationUnit {
+  id?: number;
+  name: string | null;
+}
+
+export interface GroupedAllocationResult {
+  id: number;
+  space: AllocatedSpace;
+  reservationUnit: AllocatedReservationUnit;
+  data: AllocationResult[];
+}
+
+export type RecommendationStatus =
+  | "created"
+  | "allocating"
+  | "allocated"
+  | "validated"
+  | "approved"
+  | "declined"
+  | "cancelled";
+
+export type ParameterTypes =
+  | "ageGroup"
+  | "purpose"
+  | "abilityGroup"
+  | "reservationUnitType"
+  | "equipmentCategory"
+  | "equipment"
+  | "city";
+
+export interface ParameterAgeGroup {
+  id: number;
+  minumum: number;
+  maximum: number;
+}
+
+export interface ParameterDefault {
+  id: number;
+  name: string;
 }

@@ -7,12 +7,12 @@ import {
   IconArrowRight,
   IconLocation,
 } from "hds-react";
-import { ApplicationStatus, DataGroup } from "../../common/types";
+import { DataGroup, GroupedAllocationResult } from "../../common/types";
 import { H3 } from "../../styles/typography";
 import { BasicLink, breakpoints, SelectionCheckbox } from "../../styles/util";
 
 interface IProps {
-  group: DataGroup;
+  group: GroupedAllocationResult;
   hasGrouping: boolean;
   cols: number;
   index: number;
@@ -115,10 +115,8 @@ function RecommendationDataTableGroup({
   const { t } = useTranslation();
 
   const unhandledReservationCount = group.data
-    .map((application: any) => application.status) // eslint-disable-line @typescript-eslint/no-explicit-any
-    .filter((status: ApplicationStatus) =>
-      ["in_review", "review_done"].includes(status)
-    ).length;
+    .flatMap((recommendation) => recommendation?.applicationEvent?.status)
+    .filter((status) => ["created"].includes(status)).length;
 
   const colCount: number = isSelectionActive ? cols + 1 : cols;
 

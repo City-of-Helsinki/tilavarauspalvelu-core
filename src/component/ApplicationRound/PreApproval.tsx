@@ -2,14 +2,24 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { TFunction } from "i18next";
 import styled from "styled-components";
-import { Button, IconCheckCircle, Notification } from "hds-react";
 import {
+  Button,
+  IconArrowRight,
+  IconCheckCircle,
+  Notification,
+} from "hds-react";
+import trim from "lodash/trim";
+import uniq from "lodash/uniq";
+import {
+  AllocationResult,
   ApplicationRound as ApplicationRoundType,
   ApplicationRoundStatus,
+  DataFilterConfig,
+  ApplicationEvent,
 } from "../../common/types";
 import { IngressContainer, NarrowContainer } from "../../styles/layout";
 import { breakpoints } from "../../styles/util";
-import Heading from "../Application/Heading";
+import Heading from "./Heading";
 import StatusRecommendation from "../Application/StatusRecommendation";
 import withMainMenu from "../withMainMenu";
 import ApplicationRoundNavi from "./ApplicationRoundNavi";
@@ -17,8 +27,14 @@ import TimeframeStatus from "./TimeframeStatus";
 import { ContentHeading, H3 } from "../../styles/typography";
 import DataTable, { CellConfig } from "../DataTable";
 import Dialog from "../Dialog";
-import { formatNumber } from "../../common/util";
+import {
+  formatNumber,
+  parseDuration,
+  prepareAllocationResults,
+} from "../../common/util";
 import BigRadio from "../BigRadio";
+import { getAllocationResults } from "../../common/api";
+import Loader from "../Loader";
 
 interface IProps {
   applicationRound: ApplicationRoundType;
@@ -148,11 +164,13 @@ const ScheduleCount = styled.span`
   }
 `;
 
-const getCellConfig = (t: TFunction): CellConfig => {
-  console.log(t); // eslint-disable-line
+const getCellConfig = (
+  t: TFunction,
+  applicationRound: ApplicationRoundType | null
+): CellConfig => {
   return {
     cols: [
-      { title: "Application.headings.customer", key: "organisation.name" },
+      { title: "Application.headings.applicantName", key: "organisationName" },
       {
         title: "Application.headings.participants",
         key: "organisation.activeMembers",
@@ -162,15 +180,62 @@ const getCellConfig = (t: TFunction): CellConfig => {
         key: "applicantType",
       },
       {
-        title: "Application.headings.resolution",
-        key: "aggregatedData.reservationsTotal",
+        title: "Recommendation.headings.resolution",
+        key: "applicationAggregatedData.reservationsTotal",
+        transform: ({ applicationAggregatedData }: AllocationResult) => (
+          <div
+            style={{
+              display: "flex",
+              alignContent: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <span>
+              {trim(
+                `${formatNumber(
+                  applicationAggregatedData?.reservationsTotal,
+                  t("common.volumeUnit")
+                )} / ${parseDuration(
+                  applicationAggregatedData?.minDurationTotal
+                )}`,
+                " / "
+              )}
+            </span>
+            <IconArrowRight />
+          </div>
+        ),
       },
     ],
-    index: "id",
+    index: "applicationEventScheduleId",
     sorting: "organisation.name",
     order: "asc",
-    rowLink: (id) => `/application/${id}`,
+    rowLink: ({ applicationEventScheduleId }: AllocationResult) => {
+      return applicationEventScheduleId && applicationRound
+        ? `/applicationRound/${applicationRound.id}/recommendation/${applicationEventScheduleId}`
+        : "/foobar";
+    },
+    groupLink: ({ space }) =>
+      applicationRound
+        ? `/applicationRound/${applicationRound.id}/space/${space?.id}`
+        : "",
   };
+};
+
+const getFilterConfig = (
+  recommendations: ApplicationEvent[]
+): DataFilterConfig[] => {
+  const purposes = uniq(recommendations.map((app) => app.purpose));
+
+  return [
+    {
+      title: "Application.headings.purpose",
+      filters: purposes.map((value) => ({
+        title: value,
+        key: "applicationEvent.purpose",
+        value: value || "",
+      })),
+    },
+  ];
 };
 
 function PreApproval({
@@ -181,142 +246,179 @@ function PreApproval({
     isConfirmationDialogVisible,
     setConfirmationDialogVisibility,
   ] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [recommendations, setRecommendations] = useState<
+    AllocationResult[] | []
+  >([]);
+  const [filterConfig, setFilterConfig] = useState<DataFilterConfig[] | null>(
+    null
+  );
   const [cellConfig, setCellConfig] = useState<CellConfig | null>(null);
+  const [activeFilter, setActiveFilter] = useState<string>("handled");
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const { t } = useTranslation();
 
-  const hasBeenSentForApproval = applicationRound.status === "validated";
-
   useEffect(() => {
-    setCellConfig(getCellConfig(t));
-  }, [t]);
+    const fetchRecommendations = async (arId: number) => {
+      try {
+        const result = await getAllocationResults({
+          applicationRoundId: arId,
+        });
+
+        setFilterConfig(
+          getFilterConfig(result.flatMap((n) => n.applicationEvent))
+        );
+        setCellConfig(getCellConfig(t, applicationRound));
+        setRecommendations(result || []);
+      } catch (error) {
+        setErrorMsg("errors.errorFetchingApplications");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (typeof applicationRound?.id === "number") {
+      fetchRecommendations(applicationRound.id);
+    }
+  }, [applicationRound, t]);
 
   const scheduledNumbers = {
     volume: 239048,
     hours: 2345,
   };
 
+  const hasBeenSentForApproval = applicationRound.status === "validated";
+
+  const filteredResults =
+    activeFilter === "orphans"
+      ? recommendations.filter(
+          (n) => !["validated"].includes(n.applicationEvent.status)
+        )
+      : recommendations.filter((n) =>
+          ["validated"].includes(n.applicationEvent.status)
+        );
+
+  if (isLoading || !recommendations || !cellConfig || !filterConfig) {
+    return <Loader />;
+  }
+
   return (
     <Wrapper>
       <Heading />
-      {applicationRound && (
-        <>
-          <IngressContainer>
-            <ApplicationRoundNavi applicationRoundId={applicationRound.id} />
-            <TopIngress>
-              <div>
-                <ContentHeading>{applicationRound.name}</ContentHeading>
-                <TimeframeStatus
-                  applicationPeriodBegin={
-                    applicationRound.applicationPeriodBegin
-                  }
-                  applicationPeriodEnd={applicationRound.applicationPeriodEnd}
-                />
-              </div>
-              <div />
-            </TopIngress>
-          </IngressContainer>
-          <NarrowContainer style={{ marginBottom: "var(--spacing-4-xl)" }}>
-            {hasBeenSentForApproval && (
-              <StyledNotification
-                type="success"
-                label=""
-                dismissible
-                closeButtonLabelText={`${t("common.close")}`}
-              >
-                <H3>
-                  <IconCheckCircle size="m" />{" "}
-                  {t("ApplicationRound.sentForApprovalNotificationHeader")}
-                </H3>
-                <p>{t("ApplicationRound.sentForApprovalNotificationBody")}</p>
-              </StyledNotification>
-            )}
-            <Recommendation>
-              <RecommendationLabel>
-                {t("Application.recommendedStage")}:
-              </RecommendationLabel>
-              <RecommendationValue>
-                <StatusRecommendation
-                  status={
-                    hasBeenSentForApproval ? "approval" : "approvalPreparation"
-                  }
-                  applicationRound={applicationRound}
-                />
-              </RecommendationValue>
-            </Recommendation>
-            {!hasBeenSentForApproval && (
-              <ActionContainer>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={() => {
-                    setApplicationRoundStatus("allocated");
-                  }}
-                >
-                  {t("ApplicationRound.navigateBackToHandling")}
-                </Button>
-                <Button
-                  type="submit"
-                  variant="primary"
-                  onClick={() => setConfirmationDialogVisibility(true)}
-                >
-                  {t("ApplicationRound.sendForApproval")}
-                </Button>
-              </ActionContainer>
-            )}
-          </NarrowContainer>
-          <IngressContainer>
-            <IngressFooter>
-              <div>
-                <p className="label">
-                  {t("ApplicationRound.schedulesToBeGranted")}
-                </p>{" "}
-                <SchedulePercentage>
-                  {t("ApplicationRound.percentageOfCapacity", {
-                    percentage: 76,
-                  })}
-                </SchedulePercentage>
-                <ScheduleCount>
-                  {`(${formatNumber(
-                    scheduledNumbers.volume,
-                    t("common.volumeUnit")
-                  )} / ${formatNumber(
-                    scheduledNumbers.hours,
-                    t("common.hoursUnit")
-                  )})`}
-                </ScheduleCount>
-              </div>
-              <div>
-                <BigRadio
-                  buttons={[
-                    {
-                      key: "orphans",
-                      text: "ApplicationRound.orphanApplications",
-                    },
-                    {
-                      key: "handled",
-                      text: "ApplicationRound.handledApplications",
-                    },
-                  ]}
-                />
-              </div>
-            </IngressFooter>
-          </IngressContainer>
-          {cellConfig && (
-            <DataTable
-              groups={[]}
-              hasGrouping={false}
-              config={{
-                filtering: true,
-                rowFilters: true,
-                hideHandled: false,
-                selection: false,
-              }}
-              cellConfig={cellConfig}
-              filterConfig={[]}
+      <IngressContainer>
+        <ApplicationRoundNavi applicationRoundId={applicationRound.id} />
+        <TopIngress>
+          <div>
+            <ContentHeading>{applicationRound.name}</ContentHeading>
+            <TimeframeStatus
+              applicationPeriodBegin={applicationRound.applicationPeriodBegin}
+              applicationPeriodEnd={applicationRound.applicationPeriodEnd}
             />
-          )}
-        </>
+          </div>
+          <div />
+        </TopIngress>
+      </IngressContainer>
+      <NarrowContainer style={{ marginBottom: "var(--spacing-4-xl)" }}>
+        {hasBeenSentForApproval && (
+          <StyledNotification
+            type="success"
+            label=""
+            dismissible
+            closeButtonLabelText={`${t("common.close")}`}
+          >
+            <H3>
+              <IconCheckCircle size="m" />{" "}
+              {t("ApplicationRound.sentForApprovalNotificationHeader")}
+            </H3>
+            <p>{t("ApplicationRound.sentForApprovalNotificationBody")}</p>
+          </StyledNotification>
+        )}
+        <Recommendation>
+          <RecommendationLabel>
+            {t("Application.recommendedStage")}:
+          </RecommendationLabel>
+          <RecommendationValue>
+            <StatusRecommendation
+              status={
+                hasBeenSentForApproval ? "approval" : "approvalPreparation"
+              }
+              applicationRound={applicationRound}
+            />
+          </RecommendationValue>
+        </Recommendation>
+        {!hasBeenSentForApproval && (
+          <ActionContainer>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => {
+                setApplicationRoundStatus("allocated");
+              }}
+            >
+              {t("ApplicationRound.navigateBackToHandling")}
+            </Button>
+            <Button
+              type="submit"
+              variant="primary"
+              onClick={() => setConfirmationDialogVisibility(true)}
+            >
+              {t("ApplicationRound.sendForApproval")}
+            </Button>
+          </ActionContainer>
+        )}
+      </NarrowContainer>
+      <IngressContainer>
+        <IngressFooter>
+          <div>
+            <p className="label">
+              {t("ApplicationRound.schedulesToBeGranted")}
+            </p>{" "}
+            <SchedulePercentage>
+              {t("ApplicationRound.percentageOfCapacity", {
+                percentage: 76,
+              })}
+            </SchedulePercentage>
+            <ScheduleCount>
+              {`(${formatNumber(
+                scheduledNumbers.volume,
+                t("common.volumeUnit")
+              )} / ${formatNumber(
+                scheduledNumbers.hours,
+                t("common.hoursUnit")
+              )})`}
+            </ScheduleCount>
+          </div>
+          <div>
+            <BigRadio
+              buttons={[
+                {
+                  key: "orphans",
+                  text: "ApplicationRound.orphanApplications",
+                },
+                {
+                  key: "handled",
+                  text: "ApplicationRound.handledApplications",
+                },
+              ]}
+              activeKey={activeFilter}
+              setActiveKey={setActiveFilter}
+            />
+          </div>
+        </IngressFooter>
+      </IngressContainer>
+      {cellConfig && (
+        <DataTable
+          groups={prepareAllocationResults(filteredResults)}
+          hasGrouping={false}
+          config={{
+            filtering: true,
+            rowFilters: true,
+            selection: false,
+          }}
+          cellConfig={cellConfig}
+          filterConfig={filterConfig}
+        />
       )}
       {isConfirmationDialogVisible && (
         <Dialog
@@ -347,6 +449,20 @@ function PreApproval({
             </Button>
           </ActionContainer>
         </Dialog>
+      )}
+      {errorMsg && (
+        <Notification
+          type="error"
+          label={t("errors.functionFailed")}
+          position="top-center"
+          autoClose={false}
+          dismissible
+          closeButtonLabelText={t("common.close")}
+          displayAutoCloseProgress={false}
+          onClose={() => setErrorMsg(null)}
+        >
+          {t(errorMsg)}
+        </Notification>
       )}
     </Wrapper>
   );

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { Dispatch, SetStateAction } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { Button } from "hds-react";
@@ -6,6 +6,8 @@ import { breakpoints } from "../styles/util";
 
 interface IProps {
   buttons: Button[];
+  activeKey?: string;
+  setActiveKey: Dispatch<SetStateAction<string>>;
   className?: string;
 }
 
@@ -48,8 +50,15 @@ const StyledButton = styled(Button).attrs(({ $active }: IButtonProps) => ({
   }
 `;
 
-function BigRadio({ buttons, className }: IProps): JSX.Element {
-  const [activeButton, setActiveButton] = useState<string>(buttons[0].key);
+function BigRadio({
+  buttons,
+  activeKey,
+  setActiveKey,
+  className,
+}: IProps): JSX.Element {
+  const activeButton = activeKey
+    ? buttons.find((n) => n.key === activeKey)
+    : buttons[0];
 
   const { t } = useTranslation();
 
@@ -57,11 +66,11 @@ function BigRadio({ buttons, className }: IProps): JSX.Element {
     <Wrapper className={className}>
       {buttons.map((button) => (
         <StyledButton
-          $active={activeButton === button.key}
+          $active={activeButton?.key === button.key}
           key={button.key}
           onClick={() => {
             if (button.callback) button.callback();
-            setActiveButton(button.key);
+            setActiveKey(button.key);
           }}
           disabled={button.disabled}
         >

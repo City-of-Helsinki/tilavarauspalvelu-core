@@ -6,7 +6,7 @@ import { Button, Checkbox, Notification } from "hds-react";
 import uniq from "lodash/uniq";
 import trim from "lodash/trim";
 import withMainMenu from "../withMainMenu";
-import Heading from "../Application/Heading";
+import Heading from "./Heading";
 import { ContentHeading, H2 } from "../../styles/typography";
 import { breakpoints } from "../../styles/util";
 import { IngressContainer } from "../../styles/layout";
@@ -233,7 +233,10 @@ function Review({
       {applicationRound && cellConfig && filterConfig && (
         <>
           <IngressContainer>
-            <ApplicationRoundNavi applicationRoundId={applicationRound.id} />
+            <ApplicationRoundNavi
+              applicationRoundId={applicationRound.id}
+              hideAllApplications
+            />
             <Content>
               <ContentHeading>{applicationRound.name}</ContentHeading>
               <Details>
@@ -287,7 +290,6 @@ function Review({
             config={{
               filtering: true,
               rowFilters: true,
-              hideHandled: false,
               selection: false,
             }}
             cellConfig={cellConfig}

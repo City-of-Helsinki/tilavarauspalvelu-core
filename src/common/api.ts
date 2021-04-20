@@ -5,6 +5,9 @@ import {
   ApplicationRound,
   ReservationUnit,
   Parameter,
+  AllocationRequest,
+  AllocationResult,
+  ApplicationEventStatus,
 } from "./types";
 
 const apiBaseUrl: string = process.env.REACT_APP_TILAVARAUS_API_URL || "";
@@ -14,6 +17,8 @@ const reservationUnitsBasePath = "reservation_unit";
 const parameterBasePath = "parameters";
 const applicationBasePath = "application";
 const allocationRequestPath = "allocation_request";
+const allocationResultPath = "allocation_results";
+const applicationEventStatusPath = "application_event_status";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface QueryParameters {}
@@ -141,7 +146,8 @@ export type ParameterNames =
   | "purpose"
   | "age_group"
   | "ability_group"
-  | "reservation_unit_type";
+  | "reservation_unit_type"
+  | "city";
 
 export function getParameters(name: ParameterNames): Promise<Parameter[]> {
   return apiGet<Parameter[]>({
@@ -189,15 +195,6 @@ interface AllocationRequestParams {
   applicationRoundBasketIds: number[];
 }
 
-export interface AllocationRequest {
-  id: number;
-  applicationRoundBasketIds: number[];
-  applicationRoundId: number;
-  completed: boolean;
-  startDate: string | null;
-  endDate: string | null;
-}
-
 export function triggerAllocation(
   params: AllocationRequestParams
 ): Promise<AllocationRequest> {
@@ -210,5 +207,46 @@ export function triggerAllocation(
 export function getAllocationStatus(id: number): Promise<AllocationRequest> {
   return apiGet({
     path: `v1/${allocationRequestPath}/${id}`,
+  });
+}
+
+interface AllocationResultsParams {
+  applicant?: number;
+  applicationRoundId: number;
+  reservationUnit?: number;
+}
+
+export function getAllocationResults(
+  params: AllocationResultsParams
+): Promise<AllocationResult[]> {
+  return apiGet({
+    parameters: params,
+    path: `v1/${allocationResultPath}`,
+  });
+}
+
+interface AllocationResultParams {
+  id: number;
+}
+
+export function getAllocationResult(
+  params: AllocationResultParams
+): Promise<AllocationResult> {
+  return apiGet({
+    path: `v1/${allocationResultPath}/${params.id}`,
+  });
+}
+
+interface ApplicationEventPayload {
+  status: ApplicationEventStatus;
+  applicationEventId: number;
+}
+
+export function setApplicationEventStatuses(
+  payload: ApplicationEventPayload[]
+): Promise<ApplicationEventPayload[]> {
+  return apiPost({
+    data: payload,
+    path: `v1/${applicationEventStatusPath}/`,
   });
 }
