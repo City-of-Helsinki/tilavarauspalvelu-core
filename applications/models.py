@@ -398,23 +398,15 @@ class ApplicationStatus(models.Model):
     DRAFT = "draft"
     IN_REVIEW = "in_review"
     REVIEW_DONE = "review_done"
-    ALLOCATING = "allocating"
-    ALLOCATED = "allocated"
-    VALIDATED = "validated"
     DECLINED = "declined"
     CANCELLED = "cancelled"
-    HANDLED = "handled"
 
     STATUS_CHOICES = (
         (DRAFT, _("Draft")),
         (IN_REVIEW, _("In review")),
         (REVIEW_DONE, _("Review done")),
-        (ALLOCATING, _("Allocating")),
-        (ALLOCATED, _("Allocated")),
-        (VALIDATED, _("Validated")),
         (DECLINED, _("Declined")),
         (CANCELLED, _("Cancelled")),
-        (HANDLED, _("Handled")),
     )
 
     status = models.CharField(
@@ -449,21 +441,17 @@ class ApplicationStatus(models.Model):
 
 class ApplicationEventStatus(models.Model):
     CREATED = "created"
-    ALLOCATING = "allocating"
     ALLOCATED = "allocated"
     VALIDATED = "validated"
     APPROVED = "approved"
     DECLINED = "declined"
-    CANCELLED = "cancelled"
 
     STATUS_CHOICES = (
         (CREATED, _("Created")),
-        (ALLOCATING, _("Allocating")),
         (ALLOCATED, _("Allocated")),
         (VALIDATED, _("Validated")),
         (APPROVED, _("Approved")),
         (DECLINED, _("Declined")),
-        (CANCELLED, _("Cancelled")),
     )
 
     status = models.CharField(
