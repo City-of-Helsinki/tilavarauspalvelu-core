@@ -6,6 +6,7 @@ from rest_framework import filters as drf_filters
 from rest_framework import mixins, permissions, serializers, viewsets
 
 from api.base import HierarchyModelMultipleChoiceFilter, TranslatedModelSerializer
+from api.common_filters import NumberInFilter
 from api.resources_api import ResourceSerializer
 from api.services_api import ServiceSerializer
 from api.space_api import BuildingSerializer, LocationSerializer, SpaceSerializer
@@ -26,10 +27,6 @@ from reservation_units.models import (
     ReservationUnitType,
 )
 from spaces.models import District, Unit
-
-
-class NumberInFilter(filters.BaseInFilter, filters.NumberFilter):
-    pass
 
 
 class ReservationUnitFilter(filters.FilterSet):
