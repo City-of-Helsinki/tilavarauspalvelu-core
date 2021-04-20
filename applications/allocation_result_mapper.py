@@ -1,7 +1,11 @@
 import logging
 
 from allocation.allocation_solver import AllocatedEvent
-from applications.models import ApplicationEventSchedule, ApplicationEventScheduleResult
+from applications.models import (
+    ApplicationEventSchedule,
+    ApplicationEventScheduleResult,
+    ApplicationEventStatus,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -26,6 +30,10 @@ class AllocationResultMapper(object):
                         "allocated_end": allocated_event.end,
                         "basket": allocated_event.basket_id,
                     },
+                )
+                ApplicationEventStatus.objects.create(
+                    status=ApplicationEventStatus.ALLOCATED,
+                    application_event=application_event_schedule.application_event,
                 )
             except ApplicationEventScheduleResult.DoesNotExist:
                 logger.exception(
