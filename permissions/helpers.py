@@ -122,7 +122,10 @@ def can_manage_service_sectors_application_rounds(
     permission = "can_manage_application_rounds"
     return (
         is_superuser(user)
-        or has_service_sector_permission(user, [service_sector], permission)
+        or (
+            service_sector is not None
+            and has_service_sector_permission(user, [service_sector], permission)
+        )
         or has_general_permission(user, permission)
     )
 
