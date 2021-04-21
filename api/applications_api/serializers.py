@@ -266,6 +266,10 @@ class ApplicationEventSerializer(serializers.ModelSerializer):
         choices=ApplicationEventStatus.STATUS_CHOICES,
     )
 
+    declined_reservation_unit_ids = serializers.PrimaryKeyRelatedField(
+        source="declined_reservation_units", many=True, read_only=True
+    )
+
     class Meta:
         model = ApplicationEvent
         fields = [
@@ -288,6 +292,7 @@ class ApplicationEventSerializer(serializers.ModelSerializer):
             "purpose",
             "event_reservation_units",
             "status",
+            "declined_reservation_unit_ids",
         ]
         extra_kwargs = {
             "name": {

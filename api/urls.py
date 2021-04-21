@@ -10,6 +10,7 @@ from .applications_api.views import (
     ApplicationViewSet,
 )
 from .city_api import CityViewSet
+from .declined_reservation_units_api import DeclinedReservationUnitViewSet
 from .hauki_api import OpeningHoursViewSet
 from .permissions_api import (
     GeneralRoleViewSet,
@@ -48,6 +49,11 @@ router.register(r"service_sector_role", ServiceSectorRoleViewSet, "service_secto
 router.register(r"general_role", GeneralRoleViewSet, "general_role")
 router.register(r"allocation_request", AllocationRequestViewSet, "allocation_request")
 router.register(r"allocation_results", AllocationResultViewSet, "allocation_results")
+router.register(
+    r"application_event_declined_reservation_unit",
+    DeclinedReservationUnitViewSet,
+    "declined_reservation_unit",
+)
 router.register(r"opening_hour", OpeningHoursViewSet, "opening_hour")
 router.register(r"parameters/district", DistrictViewSet, "district")
 router.register(r"parameters/purpose", PurposeViewSet, "purpose")

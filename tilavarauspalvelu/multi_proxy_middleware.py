@@ -29,5 +29,4 @@ class MultipleProxyMiddleware:
         """
         if "HTTP_X_ORIGINAL_HOST" in request.META:
             request.META["HTTP_X_FORWARDED_HOST"] = request.META["HTTP_X_ORIGINAL_HOST"]
-
         return self.get_response(request)
