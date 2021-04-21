@@ -22,7 +22,6 @@ from applications.models import (
 from permissions.api_permissions import (
     ApplicationEventPermission,
     ApplicationPermission,
-    GeneralRolePermission,
 )
 from permissions.helpers import get_service_sectors_where_can_view_applications
 
@@ -92,10 +91,7 @@ class ApplicationEventViewSet(viewsets.ModelViewSet):
 class ApplicationStatusViewSet(viewsets.ModelViewSet):
     serializer_class = ApplicationStatusSerializer
     permission_classes = (
-        [
-            ApplicationPermission,
-            GeneralRolePermission,
-        ]
+        [ApplicationPermission]
         if not settings.TMP_PERMISSIONS_DISABLED
         else [permissions.AllowAny]
     )
@@ -111,10 +107,7 @@ class ApplicationStatusViewSet(viewsets.ModelViewSet):
 class ApplicationEventStatusViewSet(viewsets.ModelViewSet):
     serializer_class = ApplicationEventStatusSerializer
     permission_classes = (
-        [
-            ApplicationEventPermission,
-            GeneralRolePermission,
-        ]
+        [ApplicationEventPermission]
         if not settings.TMP_PERMISSIONS_DISABLED
         else [permissions.AllowAny]
     )
