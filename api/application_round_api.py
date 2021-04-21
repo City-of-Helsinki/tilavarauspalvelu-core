@@ -10,6 +10,7 @@ from applications.models import (
     City,
 )
 from permissions.api_permissions import ApplicationRoundPermission
+from permissions.helpers import can_manage_service_sectors_application_rounds
 from reservation_units.models import Purpose, ReservationUnit
 from reservations.models import AgeGroup
 from spaces.models import ServiceSector
@@ -88,6 +89,8 @@ class ApplicationRoundSerializer(serializers.ModelSerializer):
 
     allocating = serializers.BooleanField(read_only=True)
 
+    is_admin = serializers.SerializerMethodField()
+
     class Meta:
         model = ApplicationRound
         fields = [
@@ -106,6 +109,7 @@ class ApplicationRoundSerializer(serializers.ModelSerializer):
             "application_round_baskets",
             "allocating",
             "criteria",
+            "is_admin",
         ]
         extra_kwargs = {
             "name": {
@@ -144,7 +148,24 @@ class ApplicationRoundSerializer(serializers.ModelSerializer):
             "application_round_baskets": {
                 "help_text": "List of allocation 'basket' objects which determines priority of reservation allocation.",
             },
+            "is_admin": {
+                "help_text": "Whether the current user can administer the application round or not.",
+            },
         }
+
+    def get_is_admin(self, obj):
+        request = self.context["request"] if "request" in self.context else None
+        request_user = (
+            request.user if request and request.user.is_authenticated else None
+        )
+
+        if request_user is None:
+            return False
+        service_sector = obj.service_sector
+
+        return can_manage_service_sectors_application_rounds(
+            request_user, service_sector
+        )
 
     def create(self, validated_data):
         request = self.context["request"] if "request" in self.context else None

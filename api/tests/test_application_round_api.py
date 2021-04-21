@@ -1,4 +1,5 @@
 import pytest
+from assertpy import assert_that
 from django.urls import reverse
 
 from applications.models import ApplicationRoundStatus
@@ -10,6 +11,43 @@ def test_application_round_fetch(user_api_client, application_round):
     assert response.status_code == 200
     assert len(response.data) == 1
     assert response.data[0].get("id") == application_round.id
+
+
+@pytest.mark.django_db
+def test_regular_user_should_not_be_admin(user_api_client, application_round):
+    response = user_api_client.get(
+        reverse("application_round-detail", kwargs={"pk": application_round.id})
+    )
+    assert_that(response.data.get("is_admin")).is_false()
+
+
+@pytest.mark.django_db
+def test_service_sector_application_round_admin_should_depend_on_service_sector(
+    user_api_client, application_round, service_sector_admin_api_client
+):
+    response = service_sector_admin_api_client.get(
+        reverse("application_round-detail", kwargs={"pk": application_round.id})
+    )
+    assert_that(response.data.get("is_admin")).is_true()
+
+    application_round.service_sector = None
+    application_round.save()
+    response = service_sector_admin_api_client.get(
+        reverse("application_round-detail", kwargs={"pk": application_round.id})
+    )
+    assert_that(response.data.get("is_admin")).is_false()
+
+
+@pytest.mark.django_db
+def test_general_admin_should_be_admin_without_service_sector(
+    user_api_client, application_round, general_admin_api_client
+):
+    application_round.service_sector = None
+    application_round.save()
+    response = general_admin_api_client.get(
+        reverse("application_round-detail", kwargs={"pk": application_round.id})
+    )
+    assert_that(response.data.get("is_admin")).is_true()
 
 
 @pytest.mark.django_db
