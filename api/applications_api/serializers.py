@@ -21,7 +21,6 @@ from applications.models import (
     Organisation,
     Person,
     Recurrence,
-    User,
 )
 from reservation_units.models import Purpose, ReservationUnit
 from reservations.models import AbilityGroup, AgeGroup
@@ -629,9 +628,7 @@ class ApplicationStatusSerializer(serializers.ModelSerializer):
     application_id = serializers.PrimaryKeyRelatedField(
         queryset=Application.objects.all(), source="application"
     )
-    user_id = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.all(), source="user"
-    )
+    user_id = serializers.PrimaryKeyRelatedField(source="user", read_only=True)
 
     class Meta:
         model = ApplicationStatus
@@ -643,7 +640,10 @@ class ApplicationStatusSerializer(serializers.ModelSerializer):
         ]
 
     def create(self, validated_data):
+        request = self.context.get("request")
         instance = ApplicationStatus(**validated_data)
+        if request:
+            instance.user = request.user
         instance.save()
         return instance
 
@@ -652,9 +652,7 @@ class ApplicationEventStatusSerializer(serializers.ModelSerializer):
     application_event_id = serializers.PrimaryKeyRelatedField(
         queryset=ApplicationEvent.objects.all(), source="application_event"
     )
-    user_id = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.all(), source="user"
-    )
+    user_id = serializers.PrimaryKeyRelatedField(source="user", read_only=True)
 
     class Meta:
         model = ApplicationEventStatus
@@ -667,6 +665,9 @@ class ApplicationEventStatusSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "timestamp"]
 
     def create(self, validated_data):
+        request = self.context.get("request")
         instance = ApplicationEventStatus(**validated_data)
+        if request:
+            instance.user = request.user
         instance.save()
         return instance
