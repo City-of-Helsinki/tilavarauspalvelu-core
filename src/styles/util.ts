@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import {
   ApplicationStatus,
   NormalizedApplicationRoundStatus,
+  RecommendationStatus,
 } from "../common/types";
 
 export const breakpoints = {
@@ -20,7 +21,7 @@ export const getGridFraction = (space: number, columns = 12): number => {
 };
 
 export const getApplicationStatusColor = (
-  status: ApplicationStatus,
+  status: ApplicationStatus | RecommendationStatus,
   size: "s" | "l"
 ): string => {
   let color = "";
@@ -28,6 +29,7 @@ export const getApplicationStatusColor = (
     case "draft":
     case "in_review":
     case "allocated":
+    case "created":
       color = "var(--color-info)";
       break;
     case "review_done":
@@ -63,9 +65,11 @@ export const getApplicationRoundStatusColor = (
     case "validated":
       color = "var(--color-alert-light)";
       break;
+    case "approved":
+      color = "var(--color-success)";
+      break;
     case "draft":
     case "incoming":
-    case "approved":
     default:
       color = "var(--color-silver)";
   }
@@ -90,7 +94,7 @@ export const Seranwrap = styled.div`
 `;
 
 export const StatusDot = styled.div<{
-  status: ApplicationStatus;
+  status: ApplicationStatus | RecommendationStatus;
   size: number;
 }>`
   display: inline-block;
@@ -135,6 +139,7 @@ export const Divider = styled.hr`
   height: 1px;
   border: 0;
   margin: var(--spacing-3-xl) 0;
+  grid-column: 1/-1;
 `;
 
 export const PlainButton = styled(Button).attrs({

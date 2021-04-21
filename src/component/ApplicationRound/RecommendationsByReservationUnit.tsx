@@ -2,87 +2,127 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
-import uniq from "lodash/uniq";
+import {
+  IconLocation,
+  IconLayers,
+  IconHome,
+  IconGroup,
+  Notification,
+} from "hds-react";
 import trim from "lodash/trim";
-import get from "lodash/get";
-import { Notification } from "hds-react";
+import uniq from "lodash/uniq";
 import { TFunction } from "i18next";
+import { ContentContainer, IngressContainer } from "../../styles/layout";
+import { H1, H3 } from "../../styles/typography";
+import { breakpoints } from "../../styles/util";
+import LinkPrev from "../LinkPrev";
+import withMainMenu from "../withMainMenu";
 import {
-  getAllocationResults,
-  getApplication,
-  getApplicationRound,
-  setApplicationEventStatuses,
-} from "../../common/api";
-import {
-  AllocationResult,
-  Application as ApplicationType,
   ApplicationRound as ApplicationRoundType,
   DataFilterConfig,
+  AllocationResult,
   ApplicationEvent,
+  ReservationUnit,
   ApplicationEventStatus,
 } from "../../common/types";
-import { ContentContainer, IngressContainer } from "../../styles/layout";
-import { H1 } from "../../styles/typography";
-import { BasicLink, breakpoints, Strong } from "../../styles/util";
-import LinkPrev from "../LinkPrev";
-import Loader from "../Loader";
-import ApplicationStatusBlock from "../Application/ApplicationStatusBlock";
-import withMainMenu from "../withMainMenu";
-import ApplicantBox from "./ApplicantBox";
 import DataTable, { CellConfig } from "../DataTable";
-import RecommendationCount from "./RecommendationCount";
+import {
+  getAllocationResults,
+  getApplicationRound,
+  getReservationUnit,
+  setApplicationEventStatuses,
+} from "../../common/api";
+import Loader from "../Loader";
 import {
   formatNumber,
   getNormalizedRecommendationStatus,
+  localizedValue,
+  parseAddress,
   parseAgeGroups,
   parseDuration,
 } from "../../common/util";
 import StatusCell from "../StatusCell";
+import StatusCircle from "../StatusCircle";
+import RecommendationCount from "./RecommendationCount";
+import i18n from "../../i18n";
 import SelectionActionBar from "../SelectionActionBar";
 
 interface IRouteParams {
   applicationRoundId: string;
-  applicantId: string;
+  reservationUnitId: string;
 }
 
 const Wrapper = styled.div`
   margin-bottom: var(--spacing-layout-xl);
 `;
 
-const Top = styled.div`
-  & > div {
-    &:nth-of-type(even) {
-      padding-right: var(--spacing-3-xl);
-    }
-  }
-
+const Ingress = styled.div`
+  margin: var(--spacing-layout-l) 0 var(--spacing-layout-xl)
+    calc(var(--spacing-layout-s) * -1);
   display: grid;
 
   @media (min-width: ${breakpoints.l}) {
-    & > div {
-      &:nth-of-type(even) {
-        max-width: 400px;
-        justify-self: right;
-      }
-    }
-
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: auto 1fr;
     grid-gap: var(--spacing-l);
   }
 `;
 
-const LinkToOthers = styled(BasicLink)`
-  text-decoration: none;
-  display: block;
-  margin-bottom: var(--spacing-xs);
+const SpaceImage = styled.img`
+  width: 144px;
+  height: 144px;
+  border-radius: 50%;
 `;
 
-const Heading = styled(H1)`
-  margin-bottom: var(--spacing-3-xs);
+const ImageFiller = styled.div`
+  width: 1px;
 `;
 
-const StyledApplicationStatusBlock = styled(ApplicationStatusBlock)`
-  margin-top: var(--spacing-xl);
+const Title = styled(H1)`
+  margin: var(--spacing-s) 0 var(--spacing-2-xs) 0;
+`;
+
+const Props = styled.div`
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin: var(--spacing-xs) 0;
+`;
+
+const Prop = styled.div`
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  margin: 0 var(--spacing-m) var(--spacing-xs) 0;
+
+  svg {
+    margin-right: var(--spacing-2-xs);
+  }
+`;
+
+const TitleContainer = styled.div`
+  display: grid;
+  padding-right: var(--spacing-m);
+
+  ${H1} {
+    margin: 0 0 var(--spacing-m);
+  }
+
+  @media (min-width: ${breakpoints.l}) {
+    grid-template-columns: 2fr 1fr;
+  }
+`;
+
+const StatusContainer = styled.div`
+  display: flex;
+  align-content: center;
+  margin-bottom: var(--spacing-m);
+
+  ${H3} {
+    font-size: var(--fontsize-heading-s);
+    margin-left: var(--spacing-m);
+    width: 50px;
+    line-height: var(--lineheight-m);
+  }
 `;
 
 const getCellConfig = (
@@ -91,10 +131,7 @@ const getCellConfig = (
 ): CellConfig => {
   return {
     cols: [
-      {
-        title: "Recommendation.headings.applicationEventName",
-        key: "applicationEvent.name",
-      },
+      { title: "Application.headings.applicantName", key: "organisationName" },
       {
         title: "ApplicationRound.basket",
         key: "basketOrderNumber",
@@ -131,23 +168,10 @@ const getCellConfig = (
         ),
       },
       {
-        title: "Recommendation.headings.spaceName",
-        key: "unitName",
-        transform: ({
-          unitName,
-          allocatedReservationUnitName,
-        }: AllocationResult) => {
-          return (
-            <Strong>
-              {unitName}, {allocatedReservationUnitName}
-            </Strong>
-          );
-        },
-      },
-      {
         title: "Recommendation.headings.status",
         key: "applicationEvent.status",
-        transform: ({ applicationEvent }: AllocationResult) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        transform: ({ applicationEvent }: any) => {
           const normalizedStatus = getNormalizedRecommendationStatus(
             applicationEvent.status
           );
@@ -204,13 +228,16 @@ const getFilterConfig = (
   ];
 };
 
-function RecommendationsByApplicant(): JSX.Element {
+function RecommendationsByReservationUnit(): JSX.Element {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [recommendations, setRecommendations] = useState<
     AllocationResult[] | []
   >([]);
-  const [application, setApplication] = useState<ApplicationType | null>(null);
+  const [
+    reservationUnit,
+    setReservationUnit,
+  ] = useState<ReservationUnit | null>(null);
   const [
     applicationRound,
     setApplicationRound,
@@ -223,7 +250,7 @@ function RecommendationsByApplicant(): JSX.Element {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const { t } = useTranslation();
-  const { applicationRoundId, applicantId } = useParams<IRouteParams>();
+  const { applicationRoundId, reservationUnitId } = useParams<IRouteParams>(); // eslint-disable-line @typescript-eslint/no-unused-vars
 
   const modifyRecommendations = async (action: string) => {
     let status: ApplicationEventStatus;
@@ -255,73 +282,86 @@ function RecommendationsByApplicant(): JSX.Element {
   };
 
   useEffect(() => {
-    const fetchData = async (appRoundId: number) => {
+    const fetchApplicationRound = async () => {
+      setErrorMsg(null);
+      setIsLoading(true);
+
       try {
         const result = await getApplicationRound({
-          id: appRoundId,
+          id: Number(applicationRoundId),
         });
-
         setApplicationRound(result);
       } catch (error) {
-        setErrorMsg("errors.errorFetchingApplication");
-        setIsLoading(false);
-      }
-    };
-
-    fetchData(Number(applicationRoundId));
-  }, [applicationRoundId]);
-
-  useEffect(() => {
-    const fetchRecommendations = async (arId: number, apId: number) => {
-      try {
-        const result = await getAllocationResults({
-          applicationRoundId: arId,
-          applicant: apId,
-        });
-
-        setFilterConfig(
-          getFilterConfig(result.flatMap((n) => n.applicationEvent))
-        );
-        setCellConfig(getCellConfig(t, applicationRound));
-        setRecommendations(result || []);
-      } catch (error) {
-        setErrorMsg("errors.errorFetchingApplications");
-        setIsLoading(false);
-      }
-    };
-
-    if (typeof applicationRound?.id === "number") {
-      fetchRecommendations(applicationRound.id, Number(applicantId));
-    }
-  }, [applicationRound, applicantId, t]);
-
-  useEffect(() => {
-    const fetchApplication = async (id: number) => {
-      try {
-        const result = await getApplication(id);
-        setApplication(result);
-      } catch (error) {
-        setErrorMsg("errors.errorFetchingApplication");
+        const msg =
+          error.response?.status === 404
+            ? "errors.applicationRoundNotFound"
+            : "errors.errorFetchingData";
+        setErrorMsg(msg);
       } finally {
         setIsLoading(false);
       }
     };
 
-    const aId = get(recommendations, "[0].applicationId");
-    if (aId) {
-      fetchApplication(aId);
-    }
-  }, [recommendations]);
+    fetchApplicationRound();
+  }, [applicationRoundId, t]);
 
-  const applicantName =
-    get(recommendations, "[0].organisationName") ||
-    get(recommendations, "[0].applicantName");
+  useEffect(() => {
+    const fetchRecommendations = async (arId: number, spId: number) => {
+      try {
+        const result = await getAllocationResults({
+          applicationRoundId: arId,
+        });
+
+        const filteredResult: AllocationResult[] = result.filter(
+          (n) => n.allocatedReservationUnitId === spId
+        );
+
+        setFilterConfig(
+          getFilterConfig(filteredResult.flatMap((n) => n.applicationEvent))
+        );
+        setCellConfig(getCellConfig(t, applicationRound));
+        setRecommendations(filteredResult || []);
+      } catch (error) {
+        setErrorMsg("errors.errorFetchingApplications");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (typeof applicationRound?.id === "number") {
+      fetchRecommendations(applicationRound.id, Number(reservationUnitId));
+    }
+  }, [applicationRound, reservationUnitId, t]);
+
+  useEffect(() => {
+    const fetchReservationUnit = async (ruId: number) => {
+      try {
+        const result = await getReservationUnit(ruId);
+        setReservationUnit(result);
+      } catch (error) {
+        setErrorMsg("errors.errorFetchingApplications");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchReservationUnit(Number(reservationUnitId));
+  }, [recommendations, reservationUnitId]);
 
   const unhandledRecommendationCount = recommendations.filter(
     (n) => n.applicationEvent.status === "created"
   ).length;
 
-  if (isLoading || !recommendations || !cellConfig || !filterConfig) {
+  const mainImage = reservationUnit?.images.find((n) => n.imageType === "main");
+
+  if (
+    isLoading ||
+    !applicationRound ||
+    !recommendations ||
+    !reservationUnit ||
+    !filterConfig ||
+    !cellConfig
+  ) {
     return <Loader />;
   }
 
@@ -329,29 +369,56 @@ function RecommendationsByApplicant(): JSX.Element {
     <Wrapper>
       <ContentContainer>
         <LinkPrev route={`/applicationRound/${applicationRoundId}`} />
+        <IngressContainer>
+          <Ingress>
+            {mainImage ? (
+              <SpaceImage src={mainImage.imageUrl} alt="" />
+            ) : (
+              <ImageFiller />
+            )}
+            <div>
+              <Title>
+                {localizedValue(reservationUnit.name, i18n.language)}
+              </Title>
+              {reservationUnit.location && (
+                <div>{parseAddress(reservationUnit.location)}</div>
+              )}
+              <Props>
+                <Prop>
+                  <IconLocation /> {reservationUnit.building.name}
+                </Prop>
+                {reservationUnit.purposes && (
+                  <Prop>
+                    <IconLayers />{" "}
+                    {t("ReservationUnit.purposeCount", {
+                      count: reservationUnit.purposes?.length,
+                    })}
+                  </Prop>
+                )}
+                <Prop>
+                  <IconHome /> {reservationUnit.reservationUnitType.name}
+                </Prop>
+                {reservationUnit.maxPersons && (
+                  <Prop>
+                    <IconGroup /> {reservationUnit.maxPersons}
+                  </Prop>
+                )}
+              </Props>
+            </div>
+          </Ingress>
+          <TitleContainer>
+            <H1 as="h2">{applicationRound?.name}</H1>
+            <StatusContainer>
+              <StatusCircle status={0} />
+              <H3>{t("ApplicationRound.amountReserved")}</H3>
+            </StatusContainer>
+          </TitleContainer>
+          <RecommendationCount
+            recommendationCount={recommendations.length}
+            unhandledCount={unhandledRecommendationCount}
+          />
+        </IngressContainer>
       </ContentContainer>
-      <IngressContainer style={{ marginBottom: "var(--spacing-l)" }}>
-        <Top>
-          <div>
-            <LinkToOthers
-              to={`/application/${get(
-                recommendations,
-                "[0].applicationId"
-              )}/details`}
-            >
-              {t("Recommendation.showOriginalApplication")}
-            </LinkToOthers>
-            <Heading>{applicantName}</Heading>
-            <div>{applicationRound?.name}</div>
-            <StyledApplicationStatusBlock status="allocated" />
-          </div>
-          <div>{application && <ApplicantBox application={application} />}</div>
-        </Top>
-        <RecommendationCount
-          recommendationCount={recommendations.length}
-          unhandledCount={unhandledRecommendationCount}
-        />
-      </IngressContainer>
       <DataTable
         groups={[{ id: 1, data: recommendations }]}
         setSelections={setSelections}
@@ -360,7 +427,6 @@ function RecommendationsByApplicant(): JSX.Element {
           filtering: true,
           rowFilters: true,
           selection: true,
-          handledStatuses: ["accepted"],
         }}
         cellConfig={cellConfig}
         filterConfig={filterConfig}
@@ -398,4 +464,4 @@ function RecommendationsByApplicant(): JSX.Element {
   );
 }
 
-export default withMainMenu(RecommendationsByApplicant);
+export default withMainMenu(RecommendationsByReservationUnit);

@@ -5,6 +5,7 @@ import { BasicLink, breakpoints } from "../../styles/util";
 
 interface IProps {
   applicationRoundId: number;
+  hideAllApplications?: boolean;
 }
 
 const Wrapper = styled.div`
@@ -25,14 +26,21 @@ const NaviItem = styled(BasicLink)`
   margin-left: 2rem;
 `;
 
-function ApplicationRoundNavi({ applicationRoundId }: IProps): JSX.Element {
+function ApplicationRoundNavi({
+  applicationRoundId,
+  hideAllApplications,
+}: IProps): JSX.Element {
   const { t } = useTranslation();
 
   return (
     <Wrapper>
-      <NaviItem to="#">{t("Application.showAllApplications")} TODO</NaviItem>
+      {!hideAllApplications && (
+        <NaviItem to={`/applicationRound/${applicationRoundId}/applications`}>
+          {t("Application.showAllApplications")}
+        </NaviItem>
+      )}
       <NaviItem to={`/applicationRound/${applicationRoundId}/criteria`}>
-        {t("ApplicationRound.roundCriteria")} TODO
+        {t("ApplicationRound.roundCriteria")}
       </NaviItem>
     </Wrapper>
   );

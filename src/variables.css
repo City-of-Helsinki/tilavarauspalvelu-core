@@ -1,6 +1,6 @@
 :root {
   --tilavaraus-admin-brand: #00005e;
-  --tilavaraus-admin-blue: #0000bf;
+  --tilavaraus-admin-blue: var(--color-bus);
   --tilavaraus-admin-blue-dark: #040091;
   --tilavaraus-admin-header-background-color: var(--tilavaraus-admin-brand);
   --tilavaraus-admin-header-color: white;

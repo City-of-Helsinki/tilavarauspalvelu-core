@@ -9,8 +9,8 @@ import { ReactComponent as IconCalendar } from "../../images/icon_calendar.svg";
 
 interface IProps {
   id: number;
-  start: string;
-  end: string;
+  start: string | null;
+  end: string | null;
   weekday: number;
   biweekly: boolean;
   timeStart: string;
@@ -30,13 +30,16 @@ const Heading = styled(Row)`
 const Col = styled.td`
   white-space: nowrap;
   padding-right: var(--spacing-m);
+  vertical-align: top;
 `;
 
 const Day = styled.div`
   display: inline-flex;
   border: 2px solid var(--color-black);
-  padding: var(--spacing-3-xs) var(--spacing-s);
+  padding: var(--spacing-3-xs) 0;
   margin-right: var(--spacing-s);
+  width: var(--spacing-layout-l);
+  justify-content: center;
 `;
 
 interface IDateLabelProps {

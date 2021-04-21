@@ -15,7 +15,7 @@ interface IProps {
 const Content = styled.div`
   --width: 518px;
   --padding: var(--spacing-layout-l);
-  position: absolute;
+  position: fixed;
   top: 30vh;
   right: var(--spacing-m);
   left: var(--spacing-m);

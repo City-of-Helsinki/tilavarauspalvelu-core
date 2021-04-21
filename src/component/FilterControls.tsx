@@ -126,7 +126,7 @@ function FilterControls({
                 data-testid="filter-controls__filter--selector"
                 key={`${filterAccordion.title}${filter.key}${filter.value}`}
                 id={`filter.${filterAccordion.title}.${filter.key}.${filter.value}`}
-                label={t(filter.title)}
+                label={filter?.title ? t(filter.title) : ""}
                 checked={!!preliminaryFilters.find((n) => isEqual(n, filter))}
                 onChange={() => toggleActiveFilter(filter)}
               />

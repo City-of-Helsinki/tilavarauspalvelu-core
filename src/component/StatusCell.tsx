@@ -2,12 +2,12 @@ import React from "react";
 import styled from "styled-components";
 import { IconArrowRight } from "hds-react";
 import { useTranslation } from "react-i18next";
-import { ApplicationStatus } from "../common/types";
+import { ApplicationStatus, RecommendationStatus } from "../common/types";
 import { StatusDot } from "../styles/util";
 
 interface IStatusCellProps {
   text: string;
-  status?: ApplicationStatus;
+  status?: ApplicationStatus | RecommendationStatus;
 }
 
 const Wrapper = styled.div`

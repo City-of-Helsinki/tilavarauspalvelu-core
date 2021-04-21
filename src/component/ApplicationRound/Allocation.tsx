@@ -14,7 +14,7 @@ import {
 } from "../../styles/layout";
 import { ContentHeading } from "../../styles/typography";
 import { breakpoints, NotificationBox, Strong } from "../../styles/util";
-import Heading from "../Application/Heading";
+import Heading from "./Heading";
 import StatusRecommendation from "../Application/StatusRecommendation";
 import withMainMenu from "../withMainMenu";
 import ApplicationRoundNavi from "./ApplicationRoundNavi";
@@ -154,73 +154,63 @@ function Allocation({
   return (
     <Wrapper>
       <Heading />
-      {applicationRound && (
-        <>
-          <IngressContainer>
-            <ApplicationRoundNavi applicationRoundId={applicationRound.id} />
+      <IngressContainer>
+        <ApplicationRoundNavi applicationRoundId={applicationRound.id} />
+        <div>
+          <ContentHeading>{applicationRound.name}</ContentHeading>
+          <Details>
             <div>
-              <ContentHeading>{applicationRound.name}</ContentHeading>
-              <Details>
-                <div>
-                  <TimeframeStatus
-                    applicationPeriodBegin={
-                      applicationRound.applicationPeriodBegin
-                    }
-                    applicationPeriodEnd={applicationRound.applicationPeriodEnd}
+              <TimeframeStatus
+                applicationPeriodBegin={applicationRound.applicationPeriodBegin}
+                applicationPeriodEnd={applicationRound.applicationPeriodEnd}
+              />
+              <Recommendation>
+                <RecommendationLabel>
+                  {t("Application.recommendedStage")}:
+                </RecommendationLabel>
+                <RecommendationValue>
+                  <StatusRecommendation
+                    status="review_done"
+                    applicationRound={applicationRound}
                   />
-                  <Recommendation>
-                    <RecommendationLabel>
-                      {t("Application.recommendedStage")}:
-                    </RecommendationLabel>
-                    <RecommendationValue>
-                      <StatusRecommendation
-                        status="review_done"
-                        applicationRound={applicationRound}
-                      />
-                    </RecommendationValue>
-                  </Recommendation>
-                </div>
-              </Details>
+                </RecommendationValue>
+              </Recommendation>
             </div>
-          </IngressContainer>
-          <WideContainer>
-            <NotificationBox>
-              <Strong>
-                {t("ApplicationRound.allocationNotificationHeading")}
-              </Strong>
-              <p>{t("ApplicationRound.allocationNotificationBody")}</p>
-            </NotificationBox>
-          </WideContainer>
-          <NarrowContainer>
-            <ActionContainer>
-              <div className="box">
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={() => {
-                    setApplicationRoundStatus("in_review");
-                  }}
-                >
-                  {t("ApplicationRound.navigateBackToReview")}
-                </Button>
-              </div>
-              <div className="box">
-                <Button
-                  type="submit"
-                  variant="primary"
-                  onClick={() => startAllocation()}
-                  iconLeft={<IconArrowRedo />}
-                >
-                  {t("ApplicationRound.allocateAction")}
-                </Button>
-                <div className="label">
-                  {t("ApplicationRound.allocateLabel")}
-                </div>
-              </div>
-            </ActionContainer>
-          </NarrowContainer>
-        </>
-      )}
+          </Details>
+        </div>
+      </IngressContainer>
+      <WideContainer>
+        <NotificationBox>
+          <Strong>{t("ApplicationRound.allocationNotificationHeading")}</Strong>
+          <p>{t("ApplicationRound.allocationNotificationBody")}</p>
+        </NotificationBox>
+      </WideContainer>
+      <NarrowContainer>
+        <ActionContainer>
+          <div className="box">
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => {
+                setApplicationRoundStatus("in_review");
+              }}
+            >
+              {t("ApplicationRound.navigateBackToReview")}
+            </Button>
+          </div>
+          <div className="box">
+            <Button
+              type="submit"
+              variant="primary"
+              onClick={() => startAllocation()}
+              iconLeft={<IconArrowRedo />}
+            >
+              {t("ApplicationRound.allocateAction")}
+            </Button>
+            <div className="label">{t("ApplicationRound.allocateLabel")}</div>
+          </div>
+        </ActionContainer>
+      </NarrowContainer>
       {isAllocating && <AllocatingDialogContent />}
       {errorMsg && (
         <Notification

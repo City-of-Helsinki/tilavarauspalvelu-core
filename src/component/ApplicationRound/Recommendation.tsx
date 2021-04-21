@@ -8,38 +8,46 @@ import {
   IconArrowRight,
   IconCheckCircle,
   IconCrossCircle,
+  IconFaceSmile,
+  IconInfoCircle,
   Notification,
 } from "hds-react";
-import { getApplication, getApplicationRound } from "../../common/api";
 import {
+  getAllocationResult,
+  getApplication,
+  getApplicationRound,
+  setApplicationEventStatuses,
+} from "../../common/api";
+import {
+  AllocationResult,
   Application as ApplicationType,
+  ApplicationEventStatus,
   ApplicationRound as ApplicationRoundType,
 } from "../../common/types";
-import { formatNumber, parseDuration } from "../../common/util";
+import { formatNumber, parseAgeGroups, parseDuration } from "../../common/util";
 import {
   ContentContainer,
   IngressContainer,
   NarrowContainer,
 } from "../../styles/layout";
-import { H1, H2 } from "../../styles/typography";
+import { H1, H2, H3 } from "../../styles/typography";
 import {
   BasicLink,
   breakpoints,
   Divider,
   PlainButton,
-  Strong,
 } from "../../styles/util";
 import LinkPrev from "../LinkPrev";
 import Loader from "../Loader";
-import ApplicationStatusBlock from "../Application/ApplicationStatusBlock";
 import withMainMenu from "../withMainMenu";
 import ApplicantBox from "./ApplicantBox";
 import RecommendedSlot from "./RecommendedSlot";
 import { ReactComponent as IconInformation } from "../../images/icon_information.svg";
+import ApplicationEventStatusBlock from "../Application/ApplicationEventStatusBlock";
 
 interface IRouteParams {
   applicationRoundId: string;
-  recommendationId: string;
+  applicationEventScheduleId: string;
 }
 
 const Wrapper = styled.div`
@@ -78,8 +86,23 @@ const Heading = styled(H1)`
   margin-bottom: var(--spacing-3-xs);
 `;
 
-const StyledApplicationStatusBlock = styled(ApplicationStatusBlock)`
+const StyledApplicationEventStatusBlock = styled(ApplicationEventStatusBlock)`
   margin-top: var(--spacing-xl);
+`;
+
+const StyledNotification = styled(Notification)`
+  margin: var(--spacing-2-xl) 0 var(--spacing-3-xl);
+  padding: var(--spacing-s) var(--spacing-l) var(--spacing-l);
+
+  div[role="heading"] {
+    display: none;
+  }
+
+  h3 {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+  }
 `;
 
 const Subheading = styled(H2)`
@@ -130,37 +153,73 @@ const ActionContainer = styled.div`
   }
 `;
 
-// TODO: clean up route
 function Recommendation(): JSX.Element {
   const [isLoading, setIsLoading] = useState(true);
-  const [recommendation, setRecommendation] = useState<any>(null); // eslint-disable-line @typescript-eslint/no-explicit-any
+  const [isSaving, setIsSaving] = useState(false);
+  const [recommendation, setRecommendation] = useState<AllocationResult | null>(
+    null
+  );
   const [application, setApplication] = useState<ApplicationType | null>(null);
   const [
     applicationRound,
     setApplicationRound,
   ] = useState<ApplicationRoundType | null>(null);
+  const [actionNotification, setActionNotification] = useState<string | null>(
+    null
+  );
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const { t } = useTranslation();
-  const { applicationRoundId, recommendationId } = useParams<IRouteParams>();
+  const {
+    applicationRoundId,
+    applicationEventScheduleId,
+  } = useParams<IRouteParams>();
+
+  const modifyRecommendation = async (
+    id: number,
+    status: ApplicationEventStatus
+  ) => {
+    try {
+      setIsSaving(true);
+      setActionNotification(null);
+      await setApplicationEventStatuses([
+        {
+          status,
+          applicationEventId: id,
+        },
+      ]);
+      setErrorMsg(null);
+      setActionNotification(status);
+    } catch (error) {
+      setErrorMsg("errors.errorSavingApplication");
+    } finally {
+      setTimeout(() => setIsSaving(false), 1000);
+    }
+  };
+
+  const fetchRecommendation = async (aesId: number, appRoundId: number) => {
+    try {
+      const recommendationResult = await getAllocationResult({
+        id: aesId,
+      });
+      const applicationRoundResult = await getApplicationRound({
+        id: appRoundId,
+      });
+
+      setRecommendation(recommendationResult);
+      setApplicationRound(applicationRoundResult);
+    } catch (error) {
+      setErrorMsg("errors.errorFetchingApplication");
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async (recId: number, appRoundId: number) => {
-      try {
-        const result = await getApplicationRound({
-          id: appRoundId,
-        });
-
-        setRecommendation({ applicationId: recId });
-        setApplicationRound(result);
-      } catch (error) {
-        setErrorMsg("errors.errorFetchingApplication");
-        setIsLoading(false);
-      }
-    };
-
-    fetchData(Number(recommendationId), Number(applicationRoundId));
-  }, [applicationRoundId, recommendationId]);
+    fetchRecommendation(
+      Number(applicationEventScheduleId),
+      Number(applicationRoundId)
+    );
+  }, [applicationRoundId, applicationEventScheduleId]);
 
   useEffect(() => {
     const fetchApplication = async (id: number) => {
@@ -179,53 +238,95 @@ function Recommendation(): JSX.Element {
     }
   }, [recommendation]);
 
-  if (isLoading || !application) {
+  const schedule = recommendation?.applicationEvent.applicationEventSchedules.find(
+    (n) => n.id === Number(applicationEventScheduleId)
+  );
+
+  if (isLoading || !application || !recommendation) {
     return <Loader />;
   }
 
   return (
     <Wrapper>
       <ContentContainer>
-        <LinkPrev route={`/applicationRound/${applicationRoundId}?allocated`} />
+        <LinkPrev route={`/applicationRound/${applicationRoundId}`} />
       </ContentContainer>
       <IngressContainer>
         <Top>
           <div>
             <LinkToOthers
-              to={`/applicationRound/${applicationRoundId}/applicant/${application.id}`}
+              to={`/applicationRound/${applicationRoundId}/applicant/${recommendation.applicantId}`}
             >
-              {t("Recommendation.linkToOtherRecommendations")} TODO
+              {t("Recommendation.linkToOtherRecommendations")}
             </LinkToOthers>
-            <div>
-              {t("Application.applicationId")} <Strong>???????</Strong>{" "}
-            </div>
-            <Heading>Ehdotus, osa ??????</Heading>
+            <Heading>{recommendation.applicationEvent.name}</Heading>
             <div>{applicationRound?.name}</div>
-            <StyledApplicationStatusBlock status="allocated" />
+            <StyledApplicationEventStatusBlock
+              status={recommendation.applicationEvent.status}
+            />
           </div>
           <div>{application && <ApplicantBox application={application} />}</div>
         </Top>
       </IngressContainer>
       <NarrowContainer>
+        {actionNotification === "validated" && (
+          <StyledNotification
+            type="success"
+            dismissible
+            onClose={() => setActionNotification(null)}
+            closeButtonLabelText={`${t("common.close")}`}
+            label={t("Recommendation.approveSuccessHeading")}
+          >
+            <H3>
+              <IconFaceSmile size="s" />{" "}
+              {t("Recommendation.approveSuccessHeading")}
+            </H3>
+            <div>{t("Recommendation.approveSuccessBody")}</div>
+          </StyledNotification>
+        )}
+        {actionNotification === "declined" && (
+          <StyledNotification
+            type="info"
+            dismissible
+            onClose={() => setActionNotification(null)}
+            closeButtonLabelText={`${t("common.close")}`}
+            label={t("Recommendation.banSuccessHeading")}
+          >
+            <H3>
+              <IconInfoCircle size="s" />{" "}
+              {t("Recommendation.banSuccessHeading")}
+            </H3>
+            <div>{t("Recommendation.banSuccessBody")}</div>
+          </StyledNotification>
+        )}
         <Subheading>{t("Recommendation.summary")}</Subheading>
         <Props>
           <PropRow>
+            <Label>{t("ApplicationRound.basket")}</Label>
+            {trim(
+              `${recommendation.basketOrderNumber}. ${recommendation.basketName}`,
+              ". "
+            )}
+          </PropRow>
+          <PropRow>
             <Label>{t("Application.headings.purpose")}</Label>
-            <Value>???</Value>
+            <Value>{recommendation.applicationEvent.purpose}</Value>
           </PropRow>
           <PropRow>
             <Label>{t("Application.headings.ageGroup")}</Label>
-            <Value>???</Value>
+            <Value>
+              {parseAgeGroups(recommendation.applicationEvent.ageGroupDisplay)}
+            </Value>
           </PropRow>
           <PropRow>
             <Label>{t("ApplicationRound.appliedReservations")}</Label>
             <Value>
               {trim(
                 `${formatNumber(
-                  application?.aggregatedData?.reservationsTotal,
+                  recommendation.applicationAggregatedData?.reservationsTotal,
                   t("common.volumeUnit")
                 )} / ${parseDuration(
-                  application?.aggregatedData?.minDurationTotal
+                  recommendation.applicationAggregatedData?.minDurationTotal
                 )}`,
                 " / "
               )}
@@ -233,44 +334,38 @@ function Recommendation(): JSX.Element {
           </PropRow>
           <PropRow>
             <Label>{t("ApplicationRound.appliedSpace")}</Label>
-            <Value>???</Value>
+            <Value>
+              {trim(
+                `${recommendation.allocatedReservationUnitName}, ${recommendation.unitName}`,
+                ", "
+              )}
+            </Value>
           </PropRow>
           <PropRow>
-            <Label>{t("Organisation.extraInformation")}</Label>
-            <Value>???</Value>
+            <Label>{t("ApplicationEvent.groupSize")}</Label>
+            <Value>
+              {t("common.personUnit", {
+                count: recommendation.applicationEvent.numPersons || 0,
+              })}
+            </Value>
           </PropRow>
         </Props>
         <Divider />
         <H2 as="h3">{t("Recommendation.recommendedSlot")}</H2>
         <Recommendations>
           <table>
-            <RecommendedSlot
-              id={1}
-              start="2021-01-01T00:00:00Z"
-              end="2022-12-31T00:00:00Z"
-              weekday={4}
-              biweekly
-              timeStart="8:00:00"
-              timeEnd="9:00:00"
-            />
-            <RecommendedSlot
-              id={1}
-              start="2021-01-01T00:00:00Z"
-              end="2022-01-01T00:00:00Z"
-              weekday={0}
-              biweekly={false}
-              timeStart="15:00:00"
-              timeEnd="17:00:00"
-            />
-            <RecommendedSlot
-              id={1}
-              start="2021-01-01T00:00:00Z"
-              end="2022-01-01T00:00:00Z"
-              weekday={2}
-              biweekly
-              timeStart="22:00:00"
-              timeEnd="24:00:00"
-            />
+            {schedule && (
+              <RecommendedSlot
+                key={schedule.id}
+                id={schedule.id}
+                start={recommendation.applicationEvent.begin}
+                end={recommendation.applicationEvent.end}
+                weekday={schedule.day}
+                biweekly={recommendation.applicationEvent.biweekly}
+                timeStart={schedule.begin}
+                timeEnd={schedule.end}
+              />
+            )}
           </table>
         </Recommendations>
         <Terms>
@@ -295,7 +390,14 @@ function Recommendation(): JSX.Element {
             <Button
               variant="secondary"
               iconLeft={<IconCrossCircle />}
-              onClick={() => console.log("decline")} // eslint-disable-line no-console
+              onClick={() =>
+                recommendation?.applicationEventScheduleId &&
+                modifyRecommendation(
+                  recommendation.applicationEventScheduleId,
+                  "declined"
+                )
+              }
+              disabled={isSaving}
             >
               {t("Recommendation.actionDecline")}
             </Button>
@@ -303,6 +405,7 @@ function Recommendation(): JSX.Element {
               variant="secondary"
               iconLeft={<IconArrowRight />}
               onClick={() => console.log("ignore")} // eslint-disable-line no-console
+              disabled={isSaving}
             >
               {t("Recommendation.actionIgnoreSpace")}
             </Button>
@@ -311,9 +414,14 @@ function Recommendation(): JSX.Element {
             <Button
               variant="primary"
               iconLeft={<IconCheckCircle />}
-              onClick={
-                () => console.log("approve") // eslint-disable-line no-console
+              onClick={() =>
+                recommendation?.applicationEventScheduleId &&
+                modifyRecommendation(
+                  recommendation.applicationEventScheduleId,
+                  "validated"
+                )
               }
+              disabled={isSaving}
             >
               {t("Recommendation.actionApprove")}
             </Button>

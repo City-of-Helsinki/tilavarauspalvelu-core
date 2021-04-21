@@ -2,11 +2,12 @@ import React from "react";
 import { Button } from "hds-react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import { breakpoints } from "../../styles/util";
+import { BasicLink, breakpoints } from "../../styles/util";
 import { H3 } from "../../styles/typography";
 import SecondaryNavigation from "../SecondaryNavigation";
 import { ReactComponent as RecurringReservation } from "../../images/icon_recurring-reservation.svg";
 import { ReactComponent as IndividualReservation } from "../../images/icon_individual-reservation.svg";
+import { ReactComponent as IconList } from "../../images/icon_list.svg";
 
 const Wrapper = styled.div`
   padding: var(--spacing-m) var(--spacing-m) 0 var(--spacing-m);
@@ -36,6 +37,12 @@ const Tab = styled(Button).attrs({ variant: "secondary" })<{
     color: var(--color-black) !important;
   }
 
+  &[disabled] {
+    svg {
+      opacity: 0.4;
+    }
+  }
+
   font-family: var(--tilavaraus-admin-font-medium);
   font-size: 1rem;
   color: var(--color-black);
@@ -51,9 +58,10 @@ const Subheading = styled(H3)`
 
 const Bottom = styled.div`
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
+  padding-bottom: var(--spacing-m);
 
   @media (min-width: ${breakpoints.m}) {
     flex-wrap: nowrap;
@@ -77,16 +85,11 @@ function Heading(): JSX.Element {
         <Subheading>{t("common.youthServices")}</Subheading>
       </Top>
       <Bottom>
-        <SecondaryNavigation
-          items={[
-            { title: t("ApplicationRound.pastRounds") },
-            { title: t("ApplicationRound.roundsInProcessing") },
-            {
-              title: t("ApplicationRound.roundsOpenForApplication"),
-            },
-            { title: t("ApplicationRound.futureRounds") },
-          ]}
-        />
+        <SecondaryNavigation items={[]} />
+        <BasicLink to="/applicationRounds">
+          <IconList style={{ marginTop: "-2px" }} />{" "}
+          {t("ApplicationRound.browseAllApplicationRounds")}
+        </BasicLink>
       </Bottom>
     </Wrapper>
   );
