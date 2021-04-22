@@ -12,7 +12,7 @@ from applications.models import (
     Organisation,
     User,
 )
-from permissions.api_permissions import AllocationRequestPermission
+from permissions.api_permissions import AllocationResultsPermission
 from reservation_units.models import ReservationUnit
 
 
@@ -123,7 +123,7 @@ class AllocationResultsFilter(filters.FilterSet):
         )
 
 
-class AllocationResultViewSet(viewsets.ModelViewSet):
+class AllocationResultViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = ApplicationEventScheduleResult.objects.all().order_by(
         "application_event_schedule__application_event_id"
     )
@@ -131,7 +131,7 @@ class AllocationResultViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_class = AllocationResultsFilter
     permission_classes = (
-        [AllocationRequestPermission]
+        [AllocationResultsPermission]
         if not settings.TMP_PERMISSIONS_DISABLED
         else [permissions.AllowAny]
     )
