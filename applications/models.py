@@ -784,6 +784,7 @@ class EventOccurrence(object):
         begin: datetime.time,
         end: datetime.time,
         occurrences: [datetime.datetime],
+
     ):
         self.weekday = weekday
         self.begin = begin
