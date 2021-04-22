@@ -7,7 +7,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('reservation_units', '0013_reservationunit_uuid'),
-        ('applications', '0034_created_and_modified_field_application'),
+        ('applications', '0035_refactor_application_statuses'),
     ]
 
     operations = [
