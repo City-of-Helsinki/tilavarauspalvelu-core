@@ -191,6 +191,26 @@ class AllocationRequestPermission(permissions.BasePermission):
             return False
 
 
+class AllocationResultsPermission(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return False
+
+    def has_permission(self, request, view):
+        service_sector_id = request.data.get(
+            "service_sector_id"
+        ) or request.query_params.get("service_sector_id")
+        service_sector = ServiceSector.objects.filter(id=service_sector_id).first()
+        if not service_sector:
+            return False
+
+        if (
+            request.method in permissions.SAFE_METHODS
+            and can_allocate_service_sector_allocations(request.user, service_sector)
+        ):
+            return True
+        return False
+
+
 class ApplicationEventPermission(permissions.BasePermission):
     def has_object_permission(self, request, view, application_event):
         return can_modify_application(request.user, application_event.application)
