@@ -799,3 +799,24 @@ def valid_unit_viewer_data(user, unit):
 @pytest.fixture(autouse=True)
 def enable_db_access_for_all_tests(db):
     pass
+
+
+@pytest.mark.django_db
+@pytest.fixture
+def staff_user():
+    user = get_user_model().objects.create(
+        username="gen_admin",
+        first_name="Amin",
+        last_name="General",
+        email="amin.general@foo.com",
+        is_staff=True,
+    )
+
+    return user
+
+
+@pytest.fixture
+def staff_user_api_client(staff_user):
+    api_client = APIClient()
+    api_client.force_authenticate(staff_user)
+    return api_client
