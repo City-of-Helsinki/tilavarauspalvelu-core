@@ -20,22 +20,23 @@ class AllocationResultMapper(object):
                 application_event_schedule = ApplicationEventSchedule.objects.get(
                     pk=allocated_event.occurrence_id
                 )
-                ApplicationEventScheduleResult.objects.update_or_create(
+
+                ApplicationEventScheduleResult.objects.create(
                     application_event_schedule=application_event_schedule,
-                    defaults={
-                        "allocated_reservation_unit_id": allocated_event.space_id,
-                        "allocated_day": application_event_schedule.day,
-                        "allocated_duration": allocated_event.duration,
-                        "allocated_begin": allocated_event.begin,
-                        "allocated_end": allocated_event.end,
-                        "basket": allocated_event.basket_id,
-                    },
+                    accepted=False,
+                    allocated_reservation_unit_id=allocated_event.space_id,
+                    allocated_duration=allocated_event.duration,
+                    allocated_begin=allocated_event.begin,
+                    allocated_end=allocated_event.end,
+                    allocated_day=application_event_schedule.day,
                 )
+
                 ApplicationEventStatus.objects.create(
                     status=ApplicationEventStatus.ALLOCATED,
                     application_event=application_event_schedule.application_event,
                 )
-            except ApplicationEventScheduleResult.DoesNotExist:
+            except Exception:
                 logger.exception(
                     "AllocationResultMapper: error occurred while creating event schedule results."
                 )
+                raise

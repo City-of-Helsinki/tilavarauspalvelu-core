@@ -45,12 +45,18 @@ class AllocationDataBuilder(object):
     ) -> [AllocationEvent]:
         events = []
         for application_event in application_events:
-            declined_unit_ids = [unit.id for unit in application_event.declined_reservation_units.all()]
-            space_ids = [unit.reservation_unit.id for unit in application_event.event_reservation_units.all() if unit.reservation_unit.id not in declined_unit_ids]
+            declined_unit_ids = [
+                unit.id for unit in application_event.declined_reservation_units.all()
+            ]
+            space_ids = [
+                unit.reservation_unit.id
+                for unit in application_event.event_reservation_units.all()
+                if unit.reservation_unit.id not in declined_unit_ids
+            ]
             events.append(
                 AllocationEvent(
                     id=application_event.id,
-                    occurrences=application_event.get_all_occurrences(),
+                    occurrences=application_event.get_not_scheduled_occurrences(),
                     period_start=self.period_start,
                     period_end=self.period_end,
                     space_ids=space_ids,
@@ -65,7 +71,6 @@ class AllocationDataBuilder(object):
                 )
             )
         return events
-
 
     def get_all_dates(self):
         dates = []

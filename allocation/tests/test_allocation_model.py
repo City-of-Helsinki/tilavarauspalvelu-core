@@ -75,6 +75,23 @@ def test_should_map_application_events(
         hour * 2
     )
 
+
+@pytest.mark.django_db
+def test_should_exclude_already_accepted_schedules(
+    application_round_with_reservation_units,
+    application_with_reservation_units,
+    recurring_application_event,
+    scheduled_for_monday,
+    result_scheduled_for_monday,
+):
+
+    data = AllocationDataBuilder(
+        application_round=application_round_with_reservation_units
+    ).get_allocation_data()
+
+    assert_that(data.baskets[None].events[0].occurrences).is_empty()
+
+
 @pytest.mark.django_db
 def test_should_map_units_to_spaces(
     application_round_with_reservation_units,
@@ -88,9 +105,9 @@ def test_should_map_units_to_spaces(
         application_round=application_round_with_reservation_units
     ).get_allocation_data()
 
-
-    assert_that(
-        data.baskets[None].events[0].space_ids).is_equal_to([matching_event_reservation_unit.reservation_unit.id])
+    assert_that(data.baskets[None].events[0].space_ids).is_equal_to(
+        [matching_event_reservation_unit.reservation_unit.id]
+    )
 
 
 @pytest.mark.django_db
@@ -102,14 +119,15 @@ def test_should_exclude_declined_units(
     scheduled_for_monday,
 ):
 
-    recurring_application_event.declined_reservation_units.set([matching_event_reservation_unit.reservation_unit])
+    recurring_application_event.declined_reservation_units.set(
+        [matching_event_reservation_unit.reservation_unit]
+    )
     data = AllocationDataBuilder(
         application_round=application_round_with_reservation_units
     ).get_allocation_data()
 
+    assert_that(data.baskets[None].events[0].space_ids).is_equal_to([])
 
-    assert_that(
-        data.baskets[None].events[0].space_ids).is_equal_to([])
 
 @pytest.mark.django_db
 def test_should_handle_none_max_duration(
