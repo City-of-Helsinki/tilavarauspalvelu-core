@@ -1,15 +1,63 @@
 import datetime
+from unittest import mock
 
 import pytest
 from assertpy import assert_that
+from django.conf import settings
+from django.utils import timezone
 
 from allocation.allocation_data_builder import AllocationDataBuilder
 from allocation.allocation_models import ALLOCATION_PRECISION
 from allocation.tests.conftest import get_default_end, get_default_start
+from opening_hours.hours import TimeElement
 
 
+def every_second_day(p_start, p_end):
+    dates = []
+    start = p_start
+    delta = datetime.timedelta(days=2)
+    while start <= p_end:
+        dates.append(start)
+        start += delta
+    return dates
+
+
+def get_opening_hour_data(*args, **kwargs):
+    if len(args) < 3:
+        return []
+    (id, start, end) = args
+    dates = every_second_day(start, end)
+    response = []
+    for date in dates:
+        response.append(
+            {
+                "resource_id": id,
+                "date": date,
+                "times": [
+                    TimeElement(
+                        start_time=datetime.time(
+                            hour=14, tzinfo=timezone.get_default_timezone()
+                        ),
+                        end_time=datetime.time(
+                            hour=18, tzinfo=timezone.get_default_timezone()
+                        ),
+                        end_time_on_next_day=False,
+                    )
+                ],
+            }
+        )
+    return response
+
+
+@mock.patch(
+    "allocation.allocation_data_builder.get_opening_hours",
+    side_effect=get_opening_hour_data,
+)
 @pytest.mark.django_db
-def test_should_map_application_round_dates(application_round_with_reservation_units):
+def test_should_map_application_round_dates(
+    mocked_opening_hours, application_round_with_reservation_units
+):
+    mocked_opening_hours()
     data = AllocationDataBuilder(
         application_round=application_round_with_reservation_units
     ).get_allocation_data()
@@ -19,7 +67,7 @@ def test_should_map_application_round_dates(application_round_with_reservation_u
 
 
 @pytest.mark.django_db
-def test_should_map_reservation_unit_open_times(
+def test_should_map_reservation_unit_open_times_with_mock_data(
     application_with_reservation_units, application_round_with_reservation_units
 ):
 
@@ -41,6 +89,39 @@ def test_should_map_reservation_unit_open_times(
             round((i * 24 + 22) * 60 // ALLOCATION_PRECISION),
         ]
         for i in range(31)
+    ]
+    assert_that(times).is_equal_to(expected)
+
+
+@mock.patch(
+    "allocation.allocation_data_builder.get_opening_hours",
+    side_effect=get_opening_hour_data,
+)
+@pytest.mark.django_db
+def test_should_map_reservation_unit_open_times_from_hauki(
+    application_with_reservation_units, application_round_with_reservation_units
+):
+
+    settings.HAUKI_API_URL = "http://test.com"
+    data = AllocationDataBuilder(
+        application_round=application_round_with_reservation_units
+    ).get_allocation_data()
+
+    times = [
+        [available.start, available.end]
+        for available in data.spaces[
+            application_round_with_reservation_units.reservation_units.all()[0].id
+        ].available_times
+    ]
+
+    # Open every second day from 14 to 18
+    expected = [
+        [
+            round((i * 24 + 14) * 60 // ALLOCATION_PRECISION),
+            round((i * 24 + 18) * 60 // ALLOCATION_PRECISION),
+        ]
+        for i in range(31)
+        if i % 2 == 0
     ]
     assert_that(times).is_equal_to(expected)
 
