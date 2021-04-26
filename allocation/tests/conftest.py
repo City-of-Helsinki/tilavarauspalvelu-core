@@ -21,6 +21,11 @@ def setup_audit_log(settings):
     settings.AUDIT_LOGGING_ENABLED = False
 
 
+@pytest.fixture(autouse=True)
+def disable_hauki_api(settings):
+    settings.HAUKI_API_URL = None
+
+
 def get_default_start() -> datetime.date:
     return datetime.date(year=2020, month=1, day=1)
 

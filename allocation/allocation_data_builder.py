@@ -2,6 +2,7 @@ import datetime
 from itertools import chain
 from typing import Dict, List
 
+from django.conf import settings
 from django.utils import timezone
 
 from allocation.allocation_models import (
@@ -11,6 +12,7 @@ from allocation.allocation_models import (
     AllocationSpace,
 )
 from applications.models import ApplicationEvent, ApplicationRound
+from opening_hours.hours import get_opening_hours
 from reservation_units.models import ReservationUnit
 
 
@@ -79,16 +81,9 @@ class AllocationDataBuilder(object):
             start += delta
         return dates
 
-    def get_space(self, unit: ReservationUnit):
+    def set_mock_opening_hour_data(self, space: AllocationSpace) -> AllocationSpace:
+        # Hardcoded data for dev purposes
         all_dates = self.get_all_dates()
-        space = AllocationSpace(
-            unit=unit,
-            period_start=self.period_start,
-            period_end=self.period_end,
-            times=[],
-        )
-        # TODO: This is hardcoded for now so we can go ahead with this
-        # replace with dates from models when it's implemented
         for the_date in all_dates:
             space.add_time(
                 start=datetime.datetime(
@@ -106,6 +101,46 @@ class AllocationDataBuilder(object):
                     tzinfo=timezone.get_default_timezone(),
                 ),
             )
+        return space
+
+    def get_space(self, unit: ReservationUnit):
+        space = AllocationSpace(
+            unit=unit,
+            period_start=self.period_start,
+            period_end=self.period_end,
+            times=[],
+        )
+
+        if not settings.HAUKI_API_URL:
+            return self.set_mock_opening_hour_data(space)
+
+        opening_hours = get_opening_hours(
+            f"{settings.HAUKI_ORIGIN_ID}:{unit.uuid}",
+            self.application_round.reservation_period_begin,
+            self.application_round.reservation_period_end,
+        )
+
+        for opening_hour in opening_hours:
+            date = opening_hour["date"]
+            for time in opening_hour["times"]:
+                space.add_time(
+                    start=datetime.datetime(
+                        year=date.year,
+                        month=date.month,
+                        day=date.day,
+                        hour=time.start_time.hour,
+                        minute=time.start_time.minute,
+                        tzinfo=time.start_time.tzinfo,
+                    ),
+                    end=datetime.datetime(
+                        year=date.year,
+                        month=date.month,
+                        day=date.day,
+                        hour=time.end_time.hour,
+                        minute=time.end_time.minute,
+                        tzinfo=time.end_time.tzinfo,
+                    ),
+                )
         return space
 
     def get_event_baskets(self) -> Dict[int, List[int]]:
