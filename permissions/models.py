@@ -104,6 +104,7 @@ UNIT_PERMISSIONS = (
         "can_allocate_applications",
         _("Can allocate applications"),
     ),
+    ("can_validate_applications", _("Can validate applications")),
 )
 
 SERVICE_SECTOR_PERMISSIONS = (
