@@ -5,16 +5,25 @@ from applications.models import (
     ApplicationEventSchedule,
     ApplicationEventScheduleResult,
     ApplicationEventStatus,
+    ApplicationRound,
 )
 
 logger = logging.getLogger(__name__)
 
 
 class AllocationResultMapper(object):
-    def __init__(self, allocated_events: [AllocatedEvent]):
+    def __init__(
+        self, allocated_events: [AllocatedEvent], application_round: ApplicationRound
+    ):
         self.allocated_events = allocated_events
+        self.application_round = application_round
 
     def to_events(self):
+        ApplicationEventScheduleResult.objects.filter(
+            accepted=False,
+            application_event_schedule__application_event__application__application_round=self.application_round,
+            # noqa: E501
+        ).delete()
         for allocated_event in self.allocated_events:
             try:
                 application_event_schedule = ApplicationEventSchedule.objects.get(

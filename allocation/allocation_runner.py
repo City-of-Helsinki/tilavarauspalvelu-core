@@ -4,14 +4,9 @@ from allocation.allocation_data_builder import AllocationDataBuilder
 from allocation.allocation_solver import AllocationSolver
 from allocation.models import AllocationRequest
 from applications.allocation_result_mapper import AllocationResultMapper
-from applications.models import ApplicationEventScheduleResult
 
 
 def start_allocation(allocation_request: AllocationRequest):
-    ApplicationEventScheduleResult.objects.filter(
-        accepted=False,
-        application_event_schedule__application_event__application__application_round=allocation_request.application_round,  # noqa: E501
-    ).delete()
     data = AllocationDataBuilder(
         application_round=allocation_request.application_round,
         output_basket_ids=[
@@ -23,7 +18,10 @@ def start_allocation(allocation_request: AllocationRequest):
     allocation_request.application_round.save()
     try:
         allocation_events = solver.solve()
-        mapper = AllocationResultMapper(allocation_events)
+        mapper = AllocationResultMapper(
+            allocation_events=allocation_events,
+            application_round=allocation_request.application_round,
+        )
         mapper.to_events()
     except Exception:
         # Safeguard so we don't lock allocation on unexpected exceptions even though this shouldn't throw anything
