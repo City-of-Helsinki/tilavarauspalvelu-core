@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from applications.models import PRIORITIES, Application
+from applications.models import PRIORITIES, Application, ApplicationEvent
 from reservation_units.models import Purpose, ReservationUnit
 
 Q = models.Q
@@ -44,6 +44,15 @@ class RecurringReservation(models.Model):
     application = models.ForeignKey(
         Application,
         verbose_name=_("Application"),
+        related_name="recurring_reservation",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+    )
+
+    application_event = models.ForeignKey(
+        ApplicationEvent,
+        verbose_name=_("Application event"),
         related_name="recurring_reservation",
         null=True,
         blank=True,
