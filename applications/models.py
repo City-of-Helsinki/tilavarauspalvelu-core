@@ -749,6 +749,15 @@ class ApplicationEvent(models.Model):
     def __str__(self):
         return self.name if self.name else super().__str__()
 
+    def get_not_scheduled_occurrences(self):
+        occurences = {}
+        for event_shedule in filter(
+            lambda event: not hasattr(event, "application_event_schedule_result"),
+            self.application_event_schedules.all(),
+        ):
+            occurences[event_shedule.id] = event_shedule.get_occurences()
+        return occurences
+
     def get_all_occurrences(self):
 
         occurences = {}
@@ -876,10 +885,14 @@ class Recurrence(models.Model):
 
 
 class ApplicationEventScheduleResult(models.Model):
+
+    accepted = models.BooleanField(default=False, null=False)
+
     application_event_schedule = models.OneToOneField(
         ApplicationEventSchedule,
         on_delete=models.CASCADE,
         primary_key=True,
+        related_name="application_event_schedule_result",
     )
 
     allocated_reservation_unit = models.ForeignKey(

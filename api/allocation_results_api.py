@@ -5,13 +5,7 @@ from rest_framework import permissions, serializers, viewsets
 
 from api.applications_api.serializers import ApplicationEventSerializer
 from api.common_filters import ModelInFilter
-from applications.models import (
-    Application,
-    ApplicationEvent,
-    ApplicationEventScheduleResult,
-    Organisation,
-    User,
-)
+from applications.models import ApplicationEvent, ApplicationEventScheduleResult
 from permissions.api_permissions import AllocationResultsPermission
 from reservation_units.models import ReservationUnit
 
@@ -19,19 +13,20 @@ from reservation_units.models import ReservationUnit
 class ApplicationEventScheduleResultSerializer(serializers.ModelSerializer):
     applicant_id = serializers.PrimaryKeyRelatedField(
         source="application_event_schedule.application_event.application.user_id",
-        queryset=User.objects.all(),
+        read_only=True,
     )
     applicant_name = serializers.SerializerMethodField()
     application_id = serializers.PrimaryKeyRelatedField(
-        queryset=Application.objects.all(),
         source="application_event_schedule.application_event.application_id",
+        read_only=True,
     )
     organisation_id = serializers.PrimaryKeyRelatedField(
         source="application_event_schedule.application_event.application.organisation_id",
-        queryset=Organisation.objects.all(),
+        read_only=True,
     )
     organisation_name = serializers.CharField(
-        source="application_event_schedule.application_event.application.organisation.name"
+        source="application_event_schedule.application_event.application.organisation.name",
+        read_only=True,
     )
     application_event = ApplicationEventSerializer(
         source="application_event_schedule.application_event", read_only=True
@@ -73,6 +68,7 @@ class ApplicationEventScheduleResultSerializer(serializers.ModelSerializer):
             "basket_order_number",
             "application_aggregated_data",
             "declined_reservation_unit_ids",
+            "accepted",
         ]
 
     def get_unit_name(self, instance):

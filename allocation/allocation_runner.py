@@ -18,7 +18,10 @@ def start_allocation(allocation_request: AllocationRequest):
     allocation_request.application_round.save()
     try:
         allocation_events = solver.solve()
-        mapper = AllocationResultMapper(allocation_events)
+        mapper = AllocationResultMapper(
+            allocation_events=allocation_events,
+            application_round=allocation_request.application_round,
+        )
         mapper.to_events()
     except Exception:
         # Safeguard so we don't lock allocation on unexpected exceptions even though this shouldn't throw anything
