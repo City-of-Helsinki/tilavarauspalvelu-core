@@ -146,19 +146,19 @@ function ApplicationDetails(): JSX.Element | null {
     fetchApplication(Number(applicationId));
   }, [applicationId]);
 
-  if (isLoading || !application) {
+  if (isLoading) {
     return <Loader />;
   }
 
-  const isOrganisation = application.applicantType !== "individual";
+  const isOrganisation = application?.applicantType !== "individual";
 
   const billingAddress: string = isEqual(
-    omit(application.billingAddress, "id"),
-    omit(application.organisation?.address, "id")
+    omit(application?.billingAddress, "id"),
+    omit(application?.organisation?.address, "id")
   )
     ? t("common.same")
     : trim(
-        `${application.billingAddress?.streetAddress}, ${application.billingAddress?.postCode} ${application.billingAddress?.city}`,
+        `${application?.billingAddress?.streetAddress}, ${application?.billingAddress?.postCode} ${application?.billingAddress?.city}`,
         ", "
       );
 
@@ -168,208 +168,212 @@ function ApplicationDetails(): JSX.Element | null {
     !application.organisation?.identifier
   ) {
     applicantType = t("Application.applicantTypes.unregisteredAssociation");
-  } else if (application.applicantType) {
+  } else if (application?.applicantType) {
     applicantType = t(
-      `Application.applicantTypes.${application.applicantType}`
+      `Application.applicantTypes.${application?.applicantType}`
     );
   }
 
   return (
     <Wrapper>
-      <ContentContainer>
-        <LinkPrev route={`/application/${application.id}`} />
-      </ContentContainer>
-      <HeadingContainer>
-        <Heading data-testid="application-details__heading--main">
-          <CustomerIcon>
-            <IconCustomers />
-          </CustomerIcon>
-          <span>{application.organisation?.name}</span>
-        </Heading>
-        <DefinitionList>
-          <dt>{t("Application.applicantType")}:</dt>
-          <dd data-testid="application-details__data--applicant-type">
-            {application.applicantType &&
-              t(`Application.applicantTypes.${application.applicantType}`)}
-          </dd>
-        </DefinitionList>
-        <DefinitionList>
-          <dt>{t("Application.applicationReceivedTime")}:</dt>
-          <dd>todo</dd>
-        </DefinitionList>
-      </HeadingContainer>
-      <IngressContainer>
-        <ContentHeading>{t("Application.applicationDetails")}</ContentHeading>
-        <StyledAccordion
-          heading={t("Application.customerBasicInfo")}
-          defaultOpen
-        >
-          <AccordionContent>
-            <ValueBox
-              label={t("Application.contactForename")}
-              value={application.contactPerson?.firstName}
-            />
-            <ValueBox
-              label={t("Application.contactSurname")}
-              value={application.contactPerson?.lastName}
-            />
-            <ValueBox
-              label={t("common.emailAddress")}
-              value={application.contactPerson?.email || "-"}
-            />
-            <StyledDivider />
-            <ValueBox
-              label={t("Application.applicantType")}
-              value={applicantType}
-            />
-            {isOrganisation && (
-              <>
-                <ValueBox
-                  label={t("Application.organisationName")}
-                  value={application.organisation?.name}
-                />
-                <ValueBox
-                  label={t("common.streetAddress")}
-                  value={application.organisation?.address?.streetAddress}
-                />
-                <ValueBox
-                  label={t("common.postalNumber")}
-                  value={application.organisation?.address?.postCode}
-                />
-                <ValueBox
-                  label={t("common.postalDistrict")}
-                  value={application.organisation?.address?.city}
-                />
-                <ValueBox
-                  label={t("common.emailAddress")}
-                  value={application.organisation?.email || "-"}
-                />
-                <ValueBox
-                  label={t("Application.identificationNumber")}
-                  value={application.organisation?.identifier}
-                />
-                <StyledDivider />
-                <ValueBox
-                  label={t("common.billingAddress")}
-                  value={billingAddress}
-                />
-                <StyledDivider />
-                <ValueBox
-                  label={t("Organisation.activeParticipants")}
-                  value={`${formatNumber(
-                    application.organisation?.activeMembers,
-                    t("common.volumeUnit")
-                  )}`}
-                />
-              </>
-            )}
-          </AccordionContent>
-        </StyledAccordion>
-        {application.applicationEvents.map((applicationEvent) => {
-          let duration = "";
-          const minDuration =
-            applicationEvent.minDuration &&
-            formatDuration(applicationEvent.minDuration);
-          const maxDuration =
-            applicationEvent.maxDuration &&
-            formatDuration(applicationEvent.maxDuration);
-          if (minDuration) {
-            duration += `${t("common.minAmount")} ${
-              minDuration.hours && minDuration.hours + t("common.hoursUnit")
-            }`;
-            if (minDuration.minutes) {
-              duration += ` ${minDuration.minutes + t("common.minutesUnit")}`;
-            }
-          }
-          if (maxDuration) {
-            duration += `, ${t("common.maxAmount")} ${
-              maxDuration.hours && maxDuration.hours + t("common.hoursUnit")
-            }`;
-            if (maxDuration.minutes) {
-              duration += ` ${maxDuration.minutes + t("common.minutesUnit")}`;
-            }
-          }
-          duration = trim(duration, ", ");
-
-          return (
+      {application && (
+        <>
+          <ContentContainer>
+            <LinkPrev route={`/application/${application.id}`} />
+          </ContentContainer>
+          <HeadingContainer>
+            <Heading data-testid="application-details__heading--main">
+              <CustomerIcon>
+                <IconCustomers />
+              </CustomerIcon>
+              <span>{application.organisation?.name}</span>
+            </Heading>
+            <DefinitionList>
+              <dt>{t("Application.applicantType")}:</dt>
+              <dd data-testid="application-details__data--applicant-type">
+                {application.applicantType &&
+                  t(`Application.applicantTypes.${application.applicantType}`)}
+              </dd>
+            </DefinitionList>
+            <DefinitionList>
+              <dt>{t("Application.applicationReceivedTime")}:</dt>
+              <dd>todo</dd>
+            </DefinitionList>
+          </HeadingContainer>
+          <IngressContainer>
+            <ContentHeading>
+              {t("Application.applicationDetails")}
+            </ContentHeading>
             <StyledAccordion
-              key={applicationEvent.id}
-              heading={applicationEvent.name}
+              heading={t("Application.customerBasicInfo")}
               defaultOpen
             >
               <AccordionContent>
                 <ValueBox
-                  label={t("ApplicationEvent.name")}
-                  value={applicationEvent.name}
+                  label={t("Application.contactForename")}
+                  value={application.contactPerson?.firstName}
                 />
                 <ValueBox
-                  label={t("ApplicationEvent.groupSize")}
-                  value={`${formatNumber(
-                    applicationEvent.numPersons,
-                    t("common.membersSuffix")
-                  )}`}
+                  label={t("Application.contactSurname")}
+                  value={application.contactPerson?.lastName}
                 />
                 <ValueBox
-                  label={t("ApplicationEvent.ageGroup")}
-                  value={parseAgeGroups(applicationEvent.ageGroupDisplay)}
+                  label={t("common.emailAddress")}
+                  value={application.contactPerson?.email || "-"}
                 />
+                <StyledDivider />
                 <ValueBox
-                  label={t("ApplicationEvent.eventDuration")}
-                  value={duration}
+                  label={t("Application.applicantType")}
+                  value={applicantType}
                 />
-                <ValueBox
-                  label={t("ApplicationEvent.purpose")}
-                  value={applicationEvent.purpose}
-                  style={{ gridColumn: "1/-1" }}
-                />
-                <ValueBox
-                  label={t("ApplicationEvent.startDate")}
-                  value={formatDate(applicationEvent.begin)}
-                />
-                <ValueBox
-                  label={t("ApplicationEvent.endDate")}
-                  value={formatDate(applicationEvent.end)}
-                />
-                <ValueBox
-                  label={t("ApplicationEvent.eventsPerWeek")}
-                  value={`${applicationEvent.eventsPerWeek}`}
-                />
-                <ValueBox
-                  label={t("ApplicationEvent.biweekly")}
-                  value={t(`common.${applicationEvent.biweekly}`)}
-                />
-                {applicationEvent.eventReservationUnits.map(
-                  (reservationUnit) => (
+                {isOrganisation && (
+                  <>
                     <ValueBox
-                      label={`${t("common.option")} 1.`}
-                      value={`${
-                        reservationUnit.reservationUnitDetails.building.name
-                      }, ${localizedValue(
-                        reservationUnit.reservationUnitDetails.name,
-                        i18n.language
-                      )}`}
+                      label={t("Application.organisationName")}
+                      value={application.organisation?.name}
                     />
-                  )
+                    <ValueBox
+                      label={t("common.streetAddress")}
+                      value={application.organisation?.address?.streetAddress}
+                    />
+                    <ValueBox
+                      label={t("common.postalNumber")}
+                      value={application.organisation?.address?.postCode}
+                    />
+                    <ValueBox
+                      label={t("common.postalDistrict")}
+                      value={application.organisation?.address?.city}
+                    />
+                    <ValueBox
+                      label={t("common.emailAddress")}
+                      value={application.organisation?.email || "-"}
+                    />
+                    <ValueBox
+                      label={t("Application.identificationNumber")}
+                      value={application.organisation?.identifier}
+                    />
+                    <StyledDivider />
+                    <ValueBox
+                      label={t("common.billingAddress")}
+                      value={billingAddress}
+                    />
+                  </>
                 )}
               </AccordionContent>
-              <Subheading>{t("ApplicationEvent.requestedTimes")}</Subheading>
-              <AccordionContent>
-                {weekdays.map((day, index) => (
-                  <ValueBox
-                    label={`${t(`calendar.${day}`)}`}
-                    value={parseApplicationEventSchedules(
-                      applicationEvent.applicationEventSchedules,
-                      index
-                    )}
-                    icon={<IconClock />}
-                    key={`requestedTimes.${day}`}
-                  />
-                ))}
-              </AccordionContent>
             </StyledAccordion>
-          );
-        })}
-      </IngressContainer>
+            {application.applicationEvents.map((applicationEvent) => {
+              let duration = "";
+              const minDuration =
+                applicationEvent.minDuration &&
+                formatDuration(applicationEvent.minDuration);
+              const maxDuration =
+                applicationEvent.maxDuration &&
+                formatDuration(applicationEvent.maxDuration);
+              if (minDuration) {
+                duration += `${t("common.minAmount")} ${
+                  minDuration.hours && minDuration.hours + t("common.hoursUnit")
+                }`;
+                if (minDuration.minutes) {
+                  duration += ` ${
+                    minDuration.minutes + t("common.minutesUnit")
+                  }`;
+                }
+              }
+              if (maxDuration) {
+                duration += `, ${t("common.maxAmount")} ${
+                  maxDuration.hours && maxDuration.hours + t("common.hoursUnit")
+                }`;
+                if (maxDuration.minutes) {
+                  duration += ` ${
+                    maxDuration.minutes + t("common.minutesUnit")
+                  }`;
+                }
+              }
+              duration = trim(duration, ", ");
+
+              return (
+                <StyledAccordion
+                  key={applicationEvent.id}
+                  heading={applicationEvent.name}
+                  defaultOpen
+                >
+                  <AccordionContent>
+                    <ValueBox
+                      label={t("ApplicationEvent.name")}
+                      value={applicationEvent.name}
+                    />
+                    <ValueBox
+                      label={t("ApplicationEvent.groupSize")}
+                      value={`${formatNumber(
+                        applicationEvent.numPersons,
+                        t("common.membersSuffix")
+                      )}`}
+                    />
+                    <ValueBox
+                      label={t("ApplicationEvent.ageGroup")}
+                      value={parseAgeGroups(applicationEvent.ageGroupDisplay)}
+                    />
+                    <ValueBox
+                      label={t("ApplicationEvent.eventDuration")}
+                      value={duration}
+                    />
+                    <ValueBox
+                      label={t("ApplicationEvent.purpose")}
+                      value={applicationEvent.purpose}
+                      style={{ gridColumn: "1/-1" }}
+                    />
+                    <ValueBox
+                      label={t("ApplicationEvent.startDate")}
+                      value={formatDate(applicationEvent.begin)}
+                    />
+                    <ValueBox
+                      label={t("ApplicationEvent.endDate")}
+                      value={formatDate(applicationEvent.end)}
+                    />
+                    <ValueBox
+                      label={t("ApplicationEvent.eventsPerWeek")}
+                      value={`${applicationEvent.eventsPerWeek}`}
+                    />
+                    <ValueBox
+                      label={t("ApplicationEvent.biweekly")}
+                      value={t(`common.${applicationEvent.biweekly}`)}
+                    />
+                    {applicationEvent.eventReservationUnits.map(
+                      (reservationUnit, index) => (
+                        <ValueBox
+                          label={`${t("common.option")} ${index + 1}.`}
+                          value={`${
+                            reservationUnit.reservationUnitDetails.building.name
+                          }, ${localizedValue(
+                            reservationUnit.reservationUnitDetails.name,
+                            i18n.language
+                          )}`}
+                        />
+                      )
+                    )}
+                  </AccordionContent>
+                  <Subheading>
+                    {t("ApplicationEvent.requestedTimes")}
+                  </Subheading>
+                  <AccordionContent>
+                    {weekdays.map((day, index) => (
+                      <ValueBox
+                        label={`${t(`calendar.${day}`)}`}
+                        value={parseApplicationEventSchedules(
+                          applicationEvent.applicationEventSchedules,
+                          index
+                        )}
+                        icon={<IconClock />}
+                        key={`requestedTimes.${day}`}
+                      />
+                    ))}
+                  </AccordionContent>
+                </StyledAccordion>
+              );
+            })}
+          </IngressContainer>
+        </>
+      )}
       {errorMsg && (
         <Notification
           type="error"

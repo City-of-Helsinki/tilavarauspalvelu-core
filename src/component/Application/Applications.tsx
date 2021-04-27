@@ -205,35 +205,40 @@ function Applications(): JSX.Element {
     }
   }, [applicationRound, t]);
 
-  if (isLoading || !applicationRound) {
+  if (isLoading) {
     return <Loader />;
   }
 
   return (
     <Wrapper>
-      <ContentContainer>
-        <LinkPrev route={`/applicationRound/${applicationRoundId}`} />
-      </ContentContainer>
-      <IngressContainer>
-        <Title>{t("Application.allApplications")}</Title>
-        <ApplicationRoundTitle>{applicationRound.name}</ApplicationRoundTitle>
-        <ApplicationCount data-testid="application-count">
-          {applications.length} {t("common.volumeUnit")}
-        </ApplicationCount>
-      </IngressContainer>
-      {cellConfig && filterConfig && (
-        <DataTable
-          groups={[{ id: 1, data: applications }]}
-          hasGrouping={false}
-          config={{
-            filtering: true,
-            rowFilters: true,
-            handledStatuses: ["validated", "handled", "declined"],
-            selection: false,
-          }}
-          cellConfig={cellConfig}
-          filterConfig={filterConfig}
-        />
+      {applicationRound && (
+        <>
+          <ContentContainer>
+            <LinkPrev route={`/applicationRound/${applicationRoundId}`} />
+          </ContentContainer>
+          <IngressContainer>
+            <Title>{t("Application.allApplications")}</Title>
+            <ApplicationRoundTitle>
+              {applicationRound.name}
+            </ApplicationRoundTitle>
+            <ApplicationCount data-testid="application-count">
+              {applications.length} {t("common.volumeUnit")}
+            </ApplicationCount>
+          </IngressContainer>
+          {cellConfig && filterConfig && (
+            <DataTable
+              groups={[{ id: 1, data: applications }]}
+              hasGrouping={false}
+              config={{
+                filtering: true,
+                rowFilters: true,
+                selection: false,
+              }}
+              cellConfig={cellConfig}
+              filterConfig={filterConfig}
+            />
+          )}
+        </>
       )}
       {errorMsg && (
         <Notification

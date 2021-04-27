@@ -9,6 +9,10 @@ import { ReactComponent as RecurringReservation } from "../../images/icon_recurr
 import { ReactComponent as IndividualReservation } from "../../images/icon_individual-reservation.svg";
 import { ReactComponent as IconList } from "../../images/icon_list.svg";
 
+interface IProps {
+  hideAllRoundsLink?: boolean;
+}
+
 const Wrapper = styled.div`
   padding: var(--spacing-m) var(--spacing-m) 0 var(--spacing-m);
   border-bottom: 1px solid var(--color-silver);
@@ -68,7 +72,7 @@ const Bottom = styled.div`
   }
 `;
 
-function Heading(): JSX.Element {
+function Heading({ hideAllRoundsLink }: IProps): JSX.Element {
   const { t } = useTranslation();
 
   return (
@@ -86,10 +90,12 @@ function Heading(): JSX.Element {
       </Top>
       <Bottom>
         <SecondaryNavigation items={[]} />
-        <BasicLink to="/applicationRounds">
-          <IconList style={{ marginTop: "-2px" }} />{" "}
-          {t("ApplicationRound.browseAllApplicationRounds")}
-        </BasicLink>
+        {!hideAllRoundsLink && (
+          <BasicLink to="/applicationRounds">
+            <IconList style={{ marginTop: "-2px" }} />{" "}
+            {t("ApplicationRound.browseAllApplicationRounds")}
+          </BasicLink>
+        )}
       </Bottom>
     </Wrapper>
   );

@@ -1,9 +1,13 @@
 import React, { ReactNode } from "react";
 import styled from "styled-components";
-import { IconClock } from "hds-react";
+import { IconClock, IconInfoCircle } from "hds-react";
 import { useTranslation } from "react-i18next";
 import { weekdays } from "../../common/const";
-import { formatDate } from "../../common/util";
+import {
+  formatDate,
+  formatTimeDistance,
+  parseDuration,
+} from "../../common/util";
 import { Divider } from "../../styles/util";
 import { ReactComponent as IconCalendar } from "../../images/icon_calendar.svg";
 
@@ -40,6 +44,12 @@ const Day = styled.div`
   margin-right: var(--spacing-s);
   width: var(--spacing-layout-l);
   justify-content: center;
+`;
+
+const Duration = styled.span`
+  color: var(--color-black-70);
+  display: inline-flex;
+  align-items: center;
 `;
 
 interface IDateLabelProps {
@@ -114,6 +124,22 @@ function RecommendedSlot({
         <Label type="time">{formatTime(timeStart)}</Label>
         <Col>-</Col>
         <Label type="time">{formatTime(timeEnd)}</Label>
+        {timeStart && timeEnd && (
+          <>
+            <Col />
+            <Col>
+              <Duration>
+                <IconInfoCircle style={{ marginRight: "var(--spacing-xs)" }} />{" "}
+                {t("Recommendation.scheduleDuration", {
+                  duration: parseDuration(
+                    formatTimeDistance(timeStart, timeEnd),
+                    "long"
+                  ),
+                })}
+              </Duration>
+            </Col>
+          </>
+        )}
       </Row>
       <Row>
         <Col colSpan={5}>

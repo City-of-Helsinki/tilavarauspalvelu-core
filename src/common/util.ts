@@ -107,9 +107,13 @@ export const parseApplicationEventSchedules = (
   );
 };
 
-export const secondsToHms = (
-  duration?: number
-): { h?: number; m?: number; s?: number } => {
+interface HMS {
+  h?: number;
+  m?: number;
+  s?: number;
+}
+
+export const secondsToHms = (duration?: number): HMS => {
   if (!duration || duration < 0) return {};
   const h = Math.floor(duration / 3600);
   const m = Math.floor((duration % 3600) / 60);
@@ -118,14 +122,59 @@ export const secondsToHms = (
   return { h, m, s };
 };
 
-export const parseDuration = (duration?: number): string => {
+export const parseDuration = (
+  duration: number | undefined,
+  unitFormat?: "long"
+): string => {
   const hms = secondsToHms(duration);
+  let hoursUnit: string;
+  let minutesUnit: string;
   let output = "";
 
-  if (hms.h) output += `${hms.h} ${i18next.t("common.hoursUnit")}`;
-  if (hms.m) output += ` ${hms.m} ${i18next.t("common.minutesUnit")}`;
+  switch (unitFormat) {
+    case "long":
+      hoursUnit = "common.hoursUnitLong";
+      minutesUnit = "common.minutesUnitLong";
+      break;
+    default:
+      hoursUnit = "common.hoursUnit";
+      minutesUnit = "common.minutesUnit";
+  }
+  if (hms.h) output += `${i18next.t(hoursUnit, { count: hms.h })} `;
+  if (hms.m) output += `${i18next.t(minutesUnit, { count: hms.m })}`;
 
   return output.trim();
+};
+
+export const formatTimeDistance = (
+  timeStart: string,
+  timeEnd: string
+): number | undefined => {
+  const startArr = timeStart.split(":");
+  const endArr = timeEnd.split(":");
+
+  if ([...startArr, ...endArr].some((n) => !Number.isInteger(Number(n)))) {
+    return undefined;
+  }
+
+  const startDate = new Date(
+    1,
+    1,
+    1970,
+    Number(startArr[0]),
+    Number(startArr[1]),
+    Number(startArr[2])
+  );
+  const endDate = new Date(
+    1,
+    1,
+    1970,
+    Number(endArr[0]),
+    Number(endArr[1]),
+    Number(endArr[2])
+  );
+
+  return Math.abs(endDate.getTime() - startDate.getTime()) / 1000;
 };
 
 const polarToCartesian = (

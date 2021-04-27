@@ -116,12 +116,12 @@ const StatusContainer = styled.div`
   display: flex;
   align-content: center;
   margin-bottom: var(--spacing-m);
+  gap: var(--spacing-m);
 
   ${H3} {
     font-size: var(--fontsize-heading-s);
-    margin-left: var(--spacing-m);
-    width: 50px;
     line-height: var(--lineheight-m);
+    margin: var(--spacing-xs) 0;
   }
 `;
 
@@ -313,7 +313,7 @@ function RecommendationsByReservationUnit(): JSX.Element {
         });
 
         const filteredResult: AllocationResult[] = result.filter(
-          (n) => n.allocatedReservationUnitId === spId
+          (n: AllocationResult) => n.allocatedReservationUnitId === spId
         );
 
         setFilterConfig(
@@ -354,98 +354,110 @@ function RecommendationsByReservationUnit(): JSX.Element {
 
   const mainImage = reservationUnit?.images.find((n) => n.imageType === "main");
 
-  if (
-    isLoading ||
-    !applicationRound ||
-    !recommendations ||
-    !reservationUnit ||
-    !filterConfig ||
-    !cellConfig
-  ) {
+  if (isLoading) {
     return <Loader />;
   }
 
   return (
     <Wrapper>
-      <ContentContainer>
-        <LinkPrev route={`/applicationRound/${applicationRoundId}`} />
-        <IngressContainer>
-          <Ingress>
-            {mainImage ? (
-              <SpaceImage src={mainImage.imageUrl} alt="" />
-            ) : (
-              <ImageFiller />
+      {applicationRound &&
+        recommendations &&
+        reservationUnit &&
+        filterConfig &&
+        cellConfig && (
+          <>
+            <ContentContainer>
+              <LinkPrev route={`/applicationRound/${applicationRoundId}`} />
+              <IngressContainer>
+                <Ingress>
+                  {mainImage ? (
+                    <SpaceImage src={mainImage.imageUrl} alt="" />
+                  ) : (
+                    <ImageFiller />
+                  )}
+                  <div>
+                    <Title>
+                      {localizedValue(reservationUnit.name, i18n.language)}
+                    </Title>
+                    {reservationUnit.location && (
+                      <div>{parseAddress(reservationUnit.location)}</div>
+                    )}
+                    <Props>
+                      <Prop>
+                        <IconLocation /> {reservationUnit.building.name}
+                      </Prop>
+                      {reservationUnit.purposes && (
+                        <Prop>
+                          <IconLayers />{" "}
+                          {t("ReservationUnit.purposeCount", {
+                            count: reservationUnit.purposes?.length,
+                          })}
+                        </Prop>
+                      )}
+                      <Prop>
+                        <IconHome /> {reservationUnit.reservationUnitType.name}
+                      </Prop>
+                      {reservationUnit.maxPersons && (
+                        <Prop>
+                          <IconGroup /> {reservationUnit.maxPersons}
+                        </Prop>
+                      )}
+                    </Props>
+                  </div>
+                </Ingress>
+                <TitleContainer>
+                  <H1 as="h2">{applicationRound?.name}</H1>
+                  <StatusContainer>
+                    <StatusCircle status={0} />
+                    <div>
+                      <H3>{t("ApplicationRound.amountReservedOfSpace")}</H3>
+                      <div>
+                        {t("ApplicationRound.amountReservedOfSpaceSubtext")}
+                      </div>
+                    </div>
+                  </StatusContainer>
+                </TitleContainer>
+                <RecommendationCount
+                  recommendationCount={recommendations.length}
+                  unhandledCount={unhandledRecommendationCount}
+                />
+              </IngressContainer>
+            </ContentContainer>
+            <DataTable
+              groups={[{ id: 1, data: recommendations }]}
+              setSelections={setSelections}
+              hasGrouping={false}
+              config={{
+                filtering: true,
+                rowFilters: true,
+                selection: true,
+              }}
+              cellConfig={cellConfig}
+              filterConfig={filterConfig}
+            />
+            {selections?.length > 0 && (
+              <SelectionActionBar
+                selections={selections}
+                options={[
+                  {
+                    label: t("Recommendation.actionMassApprove"),
+                    value: "approve",
+                  },
+                  {
+                    label: t("Recommendation.actionMassDecline"),
+                    value: "decline",
+                  },
+                  {
+                    label: t("Recommendation.actionMassIgnoreSpace"),
+                    value: "ignore",
+                  },
+                ]}
+                callback={(option: string) => modifyRecommendations(option)}
+                isSaving={isSaving}
+              />
             )}
-            <div>
-              <Title>
-                {localizedValue(reservationUnit.name, i18n.language)}
-              </Title>
-              {reservationUnit.location && (
-                <div>{parseAddress(reservationUnit.location)}</div>
-              )}
-              <Props>
-                <Prop>
-                  <IconLocation /> {reservationUnit.building.name}
-                </Prop>
-                {reservationUnit.purposes && (
-                  <Prop>
-                    <IconLayers />{" "}
-                    {t("ReservationUnit.purposeCount", {
-                      count: reservationUnit.purposes?.length,
-                    })}
-                  </Prop>
-                )}
-                <Prop>
-                  <IconHome /> {reservationUnit.reservationUnitType.name}
-                </Prop>
-                {reservationUnit.maxPersons && (
-                  <Prop>
-                    <IconGroup /> {reservationUnit.maxPersons}
-                  </Prop>
-                )}
-              </Props>
-            </div>
-          </Ingress>
-          <TitleContainer>
-            <H1 as="h2">{applicationRound?.name}</H1>
-            <StatusContainer>
-              <StatusCircle status={0} />
-              <H3>{t("ApplicationRound.amountReserved")}</H3>
-            </StatusContainer>
-          </TitleContainer>
-          <RecommendationCount
-            recommendationCount={recommendations.length}
-            unhandledCount={unhandledRecommendationCount}
-          />
-        </IngressContainer>
-      </ContentContainer>
-      <DataTable
-        groups={[{ id: 1, data: recommendations }]}
-        setSelections={setSelections}
-        hasGrouping={false}
-        config={{
-          filtering: true,
-          rowFilters: true,
-          selection: true,
-        }}
-        cellConfig={cellConfig}
-        filterConfig={filterConfig}
-      />
-      {selections?.length > 0 && (
-        <SelectionActionBar
-          selections={selections}
-          options={[
-            { label: t("Recommendation.actionMassApprove"), value: "approve" },
-            { label: t("Recommendation.actionMassDecline"), value: "decline" },
-            {
-              label: t("Recommendation.actionMassIgnoreSpace"),
-              value: "ignore",
-            },
-          ]}
-          callback={(option: string) => modifyRecommendations(option)}
-          isSaving={isSaving}
-        />
-      )}
+          </>
+        )}
       {errorMsg && (
         <Notification
           type="error"

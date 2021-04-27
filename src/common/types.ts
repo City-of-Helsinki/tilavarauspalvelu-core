@@ -35,6 +35,7 @@ export type ApplicationRound = {
   applicationRoundBaskets: ApplicationRoundBasket[];
   status: ApplicationRoundStatus;
   allocating: boolean;
+  isAdmin: boolean;
 };
 
 export type Space = {
@@ -109,10 +110,6 @@ export type ApplicationStatus =
   | "draft"
   | "in_review"
   | "review_done"
-  | "allocating"
-  | "allocated"
-  | "validated"
-  | "handled"
   | "declined"
   | "cancelled";
 
@@ -188,12 +185,10 @@ export type ApplicationEvent = {
 
 export type ApplicationEventStatus =
   | "created"
-  | "allocating"
   | "allocated"
   | "validated"
   | "approved"
-  | "declined"
-  | "cancelled";
+  | "declined";
 
 interface AgeGroupDisplay {
   minimum: number;

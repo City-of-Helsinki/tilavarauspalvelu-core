@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Notification } from "hds-react";
@@ -12,6 +12,7 @@ import {
 } from "../../common/types";
 import { getApplicationRound, saveApplicationRound } from "../../common/api";
 import Loader from "../Loader";
+import ResolutionReport from "./ResolutionReport";
 
 interface IProps {
   applicationRoundId: string;
@@ -63,32 +64,45 @@ function ApplicationRound(): JSX.Element | null {
     fetchApplicationRound();
   }, [applicationRoundId]);
 
-  if (isLoading || !applicationRound) {
+  if (isLoading) {
     return <Loader />;
   }
 
-  if (applicationRound.status === "review_done") {
-    return (
+  let content: ReactNode;
+
+  if (applicationRound?.status === "review_done") {
+    content = (
       <Allocation
         applicationRound={applicationRound}
         setApplicationRoundStatus={setApplicationRoundStatus}
       />
     );
-  }
-
-  if (applicationRound.status === "allocated") {
-    return (
+  } else if (applicationRound?.status === "allocated") {
+    content = (
       <Handling
         applicationRound={applicationRound}
         setApplicationRound={setApplicationRound}
         setApplicationRoundStatus={setApplicationRoundStatus}
       />
     );
-  }
-
-  if (["handled", "validated"].includes(applicationRound.status)) {
-    return (
+  } else if (
+    applicationRound &&
+    ["handled", "validated"].includes(applicationRound.status)
+  ) {
+    content = (
       <PreApproval
+        applicationRound={applicationRound}
+        setApplicationRoundStatus={setApplicationRoundStatus}
+      />
+    );
+  } else if (applicationRound?.status === "approved") {
+    content = <ResolutionReport applicationRound={applicationRound} />;
+  } else if (
+    applicationRound &&
+    ["in_review"].includes(applicationRound.status)
+  ) {
+    content = (
+      <Review
         applicationRound={applicationRound}
         setApplicationRoundStatus={setApplicationRoundStatus}
       />
@@ -97,10 +111,7 @@ function ApplicationRound(): JSX.Element | null {
 
   return (
     <>
-      <Review
-        applicationRound={applicationRound}
-        setApplicationRoundStatus={setApplicationRoundStatus}
-      />
+      {content}
       {errorMsg && (
         <Notification
           type="error"

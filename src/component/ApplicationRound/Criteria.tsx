@@ -260,170 +260,169 @@ function Criteria(): JSX.Element {
     "orderNumber"
   );
 
-  if (
-    isLoading ||
-    !applicationRound ||
-    !ageGroups ||
-    !purposes ||
-    !cities ||
-    !reservationUnits
-  ) {
+  if (isLoading) {
     return <Loader />;
   }
 
   return (
     <Wrapper>
-      <ContentContainer>
-        <LinkPrev route={`/applicationRound/${applicationRound.id}`} />
-      </ContentContainer>
-      <IngressContainer>
-        <Title>{applicationRound.name}</Title>
-        <Details>
-          <div>
-            <TimeframeStatus
-              applicationPeriodBegin={applicationRound.applicationPeriodBegin}
-              applicationPeriodEnd={applicationRound.applicationPeriodEnd}
-            />
-          </div>
-          <div>
-            <RecurringReservationIcon />{" "}
-            <Strong>{t("HeadingMenu.recurringReservations")}</Strong>
-          </div>
-          <div className="block">
-            <ReservationUnitCount>
-              {applicationRound.reservationUnitIds.length}
-            </ReservationUnitCount>
-            <div>{t("ApplicationRound.attachedReservationUnits")}</div>
-          </div>
-        </Details>
-      </IngressContainer>
-      <ContentContainer>
-        <StyledAccordion
-          heading={t("ApplicationRound.searchAndUsageTimeRanges")}
-          defaultOpen
-        >
-          <AccordionContent>
-            <TitleBox>
-              <H3>{t("ApplicationRound.applicationPeriodTitle")}</H3>
+      {applicationRound && ageGroups && purposes && cities && reservationUnits && (
+        <>
+          <ContentContainer>
+            <LinkPrev route={`/applicationRound/${applicationRound.id}`} />
+          </ContentContainer>
+          <IngressContainer>
+            <Title>{applicationRound.name}</Title>
+            <Details>
               <div>
-                {t("common.begins")}{" "}
-                {formatDate(applicationRound.applicationPeriodBegin)}
+                <TimeframeStatus
+                  applicationPeriodBegin={
+                    applicationRound.applicationPeriodBegin
+                  }
+                  applicationPeriodEnd={applicationRound.applicationPeriodEnd}
+                />
               </div>
               <div>
-                {t("common.ends")}{" "}
-                {formatDate(applicationRound.applicationPeriodEnd)}
+                <RecurringReservationIcon />{" "}
+                <Strong>{t("HeadingMenu.recurringReservations")}</Strong>
               </div>
-            </TitleBox>
-            <TitleBox>
-              <H3>{t("ApplicationRound.reservationPeriodTitle")}</H3>
-              <div>
-                {t("common.begins")}{" "}
-                {formatDate(applicationRound.reservationPeriodBegin)}
+              <div className="block">
+                <ReservationUnitCount>
+                  {applicationRound.reservationUnitIds.length}
+                </ReservationUnitCount>
+                <div>{t("ApplicationRound.attachedReservationUnits")}</div>
               </div>
-              <div>
-                {t("common.ends")}{" "}
-                {formatDate(applicationRound.reservationPeriodEnd)}
-              </div>
-            </TitleBox>
-          </AccordionContent>
-        </StyledAccordion>
-        <StyledAccordion
-          heading={t("ApplicationRound.summaryOfCriteriaAndBaskets")}
-          defaultOpen
-        >
-          <AccordionContent>
-            <H3>{t("ApplicationRound.preferredAllocationGroups")}</H3>
-            {baskets.map((basket) => {
-              const getPurposesStr = (): string => {
-                let result = "";
-                basket.purposeIds.forEach((pId: number): void => {
-                  const purpose = purposes.find((n) => n.id === pId);
-                  result += purpose ? `${purpose.name}, ` : "";
-                });
-                return result ? trim(result, ", ") : "-";
-              };
+            </Details>
+          </IngressContainer>
+          <ContentContainer>
+            <StyledAccordion
+              heading={t("ApplicationRound.searchAndUsageTimeRanges")}
+              defaultOpen
+            >
+              <AccordionContent>
+                <TitleBox>
+                  <H3>{t("ApplicationRound.applicationPeriodTitle")}</H3>
+                  <div>
+                    {t("common.begins")}{" "}
+                    {formatDate(applicationRound.applicationPeriodBegin)}
+                  </div>
+                  <div>
+                    {t("common.ends")}{" "}
+                    {formatDate(applicationRound.applicationPeriodEnd)}
+                  </div>
+                </TitleBox>
+                <TitleBox>
+                  <H3>{t("ApplicationRound.reservationPeriodTitle")}</H3>
+                  <div>
+                    {t("common.begins")}{" "}
+                    {formatDate(applicationRound.reservationPeriodBegin)}
+                  </div>
+                  <div>
+                    {t("common.ends")}{" "}
+                    {formatDate(applicationRound.reservationPeriodEnd)}
+                  </div>
+                </TitleBox>
+              </AccordionContent>
+            </StyledAccordion>
+            <StyledAccordion
+              heading={t("ApplicationRound.summaryOfCriteriaAndBaskets")}
+              defaultOpen
+            >
+              <AccordionContent>
+                <H3>{t("ApplicationRound.preferredAllocationGroups")}</H3>
+                {baskets.map((basket) => {
+                  const getPurposesStr = (): string => {
+                    let result = "";
+                    basket.purposeIds.forEach((pId: number): void => {
+                      const purpose = purposes.find((n) => n.id === pId);
+                      result += purpose ? `${purpose.name}, ` : "";
+                    });
+                    return result ? trim(result, ", ") : "-";
+                  };
 
-              const getCustomerTypeStr = (): string => {
-                let result = "";
-                basket.customerType.forEach((type: string): void => {
-                  result += `${t(`Application.applicantTypes.${type}`)}, `;
-                });
-                return result ? trim(result, ", ") : "-";
-              };
+                  const getCustomerTypeStr = (): string => {
+                    let result = "";
+                    basket.customerType.forEach((type: string): void => {
+                      result += `${t(`Application.applicantTypes.${type}`)}, `;
+                    });
+                    return result ? trim(result, ", ") : "-";
+                  };
 
-              const getAgeGroupsStr = (): string => {
-                let result = "";
-                basket.ageGroupIds.forEach((aId: number): void => {
-                  const ageGroup = ageGroups.find((n) => n.id === aId);
-                  result += ageGroup ? `${parseAgeGroups(ageGroup)}, ` : "";
-                });
+                  const getAgeGroupsStr = (): string => {
+                    let result = "";
+                    basket.ageGroupIds.forEach((aId: number): void => {
+                      const ageGroup = ageGroups.find((n) => n.id === aId);
+                      result += ageGroup ? `${parseAgeGroups(ageGroup)}, ` : "";
+                    });
 
-                return result ? trim(result, ", ") : "-";
-              };
+                    return result ? trim(result, ", ") : "-";
+                  };
 
-              const getCityStr = (): string | undefined => {
-                const city = cities.find((n) => n.id === basket.homeCityId);
-                return city ? city.name : "-";
-              };
+                  const getCityStr = (): string | undefined => {
+                    const city = cities.find((n) => n.id === basket.homeCityId);
+                    return city ? city.name : "-";
+                  };
 
-              return (
-                <BasketWrapper key={basket.name}>
-                  <Accordion
-                    defaultOpen
-                    heading={
-                      <BasketHeading>
-                        <IconGroup />
-                        <Strong>{basket.orderNumber}.</Strong>
-                        <BasketTitle>{basket.name}</BasketTitle>
-                      </BasketHeading>
-                    }
-                  >
-                    <Basket>
-                      <Strong>{t("Basket.purpose")}</Strong>
-                      <span>{getPurposesStr()}</span>
-                      <Strong>{t("Basket.customerType")}</Strong>
-                      <span>{getCustomerTypeStr()}</span>
-                      <Strong>{t("Basket.ageGroup")}</Strong>
-                      <span>{getAgeGroupsStr()}</span>
-                      <Strong>{t("Basket.homeCity")}</Strong>
-                      <span>{getCityStr()}</span>
-                    </Basket>
-                  </Accordion>
-                </BasketWrapper>
-              );
-            })}
-          </AccordionContent>
-        </StyledAccordion>
-        <StyledAccordion
-          heading={t("ApplicationRound.usedReservationUnits")}
-          defaultOpen
-        >
-          <AccordionContent>
-            <ReservationUnits>
-              {reservationUnits?.map((reservationUnit) => {
-                const getSpaceNames = (ru: ReservationUnitType): string => {
-                  let result = "";
-                  ru.spaces.forEach((space) => {
-                    const name = localizedValue(space.name, i18n.language);
-                    result += `${name}, `;
-                  });
+                  return (
+                    <BasketWrapper key={basket.name}>
+                      <Accordion
+                        defaultOpen
+                        heading={
+                          <BasketHeading>
+                            <IconGroup />
+                            <Strong>{basket.orderNumber}.</Strong>
+                            <BasketTitle>{basket.name}</BasketTitle>
+                          </BasketHeading>
+                        }
+                      >
+                        <Basket>
+                          <Strong>{t("Basket.purpose")}</Strong>
+                          <span>{getPurposesStr()}</span>
+                          <Strong>{t("Basket.customerType")}</Strong>
+                          <span>{getCustomerTypeStr()}</span>
+                          <Strong>{t("Basket.ageGroup")}</Strong>
+                          <span>{getAgeGroupsStr()}</span>
+                          <Strong>{t("Basket.homeCity")}</Strong>
+                          <span>{getCityStr()}</span>
+                        </Basket>
+                      </Accordion>
+                    </BasketWrapper>
+                  );
+                })}
+              </AccordionContent>
+            </StyledAccordion>
+            <StyledAccordion
+              heading={t("ApplicationRound.usedReservationUnits")}
+              defaultOpen
+            >
+              <AccordionContent>
+                <ReservationUnits>
+                  {reservationUnits?.map((reservationUnit) => {
+                    const getSpaceNames = (ru: ReservationUnitType): string => {
+                      let result = "";
+                      ru.spaces.forEach((space) => {
+                        const name = localizedValue(space.name, i18n.language);
+                        result += `${name}, `;
+                      });
 
-                  return result ? trim(result, ", ") : "-";
-                };
+                      return result ? trim(result, ", ") : "-";
+                    };
 
-                return (
-                  <ReservationUnit key={reservationUnit.id}>
-                    <div>
-                      <Strong>{reservationUnit.building.name}</Strong>
-                    </div>
-                    <div>{getSpaceNames(reservationUnit)}</div>
-                  </ReservationUnit>
-                );
-              })}
-            </ReservationUnits>
-          </AccordionContent>
-        </StyledAccordion>
-      </ContentContainer>
+                    return (
+                      <ReservationUnit key={reservationUnit.id}>
+                        <div>
+                          <Strong>{reservationUnit.building.name}</Strong>
+                        </div>
+                        <div>{getSpaceNames(reservationUnit)}</div>
+                      </ReservationUnit>
+                    );
+                  })}
+                </ReservationUnits>
+              </AccordionContent>
+            </StyledAccordion>
+          </ContentContainer>
+        </>
+      )}
       {errorMsg && (
         <Notification
           type="error"

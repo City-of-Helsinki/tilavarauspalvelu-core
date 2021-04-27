@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
@@ -6,6 +6,7 @@ import trim from "lodash/trim";
 import {
   Button,
   IconArrowRight,
+  IconArrowUndo,
   IconCheckCircle,
   IconCrossCircle,
   IconFaceSmile,
@@ -114,17 +115,28 @@ const Props = styled.div`
   font-size: var(--fontsize-heading-xs);
   line-height: 2.6rem;
 `;
+
 const PropRow = styled.div`
   display: table-row;
 `;
+
 const Label = styled.div`
   display: table-cell;
   padding-right: var(--spacing-3-xl);
   font-family: var(--tilavaraus-admin-font-bold);
   font-weight: 700;
 `;
+
 const Value = styled.div`
   display: table-cell;
+`;
+
+const SpaceSubtext = styled.div`
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  color: var(--color-black-70);
+  font-size: var(--fontsize-body-m);
 `;
 
 const Recommendations = styled.div`
@@ -238,154 +250,66 @@ function Recommendation(): JSX.Element {
     }
   }, [recommendation]);
 
+  if (isLoading) {
+    return <Loader />;
+  }
+
   const schedule = recommendation?.applicationEvent.applicationEventSchedules.find(
     (n) => n.id === Number(applicationEventScheduleId)
   );
 
-  if (isLoading || !application || !recommendation) {
-    return <Loader />;
-  }
+  const scheduleIndex =
+    schedule &&
+    recommendation?.applicationEvent.applicationEventSchedules.indexOf(
+      schedule
+    );
 
-  return (
-    <Wrapper>
-      <ContentContainer>
-        <LinkPrev route={`/applicationRound/${applicationRoundId}`} />
-      </ContentContainer>
-      <IngressContainer>
-        <Top>
-          <div>
-            <LinkToOthers
-              to={`/applicationRound/${applicationRoundId}/applicant/${recommendation.applicantId}`}
-            >
-              {t("Recommendation.linkToOtherRecommendations")}
-            </LinkToOthers>
-            <Heading>{recommendation.applicationEvent.name}</Heading>
-            <div>{applicationRound?.name}</div>
-            <StyledApplicationEventStatusBlock
-              status={recommendation.applicationEvent.status}
-            />
-          </div>
-          <div>{application && <ApplicantBox application={application} />}</div>
-        </Top>
-      </IngressContainer>
-      <NarrowContainer>
-        {actionNotification === "validated" && (
-          <StyledNotification
-            type="success"
-            dismissible
-            onClose={() => setActionNotification(null)}
-            closeButtonLabelText={`${t("common.close")}`}
-            label={t("Recommendation.approveSuccessHeading")}
-          >
-            <H3>
-              <IconFaceSmile size="s" />{" "}
-              {t("Recommendation.approveSuccessHeading")}
-            </H3>
-            <div>{t("Recommendation.approveSuccessBody")}</div>
-          </StyledNotification>
-        )}
-        {actionNotification === "declined" && (
-          <StyledNotification
-            type="info"
-            dismissible
-            onClose={() => setActionNotification(null)}
-            closeButtonLabelText={`${t("common.close")}`}
-            label={t("Recommendation.banSuccessHeading")}
-          >
-            <H3>
-              <IconInfoCircle size="s" />{" "}
-              {t("Recommendation.banSuccessHeading")}
-            </H3>
-            <div>{t("Recommendation.banSuccessBody")}</div>
-          </StyledNotification>
-        )}
-        <Subheading>{t("Recommendation.summary")}</Subheading>
-        <Props>
-          <PropRow>
-            <Label>{t("ApplicationRound.basket")}</Label>
-            {trim(
-              `${recommendation.basketOrderNumber}. ${recommendation.basketName}`,
-              ". "
-            )}
-          </PropRow>
-          <PropRow>
-            <Label>{t("Application.headings.purpose")}</Label>
-            <Value>{recommendation.applicationEvent.purpose}</Value>
-          </PropRow>
-          <PropRow>
-            <Label>{t("Application.headings.ageGroup")}</Label>
-            <Value>
-              {parseAgeGroups(recommendation.applicationEvent.ageGroupDisplay)}
-            </Value>
-          </PropRow>
-          <PropRow>
-            <Label>{t("ApplicationRound.appliedReservations")}</Label>
-            <Value>
-              {trim(
-                `${formatNumber(
-                  recommendation.applicationAggregatedData?.reservationsTotal,
-                  t("common.volumeUnit")
-                )} / ${parseDuration(
-                  recommendation.applicationAggregatedData?.minDurationTotal
-                )}`,
-                " / "
-              )}
-            </Value>
-          </PropRow>
-          <PropRow>
-            <Label>{t("ApplicationRound.appliedSpace")}</Label>
-            <Value>
-              {trim(
-                `${recommendation.allocatedReservationUnitName}, ${recommendation.unitName}`,
-                ", "
-              )}
-            </Value>
-          </PropRow>
-          <PropRow>
-            <Label>{t("ApplicationEvent.groupSize")}</Label>
-            <Value>
-              {t("common.personUnit", {
-                count: recommendation.applicationEvent.numPersons || 0,
-              })}
-            </Value>
-          </PropRow>
-        </Props>
-        <Divider />
-        <H2 as="h3">{t("Recommendation.recommendedSlot")}</H2>
-        <Recommendations>
-          <table>
-            {schedule && (
-              <RecommendedSlot
-                key={schedule.id}
-                id={schedule.id}
-                start={recommendation.applicationEvent.begin}
-                end={recommendation.applicationEvent.end}
-                weekday={schedule.day}
-                biweekly={recommendation.applicationEvent.biweekly}
-                timeStart={schedule.begin}
-                timeEnd={schedule.end}
-              />
-            )}
-          </table>
-        </Recommendations>
-        <Terms>
-          <H2 as="h3" style={{ marginTop: 0 }}>
-            {t("Recommendation.thisPartsTerms")}
-          </H2>
-          <TermButton
-            iconLeft={<IconInformation />}
-            onClick={() => console.log("TODO")} // eslint-disable-line no-console
-          >
-            TODO
-          </TermButton>
-          <TermButton
-            iconLeft={<IconInformation />}
-            onClick={() => console.log("TODO")} // eslint-disable-line no-console
-          >
-            TODO
-          </TermButton>
-        </Terms>
-        <ActionContainer>
+  const modes = ["isApproved", "isDeclined", "spaceIgnored", "default"];
+  const mode = modes[3];
+  let actionButtons: ReactNode;
+  let actionHelper = "";
+  switch (mode) {
+    case "isApproved":
+      actionButtons = (
+        <Button
+          variant="secondary"
+          iconLeft={<IconArrowUndo />}
+          onClick={() => console.log("palauta kasittelemattomaksi")}
+          disabled={isSaving}
+        >
+          {t("Recommendation.actionRevertToUnhandled")}
+        </Button>
+      );
+      break;
+    case "isDeclined":
+      actionButtons = (
+        <Button
+          variant="secondary"
+          iconLeft={<IconArrowUndo />}
+          onClick={() => console.log("palauta osaksi kasittelya")}
+          disabled={isSaving}
+        >
+          {t("Recommendation.actionReturnAsPartOfAllocation")}
+        </Button>
+      );
+      actionHelper = t("Recommendation.actionReturnAsPartOfAllocationHelper");
+      break;
+    case "spaceIgnored":
+      actionButtons = (
+        <Button
+          variant="secondary"
+          iconLeft={<IconArrowUndo />}
+          onClick={() => console.log("revert ignore")}
+          disabled={isSaving}
+        >
+          {t("Recommendation.actionRevertIgnoreSpace")}
+        </Button>
+      );
+      actionHelper = t("Recommendation.actionRevertIgnoreSpaceHelper");
+      break;
+    default:
+      actionButtons = (
+        <>
           <div>
             <Button
               variant="secondary"
@@ -426,11 +350,168 @@ function Recommendation(): JSX.Element {
               {t("Recommendation.actionApprove")}
             </Button>
           </div>
-        </ActionContainer>
-        <p style={{ lineHeight: "var(--lineheight-xl)" }}>
-          {t("Recommendation.actionHelperText")}
-        </p>
-      </NarrowContainer>
+        </>
+      );
+      actionHelper = t("Recommendation.actionHelperText");
+  }
+
+  return (
+    <Wrapper>
+      <ContentContainer>
+        <LinkPrev route={`/applicationRound/${applicationRoundId}`} />
+      </ContentContainer>
+      {application && recommendation && (
+        <>
+          <IngressContainer>
+            <Top>
+              <div>
+                <LinkToOthers
+                  to={`/applicationRound/${applicationRoundId}/applicant/${recommendation.applicantId}`}
+                >
+                  {t("Recommendation.linkToOtherRecommendations")}
+                </LinkToOthers>
+                <Heading>{recommendation.applicationEvent.name}</Heading>
+                <div>{applicationRound?.name}</div>
+                <StyledApplicationEventStatusBlock
+                  status={recommendation.applicationEvent.status}
+                />
+              </div>
+              <div>
+                {application && <ApplicantBox application={application} />}
+              </div>
+            </Top>
+          </IngressContainer>
+          <NarrowContainer>
+            {actionNotification === "validated" && (
+              <StyledNotification
+                type="success"
+                dismissible
+                onClose={() => setActionNotification(null)}
+                closeButtonLabelText={`${t("common.close")}`}
+                label={t("Recommendation.approveSuccessHeading")}
+              >
+                <H3>
+                  <IconFaceSmile size="s" />{" "}
+                  {t("Recommendation.approveSuccessHeading")}
+                </H3>
+                <div>{t("Recommendation.approveSuccessBody")}</div>
+              </StyledNotification>
+            )}
+            {actionNotification === "declined" && (
+              <StyledNotification
+                type="info"
+                dismissible
+                onClose={() => setActionNotification(null)}
+                closeButtonLabelText={`${t("common.close")}`}
+                label={t("Recommendation.banSuccessHeading")}
+              >
+                <H3>
+                  <IconInfoCircle size="s" />{" "}
+                  {t("Recommendation.banSuccessHeading")}
+                </H3>
+                <div>{t("Recommendation.banSuccessBody")}</div>
+              </StyledNotification>
+            )}
+            <Subheading>{t("Recommendation.summary")}</Subheading>
+            <Props>
+              <PropRow>
+                <Label>{t("ApplicationRound.basket")}</Label>
+                {trim(
+                  `${recommendation.basketOrderNumber}. ${recommendation.basketName}`,
+                  ". "
+                )}
+              </PropRow>
+              <PropRow>
+                <Label>{t("Application.headings.purpose")}</Label>
+                <Value>{recommendation.applicationEvent.purpose}</Value>
+              </PropRow>
+              <PropRow>
+                <Label>{t("Recommendation.labelAgeGroup")}</Label>
+                <Value>
+                  {parseAgeGroups(
+                    recommendation.applicationEvent.ageGroupDisplay
+                  )}
+                </Value>
+              </PropRow>
+              <PropRow>
+                <Label>{t("Recommendation.labelAppliedReservations")}</Label>
+                <Value>
+                  {trim(
+                    `${formatNumber(
+                      recommendation.applicationAggregatedData
+                        ?.reservationsTotal,
+                      t("common.volumeUnit")
+                    )} / ${parseDuration(
+                      recommendation.applicationAggregatedData?.minDurationTotal
+                    )}`,
+                    " / "
+                  )}
+                </Value>
+              </PropRow>
+              <PropRow>
+                <Label>{t("ApplicationRound.appliedSpace")}</Label>
+                <Value>
+                  {trim(
+                    `${recommendation.allocatedReservationUnitName}, ${recommendation.unitName}`,
+                    ", "
+                  )}
+                  <SpaceSubtext>
+                    <IconInfoCircle />
+                    {t("Recommendation.labelSpaceRank", {
+                      rank: (scheduleIndex || 0) + 1,
+                    })}
+                  </SpaceSubtext>
+                </Value>
+              </PropRow>
+              <PropRow>
+                <Label>{t("ApplicationEvent.groupSize")}</Label>
+                <Value>
+                  {t("common.personUnit", {
+                    count: recommendation.applicationEvent.numPersons || 0,
+                  })}
+                </Value>
+              </PropRow>
+            </Props>
+            <Divider />
+            <H2 as="h3">{t("Recommendation.recommendedSlot")}</H2>
+            <Recommendations>
+              <table>
+                {schedule && (
+                  <RecommendedSlot
+                    key={schedule.id}
+                    id={schedule.id}
+                    start={recommendation.applicationEvent.begin}
+                    end={recommendation.applicationEvent.end}
+                    weekday={schedule.day}
+                    biweekly={recommendation.applicationEvent.biweekly}
+                    timeStart={schedule.begin}
+                    timeEnd={schedule.end}
+                  />
+                )}
+              </table>
+            </Recommendations>
+            <Terms>
+              <H2 as="h3" style={{ marginTop: 0 }}>
+                {t("Recommendation.thisPartsTerms")}
+              </H2>
+              <TermButton
+                iconLeft={<IconInformation />}
+                onClick={() => console.log("TODO")} // eslint-disable-line no-console
+              >
+                TODO
+              </TermButton>
+              <TermButton
+                iconLeft={<IconInformation />}
+                onClick={() => console.log("TODO")} // eslint-disable-line no-console
+              >
+                TODO
+              </TermButton>
+            </Terms>
+            <ActionContainer>{actionButtons}</ActionContainer>
+            <p style={{ lineHeight: "var(--lineheight-xl)" }}>{actionHelper}</p>
+          </NarrowContainer>
+        </>
+      )}
       {errorMsg && (
         <Notification
           type="error"

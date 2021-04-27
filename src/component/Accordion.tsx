@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { H2 } from "../styles/typography";
 
 interface IProps {
-  heading: string | ReactNode | null;
+  heading: string | JSX.Element | null;
   defaultOpen?: boolean;
   children: ReactNode;
   className?: string;

@@ -59,37 +59,52 @@ function AllApplicationRounds(): JSX.Element {
     fetchApplicationRound();
   }, []);
 
-  if (isLoading || !applicationRounds) {
+  if (isLoading) {
     return <Loader />;
   }
 
   return (
     <Wrapper>
-      <Heading />
-      <IngressContainer>
-        <Subtitle>{t("common.youthServices")}</Subtitle>
-        <Title>
-          {t("ApplicationRound.titleAllRecurringApplicationRounds")}
-        </Title>
-        <RoundTypeIngress>
-          {`${applicationRounds.length} ${t("common.volumeUnit")}`}
-        </RoundTypeIngress>
-      </IngressContainer>
-      <WideContainer>
-        {applicationRounds.length > 0 ? (
-          applicationRounds.map((applicationRound) => (
-            <ApplicationRoundCard
-              applicationRound={applicationRound}
-              key={applicationRound.id}
-              getRoute={(id) => `/applicationRound/${id}`}
-            />
-          ))
-        ) : (
-          <NotificationBox>
-            {t("ApplicationRound.listHandlingPlaceholder")}
-          </NotificationBox>
-        )}
-      </WideContainer>
+      <Heading hideAllRoundsLink />
+      {applicationRounds && (
+        <>
+          <IngressContainer>
+            <Subtitle>{t("common.youthServices")}</Subtitle>
+            <Title>
+              {t("ApplicationRound.titleAllRecurringApplicationRounds")}
+            </Title>
+            <RoundTypeIngress>
+              {`${applicationRounds.length} ${t("common.volumeUnit")}`}
+            </RoundTypeIngress>
+          </IngressContainer>
+          <WideContainer>
+            {applicationRounds.length > 0 ? (
+              applicationRounds.map((applicationRound) => {
+                const getRoute = (id: number): string => {
+                  if (
+                    applicationRound.status === "validated" &&
+                    applicationRound.isAdmin
+                  ) {
+                    return `/applicationRound/{$id}/approval`;
+                  }
+                  return `/applicationRound/${id}`;
+                };
+                return (
+                  <ApplicationRoundCard
+                    applicationRound={applicationRound}
+                    key={applicationRound.id}
+                    getRoute={(id) => getRoute(id)}
+                  />
+                );
+              })
+            ) : (
+              <NotificationBox>
+                {t("ApplicationRound.listHandlingPlaceholder")}
+              </NotificationBox>
+            )}
+          </WideContainer>
+        </>
+      )}
       {errorMsg && (
         <Notification
           type="error"
