@@ -2,43 +2,32 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { TFunction } from "i18next";
 import styled from "styled-components";
-import {
-  Button,
-  IconArrowRight,
-  IconCheckCircle,
-  Notification,
-} from "hds-react";
-import trim from "lodash/trim";
 import uniq from "lodash/uniq";
+import trim from "lodash/trim";
+import { IconArrowRight, IconClock, Notification } from "hds-react";
 import {
   AllocationResult,
-  ApplicationRound as ApplicationRoundType,
-  ApplicationRoundStatus,
-  DataFilterConfig,
   ApplicationEvent,
+  ApplicationRound as ApplicationRoundType,
+  DataFilterConfig,
 } from "../../common/types";
-import { IngressContainer, NarrowContainer } from "../../styles/layout";
+import { ContentContainer, IngressContainer } from "../../styles/layout";
 import { breakpoints } from "../../styles/util";
-import Heading from "./Heading";
-import StatusRecommendation from "../Application/StatusRecommendation";
 import withMainMenu from "../withMainMenu";
-import ApplicationRoundNavi from "./ApplicationRoundNavi";
-import TimeframeStatus from "./TimeframeStatus";
 import { ContentHeading, H3 } from "../../styles/typography";
 import DataTable, { CellConfig } from "../DataTable";
-import Dialog from "../Dialog";
 import {
   formatNumber,
   parseDuration,
   prepareAllocationResults,
 } from "../../common/util";
 import BigRadio from "../BigRadio";
-import { getAllocationResults } from "../../common/api";
+import LinkPrev from "../LinkPrev";
 import Loader from "../Loader";
+import { getAllocationResults } from "../../common/api";
 
 interface IProps {
   applicationRound: ApplicationRoundType;
-  setApplicationRoundStatus: (status: ApplicationRoundStatus) => Promise<void>;
 }
 
 const Wrapper = styled.div`
@@ -60,10 +49,12 @@ const TopIngress = styled.div`
   }
 
   display: grid;
+  margin-bottom: var(--spacing-layout-xl);
 
   ${ContentHeading} {
     width: 100%;
     padding: 0;
+    margin: var(--spacing-layout-m) 0 var(--spacing-3-xs) 0;
   }
 
   @media (min-width: ${breakpoints.l}) {
@@ -72,53 +63,8 @@ const TopIngress = styled.div`
   }
 `;
 
-const StyledNotification = styled(Notification)`
-  margin-top: var(--spacing-l);
-  padding-left: var(--spacing-xl);
-
-  h3 {
-    display: flex;
-    align-items: center;
-
-    svg {
-      margin-right: var(--spacing-2-xs);
-    }
-  }
-
-  div[role="heading"] {
-    display: none;
-  }
-`;
-
-const Recommendation = styled.div`
-  margin: var(--spacing-m) 0;
-`;
-
-const RecommendationLabel = styled.label`
-  font-family: var(--tilavaraus-admin-font-bold);
-  font-size: 1.375rem;
-  font-weight: bold;
-`;
-
-const RecommendationValue = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  margin-top: var(--spacing-3-xs);
-`;
-
-const ActionContainer = styled.div`
-  button {
-    margin-top: var(--spacing-s);
-  }
-
-  display: flex;
-  justify-content: space-between;
-  flex-direction: column-reverse;
-
-  @media (min-width: ${breakpoints.l}) {
-    flex-direction: row;
-  }
+const Subheading = styled.div`
+  margin-bottom: var(--spacing-l);
 `;
 
 const IngressFooter = styled.div`
@@ -162,6 +108,12 @@ const ScheduleCount = styled.span`
     margin-left: var(--spacing-xs);
     display: inline;
   }
+`;
+
+const ResolutionStatus = styled.div`
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-s);
 `;
 
 const getCellConfig = (
@@ -238,14 +190,7 @@ const getFilterConfig = (
   ];
 };
 
-function PreApproval({
-  applicationRound,
-  setApplicationRoundStatus,
-}: IProps): JSX.Element {
-  const [
-    isConfirmationDialogVisible,
-    setConfirmationDialogVisibility,
-  ] = useState<boolean>(false);
+function ResolutionReport({ applicationRound }: IProps): JSX.Element {
   const [isLoading, setIsLoading] = useState(true);
   const [recommendations, setRecommendations] = useState<
     AllocationResult[] | []
@@ -290,7 +235,7 @@ function PreApproval({
     hours: 2345,
   };
 
-  const hasBeenSentForApproval = applicationRound.status === "validated";
+  const backLink = "/applicationRounds";
 
   const filteredResults =
     activeFilter === "orphans"
@@ -307,74 +252,24 @@ function PreApproval({
 
   return (
     <Wrapper>
-      <Heading />
-      {recommendations && cellConfig && filterConfig && (
+      {applicationRound && cellConfig && filterConfig && (
         <>
+          <ContentContainer>
+            <LinkPrev route={backLink} />
+          </ContentContainer>
           <IngressContainer>
-            <ApplicationRoundNavi applicationRoundId={applicationRound.id} />
             <TopIngress>
               <div>
-                <ContentHeading>{applicationRound.name}</ContentHeading>
-                <TimeframeStatus
-                  applicationPeriodBegin={
-                    applicationRound.applicationPeriodBegin
-                  }
-                  applicationPeriodEnd={applicationRound.applicationPeriodEnd}
-                />
+                <ContentHeading>
+                  {t("ApplicationRound.resolutionNumber", { no: "????" })}
+                </ContentHeading>
+                <Subheading>{applicationRound.name}</Subheading>
+                <ResolutionStatus>
+                  <IconClock /> {t("ApplicationRound.resolutionDate")} ???
+                </ResolutionStatus>
               </div>
               <div />
             </TopIngress>
-          </IngressContainer>
-          <NarrowContainer style={{ marginBottom: "var(--spacing-4-xl)" }}>
-            {hasBeenSentForApproval && (
-              <StyledNotification
-                type="success"
-                label=""
-                dismissible
-                closeButtonLabelText={`${t("common.close")}`}
-              >
-                <H3>
-                  <IconCheckCircle size="m" />{" "}
-                  {t("ApplicationRound.sentForApprovalNotificationHeader")}
-                </H3>
-                <p>{t("ApplicationRound.sentForApprovalNotificationBody")}</p>
-              </StyledNotification>
-            )}
-            <Recommendation>
-              <RecommendationLabel>
-                {t("Application.recommendedStage")}:
-              </RecommendationLabel>
-              <RecommendationValue>
-                <StatusRecommendation
-                  status={
-                    hasBeenSentForApproval ? "approval" : "approvalPreparation"
-                  }
-                  applicationRound={applicationRound}
-                />
-              </RecommendationValue>
-            </Recommendation>
-            {!hasBeenSentForApproval && (
-              <ActionContainer>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={() => {
-                    setApplicationRoundStatus("allocated");
-                  }}
-                >
-                  {t("ApplicationRound.navigateBackToHandling")}
-                </Button>
-                <Button
-                  type="submit"
-                  variant="primary"
-                  onClick={() => setConfirmationDialogVisibility(true)}
-                >
-                  {t("ApplicationRound.sendForApproval")}
-                </Button>
-              </ActionContainer>
-            )}
-          </NarrowContainer>
-          <IngressContainer>
             <IngressFooter>
               <div>
                 <p className="label">
@@ -425,38 +320,6 @@ function PreApproval({
               filterConfig={filterConfig}
             />
           )}
-          {isConfirmationDialogVisible && (
-            <Dialog
-              closeDialog={() => setConfirmationDialogVisibility(false)}
-              style={
-                {
-                  "--padding": "var(--spacing-layout-s)",
-                } as React.CSSProperties
-              }
-            >
-              <H3>{t("ApplicationRound.sentForApprovalDialogHeader")}</H3>
-              <p>{t("ApplicationRound.sentForApprovalDialogBody")}</p>
-              <ActionContainer>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={() => setConfirmationDialogVisibility(false)}
-                >
-                  {t("Navigation.goBack")}
-                </Button>
-                <Button
-                  type="submit"
-                  variant="primary"
-                  onClick={() => {
-                    setApplicationRoundStatus("validated");
-                    setConfirmationDialogVisibility(false);
-                  }}
-                >
-                  {t("ApplicationRound.deliverAction")}
-                </Button>
-              </ActionContainer>
-            </Dialog>
-          )}
         </>
       )}
       {errorMsg && (
@@ -477,4 +340,4 @@ function PreApproval({
   );
 }
 
-export default withMainMenu(PreApproval);
+export default withMainMenu(ResolutionReport);

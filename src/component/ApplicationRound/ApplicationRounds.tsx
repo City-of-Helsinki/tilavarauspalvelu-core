@@ -72,13 +72,16 @@ function ApplicationRounds(): JSX.Element {
 
   const isWaitingForApproval = (
     applicationRound: ApplicationRoundType
-  ): boolean => applicationRound.status === "validated";
+  ): boolean =>
+    applicationRound.isAdmin && applicationRound.status === "validated";
 
   const approveRounds = applicationRounds?.filter((applicationRound) =>
     isWaitingForApproval(applicationRound)
   );
-  const handleRounds = applicationRounds?.filter(
-    (applicationRound) => !isWaitingForApproval(applicationRound)
+  const handleRounds = applicationRounds?.filter((applicationRound) =>
+    ["in_review", "review_done", "allocated", "handled"].includes(
+      applicationRound.status
+    )
   );
 
   if (isLoading) {
@@ -103,13 +106,19 @@ function ApplicationRounds(): JSX.Element {
             </RoundTypeIngress>
           </IngressContainer>
           <WideContainer>
-            {approveRounds.map((applicationRound) => (
-              <ApplicationRoundCard
-                applicationRound={applicationRound}
-                key={applicationRound.id}
-                getRoute={(id) => `/applicationRound/${id}/approval`}
-              />
-            ))}
+            {approveRounds.map((applicationRound) => {
+              return (
+                <ApplicationRoundCard
+                  applicationRound={applicationRound}
+                  key={applicationRound.id}
+                  getRoute={(id) =>
+                    applicationRound.isAdmin
+                      ? `/applicationRound/${id}/approval`
+                      : `/applicationRound/${id}`
+                  }
+                />
+              );
+            })}
           </WideContainer>
         </Deck>
       )}

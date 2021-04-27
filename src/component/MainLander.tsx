@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useEffect } from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 // eslint-disable-next-line import/no-unresolved
 import { useReactOidc } from "@axa-fr/react-oidc-context";
 import { Button, IconArrowRight, IconGroup } from "hds-react";
 import { BrowserRouter } from "react-router-dom";
+import queryString from "query-string";
 import KorosHeading from "./KorosHeading";
 import HeroImage from "../images/hero-user@1x.jpg";
 import { H2 } from "../styles/typography";
@@ -74,7 +75,19 @@ const Body = styled.p`
 
 function MainLander({ withSiteWrapper = false }: IProps): JSX.Element {
   const { t } = useTranslation();
-  const { login } = useReactOidc();
+  const { login, oidcUser } = useReactOidc();
+
+  useEffect(() => {
+    if (oidcUser?.id_token) {
+      const search = queryString.parse(window.location.search);
+      if (typeof search.path === "string") {
+        if (window.history) {
+          window.history.pushState({}, "", search.path);
+          window.location.reload();
+        }
+      }
+    }
+  }, [oidcUser]);
 
   const Lander = (
     <Wrapper>

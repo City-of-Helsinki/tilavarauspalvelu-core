@@ -26,7 +26,7 @@ import { H1 } from "../../styles/typography";
 import { BasicLink, breakpoints, Strong } from "../../styles/util";
 import LinkPrev from "../LinkPrev";
 import Loader from "../Loader";
-import ApplicationStatusBlock from "../Application/ApplicationStatusBlock";
+import ApplicationRoundStatusBlock from "./ApplicationRoundStatusBlock";
 import withMainMenu from "../withMainMenu";
 import ApplicantBox from "./ApplicantBox";
 import DataTable, { CellConfig } from "../DataTable";
@@ -81,7 +81,7 @@ const Heading = styled(H1)`
   margin-bottom: var(--spacing-3-xs);
 `;
 
-const StyledApplicationStatusBlock = styled(ApplicationStatusBlock)`
+const StyledApplicationRoundStatusBlock = styled(ApplicationRoundStatusBlock)`
   margin-top: var(--spacing-xl);
 `;
 
@@ -321,7 +321,7 @@ function RecommendationsByApplicant(): JSX.Element {
     (n) => n.applicationEvent.status === "created"
   ).length;
 
-  if (isLoading || !recommendations || !cellConfig || !filterConfig) {
+  if (isLoading) {
     return <Loader />;
   }
 
@@ -330,55 +330,69 @@ function RecommendationsByApplicant(): JSX.Element {
       <ContentContainer>
         <LinkPrev route={`/applicationRound/${applicationRoundId}`} />
       </ContentContainer>
-      <IngressContainer style={{ marginBottom: "var(--spacing-l)" }}>
-        <Top>
-          <div>
-            <LinkToOthers
-              to={`/application/${get(
-                recommendations,
-                "[0].applicationId"
-              )}/details`}
-            >
-              {t("Recommendation.showOriginalApplication")}
-            </LinkToOthers>
-            <Heading>{applicantName}</Heading>
-            <div>{applicationRound?.name}</div>
-            <StyledApplicationStatusBlock status="allocated" />
-          </div>
-          <div>{application && <ApplicantBox application={application} />}</div>
-        </Top>
-        <RecommendationCount
-          recommendationCount={recommendations.length}
-          unhandledCount={unhandledRecommendationCount}
-        />
-      </IngressContainer>
-      <DataTable
-        groups={[{ id: 1, data: recommendations }]}
-        setSelections={setSelections}
-        hasGrouping={false}
-        config={{
-          filtering: true,
-          rowFilters: true,
-          selection: true,
-          handledStatuses: ["accepted"],
-        }}
-        cellConfig={cellConfig}
-        filterConfig={filterConfig}
-      />
-      {selections?.length > 0 && (
-        <SelectionActionBar
-          selections={selections}
-          options={[
-            { label: t("Recommendation.actionMassApprove"), value: "approve" },
-            { label: t("Recommendation.actionMassDecline"), value: "decline" },
-            {
-              label: t("Recommendation.actionMassIgnoreSpace"),
-              value: "ignore",
-            },
-          ]}
-          callback={(option: string) => modifyRecommendations(option)}
-          isSaving={isSaving}
-        />
+      {recommendations && applicationRound && cellConfig && filterConfig && (
+        <>
+          <IngressContainer style={{ marginBottom: "var(--spacing-l)" }}>
+            <Top>
+              <div>
+                <LinkToOthers
+                  to={`/application/${get(
+                    recommendations,
+                    "[0].applicationId"
+                  )}/details`}
+                >
+                  {t("Recommendation.showOriginalApplication")}
+                </LinkToOthers>
+                <Heading>{applicantName}</Heading>
+                <div>{applicationRound?.name}</div>
+                <StyledApplicationRoundStatusBlock
+                  status={applicationRound.status}
+                />
+              </div>
+              <div>
+                {application && <ApplicantBox application={application} />}
+              </div>
+            </Top>
+            <RecommendationCount
+              recommendationCount={recommendations.length}
+              unhandledCount={unhandledRecommendationCount}
+            />
+          </IngressContainer>
+          <DataTable
+            groups={[{ id: 1, data: recommendations }]}
+            setSelections={setSelections}
+            hasGrouping={false}
+            config={{
+              filtering: true,
+              rowFilters: true,
+              selection: true,
+              handledStatuses: ["accepted"],
+            }}
+            cellConfig={cellConfig}
+            filterConfig={filterConfig}
+          />
+          {selections?.length > 0 && (
+            <SelectionActionBar
+              selections={selections}
+              options={[
+                {
+                  label: t("Recommendation.actionMassApprove"),
+                  value: "approve",
+                },
+                {
+                  label: t("Recommendation.actionMassDecline"),
+                  value: "decline",
+                },
+                {
+                  label: t("Recommendation.actionMassIgnoreSpace"),
+                  value: "ignore",
+                },
+              ]}
+              callback={(option: string) => modifyRecommendations(option)}
+              isSaving={isSaving}
+            />
+          )}
+        </>
       )}
       {errorMsg && (
         <Notification

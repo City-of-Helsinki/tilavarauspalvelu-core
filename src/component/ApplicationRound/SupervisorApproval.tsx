@@ -3,10 +3,15 @@ import { useTranslation } from "react-i18next";
 import { TFunction } from "i18next";
 import styled from "styled-components";
 import { useHistory } from "react-router-dom";
-import { Button, Checkbox, Notification } from "hds-react";
+import uniq from "lodash/uniq";
+import trim from "lodash/trim";
+import { Button, Checkbox, IconArrowRight, Notification } from "hds-react";
 import {
+  AllocationResult,
+  ApplicationEvent,
   ApplicationRound as ApplicationRoundType,
   ApplicationRoundStatus,
+  DataFilterConfig,
 } from "../../common/types";
 import {
   ContentContainer,
@@ -21,11 +26,19 @@ import TimeframeStatus from "./TimeframeStatus";
 import { ContentHeading, H3 } from "../../styles/typography";
 import DataTable, { CellConfig } from "../DataTable";
 import Dialog from "../Dialog";
-import { formatNumber } from "../../common/util";
+import {
+  formatNumber,
+  parseDuration,
+  prepareAllocationResults,
+} from "../../common/util";
 import BigRadio from "../BigRadio";
 import LinkPrev from "../LinkPrev";
 import Loader from "../Loader";
-import { getApplicationRound, saveApplicationRound } from "../../common/api";
+import {
+  getApplicationRound,
+  saveApplicationRound,
+  getAllocationResults,
+} from "../../common/api";
 
 interface IProps {
   applicationRoundId: string;
@@ -163,11 +176,13 @@ const ScheduleCount = styled.span`
   }
 `;
 
-const getCellConfig = (t: TFunction): CellConfig => {
-  console.log(t); // eslint-disable-line
+const getCellConfig = (
+  t: TFunction,
+  applicationRound: ApplicationRoundType | null
+): CellConfig => {
   return {
     cols: [
-      { title: "Application.headings.customer", key: "organisation.name" },
+      { title: "Application.headings.applicantName", key: "organisationName" },
       {
         title: "Application.headings.participants",
         key: "organisation.activeMembers",
@@ -177,15 +192,62 @@ const getCellConfig = (t: TFunction): CellConfig => {
         key: "applicantType",
       },
       {
-        title: "Application.headings.resolution",
-        key: "aggregatedData.reservationsTotal",
+        title: "Recommendation.headings.resolution",
+        key: "applicationAggregatedData.reservationsTotal",
+        transform: ({ applicationAggregatedData }: AllocationResult) => (
+          <div
+            style={{
+              display: "flex",
+              alignContent: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <span>
+              {trim(
+                `${formatNumber(
+                  applicationAggregatedData?.reservationsTotal,
+                  t("common.volumeUnit")
+                )} / ${parseDuration(
+                  applicationAggregatedData?.minDurationTotal
+                )}`,
+                " / "
+              )}
+            </span>
+            <IconArrowRight />
+          </div>
+        ),
       },
     ],
-    index: "id",
+    index: "applicationEventScheduleId",
     sorting: "organisation.name",
     order: "asc",
-    rowLink: (id) => `/application/${id}`,
+    rowLink: ({ applicationEventScheduleId }: AllocationResult) => {
+      return applicationEventScheduleId && applicationRound
+        ? `/applicationRound/${applicationRound.id}/recommendation/${applicationEventScheduleId}`
+        : "";
+    },
+    groupLink: ({ space }) =>
+      applicationRound
+        ? `/applicationRound/${applicationRound.id}/space/${space?.id}`
+        : "",
   };
+};
+
+const getFilterConfig = (
+  recommendations: ApplicationEvent[]
+): DataFilterConfig[] => {
+  const purposes = uniq(recommendations.map((app) => app.purpose));
+
+  return [
+    {
+      title: "Application.headings.purpose",
+      filters: purposes.map((value) => ({
+        title: value,
+        key: "applicationEvent.purpose",
+        value: value || "",
+      })),
+    },
+  ];
 };
 
 function SupervisorApproval({ applicationRoundId }: IProps): JSX.Element {
@@ -202,6 +264,12 @@ function SupervisorApproval({ applicationRoundId }: IProps): JSX.Element {
     isConfirmationDialogVisible,
     setConfirmationDialogVisibility,
   ] = useState<boolean>(false);
+  const [recommendations, setRecommendations] = useState<
+    AllocationResult[] | []
+  >([]);
+  const [filterConfig, setFilterConfig] = useState<DataFilterConfig[] | null>(
+    null
+  );
   const [cellConfig, setCellConfig] = useState<CellConfig | null>(null);
   const [activeFilter, setActiveFilter] = useState<string>("handled");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -209,12 +277,18 @@ function SupervisorApproval({ applicationRoundId }: IProps): JSX.Element {
   const { t } = useTranslation();
   const history = useHistory();
 
-  const setApplicationRoundStatus = async (status: ApplicationRoundStatus) => {
+  const setApplicationRoundStatus = async (
+    status: ApplicationRoundStatus,
+    followupUrl?: string
+  ) => {
     const payload = { ...applicationRound, status } as ApplicationRoundType;
 
     try {
       const result = await saveApplicationRound(payload);
       setApplicationRound(result);
+      if (followupUrl) {
+        history.push(followupUrl);
+      }
     } catch (error) {
       setErrorMsg("errors.errorSavingData");
     }
@@ -230,8 +304,6 @@ function SupervisorApproval({ applicationRoundId }: IProps): JSX.Element {
           id: Number(applicationRoundId),
         });
         setApplicationRound(result);
-        setCellConfig(getCellConfig(t));
-        setIsLoading(false);
       } catch (error) {
         const msg =
           error.response?.status === 404
@@ -245,6 +317,32 @@ function SupervisorApproval({ applicationRoundId }: IProps): JSX.Element {
     fetchApplicationRound();
   }, [applicationRoundId, t]);
 
+  useEffect(() => {
+    const fetchRecommendations = async (arId: number) => {
+      try {
+        const result = await getAllocationResults({
+          applicationRoundId: arId,
+        });
+
+        setFilterConfig(
+          getFilterConfig(
+            result.flatMap((n: AllocationResult) => n.applicationEvent)
+          )
+        );
+        setCellConfig(getCellConfig(t, applicationRound));
+        setRecommendations(result || []);
+      } catch (error) {
+        setErrorMsg("errors.errorFetchingApplications");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (typeof applicationRound?.id === "number") {
+      fetchRecommendations(applicationRound.id);
+    }
+  }, [applicationRound, t]);
+
   const scheduledNumbers = {
     volume: 239048,
     hours: 2345,
@@ -252,13 +350,22 @@ function SupervisorApproval({ applicationRoundId }: IProps): JSX.Element {
 
   const backLink = "/applicationRounds";
 
+  const filteredResults =
+    activeFilter === "orphans"
+      ? recommendations.filter(
+          (n) => !["validated"].includes(n.applicationEvent.status)
+        )
+      : recommendations.filter((n) =>
+          ["validated"].includes(n.applicationEvent.status)
+        );
+
   if (isLoading) {
     return <Loader />;
   }
 
   return (
     <Wrapper>
-      {applicationRound && (
+      {applicationRound && cellConfig && filterConfig && (
         <>
           <ContentContainer>
             <LinkPrev route={backLink} />
@@ -363,14 +470,14 @@ function SupervisorApproval({ applicationRoundId }: IProps): JSX.Element {
           </IngressContainer>
           {cellConfig && (
             <DataTable
-              groups={[]}
+              groups={prepareAllocationResults(filteredResults)}
               hasGrouping={false}
               config={{
                 filtering: true,
                 rowFilters: true,
               }}
               cellConfig={cellConfig}
-              filterConfig={[]}
+              filterConfig={filterConfig}
             />
           )}
           {isCancelDialogVisible && (
@@ -398,8 +505,10 @@ function SupervisorApproval({ applicationRoundId }: IProps): JSX.Element {
                   type="submit"
                   variant="primary"
                   onClick={() => {
-                    setApplicationRoundStatus("allocated");
-                    history.push(`/applicationRound/${applicationRound.id}`);
+                    setApplicationRoundStatus(
+                      "allocated",
+                      `/applicationRounds/approvals?cancelled`
+                    );
                   }}
                 >
                   {t("ApplicationRound.returnListToHandling")}
@@ -432,9 +541,10 @@ function SupervisorApproval({ applicationRoundId }: IProps): JSX.Element {
                   type="submit"
                   variant="primary"
                   onClick={() => {
-                    // TODO: correct routing with notification
-                    setApplicationRoundStatus("approved");
-                    setConfirmationDialogVisibility(false);
+                    setApplicationRoundStatus(
+                      "approved",
+                      `/applicationRounds/approvals?approved`
+                    );
                   }}
                 >
                   {t("common.approve")}
@@ -444,7 +554,6 @@ function SupervisorApproval({ applicationRoundId }: IProps): JSX.Element {
           )}
         </>
       )}
-
       {errorMsg && (
         <Notification
           type="error"

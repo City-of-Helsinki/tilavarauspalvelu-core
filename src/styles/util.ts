@@ -34,7 +34,6 @@ export const getApplicationStatusColor = (
       break;
     case "review_done":
     case "validated":
-    case "handled":
       color = "var(--color-success)";
       break;
     case "declined":

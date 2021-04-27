@@ -31,6 +31,7 @@ function StatusRecommendation({
   const { setModalContent } = useModal();
 
   let activeState: number;
+  let modal = true;
   switch (status) {
     case "in_review":
       activeState = 2;
@@ -49,6 +50,7 @@ function StatusRecommendation({
       break;
     case "supervisorApproval":
       activeState = 7;
+      modal = false;
       break;
     default:
   }
@@ -56,17 +58,19 @@ function StatusRecommendation({
   return (
     <Wrapper className={className}>
       {t(`ApplicationRound.recommendations.${status}`)}
-      <StyledInfoBubble
-        onClick={() =>
-          setModalContent &&
-          setModalContent(
-            <StageInfo
-              activeStage={activeState}
-              applicationRound={applicationRound}
-            />
-          )
-        }
-      />
+      {modal && (
+        <StyledInfoBubble
+          onClick={() =>
+            setModalContent &&
+            setModalContent(
+              <StageInfo
+                activeStage={activeState}
+                applicationRound={applicationRound}
+              />
+            )
+          }
+        />
+      )}
     </Wrapper>
   );
 }

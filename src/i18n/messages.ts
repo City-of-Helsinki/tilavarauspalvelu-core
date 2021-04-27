@@ -61,8 +61,24 @@ const translations: ITranslations = {
     volumeUnit: [" kpl", " ", " "],
     personUnit: ["{{count}} henkilö"],
     personUnit_plural: ["{{count}} henkeä"],
-    hoursUnit: [" h", " h", " h"],
-    minutesUnit: [" min", " min", " min"],
+    hoursUnit: ["{{count}} h", "{{count}} h", "{{count}} h"],
+    hoursUnitLong: ["{{count}} tunti", "{{count}} hour", "{{count}} timme"],
+    hoursUnitLong_plural: [
+      "{{count}} tuntia",
+      "{{count}} hours",
+      "{{count}} timmar",
+    ],
+    minutesUnit: ["{{count}} min", "{{count}} min", "{{count}} min"],
+    minutesUnitLong: [
+      "{{count}} minuutti",
+      "{{count}} minute",
+      "{{count}} minut",
+    ],
+    minutesUnitLong_plural: [
+      "{{count}} minuuttia",
+      "{{count}} minutes",
+      "{{count}} minuter",
+    ],
     streetAddress: ["Katuosoite"],
     postalNumber: ["Postinumero"],
     postalDistrict: ["Postitoimipaikka"],
@@ -113,7 +129,7 @@ const translations: ITranslations = {
       "Voit käsitellä palvelussa vastuualueellesi osoitettuja Helsingin kaupungin tilavaraushakemuksia tai hallita varattaviksi asetettavien tilojen tai resurssien tietoja.",
     ],
     body: [
-      "Palvelua pilotoidaan nuorison vakiovuorovarauksilla vuoden 2021 aikana. Palveluun voivat toistaiseksi kirjautua vain ne Helsingin kaupungin työntekijät, joteka edustavat pilottikohdetta.",
+      "Palvelua pilotoidaan nuorison vakiovuorovarauksilla vuoden 2021 aikana. Palveluun voivat toistaiseksi kirjautua vain ne Helsingin kaupungin työntekijät, jotka edustavat pilottikohdetta.",
     ],
   },
   User: {
@@ -213,6 +229,7 @@ const translations: ITranslations = {
       community: ["Seura"],
       company: ["Yritys"],
       unregisteredAssociation: ["Rekisteröimätön yhdistys"],
+      nonprofit: ["Voittoa tavoittelematon yhdistys"],
     },
     contactPerson: ["Yhteyshenkilö"],
     identificationNumber: ["Rekisterinumero"],
@@ -240,7 +257,7 @@ const translations: ITranslations = {
     infoGivenByCustomer: ["Asiakkaan ilmoittamat tiedot"],
     recommendedAid: ["Haetut vuorot"],
     appliedReservations: ["Haetut vuorot"],
-    appliedSpace: ["Haettu tila"],
+    appliedSpace: ["Tarjottu tila"],
     totalReservationTime: ["Kokonaiskesto"],
     recommendedSpaceAid: ["Tilankäyttönä suositeltava avustus"],
     recommendations: {
@@ -258,7 +275,7 @@ const translations: ITranslations = {
         "Odota esihenkilösi hyväksyntää tai mahdollisia muutospyyntöjä.",
       ],
       supervisorApproval: [
-        "Tarkasta vuorojakopäätös (esim. suodattamalla) ja toimita päätökset asiakkaille.",
+        "Tarkasta vuorojakopäätös (esim. toimipisteitä suodattamalla) ja toimita päätökset asiakkaille.",
       ],
     },
     roundCriteria: ["Kierroksen kriteerit"],
@@ -301,11 +318,21 @@ const translations: ITranslations = {
     sentForApprovalNotificationBody: [
       "Voit katsella alta hyväksyntää odottavaa päätöslauselmaa.",
     ],
+    approvedNotificationHeader: ["Olet hyväskynyt vuorojakopäätöksen"],
+    approvedNotificationBody: [
+      "Näet kaikki hyväksymäsi päätökset Hyväksytyt-kansiossa.",
+    ],
+    approvalCancelledNotificationHeader: [
+      "Olet palauttanut listan käsittelyyn",
+    ],
+    approvalCancelledNotificationBody: ["Muutos näkyy käsittelijöille."],
     schedulesToBeGranted: ["Myönnettäviä vuoroja"],
     attachedReservationUnits: ["Liitettyä varausyksikköä"],
     orphanApplications: ["Ehdotuksitta jääneet"],
     handledApplications: ["Käsitellyt ehdotukset"],
     amountReserved: ["Kapasiteetista varattu"],
+    amountReservedOfSpace: ["Tilan kapasiteetista varattu"],
+    amountReservedOfSpaceSubtext: ["Kierrokselle osoitetusta tilan maksimista"],
     percentageOfCapacity: ["{{percentage}} % kapasiteetista"],
     cancelSupervisorApproval: ["Palauta lista hyväksymättä käsittelijälle"],
     approveAndSendToCustomers: ["Hyväksy ja toimita päätökset asiakkaille"],
@@ -351,6 +378,19 @@ const translations: ITranslations = {
     summaryOfCriteriaAndBaskets: ["Kriteerien ja korien yhteenveto"],
     preferredAllocationGroups: ["Tilan saajina suositut ryhmät"],
     usedReservationUnits: ["Kierrokselle liitetyt varausyksiköt"],
+    approvalListTitle: ["Hyväksyntäjonosi"],
+    approvalListSubtitle: [
+      "Näet täällä hyväksyntääsi odottavat ja hyväksytyt ehdotukset hakukierrosten tarjous- tai myöntöpäätöksistä.",
+    ],
+    noApprovalRights: [
+      "Sinulla ei ole riittäviä oikeuksia hakukierrosten hyväksyntään.",
+    ],
+    waitingForApproval: ["Odottaa hyväksyntää"],
+    noPendingApprovals: ["Ei hyväksyntää odottavia hakukierroksia."],
+    approvalDoneListTitle: ["Hyväksytyt"],
+    noPendingDoneApprovals: ["Ei hyväksyttyjä hakukierroksia."],
+    resolutionNumber: ["Päätösnumero #{{no}}"],
+    resolutionDate: ["Päätös tehty"],
   },
   Basket: {
     purpose: ["Tuettava toiminta"],
@@ -379,15 +419,31 @@ const translations: ITranslations = {
     summary: ["Ehdotuksen tiivistelmä"],
     recommendedSlot: ["Asiakkaalle ehdotettava jakso"],
     thisPartsTerms: ["Tämän osan käyttöehdot"],
-    actionDecline: ["Hylkää ehdotettu vuoro"],
+    actionDecline: ["Hylkää vuoro ja rajoita viikkomäärää"],
     actionApprove: ["Hyväksy ehdotettu vuoro"],
-    actionIgnoreSpace: ["Hylkää ehdotettu vuoro tästä tilasta"],
-    actionMassDecline: ["Hylkää ehdotetut vuorot"],
+    actionIgnoreSpace: ["Hylkää tilaehdotus"],
+    actionMassDecline: ["Hylkää vuorot ja rajoita viikkomäärää"],
     actionMassApprove: ["Hyväksy ehdotetut vuorot"],
     actionMassIgnoreSpace: ["Hylkää ehdotetut vuorot tästä tilasta"],
     actionHelperText: [
-      "Jos hylkäät ehdotetun vuoron, vuoron osuutta ei myönnetä asiakkaalle mihinkään tilaan. Jos hylkäät ehdotetun vuoron tästä tilasta, sille pyritään löytämään korvaava tila asiakkaan toiveista. Hylkäyksen ja kiellon tarjota tätä tilaa voi purkaa tarvittaessa myöhemmin. Hyväksyminen ei lähetä myöntöpäätöstä välittömästi asiakkaalle, vaan vasta esihenkilön hyväksyessä kaikki myöntöpäätökset kerralla.",
+      "Jos hylkäät tämän vuoron, ryhmältä vähennetään yksi viikkovuorotoive. Muille vuorotoiveille, joita ei ole käsitelty, pyritään löytämään vuoro. Jos hylkäät ryhmän tästä tilasta, pyritään ryhmälle löytämään korvaava tila. Uutta tilaa tarjotaan vain, jos hakijan toiveiden mukaisia vapaita aikoja on valituista tiloista jakamatta. Vuoron hylkäyksen ja kiellon tarjota tätä tilaa voi purkaa tarvittaessa myöhemmin. Hyväksyminen ei lähetä myöntöpäätöstä välittömästi asiakkaalle, vaan vasta esihenkilön hyväksyessä kaikki myöntöpäätökset kerralla.",
     ],
+    actionReturnAsPartOfAllocation: [
+      "Palauta viikkovuorotoive osaksi käsittelyä",
+    ],
+    actionReturnAsPartOfAllocationHelper: [
+      "Palautus ei tarkoita, että ryhmälle on mahdollista enää myöntää juuri tätä vuoroa. Viikkovuorotoive otetaan kuitenkin huomioon seuraavan uudelleenkäynnistyksen aikana.",
+    ],
+    actionRevertIgnoreSpace: [
+      "Pura vuoroltatilakielto, joka kohdistuu tähän tilaan",
+    ],
+    actionRevertIgnoreSpaceHelper: [
+      "Purkaminen ei tarkoita, että ryhmälle on mahdollista enää myöntää juuri tätä vuoroa tähän tilaan. Vuoron tilatoive otetaan kuitenkin huomioon seuraavan uudelleenkäynnistyksen aikana.",
+    ],
+    actionRevertToUnhandled: ["Palauta ehdotus käsittelemättömäksi"],
+    labelAgeGroup: ["Käyttäjien ikäryhmä"],
+    labelAppliedReservations: ["Vuoroja"],
+    labelSpaceRank: ["Tarjottu tila toivesijalla {{rank}}"],
     actionMassActionSubmit: ["Massakäsittele valitut"],
     recommendationCount: ["{{count}} ehdotus tehty"],
     recommendationCount_plural: ["{{count}} ehdotusta tehty"],
@@ -409,14 +465,15 @@ const translations: ITranslations = {
     approveSuccessBody: [
       "Hyväksytyt ehdotukset siirtyvät esihenkilölle hyväksyttäväksi.",
     ],
-    declineSuccessHeading: ["Ehdotus hylätty"],
+    declineSuccessHeading: ["Vuoro hylätty"],
     declineSuccessBody: [
-      "Valitsemasi vuoro hylättiin. Voit tarvittaessa purkaa hylkäyksen.",
+      "Hakijalta on vähennetty yksi viikkovuorotoive. Voit tarvittaessa purkaa hylkäyksen.",
     ],
     banSuccessHeading: ["Tilakielto asetettu"],
     banSuccessBody: [
-      "Valitsemaasi vuoroa ei tarjota enää tähän tilaan. Voit tarvittaessa purkaa tilaan kohdistuvan kiellon.",
+      "Valittua vuoroa ja ryhmän tulevia vuoroja ei tarjota enää tähän tilaan. Voit tarvittaessa purkaa tähän tilaan kohdistuvan kiellon.",
     ],
+    scheduleDuration: ["Vuoron kesto {{duration}}"],
   },
   ReservationUnit: {
     reservationStatus: ["Varaustilanne"],

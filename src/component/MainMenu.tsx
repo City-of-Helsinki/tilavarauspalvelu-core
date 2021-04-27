@@ -64,7 +64,9 @@ const SubItemList = styled.ul`
   margin-top: 0.685rem;
 `;
 
-const SubItemHeading = styled(NavLink)<{ $disabled: boolean }>`
+const SubItemHeading = styled(NavLink).attrs({ exact: true })<{
+  $disabled: boolean;
+}>`
   &.active {
     text-decoration: underline;
   }

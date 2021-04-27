@@ -30,6 +30,7 @@
     "lodash": "^4.17.20",
     "node-sass": "^4.0.0",
     "oidc-client": "^1.11.5",
+    "query-string": "^7.0.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-i18next": "^11.8.5",
@@ -41,8 +42,7 @@
     "web-vitals": "^0.2.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "start:noauth": "REACT_APP_DISABLE_AUTH=true react-scripts start",
+    "start": "HOST=local-tilavaraus.hel.fi HTTPS=true react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "test:e2e-local": "testcafe --skip-js-errors \"chrome --window-size='1920,1080'\" e2e/tests",

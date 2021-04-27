@@ -14,6 +14,11 @@ First check out the latest version of the backend/api project from https://githu
 ```
 docker-compose up --build
 ```
+Make sure /etc/hosts point domain local-tilavaraus.hel.fi to 127.0.0.1. This is important because tunnistamo currently does not provide SameSite information for the cookies it uses. Some browsers (like Chrome) default the SameSite to be Lax. Because of this tunnistamo and the site it is authenticating for need to share same-site context. Without fulfilling this requirement the silent renew might not work properly due to browser blocking required cookies.
+
+```
+127.0.0.1       local-tilavaraus.hel.fi
+```
 
 Start UI
 
@@ -23,7 +28,7 @@ yarn start
 
 ### Access with browser
 
-UI is at http://127.0.0.1:3000/
+UI is at https://local-tilavaraus.hel.fi:3000/
 Backend is at http://127.0.0.1:8000/v1/
 
 The UI development server exposes the proxied backend at http://127.0.0.1:3000/api/ which the UI uses.

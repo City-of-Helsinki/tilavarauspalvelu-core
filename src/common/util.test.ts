@@ -1,4 +1,4 @@
-import { parseDuration, secondsToHms } from "./util";
+import { formatTimeDistance, parseDuration, secondsToHms } from "./util";
 
 test("secondToHms", () => {
   expect(secondsToHms(9832475)).toEqual({ h: 2731, m: 14, s: 35 });
@@ -9,9 +9,15 @@ test("secondToHms", () => {
 });
 
 test("parseDuration", () => {
-  expect(parseDuration(7834)).toBe("2 undefined 10 undefined");
+  expect(parseDuration(7834)).toBe("undefined undefined");
   expect(parseDuration(0)).toBe("");
   expect(parseDuration(-30)).toBe("");
-  expect(parseDuration()).toBe("");
   expect(parseDuration(undefined)).toBe("");
+});
+
+test("formatTimeDistance", () => {
+  expect(formatTimeDistance("10:00:00", "14:00:00")).toBe(4 * 3600);
+  expect(formatTimeDistance("10:00:00", "foo")).toBe(undefined);
+  expect(formatTimeDistance("00:00:00", "12:00:00")).toBe(12 * 3600);
+  expect(formatTimeDistance("00:00:00", "12:00:01")).toBe(12 * 3600 + 1);
 });

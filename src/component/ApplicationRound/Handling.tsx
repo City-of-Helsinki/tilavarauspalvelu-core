@@ -290,99 +290,14 @@ function Handling({
   useEffect(() => {
     const fetchRecommendations = async () => {
       try {
-        // const result = [
-        //   {
-        //     id: 1,
-        //     space: {
-        //       id: 23,
-        //       name: "Suuri sali",
-        //     },
-        //     reservationUnit: {
-        //       name: "Fallkullan tila",
-        //     },
-        //     data: [
-        //       {
-        //         id: 2,
-        //         purpose: "Purpose",
-        //         ageGroup: "4-5",
-        //         status: "review_done",
-        //         organisation: {
-        //           name: "Org Name",
-        //           identifier: null,
-        //           yearEstablished: 1980,
-        //           activeMembers: 13,
-        //           coreBusiness: null,
-        //           address: null,
-        //         },
-        //         aggregatedData: {},
-        //       },
-        //       {
-        //         id: 3,
-        //         purpose: "Purpose #2",
-        //         ageGroup: "2-3",
-        //         status: "review_done",
-        //         organisation: {
-        //           name: "Org Name #2",
-        //           identifier: null,
-        //           yearEstablished: 1980,
-        //           activeMembers: 13,
-        //           coreBusiness: null,
-        //           address: null,
-        //         },
-        //         aggregatedData: {},
-        //       },
-        //     ],
-        //   },
-        //   {
-        //     id: 2,
-        //     space: {
-        //       id: 22,
-        //       name: "Pieni sali",
-        //     },
-        //     reservationUnit: {
-        //       name: "Haltialan tila",
-        //     },
-        //     data: [
-        //       {
-        //         id: 4,
-        //         purpose: "Purpose #3",
-        //         ageGroup: "14-15",
-        //         status: "review_done",
-        //         organisation: {
-        //           name: "Org Name #3",
-        //           identifier: null,
-        //           yearEstablished: 1980,
-        //           activeMembers: 13,
-        //           coreBusiness: null,
-        //           address: null,
-        //         },
-        //         aggregatedData: {},
-        //       },
-        //       {
-        //         id: 13,
-        //         purpose: "Purpose #4",
-        //         ageGroup: "12-13",
-        //         status: "review_done",
-        //         organisation: {
-        //           name: "Org Name #4",
-        //           identifier: null,
-        //           yearEstablished: 1980,
-        //           activeMembers: 13,
-        //           coreBusiness: null,
-        //           address: null,
-        //         },
-        //         aggregatedData: {},
-        //       },
-        //     ],
-        //   },
-        // ];
-
         const result = await getAllocationResults({
           applicationRoundId: applicationRound.id,
         });
 
         setFilterConfig(
-          getFilterConfig(result.flatMap((n) => n.applicationEvent))
+          getFilterConfig(
+            result.flatMap((n: AllocationResult) => n.applicationEvent)
+          )
         );
         setCellConfig(getCellConfig(t, applicationRound));
         setRecommendations(result);
