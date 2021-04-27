@@ -60,7 +60,7 @@
     "webpack-node-externals": "^2.5.2"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "HOST=local-tilavaraus.hel.fi HTTPS=true react-scripts start",
     "build": "yarn build:prod",
     "build:dev": "env-cmd -f ./.env.development react-scripts build",
     "build:prod": "react-scripts build && compress-cra",

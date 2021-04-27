@@ -12,8 +12,8 @@ const configuration = {
   post_logout_redirect_uri: base,
   scope: oidcScope,
   authority: 'https://api.hel.fi/sso/',
-  silent_redirect_uri: `${base}/login/helsinki/return`,
-  automaticSilentRenew: false,
+  silent_redirect_uri: `${base}/login/helsinki/silent`,
+  automaticSilentRenew: true,
   loadUserInfo: false,
 };
 
