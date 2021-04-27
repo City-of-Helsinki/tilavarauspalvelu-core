@@ -19,6 +19,7 @@ import Applications from "./component/Application/Applications";
 import Criteria from "./component/ApplicationRound/Criteria";
 import RecommendationsByReservationUnit from "./component/ApplicationRound/RecommendationsByReservationUnit";
 import ApplicationRoundApprovals from "./component/ApplicationRound/ApplicationRoundApprovals";
+import { publicUrl } from "./common/const";
 
 interface IPrivateRouteProps {
   path: string;
@@ -47,7 +48,7 @@ function App(): JSX.Element {
   };
 
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={publicUrl}>
       <UIContext.Provider
         value={{
           modalContent: null,
