@@ -260,10 +260,11 @@ function PreApproval({
   const { t } = useTranslation();
 
   useEffect(() => {
-    const fetchRecommendations = async (arId: number) => {
+    const fetchRecommendations = async (arId: number, ssId: number) => {
       try {
         const result = await getAllocationResults({
           applicationRoundId: arId,
+          serviceSectorId: ssId,
         });
 
         setFilterConfig(
@@ -281,7 +282,10 @@ function PreApproval({
     };
 
     if (typeof applicationRound?.id === "number") {
-      fetchRecommendations(applicationRound.id);
+      fetchRecommendations(
+        applicationRound.id,
+        applicationRound.serviceSectorId
+      );
     }
   }, [applicationRound, t]);
 

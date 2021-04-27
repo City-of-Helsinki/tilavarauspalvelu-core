@@ -272,17 +272,21 @@ function RecommendationsByApplicant(): JSX.Element {
   }, [applicationRoundId]);
 
   useEffect(() => {
-    const fetchRecommendations = async (arId: number, apId: number) => {
+    const fetchRecommendations = async (
+      ar: ApplicationRoundType,
+      apId: number
+    ) => {
       try {
         const result = await getAllocationResults({
-          applicationRoundId: arId,
+          applicationRoundId: ar.id,
+          serviceSectorId: ar.serviceSectorId,
           applicant: apId,
         });
 
         setFilterConfig(
           getFilterConfig(result.flatMap((n) => n.applicationEvent))
         );
-        setCellConfig(getCellConfig(t, applicationRound));
+        setCellConfig(getCellConfig(t, ar));
         setRecommendations(result || []);
       } catch (error) {
         setErrorMsg("errors.errorFetchingApplications");
@@ -291,7 +295,7 @@ function RecommendationsByApplicant(): JSX.Element {
     };
 
     if (typeof applicationRound?.id === "number") {
-      fetchRecommendations(applicationRound.id, Number(applicantId));
+      fetchRecommendations(applicationRound, Number(applicantId));
     }
   }, [applicationRound, applicantId, t]);
 

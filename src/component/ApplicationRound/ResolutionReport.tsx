@@ -205,10 +205,11 @@ function ResolutionReport({ applicationRound }: IProps): JSX.Element {
   const { t } = useTranslation();
 
   useEffect(() => {
-    const fetchRecommendations = async (arId: number) => {
+    const fetchRecommendations = async (ar: ApplicationRoundType) => {
       try {
         const result = await getAllocationResults({
-          applicationRoundId: arId,
+          applicationRoundId: ar.id,
+          serviceSectorId: ar.serviceSectorId,
         });
 
         setFilterConfig(
@@ -216,7 +217,7 @@ function ResolutionReport({ applicationRound }: IProps): JSX.Element {
             result.flatMap((n: AllocationResult) => n.applicationEvent)
           )
         );
-        setCellConfig(getCellConfig(t, applicationRound));
+        setCellConfig(getCellConfig(t, ar));
         setRecommendations(result || []);
       } catch (error) {
         setErrorMsg("errors.errorFetchingApplications");
@@ -226,7 +227,7 @@ function ResolutionReport({ applicationRound }: IProps): JSX.Element {
     };
 
     if (typeof applicationRound?.id === "number") {
-      fetchRecommendations(applicationRound.id);
+      fetchRecommendations(applicationRound);
     }
   }, [applicationRound, t]);
 

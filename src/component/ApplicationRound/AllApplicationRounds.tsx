@@ -85,7 +85,7 @@ function AllApplicationRounds(): JSX.Element {
                     applicationRound.status === "validated" &&
                     applicationRound.isAdmin
                   ) {
-                    return `/applicationRound/{$id}/approval`;
+                    return `/applicationRound/${id}/approval`;
                   }
                   return `/applicationRound/${id}`;
                 };
