@@ -99,7 +99,7 @@ function ApplicationRound(): JSX.Element | null {
     content = <ResolutionReport applicationRound={applicationRound} />;
   } else if (
     applicationRound &&
-    ["in_review"].includes(applicationRound.status)
+    ["draft", "in_review"].includes(applicationRound.status)
   ) {
     content = (
       <Review

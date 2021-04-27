@@ -77,7 +77,7 @@ function AllApplicationRounds(): JSX.Element {
               {`${applicationRounds.length} ${t("common.volumeUnit")}`}
             </RoundTypeIngress>
           </IngressContainer>
-          <WideContainer>
+          <WideContainer style={{ marginBottom: "var(--spacing-layout-xl)" }}>
             {applicationRounds.length > 0 ? (
               applicationRounds.map((applicationRound) => {
                 const getRoute = (id: number): string => {
