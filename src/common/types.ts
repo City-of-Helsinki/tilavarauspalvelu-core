@@ -237,7 +237,7 @@ export interface DataGroup {
   id: number;
   space?: AllocatedSpace;
   reservationUnit?: AllocatedReservationUnit;
-  data: any;
+  data: any; // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
 export interface AllocationResult {

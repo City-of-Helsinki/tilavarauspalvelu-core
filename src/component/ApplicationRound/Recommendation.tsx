@@ -274,7 +274,7 @@ function Recommendation(): JSX.Element {
         <Button
           variant="secondary"
           iconLeft={<IconArrowUndo />}
-          onClick={() => console.log("palauta kasittelemattomaksi")}
+          onClick={() => console.log("palauta kasittelemattomaksi")} // eslint-disable-line no-console
           disabled={isSaving}
         >
           {t("Recommendation.actionRevertToUnhandled")}
@@ -286,7 +286,7 @@ function Recommendation(): JSX.Element {
         <Button
           variant="secondary"
           iconLeft={<IconArrowUndo />}
-          onClick={() => console.log("palauta osaksi kasittelya")}
+          onClick={() => console.log("palauta osaksi kasittelya")} // eslint-disable-line no-console
           disabled={isSaving}
         >
           {t("Recommendation.actionReturnAsPartOfAllocation")}
@@ -299,7 +299,7 @@ function Recommendation(): JSX.Element {
         <Button
           variant="secondary"
           iconLeft={<IconArrowUndo />}
-          onClick={() => console.log("revert ignore")}
+          onClick={() => console.log("revert ignore")} // eslint-disable-line no-console
           disabled={isSaving}
         >
           {t("Recommendation.actionRevertIgnoreSpace")}
