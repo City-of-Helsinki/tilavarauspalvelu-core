@@ -306,10 +306,14 @@ function RecommendationsByReservationUnit(): JSX.Element {
   }, [applicationRoundId, t]);
 
   useEffect(() => {
-    const fetchRecommendations = async (arId: number, spId: number) => {
+    const fetchRecommendations = async (
+      ar: ApplicationRoundType,
+      spId: number
+    ) => {
       try {
         const result = await getAllocationResults({
-          applicationRoundId: arId,
+          applicationRoundId: ar.id,
+          serviceSectorId: ar.serviceSectorId,
         });
 
         const filteredResult: AllocationResult[] = result.filter(
@@ -329,7 +333,7 @@ function RecommendationsByReservationUnit(): JSX.Element {
     };
 
     if (typeof applicationRound?.id === "number") {
-      fetchRecommendations(applicationRound.id, Number(reservationUnitId));
+      fetchRecommendations(applicationRound, Number(reservationUnitId));
     }
   }, [applicationRound, reservationUnitId, t]);
 

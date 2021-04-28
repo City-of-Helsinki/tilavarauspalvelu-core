@@ -292,6 +292,7 @@ function Handling({
       try {
         const result = await getAllocationResults({
           applicationRoundId: applicationRound.id,
+          serviceSectorId: applicationRound.serviceSectorId,
         });
 
         setFilterConfig(

@@ -234,6 +234,7 @@ function Application(): JSX.Element | null {
     function?: () => Promise<void>;
   };
   switch (application?.status) {
+    case "draft":
     case "in_review":
     case "review_done":
       action = {

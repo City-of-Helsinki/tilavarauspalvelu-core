@@ -158,7 +158,9 @@ function ApplicationDetails(): JSX.Element | null {
   )
     ? t("common.same")
     : trim(
-        `${application?.billingAddress?.streetAddress}, ${application?.billingAddress?.postCode} ${application?.billingAddress?.city}`,
+        `${application?.billingAddress?.streetAddress || ""}, ${
+          application?.billingAddress?.postCode || ""
+        } ${application?.billingAddress?.city || ""}`,
         ", "
       );
 

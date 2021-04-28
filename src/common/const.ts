@@ -16,3 +16,4 @@ export const oidcClientId = process.env.REACT_APP_OIDC_CLIENT_ID;
 export const oidcUrl = process.env.REACT_APP_OIDC_URL;
 export const oidcScope = process.env.REACT_APP_OIDC_SCOPE;
 export const apiScope = process.env.REACT_APP_TILAVARAUS_API_SCOPE;
+export const publicUrl = process.env.PUBLIC_URL;

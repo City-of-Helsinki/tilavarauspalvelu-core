@@ -79,7 +79,7 @@ function ApplicationRounds(): JSX.Element {
     isWaitingForApproval(applicationRound)
   );
   const handleRounds = applicationRounds?.filter((applicationRound) =>
-    ["in_review", "review_done", "allocated", "handled"].includes(
+    ["draft", "in_review", "review_done", "allocated", "handled"].includes(
       applicationRound.status
     )
   );
