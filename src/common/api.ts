@@ -1,4 +1,5 @@
 import { AxiosRequestConfig, AxiosResponse } from "axios";
+import omit from "lodash/omit";
 import axiosClient from "./auth/axiosClient";
 import {
   Application,
@@ -228,12 +229,14 @@ export function getAllocationResults(
 
 interface AllocationResultParams {
   id: number;
+  serviceSectorId: number;
 }
 
 export function getAllocationResult(
   params: AllocationResultParams
 ): Promise<AllocationResult> {
   return apiGet({
+    parameters: omit(params, "id"),
     path: `v1/${allocationResultPath}/${params.id}`,
   });
 }

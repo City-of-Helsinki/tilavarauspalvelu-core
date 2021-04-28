@@ -333,7 +333,8 @@ function Handling({
   const unhandledRecommendationCount: number = recommendations
     .flatMap((recommendation) => recommendation.applicationEvent)
     .map((recommendation) => recommendation.status)
-    .filter((status) => ["created"].includes(status)).length;
+    .filter((status) => ["created", "allocating", "allocated"].includes(status))
+    .length;
 
   if (isLoading) {
     return <Loader />;

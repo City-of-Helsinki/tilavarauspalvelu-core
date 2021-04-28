@@ -211,11 +211,13 @@ function Recommendation(): JSX.Element {
 
   const fetchRecommendation = async (aesId: number, appRoundId: number) => {
     try {
-      const recommendationResult = await getAllocationResult({
-        id: aesId,
-      });
       const applicationRoundResult = await getApplicationRound({
         id: appRoundId,
+      });
+
+      const recommendationResult = await getAllocationResult({
+        id: aesId,
+        serviceSectorId: applicationRoundResult.serviceSectorId,
       });
 
       setRecommendation(recommendationResult);
