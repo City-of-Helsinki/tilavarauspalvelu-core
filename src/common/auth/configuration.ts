@@ -1,6 +1,7 @@
-import { oidcClientId, oidcScope } from "../const";
+import { oidcClientId, oidcScope, publicUrl } from "../const";
 
-const base = `${document.location.protocol}//${document.location.host}`;
+const path = publicUrl || "";
+const base = `${document.location.protocol}//${document.location.host}${path}`;
 
 const configuration = {
   client_id: oidcClientId,
