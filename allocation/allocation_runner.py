@@ -19,7 +19,7 @@ def start_allocation(allocation_request: AllocationRequest):
     try:
         allocation_events = solver.solve()
         mapper = AllocationResultMapper(
-            allocation_events=allocation_events,
+            allocated_events=allocation_events,
             application_round=allocation_request.application_round,
         )
         mapper.to_events()
