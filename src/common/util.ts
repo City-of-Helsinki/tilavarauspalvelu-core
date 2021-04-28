@@ -64,7 +64,11 @@ export const getNormalizedApplicationStatus = (
 export const getNormalizedRecommendationStatus = (
   status: RecommendationStatus
 ): RecommendationStatus => {
-  const normalizedStatus: RecommendationStatus = status;
+  let normalizedStatus: RecommendationStatus = status;
+
+  if (["created", "allocating", "allocated"].includes(status)) {
+    normalizedStatus = "created";
+  }
 
   return normalizedStatus;
 };

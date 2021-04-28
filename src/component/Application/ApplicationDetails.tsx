@@ -176,6 +176,13 @@ function ApplicationDetails(): JSX.Element | null {
     );
   }
 
+  const customerName =
+    application?.applicantType === "individual"
+      ? `${application.contactPerson?.firstName || ""} ${
+          application.contactPerson?.lastName || ""
+        }`.trim()
+      : application?.organisation?.name;
+
   return (
     <Wrapper>
       {application && (
@@ -188,7 +195,7 @@ function ApplicationDetails(): JSX.Element | null {
               <CustomerIcon>
                 <IconCustomers />
               </CustomerIcon>
-              <span>{application.organisation?.name}</span>
+              <span>{customerName}</span>
             </Heading>
             <DefinitionList>
               <dt>{t("Application.applicantType")}:</dt>

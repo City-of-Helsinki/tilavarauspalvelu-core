@@ -267,6 +267,13 @@ function Application(): JSX.Element | null {
       }
     : undefined;
 
+  const customerName =
+    application?.applicantType === "individual"
+      ? `${application.contactPerson?.firstName || ""} ${
+          application.contactPerson?.lastName || ""
+        }`.trim()
+      : application?.organisation?.name;
+
   return (
     <Wrapper>
       {application && applicationRound && (
@@ -287,7 +294,7 @@ function Application(): JSX.Element | null {
               <CustomerIcon>
                 <IconCustomers />
               </CustomerIcon>
-              <span>{application.organisation?.name}</span>
+              <span>{customerName}</span>
             </Heading>
             <ApplicantType>
               <dt>{t("Application.applicantType")}:</dt>
