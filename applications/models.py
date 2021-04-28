@@ -925,3 +925,30 @@ class ApplicationEventScheduleResult(models.Model):
         on_delete=models.SET_NULL,
         null=True,
     )
+
+
+class ApplicationEventWeeklyAmountReduction(models.Model):
+
+    application_event = models.ForeignKey(
+        ApplicationEvent,
+        verbose_name=_("Application event"),
+        related_name="weekly_amount_reductions",
+        on_delete=models.CASCADE,
+    )
+
+    application_event_schedule_result = models.ForeignKey(
+        ApplicationEventScheduleResult,
+        null=True,
+        verbose_name=_("Application event schedule result"),
+        on_delete=models.SET_NULL,
+    )
+
+    user = models.ForeignKey(
+        User,
+        verbose_name=_("User"),
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+    )
+
+    created_date = models.DateTimeField(auto_now_add=True)

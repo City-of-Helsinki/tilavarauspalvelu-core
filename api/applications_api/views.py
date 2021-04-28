@@ -10,6 +10,7 @@ from api.applications_api.filters import ApplicationFilter
 from api.applications_api.serializers import (
     ApplicationEventSerializer,
     ApplicationEventStatusSerializer,
+    ApplicationEventWeeklyAmountReductionSerializer,
     ApplicationSerializer,
     ApplicationStatusSerializer,
 )
@@ -17,11 +18,13 @@ from applications.models import (
     Application,
     ApplicationEvent,
     ApplicationEventStatus,
+    ApplicationEventWeeklyAmountReduction,
     ApplicationStatus,
 )
 from permissions.api_permissions import (
     ApplicationEventPermission,
     ApplicationEventStatusPermission,
+    ApplicationEventWeeklyAmountReductionPermission,
     ApplicationPermission,
     ApplicationStatusPermission,
 )
@@ -120,3 +123,18 @@ class ApplicationEventStatusViewSet(viewsets.ModelViewSet):
             kwargs["many"] = True
 
         return super().get_serializer(*args, **kwargs)
+
+
+class ApplicationEventWeeklyAmountReductionViewSet(viewsets.ModelViewSet):
+
+    serializer_class = ApplicationEventWeeklyAmountReductionSerializer
+
+    queryset = ApplicationEventWeeklyAmountReduction.objects.all()
+
+    http_method_names = ["post", "get"]
+
+    permission_classes = (
+        [ApplicationEventWeeklyAmountReductionPermission]
+        if not settings.TMP_PERMISSIONS_DISABLED
+        else [permissions.AllowAny]
+    )
