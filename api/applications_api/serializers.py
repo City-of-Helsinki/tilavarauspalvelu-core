@@ -22,6 +22,9 @@ from applications.models import (
     Person,
     Recurrence,
 )
+from applications.utils.reservation_creation import (
+    create_reservations_from_allocation_results,
+)
 from reservation_units.models import Purpose, ReservationUnit
 from reservations.models import AbilityGroup, AgeGroup
 
@@ -674,5 +677,12 @@ class ApplicationEventStatusSerializer(serializers.ModelSerializer):
         instance = ApplicationEventStatus(**validated_data)
         if request:
             instance.user = request.user
+
+        if (
+            instance.status == ApplicationEventStatus.APPROVED
+            and not instance.application_event.is_approved
+        ):
+            create_reservations_from_allocation_results(instance.application_event)
+
         instance.save()
         return instance

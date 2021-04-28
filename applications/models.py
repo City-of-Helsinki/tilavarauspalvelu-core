@@ -746,6 +746,10 @@ class ApplicationEvent(models.Model):
     def get_status(self):
         return self.statuses.last()
 
+    @property
+    def is_approved(self):
+        return self.statuses.filter(status=ApplicationEventStatus.APPROVED).exists()
+
     def __str__(self):
         return self.name if self.name else super().__str__()
 

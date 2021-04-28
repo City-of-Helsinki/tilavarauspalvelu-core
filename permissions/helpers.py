@@ -172,6 +172,15 @@ def can_manage_service_sectors_applications(
     )
 
 
+def can_validate_unit_applications(user: User, units: [Unit]) -> bool:
+    permission = "can_validate_applications"
+    return (
+        is_superuser(user)
+        or has_general_permission(user, permission)
+        or has_unit_permission(user, units, permission)
+    )
+
+
 def can_modify_application(user: User, application: Application) -> bool:
     return (
         is_superuser(user)

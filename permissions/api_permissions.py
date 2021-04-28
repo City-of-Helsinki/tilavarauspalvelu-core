@@ -1,6 +1,11 @@
 from rest_framework import permissions
 
-from applications.models import Application, ApplicationRound
+from applications.models import (
+    Application,
+    ApplicationEvent,
+    ApplicationEventStatus,
+    ApplicationRound,
+)
 from spaces.models import ServiceSector, Unit, UnitGroup
 
 from .helpers import (
@@ -17,6 +22,7 @@ from .helpers import (
     can_manage_resources,
     can_manage_service_sector_roles,
     can_manage_service_sectors_application_rounds,
+    can_manage_service_sectors_applications,
     can_manage_unit_group_roles,
     can_manage_unit_roles,
     can_manage_units_reservation_units,
@@ -25,6 +31,7 @@ from .helpers import (
     can_modify_city,
     can_modify_reservation,
     can_modify_reservation_unit,
+    can_validate_unit_applications,
     can_view_reservation,
 )
 
@@ -146,6 +153,72 @@ class ApplicationRoundPermission(permissions.BasePermission):
                 request.user, service_sector
             )
         except ServiceSector.DoesNotExist:
+            return False
+
+
+class ApplicationStatusPermission(permissions.BasePermission):
+    def has_object_permission(self, request, view, application_event_status):
+        return False
+
+    def has_permission(self, request, view):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+
+        application_id = request.data.get("application_id")
+        try:
+            service_sector = ServiceSector.objects.get(
+                applicationround=ApplicationRound.objects.get(
+                    applications=application_id
+                )
+            )
+            return can_manage_service_sectors_applications(request.user, service_sector)
+        except ApplicationRound.DoesNotExist:
+            return False
+        except ServiceSector.DoesNotExist:
+            return False
+
+
+class ApplicationEventStatusPermission(permissions.BasePermission):
+    def has_object_permission(self, request, view, application_event_status):
+        return False
+
+    def has_permission(self, request, view):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+
+        application_event_id = request.data.get("application_event_id")
+        status = request.data.get("status")
+        try:
+            service_sector = ServiceSector.objects.get(
+                applicationround=ApplicationRound.objects.get(
+                    applications=Application.objects.get(
+                        application_events=application_event_id
+                    )
+                )
+            )
+
+            if status in (
+                ApplicationEventStatus.APPROVED,
+                ApplicationEventStatus.DECLINED,
+            ):
+                return can_manage_service_sectors_applications(
+                    request.user, service_sector
+                )
+            elif status == ApplicationEventStatus.VALIDATED:
+                application_event = ApplicationEvent.objects.get(
+                    id=application_event_id
+                )
+                units = [
+                    event_res_unit.reservation_unit.unit
+                    for event_res_unit in application_event.event_reservation_units.all()
+                ]
+                return can_validate_unit_applications(request.user, units)
+        except (
+            Application.DoesNotExist,
+            ApplicationEvent.DoesNotExist,
+            ApplicationRound.DoesNotExist,
+            ServiceSector.DoesNotExist,
+        ):
             return False
 
 
