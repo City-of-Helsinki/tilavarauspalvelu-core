@@ -6,6 +6,7 @@ from .application_round_api import ApplicationRoundViewSet
 from .applications_api.views import (
     ApplicationEventStatusViewSet,
     ApplicationEventViewSet,
+    ApplicationEventWeeklyAmountReductionViewSet,
     ApplicationStatusViewSet,
     ApplicationViewSet,
 )
@@ -53,6 +54,11 @@ router.register(
     r"application_event_declined_reservation_unit",
     DeclinedReservationUnitViewSet,
     "declined_reservation_unit",
+)
+router.register(
+    r"application_event_weekly_amount_reduction",
+    ApplicationEventWeeklyAmountReductionViewSet,
+    "application_event_weekly_amount_reduction",
 )
 router.register(r"opening_hour", OpeningHoursViewSet, "opening_hour")
 router.register(r"parameters/district", DistrictViewSet, "district")

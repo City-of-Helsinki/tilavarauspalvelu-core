@@ -3,6 +3,7 @@ from rest_framework import permissions
 from applications.models import (
     Application,
     ApplicationEvent,
+    ApplicationEventScheduleResult,
     ApplicationEventStatus,
     ApplicationRound,
 )
@@ -298,6 +299,36 @@ class ApplicationEventPermission(permissions.BasePermission):
             except Application.DoesNotExist:
                 return False
         return request.user.is_authenticated
+
+
+class ApplicationEventWeeklyAmountReductionPermission(permissions.BasePermission):
+    def has_object_permission(self, request, view, application_event_status):
+        return False
+
+    def has_permission(self, request, view):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+
+        result_id = request.data.get("application_event_schedule_result_id")
+        try:
+            schedule_result = ApplicationEventScheduleResult.objects.get(pk=result_id)
+            service_sector = ServiceSector.objects.get(
+                applicationround=ApplicationRound.objects.get(
+                    applications=Application.objects.get(
+                        application_events=schedule_result.application_event_schedule.application_event.id
+                    )
+                )
+            )
+
+            return can_manage_service_sectors_applications(request.user, service_sector)
+        except (
+            ApplicationEventScheduleResult.DoesNotExist,
+            Application.DoesNotExist,
+            ApplicationEvent.DoesNotExist,
+            ApplicationRound.DoesNotExist,
+            ServiceSector.DoesNotExist,
+        ):
+            return False
 
 
 class AgeGroupPermission(permissions.BasePermission):

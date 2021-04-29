@@ -10,6 +10,8 @@ from allocation.models import AllocationRequest
 from applications.models import (
     Application,
     ApplicationEvent,
+    ApplicationEventSchedule,
+    ApplicationEventScheduleResult,
     ApplicationRound,
     ApplicationRoundBasket,
     City,
@@ -440,6 +442,25 @@ def weekly_recurring_mondays_and_tuesdays_2021(application_event) -> Application
             ],
         ),
         priority=200,
+    )
+
+
+@pytest.fixture
+def scheduled_for_monday(application_event) -> ApplicationEventSchedule:
+    return ApplicationEventSchedule.objects.create(
+        day=0, begin="10:00", end="12:00", application_event=application_event
+    )
+
+
+@pytest.fixture
+def result_scheduled_for_monday(scheduled_for_monday, reservation_unit):
+    return ApplicationEventScheduleResult.objects.create(
+        application_event_schedule=scheduled_for_monday,
+        allocated_reservation_unit=reservation_unit,
+        allocated_duration="01:00",
+        allocated_begin="10:00",
+        allocated_end="11:00",
+        allocated_day=0,
     )
 
 

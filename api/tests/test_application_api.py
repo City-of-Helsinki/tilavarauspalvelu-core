@@ -1,8 +1,14 @@
 import pytest
+from assertpy import assert_that
 from freezegun import freeze_time
 from rest_framework.reverse import reverse
 
-from applications.models import Application, ApplicationEvent
+from applications.models import (
+    Application,
+    ApplicationEvent,
+    ApplicationEventScheduleResult,
+    ApplicationEventWeeklyAmountReduction,
+)
 
 
 @pytest.mark.django_db
@@ -523,3 +529,97 @@ def test_wrong_service_sector_admin_cannot_view_or_update_users_application_even
         format="json",
     )
     assert response.status_code == 404
+
+
+@pytest.mark.django_db
+def test_creating_weekly_amount_reduction_should_delete_result(
+    result_scheduled_for_monday,
+    general_admin_api_client,
+):
+    assert_that(ApplicationEventWeeklyAmountReduction.objects.count()).is_equal_to(0)
+    assert_that(ApplicationEventScheduleResult.objects.count()).is_equal_to(1)
+
+    data = {
+        "application_event_schedule_result_id": result_scheduled_for_monday.application_event_schedule.id
+    }
+
+    response = general_admin_api_client.post(
+        reverse("application_event_weekly_amount_reduction-list"), data, format="json"
+    )
+    assert_that(response.status_code).is_equal_to(201)
+    assert_that(ApplicationEventScheduleResult.objects.count()).is_equal_to(0)
+
+
+@pytest.mark.django_db
+def test_cant_create_more_reductions_than_events_per_week(
+    application_event, general_admin_api_client, result_scheduled_for_monday
+):
+
+    for i in range(application_event.events_per_week):
+        ApplicationEventWeeklyAmountReduction.objects.create(
+            application_event=application_event
+        )
+    assert_that(ApplicationEventWeeklyAmountReduction.objects.count()).is_equal_to(2)
+
+    data = {
+        "application_event_schedule_result_id": result_scheduled_for_monday.application_event_schedule.id
+    }
+
+    response = general_admin_api_client.post(
+        reverse("application_event_weekly_amount_reduction-list"), data, format="json"
+    )
+    assert_that(response.status_code).is_equal_to(400)
+    assert_that(ApplicationEventScheduleResult.objects.count()).is_equal_to(1)
+
+
+@pytest.mark.django_db
+def test_cant_reduce_with_accepted_result(
+    application_event, general_admin_api_client, result_scheduled_for_monday
+):
+    result_scheduled_for_monday.accepted = True
+    result_scheduled_for_monday.save()
+
+    assert_that(ApplicationEventWeeklyAmountReduction.objects.count()).is_equal_to(0)
+
+    data = {
+        "application_event_schedule_result_id": result_scheduled_for_monday.application_event_schedule.id
+    }
+
+    response = general_admin_api_client.post(
+        reverse("application_event_weekly_amount_reduction-list"), data, format="json"
+    )
+    assert_that(response.status_code).is_equal_to(400)
+    assert_that(ApplicationEventWeeklyAmountReduction.objects.count()).is_equal_to(0)
+    assert_that(ApplicationEventScheduleResult.objects.count()).is_equal_to(1)
+
+
+@pytest.mark.django_db
+def test_regular_user_cant_create_reductions(
+    result_scheduled_for_monday,
+    user_api_client,
+):
+
+    data = {
+        "application_event_schedule_result_id": result_scheduled_for_monday.application_event_schedule.id
+    }
+
+    response = user_api_client.post(
+        reverse("application_event_weekly_amount_reduction-list"), data, format="json"
+    )
+    assert_that(response.status_code).is_equal_to(403)
+
+
+@pytest.mark.django_db
+def test_wrong_service_sector_admin_cant_create_reductions(
+    result_scheduled_for_monday,
+    service_sector_2_admin_api_client,
+):
+
+    data = {
+        "application_event_schedule_result_id": result_scheduled_for_monday.application_event_schedule.id
+    }
+
+    response = service_sector_2_admin_api_client.post(
+        reverse("application_event_weekly_amount_reduction-list"), data, format="json"
+    )
+    assert_that(response.status_code).is_equal_to(403)

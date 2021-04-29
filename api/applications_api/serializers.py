@@ -13,7 +13,9 @@ from applications.models import (
     Application,
     ApplicationEvent,
     ApplicationEventSchedule,
+    ApplicationEventScheduleResult,
     ApplicationEventStatus,
+    ApplicationEventWeeklyAmountReduction,
     ApplicationRound,
     ApplicationStatus,
     City,
@@ -686,3 +688,48 @@ class ApplicationEventStatusSerializer(serializers.ModelSerializer):
 
         instance.save()
         return instance
+
+
+class ApplicationEventWeeklyAmountReductionSerializer(serializers.ModelSerializer):
+    application_event_schedule_result_id = serializers.PrimaryKeyRelatedField(
+        source="application_event_schedule_result",
+        queryset=ApplicationEventScheduleResult.objects.all(),
+    )
+    application_event_id = serializers.PrimaryKeyRelatedField(
+        source="application_event", read_only=True
+    )
+    user = serializers.HiddenField(default=NullableCurrentUserDefault())
+
+    class Meta:
+        model = ApplicationEventWeeklyAmountReduction
+        fields = [
+            "id",
+            "application_event_schedule_result_id",
+            "user",
+            "application_event_id",
+        ]
+
+    def create(self, validated_data):
+        schedule_result = validated_data.pop("application_event_schedule_result")
+
+        schedule_result.delete()
+        reduction = super().create(validated_data)
+        return reduction
+
+    def validate(self, data):
+        result = data["application_event_schedule_result"]
+
+        application_event: ApplicationEventScheduleResult = (
+            result.application_event_schedule.application_event
+        )
+
+        if result.accepted:
+            raise serializers.ValidationError("Can't remove approved result.")
+        reduction_count = ApplicationEventWeeklyAmountReduction.objects.count()
+
+        if application_event.events_per_week < reduction_count + 1:
+            raise serializers.ValidationError(
+                "Can't reduce events per week to below zero."
+            )
+        data["application_event"] = application_event
+        return data
