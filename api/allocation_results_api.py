@@ -1,16 +1,26 @@
 from django.conf import settings
 from django_filters import rest_framework as filters
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import permissions, serializers, viewsets
+from rest_framework import mixins, permissions, serializers, viewsets
 
 from api.applications_api.serializers import ApplicationEventSerializer
 from api.common_filters import ModelInFilter
-from applications.models import ApplicationEvent, ApplicationEventScheduleResult
+from applications.models import (
+    ApplicationEvent,
+    ApplicationEventSchedule,
+    ApplicationEventScheduleResult,
+)
 from permissions.api_permissions import AllocationResultsPermission
 from reservation_units.models import ReservationUnit
 
 
 class ApplicationEventScheduleResultSerializer(serializers.ModelSerializer):
+
+    id = serializers.PrimaryKeyRelatedField(
+        source="application_event_schedule.id",
+        queryset=ApplicationEventSchedule.objects.all(),
+    )
+
     applicant_id = serializers.PrimaryKeyRelatedField(
         source="application_event_schedule.application_event.application.user_id",
         read_only=True,
@@ -50,6 +60,7 @@ class ApplicationEventScheduleResultSerializer(serializers.ModelSerializer):
     class Meta:
         model = ApplicationEventScheduleResult
         fields = [
+            "id",
             "application_id",
             "applicant_id",
             "applicant_name",
@@ -119,7 +130,7 @@ class AllocationResultsFilter(filters.FilterSet):
         )
 
 
-class AllocationResultViewSet(viewsets.ReadOnlyModelViewSet):
+class AllocationResultViewSet(viewsets.ReadOnlyModelViewSet, mixins.DestroyModelMixin):
     queryset = ApplicationEventScheduleResult.objects.all().order_by(
         "application_event_schedule__application_event_id"
     )
