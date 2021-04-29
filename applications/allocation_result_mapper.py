@@ -38,6 +38,7 @@ class AllocationResultMapper(object):
                     allocated_begin=allocated_event.begin,
                     allocated_end=allocated_event.end,
                     allocated_day=application_event_schedule.day,
+                    basket_id=allocated_event.basket_id,
                 )
 
                 ApplicationEventStatus.objects.create(
