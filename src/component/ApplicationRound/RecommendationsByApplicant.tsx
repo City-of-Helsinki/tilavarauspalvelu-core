@@ -11,7 +11,6 @@ import {
   getAllocationResults,
   getApplication,
   getApplicationRound,
-  setApplicationEventStatuses,
 } from "../../common/api";
 import {
   AllocationResult,
@@ -19,7 +18,6 @@ import {
   ApplicationRound as ApplicationRoundType,
   DataFilterConfig,
   ApplicationEvent,
-  ApplicationEventStatus,
 } from "../../common/types";
 import { ContentContainer, IngressContainer } from "../../styles/layout";
 import { H1 } from "../../styles/typography";
@@ -33,9 +31,11 @@ import DataTable, { CellConfig } from "../DataTable";
 import RecommendationCount from "./RecommendationCount";
 import {
   formatNumber,
-  getNormalizedRecommendationStatus,
+  getNormalizedApplicationEventStatus,
   parseAgeGroups,
   parseDuration,
+  processAllocationResult,
+  modifyAllocationResults,
 } from "../../common/util";
 import StatusCell from "../StatusCell";
 import SelectionActionBar from "../SelectionActionBar";
@@ -148,13 +148,14 @@ const getCellConfig = (
         title: "Recommendation.headings.status",
         key: "applicationEvent.status",
         transform: ({ applicationEvent }: AllocationResult) => {
-          const normalizedStatus = getNormalizedRecommendationStatus(
+          const normalizedStatus = getNormalizedApplicationEventStatus(
             applicationEvent.status
           );
           return (
             <StatusCell
               status={normalizedStatus}
               text={`Recommendation.statuses.${normalizedStatus}`}
+              type="applicationEvent"
             />
           );
         },
@@ -193,7 +194,7 @@ const getFilterConfig = (
     {
       title: "Application.headings.applicationStatus",
       filters: statuses.map((status) => {
-        const normalizedStatus = getNormalizedRecommendationStatus(status);
+        const normalizedStatus = getNormalizedApplicationEventStatus(status);
         return {
           title: `Recommendation.statuses.${normalizedStatus}`,
           key: "applicationEvent.status",
@@ -225,32 +226,27 @@ function RecommendationsByApplicant(): JSX.Element {
   const { t } = useTranslation();
   const { applicationRoundId, applicantId } = useParams<IRouteParams>();
 
-  const modifyRecommendations = async (action: string) => {
-    let status: ApplicationEventStatus;
-    switch (action) {
-      case "approve":
-        status = "approved";
-        break;
-      case "decline":
-        status = "declined";
-        break;
-      case "ignore":
-      default:
-    }
-
+  const fetchRecommendations = async (
+    ar: ApplicationRoundType,
+    apId: number
+  ) => {
     try {
-      setIsSaving(true);
-      await setApplicationEventStatuses(
-        selections.map((selection) => ({
-          status,
-          applicationEventId: selection,
-        }))
+      const result = await getAllocationResults({
+        applicationRoundId: ar.id,
+        serviceSectorId: ar.serviceSectorId,
+        applicant: apId,
+      });
+
+      const processedResult = processAllocationResult(result);
+
+      setFilterConfig(
+        getFilterConfig(processedResult.flatMap((n) => n.applicationEvent))
       );
-      setErrorMsg(null);
+      setCellConfig(getCellConfig(t, ar));
+      setRecommendations(processedResult || []);
     } catch (error) {
-      setErrorMsg("errors.errorSavingApplication");
-    } finally {
-      setTimeout(() => setIsSaving(false), 1000);
+      setErrorMsg("errors.errorFetchingApplications");
+      setIsLoading(false);
     }
   };
 
@@ -272,32 +268,10 @@ function RecommendationsByApplicant(): JSX.Element {
   }, [applicationRoundId]);
 
   useEffect(() => {
-    const fetchRecommendations = async (
-      ar: ApplicationRoundType,
-      apId: number
-    ) => {
-      try {
-        const result = await getAllocationResults({
-          applicationRoundId: ar.id,
-          serviceSectorId: ar.serviceSectorId,
-          applicant: apId,
-        });
-
-        setFilterConfig(
-          getFilterConfig(result.flatMap((n) => n.applicationEvent))
-        );
-        setCellConfig(getCellConfig(t, ar));
-        setRecommendations(result || []);
-      } catch (error) {
-        setErrorMsg("errors.errorFetchingApplications");
-        setIsLoading(false);
-      }
-    };
-
     if (typeof applicationRound?.id === "number") {
       fetchRecommendations(applicationRound, Number(applicantId));
     }
-  }, [applicationRound, applicantId, t]);
+  }, [applicationRound, applicantId, t]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     const fetchApplication = async (id: number) => {
@@ -321,8 +295,8 @@ function RecommendationsByApplicant(): JSX.Element {
     get(recommendations, "[0].organisationName") ||
     get(recommendations, "[0].applicantName");
 
-  const unhandledRecommendationCount = recommendations.filter(
-    (n) => n.applicationEvent.status === "created"
+  const unhandledRecommendationCount = recommendations.filter((n) =>
+    ["created", "allocating", "allocated"].includes(n.applicationEvent.status)
   ).length;
 
   if (isLoading) {
@@ -370,10 +344,17 @@ function RecommendationsByApplicant(): JSX.Element {
               filtering: true,
               rowFilters: true,
               selection: true,
-              handledStatuses: ["accepted"],
+              handledStatuses: ["ignored", "validated", "handled"],
             }}
             cellConfig={cellConfig}
             filterConfig={filterConfig}
+            areAllRowsDisabled={recommendations.every(
+              (row) => row.applicationEvent.status === "ignored"
+            )}
+            isRowDisabled={(row: AllocationResult) => {
+              return ["ignored"].includes(row.applicationEvent.status);
+            }}
+            statusField="applicationEvent.status"
           />
           {selections?.length > 0 && (
             <SelectionActionBar
@@ -388,11 +369,25 @@ function RecommendationsByApplicant(): JSX.Element {
                   value: "decline",
                 },
                 {
-                  label: t("Recommendation.actionMassIgnoreSpace"),
+                  label: t("Recommendation.actionMassIgnoreReservationUnit"),
                   value: "ignore",
                 },
               ]}
-              callback={(option: string) => modifyRecommendations(option)}
+              callback={(action: string) => {
+                setIsSaving(true);
+                setErrorMsg(null);
+                modifyAllocationResults({
+                  data: recommendations,
+                  selections,
+                  action,
+                  setErrorMsg,
+                  callback: () => {
+                    setTimeout(() => setIsSaving(false), 1000);
+                    fetchRecommendations(applicationRound, Number(applicantId));
+                    setSelections([]);
+                  },
+                });
+              }}
               isSaving={isSaving}
             />
           )}

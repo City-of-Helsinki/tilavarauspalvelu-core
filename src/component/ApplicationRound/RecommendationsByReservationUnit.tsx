@@ -23,23 +23,24 @@ import {
   AllocationResult,
   ApplicationEvent,
   ReservationUnit,
-  ApplicationEventStatus,
 } from "../../common/types";
 import DataTable, { CellConfig } from "../DataTable";
 import {
   getAllocationResults,
   getApplicationRound,
   getReservationUnit,
-  setApplicationEventStatuses,
 } from "../../common/api";
 import Loader from "../Loader";
 import {
   formatNumber,
-  getNormalizedRecommendationStatus,
+  getNormalizedApplicationEventStatus,
   localizedValue,
   parseAddress,
   parseAgeGroups,
   parseDuration,
+  prepareAllocationResults,
+  processAllocationResult,
+  modifyAllocationResults,
 } from "../../common/util";
 import StatusCell from "../StatusCell";
 import StatusCircle from "../StatusCircle";
@@ -67,7 +68,7 @@ const Ingress = styled.div`
   }
 `;
 
-const SpaceImage = styled.img`
+const ReservationUnitImage = styled.img`
   width: 144px;
   height: 144px;
   border-radius: 50%;
@@ -102,6 +103,7 @@ const Prop = styled.div`
 const TitleContainer = styled.div`
   display: grid;
   padding-right: var(--spacing-m);
+  gap: var(--spacing-m);
 
   ${H1} {
     margin: 0 0 var(--spacing-m);
@@ -170,15 +172,16 @@ const getCellConfig = (
       {
         title: "Recommendation.headings.status",
         key: "applicationEvent.status",
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        transform: ({ applicationEvent }: any) => {
-          const normalizedStatus = getNormalizedRecommendationStatus(
+        transform: ({ applicationEvent }: AllocationResult) => {
+          const normalizedStatus = getNormalizedApplicationEventStatus(
             applicationEvent.status
           );
+
           return (
             <StatusCell
               status={normalizedStatus}
               text={`Recommendation.statuses.${normalizedStatus}`}
+              type="applicationEvent"
             />
           );
         },
@@ -192,10 +195,6 @@ const getCellConfig = (
         ? `/applicationRound/${applicationRound.id}/recommendation/${applicationEventScheduleId}`
         : "/foobar";
     },
-    groupLink: ({ space }) =>
-      applicationRound
-        ? `/applicationRound/${applicationRound.id}/space/${space?.id}`
-        : "",
   };
 };
 
@@ -217,7 +216,7 @@ const getFilterConfig = (
     {
       title: "Application.headings.applicationStatus",
       filters: statuses.map((status) => {
-        const normalizedStatus = getNormalizedRecommendationStatus(status);
+        const normalizedStatus = getNormalizedApplicationEventStatus(status);
         return {
           title: `Recommendation.statuses.${normalizedStatus}`,
           key: "applicationEvent.status",
@@ -252,32 +251,29 @@ function RecommendationsByReservationUnit(): JSX.Element {
   const { t } = useTranslation();
   const { applicationRoundId, reservationUnitId } = useParams<IRouteParams>(); // eslint-disable-line @typescript-eslint/no-unused-vars
 
-  const modifyRecommendations = async (action: string) => {
-    let status: ApplicationEventStatus;
-    switch (action) {
-      case "approve":
-        status = "approved";
-        break;
-      case "decline":
-        status = "declined";
-        break;
-      case "ignore":
-      default:
-    }
-
+  const fetchRecommendations = async (
+    ar: ApplicationRoundType,
+    ruId: number
+  ) => {
     try {
-      setIsSaving(true);
-      await setApplicationEventStatuses(
-        selections.map((selection) => ({
-          status,
-          applicationEventId: selection,
-        }))
+      const result = await getAllocationResults({
+        applicationRoundId: ar.id,
+        serviceSectorId: ar.serviceSectorId,
+      });
+
+      const filteredResult: AllocationResult[] = processAllocationResult(
+        result
+      ).filter((n: AllocationResult) => n.allocatedReservationUnitId === ruId);
+
+      setFilterConfig(
+        getFilterConfig(filteredResult.flatMap((n) => n.applicationEvent))
       );
-      setErrorMsg(null);
+      setCellConfig(getCellConfig(t, applicationRound));
+      setRecommendations(filteredResult || []);
     } catch (error) {
-      setErrorMsg("errors.errorSavingApplication");
+      setErrorMsg("errors.errorFetchingApplications");
     } finally {
-      setTimeout(() => setIsSaving(false), 1000);
+      setIsLoading(false);
     }
   };
 
@@ -306,36 +302,10 @@ function RecommendationsByReservationUnit(): JSX.Element {
   }, [applicationRoundId, t]);
 
   useEffect(() => {
-    const fetchRecommendations = async (
-      ar: ApplicationRoundType,
-      spId: number
-    ) => {
-      try {
-        const result = await getAllocationResults({
-          applicationRoundId: ar.id,
-          serviceSectorId: ar.serviceSectorId,
-        });
-
-        const filteredResult: AllocationResult[] = result.filter(
-          (n: AllocationResult) => n.allocatedReservationUnitId === spId
-        );
-
-        setFilterConfig(
-          getFilterConfig(filteredResult.flatMap((n) => n.applicationEvent))
-        );
-        setCellConfig(getCellConfig(t, applicationRound));
-        setRecommendations(filteredResult || []);
-      } catch (error) {
-        setErrorMsg("errors.errorFetchingApplications");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     if (typeof applicationRound?.id === "number") {
       fetchRecommendations(applicationRound, Number(reservationUnitId));
     }
-  }, [applicationRound, reservationUnitId, t]);
+  }, [applicationRound, reservationUnitId, t]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     const fetchReservationUnit = async (ruId: number) => {
@@ -352,8 +322,8 @@ function RecommendationsByReservationUnit(): JSX.Element {
     fetchReservationUnit(Number(reservationUnitId));
   }, [recommendations, reservationUnitId]);
 
-  const unhandledRecommendationCount = recommendations.filter(
-    (n) => n.applicationEvent.status === "created"
+  const unhandledRecommendationCount = recommendations.filter((n) =>
+    ["created", "allocating", "allocated"].includes(n.applicationEvent.status)
   ).length;
 
   const mainImage = reservationUnit?.images.find((n) => n.imageType === "main");
@@ -375,7 +345,7 @@ function RecommendationsByReservationUnit(): JSX.Element {
               <IngressContainer>
                 <Ingress>
                   {mainImage ? (
-                    <SpaceImage src={mainImage.imageUrl} alt="" />
+                    <ReservationUnitImage src={mainImage.smallUrl} alt="" />
                   ) : (
                     <ImageFiller />
                   )}
@@ -428,7 +398,7 @@ function RecommendationsByReservationUnit(): JSX.Element {
               </IngressContainer>
             </ContentContainer>
             <DataTable
-              groups={[{ id: 1, data: recommendations }]}
+              groups={prepareAllocationResults(recommendations)}
               setSelections={setSelections}
               hasGrouping={false}
               config={{
@@ -438,6 +408,12 @@ function RecommendationsByReservationUnit(): JSX.Element {
               }}
               cellConfig={cellConfig}
               filterConfig={filterConfig}
+              areAllRowsDisabled={recommendations.every(
+                (row) => row.applicationEvent.status === "ignored"
+              )}
+              isRowDisabled={(row: AllocationResult) => {
+                return ["ignored"].includes(row.applicationEvent.status);
+              }}
             />
             {selections?.length > 0 && (
               <SelectionActionBar
@@ -452,11 +428,28 @@ function RecommendationsByReservationUnit(): JSX.Element {
                     value: "decline",
                   },
                   {
-                    label: t("Recommendation.actionMassIgnoreSpace"),
+                    label: t("Recommendation.actionMassIgnoreReservationUnit"),
                     value: "ignore",
                   },
                 ]}
-                callback={(option: string) => modifyRecommendations(option)}
+                callback={(action: string) => {
+                  setIsSaving(true);
+                  setErrorMsg(null);
+                  modifyAllocationResults({
+                    data: recommendations,
+                    selections,
+                    action,
+                    setErrorMsg,
+                    callback: () => {
+                      setTimeout(() => setIsSaving(false), 1000);
+                      fetchRecommendations(
+                        applicationRound,
+                        Number(reservationUnitId)
+                      );
+                      setSelections([]);
+                    },
+                  });
+                }}
                 isSaving={isSaving}
               />
             )}

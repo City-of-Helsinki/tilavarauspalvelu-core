@@ -8,7 +8,6 @@ import Loader from "../Loader";
 import {
   AllocationResult,
   ApplicationEvent,
-  ApplicationEventStatus,
   ApplicationRound as ApplicationRoundType,
   ApplicationRoundStatus,
   DataFilterConfig,
@@ -27,16 +26,17 @@ import AllocatingDialogContent from "./AllocatingDialogContent";
 import DataTable, { CellConfig } from "../DataTable";
 import {
   formatNumber,
-  getNormalizedRecommendationStatus,
+  getNormalizedApplicationEventStatus,
+  modifyAllocationResults,
   parseAgeGroups,
   parseDuration,
   prepareAllocationResults,
+  processAllocationResult,
 } from "../../common/util";
 import StatusCell from "../StatusCell";
 import {
   getAllocationResults,
   getApplicationRound,
-  setApplicationEventStatuses,
   triggerAllocation,
 } from "../../common/api";
 import SelectionActionBar from "../SelectionActionBar";
@@ -135,9 +135,9 @@ const getFilterConfig = (
     {
       title: "Application.headings.applicationStatus",
       filters: statuses.map((status) => {
-        const normalizedStatus = getNormalizedRecommendationStatus(status);
+        const normalizedStatus = getNormalizedApplicationEventStatus(status);
         return {
-          title: `Application.statuses.${normalizedStatus}`,
+          title: `Recommendation.statuses.${normalizedStatus}`,
           key: "status",
           value: status,
         };
@@ -192,15 +192,15 @@ const getCellConfig = (
       {
         title: "Recommendation.headings.status",
         key: "applicationEvent.status",
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        transform: ({ applicationEvent }: any) => {
-          const normalizedStatus = getNormalizedRecommendationStatus(
+        transform: ({ applicationEvent }: AllocationResult) => {
+          const normalizedStatus = getNormalizedApplicationEventStatus(
             applicationEvent.status
           );
           return (
             <StatusCell
               status={normalizedStatus}
               text={`Recommendation.statuses.${normalizedStatus}`}
+              type="applicationEvent"
             />
           );
         },
@@ -239,6 +239,29 @@ function Handling({
 
   const { t } = useTranslation();
 
+  const fetchRecommendations = async () => {
+    try {
+      const result = await getAllocationResults({
+        applicationRoundId: applicationRound.id,
+        serviceSectorId: applicationRound.serviceSectorId,
+      });
+
+      const processedResult = processAllocationResult(result);
+
+      setFilterConfig(
+        getFilterConfig(
+          processedResult.flatMap((n: AllocationResult) => n.applicationEvent)
+        )
+      );
+      setCellConfig(getCellConfig(t, applicationRound));
+      setRecommendations(processedResult);
+    } catch (error) {
+      setErrorMsg("errors.errorFetchingApplications");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const startAllocation = async () => {
     if (!applicationRound) return;
 
@@ -258,61 +281,64 @@ function Handling({
     }
   };
 
-  const modifyRecommendations = async (action: string) => {
-    let status: ApplicationEventStatus;
-    switch (action) {
-      case "approve":
-        status = "approved";
-        break;
-      case "decline":
-        status = "declined";
-        break;
-      case "ignore":
-      default:
-    }
+  // const modifyAllocationResults = async (action: string) => {
+  //   let status: ApplicationEventStatus;
+  //   switch (action) {
+  //     case "approve":
+  //       status = "approved";
+  //       break;
+  //     case "decline":
+  //       status = "declined";
+  //       break;
+  //     case "ignore":
+  //     default:
+  //   }
 
-    try {
-      setIsSaving(true);
-      await setApplicationEventStatuses(
-        selections.map((selection) => ({
-          status,
-          applicationEventId: selection,
-        }))
-      );
-      setErrorMsg(null);
-    } catch (error) {
-      setErrorMsg("errors.errorSavingApplication");
-    } finally {
-      setTimeout(() => setIsSaving(false), 1000);
-    }
-  };
+  //   try {
+  //     setIsSaving(true);
+  //     setErrorMsg(null);
+
+  //     if (action === "ignore") {
+  //       const allocationResults = recommendations.filter(
+  //         (n: AllocationResult) =>
+  //           n.applicationEventScheduleId &&
+  //           selections.includes(n.applicationEventScheduleId)
+  //       );
+  //       allocationResults.forEach((row) => {
+  //         if (!row.allocatedReservationUnitId) return;
+
+  //         const payload = [
+  //           ...row.applicationEvent.declinedReservationUnitIds,
+  //           row.allocatedReservationUnitId,
+  //         ];
+
+  //         setDeclinedApplicationEventReservationUnits(
+  //           row.applicationEvent.id,
+  //           payload
+  //         );
+  //       });
+  //     } else {
+  //       await setApplicationEventStatuses(
+  //         selections.map((selection) => ({
+  //           status,
+  //           applicationEventId: selection,
+  //         }))
+  //       );
+  //     }
+  //   } catch (error) {
+  //     setErrorMsg("errors.errorSavingApplication");
+  //   } finally {
+  //     setTimeout(() => setIsSaving(false), 1000);
+  //     fetchRecommendations();
+  //     setSelections([]);
+  //   }
+  // };
 
   useEffect(() => {
-    const fetchRecommendations = async () => {
-      try {
-        const result = await getAllocationResults({
-          applicationRoundId: applicationRound.id,
-          serviceSectorId: applicationRound.serviceSectorId,
-        });
-
-        setFilterConfig(
-          getFilterConfig(
-            result.flatMap((n: AllocationResult) => n.applicationEvent)
-          )
-        );
-        setCellConfig(getCellConfig(t, applicationRound));
-        setRecommendations(result);
-      } catch (error) {
-        setErrorMsg("errors.errorFetchingApplications");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     if (typeof applicationRound?.id === "number") {
       fetchRecommendations();
     }
-  }, [applicationRound, t]);
+  }, [applicationRound, t]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     const poller = setInterval(async () => {
@@ -409,11 +435,18 @@ function Handling({
               config={{
                 filtering: true,
                 rowFilters: true,
-                handledStatuses: ["validated", "handled"],
+                handledStatuses: ["ignored", "validated", "handled"],
                 selection: true,
               }}
               filterConfig={filterConfig}
               cellConfig={cellConfig}
+              areAllRowsDisabled={recommendations.every(
+                (row) => row.applicationEvent.status === "ignored"
+              )}
+              isRowDisabled={(row: AllocationResult) => {
+                return ["ignored"].includes(row.applicationEvent.status);
+              }}
+              statusField="applicationEvent.status"
             />
           )}
         </>
@@ -440,11 +473,25 @@ function Handling({
             { label: t("Recommendation.actionMassApprove"), value: "approve" },
             { label: t("Recommendation.actionMassDecline"), value: "decline" },
             {
-              label: t("Recommendation.actionMassIgnoreSpace"),
+              label: t("Recommendation.actionMassIgnoreReservationUnit"),
               value: "ignore",
             },
           ]}
-          callback={(option: string) => modifyRecommendations(option)}
+          callback={(action: string) => {
+            setIsSaving(true);
+            setErrorMsg(null);
+            modifyAllocationResults({
+              data: recommendations,
+              selections,
+              action,
+              setErrorMsg,
+              callback: () => {
+                setTimeout(() => setIsSaving(false), 1000);
+                fetchRecommendations();
+                setSelections([]);
+              },
+            });
+          }}
           isSaving={isSaving}
         />
       )}

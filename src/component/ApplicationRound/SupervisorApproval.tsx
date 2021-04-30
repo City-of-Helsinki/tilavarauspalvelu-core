@@ -46,6 +46,7 @@ interface IProps {
 
 const Wrapper = styled.div`
   width: 100%;
+  margin-bottom: var(--spacing-layout-xl);
 `;
 
 const TopIngress = styled.div`

@@ -24,7 +24,12 @@ const Wrapper = styled.div`
     border-bottom: none;
   }
 
+  &:last-of-type {
+    border-bottom: var(--border);
+  }
+
   border: var(--border);
+  border-bottom: 0;
   padding: var(--spacing-m) var(--spacing-l);
 `;
 
@@ -75,9 +80,9 @@ const Details = styled.div`
   }
 
   @media (min-width: ${breakpoints.m}) {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
+    display: grid;
+    width: 60%;
+    grid-template-columns: 1fr 1fr;
     gap: var(--spacing-layout-xl);
   }
 `;

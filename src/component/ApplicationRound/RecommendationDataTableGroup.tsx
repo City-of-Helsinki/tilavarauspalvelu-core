@@ -7,7 +7,11 @@ import {
   IconArrowRight,
   IconLocation,
 } from "hds-react";
-import { DataGroup, GroupedAllocationResult } from "../../common/types";
+import {
+  AllocationResult,
+  DataGroup,
+  GroupedAllocationResult,
+} from "../../common/types";
 import { H3 } from "../../styles/typography";
 import { BasicLink, breakpoints, SelectionCheckbox } from "../../styles/util";
 
@@ -116,9 +120,14 @@ function RecommendationDataTableGroup({
 
   const unhandledReservationCount = group.data
     .flatMap((recommendation) => recommendation?.applicationEvent?.status)
-    .filter((status) => ["created"].includes(status)).length;
+    .filter((status) => ["created", "allocating", "allocated"].includes(status))
+    .length;
 
   const colCount: number = isSelectionActive ? cols + 1 : cols;
+
+  const selectionDisabled = group.data.every(
+    (row: AllocationResult) => row.applicationEvent?.status === "ignored"
+  );
 
   if (hasGrouping === false) {
     return <>{children}</>;
@@ -144,7 +153,7 @@ function RecommendationDataTableGroup({
                       );
                     }}
                     checked={isSelected}
-                    disabled={groupRows.length < 1}
+                    disabled={groupRows.length < 1 || selectionDisabled}
                     aria-label={t(
                       `common.${
                         isSelected ? "deselectGroupX" : "selectGroupX"

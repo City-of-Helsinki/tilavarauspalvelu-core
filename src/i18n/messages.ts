@@ -257,7 +257,7 @@ const translations: ITranslations = {
     infoGivenByCustomer: ["Asiakkaan ilmoittamat tiedot"],
     recommendedAid: ["Haetut vuorot"],
     appliedReservations: ["Haetut vuorot"],
-    appliedSpace: ["Tarjottu tila"],
+    appliedReservationUnit: ["Tarjottu tila"],
     totalReservationTime: ["Kokonaiskesto"],
     recommendedSpaceAid: ["Tilankäyttönä suositeltava avustus"],
     recommendations: {
@@ -421,10 +421,10 @@ const translations: ITranslations = {
     thisPartsTerms: ["Tämän osan käyttöehdot"],
     actionDecline: ["Hylkää vuoro ja rajoita viikkomäärää"],
     actionApprove: ["Hyväksy ehdotettu vuoro"],
-    actionIgnoreSpace: ["Hylkää tilaehdotus"],
+    actionIgnoreReservationUnit: ["Hylkää tilaehdotus"],
     actionMassDecline: ["Hylkää vuorot ja rajoita viikkomäärää"],
     actionMassApprove: ["Hyväksy ehdotetut vuorot"],
-    actionMassIgnoreSpace: ["Hylkää ehdotetut vuorot tästä tilasta"],
+    actionMassIgnoreReservationUnit: ["Hylkää ehdotetut vuorot tästä tilasta"],
     actionHelperText: [
       "Jos hylkäät tämän vuoron, ryhmältä vähennetään yksi viikkovuorotoive. Muille vuorotoiveille, joita ei ole käsitelty, pyritään löytämään vuoro. Jos hylkäät ryhmän tästä tilasta, pyritään ryhmälle löytämään korvaava tila. Uutta tilaa tarjotaan vain, jos hakijan toiveiden mukaisia vapaita aikoja on valituista tiloista jakamatta. Vuoron hylkäyksen ja kiellon tarjota tätä tilaa voi purkaa tarvittaessa myöhemmin. Hyväksyminen ei lähetä myöntöpäätöstä välittömästi asiakkaalle, vaan vasta esihenkilön hyväksyessä kaikki myöntöpäätökset kerralla.",
     ],
@@ -434,16 +434,23 @@ const translations: ITranslations = {
     actionReturnAsPartOfAllocationHelper: [
       "Palautus ei tarkoita, että ryhmälle on mahdollista enää myöntää juuri tätä vuoroa. Viikkovuorotoive otetaan kuitenkin huomioon seuraavan uudelleenkäynnistyksen aikana.",
     ],
-    actionRevertIgnoreSpace: [
+    actionRevertIgnoreReservationUnit: [
       "Pura vuoroltatilakielto, joka kohdistuu tähän tilaan",
     ],
-    actionRevertIgnoreSpaceHelper: [
+    actionRevertIgnoreReservationUnitAbrv: ["Pura tilakielto"],
+    actionRevertIgnoreReservationUnitHelper: [
       "Purkaminen ei tarkoita, että ryhmälle on mahdollista enää myöntää juuri tätä vuoroa tähän tilaan. Vuoron tilatoive otetaan kuitenkin huomioon seuraavan uudelleenkäynnistyksen aikana.",
+    ],
+    confirmationRevertIgnoreReservationUnitHeader: [
+      "Puretaanko vuoron tilakielto tämän tilan osalta?",
+    ],
+    confirmationRevertIgnoreReservationUnitBody: [
+      "Et näe tätä ehdotusta enää palauttamisen jälkeen. Purkaminen ei tarkoita, että vuorolle on mahdollista enää myöntää juuri tätä vuoroa tähän tilaan. Vuoron tilatoive otetaan kuitenkin huomioon seuraavan uudelleenkäynnistyksen aikana.",
     ],
     actionRevertToUnhandled: ["Palauta ehdotus käsittelemättömäksi"],
     labelAgeGroup: ["Käyttäjien ikäryhmä"],
     labelAppliedReservations: ["Vuoroja"],
-    labelSpaceRank: ["Tarjottu tila toivesijalla {{rank}}"],
+    labelReservationUnitRank: ["Tarjottu tila toivesijalla {{rank}}"],
     actionMassActionSubmit: ["Massakäsittele valitut"],
     recommendationCount: ["{{count}} ehdotus tehty"],
     recommendationCount_plural: ["{{count}} ehdotusta tehty"],
@@ -460,6 +467,7 @@ const translations: ITranslations = {
       created: ["Käsittelemättä"],
       validated: ["Hyväksytty"],
       declined: ["Hylätty"],
+      ignored: ["Tilakielto asetettu"],
     },
     approveSuccessHeading: ["Ehdotus hyväksytty onnistuneesti"],
     approveSuccessBody: [

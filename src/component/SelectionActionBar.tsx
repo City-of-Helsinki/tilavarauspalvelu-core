@@ -9,7 +9,7 @@ import { breakpoints } from "../styles/util";
 interface IProps {
   selections: number[];
   options: OptionType[];
-  callback: (option: string) => Promise<void>;
+  callback: (option: string) => void;
   isSaving?: boolean;
 }
 

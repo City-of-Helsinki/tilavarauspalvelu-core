@@ -9,6 +9,7 @@ import {
   AllocationRequest,
   AllocationResult,
   ApplicationEventStatus,
+  ApplicationEventsDeclinedReservationUnits,
 } from "./types";
 
 const apiBaseUrl: string = process.env.REACT_APP_TILAVARAUS_API_URL || "";
@@ -20,6 +21,8 @@ const applicationBasePath = "application";
 const allocationRequestPath = "allocation_request";
 const allocationResultPath = "allocation_results";
 const applicationEventStatusPath = "application_event_status";
+const declinedApplicationEventReservationUnitsPath =
+  "application_event_declined_reservation_unit";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface QueryParameters {}
@@ -90,6 +93,17 @@ async function apiPost<T>({ path, data }: RequestParameters): Promise<T> {
     },
     method: "post",
     data,
+    validateStatus,
+  });
+}
+
+async function apiDelete<T>({ path }: RequestParameters): Promise<T> {
+  return request<T>({
+    url: `${apiBaseUrl}/${path}`,
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "delete",
     validateStatus,
   });
 }
@@ -241,6 +255,12 @@ export function getAllocationResult(
   });
 }
 
+export function deleteAllocationResult(id: number): Promise<void> {
+  return apiDelete({
+    path: `v1/${allocationResultPath}/${id}/`,
+  });
+}
+
 interface ApplicationEventPayload {
   status: ApplicationEventStatus;
   applicationEventId: number;
@@ -252,5 +272,25 @@ export function setApplicationEventStatuses(
   return apiPost({
     data: payload,
     path: `v1/${applicationEventStatusPath}/`,
+  });
+}
+
+export function getDeclinedApplicationEventReservationUnits(
+  applicationEventId: number
+): Promise<ApplicationEventsDeclinedReservationUnits> {
+  return apiGet({
+    path: `v1/${declinedApplicationEventReservationUnitsPath}/${applicationEventId}`,
+  });
+}
+
+export function setDeclinedApplicationEventReservationUnits(
+  applicationEventId: number,
+  reservationUnitIds: number[]
+): Promise<ApplicationEventsDeclinedReservationUnits> {
+  return apiPut({
+    data: {
+      declinedReservationUnitIds: reservationUnitIds,
+    },
+    path: `v1/${declinedApplicationEventReservationUnitsPath}/${applicationEventId}/`,
   });
 }

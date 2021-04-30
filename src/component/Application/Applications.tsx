@@ -31,6 +31,7 @@ interface IRouteParams {
 
 const Wrapper = styled.div`
   width: 100%;
+  margin-bottom: var(--spacing-layout-xl);
 `;
 
 const Title = styled(H1)`
@@ -83,16 +84,19 @@ const getFilterConfig = (
 const getCellConfig = (t: TFunction): CellConfig => {
   return {
     cols: [
-      { title: "Application.headings.customer", key: "organisation.name" },
       {
-        title: "Application.headings.participants",
-        key: "organisation.activeMembers",
-        transform: ({ organisation }: ApplicationType) => (
-          <>{`${formatNumber(
-            organisation?.activeMembers,
-            t("common.volumeUnit")
-          )}`}</>
-        ),
+        title: "Application.headings.customer",
+        key: "organisation.name",
+        transform: ({
+          applicantType,
+          contactPerson,
+          organisation,
+        }: ApplicationType) =>
+          applicantType === "individual"
+            ? `${contactPerson?.firstName || ""} ${
+                contactPerson?.lastName || ""
+              }`.trim()
+            : organisation?.name || "",
       },
       {
         title: "Application.headings.applicantType",
@@ -127,6 +131,7 @@ const getCellConfig = (t: TFunction): CellConfig => {
             <StatusCell
               status={normalizedStatus}
               text={`Application.statuses.${normalizedStatus}`}
+              type="application"
             />
           );
         },
