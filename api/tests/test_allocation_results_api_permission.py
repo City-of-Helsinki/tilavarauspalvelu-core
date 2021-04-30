@@ -20,23 +20,11 @@ def test_normal_user_cannot_access_results_with_service_sector(user_api_client):
     assert response.status_code == 403
 
 
-def test_general_admin_user_cant_access_results_without_service_sector(
+def test_general_admin_user_can_access_results_without_service_sector(
     general_admin_api_client,
 ):
     response = general_admin_api_client.get(
         reverse("allocation_results-list"),
-        format="json",
-    )
-
-    assert response.status_code == 403
-
-
-def test_general_admin_user_can_access_results_with_service_sector(
-    general_admin_api_client, service_sector
-):
-    response = general_admin_api_client.get(
-        reverse("allocation_results-list"),
-        data={"service_sector_id": service_sector.id},
         format="json",
     )
 

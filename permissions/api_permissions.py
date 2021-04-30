@@ -266,20 +266,28 @@ class AllocationRequestPermission(permissions.BasePermission):
 
 
 class AllocationResultsPermission(permissions.BasePermission):
-    def has_object_permission(self, request, view, obj):
-        # FIXME: Super temporary fix to get things working.
-        return True
+    def has_object_permission(self, request, view, obj: ApplicationEventScheduleResult):
+        service_sector = (
+            obj.application_event_schedule.application_event.application.application_round.service_sector
+        )
+
+        if (
+            request.method != "post"
+            and request.user.is_authenticated
+            and can_allocate_service_sector_allocations(request.user, service_sector)
+        ):
+            return True
+        return False
 
     def has_permission(self, request, view):
         service_sector_id = request.data.get(
             "service_sector_id"
         ) or request.query_params.get("service_sector_id")
         service_sector = ServiceSector.objects.filter(id=service_sector_id).first()
-        if not service_sector:
-            return False
 
         if (
-            request.method in permissions.SAFE_METHODS
+            request.method != "post"
+            and request.user.is_authenticated
             and can_allocate_service_sector_allocations(request.user, service_sector)
         ):
             return True
