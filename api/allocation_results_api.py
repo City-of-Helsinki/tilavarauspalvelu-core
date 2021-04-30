@@ -18,7 +18,7 @@ class ApplicationEventScheduleResultSerializer(serializers.ModelSerializer):
 
     id = serializers.PrimaryKeyRelatedField(
         source="application_event_schedule.id",
-        queryset=ApplicationEventSchedule.objects.all(),
+        read_only=True
     )
 
     applicant_id = serializers.PrimaryKeyRelatedField(
@@ -71,16 +71,16 @@ class ApplicationEventScheduleResultSerializer(serializers.ModelSerializer):
             "allocated_reservation_unit_id",
             "allocated_reservation_unit_name",
             "application_event_schedule_id",
-            "allocated_duration",
-            "allocated_day",
-            "allocated_begin",
-            "allocated_end",
             "basket_name",
             "basket_order_number",
             "application_aggregated_data",
             "declined_reservation_unit_ids",
             "accepted",
         ]
+        read_only_fields = ["allocated_duration",
+            "allocated_day",
+            "allocated_begin",
+            "allocated_end",]
 
     def get_unit_name(self, instance):
         return instance.allocated_reservation_unit.unit.name
@@ -130,7 +130,7 @@ class AllocationResultsFilter(filters.FilterSet):
         )
 
 
-class AllocationResultViewSet(viewsets.ReadOnlyModelViewSet, mixins.DestroyModelMixin):
+class AllocationResultViewSet(viewsets.ReadOnlyModelViewSet, mixins.DestroyModelMixin, mixins.UpdateModelMixin):
     queryset = ApplicationEventScheduleResult.objects.all().order_by(
         "application_event_schedule__application_event_id"
     )

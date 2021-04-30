@@ -275,11 +275,9 @@ class AllocationResultsPermission(permissions.BasePermission):
             "service_sector_id"
         ) or request.query_params.get("service_sector_id")
         service_sector = ServiceSector.objects.filter(id=service_sector_id).first()
-        if not service_sector:
-            return False
 
         if (
-            request.method in permissions.SAFE_METHODS
+            request.method != "post"
             and can_allocate_service_sector_allocations(request.user, service_sector)
         ):
             return True

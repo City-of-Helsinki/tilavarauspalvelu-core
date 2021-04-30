@@ -39,6 +39,11 @@ from spaces.models import District, Location, ServiceSector, Space, Unit, UnitGr
 
 
 @pytest.fixture(autouse=True)
+def enable_permissions(settings):
+    settings.TMP_PERMISSIONS_DISABLED = False
+
+
+@pytest.fixture(autouse=True)
 def setup_audit_log(settings):
     settings.AUDIT_LOGGING_ENABLED = False
 
