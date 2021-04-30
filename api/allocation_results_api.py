@@ -5,11 +5,7 @@ from rest_framework import mixins, permissions, serializers, viewsets
 
 from api.applications_api.serializers import ApplicationEventSerializer
 from api.common_filters import ModelInFilter
-from applications.models import (
-    ApplicationEvent,
-    ApplicationEventSchedule,
-    ApplicationEventScheduleResult,
-)
+from applications.models import ApplicationEvent, ApplicationEventScheduleResult
 from permissions.api_permissions import AllocationResultsPermission
 from reservation_units.models import ReservationUnit
 
@@ -17,8 +13,7 @@ from reservation_units.models import ReservationUnit
 class ApplicationEventScheduleResultSerializer(serializers.ModelSerializer):
 
     id = serializers.PrimaryKeyRelatedField(
-        source="application_event_schedule.id",
-        read_only=True
+        source="application_event_schedule.id", read_only=True
     )
 
     applicant_id = serializers.PrimaryKeyRelatedField(
@@ -77,10 +72,12 @@ class ApplicationEventScheduleResultSerializer(serializers.ModelSerializer):
             "declined_reservation_unit_ids",
             "accepted",
         ]
-        read_only_fields = ["allocated_duration",
+        read_only_fields = [
+            "allocated_duration",
             "allocated_day",
             "allocated_begin",
-            "allocated_end",]
+            "allocated_end",
+        ]
 
     def get_unit_name(self, instance):
         return instance.allocated_reservation_unit.unit.name
@@ -130,7 +127,9 @@ class AllocationResultsFilter(filters.FilterSet):
         )
 
 
-class AllocationResultViewSet(viewsets.ReadOnlyModelViewSet, mixins.DestroyModelMixin, mixins.UpdateModelMixin):
+class AllocationResultViewSet(
+    viewsets.ReadOnlyModelViewSet, mixins.DestroyModelMixin, mixins.UpdateModelMixin
+):
     queryset = ApplicationEventScheduleResult.objects.all().order_by(
         "application_event_schedule__application_event_id"
     )
