@@ -5,6 +5,7 @@ import { useLocalStorage } from 'react-use';
 import { Profile } from 'oidc-client';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
+import { TFunction } from 'i18next';
 import { applicationsUrl } from '../common/util';
 import { authEnabled, isBrowser } from '../common/const';
 import { breakpoint } from '../common/style';
@@ -38,6 +39,17 @@ const DEFAULT_LANGUAGE = 'fi';
 type Props = {
   profile: Profile | null;
   logout?: () => void;
+};
+
+const getUserName = (profile: Profile | null, t: TFunction) => {
+  if (profile === null) {
+    return '';
+  }
+  if (!profile.given_name && !profile.family_name) {
+    return t('Navigation.userNoName');
+  }
+
+  return `${profile?.given_name || ''} ${profile?.family_name || ''}`;
 };
 
 const Navigation = ({ profile, logout }: Props): JSX.Element => {
@@ -84,7 +96,7 @@ const Navigation = ({ profile, logout }: Props): JSX.Element => {
         </HDSNavigation.Row>
         <HDSNavigation.Actions>
           <HDSNavigation.User
-            userName={`${profile?.given_name} ${profile?.family_name}`}
+            userName={getUserName(profile, t)}
             authenticated={Boolean(profile)}
             label={t('common.login')}
             onSignIn={() => {
