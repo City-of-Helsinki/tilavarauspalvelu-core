@@ -11,7 +11,12 @@ import {
 } from 'hds-react';
 import { parseISO } from 'date-fns';
 import { Application, ApplicationRound } from '../common/types';
-import { isActive, applicationUrl } from '../common/util';
+import {
+  isActive,
+  applicationUrl,
+  resolutionUrl,
+  getReducedApplicationStatus,
+} from '../common/util';
 import { breakpoint } from '../common/style';
 import ConfirmationModal, { ModalRef } from '../component/ConfirmationModal';
 import { CenterSpinner } from '../component/common';
@@ -115,11 +120,15 @@ const ApplicationCard = ({
     applicationRound.applicationPeriodEnd
   );
 
+  const reducedApplicationStatus = getReducedApplicationStatus(
+    application.status
+  );
+
   let C = Tag;
-  if (application.status === 'draft') {
+  if (reducedApplicationStatus === 'draft') {
     C = YellowTag;
   }
-  if (application.status === 'allocated') {
+  if (reducedApplicationStatus === 'handled') {
     C = GreenTag;
   }
 
@@ -137,7 +146,7 @@ const ApplicationCard = ({
   return (
     <Card border key={application.id}>
       <div>
-        <C>{t(`ApplicationCard.status.${application.status}`)}</C>
+        <C>{t(`ApplicationCard.status.${reducedApplicationStatus}`)}</C>
         <RoundName>{applicationRound.name}</RoundName>
         <Applicant>
           {application.applicantType !== null
@@ -177,12 +186,20 @@ const ApplicationCard = ({
             {t('ApplicationCard.cancel')}
           </StyledButton>
         )}
+        <StyledButton
+          disabled={!(reducedApplicationStatus === 'handled')}
+          onClick={() => {
+            history.push(`${resolutionUrl(application.id as number)}`);
+          }}>
+          {t('ApplicationCard.reservations')}
+        </StyledButton>
       </Buttons>
       <ConfirmationModal
         heading={t('ApplicationCard.cancelHeading')}
         content={t('ApplicationCard.cancelContent')}
         ref={modal}
         onOk={cancel}
+        cancelLabel={t('common.close')}
       />
     </Card>
   );

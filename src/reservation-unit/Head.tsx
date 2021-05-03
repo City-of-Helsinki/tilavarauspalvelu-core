@@ -1,23 +1,22 @@
 import {
   Button,
+  IconCheck,
   IconGroup,
   IconInfoCircle,
   IconPlus,
-  IconArrowLeft,
   Koros,
-  IconCheck,
 } from 'hds-react';
-import { useHistory } from 'react-router-dom';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import { ReservationUnit as ReservationUnitType } from '../common/types';
-import IconWithText from './IconWithText';
-import Notification from './Notification';
-import Container from '../component/Container';
-import { getMainImage, localizedValue } from '../common/util';
 import useReservationUnitList from '../common/hook/useReservationUnitList';
 import { breakpoint } from '../common/style';
+import { ReservationUnit as ReservationUnitType } from '../common/types';
+import { getMainImage, localizedValue } from '../common/util';
+import Back from '../component/Back';
+import Container from '../component/Container';
+import IconWithText from './IconWithText';
+import Notification from './Notification';
 
 interface Props {
   reservationUnit: ReservationUnitType;
@@ -28,21 +27,9 @@ const TopContainer = styled.div`
   background-color: white;
 `;
 
-const BackContainer = styled.div`
-  padding-top: 1em;
-  display: flex;
-  align-items: center;
-`;
-
-const BackLabel = styled.span`
-  font-size: var(--fontsize-body-s);
-  margin-left: var(--spacing-2-xs);
-`;
-
 const RightContainer = styled.div`
   font-size: var(--fontsize-body-m);
 
-  margin-top: var(--spacing-m);
   display: grid;
   grid-template-columns: 2fr 1fr;
   gap: var(--spacing-s);
@@ -102,23 +89,12 @@ const Head = ({ reservationUnit, reservationUnitList }: Props): JSX.Element => {
   } = reservationUnitList;
 
   const { t, i18n } = useTranslation();
-  const history = useHistory();
 
   return (
     <TopContainer>
       <Notification applicationRound={null} />
       <Container>
-        <BackContainer>
-          <IconArrowLeft aria-hidden />
-          <button
-            type="button"
-            onClick={() => {
-              history.goBack();
-            }}
-            className="button-reset">
-            <BackLabel>{t('ReservationUnit.backToSearch')}</BackLabel>
-          </button>
-        </BackContainer>
+        <Back label="ReservationUnit.backToSearch" />
         <RightContainer>
           <div>
             <ReservationUnitName>

@@ -6,11 +6,13 @@ import {
   ApplicationRound,
   ReservationUnit,
   Parameter,
+  Reservation,
 } from './types';
 import { ApiError } from './ApiError';
 
 const applicationRoundBasePath = 'application_round';
 const reservationUnitsBasePath = 'reservation_unit';
+const reservationBasePath = 'reservation';
 const parameterBasePath = 'parameters';
 const applicationBasePath = 'application';
 
@@ -124,6 +126,12 @@ export function getReservationUnits(
   return apiGet<ReservationUnit[]>({
     parameters: params,
     path: `v1/${reservationUnitsBasePath}`,
+  });
+}
+
+export function getReservations(): Promise<Reservation[]> {
+  return apiGet<Reservation[]>({
+    path: `v1/${reservationBasePath}`,
   });
 }
 

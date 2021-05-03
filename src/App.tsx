@@ -6,6 +6,7 @@ import './index.scss';
 import './variables.css';
 import Routes from './common/routes';
 import Applications from './applications/Applications';
+import Resolution from './applications/Reservations';
 import Application from './application/Application';
 import { isBrowser } from './common/const';
 import Intro from './application/intro/Intro';
@@ -40,8 +41,11 @@ function App(): JSX.Element {
                 <Route path="/application/:applicationId">
                   <Application />
                 </Route>
-                <Route path="/applications/">
+                <Route path="/applications/" exact>
                   <Applications />
+                </Route>
+                <Route path="/applications/:applicationId">
+                  <Resolution />
                 </Route>
               </OidcSecure>
             </>

@@ -33,9 +33,11 @@ const translations: Translations = {
   },
   Applications: {
     heading: ['Omat hakemukset'],
+    noApplications: ['Hakemuksia ei ole.'],
     group: {
       draft: ['Luonnokset'],
       sent: ['Käsittelyssä'],
+      handled: ['Käsitelty'],
     },
   },
   ApplicationCard: {
@@ -48,8 +50,10 @@ const translations: Translations = {
     cancel: ['Peruuta hakemus'],
     status: {
       draft: ['Kesken'],
-      in_review: ['Käsittelyssä'],
+      processing: ['Käsittelyssä'],
+      handled: ['Käsitelty'],
     },
+    reservations: ['Varaukset'],
     saved: ["Viimeksi tallennettu: {{date, dd.MM.yyyy 'klo' HH:mm}}"],
     person: ['Hakemus luotu: yksityishenkilönä'],
     organisation: ['Hakemus luotu: {{type}} {{name}}'],
@@ -88,6 +92,8 @@ const translations: Translations = {
     Intro: {
       startNewApplication: ['Aloita hakemuksen täyttäminen'],
       heading: ['Vakiovuorohakemus'],
+      createFailedHeading: ['Hakemuksen luominen epäonnistui'],
+      createFailedContent: ['Yritä myöhemmin uudelleen'],
       faq1: {
         question: [
           'Edustan yhdistystä tai rekisteröitymätöntä ryhmää, kuinka toimin?',
@@ -326,7 +332,28 @@ const translations: Translations = {
   common: {
     dateTime: ["{{date, dd.MM.yyyy 'klo' HH:mm}}"],
     date: ['{{date, dd.MM.yy}}'],
+    dateLong: ['{{date, dd.MM.yyyy}}'],
     time: ['{{date, HH:mm}}'],
+    today: ['Tänään', 'Today', 'I dag'],
+    'weekDay.0': ['Su'],
+    'weekDay.1': ['Ma'],
+    'weekDay.2': ['Ti'],
+    'weekDay.3': ['Ke'],
+    'weekDay.4': ['To'],
+    'weekDay.5': ['Pe'],
+    'weekDay.6': ['La'],
+    'month.0': ['Tammikuu'],
+    'month.1': ['Helmikuu'],
+    'month.2': ['Maaliskuu'],
+    'month.3': ['Huhtikuu'],
+    'month.4': ['Toukokuu'],
+    'month.5': ['Kesäkuu'],
+    'month.6': ['Heinäkuu'],
+    'month.7': ['Elokuu'],
+    'month.8': ['Syyskuu'],
+    'month.9': ['Lokakuu'],
+    'month.10': ['Marraskuu'],
+    'month.11': ['Joulukuu'],
     error: {
       dataError: ['Tietoja ei saatu haettua'],
     },
@@ -447,12 +474,32 @@ const translations: Translations = {
     ],
     returnToApplication: ['Palaa hakemukselle'],
   },
+  ReservationCalendar: {
+    prefixForCancelled: ['Peruttu'],
+    linkToResourceUnitLabel: ['Tutustu tilaan'],
+    legend: {
+      okLabel: ['Voimassa oleva varaus'],
+      cancelledLabel: ['Peruttu varaus'],
+    },
+  },
+  Reservations: {
+    back: ['Takaisin Omat hakemukset'],
+    info: ['Hakemukselle on myönnetty seuraavat vakiovuorot'],
+    weekSelectLabel: ['Valitse viikko'],
+    showList: ['Näytä lista'],
+    showCalendar: ['Näytä kalenteri'],
+  },
   ReservationUnit: {
     backToSearch: ['Takaisin hakutuloksiin'],
     maxPersons: ['{{maxPersons}} henkilöä'],
     RelatedUnits: {
       heading: ['Toimipisteen muut tilat'],
     },
+  },
+
+  ReservationList: {
+    granted: ['Sinulle on myönnetty seuraavat vakiovuorot'],
+    cancelled: ['Seuraavat vakiovuorot on peruttu'],
   },
   search: {
     heading: ['Vakiovuorojen tilat'],

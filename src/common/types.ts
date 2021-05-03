@@ -105,19 +105,28 @@ export type ApplicantType =
   | 'community'
   | 'company';
 
+export type ApplicationStatus =
+  | 'draft'
+  | 'in_review'
+  | 'review_done'
+  | 'allocating'
+  | 'allocated'
+  | 'validated'
+  | 'handled'
+  | 'declined'
+  | 'cancelled';
+
+export type ReducedApplicationStatus =
+  | 'draft'
+  | 'processing'
+  | 'handled'
+  | 'cancelled'
+  | 'declined';
+
 export type Application = {
   id?: number;
   applicantType: ApplicantType;
-  status:
-    | 'draft'
-    | 'in_review'
-    | 'review_done'
-    | 'allocating'
-    | 'allocated'
-    | 'validated'
-    | 'handled'
-    | 'declined'
-    | 'cancelled';
+  status: ApplicationStatus;
   applicationRoundId: number;
   organisation: Organisation | null;
   contactPerson: ContactPerson | null;
@@ -146,6 +155,15 @@ export type ContactPerson = {
   phoneNumber: string | null;
 };
 
+export type ApplicationEventStatus =
+  | 'created'
+  | 'allocating'
+  | 'allocated'
+  | 'validated'
+  | 'approved'
+  | 'declined'
+  | 'cancelled';
+
 export type ApplicationEvent = {
   id?: number;
   name: string | null;
@@ -162,19 +180,13 @@ export type ApplicationEvent = {
   applicationId: number;
   eventReservationUnits: EventReservationUnit[];
   applicationEventSchedules: ApplicationEventSchedule[];
-  status:
-    | 'created'
-    | 'allocating'
-    | 'allocated'
-    | 'validated'
-    | 'approved'
-    | 'declined'
-    | 'cancelled';
+  status: ApplicationEventStatus;
 };
 
 export type EventReservationUnit = {
   priority: number;
   reservationUnitId: number;
+  reservationUnitDetails?: ReservationUnit;
 };
 
 export type DAY = 0 | 1 | 2 | 3 | 4 | 5 | 6;
@@ -184,6 +196,23 @@ export type ApplicationEventSchedule = {
   day: DAY;
   begin: string;
   end: string;
+};
+
+export type ReservationState =
+  | 'created'
+  | 'cancelled'
+  | 'confirmed'
+  | 'denied'
+  | 'requested'
+  | 'waiting for payment';
+
+export type Reservation = {
+  id: number;
+  state: ReservationState;
+  priority: number;
+  begin: string;
+  end: string;
+  reservationUnit: ReservationUnit[];
 };
 
 // for ui:

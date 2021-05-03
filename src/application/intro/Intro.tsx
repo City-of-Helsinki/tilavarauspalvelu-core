@@ -1,14 +1,15 @@
-import { Button, Select } from 'hds-react';
-import React, { useEffect, useState } from 'react';
+import { Button, Notification, Select } from 'hds-react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import { getApplicationRounds, saveApplication } from '../../common/api';
+import { useApiDataNoParams } from '../../common/hook/useApiData';
 import { breakpoint } from '../../common/style';
-import { OptionType, Application } from '../../common/types';
+import { Application, OptionType } from '../../common/types';
 import { applicationRoundState, deepCopy } from '../../common/util';
 import { AccordionWithState as Accordion } from '../../component/Accordion';
-import { CenterSpinner } from '../../component/common';
+import Loader from '../../component/Loader';
 import { minimalApplicationForInitialSave } from '../applicationInitializer';
 import ApplicationPage from '../ApplicationPage';
 
@@ -31,46 +32,41 @@ const Preformatted = styled.div`
 `;
 
 const Intro = (): JSX.Element => {
-  const [applicationRoundOptions, setApplicationRoundOptions] = useState(
-    [] as OptionType[]
-  );
-  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState(false);
   const [applicationRound, setApplicationRound] = useState(0);
 
   const history = useHistory();
   const { t } = useTranslation();
 
-  useEffect(() => {
-    const load = async () => {
-      const applicationRounds = await getApplicationRounds();
-      setApplicationRoundOptions(
-        applicationRounds
-          .filter(
-            (ar) =>
-              applicationRoundState(
-                ar.applicationPeriodBegin,
-                ar.applicationPeriodEnd
-              ) === 'active'
-          )
-          .map((ar) => ({ value: ar.id, label: ar.name }))
-      );
-      setLoading(false);
-    };
-    load();
-  }, []);
+  const applicationRounds = useApiDataNoParams(getApplicationRounds, (rounds) =>
+    rounds
+      .filter(
+        (ar) =>
+          applicationRoundState(
+            ar.applicationPeriodBegin,
+            ar.applicationPeriodEnd
+          ) === 'active'
+      )
+      .map((ar) => ({ value: ar.id, label: ar.name }))
+  );
 
   const createNewApplication = async (applicationRoundId: number) => {
-    setLoading(true);
+    setSaving(true);
 
-    const templateApplication = {
-      ...deepCopy(minimalApplicationForInitialSave(applicationRoundId)),
-    } as Application;
+    try {
+      const templateApplication = {
+        ...deepCopy(minimalApplicationForInitialSave(applicationRoundId)),
+      } as Application;
 
-    const savedApplication = await saveApplication(templateApplication);
-    if (savedApplication.id) {
-      history.replace(`/application/${savedApplication.id}/page1`);
-    } else {
-      setLoading(false);
+      const savedApplication = await saveApplication(templateApplication);
+      if (savedApplication.id) {
+        history.replace(`/application/${savedApplication.id}/page1`);
+      }
+    } catch (e) {
+      setError(true);
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -79,28 +75,24 @@ const Intro = (): JSX.Element => {
       translationKeyPrefix="Application.Intro"
       headContent={
         <Container>
-          {loading ? (
-            <CenterSpinner />
-          ) : (
-            <>
-              <Select
-                id="reservationUnitSearch.purpose"
-                placeholder={t('common.select')}
-                options={applicationRoundOptions}
-                label=""
-                onChange={(selection: OptionType): void => {
-                  setApplicationRound(selection.value as number);
-                }}
-              />
-              <Button
-                disabled={!applicationRound}
-                onClick={() => {
-                  createNewApplication(applicationRound);
-                }}>
-                {t('Application.Intro.startNewApplication')}
-              </Button>
-            </>
-          )}
+          <Loader datas={[applicationRounds]}>
+            <Select
+              id="reservationUnitSearch.purpose"
+              placeholder={t('common.select')}
+              options={applicationRounds.transformed as OptionType[]}
+              label=""
+              onChange={(selection: OptionType): void => {
+                setApplicationRound(selection.value as number);
+              }}
+            />
+            <Button
+              disabled={!applicationRound || saving}
+              onClick={() => {
+                createNewApplication(applicationRound);
+              }}>
+              {t('Application.Intro.startNewApplication')}
+            </Button>
+          </Loader>
         </Container>
       }>
       <Accordion heading={t('Application.Intro.faq1.question')}>
@@ -188,14 +180,28 @@ YRITYKSENÄ”. Ilmoita yhteystiedot ja sähköpostiosoite. Huomaa, että kaikki
         </Preformatted>
       </Accordion>
       <Container>
-        <Button
-          disabled={!applicationRound}
-          onClick={() => {
-            createNewApplication(applicationRound);
-          }}>
-          {t('Application.Intro.startNewApplication')}
-        </Button>
+        <Loader datas={[applicationRounds]}>
+          <Button
+            disabled={!applicationRound}
+            onClick={() => {
+              createNewApplication(applicationRound);
+            }}>
+            {t('Application.Intro.startNewApplication')}
+          </Button>
+        </Loader>
       </Container>
+      {error ? (
+        <Notification
+          type="error"
+          label={t('Application.Intro.createFailedHeading')}
+          position="top-center"
+          autoClose
+          displayAutoCloseProgress={false}
+          onClose={() => setError(false)}>
+          {t('Application.Intro.createFailedContent')}
+          {error}
+        </Notification>
+      ) : null}
     </ApplicationPage>
   );
 };

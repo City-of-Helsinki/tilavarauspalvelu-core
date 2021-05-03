@@ -1,4 +1,11 @@
-import { isAfter, parseISO, isBefore, format } from 'date-fns';
+import {
+  isAfter,
+  parseISO,
+  isBefore,
+  format,
+  startOfWeek as dateFnsStartOfWeek,
+  endOfWeek as dateFnsEndOfWeek,
+} from 'date-fns';
 import i18next, { TFunction } from 'i18next';
 import { stringify } from 'query-string';
 import { ReservationUnitsParameters } from './api';
@@ -12,6 +19,8 @@ import {
   TranslationObject,
   ReservationUnit,
   Image,
+  ApplicationStatus,
+  ReducedApplicationStatus,
 } from './types';
 
 export const isActive = (startDate: string, endDate: string): boolean => {
@@ -259,6 +268,28 @@ export const getAddress = (ru: ReservationUnit): string | null => {
 };
 
 export const applicationUrl = (id: number): string => `/application/${id}`;
+export const resolutionUrl = (id: number): string => `/applications/${id}`;
 
 export const errorText = (t: TFunction, key: string | undefined): string =>
   key ? t(`Application.error.${key}`) : '';
+
+export const getReducedApplicationStatus = (
+  status: ApplicationStatus
+): ReducedApplicationStatus => {
+  switch (status) {
+    case 'in_review':
+    case 'review_done':
+    case 'allocating':
+    case 'allocated':
+    case 'validated':
+      return 'processing';
+    default:
+      return status;
+  }
+};
+
+export const startOfWeek = (d: Date): Date =>
+  dateFnsStartOfWeek(d, { weekStartsOn: 1 });
+
+export const endOfWeek = (d: Date): Date =>
+  dateFnsEndOfWeek(d, { weekStartsOn: 1 });

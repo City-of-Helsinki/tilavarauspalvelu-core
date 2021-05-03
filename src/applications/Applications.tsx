@@ -1,13 +1,19 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useAsync } from 'react-use';
+import { TFunction } from 'i18next';
 import styled from 'styled-components';
 import groupBy from 'lodash/groupBy';
 import { getApplications, getApplicationRounds } from '../common/api';
-import { Application, ApplicationRound } from '../common/types';
+import {
+  Application,
+  ApplicationRound,
+  ReducedApplicationStatus,
+} from '../common/types';
 import Head from './Head';
-import { CenterSpinner } from '../component/common';
 import ApplicationsGroup from './ApplicationsGroup';
+import { getReducedApplicationStatus } from '../common/util';
+import { useApiData } from '../common/hook/useApiData';
+import Loader from '../component/Loader';
 
 const Container = styled.div`
   padding: var(--spacing-l) var(--spacing-m) var(--spacing-m);
@@ -17,61 +23,67 @@ const Container = styled.div`
   height: 100%;
 `;
 
-const statusGroupOrder = ['draft', 'sent', 'ready', 'declined', 'cancelled'];
+const statusGroupOrder: ReducedApplicationStatus[] = [
+  'draft',
+  'processing',
+  'handled',
+  'declined',
+  'cancelled',
+];
 
-const getGroup = (application: Application): string => {
-  switch (application.status) {
-    case 'in_review':
-    case 'review_done':
-    case 'allocating':
-    case 'allocated':
-    case 'validated':
-      return 'sent';
-    default:
-      return application.status;
+function ApplicationGroups({
+  rounds,
+  applications,
+  t,
+}: {
+  rounds: { [key: number]: ApplicationRound };
+  applications: { [key: string]: Application[] };
+  t: TFunction;
+}): JSX.Element {
+  if (Object.keys(applications).length === 0) {
+    return <span>{t('Applications.noApplications')}</span>;
   }
-};
+  return (
+    <>
+      {statusGroupOrder.map((gr) => (
+        <ApplicationsGroup
+          key={gr}
+          name={t(`Applications.group.${gr}`)}
+          rounds={rounds}
+          applications={applications[gr] || []}
+        />
+      ))}
+    </>
+  );
+}
 
 const Applications = (): JSX.Element | null => {
   const { t } = useTranslation();
 
-  const [applications, setApplications] = useState(
-    {} as { [key: string]: Application[] }
-  );
-  const [rounds, setRounds] = useState(
-    {} as { [key: number]: ApplicationRound }
+  const applications = useApiData(getApplications, {}, (apps) =>
+    groupBy(
+      apps.filter((app) => app.status !== 'cancelled'),
+      (a) => getReducedApplicationStatus(a.status)
+    )
   );
 
-  const status = useAsync(async () => {
-    const loadedApplications = (await getApplications()).filter(
-      (a) => a.status !== 'cancelled'
-    );
-    const groupedApplications = groupBy(loadedApplications, getGroup);
-    setApplications(groupedApplications);
-    const loadedRounds = await getApplicationRounds();
-    setRounds(
-      loadedRounds.reduce((prev, current) => {
-        return { ...prev, [current.id]: current };
-      }, {} as { [key: number]: ApplicationRound })
-    );
-  }, []);
+  const rounds = useApiData(getApplicationRounds, {}, (applicationRounds) =>
+    applicationRounds.reduce((prev, current) => {
+      return { ...prev, [current.id]: current };
+    }, {} as { [key: number]: ApplicationRound })
+  );
 
   return (
     <>
       <Head heading={t('Applications.heading')} />
       <Container>
-        {status.loading ? (
-          <CenterSpinner />
-        ) : (
-          statusGroupOrder.map((gr) => (
-            <ApplicationsGroup
-              key={gr}
-              name={t(`Applications.group.${gr}`)}
-              rounds={rounds}
-              applications={applications[gr] || []}
-            />
-          ))
-        )}
+        <Loader datas={[applications, rounds]}>
+          <ApplicationGroups
+            t={t}
+            rounds={rounds.transformed || {}}
+            applications={applications.transformed || {}}
+          />
+        </Loader>
       </Container>
     </>
   );
