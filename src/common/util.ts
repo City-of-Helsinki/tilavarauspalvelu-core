@@ -1,3 +1,4 @@
+import { Dispatch, SetStateAction } from "react";
 import { format, parseISO } from "date-fns";
 import i18next from "i18next";
 import trim from "lodash/trim";
@@ -6,15 +7,20 @@ import get from "lodash/get";
 import {
   AllocationResult,
   ApplicationEventSchedule,
+  ApplicationEventStatus,
   ApplicationRoundStatus,
   ApplicationStatus,
   GroupedAllocationResult,
   LocalizationLanguages,
   Location,
   NormalizedApplicationRoundStatus,
-  RecommendationStatus,
   TranslationObject,
+  ApplicationEvent,
 } from "./types";
+import {
+  setApplicationEventStatuses,
+  setDeclinedApplicationEventReservationUnits,
+} from "./api";
 
 export const formatDate = (date: string | null): string | null => {
   return date ? format(parseISO(date), "d.M.yyyy") : null;
@@ -61,10 +67,10 @@ export const getNormalizedApplicationStatus = (
   return normalizedStatus;
 };
 
-export const getNormalizedRecommendationStatus = (
-  status: RecommendationStatus
-): RecommendationStatus => {
-  let normalizedStatus: RecommendationStatus = status;
+export const getNormalizedApplicationEventStatus = (
+  status: ApplicationEventStatus
+): ApplicationEventStatus => {
+  let normalizedStatus: ApplicationEventStatus = status;
 
   if (["created", "allocating", "allocated"].includes(status)) {
     normalizedStatus = "created";
@@ -72,6 +78,32 @@ export const getNormalizedRecommendationStatus = (
 
   return normalizedStatus;
 };
+
+export const checkApplicationEventStatus = (
+  applicationEvent: ApplicationEvent,
+  allocatedReservationUnitId: number | null
+): ApplicationEventStatus => {
+  return allocatedReservationUnitId &&
+    applicationEvent.declinedReservationUnitIds.includes(
+      allocatedReservationUnitId
+    )
+    ? "ignored"
+    : applicationEvent.status;
+};
+
+export const processAllocationResult = (
+  allocationResults: AllocationResult[]
+): AllocationResult[] =>
+  allocationResults.map((allocationResult) => ({
+    ...allocationResult,
+    applicationEvent: {
+      ...allocationResult.applicationEvent,
+      status: checkApplicationEventStatus(
+        allocationResult.applicationEvent,
+        allocationResult.allocatedReservationUnitId
+      ),
+    },
+  }));
 
 export const getNormalizedApplicationRoundStatus = (
   status: ApplicationRoundStatus
@@ -273,4 +305,66 @@ export const parseAddress = (location: Location): string => {
     }`,
     ", "
   );
+};
+
+interface IModifyAllocationResults {
+  data: AllocationResult[];
+  selections: number[];
+  action: string;
+  setErrorMsg: Dispatch<SetStateAction<string | null>>;
+  callback: () => void;
+}
+
+export const modifyAllocationResults = async ({
+  data,
+  selections,
+  action,
+  setErrorMsg,
+  callback,
+}: IModifyAllocationResults): Promise<void> => {
+  let status: ApplicationEventStatus;
+  switch (action) {
+    case "approve":
+      status = "approved";
+      break;
+    case "decline":
+      status = "declined";
+      break;
+    case "ignore":
+    default:
+  }
+
+  try {
+    if (action === "ignore") {
+      const allocationResults = data.filter(
+        (n: AllocationResult) =>
+          n.applicationEventScheduleId &&
+          selections.includes(n.applicationEventScheduleId)
+      );
+      allocationResults.forEach((row) => {
+        if (!row.allocatedReservationUnitId) return;
+
+        const payload = [
+          ...row.applicationEvent.declinedReservationUnitIds,
+          row.allocatedReservationUnitId,
+        ];
+
+        setDeclinedApplicationEventReservationUnits(
+          row.applicationEvent.id,
+          payload
+        );
+      });
+    } else {
+      await setApplicationEventStatuses(
+        selections.map((selection) => ({
+          status,
+          applicationEventId: selection,
+        }))
+      );
+    }
+  } catch (error) {
+    setErrorMsg("errors.errorSavingApplication");
+  } finally {
+    callback();
+  }
 };

@@ -73,6 +73,8 @@ export type Location = {
 
 export type Image = {
   imageUrl: string;
+  smallUrl: string;
+  mediumUrl: string;
   imageType: "main" | "map" | "ground_plan" | "other";
 };
 
@@ -163,7 +165,7 @@ export type Address = {
 };
 
 export type ApplicationEvent = {
-  id?: number;
+  id: number;
   name: string | null;
   numPersons: number | null;
   ageGroupId: number | null;
@@ -181,6 +183,7 @@ export type ApplicationEvent = {
   eventReservationUnits: EventReservationUnit[];
   applicationEventSchedules: ApplicationEventSchedule[];
   status: ApplicationEventStatus;
+  declinedReservationUnitIds: number[];
 };
 
 export type ApplicationEventStatus =
@@ -188,7 +191,8 @@ export type ApplicationEventStatus =
   | "allocated"
   | "validated"
   | "approved"
-  | "declined";
+  | "declined"
+  | "ignored";
 
 interface AgeGroupDisplay {
   minimum: number;
@@ -245,6 +249,7 @@ export interface AllocationResult {
   applicationId: number | null;
   applicantName: string | null;
   applicantId: number | null;
+  organisationId: number | null;
   organisationName: string | null;
   unitName: string | null;
   allocatedReservationUnitId: number | null;
@@ -285,15 +290,6 @@ export interface GroupedAllocationResult {
   data: AllocationResult[];
 }
 
-export type RecommendationStatus =
-  | "created"
-  | "allocating"
-  | "allocated"
-  | "validated"
-  | "approved"
-  | "declined"
-  | "cancelled";
-
 export type ParameterTypes =
   | "ageGroup"
   | "purpose"
@@ -312,4 +308,9 @@ export interface ParameterAgeGroup {
 export interface ParameterDefault {
   id: number;
   name: string;
+}
+
+export interface ApplicationEventsDeclinedReservationUnits {
+  id: number;
+  declinedReservationUnitIds: number[];
 }

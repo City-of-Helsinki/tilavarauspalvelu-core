@@ -13,6 +13,7 @@ import { useHistory } from "react-router-dom";
 import orderBy from "lodash/orderBy";
 import get from "lodash/get";
 import isEqual from "lodash/isEqual";
+import pullAll from "lodash/pullAll";
 import classNames from "classnames";
 import FilterControls from "./FilterControls";
 import { DataFilterConfig, DataFilterOption, DataGroup } from "../common/types";
@@ -32,7 +33,7 @@ type OrderTypes = "asc" | "desc";
 interface Column {
   title: string;
   key: string;
-  transform?: ({ status }: any) => string | JSX.Element; // eslint-disable-line @typescript-eslint/no-explicit-any
+  transform?: ({ args }: any) => string | JSX.Element; // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
 interface GeneralConfig {
@@ -58,6 +59,9 @@ interface IProps {
   cellConfig: CellConfig;
   filterConfig: DataFilterConfig[];
   setSelections?: Dispatch<SetStateAction<number[]>>;
+  isRowDisabled?: (arg0: any) => boolean; // eslint-disable-line @typescript-eslint/no-explicit-any
+  areAllRowsDisabled?: boolean;
+  statusField?: string;
   className?: string;
 }
 
@@ -192,8 +196,17 @@ const Cell = styled.td`
   user-select: none;
 `;
 
-export const Row = styled.tr<{ $clickable?: boolean }>`
+export const Row = styled.tr<{ $clickable?: boolean; $disabled?: boolean }>`
   ${({ $clickable }) => $clickable && "cursor: pointer;"}
+  ${({ $disabled }) =>
+    $disabled &&
+    `
+    span.cellContent {
+      opacity: 0.5;
+      display: block;
+    }
+    cursor: default;
+  `}
 `;
 
 export const Heading = styled.thead`
@@ -371,6 +384,7 @@ const processData = (
   order: "asc" | "desc",
   filters: DataFilterOption[],
   handledAreHidden: boolean,
+  statusField: string,
   handledStatuses?: string[]
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): any[] => {
@@ -395,7 +409,7 @@ const processData = (
       data = data.filter(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (row: any): boolean =>
-          !!handledStatuses && !handledStatuses.includes(row.status)
+          !!handledStatuses && !handledStatuses.includes(get(row, statusField))
       );
     }
 
@@ -418,6 +432,9 @@ function DataTable({
   },
   cellConfig,
   filterConfig,
+  isRowDisabled = () => false,
+  areAllRowsDisabled,
+  statusField = "status",
   className,
 }: IProps): JSX.Element {
   const [sorting, setSorting] = useState<string>(cellConfig.sorting);
@@ -455,6 +472,7 @@ function DataTable({
     order,
     filters,
     handledAreHidden,
+    statusField,
     config.handledStatuses
   );
   const actionsEnabled: boolean =
@@ -486,17 +504,25 @@ function DataTable({
     setSelectedRows(result.sort((a, b) => a - b));
   };
 
+  const disabledRows = processedData
+    .flatMap((data) =>
+      data.data.flatMap(
+        (n: any) => isRowDisabled(n) && get(n, cellConfig.index) // eslint-disable-line @typescript-eslint/no-explicit-any
+      )
+    )
+    .filter((n) => n);
+
   const getRowIds = (group?: number): number[] => {
-    return group
+    const result = group
       ? processedData
           .find((data) => data.id === group)
           .data.map((data: any) => get(data, cellConfig.index)) // eslint-disable-line @typescript-eslint/no-explicit-any
       : processedData.flatMap((data) =>
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          data.data.flatMap((recommendation: any) =>
-            get(recommendation, cellConfig.index)
-          )
+          data.data.flatMap((n: any) => get(n, cellConfig.index))
         );
+
+    return pullAll(result, disabledRows);
   };
 
   const areAllRowsSelected: boolean = isEqual(selectedRows, getRowIds());
@@ -609,6 +635,7 @@ function DataTable({
                       updateSelection(e.target.checked ? getRowIds() : []);
                     }}
                     checked={areAllRowsSelected}
+                    disabled={areAllRowsDisabled}
                     aria-label={t(
                       `common.${
                         areAllRowsSelected ? "deselectAllRows" : "selectAllRows"
@@ -683,18 +710,25 @@ function DataTable({
                               key={rowKey}
                               onClick={(): void => {
                                 if (isSelectionActive) {
-                                  updateSelection(
-                                    [rowId],
-                                    selectedRows.includes(rowId)
-                                      ? "remove"
-                                      : "add"
-                                  );
+                                  if (!isRowDisabled(row)) {
+                                    updateSelection(
+                                      [rowId],
+                                      selectedRows.includes(rowId)
+                                        ? "remove"
+                                        : "add"
+                                    );
+                                  }
                                 } else if (cellConfig.rowLink) {
                                   const link: string = cellConfig.rowLink(row);
                                   history.push(link);
                                 }
                               }}
                               $clickable={!!cellConfig.rowLink}
+                              $disabled={
+                                isSelectionActive &&
+                                isRowDisabled &&
+                                isRowDisabled(row)
+                              }
                             >
                               {isSelectionActive && (
                                 <SelectionCell>
@@ -720,6 +754,9 @@ function DataTable({
                                         row: rowId,
                                       }
                                     )}
+                                    disabled={
+                                      isRowDisabled && isRowDisabled(row)
+                                    }
                                   />
                                 </SelectionCell>
                               )}
@@ -729,7 +766,13 @@ function DataTable({
                                   const value = col.transform
                                     ? col.transform(row)
                                     : get(row, col.key);
-                                  return <Cell key={colKey}>{value}</Cell>;
+                                  return (
+                                    <Cell key={colKey}>
+                                      <span className="cellContent">
+                                        {value}
+                                      </span>
+                                    </Cell>
+                                  );
                                 }
                               )}
                             </Row>

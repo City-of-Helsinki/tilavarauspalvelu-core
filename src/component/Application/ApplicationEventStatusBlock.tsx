@@ -1,8 +1,8 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { ApplicationEventStatus } from "../../common/types";
-import {} from "../../common/util";
-import { getApplicationStatusColor } from "../../styles/util";
+import { getNormalizedApplicationEventStatus } from "../../common/util";
+import { getApplicationEventStatusColor } from "../../styles/util";
 import StatusBlock from "../StatusBlock";
 
 interface IProps {
@@ -16,10 +16,12 @@ function ApplicationEventStatusBlock({
 }: IProps): JSX.Element {
   const { t } = useTranslation();
 
+  const normalizedStatus = getNormalizedApplicationEventStatus(status);
+
   return (
     <StatusBlock
-      statusStr={t(`Recommendation.statuses.${status}`)}
-      color={getApplicationStatusColor(status, "l")}
+      statusStr={t(`Recommendation.statuses.${normalizedStatus}`)}
+      color={getApplicationEventStatusColor(normalizedStatus, "l")}
       className={className}
     />
   );

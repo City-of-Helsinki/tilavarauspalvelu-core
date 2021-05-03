@@ -2,9 +2,9 @@ import { Button, Checkbox, ErrorSummary, Navigation } from "hds-react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 import {
+  ApplicationEventStatus,
   ApplicationStatus,
   NormalizedApplicationRoundStatus,
-  RecommendationStatus,
 } from "../common/types";
 
 export const breakpoints = {
@@ -21,23 +21,53 @@ export const getGridFraction = (space: number, columns = 12): number => {
 };
 
 export const getApplicationStatusColor = (
-  status: ApplicationStatus | RecommendationStatus,
+  status: ApplicationStatus,
   size: "s" | "l"
 ): string => {
   let color = "";
   switch (status) {
     case "draft":
     case "in_review":
-    case "allocated":
-    case "created":
       color = "var(--color-info)";
       break;
     case "review_done":
-    case "validated":
       color = "var(--color-success)";
       break;
     case "declined":
     case "cancelled":
+      switch (size) {
+        case "s":
+          color = "var(--color-error)";
+          break;
+        case "l":
+        default:
+          color = "var(--color-error-dark)";
+      }
+      break;
+    default:
+  }
+
+  return color;
+};
+
+export const getApplicationEventStatusColor = (
+  status: ApplicationEventStatus,
+  size: "s" | "l"
+): string => {
+  let color = "";
+  switch (status) {
+    case "created":
+    case "allocated":
+      color = "var(--color-info)";
+      break;
+    case "validated":
+      color = "var(--color-success)";
+      break;
+    case "approved":
+      color = "var(--color-alert-light)";
+      break;
+    case "ignored":
+    case "declined":
       switch (size) {
         case "s":
           color = "var(--color-error)";
@@ -93,7 +123,7 @@ export const Seranwrap = styled.div`
 `;
 
 export const StatusDot = styled.div<{
-  status: ApplicationStatus | RecommendationStatus;
+  status: ApplicationStatus;
   size: number;
 }>`
   display: inline-block;
@@ -101,6 +131,18 @@ export const StatusDot = styled.div<{
   height: ${({ size }) => size && `${size}px`};
   border-radius: 50%;
   background-color: ${({ status }) => getApplicationStatusColor(status, "s")};
+`;
+
+export const ApplicationEventStatusDot = styled.div<{
+  status: ApplicationEventStatus;
+  size: number;
+}>`
+  display: inline-block;
+  width: ${({ size }) => size && `${size}px`};
+  height: ${({ size }) => size && `${size}px`};
+  border-radius: 50%;
+  background-color: ${({ status }) =>
+    getApplicationEventStatusColor(status, "s")};
 `;
 
 export const InlineErrorSummary = styled(ErrorSummary)`

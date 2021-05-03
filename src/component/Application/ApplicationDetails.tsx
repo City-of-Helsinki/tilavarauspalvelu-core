@@ -261,11 +261,15 @@ function ApplicationDetails(): JSX.Element | null {
                       label={t("Application.identificationNumber")}
                       value={application.organisation?.identifier}
                     />
-                    <StyledDivider />
-                    <ValueBox
-                      label={t("common.billingAddress")}
-                      value={billingAddress}
-                    />
+                    {billingAddress && (
+                      <>
+                        <StyledDivider />
+                        <ValueBox
+                          label={t("common.billingAddress")}
+                          value={billingAddress}
+                        />
+                      </>
+                    )}
                   </>
                 )}
               </AccordionContent>
@@ -350,6 +354,7 @@ function ApplicationDetails(): JSX.Element | null {
                     {applicationEvent.eventReservationUnits.map(
                       (reservationUnit, index) => (
                         <ValueBox
+                          key={reservationUnit.id}
                           label={`${t("common.option")} ${index + 1}.`}
                           value={`${
                             reservationUnit.reservationUnitDetails.building.name

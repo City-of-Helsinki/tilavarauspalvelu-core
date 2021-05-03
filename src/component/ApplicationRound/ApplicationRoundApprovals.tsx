@@ -18,7 +18,9 @@ import { NotificationBox } from "../../styles/util";
 import Heading from "./Heading";
 import Accordion from "../Accordion";
 
-const Wrapper = styled.div``;
+const Wrapper = styled.div`
+  margin-bottom: var(--spacing-layout-xl);
+`;
 
 const Title = styled(H1)`
   margin-top: var(--spacing-layout-xl);

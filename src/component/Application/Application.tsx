@@ -342,7 +342,7 @@ function Application(): JSX.Element | null {
             </DataGrid>
           </NarrowContainer>
           <ContentContainer>
-            {["in_review"].includes(applicationRound?.status) &&
+            {["draft", "in_review"].includes(applicationRound.status) &&
               action.function && (
                 <ActionButton
                   data-testid="application__button--toggle-state"

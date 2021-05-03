@@ -1,6 +1,6 @@
 import React, { ReactNode, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useParams } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 import styled from "styled-components";
 import trim from "lodash/trim";
 import {
@@ -14,10 +14,12 @@ import {
   Notification,
 } from "hds-react";
 import {
+  deleteAllocationResult,
   getAllocationResult,
   getApplication,
   getApplicationRound,
   setApplicationEventStatuses,
+  setDeclinedApplicationEventReservationUnits,
 } from "../../common/api";
 import {
   AllocationResult,
@@ -25,26 +27,26 @@ import {
   ApplicationEventStatus,
   ApplicationRound as ApplicationRoundType,
 } from "../../common/types";
-import { formatNumber, parseAgeGroups, parseDuration } from "../../common/util";
+import {
+  formatNumber,
+  parseAgeGroups,
+  parseDuration,
+  processAllocationResult,
+} from "../../common/util";
 import {
   ContentContainer,
   IngressContainer,
   NarrowContainer,
 } from "../../styles/layout";
 import { H1, H2, H3 } from "../../styles/typography";
-import {
-  BasicLink,
-  breakpoints,
-  Divider,
-  PlainButton,
-} from "../../styles/util";
+import { BasicLink, breakpoints, Divider } from "../../styles/util";
 import LinkPrev from "../LinkPrev";
 import Loader from "../Loader";
 import withMainMenu from "../withMainMenu";
 import ApplicantBox from "./ApplicantBox";
 import RecommendedSlot from "./RecommendedSlot";
-import { ReactComponent as IconInformation } from "../../images/icon_information.svg";
 import ApplicationEventStatusBlock from "../Application/ApplicationEventStatusBlock";
+import Dialog from "../Dialog";
 
 interface IRouteParams {
   applicationRoundId: string;
@@ -143,14 +145,6 @@ const Recommendations = styled.div`
   overflow-x: auto;
 `;
 
-const Terms = styled.div`
-  margin-bottom: var(--spacing-layout-2-xl);
-`;
-
-const TermButton = styled(PlainButton)`
-  margin-right: var(--spacing-s);
-`;
-
 const ActionContainer = styled.div`
   button {
     margin: 0 var(--spacing-m) var(--spacing-xs) 0;
@@ -162,6 +156,12 @@ const ActionContainer = styled.div`
 
   @media (min-width: ${breakpoints.l}) {
     flex-direction: row;
+  }
+`;
+
+const DialogActionContainer = styled(ActionContainer)`
+  button {
+    margin-top: var(--spacing-s);
   }
 `;
 
@@ -179,9 +179,15 @@ function Recommendation(): JSX.Element {
   const [actionNotification, setActionNotification] = useState<string | null>(
     null
   );
+  const [
+    isIgnoreReservationUnitDialogVisible,
+    setIsIngoreReservationUnitDialogVisible,
+  ] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const { t } = useTranslation();
+  const history = useHistory();
+
   const {
     applicationRoundId,
     applicationEventScheduleId,
@@ -206,6 +212,56 @@ function Recommendation(): JSX.Element {
       setErrorMsg("errors.errorSavingApplication");
     } finally {
       setTimeout(() => setIsSaving(false), 1000);
+    }
+  };
+
+  const ignoreReservationUnit = async (
+    rec: AllocationResult,
+    ar: ApplicationRoundType,
+    revert = false
+  ) => {
+    try {
+      setIsSaving(true);
+      setErrorMsg(null);
+
+      if (
+        !ar ||
+        !rec.applicationEventScheduleId ||
+        !rec.allocatedReservationUnitId
+      )
+        return;
+
+      const payload = revert
+        ? rec.applicationEvent.declinedReservationUnitIds.filter(
+            (n) => n !== rec.allocatedReservationUnitId
+          )
+        : [
+            ...rec.applicationEvent.declinedReservationUnitIds,
+            rec.allocatedReservationUnitId,
+          ];
+
+      await setDeclinedApplicationEventReservationUnits(
+        rec.applicationEvent.id,
+        payload
+      );
+
+      if (revert) {
+        await deleteAllocationResult(rec.applicationEventScheduleId);
+        history.push(`/applicationRound/${applicationRoundId}`);
+      }
+
+      setActionNotification(revert ? null : "ignored");
+
+      const recommendationResult = await getAllocationResult({
+        id: rec.applicationEventScheduleId,
+        serviceSectorId: ar.serviceSectorId,
+      });
+
+      setRecommendation(processAllocationResult([recommendationResult])[0]);
+    } catch (error) {
+      setErrorMsg("errors.errorSavingData");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -236,10 +292,11 @@ function Recommendation(): JSX.Element {
   }, [applicationRoundId, applicationEventScheduleId]);
 
   useEffect(() => {
-    const fetchApplication = async (id: number) => {
+    const fetchApplication = async (aId: number) => {
       try {
-        const result = await getApplication(id);
-        setApplication(result);
+        const applicationResult = await getApplication(aId);
+
+        setApplication(applicationResult);
       } catch (error) {
         setErrorMsg("errors.errorFetchingApplication");
       } finally {
@@ -248,7 +305,7 @@ function Recommendation(): JSX.Element {
     };
 
     if (recommendation?.applicationId) {
-      fetchApplication(Number(recommendation.applicationId));
+      fetchApplication(recommendation.applicationId);
     }
   }, [recommendation]);
 
@@ -260,16 +317,23 @@ function Recommendation(): JSX.Element {
     (n) => n.id === Number(applicationEventScheduleId)
   );
 
-  const scheduleIndex =
-    schedule &&
-    recommendation?.applicationEvent.applicationEventSchedules.indexOf(
-      schedule
-    );
+  const reservationUnitRank = recommendation?.applicationEvent?.eventReservationUnits?.find(
+    (n) => n.reservationUnitId === recommendation.allocatedReservationUnitId
+  )?.priority;
 
-  const modes = ["isApproved", "isDeclined", "spaceIgnored", "default"];
-  const mode = modes[3];
+  let mode = "";
   let actionButtons: ReactNode;
   let actionHelper = "";
+
+  if (
+    recommendation?.allocatedReservationUnitId &&
+    recommendation?.applicationEvent.declinedReservationUnitIds.includes(
+      recommendation.allocatedReservationUnitId
+    )
+  ) {
+    mode = "reservationUnitIgnored";
+  }
+
   switch (mode) {
     case "isApproved":
       actionButtons = (
@@ -296,18 +360,20 @@ function Recommendation(): JSX.Element {
       );
       actionHelper = t("Recommendation.actionReturnAsPartOfAllocationHelper");
       break;
-    case "spaceIgnored":
+    case "reservationUnitIgnored":
       actionButtons = (
         <Button
           variant="secondary"
           iconLeft={<IconArrowUndo />}
-          onClick={() => console.log("revert ignore")} // eslint-disable-line no-console
+          onClick={() => setIsIngoreReservationUnitDialogVisible(true)}
           disabled={isSaving}
         >
-          {t("Recommendation.actionRevertIgnoreSpace")}
+          {t("Recommendation.actionRevertIgnoreReservationUnit")}
         </Button>
       );
-      actionHelper = t("Recommendation.actionRevertIgnoreSpaceHelper");
+      actionHelper = t(
+        "Recommendation.actionRevertIgnoreReservationUnitHelper"
+      );
       break;
     default:
       actionButtons = (
@@ -330,10 +396,14 @@ function Recommendation(): JSX.Element {
             <Button
               variant="secondary"
               iconLeft={<IconArrowRight />}
-              onClick={() => console.log("ignore")} // eslint-disable-line no-console
+              onClick={() =>
+                recommendation &&
+                applicationRound &&
+                ignoreReservationUnit(recommendation, applicationRound)
+              }
               disabled={isSaving}
             >
-              {t("Recommendation.actionIgnoreSpace")}
+              {t("Recommendation.actionIgnoreReservationUnit")}
             </Button>
           </div>
           <div>
@@ -405,6 +475,21 @@ function Recommendation(): JSX.Element {
                 dismissible
                 onClose={() => setActionNotification(null)}
                 closeButtonLabelText={`${t("common.close")}`}
+                label={t("Recommendation.declineSuccessHeading")}
+              >
+                <H3>
+                  <IconInfoCircle size="s" />{" "}
+                  {t("Recommendation.declineSuccessHeading")}
+                </H3>
+                <div>{t("Recommendation.declineSuccessBody")}</div>
+              </StyledNotification>
+            )}
+            {actionNotification === "ignored" && (
+              <StyledNotification
+                type="info"
+                dismissible
+                onClose={() => setActionNotification(null)}
+                closeButtonLabelText={`${t("common.close")}`}
                 label={t("Recommendation.banSuccessHeading")}
               >
                 <H3>
@@ -451,7 +536,7 @@ function Recommendation(): JSX.Element {
                 </Value>
               </PropRow>
               <PropRow>
-                <Label>{t("ApplicationRound.appliedSpace")}</Label>
+                <Label>{t("ApplicationRound.appliedReservationUnit")}</Label>
                 <Value>
                   {trim(
                     `${recommendation.allocatedReservationUnitName}, ${recommendation.unitName}`,
@@ -459,8 +544,8 @@ function Recommendation(): JSX.Element {
                   )}
                   <SpaceSubtext>
                     <IconInfoCircle />
-                    {t("Recommendation.labelSpaceRank", {
-                      rank: (scheduleIndex || 0) + 1,
+                    {t("Recommendation.labelReservationUnitRank", {
+                      rank: (reservationUnitRank || 0) + 1,
                     })}
                   </SpaceSubtext>
                 </Value>
@@ -492,27 +577,48 @@ function Recommendation(): JSX.Element {
                 )}
               </table>
             </Recommendations>
-            <Terms>
-              <H2 as="h3" style={{ marginTop: 0 }}>
-                {t("Recommendation.thisPartsTerms")}
-              </H2>
-              <TermButton
-                iconLeft={<IconInformation />}
-                onClick={() => console.log("TODO")} // eslint-disable-line no-console
-              >
-                TODO
-              </TermButton>
-              <TermButton
-                iconLeft={<IconInformation />}
-                onClick={() => console.log("TODO")} // eslint-disable-line no-console
-              >
-                TODO
-              </TermButton>
-            </Terms>
             <ActionContainer>{actionButtons}</ActionContainer>
             <p style={{ lineHeight: "var(--lineheight-xl)" }}>{actionHelper}</p>
           </NarrowContainer>
         </>
+      )}
+      {isIgnoreReservationUnitDialogVisible && (
+        <Dialog
+          closeDialog={() => setIsIngoreReservationUnitDialogVisible(false)}
+          style={
+            {
+              "--padding": "var(--spacing-layout-s)",
+            } as React.CSSProperties
+          }
+        >
+          <H3>
+            {t("Recommendation.confirmationRevertIgnoreReservationUnitHeader")}
+          </H3>
+          <p>
+            {t("Recommendation.confirmationRevertIgnoreReservationUnitBody")}
+          </p>
+          <DialogActionContainer>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => setIsIngoreReservationUnitDialogVisible(false)}
+            >
+              {t("Navigation.goBack")}
+            </Button>
+            <Button
+              type="submit"
+              variant="primary"
+              onClick={() => {
+                if (recommendation && applicationRound) {
+                  ignoreReservationUnit(recommendation, applicationRound, true);
+                  setIsIngoreReservationUnitDialogVisible(false);
+                }
+              }}
+            >
+              {t("Recommendation.actionRevertIgnoreReservationUnitAbrv")}
+            </Button>
+          </DialogActionContainer>
+        </Dialog>
       )}
       {errorMsg && (
         <Notification
