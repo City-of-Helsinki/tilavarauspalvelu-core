@@ -687,6 +687,7 @@ def test_should_only_allocate_one_event_per_schedule(
 
     assert len(solution) == 1
 
+
 @pytest.mark.django_db
 @pytest.mark.parametrize(
     "multiple_applications",
@@ -701,7 +702,7 @@ def test_should_only_allocate_one_event_per_schedule(
                                 "events_per_week": 2,
                                 "schedules": [
                                     {"day": 0, "start": "10:00", "end": "22:00"},
-                                    {"day": 1, "start": "10:00", "end": "22:00"}
+                                    {"day": 1, "start": "10:00", "end": "22:00"},
                                 ],
                             }
                         ]
@@ -718,10 +719,7 @@ def test_can_allocate_multiple_to_different_schedules(
     application_round_basket_one,
     reservation_unit,
 ):
-    application_round_with_reservation_units.reservation_units.set(
-        [reservation_unit]
-    )
-
+    application_round_with_reservation_units.reservation_units.set([reservation_unit])
 
     data = AllocationDataBuilder(
         application_round=application_round_with_reservation_units

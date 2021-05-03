@@ -37,10 +37,6 @@ from reservations.models import AbilityGroup, AgeGroup, Reservation, Reservation
 from resources.models import Resource
 from spaces.models import District, Location, ServiceSector, Space, Unit, UnitGroup
 
-@pytest.fixture(autouse=True)
-def enable_permissions(settings):
-    settings.TMP_PERMISSIONS_DISABLED = False
-
 
 @pytest.fixture(autouse=True)
 def enable_permissions(settings):

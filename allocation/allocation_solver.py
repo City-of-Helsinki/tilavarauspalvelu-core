@@ -259,17 +259,23 @@ class AllocationSolver(object):
                         <= 1
                     )
 
-    def constraint_to_one_event_per_schedule(self, model: cp_model.CpModel, selected: Dict):
-        all_events = {}
+    def constraint_to_one_event_per_schedule(
+        self, model: cp_model.CpModel, selected: Dict
+    ):
+        all_occurrences = {}
         for basket in self.baskets.values():
             for event in basket.events:
                 for occurrence_id, occurrence in event.occurrences.items():
-                    if all_events.get(occurrence_id):
-                        ev = all_events.get(occurrence_id)
+                    if all_occurrences.get(occurrence_id):
+                        ev = all_occurrences.get(occurrence_id)
                         ev["baskets"].append(basket.id)
                     else:
-                        all_events[occurrence_id] = {"occurrence": occurrence, "baskets": [basket.id], "event": event}
-        for occurrence_id, occurrence_data in all_events.items():
+                        all_occurrences[occurrence_id] = {
+                            "occurrence": occurrence,
+                            "baskets": [basket.id],
+                            "event": event,
+                        }
+        for occurrence_id, occurrence_data in all_occurrences.items():
             event = occurrence_data["event"]
             model.Add(
                 sum(
@@ -281,7 +287,6 @@ class AllocationSolver(object):
                 )
                 <= 1
             )
-
 
     # Objective
     def maximize(self, model: cp_model.CpModel, selected: Dict):

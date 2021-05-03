@@ -2,6 +2,7 @@ import datetime
 
 import pytest
 import pytz
+from django.conf import settings
 
 from applications.models import (
     Application,
@@ -15,6 +16,11 @@ from applications.models import (
 from reservation_units.models import Purpose, ReservationUnit
 from reservations.models import AgeGroup
 from spaces.models import Space
+
+
+@pytest.fixture(autouse=True)
+def disable_hauki():
+    settings.HAUKI_API_URL = None
 
 
 @pytest.fixture
@@ -188,6 +194,19 @@ def recurring_bi_weekly_application_event(minimal_application) -> ApplicationEve
 def scheduled_for_tuesday(recurring_application_event) -> ApplicationEventSchedule:
     return ApplicationEventSchedule.objects.create(
         day=1, begin="10:00", end="12:00", application_event=recurring_application_event
+    )
+
+
+@pytest.fixture
+def result_scheduled_for_tuesday(scheduled_for_tuesday, reservation_unit):
+    return ApplicationEventScheduleResult.objects.create(
+        application_event_schedule=scheduled_for_tuesday,
+        accepted=False,
+        allocated_reservation_unit=reservation_unit,
+        allocated_duration="01:00",
+        allocated_begin="10:00",
+        allocated_end="11:00",
+        allocated_day=1,
     )
 
 
