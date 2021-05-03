@@ -1,7 +1,7 @@
 {
   "name": "tilavarauspalvelu-ui",
   "license": "MIT",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "dependencies": {
     "@axa-fr/react-oidc-context": "^3.1.6",
