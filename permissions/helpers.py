@@ -6,7 +6,7 @@ from django.utils import timezone
 
 from applications.models import Application, ApplicationRound
 from reservation_units.models import ReservationUnit
-from reservations.models import Reservation
+from reservations.models import RecurringReservation, Reservation
 from spaces.models import ServiceSector, Unit, UnitGroup
 
 
@@ -274,6 +274,56 @@ def can_modify_reservation(user: User, reservation: Reservation) -> bool:
     return (
         is_superuser(user)
         or reservation.user == user
+        or has_unit_permission(user, units, permission)
+        or has_general_permission(user, permission)
+        or has_service_sector_permission(user, service_sectors, permission)
+    )
+
+
+def can_view_recurring_reservation(
+    user: User, recurring_reservation: RecurringReservation
+) -> bool:
+    permission = "can_view_reservations"
+    res_unit_ids = recurring_reservation.reservations.values_list(
+        "reservation_unit", flat=True
+    )
+    reservation_units = ReservationUnit.objects.filter(id__in=res_unit_ids)
+    units = []
+    service_sectors = []
+    for reservation_unit in reservation_units:
+        if reservation_unit.unit:
+            units.append(reservation_unit.unit)
+    for unit in units:
+        service_sectors += list(unit.service_sectors.all())
+
+    return (
+        is_superuser(user)
+        or recurring_reservation.user == user
+        or has_unit_permission(user, units, permission)
+        or has_general_permission(user, permission)
+        or has_service_sector_permission(user, service_sectors, permission)
+    )
+
+
+def can_modify_recurring_reservation(
+    user: User, recurring_reservation: RecurringReservation
+) -> bool:
+    permission = "can_manage_reservations"
+    res_unit_ids = recurring_reservation.reservations.values_list(
+        "reservation_unit", flat=True
+    )
+    reservation_units = ReservationUnit.objects.filter(id__in=res_unit_ids)
+    units = []
+    service_sectors = []
+    for reservation_unit in reservation_units:
+        if reservation_unit.unit:
+            units.append(reservation_unit.unit)
+    for unit in units:
+        service_sectors += list(unit.service_sectors.all())
+
+    return (
+        is_superuser(user)
+        or recurring_reservation.user == user
         or has_unit_permission(user, units, permission)
         or has_general_permission(user, permission)
         or has_service_sector_permission(user, service_sectors, permission)

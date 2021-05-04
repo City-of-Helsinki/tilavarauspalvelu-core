@@ -7,9 +7,11 @@ from drf_spectacular.utils import extend_schema
 from rest_framework import filters as drf_filters
 from rest_framework import permissions, serializers, viewsets
 
+from applications.models import Application, ApplicationEvent
 from permissions.api_permissions import (
     AbilityGroupPermission,
     AgeGroupPermission,
+    RecurringReservationPermission,
     ReservationPermission,
 )
 from permissions.helpers import (
@@ -17,7 +19,13 @@ from permissions.helpers import (
     get_units_where_can_view_reservations,
 )
 from reservation_units.models import ReservationUnit
-from reservations.models import STATE_CHOICES, AbilityGroup, AgeGroup, Reservation
+from reservations.models import (
+    STATE_CHOICES,
+    AbilityGroup,
+    AgeGroup,
+    RecurringReservation,
+    Reservation,
+)
 
 from .reservation_units_api import ReservationUnitSerializer
 
@@ -154,6 +162,76 @@ class ReservationViewSet(viewsets.ModelViewSet):
             )
             | Q(user=user)
         )
+
+
+class RecurringReservationSerializer(serializers.ModelSerializer):
+    reservations = PresentablePrimaryKeyRelatedField(
+        presentation_serializer=ReservationSerializer,
+        many=True,
+        queryset=Reservation.objects.all(),
+        help_text="This recurring reservation's reservations.",
+    )
+
+    class Meta:
+        model = RecurringReservation
+        fields = [
+            "application_id",
+            "application_event_id",
+            "age_group_id",
+            "ability_group_id",
+            "reservations",
+        ]
+        extra_kwargs = {
+            "application": {
+                "help_text": "Application of the recurring reservation.",
+            },
+            "application_event": {
+                "help_text": "Application event of the recurring reservation.",
+            },
+            "age_group": {
+                "help_text": "Age group of the recurring reservation.",
+            },
+            "ability_group": {
+                "help_text": "Ability group of the recurring reservation.",
+            },
+        }
+
+
+class RecurringReservationFilter(filters.FilterSet):
+    application_event = filters.ModelMultipleChoiceFilter(
+        field_name="application_event",
+        queryset=ApplicationEvent.objects.all(),
+        help_text="Show only recurring reservations for specified application_events.",
+    )
+    application = filters.ModelMultipleChoiceFilter(
+        field_name="application",
+        queryset=Application.objects.all(),
+        help_text="Show recurring reservations fro specified applications.",
+    )
+
+    class Meta:
+        model = RecurringReservation
+        fields = []
+
+
+class RecurringReservationViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = RecurringReservationSerializer
+    permission_classes = (
+        [RecurringReservationPermission]
+        if not settings.TMP_PERMISSIONS_DISABLED
+        else [permissions.AllowAny]
+    )
+    queryset = (
+        RecurringReservation.objects.all()
+        .prefetch_related("reservations")
+        .select_related("application", "application_event")
+    )
+    filter_backends = [
+        drf_filters.OrderingFilter,
+        filters.DjangoFilterBackend,
+        drf_filters.SearchFilter,
+    ]
+    filterset_class = RecurringReservationFilter
 
 
 class AgeGroupSerializer(serializers.ModelSerializer):

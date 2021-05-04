@@ -30,9 +30,11 @@ from .helpers import (
     can_modify_application,
     can_modify_application_round,
     can_modify_city,
+    can_modify_recurring_reservation,
     can_modify_reservation,
     can_modify_reservation_unit,
     can_validate_unit_applications,
+    can_view_recurring_reservation,
     can_view_reservation,
 )
 
@@ -85,6 +87,16 @@ class ReservationPermission(permissions.BasePermission):
         if request.method in permissions.SAFE_METHODS:
             return can_view_reservation(request.user, reservation)
         return can_modify_reservation(request.user, reservation)
+
+    def has_permission(self, request, view):
+        return request.user.is_authenticated
+
+
+class RecurringReservationPermission(permissions.BasePermission):
+    def has_object_permission(self, request, view, recurring_reservation):
+        if request.method in permissions.SAFE_METHODS:
+            return can_view_recurring_reservation(request.user, recurring_reservation)
+        return can_modify_recurring_reservation(request.user, recurring_reservation)
 
     def has_permission(self, request, view):
         return request.user.is_authenticated
