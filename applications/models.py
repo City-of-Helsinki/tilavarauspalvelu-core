@@ -756,7 +756,8 @@ class ApplicationEvent(models.Model):
     def get_not_scheduled_occurrences(self):
         occurences = {}
         for event_shedule in filter(
-            lambda event: not hasattr(event, "application_event_schedule_result"),
+            lambda event: not hasattr(event, "application_event_schedule_result")
+            or event.application_event_schedule_result.accepted is False,
             self.application_event_schedules.all(),
         ):
             occurences[event_shedule.id] = event_shedule.get_occurences()

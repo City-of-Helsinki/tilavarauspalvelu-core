@@ -1,6 +1,7 @@
 import datetime
 
 import pytest
+from assertpy import assert_that
 
 
 @pytest.mark.django_db
@@ -14,6 +15,36 @@ def test_getting_occurences(recurring_application_event, scheduled_for_tuesday):
         start += delta
     assert occurrences[scheduled_for_tuesday.id].occurrences == dates
     assert occurrences[scheduled_for_tuesday.id].weekday == scheduled_for_tuesday.day
+
+
+@pytest.mark.django_db
+def test_getting_not_scheduled_occurrences_for_not_accepted_result(
+    recurring_application_event, scheduled_for_tuesday, result_scheduled_for_tuesday
+):
+    result_scheduled_for_tuesday.accepted = False
+    occurrences = recurring_application_event.get_not_scheduled_occurrences()
+
+    assert_that(occurrences[scheduled_for_tuesday.id].occurrences).is_length(8)
+
+
+@pytest.mark.django_db
+def test_getting_not_scheduled_occurrences_for_accepted_result(
+    recurring_application_event, scheduled_for_tuesday, result_scheduled_for_tuesday
+):
+    result_scheduled_for_tuesday.accepted = True
+    result_scheduled_for_tuesday.save()
+    occurrences = recurring_application_event.get_not_scheduled_occurrences()
+
+    assert_that(hasattr(occurrences, f"{scheduled_for_tuesday.id}")).is_false()
+
+
+@pytest.mark.django_db
+def test_getting_not_scheduled_occurrences_without_schedule_result(
+    recurring_application_event, scheduled_for_tuesday
+):
+    occurrences = recurring_application_event.get_not_scheduled_occurrences()
+
+    assert_that(hasattr(occurrences, f"{scheduled_for_tuesday.id}")).is_false()
 
 
 @pytest.mark.django_db

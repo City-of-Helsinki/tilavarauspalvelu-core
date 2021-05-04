@@ -66,7 +66,9 @@ def test_should_delete_not_accepted(
 
     result_scheduled_for_monday.accepted = False
     result_scheduled_for_monday.save()
-    recurring_application_event.min_duration = (datetime.timedelta(hours=23),)
+    recurring_application_event.min_duration = datetime.timedelta(hours=23)
+    recurring_application_event.max_duration = datetime.timedelta(hours=23)
+    recurring_application_event.save()
 
     assert_that(ApplicationEventScheduleResult.objects.count()).is_equal_to(1)
 
