@@ -160,6 +160,20 @@ export const BasicLink = styled(Link)`
   gap: var(--spacing-xs);
 `;
 
+export const InlineRowLink = styled(BasicLink).attrs({
+  onClick: (e: React.MouseEvent<HTMLElement>) => {
+    e.stopPropagation();
+  },
+})`
+  &:hover {
+    opacity: 0.5;
+  }
+
+  font-family: var(--tilavaraus-admin-font-medium);
+  font-weight: 500;
+  text-decoration: underline;
+`;
+
 export const StyledHDSNavigation = styled(Navigation)`
   --breakpoint-xl: 9000px;
 `;

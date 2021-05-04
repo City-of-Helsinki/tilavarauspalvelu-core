@@ -276,7 +276,7 @@ function Recommendation(): JSX.Element {
         serviceSectorId: applicationRoundResult.serviceSectorId,
       });
 
-      setRecommendation(recommendationResult);
+      setRecommendation(processAllocationResult([recommendationResult])[0]);
       setApplicationRound(applicationRoundResult);
     } catch (error) {
       setErrorMsg("errors.errorFetchingApplication");

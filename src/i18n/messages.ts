@@ -462,6 +462,9 @@ const translations: ITranslations = {
       recommendationCount: ["Vuoroja (kpl/h)"],
       spaceName: ["Tilan nimi"],
       resolution: ["Päätös"],
+      reservationUnit: ["Toimipiste"],
+      basket: ["Kori"],
+      purpose: ["Toimintatyyppi"],
     },
     statuses: {
       created: ["Käsittelemättä"],

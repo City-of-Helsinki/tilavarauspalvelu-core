@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { isEqual } from "lodash";
 import { DataFilterConfig, DataFilterOption } from "../common/types";
 import Accordion from "./Accordion";
+import { breakpoints } from "../styles/util";
 
 interface IProps {
   filters: DataFilterOption[];
@@ -18,12 +19,22 @@ const Wrapper = styled.div`
   position: absolute;
   top: 56px;
   left: 40px;
-  min-width: 345px;
+  width: 100%;
+  max-width: 70vw;
   background-color: var(--color-white);
   border: 1px solid var(--color-black-90);
   z-index: var(--tilavaraus-admin-stack-dialog);
   box-shadow: 2px 2px 30px 0px rgba(0, 0, 0, 0.11);
   user-select: none;
+
+  @media (min-width: ${breakpoints.m}) {
+    max-width: 60vw;
+    min-width: 345px;
+  }
+
+  @media (min-width: ${breakpoints.xl}) {
+    max-width: 700px;
+  }
 `;
 
 const FilterAccordion = styled(Accordion).attrs({
@@ -37,6 +48,12 @@ const FilterAccordion = styled(Accordion).attrs({
 
 const Content = styled.div`
   padding: var(--spacing-s) var(--spacing-m) 0;
+
+  @media (min-width: 1080px) {
+    display: grid;
+    grid-template-columns: repeat(2, 48%);
+    grid-gap: var(--spacing-m);
+  }
 `;
 
 const Footer = styled.div`
@@ -100,14 +117,14 @@ function FilterControls({
   >([]);
 
   const toggleActiveFilter = (filter: DataFilterOption): void => {
-    let newFilters: DataFilterOption[];
+    let activeFilters: DataFilterOption[];
     if (preliminaryFilters.find((n) => isEqual(filter, n))) {
-      newFilters = preliminaryFilters.filter((n) => !isEqual(n, filter));
+      activeFilters = preliminaryFilters.filter((n) => !isEqual(n, filter));
     } else {
-      newFilters = [...preliminaryFilters, filter];
+      activeFilters = [...preliminaryFilters, filter];
     }
 
-    setPreliminaryFilters(newFilters);
+    setPreliminaryFilters(activeFilters);
   };
 
   const { t } = useTranslation();
@@ -115,24 +132,32 @@ function FilterControls({
   return visible ? (
     <Wrapper className={className}>
       <Content>
-        {config.map((filterAccordion) => (
-          <FilterAccordion
-            heading={t(filterAccordion.title)}
-            key={filterAccordion.title}
-            data-testid="filter-controls__group"
-          >
-            {filterAccordion.filters?.map((filter) => (
-              <FilterCheckbox
-                data-testid="filter-controls__filter--selector"
-                key={`${filterAccordion.title}${filter.key}${filter.value}`}
-                id={`filter.${filterAccordion.title}.${filter.key}.${filter.value}`}
-                label={filter?.title ? t(filter.title) : ""}
-                checked={!!preliminaryFilters.find((n) => isEqual(n, filter))}
-                onChange={() => toggleActiveFilter(filter)}
-              />
-            ))}
-          </FilterAccordion>
-        ))}
+        {config.map((filterAccordion) => {
+          const activeFilters = filterAccordion.filters?.filter((n) =>
+            filters.map((af) => af.key).includes(n.key)
+          );
+          const activeFiltersCount = activeFilters?.length || "";
+          return (
+            <FilterAccordion
+              heading={`${t(filterAccordion.title)} ${
+                activeFiltersCount && `(${activeFiltersCount})`
+              }`}
+              key={filterAccordion.title}
+              data-testid="filter-controls__group"
+            >
+              {filterAccordion.filters?.map((filter) => (
+                <FilterCheckbox
+                  data-testid="filter-controls__filter--selector"
+                  key={`${filterAccordion.title}${filter.key}${filter.value}`}
+                  id={`filter.${filterAccordion.title}.${filter.key}.${filter.value}`}
+                  label={filter?.title ? t(filter.title) : ""}
+                  checked={!!preliminaryFilters.find((n) => isEqual(n, filter))}
+                  onChange={() => toggleActiveFilter(filter)}
+                />
+              ))}
+            </FilterAccordion>
+          );
+        })}
       </Content>
       <Footer>
         <ResetButton

@@ -527,6 +527,12 @@ function DataTable({
 
   const areAllRowsSelected: boolean = isEqual(selectedRows, getRowIds());
 
+  const noResults = (
+    <Row key="no-results">
+      <Cell colSpan={cellConfig.cols.length}>{t("common.noResults")}</Cell>
+    </Row>
+  );
+
   return (
     <Wrapper className={className}>
       {config.filtering && (
@@ -634,7 +640,7 @@ function DataTable({
                     onChange={(e) => {
                       updateSelection(e.target.checked ? getRowIds() : []);
                     }}
-                    checked={areAllRowsSelected}
+                    checked={areAllRowsSelected && !areAllRowsDisabled}
                     disabled={areAllRowsDisabled}
                     aria-label={t(
                       `common.${
@@ -667,129 +673,130 @@ function DataTable({
             </Row>
           </Heading>
           <Body>
-            {actionsEnabled ? (
-              processedData.map(
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                (group: any, groupIndex: number): JSX.Element => {
-                  const groupRows = getRowIds(group.id);
-                  return (
-                    <RecommendationDataTableGroup
-                      group={group}
-                      hasGrouping={hasGrouping}
-                      key={group.id || "group"}
-                      cols={cellConfig.cols.length}
-                      index={groupIndex}
-                      isVisible={groupVisibility[groupIndex]}
-                      toggleGroupVisibility={(): void => {
-                        const tempGroupVisibility = [...groupVisibility];
-                        tempGroupVisibility[groupIndex] = !tempGroupVisibility[
-                          groupIndex
-                        ];
-                        setGroupVisibility(tempGroupVisibility);
-                      }}
-                      isSelectionActive={isSelectionActive}
-                      isSelected={
-                        groupRows.length > 0 &&
-                        groupRows.every((id) => selectedRows.includes(id))
-                      }
-                      toggleSelection={updateSelection}
-                      groupRows={groupRows}
-                      groupLink={cellConfig.groupLink}
-                    >
-                      {group.data.map(
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        (row: any): JSX.Element => {
-                          const rowKey = `${sorting}${order}${get(
-                            row,
-                            cellConfig.index
-                          )}`;
-                          const rowId: number = get(row, cellConfig.index);
+            {actionsEnabled
+              ? processedData.map(
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  (group: any, groupIndex: number): JSX.Element => {
+                    const groupRows = getRowIds(group.id);
 
-                          return (
-                            <Row
-                              key={rowKey}
-                              onClick={(): void => {
-                                if (isSelectionActive) {
-                                  if (!isRowDisabled(row)) {
-                                    updateSelection(
-                                      [rowId],
-                                      selectedRows.includes(rowId)
-                                        ? "remove"
-                                        : "add"
-                                    );
-                                  }
-                                } else if (cellConfig.rowLink) {
-                                  const link: string = cellConfig.rowLink(row);
-                                  history.push(link);
-                                }
-                              }}
-                              $clickable={!!cellConfig.rowLink}
-                              $disabled={
-                                isSelectionActive &&
-                                isRowDisabled &&
-                                isRowDisabled(row)
-                              }
-                            >
-                              {isSelectionActive && (
-                                <SelectionCell>
-                                  <SelectionCheckbox
-                                    id={`recommendation-row-checkbox-${get(
-                                      row,
-                                      cellConfig.index
-                                    )}`}
-                                    onChange={(e) => {
+                    if (group.data?.length < 1) {
+                      return noResults;
+                    }
+
+                    return (
+                      <RecommendationDataTableGroup
+                        group={group}
+                        hasGrouping={hasGrouping}
+                        key={group.id || "group"}
+                        cols={cellConfig.cols.length}
+                        index={groupIndex}
+                        isVisible={groupVisibility[groupIndex]}
+                        toggleGroupVisibility={(): void => {
+                          const tempGroupVisibility = [...groupVisibility];
+                          tempGroupVisibility[
+                            groupIndex
+                          ] = !tempGroupVisibility[groupIndex];
+                          setGroupVisibility(tempGroupVisibility);
+                        }}
+                        isSelectionActive={isSelectionActive}
+                        isSelected={
+                          groupRows.length > 0 &&
+                          groupRows.every((id) => selectedRows.includes(id))
+                        }
+                        toggleSelection={updateSelection}
+                        groupRows={groupRows}
+                        groupLink={cellConfig.groupLink}
+                      >
+                        {group.data.map(
+                          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                          (row: any): JSX.Element => {
+                            const rowKey = `${sorting}${order}${get(
+                              row,
+                              cellConfig.index
+                            )}`;
+                            const rowId: number = get(row, cellConfig.index);
+
+                            return (
+                              <Row
+                                key={rowKey}
+                                onClick={(): void => {
+                                  if (isSelectionActive) {
+                                    if (!isRowDisabled(row)) {
                                       updateSelection(
                                         [rowId],
-                                        e.target.checked ? "add" : "remove"
-                                      );
-                                    }}
-                                    checked={selectedRows.includes(rowId)}
-                                    aria-label={t(
-                                      `common.${
                                         selectedRows.includes(rowId)
-                                          ? "deselectRowX"
-                                          : "selectRowX"
-                                      }`,
-                                      {
-                                        row: rowId,
-                                      }
-                                    )}
-                                    disabled={
-                                      isRowDisabled && isRowDisabled(row)
+                                          ? "remove"
+                                          : "add"
+                                      );
                                     }
-                                  />
-                                </SelectionCell>
-                              )}
-                              {cellConfig.cols.map(
-                                (col: Column): JSX.Element => {
-                                  const colKey = `${rowKey}${col.key}`;
-                                  const value = col.transform
-                                    ? col.transform(row)
-                                    : get(row, col.key);
-                                  return (
-                                    <Cell key={colKey}>
-                                      <span className="cellContent">
-                                        {value}
-                                      </span>
-                                    </Cell>
-                                  );
+                                  } else if (cellConfig.rowLink) {
+                                    const link: string = cellConfig.rowLink(
+                                      row
+                                    );
+                                    history.push(link);
+                                  }
+                                }}
+                                $clickable={!!cellConfig.rowLink}
+                                $disabled={
+                                  isSelectionActive &&
+                                  isRowDisabled &&
+                                  isRowDisabled(row)
                                 }
-                              )}
-                            </Row>
-                          );
-                        }
-                      )}
-                    </RecommendationDataTableGroup>
-                  );
-                }
-              )
-            ) : (
-              <Row>
-                <Cell colSpan={cellConfig.cols.length}>
-                  {t("common.noResults")}
-                </Cell>
-              </Row>
-            )}
+                              >
+                                {isSelectionActive && (
+                                  <SelectionCell>
+                                    <SelectionCheckbox
+                                      id={`recommendation-row-checkbox-${get(
+                                        row,
+                                        cellConfig.index
+                                      )}`}
+                                      onChange={(e) => {
+                                        updateSelection(
+                                          [rowId],
+                                          e.target.checked ? "add" : "remove"
+                                        );
+                                      }}
+                                      checked={selectedRows.includes(rowId)}
+                                      aria-label={t(
+                                        `common.${
+                                          selectedRows.includes(rowId)
+                                            ? "deselectRowX"
+                                            : "selectRowX"
+                                        }`,
+                                        {
+                                          row: rowId,
+                                        }
+                                      )}
+                                      disabled={
+                                        isRowDisabled && isRowDisabled(row)
+                                      }
+                                    />
+                                  </SelectionCell>
+                                )}
+                                {cellConfig.cols.map(
+                                  (col: Column): JSX.Element => {
+                                    const colKey = `${rowKey}${col.key}`;
+                                    const value = col.transform
+                                      ? col.transform(row)
+                                      : get(row, col.key);
+                                    return (
+                                      <Cell key={colKey}>
+                                        <span className="cellContent">
+                                          {value}
+                                        </span>
+                                      </Cell>
+                                    );
+                                  }
+                                )}
+                              </Row>
+                            );
+                          }
+                        )}
+                      </RecommendationDataTableGroup>
+                    );
+                  }
+                )
+              : noResults}
           </Body>
         </Table>
       </TableWrapper>

@@ -7,13 +7,12 @@ import trim from "lodash/trim";
 import Loader from "../Loader";
 import {
   AllocationResult,
-  ApplicationEvent,
   ApplicationRound as ApplicationRoundType,
   ApplicationRoundStatus,
   DataFilterConfig,
 } from "../../common/types";
 import { IngressContainer, NarrowContainer } from "../../styles/layout";
-import { breakpoints } from "../../styles/util";
+import { InlineRowLink, breakpoints } from "../../styles/util";
 import Heading from "./Heading";
 import StatusRecommendation from "../Application/StatusRecommendation";
 import withMainMenu from "../withMainMenu";
@@ -118,17 +117,38 @@ const ActionContainer = styled.div`
 `;
 
 const getFilterConfig = (
-  recommendations: ApplicationEvent[]
+  recommendations: AllocationResult[]
 ): DataFilterConfig[] => {
-  const purposes = uniq(recommendations.map((app) => app.purpose));
-  const statuses = uniq(recommendations.map((app) => app.status));
+  const purposes = uniq(
+    recommendations.map((rec) => rec.applicationEvent.purpose)
+  ).sort();
+  const statuses = uniq(
+    recommendations.map((rec) => rec.applicationEvent.status)
+  );
+  const reservationUnits = uniq(
+    recommendations.map((rec) => rec.unitName)
+  ).sort();
+  const baskets = uniq(
+    recommendations.map((rec) => ({
+      title: `${rec.basketOrderNumber}. ${rec.basketName}`,
+      value: rec.basketName,
+    }))
+  );
 
   return [
     {
-      title: "Application.headings.purpose",
+      title: "Recommendation.headings.reservationUnit",
+      filters: reservationUnits.map((value) => ({
+        title: value,
+        key: "unitName",
+        value: value || "",
+      })),
+    },
+    {
+      title: "Recommendation.headings.purpose",
       filters: purposes.map((value) => ({
         title: value,
-        key: "purpose",
+        key: "applicationEvent.purpose",
         value: value || "",
       })),
     },
@@ -138,25 +158,43 @@ const getFilterConfig = (
         const normalizedStatus = getNormalizedApplicationEventStatus(status);
         return {
           title: `Recommendation.statuses.${normalizedStatus}`,
-          key: "status",
+          key: "applicationEvent.status",
           value: status,
         };
       }),
+    },
+    {
+      title: "Recommendation.headings.basket",
+      filters: baskets.map(({ title, value }) => ({
+        title,
+        key: "basketName",
+        value: value || "",
+      })),
     },
   ];
 };
 
 const getCellConfig = (
   t: TFunction,
-  applicationRound: ApplicationRoundType | null
+  applicationRound: ApplicationRoundType
 ): CellConfig => {
   return {
     cols: [
-      { title: "Application.headings.applicantName", key: "organisationName" },
+      {
+        title: "Application.headings.applicantName",
+        key: "organisationName",
+        transform: ({ organisationName, applicantId }: AllocationResult) => (
+          <InlineRowLink
+            to={`/applicationRound/${applicationRound.id}/applicant/${applicantId}`}
+          >
+            {organisationName}
+          </InlineRowLink>
+        ),
+      },
       {
         title: "ApplicationRound.basket",
         key: "basketOrderNumber",
-        transform: ({ basketName, basketOrderNumber }) => (
+        transform: ({ basketName, basketOrderNumber }: AllocationResult) => (
           <>{trim(`${basketOrderNumber || ""}. ${basketName || ""}`, ". ")}</>
         ),
       },
@@ -248,11 +286,7 @@ function Handling({
 
       const processedResult = processAllocationResult(result);
 
-      setFilterConfig(
-        getFilterConfig(
-          processedResult.flatMap((n: AllocationResult) => n.applicationEvent)
-        )
-      );
+      setFilterConfig(getFilterConfig(processedResult));
       setCellConfig(getCellConfig(t, applicationRound));
       setRecommendations(processedResult);
     } catch (error) {
@@ -280,59 +314,6 @@ function Handling({
       setErrorMsg(msg);
     }
   };
-
-  // const modifyAllocationResults = async (action: string) => {
-  //   let status: ApplicationEventStatus;
-  //   switch (action) {
-  //     case "approve":
-  //       status = "approved";
-  //       break;
-  //     case "decline":
-  //       status = "declined";
-  //       break;
-  //     case "ignore":
-  //     default:
-  //   }
-
-  //   try {
-  //     setIsSaving(true);
-  //     setErrorMsg(null);
-
-  //     if (action === "ignore") {
-  //       const allocationResults = recommendations.filter(
-  //         (n: AllocationResult) =>
-  //           n.applicationEventScheduleId &&
-  //           selections.includes(n.applicationEventScheduleId)
-  //       );
-  //       allocationResults.forEach((row) => {
-  //         if (!row.allocatedReservationUnitId) return;
-
-  //         const payload = [
-  //           ...row.applicationEvent.declinedReservationUnitIds,
-  //           row.allocatedReservationUnitId,
-  //         ];
-
-  //         setDeclinedApplicationEventReservationUnits(
-  //           row.applicationEvent.id,
-  //           payload
-  //         );
-  //       });
-  //     } else {
-  //       await setApplicationEventStatuses(
-  //         selections.map((selection) => ({
-  //           status,
-  //           applicationEventId: selection,
-  //         }))
-  //       );
-  //     }
-  //   } catch (error) {
-  //     setErrorMsg("errors.errorSavingApplication");
-  //   } finally {
-  //     setTimeout(() => setIsSaving(false), 1000);
-  //     fetchRecommendations();
-  //     setSelections([]);
-  //   }
-  // };
 
   useEffect(() => {
     if (typeof applicationRound?.id === "number") {
