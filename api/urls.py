@@ -25,7 +25,12 @@ from .reservation_units_api import (
     ReservationUnitTypeViewSet,
     ReservationUnitViewSet,
 )
-from .reservations_api import AbilityGroupViewSet, AgeGroupViewSet, ReservationViewSet
+from .reservations_api import (
+    AbilityGroupViewSet,
+    AgeGroupViewSet,
+    RecurringReservationViewSet,
+    ReservationViewSet,
+)
 from .resources_api import ResourceViewSet
 from .space_api import DistrictViewSet
 from .users_api import UserViewSet
@@ -35,6 +40,9 @@ router = routers.DefaultRouter()
 router.register(r"reservation_unit", ReservationUnitViewSet, "reservationunit")
 router.register(r"resource", ResourceViewSet, "resource")
 router.register(r"reservation", ReservationViewSet, "reservation")
+router.register(
+    r"recurring_reservation", RecurringReservationViewSet, "recurring_reservation"
+)
 router.register(r"application", ApplicationViewSet, "application")
 router.register(r"application_status", ApplicationStatusViewSet, "application_status")
 router.register(r"application_event", ApplicationEventViewSet, "application_event")
