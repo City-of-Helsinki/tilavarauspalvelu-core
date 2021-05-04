@@ -14,14 +14,13 @@ import uniq from "lodash/uniq";
 import { TFunction } from "i18next";
 import { ContentContainer, IngressContainer } from "../../styles/layout";
 import { H1, H3 } from "../../styles/typography";
-import { breakpoints } from "../../styles/util";
+import { breakpoints, InlineRowLink } from "../../styles/util";
 import LinkPrev from "../LinkPrev";
 import withMainMenu from "../withMainMenu";
 import {
   ApplicationRound as ApplicationRoundType,
   DataFilterConfig,
   AllocationResult,
-  ApplicationEvent,
   ReservationUnit,
 } from "../../common/types";
 import DataTable, { CellConfig } from "../DataTable";
@@ -54,7 +53,7 @@ interface IRouteParams {
 }
 
 const Wrapper = styled.div`
-  margin-bottom: var(--spacing-layout-xl);
+  margin-bottom: var(--spacing-layout-2-xl);
 `;
 
 const Ingress = styled.div`
@@ -129,11 +128,21 @@ const StatusContainer = styled.div`
 
 const getCellConfig = (
   t: TFunction,
-  applicationRound: ApplicationRoundType | null
+  applicationRound: ApplicationRoundType
 ): CellConfig => {
   return {
     cols: [
-      { title: "Application.headings.applicantName", key: "organisationName" },
+      {
+        title: "Application.headings.applicantName",
+        key: "organisationName",
+        transform: ({ organisationName, applicantId }: AllocationResult) => (
+          <InlineRowLink
+            to={`/applicationRound/${applicationRound.id}/applicant/${applicantId}`}
+          >
+            {organisationName}
+          </InlineRowLink>
+        ),
+      },
       {
         title: "ApplicationRound.basket",
         key: "basketOrderNumber",
@@ -199,14 +208,35 @@ const getCellConfig = (
 };
 
 const getFilterConfig = (
-  recommendations: ApplicationEvent[]
+  recommendations: AllocationResult[]
 ): DataFilterConfig[] => {
-  const purposes = uniq(recommendations.map((app) => app.purpose));
-  const statuses = uniq(recommendations.map((app) => app.status));
+  const purposes = uniq(
+    recommendations.map((rec) => rec.applicationEvent.purpose)
+  ).sort();
+  const statuses = uniq(
+    recommendations.map((rec) => rec.applicationEvent.status)
+  );
+  const reservationUnits = uniq(
+    recommendations.map((rec) => rec.unitName)
+  ).sort();
+  const baskets = uniq(
+    recommendations.map((rec) => ({
+      title: `${rec.basketOrderNumber}. ${rec.basketName}`,
+      value: rec.basketName,
+    }))
+  );
 
   return [
     {
-      title: "Application.headings.purpose",
+      title: "Recommendation.headings.reservationUnit",
+      filters: reservationUnits.map((value) => ({
+        title: value,
+        key: "unitName",
+        value: value || "",
+      })),
+    },
+    {
+      title: "Recommendation.headings.purpose",
       filters: purposes.map((value) => ({
         title: value,
         key: "applicationEvent.purpose",
@@ -223,6 +253,14 @@ const getFilterConfig = (
           value: status,
         };
       }),
+    },
+    {
+      title: "Recommendation.headings.basket",
+      filters: baskets.map(({ title, value }) => ({
+        title,
+        key: "basketName",
+        value: value || "",
+      })),
     },
   ];
 };
@@ -265,10 +303,8 @@ function RecommendationsByReservationUnit(): JSX.Element {
         result
       ).filter((n: AllocationResult) => n.allocatedReservationUnitId === ruId);
 
-      setFilterConfig(
-        getFilterConfig(filteredResult.flatMap((n) => n.applicationEvent))
-      );
-      setCellConfig(getCellConfig(t, applicationRound));
+      setFilterConfig(getFilterConfig(filteredResult));
+      setCellConfig(getCellConfig(t, ar));
       setRecommendations(filteredResult || []);
     } catch (error) {
       setErrorMsg("errors.errorFetchingApplications");

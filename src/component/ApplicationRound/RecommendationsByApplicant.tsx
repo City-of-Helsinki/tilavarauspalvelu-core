@@ -17,11 +17,10 @@ import {
   Application as ApplicationType,
   ApplicationRound as ApplicationRoundType,
   DataFilterConfig,
-  ApplicationEvent,
 } from "../../common/types";
 import { ContentContainer, IngressContainer } from "../../styles/layout";
 import { H1 } from "../../styles/typography";
-import { BasicLink, breakpoints, Strong } from "../../styles/util";
+import { BasicLink, breakpoints, InlineRowLink } from "../../styles/util";
 import LinkPrev from "../LinkPrev";
 import Loader from "../Loader";
 import ApplicationRoundStatusBlock from "./ApplicationRoundStatusBlock";
@@ -46,7 +45,7 @@ interface IRouteParams {
 }
 
 const Wrapper = styled.div`
-  margin-bottom: var(--spacing-layout-xl);
+  margin-bottom: var(--spacing-layout-2-xl);
 `;
 
 const Top = styled.div`
@@ -87,7 +86,7 @@ const StyledApplicationRoundStatusBlock = styled(ApplicationRoundStatusBlock)`
 
 const getCellConfig = (
   t: TFunction,
-  applicationRound: ApplicationRoundType | null
+  applicationRound: ApplicationRoundType
 ): CellConfig => {
   return {
     cols: [
@@ -134,13 +133,16 @@ const getCellConfig = (
         title: "Recommendation.headings.spaceName",
         key: "unitName",
         transform: ({
+          allocatedReservationUnitId,
           unitName,
           allocatedReservationUnitName,
         }: AllocationResult) => {
           return (
-            <Strong>
+            <InlineRowLink
+              to={`/applicationRound/${applicationRound.id}/reservationUnit/${allocatedReservationUnitId}`}
+            >
               {unitName}, {allocatedReservationUnitName}
-            </Strong>
+            </InlineRowLink>
           );
         },
       },
@@ -177,14 +179,35 @@ const getCellConfig = (
 };
 
 const getFilterConfig = (
-  recommendations: ApplicationEvent[]
+  recommendations: AllocationResult[]
 ): DataFilterConfig[] => {
-  const purposes = uniq(recommendations.map((app) => app.purpose));
-  const statuses = uniq(recommendations.map((app) => app.status));
+  const purposes = uniq(
+    recommendations.map((rec) => rec.applicationEvent.purpose)
+  ).sort();
+  const statuses = uniq(
+    recommendations.map((rec) => rec.applicationEvent.status)
+  );
+  const reservationUnits = uniq(
+    recommendations.map((rec) => rec.unitName)
+  ).sort();
+  const baskets = uniq(
+    recommendations.map((rec) => ({
+      title: `${rec.basketOrderNumber}. ${rec.basketName}`,
+      value: rec.basketName,
+    }))
+  );
 
   return [
     {
-      title: "Application.headings.purpose",
+      title: "Recommendation.headings.reservationUnit",
+      filters: reservationUnits.map((value) => ({
+        title: value,
+        key: "unitName",
+        value: value || "",
+      })),
+    },
+    {
+      title: "Recommendation.headings.purpose",
       filters: purposes.map((value) => ({
         title: value,
         key: "applicationEvent.purpose",
@@ -201,6 +224,14 @@ const getFilterConfig = (
           value: status,
         };
       }),
+    },
+    {
+      title: "Recommendation.headings.basket",
+      filters: baskets.map(({ title, value }) => ({
+        title,
+        key: "basketName",
+        value: value || "",
+      })),
     },
   ];
 };
@@ -239,9 +270,7 @@ function RecommendationsByApplicant(): JSX.Element {
 
       const processedResult = processAllocationResult(result);
 
-      setFilterConfig(
-        getFilterConfig(processedResult.flatMap((n) => n.applicationEvent))
-      );
+      setFilterConfig(getFilterConfig(processedResult));
       setCellConfig(getCellConfig(t, ar));
       setRecommendations(processedResult || []);
     } catch (error) {

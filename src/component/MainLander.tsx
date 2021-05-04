@@ -83,9 +83,9 @@ function MainLander({ withSiteWrapper = false }: IProps): JSX.Element {
       if (typeof search.path === "string") {
         if (window.history) {
           window.history.pushState({}, "", search.path);
-          window.location.reload();
         }
       }
+      window.location.reload();
     }
   }, [oidcUser]);
 
