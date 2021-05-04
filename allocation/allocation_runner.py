@@ -30,6 +30,7 @@ def start_allocation(allocation_request: AllocationRequest):
         allocation_request.end_date = datetime.now()
         allocation_request.completed = False
         allocation_request.save()
+        raise
 
     allocation_request.application_round.allocating = False
     allocation_request.application_round.save()

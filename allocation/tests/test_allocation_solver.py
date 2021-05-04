@@ -625,3 +625,108 @@ def test_should_allocate_when_event_num_persons_is_none(
 
     assert len(solution) == 1
     assert solution[0].begin == datetime.time(hour=10, minute=0)
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "multiple_applications",
+    (
+        [
+            {
+                "applications": [
+                    {
+                        "events": [
+                            {
+                                "duration": 60,
+                                "events_per_week": 2,
+                                "schedules": [
+                                    {"day": 0, "start": "10:00", "end": "22:00"}
+                                ],
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    ),
+    indirect=True,
+)
+def test_should_only_allocate_one_event_per_schedule(
+    application_round_with_reservation_units,
+    multiple_applications,
+    application_round_basket_one,
+    second_reservation_unit,
+    reservation_unit,
+):
+    application_round_with_reservation_units.reservation_units.set(
+        [reservation_unit, second_reservation_unit]
+    )
+
+    for application in application_round_with_reservation_units.applications.all():
+
+        for event in application.application_events.all():
+            unit_one = event.event_reservation_units.all()[0]
+            unit_two = EventReservationUnit.objects.create(
+                priority=100,
+                application_event=event,
+                reservation_unit=second_reservation_unit,
+            )
+            event.event_reservation_units.set([unit_one, unit_two])
+            event.num_persons = 5
+            event.save()
+
+        application_round_with_reservation_units.save()
+
+    data = AllocationDataBuilder(
+        application_round=application_round_with_reservation_units
+    ).get_allocation_data()
+
+    solver = AllocationSolver(allocation_data=data)
+
+    solution = solver.solve()
+
+    assert len(solution) == 1
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "multiple_applications",
+    (
+        [
+            {
+                "applications": [
+                    {
+                        "events": [
+                            {
+                                "duration": 60,
+                                "events_per_week": 2,
+                                "schedules": [
+                                    {"day": 0, "start": "10:00", "end": "22:00"},
+                                    {"day": 1, "start": "10:00", "end": "22:00"},
+                                ],
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    ),
+    indirect=True,
+)
+def test_can_allocate_multiple_to_different_schedules(
+    application_round_with_reservation_units,
+    multiple_applications,
+    application_round_basket_one,
+    reservation_unit,
+):
+    application_round_with_reservation_units.reservation_units.set([reservation_unit])
+
+    data = AllocationDataBuilder(
+        application_round=application_round_with_reservation_units
+    ).get_allocation_data()
+
+    solver = AllocationSolver(allocation_data=data)
+
+    solution = solver.solve()
+
+    assert len(solution) == 2

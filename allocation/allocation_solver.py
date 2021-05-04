@@ -141,7 +141,7 @@ class AllocationSolver(object):
                         )
 
         self.constraint_allocation(model=model, selected=selected)
-
+        self.constraint_to_one_event_per_schedule(model=model, selected=selected)
         self.contraint_by_events_per_week(model=model, selected=selected)
         self.constraint_by_capacity(model=model, selected=selected)
         self.constraint_by_event_time_limits(model=model, selected=selected)
@@ -258,6 +258,35 @@ class AllocationSolver(object):
                         )
                         <= 1
                     )
+
+    def constraint_to_one_event_per_schedule(
+        self, model: cp_model.CpModel, selected: Dict
+    ):
+        all_occurrences = {}
+        for basket in self.baskets.values():
+            for event in basket.events:
+                for occurrence_id, occurrence in event.occurrences.items():
+                    if all_occurrences.get(occurrence_id):
+                        ev = all_occurrences.get(occurrence_id)
+                        ev["baskets"].append(basket.id)
+                    else:
+                        all_occurrences[occurrence_id] = {
+                            "occurrence": occurrence,
+                            "baskets": [basket.id],
+                            "event": event,
+                        }
+        for occurrence_id, occurrence_data in all_occurrences.items():
+            event = occurrence_data["event"]
+            model.Add(
+                sum(
+                    selected[(space_id, basket_id, event.id, occurrence_id)]
+                    for basket_id in occurrence_data["baskets"]
+                    for space_id, space in suitable_spaces_for_event(
+                        event, self.spaces
+                    ).items()
+                )
+                <= 1
+            )
 
     # Objective
     def maximize(self, model: cp_model.CpModel, selected: Dict):
