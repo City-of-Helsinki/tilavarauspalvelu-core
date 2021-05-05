@@ -4,9 +4,12 @@ from dateutil.parser import parse
 from django.conf import settings
 from django.db.models import Q
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import permissions, viewsets
+from rest_framework import mixins, permissions, viewsets
 
-from api.applications_api.filters import ApplicationFilter
+from api.applications_api.filters import (
+    ApplicationEventWeeklyAmountReductionFilter,
+    ApplicationFilter,
+)
 from api.applications_api.serializers import (
     ApplicationEventSerializer,
     ApplicationEventStatusSerializer,
@@ -125,13 +128,20 @@ class ApplicationEventStatusViewSet(viewsets.ModelViewSet):
         return super().get_serializer(*args, **kwargs)
 
 
-class ApplicationEventWeeklyAmountReductionViewSet(viewsets.ModelViewSet):
+class ApplicationEventWeeklyAmountReductionViewSet(
+    viewsets.GenericViewSet,
+    mixins.CreateModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.DestroyModelMixin,
+    mixins.ListModelMixin,
+):
 
     serializer_class = ApplicationEventWeeklyAmountReductionSerializer
 
     queryset = ApplicationEventWeeklyAmountReduction.objects.all()
 
-    http_method_names = ["post", "get"]
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = ApplicationEventWeeklyAmountReductionFilter
 
     permission_classes = (
         [ApplicationEventWeeklyAmountReductionPermission]

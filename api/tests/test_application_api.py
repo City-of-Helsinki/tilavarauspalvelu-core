@@ -623,3 +623,21 @@ def test_wrong_service_sector_admin_cant_create_reductions(
         reverse("application_event_weekly_amount_reduction-list"), data, format="json"
     )
     assert_that(response.status_code).is_equal_to(403)
+
+
+@pytest.mark.django_db
+def test_deleting_weekly_reductions(
+    event_reduction,
+    general_admin_api_client,
+):
+    assert_that(ApplicationEventWeeklyAmountReduction.objects.count()).is_equal_to(1)
+
+    response = general_admin_api_client.delete(
+        reverse(
+            "application_event_weekly_amount_reduction-detail",
+            kwargs={"pk": event_reduction.id},
+        ),
+        format="json",
+    )
+    assert_that(response.status_code).is_equal_to(204)
+    assert_that(ApplicationEventScheduleResult.objects.count()).is_equal_to(0)

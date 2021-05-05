@@ -12,6 +12,7 @@ from applications.models import (
     ApplicationEvent,
     ApplicationEventSchedule,
     ApplicationEventScheduleResult,
+    ApplicationEventWeeklyAmountReduction,
     ApplicationRound,
     ApplicationRoundBasket,
     City,
@@ -428,6 +429,13 @@ def application_event(
         begin=datetime.date(year=2020, month=1, day=1),
         end=datetime.date(year=2020, month=6, day=1),
         biweekly=False,
+    )
+
+
+@pytest.fixture
+def event_reduction(application_event):
+    return ApplicationEventWeeklyAmountReduction.objects.create(
+        application_event=application_event,
     )
 
 
