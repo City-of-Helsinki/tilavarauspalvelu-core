@@ -11,9 +11,14 @@ from allocation.allocation_models import (
     AllocationEvent,
     AllocationSpace,
 )
-from applications.models import ApplicationEvent, ApplicationRound
+from applications.models import ApplicationEvent, ApplicationRound, ApplicationStatus
 from opening_hours.hours import get_opening_hours
 from reservation_units.models import ReservationUnit
+
+excluded_application_statuses = [
+    ApplicationStatus.DECLINED,
+    ApplicationStatus.CANCELLED,
+]
 
 
 class AllocationDataBuilder(object):
@@ -46,7 +51,12 @@ class AllocationDataBuilder(object):
         self, application_events: [ApplicationEvent]
     ) -> [AllocationEvent]:
         events = []
-        for application_event in application_events:
+        filtered_events = [
+            application_event
+            for application_event in application_events
+            if application_event.application.status not in excluded_application_statuses
+        ]
+        for application_event in filtered_events:
             declined_unit_ids = [
                 unit.id for unit in application_event.declined_reservation_units.all()
             ]
@@ -175,7 +185,11 @@ class AllocationDataBuilder(object):
 
         all_events = chain(
             *[
-                application.application_events.all()
+                filter(
+                    lambda application: application.status
+                    not in excluded_application_statuses,
+                    application.application_events.all(),
+                )
                 for application in self.application_round.applications.all()
             ]
         )
