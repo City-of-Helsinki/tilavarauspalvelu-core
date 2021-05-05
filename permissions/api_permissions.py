@@ -5,6 +5,7 @@ from applications.models import (
     ApplicationEvent,
     ApplicationEventScheduleResult,
     ApplicationEventStatus,
+    ApplicationEventWeeklyAmountReduction,
     ApplicationRound,
 )
 from spaces.models import ServiceSector, Unit, UnitGroup
@@ -322,7 +323,22 @@ class ApplicationEventPermission(permissions.BasePermission):
 
 
 class ApplicationEventWeeklyAmountReductionPermission(permissions.BasePermission):
-    def has_object_permission(self, request, view, application_event_status):
+    def has_object_permission(
+        self, request, view, weekly_reduction: ApplicationEventWeeklyAmountReduction
+    ):
+        service_sector = (
+            weekly_reduction.application_event.application.application_round.service_sector
+        )
+        if (
+            (
+                request.method in permissions.SAFE_METHODS
+                or request.method in ["POST", "DELETE"]
+            )
+            and request.user
+            and request.user.is_authenticated
+            and can_manage_service_sectors_applications(request.user, service_sector)
+        ):
+            return True
         return False
 
     def has_permission(self, request, view):
@@ -330,25 +346,25 @@ class ApplicationEventWeeklyAmountReductionPermission(permissions.BasePermission
             return True
 
         result_id = request.data.get("application_event_schedule_result_id")
-        try:
-            schedule_result = ApplicationEventScheduleResult.objects.get(pk=result_id)
-            service_sector = ServiceSector.objects.get(
-                applicationround=ApplicationRound.objects.get(
-                    applications=Application.objects.get(
-                        application_events=schedule_result.application_event_schedule.application_event.id
-                    )
+        if result_id is not None:
+            try:
+                schedule_result = ApplicationEventScheduleResult.objects.get(
+                    pk=result_id
                 )
-            )
+                service_sector = ServiceSector.objects.filter(
+                    applicationround=ApplicationRound.objects.get(
+                        applications=Application.objects.get(
+                            application_events=schedule_result.application_event_schedule.application_event.id
+                        )
+                    )
+                ).first()
 
-            return can_manage_service_sectors_applications(request.user, service_sector)
-        except (
-            ApplicationEventScheduleResult.DoesNotExist,
-            Application.DoesNotExist,
-            ApplicationEvent.DoesNotExist,
-            ApplicationRound.DoesNotExist,
-            ServiceSector.DoesNotExist,
-        ):
-            return False
+                return can_manage_service_sectors_applications(
+                    request.user, service_sector
+                )
+            except (ApplicationEventScheduleResult.DoesNotExist,):
+                return False
+        return True
 
 
 class AgeGroupPermission(permissions.BasePermission):
