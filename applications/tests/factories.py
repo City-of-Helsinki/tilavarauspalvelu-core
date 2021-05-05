@@ -1,5 +1,6 @@
 import datetime
 
+from django.utils.timezone import get_default_timezone
 from factory import SubFactory, post_generation
 from factory.django import DjangoModelFactory
 from factory.fuzzy import FuzzyChoice, FuzzyDate, FuzzyDateTime, FuzzyInteger, FuzzyText
@@ -162,8 +163,8 @@ class ApplicationEventScheduleFactory(DjangoModelFactory):
         model = "applications.ApplicationEventSchedule"
 
     day = FuzzyInteger(low=0, high=6)
-    begin = datetime.time(12, 0)
-    end = datetime.time(14, 0)
+    begin = datetime.time(12, 0, tzinfo=get_default_timezone())
+    end = datetime.time(14, 0, tzinfo=get_default_timezone())
     application_event = SubFactory(ApplicationEventFactory)
 
 
@@ -175,8 +176,8 @@ class ApplicationEventScheduleResultFactory(DjangoModelFactory):
     allocated_reservation_unit = SubFactory(ReservationUnitFactory)
     allocated_duration = "01:00"
     allocated_day = FuzzyInteger(low=0, high=6)
-    allocated_begin = datetime.time(12, 0)
-    allocated_end = datetime.time(14, 0)
+    allocated_begin = datetime.time(12, 0, tzinfo=get_default_timezone())
+    allocated_end = datetime.time(14, 0, tzinfo=get_default_timezone())
 
 
 class ApplicationStatusFactory(DjangoModelFactory):

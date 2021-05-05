@@ -1,14 +1,15 @@
 import datetime
+from unittest import mock
 
 import pytest
 from assertpy import assert_that
 from django.contrib.auth import get_user_model
 from django.test.testcases import TestCase
+from django.utils.timezone import get_default_timezone
 from freezegun import freeze_time
 from rest_framework.reverse import reverse
 from rest_framework.test import APIClient
 
-import tilavarauspalvelu
 from applications.models import ApplicationEventStatus, ApplicationStatus
 from applications.tests.factories import (
     ApplicationEventFactory,
@@ -31,6 +32,15 @@ from spaces.tests.factories import SpaceFactory
 from tilavarauspalvelu.utils.date_util import next_or_current_matching_weekday
 
 User = get_user_model()
+
+
+class MockedScheduler:
+    def __init__(self, *args, **kwargs):
+        self.begin = args[1]
+        self.end = args[2]
+
+    def get_reservation_times_based_on_opening_hours(self):
+        return self.begin, self.end
 
 
 @freeze_time("2021-05-03")
@@ -200,7 +210,11 @@ class ApplicationEventStatusApiPermissionsTestCase(ApplicationStatusBaseTestCase
             ApplicationEventStatus.VALIDATED
         )
 
-    def test_service_sector_manager_can_create_approved_status(self):
+    @mock.patch(
+        "applications.utils.reservation_creation.ReservationScheduler",
+        wraps=MockedScheduler,
+    )
+    def test_service_sector_manager_can_create_approved_status(self, mock):
         response = self.manager_api_client.post(
             reverse("application_event_status-list"),
             data={
@@ -214,9 +228,12 @@ class ApplicationEventStatusApiPermissionsTestCase(ApplicationStatusBaseTestCase
         )
 
 
-@pytest.mark.django_db
+@mock.patch(
+    "applications.utils.reservation_creation.ReservationScheduler",
+    wraps=MockedScheduler,
+)
 class ReservationCreationOnStatusCreationTestCase(ApplicationStatusBaseTestCase):
-    def test_creating_approved_status_creates_reservations(self):
+    def test_creating_approved_status_creates_reservations(self, mock):
         response = self.manager_api_client.post(
             reverse("application_event_status-list"),
             data={
@@ -228,7 +245,7 @@ class ReservationCreationOnStatusCreationTestCase(ApplicationStatusBaseTestCase)
         assert_that(RecurringReservation.objects.count()).is_equal_to(1)
         assert_that(Reservation.objects.count()).is_greater_than(0)
 
-    def test_correct_amount_of_reservations_are_created_when_weekly(self):
+    def test_correct_amount_of_reservations_are_created_when_weekly(self, mock):
         response = self.manager_api_client.post(
             reverse("application_event_status-list"),
             data={
@@ -240,7 +257,7 @@ class ReservationCreationOnStatusCreationTestCase(ApplicationStatusBaseTestCase)
         assert_that(RecurringReservation.objects.count()).is_equal_to(1)
         assert_that(Reservation.objects.count()).is_equal_to(4)
 
-    def test_correct_amount_of_reservations_are_created_when_bi_weekly(self):
+    def test_correct_amount_of_reservations_are_created_when_bi_weekly(self, mock):
         self.application_event.biweekly = True
         self.application_event.save()
         response = self.manager_api_client.post(
@@ -254,7 +271,7 @@ class ReservationCreationOnStatusCreationTestCase(ApplicationStatusBaseTestCase)
         assert_that(RecurringReservation.objects.count()).is_equal_to(1)
         assert_that(Reservation.objects.count()).is_equal_to(2)
 
-    def test_correct_dates_are_used_for_reservations(self):
+    def test_correct_dates_are_used_for_reservations(self, mock):
         response = self.manager_api_client.post(
             reverse("application_event_status-list"),
             data={
@@ -274,18 +291,18 @@ class ReservationCreationOnStatusCreationTestCase(ApplicationStatusBaseTestCase)
                 schedule_result.allocated_day
             )
 
-    @pytest.mark.skipif(
-        tilavarauspalvelu.__version__ in ["0.1.0", "0.2.0"], reason="Flickers"
-    )
-    def test_reservation_gets_denied_status_when_overlapping(self):
+    def test_reservation_gets_denied_status_when_overlapping(self, mock):
         res_date = next_or_current_matching_weekday(
             self.application_event.begin, self.result.allocated_day
         )
-        res_dt = datetime.datetime.combine(res_date, self.result.allocated_begin)
+        res_dt = datetime.datetime.combine(
+            res_date, self.result.allocated_begin, tzinfo=get_default_timezone()
+        )
         ReservationFactory(
             begin=res_dt,
             end=res_dt + datetime.timedelta(hours=12),
             reservation_unit=[self.result.allocated_reservation_unit],
+            state=STATE_CHOICES.CREATED,
         )
         response = self.manager_api_client.post(
             reverse("application_event_status-list"),
@@ -302,3 +319,19 @@ class ReservationCreationOnStatusCreationTestCase(ApplicationStatusBaseTestCase)
         assert_that(reservations[0].state).is_equal_to(STATE_CHOICES.DENIED)
         for reservation in reservations[1:4]:
             assert_that(reservation.state).is_equal_to(STATE_CHOICES.CREATED)
+
+    def test_reservation_gets_denied_status_if_unit_not_open(self, mock):
+        mock.return_value.get_reservation_times_based_on_opening_hours.return_value = (
+            None,
+            None,
+        )
+        response = self.manager_api_client.post(
+            reverse("application_event_status-list"),
+            data={
+                "status": ApplicationEventStatus.APPROVED,
+                "application_event_id": self.application_event.id,
+            },
+        )
+        assert_that(response.status_code).is_equal_to(201)
+        reservation = Reservation.objects.first()
+        assert_that(reservation.state).is_equal_to(STATE_CHOICES.DENIED)
