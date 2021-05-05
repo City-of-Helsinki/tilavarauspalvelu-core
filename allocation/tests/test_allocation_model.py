@@ -9,6 +9,7 @@ from django.utils import timezone
 from allocation.allocation_data_builder import AllocationDataBuilder
 from allocation.allocation_models import ALLOCATION_PRECISION
 from allocation.tests.conftest import get_default_end, get_default_start
+from applications.models import ApplicationStatus
 from opening_hours.hours import TimeElement
 
 
@@ -281,3 +282,43 @@ def test_mapping_application_round_baskets(
     ).has_allocation_percentage(
         application_round_basket_two.allocation_percentage
     )
+
+
+@pytest.mark.parametrize(
+    "application_status",
+    [ApplicationStatus.CANCELLED, ApplicationStatus.DECLINED],
+)
+@pytest.mark.django_db
+def test_should_exclude_cancelled_and_declined_applications(
+    application_status,
+    application_round_with_reservation_units,
+    recurring_application_event,
+):
+
+    recurring_application_event.application.status = application_status
+    recurring_application_event.application.save()
+    data = AllocationDataBuilder(
+        application_round=application_round_with_reservation_units
+    ).get_allocation_data()
+
+    assert_that(data.baskets[None].events).is_empty()
+
+
+@pytest.mark.parametrize(
+    "application_status",
+    [ApplicationStatus.IN_REVIEW, ApplicationStatus.REVIEW_DONE],
+)
+@pytest.mark.django_db
+def test_should_include_not_cancelled_or_declined_applications(
+    application_status,
+    application_round_with_reservation_units,
+    recurring_application_event,
+):
+
+    recurring_application_event.application.status = application_status
+    recurring_application_event.application.save()
+    data = AllocationDataBuilder(
+        application_round=application_round_with_reservation_units
+    ).get_allocation_data()
+
+    assert_that(data.baskets[None].events).is_length(1)
