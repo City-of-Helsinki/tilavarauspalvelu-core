@@ -145,8 +145,10 @@ class ApplicationEventFactory(DjangoModelFactory):
 
     @post_generation
     def set_dates(self, *args, **kwargs):
-        self.begin = self.application.application_round.reservation_period_begin
-        self.end = self.application.application_round.reservation_period_end
+        if not self.begin:
+            self.begin = self.application.application_round.reservation_period_begin
+        if not self.end:
+            self.end = self.application.application_round.reservation_period_end
 
 
 class EventReservationUnitFactory(DjangoModelFactory):
