@@ -18,13 +18,13 @@ import {
   getAllocationResult,
   getApplication,
   getApplicationRound,
-  setApplicationEventStatuses,
+  rejectApplicationEventSchedule,
+  setApplicationEventScheduleResultStatus,
   setDeclinedApplicationEventReservationUnits,
 } from "../../common/api";
 import {
   AllocationResult,
   Application as ApplicationType,
-  ApplicationEventStatus,
   ApplicationRound as ApplicationRoundType,
 } from "../../common/types";
 import {
@@ -52,6 +52,12 @@ interface IRouteParams {
   applicationRoundId: string;
   applicationEventScheduleId: string;
 }
+
+type NotificationStatus =
+  | "accepted"
+  | "revertedToUnhandled"
+  | "declined"
+  | "ignored";
 
 const Wrapper = styled.div`
   margin-bottom: var(--spacing-layout-xl);
@@ -148,13 +154,23 @@ const Recommendations = styled.div`
 const ActionContainer = styled.div`
   button {
     margin: 0 var(--spacing-m) var(--spacing-xs) 0;
+    width: 100%;
+
+    svg {
+      min-width: 24px;
+    }
   }
 
   display: flex;
   justify-content: space-between;
   flex-direction: column-reverse;
+  margin-top: var(--spacing-layout-xl);
 
   @media (min-width: ${breakpoints.l}) {
+    button {
+      width: auto;
+    }
+
     flex-direction: row;
   }
 `;
@@ -176,12 +192,17 @@ function Recommendation(): JSX.Element {
     applicationRound,
     setApplicationRound,
   ] = useState<ApplicationRoundType | null>(null);
-  const [actionNotification, setActionNotification] = useState<string | null>(
-    null
-  );
+  const [
+    actionNotification,
+    setActionNotification,
+  ] = useState<NotificationStatus | null>(null);
+  const [
+    isRevertRejectionDialogVisible,
+    setIsRevertRejectionDialogVisible,
+  ] = useState<boolean>(false);
   const [
     isIgnoreReservationUnitDialogVisible,
-    setIsIngoreReservationUnitDialogVisible,
+    setIsIgnoreReservationUnitDialogVisible,
   ] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -193,25 +214,70 @@ function Recommendation(): JSX.Element {
     applicationEventScheduleId,
   } = useParams<IRouteParams>();
 
-  const modifyRecommendation = async (
-    id: number,
-    status: ApplicationEventStatus
+  const fetchRecommendation = async (aesId: number, appRoundId: number) => {
+    try {
+      const applicationRoundResult = await getApplicationRound({
+        id: appRoundId,
+      });
+
+      const recommendationResult = await getAllocationResult({
+        id: aesId,
+        serviceSectorId: applicationRoundResult.serviceSectorId,
+      });
+
+      setRecommendation(processAllocationResult([recommendationResult])[0]);
+      setApplicationRound(applicationRoundResult);
+    } catch (error) {
+      setErrorMsg("errors.errorFetchingApplication");
+      setIsLoading(false);
+    }
+  };
+
+  const toggleAcceptance = async (id: number, accepted: boolean) => {
+    try {
+      setIsSaving(true);
+      setErrorMsg(null);
+      setActionNotification(null);
+      await setApplicationEventScheduleResultStatus(id, accepted);
+      setActionNotification(accepted ? "accepted" : "revertedToUnhandled");
+    } catch (error) {
+      setErrorMsg("errors.errorSavingRecommendation");
+    } finally {
+      fetchRecommendation(id, Number(applicationRoundId));
+      setTimeout(() => setIsSaving(false), 1000);
+    }
+  };
+
+  const rejectRecommendation = async (
+    applicationEventScheduleResultId: number
   ) => {
     try {
       setIsSaving(true);
-      setActionNotification(null);
-      await setApplicationEventStatuses([
-        {
-          status,
-          applicationEventId: id,
-        },
-      ]);
       setErrorMsg(null);
-      setActionNotification(status);
+      setActionNotification(null);
+      await rejectApplicationEventSchedule(applicationEventScheduleResultId);
+      setActionNotification("declined");
     } catch (error) {
-      setErrorMsg("errors.errorSavingApplication");
+      setErrorMsg("errors.errorSavingRecommendation");
     } finally {
+      fetchRecommendation(
+        applicationEventScheduleResultId,
+        Number(applicationRoundId)
+      );
       setTimeout(() => setIsSaving(false), 1000);
+    }
+  };
+
+  const revertRejection = async (id: number) => {
+    try {
+      setIsSaving(true);
+      setErrorMsg(null);
+      setActionNotification(null);
+      await deleteAllocationResult(id);
+    } catch (error) {
+      setErrorMsg("errors.errorSavingRecommendation");
+    } finally {
+      history.push(`/applicationRound/${applicationRoundId}`);
     }
   };
 
@@ -265,25 +331,6 @@ function Recommendation(): JSX.Element {
     }
   };
 
-  const fetchRecommendation = async (aesId: number, appRoundId: number) => {
-    try {
-      const applicationRoundResult = await getApplicationRound({
-        id: appRoundId,
-      });
-
-      const recommendationResult = await getAllocationResult({
-        id: aesId,
-        serviceSectorId: applicationRoundResult.serviceSectorId,
-      });
-
-      setRecommendation(processAllocationResult([recommendationResult])[0]);
-      setApplicationRound(applicationRoundResult);
-    } catch (error) {
-      setErrorMsg("errors.errorFetchingApplication");
-      setIsLoading(false);
-    }
-  };
-
   useEffect(() => {
     fetchRecommendation(
       Number(applicationEventScheduleId),
@@ -313,10 +360,6 @@ function Recommendation(): JSX.Element {
     return <Loader />;
   }
 
-  const schedule = recommendation?.applicationEvent.applicationEventSchedules.find(
-    (n) => n.id === Number(applicationEventScheduleId)
-  );
-
   const reservationUnitRank = recommendation?.applicationEvent?.eventReservationUnits?.find(
     (n) => n.reservationUnitId === recommendation.allocatedReservationUnitId
   )?.priority;
@@ -326,12 +369,19 @@ function Recommendation(): JSX.Element {
   let actionHelper = "";
 
   if (
+    applicationRound &&
+    ["handled", "validated", "approved"].includes(applicationRound.status)
+  ) {
+    mode = "disabled";
+  } else if (
     recommendation?.allocatedReservationUnitId &&
     recommendation?.applicationEvent.declinedReservationUnitIds.includes(
       recommendation.allocatedReservationUnitId
     )
   ) {
     mode = "reservationUnitIgnored";
+  } else if (recommendation?.accepted) {
+    mode = "isApproved";
   }
 
   switch (mode) {
@@ -340,7 +390,14 @@ function Recommendation(): JSX.Element {
         <Button
           variant="secondary"
           iconLeft={<IconArrowUndo />}
-          onClick={() => console.log("palauta kasittelemattomaksi")} // eslint-disable-line no-console
+          onClick={() => {
+            if (recommendation?.applicationEventScheduleId) {
+              toggleAcceptance(
+                recommendation.applicationEventScheduleId,
+                false
+              );
+            }
+          }}
           disabled={isSaving}
         >
           {t("Recommendation.actionRevertToUnhandled")}
@@ -352,7 +409,7 @@ function Recommendation(): JSX.Element {
         <Button
           variant="secondary"
           iconLeft={<IconArrowUndo />}
-          onClick={() => console.log("palauta osaksi kasittelya")} // eslint-disable-line no-console
+          onClick={() => setIsRevertRejectionDialogVisible(true)}
           disabled={isSaving}
         >
           {t("Recommendation.actionReturnAsPartOfAllocation")}
@@ -365,7 +422,7 @@ function Recommendation(): JSX.Element {
         <Button
           variant="secondary"
           iconLeft={<IconArrowUndo />}
-          onClick={() => setIsIngoreReservationUnitDialogVisible(true)}
+          onClick={() => setIsIgnoreReservationUnitDialogVisible(true)}
           disabled={isSaving}
         >
           {t("Recommendation.actionRevertIgnoreReservationUnit")}
@@ -374,6 +431,9 @@ function Recommendation(): JSX.Element {
       actionHelper = t(
         "Recommendation.actionRevertIgnoreReservationUnitHelper"
       );
+      break;
+    case "disabled":
+      actionButtons = null;
       break;
     default:
       actionButtons = (
@@ -384,10 +444,7 @@ function Recommendation(): JSX.Element {
               iconLeft={<IconCrossCircle />}
               onClick={() =>
                 recommendation?.applicationEventScheduleId &&
-                modifyRecommendation(
-                  recommendation.applicationEventScheduleId,
-                  "declined"
-                )
+                rejectRecommendation(recommendation.applicationEventScheduleId)
               }
               disabled={isSaving}
             >
@@ -410,13 +467,14 @@ function Recommendation(): JSX.Element {
             <Button
               variant="primary"
               iconLeft={<IconCheckCircle />}
-              onClick={() =>
-                recommendation?.applicationEventScheduleId &&
-                modifyRecommendation(
-                  recommendation.applicationEventScheduleId,
-                  "validated"
-                )
-              }
+              onClick={() => {
+                if (recommendation?.applicationEventScheduleId) {
+                  toggleAcceptance(
+                    recommendation.applicationEventScheduleId,
+                    true
+                  );
+                }
+              }}
               disabled={isSaving}
             >
               {t("Recommendation.actionApprove")}
@@ -446,6 +504,7 @@ function Recommendation(): JSX.Element {
                 <div>{applicationRound?.name}</div>
                 <StyledApplicationEventStatusBlock
                   status={recommendation.applicationEvent.status}
+                  accepted={recommendation.accepted}
                 />
               </div>
               <div>
@@ -454,7 +513,7 @@ function Recommendation(): JSX.Element {
             </Top>
           </IngressContainer>
           <NarrowContainer>
-            {actionNotification === "validated" && (
+            {actionNotification === "accepted" && (
               <StyledNotification
                 type="success"
                 dismissible
@@ -467,6 +526,21 @@ function Recommendation(): JSX.Element {
                   {t("Recommendation.approveSuccessHeading")}
                 </H3>
                 <div>{t("Recommendation.approveSuccessBody")}</div>
+              </StyledNotification>
+            )}
+            {actionNotification === "revertedToUnhandled" && (
+              <StyledNotification
+                type="info"
+                dismissible
+                onClose={() => setActionNotification(null)}
+                closeButtonLabelText={`${t("common.close")}`}
+                label={t("Recommendation.revertToUnhandledSuccessHeading")}
+              >
+                <H3>
+                  <IconInfoCircle size="s" />{" "}
+                  {t("Recommendation.revertToUnhandledSuccessHeading")}
+                </H3>
+                <div>{t("Recommendation.revertToUnhandledSuccessBody")}</div>
               </StyledNotification>
             )}
             {actionNotification === "declined" && (
@@ -503,10 +577,12 @@ function Recommendation(): JSX.Element {
             <Props>
               <PropRow>
                 <Label>{t("ApplicationRound.basket")}</Label>
-                {trim(
-                  `${recommendation.basketOrderNumber}. ${recommendation.basketName}`,
-                  ". "
-                )}
+                {recommendation.basketName
+                  ? trim(
+                      `${recommendation.basketOrderNumber}. ${recommendation.basketName}`,
+                      ". "
+                    )
+                  : "-"}
               </PropRow>
               <PropRow>
                 <Label>{t("Application.headings.purpose")}</Label>
@@ -563,28 +639,66 @@ function Recommendation(): JSX.Element {
             <H2 as="h3">{t("Recommendation.recommendedSlot")}</H2>
             <Recommendations>
               <table>
-                {schedule && (
-                  <RecommendedSlot
-                    key={schedule.id}
-                    id={schedule.id}
-                    start={recommendation.applicationEvent.begin}
-                    end={recommendation.applicationEvent.end}
-                    weekday={schedule.day}
-                    biweekly={recommendation.applicationEvent.biweekly}
-                    timeStart={schedule.begin}
-                    timeEnd={schedule.end}
-                  />
-                )}
+                <RecommendedSlot
+                  key={recommendation.applicationEventScheduleId}
+                  id={recommendation.applicationEventScheduleId}
+                  start={recommendation.applicationEvent.begin}
+                  end={recommendation.applicationEvent.end}
+                  weekday={recommendation.allocatedDay}
+                  biweekly={recommendation.applicationEvent.biweekly}
+                  timeStart={recommendation.allocatedBegin}
+                  timeEnd={recommendation.allocatedEnd}
+                  duration={recommendation.allocatedDuration}
+                />
               </table>
             </Recommendations>
+            <Divider />
             <ActionContainer>{actionButtons}</ActionContainer>
             <p style={{ lineHeight: "var(--lineheight-xl)" }}>{actionHelper}</p>
           </NarrowContainer>
         </>
       )}
+      {isRevertRejectionDialogVisible && (
+        <Dialog
+          closeDialog={() => setIsRevertRejectionDialogVisible(false)}
+          style={
+            {
+              "--padding": "var(--spacing-layout-s)",
+            } as React.CSSProperties
+          }
+        >
+          <H3>
+            {t("Recommendation.confirmationRevertDeclineRecomendationHeader")}
+          </H3>
+          <p>
+            {t("Recommendation.confirmationRevertDeclineRecomendationBody")}
+          </p>
+          <DialogActionContainer>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => setIsRevertRejectionDialogVisible(false)}
+            >
+              {t("Navigation.goBack")}
+            </Button>
+            <Button
+              type="submit"
+              variant="primary"
+              onClick={() => {
+                if (recommendation?.applicationEventScheduleId) {
+                  revertRejection(recommendation.applicationEventScheduleId);
+                  setIsRevertRejectionDialogVisible(false);
+                }
+              }}
+            >
+              {t("Recommendation.actionRevertRejectionAbrv")}
+            </Button>
+          </DialogActionContainer>
+        </Dialog>
+      )}
       {isIgnoreReservationUnitDialogVisible && (
         <Dialog
-          closeDialog={() => setIsIngoreReservationUnitDialogVisible(false)}
+          closeDialog={() => setIsIgnoreReservationUnitDialogVisible(false)}
           style={
             {
               "--padding": "var(--spacing-layout-s)",
@@ -601,7 +715,7 @@ function Recommendation(): JSX.Element {
             <Button
               type="button"
               variant="secondary"
-              onClick={() => setIsIngoreReservationUnitDialogVisible(false)}
+              onClick={() => setIsIgnoreReservationUnitDialogVisible(false)}
             >
               {t("Navigation.goBack")}
             </Button>
@@ -611,7 +725,7 @@ function Recommendation(): JSX.Element {
               onClick={() => {
                 if (recommendation && applicationRound) {
                   ignoreReservationUnit(recommendation, applicationRound, true);
-                  setIsIngoreReservationUnitDialogVisible(false);
+                  setIsIgnoreReservationUnitDialogVisible(false);
                 }
               }}
             >

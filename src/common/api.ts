@@ -23,6 +23,8 @@ const allocationResultPath = "allocation_results";
 const applicationEventStatusPath = "application_event_status";
 const declinedApplicationEventReservationUnitsPath =
   "application_event_declined_reservation_unit";
+const applicationEventWeeklyAmountReduction =
+  "application_event_weekly_amount_reduction";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface QueryParameters {}
@@ -104,6 +106,18 @@ async function apiDelete<T>({ path }: RequestParameters): Promise<T> {
       "Content-Type": "application/json",
     },
     method: "delete",
+    validateStatus,
+  });
+}
+
+async function apiPatch<T>({ path, data }: RequestParameters): Promise<T> {
+  return request<T>({
+    url: `${apiBaseUrl}/${path}`,
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "patch",
+    data,
     validateStatus,
   });
 }
@@ -292,5 +306,26 @@ export function setDeclinedApplicationEventReservationUnits(
       declinedReservationUnitIds: reservationUnitIds,
     },
     path: `v1/${declinedApplicationEventReservationUnitsPath}/${applicationEventId}/`,
+  });
+}
+
+export function setApplicationEventScheduleResultStatus(
+  id: number,
+  accepted: boolean
+): Promise<AllocationResult> {
+  return apiPatch({
+    path: `v1/${allocationResultPath}/${id}/`,
+    data: {
+      accepted,
+    },
+  });
+}
+
+export function rejectApplicationEventSchedule(
+  applicationEventScheduleResultId: number
+): Promise<void> {
+  return apiPost({
+    path: `v1/${applicationEventWeeklyAmountReduction}/`,
+    data: { applicationEventScheduleResultId },
   });
 }

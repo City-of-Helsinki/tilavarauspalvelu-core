@@ -16,6 +16,10 @@ const Wrapper = styled.span`
   display: flex;
   align-items: center;
   gap: var(--spacing-s);
+
+  svg {
+    min-width: 24px;
+  }
 `;
 
 function TimeframeStatus({

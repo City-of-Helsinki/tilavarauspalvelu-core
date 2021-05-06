@@ -164,18 +164,6 @@ function ApplicationDetails(): JSX.Element | null {
         ", "
       );
 
-  let applicantType = "";
-  if (
-    application?.applicantType === "association" &&
-    !application.organisation?.identifier
-  ) {
-    applicantType = t("Application.applicantTypes.unregisteredAssociation");
-  } else if (application?.applicantType) {
-    applicantType = t(
-      `Application.applicantTypes.${application?.applicantType}`
-    );
-  }
-
   const customerName =
     application?.applicantType === "individual"
       ? `${application.contactPerson?.firstName || ""} ${
@@ -206,7 +194,7 @@ function ApplicationDetails(): JSX.Element | null {
             </DefinitionList>
             <DefinitionList>
               <dt>{t("Application.applicationReceivedTime")}:</dt>
-              <dd>todo</dd>
+              <dd>{formatDate(application.createdDate, "d.M.yyyy H:mm")}</dd>
             </DefinitionList>
           </HeadingContainer>
           <IngressContainer>
@@ -233,7 +221,9 @@ function ApplicationDetails(): JSX.Element | null {
                 <StyledDivider />
                 <ValueBox
                   label={t("Application.applicantType")}
-                  value={applicantType}
+                  value={t(
+                    `Application.applicantTypes.${application?.applicantType}`
+                  )}
                 />
                 {isOrganisation && (
                   <>
@@ -259,7 +249,7 @@ function ApplicationDetails(): JSX.Element | null {
                     />
                     <ValueBox
                       label={t("Application.identificationNumber")}
-                      value={application.organisation?.identifier}
+                      value={application.organisation?.identifier || "-"}
                     />
                     {billingAddress && (
                       <>

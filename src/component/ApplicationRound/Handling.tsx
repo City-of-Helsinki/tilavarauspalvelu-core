@@ -395,6 +395,7 @@ function Handling({
                 onClick={() => {
                   setApplicationRoundStatus("handled");
                 }}
+                disabled={unhandledRecommendationCount > 0 || isSaving}
               >
                 {t("ApplicationRound.navigateToApprovalPreparation")}
               </Button>
@@ -403,6 +404,7 @@ function Handling({
                 variant="primary"
                 onClick={() => startAllocation()}
                 iconLeft={<IconArrowRedo />}
+                disabled={isSaving}
               >
                 {t("ApplicationRound.allocateAction")}
               </Button>
@@ -422,10 +424,14 @@ function Handling({
               filterConfig={filterConfig}
               cellConfig={cellConfig}
               areAllRowsDisabled={recommendations.every(
-                (row) => row.applicationEvent.status === "ignored"
+                (row) =>
+                  row.applicationEvent.status === "ignored" || row.accepted
               )}
               isRowDisabled={(row: AllocationResult) => {
-                return ["ignored"].includes(row.applicationEvent.status);
+                return (
+                  ["ignored"].includes(row.applicationEvent.status) ||
+                  row.accepted
+                );
               }}
               statusField="applicationEvent.status"
             />
@@ -469,7 +475,6 @@ function Handling({
               callback: () => {
                 setTimeout(() => setIsSaving(false), 1000);
                 fetchRecommendations();
-                setSelections([]);
               },
             });
           }}

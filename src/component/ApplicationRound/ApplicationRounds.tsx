@@ -88,12 +88,14 @@ function ApplicationRounds(): JSX.Element {
     return <Loader />;
   }
 
+  let headingStr = t("User.welcome");
+  if (profile?.given_name) {
+    headingStr += `, ${profile.given_name}`;
+  }
+
   return (
     <Wrapper>
-      <KorosHeading
-        heading={t("User.welcomeUser", { firstName: profile?.given_name })}
-        heroImage={HeroImage}
-      />
+      <KorosHeading heading={`${headingStr}!`} heroImage={HeroImage} />
       <Ingress>{t("MainLander.ingress")}</Ingress>
       {approveRounds && approveRounds.length > 0 && (
         <Deck>

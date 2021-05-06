@@ -136,6 +136,8 @@ export type Application = {
   billingAddress: Address | null;
   applicationEvents: ApplicationEvent[];
   aggregatedData: AggregatedData;
+  createdDate: string | null;
+  lastModifiedDate: string | null;
 };
 
 export type Organisation = {
@@ -249,6 +251,7 @@ export interface AllocationResult {
   applicationId: number | null;
   applicantName: string | null;
   applicantId: number | null;
+  applicantType: string | null;
   organisationId: number | null;
   organisationName: string | null;
   unitName: string | null;
@@ -262,6 +265,7 @@ export interface AllocationResult {
   applicationAggregatedData: AggregatedData;
   basketName: string | null;
   basketOrderNumber: string | null;
+  accepted: boolean;
 }
 
 export interface AllocationRequest {

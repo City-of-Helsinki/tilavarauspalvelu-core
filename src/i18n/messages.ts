@@ -119,6 +119,7 @@ const translations: ITranslations = {
     errorFetchingApplications: ["Virhe haettaessa hakemuksia"],
     errorFetchingReservationUnit: ["Virhe haettaessa tilan tietoja"],
     errorSavingApplication: ["Virhe tallennettaessa hakemusta"],
+    errorSavingRecommendation: ["Virhe tallennettaessa ehdotusta"],
     loginNeeded: ["Kirjautuminen vaaditaan"],
     authorizationNeeded: ["Oikeudet vaaditaan"],
     errorStartingAllocation: ["Allokoinnin käynnistys epäonnistui"],
@@ -133,7 +134,7 @@ const translations: ITranslations = {
     ],
   },
   User: {
-    welcomeUser: ["Tervetuloa, {{firstName}}!"],
+    welcome: ["Tervetuloa"],
   },
   MainMenu: {
     applications: ["Hakemukset"],
@@ -225,11 +226,11 @@ const translations: ITranslations = {
     organisationCoreActivity: ["Yhdistyksen tai seuran ydintoiminta"],
     applicantTypes: {
       individual: ["Yksityishenkilö"],
-      association: ["Yhdistys"],
-      community: ["Seura"],
       company: ["Yritys"],
       unregisteredAssociation: ["Rekisteröimätön yhdistys"],
       nonprofit: ["Voittoa tavoittelematon yhdistys"],
+      community: ["Rekisteröimätön yhdistys"],
+      association: ["Rekisteröity yhdistys"],
     },
     contactPerson: ["Yhteyshenkilö"],
     identificationNumber: ["Rekisterinumero"],
@@ -476,15 +477,27 @@ const translations: ITranslations = {
     approveSuccessBody: [
       "Hyväksytyt ehdotukset siirtyvät esihenkilölle hyväksyttäväksi.",
     ],
+    revertToUnhandledSuccessHeading: ["Ehdotus palautettu käsittelemättömäksi"],
+    revertToUnhandledSuccessBody: [
+      "Voit käsitellä ehdotuksen tavalliseen tapaan.",
+    ],
     declineSuccessHeading: ["Vuoro hylätty"],
     declineSuccessBody: [
       "Hakijalta on vähennetty yksi viikkovuorotoive. Voit tarvittaessa purkaa hylkäyksen.",
     ],
+    confirmationRevertDeclineRecomendationHeader: [
+      "Palautetaanko hylätty vuoro-osuus takaisin osaksi käsittelyä?",
+    ],
+    confirmationRevertDeclineRecomendationBody: [
+      "Et näe tätä ehdotusta enää palauttamisen jälkeen. Palautus ei tarkoita, että osuudelle on mahdollista enää myöntää juuri tätä vuoroa.  Palautettu viikkovuorotoive otetaan kuitenkin huomioon seuraavan uudelleenkäynnistyksen aikana.",
+    ],
+    actionRevertRejectionAbrv: ["Palauta osuus"],
     banSuccessHeading: ["Tilakielto asetettu"],
     banSuccessBody: [
       "Valittua vuoroa ja ryhmän tulevia vuoroja ei tarjota enää tähän tilaan. Voit tarvittaessa purkaa tähän tilaan kohdistuvan kiellon.",
     ],
     scheduleDuration: ["Vuoron kesto {{duration}}"],
+    noRecommendations: ["Ei ehdotuksia"],
   },
   ReservationUnit: {
     reservationStatus: ["Varaustilanne"],

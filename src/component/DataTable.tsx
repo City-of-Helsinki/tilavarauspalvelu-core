@@ -533,6 +533,8 @@ function DataTable({
     </Row>
   );
 
+  const totalRows = processedData.flatMap((n) => n.data);
+
   return (
     <Wrapper className={className}>
       {config.filtering && (
@@ -673,15 +675,11 @@ function DataTable({
             </Row>
           </Heading>
           <Body>
-            {actionsEnabled
+            {totalRows.length > 0
               ? processedData.map(
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   (group: any, groupIndex: number): JSX.Element => {
                     const groupRows = getRowIds(group.id);
-
-                    if (group.data?.length < 1) {
-                      return noResults;
-                    }
 
                     return (
                       <RecommendationDataTableGroup
