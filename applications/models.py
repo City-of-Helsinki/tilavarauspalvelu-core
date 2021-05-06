@@ -1,11 +1,11 @@
 import datetime
-import math
+
 from typing import Dict, List, Optional
 
 import recurrence
 from django.contrib.auth import get_user_model
 from django.contrib.postgres.fields import ArrayField
-from django.db import models
+from django.db import Error, models
 from django.db.models import DurationField, ExpressionWrapper, F
 from django.utils.text import format_lazy
 from django.utils.translation import gettext_lazy as _
@@ -769,6 +769,19 @@ class ApplicationEvent(models.Model):
         for event_shedule in self.application_event_schedules.all():
             occurences[event_shedule.id] = event_shedule.get_occurences()
         return occurences
+
+
+class ApplicationEventAggregateData(models.Model):
+    """Model to store aggregated data for single application event.
+
+    Overall hour counts etc.
+    """
+
+    name = models.CharField(max_length=255, verbose_name=_("Name"))
+    value = models.FloatField(max_length=255, verbose_name=_("Value"))
+    application_event = models.ForeignKey(
+        ApplicationEvent, on_delete=models.CASCADE, related_name="aggregated_data"
+    )
 
 
 class EventReservationUnit(models.Model):
