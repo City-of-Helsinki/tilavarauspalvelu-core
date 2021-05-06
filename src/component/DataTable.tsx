@@ -95,7 +95,9 @@ const Filters = styled.div`
   align-items: center;
   justify-content: flex-start;
   height: 56px;
-  position: relative;
+  position: sticky;
+  top: 0;
+  z-index: var(--tilavaraus-admin-sticky-header);
 `;
 
 interface IFilterBtn {
@@ -156,6 +158,7 @@ const Table = styled.table`
   min-width: var(--breakpoint-m);
   padding: 0 var(--spacing-m);
   border-spacing: 0;
+  position: relative;
 
   @media (min-width: ${breakpoints.m}) {
     min-width: auto;
