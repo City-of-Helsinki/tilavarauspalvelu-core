@@ -71,6 +71,10 @@ class ApplicationEventScheduleResultSerializer(serializers.ModelSerializer):
             "application_aggregated_data",
             "declined_reservation_unit_ids",
             "accepted",
+            "allocated_duration",
+            "allocated_day",
+            "allocated_begin",
+            "allocated_end",
         ]
         read_only_fields = [
             "allocated_duration",
