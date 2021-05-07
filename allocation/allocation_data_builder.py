@@ -120,7 +120,6 @@ class AllocationDataBuilder(object):
             unit=unit,
             period_start=self.period_start,
             period_end=self.period_end,
-            times=[],
         )
 
         if not settings.HAUKI_API_URL:
