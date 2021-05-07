@@ -368,6 +368,9 @@ function RecommendationsByReservationUnit(): JSX.Element {
     return <Loader />;
   }
 
+  const isApplicationRoundApproved =
+    applicationRound && ["approved"].includes(applicationRound.status);
+
   return (
     <Wrapper>
       {applicationRound &&
@@ -440,15 +443,19 @@ function RecommendationsByReservationUnit(): JSX.Element {
               config={{
                 filtering: true,
                 rowFilters: true,
-                selection: true,
+                selection: !isApplicationRoundApproved,
               }}
               cellConfig={cellConfig}
               filterConfig={filterConfig}
               areAllRowsDisabled={recommendations.every(
-                (row) => row.applicationEvent.status === "ignored"
+                (row) =>
+                  row.applicationEvent.status === "ignored" || row.accepted
               )}
               isRowDisabled={(row: AllocationResult) => {
-                return ["ignored"].includes(row.applicationEvent.status);
+                return (
+                  ["ignored"].includes(row.applicationEvent.status) ||
+                  row.accepted
+                );
               }}
             />
             {selections?.length > 0 && (
@@ -482,7 +489,6 @@ function RecommendationsByReservationUnit(): JSX.Element {
                         applicationRound,
                         Number(reservationUnitId)
                       );
-                      setSelections([]);
                     },
                   });
                 }}

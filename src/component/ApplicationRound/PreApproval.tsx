@@ -15,7 +15,6 @@ import {
   ApplicationRound as ApplicationRoundType,
   ApplicationRoundStatus,
   DataFilterConfig,
-  ApplicationEvent,
 } from "../../common/types";
 import { IngressContainer, NarrowContainer } from "../../styles/layout";
 import { breakpoints } from "../../styles/util";
@@ -31,6 +30,7 @@ import {
   formatNumber,
   parseDuration,
   prepareAllocationResults,
+  processAllocationResult,
 } from "../../common/util";
 import BigRadio from "../BigRadio";
 import { getAllocationResults } from "../../common/api";
@@ -144,26 +144,26 @@ const IngressFooter = styled.div`
   }
 `;
 
-const SchedulePercentage = styled.span`
-  font-family: var(--tilavaraus-admin-font-bold);
-  font-weight: bold;
-  font-size: 1.375rem;
-  display: block;
+// const SchedulePercentage = styled.span`
+//   font-family: var(--tilavaraus-admin-font-bold);
+//   font-weight: bold;
+//   font-size: 1.375rem;
+//   display: block;
 
-  @media (min-width: ${breakpoints.m}) {
-    display: inline;
-  }
-`;
+//   @media (min-width: ${breakpoints.m}) {
+//     display: inline;
+//   }
+// `;
 
-const ScheduleCount = styled.span`
-  font-size: var(--fontsize-body-s);
-  display: block;
+// const ScheduleCount = styled.span`
+//   font-size: var(--fontsize-body-s);
+//   display: block;
 
-  @media (min-width: ${breakpoints.m}) {
-    margin-left: var(--spacing-xs);
-    display: inline;
-  }
-`;
+//   @media (min-width: ${breakpoints.m}) {
+//     margin-left: var(--spacing-xs);
+//     display: inline;
+//   }
+// `;
 
 const getCellConfig = (
   t: TFunction,
@@ -173,17 +173,16 @@ const getCellConfig = (
     cols: [
       { title: "Application.headings.applicantName", key: "organisationName" },
       {
-        title: "Application.headings.participants",
-        key: "organisation.activeMembers",
-      },
-      {
         title: "Application.headings.applicantType",
         key: "applicantType",
       },
       {
         title: "Recommendation.headings.resolution",
         key: "applicationAggregatedData.reservationsTotal",
-        transform: ({ applicationAggregatedData }: AllocationResult) => (
+        transform: ({
+          applicationAggregatedData,
+          applicationEvent,
+        }: AllocationResult) => (
           <div
             style={{
               display: "flex",
@@ -192,15 +191,17 @@ const getCellConfig = (
             }}
           >
             <span>
-              {trim(
-                `${formatNumber(
-                  applicationAggregatedData?.reservationsTotal,
-                  t("common.volumeUnit")
-                )} / ${parseDuration(
-                  applicationAggregatedData?.minDurationTotal
-                )}`,
-                " / "
-              )}
+              {["validated"].includes(applicationEvent.status)
+                ? trim(
+                    `${formatNumber(
+                      applicationAggregatedData?.reservationsTotal,
+                      t("common.volumeUnit")
+                    )} / ${parseDuration(
+                      applicationAggregatedData?.minDurationTotal
+                    )}`,
+                    " / "
+                  )
+                : t("Recommendation.noRecommendations")}
             </span>
             <IconArrowRight />
           </div>
@@ -223,16 +224,29 @@ const getCellConfig = (
 };
 
 const getFilterConfig = (
-  recommendations: ApplicationEvent[]
+  recommendations: AllocationResult[]
 ): DataFilterConfig[] => {
-  const purposes = uniq(recommendations.map((app) => app.purpose));
+  const applicantTypes = uniq(
+    recommendations.map((rec) => rec.applicantType)
+  ).sort();
+  const reservationUnits = uniq(
+    recommendations.map((rec) => rec.unitName)
+  ).sort();
 
   return [
     {
-      title: "Application.headings.purpose",
-      filters: purposes.map((value) => ({
+      title: "Application.headings.applicantType",
+      filters: applicantTypes.map((value) => ({
         title: value,
-        key: "applicationEvent.purpose",
+        key: "applicantType",
+        value: value || "",
+      })),
+    },
+    {
+      title: "Recommendation.headings.reservationUnit",
+      filters: reservationUnits.map((value) => ({
+        title: value,
+        key: "unitName",
         value: value || "",
       })),
     },
@@ -268,13 +282,11 @@ function PreApproval({
           serviceSectorId: ssId,
         });
 
-        setFilterConfig(
-          getFilterConfig(
-            result.flatMap((n: AllocationResult) => n.applicationEvent)
-          )
-        );
+        const processedResult = processAllocationResult(result);
+
+        setFilterConfig(getFilterConfig(processedResult));
         setCellConfig(getCellConfig(t, applicationRound));
-        setRecommendations(result || []);
+        setRecommendations(processedResult || []);
       } catch (error) {
         setErrorMsg("errors.errorFetchingApplications");
       } finally {
@@ -289,11 +301,6 @@ function PreApproval({
       );
     }
   }, [applicationRound, t]);
-
-  const scheduledNumbers = {
-    volume: 239048,
-    hours: 2345,
-  };
 
   const hasBeenSentForApproval = applicationRound.status === "validated";
 
@@ -382,7 +389,7 @@ function PreApproval({
           <IngressContainer>
             <IngressFooter>
               <div>
-                <p className="label">
+                {/* <p className="label">
                   {t("ApplicationRound.schedulesToBeGranted")}
                 </p>{" "}
                 <SchedulePercentage>
@@ -398,7 +405,7 @@ function PreApproval({
                     scheduledNumbers.hours,
                     t("common.hoursUnit")
                   )})`}
-                </ScheduleCount>
+                </ScheduleCount> */}
               </div>
               <div>
                 <BigRadio

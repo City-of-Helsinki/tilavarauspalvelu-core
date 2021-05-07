@@ -7,16 +7,21 @@ import StatusBlock from "../StatusBlock";
 
 interface IProps {
   status: ApplicationEventStatus;
+  accepted?: boolean;
   className?: string;
 }
 
 function ApplicationEventStatusBlock({
   status,
+  accepted,
   className,
 }: IProps): JSX.Element {
   const { t } = useTranslation();
 
-  const normalizedStatus = getNormalizedApplicationEventStatus(status);
+  const normalizedStatus = getNormalizedApplicationEventStatus(
+    status,
+    accepted
+  );
 
   return (
     <StatusBlock

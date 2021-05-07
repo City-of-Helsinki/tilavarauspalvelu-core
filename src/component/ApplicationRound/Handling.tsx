@@ -1,7 +1,12 @@
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { TFunction, useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { Button, IconArrowRedo, Notification } from "hds-react";
+import {
+  Button,
+  IconArrowRedo,
+  IconCheckCircle,
+  Notification,
+} from "hds-react";
 import uniq from "lodash/uniq";
 import trim from "lodash/trim";
 import Loader from "../Loader";
@@ -113,6 +118,24 @@ const ActionContainer = styled.div`
 
   @media (min-width: ${breakpoints.l}) {
     flex-direction: row;
+  }
+`;
+
+const StyledNotification = styled(Notification)`
+  margin-top: var(--spacing-l);
+  padding-left: var(--spacing-xl);
+
+  h3 {
+    display: flex;
+    align-items: center;
+
+    svg {
+      margin-right: var(--spacing-2-xs);
+    }
+  }
+
+  div[role="heading"] {
+    display: none;
   }
 `;
 
@@ -264,12 +287,20 @@ function Handling({
   setApplicationRound,
   setApplicationRoundStatus,
 }: IProps): JSX.Element {
+  const isApplicationRoundApproved = ["approved"].includes(
+    applicationRound.status
+  );
+
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [isAllocating, setIsAllocating] = useState(false);
   const [recommendations, setRecommendations] = useState<AllocationResult[]>(
     []
   );
+  const [
+    isResolutionNotificationVisible,
+    setIsResolutionNotificationVisible,
+  ] = useState<boolean>(isApplicationRoundApproved);
   const [cellConfig, setCellConfig] = useState<CellConfig | null>(null);
   const [filterConfig, setFilterConfig] = useState<DataFilterConfig[]>([]);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -359,7 +390,10 @@ function Handling({
             subheading={t("ApplicationRound.suffixUnhandledSuggestions")}
           />
           <IngressContainer>
-            <ApplicationRoundNavi applicationRoundId={applicationRound.id} />
+            <ApplicationRoundNavi
+              applicationRoundId={applicationRound.id}
+              applicationRoundStatus={applicationRound.status}
+            />
             <TopIngress>
               <div>
                 <ContentHeading>{applicationRound.name}</ContentHeading>
@@ -368,6 +402,7 @@ function Handling({
                     applicationRound.applicationPeriodBegin
                   }
                   applicationPeriodEnd={applicationRound.applicationPeriodEnd}
+                  resolution={isApplicationRoundApproved}
                 />
               </div>
               <div>
@@ -377,36 +412,57 @@ function Handling({
             </TopIngress>
           </IngressContainer>
           <NarrowContainer style={{ marginBottom: "var(--spacing-4-xl)" }}>
-            <Recommendation>
-              <RecommendationLabel>
-                {t("Application.recommendedStage")}:
-              </RecommendationLabel>
-              <RecommendationValue>
-                <StatusRecommendation
-                  status="allocated"
-                  applicationRound={applicationRound}
-                />
-              </RecommendationValue>
-            </Recommendation>
-            <ActionContainer>
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={() => {
-                  setApplicationRoundStatus("handled");
-                }}
+            {!isApplicationRoundApproved && (
+              <>
+                <Recommendation>
+                  <RecommendationLabel>
+                    {t("Application.recommendedStage")}:
+                  </RecommendationLabel>
+                  <RecommendationValue>
+                    <StatusRecommendation
+                      status="allocated"
+                      applicationRound={applicationRound}
+                    />
+                  </RecommendationValue>
+                </Recommendation>
+                <ActionContainer>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={() => {
+                      setApplicationRoundStatus("handled");
+                    }}
+                    disabled={unhandledRecommendationCount > 0 || isSaving}
+                  >
+                    {t("ApplicationRound.navigateToApprovalPreparation")}
+                  </Button>
+                  <Button
+                    type="submit"
+                    variant="primary"
+                    onClick={() => startAllocation()}
+                    iconLeft={<IconArrowRedo />}
+                    disabled={isSaving}
+                  >
+                    {t("ApplicationRound.allocateAction")}
+                  </Button>
+                </ActionContainer>
+              </>
+            )}
+            {isResolutionNotificationVisible && (
+              <StyledNotification
+                type="success"
+                label=""
+                dismissible
+                closeButtonLabelText={`${t("common.close")}`}
+                onClose={() => setIsResolutionNotificationVisible(false)}
               >
-                {t("ApplicationRound.navigateToApprovalPreparation")}
-              </Button>
-              <Button
-                type="submit"
-                variant="primary"
-                onClick={() => startAllocation()}
-                iconLeft={<IconArrowRedo />}
-              >
-                {t("ApplicationRound.allocateAction")}
-              </Button>
-            </ActionContainer>
+                <H3>
+                  <IconCheckCircle size="m" />{" "}
+                  {t("ApplicationRound.notificationResolutionDoneHeading")}
+                </H3>
+                <p>{t("ApplicationRound.notificationResolutionDoneBody")}</p>
+              </StyledNotification>
+            )}
           </NarrowContainer>
           {cellConfig && (
             <DataTable
@@ -416,16 +472,22 @@ function Handling({
               config={{
                 filtering: true,
                 rowFilters: true,
-                handledStatuses: ["ignored", "validated", "handled"],
-                selection: true,
+                handledStatuses: isApplicationRoundApproved
+                  ? []
+                  : ["ignored", "validated", "handled"],
+                selection: !isApplicationRoundApproved,
               }}
               filterConfig={filterConfig}
               cellConfig={cellConfig}
               areAllRowsDisabled={recommendations.every(
-                (row) => row.applicationEvent.status === "ignored"
+                (row) =>
+                  row.applicationEvent.status === "ignored" || row.accepted
               )}
               isRowDisabled={(row: AllocationResult) => {
-                return ["ignored"].includes(row.applicationEvent.status);
+                return (
+                  ["ignored"].includes(row.applicationEvent.status) ||
+                  row.accepted
+                );
               }}
               statusField="applicationEvent.status"
             />
@@ -469,7 +531,6 @@ function Handling({
               callback: () => {
                 setTimeout(() => setIsSaving(false), 1000);
                 fetchRecommendations();
-                setSelections([]);
               },
             });
           }}

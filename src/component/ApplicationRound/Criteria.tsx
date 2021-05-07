@@ -330,65 +330,73 @@ function Criteria(): JSX.Element {
             >
               <AccordionContent>
                 <H3>{t("ApplicationRound.preferredAllocationGroups")}</H3>
-                {baskets.map((basket) => {
-                  const getPurposesStr = (): string => {
-                    let result = "";
-                    basket.purposeIds.forEach((pId: number): void => {
-                      const purpose = purposes.find((n) => n.id === pId);
-                      result += purpose ? `${purpose.name}, ` : "";
-                    });
-                    return result ? trim(result, ", ") : "-";
-                  };
+                {baskets.length < 1
+                  ? "-"
+                  : baskets.map((basket) => {
+                      const getPurposesStr = (): string => {
+                        let result = "";
+                        basket.purposeIds.forEach((pId: number): void => {
+                          const purpose = purposes.find((n) => n.id === pId);
+                          result += purpose ? `${purpose.name}, ` : "";
+                        });
+                        return result ? trim(result, ", ") : "-";
+                      };
 
-                  const getCustomerTypeStr = (): string => {
-                    let result = "";
-                    basket.customerType.forEach((type: string): void => {
-                      result += `${t(`Application.applicantTypes.${type}`)}, `;
-                    });
-                    return result ? trim(result, ", ") : "-";
-                  };
+                      const getCustomerTypeStr = (): string => {
+                        let result = "";
+                        basket.customerType.forEach((type: string): void => {
+                          result += `${t(
+                            `Application.applicantTypes.${type}`
+                          )}, `;
+                        });
+                        return result ? trim(result, ", ") : "-";
+                      };
 
-                  const getAgeGroupsStr = (): string => {
-                    let result = "";
-                    basket.ageGroupIds.forEach((aId: number): void => {
-                      const ageGroup = ageGroups.find((n) => n.id === aId);
-                      result += ageGroup ? `${parseAgeGroups(ageGroup)}, ` : "";
-                    });
+                      const getAgeGroupsStr = (): string => {
+                        let result = "";
+                        basket.ageGroupIds.forEach((aId: number): void => {
+                          const ageGroup = ageGroups.find((n) => n.id === aId);
+                          result += ageGroup
+                            ? `${parseAgeGroups(ageGroup)}, `
+                            : "";
+                        });
 
-                    return result ? trim(result, ", ") : "-";
-                  };
+                        return result ? trim(result, ", ") : "-";
+                      };
 
-                  const getCityStr = (): string | undefined => {
-                    const city = cities.find((n) => n.id === basket.homeCityId);
-                    return city ? city.name : "-";
-                  };
+                      const getCityStr = (): string | undefined => {
+                        const city = cities.find(
+                          (n) => n.id === basket.homeCityId
+                        );
+                        return city ? city.name : "-";
+                      };
 
-                  return (
-                    <BasketWrapper key={basket.name}>
-                      <Accordion
-                        defaultOpen
-                        heading={
-                          <BasketHeading>
-                            <IconGroup />
-                            <Strong>{basket.orderNumber}.</Strong>
-                            <BasketTitle>{basket.name}</BasketTitle>
-                          </BasketHeading>
-                        }
-                      >
-                        <Basket>
-                          <Strong>{t("Basket.purpose")}</Strong>
-                          <span>{getPurposesStr()}</span>
-                          <Strong>{t("Basket.customerType")}</Strong>
-                          <span>{getCustomerTypeStr()}</span>
-                          <Strong>{t("Basket.ageGroup")}</Strong>
-                          <span>{getAgeGroupsStr()}</span>
-                          <Strong>{t("Basket.homeCity")}</Strong>
-                          <span>{getCityStr()}</span>
-                        </Basket>
-                      </Accordion>
-                    </BasketWrapper>
-                  );
-                })}
+                      return (
+                        <BasketWrapper key={basket.name}>
+                          <Accordion
+                            defaultOpen
+                            heading={
+                              <BasketHeading>
+                                <IconGroup />
+                                <Strong>{basket.orderNumber}.</Strong>
+                                <BasketTitle>{basket.name}</BasketTitle>
+                              </BasketHeading>
+                            }
+                          >
+                            <Basket>
+                              <Strong>{t("Basket.purpose")}</Strong>
+                              <span>{getPurposesStr()}</span>
+                              <Strong>{t("Basket.customerType")}</Strong>
+                              <span>{getCustomerTypeStr()}</span>
+                              <Strong>{t("Basket.ageGroup")}</Strong>
+                              <span>{getAgeGroupsStr()}</span>
+                              <Strong>{t("Basket.homeCity")}</Strong>
+                              <span>{getCityStr()}</span>
+                            </Basket>
+                          </Accordion>
+                        </BasketWrapper>
+                      );
+                    })}
               </AccordionContent>
             </StyledAccordion>
             <StyledAccordion

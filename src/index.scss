@@ -12,6 +12,10 @@ body,
 
 body {
   &.noScroll {
+    &.scrollbarActive {
+      padding-right: 16px;
+    }
+
     overflow: hidden;
   }
 

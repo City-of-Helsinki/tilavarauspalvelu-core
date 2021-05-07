@@ -15,26 +15,46 @@ interface IProps {
   className?: string;
 }
 
-const Wrapper = styled.div`
+const Content = styled.div`
+  padding: var(--spacing-s) var(--spacing-m) 0;
+`;
+
+const Wrapper = styled.div<{ $wide: boolean }>`
   position: absolute;
   top: 56px;
   left: 40px;
   width: 100%;
-  max-width: 70vw;
+  ${({ $wide }) => ($wide ? "max-width:  70vw" : "max-width: 400px")};
   background-color: var(--color-white);
   border: 1px solid var(--color-black-90);
   z-index: var(--tilavaraus-admin-stack-dialog);
   box-shadow: 2px 2px 30px 0px rgba(0, 0, 0, 0.11);
   user-select: none;
 
-  @media (min-width: ${breakpoints.m}) {
-    max-width: 60vw;
-    min-width: 345px;
+  ${Content} {
+    ${({ $wide }) =>
+      $wide &&
+      `
+    @media (min-width: 1080px) {
+      display: grid;
+      grid-template-columns: repeat(2, 48%);
+      grid-gap: var(--spacing-m);
+    }
+  `}
   }
 
-  @media (min-width: ${breakpoints.xl}) {
-    max-width: 700px;
-  }
+  ${({ $wide }) =>
+    $wide &&
+    `
+    @media (min-width: ${breakpoints.m}) {
+      max-width: 60vw;
+      min-width: 345px;
+    }
+
+    @media (min-width: ${breakpoints.xl}) {
+      max-width: 700px;
+    }
+  `}
 `;
 
 const FilterAccordion = styled(Accordion).attrs({
@@ -45,16 +65,6 @@ const FilterAccordion = styled(Accordion).attrs({
     "--content-padding-top": 0,
   } as React.CSSProperties,
 })``;
-
-const Content = styled.div`
-  padding: var(--spacing-s) var(--spacing-m) 0;
-
-  @media (min-width: 1080px) {
-    display: grid;
-    grid-template-columns: repeat(2, 48%);
-    grid-gap: var(--spacing-m);
-  }
-`;
 
 const Footer = styled.div`
   display: flex;
@@ -130,7 +140,7 @@ function FilterControls({
   const { t } = useTranslation();
 
   return visible ? (
-    <Wrapper className={className}>
+    <Wrapper className={className} $wide={config.length > 3}>
       <Content>
         {config.map((filterAccordion) => {
           const activeFilters = filterAccordion.filters?.filter((n) =>

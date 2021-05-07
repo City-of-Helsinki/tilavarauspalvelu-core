@@ -332,6 +332,9 @@ function RecommendationsByApplicant(): JSX.Element {
     return <Loader />;
   }
 
+  const isApplicationRoundApproved =
+    applicationRound && ["approved"].includes(applicationRound.status);
+
   return (
     <Wrapper>
       <ContentContainer>
@@ -372,16 +375,21 @@ function RecommendationsByApplicant(): JSX.Element {
             config={{
               filtering: true,
               rowFilters: true,
-              selection: true,
-              handledStatuses: ["ignored", "validated", "handled"],
+              selection: !isApplicationRoundApproved,
+              handledStatuses: isApplicationRoundApproved
+                ? []
+                : ["ignored", "validated", "handled"],
             }}
             cellConfig={cellConfig}
             filterConfig={filterConfig}
             areAllRowsDisabled={recommendations.every(
-              (row) => row.applicationEvent.status === "ignored"
+              (row) => row.applicationEvent.status === "ignored" || row.accepted
             )}
             isRowDisabled={(row: AllocationResult) => {
-              return ["ignored"].includes(row.applicationEvent.status);
+              return (
+                ["ignored"].includes(row.applicationEvent.status) ||
+                row.accepted
+              );
             }}
             statusField="applicationEvent.status"
           />
@@ -413,7 +421,6 @@ function RecommendationsByApplicant(): JSX.Element {
                   callback: () => {
                     setTimeout(() => setIsSaving(false), 1000);
                     fetchRecommendations(applicationRound, Number(applicantId));
-                    setSelections([]);
                   },
                 });
               }}

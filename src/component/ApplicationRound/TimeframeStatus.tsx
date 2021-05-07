@@ -10,17 +10,23 @@ import { formatDate } from "../../common/util";
 interface IProps {
   applicationPeriodBegin?: string;
   applicationPeriodEnd?: string;
+  resolution?: boolean;
 }
 
 const Wrapper = styled.span`
   display: flex;
   align-items: center;
   gap: var(--spacing-s);
+
+  svg {
+    min-width: 24px;
+  }
 `;
 
 function TimeframeStatus({
   applicationPeriodBegin = "",
   applicationPeriodEnd = "",
+  resolution,
 }: IProps): JSX.Element {
   const { t } = useTranslation();
 
@@ -28,7 +34,9 @@ function TimeframeStatus({
   const dateEnd = new Date(applicationPeriodEnd);
 
   let message = "";
-  if (isPast(dateBegin) && isFuture(dateEnd)) {
+  if (resolution) {
+    message = t("ApplicationRound.resolutionDate");
+  } else if (isPast(dateBegin) && isFuture(dateEnd)) {
     message = t("Application.timeframeCurrent");
   } else if (isToday(dateEnd)) {
     message = `${t("Application.timeframePast", {

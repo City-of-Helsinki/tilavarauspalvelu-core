@@ -84,6 +84,7 @@ const translations: ITranslations = {
     postalDistrict: ["Postitoimipaikka"],
     emailAddress: ["Sähköpostiosoite"],
     billingAddress: ["Laskutusosoite"],
+    homeCity: ["Kotipaikkakunta"],
     membersSuffix: [" jäsentä"],
     minAmount: ["Vähintään"],
     maxAmount: ["Enintään"],
@@ -119,6 +120,7 @@ const translations: ITranslations = {
     errorFetchingApplications: ["Virhe haettaessa hakemuksia"],
     errorFetchingReservationUnit: ["Virhe haettaessa tilan tietoja"],
     errorSavingApplication: ["Virhe tallennettaessa hakemusta"],
+    errorSavingRecommendation: ["Virhe tallennettaessa ehdotusta"],
     loginNeeded: ["Kirjautuminen vaaditaan"],
     authorizationNeeded: ["Oikeudet vaaditaan"],
     errorStartingAllocation: ["Allokoinnin käynnistys epäonnistui"],
@@ -133,7 +135,7 @@ const translations: ITranslations = {
     ],
   },
   User: {
-    welcomeUser: ["Tervetuloa, {{firstName}}!"],
+    welcome: ["Tervetuloa"],
   },
   MainMenu: {
     applications: ["Hakemukset"],
@@ -171,6 +173,7 @@ const translations: ITranslations = {
     application_plural: ["Hakemusta", "Applications"],
     applicantType: ["Asiakastyyppi"],
     showAllApplications: ["Näytä kaikki hakemukset"],
+    showResolutions: ["Näytä päätöslauselma"],
     recommendedStage: ["Suositeltu vaihe"],
     gotoSplitPreparation: ["Siirry valmistelemaan jakoa"],
     iHaveCheckedApplications: ["Olen tarkistanut hakemukset"],
@@ -180,6 +183,8 @@ const translations: ITranslations = {
     applicationReceivedTime: ["Hakemus vastaanotettu"],
     applicationDetails: ["Hakemuksen tiedot"],
     organisationName: ["Yhdistyksen nimi"],
+    contactPersonEmailAddress: ["Yhteyshenkilön sähköpostiosoite"],
+    contactPersonPhone: ["Yhteyshenkilön puhelinnumero"],
     headings: {
       customer: ["Asiakas"],
       participants: ["Harrastajat"],
@@ -225,11 +230,11 @@ const translations: ITranslations = {
     organisationCoreActivity: ["Yhdistyksen tai seuran ydintoiminta"],
     applicantTypes: {
       individual: ["Yksityishenkilö"],
-      association: ["Yhdistys"],
-      community: ["Seura"],
       company: ["Yritys"],
       unregisteredAssociation: ["Rekisteröimätön yhdistys"],
       nonprofit: ["Voittoa tavoittelematon yhdistys"],
+      community: ["Rekisteröimätön yhdistys"],
+      association: ["Rekisteröity yhdistys"],
     },
     contactPerson: ["Yhteyshenkilö"],
     identificationNumber: ["Rekisterinumero"],
@@ -391,6 +396,10 @@ const translations: ITranslations = {
     noPendingDoneApprovals: ["Ei hyväksyttyjä hakukierroksia."],
     resolutionNumber: ["Päätösnumero #{{no}}"],
     resolutionDate: ["Päätös tehty"],
+    notificationResolutionDoneHeading: ["Esihenkilöhyväksyntä ja päätös tehty"],
+    notificationResolutionDoneBody: [
+      "Ehdotukset on nyt hyväksytty ja asiakkaille on toimitettu päätökset tai tarjoukset.",
+    ],
   },
   Basket: {
     purpose: ["Tuettava toiminta"],
@@ -476,15 +485,27 @@ const translations: ITranslations = {
     approveSuccessBody: [
       "Hyväksytyt ehdotukset siirtyvät esihenkilölle hyväksyttäväksi.",
     ],
+    revertToUnhandledSuccessHeading: ["Ehdotus palautettu käsittelemättömäksi"],
+    revertToUnhandledSuccessBody: [
+      "Voit käsitellä ehdotuksen tavalliseen tapaan.",
+    ],
     declineSuccessHeading: ["Vuoro hylätty"],
     declineSuccessBody: [
       "Hakijalta on vähennetty yksi viikkovuorotoive. Voit tarvittaessa purkaa hylkäyksen.",
     ],
+    confirmationRevertDeclineRecomendationHeader: [
+      "Palautetaanko hylätty vuoro-osuus takaisin osaksi käsittelyä?",
+    ],
+    confirmationRevertDeclineRecomendationBody: [
+      "Et näe tätä ehdotusta enää palauttamisen jälkeen. Palautus ei tarkoita, että osuudelle on mahdollista enää myöntää juuri tätä vuoroa.  Palautettu viikkovuorotoive otetaan kuitenkin huomioon seuraavan uudelleenkäynnistyksen aikana.",
+    ],
+    actionRevertRejectionAbrv: ["Palauta osuus"],
     banSuccessHeading: ["Tilakielto asetettu"],
     banSuccessBody: [
       "Valittua vuoroa ja ryhmän tulevia vuoroja ei tarjota enää tähän tilaan. Voit tarvittaessa purkaa tähän tilaan kohdistuvan kiellon.",
     ],
     scheduleDuration: ["Vuoron kesto {{duration}}"],
+    noRecommendations: ["Ei ehdotuksia"],
   },
   ReservationUnit: {
     reservationStatus: ["Varaustilanne"],
