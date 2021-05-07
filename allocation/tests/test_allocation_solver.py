@@ -96,7 +96,7 @@ def test_non_matching_unit_in_application_and_application_round_can_not_be_alloc
     ),
     indirect=True,
 )
-def test_should_only_allocate_events_which_fit_within_capacity(
+def test_should_only_allocate_events_which_fit_within_opening_times(
     application_round_with_reservation_units, multiple_applications
 ):
     data = AllocationDataBuilder(

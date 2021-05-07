@@ -1,6 +1,5 @@
 import datetime
 import logging
-import math
 from typing import Dict
 
 from ortools.sat.python import cp_model
@@ -143,7 +142,6 @@ class AllocationSolver(object):
         self.constraint_allocation(model=model, selected=selected)
         self.constraint_to_one_event_per_schedule(model=model, selected=selected)
         self.contraint_by_events_per_week(model=model, selected=selected)
-        self.constraint_by_capacity(model=model, selected=selected)
         self.constraint_by_event_time_limits(model=model, selected=selected)
         self.maximize(model=model, selected=selected)
 
@@ -175,13 +173,8 @@ class AllocationSolver(object):
                             occurrence_id,
                         ) in selected:
                             duration = allocation_event.min_duration
-                            min_start = occurrence.begin
-                            max_end = occurrence.end
-                            name_suffix = "_%i" % occurrence_id
-                            start = model.NewIntVar(
-                                min_start, max_end, "s" + name_suffix
-                            )
-                            end = model.NewIntVar(min_start, max_end, "e" + name_suffix)
+                            min_start = 0
+                            max_end = 0
                             performed = selected[
                                 (
                                     space_id,
@@ -190,6 +183,31 @@ class AllocationSolver(object):
                                     occurrence_id,
                                 )
                             ]
+                            if occurrence.first_date in space.available_times:
+                                space_time = space.available_times[
+                                    occurrence.first_date
+                                ]
+                                min_start = (
+                                    occurrence.begin
+                                    if occurrence.begin >= space_time.start
+                                    else space_time.start
+                                )
+
+                                max_end = (
+                                    occurrence.end
+                                    if occurrence.end <= space_time.end
+                                    else space_time.end
+                                )
+
+                            name_suffix = "_%i_on_space_id%i" % (
+                                occurrence_id,
+                                space_id,
+                            )
+                            start = model.NewIntVar(
+                                min_start, max_end, "s" + name_suffix
+                            )
+                            end = model.NewIntVar(min_start, max_end, "e" + name_suffix)
+
                             interval = model.NewOptionalIntervalVar(
                                 start,
                                 duration,
@@ -197,28 +215,12 @@ class AllocationSolver(object):
                                 performed,
                                 "interval_%i_on_s%i" % (occurrence_id, space_id),
                             )
+
                             self.starts[occurrence_id] = start
                             self.ends[occurrence_id] = end
                             intervals.append(interval)
-            model.AddNoOverlap(intervals)
 
-    def constraint_by_capacity(self, model: cp_model.CpModel, selected: Dict):
-        # Event durations in each space do not exceed the capacity
-        model.Add(
-            sum(
-                selected[(space_id, basket.id, event.id, event_occurrence_id)]
-                * event.min_duration
-                for basket in self.baskets.values()
-                for event in basket.events
-                for event_occurrence_id, occurrence in event.occurrences.items()
-                for space_id, space in suitable_spaces_for_event(
-                    event, self.spaces
-                ).items()
-            )
-            # TODO: When we have opening times from hauki and/or model structure in place, replace with opening hours
-            # Now this is hard coded to each space being open for 10 hours daily
-            <= math.ceil(10 * 60 / ALLOCATION_PRECISION)
-        )
+            model.AddNoOverlap(intervals)
 
     def contraint_by_events_per_week(self, model: cp_model.CpModel, selected: Dict):
         # No more than requested events per week is allocated

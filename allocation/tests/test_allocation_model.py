@@ -80,7 +80,7 @@ def test_should_map_reservation_unit_open_times_with_mock_data(
         [available.start, available.end]
         for available in data.spaces[
             application_round_with_reservation_units.reservation_units.all()[0].id
-        ].available_times
+        ].available_times.values()
     ]
 
     # Open every day in application period from 10.00 to 22.00
@@ -112,7 +112,7 @@ def test_should_map_reservation_unit_open_times_from_hauki(
         [available.start, available.end]
         for available in data.spaces[
             application_round_with_reservation_units.reservation_units.all()[0].id
-        ].available_times
+        ].available_times.values()
     ]
 
     # Open every second day from 14 to 18

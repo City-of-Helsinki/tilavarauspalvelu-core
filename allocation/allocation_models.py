@@ -6,6 +6,7 @@ from django.utils import timezone
 
 from applications.models import EventOccurrence
 from reservation_units.models import ReservationUnit
+from tilavarauspalvelu.utils.date_util import next_or_current_matching_weekday
 
 
 class AvailableTime(object):
@@ -34,12 +35,11 @@ class AllocationSpace(object):
         unit: ReservationUnit,
         period_start: datetime.date,
         period_end: datetime.date,
-        times: [AvailableTime],
     ):
         self.id = unit.id
         self._period_start = period_start
         self._period_end = period_end
-        self.available_times: [AvailableTime] = times
+        self.available_times: Dict[datetime.date, AvailableTime] = {}
         self.max_persons = unit.get_max_persons()
 
     def add_time(self, start: datetime, end: datetime):
@@ -71,21 +71,35 @@ class AllocationSpace(object):
                 )
             )
         )
-        self.available_times.append(AvailableTime(start_delta, end_delta))
+        self.available_times[start.date()] = AvailableTime(start_delta, end_delta)
 
 
 class AllocationOccurrence(object):
     """Would like to have some proper definition here"""
 
-    def __init__(self, occurrence: EventOccurrence):
+    def __init__(
+        self,
+        occurrence: EventOccurrence,
+        period_start: datetime.date,
+        event_begin: datetime.date,
+    ):
+        first_date = next_or_current_matching_weekday(event_begin, occurrence.weekday)
+        self.first_date = first_date
+        date_diff = time_delta_to_integer_with_precision(first_date - period_start)
         self.weekday = occurrence.weekday
-        self.begin = time_delta_to_integer_with_precision(
-            datetime.datetime.combine(datetime.date.min, occurrence.begin)
-            - datetime.datetime.min
+        self.begin = (
+            time_delta_to_integer_with_precision(
+                datetime.datetime.combine(datetime.date.min, occurrence.begin)
+                - datetime.datetime.min
+            )
+            + date_diff
         )
-        self.end = time_delta_to_integer_with_precision(
-            datetime.datetime.combine(datetime.date.min, occurrence.end)
-            - datetime.datetime.min
+        self.end = (
+            time_delta_to_integer_with_precision(
+                datetime.datetime.combine(datetime.date.min, occurrence.end)
+                - datetime.datetime.min
+            )
+            + date_diff
         )
         self.occurrences = occurrence.occurrences
 
@@ -110,11 +124,11 @@ class AllocationEvent(object):
     ):
         self.space_ids = space_ids
         self.id = id
-        self.occurrences = self.occurrences_to_integers_with_precision(occurrences)
         self.begin = begin
         self.end = end
         self.period_start = period_start
         self.period_end = period_end
+        self.occurrences = self.occurrences_to_integers_with_precision(occurrences)
         self.min_duration = time_delta_to_integer_with_precision(min_duration)
         self.max_duration = time_delta_to_integer_with_precision(max_duration)
         self.events_per_week = events_per_week
@@ -124,13 +138,14 @@ class AllocationEvent(object):
         else:
             self.baskets = baskets
 
-    @staticmethod
     def occurrences_to_integers_with_precision(
-        occurrences: Dict[int, EventOccurrence]
+        self, occurrences: Dict[int, EventOccurrence]
     ) -> Dict[int, AllocationOccurrence]:
         allocation_occurrences = {}
         for occurrence_id, occurrence in occurrences.items():
-            allocation_occurrences[occurrence_id] = AllocationOccurrence(occurrence)
+            allocation_occurrences[occurrence_id] = AllocationOccurrence(
+                occurrence, self.period_start, self.begin
+            )
         return allocation_occurrences
 
 
