@@ -725,7 +725,9 @@ class ApplicationEventWeeklyAmountReductionSerializer(serializers.ModelSerialize
 
         if result.accepted:
             raise serializers.ValidationError("Can't remove approved result.")
-        reduction_count = ApplicationEventWeeklyAmountReduction.objects.count()
+        reduction_count = ApplicationEventWeeklyAmountReduction.objects.filter(
+            application_event=application_event
+        ).count()
 
         if application_event.events_per_week < reduction_count + 1:
             raise serializers.ValidationError(
