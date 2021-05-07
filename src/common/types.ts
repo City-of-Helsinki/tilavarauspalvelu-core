@@ -267,6 +267,7 @@ export interface AllocationResult {
   basketName: string | null;
   basketOrderNumber: string | null;
   accepted: boolean;
+  declined: boolean;
 }
 
 export interface AllocationRequest {

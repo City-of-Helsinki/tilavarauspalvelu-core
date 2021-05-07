@@ -97,6 +97,8 @@ export const normalizeApplicationEventStatus = (
     )
   ) {
     status = "ignored";
+  } else if (allocationResult.declined) {
+    status = "declined";
   } else if (allocationResult.accepted) {
     status = "validated";
   }

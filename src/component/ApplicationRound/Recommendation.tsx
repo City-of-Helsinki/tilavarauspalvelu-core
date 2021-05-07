@@ -382,6 +382,8 @@ function Recommendation(): JSX.Element {
     mode = "reservationUnitIgnored";
   } else if (recommendation?.accepted) {
     mode = "isApproved";
+  } else if (recommendation?.declined) {
+    mode = "isDeclined";
   }
 
   switch (mode) {
