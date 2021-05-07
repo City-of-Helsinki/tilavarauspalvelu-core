@@ -38,11 +38,17 @@ function App(): JSX.Element {
 
   const toggleModal = (content: UIContextType): void => {
     const bodyEl = document.getElementsByTagName("body")[0];
-    const className = "noScroll";
+    const classes = ["noScroll"];
+    if (
+      window.document.body.scrollHeight >
+      window.document.documentElement.clientHeight
+    ) {
+      classes.push("scrollbarActive");
+    }
     if (content) {
-      bodyEl.classList.add(className);
+      bodyEl.classList.add(...classes);
     } else {
-      bodyEl.classList.remove(className);
+      bodyEl.classList.remove(...classes);
     }
     setModalContent(content);
   };

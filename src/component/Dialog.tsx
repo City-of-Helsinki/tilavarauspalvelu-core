@@ -48,11 +48,17 @@ function Dialog({
 }: IProps): JSX.Element {
   useLayoutEffect(() => {
     const bodyEl = document.getElementsByTagName("body")[0];
-    const noScrollClassName = "noScroll";
-    bodyEl.classList.add(noScrollClassName);
+    const classes = ["noScroll"];
+    if (
+      window.document.body.scrollHeight >
+      window.document.documentElement.clientHeight
+    ) {
+      classes.push("scrollbarActive");
+    }
+    bodyEl.classList.add(...classes);
 
     return () => {
-      bodyEl.classList.remove(noScrollClassName);
+      bodyEl.classList.remove(...classes);
     };
   }, []);
 
