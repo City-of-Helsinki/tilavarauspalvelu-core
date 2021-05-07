@@ -998,6 +998,16 @@ class ApplicationEventScheduleResult(models.Model):
     )
 
 
+class ApplicationEventScheduleResultAggregateData(models.Model):
+    name = models.CharField(max_length=255, verbose_name=_("Name"))
+    value = models.FloatField(max_length=255, verbose_name=_("Value"))
+    schedule_result = models.ForeignKey(
+        ApplicationEventScheduleResult,
+        on_delete=models.CASCADE,
+        related_name="aggregated_data",
+    )
+
+
 class ApplicationEventWeeklyAmountReduction(models.Model):
 
     application_event = models.ForeignKey(
