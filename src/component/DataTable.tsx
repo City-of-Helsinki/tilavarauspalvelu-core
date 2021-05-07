@@ -95,7 +95,9 @@ const Filters = styled.div`
   align-items: center;
   justify-content: flex-start;
   height: 56px;
-  position: relative;
+  position: sticky;
+  top: 0;
+  z-index: var(--tilavaraus-admin-sticky-header);
 `;
 
 interface IFilterBtn {
@@ -156,6 +158,7 @@ const Table = styled.table`
   min-width: var(--breakpoint-m);
   padding: 0 var(--spacing-m);
   border-spacing: 0;
+  position: relative;
 
   @media (min-width: ${breakpoints.m}) {
     min-width: auto;
@@ -533,6 +536,8 @@ function DataTable({
     </Row>
   );
 
+  const totalRows = processedData.flatMap((n) => n.data);
+
   return (
     <Wrapper className={className}>
       {config.filtering && (
@@ -569,24 +574,25 @@ function DataTable({
               />
             </>
           )}
-          {config.handledStatuses?.length && (
-            <HideHandledBtn
-              onClick={(): void => toggleHideHandled(!handledAreHidden)}
-              disabled={!actionsEnabled || isSelectionActive}
-              $isActive={handledAreHidden}
-              title={t(
-                `common.${
-                  handledAreHidden ? "filterShowHandled" : "filterHideHandled"
-                }`
-              )}
-            >
-              {t(
-                `common.${
-                  handledAreHidden ? "filterShowHandled" : "filterHideHandled"
-                }`
-              )}
-            </HideHandledBtn>
-          )}
+          {!!config.handledStatuses?.length &&
+            config.handledStatuses.length > 0 && (
+              <HideHandledBtn
+                onClick={(): void => toggleHideHandled(!handledAreHidden)}
+                disabled={!actionsEnabled || isSelectionActive}
+                $isActive={handledAreHidden}
+                title={t(
+                  `common.${
+                    handledAreHidden ? "filterShowHandled" : "filterHideHandled"
+                  }`
+                )}
+              >
+                {t(
+                  `common.${
+                    handledAreHidden ? "filterShowHandled" : "filterHideHandled"
+                  }`
+                )}
+              </HideHandledBtn>
+            )}
           {config.selection && (
             <SelectionToggleBtn
               onClick={(): void => {
@@ -673,15 +679,11 @@ function DataTable({
             </Row>
           </Heading>
           <Body>
-            {actionsEnabled
+            {totalRows.length > 0
               ? processedData.map(
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   (group: any, groupIndex: number): JSX.Element => {
                     const groupRows = getRowIds(group.id);
-
-                    if (group.data?.length < 1) {
-                      return noResults;
-                    }
 
                     return (
                       <RecommendationDataTableGroup

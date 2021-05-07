@@ -2,9 +2,8 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { Application as ApplicationType } from "../../common/types";
-import { formatNumber } from "../../common/util";
 import { H2 } from "../../styles/typography";
-import { BasicLink, StatusDot, Strong } from "../../styles/util";
+import { BasicLink, StatusDot } from "../../styles/util";
 import { ReactComponent as IconCustomers } from "../../images/icon_customers.svg";
 
 interface IProps {
@@ -44,17 +43,12 @@ const P = styled.div`
   line-height: var(--lineheight-s);
 `;
 
-const Members = styled.div`
-  margin: var(--spacing-m) 0;
-  line-height: var(--lineheight-l);
-`;
-
 const Status = styled.div`
   display: flex;
   align-content: center;
   position: relative;
   left: -1.75rem;
-  margin-top: var(--spacing-s);
+  margin-top: var(--spacing-xl);
 
   a {
     text-decoration: underline;
@@ -95,19 +89,6 @@ function ApplicantBox({ application }: IProps): JSX.Element {
           <P>
             {t("Application.contactPerson")}: {contactPerson}
           </P>
-          {application?.organisation?.activeMembers && (
-            <Members>
-              <div>
-                <Strong>{t("Organisation.activeParticipants")}</Strong>
-              </div>
-              <div>
-                {formatNumber(
-                  application?.organisation?.activeMembers,
-                  t("common.volumeUnit")
-                )}
-              </div>
-            </Members>
-          )}
         </>
       );
   }

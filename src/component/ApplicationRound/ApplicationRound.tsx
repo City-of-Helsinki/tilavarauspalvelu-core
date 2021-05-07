@@ -12,7 +12,6 @@ import {
 } from "../../common/types";
 import { getApplicationRound, saveApplicationRound } from "../../common/api";
 import Loader from "../Loader";
-import ResolutionReport from "./ResolutionReport";
 
 interface IProps {
   applicationRoundId: string;
@@ -96,7 +95,13 @@ function ApplicationRound(): JSX.Element | null {
       />
     );
   } else if (applicationRound?.status === "approved") {
-    content = <ResolutionReport applicationRound={applicationRound} />;
+    content = (
+      <Handling
+        applicationRound={applicationRound}
+        setApplicationRound={setApplicationRound}
+        setApplicationRoundStatus={setApplicationRoundStatus}
+      />
+    );
   } else if (
     applicationRound &&
     ["draft", "in_review"].includes(applicationRound.status)

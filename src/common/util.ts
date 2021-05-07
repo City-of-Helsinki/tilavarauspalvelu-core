@@ -15,15 +15,18 @@ import {
   Location,
   NormalizedApplicationRoundStatus,
   TranslationObject,
-  ApplicationEvent,
 } from "./types";
 import {
-  setApplicationEventStatuses,
+  rejectApplicationEventSchedule,
+  setApplicationEventScheduleResultStatus,
   setDeclinedApplicationEventReservationUnits,
 } from "./api";
 
-export const formatDate = (date: string | null): string | null => {
-  return date ? format(parseISO(date), "d.M.yyyy") : null;
+export const formatDate = (
+  date: string | null,
+  outputFormat = "d.M.yyyy"
+): string | null => {
+  return date ? format(parseISO(date), outputFormat) : null;
 };
 
 export const formatNumber = (
@@ -68,27 +71,38 @@ export const getNormalizedApplicationStatus = (
 };
 
 export const getNormalizedApplicationEventStatus = (
-  status: ApplicationEventStatus
+  status: ApplicationEventStatus,
+  accepted?: boolean
 ): ApplicationEventStatus => {
   let normalizedStatus: ApplicationEventStatus = status;
 
-  if (["created", "allocating", "allocated"].includes(status)) {
+  if (accepted) {
+    normalizedStatus = "validated";
+  } else if (["created", "allocating", "allocated"].includes(status)) {
     normalizedStatus = "created";
   }
 
   return normalizedStatus;
 };
 
-export const checkApplicationEventStatus = (
-  applicationEvent: ApplicationEvent,
-  allocatedReservationUnitId: number | null
+export const normalizeApplicationEventStatus = (
+  allocationResult: AllocationResult
 ): ApplicationEventStatus => {
-  return allocatedReservationUnitId &&
-    applicationEvent.declinedReservationUnitIds.includes(
-      allocatedReservationUnitId
+  let { status } = allocationResult.applicationEvent;
+
+  if (
+    allocationResult.allocatedReservationUnitId &&
+    allocationResult.applicationEvent.declinedReservationUnitIds.includes(
+      allocationResult.allocatedReservationUnitId
     )
-    ? "ignored"
-    : applicationEvent.status;
+  ) {
+    status = "ignored";
+  } else if (allocationResult.declined) {
+    status = "declined";
+  } else if (allocationResult.accepted) {
+    status = "validated";
+  }
+  return status;
 };
 
 export const processAllocationResult = (
@@ -98,10 +112,7 @@ export const processAllocationResult = (
     ...allocationResult,
     applicationEvent: {
       ...allocationResult.applicationEvent,
-      status: checkApplicationEventStatus(
-        allocationResult.applicationEvent,
-        allocationResult.allocatedReservationUnitId
-      ),
+      status: normalizeApplicationEventStatus(allocationResult),
     },
   }));
 
@@ -149,7 +160,7 @@ interface HMS {
   s?: number;
 }
 
-export const secondsToHms = (duration?: number): HMS => {
+export const secondsToHms = (duration?: number | null): HMS => {
   if (!duration || duration < 0) return {};
   const h = Math.floor(duration / 3600);
   const m = Math.floor((duration % 3600) / 60);
@@ -159,7 +170,7 @@ export const secondsToHms = (duration?: number): HMS => {
 };
 
 export const parseDuration = (
-  duration: number | undefined,
+  duration: number | null | undefined,
   unitFormat?: "long"
 ): string => {
   const hms = secondsToHms(duration);
@@ -180,6 +191,11 @@ export const parseDuration = (
   if (hms.m) output += `${i18next.t(minutesUnit, { count: hms.m })}`;
 
   return output.trim();
+};
+
+export const convertHMSToSeconds = (input: string): number | null => {
+  const result = Number(new Date(`1970-01-01T${input}Z`).getTime() / 1000);
+  return Number.isNaN(result) ? null : result;
 };
 
 export const formatTimeDistance = (
@@ -272,7 +288,7 @@ interface IAgeGroups {
 
 export const parseAgeGroups = (ageGroups: IAgeGroups): string => {
   return `${i18next.t("common.agesSuffix", {
-    range: trim(`${ageGroups.minimum}-${ageGroups.maximum}`, "-"),
+    range: trim(`${ageGroups.minimum || ""}-${ageGroups.maximum || ""}`, "-"),
   })}`;
 };
 
@@ -322,18 +338,6 @@ export const modifyAllocationResults = async ({
   setErrorMsg,
   callback,
 }: IModifyAllocationResults): Promise<void> => {
-  let status: ApplicationEventStatus;
-  switch (action) {
-    case "approve":
-      status = "approved";
-      break;
-    case "decline":
-      status = "declined";
-      break;
-    case "ignore":
-    default:
-  }
-
   try {
     if (action === "ignore") {
       const allocationResults = data.filter(
@@ -354,16 +358,19 @@ export const modifyAllocationResults = async ({
           payload
         );
       });
-    } else {
-      await setApplicationEventStatuses(
-        selections.map((selection) => ({
-          status,
-          applicationEventId: selection,
-        }))
+    } else if (action === "approve") {
+      await Promise.all(
+        selections.map((id) =>
+          setApplicationEventScheduleResultStatus(id, true)
+        )
+      );
+    } else if (action === "decline") {
+      await Promise.all(
+        selections.map((id) => rejectApplicationEventSchedule(id))
       );
     }
   } catch (error) {
-    setErrorMsg("errors.errorSavingApplication");
+    setErrorMsg("errors.errorSavingRecommendation");
   } finally {
     callback();
   }

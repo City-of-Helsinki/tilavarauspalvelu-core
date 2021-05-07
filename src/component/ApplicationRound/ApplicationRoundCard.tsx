@@ -113,6 +113,10 @@ function ApplicationRoundCard({
 }: IProps): JSX.Element {
   const { t } = useTranslation();
 
+  const isApplicationRoundApproved = ["approved"].includes(
+    applicationRound.status
+  );
+
   return (
     <Wrapper>
       <Top>
@@ -127,6 +131,7 @@ function ApplicationRoundCard({
           <TimeframeStatus
             applicationPeriodBegin={applicationRound.applicationPeriodBegin}
             applicationPeriodEnd={applicationRound.applicationPeriodEnd}
+            resolution={isApplicationRoundApproved}
           />
           <div>
             <Value>{applicationRound.reservationUnitIds.length}</Value>

@@ -4,25 +4,26 @@ import { IconClock, IconInfoCircle } from "hds-react";
 import { useTranslation } from "react-i18next";
 import { weekdays } from "../../common/const";
 import {
+  convertHMSToSeconds,
   formatDate,
-  formatTimeDistance,
   parseDuration,
 } from "../../common/util";
-import { Divider } from "../../styles/util";
 import { ReactComponent as IconCalendar } from "../../images/icon_calendar.svg";
 
 interface IProps {
-  id: number;
+  id: number | null;
   start: string | null;
   end: string | null;
-  weekday: number;
+  weekday: string | null;
   biweekly: boolean;
-  timeStart: string;
-  timeEnd: string;
+  timeStart: string | null;
+  timeEnd: string | null;
+  duration: string | null;
 }
 
 const Wrapper = styled.tbody`
   line-height: var(--lineheight-xl);
+  margin-bottom: var(--spacing-xl);
 `;
 
 const Row = styled.tr``;
@@ -91,6 +92,7 @@ function RecommendedSlot({
   biweekly,
   timeStart,
   timeEnd,
+  duration,
 }: IProps): JSX.Element {
   const { t } = useTranslation();
 
@@ -113,39 +115,36 @@ function RecommendedSlot({
         <Label type="date">{formatDate(end)}</Label>
         <Col />
         <Col>
-          <Day>{t(`calendar.${weekdays[weekday]}`).substring(0, 2)}</Day>
+          {weekday && (
+            <Day>
+              {t(`calendar.${weekdays[Number(weekday)]}`).substring(0, 2)}
+            </Day>
+          )}
           <span>{t(`common.${biweekly ? "biweekly" : "weekly"}`)}</span>
         </Col>
       </Row>
-      <Heading>
-        <Col colSpan={3}>{t("common.timeOfDay")}</Col>
-      </Heading>
-      <Row>
-        <Label type="time">{formatTime(timeStart)}</Label>
-        <Col>-</Col>
-        <Label type="time">{formatTime(timeEnd)}</Label>
-        {timeStart && timeEnd && (
-          <>
+      {timeStart && timeEnd && (
+        <>
+          <Heading>
+            <Col colSpan={3}>{t("common.timeOfDay")}</Col>
+          </Heading>
+          <Row>
+            <Label type="time">{formatTime(timeStart)}</Label>
+            <Col>-</Col>
+            <Label type="time">{formatTime(timeEnd)}</Label>
             <Col />
             <Col>
               <Duration>
                 <IconInfoCircle style={{ marginRight: "var(--spacing-xs)" }} />{" "}
-                {t("Recommendation.scheduleDuration", {
-                  duration: parseDuration(
-                    formatTimeDistance(timeStart, timeEnd),
-                    "long"
-                  ),
-                })}
+                {duration &&
+                  t("Recommendation.scheduleDuration", {
+                    duration: parseDuration(convertHMSToSeconds(duration)),
+                  })}
               </Duration>
             </Col>
-          </>
-        )}
-      </Row>
-      <Row>
-        <Col colSpan={5}>
-          <Divider />
-        </Col>
-      </Row>
+          </Row>
+        </>
+      )}
     </Wrapper>
   );
 }

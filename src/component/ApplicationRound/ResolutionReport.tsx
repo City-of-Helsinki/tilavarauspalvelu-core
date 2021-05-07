@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useParams } from "react-router-dom";
 import { TFunction } from "i18next";
 import styled from "styled-components";
 import uniq from "lodash/uniq";
 import trim from "lodash/trim";
-import { IconArrowRight, IconClock, Notification } from "hds-react";
+import { IconArrowRight, Notification } from "hds-react";
 import {
   AllocationResult,
   ApplicationEvent,
@@ -20,14 +21,16 @@ import {
   formatNumber,
   parseDuration,
   prepareAllocationResults,
+  processAllocationResult,
 } from "../../common/util";
 import BigRadio from "../BigRadio";
 import LinkPrev from "../LinkPrev";
 import Loader from "../Loader";
-import { getAllocationResults } from "../../common/api";
+import { getAllocationResults, getApplicationRound } from "../../common/api";
+import TimeframeStatus from "./TimeframeStatus";
 
 interface IProps {
-  applicationRound: ApplicationRoundType;
+  applicationRoundId: string;
 }
 
 const Wrapper = styled.div`
@@ -90,32 +93,26 @@ const IngressFooter = styled.div`
   }
 `;
 
-const SchedulePercentage = styled.span`
-  font-family: var(--tilavaraus-admin-font-bold);
-  font-weight: bold;
-  font-size: 1.375rem;
-  display: block;
+// const SchedulePercentage = styled.span`
+//   font-family: var(--tilavaraus-admin-font-bold);
+//   font-weight: bold;
+//   font-size: 1.375rem;
+//   display: block;
 
-  @media (min-width: ${breakpoints.m}) {
-    display: inline;
-  }
-`;
+//   @media (min-width: ${breakpoints.m}) {
+//     display: inline;
+//   }
+// `;
 
-const ScheduleCount = styled.span`
-  font-size: var(--fontsize-body-s);
-  display: block;
+// const ScheduleCount = styled.span`
+//   font-size: var(--fontsize-body-s);
+//   display: block;
 
-  @media (min-width: ${breakpoints.m}) {
-    margin-left: var(--spacing-xs);
-    display: inline;
-  }
-`;
-
-const ResolutionStatus = styled.div`
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-s);
-`;
+//   @media (min-width: ${breakpoints.m}) {
+//     margin-left: var(--spacing-xs);
+//     display: inline;
+//   }
+// `;
 
 const getCellConfig = (
   t: TFunction,
@@ -124,10 +121,6 @@ const getCellConfig = (
   return {
     cols: [
       { title: "Application.headings.applicantName", key: "organisationName" },
-      {
-        title: "Application.headings.participants",
-        key: "organisation.activeMembers",
-      },
       {
         title: "Application.headings.applicantType",
         key: "applicantType",
@@ -191,8 +184,12 @@ const getFilterConfig = (
   ];
 };
 
-function ResolutionReport({ applicationRound }: IProps): JSX.Element {
+function ResolutionReport(): JSX.Element {
   const [isLoading, setIsLoading] = useState(true);
+  const [
+    applicationRound,
+    setApplicationRound,
+  ] = useState<ApplicationRoundType | null>(null);
   const [recommendations, setRecommendations] = useState<
     AllocationResult[] | []
   >([]);
@@ -203,7 +200,31 @@ function ResolutionReport({ applicationRound }: IProps): JSX.Element {
   const [activeFilter, setActiveFilter] = useState<string>("handled");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
+  const { applicationRoundId } = useParams<IProps>();
   const { t } = useTranslation();
+
+  useEffect(() => {
+    const fetchApplicationRound = async (id: number) => {
+      setErrorMsg(null);
+      setIsLoading(true);
+
+      try {
+        const result = await getApplicationRound({
+          id,
+        });
+        setApplicationRound(result);
+      } catch (error) {
+        const msg =
+          error.response?.status === 404
+            ? "errors.applicationRoundNotFound"
+            : "errors.errorFetchingData";
+        setErrorMsg(msg);
+        setIsLoading(false);
+      }
+    };
+
+    fetchApplicationRound(Number(applicationRoundId));
+  }, [applicationRoundId]);
 
   useEffect(() => {
     const fetchRecommendations = async (ar: ApplicationRoundType) => {
@@ -213,13 +234,15 @@ function ResolutionReport({ applicationRound }: IProps): JSX.Element {
           serviceSectorId: ar.serviceSectorId,
         });
 
+        const processedResult = processAllocationResult(result);
+
         setFilterConfig(
           getFilterConfig(
-            result.flatMap((n: AllocationResult) => n.applicationEvent)
+            processedResult.flatMap((n: AllocationResult) => n.applicationEvent)
           )
         );
         setCellConfig(getCellConfig(t, ar));
-        setRecommendations(result || []);
+        setRecommendations(processedResult || []);
       } catch (error) {
         setErrorMsg("errors.errorFetchingApplications");
       } finally {
@@ -231,11 +254,6 @@ function ResolutionReport({ applicationRound }: IProps): JSX.Element {
       fetchRecommendations(applicationRound);
     }
   }, [applicationRound, t]);
-
-  const scheduledNumbers = {
-    volume: 239048,
-    hours: 2345,
-  };
 
   const backLink = "/applicationRounds";
 
@@ -266,15 +284,19 @@ function ResolutionReport({ applicationRound }: IProps): JSX.Element {
                   {t("ApplicationRound.resolutionNumber", { no: "????" })}
                 </ContentHeading>
                 <Subheading>{applicationRound.name}</Subheading>
-                <ResolutionStatus>
-                  <IconClock /> {t("ApplicationRound.resolutionDate")} ???
-                </ResolutionStatus>
+                <TimeframeStatus
+                  applicationPeriodBegin={
+                    applicationRound.applicationPeriodBegin
+                  }
+                  applicationPeriodEnd={applicationRound.applicationPeriodEnd}
+                  resolution
+                />
               </div>
               <div />
             </TopIngress>
             <IngressFooter>
               <div>
-                <p className="label">
+                {/* <p className="label">
                   {t("ApplicationRound.schedulesToBeGranted")}
                 </p>{" "}
                 <SchedulePercentage>
@@ -290,7 +312,7 @@ function ResolutionReport({ applicationRound }: IProps): JSX.Element {
                     scheduledNumbers.hours,
                     t("common.hoursUnit")
                   )})`}
-                </ScheduleCount>
+                </ScheduleCount> */}
               </div>
               <div>
                 <BigRadio

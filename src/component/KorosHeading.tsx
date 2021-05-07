@@ -88,6 +88,7 @@ const StyledKoros = styled(Koros).attrs(({ flipHorizontal }) => ({
     `
     background-color: transparent !important;
   `}
+  height: 84px;
 `;
 
 function KorosHeading({

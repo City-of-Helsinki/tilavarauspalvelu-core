@@ -7,9 +7,9 @@ import trim from "lodash/trim";
 import isEqual from "lodash/isEqual";
 import omit from "lodash/omit";
 import Accordion from "../Accordion";
-import { getApplication } from "../../common/api";
+import { getApplication, getParameters } from "../../common/api";
 import Loader from "../Loader";
-import { Application as ApplicationType } from "../../common/types";
+import { Application as ApplicationType, Parameter } from "../../common/types";
 import {
   ContentContainer,
   NarrowContainer,
@@ -126,6 +126,7 @@ const StyledDivider = styled(Divider)`
 function ApplicationDetails(): JSX.Element | null {
   const [isLoading, setIsLoading] = useState(true);
   const [application, setApplication] = useState<ApplicationType | null>(null);
+  const [cities, setCities] = useState<Parameter[]>([]);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const { applicationId } = useParams<IRouteParams>();
@@ -133,8 +134,11 @@ function ApplicationDetails(): JSX.Element | null {
 
   const fetchApplication = async (id: number) => {
     try {
-      const result = await getApplication(id);
-      setApplication(result);
+      const appResult = await getApplication(id);
+      const citiesResult = await getParameters("city");
+
+      setApplication(appResult);
+      setCities(citiesResult);
     } catch (error) {
       setErrorMsg("errors.errorFetchingApplication");
     } finally {
@@ -164,24 +168,16 @@ function ApplicationDetails(): JSX.Element | null {
         ", "
       );
 
-  let applicantType = "";
-  if (
-    application?.applicantType === "association" &&
-    !application.organisation?.identifier
-  ) {
-    applicantType = t("Application.applicantTypes.unregisteredAssociation");
-  } else if (application?.applicantType) {
-    applicantType = t(
-      `Application.applicantTypes.${application?.applicantType}`
-    );
-  }
-
   const customerName =
     application?.applicantType === "individual"
       ? `${application.contactPerson?.firstName || ""} ${
           application.contactPerson?.lastName || ""
         }`.trim()
       : application?.organisation?.name;
+
+  const homeCity: Parameter | undefined = cities.find(
+    (n) => n.id === application?.homeCityId
+  );
 
   return (
     <Wrapper>
@@ -206,7 +202,7 @@ function ApplicationDetails(): JSX.Element | null {
             </DefinitionList>
             <DefinitionList>
               <dt>{t("Application.applicationReceivedTime")}:</dt>
-              <dd>todo</dd>
+              <dd>{formatDate(application.createdDate, "d.M.yyyy H:mm")}</dd>
             </DefinitionList>
           </HeadingContainer>
           <IngressContainer>
@@ -227,13 +223,19 @@ function ApplicationDetails(): JSX.Element | null {
                   value={application.contactPerson?.lastName}
                 />
                 <ValueBox
-                  label={t("common.emailAddress")}
+                  label={t("Application.contactPersonEmailAddress")}
                   value={application.contactPerson?.email || "-"}
+                />
+                <ValueBox
+                  label={t("Application.contactPersonPhone")}
+                  value={application.contactPerson?.phoneNumber || "-"}
                 />
                 <StyledDivider />
                 <ValueBox
                   label={t("Application.applicantType")}
-                  value={applicantType}
+                  value={t(
+                    `Application.applicantTypes.${application?.applicantType}`
+                  )}
                 />
                 {isOrganisation && (
                   <>
@@ -254,12 +256,16 @@ function ApplicationDetails(): JSX.Element | null {
                       value={application.organisation?.address?.city}
                     />
                     <ValueBox
-                      label={t("common.emailAddress")}
-                      value={application.organisation?.email || "-"}
+                      label={t("common.homeCity")}
+                      value={homeCity?.name || "-"}
                     />
                     <ValueBox
                       label={t("Application.identificationNumber")}
-                      value={application.organisation?.identifier}
+                      value={application.organisation?.identifier || "-"}
+                    />
+                    <ValueBox
+                      label={t("Application.headings.coreActivity")}
+                      value={application.organisation?.coreBusiness || "-"}
                     />
                     {billingAddress && (
                       <>
@@ -275,32 +281,36 @@ function ApplicationDetails(): JSX.Element | null {
               </AccordionContent>
             </StyledAccordion>
             {application.applicationEvents.map((applicationEvent) => {
+              const parseDuration = (
+                duration: string | null,
+                type?: "min" | "max"
+              ): string => {
+                if (!duration) return "";
+                const durationObj = formatDuration(duration);
+                const translationKey = `common.${type}Amount`;
+                let result = "";
+                result += `${type ? t(translationKey) : ""} ${
+                  durationObj.hours && durationObj.hours + t("common.hoursUnit")
+                }`;
+                if (durationObj.minutes) {
+                  result += ` ${durationObj.minutes + t("common.minutesUnit")}`;
+                }
+                return result;
+              };
               let duration = "";
-              const minDuration =
-                applicationEvent.minDuration &&
-                formatDuration(applicationEvent.minDuration);
-              const maxDuration =
-                applicationEvent.maxDuration &&
-                formatDuration(applicationEvent.maxDuration);
-              if (minDuration) {
-                duration += `${t("common.minAmount")} ${
-                  minDuration.hours && minDuration.hours + t("common.hoursUnit")
-                }`;
-                if (minDuration.minutes) {
-                  duration += ` ${
-                    minDuration.minutes + t("common.minutesUnit")
-                  }`;
-                }
-              }
-              if (maxDuration) {
-                duration += `, ${t("common.maxAmount")} ${
-                  maxDuration.hours && maxDuration.hours + t("common.hoursUnit")
-                }`;
-                if (maxDuration.minutes) {
-                  duration += ` ${
-                    maxDuration.minutes + t("common.minutesUnit")
-                  }`;
-                }
+              if (
+                isEqual(
+                  applicationEvent.minDuration,
+                  applicationEvent.maxDuration
+                )
+              ) {
+                duration += parseDuration(applicationEvent.minDuration);
+              } else {
+                duration += parseDuration(applicationEvent?.minDuration, "min");
+                duration += `, ${parseDuration(
+                  applicationEvent?.maxDuration,
+                  "max"
+                )}`;
               }
               duration = trim(duration, ", ");
 
