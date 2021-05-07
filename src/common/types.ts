@@ -131,6 +131,7 @@ export type Application = {
   status: ApplicationStatus;
   applicationRoundId: number;
   applicantType: ApplicantType | null;
+  homeCityId: number | null;
   organisation: Organisation | null;
   contactPerson: ContactPerson | null;
   billingAddress: Address | null;

@@ -84,6 +84,7 @@ const translations: ITranslations = {
     postalDistrict: ["Postitoimipaikka"],
     emailAddress: ["Sähköpostiosoite"],
     billingAddress: ["Laskutusosoite"],
+    homeCity: ["Kotipaikkakunta"],
     membersSuffix: [" jäsentä"],
     minAmount: ["Vähintään"],
     maxAmount: ["Enintään"],
@@ -181,6 +182,8 @@ const translations: ITranslations = {
     applicationReceivedTime: ["Hakemus vastaanotettu"],
     applicationDetails: ["Hakemuksen tiedot"],
     organisationName: ["Yhdistyksen nimi"],
+    contactPersonEmailAddress: ["Yhteyshenkilön sähköpostiosoite"],
+    contactPersonPhone: ["Yhteyshenkilön puhelinnumero"],
     headings: {
       customer: ["Asiakas"],
       participants: ["Harrastajat"],
