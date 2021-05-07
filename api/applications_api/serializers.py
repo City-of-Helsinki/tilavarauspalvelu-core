@@ -277,6 +277,10 @@ class ApplicationEventSerializer(serializers.ModelSerializer):
         source="declined_reservation_units", many=True, read_only=True
     )
 
+    aggregated_data = serializers.DictField(
+        source="aggregated_data_dict", read_only=True
+    )
+
     class Meta:
         model = ApplicationEvent
         fields = [
@@ -301,6 +305,7 @@ class ApplicationEventSerializer(serializers.ModelSerializer):
             "status",
             "declined_reservation_unit_ids",
             "weekly_amount_reductions_count",
+            "aggregated_data",
         ]
         extra_kwargs = {
             "name": {

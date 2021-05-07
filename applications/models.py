@@ -818,6 +818,13 @@ class ApplicationEvent(models.Model):
         else:
             logger.info("Event #{} aggregate data created.".format(self.id))
 
+    @property
+    def aggregated_data_dict(self):
+        ret_dict = {}
+        for row in self.aggregated_data.all():
+            ret_dict[row.name] = row.value
+        return ret_dict
+
 
 class ApplicationEventAggregateData(models.Model):
     """Model to store aggregated data for single application event.
