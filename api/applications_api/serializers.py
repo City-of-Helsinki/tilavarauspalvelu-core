@@ -719,7 +719,7 @@ class ApplicationEventWeeklyAmountReductionSerializer(serializers.ModelSerialize
     def validate(self, data):
         result = data["application_event_schedule_result"]
 
-        application_event: ApplicationEventScheduleResult = (
+        application_event: ApplicationEvent = (
             result.application_event_schedule.application_event
         )
 
