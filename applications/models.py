@@ -1,24 +1,29 @@
 import datetime
+import logging
 import math
 from typing import Dict, List, Optional
 
 import recurrence
 from django.contrib.auth import get_user_model
 from django.contrib.postgres.fields import ArrayField
-from django.db import models
+from django.db import Error, models
 from django.db.models import DurationField, ExpressionWrapper, F
 from django.utils.text import format_lazy
 from django.utils.translation import gettext_lazy as _
 from recurrence.fields import RecurrenceField
 from rest_framework.exceptions import ValidationError
+from sentry_sdk import capture_message
 
 from applications.base_models import ContactInformation
+from applications.utils.aggregate_data import EventAggregateDataCreator
 from reservation_units.models import Purpose, ReservationUnit
 from spaces.models import District
 from tilavarauspalvelu.utils.date_util import (
     next_or_current_matching_weekday,
     previous_or_current_matching_weekday,
 )
+
+logger = logging.getLogger(__name__)
 
 User = get_user_model()
 
@@ -618,6 +623,9 @@ class Application(models.Model):
             application=self, name=name, defaults={"value": events_count}
         )
 
+        for event in self.application_events.all():
+            EventAggregateDataCreator(event).start()
+
     @property
     def aggregated_data_dict(self):
         ret_dict = {}
@@ -769,6 +777,66 @@ class ApplicationEvent(models.Model):
         for event_shedule in self.application_event_schedules.all():
             occurences[event_shedule.id] = event_shedule.get_occurences()
         return occurences
+
+    def create_aggregate_data(self):
+        total_events = []
+        total_events_durations = []
+        for schedule in self.application_event_schedules.all():
+            events_count = len(schedule.get_occurences().occurrences)
+            total_events.append(events_count)
+
+            total_events_durations.append(
+                (self.min_duration * events_count).total_seconds()
+            )
+
+        total_events_durations = sorted(total_events_durations, reverse=True)[
+            : self.events_per_week
+        ]
+        total_events_duration = sum(total_events_durations) / 3600.0
+
+        total_amounts_of_events = sum(
+            sorted(total_events, reverse=True)[: self.events_per_week]
+        )
+        try:
+            name = "duration_total"
+            ApplicationEventAggregateData.objects.update_or_create(
+                application_event=self,
+                name=name,
+                defaults={"value": total_events_duration},
+            )
+
+            name = "reservations_total"
+            ApplicationEventAggregateData.objects.update_or_create(
+                application_event=self,
+                name=name,
+                defaults={"value": total_amounts_of_events},
+            )
+        except Error:
+            capture_message(
+                "Caught an error while saving event aggregate data", level="error"
+            )
+        else:
+            logger.info("Event #{} aggregate data created.".format(self.id))
+
+    @property
+    def aggregated_data_dict(self):
+        ret_dict = {}
+        for row in self.aggregated_data.all():
+            ret_dict[row.name] = row.value
+        return ret_dict
+
+
+class ApplicationEventAggregateData(models.Model):
+    """Model to store aggregated data for single application event.
+
+    Overall hour counts etc.
+    """
+
+    name = models.CharField(max_length=255, verbose_name=_("Name"))
+    value = models.FloatField(max_length=255, verbose_name=_("Value"))
+    application_event = models.ForeignKey(
+        ApplicationEvent, on_delete=models.CASCADE, related_name="aggregated_data"
+    )
 
 
 class EventReservationUnit(models.Model):
