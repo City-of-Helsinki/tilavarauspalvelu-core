@@ -893,6 +893,8 @@ class ApplicationEventScheduleResult(models.Model):
 
     accepted = models.BooleanField(default=False, null=False)
 
+    declined = models.BooleanField(default=False, null=False)
+
     application_event_schedule = models.OneToOneField(
         ApplicationEventSchedule,
         on_delete=models.CASCADE,

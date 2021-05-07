@@ -71,6 +71,7 @@ class ApplicationEventScheduleResultSerializer(serializers.ModelSerializer):
             "application_aggregated_data",
             "declined_reservation_unit_ids",
             "accepted",
+            "declined",
             "allocated_duration",
             "allocated_day",
             "allocated_begin",
@@ -81,6 +82,7 @@ class ApplicationEventScheduleResultSerializer(serializers.ModelSerializer):
             "allocated_day",
             "allocated_begin",
             "allocated_end",
+            "declined",
         ]
 
     def get_unit_name(self, instance):

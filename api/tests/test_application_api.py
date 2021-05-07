@@ -221,6 +221,21 @@ def test_application_event_save(user_api_client, valid_application_event_data):
 
 @pytest.mark.django_db
 @freeze_time("2021-01-15")
+def test_application_event_reduction_count(
+    user_api_client, application_event, event_reduction
+):
+
+    response = user_api_client.get(
+        reverse("application_event-detail", kwargs={"pk": application_event.id}),
+        format="json",
+    )
+
+    assert response.status_code == 200
+    assert response.data.get("weekly_amount_reductions_count") == 1
+
+
+@pytest.mark.django_db
+@freeze_time("2021-01-15")
 def test_application_event_invalid_durations(
     user_api_client, valid_application_event_data
 ):
@@ -532,7 +547,7 @@ def test_wrong_service_sector_admin_cannot_view_or_update_users_application_even
 
 
 @pytest.mark.django_db
-def test_creating_weekly_amount_reduction_should_delete_result(
+def test_creating_weekly_amount_reduction_should_mark_declined(
     result_scheduled_for_monday,
     general_admin_api_client,
 ):
@@ -547,7 +562,11 @@ def test_creating_weekly_amount_reduction_should_delete_result(
         reverse("application_event_weekly_amount_reduction-list"), data, format="json"
     )
     assert_that(response.status_code).is_equal_to(201)
-    assert_that(ApplicationEventScheduleResult.objects.count()).is_equal_to(0)
+    assert_that(
+        ApplicationEventScheduleResult.objects.get(
+            application_event_schedule_id=result_scheduled_for_monday.application_event_schedule.id
+        ).declined
+    ).is_true()
 
 
 @pytest.mark.django_db
@@ -569,7 +588,11 @@ def test_cant_create_more_reductions_than_events_per_week(
         reverse("application_event_weekly_amount_reduction-list"), data, format="json"
     )
     assert_that(response.status_code).is_equal_to(400)
-    assert_that(ApplicationEventScheduleResult.objects.count()).is_equal_to(1)
+    assert_that(
+        ApplicationEventScheduleResult.objects.get(
+            pk=result_scheduled_for_monday.application_event_schedule.id
+        ).declined
+    ).is_false()
 
 
 @pytest.mark.django_db
@@ -590,7 +613,11 @@ def test_cant_reduce_with_accepted_result(
     )
     assert_that(response.status_code).is_equal_to(400)
     assert_that(ApplicationEventWeeklyAmountReduction.objects.count()).is_equal_to(0)
-    assert_that(ApplicationEventScheduleResult.objects.count()).is_equal_to(1)
+    assert_that(
+        ApplicationEventScheduleResult.objects.get(
+            pk=result_scheduled_for_monday.application_event_schedule.id
+        ).declined
+    ).is_false()
 
 
 @pytest.mark.django_db
