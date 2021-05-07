@@ -72,13 +72,16 @@ class ApplicationEventViewSet(viewsets.ModelViewSet):
     queryset = ApplicationEvent.objects.all()
 
     def get_serializer_context(self):
+        context = super().get_serializer_context()
         start: datetime = self.request.query_params.get("start", None)
         end: datetime = self.request.query_params.get("end", None)
         if start is not None:
             start = parse(start)
         if end is not None:
             end = parse(end)
-        return {"start": start, "end": end}
+
+        context.update({"start": start, "end": end})
+        return context
 
     def get_queryset(self):
         queryset = super().get_queryset()
