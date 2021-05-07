@@ -402,7 +402,7 @@ function Handling({
                     applicationRound.applicationPeriodBegin
                   }
                   applicationPeriodEnd={applicationRound.applicationPeriodEnd}
-                  resolution
+                  resolution={isApplicationRoundApproved}
                 />
               </div>
               <div>
