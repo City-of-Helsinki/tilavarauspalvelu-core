@@ -173,6 +173,7 @@ const translations: ITranslations = {
     application_plural: ["Hakemusta", "Applications"],
     applicantType: ["Asiakastyyppi"],
     showAllApplications: ["Näytä kaikki hakemukset"],
+    showResolutions: ["Näytä päätöslauselma"],
     recommendedStage: ["Suositeltu vaihe"],
     gotoSplitPreparation: ["Siirry valmistelemaan jakoa"],
     iHaveCheckedApplications: ["Olen tarkistanut hakemukset"],
@@ -395,6 +396,10 @@ const translations: ITranslations = {
     noPendingDoneApprovals: ["Ei hyväksyttyjä hakukierroksia."],
     resolutionNumber: ["Päätösnumero #{{no}}"],
     resolutionDate: ["Päätös tehty"],
+    notificationResolutionDoneHeading: ["Esihenkilöhyväksyntä ja päätös tehty"],
+    notificationResolutionDoneBody: [
+      "Ehdotukset on nyt hyväksytty ja asiakkaille on toimitettu päätökset tai tarjoukset.",
+    ],
   },
   Basket: {
     purpose: ["Tuettava toiminta"],

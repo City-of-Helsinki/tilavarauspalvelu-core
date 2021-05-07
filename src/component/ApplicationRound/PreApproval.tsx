@@ -282,9 +282,11 @@ function PreApproval({
           serviceSectorId: ssId,
         });
 
-        setFilterConfig(getFilterConfig(result));
+        const processedResult = processAllocationResult(result);
+
+        setFilterConfig(getFilterConfig(processedResult));
         setCellConfig(getCellConfig(t, applicationRound));
-        setRecommendations(processAllocationResult(result) || []);
+        setRecommendations(processedResult || []);
       } catch (error) {
         setErrorMsg("errors.errorFetchingApplications");
       } finally {

@@ -185,10 +185,6 @@ const getCellConfig = (
     cols: [
       { title: "Application.headings.applicantName", key: "organisationName" },
       {
-        title: "Application.headings.participants",
-        key: "organisation.activeMembers",
-      },
-      {
         title: "Application.headings.applicantType",
         key: "applicantType",
       },

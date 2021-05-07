@@ -332,6 +332,9 @@ function RecommendationsByApplicant(): JSX.Element {
     return <Loader />;
   }
 
+  const isApplicationRoundApproved =
+    applicationRound && ["approved"].includes(applicationRound.status);
+
   return (
     <Wrapper>
       <ContentContainer>
@@ -372,8 +375,10 @@ function RecommendationsByApplicant(): JSX.Element {
             config={{
               filtering: true,
               rowFilters: true,
-              selection: true,
-              handledStatuses: ["ignored", "validated", "handled"],
+              selection: !isApplicationRoundApproved,
+              handledStatuses: isApplicationRoundApproved
+                ? []
+                : ["ignored", "validated", "handled"],
             }}
             cellConfig={cellConfig}
             filterConfig={filterConfig}

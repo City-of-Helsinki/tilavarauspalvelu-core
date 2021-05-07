@@ -574,24 +574,25 @@ function DataTable({
               />
             </>
           )}
-          {config.handledStatuses?.length && (
-            <HideHandledBtn
-              onClick={(): void => toggleHideHandled(!handledAreHidden)}
-              disabled={!actionsEnabled || isSelectionActive}
-              $isActive={handledAreHidden}
-              title={t(
-                `common.${
-                  handledAreHidden ? "filterShowHandled" : "filterHideHandled"
-                }`
-              )}
-            >
-              {t(
-                `common.${
-                  handledAreHidden ? "filterShowHandled" : "filterHideHandled"
-                }`
-              )}
-            </HideHandledBtn>
-          )}
+          {!!config.handledStatuses?.length &&
+            config.handledStatuses.length > 0 && (
+              <HideHandledBtn
+                onClick={(): void => toggleHideHandled(!handledAreHidden)}
+                disabled={!actionsEnabled || isSelectionActive}
+                $isActive={handledAreHidden}
+                title={t(
+                  `common.${
+                    handledAreHidden ? "filterShowHandled" : "filterHideHandled"
+                  }`
+                )}
+              >
+                {t(
+                  `common.${
+                    handledAreHidden ? "filterShowHandled" : "filterHideHandled"
+                  }`
+                )}
+              </HideHandledBtn>
+            )}
           {config.selection && (
             <SelectionToggleBtn
               onClick={(): void => {

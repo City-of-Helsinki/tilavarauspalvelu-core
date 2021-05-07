@@ -368,6 +368,9 @@ function RecommendationsByReservationUnit(): JSX.Element {
     return <Loader />;
   }
 
+  const isApplicationRoundApproved =
+    applicationRound && ["approved"].includes(applicationRound.status);
+
   return (
     <Wrapper>
       {applicationRound &&
@@ -440,7 +443,7 @@ function RecommendationsByReservationUnit(): JSX.Element {
               config={{
                 filtering: true,
                 rowFilters: true,
-                selection: true,
+                selection: !isApplicationRoundApproved,
               }}
               cellConfig={cellConfig}
               filterConfig={filterConfig}
