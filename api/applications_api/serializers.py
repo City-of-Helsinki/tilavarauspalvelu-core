@@ -271,6 +271,8 @@ class ApplicationEventSerializer(serializers.ModelSerializer):
         choices=ApplicationEventStatus.STATUS_CHOICES,
     )
 
+    weekly_amount_reductions_count = serializers.SerializerMethodField()
+
     declined_reservation_unit_ids = serializers.PrimaryKeyRelatedField(
         source="declined_reservation_units", many=True, read_only=True
     )
@@ -298,6 +300,7 @@ class ApplicationEventSerializer(serializers.ModelSerializer):
             "event_reservation_units",
             "status",
             "declined_reservation_unit_ids",
+            "weekly_amount_reductions_count",
         ]
         extra_kwargs = {
             "name": {
@@ -327,6 +330,9 @@ class ApplicationEventSerializer(serializers.ModelSerializer):
                 "help_text": "Requested end date of the recurring reservation for this event.",
             },
         }
+
+    def get_weekly_amount_reductions_count(self, obj):
+        return obj.weekly_amount_reductions.count()
 
     def get_purpose_name(self, obj):
         if obj.purpose:
@@ -711,8 +717,8 @@ class ApplicationEventWeeklyAmountReductionSerializer(serializers.ModelSerialize
 
     def create(self, validated_data):
         schedule_result = validated_data.pop("application_event_schedule_result")
-
-        schedule_result.delete()
+        schedule_result.declined = True
+        schedule_result.save()
         reduction = super().create(validated_data)
         return reduction
 
