@@ -824,6 +824,56 @@ class ApplicationEvent(models.Model):
         else:
             logger.info("Event #{} aggregate data created.".format(self.id))
 
+    def create_schedule_result_aggregated_data(self):
+        total_amount_of_events = []
+        total_events_duration = []
+        for schedule in self.application_event_schedules.all():
+            if not hasattr(schedule, "application_event_schedule_result"):
+                continue
+
+            schedule.application_event_schedule_result.create_aggregate_data()
+
+            if schedule.application_event_schedule_result.declined:
+                continue
+
+            amount_of_events = len(
+                schedule.application_event_schedule_result.get_result_occurrences().occurrences
+            )
+            total_amount_of_events.append(amount_of_events)
+            total_events_duration.append(
+                (
+                    amount_of_events
+                    * schedule.application_event_schedule_result.allocated_duration
+                ).total_seconds()
+            )
+
+        total_reservations = sum(total_amount_of_events)
+        total_events_duration = sum(total_events_duration) / 3600.0
+
+        try:
+            name = "allocation_results_duration_total"
+            ApplicationEventAggregateData.objects.update_or_create(
+                application_event=self,
+                name=name,
+                defaults={"value": total_events_duration},
+            )
+
+            name = "allocation_results_reservations_total"
+            ApplicationEventAggregateData.objects.update_or_create(
+                application_event=self,
+                name=name,
+                defaults={"value": total_reservations},
+            )
+        except Error:
+            capture_message(
+                "Caught an error while saving event schedule result aggregate data",
+                level="error",
+            )
+        else:
+            logger.info(
+                "Event schedule result #{} aggregate data created.".format(self.pk)
+            )
+
     @property
     def aggregated_data_dict(self):
         ret_dict = {}
@@ -839,7 +889,7 @@ class ApplicationEventAggregateData(models.Model):
     """
 
     name = models.CharField(max_length=255, verbose_name=_("Name"))
-    value = models.FloatField(max_length=255, verbose_name=_("Value"))
+    value = models.FloatField(max_length=255, verbose_name=_("Value"), null=True)
     application_event = models.ForeignKey(
         ApplicationEvent, on_delete=models.CASCADE, related_name="aggregated_data"
     )
@@ -1008,12 +1058,8 @@ class ApplicationEventScheduleResult(models.Model):
         begin = application_event.begin
         end = application_event.end
 
-        first_matching_day = next_or_current_matching_weekday(
-            begin, self.allocated_day
-        )
-        previous_match = previous_or_current_matching_weekday(
-            end, self.allocated_day
-        )
+        first_matching_day = next_or_current_matching_weekday(begin, self.allocated_day)
+        previous_match = previous_or_current_matching_weekday(end, self.allocated_day)
         myrule = recurrence.Rule(
             recurrence.WEEKLY,
             interval=1 if not application_event.biweekly else 2,
@@ -1046,6 +1092,34 @@ class ApplicationEventScheduleResult(models.Model):
             end=self.allocated_end,
             occurrences=list(pattern.occurrences()),
         )
+
+    def create_aggregate_data(self):
+        total_amount_of_events = len(self.get_result_occurrences().occurrences)
+        total_events_duration = (
+            total_amount_of_events * self.allocated_duration
+        ).total_seconds() / 3600.0
+
+        try:
+            name = "duration_total"
+            ApplicationEventScheduleResultAggregateData.objects.update_or_create(
+                schedule_result=self,
+                name=name,
+                defaults={"value": total_events_duration},
+            )
+
+            name = "reservations_total"
+            ApplicationEventScheduleResultAggregateData.objects.update_or_create(
+                schedule_result=self,
+                name=name,
+                defaults={"value": total_amount_of_events},
+            )
+        except Error:
+            capture_message(
+                "Caught an error while saving schedule result aggregate data",
+                level="error",
+            )
+        else:
+            logger.info("Schedule result #{} aggregate data created.".format(self.pk))
 
 
 class ApplicationEventScheduleResultAggregateData(models.Model):
