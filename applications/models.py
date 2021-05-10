@@ -1053,6 +1053,13 @@ class ApplicationEventScheduleResult(models.Model):
         null=True,
     )
 
+    @property
+    def aggregated_data_dict(self):
+        ret_dict = {}
+        for row in self.aggregated_data.all():
+            ret_dict[row.name] = row.value
+        return ret_dict
+
     def get_result_occurrences(self) -> [EventOccurrence]:
         application_event = self.application_event_schedule.application_event
         begin = application_event.begin
