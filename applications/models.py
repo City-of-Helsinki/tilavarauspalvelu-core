@@ -778,6 +778,12 @@ class ApplicationEvent(models.Model):
             occurences[event_shedule.id] = event_shedule.get_occurences()
         return occurences
 
+    def get_all_result_occurrences(self):
+        occurrences = {}
+
+        for schedule in self.application_event_schedules.all():
+            occurrences[schedule.id] = schedule.get_occurences()
+
     def create_aggregate_data(self):
         total_events = []
         total_events_durations = []
@@ -996,6 +1002,50 @@ class ApplicationEventScheduleResult(models.Model):
         on_delete=models.SET_NULL,
         null=True,
     )
+
+    def get_result_occurrences(self) -> [EventOccurrence]:
+        application_event = self.application_event_schedule.application_event
+        begin = application_event.begin
+        end = application_event.end
+
+        first_matching_day = next_or_current_matching_weekday(
+            begin, self.allocated_day
+        )
+        previous_match = previous_or_current_matching_weekday(
+            end, self.allocated_day
+        )
+        myrule = recurrence.Rule(
+            recurrence.WEEKLY,
+            interval=1 if not application_event.biweekly else 2,
+            byday=self.allocated_day,
+            until=datetime.datetime(
+                year=previous_match.year,
+                month=previous_match.month,
+                day=previous_match.day,
+                hour=self.allocated_end.hour,
+                minute=self.allocated_end.minute,
+                second=0,
+            ),
+        )
+        pattern = recurrence.Recurrence(
+            dtstart=datetime.datetime(
+                year=first_matching_day.year,
+                month=first_matching_day.month,
+                day=first_matching_day.day,
+                hour=self.allocated_begin.hour,
+                minute=self.allocated_begin.minute,
+                second=0,
+            ),
+            rrules=[
+                myrule,
+            ],
+        )
+        return EventOccurrence(
+            weekday=self.allocated_day,
+            begin=self.allocated_begin,
+            end=self.allocated_end,
+            occurrences=list(pattern.occurrences()),
+        )
 
 
 class ApplicationEventScheduleResultAggregateData(models.Model):
