@@ -332,6 +332,12 @@ class ApplicationRound(models.Model):
         )
 
 
+class ApplicationRoundAggregateData(AggregateDataBase):
+    application_round = models.ForeignKey(
+        ApplicationRound, on_delete=models.CASCADE, related_name="aggregated_data"
+    )
+
+
 class City(models.Model):
     name = models.CharField(verbose_name=_("Name"), max_length=100)
 
