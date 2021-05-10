@@ -25,6 +25,10 @@ class ApplicationEventScheduleResultSerializer(serializers.ModelSerializer):
         source="application_event_schedule.application_event.application_id",
         read_only=True,
     )
+    applicant_type = serializers.CharField(
+        source="application_event_schedule.application_event.application.applicant_type",
+        read_only=True,
+    )
     organisation_id = serializers.PrimaryKeyRelatedField(
         source="application_event_schedule.application_event.application.organisation_id",
         read_only=True,
@@ -63,6 +67,7 @@ class ApplicationEventScheduleResultSerializer(serializers.ModelSerializer):
             "application_id",
             "applicant_id",
             "applicant_name",
+            "applicant_type",
             "organisation_id",
             "organisation_name",
             "application_event",
@@ -89,6 +94,7 @@ class ApplicationEventScheduleResultSerializer(serializers.ModelSerializer):
             "allocated_end",
             "declined",
             "aggregated_data",
+            "applicant_type",
         ]
 
     def get_unit_name(self, instance):
