@@ -49,6 +49,16 @@ def year_not_in_future(year: Optional[int]):
         raise ValidationError(format_lazy("{year} {msg}", year=year, msg=msg))
 
 
+class AggregateDataBase(models.Model):
+    class Meta:
+        abstract = True
+
+    name = models.CharField(max_length=255, verbose_name=_("Name"))
+    value = models.FloatField(
+        max_length=255, verbose_name=_("Value"), null=True, default=0
+    )
+
+
 class Address(models.Model):
     street_address = models.TextField(
         verbose_name=_("Street address"), null=False, blank=False, max_length=80
@@ -634,14 +644,12 @@ class Application(models.Model):
         return ret_dict
 
 
-class ApplicationAggregateData(models.Model):
+class ApplicationAggregateData(AggregateDataBase):
     """Model to store aggregated data from application events.
 
     Overall hour counts, application event counts etc.
     """
 
-    name = models.CharField(max_length=255, verbose_name=_("Name"))
-    value = models.FloatField(max_length=255, verbose_name=_("Value"))
     application = models.ForeignKey(
         Application, on_delete=models.CASCADE, related_name="aggregated_data"
     )
@@ -882,14 +890,12 @@ class ApplicationEvent(models.Model):
         return ret_dict
 
 
-class ApplicationEventAggregateData(models.Model):
+class ApplicationEventAggregateData(AggregateDataBase):
     """Model to store aggregated data for single application event.
 
     Overall hour counts etc.
     """
 
-    name = models.CharField(max_length=255, verbose_name=_("Name"))
-    value = models.FloatField(max_length=255, verbose_name=_("Value"), null=True)
     application_event = models.ForeignKey(
         ApplicationEvent, on_delete=models.CASCADE, related_name="aggregated_data"
     )
@@ -1129,9 +1135,7 @@ class ApplicationEventScheduleResult(models.Model):
             logger.info("Schedule result #{} aggregate data created.".format(self.pk))
 
 
-class ApplicationEventScheduleResultAggregateData(models.Model):
-    name = models.CharField(max_length=255, verbose_name=_("Name"))
-    value = models.FloatField(max_length=255, verbose_name=_("Value"))
+class ApplicationEventScheduleResultAggregateData(AggregateDataBase):
     schedule_result = models.ForeignKey(
         ApplicationEventScheduleResult,
         on_delete=models.CASCADE,
