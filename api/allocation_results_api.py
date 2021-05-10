@@ -51,6 +51,10 @@ class ApplicationEventScheduleResultSerializer(serializers.ModelSerializer):
         many=True,
         read_only=True,
     )
+    aggregated_data = serializers.DictField(
+        source="aggregated_data_dict",
+        read_only=True,
+    )
 
     class Meta:
         model = ApplicationEventScheduleResult
@@ -76,6 +80,7 @@ class ApplicationEventScheduleResultSerializer(serializers.ModelSerializer):
             "allocated_day",
             "allocated_begin",
             "allocated_end",
+            "aggregated_data",
         ]
         read_only_fields = [
             "allocated_duration",
@@ -83,6 +88,7 @@ class ApplicationEventScheduleResultSerializer(serializers.ModelSerializer):
             "allocated_begin",
             "allocated_end",
             "declined",
+            "aggregated_data",
         ]
 
     def get_unit_name(self, instance):

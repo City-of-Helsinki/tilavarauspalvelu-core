@@ -778,6 +778,12 @@ class ApplicationEvent(models.Model):
             occurences[event_shedule.id] = event_shedule.get_occurences()
         return occurences
 
+    def get_all_result_occurrences(self):
+        occurrences = {}
+
+        for schedule in self.application_event_schedules.all():
+            occurrences[schedule.id] = schedule.get_occurences()
+
     def create_aggregate_data(self):
         total_events = []
         total_events_durations = []
@@ -818,6 +824,56 @@ class ApplicationEvent(models.Model):
         else:
             logger.info("Event #{} aggregate data created.".format(self.id))
 
+    def create_schedule_result_aggregated_data(self):
+        total_amount_of_events = []
+        total_events_duration = []
+        for schedule in self.application_event_schedules.all():
+            if not hasattr(schedule, "application_event_schedule_result"):
+                continue
+
+            schedule.application_event_schedule_result.create_aggregate_data()
+
+            if schedule.application_event_schedule_result.declined:
+                continue
+
+            amount_of_events = len(
+                schedule.application_event_schedule_result.get_result_occurrences().occurrences
+            )
+            total_amount_of_events.append(amount_of_events)
+            total_events_duration.append(
+                (
+                    amount_of_events
+                    * schedule.application_event_schedule_result.allocated_duration
+                ).total_seconds()
+            )
+
+        total_reservations = sum(total_amount_of_events)
+        total_events_duration = sum(total_events_duration) / 3600.0
+
+        try:
+            name = "allocation_results_duration_total"
+            ApplicationEventAggregateData.objects.update_or_create(
+                application_event=self,
+                name=name,
+                defaults={"value": total_events_duration},
+            )
+
+            name = "allocation_results_reservations_total"
+            ApplicationEventAggregateData.objects.update_or_create(
+                application_event=self,
+                name=name,
+                defaults={"value": total_reservations},
+            )
+        except Error:
+            capture_message(
+                "Caught an error while saving event schedule result aggregate data",
+                level="error",
+            )
+        else:
+            logger.info(
+                "Event schedule result #{} aggregate data created.".format(self.pk)
+            )
+
     @property
     def aggregated_data_dict(self):
         ret_dict = {}
@@ -833,7 +889,7 @@ class ApplicationEventAggregateData(models.Model):
     """
 
     name = models.CharField(max_length=255, verbose_name=_("Name"))
-    value = models.FloatField(max_length=255, verbose_name=_("Value"))
+    value = models.FloatField(max_length=255, verbose_name=_("Value"), null=True)
     application_event = models.ForeignKey(
         ApplicationEvent, on_delete=models.CASCADE, related_name="aggregated_data"
     )
@@ -995,6 +1051,91 @@ class ApplicationEventScheduleResult(models.Model):
         ApplicationRoundBasket,
         on_delete=models.SET_NULL,
         null=True,
+    )
+
+    @property
+    def aggregated_data_dict(self):
+        ret_dict = {}
+        for row in self.aggregated_data.all():
+            ret_dict[row.name] = row.value
+        return ret_dict
+
+    def get_result_occurrences(self) -> [EventOccurrence]:
+        application_event = self.application_event_schedule.application_event
+        begin = application_event.begin
+        end = application_event.end
+
+        first_matching_day = next_or_current_matching_weekday(begin, self.allocated_day)
+        previous_match = previous_or_current_matching_weekday(end, self.allocated_day)
+        myrule = recurrence.Rule(
+            recurrence.WEEKLY,
+            interval=1 if not application_event.biweekly else 2,
+            byday=self.allocated_day,
+            until=datetime.datetime(
+                year=previous_match.year,
+                month=previous_match.month,
+                day=previous_match.day,
+                hour=self.allocated_end.hour,
+                minute=self.allocated_end.minute,
+                second=0,
+            ),
+        )
+        pattern = recurrence.Recurrence(
+            dtstart=datetime.datetime(
+                year=first_matching_day.year,
+                month=first_matching_day.month,
+                day=first_matching_day.day,
+                hour=self.allocated_begin.hour,
+                minute=self.allocated_begin.minute,
+                second=0,
+            ),
+            rrules=[
+                myrule,
+            ],
+        )
+        return EventOccurrence(
+            weekday=self.allocated_day,
+            begin=self.allocated_begin,
+            end=self.allocated_end,
+            occurrences=list(pattern.occurrences()),
+        )
+
+    def create_aggregate_data(self):
+        total_amount_of_events = len(self.get_result_occurrences().occurrences)
+        total_events_duration = (
+            total_amount_of_events * self.allocated_duration
+        ).total_seconds() / 3600.0
+
+        try:
+            name = "duration_total"
+            ApplicationEventScheduleResultAggregateData.objects.update_or_create(
+                schedule_result=self,
+                name=name,
+                defaults={"value": total_events_duration},
+            )
+
+            name = "reservations_total"
+            ApplicationEventScheduleResultAggregateData.objects.update_or_create(
+                schedule_result=self,
+                name=name,
+                defaults={"value": total_amount_of_events},
+            )
+        except Error:
+            capture_message(
+                "Caught an error while saving schedule result aggregate data",
+                level="error",
+            )
+        else:
+            logger.info("Schedule result #{} aggregate data created.".format(self.pk))
+
+
+class ApplicationEventScheduleResultAggregateData(models.Model):
+    name = models.CharField(max_length=255, verbose_name=_("Name"))
+    value = models.FloatField(max_length=255, verbose_name=_("Value"))
+    schedule_result = models.ForeignKey(
+        ApplicationEventScheduleResult,
+        on_delete=models.CASCADE,
+        related_name="aggregated_data",
     )
 
 

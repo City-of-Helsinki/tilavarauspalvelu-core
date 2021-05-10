@@ -7,6 +7,9 @@ from applications.models import (
     ApplicationEventStatus,
     ApplicationRound,
 )
+from applications.utils.aggregate_data import (
+    ApplicationEventScheduleResultAggregateDataCreator,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -24,6 +27,7 @@ class AllocationResultMapper(object):
             application_event_schedule__application_event__application__application_round=self.application_round,
             # noqa: E501
         ).delete()
+        application_events = []
         for allocated_event in self.allocated_events:
             try:
                 application_event_schedule = ApplicationEventSchedule.objects.get(
@@ -45,8 +49,12 @@ class AllocationResultMapper(object):
                     status=ApplicationEventStatus.ALLOCATED,
                     application_event=application_event_schedule.application_event,
                 )
+                application_events.append(application_event_schedule.application_event)
             except Exception:
                 logger.exception(
                     "AllocationResultMapper: error occurred while creating event schedule results."
                 )
                 raise
+
+        for event in set(application_events):
+            ApplicationEventScheduleResultAggregateDataCreator(event).start()
