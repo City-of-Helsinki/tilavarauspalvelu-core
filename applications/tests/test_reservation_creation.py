@@ -148,7 +148,7 @@ class ReservationSchedulerTestCase(TestCase, DjangoTestCase):
         self, mock
     ):
         scheduler = ReservationScheduler(
-            self.res_unit.id, self.reservation_begin, self.reservation_end
+            self.res_unit, self.reservation_begin, self.reservation_end
         )
         start_dt, end_dt = scheduler.get_reservation_times_based_on_opening_hours()
 
@@ -160,7 +160,7 @@ class ReservationSchedulerTestCase(TestCase, DjangoTestCase):
     ):
         reservation_end = self.reservation_end + datetime.timedelta(hours=1)
         scheduler = ReservationScheduler(
-            self.res_unit.id, self.reservation_begin, reservation_end
+            self.res_unit, self.reservation_begin, reservation_end
         )
         start_dt, end_dt = scheduler.get_reservation_times_based_on_opening_hours()
 

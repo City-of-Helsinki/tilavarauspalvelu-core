@@ -126,7 +126,7 @@ class AllocationDataBuilder(object):
             return self.set_mock_opening_hour_data(space)
 
         opening_hours = get_opening_hours(
-            f"{settings.HAUKI_ORIGIN_ID}:{unit.uuid}",
+            f"{unit.uuid}",
             self.application_round.reservation_period_begin,
             self.application_round.reservation_period_end,
         )

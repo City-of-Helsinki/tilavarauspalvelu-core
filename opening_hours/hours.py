@@ -93,9 +93,14 @@ def get_opening_hours(
 ) -> List[dict]:
     """Get opening hours for Hauki resource"""
 
-    days_data_out = []
+    resource_prefix = f"{settings.HAUKI_ORIGIN_ID}"
     if isinstance(resource_id, list):
-        resource_id = ",".join(resource_id)
+        resource_id = "%s:%s" % (
+            resource_prefix,
+            f",{resource_prefix}:".join(resource_id),
+        )
+    else:
+        resource_id = f"{resource_prefix}:{resource_id}"
     if isinstance(start_date, datetime.date):
         start_date = start_date.isoformat()
     if isinstance(end_date, datetime.date):
@@ -108,6 +113,7 @@ def get_opening_hours(
     }
     days_data_in = make_hauki_request(resource_opening_hours_url, query_params)
 
+    days_data_out = []
     for day_data_in in days_data_in["results"]:
         for opening_hours in day_data_in["opening_hours"]:
             day_data_out = {
