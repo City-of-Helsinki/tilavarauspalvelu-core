@@ -124,7 +124,7 @@ function ApplicationRoundCard({
           <Title>{applicationRound.name}</Title>
           <Subtitle>{t("common.youthServices")}</Subtitle>
         </div>
-        <ApplicationRoundStatusBlock status={applicationRound.status} />
+        <ApplicationRoundStatusBlock applicationRound={applicationRound} />
       </Top>
       <Bottom>
         <Details>
