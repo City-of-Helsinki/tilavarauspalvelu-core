@@ -383,12 +383,14 @@ function Handling({
       <Heading />
       {applicationRound && (
         <>
-          <StyledKorosHeading
-            heading={`${unhandledRecommendationCount} ${t(
-              "common.volumeUnit"
-            )}`}
-            subheading={t("ApplicationRound.suffixUnhandledSuggestions")}
-          />
+          {!isApplicationRoundApproved && (
+            <StyledKorosHeading
+              heading={`${unhandledRecommendationCount} ${t(
+                "common.volumeUnit"
+              )}`}
+              subheading={t("ApplicationRound.suffixUnhandledSuggestions")}
+            />
+          )}
           <IngressContainer>
             <ApplicationRoundNavi
               applicationRoundId={applicationRound.id}

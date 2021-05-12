@@ -356,7 +356,7 @@ function RecommendationsByApplicant(): JSX.Element {
                 <Heading>{applicantName}</Heading>
                 <div>{applicationRound?.name}</div>
                 <StyledApplicationRoundStatusBlock
-                  status={applicationRound.status}
+                  applicationRound={applicationRound}
                 />
               </div>
               <div>

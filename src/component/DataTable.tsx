@@ -28,7 +28,7 @@ import { ReactComponent as IconActivateSelection } from "../images/icon_select.s
 import { ReactComponent as IconDisableSelection } from "../images/icon_unselect.svg";
 import { truncatedText } from "../styles/typography";
 
-type OrderTypes = "asc" | "desc";
+export type OrderTypes = "asc" | "desc";
 
 interface Column {
   title: string;

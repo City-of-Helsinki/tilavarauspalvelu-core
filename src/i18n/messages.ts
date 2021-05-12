@@ -197,6 +197,7 @@ const translations: ITranslations = {
       applicantName: ["Hakijan nimi"],
       purpose: ["Käyttötarkoitus"],
       ageGroup: ["Ikäluokka"],
+      recommendations: ["Ehdotukset"],
     },
     statuses: {
       draft: ["Luonnos"],
@@ -331,6 +332,9 @@ const translations: ITranslations = {
       "Olet palauttanut listan käsittelyyn",
     ],
     approvalCancelledNotificationBody: ["Muutos näkyy käsittelijöille."],
+    unallocatedApplications: [
+      "Hakemuksia, joille ei voitu tehdä lainkaan ehdotuksia",
+    ],
     schedulesToBeGranted: ["Myönnettäviä vuoroja"],
     attachedReservationUnits: ["Liitettyä varausyksikköä"],
     orphanApplications: ["Ehdotuksitta jääneet"],
