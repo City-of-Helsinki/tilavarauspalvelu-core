@@ -12,6 +12,7 @@ import trim from "lodash/trim";
 import uniq from "lodash/uniq";
 import {
   AllocationResult,
+  Application as ApplicationType,
   ApplicationRound as ApplicationRoundType,
   ApplicationRoundStatus,
   DataFilterConfig,
@@ -24,7 +25,7 @@ import withMainMenu from "../withMainMenu";
 import ApplicationRoundNavi from "./ApplicationRoundNavi";
 import TimeframeStatus from "./TimeframeStatus";
 import { ContentHeading, H3 } from "../../styles/typography";
-import DataTable, { CellConfig } from "../DataTable";
+import DataTable, { CellConfig, OrderTypes } from "../DataTable";
 import Dialog from "../Dialog";
 import {
   formatNumber,
@@ -33,7 +34,7 @@ import {
   processAllocationResult,
 } from "../../common/util";
 import BigRadio from "../BigRadio";
-import { getAllocationResults } from "../../common/api";
+import { getAllocationResults, getApplications } from "../../common/api";
 import Loader from "../Loader";
 
 interface IProps {
@@ -144,16 +145,16 @@ const IngressFooter = styled.div`
   }
 `;
 
-// const SchedulePercentage = styled.span`
-//   font-family: var(--tilavaraus-admin-font-bold);
-//   font-weight: bold;
-//   font-size: 1.375rem;
-//   display: block;
+const BoldValue = styled.span`
+  font-family: var(--tilavaraus-admin-font-bold);
+  font-weight: bold;
+  font-size: 1.375rem;
+  display: block;
 
-//   @media (min-width: ${breakpoints.m}) {
-//     display: inline;
-//   }
-// `;
+  @media (min-width: ${breakpoints.m}) {
+    display: inline;
+  }
+`;
 
 // const ScheduleCount = styled.span`
 //   font-size: var(--fontsize-body-s);
@@ -167,9 +168,55 @@ const IngressFooter = styled.div`
 
 const getCellConfig = (
   t: TFunction,
-  applicationRound: ApplicationRoundType | null
+  applicationRound: ApplicationRoundType | null,
+  type: "unallocated" | "allocated"
 ): CellConfig => {
-  return {
+  const unallocatedCellConfig = {
+    cols: [
+      {
+        title: "Application.headings.applicantName",
+        key: "organisation.name",
+        transform: ({
+          applicantType,
+          contactPerson,
+          organisation,
+        }: ApplicationType) =>
+          applicantType === "individual"
+            ? `${contactPerson?.firstName || ""} ${
+                contactPerson?.lastName || ""
+              }`.trim()
+            : organisation?.name || "",
+      },
+      {
+        title: "Application.headings.applicantType",
+        key: "applicantType",
+        transform: ({ applicantType }: ApplicationType) =>
+          t(`Application.applicantTypes.${applicantType}`),
+      },
+      {
+        title: "Application.headings.recommendations",
+        key: "id",
+        transform: () => (
+          <div
+            style={{
+              display: "flex",
+              alignContent: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <span>{t("Recommendation.noRecommendations")}</span>
+            <IconArrowRight />
+          </div>
+        ),
+      },
+    ],
+    index: "id",
+    sorting: "organisation.name",
+    order: "asc" as OrderTypes,
+    rowLink: ({ id }: ApplicationType) => `/application/${id}`,
+  };
+
+  const allocatedCellConfig = {
     cols: [
       { title: "Application.headings.applicantName", key: "organisationName" },
       {
@@ -210,47 +257,79 @@ const getCellConfig = (
     ],
     index: "applicationEventScheduleId",
     sorting: "organisation.name",
-    order: "asc",
+    order: "asc" as OrderTypes,
     rowLink: ({ applicationEventScheduleId }: AllocationResult) => {
       return applicationEventScheduleId && applicationRound
         ? `/applicationRound/${applicationRound.id}/recommendation/${applicationEventScheduleId}`
         : "";
     },
-    groupLink: ({ space }) =>
-      applicationRound
-        ? `/applicationRound/${applicationRound.id}/space/${space?.id}`
-        : "",
   };
+
+  switch (type) {
+    case "unallocated":
+      return unallocatedCellConfig;
+    case "allocated":
+    default:
+      return allocatedCellConfig;
+  }
 };
 
 const getFilterConfig = (
-  recommendations: AllocationResult[]
+  recommendations: AllocationResult[] | null,
+  applications: ApplicationType[] | null,
+  type: "unallocated" | "allocated",
+  t: TFunction
 ): DataFilterConfig[] => {
-  const applicantTypes = uniq(
-    recommendations.map((rec) => rec.applicantType)
-  ).sort();
-  const reservationUnits = uniq(
-    recommendations.map((rec) => rec.unitName)
-  ).sort();
+  const getApplicantTypes = (input: AllocationResult[] | ApplicationType[]) =>
+    uniq(
+      input.map((n: AllocationResult | ApplicationType) => n.applicantType)
+    ).sort();
+  const getReservationUnits = (input: AllocationResult[]) =>
+    uniq(input.map((n: AllocationResult) => n.unitName)).sort();
 
-  return [
+  const unallocatedFilterConfig = [
     {
       title: "Application.headings.applicantType",
-      filters: applicantTypes.map((value) => ({
-        title: value,
-        key: "applicantType",
-        value: value || "",
-      })),
+      filters:
+        applications &&
+        getApplicantTypes(applications).map((value) => ({
+          title: t(`Application.applicantTypes.${value}`),
+          key: "applicantType",
+          value: value || "",
+        })),
+    },
+  ];
+
+  const allocatedFilterConfig = [
+    {
+      title: "Application.headings.applicantType",
+      filters:
+        recommendations &&
+        getApplicantTypes(recommendations).map((value) => ({
+          title: t(`Application.applicantTypes.${value}`),
+          key: "applicantType",
+          value: value || "",
+        })),
     },
     {
       title: "Recommendation.headings.reservationUnit",
-      filters: reservationUnits.map((value) => ({
-        title: value,
-        key: "unitName",
-        value: value || "",
-      })),
+      filters:
+        recommendations &&
+        getReservationUnits(recommendations).map((value) => ({
+          title: value,
+          key: "unitName",
+          value: value || "",
+        })),
     },
   ];
+
+  switch (type) {
+    case "unallocated":
+      return unallocatedFilterConfig;
+    case "allocated":
+    default:
+      return allocatedFilterConfig;
+  }
 };
 
 function PreApproval({
@@ -265,28 +344,62 @@ function PreApproval({
   const [recommendations, setRecommendations] = useState<
     AllocationResult[] | []
   >([]);
-  const [filterConfig, setFilterConfig] = useState<DataFilterConfig[] | null>(
-    null
-  );
-  const [cellConfig, setCellConfig] = useState<CellConfig | null>(null);
-  const [activeFilter, setActiveFilter] = useState<string>("handled");
+  const [unallocatedApplications, setUnallocatedApplications] = useState<
+    ApplicationType[]
+  >([]);
+  const [unAllocatedFilterConfig, setUnallocatedFilterConfig] = useState<
+    DataFilterConfig[] | null
+  >(null);
+  const [allocatedFilterConfig, setAllocatedFilterConfig] = useState<
+    DataFilterConfig[] | null
+  >(null);
+  const [
+    unAllocatedCellConfig,
+    setUnallocatedCellConfig,
+  ] = useState<CellConfig | null>(null);
+  const [
+    allocatedCellConfig,
+    setAllocatedCellConfig,
+  ] = useState<CellConfig | null>(null);
+  const [activeFilter, setActiveFilter] = useState<string>("allocated");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const { t } = useTranslation();
 
   useEffect(() => {
-    const fetchRecommendations = async (arId: number, ssId: number) => {
+    const fetchData = async (arId: number, ssId: number) => {
       try {
-        const result = await getAllocationResults({
+        const allocationResults = await getAllocationResults({
           applicationRoundId: arId,
           serviceSectorId: ssId,
         });
 
-        const processedResult = processAllocationResult(result);
+        const applicationsResult = await getApplications({
+          applicationRound: arId,
+          status: "in_review,review_done,declined",
+        });
 
-        setFilterConfig(getFilterConfig(processedResult));
-        setCellConfig(getCellConfig(t, applicationRound));
+        const processedResult = processAllocationResult(allocationResults);
+
+        const allocatedApplicationIds = uniq(
+          processedResult.map((result) => result.applicationId)
+        );
+        const unallocatedApps = applicationsResult.filter(
+          (application) => !allocatedApplicationIds.includes(application.id)
+        );
+
+        setUnallocatedFilterConfig(
+          getFilterConfig(processedResult, unallocatedApps, "unallocated", t)
+        );
+        setAllocatedFilterConfig(
+          getFilterConfig(processedResult, unallocatedApps, "allocated", t)
+        );
+        setUnallocatedCellConfig(
+          getCellConfig(t, applicationRound, "unallocated")
+        );
+        setAllocatedCellConfig(getCellConfig(t, applicationRound, "allocated"));
         setRecommendations(processedResult || []);
+        setUnallocatedApplications(unallocatedApps);
       } catch (error) {
         setErrorMsg("errors.errorFetchingApplications");
       } finally {
@@ -295,20 +408,15 @@ function PreApproval({
     };
 
     if (typeof applicationRound?.id === "number") {
-      fetchRecommendations(
-        applicationRound.id,
-        applicationRound.serviceSectorId
-      );
+      fetchData(applicationRound.id, applicationRound.serviceSectorId);
     }
   }, [applicationRound, t]);
 
   const hasBeenSentForApproval = applicationRound.status === "validated";
 
   const filteredResults =
-    activeFilter === "orphans"
-      ? recommendations.filter(
-          (n) => !["validated"].includes(n.applicationEvent.status)
-        )
+    activeFilter === "unallocated"
+      ? unallocatedApplications
       : recommendations.filter((n) =>
           ["validated"].includes(n.applicationEvent.status)
         );
@@ -320,157 +428,173 @@ function PreApproval({
   return (
     <Wrapper>
       <Heading />
-      {recommendations && cellConfig && filterConfig && (
-        <>
-          <IngressContainer>
-            <ApplicationRoundNavi applicationRoundId={applicationRound.id} />
-            <TopIngress>
-              <div>
-                <ContentHeading>{applicationRound.name}</ContentHeading>
-                <TimeframeStatus
-                  applicationPeriodBegin={
-                    applicationRound.applicationPeriodBegin
-                  }
-                  applicationPeriodEnd={applicationRound.applicationPeriodEnd}
-                />
-              </div>
-              <div />
-            </TopIngress>
-          </IngressContainer>
-          <NarrowContainer style={{ marginBottom: "var(--spacing-4-xl)" }}>
-            {hasBeenSentForApproval && (
-              <StyledNotification
-                type="success"
-                label=""
-                dismissible
-                closeButtonLabelText={`${t("common.close")}`}
+      {recommendations &&
+        unAllocatedCellConfig &&
+        allocatedCellConfig &&
+        unAllocatedFilterConfig &&
+        allocatedFilterConfig && (
+          <>
+            <IngressContainer>
+              <ApplicationRoundNavi applicationRoundId={applicationRound.id} />
+              <TopIngress>
+                <div>
+                  <ContentHeading>{applicationRound.name}</ContentHeading>
+                  <TimeframeStatus
+                    applicationPeriodBegin={
+                      applicationRound.applicationPeriodBegin
+                    }
+                    applicationPeriodEnd={applicationRound.applicationPeriodEnd}
+                  />
+                </div>
+                <div />
+              </TopIngress>
+            </IngressContainer>
+            <NarrowContainer style={{ marginBottom: "var(--spacing-4-xl)" }}>
+              {hasBeenSentForApproval && (
+                <StyledNotification
+                  type="success"
+                  label=""
+                  dismissible
+                  closeButtonLabelText={`${t("common.close")}`}
+                >
+                  <H3>
+                    <IconCheckCircle size="m" />{" "}
+                    {t("ApplicationRound.sentForApprovalNotificationHeader")}
+                  </H3>
+                  <p>{t("ApplicationRound.sentForApprovalNotificationBody")}</p>
+                </StyledNotification>
+              )}
+              <Recommendation>
+                <RecommendationLabel>
+                  {t("Application.recommendedStage")}:
+                </RecommendationLabel>
+                <RecommendationValue>
+                  <StatusRecommendation
+                    status={
+                      hasBeenSentForApproval
+                        ? "approval"
+                        : "approvalPreparation"
+                    }
+                    applicationRound={applicationRound}
+                  />
+                </RecommendationValue>
+              </Recommendation>
+              {!hasBeenSentForApproval && (
+                <ActionContainer>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={() => {
+                      setApplicationRoundStatus("allocated");
+                    }}
+                  >
+                    {t("ApplicationRound.navigateBackToHandling")}
+                  </Button>
+                  <Button
+                    type="submit"
+                    variant="primary"
+                    onClick={() => setConfirmationDialogVisibility(true)}
+                  >
+                    {t("ApplicationRound.sendForApproval")}
+                  </Button>
+                </ActionContainer>
+              )}
+            </NarrowContainer>
+            <IngressContainer>
+              <IngressFooter>
+                <div>
+                  {activeFilter === "unallocated" && (
+                    <>
+                      <BoldValue>
+                        {formatNumber(
+                          unallocatedApplications.length,
+                          t("common.volumeUnit")
+                        )}
+                      </BoldValue>
+                      <p className="label">
+                        {t("ApplicationRound.unallocatedApplications")}
+                      </p>
+                    </>
+                  )}
+                </div>
+                <div>
+                  <BigRadio
+                    buttons={[
+                      {
+                        key: "unallocated",
+                        text: "ApplicationRound.orphanApplications",
+                      },
+                      {
+                        key: "allocated",
+                        text: "ApplicationRound.handledApplications",
+                      },
+                    ]}
+                    activeKey={activeFilter}
+                    setActiveKey={setActiveFilter}
+                  />
+                </div>
+              </IngressFooter>
+            </IngressContainer>
+            {activeFilter === "unallocated" && unAllocatedCellConfig && (
+              <DataTable
+                groups={[{ id: 1, data: filteredResults }]}
+                hasGrouping={false}
+                config={{
+                  filtering: true,
+                  rowFilters: true,
+                }}
+                cellConfig={unAllocatedCellConfig}
+                filterConfig={unAllocatedFilterConfig}
+              />
+            )}
+            {activeFilter === "allocated" && allocatedCellConfig && (
+              <DataTable
+                groups={prepareAllocationResults(
+                  filteredResults as AllocationResult[]
+                )}
+                hasGrouping={false}
+                config={{
+                  filtering: true,
+                  rowFilters: true,
+                }}
+                cellConfig={allocatedCellConfig}
+                filterConfig={allocatedFilterConfig}
+              />
+            )}
+            {isConfirmationDialogVisible && (
+              <Dialog
+                closeDialog={() => setConfirmationDialogVisibility(false)}
+                style={
+                  {
+                    "--padding": "var(--spacing-layout-s)",
+                  } as React.CSSProperties
+                }
               >
-                <H3>
-                  <IconCheckCircle size="m" />{" "}
-                  {t("ApplicationRound.sentForApprovalNotificationHeader")}
-                </H3>
-                <p>{t("ApplicationRound.sentForApprovalNotificationBody")}</p>
-              </StyledNotification>
+                <H3>{t("ApplicationRound.sentForApprovalDialogHeader")}</H3>
+                <p>{t("ApplicationRound.sentForApprovalDialogBody")}</p>
+                <ActionContainer>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={() => setConfirmationDialogVisibility(false)}
+                  >
+                    {t("Navigation.goBack")}
+                  </Button>
+                  <Button
+                    type="submit"
+                    variant="primary"
+                    onClick={() => {
+                      setApplicationRoundStatus("validated");
+                      setConfirmationDialogVisibility(false);
+                    }}
+                  >
+                    {t("ApplicationRound.deliverAction")}
+                  </Button>
+                </ActionContainer>
+              </Dialog>
             )}
-            <Recommendation>
-              <RecommendationLabel>
-                {t("Application.recommendedStage")}:
-              </RecommendationLabel>
-              <RecommendationValue>
-                <StatusRecommendation
-                  status={
-                    hasBeenSentForApproval ? "approval" : "approvalPreparation"
-                  }
-                  applicationRound={applicationRound}
-                />
-              </RecommendationValue>
-            </Recommendation>
-            {!hasBeenSentForApproval && (
-              <ActionContainer>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={() => {
-                    setApplicationRoundStatus("allocated");
-                  }}
-                >
-                  {t("ApplicationRound.navigateBackToHandling")}
-                </Button>
-                <Button
-                  type="submit"
-                  variant="primary"
-                  onClick={() => setConfirmationDialogVisibility(true)}
-                >
-                  {t("ApplicationRound.sendForApproval")}
-                </Button>
-              </ActionContainer>
-            )}
-          </NarrowContainer>
-          <IngressContainer>
-            <IngressFooter>
-              <div>
-                {/* <p className="label">
-                  {t("ApplicationRound.schedulesToBeGranted")}
-                </p>{" "}
-                <SchedulePercentage>
-                  {t("ApplicationRound.percentageOfCapacity", {
-                    percentage: 76,
-                  })}
-                </SchedulePercentage>
-                <ScheduleCount>
-                  {`(${formatNumber(
-                    scheduledNumbers.volume,
-                    t("common.volumeUnit")
-                  )} / ${formatNumber(
-                    scheduledNumbers.hours,
-                    t("common.hoursUnit")
-                  )})`}
-                </ScheduleCount> */}
-              </div>
-              <div>
-                <BigRadio
-                  buttons={[
-                    {
-                      key: "orphans",
-                      text: "ApplicationRound.orphanApplications",
-                    },
-                    {
-                      key: "handled",
-                      text: "ApplicationRound.handledApplications",
-                    },
-                  ]}
-                  activeKey={activeFilter}
-                  setActiveKey={setActiveFilter}
-                />
-              </div>
-            </IngressFooter>
-          </IngressContainer>
-          {cellConfig && (
-            <DataTable
-              groups={prepareAllocationResults(filteredResults)}
-              hasGrouping={false}
-              config={{
-                filtering: true,
-                rowFilters: true,
-              }}
-              cellConfig={cellConfig}
-              filterConfig={filterConfig}
-            />
-          )}
-          {isConfirmationDialogVisible && (
-            <Dialog
-              closeDialog={() => setConfirmationDialogVisibility(false)}
-              style={
-                {
-                  "--padding": "var(--spacing-layout-s)",
-                } as React.CSSProperties
-              }
-            >
-              <H3>{t("ApplicationRound.sentForApprovalDialogHeader")}</H3>
-              <p>{t("ApplicationRound.sentForApprovalDialogBody")}</p>
-              <ActionContainer>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={() => setConfirmationDialogVisibility(false)}
-                >
-                  {t("Navigation.goBack")}
-                </Button>
-                <Button
-                  type="submit"
-                  variant="primary"
-                  onClick={() => {
-                    setApplicationRoundStatus("validated");
-                    setConfirmationDialogVisibility(false);
-                  }}
-                >
-                  {t("ApplicationRound.deliverAction")}
-                </Button>
-              </ActionContainer>
-            </Dialog>
-          )}
-        </>
-      )}
+          </>
+        )}
       {errorMsg && (
         <Notification
           type="error"

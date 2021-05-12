@@ -318,7 +318,7 @@ function ApplicationDetails(): JSX.Element | null {
                 <StyledAccordion
                   key={applicationEvent.id}
                   heading={applicationEvent.name}
-                  defaultOpen
+                  defaultOpen={false}
                 >
                   <AccordionContent>
                     <ValueBox
