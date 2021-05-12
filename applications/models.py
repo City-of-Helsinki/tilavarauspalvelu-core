@@ -15,7 +15,10 @@ from rest_framework.exceptions import ValidationError
 from sentry_sdk import capture_message
 
 from applications.base_models import ContactInformation
-from applications.utils.aggregate_data import EventAggregateDataCreator
+from applications.utils.aggregate_data import (
+    ApplicationRoundAggregateDataCreator,
+    EventAggregateDataCreator,
+)
 from reservation_units.models import Purpose, ReservationUnit
 from spaces.models import District
 from tilavarauspalvelu.utils.date_util import (
@@ -330,6 +333,9 @@ class ApplicationRound(models.Model):
         return "{} ({} - {})".format(
             self.name, self.reservation_period_begin, self.reservation_period_end
         )
+
+    def create_aggregate_data(self):
+        ApplicationRoundAggregateDataCreator(self).start()
 
 
 class ApplicationRoundAggregateData(AggregateDataBase):
