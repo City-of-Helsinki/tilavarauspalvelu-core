@@ -5,7 +5,7 @@ import React from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { ApplicationEvent } from '../../common/types';
-import { parseDate, formatDate, apiDurationToMinutes } from '../../common/util';
+import { apiDurationToMinutes, fromUIDate } from '../../common/util';
 import { TwoColumnContainer } from '../../component/common';
 import IconWithText from '../../reservation-unit/IconWithText';
 
@@ -38,7 +38,7 @@ const numHours = (
   minDurationMinutes: number
 ) => {
   const numWeeks =
-    differenceInWeeks(parseDate(endDate), parseDate(startDate)) /
+    differenceInWeeks(fromUIDate(endDate), fromUIDate(startDate)) /
     (biweekly ? 2 : 1);
 
   const hours = (numWeeks * eventsPerWeek * minDurationMinutes) / 60;
@@ -90,8 +90,8 @@ const ApplicationEventSummary = ({
       <Message>
         {t('ApplicationEventSummary.message', {
           name,
-          startDate: formatDate(begin),
-          endDate: formatDate(end),
+          startDate: begin,
+          endDate: end,
           hours: numHours(begin, end, biweekly, eventsPerWeek, minDuration),
         })}
       </Message>

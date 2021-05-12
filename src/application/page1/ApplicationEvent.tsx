@@ -2,6 +2,7 @@ import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
 import {
   Button as HDSButton,
   Checkbox,
+  DateInput,
   Notification,
   TextInput,
 } from 'hds-react';
@@ -16,14 +17,17 @@ import {
   ApplicationEvent as ApplicationEventType,
   ApplicationRound,
   EditorState,
+  LocalizationLanguages,
   OptionType,
   ReservationUnit,
 } from '../../common/types';
 import {
+  apiDateToUIDate,
   apiDurationToMinutes,
   errorText,
   formatApiDate,
   formatDate,
+  uiDateToApiDate,
 } from '../../common/util';
 import { breakpoint } from '../../common/style';
 import { CheckboxWrapper, HorisontalRule } from '../../component/common';
@@ -154,7 +158,7 @@ const ApplicationEvent = ({
     participantCountOptions,
   } = optionTypes;
 
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const fieldName = (nameField: string) =>
     `applicationEvents[${index}].${nameField}`;
@@ -175,8 +179,10 @@ const ApplicationEvent = ({
 
   useEffect(() => {
     const selectionIsDefaultPeriod =
-      applicationPeriodBegin === periodStartDate &&
-      applicationPeriodEnd === periodEndDate;
+      applicationPeriodEnd &&
+      applicationPeriodBegin &&
+      uiDateToApiDate(applicationPeriodBegin) === periodStartDate &&
+      uiDateToApiDate(applicationPeriodEnd) === periodEndDate;
 
     setDefaultPeriodSelected(selectionIsDefaultPeriod);
   }, [
@@ -199,8 +205,8 @@ const ApplicationEvent = ({
     const { checked } = e.target;
     setDefaultPeriodSelected(checked);
     if (checked) {
-      form.setValue(fieldName('begin'), periodStartDate);
-      form.setValue(fieldName('end'), periodEndDate);
+      form.setValue(fieldName('begin'), apiDateToUIDate(periodStartDate));
+      form.setValue(fieldName('end'), apiDateToUIDate(periodEndDate));
     }
   };
 
@@ -316,25 +322,40 @@ const ApplicationEvent = ({
           {t('Application.Page1.applicationRoundSubHeading')}
         </SubHeadLine>
         <PeriodContainer>
-          <TextInput
-            type="date"
-            onChange={() => {
+          <DateInput
+            disableConfirmation
+            language={i18n.language as LocalizationLanguages}
+            onChange={(v) => {
               form.clearErrors([fieldName('begin'), fieldName('end')]);
+              form.setValue(fieldName('begin'), v);
+              form.trigger([fieldName('end'), fieldName('begin')]);
             }}
             ref={form.register({
               validate: {
                 required: (val) => Boolean(val),
                 beginAfterEnd: (val) =>
-                  !after(form.getValues().applicationEvents?.[index]?.end, val),
+                  !after(
+                    uiDateToApiDate(
+                      form.getValues().applicationEvents?.[index]?.end
+                    ),
+                    uiDateToApiDate(val)
+                  ),
                 beginBeforePeriodBegin: (val) =>
-                  !before(applicationRound.reservationPeriodBegin, val),
+                  !before(
+                    applicationRound.reservationPeriodBegin,
+                    uiDateToApiDate(val)
+                  ),
                 beginAfterPeriodEnd: (val) =>
-                  !after(applicationRound.reservationPeriodEnd, val),
+                  !after(
+                    applicationRound.reservationPeriodEnd,
+                    uiDateToApiDate(val)
+                  ),
               },
             })}
             label={t('Application.Page1.periodStartDate')}
             id={fieldName('begin')}
             name={fieldName('begin')}
+            value={form.getValues(fieldName('begin'))}
             required
             invalid={!!form.errors.applicationEvents?.[index]?.begin?.type}
             errorText={errorText(
@@ -342,25 +363,40 @@ const ApplicationEvent = ({
               form.errors.applicationEvents?.[index]?.begin?.type
             )}
           />
-          <TextInput
-            type="date"
-            onChange={() =>
-              form.clearErrors([fieldName('begin'), fieldName('end')])
-            }
+          <DateInput
             ref={form.register({
               validate: {
-                required: (val) => Boolean(val),
-                endBeforeBegin: (val) =>
-                  !before(
-                    form.getValues().applicationEvents?.[index]?.begin,
-                    val
-                  ),
+                required: (val) => {
+                  return Boolean(val);
+                },
+                endBeforeBegin: (val) => {
+                  return !before(
+                    uiDateToApiDate(
+                      form.getValues().applicationEvents?.[index]?.begin
+                    ),
+                    uiDateToApiDate(val)
+                  );
+                },
                 endBeforePeriodBegin: (val) =>
-                  !before(applicationRound.reservationPeriodBegin, val),
+                  !before(
+                    applicationRound.reservationPeriodBegin,
+                    uiDateToApiDate(val)
+                  ),
                 endAfterPeriodEnd: (val) =>
-                  !after(applicationRound.reservationPeriodEnd, val),
+                  !after(
+                    applicationRound.reservationPeriodEnd,
+                    uiDateToApiDate(val)
+                  ),
               },
             })}
+            disableConfirmation
+            language={i18n.language as LocalizationLanguages}
+            onChange={(v) => {
+              form.clearErrors([fieldName('begin'), fieldName('end')]);
+              form.setValue(fieldName('end'), v);
+              form.trigger([fieldName('end'), fieldName('begin')]);
+            }}
+            value={form.getValues(fieldName('end'))}
             label={t('Application.Page1.periodEndDate')}
             id={fieldName('end')}
             name={fieldName('end')}
@@ -371,6 +407,7 @@ const ApplicationEvent = ({
               form.errors.applicationEvents?.[index]?.end?.type
             )}
           />
+
           <CheckboxWrapper>
             <Checkbox
               id="defaultPeriod"
@@ -508,6 +545,8 @@ const ApplicationEvent = ({
             {t('Application.Page1.deleteEvent')}
           </Button>
           <ConfirmationModal
+            id="application-event-confirmation"
+            cancelLabel="common.close"
             heading={t('DeleteEvent.heading')}
             content={t('DeleteEvent.text')}
             onOk={del}

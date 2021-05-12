@@ -5,6 +5,7 @@ import {
   format,
   startOfWeek as dateFnsStartOfWeek,
   endOfWeek as dateFnsEndOfWeek,
+  parse,
 } from 'date-fns';
 import i18next, { TFunction } from 'i18next';
 import { stringify } from 'query-string';
@@ -52,11 +53,35 @@ export const applicationRoundState = (
 
 export const parseDate = (date: string): Date => parseISO(date);
 
+const toUIDate = (date: Date): string => {
+  return format(date, 'd.M.yyyy');
+};
+
+const fromAPIDate = (date: string): Date => {
+  const d = parse(date, 'yyyy-MM-dd', new Date());
+  return d;
+};
 export const formatDate = (date: string): string => {
   if (!date) {
     return '-';
   }
-  return format(parseISO(date), 'd.M.yyyy');
+  return toUIDate(parseISO(date));
+};
+
+export const fromUIDate = (date: string): Date => {
+  return parse(date, 'd.M.yyyy', new Date());
+};
+
+const toApiDate = (date: Date): string => {
+  return format(date, 'yyyy-MM-dd');
+};
+
+export const apiDateToUIDate = (date: string): string => {
+  return toUIDate(fromAPIDate(date));
+};
+
+export const uiDateToApiDate = (date: string): string => {
+  return toApiDate(fromUIDate(date));
 };
 
 export const formatDuration = (duration: string): string => {
@@ -82,7 +107,7 @@ export const formatApiDate = (date: string): string => {
   if (!date) {
     return 'no date';
   }
-  return format(parseISO(date), 'yyyy-MM-dd');
+  return toApiDate(parseISO(date));
 };
 
 export const localizedValue = (

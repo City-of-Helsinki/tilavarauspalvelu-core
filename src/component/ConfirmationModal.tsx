@@ -1,34 +1,7 @@
+import { Button, Dialog } from 'hds-react';
 import React, { forwardRef, useImperativeHandle, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
-import { breakpoint } from '../common/style';
-import Modal from './Modal';
-
-const ModalContent = styled.div`
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  max-width: 24em;
-  max-height: 100%;
-  min-height: 10em;
-  font-family: var(--font-bold);
-  @media (max-width: ${breakpoint.s}) {
-    margin-top: var(--spacing-layout-xs);
-    margin-left: var(--spacing-layout-xs);
-    margin-right: auto;
-    width: calc(100% - 2 * var(--spacing-layout-xs));
-  }
-`;
-
-const ModalHeading = styled.div`
-  font-size: var(--fontsize-heading-l);
-`;
-
-const ModalText = styled.div`
-  margin-top: 2em;
-  font-size: var(--fontsize-body-l);
-`;
 
 type Props = {
   okLabel?: string;
@@ -37,11 +10,13 @@ type Props = {
   onCancel?: () => void;
   heading?: string;
   content?: string;
+  id: string;
 };
 
 const ConfirmationModal = forwardRef(
   (
     {
+      id,
       heading,
       content,
       onOk,
@@ -66,27 +41,38 @@ const ConfirmationModal = forwardRef(
     }
 
     return ReactDOM.createPortal(
-      <Modal
-        handleClose={() => {
-          setOpen(false);
-          if (onCancel) {
-            onCancel();
-          }
-        }}
-        closeButtonKey={cancelLabel}
-        handleOk={() => {
-          setOpen(false);
-          if (onOk) {
-            onOk();
-          }
-        }}
-        okButtonKey={okLabel}
-        show={open}>
-        <ModalContent>
-          <ModalHeading>{heading || t('confirm.heading')}</ModalHeading>
-          <ModalText>{content || t('confirm.text')}</ModalText>
-        </ModalContent>
-      </Modal>,
+      <Dialog
+        variant="danger"
+        isOpen={open}
+        id={id}
+        aria-labelledby={`${id}-header`}
+        aria-describedby={`${id}-content`}>
+        <Dialog.Header id="header" title={heading || t('confirm.heading')} />
+        <Dialog.Content id={`${id}-content`}>
+          {content || t('confirm.text')}
+        </Dialog.Content>
+        <Dialog.ActionButtons>
+          <Button
+            variant="secondary"
+            onClick={() => {
+              setOpen(false);
+              if (onCancel) {
+                onCancel();
+              }
+            }}>
+            {t(cancelLabel)}
+          </Button>
+          <Button
+            onClick={() => {
+              setOpen(false);
+              if (onOk) {
+                onOk();
+              }
+            }}>
+            {t(okLabel)}
+          </Button>
+        </Dialog.ActionButtons>
+      </Dialog>,
       root
     );
   }

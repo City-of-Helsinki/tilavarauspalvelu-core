@@ -28,6 +28,7 @@ import applicationReducer from './applicationReducer';
 import useReservationUnitList from '../common/hook/useReservationUnitList';
 import Sent from './sent/Sent';
 import { CenterSpinner } from '../component/common';
+import { apiDateToUIDate, deepCopy, uiDateToApiDate } from '../common/util';
 
 type ParamTypes = {
   applicationId: string;
@@ -49,26 +50,51 @@ const Application = (): JSX.Element | null => {
     loading: true,
   } as EditorState);
 
-  const applicationRoundLoadingStatus = useAsync(async () => {
-    if (state.application.applicationRoundId) {
-      const loadedApplicationRound = await getApplicationRound({
-        id: state.application.applicationRoundId,
-      });
-      return loadedApplicationRound;
+  const applicationLoadingStatus = useAsync(async () => {
+    if (applicationId && Number(applicationId)) {
+      try {
+        const application = await getApplication(Number(applicationId));
+        const applicationRound = await getApplicationRound({
+          id: application.applicationRoundId,
+        });
+
+        // convert dates
+        application.applicationEvents.forEach((ae, i) => {
+          if (ae.end) {
+            application.applicationEvents[i].end = apiDateToUIDate(ae.end);
+          }
+          if (ae.begin) {
+            application.applicationEvents[i].begin = apiDateToUIDate(ae.begin);
+          }
+        });
+        dispatch({
+          type: 'load',
+          application,
+          params: {
+            begin: apiDateToUIDate(applicationRound.reservationPeriodBegin),
+            end: apiDateToUIDate(applicationRound.reservationPeriodEnd),
+          },
+        });
+        return { application, applicationRound };
+      } catch (e) {
+        setError(`${t('common.error.dataError')}`);
+      }
     }
     return null;
-  }, [state.application.id]);
-
-  const applicationLoadingStatus = useAsync(async () => {
-    let loadedApplication = null;
-    if (applicationId && Number(applicationId)) {
-      loadedApplication = await getApplication(Number(applicationId));
-      dispatch({ type: 'load', application: loadedApplication });
-    }
-    return loadedApplication;
   });
 
   const { reservationUnits, clearSelections } = useReservationUnitList();
+
+  const transform = (app: ApplicationType): ApplicationType => {
+    const appToSave = deepCopy(app);
+    appToSave.applicationEvents.forEach((ae, i) => {
+      appToSave.applicationEvents[i].begin = uiDateToApiDate(
+        ae.begin as string
+      );
+      appToSave.applicationEvents[i].end = uiDateToApiDate(ae.end as string);
+    });
+    return appToSave;
+  };
 
   const saveWithEffect = async (
     appToSave: ApplicationType,
@@ -81,7 +107,7 @@ const Application = (): JSX.Element | null => {
       const existingIds = appToSave.applicationEvents
         .filter((ae) => ae.id)
         .map((ae) => ae.id);
-      loadedApplication = await saveApplication(appToSave);
+      loadedApplication = await saveApplication(transform(appToSave));
       const newEvent = loadedApplication.applicationEvents.filter(
         (ae) => existingIds.indexOf(ae.id) === -1
       );
@@ -96,6 +122,7 @@ const Application = (): JSX.Element | null => {
       }
     } catch (e) {
       setError(`${t('Application.error.saveFailed')}`);
+      throw e;
     }
   };
 
@@ -110,20 +137,42 @@ const Application = (): JSX.Element | null => {
     });
 
   const addNewApplicationEvent = async () => {
+    const params = {} as {
+      [key: string]: string;
+    };
+    if (applicationLoadingStatus.value) {
+      params.begin = apiDateToUIDate(
+        applicationLoadingStatus.value.applicationRound.reservationPeriodBegin
+      );
+      params.end = apiDateToUIDate(
+        applicationLoadingStatus.value.applicationRound.reservationPeriodEnd
+      );
+    }
+
     dispatch({
+      params,
       type: 'addNewApplicationEvent',
     });
   };
 
-  const applicationRoundName = applicationRoundLoadingStatus.value?.name || '';
+  const applicationRoundName =
+    applicationLoadingStatus.value?.applicationRound.name || '';
 
-  const ready =
-    ![applicationRoundLoadingStatus, applicationLoadingStatus].some(
-      (r) => r.loading
-    ) && state.loading === false;
+  const ready = !applicationLoadingStatus.loading && state.loading === false;
 
   if (!ready) {
-    return <CenterSpinner />;
+    return error ? (
+      <Notification
+        type="error"
+        label={error}
+        position="top-center"
+        displayAutoCloseProgress={false}
+        onClose={() => history.go(0)}>
+        {error}
+      </Notification>
+    ) : (
+      <CenterSpinner />
+    );
   }
 
   return (
@@ -139,7 +188,8 @@ const Application = (): JSX.Element | null => {
             <Page1
               selectedReservationUnits={reservationUnits}
               applicationRound={
-                applicationRoundLoadingStatus.value || ({} as ApplicationRound)
+                applicationLoadingStatus.value?.applicationRound ||
+                ({} as ApplicationRound)
               }
               dispatch={dispatch}
               editorState={state}

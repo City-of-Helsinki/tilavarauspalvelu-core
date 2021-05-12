@@ -195,6 +195,7 @@ const ApplicationCard = ({
         </StyledButton>
       </Buttons>
       <ConfirmationModal
+        id="application-card-modal"
         heading={t('ApplicationCard.cancelHeading')}
         content={t('ApplicationCard.cancelContent')}
         ref={modal}

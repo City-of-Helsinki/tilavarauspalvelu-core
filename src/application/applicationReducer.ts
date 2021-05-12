@@ -8,7 +8,11 @@ import {
   EditorState,
 } from '../common/types';
 
-const applicationEvent = (applicationId?: number): ApplicationEvent => ({
+const applicationEvent = (
+  applicationId?: number,
+  begin?: string,
+  end?: string
+): ApplicationEvent => ({
   name: i18next.t('Application.Page1.applicationEventName'),
   minDuration: defaultDuration,
   maxDuration: defaultDuration,
@@ -18,8 +22,8 @@ const applicationEvent = (applicationId?: number): ApplicationEvent => ({
   purposeId: null,
   abilityGroupId: null,
   applicationId: applicationId || 0,
-  begin: '',
-  end: '',
+  begin: begin || null,
+  end: end || null,
   biweekly: false,
   eventReservationUnits: [],
   applicationEventSchedules: [],
@@ -31,7 +35,11 @@ const reducer = (state: EditorState, action: Action): EditorState => {
     case 'addNewApplicationEvent': {
       const nextState = { ...state, savedEventId: -1 };
       nextState.application.applicationEvents.push(
-        applicationEvent(state.application.id)
+        applicationEvent(
+          state.application.id,
+          action?.params?.begin,
+          action?.params?.end
+        )
       );
       nextState.accordionStates = nextState.application.applicationEvents.map(
         (ae) => ({
@@ -64,7 +72,11 @@ const reducer = (state: EditorState, action: Action): EditorState => {
 
       if (nextState.application.applicationEvents?.length < 1) {
         nextState.application.applicationEvents.push(
-          applicationEvent(action.application?.id)
+          applicationEvent(
+            action.application?.id,
+            action?.params?.begin,
+            action?.params?.end
+          )
         );
 
         if (!nextState.application.applicationEvents[0].applicationId) {
