@@ -52,7 +52,7 @@ def create_reservation_from_schedule_result(result, application_event):
         )
 
         reservation_scheduler = ReservationScheduler(
-            result.allocated_reservation_unit.id, res_start, res_end
+            result.allocated_reservation_unit, res_start, res_end
         )
         (
             start,
@@ -83,8 +83,8 @@ def create_reservation_from_schedule_result(result, application_event):
 
 
 class ReservationScheduler:
-    def __init__(self, reservation_unit_id, begin, end):
-        self.reservation_unit_id = reservation_unit_id
+    def __init__(self, reservation_unit, begin, end):
+        self.reservation_unit = reservation_unit
         self.begin = begin
         self.end = end
         self.dates = []
@@ -152,7 +152,7 @@ class ReservationScheduler:
     def get_opening_hours(self):
         # TODO: Cache opening hours per unit.
         return get_opening_hours(
-            self.reservation_unit_id,
+            self.reservation_unit.uuid,
             start_date=self.begin.date(),
             end_date=self.end.date(),
         )

@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.utils.datetime_safe import datetime
 from rest_framework import serializers, viewsets
 from rest_framework.response import Response
@@ -14,7 +13,7 @@ class OpeningHours(object):
 
     def get_hours(self, start_date: datetime, end_date: datetime):
         return get_opening_hours(
-            resource_id=f"{settings.HAUKI_ORIGIN_ID}:{self.id}",
+            resource_id=f"{self.id}",
             start_date=start_date,
             end_date=end_date,
         )
