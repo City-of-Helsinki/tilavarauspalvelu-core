@@ -1230,6 +1230,24 @@
         }
     },
     {
+        "model": "applications.applicationroundaggregatedata",
+        "pk": 1,
+        "fields": {
+            "application_round_id": 1,
+            "name": "total_hour_capacity",
+            "value": 700
+        }
+    },
+    {
+        "model": "applications.applicationroundaggregatedata",
+        "pk": 2,
+        "fields": {
+            "application_round_id": 1,
+            "name": "total_reservation_duration",
+            "value": 70
+        }
+    },
+    {
         "model": "applications.applicationroundbasket",
         "pk": 1,
         "fields": {

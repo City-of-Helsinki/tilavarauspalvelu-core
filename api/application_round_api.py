@@ -91,6 +91,10 @@ class ApplicationRoundSerializer(serializers.ModelSerializer):
 
     is_admin = serializers.SerializerMethodField()
 
+    aggregated_data = serializers.DictField(
+        source="aggregated_data_dict", read_only=True
+    )
+
     class Meta:
         model = ApplicationRound
         fields = [
@@ -110,6 +114,7 @@ class ApplicationRoundSerializer(serializers.ModelSerializer):
             "allocating",
             "criteria",
             "is_admin",
+            "aggregated_data",
         ]
         extra_kwargs = {
             "name": {

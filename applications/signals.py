@@ -74,3 +74,17 @@ def create_aggregate_data_for_application(sender, instance, **kwargs):
     if kwargs.get("created", False):
         if instance.status == ApplicationStatus.IN_REVIEW:
             instance.application.create_aggregate_data()
+
+
+@receiver(
+    post_save,
+    sender=ApplicationRoundStatus,
+    dispatch_uid="create_aggregate_data_for_application_round",
+)
+def create_aggregate_data_for_application_round(sender, instance, **kwargs):
+    if kwargs.get("created", False):
+        if instance.status in (
+            ApplicationRoundStatus.IN_REVIEW,
+            ApplicationRoundStatus.HANDLED,
+        ):
+            instance.application_round.create_aggregate_data()

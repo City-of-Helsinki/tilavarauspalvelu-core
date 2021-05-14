@@ -95,6 +95,7 @@ def get_opening_hours(
 
     resource_prefix = f"{settings.HAUKI_ORIGIN_ID}"
     if isinstance(resource_id, list):
+        resource_id = [str(uuid) for uuid in resource_id]
         resource_id = "%s:%s" % (
             resource_prefix,
             f",{resource_prefix}:".join(resource_id),

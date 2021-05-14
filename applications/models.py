@@ -15,7 +15,10 @@ from rest_framework.exceptions import ValidationError
 from sentry_sdk import capture_message
 
 from applications.base_models import ContactInformation
-from applications.utils.aggregate_data import EventAggregateDataCreator
+from applications.utils.aggregate_data import (
+    ApplicationRoundAggregateDataCreator,
+    EventAggregateDataCreator,
+)
 from reservation_units.models import Purpose, ReservationUnit
 from spaces.models import District
 from tilavarauspalvelu.utils.date_util import (
@@ -47,6 +50,16 @@ def year_not_in_future(year: Optional[int]):
     if current_date.year < year:
         msg = _("is after current year")
         raise ValidationError(format_lazy("{year} {msg}", year=year, msg=msg))
+
+
+class AggregateDataBase(models.Model):
+    class Meta:
+        abstract = True
+
+    name = models.CharField(max_length=255, verbose_name=_("Name"))
+    value = models.FloatField(
+        max_length=255, verbose_name=_("Value"), null=True, default=0
+    )
 
 
 class Address(models.Model):
@@ -285,6 +298,11 @@ class ApplicationRound(models.Model):
 
     criteria = models.TextField(default="")
 
+    def __str__(self):
+        return "{} ({} - {})".format(
+            self.name, self.reservation_period_begin, self.reservation_period_end
+        )
+
     @property
     def status(self):
         return self.get_status().status
@@ -316,10 +334,21 @@ class ApplicationRound(models.Model):
             ] = basket.get_application_events_in_basket()
         return matching_application_events
 
-    def __str__(self):
-        return "{} ({} - {})".format(
-            self.name, self.reservation_period_begin, self.reservation_period_end
-        )
+    def create_aggregate_data(self):
+        ApplicationRoundAggregateDataCreator(self).start()
+
+    @property
+    def aggregated_data_dict(self):
+        ret_dict = {}
+        for row in self.aggregated_data.all():
+            ret_dict[row.name] = row.value
+        return ret_dict
+
+
+class ApplicationRoundAggregateData(AggregateDataBase):
+    application_round = models.ForeignKey(
+        ApplicationRound, on_delete=models.CASCADE, related_name="aggregated_data"
+    )
 
 
 class City(models.Model):
@@ -634,14 +663,12 @@ class Application(models.Model):
         return ret_dict
 
 
-class ApplicationAggregateData(models.Model):
+class ApplicationAggregateData(AggregateDataBase):
     """Model to store aggregated data from application events.
 
     Overall hour counts, application event counts etc.
     """
 
-    name = models.CharField(max_length=255, verbose_name=_("Name"))
-    value = models.FloatField(max_length=255, verbose_name=_("Value"))
     application = models.ForeignKey(
         Application, on_delete=models.CASCADE, related_name="aggregated_data"
     )
@@ -882,14 +909,12 @@ class ApplicationEvent(models.Model):
         return ret_dict
 
 
-class ApplicationEventAggregateData(models.Model):
+class ApplicationEventAggregateData(AggregateDataBase):
     """Model to store aggregated data for single application event.
 
     Overall hour counts etc.
     """
 
-    name = models.CharField(max_length=255, verbose_name=_("Name"))
-    value = models.FloatField(max_length=255, verbose_name=_("Value"), null=True)
     application_event = models.ForeignKey(
         ApplicationEvent, on_delete=models.CASCADE, related_name="aggregated_data"
     )
@@ -1129,9 +1154,7 @@ class ApplicationEventScheduleResult(models.Model):
             logger.info("Schedule result #{} aggregate data created.".format(self.pk))
 
 
-class ApplicationEventScheduleResultAggregateData(models.Model):
-    name = models.CharField(max_length=255, verbose_name=_("Name"))
-    value = models.FloatField(max_length=255, verbose_name=_("Value"))
+class ApplicationEventScheduleResultAggregateData(AggregateDataBase):
     schedule_result = models.ForeignKey(
         ApplicationEventScheduleResult,
         on_delete=models.CASCADE,
