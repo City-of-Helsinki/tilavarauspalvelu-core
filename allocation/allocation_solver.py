@@ -235,12 +235,15 @@ class AllocationSolver(object):
                                 ),
                             )
 
-                            model.Add(min_start <= end <= max_end).OnlyEnforceIf(
+                            model.Add(min_start <= end - duration).OnlyEnforceIf(
                                 performed
                             )
-                            model.Add(min_start <= start <= max_end).OnlyEnforceIf(
+                            model.Add(end <= max_end).OnlyEnforceIf(performed)
+
+                            model.Add(start + duration <= max_end).OnlyEnforceIf(
                                 performed
                             )
+                            model.Add(min_start <= start).OnlyEnforceIf(performed)
 
                             self.starts[occurrence_id] = start
                             self.ends[occurrence_id] = end
