@@ -298,6 +298,11 @@ class ApplicationRound(models.Model):
 
     criteria = models.TextField(default="")
 
+    def __str__(self):
+        return "{} ({} - {})".format(
+            self.name, self.reservation_period_begin, self.reservation_period_end
+        )
+
     @property
     def status(self):
         return self.get_status().status
@@ -329,13 +334,15 @@ class ApplicationRound(models.Model):
             ] = basket.get_application_events_in_basket()
         return matching_application_events
 
-    def __str__(self):
-        return "{} ({} - {})".format(
-            self.name, self.reservation_period_begin, self.reservation_period_end
-        )
-
     def create_aggregate_data(self):
         ApplicationRoundAggregateDataCreator(self).start()
+
+    @property
+    def aggregated_data_dict(self):
+        ret_dict = {}
+        for row in self.aggregated_data.all():
+            ret_dict[row.name] = row.value
+        return ret_dict
 
 
 class ApplicationRoundAggregateData(AggregateDataBase):
