@@ -141,7 +141,7 @@ class AllocationDataBuilder(object):
                         day=date.day,
                         hour=time.start_time.hour,
                         minute=time.start_time.minute,
-                        tzinfo=time.start_time.tzinfo,
+                        tzinfo=timezone.get_default_timezone(),
                     ),
                     end=datetime.datetime(
                         year=date.year,
@@ -149,7 +149,7 @@ class AllocationDataBuilder(object):
                         day=date.day,
                         hour=time.end_time.hour,
                         minute=time.end_time.minute,
-                        tzinfo=time.end_time.tzinfo,
+                        tzinfo=timezone.get_default_timezone(),
                     ),
                 )
         return space
