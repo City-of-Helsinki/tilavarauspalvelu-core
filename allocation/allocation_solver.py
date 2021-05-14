@@ -1,6 +1,6 @@
 import datetime
 import logging
-from typing import Dict
+from typing import Dict, Tuple
 
 from ortools.sat.python import cp_model
 
@@ -9,6 +9,7 @@ from allocation.allocation_models import (
     AllocatedEvent,
     AllocationData,
     AllocationEvent,
+    AllocationOccurrence,
     AllocationSpace,
 )
 
@@ -156,6 +157,27 @@ class AllocationSolver(object):
         )
         return printer.print_solution()
 
+    def determine_minumum_and_maximum_times(
+        self, occurrence: AllocationOccurrence, space: AllocationSpace, duration: int
+    ) -> Tuple[int, int]:
+        min_start = 0
+        max_end = 0
+        if occurrence.first_date in space.available_times:
+            space_time = space.available_times[occurrence.first_date]
+            min_start = (
+                occurrence.begin
+                if occurrence.begin >= space_time.start
+                else space_time.start
+            )
+
+            max_end = (
+                occurrence.end if occurrence.end <= space_time.end else space_time.end
+            )
+        if min_start + duration > max_end:
+            min_start = 0
+            max_end = 0
+        return min_start, max_end
+
     def constraint_by_event_time_limits(self, model: cp_model.CpModel, selected: Dict):
 
         for space_id, space in self.spaces.items():
@@ -173,8 +195,7 @@ class AllocationSolver(object):
                             occurrence_id,
                         ) in selected:
                             duration = allocation_event.min_duration
-                            min_start = 0
-                            max_end = 0
+
                             performed = selected[
                                 (
                                     space_id,
@@ -183,26 +204,18 @@ class AllocationSolver(object):
                                     occurrence_id,
                                 )
                             ]
-                            if occurrence.first_date in space.available_times:
-                                space_time = space.available_times[
-                                    occurrence.first_date
-                                ]
-                                min_start = (
-                                    occurrence.begin
-                                    if occurrence.begin >= space_time.start
-                                    else space_time.start
-                                )
 
-                                max_end = (
-                                    occurrence.end
-                                    if occurrence.end <= space_time.end
-                                    else space_time.end
-                                )
-
+                            (
+                                min_start,
+                                max_end,
+                            ) = self.determine_minumum_and_maximum_times(
+                                occurrence=occurrence, space=space, duration=duration
+                            )
                             name_suffix = "_%i_on_space_id%i" % (
                                 occurrence_id,
                                 space_id,
                             )
+
                             start = model.NewIntVar(
                                 min_start, max_end, "s" + name_suffix
                             )
@@ -213,7 +226,20 @@ class AllocationSolver(object):
                                 duration,
                                 end,
                                 performed,
-                                "interval_%i_on_s%i" % (occurrence_id, space_id),
+                                "space_%i_basket_b%s_event%i_occurrence%i"
+                                % (
+                                    space_id,
+                                    basket.id,
+                                    allocation_event.id,
+                                    occurrence_id,
+                                ),
+                            )
+
+                            model.Add(min_start <= end <= max_end).OnlyEnforceIf(
+                                performed
+                            )
+                            model.Add(min_start <= start <= max_end).OnlyEnforceIf(
+                                performed
                             )
 
                             self.starts[occurrence_id] = start

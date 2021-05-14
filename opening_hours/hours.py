@@ -124,6 +124,16 @@ def get_opening_hours(
                 "times": [],
             }
             for time_data_in in opening_hours["times"]:
-                day_data_out["times"].append(TimeElement(**time_data_in))
+                day_data_out["times"].append(
+                    TimeElement(
+                        start_time=datetime.time.fromisoformat(
+                            time_data_in.pop("start_time")
+                        ),
+                        end_time=datetime.time.fromisoformat(
+                            time_data_in.pop("end_time")
+                        ),
+                        **time_data_in,
+                    )
+                )
             days_data_out.append(day_data_out)
     return days_data_out
