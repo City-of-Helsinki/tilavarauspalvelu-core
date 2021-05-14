@@ -875,7 +875,7 @@ class ApplicationEvent(models.Model):
             )
 
         total_reservations = sum(total_amount_of_events)
-        total_events_duration = sum(total_events_duration) / 3600.0
+        total_events_duration = sum(total_events_duration)
 
         try:
             name = "allocation_results_duration_total"
@@ -1129,7 +1129,7 @@ class ApplicationEventScheduleResult(models.Model):
         total_amount_of_events = len(self.get_result_occurrences().occurrences)
         total_events_duration = (
             total_amount_of_events * self.allocated_duration
-        ).total_seconds() / 3600.0
+        ).total_seconds()
 
         try:
             name = "duration_total"

@@ -66,7 +66,7 @@ class ApplicationEventScheduleResultAggregateDataTestCase(
         duration = ApplicationEventScheduleResultAggregateData.objects.get(
             name="duration_total"
         )
-        assert_that(16).is_equal_to(duration.value)
+        assert_that(16 * 3600).is_equal_to(duration.value)
 
     def test_reservations_total(self):
         self.schedule_result.create_aggregate_data()
@@ -110,7 +110,7 @@ class ApplicationEventAggregateDataForScheduleResultsTestCase(
         duration = ApplicationEventAggregateData.objects.get(
             name="allocation_results_duration_total"
         )
-        assert_that(16).is_equal_to(duration.value)
+        assert_that(16 * 3600).is_equal_to(duration.value)
 
     def test_duration_total_sums_amounts_of_schedule_results(
         self,
@@ -134,7 +134,7 @@ class ApplicationEventAggregateDataForScheduleResultsTestCase(
         duration = ApplicationEventAggregateData.objects.get(
             name="allocation_results_duration_total"
         )
-        assert_that(34).is_equal_to(duration.value)
+        assert_that(34 * 3600).is_equal_to(duration.value)
 
     def test_reservations_total_when_one_schedule_result(self):
         self.application_event.create_schedule_result_aggregated_data()
@@ -215,4 +215,4 @@ class ApplicationEventAggregateDataForScheduleResultsTestCase(
         res_tot = ApplicationEventAggregateData.objects.get(
             name="allocation_results_duration_total"
         )
-        assert_that(res_tot.value).is_equal_to(16)
+        assert_that(res_tot.value).is_equal_to(16 * 3600)
