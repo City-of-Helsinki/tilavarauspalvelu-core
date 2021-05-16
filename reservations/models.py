@@ -51,18 +51,18 @@ class RecurringReservation(models.Model):
         Application,
         verbose_name=_("Application"),
         related_name="recurring_reservation",
-        null=True,
+        null=False,
         blank=True,
-        on_delete=models.SET_NULL,
+        on_delete=models.PROTECT,
     )
 
     application_event = models.ForeignKey(
         ApplicationEvent,
         verbose_name=_("Application event"),
         related_name="recurring_reservation",
-        null=True,
+        null=False,
         blank=True,
-        on_delete=models.SET_NULL,
+        on_delete=models.PROTECT,
     )
 
     age_group = models.ForeignKey(
@@ -165,7 +165,7 @@ class Reservation(models.Model):
         RecurringReservation,
         verbose_name=_("Recurring reservation"),
         related_name="reservations",
-        on_delete=models.SET_NULL,
+        on_delete=models.PROTECT,
         null=True,
         blank=True,
     )
