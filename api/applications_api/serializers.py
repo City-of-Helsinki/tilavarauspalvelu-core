@@ -459,6 +459,9 @@ class ApplicationSerializer(serializers.ModelSerializer):
 
     applicant_type = serializers.CharField(allow_null=True)
 
+    applicant_id = serializers.PrimaryKeyRelatedField(source="user", read_only=True)
+    applicant_name = serializers.CharField(source="user.get_full_name", read_only=True)
+
     home_city_id = serializers.PrimaryKeyRelatedField(
         queryset=City.objects.all(), source="home_city", required=False, allow_null=True
     )
@@ -471,6 +474,8 @@ class ApplicationSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "applicant_type",
+            "applicant_id",
+            "applicant_name",
             "organisation",
             "application_round_id",
             "contact_person",
@@ -688,7 +693,7 @@ class ApplicationEventStatusSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         request = self.context.get("request")
         instance = ApplicationEventStatus(**validated_data)
-        if request:
+        if request and request.user.is_authenticated:
             instance.user = request.user
 
         if (

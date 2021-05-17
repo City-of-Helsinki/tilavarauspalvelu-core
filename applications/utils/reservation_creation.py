@@ -2,6 +2,7 @@ import datetime
 import logging
 
 from django.db import Error
+from django.utils.timezone import get_default_timezone
 
 from opening_hours.hours import get_opening_hours
 from reservations.models import (
@@ -16,7 +17,12 @@ logger = logging.getLogger(__name__)
 
 
 def create_reservations_from_allocation_results(application_event):
-    for schedule in application_event.application_event_schedules.all():
+    scheduled_schedules = [
+        schedule
+        for schedule in application_event.application_event_schedules.all()
+        if hasattr(schedule, "application_event_schedule_result")
+    ]
+    for schedule in scheduled_schedules:
         create_reservation_from_schedule_result(
             schedule.application_event_schedule_result, application_event
         )
@@ -40,12 +46,12 @@ def create_reservation_from_schedule_result(result, application_event):
         res_start = datetime.datetime.combine(
             reservation_date,
             result.allocated_begin,
-            tzinfo=result.allocated_begin.tzinfo,
+            tzinfo=get_default_timezone(),
         )
         res_end = datetime.datetime.combine(
             reservation_date,
             result.allocated_end,
-            tzinfo=result.allocated_end.tzinfo,
+            tzinfo=get_default_timezone(),
         )
         is_overlapping = result.allocated_reservation_unit.check_reservation_overlap(
             res_start, res_end
@@ -114,7 +120,7 @@ class ReservationScheduler:
                     and opening_hour_date in self.dates
                 ):
                     if not time.end_time == datetime.time(
-                        23, 59, tzinfo=time.end_time.tzinfo
+                        23, 59, tzinfo=get_default_timezone()
                     ):
                         return self._get_datetimes_for_the_day(self.begin.date(), time)
                     for date in self.dates[1:]:
@@ -126,10 +132,10 @@ class ReservationScheduler:
 
     def _get_datetimes_for_the_day(self, date, time):
         start_dt = datetime.datetime.combine(
-            date, time.start_time, tzinfo=time.start_time.tzinfo
+            date, time.start_time, tzinfo=get_default_timezone()
         )
         end_dt = datetime.datetime.combine(
-            date, time.end_time, tzinfo=time.end_time.tzinfo
+            date, time.end_time, tzinfo=get_default_timezone()
         )
 
         starts_in_opening_hours = start_dt <= self.begin
