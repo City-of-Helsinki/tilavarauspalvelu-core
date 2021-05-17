@@ -157,3 +157,57 @@ def test_should_exclude_events_not_matching_application_round(
     events_by_baskets = default_application_round.get_application_events_by_basket()
 
     assert events_by_baskets == {application_round_basket_one.id: []}
+
+
+@pytest.mark.django_db
+def test_should_filter_to_baskets_by_home_city(
+    default_application_round,
+    application_round_basket_one,
+    recurring_application_event,
+    city_of_helsinki,
+):
+    application_round_basket_one.home_city = city_of_helsinki
+    application_round_basket_one.save()
+    recurring_application_event.application.home_city = city_of_helsinki
+    recurring_application_event.application.save()
+
+    events_by_baskets = default_application_round.get_application_events_by_basket()
+
+    assert events_by_baskets == {
+        application_round_basket_one.id: [recurring_application_event]
+    }
+
+
+@pytest.mark.django_db
+def test_should_exclude_if_city_does_not_match(
+    default_application_round,
+    application_round_basket_one,
+    recurring_application_event,
+    city_of_helsinki,
+    city_of_tampere,
+):
+    application_round_basket_one.home_city = city_of_helsinki
+    application_round_basket_one.save()
+    recurring_application_event.application.home_city = city_of_tampere
+    recurring_application_event.application.save()
+
+    events_by_baskets = default_application_round.get_application_events_by_basket()
+
+    assert events_by_baskets == {application_round_basket_one.id: []}
+
+
+@pytest.mark.django_db
+def test_should_include_if_basket_has_no_home_city(
+    default_application_round,
+    application_round_basket_one,
+    recurring_application_event,
+    city_of_helsinki,
+):
+    recurring_application_event.application.home_city = city_of_helsinki
+    recurring_application_event.application.save()
+
+    events_by_baskets = default_application_round.get_application_events_by_basket()
+
+    assert events_by_baskets == {
+        application_round_basket_one.id: [recurring_application_event]
+    }
