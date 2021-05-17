@@ -1,9 +1,12 @@
+from dateutil.parser import parse
 from django.conf import settings
 from django.db.models import Sum
 from django_filters import rest_framework as filters
 from easy_thumbnails.files import get_thumbnailer
 from rest_framework import filters as drf_filters
 from rest_framework import mixins, permissions, serializers, viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
 from api.base import HierarchyModelMultipleChoiceFilter, TranslatedModelSerializer
 from api.common_filters import NumberInFilter
@@ -11,6 +14,8 @@ from api.resources_api import ResourceSerializer
 from api.services_api import ServiceSerializer
 from api.space_api import BuildingSerializer, LocationSerializer, SpaceSerializer
 from applications.models import ApplicationRound
+from opening_hours.hours import HaukiRequestError
+from opening_hours.utils import get_resources_total_hours_per_resource
 from permissions.api_permissions import (
     EquipmentCategoryPermission,
     EquipmentPermission,
@@ -26,6 +31,7 @@ from reservation_units.models import (
     ReservationUnitImage,
     ReservationUnitType,
 )
+from reservations.models import Reservation
 from spaces.models import District, Unit
 
 
@@ -217,6 +223,68 @@ class ReservationUnitViewSet(viewsets.ModelViewSet):
             .prefetch_related("spaces", "resources", "services")
         )
         return qs
+
+    @action(detail=False, methods=["get"])
+    def capacity(self, request, pk=None):
+        reservation_units = request.query_params.get("reservation_unit")
+        period_start = self.request.query_params.get("period_start")
+        period_end = self.request.query_params.get("period_end")
+
+        if not (period_start and period_end):
+            raise serializers.ValidationError(
+                "Parameters period_start and period_end are required."
+            )
+        try:
+            period_start = parse(period_start).date()
+            period_end = parse(period_end).date()
+        except (ValueError, OverflowError):
+            raise serializers.ValidationError("Wrong date format. Use YYYY-MM-dd")
+
+        if not reservation_units:
+            raise serializers.ValidationError("reservation_unit parameter is required.")
+
+        try:
+            reservation_units = [
+                int(res_unit) for res_unit in reservation_units.split(",")
+            ]
+        except ValueError:
+            raise serializers.ValidationError(
+                "Given reservation unit id is not an integer"
+            )
+
+        try:
+            total_opening_hours = get_resources_total_hours_per_resource(
+                reservation_units, period_start, period_end
+            )
+        except HaukiRequestError:
+            total_opening_hours = {
+                res_unit: "Got an error while making request to HAUKI"
+                for res_unit in reservation_units
+            }
+
+        result_data = []
+        for res_unit in reservation_units:
+            total_duration = (
+                Reservation.objects.going_to_occur()
+                .filter(reservation_unit=res_unit)
+                .within_period(period_start=period_start, period_end=period_end)
+                .total_duration()
+            ).get("total_duration")
+
+            total_duration = (
+                total_duration.total_seconds() / 3600 if total_duration else 0
+            )
+
+            result_data.append(
+                {
+                    "id": res_unit,
+                    "hour_capacity": total_opening_hours.get(res_unit),
+                    "reservation_duration_total": total_duration,
+                    "period_start": period_start,
+                    "period_end": period_end,
+                }
+            )
+        return Response(result_data)
 
 
 class PurposeViewSet(
