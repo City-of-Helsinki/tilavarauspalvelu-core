@@ -94,6 +94,19 @@ class ApplicationRoundAggregateDataTestCase(TestCase):
         ApplicationRoundAggregateDataCreator(self.application_round).run()
         assert_that(ApplicationRoundAggregateData.objects.count()).is_equal_to(2)
 
+    def test_only_reservations_total_duration_created_when_reservations_only(
+        self, mock
+    ):
+        assert_that(ApplicationRoundAggregateData.objects.count()).is_zero()
+        ApplicationRoundAggregateDataCreator(
+            self.application_round, reservations_only=True
+        ).run()
+        assert_that(ApplicationRoundAggregateData.objects.count()).is_equal_to(1)
+        res_tot = ApplicationRoundAggregateData.objects.filter(
+            name="total_reservation_duration"
+        ).first()
+        assert_that(res_tot).is_not_none()
+
     def test_total_amount_of_hours_within_round_when_one_opening_time(self, mock):
         ApplicationRoundAggregateDataCreator(self.application_round).run()
         assert_that(

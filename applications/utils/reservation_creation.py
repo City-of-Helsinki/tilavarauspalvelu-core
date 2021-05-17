@@ -4,6 +4,7 @@ import logging
 from django.db import Error
 from django.utils.timezone import get_default_timezone
 
+from applications.utils.aggregate_data import ApplicationRoundAggregateDataCreator
 from opening_hours.hours import get_opening_hours
 from reservations.models import (
     STATE_CHOICES,
@@ -26,6 +27,9 @@ def create_reservations_from_allocation_results(application_event):
         create_reservation_from_schedule_result(
             schedule.application_event_schedule_result, application_event
         )
+    ApplicationRoundAggregateDataCreator(
+        application_event.application.application_round, reservations_only=True
+    )
 
 
 def create_reservation_from_schedule_result(result, application_event):

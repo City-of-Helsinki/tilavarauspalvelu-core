@@ -84,6 +84,7 @@ def create_aggregate_data_for_application(sender, instance, **kwargs):
 def create_aggregate_data_for_application_round(sender, instance, **kwargs):
     if kwargs.get("created", False):
         if instance.status in (
+            ApplicationRoundStatus.DRAFT,
             ApplicationRoundStatus.IN_REVIEW,
             ApplicationRoundStatus.HANDLED,
         ):
