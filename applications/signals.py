@@ -82,6 +82,8 @@ def create_aggregate_data_for_application(sender, instance, **kwargs):
     dispatch_uid="create_aggregate_data_for_application_round",
 )
 def create_aggregate_data_for_application_round(sender, instance, **kwargs):
+    if kwargs.get("raw", False):
+        return
     if kwargs.get("created", False):
         if instance.status in (
             ApplicationRoundStatus.DRAFT,

@@ -82,12 +82,11 @@ class ApplicationRoundAggregateDataCreator(Thread):
             .within_application_round_period(self.app_round)
             .total_duration()
         )
-
+        total_duration = total_duration_qs.get("total_duration")
         data = {
-            "total_reservation_duration": total_duration_qs.get(
-                "total_duration"
-            ).total_seconds()
-            / 3600.0,
+            "total_reservation_duration": total_duration.total_seconds() / 3600.0
+            if total_duration is not None
+            else 0,
         }
 
         self._update_or_create_aggregate_data_values(data)

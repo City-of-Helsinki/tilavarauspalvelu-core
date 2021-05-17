@@ -219,7 +219,7 @@ def application_round_basket_one(
         name="Basket with order number one",
         application_round=default_application_round,
         order_number=1,
-        customer_type=[ApplicationRoundBasket.CUSTOMER_TYPE_NONPROFIT],
+        customer_type=[],
     )
     basket.purposes.set([purpose])
     return basket
