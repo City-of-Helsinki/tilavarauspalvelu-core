@@ -14,6 +14,7 @@ import { getApplicationRound, getApplications } from "../../common/api";
 import {
   Application as ApplicationType,
   ApplicationRound as ApplicationRoundType,
+  ApplicationRoundStatus,
   DataFilterConfig,
 } from "../../common/types";
 import Loader from "../Loader";
@@ -48,7 +49,8 @@ const ApplicationCount = styled(H3)`
 `;
 
 const getFilterConfig = (
-  applications: ApplicationType[]
+  applications: ApplicationType[],
+  applicationRound: ApplicationRoundType
 ): DataFilterConfig[] => {
   const applicantTypes = uniq(applications.map((app) => app.applicantType));
   const statuses = uniq(applications.map((app) => app.status));
@@ -69,7 +71,7 @@ const getFilterConfig = (
       filters: statuses.map((status) => {
         const normalizedStatus = getNormalizedApplicationStatus(
           status,
-          "review"
+          applicationRound.status
         );
         return {
           title: `Application.statuses.${normalizedStatus}`,
@@ -81,21 +83,34 @@ const getFilterConfig = (
   ];
 };
 
-const getCellConfig = (t: TFunction): CellConfig => {
+const getCellConfig = (
+  applicationRound: ApplicationRoundType,
+  t: TFunction
+): CellConfig => {
+  let statusTitle: string;
+  let applicationStatusView: ApplicationRoundStatus;
+  switch (applicationRound.status) {
+    case "approved":
+      statusTitle = "Application.headings.resolutionStatus";
+      applicationStatusView = "approved";
+      break;
+    default:
+      statusTitle = "Application.headings.reviewStatus";
+      applicationStatusView = "in_review";
+  }
+
   return {
     cols: [
       {
         title: "Application.headings.customer",
         key: "organisation.name",
         transform: ({
+          applicantName,
           applicantType,
-          contactPerson,
           organisation,
         }: ApplicationType) =>
           applicantType === "individual"
-            ? `${contactPerson?.firstName || ""} ${
-                contactPerson?.lastName || ""
-              }`.trim()
+            ? applicantName || ""
             : organisation?.name || "",
       },
       {
@@ -120,12 +135,12 @@ const getCellConfig = (t: TFunction): CellConfig => {
         ),
       },
       {
-        title: "Application.headings.reviewStatus",
+        title: statusTitle,
         key: "status",
         transform: ({ status }: ApplicationType) => {
           const normalizedStatus = getNormalizedApplicationStatus(
             status,
-            "review"
+            applicationStatusView
           );
           return (
             <StatusCell
@@ -185,17 +200,17 @@ function Applications(): JSX.Element {
   }, [applicationRoundId]);
 
   useEffect(() => {
-    const fetchApplications = async (id: number) => {
+    const fetchApplications = async (ar: ApplicationRoundType) => {
       setErrorMsg(null);
       setIsLoading(true);
 
       try {
         const result = await getApplications({
-          applicationRound: id,
+          applicationRound: ar.id,
           status: "in_review,review_done,declined",
         });
-        setCellConfig(getCellConfig(t));
-        setFilterConfig(getFilterConfig(result));
+        setCellConfig(getCellConfig(ar, t));
+        setFilterConfig(getFilterConfig(result, ar));
         setApplications(result);
         setIsLoading(false);
       } catch (error) {
@@ -206,7 +221,7 @@ function Applications(): JSX.Element {
     };
 
     if (applicationRound) {
-      fetchApplications(applicationRound.id);
+      fetchApplications(applicationRound);
     }
   }, [applicationRound, t]);
 

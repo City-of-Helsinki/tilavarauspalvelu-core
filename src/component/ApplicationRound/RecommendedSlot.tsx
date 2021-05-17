@@ -14,7 +14,7 @@ interface IProps {
   id: number | null;
   start: string | null;
   end: string | null;
-  weekday: string | null;
+  weekday: number | null;
   biweekly: boolean;
   timeStart: string | null;
   timeEnd: string | null;
@@ -115,11 +115,12 @@ function RecommendedSlot({
         <Label type="date">{formatDate(end)}</Label>
         <Col />
         <Col>
-          {weekday && (
-            <Day>
-              {t(`calendar.${weekdays[Number(weekday)]}`).substring(0, 2)}
-            </Day>
-          )}
+          {weekday === 0 ||
+            (weekday && (
+              <Day>
+                {t(`calendar.${weekdays[Number(weekday)]}`).substring(0, 2)}
+              </Day>
+            ))}
           <span>{t(`common.${biweekly ? "biweekly" : "weekly"}`)}</span>
         </Col>
       </Row>

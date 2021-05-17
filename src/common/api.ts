@@ -242,7 +242,8 @@ export function getAllocationStatus(id: number): Promise<AllocationRequest> {
 interface AllocationResultsParams {
   applicant?: number;
   applicationRoundId: number;
-  serviceSectorId: number;
+  serviceSectorId?: number;
+  applicationEvent?: string;
   reservationUnit?: number;
 }
 

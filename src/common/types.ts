@@ -20,9 +20,15 @@ export type NormalizedApplicationRoundStatus =
 
 export type ApplicationRoundBasket = any; // eslint-disable-line
 
+export type ApplicationRoundAggregatedData = {
+  totalHourCapacity: number;
+  totalReservationDuration: number;
+};
+
 export type ApplicationRound = {
   id: number;
   name: TranslationObject;
+  aggregatedData: ApplicationRoundAggregatedData;
   reservationUnitIds: number[];
   applicationPeriodBegin: string;
   applicationPeriodEnd: string;
@@ -113,11 +119,14 @@ export type ApplicationStatus =
   | "in_review"
   | "review_done"
   | "declined"
-  | "cancelled";
+  | "cancelled"
+  | "approved"
+  | "resolution_sent";
 
 export type AggregatedData = {
   reservationsTotal?: number;
   minDurationTotal?: number;
+  durationTotal?: number;
 };
 
 export type ApplicantType =
@@ -131,6 +140,8 @@ export type Application = {
   status: ApplicationStatus;
   applicationRoundId: number;
   applicantType: ApplicantType | null;
+  applicantId: number | null;
+  applicantName: string | null;
   homeCityId: number | null;
   organisation: Organisation | null;
   contactPerson: ContactPerson | null;
@@ -167,6 +178,13 @@ export type Address = {
   city: string | null;
 };
 
+export type ApplicationEventAggregatedData = {
+  durationTotal: number;
+  reservationsTotal: number;
+  allocationResultsDurationTotal: number;
+  allocationResultsReservationsTotal: number;
+};
+
 export type ApplicationEvent = {
   id: number;
   name: string | null;
@@ -187,6 +205,7 @@ export type ApplicationEvent = {
   applicationEventSchedules: ApplicationEventSchedule[];
   status: ApplicationEventStatus;
   declinedReservationUnitIds: number[];
+  aggregatedData: ApplicationEventAggregatedData;
 };
 
 export type ApplicationEventStatus =
@@ -248,6 +267,8 @@ export interface DataGroup {
 }
 
 export interface AllocationResult {
+  id: number;
+  aggregatedData: AggregatedData;
   applicationEvent: ApplicationEvent;
   applicationId: number | null;
   applicantName: string | null;
@@ -260,7 +281,7 @@ export interface AllocationResult {
   allocatedReservationUnitName: string | null;
   applicationEventScheduleId: number | null;
   allocatedDuration: string | null;
-  allocatedDay: string | null;
+  allocatedDay: number | null;
   allocatedBegin: string | null;
   allocatedEnd: string | null;
   applicationAggregatedData: AggregatedData;

@@ -273,6 +273,7 @@ function RecommendationsByApplicant(): JSX.Element {
       setFilterConfig(getFilterConfig(processedResult));
       setCellConfig(getCellConfig(t, ar));
       setRecommendations(processedResult || []);
+      if (result.length < 1) setIsLoading(false);
     } catch (error) {
       setErrorMsg("errors.errorFetchingApplications");
       setIsLoading(false);
@@ -383,11 +384,14 @@ function RecommendationsByApplicant(): JSX.Element {
             cellConfig={cellConfig}
             filterConfig={filterConfig}
             areAllRowsDisabled={recommendations.every(
-              (row) => row.applicationEvent.status === "ignored" || row.accepted
+              (row) =>
+                row.applicationEvent.status === "ignored" ||
+                row.accepted ||
+                row.declined
             )}
             isRowDisabled={(row: AllocationResult) => {
               return (
-                ["ignored"].includes(row.applicationEvent.status) ||
+                ["ignored", "declined"].includes(row.applicationEvent.status) ||
                 row.accepted
               );
             }}

@@ -14,7 +14,7 @@ import {
 import { ApplicationRound as ApplicationRoundType } from "../../common/types";
 import { getApplicationRounds } from "../../common/api";
 import Loader from "../Loader";
-import { NotificationBox } from "../../styles/util";
+import { BasicLink, NotificationBox } from "../../styles/util";
 import Heading from "./Heading";
 import Accordion from "../Accordion";
 
@@ -79,6 +79,9 @@ function ApplicationRoundApprovals(): JSX.Element {
     isApplicationRoundCancelled,
     setIsApplicationRoundCancelled,
   ] = useState<boolean>(false);
+  const [approvedApplicationRoundId, setApprovedApplicationRoundId] = useState<
+    number | null
+  >(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const { t } = useTranslation();
@@ -107,6 +110,8 @@ function ApplicationRoundApprovals(): JSX.Element {
 
   useEffect(() => {
     const attrs = queryString.parse(window.location.search);
+    if (attrs.applicationRoundId)
+      setApprovedApplicationRoundId(Number(attrs.applicationRoundId));
     if (attrs.approved === null) setIsApplicationRoundApproved(true);
     if (attrs.cancelled === null) setIsApplicationRoundCancelled(true);
   }, []);
@@ -154,7 +159,14 @@ function ApplicationRoundApprovals(): JSX.Element {
                       <IconCheckCircle size="m" />{" "}
                       {t("ApplicationRound.approvedNotificationHeader")}
                     </H3>
-                    <p>{t("ApplicationRound.approvedNotificationBody")}</p>
+                    <p>
+                      <BasicLink
+                        to={`/applicationRound/${approvedApplicationRoundId}/applications`}
+                        style={{ textDecoration: "underline" }}
+                      >
+                        {t("ApplicationRound.notificationResolutionDoneBody")}
+                      </BasicLink>
+                    </p>
                   </StyledNotification>
                 )}
                 {isApplicationRoundCancelled && (

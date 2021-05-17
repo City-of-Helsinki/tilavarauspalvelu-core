@@ -190,14 +190,12 @@ const getCellConfig = (
         title: "Application.headings.applicantName",
         key: "organisation.name",
         transform: ({
+          applicantName,
           applicantType,
-          contactPerson,
           organisation,
         }: ApplicationType) =>
           applicantType === "individual"
-            ? `${contactPerson?.firstName || ""} ${
-                contactPerson?.lastName || ""
-              }`.trim()
+            ? applicantName || ""
             : organisation?.name || "",
       },
       {
@@ -231,10 +229,23 @@ const getCellConfig = (
 
   const allocatedCellConfig = {
     cols: [
-      { title: "Application.headings.applicantName", key: "organisationName" },
+      {
+        title: "Application.headings.applicantName",
+        key: "organisationName",
+        transform: ({
+          applicantType,
+          applicantName,
+          organisationName,
+        }: AllocationResult) =>
+          applicantName && applicantType === "individual"
+            ? applicantName || ""
+            : organisationName || "",
+      },
       {
         title: "Application.headings.applicantType",
         key: "applicantType",
+        transform: ({ applicantType }: AllocationResult) =>
+          t(`Application.applicantTypes.${applicantType}`),
       },
       {
         title: "Recommendation.headings.resolution",
@@ -683,7 +694,7 @@ function SupervisorApproval({ applicationRoundId }: IProps): JSX.Element {
                     onClick={() => {
                       setApplicationRoundStatus(
                         "approved",
-                        `/applicationRounds/approvals?approved`
+                        `/applicationRounds/approvals?approved&applicationRoundId=${applicationRoundId}`
                       );
                     }}
                   >

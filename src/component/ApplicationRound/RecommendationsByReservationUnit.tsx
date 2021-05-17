@@ -42,7 +42,7 @@ import {
   modifyAllocationResults,
 } from "../../common/util";
 import StatusCell from "../StatusCell";
-import StatusCircle from "../StatusCircle";
+// import StatusCircle from "../StatusCircle";
 import RecommendationCount from "./RecommendationCount";
 import i18n from "../../i18n";
 import SelectionActionBar from "../SelectionActionBar";
@@ -135,13 +135,24 @@ const getCellConfig = (
       {
         title: "Application.headings.applicantName",
         key: "organisationName",
-        transform: ({ organisationName, applicantId }: AllocationResult) => (
-          <InlineRowLink
-            to={`/applicationRound/${applicationRound.id}/applicant/${applicantId}`}
-          >
-            {organisationName}
-          </InlineRowLink>
-        ),
+        transform: ({
+          applicantType,
+          applicantName,
+          organisationName,
+          applicantId,
+        }: AllocationResult) => {
+          const title =
+            applicantType === "individual" ? applicantName : organisationName;
+          return applicantId ? (
+            <InlineRowLink
+              to={`/applicationRound/${applicationRound.id}/applicant/${applicantId}`}
+            >
+              {title}
+            </InlineRowLink>
+          ) : (
+            title || ""
+          );
+        },
       },
       {
         title: "ApplicationRound.basket",
@@ -421,13 +432,13 @@ function RecommendationsByReservationUnit(): JSX.Element {
                 <TitleContainer>
                   <H1 as="h2">{applicationRound?.name}</H1>
                   <StatusContainer>
-                    <StatusCircle status={0} />
+                    {/* <StatusCircle status={0} />
                     <div>
                       <H3>{t("ApplicationRound.amountReservedOfSpace")}</H3>
                       <div>
                         {t("ApplicationRound.amountReservedOfSpaceSubtext")}
                       </div>
-                    </div>
+                    </div> */}
                   </StatusContainer>
                 </TitleContainer>
                 <RecommendationCount
@@ -449,12 +460,15 @@ function RecommendationsByReservationUnit(): JSX.Element {
               filterConfig={filterConfig}
               areAllRowsDisabled={recommendations.every(
                 (row) =>
-                  row.applicationEvent.status === "ignored" || row.accepted
+                  row.applicationEvent.status === "ignored" ||
+                  row.accepted ||
+                  row.declined
               )}
               isRowDisabled={(row: AllocationResult) => {
                 return (
-                  ["ignored"].includes(row.applicationEvent.status) ||
-                  row.accepted
+                  ["ignored", "declined"].includes(
+                    row.applicationEvent.status
+                  ) || row.accepted
                 );
               }}
             />

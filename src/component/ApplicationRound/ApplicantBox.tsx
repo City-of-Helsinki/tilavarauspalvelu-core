@@ -71,12 +71,9 @@ function ApplicantBox({ application }: IProps): JSX.Element {
     case "individual":
       details = (
         <>
-          <Heading>{contactPerson}</Heading>
+          <Heading>{application.applicantName}</Heading>
           {t("Application.applicantType")}:{" "}
           {t(`Application.applicantTypes.${application.applicantType}`)}
-          <P>
-            {t("Application.contactPerson")}: {contactPerson}
-          </P>
         </>
       );
       break;

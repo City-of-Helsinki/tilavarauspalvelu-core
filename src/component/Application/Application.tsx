@@ -2,26 +2,47 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
-import { Button, Notification, IconFaceSmile } from "hds-react";
 import {
+  Button,
+  Notification,
+  IconFaceSmile,
+  IconDownload,
+  IconCalendar,
+  IconArrowRight,
+} from "hds-react";
+import sortBy from "lodash/sortBy";
+import trim from "lodash/trim";
+import {
+  getAllocationResults,
   getApplication,
   getApplicationRound,
   saveApplication,
 } from "../../common/api";
 import Loader from "../Loader";
 import {
+  AllocationResult,
   Application as ApplicationType,
   ApplicationRound as ApplicationRoundType,
   ApplicationStatus,
 } from "../../common/types";
-import { ContentContainer, NarrowContainer } from "../../styles/layout";
-import { BasicLink, breakpoints } from "../../styles/util";
+import {
+  ContentContainer,
+  NarrowContainer,
+  WideContainer,
+} from "../../styles/layout";
+import { BasicLink, breakpoints, Strong } from "../../styles/util";
 import { ContentHeading, H2, H3 } from "../../styles/typography";
 import withMainMenu from "../withMainMenu";
 import LinkPrev from "../LinkPrev";
 import { ReactComponent as IconCustomers } from "../../images/icon_customers.svg";
-import { formatNumber, parseDuration } from "../../common/util";
+import {
+  formatNumber,
+  getNormalizedApplicationStatus,
+  parseDuration,
+} from "../../common/util";
 import ApplicationStatusBlock from "./ApplicationStatusBlock";
+import Accordion from "../Accordion";
+import RecommendedSlot from "../ApplicationRound/RecommendedSlot";
 
 interface IRouteParams {
   applicationId: string;
@@ -30,6 +51,16 @@ interface IRouteParams {
 const Wrapper = styled.div`
   width: 100%;
   padding-bottom: var(--spacing-5-xl);
+`;
+
+const TopLinkContainer = styled.div`
+  display: grid;
+  grid-template-columns: 1fr;
+
+  @media (min-width: ${breakpoints.l}) {
+    display: flex;
+    justify-content: space-between;
+  }
 `;
 
 const StyledLink = styled(BasicLink)`
@@ -77,7 +108,7 @@ const ApplicantType = styled.dl`
 
   dd {
     display: inline-block;
-    margin: 0 0 0 1em;
+    margin: 0 0 0 var(--spacing-3-xs);
   }
 `;
 
@@ -127,7 +158,6 @@ const GridCol = styled.div`
   }
 
   @media (min-width: ${breakpoints.l}) {
-    border-bottom: 1px solid var(--color-black-90);
     padding-right: 20%;
 
     h3 {
@@ -141,17 +171,18 @@ const GridCol = styled.div`
 `;
 
 const DataGrid = styled.div`
-  &:last-of-type {
-    ${GridCol} {
-      border-bottom: 0;
-    }
+  display: grid;
+  border-top: 1px solid var(--color-silver);
+  padding-top: var(--spacing-xl);
+  margin-bottom: var(--spacing-layout-xl);
 
-    border-bottom: 0;
+  th {
+    padding-right: var(--spacing-l);
   }
 
-  display: grid;
-  border-bottom: 1px solid var(--color-black-90);
-  margin-bottom: var(--spacing-2-xl);
+  &:last-of-type {
+    margin-bottom: var(--spacing-layout-s);
+  }
 
   @media (min-width: ${breakpoints.l}) {
     grid-template-columns: 1fr 1fr;
@@ -159,9 +190,78 @@ const DataGrid = styled.div`
   }
 `;
 
+const ResolutionContainer = styled.div`
+  font-size: var(--fontsize-body-s);
+
+  p {
+    margin-bottom: var(--spacing-m);
+  }
+`;
+
+const DownloadResolutionBtn = styled(Button).attrs({
+  style: {
+    "--color-bus": "var(--color-black)",
+  } as React.CSSProperties,
+  variant: "secondary",
+  iconLeft: <IconDownload />,
+})`
+  font-size: var(--fontsize-body-s);
+  text-align: left;
+  align-items: flex-start;
+  margin-top: var(--spacing-xl);
+  padding-right: var(--spacing-2-xl);
+
+  svg {
+    margin-top: var(--spacing-3-xs);
+  }
+
+  div {
+    margin-top: var(--spacing-2-xs);
+  }
+
+  @media (min-width: ${breakpoints.l}) {
+    margin-top: var(--spacing-layout-l);
+  }
+`;
+
+const StyledAccordion = styled(Accordion).attrs({
+  style: {
+    "--header-font-size": "var(--fontsize-heading-m)",
+  },
+})``;
+
+const RecommendationWrapper = styled.div`
+  padding-bottom: var(--spacing-layout-m);
+  border-bottom: 1px solid var(--color-silver);
+`;
+
+const RecommendationListLinkWrapper = styled.div`
+  display: block;
+  position: relative;
+  padding: var(--spacing-xl) 0;
+`;
+
+const RecommendationListLink = styled(BasicLink)`
+  position: absolute;
+  right: 0;
+`;
+
+const MarkAsResolutionSentBtn = styled(Button)``;
+
+const MarkAsResolutionNotSentBtn = styled(Button).attrs({
+  variant: "secondary",
+})``;
+
+const ActionButtonContainer = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--spacing-layout-xl);
+  margin-bottom: var(--spacing-layout-xl);
+`;
+
 const ActionButton = styled(Button)`
   position: absolute;
-  right: var(--spacing-2-xl);
+  right: var(--spacing-layout-xl);
 `;
 
 function Application(): JSX.Element | null {
@@ -172,6 +272,9 @@ function Application(): JSX.Element | null {
     applicationRound,
     setApplicationRound,
   ] = useState<ApplicationRoundType | null>(null);
+  const [allocationResults, setAllocationResults] = useState<
+    AllocationResult[]
+  >([]);
   const [
     statusNotification,
     setStatusNotification,
@@ -184,6 +287,7 @@ function Application(): JSX.Element | null {
   const fetchApplication = async (id: number) => {
     try {
       const result = await getApplication(id);
+
       setApplication(result);
     } catch (error) {
       setErrorMsg("errors.errorFetchingApplication");
@@ -191,10 +295,27 @@ function Application(): JSX.Element | null {
     }
   };
 
-  const fetchApplicationRound = async (id: number) => {
+  const fetchApplicationRound = async (app: ApplicationType) => {
     try {
-      const result = await getApplicationRound({ id });
-      setApplicationRound(result);
+      const applicationRoundResult = await getApplicationRound({
+        id: app.applicationRoundId,
+      });
+      setApplicationRound(applicationRoundResult);
+
+      if (
+        ["approved", "resolution_sent"].includes(applicationRoundResult.status)
+      ) {
+        const applicationEventIds = app.applicationEvents
+          .map((n) => n.id)
+          .join(",");
+        const result = await getAllocationResults({
+          applicationRoundId: app.applicationRoundId,
+          applicationEvent: applicationEventIds,
+        });
+        setAllocationResults(
+          sortBy(result, ["unitName", "allocatedReservationUnitName"])
+        );
+      }
     } catch (error) {
       setErrorMsg("errors.errorFetchingApplicationRound");
     } finally {
@@ -208,13 +329,16 @@ function Application(): JSX.Element | null {
 
   useEffect(() => {
     if (application?.applicationRoundId) {
-      fetchApplicationRound(application.applicationRoundId);
+      fetchApplicationRound(application);
     }
   }, [application]);
 
-  const setApplicationStatus = async (status: ApplicationStatus) => {
-    if (!application) return;
-    const payload = { ...application, status };
+  const setApplicationStatus = async (
+    app: ApplicationType,
+    status: ApplicationStatus
+  ) => {
+    if (!app) return;
+    const payload = { ...app, status };
     try {
       setIsSaving(true);
       const result = await saveApplication(payload);
@@ -240,14 +364,14 @@ function Application(): JSX.Element | null {
       action = {
         text: t("Application.actions.declineApplication"),
         button: "secondary",
-        function: () => setApplicationStatus("declined"),
+        function: () => setApplicationStatus(application, "declined"),
       };
       break;
     case "declined":
       action = {
         text: t("Application.actions.returnAsPartOfAllocation"),
         button: "primary",
-        function: () => setApplicationStatus("in_review"),
+        function: () => setApplicationStatus(application, "in_review"),
       };
       break;
     default:
@@ -269,10 +393,35 @@ function Application(): JSX.Element | null {
 
   const customerName =
     application?.applicantType === "individual"
-      ? `${application.contactPerson?.firstName || ""} ${
-          application.contactPerson?.lastName || ""
-        }`.trim()
+      ? application?.applicantName
       : application?.organisation?.name;
+
+  const isApplicationRoundApproved =
+    applicationRound &&
+    ["approved", "resolution_sent"].includes(applicationRound.status);
+
+  const applicantId =
+    application?.applicantType === "individual"
+      ? application?.applicantId
+      : application?.organisation?.id;
+
+  const normalizedApplicationStatus =
+    application &&
+    applicationRound &&
+    getNormalizedApplicationStatus(application.status, applicationRound.status);
+
+  const allocatedSum = {
+    reservationsTotal: allocationResults.reduce((acc, cur) => {
+      return cur?.aggregatedData?.reservationsTotal
+        ? acc + cur.aggregatedData.reservationsTotal
+        : acc;
+    }, 0),
+    durationTotal: allocationResults.reduce((acc, cur) => {
+      return cur?.aggregatedData?.durationTotal
+        ? acc + cur.aggregatedData.durationTotal
+        : acc;
+    }, 0),
+  };
 
   return (
     <Wrapper>
@@ -284,12 +433,23 @@ function Application(): JSX.Element | null {
             />
           </ContentContainer>
           <NarrowContainer>
-            <StyledLink
-              to={`/application/${application.id}/details`}
-              data-testid="application__link--details"
-            >
-              {t("ApplicationRound.showClientApplication")}
-            </StyledLink>
+            <TopLinkContainer>
+              <StyledLink
+                to={`/application/${application.id}/details`}
+                data-testid="application__link--details"
+              >
+                {t("ApplicationRound.showClientApplication")}
+              </StyledLink>
+              {isApplicationRoundApproved &&
+                applicantId &&
+                allocationResults.length > 0 && (
+                  <StyledLink
+                    to={`/applicationRound/${applicationRound.id}/applicant/${applicantId}`}
+                  >
+                    {t("Application.showAllocationResultsOfApplicant")}
+                  </StyledLink>
+                )}
+            </TopLinkContainer>
             <Heading data-testid="application__heading--main">
               <CustomerIcon>
                 <IconCustomers />
@@ -303,7 +463,10 @@ function Application(): JSX.Element | null {
                   t(`Application.applicantTypes.${application.applicantType}`)}
               </dd>
             </ApplicantType>
-            <ApplicationStatusBlock status={application.status} view="review" />
+            <ApplicationStatusBlock
+              status={application.status}
+              view={applicationRound.status}
+            />
             {notificationContent ? (
               <StyledNotification
                 type="success"
@@ -318,9 +481,9 @@ function Application(): JSX.Element | null {
                 <div>{notificationContent.body}</div>
               </StyledNotification>
             ) : null}
-            <Subheading>{t("ApplicationRound.recommendedAid")}</Subheading>
             <DataGrid>
               <GridCol>
+                <Subheading>{t("ApplicationRound.recommendedAid")}</Subheading>
                 <table>
                   <tbody>
                     <tr>
@@ -339,9 +502,187 @@ function Application(): JSX.Element | null {
                   </tbody>
                 </table>
               </GridCol>
+              <GridCol />
             </DataGrid>
+            {isApplicationRoundApproved && (
+              <>
+                <ResolutionContainer>
+                  <DataGrid>
+                    <GridCol>
+                      <Subheading>{t("Application.resolution")}</Subheading>
+                      {["declined"].includes(application.status) ? (
+                        <>
+                          <p>{t("Application.declinedFromAllocation")}</p>
+                          <p>
+                            <Strong
+                              style={{ fontSize: "var(--fontsize-heading-xs)" }}
+                            >
+                              {t("Application.noAllocatedReservations")}
+                            </Strong>
+                          </p>
+                        </>
+                      ) : (
+                        <>
+                          <p>{t("Application.graduatedToAllocation")}</p>
+                          <table>
+                            <tbody>
+                              <tr>
+                                <th>
+                                  {t("Application.allocatedReservations")}
+                                </th>
+                                <td>
+                                  {allocatedSum.reservationsTotal}{" "}
+                                  {t("common.volumeUnit")}
+                                </td>
+                              </tr>
+                              <tr>
+                                <th>
+                                  {t("ApplicationRound.totalReservationTime")}
+                                </th>
+                                <td>
+                                  {parseDuration(allocatedSum.durationTotal) ||
+                                    "-"}
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </>
+                      )}
+                    </GridCol>
+                    <GridCol>
+                      <DownloadResolutionBtn
+                        onClick={() => console.log("TODO")}
+                      >
+                        <Strong>
+                          {t("Application.downloadResolution")} TODO
+                        </Strong>
+                        <div>(.pdf)</div>
+                      </DownloadResolutionBtn>
+                      {normalizedApplicationStatus === "approved" && (
+                        <p>{t("Application.downloadResolutionHelper")}</p>
+                      )}
+                    </GridCol>
+                  </DataGrid>
+                </ResolutionContainer>
+              </>
+            )}
           </NarrowContainer>
           <ContentContainer>
+            {isApplicationRoundApproved &&
+              !["declined"].includes(application.status) && (
+                <WideContainer>
+                  {allocationResults.length > 0 && (
+                    <StyledAccordion
+                      heading={t(
+                        "Application.summaryOfAllocatedApplicationEvents"
+                      )}
+                      defaultOpen={false}
+                    >
+                      <NarrowContainer
+                        style={{
+                          paddingRight: 0,
+                          marginLeft: 'calc(var("--spacing-layout-m") * -1)',
+                        }}
+                      >
+                        {allocationResults.map((allocationResult) => {
+                          return (
+                            <RecommendationWrapper
+                              key={allocationResult.applicationEventScheduleId}
+                            >
+                              <H2>{allocationResult.applicationEvent.name}</H2>
+                              <DataGrid
+                                style={{
+                                  borderTop: 0,
+                                  paddingTop: 0,
+                                  marginBottom: "var(--spacing-layout-s)",
+                                }}
+                              >
+                                <GridCol>
+                                  <table>
+                                    <tbody>
+                                      <tr>
+                                        <th>{t("Application.space")}</th>
+                                        <td>
+                                          {trim(
+                                            `${
+                                              allocationResult.unitName || ""
+                                            }, ${
+                                              allocationResult.allocatedReservationUnitName ||
+                                              ""
+                                            }`,
+                                            ", "
+                                          )}
+                                        </td>
+                                      </tr>
+                                      <tr>
+                                        <th>
+                                          {t("Application.headings.purpose")}
+                                        </th>
+                                        <td>
+                                          {
+                                            allocationResult.applicationEvent
+                                              .purpose
+                                          }
+                                        </td>
+                                      </tr>
+                                    </tbody>
+                                  </table>
+                                </GridCol>
+                                <GridCol />
+                              </DataGrid>
+                              <table>
+                                <RecommendedSlot
+                                  id={
+                                    allocationResult.applicationEventScheduleId
+                                  }
+                                  start={
+                                    allocationResult.applicationEvent.begin
+                                  }
+                                  end={allocationResult.applicationEvent.end}
+                                  weekday={allocationResult.allocatedDay}
+                                  biweekly={
+                                    allocationResult.applicationEvent.biweekly
+                                  }
+                                  timeStart={allocationResult.allocatedBegin}
+                                  timeEnd={allocationResult.allocatedEnd}
+                                  duration={allocationResult.allocatedDuration}
+                                />
+                              </table>
+                              <RecommendationListLinkWrapper>
+                                <RecommendationListLink to="/">
+                                  <IconCalendar />{" "}
+                                  {t("Application.showDetailedResultList")}{" "}
+                                  <IconArrowRight />
+                                </RecommendationListLink>
+                              </RecommendationListLinkWrapper>
+                            </RecommendationWrapper>
+                          );
+                        })}
+                      </NarrowContainer>
+                    </StyledAccordion>
+                  )}
+                  <ActionButtonContainer>
+                    {normalizedApplicationStatus === "approved" && (
+                      <MarkAsResolutionSentBtn
+                        onClick={() =>
+                          setApplicationStatus(application, "resolution_sent")
+                        }
+                      >
+                        {t("Application.markAsResolutionSent")} TODO
+                      </MarkAsResolutionSentBtn>
+                    )}
+                    {normalizedApplicationStatus === "resolution_sent" && (
+                      <MarkAsResolutionNotSentBtn
+                        onClick={() =>
+                          setApplicationStatus(application, "approved")
+                        }
+                      >
+                        {t("Application.markAsResolutionNotSent")} TODO
+                      </MarkAsResolutionNotSentBtn>
+                    )}
+                  </ActionButtonContainer>
+                </WideContainer>
+              )}
             {["draft", "in_review"].includes(applicationRound.status) &&
               action.function && (
                 <ActionButton

@@ -129,14 +129,12 @@ const getCellConfig = (
         title: "Application.headings.applicantName",
         key: "organisation.name",
         transform: ({
+          applicantName,
           applicantType,
-          contactPerson,
           organisation,
         }: ApplicationType) =>
           applicantType === "individual"
-            ? `${contactPerson?.firstName || ""} ${
-                contactPerson?.lastName || ""
-              }`.trim()
+            ? applicantName || ""
             : organisation?.name || "",
       },
       {
@@ -170,10 +168,23 @@ const getCellConfig = (
 
   const allocatedCellConfig = {
     cols: [
-      { title: "Application.headings.applicantName", key: "organisationName" },
+      {
+        title: "Application.headings.applicantName",
+        key: "organisationName",
+        transform: ({
+          applicantName,
+          applicantType,
+          organisationName,
+        }: AllocationResult) =>
+          applicantType === "individual"
+            ? applicantName || ""
+            : organisationName || "",
+      },
       {
         title: "Application.headings.applicantType",
         key: "applicantType",
+        transform: ({ applicantType }: ApplicationType) =>
+          t(`Application.applicantTypes.${applicantType}`),
       },
       {
         title: "Recommendation.headings.resolution",

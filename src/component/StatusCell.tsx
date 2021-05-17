@@ -1,6 +1,6 @@
 import React, { ReactNode } from "react";
 import styled from "styled-components";
-import { IconArrowRight } from "hds-react";
+import { IconArrowRight, IconCheck, IconEnvelope } from "hds-react";
 import { useTranslation } from "react-i18next";
 import { ApplicationEventStatus, ApplicationStatus } from "../common/types";
 import { ApplicationEventStatusDot, StatusDot } from "../styles/util";
@@ -36,10 +36,10 @@ export default function StatusCell({
 }: IStatusCellProps): JSX.Element | null {
   const { t } = useTranslation();
 
-  let dot: ReactNode;
+  let icon: ReactNode;
   switch (type) {
     case "applicationEvent":
-      dot = (
+      icon = (
         <ApplicationEventStatusDot
           status={status as ApplicationEventStatus}
           size={12}
@@ -47,8 +47,13 @@ export default function StatusCell({
       );
       break;
     case "application":
-      dot = <StatusDot status={status as ApplicationStatus} size={12} />;
-
+      if (["resolution_sent"].includes(status as ApplicationStatus)) {
+        icon = <IconEnvelope />;
+      } else if (["approved"].includes(status as ApplicationStatus)) {
+        icon = <IconCheck style={{ color: "var(--color-success)" }} />;
+      } else {
+        icon = <StatusDot status={status as ApplicationStatus} size={12} />;
+      }
       break;
     default:
   }
@@ -56,7 +61,7 @@ export default function StatusCell({
   return status ? (
     <Wrapper>
       <Status>
-        {dot}
+        {icon}
         <span>{t(text)}</span>
       </Status>
       <IconArrowRight />
