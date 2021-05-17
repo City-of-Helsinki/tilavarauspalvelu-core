@@ -3,6 +3,8 @@ import datetime
 import pytest
 from assertpy import assert_that
 
+from applications.models import APPLICANT_TYPES, CUSTOMER_TYPES
+
 
 @pytest.mark.django_db
 def test_getting_occurences(recurring_application_event, scheduled_for_tuesday):
@@ -204,6 +206,121 @@ def test_should_include_if_basket_has_no_home_city(
     city_of_helsinki,
 ):
     recurring_application_event.application.home_city = city_of_helsinki
+    recurring_application_event.application.save()
+
+    events_by_baskets = default_application_round.get_application_events_by_basket()
+
+    assert events_by_baskets == {
+        application_round_basket_one.id: [recurring_application_event]
+    }
+
+
+@pytest.mark.parametrize(
+    "applicant_customer_type",
+    [
+        (APPLICANT_TYPES.APPLICANT_TYPE_COMPANY, CUSTOMER_TYPES.CUSTOMER_TYPE_BUSINESS),
+        (
+            APPLICANT_TYPES.APPLICANT_TYPE_ASSOCIATION,
+            CUSTOMER_TYPES.CUSTOMER_TYPE_NONPROFIT,
+        ),
+        (
+            APPLICANT_TYPES.APPLICANT_TYPE_COMMUNITY,
+            CUSTOMER_TYPES.CUSTOMER_TYPE_NONPROFIT,
+        ),
+        (
+            APPLICANT_TYPES.APPLICANT_TYPE_INDIVIDUAL,
+            CUSTOMER_TYPES.CUSTOMER_TYPE_INDIVIDUAL,
+        ),
+    ],
+)
+@pytest.mark.django_db
+def test_should_filter_to_baskets_by_customer_type(
+    applicant_customer_type,
+    default_application_round,
+    application_round_basket_one,
+    recurring_application_event,
+):
+    applicant_type, customer_type = applicant_customer_type
+    application_round_basket_one.customer_type = [customer_type]
+    application_round_basket_one.save()
+    recurring_application_event.application.applicant_type = applicant_type
+    recurring_application_event.application.save()
+
+    events_by_baskets = default_application_round.get_application_events_by_basket()
+
+    assert events_by_baskets == {
+        application_round_basket_one.id: [recurring_application_event]
+    }
+
+
+@pytest.mark.parametrize(
+    "applicant_customer_type",
+    [
+        (
+            APPLICANT_TYPES.APPLICANT_TYPE_COMPANY,
+            [
+                CUSTOMER_TYPES.CUSTOMER_TYPE_NONPROFIT,
+                CUSTOMER_TYPES.CUSTOMER_TYPE_INDIVIDUAL,
+            ],
+        ),
+        (
+            APPLICANT_TYPES.APPLICANT_TYPE_ASSOCIATION,
+            [
+                CUSTOMER_TYPES.CUSTOMER_TYPE_BUSINESS,
+                CUSTOMER_TYPES.CUSTOMER_TYPE_INDIVIDUAL,
+            ],
+        ),
+        (
+            APPLICANT_TYPES.APPLICANT_TYPE_COMMUNITY,
+            [
+                CUSTOMER_TYPES.CUSTOMER_TYPE_BUSINESS,
+                CUSTOMER_TYPES.CUSTOMER_TYPE_INDIVIDUAL,
+            ],
+        ),
+        (
+            APPLICANT_TYPES.APPLICANT_TYPE_INDIVIDUAL,
+            [
+                CUSTOMER_TYPES.CUSTOMER_TYPE_NONPROFIT,
+                CUSTOMER_TYPES.CUSTOMER_TYPE_BUSINESS,
+            ],
+        ),
+    ],
+)
+@pytest.mark.django_db
+def test_should_exclude_if_customer_type_does_not_match(
+    applicant_customer_type,
+    default_application_round,
+    application_round_basket_one,
+    recurring_application_event,
+):
+    applicant_type, customer_type = applicant_customer_type
+    application_round_basket_one.customer_type = customer_type
+    application_round_basket_one.save()
+    recurring_application_event.application.applicant_type = applicant_type
+    recurring_application_event.application.save()
+
+    events_by_baskets = default_application_round.get_application_events_by_basket()
+
+    assert events_by_baskets == {application_round_basket_one.id: []}
+
+
+@pytest.mark.parametrize(
+    "applicant_type",
+    [
+        APPLICANT_TYPES.APPLICANT_TYPE_COMPANY,
+        APPLICANT_TYPES.APPLICANT_TYPE_ASSOCIATION,
+        APPLICANT_TYPES.APPLICANT_TYPE_COMMUNITY,
+        APPLICANT_TYPES.APPLICANT_TYPE_INDIVIDUAL,
+    ],
+)
+@pytest.mark.django_db
+def test_should_include_if_no_customer_type(
+    applicant_type,
+    default_application_round,
+    application_round_basket_one,
+    recurring_application_event,
+):
+    recurring_application_event.application.applicant_type = applicant_type
     recurring_application_event.application.save()
 
     events_by_baskets = default_application_round.get_application_events_by_basket()

@@ -355,16 +355,61 @@ class City(models.Model):
     name = models.CharField(verbose_name=_("Name"), max_length=100)
 
 
-class ApplicationRoundBasket(models.Model):
+class CUSTOMER_TYPE_CONST(object):
+    __slots__ = ()
+
     CUSTOMER_TYPE_BUSINESS = "business"
     CUSTOMER_TYPE_NONPROFIT = "nonprofit"
     CUSTOMER_TYPE_INDIVIDUAL = "individual"
-
     CUSTOMER_TYPE_CHOICES = (
         (CUSTOMER_TYPE_BUSINESS, _("Business")),
         (CUSTOMER_TYPE_NONPROFIT, _("Nonprofit")),
         (CUSTOMER_TYPE_INDIVIDUAL, _("Individual")),
     )
+
+
+CUSTOMER_TYPES = CUSTOMER_TYPE_CONST()
+
+
+class APPLICANT_TYPE_CONST(object):
+    __slots__ = ()
+    APPLICANT_TYPE_INDIVIDUAL = "individual"
+    APPLICANT_TYPE_ASSOCIATION = "association"
+    APPLICANT_TYPE_COMMUNITY = "community"
+    APPLICANT_TYPE_COMPANY = "company"
+
+    APPLICANT_TYPE_CHOICES = (
+        (APPLICANT_TYPE_INDIVIDUAL, _("Individual")),
+        (APPLICANT_TYPE_ASSOCIATION, _("Association")),
+        (APPLICANT_TYPE_COMMUNITY, _("Community")),
+        (APPLICANT_TYPE_COMPANY, _("Company")),
+    )
+
+
+APPLICANT_TYPES = APPLICANT_TYPE_CONST()
+
+
+def customer_types_to_applicant_types(
+    customer_types: [CUSTOMER_TYPES],
+) -> APPLICANT_TYPES:
+    applicant_types = []
+    switcher = {
+        CUSTOMER_TYPES.CUSTOMER_TYPE_BUSINESS: [APPLICANT_TYPES.APPLICANT_TYPE_COMPANY],
+        CUSTOMER_TYPES.CUSTOMER_TYPE_NONPROFIT: [
+            APPLICANT_TYPES.APPLICANT_TYPE_ASSOCIATION,
+            APPLICANT_TYPES.APPLICANT_TYPE_COMMUNITY,
+        ],
+        CUSTOMER_TYPES.CUSTOMER_TYPE_INDIVIDUAL: [
+            APPLICANT_TYPES.APPLICANT_TYPE_INDIVIDUAL
+        ],
+    }
+
+    for type in customer_types:
+        applicant_types += switcher[type]
+    return applicant_types
+
+
+class ApplicationRoundBasket(CUSTOMER_TYPE_CONST, models.Model):
 
     name = models.CharField(
         verbose_name=_("Name"),
@@ -386,7 +431,10 @@ class ApplicationRoundBasket(models.Model):
     )
     customer_type = ArrayField(
         models.CharField(
-            max_length=50, choices=CUSTOMER_TYPE_CHOICES, null=True, blank=True
+            max_length=50,
+            choices=CUSTOMER_TYPES.CUSTOMER_TYPE_CHOICES,
+            null=True,
+            blank=True,
         ),
     )
 
@@ -418,7 +466,12 @@ class ApplicationRoundBasket(models.Model):
             events = events.filter(purpose__in=self.purposes.all())
         if len(self.age_groups.all()) > 0:
             events = events.filter(age_group__in=self.age_groups.all())
-
+        if self.customer_type is not None and len(self.customer_type) > 0:
+            events = events.filter(
+                application__applicant_type__in=customer_types_to_applicant_types(
+                    self.customer_type
+                )
+            )
         return list(events.all())
 
     def get_score(self):
@@ -517,23 +570,12 @@ class ApplicationEventStatus(models.Model):
         return [s[0] for s in cls.STATUS_CHOICES]
 
 
-class Application(models.Model):
-    APPLICANT_TYPE_INDIVIDUAL = "individual"
-    APPLICANT_TYPE_ASSOCIATION = "association"
-    APPLICANT_TYPE_COMMUNITY = "community"
-    APPLICANT_TYPE_COMPANY = "company"
-
-    APPLICANT_TYPE_CHOICES = (
-        (APPLICANT_TYPE_INDIVIDUAL, _("Individual")),
-        (APPLICANT_TYPE_ASSOCIATION, _("Association")),
-        (APPLICANT_TYPE_COMMUNITY, _("Community")),
-        (APPLICANT_TYPE_COMPANY, _("Company")),
-    )
+class Application(APPLICANT_TYPE_CONST, models.Model):
 
     applicant_type = models.CharField(
         max_length=64,
         verbose_name=_("Applicant type"),
-        choices=APPLICANT_TYPE_CHOICES,
+        choices=APPLICANT_TYPES.APPLICANT_TYPE_CHOICES,
         null=True,
     )
 
