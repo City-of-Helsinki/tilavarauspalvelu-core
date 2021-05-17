@@ -412,6 +412,8 @@ class ApplicationRoundBasket(models.Model):
             application__application_round=self.application_round
         )
 
+        if self.home_city is not None:
+            events = events.filter(application__home_city=self.home_city)
         if len(self.purposes.all()) > 0:
             events = events.filter(purpose__in=self.purposes.all())
         if len(self.age_groups.all()) > 0:

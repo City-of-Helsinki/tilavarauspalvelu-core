@@ -11,6 +11,7 @@ from applications.models import (
     ApplicationEventScheduleResult,
     ApplicationRound,
     ApplicationRoundBasket,
+    City,
     EventReservationUnit,
 )
 from reservation_units.models import Purpose, ReservationUnit
@@ -236,3 +237,17 @@ def application_round_basket_two(
     )
     basket.purposes.set([purpose])
     return basket
+
+
+@pytest.fixture
+def city_of_helsinki(default_application_round, purpose) -> City:
+    return City.objects.create(
+        name="Helsinki",
+    )
+
+
+@pytest.fixture
+def city_of_tampere(default_application_round, purpose) -> City:
+    return City.objects.create(
+        name="Tampere",
+    )
