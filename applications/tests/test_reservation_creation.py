@@ -16,9 +16,13 @@ from applications.tests.factories import (
     ApplicationRoundFactory,
     EventReservationUnitFactory,
 )
-from applications.utils.reservation_creation import ReservationScheduler
+from applications.utils.reservation_creation import (
+    ReservationScheduler,
+    create_reservations_from_allocation_results,
+)
 from opening_hours.hours import TimeElement
 from reservation_units.tests.factories import ReservationUnitFactory
+from reservations.models import Reservation
 from spaces.tests.factories import SpaceFactory
 from tilavarauspalvelu.utils.date_util import next_or_current_matching_weekday
 
@@ -243,3 +247,12 @@ class ReservationSchedulerTestCase(TestCase, DjangoTestCase):
         )
         assert_that(start_dt).is_equal_to(start_dt)
         assert_that(end_dt).is_equal_to(expected_end)
+
+    def test_creating_reservations(self, mock):
+        create_reservations_from_allocation_results(self.application_event)
+        assert_that(Reservation.objects.count()).is_equal_to(4)
+
+    def test_creating_reservations_without_result(self, mock):
+        self.result.delete()
+        create_reservations_from_allocation_results(self.application_event)
+        assert_that(Reservation.objects.count()).is_equal_to(0)

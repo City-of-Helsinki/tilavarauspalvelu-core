@@ -693,7 +693,7 @@ class ApplicationEventStatusSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         request = self.context.get("request")
         instance = ApplicationEventStatus(**validated_data)
-        if request:
+        if request and request.user.is_authenticated:
             instance.user = request.user
 
         if (
