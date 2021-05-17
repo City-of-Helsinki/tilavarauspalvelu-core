@@ -26,6 +26,10 @@ class HaukiAPIError(HaukiError):
     """Request succeeded but Hauki API returned an error"""
 
 
+class HaukiConfigurationError(HaukiError):
+    """Request to the Hauki API failed"""
+
+
 @dataclass(order=True, frozen=True)
 class TimeElement:
     """Represents one time span in a days opening hours
@@ -92,8 +96,11 @@ def get_opening_hours(
     end_date: Union[str, datetime.date],
 ) -> List[dict]:
     """Get opening hours for Hauki resource"""
-
     resource_prefix = f"{settings.HAUKI_ORIGIN_ID}"
+    if not (API_URL and resource_prefix):
+        raise HaukiConfigurationError(
+            "Both hauki api url and hauki origin id need to be configured"
+        )
     if isinstance(resource_id, list):
         resource_id = [str(uuid) for uuid in resource_id]
         resource_id = "%s:%s" % (
