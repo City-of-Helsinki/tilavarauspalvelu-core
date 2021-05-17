@@ -44,7 +44,7 @@ def get_mocked_opening_hours(*args, **kwargs):
 
 @freezegun.freeze_time("2020-01-01")
 @mock.patch(
-    "applications.utils.aggregate_data.get_opening_hours",
+    "opening_hours.utils.get_opening_hours",
     return_value=get_mocked_opening_hours(),
 )
 class ApplicationRoundAggregateDataTestCase(TestCase):
