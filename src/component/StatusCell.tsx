@@ -47,7 +47,7 @@ export default function StatusCell({
       );
       break;
     case "application":
-      if (["resolution_sent"].includes(status as ApplicationStatus)) {
+      if (["sent"].includes(status as ApplicationStatus)) {
         icon = <IconEnvelope />;
       } else if (["approved"].includes(status as ApplicationStatus)) {
         icon = <IconCheck style={{ color: "var(--color-success)" }} />;

@@ -30,7 +30,7 @@ function ApplicationStatusBlock({
       icon = <IconCheck style={{ color: "var(--color-success)" }} />;
       style = { fontSize: "var(--fontsize-heading-xs)" };
       break;
-    case "resolution_sent":
+    case "sent":
       icon = <IconEnvelope />;
       style = { fontSize: "var(--fontsize-heading-xs)" };
       break;

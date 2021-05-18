@@ -34,7 +34,7 @@ export const getApplicationStatusColor = (
       color = "var(--color-success)";
       break;
     case "approved":
-    case "resolution_sent":
+    case "sent":
       color = "var(--color-white)";
       break;
     case "declined":

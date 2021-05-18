@@ -111,6 +111,9 @@ const translations: ITranslations = {
     inspect: ["Tarkastele"],
     cityOfHelsinki: ["Helsingin kaupunki"],
     chooseAction: ["valitse toiminto"],
+    weekday: ["Viikonpäivä"],
+    date: ["Päivämäärä"],
+    time: ["Kellonaika"],
   },
   errors: {
     applicationRoundNotFound: ["Haettua hakukierrosta ei löydy"],
@@ -122,6 +125,7 @@ const translations: ITranslations = {
     errorFetchingReservationUnit: ["Virhe haettaessa tilan tietoja"],
     errorSavingApplication: ["Virhe tallennettaessa hakemusta"],
     errorSavingRecommendation: ["Virhe tallennettaessa ehdotusta"],
+    errorSavingRecommendations: ["Virhe tallennettaessa ehdotuksia"],
     loginNeeded: ["Kirjautuminen vaaditaan"],
     authorizationNeeded: ["Oikeudet vaaditaan"],
     errorStartingAllocation: ["Allokoinnin käynnistys epäonnistui"],
@@ -212,7 +216,7 @@ const translations: ITranslations = {
       declined: ["Hylätty"],
       cancelled: ["Peruutettu"],
       approved: ["Päatös tehty"],
-      resolution_sent: ["Päatös lähetetty"],
+      sent: ["Päatös lähetetty"],
     },
     actions: {
       returnAsPartOfAllocation: ["Palauta hakemus osaksi jakoa"],
@@ -261,6 +265,7 @@ const translations: ITranslations = {
     markAsResolutionNotSent: ["Merkitse päätös toimittamattomaksi"],
     showDetailedResultList: ["Näytä yksityiskohtainen vuorolista"],
     space: ["Tila"],
+    allocatedForGroupX: ["Myönnetty ryhmälle {{group}}"],
   },
   ApplicationRound: {
     titleAllRecurringApplicationRounds: ["Kaikki vakiovuorojen hakukierrokset"],
@@ -497,8 +502,8 @@ const translations: ITranslations = {
     },
     statuses: {
       created: ["Käsittelemättä"],
-      validated: ["Hyväksytty"],
-      declined: ["Hylätty"],
+      validated: ["Ehdotus hyväksytty"],
+      declined: ["Ehdotus hylätty"],
       ignored: ["Tilakielto asetettu"],
     },
     approveSuccessHeading: ["Ehdotus hyväksytty onnistuneesti"],

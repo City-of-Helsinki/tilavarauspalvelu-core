@@ -12,6 +12,7 @@ import {
   ApplicationRound as ApplicationRoundType,
   ApplicationRoundStatus,
   DataFilterConfig,
+  ApplicationEventStatus,
 } from "../../common/types";
 import {
   ContentContainer,
@@ -40,6 +41,7 @@ import {
   saveApplicationRound,
   getAllocationResults,
   getApplications,
+  setApplicationEventStatuses,
 } from "../../common/api";
 
 interface IProps {
@@ -448,7 +450,7 @@ function SupervisorApproval({ applicationRoundId }: IProps): JSX.Element {
 
         const applicationsResult = await getApplications({
           applicationRound: ar.id,
-          status: "in_review,review_done,declined",
+          status: "draft,in_review,review_done,declined",
         });
 
         const processedResult = processAllocationResult(allocationResults);
@@ -486,12 +488,14 @@ function SupervisorApproval({ applicationRoundId }: IProps): JSX.Element {
 
   const backLink = "/applicationRounds";
 
+  const validatedRecommendations = recommendations.filter((n) =>
+    ["validated"].includes(n.applicationEvent.status)
+  );
+
   const filteredResults =
     activeFilter === "unallocated"
       ? unallocatedApplications
-      : recommendations.filter((n) =>
-          ["validated"].includes(n.applicationEvent.status)
-        );
+      : validatedRecommendations;
 
   if (isLoading) {
     return <Loader />;
@@ -691,11 +695,25 @@ function SupervisorApproval({ applicationRoundId }: IProps): JSX.Element {
                   <Button
                     type="submit"
                     variant="primary"
-                    onClick={() => {
-                      setApplicationRoundStatus(
-                        "approved",
-                        `/applicationRounds/approvals?approved&applicationRoundId=${applicationRoundId}`
-                      );
+                    onClick={async () => {
+                      try {
+                        const payload = uniq(
+                          validatedRecommendations.map(
+                            (n: AllocationResult) => n.applicationEvent.id
+                          )
+                        ).map((n: number) => ({
+                          status: "approved" as ApplicationEventStatus,
+                          applicationEventId: n,
+                        }));
+                        await setApplicationEventStatuses(payload);
+                        await setApplicationRoundStatus(
+                          "approved",
+                          `/applicationRounds/approvals?approved&applicationRoundId=${applicationRoundId}`
+                        );
+                      } catch (error) {
+                        setConfirmationDialogVisibility(false);
+                        setErrorMsg("errors.errorSavingRecommendations");
+                      }
                     }}
                   >
                     {t("common.approve")}

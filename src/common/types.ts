@@ -121,7 +121,7 @@ export type ApplicationStatus =
   | "declined"
   | "cancelled"
   | "approved"
-  | "resolution_sent";
+  | "sent";
 
 export type AggregatedData = {
   reservationsTotal?: number;

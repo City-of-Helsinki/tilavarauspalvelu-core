@@ -258,7 +258,7 @@ export function getAllocationResults(
 
 interface AllocationResultParams {
   id: number;
-  serviceSectorId: number;
+  serviceSectorId?: number;
 }
 
 export function getAllocationResult(

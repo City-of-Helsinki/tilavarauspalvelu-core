@@ -302,9 +302,7 @@ function Application(): JSX.Element | null {
       });
       setApplicationRound(applicationRoundResult);
 
-      if (
-        ["approved", "resolution_sent"].includes(applicationRoundResult.status)
-      ) {
+      if (["approved", "sent"].includes(applicationRoundResult.status)) {
         const applicationEventIds = app.applicationEvents
           .map((n) => n.id)
           .join(",");
@@ -397,8 +395,7 @@ function Application(): JSX.Element | null {
       : application?.organisation?.name;
 
   const isApplicationRoundApproved =
-    applicationRound &&
-    ["approved", "resolution_sent"].includes(applicationRound.status);
+    applicationRound && ["approved", "sent"].includes(applicationRound.status);
 
   const applicantId =
     application?.applicantType === "individual"
@@ -649,7 +646,9 @@ function Application(): JSX.Element | null {
                                 />
                               </table>
                               <RecommendationListLinkWrapper>
-                                <RecommendationListLink to="/">
+                                <RecommendationListLink
+                                  to={`/application/${applicationId}/result/${allocationResult.applicationEventScheduleId}`}
+                                >
                                   <IconCalendar />{" "}
                                   {t("Application.showDetailedResultList")}{" "}
                                   <IconArrowRight />
@@ -665,13 +664,13 @@ function Application(): JSX.Element | null {
                     {normalizedApplicationStatus === "approved" && (
                       <MarkAsResolutionSentBtn
                         onClick={() =>
-                          setApplicationStatus(application, "resolution_sent")
+                          setApplicationStatus(application, "sent")
                         }
                       >
                         {t("Application.markAsResolutionSent")} TODO
                       </MarkAsResolutionSentBtn>
                     )}
-                    {normalizedApplicationStatus === "resolution_sent" && (
+                    {normalizedApplicationStatus === "sent" && (
                       <MarkAsResolutionNotSentBtn
                         onClick={() =>
                           setApplicationStatus(application, "approved")

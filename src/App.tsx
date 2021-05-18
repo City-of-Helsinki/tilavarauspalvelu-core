@@ -21,6 +21,7 @@ import RecommendationsByReservationUnit from "./component/ApplicationRound/Recom
 import ApplicationRoundApprovals from "./component/ApplicationRound/ApplicationRoundApprovals";
 import { publicUrl } from "./common/const";
 import ResolutionReport from "./component/ApplicationRound/ResolutionReport";
+import Result from "./component/Application/Result";
 
 interface IPrivateRouteProps {
   path: string;
@@ -78,6 +79,11 @@ function App(): JSX.Element {
               exact
               path="/application/:applicationId/details"
               component={ApplicationDetails}
+            />
+            <PrivateRoute
+              exact
+              path="/application/:applicationId/result/:applicationEventScheduleId"
+              component={Result}
             />
             <PrivateRoute
               exact
