@@ -487,7 +487,7 @@ class ApplicationStatus(models.Model):
     DRAFT = "draft"
     IN_REVIEW = "in_review"
     REVIEW_DONE = "review_done"
-    SENT = ("sent")
+    SENT = "sent"
     DECLINED = "declined"
     CANCELLED = "cancelled"
 
