@@ -111,9 +111,15 @@ class ReservationQuerySet(models.QuerySet):
         )
 
     def within_application_round_period(self, app_round: ApplicationRound):
+        return self.within_period(
+            app_round.reservation_period_begin,
+            app_round.reservation_period_end,
+        )
+
+    def within_period(self, period_start, period_end):
         return self.filter(
-            begin__gte=app_round.reservation_period_begin,
-            end__lte=app_round.reservation_period_end,
+            begin__gte=period_start,
+            end__lte=period_end,
         )
 
     def going_to_occur(self):
