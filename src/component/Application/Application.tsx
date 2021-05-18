@@ -333,7 +333,8 @@ function Application(): JSX.Element | null {
 
   const setApplicationStatus = async (
     app: ApplicationType,
-    status: ApplicationStatus
+    status: ApplicationStatus,
+    useNotification = false
   ) => {
     if (!app) return;
     const payload = { ...app, status };
@@ -341,7 +342,9 @@ function Application(): JSX.Element | null {
       setIsSaving(true);
       const result = await saveApplication(payload);
       fetchApplication(result.id);
-      setStatusNotification(status);
+      if (useNotification) {
+        setStatusNotification(status);
+      }
       setErrorMsg(null);
     } catch (error) {
       setErrorMsg("errors.errorSavingApplication");
@@ -362,14 +365,14 @@ function Application(): JSX.Element | null {
       action = {
         text: t("Application.actions.declineApplication"),
         button: "secondary",
-        function: () => setApplicationStatus(application, "declined"),
+        function: () => setApplicationStatus(application, "declined", true),
       };
       break;
     case "declined":
       action = {
         text: t("Application.actions.returnAsPartOfAllocation"),
         button: "primary",
-        function: () => setApplicationStatus(application, "in_review"),
+        function: () => setApplicationStatus(application, "in_review", true),
       };
       break;
     default:
@@ -673,7 +676,7 @@ function Application(): JSX.Element | null {
                     {normalizedApplicationStatus === "sent" && (
                       <MarkAsResolutionNotSentBtn
                         onClick={() =>
-                          setApplicationStatus(application, "approved")
+                          setApplicationStatus(application, "in_review")
                         }
                       >
                         {t("Application.markAsResolutionNotSent")} TODO
