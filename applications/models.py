@@ -487,6 +487,7 @@ class ApplicationStatus(models.Model):
     DRAFT = "draft"
     IN_REVIEW = "in_review"
     REVIEW_DONE = "review_done"
+    SENT = ("sent",)
     DECLINED = "declined"
     CANCELLED = "cancelled"
 
@@ -494,6 +495,7 @@ class ApplicationStatus(models.Model):
         (DRAFT, _("Draft")),
         (IN_REVIEW, _("In review")),
         (REVIEW_DONE, _("Review done")),
+        (SENT, _("Decision sent")),
         (DECLINED, _("Declined")),
         (CANCELLED, _("Cancelled")),
     )
