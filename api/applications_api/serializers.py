@@ -560,6 +560,8 @@ class ApplicationSerializer(serializers.ModelSerializer):
         return data
 
     def handle_events(self, appliction_instance, event_data):
+        if event_data is None:
+            return
         event_ids = []
         for event in event_data:
             event["application"] = appliction_instance
@@ -621,25 +623,25 @@ class ApplicationSerializer(serializers.ModelSerializer):
             request.user if request and request.user.is_authenticated else None
         )
 
-        billing_address_data = validated_data.pop("billing_address")
+        billing_address_data = validated_data.pop("billing_address", None)
         if billing_address_data:
             billing_address = Address.objects.create(**billing_address_data)
             validated_data["billing_address"] = billing_address
 
         status = validated_data.pop("status")
 
-        contact_person_data = validated_data.pop("contact_person")
+        contact_person_data = validated_data.pop("contact_person", None)
 
         validated_data["contact_person"] = self.handle_person(
             contact_person_data=contact_person_data
         )
 
-        organisation_data = validated_data.pop("organisation")
+        organisation_data = validated_data.pop("organisation", None)
         validated_data["organisation"] = self.handle_organisation(
             organisation_data=organisation_data
         )
 
-        event_data = validated_data.pop("application_events")
+        event_data = validated_data.pop("application_events", None)
 
         self.handle_events(appliction_instance=instance, event_data=event_data)
 

@@ -75,6 +75,27 @@ def test_application_update_should_update_organisation_and_contact_person(
 
 @pytest.mark.django_db
 @freeze_time("2021-01-15")
+def test_should_handle_patch_requests(
+    user_api_client, application, organisation, person, purpose, application_round
+):
+    assert Application.objects.count() == 1
+
+    data = {
+        "status": "cancelled",
+    }
+
+    response = user_api_client.patch(
+        reverse("application-detail", kwargs={"pk": application.id}),
+        data=data,
+        format="json",
+    )
+
+    assert response.status_code == 200
+    assert response.data.get("status") == "cancelled"
+
+
+@pytest.mark.django_db
+@freeze_time("2021-01-15")
 def test_application_update_should_null_organisation_and_contact_person(
     user_api_client, application, organisation, person, purpose, application_round
 ):
