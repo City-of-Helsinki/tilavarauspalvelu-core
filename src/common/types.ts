@@ -341,3 +341,34 @@ export interface ApplicationEventsDeclinedReservationUnits {
   id: number;
   declinedReservationUnitIds: number[];
 }
+
+export interface RecurringReservation {
+  applicationId: number;
+  applicationEventId: number;
+  ageGroupId: number | null;
+  abilityGroupId: number | null;
+  reservations: Reservation[];
+}
+
+export interface Reservation {
+  id: number;
+  state: ReservationStatus;
+  priority: ReservationPriority;
+  userId: number | null;
+  begin: string;
+  end: string;
+  bufferTimeBefore: string | null;
+  bufferTimeAfter: string | null;
+  reservationUnit: ReservationUnit;
+  recurringReservation: number | null;
+}
+
+export type ReservationStatus =
+  | "created"
+  | "cancelled"
+  | "confirmed"
+  | "denied"
+  | "requested"
+  | "waiting_for_payment";
+
+export type ReservationPriority = 100 | 200 | 300;

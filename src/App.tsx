@@ -82,7 +82,7 @@ function App(): JSX.Element {
             />
             <PrivateRoute
               exact
-              path="/application/:applicationId/result/:applicationEventScheduleId"
+              path="/application/:applicationId/result/:applicationEventId"
               component={Result}
             />
             <PrivateRoute

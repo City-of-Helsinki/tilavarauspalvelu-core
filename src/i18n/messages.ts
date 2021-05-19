@@ -123,6 +123,7 @@ const translations: ITranslations = {
     errorFetchingApplications: ["Virhe haettaessa hakemuksia"],
     errorFetchingRecommendations: ["Virhe haettaessa ehdotuksia"],
     errorFetchingReservationUnit: ["Virhe haettaessa tilan tietoja"],
+    errorFetchingReservations: ["Virhe haettaessa varauksia"],
     errorSavingApplication: ["Virhe tallennettaessa hakemusta"],
     errorSavingRecommendation: ["Virhe tallennettaessa ehdotusta"],
     errorSavingRecommendations: ["Virhe tallennettaessa ehdotuksia"],
@@ -266,6 +267,9 @@ const translations: ITranslations = {
     showDetailedResultList: ["Näytä yksityiskohtainen vuorolista"],
     space: ["Tila"],
     allocatedForGroupX: ["Myönnetty ryhmälle {{group}}"],
+    declinedReservations: [
+      "Poikkeukset, jolloin vakiovuoro ei ole käytettävissä",
+    ],
   },
   ApplicationRound: {
     titleAllRecurringApplicationRounds: ["Kaikki vakiovuorojen hakukierrokset"],

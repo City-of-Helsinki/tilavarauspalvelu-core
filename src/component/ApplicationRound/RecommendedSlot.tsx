@@ -12,8 +12,8 @@ import { ReactComponent as IconCalendar } from "../../images/icon_calendar.svg";
 
 interface IProps {
   id: number | null;
-  start: string | null;
-  end: string | null;
+  start?: string | null;
+  end?: string | null;
   weekday: number | null;
   biweekly: boolean;
   timeStart: string | null;
@@ -110,17 +110,16 @@ function RecommendedSlot({
         <Col>{t("common.day")}</Col>
       </Heading>
       <Row>
-        <Label type="date">{formatDate(start)}</Label>
+        <Label type="date">{start ? formatDate(start) : ""}</Label>
         <Col>-</Col>
-        <Label type="date">{formatDate(end)}</Label>
+        <Label type="date">{end ? formatDate(end) : ""}</Label>
         <Col />
         <Col>
-          {weekday === 0 ||
-            (weekday && (
-              <Day>
-                {t(`calendar.${weekdays[Number(weekday)]}`).substring(0, 2)}
-              </Day>
-            ))}
+          <Day>
+            {weekday === 0 || weekday
+              ? t(`calendar.${weekdays[Number(weekday)]}`).substring(0, 2)
+              : "-"}
+          </Day>
           <span>{t(`common.${biweekly ? "biweekly" : "weekly"}`)}</span>
         </Col>
       </Row>
@@ -134,15 +133,19 @@ function RecommendedSlot({
             <Col>-</Col>
             <Label type="time">{formatTime(timeEnd)}</Label>
             <Col />
-            <Col>
-              <Duration>
-                <IconInfoCircle style={{ marginRight: "var(--spacing-xs)" }} />{" "}
-                {duration &&
-                  t("Recommendation.scheduleDuration", {
-                    duration: parseDuration(convertHMSToSeconds(duration)),
-                  })}
-              </Duration>
-            </Col>
+            {duration && (
+              <Col>
+                <Duration>
+                  <IconInfoCircle
+                    style={{ marginRight: "var(--spacing-xs)" }}
+                  />{" "}
+                  {duration &&
+                    t("Recommendation.scheduleDuration", {
+                      duration: parseDuration(convertHMSToSeconds(duration)),
+                    })}
+                </Duration>
+              </Col>
+            )}
           </Row>
         </>
       )}

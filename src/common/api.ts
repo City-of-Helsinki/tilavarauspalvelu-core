@@ -10,6 +10,8 @@ import {
   AllocationResult,
   ApplicationEventStatus,
   ApplicationEventsDeclinedReservationUnits,
+  Reservation,
+  RecurringReservation,
 } from "./types";
 
 const apiBaseUrl: string = process.env.REACT_APP_TILAVARAUS_API_URL || "";
@@ -23,8 +25,10 @@ const allocationResultPath = "allocation_results";
 const applicationEventStatusPath = "application_event_status";
 const declinedApplicationEventReservationUnitsPath =
   "application_event_declined_reservation_unit";
-const applicationEventWeeklyAmountReduction =
+const applicationEventWeeklyAmountReductionPath =
   "application_event_weekly_amount_reduction";
+const reservationPath = "reservation";
+const recurringReservationPath = "recurring_reservation";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface QueryParameters {}
@@ -326,7 +330,37 @@ export function rejectApplicationEventSchedule(
   applicationEventScheduleResultId: number
 ): Promise<void> {
   return apiPost({
-    path: `v1/${applicationEventWeeklyAmountReduction}/`,
+    path: `v1/${applicationEventWeeklyAmountReductionPath}/`,
     data: { applicationEventScheduleResultId },
+  });
+}
+
+interface IRecurringReservationAttrs {
+  application?: number;
+  applicationEvent?: number;
+  ordering?: string;
+  search?: string;
+}
+
+export function getRecurringReservations(
+  parameters: IRecurringReservationAttrs
+): Promise<RecurringReservation[]> {
+  return apiGet({
+    path: `v1/${recurringReservationPath}`,
+    parameters,
+  });
+}
+
+export function getRecurringReservation(
+  id: number
+): Promise<RecurringReservation> {
+  return apiGet({
+    path: `v1/${recurringReservationPath}/${id}`,
+  });
+}
+
+export function getReservation(id: number): Promise<Reservation> {
+  return apiGet({
+    path: `v1/${reservationPath}/${id}`,
   });
 }

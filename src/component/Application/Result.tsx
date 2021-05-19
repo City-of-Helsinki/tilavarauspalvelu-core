@@ -3,26 +3,31 @@ import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import { IconLocation, Notification } from "hds-react";
+import get from "lodash/get";
 import {
-  getAllocationResult,
   getApplication,
   getApplicationRound,
+  getRecurringReservations,
 } from "../../common/api";
 import Loader from "../Loader";
 import {
-  AllocationResult,
   Application as ApplicationType,
+  ApplicationEvent,
   ApplicationRound as ApplicationRoundType,
+  RecurringReservation,
+  Reservation,
+  ReservationUnit,
 } from "../../common/types";
 import { ContentContainer, NarrowContainer } from "../../styles/layout";
 import { ContentHeading, H2, H3 } from "../../styles/typography";
 import withMainMenu from "../withMainMenu";
 import LinkPrev from "../LinkPrev";
 import { Divider, Strong } from "../../styles/util";
+import { formatDate, localizedValue } from "../../common/util";
 
 interface IRouteParams {
   applicationId: string;
-  applicationEventScheduleId: string;
+  applicationEventId: string;
 }
 
 const Wrapper = styled.div`
@@ -53,6 +58,7 @@ const Subheading = styled(H3)`
 `;
 
 const Reservations = styled.table`
+  margin-bottom: var(--spacing-3-xl);
   border-spacing: 0;
 
   th {
@@ -78,17 +84,13 @@ function Result(): JSX.Element | null {
     applicationRound,
     setApplicationRound,
   ] = useState<ApplicationRoundType | null>(null);
-  const [
-    allocationResult,
-    setAllocationResult,
-  ] = useState<AllocationResult | null>(null);
+  const [recurringReservations, setRecurringReservations] = useState<
+    RecurringReservation[]
+  >([]);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const {
-    applicationId,
-    applicationEventScheduleId,
-  } = useParams<IRouteParams>();
-  const { t } = useTranslation();
+  const { applicationId, applicationEventId } = useParams<IRouteParams>();
+  const { t, i18n } = useTranslation();
 
   const fetchApplication = async (id: number) => {
     try {
@@ -113,16 +115,14 @@ function Result(): JSX.Element | null {
     }
   };
 
-  const fetchAllocationResult = async (applicationEventId: number) => {
+  const fetchRecurringReservations = async (aeId: number) => {
     try {
-      const result = await getAllocationResult({
-        id: applicationEventId,
+      const result = await getRecurringReservations({
+        applicationEvent: aeId,
       });
-      setAllocationResult(result);
+      setRecurringReservations(result);
     } catch (error) {
-      setErrorMsg("errors.errorFetchingRecommendations");
-      setIsLoading(false);
-    } finally {
+      setErrorMsg("errors.errorFetchingReservations");
       setIsLoading(false);
     }
   };
@@ -138,16 +138,16 @@ function Result(): JSX.Element | null {
   }, [application]);
 
   useEffect(() => {
-    if (applicationEventScheduleId) {
-      fetchAllocationResult(Number(applicationEventScheduleId));
+    if (applicationEventId) {
+      fetchRecurringReservations(Number(applicationEventId));
     }
-  }, [applicationEventScheduleId]);
+  }, [applicationEventId]);
 
   useEffect(() => {
-    if (application && applicationRound && allocationResult) {
+    if (application && applicationRound && recurringReservations) {
       setIsLoading(false);
     }
-  }, [application, applicationRound, allocationResult]);
+  }, [application, applicationRound, recurringReservations]);
 
   if (isLoading) {
     return <Loader />;
@@ -158,71 +158,133 @@ function Result(): JSX.Element | null {
       ? application?.applicantName
       : application?.organisation?.name;
 
+  const applicationEvent:
+    | ApplicationEvent
+    | undefined = application?.applicationEvents.find(
+    (n: ApplicationEvent) =>
+      n.id === get(recurringReservations, "0.applicationEventId")
+  );
+
+  const reservationUnit: ReservationUnit | undefined = get(
+    recurringReservations,
+    "0.reservations.0.reservationUnit.0"
+  );
+
+  const reservations: Reservation[] = get(
+    recurringReservations,
+    "0.reservations"
+  );
+
+  const allocatedReservations = reservations.filter(
+    (n) => !["declined"].includes(n.state)
+  );
+  const declinedReservations = reservations.filter((n) =>
+    ["declined"].includes(n.state)
+  );
+
   return (
     <Wrapper>
-      {application && applicationRound && allocationResult && (
-        <>
-          <ContentContainer style={{ marginBottom: "var(--spacing-xl)" }}>
-            <LinkPrev route={`/application/${applicationId}`} />
-          </ContentContainer>
-          <NarrowContainer>
-            <p>{customerName}</p>
-            <Heading>{allocationResult.applicationEvent.name}</Heading>
-            <p>
-              <Strong>{t("Application.allocatedReservations")}</Strong>
-            </p>
-            <div>{applicationRound.name}</div>
-            <Divider />
-            <Location>
-              <IconLocation />
-              <H2>{allocationResult.unitName}</H2>
-              <span>{allocationResult.allocatedReservationUnitName}</span>
-            </Location>
-            <Subheading>
-              {t("Application.allocatedForGroupX", {
-                group: allocationResult.applicationEvent.name,
-              })}
-            </Subheading>
-            <Reservations>
-              <tbody>
-                <tr>
-                  <th>{t("common.weekday")}</th>
-                  <th>{t("common.date")}</th>
-                  <th>{t("common.time")}</th>
-                </tr>
-                <tr>
-                  <td>TODO</td>
-                  <td>
-                    <Strong>TODO</Strong>
-                  </td>
-                  <td>TODO</td>
-                </tr>
-                <tr>
-                  <td>TODO</td>
-                  <td>
-                    <Strong>TODO</Strong>
-                  </td>
-                  <td>TODO</td>
-                </tr>
-              </tbody>
-            </Reservations>
-          </NarrowContainer>
-          {errorMsg && (
-            <Notification
-              type="error"
-              label={t("errors.functionFailed")}
-              position="top-center"
-              autoClose={false}
-              dismissible
-              closeButtonLabelText={t("common.close")}
-              displayAutoCloseProgress={false}
-              onClose={() => setErrorMsg(null)}
-            >
-              {t(errorMsg)}
-            </Notification>
-          )}
-        </>
-      )}
+      {application &&
+        applicationRound &&
+        applicationEvent &&
+        reservationUnit &&
+        reservations && (
+          <>
+            <ContentContainer style={{ marginBottom: "var(--spacing-xl)" }}>
+              <LinkPrev route={`/application/${applicationId}`} />
+            </ContentContainer>
+            <NarrowContainer>
+              <p>{customerName}</p>
+              <Heading>{applicationEvent.name}</Heading>
+              <p>
+                <Strong>{t("Application.allocatedReservations")}</Strong>
+              </p>
+              <div>{applicationRound.name}</div>
+              <Divider />
+              <Location>
+                <IconLocation />
+                <H2>{reservationUnit.building.name}</H2>
+                <span>
+                  {localizedValue(reservationUnit.name, i18n.language)}
+                </span>
+              </Location>
+              <Subheading>
+                {t("Application.allocatedForGroupX", {
+                  group: applicationEvent.name,
+                })}
+              </Subheading>
+              {allocatedReservations && allocatedReservations.length > 0 ? (
+                <Reservations>
+                  <tbody>
+                    {allocatedReservations.map((reservation: Reservation) => (
+                      <React.Fragment key={reservation.id}>
+                        <tr>
+                          <th>{t("common.weekday")}</th>
+                          <th>{t("common.date")}</th>
+                          <th>{t("common.time")}</th>
+                        </tr>
+                        <tr>
+                          <td>TODO</td>
+                          <td>
+                            <Strong>{formatDate(reservation.begin)}</Strong>
+                          </td>
+                          <td>
+                            {formatDate(reservation.begin, "H:mm")} -{" "}
+                            {formatDate(reservation.end, "H:mm")}
+                          </td>
+                        </tr>
+                      </React.Fragment>
+                    ))}
+                  </tbody>
+                </Reservations>
+              ) : (
+                <div>-</div>
+              )}
+              <Subheading>{t("Application.declinedReservations")}</Subheading>
+              {declinedReservations && declinedReservations.length > 0 ? (
+                <Reservations>
+                  <tbody>
+                    {declinedReservations.map((reservation: Reservation) => (
+                      <React.Fragment key={reservation.id}>
+                        <tr>
+                          <th>{t("common.weekday")}</th>
+                          <th>{t("common.date")}</th>
+                          <th>{t("common.time")}</th>
+                        </tr>
+                        <tr>
+                          <td>TODO</td>
+                          <td>
+                            <Strong>{formatDate(reservation.begin)}</Strong>
+                          </td>
+                          <td>
+                            {formatDate(reservation.begin, "H:mm")}—
+                            {formatDate(reservation.end, "H:mm")}
+                          </td>
+                        </tr>
+                      </React.Fragment>
+                    ))}
+                  </tbody>
+                </Reservations>
+              ) : (
+                <div>-</div>
+              )}
+            </NarrowContainer>
+            {errorMsg && (
+              <Notification
+                type="error"
+                label={t("errors.functionFailed")}
+                position="top-center"
+                autoClose={false}
+                dismissible
+                closeButtonLabelText={t("common.close")}
+                displayAutoCloseProgress={false}
+                onClose={() => setErrorMsg(null)}
+              >
+                {t(errorMsg)}
+              </Notification>
+            )}
+          </>
+        )}
     </Wrapper>
   );
 }

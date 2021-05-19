@@ -10,20 +10,25 @@ import {
   IconCalendar,
   IconArrowRight,
 } from "hds-react";
-import sortBy from "lodash/sortBy";
 import trim from "lodash/trim";
+import get from "lodash/get";
+import minBy from "lodash/minBy";
+import maxBy from "lodash/maxBy";
 import {
-  getAllocationResults,
   getApplication,
   getApplicationRound,
+  getRecurringReservations,
   saveApplication,
 } from "../../common/api";
 import Loader from "../Loader";
 import {
-  AllocationResult,
   Application as ApplicationType,
+  ApplicationEvent,
   ApplicationRound as ApplicationRoundType,
   ApplicationStatus,
+  RecurringReservation,
+  Reservation,
+  ReservationUnit,
 } from "../../common/types";
 import {
   ContentContainer,
@@ -36,8 +41,10 @@ import withMainMenu from "../withMainMenu";
 import LinkPrev from "../LinkPrev";
 import { ReactComponent as IconCustomers } from "../../images/icon_customers.svg";
 import {
+  formatDate,
   formatNumber,
   getNormalizedApplicationStatus,
+  localizedValue,
   parseDuration,
 } from "../../common/util";
 import ApplicationStatusBlock from "./ApplicationStatusBlock";
@@ -272,8 +279,11 @@ function Application(): JSX.Element | null {
     applicationRound,
     setApplicationRound,
   ] = useState<ApplicationRoundType | null>(null);
-  const [allocationResults, setAllocationResults] = useState<
-    AllocationResult[]
+  // const [allocationResults, setAllocationResults] = useState<
+  //   AllocationResult[]
+  // >([]);
+  const [recurringReservations, setRecurringReservations] = useState<
+    RecurringReservation[][]
   >([]);
   const [
     statusNotification,
@@ -282,7 +292,7 @@ function Application(): JSX.Element | null {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const { applicationId } = useParams<IRouteParams>();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const fetchApplication = async (id: number) => {
     try {
@@ -295,6 +305,18 @@ function Application(): JSX.Element | null {
     }
   };
 
+  const fetchRecurringReservations = (
+    applicationEventsIds: number[]
+  ): Promise<RecurringReservation[][]> => {
+    return Promise.all(
+      applicationEventsIds.map((applicationEventId) =>
+        getRecurringReservations({
+          applicationEvent: applicationEventId,
+        })
+      )
+    );
+  };
+
   const fetchApplicationRound = async (app: ApplicationType) => {
     try {
       const applicationRoundResult = await getApplicationRound({
@@ -303,15 +325,15 @@ function Application(): JSX.Element | null {
       setApplicationRound(applicationRoundResult);
 
       if (["approved", "sent"].includes(applicationRoundResult.status)) {
-        const applicationEventIds = app.applicationEvents
-          .map((n) => n.id)
-          .join(",");
-        const result = await getAllocationResults({
-          applicationRoundId: app.applicationRoundId,
-          applicationEvent: applicationEventIds,
-        });
-        setAllocationResults(
-          sortBy(result, ["unitName", "allocatedReservationUnitName"])
+        const applicationEventIds = app.applicationEvents.map((n) => n.id);
+        const recurringReservationsResult = await fetchRecurringReservations(
+          applicationEventIds
+        );
+
+        setRecurringReservations(
+          recurringReservationsResult.flat().length > 0
+            ? recurringReservationsResult
+            : []
         );
       }
     } catch (error) {
@@ -329,7 +351,7 @@ function Application(): JSX.Element | null {
     if (application?.applicationRoundId) {
       fetchApplicationRound(application);
     }
-  }, [application]);
+  }, [application]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const setApplicationStatus = async (
     app: ApplicationType,
@@ -410,19 +432,6 @@ function Application(): JSX.Element | null {
     applicationRound &&
     getNormalizedApplicationStatus(application.status, applicationRound.status);
 
-  const allocatedSum = {
-    reservationsTotal: allocationResults.reduce((acc, cur) => {
-      return cur?.aggregatedData?.reservationsTotal
-        ? acc + cur.aggregatedData.reservationsTotal
-        : acc;
-    }, 0),
-    durationTotal: allocationResults.reduce((acc, cur) => {
-      return cur?.aggregatedData?.durationTotal
-        ? acc + cur.aggregatedData.durationTotal
-        : acc;
-    }, 0),
-  };
-
   return (
     <Wrapper>
       {application && applicationRound && (
@@ -442,7 +451,7 @@ function Application(): JSX.Element | null {
               </StyledLink>
               {isApplicationRoundApproved &&
                 applicantId &&
-                allocationResults.length > 0 && (
+                recurringReservations.length > 0 && (
                   <StyledLink
                     to={`/applicationRound/${applicationRound.id}/applicant/${applicantId}`}
                   >
@@ -526,24 +535,36 @@ function Application(): JSX.Element | null {
                           <p>{t("Application.graduatedToAllocation")}</p>
                           <table>
                             <tbody>
-                              <tr>
-                                <th>
-                                  {t("Application.allocatedReservations")}
-                                </th>
-                                <td>
-                                  {allocatedSum.reservationsTotal}{" "}
-                                  {t("common.volumeUnit")}
-                                </td>
-                              </tr>
-                              <tr>
-                                <th>
-                                  {t("ApplicationRound.totalReservationTime")}
-                                </th>
-                                <td>
-                                  {parseDuration(allocatedSum.durationTotal) ||
-                                    "-"}
-                                </td>
-                              </tr>
+                              {get(recurringReservations, "length") > 0 ? (
+                                <>
+                                  <tr>
+                                    <th>
+                                      {t("Application.allocatedReservations")}
+                                    </th>
+                                    <td>TODO {t("common.volumeUnit")}</td>
+                                  </tr>
+                                  <tr>
+                                    <th>
+                                      {t(
+                                        "ApplicationRound.totalReservationTime"
+                                      )}
+                                    </th>
+                                    <td>TODO</td>
+                                  </tr>
+                                </>
+                              ) : (
+                                <tr>
+                                  <td>
+                                    <Strong
+                                      style={{
+                                        fontSize: "var(--fontsize-heading-xs)",
+                                      }}
+                                    >
+                                      {t("Application.noAllocatedReservations")}
+                                    </Strong>
+                                  </td>
+                                </tr>
+                              )}
                             </tbody>
                           </table>
                         </>
@@ -571,7 +592,7 @@ function Application(): JSX.Element | null {
             {isApplicationRoundApproved &&
               !["declined"].includes(application.status) && (
                 <WideContainer>
-                  {allocationResults.length > 0 && (
+                  {recurringReservations.length > 0 && (
                     <StyledAccordion
                       heading={t(
                         "Application.summaryOfAllocatedApplicationEvents"
@@ -584,80 +605,114 @@ function Application(): JSX.Element | null {
                           marginLeft: 'calc(var("--spacing-layout-m") * -1)',
                         }}
                       >
-                        {allocationResults.map((allocationResult) => {
+                        {recurringReservations.map((recurringReservation) => {
+                          const applicationEvent:
+                            | ApplicationEvent
+                            | undefined = application.applicationEvents.find(
+                            (n: ApplicationEvent) =>
+                              n.id ===
+                              get(recurringReservation, "0.applicationEventId")
+                          );
+
+                          const reservationUnit:
+                            | ReservationUnit
+                            | undefined = get(
+                            recurringReservation,
+                            "0.reservations.0.reservationUnit.0"
+                          );
+
+                          const beginDates: string[] = recurringReservation.flatMap(
+                            (n: RecurringReservation): string[] =>
+                              n.reservations.map((nn: Reservation) => nn.begin)
+                          );
+
+                          const endDates: string[] = recurringReservation.flatMap(
+                            (n: RecurringReservation): string[] =>
+                              n.reservations.map((nn: Reservation) => nn.end)
+                          );
+
+                          const beginDate = minBy(beginDates, (n) =>
+                            new Date(n).getTime()
+                          );
+
+                          const endDate = maxBy(endDates, (n) =>
+                            new Date(n).getTime()
+                          );
+
                           return (
-                            <RecommendationWrapper
-                              key={allocationResult.applicationEventScheduleId}
-                            >
-                              <H2>{allocationResult.applicationEvent.name}</H2>
-                              <DataGrid
-                                style={{
-                                  borderTop: 0,
-                                  paddingTop: 0,
-                                  marginBottom: "var(--spacing-layout-s)",
-                                }}
-                              >
-                                <GridCol>
-                                  <table>
-                                    <tbody>
-                                      <tr>
-                                        <th>{t("Application.space")}</th>
-                                        <td>
-                                          {trim(
-                                            `${
-                                              allocationResult.unitName || ""
-                                            }, ${
-                                              allocationResult.allocatedReservationUnitName ||
-                                              ""
-                                            }`,
-                                            ", "
-                                          )}
-                                        </td>
-                                      </tr>
-                                      <tr>
-                                        <th>
-                                          {t("Application.headings.purpose")}
-                                        </th>
-                                        <td>
-                                          {
-                                            allocationResult.applicationEvent
-                                              .purpose
-                                          }
-                                        </td>
-                                      </tr>
-                                    </tbody>
-                                  </table>
-                                </GridCol>
-                                <GridCol />
-                              </DataGrid>
-                              <table>
-                                <RecommendedSlot
-                                  id={
-                                    allocationResult.applicationEventScheduleId
-                                  }
-                                  start={
-                                    allocationResult.applicationEvent.begin
-                                  }
-                                  end={allocationResult.applicationEvent.end}
-                                  weekday={allocationResult.allocatedDay}
-                                  biweekly={
-                                    allocationResult.applicationEvent.biweekly
-                                  }
-                                  timeStart={allocationResult.allocatedBegin}
-                                  timeEnd={allocationResult.allocatedEnd}
-                                  duration={allocationResult.allocatedDuration}
-                                />
-                              </table>
-                              <RecommendationListLinkWrapper>
-                                <RecommendationListLink
-                                  to={`/application/${applicationId}/result/${allocationResult.applicationEventScheduleId}`}
+                            applicationEvent &&
+                            reservationUnit && (
+                              <RecommendationWrapper key={applicationEvent.id}>
+                                <H2>{applicationEvent?.name}</H2>
+                                <DataGrid
+                                  style={{
+                                    borderTop: 0,
+                                    paddingTop: 0,
+                                    marginBottom: "var(--spacing-layout-s)",
+                                  }}
                                 >
-                                  <IconCalendar />{" "}
-                                  {t("Application.showDetailedResultList")}{" "}
-                                  <IconArrowRight />
-                                </RecommendationListLink>
-                              </RecommendationListLinkWrapper>
-                            </RecommendationWrapper>
+                                  <GridCol>
+                                    <table>
+                                      <tbody>
+                                        <tr>
+                                          <th>{t("Application.space")}</th>
+                                          <td>
+                                            {trim(
+                                              `${
+                                                reservationUnit.building
+                                                  ?.name || ""
+                                              }, ${
+                                                localizedValue(
+                                                  reservationUnit.name,
+                                                  i18n.language
+                                                ) || ""
+                                              }`,
+                                              ", "
+                                            )}
+                                          </td>
+                                        </tr>
+                                        <tr>
+                                          <th>
+                                            {t("Application.headings.purpose")}
+                                          </th>
+                                          <td>{applicationEvent.purpose}</td>
+                                        </tr>
+                                      </tbody>
+                                    </table>
+                                  </GridCol>
+                                  <GridCol />
+                                </DataGrid>
+                                <table>
+                                  <RecommendedSlot
+                                    id={applicationEvent.id || null}
+                                    start={beginDate}
+                                    end={endDate}
+                                    weekday={null}
+                                    biweekly={
+                                      applicationEvent.biweekly || false
+                                    }
+                                    duration=""
+                                    timeStart={formatDate(
+                                      beginDate || "",
+                                      "H:mm:ss"
+                                    )}
+                                    timeEnd={formatDate(
+                                      endDate || "",
+                                      "H:mm:ss"
+                                    )}
+                                  />
+                                </table>
+                                <RecommendationListLinkWrapper>
+                                  <RecommendationListLink
+                                    to={`/application/${applicationId}/result/${applicationEvent.id}`}
+                                  >
+                                    <IconCalendar />{" "}
+                                    {t("Application.showDetailedResultList")}{" "}
+                                    <IconArrowRight />
+                                  </RecommendationListLink>
+                                </RecommendationListLinkWrapper>
+                              </RecommendationWrapper>
+                            )
                           );
                         })}
                       </NarrowContainer>
