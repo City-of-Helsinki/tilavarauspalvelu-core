@@ -45,6 +45,7 @@ class MockedScheduler:
 
 @freeze_time("2021-05-03")
 @pytest.mark.django_db
+@mock.patch("applications.signals")
 class ApplicationStatusBaseTestCase(TestCase):
     @classmethod
     def setUpTestData(cls) -> None:
@@ -148,22 +149,36 @@ class ApplicationStatusApiPermissionsTestCase(ApplicationStatusBaseTestCase):
             ApplicationStatus.REVIEW_DONE
         )
 
+    def test_service_sector_manager_can_create_status_for_multiple(self):
+        application_too = ApplicationFactory(application_round=self.round)
+        body = [
+            {
+                "status": ApplicationStatus.REVIEW_DONE,
+                "application_id": self.application.id,
+            },
+            {
+                "status": ApplicationStatus.REVIEW_DONE,
+                "application_id": application_too.id,
+            },
+        ]
+        response = self.manager_api_client.post(
+            reverse("application_status-list"), data=body, format="json"
+        )
+        assert_that(response.status_code).is_equal_to(201)
+        assert_that(
+            ApplicationStatus.objects.filter(application=self.application)
+            .latest("id")
+            .status
+        ).is_equal_to(ApplicationStatus.REVIEW_DONE)
+        assert_that(
+            ApplicationStatus.objects.filter(application=application_too)
+            .latest("id")
+            .status
+        ).is_equal_to(ApplicationStatus.REVIEW_DONE)
+
 
 @pytest.mark.django_db
 class ApplicationEventStatusApiPermissionsTestCase(ApplicationStatusBaseTestCase):
-    def test_service_sector_manager_cant_modify_status(self):
-        response = self.manager_api_client.post(
-            reverse(
-                "application_event_status-detail",
-                kwargs={"pk": self.application_event.id},
-            ),
-            data={
-                "status": ApplicationEventStatus.VALIDATED,
-                "application_event_id": self.application_event.id,
-            },
-        )
-        assert_that(response.status_code).is_equal_to(403)
-
     def test_user_cant_create_status(self):
         response = self.applicant_api_client.post(
             reverse("application_event_status-list"),
@@ -187,7 +202,7 @@ class ApplicationEventStatusApiPermissionsTestCase(ApplicationStatusBaseTestCase
             ApplicationEventStatus.CREATED
         )
 
-    def test_service_sector_manager_cant_create_validated_status(self):
+    def test_service_sector_manager_can_create_validated_status(self):
         response = self.manager_api_client.post(
             reverse("application_event_status-list"),
             data={
@@ -195,7 +210,7 @@ class ApplicationEventStatusApiPermissionsTestCase(ApplicationStatusBaseTestCase
                 "application_event_id": self.application_event.id,
             },
         )
-        assert_that(response.status_code).is_equal_to(403)
+        assert_that(response.status_code).is_equal_to(201)
 
     def test_unit_handler_can_create_validated_status(self):
         response = self.unit_handler_client.post(
@@ -226,6 +241,42 @@ class ApplicationEventStatusApiPermissionsTestCase(ApplicationStatusBaseTestCase
         assert_that(ApplicationEventStatus.objects.latest("id").status).is_equal_to(
             ApplicationEventStatus.APPROVED
         )
+
+    def test_service_sector_manager_can_create_validated_status_for_multiple(self):
+        second_application_event = ApplicationEventFactory(
+            application=self.application,
+            events_per_week=1,
+            begin=datetime.date.today(),
+            end=datetime.date.today() + datetime.timedelta(weeks=4),
+        )
+        body = [
+            {
+                "status": ApplicationEventStatus.VALIDATED,
+                "application_event_id": self.application_event.id,
+            },
+            {
+                "status": ApplicationEventStatus.VALIDATED,
+                "application_event_id": second_application_event.id,
+            },
+        ]
+        response = self.manager_api_client.post(
+            reverse("application_event_status-list"), data=body, format="json"
+        )
+        assert_that(response.status_code).is_equal_to(201)
+        assert_that(
+            ApplicationEventStatus.objects.filter(
+                application_event=self.application_event
+            )
+            .latest("id")
+            .status
+        ).is_equal_to(ApplicationEventStatus.VALIDATED)
+        assert_that(
+            ApplicationEventStatus.objects.filter(
+                application_event=second_application_event
+            )
+            .latest("id")
+            .status
+        ).is_equal_to(ApplicationEventStatus.VALIDATED)
 
 
 @mock.patch(

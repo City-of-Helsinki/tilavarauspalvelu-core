@@ -188,7 +188,22 @@ class ApplicationStatusPermission(permissions.BasePermission):
         if request.method in permissions.SAFE_METHODS:
             return True
 
+        if isinstance(request.data, list):
+            for data in request.data:
+                application_id = data.get("application_id")
+                permission_granted = self.check_permissions_for_single(
+                    request, application_id
+                )
+
+                if not permission_granted:
+                    return False
+            return True
+
         application_id = request.data.get("application_id")
+
+        return self.check_permissions_for_single(request, application_id)
+
+    def check_permissions_for_single(self, request, application_id):
         try:
             service_sector = ServiceSector.objects.get(
                 applicationround=ApplicationRound.objects.get(
@@ -210,8 +225,22 @@ class ApplicationEventStatusPermission(permissions.BasePermission):
         if request.method in permissions.SAFE_METHODS:
             return True
 
+        if isinstance(request.data, list):
+            for data in request.data:
+                application_event_id = data.get("application_event_id")
+                status = data.get("status")
+                permission_granted = self.check_permissions_for_single(
+                    request, status, application_event_id
+                )
+                if not permission_granted:
+                    return False
+            return True
+
         application_event_id = request.data.get("application_event_id")
         status = request.data.get("status")
+        return self.check_permissions_for_single(request, status, application_event_id)
+
+    def check_permissions_for_single(self, request, status, application_event_id):
         try:
             service_sector = ServiceSector.objects.get(
                 applicationround=ApplicationRound.objects.get(
@@ -236,7 +265,11 @@ class ApplicationEventStatusPermission(permissions.BasePermission):
                     event_res_unit.reservation_unit.unit
                     for event_res_unit in application_event.event_reservation_units.all()
                 ]
-                return can_validate_unit_applications(request.user, units)
+                return can_validate_unit_applications(
+                    request.user, units
+                ) or can_manage_service_sectors_applications(
+                    request.user, service_sector
+                )
         except (
             Application.DoesNotExist,
             ApplicationEvent.DoesNotExist,

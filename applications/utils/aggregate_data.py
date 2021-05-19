@@ -1,11 +1,24 @@
+import logging
+import sys
 from threading import Thread
 
 from django.db import Error
 
+from opening_hours.hours import HaukiConfigurationError
 from opening_hours.utils import get_resources_total_hours
 
+logger = logging.getLogger(__name__)
 
-class EventAggregateDataCreator(Thread):
+
+class BaseAggregateDataCreator(Thread):
+    def start(self) -> None:
+        if len(sys.argv) > 1 and sys.argv[1] == "test":
+            self.run()
+            return
+        super().run()
+
+
+class EventAggregateDataCreator(BaseAggregateDataCreator):
     def __init__(self, event, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.event = event
@@ -14,7 +27,7 @@ class EventAggregateDataCreator(Thread):
         return self.event.create_aggregate_data()
 
 
-class ApplicationEventScheduleResultAggregateDataCreator(Thread):
+class ApplicationEventScheduleResultAggregateDataCreator(BaseAggregateDataCreator):
     def __init__(self, event, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.event = event
@@ -23,7 +36,7 @@ class ApplicationEventScheduleResultAggregateDataCreator(Thread):
         return self.event.create_schedule_result_aggregated_data()
 
 
-class ApplicationRoundAggregateDataCreator(Thread):
+class ApplicationRoundAggregateDataCreator(BaseAggregateDataCreator):
     def __init__(self, app_round, *args, **kwargs):
         self.reservations_only = kwargs.pop("reservations_only", False)
         super().__init__(*args, **kwargs)
@@ -46,14 +59,22 @@ class ApplicationRoundAggregateDataCreator(Thread):
                     defaults={"value": value},
                 )
         except Error:
-            pass
+            logger.error(
+                "ApplicationRoundAggregateDataCreator got an error while creating ApplicationRoundAggregateData."
+            )
 
     def create_total_opening_hours(self):
-        total_opening_hours = get_resources_total_hours(
-            list(self.app_round.reservation_units.values_list("uuid", flat=True)),
-            self.app_round.reservation_period_begin,
-            self.app_round.reservation_period_end,
-        )
+        try:
+            total_opening_hours = get_resources_total_hours(
+                list(self.app_round.reservation_units.values_list("uuid", flat=True)),
+                self.app_round.reservation_period_begin,
+                self.app_round.reservation_period_end,
+            )
+        except HaukiConfigurationError:
+            total_opening_hours = 0
+            logger.error(
+                "Got HaukiConfigurationError while trying to fetch opening hours."
+            )
 
         data = {"total_hour_capacity": total_opening_hours}
 
