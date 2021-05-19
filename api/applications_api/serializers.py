@@ -40,6 +40,9 @@ MAXIMUM_TIME = timezone.datetime(
 
 
 class AddressSerializer(serializers.ModelSerializer):
+
+    id = serializers.IntegerField(allow_null=True, required=False)
+
     class Meta:
         model = Address
 
@@ -503,8 +506,15 @@ class ApplicationSerializer(serializers.ModelSerializer):
     def handle_person(contact_person_data) -> Union[Person, None]:
         person = None
         if contact_person_data is not None:
-            person = Person(**contact_person_data)
-            person.save()
+            if "id" not in contact_person_data or contact_person_data["id"] is None:
+                person = PersonSerializer(data=contact_person_data).create(
+                    validated_data=contact_person_data
+                )
+            else:
+                person = PersonSerializer(data=contact_person_data).update(
+                    instance=Person.objects.get(pk=contact_person_data["id"]),
+                    validated_data=contact_person_data,
+                )
         return person
 
     def handle_organisation(self, organisation_data) -> Union[Organisation, None]:
@@ -625,10 +635,18 @@ class ApplicationSerializer(serializers.ModelSerializer):
 
         billing_address_data = validated_data.pop("billing_address", None)
         if billing_address_data:
-            billing_address = Address.objects.create(**billing_address_data)
+            if "id" not in billing_address_data or billing_address_data["id"] is None:
+                billing_address = AddressSerializer(data=billing_address_data).create(
+                    validated_data=billing_address_data
+                )
+            else:
+                billing_address = AddressSerializer(data=billing_address_data).update(
+                    instance=Address.objects.get(pk=billing_address_data["id"]),
+                    validated_data=billing_address_data,
+                )
             validated_data["billing_address"] = billing_address
 
-        status = validated_data.pop("status")
+        status = validated_data.pop("status", None)
 
         contact_person_data = validated_data.pop("contact_person", None)
 
@@ -647,7 +665,8 @@ class ApplicationSerializer(serializers.ModelSerializer):
 
         app = super().update(instance, validated_data)
 
-        app.set_status(status, request_user)
+        if status is not None:
+            app.set_status(status, request_user)
 
         return app
 
