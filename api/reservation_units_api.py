@@ -252,9 +252,12 @@ class ReservationUnitViewSet(viewsets.ModelViewSet):
                 "Given reservation unit id is not an integer"
             )
 
+        reservation_unit_qs = ReservationUnit.objects.filter(id__in=reservation_units)
+
         try:
+            resource_ids = reservation_unit_qs.values_list("uuid", flat=True)
             total_opening_hours = get_resources_total_hours_per_resource(
-                reservation_units, period_start, period_end
+                resource_ids, period_start, period_end
             )
         except HaukiRequestError:
             total_opening_hours = {
@@ -263,7 +266,7 @@ class ReservationUnitViewSet(viewsets.ModelViewSet):
             }
 
         result_data = []
-        for res_unit in reservation_units:
+        for res_unit in reservation_unit_qs:
             total_duration = (
                 Reservation.objects.going_to_occur()
                 .filter(reservation_unit=res_unit)
@@ -274,11 +277,11 @@ class ReservationUnitViewSet(viewsets.ModelViewSet):
             total_duration = (
                 total_duration.total_seconds() / 3600 if total_duration else 0
             )
-
+            resource_id = f"{settings.HAUKI_ORIGIN_ID}:{res_unit.uuid}"
             result_data.append(
                 {
-                    "id": res_unit,
-                    "hour_capacity": total_opening_hours.get(res_unit),
+                    "id": res_unit.id,
+                    "hour_capacity": total_opening_hours.get(resource_id),
                     "reservation_duration_total": total_duration,
                     "period_start": period_start,
                     "period_end": period_end,
