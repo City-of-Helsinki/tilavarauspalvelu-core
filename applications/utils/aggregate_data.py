@@ -56,8 +56,8 @@ class ApplicationAggregateDataCreator(BaseAggregateDataCreator):
             events_count += duration["events_count"].days
 
         data_values = {
-            "min_duration_total": total_min_duration,
-            "reservations_total": events_count,
+            "applied_min_duration_total": total_min_duration,
+            "applied_reservations_total": events_count,
         }
 
         self._update_or_create_aggregate_data_values(data_values)

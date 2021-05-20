@@ -44,7 +44,7 @@ def test_application_aggregate_data_contains_min_duration_total(
 
     recurring_application_event.application.set_status(ApplicationStatus.IN_REVIEW)
     assert ApplicationAggregateData.objects.count() == 2
-    min_dur_tot = ApplicationAggregateData.objects.get(name="min_duration_total")
+    min_dur_tot = ApplicationAggregateData.objects.get(name="applied_min_duration_total")
 
     # Two times per week every second week for 89 days => 12 whole weeks
     # 12 whole weeks every other week => 1 / week => 1 * 12 weeks => 12h
@@ -71,7 +71,7 @@ def test_application_aggregate_data_contains_reservations_total(
 
     recurring_application_event.application.set_status(ApplicationStatus.IN_REVIEW)
     assert ApplicationAggregateData.objects.count() == 2
-    res_tot = ApplicationAggregateData.objects.get(name="reservations_total")
+    res_tot = ApplicationAggregateData.objects.get(name="applied_reservations_total")
 
     # First, every other week two times for twelve whole week => 6 weeks
     # 6 weeks * two times per week = 12 reservations
@@ -146,10 +146,10 @@ def test_aggregate_data_creates_data_per_application_reservations_total(
         application=application_in_second_application_round
     )
 
-    one_res = aggregate_datas_one.get(name="reservations_total")
+    one_res = aggregate_datas_one.get(name="applied_reservations_total")
     assert one_res.value == 16
 
-    two_res = aggregate_datas_two.get(name="reservations_total")
+    two_res = aggregate_datas_two.get(name="applied_reservations_total")
     assert two_res.value == 8
 
 
@@ -180,8 +180,8 @@ def test_aggregate_data_creates_data_per_application_min_duration_total(
         application=application_in_second_application_round
     )
 
-    one_res = aggregate_datas_one.get(name="min_duration_total")
+    one_res = aggregate_datas_one.get(name="applied_min_duration_total")
     assert one_res.value == 16 * 3600
 
-    two_res = aggregate_datas_two.get(name="min_duration_total")
+    two_res = aggregate_datas_two.get(name="applied_min_duration_total")
     assert two_res.value == 8 * 3600
