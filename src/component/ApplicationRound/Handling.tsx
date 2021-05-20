@@ -155,10 +155,12 @@ const getFilterConfig = (
     recommendations.map((rec) => rec.unitName)
   ).sort();
   const baskets = uniq(
-    recommendations.map((rec) => ({
-      title: `${rec.basketOrderNumber}. ${rec.basketName}`,
-      value: rec.basketName,
-    }))
+    recommendations
+      .filter((n) => n.basketName)
+      .map((rec) => ({
+        title: `${rec.basketOrderNumber}. ${rec.basketName}`,
+        value: rec.basketName,
+      }))
   );
 
   return [

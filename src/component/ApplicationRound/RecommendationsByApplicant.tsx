@@ -192,10 +192,12 @@ const getFilterConfig = (
     recommendations.map((rec) => rec.unitName)
   ).sort();
   const baskets = uniq(
-    recommendations.map((rec) => ({
-      title: `${rec.basketOrderNumber}. ${rec.basketName}`,
-      value: rec.basketName,
-    }))
+    recommendations
+      .filter((n) => n.basketName)
+      .map((rec) => ({
+        title: `${rec.basketOrderNumber}. ${rec.basketName}`,
+        value: rec.basketName,
+      }))
   );
 
   return [
@@ -329,11 +331,18 @@ function RecommendationsByApplicant(): JSX.Element {
       }
     };
 
-    const aId = get(recommendations, "[0].applicationId");
+    const aId = organisationId
+      ? get(recommendations, "[0].applicationId")
+      : get(
+          recommendations.filter(
+            (n: AllocationResult) => n.applicantType === "individual"
+          ),
+          "0.applicationId"
+        );
     if (aId) {
       fetchApplication(aId);
     }
-  }, [recommendations]);
+  }, [recommendations, organisationId]);
 
   const applicantName = organisationId
     ? get(recommendations, "[0].organisationName")
