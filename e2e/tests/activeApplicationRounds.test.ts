@@ -79,9 +79,9 @@ test("Active Application Round", async (t) => {
     .eql(applicationData.status)
     .expect(application.participants.innerText)
     .eql(applicationData.participants)
-    .expect(application.reservationsTotal.innerText)
+    .expect(application.appliedReservationsTotal.innerText)
     .eql(applicationData.applicationCount.split("/")[0].trim())
-    .expect(application.minDurationTotal.innerText)
+    .expect(application.appliedMinDurationTotal.innerText)
     .eql(applicationData.applicationCount.split("/")[1].trim());
 
   if (["in_review", "review_done"].includes(applicationData.status)) {

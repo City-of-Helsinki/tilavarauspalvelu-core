@@ -325,15 +325,15 @@ function Application(): JSX.Element | null {
                   <tbody>
                     <tr>
                       <th>{t("ApplicationRound.appliedReservations")}</th>
-                      <td data-testid="application__data--reservations-total">{`${formatNumber(
-                        application.aggregatedData.reservationsTotal,
+                      <td data-testid="application__data--applied-reservations-total">{`${formatNumber(
+                        application.aggregatedData.appliedReservationsTotal,
                         t("common.volumeUnit")
                       )}`}</td>
                     </tr>
                     <tr>
                       <th>{t("ApplicationRound.totalReservationTime")}</th>
-                      <td data-testid="application__data--min-duration-total">{`${parseDuration(
-                        application.aggregatedData.minDurationTotal
+                      <td data-testid="application__data--applied-min-duration-total">{`${parseDuration(
+                        application.aggregatedData.appliedMinDurationTotal
                       )}`}</td>
                     </tr>
                   </tbody>
