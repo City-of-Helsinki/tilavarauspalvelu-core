@@ -7,7 +7,6 @@ import recurrence
 from django.contrib.auth import get_user_model
 from django.contrib.postgres.fields import ArrayField
 from django.db import Error, models
-from django.db.models import DurationField, ExpressionWrapper, F
 from django.utils.text import format_lazy
 from django.utils.translation import gettext_lazy as _
 from recurrence.fields import RecurrenceField
@@ -16,8 +15,8 @@ from sentry_sdk import capture_message
 
 from applications.base_models import ContactInformation
 from applications.utils.aggregate_data import (
+    ApplicationAggregateDataCreator,
     ApplicationRoundAggregateDataCreator,
-    EventAggregateDataCreator,
 )
 from reservation_units.models import Purpose, ReservationUnit
 from spaces.models import District
@@ -662,44 +661,8 @@ class Application(APPLICANT_TYPE_CONST, models.Model):
             raise ValidationError(_("Application must have contact person"))
 
     def create_aggregate_data(self):
-        # Base queries
-        base_query = self.application_events.values(
-            "id", "begin", "end", "events_per_week", "min_duration", "max_duration"
-        ).annotate(
-            events_count=ExpressionWrapper(
-                (F("end") - F("begin")) / 7 * F("events_per_week"),
-                output_field=DurationField(),
-            )
-        )
-
-        weekly_query = base_query.filter(biweekly=False)
-
-        bi_weekly_query = base_query.filter(biweekly=True).annotate(
-            events_count=ExpressionWrapper(
-                F("events_count") / 2, output_field=DurationField()
-            )
-        )
-
-        total_min_duration = 0
-        events_count = 0
-        for duration in weekly_query.union(bi_weekly_query):
-            total_min_duration += (
-                duration["events_count"].days * duration["min_duration"].total_seconds()
-            )
-            events_count += duration["events_count"].days
-
-        name = "min_duration_total"
-        ApplicationAggregateData.objects.update_or_create(
-            application=self, name=name, defaults={"value": total_min_duration}
-        )
-
-        name = "reservations_total"
-        ApplicationAggregateData.objects.update_or_create(
-            application=self, name=name, defaults={"value": events_count}
-        )
-
-        for event in self.application_events.all():
-            EventAggregateDataCreator(event).start()
+        # No threading at this point.
+        ApplicationAggregateDataCreator(self).run()
 
     @property
     def aggregated_data_dict(self):
