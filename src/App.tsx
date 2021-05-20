@@ -22,6 +22,7 @@ import ApplicationRoundApprovals from "./component/ApplicationRound/ApplicationR
 import { publicUrl } from "./common/const";
 import ResolutionReport from "./component/ApplicationRound/ResolutionReport";
 import Result from "./component/Application/Result";
+import ReservationsByReservationUnit from "./component/ApplicationRound/ReservationsByReservationUnit";
 
 interface IPrivateRouteProps {
   path: string;
@@ -108,11 +109,19 @@ function App(): JSX.Element {
               component={Criteria}
             />
             <PrivateRoute
+              path="/applicationRound/:applicationRoundId/reservationUnit/:reservationUnitId/reservations"
+              component={ReservationsByReservationUnit}
+            />
+            <PrivateRoute
               path="/applicationRound/:applicationRoundId/reservationUnit/:reservationUnitId"
               component={RecommendationsByReservationUnit}
             />
             <PrivateRoute
               path="/applicationRound/:applicationRoundId/applicant/:applicantId"
+              component={RecommendationsByApplicant}
+            />
+            <PrivateRoute
+              path="/applicationRound/:applicationRoundId/organisation/:organisationId"
               component={RecommendationsByApplicant}
             />
             <PrivateRoute

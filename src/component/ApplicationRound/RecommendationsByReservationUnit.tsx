@@ -8,13 +8,14 @@ import {
   IconHome,
   IconGroup,
   Notification,
+  IconArrowRight,
 } from "hds-react";
 import trim from "lodash/trim";
 import uniq from "lodash/uniq";
 import { TFunction } from "i18next";
 import { ContentContainer, IngressContainer } from "../../styles/layout";
 import { H1, H3 } from "../../styles/typography";
-import { breakpoints, InlineRowLink } from "../../styles/util";
+import { BasicLink, breakpoints, InlineRowLink } from "../../styles/util";
 import LinkPrev from "../LinkPrev";
 import withMainMenu from "../withMainMenu";
 import {
@@ -46,6 +47,7 @@ import StatusCell from "../StatusCell";
 import RecommendationCount from "./RecommendationCount";
 import i18n from "../../i18n";
 import SelectionActionBar from "../SelectionActionBar";
+import { ReactComponent as IconBulletList } from "../../images/icon_list-bullet.svg";
 
 interface IRouteParams {
   applicationRoundId: string;
@@ -113,6 +115,20 @@ const TitleContainer = styled.div`
   }
 `;
 
+const BottomContainer = styled.div`
+  @media (min-width: ${breakpoints.l}) {
+    display: flex;
+    justify-content: space-between;
+  }
+`;
+
+const ReservationLink = styled(BasicLink)`
+  display: inline-flex;
+  gap: var(--spacing-s);
+  justify-content: space-between;
+  margin-top: var(--spacing-m);
+`;
+
 const StatusContainer = styled.div`
   display: flex;
   align-content: center;
@@ -138,14 +154,18 @@ const getCellConfig = (
         transform: ({
           applicantType,
           applicantName,
+          organisationId,
           organisationName,
           applicantId,
         }: AllocationResult) => {
+          const index = organisationId || applicantId;
           const title =
             applicantType === "individual" ? applicantName : organisationName;
-          return applicantId ? (
+          return index ? (
             <InlineRowLink
-              to={`/applicationRound/${applicationRound.id}/applicant/${applicantId}`}
+              to={`/applicationRound/${applicationRound.id}/${
+                organisationId ? "organisation" : "applicant"
+              }/${index}`}
             >
               {title}
             </InlineRowLink>
@@ -390,7 +410,7 @@ function RecommendationsByReservationUnit(): JSX.Element {
         filterConfig &&
         cellConfig && (
           <>
-            <ContentContainer>
+            <ContentContainer style={{ paddingBottom: "var(--spacing-s)" }}>
               <LinkPrev route={`/applicationRound/${applicationRoundId}`} />
               <IngressContainer>
                 <Ingress>
@@ -441,10 +461,23 @@ function RecommendationsByReservationUnit(): JSX.Element {
                     </div> */}
                   </StatusContainer>
                 </TitleContainer>
-                <RecommendationCount
-                  recommendationCount={recommendations.length}
-                  unhandledCount={unhandledRecommendationCount}
-                />
+                <BottomContainer>
+                  <RecommendationCount
+                    recommendationCount={recommendations.length}
+                    unhandledCount={unhandledRecommendationCount}
+                  />
+                  {["approved"].includes(applicationRound.status) && (
+                    <ReservationLink
+                      to={`/applicationRound/${applicationRoundId}/reservationUnit/${reservationUnitId}/reservations`}
+                    >
+                      <IconBulletList />
+                      {t(
+                        "Reservation.showSummaryOfReservationsByReservationUnit"
+                      )}
+                      <IconArrowRight />
+                    </ReservationLink>
+                  )}
+                </BottomContainer>
               </IngressContainer>
             </ContentContainer>
             <DataTable

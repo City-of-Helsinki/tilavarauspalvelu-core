@@ -237,18 +237,26 @@ const StyledAccordion = styled(Accordion).attrs({
   },
 })``;
 
-const RecommendationWrapper = styled.div`
+const ReservationWrapper = styled.div`
   padding-bottom: var(--spacing-layout-m);
   border-bottom: 1px solid var(--color-silver);
 `;
 
-const RecommendationListLinkWrapper = styled.div`
+const ReservationListLinkWrapper = styled.div`
   display: block;
   position: relative;
   padding: var(--spacing-xl) 0;
 `;
 
-const RecommendationListLink = styled(BasicLink)`
+const DeclinedReservations = styled.div`
+  h3 {
+    margin-top: var(--spacing-l);
+    margin-bottom: var(--spacing-xs);
+    display: block;
+  }
+`;
+
+const ReservationListLink = styled(BasicLink)`
   position: absolute;
   right: 0;
 `;
@@ -438,7 +446,11 @@ function Application(): JSX.Element | null {
         <>
           <ContentContainer>
             <LinkPrev
-              route={`/applicationRound/${application.applicationRoundId}`}
+              route={
+                isApplicationRoundApproved
+                  ? `/applicationRound/${application.applicationRoundId}/applications`
+                  : `/applicationRound/${application.applicationRoundId}`
+              }
             />
           </ContentContainer>
           <NarrowContainer>
@@ -453,7 +465,11 @@ function Application(): JSX.Element | null {
                 applicantId &&
                 recurringReservations.length > 0 && (
                   <StyledLink
-                    to={`/applicationRound/${applicationRound.id}/applicant/${applicantId}`}
+                    to={`/applicationRound/${applicationRound.id}/${
+                      application.organisation?.id
+                        ? "organisation"
+                        : "applicant"
+                    }/${applicantId}`}
                   >
                     {t("Application.showAllocationResultsOfApplicant")}
                   </StyledLink>
@@ -606,6 +622,7 @@ function Application(): JSX.Element | null {
                         }}
                       >
                         {recurringReservations.map((recurringReservation) => {
+                          console.log(recurringReservation);
                           const applicationEvent:
                             | ApplicationEvent
                             | undefined = application.applicationEvents.find(
@@ -639,10 +656,15 @@ function Application(): JSX.Element | null {
                             new Date(n).getTime()
                           );
 
+                          const declinedReservations = get(
+                            recurringReservation,
+                            "0.reservations"
+                          ).filter((n: Reservation) => n.state === "denied");
+
                           return (
                             applicationEvent &&
                             reservationUnit && (
-                              <RecommendationWrapper key={applicationEvent.id}>
+                              <ReservationWrapper key={applicationEvent.id}>
                                 <H2>{applicationEvent?.name}</H2>
                                 <DataGrid
                                   style={{
@@ -702,16 +724,32 @@ function Application(): JSX.Element | null {
                                     )}
                                   />
                                 </table>
-                                <RecommendationListLinkWrapper>
-                                  <RecommendationListLink
+                                {declinedReservations?.length > 0 && (
+                                  <DeclinedReservations>
+                                    <H3>
+                                      {t("Application.declinedReservations")}
+                                    </H3>
+                                    <div>
+                                      {trim(
+                                        declinedReservations.map(
+                                          (n: Reservation) =>
+                                            `${formatDate(n.begin)}, `
+                                        ),
+                                        ", "
+                                      )}
+                                    </div>
+                                  </DeclinedReservations>
+                                )}
+                                <ReservationListLinkWrapper>
+                                  <ReservationListLink
                                     to={`/application/${applicationId}/result/${applicationEvent.id}`}
                                   >
                                     <IconCalendar />{" "}
                                     {t("Application.showDetailedResultList")}{" "}
                                     <IconArrowRight />
-                                  </RecommendationListLink>
-                                </RecommendationListLinkWrapper>
-                              </RecommendationWrapper>
+                                  </ReservationListLink>
+                                </ReservationListLinkWrapper>
+                              </ReservationWrapper>
                             )
                           );
                         })}

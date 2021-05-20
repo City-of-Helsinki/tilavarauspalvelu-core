@@ -41,7 +41,8 @@ import SelectionActionBar from "../SelectionActionBar";
 
 interface IRouteParams {
   applicationRoundId: string;
-  applicantId: string;
+  organisationId?: string;
+  applicantId?: string;
 }
 
 const Wrapper = styled.div`
@@ -255,20 +256,29 @@ function RecommendationsByApplicant(): JSX.Element {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const { t } = useTranslation();
-  const { applicationRoundId, applicantId } = useParams<IRouteParams>();
+  const {
+    applicationRoundId,
+    organisationId,
+    applicantId,
+  } = useParams<IRouteParams>();
 
   const fetchRecommendations = async (
     ar: ApplicationRoundType,
+    orId: number,
     apId: number
   ) => {
     try {
       const result = await getAllocationResults({
         applicationRoundId: ar.id,
         serviceSectorId: ar.serviceSectorId,
-        applicant: apId,
+        applicant: apId || undefined,
       });
 
-      const processedResult = processAllocationResult(result);
+      const processedResult = orId
+        ? processAllocationResult(result).filter(
+            (n) => n.organisationId === orId
+          )
+        : processAllocationResult(result);
 
       setFilterConfig(getFilterConfig(processedResult));
       setCellConfig(getCellConfig(t, ar));
@@ -299,9 +309,13 @@ function RecommendationsByApplicant(): JSX.Element {
 
   useEffect(() => {
     if (typeof applicationRound?.id === "number") {
-      fetchRecommendations(applicationRound, Number(applicantId));
+      fetchRecommendations(
+        applicationRound,
+        Number(organisationId),
+        Number(applicantId)
+      );
     }
-  }, [applicationRound, applicantId, t]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [applicationRound, applicantId, organisationId, t]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     const fetchApplication = async (id: number) => {
@@ -321,9 +335,9 @@ function RecommendationsByApplicant(): JSX.Element {
     }
   }, [recommendations]);
 
-  const applicantName =
-    get(recommendations, "[0].organisationName") ||
-    get(recommendations, "[0].applicantName");
+  const applicantName = organisationId
+    ? get(recommendations, "[0].organisationName")
+    : get(recommendations, "[0].applicantName");
 
   const unhandledRecommendationCount = recommendations.filter((n) =>
     ["created", "allocating", "allocated"].includes(n.applicationEvent.status)
@@ -361,7 +375,12 @@ function RecommendationsByApplicant(): JSX.Element {
                 />
               </div>
               <div>
-                {application && <ApplicantBox application={application} />}
+                {application && (
+                  <ApplicantBox
+                    application={application}
+                    type={applicantId && "individual"}
+                  />
+                )}
               </div>
             </Top>
             <RecommendationCount
@@ -424,7 +443,11 @@ function RecommendationsByApplicant(): JSX.Element {
                   setErrorMsg,
                   callback: () => {
                     setTimeout(() => setIsSaving(false), 1000);
-                    fetchRecommendations(applicationRound, Number(applicantId));
+                    fetchRecommendations(
+                      applicationRound,
+                      Number(organisationId),
+                      Number(applicantId)
+                    );
                   },
                 });
               }}

@@ -536,6 +536,12 @@ const translations: ITranslations = {
     scheduleDuration: ["Vuoron kesto {{duration}}"],
     noRecommendations: ["Ei ehdotuksia"],
   },
+  Reservation: {
+    showSummaryOfReservationsByReservationUnit: [
+      "Näytä kooste tilaan myönnetyistä vuoroista",
+    ],
+    allocatedReservationsForReservationUnit: ["Myönnetyt käyttövuorot tilaan"],
+  },
   ReservationUnit: {
     reservationStatus: ["Varaustilanne"],
     purposeCount: ["{{count}} käyttötarkoitus"],

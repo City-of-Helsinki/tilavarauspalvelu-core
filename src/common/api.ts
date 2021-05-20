@@ -12,6 +12,7 @@ import {
   ApplicationEventsDeclinedReservationUnits,
   Reservation,
   RecurringReservation,
+  ApplicationRoundStatus,
 } from "./types";
 
 const apiBaseUrl: string = process.env.REACT_APP_TILAVARAUS_API_URL || "";
@@ -146,6 +147,16 @@ export function saveApplicationRound(
   return apiPut<ApplicationRound>({
     data: applicationRound,
     path: `v1/${applicationRoundsBasePath}/${applicationRound.id}/`,
+  });
+}
+
+export function patchApplicationRoundStatus(
+  id: number,
+  status: ApplicationRoundStatus
+): Promise<ApplicationRound> {
+  return apiPatch<ApplicationRound>({
+    data: { status },
+    path: `v1/${applicationRoundsBasePath}/${id}/`,
   });
 }
 

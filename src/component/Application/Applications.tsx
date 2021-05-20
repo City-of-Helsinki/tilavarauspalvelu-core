@@ -207,7 +207,7 @@ function Applications(): JSX.Element {
       try {
         const result = await getApplications({
           applicationRound: ar.id,
-          status: "in_review,review_done,declined",
+          status: "in_review,review_done,declined,sent",
         });
         setCellConfig(getCellConfig(ar, t));
         setFilterConfig(getFilterConfig(result, ar));

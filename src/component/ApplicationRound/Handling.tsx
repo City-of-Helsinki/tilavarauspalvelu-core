@@ -212,14 +212,18 @@ const getCellConfig = (
         transform: ({
           applicantType,
           applicantName,
+          organisationId,
           organisationName,
           applicantId,
         }: AllocationResult) => {
+          const index = organisationId || applicantId;
           const title =
             applicantType === "individual" ? applicantName : organisationName;
-          return applicantId ? (
+          return index ? (
             <InlineRowLink
-              to={`/applicationRound/${applicationRound.id}/applicant/${applicantId}`}
+              to={`/applicationRound/${applicationRound.id}/${
+                organisationId ? "organisation" : "applicant"
+              }/${index}`}
             >
               {title}
             </InlineRowLink>
