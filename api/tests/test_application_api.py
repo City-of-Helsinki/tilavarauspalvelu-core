@@ -352,6 +352,88 @@ def test_application_review_invalid(
 
 
 @pytest.mark.django_db
+@freeze_time("2021-01-15")
+def test_application_update_should_update_contact_person_and_billing_address(
+    user_api_client,
+    application,
+    organisation,
+    person,
+    purpose,
+    application_round,
+    billing_address,
+):
+    assert Application.objects.count() == 1
+
+    data = {
+        "contact_person": {
+            "id": person.id,
+            "first_name": person.first_name,
+            "last_name": "Modified",
+            "email": person.email,
+            "phone_number": person.phone_number,
+        },
+        "billing_address": {
+            "id": billing_address.id,
+            "street_address": "No bills please",
+            "post_code": "99999",
+            "city": "None",
+        },
+    }
+
+    response = user_api_client.patch(
+        reverse("application-detail", kwargs={"pk": application.id}),
+        data=data,
+        format="json",
+    )
+
+    assert response.status_code == 200
+    assert response.data.get("contact_person")["id"] == person.id
+    assert response.data.get("contact_person")["last_name"] == "Modified"
+    assert response.data.get("billing_address")["id"] == billing_address.id
+    assert response.data.get("billing_address")["street_address"] == "No bills please"
+
+
+@pytest.mark.django_db
+@freeze_time("2021-01-15")
+def test_application_update_should_create_new_contact_person_and_billing_address(
+    user_api_client,
+    application,
+    organisation,
+    person,
+    purpose,
+    application_round,
+    billing_address,
+):
+    assert Application.objects.count() == 1
+
+    data = {
+        "contact_person": {
+            "first_name": "John",
+            "last_name": "Malkovich",
+            "email": "test@test.com",
+            "phone_number": "123",
+        },
+        "billing_address": {
+            "street_address": "Bill me",
+            "post_code": "00100",
+            "city": "Helsinki",
+        },
+    }
+
+    response = user_api_client.patch(
+        reverse("application-detail", kwargs={"pk": application.id}),
+        data=data,
+        format="json",
+    )
+
+    assert response.status_code == 200
+    assert response.data.get("contact_person")["id"] != person.id
+    assert response.data.get("contact_person")["last_name"] == "Malkovich"
+    assert response.data.get("billing_address")["id"] != billing_address.id
+    assert response.data.get("billing_address")["street_address"] == "Bill me"
+
+
+@pytest.mark.django_db
 def test_unauthenticated_cannot_create_application(
     unauthenticated_api_client, valid_application_data
 ):

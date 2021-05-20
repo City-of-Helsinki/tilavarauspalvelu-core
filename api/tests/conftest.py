@@ -8,6 +8,7 @@ from rest_framework.test import APIClient
 
 from allocation.models import AllocationRequest
 from applications.models import (
+    Address,
     Application,
     ApplicationEvent,
     ApplicationEventSchedule,
@@ -402,12 +403,22 @@ def person() -> Person:
 
 
 @pytest.fixture
-def application(purpose, organisation, person, application_round, user) -> Application:
+def billing_address() -> Address:
+    return Address.objects.create(
+        street_address="Billing street 666b", post_code="00100", city="Helsinki"
+    )
+
+
+@pytest.fixture
+def application(
+    purpose, organisation, person, application_round, user, billing_address
+) -> Application:
     application = Application.objects.create(
         organisation=organisation,
         contact_person=person,
         application_round=application_round,
         user=user,
+        billing_address=billing_address,
     )
     return application
 
