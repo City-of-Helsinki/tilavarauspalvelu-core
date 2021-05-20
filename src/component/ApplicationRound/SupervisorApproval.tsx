@@ -38,10 +38,10 @@ import LinkPrev from "../LinkPrev";
 import Loader from "../Loader";
 import {
   getApplicationRound,
-  saveApplicationRound,
   getAllocationResults,
   getApplications,
   setApplicationEventStatuses,
+  patchApplicationRoundStatus,
 } from "../../common/api";
 
 interface IProps {
@@ -399,13 +399,12 @@ function SupervisorApproval({ applicationRoundId }: IProps): JSX.Element {
   const history = useHistory();
 
   const setApplicationRoundStatus = async (
+    id: number,
     status: ApplicationRoundStatus,
     followupUrl?: string
   ) => {
-    const payload = { ...applicationRound, status } as ApplicationRoundType;
-
     try {
-      const result = await saveApplicationRound(payload);
+      const result = await patchApplicationRoundStatus(id, status);
       setApplicationRound(result);
       if (followupUrl) {
         history.push(followupUrl);
@@ -661,6 +660,7 @@ function SupervisorApproval({ applicationRoundId }: IProps): JSX.Element {
                     variant="primary"
                     onClick={() => {
                       setApplicationRoundStatus(
+                        Number(applicationRoundId),
                         "allocated",
                         `/applicationRounds/approvals?cancelled`
                       );
@@ -707,6 +707,7 @@ function SupervisorApproval({ applicationRoundId }: IProps): JSX.Element {
                         }));
                         await setApplicationEventStatuses(payload);
                         await setApplicationRoundStatus(
+                          Number(applicationRoundId),
                           "approved",
                           `/applicationRounds/approvals?approved&applicationRoundId=${applicationRoundId}`
                         );

@@ -13,6 +13,7 @@ import {
   Reservation,
   RecurringReservation,
   ApplicationRoundStatus,
+  ApplicationStatus,
 } from "./types";
 
 const apiBaseUrl: string = process.env.REACT_APP_TILAVARAUS_API_URL || "";
@@ -219,18 +220,13 @@ export function getApplications(
   });
 }
 
-export function saveApplication(
-  application: Application
+export function patchApplicationStatus(
+  applicationId: number,
+  status: ApplicationStatus
 ): Promise<Application> {
-  if (application.id === undefined) {
-    return apiPost<Application>({
-      data: application,
-      path: `v1/${applicationBasePath}/`,
-    });
-  }
-  return apiPut<Application>({
-    data: application,
-    path: `v1/${applicationBasePath}/${application.id}/`,
+  return apiPatch<Application>({
+    data: { status },
+    path: `v1/${applicationBasePath}/${applicationId}/`,
   });
 }
 

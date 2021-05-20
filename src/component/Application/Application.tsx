@@ -18,7 +18,7 @@ import {
   getApplication,
   getApplicationRound,
   getRecurringReservations,
-  saveApplication,
+  patchApplicationStatus,
 } from "../../common/api";
 import Loader from "../Loader";
 import {
@@ -367,10 +367,9 @@ function Application(): JSX.Element | null {
     useNotification = false
   ) => {
     if (!app) return;
-    const payload = { ...app, status };
     try {
       setIsSaving(true);
-      const result = await saveApplication(payload);
+      const result = await patchApplicationStatus(app.id, status);
       fetchApplication(result.id);
       if (useNotification) {
         setStatusNotification(status);

@@ -10,7 +10,10 @@ import {
   ApplicationRoundStatus,
   ApplicationRound as ApplicationRoundType,
 } from "../../common/types";
-import { getApplicationRound, saveApplicationRound } from "../../common/api";
+import {
+  getApplicationRound,
+  patchApplicationRoundStatus,
+} from "../../common/api";
 import Loader from "../Loader";
 
 interface IProps {
@@ -28,11 +31,12 @@ function ApplicationRound(): JSX.Element | null {
   const { applicationRoundId } = useParams<IProps>();
   const { t } = useTranslation();
 
-  const setApplicationRoundStatus = async (status: ApplicationRoundStatus) => {
-    const payload = { ...applicationRound, status } as ApplicationRoundType;
-
+  const setApplicationRoundStatus = async (
+    id: number,
+    status: ApplicationRoundStatus
+  ) => {
     try {
-      const result = await saveApplicationRound(payload);
+      const result = await patchApplicationRoundStatus(id, status);
       setApplicationRound(result);
     } catch (error) {
       setErrorMsg("errors.errorSavingData");
@@ -73,7 +77,9 @@ function ApplicationRound(): JSX.Element | null {
     content = (
       <Allocation
         applicationRound={applicationRound}
-        setApplicationRoundStatus={setApplicationRoundStatus}
+        setApplicationRoundStatus={(status: ApplicationRoundStatus) =>
+          setApplicationRoundStatus(Number(applicationRoundId), status)
+        }
       />
     );
   } else if (applicationRound?.status === "allocated") {
@@ -81,7 +87,9 @@ function ApplicationRound(): JSX.Element | null {
       <Handling
         applicationRound={applicationRound}
         setApplicationRound={setApplicationRound}
-        setApplicationRoundStatus={setApplicationRoundStatus}
+        setApplicationRoundStatus={(status: ApplicationRoundStatus) =>
+          setApplicationRoundStatus(Number(applicationRoundId), status)
+        }
       />
     );
   } else if (
@@ -91,7 +99,9 @@ function ApplicationRound(): JSX.Element | null {
     content = (
       <PreApproval
         applicationRound={applicationRound}
-        setApplicationRoundStatus={setApplicationRoundStatus}
+        setApplicationRoundStatus={(status: ApplicationRoundStatus) =>
+          setApplicationRoundStatus(Number(applicationRoundId), status)
+        }
       />
     );
   } else if (applicationRound?.status === "approved") {
@@ -99,7 +109,9 @@ function ApplicationRound(): JSX.Element | null {
       <Handling
         applicationRound={applicationRound}
         setApplicationRound={setApplicationRound}
-        setApplicationRoundStatus={setApplicationRoundStatus}
+        setApplicationRoundStatus={(status: ApplicationRoundStatus) =>
+          setApplicationRoundStatus(Number(applicationRoundId), status)
+        }
       />
     );
   } else if (
@@ -109,7 +121,9 @@ function ApplicationRound(): JSX.Element | null {
     content = (
       <Review
         applicationRound={applicationRound}
-        setApplicationRoundStatus={setApplicationRoundStatus}
+        setApplicationRoundStatus={(status: ApplicationRoundStatus) =>
+          setApplicationRoundStatus(Number(applicationRoundId), status)
+        }
       />
     );
   }
