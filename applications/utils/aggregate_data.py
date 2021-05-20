@@ -26,7 +26,7 @@ class ApplicationAggregateDataCreator(BaseAggregateDataCreator):
 
     def run(self) -> None:
         # Base queries
-        base_query = self.application.application_events.values(
+        self._base_query = self.application.application_events.values(
             "id", "begin", "end", "events_per_week", "min_duration", "max_duration"
         ).annotate(
             events_count=ExpressionWrapper(
@@ -35,17 +35,21 @@ class ApplicationAggregateDataCreator(BaseAggregateDataCreator):
             )
         )
 
-        weekly_query = base_query.filter(biweekly=False)
+        self.weekly_query = self._base_query.filter(biweekly=False)
 
-        bi_weekly_query = base_query.filter(biweekly=True).annotate(
+        self.bi_weekly_query = self._base_query.filter(biweekly=True).annotate(
             events_count=ExpressionWrapper(
                 F("events_count") / 2, output_field=DurationField()
             )
         )
 
+        self._create_event_based_aggregate_data()
+        self._create_reservation_based_aggregate_data()
+
+    def _create_event_based_aggregate_data(self):
         total_min_duration = 0
         events_count = 0
-        for duration in weekly_query.union(bi_weekly_query):
+        for duration in self.weekly_query.union(self.bi_weekly_query):
             total_min_duration += (
                 duration["events_count"].days * duration["min_duration"].total_seconds()
             )
@@ -60,6 +64,23 @@ class ApplicationAggregateDataCreator(BaseAggregateDataCreator):
 
         for event in self.application.application_events.all():
             EventAggregateDataCreator(event).start()
+
+    def _create_reservation_based_aggregate_data(self):
+        from reservations.models import Reservation
+
+        res_qs = Reservation.objects.filter(
+            recurring_reservation__application=self.application
+        ).going_to_occur()
+        created_reservations = res_qs.count()
+        reservations_duration = res_qs.total_duration().get("total_duration")
+
+        data_values = {
+            "created_reservations_total": created_reservations,
+            "reservations_duration_total": reservations_duration.total_seconds()
+            if reservations_duration
+            else 0,
+        }
+        self._update_or_create_aggregate_data_values(data_values)
 
     def _update_or_create_aggregate_data_values(self, data: dict):
         # Avoid circulars.
