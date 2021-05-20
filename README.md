@@ -40,6 +40,22 @@ Locally:
 
 `deploy/entrypoint.sh test`
 
+
+##Requirements
+
+Workflow with requirements is as follows.
+
+requirements.txt is not edited manually, but is generated with pip-compile.
+
+requirements.txt contains fully tested, pinned versions of the requirements. requirements.in contains the primary, requirements of the project without their dependencies.
+
+In production, deployments should always use requirements.txt and the versions pinned therein. In development, new virtualenvs and development environments should also be initialised using requirements.txt. pip-sync will synchronize the active virtualenv to match exactly the packages in requirements.txt.
+
+In development and testing, to update a package update it in requirements.in and use the command pip-compile.
+
+To remove a dependency, remove it from requirements.in, run pip-compile and then pip-sync. If everything works as expected, commit the changes.
+
+
 # Environments
 
 ## Environmental variables
