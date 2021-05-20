@@ -1,12 +1,15 @@
 import datetime
 
 import pytest
+from assertpy import assert_that
 
 from applications.models import (
     ApplicationAggregateData,
     ApplicationEvent,
     ApplicationStatus,
 )
+from reservations.models import STATE_CHOICES
+from reservations.tests.factories import RecurringReservationFactory, ReservationFactory
 
 
 @pytest.mark.django_db
@@ -15,7 +18,7 @@ def test_application_aggregate_data_creates_when_status_in_review(
 ):
     assert ApplicationAggregateData.objects.exists() is False
     recurring_application_event.application.set_status(ApplicationStatus.IN_REVIEW)
-    assert ApplicationAggregateData.objects.count() == 2
+    assert ApplicationAggregateData.objects.count() == 4
 
 
 @pytest.mark.django_db
@@ -43,8 +46,10 @@ def test_application_aggregate_data_contains_min_duration_total(
     )
 
     recurring_application_event.application.set_status(ApplicationStatus.IN_REVIEW)
-    assert ApplicationAggregateData.objects.count() == 2
-    min_dur_tot = ApplicationAggregateData.objects.get(name="applied_min_duration_total")
+    assert ApplicationAggregateData.objects.count() == 4
+    min_dur_tot = ApplicationAggregateData.objects.get(
+        name="applied_min_duration_total"
+    )
 
     # Two times per week every second week for 89 days => 12 whole weeks
     # 12 whole weeks every other week => 1 / week => 1 * 12 weeks => 12h
@@ -70,7 +75,7 @@ def test_application_aggregate_data_contains_reservations_total(
     )
 
     recurring_application_event.application.set_status(ApplicationStatus.IN_REVIEW)
-    assert ApplicationAggregateData.objects.count() == 2
+    assert ApplicationAggregateData.objects.count() == 4
     res_tot = ApplicationAggregateData.objects.get(name="applied_reservations_total")
 
     # First, every other week two times for twelve whole week => 6 weeks
@@ -108,14 +113,14 @@ def test_aggregate_data_creates_data_per_application(
         ApplicationAggregateData.objects.filter(
             application=recurring_application_event.application
         ).count()
-        == 2
+        == 4
     )
 
     assert (
         ApplicationAggregateData.objects.filter(
             application=application_in_second_application_round
         ).count()
-        == 2
+        == 4
     )
 
 
@@ -185,3 +190,92 @@ def test_aggregate_data_creates_data_per_application_min_duration_total(
 
     two_res = aggregate_datas_two.get(name="applied_min_duration_total")
     assert two_res.value == 8 * 3600
+
+
+@pytest.mark.django_db
+def test_aggregate_data_creates_data_per_application_reservations_duration_total(
+    recurring_application_event, application_in_second_application_round
+):
+    recurring = RecurringReservationFactory(
+        application=recurring_application_event.application,
+        application_event=recurring_application_event,
+    )
+    ReservationFactory(
+        state=STATE_CHOICES.CREATED,
+        begin=datetime.datetime(2021, 5, 1, 12, 0),
+        end=datetime.datetime(2021, 5, 1, 14, 0),
+        recurring_reservation=recurring,
+    )
+
+    recurring = RecurringReservationFactory(
+        application=application_in_second_application_round,
+        # this shouldn't matter since we're getting the data per application.
+        application_event=recurring_application_event,
+    )
+    ReservationFactory(
+        state=STATE_CHOICES.CREATED,
+        begin=datetime.datetime(2021, 6, 1, 15, 0),
+        end=datetime.datetime(2021, 6, 1, 18, 0),
+        recurring_reservation=recurring,
+    )
+
+    recurring_application_event.application.create_aggregate_data()
+    application_in_second_application_round.create_aggregate_data()
+
+    aggregate_datas_one = ApplicationAggregateData.objects.filter(
+        application=recurring_application_event.application
+    )
+
+    aggregate_datas_two = ApplicationAggregateData.objects.filter(
+        application=application_in_second_application_round
+    )
+
+    one_res = aggregate_datas_one.get(name="reservations_duration_total")
+    assert_that(one_res.value).is_equal_to(3600 * 2)
+
+    two_res = aggregate_datas_two.get(name="reservations_duration_total")
+    assert_that(two_res.value).is_equal_to(3600 * 3)
+
+
+@pytest.mark.django_db
+def test_aggregate_data_creates_data_per_application_created_reservations_total(
+    recurring_application_event, application_in_second_application_round
+):
+    recurring = RecurringReservationFactory(
+        application=recurring_application_event.application,
+        application_event=recurring_application_event,
+    )
+    ReservationFactory(
+        state=STATE_CHOICES.CREATED,
+        begin=datetime.datetime(2021, 5, 1, 12, 0),
+        end=datetime.datetime(2021, 5, 1, 14, 0),
+        recurring_reservation=recurring,
+    )
+
+    recurring = RecurringReservationFactory(
+        application=application_in_second_application_round,
+        application_event=recurring_application_event,
+    )
+    ReservationFactory(
+        state=STATE_CHOICES.CREATED,
+        begin=datetime.datetime(2021, 6, 1, 15, 0),
+        end=datetime.datetime(2021, 6, 1, 18, 0),
+        recurring_reservation=recurring,
+    )
+
+    recurring_application_event.application.create_aggregate_data()
+    application_in_second_application_round.create_aggregate_data()
+
+    aggregate_datas_one = ApplicationAggregateData.objects.filter(
+        application=recurring_application_event.application
+    )
+
+    aggregate_datas_two = ApplicationAggregateData.objects.filter(
+        application=application_in_second_application_round
+    )
+
+    one_res = aggregate_datas_one.get(name="created_reservations_total")
+    assert_that(one_res.value).is_equal_to(1)
+
+    two_res = aggregate_datas_two.get(name="created_reservations_total")
+    assert_that(two_res.value).is_equal_to(1)
