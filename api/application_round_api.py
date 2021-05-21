@@ -83,6 +83,7 @@ class ApplicationRoundSerializer(serializers.ModelSerializer):
         help_text="Status of this application round",
         choices=ApplicationRoundStatus.get_statuses(),
     )
+    status_timestamp = serializers.DateTimeField(read_only=True)
     service_sector_id = serializers.PrimaryKeyRelatedField(
         queryset=ServiceSector.objects.all(), source="service_sector"
     )
@@ -110,6 +111,7 @@ class ApplicationRoundSerializer(serializers.ModelSerializer):
             "purpose_ids",
             "service_sector_id",
             "status",
+            "status_timestamp",
             "application_round_baskets",
             "allocating",
             "criteria",
@@ -149,6 +151,9 @@ class ApplicationRoundSerializer(serializers.ModelSerializer):
             },
             "status": {
                 "help_text": "Status of the application round.",
+            },
+            "status_timestamp": {
+                "help_text": "Timestamp of the status of the application round.",
             },
             "application_round_baskets": {
                 "help_text": "List of allocation 'basket' objects which determines priority of reservation allocation.",
