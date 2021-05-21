@@ -32,6 +32,75 @@ from .reservation_units_api import ReservationUnitSerializer
 User = get_user_model()
 
 
+class AgeGroupSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AgeGroup
+        fields = [
+            "id",
+            "minimum",
+            "maximum",
+        ]
+        extra_kwargs = {
+            "minimum": {
+                "help_text": "Minimum age of persons included in the age group.",
+            },
+            "maximum": {
+                "help_text": "Maximum age of persons included in the age group.",
+            },
+        }
+
+    def __init__(self, *args, display=False, **kwargs):
+        super(AgeGroupSerializer, self).__init__(*args, **kwargs)
+        if display:
+            self.fields.pop("id")
+
+    def validate(self, data):
+        min_age = data["minimum"]
+        max_age = data["maximum"]
+
+        if max_age is not None and max_age <= min_age:
+            raise serializers.ValidationError(
+                "Maximum age should be larger than minimum age"
+            )
+        return data
+
+
+@extend_schema(description="Age group of attendees for application events.")
+class AgeGroupViewSet(viewsets.ModelViewSet):
+    serializer_class = AgeGroupSerializer
+    queryset = AgeGroup.objects.all()
+    permission_classes = (
+        [AgeGroupPermission]
+        if not settings.TMP_PERMISSIONS_DISABLED
+        else [permissions.AllowAny]
+    )
+
+
+class AbilityGroupSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AbilityGroup
+        fields = [
+            "id",
+            "name",
+        ]
+        extra_kwargs = {
+            "name": {
+                "help_text": "Name of the ability group.",
+            },
+        }
+
+
+@extend_schema(description="Ability group of attendees for application events.")
+class AbilityGroupViewSet(viewsets.ModelViewSet):
+    serializer_class = AbilityGroupSerializer
+    queryset = AbilityGroup.objects.all()
+    permission_classes = (
+        [AbilityGroupPermission]
+        if not settings.TMP_PERMISSIONS_DISABLED
+        else [permissions.AllowAny]
+    )
+
+
 class ReservationSerializer(serializers.ModelSerializer):
     reservation_unit = PresentablePrimaryKeyRelatedField(
         presentation_serializer=ReservationUnitSerializer,
@@ -193,15 +262,31 @@ class RecurringReservationSerializer(serializers.ModelSerializer):
         queryset=Reservation.objects.all(),
         help_text="This recurring reservation's reservations.",
     )
+    first_reservation_begin = serializers.SerializerMethodField()
+    last_reservation_end = serializers.SerializerMethodField()
+    begin_weekday = serializers.SerializerMethodField()
+    age_group = PresentablePrimaryKeyRelatedField(
+        presentation_serializer=AgeGroupSerializer,
+        queryset=AgeGroup.objects.all(),
+    )
+    purpose_name = serializers.SerializerMethodField()
+    group_size = serializers.SerializerMethodField()
+    denied_reservations = ReservationSerializer(many=True)
 
     class Meta:
         model = RecurringReservation
         fields = [
             "application_id",
             "application_event_id",
-            "age_group_id",
+            "age_group",
+            "purpose_name",
+            "group_size",
             "ability_group_id",
+            "begin_weekday",
+            "first_reservation_begin",
+            "last_reservation_end",
             "reservations",
+            "denied_reservations",
         ]
         extra_kwargs = {
             "application": {
@@ -216,7 +301,35 @@ class RecurringReservationSerializer(serializers.ModelSerializer):
             "ability_group": {
                 "help_text": "Ability group of the recurring reservation.",
             },
+            "first_reservation_begin": {
+                "help_text": "Datetime when first reservation of the recurring reservation begins.",
+            },
+            "last_reservation_end": {
+                "help_text": "Datetime when last reservation of the recurring reservation ends.",
+            },
+            "denied_reservations": {
+                "help_text": "Serialized set of reservations that were denied for the recurring reservation."
+            },
         }
+
+    def get_begin_weekday(self, instance):
+        reservation = instance.reservations.all().earliest("begin")
+        if reservation:
+            return reservation.begin.weekday()
+
+    def get_first_reservation_begin(self, instance):
+        return getattr(instance.reservations.all().earliest("begin"), "begin", None)
+
+    def get_last_reservation_end(self, instance):
+        return getattr(instance.reservations.all().latest("end"), "end", None)
+
+    def get_purpose_name(self, instance):
+        purpose = instance.application_event.purpose
+        if purpose:
+            return purpose.name
+
+    def get_group_size(self, instance):
+        return instance.application_event.num_persons
 
 
 class RecurringReservationFilter(filters.FilterSet):
@@ -277,72 +390,3 @@ class RecurringReservationViewSet(viewsets.ReadOnlyModelViewSet):
             | can_view_service_sectors_reservations
             | Q(user=user)
         )
-
-
-class AgeGroupSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = AgeGroup
-        fields = [
-            "id",
-            "minimum",
-            "maximum",
-        ]
-        extra_kwargs = {
-            "minimum": {
-                "help_text": "Minimum age of persons included in the age group.",
-            },
-            "maximum": {
-                "help_text": "Maximum age of persons included in the age group.",
-            },
-        }
-
-    def __init__(self, *args, display=False, **kwargs):
-        super(AgeGroupSerializer, self).__init__(*args, **kwargs)
-        if display:
-            self.fields.pop("id")
-
-    def validate(self, data):
-        min_age = data["minimum"]
-        max_age = data["maximum"]
-
-        if max_age is not None and max_age <= min_age:
-            raise serializers.ValidationError(
-                "Maximum age should be larger than minimum age"
-            )
-        return data
-
-
-@extend_schema(description="Age group of attendees for application events.")
-class AgeGroupViewSet(viewsets.ModelViewSet):
-    serializer_class = AgeGroupSerializer
-    queryset = AgeGroup.objects.all()
-    permission_classes = (
-        [AgeGroupPermission]
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else [permissions.AllowAny]
-    )
-
-
-class AbilityGroupSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = AbilityGroup
-        fields = [
-            "id",
-            "name",
-        ]
-        extra_kwargs = {
-            "name": {
-                "help_text": "Name of the ability group.",
-            },
-        }
-
-
-@extend_schema(description="Ability group of attendees for application events.")
-class AbilityGroupViewSet(viewsets.ModelViewSet):
-    serializer_class = AbilityGroupSerializer
-    queryset = AbilityGroup.objects.all()
-    permission_classes = (
-        [AbilityGroupPermission]
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else [permissions.AllowAny]
-    )
