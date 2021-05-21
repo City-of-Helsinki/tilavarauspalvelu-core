@@ -81,6 +81,10 @@ class RecurringReservation(models.Model):
         on_delete=models.SET_NULL,
     )
 
+    @property
+    def denied_reservations(self):
+        return self.reservations.filter(state=STATE_CHOICES.DENIED)
+
 
 class STATE_CHOISE_CONST(object):
     __slots__ = ()
