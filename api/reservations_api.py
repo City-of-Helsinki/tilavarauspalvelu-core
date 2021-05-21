@@ -255,6 +255,29 @@ class RecurringReservationViewSet(viewsets.ReadOnlyModelViewSet):
     ]
     filterset_class = RecurringReservationFilter
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if settings.TMP_PERMISSIONS_DISABLED:
+            return queryset
+        user = self.request.user
+
+        can_view_units_reservations = Q(
+            reservations__reservation_unit__unit__in=get_units_where_can_view_reservations(
+                user
+            )
+        )
+        can_view_service_sectors_reservations = Q(
+            reservations__reservation_unit__unit__service_sectors__in=get_service_sectors_where_can_view_reservations(
+                user
+            )
+        )
+
+        return queryset.filter(
+            can_view_units_reservations
+            | can_view_service_sectors_reservations
+            | Q(user=user)
+        )
+
 
 class AgeGroupSerializer(serializers.ModelSerializer):
     class Meta:
