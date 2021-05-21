@@ -27,6 +27,7 @@ from reservations.models import (
     Reservation,
 )
 
+from .common_filters import ModelInFilter
 from .reservation_units_api import ReservationUnitSerializer
 
 User = get_user_model()
@@ -342,6 +343,10 @@ class RecurringReservationFilter(filters.FilterSet):
         field_name="application",
         queryset=Application.objects.all(),
         help_text="Show recurring reservations fro specified applications.",
+    )
+    reservation_unit = ModelInFilter(
+        field_name="reservations__reservation_unit",
+        queryset=ReservationUnit.objects.all(),
     )
 
     class Meta:
