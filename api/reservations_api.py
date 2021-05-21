@@ -44,6 +44,9 @@ class ReservationSerializer(serializers.ModelSerializer):
         source="user",
         help_text="Id of user for this reservation.",
     )
+    begin_weekday = serializers.SerializerMethodField()
+    application_event_name = serializers.SerializerMethodField()
+    reservation_user = serializers.SerializerMethodField()
 
     class Meta:
         model = Reservation
@@ -52,10 +55,13 @@ class ReservationSerializer(serializers.ModelSerializer):
             "state",
             "priority",
             "user_id",
+            "begin_weekday",
             "begin",
             "end",
             "buffer_time_before",
             "buffer_time_after",
+            "application_event_name",
+            "reservation_user",
             "reservation_unit",
             "recurring_reservation",
         ]
@@ -84,6 +90,22 @@ class ReservationSerializer(serializers.ModelSerializer):
                 "help_text": "Id relation to recurring reservation object if the reservation is part of recurrence.",
             },
         }
+
+    def get_begin_weekday(self, instance):
+        return instance.begin.weekday()
+
+    def get_application_event_name(self, instance):
+        if instance.recurring_reservation:
+            return instance.recurring_reservation.application_event.name
+
+    def get_reservation_user(self, instance):
+        if not instance.recurring_reservation:
+            return None
+
+        if instance.recurring_reservation.application.organisation:
+            return instance.recurring_reservation.application.organisation.name
+
+        return instance.user.get_full_name()
 
     def validate(self, data):
         for reservation_unit in data["reservation_unit"]:
@@ -161,7 +183,7 @@ class ReservationViewSet(viewsets.ModelViewSet):
                 )
             )
             | Q(user=user)
-        )
+        ).order_by("begin")
 
 
 class RecurringReservationSerializer(serializers.ModelSerializer):
