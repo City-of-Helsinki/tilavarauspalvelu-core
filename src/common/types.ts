@@ -34,6 +34,7 @@ export type ApplicationRound = {
   serviceSectorId: number;
   applicationRoundBaskets: ApplicationRoundBasket[];
   status: ApplicationRoundStatus;
+  statusTimestamp: string;
   allocating: boolean;
   isAdmin: boolean;
 };

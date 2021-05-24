@@ -131,7 +131,8 @@ function ApplicationRoundCard({
           <TimeframeStatus
             applicationPeriodBegin={applicationRound.applicationPeriodBegin}
             applicationPeriodEnd={applicationRound.applicationPeriodEnd}
-            resolution={isApplicationRoundApproved}
+            isResolved={isApplicationRoundApproved}
+            resolutionDate={applicationRound.statusTimestamp}
           />
           <div>
             <Value>{applicationRound.reservationUnitIds.length}</Value>
