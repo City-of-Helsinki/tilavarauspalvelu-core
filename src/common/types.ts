@@ -116,8 +116,8 @@ export type ApplicationStatus =
   | "cancelled";
 
 export type AggregatedData = {
-  reservationsTotal?: number;
-  minDurationTotal?: number;
+  appliedReservationsTotal?: number;
+  appliedMinDurationTotal?: number;
 };
 
 export type ApplicantType =
