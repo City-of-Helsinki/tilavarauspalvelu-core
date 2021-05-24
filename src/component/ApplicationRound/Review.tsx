@@ -93,7 +93,8 @@ const ApplicationCount = styled(H2)`
 `;
 
 const getFilterConfig = (
-  applications: ApplicationType[]
+  applications: ApplicationType[],
+  applicationRound: ApplicationRoundType
 ): DataFilterConfig[] => {
   const applicantTypes = uniq(applications.map((app) => app.applicantType));
   const statuses = uniq(applications.map((app) => app.status));
@@ -112,7 +113,7 @@ const getFilterConfig = (
       filters: statuses.map((status) => {
         const normalizedStatus = getNormalizedApplicationStatus(
           status,
-          "review"
+          applicationRound.status
         );
         return {
           title: `Application.statuses.${normalizedStatus}`,
@@ -124,21 +125,22 @@ const getFilterConfig = (
   ];
 };
 
-const getCellConfig = (t: TFunction): CellConfig => {
+const getCellConfig = (
+  applicationRound: ApplicationRoundType,
+  t: TFunction
+): CellConfig => {
   return {
     cols: [
       {
         title: "Application.headings.customer",
         key: "organisation.name",
         transform: ({
+          applicantName,
           applicantType,
-          contactPerson,
           organisation,
         }: ApplicationType) =>
           applicantType === "individual"
-            ? `${contactPerson?.firstName || ""} ${
-                contactPerson?.lastName || ""
-              }`.trim()
+            ? applicantName || ""
             : organisation?.name || "",
       },
       {
@@ -149,14 +151,14 @@ const getCellConfig = (t: TFunction): CellConfig => {
       },
       {
         title: "Application.headings.applicationCount",
-        key: "aggregatedData.reservationsTotal",
+        key: "aggregatedData.appliedReservationsTotal",
         transform: ({ aggregatedData }: ApplicationType) => (
           <>
             {trim(
               `${formatNumber(
-                aggregatedData?.reservationsTotal,
+                aggregatedData?.appliedReservationsTotal,
                 t("common.volumeUnit")
-              )} / ${parseDuration(aggregatedData?.minDurationTotal)}`,
+              )} / ${parseDuration(aggregatedData?.appliedMinDurationTotal)}`,
               " / "
             )}
           </>
@@ -168,7 +170,7 @@ const getCellConfig = (t: TFunction): CellConfig => {
         transform: ({ status }: ApplicationType) => {
           const normalizedStatus = getNormalizedApplicationStatus(
             status,
-            "review"
+            applicationRound.status
           );
           return (
             <StatusCell
@@ -207,14 +209,14 @@ function Review({
   };
 
   useEffect(() => {
-    const fetchApplications = async (applicationId: number) => {
+    const fetchApplications = async (ar: ApplicationRoundType) => {
       try {
         const result = await getApplications({
-          applicationRound: applicationId,
+          applicationRound: ar.id,
           status: "in_review,review_done,declined",
         });
-        setCellConfig(getCellConfig(t));
-        setFilterConfig(getFilterConfig(result));
+        setCellConfig(getCellConfig(ar, t));
+        setFilterConfig(getFilterConfig(result, ar));
         setApplications(result);
       } catch (error) {
         setErrorMsg("errors.errorFetchingApplications");
@@ -224,7 +226,7 @@ function Review({
     };
 
     if (typeof applicationRound?.id === "number") {
-      fetchApplications(applicationRound.id);
+      fetchApplications(applicationRound);
     }
   }, [applicationRound, t]);
 

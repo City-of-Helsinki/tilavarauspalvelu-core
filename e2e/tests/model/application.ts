@@ -6,8 +6,8 @@ class Application {
   statusBlock: Selector;
   applicantType: Selector;
   participants: Selector;
-  reservationsTotal: Selector;
-  minDurationTotal: Selector;
+  appliedReservationsTotal: Selector;
+  appliedMinDurationTotal: Selector;
   stateToggleButton: Selector;
 
   constructor() {
@@ -20,11 +20,11 @@ class Application {
     this.participants = Selector(
       '[data-testid="application__data--participants"]'
     );
-    this.reservationsTotal = Selector(
-      '[data-testid="application__data--reservations-total"'
+    this.appliedReservationsTotal = Selector(
+      '[data-testid="application__data--applied-reservations-total"'
     );
-    this.minDurationTotal = Selector(
-      '[data-testid="application__data--min-duration-total"'
+    this.appliedMinDurationTotal = Selector(
+      '[data-testid="application__data--applied-min-duration-total"'
     );
     this.stateToggleButton = Selector(
       '[data-testid="application__button--toggle-state"]'

@@ -1,5 +1,6 @@
 import React, { ErrorInfo } from "react";
 import styled from "styled-components";
+import ScrollToTop from "../common/ScrollToTop";
 import Navigation from "./Navigation";
 
 interface IProps {
@@ -39,7 +40,10 @@ export default class PageWrapper extends React.Component<IProps, IState> {
     return (
       <>
         <Navigation />
-        <Content>{content}</Content>
+        <Content>
+          {content}
+          <ScrollToTop />
+        </Content>
       </>
     );
   }

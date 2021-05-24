@@ -1,5 +1,6 @@
 import React from "react";
 import styled from "styled-components";
+import trim from "lodash/trim";
 import { describeArc } from "../common/util";
 
 interface IProps {
@@ -30,7 +31,7 @@ const Percent = styled.div<{ $percent: number }>`
   text-align: center;
   font-family: var(--tilavaraus-admin-font-bold);
   font-size: ${({ $percent }) =>
-    $percent < 100 ? "1.75rem" : "var(--fontsize-heading-m)"};
+    String($percent).length < 3 ? "1.8rem" : "1.4rem"};
   width: 100%;
   margin: 0 0 0 ${({ $percent }) => ($percent < 100 ? "5%" : "2%")};
 
@@ -86,10 +87,13 @@ const StatusCircle = ({ status, x = 90, y = 90 }: IProps): JSX.Element => {
     </Svg>
   );
 
+  const result =
+    status > 100 ? status.toFixed(0) : trim(status.toFixed(1), ".0");
+
   return (
     <Wrapper $width={size.x} $height={size.y}>
-      <Percent $percent={status}>
-        {status}
+      <Percent $percent={Number(result)}>
+        {result}
         <span>%</span>
       </Percent>
       {Graph}

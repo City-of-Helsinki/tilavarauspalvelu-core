@@ -33,6 +33,10 @@ export const getApplicationStatusColor = (
     case "review_done":
       color = "var(--color-success)";
       break;
+    case "approved":
+    case "sent":
+      color = "var(--color-white)";
+      break;
     case "declined":
     case "cancelled":
       switch (size) {

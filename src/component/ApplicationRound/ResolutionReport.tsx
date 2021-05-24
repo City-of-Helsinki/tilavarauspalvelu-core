@@ -8,7 +8,7 @@ import trim from "lodash/trim";
 import { IconArrowRight, Notification } from "hds-react";
 import {
   AllocationResult,
-  ApplicationEvent,
+  Application as ApplicationType,
   ApplicationRound as ApplicationRoundType,
   DataFilterConfig,
 } from "../../common/types";
@@ -16,7 +16,7 @@ import { ContentContainer, IngressContainer } from "../../styles/layout";
 import { breakpoints } from "../../styles/util";
 import withMainMenu from "../withMainMenu";
 import { ContentHeading, H3 } from "../../styles/typography";
-import DataTable, { CellConfig } from "../DataTable";
+import DataTable, { CellConfig, OrderTypes } from "../DataTable";
 import {
   formatNumber,
   parseDuration,
@@ -26,7 +26,11 @@ import {
 import BigRadio from "../BigRadio";
 import LinkPrev from "../LinkPrev";
 import Loader from "../Loader";
-import { getAllocationResults, getApplicationRound } from "../../common/api";
+import {
+  getAllocationResults,
+  getApplicationRound,
+  getApplications,
+} from "../../common/api";
 import TimeframeStatus from "./TimeframeStatus";
 
 interface IProps {
@@ -93,16 +97,16 @@ const IngressFooter = styled.div`
   }
 `;
 
-// const SchedulePercentage = styled.span`
-//   font-family: var(--tilavaraus-admin-font-bold);
-//   font-weight: bold;
-//   font-size: 1.375rem;
-//   display: block;
+const BoldValue = styled.span`
+  font-family: var(--tilavaraus-admin-font-bold);
+  font-weight: bold;
+  font-size: 1.375rem;
+  display: block;
 
-//   @media (min-width: ${breakpoints.m}) {
-//     display: inline;
-//   }
-// `;
+  @media (min-width: ${breakpoints.m}) {
+    display: inline;
+  }
+`;
 
 // const ScheduleCount = styled.span`
 //   font-size: var(--fontsize-body-s);
@@ -116,19 +120,79 @@ const IngressFooter = styled.div`
 
 const getCellConfig = (
   t: TFunction,
-  applicationRound: ApplicationRoundType | null
+  applicationRound: ApplicationRoundType | null,
+  type: "unallocated" | "allocated"
 ): CellConfig => {
-  return {
+  const unallocatedCellConfig = {
     cols: [
-      { title: "Application.headings.applicantName", key: "organisationName" },
+      {
+        title: "Application.headings.applicantName",
+        key: "organisation.name",
+        transform: ({
+          applicantName,
+          applicantType,
+          organisation,
+        }: ApplicationType) =>
+          applicantType === "individual"
+            ? applicantName || ""
+            : organisation?.name || "",
+      },
       {
         title: "Application.headings.applicantType",
         key: "applicantType",
+        transform: ({ applicantType }: ApplicationType) =>
+          t(`Application.applicantTypes.${applicantType}`),
+      },
+      {
+        title: "Application.headings.recommendations",
+        key: "id",
+        transform: () => (
+          <div
+            style={{
+              display: "flex",
+              alignContent: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <span>{t("Recommendation.noRecommendations")}</span>
+            <IconArrowRight />
+          </div>
+        ),
+      },
+    ],
+    index: "id",
+    sorting: "organisation.name",
+    order: "asc" as OrderTypes,
+    rowLink: ({ id }: ApplicationType) => `/application/${id}`,
+  };
+
+  const allocatedCellConfig = {
+    cols: [
+      {
+        title: "Application.headings.applicantName",
+        key: "organisationName",
+        transform: ({
+          applicantName,
+          applicantType,
+          organisationName,
+        }: AllocationResult) =>
+          applicantType === "individual"
+            ? applicantName || ""
+            : organisationName || "",
+      },
+      {
+        title: "Application.headings.applicantType",
+        key: "applicantType",
+        transform: ({ applicantType }: ApplicationType) =>
+          t(`Application.applicantTypes.${applicantType}`),
       },
       {
         title: "Recommendation.headings.resolution",
-        key: "applicationAggregatedData.reservationsTotal",
-        transform: ({ applicationAggregatedData }: AllocationResult) => (
+        key: "applicationAggregatedData.appliedReservationsTotal",
+        transform: ({
+          applicationAggregatedData,
+          applicationEvent,
+        }: AllocationResult) => (
           <div
             style={{
               display: "flex",
@@ -137,15 +201,17 @@ const getCellConfig = (
             }}
           >
             <span>
-              {trim(
-                `${formatNumber(
-                  applicationAggregatedData?.reservationsTotal,
-                  t("common.volumeUnit")
-                )} / ${parseDuration(
-                  applicationAggregatedData?.minDurationTotal
-                )}`,
-                " / "
-              )}
+              {["validated"].includes(applicationEvent.status)
+                ? trim(
+                    `${formatNumber(
+                      applicationAggregatedData?.appliedReservationsTotal,
+                      t("common.volumeUnit")
+                    )} / ${parseDuration(
+                      applicationAggregatedData?.appliedMinDurationTotal
+                    )}`,
+                    " / "
+                  )
+                : t("Recommendation.noRecommendations")}
             </span>
             <IconArrowRight />
           </div>
@@ -154,34 +220,79 @@ const getCellConfig = (
     ],
     index: "applicationEventScheduleId",
     sorting: "organisation.name",
-    order: "asc",
+    order: "asc" as OrderTypes,
     rowLink: ({ applicationEventScheduleId }: AllocationResult) => {
       return applicationEventScheduleId && applicationRound
         ? `/applicationRound/${applicationRound.id}/recommendation/${applicationEventScheduleId}`
         : "";
     },
-    groupLink: ({ space }) =>
-      applicationRound
-        ? `/applicationRound/${applicationRound.id}/space/${space?.id}`
-        : "",
   };
+
+  switch (type) {
+    case "unallocated":
+      return unallocatedCellConfig;
+    case "allocated":
+    default:
+      return allocatedCellConfig;
+  }
 };
 
 const getFilterConfig = (
-  recommendations: ApplicationEvent[]
+  recommendations: AllocationResult[] | null,
+  applications: ApplicationType[] | null,
+  type: "unallocated" | "allocated",
+  t: TFunction
 ): DataFilterConfig[] => {
-  const purposes = uniq(recommendations.map((app) => app.purpose));
+  const getApplicantTypes = (input: AllocationResult[] | ApplicationType[]) =>
+    uniq(
+      input.map((n: AllocationResult | ApplicationType) => n.applicantType)
+    ).sort();
+  const getReservationUnits = (input: AllocationResult[]) =>
+    uniq(input.map((n: AllocationResult) => n.unitName)).sort();
 
-  return [
+  const unallocatedFilterConfig = [
     {
-      title: "Application.headings.purpose",
-      filters: purposes.map((value) => ({
-        title: value,
-        key: "applicationEvent.purpose",
-        value: value || "",
-      })),
+      title: "Application.headings.applicantType",
+      filters:
+        applications &&
+        getApplicantTypes(applications).map((value) => ({
+          title: t(`Application.applicantTypes.${value}`),
+          key: "applicantType",
+          value: value || "",
+        })),
     },
   ];
+
+  const allocatedFilterConfig = [
+    {
+      title: "Application.headings.applicantType",
+      filters:
+        recommendations &&
+        getApplicantTypes(recommendations).map((value) => ({
+          title: t(`Application.applicantTypes.${value}`),
+          key: "applicantType",
+          value: value || "",
+        })),
+    },
+    {
+      title: "Recommendation.headings.reservationUnit",
+      filters:
+        recommendations &&
+        getReservationUnits(recommendations).map((value) => ({
+          title: value,
+          key: "unitName",
+          value: value || "",
+        })),
+    },
+  ];
+
+  switch (type) {
+    case "unallocated":
+      return unallocatedFilterConfig;
+    case "allocated":
+    default:
+      return allocatedFilterConfig;
+  }
 };
 
 function ResolutionReport(): JSX.Element {
@@ -193,11 +304,24 @@ function ResolutionReport(): JSX.Element {
   const [recommendations, setRecommendations] = useState<
     AllocationResult[] | []
   >([]);
-  const [filterConfig, setFilterConfig] = useState<DataFilterConfig[] | null>(
-    null
-  );
-  const [cellConfig, setCellConfig] = useState<CellConfig | null>(null);
-  const [activeFilter, setActiveFilter] = useState<string>("handled");
+  const [unallocatedApplications, setUnallocatedApplications] = useState<
+    ApplicationType[]
+  >([]);
+  const [unAllocatedFilterConfig, setUnallocatedFilterConfig] = useState<
+    DataFilterConfig[] | null
+  >(null);
+  const [allocatedFilterConfig, setAllocatedFilterConfig] = useState<
+    DataFilterConfig[] | null
+  >(null);
+  const [
+    unAllocatedCellConfig,
+    setUnallocatedCellConfig,
+  ] = useState<CellConfig | null>(null);
+  const [
+    allocatedCellConfig,
+    setAllocatedCellConfig,
+  ] = useState<CellConfig | null>(null);
+  const [activeFilter, setActiveFilter] = useState<string>("allocated");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const { applicationRoundId } = useParams<IProps>();
@@ -227,22 +351,41 @@ function ResolutionReport(): JSX.Element {
   }, [applicationRoundId]);
 
   useEffect(() => {
-    const fetchRecommendations = async (ar: ApplicationRoundType) => {
+    const fetchRecommendationsAndApplications = async (
+      ar: ApplicationRoundType
+    ) => {
       try {
-        const result = await getAllocationResults({
+        const allocationResults = await getAllocationResults({
           applicationRoundId: ar.id,
           serviceSectorId: ar.serviceSectorId,
         });
 
-        const processedResult = processAllocationResult(result);
+        const applicationsResult = await getApplications({
+          applicationRound: ar.id,
+          status: "in_review,review_done,declined",
+        });
 
-        setFilterConfig(
-          getFilterConfig(
-            processedResult.flatMap((n: AllocationResult) => n.applicationEvent)
-          )
+        const processedResult = processAllocationResult(allocationResults);
+
+        const allocatedApplicationIds = uniq(
+          processedResult.map((result) => result.applicationId)
         );
-        setCellConfig(getCellConfig(t, ar));
-        setRecommendations(processedResult || []);
+        const unallocatedApps = applicationsResult.filter(
+          (application) => !allocatedApplicationIds.includes(application.id)
+        );
+
+        setUnallocatedFilterConfig(
+          getFilterConfig(processedResult, unallocatedApps, "unallocated", t)
+        );
+        setAllocatedFilterConfig(
+          getFilterConfig(processedResult, unallocatedApps, "allocated", t)
+        );
+        setUnallocatedCellConfig(
+          getCellConfig(t, applicationRound, "unallocated")
+        );
+        setAllocatedCellConfig(getCellConfig(t, applicationRound, "allocated"));
+        setRecommendations(processAllocationResult(allocationResults) || []);
+        setUnallocatedApplications(unallocatedApps);
       } catch (error) {
         setErrorMsg("errors.errorFetchingApplications");
       } finally {
@@ -251,17 +394,15 @@ function ResolutionReport(): JSX.Element {
     };
 
     if (typeof applicationRound?.id === "number") {
-      fetchRecommendations(applicationRound);
+      fetchRecommendationsAndApplications(applicationRound);
     }
   }, [applicationRound, t]);
 
   const backLink = "/applicationRounds";
 
   const filteredResults =
-    activeFilter === "orphans"
-      ? recommendations.filter(
-          (n) => !["validated"].includes(n.applicationEvent.status)
-        )
+    activeFilter === "unallocated"
+      ? unallocatedApplications
       : recommendations.filter((n) =>
           ["validated"].includes(n.applicationEvent.status)
         );
@@ -272,80 +413,95 @@ function ResolutionReport(): JSX.Element {
 
   return (
     <Wrapper>
-      {applicationRound && cellConfig && filterConfig && (
-        <>
-          <ContentContainer>
-            <LinkPrev route={backLink} />
-          </ContentContainer>
-          <IngressContainer>
-            <TopIngress>
-              <div>
-                <ContentHeading>
-                  {t("ApplicationRound.resolutionNumber", { no: "????" })}
-                </ContentHeading>
-                <Subheading>{applicationRound.name}</Subheading>
-                <TimeframeStatus
-                  applicationPeriodBegin={
-                    applicationRound.applicationPeriodBegin
-                  }
-                  applicationPeriodEnd={applicationRound.applicationPeriodEnd}
-                  resolution
-                />
-              </div>
-              <div />
-            </TopIngress>
-            <IngressFooter>
-              <div>
-                {/* <p className="label">
-                  {t("ApplicationRound.schedulesToBeGranted")}
-                </p>{" "}
-                <SchedulePercentage>
-                  {t("ApplicationRound.percentageOfCapacity", {
-                    percentage: 76,
-                  })}
-                </SchedulePercentage>
-                <ScheduleCount>
-                  {`(${formatNumber(
-                    scheduledNumbers.volume,
-                    t("common.volumeUnit")
-                  )} / ${formatNumber(
-                    scheduledNumbers.hours,
-                    t("common.hoursUnit")
-                  )})`}
-                </ScheduleCount> */}
-              </div>
-              <div>
-                <BigRadio
-                  buttons={[
-                    {
-                      key: "orphans",
-                      text: "ApplicationRound.orphanApplications",
-                    },
-                    {
-                      key: "handled",
-                      text: "ApplicationRound.handledApplications",
-                    },
-                  ]}
-                  activeKey={activeFilter}
-                  setActiveKey={setActiveFilter}
-                />
-              </div>
-            </IngressFooter>
-          </IngressContainer>
-          {cellConfig && (
-            <DataTable
-              groups={prepareAllocationResults(filteredResults)}
-              hasGrouping={false}
-              config={{
-                filtering: true,
-                rowFilters: true,
-              }}
-              cellConfig={cellConfig}
-              filterConfig={filterConfig}
-            />
-          )}
-        </>
-      )}
+      {recommendations &&
+        applicationRound &&
+        unAllocatedCellConfig &&
+        allocatedCellConfig &&
+        unAllocatedFilterConfig &&
+        allocatedFilterConfig && (
+          <>
+            <ContentContainer>
+              <LinkPrev route={backLink} />
+            </ContentContainer>
+            <IngressContainer>
+              <TopIngress>
+                <div>
+                  <ContentHeading>
+                    {t("ApplicationRound.resolutionNumber", { no: "????" })}
+                  </ContentHeading>
+                  <Subheading>{applicationRound.name}</Subheading>
+                  <TimeframeStatus
+                    applicationPeriodBegin={
+                      applicationRound.applicationPeriodBegin
+                    }
+                    applicationPeriodEnd={applicationRound.applicationPeriodEnd}
+                    resolution
+                  />
+                </div>
+                <div />
+              </TopIngress>
+              <IngressFooter>
+                <div>
+                  {activeFilter === "unallocated" && (
+                    <>
+                      <BoldValue>
+                        {formatNumber(
+                          unallocatedApplications.length,
+                          t("common.volumeUnit")
+                        )}
+                      </BoldValue>
+                      <p className="label">
+                        {t("ApplicationRound.unallocatedApplications")}
+                      </p>
+                    </>
+                  )}
+                </div>
+                <div>
+                  <BigRadio
+                    buttons={[
+                      {
+                        key: "unallocated",
+                        text: "ApplicationRound.orphanApplications",
+                      },
+                      {
+                        key: "allocated",
+                        text: "ApplicationRound.handledApplications",
+                      },
+                    ]}
+                    activeKey={activeFilter}
+                    setActiveKey={setActiveFilter}
+                  />
+                </div>
+              </IngressFooter>
+            </IngressContainer>
+            {activeFilter === "unallocated" && unAllocatedCellConfig && (
+              <DataTable
+                groups={[{ id: 1, data: filteredResults }]}
+                hasGrouping={false}
+                config={{
+                  filtering: true,
+                  rowFilters: true,
+                }}
+                cellConfig={unAllocatedCellConfig}
+                filterConfig={unAllocatedFilterConfig}
+              />
+            )}
+            {activeFilter === "allocated" && allocatedCellConfig && (
+              <DataTable
+                groups={prepareAllocationResults(
+                  filteredResults as AllocationResult[]
+                )}
+                hasGrouping={false}
+                config={{
+                  filtering: true,
+                  rowFilters: true,
+                }}
+                cellConfig={allocatedCellConfig}
+                filterConfig={allocatedFilterConfig}
+              />
+            )}
+          </>
+        )}
       {errorMsg && (
         <Notification
           type="error"

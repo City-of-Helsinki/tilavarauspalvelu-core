@@ -41,7 +41,8 @@ import SelectionActionBar from "../SelectionActionBar";
 
 interface IRouteParams {
   applicationRoundId: string;
-  applicantId: string;
+  organisationId?: string;
+  applicantId?: string;
 }
 
 const Wrapper = styled.div`
@@ -114,15 +115,15 @@ const getCellConfig = (
       },
       {
         title: "Recommendation.headings.recommendationCount",
-        key: "applicationAggregatedData.reservationsTotal",
+        key: "applicationAggregatedData.appliedReservationsTotal",
         transform: ({ applicationAggregatedData }: AllocationResult) => (
           <>
             {trim(
               `${formatNumber(
-                applicationAggregatedData?.reservationsTotal,
+                applicationAggregatedData?.appliedReservationsTotal,
                 t("common.volumeUnit")
               )} / ${parseDuration(
-                applicationAggregatedData?.minDurationTotal
+                applicationAggregatedData?.appliedMinDurationTotal
               )}`,
               " / "
             )}
@@ -191,10 +192,12 @@ const getFilterConfig = (
     recommendations.map((rec) => rec.unitName)
   ).sort();
   const baskets = uniq(
-    recommendations.map((rec) => ({
-      title: `${rec.basketOrderNumber}. ${rec.basketName}`,
-      value: rec.basketName,
-    }))
+    recommendations
+      .filter((n) => n.basketName)
+      .map((rec) => ({
+        title: `${rec.basketOrderNumber}. ${rec.basketName}`,
+        value: rec.basketName,
+      }))
   );
 
   return [
@@ -255,24 +258,41 @@ function RecommendationsByApplicant(): JSX.Element {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const { t } = useTranslation();
-  const { applicationRoundId, applicantId } = useParams<IRouteParams>();
+  const {
+    applicationRoundId,
+    organisationId,
+    applicantId,
+  } = useParams<IRouteParams>();
+
+  const viewType = organisationId ? "organisation" : "individual";
+
+  const viewIndex = organisationId
+    ? Number(organisationId)
+    : Number(applicantId);
 
   const fetchRecommendations = async (
     ar: ApplicationRoundType,
-    apId: number
+    type: string,
+    index: number
   ) => {
     try {
       const result = await getAllocationResults({
         applicationRoundId: ar.id,
         serviceSectorId: ar.serviceSectorId,
-        applicant: apId,
+        applicant: type === "individual" ? index : undefined,
       });
 
-      const processedResult = processAllocationResult(result);
+      const processedResult =
+        type === "organisation"
+          ? processAllocationResult(result).filter(
+              (n) => n.organisationId === index
+            )
+          : processAllocationResult(result);
 
       setFilterConfig(getFilterConfig(processedResult));
       setCellConfig(getCellConfig(t, ar));
       setRecommendations(processedResult || []);
+      if (result.length < 1) setIsLoading(false);
     } catch (error) {
       setErrorMsg("errors.errorFetchingApplications");
       setIsLoading(false);
@@ -298,9 +318,9 @@ function RecommendationsByApplicant(): JSX.Element {
 
   useEffect(() => {
     if (typeof applicationRound?.id === "number") {
-      fetchRecommendations(applicationRound, Number(applicantId));
+      fetchRecommendations(applicationRound, viewType, viewIndex);
     }
-  }, [applicationRound, applicantId, t]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [applicationRound, viewIndex, t]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     const fetchApplication = async (id: number) => {
@@ -309,20 +329,32 @@ function RecommendationsByApplicant(): JSX.Element {
         setApplication(result);
       } catch (error) {
         setErrorMsg("errors.errorFetchingApplication");
-      } finally {
         setIsLoading(false);
       }
     };
 
-    const aId = get(recommendations, "[0].applicationId");
+    const aId =
+      viewType === "organisation"
+        ? get(recommendations, "[0].applicationId")
+        : get(
+            recommendations.filter(
+              (n: AllocationResult) => n.applicantType === "individual"
+            ),
+            "0.applicationId"
+          );
     if (aId) {
       fetchApplication(aId);
     }
-  }, [recommendations]);
+  }, [recommendations, viewType]);
+
+  useEffect(() => {
+    setIsLoading(false);
+  }, [application, recommendations]);
 
   const applicantName =
-    get(recommendations, "[0].organisationName") ||
-    get(recommendations, "[0].applicantName");
+    viewType === "organisation"
+      ? get(recommendations, "[0].organisationName")
+      : get(recommendations, "[0].applicantName");
 
   const unhandledRecommendationCount = recommendations.filter((n) =>
     ["created", "allocating", "allocated"].includes(n.applicationEvent.status)
@@ -356,11 +388,16 @@ function RecommendationsByApplicant(): JSX.Element {
                 <Heading>{applicantName}</Heading>
                 <div>{applicationRound?.name}</div>
                 <StyledApplicationRoundStatusBlock
-                  status={applicationRound.status}
+                  applicationRound={applicationRound}
                 />
               </div>
               <div>
-                {application && <ApplicantBox application={application} />}
+                {application && (
+                  <ApplicantBox
+                    application={application}
+                    type={applicantId && "individual"}
+                  />
+                )}
               </div>
             </Top>
             <RecommendationCount
@@ -383,11 +420,14 @@ function RecommendationsByApplicant(): JSX.Element {
             cellConfig={cellConfig}
             filterConfig={filterConfig}
             areAllRowsDisabled={recommendations.every(
-              (row) => row.applicationEvent.status === "ignored" || row.accepted
+              (row) =>
+                row.applicationEvent.status === "ignored" ||
+                row.accepted ||
+                row.declined
             )}
             isRowDisabled={(row: AllocationResult) => {
               return (
-                ["ignored"].includes(row.applicationEvent.status) ||
+                ["ignored", "declined"].includes(row.applicationEvent.status) ||
                 row.accepted
               );
             }}
@@ -420,7 +460,7 @@ function RecommendationsByApplicant(): JSX.Element {
                   setErrorMsg,
                   callback: () => {
                     setTimeout(() => setIsSaving(false), 1000);
-                    fetchRecommendations(applicationRound, Number(applicantId));
+                    fetchRecommendations(applicationRound, viewType, viewIndex);
                   },
                 });
               }}

@@ -10,6 +10,11 @@ import {
   AllocationResult,
   ApplicationEventStatus,
   ApplicationEventsDeclinedReservationUnits,
+  Reservation,
+  RecurringReservation,
+  ApplicationRoundStatus,
+  ApplicationStatus,
+  ReservationStatus,
 } from "./types";
 
 const apiBaseUrl: string = process.env.REACT_APP_TILAVARAUS_API_URL || "";
@@ -23,8 +28,10 @@ const allocationResultPath = "allocation_results";
 const applicationEventStatusPath = "application_event_status";
 const declinedApplicationEventReservationUnitsPath =
   "application_event_declined_reservation_unit";
-const applicationEventWeeklyAmountReduction =
+const applicationEventWeeklyAmountReductionPath =
   "application_event_weekly_amount_reduction";
+const reservationPath = "reservation";
+const recurringReservationPath = "recurring_reservation";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface QueryParameters {}
@@ -145,6 +152,16 @@ export function saveApplicationRound(
   });
 }
 
+export function patchApplicationRoundStatus(
+  id: number,
+  status: ApplicationRoundStatus
+): Promise<ApplicationRound> {
+  return apiPatch<ApplicationRound>({
+    data: { status },
+    path: `v1/${applicationRoundsBasePath}/${id}/`,
+  });
+}
+
 export interface ReservationUnitsParameters {
   applicationRound?: number;
   search?: string;
@@ -204,18 +221,13 @@ export function getApplications(
   });
 }
 
-export function saveApplication(
-  application: Application
+export function patchApplicationStatus(
+  applicationId: number,
+  status: ApplicationStatus
 ): Promise<Application> {
-  if (application.id === undefined) {
-    return apiPost<Application>({
-      data: application,
-      path: `v1/${applicationBasePath}/`,
-    });
-  }
-  return apiPut<Application>({
-    data: application,
-    path: `v1/${applicationBasePath}/${application.id}/`,
+  return apiPatch<Application>({
+    data: { status },
+    path: `v1/${applicationBasePath}/${applicationId}/`,
   });
 }
 
@@ -242,7 +254,8 @@ export function getAllocationStatus(id: number): Promise<AllocationRequest> {
 interface AllocationResultsParams {
   applicant?: number;
   applicationRoundId: number;
-  serviceSectorId: number;
+  serviceSectorId?: number;
+  applicationEvent?: string;
   reservationUnit?: number;
 }
 
@@ -257,7 +270,7 @@ export function getAllocationResults(
 
 interface AllocationResultParams {
   id: number;
-  serviceSectorId: number;
+  serviceSectorId?: number;
 }
 
 export function getAllocationResult(
@@ -325,7 +338,55 @@ export function rejectApplicationEventSchedule(
   applicationEventScheduleResultId: number
 ): Promise<void> {
   return apiPost({
-    path: `v1/${applicationEventWeeklyAmountReduction}/`,
+    path: `v1/${applicationEventWeeklyAmountReductionPath}/`,
     data: { applicationEventScheduleResultId },
+  });
+}
+
+interface IRecurringReservationParams {
+  application?: number;
+  applicationEvent?: number;
+  ordering?: string;
+  reservationUnit?: string;
+  search?: string;
+}
+
+interface IReservationParams {
+  active?: boolean;
+  ordering?: string;
+  reservationUnit?: string;
+  search?: string;
+  state?: ReservationStatus;
+}
+
+export function getRecurringReservations(
+  parameters: IRecurringReservationParams
+): Promise<RecurringReservation[]> {
+  return apiGet({
+    path: `v1/${recurringReservationPath}`,
+    parameters,
+  });
+}
+
+export function getRecurringReservation(
+  id: number
+): Promise<RecurringReservation> {
+  return apiGet({
+    path: `v1/${recurringReservationPath}/${id}`,
+  });
+}
+
+export function getReservations(
+  parameters: IReservationParams
+): Promise<Reservation[]> {
+  return apiGet({
+    path: `v1/${reservationPath}`,
+    parameters,
+  });
+}
+
+export function getReservation(id: number): Promise<Reservation> {
+  return apiGet({
+    path: `v1/${reservationPath}/${id}`,
   });
 }

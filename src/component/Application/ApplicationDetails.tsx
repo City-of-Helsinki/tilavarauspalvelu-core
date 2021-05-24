@@ -170,9 +170,7 @@ function ApplicationDetails(): JSX.Element | null {
 
   const customerName =
     application?.applicantType === "individual"
-      ? `${application.contactPerson?.firstName || ""} ${
-          application.contactPerson?.lastName || ""
-        }`.trim()
+      ? application?.applicantName
       : application?.organisation?.name;
 
   const homeCity: Parameter | undefined = cities.find(
@@ -318,7 +316,7 @@ function ApplicationDetails(): JSX.Element | null {
                 <StyledAccordion
                   key={applicationEvent.id}
                   heading={applicationEvent.name}
-                  defaultOpen
+                  defaultOpen={false}
                 >
                   <AccordionContent>
                     <ValueBox

@@ -8,6 +8,7 @@ import { ReactComponent as IconCustomers } from "../../images/icon_customers.svg
 
 interface IProps {
   application: ApplicationType;
+  type?: string;
 }
 
 const Wrapper = styled.div`
@@ -59,24 +60,23 @@ const Status = styled.div`
   }
 `;
 
-function ApplicantBox({ application }: IProps): JSX.Element {
+function ApplicantBox({ application, type }: IProps): JSX.Element {
   const { t } = useTranslation();
 
   const contactPerson = `${application?.contactPerson?.firstName || ""} ${
     application?.contactPerson?.lastName || ""
   }`.trim();
 
+  const applicantType = type || application.applicantType;
+
   let details;
-  switch (application.applicantType) {
+  switch (applicantType) {
     case "individual":
       details = (
         <>
-          <Heading>{contactPerson}</Heading>
+          <Heading>{application.applicantName}</Heading>
           {t("Application.applicantType")}:{" "}
-          {t(`Application.applicantTypes.${application.applicantType}`)}
-          <P>
-            {t("Application.contactPerson")}: {contactPerson}
-          </P>
+          {t(`Application.applicantTypes.individual`)}
         </>
       );
       break;

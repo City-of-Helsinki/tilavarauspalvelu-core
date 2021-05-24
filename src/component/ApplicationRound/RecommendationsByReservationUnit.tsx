@@ -8,13 +8,14 @@ import {
   IconHome,
   IconGroup,
   Notification,
+  IconArrowRight,
 } from "hds-react";
 import trim from "lodash/trim";
 import uniq from "lodash/uniq";
 import { TFunction } from "i18next";
 import { ContentContainer, IngressContainer } from "../../styles/layout";
 import { H1, H3 } from "../../styles/typography";
-import { breakpoints, InlineRowLink } from "../../styles/util";
+import { BasicLink, breakpoints, InlineRowLink } from "../../styles/util";
 import LinkPrev from "../LinkPrev";
 import withMainMenu from "../withMainMenu";
 import {
@@ -42,10 +43,11 @@ import {
   modifyAllocationResults,
 } from "../../common/util";
 import StatusCell from "../StatusCell";
-import StatusCircle from "../StatusCircle";
+// import StatusCircle from "../StatusCircle";
 import RecommendationCount from "./RecommendationCount";
 import i18n from "../../i18n";
 import SelectionActionBar from "../SelectionActionBar";
+import { ReactComponent as IconBulletList } from "../../images/icon_list-bullet.svg";
 
 interface IRouteParams {
   applicationRoundId: string;
@@ -113,6 +115,20 @@ const TitleContainer = styled.div`
   }
 `;
 
+const BottomContainer = styled.div`
+  @media (min-width: ${breakpoints.l}) {
+    display: flex;
+    justify-content: space-between;
+  }
+`;
+
+const ReservationLink = styled(BasicLink)`
+  display: inline-flex;
+  gap: var(--spacing-s);
+  justify-content: space-between;
+  margin-top: var(--spacing-m);
+`;
+
 const StatusContainer = styled.div`
   display: flex;
   align-content: center;
@@ -135,13 +151,28 @@ const getCellConfig = (
       {
         title: "Application.headings.applicantName",
         key: "organisationName",
-        transform: ({ organisationName, applicantId }: AllocationResult) => (
-          <InlineRowLink
-            to={`/applicationRound/${applicationRound.id}/applicant/${applicantId}`}
-          >
-            {organisationName}
-          </InlineRowLink>
-        ),
+        transform: ({
+          applicantType,
+          applicantName,
+          organisationId,
+          organisationName,
+          applicantId,
+        }: AllocationResult) => {
+          const index = organisationId || applicantId;
+          const title =
+            applicantType === "individual" ? applicantName : organisationName;
+          return index ? (
+            <InlineRowLink
+              to={`/applicationRound/${applicationRound.id}/${
+                organisationId ? "organisation" : "applicant"
+              }/${index}`}
+            >
+              {title}
+            </InlineRowLink>
+          ) : (
+            title || ""
+          );
+        },
       },
       {
         title: "ApplicationRound.basket",
@@ -163,15 +194,15 @@ const getCellConfig = (
       },
       {
         title: "Recommendation.headings.recommendationCount",
-        key: "applicationAggregatedData.reservationsTotal",
+        key: "applicationAggregatedData.appliedReservationsTotal",
         transform: ({ applicationAggregatedData }: AllocationResult) => (
           <>
             {trim(
               `${formatNumber(
-                applicationAggregatedData?.reservationsTotal,
+                applicationAggregatedData?.appliedReservationsTotal,
                 t("common.volumeUnit")
               )} / ${parseDuration(
-                applicationAggregatedData?.minDurationTotal
+                applicationAggregatedData?.appliedMinDurationTotal
               )}`,
               " / "
             )}
@@ -220,10 +251,12 @@ const getFilterConfig = (
     recommendations.map((rec) => rec.unitName)
   ).sort();
   const baskets = uniq(
-    recommendations.map((rec) => ({
-      title: `${rec.basketOrderNumber}. ${rec.basketName}`,
-      value: rec.basketName,
-    }))
+    recommendations
+      .filter((n) => n.basketName)
+      .map((rec) => ({
+        title: `${rec.basketOrderNumber}. ${rec.basketName}`,
+        value: rec.basketName,
+      }))
   );
 
   return [
@@ -379,7 +412,7 @@ function RecommendationsByReservationUnit(): JSX.Element {
         filterConfig &&
         cellConfig && (
           <>
-            <ContentContainer>
+            <ContentContainer style={{ paddingBottom: "var(--spacing-s)" }}>
               <LinkPrev route={`/applicationRound/${applicationRoundId}`} />
               <IngressContainer>
                 <Ingress>
@@ -421,19 +454,32 @@ function RecommendationsByReservationUnit(): JSX.Element {
                 <TitleContainer>
                   <H1 as="h2">{applicationRound?.name}</H1>
                   <StatusContainer>
-                    <StatusCircle status={0} />
+                    {/* <StatusCircle status={0} />
                     <div>
                       <H3>{t("ApplicationRound.amountReservedOfSpace")}</H3>
                       <div>
                         {t("ApplicationRound.amountReservedOfSpaceSubtext")}
                       </div>
-                    </div>
+                    </div> */}
                   </StatusContainer>
                 </TitleContainer>
-                <RecommendationCount
-                  recommendationCount={recommendations.length}
-                  unhandledCount={unhandledRecommendationCount}
-                />
+                <BottomContainer>
+                  <RecommendationCount
+                    recommendationCount={recommendations.length}
+                    unhandledCount={unhandledRecommendationCount}
+                  />
+                  {["approved"].includes(applicationRound.status) && (
+                    <ReservationLink
+                      to={`/applicationRound/${applicationRoundId}/reservationUnit/${reservationUnitId}/reservations`}
+                    >
+                      <IconBulletList />
+                      {t(
+                        "Reservation.showSummaryOfReservationsByReservationUnit"
+                      )}
+                      <IconArrowRight />
+                    </ReservationLink>
+                  )}
+                </BottomContainer>
               </IngressContainer>
             </ContentContainer>
             <DataTable
@@ -449,12 +495,15 @@ function RecommendationsByReservationUnit(): JSX.Element {
               filterConfig={filterConfig}
               areAllRowsDisabled={recommendations.every(
                 (row) =>
-                  row.applicationEvent.status === "ignored" || row.accepted
+                  row.applicationEvent.status === "ignored" ||
+                  row.accepted ||
+                  row.declined
               )}
               isRowDisabled={(row: AllocationResult) => {
                 return (
-                  ["ignored"].includes(row.applicationEvent.status) ||
-                  row.accepted
+                  ["ignored", "declined"].includes(
+                    row.applicationEvent.status
+                  ) || row.accepted
                 );
               }}
             />
