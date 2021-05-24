@@ -307,6 +307,10 @@ class ApplicationRound(models.Model):
     def status(self):
         return self.get_status().status
 
+    @property
+    def status_timestamp(self):
+        return self.get_status().timestamp
+
     @status.setter
     def status(self, status):
         self.set_status(status)
