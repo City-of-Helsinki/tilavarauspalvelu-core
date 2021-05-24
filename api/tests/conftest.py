@@ -362,6 +362,7 @@ def valid_reservation_unit_data(unit, equipment_hammer):
         "terms_of_use": "Do not mess it up",
         "equipment_ids": [equipment_hammer.id],
         "unit_id": unit.pk,
+        "contact_information": "",
     }
 
 
