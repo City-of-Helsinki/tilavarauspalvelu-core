@@ -10,7 +10,11 @@ from freezegun import freeze_time
 from rest_framework.reverse import reverse
 from rest_framework.test import APIClient
 
-from applications.models import ApplicationEventStatus, ApplicationStatus
+from applications.models import (
+    ApplicationAggregateData,
+    ApplicationEventStatus,
+    ApplicationStatus,
+)
 from applications.tests.factories import (
     ApplicationEventFactory,
     ApplicationEventScheduleFactory,
@@ -386,3 +390,26 @@ class ReservationCreationOnStatusCreationTestCase(ApplicationStatusBaseTestCase)
         assert_that(response.status_code).is_equal_to(201)
         reservation = Reservation.objects.first()
         assert_that(reservation.state).is_equal_to(STATE_CHOICES.DENIED)
+
+
+class ApplicationAggregateDataCreationOnEventStatusChangeTestCase(
+    ApplicationStatusBaseTestCase
+):
+    @mock.patch(
+        "applications.utils.reservation_creation.ReservationScheduler",
+        wraps=MockedScheduler,
+    )
+    def test_aggregate_data_is_created_after_event_approved(self, mock):
+        response = self.manager_api_client.post(
+            reverse("application_event_status-list"),
+            data={
+                "status": ApplicationEventStatus.APPROVED,
+                "application_event_id": self.application_event.id,
+            },
+        )
+        assert_that(response.status_code).is_equal_to(201)
+        aggregate_datas_one = ApplicationAggregateData.objects.filter(
+            application=self.application
+        ).count()
+
+        assert_that(aggregate_datas_one).is_equal_to(4)
