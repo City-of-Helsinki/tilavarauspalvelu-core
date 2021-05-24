@@ -402,27 +402,8 @@ function Application(): JSX.Element | null {
     applicationRound &&
     getNormalizedApplicationStatus(application.status, applicationRound.status);
 
-  const allocatedReservationsVolume: number | undefined =
-    recurringReservations?.length &&
-    recurringReservations.flatMap(
-      (recurringReservation: RecurringReservation) =>
-        recurringReservation.reservations
-    ).length;
-
-  const allocatedReservationsDuration: number | undefined =
-    recurringReservations?.length &&
-    recurringReservations
-      .flatMap(
-        (recurringReservation: RecurringReservation) =>
-          recurringReservation.reservations
-      )
-      .reduce((acc: number, cur: Reservation) => {
-        const diff: number = differenceInSeconds(
-          new Date(cur.begin),
-          new Date(cur.end)
-        );
-        return acc + Math.abs(diff);
-      }, 0);
+  const hasReservations: boolean =
+    get(application, "aggregatedData?.createdReservationsTotal", 0) > 0;
 
   return (
     <Wrapper>
@@ -445,20 +426,15 @@ function Application(): JSX.Element | null {
               >
                 {t("ApplicationRound.showClientApplication")}
               </StyledLink>
-              {isApplicationRoundApproved &&
-                applicantId &&
-                allocatedReservationsVolume &&
-                allocatedReservationsVolume > 0 && (
-                  <StyledLink
-                    to={`/applicationRound/${applicationRound.id}/${
-                      application.organisation?.id
-                        ? "organisation"
-                        : "applicant"
-                    }/${applicantId}`}
-                  >
-                    {t("Application.showAllocationResultsOfApplicant")}
-                  </StyledLink>
-                )}
+              {isApplicationRoundApproved && applicantId && hasReservations && (
+                <StyledLink
+                  to={`/applicationRound/${applicationRound.id}/${
+                    application.organisation?.id ? "organisation" : "applicant"
+                  }/${applicantId}`}
+                >
+                  {t("Application.showAllocationResultsOfApplicant")}
+                </StyledLink>
+              )}
             </TopLinkContainer>
             <Heading data-testid="application__heading--main">
               <CustomerIcon>
@@ -536,15 +512,17 @@ function Application(): JSX.Element | null {
                           <p>{t("Application.graduatedToAllocation")}</p>
                           <table>
                             <tbody>
-                              {allocatedReservationsVolume &&
-                              allocatedReservationsVolume > 0 ? (
+                              {hasReservations ? (
                                 <>
                                   <tr>
                                     <th>
                                       {t("Application.allocatedReservations")}
                                     </th>
                                     <td>
-                                      {allocatedReservationsVolume}{" "}
+                                      {
+                                        application.aggregatedData
+                                          .createdReservationsTotal
+                                      }{" "}
                                       {t("common.volumeUnit")}
                                     </td>
                                   </tr>
@@ -556,7 +534,8 @@ function Application(): JSX.Element | null {
                                     </th>
                                     <td>
                                       {parseDuration(
-                                        allocatedReservationsDuration
+                                        application.aggregatedData
+                                          .reservationsDurationTotal
                                       )}
                                     </td>
                                   </tr>
