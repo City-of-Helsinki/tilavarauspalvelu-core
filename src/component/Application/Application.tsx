@@ -580,9 +580,7 @@ function Application(): JSX.Element | null {
                       )}
                     </GridCol>
                     <GridCol>
-                      <DownloadResolutionBtn
-                        onClick={() => console.log("TODO")}
-                      >
+                      <DownloadResolutionBtn onClick={() => {}}>
                         <Strong>
                           {t("Application.downloadResolution")} TODO
                         </Strong>
