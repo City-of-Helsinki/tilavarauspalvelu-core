@@ -21,6 +21,9 @@ import RecommendationsByReservationUnit from "./component/ApplicationRound/Recom
 import ApplicationRoundApprovals from "./component/ApplicationRound/ApplicationRoundApprovals";
 import { publicUrl } from "./common/const";
 import ResolutionReport from "./component/ApplicationRound/ResolutionReport";
+import ReservationsByReservationUnit from "./component/ApplicationRound/ReservationsByReservationUnit";
+import ReservationSummariesByReservationUnit from "./component/ApplicationRound/ReservationSummariesByReservationUnit";
+import ReservationByApplicationEvent from "./component/Application/ReservationByApplicationEvent";
 
 interface IPrivateRouteProps {
   path: string;
@@ -81,6 +84,11 @@ function App(): JSX.Element {
             />
             <PrivateRoute
               exact
+              path="/application/:applicationId/recurringReservation/:recurringReservationId"
+              component={ReservationByApplicationEvent}
+            />
+            <PrivateRoute
+              exact
               path="/applicationRounds"
               component={AllApplicationRounds}
             />
@@ -102,11 +110,23 @@ function App(): JSX.Element {
               component={Criteria}
             />
             <PrivateRoute
+              path="/applicationRound/:applicationRoundId/reservationUnit/:reservationUnitId/reservations/summary"
+              component={ReservationSummariesByReservationUnit}
+            />
+            <PrivateRoute
+              path="/applicationRound/:applicationRoundId/reservationUnit/:reservationUnitId/reservations"
+              component={ReservationsByReservationUnit}
+            />
+            <PrivateRoute
               path="/applicationRound/:applicationRoundId/reservationUnit/:reservationUnitId"
               component={RecommendationsByReservationUnit}
             />
             <PrivateRoute
               path="/applicationRound/:applicationRoundId/applicant/:applicantId"
+              component={RecommendationsByApplicant}
+            />
+            <PrivateRoute
+              path="/applicationRound/:applicationRoundId/organisation/:organisationId"
               component={RecommendationsByApplicant}
             />
             <PrivateRoute

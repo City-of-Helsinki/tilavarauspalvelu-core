@@ -33,7 +33,7 @@ export const formatNumber = (
   input?: number | null,
   suffix?: string
 ): string => {
-  if (!input) return "";
+  if (input === null || input === undefined) return "";
 
   const number = new Intl.NumberFormat("fi").format(input);
 
@@ -45,7 +45,6 @@ interface IFormatDurationOutput {
   minutes: number;
 }
 
-export type ApplicationStatusView = "review" | "handling";
 export type ApplicationRoundStatusView = "listing";
 
 export const formatDuration = (time: string): IFormatDurationOutput => {
@@ -58,12 +57,16 @@ export const formatDuration = (time: string): IFormatDurationOutput => {
 
 export const getNormalizedApplicationStatus = (
   status: ApplicationStatus,
-  view: ApplicationStatusView
+  view: ApplicationRoundStatus
 ): ApplicationStatus => {
   let normalizedStatus: ApplicationStatus = status;
-  if (view === "review") {
+  if (["draft", "in_review"].includes(view)) {
     if (status === "in_review") {
       normalizedStatus = "review_done";
+    }
+  } else if (view === "approved") {
+    if (["in_review", "review_done"].includes(normalizedStatus)) {
+      normalizedStatus = "approved";
     }
   }
 

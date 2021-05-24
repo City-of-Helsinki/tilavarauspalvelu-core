@@ -1,31 +1,20 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Navigation as HDSNavigation } from "hds-react";
 // eslint-disable-next-line import/no-unresolved
 import { useReactOidc } from "@axa-fr/react-oidc-context";
 import { Profile } from "oidc-client";
-import { useLocalStorage } from "react-use";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { useHistory } from "react-router-dom";
 import MainMenu from "./MainMenu";
 import { breakpoints, StyledHDSNavigation } from "../styles/util";
-import { authEnabled, defaultLanguage } from "../common/const";
+import { authEnabled } from "../common/const";
 
 interface NavigationProps {
   profile: Profile | null;
   login?: () => void;
   logout?: () => void;
 }
-interface ILanguageOption {
-  label: string;
-  value: string;
-}
-
-const languageOptions: ILanguageOption[] = [
-  { label: "Suomeksi", value: "fi" },
-  { label: "Svenska", value: "sv" },
-  { label: "English", value: "en" },
-];
 
 const MobileNavigation = styled.div`
   @media (min-width: ${breakpoints.m}) {
@@ -55,20 +44,10 @@ const Navigation = ({
   login,
   logout,
 }: NavigationProps): JSX.Element => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
 
   const [isMenuOpen, setMenuState] = useState(false);
-  const [language, setLanguage] = useLocalStorage<string>(
-    "userLocale",
-    i18n.language
-  );
-  const formatSelectedValue = (lang = defaultLanguage): string =>
-    lang.toUpperCase();
   const history = useHistory();
-
-  useEffect(() => {
-    if (language) i18n.changeLanguage(language);
-  }, [language, i18n]);
 
   return (
     <StyledHDSNavigation
@@ -106,24 +85,6 @@ const Navigation = ({
             variant="primary"
           />
         </UserMenu>
-        <HDSNavigation.LanguageSelector
-          label={formatSelectedValue(language)}
-          buttonAriaLabel={t("Navigation.languageSelection")}
-        >
-          {languageOptions.map((languageOption) => (
-            <HDSNavigation.Item
-              key={languageOption.value}
-              label={languageOption.label}
-              onClick={(
-                e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>
-              ): void => {
-                e.preventDefault();
-                setLanguage(languageOption.value);
-              }}
-              style={{ cursor: "pointer" }}
-            />
-          ))}
-        </HDSNavigation.LanguageSelector>
       </HDSNavigation.Actions>
     </StyledHDSNavigation>
   );

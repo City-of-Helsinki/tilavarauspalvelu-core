@@ -8,6 +8,7 @@ import {
   Notification,
 } from "hds-react";
 import uniq from "lodash/uniq";
+import uniqBy from "lodash/uniqBy";
 import trim from "lodash/trim";
 import Loader from "../Loader";
 import {
@@ -17,7 +18,7 @@ import {
   DataFilterConfig,
 } from "../../common/types";
 import { IngressContainer, NarrowContainer } from "../../styles/layout";
-import { InlineRowLink, breakpoints } from "../../styles/util";
+import { InlineRowLink, breakpoints, BasicLink } from "../../styles/util";
 import Heading from "./Heading";
 import StatusRecommendation from "../Application/StatusRecommendation";
 import withMainMenu from "../withMainMenu";
@@ -32,10 +33,12 @@ import {
   formatNumber,
   getNormalizedApplicationEventStatus,
   modifyAllocationResults,
+  normalizeApplicationEventStatus,
   parseAgeGroups,
   parseDuration,
   prepareAllocationResults,
   processAllocationResult,
+  secondsToHms,
 } from "../../common/util";
 import StatusCell from "../StatusCell";
 import {
@@ -152,10 +155,12 @@ const getFilterConfig = (
     recommendations.map((rec) => rec.unitName)
   ).sort();
   const baskets = uniq(
-    recommendations.map((rec) => ({
-      title: `${rec.basketOrderNumber}. ${rec.basketName}`,
-      value: rec.basketName,
-    }))
+    recommendations
+      .filter((n) => n.basketName)
+      .map((rec) => ({
+        title: `${rec.basketOrderNumber}. ${rec.basketName}`,
+        value: rec.basketName,
+      }))
   );
 
   return [
@@ -206,13 +211,28 @@ const getCellConfig = (
       {
         title: "Application.headings.applicantName",
         key: "organisationName",
-        transform: ({ organisationName, applicantId }: AllocationResult) => (
-          <InlineRowLink
-            to={`/applicationRound/${applicationRound.id}/applicant/${applicantId}`}
-          >
-            {organisationName}
-          </InlineRowLink>
-        ),
+        transform: ({
+          applicantType,
+          applicantName,
+          organisationId,
+          organisationName,
+          applicantId,
+        }: AllocationResult) => {
+          const index = organisationId || applicantId;
+          const title =
+            applicantType === "individual" ? applicantName : organisationName;
+          return index ? (
+            <InlineRowLink
+              to={`/applicationRound/${applicationRound.id}/${
+                organisationId ? "organisation" : "applicant"
+              }/${index}`}
+            >
+              {title}
+            </InlineRowLink>
+          ) : (
+            title || ""
+          );
+        },
       },
       {
         title: "ApplicationRound.basket",
@@ -378,6 +398,26 @@ function Handling({
     return <Loader />;
   }
 
+  const getReservationHours = (allocationResults: AllocationResult[]) => {
+    const appEvents = uniqBy(allocationResults, (n) => n.applicationEvent.id);
+    const seconds = appEvents.reduce((acc: number, cur: AllocationResult) => {
+      const isStatusOk = ["validated"].includes(
+        normalizeApplicationEventStatus(cur)
+      );
+      return cur.applicationEvent.aggregatedData
+        .allocationResultsDurationTotal && isStatusOk
+        ? acc +
+            cur.applicationEvent.aggregatedData.allocationResultsDurationTotal
+        : acc;
+    }, 0);
+    const hms = secondsToHms(seconds);
+    return hms.h || 0;
+  };
+
+  const reservedHours =
+    getReservationHours(recommendations) +
+    applicationRound.aggregatedData.totalReservationDuration;
+
   return (
     <Wrapper>
       <Heading />
@@ -408,8 +448,19 @@ function Handling({
                 />
               </div>
               <div>
-                <StatusCircle status={0} />
-                <H3>{t("ApplicationRound.amountReserved")}</H3>
+                {applicationRound.aggregatedData.totalHourCapacity &&
+                  reservedHours && (
+                    <>
+                      <StatusCircle
+                        status={
+                          (reservedHours /
+                            applicationRound.aggregatedData.totalHourCapacity) *
+                          100
+                        }
+                      />
+                      <H3>{t("ApplicationRound.amountReserved")}</H3>
+                    </>
+                  )}
               </div>
             </TopIngress>
           </IngressContainer>
@@ -462,7 +513,14 @@ function Handling({
                   <IconCheckCircle size="m" />{" "}
                   {t("ApplicationRound.notificationResolutionDoneHeading")}
                 </H3>
-                <p>{t("ApplicationRound.notificationResolutionDoneBody")}</p>
+                <p>
+                  <BasicLink
+                    to={`/applicationRound/${applicationRound.id}/applications`}
+                    style={{ textDecoration: "underline" }}
+                  >
+                    {t("ApplicationRound.notificationResolutionDoneBody")}
+                  </BasicLink>
+                </p>
               </StyledNotification>
             )}
           </NarrowContainer>
@@ -483,12 +541,15 @@ function Handling({
               cellConfig={cellConfig}
               areAllRowsDisabled={recommendations.every(
                 (row) =>
-                  row.applicationEvent.status === "ignored" || row.accepted
+                  row.applicationEvent.status === "ignored" ||
+                  row.accepted ||
+                  row.declined
               )}
               isRowDisabled={(row: AllocationResult) => {
                 return (
-                  ["ignored"].includes(row.applicationEvent.status) ||
-                  row.accepted
+                  ["ignored", "declined"].includes(
+                    row.applicationEvent.status
+                  ) || row.accepted
                 );
               }}
               statusField="applicationEvent.status"

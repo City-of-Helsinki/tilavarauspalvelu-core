@@ -20,9 +20,15 @@ export type NormalizedApplicationRoundStatus =
 
 export type ApplicationRoundBasket = any; // eslint-disable-line
 
+export type ApplicationRoundAggregatedData = {
+  totalHourCapacity: number;
+  totalReservationDuration: number;
+};
+
 export type ApplicationRound = {
   id: number;
   name: TranslationObject;
+  aggregatedData: ApplicationRoundAggregatedData;
   reservationUnitIds: number[];
   applicationPeriodBegin: string;
   applicationPeriodEnd: string;
@@ -113,11 +119,15 @@ export type ApplicationStatus =
   | "in_review"
   | "review_done"
   | "declined"
-  | "cancelled";
+  | "cancelled"
+  | "approved"
+  | "sent";
 
-export type AggregatedData = {
-  appliedReservationsTotal?: number;
+export type ApplicationAggregatedData = {
   appliedMinDurationTotal?: number;
+  appliedReservationsTotal?: number;
+  createdReservationsTotal?: number;
+  reservationsDurationTotal?: number;
 };
 
 export type ApplicantType =
@@ -131,12 +141,14 @@ export type Application = {
   status: ApplicationStatus;
   applicationRoundId: number;
   applicantType: ApplicantType | null;
+  applicantId: number | null;
+  applicantName: string | null;
   homeCityId: number | null;
   organisation: Organisation | null;
   contactPerson: ContactPerson | null;
   billingAddress: Address | null;
   applicationEvents: ApplicationEvent[];
-  aggregatedData: AggregatedData;
+  aggregatedData: ApplicationAggregatedData;
   createdDate: string | null;
   lastModifiedDate: string | null;
 };
@@ -167,6 +179,13 @@ export type Address = {
   city: string | null;
 };
 
+export type ApplicationEventAggregatedData = {
+  durationTotal: number;
+  reservationsTotal: number;
+  allocationResultsDurationTotal: number;
+  allocationResultsReservationsTotal: number;
+};
+
 export type ApplicationEvent = {
   id: number;
   name: string | null;
@@ -187,6 +206,7 @@ export type ApplicationEvent = {
   applicationEventSchedules: ApplicationEventSchedule[];
   status: ApplicationEventStatus;
   declinedReservationUnitIds: number[];
+  aggregatedData: ApplicationEventAggregatedData;
 };
 
 export type ApplicationEventStatus =
@@ -198,6 +218,7 @@ export type ApplicationEventStatus =
   | "ignored";
 
 interface AgeGroupDisplay {
+  id?: number;
   minimum: number;
   maximum: number;
 }
@@ -248,6 +269,7 @@ export interface DataGroup {
 }
 
 export interface AllocationResult {
+  id: number;
   applicationEvent: ApplicationEvent;
   applicationId: number | null;
   applicantName: string | null;
@@ -260,10 +282,10 @@ export interface AllocationResult {
   allocatedReservationUnitName: string | null;
   applicationEventScheduleId: number | null;
   allocatedDuration: string | null;
-  allocatedDay: string | null;
+  allocatedDay: number | null;
   allocatedBegin: string | null;
   allocatedEnd: string | null;
-  applicationAggregatedData: AggregatedData;
+  applicationAggregatedData: ApplicationAggregatedData;
   basketName: string | null;
   basketOrderNumber: string | null;
   accepted: boolean;
@@ -307,7 +329,7 @@ export type ParameterTypes =
 
 export interface ParameterAgeGroup {
   id: number;
-  minumum: number;
+  minimum: number;
   maximum: number;
 }
 
@@ -320,3 +342,45 @@ export interface ApplicationEventsDeclinedReservationUnits {
   id: number;
   declinedReservationUnitIds: number[];
 }
+
+export interface RecurringReservation {
+  id: number;
+  applicationId: number;
+  applicationEventId: number;
+  ageGroup: AgeGroupDisplay;
+  purposeName: string | null;
+  groupSize: number | null;
+  abilityGroupId: number | null;
+  biweekly: boolean;
+  beginWeekday: string | null;
+  firstReservationBegin: string | null;
+  lastReservationEnd: string | null;
+  reservations: Reservation[];
+  deniedReservations: Reservation[];
+}
+
+export interface Reservation {
+  id: number;
+  state: ReservationStatus;
+  priority: ReservationPriority;
+  userId: number | null;
+  beginWeekday: string | null;
+  begin: string;
+  end: string;
+  bufferTimeBefore: string | null;
+  bufferTimeAfter: string | null;
+  applicationEventName: string | null;
+  reservationUser: string | null;
+  reservationUnit: ReservationUnit;
+  recurringReservation: number | null;
+}
+
+export type ReservationStatus =
+  | "created"
+  | "cancelled"
+  | "confirmed"
+  | "denied"
+  | "requested"
+  | "waiting_for_payment";
+
+export type ReservationPriority = 100 | 200 | 300;

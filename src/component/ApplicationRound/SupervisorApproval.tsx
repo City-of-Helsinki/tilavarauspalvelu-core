@@ -12,6 +12,7 @@ import {
   ApplicationRound as ApplicationRoundType,
   ApplicationRoundStatus,
   DataFilterConfig,
+  ApplicationEventStatus,
 } from "../../common/types";
 import {
   ContentContainer,
@@ -37,9 +38,10 @@ import LinkPrev from "../LinkPrev";
 import Loader from "../Loader";
 import {
   getApplicationRound,
-  saveApplicationRound,
   getAllocationResults,
   getApplications,
+  setApplicationEventStatuses,
+  patchApplicationRoundStatus,
 } from "../../common/api";
 
 interface IProps {
@@ -190,14 +192,12 @@ const getCellConfig = (
         title: "Application.headings.applicantName",
         key: "organisation.name",
         transform: ({
+          applicantName,
           applicantType,
-          contactPerson,
           organisation,
         }: ApplicationType) =>
           applicantType === "individual"
-            ? `${contactPerson?.firstName || ""} ${
-                contactPerson?.lastName || ""
-              }`.trim()
+            ? applicantName || ""
             : organisation?.name || "",
       },
       {
@@ -231,10 +231,23 @@ const getCellConfig = (
 
   const allocatedCellConfig = {
     cols: [
-      { title: "Application.headings.applicantName", key: "organisationName" },
+      {
+        title: "Application.headings.applicantName",
+        key: "organisationName",
+        transform: ({
+          applicantType,
+          applicantName,
+          organisationName,
+        }: AllocationResult) =>
+          applicantName && applicantType === "individual"
+            ? applicantName || ""
+            : organisationName || "",
+      },
       {
         title: "Application.headings.applicantType",
         key: "applicantType",
+        transform: ({ applicantType }: AllocationResult) =>
+          t(`Application.applicantTypes.${applicantType}`),
       },
       {
         title: "Recommendation.headings.resolution",
@@ -386,13 +399,12 @@ function SupervisorApproval({ applicationRoundId }: IProps): JSX.Element {
   const history = useHistory();
 
   const setApplicationRoundStatus = async (
+    id: number,
     status: ApplicationRoundStatus,
     followupUrl?: string
   ) => {
-    const payload = { ...applicationRound, status } as ApplicationRoundType;
-
     try {
-      const result = await saveApplicationRound(payload);
+      const result = await patchApplicationRoundStatus(id, status);
       setApplicationRound(result);
       if (followupUrl) {
         history.push(followupUrl);
@@ -437,7 +449,7 @@ function SupervisorApproval({ applicationRoundId }: IProps): JSX.Element {
 
         const applicationsResult = await getApplications({
           applicationRound: ar.id,
-          status: "in_review,review_done,declined",
+          status: "draft,in_review,review_done,declined",
         });
 
         const processedResult = processAllocationResult(allocationResults);
@@ -475,12 +487,14 @@ function SupervisorApproval({ applicationRoundId }: IProps): JSX.Element {
 
   const backLink = "/applicationRounds";
 
+  const validatedRecommendations = recommendations.filter((n) =>
+    ["validated"].includes(n.applicationEvent.status)
+  );
+
   const filteredResults =
     activeFilter === "unallocated"
       ? unallocatedApplications
-      : recommendations.filter((n) =>
-          ["validated"].includes(n.applicationEvent.status)
-        );
+      : validatedRecommendations;
 
   if (isLoading) {
     return <Loader />;
@@ -646,6 +660,7 @@ function SupervisorApproval({ applicationRoundId }: IProps): JSX.Element {
                     variant="primary"
                     onClick={() => {
                       setApplicationRoundStatus(
+                        Number(applicationRoundId),
                         "allocated",
                         `/applicationRounds/approvals?cancelled`
                       );
@@ -680,11 +695,26 @@ function SupervisorApproval({ applicationRoundId }: IProps): JSX.Element {
                   <Button
                     type="submit"
                     variant="primary"
-                    onClick={() => {
-                      setApplicationRoundStatus(
-                        "approved",
-                        `/applicationRounds/approvals?approved`
-                      );
+                    onClick={async () => {
+                      try {
+                        const payload = uniq(
+                          validatedRecommendations.map(
+                            (n: AllocationResult) => n.applicationEvent.id
+                          )
+                        ).map((n: number) => ({
+                          status: "approved" as ApplicationEventStatus,
+                          applicationEventId: n,
+                        }));
+                        await setApplicationEventStatuses(payload);
+                        await setApplicationRoundStatus(
+                          Number(applicationRoundId),
+                          "approved",
+                          `/applicationRounds/approvals?approved&applicationRoundId=${applicationRoundId}`
+                        );
+                      } catch (error) {
+                        setConfirmationDialogVisibility(false);
+                        setErrorMsg("errors.errorSavingRecommendations");
+                      }
                     }}
                   >
                     {t("common.approve")}
