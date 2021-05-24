@@ -12,7 +12,7 @@ import {
 } from "hds-react";
 import trim from "lodash/trim";
 import get from "lodash/get";
-import { differenceInSeconds } from "date-fns/esm";
+import differenceInSeconds from "date-fns/differenceInSeconds";
 import {
   getApplication,
   getApplicationRound,
