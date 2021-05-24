@@ -21,8 +21,9 @@ import RecommendationsByReservationUnit from "./component/ApplicationRound/Recom
 import ApplicationRoundApprovals from "./component/ApplicationRound/ApplicationRoundApprovals";
 import { publicUrl } from "./common/const";
 import ResolutionReport from "./component/ApplicationRound/ResolutionReport";
-import Result from "./component/Application/Result";
 import ReservationsByReservationUnit from "./component/ApplicationRound/ReservationsByReservationUnit";
+import ReservationSummariesByReservationUnit from "./component/ApplicationRound/ReservationSummariesByReservationUnit";
+import ReservationByApplicationEvent from "./component/Application/ReservationByApplicationEvent";
 
 interface IPrivateRouteProps {
   path: string;
@@ -83,8 +84,8 @@ function App(): JSX.Element {
             />
             <PrivateRoute
               exact
-              path="/application/:applicationId/result/:applicationEventId"
-              component={Result}
+              path="/application/:applicationId/recurringReservation/:recurringReservationId"
+              component={ReservationByApplicationEvent}
             />
             <PrivateRoute
               exact
@@ -107,6 +108,10 @@ function App(): JSX.Element {
             <PrivateRoute
               path="/applicationRound/:applicationRoundId/criteria"
               component={Criteria}
+            />
+            <PrivateRoute
+              path="/applicationRound/:applicationRoundId/reservationUnit/:reservationUnitId/reservations/summary"
+              component={ReservationSummariesByReservationUnit}
             />
             <PrivateRoute
               path="/applicationRound/:applicationRoundId/reservationUnit/:reservationUnitId/reservations"

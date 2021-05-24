@@ -217,6 +217,7 @@ export type ApplicationEventStatus =
   | "ignored";
 
 interface AgeGroupDisplay {
+  id?: number;
   minimum: number;
   maximum: number;
 }
@@ -343,11 +344,19 @@ export interface ApplicationEventsDeclinedReservationUnits {
 }
 
 export interface RecurringReservation {
+  id: number;
   applicationId: number;
   applicationEventId: number;
-  ageGroupId: number | null;
+  ageGroup: AgeGroupDisplay;
+  purposeName: string | null;
+  groupSize: number | null;
   abilityGroupId: number | null;
+  biweekly: boolean;
+  beginWeekday: string | null;
+  firstReservationBegin: string | null;
+  lastReservationEnd: string | null;
   reservations: Reservation[];
+  deniedReservations: Reservation[];
 }
 
 export interface Reservation {
@@ -355,10 +364,13 @@ export interface Reservation {
   state: ReservationStatus;
   priority: ReservationPriority;
   userId: number | null;
+  beginWeekday: string | null;
   begin: string;
   end: string;
   bufferTimeBefore: string | null;
   bufferTimeAfter: string | null;
+  applicationEventName: string | null;
+  reservationUser: string | null;
   reservationUnit: ReservationUnit;
   recurringReservation: number | null;
 }

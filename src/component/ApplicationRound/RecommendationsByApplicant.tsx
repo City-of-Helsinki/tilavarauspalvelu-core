@@ -264,23 +264,30 @@ function RecommendationsByApplicant(): JSX.Element {
     applicantId,
   } = useParams<IRouteParams>();
 
+  const viewType = organisationId ? "organisation" : "individual";
+
+  const viewIndex = organisationId
+    ? Number(organisationId)
+    : Number(applicantId);
+
   const fetchRecommendations = async (
     ar: ApplicationRoundType,
-    orId: number,
-    apId: number
+    type: string,
+    index: number
   ) => {
     try {
       const result = await getAllocationResults({
         applicationRoundId: ar.id,
         serviceSectorId: ar.serviceSectorId,
-        applicant: apId || undefined,
+        applicant: type === "individual" ? index : undefined,
       });
 
-      const processedResult = orId
-        ? processAllocationResult(result).filter(
-            (n) => n.organisationId === orId
-          )
-        : processAllocationResult(result);
+      const processedResult =
+        type === "organisation"
+          ? processAllocationResult(result).filter(
+              (n) => n.organisationId === index
+            )
+          : processAllocationResult(result);
 
       setFilterConfig(getFilterConfig(processedResult));
       setCellConfig(getCellConfig(t, ar));
@@ -311,13 +318,9 @@ function RecommendationsByApplicant(): JSX.Element {
 
   useEffect(() => {
     if (typeof applicationRound?.id === "number") {
-      fetchRecommendations(
-        applicationRound,
-        Number(organisationId),
-        Number(applicantId)
-      );
+      fetchRecommendations(applicationRound, viewType, viewIndex);
     }
-  }, [applicationRound, applicantId, organisationId, t]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [applicationRound, viewIndex, t]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     const fetchApplication = async (id: number) => {
@@ -326,27 +329,32 @@ function RecommendationsByApplicant(): JSX.Element {
         setApplication(result);
       } catch (error) {
         setErrorMsg("errors.errorFetchingApplication");
-      } finally {
         setIsLoading(false);
       }
     };
 
-    const aId = organisationId
-      ? get(recommendations, "[0].applicationId")
-      : get(
-          recommendations.filter(
-            (n: AllocationResult) => n.applicantType === "individual"
-          ),
-          "0.applicationId"
-        );
+    const aId =
+      viewType === "organisation"
+        ? get(recommendations, "[0].applicationId")
+        : get(
+            recommendations.filter(
+              (n: AllocationResult) => n.applicantType === "individual"
+            ),
+            "0.applicationId"
+          );
     if (aId) {
       fetchApplication(aId);
     }
-  }, [recommendations, organisationId]);
+  }, [recommendations, viewType]);
 
-  const applicantName = organisationId
-    ? get(recommendations, "[0].organisationName")
-    : get(recommendations, "[0].applicantName");
+  useEffect(() => {
+    setIsLoading(false);
+  }, [application, recommendations]);
+
+  const applicantName =
+    viewType === "organisation"
+      ? get(recommendations, "[0].organisationName")
+      : get(recommendations, "[0].applicantName");
 
   const unhandledRecommendationCount = recommendations.filter((n) =>
     ["created", "allocating", "allocated"].includes(n.applicationEvent.status)
@@ -452,11 +460,7 @@ function RecommendationsByApplicant(): JSX.Element {
                   setErrorMsg,
                   callback: () => {
                     setTimeout(() => setIsSaving(false), 1000);
-                    fetchRecommendations(
-                      applicationRound,
-                      Number(organisationId),
-                      Number(applicantId)
-                    );
+                    fetchRecommendations(applicationRound, viewType, viewIndex);
                   },
                 });
               }}

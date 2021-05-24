@@ -18,7 +18,8 @@ interface IProps {
   biweekly: boolean;
   timeStart: string | null;
   timeEnd: string | null;
-  duration: string | null;
+  duration?: string | null;
+  durationStr?: string | null;
 }
 
 const Wrapper = styled.tbody`
@@ -93,6 +94,7 @@ function RecommendedSlot({
   timeStart,
   timeEnd,
   duration,
+  durationStr,
 }: IProps): JSX.Element {
   const { t } = useTranslation();
 
@@ -133,19 +135,22 @@ function RecommendedSlot({
             <Col>-</Col>
             <Label type="time">{formatTime(timeEnd)}</Label>
             <Col />
-            {duration && (
-              <Col>
-                <Duration>
-                  <IconInfoCircle
-                    style={{ marginRight: "var(--spacing-xs)" }}
-                  />{" "}
-                  {duration &&
-                    t("Recommendation.scheduleDuration", {
-                      duration: parseDuration(convertHMSToSeconds(duration)),
+            {duration ||
+              (durationStr && (
+                <Col>
+                  <Duration>
+                    <IconInfoCircle
+                      style={{ marginRight: "var(--spacing-xs)" }}
+                    />{" "}
+                    {t("Recommendation.scheduleDuration", {
+                      duration:
+                        durationStr ||
+                        (duration &&
+                          parseDuration(convertHMSToSeconds(duration))),
                     })}
-                </Duration>
-              </Col>
-            )}
+                  </Duration>
+                </Col>
+              ))}
           </Row>
         </>
       )}

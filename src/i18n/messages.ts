@@ -540,7 +540,14 @@ const translations: ITranslations = {
     showSummaryOfReservationsByReservationUnit: [
       "Näytä kooste tilaan myönnetyistä vuoroista",
     ],
+    showSummaryOfReservations: ["Näytä tiivistelmä vuoroista"],
+    showReservations: ["Näytä tilan täydellinen vuoroista"],
     allocatedReservationsForReservationUnit: ["Myönnetyt käyttövuorot tilaan"],
+    headings: {
+      applicant: ["Hakija"],
+      schedule: ["Vuoro"],
+    },
+    noReservations: ["Ei varauksia"],
   },
   ReservationUnit: {
     reservationStatus: ["Varaustilanne"],

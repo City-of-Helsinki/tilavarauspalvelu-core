@@ -14,6 +14,7 @@ import {
   RecurringReservation,
   ApplicationRoundStatus,
   ApplicationStatus,
+  ReservationStatus,
 } from "./types";
 
 const apiBaseUrl: string = process.env.REACT_APP_TILAVARAUS_API_URL || "";
@@ -342,15 +343,24 @@ export function rejectApplicationEventSchedule(
   });
 }
 
-interface IRecurringReservationAttrs {
+interface IRecurringReservationParams {
   application?: number;
   applicationEvent?: number;
   ordering?: string;
+  reservationUnit?: string;
   search?: string;
 }
 
+interface IReservationParams {
+  active?: boolean;
+  ordering?: string;
+  reservationUnit?: string;
+  search?: string;
+  state?: ReservationStatus;
+}
+
 export function getRecurringReservations(
-  parameters: IRecurringReservationAttrs
+  parameters: IRecurringReservationParams
 ): Promise<RecurringReservation[]> {
   return apiGet({
     path: `v1/${recurringReservationPath}`,
@@ -363,6 +373,15 @@ export function getRecurringReservation(
 ): Promise<RecurringReservation> {
   return apiGet({
     path: `v1/${recurringReservationPath}/${id}`,
+  });
+}
+
+export function getReservations(
+  parameters: IReservationParams
+): Promise<Reservation[]> {
+  return apiGet({
+    path: `v1/${reservationPath}`,
+    parameters,
   });
 }
 

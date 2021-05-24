@@ -12,8 +12,7 @@ import {
 } from "hds-react";
 import trim from "lodash/trim";
 import get from "lodash/get";
-import minBy from "lodash/minBy";
-import maxBy from "lodash/maxBy";
+import { differenceInSeconds } from "date-fns/esm";
 import {
   getApplication,
   getApplicationRound,
@@ -32,6 +31,8 @@ import {
 } from "../../common/types";
 import {
   ContentContainer,
+  DataGrid,
+  GridCol,
   NarrowContainer,
   WideContainer,
 } from "../../styles/layout";
@@ -136,67 +137,6 @@ const StyledNotification = styled(Notification)`
   }
 `;
 
-const GridCol = styled.div`
-  &:last-child {
-    padding-bottom: var(--spacing-xl);
-  }
-
-  font-size: var(--fontsize-heading-xs);
-  line-height: 1.75;
-
-  table {
-    width: 100%;
-  }
-
-  th {
-    text-align: left;
-    padding: 0 0 var(--spacing-xs) 0;
-  }
-
-  td {
-    padding: 0 0 var(--spacing-xs) 0;
-    width: 17%;
-    white-space: nowrap;
-  }
-
-  p {
-    font-size: var(--fontsize-body-s);
-    padding-right: 20%;
-  }
-
-  @media (min-width: ${breakpoints.l}) {
-    padding-right: 20%;
-
-    h3 {
-      margin-top: 0;
-    }
-
-    p {
-      padding: 0;
-    }
-  }
-`;
-
-const DataGrid = styled.div`
-  display: grid;
-  border-top: 1px solid var(--color-silver);
-  padding-top: var(--spacing-xl);
-  margin-bottom: var(--spacing-layout-xl);
-
-  th {
-    padding-right: var(--spacing-l);
-  }
-
-  &:last-of-type {
-    margin-bottom: var(--spacing-layout-s);
-  }
-
-  @media (min-width: ${breakpoints.l}) {
-    grid-template-columns: 1fr 1fr;
-    border-bottom: 0;
-  }
-`;
-
 const ResolutionContainer = styled.div`
   font-size: var(--fontsize-body-s);
 
@@ -240,6 +180,11 @@ const StyledAccordion = styled(Accordion).attrs({
 const ReservationWrapper = styled.div`
   padding-bottom: var(--spacing-layout-m);
   border-bottom: 1px solid var(--color-silver);
+
+  th,
+  td {
+    padding-bottom: 0;
+  }
 `;
 
 const ReservationListLinkWrapper = styled.div`
@@ -287,12 +232,9 @@ function Application(): JSX.Element | null {
     applicationRound,
     setApplicationRound,
   ] = useState<ApplicationRoundType | null>(null);
-  // const [allocationResults, setAllocationResults] = useState<
-  //   AllocationResult[]
-  // >([]);
   const [recurringReservations, setRecurringReservations] = useState<
-    RecurringReservation[][]
-  >([]);
+    RecurringReservation[] | null
+  >(null);
   const [
     statusNotification,
     setStatusNotification,
@@ -313,16 +255,18 @@ function Application(): JSX.Element | null {
     }
   };
 
-  const fetchRecurringReservations = (
+  const fetchAllRecurringReservations = async (
     applicationEventsIds: number[]
-  ): Promise<RecurringReservation[][]> => {
-    return Promise.all(
+  ): Promise<RecurringReservation[]> => {
+    const recRes = await Promise.all(
       applicationEventsIds.map((applicationEventId) =>
         getRecurringReservations({
           applicationEvent: applicationEventId,
         })
       )
     );
+
+    return recRes.flat();
   };
 
   const fetchApplicationRound = async (app: ApplicationType) => {
@@ -331,23 +275,25 @@ function Application(): JSX.Element | null {
         id: app.applicationRoundId,
       });
       setApplicationRound(applicationRoundResult);
-
-      if (["approved", "sent"].includes(applicationRoundResult.status)) {
-        const applicationEventIds = app.applicationEvents.map((n) => n.id);
-        const recurringReservationsResult = await fetchRecurringReservations(
-          applicationEventIds
-        );
-
-        setRecurringReservations(
-          recurringReservationsResult.flat().length > 0
-            ? recurringReservationsResult
-            : []
-        );
-      }
     } catch (error) {
       setErrorMsg("errors.errorFetchingApplicationRound");
-    } finally {
-      setIsLoading(false);
+    }
+  };
+
+  const fetchRecurringReservations = async (app: ApplicationType) => {
+    try {
+      const applicationEventIds = app.applicationEvents.map((n) => n.id);
+      const recurringReservationsResult = await fetchAllRecurringReservations(
+        applicationEventIds
+      );
+
+      setRecurringReservations(
+        recurringReservationsResult.length > 0
+          ? recurringReservationsResult
+          : []
+      );
+    } catch (error) {
+      setErrorMsg("errors.errorFetchingReservations");
     }
   };
 
@@ -360,6 +306,21 @@ function Application(): JSX.Element | null {
       fetchApplicationRound(application);
     }
   }, [application]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (
+      application &&
+      applicationRound &&
+      ["approved", "sent"].includes(applicationRound.status)
+    )
+      fetchRecurringReservations(application);
+  }, [application, applicationRound]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (application && applicationRound && recurringReservations) {
+      setIsLoading(false);
+    }
+  }, [application, applicationRound, recurringReservations]);
 
   const setApplicationStatus = async (
     app: ApplicationType,
@@ -412,7 +373,9 @@ function Application(): JSX.Element | null {
     return <Loader />;
   }
 
-  const notificationContent = statusNotification
+  const notificationContent:
+    | { heading: string; body: string }
+    | undefined = statusNotification
     ? {
         heading: t(
           `Application.saveNotification.${statusNotification}.heading`
@@ -421,23 +384,45 @@ function Application(): JSX.Element | null {
       }
     : undefined;
 
-  const customerName =
+  const customerName: string | null | undefined =
     application?.applicantType === "individual"
       ? application?.applicantName
       : application?.organisation?.name;
 
-  const isApplicationRoundApproved =
+  const isApplicationRoundApproved: boolean | null =
     applicationRound && ["approved", "sent"].includes(applicationRound.status);
 
-  const applicantId =
+  const applicantId: number | null | undefined =
     application?.applicantType === "individual"
       ? application?.applicantId
       : application?.organisation?.id;
 
-  const normalizedApplicationStatus =
+  const normalizedApplicationStatus: ApplicationStatus | null =
     application &&
     applicationRound &&
     getNormalizedApplicationStatus(application.status, applicationRound.status);
+
+  const allocatedReservationsVolume: number | undefined =
+    recurringReservations?.length &&
+    recurringReservations.flatMap(
+      (recurringReservation: RecurringReservation) =>
+        recurringReservation.reservations
+    ).length;
+
+  const allocatedReservationsDuration: number | undefined =
+    recurringReservations?.length &&
+    recurringReservations
+      .flatMap(
+        (recurringReservation: RecurringReservation) =>
+          recurringReservation.reservations
+      )
+      .reduce((acc: number, cur: Reservation) => {
+        const diff: number = differenceInSeconds(
+          new Date(cur.begin),
+          new Date(cur.end)
+        );
+        return acc + Math.abs(diff);
+      }, 0);
 
   return (
     <Wrapper>
@@ -462,7 +447,8 @@ function Application(): JSX.Element | null {
               </StyledLink>
               {isApplicationRoundApproved &&
                 applicantId &&
-                recurringReservations.length > 0 && (
+                allocatedReservationsVolume &&
+                allocatedReservationsVolume > 0 && (
                   <StyledLink
                     to={`/applicationRound/${applicationRound.id}/${
                       application.organisation?.id
@@ -550,13 +536,17 @@ function Application(): JSX.Element | null {
                           <p>{t("Application.graduatedToAllocation")}</p>
                           <table>
                             <tbody>
-                              {get(recurringReservations, "length") > 0 ? (
+                              {allocatedReservationsVolume &&
+                              allocatedReservationsVolume > 0 ? (
                                 <>
                                   <tr>
                                     <th>
                                       {t("Application.allocatedReservations")}
                                     </th>
-                                    <td>TODO {t("common.volumeUnit")}</td>
+                                    <td>
+                                      {allocatedReservationsVolume}{" "}
+                                      {t("common.volumeUnit")}
+                                    </td>
                                   </tr>
                                   <tr>
                                     <th>
@@ -564,7 +554,11 @@ function Application(): JSX.Element | null {
                                         "ApplicationRound.totalReservationTime"
                                       )}
                                     </th>
-                                    <td>TODO</td>
+                                    <td>
+                                      {parseDuration(
+                                        allocatedReservationsDuration
+                                      )}
+                                    </td>
                                   </tr>
                                 </>
                               ) : (
@@ -607,7 +601,7 @@ function Application(): JSX.Element | null {
             {isApplicationRoundApproved &&
               !["declined"].includes(application.status) && (
                 <WideContainer>
-                  {recurringReservations.length > 0 && (
+                  {recurringReservations && recurringReservations.length > 0 && (
                     <StyledAccordion
                       heading={t(
                         "Application.summaryOfAllocatedApplicationEvents"
@@ -621,44 +615,45 @@ function Application(): JSX.Element | null {
                         }}
                       >
                         {recurringReservations.map((recurringReservation) => {
-                          console.log(recurringReservation);
                           const applicationEvent:
                             | ApplicationEvent
                             | undefined = application.applicationEvents.find(
                             (n: ApplicationEvent) =>
                               n.id ===
-                              get(recurringReservation, "0.applicationEventId")
+                              get(recurringReservation, "applicationEventId")
                           );
 
                           const reservationUnit:
                             | ReservationUnit
                             | undefined = get(
                             recurringReservation,
-                            "0.reservations.0.reservationUnit.0"
+                            "reservations.0.reservationUnit.0"
                           );
 
-                          const beginDates: string[] = recurringReservation.flatMap(
-                            (n: RecurringReservation): string[] =>
-                              n.reservations.map((nn: Reservation) => nn.begin)
-                          );
+                          const beginDate: string | null =
+                            recurringReservation.firstReservationBegin;
 
-                          const endDates: string[] = recurringReservation.flatMap(
-                            (n: RecurringReservation): string[] =>
-                              n.reservations.map((nn: Reservation) => nn.end)
-                          );
+                          const endDate: string | null =
+                            recurringReservation.lastReservationEnd;
 
-                          const beginDate = minBy(beginDates, (n) =>
-                            new Date(n).getTime()
-                          );
-
-                          const endDate = maxBy(endDates, (n) =>
-                            new Date(n).getTime()
-                          );
-
-                          const declinedReservations = get(
+                          const weekday: number | null = get(
                             recurringReservation,
-                            "0.reservations"
-                          ).filter((n: Reservation) => n.state === "denied");
+                            "reservations.0.beginWeekday"
+                          );
+
+                          const duration: number = Math.abs(
+                            differenceInSeconds(
+                              new Date(
+                                get(
+                                  recurringReservation,
+                                  "reservations.0.begin"
+                                )
+                              ),
+                              new Date(
+                                get(recurringReservation, "reservations.0.end")
+                              )
+                            )
+                          );
 
                           return (
                             applicationEvent &&
@@ -708,11 +703,11 @@ function Application(): JSX.Element | null {
                                     id={applicationEvent.id || null}
                                     start={beginDate}
                                     end={endDate}
-                                    weekday={null}
+                                    weekday={weekday}
                                     biweekly={
                                       applicationEvent.biweekly || false
                                     }
-                                    duration=""
+                                    durationStr={parseDuration(duration)}
                                     timeStart={formatDate(
                                       beginDate || "",
                                       "H:mm:ss"
@@ -723,17 +718,20 @@ function Application(): JSX.Element | null {
                                     )}
                                   />
                                 </table>
-                                {declinedReservations?.length > 0 && (
+                                {recurringReservation.deniedReservations
+                                  ?.length > 0 && (
                                   <DeclinedReservations>
                                     <H3>
                                       {t("Application.declinedReservations")}
                                     </H3>
                                     <div>
                                       {trim(
-                                        declinedReservations.map(
-                                          (n: Reservation) =>
-                                            `${formatDate(n.begin)}, `
-                                        ),
+                                        recurringReservation.deniedReservations
+                                          .map(
+                                            (n: Reservation) =>
+                                              `${formatDate(n.begin)}, `
+                                          )
+                                          .join(", "),
                                         ", "
                                       )}
                                     </div>
@@ -741,7 +739,7 @@ function Application(): JSX.Element | null {
                                 )}
                                 <ReservationListLinkWrapper>
                                   <ReservationListLink
-                                    to={`/application/${applicationId}/result/${applicationEvent.id}`}
+                                    to={`/application/${applicationId}/recurringReservation/${recurringReservation.id}`}
                                   >
                                     <IconCalendar />{" "}
                                     {t("Application.showDetailedResultList")}{" "}
@@ -762,7 +760,7 @@ function Application(): JSX.Element | null {
                           setApplicationStatus(application, "sent")
                         }
                       >
-                        {t("Application.markAsResolutionSent")} TODO
+                        {t("Application.markAsResolutionSent")}
                       </MarkAsResolutionSentBtn>
                     )}
                     {normalizedApplicationStatus === "sent" && (
@@ -771,7 +769,7 @@ function Application(): JSX.Element | null {
                           setApplicationStatus(application, "in_review")
                         }
                       >
-                        {t("Application.markAsResolutionNotSent")} TODO
+                        {t("Application.markAsResolutionNotSent")}
                       </MarkAsResolutionNotSentBtn>
                     )}
                   </ActionButtonContainer>

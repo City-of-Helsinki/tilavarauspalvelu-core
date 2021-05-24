@@ -7,7 +7,7 @@ import get from "lodash/get";
 import {
   getApplication,
   getApplicationRound,
-  getRecurringReservations,
+  getRecurringReservation,
 } from "../../common/api";
 import Loader from "../Loader";
 import {
@@ -24,10 +24,11 @@ import withMainMenu from "../withMainMenu";
 import LinkPrev from "../LinkPrev";
 import { Divider, Strong } from "../../styles/util";
 import { formatDate, localizedValue } from "../../common/util";
+import { weekdays } from "../../common/const";
 
 interface IRouteParams {
   applicationId: string;
-  applicationEventId: string;
+  recurringReservationId: string;
 }
 
 const Wrapper = styled.div`
@@ -77,19 +78,20 @@ const Reservations = styled.table`
   }
 `;
 
-function Result(): JSX.Element | null {
+function ReservationByApplicationEvent(): JSX.Element | null {
   const [isLoading, setIsLoading] = useState(true);
   const [application, setApplication] = useState<ApplicationType | null>(null);
   const [
     applicationRound,
     setApplicationRound,
   ] = useState<ApplicationRoundType | null>(null);
-  const [recurringReservations, setRecurringReservations] = useState<
-    RecurringReservation[]
-  >([]);
+  const [
+    recurringReservation,
+    setRecurringReservation,
+  ] = useState<RecurringReservation | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const { applicationId, applicationEventId } = useParams<IRouteParams>();
+  const { applicationId, recurringReservationId } = useParams<IRouteParams>();
   const { t, i18n } = useTranslation();
 
   const fetchApplication = async (id: number) => {
@@ -115,12 +117,10 @@ function Result(): JSX.Element | null {
     }
   };
 
-  const fetchRecurringReservations = async (aeId: number) => {
+  const fetchRecurringReservations = async (rrId: number) => {
     try {
-      const result = await getRecurringReservations({
-        applicationEvent: aeId,
-      });
-      setRecurringReservations(result);
+      const result = await getRecurringReservation(rrId);
+      setRecurringReservation(result);
     } catch (error) {
       setErrorMsg("errors.errorFetchingReservations");
       setIsLoading(false);
@@ -138,16 +138,16 @@ function Result(): JSX.Element | null {
   }, [application]);
 
   useEffect(() => {
-    if (applicationEventId) {
-      fetchRecurringReservations(Number(applicationEventId));
+    if (recurringReservationId) {
+      fetchRecurringReservations(Number(recurringReservationId));
     }
-  }, [applicationEventId]);
+  }, [recurringReservationId]);
 
   useEffect(() => {
-    if (application && applicationRound && recurringReservations) {
+    if (application && applicationRound && recurringReservation) {
       setIsLoading(false);
     }
-  }, [application, applicationRound, recurringReservations]);
+  }, [application, applicationRound, recurringReservation]);
 
   if (isLoading) {
     return <Loader />;
@@ -161,25 +161,12 @@ function Result(): JSX.Element | null {
   const applicationEvent:
     | ApplicationEvent
     | undefined = application?.applicationEvents.find(
-    (n: ApplicationEvent) =>
-      n.id === get(recurringReservations, "0.applicationEventId")
+    (n: ApplicationEvent) => n.id === recurringReservation?.applicationEventId
   );
 
   const reservationUnit: ReservationUnit | undefined = get(
-    recurringReservations,
-    "0.reservations.0.reservationUnit.0"
-  );
-
-  const reservations: Reservation[] = get(
-    recurringReservations,
-    "0.reservations"
-  );
-
-  const allocatedReservations = reservations.filter(
-    (n) => !["declined"].includes(n.state)
-  );
-  const declinedReservations = reservations.filter((n) =>
-    ["declined"].includes(n.state)
+    recurringReservation,
+    "reservations.0.reservationUnit.0"
   );
 
   return (
@@ -188,7 +175,7 @@ function Result(): JSX.Element | null {
         applicationRound &&
         applicationEvent &&
         reservationUnit &&
-        reservations && (
+        recurringReservation && (
           <>
             <ContentContainer style={{ marginBottom: "var(--spacing-xl)" }}>
               <LinkPrev route={`/application/${applicationId}`} />
@@ -213,56 +200,74 @@ function Result(): JSX.Element | null {
                   group: applicationEvent.name,
                 })}
               </Subheading>
-              {allocatedReservations && allocatedReservations.length > 0 ? (
+              {recurringReservation.reservations.length > 0 ? (
                 <Reservations>
                   <tbody>
-                    {allocatedReservations.map((reservation: Reservation) => (
-                      <React.Fragment key={reservation.id}>
-                        <tr>
-                          <th>{t("common.weekday")}</th>
-                          <th>{t("common.date")}</th>
-                          <th>{t("common.time")}</th>
-                        </tr>
-                        <tr>
-                          <td>TODO</td>
-                          <td>
-                            <Strong>{formatDate(reservation.begin)}</Strong>
-                          </td>
-                          <td>
-                            {formatDate(reservation.begin, "H:mm")} -{" "}
-                            {formatDate(reservation.end, "H:mm")}
-                          </td>
-                        </tr>
-                      </React.Fragment>
-                    ))}
+                    {recurringReservation.reservations.map(
+                      (reservation: Reservation) => (
+                        <React.Fragment key={reservation.id}>
+                          <tr>
+                            <th>{t("common.weekday")}</th>
+                            <th>{t("common.date")}</th>
+                            <th>{t("common.time")}</th>
+                          </tr>
+                          <tr>
+                            <td>
+                              {t(
+                                `calendar.${
+                                  weekdays[Number(reservation.beginWeekday)]
+                                }`
+                              )}
+                            </td>
+                            <td>
+                              <Strong>{formatDate(reservation.begin)}</Strong>
+                            </td>
+                            <td>
+                              {formatDate(reservation.begin, "H:mm")} -{" "}
+                              {formatDate(reservation.end, "H:mm")}
+                            </td>
+                          </tr>
+                        </React.Fragment>
+                      )
+                    )}
                   </tbody>
                 </Reservations>
               ) : (
                 <div>-</div>
               )}
               <Subheading>{t("Application.declinedReservations")}</Subheading>
-              {declinedReservations && declinedReservations.length > 0 ? (
+              {recurringReservation.deniedReservations &&
+              recurringReservation.deniedReservations.length > 0 ? (
                 <Reservations>
                   <tbody>
-                    {declinedReservations.map((reservation: Reservation) => (
-                      <React.Fragment key={reservation.id}>
-                        <tr>
-                          <th>{t("common.weekday")}</th>
-                          <th>{t("common.date")}</th>
-                          <th>{t("common.time")}</th>
-                        </tr>
-                        <tr>
-                          <td>TODO</td>
-                          <td>
-                            <Strong>{formatDate(reservation.begin)}</Strong>
-                          </td>
-                          <td>
-                            {formatDate(reservation.begin, "H:mm")}—
-                            {formatDate(reservation.end, "H:mm")}
-                          </td>
-                        </tr>
-                      </React.Fragment>
-                    ))}
+                    {recurringReservation.deniedReservations.map(
+                      (reservation: Reservation) => (
+                        <React.Fragment key={reservation.id}>
+                          <tr>
+                            <th>{t("common.weekday")}</th>
+                            <th>{t("common.date")}</th>
+                            <th>{t("common.time")}</th>
+                          </tr>
+                          <tr>
+                            <td>
+                              {" "}
+                              {t(
+                                `calendar.${
+                                  weekdays[Number(reservation.beginWeekday)]
+                                }`
+                              )}
+                            </td>
+                            <td>
+                              <Strong>{formatDate(reservation.begin)}</Strong>
+                            </td>
+                            <td>
+                              {formatDate(reservation.begin, "H:mm")}—
+                              {formatDate(reservation.end, "H:mm")}
+                            </td>
+                          </tr>
+                        </React.Fragment>
+                      )
+                    )}
                   </tbody>
                 </Reservations>
               ) : (
@@ -289,4 +294,4 @@ function Result(): JSX.Element | null {
   );
 }
 
-export default withMainMenu(Result);
+export default withMainMenu(ReservationByApplicationEvent);
