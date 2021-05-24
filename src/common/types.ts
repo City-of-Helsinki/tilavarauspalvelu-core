@@ -384,3 +384,11 @@ export type ReservationStatus =
   | "waiting_for_payment";
 
 export type ReservationPriority = 100 | 200 | 300;
+
+export interface ReservationUnitCapacity {
+  id: number;
+  hourCapacity: number;
+  reservationDurationTotal: number;
+  periodStart: string;
+  periodEnd: string;
+}

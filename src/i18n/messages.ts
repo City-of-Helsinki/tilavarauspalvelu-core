@@ -124,6 +124,7 @@ const translations: ITranslations = {
     errorFetchingRecommendations: ["Virhe haettaessa ehdotuksia"],
     errorFetchingReservationUnit: ["Virhe haettaessa tilan tietoja"],
     errorFetchingReservations: ["Virhe haettaessa varauksia"],
+    errorFetchingCapacity: ["Virhe haettaessa varaustilannetta"],
     errorSavingApplication: ["Virhe tallennettaessa hakemusta"],
     errorSavingRecommendation: ["Virhe tallennettaessa ehdotusta"],
     errorSavingRecommendations: ["Virhe tallennettaessa ehdotuksia"],

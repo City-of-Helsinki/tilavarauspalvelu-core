@@ -23,12 +23,14 @@ import {
   DataFilterConfig,
   AllocationResult,
   ReservationUnit,
+  ReservationUnitCapacity,
 } from "../../common/types";
 import DataTable, { CellConfig } from "../DataTable";
 import {
   getAllocationResults,
   getApplicationRound,
   getReservationUnit,
+  getReservationUnitCapacity,
 } from "../../common/api";
 import Loader from "../Loader";
 import {
@@ -48,6 +50,7 @@ import RecommendationCount from "./RecommendationCount";
 import i18n from "../../i18n";
 import SelectionActionBar from "../SelectionActionBar";
 import { ReactComponent as IconBulletList } from "../../images/icon_list-bullet.svg";
+import StatusCircle from "../StatusCircle";
 
 interface IRouteParams {
   applicationRoundId: string;
@@ -233,7 +236,7 @@ const getCellConfig = (
     rowLink: ({ applicationEventScheduleId }: AllocationResult) => {
       return applicationEventScheduleId && applicationRound
         ? `/applicationRound/${applicationRound.id}/recommendation/${applicationEventScheduleId}`
-        : "/foobar";
+        : "";
     },
   };
 };
@@ -302,8 +305,8 @@ function RecommendationsByReservationUnit(): JSX.Element {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [recommendations, setRecommendations] = useState<
-    AllocationResult[] | []
-  >([]);
+    AllocationResult[] | null
+  >(null);
   const [
     reservationUnit,
     setReservationUnit,
@@ -312,6 +315,10 @@ function RecommendationsByReservationUnit(): JSX.Element {
     applicationRound,
     setApplicationRound,
   ] = useState<ApplicationRoundType | null>(null);
+  const [
+    reservationUnitCapacity,
+    setReservationUnitCapacity,
+  ] = useState<ReservationUnitCapacity | null>(null);
   const [cellConfig, setCellConfig] = useState<CellConfig | null>(null);
   const [filterConfig, setFilterConfig] = useState<DataFilterConfig[] | null>(
     null
@@ -341,8 +348,23 @@ function RecommendationsByReservationUnit(): JSX.Element {
       setRecommendations(filteredResult || []);
     } catch (error) {
       setErrorMsg("errors.errorFetchingApplications");
-    } finally {
       setIsLoading(false);
+    }
+  };
+
+  const fetchReservationUnitCapacity = async (
+    ruId: number,
+    ar: ApplicationRoundType
+  ) => {
+    try {
+      const result = await getReservationUnitCapacity({
+        reservationUnit: ruId,
+        periodStart: ar.reservationPeriodBegin,
+        periodEnd: ar.reservationPeriodEnd,
+      });
+      setReservationUnitCapacity(result);
+    } catch (error) {
+      console.error(t("errors.errorFetchingCapacity"));
     }
   };
 
@@ -362,7 +384,6 @@ function RecommendationsByReservationUnit(): JSX.Element {
             ? "errors.applicationRoundNotFound"
             : "errors.errorFetchingData";
         setErrorMsg(msg);
-      } finally {
         setIsLoading(false);
       }
     };
@@ -383,7 +404,6 @@ function RecommendationsByReservationUnit(): JSX.Element {
         setReservationUnit(result);
       } catch (error) {
         setErrorMsg("errors.errorFetchingApplications");
-      } finally {
         setIsLoading(false);
       }
     };
@@ -391,9 +411,25 @@ function RecommendationsByReservationUnit(): JSX.Element {
     fetchReservationUnit(Number(reservationUnitId));
   }, [recommendations, reservationUnitId]);
 
-  const unhandledRecommendationCount = recommendations.filter((n) =>
-    ["created", "allocating", "allocated"].includes(n.applicationEvent.status)
-  ).length;
+  useEffect(() => {
+    if (reservationUnit && applicationRound) {
+      fetchReservationUnitCapacity(reservationUnit.id, applicationRound);
+    }
+  }, [reservationUnit, applicationRound]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (recommendations && reservationUnit && applicationRound) {
+      setIsLoading(false);
+    }
+  }, [recommendations, reservationUnit, applicationRound]);
+
+  const unhandledRecommendationCount = recommendations
+    ? recommendations.filter((n) =>
+        ["created", "allocating", "allocated"].includes(
+          n.applicationEvent.status
+        )
+      ).length
+    : 0;
 
   const mainImage = reservationUnit?.images.find((n) => n.imageType === "main");
 
@@ -454,13 +490,23 @@ function RecommendationsByReservationUnit(): JSX.Element {
                 <TitleContainer>
                   <H1 as="h2">{applicationRound?.name}</H1>
                   <StatusContainer>
-                    {/* <StatusCircle status={0} />
-                    <div>
-                      <H3>{t("ApplicationRound.amountReservedOfSpace")}</H3>
-                      <div>
-                        {t("ApplicationRound.amountReservedOfSpaceSubtext")}
-                      </div>
-                    </div> */}
+                    {reservationUnitCapacity && (
+                      <>
+                        <StatusCircle
+                          status={
+                            (reservationUnitCapacity.reservationDurationTotal /
+                              reservationUnitCapacity.hourCapacity) *
+                            100
+                          }
+                        />
+                        <div>
+                          <H3>{t("ApplicationRound.amountReservedOfSpace")}</H3>
+                          <div>
+                            {t("ApplicationRound.amountReservedOfSpaceSubtext")}
+                          </div>
+                        </div>
+                      </>
+                    )}
                   </StatusContainer>
                 </TitleContainer>
                 <BottomContainer>
