@@ -604,10 +604,11 @@ function Recommendation(): JSX.Element {
                   {trim(
                     `${formatNumber(
                       recommendation.applicationAggregatedData
-                        ?.reservationsTotal,
+                        ?.appliedReservationsTotal,
                       t("common.volumeUnit")
                     )} / ${parseDuration(
-                      recommendation.applicationAggregatedData?.minDurationTotal
+                      recommendation.applicationAggregatedData
+                        ?.appliedMinDurationTotal
                     )}`,
                     " / "
                   )}

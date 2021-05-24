@@ -151,14 +151,14 @@ const getCellConfig = (
       },
       {
         title: "Application.headings.applicationCount",
-        key: "aggregatedData.reservationsTotal",
+        key: "aggregatedData.appliedReservationsTotal",
         transform: ({ aggregatedData }: ApplicationType) => (
           <>
             {trim(
               `${formatNumber(
-                aggregatedData?.reservationsTotal,
+                aggregatedData?.appliedReservationsTotal,
                 t("common.volumeUnit")
-              )} / ${parseDuration(aggregatedData?.minDurationTotal)}`,
+              )} / ${parseDuration(aggregatedData?.appliedMinDurationTotal)}`,
               " / "
             )}
           </>

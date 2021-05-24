@@ -123,10 +123,11 @@ export type ApplicationStatus =
   | "approved"
   | "sent";
 
-export type AggregatedData = {
-  reservationsTotal?: number;
-  minDurationTotal?: number;
-  durationTotal?: number;
+export type ApplicationAggregatedData = {
+  appliedMinDurationTotal?: number;
+  appliedReservationsTotal?: number;
+  createdReservationsTotal?: number;
+  reservationsDurationTotal?: number;
 };
 
 export type ApplicantType =
@@ -147,7 +148,7 @@ export type Application = {
   contactPerson: ContactPerson | null;
   billingAddress: Address | null;
   applicationEvents: ApplicationEvent[];
-  aggregatedData: AggregatedData;
+  aggregatedData: ApplicationAggregatedData;
   createdDate: string | null;
   lastModifiedDate: string | null;
 };
@@ -269,7 +270,6 @@ export interface DataGroup {
 
 export interface AllocationResult {
   id: number;
-  aggregatedData: AggregatedData;
   applicationEvent: ApplicationEvent;
   applicationId: number | null;
   applicantName: string | null;
@@ -285,7 +285,7 @@ export interface AllocationResult {
   allocatedDay: number | null;
   allocatedBegin: string | null;
   allocatedEnd: string | null;
-  applicationAggregatedData: AggregatedData;
+  applicationAggregatedData: ApplicationAggregatedData;
   basketName: string | null;
   basketOrderNumber: string | null;
   accepted: boolean;
@@ -329,7 +329,7 @@ export type ParameterTypes =
 
 export interface ParameterAgeGroup {
   id: number;
-  minumum: number;
+  minimum: number;
   maximum: number;
 }
 

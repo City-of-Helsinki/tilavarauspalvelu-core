@@ -236,7 +236,7 @@ const getCellConfig = (
       },
       {
         title: "Recommendation.headings.resolution",
-        key: "applicationAggregatedData.reservationsTotal",
+        key: "applicationAggregatedData.appliedReservationsTotal",
         transform: ({
           applicationAggregatedData,
           applicationEvent,
@@ -252,10 +252,10 @@ const getCellConfig = (
               {["validated"].includes(applicationEvent.status)
                 ? trim(
                     `${formatNumber(
-                      applicationAggregatedData?.reservationsTotal,
+                      applicationAggregatedData?.appliedReservationsTotal,
                       t("common.volumeUnit")
                     )} / ${parseDuration(
-                      applicationAggregatedData?.minDurationTotal
+                      applicationAggregatedData?.appliedMinDurationTotal
                     )}`,
                     " / "
                   )
