@@ -272,11 +272,15 @@ class RecurringReservationSerializer(serializers.ModelSerializer):
     )
     purpose_name = serializers.SerializerMethodField()
     group_size = serializers.SerializerMethodField()
-    denied_reservations = ReservationSerializer(many=True)
+    denied_reservations = ReservationSerializer(many=True, read_only=True)
+    biweekly = serializers.BooleanField(
+        source="application_event.biweekly", read_only=True
+    )
 
     class Meta:
         model = RecurringReservation
         fields = [
+            "id",
             "application_id",
             "application_event_id",
             "age_group",
@@ -286,6 +290,7 @@ class RecurringReservationSerializer(serializers.ModelSerializer):
             "begin_weekday",
             "first_reservation_begin",
             "last_reservation_end",
+            "biweekly",
             "reservations",
             "denied_reservations",
         ]
