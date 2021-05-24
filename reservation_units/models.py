@@ -95,6 +95,11 @@ class ReservationUnit(models.Model):
         null=True,
         on_delete=models.SET_NULL,
     )
+    contact_information = models.TextField(
+        verbose_name=_("Contact information"),
+        blank=True,
+        default="",
+    )
 
     uuid = models.UUIDField(default=uuid.uuid4, null=False, editable=False, unique=True)
 

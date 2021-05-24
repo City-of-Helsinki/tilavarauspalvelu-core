@@ -164,6 +164,7 @@ class ReservationUnitSerializer(TranslatedModelSerializer):
             "equipment_ids",
             "unit_id",
             "uuid",
+            "contact_information",
         ]
         extra_kwargs = {
             "name": {
@@ -174,6 +175,9 @@ class ReservationUnitSerializer(TranslatedModelSerializer):
             },
             "terms_of_use": {
                 "help_text": "Terms of use that needs to be accepted in order to reserve this reservation unit.",
+            },
+            "contact_information": {
+                "help_text": "Contact information for this reservation unit.",
             },
         }
 
