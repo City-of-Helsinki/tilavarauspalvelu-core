@@ -96,6 +96,8 @@ class ApplicationRoundSerializer(serializers.ModelSerializer):
         source="aggregated_data_dict", read_only=True
     )
 
+    approved_by = serializers.SerializerMethodField()
+
     class Meta:
         model = ApplicationRound
         fields = [
@@ -117,6 +119,7 @@ class ApplicationRoundSerializer(serializers.ModelSerializer):
             "criteria",
             "is_admin",
             "aggregated_data",
+            "approved_by",
         ]
         extra_kwargs = {
             "name": {
@@ -161,6 +164,9 @@ class ApplicationRoundSerializer(serializers.ModelSerializer):
             "is_admin": {
                 "help_text": "Whether the current user can administer the application round or not.",
             },
+            "approved_by": {
+                "help_text": "Person name who approved this application round."
+            },
         }
 
     def get_is_admin(self, obj):
@@ -176,6 +182,20 @@ class ApplicationRoundSerializer(serializers.ModelSerializer):
         return can_manage_service_sectors_application_rounds(
             request_user, service_sector
         )
+
+    def get_approved_by(self, instance):
+        request = self.context.get("request", None)
+        request_user = getattr(request, "user", None)
+        if not request_user or not request_user.is_authenticated:
+            return ""
+
+        approved_status = instance.statuses.filter(
+            status=ApplicationRoundStatus.APPROVED
+        ).first()
+        if not getattr(approved_status, "user", None):
+            return ""
+
+        return approved_status.user.get_full_name()
 
     def create(self, validated_data):
         request = self.context["request"] if "request" in self.context else None
