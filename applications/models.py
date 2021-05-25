@@ -839,9 +839,7 @@ class ApplicationEvent(models.Model):
         for event_shedule in filter(
             lambda event: not hasattr(event, "application_event_schedule_result")
             or event.application_event_schedule_result.accepted is False,
-            filter(lambda b: b.id in [121],
-                self.application_event_schedules.all()
-                ),
+            filter(lambda b: b.id in [121], self.application_event_schedules.all()),
         ):
             occurences[event_shedule.id] = event_shedule.get_occurences()
         return occurences

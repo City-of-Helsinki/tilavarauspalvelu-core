@@ -145,7 +145,7 @@ class AllocationSolver(object):
                         )
 
         self.constraint_by_event_time_limits(model=model, selected=selected)
-        self.constraint_allocation(model=model, selected=selected)
+        #self.constraint_allocation(model=model, selected=selected)
         #self.constraint_to_one_event_per_schedule(model=model, selected=selected)
         #self.contraint_by_events_per_week(model=model, selected=selected)
         self.maximize(model=model, selected=selected)
@@ -193,74 +193,62 @@ class AllocationSolver(object):
                         occurrence_id,
                         occurrence,
                     ) in allocation_event.occurrences.items():
-                        if (
-                            space_id,
-                            basket.id,
-                            allocation_event.id,
+                        perf = model.NewBoolVar(
+                            "performedx[%i,%s,%i]" % (occurrence_id, space_id, basket.id)
+                        )
+
+                        duration = allocation_event.min_duration
+
+                        (
+                            min_start,
+                            max_end,
+                        ) = self.determine_minumum_and_maximum_times(
+                            occurrence=occurrence, space=space, duration=duration
+                        )
+                        name_suffix = "_%i_on_space_id%i_basket%s" % (
                             occurrence_id,
-                        ) in selected:
+                            space_id,
+                            basket.id
+                        )
 
-                            duration = allocation_event.min_duration
+                        start = model.NewIntVar(
+                            min_start, max_end, "s" + name_suffix
+                        )
+                        end = model.NewIntVar(min_start, max_end, "e" + name_suffix)
 
-                            performed = selected[
-                                (
-                                    space_id,
-                                    basket.id,
-                                    allocation_event.id,
-                                    occurrence_id,
-                                )
-                            ]
+                        duration_int = model.NewIntVar(
 
-                            (
-                                min_start,
-                                max_end,
-                            ) = self.determine_minumum_and_maximum_times(
-                                occurrence=occurrence, space=space, duration=duration
-                            )
-                            name_suffix = "_%i_on_space_id%i_basket%s" % (
-                                occurrence_id,
+                            allocation_event.min_duration, allocation_event.max_duration, "duration" + name_suffix
+                        )
+                        self.durations[(occurrence_id, space_id, basket.id)] = duration_int
+                        interval = model.NewOptionalIntervalVar(
+                            start,
+                            duration_int,
+                            end,
+                            perf,
+                            "space_%i_basket_b%s_event%i_occurrence%i"
+                            % (
                                 space_id,
-                                basket.id
-                            )
+                                basket.id,
+                                allocation_event.id,
+                                occurrence_id,
+                            ),
+                        )
 
-                            start = model.NewIntVar(
-                                min_start, max_end, "s" + name_suffix
-                            )
-                            end = model.NewIntVar(min_start, max_end, "e" + name_suffix)
+                        model.Add(min_start <= end - duration_int).OnlyEnforceIf(
+                            perf
+                        )
+                        model.Add(end <= max_end).OnlyEnforceIf(perf)
 
-                            duration_int = model.NewIntVar(
-
-                                allocation_event.min_duration, allocation_event.max_duration, "duration" + name_suffix
-                            )
-                            interval = model.NewOptionalIntervalVar(
-                                start,
-                                duration_int,
-                                end,
-                                performed,
-                                "space_%i_basket_b%s_event%i_occurrence%i"
-                                % (
-                                    space_id,
-                                    basket.id,
-                                    allocation_event.id,
-                                    occurrence_id,
-                                ),
-                            )
-
-                            model.Add(min_start <= end - duration_int).OnlyEnforceIf(
-                                performed
-                            )
-                            model.Add(end <= max_end).OnlyEnforceIf(performed)
-
-                            model.Add(start + duration_int <= max_end).OnlyEnforceIf(
-                                performed
-                            )
-                            model.Add(min_start <= start).OnlyEnforceIf(performed)
-
-                            self.duration_constraints = {}
-                            self.starts[(occurrence_id, space_id, basket.id)] = start
-                            self.ends[(occurrence_id, space_id, basket.id)] = end
-                            self.durations[(occurrence_id, space_id, basket.id)] = duration_int
-                            intervals.append(interval)
+                        model.Add(start + duration_int <= max_end).OnlyEnforceIf(
+                            perf
+                        )
+                        model.Add(min_start <= start).OnlyEnforceIf(perf)
+                        model.Add(end == start + duration_int).OnlyEnforceIf(perf)
+                        self.duration_constraints = {}
+                        self.starts[(occurrence_id, space_id, basket.id)] = start
+                        self.ends[(occurrence_id, space_id, basket.id)] = end
+                        intervals.append(interval)
 
             model.AddNoOverlap(intervals)
 
