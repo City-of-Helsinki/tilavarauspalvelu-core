@@ -432,7 +432,8 @@ function ResolutionReport(): JSX.Element {
                       applicationRound.applicationPeriodBegin
                     }
                     applicationPeriodEnd={applicationRound.applicationPeriodEnd}
-                    resolution
+                    isResolved={["approved"].includes(applicationRound.status)}
+                    resolutionDate={applicationRound.statusTimestamp}
                   />
                 </div>
                 <div />

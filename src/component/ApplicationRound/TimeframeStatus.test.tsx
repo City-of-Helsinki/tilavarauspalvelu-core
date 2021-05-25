@@ -48,8 +48,22 @@ test("Future times ok", () => {
     <TimeframeStatus
       applicationPeriodBegin={futureDate}
       applicationPeriodEnd={futureDate}
+      isResolved={false}
     />
   );
 
   expect(component.getByText("Application.timeframeFuture")).toBeTruthy();
+});
+
+test("Resolution done", () => {
+  const component = render(
+    <TimeframeStatus
+      applicationPeriodBegin={futureDate}
+      applicationPeriodEnd={futureDate}
+      isResolved
+      resolutionDate="2021-05-18T09:59:24.575633Z"
+    />
+  );
+
+  expect(component.getByText("ApplicationRound.resolutionDate")).toBeTruthy();
 });

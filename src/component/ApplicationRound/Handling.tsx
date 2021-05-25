@@ -427,7 +427,8 @@ function Handling({
                     applicationRound.applicationPeriodBegin
                   }
                   applicationPeriodEnd={applicationRound.applicationPeriodEnd}
-                  resolution={isApplicationRoundApproved}
+                  isResolved={isApplicationRoundApproved}
+                  resolutionDate={applicationRound.statusTimestamp}
                 />
               </div>
               <div>
