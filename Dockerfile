@@ -10,18 +10,19 @@ ARG LOCAL_REDHAT_USERNAME
 ARG LOCAL_REDHAT_PASSWORD
 ARG BUILD_MODE
 
-RUN yum -y update
 RUN if [ "x$BUILD_MODE" = "xlocal" ] ;\
     then \
         subscription-manager register --username $LOCAL_REDHAT_USERNAME --password $LOCAL_REDHAT_PASSWORD --auto-attach; \
     else \
         subscription-manager register --username ${REDHAT_USERNAME} --password ${REDHAT_PASSWORD} --auto-attach; \
     fi
-RUN subscription-manager repos --enable codeready-builder-for-rhel-8-x86_64-rpms
 
+RUN subscription-manager repos --enable codeready-builder-for-rhel-8-x86_64-rpms
+RUN yum -y update
 
 RUN rpm -Uvh https://download.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
-RUN yum -y install epel-release
+
+RUN yum install -y gdal
 
 
 RUN useradd -ms /bin/bash -d /tvp tvp
@@ -37,9 +38,6 @@ ENV APP_NAME tilavarauspalvelu
 WORKDIR /tvp
 
 COPY deploy/* ./deploy/
-
-RUN dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
-RUN yum install -y gdal 
 
 RUN subscription-manager remove --all
 
