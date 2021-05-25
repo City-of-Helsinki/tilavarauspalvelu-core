@@ -10,7 +10,8 @@ import { formatDate } from "../../common/util";
 interface IProps {
   applicationPeriodBegin?: string;
   applicationPeriodEnd?: string;
-  resolution?: boolean;
+  isResolved?: boolean;
+  resolutionDate?: string;
 }
 
 const Wrapper = styled.span`
@@ -26,7 +27,8 @@ const Wrapper = styled.span`
 function TimeframeStatus({
   applicationPeriodBegin = "",
   applicationPeriodEnd = "",
-  resolution,
+  isResolved,
+  resolutionDate,
 }: IProps): JSX.Element {
   const { t } = useTranslation();
 
@@ -34,8 +36,10 @@ function TimeframeStatus({
   const dateEnd = new Date(applicationPeriodEnd);
 
   let message = "";
-  if (resolution) {
-    message = t("ApplicationRound.resolutionDate");
+  if (isResolved) {
+    message = t("ApplicationRound.resolutionDate", {
+      date: formatDate(resolutionDate || ""),
+    });
   } else if (isPast(dateBegin) && isFuture(dateEnd)) {
     message = t("Application.timeframeCurrent");
   } else if (isToday(dateEnd)) {
@@ -53,7 +57,7 @@ function TimeframeStatus({
   }
 
   return (
-    <Wrapper>
+    <Wrapper data-testid="timeframe-status--wrapper">
       <IconClock /> {message}
     </Wrapper>
   );

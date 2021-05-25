@@ -424,7 +424,7 @@ const translations: ITranslations = {
     approvalDoneListTitle: ["Hyväksytyt"],
     noPendingDoneApprovals: ["Ei hyväksyttyjä hakukierroksia."],
     resolutionNumber: ["Päätösnumero #{{no}}"],
-    resolutionDate: ["Päätös tehty"],
+    resolutionDate: ["Päätös tehty {{date}}"],
     notificationResolutionDoneHeading: ["Esihenkilöhyväksyntä ja päätös tehty"],
     notificationResolutionDoneBody: [
       "Voit hallita asiakkaille lähetettäviä päätöksiä täältä.",
