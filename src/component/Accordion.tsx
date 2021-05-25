@@ -8,11 +8,17 @@ interface IProps {
   heading: string | JSX.Element | null;
   defaultOpen?: boolean;
   children: ReactNode;
+  disabled?: boolean;
   className?: string;
   style?: React.CSSProperties;
 }
 
-const Heading = styled.div`
+const ToggleButton = styled.button`
+  border: 0;
+  background: none;
+`;
+
+const Heading = styled.div<{ $disabled: boolean }>`
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -20,6 +26,19 @@ const Heading = styled.div`
   user-select: none;
   border-bottom: 1px solid var(--border-color);
   margin-bottom: var(--spacing-m);
+  ${({ $disabled }) =>
+    $disabled
+      ? `
+      cursor: default;
+      opacity: 0.5;
+    `
+      : `
+      ${ToggleButton} {
+         cursor: pointer;
+      }
+
+      cursor: pointer;
+    `}
 
   h2 {
     font-size: var(--header-font-size);
@@ -43,11 +62,6 @@ const Wrapper = styled.div<{ $open: boolean }>`
   }
 `;
 
-const ToggleButton = styled.button`
-  border: 0;
-  background: none;
-`;
-
 const ToggleIconOpen = styled(IconAngleUp).attrs({
   style: {
     "--icon-size": "var(--button-size)",
@@ -64,6 +78,7 @@ function Accordion({
   heading,
   defaultOpen = false,
   children,
+  disabled = false,
   className,
   style,
   ...rest
@@ -84,14 +99,16 @@ function Accordion({
       {...rest}
     >
       <Heading
-        onClick={() => toggleOpenState(!isAccordionOpen)}
+        onClick={() => !disabled && toggleOpenState(!isAccordionOpen)}
         data-testid="accordion__header"
+        $disabled={disabled}
       >
         <H2 className="heading">{heading}</H2>
         <ToggleButton
           type="button"
           aria-label={buttonAriaLabel}
-          onClick={() => toggleOpenState(!isAccordionOpen)}
+          disabled={disabled}
+          onClick={() => !disabled && toggleOpenState(!isAccordionOpen)}
         >
           {isAccordionOpen ? <ToggleIconOpen /> : <ToggleIconClosed />}
         </ToggleButton>

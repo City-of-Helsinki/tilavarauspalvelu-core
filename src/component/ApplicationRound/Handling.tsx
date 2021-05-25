@@ -8,6 +8,7 @@ import {
   Notification,
 } from "hds-react";
 import uniq from "lodash/uniq";
+import uniqBy from "lodash/uniqBy";
 import trim from "lodash/trim";
 import Loader from "../Loader";
 import {
@@ -144,22 +145,23 @@ const getFilterConfig = (
   recommendations: AllocationResult[]
 ): DataFilterConfig[] => {
   const purposes = uniq(
-    recommendations.map((rec) => rec.applicationEvent.purpose)
+    recommendations.map((rec: AllocationResult) => rec.applicationEvent.purpose)
   ).sort();
   const statuses = uniq(
-    recommendations.map((rec) => rec.applicationEvent.status)
+    recommendations.map((rec: AllocationResult) => rec.applicationEvent.status)
   );
   const reservationUnits = uniq(
-    recommendations.map((rec) => rec.unitName)
+    recommendations.map((rec: AllocationResult) => rec.unitName)
   ).sort();
-  const baskets = uniq(
-    recommendations
-      .filter((n) => n.basketName)
-      .map((rec) => ({
-        title: `${rec.basketOrderNumber}. ${rec.basketName}`,
-        value: rec.basketName,
-      }))
-  );
+  const baskets = uniqBy(
+    recommendations,
+    (rec: AllocationResult) => rec.basketName
+  )
+    .filter((rec: AllocationResult) => rec.basketName)
+    .map((rec: AllocationResult) => ({
+      title: `${rec.basketOrderNumber}. ${rec.basketName}`,
+      value: rec.basketName,
+    }));
 
   return [
     {

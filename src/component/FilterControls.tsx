@@ -146,6 +146,7 @@ function FilterControls({
           const activeFilters = filterAccordion.filters?.filter((n) =>
             filters.map((af) => af.key).includes(n.key)
           );
+          const filterCount = filterAccordion.filters?.length || 0;
           const activeFiltersCount = activeFilters?.length || "";
           return (
             <FilterAccordion
@@ -153,6 +154,7 @@ function FilterControls({
                 activeFiltersCount && `(${activeFiltersCount})`
               }`}
               key={filterAccordion.title}
+              disabled={filterCount < 1}
               data-testid="filter-controls__group"
             >
               {filterAccordion.filters?.map((filter) => (
