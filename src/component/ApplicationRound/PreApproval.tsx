@@ -36,6 +36,7 @@ import {
 import BigRadio from "../BigRadio";
 import { getAllocationResults, getApplications } from "../../common/api";
 import Loader from "../Loader";
+import { getAllocationCapacity } from "../../common/AllocationResult";
 
 interface IProps {
   applicationRound: ApplicationRoundType;
@@ -436,6 +437,14 @@ function PreApproval({
     return <Loader />;
   }
 
+  const capacity =
+    activeFilter === "allocated"
+      ? getAllocationCapacity(
+          filteredResults as AllocationResult[],
+          applicationRound?.aggregatedData.totalHourCapacity
+        )
+      : null;
+
   return (
     <Wrapper>
       <Heading />
@@ -513,21 +522,44 @@ function PreApproval({
             </NarrowContainer>
             <IngressContainer>
               <IngressFooter>
-                <div>
-                  {activeFilter === "unallocated" && (
-                    <>
-                      <BoldValue>
-                        {formatNumber(
-                          unallocatedApplications.length,
-                          t("common.volumeUnit")
-                        )}
-                      </BoldValue>
-                      <p className="label">
-                        {t("ApplicationRound.unallocatedApplications")}
-                      </p>
-                    </>
-                  )}
-                </div>
+                {activeFilter === "unallocated" && (
+                  <div>
+                    <BoldValue>
+                      {formatNumber(
+                        unallocatedApplications.length,
+                        t("common.volumeUnit")
+                      )}
+                    </BoldValue>
+                    <p className="label">
+                      {t("ApplicationRound.unallocatedApplications")}
+                    </p>
+                  </div>
+                )}
+                {activeFilter === "allocated" && capacity && (
+                  <div>
+                    <p className="label">
+                      {t("ApplicationRound.schedulesToBeGranted")}
+                    </p>
+                    <BoldValue>
+                      {t("ApplicationRound.percentageOfCapacity", {
+                        percentage: capacity.percentage,
+                      })}
+                    </BoldValue>
+                    <span style={{ marginLeft: "var(--spacing-xs)" }}>
+                      (
+                      {trim(
+                        `${capacity.volume} ${t("common.volumeUnit")} / ${t(
+                          "common.hoursUnit",
+                          {
+                            count: capacity.hours,
+                          }
+                        )}`,
+                        " / "
+                      )}
+                      )
+                    </span>
+                  </div>
+                )}
                 <div>
                   <BigRadio
                     buttons={[

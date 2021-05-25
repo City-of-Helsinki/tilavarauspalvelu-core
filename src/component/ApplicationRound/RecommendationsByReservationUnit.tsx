@@ -364,7 +364,7 @@ function RecommendationsByReservationUnit(): JSX.Element {
       });
       setReservationUnitCapacity(result);
     } catch (error) {
-      console.error(t("errors.errorFetchingCapacity"));
+      console.error(t("errors.errorFetchingCapacity")); // eslint-disable-line no-console
     }
   };
 

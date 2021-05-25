@@ -201,6 +201,13 @@ export const convertHMSToSeconds = (input: string): number | null => {
   return Number.isNaN(result) ? null : result;
 };
 
+export const convertHMSToHours = (input: HMS): number => {
+  if (!input.h) return 0;
+  const hours = input.h;
+  const hourFractions = input.m ? input.m / 60 : 0;
+  return hours + hourFractions;
+};
+
 export const formatTimeDistance = (
   timeStart: string,
   timeEnd: string

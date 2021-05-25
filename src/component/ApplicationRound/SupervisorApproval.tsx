@@ -43,6 +43,7 @@ import {
   setApplicationEventStatuses,
   patchApplicationRoundStatus,
 } from "../../common/api";
+import { getAllocationCapacity } from "../../common/AllocationResult";
 
 interface IProps {
   applicationRoundId: string;
@@ -500,6 +501,14 @@ function SupervisorApproval({ applicationRoundId }: IProps): JSX.Element {
     return <Loader />;
   }
 
+  const capacity =
+    activeFilter === "allocated"
+      ? getAllocationCapacity(
+          filteredResults as AllocationResult[],
+          applicationRound?.aggregatedData.totalHourCapacity
+        )
+      : null;
+
   return (
     <Wrapper>
       {recommendations &&
@@ -573,21 +582,44 @@ function SupervisorApproval({ applicationRoundId }: IProps): JSX.Element {
             </NarrowContainer>
             <IngressContainer>
               <IngressFooter>
-                <div>
-                  {activeFilter === "unallocated" && (
-                    <>
-                      <BoldValue>
-                        {formatNumber(
-                          unallocatedApplications.length,
-                          t("common.volumeUnit")
-                        )}
-                      </BoldValue>
-                      <p className="label">
-                        {t("ApplicationRound.unallocatedApplications")}
-                      </p>
-                    </>
-                  )}
-                </div>
+                {activeFilter === "unallocated" && (
+                  <div>
+                    <BoldValue>
+                      {formatNumber(
+                        unallocatedApplications.length,
+                        t("common.volumeUnit")
+                      )}
+                    </BoldValue>
+                    <p className="label">
+                      {t("ApplicationRound.unallocatedApplications")}
+                    </p>
+                  </div>
+                )}{" "}
+                {activeFilter === "allocated" && capacity && (
+                  <div>
+                    <p className="label">
+                      {t("ApplicationRound.schedulesToBeGranted")}
+                    </p>
+                    <BoldValue>
+                      {t("ApplicationRound.percentageOfCapacity", {
+                        percentage: capacity.percentage,
+                      })}
+                    </BoldValue>
+                    <span style={{ marginLeft: "var(--spacing-xs)" }}>
+                      (
+                      {trim(
+                        `${capacity.volume} ${t("common.volumeUnit")} / ${t(
+                          "common.hoursUnit",
+                          {
+                            count: capacity.hours,
+                          }
+                        )}`,
+                        " / "
+                      )}
+                      )
+                    </span>
+                  </div>
+                )}
                 <div>
                   <BigRadio
                     buttons={[

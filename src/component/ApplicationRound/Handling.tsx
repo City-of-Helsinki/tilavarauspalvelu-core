@@ -8,7 +8,6 @@ import {
   Notification,
 } from "hds-react";
 import uniq from "lodash/uniq";
-import uniqBy from "lodash/uniqBy";
 import trim from "lodash/trim";
 import Loader from "../Loader";
 import {
@@ -33,12 +32,10 @@ import {
   formatNumber,
   getNormalizedApplicationEventStatus,
   modifyAllocationResults,
-  normalizeApplicationEventStatus,
   parseAgeGroups,
   parseDuration,
   prepareAllocationResults,
   processAllocationResult,
-  secondsToHms,
 } from "../../common/util";
 import StatusCell from "../StatusCell";
 import {
@@ -47,6 +44,7 @@ import {
   triggerAllocation,
 } from "../../common/api";
 import SelectionActionBar from "../SelectionActionBar";
+import { getAllocationCapacity } from "../../common/AllocationResult";
 
 interface IProps {
   applicationRound: ApplicationRoundType;
@@ -398,25 +396,10 @@ function Handling({
     return <Loader />;
   }
 
-  const getReservationHours = (allocationResults: AllocationResult[]) => {
-    const appEvents = uniqBy(allocationResults, (n) => n.applicationEvent.id);
-    const seconds = appEvents.reduce((acc: number, cur: AllocationResult) => {
-      const isStatusOk = ["validated"].includes(
-        normalizeApplicationEventStatus(cur)
-      );
-      return cur.applicationEvent.aggregatedData
-        .allocationResultsDurationTotal && isStatusOk
-        ? acc +
-            cur.applicationEvent.aggregatedData.allocationResultsDurationTotal
-        : acc;
-    }, 0);
-    const hms = secondsToHms(seconds);
-    return hms.h || 0;
-  };
-
-  const reservedHours =
-    getReservationHours(recommendations) +
-    applicationRound.aggregatedData.totalReservationDuration;
+  const capacity = getAllocationCapacity(
+    recommendations,
+    applicationRound.aggregatedData.totalHourCapacity
+  );
 
   return (
     <Wrapper>
@@ -448,19 +431,12 @@ function Handling({
                 />
               </div>
               <div>
-                {applicationRound.aggregatedData.totalHourCapacity &&
-                  reservedHours && (
-                    <>
-                      <StatusCircle
-                        status={
-                          (reservedHours /
-                            applicationRound.aggregatedData.totalHourCapacity) *
-                          100
-                        }
-                      />
-                      <H3>{t("ApplicationRound.amountReserved")}</H3>
-                    </>
-                  )}
+                {applicationRound.aggregatedData.totalHourCapacity && capacity && (
+                  <>
+                    <StatusCircle status={capacity.percentage} />
+                    <H3>{t("ApplicationRound.amountReserved")}</H3>
+                  </>
+                )}
               </div>
             </TopIngress>
           </IngressContainer>

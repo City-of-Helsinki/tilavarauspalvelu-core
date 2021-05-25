@@ -32,6 +32,7 @@ import {
   getApplications,
 } from "../../common/api";
 import TimeframeStatus from "./TimeframeStatus";
+import { getAllocationCapacity } from "../../common/AllocationResult";
 
 interface IProps {
   applicationRoundId: string;
@@ -107,16 +108,6 @@ const BoldValue = styled.span`
     display: inline;
   }
 `;
-
-// const ScheduleCount = styled.span`
-//   font-size: var(--fontsize-body-s);
-//   display: block;
-
-//   @media (min-width: ${breakpoints.m}) {
-//     margin-left: var(--spacing-xs);
-//     display: inline;
-//   }
-// `;
 
 const getCellConfig = (
   t: TFunction,
@@ -398,8 +389,6 @@ function ResolutionReport(): JSX.Element {
     }
   }, [applicationRound, t]);
 
-  const backLink = "/applicationRounds";
-
   const filteredResults =
     activeFilter === "unallocated"
       ? unallocatedApplications
@@ -411,6 +400,14 @@ function ResolutionReport(): JSX.Element {
     return <Loader />;
   }
 
+  const capacity =
+    activeFilter === "allocated"
+      ? getAllocationCapacity(
+          filteredResults as AllocationResult[],
+          applicationRound?.aggregatedData.totalHourCapacity
+        )
+      : null;
+
   return (
     <Wrapper>
       {recommendations &&
@@ -421,7 +418,7 @@ function ResolutionReport(): JSX.Element {
         allocatedFilterConfig && (
           <>
             <ContentContainer>
-              <LinkPrev route={backLink} />
+              <LinkPrev route={`/applicationRound/${applicationRound.id}`} />
             </ContentContainer>
             <IngressContainer>
               <TopIngress>
@@ -441,21 +438,44 @@ function ResolutionReport(): JSX.Element {
                 <div />
               </TopIngress>
               <IngressFooter>
-                <div>
-                  {activeFilter === "unallocated" && (
-                    <>
-                      <BoldValue>
-                        {formatNumber(
-                          unallocatedApplications.length,
-                          t("common.volumeUnit")
-                        )}
-                      </BoldValue>
-                      <p className="label">
-                        {t("ApplicationRound.unallocatedApplications")}
-                      </p>
-                    </>
-                  )}
-                </div>
+                {activeFilter === "unallocated" && (
+                  <div>
+                    <BoldValue>
+                      {formatNumber(
+                        unallocatedApplications.length,
+                        t("common.volumeUnit")
+                      )}
+                    </BoldValue>
+                    <p className="label">
+                      {t("ApplicationRound.unallocatedApplications")}
+                    </p>
+                  </div>
+                )}
+                {activeFilter === "allocated" && capacity && (
+                  <div>
+                    <p className="label">
+                      {t("ApplicationRound.schedulesToBeGranted")}
+                    </p>
+                    <BoldValue>
+                      {t("ApplicationRound.percentageOfCapacity", {
+                        percentage: capacity.percentage,
+                      })}
+                    </BoldValue>
+                    <span style={{ marginLeft: "var(--spacing-xs)" }}>
+                      (
+                      {trim(
+                        `${capacity.volume} ${t("common.volumeUnit")} / ${t(
+                          "common.hoursUnit",
+                          {
+                            count: capacity.hours,
+                          }
+                        )}`,
+                        " / "
+                      )}
+                      )
+                    </span>
+                  </div>
+                )}
                 <div>
                   <BigRadio
                     buttons={[
