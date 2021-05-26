@@ -65,9 +65,9 @@ const ReservationList = ({ reservations }: Props): JSX.Element | null => {
         .map((reservation) => {
           return reservationLine(reservation, t, i18n.language);
         })}
-      <InfoText>{t('ReservationList.cancelled')}:</InfoText>
+      <InfoText>{t('ReservationList.denied')}:</InfoText>
       {sortedReservations
-        ?.filter((res) => res.state === 'cancelled')
+        ?.filter((res) => res.state === 'denied')
         .map((reservation) => {
           return reservationLine(reservation, t, i18n.language);
         })}

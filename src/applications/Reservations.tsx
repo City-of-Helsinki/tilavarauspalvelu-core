@@ -3,10 +3,11 @@ import {
   Button,
   Card as HDSCard,
   IconCalendar,
-  IconCalendarClock,
   IconHome,
   IconInfoCircle,
   IconLocation,
+  IconMenuHamburger,
+  IconDownload,
   Select,
 } from 'hds-react';
 import { TFunction } from 'i18next';
@@ -14,25 +15,26 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
+
 import {
   getApplication,
   getApplicationRound,
-  getReservations,
+  getRecurringReservations,
 } from '../common/api';
-import { useApiData } from '../common/hook/useApiData';
+import { ApiData, useApiData } from '../common/hook/useApiData';
 import { breakpoint } from '../common/style';
 import {
   Application,
   ApplicationEvent,
   OptionType,
+  RecurringReservation,
   Reservation,
   ReservationUnit,
 } from '../common/types';
 import { endOfWeek, getAddress, parseDate, startOfWeek } from '../common/util';
 import Back from '../component/Back';
-import { HorisontalRule } from '../component/common';
+import { HorisontalRule, TwoColumnContainer } from '../component/common';
 import Loader from '../component/Loader';
-import IconWithText from '../reservation-unit/IconWithText';
 import ReservationCalendar from './ReservationCalendar';
 import ReservationList from './ReservationList';
 
@@ -54,13 +56,19 @@ const RoundName = styled.div`
   }
 `;
 
-const EventName = styled.div`
+const SubHeading = styled.div`
   margin-top: var(--spacing-xs);
   font-size: var(--fontsize-heading-l);
   font-family: var(--font-bold);
   @media (max-width: ${breakpoint.s}) {
     font-size: var(--fontsize-heading-m);
   }
+`;
+
+const ResolutionDescription = styled.div`
+  margin-top: var(--spacing-s);
+  font-family: var(--font-regular);
+  font-size: var(--fontsize-body-l);
 `;
 
 const Applicant = styled.div`
@@ -125,7 +133,9 @@ const BuildingName = styled.div`
 const AddressLine = styled.div`
   font-size: var(--fontsize-body-m);
 `;
-
+const Buttons = styled.div`
+  justify-self: end;
+`;
 const ToggleButton = styled(Button)`
   margin-top: var(--spacing-m);
 `;
@@ -148,15 +158,17 @@ const getApplicant = (application: Application, t: TFunction): string => {
   return '';
 };
 
+const longDate = (date: Date, t: TFunction): string =>
+  t('common.dateLong', {
+    date,
+  });
+
 export const getWeekOption = (date: Date, t: TFunction): OptionType => {
   const begin = startOfWeek(date);
   const end = endOfWeek(date);
+  const monthName = t(`common.month.${begin.getMonth()}`);
   return {
-    label: `${t(`common.month.${begin.getMonth()}`)} ${t('common.dateLong', {
-      date: begin,
-    })} - ${t('common.dateLong', {
-      date: end,
-    })} `,
+    label: `${monthName} ${longDate(begin, t)} - ${longDate(end, t)} `,
     value: begin.getTime(),
   };
 };
@@ -179,30 +191,49 @@ const getWeekOptions = (
 };
 
 const displayDate = (date: Date, t: TFunction): string => {
-  return `${t(`common.weekDay.${date.getDay()}`)} ${t('common.dateLong', {
-    date,
-  })}`;
+  const weekday = t(`common.weekDay.${date.getDay()}`);
+  return `${weekday} ${longDate(date, t)}`;
 };
 
 const getWeekEvents = (
   weekBegin: Date,
   weekEnd: Date,
-  reservations?: Reservation[]
+  reservations?: RecurringReservation[]
 ) =>
-  reservations?.filter((r) => {
-    const begin = parseDate(r.begin).getTime();
-    const end = parseDate(r.end).getTime();
-    return (
-      begin > weekBegin.getTime() &&
-      begin < weekEnd.getTime() &&
-      end > weekBegin.getTime() &&
-      end < weekEnd.getTime()
-    );
-  }) || [];
+  reservations
+    ?.flatMap((rr) => rr.reservations)
+    .filter((r) => {
+      const begin = parseDate(r.begin).getTime();
+      const end = parseDate(r.end).getTime();
+      return (
+        begin > weekBegin.getTime() &&
+        begin < weekEnd.getTime() &&
+        end > weekBegin.getTime() &&
+        end < weekEnd.getTime()
+      );
+    }) || [];
+
+const modified = (
+  application: ApiData<Application, unknown>,
+  t: TFunction
+): JSX.Element => {
+  return (
+    <Modified>
+      {application.data?.lastModifiedDate
+        ? t('ApplicationCard.saved', {
+            date: parseDate(application.data?.lastModifiedDate),
+          })
+        : ''}
+    </Modified>
+  );
+};
 
 const Reservations = (): JSX.Element | null => {
   const { applicationId } = useParams<ParamTypes>();
   const [isCalendar, setIsCalendar] = useState(true);
+  const [status, setStatus] = useState<'init' | 'loading' | 'done' | 'error'>(
+    'init'
+  );
 
   const { t } = useTranslation();
 
@@ -213,7 +244,11 @@ const Reservations = (): JSX.Element | null => {
     application.data ? { id: application.data.applicationRoundId } : undefined
   );
 
-  const reservations = useApiData(getReservations, Number(applicationId));
+  const reservations = useApiData(
+    getRecurringReservations,
+    Number(applicationId)
+  );
+
   const [week, setWeek] = useState(getWeekOption(new Date(), t));
 
   const startDate = new Date(week.value as number);
@@ -221,144 +256,203 @@ const Reservations = (): JSX.Element | null => {
 
   const weekEvents = getWeekEvents(startDate, endDate, reservations.data);
 
+  const keys = [] as ReservationUnit[];
   const resUnitEvents = weekEvents.reduce((prev, reservation) => {
     reservation.reservationUnit.forEach((resUnit) => {
-      const resUnitArray = prev.get(resUnit);
+      let key = keys.find((k) => k.id === resUnit.id);
+      if (!key) {
+        keys.push(resUnit);
+        key = resUnit;
+      }
+
+      const resUnitArray = prev.get(key);
       if (resUnitArray) {
         resUnitArray.push(reservation);
       } else {
-        prev.set(resUnit, [reservation]);
+        prev.set(key, [reservation]);
       }
     });
 
     return prev;
   }, new Map<ReservationUnit, Reservation[]>());
 
+  const reservationsResultText =
+    reservations.data &&
+    t(
+      reservations.data?.length > 0
+        ? 'Reservations.resultWithReservations'
+        : 'Reservations.resultWithoutReservations'
+    );
+
   return (
     <Container>
       <Back label="Reservations.back" />
       <Loader datas={[application, applicationRound, reservations]}>
-        <RoundName>{applicationRound.data?.name}</RoundName>
-        <Applicant>
-          {getApplicant(application.data as Application, t)}
-        </Applicant>
-        <Modified>
-          {application.data?.lastModifiedDate
-            ? t('ApplicationCard.saved', {
-                date: parseDate(application.data?.lastModifiedDate),
-              })
-            : ''}
-        </Modified>
-        <IconWithText
-          icon={<IconCalendarClock />}
-          text={t('Reservations.info')}
-        />
-        <ToggleButton
-          variant="secondary"
-          onClick={() => setIsCalendar(!isCalendar)}>
-          {isCalendar
-            ? t('Reservations.showList')
-            : t('Reservations.showCalendar')}
-        </ToggleButton>
-        <HorisontalRule />
-        {application.data?.applicationEvents.map((event) => (
-          <div key={event.id}>
-            <EventName>{event.name}</EventName>
-            {isCalendar ? (
-              <Card border>
-                {event.eventReservationUnits.map((eru) => (
-                  <div key={eru.reservationUnitId}>
-                    <Actions>
-                      <Select
-                        label={t('Reservations.weekSelectLabel')}
-                        multiselect={false}
-                        id="kissa"
-                        icon={<IconCalendar />}
-                        options={getWeekOptions(t, event)}
-                        value={week}
-                        onChange={(w) => {
-                          setWeek(w);
-                        }}
-                      />
-                      <Button
-                        id="b"
-                        variant="secondary"
-                        onClick={() => {
-                          setWeek(getWeekOption(new Date(), t));
-                        }}>
-                        {t('common.today')}
-                      </Button>
-                    </Actions>
+        {reservations.data?.length === 0 ? (
+          <span> no reservations</span>
+        ) : (
+          <>
+            <RoundName>{applicationRound.data?.name}</RoundName>
+            <Applicant>
+              {getApplicant(application.data as Application, t)}
+            </Applicant>
+            {modified(application, t)}
+            <TwoColumnContainer>
+              <div>
+                <SubHeading>{t('Reservations.titleResolution')}</SubHeading>
+                <ResolutionDescription>
+                  {reservationsResultText}
+                </ResolutionDescription>
 
-                    <TwoColLayout>
-                      <IconCalendar />
-                      <div>
-                        {displayDate(startDate, t)} - {displayDate(endDate, t)}
+                <ToggleButton
+                  theme="black"
+                  variant="secondary"
+                  iconLeft={<IconDownload />}
+                  isLoading={status === 'loading'}
+                  loadingText={t('Reservations.generating')}
+                  onClick={() => {
+                    setStatus('loading');
+                    setTimeout(() => {
+                      import('../pdf/util').then(({ download }) => {
+                        download(
+                          application.data as Application,
+                          reservations.data as RecurringReservation[],
+                          applicationRound.data?.approvedBy || null,
+                          setStatus
+                        );
+                      });
+                    }, 0);
+                  }}>
+                  {t('Reservations.download')}
+                </ToggleButton>
+              </div>
+              <Buttons>
+                <ToggleButton
+                  theme="black"
+                  aria-pressed={isCalendar}
+                  variant={(isCalendar && 'secondary') || 'primary'}
+                  iconLeft={<IconMenuHamburger />}
+                  onClick={() => setIsCalendar(false)}>
+                  {t('Reservations.showList')}
+                </ToggleButton>
+                <ToggleButton
+                  theme="black"
+                  variant={(isCalendar && 'primary') || 'secondary'}
+                  aria-pressed={!isCalendar}
+                  onClick={() => setIsCalendar(true)}
+                  iconLeft={<IconCalendar />}>
+                  {t('Reservations.showCalendar')}
+                </ToggleButton>
+              </Buttons>
+            </TwoColumnContainer>
+
+            <HorisontalRule />
+            {application.data?.applicationEvents.map((event) => (
+              <div key={event.id}>
+                <SubHeading>{event.name}</SubHeading>
+                {isCalendar ? (
+                  <Card border>
+                    {event.eventReservationUnits.map((eru) => (
+                      <div key={eru.reservationUnitId}>
+                        <Actions>
+                          <Select
+                            label={t('Reservations.weekSelectLabel')}
+                            multiselect={false}
+                            icon={<IconCalendar />}
+                            options={getWeekOptions(t, event)}
+                            value={week}
+                            onChange={(w) => {
+                              setWeek(w);
+                            }}
+                          />
+                          <Button
+                            id="b"
+                            variant="secondary"
+                            onClick={() => {
+                              setWeek(getWeekOption(new Date(), t));
+                            }}>
+                            {t('common.today')}
+                          </Button>
+                        </Actions>
+
+                        <TwoColLayout>
+                          <IconCalendar />
+                          <div>
+                            {displayDate(startDate, t)} -{' '}
+                            {displayDate(endDate, t)}
+                          </div>
+                          {weekEvents.map((reservation) => {
+                            const begin = parseDate(reservation.begin);
+                            const end = parseDate(reservation.end);
+                            return (
+                              <>
+                                <div>
+                                  {t(`common.weekDay.${begin.getDay()}`)}
+                                </div>
+                                <div>
+                                  {' '}
+                                  {t('common.time', {
+                                    date: begin,
+                                  })}{' '}
+                                  - {t('common.time', { date: end })}
+                                </div>
+                              </>
+                            );
+                          })}
+                        </TwoColLayout>
+                        {Array.from(resUnitEvents.entries()).map(
+                          ([reservationUnit, resUnitReservations]) => {
+                            return (
+                              <>
+                                <HorisontalRule />
+                                <TwoColLayout>
+                                  <IconHome />
+                                  <ReservationUnitName>
+                                    {reservationUnit.name.fi}
+                                  </ReservationUnitName>
+                                  <IconInfoCircle />
+                                  <ContactInfo>
+                                    TODO contact info from API
+                                  </ContactInfo>
+                                  <IconLocation />
+                                  <div>
+                                    <BuildingName>
+                                      {reservationUnit.building?.name}
+                                    </BuildingName>
+                                    <AddressLine>
+                                      {getAddress(reservationUnit)}
+                                    </AddressLine>
+                                  </div>
+                                </TwoColLayout>
+                                <HorisontalRule />
+                                <CalendarContainer>
+                                  <div>
+                                    <ReservationCalendar
+                                      begin={new Date(week.value as number)}
+                                      reservations={resUnitReservations}
+                                      reservationUnit={reservationUnit}
+                                      applicationEvent={event}
+                                    />
+                                  </div>
+                                </CalendarContainer>
+                              </>
+                            );
+                          }
+                        )}
                       </div>
-                      {weekEvents.map((reservation) => {
-                        const begin = parseDate(reservation.begin);
-                        const end = parseDate(reservation.end);
-                        return (
-                          <>
-                            <div>{t(`common.weekDay.${begin.getDay()}`)}</div>
-                            <div>
-                              {' '}
-                              {t('common.time', {
-                                date: begin,
-                              })}{' '}
-                              - {t('common.time', { date: end })}
-                            </div>
-                          </>
-                        );
-                      })}
-                    </TwoColLayout>
-                    {Array.from(resUnitEvents.entries()).map(
-                      ([reservationUnit, resUnitReservations]) => {
-                        return (
-                          <>
-                            <HorisontalRule />
-                            <TwoColLayout>
-                              <IconHome />
-                              <ReservationUnitName>
-                                {reservationUnit.name.fi}
-                              </ReservationUnitName>
-                              <IconInfoCircle />
-                              <ContactInfo>
-                                TODO contact info from API
-                              </ContactInfo>
-                              <IconLocation />
-                              <div>
-                                <BuildingName>
-                                  {reservationUnit.building?.name}
-                                </BuildingName>
-                                <AddressLine>
-                                  {getAddress(reservationUnit)}
-                                </AddressLine>
-                              </div>
-                            </TwoColLayout>
-                            <HorisontalRule />
-                            <CalendarContainer>
-                              <div>
-                                <ReservationCalendar
-                                  begin={new Date(week.value as number)}
-                                  reservations={resUnitReservations}
-                                  reservationUnit={reservationUnit}
-                                  applicationEvent={event}
-                                />
-                              </div>
-                            </CalendarContainer>
-                          </>
-                        );
-                      }
+                    ))}
+                  </Card>
+                ) : (
+                  <ReservationList
+                    reservations={reservations.data?.flatMap(
+                      (rr) => rr.reservations
                     )}
-                  </div>
-                ))}
-              </Card>
-            ) : (
-              <ReservationList reservations={reservations.data} />
-            )}
-          </div>
-        ))}
+                  />
+                )}
+              </div>
+            ))}
+          </>
+        )}
       </Loader>
     </Container>
   );

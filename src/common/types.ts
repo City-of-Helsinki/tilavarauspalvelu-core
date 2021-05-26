@@ -14,6 +14,7 @@ export type ApplicationRound = {
   reservationPeriodEnd: string;
   purposeIds: number[];
   criteria: string;
+  approvedBy?: string;
 };
 
 export type Space = {
@@ -33,6 +34,27 @@ export type Resource = {
   spaceId: number;
   bufferTimeBefore: string;
   bufferTimeAfter: string;
+};
+
+export type ApplicationStatusChange = {
+  status: ApplicationStatus;
+  userId: number;
+  applicationId: number;
+  timestamp: string;
+};
+
+export type ApplicationRoundStatus =
+  | 'draft'
+  | 'in_review'
+  | 'review_done'
+  | 'allocated'
+  | 'handled'
+  | 'validated'
+  | 'approved';
+
+export type User = {
+  firstName: string;
+  lastName: string;
 };
 
 export type Service = {
@@ -109,19 +131,16 @@ export type ApplicationStatus =
   | 'draft'
   | 'in_review'
   | 'review_done'
-  | 'allocating'
-  | 'allocated'
-  | 'validated'
-  | 'handled'
+  | 'sent'
   | 'declined'
   | 'cancelled';
 
 export type ReducedApplicationStatus =
   | 'draft'
   | 'processing'
-  | 'handled'
   | 'cancelled'
-  | 'declined';
+  | 'declined'
+  | 'sent';
 
 export type Application = {
   id?: number;
@@ -208,11 +227,22 @@ export type ReservationState =
 
 export type Reservation = {
   id: number;
+  applicationId: number;
+  applicationEventId: number;
   state: ReservationState;
   priority: number;
   begin: string;
   end: string;
   reservationUnit: ReservationUnit[];
+};
+
+export type RecurringReservation = {
+  applicationId: number;
+  applicationEventId: number;
+  ageGroupId: number;
+  abilityGroupId: number;
+  reservations: Reservation[];
+  deniedReservations: Reservation[];
 };
 
 // for ui:

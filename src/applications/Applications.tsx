@@ -24,9 +24,9 @@ const Container = styled.div`
 `;
 
 const statusGroupOrder: ReducedApplicationStatus[] = [
-  'draft',
+  'sent',
   'processing',
-  'handled',
+  'draft',
   'declined',
   'cancelled',
 ];

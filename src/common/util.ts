@@ -304,9 +304,6 @@ export const getReducedApplicationStatus = (
   switch (status) {
     case 'in_review':
     case 'review_done':
-    case 'allocating':
-    case 'allocated':
-    case 'validated':
       return 'processing';
     default:
       return status;

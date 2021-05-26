@@ -44,7 +44,7 @@ function App(): JSX.Element {
                 <Route path="/applications/" exact>
                   <Applications />
                 </Route>
-                <Route path="/applications/:applicationId">
+                <Route path="/applications/:applicationId" exact>
                   <Resolution />
                 </Route>
               </OidcSecure>

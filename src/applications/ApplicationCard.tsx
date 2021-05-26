@@ -128,7 +128,7 @@ const ApplicationCard = ({
   if (reducedApplicationStatus === 'draft') {
     C = YellowTag;
   }
-  if (reducedApplicationStatus === 'handled') {
+  if (reducedApplicationStatus === 'sent') {
     C = GreenTag;
   }
 
@@ -187,7 +187,7 @@ const ApplicationCard = ({
           </StyledButton>
         )}
         <StyledButton
-          disabled={!(reducedApplicationStatus === 'handled')}
+          disabled={!(reducedApplicationStatus === 'sent')}
           onClick={() => {
             history.push(`${resolutionUrl(application.id as number)}`);
           }}>

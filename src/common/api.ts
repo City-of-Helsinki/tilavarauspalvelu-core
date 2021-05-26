@@ -7,12 +7,14 @@ import {
   ReservationUnit,
   Parameter,
   Reservation,
+  RecurringReservation,
 } from './types';
 import { ApiError } from './ApiError';
 
 const applicationRoundBasePath = 'application_round';
 const reservationUnitsBasePath = 'reservation_unit';
 const reservationBasePath = 'reservation';
+const recurringReservationBasePath = 'recurring_reservation';
 const parameterBasePath = 'parameters';
 const applicationBasePath = 'application';
 
@@ -114,6 +116,7 @@ export function getApplicationRound(
 
 export interface ReservationUnitsParameters {
   applicationRound?: number;
+  application?: number;
   search?: string;
   purpose?: number;
   reservationUnitType?: number;
@@ -135,6 +138,14 @@ export function getReservations(): Promise<Reservation[]> {
   });
 }
 
+export function getRecurringReservations(
+  applicationId: number
+): Promise<RecurringReservation[]> {
+  return apiGet<RecurringReservation[]>({
+    path: `v1/${recurringReservationBasePath}`,
+    parameters: { application: applicationId },
+  });
+}
 interface IDParameter {
   id: number;
 }

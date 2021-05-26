@@ -36,8 +36,8 @@ const translations: Translations = {
     noApplications: ['Hakemuksia ei ole.'],
     group: {
       draft: ['Luonnokset'],
-      sent: ['Käsittelyssä'],
-      handled: ['Käsitelty'],
+      processing: ['Käsittelyssä'],
+      sent: ['Käsitelty'],
     },
   },
   ApplicationCard: {
@@ -51,7 +51,7 @@ const translations: Translations = {
     status: {
       draft: ['Kesken'],
       processing: ['Käsittelyssä'],
-      handled: ['Käsitelty'],
+      sent: ['Käsitelty'],
     },
     reservations: ['Varaukset'],
     saved: ["Viimeksi tallennettu: {{date, dd.MM.yyyy 'klo' HH:mm}}"],
@@ -486,9 +486,18 @@ const translations: Translations = {
   Reservations: {
     back: ['Takaisin Omat hakemukset'],
     info: ['Hakemukselle on myönnetty seuraavat vakiovuorot'],
+    titleResolution: ['Vuorojaon päätös'],
+    resultWithReservations: [
+      'Hakemuksellesi on myönnetty seuraavat käyttövuorot.',
+    ],
+    resultWithoutReservations: [
+      'Hakemuksellesi ei valitettavasti ole voitu myöntää käyttövuoroja.',
+    ],
     weekSelectLabel: ['Valitse viikko'],
-    showList: ['Näytä lista'],
-    showCalendar: ['Näytä kalenteri'],
+    showList: ['Näytä listassa'],
+    showCalendar: ['Näytä kalenterissa'],
+    download: ['Lataa päätös (.pdf)'],
+    generating: ['Dokumenttia luodaan'],
   },
   ReservationUnit: {
     backToSearch: ['Takaisin hakutuloksiin'],
@@ -499,8 +508,8 @@ const translations: Translations = {
   },
 
   ReservationList: {
-    granted: ['Sinulle on myönnetty seuraavat vakiovuorot'],
-    cancelled: ['Seuraavat vakiovuorot on peruttu'],
+    granted: ['Sinulle on myönnetty seuraavat käyttövuorot'],
+    denied: ['Seuraavia käyttövuoroja ei voitu myöntää'],
   },
   search: {
     heading: ['Vakiovuorojen tilat'],
