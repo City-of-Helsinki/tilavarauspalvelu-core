@@ -104,6 +104,7 @@ export type ReservationUnit = {
   termsOfUse: string;
   building: Building;
   unitId: number;
+  contactInformation: string;
 };
 
 export type Parameter = {

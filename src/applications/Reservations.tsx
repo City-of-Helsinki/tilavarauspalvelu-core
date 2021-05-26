@@ -412,6 +412,7 @@ const Reservations = (): JSX.Element | null => {
                                   </ReservationUnitName>
                                   <IconInfoCircle />
                                   <ContactInfo>
+                                    {reservationUnit.contactInformation}
                                     TODO contact info from API
                                   </ContactInfo>
                                   <IconLocation />
