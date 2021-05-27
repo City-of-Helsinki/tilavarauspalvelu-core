@@ -1,9 +1,11 @@
 import logging
 
 from django.conf import settings
+from django.db.models import Sum
 from rest_framework import permissions, serializers, viewsets
 
 from applications.models import (
+    ApplicationEventAggregateData,
     ApplicationRound,
     ApplicationRoundBasket,
     ApplicationRoundStatus,
@@ -92,9 +94,7 @@ class ApplicationRoundSerializer(serializers.ModelSerializer):
 
     is_admin = serializers.SerializerMethodField()
 
-    aggregated_data = serializers.DictField(
-        source="aggregated_data_dict", read_only=True
-    )
+    aggregated_data = serializers.SerializerMethodField()
 
     approved_by = serializers.SerializerMethodField()
 
@@ -169,6 +169,29 @@ class ApplicationRoundSerializer(serializers.ModelSerializer):
             },
         }
 
+    def _get_allocation_result_summary(self, instance):
+        events_count = (
+            ApplicationEventAggregateData.objects.filter(
+                application_event__application__application_round=instance,
+                name="allocation_results_reservations_total",
+            )
+            .distinct()
+            .aggregate(events_count=Sum("value"))
+        )
+        duration_total = (
+            ApplicationEventAggregateData.objects.filter(
+                application_event__application__application_round=instance,
+                name="allocation_results_duration_total",
+            )
+            .distinct()
+            .aggregate(duration_total=Sum("value"))
+        )
+
+        return {
+            "allocation_result_events_count": events_count.get("events_count", 0),
+            "allocation_duration_total": duration_total.get("duration_total", 0),
+        }
+
     def get_is_admin(self, obj):
         request = self.context["request"] if "request" in self.context else None
         request_user = (
@@ -196,6 +219,11 @@ class ApplicationRoundSerializer(serializers.ModelSerializer):
             return ""
 
         return approved_status.user.get_full_name()
+
+    def get_aggregated_data(self, instance):
+        allocation_result_dict = self._get_allocation_result_summary(instance)
+        allocation_result_dict.update(instance.aggregated_data_dict)
+        return allocation_result_dict
 
     def create(self, validated_data):
         request = self.context["request"] if "request" in self.context else None
