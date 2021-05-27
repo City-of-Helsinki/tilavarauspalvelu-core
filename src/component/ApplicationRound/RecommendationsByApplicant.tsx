@@ -29,16 +29,18 @@ import withMainMenu from "../withMainMenu";
 import ApplicantBox from "./ApplicantBox";
 import DataTable, { CellConfig } from "../DataTable";
 import RecommendationCount from "./RecommendationCount";
+import StatusCell from "../StatusCell";
+import SelectionActionBar from "../SelectionActionBar";
 import {
   formatNumber,
   getNormalizedApplicationEventStatus,
   parseAgeGroups,
   parseDuration,
-  processAllocationResult,
-  modifyAllocationResults,
 } from "../../common/util";
-import StatusCell from "../StatusCell";
-import SelectionActionBar from "../SelectionActionBar";
+import {
+  modifyAllocationResults,
+  processAllocationResult,
+} from "../../common/AllocationResult";
 
 interface IRouteParams {
   applicationRoundId: string;

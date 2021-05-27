@@ -32,12 +32,15 @@ import DataTable, { CellConfig } from "../DataTable";
 import {
   formatNumber,
   getNormalizedApplicationEventStatus,
-  modifyAllocationResults,
   parseAgeGroups,
   parseDuration,
-  prepareAllocationResults,
-  processAllocationResult,
 } from "../../common/util";
+import {
+  prepareAllocationResults,
+  modifyAllocationResults,
+  processAllocationResult,
+  getAllocationCapacity,
+} from "../../common/AllocationResult";
 import StatusCell from "../StatusCell";
 import {
   getAllocationResults,
@@ -45,7 +48,6 @@ import {
   triggerAllocation,
 } from "../../common/api";
 import SelectionActionBar from "../SelectionActionBar";
-import { getAllocationCapacity } from "../../common/AllocationResult";
 
 interface IProps {
   applicationRound: ApplicationRoundType;

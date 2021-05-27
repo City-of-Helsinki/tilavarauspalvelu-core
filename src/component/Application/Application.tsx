@@ -317,10 +317,10 @@ function Application(): JSX.Element | null {
   }, [application, applicationRound]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (application && applicationRound && recurringReservations) {
+    if (application && applicationRound) {
       setIsLoading(false);
     }
-  }, [application, applicationRound, recurringReservations]);
+  }, [application, applicationRound]);
 
   const setApplicationStatus = async (
     app: ApplicationType,

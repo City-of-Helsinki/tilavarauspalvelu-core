@@ -1,4 +1,10 @@
-import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
+import React, {
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import styled from "styled-components";
 import {
   Button,
@@ -62,6 +68,7 @@ interface IProps {
   isRowDisabled?: (arg0: any) => boolean; // eslint-disable-line @typescript-eslint/no-explicit-any
   areAllRowsDisabled?: boolean;
   statusField?: string;
+  getActiveRows?: (arg0: any) => void; // eslint-disable-line @typescript-eslint/no-explicit-any
   className?: string;
 }
 
@@ -438,6 +445,7 @@ function DataTable({
   isRowDisabled = () => false,
   areAllRowsDisabled,
   statusField = "status",
+  getActiveRows,
   className,
 }: IProps): JSX.Element {
   const [sorting, setSorting] = useState<string>(cellConfig.sorting);
@@ -469,15 +477,28 @@ function DataTable({
   const { t } = useTranslation();
   const history = useHistory();
 
-  const processedData = processData(
-    groups,
-    sorting,
-    order,
-    filters,
-    handledAreHidden,
-    statusField,
-    config.handledStatuses
+  const processedData = useMemo(
+    () =>
+      processData(
+        groups,
+        sorting,
+        order,
+        filters,
+        handledAreHidden,
+        statusField,
+        config.handledStatuses
+      ),
+    [groups, sorting, order, filters, handledAreHidden, statusField, config]
   );
+
+  const flatData = useMemo(() => processedData.flatMap((n) => n.data), [
+    processedData,
+  ]);
+
+  useEffect(() => {
+    if (getActiveRows) getActiveRows(flatData);
+  }, [filters]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const actionsEnabled: boolean =
     groups.flatMap((group) => group.data).length > 0;
 
@@ -535,8 +556,6 @@ function DataTable({
       <Cell colSpan={cellConfig.cols.length}>{t("common.noResults")}</Cell>
     </Row>
   );
-
-  const totalRows = processedData.flatMap((n) => n.data);
 
   return (
     <Wrapper className={className}>
@@ -679,7 +698,7 @@ function DataTable({
             </Row>
           </Heading>
           <Body>
-            {totalRows.length > 0
+            {flatData.length > 0
               ? processedData.map(
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   (group: any, groupIndex: number): JSX.Element => {

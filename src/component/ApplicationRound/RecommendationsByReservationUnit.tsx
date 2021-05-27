@@ -41,10 +41,12 @@ import {
   parseAddress,
   parseAgeGroups,
   parseDuration,
+} from "../../common/util";
+import {
   prepareAllocationResults,
   processAllocationResult,
   modifyAllocationResults,
-} from "../../common/util";
+} from "../../common/AllocationResult";
 import StatusCell from "../StatusCell";
 // import StatusCircle from "../StatusCircle";
 import RecommendationCount from "./RecommendationCount";
