@@ -99,6 +99,7 @@ export const getApplicationRoundStatusColor = (
       color = "var(--color-alert-light)";
       break;
     case "approved":
+    case "sent":
       color = "var(--color-success)";
       break;
     case "draft":

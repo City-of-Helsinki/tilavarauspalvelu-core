@@ -510,6 +510,12 @@ const translations: ITranslations = {
       declined: ["Ehdotus hylätty"],
       ignored: ["Tilakielto asetettu"],
     },
+    applicantStatuses: {
+      handling: ["Käsittely kesken"],
+      validated: ["Odottaa esihenkilöhyväksyntää"],
+      approved: ["Päätös tehty"],
+      sent: ["Päätös lähetetty"],
+    },
     approveSuccessHeading: ["Ehdotus hyväksytty onnistuneesti"],
     approveSuccessBody: [
       "Hyväksytyt ehdotukset siirtyvät esihenkilölle hyväksyttäväksi.",
