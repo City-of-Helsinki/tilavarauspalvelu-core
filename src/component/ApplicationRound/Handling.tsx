@@ -255,18 +255,15 @@ const getCellConfig = (
         ),
       },
       {
-        // TODO
         title: "Recommendation.headings.recommendationCount",
-        key: "applicationAggregatedData.appliedReservationsTotal",
-        transform: ({ applicationAggregatedData }: AllocationResult) => (
+        key: "aggregatedData.reservationsTotal",
+        transform: ({ aggregatedData }: AllocationResult) => (
           <>
             {trim(
               `${formatNumber(
-                applicationAggregatedData?.appliedReservationsTotal,
+                aggregatedData?.reservationsTotal,
                 t("common.volumeUnit")
-              )} / ${parseDuration(
-                applicationAggregatedData?.appliedMinDurationTotal
-              )}`,
+              )} / ${parseDuration(aggregatedData?.durationTotal)}`,
               " / "
             )}
           </>

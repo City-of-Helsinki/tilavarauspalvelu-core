@@ -135,22 +135,21 @@ function RecommendedSlot({
             <Col>-</Col>
             <Label type="time">{formatTime(timeEnd)}</Label>
             <Col />
-            {duration ||
-              (durationStr && (
-                <Col>
-                  <Duration>
-                    <IconInfoCircle
-                      style={{ marginRight: "var(--spacing-xs)" }}
-                    />{" "}
-                    {t("Recommendation.scheduleDuration", {
-                      duration:
-                        durationStr ||
-                        (duration &&
-                          parseDuration(convertHMSToSeconds(duration))),
-                    })}
-                  </Duration>
-                </Col>
-              ))}
+            {(duration || durationStr) && (
+              <Col>
+                <Duration>
+                  <IconInfoCircle
+                    style={{ marginRight: "var(--spacing-xs)" }}
+                  />{" "}
+                  {t("Recommendation.scheduleDuration", {
+                    duration:
+                      durationStr ||
+                      (duration &&
+                        parseDuration(convertHMSToSeconds(duration))),
+                  })}
+                </Duration>
+              </Col>
+            )}
           </Row>
         </>
       )}

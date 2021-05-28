@@ -30,12 +30,12 @@ const getReservationAllocations = (
 ): IReservationAllocation => {
   return uniqBy(
     allocationResults,
-    (n: AllocationResult) => n.applicationEvent.id
+    (n: AllocationResult) => n.applicationEventScheduleId
   )
     .filter(
       (n: AllocationResult) =>
-        n.applicationEvent.aggregatedData.allocationResultsDurationTotal &&
-        n.applicationEvent.aggregatedData.allocationResultsReservationsTotal &&
+        n.aggregatedData.durationTotal &&
+        n.aggregatedData.reservationsTotal &&
         ["validated"].includes(normalizeApplicationEventStatus(n))
     )
     .reduce(
