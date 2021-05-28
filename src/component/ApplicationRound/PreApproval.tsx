@@ -157,16 +157,6 @@ const BoldValue = styled.span`
   }
 `;
 
-// const ScheduleCount = styled.span`
-//   font-size: var(--fontsize-body-s);
-//   display: block;
-
-//   @media (min-width: ${breakpoints.m}) {
-//     margin-left: var(--spacing-xs);
-//     display: inline;
-//   }
-// `;
-
 const getCellConfig = (
   t: TFunction,
   applicationRound: ApplicationRoundType | null,
@@ -442,7 +432,8 @@ function PreApproval({
   ): void => {
     const result: IAllocationCapacity | null = getAllocationCapacity(
       rows,
-      ar?.aggregatedData.totalHourCapacity
+      ar?.aggregatedData.totalHourCapacity,
+      ar?.aggregatedData.totalReservationDuration
     );
     setCapacity(result);
   };

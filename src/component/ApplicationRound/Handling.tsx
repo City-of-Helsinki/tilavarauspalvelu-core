@@ -399,7 +399,8 @@ function Handling({
 
   const capacity = getAllocationCapacity(
     recommendations,
-    applicationRound.aggregatedData.totalHourCapacity
+    applicationRound.aggregatedData.totalHourCapacity,
+    applicationRound.aggregatedData.totalReservationDuration
   );
 
   return (

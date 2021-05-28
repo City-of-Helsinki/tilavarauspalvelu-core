@@ -485,6 +485,15 @@ function SupervisorApproval({ applicationRoundId }: IProps): JSX.Element {
     }
   }, [applicationRound, t]);
 
+  useEffect(() => {
+    if (
+      applicationRound &&
+      ["approved", "sent"].includes(applicationRound.status)
+    ) {
+      history.push(`/applicationRound/${applicationRound.id}`);
+    }
+  }, [applicationRound, history]);
+
   const backLink = "/applicationRounds";
 
   const validatedRecommendations = recommendations.filter((n) =>
@@ -506,7 +515,8 @@ function SupervisorApproval({ applicationRoundId }: IProps): JSX.Element {
   ): void => {
     const result: IAllocationCapacity | null = getAllocationCapacity(
       rows,
-      ar?.aggregatedData.totalHourCapacity
+      ar?.aggregatedData.totalHourCapacity,
+      ar?.aggregatedData.totalReservationDuration
     );
     setCapacity(result);
   };

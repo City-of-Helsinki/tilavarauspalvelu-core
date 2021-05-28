@@ -51,7 +51,8 @@ const getReservationAllocations = (
 
 export const getAllocationCapacity = (
   allocationResults: AllocationResult[],
-  totalHourCapacity?: number
+  totalHourCapacity = 0,
+  totalReservationDuration = 0
 ): IAllocationCapacity | null => {
   if (!totalHourCapacity) return null;
   const reservations = getReservationAllocations(allocationResults);
@@ -60,7 +61,11 @@ export const getAllocationCapacity = (
   return {
     hours,
     volume: reservations.volume,
-    percentage: Number(((hours / totalHourCapacity) * 100).toFixed(1)),
+    percentage: Number(
+      ((hours / (totalHourCapacity - totalReservationDuration)) * 100).toFixed(
+        1
+      )
+    ),
   };
 };
 

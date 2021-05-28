@@ -401,7 +401,8 @@ function ResolutionReport(): JSX.Element {
   ): void => {
     const result: IAllocationCapacity | null = getAllocationCapacity(
       rows,
-      ar?.aggregatedData.totalHourCapacity
+      ar?.aggregatedData.totalHourCapacity,
+      ar?.aggregatedData.totalReservationDuration
     );
     setCapacity(result);
   };
