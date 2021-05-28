@@ -11,7 +11,8 @@ export type ApplicationRoundStatus =
   | "allocated"
   | "handled"
   | "validated"
-  | "approved";
+  | "approved"
+  | "sent";
 
 export type NormalizedApplicationRoundStatus =
   | ApplicationRoundStatus
