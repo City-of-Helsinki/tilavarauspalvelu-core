@@ -14,6 +14,9 @@ const axiosOptions = {
 const getApiAccessToken = () =>
   sessionStorage.getItem(`oidc.apiToken.${apiScope}`);
 
+export const clearApiAccessToken = (): void =>
+  sessionStorage.removeItem(`oidc.apiToken.${apiScope}`);
+
 const setApiAccessToken = (accessToken: string) =>
   sessionStorage.setItem(`oidc.apiToken.${apiScope}`, accessToken);
 
