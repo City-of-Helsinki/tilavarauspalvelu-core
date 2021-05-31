@@ -162,7 +162,6 @@ def test_partial_update_application_round_status(
 ):
 
     data = {
-        "service_sector_id": application_round.service_sector.id,
         "status": ApplicationRoundStatus.IN_REVIEW,
     }
 
@@ -196,7 +195,6 @@ def test_partial_update_application_round_name(
 ):
 
     data = {
-        "service_sector_id": application_round.service_sector.id,
         "name": "name changes",
     }
 

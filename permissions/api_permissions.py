@@ -170,7 +170,9 @@ class ApplicationRoundPermission(permissions.BasePermission):
         if request.method in permissions.SAFE_METHODS:
             return True
 
-        service_sector_id = request.data.get("service_sector_id")
+        service_sector_id = request.data.get("service_sector_id", None)
+        if not service_sector_id and view.detail:
+            return request.user.is_authenticated
         try:
             service_sector = ServiceSector.objects.get(pk=service_sector_id)
             return can_manage_service_sectors_application_rounds(
