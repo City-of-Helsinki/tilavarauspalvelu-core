@@ -154,6 +154,65 @@ def test_update_application_round(
 
 
 @pytest.mark.django_db
+def test_partial_update_application_round_status(
+    user_api_client,
+    service_sector_admin_api_client,
+    application_round,
+    valid_application_round_data,
+):
+
+    data = {
+        "service_sector_id": application_round.service_sector.id,
+        "status": ApplicationRoundStatus.IN_REVIEW,
+    }
+
+    # Normal user not allowed to edit application round
+    response = user_api_client.patch(
+        reverse("application_round-detail", kwargs={"pk": application_round.id}),
+        data=data,
+        format="json",
+    )
+    assert response.status_code == 403
+
+    # Service Sector admin can edit application round
+    response = service_sector_admin_api_client.patch(
+        reverse("application_round-detail", kwargs={"pk": application_round.id}),
+        data=data,
+        format="json",
+    )
+    assert response.status_code == 200
+
+    application_round.refresh_from_db()
+
+    assert application_round.status == ApplicationRoundStatus.IN_REVIEW
+
+
+@pytest.mark.django_db
+def test_partial_update_application_round_name(
+    user_api_client,
+    service_sector_admin_api_client,
+    application_round,
+    valid_application_round_data,
+):
+
+    data = {
+        "service_sector_id": application_round.service_sector.id,
+        "name": "name changes",
+    }
+
+    response = service_sector_admin_api_client.patch(
+        reverse("application_round-detail", kwargs={"pk": application_round.id}),
+        data=data,
+        format="json",
+    )
+    assert response.status_code == 200
+
+    application_round.refresh_from_db()
+
+    assert application_round.name == "name changes"
+
+
+@pytest.mark.django_db
 def test_normal_user_cannot_create_application_rounds(
     user_api_client, valid_application_round_data
 ):
