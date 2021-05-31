@@ -1,6 +1,5 @@
 import React from "react";
 import styled from "styled-components";
-import trim from "lodash/trim";
 import { describeArc } from "../common/util";
 
 interface IProps {
@@ -26,14 +25,14 @@ const Svg = styled.svg`
   height: 100%;
 `;
 
-const Percent = styled.div<{ $percent: number }>`
+const Percent = styled.div<{ $percent: string }>`
   position: absolute;
   text-align: center;
   font-family: var(--tilavaraus-admin-font-bold);
-  font-size: ${({ $percent }) =>
-    String($percent).length < 3 ? "1.8rem" : "1.4rem"};
+  font-size: ${({ $percent }) => ($percent.length < 3 ? "1.8rem" : "1.4rem")};
   width: 100%;
-  margin: 0 0 0 ${({ $percent }) => ($percent < 100 ? "5%" : "2%")};
+  margin: 0 0 0
+    ${({ $percent }) => (Number.parseFloat($percent) < 100 ? "5%" : "2%")};
 
   span {
     font-size: var(--fontsize-body-m);
@@ -87,12 +86,21 @@ const StatusCircle = ({ status, x = 90, y = 90 }: IProps): JSX.Element => {
     </Svg>
   );
 
-  const result =
-    status > 100 ? status.toFixed(0) : trim(status.toFixed(1), ".0");
+  const stringValue = status.toString();
+  let result: string;
+  if (status >= 100) {
+    result = Number.parseFloat(stringValue).toFixed(0);
+  } else if (status === 0) {
+    result = "0";
+  } else if (stringValue.includes(".0") || !stringValue.includes(".")) {
+    result = status.toFixed(0).toString();
+  } else {
+    result = status.toFixed(1).toString();
+  }
 
   return (
     <Wrapper $width={size.x} $height={size.y}>
-      <Percent $percent={Number(result)}>
+      <Percent $percent={result}>
         {result}
         <span>%</span>
       </Percent>

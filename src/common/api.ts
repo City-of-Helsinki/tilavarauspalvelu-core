@@ -15,6 +15,7 @@ import {
   ApplicationRoundStatus,
   ApplicationStatus,
   ReservationStatus,
+  ReservationUnitCapacity,
 } from "./types";
 
 const apiBaseUrl: string = process.env.REACT_APP_TILAVARAUS_API_URL || "";
@@ -32,6 +33,7 @@ const applicationEventWeeklyAmountReductionPath =
   "application_event_weekly_amount_reduction";
 const reservationPath = "reservation";
 const recurringReservationPath = "recurring_reservation";
+const reservationUnitCapacity = "reservation_unit/capacity";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface QueryParameters {}
@@ -388,5 +390,20 @@ export function getReservations(
 export function getReservation(id: number): Promise<Reservation> {
   return apiGet({
     path: `v1/${reservationPath}/${id}`,
+  });
+}
+
+interface IReservationUnitCapacityParams {
+  reservationUnit: number;
+  periodStart: string;
+  periodEnd: string;
+}
+
+export function getReservationUnitCapacity(
+  parameters: IReservationUnitCapacityParams
+): Promise<ReservationUnitCapacity> {
+  return apiGet({
+    path: `v1/${reservationUnitCapacity}`,
+    parameters,
   });
 }

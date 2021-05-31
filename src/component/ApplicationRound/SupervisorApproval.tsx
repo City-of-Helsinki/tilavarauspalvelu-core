@@ -27,12 +27,13 @@ import TimeframeStatus from "./TimeframeStatus";
 import { ContentHeading, H3 } from "../../styles/typography";
 import DataTable, { CellConfig, OrderTypes } from "../DataTable";
 import Dialog from "../Dialog";
+import { formatNumber, parseDuration } from "../../common/util";
 import {
-  formatNumber,
-  parseDuration,
   prepareAllocationResults,
   processAllocationResult,
-} from "../../common/util";
+  getAllocationCapacity,
+  IAllocationCapacity,
+} from "../../common/AllocationResult";
 import BigRadio from "../BigRadio";
 import LinkPrev from "../LinkPrev";
 import Loader from "../Loader";
@@ -204,7 +205,7 @@ const getCellConfig = (
         title: "Application.headings.applicantType",
         key: "applicantType",
         transform: ({ applicantType }: ApplicationType) =>
-          t(`Application.applicantTypes.${applicantType}`),
+          applicantType ? t(`Application.applicantTypes.${applicantType}`) : "",
       },
       {
         title: "Application.headings.recommendations",
@@ -226,7 +227,7 @@ const getCellConfig = (
     index: "id",
     sorting: "organisation.name",
     order: "asc" as OrderTypes,
-    rowLink: ({ id }: ApplicationType) => `/application/${id}`,
+    rowLink: ({ id }: ApplicationType) => `/application/${id}/details`,
   };
 
   const allocatedCellConfig = {
@@ -247,15 +248,12 @@ const getCellConfig = (
         title: "Application.headings.applicantType",
         key: "applicantType",
         transform: ({ applicantType }: AllocationResult) =>
-          t(`Application.applicantTypes.${applicantType}`),
+          applicantType ? t(`Application.applicantTypes.${applicantType}`) : "",
       },
       {
         title: "Recommendation.headings.resolution",
-        key: "applicationAggregatedData.appliedReservationsTotal",
-        transform: ({
-          applicationAggregatedData,
-          applicationEvent,
-        }: AllocationResult) => (
+        key: "aggregatedData.reservationsTotal",
+        transform: ({ aggregatedData, applicationEvent }: AllocationResult) => (
           <div
             style={{
               display: "flex",
@@ -267,11 +265,9 @@ const getCellConfig = (
               {["validated"].includes(applicationEvent.status)
                 ? trim(
                     `${formatNumber(
-                      applicationAggregatedData?.appliedReservationsTotal,
+                      aggregatedData?.reservationsTotal,
                       t("common.volumeUnit")
-                    )} / ${parseDuration(
-                      applicationAggregatedData?.appliedMinDurationTotal
-                    )}`,
+                    )} / ${parseDuration(aggregatedData?.durationTotal)}`,
                     " / "
                   )
                 : t("Recommendation.noRecommendations")}
@@ -393,6 +389,10 @@ function SupervisorApproval({ applicationRoundId }: IProps): JSX.Element {
     setAllocatedCellConfig,
   ] = useState<CellConfig | null>(null);
   const [activeFilter, setActiveFilter] = useState<string>("allocated");
+  const [capacity, setCapacity] = useState<IAllocationCapacity | null>(null);
+  const [filteredApplicationsCount, setFilteredApplicationsCount] = useState<
+    number | null
+  >(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const { t } = useTranslation();
@@ -485,6 +485,15 @@ function SupervisorApproval({ applicationRoundId }: IProps): JSX.Element {
     }
   }, [applicationRound, t]);
 
+  useEffect(() => {
+    if (
+      applicationRound &&
+      ["approved", "sent"].includes(applicationRound.status)
+    ) {
+      history.push(`/applicationRound/${applicationRound.id}`);
+    }
+  }, [applicationRound, history]);
+
   const backLink = "/applicationRounds";
 
   const validatedRecommendations = recommendations.filter((n) =>
@@ -499,6 +508,18 @@ function SupervisorApproval({ applicationRoundId }: IProps): JSX.Element {
   if (isLoading) {
     return <Loader />;
   }
+
+  const calculateCapacity = (
+    rows: AllocationResult[],
+    ar: ApplicationRoundType
+  ): void => {
+    const result: IAllocationCapacity | null = getAllocationCapacity(
+      rows,
+      ar?.aggregatedData.totalHourCapacity,
+      ar?.aggregatedData.totalReservationDuration
+    );
+    setCapacity(result);
+  };
 
   return (
     <Wrapper>
@@ -573,21 +594,47 @@ function SupervisorApproval({ applicationRoundId }: IProps): JSX.Element {
             </NarrowContainer>
             <IngressContainer>
               <IngressFooter>
-                <div>
-                  {activeFilter === "unallocated" && (
-                    <>
-                      <BoldValue>
-                        {formatNumber(
-                          unallocatedApplications.length,
-                          t("common.volumeUnit")
-                        )}
-                      </BoldValue>
-                      <p className="label">
-                        {t("ApplicationRound.unallocatedApplications")}
-                      </p>
-                    </>
-                  )}
-                </div>
+                {activeFilter === "unallocated" && (
+                  <div>
+                    <BoldValue>
+                      {formatNumber(
+                        filteredApplicationsCount,
+                        t("common.volumeUnit")
+                      )}
+                    </BoldValue>
+                    <p className="label">
+                      {t("ApplicationRound.unallocatedApplications")}
+                    </p>
+                  </div>
+                )}{" "}
+                {activeFilter === "allocated" && (
+                  <div>
+                    {capacity && (
+                      <>
+                        <p className="label">
+                          {t("ApplicationRound.schedulesToBeGranted")}
+                        </p>
+                        <BoldValue>
+                          {t("ApplicationRound.percentageOfCapacity", {
+                            percentage: capacity.percentage,
+                          })}
+                        </BoldValue>
+                        <span style={{ marginLeft: "var(--spacing-xs)" }}>
+                          (
+                          {trim(
+                            `${formatNumber(capacity.volume)} ${t(
+                              "common.volumeUnit"
+                            )} / ${formatNumber(capacity.hours)} ${t(
+                              "common.hoursUnit"
+                            )}`,
+                            " / "
+                          )}
+                          )
+                        </span>
+                      </>
+                    )}
+                  </div>
+                )}
                 <div>
                   <BigRadio
                     buttons={[
@@ -616,6 +663,9 @@ function SupervisorApproval({ applicationRoundId }: IProps): JSX.Element {
                 }}
                 cellConfig={unAllocatedCellConfig}
                 filterConfig={unAllocatedFilterConfig}
+                getActiveRows={(rows: ApplicationType[]) => {
+                  setFilteredApplicationsCount(rows.length);
+                }}
               />
             )}
             {activeFilter === "allocated" && allocatedCellConfig && (
@@ -630,6 +680,9 @@ function SupervisorApproval({ applicationRoundId }: IProps): JSX.Element {
                 }}
                 cellConfig={allocatedCellConfig}
                 filterConfig={allocatedFilterConfig}
+                getActiveRows={(rows: AllocationResult[]) => {
+                  calculateCapacity(rows, applicationRound);
+                }}
               />
             )}
             {isCancelDialogVisible && (

@@ -4,9 +4,10 @@ import styled from "styled-components";
 import { IconArrowRight } from "hds-react";
 import { ApplicationRound as ApplicationRoundType } from "../../common/types";
 import { H2, H3 } from "../../styles/typography";
-import { BasicLink, breakpoints } from "../../styles/util";
+import { BasicLink, breakpoints, Strong } from "../../styles/util";
 import ApplicationRoundStatusBlock from "./ApplicationRoundStatusBlock";
 import TimeframeStatus from "./TimeframeStatus";
+import { formatDate, formatNumber, secondsToHms } from "../../common/util";
 
 interface IProps {
   applicationRound: ApplicationRoundType;
@@ -76,20 +77,29 @@ const Bottom = styled.div`
 
 const Details = styled.div`
   & > * {
-    margin-bottom: var(--spacing-xs);
+    margin-bottom: var(--spacing-m);
   }
 
-  @media (min-width: ${breakpoints.m}) {
+  @media (min-width: ${breakpoints.l}) {
     display: grid;
-    width: 60%;
-    grid-template-columns: 1fr 1fr;
+    width: 100%;
+    grid-template-columns: 1fr 1fr 1fr;
     gap: var(--spacing-layout-xl);
   }
+`;
+
+const StatusSuffix = styled.div`
+  margin-top: var(--spacing-2-xs);
+  margin-left: var(--spacing-xl);
 `;
 
 const Value = styled(H2).attrs({ as: "div" })`
   display: inline-block;
   margin-bottom: var(--spacing-3-xs);
+
+  span {
+    word-wrap: nowrap;
+  }
 
   @media (min-width: ${breakpoints.m}) {
     display: block;
@@ -113,8 +123,27 @@ function ApplicationRoundCard({
 }: IProps): JSX.Element {
   const { t } = useTranslation();
 
+  const isApplicationRoundWaitingForApproval = ["validated"].includes(
+    applicationRound.status
+  );
+
   const isApplicationRoundApproved = ["approved"].includes(
     applicationRound.status
+  );
+
+  const reservationUnitLabel =
+    isApplicationRoundWaitingForApproval || isApplicationRoundApproved
+      ? "ApplicationRound.inUniqueReservationUnits"
+      : "ApplicationRound.attachedReservationUnits";
+
+  const allocationResultEventsCount = formatNumber(
+    applicationRound.aggregatedData.allocationResultEventsCount || 0,
+    t("common.volumeUnit")
+  );
+  const allocationDurationTotal = formatNumber(
+    secondsToHms(applicationRound.aggregatedData.allocationDurationTotal || 0)
+      .h,
+    t("common.hoursUnit")
   );
 
   return (
@@ -128,15 +157,44 @@ function ApplicationRoundCard({
       </Top>
       <Bottom>
         <Details>
-          <TimeframeStatus
-            applicationPeriodBegin={applicationRound.applicationPeriodBegin}
-            applicationPeriodEnd={applicationRound.applicationPeriodEnd}
-            isResolved={isApplicationRoundApproved}
-            resolutionDate={applicationRound.statusTimestamp}
-          />
+          <div>
+            <TimeframeStatus
+              applicationPeriodBegin={applicationRound.applicationPeriodBegin}
+              applicationPeriodEnd={applicationRound.applicationPeriodEnd}
+            />
+            {applicationRound.status === "validated" && (
+              <StatusSuffix>
+                <Strong>
+                  {t("Application.approvalPendingDate", {
+                    date: formatDate(applicationRound.statusTimestamp),
+                  })}
+                </Strong>
+              </StatusSuffix>
+            )}
+            {applicationRound.status === "approved" && (
+              <StatusSuffix>
+                <Strong>
+                  {t("ApplicationRound.resolutionDate", {
+                    date: formatDate(applicationRound.statusTimestamp),
+                  })}
+                </Strong>
+              </StatusSuffix>
+            )}
+          </div>
+          <div>
+            {["approved", "validated"].includes(applicationRound.status) && (
+              <>
+                <Value>
+                  <span>{allocationResultEventsCount}</span> /{" "}
+                  <span>{allocationDurationTotal}</span>
+                </Value>
+                <Label>{t("ApplicationRound.schedulesToBeGranted")}</Label>
+              </>
+            )}
+          </div>
           <div>
             <Value>{applicationRound.reservationUnitIds.length}</Value>
-            <Label>{t("ApplicationRound.attachedReservationUnits")}</Label>
+            <Label>{t(reservationUnitLabel)}</Label>
           </div>
         </Details>
         <div>

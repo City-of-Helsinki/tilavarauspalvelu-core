@@ -32,14 +32,15 @@ import DataTable, { CellConfig } from "../DataTable";
 import {
   formatNumber,
   getNormalizedApplicationEventStatus,
-  modifyAllocationResults,
-  normalizeApplicationEventStatus,
   parseAgeGroups,
   parseDuration,
-  prepareAllocationResults,
-  processAllocationResult,
-  secondsToHms,
 } from "../../common/util";
+import {
+  prepareAllocationResults,
+  modifyAllocationResults,
+  processAllocationResult,
+  getAllocationCapacity,
+} from "../../common/AllocationResult";
 import StatusCell from "../StatusCell";
 import {
   getAllocationResults,
@@ -146,22 +147,23 @@ const getFilterConfig = (
   recommendations: AllocationResult[]
 ): DataFilterConfig[] => {
   const purposes = uniq(
-    recommendations.map((rec) => rec.applicationEvent.purpose)
+    recommendations.map((rec: AllocationResult) => rec.applicationEvent.purpose)
   ).sort();
   const statuses = uniq(
-    recommendations.map((rec) => rec.applicationEvent.status)
+    recommendations.map((rec: AllocationResult) => rec.applicationEvent.status)
   );
   const reservationUnits = uniq(
-    recommendations.map((rec) => rec.unitName)
+    recommendations.map((rec: AllocationResult) => rec.unitName)
   ).sort();
-  const baskets = uniq(
-    recommendations
-      .filter((n) => n.basketName)
-      .map((rec) => ({
-        title: `${rec.basketOrderNumber}. ${rec.basketName}`,
-        value: rec.basketName,
-      }))
-  );
+  const baskets = uniqBy(
+    recommendations,
+    (rec: AllocationResult) => rec.basketName
+  )
+    .filter((rec: AllocationResult) => rec.basketName)
+    .map((rec: AllocationResult) => ({
+      title: `${rec.basketOrderNumber}. ${rec.basketName}`,
+      value: rec.basketName,
+    }));
 
   return [
     {
@@ -253,18 +255,15 @@ const getCellConfig = (
         ),
       },
       {
-        // TODO
         title: "Recommendation.headings.recommendationCount",
-        key: "applicationAggregatedData.appliedReservationsTotal",
-        transform: ({ applicationAggregatedData }: AllocationResult) => (
+        key: "aggregatedData.reservationsTotal",
+        transform: ({ aggregatedData }: AllocationResult) => (
           <>
             {trim(
               `${formatNumber(
-                applicationAggregatedData?.appliedReservationsTotal,
+                aggregatedData?.reservationsTotal,
                 t("common.volumeUnit")
-              )} / ${parseDuration(
-                applicationAggregatedData?.appliedMinDurationTotal
-              )}`,
+              )} / ${parseDuration(aggregatedData?.durationTotal)}`,
               " / "
             )}
           </>
@@ -398,25 +397,11 @@ function Handling({
     return <Loader />;
   }
 
-  const getReservationHours = (allocationResults: AllocationResult[]) => {
-    const appEvents = uniqBy(allocationResults, (n) => n.applicationEvent.id);
-    const seconds = appEvents.reduce((acc: number, cur: AllocationResult) => {
-      const isStatusOk = ["validated"].includes(
-        normalizeApplicationEventStatus(cur)
-      );
-      return cur.applicationEvent.aggregatedData
-        .allocationResultsDurationTotal && isStatusOk
-        ? acc +
-            cur.applicationEvent.aggregatedData.allocationResultsDurationTotal
-        : acc;
-    }, 0);
-    const hms = secondsToHms(seconds);
-    return hms.h || 0;
-  };
-
-  const reservedHours =
-    getReservationHours(recommendations) +
-    applicationRound.aggregatedData.totalReservationDuration;
+  const capacity = getAllocationCapacity(
+    recommendations,
+    applicationRound.aggregatedData.totalHourCapacity,
+    applicationRound.aggregatedData.totalReservationDuration
+  );
 
   return (
     <Wrapper>
@@ -449,19 +434,12 @@ function Handling({
                 />
               </div>
               <div>
-                {applicationRound.aggregatedData.totalHourCapacity &&
-                  reservedHours && (
-                    <>
-                      <StatusCircle
-                        status={
-                          (reservedHours /
-                            applicationRound.aggregatedData.totalHourCapacity) *
-                          100
-                        }
-                      />
-                      <H3>{t("ApplicationRound.amountReserved")}</H3>
-                    </>
-                  )}
+                {applicationRound.aggregatedData.totalHourCapacity && capacity && (
+                  <>
+                    <StatusCircle status={capacity.percentage} />
+                    <H3>{t("ApplicationRound.amountReserved")}</H3>
+                  </>
+                )}
               </div>
             </TopIngress>
           </IngressContainer>
