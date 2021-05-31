@@ -335,6 +335,13 @@ const translations: Translations = {
     dateLong: ['{{date, dd.MM.yyyy}}'],
     time: ['{{date, HH:mm}}'],
     today: ['Tänään', 'Today', 'I dag'],
+    'weekDayLong.0': ['Sunnuntai'],
+    'weekDayLong.1': ['Maanantai'],
+    'weekDayLong.2': ['Tiistai'],
+    'weekDayLong.3': ['Keskiviikko'],
+    'weekDayLong.4': ['Torstai'],
+    'weekDayLong.5': ['Perjantai'],
+    'weekDayLong.6': ['Lauantai'],
     'weekDay.0': ['Su'],
     'weekDay.1': ['Ma'],
     'weekDay.2': ['Ti'],
@@ -354,6 +361,8 @@ const translations: Translations = {
     'month.9': ['Lokakuu'],
     'month.10': ['Marraskuu'],
     'month.11': ['Joulukuu'],
+    hour: ['{{count}} tunti'],
+    hour_plural: ['{{count}} tuntia'],
     error: {
       dataError: ['Tietoja ei saatu haettua'],
     },
@@ -372,7 +381,6 @@ const translations: Translations = {
     search: ['Hae', 'Search', 'Sök'],
     noResults: ['Ei tuloksia', 'No results', 'Inga resultat'],
     select: ['Valitse', 'Choose', 'Välja'],
-    hour: ['Tunti'],
     abbreviations: {
       hour: ['t', 'h', 'h'],
       minute: ['min', 'min', 'min'],
@@ -498,6 +506,21 @@ const translations: Translations = {
     showCalendar: ['Näytä kalenterissa'],
     download: ['Lataa päätös (.pdf)'],
     generating: ['Dokumenttia luodaan'],
+    errorGeneratingPDF: ['PDF Dokumenttia ei pystytty luomaan'],
+  },
+
+  EventSummary: {
+    space: ['Tila'],
+    purpose: ['Käyttötarkoitus'],
+    begin: ['Alkaa'],
+    end: ['Päättyy'],
+    weekDay: ['Päivä'],
+    time: ['Kellonaika'],
+    notAvailable: ['Poikkeukset, jolloin vakiovuoro ei ole käytettävissänne'],
+    duration: ['Vuoron kesto {{duration}}'],
+    everyWeek: ['Viikottain'],
+    everyOtherWeek: ['Joka toinen viikko'],
+    showList: ['Näytä yksityiskohtainen vuorolista'],
   },
   ReservationUnit: {
     backToSearch: ['Takaisin hakutuloksiin'],
@@ -508,13 +531,21 @@ const translations: Translations = {
   },
 
   ReservationList: {
-    granted: ['Sinulle on myönnetty seuraavat käyttövuorot'],
-    denied: ['Seuraavia käyttövuoroja ei voitu myöntää'],
+    granted: ['Myönnetty ryhmälle {{groupName}}'],
+    denied: ['Poikkeukset, jolloin vakiovuoro ei ole käytettävissänne'],
+    headerWeekday: ['Viikonpäivä'],
+    headerDate: ['Päivämäärä'],
+    headerTime: ['Kellonaika'],
   },
   search: {
     heading: ['Vakiovuorojen tilat'],
     text: ['Valitse tilat, joihin haluat hakea vakiovuoroja'],
   },
+  EventReservationUnitDetails: {
+    back: ['Takaisin Vuorojaon päätös'],
+    reservations: ['Myönnetyt vuorot'],
+  },
+
   SearchForm: {
     searchTermPlaceholder: ['Hae sanalla', 'Search with words', 'Sök med ord'],
     searchButton: ['Hae tilaa'],

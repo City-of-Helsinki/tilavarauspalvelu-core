@@ -6,10 +6,11 @@ import './index.scss';
 import './variables.css';
 import Routes from './common/routes';
 import Applications from './applications/Applications';
-import Resolution from './applications/Reservations';
+import Reservations from './applications/Reservations';
 import Application from './application/Application';
 import { isBrowser } from './common/const';
 import Intro from './application/intro/Intro';
+import EventReservationUnitDetails from './applications/EventReservationUnitDetails';
 
 const OidcSecure = isBrowser
   ? // eslint-disable-next-line
@@ -45,7 +46,12 @@ function App(): JSX.Element {
                   <Applications />
                 </Route>
                 <Route path="/applications/:applicationId" exact>
-                  <Resolution />
+                  <Reservations />
+                </Route>
+                <Route
+                  path="/applications/details/:applicationId/:eventId/:reservationUnitId"
+                  exact>
+                  <EventReservationUnitDetails />
                 </Route>
               </OidcSecure>
             </>

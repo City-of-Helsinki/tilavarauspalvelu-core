@@ -5,6 +5,7 @@ import { breakpoint } from '../common/style';
 export const TwoColumnContainer = styled.div`
   @media (max-width: ${breakpoint.m}) {
     grid-template-columns: 1fr;
+    gap: 0;
   }
 
   margin-top: var(--spacing-m);
@@ -15,12 +16,10 @@ export const TwoColumnContainer = styled.div`
 `;
 
 export const SpanTwoColumns = styled.span`
-  grid-column-start: 1;
-  grid-column-end: 3;
+  grid-column: span 2;
 
   @media (max-width: ${breakpoint.m}) {
-    grid-column-start: 1;
-    grid-column-end: 2;
+    grid-column: span 1;
   }
 `;
 

@@ -87,6 +87,28 @@ export const uiDateToApiDate = (date: string): string => {
   return toApiDate(fromUIDate(date));
 };
 
+export const formatDurationMinutes = (duration: number): string => {
+  if (!duration) {
+    return '-';
+  }
+
+  const hour = Math.floor(duration / 60);
+  const min = Math.floor(duration % 60);
+
+  const p = [];
+
+  if (hour) {
+    p.push(i18next.t('common.hour', { count: hour }).toLocaleLowerCase());
+  }
+  if (min) {
+    p.push(
+      `${min} ${i18next.t('common.abbreviations.minute').toLocaleLowerCase()}`
+    );
+  }
+
+  return p.join(' ');
+};
+
 export const formatDuration = (duration: string): string => {
   if (!duration) {
     return '-';
@@ -95,15 +117,7 @@ export const formatDuration = (duration: string): string => {
   if (time.length < 3) {
     return '-';
   }
-  return `${
-    Number(time[0])
-      ? `${`${Number(time[0])} ${i18next
-          .t('common.hour')
-          .toLocaleLowerCase()}`} `
-      : ''
-  }${
-    Number(time[1]) ? time[1] + i18next.t('common.abbreviations.minute') : ''
-  }`;
+  return formatDurationMinutes(60 * Number(time[0]) + Number(time[1]));
 };
 
 export const formatApiDate = (date: string): string => {

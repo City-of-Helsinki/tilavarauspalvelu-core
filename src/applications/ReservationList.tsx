@@ -2,12 +2,13 @@ import { TFunction } from 'i18next';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import { breakpoint } from '../common/style';
 import { Reservation } from '../common/types';
-import { localizedValue, parseDate } from '../common/util';
+import { parseDate } from '../common/util';
+import { Strong } from '../common/Typography';
 
 type Props = {
   reservations?: Reservation[];
+  groupName: string;
 };
 
 const Container = styled.div`
@@ -15,62 +16,76 @@ const Container = styled.div`
 `;
 
 const InfoText = styled.div`
-  margin-top: var(--spacing-l);
-  font-size: var(--fontsize-heading-m);
+  margin-top: var(--spacing-layout-l);
+  margin-bottom: var(--spacing-m);
+  font-size: var(--fontsize-heading-s);
 `;
 
-const TwoColLayout = styled.div`
-  margin-top: var(--spacing-m);
-  display: grid;
-  grid-gap: 0.5em;
-  grid-template-columns: 2fr 9fr;
-  @media (max-width: ${breakpoint.m}) {
-    grid-template-columns: 1fr;
-    gap: 0;
+const Table = styled.table`
+  width: 50%;
+
+  th {
+    text-align: left;
+  }
+  tr {
+    height: var(--spacing-layout-s);
   }
 `;
 
-const reservationLine = (
-  reservation: Reservation,
-  t: TFunction,
-  language: string
-) => {
+const reservationLine = (reservation: Reservation, t: TFunction) => {
   const begin = parseDate(reservation.begin);
   const end = parseDate(reservation.end);
   return (
-    <TwoColLayout>
-      <span>
-        {t('common.dateLong', { date: begin })}{' '}
+    <tr>
+      <td>{t(`common.weekDayLong.${begin.getDay()}`)} </td>
+      <td>{t('common.dateLong', { date: begin })} </td>
+      <td>
         {t('common.time', { date: begin })}-{t('common.time', { date: end })}
-      </span>
-      <span>
-        {reservation.reservationUnit
-          .map((ru) => localizedValue(ru.name, language))
-          .join(',')}
-      </span>
-    </TwoColLayout>
+      </td>
+    </tr>
   );
 };
 
-const ReservationList = ({ reservations }: Props): JSX.Element | null => {
-  const { t, i18n } = useTranslation();
+const ReservationList = ({
+  reservations,
+  groupName,
+}: Props): JSX.Element | null => {
+  const { t } = useTranslation();
   const sortedReservations = reservations?.sort(
     (r1, r2) => parseDate(r1.begin).getTime() - parseDate(r2.begin).getTime()
   );
+
+  const tableHeader = (
+    <tr>
+      <th>{t('ReservationList.headerWeekday')}</th>
+      <th>{t('ReservationList.headerDate')}</th>
+      <th>{t('ReservationList.headerTime')}</th>
+    </tr>
+  );
   return (
     <Container>
-      <InfoText>{t('ReservationList.granted')}:</InfoText>
-      {sortedReservations
-        ?.filter((res) => res.state === 'confirmed')
-        .map((reservation) => {
-          return reservationLine(reservation, t, i18n.language);
-        })}
-      <InfoText>{t('ReservationList.denied')}:</InfoText>
-      {sortedReservations
-        ?.filter((res) => res.state === 'denied')
-        .map((reservation) => {
-          return reservationLine(reservation, t, i18n.language);
-        })}
+      <InfoText>
+        <Strong>{t('ReservationList.granted', { groupName })}</Strong>
+      </InfoText>
+      <Table>
+        {tableHeader}
+        {sortedReservations
+          ?.filter((res) => res.state === 'confirmed')
+          .map((reservation) => {
+            return reservationLine(reservation, t);
+          })}
+      </Table>
+      <InfoText>
+        <Strong>{t('ReservationList.denied')}</Strong>
+      </InfoText>
+      <Table>
+        {tableHeader}
+        {sortedReservations
+          ?.filter((res) => res.state === 'denied')
+          .map((reservation) => {
+            return reservationLine(reservation, t);
+          })}
+      </Table>
     </Container>
   );
 };
