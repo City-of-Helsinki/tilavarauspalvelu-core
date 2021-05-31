@@ -16,7 +16,8 @@ export type ApplicationRoundStatus =
 export type NormalizedApplicationRoundStatus =
   | ApplicationRoundStatus
   | "incoming"
-  | "handling";
+  | "handling"
+  | "sent";
 
 export type ApplicationRoundBasket = any; // eslint-disable-line
 
