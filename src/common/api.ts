@@ -24,16 +24,17 @@ const applicationRoundsBasePath = "application_round";
 const reservationUnitsBasePath = "reservation_unit";
 const parameterBasePath = "parameters";
 const applicationBasePath = "application";
-const allocationRequestPath = "allocation_request";
-const allocationResultPath = "allocation_results";
-const applicationEventStatusPath = "application_event_status";
-const declinedApplicationEventReservationUnitsPath =
+const allocationRequestBasePath = "allocation_request";
+const allocationResultBasePath = "allocation_results";
+const applicationEventStatusBasePath = "application_event_status";
+const declinedApplicationEventReservationUnitsBasePath =
   "application_event_declined_reservation_unit";
-const applicationEventWeeklyAmountReductionPath =
+const applicationEventWeeklyAmountReductionBasePath =
   "application_event_weekly_amount_reduction";
-const reservationPath = "reservation";
+const reservationBasePath = "reservation";
 const recurringReservationPath = "recurring_reservation";
-const reservationUnitCapacity = "reservation_unit/capacity";
+const reservationUnitCapacityBasePath = "reservation_unit/capacity";
+const applicationStatusBasePath = "application_status";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface QueryParameters {}
@@ -223,13 +224,13 @@ export function getApplications(
   });
 }
 
-export function patchApplicationStatus(
+export function setApplicationStatus(
   applicationId: number,
   status: ApplicationStatus
 ): Promise<Application> {
-  return apiPatch<Application>({
-    data: { status },
-    path: `v1/${applicationBasePath}/${applicationId}/`,
+  return apiPost<Application>({
+    data: { applicationId, status },
+    path: `v1/${applicationStatusBasePath}/`,
   });
 }
 
@@ -243,13 +244,13 @@ export function triggerAllocation(
 ): Promise<AllocationRequest> {
   return apiPost({
     data: params,
-    path: `v1/${allocationRequestPath}/`,
+    path: `v1/${allocationRequestBasePath}/`,
   });
 }
 
 export function getAllocationStatus(id: number): Promise<AllocationRequest> {
   return apiGet({
-    path: `v1/${allocationRequestPath}/${id}`,
+    path: `v1/${allocationRequestBasePath}/${id}`,
   });
 }
 
@@ -266,7 +267,7 @@ export function getAllocationResults(
 ): Promise<AllocationResult[]> {
   return apiGet({
     parameters: params,
-    path: `v1/${allocationResultPath}`,
+    path: `v1/${allocationResultBasePath}`,
   });
 }
 
@@ -280,13 +281,13 @@ export function getAllocationResult(
 ): Promise<AllocationResult> {
   return apiGet({
     parameters: omit(params, "id"),
-    path: `v1/${allocationResultPath}/${params.id}`,
+    path: `v1/${allocationResultBasePath}/${params.id}`,
   });
 }
 
 export function deleteAllocationResult(id: number): Promise<void> {
   return apiDelete({
-    path: `v1/${allocationResultPath}/${id}/`,
+    path: `v1/${allocationResultBasePath}/${id}/`,
   });
 }
 
@@ -300,7 +301,7 @@ export function setApplicationEventStatuses(
 ): Promise<ApplicationEventPayload[]> {
   return apiPost({
     data: payload,
-    path: `v1/${applicationEventStatusPath}/`,
+    path: `v1/${applicationEventStatusBasePath}/`,
   });
 }
 
@@ -308,7 +309,7 @@ export function getDeclinedApplicationEventReservationUnits(
   applicationEventId: number
 ): Promise<ApplicationEventsDeclinedReservationUnits> {
   return apiGet({
-    path: `v1/${declinedApplicationEventReservationUnitsPath}/${applicationEventId}`,
+    path: `v1/${declinedApplicationEventReservationUnitsBasePath}/${applicationEventId}`,
   });
 }
 
@@ -320,7 +321,7 @@ export function setDeclinedApplicationEventReservationUnits(
     data: {
       declinedReservationUnitIds: reservationUnitIds,
     },
-    path: `v1/${declinedApplicationEventReservationUnitsPath}/${applicationEventId}/`,
+    path: `v1/${declinedApplicationEventReservationUnitsBasePath}/${applicationEventId}/`,
   });
 }
 
@@ -329,7 +330,7 @@ export function setApplicationEventScheduleResultStatus(
   accepted: boolean
 ): Promise<AllocationResult> {
   return apiPatch({
-    path: `v1/${allocationResultPath}/${id}/`,
+    path: `v1/${allocationResultBasePath}/${id}/`,
     data: {
       accepted,
     },
@@ -340,7 +341,7 @@ export function rejectApplicationEventSchedule(
   applicationEventScheduleResultId: number
 ): Promise<void> {
   return apiPost({
-    path: `v1/${applicationEventWeeklyAmountReductionPath}/`,
+    path: `v1/${applicationEventWeeklyAmountReductionBasePath}/`,
     data: { applicationEventScheduleResultId },
   });
 }
@@ -382,14 +383,14 @@ export function getReservations(
   parameters: IReservationParams
 ): Promise<Reservation[]> {
   return apiGet({
-    path: `v1/${reservationPath}`,
+    path: `v1/${reservationBasePath}`,
     parameters,
   });
 }
 
 export function getReservation(id: number): Promise<Reservation> {
   return apiGet({
-    path: `v1/${reservationPath}/${id}`,
+    path: `v1/${reservationBasePath}/${id}`,
   });
 }
 
@@ -403,7 +404,7 @@ export function getReservationUnitCapacity(
   parameters: IReservationUnitCapacityParams
 ): Promise<ReservationUnitCapacity> {
   return apiGet({
-    path: `v1/${reservationUnitCapacity}`,
+    path: `v1/${reservationUnitCapacityBasePath}`,
     parameters,
   });
 }

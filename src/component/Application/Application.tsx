@@ -17,7 +17,7 @@ import {
   getApplication,
   getApplicationRound,
   getRecurringReservations,
-  patchApplicationStatus,
+  setApplicationStatus,
 } from "../../common/api";
 import Loader from "../Loader";
 import {
@@ -322,20 +322,20 @@ function Application(): JSX.Element | null {
     }
   }, [application, applicationRound]);
 
-  const setApplicationStatus = async (
+  const modifyApplicationStatus = async (
     app: ApplicationType,
     status: ApplicationStatus,
     useNotification = false
   ) => {
     if (!app) return;
     try {
+      setErrorMsg(null);
       setIsSaving(true);
-      const result = await patchApplicationStatus(app.id, status);
-      fetchApplication(result.id);
+      await setApplicationStatus(app.id, status);
+      fetchApplication(app.id);
       if (useNotification) {
         setStatusNotification(status);
       }
-      setErrorMsg(null);
     } catch (error) {
       setErrorMsg("errors.errorSavingApplication");
     } finally {
@@ -355,14 +355,14 @@ function Application(): JSX.Element | null {
       action = {
         text: t("Application.actions.declineApplication"),
         button: "secondary",
-        function: () => setApplicationStatus(application, "declined", true),
+        function: () => modifyApplicationStatus(application, "declined", true),
       };
       break;
     case "declined":
       action = {
         text: t("Application.actions.returnAsPartOfAllocation"),
         button: "primary",
-        function: () => setApplicationStatus(application, "in_review", true),
+        function: () => modifyApplicationStatus(application, "in_review", true),
       };
       break;
     default:
@@ -734,7 +734,7 @@ function Application(): JSX.Element | null {
                     {normalizedApplicationStatus === "approved" && (
                       <MarkAsResolutionSentBtn
                         onClick={() =>
-                          setApplicationStatus(application, "sent")
+                          modifyApplicationStatus(application, "sent")
                         }
                       >
                         {t("Application.markAsResolutionSent")}
@@ -743,7 +743,7 @@ function Application(): JSX.Element | null {
                     {normalizedApplicationStatus === "sent" && (
                       <MarkAsResolutionNotSentBtn
                         onClick={() =>
-                          setApplicationStatus(application, "in_review")
+                          modifyApplicationStatus(application, "in_review")
                         }
                       >
                         {t("Application.markAsResolutionNotSent")}
