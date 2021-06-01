@@ -312,7 +312,7 @@ function Handling({
 
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [isAllocating, setIsAllocating] = useState(false);
+  const [isAllocating, setIsAllocating] = useState(applicationRound.allocating);
   const [recommendations, setRecommendations] = useState<AllocationResult[]>(
     []
   );
