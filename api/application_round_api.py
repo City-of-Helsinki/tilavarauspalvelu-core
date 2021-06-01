@@ -246,6 +246,9 @@ class ApplicationRoundSerializer(serializers.ModelSerializer):
         return application_round
 
     def update(self, instance, validated_data):
+        if self.partial:
+            return self.partial_update(instance, validated_data)
+
         request = self.context["request"] if "request" in self.context else None
         request_user = (
             request.user if request and request.user.is_authenticated else None
@@ -265,8 +268,22 @@ class ApplicationRoundSerializer(serializers.ModelSerializer):
 
         return application_round
 
+    def partial_update(self, instance, validated_data):
+        request = self.context["request"] if "request" in self.context else None
+        request_user = (
+            request.user if request and request.user.is_authenticated else None
+        )
+        status = validated_data.pop("status", None)
+        if status:
+            instance.set_status(status, request_user)
+        instance = super().update(instance, validated_data)
+        return instance
+
     def validate(self, data):
-        baskets = data["application_round_baskets"]
+        baskets = data.get("application_round_baskets", None)
+        if self.partial and not baskets:
+            return data
+
         basket_order_numbers = list(map(lambda basket: basket["order_number"], baskets))
         if len(basket_order_numbers) > len(set(basket_order_numbers)):
             raise serializers.ValidationError("Order numbers should be unique")
