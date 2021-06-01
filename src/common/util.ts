@@ -51,7 +51,7 @@ export const getNormalizedApplicationStatus = (
   view: ApplicationRoundStatus
 ): ApplicationStatus => {
   let normalizedStatus: ApplicationStatus = status;
-  if (["draft", "in_review"].includes(view)) {
+  if (["draft", "in_review", "allocated"].includes(view)) {
     if (status === "in_review") {
       normalizedStatus = "review_done";
     }
