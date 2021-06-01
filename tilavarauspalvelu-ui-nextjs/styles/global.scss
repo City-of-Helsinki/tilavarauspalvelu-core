@@ -1,0 +1,66 @@
+/*@import "@hds-core/lib/base.css";
+@import "~hds-design-tokens/lib/all.scss";
+
+*/
+
+@import "font";
+@import "variables";
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--tilavaraus-gray);
+  font-family: var(--font-medium);
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  margin: 0;
+  margin: 0;
+}
+
+#root {
+  padding: 0;
+  margin: 0;
+  flex-direction: column;
+  display: flex;
+}
+
+// utils
+
+// adjust kortos svg similary to footer
+.koros > svg {
+  left: 50%;
+  position: relative;
+  transform: translateX(-50%);
+  width: 8028px;
+}
+
+.koros {
+  overflow-x: hidden;
+}
+
+h1,
+h2 {
+  font-family: var(--font-bold);
+}
+
+// align items for example icon + text vertically
+.align-vertically {
+  display: flex;
+  align-items: center;
+}
+
+.margin-left-s {
+  margin-left: var(--spacing-s);
+}
+
+.margin-top {
+  margin-top: var(--spacing-s);
+}
