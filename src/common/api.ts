@@ -291,6 +291,20 @@ export function deleteAllocationResult(id: number): Promise<void> {
   });
 }
 
+export interface ApplicationStatusPayload {
+  status: ApplicationStatus;
+  applicationId: number;
+}
+
+export function setApplicationStatuses(
+  payload: ApplicationStatusPayload[]
+): Promise<ApplicationStatusPayload[]> {
+  return apiPost({
+    data: payload,
+    path: `v1/${applicationStatusBasePath}/`,
+  });
+}
+
 interface ApplicationEventPayload {
   status: ApplicationEventStatus;
   applicationEventId: number;

@@ -185,8 +185,13 @@ function ApplicationRoundCard({
             {["approved", "validated"].includes(applicationRound.status) && (
               <>
                 <Value>
-                  <span>{allocationResultEventsCount}</span> /{" "}
-                  <span>{allocationDurationTotal}</span>
+                  <span>{allocationResultEventsCount}</span>
+                  {allocationDurationTotal && (
+                    <>
+                      {"/ "}
+                      <span>{allocationDurationTotal}</span>
+                    </>
+                  )}
                 </Value>
                 <Label>{t("ApplicationRound.schedulesToBeGranted")}</Label>
               </>
