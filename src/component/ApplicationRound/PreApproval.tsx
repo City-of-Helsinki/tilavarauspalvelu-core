@@ -377,7 +377,7 @@ function PreApproval({
 
         const applicationsResult = await getApplications({
           applicationRound: arId,
-          status: "draft,in_review,review_done,declined",
+          status: "in_review,review_done,declined",
         });
 
         const processedResult = processAllocationResult(allocationResults);
@@ -386,7 +386,8 @@ function PreApproval({
           processedResult.map((result) => result.applicationId)
         );
         const unallocatedApps = applicationsResult.filter(
-          (application) => !allocatedApplicationIds.includes(application.id)
+          (application: ApplicationType) =>
+            !allocatedApplicationIds.includes(application.id)
         );
 
         setUnallocatedFilterConfig(
