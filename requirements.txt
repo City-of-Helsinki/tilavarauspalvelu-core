@@ -278,7 +278,7 @@ unidecode==1.2.0
     # via graphene-django
 uritemplate==3.0.1
     # via drf-spectacular
-urllib3==1.26.4
+urllib3==1.26.5
     # via
     #   elastic-apm
     #   requests
