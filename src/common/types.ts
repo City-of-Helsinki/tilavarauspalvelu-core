@@ -11,8 +11,7 @@ export type ApplicationRoundStatus =
   | "allocated"
   | "handled"
   | "validated"
-  | "approved"
-  | "sent";
+  | "approved";
 
 export type NormalizedApplicationRoundStatus =
   | ApplicationRoundStatus
@@ -47,6 +46,7 @@ export type ApplicationRound = {
   statusTimestamp: string;
   allocating: boolean;
   isAdmin: boolean;
+  applicationsSent: boolean;
 };
 
 export type Space = {
