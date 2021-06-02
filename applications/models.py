@@ -770,6 +770,7 @@ class ApplicationEvent(models.Model):
     declined_reservation_units = models.ManyToManyField(
         ReservationUnit,
         verbose_name=_("Declined reservation units"),
+        blank=True,
     )
 
     @property
