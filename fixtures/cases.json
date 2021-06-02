@@ -1467,6 +1467,17 @@
       }
     },
     {
+        "model": "reservations.recurringreservation",
+        "pk": 1,
+        "fields": {
+            "user": null,
+            "application": 1,
+            "application_event": 1,
+            "age_group": 1,
+            "ability_group": 1
+        }
+    },
+    {
         "model": "reservations.reservation",
         "pk": 1,
         "fields": {
