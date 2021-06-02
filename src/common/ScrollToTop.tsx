@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { useScrollPosition } from "@n8tb1t/use-scroll-position";
 import { Button, IconAngleUp } from "hds-react";
+import { useDebounce, useWindowSize } from "react-use";
+import { breakpoints } from "../styles/util";
 
 const Btn = styled(Button).attrs({
   style: {
@@ -20,8 +22,26 @@ const Btn = styled(Button).attrs({
   justify-content: center;
 `;
 
+const breakpoint = breakpoints.m;
+
 function ScrollToTop(): JSX.Element | null {
+  const [isEnabled, setIsEnabled] = useState<boolean>(false);
   const [isVisible, setIsVisible] = useState<boolean>(false);
+
+  const { width } = useWindowSize();
+
+  const checkBreakpoint = (w: number) => {
+    setIsEnabled(w > parseInt(breakpoint, 10));
+  };
+
+  // eslint-disable-next-line no-empty-pattern
+  const [] = useDebounce(
+    () => {
+      checkBreakpoint(width);
+    },
+    300,
+    [width]
+  );
 
   useScrollPosition(
     ({ currPos }) => {
@@ -34,7 +54,7 @@ function ScrollToTop(): JSX.Element | null {
     300
   );
 
-  return isVisible ? (
+  return isEnabled && isVisible ? (
     <Btn onClick={() => window.scroll({ top: 0, left: 0, behavior: "smooth" })}>
       <IconAngleUp />
     </Btn>

@@ -27,12 +27,8 @@ import {
   Application as ApplicationType,
   ApplicationRound as ApplicationRoundType,
 } from "../../common/types";
-import {
-  formatNumber,
-  parseAgeGroups,
-  parseDuration,
-  processAllocationResult,
-} from "../../common/util";
+import { formatNumber, parseAgeGroups, parseDuration } from "../../common/util";
+import { processAllocationResult } from "../../common/AllocationResult";
 import {
   ContentContainer,
   IngressContainer,
@@ -603,12 +599,10 @@ function Recommendation(): JSX.Element {
                 <Value>
                   {trim(
                     `${formatNumber(
-                      recommendation.applicationAggregatedData
-                        ?.appliedReservationsTotal,
+                      recommendation.aggregatedData?.reservationsTotal,
                       t("common.volumeUnit")
                     )} / ${parseDuration(
-                      recommendation.applicationAggregatedData
-                        ?.appliedMinDurationTotal
+                      recommendation.aggregatedData?.durationTotal
                     )}`,
                     " / "
                   )}

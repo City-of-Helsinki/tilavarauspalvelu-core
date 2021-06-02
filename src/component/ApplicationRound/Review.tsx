@@ -11,11 +11,16 @@ import { ContentHeading, H2 } from "../../styles/typography";
 import { breakpoints } from "../../styles/util";
 import { IngressContainer } from "../../styles/layout";
 import DataTable, { CellConfig } from "../DataTable";
-import { getApplications } from "../../common/api";
+import {
+  getApplications,
+  setApplicationStatuses,
+  ApplicationStatusPayload,
+} from "../../common/api";
 import {
   Application as ApplicationType,
   ApplicationRound as ApplicationRoundType,
   ApplicationRoundStatus,
+  ApplicationStatus,
   DataFilterConfig,
 } from "../../common/types";
 import TimeframeStatus from "./TimeframeStatus";
@@ -204,8 +209,15 @@ function Review({
 
   const { t } = useTranslation();
 
-  const setApplicationRoundAsReviewed = () => {
-    setApplicationRoundStatus("review_done");
+  const setApplicationRoundAsReviewed = async (applicationIds: number[]) => {
+    const payload = applicationIds.map(
+      (applicationId: number): ApplicationStatusPayload => ({
+        status: "review_done" as ApplicationStatus,
+        applicationId,
+      })
+    );
+    await setApplicationRoundStatus("review_done");
+    await setApplicationStatuses(payload);
   };
 
   useEffect(() => {
@@ -233,6 +245,13 @@ function Review({
   if (isLoading) {
     return <Loader />;
   }
+
+  const greenApplicationIds: number[] = applications
+    .filter(
+      (application: ApplicationType) =>
+        !["declined"].includes(application.status)
+    )
+    .map((application: ApplicationType) => application.id);
 
   return (
     <Wrapper>
@@ -269,7 +288,9 @@ function Review({
                 <div>
                   <SubmitButton
                     disabled={!isApplicationChecked}
-                    onClick={setApplicationRoundAsReviewed}
+                    onClick={() =>
+                      setApplicationRoundAsReviewed(greenApplicationIds)
+                    }
                   >
                     {t("Application.gotoSplitPreparation")}
                   </SubmitButton>

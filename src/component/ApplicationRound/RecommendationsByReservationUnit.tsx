@@ -12,6 +12,7 @@ import {
 } from "hds-react";
 import trim from "lodash/trim";
 import uniq from "lodash/uniq";
+import uniqBy from "lodash/uniqBy";
 import { TFunction } from "i18next";
 import { ContentContainer, IngressContainer } from "../../styles/layout";
 import { H1, H3 } from "../../styles/typography";
@@ -23,12 +24,14 @@ import {
   DataFilterConfig,
   AllocationResult,
   ReservationUnit,
+  ReservationUnitCapacity,
 } from "../../common/types";
 import DataTable, { CellConfig } from "../DataTable";
 import {
   getAllocationResults,
   getApplicationRound,
   getReservationUnit,
+  getReservationUnitCapacity,
 } from "../../common/api";
 import Loader from "../Loader";
 import {
@@ -38,16 +41,19 @@ import {
   parseAddress,
   parseAgeGroups,
   parseDuration,
+} from "../../common/util";
+import {
   prepareAllocationResults,
   processAllocationResult,
   modifyAllocationResults,
-} from "../../common/util";
+} from "../../common/AllocationResult";
 import StatusCell from "../StatusCell";
 // import StatusCircle from "../StatusCircle";
 import RecommendationCount from "./RecommendationCount";
 import i18n from "../../i18n";
 import SelectionActionBar from "../SelectionActionBar";
 import { ReactComponent as IconBulletList } from "../../images/icon_list-bullet.svg";
+import StatusCircle from "../StatusCircle";
 
 interface IRouteParams {
   applicationRoundId: string;
@@ -194,16 +200,14 @@ const getCellConfig = (
       },
       {
         title: "Recommendation.headings.recommendationCount",
-        key: "applicationAggregatedData.appliedReservationsTotal",
-        transform: ({ applicationAggregatedData }: AllocationResult) => (
+        key: "aggregatedData.appliedReservationsTotal",
+        transform: ({ aggregatedData }: AllocationResult) => (
           <>
             {trim(
               `${formatNumber(
-                applicationAggregatedData?.appliedReservationsTotal,
+                aggregatedData?.reservationsTotal,
                 t("common.volumeUnit")
-              )} / ${parseDuration(
-                applicationAggregatedData?.appliedMinDurationTotal
-              )}`,
+              )} / ${parseDuration(aggregatedData?.durationTotal)}`,
               " / "
             )}
           </>
@@ -233,7 +237,7 @@ const getCellConfig = (
     rowLink: ({ applicationEventScheduleId }: AllocationResult) => {
       return applicationEventScheduleId && applicationRound
         ? `/applicationRound/${applicationRound.id}/recommendation/${applicationEventScheduleId}`
-        : "/foobar";
+        : "";
     },
   };
 };
@@ -242,22 +246,23 @@ const getFilterConfig = (
   recommendations: AllocationResult[]
 ): DataFilterConfig[] => {
   const purposes = uniq(
-    recommendations.map((rec) => rec.applicationEvent.purpose)
+    recommendations.map((rec: AllocationResult) => rec.applicationEvent.purpose)
   ).sort();
   const statuses = uniq(
-    recommendations.map((rec) => rec.applicationEvent.status)
+    recommendations.map((rec: AllocationResult) => rec.applicationEvent.status)
   );
   const reservationUnits = uniq(
-    recommendations.map((rec) => rec.unitName)
+    recommendations.map((rec: AllocationResult) => rec.unitName)
   ).sort();
-  const baskets = uniq(
-    recommendations
-      .filter((n) => n.basketName)
-      .map((rec) => ({
-        title: `${rec.basketOrderNumber}. ${rec.basketName}`,
-        value: rec.basketName,
-      }))
-  );
+  const baskets = uniqBy(
+    recommendations,
+    (rec: AllocationResult) => rec.basketName
+  )
+    .filter((rec: AllocationResult) => rec.basketName)
+    .map((rec: AllocationResult) => ({
+      title: `${rec.basketOrderNumber}. ${rec.basketName}`,
+      value: rec.basketName,
+    }));
 
   return [
     {
@@ -302,8 +307,8 @@ function RecommendationsByReservationUnit(): JSX.Element {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [recommendations, setRecommendations] = useState<
-    AllocationResult[] | []
-  >([]);
+    AllocationResult[] | null
+  >(null);
   const [
     reservationUnit,
     setReservationUnit,
@@ -312,6 +317,10 @@ function RecommendationsByReservationUnit(): JSX.Element {
     applicationRound,
     setApplicationRound,
   ] = useState<ApplicationRoundType | null>(null);
+  const [
+    reservationUnitCapacity,
+    setReservationUnitCapacity,
+  ] = useState<ReservationUnitCapacity | null>(null);
   const [cellConfig, setCellConfig] = useState<CellConfig | null>(null);
   const [filterConfig, setFilterConfig] = useState<DataFilterConfig[] | null>(
     null
@@ -341,8 +350,23 @@ function RecommendationsByReservationUnit(): JSX.Element {
       setRecommendations(filteredResult || []);
     } catch (error) {
       setErrorMsg("errors.errorFetchingApplications");
-    } finally {
       setIsLoading(false);
+    }
+  };
+
+  const fetchReservationUnitCapacity = async (
+    ruId: number,
+    ar: ApplicationRoundType
+  ) => {
+    try {
+      const result = await getReservationUnitCapacity({
+        reservationUnit: ruId,
+        periodStart: ar.reservationPeriodBegin,
+        periodEnd: ar.reservationPeriodEnd,
+      });
+      setReservationUnitCapacity(result);
+    } catch (error) {
+      console.error(t("errors.errorFetchingCapacity")); // eslint-disable-line no-console
     }
   };
 
@@ -362,7 +386,6 @@ function RecommendationsByReservationUnit(): JSX.Element {
             ? "errors.applicationRoundNotFound"
             : "errors.errorFetchingData";
         setErrorMsg(msg);
-      } finally {
         setIsLoading(false);
       }
     };
@@ -383,7 +406,6 @@ function RecommendationsByReservationUnit(): JSX.Element {
         setReservationUnit(result);
       } catch (error) {
         setErrorMsg("errors.errorFetchingApplications");
-      } finally {
         setIsLoading(false);
       }
     };
@@ -391,9 +413,25 @@ function RecommendationsByReservationUnit(): JSX.Element {
     fetchReservationUnit(Number(reservationUnitId));
   }, [recommendations, reservationUnitId]);
 
-  const unhandledRecommendationCount = recommendations.filter((n) =>
-    ["created", "allocating", "allocated"].includes(n.applicationEvent.status)
-  ).length;
+  useEffect(() => {
+    if (reservationUnit && applicationRound) {
+      fetchReservationUnitCapacity(reservationUnit.id, applicationRound);
+    }
+  }, [reservationUnit, applicationRound]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (recommendations && reservationUnit && applicationRound) {
+      setIsLoading(false);
+    }
+  }, [recommendations, reservationUnit, applicationRound]);
+
+  const unhandledRecommendationCount = recommendations
+    ? recommendations.filter((n) =>
+        ["created", "allocating", "allocated"].includes(
+          n.applicationEvent.status
+        )
+      ).length
+    : 0;
 
   const mainImage = reservationUnit?.images.find((n) => n.imageType === "main");
 
@@ -454,13 +492,23 @@ function RecommendationsByReservationUnit(): JSX.Element {
                 <TitleContainer>
                   <H1 as="h2">{applicationRound?.name}</H1>
                   <StatusContainer>
-                    {/* <StatusCircle status={0} />
-                    <div>
-                      <H3>{t("ApplicationRound.amountReservedOfSpace")}</H3>
-                      <div>
-                        {t("ApplicationRound.amountReservedOfSpaceSubtext")}
-                      </div>
-                    </div> */}
+                    {reservationUnitCapacity && (
+                      <>
+                        <StatusCircle
+                          status={
+                            (reservationUnitCapacity.reservationDurationTotal /
+                              reservationUnitCapacity.hourCapacity) *
+                            100
+                          }
+                        />
+                        <div>
+                          <H3>{t("ApplicationRound.amountReservedOfSpace")}</H3>
+                          <div>
+                            {t("ApplicationRound.amountReservedOfSpaceSubtext")}
+                          </div>
+                        </div>
+                      </>
+                    )}
                   </StatusContainer>
                 </TitleContainer>
                 <BottomContainer>

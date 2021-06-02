@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
 import uniq from "lodash/uniq";
+import uniqBy from "lodash/uniqBy";
 import trim from "lodash/trim";
 import get from "lodash/get";
 import { Notification } from "hds-react";
@@ -23,21 +24,23 @@ import { H1 } from "../../styles/typography";
 import { BasicLink, breakpoints, InlineRowLink } from "../../styles/util";
 import LinkPrev from "../LinkPrev";
 import Loader from "../Loader";
-import ApplicationRoundStatusBlock from "./ApplicationRoundStatusBlock";
+import ApplicantApplicationsStatusBlock from "./ApplicantApplicationsStatusBlock";
 import withMainMenu from "../withMainMenu";
 import ApplicantBox from "./ApplicantBox";
 import DataTable, { CellConfig } from "../DataTable";
 import RecommendationCount from "./RecommendationCount";
+import StatusCell from "../StatusCell";
+import SelectionActionBar from "../SelectionActionBar";
 import {
   formatNumber,
   getNormalizedApplicationEventStatus,
   parseAgeGroups,
   parseDuration,
-  processAllocationResult,
-  modifyAllocationResults,
 } from "../../common/util";
-import StatusCell from "../StatusCell";
-import SelectionActionBar from "../SelectionActionBar";
+import {
+  modifyAllocationResults,
+  processAllocationResult,
+} from "../../common/AllocationResult";
 
 interface IRouteParams {
   applicationRoundId: string;
@@ -81,7 +84,9 @@ const Heading = styled(H1)`
   margin-bottom: var(--spacing-3-xs);
 `;
 
-const StyledApplicationRoundStatusBlock = styled(ApplicationRoundStatusBlock)`
+const StyledApplicantApplicationsStatusBlock = styled(
+  ApplicantApplicationsStatusBlock
+)`
   margin-top: var(--spacing-xl);
 `;
 
@@ -115,16 +120,14 @@ const getCellConfig = (
       },
       {
         title: "Recommendation.headings.recommendationCount",
-        key: "applicationAggregatedData.appliedReservationsTotal",
-        transform: ({ applicationAggregatedData }: AllocationResult) => (
+        key: "aggregatedData.appliedReservationsTotal",
+        transform: ({ aggregatedData }: AllocationResult) => (
           <>
             {trim(
               `${formatNumber(
-                applicationAggregatedData?.appliedReservationsTotal,
+                aggregatedData?.reservationsTotal,
                 t("common.volumeUnit")
-              )} / ${parseDuration(
-                applicationAggregatedData?.appliedMinDurationTotal
-              )}`,
+              )} / ${parseDuration(aggregatedData?.durationTotal)}`,
               " / "
             )}
           </>
@@ -183,22 +186,23 @@ const getFilterConfig = (
   recommendations: AllocationResult[]
 ): DataFilterConfig[] => {
   const purposes = uniq(
-    recommendations.map((rec) => rec.applicationEvent.purpose)
+    recommendations.map((rec: AllocationResult) => rec.applicationEvent.purpose)
   ).sort();
   const statuses = uniq(
-    recommendations.map((rec) => rec.applicationEvent.status)
+    recommendations.map((rec: AllocationResult) => rec.applicationEvent.status)
   );
   const reservationUnits = uniq(
-    recommendations.map((rec) => rec.unitName)
+    recommendations.map((rec: AllocationResult) => rec.unitName)
   ).sort();
-  const baskets = uniq(
-    recommendations
-      .filter((n) => n.basketName)
-      .map((rec) => ({
-        title: `${rec.basketOrderNumber}. ${rec.basketName}`,
-        value: rec.basketName,
-      }))
-  );
+  const baskets = uniqBy(
+    recommendations,
+    (rec: AllocationResult) => rec.basketName
+  )
+    .filter((rec: AllocationResult) => rec.basketName)
+    .map((rec: AllocationResult) => ({
+      title: `${rec.basketOrderNumber}. ${rec.basketName}`,
+      value: rec.basketName,
+    }));
 
   return [
     {
@@ -372,103 +376,113 @@ function RecommendationsByApplicant(): JSX.Element {
       <ContentContainer>
         <LinkPrev route={`/applicationRound/${applicationRoundId}`} />
       </ContentContainer>
-      {recommendations && applicationRound && cellConfig && filterConfig && (
-        <>
-          <IngressContainer style={{ marginBottom: "var(--spacing-l)" }}>
-            <Top>
-              <div>
-                <LinkToOthers
-                  to={`/application/${get(
-                    recommendations,
-                    "[0].applicationId"
-                  )}/details`}
-                >
-                  {t("Recommendation.showOriginalApplication")}
-                </LinkToOthers>
-                <Heading>{applicantName}</Heading>
-                <div>{applicationRound?.name}</div>
-                <StyledApplicationRoundStatusBlock
-                  applicationRound={applicationRound}
-                />
-              </div>
-              <div>
-                {application && (
-                  <ApplicantBox
+      {recommendations &&
+        applicationRound &&
+        application &&
+        cellConfig &&
+        filterConfig && (
+          <>
+            <IngressContainer style={{ marginBottom: "var(--spacing-l)" }}>
+              <Top>
+                <div>
+                  <LinkToOthers
+                    to={`/application/${get(
+                      recommendations,
+                      "[0].applicationId"
+                    )}/details`}
+                  >
+                    {t("Recommendation.showOriginalApplication")}
+                  </LinkToOthers>
+                  <Heading>{applicantName}</Heading>
+                  <div>{applicationRound?.name}</div>
+                  <StyledApplicantApplicationsStatusBlock
+                    applicationRound={applicationRound}
                     application={application}
-                    type={applicantId && "individual"}
                   />
-                )}
-              </div>
-            </Top>
-            <RecommendationCount
-              recommendationCount={recommendations.length}
-              unhandledCount={unhandledRecommendationCount}
-            />
-          </IngressContainer>
-          <DataTable
-            groups={[{ id: 1, data: recommendations }]}
-            setSelections={setSelections}
-            hasGrouping={false}
-            config={{
-              filtering: true,
-              rowFilters: true,
-              selection: !isApplicationRoundApproved,
-              handledStatuses: isApplicationRoundApproved
-                ? []
-                : ["ignored", "validated", "handled"],
-            }}
-            cellConfig={cellConfig}
-            filterConfig={filterConfig}
-            areAllRowsDisabled={recommendations.every(
-              (row) =>
-                row.applicationEvent.status === "ignored" ||
-                row.accepted ||
-                row.declined
-            )}
-            isRowDisabled={(row: AllocationResult) => {
-              return (
-                ["ignored", "declined"].includes(row.applicationEvent.status) ||
-                row.accepted
-              );
-            }}
-            statusField="applicationEvent.status"
-          />
-          {selections?.length > 0 && (
-            <SelectionActionBar
-              selections={selections}
-              options={[
-                {
-                  label: t("Recommendation.actionMassApprove"),
-                  value: "approve",
-                },
-                {
-                  label: t("Recommendation.actionMassDecline"),
-                  value: "decline",
-                },
-                {
-                  label: t("Recommendation.actionMassIgnoreReservationUnit"),
-                  value: "ignore",
-                },
-              ]}
-              callback={(action: string) => {
-                setIsSaving(true);
-                setErrorMsg(null);
-                modifyAllocationResults({
-                  data: recommendations,
-                  selections,
-                  action,
-                  setErrorMsg,
-                  callback: () => {
-                    setTimeout(() => setIsSaving(false), 1000);
-                    fetchRecommendations(applicationRound, viewType, viewIndex);
-                  },
-                });
+                </div>
+                <div>
+                  {application && (
+                    <ApplicantBox
+                      application={application}
+                      type={applicantId && "individual"}
+                    />
+                  )}
+                </div>
+              </Top>
+              <RecommendationCount
+                recommendationCount={recommendations.length}
+                unhandledCount={unhandledRecommendationCount}
+              />
+            </IngressContainer>
+            <DataTable
+              groups={[{ id: 1, data: recommendations }]}
+              setSelections={setSelections}
+              hasGrouping={false}
+              config={{
+                filtering: true,
+                rowFilters: true,
+                selection: !isApplicationRoundApproved,
+                handledStatuses: isApplicationRoundApproved
+                  ? []
+                  : ["ignored", "validated", "handled"],
               }}
-              isSaving={isSaving}
+              cellConfig={cellConfig}
+              filterConfig={filterConfig}
+              areAllRowsDisabled={recommendations.every(
+                (row) =>
+                  row.applicationEvent.status === "ignored" ||
+                  row.accepted ||
+                  row.declined
+              )}
+              isRowDisabled={(row: AllocationResult) => {
+                return (
+                  ["ignored", "declined"].includes(
+                    row.applicationEvent.status
+                  ) || row.accepted
+                );
+              }}
+              statusField="applicationEvent.status"
             />
-          )}
-        </>
-      )}
+            {selections?.length > 0 && (
+              <SelectionActionBar
+                selections={selections}
+                options={[
+                  {
+                    label: t("Recommendation.actionMassApprove"),
+                    value: "approve",
+                  },
+                  {
+                    label: t("Recommendation.actionMassDecline"),
+                    value: "decline",
+                  },
+                  {
+                    label: t("Recommendation.actionMassIgnoreReservationUnit"),
+                    value: "ignore",
+                  },
+                ]}
+                callback={(action: string) => {
+                  setIsSaving(true);
+                  setErrorMsg(null);
+                  modifyAllocationResults({
+                    data: recommendations,
+                    selections,
+                    action,
+                    setErrorMsg,
+                    callback: () => {
+                      setTimeout(() => setIsSaving(false), 1000);
+                      fetchRecommendations(
+                        applicationRound,
+                        viewType,
+                        viewIndex
+                      );
+                    },
+                  });
+                }}
+                isSaving={isSaving}
+              />
+            )}
+          </>
+        )}
       {errorMsg && (
         <Notification
           type="error"

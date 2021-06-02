@@ -17,13 +17,16 @@ export type ApplicationRoundStatus =
 export type NormalizedApplicationRoundStatus =
   | ApplicationRoundStatus
   | "incoming"
-  | "handling";
+  | "handling"
+  | "sent";
 
 export type ApplicationRoundBasket = any; // eslint-disable-line
 
 export type ApplicationRoundAggregatedData = {
   totalHourCapacity: number;
   totalReservationDuration: number;
+  allocationDurationTotal: number;
+  allocationResultEventsCount: number;
 };
 
 export type ApplicationRound = {
@@ -277,6 +280,7 @@ export interface AllocationResult {
   applicantName: string | null;
   applicantId: number | null;
   applicantType: string | null;
+  aggregatedData: AllocationResultAggregatedData;
   organisationId: number | null;
   organisationName: string | null;
   unitName: string | null;
@@ -292,6 +296,11 @@ export interface AllocationResult {
   basketOrderNumber: string | null;
   accepted: boolean;
   declined: boolean;
+}
+
+export interface AllocationResultAggregatedData {
+  durationTotal: number;
+  reservationsTotal: number;
 }
 
 export interface AllocationRequest {
@@ -386,3 +395,11 @@ export type ReservationStatus =
   | "waiting_for_payment";
 
 export type ReservationPriority = 100 | 200 | 300;
+
+export interface ReservationUnitCapacity {
+  id: number;
+  hourCapacity: number;
+  reservationDurationTotal: number;
+  periodStart: string;
+  periodEnd: string;
+}

@@ -1,26 +1,17 @@
-import { Dispatch, SetStateAction } from "react";
 import { format, parseISO } from "date-fns";
 import i18next from "i18next";
 import trim from "lodash/trim";
-import groupBy from "lodash/groupBy";
-import get from "lodash/get";
 import {
   AllocationResult,
   ApplicationEventSchedule,
   ApplicationEventStatus,
   ApplicationRoundStatus,
   ApplicationStatus,
-  GroupedAllocationResult,
   LocalizationLanguages,
   Location,
   NormalizedApplicationRoundStatus,
   TranslationObject,
 } from "./types";
-import {
-  rejectApplicationEventSchedule,
-  setApplicationEventScheduleResultStatus,
-  setDeclinedApplicationEventReservationUnits,
-} from "./api";
 
 export const formatDate = (
   date: string | null,
@@ -37,7 +28,7 @@ export const formatNumber = (
 
   const number = new Intl.NumberFormat("fi").format(input);
 
-  return `${number}${suffix}`;
+  return `${number}${suffix || ""}`;
 };
 
 interface IFormatDurationOutput {
@@ -60,7 +51,7 @@ export const getNormalizedApplicationStatus = (
   view: ApplicationRoundStatus
 ): ApplicationStatus => {
   let normalizedStatus: ApplicationStatus = status;
-  if (["draft", "in_review"].includes(view)) {
+  if (["draft", "in_review", "allocated"].includes(view)) {
     if (status === "in_review") {
       normalizedStatus = "review_done";
     }
@@ -107,17 +98,6 @@ export const normalizeApplicationEventStatus = (
   }
   return status;
 };
-
-export const processAllocationResult = (
-  allocationResults: AllocationResult[]
-): AllocationResult[] =>
-  allocationResults.map((allocationResult) => ({
-    ...allocationResult,
-    applicationEvent: {
-      ...allocationResult.applicationEvent,
-      status: normalizeApplicationEventStatus(allocationResult),
-    },
-  }));
 
 export const getNormalizedApplicationRoundStatus = (
   status: ApplicationRoundStatus
@@ -199,6 +179,13 @@ export const parseDuration = (
 export const convertHMSToSeconds = (input: string): number | null => {
   const result = Number(new Date(`1970-01-01T${input}Z`).getTime() / 1000);
   return Number.isNaN(result) ? null : result;
+};
+
+export const convertHMSToHours = (input: HMS): number => {
+  if (!input.h) return 0;
+  const hours = input.h;
+  const hourFractions = input.m ? input.m / 60 : 0;
+  return hours + hourFractions;
 };
 
 export const formatTimeDistance = (
@@ -295,28 +282,6 @@ export const parseAgeGroups = (ageGroups: IAgeGroups): string => {
   })}`;
 };
 
-export const prepareAllocationResults = (
-  results: AllocationResult[]
-): GroupedAllocationResult[] => {
-  const groups = groupBy(results, (n) => n.allocatedReservationUnitName);
-  return Object.keys(groups).map(
-    (key: string, index: number): GroupedAllocationResult => {
-      const row = groups[key][0] as AllocationResult;
-      return {
-        id: index + 1,
-        space: {
-          id: row.allocatedReservationUnitId,
-          name: row.allocatedReservationUnitName,
-        },
-        reservationUnit: {
-          name: row.unitName,
-        },
-        data: get(groups, key),
-      };
-    }
-  );
-};
-
 export const parseAddress = (location: Location): string => {
   return trim(
     `${location.addressStreet || ""}, ${location.addressZip || ""} ${
@@ -324,57 +289,4 @@ export const parseAddress = (location: Location): string => {
     }`,
     ", "
   );
-};
-
-interface IModifyAllocationResults {
-  data: AllocationResult[];
-  selections: number[];
-  action: string;
-  setErrorMsg: Dispatch<SetStateAction<string | null>>;
-  callback: () => void;
-}
-
-export const modifyAllocationResults = async ({
-  data,
-  selections,
-  action,
-  setErrorMsg,
-  callback,
-}: IModifyAllocationResults): Promise<void> => {
-  try {
-    if (action === "ignore") {
-      const allocationResults = data.filter(
-        (n: AllocationResult) =>
-          n.applicationEventScheduleId &&
-          selections.includes(n.applicationEventScheduleId)
-      );
-      allocationResults.forEach((row) => {
-        if (!row.allocatedReservationUnitId) return;
-
-        const payload = [
-          ...row.applicationEvent.declinedReservationUnitIds,
-          row.allocatedReservationUnitId,
-        ];
-
-        setDeclinedApplicationEventReservationUnits(
-          row.applicationEvent.id,
-          payload
-        );
-      });
-    } else if (action === "approve") {
-      await Promise.all(
-        selections.map((id) =>
-          setApplicationEventScheduleResultStatus(id, true)
-        )
-      );
-    } else if (action === "decline") {
-      await Promise.all(
-        selections.map((id) => rejectApplicationEventSchedule(id))
-      );
-    }
-  } catch (error) {
-    setErrorMsg("errors.errorSavingRecommendation");
-  } finally {
-    callback();
-  }
 };
