@@ -94,11 +94,16 @@ const Count = styled(H3)`
   border: 0;
   background: transparent;
   cursor: pointer;
+  margin-left: var(--spacing-l);
 
   svg {
     margin-left: var(--spacing-xs);
     position: relative;
     top: -1px;
+  }
+
+  @media (min-width: ${breakpoints.l}) {
+    margin-left: 0;
   }
 `;
 
