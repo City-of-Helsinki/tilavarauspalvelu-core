@@ -319,15 +319,28 @@ class RecurringReservationSerializer(serializers.ModelSerializer):
         }
 
     def get_begin_weekday(self, instance):
-        reservation = instance.reservations.all().earliest("begin")
+        try:
+            reservation = instance.reservations.all().earliest("begin")
+        except Reservation.DoesNotExist:
+            return None
         if reservation:
             return reservation.begin.weekday()
 
     def get_first_reservation_begin(self, instance):
-        return getattr(instance.reservations.all().earliest("begin"), "begin", None)
+        try:
+            reservation = instance.reservations.all().earliest("begin")
+        except Reservation.DoesNotExist:
+            return None
+
+        return reservation.begin
 
     def get_last_reservation_end(self, instance):
-        return getattr(instance.reservations.all().latest("end"), "end", None)
+        try:
+            reservation = instance.reservations.all().earliest("end")
+        except Reservation.DoesNotExist:
+            return None
+
+        return reservation.end
 
     def get_purpose_name(self, instance):
         purpose = instance.application_event.purpose
