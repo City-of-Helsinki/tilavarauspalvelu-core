@@ -412,4 +412,4 @@ class RecurringReservationViewSet(viewsets.ReadOnlyModelViewSet):
             can_view_units_reservations
             | can_view_service_sectors_reservations
             | Q(user=user)
-        )
+        ).distinct()
