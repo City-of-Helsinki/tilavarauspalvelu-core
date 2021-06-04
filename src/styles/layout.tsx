@@ -48,6 +48,7 @@ export const GridCol = styled.div`
   th {
     text-align: left;
     padding: 0 0 var(--spacing-xs) 0;
+    white-space: nowrap;
   }
 
   td {
