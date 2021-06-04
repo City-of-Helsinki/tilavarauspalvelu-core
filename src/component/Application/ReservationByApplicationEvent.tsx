@@ -202,32 +202,32 @@ function ReservationByApplicationEvent(): JSX.Element | null {
               </Subheading>
               {recurringReservation.reservations.length > 0 ? (
                 <Reservations>
+                  <thead>
+                    <tr>
+                      <th>{t("common.weekday")}</th>
+                      <th>{t("common.date")}</th>
+                      <th>{t("common.time")}</th>
+                    </tr>
+                  </thead>
                   <tbody>
                     {recurringReservation.reservations.map(
                       (reservation: Reservation) => (
-                        <React.Fragment key={reservation.id}>
-                          <tr>
-                            <th>{t("common.weekday")}</th>
-                            <th>{t("common.date")}</th>
-                            <th>{t("common.time")}</th>
-                          </tr>
-                          <tr>
-                            <td>
-                              {t(
-                                `calendar.${
-                                  weekdays[Number(reservation.beginWeekday)]
-                                }`
-                              )}
-                            </td>
-                            <td>
-                              <Strong>{formatDate(reservation.begin)}</Strong>
-                            </td>
-                            <td>
-                              {formatDate(reservation.begin, "H:mm")} -{" "}
-                              {formatDate(reservation.end, "H:mm")}
-                            </td>
-                          </tr>
-                        </React.Fragment>
+                        <tr key={reservation.id}>
+                          <td>
+                            {t(
+                              `calendar.${
+                                weekdays[Number(reservation.beginWeekday)]
+                              }`
+                            )}
+                          </td>
+                          <td>
+                            <Strong>{formatDate(reservation.begin)}</Strong>
+                          </td>
+                          <td>
+                            {formatDate(reservation.begin, "H:mm")} -{" "}
+                            {formatDate(reservation.end, "H:mm")}
+                          </td>
+                        </tr>
                       )
                     )}
                   </tbody>
@@ -239,33 +239,33 @@ function ReservationByApplicationEvent(): JSX.Element | null {
               {recurringReservation.deniedReservations &&
               recurringReservation.deniedReservations.length > 0 ? (
                 <Reservations>
+                  <thead>
+                    <tr>
+                      <th>{t("common.weekday")}</th>
+                      <th>{t("common.date")}</th>
+                      <th>{t("common.time")}</th>
+                    </tr>
+                  </thead>
                   <tbody>
                     {recurringReservation.deniedReservations.map(
                       (reservation: Reservation) => (
-                        <React.Fragment key={reservation.id}>
-                          <tr>
-                            <th>{t("common.weekday")}</th>
-                            <th>{t("common.date")}</th>
-                            <th>{t("common.time")}</th>
-                          </tr>
-                          <tr>
-                            <td>
-                              {" "}
-                              {t(
-                                `calendar.${
-                                  weekdays[Number(reservation.beginWeekday)]
-                                }`
-                              )}
-                            </td>
-                            <td>
-                              <Strong>{formatDate(reservation.begin)}</Strong>
-                            </td>
-                            <td>
-                              {formatDate(reservation.begin, "H:mm")}—
-                              {formatDate(reservation.end, "H:mm")}
-                            </td>
-                          </tr>
-                        </React.Fragment>
+                        <tr key={reservation.id}>
+                          <td>
+                            {" "}
+                            {t(
+                              `calendar.${
+                                weekdays[Number(reservation.beginWeekday)]
+                              }`
+                            )}
+                          </td>
+                          <td>
+                            <Strong>{formatDate(reservation.begin)}</Strong>
+                          </td>
+                          <td>
+                            {formatDate(reservation.begin, "H:mm")}—
+                            {formatDate(reservation.end, "H:mm")}
+                          </td>
+                        </tr>
                       )
                     )}
                   </tbody>
