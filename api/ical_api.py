@@ -176,7 +176,7 @@ def export(
         ical_event.add("summary", application_event.name)
         ical_event.add("dtstart", reservation.begin)
         ical_event.add("dtend", reservation.end)
-        ical_event.add("dtstamp", datetime.datetime.now() + datetime.timedelta(hours=1))
+        ical_event.add("dtstamp", datetime.datetime.now())
         ical_event.add("description", reservation.get_ical_description())
         ical_event.add("location", reservation.get_location_string())
         ical_event["uid"] = "%s.event.events.%s" % (reservation.id, site_name)

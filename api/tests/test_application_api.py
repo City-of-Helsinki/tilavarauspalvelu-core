@@ -164,16 +164,24 @@ def test_application_update_updating_and_adding_application_events(
     )
     assert response.status_code == 200
     assert len(response.data.get("application_events")) == 2
-    assert response.data.get("application_events")[0].get("num_persons") == 112
-    assert response.data.get("application_events")[0].get("name") == "Updated name"
-    assert (
-        response.data.get("application_events")[0]
-        .get("application_event_schedules")[0]
-        .get("day")
-        == 3
-    )
 
-    assert response.data.get("application_events")[1].get("name") == "New event name"
+    event = next(
+        x
+        for x in response.data.get("application_events")
+        if x.get("id") == existing_event.get("id")
+    )
+    assert event.get("num_persons") == 112
+    assert event.get("name") == "Updated name"
+    assert event.get("application_event_schedules")[0].get("day") == 3
+
+    assert (
+        next(
+            x
+            for x in response.data.get("application_events")
+            if x.get("id") != existing_event.get("id")
+        ).get("name")
+        == "New event name"
+    )
 
 
 @pytest.mark.django_db
