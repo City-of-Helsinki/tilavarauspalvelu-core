@@ -53,6 +53,16 @@ class ReadOnly(permissions.BasePermission):
         return request.method in permissions.SAFE_METHODS
 
 
+class ReservationUnitCalendarUrlPermission(permissions.BasePermission):
+    def has_object_permission(self, request, view, reservation_unit):
+        return request.user.is_authenticated and can_modify_reservation_unit(
+            request.user, reservation_unit
+        )
+
+    def has_permission(self, request, view):
+        return True
+
+
 class ReservationUnitPermission(permissions.BasePermission):
     def has_object_permission(self, request, view, reservation_unit):
         if view.action == "capacity":

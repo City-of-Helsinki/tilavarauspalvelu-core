@@ -126,6 +126,7 @@ graphql-core==2.3.2
     #   graphql-relay
 graphql-relay==2.0.1
     # via graphene
+icalendar==4.0.7
 idna==2.10
     # via requests
 inflection==0.5.1

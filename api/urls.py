@@ -13,6 +13,11 @@ from .applications_api.views import (
 from .city_api import CityViewSet
 from .declined_reservation_units_api import DeclinedReservationUnitViewSet
 from .hauki_api import OpeningHoursViewSet
+from .ical_api import (
+    ApplicationEventIcalViewset,
+    ReservationUnitCalendarUrlViewSet,
+    ReservationUnitIcalViewset,
+)
 from .permissions_api import (
     GeneralRoleViewSet,
     ServiceSectorRoleViewSet,
@@ -68,6 +73,23 @@ router.register(
     ApplicationEventWeeklyAmountReductionViewSet,
     "application_event_weekly_amount_reduction",
 )
+router.register(
+    r"application_event_calendar",
+    ApplicationEventIcalViewset,
+    "application_event_calendar",
+)
+router.register(
+    r"reservation_unit_calendar_url",
+    ReservationUnitCalendarUrlViewSet,
+    "reservation_unit_calendar_url",
+)
+router.register(
+    r"reservation_unit_calendar",
+    ReservationUnitIcalViewset,
+    "reservation_unit_calendar",
+)
+
+
 router.register(r"opening_hour", OpeningHoursViewSet, "opening_hour")
 router.register(r"parameters/district", DistrictViewSet, "district")
 router.register(r"parameters/purpose", PurposeViewSet, "purpose")
