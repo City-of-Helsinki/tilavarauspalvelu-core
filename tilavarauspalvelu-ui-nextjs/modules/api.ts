@@ -170,8 +170,6 @@ export async function getDecisionMaker(
     )
     .find(() => true);
 
-  console.log(decisionStatusChange);
-
   return apiGet<User>({
     path: `v1/${userBasePath}/${decisionStatusChange?.userId}`,
   });

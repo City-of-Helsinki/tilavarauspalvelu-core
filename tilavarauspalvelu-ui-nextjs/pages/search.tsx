@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
+import { GetStaticProps } from "next";
 import { Koros } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import queryString from "query-string";
 import { useRouter } from "next/router";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Container from "../components/common/Container";
 import Breadcrumb from "../components/common/Breadcrumb";
 import SearchForm from "../components/search/SearchForm";
@@ -16,7 +18,6 @@ import { ReservationUnit } from "../modules/types";
 import { searchUrl } from "../modules/util";
 import { isBrowser, searchPrefix } from "../modules/const";
 import { CenterSpinner } from "../components/common/common";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 
 const style = {
   fontSize: "var(--fontsize-heading-l)",
@@ -31,13 +32,15 @@ const StyledKoros = styled(Koros)`
   fill: white;
 `;
 
-export async function getStaticProps({ locale }) {
+interface Props {}
+
+export const getStaticProps: GetStaticProps<Props> = async ({ locale }) => {
   return {
     props: {
       ...(await serverSideTranslations(locale)),
     },
   };
-}
+};
 
 const Search = (): JSX.Element => {
   const { t } = useTranslation();
@@ -45,13 +48,13 @@ const Search = (): JSX.Element => {
   const [values, setValues] = useState({} as Record<string, string>);
   const [state, setState] = useState<"loading" | "done" | "error">("done");
 
-  const [reservationUnits, setReservationUnits] =
-    useState<ReservationUnit[] | null>(null);
+  const [reservationUnits, setReservationUnits] = useState<
+    ReservationUnit[] | null
+  >(null);
 
   const searchParams = isBrowser ? window.location.search : "";
 
   useEffect(() => {
-    console.log("processing effect");
     if (searchParams) {
       const parsed = queryString.parse(searchParams);
 
@@ -85,7 +88,6 @@ const Search = (): JSX.Element => {
     history.replace(searchUrl(criteria));
   };
 
-  console.log("rendering search.tsx");
   return (
     <>
       <HeadContainer>

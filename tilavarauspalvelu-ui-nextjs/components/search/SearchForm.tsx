@@ -46,7 +46,6 @@ const ButtonContainer = styled.div`
 `;
 
 const SearchForm = ({ onSearch, formValues }: Props): JSX.Element | null => {
-  console.log(formValues);
   const { t, i18n } = useTranslation();
   const [ready, setReady] = useState<boolean>(false);
   const [reservationUnitTypeOptions, setReservationUnitTypeOptions] = useState<
@@ -67,7 +66,6 @@ const SearchForm = ({ onSearch, formValues }: Props): JSX.Element | null => {
   }, [register]);
 
   useEffect(() => {
-    console.log("fetching data");
     async function fetchData() {
       const fetchedApplicationPeriods = await getApplicationRounds();
       setApplicationPeriodOptions(
@@ -99,8 +97,6 @@ const SearchForm = ({ onSearch, formValues }: Props): JSX.Element | null => {
   if (!ready) {
     return null;
   }
-
-  console.log("rendering", formValues);
 
   return (
     <>

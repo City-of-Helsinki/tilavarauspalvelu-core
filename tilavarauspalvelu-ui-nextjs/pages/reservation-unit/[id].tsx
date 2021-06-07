@@ -14,7 +14,7 @@ import RelatedUnits from "../../components/reservation-unit/RelatedUnits";
 import useReservationUnitsList from "../../hooks/useReservationUnitList";
 import StartApplicationBar from "../../components/common/StartApplicationBar";
 import { AccordionWithState as Accordion } from "../../components/common/Accordion";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+// import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 
 type Props = {
   reservationUnit: ReservationUnitType | null;
@@ -55,7 +55,7 @@ export const getServerSideProps = async (context) => {
   return { props: { paramsId: context.params.id } };
 };
 
-const TwoColoumnLayout = styled.div`
+const TwoColumnLayout = styled.div`
   display: grid;
   gap: var(--spacing-layout-s);
   grid-template-columns: 7fr 390px;
@@ -83,7 +83,7 @@ const ReservationUnit = ({
         reservationUnitList={reservationUnitList}
       />
       <Container>
-        <TwoColoumnLayout>
+        <TwoColumnLayout>
           <div>
             <Accordion open heading={t("reservationUnit.description")}>
               <Content>
@@ -106,7 +106,7 @@ const ReservationUnit = ({
               units={relatedReservationUnits}
             />
           </SpanTwoColumns>
-        </TwoColoumnLayout>
+        </TwoColumnLayout>
       </Container>
       <StartApplicationBar
         count={reservationUnitList.reservationUnits.length}

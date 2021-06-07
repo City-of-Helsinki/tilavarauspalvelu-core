@@ -1,3 +1,4 @@
+import React from "react";
 import { ApplicationRound } from "../../modules/types";
 import ApplicationRoundCard from "./ApplicationRoundCard";
 
@@ -6,12 +7,7 @@ type Props = {
   applicationRounds: ApplicationRound[];
 };
 
-const ApplicationPeriodList = ({
-  data,
-  applicationRounds,
-  ...rest
-}: Props): JSX.Element => {
-  console.log(rest);
+const ApplicationPeriodList = ({ applicationRounds }: Props): JSX.Element => {
   if (!applicationRounds) {
     return null;
   }

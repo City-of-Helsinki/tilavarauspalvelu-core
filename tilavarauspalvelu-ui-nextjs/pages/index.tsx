@@ -1,23 +1,25 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
+import { GetStaticProps } from "next";
 import { Button, IconSearch, ImageWithCard } from "hds-react";
 import { useRouter } from "next/router";
 import styled from "styled-components";
+import { parseISO } from "date-fns";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Container from "../components/common/Container";
 import Header from "../components/index/Header";
 import ApplicationPeriods from "../components/index/ApplicationPeriodList";
 import { breakpoint } from "../modules/style";
 import Title from "../components/common/Title";
-import { parseISO } from "date-fns";
-
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { ApplicationRound } from "../modules/types";
 import { getApplicationRounds } from "../modules/api";
 
-export async function getStaticProps({ locale }) {
-  console.log("loading rounds");
+interface IProps {
+  applicationRounds: ApplicationRound[];
+}
+
+export const getStaticProps: GetStaticProps<IProps> = async ({ locale }) => {
   const applicationRounds = await getApplicationRounds();
-  console.log("loaded rounds");
   applicationRounds.sort(
     (ar1: ApplicationRound, ar2: ApplicationRound) =>
       parseISO(ar1.applicationPeriodBegin).getTime() -
@@ -32,7 +34,7 @@ export async function getStaticProps({ locale }) {
     },
     revalidate: 100, // In seconds
   };
-}
+};
 
 const TopContainer = styled.div`
   margin-right: 30%;

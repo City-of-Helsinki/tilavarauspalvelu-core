@@ -94,9 +94,9 @@ export const formatDuration = (duration: string): string => {
   }
   return `${
     Number(time[0])
-      ? `${`${Number(time[0])} ${i18next
-          .t("common.hour")
-          .toLocaleLowerCase()}`} `
+      ? `${`${Number(time[0])} ${
+          i18next.t("common.hour") || "".toLocaleLowerCase()
+        }`} `
       : ""
   }${
     Number(time[1]) ? time[1] + i18next.t("common.abbreviations.minute") : ""

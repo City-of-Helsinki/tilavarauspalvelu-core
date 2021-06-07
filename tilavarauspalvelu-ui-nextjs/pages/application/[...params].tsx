@@ -1,55 +1,48 @@
 import React, { useReducer, useState } from "react";
 import { useAsync } from "react-use";
-import {
-  Route,
-  Switch,
-  useHistory,
-  useParams,
-  useRouteMatch,
-} from "react-router-dom";
 import { Notification } from "hds-react";
+import { useRouter } from "next/router";
 import { useTranslation } from "react-i18next";
 import {
   saveApplication,
   getApplication,
   getApplicationRound,
-} from "../common/api";
+} from "../../modules/api";
 import {
   Application as ApplicationType,
   ApplicationRound,
   EditorState,
-} from "../common/types";
-import ApplicationPage from "./ApplicationPage";
-import Page1 from "./page1/Page1";
-import Page2 from "./page2/Page2";
-import Page3 from "./page3/Page3";
-import Preview from "./preview/Preview";
-import applicationReducer from "./applicationReducer";
-import useReservationUnitList from "../common/hook/useReservationUnitList";
-import Sent from "./sent/Sent";
-import { CenterSpinner } from "../component/common";
-import { apiDateToUIDate, deepCopy, uiDateToApiDate } from "../common/util";
-
-type ParamTypes = {
-  applicationId: string;
-};
+} from "../../modules/types";
+import ApplicationPage from "../../components/application/ApplicationPage";
+import Page1 from "../../components/application/Page1";
+import Page2 from "../../components/application/Page2";
+import Page3 from "../../components/application/Page3";
+import Preview from "../../components/application/Preview";
+import applicationReducer from "../../modules/application/applicationReducer";
+import useReservationUnitList from "../../hooks/useReservationUnitList";
+import Sent from "../../components/application/Sent";
+import { CenterSpinner } from "../../components/common/common";
+import { apiDateToUIDate, deepCopy, uiDateToApiDate } from "../../modules/util";
 
 const Application = (): JSX.Element | null => {
   const { t } = useTranslation();
 
-  const history = useHistory();
-  const match = useRouteMatch();
-  console.log(match);
-
   const [error, setError] = useState<string | null>();
-
-  const { applicationId } = useParams<ParamTypes>();
 
   const [state, dispatch] = useReducer(applicationReducer, {
     application: { id: 0 } as ApplicationType,
     accordionStates: [],
     loading: true,
   } as EditorState);
+
+  const router = useRouter();
+  const {
+    query: { params },
+  } = router;
+
+  if (!params) return <CenterSpinner />;
+
+  const [applicationId, pageId] = params as string[];
 
   const applicationLoadingStatus = useAsync(async () => {
     if (applicationId && Number(applicationId)) {
@@ -131,10 +124,10 @@ const Application = (): JSX.Element | null => {
     appToSave: ApplicationType
   ) =>
     saveWithEffect(appToSave, (id) => {
-      const prefix = id ? match.url.replace("new", String(id)) : match.url;
+      const prefix = `/application/${id}`;
       const target = `${prefix}/${path}`;
       clearSelections();
-      history.push(target);
+      router.push(target);
     });
 
   const addNewApplicationEvent = async () => {
@@ -179,78 +172,71 @@ const Application = (): JSX.Element | null => {
 
   return (
     <>
-      <Switch>
-        <Route exact path={`${match.url}/page1`}>
-          <ApplicationPage
+      {pageId === "page1" && (
+        <ApplicationPage
+          application={state.application}
+          breadCrumbText={applicationRoundName}
+          overrideText={applicationRoundName}
+          translationKeyPrefix="Application.Page1"
+        >
+          <Page1
+            selectedReservationUnits={reservationUnits}
+            applicationRound={
+              applicationLoadingStatus.value?.applicationRound ||
+              ({} as ApplicationRound)
+            }
+            dispatch={dispatch}
+            editorState={state}
+            save={({
+              application,
+              eventId,
+            }: {
+              application: ApplicationType;
+              eventId?: number;
+            }) => saveWithEffect(application, undefined, eventId)}
+            addNewApplicationEvent={addNewApplicationEvent}
+            setError={setError}
+          />
+        </ApplicationPage>
+      )}
+      {pageId === "page2" && (
+        <ApplicationPage
+          application={state.application}
+          translationKeyPrefix="Application.Page2"
+          breadCrumbText={applicationRoundName}
+        >
+          <Page2
             application={state.application}
-            breadCrumbText={applicationRoundName}
-            overrideText={applicationRoundName}
-            translationKeyPrefix="Application.Page1"
-            match={match}
-          >
-            <Page1
-              selectedReservationUnits={reservationUnits}
-              applicationRound={
-                applicationLoadingStatus.value?.applicationRound ||
-                ({} as ApplicationRound)
-              }
-              dispatch={dispatch}
-              editorState={state}
-              save={({
-                application,
-                eventId,
-              }: {
-                application: ApplicationType;
-                eventId?: number;
-              }) => saveWithEffect(application, undefined, eventId)}
-              addNewApplicationEvent={addNewApplicationEvent}
-              setError={setError}
-            />
-          </ApplicationPage>
-        </Route>
-        <Route exact path={`${match.url}/page2`}>
-          <ApplicationPage
+            onNext={saveAndNavigate("page3")}
+          />
+        </ApplicationPage>
+      )}
+      {pageId === "page3" && (
+        <ApplicationPage
+          application={state.application}
+          translationKeyPrefix="Application.Page3"
+          breadCrumbText={applicationRoundName}
+        >
+          <Page3
             application={state.application}
-            translationKeyPrefix="Application.Page2"
-            match={match}
-            breadCrumbText={applicationRoundName}
-          >
-            <Page2
-              application={state.application}
-              onNext={saveAndNavigate("page3")}
-            />
-          </ApplicationPage>
-        </Route>
-        <Route exact path={`${match.url}/page3`}>
-          <ApplicationPage
+            onNext={saveAndNavigate("preview")}
+          />
+        </ApplicationPage>
+      )}
+      {pageId === "preview" && (
+        <ApplicationPage
+          application={state.application}
+          translationKeyPrefix="Application.preview"
+          breadCrumbText={applicationRoundName}
+        >
+          <Preview
             application={state.application}
-            translationKeyPrefix="Application.Page3"
-            match={match}
-            breadCrumbText={applicationRoundName}
-          >
-            <Page3
-              application={state.application}
-              onNext={saveAndNavigate("preview")}
-            />
-          </ApplicationPage>
-        </Route>
-        <Route exact path={`${match.url}/preview`}>
-          <ApplicationPage
-            application={state.application}
-            translationKeyPrefix="Application.preview"
-            match={match}
-            breadCrumbText={applicationRoundName}
-          >
-            <Preview
-              application={state.application}
-              onNext={saveAndNavigate("sent")}
-            />
-          </ApplicationPage>
-        </Route>
-        <Route exact path={`${match.url}/sent`}>
-          <Sent breadCrumbText={applicationRoundName} />
-        </Route>
-      </Switch>
+            onNext={saveAndNavigate("sent")}
+          />
+        </ApplicationPage>
+      )}
+      {pageId === "sent" && <Sent breadCrumbText={applicationRoundName} />}
+
       {error ? (
         <Notification
           type="error"
