@@ -169,6 +169,7 @@ env = environ.Env(
     HAUKI_ORIGIN_ID=(str, "tvp"),
     CSRF_TRUSTED_ORIGINS=(list, []),
     MULTI_PROXY_HEADERS=(bool, False),
+    ICAL_HASH_SECRET=(str, ""),
 )
 
 environ.Env.read_env()
@@ -210,6 +211,8 @@ HAUKI_ORIGIN_ID = env("HAUKI_ORIGIN_ID")
 
 
 RESERVATION_UNIT_IMAGES_ROOT = "reservation_unit_images"
+
+ICAL_HASH_SECRET = env("ICAL_HASH_SECRET")
 
 # Whether to trust X-Forwarded-Host headers for all purposes
 # where Django would need to make use of its own hostname

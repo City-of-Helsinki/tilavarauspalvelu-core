@@ -184,6 +184,32 @@ class Reservation(models.Model):
         verbose_name=_("Number of persons"), null=True, blank=True
     )
 
+    def get_location_string(self):
+        locations = [
+            reservation_unit.get_location().__str__()
+            for reservation_unit in self.reservation_unit.all()
+        ]
+        return f"{','.join(locations)}"
+
+    def get_ical_description(self):
+        if self.recurring_reservation is None:
+            return None
+        application = self.recurring_reservation.application
+
+        application_event = self.recurring_reservation.application_event
+        unit_names = [
+            reservation_unit.unit.name
+            for reservation_unit in self.reservation_unit.all()
+            if hasattr(reservation_unit, "unit")
+        ]
+        return (
+            f"{application.organisation.name if application.organisation is not None else application.person.name}\n"
+            f"{application_event.name}\n"
+            f"{','.join([reservation_unit.name for reservation_unit in self.reservation_unit.all()])}\n"
+            f"{','.join(unit_names)}\n"
+            f"{self.reservation_unit.unit if hasattr(self.reservation_unit, 'unit') else ''}"
+        )
+
 
 class ReservationPurpose(models.Model):
     reservation = models.OneToOneField(

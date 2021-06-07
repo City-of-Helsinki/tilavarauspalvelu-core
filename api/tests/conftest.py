@@ -2,6 +2,7 @@ import datetime
 
 import pytest
 import recurrence
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from rest_framework.test import APIClient
@@ -263,7 +264,7 @@ def confirmed_reservation(reservation_unit, user) -> Reservation:
 
 @pytest.fixture
 def reservation_in_second_unit(reservation_unit2, user) -> Reservation:
-    begin_time = timezone.datetime(2020, 12, 1, 0, 0, 0).astimezone()
+    begin_time = timezone.datetime(2020, 12, 2, 0, 0, 0).astimezone()
     end_time = begin_time + datetime.timedelta(hours=1)
     reservation = Reservation.objects.create(
         begin=begin_time, end=end_time, state="created", user=user
@@ -845,6 +846,11 @@ def valid_unit_viewer_data(user, unit):
 @pytest.fixture(autouse=True)
 def enable_db_access_for_all_tests(db):
     pass
+
+
+@pytest.fixture()
+def set_ical_secret(db):
+    settings.ICAL_HASH_SECRET = "qhoew923uqqwee"
 
 
 @pytest.mark.django_db

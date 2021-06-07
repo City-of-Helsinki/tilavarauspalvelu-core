@@ -1,6 +1,7 @@
 import datetime
 import logging
 import math
+import uuid
 from typing import Dict, List, Optional
 
 import recurrence
@@ -772,6 +773,8 @@ class ApplicationEvent(models.Model):
         verbose_name=_("Declined reservation units"),
         blank=True,
     )
+
+    uuid = models.UUIDField(default=uuid.uuid4, null=False, editable=False, unique=True)
 
     @property
     def status(self):
