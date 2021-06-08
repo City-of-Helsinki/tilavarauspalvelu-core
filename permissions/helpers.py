@@ -111,8 +111,12 @@ def can_modify_reservation_unit(user: User, reservation_unit: ReservationUnit) -
 
 def can_handle_application(user: User, application: Application) -> bool:
     permission = "can_handle_applications"
-    return is_superuser(user) or has_service_sector_permission(
-        user, [application.application_period.service_sector], permission
+    return (
+        is_superuser(user)
+        or has_service_sector_permission(
+            user, [application.application_round.service_sector], permission
+        )
+        or has_general_permission(user, permission)
     )
 
 

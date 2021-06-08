@@ -288,6 +288,17 @@ class ApplicationRoundSerializer(serializers.ModelSerializer):
         if len(basket_order_numbers) > len(set(basket_order_numbers)):
             raise serializers.ValidationError("Order numbers should be unique")
 
+        status = data.get("status", None)
+
+        if (
+            self.instance
+            and self.instance.status == ApplicationRoundStatus.APPROVED
+            and status != ApplicationRoundStatus.APPROVED
+        ):
+            raise serializers.ValidationError(
+                "Cannot change status of APPROVED application round."
+            )
+
         return data
 
     def handle_baskets(self, application_round_instance, basket_data):

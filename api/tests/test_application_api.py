@@ -8,6 +8,7 @@ from applications.models import (
     ApplicationEvent,
     ApplicationEventScheduleResult,
     ApplicationEventWeeklyAmountReduction,
+    ApplicationStatus,
 )
 
 
@@ -609,6 +610,20 @@ def test_user_can_update_own_application(
 
 
 @pytest.mark.django_db
+@freeze_time("2021-01-15")
+def test_user_cannot_update_own_application_status_to_review_done(
+    user_api_client, application, valid_application_data
+):
+    valid_application_data["status"] = ApplicationStatus.REVIEW_DONE
+    response = user_api_client.put(
+        reverse("application-detail", kwargs={"pk": application.id}),
+        data=valid_application_data,
+        format="json",
+    )
+    assert response.status_code == 400
+
+
+@pytest.mark.django_db
 @freeze_time("2021-02-01")
 def test_user_cannot_update_own_application_after_period_end(
     user_api_client, application, valid_application_data
@@ -915,3 +930,60 @@ def test_deleting_weekly_reductions(
     )
     assert_that(response.status_code).is_equal_to(204)
     assert_that(ApplicationEventScheduleResult.objects.count()).is_equal_to(0)
+
+
+@pytest.mark.django_db
+def test_application_status_set_sent_from_in_review_fails(
+    general_admin_api_client, application, valid_application_data
+):
+    assert Application.objects.count() == 1
+    application.set_status(ApplicationStatus.IN_REVIEW)
+    valid_application_data["status"] = ApplicationStatus.SENT
+
+    response = general_admin_api_client.put(
+        reverse("application-detail", kwargs={"pk": application.id}),
+        data=valid_application_data,
+        format="json",
+    )
+
+    assert response.status_code == 400
+    application.refresh_from_db()
+    assert application.status == ApplicationStatus.IN_REVIEW
+
+
+@pytest.mark.django_db
+def test_application_status_set_sent_from_draft_fails(
+    general_admin_api_client, application, valid_application_data
+):
+    assert Application.objects.count() == 1
+    application.set_status(ApplicationStatus.DRAFT)
+    valid_application_data["status"] = ApplicationStatus.SENT
+
+    response = general_admin_api_client.put(
+        reverse("application-detail", kwargs={"pk": application.id}),
+        data=valid_application_data,
+        format="json",
+    )
+
+    assert response.status_code == 400
+    application.refresh_from_db()
+    assert application.status == ApplicationStatus.DRAFT
+
+
+@pytest.mark.django_db
+def test_application_status_set_sent_assigns_when_not_in_review_nor_draft(
+    general_admin_api_client, application, valid_application_data
+):
+    assert Application.objects.count() == 1
+    application.set_status(ApplicationStatus.REVIEW_DONE)
+    valid_application_data["status"] = ApplicationStatus.SENT
+
+    response = general_admin_api_client.put(
+        reverse("application-detail", kwargs={"pk": application.id}),
+        data=valid_application_data,
+        format="json",
+    )
+
+    assert response.status_code == 200
+    application.refresh_from_db()
+    assert application.status == ApplicationStatus.SENT

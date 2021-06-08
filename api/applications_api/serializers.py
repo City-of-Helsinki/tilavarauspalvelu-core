@@ -27,6 +27,7 @@ from applications.models import (
 from applications.utils.reservation_creation import (
     create_reservations_from_allocation_results,
 )
+from permissions.helpers import can_handle_application
 from reservation_units.models import Purpose, ReservationUnit
 from reservations.models import AbilityGroup, AgeGroup
 
@@ -535,6 +536,27 @@ class ApplicationSerializer(serializers.ModelSerializer):
         # Validations when user submits application for review
         if "status" in data and data["status"] == ApplicationStatus.IN_REVIEW:
             data = self.validate_for_review(data)
+        if (
+            self.instance
+            and self.instance.status
+            in (ApplicationStatus.DRAFT, ApplicationStatus.IN_REVIEW)
+            and "status" in data
+            and data["status"] == ApplicationStatus.SENT
+        ):
+            raise serializers.ValidationError(
+                "Applications in DRAFT or IN_REVIEW status cannot set as SENT."
+            )
+        if "status" in data and data["status"] not in (
+            ApplicationStatus.DRAFT,
+            ApplicationStatus.IN_REVIEW,
+            ApplicationStatus.CANCELLED,
+        ):
+            request = self.context["request"] if "request" in self.context else None
+            request_user = (
+                request.user if request and request.user.is_authenticated else None
+            )
+            if not can_handle_application(request_user, self.instance):
+                raise serializers.ValidationError("No permission for status change.")
 
         return data
 
@@ -698,6 +720,22 @@ class ApplicationStatusSerializer(serializers.ModelSerializer):
             instance.user = request.user
         instance.save()
         return instance
+
+    def validate(self, data):
+        application = data.get("application")
+        if not application:
+            raise serializers.ValidationError("Application does not exist")
+
+        if data["status"] == ApplicationStatus.SENT and application.status in (
+            ApplicationStatus.IN_REVIEW,
+            ApplicationStatus.DRAFT,
+        ):
+            raise serializers.ValidationError(
+                "Cannot set the application status to SENT from %s status"
+                % application.status
+            )
+
+        return data
 
 
 class ApplicationEventStatusSerializer(serializers.ModelSerializer):
