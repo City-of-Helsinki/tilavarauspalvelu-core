@@ -86,11 +86,11 @@ class Person(ContactInformation):
     REQUIRED_FOR_REVIEW = ["first_name", "last_name"]
 
     first_name = models.TextField(
-        verbose_name=_("First name"), null=False, blank=True, max_length=50
+        verbose_name=_("First name"), null=False, blank=False, max_length=50
     )
 
     last_name = models.TextField(
-        verbose_name=_("Last name"), null=False, blank=True, max_length=50
+        verbose_name=_("Last name"), null=False, blank=False, max_length=50
     )
 
     def __str__(self):
@@ -140,13 +140,13 @@ class Organisation(models.Model):
     )
 
     address = models.ForeignKey(
-        Address, null=True, blank=True, on_delete=models.SET_NULL
+        Address, null=True, blank=False, on_delete=models.SET_NULL
     )
 
     active_members = models.PositiveIntegerField(
         verbose_name=_("Active members"),
         null=True,
-        blank=True,
+        blank=False,
     )
     core_business = models.TextField(
         verbose_name=_("Core business of this organization"),
@@ -160,7 +160,7 @@ class Organisation(models.Model):
     email = models.EmailField(
         verbose_name=_("Email"),
         default="",
-        blank=True,
+        blank=False,
     )
 
     def __str__(self):

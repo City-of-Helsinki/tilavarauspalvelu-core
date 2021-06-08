@@ -31,6 +31,92 @@ def test_application_create(
 
 
 @pytest.mark.django_db
+def test_application_create_organization_identifier_can_be_null(
+    valid_application_data,
+    user_api_client,
+):
+    valid_application_data["organisation"]["identifier"] = None
+    assert_that(Application.objects.count()).is_zero()
+
+    response = user_api_client.post(
+        reverse("application-list"), valid_application_data, format="json"
+    )
+    assert_that(response.status_code).is_equal_to(201)
+
+    assert_that(response.data["organisation"]["identifier"]).is_none()
+    assert_that(Application.objects.count()).is_equal_to(1)
+
+
+@pytest.mark.django_db
+def test_application_create_organization_identifier_cannot_be_empty(
+    valid_application_data,
+    user_api_client,
+):
+    valid_application_data["organisation"].update({"identifier": ""})
+    assert_that(Application.objects.count()).is_zero()
+
+    response = user_api_client.post(
+        reverse("application-list"), valid_application_data, format="json"
+    )
+    assert_that(response.status_code).is_equal_to(400)
+
+
+@pytest.mark.django_db
+def test_application_create_organization_address_cannot_be_empty(
+    valid_application_data,
+    user_api_client,
+):
+    valid_application_data["organisation"].update({"address": ""})
+    assert_that(Application.objects.count()).is_zero()
+
+    response = user_api_client.post(
+        reverse("application-list"), valid_application_data, format="json"
+    )
+    assert_that(response.status_code).is_equal_to(400)
+
+
+@pytest.mark.django_db
+def test_application_create_organization_address_cannot_be_null(
+    valid_application_data,
+    user_api_client,
+):
+    data = valid_application_data.copy()
+    data["organisation"].update({"address": None})
+    assert_that(Application.objects.count()).is_zero()
+
+    response = user_api_client.post(reverse("application-list"), data, format="json")
+    assert_that(response.status_code).is_equal_to(400)
+
+
+@pytest.mark.django_db
+def test_application_create_organization_address_not_included(
+    valid_application_data,
+    user_api_client,
+):
+    valid_application_data["organisation"].pop("address")
+    assert_that(Application.objects.count()).is_zero()
+
+    response = user_api_client.post(
+        reverse("application-list"), valid_application_data, format="json"
+    )
+    assert_that(response.status_code).is_equal_to(400)
+
+
+@pytest.mark.django_db
+def test_application_create_organization_can_be_null(
+    valid_application_data,
+    user_api_client,
+):
+    valid_application_data["organisation"] = None
+    assert_that(Application.objects.count()).is_zero()
+
+    response = user_api_client.post(
+        reverse("application-list"), valid_application_data, format="json"
+    )
+    assert_that(response.status_code).is_equal_to(201)
+
+
+@pytest.mark.django_db
 @freeze_time("2021-01-15")
 def test_application_update_should_update_organisation_and_contact_person(
     user_api_client, application, organisation, person, purpose, application_round
@@ -44,7 +130,11 @@ def test_application_update_should_update_organisation_and_contact_person(
             "id": organisation.id,
             "identifier": organisation.identifier,
             "name": "Super organisation modified",
-            "address": None,
+            "address": {
+                "street_address": "Testikatu 1",
+                "post_code": 33540,
+                "city": "Tampere",
+            },
         },
         "contact_person": {
             "id": person.id,
@@ -96,7 +186,7 @@ def test_should_handle_patch_requests(
 
 @pytest.mark.django_db
 @freeze_time("2021-01-15")
-def test_application_update_should_null_organisation_and_contact_person(
+def test_application_update_should_null_organisation_and_contact_person_for_draft(
     user_api_client, application, organisation, person, purpose, application_round
 ):
     assert Application.objects.count() == 1
@@ -120,6 +210,40 @@ def test_application_update_should_null_organisation_and_contact_person(
     assert response.status_code == 200
     assert response.data.get("contact_person") is None
     assert response.data.get("organisation") is None
+    application.refresh_from_db()
+    assert application.contact_person is None
+
+
+@pytest.mark.django_db
+@freeze_time("2021-01-15")
+def test_application_update_should_force_contact_person_for_in_review(
+    user_api_client,
+    application,
+    organisation,
+    person,
+    purpose,
+    application_round,
+    valid_application_event_data,
+):
+    assert Application.objects.count() == 1
+
+    data = {
+        "id": application.id,
+        "applicant_type": Application.APPLICANT_TYPE_INDIVIDUAL,
+        "organisation": None,
+        "contact_person": None,
+        "application_round_id": application_round.id,
+        "application_events": [valid_application_event_data],
+        "status": ApplicationStatus.IN_REVIEW,
+        "billing_address": None,
+    }
+
+    response = user_api_client.put(
+        reverse("application-detail", kwargs={"pk": application.id}),
+        data=data,
+        format="json",
+    )
+    assert response.status_code == 400
 
 
 @pytest.mark.django_db
@@ -150,7 +274,13 @@ def test_application_update_updating_and_adding_application_events(
         "id": application.id,
         "applicant_type": Application.APPLICANT_TYPE_INDIVIDUAL,
         "organisation": None,
-        "contact_person": None,
+        "contact_person": {
+            "id": None,
+            "first_name": "Hak",
+            "last_name": "Ija",
+            "email": "hak.ija@test.com",
+            "phone_number": "123-123",
+        },
         "application_round_id": application_round.id,
         "application_events": [existing_event, valid_application_event_data],
         "status": "draft",
@@ -204,7 +334,13 @@ def test_application_update_should_remove_application_events_if_no_longer_in_dat
         "id": application.id,
         "applicant_type": Application.APPLICANT_TYPE_INDIVIDUAL,
         "organisation": None,
-        "contact_person": None,
+        "contact_person": {
+            "id": None,
+            "first_name": "John",
+            "last_name": "Wayne",
+            "email": "john@test.com",
+            "phone_number": "123-123",
+        },
         "application_round_id": application_round.id,
         "application_events": [valid_application_event_data],
         "status": "draft",

@@ -55,7 +55,7 @@ class OrganisationSerializer(serializers.ModelSerializer):
     address = AddressSerializer(
         help_text="Address object of this organisation",
         read_only=False,
-        allow_null=True,
+        allow_null=False,
     )
     identifier = serializers.CharField(allow_null=True)
 
@@ -543,6 +543,11 @@ class ApplicationSerializer(serializers.ModelSerializer):
         if not len(application_events):
             raise ValidationError(_("Application must have application events"))
         else:
+            contact_person_info = data.get("contact_person", None)
+            if not contact_person_info or contact_person_info == "":
+                raise serializers.ValidationError(
+                    "Contact person is required for review."
+                )
             for event in application_events:
                 if not len(event["application_event_schedules"]):
                     raise ValidationError(_("Application events must have schedules"))
@@ -569,12 +574,12 @@ class ApplicationSerializer(serializers.ModelSerializer):
 
         return data
 
-    def handle_events(self, appliction_instance, event_data):
+    def handle_events(self, application_instance, event_data):
         if event_data is None:
             return
         event_ids = []
         for event in event_data:
-            event["application"] = appliction_instance
+            event["application"] = application_instance
             if "id" not in event or event["id"] is None:
                 event_ids.append(
                     ApplicationEventSerializer(data=event)
@@ -590,7 +595,7 @@ class ApplicationSerializer(serializers.ModelSerializer):
                     )
                     .id
                 )
-        ApplicationEvent.objects.filter(application=appliction_instance).exclude(
+        ApplicationEvent.objects.filter(application=application_instance).exclude(
             id__in=event_ids
         ).delete()
 
@@ -621,7 +626,7 @@ class ApplicationSerializer(serializers.ModelSerializer):
 
         app = super().create(validated_data)
 
-        self.handle_events(appliction_instance=app, event_data=event_data)
+        self.handle_events(application_instance=app, event_data=event_data)
 
         app.set_status(status, request_user)
 
@@ -661,7 +666,7 @@ class ApplicationSerializer(serializers.ModelSerializer):
 
         event_data = validated_data.pop("application_events", None)
 
-        self.handle_events(appliction_instance=instance, event_data=event_data)
+        self.handle_events(application_instance=instance, event_data=event_data)
 
         app = super().update(instance, validated_data)
 
