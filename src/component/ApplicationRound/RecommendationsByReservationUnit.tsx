@@ -529,23 +529,28 @@ function RecommendationsByReservationUnit(): JSX.Element {
                       )}
                   </div>
                   <StatusContainer>
-                    {reservationUnitCapacity && (
-                      <>
-                        <StatusCircle
-                          status={
-                            (reservationUnitCapacity.reservationDurationTotal /
-                              reservationUnitCapacity.hourCapacity) *
-                            100
-                          }
-                        />
-                        <div>
-                          <H3>{t("ApplicationRound.amountReservedOfSpace")}</H3>
+                    {reservationUnitCapacity?.reservationDurationTotal &&
+                      reservationUnitCapacity?.hourCapacity && (
+                        <>
+                          <StatusCircle
+                            status={
+                              (reservationUnitCapacity.reservationDurationTotal /
+                                reservationUnitCapacity.hourCapacity) *
+                              100
+                            }
+                          />
                           <div>
-                            {t("ApplicationRound.amountReservedOfSpaceSubtext")}
+                            <H3>
+                              {t("ApplicationRound.amountReservedOfSpace")}
+                            </H3>
+                            <div>
+                              {t(
+                                "ApplicationRound.amountReservedOfSpaceSubtext"
+                              )}
+                            </div>
                           </div>
-                        </div>
-                      </>
-                    )}
+                        </>
+                      )}
                   </StatusContainer>
                 </TitleContainer>
                 <BottomContainer>
