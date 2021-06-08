@@ -48,6 +48,8 @@ const Wrapper = styled.div`
 `;
 
 const TitleContainer = styled.div`
+  margin-bottom: var(--spacing-xl);
+
   @media (min-width: ${breakpoints.l}) {
     display: flex;
     align-items: flex-end;
@@ -81,8 +83,9 @@ const Space = styled.div`
 `;
 
 const ReservationWrapper = styled.div`
+  padding-top: var(--spacing-layout-m);
   padding-bottom: var(--spacing-layout-m);
-  border-bottom: 1px solid var(--color-silver);
+  border-top: 1px solid var(--color-silver);
 
   th,
   td {
@@ -210,7 +213,6 @@ function ReservationSummariesByReservationUnit(): JSX.Element | null {
                 <IconBulletList /> {t("Reservation.showReservations")}
               </BasicLink>
             </TitleContainer>
-            <Divider />
             {recurringReservations && recurringReservations.length > 0 ? (
               recurringReservations.map(
                 (recurringReservation: RecurringReservation) => {
@@ -303,9 +305,7 @@ function ReservationSummariesByReservationUnit(): JSX.Element | null {
                           <div>
                             {trim(
                               recurringReservation.deniedReservations
-                                .map(
-                                  (n: Reservation) => `${formatDate(n.begin)}, `
-                                )
+                                .map((n: Reservation) => formatDate(n.begin))
                                 .join(", "),
                               ", "
                             )}
@@ -317,7 +317,10 @@ function ReservationSummariesByReservationUnit(): JSX.Element | null {
                 }
               )
             ) : (
-              <div>{t("Reservation.noReservations")}</div>
+              <>
+                <Divider />
+                <div>{t("Reservation.noReservations")}</div>
+              </>
             )}
           </NarrowContainer>
           {errorMsg && (
