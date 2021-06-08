@@ -8,7 +8,7 @@ from uuid import UUID
 from django.conf import settings
 from django.http import FileResponse
 from icalendar import Calendar, Event
-from rest_framework import permissions, serializers, viewsets
+from rest_framework import mixins, permissions, serializers, viewsets
 from rest_framework.exceptions import ValidationError
 from rest_framework.reverse import reverse
 from rest_framework.viewsets import ViewSet
@@ -52,7 +52,10 @@ class ReservationUnitCalendarUrlSerializer(serializers.ModelSerializer):
         return f"{scheme}://{host}{calendar_url}?hash={uuid_to_hmac_signature(uuid=instance.uuid)}"
 
 
-class ReservationUnitCalendarUrlViewSet(viewsets.ModelViewSet):
+class ReservationUnitCalendarUrlViewSet(
+    viewsets.GenericViewSet,
+    mixins.RetrieveModelMixin,
+):
     serializer_class = ReservationUnitCalendarUrlSerializer
     queryset = ReservationUnit.objects.all()
     permission_classes = (
