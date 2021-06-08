@@ -30,6 +30,10 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+a {
+  text-underline-offset: 2px;
+}
+
 #root {
   display: flex;
   padding: 0;
