@@ -562,6 +562,7 @@ const translations: ITranslations = {
     reservationStatus: ["Varaustilanne"],
     purposeCount: ["{{count}} käyttötarkoitus"],
     purposeCount_plural: ["{{count}} käyttötarkoitusta"],
+    downloadSpaceCalendar: ["Lataa tilan kalenterimerkinnät (.ics)"],
   },
   Applicant: {
     inAllocation: ["Mukana jaossa"],

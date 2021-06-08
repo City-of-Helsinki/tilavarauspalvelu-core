@@ -402,3 +402,7 @@ export interface ReservationUnitCapacity {
   periodStart: string;
   periodEnd: string;
 }
+
+export interface ReservationUnitCalendarUrl {
+  calendarUrl: string;
+}

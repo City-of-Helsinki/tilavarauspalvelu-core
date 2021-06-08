@@ -9,6 +9,7 @@ import {
   IconGroup,
   Notification,
   IconArrowRight,
+  IconCalendarPlus,
 } from "hds-react";
 import trim from "lodash/trim";
 import uniq from "lodash/uniq";
@@ -32,6 +33,7 @@ import {
   getApplicationRound,
   getReservationUnit,
   getReservationUnitCapacity,
+  getReservationUnitCalendarUrl,
 } from "../../common/api";
 import Loader from "../Loader";
 import {
@@ -48,7 +50,6 @@ import {
   modifyAllocationResults,
 } from "../../common/AllocationResult";
 import StatusCell from "../StatusCell";
-// import StatusCircle from "../StatusCircle";
 import RecommendationCount from "./RecommendationCount";
 import i18n from "../../i18n";
 import SelectionActionBar from "../SelectionActionBar";
@@ -118,7 +119,18 @@ const TitleContainer = styled.div`
 
   @media (min-width: ${breakpoints.l}) {
     grid-template-columns: 2fr 1fr;
+    margin-bottom: var(--spacing-l);
   }
+`;
+
+const CalendarLink = styled.a`
+  color: var(--color-bus);
+  font-family: var(--tilavaraus-admin-font-medium);
+  font-weight: 500;
+  font-size: var(--fontsize-body-s);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-s);
 `;
 
 const BottomContainer = styled.div`
@@ -321,6 +333,9 @@ function RecommendationsByReservationUnit(): JSX.Element {
     reservationUnitCapacity,
     setReservationUnitCapacity,
   ] = useState<ReservationUnitCapacity | null>(null);
+  const [reservationUnitCalendarUrl, setReservationUnitCalendarUrl] = useState<
+    string | null
+  >(null);
   const [cellConfig, setCellConfig] = useState<CellConfig | null>(null);
   const [filterConfig, setFilterConfig] = useState<DataFilterConfig[] | null>(
     null
@@ -370,6 +385,15 @@ function RecommendationsByReservationUnit(): JSX.Element {
     }
   };
 
+  const fetchReservationUnitCalendarUrl = async (ruId: number) => {
+    try {
+      const result = await getReservationUnitCalendarUrl(ruId);
+      setReservationUnitCalendarUrl(result.calendarUrl);
+    } catch (error) {
+      setErrorMsg("errors.errorFetchingData");
+    }
+  };
+
   useEffect(() => {
     const fetchApplicationRound = async () => {
       setErrorMsg(null);
@@ -416,6 +440,7 @@ function RecommendationsByReservationUnit(): JSX.Element {
   useEffect(() => {
     if (reservationUnit && applicationRound) {
       fetchReservationUnitCapacity(reservationUnit.id, applicationRound);
+      fetchReservationUnitCalendarUrl(reservationUnit.id);
     }
   }, [reservationUnit, applicationRound]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -490,7 +515,19 @@ function RecommendationsByReservationUnit(): JSX.Element {
                   </div>
                 </Ingress>
                 <TitleContainer>
-                  <H1 as="h2">{applicationRound?.name}</H1>
+                  <div>
+                    <H1 as="h2">{applicationRound?.name}</H1>
+                    {["approved"].includes(applicationRound?.status) &&
+                      reservationUnitCalendarUrl && (
+                        <CalendarLink
+                          href={reservationUnitCalendarUrl}
+                          target="_blank"
+                        >
+                          <IconCalendarPlus />{" "}
+                          {t("ReservationUnit.downloadSpaceCalendar")}
+                        </CalendarLink>
+                      )}
+                  </div>
                   <StatusContainer>
                     {reservationUnitCapacity && (
                       <>
