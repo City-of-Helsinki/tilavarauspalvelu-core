@@ -362,7 +362,7 @@ export interface RecurringReservation {
   groupSize: number | null;
   abilityGroupId: number | null;
   biweekly: boolean;
-  beginWeekday: string | null;
+  beginWeekday: number | null;
   firstReservationBegin: string | null;
   lastReservationEnd: string | null;
   reservations: Reservation[];
@@ -374,7 +374,7 @@ export interface Reservation {
   state: ReservationStatus;
   priority: ReservationPriority;
   userId: number | null;
-  beginWeekday: string | null;
+  beginWeekday: number | null;
   begin: string;
   end: string;
   bufferTimeBefore: string | null;

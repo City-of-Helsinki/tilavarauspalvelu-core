@@ -219,7 +219,8 @@ function ReservationsByReservationUnit(): JSX.Element | null {
                           </Strong>
                         </td>
                         <td>
-                          {reservation.beginWeekday
+                          {reservation.beginWeekday === 0 ||
+                          reservation.beginWeekday
                             ? t(
                                 `calendar.${
                                   weekdays[Number(reservation.beginWeekday)]
