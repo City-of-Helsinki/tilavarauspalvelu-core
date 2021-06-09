@@ -413,3 +413,47 @@ class ApplicationAggregateDataCreationOnEventStatusChangeTestCase(
         ).count()
 
         assert_that(aggregate_datas_one).is_equal_to(4)
+
+
+class ApplicationStatusChangeTestCase(ApplicationStatusBaseTestCase):
+    def test_sent_status_from_in_review_fails(self):
+        self.application.set_status(ApplicationStatus.IN_REVIEW)
+
+        response = self.manager_api_client.post(
+            reverse("application_status-list"),
+            data={
+                "status": ApplicationStatus.SENT,
+                "application_id": self.application.id,
+            },
+        )
+        assert_that(response.status_code).is_equal_to(400)
+        self.application.refresh_from_db()
+        assert_that(self.application.status).is_equal_to(ApplicationStatus.IN_REVIEW)
+
+    def test_sent_status_from_draft_fails(self):
+        self.application.set_status(ApplicationStatus.DRAFT)
+
+        response = self.manager_api_client.post(
+            reverse("application_status-list"),
+            data={
+                "status": ApplicationStatus.SENT,
+                "application_id": self.application.id,
+            },
+        )
+        assert_that(response.status_code).is_equal_to(400)
+        self.application.refresh_from_db()
+        assert_that(self.application.status).is_equal_to(ApplicationStatus.DRAFT)
+
+    def test_sent_status_assigns_correct(self):
+        self.application.set_status(ApplicationStatus.REVIEW_DONE)
+
+        response = self.manager_api_client.post(
+            reverse("application_status-list"),
+            data={
+                "status": ApplicationStatus.SENT,
+                "application_id": self.application.id,
+            },
+        )
+        assert_that(response.status_code).is_equal_to(201)
+        self.application.refresh_from_db()
+        assert_that(self.application.status).is_equal_to(ApplicationStatus.SENT)

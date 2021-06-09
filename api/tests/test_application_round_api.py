@@ -332,3 +332,25 @@ def test_wrong_service_sector_admin_cannot_manage_application_rounds(
         format="json",
     )
     assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_approved_application_round_cannot_change_status(
+    user_api_client,
+    service_sector_admin_api_client,
+    application_round,
+    valid_application_round_data,
+):
+    application_round.set_status(ApplicationRoundStatus.APPROVED)
+    data = {**valid_application_round_data, "status": ApplicationRoundStatus.IN_REVIEW}
+
+    response = service_sector_admin_api_client.put(
+        reverse("application_round-detail", kwargs={"pk": application_round.id}),
+        data=data,
+        format="json",
+    )
+    assert response.status_code == 400
+
+    application_round.refresh_from_db()
+
+    assert application_round.status == ApplicationRoundStatus.APPROVED
