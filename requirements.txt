@@ -73,7 +73,7 @@ django-recurrence==1.10.3
     # via -r requirements.in
 django-tinymce==3.2.0
     # via -r requirements.in
-django==3.1.8
+django==3.1.9
     # via
     #   -r requirements.in
     #   django-cors-headers
@@ -126,6 +126,7 @@ graphql-core==2.3.2
     #   graphql-relay
 graphql-relay==2.0.1
     # via graphene
+icalendar==4.0.7
 idna==2.10
     # via requests
 inflection==0.5.1
@@ -278,7 +279,7 @@ unidecode==1.2.0
     # via graphene-django
 uritemplate==3.0.1
     # via drf-spectacular
-urllib3==1.26.4
+urllib3==1.26.5
     # via
     #   elastic-apm
     #   requests

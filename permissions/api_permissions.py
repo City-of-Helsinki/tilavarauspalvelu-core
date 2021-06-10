@@ -53,6 +53,16 @@ class ReadOnly(permissions.BasePermission):
         return request.method in permissions.SAFE_METHODS
 
 
+class ReservationUnitCalendarUrlPermission(permissions.BasePermission):
+    def has_object_permission(self, request, view, reservation_unit):
+        return request.user.is_authenticated and can_modify_reservation_unit(
+            request.user, reservation_unit
+        )
+
+    def has_permission(self, request, view):
+        return True
+
+
 class ReservationUnitPermission(permissions.BasePermission):
     def has_object_permission(self, request, view, reservation_unit):
         if view.action == "capacity":
@@ -170,7 +180,9 @@ class ApplicationRoundPermission(permissions.BasePermission):
         if request.method in permissions.SAFE_METHODS:
             return True
 
-        service_sector_id = request.data.get("service_sector_id")
+        service_sector_id = request.data.get("service_sector_id", None)
+        if not service_sector_id and view.detail:
+            return request.user.is_authenticated
         try:
             service_sector = ServiceSector.objects.get(pk=service_sector_id)
             return can_manage_service_sectors_application_rounds(

@@ -1,13 +1,13 @@
 import datetime
 import logging
 import math
+import uuid
 from typing import Dict, List, Optional
 
 import recurrence
 from django.contrib.auth import get_user_model
 from django.contrib.postgres.fields import ArrayField
 from django.db import Error, models
-from django.db.models import DurationField, ExpressionWrapper, F
 from django.utils.text import format_lazy
 from django.utils.translation import gettext_lazy as _
 from recurrence.fields import RecurrenceField
@@ -16,8 +16,8 @@ from sentry_sdk import capture_message
 
 from applications.base_models import ContactInformation
 from applications.utils.aggregate_data import (
+    ApplicationAggregateDataCreator,
     ApplicationRoundAggregateDataCreator,
-    EventAggregateDataCreator,
 )
 from reservation_units.models import Purpose, ReservationUnit
 from spaces.models import District
@@ -86,11 +86,11 @@ class Person(ContactInformation):
     REQUIRED_FOR_REVIEW = ["first_name", "last_name"]
 
     first_name = models.TextField(
-        verbose_name=_("First name"), null=False, blank=True, max_length=50
+        verbose_name=_("First name"), null=False, blank=False, max_length=50
     )
 
     last_name = models.TextField(
-        verbose_name=_("Last name"), null=False, blank=True, max_length=50
+        verbose_name=_("Last name"), null=False, blank=False, max_length=50
     )
 
     def __str__(self):
@@ -140,13 +140,13 @@ class Organisation(models.Model):
     )
 
     address = models.ForeignKey(
-        Address, null=True, blank=True, on_delete=models.SET_NULL
+        Address, null=True, blank=False, on_delete=models.SET_NULL
     )
 
     active_members = models.PositiveIntegerField(
         verbose_name=_("Active members"),
         null=True,
-        blank=True,
+        blank=False,
     )
     core_business = models.TextField(
         verbose_name=_("Core business of this organization"),
@@ -160,7 +160,7 @@ class Organisation(models.Model):
     email = models.EmailField(
         verbose_name=_("Email"),
         default="",
-        blank=True,
+        blank=False,
     )
 
     def __str__(self):
@@ -306,6 +306,10 @@ class ApplicationRound(models.Model):
     @property
     def status(self):
         return self.get_status().status
+
+    @property
+    def status_timestamp(self):
+        return self.get_status().timestamp
 
     @status.setter
     def status(self, status):
@@ -662,44 +666,8 @@ class Application(APPLICANT_TYPE_CONST, models.Model):
             raise ValidationError(_("Application must have contact person"))
 
     def create_aggregate_data(self):
-        # Base queries
-        base_query = self.application_events.values(
-            "id", "begin", "end", "events_per_week", "min_duration", "max_duration"
-        ).annotate(
-            events_count=ExpressionWrapper(
-                (F("end") - F("begin")) / 7 * F("events_per_week"),
-                output_field=DurationField(),
-            )
-        )
-
-        weekly_query = base_query.filter(biweekly=False)
-
-        bi_weekly_query = base_query.filter(biweekly=True).annotate(
-            events_count=ExpressionWrapper(
-                F("events_count") / 2, output_field=DurationField()
-            )
-        )
-
-        total_min_duration = 0
-        events_count = 0
-        for duration in weekly_query.union(bi_weekly_query):
-            total_min_duration += (
-                duration["events_count"].days * duration["min_duration"].total_seconds()
-            )
-            events_count += duration["events_count"].days
-
-        name = "min_duration_total"
-        ApplicationAggregateData.objects.update_or_create(
-            application=self, name=name, defaults={"value": total_min_duration}
-        )
-
-        name = "reservations_total"
-        ApplicationAggregateData.objects.update_or_create(
-            application=self, name=name, defaults={"value": events_count}
-        )
-
-        for event in self.application_events.all():
-            EventAggregateDataCreator(event).start()
+        # No threading at this point.
+        ApplicationAggregateDataCreator(self).run()
 
     @property
     def aggregated_data_dict(self):
@@ -803,7 +771,10 @@ class ApplicationEvent(models.Model):
     declined_reservation_units = models.ManyToManyField(
         ReservationUnit,
         verbose_name=_("Declined reservation units"),
+        blank=True,
     )
+
+    uuid = models.UUIDField(default=uuid.uuid4, null=False, editable=False, unique=True)
 
     @property
     def status(self):

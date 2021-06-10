@@ -3,6 +3,7 @@ import sys
 from threading import Thread
 
 from django.db import Error
+from django.db.models import DurationField, ExpressionWrapper, F
 
 from opening_hours.hours import HaukiConfigurationError
 from opening_hours.utils import get_resources_total_hours
@@ -16,6 +17,86 @@ class BaseAggregateDataCreator(Thread):
             self.run()
             return
         super().run()
+
+
+class ApplicationAggregateDataCreator(BaseAggregateDataCreator):
+    def __init__(self, application, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.application = application
+
+    def run(self) -> None:
+        # Base queries
+        self._base_query = self.application.application_events.values(
+            "id", "begin", "end", "events_per_week", "min_duration", "max_duration"
+        ).annotate(
+            events_count=ExpressionWrapper(
+                (F("end") - F("begin")) / 7 * F("events_per_week"),
+                output_field=DurationField(),
+            )
+        )
+
+        self.weekly_query = self._base_query.filter(biweekly=False)
+
+        self.bi_weekly_query = self._base_query.filter(biweekly=True).annotate(
+            events_count=ExpressionWrapper(
+                F("events_count") / 2, output_field=DurationField()
+            )
+        )
+
+        self._create_event_based_aggregate_data()
+        self._create_reservation_based_aggregate_data()
+
+    def _create_event_based_aggregate_data(self):
+        total_min_duration = 0
+        events_count = 0
+        for duration in self.weekly_query.union(self.bi_weekly_query):
+            total_min_duration += (
+                duration["events_count"].days * duration["min_duration"].total_seconds()
+            )
+            events_count += duration["events_count"].days
+
+        data_values = {
+            "applied_min_duration_total": total_min_duration,
+            "applied_reservations_total": events_count,
+        }
+
+        self._update_or_create_aggregate_data_values(data_values)
+
+        for event in self.application.application_events.all():
+            EventAggregateDataCreator(event).start()
+
+    def _create_reservation_based_aggregate_data(self):
+        from reservations.models import Reservation
+
+        res_qs = Reservation.objects.filter(
+            recurring_reservation__application=self.application
+        ).going_to_occur()
+        created_reservations = res_qs.count()
+        reservations_duration = res_qs.total_duration().get("total_duration")
+
+        data_values = {
+            "created_reservations_total": created_reservations,
+            "reservations_duration_total": reservations_duration.total_seconds()
+            if reservations_duration
+            else 0,
+        }
+        self._update_or_create_aggregate_data_values(data_values)
+
+    def _update_or_create_aggregate_data_values(self, data: dict):
+        # Avoid circulars.
+        from applications.models import ApplicationAggregateData
+
+        try:
+            for name, value in data.items():
+                ApplicationAggregateData.objects.update_or_create(
+                    application=self.application,
+                    name=name,
+                    defaults={"value": value},
+                )
+        except Error:
+            logger.error(
+                "ApplicationAggregateDataCreator got an error while creating or updating ApplicationAggregateData."
+            )
 
 
 class EventAggregateDataCreator(BaseAggregateDataCreator):

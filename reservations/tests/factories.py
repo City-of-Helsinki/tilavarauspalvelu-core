@@ -9,6 +9,11 @@ from applications.models import PRIORITIES
 from reservations.models import STATE_CHOICES
 
 
+class RecurringReservationFactory(DjangoModelFactory):
+    class Meta:
+        model = "reservations.RecurringReservation"
+
+
 class ReservationFactory(DjangoModelFactory):
     class Meta:
         model = "reservations.Reservation"

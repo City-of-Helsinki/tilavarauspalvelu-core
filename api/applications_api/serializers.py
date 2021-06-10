@@ -27,6 +27,7 @@ from applications.models import (
 from applications.utils.reservation_creation import (
     create_reservations_from_allocation_results,
 )
+from permissions.helpers import can_handle_application
 from reservation_units.models import Purpose, ReservationUnit
 from reservations.models import AbilityGroup, AgeGroup
 
@@ -55,7 +56,7 @@ class OrganisationSerializer(serializers.ModelSerializer):
     address = AddressSerializer(
         help_text="Address object of this organisation",
         read_only=False,
-        allow_null=True,
+        allow_null=False,
     )
     identifier = serializers.CharField(allow_null=True)
 
@@ -535,6 +536,27 @@ class ApplicationSerializer(serializers.ModelSerializer):
         # Validations when user submits application for review
         if "status" in data and data["status"] == ApplicationStatus.IN_REVIEW:
             data = self.validate_for_review(data)
+        if (
+            self.instance
+            and self.instance.status
+            in (ApplicationStatus.DRAFT, ApplicationStatus.IN_REVIEW)
+            and "status" in data
+            and data["status"] == ApplicationStatus.SENT
+        ):
+            raise serializers.ValidationError(
+                "Applications in DRAFT or IN_REVIEW status cannot set as SENT."
+            )
+        if "status" in data and data["status"] not in (
+            ApplicationStatus.DRAFT,
+            ApplicationStatus.IN_REVIEW,
+            ApplicationStatus.CANCELLED,
+        ):
+            request = self.context["request"] if "request" in self.context else None
+            request_user = (
+                request.user if request and request.user.is_authenticated else None
+            )
+            if not can_handle_application(request_user, self.instance):
+                raise serializers.ValidationError("No permission for status change.")
 
         return data
 
@@ -543,6 +565,11 @@ class ApplicationSerializer(serializers.ModelSerializer):
         if not len(application_events):
             raise ValidationError(_("Application must have application events"))
         else:
+            contact_person_info = data.get("contact_person", None)
+            if not contact_person_info or contact_person_info == "":
+                raise serializers.ValidationError(
+                    "Contact person is required for review."
+                )
             for event in application_events:
                 if not len(event["application_event_schedules"]):
                     raise ValidationError(_("Application events must have schedules"))
@@ -569,12 +596,12 @@ class ApplicationSerializer(serializers.ModelSerializer):
 
         return data
 
-    def handle_events(self, appliction_instance, event_data):
+    def handle_events(self, application_instance, event_data):
         if event_data is None:
             return
         event_ids = []
         for event in event_data:
-            event["application"] = appliction_instance
+            event["application"] = application_instance
             if "id" not in event or event["id"] is None:
                 event_ids.append(
                     ApplicationEventSerializer(data=event)
@@ -590,7 +617,7 @@ class ApplicationSerializer(serializers.ModelSerializer):
                     )
                     .id
                 )
-        ApplicationEvent.objects.filter(application=appliction_instance).exclude(
+        ApplicationEvent.objects.filter(application=application_instance).exclude(
             id__in=event_ids
         ).delete()
 
@@ -621,7 +648,7 @@ class ApplicationSerializer(serializers.ModelSerializer):
 
         app = super().create(validated_data)
 
-        self.handle_events(appliction_instance=app, event_data=event_data)
+        self.handle_events(application_instance=app, event_data=event_data)
 
         app.set_status(status, request_user)
 
@@ -661,7 +688,7 @@ class ApplicationSerializer(serializers.ModelSerializer):
 
         event_data = validated_data.pop("application_events", None)
 
-        self.handle_events(appliction_instance=instance, event_data=event_data)
+        self.handle_events(application_instance=instance, event_data=event_data)
 
         app = super().update(instance, validated_data)
 
@@ -693,6 +720,22 @@ class ApplicationStatusSerializer(serializers.ModelSerializer):
             instance.user = request.user
         instance.save()
         return instance
+
+    def validate(self, data):
+        application = data.get("application")
+        if not application:
+            raise serializers.ValidationError("Application does not exist")
+
+        if data["status"] == ApplicationStatus.SENT and application.status in (
+            ApplicationStatus.IN_REVIEW,
+            ApplicationStatus.DRAFT,
+        ):
+            raise serializers.ValidationError(
+                "Cannot set the application status to SENT from %s status"
+                % application.status
+            )
+
+        return data
 
 
 class ApplicationEventStatusSerializer(serializers.ModelSerializer):

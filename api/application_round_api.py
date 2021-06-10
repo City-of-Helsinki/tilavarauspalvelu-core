@@ -1,9 +1,11 @@
 import logging
 
 from django.conf import settings
+from django.db.models import Sum
 from rest_framework import permissions, serializers, viewsets
 
 from applications.models import (
+    ApplicationEventAggregateData,
     ApplicationRound,
     ApplicationRoundBasket,
     ApplicationRoundStatus,
@@ -83,6 +85,7 @@ class ApplicationRoundSerializer(serializers.ModelSerializer):
         help_text="Status of this application round",
         choices=ApplicationRoundStatus.get_statuses(),
     )
+    status_timestamp = serializers.DateTimeField(read_only=True)
     service_sector_id = serializers.PrimaryKeyRelatedField(
         queryset=ServiceSector.objects.all(), source="service_sector"
     )
@@ -91,9 +94,9 @@ class ApplicationRoundSerializer(serializers.ModelSerializer):
 
     is_admin = serializers.SerializerMethodField()
 
-    aggregated_data = serializers.DictField(
-        source="aggregated_data_dict", read_only=True
-    )
+    aggregated_data = serializers.SerializerMethodField()
+
+    approved_by = serializers.SerializerMethodField()
 
     class Meta:
         model = ApplicationRound
@@ -110,11 +113,13 @@ class ApplicationRoundSerializer(serializers.ModelSerializer):
             "purpose_ids",
             "service_sector_id",
             "status",
+            "status_timestamp",
             "application_round_baskets",
             "allocating",
             "criteria",
             "is_admin",
             "aggregated_data",
+            "approved_by",
         ]
         extra_kwargs = {
             "name": {
@@ -150,12 +155,41 @@ class ApplicationRoundSerializer(serializers.ModelSerializer):
             "status": {
                 "help_text": "Status of the application round.",
             },
+            "status_timestamp": {
+                "help_text": "Timestamp of the status of the application round.",
+            },
             "application_round_baskets": {
                 "help_text": "List of allocation 'basket' objects which determines priority of reservation allocation.",
             },
             "is_admin": {
                 "help_text": "Whether the current user can administer the application round or not.",
             },
+            "approved_by": {
+                "help_text": "Person name who approved this application round."
+            },
+        }
+
+    def _get_allocation_result_summary(self, instance):
+        events_count = (
+            ApplicationEventAggregateData.objects.filter(
+                application_event__application__application_round=instance,
+                name="allocation_results_reservations_total",
+            )
+            .distinct()
+            .aggregate(events_count=Sum("value"))
+        )
+        duration_total = (
+            ApplicationEventAggregateData.objects.filter(
+                application_event__application__application_round=instance,
+                name="allocation_results_duration_total",
+            )
+            .distinct()
+            .aggregate(duration_total=Sum("value"))
+        )
+
+        return {
+            "allocation_result_events_count": events_count.get("events_count", 0),
+            "allocation_duration_total": duration_total.get("duration_total", 0),
         }
 
     def get_is_admin(self, obj):
@@ -171,6 +205,25 @@ class ApplicationRoundSerializer(serializers.ModelSerializer):
         return can_manage_service_sectors_application_rounds(
             request_user, service_sector
         )
+
+    def get_approved_by(self, instance):
+        request = self.context.get("request", None)
+        request_user = getattr(request, "user", None)
+        if not request_user or not request_user.is_authenticated:
+            return ""
+
+        approved_status = instance.statuses.filter(
+            status=ApplicationRoundStatus.APPROVED
+        ).first()
+        if not getattr(approved_status, "user", None):
+            return ""
+
+        return approved_status.user.get_full_name()
+
+    def get_aggregated_data(self, instance):
+        allocation_result_dict = self._get_allocation_result_summary(instance)
+        allocation_result_dict.update(instance.aggregated_data_dict)
+        return allocation_result_dict
 
     def create(self, validated_data):
         request = self.context["request"] if "request" in self.context else None
@@ -193,6 +246,9 @@ class ApplicationRoundSerializer(serializers.ModelSerializer):
         return application_round
 
     def update(self, instance, validated_data):
+        if self.partial:
+            return self.partial_update(instance, validated_data)
+
         request = self.context["request"] if "request" in self.context else None
         request_user = (
             request.user if request and request.user.is_authenticated else None
@@ -212,11 +268,36 @@ class ApplicationRoundSerializer(serializers.ModelSerializer):
 
         return application_round
 
+    def partial_update(self, instance, validated_data):
+        request = self.context["request"] if "request" in self.context else None
+        request_user = (
+            request.user if request and request.user.is_authenticated else None
+        )
+        status = validated_data.pop("status", None)
+        if status:
+            instance.set_status(status, request_user)
+        instance = super().update(instance, validated_data)
+        return instance
+
     def validate(self, data):
-        baskets = data["application_round_baskets"]
+        baskets = data.get("application_round_baskets", None)
+        if self.partial and not baskets:
+            return data
+
         basket_order_numbers = list(map(lambda basket: basket["order_number"], baskets))
         if len(basket_order_numbers) > len(set(basket_order_numbers)):
             raise serializers.ValidationError("Order numbers should be unique")
+
+        status = data.get("status", None)
+
+        if (
+            self.instance
+            and self.instance.status == ApplicationRoundStatus.APPROVED
+            and status != ApplicationRoundStatus.APPROVED
+        ):
+            raise serializers.ValidationError(
+                "Cannot change status of APPROVED application round."
+            )
 
         return data
 

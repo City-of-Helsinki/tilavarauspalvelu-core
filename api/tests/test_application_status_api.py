@@ -10,7 +10,11 @@ from freezegun import freeze_time
 from rest_framework.reverse import reverse
 from rest_framework.test import APIClient
 
-from applications.models import ApplicationEventStatus, ApplicationStatus
+from applications.models import (
+    ApplicationAggregateData,
+    ApplicationEventStatus,
+    ApplicationStatus,
+)
 from applications.tests.factories import (
     ApplicationEventFactory,
     ApplicationEventScheduleFactory,
@@ -386,3 +390,70 @@ class ReservationCreationOnStatusCreationTestCase(ApplicationStatusBaseTestCase)
         assert_that(response.status_code).is_equal_to(201)
         reservation = Reservation.objects.first()
         assert_that(reservation.state).is_equal_to(STATE_CHOICES.DENIED)
+
+
+class ApplicationAggregateDataCreationOnEventStatusChangeTestCase(
+    ApplicationStatusBaseTestCase
+):
+    @mock.patch(
+        "applications.utils.reservation_creation.ReservationScheduler",
+        wraps=MockedScheduler,
+    )
+    def test_aggregate_data_is_created_after_event_approved(self, mock):
+        response = self.manager_api_client.post(
+            reverse("application_event_status-list"),
+            data={
+                "status": ApplicationEventStatus.APPROVED,
+                "application_event_id": self.application_event.id,
+            },
+        )
+        assert_that(response.status_code).is_equal_to(201)
+        aggregate_datas_one = ApplicationAggregateData.objects.filter(
+            application=self.application
+        ).count()
+
+        assert_that(aggregate_datas_one).is_equal_to(4)
+
+
+class ApplicationStatusChangeTestCase(ApplicationStatusBaseTestCase):
+    def test_sent_status_from_in_review_fails(self):
+        self.application.set_status(ApplicationStatus.IN_REVIEW)
+
+        response = self.manager_api_client.post(
+            reverse("application_status-list"),
+            data={
+                "status": ApplicationStatus.SENT,
+                "application_id": self.application.id,
+            },
+        )
+        assert_that(response.status_code).is_equal_to(400)
+        self.application.refresh_from_db()
+        assert_that(self.application.status).is_equal_to(ApplicationStatus.IN_REVIEW)
+
+    def test_sent_status_from_draft_fails(self):
+        self.application.set_status(ApplicationStatus.DRAFT)
+
+        response = self.manager_api_client.post(
+            reverse("application_status-list"),
+            data={
+                "status": ApplicationStatus.SENT,
+                "application_id": self.application.id,
+            },
+        )
+        assert_that(response.status_code).is_equal_to(400)
+        self.application.refresh_from_db()
+        assert_that(self.application.status).is_equal_to(ApplicationStatus.DRAFT)
+
+    def test_sent_status_assigns_correct(self):
+        self.application.set_status(ApplicationStatus.REVIEW_DONE)
+
+        response = self.manager_api_client.post(
+            reverse("application_status-list"),
+            data={
+                "status": ApplicationStatus.SENT,
+                "application_id": self.application.id,
+            },
+        )
+        assert_that(response.status_code).is_equal_to(201)
+        self.application.refresh_from_db()
+        assert_that(self.application.status).is_equal_to(ApplicationStatus.SENT)
