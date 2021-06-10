@@ -199,6 +199,16 @@ def can_modify_application(user: User, application: Application) -> bool:
     )
 
 
+def can_read_application(user: User, application: Application) -> bool:
+    return (
+        is_superuser(user)
+        or (application.user == user)
+        or can_manage_service_sectors_applications(
+            user, application.application_round.service_sector
+        )
+    )
+
+
 def can_modify_city(user: User):
     permission = "can_modify_cities"
     return is_superuser(user) or has_general_permission(user, permission)
