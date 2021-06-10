@@ -42,7 +42,7 @@ class ReservationUnitCalendarUrlSerializer(serializers.ModelSerializer):
         )
         host = (
             request.META["HTTP_HOST"]
-            if request and hasattr(request.META, "HTTP_HOST")
+            if request and "HTTP_HOST" in request.META
             else None
         )
         calendar_url = reverse(
@@ -85,7 +85,7 @@ class ReservationUnitIcalViewset(ViewSet):
 
         host = (
             request.META["HTTP_HOST"]
-            if request and hasattr(request.META, "HTTP_HOST")
+            if request and "HTTP_HOST" in request.META
             else None
         )
 
