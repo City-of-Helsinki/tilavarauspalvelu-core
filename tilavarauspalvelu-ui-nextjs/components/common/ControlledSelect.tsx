@@ -41,7 +41,7 @@ const ControlledSelect = ({
             {...newProps}
             id={name}
             value={currentValue}
-            placeholder={t("common.select")}
+            placeholder={t("common:select")}
             options={options}
             label={label}
             required={required}

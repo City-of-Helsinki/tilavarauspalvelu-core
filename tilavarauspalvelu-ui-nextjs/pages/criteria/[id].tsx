@@ -1,13 +1,23 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Koros } from "hds-react";
+import { GetServerSideProps } from "next";
 import styled from "styled-components";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useRouter } from "next/router";
 import Container from "../../components/common/Container";
 import { getApplicationRound } from "../../modules/api";
 import { CenterSpinner } from "../../components/common/common";
 import { ApplicationRound } from "../../modules/types";
 import Sanitize from "../../components/common/Sanitize";
+
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale)),
+    },
+  };
+};
 
 const Head = styled.div`
   background-color: var(--color-white);
@@ -64,8 +74,8 @@ const Criteria = (): JSX.Element => {
         <HeadContent>
           <H1>
             {state === "done"
-              ? `${applicationRound?.name} ${t("Criteria.criteria")}`
-              : t("common.error.dataError")}
+              ? `${applicationRound?.name} ${t("applicationRound:criteria")}`
+              : t("common:error.dataError")}
           </H1>
         </HeadContent>
         <StyledKoros className="koros" type="wave" />

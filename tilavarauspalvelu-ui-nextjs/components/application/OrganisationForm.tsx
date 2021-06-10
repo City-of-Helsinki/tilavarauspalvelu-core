@@ -108,7 +108,7 @@ const OrganisationForm = ({
           <SpanTwoColumns>
             <TextInput
               ref={register({ required: true })}
-              label={t("Application.Page3.organisation.name")}
+              label={t("application:Page3.organisation.name")}
               id="organisation.name"
               name="organisation.name"
               required
@@ -117,7 +117,7 @@ const OrganisationForm = ({
             />
             <TextInput
               ref={register({ required: true })}
-              label={t("Application.Page3.organisation.coreBusiness")}
+              label={t("application:Page3.organisation.coreBusiness")}
               id="organisation.coreBusiness"
               name="organisation.coreBusiness"
               required
@@ -128,7 +128,7 @@ const OrganisationForm = ({
           <ControlledSelect
             name="homeCityId"
             required
-            label={t("Application.Page3.homeCity")}
+            label={t("application:Page3.homeCity")}
             control={control}
             options={homeCityOptions}
             error={errorText(t, errors.homeCityId?.type)}
@@ -136,7 +136,7 @@ const OrganisationForm = ({
           <Placeholder />
           <TextInput
             ref={register({ required: hasRegistration })}
-            label={t("Application.Page3.organisation.registrationNumber")}
+            label={t("application:Page3.organisation.registrationNumber")}
             id="organisation.identifier"
             name="organisation.identifier"
             required={hasRegistration}
@@ -146,7 +146,7 @@ const OrganisationForm = ({
           />
           <CheckboxWrapper>
             <Checkbox
-              label={t("Application.Page3.organisation.notRegistered")}
+              label={t("application:Page3.organisation.notRegistered")}
               id="organisation.notRegistered"
               name="organisation.notRegistered"
               checked={!hasRegistration}
@@ -155,7 +155,7 @@ const OrganisationForm = ({
           </CheckboxWrapper>
           <TextInput
             ref={register({ required: true })}
-            label={t("Application.Page3.organisation.streetAddress")}
+            label={t("application:Page3.organisation.streetAddress")}
             id="organisation.address.streetAddress"
             name="organisation.address.streetAddress"
             required
@@ -167,7 +167,7 @@ const OrganisationForm = ({
           />
           <TextInput
             ref={register({ required: true })}
-            label={t("Application.Page3.organisation.postCode")}
+            label={t("application:Page3.organisation.postCode")}
             id="organisation.address.postCode"
             name="organisation.address.postCode"
             required
@@ -179,7 +179,7 @@ const OrganisationForm = ({
           />
           <TextInput
             ref={register({ required: true })}
-            label={t("Application.Page3.organisation.city")}
+            label={t("application:Page3.organisation.city")}
             id="organisation.address.city"
             name="organisation.address.city"
             required
@@ -187,7 +187,7 @@ const OrganisationForm = ({
             errorText={errorText(t, errors.organisation?.address?.city?.type)}
           />
           <Checkbox
-            label={t("Application.Page3.organisation.separateInvoicingAddress")}
+            label={t("application:Page3.organisation.separateInvoicingAddress")}
             id="organisation.hasInvoicingAddress"
             name="organisation.hasInvoicingAddress"
             checked={hasBillingAddress}
@@ -198,7 +198,7 @@ const OrganisationForm = ({
           ) : null}
           <TextInput
             ref={register({ required: true })}
-            label={t("Application.Page3.contactPerson.phoneNumber")}
+            label={t("application:Page3.contactPerson.phoneNumber")}
             id="contactPerson.phoneNumber"
             name="contactPerson.phoneNumber"
             required
@@ -207,7 +207,7 @@ const OrganisationForm = ({
           />
           <TextInput
             ref={register({ required: true })}
-            label={t("Application.Page3.contactPerson.firstName")}
+            label={t("application:Page3.contactPerson.firstName")}
             id="contactPerson.firstName"
             name="contactPerson.firstName"
             required
@@ -216,7 +216,7 @@ const OrganisationForm = ({
           />
           <TextInput
             ref={register({ required: true })}
-            label={t("Application.Page3.contactPerson.lastName")}
+            label={t("application:Page3.contactPerson.lastName")}
             id="contactPerson.lastName"
             name="contactPerson.lastName"
             required

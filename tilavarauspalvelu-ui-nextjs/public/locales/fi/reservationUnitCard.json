@@ -1,0 +1,8 @@
+{
+  "maxPersons": "{{maxPersons}} henkilöä",
+  "RelatedUnits": {
+    "heading": "Toimipisteen muut tilat"
+  },
+  "address": "Katuosoite",
+  "type": "Palvelun tyyppi"
+}

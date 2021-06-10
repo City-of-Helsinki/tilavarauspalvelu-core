@@ -42,7 +42,7 @@ const Head = ({
       <Content>
         <Breadcrumb
           current={{
-            label: `${t("breadcrumb.application")} - ${breadCrumbText}`,
+            label: `${t("breadcrumb:application")} - ${breadCrumbText}`,
             linkTo: "#",
           }}
         />

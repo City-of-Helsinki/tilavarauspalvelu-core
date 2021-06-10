@@ -107,7 +107,7 @@ const ReservationUnitCard = ({
   return (
     <Container>
       <Image
-        alt={t("common.imgAltForSpace", {
+        alt={t("common:imgAltForSpace", {
           name: localizedValue(reservationUnit.name, i18n.language),
         })}
         src={
@@ -127,7 +127,9 @@ const ReservationUnitCard = ({
         <Bottom>
           {reservationUnit.reservationUnitType ? (
             <IconWithText
-              icon={<IconInfoCircle aria-label={t("ReservationUnit.type")} />}
+              icon={
+                <IconInfoCircle aria-label={t("reservationUnitCard:type")} />
+              }
               text={localizedValue(
                 reservationUnit.reservationUnitType?.name,
                 i18n.language
@@ -136,14 +138,22 @@ const ReservationUnitCard = ({
           ) : null}
           {reservationUnit.maxPersons ? (
             <IconWithText
-              icon={<IconGroup aria-label={t("ReservationUnit.maxPersons")} />}
+              icon={
+                <IconGroup
+                  aria-label={t("reservationUnitCard:maxPersons", {
+                    maxPersons: reservationUnit.maxPersons,
+                  })}
+                />
+              }
               text={`${reservationUnit.maxPersons}`}
             />
           ) : null}
           {getAddress(reservationUnit) ? (
             <IconWithText
               className="grow"
-              icon={<IconLocation aria-label={t("ReservationUnit.address")} />}
+              icon={
+                <IconLocation aria-label={t("reservationUnitCard:address")} />
+              }
               text={getAddress(reservationUnit) || ""}
             />
           ) : null}{" "}
@@ -157,7 +167,7 @@ const ReservationUnitCard = ({
             iconLeft={<IconCheck />}
             onClick={() => removeReservationUnit(reservationUnit)}
           >
-            {t("common.removeReservationUnit")}
+            {t("common:removeReservationUnit")}
           </Button>
         ) : (
           <Button
@@ -165,7 +175,7 @@ const ReservationUnitCard = ({
             onClick={() => selectReservationUnit(reservationUnit)}
             variant="secondary"
           >
-            {t("common.selectReservationUnit")}
+            {t("common:selectReservationUnit")}
           </Button>
         )}
       </Actions>

@@ -2,6 +2,8 @@ import { Button, Notification, Select } from "hds-react";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "next/router";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { GetStaticProps } from "next";
 import styled from "styled-components";
 import { getApplicationRounds, saveApplication } from "../modules/api";
 import { useApiDataNoParams } from "../hooks/useApiData";
@@ -12,6 +14,14 @@ import { AccordionWithState as Accordion } from "../components/common/Accordion"
 import Loader from "../components/common/Loader";
 import { minimalApplicationForInitialSave } from "../modules/application/applicationInitializer";
 import ApplicationPage from "../components/application/ApplicationPage";
+
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale)),
+    },
+  };
+};
 
 const Container = styled.div`
   margin-top: var(--spacing-layout-m);
@@ -72,13 +82,13 @@ const Intro = (): JSX.Element => {
 
   return (
     <ApplicationPage
-      translationKeyPrefix="Application.Intro"
+      translationKeyPrefix="application:Intro"
       headContent={
         <Container>
           <Loader datas={[applicationRounds]}>
             <Select
               id="reservationUnitSearch.purpose"
-              placeholder={t("common.select")}
+              placeholder={t("common:select")}
               options={applicationRounds.transformed as OptionType[]}
               label=""
               onChange={(selection: OptionType): void => {
@@ -91,13 +101,13 @@ const Intro = (): JSX.Element => {
                 createNewApplication(applicationRound);
               }}
             >
-              {t("Application.Intro.startNewApplication")}
+              {t("application:Intro.startNewApplication")}
             </Button>
           </Loader>
         </Container>
       }
     >
-      <Accordion heading={t("Application.Intro.faq1.question")}>
+      <Accordion heading={t("application:Intro.faq1.question")}>
         <Preformatted>
           {`
 Luo hakemus YHDISTYKSENÄ tai RYHMÄNÄ, jos haet vuoroa esim. järjestölle, bändille, tanssi- tai teatteriryhmälle, asukasyhdistykselle tai muuhun ryhmä- tai yhteisötoimintaan. Valinta tehdään hakemuksen lopussa kohdassa 3 ”Varaajan perustiedot”.
@@ -143,7 +153,7 @@ Valitse kalenterista KAIKKI ne ajankohdat, jolle vuorosi voidaan sijoittaa. Mit�
 `}
         </Preformatted>
       </Accordion>
-      <Accordion heading={t("Application.Intro.faq2.question")}>
+      <Accordion heading={t("application:Intro.faq2.question")}>
         <Preformatted>{`Voit täydentää hakemustasi ennen hakuajan päättymistä. Poista tarpeettomat hakemukset, sillä VIIMEISIN SAAPUNUT hakemus katsotaan voimassa olevaksi. Lähetetyn hakemuksen tunnistat
 sinisestä KÄSITTELYSSÄ-symbolista. Paperisia käyttövuoroanomuksia tai myöhässä tulleita hakemuksia ei käsitellä.
 
@@ -151,7 +161,7 @@ Päätökset vuoroista pyritään antamaan kuukauden kuluessa hakukierroksen pä
 
 Jos sinulle ei myönnetty vakiovuoroa hakemiisi tiloihin, voit tiedustella vapaaksi jääneitä aikoja suoraan muilta nuorisotaloiltamme. Muutoksenhakua ja hinnan kohtuullistamista tulee hakea kahden viikon kuluessa päätöksen antamisesta.`}</Preformatted>
       </Accordion>
-      <Accordion heading={t("Application.Intro.faq3.question")}>
+      <Accordion heading={t("application:Intro.faq3.question")}>
         <Preformatted>
           {`Luo hakemus YKSITYISHENKILÖNÄ vain, jos haet vuoroa itsellesi, perheellesi tai järjestämääsi juhlaa tai tilaisuutta varten. Valinta tehdään hakemuksen lopussa kohdassa 3 ” Varaajan perustiedot”.
 
@@ -190,20 +200,20 @@ YRITYKSENÄ”. Ilmoita yhteystiedot ja sähköpostiosoite. Huomaa, että kaikki
               createNewApplication(applicationRound);
             }}
           >
-            {t("Application.Intro.startNewApplication")}
+            {t("application:Intro.startNewApplication")}
           </Button>
         </Loader>
       </Container>
       {error ? (
         <Notification
           type="error"
-          label={t("Application.Intro.createFailedHeading")}
+          label={t("application:Intro.createFailedHeading")}
           position="top-center"
           autoClose
           displayAutoCloseProgress={false}
           onClose={() => setError(false)}
         >
-          {t("Application.Intro.createFailedContent")}
+          {t("application:Intro.createFailedContent")}
           {error}
         </Notification>
       ) : null}

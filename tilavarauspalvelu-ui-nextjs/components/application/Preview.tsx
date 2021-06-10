@@ -182,9 +182,9 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
   if (!application.id) {
     return (
       <>
-        <h1>{t("Application.preview.noData.heading")}</h1>
+        <h1>{t("application:preview.noData.heading")}</h1>
         <Link href="page1">
-          <a>{t("Application.preview.noData.text")}</a>
+          <a>{t("application:preview.noData.text")}</a>
         </Link>
       </>
     );
@@ -195,7 +195,7 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
       <Accordion
         open
         id="basicInfo"
-        heading={t("Application.preview.basicInfoSubHeading")}
+        heading={t("application:preview.basicInfoSubHeading")}
       >
         <ApplicantInfoPreview cities={cities} application={application} />
       </Accordion>
@@ -208,15 +208,15 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
         >
           <TwoColumnContainer>
             <LabelValue
-              label={t("Application.preview.applicationEvent.name")}
+              label={t("application:preview.applicationEvent.name")}
               value={applicationEvent.name}
             />
             <LabelValue
-              label={t("Application.preview.applicationEvent.numPersons")}
+              label={t("application:preview.applicationEvent.numPersons")}
               value={applicationEvent.numPersons}
             />
             <LabelValue
-              label={t("Application.preview.applicationEvent.ageGroup")}
+              label={t("application:preview.applicationEvent.ageGroup")}
               value={
                 applicationEvent.ageGroupId
                   ? `${
@@ -226,7 +226,7 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
               }
             />{" "}
             <LabelValue
-              label={t("Application.preview.applicationEvent.purpose")}
+              label={t("application:preview.applicationEvent.purpose")}
               value={
                 applicationEvent.purposeId != null
                   ? localizedValue(
@@ -237,35 +237,35 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
               }
             />{" "}
             <LabelValue
-              label={t("Application.preview.applicationEvent.begin")}
+              label={t("application:preview.applicationEvent.begin")}
               value={applicationEvent.begin || ""}
             />
             <LabelValue
-              label={t("Application.preview.applicationEvent.end")}
+              label={t("application:preview.applicationEvent.end")}
               value={applicationEvent.end || ""}
             />
             <LabelValue
-              label={t("Application.preview.applicationEvent.minDuration")}
+              label={t("application:preview.applicationEvent.minDuration")}
               value={formatDuration(applicationEvent.minDuration as string)}
             />
             <LabelValue
-              label={t("Application.preview.applicationEvent.maxDuration")}
+              label={t("application:preview.applicationEvent.maxDuration")}
               value={formatDuration(applicationEvent.maxDuration as string)}
             />
             <LabelValue
-              label={t("Application.preview.applicationEvent.eventsPerWeek")}
+              label={t("application:preview.applicationEvent.eventsPerWeek")}
               value={applicationEvent.eventsPerWeek}
             />
             <LabelValue
-              label={t("Application.preview.applicationEvent.biweekly")}
-              value={t(`common.${applicationEvent.biweekly}`) as string}
+              label={t("application:preview.applicationEvent.biweekly")}
+              value={t(`common:${applicationEvent.biweekly}`) as string}
             />
             {applicationEvent.eventReservationUnits.map(
               (reservationUnit, index) => (
                 <LabelValue
                   key={reservationUnit.reservationUnitId}
                   label={t(
-                    "Application.preview.applicationEvent.reservationUnit",
+                    "application:preview.applicationEvent.reservationUnit",
                     { order: index + 1 }
                   )}
                   value={[
@@ -290,7 +290,7 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
           </TwoColumnContainer>
           <Ruler />
           <SmallSubHeadline>
-            {t("Application.preview.applicationEventSchedules")}
+            {t("application:preview.applicationEventSchedules")}
           </SmallSubHeadline>
           <TimePreviewContainer>
             <TimePreview
@@ -302,11 +302,11 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
         </Accordion>
       ))}
       <SmallSubHeadline>
-        {t("Application.preview.termsOfService")}
+        {t("application:preview.termsOfService")}
       </SmallSubHeadline>
       <Terms>{tos}</Terms>
       <SmallSubHeadline>
-        {t("Application.preview.reservationUnitTerms")}
+        {t("application:preview.reservationUnitTerms")}
       </SmallSubHeadline>
       <Terms>{spaceTos}</Terms>
       <CheckboxContainer>
@@ -316,13 +316,13 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
           onChange={(e) => setAcceptTermsOfUse(e.target.checked)}
         />
         <label htmlFor="preview.acceptTermsOfUse">
-          {t("Application.preview.userAcceptsTerms")}
+          {t("application:preview.userAcceptsTerms")}
         </label>
       </CheckboxContainer>
       <StyledNotification
-        label={t("Application.preview.notification.processing")}
+        label={t("application:preview.notification.processing")}
       >
-        {t("Application.preview.notification.body")}
+        {t("application:preview.notification.body")}
       </StyledNotification>
       <ButtonContainer>
         <Button
@@ -330,7 +330,7 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
           iconLeft={<IconArrowLeft />}
           onClick={() => router.push("page3")}
         >
-          {t("common.prev")}
+          {t("common:prev")}
         </Button>
         <Button
           id="submit"
@@ -339,7 +339,7 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
           }}
           disabled={!acceptTermsOfUse}
         >
-          {t("common.submit")}
+          {t("common:submit")}
         </Button>
       </ButtonContainer>
     </>

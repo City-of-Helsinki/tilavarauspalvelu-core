@@ -19,11 +19,11 @@ const ApplicantInfoPreview = ({
       {application.applicantType !== "individual" ? (
         <>
           <LabelValue
-            label={t("Application.preview.organisation.name")}
+            label={t("application:preview.organisation.name")}
             value={application.organisation?.name}
           />
           <LabelValue
-            label={t("Application.preview.applicantTypeLabel")}
+            label={t("application:preview.applicantTypeLabel")}
             value={String(
               t(
                 `Application.preview.applicantType.${application.applicantType}`
@@ -32,13 +32,13 @@ const ApplicantInfoPreview = ({
           />
           <SpanTwoColumns>
             <LabelValue
-              label={t("Application.preview.organisation.coreBusiness")}
+              label={t("application:preview.organisation.coreBusiness")}
               value={application.organisation?.coreBusiness}
             />
           </SpanTwoColumns>
           <SpanTwoColumns>
             <LabelValue
-              label={t("Application.preview.homeCity")}
+              label={t("application:preview.homeCity")}
               value={
                 application.homeCityId
                   ? (cities[application.homeCityId].name as string)
@@ -48,34 +48,34 @@ const ApplicantInfoPreview = ({
           </SpanTwoColumns>
           <Address
             address={application.organisation?.address}
-            i18nMessagePrefix="common.address"
+            i18nMessagePrefix="common:address"
           />
           <Address
             address={application.billingAddress}
-            i18nMessagePrefix="common.billingAddress"
+            i18nMessagePrefix="common:billingAddress"
           />
         </>
       ) : null}
       <LabelValue
-        label={t("Application.preview.firstName")}
+        label={t("application:preview.firstName")}
         value={application.contactPerson?.firstName}
       />
       <LabelValue
-        label={t("Application.preview.lastName")}
+        label={t("application:preview.lastName")}
         value={application.contactPerson?.lastName}
       />
       <LabelValue
-        label={t("Application.preview.email")}
+        label={t("application:preview.email")}
         value={application.contactPerson?.email}
       />
       <LabelValue
-        label={t("Application.preview.phoneNumber")}
+        label={t("application:preview.phoneNumber")}
         value={application.contactPerson?.phoneNumber}
       />
       {application.applicantType === "individual" ? (
         <Address
           address={application.billingAddress}
-          i18nMessagePrefix="common.address"
+          i18nMessagePrefix="common:address"
         />
       ) : null}
     </TwoColumnContainer>

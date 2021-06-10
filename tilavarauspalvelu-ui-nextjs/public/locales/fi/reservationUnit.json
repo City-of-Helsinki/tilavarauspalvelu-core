@@ -1,0 +1,15 @@
+{
+  "type": "Tyyppi",
+  "maxPersons": "Suurin sallittu henkilömäärä",
+  "address": "Osoite",
+  "maxDuration": "Varauksen kesto",
+  "price": "Hinta",
+  "billableHours": "Maksulliset tunnit",
+  "linkMap": "Avaa kartta uuteen ikkunaan",
+  "linkHSL": "HSL Reittiopas",
+  "linkGoogle": "Google reittiohjeet",
+  "images": "Kuvat",
+  "description": "Kuvaus",
+  "termsOfUse": "Käyttöehdot ja säännöt",
+  "backToSearch": "Takaisin hakutuloksiin"
+}

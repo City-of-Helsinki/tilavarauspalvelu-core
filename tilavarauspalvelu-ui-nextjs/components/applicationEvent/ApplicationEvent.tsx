@@ -241,13 +241,13 @@ const ApplicationEvent = ({
         heading={`${eventName}` || ""}
       >
         <SubHeadLine>
-          {t("Application.Page1.basicInformationSubHeading")}
+          {t("application:Page1.basicInformationSubHeading")}
         </SubHeadLine>
         <TwoColumnContainer>
           <div>
             <TextInput
               ref={form.register({ required: true })}
-              label={t("Application.Page1.name")}
+              label={t("application:Page1.name")}
               id={fieldName("name")}
               name={fieldName("name")}
               required
@@ -268,7 +268,7 @@ const ApplicationEvent = ({
                   numPersonsMin: (val) => Number(val) > 0,
                 },
               })}
-              label={t("Application.Page1.groupSize")}
+              label={t("application:Page1.groupSize")}
               id={fieldName("numPersons")}
               name={fieldName("numPersons")}
               invalid={
@@ -283,7 +283,7 @@ const ApplicationEvent = ({
           <ControlledSelect
             name={fieldName("ageGroupId")}
             required
-            label={t("Application.Page1.ageGroup")}
+            label={t("application:Page1.ageGroup")}
             control={form.control}
             options={ageGroupOptions}
             error={errorText(
@@ -294,7 +294,7 @@ const ApplicationEvent = ({
           <ControlledSelect
             name={fieldName("purposeId")}
             required
-            label={t("Application.Page1.purpose")}
+            label={t("application:Page1.purpose")}
             control={form.control}
             options={purposeOptions}
             error={errorText(
@@ -304,7 +304,7 @@ const ApplicationEvent = ({
           />
         </TwoColumnContainer>
         <HorisontalRule />
-        <SubHeadLine>{t("Application.Page1.spacesSubHeading")}</SubHeadLine>
+        <SubHeadLine>{t("application:Page1.spacesSubHeading")}</SubHeadLine>
         <ReservationUnitList
           selectedReservationUnits={selectedReservationUnits}
           applicationEvent={applicationEvent}
@@ -320,7 +320,7 @@ const ApplicationEvent = ({
         />
         <HorisontalRule />
         <SubHeadLine>
-          {t("Application.Page1.applicationRoundSubHeading")}
+          {t("application:Page1.applicationRoundSubHeading")}
         </SubHeadLine>
         <PeriodContainer>
           <DateInput
@@ -353,7 +353,7 @@ const ApplicationEvent = ({
                   ),
               },
             })}
-            label={t("Application.Page1.periodStartDate")}
+            label={t("application:Page1.periodStartDate")}
             id={fieldName("begin")}
             name={fieldName("begin")}
             value={form.getValues(fieldName("begin"))}
@@ -398,7 +398,7 @@ const ApplicationEvent = ({
               form.trigger([fieldName("end"), fieldName("begin")]);
             }}
             value={form.getValues(fieldName("end"))}
-            label={t("Application.Page1.periodEndDate")}
+            label={t("application:Page1.periodEndDate")}
             id={fieldName("end")}
             name={fieldName("end")}
             required
@@ -426,7 +426,7 @@ const ApplicationEvent = ({
           <ControlledSelect
             name={fieldName("minDuration")}
             required
-            label={t("Application.Page1.minDuration")}
+            label={t("application:Page1.minDuration")}
             control={form.control}
             options={durationOptions}
             error={errorText(
@@ -449,7 +449,7 @@ const ApplicationEvent = ({
           <ControlledSelect
             name={fieldName("maxDuration")}
             required
-            label={t("Application.Page1.maxDuration")}
+            label={t("application:Page1.maxDuration")}
             control={form.control}
             options={durationOptions}
             error={errorText(
@@ -473,7 +473,7 @@ const ApplicationEvent = ({
             <Checkbox
               id="durationCheckbox"
               checked={defaultDurationSelected}
-              label={t("Application.Page1.defaultDurationLabel")}
+              label={t("application:Page1.defaultDurationLabel")}
               onChange={(e) => {
                 clearDurationErrors(form, fieldName);
                 selectDefaultDuration(e);
@@ -488,7 +488,7 @@ const ApplicationEvent = ({
                   eventsPerWeekMin: (val) => Number(val) > 0,
                 },
               })}
-              label={t("Application.Page1.eventsPerWeek")}
+              label={t("application:Page1.eventsPerWeek")}
               id={fieldName("eventsPerWeek")}
               name={fieldName("eventsPerWeek")}
               type="number"
@@ -514,7 +514,7 @@ const ApplicationEvent = ({
                     id={fieldName("biweekly")}
                     checked={props.value}
                     onChange={() => props.onChange(!props.value)}
-                    label={t("Application.Page1.biweekly")}
+                    label={t("application:Page1.biweekly")}
                   />
                 </CheckboxWrapper>
               );
@@ -536,7 +536,7 @@ const ApplicationEvent = ({
             id={`applicationEvents[${index}].save`}
             onClick={onSave}
           >
-            {t("Application.Page1.saveEvent")}
+            {t("application:Page1.saveEvent")}
           </Button>
           <Button
             type="button"
@@ -546,11 +546,11 @@ const ApplicationEvent = ({
               modalRef?.current?.open();
             }}
           >
-            {t("Application.Page1.deleteEvent")}
+            {t("application:Page1.deleteEvent")}
           </Button>
           <ConfirmationModal
             id="application-event-confirmation"
-            cancelLabel="common.close"
+            cancelLabel="common:close"
             heading={t("DeleteEvent.heading")}
             content={t("DeleteEvent.text")}
             onOk={del}
@@ -563,9 +563,9 @@ const ApplicationEvent = ({
         <Notification
           size="small"
           type="success"
-          label={t("Application.applicationEventSaved")}
+          label={t("application:applicationEventSaved")}
         >
-          {t("Application.applicationEventSaved")}
+          {t("application:applicationEventSaved")}
         </Notification>
       ) : null}
     </>

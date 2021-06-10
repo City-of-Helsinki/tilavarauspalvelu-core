@@ -59,7 +59,7 @@ const ServiceNotification = (): JSX.Element | null => {
             }}
           >
             <Message>{displayMessage.content}</Message>
-            <Button>{t("common.close")}</Button>
+            <Button>{t("common:close")}</Button>
           </Content>
         </Container>
       </Banner>

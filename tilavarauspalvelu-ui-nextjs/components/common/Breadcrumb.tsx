@@ -6,13 +6,12 @@ import styled from "styled-components";
 interface Props {
   current: BreadcrumbType;
 }
-
 interface BreadcrumbType {
   label: string;
   linkTo?: string;
 }
 
-const root = { label: "breadcrumb.home", linkTo: "/" } as BreadcrumbType;
+const root = { label: "home", linkTo: "/" } as BreadcrumbType;
 
 const Container = styled.nav`
   margin-top: var(--spacing-s);
@@ -38,7 +37,7 @@ const Breadcrumb = ({ current }: Props): JSX.Element => {
             aria-current="location"
             href={bc.linkTo || ""}
           >
-            {t(bc.label)}
+            <a>{t(`breadcrumb:${bc.label}`)}</a>
           </Link>
         </React.Fragment>
       ))}

@@ -21,8 +21,8 @@ const ConfirmationModal = forwardRef(
       content,
       onOk,
       onCancel,
-      okLabel = "common.ok",
-      cancelLabel = "common.cancel",
+      okLabel = "common:ok",
+      cancelLabel = "common:cancel",
     }: Props,
     ref
   ): JSX.Element | null => {

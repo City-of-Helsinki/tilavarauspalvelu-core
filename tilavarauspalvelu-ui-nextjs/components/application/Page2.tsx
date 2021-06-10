@@ -98,7 +98,7 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
         .map((ae) => ae.applicationEventSchedules.length > 0)
         .filter((l) => l === false).length > 0
     ) {
-      setMsg("Application.error.missingSchedule");
+      setMsg("application:error.missingSchedule");
       return;
     }
     onNext(appToSave);
@@ -127,11 +127,11 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
             heading={event.name || undefined}
           >
             <Notification
-              label={t("Application.Page2.info")}
+              label={t("application:Page2.info")}
               size="small"
               type="info"
             >
-              <Trans i18nKey="Application.Page2.info">
+              <Trans i18nKey="application:Page2.info">
                 <a
                   target="_blank"
                   rel="noopener noreferrer"
@@ -162,14 +162,14 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
           iconLeft={<IconArrowLeft />}
           onClick={() => history.push("page1")}
         >
-          {t("common.prev")}
+          {t("common:prev")}
         </Button>
         <Button
           id="next"
           iconRight={<IconArrowRight />}
           onClick={() => onSubmit()}
         >
-          {t("common.next")}
+          {t("common:next")}
         </Button>
       </ButtonContainer>
     </>

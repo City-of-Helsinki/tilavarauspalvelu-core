@@ -1,0 +1,12 @@
+{
+  "searchTermPlaceholder": "Hae sanalla",
+  "searchButton": "Hae tilaa",
+  "purposeLabel": "Tilan käyttötarkoitus",
+  "roundLabel": "Hakukierros",
+  "districtLabel": "Kaupunginosa",
+  "priceLabel": "Hinta",
+  "participantCountLabel": "Henkilömäärä vähintään",
+  "typeLabel": "Tilan tyyppi",
+  "showMoreFilters": "Tarkennettu haku",
+  "showLessFilters": "Näytä vähemmän vaihtoehtoja"
+}

@@ -1,6 +1,6 @@
-import React from 'react';
-import { IconLinkExternal } from 'hds-react';
-import styled from 'styled-components';
+import React from "react";
+import { IconLinkExternal } from "hds-react";
+import styled from "styled-components";
 
 type Props = {
   href: string | null;
@@ -22,7 +22,7 @@ const Name = styled.span`
   font-size: var(--fontsize-body-m);
 `;
 
-const ExtrenalLink = ({ name, href }: Props): JSX.Element | null =>
+const ExternalLink = ({ name, href }: Props): JSX.Element | null =>
   name && href ? (
     <a href={href} target="_blank" rel="noopener noreferrer">
       <Container>
@@ -32,4 +32,4 @@ const ExtrenalLink = ({ name, href }: Props): JSX.Element | null =>
     </a>
   ) : null;
 
-export default ExtrenalLink;
+export default ExternalLink;

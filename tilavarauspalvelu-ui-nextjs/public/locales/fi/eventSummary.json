@@ -1,0 +1,13 @@
+{
+  "space": "Tila",
+  "purpose": "Käyttötarkoitus",
+  "begin": "Alkaa",
+  "end": "Päättyy",
+  "weekDay": "Päivä",
+  "time": "Kellonaika",
+  "notAvailable": "Poikkeukset, jolloin vakiovuoro ei ole käytettävissänne",
+  "duration": "Vuoron kesto {{duration}}",
+  "everyWeek": "Viikottain",
+  "everyOtherWeek": "Joka toinen viikko",
+  "showList": "Näytä yksityiskohtainen vuorolista"
+}

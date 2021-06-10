@@ -94,7 +94,7 @@ const Images = ({ images }: Props): JSX.Element => {
             >
               <ThumbnailImage
                 key={image.smallUrl}
-                alt={t("common.imgAltForSpace")}
+                alt={t("common:imgAltForSpace")}
                 src={image.smallUrl}
               />
             </StyledButton>
@@ -105,12 +105,12 @@ const Images = ({ images }: Props): JSX.Element => {
             setShowModal(false);
           }}
           show={showModal}
-          closeButtonKey="common.close"
+          closeButtonKey=":close"
         >
           <ModalContent>
             {currentImage ? (
               <LargeImage
-                alt={t("common.imgAltForSpace")}
+                alt={t("common:imgAltForSpace")}
                 src={currentImage.imageUrl}
               />
             ) : null}
@@ -124,7 +124,7 @@ const Images = ({ images }: Props): JSX.Element => {
                 >
                   <ThumbnailImage
                     key={image.smallUrl}
-                    alt={t("common.imgAltForSpace")}
+                    alt={t("common:imgAltForSpace")}
                     src={image.smallUrl}
                   />
                 </StyledButton>

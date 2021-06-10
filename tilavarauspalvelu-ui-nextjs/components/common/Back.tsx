@@ -20,7 +20,7 @@ type Props = {
   label?: string;
 };
 
-const Back = ({ label = "common.prev" }: Props): JSX.Element => {
+const Back = ({ label = "common:prev" }: Props): JSX.Element => {
   const { t } = useTranslation();
   const router = useRouter();
 

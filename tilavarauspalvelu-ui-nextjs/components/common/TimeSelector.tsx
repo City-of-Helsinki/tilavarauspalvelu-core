@@ -238,7 +238,7 @@ const TimeSelector = ({
             painting={painting}
             setPainting={setPainting}
             key={`day-${c}`}
-            head={t(`calendar.${c}`)}
+            head={t(`calendar:${c}`)}
             cells={cells[i]}
             setCellValue={setCellValue}
           />
@@ -254,7 +254,7 @@ const TimeSelector = ({
         ))}
       </LegendContainer>
 
-      <SubHeadline>{t("Application.Page2.summary")}</SubHeadline>
+      <SubHeadline>{t("application:Page2.summary")}</SubHeadline>
       <TimePreviewContainer>
         <TimePreview applicationEventSchedules={summaryData} />
       </TimePreviewContainer>
@@ -262,7 +262,7 @@ const TimeSelector = ({
       {copyCells ? (
         <ButtonContainer>
           <Button variant="secondary" onClick={() => copyCells(index)}>
-            {t("Application.Page2.copyTimes")}
+            {t("application:Page2.copyTimes")}
           </Button>
         </ButtonContainer>
       ) : null}

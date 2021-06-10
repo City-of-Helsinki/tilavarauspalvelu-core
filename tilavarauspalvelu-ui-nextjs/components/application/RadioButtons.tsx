@@ -28,7 +28,7 @@ const RadioButtons = ({
           <RadioButton
             name={id}
             id={id}
-            label={t(`Application.Page3.as.type.${id}`)}
+            label={t(`application:Page3.as.type.${id}`)}
             onClick={() => {
               setActiveForm(id as FormType);
             }}

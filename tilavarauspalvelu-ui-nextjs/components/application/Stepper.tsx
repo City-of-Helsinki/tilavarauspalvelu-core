@@ -69,7 +69,7 @@ const Stepper = ({ application }: Props): JSX.Element => {
   const pages = ["page1", "page2", "page3", "preview"];
 
   return (
-    <NavigationContainer aria-label={t("common.applicationNavigationName")}>
+    <NavigationContainer aria-label={t("common:applicationNavigationName")}>
       <ul>
         {pages.map((page, index) => (
           <li key={page}>
@@ -78,14 +78,14 @@ const Stepper = ({ application }: Props): JSX.Element => {
                 <a>
                   <span>
                     <Number>{index + 1}</Number>
-                    {t(`ApplicationPage.navigation.${page}`)}
+                    {t(`application:navigation.${page}`)}
                   </span>
                 </a>
               </Link>
             ) : (
               <span>
                 <Number>{index + 1}</Number>
-                {t(`ApplicationPage.navigation.${page}`)}
+                {t(`application:navigation.${page}`)}
               </span>
             )}
           </li>

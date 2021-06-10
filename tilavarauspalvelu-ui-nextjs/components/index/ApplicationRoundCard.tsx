@@ -70,27 +70,26 @@ const ApplicationRoundCard = ({ applicationRound }: Props): JSX.Element => {
         <Name>{applicationRound.name}</Name>
         <div>
           {state === "pending" &&
-            t("ApplicationRoundCard.pending", {
-              openingDateTime: t("common.dateTime", {
+            t("applicationRound:card.pending", {
+              openingDateTime: t("common:dateTime", {
                 date: parseISO(applicationRound.applicationPeriodBegin),
               }),
             })}
           {state === "active" &&
-            t("ApplicationRoundCard.open", {
+            t("applicationRound:card.open", {
               until: parseISO(applicationRound.applicationPeriodEnd),
             })}
           {state === "past" &&
-            t("ApplicationRoundCard.past", {
+            t("applicationRound:card.past", {
               closingDate: parseISO(applicationRound.applicationPeriodEnd),
             })}
         </div>
         <CardButton
-          noLeftMargin
           variant="supplementary"
           iconLeft={<IconArrowRight />}
           onClick={() => history.push(`/criteria/${applicationRound.id}`)}
         >
-          {t("ApplicationRoundCard.criteria")}
+          {t("applicationRound:card.criteria")}
         </CardButton>
       </StyledContainer>
       {state === "active" && (
@@ -99,7 +98,7 @@ const ApplicationRoundCard = ({ applicationRound }: Props): JSX.Element => {
             history.push(searchUrl({ applicationRound: applicationRound.id }))
           }
         >
-          {t("ApplicationRoundCard.applyButton")}
+          {t("applicationRound:card.applyButton")}
         </CardButton>
       )}
       {state === "past" && (
@@ -108,7 +107,7 @@ const ApplicationRoundCard = ({ applicationRound }: Props): JSX.Element => {
             history.push(searchUrl({ applicationRound: applicationRound.id }))
           }
         >
-          {t("ApplicationRoundCard.displayPastButton")}
+          {t("applicationRound:card.displayPastButton")}
         </CardButton>
       )}
     </StyledCard>

@@ -69,7 +69,7 @@ const SearchForm = ({ onSearch, formValues }: Props): JSX.Element | null => {
     async function fetchData() {
       const fetchedApplicationPeriods = await getApplicationRounds();
       setApplicationPeriodOptions(
-        mapOptions(fetchedApplicationPeriods, t("common.select"), i18n.language)
+        mapOptions(fetchedApplicationPeriods, t("common:select"), i18n.language)
       );
       const fetchedReservationUnitTypes = await getParameters(
         "reservation_unit_type"
@@ -77,7 +77,7 @@ const SearchForm = ({ onSearch, formValues }: Props): JSX.Element | null => {
       setReservationUnitTypeOptions(
         mapOptions(
           fetchedReservationUnitTypes,
-          t("common.select"),
+          t("common:select"),
           i18n.language
         )
       );
@@ -106,7 +106,7 @@ const SearchForm = ({ onSearch, formValues }: Props): JSX.Element | null => {
           name="search"
           label="&nbsp;"
           ref={register()}
-          placeholder={t("SearchForm.searchTermPlaceholder")}
+          placeholder={t("searchForm:searchTermPlaceholder")}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
               handleSubmit(search)();
@@ -116,7 +116,7 @@ const SearchForm = ({ onSearch, formValues }: Props): JSX.Element | null => {
         />
         <Select
           id="applicationRound"
-          placeholder={t("common.select")}
+          placeholder={t("common:select")}
           options={applicationPeriodOptions}
           onChange={(selection: OptionType): void => {
             setValue("applicationRound", selection.value);
@@ -125,15 +125,15 @@ const SearchForm = ({ onSearch, formValues }: Props): JSX.Element | null => {
             getValues("applicationRound"),
             applicationPeriodOptions
           )}
-          label={t("SearchForm.roundLabel")}
+          label={t("searchForm:roundLabel")}
         />
         <Select
           id="participantCountFilter"
-          placeholder={t("common.select")}
-          options={[emptyOption(t("common.select"))].concat(
+          placeholder={t("common:select")}
+          options={[emptyOption(t("common:select"))].concat(
             participantCountOptions
           )}
-          label={t("SearchForm.participantCountLabel")}
+          label={t("searchForm:participantCountLabel")}
           onChange={(selection: OptionType): void => {
             setValue("maxPersons", selection.value);
           }}
@@ -143,9 +143,9 @@ const SearchForm = ({ onSearch, formValues }: Props): JSX.Element | null => {
           )}
         />
         <Select
-          placeholder={t("common.select")}
+          placeholder={t("common:select")}
           options={reservationUnitTypeOptions}
-          label={t("SearchForm.typeLabel")}
+          label={t("searchForm:typeLabel")}
           onChange={(selection: OptionType): void => {
             setValue("reservationUnitType", selection.value);
           }}
@@ -162,7 +162,7 @@ const SearchForm = ({ onSearch, formValues }: Props): JSX.Element | null => {
           onClick={handleSubmit(search)}
           iconLeft={<IconSearch />}
         >
-          {t("SearchForm.searchButton")}
+          {t("searchForm:searchButton")}
         </Button>
       </ButtonContainer>
     </>

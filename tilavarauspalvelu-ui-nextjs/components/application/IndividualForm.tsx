@@ -68,7 +68,7 @@ const IndividualForm = ({
         <TwoColumnContainer>
           <TextInput
             ref={register({ required: true })}
-            label={t("Application.Page3.firstName")}
+            label={t("application:Page3.firstName")}
             id="contactPerson.firstName"
             name="contactPerson.firstName"
             required
@@ -77,7 +77,7 @@ const IndividualForm = ({
           />
           <TextInput
             ref={register({ required: true })}
-            label={t("Application.Page3.lastName")}
+            label={t("application:Page3.lastName")}
             id="contactPerson.lastName"
             name="contactPerson.lastName"
             required
@@ -87,7 +87,7 @@ const IndividualForm = ({
           <BillingAddress register={register} errors={errors} />
           <TextInput
             ref={register({ required: true })}
-            label={t("Application.Page3.phoneNumber")}
+            label={t("application:Page3.phoneNumber")}
             id="contactPerson.phoneNumber"
             name="contactPerson.phoneNumber"
             required

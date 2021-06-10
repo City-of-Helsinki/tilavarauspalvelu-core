@@ -147,7 +147,7 @@ const Page1 = ({
   const onSubmit = (data: Application, eventId?: number) => {
     const appToSave = prepareData(data);
     if (appToSave.applicationEvents.length === 0) {
-      setError(t("Application.error.noEvents"));
+      setError(t("application:error.noEvents"));
       return;
     }
     if (
@@ -155,7 +155,7 @@ const Page1 = ({
         (ae) => ae.eventReservationUnits.length === 0
       ).length > 0
     ) {
-      setError(t("Application.error.noReservationUnits"));
+      setError(t("application:error.noReservationUnits"));
       return;
     }
 
@@ -186,7 +186,7 @@ const Page1 = ({
       save({ application: appToSave, eventId: -1 });
     } else {
       // has some validation errors that needs to be fixed before event can be removed
-      setError(t("Application.error.otherEventsHaveErrors"));
+      setError(t("application:error.otherEventsHaveErrors"));
     }
   };
 
@@ -240,7 +240,7 @@ const Page1 = ({
           onClick={() => form.handleSubmit(onAddApplicationEvent)()}
           disabled={addNewEventButtonDisabled}
         >
-          {t("Application.Page1.createNew")}
+          {t("application:Page1.createNew")}
         </Button>
         <Button
           id="next"
@@ -248,7 +248,7 @@ const Page1 = ({
           disabled={nextButtonDisabled}
           onClick={() => history.push("page2")}
         >
-          {t("common.next")}
+          {t("common:next")}
         </Button>
       </ButtonContainer>
     </>

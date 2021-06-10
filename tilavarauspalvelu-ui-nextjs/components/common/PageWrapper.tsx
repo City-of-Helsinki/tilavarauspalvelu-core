@@ -7,6 +7,7 @@ import ServiceNotification from "./ServiceNotification";
 interface Props {
   children: React.ReactNode;
 }
+
 const Main = styled.main`
   font-size: var(--fontsize-body-m);
   flex-grow: 1;

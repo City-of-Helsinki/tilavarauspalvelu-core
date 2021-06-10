@@ -3,6 +3,8 @@ import { useAsync } from "react-use";
 import { Notification } from "hds-react";
 import { useRouter } from "next/router";
 import { useTranslation } from "react-i18next";
+import { GetServerSideProps } from "next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import {
   saveApplication,
   getApplication,
@@ -24,6 +26,14 @@ import Sent from "../../components/application/Sent";
 import { CenterSpinner } from "../../components/common/common";
 import { apiDateToUIDate, deepCopy, uiDateToApiDate } from "../../modules/util";
 
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale)),
+    },
+  };
+};
+
 const Application = (): JSX.Element | null => {
   const { t } = useTranslation();
 
@@ -39,8 +49,6 @@ const Application = (): JSX.Element | null => {
   const {
     query: { params },
   } = router;
-
-  if (!params) return <CenterSpinner />;
 
   const [applicationId, pageId] = params as string[];
 
@@ -71,7 +79,7 @@ const Application = (): JSX.Element | null => {
         });
         return { application, applicationRound };
       } catch (e) {
-        setError(`${t("common.error.dataError")}`);
+        setError(`${t("common:error.dataError")}`);
       }
     }
     return null;
@@ -115,7 +123,7 @@ const Application = (): JSX.Element | null => {
         postSave(loadedApplication.id);
       }
     } catch (e) {
-      setError(`${t("Application.error.saveFailed")}`);
+      setError(`${t("application:error.saveFailed")}`);
       throw e;
     }
   };
@@ -131,20 +139,20 @@ const Application = (): JSX.Element | null => {
     });
 
   const addNewApplicationEvent = async () => {
-    const params = {} as {
+    const args = {} as {
       [key: string]: string;
     };
     if (applicationLoadingStatus.value) {
-      params.begin = apiDateToUIDate(
+      args.begin = apiDateToUIDate(
         applicationLoadingStatus.value.applicationRound.reservationPeriodBegin
       );
-      params.end = apiDateToUIDate(
+      args.end = apiDateToUIDate(
         applicationLoadingStatus.value.applicationRound.reservationPeriodEnd
       );
     }
 
     dispatch({
-      params,
+      params: args,
       type: "addNewApplicationEvent",
     });
   };
@@ -161,7 +169,7 @@ const Application = (): JSX.Element | null => {
         label={error}
         position="top-center"
         displayAutoCloseProgress={false}
-        onClose={() => history.go(0)}
+        onClose={() => router.reload()}
       >
         {error}
       </Notification>
@@ -177,7 +185,7 @@ const Application = (): JSX.Element | null => {
           application={state.application}
           breadCrumbText={applicationRoundName}
           overrideText={applicationRoundName}
-          translationKeyPrefix="Application.Page1"
+          translationKeyPrefix="application:Page1"
         >
           <Page1
             selectedReservationUnits={reservationUnits}
@@ -202,7 +210,7 @@ const Application = (): JSX.Element | null => {
       {pageId === "page2" && (
         <ApplicationPage
           application={state.application}
-          translationKeyPrefix="Application.Page2"
+          translationKeyPrefix="application:Page2"
           breadCrumbText={applicationRoundName}
         >
           <Page2
@@ -214,7 +222,7 @@ const Application = (): JSX.Element | null => {
       {pageId === "page3" && (
         <ApplicationPage
           application={state.application}
-          translationKeyPrefix="Application.Page3"
+          translationKeyPrefix="application:Page3"
           breadCrumbText={applicationRoundName}
         >
           <Page3
@@ -226,7 +234,7 @@ const Application = (): JSX.Element | null => {
       {pageId === "preview" && (
         <ApplicationPage
           application={state.application}
-          translationKeyPrefix="Application.preview"
+          translationKeyPrefix="application:preview"
           breadCrumbText={applicationRoundName}
         >
           <Preview

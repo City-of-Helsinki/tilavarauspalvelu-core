@@ -74,8 +74,8 @@ const Modal = ({
   handleOk,
   show,
   children,
-  closeButtonKey = "common.close",
-  okButtonKey = "common.ok",
+  closeButtonKey = "common:close",
+  okButtonKey = "common:ok",
 }: Props): JSX.Element | null => {
   const { t } = useTranslation();
 

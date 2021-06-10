@@ -53,8 +53,8 @@ function displayDuration(applicationEvent: ApplicationEvent, t: TFunction) {
     (applicationEvent.minDuration || "00:00:00").split(":")[1]
   );
 
-  return `${displayHours} ${t("common.abbreviations.hour")} ${
-    displayMinutes ? displayMinutes + t("common.abbreviations.minute") : ""
+  return `${displayHours} ${t("common:abbreviations.hour")} ${
+    displayMinutes ? displayMinutes + t("common:abbreviations.minute") : ""
   }`;
 }
 
@@ -81,14 +81,16 @@ const ApplicationEventSummary = ({
     return null;
   }
 
+  console.log(numPersons, eventsPerWeek);
+
   return (
     <>
       <SubHeadLine>
-        {t("Application.Page1.applicationEventSummary")}
+        {t("application:Page1.applicationEventSummary")}
       </SubHeadLine>
 
       <Message>
-        {t("ApplicationEventSummary.message", {
+        {t("applicationEventSummary:message", {
           name,
           startDate: begin,
           endDate: end,
@@ -99,14 +101,17 @@ const ApplicationEventSummary = ({
         <CustomIconWithText
           icon={<IconGroup aria-hidden />}
           text={
-            <Trans i18nKey="ApplicationEventSummary.numPersons">
-              Ryhmän koko on <strong>{numPersons}</strong>
+            <Trans
+              i18nKey="applicationEventSummary:numPersons"
+              count={numPersons}
+            >
+              Ryhmän koko on <strong>{{ numPersons }}</strong>
             </Trans>
           }
         />
         <CustomIconWithText
           icon={<IconClock aria-hidden />}
-          text={t("ApplicationEventSummary.minDuration", {
+          text={t("applicationEventSummary:minDuration", {
             minDuration: displayDuration(applicationEvent, t),
           })}
         />
@@ -115,16 +120,16 @@ const ApplicationEventSummary = ({
           text={
             <Trans
               count={eventsPerWeek}
-              i18nKey="ApplicationEventSummary.eventsPerWeek"
+              i18nKey="applicationEventSummary:eventsPerWeek"
             >
-              <strong>{eventsPerWeek}</strong> vuoro viikossa
+              <strong>{{ eventsPerWeek }}</strong> vuoro viikossa
             </Trans>
           }
         />
         {biweekly ? (
           <CustomIconWithText
             icon={<IconArrowRedo />}
-            text={<strong>{t("Application.Page1.biweekly")}</strong>}
+            text={<strong>{t("application:Page1.biweekly")}</strong>}
           />
         ) : null}
       </TwoColumnContainer>

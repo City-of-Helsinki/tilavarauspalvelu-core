@@ -49,7 +49,7 @@ const StartApplicationBar = ({ count }: Props): JSX.Element | null => {
       <Container style={{ padding: "var(--spacing-m) var(--spacing-m)" }}>
         <InnerContainer>
           <ReservationUnitCount id="reservationUnitCount">
-            {t("shoppingCart.count", { count })}
+            {t("shoppingCart:count", { count })}
           </ReservationUnitCount>
           <Button
             id="startApplicationButton"
@@ -59,7 +59,7 @@ const StartApplicationBar = ({ count }: Props): JSX.Element | null => {
               router.push(`/intro`);
             }}
           >
-            {t("shoppingCart.next")}
+            {t("shoppingCart:next")}
           </Button>
         </InnerContainer>
       </Container>

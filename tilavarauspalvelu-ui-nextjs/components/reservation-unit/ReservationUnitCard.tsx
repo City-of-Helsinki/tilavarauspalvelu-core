@@ -125,21 +125,21 @@ const ReservationUnitCard = ({
   return (
     <NameCardContainer>
       <PreCardLabel>
-        {t("ReservationUnitList.option")} {order + 1}.
+        {t("reservationUnitList:option")} {order + 1}.
       </PreCardLabel>
       {invalid ? (
         <Notification
           type="error"
-          label={t("Application.error.reservationUnitTooSmall")}
+          label={t("application:error.reservationUnitTooSmall")}
         >
-          {t("Application.error.reservationUnitTooSmall")}
+          {t("application:error.reservationUnitTooSmall")}
         </Notification>
       ) : null}
       <CardButtonContainer>
         <CardContainer>
           <Image
             src={getMainImage(reservationUnit)?.smallUrl}
-            alt={t("common.imgAltForSpace", {
+            alt={t("common:imgAltForSpace", {
               name: localizedValue(reservationUnit.name, i18n.language),
             })}
           />
@@ -164,7 +164,7 @@ const ReservationUnitCard = ({
                 onDelete(reservationUnit);
               }}
             >
-              {t("ReservationUnitList.buttonRemove")}
+              {t("reservationUnitList:buttonRemove")}
             </Button>
           </div>
         </CardContainer>
@@ -174,7 +174,7 @@ const ReservationUnitCard = ({
               className="button-reset"
               disabled={first}
               type="button"
-              aria-label={t("ReservationUnitList.buttonUp")}
+              aria-label={t("reservationUnitList:buttonUp")}
               onClick={() => onMoveUp(reservationUnit)}
             >
               <IconArrowUp aria-hidden size="m" />
@@ -183,7 +183,7 @@ const ReservationUnitCard = ({
           <Circle passive={last}>
             <button
               className="button-reset"
-              aria-label={t("ReservationUnitList.buttonDown")}
+              aria-label={t("reservationUnitList:buttonDown")}
               type="button"
               disabled={last}
               onClick={() => onMoveDown(reservationUnit)}

@@ -28,7 +28,7 @@ const TimePreview = ({ applicationEventSchedules }: Props): JSX.Element => {
         <Wrapper key={day}>
           <StyledIconClock aria-hidden="true" />
           <LabelValue
-            label={t(`calendar.${day}`)}
+            label={t(`calendar:${day}`)}
             value={applicationEventSchedules
               .filter((s) => s.day === index)
               .map(

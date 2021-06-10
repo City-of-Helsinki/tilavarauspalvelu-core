@@ -68,15 +68,15 @@ const Address = ({ reservationUnit }: Props): JSX.Element => {
       ) : null}
       <ExternalLink
         href={mapUrl(reservationUnit.location)}
-        name={t("reservationUnit.linkMap")}
+        name={t("reservationUnit:linkMap")}
       />
       <ExternalLink
         href={googleUrl(reservationUnit.location)}
-        name={t("reservationUnit.linkGoogle")}
+        name={t("reservationUnit:linkGoogle")}
       />{" "}
       <ExternalLink
         href={hslUrl(i18n.language, reservationUnit.location)}
-        name={t("reservationUnit.linkHSL")}
+        name={t("reservationUnit:linkHSL")}
       />
     </Container>
   );

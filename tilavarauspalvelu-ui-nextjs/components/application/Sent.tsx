@@ -21,11 +21,11 @@ const Sent = ({ breadCrumbText }: Props): JSX.Element => {
   return (
     <>
       <Head
-        heading={t("Application.sent.heading")}
+        heading={t("application:sent.heading")}
         breadCrumbText={breadCrumbText}
       />
       <Container main>
-        <Accordion heading={t("Application.sent.faq1Question")}>
+        <Accordion heading={t("application:sent.faq1Question")}>
           <Preformatted>{`HAKEMUKSESI ON NYT VASTAANOTETTU
 
 Voit halutessasi täydentää hakemustasi ennen hakuajan päättymistä. Tarvittaessa poista tarpeettomat hakemukset, sillä VIIMEKSI SAAPUNUT hakemus katsotaan voimassa olevaksi.
@@ -38,13 +38,13 @@ Saatuasi päätöksen, ota yhteyttä siihen toimipisteeseen, josta vuoro on myö
 
 Jos sinulle ei myönnetty vakiovuoroa hakemiisi tiloihin, voit tiedustella vapaaksi jääneitä aikoja suoraan muilta nuorisotaloiltamme. Muutoksenhakua ja hinnan kohtuullistamista tulee hakea kahden viikon kuluessa päätöksen antamisesta.`}</Preformatted>
         </Accordion>
-        <Accordion heading={t("Application.sent.faq2Question")}>
+        <Accordion heading={t("application:sent.faq2Question")}>
           <Preformatted>
             {`Myönnetyistä vakiovuoroista lähetetään hakijalle päätös ja varausvahvistus. Kun hakemuksesi on käsitelty, sinulle myönnetyt vuorot näkyvät varausjärjestelmässä. Maksulliset vuorot laskutetaan sopimuksen mukaisesti. Muutosta tai kohtuullistamista myönnettyyn käyttövuoroon tulee hakea viimeistään kahden viikon kuluessa varausvahvistuksen saapumisesta.
 `}
           </Preformatted>
         </Accordion>
-        <Accordion heading={t("Application.sent.faq3Question")}>
+        <Accordion heading={t("application:sent.faq3Question")}>
           <Preformatted>{`Päätökseen tyytymätön voi hakea hinnan kohtuullistamista kirjallisesti aluepäälliköltä viimeistään kahden viikon kuluessa varausvahvistuksen saapumisesta. Aluepäällikkö voi perustellusta syystä päättää hinnan kohtuullistamisesta viranhaltijan päätöspöytäkirjassaan vuoronsaajan sitä kirjallisesti hakiessa Kohtuullistamislomakkeella. Kohtuullistamispyyntö osoitetaan siihen toimipisteeseen, josta käyttövuoro on myönnetty.
 
 Tilavarauksessa sovelletaan voimassa olevia toimialakohtaisia hinnoitteluperiaatteita. Mahdolliset lisäpalvelut eivät sisälly tilan hintaan ja niistä voidaan veloittaa erikseen.

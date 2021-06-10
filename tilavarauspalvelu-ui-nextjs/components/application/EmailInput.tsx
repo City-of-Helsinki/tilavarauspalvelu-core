@@ -17,9 +17,9 @@ const EmailInput = ({ register, errors }: Props): JSX.Element | null => {
       <SpanTwoColumns>
         <Notification
           size="small"
-          label={t("Application.Page3.emailNotification")}
+          label={t("application:Page3.emailNotification")}
         >
-          {t("Application.Page3.emailNotification")}
+          {t("application:Page3.emailNotification")}
         </Notification>
       </SpanTwoColumns>
       <SpanTwoColumns>
@@ -28,7 +28,7 @@ const EmailInput = ({ register, errors }: Props): JSX.Element | null => {
             required: true,
             pattern: /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
           })}
-          label={t("Application.Page3.email")}
+          label={t("application:Page3.email")}
           id="contactPerson.email"
           name="contactPerson.email"
           type="email"

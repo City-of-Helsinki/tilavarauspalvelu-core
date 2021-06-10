@@ -7,7 +7,8 @@ import {
   endOfWeek as dateFnsEndOfWeek,
   parse,
 } from "date-fns";
-import i18next, { TFunction } from "i18next";
+import { i18n } from "next-i18next";
+import { TFunction } from "i18next";
 import { stringify } from "query-string";
 import { ReservationUnitsParameters } from "./api";
 import { searchPrefix, emptyOption, applicationsPrefix } from "./const";
@@ -95,12 +96,10 @@ export const formatDuration = (duration: string): string => {
   return `${
     Number(time[0])
       ? `${`${Number(time[0])} ${
-          i18next.t("common.hour") || "".toLocaleLowerCase()
+          i18n.t("common:hour") || "".toLocaleLowerCase()
         }`} `
       : ""
-  }${
-    Number(time[1]) ? time[1] + i18next.t("common.abbreviations.minute") : ""
-  }`;
+  }${Number(time[1]) ? time[1] + i18n.t("common:abbreviations.minute") : ""}`;
 };
 
 export const formatApiDate = (date: string): string => {
@@ -296,7 +295,7 @@ export const applicationUrl = (id: number): string => `/application/${id}`;
 export const resolutionUrl = (id: number): string => `/applications/${id}`;
 
 export const errorText = (t: TFunction, key: string | undefined): string =>
-  key ? t(`Application.error.${key}`) : "";
+  key ? t(`application:error.${key}`) : "";
 
 export const getReducedApplicationStatus = (
   status: ApplicationStatus
@@ -318,3 +317,25 @@ export const startOfWeek = (d: Date): Date =>
 
 export const endOfWeek = (d: Date): Date =>
   dateFnsEndOfWeek(d, { weekStartsOn: 1 });
+
+export const formatDurationMinutes = (duration: number): string => {
+  if (!duration) {
+    return "-";
+  }
+
+  const hour = Math.floor(duration / 60);
+  const min = Math.floor(duration % 60);
+
+  const p = [];
+
+  if (hour) {
+    p.push(i18n.t("common:hour", { count: hour }).toLocaleLowerCase());
+  }
+  if (min) {
+    p.push(
+      `${min} ${i18n.t("common:abbreviations.minute").toLocaleLowerCase()}`
+    );
+  }
+
+  return p.join(" ");
+};

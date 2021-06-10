@@ -19,10 +19,10 @@ const Buttons = ({ onSubmit }: Props): JSX.Element | null => {
         iconLeft={<IconArrowLeft />}
         onClick={() => router.push("page2")}
       >
-        {t("common.prev")}
+        {t("common:prev")}
       </Button>
       <Button id="next" iconRight={<IconArrowRight />} onClick={onSubmit}>
-        {t("common.next")}
+        {t("common:next")}
       </Button>
     </ButtonContainer>
   );

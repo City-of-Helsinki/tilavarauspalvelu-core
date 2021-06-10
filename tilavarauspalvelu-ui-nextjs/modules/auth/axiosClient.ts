@@ -1,8 +1,13 @@
 import axios, { AxiosRequestConfig } from "axios";
 import createAuthRefreshInterceptor from "axios-auth-refresh";
 import applyCaseMiddleware from "axios-case-converter";
-import { isBrowser } from "../const";
-import { authEnabled, oidcUrl, oidcClientId, apiScope } from "../const";
+import {
+  isBrowser,
+  authEnabled,
+  oidcUrl,
+  oidcClientId,
+  apiScope,
+} from "../const";
 
 const axiosOptions = {
   timeout: 20000,

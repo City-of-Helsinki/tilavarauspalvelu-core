@@ -1,0 +1,21 @@
+{
+  "cancelHeading": "Oletko varma että haluat peruuttaa hakemuksesi?",
+  "cancelContent": "Jos peruutat hakemuksen et voi enää muokata tai lähettää sitä.",
+  "cancelFailed": "Hakemuksen peruuttaminen epäonnistui.",
+  "edit": "Muokkaa hakemusta",
+  "cancel": "Peruuta hakemus",
+  "status": {
+    "draft": "Kesken",
+    "processing": "Käsittelyssä",
+    "sent": "Käsitelty"
+  },
+  "reservations": "Varaukset",
+  "saved": "Viimeksi tallennettu: {{date, dd.MM.yyyy 'klo' HH:mm}}",
+  "person": "Hakemus luotu: yksityishenkilönä",
+  "organisation": "Hakemus luotu: {{type}} {{name}}",
+  "applicantType": {
+    "community": "yhdistykselle",
+    "association": "rekisteröidylle yhdistykselle",
+    "company": "yritykselle"
+  }
+}

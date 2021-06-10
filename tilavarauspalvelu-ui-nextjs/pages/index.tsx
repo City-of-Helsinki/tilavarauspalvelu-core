@@ -104,17 +104,17 @@ type Props = {
 };
 
 const Home = ({ applicationRounds }: Props): JSX.Element => {
-  const { t } = useTranslation();
+  const { t } = useTranslation("home");
   const router = useRouter();
 
   return (
     <>
       <Title>Tilavarauspalvelu</Title>
-      <Header heading={t("home.head.heading")} text={t("home.head.text")} />
+      <Header heading={t("head.heading")} text={t("head.text")} />
       <Container>
         <TopContainer>
-          <Heading>{t("home.applicationTimes.heading")}</Heading>
-          <p className="text-lg">{t("home.applicationTimes.text")}</p>
+          <Heading>{t("applicationTimes.heading")}</Heading>
+          <p className="text-lg">{t("applicationTimes.text")}</p>
         </TopContainer>
         <ApplicationPeriods applicationRounds={applicationRounds} />
         <StyledImageWithCard
@@ -124,8 +124,8 @@ const Home = ({ applicationRounds }: Props): JSX.Element => {
           src="main.jpg"
         >
           <InfoContainer>
-            <Heading>{t("home.info.heading")}</Heading>
-            <p>{t("home.info.text")}</p>
+            <Heading>{t("info.heading")}</Heading>
+            <p>{t("info.text")}</p>
             <ButtonContainer>
               <Button
                 id="browseAllButton"
@@ -134,7 +134,7 @@ const Home = ({ applicationRounds }: Props): JSX.Element => {
                 onClick={() => router.push("/search/?search=")}
                 iconLeft={<IconSearch />}
               >
-                {t("home.browseAllButton")}
+                {t("browseAllButton")}
               </Button>
             </ButtonContainer>
           </InfoContainer>

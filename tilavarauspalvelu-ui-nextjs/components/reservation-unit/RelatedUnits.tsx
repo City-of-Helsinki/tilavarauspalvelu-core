@@ -98,7 +98,7 @@ const RelatedUnits = ({
   }
   return (
     <>
-      <Heading>{t("ReservationUnit.RelatedUnits.heading")}</Heading>
+      <Heading>{t("reservationUnitCard:RelatedUnits.heading")}</Heading>
       <Grid>
         {units.slice(0, 3).map((unit) => (
           <Unit key={unit.id}>
@@ -111,7 +111,9 @@ const RelatedUnits = ({
               <Props>
                 <IconWithText
                   icon={
-                    <IconInfoCircle aria-label={t("reservationUnit.type")} />
+                    <IconInfoCircle
+                      aria-label={t("reservationUnitCard:type")}
+                    />
                   }
                   text={localizedValue(
                     unit.reservationUnitType?.name,
@@ -121,7 +123,11 @@ const RelatedUnits = ({
                 {unit.maxPersons ? (
                   <IconWithText
                     icon={
-                      <IconGroup aria-label={t("reservationUnit.maxPersons")} />
+                      <IconGroup
+                        aria-label={t("reservationUnitCard:maxPersons", {
+                          maxPersons: unit.maxPersons,
+                        })}
+                      />
                     }
                     text={`${unit.maxPersons}`}
                   />
@@ -132,7 +138,9 @@ const RelatedUnits = ({
                   <SpanTwoColumns>
                     <IconWithText
                       icon={
-                        <IconLocation aria-label={t("reservationUnit.type")} />
+                        <IconLocation
+                          aria-label={t("reservationUnitCard:address")}
+                        />
                       }
                       text={getAddress(unit) as string}
                     />
@@ -149,7 +157,7 @@ const RelatedUnits = ({
                   iconLeft={<IconCheck />}
                   className="margin-left-s margin-top-s"
                 >
-                  {t("common.reservationUnitSelected")}
+                  {t("common:reservationUnitSelected")}
                 </Button>
               ) : (
                 <Button
@@ -158,7 +166,7 @@ const RelatedUnits = ({
                   className="margin-left-s margin-top-s"
                   variant="secondary"
                 >
-                  {t("common.selectReservationUnit")}
+                  {t("common:selectReservationUnit")}
                 </Button>
               )}
             </Buttons>

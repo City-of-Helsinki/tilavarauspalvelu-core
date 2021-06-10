@@ -97,7 +97,7 @@ const Head = ({
     <TopContainer>
       <Notification applicationRound={null} />
       <Container>
-        <Back label="ReservationUnit.backToSearch" />
+        <Back label="reservationUnit:backToSearch" />
         <RightContainer>
           <div>
             <ReservationUnitName>
@@ -111,7 +111,7 @@ const Head = ({
                 {reservationUnit.reservationUnitType ? (
                   <IconWithText
                     icon={
-                      <IconInfoCircle aria-label={t("reservationUnit.type")} />
+                      <IconInfoCircle aria-label={t("reservationUnit:type")} />
                     }
                     text={localizedValue(
                       reservationUnit.reservationUnitType?.name,
@@ -121,9 +121,9 @@ const Head = ({
                 ) : null}
                 <IconWithText
                   icon={
-                    <IconGroup aria-label={t("reservationUnit.maxPersons")} />
+                    <IconGroup aria-label={t("reservationUnit:maxPersons")} />
                   }
-                  text={t("ReservationUnit.maxPersons", {
+                  text={t("reservationUnitCard:maxPersons", {
                     maxPersons: reservationUnit.maxPersons,
                   })}
                 />
@@ -137,7 +137,7 @@ const Head = ({
                   iconLeft={<IconCheck />}
                   className="margin-left-s margin-top-s"
                 >
-                  {t("common.reservationUnitSelected")}
+                  {t("common:reservationUnitSelected")}
                 </Button>
               ) : (
                 <Button
@@ -146,13 +146,13 @@ const Head = ({
                   className="margin-left-s margin-top-s"
                   variant="secondary"
                 >
-                  {t("common.selectReservationUnit")}
+                  {t("common:selectReservationUnit")}
                 </Button>
               )}
             </ButtonContainer>
           </div>
           <Image
-            alt={t("common.imgAltForSpace", {
+            alt={t("common:imgAltForSpace", {
               name: localizedValue(reservationUnit.name, i18n.language),
             })}
             src={

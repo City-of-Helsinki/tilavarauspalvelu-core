@@ -1,0 +1,9 @@
+{
+  "heading": "Omat hakemukset",
+  "noApplications": "Hakemuksia ei ole.",
+  "group": {
+    "draft": "Luonnokset",
+    "processing": "Käsittelyssä",
+    "sent": "Käsitelty"
+  }
+}

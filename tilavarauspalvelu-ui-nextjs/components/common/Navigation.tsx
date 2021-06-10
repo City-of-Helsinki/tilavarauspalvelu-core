@@ -8,7 +8,6 @@ import { TFunction } from "i18next";
 import { applicationsUrl } from "../../modules/util";
 import { authEnabled, isBrowser } from "../../modules/const";
 import { breakpoint } from "../../modules/style";
-import dynamic from "next/dynamic";
 
 interface LanguageOption {
   label: string;
@@ -46,14 +45,14 @@ const getUserName = (profile: any | null, t: TFunction) => {
     return "";
   }
   if (!profile.given_name && !profile.family_name) {
-    return t("Navigation.userNoName");
+    return t("userNoName");
   }
 
   return `${profile?.given_name || ""} ${profile?.family_name || ""}`;
 };
 
 const Navigation = ({ profile, logout }: Props): JSX.Element => {
-  const { t, i18n } = useTranslation();
+  const { t, i18n } = useTranslation(["common", "navigation"]);
   const router = useRouter();
   const [language, setLanguage] = useLocalStorage<string>(
     "userLocale",
@@ -73,23 +72,23 @@ const Navigation = ({ profile, logout }: Props): JSX.Element => {
   return (
     <>
       <StyledNavigation
-        title={t("common.applicationName")}
+        title={t("common:applicationName")}
         menuToggleAriaLabel="Menu"
         skipTo="#main"
-        skipToContentLabel={t("Navigation.skipToMainContent")}
+        skipToContentLabel={t("navigation:skipToMainContent")}
       >
         <HDSNavigation.Row variant="inline">
           <HDSNavigation.Item
-            label={t("Navigation.Item.spaceReservation")}
+            label={t("navigation:Item.spaceReservation")}
             onClick={() => router.push("/")}
           />
           <HDSNavigation.Item
-            label={t("Navigation.Item.reservationUnitSearch")}
+            label={t("navigation:Item.reservationUnitSearch")}
             onClick={() => router.push("/search")}
           />
           {profile ? (
             <HDSNavigation.Item
-              label={t("Navigation.Item.applications")}
+              label={t("navigation:Item.applications")}
               onClick={() => router.push(applicationsUrl)}
             />
           ) : (
@@ -100,13 +99,13 @@ const Navigation = ({ profile, logout }: Props): JSX.Element => {
           <HDSNavigation.User
             userName={getUserName(profile, t)}
             authenticated={Boolean(profile)}
-            label={t("common.login")}
+            label={t("common:login")}
             onSignIn={() => {
               router.push(applicationsUrl);
             }}
           >
             <HDSNavigation.Item
-              label={t("common.logout")}
+              label={t("common:logout")}
               onClick={() => logout && logout()}
             />
           </HDSNavigation.User>

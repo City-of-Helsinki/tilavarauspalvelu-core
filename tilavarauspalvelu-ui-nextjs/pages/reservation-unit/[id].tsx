@@ -1,6 +1,7 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Container from "../../components/common/Container";
 import { ReservationUnit as ReservationUnitType } from "../../modules/types";
 import { getReservationUnit, getReservationUnits } from "../../modules/api";
@@ -14,24 +15,14 @@ import RelatedUnits from "../../components/reservation-unit/RelatedUnits";
 import useReservationUnitsList from "../../hooks/useReservationUnitList";
 import StartApplicationBar from "../../components/common/StartApplicationBar";
 import { AccordionWithState as Accordion } from "../../components/common/Accordion";
-// import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 
 type Props = {
   reservationUnit: ReservationUnitType | null;
   relatedReservationUnits: ReservationUnitType[];
 };
 
-/*export async function getStaticProps({ params, locale }) {
-  return {
-    props: {
-      ...(await serverSideTranslations(locale)),
-    },
-  };
-}
-*/
-
-export const getServerSideProps = async (context) => {
-  const id = Number(context.params.id);
+export const getServerSideProps = async ({ locale, params }) => {
+  const id = Number(params.id);
 
   let reservationUnit = null;
   let relatedReservationUnits = [] as ReservationUnitType[];
@@ -46,13 +37,14 @@ export const getServerSideProps = async (context) => {
 
     return {
       props: {
+        ...(await serverSideTranslations(locale)),
         reservationUnit,
         relatedReservationUnits,
       },
     };
   }
 
-  return { props: { paramsId: context.params.id } };
+  return { props: { ...(await serverSideTranslations(locale)), paramsId: id } };
 };
 
 const TwoColumnLayout = styled.div`
@@ -85,12 +77,12 @@ const ReservationUnit = ({
       <Container>
         <TwoColumnLayout>
           <div>
-            <Accordion open heading={t("reservationUnit.description")}>
+            <Accordion open heading={t("reservationUnit:description")}>
               <Content>
                 <Sanitize html={reservationUnit.description} />
               </Content>
             </Accordion>
-            <Accordion heading={t("reservationUnit.termsOfUse")}>
+            <Accordion heading={t("reservationUnit:termsOfUse")}>
               <Content>
                 <Sanitize html={reservationUnit.termsOfUse} />
               </Content>

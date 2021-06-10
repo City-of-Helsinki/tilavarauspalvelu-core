@@ -41,17 +41,17 @@ const SearchResultList = ({ error, reservationUnits }: Props): JSX.Element => {
       <Container id="searchResultList">
         {error ? (
           <Notification size="small" type="alert">
-            {t("SearchResultList.error")}
+            {t("searchResultList:error")}
           </Notification>
         ) : null}
         {reservationUnits !== null ? (
           <>
             <HitCount>
               {reservationUnits.length
-                ? t("SearchResultList.count", {
+                ? t("searchResultList:count", {
                     count: reservationUnits.length,
                   })
-                : t("SearchResultList.noResults")}
+                : t("searchResultList:noResults")}
             </HitCount>
             <ListContainer>
               {reservationUnits.map((ru) => (

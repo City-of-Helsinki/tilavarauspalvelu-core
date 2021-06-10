@@ -14,11 +14,12 @@ export type ApplicationRound = {
   reservationPeriodEnd: string;
   purposeIds: number[];
   criteria: string;
+  approvedBy: string;
 };
 
 export type Space = {
   id: number;
-  locationType: 'fixed';
+  locationType: "fixed";
   name: TranslationObject;
   parentId: number;
   buildingId: number;
@@ -29,7 +30,7 @@ export type Space = {
 export type Resource = {
   id: number;
   name: TranslationObject;
-  locationType: 'fixed';
+  locationType: "fixed";
   spaceId: number;
   bufferTimeBefore: string;
   bufferTimeAfter: string;
@@ -50,7 +51,7 @@ export type User = {
 export type Service = {
   id: number;
   name: TranslationObject;
-  serviceType: 'introduction';
+  serviceType: "introduction";
   bufferTimeBefore: string;
   bufferTimeAfter: string;
 };
@@ -72,7 +73,7 @@ export type Image = {
   imageUrl: string;
   mediumUrl: string;
   smallUrl: string;
-  imageType: 'main' | 'map' | 'ground_plan' | 'other';
+  imageType: "main" | "map" | "ground_plan" | "other";
 };
 
 export type Building = {
@@ -112,28 +113,30 @@ export type Address = {
 
 export type ApplicantType =
   | null
-  | 'individual'
-  | 'association'
-  | 'community'
-  | 'company';
+  | "individual"
+  | "association"
+  | "community"
+  | "company";
 
 export type ApplicationStatus =
-  | 'draft'
-  | 'in_review'
-  | 'review_done'
-  | 'allocating'
-  | 'allocated'
-  | 'validated'
-  | 'handled'
-  | 'declined'
-  | 'cancelled';
+  | "draft"
+  | "in_review"
+  | "review_done"
+  | "allocating"
+  | "allocated"
+  | "validated"
+  | "handled"
+  | "declined"
+  | "cancelled"
+  | "sent";
 
 export type ReducedApplicationStatus =
-  | 'draft'
-  | 'processing'
-  | 'handled'
-  | 'cancelled'
-  | 'declined';
+  | "draft"
+  | "processing"
+  | "handled"
+  | "cancelled"
+  | "declined"
+  | "sent";
 
 export type Application = {
   id?: number;
@@ -168,13 +171,13 @@ export type ContactPerson = {
 };
 
 export type ApplicationEventStatus =
-  | 'created'
-  | 'allocating'
-  | 'allocated'
-  | 'validated'
-  | 'approved'
-  | 'declined'
-  | 'cancelled';
+  | "created"
+  | "allocating"
+  | "allocated"
+  | "validated"
+  | "approved"
+  | "declined"
+  | "cancelled";
 
 export type ApplicationEvent = {
   id?: number;
@@ -211,12 +214,12 @@ export type ApplicationEventSchedule = {
 };
 
 export type ReservationState =
-  | 'created'
-  | 'cancelled'
-  | 'confirmed'
-  | 'denied'
-  | 'requested'
-  | 'waiting for payment';
+  | "created"
+  | "cancelled"
+  | "confirmed"
+  | "denied"
+  | "requested"
+  | "waiting for payment";
 
 export type Reservation = {
   id: number;
@@ -246,11 +249,11 @@ export type OptionType = {
 
 export type Action = {
   type:
-    | 'load'
-    | 'addNewApplicationEvent'
-    | 'save'
-    | 'toggleAccordionState'
-    | 'removeApplicationEvent';
+    | "load"
+    | "addNewApplicationEvent"
+    | "save"
+    | "toggleAccordionState"
+    | "removeApplicationEvent";
   application?: Application;
   savedEventId?: number;
   eventId?: number;
@@ -262,9 +265,9 @@ export type ApplicationEditor = {
   reservationUnits: ReservationUnit[];
 };
 
-export type FormType = undefined | 'individual' | 'organisation' | 'company';
+export type FormType = undefined | "individual" | "organisation" | "company";
 
-export type LocalizationLanguages = 'fi' | 'sv' | 'en';
+export type LocalizationLanguages = "fi" | "sv" | "en";
 
 export type EditorState = {
   loading: boolean;

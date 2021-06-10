@@ -15,7 +15,7 @@ const BillingAddress = ({ register, errors }: Props): JSX.Element | null => {
     <>
       <TextInput
         ref={register({ required: true })}
-        label={t("Application.Page3.billingAddress.streetAddress")}
+        label={t("application:Page3.billingAddress.streetAddress")}
         id="billingAddress.streetAddress"
         name="billingAddress.streetAddress"
         required
@@ -24,7 +24,7 @@ const BillingAddress = ({ register, errors }: Props): JSX.Element | null => {
       />
       <TextInput
         ref={register({ required: true })}
-        label={t("Application.Page3.billingAddress.postCode")}
+        label={t("application:Page3.billingAddress.postCode")}
         id="billingAddress.postCode"
         name="billingAddress.postCode"
         required
@@ -33,7 +33,7 @@ const BillingAddress = ({ register, errors }: Props): JSX.Element | null => {
       />
       <TextInput
         ref={register({ required: true })}
-        label={t("Application.Page3.billingAddress.city")}
+        label={t("application:Page3.billingAddress.city")}
         id="billingAddress.city"
         name="billingAddress.city"
         required

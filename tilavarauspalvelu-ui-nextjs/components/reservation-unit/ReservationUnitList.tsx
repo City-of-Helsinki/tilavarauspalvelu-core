@@ -162,9 +162,9 @@ const ReservationUnitList = ({
     <MainContainer>
       <Notification
         size="small"
-        label={t("ReservationUnitList.infoReservationUnits")}
+        label={t("reservationUnitList:infoReservationUnits")}
       >
-        {t("ReservationUnitList.infoReservationUnits")}
+        {t("reservationUnitList:infoReservationUnits")}
       </Notification>
       {reservationUnits.map((ru, index, all) => {
         return (
@@ -187,7 +187,7 @@ const ReservationUnitList = ({
           iconLeft={<IconPlusCircle aria-hidden />}
           onClick={() => setShowModal(true)}
         >
-          {t("ReservationUnitList.add")}
+          {t("reservationUnitList:add")}
         </Button>
       </ButtonContainer>
       <Modal
@@ -195,7 +195,7 @@ const ReservationUnitList = ({
           setShowModal(false);
         }}
         show={showModal}
-        closeButtonKey="ReservationUnitModal.returnToApplication"
+        closeButtonKey="reservationUnitModal:returnToApplication"
       >
         <ReservationUnitModal
           currentReservationUnits={reservationUnits}

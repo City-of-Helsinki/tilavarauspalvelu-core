@@ -9,7 +9,7 @@ const Footer = (): JSX.Element => {
 
   return (
     <HDSFooter
-      title={t("common.applicationName")}
+      title={t("common:applicationName")}
       theme={{
         "--footer-background": "var(--tilavaraus-footer-background-color)",
         "--footer-color": "var(--tilavaraus-footer-color)",
@@ -18,31 +18,31 @@ const Footer = (): JSX.Element => {
       }}
     >
       <HDSFooter.Navigation
-        navigationAriaLabel={t("Footer.Navigation.navigationAriaLabel")}
+        navigationAriaLabel={t("footer:Navigation.navigationAriaLabel")}
       >
         {linkIds.map((id) => (
           <HDSFooter.Item
             key={id}
-            href={t(`Footer.Navigation.${id}.href`)}
-            label={t(`Footer.Navigation.${id}.label`)}
+            href={t(`footer:Navigation.${id}.href`)}
+            label={t(`footer:Navigation.${id}.label`)}
             target="_blank"
             rel="noopener noreferrer"
           />
         ))}
       </HDSFooter.Navigation>
       <HDSFooter.Base
-        copyrightHolder={t("Footer.Base.copyrightHolder")}
-        copyrightText={t("Footer.Base.copyrightText")}
+        copyrightHolder={t("footer:Base.copyrightHolder")}
+        copyrightText={t("footer:Base.copyrightText")}
       >
         <HDSFooter.Item
-          href={t(`Footer.Base.Item.privacyStatement.href`)}
-          label={t(`Footer.Base.Item.privacyStatement.label`)}
+          href={t(`footer:Base.Item.privacyStatement.href`)}
+          label={t(`footer:Base.Item.privacyStatement.label`)}
           target="_blank"
           rel="noopener noreferrer"
         />
         <HDSFooter.Item
-          href={t(`Footer.Base.Item.accessibilityStatement.href`)}
-          label={t(`Footer.Base.Item.accessibilityStatement.label`)}
+          href={t(`footer:Base.Item.accessibilityStatement.href`)}
+          label={t(`footer:Base.Item.accessibilityStatement.label`)}
           target="_blank"
           rel="noopener noreferrer"
         />

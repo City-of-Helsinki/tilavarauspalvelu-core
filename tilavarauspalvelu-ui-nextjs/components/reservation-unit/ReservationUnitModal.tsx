@@ -138,13 +138,13 @@ const ReservationUnitCard = ({
   const handle = () =>
     isSelected ? handleRemove(reservationUnit) : handleAdd(reservationUnit);
   const buttonText = isSelected
-    ? t("ReservationUnitModal.unSelectReservationUnit")
-    : t("ReservationUnitModal.selectReservationUnit");
+    ? t("reservationUnitModal:unSelectReservationUnit")
+    : t("reservationUnitModal:selectReservationUnit");
 
   return (
     <Container>
       <Image
-        alt={t("common.imgAltForSpace", {
+        alt={t("common:imgAltForSpace", {
           name: localizedValue(reservationUnit.name, i18n.language),
         })}
         src={
@@ -161,7 +161,7 @@ const ReservationUnitCard = ({
           <a target="_blank">
             <LinkContent>
               <IconLinkExternal />
-              <LinkText>{t("ReservationUnitModal.openLinkToNewTab")}</LinkText>
+              <LinkText>{t("reservationUnitModal:openLinkToNewTab")}</LinkText>
             </LinkContent>
           </a>
         </Link>
@@ -322,26 +322,26 @@ const ReservationUnitModal = ({
 
   if (results === undefined && searching === false) searchResults();
   const emptyResult = results?.length === 0 && (
-    <div>{t("common.noResults")}</div>
+    <div>{t("common:noResults")}</div>
   );
 
   return (
     <MainContainer>
-      <Heading>{t("ReservationUnitModal.heading")}</Heading>
+      <Heading>{t("reservationUnitModal:heading")}</Heading>
       <Text>{applicationRound.name}</Text>
       <Filters>
         <TextInput
           id="reservationUnitSearch.search"
-          label={t("ReservationUnitModal.searchTermLabel")}
+          label={t("reservationUnitModal:searchTermLabel")}
           onChange={(e: ChangeEvent<HTMLInputElement>): void => {
             setSearchTerm(e.target.value);
           }}
         />
         <Select
           id="reservationUnitSearch.reservationUnitType"
-          placeholder={t("common.select")}
+          placeholder={t("common:select")}
           options={reservationUnitTypeOptions}
-          label={t("ReservationUnitModal.searchReservationUnitTypeLabel")}
+          label={t("reservationUnitModal:searchReservationUnitTypeLabel")}
           onChange={(selection: OptionType): void => {
             setReservationUnitType(selection);
           }}
@@ -349,9 +349,9 @@ const ReservationUnitModal = ({
         />
         <Select
           id="participantCountFilter"
-          placeholder={t("common.select")}
+          placeholder={t("common:select")}
           options={participantCountOptions}
-          label={t("SearchForm.participantCountLabel")}
+          label={t("searchForm:participantCountLabel")}
           onChange={(selection: OptionType): void => {
             setMaxPersons(selection);
           }}
@@ -365,7 +365,7 @@ const ReservationUnitModal = ({
             searchResults();
           }}
         >
-          {t("common.search")}
+          {t("common:search")}
         </SearchButton>
         {searching && <StyledLoadingSpinner />}
       </ButtonContainer>
