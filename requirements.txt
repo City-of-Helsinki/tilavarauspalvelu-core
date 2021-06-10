@@ -73,7 +73,7 @@ django-recurrence==1.10.3
     # via -r requirements.in
 django-tinymce==3.2.0
     # via -r requirements.in
-django==3.1.9
+django==3.1.10
     # via
     #   -r requirements.in
     #   django-cors-headers
@@ -127,6 +127,7 @@ graphql-core==2.3.2
 graphql-relay==2.0.1
     # via graphene
 icalendar==4.0.7
+    # via -r requirements.in
 idna==2.10
     # via requests
 inflection==0.5.1
@@ -211,6 +212,7 @@ python-dateutil==2.6.0
     #   django-recurrence
     #   faker
     #   freezegun
+    #   icalendar
 python-jose==3.2.0
     # via django-helusers
 python3-openid==3.2.0
@@ -219,6 +221,7 @@ pytz==2021.1
     # via
     #   django
     #   django-recurrence
+    #   icalendar
 pyyaml==5.4.1
     # via drf-spectacular
 regex==2021.4.4
