@@ -123,6 +123,7 @@ class AllocationSolver(object):
         self.spaces: Dict[int, AllocationSpace] = allocation_data.spaces
         self.baskets = allocation_data.baskets
         self.starts = {}
+        self.performed = {}
         self.ends = {}
         self.durations = {}
         self.duration_constraints = {}
@@ -145,9 +146,9 @@ class AllocationSolver(object):
                         )
 
         self.constraint_by_event_time_limits(model=model, selected=selected)
-        #self.constraint_allocation(model=model, selected=selected)
-        #self.constraint_to_one_event_per_schedule(model=model, selected=selected)
-        #self.contraint_by_events_per_week(model=model, selected=selected)
+        self.constraint_allocation(model=model, selected=selected)
+        self.constraint_to_one_event_per_schedule(model=model, selected=selected)
+        self.contraint_by_events_per_week(model=model, selected=selected)
         self.maximize(model=model, selected=selected)
 
         printer = AllocationSolutionPrinter(
@@ -194,8 +195,10 @@ class AllocationSolver(object):
                         occurrence,
                     ) in allocation_event.occurrences.items():
                         perf = model.NewBoolVar(
-                            "performedx[%i,%s,%i]" % (occurrence_id, space_id, basket.id)
+                            "performedx[%i,%i,%i,%s]" % (occurrence_id, space_id, occurrence_id, basket.id)
                         )
+
+                        self.performed[(occurrence_id, space_id, allocation_event.id, basket.id)] = perf
 
                         duration = allocation_event.min_duration
 
@@ -266,7 +269,7 @@ class AllocationSolver(object):
             event = event_data["event"]
             model.Add(
                 sum(
-                    self.durations[(occurrence_id, space_id, basket_id)]
+                    self.performed[(occurrence_id, space_id, event.id, basket_id)]
                     for basket_id in event_data["baskets"]
                     for occurrence_id, occurrence in event.occurrences.items()
                     for space_id, space in suitable_spaces_for_event(
@@ -283,7 +286,7 @@ class AllocationSolver(object):
                 for occurrence_id, occurrence in event.occurrences.items():
                     model.Add(
                         sum(
-                            self.durations[(occurrence_id, space_id, basket.id)]
+                            self.performed[(occurrence_id, space_id, event.id, basket.id)]
                             for space_id, space in suitable_spaces_for_event(
                                 event, self.spaces
                             ).items()
@@ -311,7 +314,7 @@ class AllocationSolver(object):
             event = occurrence_data["event"]
             model.Add(
                 sum(
-                    self.durations[(occurrence_id, space_id, basket_id)]
+                    self.performed[(occurrence_id, space_id, event.id, basket_id)]
                     for basket_id in occurrence_data["baskets"]
                     for space_id, space in suitable_spaces_for_event(
                         event, self.spaces
