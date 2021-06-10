@@ -45,11 +45,11 @@ class AllocationSolutionPrinter(object):
         ends,
         baskets,
         durations,
-        selected={},
+        performed,
         output_basket_ids: [int] = [],
     ):
         self.model = model
-        self.selected = selected
+        self.performed = performed
         self.spaces = spaces
         self.starts = starts
         self.ends = ends
@@ -70,7 +70,11 @@ class AllocationSolutionPrinter(object):
                         for space_id, space in suitable_spaces_for_event(
                             event, self.spaces
                         ).items():
-                            if solver.Value(self.durations[(occurrence_id, space_id, basket.id)]
+                            if solver.BooleanValue(
+                                self.performed[
+                                    (occurrence_id, space_id, event.id, basket.id)
+                                ]
+
                             ) and (
                                 len(self.output_basket_ids) == 0
                                 or basket.id in self.output_basket_ids
@@ -94,7 +98,7 @@ class AllocationSolutionPrinter(object):
                                     * ALLOCATION_PRECISION
                                 )
 
-                                allocated_duration = solver.Value(self.durations[(occurrence_id, space_id, basket.id)])
+                                allocated_duration = solver.Value(self.durations[(occurrence_id, space_id, event.id, basket.id)])
 
                                 solution.append(
                                     AllocatedEvent(
@@ -154,7 +158,7 @@ class AllocationSolver(object):
         printer = AllocationSolutionPrinter(
             model=model,
             spaces=self.spaces,
-            selected=selected,
+            performed=self.performed,
             starts=self.starts,
             ends=self.ends,
             baskets=self.baskets,
@@ -198,6 +202,7 @@ class AllocationSolver(object):
                             "performedx[%i,%i,%i,%s]" % (occurrence_id, space_id, occurrence_id, basket.id)
                         )
 
+
                         self.performed[(occurrence_id, space_id, allocation_event.id, basket.id)] = perf
 
                         duration = allocation_event.min_duration
@@ -223,7 +228,7 @@ class AllocationSolver(object):
 
                             allocation_event.min_duration, allocation_event.max_duration, "duration" + name_suffix
                         )
-                        self.durations[(occurrence_id, space_id, basket.id)] = duration_int
+                        self.durations[(occurrence_id, space_id, allocation_event.id, basket.id)] = duration_int
                         interval = model.NewOptionalIntervalVar(
                             start,
                             duration_int,
@@ -323,8 +328,12 @@ class AllocationSolver(object):
                 <= 1
             )
 
+
+
+
+
     # Objective
-    def maximize(self, model: cp_model.CpModel, selected: Dict):
+    def maximize_old(self, model: cp_model.CpModel, selected: Dict):
         foo = self.durations.values()
         for val in foo:
             print(val)
@@ -333,5 +342,28 @@ class AllocationSolver(object):
 
                 self.durations.values()
 
+            )
+        )
+
+    # Objective
+    def maximize(self, model: cp_model.CpModel, selected: Dict):
+        for basket in self.baskets.values():
+            for event in basket.events:
+                for event_occurrence_id, occurrence in event.occurrences.items():
+                    for space_id, space in suitable_spaces_for_event(
+                        event, self.spaces
+                    ).items():
+                        print(self.performed[(event_occurrence_id, space_id, event.id, basket.id)])
+        model.Maximize(
+            sum(
+                self.performed[(event_occurrence_id, space_id, event.id, basket.id)]
+                #* self.durations[(event_occurrence_id, space_id, event.id, basket.id)]
+                #* basket.score
+                for basket in self.baskets.values()
+                for event in basket.events
+                for event_occurrence_id, occurrence in event.occurrences.items()
+                for space_id, space in suitable_spaces_for_event(
+                    event, self.spaces
+                ).items()
             )
         )
