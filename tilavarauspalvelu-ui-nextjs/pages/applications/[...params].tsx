@@ -84,8 +84,8 @@ const EventReservationUnitDetails = (): JSX.Element | null => {
   const [
     undefined,
     applicationId,
-    reservationUnitId,
     eventId,
+    reservationUnitId,
   ] = params as string[];
 
   const fetchData = async (appId: number) => {
@@ -130,6 +130,9 @@ const EventReservationUnitDetails = (): JSX.Element | null => {
   const applicationEvent = application?.applicationEvents?.find(
     (event) => event.id === Number(eventId)
   );
+
+
+  console.log('eventId', eventId, 'event', applicationEvent, application);
 
   const reservationUnit = unitReservations
     ?.flatMap((reservation) => reservation.reservationUnit)
