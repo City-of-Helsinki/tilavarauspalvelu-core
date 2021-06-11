@@ -46,6 +46,7 @@ export type ApplicationRound = {
   statusTimestamp: string;
   allocating: boolean;
   isAdmin: boolean;
+  approvedBy: string;
 };
 
 export type Space = {
@@ -383,6 +384,10 @@ export interface Reservation {
   reservationUser: string | null;
   reservationUnit: ReservationUnit;
   recurringReservation: number | null;
+}
+
+export interface ReservationModified extends Reservation {
+  applicationEventId: number;
 }
 
 export type ReservationStatus =

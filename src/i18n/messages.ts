@@ -557,6 +557,8 @@ const translations: ITranslations = {
       schedule: ["Vuoro"],
     },
     noReservations: ["Ei varauksia"],
+    generatingDocument: ["Dokumenttia luodaan"],
+    errorGeneratingDocument: ["Dokumenttia ei pystytty luomaan"],
   },
   ReservationUnit: {
     reservationStatus: ["Varaustilanne"],
