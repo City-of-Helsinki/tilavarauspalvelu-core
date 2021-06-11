@@ -92,21 +92,9 @@ export const defaultDuration = "01:30:00";
 
 export const isBrowser = typeof window !== "undefined";
 
-type EnvironmentVariables =
-  | "REACT_APP_SENTRY_DSN"
-  | "REACT_APP_SENTRY_ENVIRONMENT"
-  | "NEXT_PUBLIC_TILAVARAUS_API_URL"
-  | "REACT_APP_DISABLE_AUTH"
-  | "NEXT_PUBLIC_OIDC_CLIENT_ID"
-  | "NEXT_PUBLIC_OIDC_URL"
-  | "NEXT_PUBLIC_OIDC_SCOPE"
-  | "NEXT_PUBLIC_TILAVARAUS_API_SCOPE";
+export const sentryDSN = process.env.REACT_APP_SENTRY_DSN;
 
-const getConfig = (name: EnvironmentVariables) => process.env[name];
-
-export const sentryDSN = getConfig("REACT_APP_SENTRY_DSN");
-
-export const sentryEnvironment = getConfig("REACT_APP_SENTRY_ENVIRONMENT");
+export const sentryEnvironment = process.env.REACT_APP_SENTRY_ENVIRONMENT;
 
 export const apiBaseUrl = process.env.NEXT_PUBLIC_TILAVARAUS_API_URL;
 
