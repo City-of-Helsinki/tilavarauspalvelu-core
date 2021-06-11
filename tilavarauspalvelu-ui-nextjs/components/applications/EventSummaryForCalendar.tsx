@@ -235,7 +235,7 @@ const ReservationUnitEventsSummaryForCalendar = ({
                       </ReservationUnitName>
                       <IconInfoCircle />
                       <ContactInfo>
-                        {/*reservationUnit.contactInformation*/} TODO
+                        {reservationUnit.contactInformation}
                       </ContactInfo>
                       <IconLocation />
                       <div>

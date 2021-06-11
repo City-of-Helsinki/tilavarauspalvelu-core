@@ -94,6 +94,7 @@ export type ReservationUnit = {
   reservationUnitType?: Parameter;
   termsOfUse: string;
   building: Building;
+  contactInformation: string;
   unitId: number;
 };
 
