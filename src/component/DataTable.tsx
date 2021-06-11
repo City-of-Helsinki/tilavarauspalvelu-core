@@ -197,16 +197,25 @@ const Cell = styled.td`
     }
 
     border-right: 0 none;
+    padding-right: var(--spacing-m);
   }
 
   ${truncatedText}
   position: relative;
   height: var(--spacing-4-xl);
-  padding: 0 var(--spacing-l) 0 var(--spacing-xs);
+  padding: 0 var(--spacing-xs);
   user-select: none;
+
+  a {
+    display: inline;
+  }
 `;
 
-export const Row = styled.tr<{ $clickable?: boolean; $disabled?: boolean }>`
+export const Row = styled.tr<{
+  $clickable?: boolean;
+  $disabled?: boolean;
+  $columnCount?: number;
+}>`
   ${({ $clickable }) => $clickable && "cursor: pointer;"}
   ${({ $disabled }) =>
     $disabled &&
@@ -217,6 +226,14 @@ export const Row = styled.tr<{ $clickable?: boolean; $disabled?: boolean }>`
     }
     cursor: default;
   `}
+
+  ${Cell} {
+    ${({ $columnCount }) =>
+      $columnCount &&
+      `
+      max-width: ${1000 / $columnCount}px;
+    `}
+  }
 `;
 
 export const Heading = styled.thead`
@@ -763,6 +780,7 @@ function DataTable({
                                   isRowDisabled &&
                                   isRowDisabled(row)
                                 }
+                                $columnCount={cellConfig.cols.length}
                               >
                                 {isSelectionActive && (
                                   <SelectionCell>
