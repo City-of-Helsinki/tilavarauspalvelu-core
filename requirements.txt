@@ -58,7 +58,9 @@ django-extensions==3.0.9
 django-extra-fields==3.0.2
     # via -r requirements.in
 django-filter==2.4.0
-    # via -r requirements.in
+    # via
+    #   -r requirements.in
+    #   graphene-permissions
 django-helusers==0.6.0
     # via -r requirements.in
 django-js-asset==1.2.2
@@ -109,6 +111,8 @@ factory-boy==3.2.0
     # via pytest-factoryboy
 faker==8.2.0
     # via factory-boy
+fastdiff==0.3.0
+    # via snapshottest
 flake8==3.8.4
     # via -r requirements.in
 freezegun==0.3.14
@@ -116,9 +120,15 @@ freezegun==0.3.14
 future==0.18.2
     # via pyjwkest
 graphene-django==2.13.0
+    # via
+    #   -r requirements.in
+    #   graphene-permissions
+graphene-permissions==1.1.4
     # via -r requirements.in
 graphene==2.1.8
-    # via graphene-django
+    # via
+    #   graphene-django
+    #   graphene-permissions
 graphql-core==2.3.2
     # via
     #   graphene
@@ -260,13 +270,18 @@ six==1.15.0
     #   python-dateutil
     #   python-jose
     #   singledispatch
+    #   snapshottest
     #   social-auth-app-django
+snapshottest==0.6.0
+    # via -r requirements.in
 social-auth-app-django==4.0.0
     # via -r requirements.in
 social-auth-core==4.1.0
     # via social-auth-app-django
 sqlparse==0.4.1
     # via django
+termcolor==1.1.0
+    # via snapshottest
 text-unidecode==1.3
     # via faker
 toml==0.10.2
@@ -289,6 +304,10 @@ urllib3==1.26.5
     #   sentry-sdk
 uwsgi==2.0.19.1
     # via -r requirements.in
+wasmer-compiler-cranelift==1.0.0
+    # via fastdiff
+wasmer==1.0.0
+    # via fastdiff
 whitenoise==5.2.0
     # via -r requirements.in
 

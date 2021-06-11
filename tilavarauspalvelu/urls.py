@@ -9,6 +9,7 @@ from drf_spectacular.views import (
 )
 
 from api.urls import router as api_router
+from api.urls import urlpatterns as graphql
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -20,6 +21,7 @@ urlpatterns = [
     path("helauth/", include("helusers.urls")),
     path("tinymce/", include("tinymce.urls")),
 ]
+urlpatterns.extend(graphql)
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
