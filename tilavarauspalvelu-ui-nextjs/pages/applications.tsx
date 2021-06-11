@@ -1,13 +1,11 @@
 import React from "react";
 import { groupBy } from "lodash";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import dynamic from "next/dynamic";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { TFunction } from "next-i18next";
 import { useApiData } from "../hooks/useApiData";
 import { getApplicationRounds, getApplications } from "../modules/api";
-import { isBrowser } from "../modules/const";
 import {
   Application,
   ApplicationRound,
@@ -17,6 +15,7 @@ import { getReducedApplicationStatus } from "../modules/util";
 import Head from "../components/applications/Head";
 import Loader from "../components/common/Loader";
 import ApplicationsGroup from "../components/applications/ApplicationsGroup";
+import RequireAuthentication from "../components/common/RequireAuthentication";
 
 export async function getStaticProps({ locale }) {
   return {
@@ -70,10 +69,6 @@ function ApplicationGroups({
 }
 
 const Applications = (): JSX.Element => {
-  const OidcSecure = dynamic(() =>
-    import("@axa-fr/react-oidc-context").then((mod) => mod.OidcSecure)
-  );
-
   const { t } = useTranslation();
 
   const applications = useApiData(getApplications, {}, (apps) =>
@@ -89,14 +84,10 @@ const Applications = (): JSX.Element => {
     }, {} as { [key: number]: ApplicationRound })
   );
 
-  if (!isBrowser) {
-    return null;
-  }
-
   return (
-    <OidcSecure>
-      <>
-        <Head heading={t("applications:heading")} />
+    <>
+      <Head heading={t("applications:heading")} />
+      <RequireAuthentication>
         <Container>
           <Loader datas={[applications, rounds]}>
             <ApplicationGroups
@@ -106,8 +97,8 @@ const Applications = (): JSX.Element => {
             />
           </Loader>
         </Container>
-      </>
-    </OidcSecure>
+      </RequireAuthentication>
+    </>
   );
 };
 

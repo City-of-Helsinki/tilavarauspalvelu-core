@@ -25,6 +25,7 @@ import useReservationUnitList from "../../hooks/useReservationUnitList";
 import Sent from "../../components/application/Sent";
 import { CenterSpinner } from "../../components/common/common";
 import { apiDateToUIDate, deepCopy, uiDateToApiDate } from "../../modules/util";
+import RequireAuthentication from "../../components/common/RequireAuthentication";
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
@@ -179,7 +180,7 @@ const Application = (): JSX.Element | null => {
   }
 
   return (
-    <>
+    <RequireAuthentication>
       {pageId === "page1" && (
         <ApplicationPage
           application={state.application}
@@ -257,7 +258,7 @@ const Application = (): JSX.Element | null => {
           {error}
         </Notification>
       ) : null}
-    </>
+    </RequireAuthentication>
   );
 };
 

@@ -25,6 +25,7 @@ const PageWrapper = (props: Props): JSX.Element => {
         }}
       />
       <Footer />
+      <div id="modal-root" />
     </>
   );
 };

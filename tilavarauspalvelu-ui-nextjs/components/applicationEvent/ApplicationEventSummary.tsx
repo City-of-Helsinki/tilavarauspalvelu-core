@@ -81,8 +81,6 @@ const ApplicationEventSummary = ({
     return null;
   }
 
-  console.log(numPersons, eventsPerWeek);
-
   return (
     <>
       <SubHeadLine>
