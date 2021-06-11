@@ -131,9 +131,6 @@ const EventReservationUnitDetails = (): JSX.Element | null => {
     (event) => event.id === Number(eventId)
   );
 
-
-  console.log('eventId', eventId, 'event', applicationEvent, application);
-
   const reservationUnit = unitReservations
     ?.flatMap((reservation) => reservation.reservationUnit)
     .find((ru) => ru.id === Number(reservationUnitId));

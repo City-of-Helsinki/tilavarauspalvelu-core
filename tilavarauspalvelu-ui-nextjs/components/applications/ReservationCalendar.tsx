@@ -62,21 +62,31 @@ const Label = styled.div`
   height: var(--spacing-m);
 `;
 
-const eventStyleGetter = (event: { reservation: Reservation }) => {
+// EventPropGetter<T> = (event: T, start: stringOrDate, end: stringOrDate, isSelected: boolean) => React.HTMLAttributes<HTMLDivElement>;
+type Event = {
+  title: string;
+  start: Date;
+  end: Date;
+  allDay: boolean;
+  event: Reservation;
+};
+
+const eventStyleGetter = ({
+  event,
+}: Event): React.HTMLAttributes<HTMLDivElement> => {
   const style = {
     borderRadius: "0px",
-    opacity: 0.8,
+    opacity: "0.8",
     color: "var(--color-white)",
     display: "block",
-  } as React.CSSProperties;
+  } as Record<string, string>;
 
-  const { reservation } = event;
   style.backgroundColor =
-    reservation.state === "cancelled"
+    event.state === "cancelled"
       ? "var(--color-error-dark)"
       : "var(--color-success-dark)";
 
-  if (reservation.state === "cancelled") {
+  if (event.state === "cancelled") {
     style.textDecoration = "line-through";
   }
 
@@ -122,10 +132,10 @@ const ReservationCalendar = ({
             start: parseDate(r.begin),
             end: parseDate(r.end),
             allDay: false,
-            reservation: r,
+            event: r,
           };
 
-          return event;
+          return event as Event;
         })}
         date={begin}
         onNavigate={ignore}
