@@ -465,6 +465,7 @@ class ApplicationSerializer(serializers.ModelSerializer):
 
     applicant_id = serializers.PrimaryKeyRelatedField(source="user", read_only=True)
     applicant_name = serializers.CharField(source="user.get_full_name", read_only=True)
+    applicant_email = serializers.EmailField(source="user.email", read_only=True)
 
     home_city_id = serializers.PrimaryKeyRelatedField(
         queryset=City.objects.all(), source="home_city", required=False, allow_null=True
@@ -480,6 +481,7 @@ class ApplicationSerializer(serializers.ModelSerializer):
             "applicant_type",
             "applicant_id",
             "applicant_name",
+            "applicant_email",
             "organisation",
             "application_round_id",
             "contact_person",
