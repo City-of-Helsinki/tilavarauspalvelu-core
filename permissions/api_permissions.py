@@ -9,6 +9,7 @@ from applications.models import (
     ApplicationRound,
 )
 from spaces.models import ServiceSector, Unit, UnitGroup
+from .feature_permissions.feature_permissions import features
 
 from .helpers import (
     can_allocate_allocation_request,
@@ -174,7 +175,7 @@ class ApplicationRoundPermission(permissions.BasePermission):
     def has_object_permission(self, request, view, application_round):
         if request.method in permissions.SAFE_METHODS:
             return True
-
+        features.get_permissions()
         return can_modify_application_round(request.user, application_round)
 
     def has_permission(self, request, view):

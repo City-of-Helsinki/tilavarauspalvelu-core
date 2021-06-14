@@ -5,6 +5,7 @@ from django.db.models import Q
 from django.utils import timezone
 
 from applications.models import Application, ApplicationRound
+from permissions.feature_permissions.feature_permissions import features
 from reservation_units.models import ReservationUnit
 from reservations.models import RecurringReservation, Reservation
 from spaces.models import ServiceSector, Unit, UnitGroup
@@ -123,7 +124,20 @@ def can_handle_application(user: User, application: Application) -> bool:
 def can_manage_service_sectors_application_rounds(
     user: User, service_sector: ServiceSector
 ) -> bool:
+
+
     permission = "can_manage_application_rounds"
+
+    if flag_enabled('FEATURE_PERMISSIONS'):
+        return (
+                is_superuser(user)
+                or (
+                        service_sector is not None
+                        and has_service_sector_permission(permission, [service_sector], features.get_permissions(user))
+                )
+                or has_general_permission(permission, features.get_permissions(user))
+        )
+
     return (
         is_superuser(user)
         or (
