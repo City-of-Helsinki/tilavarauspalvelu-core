@@ -131,6 +131,10 @@ const CalendarLink = styled.a`
   display: flex;
   align-items: center;
   gap: var(--spacing-s);
+
+  svg {
+    color: var(--color-black);
+  }
 `;
 
 const BottomContainer = styled.div`
