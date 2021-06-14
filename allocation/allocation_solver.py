@@ -46,6 +46,7 @@ class AllocationSolutionPrinter(object):
         baskets,
         durations,
         performed,
+        performed_integers,
         output_basket_ids: [int] = [],
     ):
         self.model = model
@@ -56,6 +57,7 @@ class AllocationSolutionPrinter(object):
         self.baskets = baskets
         self.durations = durations
         self.output_basket_ids = output_basket_ids
+        self.performed_integers = performed_integers
 
     def print_solution(self):
         solver = cp_model.CpSolver()
@@ -128,6 +130,7 @@ class AllocationSolver(object):
         self.baskets = allocation_data.baskets
         self.starts = {}
         self.performed = {}
+        self.performed_integers = {}
         self.ends = {}
         self.durations = {}
         self.duration_constraints = {}
@@ -159,6 +162,7 @@ class AllocationSolver(object):
             model=model,
             spaces=self.spaces,
             performed=self.performed,
+            performed_integers = self.performed_integers,
             starts=self.starts,
             ends=self.ends,
             baskets=self.baskets,
@@ -228,7 +232,15 @@ class AllocationSolver(object):
 
                             allocation_event.min_duration, allocation_event.max_duration, "duration" + name_suffix
                         )
-                        self.durations[(occurrence_id, space_id, allocation_event.id, basket.id)] = duration_int
+
+                        performed_as_int = model.NewIntVar(
+
+                            0, 1, "perf_int" + name_suffix
+                        )
+
+
+
+
                         interval = model.NewOptionalIntervalVar(
                             start,
                             duration_int,
@@ -243,6 +255,9 @@ class AllocationSolver(object):
                             ),
                         )
 
+
+                        self.performed_integers[(occurrence_id, space_id, allocation_event.id, basket.id)] = performed_as_int
+
                         model.Add(min_start <= end - duration_int).OnlyEnforceIf(
                             perf
                         )
@@ -251,9 +266,14 @@ class AllocationSolver(object):
                         model.Add(start + duration_int <= max_end).OnlyEnforceIf(
                             perf
                         )
+
+                        model.Add(duration_int ==0).OnlyEnforceIf(
+                            perf.Not()
+                        )
+
                         model.Add(min_start <= start).OnlyEnforceIf(perf)
                         model.Add(end == start + duration_int).OnlyEnforceIf(perf)
-                        self.duration_constraints = {}
+                        self.durations[(occurrence_id, space_id, allocation_event.id, basket.id)] = duration_int
                         self.starts[(occurrence_id, space_id, basket.id)] = start
                         self.ends[(occurrence_id, space_id, basket.id)] = end
                         intervals.append(interval)
@@ -357,7 +377,7 @@ class AllocationSolver(object):
         model.Maximize(
             sum(
                 self.performed[(event_occurrence_id, space_id, event.id, basket.id)]
-                #* self.durations[(event_occurrence_id, space_id, event.id, basket.id)]
+                #self.durations[(event_occurrence_id, space_id, event.id, basket.id)]
                 #* basket.score
                 for basket in self.baskets.values()
                 for event in basket.events

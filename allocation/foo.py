@@ -1,78 +1,71 @@
-#!/usr/bin/env python3
-# Copyright 2010-2021 Google LLC
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-"""Solves a binpacking problem using the CP-SAT solver."""
+import collections
 
+# Import Python wrapper for or-tools CP-SAT solver.
 from ortools.sat.python import cp_model
 
 
-def BinpackingProblemSat():
-    """Solves a bin-packing problem using the CP-SAT solver."""
-    # Data.
-    bin_capacity = 100
-    slack_capacity = 20
-    num_bins = 5
-    all_bins = range(num_bins)
-
-    items = [(20, 6), (15, 6), (30, 4), (45, 3)]
-    num_items = len(items)
-    all_items = range(num_items)
-
-    # Model.
+def MinimalJobshopSat():
+    """Minimal jobshop problem."""
+    # Create the model.
     model = cp_model.CpModel()
 
-    # Main variables.
-    x = {}
-    for i in all_items:
-        num_copies = items[i][1]
-        for b in all_bins:
-            x[(i, b)] = model.NewIntVar(0, num_copies, "x_%i_%i" % (i, b))
+    jobs_data = [20, 30, 40  # Job2
+    ]
 
-    # Load variables.
-    load = [model.NewIntVar(0, bin_capacity, "load_%i" % b) for b in all_bins]
+    #machines_count = 1 + max(task[0] for job in jobs_data for task in job)
+    #all_machines = range(machines_count)
 
-    # Slack variables.
-    slacks = [model.NewBoolVar("slack_%i" % b) for b in all_bins]
+    # Computes horizon dynamically as the sum of all durations.
+    horizon = sum(jobs_data)
 
-    # Links load and x.
-    for b in all_bins:
-        model.Add(load[b] == sum(x[(i, b)] * items[i][0] for i in all_items))
+    # Named tuple to store information about created variables.
+    task_type = collections.namedtuple('task_type', 'start end interval')
+    # Named tuple to manipulate solution information.
+    assigned_task_type = collections.namedtuple('assigned_task_type',
+                                                'start job index duration')
 
-    # Place all items.
-    for i in all_items:
-        model.Add(sum(x[(i, b)] for b in all_bins) == items[i][1])
+    # Creates job intervals and add to the corresponding machine lists.
+    all_tasks = {}
+    machine_to_intervals = collections.defaultdict(list)
 
-    # Links load and slack through an equivalence relation.
-    safe_capacity = bin_capacity - slack_capacity
-    for b in all_bins:
-        # slack[b] => load[b] <= safe_capacity.
-        model.Add(load[b] <= safe_capacity).OnlyEnforceIf(slacks[b])
-        # not(slack[b]) => load[b] > safe_capacity.
-        model.Add(load[b] > safe_capacity).OnlyEnforceIf(slacks[b].Not())
+    intervals = []
+    for job in jobs_data:
+        duration = job
+        suffix = '_%i' % (job)
+        start_var = model.NewIntVar(0, horizon, 'start' + suffix)
+        end_var = model.NewIntVar(0, horizon, 'end' + suffix)
+        interval_var = model.NewIntervalVar(start_var, duration, end_var,
+                                            'interval' + suffix)
 
-    # Maximize sum of slacks.
-    model.Maximize(sum(slacks))
+        all_tasks[job] = task_type(start=start_var,
+                                   end=end_var,
+                                   interval=interval_var)
 
-    # Solves and prints out the solution.
+        intervals.append(interval_var)
+
+    model.AddNoOverlap(intervals)
+
+
+    # Makespan objective.
+    obj_var = model.NewIntVar(0, horizon, 'makespan')
+
+    model.Minimize(obj_var)
+
+    # Solve model.
     solver = cp_model.CpSolver()
     status = solver.Solve(model)
-    print("Solve status: %s" % solver.StatusName(status))
+
     if status == cp_model.OPTIMAL:
-        print("Optimal objective value: %i" % solver.ObjectiveValue())
-    print("Statistics")
-    print("  - conflicts : %i" % solver.NumConflicts())
-    print("  - branches  : %i" % solver.NumBranches())
-    print("  - wall time : %f s" % solver.WallTime())
+        # Create one list of assigned tasks per machine.
+        assigned_jobs = collections.defaultdict(list)
+        for job in jobs_data:
+            val = solver.Value(all_tasks[job])
+            print(val)
 
 
-BinpackingProblemSat()
+        # Finally print the solution found.
+        print('Optimal Schedule Length: %i' % solver.ObjectiveValue())
+        #print(output)
+
+
+MinimalJobshopSat()
