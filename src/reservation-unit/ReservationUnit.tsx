@@ -38,10 +38,8 @@ const ReservationUnit = (): JSX.Element | null => {
   const { id } = useParams<ParamTypes>();
   const { t } = useTranslation();
 
-  const [
-    reservationUnit,
-    setReservationUnit,
-  ] = useState<ReservationUnitType | null>(null);
+  const [reservationUnit, setReservationUnit] =
+    useState<ReservationUnitType | null>(null);
 
   const reservationUnitList = useReservationUnitsList();
 

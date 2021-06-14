@@ -1,0 +1,43 @@
+name: e2e
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      CYPRESS_BASE_URL: http://localhost:3000
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build image
+        run: |
+          docker build -t tilavaraus-ui .
+      - name: Start container
+        run: |
+          docker run -e REACT_APP_DISABLE_AUTH=true -e REACT_APP_TILAVARAUS_API_URL=http://localhost:8000 -p 3000:3000 -d --name tilavaraus-ui-server tilavaraus-ui
+      - name: Run server tests
+        run: |
+          yarn install --frozen-lockfile
+          yarn test:server
+      - name: Cypress e2e & a11y
+        uses: cypress-io/github-action@v2
+      - name: Upload images on failure
+        uses: actions/upload-artifact@v1
+        if: failure()
+        with:
+          name: cypress-screenshots
+          path: cypress/screenshots
+      - name: Upload videos
+        uses: actions/upload-artifact@v1
+        if: always()
+        with:
+          name: cypress-videos
+          path: cypress/videos
+      - name: Stop container
+        run: |
+          docker stop tilavaraus-ui-server

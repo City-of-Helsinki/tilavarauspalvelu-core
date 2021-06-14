@@ -62,9 +62,9 @@ You will also see any lint errors in the console.
 Launches the test runner in the interactive watch mode.\
 See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-### `yarn test:e2e-local`
+### `yarn test:browser`
 
-Runs end to end tests against local setup. Both ui and api must be running before running this script.
+Runs cypress, see [cypress/README.md](cypress/README.md) for more info.
 
 ### `yarn test:axe-local`
 
@@ -77,8 +77,6 @@ It correctly bundles React in production mode and optimizes the build for the be
 
 The build is minified and the filenames include the hashes.\
 Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
 ## Configurable environment variables
 

@@ -1,5 +1,5 @@
 module.exports = {
-  extends: ['airbnb-typescript-prettier', 'plugin:jsx-a11y/recommended'],
+  extends: ['plugin:jsx-a11y/recommended'],
   parser: '@typescript-eslint/parser',
   parserOptions: {
     tsconfigRootDir: __dirname,
@@ -13,10 +13,6 @@ module.exports = {
     node: true,
   },
   rules: {
-    'import/no-extraneous-dependencies': [
-      'error',
-      { devDependencies: ['e2e/**/*.ts'] },
-    ],
     'import/no-unresolved': 0,
     'react/prop-types': 0,
     'react/destructuring-assignment': 0,

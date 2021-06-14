@@ -97,7 +97,6 @@ const Page1 = ({
     mode: 'onChange',
     defaultValues: {
       applicationEvents: application.applicationEvents,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as Record<string, any>,
   });
 

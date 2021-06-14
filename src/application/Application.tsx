@@ -127,15 +127,14 @@ const Application = (): JSX.Element | null => {
     }
   };
 
-  const saveAndNavigate = (path: string) => async (
-    appToSave: ApplicationType
-  ) =>
-    saveWithEffect(appToSave, (id) => {
-      const prefix = id ? match.url.replace("new", String(id)) : match.url;
-      const target = `${prefix}/${path}`;
-      clearSelections();
-      history.push(target);
-    });
+  const saveAndNavigate =
+    (path: string) => async (appToSave: ApplicationType) =>
+      saveWithEffect(appToSave, (id) => {
+        const prefix = id ? match.url.replace("new", String(id)) : match.url;
+        const target = `${prefix}/${path}`;
+        clearSelections();
+        history.push(target);
+      });
 
   const addNewApplicationEvent = async () => {
     const params = {} as {
