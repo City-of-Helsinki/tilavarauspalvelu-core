@@ -174,7 +174,6 @@ const ApplicationEvent = ({
 
   useEffect(() => {
     form.register({ name: fieldName('eventReservationUnits') });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

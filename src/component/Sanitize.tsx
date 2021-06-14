@@ -13,7 +13,6 @@ const config = {
 };
 const Sanitize = ({ html }: Props): JSX.Element | null =>
   html ? (
-    // eslint-disable-next-line react/no-danger
     <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(html, config) }} />
   ) : null;
 

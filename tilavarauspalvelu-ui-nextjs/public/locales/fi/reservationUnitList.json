@@ -1,0 +1,8 @@
+{
+  "option": "Vaihtoehto",
+  "buttonRemove": "Poista",
+  "buttonUp": "Siirrä ylös",
+  "buttonDown": "Siirrä alas",
+  "add": "Lisää tila",
+  "infoReservationUnits": "Järjestä tilat haluamasi järjestykseen nuolilla. Ensisijaisin tila ylimmäiseksi. Voit lisätä tilatoiveita Lisää tila painikkeella."
+}

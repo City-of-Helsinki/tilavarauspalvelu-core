@@ -1,0 +1,13 @@
+{
+  "back": "Takaisin Omat hakemukset",
+  "info": "Hakemukselle on myönnetty seuraavat vakiovuorot",
+  "titleResolution": "Vuorojaon päätös",
+  "resultWithReservations": "Hakemuksellesi on myönnetty seuraavat käyttövuorot.",
+  "resultWithoutReservations": "Hakemuksellesi ei valitettavasti ole voitu myöntää käyttövuoroja.",
+  "weekSelectLabel": "Valitse viikko",
+  "showList": "Näytä listassa",
+  "showCalendar": "Näytä kalenterissa",
+  "download": "Lataa päätös (.pdf)",
+  "generating": "Dokumenttia luodaan",
+  "errorGeneratingPDF": "PDF Dokumenttia ei pystytty luomaan"
+}

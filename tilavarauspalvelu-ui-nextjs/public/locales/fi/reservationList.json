@@ -1,0 +1,7 @@
+{
+  "granted": "Myönnetty ryhmälle {{groupName}}",
+  "denied": "Poikkeukset, jolloin vakiovuoro ei ole käytettävissänne",
+  "headerWeekday": "Viikonpäivä",
+  "headerDate": "Päivämäärä",
+  "headerTime": "Kellonaika"
+}

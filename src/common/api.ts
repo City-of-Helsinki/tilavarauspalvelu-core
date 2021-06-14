@@ -18,7 +18,6 @@ const recurringReservationBasePath = 'recurring_reservation';
 const parameterBasePath = 'parameters';
 const applicationBasePath = 'application';
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface QueryParameters extends ReservationUnitsParameters {}
 
 interface RequestParameters {

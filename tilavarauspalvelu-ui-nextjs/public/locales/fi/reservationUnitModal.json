@@ -1,0 +1,10 @@
+{
+  "selectReservationUnit": "Lisää hakemukselle",
+  "unSelectReservationUnit": "Poista hakemukselta",
+  "heading": "Lisää sopivia tiloja hakemukselle",
+  "searchTermLabel": "Sanahaku",
+  "searchPurposeLabel": "Käyttötarkoitus",
+  "searchReservationUnitTypeLabel": "Tilan tyyppi",
+  "openLinkToNewTab": "Avaa välilehdellä",
+  "returnToApplication": "Palaa hakemukselle"
+}

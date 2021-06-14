@@ -38,10 +38,8 @@ const time = (isoDateTime: string) => {
     .padStart(2, '0')}`;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const timeSpan = (begin: string, end: string) => `${time(begin)}-${time(end)}`;
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const state = (reservationState: ReservationState) =>
   reservationState === 'confirmed' ? 'Myönnetään' : 'Ei käytettävissä';
 

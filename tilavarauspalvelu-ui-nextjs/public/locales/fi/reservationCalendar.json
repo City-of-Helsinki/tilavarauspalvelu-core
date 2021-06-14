@@ -1,0 +1,8 @@
+{
+  "prefixForCancelled": "Peruttu",
+  "linkToResourceUnitLabel": "Tutustu tilaan",
+  "legend": {
+    "okLabel": "Voimassa oleva varaus",
+    "cancelledLabel": "Peruttu varaus"
+  }
+}

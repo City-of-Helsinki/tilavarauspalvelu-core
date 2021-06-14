@@ -13,7 +13,6 @@ interface Props {
   applicationRound: ApplicationRound;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const StyledCard = styled(({ act, ...rest }) => <Card {...rest} />)`
   && {
     max-width: var(--container-width-m);
@@ -42,7 +41,6 @@ const Name = styled.div`
   font-weight: 500;
 `;
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const CardButton = styled(({ noLeftMargin, ...rest }) => <Button {...rest} />)`
   @media (max-width: ${breakpoint.s}) {
     justify-self: center;

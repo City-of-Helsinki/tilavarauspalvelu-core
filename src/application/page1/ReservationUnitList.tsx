@@ -82,7 +82,6 @@ const ReservationUnitList = ({
         };
       })
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reservationUnits]);
 
   useEffect(() => {
@@ -92,7 +91,6 @@ const ReservationUnitList = ({
     } else {
       form.setError(fieldName, { type: 'reservationUnitTooSmall' });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reservationUnits, minSize]);
 
   useEffect(() => {

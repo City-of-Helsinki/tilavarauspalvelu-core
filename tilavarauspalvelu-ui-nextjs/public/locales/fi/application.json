@@ -1,0 +1,174 @@
+{
+  "error": {
+    "saveFailed": "Hakemuksen tallennus ei onnistunut",
+    "required": "Pakollinen",
+    "pattern": "Tarkista muoto",
+    "numPersonsMin": "Ryhmän koko virheellinen",
+    "minDurationBiggerThanMaxDuration": "Minimikesto on suurempi kuin maksimikesto",
+    "maxDurationSmallerThanMinDuration": "Maksimikesto on pienempi kuin minimikesto",
+    "eventsPerWeekMin": "Minimissään yksi vuoro viikossa",
+    "beginAfterEnd": "Kauden aloituspäivä myöhempi kuin lopetuspäivä",
+    "beginBeforePeriodBegin": "Kauden aloituspäivä on liian aikainen",
+    "beginAfterPeriodEnd": "Kauden aloituspäivä on liian myöhäinen",
+    "endAfterPeriodEnd": "Kauden lopetuspäivä on liian myöhäinen",
+    "endBeforeBegin": "Kauden lopetuspäivä on aikaisempi kuin aloituspäivä",
+    "endBeforePeriodBegin": "Kauden lopetuspäivä on liian aikainen",
+    "missingSchedule": "Lisää kaikille vakiovuoroille vähintään yksi aika",
+    "reservationUnitTooSmall": "Tila on liian pieni ryhmän käyttöön",
+    "otherEventsHaveErrors": "Korjaa ensin validaatiovirheet",
+    "noReservationUnits": "Lisää hakemukselle yksi tai useampi tila",
+    "noEvents": "Lisää hakemukselle yksi tai useampi vakiovuoro"
+  },
+  "Intro": {
+    "startNewApplication": "Aloita hakemuksen täyttäminen",
+    "heading": "Vakiovuorohakemus",
+    "createFailedHeading": "Hakemuksen luominen epäonnistui",
+    "createFailedContent": "Yritä myöhemmin uudelleen",
+    "faq1": {
+      "question": "Edustan yhdistystä tai rekisteröitymätöntä ryhmää, kuinka toimin?"
+    },
+    "faq2": {
+      "question": "Kuinka hakemusten käsittely tapahtuu?"
+    },
+
+    "faq3": {
+      "question": "Kuinka täytän vakiovuorohakemuksen yksityishenkilönä?"
+    }
+  },
+  "applicationEventSaved": "Vakiovuoro tallennettu hakemukselle",
+  "Page1": {
+    "heading": "1. Vakiovuoron luominen",
+    "text": "Perustiedot",
+    "basicInformationSubHeading": "Perustiedot",
+    "name": "Vakiovuoron nimi",
+    "groupSize": "Ryhmän koko",
+    "ageGroup": "Ikäryhmä",
+    "abilityGroup": "Tasoryhmä",
+    "purpose": "Vuoron käyttötarkoitus / toiminnan sisältö",
+    "spacesSubHeading": "Toivotut tilat",
+    "applicationRoundSubHeading": "Vakiovuoron kausi",
+    "periodStartDate": "Kauden aloituspäivä",
+    "periodEndDate": "Kauden päätöspäivä",
+    "minDuration": "Vuoron minimikesto",
+    "maxDuration": "Vuoron maksimikesto",
+    "eventsPerWeek": "Vuorojen määrä viikossa",
+    "biweekly": "Vuoro vain joka toinen viikko",
+    "defaultDurationLabel": "1 tunti 30 min",
+    "createNew": "Lisää uusi vakiovuoro hakemukselle",
+    "applicationEventName": "Nimetön vakiovuoro",
+    "applicationEventSummary": "Yhteenveto",
+    "applicationEventSaved": "Vakiovuoro tallennettu hakemukselle",
+    "saveEvent": "Hyväksy ja tallenna vakiovuoro",
+    "deleteEvent": "Poista vakiovuoro"
+  },
+  "Page2": {
+    "heading": "2. Vakiovuoron ajankohta",
+    "info": "Tarkista tilakohtaiset aukioloajat <0>hakuohjeista<0>",
+    "text": "Anna toivomasi ajankohta jokaiselle luomallesi vakiovuorolle.",
+    "copyTimes": "Kopioi ajat kaikille vakiovuoroille",
+    "summary": "Yhteenveto"
+  },
+  "Page3": {
+    "heading": "3. Varaajan perustiedot",
+    "text": "Varaavan yhteisön ja yhteyshenkilön perustiedot",
+    "asPrivatePersonSubHeading": "Varaan yksityishenkilönä",
+    "firstName": "Etunimi",
+    "homeCity": "Kotipaikka",
+    "lastName": "Sukunimi",
+    "phoneNumber": "Puhelinumero",
+    "email": "Hakemukselle liitettävä sähköpostiosoite",
+    "emailNotification": "Kaikki hakemukseen liittyvät viestit lähetetään alla olevaan sähköpostiin",
+    "as": {
+      "type": {
+        "organisation": "Luon hakemuksen yhdistyksen, järjestön, ryhmän tai yhteisön puolesta",
+        "company": "Luon hakemuksen yrityksen puolesta",
+        "individual": "Luon hakemuksen yksityishenkilönä"
+      }
+    },
+    "contactPerson": {
+      "firstName": "Yhteyshenkilön etunimi",
+      "lastName": "Yhteyshenkilön sukunimi",
+      "phoneNumber": "Yhteyshenkilön puhelinnumero"
+    },
+    "billingAddress": {
+      "streetAddress": "Katuosoite",
+      "postCode": "Postinumero",
+      "city": "Postitoimipaikka"
+    },
+    "company": {
+      "name": "Yrityksen virallinen nimi",
+      "coreBusiness": "Yrityksen ydintoiminta",
+      "registrationNumber": "Y-tunnus"
+    },
+    "organisation": {
+      "name": "Yhdistyksen, järjestön, ryhmän tai yhteisön virallinen nimi",
+      "coreBusiness": "Yhdistyksen tai seuran ydintoiminta",
+      "registrationNumber": "Rekisterinumero",
+      "streetAddress": "Katuosoite",
+      "postCode": "Postinumero",
+      "city": "Postitoimipaikka",
+      "notRegistered": "Yhdistystä ei ole rekisteröity",
+      "separateInvoicingAddress": "Laskutusosoite on eri kuin tämä"
+    }
+  },
+  "preview": {
+    "applicantType": {
+      "community": "Rekisteröimätön yhdistys",
+      "company": "Yritys",
+      "individual": "Yksityishenkilö",
+      "association": "Rekisteröity yhdistys"
+    },
+    "homeCity": "Kotipaikka",
+    "heading": "4. Hakemuksen lähettäminen",
+    "text": "Yhteenveto hakemuksestasi",
+    "basicInfoSubHeading": "Varaajan perustiedot",
+    "firstName": "Yhteyshenkilön etunimi",
+    "lastName": "Yhteyshenkilön sukunimi",
+    "applicantTypeLabel": "Hakijan tyyppi",
+    "email": "Sähköpostiosoite",
+    "phoneNumber": "Puhelinumero",
+    "organisation": {
+      "name": "Hakijan nimi",
+      "coreBusiness": "Ydintoiminta"
+    },
+    "applicationEvent": {
+      "name": "Vakiovuoron nimi",
+      "numPersons": "Ryhmän koko",
+      "ageGroup": "Ikäryhmä",
+      "abilityGroup": "Tasoryhmä",
+      "purpose": "Vuoron käyttötarkoitus",
+      "additionalInfo": "Lisätietoja vuoroon liittyen",
+      "begin": "Kauden aloituspäivä",
+      "end": "Kauden päätöspäivä",
+      "minDuration": "Minimikesto",
+      "maxDuration": "Maksimikesto",
+      "eventsPerWeek": "Vuorojen määrä viikossa",
+      "biweekly": "Vakiovuorot vain joka toinen viikko",
+      "reservationUnit": "Vaihtoehto {{order}}."
+    },
+    "applicationEventSchedules": "Toivotut ajat",
+    "noData": {
+      "heading": "Lomakkeen tietoja ei ole vielä olemassa",
+      "text": "Täytä ensin lomake."
+    },
+    "notification": {
+      "processing": "Käsittely",
+      "body": "Hakemusten käsittely aloitetaan, kun hakuaika on päättynyt. Ilmoitamme antamaasi sähköpostiosoitteeseen eri vaiheista."
+    },
+    "reservationUnitTerms": "Täydentävät varausehdot",
+    "termsOfService": "Helsingin kaupungin tilojen ja laitteiden varausehdot",
+    "userAcceptsTerms": "Olen lukenut ja hyväksyn palveluehdot ja tilojen varausehdot."
+  },
+  "sent": {
+    "heading": "Hakemuksesi on lähetetty käsiteltäväksi",
+    "faq1Question": "Kuinka hakemuksen käsittely etenee?",
+    "faq2Question": "Kuinka hakemuksen käsittely tapahtuu?",
+    "faq3Question": "Kohtuullistaminen, vuoron peruutus ja muutoksenhaku"
+  },
+  "navigation": {
+    "page1": "Vakiovuoron perustiedot",
+    "page2": "Vakiovuoron ajankohta",
+    "page3": "Varaajan perustiedot",
+    "preview": "Tarkista ja lähetä käsiteltäväksi"
+  }
+}

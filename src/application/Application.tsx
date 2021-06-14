@@ -1,34 +1,34 @@
-import React, { useReducer, useState } from 'react';
-import { useAsync } from 'react-use';
+import React, { useReducer, useState } from "react";
+import { useAsync } from "react-use";
 import {
   Route,
   Switch,
   useHistory,
   useParams,
   useRouteMatch,
-} from 'react-router-dom';
-import { Notification } from 'hds-react';
-import { useTranslation } from 'react-i18next';
+} from "react-router-dom";
+import { Notification } from "hds-react";
+import { useTranslation } from "react-i18next";
 import {
   saveApplication,
   getApplication,
   getApplicationRound,
-} from '../common/api';
+} from "../common/api";
 import {
   Application as ApplicationType,
   ApplicationRound,
   EditorState,
-} from '../common/types';
-import ApplicationPage from './ApplicationPage';
-import Page1 from './page1/Page1';
-import Page2 from './page2/Page2';
-import Page3 from './page3/Page3';
-import Preview from './preview/Preview';
-import applicationReducer from './applicationReducer';
-import useReservationUnitList from '../common/hook/useReservationUnitList';
-import Sent from './sent/Sent';
-import { CenterSpinner } from '../component/common';
-import { apiDateToUIDate, deepCopy, uiDateToApiDate } from '../common/util';
+} from "../common/types";
+import ApplicationPage from "./ApplicationPage";
+import Page1 from "./page1/Page1";
+import Page2 from "./page2/Page2";
+import Page3 from "./page3/Page3";
+import Preview from "./preview/Preview";
+import applicationReducer from "./applicationReducer";
+import useReservationUnitList from "../common/hook/useReservationUnitList";
+import Sent from "./sent/Sent";
+import { CenterSpinner } from "../component/common";
+import { apiDateToUIDate, deepCopy, uiDateToApiDate } from "../common/util";
 
 type ParamTypes = {
   applicationId: string;
@@ -39,6 +39,7 @@ const Application = (): JSX.Element | null => {
 
   const history = useHistory();
   const match = useRouteMatch();
+  console.log(match);
 
   const [error, setError] = useState<string | null>();
 
@@ -68,7 +69,7 @@ const Application = (): JSX.Element | null => {
           }
         });
         dispatch({
-          type: 'load',
+          type: "load",
           application,
           params: {
             begin: apiDateToUIDate(applicationRound.reservationPeriodBegin),
@@ -77,7 +78,7 @@ const Application = (): JSX.Element | null => {
         });
         return { application, applicationRound };
       } catch (e) {
-        setError(`${t('common.error.dataError')}`);
+        setError(`${t("common.error.dataError")}`);
       }
     }
     return null;
@@ -112,7 +113,7 @@ const Application = (): JSX.Element | null => {
         (ae) => existingIds.indexOf(ae.id) === -1
       );
       dispatch({
-        type: 'save',
+        type: "save",
         application: loadedApplication,
         savedEventId: eventId || (newEvent.length && newEvent[0].id) || 0,
       });
@@ -121,7 +122,7 @@ const Application = (): JSX.Element | null => {
         postSave(loadedApplication.id);
       }
     } catch (e) {
-      setError(`${t('Application.error.saveFailed')}`);
+      setError(`${t("Application.error.saveFailed")}`);
       throw e;
     }
   };
@@ -129,7 +130,7 @@ const Application = (): JSX.Element | null => {
   const saveAndNavigate =
     (path: string) => async (appToSave: ApplicationType) =>
       saveWithEffect(appToSave, (id) => {
-        const prefix = id ? match.url.replace('new', String(id)) : match.url;
+        const prefix = id ? match.url.replace("new", String(id)) : match.url;
         const target = `${prefix}/${path}`;
         clearSelections();
         history.push(target);
@@ -150,12 +151,12 @@ const Application = (): JSX.Element | null => {
 
     dispatch({
       params,
-      type: 'addNewApplicationEvent',
+      type: "addNewApplicationEvent",
     });
   };
 
   const applicationRoundName =
-    applicationLoadingStatus.value?.applicationRound.name || '';
+    applicationLoadingStatus.value?.applicationRound.name || "";
 
   const ready = !applicationLoadingStatus.loading && state.loading === false;
 
@@ -166,7 +167,8 @@ const Application = (): JSX.Element | null => {
         label={error}
         position="top-center"
         displayAutoCloseProgress={false}
-        onClose={() => history.go(0)}>
+        onClose={() => history.go(0)}
+      >
         {error}
       </Notification>
     ) : (
@@ -183,7 +185,8 @@ const Application = (): JSX.Element | null => {
             breadCrumbText={applicationRoundName}
             overrideText={applicationRoundName}
             translationKeyPrefix="Application.Page1"
-            match={match}>
+            match={match}
+          >
             <Page1
               selectedReservationUnits={reservationUnits}
               applicationRound={
@@ -209,10 +212,11 @@ const Application = (): JSX.Element | null => {
             application={state.application}
             translationKeyPrefix="Application.Page2"
             match={match}
-            breadCrumbText={applicationRoundName}>
+            breadCrumbText={applicationRoundName}
+          >
             <Page2
               application={state.application}
-              onNext={saveAndNavigate('page3')}
+              onNext={saveAndNavigate("page3")}
             />
           </ApplicationPage>
         </Route>
@@ -221,10 +225,11 @@ const Application = (): JSX.Element | null => {
             application={state.application}
             translationKeyPrefix="Application.Page3"
             match={match}
-            breadCrumbText={applicationRoundName}>
+            breadCrumbText={applicationRoundName}
+          >
             <Page3
               application={state.application}
-              onNext={saveAndNavigate('preview')}
+              onNext={saveAndNavigate("preview")}
             />
           </ApplicationPage>
         </Route>
@@ -233,10 +238,11 @@ const Application = (): JSX.Element | null => {
             application={state.application}
             translationKeyPrefix="Application.preview"
             match={match}
-            breadCrumbText={applicationRoundName}>
+            breadCrumbText={applicationRoundName}
+          >
             <Preview
               application={state.application}
-              onNext={saveAndNavigate('sent')}
+              onNext={saveAndNavigate("sent")}
             />
           </ApplicationPage>
         </Route>
@@ -251,7 +257,8 @@ const Application = (): JSX.Element | null => {
           position="top-center"
           autoClose
           displayAutoCloseProgress={false}
-          onClose={() => setError(null)}>
+          onClose={() => setError(null)}
+        >
           {error}
         </Notification>
       ) : null}

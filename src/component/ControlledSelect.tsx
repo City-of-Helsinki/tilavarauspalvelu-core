@@ -33,7 +33,6 @@ const ControlledSelect = ({
         document.getElementById(`${name}-toggle-button`)?.focus();
       }}
       render={(props) => {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { ref, value, ...newProps } = props;
         const currentValue = getSelectedOption(value, options);
         return (

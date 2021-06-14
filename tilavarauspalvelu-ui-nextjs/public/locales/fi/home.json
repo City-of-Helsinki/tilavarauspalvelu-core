@@ -1,0 +1,15 @@
+{
+  "head": {
+    "heading": "Vakiovuoron hakeminen",
+    "text": "Hae säännöllisiä vuoroja"
+  },
+  "info": {
+    "heading": "Hakeminen",
+    "text": "Vakiovuoroja haetaan yleisen haun kautta. Voit selata tiloja valmiiksi, mutta hakemuksen voi jättää vain hakuajan puitteissa."
+  },
+  "browseAllButton": "Selaa kaikkia tiloja",
+  "applicationTimes": {
+    "heading": "Vakiovuorojen hakuajat",
+    "text": "Vakiovuoroihin on hakuaika kaksi kertaa vuodessa. Ajankohta vaihtelee palvelusta ja toimialasta riippuen."
+  }
+}

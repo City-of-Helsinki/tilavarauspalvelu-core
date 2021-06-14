@@ -68,7 +68,6 @@ if (isClient && authEnabled) {
     return req;
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const refreshAuthLogic = (failedRequest: any) => {
     const accessToken = getAccessToken();
     return updateApiAccessToken(accessToken).then((apiAccessToken) => {
