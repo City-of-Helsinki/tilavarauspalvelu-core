@@ -25,7 +25,9 @@ function ApplicationRoundStatusBlock({
     status = "in_review";
   }
 
-  const normalizedStatus = getNormalizedApplicationRoundStatus(status);
+  const normalizedStatus = getNormalizedApplicationRoundStatus(
+    applicationRound
+  );
 
   return (
     <StatusBlock

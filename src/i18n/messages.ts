@@ -282,6 +282,7 @@ const translations: ITranslations = {
       handling: ["Käsittelyssä"],
       validated: ["Odottaa esihenkilöhyväksyntää"],
       approved: ["Päätökset tehty"],
+      sent: ["Päätökset lähetetty"],
     },
     listApprovalTitle: ["Hyväksynnät"],
     listHandlingTitle: ["Käsittely"],

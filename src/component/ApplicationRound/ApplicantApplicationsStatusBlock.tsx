@@ -30,7 +30,7 @@ function ApplicantApplicationsStatusBlock({
   const normalizedStatus =
     application.status === "sent"
       ? "sent"
-      : getNormalizedApplicationRoundStatus(status);
+      : getNormalizedApplicationRoundStatus(applicationRound);
 
   return (
     <StatusBlock

@@ -47,6 +47,7 @@ export type ApplicationRound = {
   allocating: boolean;
   isAdmin: boolean;
   approvedBy: string;
+  applicationsSent: boolean;
 };
 
 export type Space = {

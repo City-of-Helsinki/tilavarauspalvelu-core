@@ -5,6 +5,7 @@ import {
   AllocationResult,
   ApplicationEventSchedule,
   ApplicationEventStatus,
+  ApplicationRound,
   ApplicationRoundStatus,
   ApplicationStatus,
   LocalizationLanguages,
@@ -100,14 +101,23 @@ export const normalizeApplicationEventStatus = (
 };
 
 export const getNormalizedApplicationRoundStatus = (
-  status: ApplicationRoundStatus
+  applicationRound: ApplicationRound
 ): ApplicationRoundStatus | NormalizedApplicationRoundStatus => {
   let normalizedStatus: NormalizedApplicationRoundStatus;
 
-  if (["in_review", "review_done", "allocated", "handled"].includes(status)) {
+  if (
+    ["in_review", "review_done", "allocated", "handled"].includes(
+      applicationRound.status
+    )
+  ) {
     normalizedStatus = "handling";
+  } else if (
+    ["approved"].includes(applicationRound.status) &&
+    applicationRound.applicationsSent
+  ) {
+    normalizedStatus = "sent";
   } else {
-    normalizedStatus = status;
+    normalizedStatus = applicationRound.status;
   }
 
   return normalizedStatus;
