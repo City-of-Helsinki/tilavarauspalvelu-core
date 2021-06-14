@@ -107,7 +107,9 @@ const Navigation = ({ profile, logout }: Props): JSX.Element => {
               onClick={() => logout && logout()}
             />
           </HDSNavigation.User>
-          <HDSNavigation.LanguageSelector label={formatSelectedValue(language)}>
+          <HDSNavigation.LanguageSelector
+            id="language-selector"
+            label={formatSelectedValue(language)}>
             {languageOptions.map((languageOption) => (
               <HDSNavigation.Item
                 key={languageOption.value}
