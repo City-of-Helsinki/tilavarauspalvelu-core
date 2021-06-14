@@ -8,10 +8,11 @@ import {
   parse,
 } from "date-fns";
 import { i18n } from "next-i18next";
+import * as Sentry from '@sentry/react';
 import { TFunction } from "i18next";
 import { stringify } from "query-string";
 import { ReservationUnitsParameters } from "./api";
-import { searchPrefix, emptyOption, applicationsPrefix } from "./const";
+import { searchPrefix, emptyOption, applicationsPrefix, sentryDSN, sentryEnvironment } from "./const";
 import {
   ApplicationEventSchedule,
   Cell,
@@ -339,3 +340,24 @@ export const formatDurationMinutes = (duration: number): string => {
 
   return p.join(" ");
 };
+
+export const initSentry = ()=>{
+  if (sentryDSN) {
+    console.debug("Initializing sentry.");
+    try {
+      Sentry.init({
+        dsn: sentryDSN,
+        environment: sentryEnvironment,
+        release: `tilavarauspalvelu-ui@${process.env.npm_package_version}`,
+        integrations: [
+          new Sentry.Integrations.GlobalHandlers({
+            onunhandledrejection: true,
+            onerror: true,
+          }),
+        ],
+      });
+    } catch (e) {
+      console.error('Could not initialize sentry:', e);
+    }
+  }
+}

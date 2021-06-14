@@ -92,9 +92,9 @@ export const defaultDuration = "01:30:00";
 
 export const isBrowser = typeof window !== "undefined";
 
-export const sentryDSN = process.env.REACT_APP_SENTRY_DSN;
+export const sentryDSN = process.env.NEXT_PUBLIC_SENTRY_DSN;
 
-export const sentryEnvironment = process.env.REACT_APP_SENTRY_ENVIRONMENT;
+export const sentryEnvironment = process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT;
 
 export const apiBaseUrl = process.env.NEXT_PUBLIC_TILAVARAUS_API_URL;
 
