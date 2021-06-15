@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -7,6 +8,8 @@ from spaces.models import ServiceSector, Unit, UnitGroup
 from .base_models import BaseRole
 
 User = get_user_model()
+
+
 
 GENERAL_PERMISSIONS = (
     (
@@ -138,6 +141,36 @@ SERVICE_SECTOR_PERMISSIONS = (
 )
 
 
+SERVICE_SECTOR_FEATURES = (
+    ("can_manage_service_sector_roles", _("Can modify roles for the service sector")),
+    ("can_manage_unit_roles", _("Can modify roles for units in the service sector")),
+    (
+        "can_manage_reservation_units",
+        _("Can create, edit and delete reservation units in certain unit"),
+    ),
+    (
+        "can_manage_application_rounds",
+        _("Can create, edit and delete application rounds in the service sector"),
+    ),
+    ("can_handle_applications", _("Can handle applications in the service sector")),
+    (
+        "can_manage_reservations",
+        _("Can create, edit and cancel reservations in the service sector"),
+    ),
+    (
+        "can_view_reservations",
+        _("Can view details of all reservations in the service sector"),
+    ),
+    (
+        "can_view_users",
+        _("Can view users in the whole system"),
+    ),
+    (
+        "can_allocate_applications",
+        _("Can allocate applications in the service sector"),
+    ),
+)
+
 class UnitRoleChoice(models.Model):
     code = models.CharField(verbose_name=_("Code"), max_length=50, primary_key=True)
     verbose_name = models.CharField(verbose_name=_("Verbose name"), max_length=255)
@@ -196,6 +229,19 @@ class GeneralRolePermission(models.Model):
     permission = models.CharField(
         verbose_name=_("Permission"), max_length=255, choices=GENERAL_PERMISSIONS
     )
+
+
+class ServiceSectorFeature(models.Model):
+    name = models.CharField(verbose_name=_("Role name"), max_length=150, choices=GENERAL_PERMISSIONS)
+
+    def save(self, *args, **kwargs):
+        raise ValidationError("Features are not editable.")
+
+class ServiceSectorFeatureRole(models.Model):
+    role = models.CharField(verbose_name=_("Role name"), max_length=150)
+
+    features = models.ManyToManyField(ServiceSectorFeature)
+
 
 
 class UnitRole(BaseRole):

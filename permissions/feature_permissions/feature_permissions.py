@@ -1,7 +1,7 @@
 from enum import Enum
 
 from users.models import User
-
+from django.utils.translation import gettext_lazy as _
 
 class ApplicationRoundPermissionEnum(Enum):
     can_modify_application_round = 'can_modify_application_round'
@@ -45,6 +45,7 @@ handling_applications_features = HandlingApplicationsFeature()
 approving_applications_features = ApprovingApplicationsFeature()
 
 
+
 class Features(object):
     features = {
         'handling_applications_feature': handling_applications_features,
@@ -68,3 +69,7 @@ class Features(object):
 
 
 features = Features()
+
+SERVICE_SECTOR_FEATURE_CHOICES = (
+    (features["handling_applications_feature"], _("Can process applications.")),
+)
