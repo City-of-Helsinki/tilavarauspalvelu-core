@@ -7,6 +7,8 @@ from uuid import UUID
 
 from django.conf import settings
 from django.http import FileResponse
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import OpenApiParameter, extend_schema
 from icalendar import Calendar, Event
 from rest_framework import mixins, permissions, serializers, viewsets
 from rest_framework.exceptions import ValidationError
@@ -97,28 +99,45 @@ class ReservationUnitIcalViewset(ViewSet):
         )
         buffer.seek(0)
 
-        return FileResponse(buffer, as_attachment=True, filename="file.ics")
+        return FileResponse(buffer, as_attachment=True, filename="reservation_unit_calendar.ics")
 
 
 class ApplicationEventIcalViewset(ViewSet):
     queryset = ApplicationEvent.objects.all()
 
-    def get_object(self):
-        return ApplicationEvent.objects.get(uuid=self.kwargs["pk"])
-
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "id",
+                OpenApiTypes.UUID,
+                OpenApiParameter.PATH,
+                description="UUID of the application event.",
+            )
+        ],
+        description="Get iCalendar for an application event.",
+        auth=None,
+    )
     def retrieve(self, request, *args, **kwargs):
+        host = (
+            request.META["HTTP_HOST"]
+            if request and "HTTP_HOST" in request.META
+            else None
+        )
         instance = self.get_object()
         buffer = io.BytesIO()
         buffer.write(
             export(
                 instance,
-                request.META["HTTP_HOST"],
+                host,
                 application_event_calendar(instance),
             ).to_ical()
         )
         buffer.seek(0)
 
-        return FileResponse(buffer, as_attachment=True, filename="file.ics")
+        return FileResponse(buffer, as_attachment=True, filename="application_event_calendar.ics")
+
+    def get_object(self):
+        return ApplicationEvent.objects.get(uuid=self.kwargs["pk"])
 
 
 ICAL_VERSION = "2.0"
