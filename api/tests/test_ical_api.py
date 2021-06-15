@@ -30,7 +30,7 @@ def test_unit_group_admin_can_get_calendar_url(
 
     assert response.status_code == 200
     assert response.data.get("calendar_url") == (
-        f"http://None/v1/reservation_unit_calendar/{reservation_unit.id}"
+        f"http://testserver/v1/reservation_unit_calendar/{reservation_unit.id}"
         f"/?hash={uuid_to_hmac_signature(reservation_unit.uuid)}"
     )
 
