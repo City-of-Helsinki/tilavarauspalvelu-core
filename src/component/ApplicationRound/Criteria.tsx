@@ -171,10 +171,8 @@ const ReservationUnit = styled.div`
 
 function Criteria(): JSX.Element {
   const [isLoading, setIsLoading] = useState(true);
-  const [
-    applicationRound,
-    setApplicationRound,
-  ] = useState<ApplicationRoundType | null>(null);
+  const [applicationRound, setApplicationRound] =
+    useState<ApplicationRoundType | null>(null);
   const [ageGroups, setAgeGroups] = useState<Parameter[] | null>(null);
   const [purposes, setPurposes] = useState<Parameter[] | null>(null);
   const [cities, setCities] = useState<Parameter[] | null>(null);

@@ -97,14 +97,10 @@ const Reservations = styled.table`
 
 function ReservationsByReservationUnit(): JSX.Element | null {
   const [isLoading, setIsLoading] = useState(true);
-  const [
-    applicationRound,
-    setApplicationRound,
-  ] = useState<ApplicationRoundType | null>(null);
-  const [
-    reservationUnit,
-    setReservationUnit,
-  ] = useState<ReservationUnit | null>(null);
+  const [applicationRound, setApplicationRound] =
+    useState<ApplicationRoundType | null>(null);
+  const [reservationUnit, setReservationUnit] =
+    useState<ReservationUnit | null>(null);
   const [reservations, setReservations] = useState<Reservation[] | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 

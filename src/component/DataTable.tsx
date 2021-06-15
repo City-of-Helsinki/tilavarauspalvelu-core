@@ -520,9 +520,10 @@ function DataTable({
     [groups, sorting, order, filters, handledAreHidden, statusField, config]
   );
 
-  const flatData = useMemo(() => processedData.flatMap((n) => n.data), [
-    processedData,
-  ]);
+  const flatData = useMemo(
+    () => processedData.flatMap((n) => n.data),
+    [processedData]
+  );
 
   useEffect(() => {
     if (getActiveRows) getActiveRows(flatData);
@@ -704,26 +705,24 @@ function DataTable({
                   />
                 </HeadingSelectionCell>
               )}
-              {cellConfig.cols.map(
-                (col): JSX.Element => {
-                  const sortingActive = actionsEnabled && col.key === sorting;
-                  const title = t(col.title);
-                  return (
-                    <Cell
-                      as="th"
-                      key={col.key}
-                      onClick={(): void | false =>
-                        actionsEnabled && setSortingAndOrder(col.key)
-                      }
-                      className={classNames({ sortingActive, actionsEnabled })}
-                      title={title}
-                    >
-                      <span>{title}</span>
-                      {sortingActive && <SortingArrow direction={order} />}
-                    </Cell>
-                  );
-                }
-              )}
+              {cellConfig.cols.map((col): JSX.Element => {
+                const sortingActive = actionsEnabled && col.key === sorting;
+                const title = t(col.title);
+                return (
+                  <Cell
+                    as="th"
+                    key={col.key}
+                    onClick={(): void | false =>
+                      actionsEnabled && setSortingAndOrder(col.key)
+                    }
+                    className={classNames({ sortingActive, actionsEnabled })}
+                    title={title}
+                  >
+                    <span>{title}</span>
+                    {sortingActive && <SortingArrow direction={order} />}
+                  </Cell>
+                );
+              })}
             </Row>
           </Heading>
           <Body>
@@ -743,9 +742,8 @@ function DataTable({
                         isVisible={groupVisibility[groupIndex]}
                         toggleGroupVisibility={(): void => {
                           const tempGroupVisibility = [...groupVisibility];
-                          tempGroupVisibility[
-                            groupIndex
-                          ] = !tempGroupVisibility[groupIndex];
+                          tempGroupVisibility[groupIndex] =
+                            !tempGroupVisibility[groupIndex];
                           setGroupVisibility(tempGroupVisibility);
                         }}
                         isSelectionActive={isSelectionActive}
@@ -780,9 +778,8 @@ function DataTable({
                                       );
                                     }
                                   } else if (cellConfig.rowLink) {
-                                    const link: string = cellConfig.rowLink(
-                                      row
-                                    );
+                                    const link: string =
+                                      cellConfig.rowLink(row);
                                     history.push(link);
                                   }
                                 }}

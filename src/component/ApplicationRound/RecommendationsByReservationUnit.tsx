@@ -325,18 +325,12 @@ function RecommendationsByReservationUnit(): JSX.Element {
   const [recommendations, setRecommendations] = useState<
     AllocationResult[] | null
   >(null);
-  const [
-    reservationUnit,
-    setReservationUnit,
-  ] = useState<ReservationUnit | null>(null);
-  const [
-    applicationRound,
-    setApplicationRound,
-  ] = useState<ApplicationRoundType | null>(null);
-  const [
-    reservationUnitCapacity,
-    setReservationUnitCapacity,
-  ] = useState<ReservationUnitCapacity | null>(null);
+  const [reservationUnit, setReservationUnit] =
+    useState<ReservationUnit | null>(null);
+  const [applicationRound, setApplicationRound] =
+    useState<ApplicationRoundType | null>(null);
+  const [reservationUnitCapacity, setReservationUnitCapacity] =
+    useState<ReservationUnitCapacity | null>(null);
   const [reservationUnitCalendarUrl, setReservationUnitCalendarUrl] = useState<
     string | null
   >(null);

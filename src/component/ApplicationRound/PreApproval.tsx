@@ -333,10 +333,8 @@ function PreApproval({
   applicationRound,
   setApplicationRoundStatus,
 }: IProps): JSX.Element {
-  const [
-    isConfirmationDialogVisible,
-    setConfirmationDialogVisibility,
-  ] = useState<boolean>(false);
+  const [isConfirmationDialogVisible, setConfirmationDialogVisibility] =
+    useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(true);
   const [recommendations, setRecommendations] = useState<
     AllocationResult[] | []
@@ -350,14 +348,10 @@ function PreApproval({
   const [allocatedFilterConfig, setAllocatedFilterConfig] = useState<
     DataFilterConfig[] | null
   >(null);
-  const [
-    unAllocatedCellConfig,
-    setUnallocatedCellConfig,
-  ] = useState<CellConfig | null>(null);
-  const [
-    allocatedCellConfig,
-    setAllocatedCellConfig,
-  ] = useState<CellConfig | null>(null);
+  const [unAllocatedCellConfig, setUnallocatedCellConfig] =
+    useState<CellConfig | null>(null);
+  const [allocatedCellConfig, setAllocatedCellConfig] =
+    useState<CellConfig | null>(null);
   const [capacity, setCapacity] = useState<IAllocationCapacity | null>(null);
   const [filteredApplicationsCount, setFilteredApplicationsCount] = useState<
     number | null

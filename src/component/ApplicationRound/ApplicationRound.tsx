@@ -23,10 +23,8 @@ interface IProps {
 function ApplicationRound(): JSX.Element | null {
   const [isLoading, setIsLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [
-    applicationRound,
-    setApplicationRound,
-  ] = useState<ApplicationRoundType | null>(null);
+  const [applicationRound, setApplicationRound] =
+    useState<ApplicationRoundType | null>(null);
 
   const { applicationRoundId } = useParams<IProps>();
   const { t } = useTranslation();

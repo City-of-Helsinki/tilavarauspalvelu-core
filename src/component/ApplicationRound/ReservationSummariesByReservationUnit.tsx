@@ -111,14 +111,10 @@ const DeclinedReservations = styled.div`
 
 function ReservationSummariesByReservationUnit(): JSX.Element | null {
   const [isLoading, setIsLoading] = useState(true);
-  const [
-    applicationRound,
-    setApplicationRound,
-  ] = useState<ApplicationRoundType | null>(null);
-  const [
-    reservationUnit,
-    setReservationUnit,
-  ] = useState<ReservationUnit | null>(null);
+  const [applicationRound, setApplicationRound] =
+    useState<ApplicationRoundType | null>(null);
+  const [reservationUnit, setReservationUnit] =
+    useState<ReservationUnit | null>(null);
   const [recurringReservations, setRecurringReservations] = useState<
     RecurringReservation[] | null
   >(null);

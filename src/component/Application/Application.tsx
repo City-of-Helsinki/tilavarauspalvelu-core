@@ -231,17 +231,13 @@ function Application(): JSX.Element | null {
     "init" | "loading" | "done" | "error"
   >("init");
   const [application, setApplication] = useState<ApplicationType | null>(null);
-  const [
-    applicationRound,
-    setApplicationRound,
-  ] = useState<ApplicationRoundType | null>(null);
+  const [applicationRound, setApplicationRound] =
+    useState<ApplicationRoundType | null>(null);
   const [recurringReservations, setRecurringReservations] = useState<
     RecurringReservation[] | null
   >(null);
-  const [
-    statusNotification,
-    setStatusNotification,
-  ] = useState<ApplicationStatus | null>(null);
+  const [statusNotification, setStatusNotification] =
+    useState<ApplicationStatus | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const { applicationId } = useParams<IRouteParams>();
@@ -376,16 +372,15 @@ function Application(): JSX.Element | null {
     return <Loader />;
   }
 
-  const notificationContent:
-    | { heading: string; body: string }
-    | undefined = statusNotification
-    ? {
-        heading: t(
-          `Application.saveNotification.${statusNotification}.heading`
-        ),
-        body: t(`Application.saveNotification.${statusNotification}.body`),
-      }
-    : undefined;
+  const notificationContent: { heading: string; body: string } | undefined =
+    statusNotification
+      ? {
+          heading: t(
+            `Application.saveNotification.${statusNotification}.heading`
+          ),
+          body: t(`Application.saveNotification.${statusNotification}.body`),
+        }
+      : undefined;
 
   const customerName: string | null | undefined =
     application?.applicantType === "individual"
@@ -615,20 +610,18 @@ function Application(): JSX.Element | null {
                         }}
                       >
                         {recurringReservations.map((recurringReservation) => {
-                          const applicationEvent:
-                            | ApplicationEvent
-                            | undefined = application.applicationEvents.find(
-                            (n: ApplicationEvent) =>
-                              n.id ===
-                              get(recurringReservation, "applicationEventId")
-                          );
+                          const applicationEvent: ApplicationEvent | undefined =
+                            application.applicationEvents.find(
+                              (n: ApplicationEvent) =>
+                                n.id ===
+                                get(recurringReservation, "applicationEventId")
+                            );
 
-                          const reservationUnit:
-                            | ReservationUnit
-                            | undefined = get(
-                            recurringReservation,
-                            "reservations.0.reservationUnit.0"
-                          );
+                          const reservationUnit: ReservationUnit | undefined =
+                            get(
+                              recurringReservation,
+                              "reservations.0.reservationUnit.0"
+                            );
 
                           const beginDate: string | null =
                             recurringReservation.firstReservationBegin;

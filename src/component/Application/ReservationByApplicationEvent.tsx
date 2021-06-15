@@ -81,14 +81,10 @@ const Reservations = styled.table`
 function ReservationByApplicationEvent(): JSX.Element | null {
   const [isLoading, setIsLoading] = useState(true);
   const [application, setApplication] = useState<ApplicationType | null>(null);
-  const [
-    applicationRound,
-    setApplicationRound,
-  ] = useState<ApplicationRoundType | null>(null);
-  const [
-    recurringReservation,
-    setRecurringReservation,
-  ] = useState<RecurringReservation | null>(null);
+  const [applicationRound, setApplicationRound] =
+    useState<ApplicationRoundType | null>(null);
+  const [recurringReservation, setRecurringReservation] =
+    useState<RecurringReservation | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const { applicationId, recurringReservationId } = useParams<IRouteParams>();
@@ -158,11 +154,10 @@ function ReservationByApplicationEvent(): JSX.Element | null {
       ? application?.applicantName
       : application?.organisation?.name;
 
-  const applicationEvent:
-    | ApplicationEvent
-    | undefined = application?.applicationEvents.find(
-    (n: ApplicationEvent) => n.id === recurringReservation?.applicationEventId
-  );
+  const applicationEvent: ApplicationEvent | undefined =
+    application?.applicationEvents.find(
+      (n: ApplicationEvent) => n.id === recurringReservation?.applicationEventId
+    );
 
   const reservationUnit: ReservationUnit | undefined = get(
     recurringReservation,

@@ -250,10 +250,8 @@ function RecommendationsByApplicant(): JSX.Element {
     AllocationResult[] | []
   >([]);
   const [application, setApplication] = useState<ApplicationType | null>(null);
-  const [
-    applicationRound,
-    setApplicationRound,
-  ] = useState<ApplicationRoundType | null>(null);
+  const [applicationRound, setApplicationRound] =
+    useState<ApplicationRoundType | null>(null);
   const [cellConfig, setCellConfig] = useState<CellConfig | null>(null);
   const [filterConfig, setFilterConfig] = useState<DataFilterConfig[] | null>(
     null
@@ -262,11 +260,8 @@ function RecommendationsByApplicant(): JSX.Element {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const { t } = useTranslation();
-  const {
-    applicationRoundId,
-    organisationId,
-    applicantId,
-  } = useParams<IRouteParams>();
+  const { applicationRoundId, organisationId, applicantId } =
+    useParams<IRouteParams>();
 
   const viewType = organisationId ? "organisation" : "individual";
 

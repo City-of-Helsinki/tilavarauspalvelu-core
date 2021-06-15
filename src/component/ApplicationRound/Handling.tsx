@@ -316,10 +316,8 @@ function Handling({
   const [recommendations, setRecommendations] = useState<AllocationResult[]>(
     []
   );
-  const [
-    isResolutionNotificationVisible,
-    setIsResolutionNotificationVisible,
-  ] = useState<boolean>(isApplicationRoundApproved);
+  const [isResolutionNotificationVisible, setIsResolutionNotificationVisible] =
+    useState<boolean>(isApplicationRoundApproved);
   const [cellConfig, setCellConfig] = useState<CellConfig | null>(null);
   const [filterConfig, setFilterConfig] = useState<DataFilterConfig[]>([]);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -390,8 +388,9 @@ function Handling({
   const unhandledRecommendationCount: number = recommendations
     .flatMap((recommendation) => recommendation.applicationEvent)
     .map((recommendation) => recommendation.status)
-    .filter((status) => ["created", "allocating", "allocated"].includes(status))
-    .length;
+    .filter((status) =>
+      ["created", "allocating", "allocated"].includes(status)
+    ).length;
 
   if (isLoading) {
     return <Loader />;

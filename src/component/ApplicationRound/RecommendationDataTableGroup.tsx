@@ -125,8 +125,9 @@ function RecommendationDataTableGroup({
 
   const unhandledReservationCount = group.data
     .flatMap((recommendation) => recommendation?.applicationEvent?.status)
-    .filter((status) => ["created", "allocating", "allocated"].includes(status))
-    .length;
+    .filter((status) =>
+      ["created", "allocating", "allocated"].includes(status)
+    ).length;
 
   const colCount: number = isSelectionActive ? cols + 1 : cols;
 
