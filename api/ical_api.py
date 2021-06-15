@@ -99,7 +99,9 @@ class ReservationUnitIcalViewset(ViewSet):
         )
         buffer.seek(0)
 
-        return FileResponse(buffer, as_attachment=True, filename="reservation_unit_calendar.ics")
+        return FileResponse(
+            buffer, as_attachment=True, filename="reservation_unit_calendar.ics"
+        )
 
 
 class ApplicationEventIcalViewset(ViewSet):
@@ -134,7 +136,9 @@ class ApplicationEventIcalViewset(ViewSet):
         )
         buffer.seek(0)
 
-        return FileResponse(buffer, as_attachment=True, filename="application_event_calendar.ics")
+        return FileResponse(
+            buffer, as_attachment=True, filename="application_event_calendar.ics"
+        )
 
     def get_object(self):
         return ApplicationEvent.objects.get(uuid=self.kwargs["pk"])
@@ -155,12 +159,19 @@ def application_event_calendar(application_event: ApplicationEvent) -> Calendar:
     cal = Calendar()
 
     cal.add("version", ICAL_VERSION)
-    organisation_name = (
-        application_event.application.organisation.name
+
+    applicant_name = (
+        ""
+        if application_event.application.organisation is None
+        and application_event.application.contact_person is None
+        else application_event.application.organisation.name
         if application_event.application.organisation is not None
-        else application_event.application.person.name
+        else (
+            f"{application_event.application.contact_person.first_name} "
+            f"{application_event.application.contact_person.last_name}"
+        )
     )
-    cal["x-wr-calname"] = f"{organisation_name}, " f"{application_event.name}"
+    cal["x-wr-calname"] = f"{applicant_name}, " f"{application_event.name}"
     return cal
 
 
