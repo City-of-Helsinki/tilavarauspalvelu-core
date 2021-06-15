@@ -285,6 +285,8 @@ class ApplicationEventSerializer(serializers.ModelSerializer):
         source="aggregated_data_dict", read_only=True
     )
 
+    uuid = serializers.UUIDField(read_only=True)
+
     class Meta:
         model = ApplicationEvent
         fields = [
@@ -310,6 +312,7 @@ class ApplicationEventSerializer(serializers.ModelSerializer):
             "declined_reservation_unit_ids",
             "weekly_amount_reductions_count",
             "aggregated_data",
+            "uuid",
         ]
         extra_kwargs = {
             "name": {

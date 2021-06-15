@@ -100,3 +100,60 @@ def test_getting_reservation_unit_calendar_with_invalid_hash(
     url = f"{base_url}?hash={uuid_to_hmac_signature(uuid.uuid4())}"
     response = user_api_client.get(url)
     assert response.status_code == 400
+
+
+@pytest.mark.django_db
+def test_getting_application_event_calendar_name_for_organisation(
+    user_api_client,
+    application_event,
+    organisation,
+):
+    application_event.application.organization = organisation
+    response = user_api_client.get(
+        reverse(
+            "application_event_calendar-detail", kwargs={"pk": application_event.uuid}
+        )
+    )
+
+    zip_content = (
+        io.BytesIO(b"".join(response.streaming_content)).read().decode("utf-8")
+    )
+
+    assert_that(response.status_code).is_equal_to(200)
+    assert_that(organisation.name in zip_content).is_true()
+
+
+@pytest.mark.django_db
+def test_getting_application_event_calendar_name_for_contact_person(
+    user_api_client, application_event, person
+):
+    application_event.application.contact_person = person
+    application_event.application.organisation = None
+    application_event.application.save()
+    response = user_api_client.get(
+        reverse(
+            "application_event_calendar-detail", kwargs={"pk": application_event.uuid}
+        )
+    )
+
+    zip_content = (
+        io.BytesIO(b"".join(response.streaming_content)).read().decode("utf-8")
+    )
+
+    assert_that(response.status_code).is_equal_to(200)
+    assert_that(person.first_name in zip_content).is_true()
+    assert_that(person.last_name in zip_content).is_true()
+
+
+@pytest.mark.django_db
+def test_getting_application_event_should_give_404_when_not_found(
+    user_api_client, application_event, person
+):
+    response = user_api_client.get(
+        reverse(
+            "application_event_calendar-detail",
+            kwargs={"pk": "a301b49f-89f5-4b9a-ac90-cd27815b3581"},
+        )
+    )
+
+    assert_that(response.status_code).is_equal_to(404)

@@ -2,14 +2,18 @@ import datetime
 import hashlib
 import hmac
 import io
+from typing import Union
 from urllib.parse import urlsplit
 from uuid import UUID
 
 from django.conf import settings
-from django.http import FileResponse
+from django.http import FileResponse, Http404
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import OpenApiParameter, extend_schema
 from icalendar import Calendar, Event
 from rest_framework import mixins, permissions, serializers, viewsets
 from rest_framework.exceptions import ValidationError
+from rest_framework.request import Request
 from rest_framework.reverse import reverse
 from rest_framework.viewsets import ViewSet
 
@@ -27,6 +31,10 @@ def uuid_to_hmac_signature(uuid: UUID):
     ).hexdigest()
 
 
+def get_host(request: Union[Request, None]):
+    return request.META.get("HTTP_HOST") if request else None
+
+
 class ReservationUnitCalendarUrlSerializer(serializers.ModelSerializer):
 
     calendar_url = serializers.SerializerMethodField()
@@ -40,16 +48,11 @@ class ReservationUnitCalendarUrlSerializer(serializers.ModelSerializer):
         scheme = (
             urlsplit(request.build_absolute_uri(None)).scheme if request else "http"
         )
-        host = (
-            request.META["HTTP_HOST"]
-            if request and "HTTP_HOST" in request.META
-            else None
-        )
         calendar_url = reverse(
             "reservation_unit_calendar-detail", kwargs={"pk": instance.id}
         )
 
-        return f"{scheme}://{host}{calendar_url}?hash={uuid_to_hmac_signature(uuid=instance.uuid)}"
+        return f"{scheme}://{get_host(request)}{calendar_url}?hash={uuid_to_hmac_signature(uuid=instance.uuid)}"
 
 
 class ReservationUnitCalendarUrlViewSet(
@@ -83,42 +86,56 @@ class ReservationUnitIcalViewset(ViewSet):
         if not hmac.compare_digest(comparison_signature, hash):
             raise ValidationError("invalid hash signature")
 
-        host = (
-            request.META["HTTP_HOST"]
-            if request and "HTTP_HOST" in request.META
-            else None
-        )
-
         buffer = io.BytesIO()
         buffer.write(
             export_reservation_unit_events(
-                instance, host, reservation_unit_calendar(instance)
+                instance, get_host(request), reservation_unit_calendar(instance)
             ).to_ical()
         )
         buffer.seek(0)
 
-        return FileResponse(buffer, as_attachment=True, filename="file.ics")
+        return FileResponse(
+            buffer, as_attachment=True, filename="reservation_unit_calendar.ics"
+        )
 
 
 class ApplicationEventIcalViewset(ViewSet):
     queryset = ApplicationEvent.objects.all()
 
-    def get_object(self):
-        return ApplicationEvent.objects.get(uuid=self.kwargs["pk"])
-
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "id",
+                OpenApiTypes.UUID,
+                OpenApiParameter.PATH,
+                description="UUID of the application event.",
+            )
+        ],
+        description="Get iCalendar for an application event.",
+        auth=None,
+    )
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
         buffer = io.BytesIO()
         buffer.write(
             export(
                 instance,
-                request.META["HTTP_HOST"],
+                get_host(request),
                 application_event_calendar(instance),
             ).to_ical()
         )
         buffer.seek(0)
 
-        return FileResponse(buffer, as_attachment=True, filename="file.ics")
+        return FileResponse(
+            buffer, as_attachment=True, filename="application_event_calendar.ics"
+        )
+
+    def get_object(self):
+        try:
+            application_event = ApplicationEvent.objects.get(uuid=self.kwargs["pk"])
+            return application_event
+        except ApplicationEvent.DoesNotExist:
+            raise Http404
 
 
 ICAL_VERSION = "2.0"
@@ -136,12 +153,17 @@ def application_event_calendar(application_event: ApplicationEvent) -> Calendar:
     cal = Calendar()
 
     cal.add("version", ICAL_VERSION)
-    organisation_name = (
-        application_event.application.organisation.name
-        if application_event.application.organisation is not None
-        else application_event.application.person.name
-    )
-    cal["x-wr-calname"] = f"{organisation_name}, " f"{application_event.name}"
+
+    organisation = application_event.application.organisation
+    contact_person = application_event.application.contact_person
+
+    applicant_name = ""
+    if organisation:
+        applicant_name = organisation.name
+    elif contact_person:
+        applicant_name = f"{contact_person.first_name} {contact_person.last_name}"
+
+    cal["x-wr-calname"] = f"{applicant_name}, " f"{application_event.name}"
     return cal
 
 
