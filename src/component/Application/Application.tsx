@@ -9,6 +9,7 @@ import {
   IconDownload,
   IconCalendar,
   IconArrowRight,
+  LoadingSpinner,
 } from "hds-react";
 import trim from "lodash/trim";
 import get from "lodash/get";
@@ -150,7 +151,6 @@ const DownloadResolutionBtn = styled(Button).attrs({
     "--color-bus": "var(--color-black)",
   } as React.CSSProperties,
   variant: "secondary",
-  iconLeft: <IconDownload aria-hidden />,
 })`
   font-size: var(--fontsize-body-s);
   text-align: left;
@@ -227,6 +227,9 @@ const ActionButton = styled(Button)`
 function Application(): JSX.Element | null {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [documentStatus, setDocumentStatus] = useState<
+    "init" | "loading" | "done" | "error"
+  >("init");
   const [application, setApplication] = useState<ApplicationType | null>(null);
   const [
     applicationRound,
@@ -560,10 +563,29 @@ function Application(): JSX.Element | null {
                       )}
                     </GridCol>
                     <GridCol>
-                      <DownloadResolutionBtn onClick={() => {}}>
-                        <Strong>
-                          {t("Application.downloadResolution")} TODO
-                        </Strong>
+                      <DownloadResolutionBtn
+                        iconLeft={
+                          documentStatus === "loading" ? (
+                            <LoadingSpinner small />
+                          ) : (
+                            <IconDownload aria-hidden />
+                          )
+                        }
+                        onClick={() => {
+                          setTimeout(() => {
+                            import("../pdf/util").then(({ download }) => {
+                              download(
+                                application as ApplicationType,
+                                recurringReservations as RecurringReservation[],
+                                applicationRound.approvedBy || null,
+                                setDocumentStatus
+                              );
+                            });
+                          }, 0);
+                        }}
+                        disabled={documentStatus === "loading"}
+                      >
+                        <Strong>{t("Application.downloadResolution")}</Strong>
                         <div>(.pdf)</div>
                       </DownloadResolutionBtn>
                       {normalizedApplicationStatus === "approved" && (
@@ -766,6 +788,20 @@ function Application(): JSX.Element | null {
                   {action.text}
                 </ActionButton>
               )}
+            {documentStatus === "error" && (
+              <Notification
+                type="error"
+                label={t("errors.functionFailed")}
+                position="top-center"
+                autoClose={false}
+                dismissible
+                closeButtonLabelText={t("common.close")}
+                displayAutoCloseProgress={false}
+                onClose={() => setDocumentStatus("init")}
+              >
+                {t("Reservation.errorGeneratingDocument")}
+              </Notification>
+            )}
           </ContentContainer>
         </>
       )}
