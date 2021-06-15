@@ -37,6 +37,7 @@ export default function StatusCell({
   const { t } = useTranslation();
 
   let icon: ReactNode;
+  let linkText = "";
   switch (type) {
     case "applicationEvent":
       icon = (
@@ -45,15 +46,25 @@ export default function StatusCell({
           size={12}
         />
       );
+      linkText = "ApplicationEvent.gotoLink";
       break;
     case "application":
       if (["sent"].includes(status as ApplicationStatus)) {
-        icon = <IconEnvelope />;
+        icon = <IconEnvelope aria-hidden />;
       } else if (["approved"].includes(status as ApplicationStatus)) {
-        icon = <IconCheck style={{ color: "var(--color-success)" }} />;
+        icon = (
+          <IconCheck aria-hidden style={{ color: "var(--color-success)" }} />
+        );
       } else {
-        icon = <StatusDot status={status as ApplicationStatus} size={12} />;
+        icon = (
+          <StatusDot
+            aria-hidden
+            status={status as ApplicationStatus}
+            size={12}
+          />
+        );
       }
+      linkText = "Application.gotoLink";
       break;
     default:
   }
@@ -64,7 +75,10 @@ export default function StatusCell({
         {icon}
         <span>{t(text)}</span>
       </Status>
-      <IconArrowRight />
+      <IconArrowRight
+        aria-label={t(linkText)}
+        data-testid="status-cell__link--icon"
+      />
     </Wrapper>
   ) : null;
 }

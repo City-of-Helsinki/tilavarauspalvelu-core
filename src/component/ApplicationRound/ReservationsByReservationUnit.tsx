@@ -97,14 +97,10 @@ const Reservations = styled.table`
 
 function ReservationsByReservationUnit(): JSX.Element | null {
   const [isLoading, setIsLoading] = useState(true);
-  const [
-    applicationRound,
-    setApplicationRound,
-  ] = useState<ApplicationRoundType | null>(null);
-  const [
-    reservationUnit,
-    setReservationUnit,
-  ] = useState<ReservationUnit | null>(null);
+  const [applicationRound, setApplicationRound] =
+    useState<ApplicationRoundType | null>(null);
+  const [reservationUnit, setReservationUnit] =
+    useState<ReservationUnit | null>(null);
   const [reservations, setReservations] = useState<Reservation[] | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -183,7 +179,7 @@ function ReservationsByReservationUnit(): JSX.Element | null {
             </div>
             <TitleContainer>
               <Location>
-                <IconLocation />
+                <IconLocation aria-hidden />
                 <div>
                   <H2>{reservationUnit.building.name}</H2>
                   <Space>
@@ -194,7 +190,8 @@ function ReservationsByReservationUnit(): JSX.Element | null {
               <BasicLink
                 to={`/applicationRound/${applicationRoundId}/reservationUnit/${reservationUnitId}/reservations/summary`}
               >
-                <IconBulletList /> {t("Reservation.showSummaryOfReservations")}
+                <IconBulletList aria-hidden />{" "}
+                {t("Reservation.showSummaryOfReservations")}
               </BasicLink>
             </TitleContainer>
             <Divider />

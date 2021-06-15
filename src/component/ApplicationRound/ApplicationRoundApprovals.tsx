@@ -71,14 +71,10 @@ function ApplicationRoundApprovals(): JSX.Element {
   const [applicationRounds, setApplicationRounds] = useState<
     ApplicationRoundType[] | null
   >(null);
-  const [
-    isApplicationRoundApproved,
-    setIsApplicationRoundApproved,
-  ] = useState<boolean>(false);
-  const [
-    isApplicationRoundCancelled,
-    setIsApplicationRoundCancelled,
-  ] = useState<boolean>(false);
+  const [isApplicationRoundApproved, setIsApplicationRoundApproved] =
+    useState<boolean>(false);
+  const [isApplicationRoundCancelled, setIsApplicationRoundCancelled] =
+    useState<boolean>(false);
   const [approvedApplicationRoundId, setApprovedApplicationRoundId] = useState<
     number | null
   >(null);

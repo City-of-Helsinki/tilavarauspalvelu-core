@@ -11,7 +11,7 @@ interface IState {
   hasError: boolean;
 }
 
-const Content = styled.div`
+const Content = styled.main`
   width: 100%;
   height: 100%;
 `;

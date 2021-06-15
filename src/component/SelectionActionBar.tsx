@@ -125,10 +125,8 @@ function SelectionActionBar({
   callback,
   isSaving,
 }: IProps): JSX.Element {
-  const [
-    massSelectionAction,
-    setMassSelectionAction,
-  ] = useState<OptionType | null>(null);
+  const [massSelectionAction, setMassSelectionAction] =
+    useState<OptionType | null>(null);
   const { t } = useTranslation();
 
   const countStr = t("Application.applicationsSelected", {

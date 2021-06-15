@@ -125,8 +125,9 @@ function RecommendationDataTableGroup({
 
   const unhandledReservationCount = group.data
     .flatMap((recommendation) => recommendation?.applicationEvent?.status)
-    .filter((status) => ["created", "allocating", "allocated"].includes(status))
-    .length;
+    .filter((status) =>
+      ["created", "allocating", "allocated"].includes(status)
+    ).length;
 
   const colCount: number = isSelectionActive ? cols + 1 : cols;
 
@@ -172,14 +173,14 @@ function RecommendationDataTableGroup({
                 <H3>
                   {groupLink ? (
                     <BasicLink to={groupLink(group)}>
-                      {group.space.name} <IconArrowRight />
+                      {group.space.name} <IconArrowRight aria-hidden />
                     </BasicLink>
                   ) : (
                     group.space.name
                   )}
                 </H3>
                 <ReservationUnit>
-                  <IconLocation />
+                  <IconLocation aria-hidden />
                   {group.reservationUnit.name}
                 </ReservationUnit>
               </Title>
@@ -188,7 +189,11 @@ function RecommendationDataTableGroup({
               {`${unhandledReservationCount} ${t(
                 "Application.statuses.allocated"
               )}`}
-              {isVisible ? <IconAngleUp /> : <IconAngleDown />}
+              {isVisible ? (
+                <IconAngleUp aria-hidden />
+              ) : (
+                <IconAngleDown aria-hidden />
+              )}
             </Count>
           </Content>
         </td>

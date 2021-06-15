@@ -187,7 +187,7 @@ function ApplicationDetails(): JSX.Element | null {
           <HeadingContainer>
             <Heading data-testid="application-details__heading--main">
               <CustomerIcon>
-                <IconCustomers />
+                <IconCustomers aria-hidden />
               </CustomerIcon>
               <span>{customerName}</span>
             </Heading>
@@ -385,7 +385,7 @@ function ApplicationDetails(): JSX.Element | null {
                           applicationEvent.applicationEventSchedules,
                           index
                         )}
-                        icon={<IconClock />}
+                        icon={<IconClock aria-hidden />}
                         key={`requestedTimes.${day}`}
                       />
                     ))}

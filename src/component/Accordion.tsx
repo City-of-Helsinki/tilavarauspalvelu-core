@@ -110,7 +110,11 @@ function Accordion({
           disabled={disabled}
           onClick={() => !disabled && toggleOpenState(!isAccordionOpen)}
         >
-          {isAccordionOpen ? <ToggleIconOpen /> : <ToggleIconClosed />}
+          {isAccordionOpen ? (
+            <ToggleIconOpen aria-hidden />
+          ) : (
+            <ToggleIconClosed aria-hidden />
+          )}
         </ToggleButton>
       </Heading>
       <Content aria-hidden={!isAccordionOpen}>{children}</Content>

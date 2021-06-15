@@ -171,10 +171,8 @@ const ReservationUnit = styled.div`
 
 function Criteria(): JSX.Element {
   const [isLoading, setIsLoading] = useState(true);
-  const [
-    applicationRound,
-    setApplicationRound,
-  ] = useState<ApplicationRoundType | null>(null);
+  const [applicationRound, setApplicationRound] =
+    useState<ApplicationRoundType | null>(null);
   const [ageGroups, setAgeGroups] = useState<Parameter[] | null>(null);
   const [purposes, setPurposes] = useState<Parameter[] | null>(null);
   const [cities, setCities] = useState<Parameter[] | null>(null);
@@ -283,7 +281,7 @@ function Criteria(): JSX.Element {
                 />
               </div>
               <div>
-                <RecurringReservationIcon />{" "}
+                <RecurringReservationIcon aria-hidden />{" "}
                 <Strong>{t("HeadingMenu.recurringReservations")}</Strong>
               </div>
               <div className="block">
@@ -377,7 +375,7 @@ function Criteria(): JSX.Element {
                             defaultOpen
                             heading={
                               <BasketHeading>
-                                <IconGroup />
+                                <IconGroup aria-hidden />
                                 <Strong>{basket.orderNumber}.</Strong>
                                 <BasketTitle>{basket.name}</BasketTitle>
                               </BasketHeading>

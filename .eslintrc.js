@@ -19,6 +19,12 @@ module.exports = {
     node: true,
   },
   rules: {
+    "import/no-extraneous-dependencies": [
+      "error",
+      {
+        devDependencies: true,
+      },
+    ],
     "import/prefer-default-export": 0,
     "jsx-a11y/alt-text": 1,
     "jsx-a11y/label-has-associated-control": [

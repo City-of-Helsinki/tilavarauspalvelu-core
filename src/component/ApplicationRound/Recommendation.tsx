@@ -184,18 +184,12 @@ function Recommendation(): JSX.Element {
     null
   );
   const [application, setApplication] = useState<ApplicationType | null>(null);
-  const [
-    applicationRound,
-    setApplicationRound,
-  ] = useState<ApplicationRoundType | null>(null);
-  const [
-    actionNotification,
-    setActionNotification,
-  ] = useState<NotificationStatus | null>(null);
-  const [
-    isRevertRejectionDialogVisible,
-    setIsRevertRejectionDialogVisible,
-  ] = useState<boolean>(false);
+  const [applicationRound, setApplicationRound] =
+    useState<ApplicationRoundType | null>(null);
+  const [actionNotification, setActionNotification] =
+    useState<NotificationStatus | null>(null);
+  const [isRevertRejectionDialogVisible, setIsRevertRejectionDialogVisible] =
+    useState<boolean>(false);
   const [
     isIgnoreReservationUnitDialogVisible,
     setIsIgnoreReservationUnitDialogVisible,
@@ -205,10 +199,8 @@ function Recommendation(): JSX.Element {
   const { t } = useTranslation();
   const history = useHistory();
 
-  const {
-    applicationRoundId,
-    applicationEventScheduleId,
-  } = useParams<IRouteParams>();
+  const { applicationRoundId, applicationEventScheduleId } =
+    useParams<IRouteParams>();
 
   const fetchRecommendation = async (aesId: number, appRoundId: number) => {
     try {
@@ -356,9 +348,10 @@ function Recommendation(): JSX.Element {
     return <Loader />;
   }
 
-  const reservationUnitRank = recommendation?.applicationEvent?.eventReservationUnits?.find(
-    (n) => n.reservationUnitId === recommendation.allocatedReservationUnitId
-  )?.priority;
+  const reservationUnitRank =
+    recommendation?.applicationEvent?.eventReservationUnits?.find(
+      (n) => n.reservationUnitId === recommendation.allocatedReservationUnitId
+    )?.priority;
 
   let mode = "";
   let actionButtons: ReactNode;

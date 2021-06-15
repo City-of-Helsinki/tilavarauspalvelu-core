@@ -30,7 +30,7 @@ export type ApplicationRoundAggregatedData = {
 
 export type ApplicationRound = {
   id: number;
-  name: TranslationObject;
+  name: string;
   aggregatedData: ApplicationRoundAggregatedData;
   reservationUnitIds: number[];
   applicationPeriodBegin: string;

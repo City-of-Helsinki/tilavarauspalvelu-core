@@ -312,7 +312,11 @@ const Body = styled.tbody`
 
 const HideHandledBtn = styled(Button).attrs(
   ({ $isActive }: IToggleableButton) => ({
-    iconLeft: $isActive ? <IconEye /> : <IconEyeCrossed />,
+    iconLeft: $isActive ? (
+      <IconEye aria-hidden />
+    ) : (
+      <IconEyeCrossed aria-hidden />
+    ),
     style: {
       "--filter-button-color": "transparent",
       "--color-bus": "var(--filter-button-color)",
@@ -326,7 +330,7 @@ const HideHandledBtn = styled(Button).attrs(
 )<IToggleableButton>``;
 
 const ToggleVisibilityBtn = styled(Button).attrs({
-  iconLeft: <IconOpenAll />,
+  iconLeft: <IconOpenAll aria-hidden />,
   style: {
     "--filter-button-color": "transparent",
     "--color-bus": "var(--filter-button-color)",
@@ -356,7 +360,11 @@ const ToggleVisibilityBtn = styled(Button).attrs({
 
 const SelectionToggleBtn = styled(Button).attrs(
   ({ $isActive }: IToggleableButton) => ({
-    iconLeft: $isActive ? <IconDisableSelection /> : <IconActivateSelection />,
+    iconLeft: $isActive ? (
+      <IconDisableSelection aria-hidden />
+    ) : (
+      <IconActivateSelection aria-hidden />
+    ),
     style: {
       "--filter-button-color": "transparent",
       "--color-bus": "var(--filter-button-color)",
@@ -402,7 +410,11 @@ interface SortingProps {
 }
 
 function SortingArrow({ direction }: SortingProps): JSX.Element {
-  return direction === "asc" ? <IconArrowDown /> : <IconArrowUp />;
+  return direction === "asc" ? (
+    <IconArrowDown aria-hidden />
+  ) : (
+    <IconArrowUp aria-hidden />
+  );
 }
 
 const processData = (
@@ -508,9 +520,10 @@ function DataTable({
     [groups, sorting, order, filters, handledAreHidden, statusField, config]
   );
 
-  const flatData = useMemo(() => processedData.flatMap((n) => n.data), [
-    processedData,
-  ]);
+  const flatData = useMemo(
+    () => processedData.flatMap((n) => n.data),
+    [processedData]
+  );
 
   useEffect(() => {
     if (getActiveRows) getActiveRows(flatData);
@@ -582,7 +595,7 @@ function DataTable({
             <>
               <FilterBtn
                 data-testid="data-table__button--filter-toggle"
-                iconLeft={<IconSliders />}
+                iconLeft={<IconSliders aria-hidden />}
                 onClick={(): void => toggleFilterVisibility(!filtersAreVisible)}
                 className={classNames({
                   filterControlsAreOpen: filtersAreVisible,
@@ -692,26 +705,24 @@ function DataTable({
                   />
                 </HeadingSelectionCell>
               )}
-              {cellConfig.cols.map(
-                (col): JSX.Element => {
-                  const sortingActive = actionsEnabled && col.key === sorting;
-                  const title = t(col.title);
-                  return (
-                    <Cell
-                      as="th"
-                      key={col.key}
-                      onClick={(): void | false =>
-                        actionsEnabled && setSortingAndOrder(col.key)
-                      }
-                      className={classNames({ sortingActive, actionsEnabled })}
-                      title={title}
-                    >
-                      <span>{title}</span>
-                      {sortingActive && <SortingArrow direction={order} />}
-                    </Cell>
-                  );
-                }
-              )}
+              {cellConfig.cols.map((col): JSX.Element => {
+                const sortingActive = actionsEnabled && col.key === sorting;
+                const title = t(col.title);
+                return (
+                  <Cell
+                    as="th"
+                    key={col.key}
+                    onClick={(): void | false =>
+                      actionsEnabled && setSortingAndOrder(col.key)
+                    }
+                    className={classNames({ sortingActive, actionsEnabled })}
+                    title={title}
+                  >
+                    <span>{title}</span>
+                    {sortingActive && <SortingArrow direction={order} />}
+                  </Cell>
+                );
+              })}
             </Row>
           </Heading>
           <Body>
@@ -731,9 +742,8 @@ function DataTable({
                         isVisible={groupVisibility[groupIndex]}
                         toggleGroupVisibility={(): void => {
                           const tempGroupVisibility = [...groupVisibility];
-                          tempGroupVisibility[
-                            groupIndex
-                          ] = !tempGroupVisibility[groupIndex];
+                          tempGroupVisibility[groupIndex] =
+                            !tempGroupVisibility[groupIndex];
                           setGroupVisibility(tempGroupVisibility);
                         }}
                         isSelectionActive={isSelectionActive}
@@ -768,9 +778,8 @@ function DataTable({
                                       );
                                     }
                                   } else if (cellConfig.rowLink) {
-                                    const link: string = cellConfig.rowLink(
-                                      row
-                                    );
+                                    const link: string =
+                                      cellConfig.rowLink(row);
                                     history.push(link);
                                   }
                                 }}

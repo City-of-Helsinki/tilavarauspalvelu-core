@@ -111,14 +111,10 @@ const DeclinedReservations = styled.div`
 
 function ReservationSummariesByReservationUnit(): JSX.Element | null {
   const [isLoading, setIsLoading] = useState(true);
-  const [
-    applicationRound,
-    setApplicationRound,
-  ] = useState<ApplicationRoundType | null>(null);
-  const [
-    reservationUnit,
-    setReservationUnit,
-  ] = useState<ReservationUnit | null>(null);
+  const [applicationRound, setApplicationRound] =
+    useState<ApplicationRoundType | null>(null);
+  const [reservationUnit, setReservationUnit] =
+    useState<ReservationUnit | null>(null);
   const [recurringReservations, setRecurringReservations] = useState<
     RecurringReservation[] | null
   >(null);
@@ -199,7 +195,7 @@ function ReservationSummariesByReservationUnit(): JSX.Element | null {
             </div>
             <TitleContainer>
               <Location>
-                <IconLocation />
+                <IconLocation aria-hidden />
                 <div>
                   <H2>{reservationUnit.building.name}</H2>
                   <Space>
@@ -210,7 +206,8 @@ function ReservationSummariesByReservationUnit(): JSX.Element | null {
               <BasicLink
                 to={`/applicationRound/${applicationRoundId}/reservationUnit/${reservationUnitId}/reservations`}
               >
-                <IconBulletList /> {t("Reservation.showReservations")}
+                <IconBulletList aria-hidden />{" "}
+                {t("Reservation.showReservations")}
               </BasicLink>
             </TitleContainer>
             {recurringReservations && recurringReservations.length > 0 ? (

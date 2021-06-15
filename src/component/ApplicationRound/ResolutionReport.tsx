@@ -283,10 +283,8 @@ const getFilterConfig = (
 
 function ResolutionReport(): JSX.Element {
   const [isLoading, setIsLoading] = useState(true);
-  const [
-    applicationRound,
-    setApplicationRound,
-  ] = useState<ApplicationRoundType | null>(null);
+  const [applicationRound, setApplicationRound] =
+    useState<ApplicationRoundType | null>(null);
   const [recommendations, setRecommendations] = useState<
     AllocationResult[] | []
   >([]);
@@ -299,14 +297,10 @@ function ResolutionReport(): JSX.Element {
   const [allocatedFilterConfig, setAllocatedFilterConfig] = useState<
     DataFilterConfig[] | null
   >(null);
-  const [
-    unAllocatedCellConfig,
-    setUnallocatedCellConfig,
-  ] = useState<CellConfig | null>(null);
-  const [
-    allocatedCellConfig,
-    setAllocatedCellConfig,
-  ] = useState<CellConfig | null>(null);
+  const [unAllocatedCellConfig, setUnallocatedCellConfig] =
+    useState<CellConfig | null>(null);
+  const [allocatedCellConfig, setAllocatedCellConfig] =
+    useState<CellConfig | null>(null);
   const [activeFilter, setActiveFilter] = useState<string>("allocated");
   const [capacity, setCapacity] = useState<IAllocationCapacity | null>(null);
   const [filteredApplicationsCount, setFilteredApplicationsCount] = useState<

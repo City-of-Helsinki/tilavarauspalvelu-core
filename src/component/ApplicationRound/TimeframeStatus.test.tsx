@@ -2,6 +2,7 @@ import React from "react";
 import { render } from "@testing-library/react";
 import endOfYesterday from "date-fns/endOfYesterday";
 import endOfTomorrow from "date-fns/endOfTomorrow";
+import { axe } from "jest-axe";
 import TimeframeStatus from "./TimeframeStatus";
 
 const pastDate = endOfYesterday().toISOString();
@@ -19,7 +20,7 @@ jest.mock("react-i18next", () => ({
   },
 }));
 
-test("Past times ok", () => {
+test("Past times ok", async () => {
   const component = render(
     <TimeframeStatus
       applicationPeriodBegin={pastDate}
@@ -28,9 +29,10 @@ test("Past times ok", () => {
   );
 
   expect(component.getByText("Application.timeframePast")).toBeTruthy();
+  expect(await axe(component.container)).toHaveNoViolations();
 });
 
-test("Today ending time ok", () => {
+test("Today ending time ok", async () => {
   const component = render(
     <TimeframeStatus
       applicationPeriodBegin={pastDate}
@@ -41,9 +43,10 @@ test("Today ending time ok", () => {
   expect(
     component.getByText("Application.timeframePast (common.today)")
   ).toBeTruthy();
+  expect(await axe(component.container)).toHaveNoViolations();
 });
 
-test("Future times ok", () => {
+test("Future times ok", async () => {
   const component = render(
     <TimeframeStatus
       applicationPeriodBegin={futureDate}
@@ -53,9 +56,10 @@ test("Future times ok", () => {
   );
 
   expect(component.getByText("Application.timeframeFuture")).toBeTruthy();
+  expect(await axe(component.container)).toHaveNoViolations();
 });
 
-test("Resolution done", () => {
+test("Resolution done", async () => {
   const component = render(
     <TimeframeStatus
       applicationPeriodBegin={futureDate}
@@ -66,4 +70,5 @@ test("Resolution done", () => {
   );
 
   expect(component.getByText("ApplicationRound.resolutionDate")).toBeTruthy();
+  expect(await axe(component.container)).toHaveNoViolations();
 });

@@ -78,7 +78,11 @@ function Label({ type, children }: IDateLabelProps): JSX.Element {
   return (
     <Col>
       <LabelWrapper>
-        {type === "date" ? <IconCalendar /> : <IconClock size="m" />}
+        {type === "date" ? (
+          <IconCalendar aria-hidden />
+        ) : (
+          <IconClock size="m" aria-hidden />
+        )}
         {children}
       </LabelWrapper>
     </Col>
@@ -117,7 +121,7 @@ function RecommendedSlot({
         <Label type="date">{end ? formatDate(end) : ""}</Label>
         <Col />
         <Col>
-          <Day>
+          <Day data-testid="recommended-slot__weekday">
             {weekday === 0 || weekday
               ? t(`calendar.${weekdays[Number(weekday)]}`).substring(0, 2)
               : "-"}
@@ -140,6 +144,7 @@ function RecommendedSlot({
                 <Duration>
                   <IconInfoCircle
                     style={{ marginRight: "var(--spacing-xs)" }}
+                    aria-hidden
                   />{" "}
                   {t("Recommendation.scheduleDuration", {
                     duration:

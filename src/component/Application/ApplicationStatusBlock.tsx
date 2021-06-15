@@ -27,11 +27,13 @@ function ApplicationStatusBlock({
   let style: React.CSSProperties = {};
   switch (normalizedStatus) {
     case "approved":
-      icon = <IconCheck style={{ color: "var(--color-success)" }} />;
+      icon = (
+        <IconCheck aria-hidden style={{ color: "var(--color-success)" }} />
+      );
       style = { fontSize: "var(--fontsize-heading-xs)" };
       break;
     case "sent":
-      icon = <IconEnvelope />;
+      icon = <IconEnvelope aria-hidden />;
       style = { fontSize: "var(--fontsize-heading-xs)" };
       break;
     default:
