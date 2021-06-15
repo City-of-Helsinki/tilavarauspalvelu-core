@@ -32,7 +32,7 @@ def uuid_to_hmac_signature(uuid: UUID):
 
 
 def get_host(request: Union[Request, None]):
-    return request.META.get("HTTP_HOST") if request else None
+    return request.get_host() if request else None
 
 
 class ReservationUnitCalendarUrlSerializer(serializers.ModelSerializer):
