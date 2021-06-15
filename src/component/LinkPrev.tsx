@@ -19,7 +19,7 @@ function LinkPrev({ route }: IProps): JSX.Element {
   const { t } = useTranslation();
   return (
     <StyledLink to={route} data-testid="link__previous">
-      <IconAngleLeft size="m" />
+      <IconAngleLeft size="m" aria-hidden />
       {t("common.prev")}
     </StyledLink>
   );

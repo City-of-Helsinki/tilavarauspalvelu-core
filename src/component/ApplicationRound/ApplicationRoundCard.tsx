@@ -204,7 +204,7 @@ function ApplicationRoundCard({
         </Details>
         <div>
           <BasicLink to={getRoute(applicationRound.id)}>
-            {t("common.inspect")} <IconArrowRight />
+            {t("common.inspect")} <IconArrowRight aria-hidden />
           </BasicLink>
         </div>
       </Bottom>

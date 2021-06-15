@@ -199,7 +199,7 @@ function ReservationSummariesByReservationUnit(): JSX.Element | null {
             </div>
             <TitleContainer>
               <Location>
-                <IconLocation />
+                <IconLocation aria-hidden />
                 <div>
                   <H2>{reservationUnit.building.name}</H2>
                   <Space>
@@ -210,7 +210,8 @@ function ReservationSummariesByReservationUnit(): JSX.Element | null {
               <BasicLink
                 to={`/applicationRound/${applicationRoundId}/reservationUnit/${reservationUnitId}/reservations`}
               >
-                <IconBulletList /> {t("Reservation.showReservations")}
+                <IconBulletList aria-hidden />{" "}
+                {t("Reservation.showReservations")}
               </BasicLink>
             </TitleContainer>
             {recurringReservations && recurringReservations.length > 0 ? (

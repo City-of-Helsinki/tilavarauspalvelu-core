@@ -150,7 +150,7 @@ const DownloadResolutionBtn = styled(Button).attrs({
     "--color-bus": "var(--color-black)",
   } as React.CSSProperties,
   variant: "secondary",
-  iconLeft: <IconDownload />,
+  iconLeft: <IconDownload aria-hidden />,
 })`
   font-size: var(--fontsize-body-s);
   text-align: left;
@@ -438,7 +438,7 @@ function Application(): JSX.Element | null {
             </TopLinkContainer>
             <Heading data-testid="application__heading--main">
               <CustomerIcon>
-                <IconCustomers />
+                <IconCustomers aria-hidden />
               </CustomerIcon>
               <span>{customerName}</span>
             </Heading>
@@ -462,7 +462,8 @@ function Application(): JSX.Element | null {
                 label={notificationContent.heading}
               >
                 <H3>
-                  <IconFaceSmile size="m" /> {notificationContent.heading}
+                  <IconFaceSmile size="m" aria-hidden />{" "}
+                  {notificationContent.heading}
                 </H3>
                 <div>{notificationContent.body}</div>
               </StyledNotification>
@@ -718,9 +719,9 @@ function Application(): JSX.Element | null {
                                   <ReservationListLink
                                     to={`/application/${applicationId}/recurringReservation/${recurringReservation.id}`}
                                   >
-                                    <IconCalendar />{" "}
+                                    <IconCalendar aria-hidden />{" "}
                                     {t("Application.showDetailedResultList")}{" "}
-                                    <IconArrowRight />
+                                    <IconArrowRight aria-hidden />
                                   </ReservationListLink>
                                 </ReservationListLinkWrapper>
                               </ReservationWrapper>

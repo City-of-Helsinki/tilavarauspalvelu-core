@@ -1,5 +1,6 @@
 import React from "react";
 import { fireEvent, render, waitFor } from "@testing-library/react";
+import { axe } from "jest-axe";
 import FilterControls from "./FilterControls";
 
 jest.mock("react-i18next", () => ({
@@ -42,7 +43,7 @@ test("Filter Controls", async () => {
     },
   ];
 
-  const { getByTestId, getAllByTestId } = render(
+  const { getByTestId, getAllByTestId, container } = render(
     <FilterControls
       filters={[]}
       visible
@@ -106,4 +107,6 @@ test("Filter Controls", async () => {
   await waitFor(() => {
     expect(submitButton).not.toBeDisabled();
   });
+
+  expect(await axe(container)).toHaveNoViolations();
 });

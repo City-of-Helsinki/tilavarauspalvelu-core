@@ -183,7 +183,7 @@ function ReservationsByReservationUnit(): JSX.Element | null {
             </div>
             <TitleContainer>
               <Location>
-                <IconLocation />
+                <IconLocation aria-hidden />
                 <div>
                   <H2>{reservationUnit.building.name}</H2>
                   <Space>
@@ -194,7 +194,8 @@ function ReservationsByReservationUnit(): JSX.Element | null {
               <BasicLink
                 to={`/applicationRound/${applicationRoundId}/reservationUnit/${reservationUnitId}/reservations/summary`}
               >
-                <IconBulletList /> {t("Reservation.showSummaryOfReservations")}
+                <IconBulletList aria-hidden />{" "}
+                {t("Reservation.showSummaryOfReservations")}
               </BasicLink>
             </TitleContainer>
             <Divider />

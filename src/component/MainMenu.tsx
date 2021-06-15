@@ -6,9 +6,6 @@ import styled from "styled-components";
 import { breakpoints } from "../styles/util";
 import { ReactComponent as PremiseApplications } from "../images/icon_premise-applications.svg";
 import { truncatedText } from "../styles/typography";
-// import { ReactComponent as IconCustomers } from "../images/icon_customers.svg";
-// import { ReactComponent as IconPremises } from "../images/icon_premises.svg";
-// import { ReactComponent as IconTwoArrows } from "../images/icon_two-arrows.svg";
 
 const Wrapper = styled.ul<{ placement: string }>`
   display: flex;
@@ -140,7 +137,11 @@ const SubItems = ({
           { title: parentTitle }
         )}
       >
-        {isMenuOpen ? <IconAngleUp /> : <IconAngleDown />}
+        {isMenuOpen ? (
+          <IconAngleUp aria-hidden />
+        ) : (
+          <IconAngleDown aria-hidden />
+        )}
       </Toggler>
       {isMenuOpen && (
         <SubItemList>
@@ -164,7 +165,7 @@ const SubItems = ({
 const menuTree: IMenuChild[] = [
   {
     title: "MainMenu.applications",
-    icon: <PremiseApplications />,
+    icon: <PremiseApplications aria-hidden />,
     items: [
       {
         title: "MainMenu.handling",
@@ -176,42 +177,6 @@ const menuTree: IMenuChild[] = [
       },
     ],
   },
-  // {
-  //   title: "MainMenu.clients",
-  //   icon: <IconCustomers />,
-  //   items: [
-  //     {
-  //       title: "MainMenu.archive",
-  //       route: "",
-  //     },
-  //   ],
-  // },
-  // {
-  //   title: "MainMenu.premisesAndSettings",
-  //   icon: <IconPremises />,
-  //   items: [
-  //     {
-  //       title: "MainMenu.services",
-  //       route: "",
-  //     },
-  //     {
-  //       title: "MainMenu.spaceAndHobbyTypes",
-  //       route: "",
-  //     },
-  //     {
-  //       title: "MainMenu.applicationRounds",
-  //       route: "",
-  //     },
-  //     {
-  //       title: "MainMenu.conditionsAndAttachments",
-  //       route: "",
-  //     },
-  //   ],
-  // },
-  // {
-  //   title: "MainMenu.userManagement",
-  //   icon: <IconTwoArrows />,
-  // },
 ];
 
 interface MainMenuProps {

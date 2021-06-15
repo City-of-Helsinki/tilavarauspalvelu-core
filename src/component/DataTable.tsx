@@ -312,7 +312,11 @@ const Body = styled.tbody`
 
 const HideHandledBtn = styled(Button).attrs(
   ({ $isActive }: IToggleableButton) => ({
-    iconLeft: $isActive ? <IconEye /> : <IconEyeCrossed />,
+    iconLeft: $isActive ? (
+      <IconEye aria-hidden />
+    ) : (
+      <IconEyeCrossed aria-hidden />
+    ),
     style: {
       "--filter-button-color": "transparent",
       "--color-bus": "var(--filter-button-color)",
@@ -326,7 +330,7 @@ const HideHandledBtn = styled(Button).attrs(
 )<IToggleableButton>``;
 
 const ToggleVisibilityBtn = styled(Button).attrs({
-  iconLeft: <IconOpenAll />,
+  iconLeft: <IconOpenAll aria-hidden />,
   style: {
     "--filter-button-color": "transparent",
     "--color-bus": "var(--filter-button-color)",
@@ -356,7 +360,11 @@ const ToggleVisibilityBtn = styled(Button).attrs({
 
 const SelectionToggleBtn = styled(Button).attrs(
   ({ $isActive }: IToggleableButton) => ({
-    iconLeft: $isActive ? <IconDisableSelection /> : <IconActivateSelection />,
+    iconLeft: $isActive ? (
+      <IconDisableSelection aria-hidden />
+    ) : (
+      <IconActivateSelection aria-hidden />
+    ),
     style: {
       "--filter-button-color": "transparent",
       "--color-bus": "var(--filter-button-color)",
@@ -402,7 +410,11 @@ interface SortingProps {
 }
 
 function SortingArrow({ direction }: SortingProps): JSX.Element {
-  return direction === "asc" ? <IconArrowDown /> : <IconArrowUp />;
+  return direction === "asc" ? (
+    <IconArrowDown aria-hidden />
+  ) : (
+    <IconArrowUp aria-hidden />
+  );
 }
 
 const processData = (
@@ -582,7 +594,7 @@ function DataTable({
             <>
               <FilterBtn
                 data-testid="data-table__button--filter-toggle"
-                iconLeft={<IconSliders />}
+                iconLeft={<IconSliders aria-hidden />}
                 onClick={(): void => toggleFilterVisibility(!filtersAreVisible)}
                 className={classNames({
                   filterControlsAreOpen: filtersAreVisible,

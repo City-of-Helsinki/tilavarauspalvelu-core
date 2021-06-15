@@ -272,6 +272,7 @@ const translations: ITranslations = {
     declinedReservations: [
       "Poikkeukset, jolloin vakiovuoro ei ole käytettävissä",
     ],
+    gotoLink: ["Tarkastele hakemusta"],
   },
   ApplicationRound: {
     titleAllRecurringApplicationRounds: ["Kaikki vakiovuorojen hakukierrokset"],
@@ -451,6 +452,7 @@ const translations: ITranslations = {
     eventsPerWeek: ["Vuorojen määrä per viikko"],
     biweekly: ["Vakiovuorot vain joka toinen viikko"],
     requestedTimes: ["Toivotut ajat"],
+    gotoLink: ["Tarkastele vuoroehdotusta"],
   },
   Organisation: {
     activeParticipants: ["Aktiiviharrastajat"],

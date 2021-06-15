@@ -150,8 +150,8 @@ function FilterControls({
           const activeFiltersCount = activeFilters?.length || "";
           return (
             <FilterAccordion
-              heading={`${t(filterAccordion.title)} ${
-                activeFiltersCount && `(${activeFiltersCount})`
+              heading={`${t(filterAccordion.title)}${
+                activeFiltersCount && ` (${activeFiltersCount})`
               }`}
               key={filterAccordion.title}
               disabled={filterCount < 1}
@@ -179,7 +179,7 @@ function FilterControls({
             applyFilters([]);
           }}
           disabled={preliminaryFilters.length === 0}
-          iconLeft={<IconCross />}
+          iconLeft={<IconCross aria-hidden />}
         >
           {t("common.resetFilters")}
         </ResetButton>

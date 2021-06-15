@@ -493,22 +493,24 @@ function RecommendationsByReservationUnit(): JSX.Element {
                     )}
                     <Props>
                       <Prop>
-                        <IconLocation /> {reservationUnit.building.name}
+                        <IconLocation aria-hidden />{" "}
+                        {reservationUnit.building.name}
                       </Prop>
                       {reservationUnit.purposes && (
                         <Prop>
-                          <IconLayers />{" "}
+                          <IconLayers aria-hidden />{" "}
                           {t("ReservationUnit.purposeCount", {
                             count: reservationUnit.purposes?.length,
                           })}
                         </Prop>
                       )}
                       <Prop>
-                        <IconHome /> {reservationUnit.reservationUnitType.name}
+                        <IconHome aria-hidden />{" "}
+                        {reservationUnit.reservationUnitType.name}
                       </Prop>
                       {reservationUnit.maxPersons && (
                         <Prop>
-                          <IconGroup /> {reservationUnit.maxPersons}
+                          <IconGroup aria-hidden /> {reservationUnit.maxPersons}
                         </Prop>
                       )}
                     </Props>
@@ -523,7 +525,7 @@ function RecommendationsByReservationUnit(): JSX.Element {
                           href={reservationUnitCalendarUrl}
                           target="_blank"
                         >
-                          <IconCalendarPlus />{" "}
+                          <IconCalendarPlus aria-hidden />{" "}
                           {t("ReservationUnit.downloadSpaceCalendar")}
                         </CalendarLink>
                       )}
@@ -562,11 +564,11 @@ function RecommendationsByReservationUnit(): JSX.Element {
                     <ReservationLink
                       to={`/applicationRound/${applicationRoundId}/reservationUnit/${reservationUnitId}/reservations`}
                     >
-                      <IconBulletList />
+                      <IconBulletList aria-hidden />
                       {t(
                         "Reservation.showSummaryOfReservationsByReservationUnit"
                       )}
-                      <IconArrowRight />
+                      <IconArrowRight aria-hidden />
                     </ReservationLink>
                   )}
                 </BottomContainer>

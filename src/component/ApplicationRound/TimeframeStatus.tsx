@@ -58,7 +58,7 @@ function TimeframeStatus({
 
   return (
     <Wrapper data-testid="timeframe-status--wrapper">
-      <IconClock /> {message}
+      <IconClock aria-hidden /> {message}
     </Wrapper>
   );
 }

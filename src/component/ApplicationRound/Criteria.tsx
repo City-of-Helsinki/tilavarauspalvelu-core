@@ -283,7 +283,7 @@ function Criteria(): JSX.Element {
                 />
               </div>
               <div>
-                <RecurringReservationIcon />{" "}
+                <RecurringReservationIcon aria-hidden />{" "}
                 <Strong>{t("HeadingMenu.recurringReservations")}</Strong>
               </div>
               <div className="block">
@@ -377,7 +377,7 @@ function Criteria(): JSX.Element {
                             defaultOpen
                             heading={
                               <BasketHeading>
-                                <IconGroup />
+                                <IconGroup aria-hidden />
                                 <Strong>{basket.orderNumber}.</Strong>
                                 <BasketTitle>{basket.name}</BasketTitle>
                               </BasketHeading>
