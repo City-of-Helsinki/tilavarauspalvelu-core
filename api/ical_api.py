@@ -2,16 +2,18 @@ import datetime
 import hashlib
 import hmac
 import io
+from typing import Union
 from urllib.parse import urlsplit
 from uuid import UUID
 
 from django.conf import settings
-from django.http import FileResponse
+from django.http import FileResponse, Http404
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from icalendar import Calendar, Event
 from rest_framework import mixins, permissions, serializers, viewsets
 from rest_framework.exceptions import ValidationError
+from rest_framework.request import Request
 from rest_framework.reverse import reverse
 from rest_framework.viewsets import ViewSet
 
@@ -29,6 +31,10 @@ def uuid_to_hmac_signature(uuid: UUID):
     ).hexdigest()
 
 
+def get_host(request: Union[Request, None]):
+    return request.META.get("HTTP_HOST") if request else None
+
+
 class ReservationUnitCalendarUrlSerializer(serializers.ModelSerializer):
 
     calendar_url = serializers.SerializerMethodField()
@@ -42,16 +48,11 @@ class ReservationUnitCalendarUrlSerializer(serializers.ModelSerializer):
         scheme = (
             urlsplit(request.build_absolute_uri(None)).scheme if request else "http"
         )
-        host = (
-            request.META["HTTP_HOST"]
-            if request and "HTTP_HOST" in request.META
-            else None
-        )
         calendar_url = reverse(
             "reservation_unit_calendar-detail", kwargs={"pk": instance.id}
         )
 
-        return f"{scheme}://{host}{calendar_url}?hash={uuid_to_hmac_signature(uuid=instance.uuid)}"
+        return f"{scheme}://{get_host(request)}{calendar_url}?hash={uuid_to_hmac_signature(uuid=instance.uuid)}"
 
 
 class ReservationUnitCalendarUrlViewSet(
@@ -85,16 +86,10 @@ class ReservationUnitIcalViewset(ViewSet):
         if not hmac.compare_digest(comparison_signature, hash):
             raise ValidationError("invalid hash signature")
 
-        host = (
-            request.META["HTTP_HOST"]
-            if request and "HTTP_HOST" in request.META
-            else None
-        )
-
         buffer = io.BytesIO()
         buffer.write(
             export_reservation_unit_events(
-                instance, host, reservation_unit_calendar(instance)
+                instance, get_host(request), reservation_unit_calendar(instance)
             ).to_ical()
         )
         buffer.seek(0)
@@ -120,17 +115,12 @@ class ApplicationEventIcalViewset(ViewSet):
         auth=None,
     )
     def retrieve(self, request, *args, **kwargs):
-        host = (
-            request.META["HTTP_HOST"]
-            if request and "HTTP_HOST" in request.META
-            else None
-        )
         instance = self.get_object()
         buffer = io.BytesIO()
         buffer.write(
             export(
                 instance,
-                host,
+                get_host(request),
                 application_event_calendar(instance),
             ).to_ical()
         )
@@ -141,7 +131,11 @@ class ApplicationEventIcalViewset(ViewSet):
         )
 
     def get_object(self):
-        return ApplicationEvent.objects.get(uuid=self.kwargs["pk"])
+        try:
+            application_event = ApplicationEvent.objects.get(uuid=self.kwargs["pk"])
+            return application_event
+        except ApplicationEvent.DoesNotExist:
+            raise Http404
 
 
 ICAL_VERSION = "2.0"
@@ -160,17 +154,15 @@ def application_event_calendar(application_event: ApplicationEvent) -> Calendar:
 
     cal.add("version", ICAL_VERSION)
 
-    applicant_name = (
-        ""
-        if application_event.application.organisation is None
-        and application_event.application.contact_person is None
-        else application_event.application.organisation.name
-        if application_event.application.organisation is not None
-        else (
-            f"{application_event.application.contact_person.first_name} "
-            f"{application_event.application.contact_person.last_name}"
-        )
-    )
+    organisation = application_event.application.organisation
+    contact_person = application_event.application.contact_person
+
+    applicant_name = ""
+    if organisation:
+        applicant_name = organisation.name
+    elif contact_person:
+        applicant_name = f"{contact_person.first_name} {contact_person.last_name}"
+
     cal["x-wr-calname"] = f"{applicant_name}, " f"{application_event.name}"
     return cal
 

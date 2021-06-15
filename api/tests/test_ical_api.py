@@ -143,3 +143,17 @@ def test_getting_application_event_calendar_name_for_contact_person(
     assert_that(response.status_code).is_equal_to(200)
     assert_that(person.first_name in zip_content).is_true()
     assert_that(person.last_name in zip_content).is_true()
+
+
+@pytest.mark.django_db
+def test_getting_application_event_should_give_404_when_not_found(
+    user_api_client, application_event, person
+):
+    response = user_api_client.get(
+        reverse(
+            "application_event_calendar-detail",
+            kwargs={"pk": "a301b49f-89f5-4b9a-ac90-cd27815b3581"},
+        )
+    )
+
+    assert_that(response.status_code).is_equal_to(404)
