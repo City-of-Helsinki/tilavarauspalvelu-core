@@ -202,8 +202,17 @@ class Reservation(models.Model):
             for reservation_unit in self.reservation_unit.all()
             if hasattr(reservation_unit, "unit")
         ]
+        organisation = application.organisation
+        contact_person = application.contact_person
+
+        applicant_name = ""
+        if organisation:
+            applicant_name = organisation.name
+        elif contact_person:
+            applicant_name = f"{contact_person.first_name} {contact_person.last_name}"
+
         return (
-            f"{application.organisation.name if application.organisation is not None else application.person.name}\n"
+            f"{applicant_name}\n"
             f"{application_event.name}\n"
             f"{','.join([reservation_unit.name for reservation_unit in self.reservation_unit.all()])}\n"
             f"{','.join(unit_names)}\n"
