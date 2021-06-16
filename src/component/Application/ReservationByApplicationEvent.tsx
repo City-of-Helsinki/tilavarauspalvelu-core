@@ -242,8 +242,9 @@ function ReservationByApplicationEvent(): JSX.Element | null {
                     </tr>
                   </thead>
                   <tbody>
-                    {recurringReservation.deniedReservations.map(
-                      (reservation: Reservation) => (
+                    {recurringReservation.deniedReservations
+                      .reverse()
+                      .map((reservation: Reservation) => (
                         <tr key={reservation.id}>
                           <td>
                             {" "}
@@ -261,8 +262,7 @@ function ReservationByApplicationEvent(): JSX.Element | null {
                             {formatDate(reservation.end, "H:mm")}
                           </td>
                         </tr>
-                      )
-                    )}
+                      ))}
                   </tbody>
                 </Reservations>
               ) : (

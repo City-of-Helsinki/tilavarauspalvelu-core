@@ -12,6 +12,7 @@ const styles = StyleSheet.create({
   },
   pageNumber: { fontFamily: FAMILY_BOLD, marginLeft: "auto" },
   cell: { width: 200 },
+  wideCell: { width: 300 },
 });
 
 const PageHeader = (): JSX.Element => (
@@ -19,7 +20,7 @@ const PageHeader = (): JSX.Element => (
     <View style={styles.cell}>
       <Logo />
     </View>
-    <View style={styles.cell}>
+    <View style={styles.wideCell}>
       <B>Helsingin kaupunki</B>
       <Text>Kulttuurin ja vapaa-ajan toimiala</Text>
     </View>

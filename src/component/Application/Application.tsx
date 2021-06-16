@@ -724,6 +724,7 @@ function Application(): JSX.Element | null {
                                             (n: Reservation) =>
                                               `${formatDate(n.begin)}, `
                                           )
+                                          .reverse()
                                           .join(", "),
                                         ", "
                                       )}

@@ -303,6 +303,7 @@ function ReservationSummariesByReservationUnit(): JSX.Element | null {
                             {trim(
                               recurringReservation.deniedReservations
                                 .map((n: Reservation) => formatDate(n.begin))
+                                .reverse()
                                 .join(", "),
                               ", "
                             )}
