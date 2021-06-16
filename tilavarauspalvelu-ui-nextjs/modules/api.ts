@@ -20,6 +20,7 @@ const recurringReservationBasePath = "recurring_reservation";
 const parameterBasePath = "parameters";
 const applicationBasePath = "application";
 const applicationEventStatusBasePath = "application_event_status";
+const applicationEventFeedBasePath = "application_event_calendar";
 const userBasePath = "users";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -233,3 +234,5 @@ export const cancelApplication = async (
   application.status = "cancelled";
   await saveApplication(application);
 };
+
+export const applicationEventCalendarFeedUrl = (uuid: string): string => `${apiBaseUrl}/v1/${applicationEventFeedBasePath}/${uuid}`;

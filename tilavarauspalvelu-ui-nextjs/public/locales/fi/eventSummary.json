@@ -9,5 +9,6 @@
   "duration": "Vuoron kesto {{duration}}",
   "everyWeek": "Viikottain",
   "everyOtherWeek": "Joka toinen viikko",
-  "showList": "Näytä yksityiskohtainen vuorolista"
+  "showList": "Näytä yksityiskohtainen vuorolista",
+  "downloadCalendarFeed": "Lataa kalenterimerkinnät (.ics)"
 }
