@@ -57,9 +57,11 @@ const ReservationsDocument = ({
             return prev;
           }, [] as ReservationUnit[]);
 
-        return eventReservationUnits.map((resUnit) => {
-          const reservationUnitReservations = eventReservations.filter(
-            (er) => er.reservationUnit.id === resUnit.id
+        return eventReservationUnits.map((resUnit: ReservationUnit) => {
+          const reservationUnitReservations = eventReservations.filter((er) =>
+            er.reservationUnit.find(
+              (ru: ReservationUnit) => ru.id === resUnit.id
+            )
           );
 
           const hasCancelations = Boolean(

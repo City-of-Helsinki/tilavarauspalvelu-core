@@ -383,7 +383,7 @@ export interface Reservation {
   bufferTimeAfter: string | null;
   applicationEventName: string | null;
   reservationUser: string | null;
-  reservationUnit: ReservationUnit;
+  reservationUnit: ReservationUnit[];
   recurringReservation: number | null;
 }
 
