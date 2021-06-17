@@ -119,7 +119,7 @@ const Subheading = styled(H3)`
 `;
 
 const StyledDivider = styled(Divider)`
-  margin: var(--spacing-s) 0;
+  margin: var(--spacing-xs) 0;
   background-color: var(--color-black);
 `;
 
@@ -212,6 +212,11 @@ function ApplicationDetails(): JSX.Element | null {
               defaultOpen
             >
               <AccordionContent>
+                <ValueBox
+                  label={t("Application.authenticatedUser")}
+                  value={application.applicantEmail}
+                />
+                <StyledDivider />
                 <ValueBox
                   label={t("Application.contactForename")}
                   value={application.contactPerson?.firstName}

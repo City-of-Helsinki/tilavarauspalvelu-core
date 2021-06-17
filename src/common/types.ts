@@ -149,6 +149,7 @@ export type Application = {
   applicantType: ApplicantType | null;
   applicantId: number | null;
   applicantName: string | null;
+  applicantEmail: string | null;
   homeCityId: number | null;
   organisation: Organisation | null;
   contactPerson: ContactPerson | null;
