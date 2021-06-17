@@ -193,6 +193,7 @@ const translations: ITranslations = {
     organisationName: ["Yhdistyksen nimi"],
     contactPersonEmailAddress: ["Yhteyshenkilön sähköpostiosoite"],
     contactPersonPhone: ["Yhteyshenkilön puhelinnumero"],
+    authenticatedUser: ["Tunnistautunut käyttäjä"],
     headings: {
       customer: ["Asiakas"],
       participants: ["Harrastajat"],
