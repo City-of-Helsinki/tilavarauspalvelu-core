@@ -32,7 +32,7 @@ export function acceptAndSaveEvent(): Cypress.Chainable<JQuery<HTMLElement>> {
 }
 
 export function nextButton(): Cypress.Chainable<JQuery<HTMLElement>> {
-  return cy.get('#next');
+  return cy.get('#next:not(:disabled)').should('be.visible');
 }
 
 const random = {

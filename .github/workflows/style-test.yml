@@ -15,11 +15,10 @@ jobs:
       - name: Use Node.js lts/fermium (14)
         uses: actions/setup-node@v2-beta
         with:
-          node-version: '14'
+          node-version: "14"
       - name: Run style checks and client tests
         run: |
           yarn install --frozen-lockfile
           yarn lint
-          yarn lint:css
           yarn build
           yarn test

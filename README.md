@@ -1,3 +1,5 @@
+This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Prerequisites
@@ -49,7 +51,7 @@ docker exec -ti tilavarauspalvelu-core_dev_1 python manage.py createsuperuser
 
 In the project directory, you can run:
 
-### `yarn start`
+### `yarn dev`
 
 Runs the app in the development mode.\
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
@@ -62,9 +64,9 @@ You will also see any lint errors in the console.
 Launches the test runner in the interactive watch mode.\
 See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-### `yarn test:browser`
+### `yarn test:e2e-local`
 
-Runs cypress, see [cypress/README.md](cypress/README.md) for more info.
+Runs end to end tests against local setup. Both ui and api must be running before running this script.
 
 ### `yarn test:axe-local`
 
@@ -72,20 +74,21 @@ Runs accessibility tests against local setup. Both ui and api must be running be
 
 ### `yarn build`
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Builds a production version
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### `yarn start`
+
+Starts production version
 
 ## Configurable environment variables
 
-| Name                           | Description                                                   |
-| ------------------------------ | ------------------------------------------------------------- |
-| REACT_APP_TILAVARAUS_API_URL   | tilavaraus-core base url                                      |
-| REACT_APP_SENTRY_DSN           | Sentry dsn                                                    |
-| REACT_APP_SENTRY_ENVIRONMENT   | Sentry environment, for example 'test', 'prod'                |
-| REACT_APP_OIDC_CLIENT_ID       | Oidc client id                                                |
-| REACT_APP_OIDC_URL             | https://api.hel.fi/sso                                        |
-| REACT_APP_OIDC_SCOPE           | openid profile email https://api.hel.fi/auth/tilavarausapidev |
-| REACT_APP_TILAVARAUS_API_SCOPE | https://api.hel.fi/auth/tilavarausapidev                      |
+| Name                             | Description                                                   |
+| -------------------------------- | ------------------------------------------------------------- |
+| NEXT_PUBLIC_TILAVARAUS_API_URL   | tilavaraus-core base url                                      |
+| NEXT_PUBLIC_SENTRY_DSN           | Sentry dsn                                                    |
+| NEXT_PUBLIC_SENTRY_ENVIRONMENT   | Sentry environment, for example 'test', 'prod'                |
+| NEXT_PUBLIC_OIDC_CLIENT_ID       | Oidc client id                                                |
+| NEXT_PUBLIC_OIDC_URL             | https://api.hel.fi/sso                                        |
+| NEXT_PUBLIC_OIDC_SCOPE           | openid profile email https://api.hel.fi/auth/tilavarausapidev |
+| NEXT_PUBLIC_TILAVARAUS_API_SCOPE | https://api.hel.fi/auth/tilavarausapidev                      |
+| NEXT_PUBLIC_ENABLE_MATOMO        | 'true' enables matomo tracking                                |

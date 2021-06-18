@@ -11,7 +11,7 @@ import {
   fillAsIndividual,
   acceptTerms,
   submitApplication,
-} from 'model/application';
+} from '../model/application';
 import {
   addReservationUnitButton,
   startApplicationButton,
@@ -80,7 +80,10 @@ describe('application', () => {
     addReservationUnitButton('Studiokompleksi').click();
     startApplicationButton().click();
 
+    cy.get('h1').should('contain', 'Vakiovuorohakemus');
+
     cy.a11yCheck();
+
 
     selectApplicationRoundButton().click();
     firstAvailableApplicationRound().click();
@@ -95,6 +98,9 @@ describe('application', () => {
       '@reservationUnitType',
     ]);
 
+
+    cy.get('h1').should('contain', 'Vakiovuoron luominen');
+
     cy.a11yCheck();
 
     applicationName().clear().type('Kurikan Vimma');
@@ -102,16 +108,28 @@ describe('application', () => {
     selectOption('applicationEvents[0].ageGroupId', 1);
     selectOption('applicationEvents[0].purposeId', 1);
     acceptAndSaveEvent().click();
+
+    cy.fixture('v1/application/138_page_2').then((json) => {
+      cy.intercept('GET', '/v1/application/138/*', json);
+    });
+
     nextButton().click();
+
+    cy.wait([
+      '@applicationRound1',
+    ]);
+
+    cy.get('h1').should('contain', 'ajankohta');
 
     cy.a11yCheck();
 
-
     randomApplicationEventScheduleButton().click();
     randomApplicationEventScheduleButton().click();
     randomApplicationEventScheduleButton().click();
 
     nextButton().click();
+
+    cy.get('h1').should('contain', 'Varaajan perus');
 
     cy.a11yCheck();
 
@@ -120,11 +138,17 @@ describe('application', () => {
 
     cy.fixture('v1/application/put_page_3').then((json) => {
       cy.intercept('PUT', '/v1/application/138', json);
+      cy.intercept('GET', '/v1/application/138/*', json);
     });
 
     nextButton().click();
+    cy.wait([
+      '@purpose',
+      '@city',
+      '@ageGroup',
+    ]);
 
-    cy.a11yCheck();
+    cy.get('h1').should('contain', 'Hakemuksen lähe');
 
     acceptTerms();
 
