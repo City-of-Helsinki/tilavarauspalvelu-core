@@ -42,6 +42,7 @@ const Container = styled.div`
   max-width: var(--container-width-xl);
   margin: 0 auto var(--spacing-2-xl) auto;
   height: 100%;
+
   @media (max-width: ${breakpoint.m}) {
     padding: var(--spacing-s);
   }
@@ -50,6 +51,7 @@ const Container = styled.div`
 const RoundName = styled.div`
   font-size: var(--fontsize-heading-xl);
   font-family: var(--font-bold);
+
   @media (max-width: ${breakpoint.s}) {
     font-size: var(--fontsize-heading-l);
   }
@@ -75,12 +77,14 @@ const Modified = styled.div`
 
 const Buttons = styled.div`
   justify-self: end;
+
   @media (max-width: ${breakpoint.s}) {
     width: 100%;
   }
 `;
 const ToggleButton = styled(Button)`
   margin-top: var(--spacing-m);
+
   @media (max-width: ${breakpoint.s}) {
     width: 100%;
   }

@@ -52,6 +52,7 @@ const TwoColumnLayout = styled.div`
   display: grid;
   gap: var(--spacing-layout-s);
   grid-template-columns: 7fr 390px;
+
   @media (max-width: ${breakpoint.l}) {
     grid-template-columns: 1fr;
   }

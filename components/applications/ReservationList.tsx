@@ -27,6 +27,7 @@ const Table = styled.table`
   th {
     text-align: left;
   }
+
   tr {
     height: var(--spacing-layout-s);
   }

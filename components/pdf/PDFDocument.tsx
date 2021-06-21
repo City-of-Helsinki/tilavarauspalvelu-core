@@ -12,6 +12,7 @@ const styles = StyleSheet.create({
     lineHeight: 1.6,
     paddingBottom: 100,
   },
+
   section: {
     paddingHorizontal: 75,
   },

@@ -25,6 +25,7 @@ export const getServerSideProps = async ({ locale }) => {
 
 const TopContainer = styled.div`
   margin-right: 30%;
+
   @media (max-width: ${breakpoint.m}) {
     margin-right: 0%;
   }
@@ -55,6 +56,7 @@ const StyledImageWithCard = styled(ImageWithCard)`
       > :nth-child(2) {
         height: auto;
         margin: var(--spacing-m) 0 0 0;
+
         div {
           margin: 0;
         }

@@ -71,6 +71,7 @@ const TwoColumnContainer = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--spacing-l);
+
   @media (max-width: ${breakpoint.m}) {
     grid-template-columns: 1fr;
     gap: 0;
@@ -84,6 +85,7 @@ const PeriodContainer = styled.div`
   gap: var(--spacing-m);
   align-items: baseline;
   margin-bottom: var(--spacing-layout-s);
+
   @media (max-width: ${breakpoint.m}) {
     grid-template-columns: 1fr;
   }
@@ -101,6 +103,7 @@ const SpanTwoColumns = styled.span`
 
 const Button = styled(HDSButton)`
   margin-top: var(--spacing-layout-l);
+
   @media (max-width: ${breakpoint.s}) {
     margin-top: var(--spacing-layout-s);
     margin-left: auto;

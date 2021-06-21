@@ -24,6 +24,7 @@ const ImageGrid = styled.div`
   display: grid;
   gap: var(--spacing-xs);
   grid-template-columns: 1fr 1fr 1fr;
+
   @media (max-width: ${breakpoint.l}) {
     display: flex;
   }
@@ -33,6 +34,7 @@ const ThumbnailImage = styled.img`
   object-fit: cover;
   width: 122px;
   height: 122px;
+
   @media (max-width: ${breakpoint.l}) {
     max-width: 100%;
     height: auto;
@@ -56,6 +58,7 @@ const StyledButton = styled.button`
 const ModalImages = styled.div`
   margin-top: var(--spacing-layout-s);
   display: flex;
+
   button {
     margin-right: 1em;
   }

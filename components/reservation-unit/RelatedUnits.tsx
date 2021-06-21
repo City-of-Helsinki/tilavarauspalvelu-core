@@ -53,9 +53,9 @@ const Grid = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap: var(--spacing-s);
+
   @media (max-width: ${breakpoint.m}) {
     grid-template-columns: 1fr;
-
     margin-top: 0;
   }
 `;

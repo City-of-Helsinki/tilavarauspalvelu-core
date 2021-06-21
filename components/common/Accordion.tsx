@@ -16,6 +16,7 @@ const HeadingButton = styled(Button)`
     width: 100%;
     padding-left: 0;
     border-left: 0;
+
     span {
       color: var(--color-black-90);
       font-size: var(--fontsize-heading-m);

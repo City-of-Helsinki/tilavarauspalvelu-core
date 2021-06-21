@@ -38,6 +38,7 @@ const CardButtonContainer = styled.div`
   grid-template-columns: 4fr 1fr;
   margin-top: var(--spacing-s);
   align-items: center;
+
   @media (max-width: ${breakpoint.s}) {
     grid-template-columns: 3fr 1fr;
   }
@@ -49,6 +50,7 @@ const CardContainer = styled.div`
   display: grid;
   grid-template-columns: 76px 5fr 1fr 1fr;
   align-items: center;
+
   @media (max-width: ${breakpoint.m}) {
     grid-template-columns: 1fr 2fr;
     gap: var(--spacing-xs);
@@ -59,6 +61,7 @@ const Image = styled.img`
   width: 76px;
   height: 99px;
   object-fit: cover;
+
   @media (max-width: ${breakpoint.s}) {
     width: 50px;
     height: auto;
@@ -92,6 +95,7 @@ const MaxPersonsCountContainer = styled.span`
 
 const ArrowContainer = styled.div`
   display: flex;
+
   @media (max-width: ${breakpoint.s}) {
     flex-direction: column;
   }
@@ -101,7 +105,8 @@ const Circle = styled.div<{ passive: boolean }>`
   margin-left: var(--spacing-xs);
   height: var(--spacing-layout-m);
   width: var(--spacing-layout-m);
-  background-color: ${(props) =>
+  background-color:
+    ${(props) =>
     props.passive ? "var(--color-black-10)" : "var(--color-bus)"};
   color: ${(props) => (props.passive ? "var(--color-black-50)" : "white")};
   border-radius: 50%;

@@ -87,7 +87,6 @@ const Terms = styled.div`
   margin-top: var(--spacing-s);
   width: (--container-width-m);
   white-space: break-spaces;
-
   height: 20em;
   overflow-y: scroll;
   background-color: var(--color-white);

@@ -22,6 +22,7 @@ const Message = styled.div`
 
 const Content = styled.div`
   margin-top: var(--spacing-s);
+
   @media (max-width: ${breakpoint.s}) {
     margin-top: var(--spacing-l);
   }

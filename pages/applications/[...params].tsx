@@ -42,6 +42,7 @@ const Container = styled.div`
   max-width: var(--container-width-xl);
   margin: 0 auto var(--spacing-2-xl) auto;
   height: 100%;
+
   @media (max-width: ${breakpoint.m}) {
     padding: var(--spacing-s);
   }

@@ -18,10 +18,14 @@ interface LanguageOption {
 const languageOptions: LanguageOption[] = [{ label: "Suomeksi", value: "fi" }];
 
 const StyledNavigation = styled(HDSNavigation)`
-  --header-background-color: var(
-    --tilavaraus-header-background-color
-  ) !important;
+
+  --header-background-color:
+    var(
+      --tilavaraus-header-background-color
+    ) !important;
+
   color: var(--tilavaraus-header-color);
+
   @media (max-width: ${breakpoint.s}) {
     position: fixed !important;
     z-index: 10 !important;

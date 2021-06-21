@@ -38,6 +38,7 @@ type Props = {
 const SummaryContainer = styled.div`
   margin-right: var(--spacing-layout-l);
   margin-left: var(--spacing-layout-l);
+
   @media (max-width: ${breakpoint.l}) {
     margin-right: initial;
     margin-left: initial;
@@ -71,6 +72,7 @@ const Container = styled.div`
   font-family: var(--font-regular);
   grid-template-columns: 10em 10em 1fr;
   gap: var(--spacing-xs);
+
   @media (max-width: ${breakpoint.m}) {
     display: block;
     gap: 0;
@@ -82,6 +84,7 @@ const Actions = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
   font-family: var(--font-bold);
+
   @media (max-width: ${breakpoint.m}) {
     display: block;
   }
@@ -93,6 +96,7 @@ const Exceptions = styled.div`
 
 const Label = styled.div`
   margin-bottom: var(--spacing-xs);
+
   @media (max-width: ${breakpoint.m}) {
     margin-top: var(--spacing-s);
     margin-bottom: 5px;
@@ -101,6 +105,7 @@ const Label = styled.div`
 
 const StrongLabel = styled.div`
   font-family: var(--font-bold);
+
   @media (max-width: ${breakpoint.m}) {
     margin-top: var(--spacing-s);
     margin-bottom: 5px;
@@ -121,6 +126,7 @@ const TimeSpan = styled.div`
   margin: 0;
   display: grid;
   grid-template-columns: 8em 2.7em 1fr;
+
   @media (max-width: ${breakpoint.m}) {
     grid-template-columns: 6em 1em 6em;
   }
