@@ -43,7 +43,6 @@ const ButtonContainer = styled.div`
 `;
 
 const Notification = styled(HDSNotification)`
-
   --notification-z-index: 0 !important;
 `;
 

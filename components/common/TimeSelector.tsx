@@ -26,7 +26,6 @@ const TimeSelectionButton = styled.button<{
   selected: boolean;
   firstRow: boolean;
 }>`
-
   --border-color: var(--color-black-50);
 
   display: block;
@@ -35,17 +34,14 @@ const TimeSelectionButton = styled.button<{
   font-size: var(--fontsize-heading-m);
   font-weight: bold;
   padding: 0.3em 0.5em;
-  background:
-    ${(props) =>
+  background: ${(props) =>
     props.selected ? "var(--tilavaraus-calendar-selected)" : "#e5e5e5"};
-  border:
-    1px solid
+  border: 1px solid
     ${(props) =>
-    props.selected
-    ? "var(--tilavaraus-calendar-selected)"
-    : "var(--border-color)"};
-  border-top:
-    ${(props) =>
+      props.selected
+        ? "var(--tilavaraus-calendar-selected)"
+        : "var(--border-color)"};
+  border-top: ${(props) =>
     props.firstrow ? "1px solid var(--border-color)" : "none"};
   white-space: nowrap;
 `;

@@ -105,8 +105,7 @@ const Circle = styled.div<{ passive: boolean }>`
   margin-left: var(--spacing-xs);
   height: var(--spacing-layout-m);
   width: var(--spacing-layout-m);
-  background-color:
-    ${(props) =>
+  background-color: ${(props) =>
     props.passive ? "var(--color-black-10)" : "var(--color-bus)"};
   color: ${(props) => (props.passive ? "var(--color-black-50)" : "white")};
   border-radius: 50%;
