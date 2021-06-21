@@ -238,7 +238,7 @@ const ApplicationEvent = ({
           })
         }
         open={isOpen(applicationEvent.id, editorState.accordionStates)}
-        heading={`${eventName}` || t('application:Page1.applicationEventName')}
+        heading={`${eventName}` || t("application:Page1.applicationEventName")}
       >
         <SubHeadLine>
           {t("application:Page1.basicInformationSubHeading")}

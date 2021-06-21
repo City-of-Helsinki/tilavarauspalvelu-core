@@ -12,7 +12,10 @@ import React, { Fragment } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { ApiData, useApiData } from "../../hooks/useApiData";
-import { applicationEventCalendarFeedUrl, getParameters } from "../../modules/api";
+import {
+  applicationEventCalendarFeedUrl,
+  getParameters,
+} from "../../modules/api";
 import { breakpoint } from "../../modules/style";
 import { Strong } from "../../modules/style/typography";
 import {
@@ -300,12 +303,22 @@ const ReservationUnitEventsSummaryForList = ({
                     </ExceptionItems>
                   </Exceptions>
                 ) : null}
-                <Actions><div>
-                  <IconWithText
-                    icon={<IconCalendarPlus aria-hidden />}
-                    text={`${reservationUnit.building.name}, ${reservationUnit.name.fi}`}
-                  />
-                  <CalendarFeedLink><a href={applicationEventCalendarFeedUrl(applicationEvent.uuid)}>{t("eventSummary:downloadCalendarFeed")}</a></CalendarFeedLink></div>
+                <Actions>
+                  <div>
+                    <IconWithText
+                      icon={<IconCalendarPlus aria-hidden />}
+                      text={`${reservationUnit.building.name}, ${reservationUnit.name.fi}`}
+                    />
+                    <CalendarFeedLink>
+                      <a
+                        href={applicationEventCalendarFeedUrl(
+                          applicationEvent.uuid
+                        )}
+                      >
+                        {t("eventSummary:downloadCalendarFeed")}
+                      </a>
+                    </CalendarFeedLink>
+                  </div>
                   <div>
                     <Button
                       theme="black"

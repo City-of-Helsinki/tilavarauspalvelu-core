@@ -8,6 +8,7 @@ import { TFunction } from "i18next";
 import { applicationsUrl } from "../../modules/util";
 import { authEnabled, isBrowser } from "../../modules/const";
 import { breakpoint } from "../../modules/style";
+import { UserProfile } from "../../modules/types";
 
 interface LanguageOption {
   label: string;
@@ -36,11 +37,11 @@ const PreContent = styled.div`
 const DEFAULT_LANGUAGE = "fi";
 
 type Props = {
-  profile: any | null;
+  profile: UserProfile | null;
   logout?: () => void;
 };
 
-const getUserName = (profile: any | null, t: TFunction) => {
+const getUserName = (profile: UserProfile | null, t: TFunction) => {
   if (profile === null) {
     return "";
   }
@@ -63,7 +64,6 @@ const Navigation = ({ profile, logout }: Props): JSX.Element => {
     lang.toUpperCase();
 
   useEffect(() => {
-    console.log("should change language to", language);
     /* if (language) {
       i18n.changeLanguage(language);
     } */
@@ -140,12 +140,11 @@ const NavigationWithProfileAndLogout = (): JSX.Element => {
   return (
     <WithOidc
       render={(props: {
-        profile: any | null;
+        profile: UserProfile | null;
         logout: (() => void) | undefined;
       }) => <Navigation profile={props.profile} logout={props.logout} />}
     />
   );
-  return <Navigation profile={null} />;
 };
 
 export default NavigationWithProfileAndLogout;

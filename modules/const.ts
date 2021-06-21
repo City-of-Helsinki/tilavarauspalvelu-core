@@ -47,21 +47,7 @@ export const emptyOption = (label: string): OptionType => ({
 });
 
 export const participantCountOptions = [
-  1,
-  2,
-  5,
-  10,
-  15,
-  20,
-  25,
-  30,
-  40,
-  50,
-  60,
-  80,
-  100,
-  150,
-  200,
+  1, 2, 5, 10, 15, 20, 25, 30, 40, 50, 60, 80, 100, 150, 200,
 ].map((v) => ({ label: `${v}`, value: v } as OptionType));
 
 const option = (label: string, value: string): OptionType => {
@@ -94,13 +80,17 @@ export const isBrowser = typeof window !== "undefined";
 
 export const sentryDSN = process.env.NEXT_PUBLIC_SENTRY_DSN;
 
-export const matomoEnabled = process.env.NEXT_PUBLIC_ENABLE_MATOMO === 'true';
+export const matomoEnabled = process.env.NEXT_PUBLIC_ENABLE_MATOMO === "true";
 
 export const sentryEnvironment = process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT;
 
-export const apiBaseUrl = isBrowser ? window.config?.apiBaseUrl : process.env.TILAVARAUS_API_URL;
+export const apiBaseUrl = isBrowser
+  ? window.config?.apiBaseUrl
+  : process.env.NEXT_PUBLIC_TILAVARAUS_API_URL;
 
-export const authEnabled = isBrowser ? window.config?.authEnabled: process.env.DISABLE_AUTH !== "true";
+export const authEnabled = isBrowser
+  ? window.config?.authEnabled
+  : process.env.DISABLE_AUTH !== "true";
 
 export const oidcClientId = process.env.NEXT_PUBLIC_OIDC_CLIENT_ID;
 

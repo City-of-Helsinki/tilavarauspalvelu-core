@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { GetStaticProps } from "next";
 import { Koros } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
@@ -32,8 +31,7 @@ const StyledKoros = styled(Koros)`
   fill: white;
 `;
 
-interface Props {}
-
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const getServerSideProps = async ({ locale }) => {
   return {
     props: {

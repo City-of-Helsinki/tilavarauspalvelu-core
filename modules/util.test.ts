@@ -1,17 +1,17 @@
-import { ApplicationEventSchedule, Cell, DAY } from './types';
+import { ApplicationEventSchedule, Cell, DAY } from "./types";
 import {
   cellsToApplicationEventSchedules,
   applicationEventSchedulesToCells,
   applicationRoundState,
-} from './util';
+} from "./util";
 
 const cell = (hour: number, state = true): Cell => ({
-  label: 'cell',
-  key: 'key',
+  label: "cell",
+  key: "key",
   hour,
   state,
 });
-test('test that time selector ui model converts to api model', () => {
+test("test that time selector ui model converts to api model", () => {
   const week = [
     [cell(7), cell(8), cell(9), cell(11)],
     [cell(12)],
@@ -21,10 +21,10 @@ test('test that time selector ui model converts to api model', () => {
   const result = cellsToApplicationEventSchedules(week);
 
   expect(result.length).toBe(4);
-  expect(result[0]).toStrictEqual({ begin: '07:00', end: '10:00', day: 0 });
-  expect(result[1]).toStrictEqual({ begin: '11:00', end: '12:00', day: 0 });
-  expect(result[2]).toStrictEqual({ begin: '12:00', end: '13:00', day: 1 });
-  expect(result[3]).toStrictEqual({ begin: '22:00', end: '00:00', day: 2 });
+  expect(result[0]).toStrictEqual({ begin: "07:00", end: "10:00", day: 0 });
+  expect(result[1]).toStrictEqual({ begin: "11:00", end: "12:00", day: 0 });
+  expect(result[2]).toStrictEqual({ begin: "12:00", end: "13:00", day: 1 });
+  expect(result[3]).toStrictEqual({ begin: "22:00", end: "00:00", day: 2 });
 
   const noSelections = cellsToApplicationEventSchedules([
     [cell(7, false), cell(8, false), cell(9, false)],
@@ -42,10 +42,10 @@ const appEventSchedule = (
 const cellWithHour = (cells: Cell[], hour: number) =>
   cells.find((c) => c.hour === hour);
 
-test('test that api model converts to time selector ui model', () => {
+test("test that api model converts to time selector ui model", () => {
   const result = applicationEventSchedulesToCells([
-    appEventSchedule('08:00', '11:00', 0),
-    appEventSchedule('07:00', '08:00', 1),
+    appEventSchedule("08:00", "11:00", 0),
+    appEventSchedule("07:00", "08:00", 1),
   ]);
 
   expect(result.length).toBe(7);
@@ -57,26 +57,26 @@ test('test that api model converts to time selector ui model', () => {
   expect(cellWithHour(result[1], 7)?.state).toBe(true);
 });
 
-test('applicationRoundState', () => {
+test("applicationRoundState", () => {
   jest
-    .useFakeTimers('modern')
-    .setSystemTime(new Date('2021-01-01T007:59:59Z').getTime());
+    .useFakeTimers("modern")
+    .setSystemTime(new Date("2021-01-01T007:59:59Z").getTime());
   expect(
-    applicationRoundState('2021-01-01T08:00:00Z', '2021-02-01T08:00:00Z')
-  ).toBe('pending');
+    applicationRoundState("2021-01-01T08:00:00Z", "2021-02-01T08:00:00Z")
+  ).toBe("pending");
 
   jest
-    .useFakeTimers('modern')
-    .setSystemTime(new Date('2021-01-01T08:00:01Z').getTime());
+    .useFakeTimers("modern")
+    .setSystemTime(new Date("2021-01-01T08:00:01Z").getTime());
   expect(
-    applicationRoundState('2021-01-01T08:00:00Z', '2021-02-01T08:00:00Z')
-  ).toBe('active');
+    applicationRoundState("2021-01-01T08:00:00Z", "2021-02-01T08:00:00Z")
+  ).toBe("active");
 
   jest
-    .useFakeTimers('modern')
-    .setSystemTime(new Date('2021-02-01T08:00:01Z').getTime());
+    .useFakeTimers("modern")
+    .setSystemTime(new Date("2021-02-01T08:00:01Z").getTime());
 
   expect(
-    applicationRoundState('2021-01-01T08:00:00Z', '2021-02-01T08:00:00Z')
-  ).toBe('past');
+    applicationRoundState("2021-01-01T08:00:00Z", "2021-02-01T08:00:00Z")
+  ).toBe("past");
 });

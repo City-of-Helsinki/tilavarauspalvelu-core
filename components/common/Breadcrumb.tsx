@@ -33,7 +33,7 @@ const Breadcrumb = ({ current }: Props): JSX.Element => {
         <React.Fragment key={bc.label}>
           {i > 0 && " › "}
           <Link
-            /* TODO: isActive={() => i === breadcrumbs.length - 1}*/
+            /* TODO: isActive={() => i === breadcrumbs.length - 1} */
             aria-current="location"
             href={bc.linkTo || ""}
           >

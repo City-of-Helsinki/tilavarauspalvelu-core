@@ -15,7 +15,7 @@ import { ReservationUnit as ReservationUnitType } from "../../modules/types";
 import { getMainImage, localizedValue } from "../../modules/util";
 import Back from "../common/Back";
 import Container from "../common/Container";
-import IconWithText from "../common//IconWithText";
+import IconWithText from "../common/IconWithText";
 import Notification from "./Notification";
 
 interface PropsType {

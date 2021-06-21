@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
+import dynamic from "next/dynamic";
 import { breakpoint } from "../../modules/style";
 import { Image } from "../../modules/types";
-import dynamic from "next/dynamic";
 
 const Modal = dynamic(() => import("../common/Modal"));
 type Props = {

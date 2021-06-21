@@ -21,6 +21,7 @@ type Props = {
   relatedReservationUnits: ReservationUnitType[];
 };
 
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const getServerSideProps = async ({ locale, params }) => {
   const id = Number(params.id);
 
