@@ -86,7 +86,7 @@ class ReservationUnitImageSerializer(serializers.ModelSerializer):
     def get_medium_url(self, obj):
         if not obj.image:
             return None
-        url = get_thumbnailer(obj.image)["small"].url
+        url = get_thumbnailer(obj.image)["medium"].url
         request = self.context.get("request")
         return request.build_absolute_uri(url)
 
