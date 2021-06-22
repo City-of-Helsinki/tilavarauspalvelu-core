@@ -86,7 +86,7 @@ export const sentryEnvironment = process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT;
 
 export const apiBaseUrl = isBrowser
   ? window.config?.apiBaseUrl
-  : process.env.NEXT_PUBLIC_TILAVARAUS_API_URL;
+  : process.env.TILAVARAUS_API_URL;
 
 export const authEnabled = isBrowser
   ? window.config?.authEnabled
