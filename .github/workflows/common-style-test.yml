@@ -14,7 +14,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    env:
+      working-directory: ./common
     steps:
       - uses: actions/checkout@v2
       - name: Use Node.js lts/fermium (14)
