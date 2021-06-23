@@ -1,5 +1,5 @@
 {
-  "name": "tilavarauspalvelu-ui-nextjs",
+  "name": "@tilavarauspalvelu/ui",
   "version": "0.1.0",
   "private": true,
   "scripts": {
