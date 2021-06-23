@@ -33,6 +33,7 @@ import ReservationCalendar from "./ReservationCalendar";
 
 const Card = styled(HDSCard)`
   margin-top: var(--spacing-layout-m);
+
   @media (max-width: ${breakpoint.m}) {
     padding: var(--spacing-s);
   }
@@ -43,6 +44,7 @@ const TwoColLayout = styled.div`
   display: grid;
   grid-gap: var(--spacing-layout-xs);
   grid-template-columns: var(--spacing-layout-m) 1fr;
+
   @media (max-width: ${breakpoint.m}) {
     grid-template-columns: var(--spacing-layout-xs) 1fr;
   }
@@ -53,6 +55,7 @@ const Actions = styled.div`
   align-items: end;
   grid-gap: var(--spacing-layout-xs);
   grid-template-columns: 1fr 10rem;
+
   @media (max-width: ${breakpoint.m}) {
     grid-template-columns: 1fr;
   }
@@ -61,6 +64,7 @@ const Actions = styled.div`
 const CalendarContainer = styled.div`
   @media (max-width: ${breakpoint.s}) {
     overflow-x: scroll;
+
     > div {
       width: 30em;
     }

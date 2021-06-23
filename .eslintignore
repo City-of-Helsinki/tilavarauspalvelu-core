@@ -1,0 +1,6 @@
+node_modules
+cypress
+dist
+build
+public
+next-env.d.ts

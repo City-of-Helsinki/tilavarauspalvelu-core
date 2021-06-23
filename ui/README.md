@@ -33,6 +33,11 @@ yarn start
 UI is at https://local-tilavaraus.hel.fi:3000/
 Backend is at http://127.0.0.1:8000/v1/
 
+### Recommended editor/IDE tooling
+- eslint
+- prettier
+- stylelint
+
 ### Test data
 
 Some test data can be loaded to the backend with following command:

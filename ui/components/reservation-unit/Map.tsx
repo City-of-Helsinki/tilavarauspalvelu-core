@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import ReactMapGL, { Marker, NavigationControl } from "react-map-gl";
-import { mapStyle } from "../../modules/const";
 import Image from "next/image";
+import { mapStyle } from "../../modules/const";
 
 type State = Record<string, number>;
 type Props = { title: string; latitude?: number; longitude?: number };

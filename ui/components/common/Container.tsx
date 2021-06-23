@@ -19,7 +19,7 @@ const styles = `
 
 `;
 
-//TODO wtf?
+// TODO wtf?
 const Wrapper = styled.div`
   ${styles}
 `;

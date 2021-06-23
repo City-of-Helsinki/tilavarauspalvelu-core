@@ -32,10 +32,10 @@ const date = (isoDateTime: string) => {
 
 const time = (isoDateTime: string) => {
   const d = parseDate(isoDateTime);
-  return `${d
-    .getHours()
+  return `${d.getHours().toString().padStart(2, "0")}:${d
+    .getMinutes()
     .toString()
-    .padStart(2, "0")}:${d.getMinutes().toString().padStart(2, "0")}`;
+    .padStart(2, "0")}`;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

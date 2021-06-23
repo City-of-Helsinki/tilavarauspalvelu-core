@@ -10,6 +10,7 @@ const Button = styled(HDSButton)`
   margin-left: 0;
   padding-left: 0;
   color: black;
+
   && div {
     margin-left: 0;
     padding-left: 0;

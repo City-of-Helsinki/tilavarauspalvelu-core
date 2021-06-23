@@ -1,6 +1,5 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
-import { GetStaticProps } from "next";
 import { Button, IconSearch, ImageWithCard } from "hds-react";
 import { useRouter } from "next/router";
 import styled from "styled-components";
@@ -15,11 +14,8 @@ import { getApplicationRounds } from "../modules/api";
 import { useApiData } from "../hooks/useApiData";
 import Loader from "../components/common/Loader";
 
-interface IProps {
-  applicationRounds: ApplicationRound[];
-}
-
-export const getServerSideProps = async ({ locale, params }) => {
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+export const getServerSideProps = async ({ locale }) => {
   return {
     props: {
       ...(await serverSideTranslations(locale)),
@@ -29,6 +25,7 @@ export const getServerSideProps = async ({ locale, params }) => {
 
 const TopContainer = styled.div`
   margin-right: 30%;
+
   @media (max-width: ${breakpoint.m}) {
     margin-right: 0%;
   }
@@ -59,6 +56,7 @@ const StyledImageWithCard = styled(ImageWithCard)`
       > :nth-child(2) {
         height: auto;
         margin: var(--spacing-m) 0 0 0;
+
         div {
           margin: 0;
         }
@@ -90,22 +88,21 @@ const ButtonContainer = styled.div`
   }
 `;
 
-type Props = {
-  applicationRounds: ApplicationRound[];
-};
-
 const Home = (): JSX.Element => {
   const { t } = useTranslation("home");
   const router = useRouter();
 
-  const applicationRounds = useApiData(getApplicationRounds, {}, (applicationRounds) => {
-      applicationRounds.sort(
+  const applicationRounds = useApiData(
+    getApplicationRounds,
+    {},
+    (ar: ApplicationRound[]) => {
+      ar.sort(
         (ar1: ApplicationRound, ar2: ApplicationRound) =>
           parseISO(ar1.applicationPeriodBegin).getTime() -
           parseISO(ar2.applicationPeriodBegin).getTime()
       );
 
-      return applicationRounds;
+      return ar;
     }
   );
 
@@ -118,7 +115,9 @@ const Home = (): JSX.Element => {
           <p className="text-lg">{t("applicationTimes.text")}</p>
         </TopContainer>
         <Loader datas={[applicationRounds]}>
-        <ApplicationPeriods applicationRounds={applicationRounds.transformed} />
+          <ApplicationPeriods
+            applicationRounds={applicationRounds.transformed}
+          />
         </Loader>
         <StyledImageWithCard
           cardAlignment="right"

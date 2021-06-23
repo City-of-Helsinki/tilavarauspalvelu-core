@@ -5,7 +5,7 @@ import styled from "styled-components";
 import useReservationUnitsList from "../../hooks/useReservationUnitList";
 import { ReservationUnit } from "../../modules/types";
 import Container from "../common/Container";
-import StartApplicationBar from "../../components/common/StartApplicationBar";
+import StartApplicationBar from "../common/StartApplicationBar";
 import ReservationUnitCard from "./ReservationUnitCard";
 
 interface Props {

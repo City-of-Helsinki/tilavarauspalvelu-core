@@ -1,7 +1,8 @@
 interface Window {
-  _paq: string[][]
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  _paq: string[][];
   config: {
     apiBaseUrl: string;
     authEnabled: boolean;
-  }
+  };
 }

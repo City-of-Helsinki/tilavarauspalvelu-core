@@ -52,9 +52,10 @@ const reducer = (state: EditorState, action: Action): EditorState => {
     case "removeApplicationEvent": {
       const { eventId } = action;
       const nextState = { ...state, savedEventId: -1 };
-      nextState.application.applicationEvents = nextState.application.applicationEvents.filter(
-        (ae) => ae.id !== eventId
-      );
+      nextState.application.applicationEvents =
+        nextState.application.applicationEvents.filter(
+          (ae) => ae.id !== eventId
+        );
       nextState.accordionStates = nextState.application.applicationEvents.map(
         (ae) => ({
           applicationEventId: ae.id as number,

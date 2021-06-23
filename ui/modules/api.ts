@@ -235,4 +235,5 @@ export const cancelApplication = async (
   await saveApplication(application);
 };
 
-export const applicationEventCalendarFeedUrl = (uuid: string): string => `${apiBaseUrl}/v1/${applicationEventFeedBasePath}/${uuid}`;
+export const applicationEventCalendarFeedUrl = (uuid: string): string =>
+  `${apiBaseUrl}/v1/${applicationEventFeedBasePath}/${uuid}`;

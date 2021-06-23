@@ -3,7 +3,6 @@ import { ApplicationRound } from "../../modules/types";
 import ApplicationRoundCard from "./ApplicationRoundCard";
 
 type Props = {
-  data?: ApplicationRound[];
   applicationRounds: ApplicationRound[];
 };
 

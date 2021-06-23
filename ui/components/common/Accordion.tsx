@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 
-import { Button, IconAngleDown, IconAngleUp, useAccordion } from 'hds-react';
-import styled from 'styled-components';
+import { Button, IconAngleDown, IconAngleUp, useAccordion } from "hds-react";
+import styled from "styled-components";
 
 const AccordionElement = styled.div`
   border-bottom: 1px solid var(--color-black-60);
@@ -16,6 +16,7 @@ const HeadingButton = styled(Button)`
     width: 100%;
     padding-left: 0;
     border-left: 0;
+
     span {
       color: var(--color-black-90);
       font-size: var(--fontsize-heading-m);
@@ -69,7 +70,8 @@ const Accordion = ({
       <HeadingButton
         variant="supplementary"
         iconRight={icon}
-        onClick={onToggle}>
+        onClick={onToggle}
+      >
         {heading}
       </HeadingButton>
       {isOpen ? children : null}

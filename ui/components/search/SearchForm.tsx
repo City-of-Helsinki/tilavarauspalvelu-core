@@ -84,7 +84,7 @@ const SearchForm = ({ onSearch, formValues }: Props): JSX.Element | null => {
       setReady(true);
     }
     fetchData();
-  }, []);
+  }, [i18n, t]);
 
   useEffect(() => {
     Object.keys(formValues).forEach((p) => setValue(p, formValues[p]));

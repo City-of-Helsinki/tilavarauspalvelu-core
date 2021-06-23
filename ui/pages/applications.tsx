@@ -17,6 +17,7 @@ import Loader from "../components/common/Loader";
 import ApplicationsGroup from "../components/applications/ApplicationsGroup";
 import RequireAuthentication from "../components/common/RequireAuthentication";
 
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export async function getStaticProps({ locale }) {
   return {
     props: {

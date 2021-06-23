@@ -42,7 +42,7 @@ const TimeSelectionButton = styled.button<{
         ? "var(--tilavaraus-calendar-selected)"
         : "var(--border-color)"};
   border-top: ${(props) =>
-    props.firstRow ? "1px solid var(--border-color)" : "none"};
+    props.firstrow ? "1px solid var(--border-color)" : "none"};
   white-space: nowrap;
 `;
 
@@ -159,6 +159,7 @@ const LegendBox = styled.div<{ type: string }>`
     `
     background-color: var(--tilavaraus-calendar-selected);
   `}
+
   margin-right: 1em;
   width: 20px;
   height: 20px;
