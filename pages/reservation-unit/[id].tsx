@@ -21,6 +21,7 @@ type Props = {
   relatedReservationUnits: ReservationUnitType[];
 };
 
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const getServerSideProps = async ({ locale, params }) => {
   const id = Number(params.id);
 
@@ -51,6 +52,7 @@ const TwoColumnLayout = styled.div`
   display: grid;
   gap: var(--spacing-layout-s);
   grid-template-columns: 7fr 390px;
+
   @media (max-width: ${breakpoint.l}) {
     grid-template-columns: 1fr;
   }

@@ -38,6 +38,7 @@ const ModalElement = styled.div`
   flex-direction: column;
   max-height: 100%;
   overflow-y: auto;
+
   @media (max-width: ${breakpoint.s}) {
     height: 100%;
     width: 100%;
@@ -63,6 +64,7 @@ const ButtonContainer = styled.div`
   @media (max-width: ${breakpoint.s}) {
     width: calc(100% - 2 * var(--spacing-layout-xs));
     padding: var(--spacing-layout-xs);
+
     > button {
       margin: 0;
     }

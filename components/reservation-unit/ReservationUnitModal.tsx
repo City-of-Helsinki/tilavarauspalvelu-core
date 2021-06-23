@@ -97,6 +97,7 @@ const Props = styled.span`
   @media (max-width: ${breakpoint.m}) {
     flex-direction: column;
     align-items: flex-start;
+
     span:not(:first-child) {
       margin-right: 0;
     }
@@ -206,6 +207,7 @@ const MainContainer = styled.div`
   overflow-y: auto;
   width: 48em;
   height: 40em;
+
   @media (max-width: ${breakpoint.s}) {
     margin: 0;
     padding: var(--spacing-xs);
@@ -227,7 +229,7 @@ const Text = styled.span`
 const Filters = styled.div`
   @media (max-width: ${breakpoint.m}) {
     grid-template-columns: 1fr;
-    margin-left: 0px;
+    margin-left: 0;
   }
 
   margin-top: var(--spacing-m);

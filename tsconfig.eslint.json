@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "components",
+    "hooks",
+    "modules",
+    "pages",
+  ],
+}

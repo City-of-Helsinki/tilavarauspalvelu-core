@@ -1,5 +1,5 @@
-import React, { ReactElement } from 'react';
-import styled from 'styled-components';
+import React, { ReactElement } from "react";
+import styled from "styled-components";
 
 type IconWithTextProps = {
   icon: React.ReactElement;
@@ -24,7 +24,7 @@ const SpanTwoColumns = styled.span`
 
 const IconWithText = ({
   icon,
-  text = '',
+  text = "",
   texts = [],
   className,
 }: IconWithTextProps): JSX.Element => (

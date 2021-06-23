@@ -15,7 +15,7 @@ import { ReservationUnit as ReservationUnitType } from "../../modules/types";
 import { getMainImage, localizedValue } from "../../modules/util";
 import Back from "../common/Back";
 import Container from "../common/Container";
-import IconWithText from "../common//IconWithText";
+import IconWithText from "../common/IconWithText";
 import Notification from "./Notification";
 
 interface PropsType {
@@ -29,7 +29,6 @@ const TopContainer = styled.div`
 
 const RightContainer = styled.div`
   font-size: var(--fontsize-body-m);
-
   display: grid;
   grid-template-columns: 2fr 1fr;
   gap: var(--spacing-s);
@@ -70,6 +69,7 @@ const Image = styled.img`
   width: 100%;
   height: 259px;
   object-fit: cover;
+
   @media (max-width: ${breakpoint.m}) {
     width: 100%;
     height: auto;

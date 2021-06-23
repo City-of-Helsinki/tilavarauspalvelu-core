@@ -1,5 +1,6 @@
-import { useReactOidc } from '@axa-fr/react-oidc-context';
-import { Profile } from 'oidc-client';
+// eslint-disable-next-line import/no-unresolved
+import { useReactOidc } from "@axa-fr/react-oidc-context";
+import { Profile } from "oidc-client";
 
 export type RenderPropsType = { profile: Profile; logout: () => void };
 type Props = { render: (props: RenderPropsType) => JSX.Element };

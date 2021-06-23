@@ -24,9 +24,11 @@ import { cancelApplication } from "../../modules/api";
 
 const Card = styled(HdsCard)`
   margin-bottom: var(--spacing-m);
+
   @media (max-width: ${breakpoint.l}) {
     grid-template-columns: 1fr;
   }
+
   width: auto;
 `;
 
@@ -70,6 +72,7 @@ const RoundName = styled.div`
   font-size: var(--fontsize-heading-m);
   font-family: var(--font-bold);
   margin-bottom: 0;
+
   @media (max-width: ${breakpoint.s}) {
     font-size: var(--fontsize-heading-m);
   }
@@ -83,6 +86,7 @@ const Modified = styled.div`
 const StyledButton = styled(Button)`
   margin-right: var(--spacing-xs);
   font-size: var(--fontsize-body-m);
+
   @media (max-width: ${breakpoint.s}) {
     margin-top: var(--spacing-xs);
     margin-right: 0;

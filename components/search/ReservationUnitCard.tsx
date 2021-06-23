@@ -41,6 +41,7 @@ const MainContent = styled.div`
   display: flex;
   flex-direction: column;
   margin: var(--spacing-m);
+
   @media (max-width: ${breakpoint.s}) {
     margin: var(--spacing-xs);
   }
@@ -64,6 +65,7 @@ const Bottom = styled.span`
 
   > div {
     margin: 5px;
+
     :last-child {
       flex-grow: 1;
     }
@@ -79,9 +81,11 @@ const Actions = styled.div`
   flex-direction: column;
   padding: var(--spacing-s) var(--spacing-m);
   align-items: flex-end;
+
   @media (max-width: ${breakpoint.m}) {
     display: block;
   }
+
   @media (max-width: ${breakpoint.m}) {
     padding: 0 var(--spacing-xs) var(--spacing-xs) var(--spacing-xs);
   }
@@ -91,6 +95,7 @@ const Image = styled.img`
   width: 240px;
   object-fit: cover;
   height: 156px;
+
   @media (max-width: ${breakpoint.s}) {
     width: 100%;
     height: 50vw;

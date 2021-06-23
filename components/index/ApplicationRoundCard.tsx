@@ -4,7 +4,7 @@ import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import styled from "styled-components";
 import { parseISO } from "date-fns";
-import Card from "../../components/common/Card";
+import Card from "../common/Card";
 import { ApplicationRound } from "../../modules/types";
 import { applicationRoundState, searchUrl } from "../../modules/util";
 import { breakpoint } from "../../modules/style";

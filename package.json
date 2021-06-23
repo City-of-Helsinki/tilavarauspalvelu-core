@@ -8,7 +8,7 @@
     "start": "next start",
     "test": "jest",
     "test:browser": "CYPRESS_BASE_URL=http://local-tilavaraus.hel.fi:3000 ./node_modules/.bin/cypress open",
-    "lint": "eslint --ext ts,tsx",
+    "lint": "eslint --ext ts,tsx .",
     "lint:css": "stylelint '**/*.tsx'",
     "ts-check": "tsc --noEmit --project tsconfig.json"
   },
@@ -44,12 +44,20 @@
   "devDependencies": {
     "@types/jest": "^26.0.23",
     "@types/react": "^17.0.6",
+    "@typescript-eslint/eslint-plugin": "^4.27.0",
+    "@typescript-eslint/parser": "^4.27.0",
     "axe-core": "^4.2.2",
     "cypress": "^7.5.0",
     "cypress-axe": "^0.12.2",
-    "eslint": "^7.28.0",
+    "eslint": "^7.29.0",
+    "eslint-config-airbnb-typescript-prettier": "^4.2.0",
+    "eslint-plugin-jsx-a11y": "^6.4.1",
     "jest": "^27.0.4",
+    "prettier": "^2.3.1",
     "stylelint": "^13.13.1",
-    "typescript": "^4.2.4"
+    "stylelint-config-recommended": "^5.0.0",
+    "stylelint-config-styled-components": "^0.1.1",
+    "stylelint-processor-styled-components": "^1.10.0",
+    "typescript": "^4.3.4"
   }
 }

@@ -289,3 +289,10 @@ export type Cell = {
   state: boolean;
   key: string;
 };
+
+export type UserProfile = {
+  // eslint-disable-next-line camelcase
+  given_name: string;
+  // eslint-disable-next-line camelcase
+  family_name: string;
+};

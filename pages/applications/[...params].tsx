@@ -42,6 +42,7 @@ const Container = styled.div`
   max-width: var(--container-width-xl);
   margin: 0 auto var(--spacing-2-xl) auto;
   height: 100%;
+
   @media (max-width: ${breakpoint.m}) {
     padding: var(--spacing-s);
   }
@@ -64,9 +65,11 @@ const ReservationUnitName = styled.span`
 const EventReservationUnitDetails = (): JSX.Element | null => {
   const [isLoading, setIsLoading] = useState(true);
   const [application, setApplication] = useState<Application | null>(null);
+  // eslint-disable-next-line prettier/prettier
   const [
     applicationRound,
     setApplicationRound,
+    // eslint-disable-next-line prettier/prettier
   ] = useState<ApplicationRound | null>(null);
   const [reservations, setReservations] = useState<
     RecurringReservation[] | null
@@ -79,14 +82,8 @@ const EventReservationUnitDetails = (): JSX.Element | null => {
 
   const { t, i18n } = useTranslation();
 
-  if (!params) return <CenterSpinner />;
-
-  const [
-    undefined,
-    applicationId,
-    eventId,
-    reservationUnitId,
-  ] = params as string[];
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [path, applicationId, eventId, reservationUnitId] = params as string[];
 
   const fetchData = async (appId: number) => {
     try {
@@ -100,6 +97,7 @@ const EventReservationUnitDetails = (): JSX.Element | null => {
       setApplicationRound(applicationRoundResult);
       setReservations(reservationsResult);
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error(error);
     } finally {
       setIsLoading(false);
@@ -111,6 +109,8 @@ const EventReservationUnitDetails = (): JSX.Element | null => {
       fetchData(Number(applicationId));
     }
   }, [applicationId]);
+
+  if (!params) return <CenterSpinner />;
 
   if (!isBrowser) return null;
 
