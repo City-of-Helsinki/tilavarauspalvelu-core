@@ -24,6 +24,7 @@ jobs:
           node-version: "14"
       - name: Run style checks and tests
         run: |
+          ls -la
           yarn install --frozen-lockfile
           yarn lint
           yarn test
