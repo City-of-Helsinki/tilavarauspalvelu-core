@@ -35,3 +35,7 @@ yarn-error.log*
 
 # linting
 .eslintcache
+
+# local certs
+local-tilavaraus.crt
+local-tilavaraus.key
