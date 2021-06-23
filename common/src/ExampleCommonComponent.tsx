@@ -1,9 +1,7 @@
-import React from 'react';
+import React from "react";
 
-function Common() {
-  return (
-    <div>Hello from common!</div>
-  );
+function Common(): JSX.Element {
+  return <div>Hello from common!</div>;
 }
 
 export default Common;
