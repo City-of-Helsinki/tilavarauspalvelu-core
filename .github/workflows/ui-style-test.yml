@@ -1,11 +1,16 @@
-name: style-test
+name: ui-style-test
 
 on:
   push:
     branches: [main]
+    paths:
+      - "ui/**"
+      - ".github/workflows/ui-style-test.yml"
   pull_request:
     branches: [main]
-
+    paths:
+      - "ui/**"
+      - ".github/workflows/ui-style-test.yml"
 jobs:
   build:
     runs-on: ubuntu-latest

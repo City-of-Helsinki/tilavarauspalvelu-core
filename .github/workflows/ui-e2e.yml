@@ -1,10 +1,16 @@
-name: e2e
+name: ui-e2e
 
 on:
   push:
     branches: [main]
+    paths:
+      - "ui/**"
+      - ".github/workflows/ui-e2e.yml"
   pull_request:
     branches: [main]
+    paths:
+      - "ui/**"
+      - ".github/workflows/ui-e2e.yml"
 
 jobs:
   build:
