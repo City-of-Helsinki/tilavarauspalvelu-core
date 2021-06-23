@@ -426,6 +426,20 @@ def application(
 
 
 @pytest.fixture
+def application2(
+    purpose, organisation, person, application_round, user, billing_address
+) -> Application:
+    application = Application.objects.create(
+        organisation=organisation,
+        contact_person=person,
+        application_round=application_round,
+        user=user,
+        billing_address=billing_address,
+    )
+    return application
+
+
+@pytest.fixture
 def application_event(
     application, purpose, ten_to_15_age_group, hobbyist_ability_group
 ) -> ApplicationEvent:

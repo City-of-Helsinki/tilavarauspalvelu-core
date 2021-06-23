@@ -9,6 +9,7 @@ from applications.models import (
     ApplicationRound,
     ApplicationRoundBasket,
     ApplicationRoundStatus,
+    ApplicationStatus,
     City,
 )
 from permissions.api_permissions import ApplicationRoundPermission
@@ -98,6 +99,8 @@ class ApplicationRoundSerializer(serializers.ModelSerializer):
 
     approved_by = serializers.SerializerMethodField()
 
+    applications_sent = serializers.SerializerMethodField()
+
     class Meta:
         model = ApplicationRound
         fields = [
@@ -120,6 +123,7 @@ class ApplicationRoundSerializer(serializers.ModelSerializer):
             "is_admin",
             "aggregated_data",
             "approved_by",
+            "applications_sent",
         ]
         extra_kwargs = {
             "name": {
@@ -224,6 +228,15 @@ class ApplicationRoundSerializer(serializers.ModelSerializer):
         allocation_result_dict = self._get_allocation_result_summary(instance)
         allocation_result_dict.update(instance.aggregated_data_dict)
         return allocation_result_dict
+
+    def get_applications_sent(self, instance: ApplicationRound):
+        not_sent = instance.applications.filter(
+            cached_latest_status__in=[
+                ApplicationStatus.IN_REVIEW,
+                ApplicationStatus.REVIEW_DONE,
+            ]
+        ).exists()
+        return not not_sent
 
     def create(self, validated_data):
         request = self.context["request"] if "request" in self.context else None
