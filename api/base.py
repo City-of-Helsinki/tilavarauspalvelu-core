@@ -100,10 +100,11 @@ class TranslatedFieldSerializer(serializers.Serializer):
                 field_class = serializers.CharField
             translated_field = field_class(**field_kwargs)
             setattr(self, language_code, translated_field)
-            # Serializers have a metaclass that sets _declared_fields. We must add our
-            # translated fields there as well, otherwise they're not considered declared.
-            if language_code not in self._declared_fields:
-                self._declared_fields[language_code] = translated_field
+            # Dynamically add the translated fields to serializer fields.
+            # Note; not using _declared_fields since its a class based variable.
+            # So it changes the class not the instance, thus fields.
+            if language_code not in self.fields:
+                self.fields[language_code] = translated_field
         super().__init__(source="*")
 
 
