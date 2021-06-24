@@ -1,5 +1,8 @@
 name: ui-e2e
 
+defaults:
+  run:
+    working-directory: ui
 on:
   push:
     branches: [main]

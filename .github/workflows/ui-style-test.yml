@@ -1,5 +1,8 @@
 name: ui-style-test
 
+defaults:
+  run:
+    working-directory: ui
 on:
   push:
     branches: [main]
