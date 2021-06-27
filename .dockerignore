@@ -1,4 +1,7 @@
 # Blacklisted folders
 #################################################
 node_modules
+.next
+.yarn
+cypress
 
