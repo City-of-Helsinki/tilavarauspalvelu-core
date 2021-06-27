@@ -1,6 +1,5 @@
 name: ui-e2e
 
-defaults:
 on:
   push:
     branches: [main]
