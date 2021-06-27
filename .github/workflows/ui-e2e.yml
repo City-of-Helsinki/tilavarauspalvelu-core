@@ -28,6 +28,8 @@ jobs:
           docker run -e DISABLE_AUTH=true -e TILAVARAUS_API_URL=http://localhost:8000 -p 3000:3000 -d --name tilavaraus-ui-server tilavaraus-ui
       - name: Cypress e2e & a11y
         uses: cypress-io/github-action@v2
+        with:
+          project: ./ui
       - name: Upload images on failure
         uses: actions/upload-artifact@v1
         if: failure()
