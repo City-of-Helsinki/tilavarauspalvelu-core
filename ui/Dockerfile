@@ -13,6 +13,7 @@ RUN yarn policies set-version $YARN_VERSION
 #RUN apk add --no-cache libc6-compat
 WORKDIR /app
 COPY package.json yarn.lock ./
+COPY ui/package.json ./ui/package.json
 RUN yarn install --frozen-lockfile
 
 # Rebuild the source code only when needed
@@ -25,10 +26,13 @@ ENV NPM_CONFIG_LOGLEVEL warn
 
 ENV YARN_VERSION 1.22.5
 RUN yarn policies set-version $YARN_VERSION
-WORKDIR /app
-COPY . .
+WORKDIR /app/ui
+COPY ui .
 
-COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/node_modules /app/node_modules
+COPY --from=deps /app/yarn.lock /app/yarn.lock
+COPY --from=deps /app/package.json /app/package.json
+COPY --from=deps /app/ui/package.json /app/ui/package.json
 RUN yarn build && yarn install --production --ignore-scripts --prefer-offline
 
 # Production image, copy all the files and run next
@@ -41,16 +45,16 @@ ENV NPM_CONFIG_LOGLEVEL warn
 
 ENV YARN_VERSION 1.22.5
 RUN yarn policies set-version $YARN_VERSION
-WORKDIR /app
+WORKDIR /app/ui
 
 ENV NODE_ENV production
-run ls /app/
-COPY --from=builder /app/next.config.js ./
-COPY --from=builder /app/next-i18next.config.js ./
-COPY --from=builder /app/public ./public
-COPY --from=builder --chown=default:root /app/.next ./.next
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/ui/next.config.js ./
+COPY --from=builder /app/ui/next-i18next.config.js ./
+COPY --from=builder /app/ui/public ./public
+COPY --from=builder --chown=default:root /app//ui/.next ./.next
+COPY --from=builder /app/node_modules /app/node_modules
+COPY --from=builder /app/ui/package.json /app/ui/package.json
+COPY --from=builder /app/package.json /app/package.json
 
 USER default
 
@@ -58,5 +62,3 @@ EXPOSE 3000
 
 ENV NEXT_TELEMETRY_DISABLED 1
 CMD ["yarn", "start"]
-
-
