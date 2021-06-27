@@ -35,13 +35,13 @@ jobs:
         if: failure()
         with:
           name: cypress-screenshots
-          path: cypress/screenshots
+          path: ui/cypress/screenshots
       - name: Upload videos
         uses: actions/upload-artifact@v1
         if: always()
         with:
           name: cypress-videos
-          path: cypress/videos
+          path: ui/cypress/videos
       - name: Stop container
         run: |
           docker stop tilavaraus-ui-server
