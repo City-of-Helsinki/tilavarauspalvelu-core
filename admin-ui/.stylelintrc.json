@@ -12,7 +12,7 @@
 		true,
 		{
 		  "importFrom": [
-			  "node_modules/hds-core/lib/base.css",
+			  "../node_modules/hds-core/lib/base.css",
 			  "src/variables.css"
 		  ]
 		}
