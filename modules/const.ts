@@ -79,16 +79,23 @@ export const defaultDuration = "01:30:00";
 
 export const isBrowser = typeof window !== "undefined";
 
-const { publicRuntimeConfig } = getConfig();
+const { serverRuntimeConfig, publicRuntimeConfig } = getConfig();
 
 export const {
   sentryDSN,
   matomoEnabled,
   sentryEnvironment,
-  apiBaseUrl,
-  authEnabled,
   oidcClientId,
   oidcUrl,
   oidcScope,
   apiScope,
 } = publicRuntimeConfig;
+
+console.log(isBrowser, publicRuntimeConfig, serverRuntimeConfig);
+
+export const apiBaseUrl = isBrowser
+  ? publicRuntimeConfig.apiBaseUrl
+  : serverRuntimeConfig.apiBaseUrl;
+export const authEnabled = isBrowser
+  ? publicRuntimeConfig.authEnabled
+  : serverRuntimeConfig.authEnabled;

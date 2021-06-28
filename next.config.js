@@ -2,6 +2,10 @@ const { i18n } = require("./next-i18next.config");
 
 module.exports = {
   i18n,
+  serverRuntimeConfig: {
+    apiBaseUrl: process.env.TILAVARAUS_API_URL,
+    authEnabled: process.env.DISABLE_AUTH !== "true",
+  },
   publicRuntimeConfig: {
     apiBaseUrl: process.env.TILAVARAUS_API_URL,
     authEnabled: process.env.DISABLE_AUTH !== "true",
