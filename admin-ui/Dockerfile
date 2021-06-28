@@ -18,7 +18,7 @@ COPY package.json yarn.lock /opt/app-root/src/
 RUN yarn && yarn cache clean --force
 
 # Copy all files
-COPY . .
+COPY admin-ui .
 
 # Build application
 RUN yarn build

@@ -2,8 +2,9 @@
     "name": "tilavarauspalvelu",
     "private": true,
     "workspaces": [
-        "ui",
-        "common"
+        "common",
+	"ui",
+        "admin-ui"
     ],
     "version": "1.0.0",
     "main": "index.js",

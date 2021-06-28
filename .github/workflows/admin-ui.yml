@@ -1,13 +1,23 @@
 # This workflow will do a clean install of node dependencies, build the source code and run tests against node 14
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
 
-name: CI
+name: admin-ui
+
+defaults:
+  run:
+    working-directory: admin-ui
 
 on:
   push:
     branches: [main]
+    paths:
+      - "admin-ui/**"
+      - ".github/workflows/admin-ui.yml"
   pull_request:
     branches: [main]
+    paths:
+      - "admin-ui/**"
+      - ".github/workflows/admin-ui.yml"
 
 jobs:
   build:
@@ -26,4 +36,5 @@ jobs:
           yarn lint:css
           yarn build
           yarn test
-          docker build -t tilavaraus-admin-ui .
+          cd ..
+          docker build .f admin-ui/Dockerfile -t tilavaraus-admin-ui .
