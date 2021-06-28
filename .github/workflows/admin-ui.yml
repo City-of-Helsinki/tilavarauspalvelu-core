@@ -37,4 +37,4 @@ jobs:
           yarn build
           yarn test
           cd ..
-          docker build .f admin-ui/Dockerfile -t tilavaraus-admin-ui .
+          docker build -f admin-ui/Dockerfile -t tilavaraus-admin-ui .
