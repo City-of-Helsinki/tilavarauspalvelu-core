@@ -26,6 +26,7 @@ jobs:
           node-version: "14"
       - name: Run style checks and client tests
         run: |
+          yarn set version berry
           yarn install --frozen-lockfile
           yarn lint
           yarn build
