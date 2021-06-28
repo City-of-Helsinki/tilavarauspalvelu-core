@@ -34,6 +34,7 @@ jobs:
           python3 -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install bandit
+          pip install safety
       - name: Lint with flake8
         run: |
           # stop the build if there are Python syntax errors or undefined names
@@ -46,6 +47,9 @@ jobs:
       - name: bandit check
         run : |
           bandit -a vuln --exclude "tests" -r .
+      - name: Safety check
+        run : |
+          safety check --full-report
       - name: Test with pytest
         env:
           DATABASE_URL: postgis://tvp:tvp@localhost/tvp
