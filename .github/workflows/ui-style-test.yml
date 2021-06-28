@@ -27,7 +27,7 @@ jobs:
       - name: Run style checks and client tests
         run: |
           yarn set version berry
-          yarn install --frozen-lockfile
+          yarn install --immutable
           yarn lint
           yarn build
           yarn test
