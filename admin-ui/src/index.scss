@@ -1,0 +1,42 @@
+@import "~hds-core/lib/base.css";
+@import "~hds-design-tokens/lib/all.scss";
+@import "font";
+@import "variables";
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  &.noScroll {
+    &.scrollbarActive {
+      padding-right: 16px;
+    }
+
+    overflow: hidden;
+  }
+
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-white);
+  font-family: var(--font-default);
+  font-size: 16px;
+  min-width: 320px;
+  color: var(--tilavaraus-admin-content-text-color);
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  text-underline-offset: 2px;
+}
+
+#root {
+  display: flex;
+  padding: 0;
+  flex-direction: column;
+  align-items: flex-start;
+}

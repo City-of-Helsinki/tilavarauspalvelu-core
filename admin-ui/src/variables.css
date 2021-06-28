@@ -1,0 +1,23 @@
+:root {
+  --tilavaraus-admin-brand: #00005e;
+  --tilavaraus-admin-blue: var(--color-bus);
+  --tilavaraus-admin-blue-dark: #040091;
+  --tilavaraus-admin-header-background-color: var(--tilavaraus-admin-brand);
+  --tilavaraus-admin-header-color: white;
+  --tilavaraus-admin-background-color: white;
+  --tilavaraus-admin-content-text-color: #1a1a1a;
+  --tilavaraus-admin-gray: #f5f6f8;
+  --tilavaraus-admin-gray-darker: #f0f1f4;
+  --tilavaraus-ui-gray: var(--color-black-40);
+  --container-width-xxl: 1440px;
+  --main-menu-width: 240px;
+  --ingress-container-width: 1080px;
+  --tilavaraus-admin-font: "HelsinkiGrotesk", var(--font-default);
+  --tilavaraus-admin-font-medium: "HelsinkiGrotesk-Medium", var(--font-default);
+  --tilavaraus-admin-font-bold: "HelsinkiGrotesk-Bold", var(--font-default);
+  --tilavaraus-admin-stack-modal: 1000;
+  --tilavaraus-admin-stack-seranwrap: 900;
+  --tilavaraus-admin-stack-dialog: 800;
+  --tilavaraus-admin-sticky-header: 700;
+  --tilavaraus-admin-stack-main-menu: 500;
+}
