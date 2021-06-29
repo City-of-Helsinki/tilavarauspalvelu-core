@@ -42,7 +42,7 @@ const TimeSelectionButton = styled.button<{
         ? "var(--tilavaraus-calendar-selected)"
         : "var(--border-color)"};
   border-top: ${(props) =>
-    props.firstrow ? "1px solid var(--border-color)" : "none"};
+    props.firstRow ? "1px solid var(--border-color)" : "none"};
   white-space: nowrap;
 `;
 
