@@ -1,0 +1,40 @@
+# This workflow will do a clean install of node dependencies, build the source code and run tests against node 14
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+
+name: admin-ui
+
+defaults:
+  run:
+    working-directory: admin-ui
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "admin-ui/**"
+      - ".github/workflows/admin-ui.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "admin-ui/**"
+      - ".github/workflows/admin-ui.yml"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js lts/fermium (14)
+        uses: actions/setup-node@v2-beta
+        with:
+          node-version: "14"
+      - name: Run CI checks
+        run: |
+          yarn install --frozen-lockfile
+          yarn lint
+          yarn lint:css
+          yarn build
+          yarn test
+          cd ..
+          docker build -f admin-ui/Dockerfile -t tilavaraus-admin-ui .
