@@ -26,7 +26,7 @@ Make sure /etc/hosts point domain local-tilavaraus.hel.fi to 127.0.0.1. This is 
 127.0.0.1       local-tilavaraus.hel.fi
 ```
 
-Create a self-signed certificate for SSL connection on developpment server:
+Create a self-signed certificate for SSL connection on developpment server and copy to /common/certificates:
 ```
 openssl req -x509 -out local-tilavaraus.crt -keyout local-tilavaraus.key \
   -newkey rsa:2048 -nodes -sha256 \

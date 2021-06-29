@@ -8,8 +8,8 @@ const app = next({ dev });
 const handle = app.getRequestHandler();
 
 const httpsOptions = {
-  key: fs.readFileSync("./local-tilavaraus.key"),
-  cert: fs.readFileSync("./local-tilavaraus.crt"),
+  key: fs.readFileSync("../common/certificates/local-tilavaraus.key"),
+  cert: fs.readFileSync("../common/certificates/local-tilavaraus.crt"),
 };
 
 app.prepare().then(() => {
