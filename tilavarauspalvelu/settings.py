@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 
 import logging
 import os
-import subprocess
+import subprocess  # nosec
 
 import environ
 import sentry_sdk
@@ -33,7 +33,7 @@ def get_git_revision_hash() -> str:
     """
     try:
         # We are not interested in gits complaints
-        git_hash = subprocess.check_output(
+        git_hash = subprocess.check_output(  # nosec
             ["git", "rev-parse", "HEAD"], stderr=subprocess.DEVNULL, encoding="utf8"
         )
     # ie. "git" was not found
@@ -190,7 +190,7 @@ if DEBUG is True and env("SECRET_KEY") == "":
     logger.warning(
         "Running in debug mode without proper secret key. Fix if not intentional"
     )
-    SECRET_KEY = "example_secret"
+    SECRET_KEY = "example_secret"  # nosec
 else:
     SECRET_KEY = env("SECRET_KEY")
 
@@ -363,7 +363,7 @@ local_settings_path = os.path.join(BASE_DIR, "local_settings.py")
 if os.path.exists(local_settings_path):
     with open(local_settings_path) as fp:
         code = compile(fp.read(), local_settings_path, "exec")
-    exec(code, globals(), locals())
+    exec(code, globals(), locals())  # nosec
 
 if TMP_PERMISSIONS_DISABLED and not DEBUG:
     logging.error("Running with permissions disabled in production environment.")
