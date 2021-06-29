@@ -52,7 +52,6 @@ async function request<T>(requestConfig: AxiosRequestConfig): Promise<T> {
     return response.data;
   } catch (error) {
     const errorMessage: string | undefined = error.response?.data?.detail;
-    console.log(error);
     if (errorMessage) {
       throw new ApiError(errorMessage, error.response?.status);
     } else {

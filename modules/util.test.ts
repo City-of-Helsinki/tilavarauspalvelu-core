@@ -6,6 +6,7 @@ import {
 } from "./util";
 
 jest.mock("next/config", () => () => ({
+  serverRuntimeConfig: {},
   publicRuntimeConfig: {},
 }));
 

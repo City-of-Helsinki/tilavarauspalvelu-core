@@ -91,8 +91,6 @@ export const {
   apiScope,
 } = publicRuntimeConfig;
 
-console.log(isBrowser, publicRuntimeConfig, serverRuntimeConfig);
-
 export const apiBaseUrl = isBrowser
   ? publicRuntimeConfig.apiBaseUrl
   : serverRuntimeConfig.apiBaseUrl;
