@@ -1,0 +1,29 @@
+name: common-style-test
+
+defaults:
+  run:
+    working-directory: common
+on:
+  push:
+    branches: [main]
+    paths:
+      - "common/**"
+      - ".github/workflows/common-style-test.yml"
+  pull_request:
+    paths:
+      - "common/**"
+      - ".github/workflows/common-style-test.yml"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js lts/fermium (14)
+        uses: actions/setup-node@v2-beta
+        with:
+          node-version: "14"
+      - name: Run style checks and tests
+        run: |
+          yarn install --frozen-lockfile
+          yarn lint

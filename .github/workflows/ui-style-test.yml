@@ -1,11 +1,19 @@
-name: style-test
+name: ui-style-test
 
+defaults:
+  run:
+    working-directory: ui
 on:
   push:
     branches: [main]
+    paths:
+      - "ui/**"
+      - ".github/workflows/ui-style-test.yml"
   pull_request:
     branches: [main]
-
+    paths:
+      - "ui/**"
+      - ".github/workflows/ui-style-test.yml"
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -21,4 +29,4 @@ jobs:
           yarn install --frozen-lockfile
           yarn lint
           yarn build
-          yarn test
+          #yarn test
