@@ -413,3 +413,10 @@ export interface ReservationUnitCapacity {
 export interface ReservationUnitCalendarUrl {
   calendarUrl: string;
 }
+
+export interface UnitWIP {
+  id: number;
+  name: string;
+  service: string;
+  area: string;
+}

@@ -33,6 +33,8 @@ import { ReactComponent as IconOpenAll } from "../images/icon_open-all.svg";
 import { ReactComponent as IconActivateSelection } from "../images/icon_select.svg";
 import { ReactComponent as IconDisableSelection } from "../images/icon_unselect.svg";
 import { truncatedText } from "../styles/typography";
+import FilterContainer, { FilterBtn } from "./FilterContainer";
+import { filterData } from "../common/util";
 
 export type OrderTypes = "asc" | "desc";
 
@@ -77,67 +79,6 @@ interface IToggleableButton {
 }
 
 const Wrapper = styled.div``;
-
-const Filters = styled.div`
-  & > button {
-    margin-right: var(--spacing-m);
-
-    span {
-      display: none;
-
-      @media (min-width: ${breakpoints.s}) {
-        display: inline;
-      }
-    }
-  }
-
-  svg {
-    display: inline;
-    min-width: 20px;
-  }
-
-  background-color: var(--tilavaraus-admin-gray);
-  padding: 0 var(--spacing-xl);
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  height: 56px;
-  position: sticky;
-  top: 0;
-  z-index: var(--tilavaraus-admin-sticky-header);
-`;
-
-interface IFilterBtn {
-  $filterControlsAreOpen: boolean;
-  $filtersActive: boolean;
-}
-
-const FilterBtn = styled(Button).attrs(
-  ({ $filterControlsAreOpen, $filtersActive }: IFilterBtn) => ({
-    style: {
-      "--filter-button-color": $filtersActive
-        ? "var(--tilavaraus-admin-blue-dark)"
-        : $filterControlsAreOpen
-        ? "var(--color-silver)"
-        : "transparent",
-      "--color-bus": "var(--filter-button-color)",
-      "--color-bus-dark": "var(--filter-button-color)",
-      "--color-white": $filtersActive
-        ? "white"
-        : "var(--tilavaraus-admin-content-text-color)",
-      "--background-color-disabled": "transparent",
-      "--border-color-disabled": "transparent",
-      "--color-disabled": "var(--color-black-50)",
-    } as React.CSSProperties,
-  })
-)<IFilterBtn>`
-  ${({ $filtersActive }) =>
-    $filtersActive &&
-    `
-    font-family: var(--tilavaraus-admin-font-bold);
-    font-weight: bold;
-  `}
-`;
 
 const tableBorder = (size = "0.5em"): string =>
   `${size} solid var(--tilavaraus-admin-gray)`;
@@ -430,16 +371,7 @@ const processData = (
   return groups.map((group) => {
     let data;
     if (filters.length > 0) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const filteredData = group.data.filter((row: any): boolean => {
-        return (
-          filters.filter(
-            (filter): boolean => get(row, filter.key) === filter.value
-          ).length === filters.length
-        );
-      });
-
-      data = filteredData;
+      data = filterData(group.data, filters);
     } else {
       data = group.data;
     }
@@ -590,7 +522,7 @@ function DataTable({
   return (
     <Wrapper className={className}>
       {config.filtering && (
-        <Filters>
+        <FilterContainer>
           {config.rowFilters && (
             <>
               <FilterBtn
@@ -682,7 +614,7 @@ function DataTable({
               )}
             </ToggleVisibilityBtn>
           )}
-        </Filters>
+        </FilterContainer>
       )}
       <TableWrapper>
         <Table data-testid="data-table">
