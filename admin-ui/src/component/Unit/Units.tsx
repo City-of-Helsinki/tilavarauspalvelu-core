@@ -129,7 +129,7 @@ const Units = (): JSX.Element => {
       )}
       <UnitList>
         {filteredResults.map((unit) => (
-          <UnitCard unit={unit} />
+          <UnitCard unit={unit} key={unit.id} />
         ))}
       </UnitList>
       {errorMsg && (
