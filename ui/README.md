@@ -7,19 +7,31 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 1. Node lts/fermium (`nvm use`)
 1. Yarn
 
+### Recommended editor/IDE tooling
+- eslint
+- prettier
+- stylelint
+
 ## Developing locally
 
 First check out the latest version of the backend/api project from https://github.com/City-of-Helsinki/tilavarauspalvelu-core and change current directory to backend project and start it:
 
 ```
 docker-compose up --build
-
 ```
 
 Make sure /etc/hosts point domain local-tilavaraus.hel.fi to 127.0.0.1. This is important because tunnistamo currently does not provide SameSite information for the cookies it uses. Some browsers (like Chrome) default the SameSite to be Lax. Because of this tunnistamo and the site it is authenticating for need to share same-site context. Without fulfilling this requirement the silent renew might not work properly due to browser blocking required cookies.
 
 ```
 127.0.0.1       local-tilavaraus.hel.fi
+```
+
+Create a self-signed certificate for SSL connection on developpment server and copy to /common/certificates:
+```
+openssl req -x509 -out local-tilavaraus.crt -keyout local-tilavaraus.key \
+  -newkey rsa:2048 -nodes -sha256 \
+  -subj '/CN=local-tilavaraus' -extensions EXT -config <( \
+   printf "[dn]\nCN=local-tilavaraus\n[req]\ndistinguished_name = dn\n[EXT]\nsubjectAltName=DNS:local-tilavaraus\nkeyUsage=digitalSignature\nextendedKeyUsage=serverAuth")
 ```
 
 Start UI
@@ -32,11 +44,6 @@ yarn start
 
 UI is at https://local-tilavaraus.hel.fi:3000/
 Backend is at http://127.0.0.1:8000/v1/
-
-### Recommended editor/IDE tooling
-- eslint
-- prettier
-- stylelint
 
 ### Test data
 

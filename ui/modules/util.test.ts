@@ -5,6 +5,11 @@ import {
   applicationRoundState,
 } from "./util";
 
+jest.mock("next/config", () => () => ({
+  serverRuntimeConfig: {},
+  publicRuntimeConfig: {},
+}));
+
 const cell = (hour: number, state = true): Cell => ({
   label: "cell",
   key: "key",

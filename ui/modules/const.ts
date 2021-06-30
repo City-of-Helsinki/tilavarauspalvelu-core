@@ -1,3 +1,4 @@
+import getConfig from "next/config";
 import { OptionType } from "./types";
 
 export const weekdays = [
@@ -78,24 +79,21 @@ export const defaultDuration = "01:30:00";
 
 export const isBrowser = typeof window !== "undefined";
 
-export const sentryDSN = process.env.NEXT_PUBLIC_SENTRY_DSN;
+const { serverRuntimeConfig, publicRuntimeConfig } = getConfig();
 
-export const matomoEnabled = process.env.NEXT_PUBLIC_ENABLE_MATOMO === "true";
-
-export const sentryEnvironment = process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT;
+export const {
+  sentryDSN,
+  matomoEnabled,
+  sentryEnvironment,
+  oidcClientId,
+  oidcUrl,
+  oidcScope,
+  apiScope,
+} = publicRuntimeConfig;
 
 export const apiBaseUrl = isBrowser
-  ? window.config?.apiBaseUrl
-  : process.env.TILAVARAUS_API_URL;
-
+  ? publicRuntimeConfig.apiBaseUrl
+  : serverRuntimeConfig.apiBaseUrl;
 export const authEnabled = isBrowser
-  ? window.config?.authEnabled
-  : process.env.DISABLE_AUTH !== "true";
-
-export const oidcClientId = process.env.NEXT_PUBLIC_OIDC_CLIENT_ID;
-
-export const oidcUrl = process.env.NEXT_PUBLIC_OIDC_URL;
-
-export const oidcScope = process.env.NEXT_PUBLIC_OIDC_SCOPE;
-
-export const apiScope = process.env.NEXT_PUBLIC_TILAVARAUS_API_SCOPE;
+  ? publicRuntimeConfig.authEnabled
+  : serverRuntimeConfig.authEnabled;

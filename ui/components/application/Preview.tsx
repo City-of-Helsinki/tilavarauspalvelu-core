@@ -303,11 +303,11 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
       <SmallSubHeadline>
         {t("application:preview.termsOfService")}
       </SmallSubHeadline>
-      <Terms tabIndex="0">{tos}</Terms>
+      <Terms tabIndex={0}>{tos}</Terms>
       <SmallSubHeadline>
         {t("application:preview.reservationUnitTerms")}
       </SmallSubHeadline>
-      <Terms tabIndex="0">{spaceTos}</Terms>
+      <Terms tabIndex={0}>{spaceTos}</Terms>
       <CheckboxContainer>
         <Checkbox
           id="preview.acceptTermsOfUse"
