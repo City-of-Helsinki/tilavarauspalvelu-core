@@ -30,9 +30,10 @@ RUN yarn build
 # Production image, copy all the files and run next
 FROM registry.access.redhat.com/ubi8/nodejs-14  AS runner
 USER root
-RUN npm install --global yarn &&\
-  yarn set version 1.22.10 &&\
-  chown -R default:root /opt/app-root/src
+RUN curl --silent --location https://dl.yarnpkg.com/rpm/yarn.repo | tee /etc/yum.repos.d/yarn.repo
+RUN yum -y install yarn
+USER default
+RUN yarn policies set-version 1.22.10
 
 ENV NPM_CONFIG_LOGLEVEL warn
 
@@ -46,8 +47,6 @@ COPY --from=builder --chown=default:root /app/ui/.next ./.next
 COPY --from=builder /app/node_modules /app/node_modules
 COPY --from=builder /app/ui/package.json /app/ui/package.json
 COPY --from=builder /app/package.json /app/package.json
-
-RUN chown -R default:root /opt/app-root
 
 USER default
 
