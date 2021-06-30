@@ -75,6 +75,7 @@ const Navigation = ({ profile, logout }: Props): JSX.Element => {
     <>
       <StyledNavigation
         title={t("common:applicationName")}
+        onTitleClick={() => router.push("/")}
         menuToggleAriaLabel="Menu"
         skipTo="#main"
         skipToContentLabel={t("navigation:skipToMainContent")}
