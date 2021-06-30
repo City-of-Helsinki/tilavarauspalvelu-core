@@ -25,7 +25,7 @@ COPY --from=deps /app/node_modules /app/node_modules
 COPY --from=deps /app/yarn.lock /app/yarn.lock
 COPY --from=deps /app/package.json /app/package.json
 COPY --from=deps /app/ui/package.json /app/ui/package.json
-RUN yarn build && yarn install --production --ignore-scripts --prefer-offlinepwd --frozen-lockfile
+RUN yarn build
 
 # Production image, copy all the files and run next
 FROM registry.access.redhat.com/ubi8/nodejs-14  AS runner
