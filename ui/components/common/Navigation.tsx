@@ -75,18 +75,19 @@ const Navigation = ({ profile, logout }: Props): JSX.Element => {
     <>
       <StyledNavigation
         title={t("common:applicationName")}
+        onTitleClick={() => router.push("/")}
         menuToggleAriaLabel="Menu"
         skipTo="#main"
         skipToContentLabel={t("navigation:skipToMainContent")}
       >
         <HDSNavigation.Row variant="inline">
           <HDSNavigation.Item
-            label={t("navigation:Item.spaceReservation")}
-            onClick={() => router.push("/")}
-          />
-          <HDSNavigation.Item
             label={t("navigation:Item.reservationUnitSearch")}
             onClick={() => router.push("/search")}
+          />
+          <HDSNavigation.Item
+            label={t("navigation:Item.spaceReservation")}
+            onClick={() => router.push("/")}
           />
           {profile ? (
             <HDSNavigation.Item
