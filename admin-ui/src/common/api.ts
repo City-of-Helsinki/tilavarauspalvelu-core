@@ -17,6 +17,7 @@ import {
   ReservationStatus,
   ReservationUnitCapacity,
   ReservationUnitCalendarUrl,
+  UnitWIP,
 } from "./types";
 
 const apiBaseUrl: string = process.env.REACT_APP_TILAVARAUS_API_URL || "";
@@ -431,4 +432,28 @@ export function getReservationUnitCalendarUrl(
   return apiGet({
     path: `v1/${reservationUnitCalendarUrlBasePath}/${reservationUnitId}`,
   });
+}
+
+export async function getUnits(): Promise<UnitWIP[]> {
+  const result = [
+    {
+      id: 1,
+      name: "Toimipiste #1",
+      service: "Palvelu",
+      area: "",
+    },
+    {
+      id: 2,
+      name: "Toimipiste #2",
+      service: "",
+      area: "Alue",
+    },
+    {
+      id: 3,
+      name: "Toimipiste #3",
+      service: "Palvelu #2",
+      area: "Alue #2",
+    },
+  ];
+  return result;
 }

@@ -156,6 +156,7 @@ const translations: ITranslations = {
     spaceAndHobbyTypes: ["Tila- ja harrastetyypit"],
     applicationRounds: ["Hakukierrokset"],
     conditionsAndAttachments: ["Ehdot ja liitteet"],
+    units: ["Toimipisteet"],
   },
   HeadingMenu: {
     recurringReservations: ["Vakiovuorot"],
@@ -613,6 +614,20 @@ const translations: ITranslations = {
         "Et pysty siirron jälkeen enää tekemään käsittelyä, joten odota esihenkilöpäätöstä. Asiakkaat saavat päätökset, jos esihenkilö hyväksyy vuoroajan.",
       ],
     },
+  },
+  Unit: {
+    headings: {
+      service: ["Palvelut"],
+      area: ["Alue"],
+    },
+    reservationUnits: ["{{count}} varausyksikkö"],
+    reservationUnits_plural: ["{{count}} varausyksikköä"],
+    noReservationUnits: ["Ei varausyksiköitä"],
+    noArea: ["Alue puuttuu"],
+    noService: ["Palvelu puuttuu"],
+    unitCount: ["{{count}} toimipiste"],
+    unitCount_plural: ["{{count}} toimipistettä"],
+    noUnits: ["Ei toimipisteitä"],
   },
 };
 
