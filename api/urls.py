@@ -1,4 +1,5 @@
 from django.urls import path
+from django.views.decorators.csrf import csrf_exempt
 from graphene_django.views import GraphQLView
 from rest_framework import routers
 
@@ -14,6 +15,7 @@ from .applications_api.views import (
 )
 from .city_api import CityViewSet
 from .declined_reservation_units_api import DeclinedReservationUnitViewSet
+from .graphql.schema import schema
 from .hauki_api import OpeningHoursViewSet
 from .ical_api import (
     ApplicationEventIcalViewset,
@@ -115,7 +117,6 @@ router.register(
 )
 router.register(r"parameters/city", CityViewSet, "city")
 
-
 urlpatterns = [
-    path("graphql/", GraphQLView.as_view(graphiql=True)),
+    path("graphql/", csrf_exempt(GraphQLView.as_view(schema=schema, graphiql=True))),
 ]
