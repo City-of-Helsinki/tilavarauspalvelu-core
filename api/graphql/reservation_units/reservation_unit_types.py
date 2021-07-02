@@ -12,8 +12,8 @@ from reservation_units.models import (
     Purpose,
     ReservationUnit,
     ReservationUnitImage,
-    ReservationUnitType,
 )
+from reservation_units.models import ReservationUnitType as ReservationUnitTypeModel
 from resources.models import Resource
 from spaces.models import Space
 
@@ -58,7 +58,7 @@ class ReservationUnitImageType(DjangoObjectType):
 
 class ReservationUnitTypeType(DjangoObjectType):
     class Meta:
-        model = ReservationUnitType
+        model = ReservationUnitTypeModel
         fields = ["name", "id"]
 
 
@@ -84,7 +84,6 @@ class ReservationUnitType(AuthNode, DjangoObjectType):
     spaces = graphene.List(SpaceType)
     resources = graphene.List(ResourceType)
     services = graphene.List(ServiceType)
-    location = graphene.String()
     purposes = graphene.List(PurposeType)
     images = graphene.List(ReservationUnitImageType)
     location = graphene.Field(LocationType)
