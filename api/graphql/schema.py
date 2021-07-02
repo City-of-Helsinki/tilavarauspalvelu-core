@@ -55,7 +55,7 @@ class BuildingType(DjangoObjectType):
 
     class Meta:
         model = Building
-        fields = ("id", "name", "district", "real_estate", "area")
+        fields = ("id", "name", "district", "real_estate", "surface_area")
 
 
 class SpaceType(DjangoObjectType):
@@ -66,7 +66,7 @@ class SpaceType(DjangoObjectType):
             "name",
             "parent",
             "building",
-            "area",
+            "surface_area",
         )
 
 
@@ -193,6 +193,7 @@ class ReservationUnitType(AuthNode, DjangoObjectType):
     reservation_unit_type = graphene.Field(ReservationUnitTypeType)
     equipment = graphene.List(EquipmentType)
     unit = graphene.Field(UnitType)
+    max_persons = graphene.Int()
 
     class Meta:
         model = ReservationUnit
@@ -204,7 +205,8 @@ class ReservationUnitType(AuthNode, DjangoObjectType):
             "resources",
             "services",
             "require_introduction",
-            "purposes" "images",
+            "purposes",
+            "images",
             "location",
             "max_persons",
             "reservation_unit_type",
@@ -250,6 +252,9 @@ class ReservationUnitType(AuthNode, DjangoObjectType):
 
     def resolve_unit(self, info):
         return self.unit
+
+    def resolve_max_persons(self, info):
+        return self.get_max_persons()
 
 
 class ReservationType(DjangoObjectType):

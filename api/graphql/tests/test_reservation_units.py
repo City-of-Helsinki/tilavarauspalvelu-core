@@ -5,13 +5,19 @@ from assertpy import assert_that
 from graphene_django.utils import GraphQLTestCase
 from rest_framework.test import APIClient
 
-from reservation_units.tests.factories import ReservationUnitFactory
+from reservation_units.tests.factories import (
+    ReservationUnitFactory,
+    ReservationUnitTypeFactory,
+)
 
 
 class ReservationUnitTestCase(GraphQLTestCase, snapshottest.TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.reservation_unit = ReservationUnitFactory(name="Test name")
+        type = ReservationUnitTypeFactory(name="Test type")
+        cls.reservation_unit = ReservationUnitFactory(
+            name="Test name", reservation_unit_type=type
+        )
 
         cls.api_client = APIClient()
 
@@ -23,10 +29,42 @@ class ReservationUnitTestCase(GraphQLTestCase, snapshottest.TestCase):
                     edges {
                         node {
                             name
+                            description
+                            spaces {
+                              name
+                            }
+                            resources {
+                              name
+                            }
+                            services {
+                              name
+                            }
+                            requireIntroduction
+                            purposes {
+                              name
+                            }
+                            images {
+                              imageUrl
+                              mediumUrl
+                              smallUrl
+                            }
+                            location {
+                              longitude
+                              latitude
+                            }
+                            maxPersons
+                            reservationUnitType {
+                              name
+                            }
+                            termsOfUse
+                            equipment {
+                              name
+                            }
+                            contactInformation
+                          }
                         }
                     }
                 }
-            }
             """
         )
 
