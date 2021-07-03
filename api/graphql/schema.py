@@ -9,6 +9,7 @@ from rest_framework.generics import get_object_or_404
 from api.graphql.reservation_units.reservation_unit_types import ReservationUnitType
 from api.graphql.reservations.reservation_types import ReservationType
 from reservation_units.models import ReservationUnit
+from api.graphql.resources.resource_types import ResourceType
 from reservations.forms import ReservationForm
 
 
@@ -27,6 +28,7 @@ class Query(graphene.ObjectType):
     reservation_units = DjangoFilterConnectionField(ReservationUnitType)
     reservation_unit = relay.Node.Field(ReservationUnitType)
     reservation_unit_by_pk = Field(ReservationUnitType, pk=graphene.Int())
+    resources = DjangoFilterConnectionField(ResourceType)
 
     def resolve_reservation_unit_by_pk(parent, info, **kwargs):
         pk = kwargs.get("pk")
