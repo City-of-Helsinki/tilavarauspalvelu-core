@@ -34,7 +34,6 @@ class Query(graphene.ObjectType):
         pk = kwargs.get("pk")
         return get_object_or_404(ReservationUnit, pk=pk)
 
-
 class Mutation(graphene.ObjectType):
     create_reservation = ReservationMutation.Field()
 

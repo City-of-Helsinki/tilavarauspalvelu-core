@@ -1,8 +1,11 @@
-from graphene_django import DjangoObjectType
+import graphene
 
+from api.graphql.base_type import PrimaryKeyObjectType
 from reservations.models import Reservation
 
 
-class ReservationType(DjangoObjectType):
+class ReservationType(PrimaryKeyObjectType):
     class Meta:
         model = Reservation
+
+        interfaces = (graphene.relay.Node,)
