@@ -34,7 +34,7 @@ class ReservationUnitImageType(DjangoObjectType):
 
     class Meta:
         model = ReservationUnitImage
-        fields = ["image_url", "medium_url", "small_url", "image_type"]
+        fields = ("image_url", "medium_url", "small_url", "image_type")
 
     def resolve_image_url(self, info):
         if not self.image:
@@ -59,13 +59,13 @@ class ReservationUnitImageType(DjangoObjectType):
 class ReservationUnitTypeType(DjangoObjectType):
     class Meta:
         model = ReservationUnitTypeModel
-        fields = ["name", "id"]
+        fields = ("name", "id")
 
 
 class EquipmentCategoryType(DjangoObjectType):
     class Meta:
         model = EquipmentCategory
-        fields = ["name", "id"]
+        fields = ("name", "id")
 
 
 class EquipmentType(DjangoObjectType):
@@ -73,7 +73,7 @@ class EquipmentType(DjangoObjectType):
 
     class Meta:
         model = Equipment
-        fields = ["name", "id"]
+        fields = ("name", "id")
 
     def resolve_category(self, info):
         return self.category

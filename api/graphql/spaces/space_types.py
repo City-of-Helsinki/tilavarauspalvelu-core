@@ -49,19 +49,19 @@ class LocationType(DjangoObjectType):
 
     class Meta:
         model = Location
-        fields = [
+        fields = (
             "address_street",
             "address_zip",
             "address_city",
             "longitude",
             "latitude",
-        ]
+        )
 
 
 class UnitType(DjangoObjectType):
     class Meta:
         model = Unit
-        fields = [
+        fields = (
             "id",
             "tprek_id",
             "name",
@@ -70,4 +70,4 @@ class UnitType(DjangoObjectType):
             "web_page",
             "email",
             "phone",
-        ]
+        )
