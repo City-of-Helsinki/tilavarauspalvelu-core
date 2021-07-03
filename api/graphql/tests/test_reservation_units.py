@@ -67,8 +67,9 @@ class ReservationUnitTestCase(GraphQLTestCase, snapshottest.TestCase):
                 }
             """
         )
-        assert_that(response.status_code).is_equal_to(200)
+
         content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
         self.assertMatchSnapshot(content)
 
     def test_should_be_able_to_find_by_pk(self):
@@ -80,8 +81,9 @@ class ReservationUnitTestCase(GraphQLTestCase, snapshottest.TestCase):
             f"}}"
         )
         response = self.query(query)
-        assert_that(response.status_code).is_equal_to(200)
+
         content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
         assert_that(
             content.get("data").get("reservationUnitByPk").get("pk")
         ).is_equal_to(self.reservation_unit.id)
