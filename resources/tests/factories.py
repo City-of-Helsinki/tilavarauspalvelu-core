@@ -11,3 +11,4 @@ class ResourceFactory(DjangoModelFactory):
 
     name = FuzzyText()
     space = SubFactory(SpaceFactory)
+    location_type = "fixed"

@@ -20,3 +20,13 @@ class ResourceType(PrimaryKeyObjectType):
         )
 
         interfaces = (graphene.relay.Node,)
+
+    def resolve_buffer_time_before(self, info):
+        if self.buffer_time_before is None:
+            return None
+        return self.buffer_time_before.total_seconds()
+
+    def resolve_buffer_time_after(self, info):
+        if self.buffer_time_after is None:
+            return None
+        return self.buffer_time_after.total_seconds()
