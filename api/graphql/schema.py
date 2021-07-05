@@ -8,8 +8,8 @@ from rest_framework.generics import get_object_or_404
 
 from api.graphql.reservation_units.reservation_unit_types import ReservationUnitType
 from api.graphql.reservations.reservation_types import ReservationType
-from reservation_units.models import ReservationUnit
 from api.graphql.resources.resource_types import ResourceType
+from reservation_units.models import ReservationUnit
 from reservations.forms import ReservationForm
 from resources.models import Resource
 

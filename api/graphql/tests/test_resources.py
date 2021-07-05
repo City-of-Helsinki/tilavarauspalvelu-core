@@ -27,11 +27,9 @@ class ResourceGraphQLTestCase(GraphQLTestCase, snapshottest.TestCase):
                   node {
                     name
                     space {
-                      pk
                       name
                     }
                     building {
-                      pk
                       name
                     }
                     locationType

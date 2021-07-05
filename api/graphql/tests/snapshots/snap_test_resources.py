@@ -20,7 +20,6 @@ snapshots['ResourceGraphQLTestCase::test_getting_resources_with_null_buffer_time
                         'name': 'Test resource',
                         'space': {
                             'name': 'Test space',
-                            'pk': 1
                         }
                     }
                 }
