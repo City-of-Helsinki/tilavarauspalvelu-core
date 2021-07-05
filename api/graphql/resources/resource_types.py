@@ -19,6 +19,10 @@ class ResourceType(PrimaryKeyObjectType):
             "buffer_time_after",
         )
 
+        filter_fields = {
+            "name": ["exact", "icontains", "istartswith"],
+        }
+
         interfaces = (graphene.relay.Node,)
 
     def resolve_buffer_time_before(self, info):
