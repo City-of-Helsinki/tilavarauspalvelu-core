@@ -1,22 +1,26 @@
 import graphene
-from graphene_django import DjangoObjectType
 
+from api.graphql.base_type import PrimaryKeyObjectType
 from spaces.models import Building, District, Location, RealEstate, Space, Unit
 
 
-class DistrictType(DjangoObjectType):
+class DistrictType(PrimaryKeyObjectType):
     class Meta:
         model = District
         fields = ("id", "name")
 
+        interfaces = (graphene.relay.Node,)
 
-class RealEstateType(DjangoObjectType):
+
+class RealEstateType(PrimaryKeyObjectType):
     class Meta:
         model = RealEstate
         fields = ("id", "name", "district", "area")
 
+        interfaces = (graphene.relay.Node,)
 
-class BuildingType(DjangoObjectType):
+
+class BuildingType(PrimaryKeyObjectType):
     district = DistrictType()
     real_estate = RealEstateType()
 
@@ -24,8 +28,10 @@ class BuildingType(DjangoObjectType):
         model = Building
         fields = ("id", "name", "district", "real_estate", "surface_area")
 
+        interfaces = (graphene.relay.Node,)
 
-class SpaceType(DjangoObjectType):
+
+class SpaceType(PrimaryKeyObjectType):
     class Meta:
         model = Space
         fields = (
@@ -36,8 +42,10 @@ class SpaceType(DjangoObjectType):
             "surface_area",
         )
 
+        interfaces = (graphene.relay.Node,)
 
-class LocationType(DjangoObjectType):
+
+class LocationType(PrimaryKeyObjectType):
     longitude = graphene.String()
     latitude = graphene.String()
 
@@ -49,19 +57,21 @@ class LocationType(DjangoObjectType):
 
     class Meta:
         model = Location
-        fields = [
+        fields = (
             "address_street",
             "address_zip",
             "address_city",
             "longitude",
             "latitude",
-        ]
+        )
+
+        interfaces = (graphene.relay.Node,)
 
 
-class UnitType(DjangoObjectType):
+class UnitType(PrimaryKeyObjectType):
     class Meta:
         model = Unit
-        fields = [
+        fields = (
             "id",
             "tprek_id",
             "name",
@@ -70,4 +80,6 @@ class UnitType(DjangoObjectType):
             "web_page",
             "email",
             "phone",
-        ]
+        )
+
+        interfaces = (graphene.relay.Node,)

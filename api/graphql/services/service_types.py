@@ -1,10 +1,10 @@
 import graphene
-from graphene_django import DjangoObjectType
 
+from api.graphql.base_type import PrimaryKeyObjectType
 from services.models import Service
 
 
-class ServiceType(DjangoObjectType):
+class ServiceType(PrimaryKeyObjectType):
     buffer_time_before = graphene.String()
     buffer_time_after = graphene.String()
 
@@ -17,3 +17,5 @@ class ServiceType(DjangoObjectType):
             "buffer_time_before",
             "buffer_time_after",
         )
+
+        interfaces = (graphene.relay.Node,)

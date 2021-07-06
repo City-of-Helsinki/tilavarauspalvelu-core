@@ -3,6 +3,7 @@ from easy_thumbnails.files import get_thumbnailer
 from graphene_django import DjangoObjectType
 from graphene_permissions.mixins import AuthNode
 
+from api.graphql.base_type import PrimaryKeyObjectType
 from api.graphql.resources.resource_types import ResourceType
 from api.graphql.services.service_types import ServiceType
 from api.graphql.spaces.space_types import LocationType, SpaceType, UnitType
@@ -18,13 +19,15 @@ from resources.models import Resource
 from spaces.models import Space
 
 
-class PurposeType(DjangoObjectType):
+class PurposeType(PrimaryKeyObjectType):
     class Meta:
         model = Purpose
         fields = (
             "id",
             "name",
         )
+
+        interfaces = (graphene.relay.Node,)
 
 
 class ReservationUnitImageType(DjangoObjectType):
@@ -34,7 +37,7 @@ class ReservationUnitImageType(DjangoObjectType):
 
     class Meta:
         model = ReservationUnitImage
-        fields = ["image_url", "medium_url", "small_url", "image_type"]
+        fields = ("image_url", "medium_url", "small_url", "image_type")
 
     def resolve_image_url(self, info):
         if not self.image:
@@ -56,30 +59,36 @@ class ReservationUnitImageType(DjangoObjectType):
         return info.context.build_absolute_uri(url)
 
 
-class ReservationUnitTypeType(DjangoObjectType):
+class ReservationUnitTypeType(PrimaryKeyObjectType):
     class Meta:
         model = ReservationUnitTypeModel
-        fields = ["name", "id"]
+        fields = ("name", "id")
+
+        interfaces = (graphene.relay.Node,)
 
 
-class EquipmentCategoryType(DjangoObjectType):
+class EquipmentCategoryType(PrimaryKeyObjectType):
     class Meta:
         model = EquipmentCategory
-        fields = ["name", "id"]
+        fields = ("name", "id")
+
+        interfaces = (graphene.relay.Node,)
 
 
-class EquipmentType(DjangoObjectType):
+class EquipmentType(PrimaryKeyObjectType):
     category = graphene.Field(EquipmentCategoryType)
 
     class Meta:
         model = Equipment
-        fields = ["name", "id"]
+        fields = ("name", "id")
+
+        interfaces = (graphene.relay.Node,)
 
     def resolve_category(self, info):
         return self.category
 
 
-class ReservationUnitType(AuthNode, DjangoObjectType):
+class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
     pk = graphene.Int()
     spaces = graphene.List(SpaceType)
     resources = graphene.List(ResourceType)
