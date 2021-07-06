@@ -15,7 +15,14 @@ _log_boxed "Tilavarauspalvelu container"
 
 if [ "$1" = "start_django_development_server" ]; then
     _log_boxed "Running development server"
-    exec deploy/start_dev_server.sh
+    if [ "$CELERY_ENABLED" = true ] ; then
+      _log_boxed "Running with celery"
+      exec celery -A tilavarauspalvelu worker --detach & deploy/start_dev_server.sh
+    else
+      _log_boxed "Running without celery"
+      exec deploy/start_dev_server.sh
+    fi
+
 elif [ "$1" = "migrate" ]; then
     _log_boxed "Running migrations"
     ./manage.py migrate
@@ -52,7 +59,12 @@ elif [ "$1" = "e" ]; then
     exec "$@"
 else
     _log_boxed "Starting production server"
-    exec uwsgi -y deploy/uwsgi.yml
+    if [ "$CELERY_ENABLED" = true ] ; then
+      exec celery -A tilavarauspalvelu worker --detach & uwsgi -y deploy/uwsgi.yml
+    else
+      exec uwsgi -y deploy/uwsgi.yml
+    fi
+
 fi
 
 _log_boxed "Tilavaraus entrypoint finished"

@@ -6,6 +6,8 @@
 #
 absl-py==0.12.0
     # via ortools
+amqp==5.0.6
+    # via kombu
 aniso8601==7.0.0
     # via graphene
 appdirs==1.4.4
@@ -18,10 +20,16 @@ attrs==21.2.0
     # via
     #   jsonschema
     #   pytest
+billiard==3.6.4.0
+    # via celery
 black==20.8b1
     # via -r requirements.in
 cachetools==4.2.2
     # via django-helusers
+celery==5.1.2
+    # via
+    #   -r requirements.in
+    #   django-celery-results
 certifi==2020.12.5
     # via
     #   elastic-apm
@@ -31,9 +39,19 @@ cffi==1.14.5
     # via cryptography
 chardet==4.0.0
     # via requests
-click==8.0.1
+click-didyoumean==0.0.3
+    # via celery
+click-plugins==1.1.1
+    # via celery
+click-repl==0.2.0
+    # via celery
+click==7.1.2
     # via
     #   black
+    #   celery
+    #   click-didyoumean
+    #   click-plugins
+    #   click-repl
     #   pip-tools
 coverage==5.5
     # via pytest-cov
@@ -46,6 +64,8 @@ defusedxml==0.7.1
 deprecation==2.1.0
     # via django-helusers
 django-auditlog==1.0a1
+    # via -r requirements.in
+django-celery-results==2.2.0
     # via -r requirements.in
 django-cors-headers==3.6.0
     # via -r requirements.in
@@ -150,6 +170,8 @@ isort==5.6.4
     # via -r requirements.in
 jsonschema==3.2.0
     # via drf-spectacular
+kombu==5.1.0
+    # via celery
 mccabe==0.6.1
     # via flake8
 mypy-extensions==0.4.3
@@ -179,6 +201,8 @@ promise==2.3
     #   graphene-django
     #   graphql-core
     #   graphql-relay
+prompt-toolkit==3.0.19
+    # via click-repl
 protobuf==3.17.0
     # via ortools
 psycopg2==2.8.6
@@ -229,6 +253,7 @@ python3-openid==3.2.0
     # via social-auth-core
 pytz==2021.1
     # via
+    #   celery
     #   django
     #   django-recurrence
     #   icalendar
@@ -255,6 +280,7 @@ singledispatch==3.6.1
 six==1.15.0
     # via
     #   absl-py
+    #   click-repl
     #   django-jsonfield
     #   django-modeltranslation
     #   ecdsa
@@ -304,10 +330,17 @@ urllib3==1.26.5
     #   sentry-sdk
 uwsgi==2.0.19.1
     # via -r requirements.in
+vine==5.0.0
+    # via
+    #   amqp
+    #   celery
+    #   kombu
 wasmer-compiler-cranelift==1.0.0
     # via fastdiff
 wasmer==1.0.0
     # via fastdiff
+wcwidth==0.2.5
+    # via prompt-toolkit
 whitenoise==5.2.0
     # via -r requirements.in
 

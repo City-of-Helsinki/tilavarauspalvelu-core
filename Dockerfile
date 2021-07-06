@@ -29,6 +29,7 @@ RUN useradd -ms /bin/bash -d /tvp tvp
 # Statics are kept inside container image for serving using whitenoise
 RUN mkdir -p /srv/static && chown tvp /srv/static && chown tvp /opt/app-root/bin
 
+
 RUN chown tvp /opt/app-root/lib/python3.8/site-packages
 RUN chown tvp /opt/app-root/lib/python3.8/site-packages/*
 RUN pip install --upgrade pip
@@ -67,6 +68,10 @@ RUN python manage.py collectstatic --noinput
 
 RUN chgrp -R 0 /tvp
 RUN chmod g=u -R /tvp
+
+RUN mkdir -p /broker/queue && chown tvp /broker/queue
+
+RUN mkdir -p /broker/processed && chown tvp /broker/queue
 
 ENTRYPOINT ["/tvp/deploy/entrypoint.sh"]
 

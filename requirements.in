@@ -1,7 +1,9 @@
 assertpy==1.1
 black==20.8b1
+celery
 Django==3.1.12
 django-auditlog==1.0a1
+django-celery-results
 django-cors-headers==3.6.0
 django-enumfields==2.0.0
 django-environ==0.4.5
