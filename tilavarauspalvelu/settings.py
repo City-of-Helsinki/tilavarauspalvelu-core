@@ -91,6 +91,7 @@ INSTALLED_APPS = [
     "social_django",
     "tinymce",
     "easy_thumbnails",
+    "django_celery_results",
 ]
 
 MIDDLEWARE = [
@@ -170,6 +171,19 @@ env = environ.Env(
     CSRF_TRUSTED_ORIGINS=(list, []),
     MULTI_PROXY_HEADERS=(bool, False),
     ICAL_HASH_SECRET=(str, ""),
+    # Celery
+    CELERY_ENABLED=(bool, True),
+    CELERY_RESULT_BACKEND=(str, "django-db"),
+    CELERY_CACHE_BACKEND=(str, "django-cache"),
+    CELERY_TIMEZONE=(str, "Europe/Helsinki"),
+    CELERY_TASK_TRACK_STARTED=(bool, False),
+    CELERY_TASK_TIME_LIMIT=(int, 5 * 60),
+    CELERY_BROKER_URL=(str, "filesystem://"),
+    # Celery filesystem backend
+    CELERY_FILESYSTEM_BACKEND=(bool, True),
+    CELERY_QUEUE_FOLDER_OUT=(str, "./broker/queue/"),
+    CELERY_QUEUE_FOLDER_IN=(str, "./broker/queue/"),
+    CELERY_PROCESSED_FOLDER=(str, "./broker/processed/"),
 )
 
 environ.Env.read_env()
@@ -355,6 +369,31 @@ THUMBNAIL_ALIASES = {
         "medium": {"size": (384, 384), "crop": True},
     },
 }
+
+CELERY_ENABLED = env("CELERY_ENABLED")
+CELERY_RESULT_BACKEND = env("CELERY_RESULT_BACKEND")
+
+CELERY_CACHE_BACKEND = env("CELERY_CACHE_BACKEND")
+
+CELERY_TIMEZONE = env("CELERY_TIMEZONE")
+CELERY_TASK_TRACK_STARTED = env("CELERY_TASK_TRACK_STARTED")
+CELERY_TASK_TIME_LIMIT = env("CELERY_TASK_TIME_LIMIT")
+CELERY_BROKER_URL = env("CELERY_BROKER_URL")
+CELERY_FILESYSTEM_BACKEND = env("CELERY_FILESYSTEM_BACKEND")
+
+
+if CELERY_FILESYSTEM_BACKEND:
+
+    CELERY_QUEUE_FOLDER_OUT = env("CELERY_QUEUE_FOLDER_OUT")
+    CELERY_QUEUE_FOLDER_IN = env("CELERY_QUEUE_FOLDER_IN")
+    CELERY_PROCESSED_FOLDER = env("CELERY_PROCESSED_FOLDER")
+
+    CELERY_BROKER_TRANSPORT_OPTIONS = {
+        "data_folder_out": CELERY_QUEUE_FOLDER_OUT,
+        "data_folder_in": CELERY_QUEUE_FOLDER_IN,
+        "processed_folder": CELERY_PROCESSED_FOLDER,
+        "store_processed": True,
+    }
 
 
 # local_settings.py can be used to override environment-specific settings
