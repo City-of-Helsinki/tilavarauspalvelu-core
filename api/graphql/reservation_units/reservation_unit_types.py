@@ -22,10 +22,7 @@ from spaces.models import Space
 class PurposeType(PrimaryKeyObjectType):
     class Meta:
         model = Purpose
-        fields = (
-            "id",
-            "name",
-        )
+        fields = ("id", "name", "pk")
 
         interfaces = (graphene.relay.Node,)
 
