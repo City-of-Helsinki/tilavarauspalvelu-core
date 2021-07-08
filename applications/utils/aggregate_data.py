@@ -2,9 +2,14 @@ import logging
 import sys
 from threading import Thread
 
+import celery
+from django.conf import settings
 from django.db import Error
 from django.db.models import DurationField, ExpressionWrapper, F
 
+from applications.utils.aggregate_tasks import (
+    _celery_application_event_schedule_result_aggregate_data_create,
+)
 from opening_hours.hours import HaukiConfigurationError
 from opening_hours.utils import get_resources_total_hours
 
@@ -17,6 +22,16 @@ class BaseAggregateDataCreator(Thread):
             self.run()
             return
         super().run()
+
+
+class CeleryRunner(object):
+    _task: celery.Task
+
+    def run_celery_task(self, *args, **kwargs):
+        if settings.CELERY_ENABLED:
+            self._task.delay(*args, **kwargs)
+        else:
+            self._task(*args, **kwargs)
 
 
 class ApplicationAggregateDataCreator(BaseAggregateDataCreator):
@@ -108,13 +123,23 @@ class EventAggregateDataCreator(BaseAggregateDataCreator):
         return self.event.create_aggregate_data()
 
 
-class ApplicationEventScheduleResultAggregateDataCreator(BaseAggregateDataCreator):
-    def __init__(self, event, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+class _ApplicationEventScheduleResultAggregateDataCreator(object):
+    def __init__(self, event):
         self.event = event
 
     def run(self) -> None:
         return self.event.create_schedule_result_aggregated_data()
+
+
+class ApplicationEventScheduleResultAggregateDataRunner(CeleryRunner):
+    _task = _celery_application_event_schedule_result_aggregate_data_create
+    application_event_id: int
+
+    def __init__(self, application_event_id: int):
+        self.application_event_id = application_event_id
+
+    def run(self):
+        self.run_celery_task(self.application_event_id)
 
 
 class ApplicationRoundAggregateDataCreator(BaseAggregateDataCreator):

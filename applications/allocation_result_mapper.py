@@ -8,7 +8,7 @@ from applications.models import (
     ApplicationRound,
 )
 from applications.utils.aggregate_data import (
-    ApplicationEventScheduleResultAggregateDataCreator,
+    ApplicationEventScheduleResultAggregateDataRunner,
 )
 
 logger = logging.getLogger(__name__)
@@ -57,4 +57,6 @@ class AllocationResultMapper(object):
                 raise
 
         for event in set(application_events):
-            ApplicationEventScheduleResultAggregateDataCreator(event).start()
+            ApplicationEventScheduleResultAggregateDataRunner(
+                application_event_id=event.id
+            ).run()
