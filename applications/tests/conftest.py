@@ -24,6 +24,11 @@ def disable_hauki():
     settings.HAUKI_API_URL = None
 
 
+@pytest.fixture(autouse=True)
+def disable_celery():
+    settings.CELERY_ENABLED = False
+
+
 @pytest.fixture
 def purpose() -> Purpose:
     return Purpose.objects.create(name="Football")

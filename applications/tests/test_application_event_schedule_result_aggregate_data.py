@@ -2,6 +2,7 @@ import datetime
 
 import freezegun
 from assertpy import assert_that
+from django.conf import settings
 from django.test.testcases import TestCase
 from django.utils.timezone import get_default_timezone
 
@@ -13,6 +14,9 @@ from applications.tests.factories import (
     ApplicationEventFactory,
     ApplicationEventScheduleFactory,
     ApplicationEventScheduleResultFactory,
+)
+from applications.utils.aggregate_data import (
+    ApplicationEventScheduleResultAggregateDataRunner,
 )
 
 
@@ -216,3 +220,22 @@ class ApplicationEventAggregateDataForScheduleResultsTestCase(
             name="allocation_results_duration_total"
         )
         assert_that(res_tot.value).is_equal_to(16 * 3600)
+
+
+@freezegun.freeze_time("2020-01-01")
+class ApplicationEventScheduleResultAggregateDataRunnerTestCase(
+    ApplicationEventScheduleResultAggregateDataBaseTestCase
+):
+    def test_running_creation_with_runner(
+        self,
+    ):
+        settings.CELERY_ENABLED = False
+        assert_that(
+            ApplicationEventScheduleResultAggregateData.objects.count()
+        ).is_zero()
+        ApplicationEventScheduleResultAggregateDataRunner(
+            self.application_event.id
+        ).run()
+        assert_that(
+            ApplicationEventScheduleResultAggregateData.objects.count()
+        ).is_equal_to(2)
