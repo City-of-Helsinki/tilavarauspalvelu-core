@@ -6,6 +6,10 @@ from graphene_permissions.mixins import AuthFilter
 from graphene_permissions.permissions import AllowAuthenticated
 from rest_framework.generics import get_object_or_404
 
+from api.graphql.reservation_units.reservation_unit_mutations import (
+    PurposeCreateMutation,
+    PurposeUpdateMutation,
+)
 from api.graphql.reservation_units.reservation_unit_types import ReservationUnitType
 from api.graphql.reservations.reservation_types import ReservationType
 from api.graphql.resources.resource_types import ResourceType
@@ -44,6 +48,8 @@ class Query(graphene.ObjectType):
 
 class Mutation(graphene.ObjectType):
     create_reservation = ReservationMutation.Field()
+    create_purpose = PurposeCreateMutation.Field()
+    update_purpose = PurposeUpdateMutation.Field()
 
 
 schema = graphene.Schema(query=Query, mutation=Mutation)

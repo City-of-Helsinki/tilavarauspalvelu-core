@@ -15,7 +15,7 @@ class DistrictType(PrimaryKeyObjectType):
 class RealEstateType(PrimaryKeyObjectType):
     class Meta:
         model = RealEstate
-        fields = ("id", "name", "district", "area")
+        fields = ("id", "name", "district", "surface_area")
 
         interfaces = (graphene.relay.Node,)
 
