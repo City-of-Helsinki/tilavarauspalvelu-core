@@ -53,7 +53,7 @@ click==7.1.2
     #   click-plugins
     #   click-repl
     #   pip-tools
-coverage==5.5
+coverage==6.0b1
     # via pytest-cov
 cryptography==3.4.7
     # via social-auth-core
