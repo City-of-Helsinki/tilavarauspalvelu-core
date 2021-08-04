@@ -42,6 +42,10 @@ class SpaceType(PrimaryKeyObjectType):
             "surface_area",
         )
 
+        filter_fields = {
+            "name": ["exact", "icontains", "istartswith"],
+        }
+
         interfaces = (graphene.relay.Node,)
 
 
