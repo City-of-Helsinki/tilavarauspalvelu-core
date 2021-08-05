@@ -419,4 +419,8 @@ export interface UnitWIP {
   name: string;
   service: string;
   area: string;
+  resources: [];
+  spaces: [];
+  openingHours: [];
+  reservationUnits: [];
 }

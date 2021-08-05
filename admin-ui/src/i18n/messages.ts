@@ -628,6 +628,31 @@ const translations: ITranslations = {
     unitCount: ["{{count}} toimipiste"],
     unitCount_plural: ["{{count}} toimipistettä"],
     noUnits: ["Ei toimipisteitä"],
+    showOnMap: ["Näytä kartalla"],
+    showOpeningHours: ["Aukioloajat"],
+    showSpacesAndResources: ["Tilat ja resurssit"],
+    showConfiguration: ["Asetukset"],
+    noSpacesResourcesTitle: [
+      "Toimipisteelle ei ole määritetty tiloja eikä resursseja",
+    ],
+    noSpacesResources: [
+      "Toimipisteellä täytyy olla vähintään yksi tila, jotta voit luoda ensimmäisen varausyksikön.",
+    ],
+    createSpaces: ["Luo tiloja."],
+    noOpeningHoursTitle: ["Toimipisteelle ei ole määritetty aukioloaikoja"],
+    maintainOpeningHours: [
+      "Siirry päivittämään aukiolot Toimipisterekisterin kautta.",
+    ],
+    noOpeningHours: [
+      "Toimipisteellä täytyy olla aukioloajat, jotka ohjaavat käytön suunnittelua.",
+    ],
+    reservationUnitTitle: ["Varausyksiköt"],
+    reservationUnitReadMore: ["Lue lisää varausyksiköistä"],
+    reservationUnitCreate: ["Luo uusi varausyksikkö"],
+    noReservationUnitsTitle: ["Ei vielä luotuja varausyksiköitä."],
+    noReservationUnitsInfo: [
+      "Tarkista ennen varausyksiköiden luontia, että olet luonut toimipisteelle aukioloajat sekä tarvittavat tilat ja resurssit.",
+    ],
   },
 };
 

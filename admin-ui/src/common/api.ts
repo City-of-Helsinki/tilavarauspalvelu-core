@@ -434,26 +434,42 @@ export function getReservationUnitCalendarUrl(
   });
 }
 
+const units = [
+  {
+    id: 1,
+    name: "Toimipiste #1",
+    service: "Palvelu",
+    area: "",
+    resources: [],
+    spaces: [],
+    openingHours: [],
+  },
+  {
+    id: 2,
+    name: "Toimipiste #2",
+    service: "",
+    area: "Alue",
+    resources: [],
+    spaces: [],
+    openingHours: [],
+  },
+  {
+    id: 3,
+    name: "Toimipiste #3",
+    service: "Palvelu #2",
+    area: "Alue #2",
+    resources: [],
+    spaces: [],
+    openingHours: [],
+  },
+] as UnitWIP[];
+
 export async function getUnits(): Promise<UnitWIP[]> {
-  const result = [
-    {
-      id: 1,
-      name: "Toimipiste #1",
-      service: "Palvelu",
-      area: "",
-    },
-    {
-      id: 2,
-      name: "Toimipiste #2",
-      service: "",
-      area: "Alue",
-    },
-    {
-      id: 3,
-      name: "Toimipiste #3",
-      service: "Palvelu #2",
-      area: "Alue #2",
-    },
-  ];
-  return result;
+  return units;
+}
+
+export async function getUnit(id: number): Promise<UnitWIP> {
+  const unit = units.find((u) => u.id === id);
+  if (!unit) throw Error("not found");
+  return unit;
 }
