@@ -2,7 +2,7 @@ from django.conf import settings
 from rest_framework import permissions, serializers, viewsets
 
 from api.base import TranslatedModelSerializer
-from permissions.api_permissions import ResourcePermission
+from permissions.api_permissions.drf_permissions import ResourcePermission
 from resources.models import Resource, Space
 
 

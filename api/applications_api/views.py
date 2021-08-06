@@ -24,7 +24,7 @@ from applications.models import (
     ApplicationEventWeeklyAmountReduction,
     ApplicationStatus,
 )
-from permissions.api_permissions import (
+from permissions.api_permissions.drf_permissions import (
     ApplicationEventPermission,
     ApplicationEventStatusPermission,
     ApplicationEventWeeklyAmountReductionPermission,

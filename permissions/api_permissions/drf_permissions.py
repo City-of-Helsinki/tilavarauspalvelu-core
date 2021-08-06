@@ -8,9 +8,7 @@ from applications.models import (
     ApplicationEventWeeklyAmountReduction,
     ApplicationRound,
 )
-from spaces.models import ServiceSector, Unit, UnitGroup
-
-from .helpers import (
+from permissions.helpers import (
     can_allocate_allocation_request,
     can_allocate_service_sector_allocations,
     can_manage_ability_groups,
@@ -39,6 +37,7 @@ from .helpers import (
     can_view_recurring_reservation,
     can_view_reservation,
 )
+from spaces.models import ServiceSector, Unit, UnitGroup
 
 
 class AllowNonePermission(permissions.BasePermission):

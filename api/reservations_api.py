@@ -8,7 +8,7 @@ from rest_framework import filters as drf_filters
 from rest_framework import permissions, serializers, viewsets
 
 from applications.models import Application, ApplicationEvent
-from permissions.api_permissions import (
+from permissions.api_permissions.drf_permissions import (
     AbilityGroupPermission,
     AgeGroupPermission,
     RecurringReservationPermission,
