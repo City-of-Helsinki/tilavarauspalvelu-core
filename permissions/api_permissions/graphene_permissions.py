@@ -8,6 +8,7 @@ from permissions.helpers import (
     can_manage_purposes,
     can_manage_resources,
     can_manage_spaces,
+    can_manage_units,
     can_modify_reservation_unit,
     can_view_reservations,
 )
@@ -73,3 +74,13 @@ class SpacePermission(BasePermission):
     @classmethod
     def has_mutation_permission(cls, root: Any, info: ResolveInfo, input: dict) -> bool:
         return can_manage_spaces(info.context.user)
+
+
+class UnitPermission(BasePermission):
+    @classmethod
+    def has_permission(cls, info: ResolveInfo) -> bool:
+        return True
+
+    @classmethod
+    def has_mutation_permission(cls, root: Any, info: ResolveInfo, input: dict) -> bool:
+        return can_manage_units(info.context.user)

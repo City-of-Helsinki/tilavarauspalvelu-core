@@ -82,6 +82,18 @@ def can_manage_unit_roles(user: User, unit: Unit) -> bool:
     )
 
 
+def can_manage_units(user: User, unit: Unit) -> bool:
+    permission = "can_manage_units"
+    return (
+        is_superuser(user)
+        or has_service_sector_permission(
+            user, list(unit.service_sectors.all()), permission
+        )
+        or has_unit_permission(user, [unit], permission)
+        or has_general_permission(user, permission)
+    )
+
+
 def can_manage_unit_group_roles(user: User, unit_group: UnitGroup) -> bool:
     permission = "can_manage_unit_roles"
     return (
