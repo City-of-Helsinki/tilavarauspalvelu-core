@@ -72,9 +72,7 @@ class ReservationUnitPermission(permissions.BasePermission):
 
         if request.method in permissions.SAFE_METHODS:
             return True
-        return request.user.is_authenticated and can_modify_reservation_unit(
-            request.user, reservation_unit
-        )
+        return can_modify_reservation_unit(request.user, reservation_unit)
 
     def has_permission(self, request, view):
         if request.method == "POST":
