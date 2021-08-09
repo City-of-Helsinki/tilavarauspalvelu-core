@@ -1,8 +1,7 @@
 import graphene
 from graphene import Field, relay
-from graphene_django.filter import DjangoFilterConnectionField
 from graphene_django.forms.mutation import DjangoModelFormMutation
-from graphene_permissions.mixins import AuthFilter
+from graphene_permissions.mixins import AuthFilter, AuthMutation
 from graphene_permissions.permissions import AllowAuthenticated
 from rest_framework.generics import get_object_or_404
 
@@ -15,13 +14,20 @@ from api.graphql.reservations.reservation_types import ReservationType
 from api.graphql.resources.resource_types import ResourceType
 from api.graphql.spaces.space_mutations import SpaceCreateMutation, SpaceUpdateMutation
 from api.graphql.spaces.space_types import SpaceType
+from permissions.api_permissions.graphene_permissions import (
+    ReservationUnitPermission,
+    ResourcePermission,
+    SpacePermission,
+)
 from reservation_units.models import ReservationUnit
 from reservations.forms import ReservationForm
 from resources.models import Resource
 
 
-class ReservationMutation(DjangoModelFormMutation):
+class ReservationMutation(AuthMutation, DjangoModelFormMutation):
     reservation = graphene.Field(ReservationType)
+
+    permission_classes = (ReservationUnitPermission,)
 
     class Meta:
         form_class = ReservationForm
@@ -31,16 +37,27 @@ class AllowAuthenticatedFilter(AuthFilter):
     permission_classes = (AllowAuthenticated,)
 
 
+class ReservationUnitsFilter(AuthFilter):
+    permission_classes = (ReservationUnitPermission,)
+
+
+class ResourcesFilter(AuthFilter):
+    permission_classes = (ResourcePermission,)
+
+
+class SpacesFilter(AuthFilter):
+    permission_classes = (SpacePermission,)
+
+
 class Query(graphene.ObjectType):
-    reservation_units = DjangoFilterConnectionField(ReservationUnitType)
+    reservation_units = ReservationUnitsFilter(ReservationUnitType)
     reservation_unit = relay.Node.Field(ReservationUnitType)
     reservation_unit_by_pk = Field(ReservationUnitType, pk=graphene.Int())
-
-    resources = DjangoFilterConnectionField(ResourceType)
+    resources = ResourcesFilter(ResourceType)
     resource = relay.Node.Field(ResourceType)
     resource_by_pk = Field(ResourceType, pk=graphene.Int())
 
-    spaces = DjangoFilterConnectionField(SpaceType)
+    spaces = SpacesFilter(SpaceType)
     space = relay.Node.Field(SpaceType)
     space_by_pk = Field(SpaceType, pk=graphene.Int())
 

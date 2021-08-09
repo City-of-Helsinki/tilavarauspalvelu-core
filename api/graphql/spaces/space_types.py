@@ -1,6 +1,8 @@
 import graphene
+from graphene_permissions.mixins import AuthNode
 
 from api.graphql.base_type import PrimaryKeyObjectType
+from permissions.api_permissions.graphene_permissions import SpacePermission
 from spaces.models import Building, District, Location, RealEstate, Space, Unit
 
 
@@ -31,7 +33,9 @@ class BuildingType(PrimaryKeyObjectType):
         interfaces = (graphene.relay.Node,)
 
 
-class SpaceType(PrimaryKeyObjectType):
+class SpaceType(AuthNode, PrimaryKeyObjectType):
+    permission_classes = (SpacePermission,)
+
     class Meta:
         model = Space
         fields = (

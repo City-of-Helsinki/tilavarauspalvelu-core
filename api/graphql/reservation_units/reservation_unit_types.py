@@ -7,6 +7,7 @@ from api.graphql.base_type import PrimaryKeyObjectType
 from api.graphql.resources.resource_types import ResourceType
 from api.graphql.services.service_types import ServiceType
 from api.graphql.spaces.space_types import LocationType, SpaceType, UnitType
+from permissions.api_permissions.graphene_permissions import ReservationUnitPermission
 from reservation_units.models import (
     Equipment,
     EquipmentCategory,
@@ -19,7 +20,7 @@ from resources.models import Resource
 from spaces.models import Space
 
 
-class PurposeType(PrimaryKeyObjectType):
+class PurposeType(AuthNode, PrimaryKeyObjectType):
     class Meta:
         model = Purpose
         fields = ("id", "name", "pk")
@@ -97,6 +98,8 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
     equipment = graphene.List(EquipmentType)
     unit = graphene.Field(UnitType)
     max_persons = graphene.Int()
+
+    permission_classes = (ReservationUnitPermission,)
 
     class Meta:
         model = ReservationUnit

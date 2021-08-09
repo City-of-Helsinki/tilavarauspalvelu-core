@@ -1,12 +1,16 @@
 import graphene
+from graphene_permissions.mixins import AuthNode
 
 from api.graphql.base_type import PrimaryKeyObjectType
 from api.graphql.spaces.space_types import BuildingType
+from permissions.api_permissions.graphene_permissions import ResourcePermission
 from resources.models import Resource
 
 
-class ResourceType(PrimaryKeyObjectType):
+class ResourceType(AuthNode, PrimaryKeyObjectType):
     building = graphene.List(BuildingType)
+
+    permission_classes = (ResourcePermission,)
 
     class Meta:
         model = Resource

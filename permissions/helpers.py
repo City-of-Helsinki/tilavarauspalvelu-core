@@ -395,6 +395,11 @@ def can_manage_resources(user: User):
     return is_superuser(user) or has_general_permission(user, permission)
 
 
+def can_manage_spaces(user: User):
+    permission = "can_manage_spaces"
+    return is_superuser(user) or has_general_permission(user, permission)
+
+
 def can_view_users(user: User):
     permission = "can_view_users"
     return (
