@@ -653,6 +653,8 @@ const translations: ITranslations = {
     noReservationUnitsInfo: [
       "Tarkista ennen varausyksiköiden luontia, että olet luonut toimipisteelle aukioloajat sekä tarvittavat tilat ja resurssit.",
     ],
+    address: ["Osoite"],
+    location: ["Toimipisteen sijainti"],
   },
 };
 

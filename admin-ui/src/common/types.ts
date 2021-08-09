@@ -81,6 +81,8 @@ export type Location = {
   addressStreet: string;
   addressZip: string;
   addressCity: string;
+  latitude: number;
+  longitude: number;
 };
 
 export type Image = {
@@ -417,6 +419,7 @@ export interface ReservationUnitCalendarUrl {
 export interface UnitWIP {
   id: number;
   name: string;
+  location: Location;
   service: string;
   area: string;
   resources: [];

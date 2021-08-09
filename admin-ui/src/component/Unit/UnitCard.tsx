@@ -11,6 +11,7 @@ import { useTranslation } from "react-i18next";
 import { UnitWIP } from "../../common/types";
 import { H2 } from "../../styles/typography";
 import { BasicLink, breakpoints } from "../../styles/util";
+import { parseAddress } from "../../common/util";
 
 interface IProps {
   unit: UnitWIP;
@@ -91,7 +92,7 @@ const UnitCard = ({ unit }: IProps): JSX.Element => {
           <H2>{unit.name}</H2>
           <IconArrowRight />
         </BasicLink>
-        <Address>Katuosoite 13, 00234 Helsinki</Address>
+        <Address>{parseAddress(unit.location)}</Address>
         <Props>
           <Prop $disabled={reservationUnitCount < 1}>
             <IconLink />{" "}

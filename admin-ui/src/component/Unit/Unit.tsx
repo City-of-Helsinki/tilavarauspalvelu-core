@@ -24,6 +24,7 @@ import ExternalLink from "./ExternalLink";
 import { useModal } from "../../context/UIContext";
 import InfoModalContent from "./InfoModalContent";
 import SecondaryNavigation from "../SecondaryNavigation";
+import { parseAddress } from "../../common/util";
 
 interface IProps {
   unitId: string;
@@ -197,7 +198,7 @@ const Unit = (): JSX.Element => {
           <Image src="https://tilavaraus.hel.fi/v1/media/reservation_unit_images/liikumistila2.jfif.250x250_q85_crop.jpg" />
           <div>
             <Name>{unit?.name}</Name>
-            <Address>Katuosoite 13, 00234 Helsinki</Address>
+            {unit ? <Address>{parseAddress(unit?.location)}</Address> : null}
             <Props>
               <Prop $disabled={!unit?.area}>
                 <IconGlobe /> {unit?.area || t("Unit.noArea")}
