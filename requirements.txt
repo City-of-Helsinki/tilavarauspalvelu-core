@@ -143,12 +143,12 @@ graphene-django==2.13.0
     # via
     #   -r requirements.in
     #   graphene-permissions
-graphene-permissions==1.1.4
-    # via -r requirements.in
 graphene==2.1.8
     # via
     #   graphene-django
     #   graphene-permissions
+graphene_permissions==1.1.4
+    # via -r requirements.in
 graphql-core==2.3.2
     # via
     #   graphene
