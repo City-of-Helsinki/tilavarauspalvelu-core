@@ -85,7 +85,7 @@ const Prop = styled.div<{ $disabled: boolean }>`
 `;
 
 const StyledNotification = styled(Notification)`
-  margin: var(--spacing-s) var(--spacing-layout-m);
+  margin: var(--spacing-xs) var(--spacing-layout-2-xs);
   width: auto;
   @media (min-width: ${breakpoints.xl}) {
     margin: var(--spacing-s) var(--spacing-layout-xl);

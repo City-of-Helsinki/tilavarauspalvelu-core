@@ -48,9 +48,12 @@ const UnitMap = (): JSX.Element => {
       <SubPageHead title={t("Unit.location")} unit={unit} />
       <ContentContainer>
         <Map
-          id={String(unit.id)}
-          latitude={unit.location.latitude}
-          longitude={unit.location.longitude}
+          markers={[
+            {
+              latitude: unit.location.latitude,
+              longitude: unit.location.longitude,
+            },
+          ]}
         />
       </ContentContainer>
       {errorMsg && (

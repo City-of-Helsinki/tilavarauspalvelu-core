@@ -303,6 +303,14 @@ export const parseAddress = (location: Location): string => {
   );
 };
 
+export const parseAddressLine1 = (location: Location): string => {
+  return trim(`${location.addressStreet || ""}`);
+};
+
+export const parseAddressLine2 = (location: Location): string => {
+  return trim(`${location.addressZip || ""} ${location.addressCity || ""}`);
+};
+
 export const filterData = <T>(data: T[], filters: DataFilterOption[]): T[] => {
   return data.filter(
     (row) =>

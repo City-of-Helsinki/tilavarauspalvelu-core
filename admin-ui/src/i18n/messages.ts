@@ -655,6 +655,7 @@ const translations: ITranslations = {
     ],
     address: ["Osoite"],
     location: ["Toimipisteen sijainti"],
+    linkToUnitPage: ["Siirry"],
   },
 };
 
