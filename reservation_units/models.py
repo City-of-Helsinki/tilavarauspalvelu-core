@@ -100,6 +100,12 @@ class ReservationUnit(models.Model):
         blank=True,
         default="",
     )
+    max_reservation_duration = models.DurationField(
+        verbose_name=_("Maximum reservation duration"), blank=True, null=True
+    )
+    min_reservation_duration = models.DurationField(
+        verbose_name=_("Minimum reservation duration"), blank=True, null=True
+    )
 
     uuid = models.UUIDField(default=uuid.uuid4, null=False, editable=False, unique=True)
 
