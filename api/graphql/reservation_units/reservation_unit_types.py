@@ -104,6 +104,8 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
     max_persons = graphene.Int()
     terms_of_use = graphene.String()
     surface_area = graphene.Int()
+    max_reservation_duration = graphene.Int()
+    min_reservation_duration = graphene.Int()
 
     permission_classes = (
         (ReservationUnitPermission,)
@@ -130,6 +132,8 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
             "equipment",
             "uuid",
             "contact_information",
+            "max_reservation_duration",
+            "min_reservation_duration",
         )
         filter_fields = {
             "name": ["exact", "icontains", "istartswith"],
@@ -178,3 +182,13 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
     def resolve_surface_area(self, info):
         surface_area = self.spaces.aggregate(total_surface_area=Sum("surface_area"))
         return surface_area.get("total_surface_area")
+
+    def resolve_max_reservation_duration(self, info):
+        if not self.max_reservation_duration:
+            return None
+        return self.max_reservation_duration.total_seconds()
+
+    def resolve_min_reservation_duration(self, info):
+        if not self.min_reservation_duration:
+            return None
+        return self.min_reservation_duration.total_seconds()
