@@ -156,6 +156,7 @@ const translations: ITranslations = {
     spaceAndHobbyTypes: ["Tila- ja harrastetyypit"],
     applicationRounds: ["Hakukierrokset"],
     conditionsAndAttachments: ["Ehdot ja liitteet"],
+    spaces: ["Tilat"],
   },
   HeadingMenu: {
     recurringReservations: ["Vakiovuorot"],
@@ -569,6 +570,13 @@ const translations: ITranslations = {
     purposeCount: ["{{count}} käyttötarkoitus"],
     purposeCount_plural: ["{{count}} käyttötarkoitusta"],
     downloadSpaceCalendar: ["Lataa tilan kalenterimerkinnät (.ics)"],
+  },
+  Spaces: {
+    spaceListHeading: ["Kaikki tilat"],
+    spaceListDescription: [
+      "Täällä näet koosteen kaikista tiloista, joita on liitetty järjestelmään ja jotka sinulla on oikeus nähdä.",
+    ],
+    searchPlaceholder: ["Hae tiloja"],
   },
   Applicant: {
     inAllocation: ["Mukana jaossa"],

@@ -5,6 +5,7 @@ import { NavLink, RouteProps } from "react-router-dom";
 import styled from "styled-components";
 import { breakpoints } from "../styles/util";
 import { ReactComponent as PremiseApplications } from "../images/icon_premise-applications.svg";
+import { ReactComponent as IconPremises } from "../images/icon_premises.svg";
 import { truncatedText } from "../styles/typography";
 
 const Wrapper = styled.ul<{ placement: string }>`
@@ -174,6 +175,16 @@ const menuTree: IMenuChild[] = [
       {
         title: "MainMenu.approvals",
         route: "/applicationRounds/approvals",
+      },
+    ],
+  },
+  {
+    title: "MainMenu.premisesAndSettings",
+    icon: <IconPremises aria-hidden />,
+    items: [
+      {
+        title: "MainMenu.spaces",
+        route: "/spaces",
       },
     ],
   },

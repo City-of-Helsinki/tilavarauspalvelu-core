@@ -24,6 +24,7 @@ import ResolutionReport from "./component/ApplicationRound/ResolutionReport";
 import ReservationsByReservationUnit from "./component/ApplicationRound/ReservationsByReservationUnit";
 import ReservationSummariesByReservationUnit from "./component/ApplicationRound/ReservationSummariesByReservationUnit";
 import ReservationByApplicationEvent from "./component/Application/ReservationByApplicationEvent";
+import SpacesList from "./component/Spaces/SpacesList";
 
 interface IPrivateRouteProps {
   path: string;
@@ -141,6 +142,7 @@ function App(): JSX.Element {
               path="/applicationRound/:applicationRoundId"
               component={ApplicationRound}
             />
+            <PrivateRoute path="/spaces" component={SpacesList} />
           </Switch>
         </PageWrapper>
         {modalContent && <Modal>{modalContent}</Modal>}

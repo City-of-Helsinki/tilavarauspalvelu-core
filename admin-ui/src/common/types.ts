@@ -54,9 +54,10 @@ export type Space = {
   id: number;
   locationType: "fixed";
   name: TranslationObject;
-  parent: number;
+  parent?: number;
   building: number;
-  surfaceArea: null;
+  surfaceArea?: string;
+  district: number;
 };
 
 export type Resource = {
