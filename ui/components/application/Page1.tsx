@@ -246,7 +246,7 @@ const Page1 = ({
           id="next"
           iconRight={<IconArrowRight />}
           disabled={nextButtonDisabled}
-          onClick={() => history.push("page2")}
+          onClick={() => history.push(`${editorState.application.id}/page2`)}
         >
           {t("common:next")}
         </Button>

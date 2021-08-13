@@ -97,7 +97,10 @@ const IndividualForm = ({
           <EmailInput register={register} errors={errors} />
         </TwoColumnContainer>
       </RadioButtons>
-      <Buttons onSubmit={handleSubmit(onSubmit)} />
+      <Buttons
+        onSubmit={handleSubmit(onSubmit)}
+        applicationId={application.id}
+      />
     </form>
   );
 };

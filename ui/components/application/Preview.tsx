@@ -325,7 +325,7 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
         <Button
           variant="secondary"
           iconLeft={<IconArrowLeft />}
-          onClick={() => router.push("page3")}
+          onClick={() => router.push(`${application.id}/page3`)}
         >
           {t("common:prev")}
         </Button>

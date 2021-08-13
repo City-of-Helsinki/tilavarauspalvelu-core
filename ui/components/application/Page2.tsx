@@ -160,7 +160,7 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
         <Button
           variant="secondary"
           iconLeft={<IconArrowLeft />}
-          onClick={() => history.push("page1")}
+          onClick={() => history.push(`${application.id}/page1`)}
         >
           {t("common:prev")}
         </Button>
