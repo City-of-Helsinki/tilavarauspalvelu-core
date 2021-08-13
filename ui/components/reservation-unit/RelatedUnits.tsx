@@ -104,7 +104,7 @@ const RelatedUnits = ({
           <Unit key={unit.id}>
             <Image src={getMainImage(unit)?.imageUrl} />
             <Content>
-              <Link href={reservationUnitPath(unit.id)}>
+              <Link href={reservationUnitPath(unit.id)} passHref>
                 <Name>{localizedValue(unit.name, i18n.language)}</Name>
               </Link>
               <Building>{unit.building.name}</Building>
