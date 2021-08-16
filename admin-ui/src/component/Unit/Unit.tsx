@@ -185,7 +185,7 @@ const Unit = (): JSX.Element => {
             <IconClock style={{ marginTop: "-2px" }} />{" "}
             {t("Unit.showOpeningHours")}
           </BasicLink>
-          <BasicLink to={`/unit/${unitId}/spacesAndResources`}>
+          <BasicLink to={`/unit/${unitId}/spacesResources`}>
             {t("Unit.showSpacesAndResources")}
           </BasicLink>
           <BasicLink to={`/unit/${unitId}/configuration`}>

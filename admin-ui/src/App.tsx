@@ -27,6 +27,7 @@ import ReservationByApplicationEvent from "./component/Application/ReservationBy
 import Units from "./component/Unit/Units";
 import Unit from "./component/Unit/Unit";
 import UnitMap from "./component/Unit/UnitMap";
+import SpacesResources from "./component/Unit/SpacesResources";
 
 interface IPrivateRouteProps {
   path: string;
@@ -146,6 +147,10 @@ function App(): JSX.Element {
             />
             <PrivateRoute path="/units" component={Units} />
             <PrivateRoute path="/unit/:unitId/map" component={UnitMap} />
+            <PrivateRoute
+              path="/unit/:unitId/spacesResources"
+              component={SpacesResources}
+            />
             <PrivateRoute path="/unit/:unitId" component={Unit} />
           </Switch>
         </PageWrapper>

@@ -56,7 +56,9 @@ export type Space = {
   name: TranslationObject;
   parent: number;
   building: number;
-  surfaceArea: null;
+  surfaceArea: number; // WIP
+  maxPersons: number; // WIP
+  code: string; // WIP
 };
 
 export type Resource = {
@@ -64,6 +66,8 @@ export type Resource = {
   name: TranslationObject;
   locationType: "fixed";
   space: number;
+  unit: UnitWIP; // WIP
+  resourceType: string; // WIP
   bufferTimeBefore: string;
   bufferTimeAfter: string;
 };

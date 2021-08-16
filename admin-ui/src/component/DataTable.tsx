@@ -66,12 +66,14 @@ interface IProps {
   config: GeneralConfig;
   cellConfig: CellConfig;
   filterConfig: DataFilterConfig[];
+  displayHeadings?: boolean;
   setSelections?: Dispatch<SetStateAction<number[]>>;
   isRowDisabled?: (arg0: any) => boolean; // eslint-disable-line @typescript-eslint/no-explicit-any
   areAllRowsDisabled?: boolean;
   statusField?: string;
   getActiveRows?: (arg0: any) => void; // eslint-disable-line @typescript-eslint/no-explicit-any
   className?: string;
+  noResultsKey?: string;
 }
 
 interface IToggleableButton {
@@ -83,16 +85,19 @@ const Wrapper = styled.div``;
 const tableBorder = (size = "0.5em"): string =>
   `${size} solid var(--tilavaraus-admin-gray)`;
 
-const TableWrapper = styled.div`
+const TableWrapper = styled.div<{
+  $shadow?: boolean;
+}>`
   &:after {
     content: "";
     position: absolute;
     top: calc(var(--spacing-4-xl) - 12px);
+    ${({ $shadow }) =>
+      $shadow && "box-shadow: 0px 12px 16px 0 rgba(0, 0, 0, 0.13);"}
     left: 0;
     right: 0;
     width: 100%;
     height: 12px;
-    box-shadow: 0px 12px 16px 0 rgba(0, 0, 0, 0.13);
     z-index: 1;
   }
 
@@ -401,6 +406,7 @@ function DataTable({
     handledStatuses: [],
     selection: false,
   },
+  displayHeadings = true,
   cellConfig,
   filterConfig,
   isRowDisabled = () => false,
@@ -408,6 +414,7 @@ function DataTable({
   statusField = "status",
   getActiveRows,
   className,
+  noResultsKey,
 }: IProps): JSX.Element {
   const [sorting, setSorting] = useState<string>(cellConfig.sorting);
   const [order, setOrder] = useState<OrderTypes>(cellConfig.order);
@@ -515,7 +522,9 @@ function DataTable({
 
   const noResults = (
     <Row key="no-results">
-      <Cell colSpan={cellConfig.cols.length}>{t("common.noResults")}</Cell>
+      <Cell colSpan={cellConfig.cols.length}>
+        {t(noResultsKey || "common.noResults")}
+      </Cell>
     </Row>
   );
 
@@ -616,46 +625,50 @@ function DataTable({
           )}
         </FilterContainer>
       )}
-      <TableWrapper>
+      <TableWrapper $shadow={displayHeadings}>
         <Table data-testid="data-table">
           <Heading>
-            <Row>
-              {isSelectionActive && (
-                <HeadingSelectionCell as="th">
-                  <SelectionCheckbox
-                    id="recommendation-all-checkbox"
-                    onChange={(e) => {
-                      updateSelection(e.target.checked ? getRowIds() : []);
-                    }}
-                    checked={areAllRowsSelected && !areAllRowsDisabled}
-                    disabled={areAllRowsDisabled}
-                    aria-label={t(
-                      `common.${
-                        areAllRowsSelected ? "deselectAllRows" : "selectAllRows"
-                      }`
-                    )}
-                  />
-                </HeadingSelectionCell>
-              )}
-              {cellConfig.cols.map((col): JSX.Element => {
-                const sortingActive = actionsEnabled && col.key === sorting;
-                const title = t(col.title);
-                return (
-                  <Cell
-                    as="th"
-                    key={col.key}
-                    onClick={(): void | false =>
-                      actionsEnabled && setSortingAndOrder(col.key)
-                    }
-                    className={classNames({ sortingActive, actionsEnabled })}
-                    title={title}
-                  >
-                    <span>{title}</span>
-                    {sortingActive && <SortingArrow direction={order} />}
-                  </Cell>
-                );
-              })}
-            </Row>
+            {displayHeadings && (
+              <Row>
+                {isSelectionActive && (
+                  <HeadingSelectionCell as="th">
+                    <SelectionCheckbox
+                      id="recommendation-all-checkbox"
+                      onChange={(e) => {
+                        updateSelection(e.target.checked ? getRowIds() : []);
+                      }}
+                      checked={areAllRowsSelected && !areAllRowsDisabled}
+                      disabled={areAllRowsDisabled}
+                      aria-label={t(
+                        `common.${
+                          areAllRowsSelected
+                            ? "deselectAllRows"
+                            : "selectAllRows"
+                        }`
+                      )}
+                    />
+                  </HeadingSelectionCell>
+                )}
+                {cellConfig.cols.map((col): JSX.Element => {
+                  const sortingActive = actionsEnabled && col.key === sorting;
+                  const title = t(col.title);
+                  return (
+                    <Cell
+                      as="th"
+                      key={col.key}
+                      onClick={(): void | false =>
+                        actionsEnabled && setSortingAndOrder(col.key)
+                      }
+                      className={classNames({ sortingActive, actionsEnabled })}
+                      title={title}
+                    >
+                      <span>{title}</span>
+                      {sortingActive && <SortingArrow direction={order} />}
+                    </Cell>
+                  );
+                })}
+              </Row>
+            )}
           </Heading>
           <Body>
             {flatData.length > 0

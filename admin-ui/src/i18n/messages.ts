@@ -631,6 +631,7 @@ const translations: ITranslations = {
     showOnMap: ["Näytä kartalla"],
     showOpeningHours: ["Aukioloajat"],
     showSpacesAndResources: ["Tilat ja resurssit"],
+    spacesAndResources: ["Tilojen ja resurssien hallinta"],
     showConfiguration: ["Asetukset"],
     noSpacesResourcesTitle: [
       "Toimipisteelle ei ole määritetty tiloja eikä resursseja",
@@ -648,6 +649,7 @@ const translations: ITranslations = {
     ],
     reservationUnitTitle: ["Varausyksiköt"],
     reservationUnitReadMore: ["Lue lisää varausyksiköistä"],
+    hierarchyReadMore: ["Lue lisää hierarkiasta"],
     reservationUnitCreate: ["Luo uusi varausyksikkö"],
     noReservationUnitsTitle: ["Ei vielä luotuja varausyksiköitä."],
     noReservationUnitsInfo: [
@@ -656,6 +658,12 @@ const translations: ITranslations = {
     address: ["Osoite"],
     location: ["Toimipisteen sijainti"],
     linkToUnitPage: ["Siirry"],
+    spaces: ["Tilat"],
+    addSpace: ["Uusi tila"],
+    noSpaces: ["Ei vielä tiloja"],
+    resources: ["Resurssit"],
+    addResource: ["Uusi resurssi"],
+    noResources: ["Ei vielä resursseja"],
   },
 };
 

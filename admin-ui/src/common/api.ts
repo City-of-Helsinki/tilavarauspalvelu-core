@@ -479,8 +479,39 @@ const units = [
       longitude: 25.2553303,
     },
     area: "Alue #2",
-    resources: [],
-    spaces: [],
+    resources: [
+      {
+        id: 1,
+        name: {
+          fi: "Resurssin nimi",
+        },
+        resourceType: "Tulostin",
+      },
+      {
+        id: 2,
+        resourceType: "Tulostin",
+        name: {
+          fi: "Toinen resurssi",
+        },
+      },
+    ],
+    spaces: [
+      {
+        id: 1,
+        name: {
+          fi: "Tilan nimi",
+        },
+        maxPersons: 11,
+        surfaceArea: 30,
+      },
+      {
+        id: 2,
+        code: "LK1234",
+        name: {
+          fi: "Toinen tila",
+        },
+      },
+    ],
     openingHours: [],
   },
 ] as UnitWIP[];
