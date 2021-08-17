@@ -18,6 +18,7 @@ import {
   ReservationUnitCapacity,
   ReservationUnitCalendarUrl,
   Space,
+  UnitWIP,
 } from "./types";
 
 const apiBaseUrl: string = process.env.REACT_APP_TILAVARAUS_API_URL || "";
@@ -442,14 +443,12 @@ const MockSpaces: Space[] = [
       en: "Space #1 name",
       sv: "Space #1 namn",
     },
-    building: {
-      id: 1,
-      district: 1,
-      name: "Mesta",
-      realEstate: "3",
-      surfaceArea: "14m2",
-    },
+    building: 2,
+    parent: 1,
+    maxPersons: 43,
+    surfaceArea: 23,
     locationType: "fixed",
+    code: "code",
   },
   {
     id: 2,
@@ -458,17 +457,107 @@ const MockSpaces: Space[] = [
       en: "Space #2 name",
       sv: "Space #2 namn",
     },
-    building: {
-      id: 2,
-      district: 2,
-      name: "Mesta 2",
-      realEstate: "13",
-      surfaceArea: "114m2",
-    },
+    building: 1,
+    parent: 1,
+    maxPersons: 23,
+    surfaceArea: 300,
     locationType: "fixed",
+    code: "code",
   },
 ];
 
 export function getSpaces(): Promise<Space[]> {
   return Promise.resolve(MockSpaces);
+}
+
+const units = [
+  {
+    id: 1,
+    name: "Toimipiste #1",
+    service: "Palvelu",
+    location: {
+      addressCity: "Helsinki",
+      addressStreet: "Katuosoite 13",
+      addressZip: "00234",
+      latitude: 60.2187538,
+      longitude: 25.0553303,
+    },
+    area: "",
+    resources: [],
+    spaces: [],
+    openingHours: [],
+  },
+  {
+    id: 2,
+    name: "Toimipiste #2",
+    service: "",
+    location: {
+      addressCity: "Helsinki",
+      addressStreet: "Katuosoite 12",
+      addressZip: "00234",
+      latitude: 60.2187538,
+      longitude: 25.1553303,
+    },
+    area: "Alue",
+    resources: [],
+    spaces: [],
+    openingHours: [],
+  },
+  {
+    id: 3,
+    name: "Toimipiste #3",
+    service: "Palvelu #2",
+    location: {
+      addressCity: "Helsinki",
+      addressStreet: "Katuosoite 11",
+      addressZip: "00234",
+      latitude: 60.2187538,
+      longitude: 25.2553303,
+    },
+    area: "Alue #2",
+    resources: [
+      {
+        id: 1,
+        name: {
+          fi: "Resurssin nimi",
+        },
+        resourceType: "Tulostin",
+      },
+      {
+        id: 2,
+        resourceType: "Tulostin",
+        name: {
+          fi: "Toinen resurssi",
+        },
+      },
+    ],
+    spaces: [
+      {
+        id: 1,
+        name: {
+          fi: "Tilan nimi",
+        },
+        maxPersons: 11,
+        surfaceArea: 30,
+      },
+      {
+        id: 2,
+        code: "LK1234",
+        name: {
+          fi: "Toinen tila",
+        },
+      },
+    ],
+    openingHours: [],
+  },
+] as UnitWIP[];
+
+export async function getUnits(): Promise<UnitWIP[]> {
+  return units;
+}
+
+export async function getUnit(id: number): Promise<UnitWIP> {
+  const unit = units.find((u) => u.id === id);
+  if (!unit) throw Error("not found");
+  return unit;
 }

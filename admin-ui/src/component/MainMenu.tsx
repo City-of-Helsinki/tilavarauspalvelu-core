@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { NavLink, RouteProps } from "react-router-dom";
 import styled from "styled-components";
 import { breakpoints } from "../styles/util";
-import { ReactComponent as PremiseApplications } from "../images/icon_premise-applications.svg";
+import { ReactComponent as IconPremiseApplications } from "../images/icon_premise-applications.svg";
 import { ReactComponent as IconPremises } from "../images/icon_premises.svg";
 import { truncatedText } from "../styles/typography";
 
@@ -166,7 +166,7 @@ const SubItems = ({
 const menuTree: IMenuChild[] = [
   {
     title: "MainMenu.applications",
-    icon: <PremiseApplications aria-hidden />,
+    icon: <IconPremiseApplications aria-hidden />,
     items: [
       {
         title: "MainMenu.handling",
@@ -185,6 +185,10 @@ const menuTree: IMenuChild[] = [
       {
         title: "MainMenu.spaces",
         route: "/spaces",
+      },
+      {
+        title: "MainMenu.units",
+        route: "/units",
       },
     ],
   },

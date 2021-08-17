@@ -25,6 +25,10 @@ import ReservationsByReservationUnit from "./component/ApplicationRound/Reservat
 import ReservationSummariesByReservationUnit from "./component/ApplicationRound/ReservationSummariesByReservationUnit";
 import ReservationByApplicationEvent from "./component/Application/ReservationByApplicationEvent";
 import SpacesList from "./component/Spaces/SpacesList";
+import Units from "./component/Unit/Units";
+import Unit from "./component/Unit/Unit";
+import UnitMap from "./component/Unit/UnitMap";
+import SpacesResources from "./component/Unit/SpacesResources";
 
 interface IPrivateRouteProps {
   path: string;
@@ -143,6 +147,13 @@ function App(): JSX.Element {
               component={ApplicationRound}
             />
             <PrivateRoute path="/spaces" component={SpacesList} />
+            <PrivateRoute path="/units" component={Units} />
+            <PrivateRoute path="/unit/:unitId/map" component={UnitMap} />
+            <PrivateRoute
+              path="/unit/:unitId/spacesResources"
+              component={SpacesResources}
+            />
+            <PrivateRoute path="/unit/:unitId" component={Unit} />
           </Switch>
         </PageWrapper>
         {modalContent && <Modal>{modalContent}</Modal>}

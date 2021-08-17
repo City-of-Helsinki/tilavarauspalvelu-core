@@ -14,7 +14,6 @@ import { useDebounce } from "react-use";
 import {
   DataFilterConfig,
   LocalizationLanguages,
-  ReservationUnitBuilding,
   Space,
 } from "../../common/types";
 import { IngressContainer } from "../../styles/layout";
@@ -91,8 +90,8 @@ const getCellConfig = (
       },
       {
         title: t("Spaces.headings.volume"),
-        key: "building.realEstate",
-        transform: ({ building }: Space) => (
+        key: "maxPersons",
+        transform: ({ maxPersons }: Space) => (
           <div
             style={{
               display: "flex",
@@ -101,14 +100,14 @@ const getCellConfig = (
             }}
           >
             <IconGroup />
-            <span>{building.realEstate}</span>
+            <span>{maxPersons}</span>
           </div>
         ),
       },
       {
         title: t("Spaces.headings.size"),
         key: "building.surfaceArea",
-        transform: ({ building }: Space) => (
+        transform: ({ surfaceArea }: Space) => (
           <div
             style={{
               display: "flex",
@@ -116,7 +115,7 @@ const getCellConfig = (
               justifyContent: "space-between",
             }}
           >
-            <span>{building.surfaceArea}</span>
+            <span>{surfaceArea}</span>
             <IconArrowRight />
           </div>
         ),
@@ -130,30 +129,31 @@ const getCellConfig = (
 };
 
 const getFilterConfig = (spaces: Space[], t: TFunction): DataFilterConfig[] => {
-  const units = uniq(spaces.map((space: Space) => space.building));
-  const districts = uniq(spaces.map((space: Space) => space.building.district));
+  console.log(uniq, spaces, t);
+  // const units = uniq(spaces.map((space: Space) => space.building));
+  // const districts = uniq(spaces.map((space: Space) => space.building.district));
 
   return [
-    {
-      title: t("Spaces.headings.unit"),
-      filters:
-        units &&
-        units.map((unit: ReservationUnitBuilding) => ({
-          title: unit.name,
-          key: "building.name",
-          value: unit.name || "",
-        })),
-    },
-    {
-      title: t("Spaces.headings.district"),
-      filters:
-        districts &&
-        districts.map((district: number) => ({
-          title: String(district),
-          key: "building.district",
-          value: district || "",
-        })),
-    },
+    // {
+    //   title: t("Spaces.headings.unit"),
+    //   filters:
+    //     units &&
+    //     units.map((unit: ReservationUnitBuilding) => ({
+    //       title: unit.name,
+    //       key: "building.name",
+    //       value: unit.name || "",
+    //     })),
+    // },
+    // {
+    //   title: t("Spaces.headings.district"),
+    //   filters:
+    //     districts &&
+    //     districts.map((district: number) => ({
+    //       title: String(district),
+    //       key: "building.district",
+    //       value: district || "",
+    //     })),
+    // },
   ];
 };
 
@@ -204,19 +204,18 @@ const SpacesList = (): JSX.Element => {
   const filteredSpaces = searchTerm
     ? spaces.filter((space: Space) => {
         const searchTerms = searchTerm.toLowerCase().split(" ");
-        const { name, building } = space;
-        const { name: unit, district } = building;
+        // const { name, building } = space;
+        const { name } = space;
+        // const { name: unit, district } = building;
         const localizedName =
           name && isTranslationObject(name)
             ? localizedValue(name, i18n.language as LocalizationLanguages)
             : String(name);
 
         return searchTerms.every((term: string) => {
-          return (
-            localizedName.toLowerCase().includes(term) ||
-            String(unit).toLowerCase().includes(term) ||
-            String(district).toLowerCase().includes(term)
-          );
+          return localizedName.toLowerCase().includes(term);
+          // || String(unit).toLowerCase().includes(term) ||
+          // String(district).toLowerCase().includes(term)
         });
       })
     : spaces;

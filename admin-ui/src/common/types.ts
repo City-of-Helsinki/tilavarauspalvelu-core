@@ -54,9 +54,11 @@ export type Space = {
   id: number;
   locationType: "fixed";
   name: TranslationObject;
-  parent?: Space;
-  building: ReservationUnitBuilding;
-  surfaceArea?: string;
+  parent: number;
+  building: number;
+  surfaceArea: number; // WIP
+  maxPersons: number; // WIP
+  code: string; // WIP
 };
 
 export type Resource = {
@@ -64,6 +66,8 @@ export type Resource = {
   name: TranslationObject;
   locationType: "fixed";
   space: number;
+  unit: UnitWIP; // WIP
+  resourceType: string; // WIP
   bufferTimeBefore: string;
   bufferTimeAfter: string;
 };
@@ -81,6 +85,8 @@ export type Location = {
   addressStreet: string;
   addressZip: string;
   addressCity: string;
+  latitude: number;
+  longitude: number;
 };
 
 export type Image = {
@@ -412,4 +418,16 @@ export interface ReservationUnitCapacity {
 
 export interface ReservationUnitCalendarUrl {
   calendarUrl: string;
+}
+
+export interface UnitWIP {
+  id: number;
+  name: string;
+  location: Location;
+  service: string;
+  area: string;
+  resources: [];
+  spaces: [];
+  openingHours: [];
+  reservationUnits: [];
 }
