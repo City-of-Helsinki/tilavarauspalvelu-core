@@ -309,7 +309,9 @@ IPWARE_META_PRECEDENCE_ORDER = ("HTTP_X_FORWARDED_FOR",)
 GRAPHENE = {"SCHEMA": "api.graphql.schema.schema"}
 
 REST_FRAMEWORK = {
-    "DEFAULT_PERMISSION_CLASSES": ["permissions.api_permissions.ReadOnly"],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "permissions.api_permissions.drf_permissions.ReadOnly"
+    ],
     "DEFAULT_AUTHENTICATION_CLASSES": ["helusers.oidc.ApiTokenAuthentication"]
     + (
         [

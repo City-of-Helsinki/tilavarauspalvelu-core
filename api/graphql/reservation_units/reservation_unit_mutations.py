@@ -1,5 +1,6 @@
 import graphene
 from graphene_django.rest_framework.mutation import SerializerMutation
+from graphene_permissions.mixins import AuthMutation
 from rest_framework.generics import get_object_or_404
 
 from api.graphql.reservation_units.reservation_unit_serializers import (
@@ -7,11 +8,14 @@ from api.graphql.reservation_units.reservation_unit_serializers import (
     PurposeUpdateSerializer,
 )
 from api.graphql.reservation_units.reservation_unit_types import PurposeType
+from permissions.api_permissions.graphene_permissions import PurposePermission
 from reservation_units.models import Purpose
 
 
-class PurposeCreateMutation(SerializerMutation):
+class PurposeCreateMutation(SerializerMutation, AuthMutation):
     purpose = graphene.Field(PurposeType)
+
+    permission_classes = (PurposePermission,)
 
     class Meta:
         model_operations = ["create"]
@@ -24,8 +28,10 @@ class PurposeCreateMutation(SerializerMutation):
         return cls(errors=None, purpose=purpose)
 
 
-class PurposeUpdateMutation(SerializerMutation):
+class PurposeUpdateMutation(SerializerMutation, AuthMutation):
     purpose = graphene.Field(PurposeType)
+
+    permission_classes = (PurposePermission,)
 
     class Meta:
         model_operations = ["update"]

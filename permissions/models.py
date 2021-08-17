@@ -70,6 +70,10 @@ GENERAL_PERMISSIONS = (
         "can_manage_resources",
         _("Can create, edit and delete resources in the whole system"),
     ),
+    (
+        "can_manage_spaces",
+        _("Can create, edit and delete spaces in the whole system"),
+    ),
     ("can_handle_applications", _("Can handle applications in the whole system")),
     (
         "can_manage_application_rounds",

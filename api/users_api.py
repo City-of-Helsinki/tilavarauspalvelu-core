@@ -10,7 +10,7 @@ from api.permissions_api import (
     ServiceSectorRoleSerializer,
     UnitRoleSerializer,
 )
-from permissions.api_permissions import UserPermission
+from permissions.api_permissions.drf_permissions import UserPermission
 from permissions.helpers import can_view_users
 
 User = get_user_model()

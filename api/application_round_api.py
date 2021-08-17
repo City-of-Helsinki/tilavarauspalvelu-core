@@ -12,7 +12,7 @@ from applications.models import (
     ApplicationStatus,
     City,
 )
-from permissions.api_permissions import ApplicationRoundPermission
+from permissions.api_permissions.drf_permissions import ApplicationRoundPermission
 from permissions.helpers import can_manage_service_sectors_application_rounds
 from reservation_units.models import Purpose, ReservationUnit
 from reservations.models import AgeGroup

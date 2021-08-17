@@ -3,7 +3,7 @@ from drf_spectacular.utils import extend_schema
 from rest_framework import permissions, serializers, viewsets
 
 from applications.models import ApplicationEvent
-from permissions.api_permissions import ApplicationEventPermission
+from permissions.api_permissions.drf_permissions import ApplicationEventPermission
 from reservation_units.models import ReservationUnit
 
 

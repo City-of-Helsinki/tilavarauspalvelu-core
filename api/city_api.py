@@ -2,7 +2,7 @@ from django.conf import settings
 from rest_framework import permissions, serializers, viewsets
 
 from applications.models import City
-from permissions.api_permissions import CityPermission
+from permissions.api_permissions.drf_permissions import CityPermission
 
 
 class CitySerializer(serializers.ModelSerializer):

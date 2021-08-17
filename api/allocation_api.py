@@ -13,7 +13,7 @@ from applications.models import (
     ApplicationRoundBasket,
     ApplicationRoundStatus,
 )
-from permissions.api_permissions import AllocationRequestPermission
+from permissions.api_permissions.drf_permissions import AllocationRequestPermission
 
 
 class AllocationInProcessException(Exception):

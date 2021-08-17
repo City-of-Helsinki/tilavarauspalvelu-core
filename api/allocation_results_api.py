@@ -6,7 +6,7 @@ from rest_framework import mixins, permissions, serializers, viewsets
 from api.applications_api.serializers import ApplicationEventSerializer
 from api.common_filters import ModelInFilter
 from applications.models import ApplicationEvent, ApplicationEventScheduleResult
-from permissions.api_permissions import AllocationResultsPermission
+from permissions.api_permissions.drf_permissions import AllocationResultsPermission
 from reservation_units.models import ReservationUnit
 
 

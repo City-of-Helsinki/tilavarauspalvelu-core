@@ -1,5 +1,6 @@
 import graphene
 from graphene_django.rest_framework.mutation import SerializerMutation
+from graphene_permissions.mixins import AuthMutation
 from rest_framework.generics import get_object_or_404
 
 from api.graphql.spaces.space_serializers import (
@@ -7,11 +8,14 @@ from api.graphql.spaces.space_serializers import (
     SpaceUpdateSerializer,
 )
 from api.graphql.spaces.space_types import SpaceType
+from permissions.api_permissions.graphene_permissions import SpacePermission
 from spaces.models import Space
 
 
-class SpaceCreateMutation(SerializerMutation):
+class SpaceCreateMutation(SerializerMutation, AuthMutation):
     space = graphene.Field(SpaceType)
+
+    permission_classes = (SpacePermission,)
 
     class Meta:
         model_operations = ["create"]
@@ -24,8 +28,10 @@ class SpaceCreateMutation(SerializerMutation):
         return cls(errors=None, space=space)
 
 
-class SpaceUpdateMutation(SerializerMutation):
+class SpaceUpdateMutation(SerializerMutation, AuthMutation):
     space = graphene.Field(SpaceType)
+
+    permission_classes = (SpacePermission,)
 
     class Meta:
         model_operations = ["update"]

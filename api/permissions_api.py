@@ -5,7 +5,7 @@ from rest_framework import permissions, serializers, viewsets
 from rest_framework.exceptions import ValidationError
 
 from api.base import TranslatedModelSerializer
-from permissions.api_permissions import (
+from permissions.api_permissions.drf_permissions import (
     GeneralRolePermission,
     ServiceSectorRolePermission,
     UnitRolePermission,

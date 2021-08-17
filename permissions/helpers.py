@@ -104,8 +104,10 @@ def can_manage_units_reservation_units(user: User, unit: Unit) -> bool:
 
 
 def can_modify_reservation_unit(user: User, reservation_unit: ReservationUnit) -> bool:
-    return is_superuser(user) or can_manage_units_reservation_units(
-        user, reservation_unit.unit
+    return (
+        user.is_authenticated
+        and is_superuser(user)
+        or can_manage_units_reservation_units(user, reservation_unit.unit)
     )
 
 
@@ -273,6 +275,15 @@ def can_view_reservation(user: User, reservation: Reservation) -> bool:
     )
 
 
+def can_view_reservations(user):
+    return user.is_authenticated
+
+
+def can_create_reservation(user, reservation):
+    # For reservation creation by a user. Just a stub method for permissions => logic later.
+    return False
+
+
 def can_modify_reservation(user: User, reservation: Reservation) -> bool:
     permission = "can_manage_reservations"
     reservation_units = reservation.reservation_unit.all()
@@ -381,6 +392,11 @@ def can_manage_districts(user: User):
 
 def can_manage_resources(user: User):
     permission = "can_manage_resources"
+    return is_superuser(user) or has_general_permission(user, permission)
+
+
+def can_manage_spaces(user: User):
+    permission = "can_manage_spaces"
     return is_superuser(user) or has_general_permission(user, permission)
 
 
