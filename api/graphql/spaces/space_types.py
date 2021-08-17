@@ -3,7 +3,7 @@ from graphene_permissions.mixins import AuthNode
 
 from api.graphql.base_type import PrimaryKeyObjectType
 from permissions.api_permissions.graphene_permissions import SpacePermission
-from spaces.models import Building, District, Location, RealEstate, Space, Unit
+from spaces.models import Building, District, Location, RealEstate, Space
 
 
 class DistrictType(PrimaryKeyObjectType):
@@ -71,23 +71,6 @@ class LocationType(PrimaryKeyObjectType):
             "address_city",
             "longitude",
             "latitude",
-        )
-
-        interfaces = (graphene.relay.Node,)
-
-
-class UnitType(PrimaryKeyObjectType):
-    class Meta:
-        model = Unit
-        fields = (
-            "id",
-            "tprek_id",
-            "name",
-            "description",
-            "short_description",
-            "web_page",
-            "email",
-            "phone",
         )
 
         interfaces = (graphene.relay.Node,)

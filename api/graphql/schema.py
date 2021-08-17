@@ -14,10 +14,13 @@ from api.graphql.reservations.reservation_types import ReservationType
 from api.graphql.resources.resource_types import ResourceType
 from api.graphql.spaces.space_mutations import SpaceCreateMutation, SpaceUpdateMutation
 from api.graphql.spaces.space_types import SpaceType
+from api.graphql.units.unit_mutations import UnitUpdateMutation
+from api.graphql.units.unit_types import UnitType
 from permissions.api_permissions.graphene_permissions import (
     ReservationUnitPermission,
     ResourcePermission,
     SpacePermission,
+    UnitPermission,
 )
 from reservation_units.models import ReservationUnit
 from reservations.forms import ReservationForm
@@ -49,6 +52,10 @@ class SpacesFilter(AuthFilter):
     permission_classes = (SpacePermission,)
 
 
+class UnitsFilter(AuthFilter):
+    permission_classes = (UnitPermission,)
+
+
 class Query(graphene.ObjectType):
     reservation_units = ReservationUnitsFilter(ReservationUnitType)
     reservation_unit = relay.Node.Field(ReservationUnitType)
@@ -60,6 +67,10 @@ class Query(graphene.ObjectType):
     spaces = SpacesFilter(SpaceType)
     space = relay.Node.Field(SpaceType)
     space_by_pk = Field(SpaceType, pk=graphene.Int())
+
+    units = UnitsFilter(UnitType)
+    unit = relay.Node.Field(UnitType)
+    unit_by_pk = Field(UnitType, pk=graphene.Int())
 
     def resolve_reservation_unit_by_pk(parent, info, **kwargs):
         pk = kwargs.get("pk")
@@ -78,6 +89,8 @@ class Mutation(graphene.ObjectType):
 
     create_space = SpaceCreateMutation.Field()
     update_space = SpaceUpdateMutation.Field()
+
+    update_unit = UnitUpdateMutation.Field()
 
 
 schema = graphene.Schema(query=Query, mutation=Mutation)

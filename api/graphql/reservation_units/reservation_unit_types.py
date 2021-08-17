@@ -6,7 +6,8 @@ from graphene_permissions.mixins import AuthNode
 from api.graphql.base_type import PrimaryKeyObjectType
 from api.graphql.resources.resource_types import ResourceType
 from api.graphql.services.service_types import ServiceType
-from api.graphql.spaces.space_types import LocationType, SpaceType, UnitType
+from api.graphql.spaces.space_types import LocationType, SpaceType
+from api.graphql.units.unit_types import UnitType
 from permissions.api_permissions.graphene_permissions import ReservationUnitPermission
 from reservation_units.models import (
     Equipment,
