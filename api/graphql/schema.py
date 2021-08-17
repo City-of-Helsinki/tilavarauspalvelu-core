@@ -1,3 +1,4 @@
+import django_filters
 import graphene
 from graphene import Field, relay
 from graphene_django.forms.mutation import DjangoModelFormMutation
@@ -5,6 +6,9 @@ from graphene_permissions.mixins import AuthFilter, AuthMutation
 from graphene_permissions.permissions import AllowAuthenticated
 from rest_framework.generics import get_object_or_404
 
+from api.graphql.reservation_units.reservation_unit_filtersets import (
+    ReservationUnitsFilterSet,
+)
 from api.graphql.reservation_units.reservation_unit_mutations import (
     PurposeCreateMutation,
     PurposeUpdateMutation,
@@ -40,7 +44,7 @@ class AllowAuthenticatedFilter(AuthFilter):
     permission_classes = (AllowAuthenticated,)
 
 
-class ReservationUnitsFilter(AuthFilter):
+class ReservationUnitsFilter(AuthFilter, django_filters.FilterSet):
     permission_classes = (ReservationUnitPermission,)
 
 
@@ -57,9 +61,12 @@ class UnitsFilter(AuthFilter):
 
 
 class Query(graphene.ObjectType):
-    reservation_units = ReservationUnitsFilter(ReservationUnitType)
+    reservation_units = ReservationUnitsFilter(
+        ReservationUnitType, filterset_class=ReservationUnitsFilterSet
+    )
     reservation_unit = relay.Node.Field(ReservationUnitType)
     reservation_unit_by_pk = Field(ReservationUnitType, pk=graphene.Int())
+
     resources = ResourcesFilter(ResourceType)
     resource = relay.Node.Field(ResourceType)
     resource_by_pk = Field(ResourceType, pk=graphene.Int())
