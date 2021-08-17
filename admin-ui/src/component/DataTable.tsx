@@ -16,7 +16,6 @@ import {
 } from "hds-react";
 import { useTranslation } from "react-i18next";
 import { useHistory } from "react-router-dom";
-import orderBy from "lodash/orderBy";
 import get from "lodash/get";
 import isEqual from "lodash/isEqual";
 import pullAll from "lodash/pullAll";
@@ -33,6 +32,7 @@ import { ReactComponent as IconOpenAll } from "../images/icon_open-all.svg";
 import { ReactComponent as IconActivateSelection } from "../images/icon_select.svg";
 import { ReactComponent as IconDisableSelection } from "../images/icon_unselect.svg";
 import { truncatedText } from "../styles/typography";
+import { isTranslationObject, localizedValue } from "../common/util";
 
 export type OrderTypes = "asc" | "desc";
 
@@ -424,6 +424,7 @@ const processData = (
   filters: DataFilterOption[],
   handledAreHidden: boolean,
   statusField: string,
+  language: string,
   handledStatuses?: string[]
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): any[] => {
@@ -452,9 +453,27 @@ const processData = (
       );
     }
 
+    const sortedData = [...data].sort((a, b) => {
+      const aValue = isTranslationObject(get(a, sorting))
+        ? localizedValue(get(a, sorting), language)
+        : get(a, sorting);
+      const bValue = isTranslationObject(get(b, sorting))
+        ? localizedValue(get(b, sorting), language)
+        : get(b, sorting);
+
+      if (aValue < bValue) {
+        return order === "asc" ? -1 : 1;
+      }
+      if (aValue > bValue) {
+        return order === "asc" ? 1 : -1;
+      }
+
+      return 0;
+    });
+
     return {
       ...group,
-      data: orderBy(data, [sorting], [order]),
+      data: sortedData,
     };
   });
 };
@@ -500,10 +519,11 @@ function DataTable({
     } else {
       setOrder("asc");
     }
+
     setSorting(colKey);
   };
 
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const history = useHistory();
 
   const processedData = useMemo(
@@ -515,9 +535,19 @@ function DataTable({
         filters,
         handledAreHidden,
         statusField,
+        i18n.language,
         config.handledStatuses
       ),
-    [groups, sorting, order, filters, handledAreHidden, statusField, config]
+    [
+      groups,
+      sorting,
+      order,
+      filters,
+      handledAreHidden,
+      statusField,
+      config,
+      i18n,
+    ]
   );
 
   const flatData = useMemo(

@@ -17,6 +17,7 @@ import {
   ReservationStatus,
   ReservationUnitCapacity,
   ReservationUnitCalendarUrl,
+  Space,
 } from "./types";
 
 const apiBaseUrl: string = process.env.REACT_APP_TILAVARAUS_API_URL || "";
@@ -431,4 +432,43 @@ export function getReservationUnitCalendarUrl(
   return apiGet({
     path: `v1/${reservationUnitCalendarUrlBasePath}/${reservationUnitId}`,
   });
+}
+
+const MockSpaces: Space[] = [
+  {
+    id: 1,
+    name: {
+      fi: "Tilan #1 nimi",
+      en: "Space #1 name",
+      sv: "Space #1 namn",
+    },
+    building: {
+      id: 1,
+      district: 1,
+      name: "Mesta",
+      realEstate: "3",
+      surfaceArea: "14m2",
+    },
+    locationType: "fixed",
+  },
+  {
+    id: 2,
+    name: {
+      fi: "Tilan #2 nimi",
+      en: "Space #2 name",
+      sv: "Space #2 namn",
+    },
+    building: {
+      id: 2,
+      district: 2,
+      name: "Mesta 2",
+      realEstate: "13",
+      surfaceArea: "114m2",
+    },
+    locationType: "fixed",
+  },
+];
+
+export function getSpaces(): Promise<Space[]> {
+  return Promise.resolve(MockSpaces);
 }

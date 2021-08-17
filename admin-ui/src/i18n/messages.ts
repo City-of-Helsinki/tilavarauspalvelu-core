@@ -57,6 +57,7 @@ const translations: ITranslations = {
     today: ["Tänään"],
     agesSuffix: ["{{range}}-vuotiaat"],
     resetFilters: ["Tyhjennä suodattimet"],
+    resetSearch: ["Tyhjennä hakukenttä"],
     apply: ["Käytä"],
     volumeUnit: [" kpl", " ", " "],
     personUnit: ["{{count}} henkilö"],
@@ -577,6 +578,13 @@ const translations: ITranslations = {
       "Täällä näet koosteen kaikista tiloista, joita on liitetty järjestelmään ja jotka sinulla on oikeus nähdä.",
     ],
     searchPlaceholder: ["Hae tiloja"],
+    headings: {
+      name: ["Nimi"],
+      unit: ["Toimipiste"],
+      district: ["Kaupunginosa"],
+      volume: ["Vetoisuus"],
+      size: ["Koko"],
+    },
   },
   Applicant: {
     inAllocation: ["Mukana jaossa"],

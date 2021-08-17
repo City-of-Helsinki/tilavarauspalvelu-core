@@ -300,3 +300,13 @@ export const parseAddress = (location: Location): string => {
     ", "
   );
 };
+
+export const isTranslationObject = (value: unknown): boolean => {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    {}.propertyIsEnumerable.call(value, "fi") &&
+    {}.propertyIsEnumerable.call(value, "en") &&
+    {}.propertyIsEnumerable.call(value, "sv")
+  );
+};
