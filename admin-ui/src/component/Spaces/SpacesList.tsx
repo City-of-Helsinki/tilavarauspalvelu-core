@@ -129,6 +129,7 @@ const getCellConfig = (
 };
 
 const getFilterConfig = (spaces: Space[], t: TFunction): DataFilterConfig[] => {
+  // eslint-disable-next-line no-console
   console.log(uniq, spaces, t);
   // const units = uniq(spaces.map((space: Space) => space.building));
   // const districts = uniq(spaces.map((space: Space) => space.building.district));
