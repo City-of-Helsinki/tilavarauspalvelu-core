@@ -37,17 +37,21 @@ class SpaceSerializer(TranslatedModelSerializer):
         queryset=Space.objects.all(),
         source="parent",
         help_text="Id of parent space for this space.",
+        allow_null=True,
     )
     building_id = serializers.PrimaryKeyRelatedField(
         queryset=Building.objects.all(),
         source="building",
         help_text="Id of building for this space.",
+        allow_null=True,
     )
     district_id = serializers.PrimaryKeyRelatedField(
         queryset=District.objects.all(),
         source="district",
         help_text="Id of district for this space.",
+        allow_null=True,
     )
+    name = serializers.CharField()
 
     class Meta:
         model = Space
