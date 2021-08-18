@@ -4,7 +4,6 @@ from __future__ import unicode_literals
 
 from snapshottest import Snapshot
 
-
 snapshots = Snapshot()
 
 snapshots['ResourceGraphQLTestCase::test_getting_keyword_categories 1'] = {

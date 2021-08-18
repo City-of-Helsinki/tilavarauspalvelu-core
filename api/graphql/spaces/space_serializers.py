@@ -4,8 +4,9 @@ from api.graphql.base_serializers import (
     PrimaryKeySerializer,
     PrimaryKeyUpdateSerializer,
 )
+from api.graphql.translate_fields import get_all_translatable_fields
 from api.space_api import SpaceSerializer
-from spaces.models import Unit
+from spaces.models import Space, Unit
 
 
 class SpaceCreateSerializer(SpaceSerializer, PrimaryKeySerializer):
@@ -25,15 +26,16 @@ class SpaceCreateSerializer(SpaceSerializer, PrimaryKeySerializer):
         self.fields["name_fi"].required = True
 
     class Meta(SpaceSerializer.Meta):
-        fields = SpaceSerializer.Meta.fields + [
-            "max_persons",
-            "code",
-            "terms_of_use",
-            "unit_id",
-            "name_fi",
-            "name_en",
-            "name_sv",
-        ]
+        fields = (
+            SpaceSerializer.Meta.fields
+            + [
+                "max_persons",
+                "code",
+                "terms_of_use",
+                "unit_id",
+            ]
+            + get_all_translatable_fields(Space)
+        )
 
     def validate(self, data):
         name_fi = data.get("name_fi", getattr(self.instance, "name_fi", None))

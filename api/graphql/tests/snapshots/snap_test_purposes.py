@@ -4,7 +4,6 @@ from __future__ import unicode_literals
 
 from snapshottest import Snapshot
 
-
 snapshots = Snapshot()
 
 snapshots['PurposeQueryTestCase::test_getting_purposes 1'] = {
@@ -28,7 +27,9 @@ snapshots['PurposeTestCase::test_creating_purpose 1'] = {
         'createPurpose': {
             'errors': None,
             'purpose': {
-                'nameFi': 'Created purpose'
+                'name': {
+                    'nameFi': "{'nameFi': 'Created purpose'}"
+                }
             }
         }
     }
@@ -38,7 +39,9 @@ snapshots['PurposeTestCase::test_updating_purpose 1'] = {
     'updatePurpose': {
         'errors': None,
         'purpose': {
-            'nameFi': 'Updated name'
+            'name': {
+                'nameFi': "{'nameFi': 'Updated name'}"
+            }
         }
     }
 }

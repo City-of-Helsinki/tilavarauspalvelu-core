@@ -52,9 +52,13 @@ class ResourceGraphQLTestCase(ResourceGraphQLBase, snapshottest.TestCase):
               resources {
                 edges {
                   node {
-                    name
+                    name {
+                        nameFi
+                    }
                     space {
-                      name
+                        name {
+                            nameFi
+                        }
                     }
                     building {
                       name
@@ -78,13 +82,19 @@ class ResourceGraphQLTestCase(ResourceGraphQLBase, snapshottest.TestCase):
         self.resource.buffer_time_before = timedelta(hours=1)
         self.resource.buffer_time_after = timedelta(hours=2)
         self.resource.save()
-        query = (
-            f"{{\n"
-            f"resourceByPk(pk: {self.resource.id}) {{\n"
-            f"id name pk bufferTimeBefore bufferTimeAfter\n"
-            f"}}"
-            f"}}"
-        )
+        query = f"""
+            {{
+                resourceByPk(pk: {self.resource.id}) {{
+                    id
+                    name {{
+                        nameFi
+                    }}
+                    pk
+                    bufferTimeBefore
+                    bufferTimeAfter
+                }}
+            }}
+            """
         response = self.query(query)
 
         content = json.loads(response.content)
@@ -101,13 +111,17 @@ class ResourceGraphQLTestCase(ResourceGraphQLBase, snapshottest.TestCase):
         self.assertMatchSnapshot(content)
 
     def test_should_error_when_not_found_by_pk(self):
-        query = (
-            f"{{\n"
-            f"resourceByPk(pk: {self.resource.id + 657}) {{\n"
-            f"id name pk\n"
-            f"}}"
-            f"}}"
-        )
+        query = f"""
+            {{
+                resourceByPk(pk: {self.resource.id + 657}) {{
+                    id
+                    name {{
+                        nameFi
+                    }}
+                    pk
+                }}
+            }}
+            """
         response = self.query(query)
 
         content = json.loads(response.content)

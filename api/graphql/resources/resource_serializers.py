@@ -4,6 +4,7 @@ from api.graphql.base_serializers import (
     PrimaryKeySerializer,
     PrimaryKeyUpdateSerializer,
 )
+from api.graphql.translate_fields import get_all_translatable_fields
 from api.resources_api import ResourceSerializer
 from resources.models import Resource
 
@@ -14,15 +15,12 @@ class ResourceCreateSerializer(ResourceSerializer, PrimaryKeySerializer):
     )  # For some reason graphene blows up if this isn't defined here.
 
     class Meta(ResourceSerializer.Meta):
-        fields = ResourceSerializer.Meta.fields + [
-            "name_fi",
-            "name_en",
-            "name_sv",
-            "is_draft",
-            "description_fi",
-            "description_en",
-            "description_sv",
-        ]
+
+        fields = (
+            ResourceSerializer.Meta.fields
+            + ["is_draft"]
+            + get_all_translatable_fields(Resource)
+        )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -30,14 +28,7 @@ class ResourceCreateSerializer(ResourceSerializer, PrimaryKeySerializer):
         self.fields["space_id"].allow_null = True
         self.fields["name"].required = False
 
-        self.translation_fields = [
-            "name_fi",
-            "name_en",
-            "name_sv",
-            "description_fi",
-            "description_en",
-            "description_sv",
-        ]
+        self.translation_fields = get_all_translatable_fields(Resource)
 
     def validate(self, data):
         location_type = data.get("location_type")

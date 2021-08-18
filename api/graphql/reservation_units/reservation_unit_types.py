@@ -16,6 +16,10 @@ from api.graphql.reservations.reservation_types import ReservationType
 from api.graphql.resources.resource_types import ResourceType
 from api.graphql.services.service_types import ServiceType
 from api.graphql.spaces.space_types import LocationType, SpaceType
+from api.graphql.translate_fields import (
+    django_type_self_resolver,
+    get_translatable_field,
+)
 from api.graphql.units.unit_types import UnitType
 from applications.models import ApplicationRound
 from opening_hours.hauki_link_generator import generate_hauki_link
@@ -83,10 +87,17 @@ class KeywordCategoryType(AuthNode, PrimaryKeyObjectType):
         return self.keyword_groups.all()
 
 
+class PurposeNameField(DjangoObjectType):
+    class Meta:
+        model = Purpose
+        fields = get_translatable_field(model, "name")
+
+
 class PurposeType(AuthNode, PrimaryKeyObjectType):
     permission_classes = (
         (PurposePermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
     )
+    name = graphene.Field(PurposeNameField, resolver=django_type_self_resolver)
 
     class Meta:
         model = Purpose
@@ -227,8 +238,15 @@ class ApplicationRoundType(AuthNode, PrimaryKeyObjectType):
         }
 
 
+class ReservationUnitNameField(DjangoObjectType):
+    class Meta:
+        model = ReservationUnit
+        fields = get_translatable_field(model, "name")
+
+
 class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
     pk = graphene.Int()
+    name = graphene.Field(ReservationUnitNameField, resolver=django_type_self_resolver)
     spaces = graphene.List(SpaceType)
     resources = graphene.List(ResourceType)
     services = graphene.List(ServiceType)

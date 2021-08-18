@@ -23,7 +23,9 @@ class PurposeTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
             mutation createPurpose($input: PurposeCreateMutationInput!){
                 createPurpose(input: $input) {
                     purpose {
-                        nameFi
+                        name {
+                            nameFi
+                        }
                     }
                     errors {
                         messages
@@ -37,7 +39,9 @@ class PurposeTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
             mutation updatePurpose($input: PurposeUpdateMutationInput!){
                 updatePurpose(input: $input) {
                     purpose {
-                        nameFi
+                        name {
+                            nameFi
+                        }
                         pk
                     }
                     errors {
@@ -51,7 +55,7 @@ class PurposeTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
     def test_updating_purpose(self):
         response = self.query(
             self.get_update_query(),
-            input_data={"pk": self.purpose.id, "nameFi": "Updated name"},
+            input_data={"pk": self.purpose.id, "name": {"nameFi": "Updated name"}},
         )
 
         content = json.loads(response.content).get("data")
@@ -65,7 +69,7 @@ class PurposeTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
     def test_updating_should_error_when_not_found(self):
         response = self.query(
             self.get_update_query(),
-            input_data={"pk": self.purpose.id + 3782, "nameFi": "Fail name"},
+            input_data={"pk": self.purpose.id + 3782, "name": {"nameFi": "Fail name"}},
         )
 
         content = json.loads(response.content)
@@ -77,7 +81,7 @@ class PurposeTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
 
     def test_creating_purpose(self):
         response = self.query(
-            self.get_create_query(), input_data={"nameFi": "Created purpose"}
+            self.get_create_query(), input_data={"name": {"nameFi": "Created purpose"}}
         )
 
         content = json.loads(response.content)

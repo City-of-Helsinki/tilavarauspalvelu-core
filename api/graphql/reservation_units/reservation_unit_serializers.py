@@ -4,13 +4,19 @@ from api.graphql.base_serializers import (
     PrimaryKeySerializer,
     PrimaryKeyUpdateSerializer,
 )
+from api.graphql.translate_fields import get_all_translatable_fields
 from api.reservation_units_api import (
     EquipmentCategorySerializer,
     EquipmentSerializer,
     PurposeSerializer,
     ReservationUnitSerializer,
 )
-from reservation_units.models import Equipment, Purpose, ReservationUnitType
+from reservation_units.models import (
+    Equipment,
+    Purpose,
+    ReservationUnit,
+    ReservationUnitType,
+)
 from resources.models import Resource
 from services.models import Service
 from spaces.models import Space
@@ -82,7 +88,11 @@ class PurposeCreateSerializer(PurposeSerializer, PrimaryKeySerializer):
 
 class PurposeUpdateSerializer(PrimaryKeyUpdateSerializer, PurposeCreateSerializer):
     class Meta(PurposeCreateSerializer.Meta):
-        fields = PurposeCreateSerializer.Meta.fields + ["pk"]
+        fields = (
+            PurposeCreateSerializer.Meta.fields
+            + ["pk"]
+            + get_all_translatable_fields(Purpose)
+        )
 
 
 class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySerializer):
@@ -116,25 +126,23 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
         self.fields["description"].required = False
 
     class Meta(ReservationUnitSerializer.Meta):
-        fields = ReservationUnitSerializer.Meta.fields + [
-            "max_reservation_duration",
-            "min_reservation_duration",
-            "name_fi",
-            "name_en",
-            "name_sv",
-            "description_fi",
-            "description_en",
-            "description_sv",
-            "is_draft",
-            "space_ids",
-            "resource_ids",
-            "purpose_ids",
-            "service_ids",
-            "reservation_unit_type_id",
-            "surface_area",
-            "buffer_time_between_reservations",
-            "max_persons",
-        ]
+        fields = (
+            ReservationUnitSerializer.Meta.fields
+            + [
+                "max_reservation_duration",
+                "min_reservation_duration",
+                "is_draft",
+                "space_ids",
+                "resource_ids",
+                "purpose_ids",
+                "service_ids",
+                "reservation_unit_type_id",
+                "surface_area",
+                "buffer_time_between_reservations",
+                "max_persons",
+            ]
+            + get_all_translatable_fields(ReservationUnit)
+        )
 
     def _check_id_list(self, id_list, field_name):
         for identifier in id_list:

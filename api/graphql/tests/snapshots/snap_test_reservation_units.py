@@ -4,7 +4,6 @@ from __future__ import unicode_literals
 
 from snapshottest import Snapshot
 
-
 snapshots = Snapshot()
 
 snapshots['ReservationUnitTestCase::test_filtering_by_active_application_rounds 1'] = {
@@ -36,7 +35,9 @@ snapshots['ReservationUnitTestCase::test_filtering_by_keyword_group 1'] = {
                                 'name': 'Sports'
                             }
                         ],
-                        'name': 'Test name'
+                        'name': {
+                            'nameFi': 'Test name'
+                        }
                     }
                 }
             ]
@@ -51,7 +52,9 @@ snapshots['ReservationUnitTestCase::test_filtering_by_max_persons 1'] = {
                 {
                     'node': {
                         'maxPersons': 110,
-                        'name': 'Test name'
+                        'name': {
+                            'nameFi': 'Test name'
+                        }
                     }
                 }
             ]
@@ -74,7 +77,9 @@ snapshots['ReservationUnitTestCase::test_filtering_by_multiple_reservation_state
             'edges': [
                 {
                     'node': {
-                        'name': 'Test name',
+                        'name': {
+                            'nameFi': 'Test name'
+                        },
                         'reservations': [
                             {
                                 'begin': '2021-05-03T00:00:00+00:00',
@@ -100,7 +105,9 @@ snapshots['ReservationUnitTestCase::test_filtering_by_reservation_state 1'] = {
             'edges': [
                 {
                     'node': {
-                        'name': 'Test name',
+                        'name': {
+                            'nameFi': 'Test name'
+                        },
                         'reservations': [
                             {
                                 'begin': '2021-05-03T00:00:00+00:00',
@@ -121,7 +128,9 @@ snapshots['ReservationUnitTestCase::test_filtering_by_reservation_timestamps 1']
             'edges': [
                 {
                     'node': {
-                        'name': 'Test name',
+                        'name': {
+                            'nameFi': 'Test name'
+                        },
                         'reservations': [
                             {
                                 'begin': '2021-05-03T00:00:00+00:00',
@@ -143,13 +152,17 @@ snapshots['ReservationUnitTestCase::test_filtering_by_reservation_unit_descripti
                 {
                     'node': {
                         'description': 'Lorem ipsum',
-                        'name': 'Test name'
+                        'name': {
+                            'nameFi': 'Test name'
+                        }
                     }
                 },
                 {
                     'node': {
                         'description': 'Lorem ipsum',
-                        'name': 'Test name'
+                        'name': {
+                            'nameFi': 'Test name'
+                        }
                     }
                 }
             ]
@@ -163,12 +176,16 @@ snapshots['ReservationUnitTestCase::test_filtering_by_reservation_unit_name 1'] 
             'edges': [
                 {
                     'node': {
-                        'name': 'Test name'
+                        'name': {
+                            'nameFi': 'Test name'
+                        }
                     }
                 },
                 {
                     'node': {
-                        'name': 'Test name'
+                        'name': {
+                            'nameFi': 'Test name'
+                        }
                     }
                 }
             ]
@@ -182,10 +199,14 @@ snapshots['ReservationUnitTestCase::test_filtering_by_space_name 1'] = {
             'edges': [
                 {
                     'node': {
-                        'name': 'Test name',
+                        'name': {
+                            'nameFi': 'Test name'
+                        },
                         'spaces': [
                             {
-                                'name': 'space name'
+                                'name': {
+                                    'nameFi': 'space name'
+                                }
                             }
                         ]
                     }
@@ -201,7 +222,9 @@ snapshots['ReservationUnitTestCase::test_filtering_by_type 1'] = {
             'edges': [
                 {
                     'node': {
-                        'name': 'Test name',
+                        'name': {
+                            'nameFi': 'Test name'
+                        },
                         'reservationUnitType': {
                             'name': 'Test type'
                         }
@@ -218,7 +241,9 @@ snapshots['ReservationUnitTestCase::test_filtering_by_type_text 1'] = {
             'edges': [
                 {
                     'node': {
-                        'name': 'Test name',
+                        'name': {
+                            'nameFi': 'Test name'
+                        },
                         'reservationUnitType': {
                             'name': 'Test type'
                         }
@@ -226,7 +251,9 @@ snapshots['ReservationUnitTestCase::test_filtering_by_type_text 1'] = {
                 },
                 {
                     'node': {
-                        'name': 'Test name',
+                        'name': {
+                            'nameFi': 'Test name'
+                        },
                         'reservationUnitType': {
                             'name': 'Test type'
                         }
@@ -243,7 +270,9 @@ snapshots['ReservationUnitTestCase::test_getting_hauki_url 1'] = {
             'haukiUrl': {
                 'url': 'https://test.com/resource/origin:3774af34-9916-40f2-acc7-68db5a627710/?hsa_source=origin&hsa_username=AnonymousUser&hsa_organization=ORGANISATION&hsa_created_at=2021-05-03 00:00:00+00:00&hsa_valid_until=2021-05-03 00:30:00+00:00&hsa_resource=origin:3774af34-9916-40f2-acc7-68db5a627710&hsa_signature=8df8cd01df388f8f1aad70e82035eaae3a27d33c2f3e3583bb7f9bb7aca966f1'
             },
-            'name': 'Test name'
+            'name': {
+                'nameFi': 'Test name'
+            }
         }
     }
 }
@@ -264,7 +293,9 @@ snapshots['ReservationUnitTestCase::test_getting_reservation_units 1'] = {
                         ],
                         'location': None,
                         'maxPersons': 110,
-                        'name': 'Test name',
+                        'name': {
+                            'nameFi': 'Test name'
+                        },
                         'purposes': [
                         ],
                         'requireIntroduction': False,
@@ -279,10 +310,14 @@ snapshots['ReservationUnitTestCase::test_getting_reservation_units 1'] = {
                         ],
                         'spaces': [
                             {
-                                'name': 'Large space'
+                                'name': {
+                                    'nameFi': 'Large space'
+                                }
                             },
                             {
-                                'name': 'Small space'
+                                'name': {
+                                    'nameFi': 'Small space'
+                                }
                             }
                         ],
                         'termsOfUse': ''

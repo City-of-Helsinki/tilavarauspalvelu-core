@@ -54,20 +54,20 @@ class ReservationUnitTestCase(GraphQLTestCase, snapshottest.TestCase):
                 reservationUnits {
                     edges {
                         node {
-                            name
+                            name{nameFi}
                             description
                             spaces {
-                              name
+                              name{nameFi}
                             }
                             resources {
-                              name
+                              name{nameFi}
                             }
                             services {
                               name
                             }
                             requireIntroduction
                             purposes {
-                              nameFi
+                              name{nameFi}
                             }
                             images {
                               imageUrl
@@ -119,7 +119,7 @@ class ReservationUnitTestCase(GraphQLTestCase, snapshottest.TestCase):
         query = (
             f"{{\n"
             f"reservationUnitByPk(pk: {self.reservation_unit.id}) {{\n"
-            f"id name pk\n"
+            f"id name{{nameFi}} pk\n"
             f"}}"
             f"}}"
         )
@@ -140,7 +140,7 @@ class ReservationUnitTestCase(GraphQLTestCase, snapshottest.TestCase):
         query = (
             f"{{\n"
             f"reservationUnitByPk(pk: {self.reservation_unit.id}) {{\n"
-            f"name\n"
+            f"name{{nameFi}}\n"
             f"haukiUrl{{url}}"
             f"}}"
             f"}}"
@@ -210,7 +210,7 @@ class ReservationUnitTestCase(GraphQLTestCase, snapshottest.TestCase):
             f"reservationUnits(reservationUnitType:{self.type.id}){{"
             f"edges {{"
             f"node {{"
-            f"name "
+            f"name{{nameFi}} "
             f"reservationUnitType {{"
             f"name"
             f"}}"
@@ -249,7 +249,7 @@ class ReservationUnitTestCase(GraphQLTestCase, snapshottest.TestCase):
                 reservationUnits(maxPersonsLte:120, maxPersonsGte:60) {
                     edges {
                         node{
-                            name maxPersons
+                            name{nameFi} maxPersons
                         }
                     }
                 }
@@ -267,7 +267,7 @@ class ReservationUnitTestCase(GraphQLTestCase, snapshottest.TestCase):
                 reservationUnits(maxPersonsLte:20, maxPersonsGte:15) {
                     edges {
                         node{
-                            name maxPersons
+                            name{nameFi} maxPersons
                         }
                     }
                 }
@@ -288,7 +288,9 @@ class ReservationUnitTestCase(GraphQLTestCase, snapshottest.TestCase):
                 reservationUnits(textSearch:"Test type"){
                 edges {
                     node {
-                        name
+                        name {
+                            nameFi
+                        }
                         reservationUnitType{name}
                     }
                 }
@@ -308,7 +310,9 @@ class ReservationUnitTestCase(GraphQLTestCase, snapshottest.TestCase):
                 reservationUnits(textSearch:"Nonexisting type"){
                 edges {
                     node {
-                        name
+                        name {
+                            nameFi
+                        }
                     }
                 }
                 }
@@ -326,7 +330,7 @@ class ReservationUnitTestCase(GraphQLTestCase, snapshottest.TestCase):
                 reservationUnits(textSearch:"Test name"){
                 edges {
                     node {
-                        name
+                        name{nameFi}
                     }
                 }
                 }
@@ -345,7 +349,7 @@ class ReservationUnitTestCase(GraphQLTestCase, snapshottest.TestCase):
                 reservationUnits(textSearch:"Nonexisting name"){
                 edges {
                     node {
-                        name
+                        name{nameFi}
                     }
                 }
                 }
@@ -365,7 +369,7 @@ class ReservationUnitTestCase(GraphQLTestCase, snapshottest.TestCase):
                 reservationUnits(textSearch:"Lorem ipsum"){
                 edges {
                     node {
-                        name
+                        name{nameFi}
                         description
                     }
                 }
@@ -385,7 +389,7 @@ class ReservationUnitTestCase(GraphQLTestCase, snapshottest.TestCase):
                 reservationUnits(textSearch:"Dolor sit"){
                 edges {
                     node {
-                        name
+                        name{nameFi}
                     }
                 }
                 }
@@ -407,8 +411,8 @@ class ReservationUnitTestCase(GraphQLTestCase, snapshottest.TestCase):
                 reservationUnits(textSearch:"space name"){
                 edges {
                     node {
-                        name
-                        spaces{name}
+                        name{nameFi}
+                        spaces{name{nameFi}}
                     }
                 }
                 }
@@ -427,7 +431,7 @@ class ReservationUnitTestCase(GraphQLTestCase, snapshottest.TestCase):
                 reservationUnits(textSearch:"not a space name"){
                 edges {
                     node {
-                        name
+                        name{nameFi}
                     }
                 }
                 }
@@ -449,7 +453,7 @@ class ReservationUnitTestCase(GraphQLTestCase, snapshottest.TestCase):
             f"reservationUnits( keywordGroups:{keyword_group.id}){{"
             f"edges {{"
             f"node {{"
-            f"name\n"
+            f"name{{nameFi}}\n"
             f"keywordGroups{{name}}"
             f"}}"
             f"}}"
@@ -500,7 +504,9 @@ class ReservationUnitTestCase(GraphQLTestCase, snapshottest.TestCase):
                 reservationUnits {
                     edges {
                         node {
-                            name
+                            name {
+                                nameFi
+                            }
                             reservations(from: "2021-05-03", to: "2021-05-04") {
                                 begin
                                 end
@@ -542,7 +548,9 @@ class ReservationUnitTestCase(GraphQLTestCase, snapshottest.TestCase):
                 reservationUnits {
                     edges {
                         node {
-                            name
+                            name {
+                                nameFi
+                            }
                             reservations(state: "CREATED") {
                                 begin
                                 end
@@ -588,7 +596,9 @@ class ReservationUnitTestCase(GraphQLTestCase, snapshottest.TestCase):
                 reservationUnits {
                     edges {
                         node {
-                            name
+                            name {
+                                nameFi
+                            }
                             reservations(state: ["CREATED", "CONFIRMED"]) {
                                 begin
                                 end
