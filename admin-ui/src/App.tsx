@@ -29,6 +29,7 @@ import Units from "./component/Unit/Units";
 import Unit from "./component/Unit/Unit";
 import UnitMap from "./component/Unit/UnitMap";
 import SpacesResources from "./component/Unit/SpacesResources";
+import ResourcesList from "./component/Resources/ResourcesList";
 
 interface IPrivateRouteProps {
   path: string;
@@ -147,6 +148,7 @@ function App(): JSX.Element {
               component={ApplicationRound}
             />
             <PrivateRoute path="/spaces" component={SpacesList} />
+            <PrivateRoute path="/resources" component={ResourcesList} />
             <PrivateRoute path="/units" component={Units} />
             <PrivateRoute path="/unit/:unitId/map" component={UnitMap} />
             <PrivateRoute

@@ -187,6 +187,10 @@ const menuTree: IMenuChild[] = [
         route: "/spaces",
       },
       {
+        title: "MainMenu.resources",
+        route: "/resources",
+      },
+      {
         title: "MainMenu.units",
         route: "/units",
       },
