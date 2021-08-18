@@ -15,7 +15,7 @@ from api.services_api import ServiceSerializer
 from api.space_api import BuildingSerializer, LocationSerializer, SpaceSerializer
 from applications.models import ApplicationRound
 from opening_hours.hours import HaukiRequestError
-from opening_hours.utils import get_resources_total_hours_per_resource
+from opening_hours.utils.summaries import get_resources_total_hours_per_resource
 from permissions.api_permissions.drf_permissions import (
     EquipmentCategoryPermission,
     EquipmentPermission,
