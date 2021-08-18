@@ -24,6 +24,7 @@ import ResolutionReport from "./component/ApplicationRound/ResolutionReport";
 import ReservationsByReservationUnit from "./component/ApplicationRound/ReservationsByReservationUnit";
 import ReservationSummariesByReservationUnit from "./component/ApplicationRound/ReservationSummariesByReservationUnit";
 import ReservationByApplicationEvent from "./component/Application/ReservationByApplicationEvent";
+import SpacesList from "./component/Spaces/SpacesList";
 import Units from "./component/Unit/Units";
 import Unit from "./component/Unit/Unit";
 import UnitMap from "./component/Unit/UnitMap";
@@ -145,6 +146,7 @@ function App(): JSX.Element {
               path="/applicationRound/:applicationRoundId"
               component={ApplicationRound}
             />
+            <PrivateRoute path="/spaces" component={SpacesList} />
             <PrivateRoute path="/units" component={Units} />
             <PrivateRoute path="/unit/:unitId/map" component={UnitMap} />
             <PrivateRoute

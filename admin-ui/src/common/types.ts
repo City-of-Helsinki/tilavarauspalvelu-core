@@ -96,9 +96,9 @@ export type Image = {
   imageType: "main" | "map" | "ground_plan" | "other";
 };
 
-type ReservationUnitBuilding = {
+export type ReservationUnitBuilding = {
   id: number;
-  district: number | null;
+  district: number;
   name: string | null;
   realEstate: string | null;
   surfaceArea: string | null;

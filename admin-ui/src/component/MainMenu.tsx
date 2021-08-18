@@ -183,6 +183,10 @@ const menuTree: IMenuChild[] = [
     icon: <IconPremises aria-hidden />,
     items: [
       {
+        title: "MainMenu.spaces",
+        route: "/spaces",
+      },
+      {
         title: "MainMenu.units",
         route: "/units",
       },

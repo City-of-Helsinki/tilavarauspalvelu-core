@@ -5,11 +5,12 @@
 trigger:
   branches:
     include:
-    - main
-    - refs/tags/*
+      - main
+      - refs/tags/*
   paths:
-    exclude:
-    - README.md
+    include:
+      - common
+      - ui
 
 # By default, use self-hosted agents
 pool: Default
@@ -19,11 +20,11 @@ pr: none
 
 resources:
   repositories:
-  # Azure DevOps repository
-  - repository: tilavarauspalvelu-pipelines
-    type: git
-    # project/repository
-    name: tilavarauspalvelu/tilavarauspalvelu-pipelines
+    # Azure DevOps repository
+    - repository: tilavarauspalvelu-pipelines
+      type: git
+      # project/repository
+      name: tilavarauspalvelu/tilavarauspalvelu-pipelines
 
 extends:
   template: azure-pipelines-tilavarauspalvelu-ui.yml@tilavarauspalvelu-pipelines

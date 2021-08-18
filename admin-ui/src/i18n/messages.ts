@@ -57,6 +57,7 @@ const translations: ITranslations = {
     today: ["Tänään"],
     agesSuffix: ["{{range}}-vuotiaat"],
     resetFilters: ["Tyhjennä suodattimet"],
+    resetSearch: ["Tyhjennä hakukenttä"],
     apply: ["Käytä"],
     volumeUnit: [" kpl", " ", " "],
     personUnit: ["{{count}} henkilö"],
@@ -156,6 +157,7 @@ const translations: ITranslations = {
     spaceAndHobbyTypes: ["Tila- ja harrastetyypit"],
     applicationRounds: ["Hakukierrokset"],
     conditionsAndAttachments: ["Ehdot ja liitteet"],
+    spaces: ["Tilat"],
     units: ["Toimipisteet"],
   },
   HeadingMenu: {
@@ -570,6 +572,20 @@ const translations: ITranslations = {
     purposeCount: ["{{count}} käyttötarkoitus"],
     purposeCount_plural: ["{{count}} käyttötarkoitusta"],
     downloadSpaceCalendar: ["Lataa tilan kalenterimerkinnät (.ics)"],
+  },
+  Spaces: {
+    spaceListHeading: ["Kaikki tilat"],
+    spaceListDescription: [
+      "Täällä näet koosteen kaikista tiloista, joita on liitetty järjestelmään ja jotka sinulla on oikeus nähdä.",
+    ],
+    searchPlaceholder: ["Hae tiloja"],
+    headings: {
+      name: ["Nimi"],
+      unit: ["Toimipiste"],
+      district: ["Kaupunginosa"],
+      volume: ["Vetoisuus"],
+      size: ["Koko"],
+    },
   },
   Applicant: {
     inAllocation: ["Mukana jaossa"],

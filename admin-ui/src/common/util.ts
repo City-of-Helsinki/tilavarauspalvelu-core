@@ -303,6 +303,16 @@ export const parseAddress = (location: Location): string => {
   );
 };
 
+export const isTranslationObject = (value: unknown): boolean => {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    {}.propertyIsEnumerable.call(value, "fi") &&
+    {}.propertyIsEnumerable.call(value, "en") &&
+    {}.propertyIsEnumerable.call(value, "sv")
+  );
+};
+
 export const parseAddressLine1 = (location: Location): string => {
   return trim(`${location.addressStreet || ""}`);
 };

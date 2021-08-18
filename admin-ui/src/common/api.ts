@@ -17,6 +17,7 @@ import {
   ReservationStatus,
   ReservationUnitCapacity,
   ReservationUnitCalendarUrl,
+  Space,
   UnitWIP,
 } from "./types";
 
@@ -432,6 +433,41 @@ export function getReservationUnitCalendarUrl(
   return apiGet({
     path: `v1/${reservationUnitCalendarUrlBasePath}/${reservationUnitId}`,
   });
+}
+
+const MockSpaces: Space[] = [
+  {
+    id: 1,
+    name: {
+      fi: "Tilan #1 nimi",
+      en: "Space #1 name",
+      sv: "Space #1 namn",
+    },
+    building: 2,
+    parent: 1,
+    maxPersons: 43,
+    surfaceArea: 23,
+    locationType: "fixed",
+    code: "code",
+  },
+  {
+    id: 2,
+    name: {
+      fi: "Tilan #2 nimi",
+      en: "Space #2 name",
+      sv: "Space #2 namn",
+    },
+    building: 1,
+    parent: 1,
+    maxPersons: 23,
+    surfaceArea: 300,
+    locationType: "fixed",
+    code: "code",
+  },
+];
+
+export function getSpaces(): Promise<Space[]> {
+  return Promise.resolve(MockSpaces);
 }
 
 const units = [

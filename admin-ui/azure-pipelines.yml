@@ -8,8 +8,9 @@ trigger:
       - main
       - refs/tags/*
   paths:
-    exclude:
-      - README.md
+    include:
+      - common
+      - admin-ui
 
 # By default, use self-hosted agents
 pool: Default

@@ -6,9 +6,10 @@ import { ButtonContainer } from "../common/common";
 
 type Props = {
   onSubmit: () => void;
+  applicationId: number;
 };
 
-const Buttons = ({ onSubmit }: Props): JSX.Element | null => {
+const Buttons = ({ onSubmit, applicationId }: Props): JSX.Element | null => {
   const { t } = useTranslation();
 
   const router = useRouter();
@@ -17,7 +18,7 @@ const Buttons = ({ onSubmit }: Props): JSX.Element | null => {
       <Button
         variant="secondary"
         iconLeft={<IconArrowLeft />}
-        onClick={() => router.push("page2")}
+        onClick={() => router.push(`${applicationId}/page2`)}
       >
         {t("common:prev")}
       </Button>
