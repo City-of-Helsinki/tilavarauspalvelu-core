@@ -54,8 +54,8 @@ export type Space = {
   id: number;
   locationType: "fixed";
   name: TranslationObject;
-  parent: number;
-  building: number;
+  parent: Space | null;
+  building: ReservationUnitBuilding | null;
   surfaceArea: number; // WIP
   maxPersons: number; // WIP
   code: string; // WIP
@@ -98,10 +98,15 @@ export type Image = {
 
 export type ReservationUnitBuilding = {
   id: number;
-  district: number;
+  district: District;
   name: string | null;
   realEstate: string | null;
   surfaceArea: string | null;
+};
+
+export type District = {
+  id: number;
+  name: string;
 };
 
 export type ReservationUnit = {

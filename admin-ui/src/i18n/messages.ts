@@ -59,6 +59,7 @@ const translations: ITranslations = {
     resetFilters: ["Tyhjennä suodattimet"],
     resetSearch: ["Tyhjennä hakukenttä"],
     apply: ["Käytä"],
+    areaUnitSquareMeter: [" m²"],
     volumeUnit: [" kpl", " ", " "],
     personUnit: ["{{count}} henkilö"],
     personUnit_plural: ["{{count}} henkeä"],

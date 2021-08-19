@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@apollo/client": "^3.4.8",
     "@axa-fr/react-oidc-context": "^3.1.6",
     "@n8tb1t/use-scroll-position": "^2.0.3",
     "@react-pdf/renderer": "^2.0.15",
@@ -25,6 +26,7 @@
     "axios-case-converter": "^0.7.0",
     "classnames": "^2.2.6",
     "date-fns": "^2.16.1",
+    "graphql": "^15.5.1",
     "hds-core": "^1.0.0",
     "hds-design-tokens": "^1.0.0",
     "hds-react": "^1.0.0",

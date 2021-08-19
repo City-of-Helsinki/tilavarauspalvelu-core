@@ -1,4 +1,4 @@
-import React, { useState, useEffect, ChangeEvent } from "react";
+import React, { useState, ChangeEvent } from "react";
 import {
   IconArrowRight,
   IconGroup,
@@ -11,6 +11,7 @@ import { uniq } from "lodash";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { useDebounce } from "react-use";
+import { useQuery, ApolloError } from "@apollo/client";
 import {
   DataFilterConfig,
   LocalizationLanguages,
@@ -19,12 +20,12 @@ import {
 import { IngressContainer } from "../../styles/layout";
 import { H1 } from "../../styles/typography";
 import withMainMenu from "../withMainMenu";
-import { getSpaces } from "../../common/api";
 import Loader from "../Loader";
 import DataTable, { CellConfig } from "../DataTable";
 import { isTranslationObject, localizedValue } from "../../common/util";
 import { breakpoints, Strong } from "../../styles/util";
 import ClearButton from "../ClearButton";
+import { SPACES_QUERY } from "../../common/queries";
 
 const Wrapper = styled.div`
   padding: var(--spacing-layout-2-xl) 0;
@@ -86,7 +87,7 @@ const getCellConfig = (
       },
       {
         title: t("Spaces.headings.district"),
-        key: "building.district",
+        key: "building.district.name",
       },
       {
         title: t("Spaces.headings.volume"),
@@ -100,13 +101,13 @@ const getCellConfig = (
             }}
           >
             <IconGroup />
-            <span>{maxPersons}</span>
+            <span>{maxPersons || "?"}</span>
           </div>
         ),
       },
       {
         title: t("Spaces.headings.size"),
-        key: "building.surfaceArea",
+        key: "surfaceArea",
         transform: ({ surfaceArea }: Space) => (
           <div
             style={{
@@ -115,7 +116,10 @@ const getCellConfig = (
               justifyContent: "space-between",
             }}
           >
-            <span>{surfaceArea}</span>
+            <span>
+              {surfaceArea || "?"}
+              {t("common.areaUnitSquareMeter")}
+            </span>
             <IconArrowRight />
           </div>
         ),
@@ -129,36 +133,42 @@ const getCellConfig = (
 };
 
 const getFilterConfig = (spaces: Space[], t: TFunction): DataFilterConfig[] => {
-  // eslint-disable-next-line no-console
-  console.log(uniq, spaces, t);
-  // const units = uniq(spaces.map((space: Space) => space.building));
-  // const districts = uniq(spaces.map((space: Space) => space.building.district));
+  const buildings = uniq(
+    spaces.map((space: Space) => space?.building?.name || "")
+  ).filter((n) => n);
+  const districts = uniq(
+    spaces
+      .map((space: Space) => space?.building?.district?.name || "")
+      .filter((n) => n)
+  );
 
   return [
-    // {
-    //   title: t("Spaces.headings.unit"),
-    //   filters:
-    //     units &&
-    //     units.map((unit: ReservationUnitBuilding) => ({
-    //       title: unit.name,
-    //       key: "building.name",
-    //       value: unit.name || "",
-    //     })),
-    // },
-    // {
-    //   title: t("Spaces.headings.district"),
-    //   filters:
-    //     districts &&
-    //     districts.map((district: number) => ({
-    //       title: String(district),
-    //       key: "building.district",
-    //       value: district || "",
-    //     })),
-    // },
+    {
+      title: t("Spaces.headings.unit"),
+      filters:
+        buildings &&
+        buildings.map((building: string) => ({
+          title: building,
+          key: "building.name",
+          value: building,
+        })),
+    },
+    {
+      title: t("Spaces.headings.district"),
+      filters:
+        districts &&
+        districts.map((district: string) => ({
+          title: district,
+          key: "building.district.name",
+          value: district,
+        })),
+    },
   ];
 };
 
 const SpacesList = (): JSX.Element => {
+  const { t, i18n } = useTranslation();
+
   const [spaces, setSpaces] = useState<Space[]>([]);
   const [filterConfig, setFilterConfig] = useState<DataFilterConfig[] | null>(
     null
@@ -176,47 +186,61 @@ const SpacesList = (): JSX.Element => {
     [searchValue]
   );
 
-  const { t, i18n } = useTranslation();
+  useQuery(SPACES_QUERY, {
+    onCompleted: (data) => {
+      const result = data?.spaces?.edges?.map(({ node }: any) => node); // eslint-disable-line
+      setSpaces(result);
+      setCellConfig(getCellConfig(t, i18n.language as LocalizationLanguages));
+      setFilterConfig(getFilterConfig(result, t));
+      setIsLoading(false);
+    },
+    onError: (err: ApolloError) => {
+      setErrorMsg(err.message);
+      setIsLoading(false);
+    },
+  });
 
-  useEffect(() => {
-    const fetchSpaces = async () => {
-      setErrorMsg(null);
-      setIsLoading(true);
+  if (errorMsg) {
+    return (
+      <Notification
+        type="error"
+        label={t("errors.functionFailed")}
+        position="top-center"
+        autoClose={false}
+        dismissible
+        closeButtonLabelText={t("common.close")}
+        displayAutoCloseProgress={false}
+        onClose={() => setErrorMsg(null)}
+      >
+        {t(errorMsg)}
+      </Notification>
+    );
+  }
 
-      try {
-        const result = await getSpaces();
-        setCellConfig(getCellConfig(t, i18n.language as LocalizationLanguages));
-        setFilterConfig(getFilterConfig(result, t));
-        setSpaces(result);
-      } catch (error) {
-        setErrorMsg(error.message);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchSpaces();
-  }, [t, i18n]);
-
-  if (isLoading || !filterConfig || !cellConfig) {
+  if (isLoading || !spaces || !filterConfig || !cellConfig) {
     return <Loader />;
   }
 
   const filteredSpaces = searchTerm
     ? spaces.filter((space: Space) => {
         const searchTerms = searchTerm.toLowerCase().split(" ");
-        // const { name, building } = space;
-        const { name } = space;
-        // const { name: unit, district } = building;
+        const { name, building } = space;
+        const buildingName = building?.name?.toLowerCase();
+        const districtName = building?.district?.name?.toLowerCase();
         const localizedName =
           name && isTranslationObject(name)
-            ? localizedValue(name, i18n.language as LocalizationLanguages)
-            : String(name);
+            ? localizedValue(
+                name,
+                i18n.language as LocalizationLanguages
+              ).toLowerCase()
+            : String(name).toLowerCase();
 
         return searchTerms.every((term: string) => {
-          return localizedName.toLowerCase().includes(term);
-          // || String(unit).toLowerCase().includes(term) ||
-          // String(district).toLowerCase().includes(term)
+          return (
+            localizedName?.includes(term) ||
+            buildingName?.includes(term) ||
+            districtName?.includes(term)
+          );
         });
       })
     : spaces;
@@ -257,20 +281,6 @@ const SpacesList = (): JSX.Element => {
         cellConfig={cellConfig}
         filterConfig={filterConfig}
       />
-      {errorMsg && (
-        <Notification
-          type="error"
-          label={t("errors.functionFailed")}
-          position="top-center"
-          autoClose={false}
-          dismissible
-          closeButtonLabelText={t("common.close")}
-          displayAutoCloseProgress={false}
-          onClose={() => setErrorMsg(null)}
-        >
-          {t(errorMsg)}
-        </Notification>
-      )}
     </Wrapper>
   );
 };
