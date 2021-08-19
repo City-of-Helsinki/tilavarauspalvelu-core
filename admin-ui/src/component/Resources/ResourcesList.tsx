@@ -1,10 +1,12 @@
-import React, { useState, useEffect, ChangeEvent } from "react";
+import React, { useState, ChangeEvent } from "react";
 import { IconArrowRight, Notification, TextInput, IconSearch } from "hds-react";
 import { TFunction } from "i18next";
 import { uniq } from "lodash";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { useDebounce } from "react-use";
+import { useQuery, ApolloError } from "@apollo/client";
+
 import {
   DataFilterConfig,
   LocalizationLanguages,
@@ -18,7 +20,7 @@ import DataTable, { CellConfig } from "../DataTable";
 import { isTranslationObject, localizedValue } from "../../common/util";
 import { breakpoints, Strong } from "../../styles/util";
 import ClearButton from "../ClearButton";
-import { getResources } from "../../common/api";
+import { RESOURCES_QUERY } from "../../common/queries";
 
 const Wrapper = styled.div`
   padding: var(--spacing-layout-2-xl) 0;
@@ -75,12 +77,12 @@ const getCellConfig = (
         ),
       },
       {
-        title: t("Resources.headings.unit"),
-        key: "unit.name",
+        title: t("Resources.headings.building"),
+        key: "space.building.name",
       },
       {
         title: t("Resources.headings.district"),
-        key: "unit.district",
+        key: "space.building.district.name",
       },
       {
         title: t("Resources.headings.resourceType"),
@@ -93,7 +95,7 @@ const getCellConfig = (
               justifyContent: "space-between",
             }}
           >
-            <span>{resourceType}</span>
+            <span>{resourceType || "?"}</span>
             <IconArrowRight />
           </div>
         ),
@@ -110,21 +112,23 @@ const getFilterConfig = (
   resources: Resource[],
   t: TFunction
 ): DataFilterConfig[] => {
-  const units = uniq(resources.map((resource: Resource) => resource.unit.name));
+  const buildings = uniq(
+    resources.map((resource: Resource) => resource?.space?.building?.name || "")
+  ).filter((n) => n);
   const types = uniq(
     resources.map((resource: Resource) => resource.resourceType)
-  );
+  ).filter((n) => n);
   // const districts = uniq(spaces.map((space: Space) => space.building.district));
 
   return [
     {
-      title: t("Resources.headings.unit"),
+      title: t("Resources.headings.building"),
       filters:
-        units &&
-        units.map((unit: string) => ({
-          title: unit,
-          key: "unit.name",
-          value: unit || "",
+        buildings &&
+        buildings.map((building: string) => ({
+          title: building,
+          key: "space.building.name",
+          value: building || "",
         })),
     },
     {
@@ -141,6 +145,8 @@ const getFilterConfig = (
 };
 
 const ResourcesList = (): JSX.Element => {
+  const { t, i18n } = useTranslation();
+
   const [resources, setResources] = useState<Resource[]>([]);
   const [filterConfig, setFilterConfig] = useState<DataFilterConfig[] | null>(
     null
@@ -158,37 +164,44 @@ const ResourcesList = (): JSX.Element => {
     [searchValue]
   );
 
-  const { t, i18n } = useTranslation();
+  useQuery(RESOURCES_QUERY, {
+    onCompleted: (data) => {
+      const result = data?.resources?.edges?.map(({ node }: any) => node); // eslint-disable-line
+      setResources(result);
+      setCellConfig(getCellConfig(t, i18n.language as LocalizationLanguages));
+      setFilterConfig(getFilterConfig(result, t));
+      setIsLoading(false);
+    },
+    onError: (err: ApolloError) => {
+      setErrorMsg(err.message);
+      setIsLoading(false);
+    },
+  });
 
-  useEffect(() => {
-    const fetchResources = async () => {
-      setErrorMsg(null);
-      setIsLoading(true);
+  if (errorMsg) {
+    <Notification
+      type="error"
+      label={t("errors.functionFailed")}
+      position="top-center"
+      autoClose={false}
+      dismissible
+      closeButtonLabelText={t("common.close")}
+      displayAutoCloseProgress={false}
+      onClose={() => setErrorMsg(null)}
+    >
+      {t(errorMsg)}
+    </Notification>;
+  }
 
-      try {
-        const result = await getResources();
-        setCellConfig(getCellConfig(t, i18n.language as LocalizationLanguages));
-        setFilterConfig(getFilterConfig(result, t));
-        setResources(result);
-      } catch (error) {
-        setErrorMsg(error.message);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchResources();
-  }, [t, i18n]);
-
-  if (isLoading || !filterConfig || !cellConfig) {
+  if (isLoading || !resources || !filterConfig || !cellConfig) {
     return <Loader />;
   }
 
   const filteredResources = searchTerm
     ? resources.filter((resource: Resource) => {
         const searchTerms = searchTerm.toLowerCase().split(" ");
-        const { name, unit, resourceType } = resource;
-        const { name: unitName } = unit;
+        const { name, space, resourceType } = resource;
+        const buildingName = space?.building?.name;
         const localizedName =
           name && isTranslationObject(name)
             ? localizedValue(name, i18n.language as LocalizationLanguages)
@@ -197,7 +210,7 @@ const ResourcesList = (): JSX.Element => {
         return searchTerms.every((term: string) => {
           return (
             localizedName.toLowerCase().includes(term) ||
-            String(unitName).toLowerCase().includes(term) ||
+            String(buildingName).toLowerCase().includes(term) ||
             String(resourceType).toLowerCase().includes(term)
           );
         });
@@ -240,20 +253,6 @@ const ResourcesList = (): JSX.Element => {
         cellConfig={cellConfig}
         filterConfig={filterConfig}
       />
-      {errorMsg && (
-        <Notification
-          type="error"
-          label={t("errors.functionFailed")}
-          position="top-center"
-          autoClose={false}
-          dismissible
-          closeButtonLabelText={t("common.close")}
-          displayAutoCloseProgress={false}
-          onClose={() => setErrorMsg(null)}
-        >
-          {t(errorMsg)}
-        </Notification>
-      )}
     </Wrapper>
   );
 };

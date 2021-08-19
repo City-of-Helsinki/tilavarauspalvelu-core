@@ -82,7 +82,7 @@ const getCellConfig = (
         ),
       },
       {
-        title: t("Spaces.headings.unit"),
+        title: t("Spaces.headings.building"),
         key: "building.name",
       },
       {
@@ -144,7 +144,7 @@ const getFilterConfig = (spaces: Space[], t: TFunction): DataFilterConfig[] => {
 
   return [
     {
-      title: t("Spaces.headings.unit"),
+      title: t("Spaces.headings.building"),
       filters:
         buildings &&
         buildings.map((building: string) => ({

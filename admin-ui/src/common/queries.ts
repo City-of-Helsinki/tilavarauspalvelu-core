@@ -29,3 +29,26 @@ export const SPACES_QUERY = gql`
     }
   }
 `;
+
+export const RESOURCES_QUERY = gql`
+  query getResources {
+    resources {
+      edges {
+        node {
+          id: pk
+          name
+          locationType
+          space {
+            name
+            building {
+              name
+              district {
+                name
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;

@@ -65,7 +65,7 @@ export type Resource = {
   id: number;
   name: TranslationObject;
   locationType: "fixed";
-  space: number;
+  space: Space | null;
   unit: UnitWIP; // WIP
   resourceType: string; // WIP
   bufferTimeBefore: string;
