@@ -158,6 +158,7 @@ const translations: ITranslations = {
     applicationRounds: ["Hakukierrokset"],
     conditionsAndAttachments: ["Ehdot ja liitteet"],
     spaces: ["Tilat"],
+    resources: ["Resurssit"],
     units: ["Toimipisteet"],
   },
   HeadingMenu: {
@@ -585,6 +586,19 @@ const translations: ITranslations = {
       district: ["Kaupunginosa"],
       volume: ["Vetoisuus"],
       size: ["Koko"],
+    },
+  },
+  Resources: {
+    resourceListHeading: ["Kaikki resurssit"],
+    resourceListDescription: [
+      "Täällä näet koosteen kaikista resursseista, joita on liitetty järjestelmään ja jotka sinulla on oikeus nähdä.",
+    ],
+    searchPlaceholder: ["Hae resursseja"],
+    headings: {
+      name: ["Nimi"],
+      unit: ["Toimipiste"],
+      district: ["Kaupunginosa"],
+      resourceType: ["Resurssityyppi"],
     },
   },
   Applicant: {

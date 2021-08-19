@@ -1,11 +1,5 @@
 import React, { useState, useEffect, ChangeEvent } from "react";
-import {
-  IconArrowRight,
-  IconGroup,
-  Notification,
-  TextInput,
-  IconSearch,
-} from "hds-react";
+import { IconArrowRight, Notification, TextInput, IconSearch } from "hds-react";
 import { TFunction } from "i18next";
 import { uniq } from "lodash";
 import { useTranslation } from "react-i18next";
@@ -14,17 +8,17 @@ import { useDebounce } from "react-use";
 import {
   DataFilterConfig,
   LocalizationLanguages,
-  Space,
+  Resource,
 } from "../../common/types";
 import { IngressContainer } from "../../styles/layout";
 import { H1 } from "../../styles/typography";
 import withMainMenu from "../withMainMenu";
-import { getSpaces } from "../../common/api";
 import Loader from "../Loader";
 import DataTable, { CellConfig } from "../DataTable";
 import { isTranslationObject, localizedValue } from "../../common/util";
 import { breakpoints, Strong } from "../../styles/util";
 import ClearButton from "../ClearButton";
+import { getResources } from "../../common/api";
 
 const Wrapper = styled.div`
   padding: var(--spacing-layout-2-xl) 0;
@@ -60,7 +54,7 @@ const StyledInput = styled(TextInput).attrs({
   } as React.CSSProperties,
 })``;
 
-const SpaceCount = styled.div`
+const ResourceCount = styled.div`
   font-family: var(--tilavaraus-admin-font-bold);
   font-weight: 700;
   font-size: var(--fontsize-heading-s);
@@ -74,40 +68,24 @@ const getCellConfig = (
   return {
     cols: [
       {
-        title: t("Spaces.headings.name"),
+        title: t("Resources.headings.name"),
         key: "name",
-        transform: ({ name }: Space) => (
+        transform: ({ name }: Resource) => (
           <Strong>{localizedValue(name, language)}</Strong>
         ),
       },
       {
-        title: t("Spaces.headings.unit"),
-        key: "building.name",
+        title: t("Resources.headings.unit"),
+        key: "unit.name",
       },
       {
-        title: t("Spaces.headings.district"),
-        key: "building.district",
+        title: t("Resources.headings.district"),
+        key: "unit.district",
       },
       {
-        title: t("Spaces.headings.volume"),
-        key: "maxPersons",
-        transform: ({ maxPersons }: Space) => (
-          <div
-            style={{
-              display: "flex",
-              alignContent: "center",
-              gap: "var(--spacing-xs)",
-            }}
-          >
-            <IconGroup />
-            <span>{maxPersons}</span>
-          </div>
-        ),
-      },
-      {
-        title: t("Spaces.headings.size"),
-        key: "building.surfaceArea",
-        transform: ({ surfaceArea }: Space) => (
+        title: t("Resources.headings.resourceType"),
+        key: "resourceType",
+        transform: ({ resourceType }: Resource) => (
           <div
             style={{
               display: "flex",
@@ -115,7 +93,7 @@ const getCellConfig = (
               justifyContent: "space-between",
             }}
           >
-            <span>{surfaceArea}</span>
+            <span>{resourceType}</span>
             <IconArrowRight />
           </div>
         ),
@@ -124,42 +102,46 @@ const getCellConfig = (
     index: "id",
     sorting: "name",
     order: "asc",
-    rowLink: ({ id }: Space) => `/spaces/${id}`,
+    rowLink: ({ id }: Resource) => `/resources/${id}`,
   };
 };
 
-const getFilterConfig = (spaces: Space[], t: TFunction): DataFilterConfig[] => {
-  // eslint-disable-next-line no-console
-  console.log(uniq, spaces, t);
-  // const units = uniq(spaces.map((space: Space) => space.building));
+const getFilterConfig = (
+  resources: Resource[],
+  t: TFunction
+): DataFilterConfig[] => {
+  const units = uniq(resources.map((resource: Resource) => resource.unit.name));
+  const types = uniq(
+    resources.map((resource: Resource) => resource.resourceType)
+  );
   // const districts = uniq(spaces.map((space: Space) => space.building.district));
 
   return [
-    // {
-    //   title: t("Spaces.headings.unit"),
-    //   filters:
-    //     units &&
-    //     units.map((unit: ReservationUnitBuilding) => ({
-    //       title: unit.name,
-    //       key: "building.name",
-    //       value: unit.name || "",
-    //     })),
-    // },
-    // {
-    //   title: t("Spaces.headings.district"),
-    //   filters:
-    //     districts &&
-    //     districts.map((district: number) => ({
-    //       title: String(district),
-    //       key: "building.district",
-    //       value: district || "",
-    //     })),
-    // },
+    {
+      title: t("Resources.headings.unit"),
+      filters:
+        units &&
+        units.map((unit: string) => ({
+          title: unit,
+          key: "unit.name",
+          value: unit || "",
+        })),
+    },
+    {
+      title: t("Resources.headings.resourceType"),
+      filters:
+        types &&
+        types.map((type: string) => ({
+          title: type,
+          key: "resourceType",
+          value: type || "",
+        })),
+    },
   ];
 };
 
-const SpacesList = (): JSX.Element => {
-  const [spaces, setSpaces] = useState<Space[]>([]);
+const ResourcesList = (): JSX.Element => {
+  const [resources, setResources] = useState<Resource[]>([]);
   const [filterConfig, setFilterConfig] = useState<DataFilterConfig[] | null>(
     null
   );
@@ -179,15 +161,15 @@ const SpacesList = (): JSX.Element => {
   const { t, i18n } = useTranslation();
 
   useEffect(() => {
-    const fetchSpaces = async () => {
+    const fetchResources = async () => {
       setErrorMsg(null);
       setIsLoading(true);
 
       try {
-        const result = await getSpaces();
+        const result = await getResources();
         setCellConfig(getCellConfig(t, i18n.language as LocalizationLanguages));
         setFilterConfig(getFilterConfig(result, t));
-        setSpaces(result);
+        setResources(result);
       } catch (error) {
         setErrorMsg(error.message);
       } finally {
@@ -195,42 +177,43 @@ const SpacesList = (): JSX.Element => {
       }
     };
 
-    fetchSpaces();
+    fetchResources();
   }, [t, i18n]);
 
   if (isLoading || !filterConfig || !cellConfig) {
     return <Loader />;
   }
 
-  const filteredSpaces = searchTerm
-    ? spaces.filter((space: Space) => {
+  const filteredResources = searchTerm
+    ? resources.filter((resource: Resource) => {
         const searchTerms = searchTerm.toLowerCase().split(" ");
-        // const { name, building } = space;
-        const { name } = space;
-        // const { name: unit, district } = building;
+        const { name, unit, resourceType } = resource;
+        const { name: unitName } = unit;
         const localizedName =
           name && isTranslationObject(name)
             ? localizedValue(name, i18n.language as LocalizationLanguages)
             : String(name);
 
         return searchTerms.every((term: string) => {
-          return localizedName.toLowerCase().includes(term);
-          // || String(unit).toLowerCase().includes(term) ||
-          // String(district).toLowerCase().includes(term)
+          return (
+            localizedName.toLowerCase().includes(term) ||
+            String(unitName).toLowerCase().includes(term) ||
+            String(resourceType).toLowerCase().includes(term)
+          );
         });
       })
-    : spaces;
+    : resources;
 
   return (
     <Wrapper>
       <IngressContainer>
-        <H1>{t("Spaces.spaceListHeading")}</H1>
-        <p>{t("Spaces.spaceListDescription")}</p>
+        <H1>{t("Resources.resourceListHeading")}</H1>
+        <p>{t("Resources.resourceListDescription")}</p>
         <SearchContainer>
           <IconSearch className="searchIcon" />
           <StyledInput
-            id="spacesSearch"
-            placeholder={t("Spaces.searchPlaceholder")}
+            id="resourcesSearch"
+            placeholder={t("Resources.searchPlaceholder")}
             onChange={(event: ChangeEvent<HTMLInputElement>) => {
               cancelTypeahead();
               setSearchValue(event.target.value);
@@ -246,12 +229,12 @@ const SpacesList = (): JSX.Element => {
             />
           )}
         </SearchContainer>
-        <SpaceCount>
-          {spaces.length} {t("common.volumeUnit")}
-        </SpaceCount>
+        <ResourceCount>
+          {resources.length} {t("common.volumeUnit")}
+        </ResourceCount>
       </IngressContainer>
       <DataTable
-        groups={[{ id: 1, data: filteredSpaces }]}
+        groups={[{ id: 1, data: filteredResources }]}
         hasGrouping={false}
         config={{ filtering: true, rowFilters: true }}
         cellConfig={cellConfig}
@@ -275,4 +258,4 @@ const SpacesList = (): JSX.Element => {
   );
 };
 
-export default withMainMenu(SpacesList);
+export default withMainMenu(ResourcesList);
