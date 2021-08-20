@@ -17,9 +17,7 @@ import {
   ReservationStatus,
   ReservationUnitCapacity,
   ReservationUnitCalendarUrl,
-  Space,
   UnitWIP,
-  Resource,
 } from "./types";
 
 const apiBaseUrl: string = process.env.REACT_APP_TILAVARAUS_API_URL || "";
@@ -436,41 +434,6 @@ export function getReservationUnitCalendarUrl(
   });
 }
 
-const MockSpaces: Space[] = [
-  {
-    id: 1,
-    name: {
-      fi: "Tilan #1 nimi",
-      en: "Space #1 name",
-      sv: "Space #1 namn",
-    },
-    building: 2,
-    parent: 1,
-    maxPersons: 43,
-    surfaceArea: 23,
-    locationType: "fixed",
-    code: "code",
-  },
-  {
-    id: 2,
-    name: {
-      fi: "Tilan #2 nimi",
-      en: "Space #2 name",
-      sv: "Space #2 namn",
-    },
-    building: 1,
-    parent: 1,
-    maxPersons: 23,
-    surfaceArea: 300,
-    locationType: "fixed",
-    code: "code",
-  },
-];
-
-export function getSpaces(): Promise<Space[]> {
-  return Promise.resolve(MockSpaces);
-}
-
 const units = [
   {
     id: 1,
@@ -561,31 +524,4 @@ export async function getUnit(id: number): Promise<UnitWIP> {
   const unit = units.find((u) => u.id === id);
   if (!unit) throw Error("not found");
   return unit;
-}
-
-const mockResources: Resource[] = [
-  {
-    id: 1,
-    name: { fi: "Resurssi #1" },
-    locationType: "fixed",
-    resourceType: "Tyyppi",
-    space: 1,
-    unit: units[0],
-    bufferTimeBefore: "0",
-    bufferTimeAfter: "0",
-  },
-  {
-    id: 2,
-    name: { fi: "Resurssi #2" },
-    locationType: "fixed",
-    resourceType: "Tyyppi #2",
-    space: 1,
-    unit: units[2],
-    bufferTimeBefore: "0",
-    bufferTimeAfter: "0",
-  },
-];
-
-export function getResources(): Promise<Resource[]> {
-  return Promise.resolve(mockResources);
 }

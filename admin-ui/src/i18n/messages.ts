@@ -59,6 +59,7 @@ const translations: ITranslations = {
     resetFilters: ["Tyhjennä suodattimet"],
     resetSearch: ["Tyhjennä hakukenttä"],
     apply: ["Käytä"],
+    areaUnitSquareMeter: [" m²"],
     volumeUnit: [" kpl", " ", " "],
     personUnit: ["{{count}} henkilö"],
     personUnit_plural: ["{{count}} henkeä"],
@@ -582,7 +583,7 @@ const translations: ITranslations = {
     searchPlaceholder: ["Hae tiloja"],
     headings: {
       name: ["Nimi"],
-      unit: ["Toimipiste"],
+      building: ["Toimipiste"],
       district: ["Kaupunginosa"],
       volume: ["Vetoisuus"],
       size: ["Koko"],
@@ -596,7 +597,7 @@ const translations: ITranslations = {
     searchPlaceholder: ["Hae resursseja"],
     headings: {
       name: ["Nimi"],
-      unit: ["Toimipiste"],
+      building: ["Toimipiste"],
       district: ["Kaupunginosa"],
       resourceType: ["Resurssityyppi"],
     },
