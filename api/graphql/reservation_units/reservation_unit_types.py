@@ -20,6 +20,9 @@ from reservation_units.models import (
     ReservationUnitImage,
 )
 from reservation_units.models import ReservationUnitType as ReservationUnitTypeModel
+from reservation_units.utils.reservation_unit_reservation_scheduler import (
+    ReservationUnitReservationScheduler,
+)
 from resources.models import Resource
 from spaces.models import Space
 
@@ -192,3 +195,37 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
         if not self.min_reservation_duration:
             return None
         return self.min_reservation_duration.total_seconds()
+
+
+class ReservationUnitByPkType(ReservationUnitType):
+    next_available_slot = graphene.DateTime()
+
+    class Meta:
+        model = ReservationUnit
+        fields = (
+            "id",
+            "name",
+            "description",
+            "spaces",
+            "resources",
+            "services",
+            "require_introduction",
+            "purposes",
+            "images",
+            "location",
+            "max_persons",
+            "reservation_unit_type",
+            "terms_of_use",
+            "equipment",
+            "uuid",
+            "contact_information",
+            "max_reservation_duration",
+            "min_reservation_duration",
+            "next_available_slot",
+        )
+
+        interfaces = (graphene.relay.Node,)
+
+    def resolve_next_available_slot(self, info):
+        scheduler = ReservationUnitReservationScheduler(self)
+        return scheduler.get_next_available_reservation_time()
