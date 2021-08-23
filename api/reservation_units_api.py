@@ -136,6 +136,7 @@ class ReservationUnitSerializer(TranslatedModelSerializer):
         source="equipments",
         many=True,
         help_text="Ids of equipment available in this reservation unit.",
+        required=False,
     )
 
     unit_id = serializers.PrimaryKeyRelatedField(
