@@ -203,6 +203,13 @@ class Space(MPTTModel):
     max_persons = models.fields.PositiveIntegerField(
         verbose_name=_("Maximum number of persons"), null=True, blank=True
     )
+    code = models.CharField(
+        verbose_name=_("Code for the space"),
+        max_length=255,
+        db_index=True,
+        blank=True,
+        default="",
+    )
 
     def __str__(self):
         return "{} ({})".format(self.name, self.building.name if self.building else "")
