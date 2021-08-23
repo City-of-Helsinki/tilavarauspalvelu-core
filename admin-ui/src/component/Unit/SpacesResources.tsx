@@ -9,8 +9,8 @@ import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
 import { getUnit } from "../../common/api";
-import { UnitWIP } from "../../common/types";
 import { useModal } from "../../context/UIContext";
+import { UnitWIP } from "../../common/types";
 import { IngressContainer, WideContainer } from "../../styles/layout";
 import Loader from "../Loader";
 import withMainMenu from "../withMainMenu";
@@ -18,6 +18,9 @@ import InfoModalContent from "./InfoModalContent";
 import ResourcesTable from "./ResourcesTable";
 import SpacesTable from "./SpacesTable";
 import SubPageHead from "./SubPageHead";
+import Modal, { useModal as useHDSModal } from "../HDSModal";
+import NewSpaceModalDialog from "./NewSpaceModal";
+import { breakpoints } from "../../styles/util";
 
 interface IProps {
   unitId: string;
@@ -59,14 +62,25 @@ const ActionButton = styled(Button)`
   }
 `;
 
+const StyledNotification = styled(Notification)`
+  margin: var(--spacing-xs) var(--spacing-layout-2-xs);
+  width: auto;
+  @media (min-width: ${breakpoints.xl}) {
+    margin: var(--spacing-s) var(--spacing-layout-xl);
+  }
+`;
+
 const SpacesResources = (): JSX.Element => {
+  const [saveSuccess, setSaveSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [unit, setUnit] = useState<UnitWIP>();
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const { setModalContent } = useModal();
 
   const { t, i18n } = useTranslation();
   const { unitId } = useParams<IProps>();
-  const { setModalContent } = useModal();
+
+  const newSpacesButtonRef = React.createRef<HTMLButtonElement>();
 
   useEffect(() => {
     const fetchUnit = async () => {
@@ -83,14 +97,40 @@ const SpacesResources = (): JSX.Element => {
     fetchUnit();
   }, [i18n.language, t, unitId]);
 
+  const [newSpaceDialogisOpen, openNewSpaceDialog, closeNewSpaceDialog] =
+    useHDSModal();
+
   if (isLoading || !unit) {
     return <Loader />;
   }
 
   return (
     <Wrapper>
+      <Modal
+        id="modal-id"
+        open={newSpaceDialogisOpen}
+        close={() => closeNewSpaceDialog()}
+        afterCloseFocusRef={newSpacesButtonRef}
+      >
+        <NewSpaceModalDialog
+          unit={unit}
+          closeModal={closeNewSpaceDialog}
+          onSave={() => setSaveSuccess(true)}
+        />
+      </Modal>
       <SubPageHead title={t("Unit.spacesAndResources")} unit={unit} />
       <IngressContainer>
+        {saveSuccess ? (
+          <StyledNotification
+            type="success"
+            label={t("Unit.newSpacesCreatedTitle")}
+            dismissible
+            closeButtonLabelText={`${t("common.close")}`}
+            onClose={() => setSaveSuccess(false)}
+          >
+            {t("Unit.newSpacesCreatedNotification")}
+          </StyledNotification>
+        ) : null}
         <Info>
           <StyledButton
             variant="supplementary"
@@ -107,8 +147,10 @@ const SpacesResources = (): JSX.Element => {
         <TableHead>
           <Title>{t("Unit.spaces")}</Title>
           <ActionButton
+            ref={newSpacesButtonRef}
             iconLeft={<IconPlusCircleFill />}
             variant="supplementary"
+            onClick={() => openNewSpaceDialog()}
           >
             {t("Unit.addSpace")}
           </ActionButton>

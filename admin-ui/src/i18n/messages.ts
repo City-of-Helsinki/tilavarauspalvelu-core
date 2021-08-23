@@ -116,6 +116,8 @@ const translations: ITranslations = {
     weekday: ["Viikonpäivä"],
     date: ["Päivämäärä"],
     time: ["Kellonaika"],
+    increaseByOneAriaLabel: ["Lisää yhdellä"],
+    decreaseByOneAriaLabel: ["Vähennä yhdellä"],
   },
   errors: {
     applicationRoundNotFound: ["Haettua hakukierrosta ei löydy"],
@@ -695,6 +697,47 @@ const translations: ITranslations = {
     resources: ["Resurssit"],
     addResource: ["Uusi resurssi"],
     noResources: ["Ei vielä resursseja"],
+    newSpacesCreatedTitle: ["Uudet tilat luotu onnistuneesti"],
+    newSpacesCreatedNotification: [
+      "Voit luoda tiloille alitiloja niin pitkälle kuin on tarpeellista.",
+    ],
+  },
+  SpaceModal: {
+    phase: ["Vaihe"],
+    page1: {
+      modalTitle: ["Luo uusi tila toimipisteelle"],
+      info: [
+        "Voit luoda yhden tai kerralla useita samaan tasoon liittyviä tiloja, joiden nimet ja tiedot voivat vaihdella.",
+      ],
+      title: ["Valitse tilojen määrä ja ylitila"],
+      numSpacesLabel: ["Uusien tilojen määrä"],
+      numSpacesHelperText: ["Valitse alustava määrä."],
+      parentLabel: ["Ylitila"],
+      parentPlaceholder: ["Valitse ylitila tai uusi itsenäinen tila."],
+      parentHelperText: [
+        "Ylitila tarkoittaa tilaa, jonka osaksi nyt luomasi tila kuuluu. Jos tila on uusi itsenäinen tila, valitse itsenäinen tila. Voit vaihtaa ylitilan myöhemminkin.",
+      ],
+      buttonCancel: ["Palaa tallentamatta tiloja"],
+      buttonNext: ["Seuraava"],
+    },
+    page2: {
+      modalTitle: ["Määritä tilojen pohjatiedot"],
+      info: [
+        "Voit muokata tiloja milloin tahansa myöhemmin. Huomioi paloturvallisuusmääräykset maksimihenkilömäärissä.",
+      ],
+      newRootSpace: ["Uusi itsenäinen tila"],
+      addRowButton: ["Lisää rivi"],
+      prevButton: ["Edellinen"],
+      createButton: ["Luo tilatieto"],
+      nameLabel: ["Tilan nimi"],
+      surfaceAreaLabel: ["Pinta-ala"],
+      surfaceAreaHelperText: ["m²"],
+      maxPersonsLabel: ["Maksimihenkilömäärä"],
+      maxPersonsHelperText: ["henkilöä"],
+      codeLabel: ["Tilan numero"],
+      codePlaceholder: ["Numero tai koodi"],
+      saving: ["Luodaan tilatietoja..."],
+    },
   },
 };
 

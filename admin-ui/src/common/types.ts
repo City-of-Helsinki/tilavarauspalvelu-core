@@ -436,3 +436,25 @@ export interface UnitWIP {
   openingHours: [];
   reservationUnits: [];
 }
+
+/* WIP, perhaps we should autogenerate these under common module for both uis to use */
+export type SpaceCreateMutationInput = {
+  key?: string; // client only
+  name: string;
+  parentId: string;
+  buildingId: string;
+  surfaceArea: number;
+  districtId: string;
+  clientMutationId?: string;
+};
+
+export type ErrorType = {
+  field: string;
+  messages: string[];
+};
+
+export type SpaceCreateMutationPayload = {
+  id: number;
+  errors: ErrorType;
+  clientMutationId: string;
+};

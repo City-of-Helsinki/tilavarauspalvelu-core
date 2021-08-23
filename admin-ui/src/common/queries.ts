@@ -52,3 +52,15 @@ export const RESOURCES_QUERY = gql`
     }
   }
 `;
+
+export const CREATE_SPACE = gql`
+  mutation createSpace($input: SpaceCreateMutationInput!) {
+    createSpace(input: $input) {
+      id
+      errors {
+        field
+        messages
+      }
+    }
+  }
+`;
