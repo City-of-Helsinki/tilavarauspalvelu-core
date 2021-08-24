@@ -9,11 +9,11 @@ from permissions.helpers import (
     can_manage_resources,
     can_manage_spaces,
     can_manage_units,
-    can_modify_reservation_unit,
+    can_manage_units_reservation_units,
     can_view_reservations,
 )
-from reservation_units.models import ReservationUnit
 from reservations.models import Reservation
+from spaces.models import Unit
 
 
 class ReservationUnitPermission(BasePermission):
@@ -23,8 +23,8 @@ class ReservationUnitPermission(BasePermission):
 
     @classmethod
     def has_mutation_permission(cls, root: Any, info: ResolveInfo, input: dict) -> bool:
-        res_unit = ReservationUnit.objects.filter(id=input["id"])
-        return can_modify_reservation_unit(info.context.user, res_unit)
+        unit = Unit.objects.filter(id=input["unit_id"]).first()
+        return can_manage_units_reservation_units(info.context.user, unit)
 
 
 class ResourcePermission(BasePermission):
