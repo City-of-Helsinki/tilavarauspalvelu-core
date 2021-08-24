@@ -63,8 +63,8 @@ const mapStyle = (lang: string) => ({
 });
 
 const NavControlContainer = styled.div`
-  left: 30px;
-  bottom: 30px;
+  left: 20px;
+  bottom: 106px;
   position: absolute;
 `;
 
