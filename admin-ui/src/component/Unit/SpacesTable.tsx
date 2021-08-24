@@ -1,10 +1,11 @@
 import React from "react";
-import { Button, IconGroup, IconMenuDots } from "hds-react";
+import { IconGroup } from "hds-react";
 import { trim } from "lodash";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { Space } from "../../common/types";
 import DataTable, { CellConfig } from "../DataTable";
+import PopupMenu from "./PopupMenu";
 
 interface IProps {
   spaces: Space[];
@@ -25,19 +26,6 @@ const Prop = styled.div`
   font-family: var(--tilavaraus-admin-font-medium);
   font-weight: 500;
   margin-bottom: var(--spacing-xs);
-`;
-
-const RowButton = styled(Button)`
-  color: var(--color-black);
-  margin-left: auto;
-  padding: 0;
-  span {
-    padding: 0;
-  }
-`;
-
-const MenuIcon = styled(IconMenuDots)`
-  margin-left: auto;
 `;
 
 const MaxPersons = styled.div`
@@ -83,18 +71,31 @@ const SpacesTable = ({ spaces }: IProps): JSX.Element => {
                 {maxPersons}
               </Prop>
             ) : null}
-            <RowButton
-              onClick={(e) => {
-                e.stopPropagation();
-                // eslint-disable-next-line no-alert
-                window.alert("display popup menu");
-                return false;
-              }}
-              iconLeft={<MenuIcon />}
-              variant="supplementary"
-            >
-              {" "}
-            </RowButton>
+            <PopupMenu
+              items={[
+                {
+                  name: t("SpaceTable.menuAddSubSpace"),
+                  onClick: () => {
+                    // eslint-disable-next-line no-console
+                    console.log("Clicked!");
+                  },
+                },
+                {
+                  name: t("SpaceTable.menuEditSpace"),
+                  onClick: () => {
+                    // eslint-disable-next-line no-console
+                    console.log("Clicked!");
+                  },
+                },
+                {
+                  name: t("SpaceTable.menuRemoveSpace"),
+                  onClick: () => {
+                    // eslint-disable-next-line no-console
+                    console.log("Clicked!");
+                  },
+                },
+              ]}
+            />
           </MaxPersons>
         ),
       },

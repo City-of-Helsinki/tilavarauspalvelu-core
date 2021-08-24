@@ -1,11 +1,11 @@
 import React from "react";
-import { Button, IconMenuDots } from "hds-react";
 import { trim } from "lodash";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { Resource } from "../../common/types";
 
 import DataTable, { CellConfig } from "../DataTable";
+import PopupMenu from "./PopupMenu";
 
 interface IProps {
   resources: Resource[];
@@ -24,20 +24,6 @@ const ResourceType = styled.div`
 `;
 
 const ResourceTypeName = styled.span``;
-
-const MenuIcon = styled(IconMenuDots)`
-  margin-left: auto;
-`;
-
-const RowButton = styled(Button)`
-  color: var(--color-black);
-  margin-left: auto;
-  padding: 0;
-  border-radius: 0;
-  span {
-    padding: 0;
-  }
-`;
 
 const ResourcesTable = ({ resources }: IProps): JSX.Element => {
   const { t, i18n } = useTranslation();
@@ -67,18 +53,24 @@ const ResourcesTable = ({ resources }: IProps): JSX.Element => {
         transform: ({ resourceType }: Resource) => (
           <ResourceType>
             <ResourceTypeName>{resourceType}</ResourceTypeName>
-            <RowButton
-              onClick={(e) => {
-                e.stopPropagation();
-                // eslint-disable-next-line no-alert
-                window.alert("display popup menu");
-                return false;
-              }}
-              iconLeft={<MenuIcon />}
-              variant="supplementary"
-            >
-              {" "}
-            </RowButton>
+            <PopupMenu
+              items={[
+                {
+                  name: t("ResourcesTable.menuEditResource"),
+                  onClick: () => {
+                    // eslint-disable-next-line no-console
+                    console.log("Clicked!");
+                  },
+                },
+                {
+                  name: t("ResourcesTable.menuRemoveResource"),
+                  onClick: () => {
+                    // eslint-disable-next-line no-console
+                    console.log("Clicked!");
+                  },
+                },
+              ]}
+            />
           </ResourceType>
         ),
       },

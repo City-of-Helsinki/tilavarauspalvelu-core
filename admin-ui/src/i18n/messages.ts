@@ -739,6 +739,15 @@ const translations: ITranslations = {
       saving: ["Luodaan tilatietoja..."],
     },
   },
+  SpaceTable: {
+    menuAddSubSpace: ["Lisää alitiloja"],
+    menuEditSpace: ["Muokkaa tilatietoja"],
+    menuRemoveSpace: ["Poista tila"],
+  },
+  ResourcesTable: {
+    menuEditResource: ["Muokkaa resurssia"],
+    menuRemoveResource: ["Poista resurssi"],
+  },
 };
 
 // transform to i18n format
