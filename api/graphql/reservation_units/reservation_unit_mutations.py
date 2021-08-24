@@ -1,6 +1,8 @@
 import graphene
+from django.conf import settings
 from graphene_django.rest_framework.mutation import SerializerMutation
 from graphene_permissions.mixins import AuthMutation
+from graphene_permissions.permissions import AllowAny
 from rest_framework.generics import get_object_or_404
 
 from api.graphql.base_mutations import AuthSerializerMutation
@@ -24,7 +26,9 @@ from reservation_units.models import Purpose
 class PurposeCreateMutation(SerializerMutation, AuthMutation):
     purpose = graphene.Field(PurposeType)
 
-    permission_classes = (PurposePermission,)
+    permission_classes = (
+        (PurposePermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
+    )
 
     class Meta:
         model_operations = ["create"]
@@ -40,7 +44,9 @@ class PurposeCreateMutation(SerializerMutation, AuthMutation):
 class PurposeUpdateMutation(SerializerMutation, AuthMutation):
     purpose = graphene.Field(PurposeType)
 
-    permission_classes = (PurposePermission,)
+    permission_classes = (
+        (PurposePermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
+    )
 
     class Meta:
         model_operations = ["update"]
@@ -59,7 +65,11 @@ class PurposeUpdateMutation(SerializerMutation, AuthMutation):
 class ReservationUnitCreateMutation(AuthSerializerMutation, SerializerMutation):
     reservation_unit = graphene.Field(ReservationUnitType)
 
-    permission_classes = (ReservationUnitPermission,)
+    permission_classes = (
+        (ReservationUnitPermission,)
+        if not settings.TMP_PERMISSIONS_DISABLED
+        else (AllowAny,)
+    )
 
     class Meta:
         model_operations = ["create"]
@@ -70,7 +80,11 @@ class ReservationUnitCreateMutation(AuthSerializerMutation, SerializerMutation):
 class ReservationUnitUpdateMutation(AuthSerializerMutation, SerializerMutation):
     reservation_unit = graphene.Field(ReservationUnitType)
 
-    permission_classes = (ReservationUnitPermission,)
+    permission_classes = (
+        (ReservationUnitPermission,)
+        if not settings.TMP_PERMISSIONS_DISABLED
+        else (AllowAny,)
+    )
 
     class Meta:
         model_operations = ["update"]
