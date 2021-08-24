@@ -99,6 +99,7 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
     equipment = graphene.List(EquipmentType)
     unit = graphene.Field(UnitType)
     max_persons = graphene.Int()
+    terms_of_use = graphene.String()
 
     permission_classes = (ReservationUnitPermission,)
 
