@@ -52,7 +52,7 @@ type Action =
   | { type: "nextPage" }
   | { type: "prevPage" }
   | { type: "addRow" }
-  | { type: "delete"; order: number };
+  | { type: "delete"; index: number };
 
 const initialState = {
   numSpaces: 0,
@@ -116,6 +116,13 @@ const reducer = (state: State, action: Action): State => {
         ]),
       };
     }
+    case "delete": {
+      return {
+        ...state,
+        spaces: state.spaces.filter((s, i) => action.index !== i),
+      };
+    }
+
     case "nextPage": {
       const nextState = {
         ...state,
@@ -184,6 +191,7 @@ const NewRowButton = styled(Button)`
 `;
 
 const EditorContainer = styled.div`
+  margin: 2em 0;
   display: grid;
   grid-template-columns: 1fr 2em;
   gap: 1em;
@@ -211,6 +219,11 @@ const RoundTag = styled(Tag)`
   margin-top: var(--spacing-s);
   margin-left: auto;
 `;
+
+const IconDelete = styled(IconTrash)`
+  padding-top: 2em;
+`;
+
 const parentOptions = [
   {
     label: "Itsenäinen tila",
@@ -319,6 +332,7 @@ const SpaceEditor = ({
     <EditorContainer>
       <div>
         <TextInput
+          required
           id={`name[${index}]`}
           label={t("SpaceModal.page2.nameLabel")}
           onBlur={(e) => {
@@ -383,7 +397,11 @@ const SpaceEditor = ({
           />
         </EditorColumns>
       </div>
-      <IconTrash onClick={() => dispatch} />
+      <IconDelete
+        tabIndex={0}
+        onKeyPress={() => dispatch({ type: "delete", index })}
+        onClick={() => dispatch({ type: "delete", index })}
+      />
     </EditorContainer>
   </>
 );
