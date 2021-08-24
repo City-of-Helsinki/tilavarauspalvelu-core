@@ -24,5 +24,7 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
 class ReservationUnitUpdateSerializer(
     ReservationUnitSerializer, PrimaryKeyUpdateSerializer
 ):
+    name = serializers.CharField(required=False)
+
     class Meta(ReservationUnitSerializer.Meta):
         fields = ReservationUnitSerializer.Meta.fields + ["pk"]

@@ -3,6 +3,7 @@ from graphene_django.rest_framework.mutation import SerializerMutation
 from graphene_permissions.mixins import AuthMutation
 from rest_framework.generics import get_object_or_404
 
+from api.graphql.base_mutations import AuthSerializerMutation
 from api.graphql.reservation_units.reservation_unit_serializers import (
     PurposeCreateSerializer,
     PurposeUpdateSerializer,
@@ -17,7 +18,7 @@ from permissions.api_permissions.graphene_permissions import (
     PurposePermission,
     ReservationUnitPermission,
 )
-from reservation_units.models import Purpose, ReservationUnit
+from reservation_units.models import Purpose
 
 
 class PurposeCreateMutation(SerializerMutation, AuthMutation):
@@ -55,7 +56,7 @@ class PurposeUpdateMutation(SerializerMutation, AuthMutation):
         return cls(errors=None, purpose=purpose)
 
 
-class ReservationUnitCreateMutation(SerializerMutation, AuthMutation):
+class ReservationUnitCreateMutation(AuthSerializerMutation, SerializerMutation):
     reservation_unit = graphene.Field(ReservationUnitType)
 
     permission_classes = (ReservationUnitPermission,)
@@ -65,27 +66,13 @@ class ReservationUnitCreateMutation(SerializerMutation, AuthMutation):
 
         serializer_class = ReservationUnitCreateSerializer
 
-    @classmethod
-    def perform_mutate(cls, serializer, info):
-        reservation_unit = serializer.create(serializer.validated_data)
-        return cls(errors=None, reservation_unit=reservation_unit)
 
-
-class ReservationUnitUpdateMutation(SerializerMutation, AuthMutation):
+class ReservationUnitUpdateMutation(AuthSerializerMutation, SerializerMutation):
     reservation_unit = graphene.Field(ReservationUnitType)
 
     permission_classes = (ReservationUnitPermission,)
 
     class Meta:
-        model_operations = ["create"]
+        model_operations = ["update"]
         lookup_field = "pk"
         serializer_class = ReservationUnitUpdateSerializer
-
-    @classmethod
-    def perform_mutate(cls, serializer, info):
-        validated_data = serializer.validated_data
-        pk = validated_data.get("pk")
-        reservation_unit = serializer.update(
-            get_object_or_404(ReservationUnit, pk=pk), validated_data
-        )
-        return cls(errors=None, reservation_unit=reservation_unit)
