@@ -44,6 +44,7 @@ class SpaceType(AuthNode, PrimaryKeyObjectType):
             "parent",
             "building",
             "surface_area",
+            "terms_of_use",
         )
 
         filter_fields = {
