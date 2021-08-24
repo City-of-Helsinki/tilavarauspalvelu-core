@@ -486,12 +486,7 @@ const SecondPage = ({
             const promises = Promise.allSettled(
               editorState.spaces.map((s) =>
                 createSpace(
-                  omit(s, [
-                    "key",
-                    "maxPersons", // WIP not in api
-                    "locationType",
-                    "code", // WIP not in api
-                  ]) as SpaceCreateMutationInput
+                  omit(s, ["key", "locationType"]) as SpaceCreateMutationInput
                 )
               )
             );

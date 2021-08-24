@@ -441,10 +441,12 @@ export interface UnitWIP {
 export type SpaceCreateMutationInput = {
   key?: string; // client only
   name: string;
-  parentId: string;
+  parentId?: string;
   buildingId: string;
-  surfaceArea: number;
-  districtId: string;
+  surfaceArea?: number;
+  maxPersons?: number;
+  districtId?: string;
+  code?: string;
   clientMutationId?: string;
 };
 
