@@ -1,4 +1,5 @@
 import graphene
+from django.db.models import Sum
 from easy_thumbnails.files import get_thumbnailer
 from graphene_django import DjangoObjectType
 from graphene_permissions.mixins import AuthNode
@@ -100,6 +101,7 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
     unit = graphene.Field(UnitType)
     max_persons = graphene.Int()
     terms_of_use = graphene.String()
+    surface_area = graphene.Int()
 
     permission_classes = (ReservationUnitPermission,)
 
@@ -166,3 +168,7 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
 
     def resolve_max_persons(self, info):
         return self.get_max_persons()
+
+    def resolve_surface_area(self, info):
+        surface_area = self.spaces.aggregate(total_surface_area=Sum("surface_area"))
+        return surface_area.get("total_surface_area")
