@@ -1,8 +1,10 @@
 import graphene
+from django.conf import settings
 from django.db.models import Sum
 from easy_thumbnails.files import get_thumbnailer
 from graphene_django import DjangoObjectType
 from graphene_permissions.mixins import AuthNode
+from graphene_permissions.permissions import AllowAny
 
 from api.graphql.base_type import PrimaryKeyObjectType
 from api.graphql.resources.resource_types import ResourceType
@@ -103,7 +105,11 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
     terms_of_use = graphene.String()
     surface_area = graphene.Int()
 
-    permission_classes = (ReservationUnitPermission,)
+    permission_classes = (
+        (ReservationUnitPermission,)
+        if not settings.TMP_PERMISSIONS_DISABLED
+        else (AllowAny,)
+    )
 
     class Meta:
         model = ReservationUnit

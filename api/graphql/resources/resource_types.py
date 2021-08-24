@@ -1,5 +1,7 @@
 import graphene
+from django.conf import settings
 from graphene_permissions.mixins import AuthNode
+from graphene_permissions.permissions import AllowAny
 
 from api.graphql.base_type import PrimaryKeyObjectType
 from api.graphql.spaces.space_types import BuildingType
@@ -10,7 +12,9 @@ from resources.models import Resource
 class ResourceType(AuthNode, PrimaryKeyObjectType):
     building = graphene.List(BuildingType)
 
-    permission_classes = (ResourcePermission,)
+    permission_classes = (
+        (ResourcePermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
+    )
 
     class Meta:
         model = Resource
