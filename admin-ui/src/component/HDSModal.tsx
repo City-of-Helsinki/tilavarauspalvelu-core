@@ -4,7 +4,7 @@ import { createGlobalStyle } from "styled-components";
 
 interface IProps {
   afterCloseFocusRef: RefObject<HTMLElement>;
-  children: JSX.Element;
+  children: JSX.Element | null;
   id: string;
   open: boolean;
   close: () => void;
@@ -45,9 +45,20 @@ export default Modal;
 
 export const useModal = (
   initiallyOpen = false
-): [boolean, () => void, () => void] => {
+): {
+  open: boolean;
+  openModal: () => void;
+  closeModal: () => void;
+  modalContent: JSX.Element | null;
+  openWithContent: (content: JSX.Element) => void;
+} => {
   const [open, setOpen] = useState(initiallyOpen);
-  const openDialog = () => setOpen(true);
-  const closeDialog = () => setOpen(false);
-  return [open, openDialog, closeDialog];
+  const [modalContent, setModalContent] = useState<JSX.Element | null>(null);
+  const openModal = () => setOpen(true);
+  const closeModal = () => setOpen(false);
+  const openWithContent = (content: JSX.Element) => {
+    setModalContent(content);
+    setOpen(true);
+  };
+  return { open, openModal, closeModal, modalContent, openWithContent };
 };

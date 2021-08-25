@@ -706,6 +706,7 @@ const translations: ITranslations = {
     phase: ["Vaihe"],
     page1: {
       modalTitle: ["Luo uusi tila toimipisteelle"],
+      subSpaceModalTitle: ["Luo alitila tilalle"],
       info: [
         "Voit luoda yhden tai kerralla useita samaan tasoon liittyviä tiloja, joiden nimet ja tiedot voivat vaihdella.",
       ],
@@ -722,8 +723,12 @@ const translations: ITranslations = {
     },
     page2: {
       modalTitle: ["Määritä tilojen pohjatiedot"],
+      subSpaceModalTitle: ["Määritä alitilatiedot"],
       info: [
         "Voit muokata tiloja milloin tahansa myöhemmin. Huomioi paloturvallisuusmääräykset maksimihenkilömäärissä.",
+      ],
+      subSpaceInfo: [
+        "Voit luoda yhden tai kerralla useita alitiloja, joiden nimet ja tiedot voivat vaihdella.",
       ],
       newRootSpace: ["Uusi itsenäinen tila"],
       addRowButton: ["Lisää rivi"],

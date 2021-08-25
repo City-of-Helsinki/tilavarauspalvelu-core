@@ -19,7 +19,7 @@ import ResourcesTable from "./ResourcesTable";
 import SpacesTable from "./SpacesTable";
 import SubPageHead from "./SubPageHead";
 import Modal, { useModal as useHDSModal } from "../HDSModal";
-import NewSpaceModalDialog from "./NewSpaceModal";
+import NewSpaceModal from "./NewSpaceModal";
 import { breakpoints } from "../../styles/util";
 
 interface IProps {
@@ -97,8 +97,11 @@ const SpacesResources = (): JSX.Element => {
     fetchUnit();
   }, [i18n.language, t, unitId]);
 
-  const [newSpaceDialogisOpen, openNewSpaceDialog, closeNewSpaceDialog] =
-    useHDSModal();
+  const {
+    open: newSpaceDialogIsOpen,
+    openModal: openNewSpaceModal,
+    closeModal: closeNewSpaceModal,
+  } = useHDSModal();
 
   if (isLoading || !unit) {
     return <Loader />;
@@ -108,13 +111,13 @@ const SpacesResources = (): JSX.Element => {
     <Wrapper>
       <Modal
         id="modal-id"
-        open={newSpaceDialogisOpen}
-        close={() => closeNewSpaceDialog()}
+        open={newSpaceDialogIsOpen}
+        close={() => closeNewSpaceModal()}
         afterCloseFocusRef={newSpacesButtonRef}
       >
-        <NewSpaceModalDialog
+        <NewSpaceModal
           unit={unit}
-          closeModal={closeNewSpaceDialog}
+          closeModal={closeNewSpaceModal}
           onSave={() => setSaveSuccess(true)}
         />
       </Modal>
@@ -150,13 +153,17 @@ const SpacesResources = (): JSX.Element => {
             ref={newSpacesButtonRef}
             iconLeft={<IconPlusCircleFill />}
             variant="supplementary"
-            onClick={() => openNewSpaceDialog()}
+            onClick={() => openNewSpaceModal()}
           >
             {t("Unit.addSpace")}
           </ActionButton>
         </TableHead>
       </WideContainer>{" "}
-      <SpacesTable spaces={unit.spaces} />
+      <SpacesTable
+        spaces={unit.spaces}
+        unit={unit}
+        onSave={() => setSaveSuccess(true)}
+      />
       <WideContainer>
         <TableHead>
           <Title>{t("Unit.resources")}</Title>

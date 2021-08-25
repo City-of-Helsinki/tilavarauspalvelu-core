@@ -1,14 +1,18 @@
-import React from "react";
+import React, { useRef } from "react";
 import { IconGroup } from "hds-react";
 import { trim } from "lodash";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { Space } from "../../common/types";
+import { Space, UnitWIP } from "../../common/types";
 import DataTable, { CellConfig } from "../DataTable";
 import PopupMenu from "./PopupMenu";
+import Modal, { useModal as useHDSModal } from "../HDSModal";
+import NewSpaceModal from "./NewSpaceModal";
 
 interface IProps {
   spaces: Space[];
+  unit: UnitWIP;
+  onSave: () => void;
 }
 
 const Wrapper = styled.div``;
@@ -32,8 +36,14 @@ const MaxPersons = styled.div`
   display: flex;
 `;
 
-const SpacesTable = ({ spaces }: IProps): JSX.Element => {
+const SpacesTable = ({ spaces, unit, onSave }: IProps): JSX.Element => {
   const { t, i18n } = useTranslation();
+  const {
+    open: isOpen,
+    openWithContent,
+    closeModal,
+    modalContent,
+  } = useHDSModal();
 
   const cellConfig = {
     cols: [
@@ -63,41 +73,48 @@ const SpacesTable = ({ spaces }: IProps): JSX.Element => {
       {
         title: "Unit.headings.maxPersons",
         key: "maxPersons",
-        transform: ({ maxPersons }: Space) => (
-          <MaxPersons>
-            {maxPersons ? (
-              <Prop>
-                <IconGroup />
-                {maxPersons}
-              </Prop>
-            ) : null}
-            <PopupMenu
-              items={[
-                {
-                  name: t("SpaceTable.menuAddSubSpace"),
-                  onClick: () => {
-                    // eslint-disable-next-line no-console
-                    console.log("Clicked!");
+        transform: (space: Space) => {
+          return (
+            <MaxPersons>
+              {space.maxPersons ? (
+                <Prop>
+                  <IconGroup />
+                  {space.maxPersons}
+                </Prop>
+              ) : null}
+              <PopupMenu
+                items={[
+                  {
+                    name: t("SpaceTable.menuAddSubSpace"),
+                    onClick: () =>
+                      openWithContent(
+                        <NewSpaceModal
+                          parentSpace={space}
+                          unit={unit}
+                          closeModal={closeModal}
+                          onSave={onSave}
+                        />
+                      ),
                   },
-                },
-                {
-                  name: t("SpaceTable.menuEditSpace"),
-                  onClick: () => {
-                    // eslint-disable-next-line no-console
-                    console.log("Clicked!");
+                  {
+                    name: t("SpaceTable.menuEditSpace"),
+                    onClick: () => {
+                      // eslint-disable-next-line no-console
+                      console.log("Clicked!");
+                    },
                   },
-                },
-                {
-                  name: t("SpaceTable.menuRemoveSpace"),
-                  onClick: () => {
-                    // eslint-disable-next-line no-console
-                    console.log("Clicked!");
+                  {
+                    name: t("SpaceTable.menuRemoveSpace"),
+                    onClick: () => {
+                      // eslint-disable-next-line no-console
+                      console.log("Clicked!");
+                    },
                   },
-                },
-              ]}
-            />
-          </MaxPersons>
-        ),
+                ]}
+              />
+            </MaxPersons>
+          );
+        },
       },
     ],
     index: "id",
@@ -105,6 +122,8 @@ const SpacesTable = ({ spaces }: IProps): JSX.Element => {
     order: "asc",
     rowLink: ({ id }: Space) => `/space/${id}`,
   } as CellConfig;
+
+  const ref = useRef(null);
 
   return (
     <Wrapper>
@@ -121,6 +140,14 @@ const SpacesTable = ({ spaces }: IProps): JSX.Element => {
         filterConfig={[]}
         noResultsKey="Unit.noSpaces"
       />
+      <Modal
+        id="modal-id"
+        open={isOpen}
+        close={closeModal}
+        afterCloseFocusRef={ref}
+      >
+        {modalContent}
+      </Modal>
     </Wrapper>
   );
 };

@@ -1,4 +1,4 @@
-import React, { useReducer } from "react";
+import React, { useReducer, useEffect } from "react";
 import {
   Button,
   Dialog,
@@ -22,7 +22,6 @@ import {
   UnitWIP,
   SpaceCreateMutationInput,
   SpaceCreateMutationPayload,
-  OptionType,
 } from "../../common/types";
 import { parseAddress } from "../../common/util";
 import { CREATE_SPACE } from "../../common/queries";
@@ -31,6 +30,7 @@ import { CustomDialogHeader } from "./CustomDialogHeader";
 const defaultParentSpaceId = "1";
 interface IProps {
   unit: UnitWIP;
+  parentSpace?: Space;
   closeModal: () => void;
   onSave: () => void;
 }
@@ -48,7 +48,7 @@ type Action =
   | { type: "setSpaceSurfaceArea"; surfaceArea: number; index: number }
   | { type: "setSpaceMaxPersonCount"; maxPersonCount: number; index: number }
   | { type: "setSpaceCode"; code: string; index: number }
-  | { type: "setParentSpace"; parentSpace?: string | null }
+  | { type: "setParentSpace"; parentSpace?: Space | null }
   | { type: "nextPage" }
   | { type: "prevPage" }
   | { type: "addRow" }
@@ -224,12 +224,14 @@ const IconDelete = styled(IconTrash)`
   padding-top: 2em;
 `;
 
+type ParentType = { label: string; value: Space | null };
+
 const parentOptions = [
   {
     label: "Itsenäinen tila",
     value: null,
-  } as OptionType,
-];
+  },
+] as ParentType[];
 
 function FirstPage({
   editorState,
@@ -237,12 +239,14 @@ function FirstPage({
   dispatch,
   closeModal,
   t,
+  hasFixedParent,
 }: {
   editorState: State;
   unit: UnitWIP;
   dispatch: React.Dispatch<Action>;
   closeModal: () => void;
   t: TFunction;
+  hasFixedParent: boolean;
 }): JSX.Element {
   const nextEnabled =
     editorState.numSpaces > 0 && editorState.parentSpace !== undefined;
@@ -252,7 +256,11 @@ function FirstPage({
       <CustomDialogHeader
         id="dialog-title"
         extras={<RoundTag>{t("SpaceModal.phase")} 1/2</RoundTag>}
-        title={t("SpaceModal.page1.modalTitle")}
+        title={t(
+          hasFixedParent
+            ? "SpaceModal.page1.subSpaceModalTitle"
+            : "SpaceModal.page1.modalTitle"
+        )}
         close={closeModal}
       />
       <Dialog.Content>
@@ -261,10 +269,15 @@ function FirstPage({
         </p>
         <UnitInfo>
           <IconCheck />
-          <Name>{unit.name}</Name>
+          <div>
+            <Name>{unit.name}</Name>
+            <Parent>
+              {editorState.parentSpace ? editorState.parentSpace.name.fi : null}
+            </Parent>
+          </div>
           <Address>{parseAddress(unit.location)}</Address>
         </UnitInfo>
-        <Title>{t("SpaceModal.page1.title")}</Title>
+        {!hasFixedParent ? <Title>{t("SpaceModal.page1.title")}</Title> : null}
         <NarrowNumberInput
           value={editorState.numSpaces}
           helperText={t("SpaceModal.page1.numSpacesHelperText")}
@@ -284,21 +297,25 @@ function FirstPage({
           max={10}
           required
         />
-        <br />
-        <Select
-          id="parent"
-          label={t("SpaceModal.page1.parentLabel")}
-          placeholder={t("SpaceModal.page1.parentPlaceholder")}
-          required
-          helper={t("SpaceModal.page1.parentHelperText")}
-          options={parentOptions}
-          onChange={(selected: OptionType) =>
-            dispatch({
-              type: "setParentSpace",
-              parentSpace: selected.value as string,
-            })
-          }
-        />
+        {!hasFixedParent ? (
+          <>
+            <br />
+            <Select
+              id="parent"
+              label={t("SpaceModal.page1.parentLabel")}
+              placeholder={t("SpaceModal.page1.parentPlaceholder")}
+              required
+              helper={t("SpaceModal.page1.parentHelperText")}
+              options={parentOptions}
+              onChange={(selected: ParentType) =>
+                dispatch({
+                  type: "setParentSpace",
+                  parentSpace: selected.value,
+                })
+              }
+            />
+          </>
+        ) : null}
       </Dialog.Content>
       <ActionButtons>
         <Button onClick={closeModal} variant="secondary">
@@ -414,6 +431,7 @@ const SecondPage = ({
   createSpace,
   t,
   onSave,
+  hasFixedParent,
 }: {
   editorState: State;
   unit: UnitWIP;
@@ -424,6 +442,7 @@ const SecondPage = ({
   ) => Promise<FetchResult<{ createSpace: SpaceCreateMutationPayload }>>;
   t: TFunction;
   onSave: () => void;
+  hasFixedParent: boolean;
 }): JSX.Element => {
   const nextEnabled =
     editorState.numSpaces > 0 && editorState.parentSpace !== undefined;
@@ -432,13 +451,21 @@ const SecondPage = ({
     <>
       <CustomDialogHeader
         id="dialog-title"
-        title={t("SpaceModal.page2.modalTitle")}
+        title={t(
+          hasFixedParent
+            ? "SpaceModal.page2.subSpaceModalTitle"
+            : "SpaceModal.page2.modalTitle"
+        )}
         extras={<RoundTag>{t("SpaceModal.phase")} 2/2</RoundTag>}
         close={closeModal}
       />
       <Dialog.Content>
         <p className="text-body" id="custom-dialog-content">
-          {t("SpaceModal.page2.info")}
+          {t(
+            hasFixedParent
+              ? "SpaceModal.page2.subSpaceInfo"
+              : "SpaceModal.page2.info"
+          )}
         </p>
         <UnitInfo>
           <IconCheck />
@@ -446,7 +473,7 @@ const SecondPage = ({
             <Name>{unit.name}</Name>
             <Parent>
               {editorState.parentSpace
-                ? editorState.parentSpace.name
+                ? editorState.parentSpace.name.fi
                 : t("SpaceModal.page2.newRootSpace")}
             </Parent>
           </div>
@@ -522,9 +549,16 @@ const NewSpaceModal = ({
   unit,
   closeModal,
   onSave,
+  parentSpace,
 }: IProps): JSX.Element | null => {
   const [editorState, dispatch] = useReducer(reducer, initialState);
   const { t } = useTranslation();
+
+  useEffect(() => {
+    if (parentSpace) {
+      dispatch({ type: "setParentSpace", parentSpace });
+    }
+  }, [parentSpace]);
 
   const createSpaceMutation = useMutation<
     { createSpace: SpaceCreateMutationPayload },
@@ -536,6 +570,7 @@ const NewSpaceModal = ({
   ): Promise<FetchResult<{ createSpace: SpaceCreateMutationPayload }>> =>
     createSpaceMutation[0]({ variables: { input } });
 
+  const hasFixedParent = Boolean(parentSpace);
   return editorState.page === 0 ? (
     <FirstPage
       editorState={editorState}
@@ -543,6 +578,7 @@ const NewSpaceModal = ({
       dispatch={dispatch}
       closeModal={closeModal}
       t={t}
+      hasFixedParent={hasFixedParent}
     />
   ) : (
     <SecondPage
@@ -553,6 +589,7 @@ const NewSpaceModal = ({
       createSpace={createSpace}
       t={t}
       onSave={onSave}
+      hasFixedParent={hasFixedParent}
     />
   );
 };
