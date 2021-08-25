@@ -44,7 +44,7 @@ def get_mocked_opening_hours():
     ]
 
 
-@mock.patch("opening_hours.utils.get_opening_hours")
+@mock.patch("opening_hours.utils.summaries.get_opening_hours")
 class ReservationUnitCapacityTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):

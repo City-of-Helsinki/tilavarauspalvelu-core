@@ -5,7 +5,7 @@ from assertpy import assert_that
 from django.test.testcases import TestCase
 
 from opening_hours.hours import TimeElement
-from opening_hours.utils import (
+from opening_hours.utils.summaries import (
     get_resources_total_hours,
     get_resources_total_hours_per_resource,
 )
@@ -38,7 +38,9 @@ def get_mocked_hours():
     ]
 
 
-@mock.patch("opening_hours.utils.get_opening_hours", return_value=get_mocked_hours())
+@mock.patch(
+    "opening_hours.utils.summaries.get_opening_hours", return_value=get_mocked_hours()
+)
 class GetResourcesTotalHoursTestCase(TestCase):
     def test_total_hours_sums_up_correct(self, mock):
         total_hours = get_resources_total_hours(
@@ -47,7 +49,9 @@ class GetResourcesTotalHoursTestCase(TestCase):
         assert_that(total_hours).is_equal_to(24)
 
 
-@mock.patch("opening_hours.utils.get_opening_hours", return_value=get_mocked_hours())
+@mock.patch(
+    "opening_hours.utils.summaries.get_opening_hours", return_value=get_mocked_hours()
+)
 class GetResourcesTotalHoursListTestCase(TestCase):
     def test_resource_total_hours_per_resource(self, mock):
         total_hours_dict = get_resources_total_hours_per_resource(

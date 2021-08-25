@@ -11,7 +11,7 @@ from applications.utils.aggregate_tasks import (
     _celery_application_event_schedule_result_aggregate_data_create,
 )
 from opening_hours.hours import HaukiConfigurationError
-from opening_hours.utils import get_resources_total_hours
+from opening_hours.utils.summaries import get_resources_total_hours
 
 logger = logging.getLogger(__name__)
 

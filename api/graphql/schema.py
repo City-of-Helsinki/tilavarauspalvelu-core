@@ -15,7 +15,10 @@ from api.graphql.reservation_units.reservation_unit_mutations import (
     ReservationUnitCreateMutation,
     ReservationUnitUpdateMutation,
 )
-from api.graphql.reservation_units.reservation_unit_types import ReservationUnitType
+from api.graphql.reservation_units.reservation_unit_types import (
+    ReservationUnitByPkType,
+    ReservationUnitType,
+)
 from api.graphql.reservations.reservation_types import ReservationType
 from api.graphql.resources.resource_types import ResourceType
 from api.graphql.spaces.space_mutations import SpaceCreateMutation, SpaceUpdateMutation
@@ -67,7 +70,7 @@ class Query(graphene.ObjectType):
         ReservationUnitType, filterset_class=ReservationUnitsFilterSet
     )
     reservation_unit = relay.Node.Field(ReservationUnitType)
-    reservation_unit_by_pk = Field(ReservationUnitType, pk=graphene.Int())
+    reservation_unit_by_pk = Field(ReservationUnitByPkType, pk=graphene.Int())
 
     resources = ResourcesFilter(ResourceType)
     resource = relay.Node.Field(ResourceType)
