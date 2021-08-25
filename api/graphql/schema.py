@@ -21,7 +21,11 @@ from api.graphql.reservation_units.reservation_unit_types import (
 )
 from api.graphql.reservations.reservation_types import ReservationType
 from api.graphql.resources.resource_types import ResourceType
-from api.graphql.spaces.space_mutations import SpaceCreateMutation, SpaceUpdateMutation
+from api.graphql.spaces.space_mutations import (
+    SpaceCreateMutation,
+    SpaceDeleteMutation,
+    SpaceUpdateMutation,
+)
 from api.graphql.spaces.space_types import SpaceType
 from api.graphql.units.unit_mutations import UnitUpdateMutation
 from api.graphql.units.unit_types import UnitType
@@ -104,6 +108,7 @@ class Mutation(graphene.ObjectType):
 
     create_space = SpaceCreateMutation.Field()
     update_space = SpaceUpdateMutation.Field()
+    delete_space = SpaceDeleteMutation.Field()
 
     update_unit = UnitUpdateMutation.Field()
 
