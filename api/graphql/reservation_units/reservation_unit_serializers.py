@@ -19,6 +19,14 @@ class PurposeUpdateSerializer(PurposeSerializer, PrimaryKeyUpdateSerializer):
 class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySerializer):
     terms_of_use = serializers.CharField(required=False)
     name = serializers.CharField()
+    max_reservation_duration = serializers.DurationField()
+    min_reservation_duration = serializers.DurationField()
+
+    class Meta(ReservationUnitSerializer.Meta):
+        fields = ReservationUnitSerializer.Meta.fields + [
+            "max_reservation_duration",
+            "min_reservation_duration",
+        ]
 
 
 class ReservationUnitUpdateSerializer(
@@ -26,5 +34,5 @@ class ReservationUnitUpdateSerializer(
 ):
     name = serializers.CharField(required=False)
 
-    class Meta(ReservationUnitSerializer.Meta):
-        fields = ReservationUnitSerializer.Meta.fields + ["pk"]
+    class Meta(ReservationUnitCreateSerializer.Meta):
+        fields = ReservationUnitCreateSerializer.Meta.fields + ["pk"]
