@@ -30,7 +30,9 @@ class SpaceCreateMutation(AuthSerializerMutation, SerializerMutation):
 class SpaceUpdateMutation(AuthSerializerMutation, SerializerMutation):
     space = graphene.Field(SpaceType)
 
-    permission_classes = (SpacePermission,)
+    permission_classes = (
+        (SpacePermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
+    )
 
     class Meta:
         model_operations = ["update"]
@@ -39,5 +41,7 @@ class SpaceUpdateMutation(AuthSerializerMutation, SerializerMutation):
 
 
 class SpaceDeleteMutation(AuthDeleteMutation, ClientIDMutation):
-    permission_classes = (SpacePermission,)
+    permission_classes = (
+        (SpacePermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
+    )
     model = Space
