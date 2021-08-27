@@ -1,9 +1,10 @@
 import django_filters
 import graphene
+from django.conf import settings
 from graphene import Field, relay
 from graphene_django.forms.mutation import DjangoModelFormMutation
 from graphene_permissions.mixins import AuthFilter, AuthMutation
-from graphene_permissions.permissions import AllowAuthenticated
+from graphene_permissions.permissions import AllowAny, AllowAuthenticated
 from rest_framework.generics import get_object_or_404
 
 from api.graphql.reservation_units.reservation_unit_filtersets import (
@@ -43,7 +44,11 @@ from resources.models import Resource
 class ReservationMutation(AuthMutation, DjangoModelFormMutation):
     reservation = graphene.Field(ReservationType)
 
-    permission_classes = (ReservationUnitPermission,)
+    permission_classes = (
+        (ReservationUnitPermission,)
+        if not settings.TMP_PERMISSIONS_DISABLED
+        else (AllowAny,)
+    )
 
     class Meta:
         form_class = ReservationForm
@@ -54,19 +59,29 @@ class AllowAuthenticatedFilter(AuthFilter):
 
 
 class ReservationUnitsFilter(AuthFilter, django_filters.FilterSet):
-    permission_classes = (ReservationUnitPermission,)
+    permission_classes = (
+        (ReservationUnitPermission,)
+        if not settings.TMP_PERMISSIONS_DISABLED
+        else (AllowAny,)
+    )
 
 
 class ResourcesFilter(AuthFilter):
-    permission_classes = (ResourcePermission,)
+    permission_classes = (
+        (ResourcePermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
+    )
 
 
 class SpacesFilter(AuthFilter):
-    permission_classes = (SpacePermission,)
+    permission_classes = (
+        (SpacePermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
+    )
 
 
 class UnitsFilter(AuthFilter):
-    permission_classes = (UnitPermission,)
+    permission_classes = (
+        (UnitPermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
+    )
 
 
 class Query(graphene.ObjectType):
