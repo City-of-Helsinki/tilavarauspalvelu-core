@@ -1,3 +1,5 @@
+import datetime
+
 import graphene
 from django.conf import settings
 from django.db.models import Sum
@@ -107,8 +109,8 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
     max_persons = graphene.Int()
     terms_of_use = graphene.String()
     surface_area = graphene.Int()
-    max_reservation_duration = graphene.Int()
-    min_reservation_duration = graphene.Int()
+    max_reservation_duration = graphene.Time()
+    min_reservation_duration = graphene.Time()
 
     permission_classes = (
         (ReservationUnitPermission,)
@@ -189,12 +191,14 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
     def resolve_max_reservation_duration(self, info):
         if not self.max_reservation_duration:
             return None
-        return self.max_reservation_duration.total_seconds()
+        duration = datetime.datetime(1, 1, 1) + self.max_reservation_duration
+        return duration.time()
 
     def resolve_min_reservation_duration(self, info):
         if not self.min_reservation_duration:
             return None
-        return self.min_reservation_duration.total_seconds()
+        duration = datetime.datetime(1, 1, 1) + self.min_reservation_duration
+        return duration.time()
 
 
 class ReservationUnitByPkType(ReservationUnitType):
