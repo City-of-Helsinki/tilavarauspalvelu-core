@@ -81,6 +81,8 @@ django-filter==2.4.0
     # via
     #   -r requirements.in
     #   graphene-permissions
+django-graphql-jwt==0.3.4
+    # via -r requirements.in
 django-helusers==0.6.0
     # via -r requirements.in
 django-js-asset==1.2.2
@@ -101,6 +103,7 @@ django==3.1.13
     #   django-cors-headers
     #   django-extra-fields
     #   django-filter
+    #   django-graphql-jwt
     #   django-helusers
     #   django-jsonfield
     #   django-modeltranslation
@@ -142,9 +145,11 @@ future==0.18.2
 graphene-django==2.13.0
     # via
     #   -r requirements.in
+    #   django-graphql-jwt
     #   graphene-permissions
 graphene==2.1.8
     # via
+    #   django-graphql-jwt
     #   graphene-django
     #   graphene-permissions
 graphene_permissions==1.1.4
@@ -224,7 +229,9 @@ pyflakes==2.2.0
 pyjwkest==1.4.2
     # via drf-oidc-auth
 pyjwt==2.1.0
-    # via social-auth-core
+    # via
+    #   django-graphql-jwt
+    #   social-auth-core
 pyparsing==2.4.7
     # via packaging
 pyrsistent==0.17.3
