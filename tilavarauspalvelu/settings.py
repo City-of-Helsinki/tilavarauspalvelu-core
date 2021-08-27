@@ -289,6 +289,7 @@ AUTH_USER_MODEL = "users.User"
 AUTHENTICATION_BACKENDS = [
     "helusers.tunnistamo_oidc.TunnistamoOIDCAuth",
     "django.contrib.auth.backends.ModelBackend",
+    "tilavarauspalvelu.graphql_api_token_authentication.GraphQLApiTokenAuthentication",
 ]
 
 LOGIN_REDIRECT_URL = "/admin/"
@@ -306,7 +307,12 @@ SOCIAL_AUTH_TUNNISTAMO_SECRET = env("TUNNISTAMO_ADMIN_SECRET")
 SOCIAL_AUTH_TUNNISTAMO_OIDC_ENDPOINT = env("TUNNISTAMO_ADMIN_OIDC_ENDPOINT")
 IPWARE_META_PRECEDENCE_ORDER = ("HTTP_X_FORWARDED_FOR",)
 
-GRAPHENE = {"SCHEMA": "api.graphql.schema.schema"}
+GRAPHENE = {
+    "SCHEMA": "api.graphql.schema.schema",
+    "MIDDLEWARE": [
+        "graphql_jwt.middleware.JSONWebTokenMiddleware",
+    ],
+}
 
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
