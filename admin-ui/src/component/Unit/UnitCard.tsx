@@ -8,13 +8,13 @@ import {
   IconLocation,
 } from "hds-react";
 import { useTranslation } from "react-i18next";
-import { UnitWIP } from "../../common/types";
+import { UnitType } from "../../common/types";
 import { H2 } from "../../styles/typography";
 import { BasicLink, breakpoints } from "../../styles/util";
 import { parseAddress } from "../../common/util";
 
 interface IProps {
-  unit: UnitWIP;
+  unit: UnitType;
 }
 
 const Wrapper = styled.div`
@@ -80,7 +80,7 @@ const Prop = styled.div<{ $disabled: boolean }>`
 const UnitCard = ({ unit }: IProps): JSX.Element => {
   const { t } = useTranslation();
 
-  const reservationUnitCount = unit.id - 1;
+  const reservationUnitCount = unit.reservationUnits?.length || 0;
 
   return (
     <Wrapper>
@@ -88,11 +88,13 @@ const UnitCard = ({ unit }: IProps): JSX.Element => {
         <IconLocation size="m" />
       </LocationBox>
       <Content>
-        <BasicLink to={`/unit/${unit.id}`}>
+        <BasicLink to={`/unit/${unit.pk}`}>
           <H2>{unit.name}</H2>
           <IconArrowRight />
         </BasicLink>
-        <Address>{parseAddress(unit.location)}</Address>
+        {unit.location ? (
+          <Address>{parseAddress(unit.location)}</Address>
+        ) : null}
         <Props>
           <Prop $disabled={reservationUnitCount < 1}>
             <IconLink />{" "}

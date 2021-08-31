@@ -64,3 +64,16 @@ export const CREATE_SPACE = gql`
     }
   }
 `;
+
+export const UNITS_QUERY = gql`
+  query units {
+    units {
+      edges {
+        node {
+          name
+          pk
+        }
+      }
+    }
+  }
+`;

@@ -460,3 +460,15 @@ export type SpaceCreateMutationPayload = {
   errors: ErrorType;
   clientMutationId: string;
 };
+
+export type UnitType = {
+  pk: number;
+  name: string;
+  location?: Location;
+  area?: string; // district?
+  service?: string;
+  reservationUnits: []
+  resources: [];
+  spaces: [];
+  openingHours: [];
+};

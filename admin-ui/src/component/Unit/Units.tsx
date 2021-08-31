@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import classNames from "classnames";
 import { IconArrowRight, IconSliders, Notification } from "hds-react";
 import uniq from "lodash/uniq";
+import { useQuery, ApolloError } from "@apollo/client";
 import { IngressContainer } from "../../styles/layout";
 import withMainMenu from "../withMainMenu";
 import { H1, H3 } from "../../styles/typography";
@@ -12,10 +13,10 @@ import FilterControls from "../FilterControls";
 import {
   DataFilterConfig,
   DataFilterOption,
+  UnitType,
   UnitWIP,
 } from "../../common/types";
 import Loader from "../Loader";
-import { getUnits } from "../../common/api";
 import {
   filterData,
   parseAddressLine1,
@@ -25,6 +26,7 @@ import UnitCard from "./UnitCard";
 import Map from "./Map";
 import { ReactComponent as MapMarker } from "../../images/map_marker.svg";
 import { BasicLink, breakpoints } from "../../styles/util";
+import { UNITS_QUERY } from "../../common/queries";
 
 const Wrapper = styled.div``;
 
@@ -88,7 +90,7 @@ const getFilterConfig = (units: UnitWIP[]): DataFilterConfig[] => {
 
 const Units = (): JSX.Element => {
   const [isLoading, setIsLoading] = useState(true);
-  const [units, setUnits] = useState<UnitWIP[]>([]);
+  const [units, setUnits] = useState<UnitType[]>([]);
   const [filtersAreVisible, toggleFilterVisibility] = useState(false);
   const [filters, setFilters] = useState<DataFilterOption[]>([]);
   const [filterConfig, setFilterConfig] = useState<DataFilterConfig[] | null>(
@@ -98,21 +100,20 @@ const Units = (): JSX.Element => {
 
   const { t } = useTranslation();
 
-  useEffect(() => {
-    const fetchUnits = async () => {
-      try {
-        const result = await getUnits();
-        setUnits(result);
-        setFilterConfig(getFilterConfig(result));
-      } catch (error) {
-        setErrorMsg("errors.errorFetchingData");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchUnits();
-  }, []);
+  useQuery(UNITS_QUERY, {
+    onCompleted: (data) => {
+      const result = data?.units?.edges?.map(
+        ({ node }: { node: UnitType }) => node
+      );
+      setUnits(result);
+      setFilterConfig(getFilterConfig(result));
+      setIsLoading(false);
+    },
+    onError: (err: ApolloError) => {
+      setErrorMsg(err.message);
+      setIsLoading(false);
+    },
+  });
 
   const filteredResults = useMemo(
     () => filterData(units, filters),
@@ -126,22 +127,28 @@ const Units = (): JSX.Element => {
   return (
     <Wrapper>
       <Map
-        markers={filteredResults.map((r) => ({
-          latitude: r.location.latitude,
-          longitude: r.location.longitude,
-          marker: MapMarker,
-          children: (
-            <PopupContainer>
-              <PopupName>{r.name}</PopupName>
-              <PopupAddress>{parseAddressLine1(r.location)}</PopupAddress>
-              <PopupAddress>{parseAddressLine2(r.location)}</PopupAddress>
-              <PopupLink to={`/unit/${r.id}`}>
-                {t("Unit.linkToUnitPage")}
-                <IconArrowRight />
-              </PopupLink>
-            </PopupContainer>
-          ),
-        }))}
+        markers={filteredResults
+          .filter((r) => r.location?.latitude && r.location?.longitude)
+          .map((r) => ({
+            latitude: Number(r.location?.latitude),
+            longitude: Number(r.location?.longitude),
+            marker: MapMarker,
+            children: (
+              <PopupContainer>
+                <PopupName>{r.name}</PopupName>
+                {r.location ? (
+                  <>
+                    <PopupAddress>{parseAddressLine1(r.location)}</PopupAddress>
+                    <PopupAddress>{parseAddressLine2(r.location)}</PopupAddress>
+                  </>
+                ) : null}
+                <PopupLink to={`/unit/${r.pk}`}>
+                  {t("Unit.linkToUnitPage")}
+                  <IconArrowRight />
+                </PopupLink>
+              </PopupContainer>
+            ),
+          }))}
       />
       <IngressContainer>
         <H1>{t("MainMenu.units")}</H1>
@@ -180,7 +187,7 @@ const Units = (): JSX.Element => {
       )}
       <UnitList>
         {filteredResults.map((unit) => (
-          <UnitCard unit={unit} key={unit.id} />
+          <UnitCard unit={unit} key={unit.pk} />
         ))}
       </UnitList>
       {errorMsg && (
