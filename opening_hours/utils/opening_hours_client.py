@@ -1,8 +1,14 @@
 import datetime
+from typing import Dict, List
 
 from django.conf import settings
 
-from opening_hours.hours import TimeElement, get_opening_hours
+from opening_hours.hours import (
+    Period,
+    TimeElement,
+    get_opening_hours,
+    get_periods_for_resource,
+)
 
 
 class OpeningHoursClient:
@@ -12,6 +18,8 @@ class OpeningHoursClient:
         start: datetime.date,
         end: datetime.date,
         single=False,
+        init_periods=False,
+        init_opening_hours=True,
     ):
         if single:
             resources = [str(resources)]
@@ -25,9 +33,18 @@ class OpeningHoursClient:
             for resource_id in resources
         }
         self.opening_hours = {}
-        self._init_opening_hours_structure()
+        if init_opening_hours:
+            self._init_opening_hours_structure()
+            self._fetch_opening_hours(resources, start, end)
 
-        self._fetch_opening_hours(resources, start, end)
+        self.periods = {}
+        for resource in resources:
+            self.periods[resource] = []
+        if init_periods:
+            for resource in resources:
+                periods = get_periods_for_resource(resource)
+                for period in periods:
+                    self.periods[resource].append(period)
 
     def _init_opening_hours_structure(self):
         """Opening hours structure is:
@@ -63,6 +80,19 @@ class OpeningHoursClient:
         resource = self.opening_hours.get(resource, {})
         times = resource.get(date, [])
         return times
+
+    def get_opening_hours_for_date_range(
+        self, resource: str, date_start: datetime.date, date_end: datetime.date
+    ) -> Dict[datetime.date, List[TimeElement]]:
+        opening_hours = {
+            date: times
+            for date, times in self.opening_hours.get(resource, {}).items()
+            if date >= date_start and date <= date_end and times
+        }
+        return opening_hours
+
+    def get_resource_periods(self, resource) -> List[Period]:
+        return self.periods.get(resource)
 
     def is_resource_open(
         self, resource: str, start_time: datetime.datetime, end_time: datetime.datetime
