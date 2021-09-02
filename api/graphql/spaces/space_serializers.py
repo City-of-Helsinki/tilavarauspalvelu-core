@@ -18,9 +18,9 @@ class SpaceCreateSerializer(SpaceSerializer, PrimaryKeySerializer):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["building_id"].required = False
         self.fields["district_id"].required = False
         self.fields["parent_id"].required = False
+        self.fields.pop("building_id")
 
     class Meta(SpaceSerializer.Meta):
         fields = SpaceSerializer.Meta.fields + [
