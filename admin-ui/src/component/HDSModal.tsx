@@ -11,8 +11,8 @@ interface IProps {
 }
 
 const WideDialogStyle = createGlobalStyle`
-  div [role=dialog] {
-    width: var(--container-width-m) !important;
+  div.wide-dialog {
+    width: var(--container-width-l) !important;
   }
   `;
 
@@ -27,6 +27,7 @@ const Modal = ({
     <>
       <WideDialogStyle />
       <Dialog
+        className="wide-dialog"
         aria-describedby="dialog-content"
         aria-labelledby="dialog-title"
         close={close}

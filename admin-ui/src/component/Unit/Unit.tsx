@@ -1,7 +1,4 @@
-import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
-import styled from "styled-components";
-import { useTranslation } from "react-i18next";
+import { useQuery } from "@apollo/client";
 import {
   Button,
   IconClock,
@@ -12,19 +9,23 @@ import {
   IconPlusCircleFill,
   Notification,
 } from "hds-react";
-import { ContentContainer, IngressContainer } from "../../styles/layout";
-import withMainMenu from "../withMainMenu";
-import { H1 } from "../../styles/typography";
-import { UnitWIP } from "../../common/types";
-import Loader from "../Loader";
-import { getUnit } from "../../common/api";
-import LinkPrev from "../LinkPrev";
-import { BasicLink, breakpoints } from "../../styles/util";
-import ExternalLink from "./ExternalLink";
-import { useModal } from "../../context/UIContext";
-import InfoModalContent from "./InfoModalContent";
-import SecondaryNavigation from "../SecondaryNavigation";
+import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useParams } from "react-router-dom";
+import styled from "styled-components";
+import { UNIT_QUERY } from "../../common/queries";
+import { UnitType } from "../../common/types";
 import { parseAddress } from "../../common/util";
+import { useModal } from "../../context/UIContext";
+import { ContentContainer, IngressContainer } from "../../styles/layout";
+import { H1 } from "../../styles/typography";
+import { BasicLink, breakpoints } from "../../styles/util";
+import LinkPrev from "../LinkPrev";
+import Loader from "../Loader";
+import SecondaryNavigation from "../SecondaryNavigation";
+import withMainMenu from "../withMainMenu";
+import ExternalLink from "./ExternalLink";
+import InfoModalContent from "./InfoModalContent";
 
 interface IProps {
   unitId: string;
@@ -138,7 +139,7 @@ const NoReservationUnits = styled.div``;
 
 const Unit = (): JSX.Element => {
   const [isLoading, setIsLoading] = useState(true);
-  const [unit, setUnit] = useState<UnitWIP>();
+  const [unit, setUnit] = useState<UnitType>();
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [hasOpeningHours, setOpeningHours] = useState(true);
   const [hasSpacesResources, setSpacesResources] = useState(true);
@@ -146,6 +147,25 @@ const Unit = (): JSX.Element => {
 
   const { t } = useTranslation();
   const { unitId } = useParams<IProps>();
+
+  useQuery(UNIT_QUERY, {
+    variables: { pk: unitId },
+    onCompleted: (data: UnitType) => {
+      setUnit(data);
+      setOpeningHours(Boolean(data.openingHours?.length));
+      setSpacesResources(
+        Boolean(data.resources?.length || data.spaces?.length || false)
+      );
+      setReservationUnits(Boolean(data.reservationUnits));
+      setIsLoading(false);
+    },
+    onError: () => {
+      setErrorMsg("errors.errorFetchingData");
+      setIsLoading(false);
+    },
+  });
+
+  /*
   useEffect(() => {
     const fetchUnit = async () => {
       try {
@@ -157,6 +177,7 @@ const Unit = (): JSX.Element => {
         );
         setReservationUnits(Boolean(result.reservationUnits));
       } catch (error) {
+        console.error(error);
         setErrorMsg("errors.errorFetchingData");
       } finally {
         setIsLoading(false);
@@ -165,6 +186,7 @@ const Unit = (): JSX.Element => {
 
     fetchUnit();
   }, [unitId]);
+  */
 
   const { setModalContent } = useModal();
 
@@ -198,7 +220,9 @@ const Unit = (): JSX.Element => {
           <Image src="https://tilavaraus.hel.fi/v1/media/reservation_unit_images/liikumistila2.jfif.250x250_q85_crop.jpg" />
           <div>
             <Name>{unit?.name}</Name>
-            {unit ? <Address>{parseAddress(unit?.location)}</Address> : null}
+            {unit?.location ? (
+              <Address>{parseAddress(unit?.location)}</Address>
+            ) : null}
             <Props>
               <Prop $disabled={!unit?.area}>
                 <IconGlobe /> {unit?.area || t("Unit.noArea")}

@@ -3,16 +3,26 @@ import { IconGroup } from "hds-react";
 import { trim } from "lodash";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { Space, UnitWIP } from "../../common/types";
+import { FetchResult, useMutation } from "@apollo/client";
+import {
+  Space,
+  SpaceDeleteMutationInput,
+  SpaceDeleteMutationPayload,
+  UnitWIP,
+} from "../../common/types";
+import { DELETE_SPACE } from "../../common/queries";
 import DataTable, { CellConfig } from "../DataTable";
 import PopupMenu from "./PopupMenu";
 import Modal, { useModal as useHDSModal } from "../HDSModal";
 import NewSpaceModal from "./NewSpaceModal";
+import ConfirmationDialog, { ModalRef } from "../ConfirmationDialog";
 
 interface IProps {
   spaces: Space[];
   unit: UnitWIP;
   onSave: () => void;
+  onDelete: () => void;
+  onDataError: (error: string) => void;
 }
 
 const Wrapper = styled.div``;
@@ -36,7 +46,13 @@ const MaxPersons = styled.div`
   display: flex;
 `;
 
-const SpacesTable = ({ spaces, unit, onSave }: IProps): JSX.Element => {
+const SpacesTable = ({
+  spaces,
+  unit,
+  onSave,
+  onDelete,
+  onDataError,
+}: IProps): JSX.Element => {
   const { t, i18n } = useTranslation();
   const {
     open: isOpen,
@@ -44,6 +60,18 @@ const SpacesTable = ({ spaces, unit, onSave }: IProps): JSX.Element => {
     closeModal,
     modalContent,
   } = useHDSModal();
+
+  const [deleteSpaceMutation] = useMutation<
+    { deleteSpace: SpaceDeleteMutationPayload },
+    { input: SpaceDeleteMutationInput }
+  >(DELETE_SPACE);
+
+  const deleteSpace = (
+    id: number
+  ): Promise<FetchResult<{ deleteSpace: SpaceDeleteMutationPayload }>> =>
+    deleteSpaceMutation({ variables: { input: { pk: id } } });
+
+  const modal = useRef<ModalRef>();
 
   const cellConfig = {
     cols: [
@@ -93,6 +121,7 @@ const SpacesTable = ({ spaces, unit, onSave }: IProps): JSX.Element => {
                           unit={unit}
                           closeModal={closeModal}
                           onSave={onSave}
+                          onDataError={onDataError}
                         />
                       ),
                   },
@@ -106,8 +135,29 @@ const SpacesTable = ({ spaces, unit, onSave }: IProps): JSX.Element => {
                   {
                     name: t("SpaceTable.menuRemoveSpace"),
                     onClick: () => {
-                      // eslint-disable-next-line no-console
-                      console.log("Clicked!");
+                      modal.current?.open({
+                        id: "confirmation-modal",
+                        open: true,
+                        heading: t("SpaceTable.removeConfirmationTitle", {
+                          name: space.name[i18n.language],
+                        }),
+                        content: t("SpaceTable.removeConfirmationMessage"),
+                        acceptLabel: t("SpaceTable.removeConfirmationAccept"),
+                        cancelLabel: t("SpaceTable.removeConfirmationCancel"),
+                        onAccept: () => {
+                          deleteSpace(space.id)
+                            .then((d) => {
+                              if (!d.errors) {
+                                onDelete();
+                              } else {
+                                onDataError("SpaceTable.removeFailed");
+                              }
+                            })
+                            .catch(() => {
+                              onDataError("SpaceTable.removeFailed");
+                            });
+                        },
+                      });
                     },
                   },
                 ]}
@@ -148,6 +198,7 @@ const SpacesTable = ({ spaces, unit, onSave }: IProps): JSX.Element => {
       >
         {modalContent}
       </Modal>
+      <ConfirmationDialog open={false} id="confirmation-dialog" ref={modal} />
     </Wrapper>
   );
 };

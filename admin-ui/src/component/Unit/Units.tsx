@@ -190,6 +190,7 @@ const Units = (): JSX.Element => {
           <UnitCard unit={unit} key={unit.pk} />
         ))}
       </UnitList>
+
       {errorMsg && (
         <Notification
           type="error"

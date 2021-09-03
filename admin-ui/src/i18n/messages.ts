@@ -28,6 +28,11 @@ const translations: ITranslations = {
     saturday: ["Lauantai"],
     sunday: ["Sunnuntai"],
   },
+  language: {
+    fi: ["suomeksi"],
+    sv: ["ruotsiksi"],
+    en: ["englanniksi"],
+  },
   common: {
     applicationName: ["Tilavarauskäsittely"],
     selectReservationUnit: ["Valitse tila"],
@@ -701,6 +706,8 @@ const translations: ITranslations = {
     newSpacesCreatedNotification: [
       "Voit luoda tiloille alitiloja niin pitkälle kuin on tarpeellista.",
     ],
+    spacesDeletedTitle: ["Tila poistettu"],
+    spacesDeletedNotification: ["Tila poistettu onnistuneesti"],
   },
   SpaceModal: {
     phase: ["Vaihe"],
@@ -748,10 +755,37 @@ const translations: ITranslations = {
     menuAddSubSpace: ["Lisää alitiloja"],
     menuEditSpace: ["Muokkaa tilatietoja"],
     menuRemoveSpace: ["Poista tila"],
+    removeConfirmationTitle: ["Haluatko varmasti poistaa tilan {{name}}?"],
+    removeConfirmationMessage: [
+      "Tila poistetaan kaikista varausyksiköistä, joihin se on liitetty. Et voi perua toimintoa.",
+    ],
+    removeConfirmationAccept: ["Poista"],
+    removeConfirmationCancel: ["Kumoa"],
+    removeFailed: ["Tilan poistaminen ei onnistunut."],
   },
-  ResourcesTable: {
+  ResourceModal: {
+    modalTitle: ["Luo uusi resurssi toimipisteelle"],
+    info: [
+      "Voit luoda kerralla yhden toimipisteen resurssin. Niitä voivat olla esim. laitteet tai tarvikkeet.",
+    ],
+    nameLabel: ["Resurssin nimi {{lang}}"],
+    namePlaceholder: ["Kirjaa tarkenne  {{language}}"],
+    descriptionLabel: ["Resurssin kuvaus {{lang}}"],
+    descriptionPlaceholder: ["Resurssin kuvaus {{language}}"],
+    cancel: ["Palaa tallentamatta tietoja"],
+    save: ["Luo resurssitieto"],
+    saveError: ["Tietojen tallennus epäonnistui."],
+  },
+  ResourceTable: {
     menuEditResource: ["Muokkaa resurssia"],
     menuRemoveResource: ["Poista resurssi"],
+    removeConfirmationTitle: ["Haluatko varmasti poistaa resurssin {{name}}?"],
+    removeConfirmationMessage: [
+      "Resurssi poistetaan toimipisteestä. Et voi perua toimintoa.",
+    ],
+    removeConfirmationAccept: ["Poista"],
+    removeConfirmationCancel: ["Kumoa"],
+    removeFailed: ["Resurssin poistaminen ei onnistunut."],
   },
 };
 

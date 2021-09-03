@@ -13,7 +13,6 @@ import {
   TextInput,
 } from "hds-react";
 import styled from "styled-components";
-
 import { FetchResult, useMutation } from "@apollo/client";
 import { useTranslation, TFunction } from "react-i18next";
 import { omit, set } from "lodash";
@@ -33,6 +32,7 @@ interface IProps {
   parentSpace?: Space;
   closeModal: () => void;
   onSave: () => void;
+  onDataError: (message: string) => void;
 }
 
 type State = {
@@ -431,6 +431,7 @@ const SecondPage = ({
   createSpace,
   t,
   onSave,
+  onDataError,
   hasFixedParent,
 }: {
   editorState: State;
@@ -442,6 +443,7 @@ const SecondPage = ({
   ) => Promise<FetchResult<{ createSpace: SpaceCreateMutationPayload }>>;
   t: TFunction;
   onSave: () => void;
+  onDataError: (message: string) => void;
   hasFixedParent: boolean;
 }): JSX.Element => {
   const nextEnabled =
@@ -530,11 +532,11 @@ const SecondPage = ({
                   onSave();
                   closeModal();
                 } else {
-                  // WIP
+                  onDataError(t("SpaceModal.page2.saveFailed"));
                 }
               })
               .catch(() => {
-                // WIP
+                onDataError(t("SpaceModal.page2.saveFailed"));
               });
           }}
         >
@@ -549,6 +551,7 @@ const NewSpaceModal = ({
   unit,
   closeModal,
   onSave,
+  onDataError,
   parentSpace,
 }: IProps): JSX.Element | null => {
   const [editorState, dispatch] = useReducer(reducer, initialState);
@@ -589,6 +592,7 @@ const NewSpaceModal = ({
       createSpace={createSpace}
       t={t}
       onSave={onSave}
+      onDataError={onDataError}
       hasFixedParent={hasFixedParent}
     />
   );

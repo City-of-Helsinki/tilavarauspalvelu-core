@@ -458,17 +458,54 @@ export type ErrorType = {
 export type SpaceCreateMutationPayload = {
   id: number;
   errors: ErrorType;
-  clientMutationId: string;
+  clientMutationId?: string;
 };
 
+export type SpaceDeleteMutationInput = {
+  pk: number;
+  clientMutationId?: string;
+};
+
+export type SpaceDeleteMutationPayload = {
+  deleted: boolean;
+  clientMutationId?: string;
+};
+
+// WIP, api incomplete
 export type UnitType = {
   pk: number;
   name: string;
   location?: Location;
   area?: string; // district?
   service?: string;
-  reservationUnits: []
+  reservationUnits: [];
   resources: [];
   spaces: [];
   openingHours: [];
+};
+
+// WIP, no api yet
+export type ResourceCreateMutationInput = {
+  unitId: number;
+  name: TranslationObject;
+  description: TranslationObject;
+};
+
+// WIP no api yet
+export type ResourceCreateMutationPayload = {
+  id: number;
+  errors: ErrorType;
+  clientMutationId: string;
+};
+
+// WIP no api yet
+export type ResourceDeleteMutationInput = {
+  pk: number;
+  clientMutationId?: string;
+};
+
+// WIP no api yet
+export type ResourceDeleteMutationPayload = {
+  deleted: boolean;
+  clientMutationId?: string;
 };

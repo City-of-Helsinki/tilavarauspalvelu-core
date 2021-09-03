@@ -1,14 +1,23 @@
-import React from "react";
+import React, { useRef } from "react";
 import { trim } from "lodash";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { Resource } from "../../common/types";
+import { FetchResult, useMutation } from "@apollo/client";
+import {
+  Resource,
+  ResourceDeleteMutationInput,
+  ResourceDeleteMutationPayload,
+} from "../../common/types";
 
 import DataTable, { CellConfig } from "../DataTable";
 import PopupMenu from "./PopupMenu";
+import ConfirmationDialog, { ModalRef } from "../ConfirmationDialog";
+import { DELETE_RESOURCE } from "../../common/queries";
 
 interface IProps {
   resources: Resource[];
+  onDelete: (text?: string) => void;
+  onDataError: (error: string) => void;
 }
 
 const Wrapper = styled.div``;
@@ -25,8 +34,24 @@ const ResourceType = styled.div`
 
 const ResourceTypeName = styled.span``;
 
-const ResourcesTable = ({ resources }: IProps): JSX.Element => {
+const ResourcesTable = ({
+  resources,
+  onDelete,
+  onDataError,
+}: IProps): JSX.Element => {
+  const [deleteResourceMutation] = useMutation<
+    { deleteSpace: ResourceDeleteMutationPayload },
+    { input: ResourceDeleteMutationInput }
+  >(DELETE_RESOURCE);
+
+  const deleteResource = (
+    id: number
+  ): Promise<FetchResult<{ deleteSpace: ResourceDeleteMutationPayload }>> =>
+    deleteResourceMutation({ variables: { input: { pk: id } } });
+
   const { t, i18n } = useTranslation();
+
+  const modal = useRef<ModalRef>();
 
   const cellConfig = {
     cols: [
@@ -50,23 +75,39 @@ const ResourcesTable = ({ resources }: IProps): JSX.Element => {
       {
         title: "Resource.type",
         key: "type",
-        transform: ({ resourceType }: Resource) => (
+        transform: ({ name, id, resourceType }: Resource) => (
           <ResourceType>
             <ResourceTypeName>{resourceType}</ResourceTypeName>
             <PopupMenu
               items={[
                 {
-                  name: t("ResourcesTable.menuEditResource"),
+                  name: t("ResourceTable.menuEditResource"),
                   onClick: () => {
                     // eslint-disable-next-line no-console
                     console.log("Clicked!");
                   },
                 },
                 {
-                  name: t("ResourcesTable.menuRemoveResource"),
+                  name: t("ResourceTable.menuRemoveResource"),
                   onClick: () => {
-                    // eslint-disable-next-line no-console
-                    console.log("Clicked!");
+                    modal.current?.open({
+                      id: "confirmation-modal",
+                      open: true,
+                      heading: t("ResourceTable.removeConfirmationTitle", {
+                        name: name[i18n.language],
+                      }),
+                      content: t("ResourceTable.removeConfirmationMessage"),
+                      acceptLabel: t("ResourceTable.removeConfirmationAccept"),
+                      cancelLabel: t("ResourceTable.removeConfirmationCancel"),
+                      onAccept: async () => {
+                        try {
+                          await deleteResource(id);
+                          onDelete(t("ResourceTable.remove.success"));
+                        } catch (error) {
+                          onDataError(t("ResourceTable.removeFailed"));
+                        }
+                      },
+                    });
                   },
                 },
               ]}
@@ -96,6 +137,7 @@ const ResourcesTable = ({ resources }: IProps): JSX.Element => {
         filterConfig={[]}
         noResultsKey="Unit.noResources"
       />
+      <ConfirmationDialog open={false} id="confirmation-dialog" ref={modal} />
     </Wrapper>
   );
 };
