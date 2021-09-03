@@ -13,7 +13,11 @@ from api.graphql.resources.resource_types import ResourceType
 from api.graphql.services.service_types import ServiceType
 from api.graphql.spaces.space_types import LocationType, SpaceType
 from api.graphql.units.unit_types import UnitType
-from permissions.api_permissions.graphene_permissions import ReservationUnitPermission
+from opening_hours.hauki_link_generator import generate_hauki_link
+from permissions.api_permissions.graphene_permissions import (
+    ReservationUnitHaukiUrlPermission,
+    ReservationUnitPermission,
+)
 from reservation_units.models import (
     Equipment,
     EquipmentCategory,
@@ -35,6 +39,24 @@ class PurposeType(AuthNode, PrimaryKeyObjectType):
         fields = ("id", "name", "pk")
 
         interfaces = (graphene.relay.Node,)
+
+
+class ReservationUnitHaukiUrlType(AuthNode, DjangoObjectType):
+
+    url = graphene.String()
+
+    permission_classes = (
+        (ReservationUnitHaukiUrlPermission,)
+        if not settings.TMP_PERMISSIONS_DISABLED
+        else (AllowAny,)
+    )
+
+    class Meta:
+        model = ReservationUnit
+        fields = ("url",)
+
+    def resolve_url(self, info):
+        return generate_hauki_link(self.uuid, info.context.user)
 
 
 class ReservationUnitImageType(DjangoObjectType):
@@ -204,6 +226,8 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
 class ReservationUnitByPkType(ReservationUnitType):
     next_available_slot = graphene.DateTime()
 
+    hauki_url = graphene.Field(ReservationUnitHaukiUrlType)
+
     class Meta:
         model = ReservationUnit
         fields = (
@@ -226,6 +250,7 @@ class ReservationUnitByPkType(ReservationUnitType):
             "max_reservation_duration",
             "min_reservation_duration",
             "next_available_slot",
+            "hauki_url",
         )
 
         interfaces = (graphene.relay.Node,)
@@ -233,3 +258,6 @@ class ReservationUnitByPkType(ReservationUnitType):
     def resolve_next_available_slot(self, info):
         scheduler = ReservationUnitReservationScheduler(self)
         return scheduler.get_next_available_reservation_time()
+
+    def resolve_hauki_url(self, info):
+        return self
