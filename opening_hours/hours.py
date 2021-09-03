@@ -125,9 +125,15 @@ def get_opening_hours(
     resource_id: Union[str, int, list],
     start_date: Union[str, datetime.date],
     end_date: Union[str, datetime.date],
+    hauki_origin_id=None,
 ) -> List[dict]:
     """Get opening hours for Hauki resource"""
-    resource_prefix = f"{settings.HAUKI_ORIGIN_ID}"
+    if hauki_origin_id:
+        hauki_origin_id = hauki_origin_id
+    else:
+        hauki_origin_id = settings.HAUKI_ORIGIN_ID
+
+    resource_prefix = f"{hauki_origin_id}"
     if not (settings.HAUKI_API_URL and resource_prefix):
         raise HaukiConfigurationError(
             "Both hauki api url and hauki origin id need to be configured"
@@ -180,9 +186,16 @@ def get_opening_hours(
     return days_data_out
 
 
-def get_periods_for_resource(resource_id: Union[str, int, list]) -> List[Period]:
+def get_periods_for_resource(
+    resource_id: Union[str, int, list], hauki_origin_id=None
+) -> List[Period]:
     """Get periods for Hauki resource"""
-    resource_prefix = f"{settings.HAUKI_ORIGIN_ID}"
+    if hauki_origin_id:
+        hauki_origin_id = hauki_origin_id
+    else:
+        hauki_origin_id = settings.HAUKI_ORIGIN_ID
+
+    resource_prefix = f"{hauki_origin_id}"
     if not (settings.HAUKI_API_URL and resource_prefix):
         raise HaukiConfigurationError(
             "Both hauki api url and hauki origin id need to be configured"

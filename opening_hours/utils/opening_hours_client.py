@@ -20,17 +20,20 @@ class OpeningHoursClient:
         single=False,
         init_periods=False,
         init_opening_hours=True,
+        hauki_origin_id=None,
     ):
         if single:
             resources = [str(resources)]
         self.start = start
         self.end = end
 
+        if not hauki_origin_id:
+            hauki_origin_id = settings.HAUKI_ORIGIN_ID
+
         self.resources = {}
 
         self.resources = {
-            f"{settings.HAUKI_ORIGIN_ID}:{resource_id}": resource_id
-            for resource_id in resources
+            f"{hauki_origin_id}:{resource_id}": resource_id for resource_id in resources
         }
         self.opening_hours = {}
         if init_opening_hours:
