@@ -13,6 +13,11 @@ class UnitType(AuthNode, PrimaryKeyObjectType):
         (UnitPermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
     )
 
+    # avoid circulars and use path.
+    reservation_units = graphene.List(
+        "api.graphql.reservation_units.reservation_unit_types.ReservationUnitType"
+    )
+
     class Meta:
         model = Unit
         fields = (
@@ -31,3 +36,6 @@ class UnitType(AuthNode, PrimaryKeyObjectType):
         }
 
         interfaces = (graphene.relay.Node,)
+
+    def resolve_reservation_units(self, info):
+        return self.reservationunit_set.all()
