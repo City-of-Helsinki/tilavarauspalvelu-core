@@ -17,6 +17,7 @@ class UnitType(AuthNode, PrimaryKeyObjectType):
     reservation_units = graphene.List(
         "api.graphql.reservation_units.reservation_unit_types.ReservationUnitType"
     )
+    spaces = graphene.List("api.graphql.spaces.space_types.SpaceType")
 
     class Meta:
         model = Unit
@@ -39,3 +40,6 @@ class UnitType(AuthNode, PrimaryKeyObjectType):
 
     def resolve_reservation_units(self, info):
         return self.reservationunit_set.all()
+
+    def resolve_spaces(self, info):
+        return self.spaces.all()
