@@ -18,6 +18,7 @@ class UnitType(AuthNode, PrimaryKeyObjectType):
         "api.graphql.reservation_units.reservation_unit_types.ReservationUnitType"
     )
     spaces = graphene.List("api.graphql.spaces.space_types.SpaceType")
+    location = graphene.Field("api.graphql.spaces.space_types.LocationType")
 
     class Meta:
         model = Unit
@@ -43,3 +44,6 @@ class UnitType(AuthNode, PrimaryKeyObjectType):
 
     def resolve_spaces(self, info):
         return self.spaces.all()
+
+    def resolve_location(self, info):
+        return getattr(self, "location", None)
