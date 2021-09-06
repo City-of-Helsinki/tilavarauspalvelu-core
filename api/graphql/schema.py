@@ -39,7 +39,7 @@ from permissions.api_permissions.graphene_permissions import (
 from reservation_units.models import ReservationUnit
 from reservations.forms import ReservationForm
 from resources.models import Resource
-from spaces.models import Unit
+from spaces.models import Space, Unit
 
 
 class ReservationMutation(AuthMutation, DjangoModelFormMutation):
@@ -115,6 +115,10 @@ class Query(graphene.ObjectType):
     def resolve_unit_by_pk(self, info, **kwargs):
         pk = kwargs.get("pk")
         return get_object_or_404(Unit, pk=pk)
+
+    def resolve_space_by_pk(self, info, **kwargs):
+        pk = kwargs.get("pk")
+        return get_object_or_404(Space, pk=pk)
 
 
 class Mutation(graphene.ObjectType):
