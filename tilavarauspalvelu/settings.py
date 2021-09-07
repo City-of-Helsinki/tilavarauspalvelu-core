@@ -320,6 +320,8 @@ GRAPHENE = {
     ],
 }
 
+GRAPHQL_JWT = {"JWT_AUTH_HEADER_PREFIX": "Bearer"}
+
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "permissions.api_permissions.drf_permissions.ReadOnly"
