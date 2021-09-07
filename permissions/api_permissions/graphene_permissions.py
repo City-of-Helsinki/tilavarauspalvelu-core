@@ -16,6 +16,21 @@ from reservations.models import Reservation
 from spaces.models import Unit
 
 
+class ReservationUnitHaukiUrlPermission(BasePermission):
+    @classmethod
+    def has_permission(cls, info: ResolveInfo) -> bool:
+        return False
+
+    @classmethod
+    def has_node_permission(cls, info: ResolveInfo, id: str) -> bool:
+        # FIXME: needs a fix for permissions, not called currently TILA-777
+        return True
+
+    @classmethod
+    def has_mutation_permission(cls, root: Any, info: ResolveInfo, input: dict) -> bool:
+        return False
+
+
 class ReservationUnitPermission(BasePermission):
     @classmethod
     def has_permission(cls, info: ResolveInfo) -> bool:

@@ -7,6 +7,17 @@ from snapshottest import Snapshot
 
 snapshots = Snapshot()
 
+snapshots['ReservationUnitTestCase::test_getting_hauki_url 1'] = {
+    'data': {
+        'reservationUnitByPk': {
+            'haukiUrl': {
+                'url': 'https://test.com/resource/origin:3774af34-9916-40f2-acc7-68db5a627710/?hsa_source=origin&hsa_username=AnonymousUser&hsa_organization=ORGANISATION&hsa_created_at=2021-05-03 00:00:00+00:00&hsa_valid_until=2021-05-03 00:30:00+00:00&hsa_resource=origin:3774af34-9916-40f2-acc7-68db5a627710&hsa_signature=8df8cd01df388f8f1aad70e82035eaae3a27d33c2f3e3583bb7f9bb7aca966f1'
+            },
+            'name': 'Test name'
+        }
+    }
+}
+
 snapshots['ReservationUnitTestCase::test_getting_reservation_units 1'] = {
     'data': {
         'reservationUnits': {
