@@ -102,6 +102,14 @@ class Unit(models.Model):
     def __str__(self):
         return self.name
 
+    @property
+    def hauki_resource_id(self):
+        return self.tprek_id
+
+    @property
+    def hauki_resource_origin_id(self):
+        return "tprek"
+
 
 class RealEstate(models.Model):
     name = models.CharField(verbose_name=_("Name"), max_length=255)

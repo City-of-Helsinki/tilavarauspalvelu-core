@@ -158,6 +158,14 @@ class ReservationUnit(models.Model):
 
         return qs.exists()
 
+    @property
+    def hauki_resource_id(self):
+        return str(self.uuid)
+
+    @property
+    def hauki_resource_origin_id(self):
+        return settings.HAUKI_ORIGIN_ID
+
 
 class ReservationUnitImage(models.Model):
     TYPES = (

@@ -1,14 +1,13 @@
 import datetime
 import logging
 from dataclasses import dataclass, field
-from typing import List, Optional, Union
+from typing import Dict, List, Optional, Union
 
 import requests
 from django.conf import settings
 
 from opening_hours.enums import State
 
-API_URL = settings.HAUKI_API_URL
 REQUESTS_TIMEOUT = 15
 
 logger = logging.getLogger(__name__)
@@ -70,6 +69,38 @@ class TimeElement:
         )
 
 
+@dataclass(order=True, frozen=True)
+class TimeSpan:
+    """Represents one TimeSpan in Period's time span group's time_spans."""
+
+    id: int
+    group: int
+    start_time: Optional[datetime.time]
+    end_time: Optional[datetime.time]
+    end_time_on_next_day: bool
+    name: Dict[str, str]
+    description: Dict[str, str]
+    created: Optional[datetime.datetime]
+    modified: Optional[datetime.datetime]
+    resource_state: State = State.UNDEFINED
+    full_day: bool = False
+    weekdays: Optional[list] = field(default=None, compare=False)
+
+
+@dataclass(order=True, frozen=True)
+class Period:
+    """Represents one period in date_period end point"""
+
+    id: int
+    resource: str
+    name: dict
+    description: dict
+    start_date: Optional[datetime.date]
+    end_date: Optional[datetime.date]
+    time_spans: List[TimeSpan]
+    resource_state: State = State.UNDEFINED
+
+
 def make_hauki_request(url, params):
     try:
         response = requests.get(url, params=params, timeout=REQUESTS_TIMEOUT)
@@ -94,10 +125,16 @@ def get_opening_hours(
     resource_id: Union[str, int, list],
     start_date: Union[str, datetime.date],
     end_date: Union[str, datetime.date],
+    hauki_origin_id=None,
 ) -> List[dict]:
     """Get opening hours for Hauki resource"""
-    resource_prefix = f"{settings.HAUKI_ORIGIN_ID}"
-    if not (API_URL and resource_prefix):
+    if hauki_origin_id:
+        hauki_origin_id = hauki_origin_id
+    else:
+        hauki_origin_id = settings.HAUKI_ORIGIN_ID
+
+    resource_prefix = f"{hauki_origin_id}"
+    if not (settings.HAUKI_API_URL and resource_prefix):
         raise HaukiConfigurationError(
             "Both hauki api url and hauki origin id need to be configured"
         )
@@ -114,7 +151,9 @@ def get_opening_hours(
     if isinstance(end_date, datetime.date):
         end_date = end_date.isoformat()
 
-    resource_opening_hours_url = f"{API_URL}/v1/opening_hours/?resource={resource_id}"
+    resource_opening_hours_url = (
+        f"{settings.HAUKI_API_URL}/v1/opening_hours/?resource={resource_id}"
+    )
     query_params = {
         "start_date": start_date,
         "end_date": end_date,
@@ -145,3 +184,69 @@ def get_opening_hours(
                 )
             days_data_out.append(day_data_out)
     return days_data_out
+
+
+def get_periods_for_resource(
+    resource_id: Union[str, int, list], hauki_origin_id=None
+) -> List[Period]:
+    """Get periods for Hauki resource"""
+    if hauki_origin_id:
+        hauki_origin_id = hauki_origin_id
+    else:
+        hauki_origin_id = settings.HAUKI_ORIGIN_ID
+
+    resource_prefix = f"{hauki_origin_id}"
+    if not (settings.HAUKI_API_URL and resource_prefix):
+        raise HaukiConfigurationError(
+            "Both hauki api url and hauki origin id need to be configured"
+        )
+    if isinstance(resource_id, list):
+        resource_id = [str(uuid) for uuid in resource_id]
+        resource_id = "%s:%s" % (
+            resource_prefix,
+            f",{resource_prefix}:".join(resource_id),
+        )
+    else:
+        resource_id = f"{resource_prefix}:{resource_id}"
+
+    resource_periods_url = (
+        f"{settings.HAUKI_API_URL}/v1/date_period/?resource={resource_id}"
+    )
+
+    periods_data_in = make_hauki_request(resource_periods_url, None)
+
+    periods_data_out = []
+    for period in periods_data_in:
+        period_data_out = {
+            "id": period["id"],
+            "resource": period["resource"],
+            "start_date": datetime.datetime.strptime(
+                period["start_date"], "%Y-%m-%d"
+            ).date()
+            if period["start_date"]
+            else None,
+            "end_date": datetime.datetime.strptime(
+                period["end_date"], "%Y-%m-%d"
+            ).date()
+            if period["end_date"]
+            else None,
+            "description": period["description"],
+            "name": period["name"],
+            "resource_state": period["resource_state"],
+            "time_spans": [],
+        }
+        for time_span_group in period["time_span_groups"]:
+            for time_data_in in time_span_group["time_spans"]:
+                period_data_out["time_spans"].append(
+                    TimeSpan(
+                        start_time=datetime.time.fromisoformat(
+                            time_data_in.pop("start_time")
+                        ),
+                        end_time=datetime.time.fromisoformat(
+                            time_data_in.pop("end_time")
+                        ),
+                        **time_data_in,
+                    )
+                )
+            periods_data_out.append(Period(**period_data_out))
+    return periods_data_out
