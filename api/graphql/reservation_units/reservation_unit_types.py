@@ -9,6 +9,7 @@ from graphene_permissions.mixins import AuthNode
 from graphene_permissions.permissions import AllowAny
 
 from api.graphql.base_type import PrimaryKeyObjectType
+from api.graphql.opening_hours.opening_hours_types import OpeningHoursMixin
 from api.graphql.resources.resource_types import ResourceType
 from api.graphql.services.service_types import ServiceType
 from api.graphql.spaces.space_types import LocationType, SpaceType
@@ -223,7 +224,7 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
         return duration.time()
 
 
-class ReservationUnitByPkType(ReservationUnitType):
+class ReservationUnitByPkType(ReservationUnitType, OpeningHoursMixin):
     next_available_slot = graphene.DateTime()
 
     hauki_url = graphene.Field(ReservationUnitHaukiUrlType)

@@ -39,6 +39,8 @@ class SpaceType(AuthNode, PrimaryKeyObjectType):
     permission_classes = (
         (SpacePermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
     )
+    children = graphene.List(lambda: SpaceType)
+    resources = graphene.List("api.graphql.resources.resource_types.ResourceType")
 
     class Meta:
         model = Space
@@ -50,6 +52,9 @@ class SpaceType(AuthNode, PrimaryKeyObjectType):
             "surface_area",
             "terms_of_use",
             "unit",
+            "code",
+            "max_persons",
+            "parent",
         )
 
         filter_fields = {
@@ -57,6 +62,12 @@ class SpaceType(AuthNode, PrimaryKeyObjectType):
         }
 
         interfaces = (graphene.relay.Node,)
+
+    def resolve_children(self, info):
+        return Space.objects.filter(parent=self)
+
+    def resolve_resources(self, info):
+        return self.resource_set.all()
 
 
 class LocationType(PrimaryKeyObjectType):
