@@ -165,29 +165,6 @@ const Unit = (): JSX.Element => {
     },
   });
 
-  /*
-  useEffect(() => {
-    const fetchUnit = async () => {
-      try {
-        const result = await getUnit(Number(unitId));
-        setUnit(result);
-        setOpeningHours(Boolean(result.openingHours.length));
-        setSpacesResources(
-          Boolean(result.resources.length || result.spaces.length)
-        );
-        setReservationUnits(Boolean(result.reservationUnits));
-      } catch (error) {
-        console.error(error);
-        setErrorMsg("errors.errorFetchingData");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchUnit();
-  }, [unitId]);
-  */
-
   const { setModalContent } = useModal();
 
   if (isLoading) {

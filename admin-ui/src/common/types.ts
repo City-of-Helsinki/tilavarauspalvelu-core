@@ -442,9 +442,21 @@ export type SpaceCreateMutationInput = {
   key?: string; // client only
   name: string;
   parentId?: string;
-  buildingId: string;
   surfaceArea?: number;
   maxPersons?: number;
+  districtId?: string;
+  code?: string;
+  clientMutationId?: string;
+};
+
+export type SpaceUpdateMutationInput = {
+  pk?: number;
+  name: string;
+  parentId?: string;
+  surfaceArea?: number;
+  maxPersons?: number;
+  termsOfUse?: string;
+  unitId?: string;
   districtId?: string;
   code?: string;
   clientMutationId?: string;
@@ -456,6 +468,12 @@ export type ErrorType = {
 };
 
 export type SpaceCreateMutationPayload = {
+  id: number;
+  errors: ErrorType;
+  clientMutationId?: string;
+};
+
+export type SpaceUpdateMutationPayload = {
   id: number;
   errors: ErrorType;
   clientMutationId?: string;
@@ -478,6 +496,24 @@ export type UnitType = {
   location?: Location;
   area?: string; // district?
   service?: string;
+  reservationUnits: [];
+  resources: [];
+  spaces: [];
+  openingHours: [];
+};
+
+export type SpaceType = {
+  pk?: number;
+  name: string;
+  location?: Location;
+  surfaceArea: number;
+  termsOfUse: string;
+  code?: string;
+  area?: string;
+  service?: string;
+  unit?: UnitType;
+  parent?: SpaceType;
+  maxPersons: number;
   reservationUnits: [];
   resources: [];
   spaces: [];

@@ -4,6 +4,7 @@ import { trim } from "lodash";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { FetchResult, useMutation } from "@apollo/client";
+import { useHistory } from "react-router-dom";
 import {
   Space,
   SpaceDeleteMutationInput,
@@ -73,6 +74,8 @@ const SpacesTable = ({
 
   const modal = useRef<ModalRef>();
 
+  const history = useHistory();
+
   const cellConfig = {
     cols: [
       {
@@ -128,8 +131,7 @@ const SpacesTable = ({
                   {
                     name: t("SpaceTable.menuEditSpace"),
                     onClick: () => {
-                      // eslint-disable-next-line no-console
-                      console.log("Clicked!");
+                      history.push(`/unit/${unit.id}/space/edit/${space.id}`);
                     },
                   },
                   {

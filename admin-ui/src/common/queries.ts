@@ -65,6 +65,37 @@ export const CREATE_SPACE = gql`
   }
 `;
 
+export const UPDATE_SPACE = gql`
+  mutation updateSpace($input: SpaceUpdateMutationInput!) {
+    updateSpace(input: $input) {
+      id
+      errors {
+        field
+        messages
+      }
+    }
+  }
+`;
+
+export const SPACE_HIERARCHY_QUERY = gql`
+  query getSpaces {
+    spaces {
+      edges {
+        node {
+          pk
+          name
+          parent {
+            pk
+          }
+          unit {
+            pk
+          }
+        }
+      }
+    }
+  }
+`;
+
 export const UNITS_QUERY = gql`
   query units {
     units {
@@ -119,6 +150,34 @@ export const DELETE_RESOURCE = gql`
       errors {
         field
         messages
+      }
+    }
+  }
+`;
+
+export const SPACE_QUERY = gql`
+  query space($pk: Int) {
+    spaceByPk(pk: $pk) {
+      pk
+      name
+      surfaceArea
+      maxPersons
+      code
+      termsOfUse
+      unit {
+        pk
+        name
+        description
+      }
+      parent {
+        pk
+        name
+        parent {
+          name
+          parent {
+            name
+          }
+        }
       }
     }
   }

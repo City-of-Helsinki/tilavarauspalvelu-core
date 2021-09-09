@@ -75,8 +75,6 @@ const initialSpace = (parentSpaceId: string | null) =>
     surfaceArea: 0,
     maxPersons: 0,
     locationType: "fixed",
-    buildingId: "1", // WIP to be removed from api
-    districtId: "1", // WIP to be removed from api
     parentId: parentSpaceId, // WIP to be made optional in api
   } as SpaceCreateMutationInput);
 
@@ -515,7 +513,11 @@ const SecondPage = ({
             const promises = Promise.allSettled(
               editorState.spaces.map((s) =>
                 createSpace(
-                  omit(s, ["key", "locationType"]) as SpaceCreateMutationInput
+                  omit(s, [
+                    "key",
+                    "locationType",
+                    "parentId",
+                  ]) as SpaceCreateMutationInput
                 )
               )
             );

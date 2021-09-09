@@ -31,6 +31,7 @@ import Units from "./component/Unit/Units";
 import Unit from "./component/Unit/Unit";
 import UnitMap from "./component/Unit/UnitMap";
 import SpacesResources from "./component/Unit/SpacesResources";
+import SpaceEditor from "./component/Spaces/SpaceEditor";
 import ResourcesList from "./component/Resources/ResourcesList";
 
 interface IPrivateRouteProps {
@@ -157,6 +158,10 @@ function App(): JSX.Element {
               <PrivateRoute
                 path="/unit/:unitId/spacesResources"
                 component={SpacesResources}
+              />
+              <PrivateRoute
+                path="/unit/:unitId/space/edit/:spaceId"
+                component={SpaceEditor}
               />
               <PrivateRoute path="/unit/:unitId" component={Unit} />
             </Switch>

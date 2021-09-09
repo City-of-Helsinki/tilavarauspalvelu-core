@@ -709,6 +709,19 @@ const translations: ITranslations = {
     spacesDeletedTitle: ["Tila poistettu"],
     spacesDeletedNotification: ["Tila poistettu onnistuneesti"],
   },
+  SpaceEditor: {
+    noParent: ["Päätason tila"],
+    noAddress: ["Toimipisteellä ei ole osoitetta"],
+    details: ["Tilan tiedot"],
+    hierarchy: ["Tilapuurakenne"],
+    parent: ["Ylitila"],
+    other: ["Muut tiedot"],
+    cancel: ["Palaa tallentamatta tietoja"],
+    save: ["Tallenna tiedot"],
+    termsOfUse: ["Käyttöehdot"],
+    termsOfUseHelperText: ["Tilan käyttöehdot..."],
+    noMaxPersons: ["Henkilömäärää ei asetettu"],
+  },
   SpaceModal: {
     phase: ["Vaihe"],
     page1: {

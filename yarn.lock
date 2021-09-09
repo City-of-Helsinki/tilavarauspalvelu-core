@@ -7,6 +7,24 @@
   resolved "https://registry.yarnpkg.com/@alloc/types/-/types-1.3.0.tgz#904245b8d3260a4b7d8a801c12501968f64fac08"
   integrity sha512-mH7LiFiq9g6rX2tvt1LtwsclfG5hnsmtIfkZiauAGrm1AwXhoRS0sF2WrN9JGN7eV5vFXqNaB0eXZ3IvMsVi9g==
 
+"@apollo/client@^3.0.0":
+  version "3.4.10"
+  resolved "https://registry.yarnpkg.com/@apollo/client/-/client-3.4.10.tgz#cee9ed75b1bb7f391c55d79300ecf87096e59792"
+  integrity sha512-b+8TT3jBM2BtEJi+V2FuLpvoYDZCY3baNYrgAgEyw4fjnuBCSRPY7qVjqriZAwMaGiTLtyVifGhmdeICQs4Eow==
+  dependencies:
+    "@graphql-typed-document-node/core" "^3.0.0"
+    "@wry/context" "^0.6.0"
+    "@wry/equality" "^0.5.0"
+    "@wry/trie" "^0.3.0"
+    graphql-tag "^2.12.3"
+    hoist-non-react-statics "^3.3.2"
+    optimism "^0.16.1"
+    prop-types "^15.7.2"
+    symbol-observable "^4.0.0"
+    ts-invariant "^0.9.0"
+    tslib "^2.3.0"
+    zen-observable-ts "^1.1.0"
+
 "@apollo/client@^3.4.8":
   version "3.4.8"
   resolved "https://registry.yarnpkg.com/@apollo/client/-/client-3.4.8.tgz#66d06dc1784d07d46731b3bda546046f8c280b74"
@@ -3533,6 +3551,13 @@ anymatch@^3.0.0, anymatch@^3.0.3, anymatch@~3.1.1, anymatch@~3.1.2:
   dependencies:
     normalize-path "^3.0.0"
     picomatch "^2.0.4"
+
+apollo-link-token-refresh@^0.3.2:
+  version "0.3.2"
+  resolved "https://registry.yarnpkg.com/apollo-link-token-refresh/-/apollo-link-token-refresh-0.3.2.tgz#60773790b0f111d674dd358e1e53a660a6f56b35"
+  integrity sha512-4us703pt1RyW8NOLCUtCVLbnse2gux43W9mePzfAHKeNsj8d6rzRE4IDIS+6GEb/jay36uw8E7BvX5X9k6Ivkw==
+  dependencies:
+    "@apollo/client" "^3.0.0"
 
 aproba@^1.0.3, aproba@^1.1.1:
   version "1.2.0"
@@ -8073,17 +8098,27 @@ hash.js@^1.0.0, hash.js@^1.0.3:
     inherits "^2.0.3"
     minimalistic-assert "^1.0.1"
 
-hds-core@1.2.0, hds-core@^1.0.0, hds-core@^1.1.0:
+hds-core@1.2.0, hds-core@^1.1.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/hds-core/-/hds-core-1.2.0.tgz#8cd191e324d503aa934b5b0443fb5955ab744d48"
   integrity sha512-KqUh2JlVVuvyARnFkOjhjGNzESkG5i2WtU1qNeYFDXggPAt/eEoZTMXcxj8U2j9Hc3xXBluf4Kkx+u68dpOsmA==
 
-hds-design-tokens@^1.0.0, hds-design-tokens@^1.1.0:
+hds-core@1.4.0, hds-core@^1.4.0:
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/hds-core/-/hds-core-1.4.0.tgz#e4b4d9bfaaf36a376bf3f3242f220df74197f7b9"
+  integrity sha512-wDhx79Pm8QYVS9YZJOs0D/jOT5yUcubPKYexOA56zbsnnp5uE1kMzDeKXNYmrkX09IfBuQVMFvf2MTOn8J1t6w==
+
+hds-design-tokens@^1.1.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/hds-design-tokens/-/hds-design-tokens-1.2.0.tgz#458efb6210f2bfbc53bd1d5f2f08857fb220faeb"
   integrity sha512-05bo4sK5rD4yVDSd0aCgRRQa04mrgk56Ok2OsqgtkEt0hDRgAcmJDHoX0HhKHGfMxy9h+bB1OhAMuIjpnVSDUQ==
 
-hds-react@^1.0.0, hds-react@^1.1.0:
+hds-design-tokens@^1.4.0:
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/hds-design-tokens/-/hds-design-tokens-1.4.0.tgz#33d67cb04eabc3ddc0fe1ad63b7f06344f60e6a7"
+  integrity sha512-m4j5blhZYj+KNdv3Hvh7N+SShMmnBbZ+h2PkfWIPPvL/VAlGHGQS2TFlGfs5p5oiBAO7+iZ+FvGh4jE9mSxGww==
+
+hds-react@^1.1.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/hds-react/-/hds-react-1.2.0.tgz#9add96e3fef986bdfc730af1745567593d97faf6"
   integrity sha512-CurVKMSjrFqMkeUnpVpLZEA6CM9w4b+WZ+kxE77poDeAs9qOQ3ssY5K2rFpDqxQht08DNFJx5ujCkmtxiZch9Q==
@@ -8098,6 +8133,28 @@ hds-react@^1.0.0, hds-react@^1.1.0:
     lodash.isequal "4.5.0"
     lodash.isfunction "3.0.9"
     lodash.uniqueid "4.0.1"
+    react-merge-refs "1.1.0"
+    react-popper "2.2.3"
+    react-spring "9.0.0-rc.3"
+    react-use-measure "2.0.1"
+    react-virtual "2.2.7"
+
+hds-react@^1.4.0:
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/hds-react/-/hds-react-1.4.0.tgz#639211372540c442d409d209b1ffbf155a3166b0"
+  integrity sha512-HBfcEoebs7If3OxjwkHvQYILj+khTv+oZdkWu+cGdTS1KtrWjL7bBC9iBCCYo0G4xhMMOXoUM/xyE2dfGgwccg==
+  dependencies:
+    "@babel/runtime" "7.11.2"
+    "@juggle/resize-observer" "3.2.0"
+    "@popperjs/core" "2.5.3"
+    "@react-aria/visually-hidden" "3.2.0"
+    date-fns "2.16.1"
+    downshift "6.0.6"
+    hds-core "1.4.0"
+    lodash.isequal "4.5.0"
+    lodash.isfunction "3.0.9"
+    lodash.uniqueid "4.0.1"
+    lodash.xor "^4.5.0"
     react-merge-refs "1.1.0"
     react-popper "2.2.3"
     react-spring "9.0.0-rc.3"
@@ -10608,6 +10665,11 @@ lodash.uniqueid@4.0.1:
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/lodash.uniqueid/-/lodash.uniqueid-4.0.1.tgz#3268f26a7c88e4f4b1758d679271814e31fa5b26"
   integrity sha1-MmjyanyI5PSxdY1nknGBTjH6WyY=
+
+lodash.xor@^4.5.0:
+  version "4.5.0"
+  resolved "https://registry.yarnpkg.com/lodash.xor/-/lodash.xor-4.5.0.tgz#4d48ed7e98095b0632582ba714d3ff8ae8fb1db6"
+  integrity sha1-TUjtfpgJWwYyWCunFNP/iuj7HbY=
 
 "lodash@4.6.1 || ^4.16.1", "lodash@>=3.5 <5", lodash@^4.0.0, lodash@^4.14.0, lodash@^4.17.11, lodash@^4.17.13, lodash@^4.17.14, lodash@^4.17.15, lodash@^4.17.19, lodash@^4.17.20, lodash@^4.17.21, lodash@^4.17.5, lodash@^4.7.0, lodash@~4.17.10:
   version "4.17.21"
