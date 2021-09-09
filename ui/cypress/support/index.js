@@ -14,15 +14,15 @@
 // ***********************************************************
 
 // Import commands.js using ES2015 syntax:
-import './commands';
+import "./commands";
 
 // Alternatively you can use CommonJS syntax:
 // require('./commands')
-import 'cypress-axe';
+import "cypress-axe";
 
-beforeEach(function(){
-  cy.on('uncaught:exception', (err, runnable) => {
-    if(err.message.indexOf('ResizeObserver') !==-1) {
+beforeEach(function () {
+  cy.on("uncaught:exception", (err, runnable) => {
+    if (err.message.indexOf("ResizeObserver") !== -1) {
       return false;
     }
   });
