@@ -19,9 +19,10 @@ export const handlers = [
     async (req, res, ctx) => {
       const { pk: id } = req.variables;
 
-      const response = id
-        ? await import(`../cypress/fixtures/query/reservationUnit/${id}.json`)
-        : Promise.resolve();
+      const url = id
+        ? `../cypress/fixtures/query/reservationUnit/${id}.json`
+        : null;
+      const response = id ? await import(url) : Promise.resolve();
 
       const reservationUnit = await response;
       return res(ctx.data({ reservationUnit }));
@@ -32,9 +33,10 @@ export const handlers = [
     async (req, res, ctx) => {
       const { id } = req.params;
 
-      const response = id
-        ? await import(`../cypress/fixtures/rest/reservationUnit/${id}.json`)
-        : Promise.resolve();
+      const url = id
+        ? `../cypress/fixtures/rest/reservationUnit/${id}.json`
+        : null;
+      const response = id ? await import(url) : Promise.resolve();
 
       const reservationUnit = await response;
       return res(ctx.json(reservationUnit));
