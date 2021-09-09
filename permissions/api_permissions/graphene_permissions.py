@@ -1,5 +1,6 @@
 from typing import Any
 
+from django.shortcuts import get_object_or_404
 from graphene_permissions.permissions import BasePermission
 from graphql import ResolveInfo
 
@@ -83,4 +84,6 @@ class UnitPermission(BasePermission):
 
     @classmethod
     def has_mutation_permission(cls, root: Any, info: ResolveInfo, input: dict) -> bool:
-        return can_manage_units(info.context.user)
+        pk = input.get("pk")
+        unit = get_object_or_404(Unit, pk=pk)
+        return can_manage_units(info.context.user, unit)
