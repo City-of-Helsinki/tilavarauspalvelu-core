@@ -29,7 +29,7 @@ from api.graphql.spaces.space_mutations import (
 )
 from api.graphql.spaces.space_types import SpaceType
 from api.graphql.units.unit_mutations import UnitUpdateMutation
-from api.graphql.units.unit_types import UnitType
+from api.graphql.units.unit_types import UnitByPkType, UnitType
 from permissions.api_permissions.graphene_permissions import (
     ReservationUnitPermission,
     ResourcePermission,
@@ -102,7 +102,7 @@ class Query(graphene.ObjectType):
 
     units = UnitsFilter(UnitType)
     unit = relay.Node.Field(UnitType)
-    unit_by_pk = Field(UnitType, pk=graphene.Int())
+    unit_by_pk = Field(UnitByPkType, pk=graphene.Int())
 
     def resolve_reservation_unit_by_pk(self, info, **kwargs):
         pk = kwargs.get("pk")
