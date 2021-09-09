@@ -5,8 +5,6 @@
     "hooks",
     "modules",
     "pages",
-    "mocks",
-    "*.setup.ts",
-    "*.config.ts"
+    "mocks"
   ],
 }
