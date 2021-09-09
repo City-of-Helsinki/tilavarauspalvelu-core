@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.forms import CharField, ModelForm
+from mptt.admin import MPTTModelAdmin
 from tinymce.widgets import TinyMCE
 
 from .models import (
@@ -7,6 +8,7 @@ from .models import (
     DayPart,
     Equipment,
     EquipmentCategory,
+    Keyword,
     Period,
     Purpose,
     ReservationUnit,
@@ -75,3 +77,13 @@ class EquipmentAdmin(admin.ModelAdmin):
 @admin.register(EquipmentCategory)
 class EquipmentCategoryAdmin(admin.ModelAdmin):
     model = EquipmentCategory
+
+
+class KwywordInline(admin.TabularInline):
+    model = Keyword
+
+
+@admin.register(Keyword)
+class SpaceAdmin(MPTTModelAdmin):
+    model = Keyword
+    inlines = [KwywordInline]

@@ -5,6 +5,8 @@ from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from easy_thumbnails.fields import ThumbnailerImageField
+from mptt.fields import TreeForeignKey
+from mptt.models import MPTTModel
 
 from resources.models import Resource
 from services.models import Service
@@ -43,6 +45,24 @@ class ReservationUnitType(models.Model):
         return self.name
 
 
+class Keyword(MPTTModel):
+    name = models.CharField(verbose_name=_("Name"), max_length=255)
+    parent = TreeForeignKey(
+        "self",
+        verbose_name=_("Parent keyword"),
+        related_name="children",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+
+    def get_level(self):
+        return self.level
+
+    def __str__(self):
+        return self.name
+
+
 class ReservationUnit(models.Model):
     name = models.CharField(verbose_name=_("Name"), max_length=255)
     description = models.TextField(
@@ -51,6 +71,14 @@ class ReservationUnit(models.Model):
     spaces = models.ManyToManyField(
         Space, verbose_name=_("Spaces"), related_name="reservation_units", blank=True
     )
+
+    keywords = models.ManyToManyField(
+        Keyword,
+        verbose_name=_("Keywords"),
+        related_name="reservation_units",
+        blank=True,
+    )
+
     resources = models.ManyToManyField(
         Resource,
         verbose_name=_("Resources"),
