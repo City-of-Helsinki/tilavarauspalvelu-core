@@ -79,14 +79,14 @@ const Images = ({ images }: Props): JSX.Element => {
   const [showModal, setShowModal] = useState(false);
   const [currentImage, setCurrentImage] = useState<Image>();
 
-  if (images.length === 0) {
+  if (images?.length === 0) {
     return <div />;
   }
   return (
     <Container>
       <Heading>{t("reservationUnit.images")}</Heading>
       <ImageGrid>
-        {images.map((image) => (
+        {images?.map((image) => (
           <div>
             <StyledButton
               type="button"
@@ -118,7 +118,7 @@ const Images = ({ images }: Props): JSX.Element => {
               />
             ) : null}
             <ModalImages>
-              {images.map((image) => (
+              {images?.map((image) => (
                 <StyledButton
                   type="button"
                   onClick={() => {
