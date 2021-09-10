@@ -27,13 +27,16 @@ class OpeningHoursClient:
         self.start = start
         self.end = end
 
-        if not hauki_origin_id:
-            hauki_origin_id = settings.HAUKI_ORIGIN_ID
+        if hauki_origin_id:
+            self.hauki_origin_id = hauki_origin_id
+        else:
+            self.hauki_origin_id = settings.HAUKI_ORIGIN_ID
 
         self.resources = {}
 
         self.resources = {
-            f"{hauki_origin_id}:{resource_id}": resource_id for resource_id in resources
+            f"{self.hauki_origin_id}:{resource_id}": resource_id
+            for resource_id in resources
         }
         self.opening_hours = {}
         if init_opening_hours:
@@ -70,7 +73,7 @@ class OpeningHoursClient:
     def _fetch_opening_hours(
         self, resources: [str], start: datetime.date, end: datetime.date
     ):
-        for hour in get_opening_hours(resources, start, end):
+        for hour in get_opening_hours(resources, start, end, self.hauki_origin_id):
             res_id = self.resources[hour["resource_id"]]
             self.opening_hours[res_id][hour["date"]].extend(hour["times"])
 
