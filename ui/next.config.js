@@ -16,5 +16,6 @@ module.exports = {
     oidcUrl: process.env.OIDC_URL,
     oidcScope: process.env.OIDC_SCOPE,
     apiScope: process.env.TILAVARAUS_API_SCOPE,
+    mockRequests: process.env.MOCK_REQUESTS === "true",
   },
 };

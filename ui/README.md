@@ -71,18 +71,18 @@ Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 The page will reload if you make edits.\
 You will also see any lint errors in the console.
 
+### `yarn dev:test`
+
+Runs the dev server and mocks network requests
+
 ### `yarn test`
 
 Launches the test runner in the interactive watch mode.\
 See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-### `yarn test:e2e-local`
+### `yarn test:browser`
 
 Runs end to end tests against local setup. Both ui and api must be running before running this script.
-
-### `yarn test:axe-local`
-
-Runs accessibility tests against local setup. Both ui and api must be running before running this script.
 
 ### `yarn build`
 
@@ -91,6 +91,10 @@ Builds a production version
 ### `yarn start`
 
 Starts production version
+
+### Mocking network requests
+
+You can write handlers for rest and graphql requests in '/mocks/handlers.ts'. Can also be used for mocking browser data.
 
 ## Configurable environment variables
 
@@ -104,3 +108,4 @@ Starts production version
 | NEXT_PUBLIC_OIDC_SCOPE           | openid profile email https://api.hel.fi/auth/tilavarausapidev |
 | NEXT_PUBLIC_TILAVARAUS_API_SCOPE | https://api.hel.fi/auth/tilavarausapidev                      |
 | NEXT_PUBLIC_ENABLE_MATOMO        | 'true' enables matomo tracking                                |
+| NEXT_PUBLIC_MOCK_REQUESTS        | 'true' enables network level request mocking                                |

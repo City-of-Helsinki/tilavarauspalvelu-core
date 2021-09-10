@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "node server.js",
+    "dev:test": "MOCK_REQUESTS=true node server.js",
     "build": "next build",
     "start": "next start",
     "test": "jest",
@@ -55,11 +56,15 @@
     "eslint-config-airbnb-typescript-prettier": "^4.2.0",
     "eslint-plugin-jsx-a11y": "^6.4.1",
     "jest": "^27.0.4",
+    "msw": "^0.35.0",
     "prettier": "^2.3.1",
     "stylelint": "^13.13.1",
     "stylelint-config-recommended": "^5.0.0",
     "stylelint-config-styled-components": "^0.1.1",
     "stylelint-processor-styled-components": "^1.10.0",
     "typescript": "^4.3.4"
+  },
+  "msw": {
+    "workerDirectory": "public"
   }
 }

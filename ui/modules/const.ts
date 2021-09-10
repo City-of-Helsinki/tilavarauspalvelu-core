@@ -89,6 +89,7 @@ export const {
   oidcUrl,
   oidcScope,
   apiScope,
+  mockRequests,
 } = publicRuntimeConfig;
 
 export const apiBaseUrl = isBrowser
