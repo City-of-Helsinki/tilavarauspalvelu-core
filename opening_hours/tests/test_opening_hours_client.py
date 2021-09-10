@@ -8,6 +8,7 @@ from django.test.testcases import TestCase
 from opening_hours.hours import TimeElement
 from opening_hours.utils.opening_hours_client import OpeningHoursClient
 from reservation_units.tests.factories import ReservationUnitFactory
+from spaces.tests.factories import UnitFactory
 
 DATES = [
     datetime.datetime.strptime("2021-01-01", "%Y-%m-%d").date(),
@@ -16,10 +17,11 @@ DATES = [
 
 
 @mock.patch("opening_hours.utils.opening_hours_client.get_opening_hours")
-class ReservationUnitCapacityTestCase(TestCase):
+class OpeningHoursClientTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.reservation_unit = ReservationUnitFactory()
+        cls.unit = UnitFactory(tprek_id=1234)
 
     def get_mocked_opening_hours(self):
         resource_id = f"{settings.HAUKI_ORIGIN_ID}:{self.reservation_unit.uuid}"
@@ -164,3 +166,24 @@ class ReservationUnitCapacityTestCase(TestCase):
 
         assert_that(date).is_none()
         assert_that(times).is_none()
+
+    def test_default_origin_id_is_used(self, mock):
+        OpeningHoursClient(
+            str(self.reservation_unit.uuid),
+            DATES[0],
+            DATES[0],
+            single=True,
+        )
+        origin_id = mock.call_args.args[3]
+        assert_that(origin_id).is_same_as(settings.HAUKI_ORIGIN_ID)
+
+    def test_origin_id_is_overridden(self, mock):
+        OpeningHoursClient(
+            str(self.unit.tprek_id),
+            DATES[0],
+            DATES[0],
+            single=True,
+            hauki_origin_id=self.unit.hauki_resource_origin_id,
+        )
+        origin_id = mock.call_args.args[3]
+        assert_that(origin_id).is_same_as(self.unit.hauki_resource_origin_id)
