@@ -80,3 +80,26 @@ class ReservationUnitFactory(DjangoModelFactory):
 
         for equipment in equipments:
             self.equipments.add(equipment)
+
+
+class KeywordCategoryFactory(DjangoModelFactory):
+    class Meta:
+        model = "reservation_units.KeywordCategory"
+
+    name = FuzzyText()
+
+
+class KeywordGroupFactory(DjangoModelFactory):
+    class Meta:
+        model = "reservation_units.KeywordGroup"
+
+    name = FuzzyText()
+    keyword_category = None
+
+
+class KeywordFactory(DjangoModelFactory):
+    class Meta:
+        model = "reservation_units.Keyword"
+
+    name = FuzzyText()
+    keyword_group = None
