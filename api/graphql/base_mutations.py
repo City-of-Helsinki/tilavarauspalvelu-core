@@ -1,6 +1,7 @@
 import graphene
 from django.core.exceptions import ValidationError
 from graphene_permissions.mixins import AuthMutation
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import get_object_or_404
 
 
@@ -8,7 +9,7 @@ class AuthSerializerMutation(AuthMutation):
     @classmethod
     def mutate_and_get_payload(cls, root, info, **input):
         if not cls.has_permission(root, info, input):
-            return None
+            raise PermissionDenied("No permission to mutate")
 
         return super().mutate_and_get_payload(root, info, **input)
 
