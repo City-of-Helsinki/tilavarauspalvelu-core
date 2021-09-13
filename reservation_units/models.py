@@ -43,6 +43,45 @@ class ReservationUnitType(models.Model):
         return self.name
 
 
+class KeywordCategory(models.Model):
+    name = models.CharField(verbose_name=_("Name"), max_length=255)
+
+    def __str__(self):
+        return "{}".format(self.name)
+
+
+class KeywordGroup(models.Model):
+    name = models.CharField(verbose_name=_("Name"), max_length=255)
+
+    keyword_category = models.ForeignKey(
+        KeywordCategory,
+        verbose_name=_("Keyword category"),
+        related_name="keyword_groups",
+        blank=False,
+        null=False,
+        on_delete=models.PROTECT,
+    )
+
+    def __str__(self):
+        return "{}".format(self.name)
+
+
+class Keyword(models.Model):
+    name = models.CharField(verbose_name=_("Name"), max_length=255)
+
+    keyword_group = models.ForeignKey(
+        KeywordGroup,
+        verbose_name=_("Keyword group"),
+        related_name="keywords",
+        blank=False,
+        null=False,
+        on_delete=models.PROTECT,
+    )
+
+    def __str__(self):
+        return "{}".format(self.name)
+
+
 class ReservationUnit(models.Model):
     name = models.CharField(verbose_name=_("Name"), max_length=255)
     description = models.TextField(
@@ -51,6 +90,14 @@ class ReservationUnit(models.Model):
     spaces = models.ManyToManyField(
         Space, verbose_name=_("Spaces"), related_name="reservation_units", blank=True
     )
+
+    keyword_groups = models.ManyToManyField(
+        KeywordGroup,
+        verbose_name=_("Keyword groups"),
+        related_name="reservation_units",
+        blank=True,
+    )
+
     resources = models.ManyToManyField(
         Resource,
         verbose_name=_("Resources"),

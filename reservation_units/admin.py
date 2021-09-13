@@ -7,6 +7,9 @@ from .models import (
     DayPart,
     Equipment,
     EquipmentCategory,
+    Keyword,
+    KeywordCategory,
+    KeywordGroup,
     Period,
     Purpose,
     ReservationUnit,
@@ -75,3 +78,18 @@ class EquipmentAdmin(admin.ModelAdmin):
 @admin.register(EquipmentCategory)
 class EquipmentCategoryAdmin(admin.ModelAdmin):
     model = EquipmentCategory
+
+
+@admin.register(KeywordCategory)
+class KeywordCategoryAdmin(admin.ModelAdmin):
+    model = KeywordCategory
+
+
+@admin.register(KeywordGroup)
+class KeywordGroupAdmin(admin.ModelAdmin):
+    model = KeywordGroup
+
+
+@admin.register(Keyword)
+class KeywordAdmin(admin.ModelAdmin):
+    model = Keyword
