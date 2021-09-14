@@ -25,7 +25,7 @@ const getFilterConfig = (units: ReservationUnitType[]): DataFilterConfig[] => {
 
   return [
     {
-      title: "ReservationUnit.headings.service",
+      title: "ReservationUnitList.typeFilter",
       filters: types.map((value) => ({
         title: value.name || "",
         key: "reservationUnitType.pk",
@@ -34,7 +34,7 @@ const getFilterConfig = (units: ReservationUnitType[]): DataFilterConfig[] => {
     },
     {
       // wip no api yet
-      title: "ReservationUnit.headings.status",
+      title: "ReservationUnitList.statusFilter",
       filters: status.map((value) => ({
         title: i18next.t(value),
         key: "status",

@@ -786,6 +786,10 @@ const translations: ITranslations = {
     purpose: ["{{count}} käyttötarkoitus"],
     purpose_plural: ["{{count}} käyttötarkoitusta"],
   },
+  ReservationUnitList: {
+    typeFilter: ["Tyyppi"],
+    statusFilter: ["Tila"],
+  },
   ResourceModal: {
     modalTitle: ["Luo uusi resurssi toimipisteelle"],
     info: [
