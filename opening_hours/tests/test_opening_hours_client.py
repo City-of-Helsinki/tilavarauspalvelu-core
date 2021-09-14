@@ -28,6 +28,7 @@ class OpeningHoursClientTestCase(TestCase):
         return [
             {
                 "resource_id": resource_id,
+                "origin_id": str(self.reservation_unit.uuid),
                 "date": DATES[0],
                 "times": [
                     TimeElement(
@@ -39,6 +40,7 @@ class OpeningHoursClientTestCase(TestCase):
             },
             {
                 "resource_id": resource_id,
+                "origin_id": str(self.reservation_unit.uuid),
                 "date": DATES[1],
                 "times": [
                     TimeElement(

@@ -177,6 +177,7 @@ def get_mocked_opening_hours(uuid):
     return [
         {
             "resource_id": resource_id,
+            "origin_id": str(uuid),
             "date": datetime.date(2020, 1, 1),
             "times": [
                 TimeElement(
@@ -190,6 +191,7 @@ def get_mocked_opening_hours(uuid):
         },
         {
             "resource_id": resource_id,
+            "origin_id": str(uuid),
             "date": datetime.date(2020, 1, 2),
             "times": [
                 TimeElement(
