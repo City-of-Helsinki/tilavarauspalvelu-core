@@ -103,6 +103,16 @@ export const UNITS_QUERY = gql`
         node {
           name
           pk
+          reservationUnits {
+            pk
+          }
+          spaces {
+            pk
+          }
+          location {
+            longitude
+            latitude
+          }
         }
       }
     }
@@ -124,6 +134,34 @@ export const UNIT_QUERY = gql`
       name
       tprekId
       shortDescription
+      reservationUnits {
+        pk
+        name
+        maxPersons
+        surfaceArea
+        purposes {
+          pk
+          name
+        }
+        reservationUnitType {
+          pk
+          name
+        }
+        images {
+          imageType
+          mediumUrl
+        }
+      }
+      spaces {
+        pk
+      }
+      location {
+        addressStreet
+        addressZip
+        addressCity
+        longitude
+        latitude
+      }
       name
     }
   }
