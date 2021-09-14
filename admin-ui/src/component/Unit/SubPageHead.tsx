@@ -2,7 +2,7 @@ import { IconLocation } from "hds-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { UnitWIP } from "../../common/types";
+import { UnitType } from "../../common/types";
 import { parseAddress } from "../../common/util";
 import { ContentContainer, IngressContainer } from "../../styles/layout";
 import { H1 } from "../../styles/typography";
@@ -10,7 +10,7 @@ import LinkPrev from "../LinkPrev";
 
 interface IProps {
   title: string;
-  unit: UnitWIP;
+  unit: UnitType;
 }
 
 const Wrapper = styled.div`
@@ -44,7 +44,7 @@ const UnitSubPageHeader = ({ title, unit }: IProps): JSX.Element => {
   return (
     <Wrapper>
       <ContentContainer>
-        <LinkPrev route={`/unit/${unit.id}`} />
+        <LinkPrev route={`/unit/${unit.pk}`} />
       </ContentContainer>
       <IngressContainer>
         <H1>{title}</H1>
@@ -53,7 +53,9 @@ const UnitSubPageHeader = ({ title, unit }: IProps): JSX.Element => {
           <div>
             <Name>{unit.name}</Name>
             <Label>{t("Unit.address")}</Label>:{" "}
-            <Address>{parseAddress(unit.location)}</Address>
+            {unit.location ? (
+              <Address>{parseAddress(unit.location)}</Address>
+            ) : null}
           </div>
         </Container>
       </IngressContainer>

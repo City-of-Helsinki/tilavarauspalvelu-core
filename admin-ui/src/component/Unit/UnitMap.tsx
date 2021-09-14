@@ -1,10 +1,12 @@
+import { useQuery } from "@apollo/client";
 import { Notification } from "hds-react";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
-import { getUnit } from "../../common/api";
-import { UnitWIP } from "../../common/types";
+
+import { UNIT_QUERY } from "../../common/queries";
+import { UnitType } from "../../common/types";
 import { ContentContainer } from "../../styles/layout";
 import Loader from "../Loader";
 import withMainMenu from "../withMainMenu";
@@ -19,42 +21,42 @@ const Wrapper = styled.div``;
 
 const UnitMap = (): JSX.Element => {
   const [isLoading, setIsLoading] = useState(true);
-  const [unit, setUnit] = useState<UnitWIP>();
+  const [unit, setUnit] = useState<UnitType>();
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const { t } = useTranslation();
   const { unitId } = useParams<IProps>();
-  useEffect(() => {
-    const fetchUnit = async () => {
-      try {
-        const result = await getUnit(Number(unitId));
-        setUnit(result);
-      } catch (error) {
-        setErrorMsg("errors.errorFetchingData");
-      } finally {
-        setIsLoading(false);
-      }
-    };
 
-    fetchUnit();
-  }, [unitId]);
+  useQuery(UNIT_QUERY, {
+    variables: { pk: unitId },
+    onCompleted: ({ unitByPk }: { unitByPk: UnitType }) => {
+      setUnit(unitByPk);
+      setIsLoading(false);
+    },
+    onError: () => {
+      setErrorMsg("errors.errorFetchingData");
+      setIsLoading(false);
+    },
+  });
 
   if (isLoading || !unit) {
     return <Loader />;
+  }
+
+  const markers = [];
+
+  if (unit.location) {
+    markers.push({
+      latitude: unit.location.latitude,
+      longitude: unit.location.longitude,
+    });
   }
 
   return (
     <Wrapper>
       <SubPageHead title={t("Unit.location")} unit={unit} />
       <ContentContainer>
-        <Map
-          markers={[
-            {
-              latitude: unit.location.latitude,
-              longitude: unit.location.longitude,
-            },
-          ]}
-        />
+        <Map markers={markers} />
       </ContentContainer>
       {errorMsg && (
         <Notification

@@ -9,7 +9,7 @@ import {
   Space,
   SpaceDeleteMutationInput,
   SpaceDeleteMutationPayload,
-  UnitWIP,
+  UnitType,
 } from "../../common/types";
 import { DELETE_SPACE } from "../../common/queries";
 import DataTable, { CellConfig } from "../DataTable";
@@ -20,7 +20,7 @@ import ConfirmationDialog, { ModalRef } from "../ConfirmationDialog";
 
 interface IProps {
   spaces: Space[];
-  unit: UnitWIP;
+  unit: UnitType;
   onSave: () => void;
   onDelete: () => void;
   onDataError: (error: string) => void;
@@ -131,7 +131,7 @@ const SpacesTable = ({
                   {
                     name: t("SpaceTable.menuEditSpace"),
                     onClick: () => {
-                      history.push(`/unit/${unit.id}/space/edit/${space.id}`);
+                      history.push(`/unit/${unit.pk}/space/edit/${space.id}`);
                     },
                   },
                   {

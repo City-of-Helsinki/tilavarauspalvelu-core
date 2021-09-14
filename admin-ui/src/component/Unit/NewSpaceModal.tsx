@@ -18,9 +18,9 @@ import { useTranslation, TFunction } from "react-i18next";
 import { omit, set } from "lodash";
 import {
   Space,
-  UnitWIP,
   SpaceCreateMutationInput,
   SpaceCreateMutationPayload,
+  UnitType,
 } from "../../common/types";
 import { parseAddress } from "../../common/util";
 import { CREATE_SPACE } from "../../common/queries";
@@ -28,7 +28,7 @@ import { CustomDialogHeader } from "./CustomDialogHeader";
 
 const defaultParentSpaceId = "1";
 interface IProps {
-  unit: UnitWIP;
+  unit: UnitType;
   parentSpace?: Space;
   closeModal: () => void;
   onSave: () => void;
@@ -240,7 +240,7 @@ function FirstPage({
   hasFixedParent,
 }: {
   editorState: State;
-  unit: UnitWIP;
+  unit: UnitType;
   dispatch: React.Dispatch<Action>;
   closeModal: () => void;
   t: TFunction;
@@ -273,7 +273,9 @@ function FirstPage({
               {editorState.parentSpace ? editorState.parentSpace.name.fi : null}
             </Parent>
           </div>
-          <Address>{parseAddress(unit.location)}</Address>
+          {unit.location ? (
+            <Address>{parseAddress(unit.location)}</Address>
+          ) : null}
         </UnitInfo>
         {!hasFixedParent ? <Title>{t("SpaceModal.page1.title")}</Title> : null}
         <NarrowNumberInput
@@ -433,7 +435,7 @@ const SecondPage = ({
   hasFixedParent,
 }: {
   editorState: State;
-  unit: UnitWIP;
+  unit: UnitType;
   dispatch: React.Dispatch<Action>;
   closeModal: () => void;
   createSpace: (
@@ -477,7 +479,9 @@ const SecondPage = ({
                 : t("SpaceModal.page2.newRootSpace")}
             </Parent>
           </div>
-          <Address>{parseAddress(unit.location)}</Address>
+          {unit.location ? (
+            <Address>{parseAddress(unit.location)}</Address>
+          ) : null}
         </UnitInfo>
         {editorState.spaces.map((space, i) => (
           <SpaceEditor

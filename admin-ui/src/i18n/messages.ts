@@ -694,6 +694,7 @@ const translations: ITranslations = {
       "Tarkista ennen varausyksiköiden luontia, että olet luonut toimipisteelle aukioloajat sekä tarvittavat tilat ja resurssit.",
     ],
     address: ["Osoite"],
+    noAddress: ["Osoite puuttuu"],
     location: ["Toimipisteen sijainti"],
     linkToUnitPage: ["Siirry"],
     spaces: ["Tilat"],
@@ -775,6 +776,15 @@ const translations: ITranslations = {
     removeConfirmationAccept: ["Poista"],
     removeConfirmationCancel: ["Kumoa"],
     removeFailed: ["Tilan poistaminen ei onnistunut."],
+  },
+  ReservationUnitCard: {
+    spaceOnly: ["Tila"],
+    spaceAndResource: ["Tila ja resurssi"],
+    noArea: ["pinta-ala puuttuu"],
+    noMaxPersons: ["Maksimihenkilömäärä puuttuu"],
+    noPurpose: ["Käyttötarkoitus puuttuu"],
+    purpose: ["{{count}} käyttötarkoitus"],
+    purpose_plural: ["{{count}} käyttötarkoitusta"],
   },
   ResourceModal: {
     modalTitle: ["Luo uusi resurssi toimipisteelle"],

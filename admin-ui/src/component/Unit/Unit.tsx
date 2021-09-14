@@ -22,6 +22,7 @@ import { H1 } from "../../styles/typography";
 import { BasicLink, breakpoints } from "../../styles/util";
 import LinkPrev from "../LinkPrev";
 import Loader from "../Loader";
+import ReservationUnitList from "../ReservationUnit/ReservationUnitList";
 import SecondaryNavigation from "../SecondaryNavigation";
 import withMainMenu from "../withMainMenu";
 import ExternalLink from "./ExternalLink";
@@ -103,15 +104,22 @@ const Info = styled.div`
   display: flex;
 `;
 
+const ResourceUnitCount = styled.div`
+  padding: var(--spacing-s) 0;
+  font-family: var(--tilavaraus-admin-font-bold);
+  font-size: var(--fontsize-heading-xs);
+`;
+
 const StyledButton = styled(Button)`
-  color: var(--color-black);
   padding: 0;
   span {
+    color: var(--color-black);
     padding: 0;
   }
 `;
 
 const StyledBoldButton = styled(StyledButton)`
+  color: var(--color-black);
   font-family: var(--tilavaraus-admin-font-bold);
   margin-left: auto;
 `;
@@ -143,20 +151,16 @@ const Unit = (): JSX.Element => {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [hasOpeningHours, setOpeningHours] = useState(true);
   const [hasSpacesResources, setSpacesResources] = useState(true);
-  const [hasReservationUnits, setReservationUnits] = useState(true);
 
   const { t } = useTranslation();
   const { unitId } = useParams<IProps>();
 
   useQuery(UNIT_QUERY, {
     variables: { pk: unitId },
-    onCompleted: (data: UnitType) => {
-      setUnit(data);
-      setOpeningHours(Boolean(data.openingHours?.length));
-      setSpacesResources(
-        Boolean(data.resources?.length || data.spaces?.length || false)
-      );
-      setReservationUnits(Boolean(data.reservationUnits));
+    onCompleted: ({ unitByPk }: { unitByPk: UnitType }) => {
+      setUnit(unitByPk);
+      setOpeningHours(Boolean(unitByPk.openingHours?.length));
+      setSpacesResources(Boolean(unitByPk.spaces?.length > 0));
       setIsLoading(false);
     },
     onError: () => {
@@ -199,7 +203,9 @@ const Unit = (): JSX.Element => {
             <Name>{unit?.name}</Name>
             {unit?.location ? (
               <Address>{parseAddress(unit?.location)}</Address>
-            ) : null}
+            ) : (
+              <Prop $disabled>{t("Unit.noAddress")}</Prop>
+            )}
             <Props>
               <Prop $disabled={!unit?.area}>
                 <IconGlobe /> {unit?.area || t("Unit.noArea")}
@@ -234,15 +240,24 @@ const Unit = (): JSX.Element => {
         ) : null}
         <HeadingLarge>{t("Unit.reservationUnitTitle")}</HeadingLarge>
         <Info>
-          <StyledButton
-            variant="supplementary"
-            iconRight={<IconInfoCircleFill />}
-            onClick={() =>
-              setModalContent && setModalContent(<InfoModalContent />)
-            }
-          >
-            {t("Unit.reservationUnitReadMore")}
-          </StyledButton>
+          <div>
+            <StyledButton
+              variant="supplementary"
+              iconRight={<IconInfoCircleFill />}
+              onClick={() =>
+                setModalContent && setModalContent(<InfoModalContent />)
+              }
+            >
+              {t("Unit.reservationUnitReadMore")}
+            </StyledButton>
+            {unit?.reservationUnits && unit?.reservationUnits.length > 0 ? (
+              <ResourceUnitCount>
+                {t("Unit.reservationUnits", {
+                  count: unit?.reservationUnits.length,
+                })}
+              </ResourceUnitCount>
+            ) : null}
+          </div>
           <StyledBoldButton
             variant="supplementary"
             iconLeft={<IconPlusCircleFill />}
@@ -251,11 +266,11 @@ const Unit = (): JSX.Element => {
           </StyledBoldButton>
         </Info>
       </IngressContainer>
-      <ContentContainer>
-        <ReservationUnits>
-          {hasReservationUnits ? (
-            "todo lista varausyksiköitä"
-          ) : (
+      {unit?.reservationUnits && unit?.reservationUnits.length > 0 ? (
+        <ReservationUnitList reservationUnits={unit?.reservationUnits} />
+      ) : (
+        <ContentContainer>
+          <ReservationUnits>
             <NoReservationUnits>
               <div>
                 <NoReservationUnitsTitle>
@@ -266,9 +281,9 @@ const Unit = (): JSX.Element => {
                 </NoReservationUnitsInfo>
               </div>
             </NoReservationUnits>
-          )}
-        </ReservationUnits>
-      </ContentContainer>
+          </ReservationUnits>
+        </ContentContainer>
+      )}
       {errorMsg && (
         <Notification
           type="error"

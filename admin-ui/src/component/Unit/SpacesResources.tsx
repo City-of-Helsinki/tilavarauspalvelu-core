@@ -4,13 +4,13 @@ import {
   IconPlusCircleFill,
   Notification,
 } from "hds-react";
-import React, { useEffect, useReducer } from "react";
+import React, { useReducer } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
-import { getUnit } from "../../common/api";
+import { useQuery } from "@apollo/client";
 import { useModal } from "../../context/UIContext";
-import { UnitWIP } from "../../common/types";
+import { UnitType } from "../../common/types";
 import { IngressContainer, WideContainer } from "../../styles/layout";
 import Loader from "../Loader";
 import withMainMenu from "../withMainMenu";
@@ -22,6 +22,7 @@ import Modal, { useModal as useHDSModal } from "../HDSModal";
 import NewSpaceModal from "./NewSpaceModal";
 import { breakpoints } from "../../styles/util";
 import NewResourceModal from "./NewResourceModal";
+import { UNIT_QUERY } from "../../common/queries";
 
 interface IProps {
   unitId: string;
@@ -40,13 +41,13 @@ type Action =
     }
   | { type: "clearNotification" }
   | { type: "clearError" }
-  | { type: "unitLoaded"; unit: UnitWIP }
+  | { type: "unitLoaded"; unit: UnitType }
   | { type: "dataLoadError"; message: string };
 
 type State = {
   notification: null | NotificationType;
   loading: boolean;
-  unit: UnitWIP | null;
+  unit: UnitType | null;
   error: null | {
     message: string;
   };
@@ -136,27 +137,24 @@ const SpacesResources = (): JSX.Element | null => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const { setModalContent } = useModal();
 
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const { unitId } = useParams<IProps>();
 
   const newSpacesButtonRef = React.createRef<HTMLButtonElement>();
   const newResourceButtonRef = React.createRef<HTMLButtonElement>();
 
-  useEffect(() => {
-    const fetchUnit = async () => {
-      try {
-        const result = await getUnit(Number(unitId));
-        dispatch({ type: "unitLoaded", unit: result });
-      } catch (error) {
-        dispatch({
-          type: "dataLoadError",
-          message: "errors.errorFetchingData",
-        });
-      }
-    };
-
-    fetchUnit();
-  }, [i18n.language, t, unitId]);
+  useQuery(UNIT_QUERY, {
+    variables: { pk: unitId },
+    onCompleted: ({ unitByPk }: { unitByPk: UnitType }) => {
+      dispatch({ type: "unitLoaded", unit: unitByPk });
+    },
+    onError: () => {
+      dispatch({
+        type: "dataLoadError",
+        message: "errors.errorFetchingData",
+      });
+    },
+  });
 
   const {
     open: newSpaceDialogIsOpen,
@@ -203,7 +201,7 @@ const SpacesResources = (): JSX.Element | null => {
       },
     });
 
-  const onSave = (text?: string) =>
+  const onDeleteSpaceSuccess = (text?: string) =>
     dispatch({
       type: "setNotification",
       notification: {
@@ -292,7 +290,7 @@ const SpacesResources = (): JSX.Element | null => {
         spaces={state.unit.spaces}
         unit={state.unit}
         onSave={saveSpaceSuccess}
-        onDelete={onSave}
+        onDelete={onDeleteSpaceSuccess}
         onDataError={onDataError}
       />
       <WideContainer>
@@ -309,7 +307,7 @@ const SpacesResources = (): JSX.Element | null => {
       </WideContainer>
       <ResourcesTable
         resources={state.unit.resources}
-        onDelete={onSave}
+        onDelete={onDeleteSpaceSuccess}
         onDataError={onDataError}
       />
       {state.error ? (

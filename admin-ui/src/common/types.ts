@@ -520,6 +520,30 @@ export type SpaceType = {
   openingHours: [];
 };
 
+export type ReservationUnitTypeType = {
+  pk: number;
+  name: string;
+};
+
+export type PurposeType = {
+  pk: number;
+  name: string;
+}
+
+export type ReservationUnitType = {
+  pk: number;
+  status: string; // WIP no api yet!
+  name: string;
+  maxPersons: number;
+  surfaceArea: number;
+  resources: Resource[];
+  services: Service[];
+  images: Image[];
+  location: Location;
+  reservationUnitType: ReservationUnitTypeType;
+  purposes: PurposeType[];
+};
+
 // WIP, no api yet
 export type ResourceCreateMutationInput = {
   unitId: number;

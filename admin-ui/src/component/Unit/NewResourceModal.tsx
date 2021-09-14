@@ -12,9 +12,9 @@ import { FetchResult, useMutation } from "@apollo/client";
 import { useTranslation } from "react-i18next";
 import { omit, set } from "lodash";
 import {
-  UnitWIP,
   ResourceCreateMutationInput,
   ResourceCreateMutationPayload,
+  UnitType,
 } from "../../common/types";
 import { parseAddress } from "../../common/util";
 import { CREATE_RESOURCE } from "../../common/queries";
@@ -22,7 +22,7 @@ import { CustomDialogHeader } from "./CustomDialogHeader";
 import { breakpoints } from "../../styles/util";
 
 interface IProps {
-  unit: UnitWIP;
+  unit: UnitType;
   closeModal: () => void;
   onSave: () => void;
 }
@@ -155,7 +155,9 @@ const NewResourceModal = ({
           <div>
             <Name>{unit.name}</Name>
           </div>
-          <Address>{parseAddress(unit.location)}</Address>
+          {unit.location ? (
+            <Address>{parseAddress(unit.location)}</Address>
+          ) : null}
         </UnitInfo>
         <EditorContainer>
           {languages.map((lang) => (
