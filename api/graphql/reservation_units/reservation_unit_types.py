@@ -22,6 +22,9 @@ from permissions.api_permissions.graphene_permissions import (
 from reservation_units.models import (
     Equipment,
     EquipmentCategory,
+    Keyword,
+    KeywordCategory,
+    KeywordGroup,
     Purpose,
     ReservationUnit,
     ReservationUnitImage,
@@ -32,6 +35,43 @@ from reservation_units.utils.reservation_unit_reservation_scheduler import (
 )
 from resources.models import Resource
 from spaces.models import Space
+
+
+class KeywordType(AuthNode, PrimaryKeyObjectType):
+    class Meta:
+        model = Keyword
+        fields = ("id", "name", "pk")
+        filter_fields = ["name"]
+        interfaces = (graphene.relay.Node,)
+
+
+class KeywordGroupType(AuthNode, PrimaryKeyObjectType):
+
+    keywords = graphene.List(KeywordType)
+
+    class Meta:
+        model = KeywordGroup
+        fields = ("id", "name", "pk")
+        filter_fields = ["name"]
+        interfaces = (graphene.relay.Node,)
+
+    def resolve_keywords(self, info):
+        return self.keywords.all()
+
+
+class KeywordCategoryType(AuthNode, PrimaryKeyObjectType):
+    keyword_groups = graphene.List(KeywordGroupType)
+
+    class Meta:
+        model = KeywordCategory
+        fields = ("id", "name", "pk")
+
+        filter_fields = ["name"]
+
+        interfaces = (graphene.relay.Node,)
+
+    def resolve_keyword_groups(self, info):
+        return self.keyword_groups.all()
 
 
 class PurposeType(AuthNode, PrimaryKeyObjectType):
