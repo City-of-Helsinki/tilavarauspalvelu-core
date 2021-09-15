@@ -7,6 +7,23 @@ from snapshottest import Snapshot
 
 snapshots = Snapshot()
 
+snapshots['ReservationUnitTestCase::test_filtering_by_type 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'name': 'Test name',
+                        'reservationUnitType': {
+                            'name': 'Test type'
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}
+
 snapshots['ReservationUnitTestCase::test_getting_hauki_url 1'] = {
     'data': {
         'reservationUnitByPk': {

@@ -22,10 +22,10 @@ from reservation_units.tests.factories import (
 class ReservationUnitTestCase(GraphQLTestCase, snapshottest.TestCase):
     @classmethod
     def setUpTestData(cls):
-        type = ReservationUnitTypeFactory(name="Test type")
+        cls.type = ReservationUnitTypeFactory(name="Test type")
         cls.reservation_unit = ReservationUnitFactory(
             name="Test name",
-            reservation_unit_type=type,
+            reservation_unit_type=cls.type,
             uuid="3774af34-9916-40f2-acc7-68db5a627710",
         )
 
@@ -170,6 +170,44 @@ class ReservationUnitTestCase(GraphQLTestCase, snapshottest.TestCase):
             .get("openingHours")
             .get("openingTimes")
         ).is_not_empty()
+
+    def test_filtering_by_type(self):
+        response = self.query(
+            f"query {{"
+            f"reservationUnits(reservationUnitType:{self.type.id}){{"
+            f"edges {{"
+            f"node {{"
+            f"name "
+            f"reservationUnitType {{"
+            f"name"
+            f"}}"
+            f"}}"
+            f"}}"
+            f"}}"
+            f"}}"
+        )
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filtering_by_type_not_found(self):
+        response = self.query(
+            """
+            query {
+                reservationUnits(reservationUnitType:345987){
+                edges {
+                    node {
+                        name
+                    }
+                }
+                }
+            }
+            """
+        )
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_not_empty()
 
 
 def get_mocked_opening_hours(uuid):
