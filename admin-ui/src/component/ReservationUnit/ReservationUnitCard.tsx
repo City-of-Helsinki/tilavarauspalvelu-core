@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { IconArrowRight, IconLocate, IconLayers, IconHome } from "hds-react";
+import { IconArrowRight, IconLayers, IconHome, IconGroup } from "hds-react";
 import { useTranslation } from "react-i18next";
 import { ReservationUnitType } from "../../common/types";
 import { H2 } from "../../styles/typography";
@@ -115,7 +115,7 @@ const ReservationUnitCard = ({ reservationUnit }: IProps): JSX.Element => {
               t("ReservationUnitCard.noReservationUnitType")}
           </Prop>
           <Prop $disabled={!reservationUnit.maxPersons}>
-            <IconLocate />{" "}
+            <IconGroup />{" "}
             {reservationUnit.maxPersons ||
               t("ReservationUnitCard.noMaxPersons")}
           </Prop>
