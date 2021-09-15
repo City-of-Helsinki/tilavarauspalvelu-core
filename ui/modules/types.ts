@@ -296,3 +296,11 @@ export type UserProfile = {
   // eslint-disable-next-line camelcase
   family_name: string;
 };
+
+export type Promotion = {
+  id: number;
+  heading: TranslationObject;
+  body?: TranslationObject;
+  image: string;
+  link: string;
+};

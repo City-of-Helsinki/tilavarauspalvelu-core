@@ -15,8 +15,6 @@ body,
 }
 
 body {
-  display: flex;
-  flex-direction: column;
   background-color: var(--tilavaraus-gray);
   font-family: var(--font-medium);
   -moz-osx-font-smoothing: grayscale;
@@ -24,6 +22,8 @@ body {
   min-height: 100vh;
   margin: 0;
   margin: 0;
+  color: var(--color-black-90);
+  min-width: 320px;
 }
 
 #root {
@@ -31,6 +31,13 @@ body {
   margin: 0;
   flex-direction: column;
   display: flex;
+}
+
+#__next {
+  min-height: 100vh;
+  position: relative;
+  display: flex;
+  flex-direction: column;
 }
 
 // utils
@@ -64,4 +71,31 @@ h2 {
 
 .margin-top {
   margin-top: var(--spacing-s);
+}
+
+a {
+  &:visited {
+    color: inherit;
+  }
+
+  color: var(--color-bus);
+  text-underline-offset: 0.1rem;
+  text-decoration: none;
+}
+
+p {
+  line-height: var(--lineheight-l);
+}
+
+ul {
+  padding-left: var(--spacing-m);
+
+  li {
+    line-height: var(--lineheight-l);
+  }
+}
+
+strong {
+  font-family: var(--font-bold);
+  font-weight: 700;
 }

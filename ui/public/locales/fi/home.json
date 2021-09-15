@@ -1,15 +1,38 @@
 {
   "head": {
-    "heading": "Vakiovuoron hakeminen",
-    "text": "Hae säännöllisiä vuoroja"
+    "heading": "Tilat ja laitteet varattavana",
+    "text": "Varaamosta voit varata julkisia tiloja ja laitteita omaan käyttöösi",
+    "searchPlaceholder": "Hae tilaa tai laitetta"
   },
   "info": {
-    "heading": "Hakeminen",
+    "heading": "Yksittäisvarauksen tekeminen",
+    "text": "XXXXX"
+  },
+  "infoRecurring": {
+    "heading": "Vakiovuoron hakeminen",
     "text": "Vakiovuoroja haetaan yleisen haun kautta. Voit selata tiloja valmiiksi, mutta hakemuksen voi jättää vain hakuajan puitteissa."
   },
   "browseAllButton": "Selaa kaikkia tiloja",
+  "browseReservationsButton": "Selaa varausyksiköitä",
+  "browseRecurringReservationsButton": "Hae vakiovuoroa",
   "applicationTimes": {
     "heading": "Vakiovuorojen hakuajat",
     "text": "Vakiovuoroihin on hakuaika kaksi kertaa vuodessa. Ajankohta vaihtelee palvelusta ja toimialasta riippuen."
-  }
+  },
+  "footer": {
+    "heading": "Palvelusta",
+    "body": "Varaamo on Helsingin kaupungin ylläpitämä verkkopalvelu, jonka kautta voi varata kaupungin julkisia tiloja sekä työpisteitä yksityiseen käyttöön.\n\nTilavarausjärjestelmä on testausvaiheessa, eikä pilottikäytössä olevassa versiossa ole vielä kaikkia suunnitteilla olevia ominaisuuksia ja toiminnallisuuksia."
+  },
+  "shortcutsHeadingMobile": "Tai valitse mitä haluat tehdä",
+  "shortcutsHeading": "Valitse mitä haluat tehdä",
+  "shortcuts": {
+    "organizeEvent": "Järjestää tapahtuman",
+    "pictureOrSound": "Kuvaa tai ääntä",
+    "sports": "Liikkua tai pelata",
+    "tutoring": "Opastus",
+    "working": "Pitää kokouksen tai työskennellä",
+    "sauna": "Saunoa tai mökkeillä",
+    "workshop": "Valmistaa esineitä, askarrella tai korjata"
+  },
+  "recommendations": "Suositukset"
 }

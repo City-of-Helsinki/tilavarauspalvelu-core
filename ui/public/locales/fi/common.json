@@ -67,5 +67,7 @@
     "streetAddress": "Laskutusosoite",
     "postCode": "Postinumero",
     "city": "Postitoimipaikka"
-  }
+  },
+  "readMore": "Lue lisää",
+  "seeDetails": "Katso tiedot"
 }

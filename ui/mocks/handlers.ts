@@ -1,16 +1,24 @@
 import { graphql } from "msw";
-import { ReservationUnit } from "../modules/types";
+import { Promotion, ReservationUnit } from "../modules/types";
 
-type Variables = {
+type ReservationUnitVariables = {
   pk: number;
 };
 
-type ReturnType = {
+type ReservationUnitReturn = {
   reservationUnit: ReservationUnit;
 };
 
+type PromotionsReturn = {
+  promotions: Promotion[];
+};
+
+type RecommendationsReturn = {
+  recommendations: ReservationUnit[];
+};
+
 export const handlers = [
-  graphql.query<ReturnType, Variables>(
+  graphql.query<ReservationUnitReturn, ReservationUnitVariables>(
     "SelectedReservationUnit",
     async (req, res, ctx) => {
       const { pk: id } = req.variables;
@@ -22,6 +30,23 @@ export const handlers = [
 
       const reservationUnit = await response;
       return res(ctx.data({ reservationUnit }));
+    }
+  ),
+  graphql.query<PromotionsReturn>("Promotions", async (req, res, ctx) => {
+    const response =
+      await require("../cypress/fixtures/query/promotions/promotions.json");
+
+    const promotions = await response;
+    return res(ctx.data({ promotions }));
+  }),
+  graphql.query<RecommendationsReturn>(
+    "Recommendations",
+    async (req, res, ctx) => {
+      const response =
+        await require("../cypress/fixtures/query/recommendations/recommendations.json");
+
+      const recommendations = await response;
+      return res(ctx.data({ recommendations }));
     }
   ),
 ];

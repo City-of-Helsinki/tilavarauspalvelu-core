@@ -10,6 +10,7 @@ import {
 import { i18n } from "next-i18next";
 import { TFunction } from "i18next";
 import { stringify } from "query-string";
+import { trim } from "lodash";
 import { ReservationUnitsParameters } from "./api";
 import { searchPrefix, emptyOption, applicationsPrefix } from "./const";
 import {
@@ -291,7 +292,10 @@ export const getAddress = (ru: ReservationUnit): string | null => {
     return null;
   }
 
-  return `${ru.location.addressStreet}, ${ru.location.addressCity}`;
+  return trim(
+    `${ru.location.addressStreet || ""}, ${ru.location.addressCity || ""}`,
+    ", "
+  );
 };
 
 export const applicationUrl = (id: number): string => `/application/${id}`;
