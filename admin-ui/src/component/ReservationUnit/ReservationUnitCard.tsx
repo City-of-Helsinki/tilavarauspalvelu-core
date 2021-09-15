@@ -100,7 +100,7 @@ const ReservationUnitCard = ({ reservationUnit }: IProps): JSX.Element => {
           )}
         </ComboType>
         <Props>
-          <Prop $disabled={!(reservationUnit.purposes?.length > 1)}>
+          <Prop $disabled={!(reservationUnit.purposes?.length > 0)}>
             <IconLayers />{" "}
             {t(
               reservationUnit.purposes?.length > 0
