@@ -40,6 +40,15 @@ class ResourceCreateSerializer(ResourceSerializer, PrimaryKeySerializer):
         ]
 
     def validate(self, data):
+        location_type = data.get("location_type")
+        if not location_type or location_type not in (
+            Resource.LOCATION_FIXED,
+            Resource.LOCATION_MOVABLE,
+        ):
+            raise serializers.ValidationError(
+                f"Wrong type of location type. Values are {Resource.LOCATION_FIXED, Resource.LOCATION_MOVABLE}"
+            )
+
         is_draft = data.get("is_draft")
 
         if not is_draft:
@@ -75,6 +84,16 @@ class ResourceUpdateSerializer(PrimaryKeyUpdateSerializer, ResourceCreateSeriali
         fields = ResourceCreateSerializer.Meta.fields + ["pk"]
 
     def validate(self, data):
+        if "location_type" in data:
+            location_type = data.get("location_type")
+            if location_type not in (
+                Resource.LOCATION_FIXED,
+                Resource.LOCATION_MOVABLE,
+            ):
+                raise serializers.ValidationError(
+                    f"Wrong type of location type. Values are {Resource.LOCATION_FIXED, Resource.LOCATION_MOVABLE}"
+                )
+
         is_draft = data.get("is_draft", self.instance.is_draft)
         if not is_draft:
             for field, value in data.items():

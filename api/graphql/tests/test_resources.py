@@ -231,6 +231,25 @@ class ResourceCreateForPublishGraphQLTestCase(ResourceGraphQLBase):
             0
         )
 
+    def test_location_type_wrong_errors(self):
+        data = self.get_valid_input_data()
+        data["locationType"] = "imwrong"
+        response = self.query(
+            self.get_create_query(),
+            input_data=data,
+        )
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
+        assert_that(
+            content.get("data")
+            .get("createResource")
+            .get("errors")[0]
+            .get("messages")[0]
+        ).contains("Wrong type of location type")
+        assert_that(Resource.objects.exclude(id=self.resource.id).count()).is_equal_to(
+            0
+        )
+
 
 class ResourceCreateAsDraftGraphQLTestCase(ResourceGraphQLBase):
     def setUp(self) -> None:
@@ -477,6 +496,19 @@ class ResourceUpdateForPublishGraphQLTestCase(ResourceGraphQLBase):
         assert_that(
             content.get("data").get("updateResource").get("errors")[0].get("messages")
         ).contains("Location type 'fixed' needs a space to be defined.")
+
+    def test_location_type_wrong_errors(self):
+        data = {"pk": self.resource.pk, "locationType": "imsowrong"}
+        response = self.query(self.get_update_query(), input_data=data)
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        assert_that(
+            content.get("data")
+            .get("updateResource")
+            .get("errors")[0]
+            .get("messages")[0]
+        ).contains("Wrong type of location type")
 
 
 class ResourceUpdateAsDraftGraphQLTestCase(ResourceGraphQLBase):
