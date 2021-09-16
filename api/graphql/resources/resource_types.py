@@ -22,9 +22,11 @@ class ResourceType(AuthNode, PrimaryKeyObjectType):
             "id",
             "location_type",
             "name",
+            "description",
             "space",
             "buffer_time_before",
             "buffer_time_after",
+            "is_draft",
         )
 
         filter_fields = {
