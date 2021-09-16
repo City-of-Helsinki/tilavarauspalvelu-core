@@ -7,6 +7,30 @@ from snapshottest import Snapshot
 
 snapshots = Snapshot()
 
+snapshots['ReservationUnitTestCase::test_filtering_by_max_persons 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'maxPersons': 110,
+                        'name': 'Test name'
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitTestCase::test_filtering_by_max_persons_not_found 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+            ]
+        }
+    }
+}
+
 snapshots['ReservationUnitTestCase::test_filtering_by_type 1'] = {
     'data': {
         'reservationUnits': {
@@ -48,7 +72,7 @@ snapshots['ReservationUnitTestCase::test_getting_reservation_units 1'] = {
                         'images': [
                         ],
                         'location': None,
-                        'maxPersons': None,
+                        'maxPersons': 110,
                         'name': 'Test name',
                         'purposes': [
                         ],
@@ -61,6 +85,12 @@ snapshots['ReservationUnitTestCase::test_getting_reservation_units 1'] = {
                         'services': [
                         ],
                         'spaces': [
+                            {
+                                'name': 'Large space'
+                            },
+                            {
+                                'name': 'Small space'
+                            }
                         ],
                         'termsOfUse': ''
                     }

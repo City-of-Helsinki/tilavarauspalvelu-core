@@ -16,6 +16,7 @@ from reservation_units.tests.factories import (
     ReservationUnitFactory,
     ReservationUnitTypeFactory,
 )
+from spaces.tests.factories import SpaceFactory
 
 
 @freeze_time("2021-05-03")
@@ -23,15 +24,19 @@ class ReservationUnitTestCase(GraphQLTestCase, snapshottest.TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.type = ReservationUnitTypeFactory(name="Test type")
+        large_space = SpaceFactory(max_persons=100, name="Large space")
+        small_space = SpaceFactory(max_persons=10, name="Small space")
         cls.reservation_unit = ReservationUnitFactory(
             name="Test name",
             reservation_unit_type=cls.type,
             uuid="3774af34-9916-40f2-acc7-68db5a627710",
+            spaces=[large_space, small_space],
         )
 
         cls.api_client = APIClient()
 
     def test_getting_reservation_units(self):
+        self.maxDiff = None
         response = self.query(
             """
             query {
@@ -208,6 +213,42 @@ class ReservationUnitTestCase(GraphQLTestCase, snapshottest.TestCase):
 
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_empty()
+
+    def test_filtering_by_max_persons(self):
+        response = self.query(
+            """
+            query {
+                reservationUnits(maxPersonsLte:120, maxPersonsGte:60) {
+                    edges {
+                        node{
+                            name maxPersons
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filtering_by_max_persons_not_found(self):
+        response = self.query(
+            """
+            query {
+                reservationUnits(maxPersonsLte:20, maxPersonsGte:15) {
+                    edges {
+                        node{
+                            name maxPersons
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
 
 
 def get_mocked_opening_hours(uuid):
