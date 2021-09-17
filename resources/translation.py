@@ -4,7 +4,7 @@ from .models import Resource
 
 
 class ResourceTranslationOptions(TranslationOptions):
-    fields = ["name"]
+    fields = ["name", "description"]
 
 
 translator.register(Resource, ResourceTranslationOptions)
