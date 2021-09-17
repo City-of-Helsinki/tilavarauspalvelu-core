@@ -1,5 +1,9 @@
+import operator
+from functools import reduce
+
 import django_filters
-from django.db.models import Sum
+from django.db.models import Q, Sum
+from django_filters import CharFilter
 
 from api.common_filters import ModelInFilter
 from reservation_units.models import ReservationUnit, ReservationUnitType
@@ -18,11 +22,34 @@ class ReservationUnitsFilterSet(django_filters.FilterSet):
         field_name="max_persons", method="get_max_persons_lte"
     )
 
+    text_search = CharFilter(method="get_text_search")
+
     class Meta:
         model = ReservationUnit
         fields = [
             "unit",
         ]
+
+    def get_text_search(self, qs, property, value: str):
+
+        words = value.split(",")
+        queries = []
+        for word in words:
+            queries.append(
+                Q(name__icontains=word)
+                | Q(description__icontains=word)
+                | Q(spaces__name__icontains=word)
+                | Q(keyword_groups__name__icontains=word)
+                | Q(resources__name__icontains=word)
+                | Q(services__name__icontains=word)
+                | Q(purposes__name__icontains=word)
+                | Q(reservation_unit_type__name__icontains=word)
+                | Q(equipments__name__icontains=word)
+                | Q(unit__name__icontains=word)
+            )
+        query = reduce(operator.or_, (query for query in queries))
+
+        return qs.filter(query)
 
     def get_max_persons_gte(self, qs, property, value):
         return qs.annotate(max_person_sum=Sum("spaces__max_persons")).filter(
