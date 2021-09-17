@@ -165,7 +165,7 @@ def get_opening_hours(
         for opening_hours in day_data_in["opening_hours"]:
             day_data_out = {
                 "resource_id": day_data_in["resource"]["id"],
-                "origin_id": day_data_in["resource"]["origins"]["origin_id"],
+                "origin_id": day_data_in["resource"]["origins"][0]["origin_id"],
                 "date": datetime.datetime.strptime(
                     opening_hours["date"], "%Y-%m-%d"
                 ).date(),
