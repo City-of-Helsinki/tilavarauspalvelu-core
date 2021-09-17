@@ -13,6 +13,8 @@ from rest_framework.test import APIClient
 from opening_hours.enums import State
 from opening_hours.hours import TimeElement
 from reservation_units.tests.factories import (
+    KeywordCategoryFactory,
+    KeywordGroupFactory,
     ReservationUnitFactory,
     ReservationUnitTypeFactory,
 )
@@ -409,6 +411,45 @@ class ReservationUnitTestCase(GraphQLTestCase, snapshottest.TestCase):
 
         content = json.loads(response.content)
         assert_that(self.content_is_empty(content)).is_true()
+
+    def test_filtering_by_keyword_group(self):
+        category = KeywordCategoryFactory()
+
+        keyword_group = KeywordGroupFactory(keyword_category=category, name="Sports")
+        self.reservation_unit.keyword_groups.set([keyword_group])
+        self.reservation_unit.save()
+        response = self.query(
+            f"query {{"
+            f"reservationUnits( keywordGroups:{keyword_group.id}){{"
+            f"edges {{"
+            f"node {{"
+            f"name\n"
+            f"keywordGroups{{name}}"
+            f"}}"
+            f"}}"
+            f"}}"
+            f"}}"
+        )
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+        response = self.query(
+            f"query {{"
+            f"reservationUnits( keywordGroups:{keyword_group.id+214979}){{"
+            f"edges {{"
+            f"node {{"
+            f"name\n"
+            f"keywordGroups{{name}}"
+            f"}}"
+            f"}}"
+            f"}}"
+            f"}}"
+        )
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_not_empty()
 
 
 def get_mocked_opening_hours(uuid):

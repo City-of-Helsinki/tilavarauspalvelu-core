@@ -7,6 +7,25 @@ from snapshottest import Snapshot
 
 snapshots = Snapshot()
 
+snapshots['ReservationUnitTestCase::test_filtering_by_keyword_group 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'keywordGroups': [
+                            {
+                                'name': 'Sports'
+                            }
+                        ],
+                        'name': 'Test name'
+                    }
+                }
+            ]
+        }
+    }
+}
+
 snapshots['ReservationUnitTestCase::test_filtering_by_max_persons 1'] = {
     'data': {
         'reservationUnits': {

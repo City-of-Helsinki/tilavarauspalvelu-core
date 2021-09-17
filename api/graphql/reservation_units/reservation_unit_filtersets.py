@@ -6,7 +6,7 @@ from django.db.models import Q, Sum
 from django_filters import CharFilter
 
 from api.common_filters import ModelInFilter
-from reservation_units.models import ReservationUnit, ReservationUnitType
+from reservation_units.models import KeywordGroup, ReservationUnit, ReservationUnitType
 from spaces.models import Unit
 
 
@@ -24,11 +24,13 @@ class ReservationUnitsFilterSet(django_filters.FilterSet):
 
     text_search = CharFilter(method="get_text_search")
 
+    keyword_groups = ModelInFilter(
+        field_name="keyword_groups", queryset=KeywordGroup.objects.all()
+    )
+
     class Meta:
         model = ReservationUnit
-        fields = [
-            "unit",
-        ]
+        fields = ["unit", "keyword_groups"]
 
     def get_text_search(self, qs, property, value: str):
 
