@@ -298,7 +298,8 @@ class ReservationUnitByPkType(ReservationUnitType, OpeningHoursMixin):
 
     def resolve_next_available_slot(self, info):
         scheduler = ReservationUnitReservationScheduler(self)
-        return scheduler.get_next_available_reservation_time()
+        start, end = scheduler.get_next_available_reservation_time()
+        return start
 
     def resolve_hauki_url(self, info):
         return self
