@@ -97,6 +97,7 @@ class OpeningHoursMixin:
                         start_time=time.start_time,
                         end_time=time.end_time,
                         state=time.resource_state,
+                        periods=time.periods,
                     )
                     opening_hours.append(oh)
             return_object.opening_times = opening_hours
