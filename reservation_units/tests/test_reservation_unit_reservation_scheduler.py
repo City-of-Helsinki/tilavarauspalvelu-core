@@ -58,6 +58,7 @@ class ReservationUnitSchedulerGetNextAvailableReservationTimeTestCase(TestCase):
         return [
             {
                 "resource_id": resource_id,
+                "origin_id": str(self.reservation_unit.uuid),
                 "date": self.DATES[0],
                 "times": [
                     TimeElement(
@@ -69,6 +70,7 @@ class ReservationUnitSchedulerGetNextAvailableReservationTimeTestCase(TestCase):
             },
             {
                 "resource_id": resource_id,
+                "origin_id": str(self.reservation_unit.uuid),
                 "date": self.DATES[1],
                 "times": [
                     TimeElement(
