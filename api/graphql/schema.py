@@ -11,6 +11,12 @@ from api.graphql.reservation_units.reservation_unit_filtersets import (
     ReservationUnitsFilterSet,
 )
 from api.graphql.reservation_units.reservation_unit_mutations import (
+    EquipmentCategoryCreateMutation,
+    EquipmentCategoryDeleteMutation,
+    EquipmentCategoryUpdateMutation,
+    EquipmentCreateMutation,
+    EquipmentDeleteMutation,
+    EquipmentUpdateMutation,
     PurposeCreateMutation,
     PurposeUpdateMutation,
     ReservationUnitCreateMutation,
@@ -148,6 +154,14 @@ class Mutation(graphene.ObjectType):
 
     create_purpose = PurposeCreateMutation.Field()
     update_purpose = PurposeUpdateMutation.Field()
+
+    create_equipment = EquipmentCreateMutation.Field()
+    update_equipment = EquipmentUpdateMutation.Field()
+    delete_equipment = EquipmentDeleteMutation.Field()
+
+    create_equipment_category = EquipmentCategoryCreateMutation.Field()
+    update_equipment_category = EquipmentCategoryUpdateMutation.Field()
+    delete_equipment_category = EquipmentCategoryDeleteMutation.Field()
 
     create_space = SpaceCreateMutation.Field()
     update_space = SpaceUpdateMutation.Field()
