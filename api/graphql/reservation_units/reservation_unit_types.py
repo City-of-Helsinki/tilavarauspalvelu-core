@@ -174,6 +174,7 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
     surface_area = graphene.Int()
     max_reservation_duration = graphene.Time()
     min_reservation_duration = graphene.Time()
+    keyword_groups = graphene.List(KeywordGroupType)
 
     permission_classes = (
         (ReservationUnitPermission,)
@@ -262,6 +263,9 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
             return None
         duration = datetime.datetime(1, 1, 1) + self.min_reservation_duration
         return duration.time()
+
+    def resolve_keyword_groups(self, info):
+        return KeywordGroup.objects.filter(reservation_units=self.id)
 
 
 class ReservationUnitByPkType(ReservationUnitType, OpeningHoursMixin):
