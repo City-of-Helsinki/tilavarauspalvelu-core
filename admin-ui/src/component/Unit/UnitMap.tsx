@@ -47,8 +47,8 @@ const UnitMap = (): JSX.Element => {
 
   if (unit.location) {
     markers.push({
-      latitude: unit.location.latitude,
-      longitude: unit.location.longitude,
+      latitude: Number(unit.location.latitude),
+      longitude: Number(unit.location.longitude),
     });
   }
 
