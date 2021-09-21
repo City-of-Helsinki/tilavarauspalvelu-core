@@ -15,21 +15,23 @@ import {
 import styled from "styled-components";
 import { FetchResult, useMutation } from "@apollo/client";
 import { useTranslation, TFunction } from "react-i18next";
-import { omit, set } from "lodash";
+import { omit, set, startCase } from "lodash";
 import {
   Space,
   SpaceCreateMutationInput,
   SpaceCreateMutationPayload,
+  SpaceType,
   UnitType,
 } from "../../common/types";
 import { parseAddress } from "../../common/util";
 import { CREATE_SPACE } from "../../common/queries";
 import { CustomDialogHeader } from "./CustomDialogHeader";
+import { languages } from "../../common/const";
 
 const defaultParentSpaceId = "1";
 interface IProps {
   unit: UnitType;
-  parentSpace?: Space;
+  parentSpace?: SpaceType;
   closeModal: () => void;
   onSave: () => void;
   onDataError: (message: string) => void;
@@ -40,15 +42,17 @@ type State = {
   parentSpace?: Space | null;
   spaces: SpaceCreateMutationInput[];
   page: number;
+  unitId: string;
 };
 
 type Action =
   | { type: "setNumSpaces"; numSpaces: number }
-  | { type: "setSpaceName"; name: string; index: number }
+  | { type: "setSpaceName"; name: string; index: number; lang: string }
   | { type: "setSpaceSurfaceArea"; surfaceArea: number; index: number }
   | { type: "setSpaceMaxPersonCount"; maxPersonCount: number; index: number }
   | { type: "setSpaceCode"; code: string; index: number }
-  | { type: "setParentSpace"; parentSpace?: Space | null }
+  | { type: "setParentSpace"; parentSpace?: SpaceType | null }
+  | { type: "setUnit"; unit: UnitType }
   | { type: "nextPage" }
   | { type: "prevPage" }
   | { type: "addRow" }
@@ -59,7 +63,8 @@ const initialState = {
   parentSpace: undefined,
   spaces: [],
   page: 0,
-};
+  unitId: "0",
+} as State;
 
 let id = -1;
 
@@ -68,10 +73,11 @@ const getId = (): string => {
   return String(id);
 };
 
-const initialSpace = (parentSpaceId: string | null) =>
+const initialSpace = (parentSpaceId: string | null, unitId: string) =>
   ({
+    unitId,
     key: getId(),
-    name: "",
+    nameFi: "",
     surfaceArea: 0,
     maxPersons: 0,
     locationType: "fixed",
@@ -84,7 +90,11 @@ const reducer = (state: State, action: Action): State => {
       return set({ ...state }, "numSpaces", action.numSpaces);
     }
     case "setSpaceName": {
-      return set({ ...state }, `spaces[${action.index}].name`, action.name);
+      return set(
+        { ...state },
+        `spaces[${action.index}].name${startCase(action.lang)}`,
+        action.name
+      );
     }
     case "setSpaceCode": {
       return set({ ...state }, `spaces[${action.index}].code`, action.code);
@@ -103,6 +113,9 @@ const reducer = (state: State, action: Action): State => {
         action.surfaceArea
       );
     }
+    case "setUnit": {
+      return set({ ...state }, "unitId", action.unit.pk);
+    }
     case "setParentSpace": {
       return set({ ...state }, "parentSpace", action.parentSpace);
     }
@@ -110,7 +123,10 @@ const reducer = (state: State, action: Action): State => {
       return {
         ...state,
         spaces: state.spaces.concat([
-          initialSpace(String(state.parentSpace?.id || defaultParentSpaceId)),
+          initialSpace(
+            String(state.parentSpace?.id || defaultParentSpaceId),
+            state.unitId
+          ),
         ]),
       };
     }
@@ -130,7 +146,10 @@ const reducer = (state: State, action: Action): State => {
       // populate initial data for spaces
       if (nextState.spaces.length === 0) {
         nextState.spaces = Array.from(Array(state.numSpaces).keys()).map(() =>
-          initialSpace(String(state.parentSpace?.id || defaultParentSpaceId))
+          initialSpace(
+            String(state.parentSpace?.id || defaultParentSpaceId),
+            state.unitId
+          )
         );
       }
       return nextState;
@@ -222,7 +241,7 @@ const IconDelete = styled(IconTrash)`
   padding-top: 2em;
 `;
 
-type ParentType = { label: string; value: Space | null };
+type ParentType = { label: string; value: SpaceType | null };
 
 const parentOptions = [
   {
@@ -348,15 +367,26 @@ const SpaceEditor = ({
   <>
     <EditorContainer>
       <div>
-        <TextInput
-          required
-          id={`name[${index}]`}
-          label={t("SpaceModal.page2.nameLabel")}
-          onBlur={(e) => {
-            dispatch({ type: "setSpaceName", index, name: e.target.value });
-          }}
-          defaultValue={space.name}
-        />
+        {languages.map((lang) => (
+          <TextInput
+            key={lang}
+            required
+            id={`name.${lang}`}
+            label={t("SpaceModal.nameLabel", { lang })}
+            placeholder={t("SpaceModal.namePlaceholder", {
+              language: t(`language.${lang}`),
+            })}
+            onBlur={(e) => {
+              dispatch({
+                type: "setSpaceName",
+                index,
+                name: e.target.value,
+                lang,
+              });
+            }}
+            defaultValue=""
+          />
+        ))}
 
         <EditorColumns>
           <NumberInput
@@ -516,13 +546,14 @@ const SecondPage = ({
           onClick={() => {
             const promises = Promise.allSettled(
               editorState.spaces.map((s) =>
-                createSpace(
-                  omit(s, [
+                createSpace({
+                  ...(omit(s, [
                     "key",
                     "locationType",
                     "parentId",
-                  ]) as SpaceCreateMutationInput
-                )
+                  ]) as SpaceCreateMutationInput),
+                  unitId: editorState.unitId,
+                })
               )
             );
 
@@ -568,6 +599,12 @@ const NewSpaceModal = ({
       dispatch({ type: "setParentSpace", parentSpace });
     }
   }, [parentSpace]);
+
+  useEffect(() => {
+    if (unit) {
+      dispatch({ type: "setUnit", unit });
+    }
+  }, [unit]);
 
   const createSpaceMutation = useMutation<
     { createSpace: SpaceCreateMutationPayload },
