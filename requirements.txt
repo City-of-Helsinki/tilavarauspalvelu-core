@@ -128,7 +128,7 @@ easy-thumbnails==2.7.1
     # via -r requirements.in
 ecdsa==0.14.1
     # via python-jose
-elastic-apm==5.10.0
+elastic-apm==5.10.1
     # via -r requirements.in
 factory-boy==3.2.0
     # via pytest-factoryboy
@@ -195,7 +195,7 @@ pathspec==0.8.1
     # via black
 pep517==0.10.0
     # via pip-tools
-pillow==8.3.1
+pillow==8.3.2
     # via easy-thumbnails
 pip-tools==6.1.0
     # via -r requirements.in
@@ -311,7 +311,7 @@ social-auth-app-django==4.0.0
     # via -r requirements.in
 social-auth-core==4.1.0
     # via social-auth-app-django
-sqlparse==0.4.1
+sqlparse==0.4.2
     # via django
 termcolor==1.1.0
     # via snapshottest

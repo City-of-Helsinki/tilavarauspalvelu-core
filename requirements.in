@@ -31,7 +31,7 @@ psycopg2==2.8.6
 pytest-cov==2.10.1
 pytest-django==4.1.0
 pytest-factoryboy==2.1.0
-elastic-apm==5.10.0
+elastic-apm==5.10.1
 sentry-sdk==0.19.5
 snapshottest
 social-auth-app-django==4.0.0
