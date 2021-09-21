@@ -22,6 +22,7 @@ import { parseAddress } from "../../common/util";
 import { CREATE_RESOURCE } from "../../common/queries";
 import { CustomDialogHeader } from "./CustomDialogHeader";
 import { breakpoints } from "../../styles/util";
+import { languages } from "../../common/const";
 
 interface IProps {
   unit: UnitType;
@@ -120,8 +121,6 @@ const EditorColumns = styled.div`
   }
 `;
 
-const languages = ["fi", "sv", "en"];
-
 const NewResourceModal = ({
   unit,
   closeModal,
@@ -139,7 +138,10 @@ const NewResourceModal = ({
   }, [spaceId]);
 
   const [createResourceMutation] = useMutation<
-    { createResource: ResourceCreateMutationPayload },
+    {
+      refetchQueries: ["unitByPk"];
+      createResource: ResourceCreateMutationPayload;
+    },
     { input: ResourceCreateMutationInput }
   >(CREATE_RESOURCE);
 

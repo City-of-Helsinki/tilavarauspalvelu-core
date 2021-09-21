@@ -10,6 +10,8 @@ export const weekdays = [
   "sunday",
 ];
 
+export const languages = ["fi", "sv", "en"];
+
 export const apiBaseUrl = process.env.REACT_APP_TILAVARAUS_API_URL;
 export const authEnabled = process.env.REACT_APP_DISABLE_AUTH !== "true";
 export const oidcClientId = process.env.REACT_APP_OIDC_CLIENT_ID;
