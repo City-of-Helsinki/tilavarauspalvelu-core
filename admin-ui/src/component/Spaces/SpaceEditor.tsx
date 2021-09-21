@@ -11,7 +11,7 @@ import React, { useReducer } from "react";
 import { FetchResult, useMutation, useQuery } from "@apollo/client";
 import { useTranslation } from "react-i18next";
 import i18next from "i18next";
-import { useParams } from "react-router-dom";
+import { useParams, useHistory } from "react-router-dom";
 import styled from "styled-components";
 import {
   SpaceType,
@@ -246,6 +246,7 @@ const getParent = (v: string | undefined, options: ParentType[]) => {
 
 const SpaceEditor = (): JSX.Element | null => {
   const { spaceId, unitId } = useParams<IProps>();
+  const history = useHistory();
 
   const [state, dispatch] = useReducer(
     reducer,
@@ -456,7 +457,11 @@ const SpaceEditor = (): JSX.Element | null => {
               />
             </Section>
             <Buttons>
-              <Button disabled={!state.hasChanges} variant="secondary">
+              <Button
+                disabled={!state.hasChanges}
+                variant="secondary"
+                onClick={() => history.go(-1)}
+              >
                 {t("SpaceEditor.cancel")}
               </Button>
               <SaveButton
