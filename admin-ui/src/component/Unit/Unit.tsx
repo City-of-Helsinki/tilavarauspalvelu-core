@@ -11,7 +11,7 @@ import {
 } from "hds-react";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useParams } from "react-router-dom";
+import { useParams, useHistory } from "react-router-dom";
 import styled from "styled-components";
 import { UNIT_QUERY } from "../../common/queries";
 import { UnitType } from "../../common/types";
@@ -145,7 +145,7 @@ const NoReservationUnitsInfo = styled.p`
 
 const NoReservationUnits = styled.div``;
 
-const Unit = (): JSX.Element => {
+const Unit = (): JSX.Element | null => {
   const [isLoading, setIsLoading] = useState(true);
   const [unit, setUnit] = useState<UnitType>();
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -154,6 +154,7 @@ const Unit = (): JSX.Element => {
 
   const { t } = useTranslation();
   const { unitId } = useParams<IProps>();
+  const history = useHistory();
 
   useQuery(UNIT_QUERY, {
     variables: { pk: unitId },
@@ -173,6 +174,10 @@ const Unit = (): JSX.Element => {
 
   if (isLoading) {
     return <Loader />;
+  }
+
+  if (!unit) {
+    return null;
   }
 
   return (
@@ -233,7 +238,9 @@ const Unit = (): JSX.Element => {
             size="large"
           >
             {t("Unit.noOpeningHours")}{" "}
-            <ExternalLink to="https://palvelukartta.hel.fi/fi/">
+            <ExternalLink
+              to={`https://asiointi.hel.fi/tprperhe/TPR/UI/ServicePoint/ServicePointEdit/${unit.tprekId}`}
+            >
               {t("Unit.maintainOpeningHours")}
             </ExternalLink>
           </StyledNotification>
@@ -261,13 +268,19 @@ const Unit = (): JSX.Element => {
           <StyledBoldButton
             variant="supplementary"
             iconLeft={<IconPlusCircleFill />}
+            onClick={() => {
+              history.push(`/unit/${unitId}/reservationUnit/edit/`);
+            }}
           >
             {t("Unit.reservationUnitCreate")}
           </StyledBoldButton>
         </Info>
       </IngressContainer>
       {unit?.reservationUnits && unit?.reservationUnits.length > 0 ? (
-        <ReservationUnitList reservationUnits={unit?.reservationUnits} />
+        <ReservationUnitList
+          reservationUnits={unit?.reservationUnits}
+          unitId={unit?.pk}
+        />
       ) : (
         <ContentContainer>
           <ReservationUnits>
