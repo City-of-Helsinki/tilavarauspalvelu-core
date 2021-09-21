@@ -173,7 +173,7 @@ const SpacesTable = ({
     index: "id",
     sorting: "name.fi",
     order: "asc",
-    rowLink: ({ pk }: SpaceType) => `/space/${pk}`,
+    rowLink: ({ pk }: SpaceType) => `/unit/${unit.pk}/space/edit/${pk}`,
   } as CellConfig;
 
   const ref = useRef(null);
