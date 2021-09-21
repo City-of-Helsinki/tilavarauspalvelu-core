@@ -12,7 +12,6 @@
     "heading": "Vakiovuoron hakeminen",
     "text": "Vakiovuoroja haetaan yleisen haun kautta. Voit selata tiloja valmiiksi, mutta hakemuksen voi jättää vain hakuajan puitteissa."
   },
-  "browseAllButton": "Selaa kaikkia tiloja",
   "browseReservationsButton": "Selaa varausyksiköitä",
   "browseRecurringReservationsButton": "Hae vakiovuoroa",
   "applicationTimes": {

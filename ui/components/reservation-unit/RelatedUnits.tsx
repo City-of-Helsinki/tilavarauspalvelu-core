@@ -126,7 +126,7 @@ const RelatedUnits = ({
           <Unit key={unit.id}>
             <Image
               src={getMainImage(unit)?.imageUrl}
-              image-alt={unit.name}
+              alt=""
               style={{ marginTop: 0 }}
             />
             <Content>

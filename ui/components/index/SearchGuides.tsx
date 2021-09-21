@@ -69,14 +69,14 @@ const SearchGuides = (): JSX.Element => {
         color="primary"
         src="images/guide-single.png"
       >
-        <InfoContainer>
+        <InfoContainer data-test-id="search-guide__single">
           <div>
             <Heading>{t("info.heading")}</Heading>
             <p>{t("info.text")}</p>
           </div>
           <ButtonContainer>
             <Button
-              id="browseAllButton"
+              id="browseSingleReservationUnits"
               onClick={() => router.push("/search/?search=")}
               iconRight={<IconArrowRight />}
             >
@@ -91,14 +91,14 @@ const SearchGuides = (): JSX.Element => {
         color="secondary"
         src="images/guide-recurring.png"
       >
-        <InfoContainer>
+        <InfoContainer data-test-id="search-guide__recurring">
           <div>
             <Heading>{t("infoRecurring.heading")}</Heading>
             <p>{t("infoRecurring.text")}</p>
           </div>
           <ButtonContainer>
             <Button
-              id="browseAllButton"
+              id="browseRecurringReservationUnits"
               onClick={() => router.push("/search/?search=")}
               iconRight={<IconArrowRight />}
             >
