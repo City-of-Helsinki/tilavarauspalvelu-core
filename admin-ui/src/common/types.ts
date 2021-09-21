@@ -441,7 +441,10 @@ export interface UnitWIP {
 /* WIP, perhaps we should autogenerate these under common module for both uis to use */
 export type SpaceCreateMutationInput = {
   key?: string; // client only
-  name: string;
+  nameFi: string;
+  nameSv?: string;
+  nameEn?: string;
+  unitId: string;
   parentId?: string;
   surfaceArea?: number;
   maxPersons?: number;
