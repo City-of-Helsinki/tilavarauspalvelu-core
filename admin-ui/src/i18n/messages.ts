@@ -730,6 +730,8 @@ const translations: ITranslations = {
   },
   SpaceModal: {
     phase: ["Vaihe"],
+    namePlaceholder: ["Tilan nimi {{language}}"],
+    nameLabel: ["Tilan nimi {{lang}}"],
     page1: {
       modalTitle: ["Luo uusi tila toimipisteelle"],
       subSpaceModalTitle: ["Luo alitila tilalle"],
@@ -803,6 +805,8 @@ const translations: ITranslations = {
     nameSvLabel: ["Varausyksikön nimi sv"],
     nameEnLabel: ["Varausyksikön nimi en"],
     nameHelper: ["Vinkki: hyvä nimi erottaa sen muista."],
+    descriptionLabel: ["Kuvaus {{lang}}"],
+    descriptionPlaceholder: ["Kuvaus {{language}}"],
     spacesLabel: ["Tilat"],
     spacesPlaceholder: ["Liitä tarvittavat tilat"],
     resourcesLabel: ["Resurssit"],
@@ -848,6 +852,7 @@ const translations: ITranslations = {
     removeConfirmationAccept: ["Poista"],
     removeConfirmationCancel: ["Kumoa"],
     removeFailed: ["Resurssin poistaminen ei onnistunut."],
+    removeSuccess: ["Resurssi poistettu."],
   },
 };
 

@@ -31,14 +31,14 @@ const Address = styled.span`
 `;
 
 const LocationIcon = styled(IconLocation)`
-  margin: 2px var(--spacing-s);
+  margin: 2px var(--spacing-s) 2px 0;
 `;
 
 const Label = styled(Address)`
   font-family: var(--tilavaraus-admin-font-bold);
 `;
 
-const UnitSubPageHeader = ({ title, unit }: IProps): JSX.Element => {
+const SubPageHead = ({ title, unit }: IProps): JSX.Element => {
   const { t } = useTranslation();
 
   return (
@@ -63,4 +63,4 @@ const UnitSubPageHeader = ({ title, unit }: IProps): JSX.Element => {
   );
 };
 
-export default UnitSubPageHeader;
+export default SubPageHead;

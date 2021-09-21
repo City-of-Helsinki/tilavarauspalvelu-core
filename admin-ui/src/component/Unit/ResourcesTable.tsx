@@ -105,7 +105,7 @@ const ResourcesTable = ({
                       onAccept: async () => {
                         try {
                           await deleteResource(pk);
-                          onDelete(t("ResourceTable.remove.success"));
+                          onDelete(t("ResourceTable.removeSuccess"));
                         } catch (error) {
                           onDataError(t("ResourceTable.removeFailed"));
                         }

@@ -17,6 +17,7 @@ import { ContentContainer } from "../../styles/layout";
 
 interface IProps {
   reservationUnits: ReservationUnitType[];
+  unitId: number;
 }
 
 const getFilterConfig = (units: ReservationUnitType[]): DataFilterConfig[] => {
@@ -27,9 +28,9 @@ const getFilterConfig = (units: ReservationUnitType[]): DataFilterConfig[] => {
     {
       title: "ReservationUnitList.typeFilter",
       filters: types.map((value) => ({
-        title: value.name || "",
+        title: value?.name || "",
         key: "reservationUnitType.pk",
-        value: value.pk,
+        value: value?.pk,
       })),
     },
     {
@@ -44,7 +45,10 @@ const getFilterConfig = (units: ReservationUnitType[]): DataFilterConfig[] => {
   ];
 };
 
-const ReservationUnitList = ({ reservationUnits }: IProps): JSX.Element => {
+const ReservationUnitList = ({
+  reservationUnits,
+  unitId,
+}: IProps): JSX.Element => {
   const { t } = useTranslation();
   const [filters, setFilters] = useState<DataFilterOption[]>([]);
   const filterConfig = getFilterConfig(reservationUnits);
@@ -83,7 +87,11 @@ const ReservationUnitList = ({ reservationUnits }: IProps): JSX.Element => {
       <ContentContainer>
         <div>
           {filteredResults.map((resUnit) => (
-            <ReservationUnitCard reservationUnit={resUnit} key={resUnit.pk} />
+            <ReservationUnitCard
+              reservationUnit={resUnit}
+              unitId={unitId}
+              key={resUnit.pk}
+            />
           ))}
         </div>
       </ContentContainer>
