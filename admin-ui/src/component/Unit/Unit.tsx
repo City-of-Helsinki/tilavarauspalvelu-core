@@ -119,9 +119,11 @@ const StyledButton = styled(Button)`
 `;
 
 const StyledBoldButton = styled(StyledButton)`
-  color: var(--color-black);
   font-family: var(--tilavaraus-admin-font-bold);
   margin-left: auto;
+  span {
+    color: var(--color-black);
+  }
 `;
 
 const ReservationUnits = styled.div`
@@ -266,6 +268,7 @@ const Unit = (): JSX.Element | null => {
             ) : null}
           </div>
           <StyledBoldButton
+            disabled={unit?.spaces.length < 1}
             variant="supplementary"
             iconLeft={<IconPlusCircleFill />}
             onClick={() => {
