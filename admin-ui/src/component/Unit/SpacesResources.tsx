@@ -163,8 +163,9 @@ const SpacesResources = (): JSX.Element | null => {
   } = useHDSModal();
 
   const {
-    open: newResourceModalIsOpen,
-    openModal: openNewResourceModal,
+    openWithContent,
+    modalContent,
+    open: isNewResourceModalOpen,
     closeModal: closeNewResourceModal,
   } = useHDSModal();
 
@@ -221,6 +222,9 @@ const SpacesResources = (): JSX.Element | null => {
   if (state.unit === null) {
     return null;
   }
+
+  const resources = state.unit.spaces.flatMap((s) => s.resources);
+
   return (
     <Wrapper>
       <Modal
@@ -234,18 +238,6 @@ const SpacesResources = (): JSX.Element | null => {
           closeModal={closeNewSpaceModal}
           onSave={saveSpaceSuccess}
           onDataError={onDataError}
-        />
-      </Modal>
-      <Modal
-        id="resource-modal"
-        open={newResourceModalIsOpen}
-        close={() => closeNewResourceModal()}
-        afterCloseFocusRef={newResourceButtonRef}
-      >
-        <NewResourceModal
-          unit={state.unit}
-          closeModal={closeNewResourceModal}
-          onSave={saveSpaceSuccess}
         />
       </Modal>
       <SubPageHead title={t("Unit.spacesAndResources")} unit={state.unit} />
@@ -297,16 +289,27 @@ const SpacesResources = (): JSX.Element | null => {
         <TableHead>
           <Title>{t("Unit.resources")}</Title>
           <ActionButton
+            disabled={state.unit?.spaces?.length === 0}
             iconLeft={<IconPlusCircleFill />}
             variant="supplementary"
-            onClick={() => openNewResourceModal()}
+            onClick={() =>
+              openWithContent(
+                <NewResourceModal
+                  spaces={state.unit?.spaces || []}
+                  spaceId={0}
+                  unit={state.unit as UnitType}
+                  closeModal={closeNewResourceModal}
+                  onSave={saveSpaceSuccess}
+                />
+              )
+            }
           >
             {t("Unit.addResource")}
           </ActionButton>
         </TableHead>
       </WideContainer>
       <ResourcesTable
-        resources={state.unit.resources}
+        resources={resources}
         onDelete={onDeleteSpaceSuccess}
         onDataError={onDataError}
       />
@@ -326,6 +329,14 @@ const SpacesResources = (): JSX.Element | null => {
           </Notification>
         </Wrapper>
       ) : null}
+      <Modal
+        id="resource-modal"
+        open={isNewResourceModalOpen}
+        close={closeNewResourceModal}
+        afterCloseFocusRef={newResourceButtonRef}
+      >
+        {modalContent}
+      </Modal>
     </Wrapper>
   );
 };

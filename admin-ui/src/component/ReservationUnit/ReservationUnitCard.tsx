@@ -8,6 +8,7 @@ import { BasicLink, breakpoints } from "../../styles/util";
 
 interface IProps {
   reservationUnit: ReservationUnitType;
+  unitId: number;
 }
 
 const Wrapper = styled.div`
@@ -77,7 +78,10 @@ const Prop = styled.div<{ $disabled: boolean }>`
   ${({ $disabled }) => $disabled && "opacity: 0.4;"}
 `;
 
-const ReservationUnitCard = ({ reservationUnit }: IProps): JSX.Element => {
+const ReservationUnitCard = ({
+  reservationUnit,
+  unitId,
+}: IProps): JSX.Element => {
   const { t } = useTranslation();
 
   const image =
@@ -88,7 +92,9 @@ const ReservationUnitCard = ({ reservationUnit }: IProps): JSX.Element => {
     <Wrapper>
       <ImageBox>{image ? <Image src={image?.mediumUrl} /> : null}</ImageBox>
       <Content>
-        <BasicLink to={`/reservationUnit/${reservationUnit.pk}`}>
+        <BasicLink
+          to={`/unit/${unitId}/reservationUnit/edit/${reservationUnit.pk}`}
+        >
           <H2>{reservationUnit.name}</H2>
           <IconArrowRight />
         </BasicLink>

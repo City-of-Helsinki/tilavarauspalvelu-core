@@ -6,9 +6,9 @@ import styled from "styled-components";
 import { FetchResult, useMutation } from "@apollo/client";
 import { useHistory } from "react-router-dom";
 import {
-  Space,
   SpaceDeleteMutationInput,
   SpaceDeleteMutationPayload,
+  SpaceType,
   UnitType,
 } from "../../common/types";
 import { DELETE_SPACE } from "../../common/queries";
@@ -17,9 +17,10 @@ import PopupMenu from "./PopupMenu";
 import Modal, { useModal as useHDSModal } from "../HDSModal";
 import NewSpaceModal from "./NewSpaceModal";
 import ConfirmationDialog, { ModalRef } from "../ConfirmationDialog";
+import { localizedValue } from "../../common/util";
 
 interface IProps {
-  spaces: Space[];
+  spaces: SpaceType[];
   unit: UnitType;
   onSave: () => void;
   onDelete: () => void;
@@ -81,14 +82,14 @@ const SpacesTable = ({
       {
         title: "Unit.headings.name",
         key: `name.${i18n.language}`,
-        transform: ({ name }: Space) => (
-          <Name>{trim(name[i18n.language]) + t("")}</Name>
+        transform: ({ name }: SpaceType) => (
+          <Name>{trim(localizedValue(name, i18n.language))}</Name>
         ),
       },
       {
         title: "Unit.headings.code",
         key: "code",
-        transform: ({ code }: Space) => trim(code),
+        transform: ({ code }: SpaceType) => trim(code),
       },
       {
         title: "Unit.headings.numSubSpaces",
@@ -98,13 +99,13 @@ const SpacesTable = ({
       {
         title: "Unit.headings.surfaceArea",
         key: "surfaceArea",
-        transform: ({ surfaceArea }: Space) =>
+        transform: ({ surfaceArea }: SpaceType) =>
           surfaceArea ? `${surfaceArea}m²` : "",
       },
       {
         title: "Unit.headings.maxPersons",
         key: "maxPersons",
-        transform: (space: Space) => {
+        transform: (space: SpaceType) => {
           return (
             <MaxPersons>
               {space.maxPersons ? (
@@ -131,7 +132,7 @@ const SpacesTable = ({
                   {
                     name: t("SpaceTable.menuEditSpace"),
                     onClick: () => {
-                      history.push(`/unit/${unit.pk}/space/edit/${space.id}`);
+                      history.push(`/unit/${unit.pk}/space/edit/${space.pk}`);
                     },
                   },
                   {
@@ -141,13 +142,13 @@ const SpacesTable = ({
                         id: "confirmation-modal",
                         open: true,
                         heading: t("SpaceTable.removeConfirmationTitle", {
-                          name: space.name[i18n.language],
+                          name: localizedValue(space.name, i18n.language),
                         }),
                         content: t("SpaceTable.removeConfirmationMessage"),
                         acceptLabel: t("SpaceTable.removeConfirmationAccept"),
                         cancelLabel: t("SpaceTable.removeConfirmationCancel"),
                         onAccept: () => {
-                          deleteSpace(space.id)
+                          deleteSpace(space.pk as number)
                             .then((d) => {
                               if (!d.errors) {
                                 onDelete();
@@ -172,7 +173,7 @@ const SpacesTable = ({
     index: "id",
     sorting: "name.fi",
     order: "asc",
-    rowLink: ({ id }: Space) => `/space/${id}`,
+    rowLink: ({ pk }: SpaceType) => `/space/${pk}`,
   } as CellConfig;
 
   const ref = useRef(null);

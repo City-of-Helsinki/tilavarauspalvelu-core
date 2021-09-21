@@ -61,12 +61,13 @@ export type Space = {
   code: string; // WIP
 };
 
+// WIP api in progress
 export type Resource = {
-  id: number;
-  name: TranslationObject;
+  pk: number;
+  name: string;
   locationType: "fixed";
   space: Space | null;
-  unit: UnitWIP; // WIP
+  unit: UnitType;
   resourceType: string; // WIP
   bufferTimeBefore: string;
   bufferTimeAfter: string;
@@ -491,14 +492,15 @@ export type SpaceDeleteMutationPayload = {
 
 // WIP, api incomplete
 export type UnitType = {
+  tprekId: number;
   pk: number;
   name: string;
   location?: Location;
   area?: string; // district?
   service?: string;
-  reservationUnits: [];
-  resources: [];
-  spaces: [];
+  reservationUnits: ReservationUnitType[];
+  resources: Resource[];
+  spaces: SpaceType[];
   openingHours: [];
 };
 
@@ -515,8 +517,8 @@ export type SpaceType = {
   parent?: SpaceType;
   maxPersons: number;
   reservationUnits: [];
-  resources: [];
-  spaces: [];
+  resources: Resource[];
+  spaces: SpaceType[];
   openingHours: [];
 };
 
@@ -528,8 +530,9 @@ export type ReservationUnitTypeType = {
 export type PurposeType = {
   pk: number;
   name: string;
-}
+};
 
+// WIP incomplete
 export type ReservationUnitType = {
   pk: number;
   status: string; // WIP no api yet!
@@ -537,18 +540,69 @@ export type ReservationUnitType = {
   maxPersons: number;
   surfaceArea: number;
   resources: Resource[];
+  spaces: SpaceType[];
   services: Service[];
+  maxReservationDuration: string;
+  minReservationDuration: string;
+  description: string;
+  requireIntroduction: boolean;
   images: Image[];
   location: Location;
   reservationUnitType: ReservationUnitTypeType;
   purposes: PurposeType[];
+  termsOfUse: string;
 };
 
 // WIP, no api yet
 export type ResourceCreateMutationInput = {
-  unitId: number;
-  name: TranslationObject;
-  description: TranslationObject;
+  spaceId: string; // ???
+  bufferTimeBefore: string;
+  bufferTimeAfter: string;
+  locationType: "fixed" | "movable";
+  isDraft: boolean;
+  nameFi: string;
+  nameSv: string;
+  nameEn: string;
+  descriptionFi: string;
+  descriptionSv: string;
+  descriptionEn: string;
+};
+
+// WIP, api incomplete
+export type ReservationUnitCreateMutationInput = {
+  name?: string;
+  description?: string;
+  requireIntroduction?: boolean;
+  termsOfUse?: string;
+  equipmentIds?: string;
+  unitId: string;
+  contactInformation?: string;
+  maxReservationDuration?: string;
+  minReservationDuration?: string;
+  clientMutationId?: string;
+};
+
+export type ReservationUnitCreateMutationPayload = {
+  id: number;
+  errors: ErrorType;
+  clientMutationId: string;
+};
+
+export type ReservationUnitUpdateMutationInput =
+  ReservationUnitCreateMutationInput & {
+    pk: number;
+  };
+
+export type ReservationUnitUpdateMutationPayload = {
+  errors: ErrorType;
+  clientMutationId: string;
+};
+
+// WIP no api yet
+export type ResourceUpdateMutationPayload = {
+  id: number;
+  errors: ErrorType;
+  clientMutationId: string;
 };
 
 // WIP no api yet

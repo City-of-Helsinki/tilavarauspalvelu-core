@@ -1,19 +1,21 @@
-import React, { useReducer } from "react";
+import React, { useEffect, useReducer } from "react";
 import {
   Button,
   Dialog,
   IconCheck,
   Notification,
+  Select,
   TextArea,
   TextInput,
 } from "hds-react";
 import styled from "styled-components";
 import { FetchResult, useMutation } from "@apollo/client";
 import { useTranslation } from "react-i18next";
-import { omit, set } from "lodash";
+import { omit, set, startCase } from "lodash";
 import {
   ResourceCreateMutationInput,
   ResourceCreateMutationPayload,
+  SpaceType,
   UnitType,
 } from "../../common/types";
 import { parseAddress } from "../../common/util";
@@ -23,17 +25,21 @@ import { breakpoints } from "../../styles/util";
 
 interface IProps {
   unit: UnitType;
+  spaceId: number;
   closeModal: () => void;
   onSave: () => void;
+  spaces: SpaceType[];
 }
 
 type State = {
   resource: ResourceCreateMutationInput;
+  spaceId: number;
   error?: string;
 };
 
 type Action =
   | { type: "setResourceName"; lang: string; name: string }
+  | { type: "setSpaceId"; spaceId: number }
   | { type: "setError"; error: string }
   | { type: "clearError" }
   | {
@@ -42,17 +48,24 @@ type Action =
       description: string;
     };
 
-const initialState = { resource: { name: {}, description: {} } } as State;
+const initialState = { resource: {} } as State;
 
 const reducer = (state: State, action: Action): State => {
   switch (action.type) {
+    case "setSpaceId": {
+      return set({ ...state }, "resource.spaceId", action.spaceId);
+    }
     case "setResourceName": {
-      return set({ ...state }, `resource.name.[${action.lang}]`, action.name);
+      return set(
+        { ...state },
+        `resource.name${startCase(action.lang)}`,
+        action.name
+      );
     }
     case "setResourceDescription": {
       return set(
         { ...state },
-        `resource.description.[${action.lang}]`,
+        `resource.description${startCase(action.lang)}`,
         action.description
       );
     }
@@ -70,13 +83,9 @@ const reducer = (state: State, action: Action): State => {
 const UnitInfo = styled.div`
   margin: var(--spacing-m) 0;
   display: flex;
-  padding-bottom: var(--spacing-m);
   gap: var(--spacing-m);
-  border-bottom: 1px solid var(--color-black);
 `;
-const Name = styled.div`
-  margin: 0 0 var(--spacing-m) 0;
-`;
+const Name = styled.div``;
 
 const Address = styled.span`
   font-family: var(--tilavaraus-admin-font-bold);
@@ -117,9 +126,17 @@ const NewResourceModal = ({
   unit,
   closeModal,
   onSave,
+  spaceId,
+  spaces,
 }: IProps): JSX.Element | null => {
   const [editorState, dispatch] = useReducer(reducer, initialState);
   const { t } = useTranslation();
+
+  useEffect(() => {
+    if (spaceId) {
+      dispatch({ type: "setSpaceId", spaceId });
+    }
+  }, [spaceId]);
 
   const [createResourceMutation] = useMutation<
     { createResource: ResourceCreateMutationPayload },
@@ -131,13 +148,38 @@ const NewResourceModal = ({
   ): Promise<FetchResult<{ createResource: ResourceCreateMutationPayload }>> =>
     createResourceMutation({ variables: { input } });
 
-  const saveEnabled =
-    editorState.resource.name.fi &&
-    editorState.resource.name.sv &&
-    editorState.resource.name.en &&
-    editorState.resource.description.fi &&
-    editorState.resource.description.sv &&
-    editorState.resource.description.en;
+  const saveAsReadyEnabled =
+    editorState.resource.nameFi &&
+    editorState.resource.nameSv &&
+    editorState.resource.nameEn &&
+    editorState.resource.descriptionFi &&
+    editorState.resource.descriptionSv &&
+    editorState.resource.descriptionEn;
+
+  const editDisabled = !editorState.resource.spaceId;
+
+  const create = async (resource: ResourceCreateMutationInput) => {
+    try {
+      const { data } = await createResource({
+        ...resource,
+        locationType: "fixed",
+      });
+
+      if (data?.createResource.errors === null) {
+        onSave();
+        closeModal();
+        dispatch({
+          type: "setError",
+          error: t("ResourceModal.saveError"),
+        });
+      }
+    } catch (error) {
+      dispatch({
+        type: "setError",
+        error: t("ResourceModal.saveError"),
+      });
+    }
+  };
 
   return (
     <>
@@ -159,9 +201,22 @@ const NewResourceModal = ({
             <Address>{parseAddress(unit.location)}</Address>
           ) : null}
         </UnitInfo>
+        <Select
+          id="space"
+          required
+          label={t("ResourceModal.selectSpace")}
+          placeholder={t("common.select")}
+          options={[
+            ...spaces.map((s) => ({ label: s.name, value: s.pk as number })),
+          ]}
+          onChange={(v: { label: string; value: number }) =>
+            dispatch({ type: "setSpaceId", spaceId: v.value })
+          }
+        />
         <EditorContainer>
           {languages.map((lang) => (
             <TextInput
+              disabled={editDisabled}
               key={lang}
               required
               id={`name.${lang}`}
@@ -182,6 +237,7 @@ const NewResourceModal = ({
           <EditorColumns>
             {languages.map((lang) => (
               <TextArea
+                disabled={editDisabled}
                 key={lang}
                 required
                 id={`description.${lang}`}
@@ -207,19 +263,19 @@ const NewResourceModal = ({
           {t("ResourceModal.cancel")}
         </Button>
         <SaveButton
-          disabled={!saveEnabled}
+          disabled={editDisabled}
+          onClick={() => {
+            create({ ...editorState.resource, isDraft: true });
+          }}
+          variant="secondary"
+        >
+          {t("ResourceModal.saveAsDraft")}
+        </SaveButton>
+        <SaveButton
+          disabled={!saveAsReadyEnabled}
           loadingText={t("ResourceModal.saving")}
           onClick={async () => {
-            try {
-              await createResource(editorState.resource);
-              onSave();
-              closeModal();
-            } catch (error) {
-              dispatch({
-                type: "setError",
-                error: t("ResourceModal.saveError"),
-              });
-            }
+            create({ ...editorState.resource, isDraft: false });
           }}
         >
           {t("ResourceModal.save")}

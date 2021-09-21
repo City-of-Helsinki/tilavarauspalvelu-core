@@ -13,6 +13,7 @@ import DataTable, { CellConfig } from "../DataTable";
 import PopupMenu from "./PopupMenu";
 import ConfirmationDialog, { ModalRef } from "../ConfirmationDialog";
 import { DELETE_RESOURCE } from "../../common/queries";
+import { localizedValue } from "../../common/util";
 
 interface IProps {
   resources: Resource[];
@@ -59,7 +60,7 @@ const ResourcesTable = ({
         title: "Resource.name",
         key: `name.${i18n.language}`,
         transform: ({ name }: Resource) => (
-          <Name>{trim(name[i18n.language]) + t("")}</Name>
+          <Name>{trim(localizedValue(name, i18n.language))}</Name>
         ),
       },
       {
@@ -75,7 +76,7 @@ const ResourcesTable = ({
       {
         title: "Resource.type",
         key: "type",
-        transform: ({ name, id, resourceType }: Resource) => (
+        transform: ({ name, pk, resourceType }: Resource) => (
           <ResourceType>
             <ResourceTypeName>{resourceType}</ResourceTypeName>
             <PopupMenu
@@ -94,14 +95,14 @@ const ResourcesTable = ({
                       id: "confirmation-modal",
                       open: true,
                       heading: t("ResourceTable.removeConfirmationTitle", {
-                        name: name[i18n.language],
+                        name: localizedValue(name, i18n.language),
                       }),
                       content: t("ResourceTable.removeConfirmationMessage"),
                       acceptLabel: t("ResourceTable.removeConfirmationAccept"),
                       cancelLabel: t("ResourceTable.removeConfirmationCancel"),
                       onAccept: async () => {
                         try {
-                          await deleteResource(id);
+                          await deleteResource(pk);
                           onDelete(t("ResourceTable.remove.success"));
                         } catch (error) {
                           onDataError(t("ResourceTable.removeFailed"));

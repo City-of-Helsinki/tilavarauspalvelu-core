@@ -273,11 +273,14 @@ export const describeArc = (
 };
 
 export const localizedValue = (
-  name: TranslationObject | undefined,
+  name: TranslationObject | string | undefined,
   lang: string
 ): string => {
   if (!name) {
     return "???";
+  }
+  if (typeof name === "string") {
+    return name;
   }
 
   return name[lang as LocalizationLanguages] || "???";

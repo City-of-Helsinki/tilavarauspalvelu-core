@@ -154,6 +154,13 @@ export const UNIT_QUERY = gql`
       }
       spaces {
         pk
+        name
+        maxPersons
+        surfaceArea
+        resources {
+          pk
+          name
+        }
       }
       location {
         addressStreet
@@ -167,11 +174,115 @@ export const UNIT_QUERY = gql`
   }
 `;
 
-// WIP, no api yet
+export const UNIT_WITH_SPACES_AND_RESOURCES = gql`
+  query unit($pk: Int) {
+    unitByPk(pk: $pk) {
+      pk
+      name
+      spaces {
+        pk
+        name
+        maxPersons
+        surfaceArea
+        resources {
+          pk
+          name
+        }
+      }
+      location {
+        addressStreet
+        addressZip
+        addressCity
+      }
+    }
+  }
+`;
+
+// WIP, incomplete
+export const RESERVATIONUNIT_QUERY = gql`
+  query reservationUnit($pk: Int) {
+    reservationUnitByPk(pk: $pk) {
+      name
+      description
+      spaces {
+        pk
+        name
+      }
+      resources {
+        pk
+        name
+      }
+      services {
+        pk
+        name
+      }
+      purposes {
+        pk
+        name
+      }
+      reservationUnitType {
+        pk
+        name
+      }
+      requireIntroduction
+      termsOfUse
+      contactInformation
+      maxReservationDuration
+      minReservationDuration
+      images {
+        imageType
+        imageUrl
+      }
+      pk
+      location {
+        addressStreet
+        addressZip
+        addressCity
+        longitude
+        latitude
+      }
+      equipment {
+        pk
+        name
+      }
+      unit {
+        pk
+      }
+      maxPersons
+      surfaceArea
+    }
+  }
+`;
+
+// WIP api incomplete
+export const UPDATE_RESERVATION_UNIT = gql`
+  mutation updateReservationUnit($input: ReservationUnitUpdateMutationInput!) {
+    updateReservationUnit(input: $input) {
+      pk
+      errors {
+        field
+        messages
+      }
+    }
+  }
+`;
+
+// WIP api incomplete
+export const CREATE_RESERVATION_UNIT = gql`
+  mutation createReservationUnit($input: ReservationUnitCreateMutationInput!) {
+    createReservationUnit(input: $input) {
+      id
+      errors {
+        field
+        messages
+      }
+    }
+  }
+`;
+
 export const CREATE_RESOURCE = gql`
   mutation createResource($input: ResourceCreateMutationInput!) {
-    createSpace(input: $input) {
-      id
+    createResource(input: $input) {
       errors {
         field
         messages
@@ -185,10 +296,7 @@ export const DELETE_RESOURCE = gql`
   mutation deleteResource($input: ResourceDeleteMutationInput!) {
     deleteResource(input: $input) {
       deleted
-      errors {
-        field
-        messages
-      }
+      errors
     }
   }
 `;
@@ -206,6 +314,11 @@ export const SPACE_QUERY = gql`
         pk
         name
         description
+        location {
+          addressStreet
+          addressZip
+          addressCity
+        }
       }
       parent {
         pk

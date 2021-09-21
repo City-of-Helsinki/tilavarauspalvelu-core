@@ -104,7 +104,7 @@ const getCellConfig = (
     index: "id",
     sorting: "name",
     order: "asc",
-    rowLink: ({ id }: Resource) => `/resources/${id}`,
+    rowLink: ({ pk }: Resource) => `/resources/${pk}`,
   };
 };
 
