@@ -1,5 +1,37 @@
 [
   {
+    "id": 36,
+    "name": "Pukinmäen nuorisotalon sali",
+    "images": [
+      {
+        "imageUrl": "http://localhost:8000/media/reservation_unit_images/lavenderhouse_1-x_large.jpg",
+        "smallUrl": "http://localhost:8000/media/reservation_unit_images/lavenderhouse_1-x_large.jpg.250x250_q85_crop.jpg",
+        "imageType": "MAIN"
+      },
+      {
+        "imageUrl": "http://localhost:8000/media/reservation_unit_images/external-content.duckduckgo.jpg",
+        "smallUrl": "http://localhost:8000/media/reservation_unit_images/external-content.duckduckgo.jpg.250x250_q85_crop.jpg",
+        "imageType": "OTHER"
+      },
+      {
+        "imageUrl": "http://localhost:8000/media/reservation_unit_images/575479-L.jpg",
+        "smallUrl": "http://localhost:8000/media/reservation_unit_images/575479-L.jpg.250x250_q85_crop.jpg",
+        "imageType": "OTHER"
+      }
+    ],
+    "building": {
+      "id": 7,
+      "name": "Pukinmäen nuorisotalo"
+    },
+    "reservationUnitType": {
+      "name": "Nuorisopalvelut"
+    },
+    "maxPersons": 60,
+    "location": {
+      "addressStreet": "Säterintie 2"
+    }
+  },
+  {
     "id": 48,
     "name": "Arabian nuorisotalon sali",
     "images": [],
@@ -349,38 +381,6 @@
     "maxPersons": 18,
     "location": {
       "addressStreet": "Messitytönkatu 4"
-    }
-  },
-  {
-    "id": 36,
-    "name": "Pukinmäen nuorisotalon sali",
-    "images": [
-      {
-        "imageUrl": "http://localhost:8000/media/reservation_unit_images/lavenderhouse_1-x_large.jpg",
-        "smallUrl": "http://localhost:8000/media/reservation_unit_images/lavenderhouse_1-x_large.jpg.250x250_q85_crop.jpg",
-        "imageType": "MAIN"
-      },
-      {
-        "imageUrl": "http://localhost:8000/media/reservation_unit_images/external-content.duckduckgo.jpg",
-        "smallUrl": "http://localhost:8000/media/reservation_unit_images/external-content.duckduckgo.jpg.250x250_q85_crop.jpg",
-        "imageType": "OTHER"
-      },
-      {
-        "imageUrl": "http://localhost:8000/media/reservation_unit_images/575479-L.jpg",
-        "smallUrl": "http://localhost:8000/media/reservation_unit_images/575479-L.jpg.250x250_q85_crop.jpg",
-        "imageType": "OTHER"
-      }
-    ],
-    "building": {
-      "id": 7,
-      "name": "Pukinmäen nuorisotalo"
-    },
-    "reservationUnitType": {
-      "name": "Nuorisopalvelut"
-    },
-    "maxPersons": 60,
-    "location": {
-      "addressStreet": "Säterintie 2"
     }
   }
 ]

@@ -67,7 +67,7 @@ const SearchGuides = (): JSX.Element => {
         cardAlignment="left"
         cardLayout="hover"
         color="primary"
-        src="main.jpg"
+        src="images/guide-single.png"
       >
         <InfoContainer>
           <div>
@@ -89,7 +89,7 @@ const SearchGuides = (): JSX.Element => {
         cardAlignment="right"
         cardLayout="hover"
         color="secondary"
-        src="main.jpg"
+        src="images/guide-recurring.png"
       >
         <InfoContainer>
           <div>

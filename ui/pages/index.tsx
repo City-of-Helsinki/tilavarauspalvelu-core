@@ -78,6 +78,7 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
 
 const DesktopStyledKoros = styled(StyledKoros)`
   display: none;
+  margin-top: -54px;
 
   @media (min-width: ${breakpoint.m}) {
     display: block;

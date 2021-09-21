@@ -10,6 +10,19 @@ interface HeadProps {
   text: string;
 }
 
+const Wrapper = styled.div`
+  width: 100%;
+
+  @media (min-width: ${breakpoint.m}) {
+    background-image: url("images/hero-front@1x.jpg");
+    background-size: cover;
+
+    @media (-webkit-min-device-pixel-ratio: 2) {
+      background-image: url("images/hero-front@2x.jpg");
+    }
+  }
+`;
+
 const Content = styled.div`
   font-size: var(--fontsize-body-xl);
   background-color: var(--tilavaraus-header-background-color);
@@ -21,7 +34,8 @@ const Content = styled.div`
     max-width: var(--container-width-xl);
     padding: var(--spacing-layout-xl) var(--spacing-m) var(--spacing-3-xl);
     justify-content: center;
-    margin: 0 auto var(--spacing-2-xl) auto;
+    margin: 0 auto;
+    padding-bottom: var(--spacing-layout-2-xl);
   }
 `;
 
@@ -31,8 +45,7 @@ const Box = styled.div`
 
   @media (min-width: ${breakpoint.m}) {
     text-align: center;
-    background-color: var(--color-black);
-    opacity: 0.75;
+    background-color: rgba(0, 0, 0, 0.75);
     max-width: 742px;
     color: var(--color-white);
     padding: var(--spacing-l) var(--spacing-3-xl) var(--spacing-3-xl);
@@ -107,26 +120,28 @@ const Head = (props: HeadProps): JSX.Element => {
   };
 
   return (
-    <Content>
-      <Box>
-        <H1>{props.heading}</H1>
-        <p>{props.text}</p>
-        <form onSubmit={(e) => handleSubmit(e)}>
-          <StyledTextInput
-            id="searchInput--frontpage"
-            placeholder={t("head.searchPlaceholder")}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            label={
-              <SubmitIcon
-                size="m"
-                onClick={(e) => handleSubmit(e)}
-                $active={!!searchTerm}
-              />
-            }
-          />
-        </form>
-      </Box>
-    </Content>
+    <Wrapper>
+      <Content>
+        <Box>
+          <H1>{props.heading}</H1>
+          <p>{props.text}</p>
+          <form onSubmit={(e) => handleSubmit(e)}>
+            <StyledTextInput
+              id="searchInput--frontpage"
+              placeholder={t("head.searchPlaceholder")}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              label={
+                <SubmitIcon
+                  size="m"
+                  onClick={(e) => handleSubmit(e)}
+                  $active={!!searchTerm}
+                />
+              }
+            />
+          </form>
+        </Box>
+      </Content>
+    </Wrapper>
   );
 };
 
