@@ -17,6 +17,7 @@ import { localizedValue } from "../../common/util";
 
 interface IProps {
   resources: Resource[];
+  hasSpaces: boolean;
   onDelete: (text?: string) => void;
   onDataError: (error: string) => void;
 }
@@ -37,6 +38,7 @@ const ResourceTypeName = styled.span``;
 
 const ResourcesTable = ({
   resources,
+  hasSpaces,
   onDelete,
   onDataError,
 }: IProps): JSX.Element => {
@@ -136,7 +138,7 @@ const ResourcesTable = ({
         displayHeadings={false}
         cellConfig={cellConfig}
         filterConfig={[]}
-        noResultsKey="Unit.noResources"
+        noResultsKey={hasSpaces ? "Unit.noResources" : "Unit.noResourcesSpaces"}
       />
       <ConfirmationDialog open={false} id="confirmation-dialog" ref={modal} />
     </Wrapper>

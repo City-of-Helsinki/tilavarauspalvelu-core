@@ -309,6 +309,7 @@ const SpacesResources = (): JSX.Element | null => {
         </TableHead>
       </WideContainer>
       <ResourcesTable
+        hasSpaces={state.unit.spaces.length > 0}
         resources={resources}
         onDelete={onDeleteSpaceSuccess}
         onDataError={onDataError}

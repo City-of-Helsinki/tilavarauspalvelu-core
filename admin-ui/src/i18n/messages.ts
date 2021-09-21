@@ -703,6 +703,9 @@ const translations: ITranslations = {
     resources: ["Resurssit"],
     addResource: ["Uusi resurssi"],
     noResources: ["Ei vielä resursseja"],
+    noResourcesSpaces: [
+      "Lisää ensin tila ja sen jälkeen voit luoda resursseja",
+    ],
     newSpacesCreatedTitle: ["Uudet tilat luotu onnistuneesti"],
     newSpacesCreatedNotification: [
       "Voit luoda tiloille alitiloja niin pitkälle kuin on tarpeellista.",
