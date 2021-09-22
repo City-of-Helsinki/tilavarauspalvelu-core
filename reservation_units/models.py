@@ -156,6 +156,13 @@ class ReservationUnit(models.Model):
 
     uuid = models.UUIDField(default=uuid.uuid4, null=False, editable=False, unique=True)
 
+    is_draft = models.BooleanField(
+        default=False,
+        verbose_name=_("Is this in draft state"),
+        blank=True,
+        db_index=True,
+    )
+
     def __str__(self):
         return "{}".format(self.name)
 
