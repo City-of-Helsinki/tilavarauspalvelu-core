@@ -23,6 +23,8 @@ from api.graphql.reservation_units.reservation_unit_mutations import (
     ReservationUnitUpdateMutation,
 )
 from api.graphql.reservation_units.reservation_unit_types import (
+    EquipmentCategoryType,
+    EquipmentType,
     KeywordCategoryType,
     KeywordGroupType,
     KeywordType,
@@ -44,6 +46,10 @@ from api.graphql.spaces.space_mutations import (
 from api.graphql.spaces.space_types import SpaceType
 from api.graphql.units.unit_mutations import UnitUpdateMutation
 from api.graphql.units.unit_types import UnitByPkType, UnitType
+from permissions.api_permissions.drf_permissions import (
+    EquipmentCategoryPermission,
+    EquipmentPermission,
+)
 from permissions.api_permissions.graphene_permissions import (
     KeywordPermission,
     ReservationUnitPermission,
@@ -51,7 +57,7 @@ from permissions.api_permissions.graphene_permissions import (
     SpacePermission,
     UnitPermission,
 )
-from reservation_units.models import ReservationUnit
+from reservation_units.models import Equipment, EquipmentCategory, ReservationUnit
 from reservations.forms import ReservationForm
 from resources.models import Resource
 from spaces.models import Space, Unit
@@ -106,6 +112,20 @@ class KeywordFilter(AuthFilter):
     )
 
 
+class EquipmentFilter(AuthFilter):
+    permission_classes = (
+        (EquipmentPermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
+    )
+
+
+class EquipmentCategoryFilter(AuthFilter):
+    permission_classes = (
+        (EquipmentCategoryPermission,)
+        if not settings.TMP_PERMISSIONS_DISABLED
+        else (AllowAny,)
+    )
+
+
 class Query(graphene.ObjectType):
     reservation_units = ReservationUnitsFilter(
         ReservationUnitType, filterset_class=ReservationUnitsFilterSet
@@ -116,6 +136,14 @@ class Query(graphene.ObjectType):
     resources = ResourcesFilter(ResourceType)
     resource = relay.Node.Field(ResourceType)
     resource_by_pk = Field(ResourceType, pk=graphene.Int())
+
+    equipments = EquipmentFilter(EquipmentType)
+    equipment = relay.Node.Field((EquipmentType))
+    equipment_by_pk = Field(EquipmentType, pk=graphene.Int())
+
+    equipment_categories = EquipmentCategoryFilter(EquipmentCategoryType)
+    equipment_category = relay.Node.Field((EquipmentCategoryType))
+    equipment_category_by_pk = Field(EquipmentCategoryType, pk=graphene.Int())
 
     spaces = SpacesFilter(SpaceType)
     space = relay.Node.Field(SpaceType)
@@ -144,6 +172,14 @@ class Query(graphene.ObjectType):
     def resolve_space_by_pk(self, info, **kwargs):
         pk = kwargs.get("pk")
         return get_object_or_404(Space, pk=pk)
+
+    def resolve_equipment_by_pk(self, info, **kwargs):
+        pk = kwargs.get("pk")
+        return get_object_or_404(Equipment, pk=pk)
+
+    def resolve_equipment_category_by_pk(self, info, **kwargs):
+        pk = kwargs.get("pk")
+        return get_object_or_404(EquipmentCategory, pk=pk)
 
 
 class Mutation(graphene.ObjectType):
