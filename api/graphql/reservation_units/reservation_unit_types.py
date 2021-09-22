@@ -16,6 +16,8 @@ from api.graphql.spaces.space_types import LocationType, SpaceType
 from api.graphql.units.unit_types import UnitType
 from opening_hours.hauki_link_generator import generate_hauki_link
 from permissions.api_permissions.graphene_permissions import (
+    EquipmentCategoryPermission,
+    EquipmentPermission,
     ReservationUnitHaukiUrlPermission,
     ReservationUnitPermission,
 )
@@ -137,7 +139,13 @@ class ReservationUnitTypeType(PrimaryKeyObjectType):
         interfaces = (graphene.relay.Node,)
 
 
-class EquipmentCategoryType(PrimaryKeyObjectType):
+class EquipmentCategoryType(AuthNode, PrimaryKeyObjectType):
+    permission_classes = (
+        (EquipmentCategoryPermission,)
+        if not settings.TMP_PERMISSIONS_DISABLED
+        else (AllowAny,)
+    )
+
     class Meta:
         model = EquipmentCategory
         fields = ("name", "id")
@@ -145,8 +153,12 @@ class EquipmentCategoryType(PrimaryKeyObjectType):
         interfaces = (graphene.relay.Node,)
 
 
-class EquipmentType(PrimaryKeyObjectType):
+class EquipmentType(AuthNode, PrimaryKeyObjectType):
     category = graphene.Field(EquipmentCategoryType)
+
+    permission_classes = (
+        (EquipmentPermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
+    )
 
     class Meta:
         model = Equipment

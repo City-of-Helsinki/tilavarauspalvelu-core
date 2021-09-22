@@ -6,6 +6,8 @@ from graphql import ResolveInfo
 
 from permissions.helpers import (
     can_create_reservation,
+    can_manage_equipment,
+    can_manage_equipment_categories,
     can_manage_purposes,
     can_manage_resources,
     can_manage_spaces,
@@ -112,3 +114,23 @@ class KeywordPermission(BasePermission):
     @classmethod
     def has_mutation_permission(cls, root: Any, info: ResolveInfo, input: dict) -> bool:
         return False
+
+
+class EquipmentCategoryPermission(BasePermission):
+    @classmethod
+    def has_permission(self, info: ResolveInfo) -> bool:
+        return True
+
+    @classmethod
+    def has_mutation_permission(cls, root: Any, info: ResolveInfo, input: dict) -> bool:
+        return can_manage_equipment_categories(info.context.user)
+
+
+class EquipmentPermission(BasePermission):
+    @classmethod
+    def has_permission(self, info: ResolveInfo) -> bool:
+        return True
+
+    @classmethod
+    def has_mutation_permission(cls, root: Any, info: ResolveInfo, input: dict) -> bool:
+        return can_manage_equipment(info.context.user)

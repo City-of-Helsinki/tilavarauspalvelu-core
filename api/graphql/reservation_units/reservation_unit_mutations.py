@@ -1,26 +1,113 @@
 import graphene
 from django.conf import settings
+from graphene import ClientIDMutation
 from graphene_django.rest_framework.mutation import SerializerMutation
 from graphene_permissions.mixins import AuthMutation
 from graphene_permissions.permissions import AllowAny
 from rest_framework.generics import get_object_or_404
 
-from api.graphql.base_mutations import AuthSerializerMutation
+from api.graphql.base_mutations import AuthDeleteMutation, AuthSerializerMutation
 from api.graphql.reservation_units.reservation_unit_serializers import (
+    EquipmentCategoryCreateSerializer,
+    EquipmentCategoryUpdateSerializer,
+    EquipmentCreateSerializer,
+    EquipmentUpdateSerializer,
     PurposeCreateSerializer,
     PurposeUpdateSerializer,
     ReservationUnitCreateSerializer,
     ReservationUnitUpdateSerializer,
 )
 from api.graphql.reservation_units.reservation_unit_types import (
+    EquipmentCategoryType,
+    EquipmentType,
     PurposeType,
     ReservationUnitType,
 )
 from permissions.api_permissions.graphene_permissions import (
+    EquipmentCategoryPermission,
+    EquipmentPermission,
     PurposePermission,
     ReservationUnitPermission,
 )
-from reservation_units.models import Purpose
+from reservation_units.models import Equipment, EquipmentCategory, Purpose
+
+
+class EquipmentCreateMutation(AuthSerializerMutation, SerializerMutation):
+    equipment = graphene.Field(EquipmentType)
+
+    permission_classes = (
+        (EquipmentPermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
+    )
+
+    class Meta:
+        model_operations = ["create"]
+        serializer_class = EquipmentCreateSerializer
+
+
+class EquipmentUpdateMutation(AuthSerializerMutation, SerializerMutation):
+    equipment = graphene.Field(EquipmentType)
+
+    permission_classes = (
+        (EquipmentPermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
+    )
+
+    class Meta:
+        model_operations = ["update"]
+        lookup_field = "pk"
+        serializer_class = EquipmentUpdateSerializer
+
+
+class EquipmentDeleteMutation(AuthDeleteMutation, ClientIDMutation):
+    permission_classes = (
+        (EquipmentPermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
+    )
+    model = Equipment
+
+    @classmethod
+    def validate(self, root, info, **input):
+        return None
+
+
+class EquipmentCategoryCreateMutation(AuthSerializerMutation, SerializerMutation):
+    equipment_category = graphene.Field(EquipmentCategoryType)
+
+    permission_classes = (
+        (EquipmentCategoryPermission,)
+        if not settings.TMP_PERMISSIONS_DISABLED
+        else (AllowAny,)
+    )
+
+    class Meta:
+        model_operations = ["create"]
+        serializer_class = EquipmentCategoryCreateSerializer
+
+
+class EquipmentCategoryUpdateMutation(AuthSerializerMutation, SerializerMutation):
+    equipment_category = graphene.Field(EquipmentCategoryType)
+
+    permission_classes = (
+        (EquipmentCategoryPermission,)
+        if not settings.TMP_PERMISSIONS_DISABLED
+        else (AllowAny,)
+    )
+
+    class Meta:
+        model_operations = ["update"]
+        lookup_field = "pk"
+        serializer_class = EquipmentCategoryUpdateSerializer
+
+
+class EquipmentCategoryDeleteMutation(AuthDeleteMutation, ClientIDMutation):
+    permission_classes = (
+        (EquipmentCategoryPermission,)
+        if not settings.TMP_PERMISSIONS_DISABLED
+        else (AllowAny,)
+    )
+    model = EquipmentCategory
+
+    @classmethod
+    def validate(self, root, info, **input):
+        return None
 
 
 class PurposeCreateMutation(SerializerMutation, AuthMutation):
