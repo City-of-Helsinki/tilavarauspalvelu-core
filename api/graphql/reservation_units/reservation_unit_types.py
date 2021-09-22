@@ -150,10 +150,17 @@ class EquipmentCategoryType(AuthNode, PrimaryKeyObjectType):
         model = EquipmentCategory
         fields = ("name", "id")
 
+        filter_fields = {
+            "name": ["exact", "icontains", "istartswith"],
+        }
+
         interfaces = (graphene.relay.Node,)
 
 
 class EquipmentType(AuthNode, PrimaryKeyObjectType):
+    permission_classes = (
+        (EquipmentPermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
+    )
     category = graphene.Field(EquipmentCategoryType)
 
     permission_classes = (
@@ -163,6 +170,10 @@ class EquipmentType(AuthNode, PrimaryKeyObjectType):
     class Meta:
         model = Equipment
         fields = ("name", "id")
+
+        filter_fields = {
+            "name": ["exact", "icontains", "istartswith"],
+        }
 
         interfaces = (graphene.relay.Node,)
 
