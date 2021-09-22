@@ -4,7 +4,7 @@ from .models import Equipment, EquipmentCategory, Purpose, ReservationUnit
 
 
 class ReservationUnitTranslationOptions(TranslationOptions):
-    fields = ["name"]
+    fields = ["name", "description"]
 
 
 class PurposeTranslationOptions(TranslationOptions):
