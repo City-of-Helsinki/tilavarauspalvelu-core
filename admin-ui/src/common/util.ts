@@ -1,6 +1,7 @@
 import { format, parseISO } from "date-fns";
 import i18next from "i18next";
 import trim from "lodash/trim";
+import get from "lodash/get";
 import {
   AllocationResult,
   ApplicationEventSchedule,
@@ -8,6 +9,7 @@ import {
   ApplicationRound,
   ApplicationRoundStatus,
   ApplicationStatus,
+  DataFilterOption,
   LocalizationLanguages,
   Location,
   NormalizedApplicationRoundStatus,
@@ -271,11 +273,14 @@ export const describeArc = (
 };
 
 export const localizedValue = (
-  name: TranslationObject | undefined,
+  name: TranslationObject | string | undefined,
   lang: string
 ): string => {
   if (!name) {
     return "???";
+  }
+  if (typeof name === "string") {
+    return name;
   }
 
   return name[lang as LocalizationLanguages] || "???";
@@ -298,5 +303,31 @@ export const parseAddress = (location: Location): string => {
       location.addressCity || ""
     }`,
     ", "
+  );
+};
+
+export const isTranslationObject = (value: unknown): boolean => {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    ({}.propertyIsEnumerable.call(value, "fi") ||
+      {}.propertyIsEnumerable.call(value, "en") ||
+      {}.propertyIsEnumerable.call(value, "sv"))
+  );
+};
+
+export const parseAddressLine1 = (location: Location): string => {
+  return trim(`${location.addressStreet || ""}`);
+};
+
+export const parseAddressLine2 = (location: Location): string => {
+  return trim(`${location.addressZip || ""} ${location.addressCity || ""}`);
+};
+
+export const filterData = <T>(data: T[], filters: DataFilterOption[]): T[] => {
+  return data.filter(
+    (row) =>
+      filters.filter((filter) => get(row, filter.key) === filter.value)
+        .length === filters.length
   );
 };

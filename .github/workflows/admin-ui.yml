@@ -14,7 +14,9 @@ on:
       - "admin-ui/**"
       - ".github/workflows/admin-ui.yml"
   pull_request:
-    branches: [main]
+    branches:
+      - "main"
+      - "TILA-663"
     paths:
       - "admin-ui/**"
       - ".github/workflows/admin-ui.yml"
