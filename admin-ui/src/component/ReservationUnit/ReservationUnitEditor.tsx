@@ -63,6 +63,7 @@ type Action =
   | { type: "unitLoaded"; unit: UnitType }
   | { type: "editNew" }
   | { type: "dataInitializationError"; message: string }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   | { type: "set"; value: any }
   | { type: "setSpaces"; spaces: OptionType[] }
   | { type: "setResources"; resources: OptionType[] };
@@ -136,8 +137,6 @@ const modifyEditorState = (state: State, edit: any) => ({
 });
 
 const reducer = (state: State, action: Action): State => {
-  console.log(action.type);
-
   switch (action.type) {
     case "clearNotification": {
       return { ...state, notification: null };
@@ -439,8 +438,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
     }
   }, [reservationUnitId]);
 
-  console.log("rendering with", state);
-
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const setValue = (value: any) => {
     dispatch({ type: "set", value });
   };

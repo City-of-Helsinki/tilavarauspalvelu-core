@@ -3,7 +3,8 @@
     "baseUrl": "./",
     "target": "es5",
     "lib": ["esnext", "dom"],
-    "types": ["cypress", "cypress-axe"]
+    "types": ["cypress", "cypress-axe"],
+    "resolveJsonModule": true,
   },
-  "include": ["."]
+  "include": ["**/*.ts", "../mocks/*.ts"]
 }
