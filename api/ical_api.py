@@ -2,9 +2,8 @@ import datetime
 import hashlib
 import hmac
 import io
-from typing import Union
+from typing import Any, Union
 from urllib.parse import urlsplit
-from uuid import UUID
 
 from django.conf import settings
 from django.http import FileResponse, Http404
@@ -25,10 +24,10 @@ from reservation_units.models import ReservationUnit
 from reservations.models import Reservation
 
 
-def uuid_to_hmac_signature(uuid: UUID):
+def hmac_signature(value: Any) -> str:
     return hmac.new(
         key=settings.ICAL_HASH_SECRET.encode("utf-8"),
-        msg=str(uuid).encode("utf-8"),
+        msg=str(value).encode("utf-8"),
         digestmod=hashlib.sha256,
     ).hexdigest()
 
@@ -54,7 +53,7 @@ class ReservationUnitCalendarUrlSerializer(serializers.ModelSerializer):
             "reservation_unit_calendar-detail", kwargs={"pk": instance.id}
         )
 
-        return f"{scheme}://{get_host(request)}{calendar_url}?hash={uuid_to_hmac_signature(uuid=instance.uuid)}"
+        return f"{scheme}://{get_host(request)}{calendar_url}?hash={hmac_signature(instance.uuid)}"
 
 
 class ReservationUnitCalendarUrlViewSet(
@@ -83,7 +82,7 @@ class ReservationUnitIcalViewset(ViewSet):
 
         instance = self.get_object()
 
-        comparison_signature = uuid_to_hmac_signature(uuid=instance.uuid)
+        comparison_signature = hmac_signature(instance.uuid)
 
         if not hmac.compare_digest(comparison_signature, hash):
             raise ValidationError("invalid hash signature")

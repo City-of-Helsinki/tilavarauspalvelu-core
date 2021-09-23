@@ -5,7 +5,7 @@ import pytest
 from assertpy import assert_that
 from rest_framework.reverse import reverse
 
-from api.ical_api import uuid_to_hmac_signature
+from api.ical_api import hmac_signature
 
 
 @pytest.mark.django_db
@@ -31,7 +31,7 @@ def test_unit_group_admin_can_get_calendar_url(
     assert response.status_code == 200
     assert response.data.get("calendar_url") == (
         f"http://testserver/v1/reservation_unit_calendar/{reservation_unit.id}"
-        f"/?hash={uuid_to_hmac_signature(reservation_unit.uuid)}"
+        f"/?hash={hmac_signature(reservation_unit.uuid)}"
     )
 
 
@@ -56,7 +56,7 @@ def test_getting_reservation_unit_calendar(
     base_url = reverse(
         "reservation_unit_calendar-detail", kwargs={"pk": reservation_unit.id}
     )
-    url = f"{base_url}?hash={uuid_to_hmac_signature(reservation_unit.uuid)}"
+    url = f"{base_url}?hash={hmac_signature(reservation_unit.uuid)}"
     response = user_api_client.get(url)
     assert response.status_code == 200
     zip_content = (
@@ -97,7 +97,7 @@ def test_getting_reservation_unit_calendar_with_invalid_hash(
     base_url = reverse(
         "reservation_unit_calendar-detail", kwargs={"pk": reservation_unit.id}
     )
-    url = f"{base_url}?hash={uuid_to_hmac_signature(uuid.uuid4())}"
+    url = f"{base_url}?hash={hmac_signature(uuid.uuid4())}"
     response = user_api_client.get(url)
     assert response.status_code == 400
 
