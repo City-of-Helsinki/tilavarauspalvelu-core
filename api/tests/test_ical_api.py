@@ -157,3 +157,51 @@ def test_getting_application_event_should_give_404_when_not_found(
     )
 
     assert_that(response.status_code).is_equal_to(404)
+
+
+@pytest.mark.django_db
+def test_getting_reservation_calendar(
+    user_api_client,
+    reservation,
+    reservation_in_second_unit,
+    set_ical_secret,
+):
+    base_url = reverse("reservation_calendar-detail", kwargs={"pk": reservation.pk})
+    url = f"{base_url}?hash={hmac_signature(f'reservation-{reservation.pk}')}"
+    response = user_api_client.get(url)
+    assert response.status_code == 200
+    zip_content = (
+        io.BytesIO(b"".join(response.streaming_content)).read().decode("utf-8")
+    )
+
+    expected_start = (
+        f"DTSTART;VALUE=DATE-TIME:{reservation.begin.strftime('%Y%m%dT%H%M%SZ')}"
+    )
+    unexpected_start = f"DTSTART;VALUE=DATE-TIME:{reservation_in_second_unit.begin.strftime('%Y%m%dT%H%M%SZ')}"
+
+    assert_that(expected_start in zip_content).is_true()
+    assert_that(unexpected_start in zip_content).is_false()
+
+
+@pytest.mark.django_db
+def test_getting_reservation_calendar_without_hash(
+    user_api_client,
+    reservation,
+    set_ical_secret,
+):
+    response = user_api_client.get(
+        reverse("reservation_calendar-detail", kwargs={"pk": reservation.pk})
+    )
+    assert response.status_code == 400
+
+
+@pytest.mark.django_db
+def test_getting_reservation_calendar_with_invalid_hash(
+    user_api_client,
+    reservation,
+    set_ical_secret,
+):
+    base_url = reverse("reservation_calendar-detail", kwargs={"pk": reservation.pk})
+    url = f"{base_url}?hash={hmac_signature('this-does-not-exist')}"
+    response = user_api_client.get(url)
+    assert response.status_code == 400

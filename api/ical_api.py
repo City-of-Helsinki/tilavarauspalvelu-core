@@ -56,6 +56,40 @@ class ReservationUnitCalendarUrlSerializer(serializers.ModelSerializer):
         return f"{scheme}://{get_host(request)}{calendar_url}?hash={hmac_signature(instance.uuid)}"
 
 
+class ReservationIcalViewset(ViewSet):
+    queryset = Reservation.objects.all()
+
+    def get_object(self):
+        return Reservation.objects.get(pk=self.kwargs["pk"])
+
+    def retrieve(self, request, *args, **kwargs):
+        hash = request.query_params.get("hash", None)
+        if hash is None:
+            raise ValidationError("hash is required")
+
+        instance = self.get_object()
+        # We use a prefix for the value to sign, because using the plain integer PK
+        # could enable reusing the hashes for accessing other resources.
+        comparison_signature = hmac_signature(f"reservation-{instance.pk}")
+
+        if not hmac.compare_digest(comparison_signature, hash):
+            raise ValidationError("invalid hash signature")
+
+        buffer = io.BytesIO()
+        buffer.write(
+            export_reservation_events(
+                instance,
+                get_host(request),
+                reservation_unit_calendar(instance.reservation_unit),
+            ).to_ical()
+        )
+        buffer.seek(0)
+
+        return FileResponse(
+            buffer, as_attachment=True, filename="reservation_calendar.ics"
+        )
+
+
 class ReservationUnitCalendarUrlViewSet(
     viewsets.GenericViewSet,
     mixins.RetrieveModelMixin,
@@ -173,20 +207,25 @@ def export_reservation_unit_events(
 ):
     reservations = Reservation.objects.filter(reservation_unit=reserlation_unit)
     for reservation in reservations:
-        ical_event = Event()
-        ical_event.add(
-            "summary",
-            reservation.recurring_reservation.application_event.name
-            if reservation.recurring_reservation
-            else "",
-        )
-        ical_event.add("dtstart", reservation.begin)
-        ical_event.add("dtend", reservation.end)
-        ical_event.add("dtstamp", datetime.datetime.now())
-        ical_event.add("description", reservation.get_ical_description())
-        ical_event.add("location", reservation.get_location_string())
-        ical_event["uid"] = "%s.event.events.%s" % (reservation.id, site_name)
-        cal.add_component(ical_event)
+        export_reservation_events(reservation, site_name, cal)
+    return cal
+
+
+def export_reservation_events(reservation: Reservation, site_name: str, cal: Calendar):
+    ical_event = Event()
+    ical_event.add(
+        "summary",
+        reservation.recurring_reservation.application_event.name
+        if reservation.recurring_reservation
+        else "",
+    )
+    ical_event.add("dtstart", reservation.begin)
+    ical_event.add("dtend", reservation.end)
+    ical_event.add("dtstamp", datetime.datetime.now())
+    ical_event.add("description", reservation.get_ical_description())
+    ical_event.add("location", reservation.get_location_string())
+    ical_event["uid"] = f"{reservation.pk}.event.events.{site_name}"
+    cal.add_component(ical_event)
     return cal
 
 
