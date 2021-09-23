@@ -15,6 +15,7 @@ from permissions.helpers import (
     can_manage_units_reservation_units,
     can_view_reservations,
 )
+from reservation_units.models import ReservationUnit
 from reservations.models import Reservation
 from spaces.models import Unit
 
@@ -41,7 +42,15 @@ class ReservationUnitPermission(BasePermission):
 
     @classmethod
     def has_mutation_permission(cls, root: Any, info: ResolveInfo, input: dict) -> bool:
-        unit = Unit.objects.filter(id=input["unit_id"]).first()
+        unit_id = input.get("unit_id")
+        pk = input.get("pk")
+        if not unit_id:
+            unit_id = getattr(
+                ReservationUnit.objects.filter(pk=pk).first(), "unit_id", None
+            )
+        if not unit_id:
+            return False
+        unit = Unit.objects.filter(id=unit_id).first()
         return can_manage_units_reservation_units(info.context.user, unit)
 
 
