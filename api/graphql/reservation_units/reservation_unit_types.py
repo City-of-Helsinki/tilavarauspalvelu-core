@@ -215,6 +215,9 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
             "contact_information",
             "max_reservation_duration",
             "min_reservation_duration",
+            "is_draft",
+            "surface_area",
+            "buffer_time_between_reservations",
         )
         filter_fields = {
             "name": ["exact", "icontains", "istartswith"],
@@ -258,7 +261,10 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
         return self.unit
 
     def resolve_max_persons(self, info):
-        return self.get_max_persons()
+        if not self.max_persons:
+            # Gets the max persons from spaces.
+            return self.get_max_persons()
+        return self.max_persons
 
     def resolve_surface_area(self, info):
         surface_area = self.spaces.aggregate(total_surface_area=Sum("surface_area"))
