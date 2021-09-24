@@ -22,7 +22,7 @@ import { H1 } from "../../styles/typography";
 import { BasicLink, breakpoints } from "../../styles/util";
 import LinkPrev from "../LinkPrev";
 import Loader from "../Loader";
-import ReservationUnitList from "../ReservationUnit/ReservationUnitList";
+import ReservationUnitList from "./ReservationUnitList";
 import SecondaryNavigation from "../SecondaryNavigation";
 import withMainMenu from "../withMainMenu";
 import ExternalLink from "./ExternalLink";

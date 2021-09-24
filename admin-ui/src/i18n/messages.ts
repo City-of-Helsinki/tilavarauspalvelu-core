@@ -165,6 +165,7 @@ const translations: ITranslations = {
     spaceAndHobbyTypes: ["Tila- ja harrastetyypit"],
     applicationRounds: ["Hakukierrokset"],
     conditionsAndAttachments: ["Ehdot ja liitteet"],
+    reservationUnits: ["Varausyksiköt"],
     spaces: ["Tilat"],
     resources: ["Resurssit"],
     units: ["Toimipisteet"],
@@ -783,6 +784,21 @@ const translations: ITranslations = {
     removeConfirmationAccept: ["Poista"],
     removeConfirmationCancel: ["Kumoa"],
     removeFailed: ["Tilan poistaminen ei onnistunut."],
+  },
+  ReservationUnits: {
+    reservationUnitListHeading: ["Kaikki julkaistut varausyksiköt"],
+    reservationUnitListDescription: [
+      "Täällä näet koosteen kaikista varausyksiköistä, joita on liitetty järjestelmään ja jotka sinulla on oikeus nähdä. Uusia varausyksiköitä luodaan toimipisteisiin tai alueisiin liittyen.",
+    ],
+    searchPlaceHolder: ["Hae varausyksiköitä"],
+    headings: {
+      name: ["Nimi"],
+      unitName: ["Toimipiste"],
+      district: ["Kaupunginosa"],
+      reservationUnitType: ["Tilatyyppi"],
+      maxPersons: ["Maksimihenkilömäärä"],
+      surfaceArea: ["Pinta-ala"],
+    },
   },
   ReservationUnitCard: {
     spaceOnly: ["Tila"],

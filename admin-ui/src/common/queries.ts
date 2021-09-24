@@ -53,6 +53,27 @@ export const RESOURCES_QUERY = gql`
   }
 `;
 
+export const RESERVATION_UNITS_QUERY = gql`
+  query reservationUnits {
+    reservationUnits {
+      edges {
+        node {
+          pk
+          name
+          unit {
+            name
+          }
+          reservationUnitType {
+            name
+          }
+          maxPersons
+          surfaceArea
+        }
+      }
+    }
+  }
+`;
+
 export const CREATE_SPACE = gql`
   mutation createSpace($input: SpaceCreateMutationInput!) {
     createSpace(input: $input) {
