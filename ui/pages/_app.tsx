@@ -1,8 +1,10 @@
 import React from "react";
 import { appWithTranslation } from "next-i18next";
 import dynamic from "next/dynamic";
+import { ApolloProvider } from "@apollo/client";
 import { format } from "date-fns";
 import { AppProps } from "next/app";
+import apolloClient from "../modules/apolloClient";
 import SessionLost from "../components/common/SessionLost";
 import PageWrapper from "../components/common/PageWrapper";
 import { authEnabled, isBrowser, mockRequests } from "../modules/const";
@@ -21,9 +23,11 @@ if (mockRequests) {
 function MyApp({ Component, pageProps }: AppProps) {
   if (!isBrowser) {
     return (
-      <PageWrapper>
-        <Component {...pageProps} />
-      </PageWrapper>
+      <ApolloProvider client={apolloClient}>
+        <PageWrapper>
+          <Component {...pageProps} />
+        </PageWrapper>
+      </ApolloProvider>
     );
   }
 
@@ -44,9 +48,11 @@ function MyApp({ Component, pageProps }: AppProps) {
         isEnabled={authEnabled}
         callbackComponentOverride={LoggingIn}
       >
-        <PageWrapper>
-          <Component {...pageProps} />
-        </PageWrapper>
+        <ApolloProvider client={apolloClient}>
+          <PageWrapper>
+            <Component {...pageProps} />
+          </PageWrapper>
+        </ApolloProvider>
       </AuthenticationProvider>
     </TrackingWrapper>
   );

@@ -1,22 +1,69 @@
 import React, { useState, useEffect } from "react";
 import { Koros } from "hds-react";
 import { useTranslation } from "next-i18next";
+import { gql, useQuery } from "@apollo/client";
 import styled from "styled-components";
 import queryString from "query-string";
 import { useRouter } from "next/router";
+import { isEqual, omit } from "lodash";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Container from "../../components/common/Container";
 import Breadcrumb from "../../components/common/Breadcrumb";
 import SearchForm from "../../components/single-search/SearchForm";
 import SearchResultList from "../../components/single-search/SearchResultList";
-import {
-  getReservationUnits,
-  ReservationUnitsParameters,
-} from "../../modules/api";
-import { ReservationUnit } from "../../modules/types";
-import { searchUrl } from "../../modules/util";
+import { ReservationUnitsParameters } from "../../modules/api";
+import { singleSearchUrl } from "../../modules/util";
 import { isBrowser, searchPrefix } from "../../modules/const";
 import { CenterSpinner } from "../../components/common/common";
+
+const RESERVATION_UNITS = gql`
+  query SearchReservationUnits(
+    $search: String
+    $minPersons: Float
+    $maxPersons: Float
+    $unit: ID
+    $reservationUnitType: ID
+    $limit: Int
+    $after: String
+  ) {
+    reservationUnits(
+      textSearch: $search
+      maxPersonsGte: $minPersons
+      maxPersonsLte: $maxPersons
+      reservationUnitType: $reservationUnitType
+      unit: $unit
+      first: $limit
+      after: $after
+    ) {
+      edges {
+        node {
+          id: pk
+          name
+          reservationUnitType {
+            name
+          }
+          building: unit {
+            name
+          }
+          maxPersons
+          location {
+            addressStreet
+          }
+          images {
+            imageType
+            mediumUrl
+          }
+        }
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
+      }
+    }
+  }
+`;
+
+const pagingLimit = 10;
 
 const style = {
   fontSize: "var(--fontsize-heading-l)",
@@ -25,6 +72,10 @@ const style = {
 const HeadContainer = styled.div`
   background-color: white;
   padding-top: var(--spacing-layout-xs);
+`;
+
+const Heading = styled.h1`
+  margin: var(--spacing-l) 0 var(--spacing-s);
 `;
 
 const StyledKoros = styled(Koros)`
@@ -44,11 +95,19 @@ const Search = (): JSX.Element => {
   const { t } = useTranslation();
 
   const [values, setValues] = useState({} as Record<string, string>);
-  const [state, setState] = useState<"loading" | "done" | "error">("done");
 
-  const [reservationUnits, setReservationUnits] = useState<
-    ReservationUnit[] | null
-  >(null);
+  const { data, fetchMore, refetch, loading, error } = useQuery(
+    RESERVATION_UNITS,
+    {
+      variables: { ...values, limit: pagingLimit },
+      fetchPolicy: "network-only",
+    }
+  );
+
+  const reservationUnits = data?.reservationUnits?.edges?.map(
+    (edge) => edge.node
+  );
+  const pageInfo = data?.reservationUnits?.pageInfo;
 
   const searchParams = isBrowser ? window.location.search : "";
 
@@ -66,43 +125,59 @@ const Search = (): JSX.Element => {
         return p;
       }, {} as Record<string, string>);
 
-      setValues(newValues);
-      setState("loading");
-      getReservationUnits(newValues)
-        .then((v) => {
-          setReservationUnits(v);
-          setState("done");
-        })
-        .catch(() => {
-          setState("error");
-          setReservationUnits(null);
-        });
+      if (!isEqual(values, newValues)) {
+        setValues(newValues);
+      }
     }
-  }, [searchParams, setReservationUnits]);
+  }, [searchParams, values]);
 
   const history = useRouter();
 
   const onSearch = async (criteria: ReservationUnitsParameters) => {
-    history.replace(searchUrl(criteria));
+    history.replace(singleSearchUrl(criteria));
+    refetch(criteria);
+  };
+
+  const onRemove = (key: string[]) => {
+    const newValues = key ? omit(values, key) : {};
+    setValues(newValues);
+    history.replace(singleSearchUrl(newValues));
+    refetch(newValues);
   };
 
   return (
     <>
       <HeadContainer>
         <Container>
-          <Breadcrumb current={{ label: "search", linkTo: searchPrefix }} />
-          <h1 style={style}>{t("search:heading")}</h1>
-          <span className="text-lg">{t("search:text")}</span>
-          <SearchForm onSearch={onSearch} formValues={values} />
+          <Breadcrumb
+            root={{ label: "singleReservations" }}
+            current={{ label: "search", linkTo: searchPrefix }}
+          />
+          <Heading style={style}>{t("search:single.heading")}</Heading>
+          <span className="text-lg">{t("search:single.text")}</span>
+          <SearchForm
+            onSearch={onSearch}
+            formValues={values}
+            removeValue={onRemove}
+          />
         </Container>
       </HeadContainer>
       <StyledKoros type="wave" className="koros" flipHorizontal />
-      {state === "loading" ? (
-        <CenterSpinner />
+      {loading ? (
+        <CenterSpinner style={{ marginTop: "var(--spacing-xl)" }} />
       ) : (
         <SearchResultList
-          error={state === "error"}
+          error={!!error}
           reservationUnits={reservationUnits}
+          fetchMore={(after) => {
+            fetchMore({
+              variables: {
+                ...values,
+                after,
+              },
+            });
+          }}
+          pageInfo={pageInfo}
         />
       )}
     </>
