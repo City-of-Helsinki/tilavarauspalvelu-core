@@ -12,7 +12,7 @@ import {
 import { filterData } from "../../common/util";
 import FilterContainer, { FilterBtn } from "../FilterContainer";
 import FilterControls from "../FilterControls";
-import ReservationUnitCard from "./ReservationUnitCard";
+import ReservationUnitCard from "../ReservationUnits/ReservationUnitCard";
 import { ContentContainer } from "../../styles/layout";
 
 interface IProps {

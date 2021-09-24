@@ -550,6 +550,7 @@ export type ReservationUnitType = {
   description: string;
   requireIntroduction: boolean;
   images: Image[];
+  unit: ReservationUnitType;
   location: Location;
   reservationUnitType: ReservationUnitTypeType;
   purposes: PurposeType[];
