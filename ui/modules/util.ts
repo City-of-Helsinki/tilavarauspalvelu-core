@@ -176,7 +176,7 @@ export const getSelectedOption = (
   return option;
 };
 
-export const getComboboxOptions = (
+export const getComboboxValues = (
   value: string,
   options: OptionType[]
 ): OptionType[] => {

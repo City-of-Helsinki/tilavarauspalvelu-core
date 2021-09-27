@@ -40,9 +40,11 @@ const RESERVATION_UNITS = gql`
           id: pk
           name
           reservationUnitType {
+            id: pk
             name
           }
           building: unit {
+            id: pk
             name
           }
           maxPersons

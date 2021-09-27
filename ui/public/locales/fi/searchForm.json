@@ -26,5 +26,6 @@
   "removeSelection": "Poista valinta",
   "selectedElement": "Valinta",
   "openCombobox": "Avaa valintalaatikko",
-  "searchForValue": "Hae"
+  "searchForValue": "Hae",
+  "removeFilter": "Poista hakuehto \"{{value}}\""
 }

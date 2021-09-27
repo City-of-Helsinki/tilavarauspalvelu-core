@@ -80,6 +80,7 @@ const SearchResultList = ({
                 <PaginationButton
                   onClick={() => fetchMore(pageInfo.endCursor)}
                   iconLeft={<IconPlus />}
+                  data-test-id="search-form__pagination-button"
                 >
                   {t("common:showMore")}
                 </PaginationButton>

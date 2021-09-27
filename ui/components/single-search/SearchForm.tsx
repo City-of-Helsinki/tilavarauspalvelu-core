@@ -17,7 +17,7 @@ import { getParameters } from "../../modules/api";
 import {
   mapOptions,
   getSelectedOption,
-  getComboboxOptions,
+  getComboboxValues,
 } from "../../modules/util";
 import { emptyOption, participantCountOptions } from "../../modules/const";
 import { OptionType } from "../../modules/types";
@@ -41,9 +41,7 @@ const SEARCH_FORM_PARAMS = gql`
   }
 `;
 
-const Button = styled(HDSButton)`
-  margin-left: var(--spacing-m);
-`;
+const Button = styled(HDSButton)``;
 
 const Container = styled.div`
   margin-top: var(--spacing-l);
@@ -89,10 +87,6 @@ const Container = styled.div`
   }
 `;
 
-const StyledCombobox = styled(Combobox)`
-  z-index: 1000;
-`;
-
 const Group = styled.div<{ children: ReactNode[]; $gap?: string }>`
   display: grid;
   grid-template-columns: repeat(${({ children }) => children.length}, 1fr);
@@ -106,18 +100,22 @@ const Hr = styled.hr`
 const ButtonContainer = styled.div`
   margin-top: var(--spacing-l);
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
 `;
 
 const TagControls = styled.div`
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
 `;
 
 const Filters = styled.div`
   display: flex;
+  flex-wrap: wrap;
   gap: var(--spacing-s);
   margin-right: var(--spacing-m);
+  margin-bottom: var(--spacing-s);
 `;
 
 const ResetButton = styled.button`
@@ -131,6 +129,7 @@ const ResetButton = styled.button`
   border: 0;
   text-decoration: underline;
   background: transparent;
+  margin-bottom: var(--spacing-s);
 `;
 
 const SearchForm = ({
@@ -258,7 +257,7 @@ const SearchForm = ({
             "reservationUnitType"
           )}${reservationUnitTypeOptions.map((n) => n.value).join(",")}`}
         />
-        <StyledCombobox
+        <Combobox<OptionType>
           id="unitFilter"
           clearButtonAriaLabel={t("searchForm:clearSelections")}
           label={t("searchForm:unitFilter")}
@@ -273,8 +272,9 @@ const SearchForm = ({
           )} {value}`}
           selectedItemSrLabel={`${t("searchForm:selectedElement")} {value}`}
           toggleButtonAriaLabel={t("searchForm:openCombobox")}
-          defaultValue={getComboboxOptions(getValues("unit"), unitOptions)}
+          defaultValue={getComboboxValues(getValues("unit"), unitOptions)}
           key={`unit${getValues("unit")}`}
+          style={{ zIndex: 1 }}
         />
       </Container>
       <Hr />
@@ -282,18 +282,29 @@ const SearchForm = ({
         <TagControls>
           {Object.keys(formValues).length > 0 && (
             <>
-              <Filters>
-                {Object.keys(formValues).map((value) => (
-                  <Tag onDelete={() => removeValue([value])} key={value}>
-                    {t(`searchForm:filters.${value}`, {
-                      value: formValues[value],
-                    })}
-                  </Tag>
-                ))}
+              <Filters data-test-id="search-form__filter--tags">
+                {Object.keys(formValues).map((value) => {
+                  const label = t(`searchForm:filters.${value}`, {
+                    value: formValues[value],
+                  });
+                  return (
+                    <Tag
+                      id={`filter-tag__${value}`}
+                      onDelete={() => removeValue([value])}
+                      key={value}
+                      deleteButtonAriaLabel={t(`searchForm:removeFilter`, {
+                        value: label,
+                      })}
+                    >
+                      {label}
+                    </Tag>
+                  );
+                })}
               </Filters>
               <ResetButton
                 disabled={Object.keys(formValues).length < 1}
                 onClick={() => removeValue()}
+                data-test-id="search-form__reset-button"
               >
                 {t("searchForm:resetForm")}
               </ResetButton>
