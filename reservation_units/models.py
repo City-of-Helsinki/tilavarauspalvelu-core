@@ -156,6 +156,29 @@ class ReservationUnit(models.Model):
 
     uuid = models.UUIDField(default=uuid.uuid4, null=False, editable=False, unique=True)
 
+    is_draft = models.BooleanField(
+        default=False,
+        verbose_name=_("Is this in draft state"),
+        blank=True,
+        db_index=True,
+    )
+
+    max_persons = models.fields.PositiveIntegerField(
+        verbose_name=_("Maximum number of persons"), null=True, blank=True
+    )
+
+    surface_area = models.DecimalField(
+        verbose_name=_("Surface area"),
+        max_digits=10,
+        decimal_places=2,
+        blank=True,
+        null=True,
+    )
+
+    buffer_time_between_reservations = models.DurationField(
+        verbose_name=_("Buffer time between reservations"), blank=True, null=True
+    )
+
     def __str__(self):
         return "{}".format(self.name)
 

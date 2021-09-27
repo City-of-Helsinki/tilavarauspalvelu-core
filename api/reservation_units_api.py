@@ -212,7 +212,7 @@ class ReservationUnitViewSet(viewsets.ModelViewSet):
         filters.DjangoFilterBackend,
         drf_filters.SearchFilter,
     ]
-    ordering_fields = ["name", "max_persons"]
+    ordering_fields = ["name", "max_persons_sum"]
     filterset_class = ReservationUnitFilter
     search_fields = ["name"]
     permission_classes = (
@@ -223,7 +223,7 @@ class ReservationUnitViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         qs = (
-            ReservationUnit.objects.annotate(max_persons=Sum("spaces__max_persons"))
+            ReservationUnit.objects.annotate(max_persons_sum=Sum("spaces__max_persons"))
             .all()
             .prefetch_related("spaces", "resources", "services")
         )

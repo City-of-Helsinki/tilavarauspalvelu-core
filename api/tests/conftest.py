@@ -359,6 +359,11 @@ def valid_reservation_unit_data(unit, equipment_hammer):
             "en": "New reservation unit",
             "sv": "Nya reservation sak",
         },
+        "description": {
+            "fi": "Description",
+            "en": "",
+            "sv": "",
+        },
         "require_introduction": False,
         "terms_of_use": "Do not mess it up",
         "equipment_ids": [equipment_hammer.id],
