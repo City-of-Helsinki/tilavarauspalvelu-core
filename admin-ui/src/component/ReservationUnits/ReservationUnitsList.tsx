@@ -1,16 +1,9 @@
-import React, { useState, ChangeEvent } from "react";
-import {
-  IconArrowRight,
-  Notification,
-  TextInput,
-  IconSearch,
-  IconGroup,
-} from "hds-react";
+import React, { useState } from "react";
+import { IconArrowRight, Notification, IconSearch, IconGroup } from "hds-react";
 import { TFunction } from "i18next";
 import { uniq } from "lodash";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { useDebounce } from "react-use";
 import { useQuery, ApolloError } from "@apollo/client";
 
 import {
@@ -24,8 +17,7 @@ import withMainMenu from "../withMainMenu";
 import Loader from "../Loader";
 import DataTable, { CellConfig } from "../DataTable";
 import { localizedValue } from "../../common/util";
-import { breakpoints, Strong } from "../../styles/util";
-import ClearButton from "../ClearButton";
+import { BasicLink, Strong } from "../../styles/util";
 import { RESERVATION_UNITS_QUERY } from "../../common/queries";
 
 const Wrapper = styled.div`
@@ -33,36 +25,10 @@ const Wrapper = styled.div`
 `;
 
 const SearchContainer = styled.div`
-  display: grid;
-  align-items: center;
-  margin-top: var(--spacing-layout-xl);
-  margin-bottom: var(--spacing-layout-m);
-  position: relative;
-  width: 100%;
-
-  &&& input {
-    padding-right: var(--spacing-2-xl);
-    padding-left: var(--spacing-xl);
-  }
-
-  .searchIcon {
-    position: absolute;
-    left: 0;
-    z-index: 1;
-  }
-
-  @media (min-width: ${breakpoints.s}) {
-    width: 20rem;
-  }
+  margin: var(--spacing-layout-l) 0;
 `;
 
-const StyledInput = styled(TextInput).attrs({
-  style: {
-    "--border-width": "0",
-  } as React.CSSProperties,
-})``;
-
-const ResourceCount = styled.div`
+const ReservationUnitCount = styled.div`
   font-family: var(--tilavaraus-admin-font-bold);
   font-weight: 700;
   font-size: var(--fontsize-heading-s);
@@ -177,22 +143,15 @@ const getFilterConfig = (
 const ReservationUnitsList = (): JSX.Element => {
   const { t, i18n } = useTranslation();
 
-  const [resources, setResources] = useState<ReservationUnitType[]>([]);
+  const [reservationUnits, setReservationUnits] = useState<
+    ReservationUnitType[]
+  >([]);
   const [filterConfig, setFilterConfig] = useState<DataFilterConfig[] | null>(
     null
   );
   const [cellConfig, setCellConfig] = useState<CellConfig | null>(null);
-  const [searchTerm, setSearchTerm] = useState<string | null>(null);
-  const [searchValue, setSearchValue] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [, cancelTypeahead] = useDebounce(
-    () => {
-      setSearchTerm(searchValue);
-    },
-    300,
-    [searchValue]
-  );
 
   useQuery(RESERVATION_UNITS_QUERY, {
     onCompleted: (data) => {
@@ -200,7 +159,7 @@ const ReservationUnitsList = (): JSX.Element => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ({ node }: any) => node
       );
-      setResources(result);
+      setReservationUnits(result);
       setCellConfig(getCellConfig(t, i18n.language as LocalizationLanguages));
       setFilterConfig(getFilterConfig(result, t));
       setIsLoading(false);
@@ -225,25 +184,9 @@ const ReservationUnitsList = (): JSX.Element => {
     </Notification>;
   }
 
-  if (isLoading || !resources || !filterConfig || !cellConfig) {
+  if (isLoading || !reservationUnits || !filterConfig || !cellConfig) {
     return <Loader />;
   }
-
-  const filteredResources = searchTerm
-    ? resources.filter((reservationUnit: ReservationUnitType) => {
-        const searchTerms = searchTerm.toLowerCase().split(" ");
-        const { name } = reservationUnit;
-        const localizedName = localizedValue(name, i18n.language);
-        const unitName = reservationUnit.unit.name;
-
-        return searchTerms.every((term: string) => {
-          return (
-            localizedName.toLowerCase().includes(term) ||
-            String(unitName).toLowerCase().includes(term)
-          );
-        });
-      })
-    : resources;
 
   return (
     <Wrapper>
@@ -251,31 +194,17 @@ const ReservationUnitsList = (): JSX.Element => {
         <H1>{t("ReservationUnits.reservationUnitListHeading")}</H1>
         <p>{t("ReservationUnits.reservationUnitListDescription")}</p>
         <SearchContainer>
-          <IconSearch className="searchIcon" />
-          <StyledInput
-            id="resourcesSearch"
-            placeholder={t("ReservationUnits.searchPlaceHolder")}
-            onChange={(event: ChangeEvent<HTMLInputElement>) => {
-              cancelTypeahead();
-              setSearchValue(event.target.value);
-            }}
-            value={searchValue || ""}
-          />
-          {searchValue && (
-            <ClearButton
-              onClick={() => {
-                setSearchTerm(null);
-                setSearchValue(null);
-              }}
-            />
-          )}
+          <BasicLink to="/reservationUnits/search">
+            <IconSearch />
+            {t("ReservationUnits.switchToSearch")}
+          </BasicLink>
         </SearchContainer>
-        <ResourceCount>
-          {resources.length} {t("common.volumeUnit")}
-        </ResourceCount>
+        <ReservationUnitCount>
+          {reservationUnits.length} {t("common.volumeUnit")}
+        </ReservationUnitCount>
       </IngressContainer>
       <DataTable
-        groups={[{ id: 1, data: filteredResources }]}
+        groups={[{ id: 1, data: reservationUnits }]}
         hasGrouping={false}
         config={{ filtering: true, rowFilters: true }}
         cellConfig={cellConfig}

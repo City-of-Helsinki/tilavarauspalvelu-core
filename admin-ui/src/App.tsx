@@ -35,6 +35,7 @@ import SpaceEditor from "./component/Spaces/SpaceEditor";
 import ReservationUnitEditor from "./component/ReservationUnits/ReservationUnitEditor";
 import ResourcesList from "./component/Resources/ResourcesList";
 import ReservationUnitsList from "./component/ReservationUnits/ReservationUnitsList";
+import ReservationUnitsSearch from "./component/ReservationUnits/ReservationUnitsSearch";
 
 interface IPrivateRouteProps {
   path: string;
@@ -157,6 +158,11 @@ function App(): JSX.Element {
               <PrivateRoute
                 path="/reservationUnits"
                 component={ReservationUnitsList}
+                exact
+              />
+              <PrivateRoute
+                path="/reservationUnits/search"
+                component={ReservationUnitsSearch}
               />
               <PrivateRoute path="/resources" component={ResourcesList} />
               <PrivateRoute path="/units" component={Units} />
