@@ -18,6 +18,7 @@ from .declined_reservation_units_api import DeclinedReservationUnitViewSet
 from .hauki_api import OpeningHoursViewSet
 from .ical_api import (
     ApplicationEventIcalViewset,
+    ReservationIcalViewset,
     ReservationUnitCalendarUrlViewSet,
     ReservationUnitIcalViewset,
 )
@@ -90,6 +91,11 @@ router.register(
     r"reservation_unit_calendar",
     ReservationUnitIcalViewset,
     "reservation_unit_calendar",
+)
+router.register(
+    r"reservation_calendar",
+    ReservationIcalViewset,
+    "reservation_calendar",
 )
 
 
