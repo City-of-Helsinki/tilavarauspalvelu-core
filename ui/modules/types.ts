@@ -22,7 +22,6 @@ export type Space = {
   locationType: "fixed";
   name: TranslationObject;
   parentId: number;
-  buildingId: number;
   surfaceArea: null;
   districtId: number;
 };
