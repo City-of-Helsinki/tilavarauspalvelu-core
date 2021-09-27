@@ -95,6 +95,10 @@ export const SEARCH_RESERVATION_UNITS_QUERY = gql`
           reservationUnitType {
             name
           }
+          images {
+            imageType
+            mediumUrl
+          }
           maxPersons
           surfaceArea
         }
