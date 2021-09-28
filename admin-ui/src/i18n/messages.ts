@@ -790,7 +790,8 @@ const translations: ITranslations = {
     reservationUnitListDescription: [
       "Täällä näet koosteen kaikista varausyksiköistä, joita on liitetty järjestelmään ja jotka sinulla on oikeus nähdä. Uusia varausyksiköitä luodaan toimipisteisiin tai alueisiin liittyen.",
     ],
-    searchPlaceHolder: ["Hae varausyksiköitä"],
+    switchToSearch: ["Hae varausyksiköitä"],
+    switchToList: ["Selaa varausyksiköitä"],
     headings: {
       name: ["Nimi"],
       unitName: ["Toimipiste"],
@@ -799,6 +800,20 @@ const translations: ITranslations = {
       maxPersons: ["Maksimihenkilömäärä"],
       surfaceArea: ["Pinta-ala"],
     },
+  },
+  ReservationUnitsSearch: {
+    resultCount: ["{{count}} hakutulos"],
+    resultCount_plural: ["{{count}} hakutulosta"],
+    textSearchLabel: ["Hae varausyksikön nimellä"],
+    textSearchPlaceHolder: ["Varausyksikön nimi"],
+    maxPersonsLabel: ["Rajaa maksimihenkilömäärällä"],
+    maxPersonsGtePlaceHolder: ["Alin maksimi"],
+    maxPersonsLtePlaceHolder: ["Ylin maksimi"],
+    surfaceAreaLabel: ["Rajaa pinta-alalla"],
+    surfaceAreaLowPlaceHolder: ["Alin m²"],
+    surfaceAreaHighPlaceHolder: ["Ylin m²"],
+    notANumber: ["Ei ole numero"],
+    clear: ["Tyhjennä hakukriteerit"],
   },
   ReservationUnitCard: {
     spaceOnly: ["Tila"],

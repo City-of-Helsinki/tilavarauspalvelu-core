@@ -85,8 +85,8 @@ const ReservationUnitCard = ({
   const { t } = useTranslation();
 
   const image =
-    reservationUnit.images.find((i) => i.imageType === "main") ||
-    reservationUnit.images.find(() => true);
+    reservationUnit.images?.find((i) => i.imageType === "main") ||
+    reservationUnit.images?.find(() => true);
 
   return (
     <Wrapper>
