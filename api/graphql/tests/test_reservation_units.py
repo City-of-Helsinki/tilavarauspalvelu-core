@@ -22,6 +22,8 @@ from reservation_units.tests.factories import (
     ReservationUnitFactory,
     ReservationUnitTypeFactory,
 )
+from reservations.models import STATE_CHOICES
+from reservations.tests.factories import ReservationFactory
 from resources.tests.factories import ResourceFactory
 from services.tests.factories import ServiceFactory
 from spaces.tests.factories import SpaceFactory, UnitFactory
@@ -84,6 +86,11 @@ class ReservationUnitTestCase(GraphQLTestCase, snapshottest.TestCase):
                               name
                             }
                             contactInformation
+                            reservations {
+                              begin
+                              end
+                              state
+                            }
                           }
                         }
                     }
@@ -456,6 +463,89 @@ class ReservationUnitTestCase(GraphQLTestCase, snapshottest.TestCase):
 
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_empty()
+
+    def test_filtering_by_reservation_timestamps(self):
+        now = datetime.datetime.now().astimezone()
+        one_hour = datetime.timedelta(hours=1)
+        matching_reservation = ReservationFactory(
+            begin=now,
+            end=now + one_hour,
+            state=STATE_CHOICES.CREATED,
+        )
+        other_reservation = ReservationFactory(
+            begin=datetime.datetime(2021, 1, 1),
+            end=datetime.datetime(2021, 1, 2),
+        )
+        self.reservation_unit.reservation_set.set(
+            [matching_reservation, other_reservation]
+        )
+        self.reservation_unit.save()
+
+        response = self.query(
+            """
+            query {
+                reservationUnits {
+                    edges {
+                        node {
+                            name
+                            reservations(from: "2021-05-03T00:00:00Z", to: "2021-05-04T00:00:00Z") {
+                                begin
+                                end
+                                state
+                            }
+                        }
+                    }
+                }
+            }
+            """
+        )
+
+        content = json.loads(response.content)
+        assert_that(self.content_is_empty(content)).is_false()
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filtering_by_reservation_state(self):
+        now = datetime.datetime.now().astimezone()
+        one_hour = datetime.timedelta(hours=1)
+        matching_reservation = ReservationFactory(
+            begin=now,
+            end=now + one_hour,
+            state=STATE_CHOICES.CREATED,
+        )
+        other_reservation = ReservationFactory(
+            begin=now + one_hour,
+            end=now + one_hour + one_hour,
+            state=STATE_CHOICES.CANCELLED,
+        )
+        self.reservation_unit.reservation_set.set(
+            [matching_reservation, other_reservation]
+        )
+        self.reservation_unit.save()
+
+        response = self.query(
+            """
+            query {
+                reservationUnits {
+                    edges {
+                        node {
+                            name
+                            reservations(state: "CREATED") {
+                                begin
+                                end
+                                state
+                            }
+                        }
+                    }
+                }
+            }
+            """
+        )
+
+        content = json.loads(response.content)
+        assert_that(self.content_is_empty(content)).is_false()
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
 
 
 def get_mocked_opening_hours(uuid):
