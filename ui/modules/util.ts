@@ -9,10 +9,15 @@ import {
 } from "date-fns";
 import { i18n } from "next-i18next";
 import { TFunction } from "i18next";
-import { stringify } from "query-string";
 import { trim } from "lodash";
+import { stringify } from "query-string";
 import { ReservationUnitsParameters } from "./api";
-import { searchPrefix, emptyOption, applicationsPrefix } from "./const";
+import {
+  searchPrefix,
+  emptyOption,
+  applicationsPrefix,
+  singleSearchPrefix,
+} from "./const";
 import {
   ApplicationEventSchedule,
   Cell,
@@ -171,8 +176,21 @@ export const getSelectedOption = (
   return option;
 };
 
+export const getComboboxValues = (
+  value: string,
+  options: OptionType[]
+): OptionType[] => {
+  if (!value || options.length < 1) return undefined;
+  return value.includes(",")
+    ? value.split(",").map((unit) => getSelectedOption(unit, options))
+    : [getSelectedOption(value, options)];
+};
+
 export const searchUrl = (params: ReservationUnitsParameters): string =>
   `${searchPrefix}/?${stringify(params)}`;
+
+export const singleSearchUrl = (params: ReservationUnitsParameters): string =>
+  `${singleSearchPrefix}/?${stringify(params)}`;
 
 export const applicationsUrl = `${applicationsPrefix}/`;
 
@@ -278,7 +296,7 @@ export const getMainImage = (ru: ReservationUnit): Image | null => {
   if (!ru.images || ru.images.length === 0) {
     return null;
   }
-  ru.images.sort((a, b) => {
+  [...ru.images].sort((a, b) => {
     return (
       imagePriority.indexOf(a.imageType) - imagePriority.indexOf(b.imageType)
     );

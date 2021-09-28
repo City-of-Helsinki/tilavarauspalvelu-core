@@ -3,6 +3,7 @@ import {
   cellsToApplicationEventSchedules,
   applicationEventSchedulesToCells,
   applicationRoundState,
+  getComboboxValues,
 } from "./util";
 
 jest.mock("next/config", () => () => ({
@@ -84,4 +85,21 @@ test("applicationRoundState", () => {
   expect(
     applicationRoundState("2021-01-01T08:00:00Z", "2021-02-01T08:00:00Z")
   ).toBe("past");
+});
+
+test("getComboboxValues", () => {
+  const optionsAbc = [
+    { label: "a", value: "a" },
+    { label: "b", value: "b" },
+    { label: "c", value: "c" },
+  ];
+
+  expect(getComboboxValues("b,c", optionsAbc)).toEqual([
+    { label: "b", value: "b" },
+    { label: "c", value: "c" },
+  ]);
+
+  expect(getComboboxValues("", optionsAbc)).toEqual(undefined);
+  expect(getComboboxValues("b,c", [])).toEqual(undefined);
+  expect(getComboboxValues("", [])).toEqual(undefined);
 });

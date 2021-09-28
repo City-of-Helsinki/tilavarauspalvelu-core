@@ -1,12 +1,31 @@
 {
+  "textSearchLabel": "Vapaasanahaku",
   "searchTermPlaceholder": "Hae sanalla",
   "searchButton": "Hae tilaa",
-  "purposeLabel": "Tilan käyttötarkoitus",
+  "purposeLabel": "Käyttötarkoitus",
   "roundLabel": "Hakukierros",
   "districtLabel": "Kaupunginosa",
   "priceLabel": "Hinta",
   "participantCountLabel": "Henkilömäärä vähintään",
+  "participantCountCombined": "Henkilömäärä",
   "typeLabel": "Tilan tyyppi",
   "showMoreFilters": "Tarkennettu haku",
-  "showLessFilters": "Näytä vähemmän vaihtoehtoja"
+  "showLessFilters": "Näytä vähemmän vaihtoehtoja",
+  "unitFilter": "Toimipiste",
+  "resetForm": "Tyhjennä hakuehdot",
+  "filters": {
+    "search": "\"{{value}}\"",
+    "minPersons": "Henkilömäärä min",
+    "maxPersons": "Henkilömäärä max",
+    "purpose": "Käyttötarkoitus",
+    "reservationUnitType": "Tilan tyyppi",
+    "unit": "Toimipiste"
+  },
+  "all": "Kaikki",
+  "clearSelections": "Poista valinnat",
+  "removeSelection": "Poista valinta",
+  "selectedElement": "Valinta",
+  "openCombobox": "Avaa valintalaatikko",
+  "searchForValue": "Hae",
+  "removeFilter": "Poista hakuehto \"{{value}}\""
 }

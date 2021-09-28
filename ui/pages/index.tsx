@@ -25,6 +25,7 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
       promotions {
         id
         heading
+        body
         image
         link
       }

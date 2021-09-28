@@ -126,6 +126,8 @@ export interface ReservationUnitsParameters {
   purpose?: number;
   reservationUnitType?: number;
   unit?: number;
+  limit?: number;
+  after?: string;
 }
 
 export function getReservationUnits(

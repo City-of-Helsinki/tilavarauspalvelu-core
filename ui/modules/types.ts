@@ -22,7 +22,6 @@ export type Space = {
   locationType: "fixed";
   name: TranslationObject;
   parentId: number;
-  buildingId: number;
   surfaceArea: null;
   districtId: number;
 };
@@ -77,6 +76,7 @@ export type Image = {
 };
 
 export type Building = {
+  id: number;
   name: string;
 };
 
@@ -303,4 +303,9 @@ export type Promotion = {
   body?: TranslationObject;
   image: string;
   link: string;
+};
+
+export type PageInfo = {
+  endCursor: string;
+  hasNextPage: boolean;
 };

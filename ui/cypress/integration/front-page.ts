@@ -4,9 +4,6 @@ import {
 } from "../model/home";
 
 beforeEach(() => {
-  cy.fixture("v1/application_round").then((json) => {
-    cy.intercept("GET", "/v1/application_round/*", json);
-  });
   cy.visit("/");
 });
 

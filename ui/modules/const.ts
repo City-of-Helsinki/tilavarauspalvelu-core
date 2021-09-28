@@ -13,6 +13,7 @@ export const weekdays = [
 
 export const reservationUnitPrefix = "/reservation-unit";
 export const searchPrefix = "/search";
+export const singleSearchPrefix = "/single/search";
 export const applicationsPrefix = "/applications";
 export const applicationPrefix = "/application";
 export const criteriaPrefix = "/criteria";

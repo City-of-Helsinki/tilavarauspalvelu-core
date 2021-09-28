@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import { format } from "date-fns";
 import { AppProps } from "next/app";
 import { ApolloProvider } from "@apollo/client";
+import apolloClient from "../modules/apolloClient";
 import SessionLost from "../components/common/SessionLost";
 import PageWrapper from "../components/common/PageWrapper";
 import { authEnabled, isBrowser, mockRequests } from "../modules/const";
@@ -13,7 +14,6 @@ import oidcConfiguration from "../modules/auth/configuration";
 import nextI18NextConfig from "../next-i18next.config";
 import "../styles/global.scss";
 import { TrackingWrapper } from "../modules/tracking";
-import apolloClient from "../modules/apolloClient";
 
 if (mockRequests) {
   require("../mocks");
