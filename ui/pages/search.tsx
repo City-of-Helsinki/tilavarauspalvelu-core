@@ -91,8 +91,8 @@ const Search = (): JSX.Element => {
       <HeadContainer>
         <Container>
           <Breadcrumb current={{ label: "search", linkTo: searchPrefix }} />
-          <h1 style={style}>{t("search:heading")}</h1>
-          <span className="text-lg">{t("search:text")}</span>
+          <h1 style={style}>{t("search:recurring.heading")}</h1>
+          <span className="text-lg">{t("search:recurring.text")}</span>
           <SearchForm onSearch={onSearch} formValues={values} />
         </Container>
       </HeadContainer>

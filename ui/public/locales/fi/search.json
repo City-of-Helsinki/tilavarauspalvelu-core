@@ -1,4 +1,10 @@
 {
-  "heading": "Vakiovuorojen tilat",
-  "text": "Valitse tilat, joihin haluat hakea vakiovuoroja"
+  "recurring": {
+    "heading": "Vakiovuorojen tilat",
+    "text": "Valitse tilat, joihin haluat hakea vakiovuoroja"
+  },
+  "single": {
+    "heading": "Tarkennettu haku",
+    "text": "Etsi sinulle sopivaa vuoroa"
+  }
 }

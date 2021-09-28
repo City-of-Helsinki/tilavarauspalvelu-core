@@ -67,5 +67,8 @@
     "streetAddress": "Laskutusosoite",
     "postCode": "Postinumero",
     "city": "Postitoimipaikka"
-  }
+  },
+  "beginningWith": "Alkaen",
+  "endingWith": "Päättyen",
+  "showMore": "Näytä enemmän"
 }

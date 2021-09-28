@@ -14,6 +14,7 @@
     "ts-check": "tsc --noEmit --project tsconfig.json"
   },
   "dependencies": {
+    "@apollo/client": "^3.4.13",
     "@axa-fr/react-oidc-context": "^3.1.6",
     "@react-pdf/renderer": "^2.0.15",
     "@sentry/react": "^6.6.0",
@@ -23,6 +24,7 @@
     "babel-plugin-styled-components": "^1.12.0",
     "date-fns": "^2.22.1",
     "focus-trap-react": "^8.5.0",
+    "graphql": "^15.6.0",
     "hds-core": "^1.1.0",
     "hds-design-tokens": "^1.1.0",
     "hds-react": "^1.1.0",
@@ -50,7 +52,7 @@
     "@typescript-eslint/eslint-plugin": "^4.27.0",
     "@typescript-eslint/parser": "^4.27.0",
     "axe-core": "^4.2.2",
-    "cypress": "^7.5.0",
+    "cypress": "8.4.1",
     "cypress-axe": "^0.12.2",
     "eslint": "^7.29.0",
     "eslint-config-airbnb-typescript-prettier": "^4.2.0",
