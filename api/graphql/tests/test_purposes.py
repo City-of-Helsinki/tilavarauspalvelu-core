@@ -2,33 +2,56 @@ import json
 
 import snapshottest
 from assertpy import assert_that
-from graphene_django.utils import GraphQLTestCase
-from rest_framework.test import APIClient
 
+from api.graphql.tests.base import GrapheneTestCaseBase
+from reservation_units.models import Purpose
 from reservation_units.tests.factories import PurposeFactory
 
 
-class PurposeTestCase(GraphQLTestCase, snapshottest.TestCase):
+class PurposeTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
     @classmethod
     def setUpTestData(cls):
+        super().setUpTestData()
         cls.purpose = PurposeFactory(name="Test purpose")
 
-        cls.api_client = APIClient()
+    def setUp(self) -> None:
+        super().setUp()
+        self._client.force_login(self.general_admin)
+
+    def get_create_query(self):
+        return """
+            mutation createPurpose($input: PurposeCreateMutationInput!){
+                createPurpose(input: $input) {
+                    purpose {
+                        name
+                    }
+                    errors {
+                        messages
+                        field
+                    }
+                }
+            }"""
+
+    def get_update_query(self):
+        return """
+            mutation updatePurpose($input: PurposeUpdateMutationInput!){
+                updatePurpose(input: $input) {
+                    purpose {
+                        name
+                        pk
+                    }
+                    errors {
+                        messages
+                        field
+                    }
+                }
+            }
+        """
 
     def test_updating_purpose(self):
         response = self.query(
-            f"mutation {{\n"
-            f'updatePurpose(input: {{pk: {self.purpose.id}, name: "Updated name"}}) {{\n'
-            f"purpose {{\n"
-            f"name\n"
-            f"pk\n"
-            f"}}\n"
-            f"errors {{\n"
-            f"messages\n"
-            f"field\n"
-            f"}}\n"
-            f"}}\n"
-            f"}}\n"
+            self.get_update_query(),
+            input_data={"pk": self.purpose.id, "name": "Updated name"},
         )
 
         content = json.loads(response.content).get("data")
@@ -39,20 +62,10 @@ class PurposeTestCase(GraphQLTestCase, snapshottest.TestCase):
         content.get("updatePurpose").get("purpose").pop("pk")
         self.assertMatchSnapshot(content)
 
-    def test_updading_should_error_when_not_found(self):
+    def test_updating_should_error_when_not_found(self):
         response = self.query(
-            f"mutation {{\n"
-            f'updatePurpose(input: {{pk: {self.purpose.id + 3782}, name: "Fail name"}}) {{\n'
-            f"purpose {{\n"
-            f"id\n"
-            f"name\n"
-            f"}}\n"
-            f"errors {{\n"
-            f"messages\n"
-            f"field\n"
-            f"}}\n"
-            f"}}\n"
-            f"}}\n"
+            self.get_update_query(),
+            input_data={"pk": self.purpose.id + 3782, "name": "Fail name"},
         )
 
         content = json.loads(response.content)
@@ -64,19 +77,32 @@ class PurposeTestCase(GraphQLTestCase, snapshottest.TestCase):
 
     def test_creating_purpose(self):
         response = self.query(
-            "mutation {\n"
-            'createPurpose(input: {name: "Created purpose"}) {\n'
-            "purpose {\n"
-            "name\n"
-            "}\n"
-            "errors {\n"
-            "messages\n"
-            "field\n"
-            "}\n"
-            "}\n"
-            "}\n"
+            self.get_create_query(), input_data={"name": "Created purpose"}
         )
 
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
         self.assertMatchSnapshot(content)
+
+    def test_normal_user_cannot_create(self):
+        self._client.force_login(self.regular_joe)
+        response = self.query(
+            self.get_create_query(),
+            input_data={"name": "Created purpose"},
+        )
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(Purpose.objects.exclude(id=self.purpose.id).exists()).is_false()
+
+    def test_normal_user_cannot_update(self):
+        self._client.force_login(self.regular_joe)
+        response = self.query(
+            self.get_update_query(),
+            input_data={"pk": self.purpose.id, "name": "Updated name"},
+        )
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_not_none()
+        self.purpose.refresh_from_db()
+        assert_that(self.purpose.name).is_equal_to("Test purpose")
