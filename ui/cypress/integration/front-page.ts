@@ -5,6 +5,7 @@ import {
 
 beforeEach(() => {
   cy.visit("/");
+  cy.injectAxe();
 });
 
 describe("Tilavaraus ui front page", () => {
@@ -25,6 +26,8 @@ describe("Tilavaraus ui front page", () => {
   });
 
   it("is accessible", () => {
-    cy.a11yCheck();
+    cy.checkA11y(null, {
+      includedImpacts: ["critical"],
+    });
   });
 });

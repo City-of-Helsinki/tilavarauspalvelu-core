@@ -17,16 +17,39 @@ const shortcuts: Shortcut[] = [
   {
     heading: "organizeEvent",
     link: "/",
-    icon: <IconCalendar size="xl" />,
+    icon: <IconCalendar size="xl" aria-label="" />,
   },
-  { heading: "pictureOrSound", link: "/", icon: <IconCalendar size="xl" /> },
-  { heading: "sports", link: "/", icon: <IconCalendar size="xl" /> },
-  { heading: "tutoring", link: "/", icon: <IconCalendar size="xl" /> },
-  { heading: "working", link: "/", icon: <IconCalendar size="xl" /> },
-  { heading: "sauna", link: "/", icon: <IconCalendar size="xl" /> },
-  { heading: "workshop", link: "/", icon: <IconCalendar size="xl" /> },
+  {
+    heading: "pictureOrSound",
+    link: "/",
+    icon: <IconCalendar size="xl" aria-label="" />,
+  },
+  {
+    heading: "sports",
+    link: "/",
+    icon: <IconCalendar size="xl" aria-label="" />,
+  },
+  {
+    heading: "tutoring",
+    link: "/",
+    icon: <IconCalendar size="xl" aria-label="" />,
+  },
+  {
+    heading: "working",
+    link: "/",
+    icon: <IconCalendar size="xl" aria-label="" />,
+  },
+  {
+    heading: "sauna",
+    link: "/",
+    icon: <IconCalendar size="xl" aria-label="" />,
+  },
+  {
+    heading: "workshop",
+    link: "/",
+    icon: <IconCalendar size="xl" aria-label="" />,
+  },
 ];
-
 const Wrapper = styled.div`
   background-color: var(--tilavaraus-header-background-color);
   padding-bottom: var(--spacing-layout-l);

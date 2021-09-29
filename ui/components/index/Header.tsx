@@ -112,7 +112,7 @@ const SubmitIcon = styled(IconSearch)<{ $active: boolean }>`
 const Head = (props: HeadProps): JSX.Element => {
   const [searchTerm, setSearchTerm] = useState<string>("");
 
-  const { t } = useTranslation("home");
+  const { t } = useTranslation(["home", "common"]);
 
   const handleSubmit = (event: React.FormEvent | React.MouseEvent) => {
     event.preventDefault();
@@ -134,6 +134,7 @@ const Head = (props: HeadProps): JSX.Element => {
                 <SubmitIcon
                   size="m"
                   onClick={(e) => handleSubmit(e)}
+                  aria-label={t("common:search")}
                   $active={!!searchTerm}
                 />
               }

@@ -8,7 +8,7 @@ import { breakpoint } from "../modules/style";
 type Props = {
   children: React.ReactNode[];
   slidesToShow?: number;
-  slidesToScroll?: number;
+  slidesToScroll?: number | "auto";
   cellSpacing?: number;
   wrapAround?: boolean;
   hideCenterControls?: boolean;
@@ -118,7 +118,7 @@ const VerticalButton = styled(Button)<{
 const Carousel = ({
   children,
   slidesToShow = 1,
-  slidesToScroll = 1,
+  slidesToScroll = "auto",
   cellSpacing = 1,
   wrapAround = true,
   hideCenterControls = false,
@@ -138,7 +138,7 @@ const Carousel = ({
             onClick={previousSlide}
             aria-label={t("common:prev")}
           >
-            <IconAngleLeft />
+            <IconAngleLeft aria-label={t("common:prev")} />
           </VerticalButton>
         );
       }}
@@ -157,7 +157,7 @@ const Carousel = ({
             onClick={nextSlide}
             aria-label={t("common:next")}
           >
-            <IconAngleRight />
+            <IconAngleRight aria-label={t("common:next")} />
           </VerticalButton>
         );
       }}
