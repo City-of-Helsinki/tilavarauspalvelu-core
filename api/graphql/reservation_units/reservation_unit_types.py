@@ -1,15 +1,18 @@
 import datetime
+from typing import Optional
 
 import graphene
 from django.conf import settings
-from django.db.models import Sum
+from django.db.models import QuerySet, Sum
 from easy_thumbnails.files import get_thumbnailer
 from graphene_django import DjangoObjectType
 from graphene_permissions.mixins import AuthNode
 from graphene_permissions.permissions import AllowAny
+from graphql import ResolveInfo
 
 from api.graphql.base_type import PrimaryKeyObjectType
 from api.graphql.opening_hours.opening_hours_types import OpeningHoursMixin
+from api.graphql.reservations.reservation_types import ReservationType
 from api.graphql.resources.resource_types import ResourceType
 from api.graphql.services.service_types import ServiceType
 from api.graphql.spaces.space_types import LocationType, SpaceType
@@ -35,6 +38,7 @@ from reservation_units.models import ReservationUnitType as ReservationUnitTypeM
 from reservation_units.utils.reservation_unit_reservation_scheduler import (
     ReservationUnitReservationScheduler,
 )
+from reservations.models import STATE_CHOICES
 from resources.models import Resource
 from spaces.models import Space
 
@@ -198,6 +202,12 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
     max_reservation_duration = graphene.Time()
     min_reservation_duration = graphene.Time()
     keyword_groups = graphene.List(KeywordGroupType)
+    reservations = graphene.List(
+        ReservationType,
+        from_=graphene.DateTime(name="from"),
+        to=graphene.DateTime(),
+        state=graphene.String(),
+    )
 
     permission_classes = (
         (ReservationUnitPermission,)
@@ -229,6 +239,7 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
             "is_draft",
             "surface_area",
             "buffer_time_between_reservations",
+            "reservations",
         )
         filter_fields = {
             "name": ["exact", "icontains", "istartswith"],
@@ -295,6 +306,22 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
 
     def resolve_keyword_groups(self, info):
         return KeywordGroup.objects.filter(reservation_units=self.id)
+
+    def resolve_reservations(
+        self,
+        info: ResolveInfo,
+        from_: Optional[datetime.datetime] = None,
+        to: Optional[datetime.datetime] = None,
+        state: Optional[str] = None,
+    ) -> QuerySet:
+        reservations = self.reservation_set.all()
+        if from_ is not None:
+            reservations = reservations.filter(begin__gte=from_)
+        if to is not None:
+            reservations = reservations.filter(end__lte=to)
+        if state is not None:
+            reservations = reservations.filter(state=getattr(STATE_CHOICES, state))
+        return reservations
 
 
 class ReservationUnitByPkType(ReservationUnitType, OpeningHoursMixin):

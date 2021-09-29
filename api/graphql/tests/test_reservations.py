@@ -15,7 +15,7 @@ class ReservationTestCase(GraphQLTestCase, snapshottest.TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.user = get_user_model().objects.create()
-        cls.reservation_unit = ReservationUnitFactory()
+        cls.reservation_unit = ReservationUnitFactory(pk=1)
 
         cls.api_client = APIClient()
 
@@ -48,4 +48,6 @@ class ReservationTestCase(GraphQLTestCase, snapshottest.TestCase):
 
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
-        self.assertMatchSnapshot(content)
+        assert_that(
+            content.get("data").get("createReservation").get("reservation").get("id")
+        ).is_not_none()
