@@ -4,7 +4,16 @@ from __future__ import unicode_literals
 
 from snapshottest import Snapshot
 
+
 snapshots = Snapshot()
+
+snapshots["ReservationUnitTestCase::test_filtering_by_active_application_rounds 1"] = {
+    "data": {
+        "reservationUnits": {
+            "edges": [{"node": {"applicationRounds": [{"name": "Test Round"}]}}]
+        }
+    }
+}
 
 snapshots["ReservationUnitTestCase::test_filtering_by_keyword_group 1"] = {
     "data": {
@@ -154,6 +163,7 @@ snapshots["ReservationUnitTestCase::test_getting_reservation_units 1"] = {
             "edges": [
                 {
                     "node": {
+                        "applicationRounds": [],
                         "contactInformation": "",
                         "description": "",
                         "equipment": [],

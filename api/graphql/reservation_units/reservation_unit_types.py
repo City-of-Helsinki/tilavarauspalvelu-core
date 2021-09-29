@@ -3,7 +3,7 @@ from typing import Optional
 
 import graphene
 from django.conf import settings
-from django.db.models import QuerySet, Sum
+from django.db.models import Q, QuerySet, Sum
 from easy_thumbnails.files import get_thumbnailer
 from graphene_django import DjangoObjectType
 from graphene_permissions.mixins import AuthNode
@@ -17,7 +17,9 @@ from api.graphql.resources.resource_types import ResourceType
 from api.graphql.services.service_types import ServiceType
 from api.graphql.spaces.space_types import LocationType, SpaceType
 from api.graphql.units.unit_types import UnitType
+from applications.models import ApplicationRound
 from opening_hours.hauki_link_generator import generate_hauki_link
+from permissions.api_permissions.drf_permissions import ApplicationRoundPermission
 from permissions.api_permissions.graphene_permissions import (
     EquipmentCategoryPermission,
     EquipmentPermission,
@@ -185,6 +187,39 @@ class EquipmentType(AuthNode, PrimaryKeyObjectType):
         return self.category
 
 
+class ApplicationRoundType(AuthNode, PrimaryKeyObjectType):
+    permission_classes = (
+        (ApplicationRoundPermission,)
+        if not settings.TMP_PERMISSIONS_DISABLED
+        else (AllowAny,)
+    )
+
+    class Input:
+        active = graphene.Field(graphene.Boolean)
+
+    class Meta:
+        model = ApplicationRound
+        fields = (
+            "name",
+            "target_group",
+            "allocating",
+            "reservation_units",
+            "application_period_begin",
+            "application_period_end",
+            "reservation_period_begin",
+            "reservation_period_end",
+            "public_display_begin",
+            "public_display_end",
+            "purposes",
+            "service_sector",
+            "criteria",
+        )
+
+        filter_fields = {
+            "name": ["exact", "icontains", "istartswith"],
+        }
+
+
 class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
     pk = graphene.Int()
     spaces = graphene.List(SpaceType)
@@ -208,6 +243,7 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
         to=graphene.DateTime(),
         state=graphene.String(),
     )
+    application_rounds = graphene.List(ApplicationRoundType, active=graphene.Boolean())
 
     permission_classes = (
         (ReservationUnitPermission,)
@@ -240,6 +276,7 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
             "surface_area",
             "buffer_time_between_reservations",
             "reservations",
+            "application_rounds",
         )
         filter_fields = {
             "name": ["exact", "icontains", "istartswith"],
@@ -322,6 +359,19 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
         if state is not None:
             reservations = reservations.filter(state=getattr(STATE_CHOICES, state))
         return reservations
+
+    def resolve_application_rounds(
+        self, info: ResolveInfo, active: Optional[bool] = None
+    ) -> QuerySet:
+        application_rounds = self.application_rounds.all()
+        if active is None:
+            return application_rounds
+        now = datetime.datetime.now().astimezone()
+        active_filter = Q(
+            application_period_begin__lte=now,
+            application_period_end__gte=now,
+        )
+        return application_rounds.filter(active_filter if active else ~active_filter)
 
 
 class ReservationUnitByPkType(ReservationUnitType, OpeningHoursMixin):

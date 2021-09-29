@@ -11,6 +11,7 @@ from graphene_django.utils import GraphQLTestCase
 from rest_framework.test import APIClient
 
 from api.graphql.tests.base import GrapheneTestCaseBase
+from applications.tests.factories import ApplicationRoundFactory
 from opening_hours.enums import State
 from opening_hours.hours import TimeElement
 from reservation_units.models import ReservationUnit
@@ -90,6 +91,18 @@ class ReservationUnitTestCase(GraphQLTestCase, snapshottest.TestCase):
                               begin
                               end
                               state
+                            }
+                            applicationRounds {
+                              name
+                              targetGroup
+                              allocating
+                              applicationPeriodBegin
+                              applicationPeriodEnd
+                              reservationPeriodBegin
+                              reservationPeriodEnd
+                              publicDisplayBegin
+                              publicDisplayEnd
+                              criteria
                             }
                           }
                         }
@@ -538,6 +551,41 @@ class ReservationUnitTestCase(GraphQLTestCase, snapshottest.TestCase):
                         }
                     }
                 }
+            }
+            """
+        )
+
+        content = json.loads(response.content)
+        assert_that(self.content_is_empty(content)).is_false()
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filtering_by_active_application_rounds(self):
+        now = datetime.datetime.now().astimezone()
+        one_hour = datetime.timedelta(hours=1)
+        matching_round = ApplicationRoundFactory(
+            name="Test Round",
+            application_period_begin=now - one_hour,
+            application_period_end=now + one_hour,
+        )
+        other_round = ApplicationRoundFactory(
+            application_period_begin=datetime.datetime(2021, 1, 1, 12).astimezone(),
+            application_period_end=datetime.datetime(2021, 1, 1, 13).astimezone(),
+        )
+        self.reservation_unit.application_rounds.set([matching_round, other_round])
+        self.reservation_unit.save()
+        response = self.query(
+            """
+            query {
+              reservationUnits {
+                edges {
+                  node {
+                    applicationRounds(active: true) {
+                      name
+                    }
+                  }
+                }
+              }
             }
             """
         )
