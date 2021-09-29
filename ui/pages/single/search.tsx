@@ -24,7 +24,7 @@ const RESERVATION_UNITS = gql`
     $unit: ID
     $reservationUnitType: ID
     $limit: Int
-    $after: String
+    $cursor: String
   ) {
     reservationUnits(
       textSearch: $search
@@ -33,7 +33,7 @@ const RESERVATION_UNITS = gql`
       reservationUnitType: $reservationUnitType
       unit: $unit
       first: $limit
-      after: $after
+      after: $cursor
     ) {
       edges {
         node {
@@ -103,6 +103,7 @@ const Search = (): JSX.Element => {
     {
       variables: { ...values, limit: pagingLimit },
       fetchPolicy: "network-only",
+      nextFetchPolicy: "network-only",
     }
   );
 
@@ -171,11 +172,11 @@ const Search = (): JSX.Element => {
         <SearchResultList
           error={!!error}
           reservationUnits={reservationUnits}
-          fetchMore={(after) => {
+          fetchMore={(cursor) => {
             fetchMore({
               variables: {
                 ...values,
-                after,
+                cursor,
               },
             });
           }}

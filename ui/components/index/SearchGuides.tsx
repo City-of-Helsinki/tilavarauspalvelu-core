@@ -77,7 +77,7 @@ const SearchGuides = (): JSX.Element => {
           <ButtonContainer>
             <Button
               id="browseSingleReservationUnits"
-              onClick={() => router.push("/search/?search=")}
+              onClick={() => router.push("/single/search")}
               iconRight={<IconArrowRight />}
             >
               {t("browseReservationsButton")}
@@ -99,7 +99,7 @@ const SearchGuides = (): JSX.Element => {
           <ButtonContainer>
             <Button
               id="browseRecurringReservationUnits"
-              onClick={() => router.push("/search/?search=")}
+              onClick={() => router.push("/search")}
               iconRight={<IconArrowRight />}
             >
               {t("browseRecurringReservationsButton")}

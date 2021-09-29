@@ -25,7 +25,6 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
       promotions {
         id
         heading
-        body
         image
         link
       }
@@ -58,23 +57,35 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
     }
   `;
 
-  const { data: promotionsData } = await apolloClient.query({
-    query: PROMOTIONS,
-  });
+  try {
+    const { data: promotionsData } = await apolloClient.query({
+      query: PROMOTIONS,
+      errorPolicy: "ignore",
+    });
 
-  const { data: recommendationsData } = await apolloClient.query({
-    query: RECOMMENDATIONS,
-  });
+    const { data: recommendationsData } = await apolloClient.query({
+      query: RECOMMENDATIONS,
+      errorPolicy: "ignore",
+    });
 
-  return {
-    props: {
-      promotions: promotionsData.promotions
-        ? promotionsData.promotions.slice(0, 6)
-        : [],
-      recommendations: recommendationsData.recommendations,
-      ...(await serverSideTranslations(locale)),
-    },
-  };
+    return {
+      props: {
+        promotions: promotionsData.promotions
+          ? promotionsData.promotions.slice(0, 6)
+          : [],
+        recommendations: recommendationsData.recommendations,
+        ...(await serverSideTranslations(locale)),
+      },
+    };
+  } catch (e) {
+    return {
+      props: {
+        promotions: [],
+        recommendations: [],
+        ...(await serverSideTranslations(locale)),
+      },
+    };
+  }
 };
 
 const DesktopStyledKoros = styled(StyledKoros)`
@@ -89,6 +100,7 @@ const DesktopStyledKoros = styled(StyledKoros)`
 const Home = ({ promotions, recommendations }: Props): JSX.Element => {
   const { t } = useTranslation("home");
 
+  const shouldDisplayRecommendations = recommendations?.length > 0;
   const shouldDisplayPromotions = promotions?.length >= 2;
 
   return (
@@ -102,17 +114,25 @@ const Home = ({ promotions, recommendations }: Props): JSX.Element => {
       <Shortcuts />
       <StyledKoros
         $from="var(--tilavaraus-header-background-color)"
-        $to="var(--tilavaraus-gray)"
+        $to={
+          !shouldDisplayRecommendations && shouldDisplayPromotions
+            ? "var(--color-white)"
+            : "var(--tilavaraus-gray)"
+        }
         type="wave"
       />
-      <Recommendations recommendations={recommendations} />
-      {shouldDisplayPromotions ? (
+      {shouldDisplayRecommendations && (
+        <Recommendations recommendations={recommendations} />
+      )}
+      {shouldDisplayPromotions && (
         <>
-          <StyledKoros
-            $from="var(--tilavaraus-gray)"
-            $to="var(--color-white)"
-            type="basic"
-          />
+          {shouldDisplayRecommendations && (
+            <StyledKoros
+              $from="var(--tilavaraus-gray)"
+              $to="var(--color-white)"
+              type="basic"
+            />
+          )}
           <Promotions items={promotions} />
           <StyledKoros
             $from="var(--color-white)"
@@ -120,12 +140,6 @@ const Home = ({ promotions, recommendations }: Props): JSX.Element => {
             type="basic"
           />
         </>
-      ) : (
-        <StyledKoros
-          $from="var(--color-white)"
-          $to="var(--tilavaraus-gray)"
-          type="basic"
-        />
       )}
       <SearchGuides />
       <StyledKoros

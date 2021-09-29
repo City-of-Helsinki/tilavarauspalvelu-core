@@ -11,6 +11,7 @@ export const promotionHandlers = [
       {
         id: 1,
         heading: { fi: "Uimaan stadissa!" },
+        body: null,
         image: "main.jpg",
         link: "/",
       },
@@ -26,18 +27,21 @@ export const promotionHandlers = [
       {
         id: 3,
         heading: { fi: "Juokse maraton!" },
+        body: null,
         image: "main.jpg",
         link: "/",
       },
       {
         id: 4,
         heading: { fi: "Vuokraa tila!" },
+        body: null,
         image: "main.jpg",
         link: "/",
       },
       {
         id: 5,
         heading: { fi: "Tai jotain muuta!" },
+        body: null,
         image: "main.jpg",
         link: "/",
       },

@@ -15,6 +15,7 @@ interface Props {
 
 const Wrapper = styled.div`
   margin-top: var(--spacing-layout-l);
+  margin-bottom: var(--spacing-layout-xl);
 `;
 
 const HitCount = styled.h2`
@@ -76,7 +77,7 @@ const SearchResultList = ({
               {reservationUnits?.map((ru) => (
                 <ReservationUnitCard reservationUnit={ru} key={ru.id} />
               ))}
-              {pageInfo?.hasNextPage && (
+              {pageInfo?.hasNextPage && reservationUnits?.length > 0 && (
                 <PaginationButton
                   onClick={() => fetchMore(pageInfo.endCursor)}
                   iconLeft={<IconPlus />}
