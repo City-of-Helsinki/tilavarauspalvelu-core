@@ -37,6 +37,34 @@ snapshots["ReservationUnitTestCase::test_filtering_by_max_persons_not_found 1"] 
     "data": {"reservationUnits": {"edges": []}}
 }
 
+snapshots[
+    "ReservationUnitTestCase::test_filtering_by_multiple_reservation_states 1"
+] = {
+    "data": {
+        "reservationUnits": {
+            "edges": [
+                {
+                    "node": {
+                        "name": "Test name",
+                        "reservations": [
+                            {
+                                "begin": "2021-05-03T00:00:00+00:00",
+                                "end": "2021-05-03T01:00:00+00:00",
+                                "state": "CREATED",
+                            },
+                            {
+                                "begin": "2021-05-03T01:00:00+00:00",
+                                "end": "2021-05-03T02:00:00+00:00",
+                                "state": "CONFIRMED",
+                            },
+                        ],
+                    }
+                }
+            ]
+        }
+    }
+}
+
 snapshots["ReservationUnitTestCase::test_filtering_by_reservation_state 1"] = {
     "data": {
         "reservationUnits": {

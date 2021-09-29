@@ -1,5 +1,5 @@
 import datetime
-from typing import Optional
+from typing import List, Optional
 
 import graphene
 from django.conf import settings
@@ -239,9 +239,9 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
     keyword_groups = graphene.List(KeywordGroupType)
     reservations = graphene.List(
         ReservationType,
-        from_=graphene.DateTime(name="from"),
-        to=graphene.DateTime(),
-        state=graphene.String(),
+        from_=graphene.Date(name="from"),
+        to=graphene.Date(),
+        state=graphene.List(graphene.String),
     )
     application_rounds = graphene.List(ApplicationRoundType, active=graphene.Boolean())
 
@@ -347,9 +347,9 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
     def resolve_reservations(
         self,
         info: ResolveInfo,
-        from_: Optional[datetime.datetime] = None,
-        to: Optional[datetime.datetime] = None,
-        state: Optional[str] = None,
+        from_: Optional[datetime.date] = None,
+        to: Optional[datetime.date] = None,
+        state: Optional[List[str]] = None,
     ) -> QuerySet:
         reservations = self.reservation_set.all()
         if from_ is not None:
@@ -357,7 +357,8 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
         if to is not None:
             reservations = reservations.filter(end__lte=to)
         if state is not None:
-            reservations = reservations.filter(state=getattr(STATE_CHOICES, state))
+            states = [getattr(STATE_CHOICES, s) for s in state]
+            reservations = reservations.filter(state__in=states)
         return reservations
 
     def resolve_application_rounds(

@@ -501,7 +501,7 @@ class ReservationUnitTestCase(GraphQLTestCase, snapshottest.TestCase):
                     edges {
                         node {
                             name
-                            reservations(from: "2021-05-03T00:00:00Z", to: "2021-05-04T00:00:00Z") {
+                            reservations(from: "2021-05-03", to: "2021-05-04") {
                                 begin
                                 end
                                 state
@@ -544,6 +544,52 @@ class ReservationUnitTestCase(GraphQLTestCase, snapshottest.TestCase):
                         node {
                             name
                             reservations(state: "CREATED") {
+                                begin
+                                end
+                                state
+                            }
+                        }
+                    }
+                }
+            }
+            """
+        )
+
+        content = json.loads(response.content)
+        assert_that(self.content_is_empty(content)).is_false()
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filtering_by_multiple_reservation_states(self):
+        now = datetime.datetime.now().astimezone()
+        one_hour = datetime.timedelta(hours=1)
+        two_hours = datetime.timedelta(hours=2)
+        matching_reservations = [
+            ReservationFactory(
+                begin=now, end=now + one_hour, state=STATE_CHOICES.CREATED
+            ),
+            ReservationFactory(
+                begin=now + one_hour, end=now + two_hours, state=STATE_CHOICES.CONFIRMED
+            ),
+        ]
+        other_reservation = ReservationFactory(
+            begin=now + two_hours,
+            end=now + two_hours + one_hour,
+            state=STATE_CHOICES.CANCELLED,
+        )
+        self.reservation_unit.reservation_set.set(
+            matching_reservations + [other_reservation]
+        )
+        self.reservation_unit.save()
+
+        response = self.query(
+            """
+            query {
+                reservationUnits {
+                    edges {
+                        node {
+                            name
+                            reservations(state: ["CREATED", "CONFIRMED"]) {
                                 begin
                                 end
                                 state
