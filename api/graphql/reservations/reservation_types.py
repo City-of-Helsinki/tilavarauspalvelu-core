@@ -14,8 +14,8 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
         interfaces = (graphene.relay.Node,)
 
     class Input:
-        from_ = graphene.Field(graphene.DateTime, name="from")
-        to = graphene.Field(graphene.DateTime)
+        from_ = graphene.Field(graphene.Date, name="from")
+        to = graphene.Field(graphene.Date)
 
     calendar_url = graphene.String()
 

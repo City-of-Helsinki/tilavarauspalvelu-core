@@ -501,7 +501,7 @@ class ReservationUnitTestCase(GraphQLTestCase, snapshottest.TestCase):
                     edges {
                         node {
                             name
-                            reservations(from: "2021-05-03T00:00:00Z", to: "2021-05-04T00:00:00Z") {
+                            reservations(from: "2021-05-03", to: "2021-05-04") {
                                 begin
                                 end
                                 state

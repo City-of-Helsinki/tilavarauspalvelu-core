@@ -239,8 +239,8 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
     keyword_groups = graphene.List(KeywordGroupType)
     reservations = graphene.List(
         ReservationType,
-        from_=graphene.DateTime(name="from"),
-        to=graphene.DateTime(),
+        from_=graphene.Date(name="from"),
+        to=graphene.Date(),
         state=graphene.List(graphene.String),
     )
     application_rounds = graphene.List(ApplicationRoundType, active=graphene.Boolean())
@@ -347,8 +347,8 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
     def resolve_reservations(
         self,
         info: ResolveInfo,
-        from_: Optional[datetime.datetime] = None,
-        to: Optional[datetime.datetime] = None,
+        from_: Optional[datetime.date] = None,
+        to: Optional[datetime.date] = None,
         state: Optional[List[str]] = None,
     ) -> QuerySet:
         reservations = self.reservation_set.all()
