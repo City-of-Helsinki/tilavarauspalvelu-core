@@ -5,12 +5,6 @@ import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { FetchResult, useMutation } from "@apollo/client";
 import { useHistory } from "react-router-dom";
-import {
-  SpaceDeleteMutationInput,
-  SpaceDeleteMutationPayload,
-  SpaceType,
-  UnitType,
-} from "../../common/types";
 import { DELETE_SPACE } from "../../common/queries";
 import DataTable, { CellConfig } from "../DataTable";
 import PopupMenu from "./PopupMenu";
@@ -18,10 +12,16 @@ import Modal, { useModal as useHDSModal } from "../HDSModal";
 import NewSpaceModal from "./NewSpaceModal";
 import ConfirmationDialog, { ModalRef } from "../ConfirmationDialog";
 import { localizedValue } from "../../common/util";
+import {
+  SpaceDeleteMutationInput,
+  SpaceDeleteMutationPayload,
+  SpaceType,
+  UnitByPkType,
+} from "../../common/gql-types";
 
 interface IProps {
   spaces: SpaceType[];
-  unit: UnitType;
+  unit: UnitByPkType;
   onSave: () => void;
   onDelete: () => void;
   onDataError: (error: string) => void;
@@ -71,7 +71,7 @@ const SpacesTable = ({
   const deleteSpace = (
     id: number
   ): Promise<FetchResult<{ deleteSpace: SpaceDeleteMutationPayload }>> =>
-    deleteSpaceMutation({ variables: { input: { pk: id } } });
+    deleteSpaceMutation({ variables: { input: { pk: String(id) } } });
 
   const modal = useRef<ModalRef>();
 

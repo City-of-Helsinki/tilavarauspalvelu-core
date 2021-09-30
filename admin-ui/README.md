@@ -20,10 +20,22 @@ Make sure /etc/hosts point domain local-tilavaraus.hel.fi to 127.0.0.1. This is 
 127.0.0.1       local-tilavaraus.hel.fi
 ```
 
-Start UI
+Create a self-signed certificate for SSL connection on developpment server by running the following command in the common directory
+```
+yarn generate-certificate
+```
+
+
+### Start UI
 
 ```
 yarn start
+```
+
+### When GQL api changes and you need to update the Typescript types
+
+```
+yarn generate-gql-types
 ```
 
 ### Access with browser

@@ -2,18 +2,16 @@ import { IconSliders } from "hds-react";
 import { uniq } from "lodash";
 import React, { useMemo, useState } from "react";
 import i18next from "i18next";
-
 import { useTranslation } from "react-i18next";
-import {
-  DataFilterConfig,
-  DataFilterOption,
-  ReservationUnitType,
-} from "../../common/types";
+
+import { DataFilterConfig, DataFilterOption } from "../../common/types";
+
 import { filterData } from "../../common/util";
 import FilterContainer, { FilterBtn } from "../FilterContainer";
 import FilterControls from "../FilterControls";
 import ReservationUnitCard from "../ReservationUnits/ReservationUnitCard";
 import { ContentContainer } from "../../styles/layout";
+import { ReservationUnitType } from "../../common/gql-types";
 
 interface IProps {
   reservationUnits: ReservationUnitType[];
@@ -22,7 +20,7 @@ interface IProps {
 
 const getFilterConfig = (units: ReservationUnitType[]): DataFilterConfig[] => {
   const types = uniq(units.map((unit) => unit.reservationUnitType));
-  const status = uniq(units.map((unit) => unit.status));
+  const status = uniq(units.map((unit) => unit.isDraft));
 
   return [
     {
@@ -30,14 +28,14 @@ const getFilterConfig = (units: ReservationUnitType[]): DataFilterConfig[] => {
       filters: types.map((value) => ({
         title: value?.name || "",
         key: "reservationUnitType.pk",
-        value: value?.pk,
+        value: value?.pk as number,
       })),
     },
     {
       // wip no api yet
       title: "ReservationUnitList.statusFilter",
       filters: status.map((value) => ({
-        title: i18next.t(value),
+        title: i18next.t(`ReservationUnit.isDraft.${value}`),
         key: "status",
         value,
       })),
@@ -89,7 +87,7 @@ const ReservationUnitList = ({
           {filteredResults.map((resUnit) => (
             <ReservationUnitCard
               reservationUnit={resUnit}
-              unitId={unitId}
+              unitId={unitId as number}
               key={resUnit.pk}
             />
           ))}

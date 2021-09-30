@@ -12,11 +12,7 @@ import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { useDebounce } from "react-use";
 import { useQuery, ApolloError } from "@apollo/client";
-import {
-  DataFilterConfig,
-  LocalizationLanguages,
-  Space,
-} from "../../common/types";
+import { DataFilterConfig, LocalizationLanguages } from "../../common/types";
 import { IngressContainer } from "../../styles/layout";
 import { H1 } from "../../styles/typography";
 import withMainMenu from "../withMainMenu";
@@ -26,6 +22,7 @@ import { isTranslationObject, localizedValue } from "../../common/util";
 import { breakpoints, Strong } from "../../styles/util";
 import ClearButton from "../ClearButton";
 import { SPACES_QUERY } from "../../common/queries";
+import { Query, SpaceType } from "../../common/gql-types";
 
 const Wrapper = styled.div`
   padding: var(--spacing-layout-2-xl) 0;
@@ -77,7 +74,7 @@ const getCellConfig = (
       {
         title: t("Spaces.headings.name"),
         key: "name",
-        transform: ({ name }: Space) => (
+        transform: ({ name }: SpaceType) => (
           <Strong>{localizedValue(name, language)}</Strong>
         ),
       },
@@ -92,7 +89,7 @@ const getCellConfig = (
       {
         title: t("Spaces.headings.volume"),
         key: "maxPersons",
-        transform: ({ maxPersons }: Space) => (
+        transform: ({ maxPersons }: SpaceType) => (
           <div
             style={{
               display: "flex",
@@ -108,7 +105,7 @@ const getCellConfig = (
       {
         title: t("Spaces.headings.size"),
         key: "surfaceArea",
-        transform: ({ surfaceArea }: Space) => (
+        transform: ({ surfaceArea }: SpaceType) => (
           <div
             style={{
               display: "flex",
@@ -128,17 +125,20 @@ const getCellConfig = (
     index: "id",
     sorting: "name",
     order: "asc",
-    rowLink: ({ id }: Space) => `/spaces/${id}`,
+    rowLink: ({ id }: SpaceType) => `/spaces/${id}`,
   };
 };
 
-const getFilterConfig = (spaces: Space[], t: TFunction): DataFilterConfig[] => {
+const getFilterConfig = (
+  spaces: SpaceType[],
+  t: TFunction
+): DataFilterConfig[] => {
   const buildings = uniq(
-    spaces.map((space: Space) => space?.building?.name || "")
+    spaces.map((space: SpaceType) => space?.building?.name || "")
   ).filter((n) => n);
   const districts = uniq(
     spaces
-      .map((space: Space) => space?.building?.district?.name || "")
+      .map((space: SpaceType) => space?.building?.district?.name || "")
       .filter((n) => n)
   );
 
@@ -169,7 +169,7 @@ const getFilterConfig = (spaces: Space[], t: TFunction): DataFilterConfig[] => {
 const SpacesList = (): JSX.Element => {
   const { t, i18n } = useTranslation();
 
-  const [spaces, setSpaces] = useState<Space[]>([]);
+  const [spaces, setSpaces] = useState<SpaceType[]>([]);
   const [filterConfig, setFilterConfig] = useState<DataFilterConfig[] | null>(
     null
   );
@@ -186,12 +186,14 @@ const SpacesList = (): JSX.Element => {
     [searchValue]
   );
 
-  useQuery(SPACES_QUERY, {
+  useQuery<Query>(SPACES_QUERY, {
     onCompleted: (data) => {
-      const result = data?.spaces?.edges?.map(({ node }: any) => node); // eslint-disable-line
-      setSpaces(result);
-      setCellConfig(getCellConfig(t, i18n.language as LocalizationLanguages));
-      setFilterConfig(getFilterConfig(result, t));
+      const result = data?.spaces?.edges?.map((s) => s?.node as SpaceType);
+      if (result) {
+        setSpaces(result);
+        setCellConfig(getCellConfig(t, i18n.language as LocalizationLanguages));
+        setFilterConfig(getFilterConfig(result, t));
+      }
       setIsLoading(false);
     },
     onError: (err: ApolloError) => {
@@ -222,7 +224,7 @@ const SpacesList = (): JSX.Element => {
   }
 
   const filteredSpaces = searchTerm
-    ? spaces.filter((space: Space) => {
+    ? spaces.filter((space: SpaceType) => {
         const searchTerms = searchTerm.toLowerCase().split(" ");
         const { name, building } = space;
         const buildingName = building?.name?.toLowerCase();

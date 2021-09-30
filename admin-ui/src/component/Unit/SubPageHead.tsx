@@ -2,7 +2,7 @@ import { IconLocation } from "hds-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { UnitType } from "../../common/types";
+import { UnitByPkType } from "../../common/gql-types";
 import { parseAddress } from "../../common/util";
 import { ContentContainer, IngressContainer } from "../../styles/layout";
 import { H1 } from "../../styles/typography";
@@ -10,7 +10,7 @@ import LinkPrev from "../LinkPrev";
 
 interface IProps {
   title: string;
-  unit: UnitType;
+  unit: UnitByPkType;
 }
 
 const Wrapper = styled.div`

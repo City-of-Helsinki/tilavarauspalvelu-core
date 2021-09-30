@@ -17,22 +17,25 @@ import { useParams, useHistory } from "react-router-dom";
 import styled from "styled-components";
 import { languages } from "../../common/const";
 import {
+  Query,
+  QueryReservationUnitByPkArgs,
+  QueryUnitByPkArgs,
+  ReservationUnitByPkType,
+  ReservationUnitCreateMutationInput,
+  ReservationUnitCreateMutationPayload,
+  ReservationUnitUpdateMutationInput,
+  ReservationUnitUpdateMutationPayload,
+  ResourceType,
+  SpaceType,
+  UnitByPkType,
+} from "../../common/gql-types";
+import {
   CREATE_RESERVATION_UNIT,
   RESERVATIONUNIT_QUERY,
   UNIT_WITH_SPACES_AND_RESOURCES,
   UPDATE_RESERVATION_UNIT,
 } from "../../common/queries";
-import {
-  OptionType,
-  ReservationUnitCreateMutationInput,
-  ReservationUnitCreateMutationPayload,
-  ReservationUnitType,
-  ReservationUnitUpdateMutationInput,
-  ReservationUnitUpdateMutationPayload,
-  Resource,
-  SpaceType,
-  UnitType,
-} from "../../common/types";
+import { OptionType } from "../../common/types";
 import { ContentContainer, IngressContainer } from "../../styles/layout";
 
 import { breakpoints } from "../../styles/util";
@@ -59,8 +62,8 @@ type Action =
     }
   | { type: "clearNotification" }
   | { type: "clearError" }
-  | { type: "dataLoaded"; reservationUnit: ReservationUnitType }
-  | { type: "unitLoaded"; unit: UnitType }
+  | { type: "dataLoaded"; reservationUnit: ReservationUnitByPkType }
+  | { type: "unitLoaded"; unit: UnitByPkType }
   | { type: "editNew" }
   | { type: "dataInitializationError"; message: string }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -87,17 +90,17 @@ type State = {
   unitId: number;
   notification: null | NotificationType;
   loading: boolean;
-  reservationUnit: ReservationUnitType | null;
+  reservationUnit: ReservationUnitByPkType | null;
   reservationUnitEdit: ReservationUnitEditorType | null;
   hasChanges: boolean;
   error?: {
     message: string;
   };
   spaces: SpaceType[];
-  resources: Resource[];
+  resources: ResourceType[];
   spaceOptions: OptionType[];
   resourceOptions: OptionType[];
-  unit?: UnitType;
+  unit?: UnitByPkType;
 };
 
 const getInitialState = (reservationUnitId: number, unitId: number): State => ({
@@ -171,7 +174,10 @@ const reducer = (state: State, action: Action): State => {
       let errorKey: string | undefined;
 
       const spaceOptions =
-        unit?.spaces.map((s) => ({ label: s.name, value: Number(s.pk) })) || [];
+        unit?.spaces?.map((s) => ({
+          label: String(s?.name),
+          value: Number(s?.pk),
+        })) || [];
 
       if (spaceOptions.length === 0) {
         errorKey = "ReservationUnitEditor.errorNoSpaces";
@@ -179,14 +185,15 @@ const reducer = (state: State, action: Action): State => {
 
       const resourceOptions =
         unit?.spaces
-          ?.flatMap((s) => s.resources)
-          .map((r) => ({ label: r.name, value: Number(r.pk) })) || [];
+          ?.flatMap((s) => s?.resources)
+          .map((r) => ({ label: String(r?.name), value: Number(r?.pk) })) || [];
 
       return withLoadingStatus({
         ...state,
-        spaces: unit.spaces,
+        spaces: unit.spaces as SpaceType[],
         resources:
-          (unit?.spaces && unit.spaces.flatMap((s) => s.resources)) || [],
+          ((unit?.spaces &&
+            unit.spaces.flatMap((s) => s?.resources)) as ResourceType[]) || [],
         spaceOptions,
         unit,
         resourceOptions,
@@ -403,25 +410,23 @@ const ReservationUnitEditor = (): JSX.Element | null => {
     }
   };
 
-  useQuery(RESERVATIONUNIT_QUERY, {
-    variables: { pk: reservationUnitId },
+  useQuery<Query, QueryReservationUnitByPkArgs>(RESERVATIONUNIT_QUERY, {
+    variables: { pk: Number(reservationUnitId) },
     skip: !reservationUnitId,
-    onCompleted: ({
-      reservationUnitByPk,
-    }: {
-      reservationUnitByPk: ReservationUnitType;
-    }) => {
-      dispatch({ type: "dataLoaded", reservationUnit: reservationUnitByPk });
+    onCompleted: ({ reservationUnitByPk }) => {
+      if (reservationUnitByPk) {
+        dispatch({ type: "dataLoaded", reservationUnit: reservationUnitByPk });
+      }
     },
     onError: (e) => {
       onDataError(t("errors.errorFetchingData", { error: e }));
     },
   });
 
-  useQuery(UNIT_WITH_SPACES_AND_RESOURCES, {
-    variables: { pk: unitId },
-    onCompleted: ({ unitByPk }: { unitByPk: UnitType }) => {
-      if (unitByPk === null) {
+  useQuery<Query, QueryUnitByPkArgs>(UNIT_WITH_SPACES_AND_RESOURCES, {
+    variables: { pk: Number(unitId) },
+    onCompleted: ({ unitByPk }) => {
+      if (unitByPk === null || unitByPk === undefined) {
         onDataError(t("ReservationUnitEditor.unitNotAvailable"));
       } else {
         dispatch({ type: "unitLoaded", unit: unitByPk });
@@ -497,7 +502,10 @@ const ReservationUnitEditor = (): JSX.Element | null => {
         ) : null}
         <EditorContainer>
           <Editor>
-            <Accordion heading={t("ReservationUnitEditor.basicInformation")}>
+            <Accordion
+              initiallyOpen
+              heading={t("ReservationUnitEditor.basicInformation")}
+            >
               <Section>
                 <TextInputWithPadding
                   value={state.reservationUnitEdit.name}
@@ -546,7 +554,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                     onChange={(spaces) =>
                       dispatch({ type: "setSpaces", spaces })
                     }
-                    disabled={state.spaceOptions.length === 0 || true}
+                    disabled={state.spaceOptions.length === 0}
                     value={[...getSelectedSpaces(state)]}
                   />
                   <Combobox
@@ -562,7 +570,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                     onChange={(resources) =>
                       dispatch({ type: "setResources", resources })
                     }
-                    disabled={state.resourceOptions.length === 0 || true}
+                    disabled={state.resourceOptions.length === 0}
                     value={[...getSelectedResources(state)]}
                   />
                 </EditorColumns>

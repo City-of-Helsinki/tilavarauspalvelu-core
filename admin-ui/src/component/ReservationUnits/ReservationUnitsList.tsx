@@ -6,11 +6,7 @@ import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { useQuery, ApolloError } from "@apollo/client";
 
-import {
-  DataFilterConfig,
-  LocalizationLanguages,
-  ReservationUnitType,
-} from "../../common/types";
+import { DataFilterConfig, LocalizationLanguages } from "../../common/types";
 import { IngressContainer } from "../../styles/layout";
 import { H1 } from "../../styles/typography";
 import withMainMenu from "../withMainMenu";
@@ -19,6 +15,11 @@ import DataTable, { CellConfig } from "../DataTable";
 import { localizedValue } from "../../common/util";
 import { BasicLink, Strong } from "../../styles/util";
 import { RESERVATION_UNITS_QUERY } from "../../common/queries";
+import {
+  Query,
+  QueryReservationUnitArgs,
+  ReservationUnitType,
+} from "../../common/gql-types";
 
 const Wrapper = styled.div`
   padding: var(--spacing-layout-2-xl) 0;
@@ -51,7 +52,7 @@ const getCellConfig = (
       {
         title: t("ReservationUnits.headings.unitName"),
         key: "unit.name",
-        transform: ({ unit }: ReservationUnitType) => unit.name,
+        transform: ({ unit }: ReservationUnitType) => unit?.name || "?",
       },
       {
         title: t("ReservationUnits.headings.district"),
@@ -131,8 +132,8 @@ const getFilterConfig = (
       title: t("ReservationUnits.headings.reservationUnitType"),
       filters:
         types &&
-        types.map((type: string) => ({
-          title: type,
+        types.map((type) => ({
+          title: type || "?",
           key: "reservationUnitType.name",
           value: type || "",
         })),
@@ -153,15 +154,16 @@ const ReservationUnitsList = (): JSX.Element => {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  useQuery(RESERVATION_UNITS_QUERY, {
+  useQuery<Query, QueryReservationUnitArgs>(RESERVATION_UNITS_QUERY, {
     onCompleted: (data) => {
       const result = data?.reservationUnits?.edges?.map(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        ({ node }: any) => node
+        (ru) => ru?.node as ReservationUnitType
       );
-      setReservationUnits(result);
-      setCellConfig(getCellConfig(t, i18n.language as LocalizationLanguages));
-      setFilterConfig(getFilterConfig(result, t));
+      if (result) {
+        setReservationUnits(result);
+        setCellConfig(getCellConfig(t, i18n.language as LocalizationLanguages));
+        setFilterConfig(getFilterConfig(result, t));
+      }
       setIsLoading(false);
     },
     onError: (err: ApolloError) => {
