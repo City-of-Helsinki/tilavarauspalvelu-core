@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
+import { AxiosError } from "axios";
 // eslint-disable-next-line import/no-unresolved
 import { useReactOidc } from "@axa-fr/react-oidc-context";
 import { Notification } from "hds-react";
@@ -59,7 +60,7 @@ function ApplicationRounds(): JSX.Element {
         setIsLoading(false);
       } catch (error) {
         const msg =
-          error.response?.status === 404
+          (error as AxiosError).response?.status === 404
             ? "errors.applicationRoundNotFound"
             : "errors.errorFetchingData";
         setErrorMsg(msg);
