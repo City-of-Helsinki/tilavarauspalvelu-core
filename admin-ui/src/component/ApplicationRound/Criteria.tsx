@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import { IconGroup, Notification } from "hds-react";
 import styled from "styled-components";
+import { AxiosError } from "axios";
 import trim from "lodash/trim";
 import sortBy from "lodash/sortBy";
 import { ContentContainer, IngressContainer } from "../../styles/layout";
@@ -181,7 +182,9 @@ function Criteria(): JSX.Element {
   >(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const { applicationRoundId } = useParams<IRouteParams>();
+  const applicationRoundId = Number(
+    useParams<IRouteParams>().applicationRoundId
+  );
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -213,13 +216,13 @@ function Criteria(): JSX.Element {
 
       try {
         const result = await getApplicationRound({
-          id: Number(applicationRoundId),
+          id: applicationRoundId,
         });
         setApplicationRound(result);
         setIsLoading(false);
       } catch (error) {
         const msg =
-          error.response?.status === 404
+          (error as AxiosError).response?.status === 404
             ? "errors.applicationRoundNotFound"
             : "errors.errorFetchingData";
         setErrorMsg(msg);
