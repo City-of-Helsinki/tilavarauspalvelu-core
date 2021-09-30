@@ -2,7 +2,6 @@ import graphene
 from django.conf import settings
 from graphene import ClientIDMutation
 from graphene_django.rest_framework.mutation import SerializerMutation
-from graphene_permissions.mixins import AuthMutation
 from graphene_permissions.permissions import AllowAny
 from rest_framework.generics import get_object_or_404
 
@@ -110,7 +109,7 @@ class EquipmentCategoryDeleteMutation(AuthDeleteMutation, ClientIDMutation):
         return None
 
 
-class PurposeCreateMutation(SerializerMutation, AuthMutation):
+class PurposeCreateMutation(AuthSerializerMutation, SerializerMutation):
     purpose = graphene.Field(PurposeType)
 
     permission_classes = (
@@ -128,7 +127,7 @@ class PurposeCreateMutation(SerializerMutation, AuthMutation):
         return cls(errors=None, purpose=purpose)
 
 
-class PurposeUpdateMutation(SerializerMutation, AuthMutation):
+class PurposeUpdateMutation(AuthSerializerMutation, SerializerMutation):
     purpose = graphene.Field(PurposeType)
 
     permission_classes = (
