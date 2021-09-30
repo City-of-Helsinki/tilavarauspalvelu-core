@@ -6,6 +6,8 @@ from graphql import ResolveInfo
 
 from permissions.helpers import (
     can_create_reservation,
+    can_manage_ability_groups,
+    can_manage_age_groups,
     can_manage_equipment,
     can_manage_equipment_categories,
     can_manage_purposes,
@@ -87,6 +89,26 @@ class PurposePermission(BasePermission):
     @classmethod
     def has_mutation_permission(cls, root: Any, info: ResolveInfo, input: dict) -> bool:
         return can_manage_purposes(info.context.user)
+
+
+class AgeGroupPermission(BasePermission):
+    @classmethod
+    def has_filter_permission(cls, info: ResolveInfo) -> bool:
+        return True
+
+    @classmethod
+    def has_mutation_permission(cls, root: Any, info: ResolveInfo, input: dict) -> bool:
+        return can_manage_age_groups(info.context.user)
+
+
+class AbilityGroupPermission(BasePermission):
+    @classmethod
+    def has_filter_permission(cls, info: ResolveInfo) -> bool:
+        return True
+
+    @classmethod
+    def has_mutation_permission(cls, root: Any, info: ResolveInfo, input: dict) -> bool:
+        return can_manage_ability_groups(info.context.user)
 
 
 class SpacePermission(BasePermission):
