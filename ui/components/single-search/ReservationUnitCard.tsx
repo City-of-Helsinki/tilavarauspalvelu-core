@@ -5,12 +5,12 @@ import router from "next/router";
 import Link from "next/link";
 import styled from "styled-components";
 import { breakpoint } from "../../modules/style";
-import { ReservationUnit } from "../../modules/types";
 import { getAddress, getMainImage, localizedValue } from "../../modules/util";
 import IconWithText from "../common/IconWithText";
+import { ReservationUnitType } from "../../modules/gql-types";
 
 interface Props {
-  reservationUnit: ReservationUnit;
+  reservationUnit: ReservationUnitType;
 }
 
 const Container = styled.div`
@@ -139,7 +139,7 @@ const ReservationUnitCard = ({ reservationUnit }: Props): JSX.Element => {
           </Link>
         </Name>
         <Description>
-          {localizedValue(reservationUnit.building.name, i18n.language)}
+          {localizedValue(reservationUnit.unit?.name, i18n.language)}
         </Description>
         <Bottom>
           {reservationUnit.reservationUnitType && (

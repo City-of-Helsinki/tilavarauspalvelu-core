@@ -11,7 +11,7 @@ import {
 import { useForm } from "react-hook-form";
 import styled from "styled-components";
 import { gql, useQuery } from "@apollo/client";
-import { pick, sortBy } from "lodash";
+import { sortBy } from "lodash";
 import { breakpoint } from "../../modules/style";
 import { getParameters } from "../../modules/api";
 import {
@@ -21,6 +21,7 @@ import {
 } from "../../modules/util";
 import { emptyOption, participantCountOptions } from "../../modules/const";
 import { OptionType } from "../../modules/types";
+import { Query } from "../../modules/gql-types";
 
 type Props = {
   onSearch: (search: Record<string, string>) => void;
@@ -33,7 +34,7 @@ const SEARCH_FORM_PARAMS = gql`
     units {
       edges {
         node {
-          id: pk
+          pk
           name
         }
       }
@@ -144,11 +145,12 @@ const SearchForm = ({
     OptionType[]
   >([]);
 
-  useQuery(SEARCH_FORM_PARAMS, {
+  useQuery<Query>(SEARCH_FORM_PARAMS, {
     onCompleted: (res) => {
-      const units = res?.units?.edges?.map((edge) =>
-        pick(edge.node, ["id", "name"])
-      );
+      const units = res?.units?.edges?.map(({ node: { pk, name } }) => ({
+        id: pk,
+        name,
+      }));
       setUnitOptions(mapOptions(sortBy(units, "name")));
     },
   });

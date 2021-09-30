@@ -295,8 +295,3 @@ export type UserProfile = {
   // eslint-disable-next-line camelcase
   family_name: string;
 };
-
-export type PageInfo = {
-  endCursor: string;
-  hasNextPage: boolean;
-};

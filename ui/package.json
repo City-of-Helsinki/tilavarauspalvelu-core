@@ -11,7 +11,8 @@
     "test:browser": "CYPRESS_BASE_URL=https://local-tilavaraus.hel.fi:3000 ./node_modules/.bin/cypress open",
     "lint": "eslint --ext ts,tsx .",
     "lint:css": "stylelint '**/*.tsx'",
-    "ts-check": "tsc --noEmit --project tsconfig.json"
+    "ts-check": "tsc --noEmit --project tsconfig.json",
+    "generate-gql-types": "graphql-codegen"
   },
   "dependencies": {
     "@apollo/client": "^3.4.13",
@@ -46,6 +47,8 @@
     "styled-components": "^5.3.0"
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "^2.2.0",
+    "@graphql-codegen/typescript": "^2.2.2",
     "@next/eslint-plugin-next": "^11.1.0",
     "@types/jest": "^26.0.23",
     "@types/react": "^17.0.6",
