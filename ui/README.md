@@ -31,11 +31,19 @@ Create a self-signed certificate for SSL connection on developpment server by ru
 yarn generate-certificate
 ```
 
-Start UI
+### Start UI
 
 ```
 yarn start
 ```
+
+### Generate new gql types
+When GQL api changes and you need to update the Typescript types
+
+```
+yarn generate-gql-types
+```
+
 
 ### Access with browser
 
