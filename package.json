@@ -1,13 +1,11 @@
 {
     "name": "tilavarauspalvelu",
     "private": true,
-    "workspaces": {
-      "packages": [
+    "workspaces": [
         "common",
 	      "ui",
         "admin-ui"
-      ]
-    }
+    ]
     ,
     "version": "1.0.0",
     "main": "index.js",

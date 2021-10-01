@@ -150,7 +150,7 @@ const ReservationUnitCard = ({
           <div>
             <Name>{localizedValue(reservationUnit.name, i18n.language)}</Name>
             <BuildingName>
-              {localizedValue(reservationUnit.building.name, i18n.language)}
+              {localizedValue(reservationUnit.building?.name, i18n.language)}
             </BuildingName>
             <Address>{getAddress(reservationUnit)}</Address>
           </div>
