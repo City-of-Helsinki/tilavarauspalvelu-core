@@ -1,7 +1,10 @@
+import { gql } from '@apollo/client';
+import * as Apollo from '@apollo/client';
 export type Maybe<T> = T | null;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
+const defaultOptions =  {}
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -32,6 +35,49 @@ export type Scalars = {
    * in fields, resolvers and input.
    */
   UUID: any;
+};
+
+/** An enumeration. */
+export enum ApplicationRoundTargetGroup {
+  /** Kaikki */
+  All = 'ALL',
+  /** Internal */
+  Internal = 'INTERNAL',
+  /** Public */
+  Public = 'PUBLIC'
+}
+
+export type ApplicationRoundType = {
+  __typename?: 'ApplicationRoundType';
+  allocating: Scalars['Boolean'];
+  applicationPeriodBegin: Scalars['DateTime'];
+  applicationPeriodEnd: Scalars['DateTime'];
+  criteria: Scalars['String'];
+  name: Scalars['String'];
+  pk?: Maybe<Scalars['Int']>;
+  publicDisplayBegin: Scalars['DateTime'];
+  publicDisplayEnd: Scalars['DateTime'];
+  purposes: PurposeTypeConnection;
+  reservationPeriodBegin: Scalars['Date'];
+  reservationPeriodEnd: Scalars['Date'];
+  reservationUnits: ReservationUnitByPkTypeConnection;
+  targetGroup: ApplicationRoundTargetGroup;
+};
+
+
+export type ApplicationRoundTypePurposesArgs = {
+  after?: Maybe<Scalars['String']>;
+  before?: Maybe<Scalars['String']>;
+  first?: Maybe<Scalars['Int']>;
+  last?: Maybe<Scalars['Int']>;
+};
+
+
+export type ApplicationRoundTypeReservationUnitsArgs = {
+  after?: Maybe<Scalars['String']>;
+  before?: Maybe<Scalars['String']>;
+  first?: Maybe<Scalars['Int']>;
+  last?: Maybe<Scalars['Int']>;
 };
 
 export type BuildingType = Node & {
@@ -487,6 +533,23 @@ export type PurposeType = Node & {
   pk?: Maybe<Scalars['Int']>;
 };
 
+export type PurposeTypeConnection = {
+  __typename?: 'PurposeTypeConnection';
+  /** Contains the nodes in this connection. */
+  edges: Array<Maybe<PurposeTypeEdge>>;
+  /** Pagination data for this connection. */
+  pageInfo: PageInfo;
+};
+
+/** A Relay edge containing a `PurposeType` and its cursor. */
+export type PurposeTypeEdge = {
+  __typename?: 'PurposeTypeEdge';
+  /** A cursor for use in pagination */
+  cursor: Scalars['String'];
+  /** The item at the end of the edge */
+  node?: Maybe<PurposeType>;
+};
+
 export type PurposeUpdateMutationInput = {
   clientMutationId?: Maybe<Scalars['String']>;
   name: Scalars['String'];
@@ -773,6 +836,7 @@ export type ReservationTypeReservationUnitArgs = {
 
 export type ReservationUnitByPkType = Node & {
   __typename?: 'ReservationUnitByPkType';
+  applicationRounds?: Maybe<Array<Maybe<ApplicationRoundType>>>;
   contactInformation: Scalars['String'];
   description: Scalars['String'];
   equipment?: Maybe<Array<Maybe<EquipmentType>>>;
@@ -792,6 +856,7 @@ export type ReservationUnitByPkType = Node & {
   purposes?: Maybe<Array<Maybe<PurposeType>>>;
   requireIntroduction: Scalars['Boolean'];
   reservationUnitType?: Maybe<ReservationUnitTypeType>;
+  reservations?: Maybe<Array<Maybe<ReservationType>>>;
   resources?: Maybe<Array<Maybe<ResourceType>>>;
   services?: Maybe<Array<Maybe<ServiceType>>>;
   spaces?: Maybe<Array<Maybe<SpaceType>>>;
@@ -802,11 +867,23 @@ export type ReservationUnitByPkType = Node & {
 };
 
 
+export type ReservationUnitByPkTypeApplicationRoundsArgs = {
+  active?: Maybe<Scalars['Boolean']>;
+};
+
+
 export type ReservationUnitByPkTypeOpeningHoursArgs = {
   endDate?: Maybe<Scalars['Date']>;
   openingTimes?: Maybe<Scalars['Boolean']>;
   periods?: Maybe<Scalars['Boolean']>;
   startDate?: Maybe<Scalars['Date']>;
+};
+
+
+export type ReservationUnitByPkTypeReservationsArgs = {
+  from?: Maybe<Scalars['Date']>;
+  state?: Maybe<Array<Maybe<Scalars['String']>>>;
+  to?: Maybe<Scalars['Date']>;
 };
 
 export type ReservationUnitByPkTypeConnection = {
@@ -933,6 +1010,7 @@ export type ReservationUnitImageType = {
 
 export type ReservationUnitType = Node & {
   __typename?: 'ReservationUnitType';
+  applicationRounds?: Maybe<Array<Maybe<ApplicationRoundType>>>;
   bufferTimeBetweenReservations?: Maybe<Scalars['Float']>;
   contactInformation: Scalars['String'];
   description: Scalars['String'];
@@ -951,6 +1029,7 @@ export type ReservationUnitType = Node & {
   purposes?: Maybe<Array<Maybe<PurposeType>>>;
   requireIntroduction: Scalars['Boolean'];
   reservationUnitType?: Maybe<ReservationUnitTypeType>;
+  reservations?: Maybe<Array<Maybe<ReservationType>>>;
   resources?: Maybe<Array<Maybe<ResourceType>>>;
   services?: Maybe<Array<Maybe<ServiceType>>>;
   spaces?: Maybe<Array<Maybe<SpaceType>>>;
@@ -958,6 +1037,18 @@ export type ReservationUnitType = Node & {
   termsOfUse?: Maybe<Scalars['String']>;
   unit?: Maybe<UnitType>;
   uuid: Scalars['UUID'];
+};
+
+
+export type ReservationUnitTypeApplicationRoundsArgs = {
+  active?: Maybe<Scalars['Boolean']>;
+};
+
+
+export type ReservationUnitTypeReservationsArgs = {
+  from?: Maybe<Scalars['Date']>;
+  state?: Maybe<Array<Maybe<Scalars['String']>>>;
+  to?: Maybe<Scalars['Date']>;
 };
 
 export type ReservationUnitTypeConnection = {
@@ -1070,7 +1161,10 @@ export type ReservationUnitUpdateMutationPayload = {
 export type ResourceCreateMutationInput = {
   /** Begin date and time of the reservation. */
   bufferTimeAfter?: Maybe<Scalars['String']>;
-  /** Buffer time while reservation unit is unreservable after the reservation. Dynamically calculated from spaces and resources. */
+  /**
+   * Buffer time while reservation unit is unreservable after the reservation.
+   * Dynamically calculated from spaces and resources.
+   */
   bufferTimeBefore?: Maybe<Scalars['String']>;
   clientMutationId?: Maybe<Scalars['String']>;
   descriptionEn?: Maybe<Scalars['String']>;
@@ -1090,7 +1184,10 @@ export type ResourceCreateMutationPayload = {
   __typename?: 'ResourceCreateMutationPayload';
   /** Begin date and time of the reservation. */
   bufferTimeAfter?: Maybe<Scalars['String']>;
-  /** Buffer time while reservation unit is unreservable after the reservation. Dynamically calculated from spaces and resources. */
+  /**
+   * Buffer time while reservation unit is unreservable after the reservation.
+   * Dynamically calculated from spaces and resources.
+   */
   bufferTimeBefore?: Maybe<Scalars['String']>;
   clientMutationId?: Maybe<Scalars['String']>;
   descriptionEn?: Maybe<Scalars['String']>;
@@ -1165,7 +1262,10 @@ export type ResourceTypeEdge = {
 export type ResourceUpdateMutationInput = {
   /** Begin date and time of the reservation. */
   bufferTimeAfter?: Maybe<Scalars['String']>;
-  /** Buffer time while reservation unit is unreservable after the reservation. Dynamically calculated from spaces and resources. */
+  /**
+   * Buffer time while reservation unit is unreservable after the reservation.
+   * Dynamically calculated from spaces and resources.
+   */
   bufferTimeBefore?: Maybe<Scalars['String']>;
   clientMutationId?: Maybe<Scalars['String']>;
   descriptionEn?: Maybe<Scalars['String']>;
@@ -1186,7 +1286,10 @@ export type ResourceUpdateMutationPayload = {
   __typename?: 'ResourceUpdateMutationPayload';
   /** Begin date and time of the reservation. */
   bufferTimeAfter?: Maybe<Scalars['String']>;
-  /** Buffer time while reservation unit is unreservable after the reservation. Dynamically calculated from spaces and resources. */
+  /**
+   * Buffer time while reservation unit is unreservable after the reservation.
+   * Dynamically calculated from spaces and resources.
+   */
   bufferTimeBefore?: Maybe<Scalars['String']>;
   clientMutationId?: Maybe<Scalars['String']>;
   descriptionEn?: Maybe<Scalars['String']>;
@@ -1464,3 +1567,135 @@ export type UnitUpdateMutationPayload = {
   unit?: Maybe<UnitType>;
   webPage?: Maybe<Scalars['String']>;
 };
+
+
+export const SearchFormParamsDocument = gql`
+    query SearchFormParams {
+  units {
+    edges {
+      node {
+        pk
+        name
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useSearchFormParamsQuery__
+ *
+ * To run a query within a React component, call `useSearchFormParamsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useSearchFormParamsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useSearchFormParamsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useSearchFormParamsQuery(baseOptions?: Apollo.QueryHookOptions<SearchFormParamsQuery, SearchFormParamsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<SearchFormParamsQuery, SearchFormParamsQueryVariables>(SearchFormParamsDocument, options);
+      }
+export function useSearchFormParamsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<SearchFormParamsQuery, SearchFormParamsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<SearchFormParamsQuery, SearchFormParamsQueryVariables>(SearchFormParamsDocument, options);
+        }
+export type SearchFormParamsQueryHookResult = ReturnType<typeof useSearchFormParamsQuery>;
+export type SearchFormParamsLazyQueryHookResult = ReturnType<typeof useSearchFormParamsLazyQuery>;
+export type SearchFormParamsQueryResult = Apollo.QueryResult<SearchFormParamsQuery, SearchFormParamsQueryVariables>;
+export const SearchReservationUnitsDocument = gql`
+    query SearchReservationUnits($search: String, $minPersons: Float, $maxPersons: Float, $unit: ID, $reservationUnitType: ID, $first: Int, $after: String) {
+  reservationUnits(
+    textSearch: $search
+    maxPersonsGte: $minPersons
+    maxPersonsLte: $maxPersons
+    reservationUnitType: $reservationUnitType
+    unit: $unit
+    first: $first
+    after: $after
+  ) {
+    edges {
+      node {
+        id: pk
+        name
+        reservationUnitType {
+          id: pk
+          name
+        }
+        building: unit {
+          id: pk
+          name
+        }
+        maxPersons
+        location {
+          addressStreet
+        }
+        images {
+          imageType
+          mediumUrl
+        }
+      }
+    }
+    pageInfo {
+      endCursor
+      hasNextPage
+    }
+  }
+}
+    `;
+
+/**
+ * __useSearchReservationUnitsQuery__
+ *
+ * To run a query within a React component, call `useSearchReservationUnitsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useSearchReservationUnitsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useSearchReservationUnitsQuery({
+ *   variables: {
+ *      search: // value for 'search'
+ *      minPersons: // value for 'minPersons'
+ *      maxPersons: // value for 'maxPersons'
+ *      unit: // value for 'unit'
+ *      reservationUnitType: // value for 'reservationUnitType'
+ *      first: // value for 'first'
+ *      after: // value for 'after'
+ *   },
+ * });
+ */
+export function useSearchReservationUnitsQuery(baseOptions?: Apollo.QueryHookOptions<SearchReservationUnitsQuery, SearchReservationUnitsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<SearchReservationUnitsQuery, SearchReservationUnitsQueryVariables>(SearchReservationUnitsDocument, options);
+      }
+export function useSearchReservationUnitsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<SearchReservationUnitsQuery, SearchReservationUnitsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<SearchReservationUnitsQuery, SearchReservationUnitsQueryVariables>(SearchReservationUnitsDocument, options);
+        }
+export type SearchReservationUnitsQueryHookResult = ReturnType<typeof useSearchReservationUnitsQuery>;
+export type SearchReservationUnitsLazyQueryHookResult = ReturnType<typeof useSearchReservationUnitsLazyQuery>;
+export type SearchReservationUnitsQueryResult = Apollo.QueryResult<SearchReservationUnitsQuery, SearchReservationUnitsQueryVariables>;
+export type SearchFormParamsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type SearchFormParamsQuery = { __typename?: 'Query', units?: { __typename?: 'UnitTypeConnection', edges: Array<{ __typename?: 'UnitTypeEdge', node?: { __typename?: 'UnitType', pk?: number | null | undefined, name: string } | null | undefined } | null | undefined> } | null | undefined };
+
+export type SearchReservationUnitsQueryVariables = Exact<{
+  search?: Maybe<Scalars['String']>;
+  minPersons?: Maybe<Scalars['Float']>;
+  maxPersons?: Maybe<Scalars['Float']>;
+  unit?: Maybe<Scalars['ID']>;
+  reservationUnitType?: Maybe<Scalars['ID']>;
+  first?: Maybe<Scalars['Int']>;
+  after?: Maybe<Scalars['String']>;
+}>;
+
+
+export type SearchReservationUnitsQuery = { __typename?: 'Query', reservationUnits?: { __typename?: 'ReservationUnitTypeConnection', edges: Array<{ __typename?: 'ReservationUnitTypeEdge', node?: { __typename?: 'ReservationUnitType', name: string, maxPersons?: number | null | undefined, id?: number | null | undefined, reservationUnitType?: { __typename?: 'ReservationUnitTypeType', name: string, id?: number | null | undefined } | null | undefined, building?: { __typename?: 'UnitType', name: string, id?: number | null | undefined } | null | undefined, location?: { __typename?: 'LocationType', addressStreet: string } | null | undefined, images?: Array<{ __typename?: 'ReservationUnitImageType', imageType: ReservationUnitImageImageType, mediumUrl?: string | null | undefined } | null | undefined> | null | undefined } | null | undefined } | null | undefined>, pageInfo: { __typename?: 'PageInfo', endCursor?: string | null | undefined, hasNextPage: boolean } } | null | undefined };
