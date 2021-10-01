@@ -64,6 +64,14 @@ You can also manually add test data by visiting the django admin at http://127.0
 docker exec -ti tilavarauspalvelu-core_dev_1 python manage.py createsuperuser
 ```
 
+### Graphql workflow
+
+When server has new api changes -> update schema & generate new types by running: ```yarn update-schema generate-gql-types```
+
+When a query is modified and you need new mock data types run: ```generate-gql-types```, see [mocks/handlers/singleSearch.ts](mocks/handlers/singleSearch.ts) for example on how to use type safe mock test data.
+
+* Protip for VSCode users: install https://marketplace.visualstudio.com/items?itemName=GraphQL.vscode-graphql to get autocomplete suggestions and query validation when writing queries.
+
 ## Available Scripts
 
 In the project directory, you can run:
