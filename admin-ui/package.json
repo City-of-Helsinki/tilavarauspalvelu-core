@@ -56,7 +56,9 @@
     "lint:css": "stylelint './src/**/*.tsx'",
     "ts-check": "tsc --noEmit --project tsconfig.json",
     "eject": "react-scripts eject",
-    "generate-gql-types": "graphql-codegen"
+    "generate-gql-types": "graphql-codegen",
+    "update-schema": "npx get-graphql-schema http://localhost:8000/graphql/ > ../tilavaraus.graphql"
+
   },
   "eslintConfig": {
     "extends": [
