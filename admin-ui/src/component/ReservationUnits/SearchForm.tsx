@@ -4,9 +4,9 @@ import React, { useReducer } from "react";
 import { useTranslation } from "react-i18next";
 import i18next from "i18next";
 import styled from "styled-components";
-import { ReservationUnitTypeType } from "../../common/types";
 import { IngressContainer } from "../../styles/layout";
 import { breakpoints } from "../../styles/util";
+import { ReservationUnitTypeType } from "../../common/gql-types";
 
 export type SearchArguments = {
   textSearch?: string;

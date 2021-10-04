@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { AxiosError } from "axios";
 import { useTranslation } from "react-i18next";
 import { TFunction } from "i18next";
 import styled from "styled-components";
@@ -417,7 +418,7 @@ function SupervisorApproval({ applicationRoundId }: IProps): JSX.Element {
         setApplicationRound(result);
       } catch (error) {
         const msg =
-          error.response?.status === 404
+          (error as AxiosError).response?.status === 404
             ? "errors.applicationRoundNotFound"
             : "errors.errorFetchingData";
         setErrorMsg(msg);

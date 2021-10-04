@@ -3,19 +3,13 @@ import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import classNames from "classnames";
 import { IconArrowRight, IconSliders, Notification } from "hds-react";
-import uniq from "lodash/uniq";
 import { useQuery, ApolloError } from "@apollo/client";
 import { IngressContainer } from "../../styles/layout";
 import withMainMenu from "../withMainMenu";
 import { H1, H3 } from "../../styles/typography";
 import FilterContainer, { FilterBtn } from "../FilterContainer";
 import FilterControls from "../FilterControls";
-import {
-  DataFilterConfig,
-  DataFilterOption,
-  UnitType,
-  UnitWIP,
-} from "../../common/types";
+import { DataFilterConfig, DataFilterOption } from "../../common/types";
 import Loader from "../Loader";
 import {
   filterData,
@@ -27,6 +21,7 @@ import Map from "./Map";
 import { ReactComponent as MapMarker } from "../../images/map_marker.svg";
 import { BasicLink, breakpoints } from "../../styles/util";
 import { UNITS_QUERY } from "../../common/queries";
+import { Query, UnitType } from "../../common/gql-types";
 
 const Wrapper = styled.div``;
 
@@ -64,7 +59,9 @@ const UnitList = styled.div`
   margin: var(--spacing-m);
 `;
 
-const getFilterConfig = (units: UnitWIP[]): DataFilterConfig[] => {
+/*
+const getFilterConfig = (units: UnitType[]): DataFilterConfig[] => {
+  return [];
   const services = uniq(units.map((unit) => unit.service)).filter((n) => n);
   const areas = uniq(units.map((unit) => unit.area)).filter((n) => n);
 
@@ -87,6 +84,7 @@ const getFilterConfig = (units: UnitWIP[]): DataFilterConfig[] => {
     },
   ];
 };
+  */
 
 const Units = (): JSX.Element => {
   const [isLoading, setIsLoading] = useState(true);
@@ -100,13 +98,18 @@ const Units = (): JSX.Element => {
 
   const { t } = useTranslation();
 
-  useQuery(UNITS_QUERY, {
+  useQuery<Query>(UNITS_QUERY, {
     onCompleted: (data) => {
-      const result = data?.units?.edges?.map(
-        ({ node }: { node: UnitType }) => node
-      );
-      setUnits(result);
-      setFilterConfig(getFilterConfig(result));
+      const result = data?.units?.edges.map((u) => u?.node as UnitType);
+      if (result !== undefined || result !== null) {
+        if (!result) {
+          setUnits([]);
+          setFilterConfig([]);
+        } else {
+          setUnits(result);
+          // setFilterConfig(getFilterConfig(result));
+        }
+      }
       setIsLoading(false);
     },
     onError: (err: ApolloError) => {

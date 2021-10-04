@@ -16,31 +16,33 @@ import styled from "styled-components";
 import { FetchResult, useMutation } from "@apollo/client";
 import { useTranslation, TFunction } from "react-i18next";
 import { omit, set, startCase } from "lodash";
-import {
-  Space,
-  SpaceCreateMutationInput,
-  SpaceCreateMutationPayload,
-  SpaceType,
-  UnitType,
-} from "../../common/types";
+import { Space } from "../../common/types";
 import { parseAddress } from "../../common/util";
 import { CREATE_SPACE } from "../../common/queries";
 import { CustomDialogHeader } from "./CustomDialogHeader";
 import { languages } from "../../common/const";
+import {
+  SpaceCreateMutationInput,
+  SpaceCreateMutationPayload,
+  SpaceType,
+  UnitByPkType,
+} from "../../common/gql-types";
 
 const defaultParentSpaceId = "1";
 interface IProps {
-  unit: UnitType;
+  unit: UnitByPkType;
   parentSpace?: SpaceType;
   closeModal: () => void;
   onSave: () => void;
   onDataError: (message: string) => void;
 }
 
+type SpaceMutationInputWithKey<T> = Partial<T> & { key: string };
+
 type State = {
   numSpaces: number;
   parentSpace?: Space | null;
-  spaces: SpaceCreateMutationInput[];
+  spaces: SpaceMutationInputWithKey<SpaceCreateMutationInput>[];
   page: number;
   unitId: string;
 };
@@ -52,7 +54,7 @@ type Action =
   | { type: "setSpaceMaxPersonCount"; maxPersonCount: number; index: number }
   | { type: "setSpaceCode"; code: string; index: number }
   | { type: "setParentSpace"; parentSpace?: SpaceType | null }
-  | { type: "setUnit"; unit: UnitType }
+  | { type: "setUnit"; unit: UnitByPkType }
   | { type: "nextPage" }
   | { type: "prevPage" }
   | { type: "addRow" }
@@ -82,7 +84,7 @@ const initialSpace = (parentSpaceId: string | null, unitId: string) =>
     maxPersons: 0,
     locationType: "fixed",
     parentId: parentSpaceId, // WIP to be made optional in api
-  } as SpaceCreateMutationInput);
+  } as SpaceMutationInputWithKey<SpaceCreateMutationInput>);
 
 const reducer = (state: State, action: Action): State => {
   switch (action.type) {
@@ -259,7 +261,7 @@ function FirstPage({
   hasFixedParent,
 }: {
   editorState: State;
-  unit: UnitType;
+  unit: UnitByPkType;
   dispatch: React.Dispatch<Action>;
   closeModal: () => void;
   t: TFunction;
@@ -390,7 +392,7 @@ const SpaceEditor = ({
 
         <EditorColumns>
           <NumberInput
-            defaultValue={space.surfaceArea}
+            defaultValue={space.surfaceArea || 0}
             id={`surfaceArea[${index}]`}
             label={t("SpaceModal.page2.surfaceAreaLabel")}
             helperText={t("SpaceModal.page2.surfaceAreaHelperText")}
@@ -410,7 +412,7 @@ const SpaceEditor = ({
             required
           />
           <NumberInput
-            defaultValue={space.surfaceArea}
+            defaultValue={space.surfaceArea || 0}
             id={`maxPersons[${index}]`}
             label={t("SpaceModal.page2.maxPersonsLabel")}
             minusStepButtonAriaLabel={t("common.decreaseByOneAriaLabel")}
@@ -465,7 +467,7 @@ const SecondPage = ({
   hasFixedParent,
 }: {
   editorState: State;
-  unit: UnitType;
+  unit: UnitByPkType;
   dispatch: React.Dispatch<Action>;
   closeModal: () => void;
   createSpace: (
@@ -517,7 +519,7 @@ const SecondPage = ({
           <SpaceEditor
             index={i}
             key={space.key}
-            space={space}
+            space={space as SpaceCreateMutationInput}
             t={t}
             dispatch={dispatch}
           />

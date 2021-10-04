@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { TFunction } from "i18next";
 import { useParams } from "react-router-dom";
 import { Notification } from "hds-react";
+import { AxiosError } from "axios";
 import styled from "styled-components";
 import uniq from "lodash/uniq";
 import trim from "lodash/trim";
@@ -183,13 +184,13 @@ function Applications(): JSX.Element {
           id: Number(applicationRoundId),
         });
         setApplicationRound(result);
-        setIsLoading(false);
       } catch (error) {
         const msg =
-          error.response?.status === 404
+          (error as AxiosError).response?.status === 404
             ? "errors.applicationRoundNotFound"
             : "errors.errorFetchingData";
         setErrorMsg(msg);
+      } finally {
         setIsLoading(false);
       }
     };

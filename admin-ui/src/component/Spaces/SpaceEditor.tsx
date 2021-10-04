@@ -13,11 +13,6 @@ import { useTranslation } from "react-i18next";
 import i18next from "i18next";
 import { useParams, useHistory } from "react-router-dom";
 import styled from "styled-components";
-import {
-  SpaceType,
-  SpaceUpdateMutationInput,
-  SpaceUpdateMutationPayload,
-} from "../../common/types";
 import { ContentContainer, IngressContainer } from "../../styles/layout";
 import { breakpoints } from "../../styles/util";
 import Loader from "../Loader";
@@ -30,6 +25,15 @@ import {
 import SpaceHead from "./SpaceHead";
 import { H1 } from "../../styles/typography";
 import SpaceHierarchy from "./SpaceHierarchy";
+import {
+  Maybe,
+  Query,
+  QuerySpaceByPkArgs,
+  SpaceType,
+  SpaceUpdateMutationInput,
+  SpaceUpdateMutationPayload,
+  UnitType,
+} from "../../common/gql-types";
 
 interface IProps {
   unitId: string;
@@ -57,7 +61,7 @@ type Action =
   | { type: "clearNotification" }
   | { type: "clearError" }
   | { type: "dataLoaded"; space: SpaceType }
-  | { type: "hierarchyLoaded"; spaces: { node: SpaceType }[] }
+  | { type: "hierarchyLoaded"; spaces: SpaceType[] }
   | { type: "dataLoadError"; message: string }
   | { type: "setName"; name: string }
   | { type: "setMaxPersons"; maxPersons: number }
@@ -112,7 +116,7 @@ const reducer = (state: State, action: Action): State => {
           ...space,
         },
         spaceEdit: {
-          ...pick(space, [
+          ...pick({ ...space, pk: space.pk as number }, [
             "pk",
             "name",
             "surfaceArea",
@@ -128,11 +132,9 @@ const reducer = (state: State, action: Action): State => {
       };
     }
     case "hierarchyLoaded": {
-      const unitSpaces = action.spaces
-        .map(({ node }: { node: SpaceType }) => node)
-        .filter((space) => {
-          return space.unit?.pk === state.unitId;
-        });
+      const unitSpaces = action.spaces.filter((space) => {
+        return space.unit?.pk === state.unitId;
+      });
 
       const additionalOptions = unitSpaces
         .filter((space) => space.pk !== state.spaceId)
@@ -239,7 +241,7 @@ const SaveButton = styled(Button)`
   margin-left: auto;
 `;
 
-const getParent = (v: string | undefined, options: ParentType[]) => {
+const getParent = (v: Maybe<string>, options: ParentType[]) => {
   const p = options.find((po) => String(po.value?.pk) === v) || options[0];
   return p;
 };
@@ -272,22 +274,27 @@ const SpaceEditor = (): JSX.Element | null => {
 
   const { t } = useTranslation();
 
-  useQuery(SPACE_QUERY, {
-    variables: { pk: spaceId },
-    onCompleted: ({ spaceByPk }: { spaceByPk: SpaceType }) => {
-      dispatch({ type: "dataLoaded", space: spaceByPk });
+  useQuery<Query, QuerySpaceByPkArgs>(SPACE_QUERY, {
+    variables: { pk: Number(spaceId) },
+    onCompleted: ({ spaceByPk }) => {
+      if (spaceByPk) {
+        dispatch({ type: "dataLoaded", space: spaceByPk });
+      }
     },
     onError: (e) => {
       onDataError(t("errors.errorFetchingData", { error: e }));
     },
   });
 
-  useQuery(SPACE_HIERARCHY_QUERY, {
-    onCompleted: (data) => {
-      dispatch({
-        type: "hierarchyLoaded",
-        spaces: data.spaces.edges,
-      });
+  useQuery<Query>(SPACE_HIERARCHY_QUERY, {
+    onCompleted: ({ spaces }) => {
+      const result = spaces?.edges.map((s) => s?.node as SpaceType);
+      if (result) {
+        dispatch({
+          type: "hierarchyLoaded",
+          spaces: result,
+        });
+      }
     },
     onError: (e) => {
       onDataError(t("errors.errorFetchingData", { error: e }));
@@ -335,9 +342,9 @@ const SpaceEditor = (): JSX.Element | null => {
     <Wrapper>
       <SpaceHead
         title={state.space.parent?.name || t("SpaceEditor.noParent")}
-        unit={state.space.unit}
-        maxPersons={state.spaceEdit?.maxPersons}
-        surfaceArea={state.spaceEdit?.surfaceArea}
+        unit={state.space.unit as UnitType}
+        maxPersons={state.spaceEdit?.maxPersons || undefined}
+        surfaceArea={state.spaceEdit?.surfaceArea || undefined}
       />
       <IngressContainer>
         {state.notification ? (
@@ -370,7 +377,7 @@ const SpaceEditor = (): JSX.Element | null => {
                 helper={t("SpaceModal.page1.parentHelperText")}
                 options={state.parentOptions}
                 value={getParent(
-                  state.spaceEdit?.parentId,
+                  state.spaceEdit?.parentId || null,
                   state.parentOptions
                 )}
                 onChange={(selected: ParentType) =>
@@ -384,7 +391,7 @@ const SpaceEditor = (): JSX.Element | null => {
             <Section>
               <SubHeading>{t("SpaceEditor.other")}</SubHeading>
               <TextInput
-                defaultValue={state.spaceEdit?.name}
+                defaultValue={state.spaceEdit?.name || "?"}
                 required
                 id="name"
                 label={t("SpaceModal.page2.nameLabel")}
@@ -394,7 +401,7 @@ const SpaceEditor = (): JSX.Element | null => {
               />
               <EditorColumns>
                 <NumberInput
-                  defaultValue={state.spaceEdit?.surfaceArea}
+                  defaultValue={state.spaceEdit?.surfaceArea || undefined}
                   id="surfaceArea"
                   label={t("SpaceModal.page2.surfaceAreaLabel")}
                   helperText={t("SpaceModal.page2.surfaceAreaHelperText")}
@@ -412,7 +419,7 @@ const SpaceEditor = (): JSX.Element | null => {
                   required
                 />
                 <NumberInput
-                  defaultValue={state.spaceEdit?.maxPersons}
+                  defaultValue={state.spaceEdit?.maxPersons || undefined}
                   id="maxPersons"
                   label={t("SpaceModal.page2.maxPersonsLabel")}
                   minusStepButtonAriaLabel={t("common.decreaseByOneAriaLabel")}
@@ -433,7 +440,7 @@ const SpaceEditor = (): JSX.Element | null => {
                   id="code"
                   label={t("SpaceModal.page2.codeLabel")}
                   placeholder={t("SpaceModal.page2.codePlaceholder")}
-                  defaultValue={state.spaceEdit?.code}
+                  defaultValue={state.spaceEdit?.code || undefined}
                   onChange={(e) => {
                     dispatch({
                       type: "setCode",
@@ -446,7 +453,7 @@ const SpaceEditor = (): JSX.Element | null => {
                 required
                 id="termsOfUse"
                 label={t("SpaceEditor.termsOfUse")}
-                defaultValue={state.spaceEdit?.termsOfUse}
+                defaultValue={state.spaceEdit?.termsOfUse || undefined}
                 helperText={t("SpaceEditor.termsOfUseHelperText")}
                 onChange={(e) => {
                   dispatch({

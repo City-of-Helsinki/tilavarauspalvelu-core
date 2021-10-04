@@ -8,10 +8,10 @@ import {
   IconLocation,
 } from "hds-react";
 import { useTranslation } from "react-i18next";
-import { UnitType } from "../../common/types";
 import { H2 } from "../../styles/typography";
 import { BasicLink, breakpoints } from "../../styles/util";
 import { parseAddress } from "../../common/util";
+import { UnitType } from "../../common/gql-types";
 
 interface IProps {
   unit: UnitType;
@@ -105,11 +105,13 @@ const UnitCard = ({ unit }: IProps): JSX.Element => {
               { count: reservationUnitCount }
             )}
           </Prop>
-          <Prop $disabled={!unit.area}>
-            <IconGlobe /> {unit.area || t("Unit.noArea")}
+          <Prop $disabled>
+            <IconGlobe />
+            {t("Unit.noArea")}
           </Prop>
-          <Prop $disabled={!unit.service}>
-            <IconLocate /> {unit.service || t("Unit.noService")}
+          <Prop $disabled>
+            <IconLocate />
+            {t("Unit.noService")}
           </Prop>
         </Props>
       </Content>

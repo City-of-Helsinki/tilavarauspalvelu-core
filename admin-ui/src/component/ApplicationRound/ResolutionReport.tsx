@@ -6,6 +6,7 @@ import styled from "styled-components";
 import uniq from "lodash/uniq";
 import trim from "lodash/trim";
 import { IconArrowRight, Notification } from "hds-react";
+import { AxiosError } from "axios";
 import {
   AllocationResult,
   Application as ApplicationType,
@@ -323,7 +324,7 @@ function ResolutionReport(): JSX.Element {
         setApplicationRound(result);
       } catch (error) {
         const msg =
-          error.response?.status === 404
+          (error as AxiosError).response?.status === 404
             ? "errors.applicationRoundNotFound"
             : "errors.errorFetchingData";
         setErrorMsg(msg);

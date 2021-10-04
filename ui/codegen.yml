@@ -1,0 +1,11 @@
+schema: ../tilavaraus.graphql
+documents: "{pages,components}/**/*.tsx"
+generates:
+  ./modules/gql-types.ts:
+    plugins:
+      - typescript
+      - typescript-react-apollo
+      - typescript-operations
+    config:
+      withHooks: true
+      withMutationFn: true

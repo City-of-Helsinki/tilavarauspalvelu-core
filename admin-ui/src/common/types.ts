@@ -61,18 +61,6 @@ export type Space = {
   code: string; // WIP
 };
 
-// WIP api in progress
-export type Resource = {
-  pk: number;
-  name: string;
-  locationType: "fixed";
-  space: Space | null;
-  unit: UnitType;
-  resourceType: string; // WIP
-  bufferTimeBefore: string;
-  bufferTimeAfter: string;
-};
-
 export type Service = {
   id: number;
   name: TranslationObject;
@@ -116,7 +104,7 @@ export type ReservationUnit = {
   maxPersons: number;
   requireIntroduction: boolean;
   spaces: Space[];
-  resources: Resource[];
+  // resources: Resource[];
   services: Service[];
   images: Image[];
   location: Location;
@@ -267,7 +255,7 @@ export interface ReservationUnitsParameters {
 
 export interface DataFilterOption {
   key: string;
-  value?: string | number;
+  value?: string | number | boolean;
   title: string | null;
 }
 export interface DataFilterConfig {
@@ -437,193 +425,3 @@ export interface UnitWIP {
   openingHours: [];
   reservationUnits: [];
 }
-
-/* WIP, perhaps we should autogenerate these under common module for both uis to use */
-export type SpaceCreateMutationInput = {
-  key?: string; // client only
-  nameFi: string;
-  nameSv?: string;
-  nameEn?: string;
-  unitId: string;
-  parentId?: string;
-  surfaceArea?: number;
-  maxPersons?: number;
-  districtId?: string;
-  code?: string;
-  clientMutationId?: string;
-};
-
-export type SpaceUpdateMutationInput = {
-  pk?: number;
-  name: string;
-  parentId?: string;
-  surfaceArea?: number;
-  maxPersons?: number;
-  termsOfUse?: string;
-  unitId?: string;
-  districtId?: string;
-  code?: string;
-  clientMutationId?: string;
-};
-
-export type ErrorType = {
-  field: string;
-  messages: string[];
-};
-
-export type SpaceCreateMutationPayload = {
-  id: number;
-  errors: ErrorType;
-  clientMutationId?: string;
-};
-
-export type SpaceUpdateMutationPayload = {
-  id: number;
-  errors: ErrorType;
-  clientMutationId?: string;
-};
-
-export type SpaceDeleteMutationInput = {
-  pk: number;
-  clientMutationId?: string;
-};
-
-export type SpaceDeleteMutationPayload = {
-  deleted: boolean;
-  clientMutationId?: string;
-};
-
-// WIP, api incomplete
-export type UnitType = {
-  tprekId: number;
-  pk: number;
-  name: string;
-  location?: Location;
-  area?: string; // district?
-  service?: string;
-  reservationUnits: ReservationUnitType[];
-  resources: Resource[];
-  spaces: SpaceType[];
-  openingHours: [];
-};
-
-export type SpaceType = {
-  pk?: number;
-  name: string;
-  location?: Location;
-  surfaceArea: number;
-  termsOfUse: string;
-  code?: string;
-  area?: string;
-  service?: string;
-  unit?: UnitType;
-  parent?: SpaceType;
-  maxPersons: number;
-  reservationUnits: [];
-  resources: Resource[];
-  spaces: SpaceType[];
-  openingHours: [];
-};
-
-export type ReservationUnitTypeType = {
-  pk: number;
-  name: string;
-};
-
-export type PurposeType = {
-  pk: number;
-  name: string;
-};
-
-// WIP incomplete
-export type ReservationUnitType = {
-  pk: number;
-  status: string; // WIP no api yet!
-  name: string;
-  maxPersons: number;
-  surfaceArea: number;
-  resources: Resource[];
-  spaces: SpaceType[];
-  services: Service[];
-  maxReservationDuration: string;
-  minReservationDuration: string;
-  description: string;
-  requireIntroduction: boolean;
-  images: Image[];
-  unit: ReservationUnitType;
-  location: Location;
-  reservationUnitType: ReservationUnitTypeType;
-  purposes: PurposeType[];
-  termsOfUse: string;
-};
-
-// WIP, no api yet
-export type ResourceCreateMutationInput = {
-  spaceId: string; // ???
-  bufferTimeBefore: string;
-  bufferTimeAfter: string;
-  locationType: "fixed" | "movable";
-  isDraft: boolean;
-  nameFi: string;
-  nameSv: string;
-  nameEn: string;
-  descriptionFi: string;
-  descriptionSv: string;
-  descriptionEn: string;
-};
-
-// WIP, api incomplete
-export type ReservationUnitCreateMutationInput = {
-  name?: string;
-  description?: string;
-  requireIntroduction?: boolean;
-  termsOfUse?: string;
-  equipmentIds?: string;
-  unitId: string;
-  contactInformation?: string;
-  maxReservationDuration?: string;
-  minReservationDuration?: string;
-  clientMutationId?: string;
-};
-
-export type ReservationUnitCreateMutationPayload = {
-  id: number;
-  errors: ErrorType;
-  clientMutationId: string;
-};
-
-export type ReservationUnitUpdateMutationInput =
-  ReservationUnitCreateMutationInput & {
-    pk: number;
-  };
-
-export type ReservationUnitUpdateMutationPayload = {
-  errors: ErrorType;
-  clientMutationId: string;
-};
-
-// WIP no api yet
-export type ResourceUpdateMutationPayload = {
-  id: number;
-  errors: ErrorType;
-  clientMutationId: string;
-};
-
-// WIP no api yet
-export type ResourceCreateMutationPayload = {
-  id: number;
-  errors: ErrorType;
-  clientMutationId: string;
-};
-
-// WIP no api yet
-export type ResourceDeleteMutationInput = {
-  pk: number;
-  clientMutationId?: string;
-};
-
-// WIP no api yet
-export type ResourceDeleteMutationPayload = {
-  deleted: boolean;
-  clientMutationId?: string;
-};

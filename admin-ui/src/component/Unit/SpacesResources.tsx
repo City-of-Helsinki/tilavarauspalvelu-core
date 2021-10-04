@@ -10,7 +10,6 @@ import { useParams } from "react-router-dom";
 import styled from "styled-components";
 import { useQuery } from "@apollo/client";
 import { useModal } from "../../context/UIContext";
-import { UnitType } from "../../common/types";
 import { IngressContainer, WideContainer } from "../../styles/layout";
 import Loader from "../Loader";
 import withMainMenu from "../withMainMenu";
@@ -23,6 +22,14 @@ import NewSpaceModal from "./NewSpaceModal";
 import { breakpoints } from "../../styles/util";
 import NewResourceModal from "./NewResourceModal";
 import { UNIT_QUERY } from "../../common/queries";
+import {
+  Query,
+  QueryUnitByPkArgs,
+  ResourceType,
+  SpaceType,
+  UnitByPkType,
+  UnitType,
+} from "../../common/gql-types";
 
 interface IProps {
   unitId: string;
@@ -41,13 +48,13 @@ type Action =
     }
   | { type: "clearNotification" }
   | { type: "clearError" }
-  | { type: "unitLoaded"; unit: UnitType }
+  | { type: "unitLoaded"; unit: UnitByPkType }
   | { type: "dataLoadError"; message: string };
 
 type State = {
   notification: null | NotificationType;
   loading: boolean;
-  unit: UnitType | null;
+  unit: UnitByPkType | null;
   error: null | {
     message: string;
   };
@@ -138,15 +145,17 @@ const SpacesResources = (): JSX.Element | null => {
   const { setModalContent } = useModal();
 
   const { t } = useTranslation();
-  const { unitId } = useParams<IProps>();
+  const unitId = Number(useParams<IProps>().unitId);
 
   const newSpacesButtonRef = React.createRef<HTMLButtonElement>();
   const newResourceButtonRef = React.createRef<HTMLButtonElement>();
 
-  useQuery(UNIT_QUERY, {
+  useQuery<Query, QueryUnitByPkArgs>(UNIT_QUERY, {
     variables: { pk: unitId },
-    onCompleted: ({ unitByPk }: { unitByPk: UnitType }) => {
-      dispatch({ type: "unitLoaded", unit: unitByPk });
+    onCompleted: ({ unitByPk }) => {
+      if (unitByPk) {
+        dispatch({ type: "unitLoaded", unit: unitByPk });
+      }
     },
     onError: () => {
       dispatch({
@@ -223,7 +232,9 @@ const SpacesResources = (): JSX.Element | null => {
     return null;
   }
 
-  const resources = state.unit.spaces.flatMap((s) => s.resources);
+  const resources = state.unit.spaces?.flatMap(
+    (s) => s?.resources
+  ) as ResourceType[];
 
   return (
     <Wrapper>
@@ -279,7 +290,7 @@ const SpacesResources = (): JSX.Element | null => {
         </TableHead>
       </WideContainer>{" "}
       <SpacesTable
-        spaces={state.unit.spaces}
+        spaces={state.unit.spaces as SpaceType[]}
         unit={state.unit}
         onSave={saveSpaceSuccess}
         onDelete={onDeleteSpaceSuccess}
@@ -295,7 +306,7 @@ const SpacesResources = (): JSX.Element | null => {
             onClick={() =>
               openWithContent(
                 <NewResourceModal
-                  spaces={state.unit?.spaces || []}
+                  spaces={(state.unit?.spaces as SpaceType[]) || []}
                   spaceId={0}
                   unit={state.unit as UnitType}
                   closeModal={closeNewResourceModal}
@@ -309,7 +320,7 @@ const SpacesResources = (): JSX.Element | null => {
         </TableHead>
       </WideContainer>
       <ResourcesTable
-        hasSpaces={state.unit.spaces.length > 0}
+        hasSpaces={Boolean(state.unit?.spaces?.length)}
         resources={resources}
         onDelete={onDeleteSpaceSuccess}
         onDataError={onDataError}

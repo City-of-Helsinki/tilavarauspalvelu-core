@@ -7,11 +7,7 @@ import styled from "styled-components";
 import { useDebounce } from "react-use";
 import { useQuery, ApolloError } from "@apollo/client";
 
-import {
-  DataFilterConfig,
-  LocalizationLanguages,
-  Resource,
-} from "../../common/types";
+import { DataFilterConfig, LocalizationLanguages } from "../../common/types";
 import { IngressContainer } from "../../styles/layout";
 import { H1 } from "../../styles/typography";
 import withMainMenu from "../withMainMenu";
@@ -21,6 +17,7 @@ import { isTranslationObject, localizedValue } from "../../common/util";
 import { breakpoints, Strong } from "../../styles/util";
 import ClearButton from "../ClearButton";
 import { RESOURCES_QUERY } from "../../common/queries";
+import { Query, ResourceType } from "../../common/gql-types";
 
 const Wrapper = styled.div`
   padding: var(--spacing-layout-2-xl) 0;
@@ -72,7 +69,7 @@ const getCellConfig = (
       {
         title: t("Resources.headings.name"),
         key: "name",
-        transform: ({ name }: Resource) => (
+        transform: ({ name }: ResourceType) => (
           <Strong>{localizedValue(name, language)}</Strong>
         ),
       },
@@ -87,7 +84,7 @@ const getCellConfig = (
       {
         title: t("Resources.headings.resourceType"),
         key: "resourceType",
-        transform: ({ resourceType }: Resource) => (
+        transform: ({ locationType }: ResourceType) => (
           <div
             style={{
               display: "flex",
@@ -95,7 +92,7 @@ const getCellConfig = (
               justifyContent: "space-between",
             }}
           >
-            <span>{resourceType || "?"}</span>
+            <span>{locationType || "?"}</span>
             <IconArrowRight />
           </div>
         ),
@@ -104,20 +101,20 @@ const getCellConfig = (
     index: "id",
     sorting: "name",
     order: "asc",
-    rowLink: ({ pk }: Resource) => `/resources/${pk}`,
+    rowLink: ({ pk }: ResourceType) => `/resources/${pk}`,
   };
 };
 
 const getFilterConfig = (
-  resources: Resource[],
+  resources: ResourceType[],
   t: TFunction
 ): DataFilterConfig[] => {
   const buildings = uniq(
-    resources.map((resource: Resource) => resource?.space?.building?.name || "")
+    resources.map((resource) => resource?.space?.building?.name || "")
   ).filter((n) => n);
-  const types = uniq(
-    resources.map((resource: Resource) => resource.resourceType)
-  ).filter((n) => n);
+  const types = uniq(resources.map((resource) => resource.locationType)).filter(
+    (n) => n
+  );
   // const districts = uniq(spaces.map((space: Space) => space.building.district));
 
   return [
@@ -137,7 +134,7 @@ const getFilterConfig = (
         types &&
         types.map((type: string) => ({
           title: type,
-          key: "resourceType",
+          key: "locationType",
           value: type || "",
         })),
     },
@@ -147,7 +144,7 @@ const getFilterConfig = (
 const ResourcesList = (): JSX.Element => {
   const { t, i18n } = useTranslation();
 
-  const [resources, setResources] = useState<Resource[]>([]);
+  const [resources, setResources] = useState<ResourceType[]>([]);
   const [filterConfig, setFilterConfig] = useState<DataFilterConfig[] | null>(
     null
   );
@@ -164,12 +161,16 @@ const ResourcesList = (): JSX.Element => {
     [searchValue]
   );
 
-  useQuery(RESOURCES_QUERY, {
+  useQuery<Query>(RESOURCES_QUERY, {
     onCompleted: (data) => {
-      const result = data?.resources?.edges?.map(({ node }: any) => node); // eslint-disable-line
-      setResources(result);
-      setCellConfig(getCellConfig(t, i18n.language as LocalizationLanguages));
-      setFilterConfig(getFilterConfig(result, t));
+      const result = data?.resources?.edges?.map(
+        (r) => r?.node as ResourceType
+      );
+      if (result) {
+        setResources(result);
+        setCellConfig(getCellConfig(t, i18n.language as LocalizationLanguages));
+        setFilterConfig(getFilterConfig(result, t));
+      }
       setIsLoading(false);
     },
     onError: (err: ApolloError) => {
@@ -198,9 +199,9 @@ const ResourcesList = (): JSX.Element => {
   }
 
   const filteredResources = searchTerm
-    ? resources.filter((resource: Resource) => {
+    ? resources.filter((resource: ResourceType) => {
         const searchTerms = searchTerm.toLowerCase().split(" ");
-        const { name, space, resourceType } = resource;
+        const { name, space, locationType } = resource;
         const buildingName = space?.building?.name;
         const localizedName =
           name && isTranslationObject(name)
@@ -211,7 +212,7 @@ const ResourcesList = (): JSX.Element => {
           return (
             localizedName.toLowerCase().includes(term) ||
             String(buildingName).toLowerCase().includes(term) ||
-            String(resourceType).toLowerCase().includes(term)
+            String(locationType).toLowerCase().includes(term)
           );
         });
       })

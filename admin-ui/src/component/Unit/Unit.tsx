@@ -14,7 +14,6 @@ import { useTranslation } from "react-i18next";
 import { useParams, useHistory } from "react-router-dom";
 import styled from "styled-components";
 import { UNIT_QUERY } from "../../common/queries";
-import { UnitType } from "../../common/types";
 import { parseAddress } from "../../common/util";
 import { useModal } from "../../context/UIContext";
 import { ContentContainer, IngressContainer } from "../../styles/layout";
@@ -27,6 +26,12 @@ import SecondaryNavigation from "../SecondaryNavigation";
 import withMainMenu from "../withMainMenu";
 import ExternalLink from "./ExternalLink";
 import InfoModalContent from "./InfoModalContent";
+import {
+  Query,
+  QueryUnitByPkArgs,
+  ReservationUnitType,
+  UnitByPkType,
+} from "../../common/gql-types";
 
 interface IProps {
   unitId: string;
@@ -149,21 +154,23 @@ const NoReservationUnits = styled.div``;
 
 const Unit = (): JSX.Element | null => {
   const [isLoading, setIsLoading] = useState(true);
-  const [unit, setUnit] = useState<UnitType>();
+  const [unit, setUnit] = useState<UnitByPkType>();
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [hasOpeningHours, setOpeningHours] = useState(true);
   const [hasSpacesResources, setSpacesResources] = useState(true);
 
   const { t } = useTranslation();
-  const { unitId } = useParams<IProps>();
+  const unitId = Number(useParams<IProps>().unitId);
   const history = useHistory();
 
-  useQuery(UNIT_QUERY, {
+  useQuery<Query, QueryUnitByPkArgs>(UNIT_QUERY, {
     variables: { pk: unitId },
-    onCompleted: ({ unitByPk }: { unitByPk: UnitType }) => {
-      setUnit(unitByPk);
-      setOpeningHours(Boolean(unitByPk.openingHours?.length));
-      setSpacesResources(Boolean(unitByPk.spaces?.length > 0));
+    onCompleted: ({ unitByPk }) => {
+      if (unitByPk) {
+        setUnit(unitByPk);
+        setOpeningHours(Boolean(unitByPk.openingHours));
+        setSpacesResources(Boolean(unitByPk?.spaces?.length));
+      }
       setIsLoading(false);
     },
     onError: () => {
@@ -214,11 +221,12 @@ const Unit = (): JSX.Element | null => {
               <Prop $disabled>{t("Unit.noAddress")}</Prop>
             )}
             <Props>
-              <Prop $disabled={!unit?.area}>
-                <IconGlobe /> {unit?.area || t("Unit.noArea")}
+              <Prop $disabled>
+                <IconGlobe /> {t("Unit.noArea")}
               </Prop>
-              <Prop $disabled={!unit?.service}>
-                <IconLocate /> {unit?.service || t("Unit.noService")}
+              <Prop $disabled>
+                <IconLocate />
+                {t("Unit.noService")}
               </Prop>
             </Props>
           </div>
@@ -268,7 +276,7 @@ const Unit = (): JSX.Element | null => {
             ) : null}
           </div>
           <StyledBoldButton
-            disabled={unit?.spaces.length < 1}
+            disabled={Boolean(unit?.spaces?.length)}
             variant="supplementary"
             iconLeft={<IconPlusCircleFill />}
             onClick={() => {
@@ -281,8 +289,10 @@ const Unit = (): JSX.Element | null => {
       </IngressContainer>
       {unit?.reservationUnits && unit?.reservationUnits.length > 0 ? (
         <ReservationUnitList
-          reservationUnits={unit?.reservationUnits}
-          unitId={unit?.pk}
+          reservationUnits={
+            (unit?.reservationUnits as ReservationUnitType[]) || []
+          }
+          unitId={unitId}
         />
       ) : (
         <ContentContainer>
