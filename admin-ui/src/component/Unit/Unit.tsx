@@ -276,7 +276,7 @@ const Unit = (): JSX.Element | null => {
             ) : null}
           </div>
           <StyledBoldButton
-            disabled={Boolean(unit?.spaces?.length)}
+            disabled={!hasSpacesResources}
             variant="supplementary"
             iconLeft={<IconPlusCircleFill />}
             onClick={() => {
