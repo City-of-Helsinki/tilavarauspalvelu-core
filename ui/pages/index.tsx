@@ -6,7 +6,7 @@ import styled from "styled-components";
 import { gql } from "@apollo/client";
 import apolloClient from "../modules/apolloClient";
 import Header from "../components/index/Header";
-import Shortcuts from "../components/index/Shortcuts";
+// import Shortcuts from "../components/index/Shortcuts";
 import Recommendations from "../components/index/Recommendations";
 import SearchGuides from "../components/index/SearchGuides";
 import ServiceInfo from "../components/index/ServiceInfo";
@@ -100,20 +100,24 @@ const DesktopStyledKoros = styled(StyledKoros)`
 const Home = ({ promotions, recommendations }: Props): JSX.Element => {
   const { t } = useTranslation("home");
 
-  const shouldDisplayRecommendations = recommendations?.length > 0;
-  const shouldDisplayPromotions = promotions?.length >= 2;
+  // const shouldDisplayRecommendations = recommendations?.length > 0;
+  const shouldDisplayRecommendations = false;
+  // const shouldDisplayPromotions = promotions?.length >= 2;
+  const shouldDisplayPromotions = false;
 
   return (
     <>
       <Header heading={t("head.heading")} text={t("head.text")} />
       <DesktopStyledKoros
         $from="transparent"
-        $to="var(--tilavaraus-header-background-color)"
+        // $to="var(--tilavaraus-header-background-color)"
+        $to="var(--tilavaraus-gray)"
         type="wave"
       />
-      <Shortcuts />
+      {/* <Shortcuts /> */}
       <StyledKoros
-        $from="var(--tilavaraus-header-background-color)"
+        // $from="var(--tilavaraus-header-background-color)"
+        $from="var(--tilavaraus-gray)"
         $to={
           !shouldDisplayRecommendations && shouldDisplayPromotions
             ? "var(--color-white)"

@@ -4,6 +4,7 @@ import router from "next/router";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { breakpoint } from "../../modules/style";
+import { singleSearchPrefix } from "../../modules/const";
 
 interface HeadProps {
   heading: string;
@@ -116,7 +117,7 @@ const Head = (props: HeadProps): JSX.Element => {
 
   const handleSubmit = (event: React.FormEvent | React.MouseEvent) => {
     event.preventDefault();
-    router.push(`/search?search=${searchTerm}`);
+    router.push(`${singleSearchPrefix}?search=${searchTerm}`);
   };
 
   return (

@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { Button, IconArrowRight, ImageWithCard } from "hds-react";
 import { breakpoint } from "../../modules/style";
 import Container from "../common/Container";
+import { searchPrefix, singleSearchPrefix } from "../../modules/const";
 
 const Wrapper = styled(Container)`
   padding-top: var(--spacing-xl);
@@ -77,7 +78,7 @@ const SearchGuides = (): JSX.Element => {
           <ButtonContainer>
             <Button
               id="browseSingleReservationUnits"
-              onClick={() => router.push("/single/search")}
+              onClick={() => router.push(singleSearchPrefix)}
               iconRight={<IconArrowRight />}
             >
               {t("browseReservationsButton")}
@@ -99,7 +100,7 @@ const SearchGuides = (): JSX.Element => {
           <ButtonContainer>
             <Button
               id="browseRecurringReservationUnits"
-              onClick={() => router.push("/search")}
+              onClick={() => router.push(searchPrefix)}
               iconRight={<IconArrowRight />}
             >
               {t("browseRecurringReservationsButton")}
