@@ -456,7 +456,6 @@ function DataTable({
   }, [setSelections, selectedRows]);
 
   const setSortingAndOrder = (colKey: string): void => {
-    console.log("sorting", sorting);
     if (sorting === colKey) {
       setOrder(order === "desc" ? "asc" : "desc");
     } else {

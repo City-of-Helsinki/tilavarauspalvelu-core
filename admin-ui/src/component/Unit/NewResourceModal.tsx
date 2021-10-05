@@ -161,7 +161,6 @@ const NewResourceModal = ({
 
       if (data?.createResource?.errors === null) {
         onSave();
-        console.log("save success, calling close!");
         closeModal();
       } else {
         dispatch({
