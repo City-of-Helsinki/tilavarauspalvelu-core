@@ -113,7 +113,8 @@ const getCellConfig = (
     index: "pk",
     sorting: "name",
     order: "asc",
-    rowLink: ({ pk }: ReservationUnitType) => `/ReservationUnits/${pk}`,
+    rowLink: ({ pk, unit }: ReservationUnitType) =>
+      `/unit/${unit?.pk}/reservationUnit/edit/${pk}`,
   };
 };
 

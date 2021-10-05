@@ -66,9 +66,10 @@ const ResourcesTable = ({
         ),
       },
       {
-        title: "Resource.unit",
+        title: "Resource.space.name",
         key: "unit",
-        transform: () => "Hannantalo WIP",
+        transform: ({ space }: ResourceType) =>
+          space?.name || t("ResourceTable.noSpace"),
       },
       {
         title: "Resource.area",
@@ -87,7 +88,7 @@ const ResourcesTable = ({
                   name: t("ResourceTable.menuEditResource"),
                   onClick: () => {
                     // eslint-disable-next-line no-console
-                    console.log("Clicked!");
+                    console.log("Edit resource todo");
                   },
                 },
                 {
@@ -119,7 +120,7 @@ const ResourcesTable = ({
         ),
       },
     ],
-    index: "id",
+    index: "pk",
     sorting: "name.fi",
     order: "asc",
     // rowLink: ({ id }: Resource) => `/resource/${id}`,

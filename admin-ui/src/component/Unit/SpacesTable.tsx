@@ -170,7 +170,7 @@ const SpacesTable = ({
         },
       },
     ],
-    index: "id",
+    index: "pk",
     sorting: "name.fi",
     order: "asc",
     rowLink: ({ pk }: SpaceType) => `/unit/${unit.pk}/space/edit/${pk}`,

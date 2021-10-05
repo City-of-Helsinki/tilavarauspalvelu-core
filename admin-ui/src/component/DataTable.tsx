@@ -396,10 +396,10 @@ const processData = (
     const sortedData = [...data].sort((a, b) => {
       const aValue = isTranslationObject(get(a, sorting))
         ? localizedValue(get(a, sorting), language)
-        : get(a, sorting);
+        : get(a, sorting, "");
       const bValue = isTranslationObject(get(b, sorting))
         ? localizedValue(get(b, sorting), language)
-        : get(b, sorting);
+        : get(b, sorting, "");
 
       if (aValue < bValue) {
         return order === "asc" ? -1 : 1;
@@ -456,6 +456,7 @@ function DataTable({
   }, [setSelections, selectedRows]);
 
   const setSortingAndOrder = (colKey: string): void => {
+    console.log("sorting", sorting);
     if (sorting === colKey) {
       setOrder(order === "desc" ? "asc" : "desc");
     } else {

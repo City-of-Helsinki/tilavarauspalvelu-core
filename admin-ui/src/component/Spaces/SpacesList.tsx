@@ -122,10 +122,10 @@ const getCellConfig = (
         ),
       },
     ],
-    index: "id",
+    index: "pk",
     sorting: "name",
     order: "asc",
-    rowLink: ({ id }: SpaceType) => `/spaces/${id}`,
+    rowLink: ({ pk, unit }: SpaceType) => `unit/${unit?.pk}/space/edit/${pk}`,
   };
 };
 

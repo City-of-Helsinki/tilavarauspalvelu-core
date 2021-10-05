@@ -74,12 +74,13 @@ const getCellConfig = (
         ),
       },
       {
-        title: t("Resources.headings.building"),
-        key: "space.building.name",
+        title: t("Resources.headings.unit"),
+        key: "space.unit.name",
       },
       {
         title: t("Resources.headings.district"),
-        key: "space.building.district.name",
+        key: "space.unit.district.name",
+        transform: () => "??",
       },
       {
         title: t("Resources.headings.resourceType"),
@@ -98,7 +99,7 @@ const getCellConfig = (
         ),
       },
     ],
-    index: "id",
+    index: "pk",
     sorting: "name",
     order: "asc",
     rowLink: ({ pk }: ResourceType) => `/resources/${pk}`,
@@ -110,7 +111,7 @@ const getFilterConfig = (
   t: TFunction
 ): DataFilterConfig[] => {
   const buildings = uniq(
-    resources.map((resource) => resource?.space?.building?.name || "")
+    resources.map((resource) => resource?.space?.unit?.name || "")
   ).filter((n) => n);
   const types = uniq(resources.map((resource) => resource.locationType)).filter(
     (n) => n
@@ -119,12 +120,12 @@ const getFilterConfig = (
 
   return [
     {
-      title: t("Resources.headings.building"),
+      title: t("Resources.headings.unit"),
       filters:
         buildings &&
         buildings.map((building: string) => ({
           title: building,
-          key: "space.building.name",
+          key: "space.unit.name",
           value: building || "",
         })),
     },
