@@ -127,7 +127,7 @@ const ReservationUnitCard = ({
           </Link>
         </Name>
         <Description>
-          {localizedValue(reservationUnit.building.name, i18n.language)}
+          {localizedValue(reservationUnit.building?.name, i18n.language)}
         </Description>
         <Bottom>
           {reservationUnit.reservationUnitType ? (

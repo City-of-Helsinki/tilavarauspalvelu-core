@@ -18,7 +18,6 @@
     "@types/react-dom": "^17.0.8",
     "@typescript-eslint/eslint-plugin": "^4.27.0",
     "@typescript-eslint/parser": "^4.27.0",
-    "axe-core": "^4.2.2",
     "eslint": "^7.29.0",
     "eslint-config-airbnb-typescript-prettier": "^4.2.0",
     "eslint-plugin-jsx-a11y": "^6.4.1",
@@ -33,7 +32,8 @@
   "scripts": {
     "start": "react-scripts start",
     "test": "react-scripts test",
-    "lint": "eslint --ext ts,tsx ."
+    "lint": "eslint --ext ts,tsx .",
+    "generate-certificate": "echo \"[dn]\nCN=local-tilavaraus\n[req]\ndistinguished_name = dn\n[EXT]\nsubjectAltName=DNS:local-tilavaraus\nkeyUsage=digitalSignature\nextendedKeyUsage=serverAuth\"| openssl req -x509 -out certificates/local-tilavaraus.crt -keyout certificates/local-tilavaraus.key -newkey rsa:2048 -nodes -sha256 -subj '/CN=local-tilavaraus' -extensions EXT -config /dev/stdin"
   },
   "browserslist": {
     "production": [

@@ -304,8 +304,3 @@ export type Promotion = {
   image: string;
   link: string;
 };
-
-export type PageInfo = {
-  endCursor: string;
-  hasNextPage: boolean;
-};

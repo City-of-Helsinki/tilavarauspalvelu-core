@@ -24,7 +24,7 @@ const applicationEventFeedBasePath = "application_event_calendar";
 const userBasePath = "users";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-interface QueryParameters extends ReservationUnitsParameters {}
+interface QueryParameters {}
 
 interface RequestParameters {
   path: string;
@@ -131,7 +131,7 @@ export interface ReservationUnitsParameters {
 }
 
 export function getReservationUnits(
-  params: ReservationUnitsParameters
+  params: QueryParameters
 ): Promise<ReservationUnit[]> {
   return apiGet<ReservationUnit[]>({
     parameters: params,

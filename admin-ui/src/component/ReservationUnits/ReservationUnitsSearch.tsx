@@ -4,8 +4,12 @@ import { isEmpty } from "lodash";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
+import {
+  Query,
+  QueryReservationUnitsArgs,
+  ReservationUnitType,
+} from "../../common/gql-types";
 import { SEARCH_RESERVATION_UNITS_QUERY } from "../../common/queries";
-import { ReservationUnitType } from "../../common/types";
 import { ReactComponent as IconList } from "../../images/icon_list.svg";
 import { IngressContainer } from "../../styles/layout";
 import { H1 } from "../../styles/typography";
@@ -41,30 +45,34 @@ const ReservationUnitsSearch = (): JSX.Element => {
   const [isLoading, setIsLoading] = useState(false);
   const [search, setSearch] = useState<SearchArguments>({});
 
-  const { refetch } = useQuery(SEARCH_RESERVATION_UNITS_QUERY, {
-    skip: isEmpty(search),
-    variables: {
-      ...search,
-      maxPersonsLte: search.maxPersonsLte
-        ? Number(search.maxPersonsLte)
-        : undefined,
-      maxPersonsGte: search.maxPersonsGte
-        ? Number(search.maxPersonsGte)
-        : undefined,
-    },
-    onCompleted: (data) => {
-      const result = data?.reservationUnits?.edges?.map(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        ({ node }: any) => node
-      );
-      setReservationUnits(result);
-      setIsLoading(false);
-    },
-    onError: (err: ApolloError) => {
-      setErrorMsg(err.message);
-      setIsLoading(false);
-    },
-  });
+  const { refetch } = useQuery<Query, QueryReservationUnitsArgs>(
+    SEARCH_RESERVATION_UNITS_QUERY,
+    {
+      skip: isEmpty(search),
+      variables: {
+        ...search,
+        maxPersonsLte: search.maxPersonsLte
+          ? Number(search.maxPersonsLte)
+          : undefined,
+        maxPersonsGte: search.maxPersonsGte
+          ? Number(search.maxPersonsGte)
+          : undefined,
+      },
+      onCompleted: (data) => {
+        const result = data?.reservationUnits?.edges?.map(
+          (ru) => ru?.node as ReservationUnitType
+        );
+        if (result) {
+          setReservationUnits(result);
+        }
+        setIsLoading(false);
+      },
+      onError: (err: ApolloError) => {
+        setErrorMsg(err.message);
+        setIsLoading(false);
+      },
+    }
+  );
 
   useEffect(() => {
     if (!isEmpty(search)) {
@@ -116,7 +124,7 @@ const ReservationUnitsSearch = (): JSX.Element => {
           return (
             <ReservationUnitCard
               key={ru.pk}
-              unitId={ru.pk}
+              unitId={ru.pk as number}
               reservationUnit={ru}
             />
           );

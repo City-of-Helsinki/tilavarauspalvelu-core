@@ -20,10 +20,22 @@ Make sure /etc/hosts point domain local-tilavaraus.hel.fi to 127.0.0.1. This is 
 127.0.0.1       local-tilavaraus.hel.fi
 ```
 
-Start UI
+Create a self-signed certificate for SSL connection on developpment server by running the following command in the common directory
+```
+yarn generate-certificate
+```
+
+
+### Start UI
 
 ```
 yarn start
+```
+
+### When GQL api changes and you need to update the Typescript types
+
+```
+yarn generate-gql-types
 ```
 
 ### Access with browser
@@ -47,6 +59,11 @@ You can also manually add test data by visiting the django admin at http://127.0
 docker exec -ti tilavarauspalvelu-core_dev_1 python manage.py createsuperuser
 ```
 
+### Graphql workflow
+
+When server has new api changes -> update schema & generate new types by running: ```yarn update-schema generate-gql-types```
+
+* Protip for VSCode users: install https://marketplace.visualstudio.com/items?itemName=GraphQL.vscode-graphql to get autocomplete suggestions and query validation when writing queries.
 ## Configurable environment variables
 
 Use `.env.local` for development.

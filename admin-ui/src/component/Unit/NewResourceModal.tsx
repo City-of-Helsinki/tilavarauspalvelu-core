@@ -12,17 +12,17 @@ import styled from "styled-components";
 import { FetchResult, useMutation } from "@apollo/client";
 import { useTranslation } from "react-i18next";
 import { omit, set, startCase } from "lodash";
-import {
-  ResourceCreateMutationInput,
-  ResourceCreateMutationPayload,
-  SpaceType,
-  UnitType,
-} from "../../common/types";
 import { parseAddress } from "../../common/util";
 import { CREATE_RESOURCE } from "../../common/queries";
 import { CustomDialogHeader } from "./CustomDialogHeader";
 import { breakpoints } from "../../styles/util";
 import { languages } from "../../common/const";
+import {
+  ResourceCreateMutationInput,
+  ResourceCreateMutationPayload,
+  SpaceType,
+  UnitType,
+} from "../../common/gql-types";
 
 interface IProps {
   unit: UnitType;

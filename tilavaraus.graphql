@@ -1,0 +1,1295 @@
+"""An enumeration."""
+enum ApplicationRoundTargetGroup {
+  """Internal"""
+  INTERNAL
+
+  """Public"""
+  PUBLIC
+
+  """Kaikki"""
+  ALL
+}
+
+type ApplicationRoundType {
+  name: String!
+  targetGroup: ApplicationRoundTargetGroup!
+  allocating: Boolean!
+  reservationUnits(before: String, after: String, first: Int, last: Int): ReservationUnitByPkTypeConnection!
+  applicationPeriodBegin: DateTime!
+  applicationPeriodEnd: DateTime!
+  reservationPeriodBegin: Date!
+  reservationPeriodEnd: Date!
+  publicDisplayBegin: DateTime!
+  publicDisplayEnd: DateTime!
+  purposes(before: String, after: String, first: Int, last: Int): PurposeTypeConnection!
+  criteria: String!
+  pk: Int
+}
+
+type BuildingType implements Node {
+  """The ID of the object."""
+  id: ID!
+  name: String!
+  district: DistrictType
+  realEstate: RealEstateType
+  surfaceArea: Float
+  pk: Int
+}
+
+"""
+The `Date` scalar type represents a Date
+value as specified by
+[iso8601](https://en.wikipedia.org/wiki/ISO_8601).
+"""
+scalar Date
+
+"""
+The `DateTime` scalar type represents a DateTime
+value as specified by
+[iso8601](https://en.wikipedia.org/wiki/ISO_8601).
+"""
+scalar DateTime
+
+type DistrictType implements Node {
+  """The ID of the object."""
+  id: ID!
+  name: String!
+  pk: Int
+}
+
+input EquipmentCategoryCreateMutationInput {
+  name: String
+  nameFi: String
+  nameEn: String
+  clientMutationId: String
+}
+
+type EquipmentCategoryCreateMutationPayload {
+  id: Int
+  name: String
+  nameFi: String
+  nameEn: String
+
+  """May contain more than one error for same field."""
+  errors: [ErrorType]
+  equipmentCategory: EquipmentCategoryType
+  clientMutationId: String
+}
+
+input EquipmentCategoryDeleteMutationInput {
+  pk: ID
+  clientMutationId: String
+}
+
+type EquipmentCategoryDeleteMutationPayload {
+  deleted: Boolean
+  errors: String
+  clientMutationId: String
+}
+
+type EquipmentCategoryType implements Node {
+  """The ID of the object."""
+  id: ID!
+  name: String!
+  pk: Int
+}
+
+type EquipmentCategoryTypeConnection {
+  """Pagination data for this connection."""
+  pageInfo: PageInfo!
+
+  """Contains the nodes in this connection."""
+  edges: [EquipmentCategoryTypeEdge]!
+}
+
+"""A Relay edge containing a `EquipmentCategoryType` and its cursor."""
+type EquipmentCategoryTypeEdge {
+  """The item at the end of the edge"""
+  node: EquipmentCategoryType
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
+
+input EquipmentCategoryUpdateMutationInput {
+  name: String
+  nameFi: String
+  nameEn: String
+  pk: Int!
+  clientMutationId: String
+}
+
+type EquipmentCategoryUpdateMutationPayload {
+  id: Int
+  name: String
+  nameFi: String
+  nameEn: String
+  pk: Int
+
+  """May contain more than one error for same field."""
+  errors: [ErrorType]
+  equipmentCategory: EquipmentCategoryType
+  clientMutationId: String
+}
+
+input EquipmentCreateMutationInput {
+  name: String
+  categoryId: String!
+  nameFi: String
+  nameEn: String
+  clientMutationId: String
+}
+
+type EquipmentCreateMutationPayload {
+  id: Int
+  name: String
+  categoryId: String
+  nameFi: String
+  nameEn: String
+
+  """May contain more than one error for same field."""
+  errors: [ErrorType]
+  equipment: EquipmentType
+  clientMutationId: String
+}
+
+input EquipmentDeleteMutationInput {
+  pk: ID
+  clientMutationId: String
+}
+
+type EquipmentDeleteMutationPayload {
+  deleted: Boolean
+  errors: String
+  clientMutationId: String
+}
+
+type EquipmentType implements Node {
+  """The ID of the object."""
+  id: ID!
+  name: String!
+  pk: Int
+  category: EquipmentCategoryType
+}
+
+type EquipmentTypeConnection {
+  """Pagination data for this connection."""
+  pageInfo: PageInfo!
+
+  """Contains the nodes in this connection."""
+  edges: [EquipmentTypeEdge]!
+}
+
+"""A Relay edge containing a `EquipmentType` and its cursor."""
+type EquipmentTypeEdge {
+  """The item at the end of the edge"""
+  node: EquipmentType
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
+
+input EquipmentUpdateMutationInput {
+  name: String
+  categoryId: String!
+  nameFi: String
+  nameEn: String
+  pk: Int!
+  clientMutationId: String
+}
+
+type EquipmentUpdateMutationPayload {
+  id: Int
+  name: String
+  categoryId: String
+  nameFi: String
+  nameEn: String
+  pk: Int
+
+  """May contain more than one error for same field."""
+  errors: [ErrorType]
+  equipment: EquipmentType
+  clientMutationId: String
+}
+
+type ErrorType {
+  field: String!
+  messages: [String!]!
+}
+
+type KeywordCategoryType implements Node {
+  """The ID of the object."""
+  id: ID!
+  name: String!
+  pk: Int
+  keywordGroups: [KeywordGroupType]
+}
+
+type KeywordCategoryTypeConnection {
+  """Pagination data for this connection."""
+  pageInfo: PageInfo!
+
+  """Contains the nodes in this connection."""
+  edges: [KeywordCategoryTypeEdge]!
+}
+
+"""A Relay edge containing a `KeywordCategoryType` and its cursor."""
+type KeywordCategoryTypeEdge {
+  """The item at the end of the edge"""
+  node: KeywordCategoryType
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
+
+type KeywordGroupType implements Node {
+  """The ID of the object."""
+  id: ID!
+  name: String!
+  pk: Int
+  keywords: [KeywordType]
+}
+
+type KeywordGroupTypeConnection {
+  """Pagination data for this connection."""
+  pageInfo: PageInfo!
+
+  """Contains the nodes in this connection."""
+  edges: [KeywordGroupTypeEdge]!
+}
+
+"""A Relay edge containing a `KeywordGroupType` and its cursor."""
+type KeywordGroupTypeEdge {
+  """The item at the end of the edge"""
+  node: KeywordGroupType
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
+
+type KeywordType implements Node {
+  """The ID of the object."""
+  id: ID!
+  name: String!
+  pk: Int
+}
+
+type KeywordTypeConnection {
+  """Pagination data for this connection."""
+  pageInfo: PageInfo!
+
+  """Contains the nodes in this connection."""
+  edges: [KeywordTypeEdge]!
+}
+
+"""A Relay edge containing a `KeywordType` and its cursor."""
+type KeywordTypeEdge {
+  """The item at the end of the edge"""
+  node: KeywordType
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
+
+type LocationType implements Node {
+  addressStreet: String!
+  addressZip: String!
+  addressCity: String!
+
+  """The ID of the object."""
+  id: ID!
+  pk: Int
+  longitude: String
+  latitude: String
+}
+
+type Mutation {
+  createReservation(input: ReservationMutationInput!): ReservationMutationPayload
+  createReservationUnit(input: ReservationUnitCreateMutationInput!): ReservationUnitCreateMutationPayload
+  updateReservationUnit(input: ReservationUnitUpdateMutationInput!): ReservationUnitUpdateMutationPayload
+  createPurpose(input: PurposeCreateMutationInput!): PurposeCreateMutationPayload
+  updatePurpose(input: PurposeUpdateMutationInput!): PurposeUpdateMutationPayload
+  createEquipment(input: EquipmentCreateMutationInput!): EquipmentCreateMutationPayload
+  updateEquipment(input: EquipmentUpdateMutationInput!): EquipmentUpdateMutationPayload
+  deleteEquipment(input: EquipmentDeleteMutationInput!): EquipmentDeleteMutationPayload
+  createEquipmentCategory(input: EquipmentCategoryCreateMutationInput!): EquipmentCategoryCreateMutationPayload
+  updateEquipmentCategory(input: EquipmentCategoryUpdateMutationInput!): EquipmentCategoryUpdateMutationPayload
+  deleteEquipmentCategory(input: EquipmentCategoryDeleteMutationInput!): EquipmentCategoryDeleteMutationPayload
+  createSpace(input: SpaceCreateMutationInput!): SpaceCreateMutationPayload
+  updateSpace(input: SpaceUpdateMutationInput!): SpaceUpdateMutationPayload
+  deleteSpace(input: SpaceDeleteMutationInput!): SpaceDeleteMutationPayload
+  createResource(input: ResourceCreateMutationInput!): ResourceCreateMutationPayload
+  updateResource(input: ResourceUpdateMutationInput!): ResourceUpdateMutationPayload
+  deleteResource(input: ResourceDeleteMutationInput!): ResourceDeleteMutationPayload
+  updateUnit(input: UnitUpdateMutationInput!): UnitUpdateMutationPayload
+}
+
+"""An object with an ID"""
+interface Node {
+  """The ID of the object."""
+  id: ID!
+}
+
+type OpeningHoursType {
+  openingTimes: [OpeningTimesType]
+  openingTimePeriods: [PeriodType]
+}
+
+type OpeningTimesType {
+  date: Date
+  startTime: Time
+  endTime: Time
+  state: String
+  periods: [Int]
+}
+
+"""
+The Relay compliant `PageInfo` type, containing data necessary to paginate this connection.
+"""
+type PageInfo {
+  """When paginating forwards, are there more items?"""
+  hasNextPage: Boolean!
+
+  """When paginating backwards, are there more items?"""
+  hasPreviousPage: Boolean!
+
+  """When paginating backwards, the cursor to continue."""
+  startCursor: String
+
+  """When paginating forwards, the cursor to continue."""
+  endCursor: String
+}
+
+type PeriodType {
+  periodId: Int
+  startDate: Date
+  endDate: Date
+  resourceState: String
+  timeSpans: [TimeSpanType]
+  name: TranslatedStringType
+  description: TranslatedStringType
+}
+
+input PurposeCreateMutationInput {
+  name: String!
+  clientMutationId: String
+}
+
+type PurposeCreateMutationPayload {
+  id: Int
+  name: String
+
+  """May contain more than one error for same field."""
+  errors: [ErrorType]
+  purpose: PurposeType
+  clientMutationId: String
+}
+
+type PurposeType implements Node {
+  """The ID of the object."""
+  id: ID!
+  name: String!
+  pk: Int
+}
+
+type PurposeTypeConnection {
+  """Pagination data for this connection."""
+  pageInfo: PageInfo!
+
+  """Contains the nodes in this connection."""
+  edges: [PurposeTypeEdge]!
+}
+
+"""A Relay edge containing a `PurposeType` and its cursor."""
+type PurposeTypeEdge {
+  """The item at the end of the edge"""
+  node: PurposeType
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
+
+input PurposeUpdateMutationInput {
+  name: String!
+  pk: Int!
+  clientMutationId: String
+}
+
+type PurposeUpdateMutationPayload {
+  id: Int
+  name: String
+  pk: Int
+
+  """May contain more than one error for same field."""
+  errors: [ErrorType]
+  purpose: PurposeType
+  clientMutationId: String
+}
+
+type Query {
+  reservationUnits(before: String, after: String, first: Int, last: Int, unit: ID, keywordGroups: ID, reservationUnitType: ID, maxPersonsGte: Float, maxPersonsLte: Float, textSearch: String): ReservationUnitTypeConnection
+
+  """The ID of the object"""
+  reservationUnit(id: ID!): ReservationUnitType
+  reservationUnitByPk(pk: Int): ReservationUnitByPkType
+  resources(before: String, after: String, first: Int, last: Int, name: String, name_Icontains: String, name_Istartswith: String): ResourceTypeConnection
+
+  """The ID of the object"""
+  resource(id: ID!): ResourceType
+  resourceByPk(pk: Int): ResourceType
+  equipments(before: String, after: String, first: Int, last: Int, name: String, name_Icontains: String, name_Istartswith: String): EquipmentTypeConnection
+
+  """The ID of the object"""
+  equipment(id: ID!): EquipmentType
+  equipmentByPk(pk: Int): EquipmentType
+  equipmentCategories(before: String, after: String, first: Int, last: Int, name: String, name_Icontains: String, name_Istartswith: String): EquipmentCategoryTypeConnection
+
+  """The ID of the object"""
+  equipmentCategory(id: ID!): EquipmentCategoryType
+  equipmentCategoryByPk(pk: Int): EquipmentCategoryType
+  spaces(before: String, after: String, first: Int, last: Int, name: String, name_Icontains: String, name_Istartswith: String): SpaceTypeConnection
+
+  """The ID of the object"""
+  space(id: ID!): SpaceType
+  spaceByPk(pk: Int): SpaceType
+  units(before: String, after: String, first: Int, last: Int, name: String, name_Icontains: String, name_Istartswith: String): UnitTypeConnection
+
+  """The ID of the object"""
+  unit(id: ID!): UnitType
+  unitByPk(pk: Int): UnitByPkType
+  keywordCategories(before: String, after: String, first: Int, last: Int, name: String): KeywordCategoryTypeConnection
+  keywordGroups(before: String, after: String, first: Int, last: Int, name: String): KeywordGroupTypeConnection
+  keywords(before: String, after: String, first: Int, last: Int, name: String): KeywordTypeConnection
+}
+
+type RealEstateType implements Node {
+  """The ID of the object."""
+  id: ID!
+  name: String!
+  district: DistrictType
+  surfaceArea: Float
+  pk: Int
+}
+
+input ReservationMutationInput {
+  state: String!
+  priority: String!
+  user: ID!
+  begin: DateTime!
+  end: DateTime!
+  bufferTimeBefore: String
+  bufferTimeAfter: String
+  reservationUnit: [ID]!
+  id: ID
+  clientMutationId: String
+}
+
+type ReservationMutationPayload {
+  reservation: ReservationType
+  errors: [ErrorType]
+  clientMutationId: String
+}
+
+"""An enumeration."""
+enum ReservationPriority {
+  """Low"""
+  A_100
+
+  """Medium"""
+  A_200
+
+  """High"""
+  A_300
+}
+
+"""An enumeration."""
+enum ReservationState {
+  """created"""
+  CREATED
+
+  """cancelled"""
+  CANCELLED
+
+  """confirmed"""
+  CONFIRMED
+
+  """denied"""
+  DENIED
+
+  """requested"""
+  REQUESTED
+
+  """waiting for payment"""
+  WAITING_FOR_PAYMENT
+}
+
+type ReservationType implements Node {
+  """The ID of the object."""
+  id: ID!
+  state: ReservationState!
+  priority: ReservationPriority!
+  begin: DateTime!
+  end: DateTime!
+  bufferTimeBefore: Float
+  bufferTimeAfter: Float
+  reservationUnit(before: String, after: String, first: Int, last: Int): ReservationUnitByPkTypeConnection!
+  numPersons: Int
+  pk: Int
+  calendarUrl: String
+}
+
+type ReservationUnitByPkType implements Node {
+  """The ID of the object."""
+  id: ID!
+  name: String!
+  description: String!
+  spaces: [SpaceType]
+  resources: [ResourceType]
+  services: [ServiceType]
+  purposes: [PurposeType]
+  reservationUnitType: ReservationUnitTypeType
+  requireIntroduction: Boolean!
+  termsOfUse: String
+  contactInformation: String!
+  maxReservationDuration: Time
+  minReservationDuration: Time
+  uuid: UUID!
+  maxPersons: Int
+  images: [ReservationUnitImageType]
+  openingHours(openingTimes: Boolean, periods: Boolean, startDate: Date, endDate: Date): OpeningHoursType
+  pk: Int
+  location: LocationType
+  equipment: [EquipmentType]
+  unit: UnitType
+  surfaceArea: Int
+  keywordGroups: [KeywordGroupType]
+  reservations(from: Date, to: Date, state: [String]): [ReservationType]
+  applicationRounds(active: Boolean): [ApplicationRoundType]
+  nextAvailableSlot: DateTime
+  haukiUrl: ReservationUnitHaukiUrlType
+}
+
+type ReservationUnitByPkTypeConnection {
+  """Pagination data for this connection."""
+  pageInfo: PageInfo!
+
+  """Contains the nodes in this connection."""
+  edges: [ReservationUnitByPkTypeEdge]!
+}
+
+"""A Relay edge containing a `ReservationUnitByPkType` and its cursor."""
+type ReservationUnitByPkTypeEdge {
+  """The item at the end of the edge"""
+  node: ReservationUnitByPkType
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
+
+input ReservationUnitCreateMutationInput {
+  name: String
+  description: String
+
+  """
+  Determines if introduction is required in order to reserve this reservation unit.
+  """
+  requireIntroduction: Boolean
+  maxPersons: Int
+  termsOfUse: String
+  equipmentIds: [String]
+  unitId: String!
+
+  """Contact information for this reservation unit."""
+  contactInformation: String
+  maxReservationDuration: String
+  minReservationDuration: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  isDraft: Boolean
+  spaceIds: [String]
+  resourceIds: [String]
+  purposeIds: [String]
+  serviceIds: [String]
+  reservationUnitTypeId: String
+  surfaceArea: Float
+  bufferTimeBetweenReservations: String
+  clientMutationId: String
+}
+
+type ReservationUnitCreateMutationPayload {
+  id: Int
+  name: String
+  description: String
+
+  """Spaces included in the reservation unit as nested related objects."""
+  spaces: [SpaceType]
+
+  """Resources included in the reservation unit as nested related objects."""
+  resources: [ResourceType]
+
+  """Services included in the reservation unit as nested related objects."""
+  services: [ServiceType]
+
+  """
+  Determines if introduction is required in order to reserve this reservation unit.
+  """
+  requireIntroduction: Boolean
+  purposes: [PurposeType]
+
+  """Images of the reservation unit as nested related objects. """
+  images: [ReservationUnitImageType]
+
+  """
+  Location of this reservation unit. Dynamically determined from spaces of the reservation unit.
+  """
+  location: String
+  maxPersons: Int
+
+  """Type of the reservation unit as nested related object."""
+  reservationUnitType: ReservationUnitTypeType
+  building: String
+  termsOfUse: String
+  equipmentIds: [String]
+  unitId: String
+  uuid: String
+
+  """Contact information for this reservation unit."""
+  contactInformation: String
+  maxReservationDuration: String
+  minReservationDuration: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  isDraft: Boolean
+  spaceIds: [String]
+  resourceIds: [String]
+  purposeIds: [String]
+  serviceIds: [String]
+  reservationUnitTypeId: String
+  surfaceArea: Float
+  bufferTimeBetweenReservations: String
+
+  """May contain more than one error for same field."""
+  errors: [ErrorType]
+  reservationUnit: ReservationUnitType
+  clientMutationId: String
+}
+
+type ReservationUnitHaukiUrlType {
+  url: String
+}
+
+"""An enumeration."""
+enum ReservationUnitImageImageType {
+  """Main image"""
+  MAIN
+
+  """Ground plan"""
+  GROUND_PLAN
+
+  """Map"""
+  MAP
+
+  """Other"""
+  OTHER
+}
+
+type ReservationUnitImageType {
+  imageType: ReservationUnitImageImageType!
+  imageUrl: String
+  mediumUrl: String
+  smallUrl: String
+}
+
+type ReservationUnitType implements Node {
+  """The ID of the object."""
+  id: ID!
+  name: String!
+  description: String!
+  spaces: [SpaceType]
+  resources: [ResourceType]
+  services: [ServiceType]
+  purposes: [PurposeType]
+  reservationUnitType: ReservationUnitTypeType
+  requireIntroduction: Boolean!
+  termsOfUse: String
+  contactInformation: String!
+  maxReservationDuration: Time
+  minReservationDuration: Time
+  uuid: UUID!
+  isDraft: Boolean!
+  maxPersons: Int
+  surfaceArea: Int
+  bufferTimeBetweenReservations: Float
+  images: [ReservationUnitImageType]
+  applicationRounds(active: Boolean): [ApplicationRoundType]
+  pk: Int
+  location: LocationType
+  equipment: [EquipmentType]
+  unit: UnitType
+  keywordGroups: [KeywordGroupType]
+  reservations(from: Date, to: Date, state: [String]): [ReservationType]
+}
+
+type ReservationUnitTypeConnection {
+  """Pagination data for this connection."""
+  pageInfo: PageInfo!
+
+  """Contains the nodes in this connection."""
+  edges: [ReservationUnitTypeEdge]!
+}
+
+"""A Relay edge containing a `ReservationUnitType` and its cursor."""
+type ReservationUnitTypeEdge {
+  """The item at the end of the edge"""
+  node: ReservationUnitType
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
+
+type ReservationUnitTypeType implements Node {
+  """The ID of the object."""
+  id: ID!
+  name: String!
+  pk: Int
+}
+
+input ReservationUnitUpdateMutationInput {
+  name: String
+  description: String
+
+  """
+  Determines if introduction is required in order to reserve this reservation unit.
+  """
+  requireIntroduction: Boolean
+  maxPersons: Int
+  termsOfUse: String
+  equipmentIds: [String]
+  unitId: String
+
+  """Contact information for this reservation unit."""
+  contactInformation: String
+  maxReservationDuration: String
+  minReservationDuration: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  isDraft: Boolean
+  spaceIds: [String]
+  resourceIds: [String]
+  purposeIds: [String]
+  serviceIds: [String]
+  reservationUnitTypeId: String
+  surfaceArea: Float
+  bufferTimeBetweenReservations: String
+  pk: Int!
+  clientMutationId: String
+}
+
+type ReservationUnitUpdateMutationPayload {
+  id: Int
+  name: String
+  description: String
+
+  """Spaces included in the reservation unit as nested related objects."""
+  spaces: [SpaceType]
+
+  """Resources included in the reservation unit as nested related objects."""
+  resources: [ResourceType]
+
+  """Services included in the reservation unit as nested related objects."""
+  services: [ServiceType]
+
+  """
+  Determines if introduction is required in order to reserve this reservation unit.
+  """
+  requireIntroduction: Boolean
+  purposes: [PurposeType]
+
+  """Images of the reservation unit as nested related objects. """
+  images: [ReservationUnitImageType]
+
+  """
+  Location of this reservation unit. Dynamically determined from spaces of the reservation unit.
+  """
+  location: String
+  maxPersons: Int
+
+  """Type of the reservation unit as nested related object."""
+  reservationUnitType: ReservationUnitTypeType
+  building: String
+  termsOfUse: String
+  equipmentIds: [String]
+  unitId: String
+  uuid: String
+
+  """Contact information for this reservation unit."""
+  contactInformation: String
+  maxReservationDuration: String
+  minReservationDuration: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  isDraft: Boolean
+  spaceIds: [String]
+  resourceIds: [String]
+  purposeIds: [String]
+  serviceIds: [String]
+  reservationUnitTypeId: String
+  surfaceArea: Float
+  bufferTimeBetweenReservations: String
+  pk: Int
+
+  """May contain more than one error for same field."""
+  errors: [ErrorType]
+  reservationUnit: ReservationUnitType
+  clientMutationId: String
+}
+
+input ResourceCreateMutationInput {
+  locationType: String
+  name: String
+
+  """Id of related space for this resource."""
+  spaceId: String
+
+  """
+  Buffer time while reservation unit is unreservable after the reservation.
+  Dynamically calculated from spaces and resources.
+  """
+  bufferTimeBefore: String
+
+  """Begin date and time of the reservation."""
+  bufferTimeAfter: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
+  isDraft: Boolean
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  clientMutationId: String
+}
+
+type ResourceCreateMutationPayload {
+  id: Int
+  locationType: String
+  name: String
+
+  """Id of related space for this resource."""
+  spaceId: String
+
+  """
+  Buffer time while reservation unit is unreservable after the reservation.
+  Dynamically calculated from spaces and resources.
+  """
+  bufferTimeBefore: String
+
+  """Begin date and time of the reservation."""
+  bufferTimeAfter: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
+  isDraft: Boolean
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+
+  """May contain more than one error for same field."""
+  errors: [ErrorType]
+  resource: ResourceType
+  clientMutationId: String
+}
+
+input ResourceDeleteMutationInput {
+  pk: ID
+  clientMutationId: String
+}
+
+type ResourceDeleteMutationPayload {
+  deleted: Boolean
+  errors: String
+  clientMutationId: String
+}
+
+"""An enumeration."""
+enum ResourceLocationType {
+  """Fixed"""
+  FIXED
+
+  """Movable"""
+  MOVABLE
+}
+
+type ResourceType implements Node {
+  """The ID of the object."""
+  id: ID!
+  locationType: ResourceLocationType!
+  name: String!
+  description: String!
+  space: SpaceType
+  bufferTimeBefore: Float
+  bufferTimeAfter: Float
+  isDraft: Boolean!
+  pk: Int
+  building: [BuildingType]
+}
+
+type ResourceTypeConnection {
+  """Pagination data for this connection."""
+  pageInfo: PageInfo!
+
+  """Contains the nodes in this connection."""
+  edges: [ResourceTypeEdge]!
+}
+
+"""A Relay edge containing a `ResourceType` and its cursor."""
+type ResourceTypeEdge {
+  """The item at the end of the edge"""
+  node: ResourceType
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
+
+input ResourceUpdateMutationInput {
+  locationType: String
+  name: String
+
+  """Id of related space for this resource."""
+  spaceId: String
+
+  """
+  Buffer time while reservation unit is unreservable after the reservation.
+  Dynamically calculated from spaces and resources.
+  """
+  bufferTimeBefore: String
+
+  """Begin date and time of the reservation."""
+  bufferTimeAfter: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
+  isDraft: Boolean
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  pk: Int!
+  clientMutationId: String
+}
+
+type ResourceUpdateMutationPayload {
+  id: Int
+  locationType: String
+  name: String
+
+  """Id of related space for this resource."""
+  spaceId: String
+
+  """
+  Buffer time while reservation unit is unreservable after the reservation.
+  Dynamically calculated from spaces and resources.
+  """
+  bufferTimeBefore: String
+
+  """Begin date and time of the reservation."""
+  bufferTimeAfter: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
+  isDraft: Boolean
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  pk: Int
+
+  """May contain more than one error for same field."""
+  errors: [ErrorType]
+  resource: ResourceType
+  clientMutationId: String
+}
+
+"""An enumeration."""
+enum ServiceServiceType {
+  """Introduction"""
+  INTRODUCTION
+
+  """Catering"""
+  CATERING
+
+  """Configuration"""
+  CONFIGURATION
+}
+
+type ServiceType implements Node {
+  """The ID of the object."""
+  id: ID!
+  name: String!
+  serviceType: ServiceServiceType!
+  bufferTimeBefore: String
+  bufferTimeAfter: String
+  pk: Int
+}
+
+input SpaceCreateMutationInput {
+  name: String
+
+  """Id of parent space for this space."""
+  parentId: String
+
+  """Surface area of the space as square meters"""
+  surfaceArea: Float
+
+  """Id of district for this space."""
+  districtId: String
+  maxPersons: Int
+  code: String
+  termsOfUse: String
+  unitId: String
+  nameFi: String!
+  nameEn: String
+  nameSv: String
+  clientMutationId: String
+}
+
+type SpaceCreateMutationPayload {
+  id: Int
+  name: String
+
+  """Id of parent space for this space."""
+  parentId: String
+
+  """Surface area of the space as square meters"""
+  surfaceArea: Float
+
+  """Id of district for this space."""
+  districtId: String
+  maxPersons: Int
+  code: String
+  termsOfUse: String
+  unitId: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
+
+  """May contain more than one error for same field."""
+  errors: [ErrorType]
+  space: SpaceType
+  clientMutationId: String
+}
+
+input SpaceDeleteMutationInput {
+  pk: ID
+  clientMutationId: String
+}
+
+type SpaceDeleteMutationPayload {
+  deleted: Boolean
+  errors: String
+  clientMutationId: String
+}
+
+type SpaceType implements Node {
+  """The ID of the object."""
+  id: ID!
+  name: String!
+  parent: SpaceType
+  building: BuildingType
+  unit: UnitByPkType
+  surfaceArea: Float
+  maxPersons: Int
+  code: String!
+  termsOfUse: String!
+  pk: Int
+  children: [SpaceType]
+  resources: [ResourceType]
+}
+
+type SpaceTypeConnection {
+  """Pagination data for this connection."""
+  pageInfo: PageInfo!
+
+  """Contains the nodes in this connection."""
+  edges: [SpaceTypeEdge]!
+}
+
+"""A Relay edge containing a `SpaceType` and its cursor."""
+type SpaceTypeEdge {
+  """The item at the end of the edge"""
+  node: SpaceType
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
+
+input SpaceUpdateMutationInput {
+  name: String
+
+  """Id of parent space for this space."""
+  parentId: String
+
+  """Surface area of the space as square meters"""
+  surfaceArea: Float
+
+  """Id of district for this space."""
+  districtId: String
+  maxPersons: Int
+  code: String
+  termsOfUse: String
+  unitId: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
+  pk: Int!
+  clientMutationId: String
+}
+
+type SpaceUpdateMutationPayload {
+  id: Int
+  name: String
+
+  """Id of parent space for this space."""
+  parentId: String
+
+  """Surface area of the space as square meters"""
+  surfaceArea: Float
+
+  """Id of district for this space."""
+  districtId: String
+  maxPersons: Int
+  code: String
+  termsOfUse: String
+  unitId: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
+  pk: Int
+
+  """May contain more than one error for same field."""
+  errors: [ErrorType]
+  space: SpaceType
+  clientMutationId: String
+}
+
+"""
+The `Time` scalar type represents a Time value as
+specified by
+[iso8601](https://en.wikipedia.org/wiki/ISO_8601).
+"""
+scalar Time
+
+type TimeSpanType {
+  startTime: Time
+  endTime: Time
+  weekdays: [Int]
+  resourceState: String
+  endTimeOnNextDay: Boolean
+  name: TranslatedStringType
+  description: TranslatedStringType
+}
+
+type TranslatedStringType {
+  fi: String
+  en: String
+  sv: String
+}
+
+type UnitByPkType implements Node {
+  """The ID of the object."""
+  id: ID!
+  tprekId: String
+  name: String!
+  description: String!
+  shortDescription: String!
+  webPage: String!
+  email: String!
+  phone: String!
+  openingHours(openingTimes: Boolean, periods: Boolean, startDate: Date, endDate: Date): OpeningHoursType
+  pk: Int
+  reservationUnits: [ReservationUnitType]
+  spaces: [SpaceType]
+  location: LocationType
+}
+
+type UnitType implements Node {
+  """The ID of the object."""
+  id: ID!
+  tprekId: String
+  name: String!
+  description: String!
+  shortDescription: String!
+  webPage: String!
+  email: String!
+  phone: String!
+  pk: Int
+  reservationUnits: [ReservationUnitType]
+  spaces: [SpaceType]
+  location: LocationType
+}
+
+type UnitTypeConnection {
+  """Pagination data for this connection."""
+  pageInfo: PageInfo!
+
+  """Contains the nodes in this connection."""
+  edges: [UnitTypeEdge]!
+}
+
+"""A Relay edge containing a `UnitType` and its cursor."""
+type UnitTypeEdge {
+  """The item at the end of the edge"""
+  node: UnitType
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
+
+input UnitUpdateMutationInput {
+  tprekId: String
+  name: String
+  description: String
+  shortDescription: String
+  webPage: String
+  email: String
+  phone: String
+  pk: Int!
+  clientMutationId: String
+}
+
+type UnitUpdateMutationPayload {
+  id: Int
+  tprekId: String
+  name: String
+  description: String
+  shortDescription: String
+  webPage: String
+  email: String
+  phone: String
+  pk: Int
+
+  """May contain more than one error for same field."""
+  errors: [ErrorType]
+  unit: UnitType
+  clientMutationId: String
+}
+
+"""
+Leverages the internal Python implmeentation of UUID (uuid.UUID) to provide native UUID objects
+in fields, resolvers and input.
+"""
+scalar UUID
+

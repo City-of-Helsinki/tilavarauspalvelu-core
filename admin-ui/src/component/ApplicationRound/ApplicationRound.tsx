@@ -2,6 +2,7 @@ import React, { ReactNode, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Notification } from "hds-react";
+import { AxiosError } from "axios";
 import Review from "./Review";
 import Allocation from "./Allocation";
 import Handling from "./Handling";
@@ -54,7 +55,7 @@ function ApplicationRound(): JSX.Element | null {
         setIsLoading(false);
       } catch (error) {
         const msg =
-          error.response?.status === 404
+          (error as AxiosError).response?.status === 404
             ? "errors.applicationRoundNotFound"
             : "errors.errorFetchingData";
         setErrorMsg(msg);

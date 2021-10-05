@@ -3,20 +3,20 @@ import { trim } from "lodash";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { FetchResult, useMutation } from "@apollo/client";
-import {
-  Resource,
-  ResourceDeleteMutationInput,
-  ResourceDeleteMutationPayload,
-} from "../../common/types";
 
 import DataTable, { CellConfig } from "../DataTable";
 import PopupMenu from "./PopupMenu";
 import ConfirmationDialog, { ModalRef } from "../ConfirmationDialog";
 import { DELETE_RESOURCE } from "../../common/queries";
 import { localizedValue } from "../../common/util";
+import {
+  ResourceDeleteMutationInput,
+  ResourceDeleteMutationPayload,
+  ResourceType,
+} from "../../common/gql-types";
 
 interface IProps {
-  resources: Resource[];
+  resources: ResourceType[] | undefined;
   hasSpaces: boolean;
   onDelete: (text?: string) => void;
   onDataError: (error: string) => void;
@@ -29,7 +29,7 @@ const Name = styled.div`
   font-family: var(--tilavaraus-admin-font-bold);
 `;
 
-const ResourceType = styled.div`
+const ResourceTypeContainer = styled.div`
   display: flex;
   align-items: center;
 `;
@@ -50,7 +50,7 @@ const ResourcesTable = ({
   const deleteResource = (
     id: number
   ): Promise<FetchResult<{ deleteSpace: ResourceDeleteMutationPayload }>> =>
-    deleteResourceMutation({ variables: { input: { pk: id } } });
+    deleteResourceMutation({ variables: { input: { pk: String(id) } } });
 
   const { t, i18n } = useTranslation();
 
@@ -61,7 +61,7 @@ const ResourcesTable = ({
       {
         title: "Resource.name",
         key: `name.${i18n.language}`,
-        transform: ({ name }: Resource) => (
+        transform: ({ name }: ResourceType) => (
           <Name>{trim(localizedValue(name, i18n.language))}</Name>
         ),
       },
@@ -78,9 +78,9 @@ const ResourcesTable = ({
       {
         title: "Resource.type",
         key: "type",
-        transform: ({ name, pk, resourceType }: Resource) => (
-          <ResourceType>
-            <ResourceTypeName>{resourceType}</ResourceTypeName>
+        transform: ({ name, pk, locationType }: ResourceType) => (
+          <ResourceTypeContainer>
+            <ResourceTypeName>{locationType}</ResourceTypeName>
             <PopupMenu
               items={[
                 {
@@ -104,7 +104,7 @@ const ResourcesTable = ({
                       cancelLabel: t("ResourceTable.removeConfirmationCancel"),
                       onAccept: async () => {
                         try {
-                          await deleteResource(pk);
+                          await deleteResource(pk as number);
                           onDelete(t("ResourceTable.removeSuccess"));
                         } catch (error) {
                           onDataError(t("ResourceTable.removeFailed"));
@@ -115,7 +115,7 @@ const ResourcesTable = ({
                 },
               ]}
             />
-          </ResourceType>
+          </ResourceTypeContainer>
         ),
       },
     ],

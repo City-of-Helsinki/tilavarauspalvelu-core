@@ -15,6 +15,7 @@ import {
   NormalizedApplicationRoundStatus,
   TranslationObject,
 } from "./types";
+import { LocationType } from "./gql-types";
 
 export const formatDate = (
   date: string | null,
@@ -297,7 +298,7 @@ export const parseAgeGroups = (ageGroups: IAgeGroups): string => {
   })}`;
 };
 
-export const parseAddress = (location: Location): string => {
+export const parseAddress = (location: Location | LocationType): string => {
   return trim(
     `${location.addressStreet || ""}, ${location.addressZip || ""} ${
       location.addressCity || ""
@@ -316,11 +317,15 @@ export const isTranslationObject = (value: unknown): boolean => {
   );
 };
 
-export const parseAddressLine1 = (location: Location): string => {
+export const parseAddressLine1 = (
+  location: Location | LocationType
+): string => {
   return trim(`${location.addressStreet || ""}`);
 };
 
-export const parseAddressLine2 = (location: Location): string => {
+export const parseAddressLine2 = (
+  location: Location | LocationType
+): string => {
   return trim(`${location.addressZip || ""} ${location.addressCity || ""}`);
 };
 

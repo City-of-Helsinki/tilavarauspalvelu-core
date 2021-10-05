@@ -2,9 +2,12 @@ import React from "react";
 import styled from "styled-components";
 import { IconArrowRight, IconLayers, IconHome, IconGroup } from "hds-react";
 import { useTranslation } from "react-i18next";
-import { ReservationUnitType } from "../../common/types";
 import { H2 } from "../../styles/typography";
 import { BasicLink, breakpoints } from "../../styles/util";
+import {
+  ReservationUnitImageImageType,
+  ReservationUnitType,
+} from "../../common/gql-types";
 
 interface IProps {
   reservationUnit: ReservationUnitType;
@@ -85,12 +88,17 @@ const ReservationUnitCard = ({
   const { t } = useTranslation();
 
   const image =
-    reservationUnit.images?.find((i) => i.imageType === "main") ||
-    reservationUnit.images?.find(() => true);
+    reservationUnit.images?.find(
+      (i) => i?.imageType === ReservationUnitImageImageType.Main
+    ) || reservationUnit.images?.find(() => true);
+
+  const hasPurposes = (reservationUnit?.purposes?.length || 0) > 0;
 
   return (
     <Wrapper>
-      <ImageBox>{image ? <Image src={image?.mediumUrl} /> : null}</ImageBox>
+      <ImageBox>
+        {image?.mediumUrl ? <Image src={image?.mediumUrl} /> : null}
+      </ImageBox>
       <Content>
         <BasicLink
           to={`/unit/${unitId}/reservationUnit/edit/${reservationUnit.pk}`}
@@ -100,16 +108,16 @@ const ReservationUnitCard = ({
         </BasicLink>
         <ComboType>
           {t(
-            reservationUnit.resources?.length > 1
+            (reservationUnit?.resources?.length || 0) > 1
               ? "ReservationUnitCard.spaceAndResource"
               : "ReservationUnitCard.spaceOnly"
           )}
         </ComboType>
         <Props>
-          <Prop $disabled={!(reservationUnit.purposes?.length > 0)}>
+          <Prop $disabled={!hasPurposes}>
             <IconLayers />{" "}
             {t(
-              reservationUnit.purposes?.length > 0
+              hasPurposes
                 ? "ReservationUnitCard.purpose"
                 : "ReservationUnitCard.noPurpose",
               { count: reservationUnit.purposes?.length }

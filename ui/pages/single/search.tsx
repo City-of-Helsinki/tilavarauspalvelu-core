@@ -11,10 +11,11 @@ import Container from "../../components/common/Container";
 import Breadcrumb from "../../components/common/Breadcrumb";
 import SearchForm from "../../components/single-search/SearchForm";
 import SearchResultList from "../../components/single-search/SearchResultList";
-import { ReservationUnitsParameters } from "../../modules/api";
+
 import { singleSearchUrl } from "../../modules/util";
 import { isBrowser, searchPrefix } from "../../modules/const";
 import { CenterSpinner } from "../../components/common/common";
+import { Query, QueryReservationUnitsArgs } from "../../modules/gql-types";
 
 const RESERVATION_UNITS = gql`
   query SearchReservationUnits(
@@ -23,8 +24,8 @@ const RESERVATION_UNITS = gql`
     $maxPersons: Float
     $unit: ID
     $reservationUnitType: ID
-    $limit: Int
-    $cursor: String
+    $first: Int
+    $after: String
   ) {
     reservationUnits(
       textSearch: $search
@@ -32,8 +33,8 @@ const RESERVATION_UNITS = gql`
       maxPersonsLte: $maxPersons
       reservationUnitType: $reservationUnitType
       unit: $unit
-      first: $limit
-      after: $cursor
+      first: $first
+      after: $after
     ) {
       edges {
         node {
@@ -98,14 +99,13 @@ const Search = (): JSX.Element => {
 
   const [values, setValues] = useState({} as Record<string, string>);
 
-  const { data, fetchMore, refetch, loading, error } = useQuery(
-    RESERVATION_UNITS,
-    {
-      variables: { ...values, limit: pagingLimit },
-      fetchPolicy: "network-only",
-      nextFetchPolicy: "network-only",
-    }
-  );
+  const { data, fetchMore, refetch, loading, error } = useQuery<
+    Query,
+    QueryReservationUnitsArgs
+  >(RESERVATION_UNITS, {
+    variables: { ...values, first: pagingLimit },
+    fetchPolicy: "network-only",
+  });
 
   const reservationUnits = data?.reservationUnits?.edges?.map(
     (edge) => edge.node
@@ -136,7 +136,7 @@ const Search = (): JSX.Element => {
 
   const history = useRouter();
 
-  const onSearch = async (criteria: ReservationUnitsParameters) => {
+  const onSearch = async (criteria: QueryReservationUnitsArgs) => {
     history.replace(singleSearchUrl(criteria));
     refetch(criteria);
   };
@@ -176,7 +176,7 @@ const Search = (): JSX.Element => {
             fetchMore({
               variables: {
                 ...values,
-                cursor,
+                after: cursor,
               },
             });
           }}

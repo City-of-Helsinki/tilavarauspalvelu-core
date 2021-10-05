@@ -4,3 +4,4 @@ dist
 build
 public
 next-env.d.ts
+gql-types.ts

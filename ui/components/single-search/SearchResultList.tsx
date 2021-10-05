@@ -2,12 +2,12 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import { Notification as HDSNotification, Button, IconPlus } from "hds-react";
 import styled from "styled-components";
-import { PageInfo, ReservationUnit } from "../../modules/types";
 import Container from "../common/Container";
 import ReservationUnitCard from "./ReservationUnitCard";
+import { PageInfo, ReservationUnitType } from "../../modules/gql-types";
 
 interface Props {
-  reservationUnits: ReservationUnit[] | null;
+  reservationUnits: ReservationUnitType[] | null;
   fetchMore: (arg: string) => void;
   pageInfo: PageInfo;
   error: boolean;

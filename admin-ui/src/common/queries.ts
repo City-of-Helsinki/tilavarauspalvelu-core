@@ -252,6 +252,19 @@ export const UNIT_WITH_SPACES_AND_RESOURCES = gql`
   }
 `;
 
+export const RESERVATION_UNIT_EDITOR_PARAMETERS = gql`
+  query reservation_unit_editor_parameters {
+    equipments {
+      edges {
+        node {
+          name
+          pk
+        }
+      }
+    }
+  }
+`;
+
 // WIP, incomplete
 export const RESERVATIONUNIT_QUERY = gql`
   query reservationUnit($pk: Int) {
@@ -312,7 +325,6 @@ export const RESERVATIONUNIT_QUERY = gql`
 export const UPDATE_RESERVATION_UNIT = gql`
   mutation updateReservationUnit($input: ReservationUnitUpdateMutationInput!) {
     updateReservationUnit(input: $input) {
-      pk
       errors {
         field
         messages

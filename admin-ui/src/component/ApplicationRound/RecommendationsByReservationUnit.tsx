@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
+import { AxiosError } from "axios";
 import styled from "styled-components";
 import {
   IconLocation,
@@ -404,7 +405,7 @@ function RecommendationsByReservationUnit(): JSX.Element {
         setApplicationRound(result);
       } catch (error) {
         const msg =
-          error.response?.status === 404
+          (error as AxiosError).response?.status === 404
             ? "errors.applicationRoundNotFound"
             : "errors.errorFetchingData";
         setErrorMsg(msg);

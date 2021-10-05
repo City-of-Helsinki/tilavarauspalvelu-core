@@ -11,7 +11,9 @@
     "test:browser": "CYPRESS_BASE_URL=https://local-tilavaraus.hel.fi:3000 ./node_modules/.bin/cypress open",
     "lint": "eslint --ext ts,tsx .",
     "lint:css": "stylelint '**/*.tsx'",
-    "ts-check": "tsc --noEmit --project tsconfig.json"
+    "ts-check": "tsc --noEmit --project tsconfig.json",
+    "generate-gql-types": "graphql-codegen",
+    "update-schema": "npx get-graphql-schema http://localhost:8000/graphql/ > ../tilavaraus.graphql"
   },
   "dependencies": {
     "@apollo/client": "^3.4.13",
@@ -25,9 +27,9 @@
     "date-fns": "^2.22.1",
     "focus-trap-react": "^8.5.0",
     "graphql": "^15.6.0",
-    "hds-core": "^1.4.1",
-    "hds-design-tokens": "^1.4.1",
-    "hds-react": "^1.4.1",
+    "hds-core": "1.3.0",
+    "hds-design-tokens": "1.3.0",
+    "hds-react": "1.3.0",
     "i18next": "^20.3.1",
     "lodash": "^4.17.21",
     "next": "11.1.1",
@@ -47,13 +49,17 @@
     "styled-components": "^5.3.0"
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "^2.2.0",
+    "@graphql-codegen/typescript": "^2.2.2",
+    "@graphql-codegen/typescript-operations": "^2.1.5",
+    "@graphql-codegen/typescript-react-apollo": "^3.1.4",
     "@next/eslint-plugin-next": "^11.1.0",
     "@types/jest": "^26.0.23",
     "@types/react": "^17.0.6",
     "@typescript-eslint/eslint-plugin": "^4.27.0",
     "@typescript-eslint/parser": "^4.27.0",
     "axe-core": "^4.2.2",
-    "cypress": "8.4.1",
+    "cypress": "8.5.0",
     "cypress-axe": "^0.12.2",
     "eslint": "^7.29.0",
     "eslint-config-airbnb-typescript-prettier": "^4.2.0",

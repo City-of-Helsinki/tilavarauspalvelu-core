@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
+import { AxiosError } from "axios";
 import { useTranslation } from "react-i18next";
 import { IconCheckCircle, IconInfoCircle, Notification } from "hds-react";
 import queryString from "query-string";
@@ -93,7 +94,7 @@ function ApplicationRoundApprovals(): JSX.Element {
         setIsLoading(false);
       } catch (error) {
         const msg =
-          error.response?.status === 404
+          (error as AxiosError).response?.status === 404
             ? "errors.applicationRoundNotFound"
             : "errors.errorFetchingData";
         setErrorMsg(msg);

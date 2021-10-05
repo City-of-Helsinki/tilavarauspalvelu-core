@@ -4,9 +4,9 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
+import { Query, QueryUnitByPkArgs, UnitByPkType } from "../../common/gql-types";
 
 import { UNIT_QUERY } from "../../common/queries";
-import { UnitType } from "../../common/types";
 import { ContentContainer } from "../../styles/layout";
 import Loader from "../Loader";
 import withMainMenu from "../withMainMenu";
@@ -21,16 +21,18 @@ const Wrapper = styled.div``;
 
 const UnitMap = (): JSX.Element => {
   const [isLoading, setIsLoading] = useState(true);
-  const [unit, setUnit] = useState<UnitType>();
+  const [unit, setUnit] = useState<UnitByPkType | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const { t } = useTranslation();
-  const { unitId } = useParams<IProps>();
+  const unitId = Number(useParams<IProps>().unitId);
 
-  useQuery(UNIT_QUERY, {
+  useQuery<Query, QueryUnitByPkArgs>(UNIT_QUERY, {
     variables: { pk: unitId },
-    onCompleted: ({ unitByPk }: { unitByPk: UnitType }) => {
-      setUnit(unitByPk);
+    onCompleted: ({ unitByPk }) => {
+      if (unitByPk) {
+        setUnit(unitByPk);
+      }
       setIsLoading(false);
     },
     onError: () => {
