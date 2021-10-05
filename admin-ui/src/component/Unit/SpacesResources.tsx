@@ -6,7 +6,7 @@ import {
 } from "hds-react";
 import React, { useReducer } from "react";
 import { useTranslation } from "react-i18next";
-import { useParams } from "react-router-dom";
+import { useParams, useHistory } from "react-router-dom";
 import styled from "styled-components";
 import { useQuery } from "@apollo/client";
 import { useModal } from "../../context/UIContext";
@@ -152,6 +152,7 @@ const SpacesResources = (): JSX.Element | null => {
 
   useQuery<Query, QueryUnitByPkArgs>(UNIT_QUERY, {
     variables: { pk: unitId },
+    fetchPolicy: "network-only",
     onCompleted: ({ unitByPk }) => {
       if (unitByPk) {
         dispatch({ type: "unitLoaded", unit: unitByPk });
@@ -164,6 +165,8 @@ const SpacesResources = (): JSX.Element | null => {
       });
     },
   });
+
+  const history = useHistory();
 
   const {
     open: newSpaceDialogIsOpen,
@@ -246,7 +249,10 @@ const SpacesResources = (): JSX.Element | null => {
       >
         <NewSpaceModal
           unit={state.unit}
-          closeModal={closeNewSpaceModal}
+          closeModal={() => {
+            closeNewSpaceModal();
+            history.go(0); // WIP is there better way to reload?
+          }}
           onSave={saveSpaceSuccess}
           onDataError={onDataError}
         />
@@ -309,7 +315,10 @@ const SpacesResources = (): JSX.Element | null => {
                   spaces={(state.unit?.spaces as SpaceType[]) || []}
                   spaceId={0}
                   unit={state.unit as UnitType}
-                  closeModal={closeNewResourceModal}
+                  closeModal={() => {
+                    closeNewResourceModal();
+                    history.go(0); // WIP is there better way to reload?
+                  }}
                   onSave={saveSpaceSuccess}
                 />
               )

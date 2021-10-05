@@ -5,8 +5,11 @@ export const SPACES_QUERY = gql`
     spaces {
       edges {
         node {
-          id: pk
+          pk
           name
+          unit {
+            pk
+          }
           building {
             name
             district {
@@ -23,7 +26,7 @@ export const SPACES_QUERY = gql`
             }
           }
           surfaceArea
-          # maxPersons
+          maxPersons
         }
       }
     }
@@ -35,16 +38,13 @@ export const RESOURCES_QUERY = gql`
     resources {
       edges {
         node {
-          id: pk
+          pk
           name
           locationType
           space {
             name
-            building {
+            unit {
               name
-              district {
-                name
-              }
             }
           }
         }
@@ -214,6 +214,11 @@ export const UNIT_QUERY = gql`
         resources {
           pk
           name
+          space {
+            unit {
+              name
+            }
+          }
         }
       }
       location {

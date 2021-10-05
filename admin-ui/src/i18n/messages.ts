@@ -610,7 +610,7 @@ const translations: ITranslations = {
     searchPlaceholder: ["Hae resursseja"],
     headings: {
       name: ["Nimi"],
-      building: ["Toimipiste"],
+      unit: ["Toimipiste"],
       district: ["Kaupunginosa"],
       resourceType: ["Resurssityyppi"],
     },
@@ -848,6 +848,7 @@ const translations: ITranslations = {
     spacesLabel: ["Tilat"],
     spacesPlaceholder: ["Liitä tarvittavat tilat"],
     equipmentsLabel: ["Varustelu"],
+    equipmentsPlaceholder: ["Valitse varusteet"],
     resourcesLabel: ["Resurssit"],
     resourcesPlaceholder: ["Liitä tarvittavat resurssit"],
     requireIntroductionLabel: ["Varausyksikkö vaatii pakollisen perehdytyksen"],

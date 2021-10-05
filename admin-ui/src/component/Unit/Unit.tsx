@@ -165,6 +165,7 @@ const Unit = (): JSX.Element | null => {
 
   useQuery<Query, QueryUnitByPkArgs>(UNIT_QUERY, {
     variables: { pk: unitId },
+    fetchPolicy: "network-only",
     onCompleted: ({ unitByPk }) => {
       if (unitByPk) {
         setUnit(unitByPk);

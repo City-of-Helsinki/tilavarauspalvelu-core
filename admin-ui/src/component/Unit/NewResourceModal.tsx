@@ -9,7 +9,7 @@ import {
   TextInput,
 } from "hds-react";
 import styled from "styled-components";
-import { FetchResult, useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import { useTranslation } from "react-i18next";
 import { omit, set, startCase } from "lodash";
 import { parseAddress } from "../../common/util";
@@ -18,8 +18,8 @@ import { CustomDialogHeader } from "./CustomDialogHeader";
 import { breakpoints } from "../../styles/util";
 import { languages } from "../../common/const";
 import {
+  Mutation,
   ResourceCreateMutationInput,
-  ResourceCreateMutationPayload,
   SpaceType,
   UnitType,
 } from "../../common/gql-types";
@@ -137,17 +137,9 @@ const NewResourceModal = ({
     }
   }, [spaceId]);
 
-  const [createResourceMutation] = useMutation<
-    {
-      refetchQueries: ["unitByPk"];
-      createResource: ResourceCreateMutationPayload;
-    },
-    { input: ResourceCreateMutationInput }
-  >(CREATE_RESOURCE);
+  const [createResourceMutation] = useMutation<Mutation>(CREATE_RESOURCE);
 
-  const createResource = (
-    input: ResourceCreateMutationInput
-  ): Promise<FetchResult<{ createResource: ResourceCreateMutationPayload }>> =>
+  const createResource = (input: ResourceCreateMutationInput) =>
     createResourceMutation({ variables: { input } });
 
   const saveAsReadyEnabled =
@@ -167,9 +159,10 @@ const NewResourceModal = ({
         locationType: "fixed",
       });
 
-      if (data?.createResource.errors === null) {
+      if (data?.createResource?.errors === null) {
         onSave();
         closeModal();
+      } else {
         dispatch({
           type: "setError",
           error: t("ResourceModal.saveError"),
