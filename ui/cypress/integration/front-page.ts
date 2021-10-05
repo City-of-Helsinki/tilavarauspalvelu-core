@@ -3,12 +3,12 @@ import {
   browseRecurringReservationUnitsButton,
 } from "../model/home";
 
-beforeEach(() => {
-  cy.visit("/");
-  cy.injectAxe();
-});
-
 describe("Tilavaraus ui front page", () => {
+  beforeEach(() => {
+    cy.visit("/");
+    cy.injectAxe();
+  });
+
   it("displays search guides", () => {
     cy.get('[data-test-id="search-guide__single"] h2').should(
       "contain",
@@ -26,8 +26,6 @@ describe("Tilavaraus ui front page", () => {
   });
 
   it("is accessible", () => {
-    cy.checkA11y(null, {
-      includedImpacts: ["critical"],
-    });
+    cy.checkA11y(null, null, null, true);
   });
 });

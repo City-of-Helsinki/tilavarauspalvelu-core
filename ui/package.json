@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "node server.js",
-    "dev:test": "MOCK_REQUESTS=true node server.js",
+    "dev:test": "NEXT_PUBLIC_MOCK_REQUESTS=true node server.js",
     "build": "next build",
     "start": "next start",
     "test": "jest",

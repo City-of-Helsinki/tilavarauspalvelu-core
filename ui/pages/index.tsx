@@ -7,11 +7,11 @@ import { gql } from "@apollo/client";
 import apolloClient from "../modules/apolloClient";
 import Header from "../components/index/Header";
 // import Shortcuts from "../components/index/Shortcuts";
-import Recommendations from "../components/index/Recommendations";
+// import Recommendations from "../components/index/Recommendations";
 import SearchGuides from "../components/index/SearchGuides";
 import ServiceInfo from "../components/index/ServiceInfo";
 import { breakpoint, StyledKoros } from "../modules/style";
-import Promotions from "../components/index/Promotions";
+// import Promotions from "../components/index/Promotions";
 import { Promotion, ReservationUnit } from "../modules/types";
 
 type Props = {
@@ -100,10 +100,8 @@ const DesktopStyledKoros = styled(StyledKoros)`
 const Home = ({ promotions, recommendations }: Props): JSX.Element => {
   const { t } = useTranslation("home");
 
-  // const shouldDisplayRecommendations = recommendations?.length > 0;
-  const shouldDisplayRecommendations = false;
-  // const shouldDisplayPromotions = promotions?.length >= 2;
-  const shouldDisplayPromotions = false;
+  const shouldDisplayRecommendations = recommendations?.length > 0;
+  const shouldDisplayPromotions = promotions?.length >= 2;
 
   return (
     <>
@@ -125,10 +123,10 @@ const Home = ({ promotions, recommendations }: Props): JSX.Element => {
         }
         type="wave"
       />
-      {shouldDisplayRecommendations && (
+      {/* {shouldDisplayRecommendations && (
         <Recommendations recommendations={recommendations} />
-      )}
-      {shouldDisplayPromotions && (
+      )} */}
+      {/* {shouldDisplayPromotions && (
         <>
           {shouldDisplayRecommendations && (
             <StyledKoros
@@ -144,7 +142,7 @@ const Home = ({ promotions, recommendations }: Props): JSX.Element => {
             type="basic"
           />
         </>
-      )}
+      )} */}
       <SearchGuides />
       <StyledKoros
         $from="var(--tilavaraus-gray)"
