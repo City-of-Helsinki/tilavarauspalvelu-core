@@ -1,5 +1,5 @@
 {
-  "maxPersons": "{{maxPersons}} henkilöä",
+  "maxPersons": "Henkilömäärä",
   "RelatedUnits": {
     "heading": "Toimipisteen muut tilat"
   },

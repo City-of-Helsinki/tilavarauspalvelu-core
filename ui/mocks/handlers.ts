@@ -1,7 +1,9 @@
-import { reservationUnitHandlers } from "./handlers/reservationUnit";
+import { promotionHandlers } from "./handlers/promotions";
+import { recommendationHandlers } from "./handlers/recommendations";
 import { reservationUnitSearchHandlers } from "./handlers/singleSearch";
 
 export const handlers = [
-  ...reservationUnitHandlers,
   ...reservationUnitSearchHandlers,
+  ...promotionHandlers,
+  ...recommendationHandlers,
 ];

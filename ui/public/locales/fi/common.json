@@ -68,6 +68,8 @@
     "postCode": "Postinumero",
     "city": "Postitoimipaikka"
   },
+  "readMore": "Lue lisää",
+  "seeDetails": "Katso tiedot",
   "beginningWith": "Alkaen",
   "endingWith": "Päättyen",
   "showMore": "Näytä enemmän"

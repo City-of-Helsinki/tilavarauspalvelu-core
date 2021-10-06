@@ -20,12 +20,9 @@ const PageWrapper = (props: Props): JSX.Element => {
       <Title>Tilavarauspalvelu</Title>
       <Navigation />
       <ServiceNotification />
-      <Main id="main">{props.children}</Main>
-      <div
-        style={{
-          marginTop: "var(--spacing-layout-xl)",
-        }}
-      />
+      <Main id="main" style={{ marginBottom: "-14px" }}>
+        {props.children}
+      </Main>
       <Footer />
       <div id="modal-root" />
     </>

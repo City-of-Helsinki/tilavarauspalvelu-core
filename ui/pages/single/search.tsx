@@ -172,11 +172,11 @@ const Search = (): JSX.Element => {
         <SearchResultList
           error={!!error}
           reservationUnits={reservationUnits}
-          fetchMore={(after) => {
+          fetchMore={(cursor) => {
             fetchMore({
               variables: {
                 ...values,
-                after,
+                after: cursor,
               },
             });
           }}

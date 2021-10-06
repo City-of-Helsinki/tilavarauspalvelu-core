@@ -76,6 +76,7 @@ export type Image = {
 };
 
 export type Building = {
+  id: number;
   name: string;
 };
 
@@ -294,4 +295,12 @@ export type UserProfile = {
   given_name: string;
   // eslint-disable-next-line camelcase
   family_name: string;
+};
+
+export type Promotion = {
+  id: number;
+  heading: TranslationObject;
+  body?: TranslationObject;
+  image: string;
+  link: string;
 };
