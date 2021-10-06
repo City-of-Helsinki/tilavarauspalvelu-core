@@ -97,6 +97,12 @@ const DesktopStyledKoros = styled(StyledKoros)`
   }
 `;
 
+const MobileStyledKoros = styled(StyledKoros)`
+  @media (min-width: ${breakpoint.m}) {
+    display: none;
+  }
+`;
+
 const Home = ({ promotions, recommendations }: Props): JSX.Element => {
   const { t } = useTranslation("home");
 
@@ -113,9 +119,9 @@ const Home = ({ promotions, recommendations }: Props): JSX.Element => {
         type="wave"
       />
       {/* <Shortcuts /> */}
-      <StyledKoros
-        // $from="var(--tilavaraus-header-background-color)"
-        $from="var(--tilavaraus-gray)"
+      <MobileStyledKoros
+        $from="var(--tilavaraus-header-background-color)"
+        // $from="var(--tilavaraus-gray)"
         $to={
           !shouldDisplayRecommendations && shouldDisplayPromotions
             ? "var(--color-white)"

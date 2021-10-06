@@ -47,7 +47,7 @@ const Box = styled.div`
   @media (min-width: ${breakpoint.m}) {
     text-align: center;
     background-color: rgba(0, 0, 0, 0.75);
-    max-width: 742px;
+    width: 620px;
     color: var(--color-white);
     padding: var(--spacing-l) var(--spacing-3-xl) var(--spacing-3-xl);
   }
