@@ -32,4 +32,12 @@ const Container = ({ main = false, ...rest }: Props): JSX.Element => {
   return main ? <WrapperMain {...rest} /> : <Wrapper {...rest} />;
 };
 
+export const CenteredContainer = styled(Container)`
+  margin: 0 auto;
+
+  @media (min-width: ${breakpoint.m}) {
+    max-width: 590px;
+  }
+`;
+
 export default Container;

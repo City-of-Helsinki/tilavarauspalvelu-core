@@ -62,6 +62,13 @@ const Content = styled.div`
   font-family: var(--font-regular);
 `;
 
+const Heading = styled.div`
+  margin-top: var(--spacing-s);
+  margin-bottom: var(--spacing-l);
+  font-size: var(--fontsize-heading-m);
+  font-family: var(--font-bold);
+`;
+
 const ReservationUnit = ({
   reservationUnit,
   relatedReservationUnits,
@@ -95,9 +102,11 @@ const ReservationUnit = ({
             <Images images={reservationUnit.images} />
           </div>
           <SpanTwoColumns>
+            <Heading>{t("reservationUnitCard:RelatedUnits.heading")}</Heading>
             <RelatedUnits
               reservationUnitList={reservationUnitList}
-              units={relatedReservationUnits}
+              units={[...relatedReservationUnits, ...relatedReservationUnits]}
+              viewType="recurring"
             />
           </SpanTwoColumns>
         </TwoColumnLayout>

@@ -1,3 +1,11 @@
-export function browseAllButton(): Cypress.Chainable<JQuery<HTMLElement>> {
-  return cy.get('#browseAllButton');
+export function browseSingleReservationUnitsButton(): Cypress.Chainable<
+  JQuery<HTMLElement>
+> {
+  return cy.get("#browseSingleReservationUnits");
+}
+
+export function browseRecurringReservationUnitsButton(): Cypress.Chainable<
+  JQuery<HTMLElement>
+> {
+  return cy.get("#browseRecurringReservationUnits");
 }
