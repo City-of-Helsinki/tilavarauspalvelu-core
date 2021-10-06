@@ -61,6 +61,7 @@ export const RESERVATION_UNITS_QUERY = gql`
           pk
           name
           unit {
+            pk
             name
           }
           reservationUnitType {
