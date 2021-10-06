@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useEffect, useRef, useState } from "react";
+import React, { useRef } from "react";
 import {
   Button as HDSButton,
   Checkbox,
@@ -151,9 +151,6 @@ const ApplicationEvent = ({
   );
   const periodEndDate = formatApiDate(applicationRound.reservationPeriodEnd);
 
-  const [defaultPeriodSelected, setDefaultPeriodSelected] = useState(false);
-  const [defaultDurationSelected, setDefaultDurationSelected] = useState(false);
-
   const {
     ageGroupOptions,
     purposeOptions,
@@ -166,6 +163,15 @@ const ApplicationEvent = ({
   const fieldName = (nameField: string) =>
     `applicationEvents[${index}].${nameField}`;
 
+  form.register({ name: fieldName("eventReservationUnits") });
+  form.register(fieldName("begin"));
+  form.register(fieldName("end"));
+  form.register(fieldName("minDuration"));
+  form.register(fieldName("maxDuration"));
+  form.register(fieldName("numPersons"));
+  form.register(fieldName("eventsPerWeek"));
+  form.register(fieldName("biweekly"));
+
   const eventName = form.watch(fieldName("name"));
   const applicationPeriodBegin = form.watch(fieldName("begin"));
   const applicationPeriodEnd = form.watch(fieldName("end"));
@@ -175,51 +181,16 @@ const ApplicationEvent = ({
   form.watch(fieldName("eventsPerWeek"));
   form.watch(fieldName("biweekly"));
 
-  useEffect(() => {
-    form.register({ name: fieldName("eventReservationUnits") });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    const selectionIsDefaultPeriod =
-      applicationPeriodEnd &&
-      applicationPeriodBegin &&
-      uiDateToApiDate(applicationPeriodBegin) === periodStartDate &&
-      uiDateToApiDate(applicationPeriodEnd) === periodEndDate;
-
-    setDefaultPeriodSelected(selectionIsDefaultPeriod);
-  }, [
-    applicationPeriodBegin,
-    applicationPeriodEnd,
-    periodStartDate,
-    periodEndDate,
-  ]);
-
   const modalRef = useRef<ModalRef>();
 
-  useEffect(() => {
-    const selectionIsDefaultDuration =
-      durationMin === defaultDuration && durationMax === defaultDuration;
-
-    setDefaultDurationSelected(selectionIsDefaultDuration);
-  }, [durationMin, durationMax]);
-
-  const selectDefaultPeriod = (e: ChangeEvent<HTMLInputElement>): void => {
-    const { checked } = e.target;
-    setDefaultPeriodSelected(checked);
-    if (checked) {
-      form.setValue(fieldName("begin"), apiDateToUIDate(periodStartDate));
-      form.setValue(fieldName("end"), apiDateToUIDate(periodEndDate));
-    }
+  const selectDefaultPeriod = (): void => {
+    form.setValue(fieldName("begin"), apiDateToUIDate(periodStartDate));
+    form.setValue(fieldName("end"), apiDateToUIDate(periodEndDate));
   };
 
-  const selectDefaultDuration = (e: ChangeEvent<HTMLInputElement>): void => {
-    const { checked } = e.target;
-    setDefaultDurationSelected(checked);
-    if (checked) {
-      form.setValue(fieldName("minDuration"), defaultDuration);
-      form.setValue(fieldName("maxDuration"), defaultDuration);
-    }
+  const selectDefaultDuration = (): void => {
+    form.setValue(fieldName("minDuration"), defaultDuration);
+    form.setValue(fieldName("maxDuration"), defaultDuration);
   };
 
   const del = () => {
@@ -230,6 +201,15 @@ const ApplicationEvent = ({
       onDeleteEvent();
     }
   };
+
+  const selectionIsDefaultPeriod =
+    applicationPeriodEnd &&
+    applicationPeriodBegin &&
+    uiDateToApiDate(applicationPeriodBegin) === periodStartDate &&
+    uiDateToApiDate(applicationPeriodEnd) === periodEndDate;
+
+  const selectionIsDefaultDuration =
+    durationMin === defaultDuration && durationMax === defaultDuration;
 
   return (
     <>
@@ -411,19 +391,18 @@ const ApplicationEvent = ({
               form.errors.applicationEvents?.[index]?.end?.type
             )}
           />
-
           <CheckboxWrapper>
             <Checkbox
               id="defaultPeriod"
-              checked={defaultPeriodSelected}
+              checked={selectionIsDefaultPeriod}
               label={`${formatDate(
                 applicationRound.reservationPeriodBegin
               )} - ${formatDate(applicationRound.reservationPeriodEnd)}`}
-              onChange={(e) => {
+              onChange={() => {
                 form.clearErrors([fieldName("begin"), fieldName("end")]);
-                selectDefaultPeriod(e);
+                selectDefaultPeriod();
               }}
-              disabled={defaultPeriodSelected}
+              disabled={selectionIsDefaultPeriod}
             />
           </CheckboxWrapper>
           <ControlledSelect
@@ -475,13 +454,13 @@ const ApplicationEvent = ({
           <CheckboxWrapper>
             <Checkbox
               id="durationCheckbox"
-              checked={defaultDurationSelected}
+              checked={selectionIsDefaultDuration}
               label={t("application:Page1.defaultDurationLabel")}
-              onChange={(e) => {
+              onChange={() => {
                 clearDurationErrors(form, fieldName);
-                selectDefaultDuration(e);
+                selectDefaultDuration();
               }}
-              disabled={defaultDurationSelected}
+              disabled={selectionIsDefaultDuration}
             />
           </CheckboxWrapper>
           <SpanTwoColumns>
