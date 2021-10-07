@@ -7,12 +7,28 @@ from snapshottest import Snapshot
 
 snapshots = Snapshot()
 
+snapshots['PurposeQueryTestCase::test_getting_purposes 1'] = {
+    'data': {
+        'purposes': {
+            'edges': [
+                {
+                    'node': {
+                        'nameEn': 'en',
+                        'nameFi': 'fi',
+                        'nameSv': 'sv'
+                    }
+                }
+            ]
+        }
+    }
+}
+
 snapshots['PurposeTestCase::test_creating_purpose 1'] = {
     'data': {
         'createPurpose': {
             'errors': None,
             'purpose': {
-                'name': 'Created purpose'
+                'nameFi': 'Created purpose'
             }
         }
     }
@@ -22,7 +38,7 @@ snapshots['PurposeTestCase::test_updating_purpose 1'] = {
     'updatePurpose': {
         'errors': None,
         'purpose': {
-            'name': 'Updated name'
+            'nameFi': 'Updated name'
         }
     }
 }

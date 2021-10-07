@@ -73,12 +73,16 @@ class EquipmentCategoryUpdateSerializer(
 
 
 class PurposeCreateSerializer(PurposeSerializer, PrimaryKeySerializer):
-    pass
-
-
-class PurposeUpdateSerializer(PurposeSerializer, PrimaryKeyUpdateSerializer):
     class Meta(PurposeSerializer.Meta):
-        fields = PurposeSerializer.Meta.fields + ["pk"]
+        class Meta:
+            model = Purpose
+
+        fields = ["name_fi", "name_en", "name_sv"]
+
+
+class PurposeUpdateSerializer(PrimaryKeyUpdateSerializer, PurposeCreateSerializer):
+    class Meta(PurposeCreateSerializer.Meta):
+        fields = PurposeCreateSerializer.Meta.fields + ["pk"]
 
 
 class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySerializer):

@@ -67,7 +67,7 @@ class ReservationUnitTestCase(GraphQLTestCase, snapshottest.TestCase):
                             }
                             requireIntroduction
                             purposes {
-                              name
+                              nameFi
                             }
                             images {
                               imageUrl

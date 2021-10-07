@@ -23,6 +23,7 @@ from permissions.api_permissions.drf_permissions import ApplicationRoundPermissi
 from permissions.api_permissions.graphene_permissions import (
     EquipmentCategoryPermission,
     EquipmentPermission,
+    PurposePermission,
     ReservationUnitHaukiUrlPermission,
     ReservationUnitPermission,
 )
@@ -83,9 +84,15 @@ class KeywordCategoryType(AuthNode, PrimaryKeyObjectType):
 
 
 class PurposeType(AuthNode, PrimaryKeyObjectType):
+    permission_classes = (
+        (PurposePermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
+    )
+
     class Meta:
         model = Purpose
-        fields = ("id", "name", "pk")
+        fields = ("id", "pk", "name_fi", "name_en", "name_sv")
+
+        filter_fields = ["name_fi", "name_en", "name_sv"]
 
         interfaces = (graphene.relay.Node,)
 

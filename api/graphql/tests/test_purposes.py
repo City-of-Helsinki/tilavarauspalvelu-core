@@ -23,7 +23,7 @@ class PurposeTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
             mutation createPurpose($input: PurposeCreateMutationInput!){
                 createPurpose(input: $input) {
                     purpose {
-                        name
+                        nameFi
                     }
                     errors {
                         messages
@@ -37,7 +37,7 @@ class PurposeTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
             mutation updatePurpose($input: PurposeUpdateMutationInput!){
                 updatePurpose(input: $input) {
                     purpose {
-                        name
+                        nameFi
                         pk
                     }
                     errors {
@@ -51,7 +51,7 @@ class PurposeTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
     def test_updating_purpose(self):
         response = self.query(
             self.get_update_query(),
-            input_data={"pk": self.purpose.id, "name": "Updated name"},
+            input_data={"pk": self.purpose.id, "nameFi": "Updated name"},
         )
 
         content = json.loads(response.content).get("data")
@@ -65,7 +65,7 @@ class PurposeTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
     def test_updating_should_error_when_not_found(self):
         response = self.query(
             self.get_update_query(),
-            input_data={"pk": self.purpose.id + 3782, "name": "Fail name"},
+            input_data={"pk": self.purpose.id + 3782, "nameFi": "Fail name"},
         )
 
         content = json.loads(response.content)
@@ -77,7 +77,7 @@ class PurposeTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
 
     def test_creating_purpose(self):
         response = self.query(
-            self.get_create_query(), input_data={"name": "Created purpose"}
+            self.get_create_query(), input_data={"nameFi": "Created purpose"}
         )
 
         content = json.loads(response.content)
@@ -106,3 +106,31 @@ class PurposeTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
         assert_that(content.get("errors")).is_not_none()
         self.purpose.refresh_from_db()
         assert_that(self.purpose.name).is_equal_to("Test purpose")
+
+
+class PurposeQueryTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.purpose = PurposeFactory(name_fi="fi", name_en="en", name_sv="sv")
+
+    def test_getting_purposes(self):
+        response = self.query(
+            """
+            query {
+            purposes{
+                edges{
+                  node{
+                    nameFi
+                    nameEn
+                    nameSv
+                  }
+                }
+              }
+            }
+            """
+        )
+        assert_that(response.status_code).is_equal_to(200)
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
