@@ -8,7 +8,6 @@ from api.graphql.translate_fields import get_all_translatable_fields
 from api.reservation_units_api import (
     EquipmentCategorySerializer,
     EquipmentSerializer,
-    PurposeSerializer,
     ReservationUnitSerializer,
 )
 from reservation_units.models import (
@@ -23,20 +22,14 @@ from spaces.models import Space
 
 
 class EquipmentCreateSerializer(EquipmentSerializer, PrimaryKeySerializer):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["name"].required = False
-
     class Meta(EquipmentSerializer.Meta):
-        fields = EquipmentSerializer.Meta.fields + ["name_fi", "name_en", "name_en"]
+        fields = ["id", "name_fi", "name_sv", "name_en", "category_id"]
 
     def validate(self, data):
-        name = data.get("name", getattr(self.instance, "name", None))
         name_fi = data.get("name_fi", getattr(self.instance, "name_fi", None))
-        no_name = not name or name.isspace()
         no_name_fi = not name_fi or name_fi.isspace()
-        if no_name and no_name_fi:
-            raise serializers.ValidationError("Name (or nameFi) is required.")
+        if no_name_fi:
+            raise serializers.ValidationError("nameFi is required.")
 
         return data
 
@@ -49,24 +42,19 @@ class EquipmentUpdateSerializer(PrimaryKeyUpdateSerializer, EquipmentCreateSeria
 class EquipmentCategoryCreateSerializer(
     EquipmentCategorySerializer, PrimaryKeySerializer
 ):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["name"].required = False
-
     class Meta(EquipmentCategorySerializer.Meta):
-        fields = EquipmentCategorySerializer.Meta.fields + [
+        fields = [
+            "id",
             "name_fi",
             "name_en",
             "name_en",
         ]
 
     def validate(self, data):
-        name = data.get("name", getattr(self.instance, "name", None))
         name_fi = data.get("name_fi", getattr(self.instance, "name_fi", None))
-        no_name = not name or name.isspace()
         no_name_fi = not name_fi or name_fi.isspace()
-        if no_name and no_name_fi:
-            raise serializers.ValidationError("Name (or nameFi) is required.")
+        if no_name_fi:
+            raise serializers.ValidationError("nameFi is required.")
 
         return data
 
@@ -78,26 +66,24 @@ class EquipmentCategoryUpdateSerializer(
         fields = EquipmentCategoryCreateSerializer.Meta.fields + ["pk"]
 
 
-class PurposeCreateSerializer(PurposeSerializer, PrimaryKeySerializer):
-    class Meta(PurposeSerializer.Meta):
-        class Meta:
-            model = Purpose
-
-        fields = ["name_fi", "name_en", "name_sv"]
+class PurposeCreateSerializer(PrimaryKeySerializer):
+    class Meta:
+        model = Purpose
+        fields = get_all_translatable_fields(model)
 
 
-class PurposeUpdateSerializer(PrimaryKeyUpdateSerializer, PurposeCreateSerializer):
+class PurposeUpdateSerializer(PurposeCreateSerializer):
     class Meta(PurposeCreateSerializer.Meta):
-        fields = (
-            PurposeCreateSerializer.Meta.fields
-            + ["pk"]
-            + get_all_translatable_fields(Purpose)
+        fields = ["pk"] + get_all_translatable_fields(
+            PurposeCreateSerializer.Meta.model
         )
 
 
 class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySerializer):
     terms_of_use = serializers.CharField(required=False)
-    name = serializers.CharField(required=False)
+    name_fi = serializers.CharField(required=False, allow_blank=True)
+    name_sv = serializers.CharField(required=False, allow_blank=True)
+    name_en = serializers.CharField(required=False, allow_blank=True)
     max_reservation_duration = serializers.DurationField(required=False)
     min_reservation_duration = serializers.DurationField(required=False)
     max_persons = serializers.IntegerField(required=False)
@@ -121,28 +107,35 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
         "description_sv",
     ]
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["description"].required = False
-
     class Meta(ReservationUnitSerializer.Meta):
-        fields = (
-            ReservationUnitSerializer.Meta.fields
-            + [
-                "max_reservation_duration",
-                "min_reservation_duration",
-                "is_draft",
-                "space_ids",
-                "resource_ids",
-                "purpose_ids",
-                "service_ids",
-                "reservation_unit_type_id",
-                "surface_area",
-                "buffer_time_between_reservations",
-                "max_persons",
-            ]
-            + get_all_translatable_fields(ReservationUnit)
-        )
+        fields = [
+            "id",
+            "spaces",
+            "resources",
+            "services",
+            "require_introduction",
+            "purposes",
+            "images",
+            "location",
+            "max_persons",
+            "reservation_unit_type",
+            "building",
+            "terms_of_use",
+            "equipment_ids",
+            "unit_id",
+            "uuid",
+            "contact_information",
+            "max_reservation_duration",
+            "min_reservation_duration",
+            "is_draft",
+            "space_ids",
+            "resource_ids",
+            "purpose_ids",
+            "service_ids",
+            "reservation_unit_type_id",
+            "surface_area",
+            "buffer_time_between_reservations",
+        ] + get_all_translatable_fields(ReservationUnit)
 
     def _check_id_list(self, id_list, field_name):
         for identifier in id_list:

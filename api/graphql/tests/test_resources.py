@@ -52,13 +52,9 @@ class ResourceGraphQLTestCase(ResourceGraphQLBase, snapshottest.TestCase):
               resources {
                 edges {
                   node {
-                    name {
-                        nameFi
-                    }
+                    nameFi
                     space {
-                        name {
-                            nameFi
-                        }
+                        nameFi
                     }
                     building {
                       name
@@ -86,9 +82,7 @@ class ResourceGraphQLTestCase(ResourceGraphQLBase, snapshottest.TestCase):
             {{
                 resourceByPk(pk: {self.resource.id}) {{
                     id
-                    name {{
-                        nameFi
-                    }}
+                    nameFi
                     pk
                     bufferTimeBefore
                     bufferTimeAfter
@@ -115,9 +109,7 @@ class ResourceGraphQLTestCase(ResourceGraphQLBase, snapshottest.TestCase):
             {{
                 resourceByPk(pk: {self.resource.id + 657}) {{
                     id
-                    name {{
-                        nameFi
-                    }}
+                    nameFi
                     pk
                 }}
             }}

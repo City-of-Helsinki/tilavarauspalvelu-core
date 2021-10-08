@@ -1,26 +1,17 @@
 import graphene
 from django.conf import settings
-from graphene_django import DjangoObjectType
 from graphene_permissions.mixins import AuthNode
 from graphene_permissions.permissions import AllowAny
 
 from api.graphql.base_type import PrimaryKeyObjectType
-from api.graphql.translate_fields import (
-    django_type_self_resolver,
-    get_translatable_field,
-)
 from permissions.api_permissions.graphene_permissions import SpacePermission
 from spaces.models import Building, District, Location, RealEstate, Space
 
 
-class DistrictNameField(DjangoObjectType):
-    class Meta:
-        model = District
-        fields = get_translatable_field(model, "name")
-
-
 class DistrictType(PrimaryKeyObjectType):
-    name = graphene.Field(DistrictNameField, resolver=django_type_self_resolver)
+    name_fi = graphene.String()
+    name_sv = graphene.String()
+    name_en = graphene.String()
 
     class Meta:
         model = District
@@ -48,12 +39,6 @@ class BuildingType(PrimaryKeyObjectType):
         interfaces = (graphene.relay.Node,)
 
 
-class SpaceNameField(DjangoObjectType):
-    class Meta:
-        model = Space
-        fields = get_translatable_field(model, "name")
-
-
 class SpaceType(AuthNode, PrimaryKeyObjectType):
 
     permission_classes = (
@@ -62,7 +47,9 @@ class SpaceType(AuthNode, PrimaryKeyObjectType):
     children = graphene.List(lambda: SpaceType)
     resources = graphene.List("api.graphql.resources.resource_types.ResourceType")
 
-    name = graphene.Field(SpaceNameField, resolver=django_type_self_resolver)
+    name_fi = graphene.String()
+    name_sv = graphene.String()
+    name_en = graphene.String()
 
     class Meta:
         model = Space

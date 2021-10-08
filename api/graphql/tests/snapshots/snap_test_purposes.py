@@ -27,9 +27,7 @@ snapshots['PurposeTestCase::test_creating_purpose 1'] = {
         'createPurpose': {
             'errors': None,
             'purpose': {
-                'name': {
-                    'nameFi': "{'nameFi': 'Created purpose'}"
-                }
+                'nameFi': 'Created purpose'
             }
         }
     }
@@ -39,9 +37,7 @@ snapshots['PurposeTestCase::test_updating_purpose 1'] = {
     'updatePurpose': {
         'errors': None,
         'purpose': {
-            'name': {
-                'nameFi': "{'nameFi': 'Updated name'}"
-            }
+            'nameFi': 'Updated name'
         }
     }
 }

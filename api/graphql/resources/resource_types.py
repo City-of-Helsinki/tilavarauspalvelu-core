@@ -1,36 +1,21 @@
 import graphene
 from django.conf import settings
-from graphene_django import DjangoObjectType
 from graphene_permissions.mixins import AuthNode
 from graphene_permissions.permissions import AllowAny
 
 from api.graphql.base_type import PrimaryKeyObjectType
 from api.graphql.spaces.space_types import BuildingType
-from api.graphql.translate_fields import (
-    django_type_self_resolver,
-    get_translatable_field,
-)
 from permissions.api_permissions.graphene_permissions import ResourcePermission
 from resources.models import Resource
 
 
-class ResourceDescriptionField(DjangoObjectType):
-    class Meta:
-        model = Resource
-        fields = get_translatable_field(model, "description")
-
-
-class ResourceNameField(DjangoObjectType):
-    class Meta:
-        model = Resource
-        fields = get_translatable_field(model, "name")
-
-
 class ResourceType(AuthNode, PrimaryKeyObjectType):
-    name = graphene.Field(ResourceNameField, resolver=django_type_self_resolver)
-    description = graphene.Field(
-        ResourceDescriptionField, resolver=django_type_self_resolver
-    )
+    name_fi = graphene.String()
+    name_sv = graphene.String()
+    name_en = graphene.String()
+    description_fi = graphene.String()
+    description_sv = graphene.String()
+    description_en = graphene.String()
     building = graphene.List(BuildingType)
 
     permission_classes = (
@@ -42,8 +27,12 @@ class ResourceType(AuthNode, PrimaryKeyObjectType):
         fields = (
             "id",
             "location_type",
-            "name",
-            "description",
+            "name_fi",
+            "name_sv",
+            "name_en",
+            "description_fi",
+            "description_sv",
+            "description_en",
             "space",
             "buffer_time_before",
             "buffer_time_after",
@@ -51,7 +40,9 @@ class ResourceType(AuthNode, PrimaryKeyObjectType):
         )
 
         filter_fields = {
-            "name": ["exact", "icontains", "istartswith"],
+            "name_fi": ["exact", "icontains", "istartswith"],
+            "name_sv": ["exact", "icontains", "istartswith"],
+            "name_en": ["exact", "icontains", "istartswith"],
         }
 
         interfaces = (graphene.relay.Node,)
