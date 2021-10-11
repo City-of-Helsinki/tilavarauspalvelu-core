@@ -103,6 +103,7 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
     )
 
     recurring_reservation = graphene.Field(RecurringReservationType)
+    state = graphene.String()
 
     class Meta:
         model = Reservation

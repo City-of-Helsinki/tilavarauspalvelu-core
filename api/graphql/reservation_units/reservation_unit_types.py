@@ -42,7 +42,6 @@ from reservation_units.models import ReservationUnitType as ReservationUnitTypeM
 from reservation_units.utils.reservation_unit_reservation_scheduler import (
     ReservationUnitReservationScheduler,
 )
-from reservations.models import STATE_CHOICES
 from resources.models import Resource
 from spaces.models import Space
 
@@ -363,8 +362,7 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
         if to is not None:
             reservations = reservations.filter(end__lte=to)
         if state is not None:
-            states = [getattr(STATE_CHOICES, s) for s in state]
-            reservations = reservations.filter(state__in=states)
+            reservations = reservations.filter(state__in=state)
         return reservations
 
     def resolve_application_rounds(
