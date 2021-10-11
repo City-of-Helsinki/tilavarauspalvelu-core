@@ -28,6 +28,7 @@ from api.graphql.reservation_units.reservation_unit_types import (
     KeywordCategoryType,
     KeywordGroupType,
     KeywordType,
+    PurposeType,
     ReservationUnitByPkType,
     ReservationUnitType,
 )
@@ -52,6 +53,7 @@ from permissions.api_permissions.drf_permissions import (
 )
 from permissions.api_permissions.graphene_permissions import (
     KeywordPermission,
+    PurposePermission,
     ReservationUnitPermission,
     ResourcePermission,
     SpacePermission,
@@ -126,6 +128,12 @@ class EquipmentCategoryFilter(AuthFilter):
     )
 
 
+class PurposeFilter(AuthFilter):
+    permission_classes = (
+        (PurposePermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
+    )
+
+
 class Query(graphene.ObjectType):
     reservation_units = ReservationUnitsFilter(
         ReservationUnitType, filterset_class=ReservationUnitsFilterSet
@@ -156,6 +164,8 @@ class Query(graphene.ObjectType):
     keyword_categories = KeywordFilter(KeywordCategoryType)
     keyword_groups = KeywordFilter(KeywordGroupType)
     keywords = KeywordFilter(KeywordType)
+
+    purposes = PurposeFilter(PurposeType)
 
     def resolve_reservation_unit_by_pk(self, info, **kwargs):
         pk = kwargs.get("pk")
