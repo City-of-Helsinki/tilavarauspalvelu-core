@@ -51,6 +51,8 @@ def has_service_sector_permission(
 
 
 def has_general_permission(user: User, required_permission: str) -> bool:
+    if user.is_anonymous:
+        return False
     return user.general_roles.filter(
         role__permissions__permission=required_permission
     ).exists()
@@ -243,6 +245,8 @@ def get_service_sectors_where_can_view_applications(user: User) -> list:
 
 def get_units_where_can_view_reservations(user: User) -> list:
     permission = "can_view_reservations"
+    if user.is_anonymous:
+        return []
     if has_general_permission(user, permission) or is_superuser(user):
         return list(Unit.objects.all())
 
@@ -256,6 +260,8 @@ def get_units_where_can_view_reservations(user: User) -> list:
 
 def get_service_sectors_where_can_view_reservations(user: User) -> list:
     permission = "can_view_reservations"
+    if user.is_anonymous:
+        return []
     if has_general_permission(user, permission) or is_superuser(user):
         return list(ServiceSector.objects.all())
     return list(
@@ -269,6 +275,9 @@ def get_service_sectors_where_can_view_reservations(user: User) -> list:
 def can_view_reservation(user: User, reservation: Reservation) -> bool:
     permission = "can_view_reservations"
     reservation_units = reservation.reservation_unit.all()
+
+    if user.is_anonymous:
+        return False
 
     units = []
     service_sectors = []
@@ -285,10 +294,6 @@ def can_view_reservation(user: User, reservation: Reservation) -> bool:
         or has_general_permission(user, permission)
         or has_service_sector_permission(user, service_sectors, permission)
     )
-
-
-def can_view_reservations(user):
-    return user.is_authenticated
 
 
 def can_create_reservation(user, reservation):
@@ -321,6 +326,9 @@ def can_view_recurring_reservation(
     user: User, recurring_reservation: RecurringReservation
 ) -> bool:
     permission = "can_view_reservations"
+
+    if user.is_anonymous:
+        return False
     res_unit_ids = recurring_reservation.reservations.values_list(
         "reservation_unit", flat=True
     )
