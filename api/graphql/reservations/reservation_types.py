@@ -7,9 +7,14 @@ from rest_framework.reverse import reverse
 
 from api.graphql.base_type import PrimaryKeyObjectType
 from api.ical_api import hmac_signature
+from permissions.api_permissions.graphene_field_decorators import (
+    recurring_reservation_non_public_field,
+    reservation_non_public_field,
+)
 from permissions.api_permissions.graphene_permissions import (
     AbilityGroupPermission,
     AgeGroupPermission,
+    RecurringReservationPermission,
     ReservationPermission,
 )
 from reservations.models import (
@@ -43,6 +48,12 @@ class AbilityGroupType(AuthNode, PrimaryKeyObjectType):
 
 
 class RecurringReservationType(AuthNode, PrimaryKeyObjectType):
+    permission_classes = (
+        (RecurringReservationPermission,)
+        if not settings.TMP_PERMISSIONS_DISABLED
+        else (AllowAny,)
+    )
+
     user = graphene.String()
     application_id = graphene.Int()
     application_event_id = graphene.Int()
@@ -59,17 +70,20 @@ class RecurringReservationType(AuthNode, PrimaryKeyObjectType):
             "ability_group",
         ]
 
+    @recurring_reservation_non_public_field
     def resolve_user(self, info: ResolveInfo) -> [str]:
         if not self.user:
             return None
         return self.user.email
 
+    @recurring_reservation_non_public_field
     def resolve_application_id(self, info: ResolveInfo) -> [graphene.Int]:
         if not self.application_id:
             return None
 
         return self.application_id
 
+    @recurring_reservation_non_public_field
     def resolve_application_event_id(self, info: ResolveInfo) -> [str]:
         if not self.application_event_id:
             return None
@@ -126,9 +140,10 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
         signature = hmac_signature(f"reservation-{self.pk}")
         return f"{scheme}://{host}{calendar_url}?hash={signature}"
 
-    def resolve_user(self, info: ResolveInfo) -> str:
+    @reservation_non_public_field
+    def resolve_user(self, info: ResolveInfo) -> [str]:
         if not self.user:
-            return ""
+            return None
         return self.user.email
 
     def resolve_reservation_units(self, info: ResolveInfo):
