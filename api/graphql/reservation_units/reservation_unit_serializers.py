@@ -23,7 +23,10 @@ from spaces.models import Space
 
 class EquipmentCreateSerializer(EquipmentSerializer, PrimaryKeySerializer):
     class Meta(EquipmentSerializer.Meta):
-        fields = ["id", "name_fi", "name_sv", "name_en", "category_id"]
+        fields = [
+            "id",
+            "category_id",
+        ] + get_all_translatable_fields(EquipmentSerializer.Meta.model)
 
     def validate(self, data):
         name_fi = data.get("name_fi", getattr(self.instance, "name_fi", None))
@@ -43,12 +46,7 @@ class EquipmentCategoryCreateSerializer(
     EquipmentCategorySerializer, PrimaryKeySerializer
 ):
     class Meta(EquipmentCategorySerializer.Meta):
-        fields = [
-            "id",
-            "name_fi",
-            "name_en",
-            "name_en",
-        ]
+        fields = ["id"] + get_all_translatable_fields(EquipmentSerializer.Meta.model)
 
     def validate(self, data):
         name_fi = data.get("name_fi", getattr(self.instance, "name_fi", None))
@@ -72,15 +70,15 @@ class PurposeCreateSerializer(PrimaryKeySerializer):
         fields = get_all_translatable_fields(model)
 
 
-class PurposeUpdateSerializer(PurposeCreateSerializer):
+class PurposeUpdateSerializer(PrimaryKeyUpdateSerializer, PurposeCreateSerializer):
     class Meta(PurposeCreateSerializer.Meta):
-        fields = ["pk"] + get_all_translatable_fields(
-            PurposeCreateSerializer.Meta.model
-        )
+        fields = ["pk"] + PurposeCreateSerializer.Meta.fields
 
 
 class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySerializer):
-    terms_of_use = serializers.CharField(required=False)
+    terms_of_use_fi = serializers.CharField(required=False)
+    terms_of_use_sv = serializers.CharField(required=False)
+    terms_of_use_en = serializers.CharField(required=False)
     name_fi = serializers.CharField(required=False, allow_blank=True)
     name_sv = serializers.CharField(required=False, allow_blank=True)
     name_en = serializers.CharField(required=False, allow_blank=True)
@@ -98,14 +96,7 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
         queryset=ReservationUnitType.objects.all(),
     )
 
-    translation_fields = [
-        "name_fi",
-        "name_en",
-        "name_sv",
-        "description_fi",
-        "description_en",
-        "description_sv",
-    ]
+    translation_fields = get_all_translatable_fields(ReservationUnit)
 
     class Meta(ReservationUnitSerializer.Meta):
         fields = [
@@ -120,11 +111,9 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
             "max_persons",
             "reservation_unit_type",
             "building",
-            "terms_of_use",
             "equipment_ids",
             "unit_id",
             "uuid",
-            "contact_information",
             "max_reservation_duration",
             "min_reservation_duration",
             "is_draft",
@@ -152,17 +141,11 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
         if not is_draft:
             self.validate_for_publish(data)
 
-        if "name" in data.keys():
-            name = data.get("name")
-            if not name or name.isspace():
-                raise serializers.ValidationError(
-                    "nameFi (or name) is required for draft reservation units."
-                )
         if "name_fi" in data.keys():
             name = data.get("name_fi")
             if not name or name.isspace():
                 raise serializers.ValidationError(
-                    "nameFi (or name) is required for draft reservation units."
+                    "nameFi is required for draft reservation units."
                 )
 
         return data

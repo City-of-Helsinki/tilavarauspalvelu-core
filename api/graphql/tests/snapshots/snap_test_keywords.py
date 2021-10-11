@@ -16,13 +16,13 @@ snapshots['ResourceGraphQLTestCase::test_getting_keyword_categories 1'] = {
                             {
                                 'keywords': [
                                     {
-                                        'name': 'Test keyword'
+                                        'nameFi': 'Test keyword'
                                     }
                                 ],
-                                'name': 'Test group'
+                                'nameFi': 'Test group'
                             }
                         ],
-                        'name': 'Test category'
+                        'nameFi': 'Test category'
                     }
                 }
             ]
@@ -38,10 +38,10 @@ snapshots['ResourceGraphQLTestCase::test_getting_keyword_groups 1'] = {
                     'node': {
                         'keywords': [
                             {
-                                'name': 'Test keyword'
+                                'nameFi': 'Test keyword'
                             }
                         ],
-                        'name': 'Test group'
+                        'nameFi': 'Test group'
                     }
                 }
             ]
@@ -55,7 +55,7 @@ snapshots['ResourceGraphQLTestCase::test_getting_keywords 1'] = {
             'edges': [
                 {
                     'node': {
-                        'name': 'Test keyword'
+                        'nameFi': 'Test keyword'
                     }
                 }
             ]

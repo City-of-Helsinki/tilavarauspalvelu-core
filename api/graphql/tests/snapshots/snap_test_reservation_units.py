@@ -14,7 +14,7 @@ snapshots['ReservationUnitTestCase::test_filtering_by_active_application_rounds 
                     'node': {
                         'applicationRounds': [
                             {
-                                'name': 'Test Round'
+                                'nameFi': 'Test Round'
                             }
                         ]
                     }
@@ -32,7 +32,7 @@ snapshots['ReservationUnitTestCase::test_filtering_by_keyword_group 1'] = {
                     'node': {
                         'keywordGroups': [
                             {
-                                'name': 'Sports'
+                                'nameFi': 'Sports'
                             }
                         ],
                         'nameFi': 'Test name'
@@ -141,13 +141,13 @@ snapshots['ReservationUnitTestCase::test_filtering_by_reservation_unit_descripti
             'edges': [
                 {
                     'node': {
-                        'description': 'Lorem ipsum',
+                        'descriptionFi': 'Lorem ipsum',
                         'nameFi': 'Test name'
                     }
                 },
                 {
                     'node': {
-                        'description': 'Lorem ipsum',
+                        'descriptionFi': 'Lorem ipsum',
                         'nameFi': 'Test name'
                     }
                 }
@@ -202,7 +202,7 @@ snapshots['ReservationUnitTestCase::test_filtering_by_type 1'] = {
                     'node': {
                         'nameFi': 'Test name',
                         'reservationUnitType': {
-                            'name': 'Test type'
+                            'nameFi': 'Test type'
                         }
                     }
                 }
@@ -219,7 +219,7 @@ snapshots['ReservationUnitTestCase::test_filtering_by_type_text 1'] = {
                     'node': {
                         'nameFi': 'Test name',
                         'reservationUnitType': {
-                            'name': 'Test type'
+                            'nameFi': 'Test type'
                         }
                     }
                 },
@@ -227,7 +227,7 @@ snapshots['ReservationUnitTestCase::test_filtering_by_type_text 1'] = {
                     'node': {
                         'nameFi': 'Test name',
                         'reservationUnitType': {
-                            'name': 'Test type'
+                            'nameFi': 'Test type'
                         }
                     }
                 }
@@ -255,8 +255,8 @@ snapshots['ReservationUnitTestCase::test_getting_reservation_units 1'] = {
                     'node': {
                         'applicationRounds': [
                         ],
-                        'contactInformation': '',
-                        'description': '',
+                        'contactInformationFi': '',
+                        'descriptionFi': '',
                         'equipment': [
                         ],
                         'images': [
@@ -268,7 +268,7 @@ snapshots['ReservationUnitTestCase::test_getting_reservation_units 1'] = {
                         ],
                         'requireIntroduction': False,
                         'reservationUnitType': {
-                            'name': 'Test type'
+                            'nameFi': 'Test type'
                         },
                         'reservations': [
                         ],
@@ -284,7 +284,7 @@ snapshots['ReservationUnitTestCase::test_getting_reservation_units 1'] = {
                                 'nameFi': 'Small space'
                             }
                         ],
-                        'termsOfUse': ''
+                        'termsOfUseFi': None
                     }
                 }
             ]

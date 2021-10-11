@@ -12,7 +12,9 @@ from spaces.models import Space, Unit
 class SpaceCreateSerializer(SpaceSerializer, PrimaryKeySerializer):
     max_persons = serializers.IntegerField(required=False)
     code = serializers.CharField(required=False)
-    terms_of_use = serializers.CharField(required=False, default="")
+    terms_of_use_fi = serializers.CharField(required=False, default="")
+    terms_of_use_sv = serializers.CharField(required=False, default="")
+    terms_of_use_en = serializers.CharField(required=False, default="")
     unit_id = serializers.PrimaryKeyRelatedField(
         queryset=Unit.objects.all(), source="unit", required=False, allow_null=True
     )
@@ -22,20 +24,19 @@ class SpaceCreateSerializer(SpaceSerializer, PrimaryKeySerializer):
         self.fields["district_id"].required = False
         self.fields["parent_id"].required = False
         self.fields.pop("building_id")
-        self.fields["name"].required = False
         self.fields["name_fi"].required = True
 
     class Meta(SpaceSerializer.Meta):
-        fields = (
-            SpaceSerializer.Meta.fields
-            + [
-                "max_persons",
-                "code",
-                "terms_of_use",
-                "unit_id",
-            ]
-            + get_all_translatable_fields(Space)
-        )
+        fields = [
+            "id",
+            "parent_id",
+            "building_id",
+            "surface_area",
+            "district_id",
+            "max_persons",
+            "code",
+            "unit_id",
+        ] + get_all_translatable_fields(Space)
 
     def validate(self, data):
         name_fi = data.get("name_fi", getattr(self.instance, "name_fi", None))

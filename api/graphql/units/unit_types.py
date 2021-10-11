@@ -5,6 +5,7 @@ from graphene_permissions.permissions import AllowAny
 
 from api.graphql.base_type import PrimaryKeyObjectType
 from api.graphql.opening_hours.opening_hours_types import OpeningHoursMixin
+from api.graphql.translate_fields import get_all_translatable_fields
 from permissions.api_permissions.graphene_permissions import UnitPermission
 from spaces.models import Unit
 
@@ -23,19 +24,18 @@ class UnitType(AuthNode, PrimaryKeyObjectType):
 
     class Meta:
         model = Unit
-        fields = (
+        fields = [
             "id",
             "tprek_id",
-            "name",
-            "description",
-            "short_description",
             "web_page",
             "email",
             "phone",
-        )
+        ] + get_all_translatable_fields(model)
 
         filter_fields = {
-            "name": ["exact", "icontains", "istartswith"],
+            "name_fi": ["exact", "icontains", "istartswith"],
+            "name_sv": ["exact", "icontains", "istartswith"],
+            "name_en": ["exact", "icontains", "istartswith"],
         }
 
         interfaces = (graphene.relay.Node,)
@@ -58,15 +58,12 @@ class UnitByPkType(UnitType, OpeningHoursMixin):
 
     class Meta:
         model = Unit
-        fields = (
+        fields = [
             "id",
             "tprek_id",
-            "name",
-            "description",
-            "short_description",
             "web_page",
             "email",
             "phone",
-        )
+        ] + get_all_translatable_fields(model)
 
         interfaces = (graphene.relay.Node,)

@@ -1,6 +1,7 @@
 import graphene
 
 from api.graphql.base_type import PrimaryKeyObjectType
+from api.graphql.translate_fields import get_all_translatable_fields
 from services.models import Service
 
 
@@ -10,12 +11,11 @@ class ServiceType(PrimaryKeyObjectType):
 
     class Meta:
         model = Service
-        fields = (
+        fields = [
             "id",
-            "name",
             "service_type",
             "buffer_time_before",
             "buffer_time_after",
-        )
+        ] + get_all_translatable_fields(model)
 
         interfaces = (graphene.relay.Node,)

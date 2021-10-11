@@ -55,7 +55,7 @@ class ReservationUnitTestCase(GraphQLTestCase, snapshottest.TestCase):
                     edges {
                         node {
                             nameFi
-                            description
+                            descriptionFi
                             spaces {
                               nameFi
                             }
@@ -63,7 +63,7 @@ class ReservationUnitTestCase(GraphQLTestCase, snapshottest.TestCase):
                               nameFi
                             }
                             services {
-                              name
+                              nameFi
                             }
                             requireIntroduction
                             purposes {
@@ -80,20 +80,20 @@ class ReservationUnitTestCase(GraphQLTestCase, snapshottest.TestCase):
                             }
                             maxPersons
                             reservationUnitType {
-                              name
+                              nameFi
                             }
-                            termsOfUse
+                            termsOfUseFi
                             equipment {
                               nameFi
                             }
-                            contactInformation
+                            contactInformationFi
                             reservations {
                               begin
                               end
                               state
                             }
                             applicationRounds {
-                              name
+                              nameFi
                               targetGroup
                               allocating
                               applicationPeriodBegin
@@ -102,7 +102,7 @@ class ReservationUnitTestCase(GraphQLTestCase, snapshottest.TestCase):
                               reservationPeriodEnd
                               publicDisplayBegin
                               publicDisplayEnd
-                              criteria
+                              criteriaFi
                             }
                           }
                         }
@@ -212,7 +212,7 @@ class ReservationUnitTestCase(GraphQLTestCase, snapshottest.TestCase):
             f"node {{"
             f"nameFi "
             f"reservationUnitType {{"
-            f"name"
+            f"nameFi"
             f"}}"
             f"}}"
             f"}}"
@@ -231,7 +231,7 @@ class ReservationUnitTestCase(GraphQLTestCase, snapshottest.TestCase):
                 reservationUnits(reservationUnitType:345987){
                 edges {
                     node {
-                        name
+                        nameFi
                     }
                 }
                 }
@@ -289,7 +289,9 @@ class ReservationUnitTestCase(GraphQLTestCase, snapshottest.TestCase):
                 edges {
                     node {
                         nameFi
-                        reservationUnitType{name}
+                        reservationUnitType {
+                            nameFi
+                        }
                     }
                 }
                 }
@@ -357,7 +359,7 @@ class ReservationUnitTestCase(GraphQLTestCase, snapshottest.TestCase):
         assert_that(self.content_is_empty(content)).is_true()
 
     def test_filtering_by_reservation_unit_description(self):
-        self.reservation_unit.description = "Lorem ipsum"
+        self.reservation_unit.description_fi = "Lorem ipsum"
         self.reservation_unit.save()
         response = self.query(
             """
@@ -366,7 +368,7 @@ class ReservationUnitTestCase(GraphQLTestCase, snapshottest.TestCase):
                 edges {
                     node {
                         nameFi
-                        description
+                        descriptionFi
                     }
                 }
                 }
@@ -450,7 +452,7 @@ class ReservationUnitTestCase(GraphQLTestCase, snapshottest.TestCase):
             f"edges {{"
             f"node {{"
             f"nameFi\n"
-            f"keywordGroups{{name}}"
+            f"keywordGroups{{nameFi}}"
             f"}}"
             f"}}"
             f"}}"
@@ -466,8 +468,8 @@ class ReservationUnitTestCase(GraphQLTestCase, snapshottest.TestCase):
             f"reservationUnits( keywordGroups:{keyword_group.id+214979}){{"
             f"edges {{"
             f"node {{"
-            f"name\n"
-            f"keywordGroups{{name}}"
+            f"nameFi\n"
+            f"keywordGroups{{nameFi}}"
             f"}}"
             f"}}"
             f"}}"
@@ -627,7 +629,7 @@ class ReservationUnitTestCase(GraphQLTestCase, snapshottest.TestCase):
                 edges {
                   node {
                     applicationRounds(active: true) {
-                      name
+                      nameFi
                     }
                   }
                 }
@@ -787,7 +789,7 @@ class ReservationUnitCreateAsDraftTestCase(ReservationUnitMutationsTestCaseBase)
         assert_that(res_unit.id).is_equal_to(res_unit_data.get("id"))
 
     def test_create_errors_without_unit_id(self):
-        data = {"isDraft": True, "name": "Resunit name"}
+        data = {"isDraft": True, "nameFi": "Resunit name"}
         response = self.query(self.get_create_query(), input_data=data)
         assert_that(response.status_code).is_equal_to(400)
         content = json.loads(response.content)
@@ -877,6 +879,12 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
             "descriptionFi": "descFi",
             "descriptionEn": "descEn",
             "descriptionSv": "descSV",
+            "termsOfUseFi": "termsFi",
+            "termsOfUseEn": "termsEn",
+            "termsOfUseSv": "termsSv",
+            "contactInformationFi": "contactFi",
+            "contactInformationEn": "contactEn",
+            "contactInformationSv": "contactSv",
             "spaceIds": [self.space.id],
             "resourceIds": [self.resource.id],
             "serviceIds": [self.service.id],
@@ -1320,7 +1328,7 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
         res_unit_data = content.get("data").get("updateReservationUnit")
         assert_that(res_unit_data.get("errors")).is_not_none()
         assert_that(res_unit_data.get("errors")[0].get("messages")[0]).contains(
-            "nameFi (or name) is required for draft reservation units"
+            "nameFi is required for draft reservation units"
         )
 
         self.res_unit.refresh_from_db()
@@ -1361,14 +1369,18 @@ class ReservationUnitUpdateNotDraftTestCase(ReservationUnitMutationsTestCaseBase
         super().setUpTestData()
         cls.res_unit = ReservationUnitFactory(
             is_draft=False,
-            name="Resunit name",
             name_fi="Resunit name",
             name_en="Resunit name",
             name_sv="Resunit name",
-            description="Desc",
             description_fi="Desc",
             description_en="Desc",
             description_sv="Desc",
+            terms_of_use_fi="Terms",
+            terms_of_use_sv="Terms",
+            terms_of_use_en="Terms",
+            contact_information_fi="Info",
+            contact_information_sv="Info",
+            contact_information_en="Info",
             reservation_unit_type=cls.reservation_unit_type,
             unit=cls.unit,
         )

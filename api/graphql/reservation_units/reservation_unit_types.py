@@ -16,7 +16,7 @@ from api.graphql.reservations.reservation_types import ReservationType
 from api.graphql.resources.resource_types import ResourceType
 from api.graphql.services.service_types import ServiceType
 from api.graphql.spaces.space_types import LocationType, SpaceType
-from api.graphql.translate_fields import get_translatable_field
+from api.graphql.translate_fields import get_all_translatable_fields
 from api.graphql.units.unit_types import UnitType
 from applications.models import ApplicationRound
 from opening_hours.hauki_link_generator import generate_hauki_link
@@ -50,8 +50,8 @@ from spaces.models import Space
 class KeywordType(AuthNode, PrimaryKeyObjectType):
     class Meta:
         model = Keyword
-        fields = ("id", "name", "pk")
-        filter_fields = ["name"]
+        fields = ["id", "pk"] + get_all_translatable_fields(model)
+        filter_fields = ["name_fi", "name_sv", "name_en"]
         interfaces = (graphene.relay.Node,)
 
 
@@ -61,8 +61,8 @@ class KeywordGroupType(AuthNode, PrimaryKeyObjectType):
 
     class Meta:
         model = KeywordGroup
-        fields = ("id", "name", "pk")
-        filter_fields = ["name"]
+        fields = ["id", "pk"] + get_all_translatable_fields(model)
+        filter_fields = ["name_fi", "name_sv", "name_en"]
         interfaces = (graphene.relay.Node,)
 
     def resolve_keywords(self, info):
@@ -74,31 +74,23 @@ class KeywordCategoryType(AuthNode, PrimaryKeyObjectType):
 
     class Meta:
         model = KeywordCategory
-        fields = ("id", "name", "pk")
-
-        filter_fields = ["name"]
-
+        fields = ["id", "pk"] + get_all_translatable_fields(model)
+        filter_fields = ["name_fi", "name_sv", "name_en"]
         interfaces = (graphene.relay.Node,)
 
     def resolve_keyword_groups(self, info):
         return self.keyword_groups.all()
 
 
-class PurposeNameField(DjangoObjectType):
-    class Meta:
-        model = Purpose
-        fields = get_translatable_field(model, "name")
-
-
 class PurposeType(AuthNode, PrimaryKeyObjectType):
-    name_fi = graphene.String()
-    name_sv = graphene.String()
-    name_en = graphene.String()
+    permission_classes = (
+        (PurposePermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
+    )
 
     class Meta:
         model = Purpose
-        fields = ("id", "pk", "name_fi", "name_sv", "name_en")
-
+        fields = ["id"] + get_all_translatable_fields(model)
+        filter_fields = ["name_fi", "name_en", "name_sv"]
         interfaces = (graphene.relay.Node,)
 
 
@@ -152,7 +144,7 @@ class ReservationUnitImageType(DjangoObjectType):
 class ReservationUnitTypeType(PrimaryKeyObjectType):
     class Meta:
         model = ReservationUnitTypeModel
-        fields = ("name", "id")
+        fields = ["id"] + get_all_translatable_fields(model)
 
         interfaces = (graphene.relay.Node,)
 
@@ -166,7 +158,7 @@ class EquipmentCategoryType(AuthNode, PrimaryKeyObjectType):
 
     class Meta:
         model = EquipmentCategory
-        fields = ("id", "name_fi", "name_sv", "name_en")
+        fields = ["id"] + get_all_translatable_fields(model)
 
         filter_fields = {
             "name_fi": ["exact", "icontains", "istartswith"],
@@ -189,7 +181,7 @@ class EquipmentType(AuthNode, PrimaryKeyObjectType):
 
     class Meta:
         model = Equipment
-        fields = ("id", "name_fi", "name_sv", "name_en")
+        fields = ["id"] + get_all_translatable_fields(model)
 
         filter_fields = {
             "name_fi": ["exact", "icontains", "istartswith"],
@@ -215,8 +207,7 @@ class ApplicationRoundType(AuthNode, PrimaryKeyObjectType):
 
     class Meta:
         model = ApplicationRound
-        fields = (
-            "name",
+        fields = [
             "target_group",
             "allocating",
             "reservation_units",
@@ -228,11 +219,12 @@ class ApplicationRoundType(AuthNode, PrimaryKeyObjectType):
             "public_display_end",
             "purposes",
             "service_sector",
-            "criteria",
-        )
+        ] + get_all_translatable_fields(model)
 
         filter_fields = {
-            "name": ["exact", "icontains", "istartswith"],
+            "name_fi": ["exact", "icontains", "istartswith"],
+            "name_sv": ["exact", "icontains", "istartswith"],
+            "name_en": ["exact", "icontains", "istartswith"],
         }
 
 
@@ -251,7 +243,6 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
     equipment = graphene.List(EquipmentType)
     unit = graphene.Field(UnitType)
     max_persons = graphene.Int()
-    terms_of_use = graphene.String()
     surface_area = graphene.Int()
     max_reservation_duration = graphene.Time()
     min_reservation_duration = graphene.Time()
@@ -272,10 +263,8 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
 
     class Meta:
         model = ReservationUnit
-        fields = (
+        fields = [
             "id",
-            "name",
-            "description",
             "spaces",
             "resources",
             "services",
@@ -285,10 +274,8 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
             "location",
             "max_persons",
             "reservation_unit_type",
-            "terms_of_use",
             "equipment",
             "uuid",
-            "contact_information",
             "max_reservation_duration",
             "min_reservation_duration",
             "is_draft",
@@ -296,10 +283,14 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
             "buffer_time_between_reservations",
             "reservations",
             "application_rounds",
-        )
+        ] + get_all_translatable_fields(model)
         filter_fields = {
-            "name": ["exact", "icontains", "istartswith"],
-            "description": ["exact", "icontains"],
+            "name_fi": ["exact", "icontains", "istartswith"],
+            "name_sv": ["exact", "icontains", "istartswith"],
+            "name_en": ["exact", "icontains", "istartswith"],
+            "description_fi": ["exact", "icontains"],
+            "description_sv": ["exact", "icontains"],
+            "description_en": ["exact", "icontains"],
         }
 
         interfaces = (graphene.relay.Node,)
@@ -401,10 +392,8 @@ class ReservationUnitByPkType(ReservationUnitType, OpeningHoursMixin):
 
     class Meta:
         model = ReservationUnit
-        fields = (
+        fields = [
             "id",
-            "name",
-            "description",
             "spaces",
             "resources",
             "services",
@@ -414,15 +403,13 @@ class ReservationUnitByPkType(ReservationUnitType, OpeningHoursMixin):
             "location",
             "max_persons",
             "reservation_unit_type",
-            "terms_of_use",
             "equipment",
             "uuid",
-            "contact_information",
             "max_reservation_duration",
             "min_reservation_duration",
             "next_available_slot",
             "hauki_url",
-        )
+        ] + get_all_translatable_fields(model)
 
         interfaces = (graphene.relay.Node,)
 

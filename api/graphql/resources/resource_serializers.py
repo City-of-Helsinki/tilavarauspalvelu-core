@@ -16,17 +16,19 @@ class ResourceCreateSerializer(ResourceSerializer, PrimaryKeySerializer):
 
     class Meta(ResourceSerializer.Meta):
 
-        fields = (
-            ResourceSerializer.Meta.fields
-            + ["is_draft"]
-            + get_all_translatable_fields(Resource)
-        )
+        fields = [
+            "id",
+            "location_type",
+            "space_id",
+            "buffer_time_before",
+            "buffer_time_after",
+            "is_draft",
+        ] + get_all_translatable_fields(Resource)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["space_id"].required = False
         self.fields["space_id"].allow_null = True
-        self.fields["name"].required = False
 
         self.translation_fields = get_all_translatable_fields(Resource)
 

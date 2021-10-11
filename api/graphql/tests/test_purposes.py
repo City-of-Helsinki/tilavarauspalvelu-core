@@ -88,7 +88,7 @@ class PurposeTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
         self._client.force_login(self.regular_joe)
         response = self.query(
             self.get_create_query(),
-            input_data={"name": "Created purpose"},
+            input_data={"nameFi": "Created purpose"},
         )
 
         content = json.loads(response.content)
@@ -99,7 +99,7 @@ class PurposeTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
         self._client.force_login(self.regular_joe)
         response = self.query(
             self.get_update_query(),
-            input_data={"pk": self.purpose.id, "name": "Updated name"},
+            input_data={"pk": self.purpose.id, "nameFi": "Updated name"},
         )
 
         content = json.loads(response.content)

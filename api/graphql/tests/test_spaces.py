@@ -123,7 +123,7 @@ class CreateSpaceTestCase(SpaceMutationBaseTestCase):
         ).is_true()
 
     def test_no_name_fi_errors(self):
-        data = {"name": "SpaceName"}
+        data = {"nameSv": "SpaceName"}
         response = self.query(self.get_create_query(), input_data=data)
         assert_that(response.status_code).is_equal_to(400)
 

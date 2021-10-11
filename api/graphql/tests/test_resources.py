@@ -15,9 +15,9 @@ from spaces.tests.factories import SpaceFactory
 class ResourceGraphQLBase(GraphQLTestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.space = SpaceFactory(name="Test space")
+        cls.space = SpaceFactory(name_fi="Test space")
         cls.resource = ResourceFactory(
-            name="Test resource",
+            name_fi="Test resource",
             name_en="name",
             name_sv="namn",
             description_fi="selite",
@@ -57,7 +57,7 @@ class ResourceGraphQLTestCase(ResourceGraphQLBase, snapshottest.TestCase):
                         nameFi
                     }
                     building {
-                      name
+                      nameFi
                     }
                     locationType
                     bufferTimeBefore
