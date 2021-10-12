@@ -4,20 +4,18 @@ from django.conf import settings
 from opening_hours.utils.opening_hours_client import OpeningHoursClient
 
 
-class TranslatedStringType(graphene.ObjectType):
-    fi = graphene.String()
-    en = graphene.String()
-    sv = graphene.String()
-
-
 class TimeSpanType(graphene.ObjectType):
     start_time = graphene.Time()
     end_time = graphene.Time()
     weekdays = graphene.List(graphene.Int)
     resource_state = graphene.String()
     end_time_on_next_day = graphene.Boolean()
-    name = graphene.Field(TranslatedStringType)
-    description = graphene.Field(TranslatedStringType)
+    name_fi = graphene.String()
+    name_en = graphene.String()
+    name_sv = graphene.String()
+    description_fi = graphene.String()
+    description_en = graphene.String()
+    description_sv = graphene.String()
 
 
 class PeriodType(graphene.ObjectType):
@@ -26,8 +24,12 @@ class PeriodType(graphene.ObjectType):
     end_date = graphene.Date()
     resource_state = graphene.String()
     time_spans = graphene.List(TimeSpanType)
-    name = graphene.Field(TranslatedStringType)
-    description = graphene.Field(TranslatedStringType)
+    name_fi = graphene.String()
+    name_en = graphene.String()
+    name_sv = graphene.String()
+    description_fi = graphene.String()
+    description_en = graphene.String()
+    description_sv = graphene.String()
 
 
 class OpeningTimesType(graphene.ObjectType):
@@ -115,16 +117,12 @@ class OpeningHoursMixin:
                             end_time=time_span.end_time,
                             resource_state=time_span.resource_state,
                             weekdays=time_span.weekdays,
-                            name=TranslatedStringType(
-                                fi=time_span.name.get("fi"),
-                                en=time_span.name.get("en"),
-                                sv=time_span.name.get("sv"),
-                            ),
-                            description=TranslatedStringType(
-                                fi=time_span.description.get("fi"),
-                                en=time_span.description.get("en"),
-                                sv=time_span.description.get("sv"),
-                            ),
+                            name_fi=time_span.name.get("fi"),
+                            name_sv=time_span.name.get("sv"),
+                            name_en=time_span.name.get("en"),
+                            description_fi=time_span.description.get("fi"),
+                            description_sv=time_span.description.get("sv"),
+                            description_en=time_span.description.get("en"),
                         )
                     )
                 periods.append(
@@ -133,16 +131,12 @@ class OpeningHoursMixin:
                         start_date=period.start_date,
                         end_date=period.end_date,
                         time_spans=time_spans,
-                        name=TranslatedStringType(
-                            fi=period.name.get("fi"),
-                            en=period.name.get("en"),
-                            sv=period.name.get("sv"),
-                        ),
-                        description=TranslatedStringType(
-                            fi=period.description.get("fi"),
-                            en=period.description.get("en"),
-                            sv=period.description.get("sv"),
-                        ),
+                        name_fi=period.name.get("fi"),
+                        name_sv=period.name.get("sv"),
+                        name_en=period.name.get("en"),
+                        description_fi=period.description.get("fi"),
+                        description_sv=period.description.get("sv"),
+                        description_en=period.description.get("en"),
                     )
                 )
             return_object.opening_time_periods = periods

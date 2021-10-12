@@ -43,7 +43,7 @@ class UnitsUpdateTestCase(GraphQLTestCase):
         desc = "Awesomeunit"
         response = self.query(
             self.get_update_query(),
-            input_data={"pk": self.unit.pk, "description": desc},
+            input_data={"pk": self.unit.pk, "descriptionFi": desc},
         )
 
         assert_that(response.status_code).is_equal_to(200)
@@ -57,7 +57,7 @@ class UnitsUpdateTestCase(GraphQLTestCase):
         desc = "Awesomeunit"
         response = self.query(
             self.get_update_query(),
-            input_data={"pk": self.unit.pk, "description": desc},
+            input_data={"pk": self.unit.pk, "descriptionFi": desc},
         )
 
         assert_that(response.status_code).is_equal_to(200)

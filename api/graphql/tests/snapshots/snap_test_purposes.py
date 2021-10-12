@@ -4,7 +4,6 @@ from __future__ import unicode_literals
 
 from snapshottest import Snapshot
 
-
 snapshots = Snapshot()
 
 snapshots['PurposeQueryTestCase::test_getting_purposes 1'] = {

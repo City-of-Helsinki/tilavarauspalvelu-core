@@ -22,7 +22,7 @@ class EquipmentCreateTestCase(EquipmentBaseTestCase):
         return """
             mutation createEquipment($input: EquipmentCreateMutationInput!) {
                 createEquipment(input: $input) {
-                    name
+                    nameFi
                     id
                     errors {
                         messages
@@ -42,7 +42,7 @@ class EquipmentCreateTestCase(EquipmentBaseTestCase):
     def test_regular_user_cannot_create(self):
         self._client.force_login(self.regular_joe)
         data = {
-            "name": "Regular user created equipment",
+            "nameFi": "Regular user created equipment",
             "categoryId": self.category.id,
         }
         response = self.query(self.get_create_query(), input_data=data)
@@ -62,7 +62,7 @@ class EquipmentUpdateTestCase(EquipmentBaseTestCase):
         return """
             mutation updateEquipment($input: EquipmentUpdateMutationInput!) {
                 updateEquipment(input: $input) {
-                    name
+                    nameFi
                     pk
                     errors {
                         messages
@@ -87,11 +87,11 @@ class EquipmentUpdateTestCase(EquipmentBaseTestCase):
         self.equipment.refresh_from_db()
 
         assert_that(equipment_content.get("pk")).is_equal_to(self.equipment.pk)
-        assert_that(equipment_content.get("name")).is_equal_to("Updated name")
+        assert_that(equipment_content.get("nameFi")).is_equal_to("Updated name")
         assert_that(self.equipment.name).is_equal_to("Updated name")
 
     def test_updating_should_error_when_not_found(self):
-        data = {"pk": "1234", "name": "Me errors", "categoryId": self.category.id}
+        data = {"pk": "1234", "nameFi": "Me errors", "categoryId": self.category.id}
         response = self.query(self.get_update_query(), input_data=data)
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
@@ -102,7 +102,7 @@ class EquipmentUpdateTestCase(EquipmentBaseTestCase):
         name = self.equipment.name
         data = {
             "pk": self.equipment.pk,
-            "name": "Regular user updated the name",
+            "nameFi": "Regular user updated the name",
             "categoryId": self.category.id,
         }
         response = self.query(self.get_update_query(), input_data=data)
@@ -118,7 +118,7 @@ class EquipmentCategoryCreateTestCase(EquipmentBaseTestCase):
         return """
             mutation createEquipmentCategory($input: EquipmentCategoryCreateMutationInput!) {
                 createEquipmentCategory(input: $input) {
-                    name
+                    nameFi
                     id
                     errors {
                         messages
@@ -154,7 +154,7 @@ class EquipmentCategoryCreateTestCase(EquipmentBaseTestCase):
     def test_regular_user_cannot_create(self):
         self._client.force_login(self.regular_joe)
         data = {
-            "name": "Regular user created equipment category",
+            "nameFi": "Regular user created equipment category",
         }
         response = self.query(self.get_create_query(), input_data=data)
         assert_that(response.status_code).is_equal_to(200)
@@ -173,7 +173,7 @@ class EquipmentCategoryUpdateTestCase(EquipmentBaseTestCase):
         return """
             mutation updateEquipmentCategory($input: EquipmentCategoryUpdateMutationInput!) {
                 updateEquipmentCategory(input: $input) {
-                    name
+                    nameFi
                     pk
                     errors {
                         messages
@@ -194,11 +194,11 @@ class EquipmentCategoryUpdateTestCase(EquipmentBaseTestCase):
         self.equipment_category.refresh_from_db()
 
         assert_that(equipment_content.get("pk")).is_equal_to(self.equipment_category.pk)
-        assert_that(equipment_content.get("name")).is_equal_to("Updated name")
+        assert_that(equipment_content.get("nameFi")).is_equal_to("Updated name")
         assert_that(self.equipment_category.name).is_equal_to("Updated name")
 
     def test_updating_should_error_when_not_found(self):
-        data = {"pk": "1234", "name": "Me errors"}
+        data = {"pk": "1234", "nameFi": "Me errors"}
         response = self.query(self.get_update_query(), input_data=data)
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
@@ -209,7 +209,7 @@ class EquipmentCategoryUpdateTestCase(EquipmentBaseTestCase):
         name = self.equipment_category.name
         data = {
             "pk": self.equipment_category.pk,
-            "name": "Regular user updated the name",
+            "nameFi": "Regular user updated the name",
         }
         response = self.query(self.get_update_query(), input_data=data)
         assert_that(response.status_code).is_equal_to(200)

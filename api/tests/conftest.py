@@ -365,10 +365,18 @@ def valid_reservation_unit_data(unit, equipment_hammer):
             "sv": "",
         },
         "require_introduction": False,
-        "terms_of_use": "Do not mess it up",
+        "terms_of_use": {
+            "fi": "Älä sotke paikkoja",
+            "en": "Do not mess it up",
+            "sv": "Förstör inte platserna",
+        },
         "equipment_ids": [equipment_hammer.id],
         "unit_id": unit.pk,
-        "contact_information": "",
+        "contact_information": {
+            "fi": "",
+            "en": "",
+            "sv": "",
+        },
     }
 
 

@@ -30,11 +30,11 @@ class ResourceGraphQLTestCase(GraphQLTestCase, snapshottest.TestCase):
             keywordCategories{
                 edges{
                   node{
-                    name
+                    nameFi
                     keywordGroups{
-                      name
+                      nameFi
                       keywords{
-                        name
+                        nameFi
                       }
                     }
                   }
@@ -56,9 +56,9 @@ class ResourceGraphQLTestCase(GraphQLTestCase, snapshottest.TestCase):
               keywordGroups{
                 edges{
                   node{
-                    name
+                    nameFi
                     keywords{
-                      name
+                      nameFi
                     }
                   }
                 }
@@ -79,7 +79,7 @@ class ResourceGraphQLTestCase(GraphQLTestCase, snapshottest.TestCase):
               keywords{
                 edges{
                   node{
-                    name
+                    nameFi
                   }
                 }
               }

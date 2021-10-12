@@ -5,6 +5,7 @@ from graphene_permissions.permissions import AllowAny
 
 from api.graphql.base_type import PrimaryKeyObjectType
 from api.graphql.spaces.space_types import BuildingType
+from api.graphql.translate_fields import get_all_translatable_fields
 from permissions.api_permissions.graphene_permissions import ResourcePermission
 from resources.models import Resource
 
@@ -18,19 +19,19 @@ class ResourceType(AuthNode, PrimaryKeyObjectType):
 
     class Meta:
         model = Resource
-        fields = (
+        fields = [
             "id",
             "location_type",
-            "name",
-            "description",
             "space",
             "buffer_time_before",
             "buffer_time_after",
             "is_draft",
-        )
+        ] + get_all_translatable_fields(model)
 
         filter_fields = {
-            "name": ["exact", "icontains", "istartswith"],
+            "name_fi": ["exact", "icontains", "istartswith"],
+            "name_sv": ["exact", "icontains", "istartswith"],
+            "name_en": ["exact", "icontains", "istartswith"],
         }
 
         interfaces = (graphene.relay.Node,)
