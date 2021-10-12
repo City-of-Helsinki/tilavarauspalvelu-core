@@ -14,7 +14,7 @@
   "unitFilter": "Toimipiste",
   "resetForm": "Tyhjennä hakuehdot",
   "filters": {
-    "search": "\"{{value}}\"",
+    "textSearch": "\"{{value}}\"",
     "minPersons": "Henkilömäärä min",
     "maxPersons": "Henkilömäärä max",
     "purpose": "Käyttötarkoitus",
