@@ -296,9 +296,9 @@ def can_view_reservation(user: User, reservation: Reservation) -> bool:
     )
 
 
-def can_create_reservation(user, reservation):
-    # For reservation creation by a user. Just a stub method for permissions => logic later.
-    return False
+def can_create_reservation(user):
+    """Reservation creation by end user."""
+    return user.is_authenticated
 
 
 def can_modify_reservation(user: User, reservation: Reservation) -> bool:

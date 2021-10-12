@@ -15,6 +15,7 @@ from permissions.helpers import (
     can_manage_spaces,
     can_manage_units,
     can_manage_units_reservation_units,
+    can_modify_reservation,
     can_view_recurring_reservation,
 )
 from reservation_units.models import ReservationUnit
@@ -73,8 +74,11 @@ class ResourcePermission(BasePermission):
 class ReservationPermission(BasePermission):
     @classmethod
     def has_mutation_permission(cls, root: Any, info: ResolveInfo, input: dict) -> bool:
-        reservation = Reservation(**input)
-        return can_create_reservation(info.context.user, reservation)
+        pk = input.get("pk")
+        if pk:
+            reservation = get_object_or_404(Reservation, pk=input.get("pk"))
+            return can_modify_reservation(info.context.user, reservation)
+        return can_create_reservation(info.context.user)
 
     @classmethod
     def has_filter_permission(self, info: ResolveInfo) -> bool:
