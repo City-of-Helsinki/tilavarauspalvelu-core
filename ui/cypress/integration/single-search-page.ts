@@ -9,7 +9,7 @@ import {
   formResetButton,
   paginationButton,
   inputUnitToggler,
-  inputUnit,
+  inputUnitOption,
 } from "../model/search";
 
 describe("Tilavaraus ui search page", () => {
@@ -18,7 +18,7 @@ describe("Tilavaraus ui search page", () => {
       cy.intercept("GET", "/v1/parameters/reservation_unit_type/*", json);
     });
 
-    cy.visit("/single/search");
+    cy.visit("/search/single");
   });
 
   const searchTerm = "tila";
@@ -50,12 +50,9 @@ describe("Tilavaraus ui search page", () => {
       .siblings("ul")
       .children("li:nth-of-type(2)")
       .click();
-    inputUnitToggler()
-      .click()
-      .siblings("ul")
-      .children("li:nth-of-type(1)")
-      .click();
-    inputUnitToggler().siblings("ul").children("li:nth-of-type(3)").click();
+    inputUnitToggler().click();
+    inputUnitOption(1).click();
+    inputUnitOption(3).click();
     inputUnitToggler().click();
     searchButton().click();
 

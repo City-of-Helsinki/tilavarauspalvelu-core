@@ -1,0 +1,179 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`matches snapshot 1`] = `
+<div
+  class="DateSelectorMenu__Wrapper-sc-4q8ipz-0 jXmzKr"
+  data-testid="date-selector-menu"
+>
+  <div
+    class="DateSelectorMenu__CheckboxWrapper-sc-4q8ipz-1 ilGTbW"
+  >
+    <div
+      class="Checkbox-module_checkbox__3L0GR checkbox_hds-checkbox__9HMCz Checkbox__StyledCheckbox-sc-14mc6iy-0 gYbgIB"
+      style="--background-unselected: var(--color-white); display: block; line-height: 24px;"
+    >
+      <input
+        class="Checkbox-module_input__3VZvy checkbox_hds-checkbox__input__1w0pu"
+        id="name_today"
+        name="date"
+        role="checkbox"
+        type="checkbox"
+        value="today"
+      />
+      <label
+        class="Checkbox-module_label__L5AN1 checkbox_hds-checkbox__label__3HoD3"
+        for="name_today"
+      >
+        dateSelector:dateTypeToday
+      </label>
+    </div>
+    <div
+      class="Checkbox-module_checkbox__3L0GR checkbox_hds-checkbox__9HMCz Checkbox__StyledCheckbox-sc-14mc6iy-0 gYbgIB"
+      style="--background-unselected: var(--color-white); display: block; line-height: 24px;"
+    >
+      <input
+        class="Checkbox-module_input__3VZvy checkbox_hds-checkbox__input__1w0pu"
+        id="name_tomorrow"
+        name="date"
+        role="checkbox"
+        type="checkbox"
+        value="tomorrow"
+      />
+      <label
+        class="Checkbox-module_label__L5AN1 checkbox_hds-checkbox__label__3HoD3"
+        for="name_tomorrow"
+      >
+        dateSelector:dateTypeTomorrow
+      </label>
+    </div>
+    <div
+      class="Checkbox-module_checkbox__3L0GR checkbox_hds-checkbox__9HMCz Checkbox__StyledCheckbox-sc-14mc6iy-0 gYbgIB"
+      style="--background-unselected: var(--color-white); display: block; line-height: 24px;"
+    >
+      <input
+        class="Checkbox-module_input__3VZvy checkbox_hds-checkbox__input__1w0pu"
+        id="name_this_week"
+        name="date"
+        role="checkbox"
+        type="checkbox"
+        value="this_week"
+      />
+      <label
+        class="Checkbox-module_label__L5AN1 checkbox_hds-checkbox__label__3HoD3"
+        for="name_this_week"
+      >
+        dateSelector:dateTypeThisWeek
+      </label>
+    </div>
+    <div
+      class="Checkbox-module_checkbox__3L0GR checkbox_hds-checkbox__9HMCz Checkbox__StyledCheckbox-sc-14mc6iy-0 gYbgIB"
+      style="--background-unselected: var(--color-white); display: block; line-height: 24px;"
+    >
+      <input
+        class="Checkbox-module_input__3VZvy checkbox_hds-checkbox__input__1w0pu"
+        id="name_weekend"
+        name="date"
+        role="checkbox"
+        type="checkbox"
+        value="weekend"
+      />
+      <label
+        class="Checkbox-module_label__L5AN1 checkbox_hds-checkbox__label__3HoD3"
+        for="name_weekend"
+      >
+        dateSelector:dateTypeWeekend
+      </label>
+    </div>
+  </div>
+  <button
+    class="DateSelectorMenu__Btn-sc-4q8ipz-2 gDyqJS selectDates"
+    type="button"
+  >
+    <svg
+      aria-hidden="true"
+      class="Icon-module_icon__1Jtzj icon_hds-icon__1YqNC Icon-module_s__2WGWe icon_hds-icon--size-s__2Lkik"
+      role="img"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <g
+        fill="none"
+        fill-rule="evenodd"
+      >
+        <path
+          d="M0 0h24v24H0z"
+        />
+        <path
+          d="M20 14v3h3v2h-3v3h-2v-3h-3v-2h3v-3h2zM17 2a1 1 0 011 1v1h4v8h-2v-1H4v8h9v2H2V4h4V3a1 1 0 112 0v1h8V3a1 1 0 011-1zm3 4H4v3h16V6z"
+          fill="currentColor"
+        />
+      </g>
+    </svg>
+    <div
+      class="DateSelectorMenu__BtnText-sc-4q8ipz-3 eNxEJL"
+    >
+      dateSelector:menu.buttonCustom
+    </div>
+    <svg
+      aria-hidden="true"
+      class="Icon-module_icon__1Jtzj icon_hds-icon__1YqNC Icon-module_s__2WGWe icon_hds-icon--size-s__2Lkik"
+      role="img"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <g
+        fill="none"
+        fill-rule="evenodd"
+      >
+        <polygon
+          points="0 24 0 0 24 0 24 24"
+        />
+        <polygon
+          fill="currentColor"
+          points="13.5 12 8.5 7 10 5.5 16.5 12 10 18.5 8.5 17"
+        />
+      </g>
+    </svg>
+  </button>
+  <button
+    class="DateSelectorMenu__Btn-sc-4q8ipz-2 inhOyv back"
+    type="button"
+  >
+    <svg
+      aria-hidden="true"
+      class="Icon-module_icon__1Jtzj icon_hds-icon__1YqNC Icon-module_s__2WGWe icon_hds-icon--size-s__2Lkik"
+      role="img"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <g
+        fill="none"
+        fill-rule="evenodd"
+      >
+        <polygon
+          points="24 0 24 24 0 24 0 0"
+        />
+        <polygon
+          fill="currentColor"
+          points="10.5 12 15.5 17 14 18.5 7.5 12 14 5.5 15.5 7"
+        />
+      </g>
+    </svg>
+    <div
+      class="DateSelectorMenu__BtnText-sc-4q8ipz-3 eNxEJL"
+    >
+      dateSelector:menu.buttonBack
+    </div>
+  </button>
+  <button
+    class="DateSelectorMenu__Btn-sc-4q8ipz-2 gDyqJS close"
+    type="button"
+  >
+    <div
+      class="DateSelectorMenu__BtnText-sc-4q8ipz-3 eNxEJL"
+    >
+      dateSelector:menu.buttonClose
+    </div>
+  </button>
+</div>
+`;
