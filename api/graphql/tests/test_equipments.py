@@ -1,5 +1,6 @@
 import json
 
+import snapshottest
 from assertpy import assert_that
 
 from api.graphql.tests.base import GrapheneTestCaseBase
@@ -7,11 +8,11 @@ from reservation_units.models import Equipment
 from reservation_units.tests.factories import EquipmentCategoryFactory, EquipmentFactory
 
 
-class EquipmentBaseTestCase(GrapheneTestCaseBase):
+class EquipmentBaseTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        cls.category = EquipmentCategoryFactory()
+        cls.category = EquipmentCategoryFactory(name="Test Category")
 
     def setUp(self) -> None:
         self._client.force_login(self.general_admin)
@@ -111,6 +112,28 @@ class EquipmentUpdateTestCase(EquipmentBaseTestCase):
         assert_that(content.get("errors")).is_not_none()
         self.equipment.refresh_from_db()
         assert_that(self.equipment.name).is_equal_to(name)
+
+
+class EquipmentQueryTestCase(EquipmentBaseTestCase):
+    def test_getting_equipment(self):
+        EquipmentFactory(name="Test equipment")
+        response = self.query(
+            """
+            query {
+              equipments {
+                edges {
+                  node {
+                    nameFi
+                  }
+                }
+              }
+            }
+            """
+        )
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
 
 
 class EquipmentCategoryCreateTestCase(EquipmentBaseTestCase):
@@ -217,3 +240,24 @@ class EquipmentCategoryUpdateTestCase(EquipmentBaseTestCase):
         assert_that(content.get("errors")).is_not_none()
         self.equipment_category.refresh_from_db()
         assert_that(self.equipment_category.name).is_equal_to(name)
+
+
+class EquipmentCategoryQueryTestCase(EquipmentBaseTestCase):
+    def test_getting_equipment_category(self):
+        response = self.query(
+            """
+            query {
+              equipmentCategories {
+                edges {
+                  node {
+                    nameFi
+                  }
+                }
+              }
+            }
+            """
+        )
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)

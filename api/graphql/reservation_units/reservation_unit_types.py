@@ -175,10 +175,6 @@ class EquipmentType(AuthNode, PrimaryKeyObjectType):
     )
     category = graphene.Field(EquipmentCategoryType)
 
-    permission_classes = (
-        (EquipmentPermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
-    )
-
     class Meta:
         model = Equipment
         fields = ["id"] + get_all_translatable_fields(model)

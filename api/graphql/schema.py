@@ -47,11 +47,9 @@ from api.graphql.spaces.space_mutations import (
 from api.graphql.spaces.space_types import SpaceType
 from api.graphql.units.unit_mutations import UnitUpdateMutation
 from api.graphql.units.unit_types import UnitByPkType, UnitType
-from permissions.api_permissions.drf_permissions import (
+from permissions.api_permissions.graphene_permissions import (
     EquipmentCategoryPermission,
     EquipmentPermission,
-)
-from permissions.api_permissions.graphene_permissions import (
     KeywordPermission,
     PurposePermission,
     ReservationUnitPermission,
