@@ -93,6 +93,25 @@ snapshots['ReservationUnitTestCase::test_filtering_by_multiple_reservation_state
     }
 }
 
+snapshots['ReservationUnitTestCase::test_filtering_by_purpose 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'nameFi': 'Test name',
+                        'purposes': [
+                            {
+                                'nameFi': 'Test purpose'
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    }
+}
+
 snapshots['ReservationUnitTestCase::test_filtering_by_reservation_state 1'] = {
     'data': {
         'reservationUnits': {

@@ -6,7 +6,12 @@ from django.db.models import Q, Sum
 from django_filters import CharFilter
 
 from api.common_filters import ModelInFilter
-from reservation_units.models import KeywordGroup, ReservationUnit, ReservationUnitType
+from reservation_units.models import (
+    KeywordGroup,
+    Purpose,
+    ReservationUnit,
+    ReservationUnitType,
+)
 from spaces.models import Unit
 
 
@@ -27,6 +32,8 @@ class ReservationUnitsFilterSet(django_filters.FilterSet):
     keyword_groups = ModelInFilter(
         field_name="keyword_groups", queryset=KeywordGroup.objects.all()
     )
+
+    purposes = ModelInFilter(field_name="purposes", queryset=Purpose.objects.all())
 
     class Meta:
         model = ReservationUnit
