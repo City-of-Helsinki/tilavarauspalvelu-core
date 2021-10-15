@@ -224,6 +224,29 @@ class ReservationUnitTestCase(GraphQLTestCase, snapshottest.TestCase):
         assert_that(content.get("errors")).is_none()
         self.assertMatchSnapshot(content)
 
+    def test_filtering_by_purpose(self):
+        purpose = PurposeFactory(name="Test purpose")
+        self.reservation_unit.purposes.set([purpose])
+        response = self.query(
+            f"""
+            query {{
+                reservationUnits(purposes: {purpose.pk}) {{
+                    edges {{
+                        node {{
+                            nameFi purposes {{
+                                nameFi
+                            }}
+                        }}
+                    }}
+                }}
+            }}
+            """
+        )
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
     def test_filtering_by_type_not_found(self):
         response = self.query(
             """
