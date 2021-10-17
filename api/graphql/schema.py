@@ -4,8 +4,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db.models import Q
 from graphene import Field, relay
-from graphene_django.forms.mutation import DjangoModelFormMutation
-from graphene_permissions.mixins import AuthFilter, AuthMutation
+from graphene_permissions.mixins import AuthFilter
 from graphene_permissions.permissions import AllowAny, AllowAuthenticated
 from rest_framework.generics import get_object_or_404
 
@@ -33,6 +32,10 @@ from api.graphql.reservation_units.reservation_unit_types import (
     PurposeType,
     ReservationUnitByPkType,
     ReservationUnitType,
+)
+from api.graphql.reservations.reservation_mutations import (
+    ReservationCreateMutation,
+    ReservationUpdateMutation,
 )
 from api.graphql.reservations.reservation_types import ReservationType
 from api.graphql.resources.resource_mutations import (
@@ -65,22 +68,8 @@ from permissions.helpers import (
     get_units_where_can_view_reservations,
 )
 from reservation_units.models import Equipment, EquipmentCategory, ReservationUnit
-from reservations.forms import ReservationForm
 from resources.models import Resource
 from spaces.models import ServiceSector, Space, Unit
-
-
-class ReservationMutation(AuthMutation, DjangoModelFormMutation):
-    reservation = graphene.Field(ReservationType)
-
-    permission_classes = (
-        (ReservationUnitPermission,)
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else (AllowAny,)
-    )
-
-    class Meta:
-        form_class = ReservationForm
 
 
 class AllowAuthenticatedFilter(AuthFilter):
@@ -235,7 +224,8 @@ class Query(graphene.ObjectType):
 
 
 class Mutation(graphene.ObjectType):
-    create_reservation = ReservationMutation.Field()
+    create_reservation = ReservationCreateMutation.Field()
+    update_reservation = ReservationUpdateMutation.Field()
 
     create_reservation_unit = ReservationUnitCreateMutation.Field()
     update_reservation_unit = ReservationUnitUpdateMutation.Field()

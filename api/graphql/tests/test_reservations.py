@@ -49,7 +49,7 @@ class ReservationTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCase):
 
 
 @freezegun.freeze_time("2021-10-12T12:00:00Z")
-@patch("opening_hours.hours.get_opening_hours")
+@patch("opening_hours.utils.opening_hours_client.get_opening_hours")
 @patch(
     "opening_hours.hours.get_periods_for_resource", return_value=get_mocked_periods()
 )
