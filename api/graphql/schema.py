@@ -33,6 +33,7 @@ from api.graphql.reservation_units.reservation_unit_types import (
     ReservationUnitByPkType,
     ReservationUnitType,
 )
+from api.graphql.reservations.reservation_filtersets import ReservationFilterSet
 from api.graphql.reservations.reservation_mutations import (
     ReservationCreateMutation,
     ReservationUpdateMutation,
@@ -76,7 +77,7 @@ class AllowAuthenticatedFilter(AuthFilter):
     permission_classes = (AllowAuthenticated,)
 
 
-class ReservationsFilter(AuthFilter):
+class ReservationsFilter(AuthFilter, django_filters.FilterSet):
     permission_classes = (
         (ReservationPermission,)
         if not settings.TMP_PERMISSIONS_DISABLED
@@ -164,7 +165,9 @@ class PurposeFilter(AuthFilter):
 
 
 class Query(graphene.ObjectType):
-    reservations = ReservationsFilter(ReservationType)
+    reservations = ReservationsFilter(
+        ReservationType, filterset_class=ReservationFilterSet
+    )
 
     reservation_units = ReservationUnitsFilter(
         ReservationUnitType, filterset_class=ReservationUnitsFilterSet
