@@ -78,12 +78,12 @@ snapshots['ReservationUnitTestCase::test_filtering_by_multiple_reservation_state
                             {
                                 'begin': '2021-05-03T00:00:00+00:00',
                                 'end': '2021-05-03T01:00:00+00:00',
-                                'state': 'CREATED'
+                                'state': 'created'
                             },
                             {
                                 'begin': '2021-05-03T01:00:00+00:00',
                                 'end': '2021-05-03T02:00:00+00:00',
-                                'state': 'CONFIRMED'
+                                'state': 'confirmed'
                             }
                         ]
                     }
@@ -123,7 +123,7 @@ snapshots['ReservationUnitTestCase::test_filtering_by_reservation_state 1'] = {
                             {
                                 'begin': '2021-05-03T00:00:00+00:00',
                                 'end': '2021-05-03T01:00:00+00:00',
-                                'state': 'CREATED'
+                                'state': 'created'
                             }
                         ]
                     }
@@ -144,7 +144,7 @@ snapshots['ReservationUnitTestCase::test_filtering_by_reservation_timestamps 1']
                             {
                                 'begin': '2021-05-03T00:00:00+00:00',
                                 'end': '2021-05-03T01:00:00+00:00',
-                                'state': 'CREATED'
+                                'state': 'created'
                             }
                         ]
                     }
