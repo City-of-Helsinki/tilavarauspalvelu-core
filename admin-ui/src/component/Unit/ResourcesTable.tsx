@@ -8,7 +8,7 @@ import DataTable, { CellConfig } from "../DataTable";
 import PopupMenu from "./PopupMenu";
 import ConfirmationDialog, { ModalRef } from "../ConfirmationDialog";
 import { DELETE_RESOURCE } from "../../common/queries";
-import { localizedValue } from "../../common/util";
+
 import {
   ResourceDeleteMutationInput,
   ResourceDeleteMutationPayload,
@@ -61,15 +61,15 @@ const ResourcesTable = ({
       {
         title: "Resource.name",
         key: `name.${i18n.language}`,
-        transform: ({ name }: ResourceType) => (
-          <Name>{trim(localizedValue(name, i18n.language))}</Name>
+        transform: ({ nameFi }: ResourceType) => (
+          <Name>{trim(nameFi as string)}</Name>
         ),
       },
       {
         title: "Resource.space.name",
-        key: "unit",
+        key: "space.unit.nameFi",
         transform: ({ space }: ResourceType) =>
-          space?.name || t("ResourceTable.noSpace"),
+          space?.unit?.nameFi || t("ResourceTable.noSpace"),
       },
       {
         title: "Resource.area",
@@ -79,7 +79,7 @@ const ResourcesTable = ({
       {
         title: "Resource.type",
         key: "type",
-        transform: ({ name, pk, locationType }: ResourceType) => (
+        transform: ({ nameFi, pk, locationType }: ResourceType) => (
           <ResourceTypeContainer>
             <ResourceTypeName>{locationType}</ResourceTypeName>
             <PopupMenu
@@ -98,7 +98,7 @@ const ResourcesTable = ({
                       id: "confirmation-modal",
                       open: true,
                       heading: t("ResourceTable.removeConfirmationTitle", {
-                        name: localizedValue(name, i18n.language),
+                        name: nameFi,
                       }),
                       content: t("ResourceTable.removeConfirmationMessage"),
                       acceptLabel: t("ResourceTable.removeConfirmationAccept"),

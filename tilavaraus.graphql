@@ -11,7 +11,9 @@ enum ApplicationRoundTargetGroup {
 }
 
 type ApplicationRoundType {
-  name: String!
+  nameFi: String
+  nameEn: String
+  nameSv: String
   targetGroup: ApplicationRoundTargetGroup!
   allocating: Boolean!
   reservationUnits(before: String, after: String, first: Int, last: Int): ReservationUnitByPkTypeConnection!
@@ -21,15 +23,19 @@ type ApplicationRoundType {
   reservationPeriodEnd: Date!
   publicDisplayBegin: DateTime!
   publicDisplayEnd: DateTime!
-  purposes(before: String, after: String, first: Int, last: Int): PurposeTypeConnection!
-  criteria: String!
+  purposes(before: String, after: String, first: Int, last: Int, nameFi: String, nameEn: String, nameSv: String): PurposeTypeConnection!
+  criteriaFi: String
+  criteriaEn: String
+  criteriaSv: String
   pk: Int
 }
 
 type BuildingType implements Node {
   """The ID of the object."""
   id: ID!
-  name: String!
+  nameFi: String
+  nameEn: String
+  nameSv: String
   district: DistrictType
   realEstate: RealEstateType
   surfaceArea: Float
@@ -53,22 +59,24 @@ scalar DateTime
 type DistrictType implements Node {
   """The ID of the object."""
   id: ID!
-  name: String!
+  nameFi: String
+  nameEn: String
+  nameSv: String
   pk: Int
 }
 
 input EquipmentCategoryCreateMutationInput {
-  name: String
   nameFi: String
   nameEn: String
+  nameSv: String
   clientMutationId: String
 }
 
 type EquipmentCategoryCreateMutationPayload {
   id: Int
-  name: String
   nameFi: String
   nameEn: String
+  nameSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -90,7 +98,9 @@ type EquipmentCategoryDeleteMutationPayload {
 type EquipmentCategoryType implements Node {
   """The ID of the object."""
   id: ID!
-  name: String!
+  nameFi: String
+  nameEn: String
+  nameSv: String
   pk: Int
 }
 
@@ -112,18 +122,18 @@ type EquipmentCategoryTypeEdge {
 }
 
 input EquipmentCategoryUpdateMutationInput {
-  name: String
   nameFi: String
   nameEn: String
+  nameSv: String
   pk: Int!
   clientMutationId: String
 }
 
 type EquipmentCategoryUpdateMutationPayload {
   id: Int
-  name: String
   nameFi: String
   nameEn: String
+  nameSv: String
   pk: Int
 
   """May contain more than one error for same field."""
@@ -133,19 +143,19 @@ type EquipmentCategoryUpdateMutationPayload {
 }
 
 input EquipmentCreateMutationInput {
-  name: String
   categoryId: String!
   nameFi: String
   nameEn: String
+  nameSv: String
   clientMutationId: String
 }
 
 type EquipmentCreateMutationPayload {
   id: Int
-  name: String
   categoryId: String
   nameFi: String
   nameEn: String
+  nameSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -167,7 +177,9 @@ type EquipmentDeleteMutationPayload {
 type EquipmentType implements Node {
   """The ID of the object."""
   id: ID!
-  name: String!
+  nameFi: String
+  nameEn: String
+  nameSv: String
   pk: Int
   category: EquipmentCategoryType
 }
@@ -190,20 +202,20 @@ type EquipmentTypeEdge {
 }
 
 input EquipmentUpdateMutationInput {
-  name: String
   categoryId: String!
   nameFi: String
   nameEn: String
+  nameSv: String
   pk: Int!
   clientMutationId: String
 }
 
 type EquipmentUpdateMutationPayload {
   id: Int
-  name: String
   categoryId: String
   nameFi: String
   nameEn: String
+  nameSv: String
   pk: Int
 
   """May contain more than one error for same field."""
@@ -220,7 +232,9 @@ type ErrorType {
 type KeywordCategoryType implements Node {
   """The ID of the object."""
   id: ID!
-  name: String!
+  nameFi: String
+  nameEn: String
+  nameSv: String
   pk: Int
   keywordGroups: [KeywordGroupType]
 }
@@ -245,7 +259,9 @@ type KeywordCategoryTypeEdge {
 type KeywordGroupType implements Node {
   """The ID of the object."""
   id: ID!
-  name: String!
+  nameFi: String
+  nameEn: String
+  nameSv: String
   pk: Int
   keywords: [KeywordType]
 }
@@ -270,7 +286,9 @@ type KeywordGroupTypeEdge {
 type KeywordType implements Node {
   """The ID of the object."""
   id: ID!
-  name: String!
+  nameFi: String
+  nameEn: String
+  nameSv: String
   pk: Int
 }
 
@@ -292,9 +310,13 @@ type KeywordTypeEdge {
 }
 
 type LocationType implements Node {
-  addressStreet: String!
+  addressStreetFi: String
+  addressStreetEn: String
+  addressStreetSv: String
   addressZip: String!
-  addressCity: String!
+  addressCityFi: String
+  addressCityEn: String
+  addressCitySv: String
 
   """The ID of the object."""
   id: ID!
@@ -366,18 +388,25 @@ type PeriodType {
   endDate: Date
   resourceState: String
   timeSpans: [TimeSpanType]
-  name: TranslatedStringType
-  description: TranslatedStringType
+  nameFi: String
+  nameEn: String
+  nameSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
 }
 
 input PurposeCreateMutationInput {
-  name: String!
+  nameFi: String
+  nameEn: String
+  nameSv: String
   clientMutationId: String
 }
 
 type PurposeCreateMutationPayload {
-  id: Int
-  name: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -388,7 +417,9 @@ type PurposeCreateMutationPayload {
 type PurposeType implements Node {
   """The ID of the object."""
   id: ID!
-  name: String!
+  nameFi: String
+  nameEn: String
+  nameSv: String
   pk: Int
 }
 
@@ -410,15 +441,18 @@ type PurposeTypeEdge {
 }
 
 input PurposeUpdateMutationInput {
-  name: String!
   pk: Int!
+  nameFi: String
+  nameEn: String
+  nameSv: String
   clientMutationId: String
 }
 
 type PurposeUpdateMutationPayload {
-  id: Int
-  name: String
   pk: Int
+  nameFi: String
+  nameEn: String
+  nameSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -427,45 +461,48 @@ type PurposeUpdateMutationPayload {
 }
 
 type Query {
-  reservationUnits(before: String, after: String, first: Int, last: Int, unit: ID, keywordGroups: ID, reservationUnitType: ID, maxPersonsGte: Float, maxPersonsLte: Float, textSearch: String): ReservationUnitTypeConnection
+  reservationUnits(before: String, after: String, first: Int, last: Int, unit: ID, keywordGroups: ID, reservationUnitType: ID, maxPersonsGte: Float, maxPersonsLte: Float, textSearch: String, purposes: ID): ReservationUnitTypeConnection
 
   """The ID of the object"""
   reservationUnit(id: ID!): ReservationUnitType
   reservationUnitByPk(pk: Int): ReservationUnitByPkType
-  resources(before: String, after: String, first: Int, last: Int, name: String, name_Icontains: String, name_Istartswith: String): ResourceTypeConnection
+  resources(before: String, after: String, first: Int, last: Int, nameFi: String, nameFi_Icontains: String, nameFi_Istartswith: String, nameSv: String, nameSv_Icontains: String, nameSv_Istartswith: String, nameEn: String, nameEn_Icontains: String, nameEn_Istartswith: String): ResourceTypeConnection
 
   """The ID of the object"""
   resource(id: ID!): ResourceType
   resourceByPk(pk: Int): ResourceType
-  equipments(before: String, after: String, first: Int, last: Int, name: String, name_Icontains: String, name_Istartswith: String): EquipmentTypeConnection
+  equipments(before: String, after: String, first: Int, last: Int, nameFi: String, nameFi_Icontains: String, nameFi_Istartswith: String, nameSv: String, nameSv_Icontains: String, nameSv_Istartswith: String, nameEn: String, nameEn_Icontains: String, nameEn_Istartswith: String): EquipmentTypeConnection
 
   """The ID of the object"""
   equipment(id: ID!): EquipmentType
   equipmentByPk(pk: Int): EquipmentType
-  equipmentCategories(before: String, after: String, first: Int, last: Int, name: String, name_Icontains: String, name_Istartswith: String): EquipmentCategoryTypeConnection
+  equipmentCategories(before: String, after: String, first: Int, last: Int, nameFi: String, nameFi_Icontains: String, nameFi_Istartswith: String, nameSv: String, nameSv_Icontains: String, nameSv_Istartswith: String, nameEn: String, nameEn_Icontains: String, nameEn_Istartswith: String): EquipmentCategoryTypeConnection
 
   """The ID of the object"""
   equipmentCategory(id: ID!): EquipmentCategoryType
   equipmentCategoryByPk(pk: Int): EquipmentCategoryType
-  spaces(before: String, after: String, first: Int, last: Int, name: String, name_Icontains: String, name_Istartswith: String): SpaceTypeConnection
+  spaces(before: String, after: String, first: Int, last: Int, nameFi: String, nameFi_Icontains: String, nameFi_Istartswith: String, nameSv: String, nameSv_Icontains: String, nameSv_Istartswith: String, nameEn: String, nameEn_Icontains: String, nameEn_Istartswith: String): SpaceTypeConnection
 
   """The ID of the object"""
   space(id: ID!): SpaceType
   spaceByPk(pk: Int): SpaceType
-  units(before: String, after: String, first: Int, last: Int, name: String, name_Icontains: String, name_Istartswith: String): UnitTypeConnection
+  units(before: String, after: String, first: Int, last: Int, nameFi: String, nameFi_Icontains: String, nameFi_Istartswith: String, nameSv: String, nameSv_Icontains: String, nameSv_Istartswith: String, nameEn: String, nameEn_Icontains: String, nameEn_Istartswith: String): UnitTypeConnection
 
   """The ID of the object"""
   unit(id: ID!): UnitType
   unitByPk(pk: Int): UnitByPkType
-  keywordCategories(before: String, after: String, first: Int, last: Int, name: String): KeywordCategoryTypeConnection
-  keywordGroups(before: String, after: String, first: Int, last: Int, name: String): KeywordGroupTypeConnection
-  keywords(before: String, after: String, first: Int, last: Int, name: String): KeywordTypeConnection
+  keywordCategories(before: String, after: String, first: Int, last: Int, nameFi: String, nameSv: String, nameEn: String): KeywordCategoryTypeConnection
+  keywordGroups(before: String, after: String, first: Int, last: Int, nameFi: String, nameSv: String, nameEn: String): KeywordGroupTypeConnection
+  keywords(before: String, after: String, first: Int, last: Int, nameFi: String, nameSv: String, nameEn: String): KeywordTypeConnection
+  purposes(before: String, after: String, first: Int, last: Int, nameFi: String, nameEn: String, nameSv: String): PurposeTypeConnection
 }
 
 type RealEstateType implements Node {
   """The ID of the object."""
   id: ID!
-  name: String!
+  nameFi: String
+  nameEn: String
+  nameSv: String
   district: DistrictType
   surfaceArea: Float
   pk: Int
@@ -541,16 +578,24 @@ type ReservationType implements Node {
 type ReservationUnitByPkType implements Node {
   """The ID of the object."""
   id: ID!
-  name: String!
-  description: String!
+  nameFi: String
+  nameEn: String
+  nameSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   spaces: [SpaceType]
   resources: [ResourceType]
   services: [ServiceType]
   purposes: [PurposeType]
   reservationUnitType: ReservationUnitTypeType
   requireIntroduction: Boolean!
-  termsOfUse: String
-  contactInformation: String!
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
+  contactInformationFi: String
+  contactInformationEn: String
+  contactInformationSv: String
   maxReservationDuration: Time
   minReservationDuration: Time
   uuid: UUID!
@@ -587,28 +632,15 @@ type ReservationUnitByPkTypeEdge {
 }
 
 input ReservationUnitCreateMutationInput {
-  name: String
-  description: String
-
   """
   Determines if introduction is required in order to reserve this reservation unit.
   """
   requireIntroduction: Boolean
   maxPersons: Int
-  termsOfUse: String
   equipmentIds: [String]
   unitId: String!
-
-  """Contact information for this reservation unit."""
-  contactInformation: String
   maxReservationDuration: String
   minReservationDuration: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   isDraft: Boolean
   spaceIds: [String]
   resourceIds: [String]
@@ -617,13 +649,23 @@ input ReservationUnitCreateMutationInput {
   reservationUnitTypeId: String
   surfaceArea: Float
   bufferTimeBetweenReservations: String
+  contactInformationFi: String
+  contactInformationEn: String
+  contactInformationSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
   clientMutationId: String
 }
 
 type ReservationUnitCreateMutationPayload {
   id: Int
-  name: String
-  description: String
 
   """Spaces included in the reservation unit as nested related objects."""
   spaces: [SpaceType]
@@ -652,21 +694,11 @@ type ReservationUnitCreateMutationPayload {
   """Type of the reservation unit as nested related object."""
   reservationUnitType: ReservationUnitTypeType
   building: String
-  termsOfUse: String
   equipmentIds: [String]
   unitId: String
   uuid: String
-
-  """Contact information for this reservation unit."""
-  contactInformation: String
   maxReservationDuration: String
   minReservationDuration: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   isDraft: Boolean
   spaceIds: [String]
   resourceIds: [String]
@@ -675,6 +707,18 @@ type ReservationUnitCreateMutationPayload {
   reservationUnitTypeId: String
   surfaceArea: Float
   bufferTimeBetweenReservations: String
+  contactInformationFi: String
+  contactInformationEn: String
+  contactInformationSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -711,16 +755,24 @@ type ReservationUnitImageType {
 type ReservationUnitType implements Node {
   """The ID of the object."""
   id: ID!
-  name: String!
-  description: String!
+  nameFi: String
+  nameEn: String
+  nameSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   spaces: [SpaceType]
   resources: [ResourceType]
   services: [ServiceType]
   purposes: [PurposeType]
   reservationUnitType: ReservationUnitTypeType
   requireIntroduction: Boolean!
-  termsOfUse: String
-  contactInformation: String!
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
+  contactInformationFi: String
+  contactInformationEn: String
+  contactInformationSv: String
   maxReservationDuration: Time
   minReservationDuration: Time
   uuid: UUID!
@@ -758,33 +810,22 @@ type ReservationUnitTypeEdge {
 type ReservationUnitTypeType implements Node {
   """The ID of the object."""
   id: ID!
-  name: String!
+  nameFi: String
+  nameEn: String
+  nameSv: String
   pk: Int
 }
 
 input ReservationUnitUpdateMutationInput {
-  name: String
-  description: String
-
   """
   Determines if introduction is required in order to reserve this reservation unit.
   """
   requireIntroduction: Boolean
   maxPersons: Int
-  termsOfUse: String
   equipmentIds: [String]
   unitId: String
-
-  """Contact information for this reservation unit."""
-  contactInformation: String
   maxReservationDuration: String
   minReservationDuration: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   isDraft: Boolean
   spaceIds: [String]
   resourceIds: [String]
@@ -793,14 +834,24 @@ input ReservationUnitUpdateMutationInput {
   reservationUnitTypeId: String
   surfaceArea: Float
   bufferTimeBetweenReservations: String
+  contactInformationFi: String
+  contactInformationEn: String
+  contactInformationSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
   pk: Int!
   clientMutationId: String
 }
 
 type ReservationUnitUpdateMutationPayload {
   id: Int
-  name: String
-  description: String
 
   """Spaces included in the reservation unit as nested related objects."""
   spaces: [SpaceType]
@@ -829,21 +880,11 @@ type ReservationUnitUpdateMutationPayload {
   """Type of the reservation unit as nested related object."""
   reservationUnitType: ReservationUnitTypeType
   building: String
-  termsOfUse: String
   equipmentIds: [String]
   unitId: String
   uuid: String
-
-  """Contact information for this reservation unit."""
-  contactInformation: String
   maxReservationDuration: String
   minReservationDuration: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   isDraft: Boolean
   spaceIds: [String]
   resourceIds: [String]
@@ -852,6 +893,18 @@ type ReservationUnitUpdateMutationPayload {
   reservationUnitTypeId: String
   surfaceArea: Float
   bufferTimeBetweenReservations: String
+  contactInformationFi: String
+  contactInformationEn: String
+  contactInformationSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
   pk: Int
 
   """May contain more than one error for same field."""
@@ -862,7 +915,6 @@ type ReservationUnitUpdateMutationPayload {
 
 input ResourceCreateMutationInput {
   locationType: String
-  name: String
 
   """Id of related space for this resource."""
   spaceId: String
@@ -875,10 +927,10 @@ input ResourceCreateMutationInput {
 
   """Begin date and time of the reservation."""
   bufferTimeAfter: String
+  isDraft: Boolean
   nameFi: String
   nameEn: String
   nameSv: String
-  isDraft: Boolean
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
@@ -888,7 +940,6 @@ input ResourceCreateMutationInput {
 type ResourceCreateMutationPayload {
   id: Int
   locationType: String
-  name: String
 
   """Id of related space for this resource."""
   spaceId: String
@@ -901,10 +952,10 @@ type ResourceCreateMutationPayload {
 
   """Begin date and time of the reservation."""
   bufferTimeAfter: String
+  isDraft: Boolean
   nameFi: String
   nameEn: String
   nameSv: String
-  isDraft: Boolean
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
@@ -939,8 +990,12 @@ type ResourceType implements Node {
   """The ID of the object."""
   id: ID!
   locationType: ResourceLocationType!
-  name: String!
-  description: String!
+  nameFi: String
+  nameEn: String
+  nameSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   space: SpaceType
   bufferTimeBefore: Float
   bufferTimeAfter: Float
@@ -968,7 +1023,6 @@ type ResourceTypeEdge {
 
 input ResourceUpdateMutationInput {
   locationType: String
-  name: String
 
   """Id of related space for this resource."""
   spaceId: String
@@ -981,10 +1035,10 @@ input ResourceUpdateMutationInput {
 
   """Begin date and time of the reservation."""
   bufferTimeAfter: String
+  isDraft: Boolean
   nameFi: String
   nameEn: String
   nameSv: String
-  isDraft: Boolean
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
@@ -995,7 +1049,6 @@ input ResourceUpdateMutationInput {
 type ResourceUpdateMutationPayload {
   id: Int
   locationType: String
-  name: String
 
   """Id of related space for this resource."""
   spaceId: String
@@ -1008,10 +1061,10 @@ type ResourceUpdateMutationPayload {
 
   """Begin date and time of the reservation."""
   bufferTimeAfter: String
+  isDraft: Boolean
   nameFi: String
   nameEn: String
   nameSv: String
-  isDraft: Boolean
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
@@ -1038,7 +1091,9 @@ enum ServiceServiceType {
 type ServiceType implements Node {
   """The ID of the object."""
   id: ID!
-  name: String!
+  nameFi: String
+  nameEn: String
+  nameSv: String
   serviceType: ServiceServiceType!
   bufferTimeBefore: String
   bufferTimeAfter: String
@@ -1046,8 +1101,6 @@ type ServiceType implements Node {
 }
 
 input SpaceCreateMutationInput {
-  name: String
-
   """Id of parent space for this space."""
   parentId: String
 
@@ -1058,17 +1111,18 @@ input SpaceCreateMutationInput {
   districtId: String
   maxPersons: Int
   code: String
-  termsOfUse: String
   unitId: String
   nameFi: String!
   nameEn: String
   nameSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
   clientMutationId: String
 }
 
 type SpaceCreateMutationPayload {
   id: Int
-  name: String
 
   """Id of parent space for this space."""
   parentId: String
@@ -1080,11 +1134,13 @@ type SpaceCreateMutationPayload {
   districtId: String
   maxPersons: Int
   code: String
-  termsOfUse: String
   unitId: String
   nameFi: String
   nameEn: String
   nameSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -1106,14 +1162,18 @@ type SpaceDeleteMutationPayload {
 type SpaceType implements Node {
   """The ID of the object."""
   id: ID!
-  name: String!
+  nameFi: String
+  nameEn: String
+  nameSv: String
   parent: SpaceType
   building: BuildingType
   unit: UnitByPkType
   surfaceArea: Float
   maxPersons: Int
   code: String!
-  termsOfUse: String!
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
   pk: Int
   children: [SpaceType]
   resources: [ResourceType]
@@ -1137,8 +1197,6 @@ type SpaceTypeEdge {
 }
 
 input SpaceUpdateMutationInput {
-  name: String
-
   """Id of parent space for this space."""
   parentId: String
 
@@ -1149,18 +1207,19 @@ input SpaceUpdateMutationInput {
   districtId: String
   maxPersons: Int
   code: String
-  termsOfUse: String
   unitId: String
   nameFi: String
   nameEn: String
   nameSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
   pk: Int!
   clientMutationId: String
 }
 
 type SpaceUpdateMutationPayload {
   id: Int
-  name: String
 
   """Id of parent space for this space."""
   parentId: String
@@ -1172,11 +1231,13 @@ type SpaceUpdateMutationPayload {
   districtId: String
   maxPersons: Int
   code: String
-  termsOfUse: String
   unitId: String
   nameFi: String
   nameEn: String
   nameSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
   pk: Int
 
   """May contain more than one error for same field."""
@@ -1198,23 +1259,27 @@ type TimeSpanType {
   weekdays: [Int]
   resourceState: String
   endTimeOnNextDay: Boolean
-  name: TranslatedStringType
-  description: TranslatedStringType
-}
-
-type TranslatedStringType {
-  fi: String
-  en: String
-  sv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
 }
 
 type UnitByPkType implements Node {
   """The ID of the object."""
   id: ID!
   tprekId: String
-  name: String!
-  description: String!
-  shortDescription: String!
+  nameFi: String
+  nameEn: String
+  nameSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  shortDescriptionFi: String
+  shortDescriptionEn: String
+  shortDescriptionSv: String
   webPage: String!
   email: String!
   phone: String!
@@ -1229,9 +1294,15 @@ type UnitType implements Node {
   """The ID of the object."""
   id: ID!
   tprekId: String
-  name: String!
-  description: String!
-  shortDescription: String!
+  nameFi: String
+  nameEn: String
+  nameSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  shortDescriptionFi: String
+  shortDescriptionEn: String
+  shortDescriptionSv: String
   webPage: String!
   email: String!
   phone: String!
@@ -1259,27 +1330,39 @@ type UnitTypeEdge {
 }
 
 input UnitUpdateMutationInput {
+  pk: Int!
   tprekId: String
-  name: String
-  description: String
-  shortDescription: String
   webPage: String
   email: String
   phone: String
-  pk: Int!
+  nameFi: String
+  nameEn: String
+  nameSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  shortDescriptionFi: String
+  shortDescriptionEn: String
+  shortDescriptionSv: String
   clientMutationId: String
 }
 
 type UnitUpdateMutationPayload {
   id: Int
+  pk: Int
   tprekId: String
-  name: String
-  description: String
-  shortDescription: String
   webPage: String
   email: String
   phone: String
-  pk: Int
+  nameFi: String
+  nameEn: String
+  nameSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  shortDescriptionFi: String
+  shortDescriptionEn: String
+  shortDescriptionSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]

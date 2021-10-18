@@ -6,7 +6,7 @@ import {
   Button,
   TextArea,
 } from "hds-react";
-import { pick, set } from "lodash";
+import { pick, set, upperFirst } from "lodash";
 import React, { useReducer } from "react";
 import { FetchResult, useMutation, useQuery } from "@apollo/client";
 import { useTranslation } from "react-i18next";
@@ -67,7 +67,7 @@ type Action =
   | { type: "setMaxPersons"; maxPersons: number }
   | { type: "setSurfaceArea"; surfaceArea: number }
   | { type: "setCode"; code: string }
-  | { type: "setTermsOfUse"; termsOfUse: string }
+  | { type: "setTermsOfUse"; termsOfUse: string; lang: string }
   | { type: "setParent"; parentId?: number };
 
 type State = {
@@ -118,15 +118,15 @@ const reducer = (state: State, action: Action): State => {
         spaceEdit: {
           ...pick({ ...space, pk: space.pk as number }, [
             "pk",
-            "name",
+            "nameFi",
             "surfaceArea",
             "maxPersons",
             "code",
-            "termsOfUse",
+            "termsOfUseFi",
           ]),
           parentId: space.parent ? String(space.parent.pk) : undefined,
           unitId: space.unit ? String(space.unit.pk) : undefined,
-        },
+        } as SpaceUpdateMutationInput,
         loading: false,
         hasChanges: false,
       };
@@ -139,7 +139,7 @@ const reducer = (state: State, action: Action): State => {
       const additionalOptions = unitSpaces
         .filter((space) => space.pk !== state.spaceId)
         .map((space) => ({
-          label: space.name,
+          label: space.nameFi as string,
           value: space,
         }));
 
@@ -173,11 +173,15 @@ const reducer = (state: State, action: Action): State => {
     }
     case "setTermsOfUse": {
       return modified(
-        set({ ...state }, `spaceEdit.termsOfUse`, action.termsOfUse)
+        set(
+          { ...state },
+          `spaceEdit.termsOfUse${upperFirst(action.lang)}`,
+          action.termsOfUse
+        )
       );
     }
     case "setName": {
-      return modified(set({ ...state }, `spaceEdit.name`, action.name));
+      return modified(set({ ...state }, `spaceEdit.nameFi`, action.name));
     }
     case "setMaxPersons": {
       return modified(
@@ -341,7 +345,7 @@ const SpaceEditor = (): JSX.Element | null => {
   return (
     <Wrapper>
       <SpaceHead
-        title={state.space.parent?.name || t("SpaceEditor.noParent")}
+        title={state.space.parent?.nameFi || t("SpaceEditor.noParent")}
         unit={state.space.unit as UnitType}
         maxPersons={state.spaceEdit?.maxPersons || undefined}
         surfaceArea={state.spaceEdit?.surfaceArea || undefined}
@@ -391,7 +395,7 @@ const SpaceEditor = (): JSX.Element | null => {
             <Section>
               <SubHeading>{t("SpaceEditor.other")}</SubHeading>
               <TextInput
-                defaultValue={state.spaceEdit?.name || "?"}
+                defaultValue={state.spaceEdit?.nameFi || "?"}
                 required
                 id="name"
                 label={t("SpaceModal.page2.nameLabel")}
@@ -451,13 +455,14 @@ const SpaceEditor = (): JSX.Element | null => {
               </EditorColumns>
               <TextArea
                 required
-                id="termsOfUse"
+                id="termsOfUseFi"
                 label={t("SpaceEditor.termsOfUse")}
-                defaultValue={state.spaceEdit?.termsOfUse || undefined}
+                defaultValue={state.spaceEdit?.termsOfUseFi || undefined}
                 helperText={t("SpaceEditor.termsOfUseHelperText")}
                 onChange={(e) => {
                   dispatch({
                     type: "setTermsOfUse",
+                    lang: "fi",
                     termsOfUse: e.target.value,
                   });
                 }}

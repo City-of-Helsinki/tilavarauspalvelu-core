@@ -12,13 +12,12 @@ import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { useDebounce } from "react-use";
 import { useQuery, ApolloError } from "@apollo/client";
-import { DataFilterConfig, LocalizationLanguages } from "../../common/types";
+import { DataFilterConfig } from "../../common/types";
 import { IngressContainer } from "../../styles/layout";
 import { H1 } from "../../styles/typography";
 import withMainMenu from "../withMainMenu";
 import Loader from "../Loader";
 import DataTable, { CellConfig } from "../DataTable";
-import { isTranslationObject, localizedValue } from "../../common/util";
 import { breakpoints, Strong } from "../../styles/util";
 import ClearButton from "../ClearButton";
 import { SPACES_QUERY } from "../../common/queries";
@@ -65,26 +64,21 @@ const SpaceCount = styled.div`
   margin-bottom: var(--spacing-m);
 `;
 
-const getCellConfig = (
-  t: TFunction,
-  language: LocalizationLanguages
-): CellConfig => {
+const getCellConfig = (t: TFunction): CellConfig => {
   return {
     cols: [
       {
         title: t("Spaces.headings.name"),
-        key: "name",
-        transform: ({ name }: SpaceType) => (
-          <Strong>{localizedValue(name, language)}</Strong>
-        ),
+        key: "nameFi",
+        transform: ({ nameFi }: SpaceType) => <Strong>{nameFi}</Strong>,
       },
       {
         title: t("Spaces.headings.building"),
-        key: "building.name",
+        key: "building.nameFi",
       },
       {
         title: t("Spaces.headings.district"),
-        key: "building.district.name",
+        key: "building.district.nameFi",
       },
       {
         title: t("Spaces.headings.volume"),
@@ -134,11 +128,11 @@ const getFilterConfig = (
   t: TFunction
 ): DataFilterConfig[] => {
   const buildings = uniq(
-    spaces.map((space: SpaceType) => space?.building?.name || "")
+    spaces.map((space: SpaceType) => space?.building?.nameFi || "")
   ).filter((n) => n);
   const districts = uniq(
     spaces
-      .map((space: SpaceType) => space?.building?.district?.name || "")
+      .map((space: SpaceType) => space?.building?.district?.nameFi || "")
       .filter((n) => n)
   );
 
@@ -167,7 +161,7 @@ const getFilterConfig = (
 };
 
 const SpacesList = (): JSX.Element => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
 
   const [spaces, setSpaces] = useState<SpaceType[]>([]);
   const [filterConfig, setFilterConfig] = useState<DataFilterConfig[] | null>(
@@ -191,7 +185,7 @@ const SpacesList = (): JSX.Element => {
       const result = data?.spaces?.edges?.map((s) => s?.node as SpaceType);
       if (result) {
         setSpaces(result);
-        setCellConfig(getCellConfig(t, i18n.language as LocalizationLanguages));
+        setCellConfig(getCellConfig(t));
         setFilterConfig(getFilterConfig(result, t));
       }
       setIsLoading(false);
@@ -226,16 +220,10 @@ const SpacesList = (): JSX.Element => {
   const filteredSpaces = searchTerm
     ? spaces.filter((space: SpaceType) => {
         const searchTerms = searchTerm.toLowerCase().split(" ");
-        const { name, building } = space;
-        const buildingName = building?.name?.toLowerCase();
-        const districtName = building?.district?.name?.toLowerCase();
-        const localizedName =
-          name && isTranslationObject(name)
-            ? localizedValue(
-                name,
-                i18n.language as LocalizationLanguages
-              ).toLowerCase()
-            : String(name).toLowerCase();
+        const { nameFi, building } = space;
+        const buildingName = building?.nameFi?.toLowerCase();
+        const districtName = building?.district?.nameFi?.toLowerCase();
+        const localizedName = String(nameFi).toLowerCase();
 
         return searchTerms.every((term: string) => {
           return (

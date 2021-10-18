@@ -138,7 +138,7 @@ const Units = (): JSX.Element => {
             marker: MapMarker,
             children: (
               <PopupContainer>
-                <PopupName>{r.name}</PopupName>
+                <PopupName>{r.nameFi}</PopupName>
                 {r.location ? (
                   <>
                     <PopupAddress>{parseAddressLine1(r.location)}</PopupAddress>

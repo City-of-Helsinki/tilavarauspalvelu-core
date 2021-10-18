@@ -34,7 +34,7 @@ const SpaceHierarchy = ({ space, unitSpaces }: Props): JSX.Element => {
 
   return (
     <Tree>
-      {tree.map((parent, i) => `${i !== 0 ? " › " : ""} ${parent.name}`)}
+      {tree.map((parent, i) => `${i !== 0 ? " › " : ""} ${parent.nameFi}`)}
     </Tree>
   );
 };

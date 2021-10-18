@@ -289,7 +289,7 @@ function FirstPage({
         <UnitInfo>
           <IconCheck />
           <div>
-            <Name>{unit.name}</Name>
+            <Name>{unit.nameFi}</Name>
             <Parent>
               {editorState.parentSpace ? editorState.parentSpace.name.fi : null}
             </Parent>
@@ -504,7 +504,7 @@ const SecondPage = ({
         <UnitInfo>
           <IconCheck />
           <div>
-            <Name>{unit.name}</Name>
+            <Name>{unit.nameFi}</Name>
             <Parent>
               {editorState.parentSpace
                 ? editorState.parentSpace.name.fi

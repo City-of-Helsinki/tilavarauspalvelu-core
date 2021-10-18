@@ -190,7 +190,7 @@ const NewResourceModal = ({
         <UnitInfo>
           <IconCheck />
           <div>
-            <Name>{unit.name}</Name>
+            <Name>{unit.nameFi}</Name>
           </div>
           {unit.location ? (
             <Address>{parseAddress(unit.location)}</Address>
@@ -202,7 +202,10 @@ const NewResourceModal = ({
           label={t("ResourceModal.selectSpace")}
           placeholder={t("common.select")}
           options={[
-            ...spaces.map((s) => ({ label: s.name, value: s.pk as number })),
+            ...spaces.map((s) => ({
+              label: s.nameFi as string,
+              value: s.pk as number,
+            })),
           ]}
           onChange={(v: { label: string; value: number }) =>
             dispatch({ type: "setSpaceId", spaceId: v.value })

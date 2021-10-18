@@ -11,7 +11,7 @@ import {
   TimeInput,
 } from "hds-react";
 import i18next from "i18next";
-import { pick, sumBy } from "lodash";
+import { get, pick, sumBy, upperFirst } from "lodash";
 import React, { useEffect, useReducer } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams, useHistory } from "react-router-dom";
@@ -78,8 +78,12 @@ type Action =
 
 type ReservationUnitEditorType = {
   pk: number;
-  name: string;
-  description: string;
+  nameFi: string;
+  nameSv: string;
+  nameEn: string;
+  descriptionFi: string;
+  descriptionSv: string;
+  descriptionEn: string;
   spaceIds: number[];
   resourceIds: number[];
   equipmentIds: number[];
@@ -167,12 +171,19 @@ const reducer = (state: State, action: Action): State => {
         reservationUnitEdit: {
           ...(pick(reservationUnit, [
             "pk",
-            "name",
+            "nameFi",
+            "nameSv",
+            "nameEn",
+            "descriptionFi",
+            "descriptionEn",
+            "descriptionSv",
             "termsOfUse",
             "minReservationDuration",
             "maxReservationDuration",
             "requireIntroduction",
-            "description",
+            "descriptionFi",
+            "descriptionSv",
+            "descriptionEn",
             "surfaceArea",
             "maxPersons",
             "maxReservationDuration",
@@ -199,7 +210,7 @@ const reducer = (state: State, action: Action): State => {
 
       const spaceOptions =
         unit?.spaces?.map((s) => ({
-          label: String(s?.name),
+          label: String(s?.nameFi),
           value: Number(s?.pk),
         })) || [];
 
@@ -210,7 +221,8 @@ const reducer = (state: State, action: Action): State => {
       const resourceOptions =
         unit?.spaces
           ?.flatMap((s) => s?.resources)
-          .map((r) => ({ label: String(r?.name), value: Number(r?.pk) })) || [];
+          .map((r) => ({ label: String(r?.nameFi), value: Number(r?.pk) })) ||
+        [];
 
       return withLoadingStatus({
         ...state,
@@ -229,7 +241,7 @@ const reducer = (state: State, action: Action): State => {
       return withLoadingStatus({
         ...state,
         equipmentOptions: action.equipments.map((e) => ({
-          label: e.name,
+          label: e.nameFi as string,
           value: e.pk as number,
         })),
       });
@@ -452,7 +464,12 @@ const ReservationUnitEditor = (): JSX.Element | null => {
         "isDraft",
         "pk",
         "unitId",
-        "name",
+        "nameFi",
+        "nameSv",
+        "nameEn",
+        "descriptionFi",
+        "descriptionSv",
+        "descriptionEn",
         "spaceIds",
         "resourceIds",
         "equipmentIds",
@@ -595,7 +612,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
           <SubPageHead
             unit={state.unit}
             title={
-              state.reservationUnitEdit.name ||
+              state.reservationUnitEdit.nameFi ||
               t("ReservationUnitEditor.defaultHeading")
             }
           />
@@ -608,37 +625,31 @@ const ReservationUnitEditor = (): JSX.Element | null => {
             >
               <Section>
                 <TextInputWithPadding
-                  value={state.reservationUnitEdit.name}
+                  value={state.reservationUnitEdit.nameFi || ""}
                   required
-                  id="name"
+                  id="nameFi"
                   label={t("ReservationUnitEditor.nameLabel")}
                   helperText={t("ReservationUnitEditor.nameHelper")}
                   onChange={(e) => {
-                    setValue({ name: e.target.value });
+                    setValue({ nameFi: e.target.value });
                   }}
                 />
                 <TextInputWithPadding
-                  disabled
-                  value={
-                    "" // state.reservationUnitEdit.name_sv */
-                  }
+                  value={state.reservationUnitEdit.nameSv || ""}
                   required
                   id="nameSv"
                   label={t("ReservationUnitEditor.nameSvLabel")}
                   onChange={(e) => {
-                    setValue({ name_sv: e.target.value });
+                    setValue({ nameSv: e.target.value });
                   }}
                 />
                 <TextInputWithPadding
-                  disabled
-                  value={
-                    "" // state.reservationUnitEdit.name_en */
-                  }
+                  value={state.reservationUnitEdit.nameEn || ""}
                   required
                   id="nameEn"
                   label={t("ReservationUnitEditor.nameEnLabel")}
                   onChange={(e) => {
-                    setValue({ name_en: e.target.value });
+                    setValue({ nameEn: e.target.value });
                   }}
                 />
                 <EditorColumns>
@@ -790,7 +801,6 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                 <TextArea
                   key={lang}
                   required
-                  disabled={lang !== "fi"}
                   id={`description.${lang}`}
                   label={t("ReservationUnitEditor.descriptionLabel", {
                     lang,
@@ -801,8 +811,16 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                       language: t(`language.${lang}`),
                     }
                   )}
-                  value={state.reservationUnitEdit?.description}
-                  onChange={(e) => setValue({ description: e.target.value })}
+                  value={get(
+                    state,
+                    `reservationUnitEdit.description${upperFirst(lang)}`,
+                    ""
+                  )}
+                  onChange={(e) =>
+                    setValue({
+                      [`description${upperFirst(lang)}`]: e.target.value,
+                    })
+                  }
                 />
               ))}
             </Accordion>

@@ -89,7 +89,7 @@ const UnitCard = ({ unit }: IProps): JSX.Element => {
       </LocationBox>
       <Content>
         <BasicLink to={`/unit/${unit.pk}`}>
-          <H2>{unit.name}</H2>
+          <H2>{unit.nameFi}</H2>
           <IconArrowRight />
         </BasicLink>
         {unit.location ? (
