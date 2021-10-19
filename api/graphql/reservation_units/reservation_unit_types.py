@@ -332,6 +332,8 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
         return self.max_persons
 
     def resolve_surface_area(self, info):
+        if self.surface_area is not None:
+            return self.surface_area
         surface_area = self.spaces.aggregate(total_surface_area=Sum("surface_area"))
         return surface_area.get("total_surface_area")
 

@@ -35,8 +35,10 @@ class ReservationUnitTestCase(GraphQLTestCase, snapshottest.TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.type = ReservationUnitTypeFactory(name="Test type")
-        large_space = SpaceFactory(max_persons=100, name="Large space")
-        small_space = SpaceFactory(max_persons=10, name="Small space")
+        large_space = SpaceFactory(
+            max_persons=100, name="Large space", surface_area=100
+        )
+        small_space = SpaceFactory(max_persons=10, name="Small space", surface_area=50)
         cls.reservation_unit = ReservationUnitFactory(
             name="Test name",
             reservation_unit_type=cls.type,
@@ -79,6 +81,7 @@ class ReservationUnitTestCase(GraphQLTestCase, snapshottest.TestCase):
                               latitude
                             }
                             maxPersons
+                            surfaceArea
                             reservationUnitType {
                               nameFi
                             }
@@ -661,6 +664,27 @@ class ReservationUnitTestCase(GraphQLTestCase, snapshottest.TestCase):
             """
         )
 
+        content = json.loads(response.content)
+        assert_that(self.content_is_empty(content)).is_false()
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_getting_manually_given_surface_area(self):
+        self.reservation_unit.surface_area = 500
+        self.reservation_unit.save()
+        response = self.query(
+            """
+            query {
+                reservationUnits {
+                    edges {
+                        node {
+                            surfaceArea
+                        }
+                    }
+                }
+            }
+            """
+        )
         content = json.loads(response.content)
         assert_that(self.content_is_empty(content)).is_false()
         assert_that(content.get("errors")).is_none()
@@ -1438,6 +1462,32 @@ class ReservationUnitUpdateNotDraftTestCase(ReservationUnitMutationsTestCaseBase
         assert_that(res_unit_data.get("errors")).is_none()
         self.res_unit.refresh_from_db()
         assert_that(self.res_unit.name_fi).is_equal_to("New name")
+
+    def test_update_surface_area(self):
+        expected_surface_area = 150
+        data = self.get_valid_update_data()
+        data["surfaceArea"] = expected_surface_area
+        update_query = """
+            mutation updateReservationUnit($input: ReservationUnitUpdateMutationInput!) {
+                updateReservationUnit(input: $input) {
+                    surfaceArea
+                    errors {
+                        messages
+                        field
+                    }
+                }
+            }
+        """
+        response = self.query(update_query, input_data=data)
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        res_unit_data = content.get("data").get("updateReservationUnit")
+        assert_that(content.get("errors")).is_none()
+        assert_that(res_unit_data.get("errors")).is_none()
+        assert_that(res_unit_data.get("surfaceArea")).is_equal_to(expected_surface_area)
+        self.res_unit.refresh_from_db()
+        assert_that(self.res_unit.surface_area).is_equal_to(expected_surface_area)
 
     def test_errors_on_empty_name_translations(self):
         data = self.get_valid_update_data()
