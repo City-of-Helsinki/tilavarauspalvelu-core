@@ -306,6 +306,8 @@ export const RESERVATIONUNIT_QUERY = gql`
       }
       requireIntroduction
       termsOfUseFi
+      termsOfUseSv
+      termsOfUseEn
       contactInformationFi
       maxReservationDuration
       minReservationDuration

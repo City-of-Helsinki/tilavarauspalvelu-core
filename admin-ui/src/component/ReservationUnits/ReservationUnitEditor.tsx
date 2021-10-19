@@ -92,7 +92,9 @@ type ReservationUnitEditorType = {
   requireIntroduction: boolean;
   maxReservationDuration: string;
   minReservationDuration: string;
-  termsOfUse: string;
+  termsOfUseFi: string;
+  termsOfUseSv: string;
+  termsOfUseEn: string;
 };
 
 type State = {
@@ -177,7 +179,9 @@ const reducer = (state: State, action: Action): State => {
             "descriptionFi",
             "descriptionEn",
             "descriptionSv",
-            "termsOfUse",
+            "termsOfUseFi",
+            "termsOfUseSv",
+            "termsOfUseEn",
             "minReservationDuration",
             "maxReservationDuration",
             "requireIntroduction",
@@ -475,7 +479,9 @@ const ReservationUnitEditor = (): JSX.Element | null => {
         "equipmentIds",
         "surfaceArea",
         "maxPersons",
-        "termsOfUse",
+        "termsOfUseFi",
+        "termsOfUseSv",
+        "termsOfUseEn",
         "maxReservationDuration",
         "minReservationDuration",
         "requireIntroduction",
@@ -826,18 +832,29 @@ const ReservationUnitEditor = (): JSX.Element | null => {
             </Accordion>
 
             <Accordion heading={t("ReservationUnitEditor.termsInstructions")}>
-              <TextArea
-                required
-                id="termsOfUse"
-                label={t("ReservationUnitEditor.termsOfUse")}
-                value={state.reservationUnitEdit.termsOfUse || ""}
-                helperText={t("ReservationUnitEditor.termsOfUseHelperText")}
-                onChange={(e) => {
-                  setValue({
-                    termsOfUse: e.target.value,
-                  });
-                }}
-              />
+              {languages.map((lang) => (
+                <TextArea
+                  key={lang}
+                  required
+                  id={`tos.${lang}`}
+                  label={t("ReservationUnitEditor.tosLabel", {
+                    lang,
+                  })}
+                  placeholder={t("ReservationUnitEditor.tosPlaceholder", {
+                    language: t(`language.${lang}`),
+                  })}
+                  value={get(
+                    state,
+                    `reservationUnitEdit.termsOfUse${upperFirst(lang)}`,
+                    ""
+                  )}
+                  onChange={(e) =>
+                    setValue({
+                      [`termsOfUse${upperFirst(lang)}`]: e.target.value,
+                    })
+                  }
+                />
+              ))}
             </Accordion>
             <Buttons>
               <Button
