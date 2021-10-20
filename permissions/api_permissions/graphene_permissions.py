@@ -45,15 +45,15 @@ class ReservationUnitPermission(BasePermission):
 
     @classmethod
     def has_mutation_permission(cls, root: Any, info: ResolveInfo, input: dict) -> bool:
-        unit_id = input.get("unit_id")
+        unit_pk = input.get("unit_pk")
         pk = input.get("pk")
-        if not unit_id:
-            unit_id = getattr(
+        if not unit_pk:
+            unit_pk = getattr(
                 ReservationUnit.objects.filter(pk=pk).first(), "unit_id", None
             )
-        if not unit_id:
+        if not unit_pk:
             return False
-        unit = Unit.objects.filter(id=unit_id).first()
+        unit = Unit.objects.filter(id=unit_pk).first()
         return can_manage_units_reservation_units(info.context.user, unit)
 
 
