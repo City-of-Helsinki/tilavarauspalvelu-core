@@ -7,9 +7,15 @@ from api.graphql.base_serializers import (
 from api.graphql.translate_fields import get_all_translatable_fields
 from api.resources_api import ResourceSerializer
 from resources.models import Resource
+from spaces.models import Space
 
 
 class ResourceCreateSerializer(ResourceSerializer, PrimaryKeySerializer):
+    space_pk = serializers.PrimaryKeyRelatedField(
+        queryset=Space.objects.all(),
+        source="space",
+        help_text="PK of the related space for this resource.",
+    )
     location_type = serializers.CharField(
         required=False
     )  # For some reason graphene blows up if this isn't defined here.
@@ -19,7 +25,7 @@ class ResourceCreateSerializer(ResourceSerializer, PrimaryKeySerializer):
         fields = [
             "id",
             "location_type",
-            "space_id",
+            "space_pk",
             "buffer_time_before",
             "buffer_time_after",
             "is_draft",
@@ -27,8 +33,8 @@ class ResourceCreateSerializer(ResourceSerializer, PrimaryKeySerializer):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["space_id"].required = False
-        self.fields["space_id"].allow_null = True
+        self.fields["space_pk"].required = False
+        self.fields["space_pk"].allow_null = True
 
         self.translation_fields = get_all_translatable_fields(Resource)
 
