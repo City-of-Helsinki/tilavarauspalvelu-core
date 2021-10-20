@@ -380,50 +380,23 @@ const TextInputWithPadding = styled(TextInput)`
   padding-bottom: var(--spacing-m);
 `;
 
-const getSelectedSpaces = (state: State): OptionType[] => {
-  if (!state.spaceOptions || !state.reservationUnitEdit?.spaceIds) {
+const getSelectedOptions = (
+  state: State,
+  optionsPropertyName: string,
+  valuePropName: string
+): OptionType[] => {
+  const fullPropName = `reservationUnitEdit.${valuePropName}`;
+  const options = get(state, optionsPropertyName);
+
+  if (!options || !get(state, fullPropName)) {
     return [];
   }
-
-  return state.reservationUnitEdit?.spaceIds
-    .map((space) => state.spaceOptions.find((so) => so.value === space))
-    .filter(Boolean) as OptionType[];
-};
-
-const getSelectedResources = (state: State): OptionType[] => {
-  if (!state.resourceOptions || !state.reservationUnitEdit?.resourceIds) {
-    return [];
-  }
-
-  return state.reservationUnitEdit?.resourceIds
-    .map((resourceId) =>
-      state.resourceOptions.find((so) => so.value === resourceId)
-    )
-    .filter(Boolean) as OptionType[];
-};
-
-const getSelectedEquipments = (state: State): OptionType[] => {
-  if (!state.equipmentOptions || !state.reservationUnitEdit?.equipmentIds) {
-    return [];
-  }
-
-  return state.reservationUnitEdit?.equipmentIds
-    .map((equipmentId) =>
-      state.equipmentOptions.find((so) => so.value === equipmentId)
-    )
-    .filter(Boolean) as OptionType[];
-};
-
-const getSelectedPurposes = (state: State): OptionType[] => {
-  if (!state.purposeOptions || !state.reservationUnitEdit?.purposeIds) {
-    return [];
-  }
-
-  return state.reservationUnitEdit?.purposeIds
-    .map((purposeId) =>
-      state.purposeOptions.find((so) => so.value === purposeId)
-    )
-    .filter(Boolean) as OptionType[];
+  return (
+    get(state, fullPropName)
+      // eslint-disable-next-line
+      .map((optionId: any) => options.find((so: any) => so.value === optionId))
+      .filter(Boolean) as OptionType[]
+  );
 };
 
 const getDuration = (duration: string | undefined): string => {
@@ -719,7 +692,9 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                       dispatch({ type: "setSpaces", spaces })
                     }
                     disabled={state.spaceOptions.length === 0}
-                    value={[...getSelectedSpaces(state)]}
+                    value={[
+                      ...getSelectedOptions(state, "spaceOptions", "spaceIds"),
+                    ]}
                   />
                   <Combobox
                     multiselect
@@ -735,7 +710,13 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                       dispatch({ type: "setResources", resources })
                     }
                     disabled={state.resourceOptions.length === 0}
-                    value={[...getSelectedResources(state)]}
+                    value={[
+                      ...getSelectedOptions(
+                        state,
+                        "resourceOptions",
+                        "resourceIds"
+                      ),
+                    ]}
                   />
                 </EditorColumns>
                 <Checkbox
@@ -807,7 +788,13 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                     dispatch({ type: "setPurposes", purposes })
                   }
                   disabled={state.resourceOptions.length === 0}
-                  value={[...getSelectedPurposes(state)]}
+                  value={[
+                    ...getSelectedOptions(
+                      state,
+                      "purposeOptions",
+                      "purposeIds"
+                    ),
+                  ]}
                 />
 
                 <Combobox
@@ -821,8 +808,14 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                   onChange={(equipments) =>
                     dispatch({ type: "setEquipments", equipments })
                   }
-                  disabled={state.resourceOptions.length === 0}
-                  value={[...getSelectedEquipments(state)]}
+                  disabled={state.equipmentOptions.length === 0}
+                  value={[
+                    ...getSelectedOptions(
+                      state,
+                      "equipmentOptions",
+                      "equipmentIds"
+                    ),
+                  ]}
                 />
               </EditorColumns>
               <EditorColumns>
