@@ -6,36 +6,54 @@ from api.graphql.base_serializers import (
 )
 from api.graphql.translate_fields import get_all_translatable_fields
 from api.space_api import SpaceSerializer
-from spaces.models import Space, Unit
+from spaces.models import Building, District, Space, Unit
 
 
 class SpaceCreateSerializer(SpaceSerializer, PrimaryKeySerializer):
+    parent_pk = serializers.PrimaryKeyRelatedField(
+        queryset=Space.objects.all(),
+        source="parent",
+        help_text="PK of the parent space for this space.",
+        allow_null=True,
+    )
+    building_pk = serializers.PrimaryKeyRelatedField(
+        queryset=Building.objects.all(),
+        source="building",
+        help_text="PK of the building for this space.",
+        allow_null=True,
+    )
+    district_pk = serializers.PrimaryKeyRelatedField(
+        queryset=District.objects.all(),
+        source="district",
+        help_text="PK of the district for this space.",
+        allow_null=True,
+    )
     max_persons = serializers.IntegerField(required=False)
     code = serializers.CharField(required=False)
     terms_of_use_fi = serializers.CharField(required=False, default="")
     terms_of_use_sv = serializers.CharField(required=False, default="")
     terms_of_use_en = serializers.CharField(required=False, default="")
-    unit_id = serializers.PrimaryKeyRelatedField(
+    unit_pk = serializers.PrimaryKeyRelatedField(
         queryset=Unit.objects.all(), source="unit", required=False, allow_null=True
     )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["district_id"].required = False
-        self.fields["parent_id"].required = False
-        self.fields.pop("building_id")
+        self.fields["district_pk"].required = False
+        self.fields["parent_pk"].required = False
+        self.fields.pop("building_pk")
         self.fields["name_fi"].required = True
 
     class Meta(SpaceSerializer.Meta):
         fields = [
             "id",
-            "parent_id",
-            "building_id",
+            "parent_pk",
+            "building_pk",
             "surface_area",
-            "district_id",
+            "district_pk",
             "max_persons",
             "code",
-            "unit_id",
+            "unit_pk",
         ] + get_all_translatable_fields(Space)
 
     def validate(self, data):

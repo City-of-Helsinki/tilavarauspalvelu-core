@@ -12,10 +12,10 @@ from api.reservation_units_api import (
 )
 from reservation_units.models import (
     Equipment,
+    EquipmentCategory,
     Purpose,
     ReservationUnit,
     ReservationUnitType,
-    EquipmentCategory,
 )
 from resources.models import Resource
 from services.models import Service
