@@ -34,7 +34,7 @@ class EquipmentCreateTestCase(EquipmentBaseTestCase):
         """
 
     def test_creating_equipment(self):
-        data = {"nameFi": "Equipment name", "categoryId": self.category.id}
+        data = {"nameFi": "Equipment name", "categoryPk": self.category.id}
         response = self.query(self.get_create_query(), input_data=data)
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
@@ -44,7 +44,7 @@ class EquipmentCreateTestCase(EquipmentBaseTestCase):
         self._client.force_login(self.regular_joe)
         data = {
             "nameFi": "Regular user created equipment",
-            "categoryId": self.category.id,
+            "categoryPk": self.category.id,
         }
         response = self.query(self.get_create_query(), input_data=data)
         assert_that(response.status_code).is_equal_to(200)
@@ -77,7 +77,7 @@ class EquipmentUpdateTestCase(EquipmentBaseTestCase):
         data = {
             "pk": self.equipment.pk,
             "nameFi": "Updated name",
-            "categoryId": self.category.id,
+            "categoryPk": self.category.id,
         }
         response = self.query(self.get_update_query(), input_data=data)
         assert_that(response.status_code).is_equal_to(200)
@@ -92,7 +92,7 @@ class EquipmentUpdateTestCase(EquipmentBaseTestCase):
         assert_that(self.equipment.name).is_equal_to("Updated name")
 
     def test_updating_should_error_when_not_found(self):
-        data = {"pk": "1234", "nameFi": "Me errors", "categoryId": self.category.id}
+        data = {"pk": "1234", "nameFi": "Me errors", "categoryPk": self.category.id}
         response = self.query(self.get_update_query(), input_data=data)
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
@@ -104,7 +104,7 @@ class EquipmentUpdateTestCase(EquipmentBaseTestCase):
         data = {
             "pk": self.equipment.pk,
             "nameFi": "Regular user updated the name",
-            "categoryId": self.category.id,
+            "categoryPk": self.category.id,
         }
         response = self.query(self.get_update_query(), input_data=data)
         assert_that(response.status_code).is_equal_to(200)

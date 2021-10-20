@@ -15,6 +15,7 @@ from reservation_units.models import (
     Purpose,
     ReservationUnit,
     ReservationUnitType,
+    EquipmentCategory,
 )
 from resources.models import Resource
 from services.models import Service
@@ -22,10 +23,14 @@ from spaces.models import Space, Unit
 
 
 class EquipmentCreateSerializer(EquipmentSerializer, PrimaryKeySerializer):
+    category_pk = serializers.PrimaryKeyRelatedField(
+        queryset=EquipmentCategory.objects.all(), source="category"
+    )
+
     class Meta(EquipmentSerializer.Meta):
         fields = [
             "id",
-            "category_id",
+            "category_pk",
         ] + get_all_translatable_fields(EquipmentSerializer.Meta.model)
 
     def validate(self, data):
