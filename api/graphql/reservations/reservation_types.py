@@ -55,8 +55,8 @@ class RecurringReservationType(AuthNode, PrimaryKeyObjectType):
     )
 
     user = graphene.String()
-    application_id = graphene.Int()
-    application_event_id = graphene.Int()
+    application_pk = graphene.Int()
+    application_event_pk = graphene.Int()
     age_group = graphene.Field(AgeGroupType)
     ability_group = graphene.Field(AbilityGroupType)
 
@@ -64,8 +64,8 @@ class RecurringReservationType(AuthNode, PrimaryKeyObjectType):
         model = RecurringReservation
         fields = [
             "user",
-            "application_id",
-            "application_event_id",
+            "application_pk",
+            "application_event_pk",
             "age_group",
             "ability_group",
         ]
@@ -77,18 +77,18 @@ class RecurringReservationType(AuthNode, PrimaryKeyObjectType):
         return self.user.email
 
     @recurring_reservation_non_public_field
-    def resolve_application_id(self, info: ResolveInfo) -> [graphene.Int]:
-        if not self.application_id:
+    def resolve_application_pk(self, info: ResolveInfo) -> [graphene.Int]:
+        if not self.application_pk:
             return None
 
-        return self.application_id
+        return self.application_pk
 
     @recurring_reservation_non_public_field
-    def resolve_application_event_id(self, info: ResolveInfo) -> [str]:
-        if not self.application_event_id:
+    def resolve_application_event_pk(self, info: ResolveInfo) -> [str]:
+        if not self.application_event_pk:
             return None
 
-        return self.application_event_id
+        return self.application_event_pk
 
 
 class ReservationType(AuthNode, PrimaryKeyObjectType):

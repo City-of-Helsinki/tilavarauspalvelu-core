@@ -13,7 +13,7 @@ from reservations.models import STATE_CHOICES, Reservation
 
 
 class ReservationCreateSerializer(PrimaryKeySerializer):
-    reservation_unit_ids = serializers.ListField(source="reservation_unit")
+    reservation_unit_pks = serializers.ListField(source="reservation_unit")
     priority = serializers.IntegerField()
 
     class Meta:
@@ -25,7 +25,7 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
             "end",
             "buffer_time_before",
             "buffer_time_after",
-            "reservation_unit_ids",
+            "reservation_unit_pks",
         ]
 
     def validate(self, data):
@@ -129,8 +129,8 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
                 "Reservation unit buffer time between reservations overlaps with current end time."
             )
 
-    def validate_reservation_unit_ids(self, data):
-        self._check_id_list(data, "space_ids")
+    def validate_reservation_unit_pks(self, data):
+        self._check_id_list(data, "reservation_unit_pks")
         reservation_units = ReservationUnit.objects.filter(id__in=data)
         return reservation_units
 
@@ -157,7 +157,7 @@ class ReservationUpdateSerializer(
         self.fields["end"].required = False
         self.fields["buffer_time_before"].required = False
         self.fields["buffer_time_after"].required = False
-        self.fields["reservation_unit_ids"].required = False
+        self.fields["reservation_unit_pks"].required = False
 
     def validate(self, data):
         if self.instance.state not in (STATE_CHOICES.CREATED, STATE_CHOICES.REQUESTED):
