@@ -568,7 +568,7 @@ class ReservationUnitTestCase(GraphQLTestCase, snapshottest.TestCase):
                     edges {
                         node {
                             nameFi
-                            reservations(state: "CREATED") {
+                            reservations(state: "created") {
                                 begin
                                 end
                                 state
@@ -614,7 +614,7 @@ class ReservationUnitTestCase(GraphQLTestCase, snapshottest.TestCase):
                     edges {
                         node {
                             nameFi
-                            reservations(state: ["CREATED", "CONFIRMED"]) {
+                            reservations(state: ["created", "confirmed"]) {
                                 begin
                                 end
                                 state

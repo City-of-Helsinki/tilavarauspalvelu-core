@@ -46,7 +46,7 @@ class ReservationUnitReservationScheduler:
         is_reservation_unit_closed = not self.opening_hours_client.is_resource_open(
             str(self.reservation_unit.uuid), self.start_time, self.end_time
         )
-        open_application_round = self._get_conflicting_open_application_round(
+        open_application_round = self.get_conflicting_open_application_round(
             self.start_time.date(), self.end_time.date()
         )
         is_overlapping = self.reservation_unit.check_reservation_overlap(
@@ -78,7 +78,7 @@ class ReservationUnitReservationScheduler:
             is_overlapping = self.reservation_unit.check_reservation_overlap(
                 self.start_time, self.end_time
             )
-            open_application_round = self._get_conflicting_open_application_round(
+            open_application_round = self.get_conflicting_open_application_round(
                 self.start_time.date(), self.end_time.date()
             )
             is_reservation_unit_closed = not self.opening_hours_client.is_resource_open(
@@ -90,7 +90,7 @@ class ReservationUnitReservationScheduler:
 
         return self.start_time, self.end_time
 
-    def _get_conflicting_open_application_round(
+    def get_conflicting_open_application_round(
         self, start: datetime.date, end: datetime.date
     ):
         from applications.models import ApplicationRound, ApplicationRoundStatus
@@ -136,3 +136,10 @@ class ReservationUnitReservationScheduler:
             start = datetime.timedelta(days=1)
 
         return matching
+
+    def is_reservation_unit_open(
+        self, start: datetime.datetime, end: datetime.datetime
+    ):
+        return self.opening_hours_client.is_resource_open(
+            str(self.reservation_unit.uuid), start, end
+        )

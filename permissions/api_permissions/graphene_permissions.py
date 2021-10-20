@@ -6,6 +6,8 @@ from graphql import ResolveInfo
 
 from permissions.helpers import (
     can_create_reservation,
+    can_manage_ability_groups,
+    can_manage_age_groups,
     can_manage_equipment,
     can_manage_equipment_categories,
     can_manage_purposes,
@@ -13,10 +15,11 @@ from permissions.helpers import (
     can_manage_spaces,
     can_manage_units,
     can_manage_units_reservation_units,
-    can_view_reservations,
+    can_modify_reservation,
+    can_view_recurring_reservation,
 )
 from reservation_units.models import ReservationUnit
-from reservations.models import Reservation
+from reservations.models import RecurringReservation, Reservation
 from spaces.models import Unit
 
 
@@ -71,12 +74,36 @@ class ResourcePermission(BasePermission):
 class ReservationPermission(BasePermission):
     @classmethod
     def has_mutation_permission(cls, root: Any, info: ResolveInfo, input: dict) -> bool:
-        reservation = Reservation(**input)
-        return can_create_reservation(info.context.user, reservation)
+        pk = input.get("pk")
+        if pk:
+            reservation = get_object_or_404(Reservation, pk=input.get("pk"))
+            return can_modify_reservation(info.context.user, reservation)
+        return can_create_reservation(info.context.user)
 
     @classmethod
     def has_filter_permission(self, info: ResolveInfo) -> bool:
-        return can_view_reservations(info.context.user)
+        """Authenticated users can see reservations.
+
+        The reservation fields has own permission checks.
+        """
+        return info.context.user.is_authenticated
+
+
+class RecurringReservationPermission(BasePermission):
+    @classmethod
+    def has_node_permission(cls, info: ResolveInfo, id: str) -> bool:
+        recurring_reservation = RecurringReservation.objects.filter(id=id)
+        if not recurring_reservation:
+            return False
+        return can_view_recurring_reservation(info.context.user, recurring_reservation)
+
+    @classmethod
+    def has_filter_permission(cls, info: ResolveInfo) -> bool:
+        return False
+
+    @classmethod
+    def has_mutation_permission(cls, root: Any, info: ResolveInfo, input: dict) -> bool:
+        return False
 
 
 class PurposePermission(BasePermission):
@@ -87,6 +114,26 @@ class PurposePermission(BasePermission):
     @classmethod
     def has_mutation_permission(cls, root: Any, info: ResolveInfo, input: dict) -> bool:
         return can_manage_purposes(info.context.user)
+
+
+class AgeGroupPermission(BasePermission):
+    @classmethod
+    def has_filter_permission(cls, info: ResolveInfo) -> bool:
+        return True
+
+    @classmethod
+    def has_mutation_permission(cls, root: Any, info: ResolveInfo, input: dict) -> bool:
+        return can_manage_age_groups(info.context.user)
+
+
+class AbilityGroupPermission(BasePermission):
+    @classmethod
+    def has_filter_permission(cls, info: ResolveInfo) -> bool:
+        return True
+
+    @classmethod
+    def has_mutation_permission(cls, root: Any, info: ResolveInfo, input: dict) -> bool:
+        return can_manage_ability_groups(info.context.user)
 
 
 class SpacePermission(BasePermission):

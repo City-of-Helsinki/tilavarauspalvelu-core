@@ -1,3 +1,4 @@
+import datetime
 import uuid as uuid
 
 from django.conf import settings
@@ -207,17 +208,8 @@ class ReservationUnit(models.Model):
     def check_reservation_overlap(self, start_time, end_time, reservation=None):
         from reservations.models import STATE_CHOICES, Reservation
 
-        spaces = []
-
-        for space in self.spaces.all():
-            spaces += list(space.get_family())
-
-        reservation_units_with_same_components = ReservationUnit.objects.filter(
-            Q(resources__in=self.resources.all()) | Q(spaces__in=spaces)
-        ).distinct()
-
         qs = Reservation.objects.filter(
-            reservation_unit__in=reservation_units_with_same_components,
+            reservation_unit__in=self.reservation_units_with_same_components,
             end__gt=start_time,
             begin__lt=end_time,
         ).exclude(state__in=[STATE_CHOICES.CANCELLED, STATE_CHOICES.DENIED])
@@ -227,6 +219,42 @@ class ReservationUnit(models.Model):
             qs = qs.exclude(pk=reservation.pk)
 
         return qs.exists()
+
+    def get_next_reservation(self, end_time: datetime.datetime, reservation=None):
+        from reservations.models import STATE_CHOICES, Reservation
+
+        qs = Reservation.objects.filter(
+            reservation_unit__in=self.reservation_units_with_same_components,
+            begin__gte=end_time,
+        ).exclude(state__in=[STATE_CHOICES.CANCELLED, STATE_CHOICES.DENIED])
+
+        if reservation:
+            qs = qs.exclude(id=reservation.id)
+
+        return qs.order_by("-begin").first()
+
+    def get_previous_reservation(self, start_time: datetime.datetime, reservation=None):
+        from reservations.models import STATE_CHOICES, Reservation
+
+        qs = Reservation.objects.filter(
+            reservation_unit__in=self.reservation_units_with_same_components,
+            end__lte=start_time,
+        ).exclude(state__in=[STATE_CHOICES.CANCELLED, STATE_CHOICES.DENIED])
+
+        if reservation:
+            qs = qs.exclude(id=reservation.id)
+
+        return qs.order_by("-end").first()
+
+    @property
+    def reservation_units_with_same_components(self):
+        spaces = []
+        for space in self.spaces.all():
+            spaces += list(space.get_family())
+
+        return ReservationUnit.objects.filter(
+            Q(resources__in=self.resources.all()) | Q(spaces__in=spaces)
+        ).distinct()
 
     @property
     def hauki_resource_id(self):

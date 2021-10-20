@@ -1,9 +1,10 @@
 import django_filters
 import graphene
 from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.db.models import Q
 from graphene import Field, relay
-from graphene_django.forms.mutation import DjangoModelFormMutation
-from graphene_permissions.mixins import AuthFilter, AuthMutation
+from graphene_permissions.mixins import AuthFilter
 from graphene_permissions.permissions import AllowAny, AllowAuthenticated
 from rest_framework.generics import get_object_or_404
 
@@ -32,6 +33,11 @@ from api.graphql.reservation_units.reservation_unit_types import (
     ReservationUnitByPkType,
     ReservationUnitType,
 )
+from api.graphql.reservations.reservation_filtersets import ReservationFilterSet
+from api.graphql.reservations.reservation_mutations import (
+    ReservationCreateMutation,
+    ReservationUpdateMutation,
+)
 from api.graphql.reservations.reservation_types import ReservationType
 from api.graphql.resources.resource_mutations import (
     ResourceCreateMutation,
@@ -52,32 +58,58 @@ from permissions.api_permissions.graphene_permissions import (
     EquipmentPermission,
     KeywordPermission,
     PurposePermission,
+    ReservationPermission,
     ReservationUnitPermission,
     ResourcePermission,
     SpacePermission,
     UnitPermission,
 )
+from permissions.helpers import (
+    get_service_sectors_where_can_view_reservations,
+    get_units_where_can_view_reservations,
+)
 from reservation_units.models import Equipment, EquipmentCategory, ReservationUnit
-from reservations.forms import ReservationForm
 from resources.models import Resource
-from spaces.models import Space, Unit
-
-
-class ReservationMutation(AuthMutation, DjangoModelFormMutation):
-    reservation = graphene.Field(ReservationType)
-
-    permission_classes = (
-        (ReservationUnitPermission,)
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else (AllowAny,)
-    )
-
-    class Meta:
-        form_class = ReservationForm
+from spaces.models import ServiceSector, Space, Unit
 
 
 class AllowAuthenticatedFilter(AuthFilter):
     permission_classes = (AllowAuthenticated,)
+
+
+class ReservationsFilter(AuthFilter, django_filters.FilterSet):
+    permission_classes = (
+        (ReservationPermission,)
+        if not settings.TMP_PERMISSIONS_DISABLED
+        else (AllowAny,)
+    )
+
+    @classmethod
+    def resolve_queryset(
+        cls, connection, iterable, info, args, filtering_args, filterset_class
+    ):
+        queryset = super().resolve_queryset(
+            connection, iterable, info, args, filtering_args, filterset_class
+        )
+
+        user = info.context.user
+        viewable_units = get_units_where_can_view_reservations(user)
+        viewable_service_sectors = get_service_sectors_where_can_view_reservations(user)
+        if settings.TMP_PERMISSIONS_DISABLED:
+            viewable_units = Unit.objects.all()
+            viewable_service_sectors = ServiceSector.objects.all()
+            user = (
+                get_user_model().objects.get(username="admin")
+                if settings.TMP_PERMISSIONS_DISABLED
+                else info.context.user
+            )
+        elif user.is_anonymous:
+            return queryset.none()
+        return queryset.filter(
+            Q(reservation_unit__unit__in=viewable_units)
+            | Q(reservation_unit__unit__service_sectors__in=viewable_service_sectors)
+            | Q(user=user)
+        ).order_by("begin")
 
 
 class ReservationUnitsFilter(AuthFilter, django_filters.FilterSet):
@@ -133,6 +165,10 @@ class PurposeFilter(AuthFilter):
 
 
 class Query(graphene.ObjectType):
+    reservations = ReservationsFilter(
+        ReservationType, filterset_class=ReservationFilterSet
+    )
+
     reservation_units = ReservationUnitsFilter(
         ReservationUnitType, filterset_class=ReservationUnitsFilterSet
     )
@@ -191,7 +227,8 @@ class Query(graphene.ObjectType):
 
 
 class Mutation(graphene.ObjectType):
-    create_reservation = ReservationMutation.Field()
+    create_reservation = ReservationCreateMutation.Field()
+    update_reservation = ReservationUpdateMutation.Field()
 
     create_reservation_unit = ReservationUnitCreateMutation.Field()
     update_reservation_unit = ReservationUnitUpdateMutation.Field()

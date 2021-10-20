@@ -7,6 +7,7 @@ from permissions.models import GeneralRole, GeneralRoleChoice
 class GrapheneTestCaseBase(GraphQLTestCase):
     @classmethod
     def setUpTestData(cls):
+        super().setUpTestData()
         cls.general_admin = get_user_model().objects.create(
             username="gen_admin",
             first_name="Admin",
