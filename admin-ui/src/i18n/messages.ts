@@ -849,7 +849,7 @@ const translations: ITranslations = {
     spacesPlaceholder: ["Liitä tarvittavat tilat"],
     equipmentsLabel: ["Varustelu"],
     equipmentsPlaceholder: ["Valitse varusteet"],
-    purposessLabel: ["Käyttötarkoitus"],
+    purposesLabel: ["Käyttötarkoitus"],
     purposesPlaceholder: ["Valitse mitä tarkoitusta tuetaan"],
     resourcesLabel: ["Resurssit"],
     resourcesPlaceholder: ["Liitä tarvittavat resurssit"],
