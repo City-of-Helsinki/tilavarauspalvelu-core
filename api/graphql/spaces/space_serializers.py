@@ -4,25 +4,26 @@ from api.graphql.base_serializers import (
     PrimaryKeySerializer,
     PrimaryKeyUpdateSerializer,
 )
+from api.graphql.primary_key_fields import IntegerPrimaryKeyField
 from api.graphql.translate_fields import get_all_translatable_fields
 from api.space_api import SpaceSerializer
 from spaces.models import Building, District, Space, Unit
 
 
 class SpaceCreateSerializer(SpaceSerializer, PrimaryKeySerializer):
-    parent_pk = serializers.PrimaryKeyRelatedField(
+    parent_pk = IntegerPrimaryKeyField(
         queryset=Space.objects.all(),
         source="parent",
         help_text="PK of the parent space for this space.",
         allow_null=True,
     )
-    building_pk = serializers.PrimaryKeyRelatedField(
+    building_pk = IntegerPrimaryKeyField(
         queryset=Building.objects.all(),
         source="building",
         help_text="PK of the building for this space.",
         allow_null=True,
     )
-    district_pk = serializers.PrimaryKeyRelatedField(
+    district_pk = IntegerPrimaryKeyField(
         queryset=District.objects.all(),
         source="district",
         help_text="PK of the district for this space.",
@@ -33,7 +34,7 @@ class SpaceCreateSerializer(SpaceSerializer, PrimaryKeySerializer):
     terms_of_use_fi = serializers.CharField(required=False, default="")
     terms_of_use_sv = serializers.CharField(required=False, default="")
     terms_of_use_en = serializers.CharField(required=False, default="")
-    unit_pk = serializers.PrimaryKeyRelatedField(
+    unit_pk = IntegerPrimaryKeyField(
         queryset=Unit.objects.all(), source="unit", required=False, allow_null=True
     )
 

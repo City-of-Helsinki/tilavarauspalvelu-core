@@ -4,6 +4,7 @@ from api.graphql.base_serializers import (
     PrimaryKeySerializer,
     PrimaryKeyUpdateSerializer,
 )
+from api.graphql.primary_key_fields import IntegerPrimaryKeyField
 from api.graphql.translate_fields import get_all_translatable_fields
 from api.reservation_units_api import (
     EquipmentCategorySerializer,
@@ -23,7 +24,7 @@ from spaces.models import Space, Unit
 
 
 class EquipmentCreateSerializer(EquipmentSerializer, PrimaryKeySerializer):
-    category_pk = serializers.PrimaryKeyRelatedField(
+    category_pk = IntegerPrimaryKeyField(
         queryset=EquipmentCategory.objects.all(), source="category"
     )
 
@@ -90,19 +91,37 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
     max_reservation_duration = serializers.DurationField(required=False)
     min_reservation_duration = serializers.DurationField(required=False)
     max_persons = serializers.IntegerField(required=False)
-    space_pks = serializers.ListField(source="spaces", required=False)
-    resource_pks = serializers.ListField(source="resources", required=False)
-    purpose_pks = serializers.ListField(source="purposes", required=False)
-    equipment_pks = serializers.ListField(source="equipments", required=False)
-    service_pks = serializers.ListField(source="services", required=False)
-    reservation_unit_type_pk = serializers.PrimaryKeyRelatedField(
+    space_pks = serializers.ListField(
+        child=IntegerPrimaryKeyField(queryset=Space.objects.all()),
+        source="spaces",
+        required=False,
+    )
+    resource_pks = serializers.ListField(
+        child=IntegerPrimaryKeyField(queryset=Resource.objects.all()),
+        source="resources",
+        required=False,
+    )
+    purpose_pks = serializers.ListField(
+        child=IntegerPrimaryKeyField(queryset=Purpose.objects.all()),
+        source="purposes",
+        required=False,
+    )
+    equipment_pks = serializers.ListField(
+        child=IntegerPrimaryKeyField(queryset=Equipment.objects.all()),
+        source="equipments",
+        required=False,
+    )
+    service_pks = serializers.ListField(
+        child=IntegerPrimaryKeyField(queryset=Service.objects.all()),
+        source="services",
+        required=False,
+    )
+    reservation_unit_type_pk = IntegerPrimaryKeyField(
         source="reservation_unit_type",
         required=False,
         queryset=ReservationUnitType.objects.all(),
     )
-    unit_pk = serializers.PrimaryKeyRelatedField(
-        queryset=Unit.objects.all(), source="unit"
-    )
+    unit_pk = IntegerPrimaryKeyField(queryset=Unit.objects.all(), source="unit")
 
     translation_fields = get_all_translatable_fields(ReservationUnit)
 
@@ -157,31 +176,6 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
                 )
 
         return data
-
-    def validate_space_pks(self, data):
-        self._check_pk_list(data, "space_pks")
-        spaces = Space.objects.filter(pk__in=data)
-        return spaces
-
-    def validate_resource_pks(self, data):
-        self._check_pk_list(data, "resource_pks")
-        resources = Resource.objects.filter(pk__in=data)
-        return resources
-
-    def validate_purpose_pks(self, data):
-        self._check_pk_list(data, "purpose_pks")
-        purposes = Purpose.objects.filter(pk__in=data)
-        return purposes
-
-    def validate_equipment_pks(self, data):
-        self._check_pk_list(data, "equipment_pks")
-        equipments = Equipment.objects.filter(pk__in=data)
-        return equipments
-
-    def validate_service_pks(self, data):
-        self._check_pk_list(data, "service_pks")
-        services = Service.objects.filter(pk__in=data)
-        return services
 
     def validate_for_publish(self, data):
         """Validates necessary fields for published reservation unit."""

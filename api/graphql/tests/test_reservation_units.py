@@ -1118,30 +1118,18 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         data["spacePks"] = "b"
 
         response = self.query(self.get_create_query(), input_data=data)
-        assert_that(response.status_code).is_equal_to(200)
+        assert_that(response.status_code).is_equal_to(400)
         content = json.loads(response.content)
-        res_unit_data = content.get("data").get("createReservationUnit")
-        assert_that(content.get("errors")).is_none()
-        assert_that(res_unit_data.get("errors")).is_not_none()
-
-        assert_that(res_unit_data.get("errors")[0].get("messages")[0]).contains(
-            "Wrong type of id: b for space_pks"
-        )
+        assert_that(content.get("errors")).is_not_none()
 
     def test_create_errors_on_wrong_type_of_resource_pk(self):
         data = self.get_valid_data()
         data["resourcePks"] = "b"
 
         response = self.query(self.get_create_query(), input_data=data)
-        assert_that(response.status_code).is_equal_to(200)
+        assert_that(response.status_code).is_equal_to(400)
         content = json.loads(response.content)
-        res_unit_data = content.get("data").get("createReservationUnit")
-        assert_that(content.get("errors")).is_none()
-        assert_that(res_unit_data.get("errors")).is_not_none()
-
-        assert_that(res_unit_data.get("errors")[0].get("messages")[0]).contains(
-            "Wrong type of id: b for resource_pks"
-        )
+        assert_that(content.get("errors")).is_not_none()
 
     def test_create_errors_on_reservation_unit_type(self):
         data = self.get_valid_data()
@@ -1160,7 +1148,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
 
     def test_create_errors_on_wrong_reservation_unit_type(self):
         data = self.get_valid_data()
-        data["reservationUnitTypePk"] = "b"
+        data["reservationUnitTypePk"] = -15
 
         response = self.query(self.get_create_query(), input_data=data)
         assert_that(response.status_code).is_equal_to(200)
@@ -1213,15 +1201,9 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         data["purposePks"] = ["b"]
 
         response = self.query(self.get_create_query(), input_data=data)
-        assert_that(response.status_code).is_equal_to(200)
+        assert_that(response.status_code).is_equal_to(400)
         content = json.loads(response.content)
-        res_unit_data = content.get("data").get("createReservationUnit")
-        assert_that(content.get("errors")).is_none()
-        assert_that(res_unit_data.get("errors")).is_not_none()
-
-        assert_that(res_unit_data.get("errors")[0].get("messages")[0]).contains(
-            "Wrong type of id: b for purpose_pks"
-        )
+        assert_that(content.get("errors")).is_not_none()
 
     def test_create_with_multiple_services(self):
         purposes = ServiceFactory.create_batch(5)
@@ -1247,15 +1229,9 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         data["servicePks"] = ["b"]
 
         response = self.query(self.get_create_query(), input_data=data)
-        assert_that(response.status_code).is_equal_to(200)
+        assert_that(response.status_code).is_equal_to(400)
         content = json.loads(response.content)
-        res_unit_data = content.get("data").get("createReservationUnit")
-        assert_that(content.get("errors")).is_none()
-        assert_that(res_unit_data.get("errors")).is_not_none()
-
-        assert_that(res_unit_data.get("errors")[0].get("messages")[0]).contains(
-            "Wrong type of id: b for service_pks"
-        )
+        assert_that(content.get("errors")).is_not_none()
 
     def test_create_with_multiple_resources(self):
         resource = ResourceFactory()
@@ -1300,15 +1276,9 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         data["equipmentPks"] = ["b"]
 
         response = self.query(self.get_create_query(), input_data=data)
-        assert_that(response.status_code).is_equal_to(200)
+        assert_that(response.status_code).is_equal_to(400)
         content = json.loads(response.content)
-        res_unit_data = content.get("data").get("createReservationUnit")
-        assert_that(content.get("errors")).is_none()
-        assert_that(res_unit_data.get("errors")).is_not_none()
-
-        assert_that(res_unit_data.get("errors")[0].get("messages")[0]).contains(
-            "Wrong type of id: b for equipment_pks"
-        )
+        assert_that(content.get("errors")).is_not_none()
 
     def test_regular_user_cannot_create(self):
         self._client.force_login(self.regular_joe)
@@ -1380,19 +1350,6 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
 
         self.res_unit.refresh_from_db()
         assert_that(self.res_unit.name_fi).is_not_empty()
-
-    def test_errors_with_empty_unit_pk(self):
-        data = self.get_valid_update_data()
-        data["unitPk"] = " "
-
-        response = self.query(self.get_update_query(), input_data=data)
-        assert_that(response.status_code).is_equal_to(200)
-
-        content = json.loads(response.content)
-        assert_that(content.get("errors")).is_not_none()
-
-        self.res_unit.refresh_from_db()
-        assert_that(self.res_unit.unit).is_not_none()
 
     def test_regular_user_cannot_update(self):
         self._client.force_login(self.regular_joe)
@@ -1547,7 +1504,7 @@ class ReservationUnitUpdateNotDraftTestCase(ReservationUnitMutationsTestCaseBase
 
     def test_errors_on_empty_type(self):
         data = self.get_valid_update_data()
-        data["reservationUnitTypePk"] = ""
+        data["reservationUnitTypePk"] = None
 
         response = self.query(self.get_update_query(), input_data=data)
         assert_that(response.status_code).is_equal_to(200)

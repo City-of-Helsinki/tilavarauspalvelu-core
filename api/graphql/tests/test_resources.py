@@ -426,7 +426,7 @@ class ResourceUpdateForPublishGraphQLTestCase(ResourceGraphQLBase):
 
     def test_validation_error_when_try_to_null_space_and_fixed_location(self):
         data = self.get_valid_input_data()
-        data["spacePk"] = ""
+        data["spacePk"] = None
         response = self.query(self.get_update_query(), input_data=data)
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
@@ -449,7 +449,7 @@ class ResourceUpdateForPublishGraphQLTestCase(ResourceGraphQLBase):
 
     def test_update_space_null_and_location_movable(self):
         data = self.get_valid_input_data()
-        data["spacePk"] = ""
+        data["spacePk"] = None
         data["locationType"] = Resource.LOCATION_MOVABLE
         response = self.query(self.get_update_query(), input_data=data)
         assert_that(response.status_code).is_equal_to(200)
@@ -493,7 +493,7 @@ class ResourceUpdateForPublishGraphQLTestCase(ResourceGraphQLBase):
         )
 
     def test_partial_update_fails_when_removing_space_from_fixed_location(self):
-        data = {"pk": self.resource.pk, "spacePk": ""}
+        data = {"pk": self.resource.pk, "spacePk": None}
         response = self.query(self.get_update_query(), input_data=data)
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
@@ -566,7 +566,7 @@ class ResourceUpdateAsDraftGraphQLTestCase(ResourceGraphQLBase):
 
     def test_updated_when_no_space_and_fixed_location(self):
         data = self.get_valid_input_data()
-        data["spacePk"] = ""
+        data["spacePk"] = None
         response = self.query(self.get_update_query(), input_data=data)
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)

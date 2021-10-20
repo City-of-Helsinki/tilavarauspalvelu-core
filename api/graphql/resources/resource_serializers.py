@@ -4,6 +4,7 @@ from api.graphql.base_serializers import (
     PrimaryKeySerializer,
     PrimaryKeyUpdateSerializer,
 )
+from api.graphql.primary_key_fields import IntegerPrimaryKeyField
 from api.graphql.translate_fields import get_all_translatable_fields
 from api.resources_api import ResourceSerializer
 from resources.models import Resource
@@ -11,7 +12,7 @@ from spaces.models import Space
 
 
 class ResourceCreateSerializer(ResourceSerializer, PrimaryKeySerializer):
-    space_pk = serializers.PrimaryKeyRelatedField(
+    space_pk = IntegerPrimaryKeyField(
         queryset=Space.objects.all(),
         source="space",
         help_text="PK of the related space for this resource.",
