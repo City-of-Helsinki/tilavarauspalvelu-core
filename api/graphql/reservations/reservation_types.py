@@ -104,6 +104,8 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
 
     recurring_reservation = graphene.Field(RecurringReservationType)
     state = graphene.String()
+    name = graphene.String()
+    description = graphene.String()
 
     class Meta:
         model = Reservation
@@ -118,6 +120,8 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
             "reservation_units",
             "recurring_reservation",
             "num_persons",
+            "name",
+            "description",
         ]
         filter_fields = {
             "state": ["exact"],
