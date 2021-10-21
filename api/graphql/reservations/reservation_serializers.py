@@ -32,6 +32,10 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
             "reservation_unit_pks",
         ]
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["reservation_unit_pks"].write_only = True
+
     def validate(self, data):
         begin = data.get("begin", getattr(self.instance, "begin", None))
         end = data.get("end", getattr(self.instance, "end", None))

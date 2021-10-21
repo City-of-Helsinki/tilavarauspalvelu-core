@@ -153,6 +153,14 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
             "buffer_time_between_reservations",
         ] + get_all_translatable_fields(ReservationUnit)
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["equipment_pks"].write_only = True
+        self.fields["space_pks"].write_only = True
+        self.fields["resource_pks"].write_only = True
+        self.fields["purpose_pks"].write_only = True
+        self.fields["service_pks"].write_only = True
+
     def _check_pk_list(self, id_list, field_name):
         for identifier in id_list:
             try:
