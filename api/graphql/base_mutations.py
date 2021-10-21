@@ -19,7 +19,7 @@ class AuthDeleteMutation(AuthMutation):
     errors = graphene.String()
 
     class Input:
-        pk = graphene.ID()
+        pk = graphene.Int(required=True)
 
     @classmethod
     def mutate_and_get_payload(cls, root, info, **input):

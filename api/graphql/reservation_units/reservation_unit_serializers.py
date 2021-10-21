@@ -30,7 +30,7 @@ class EquipmentCreateSerializer(EquipmentSerializer, PrimaryKeySerializer):
 
     class Meta(EquipmentSerializer.Meta):
         fields = [
-            "id",
+            "pk",
             "category_pk",
         ] + get_all_translatable_fields(EquipmentSerializer.Meta.model)
 
@@ -52,7 +52,7 @@ class EquipmentCategoryCreateSerializer(
     EquipmentCategorySerializer, PrimaryKeySerializer
 ):
     class Meta(EquipmentCategorySerializer.Meta):
-        fields = ["id"] + get_all_translatable_fields(EquipmentSerializer.Meta.model)
+        fields = ["pk"] + get_all_translatable_fields(EquipmentSerializer.Meta.model)
 
     def validate(self, data):
         name_fi = data.get("name_fi", getattr(self.instance, "name_fi", None))
@@ -127,7 +127,7 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
 
     class Meta(ReservationUnitSerializer.Meta):
         fields = [
-            "id",
+            "pk",
             "spaces",
             "resources",
             "services",

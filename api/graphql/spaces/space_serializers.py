@@ -47,7 +47,7 @@ class SpaceCreateSerializer(SpaceSerializer, PrimaryKeySerializer):
 
     class Meta(SpaceSerializer.Meta):
         fields = [
-            "id",
+            "pk",
             "parent_pk",
             "building_pk",
             "surface_area",

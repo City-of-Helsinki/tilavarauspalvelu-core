@@ -102,7 +102,7 @@ class CreateSpaceTestCase(SpaceMutationBaseTestCase):
         return """
         mutation createSpace($input: SpaceCreateMutationInput!) {
             createSpace(input: $input) {
-                id
+                pk
                 errors {
                   field
                   messages
@@ -119,7 +119,7 @@ class CreateSpaceTestCase(SpaceMutationBaseTestCase):
         assert_that(content.get("errors")).is_none()
         assert_that(content["data"]["createSpace"]["errors"]).is_none()
         assert_that(
-            Space.objects.filter(id=content["data"]["createSpace"]["id"]).exists()
+            Space.objects.filter(id=content["data"]["createSpace"]["pk"]).exists()
         ).is_true()
 
     def test_no_name_fi_errors(self):
@@ -170,7 +170,7 @@ class UpdateSpaceTestCase(SpaceMutationBaseTestCase):
         return """
         mutation updateSpace($input: SpaceUpdateMutationInput!) {
             updateSpace(input: $input) {
-                id
+                pk
                 errors {
                   field
                   messages
@@ -187,7 +187,7 @@ class UpdateSpaceTestCase(SpaceMutationBaseTestCase):
         assert_that(content.get("errors")).is_none()
         assert_that(content["data"]["updateSpace"]["errors"]).is_none()
         assert_that(
-            Space.objects.get(id=content["data"]["updateSpace"]["id"]).name_en
+            Space.objects.get(id=content["data"]["updateSpace"]["pk"]).name_en
         ).is_equal_to("SpaceName")
 
     def test_empty_name_fi_errors(self):

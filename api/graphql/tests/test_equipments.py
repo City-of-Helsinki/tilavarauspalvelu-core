@@ -24,7 +24,7 @@ class EquipmentCreateTestCase(EquipmentBaseTestCase):
             mutation createEquipment($input: EquipmentCreateMutationInput!) {
                 createEquipment(input: $input) {
                     nameFi
-                    id
+                    pk
                     errors {
                         messages
                         field
@@ -38,7 +38,7 @@ class EquipmentCreateTestCase(EquipmentBaseTestCase):
         response = self.query(self.get_create_query(), input_data=data)
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
-        assert_that(content.get("data").get("createEquipment").get("id")).is_not_none()
+        assert_that(content.get("data").get("createEquipment").get("pk")).is_not_none()
 
     def test_regular_user_cannot_create(self):
         self._client.force_login(self.regular_joe)
@@ -142,7 +142,7 @@ class EquipmentCategoryCreateTestCase(EquipmentBaseTestCase):
             mutation createEquipmentCategory($input: EquipmentCategoryCreateMutationInput!) {
                 createEquipmentCategory(input: $input) {
                     nameFi
-                    id
+                    pk
                     errors {
                         messages
                         field
@@ -157,7 +157,7 @@ class EquipmentCategoryCreateTestCase(EquipmentBaseTestCase):
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
         assert_that(
-            content.get("data").get("createEquipmentCategory").get("id")
+            content.get("data").get("createEquipmentCategory").get("pk")
         ).is_not_none()
 
     def test_empty_name_errors(self):
@@ -168,7 +168,7 @@ class EquipmentCategoryCreateTestCase(EquipmentBaseTestCase):
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
         assert_that(
-            content.get("data").get("createEquipmentCategory").get("id")
+            content.get("data").get("createEquipmentCategory").get("pk")
         ).is_none()
         assert_that(
             content.get("data").get("createEquipmentCategory").get("errors")

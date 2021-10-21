@@ -22,7 +22,6 @@ class UnitUpdateSerializer(UnitSerializer, PrimaryKeyUpdateSerializer):
 
     class Meta(UnitSerializer.Meta):
         fields = [
-            "id",
             "pk",
             "tprek_id",
             "web_page",

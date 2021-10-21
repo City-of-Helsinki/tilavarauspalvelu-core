@@ -131,7 +131,7 @@ class ResourceCreateForPublishGraphQLTestCase(ResourceGraphQLBase):
     def get_create_query(self):
         return (
             "mutation createResource($input: ResourceCreateMutationInput!) "
-            "{createResource(input: $input){id errors{messages field}}}"
+            "{createResource(input: $input){pk errors{messages field}}}"
         )
 
     def get_valid_input_data(self):
@@ -264,7 +264,7 @@ class ResourceCreateAsDraftGraphQLTestCase(ResourceGraphQLBase):
     def get_create_query(self):
         return (
             "mutation createResource($input: ResourceCreateMutationInput!) "
-            "{createResource(input: $input){id errors{messages}}}"
+            "{createResource(input: $input){pk errors{messages}}}"
         )
 
     def get_valid_input_data(self):
@@ -292,8 +292,8 @@ class ResourceCreateAsDraftGraphQLTestCase(ResourceGraphQLBase):
         assert_that(Resource.objects.exclude(id=self.resource.id).count()).is_equal_to(
             1
         )
-        res_id = content.get("data").get("createResource").get("id")
-        assert_that(Resource.objects.get(id=res_id))
+        res_pk = content.get("data").get("createResource").get("pk")
+        assert_that(Resource.objects.get(pk=res_pk))
 
     def test_created_when_missing_name_translation(self):
         data = self.get_valid_input_data()
@@ -309,8 +309,8 @@ class ResourceCreateAsDraftGraphQLTestCase(ResourceGraphQLBase):
         assert_that(Resource.objects.exclude(id=self.resource.id).count()).is_equal_to(
             1
         )
-        res_id = content.get("data").get("createResource").get("id")
-        assert_that(Resource.objects.get(id=res_id))
+        res_pk = content.get("data").get("createResource").get("pk")
+        assert_that(Resource.objects.get(pk=res_pk))
 
     def test_created_when_missing_description_translation(self):
         data = self.get_valid_input_data()
@@ -326,8 +326,8 @@ class ResourceCreateAsDraftGraphQLTestCase(ResourceGraphQLBase):
         assert_that(Resource.objects.exclude(id=self.resource.id).count()).is_equal_to(
             1
         )
-        res_id = content.get("data").get("createResource").get("id")
-        assert_that(Resource.objects.get(id=res_id))
+        res_pk = content.get("data").get("createResource").get("pk")
+        assert_that(Resource.objects.get(pk=res_pk))
 
     def test_created_when_no_space_and_fixed_location(self):
         data = self.get_valid_input_data()
@@ -343,8 +343,8 @@ class ResourceCreateAsDraftGraphQLTestCase(ResourceGraphQLBase):
         assert_that(Resource.objects.exclude(id=self.resource.id).count()).is_equal_to(
             1
         )
-        res_id = content.get("data").get("createResource").get("id")
-        assert_that(Resource.objects.get(id=res_id))
+        res_pk = content.get("data").get("createResource").get("pk")
+        assert_that(Resource.objects.get(pk=res_pk))
 
     def test_regular_user_cannot_create(self):
         self._client.force_login(self.regular_joe)
@@ -373,7 +373,7 @@ class ResourceUpdateForPublishGraphQLTestCase(ResourceGraphQLBase):
     def get_update_query(self):
         return (
             "mutation updateResource($input: ResourceUpdateMutationInput!) "
-            "{updateResource(input: $input){id errors{messages}}}"
+            "{updateResource(input: $input){pk errors{messages}}}"
         )
 
     def get_valid_input_data(self):

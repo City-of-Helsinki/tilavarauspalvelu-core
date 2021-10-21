@@ -25,7 +25,7 @@ class UnitType(AuthNode, PrimaryKeyObjectType):
     class Meta:
         model = Unit
         fields = [
-            "id",
+            "pk",
             "tprek_id",
             "web_page",
             "email",
@@ -59,7 +59,7 @@ class UnitByPkType(UnitType, OpeningHoursMixin):
     class Meta:
         model = Unit
         fields = [
-            "id",
+            "pk",
             "tprek_id",
             "web_page",
             "email",

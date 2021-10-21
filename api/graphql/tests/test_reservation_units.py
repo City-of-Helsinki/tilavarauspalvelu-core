@@ -808,7 +808,7 @@ class ReservationUnitCreateAsDraftTestCase(ReservationUnitMutationsTestCaseBase)
         return """
         mutation createReservationUnit($input: ReservationUnitCreateMutationInput!) {
             createReservationUnit(input: $input){
-                id
+                pk
                 errors {
                     messages field
                 }
@@ -833,7 +833,7 @@ class ReservationUnitCreateAsDraftTestCase(ReservationUnitMutationsTestCaseBase)
 
         res_unit = ReservationUnit.objects.first()
         assert_that(res_unit).is_not_none()
-        assert_that(res_unit.id).is_equal_to(res_unit_data.get("id"))
+        assert_that(res_unit.id).is_equal_to(res_unit_data.get("pk"))
 
     def test_create_errors_without_unit_pk(self):
         data = {"isDraft": True, "nameFi": "Resunit name"}
@@ -875,7 +875,7 @@ class ReservationUnitCreateAsDraftTestCase(ReservationUnitMutationsTestCaseBase)
 
         res_unit = ReservationUnit.objects.first()
         assert_that(res_unit).is_not_none()
-        assert_that(res_unit.id).is_equal_to(res_unit_data.get("id"))
+        assert_that(res_unit.id).is_equal_to(res_unit_data.get("pk"))
 
     def test_create_without_is_draft_with_name_and_unit_fails(self):
         data = {
@@ -909,7 +909,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         return """
         mutation createReservationUnit($input: ReservationUnitCreateMutationInput!) {
             createReservationUnit(input: $input){
-                id
+                pk
                 errors {
                     messages field
                 }
@@ -954,7 +954,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         res_unit = ReservationUnit.objects.first()
         assert_that(res_unit).is_not_none()
         assert_that(res_unit.is_draft).is_false()
-        assert_that(res_unit.id).is_equal_to(res_unit_data.get("id"))
+        assert_that(res_unit.id).is_equal_to(res_unit_data.get("pk"))
         assert_that(res_unit.name_fi).is_equal_to(data.get("nameFi"))
         assert_that(res_unit.name_en).is_equal_to(data.get("nameEn"))
         assert_that(res_unit.name_sv).is_equal_to(data.get("nameSv"))
@@ -1172,7 +1172,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
 
         res_unit = ReservationUnit.objects.first()
         assert_that(res_unit).is_not_none()
-        assert_that(res_unit.id).is_equal_to(res_unit_data.get("id"))
+        assert_that(res_unit.id).is_equal_to(res_unit_data.get("pk"))
         assert_that(list(res_unit.spaces.all().values_list("id", flat=True))).is_in(
             data.get("spacePks")
         )
@@ -1191,7 +1191,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
 
         res_unit = ReservationUnit.objects.first()
         assert_that(res_unit).is_not_none()
-        assert_that(res_unit.id).is_equal_to(res_unit_data.get("id"))
+        assert_that(res_unit.id).is_equal_to(res_unit_data.get("pk"))
         assert_that(list(res_unit.purposes.all().values_list("id", flat=True))).is_in(
             data.get("purposePks")
         )
@@ -1219,7 +1219,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
 
         res_unit = ReservationUnit.objects.first()
         assert_that(res_unit).is_not_none()
-        assert_that(res_unit.id).is_equal_to(res_unit_data.get("id"))
+        assert_that(res_unit.id).is_equal_to(res_unit_data.get("pk"))
         assert_that(list(res_unit.services.all().values_list("id", flat=True))).is_in(
             data.get("servicePks")
         )
@@ -1247,7 +1247,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
 
         res_unit = ReservationUnit.objects.first()
         assert_that(res_unit).is_not_none()
-        assert_that(res_unit.id).is_equal_to(res_unit_data.get("id"))
+        assert_that(res_unit.id).is_equal_to(res_unit_data.get("pk"))
         assert_that(list(res_unit.resources.all().values_list("id", flat=True))).is_in(
             data.get("resourcePks")
         )
@@ -1266,7 +1266,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
 
         res_unit = ReservationUnit.objects.first()
         assert_that(res_unit).is_not_none()
-        assert_that(res_unit.id).is_equal_to(res_unit_data.get("id"))
+        assert_that(res_unit.id).is_equal_to(res_unit_data.get("pk"))
         assert_that(list(res_unit.equipments.all().values_list("id", flat=True))).is_in(
             data.get("equipmentPks")
         )
@@ -1307,7 +1307,7 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
         return """
             mutation updateReservationUnit($input: ReservationUnitUpdateMutationInput!) {
                 updateReservationUnit(input: $input){
-                    id
+                    pk
                     errors {
                         messages field
                     }
@@ -1395,7 +1395,7 @@ class ReservationUnitUpdateNotDraftTestCase(ReservationUnitMutationsTestCaseBase
         return """
         mutation updateReservationUnit($input: ReservationUnitUpdateMutationInput!) {
             updateReservationUnit(input: $input){
-                id
+                pk
                 errors {
                     messages field
                 }
