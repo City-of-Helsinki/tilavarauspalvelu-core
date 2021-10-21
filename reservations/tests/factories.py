@@ -2,7 +2,7 @@ from datetime import datetime
 
 from factory import post_generation
 from factory.django import DjangoModelFactory
-from factory.fuzzy import FuzzyChoice, FuzzyDateTime, FuzzyInteger
+from factory.fuzzy import FuzzyChoice, FuzzyDateTime, FuzzyInteger, FuzzyText
 from pytz import UTC
 
 from applications.models import PRIORITIES
@@ -17,6 +17,9 @@ class RecurringReservationFactory(DjangoModelFactory):
 class ReservationFactory(DjangoModelFactory):
     class Meta:
         model = "reservations.Reservation"
+
+    name = FuzzyText()
+    description = FuzzyText()
 
     state = FuzzyChoice(
         choices=(
