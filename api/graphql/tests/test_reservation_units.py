@@ -174,7 +174,7 @@ class ReservationUnitTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
 
     @override_settings(HAUKI_ORIGIN_ID="1234", HAUKI_API_URL="url")
     @mock.patch("opening_hours.utils.opening_hours_client.get_opening_hours")
-    @mock.patch("opening_hours.hours.make_hauki_request")
+    @mock.patch("opening_hours.hours.make_hauki_get_request")
     def test_opening_hours(self, mock_periods, mock_opening_times):
         mock_opening_times.return_value = get_mocked_opening_hours(
             self.reservation_unit.uuid

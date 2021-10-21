@@ -68,7 +68,7 @@ def get_mocked_periods():
 
 
 @override_settings(HAUKI_ORIGIN_ID="1234", HAUKI_API_URL="url")
-@mock.patch("opening_hours.hours.make_hauki_request")
+@mock.patch("opening_hours.hours.make_hauki_get_request")
 def test_get_periods_for_resource_when_periods(mock):
     mock.return_value = get_mocked_periods()
     data = get_periods_for_resource("1234")
@@ -78,7 +78,7 @@ def test_get_periods_for_resource_when_periods(mock):
 
 
 @override_settings(HAUKI_ORIGIN_ID="1234", HAUKI_API_URL="url")
-@mock.patch("opening_hours.hours.make_hauki_request")
+@mock.patch("opening_hours.hours.make_hauki_get_request")
 def test_get_periods_for_resource_when_empty(mock):
     mock.return_value = []
     data = get_periods_for_resource("1234")
