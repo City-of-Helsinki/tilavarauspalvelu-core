@@ -1,9 +1,13 @@
 from logging import getLogger
+from typing import List, Optional
+from urllib.parse import urljoin
 
 import requests
+from django.conf import settings
 from django.contrib.gis.geos import Point
 from django.db import transaction
 
+from opening_hours.hauki_request import make_hauki_get_request
 from spaces.models import Location, Unit
 
 logger = getLogger(__name__)
@@ -42,6 +46,7 @@ class UnitImporter:
             "web_page": "www_fi",
             "email": "email",
             "phone": "phone",
+            "tprek_department_id": "dept_id",
         },
         "location": {
             "address_street": "street_address_fi",
@@ -64,6 +69,7 @@ class UnitImporter:
             "address_city": None,
             "lat": None,
             "lon": None,
+            "tprek_department_id": None,
         },
     }
 
@@ -73,10 +79,13 @@ class UnitImporter:
         if field_map:
             self.field_map = field_map
 
+        self.imported_unit_ids = []
+
     @transaction.atomic
-    def import_units(self):
+    def import_units(self, import_hauki_resource_id=False):
         self.creation_counter = 0
         self.update_counter = 0
+        self.import_hauki_resource_ids = import_hauki_resource_id
 
         resp = requests.get(self.url)
         resp.raise_for_status()
@@ -92,6 +101,12 @@ class UnitImporter:
         logger.info(
             "Created %s\nUpdated %s" % (self.creation_counter, self.update_counter)
         )
+        if self.import_hauki_resource_ids:
+            hauki_importer = UnitHaukiResourceIdImporter()
+            logger.info("Importing from Hauki...")
+            hauki_importer.import_hauki_resource_ids_for_units(
+                unit_ids=self.imported_unit_ids
+            )
 
     def _update_counters(self, created: bool):
         if created:
@@ -131,4 +146,61 @@ class UnitImporter:
             unit=unit, defaults=location_data
         )
 
+        self.imported_unit_ids.append(unit.id)
+
         return unit_created
+
+
+class UnitHaukiResourceIdImporter:
+    @transaction.atomic
+    def import_hauki_resource_ids_for_units(
+        self,
+        unit_ids: Optional[List[int]] = None,
+        tprek_ids: Optional[List[str]] = None,
+    ):
+        if not unit_ids and not tprek_ids:
+            raise ValueError("Either unit_ids or tprek_ids is required.")
+
+        if unit_ids:
+            units = Unit.objects.filter(id__in=unit_ids)
+        else:
+            units = Unit.objects.filter(tprek_id__in=tprek_ids)
+
+        url = settings.HAUKI_API_URL
+        url = urljoin(url, "/v1/resource/")
+
+        logger.info(f"Importing units {units} resource ids from url {url}")
+
+        params = {
+            "data_source": "tprek",
+            "origin_id_exists": True,
+            "page_size": 50000,
+        }
+
+        self.resource_id_map = {}
+        counter = 0
+
+        def read_response(counter):
+            counter += 1
+            logger.info(f"Fetching from hauki. Page number: {counter}")
+            for resource in data["results"]:
+                for origin in resource["origins"]:
+                    if origin["data_source"]["id"] == "tprek":
+                        self.resource_id_map[origin["origin_id"]] = resource["id"]
+            return counter
+
+        next = url
+        while next:
+            data = make_hauki_get_request(next, params)
+            counter = read_response(counter)
+            next = data.get("next", False)
+
+        resource_ids_updated = []
+        for unit in units:
+            resource_id = self.resource_id_map.get(unit.tprek_id)
+            if resource_id:
+                unit.hauki_resource_id = resource_id
+                unit.save()
+                resource_ids_updated.append(unit.tprek_id)
+
+        print(f"Updated resource ids for {len(resource_ids_updated)} units.")
