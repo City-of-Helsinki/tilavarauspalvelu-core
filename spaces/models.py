@@ -86,6 +86,9 @@ class Unit(models.Model):
         blank=True,
         null=True,  # If some units needs to be created manually.
     )
+    tprek_department_id = models.CharField(
+        verbose_name=_("TPREK department id"), max_length=255, blank=True, null=True
+    )
     name = models.CharField(verbose_name=_("Name"), max_length=255)
     description = models.TextField(
         verbose_name=_("Description"), max_length=255, blank=True, default=""
@@ -99,15 +102,19 @@ class Unit(models.Model):
     email = models.EmailField(verbose_name=_("Email"), blank=True, max_length=255)
     phone = models.CharField(verbose_name=_("Telephone"), blank=True, max_length=255)
 
+    hauki_resource_id = models.CharField(
+        verbose_name=_("Hauki resource id"), max_length=255, blank=True, null=True
+    )
+
     def __str__(self):
         return self.name
 
     @property
-    def hauki_resource_id(self):
+    def hauki_resource_origin_id(self):
         return self.tprek_id
 
     @property
-    def hauki_resource_origin_id(self):
+    def hauki_resource_data_source_id(self):
         return "tprek"
 
 

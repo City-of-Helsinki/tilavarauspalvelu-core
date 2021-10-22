@@ -257,11 +257,11 @@ class ReservationUnit(models.Model):
         ).distinct()
 
     @property
-    def hauki_resource_id(self):
+    def hauki_resource_origin_id(self):
         return str(self.uuid)
 
     @property
-    def hauki_resource_origin_id(self):
+    def hauki_resource_data_source_id(self):
         return settings.HAUKI_ORIGIN_ID
 
 
