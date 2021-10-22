@@ -174,13 +174,19 @@ def test_getting_reservation_calendar(
         io.BytesIO(b"".join(response.streaming_content)).read().decode("utf-8")
     )
 
+    expected_summary = "SUMMARY:" + reservation.get_ical_summary().replace("\n", "\\n")
+    expected_description = "DESCRIPTION:" + reservation.get_ical_description().replace(
+        "\n", "\\n"
+    )
     expected_start = (
         f"DTSTART;VALUE=DATE-TIME:{reservation.begin.strftime('%Y%m%dT%H%M%SZ')}"
     )
     unexpected_start = f"DTSTART;VALUE=DATE-TIME:{reservation_in_second_unit.begin.strftime('%Y%m%dT%H%M%SZ')}"
 
-    assert_that(expected_start in zip_content).is_true()
-    assert_that(unexpected_start in zip_content).is_false()
+    assert_that(zip_content).contains(expected_summary)
+    assert_that(zip_content).contains(expected_description)
+    assert_that(zip_content).contains(expected_start)
+    assert_that(zip_content).does_not_contain(unexpected_start)
 
 
 @pytest.mark.django_db
