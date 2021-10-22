@@ -12,14 +12,14 @@ from spaces.models import Building, District, Location, RealEstate, Space
 class DistrictType(PrimaryKeyObjectType):
     class Meta:
         model = District
-        fields = ["id"] + get_all_translatable_fields(model)
+        fields = ["pk"] + get_all_translatable_fields(model)
         interfaces = (graphene.relay.Node,)
 
 
 class RealEstateType(PrimaryKeyObjectType):
     class Meta:
         model = RealEstate
-        fields = ["id", "district", "surface_area"] + get_all_translatable_fields(model)
+        fields = ["pk", "district", "surface_area"] + get_all_translatable_fields(model)
         interfaces = (graphene.relay.Node,)
 
 
@@ -30,7 +30,7 @@ class BuildingType(PrimaryKeyObjectType):
     class Meta:
         model = Building
         fields = [
-            "id",
+            "pk",
             "district",
             "real_estate",
             "surface_area",
@@ -49,7 +49,7 @@ class SpaceType(AuthNode, PrimaryKeyObjectType):
     class Meta:
         model = Space
         fields = [
-            "id",
+            "pk",
             "parent",
             "building",
             "surface_area",

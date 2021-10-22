@@ -4,6 +4,7 @@ from api.graphql.base_serializers import (
     PrimaryKeySerializer,
     PrimaryKeyUpdateSerializer,
 )
+from api.graphql.primary_key_fields import IntegerPrimaryKeyField
 from api.graphql.translate_fields import get_all_translatable_fields
 from api.reservation_units_api import (
     EquipmentCategorySerializer,
@@ -12,20 +13,25 @@ from api.reservation_units_api import (
 )
 from reservation_units.models import (
     Equipment,
+    EquipmentCategory,
     Purpose,
     ReservationUnit,
     ReservationUnitType,
 )
 from resources.models import Resource
 from services.models import Service
-from spaces.models import Space
+from spaces.models import Space, Unit
 
 
 class EquipmentCreateSerializer(EquipmentSerializer, PrimaryKeySerializer):
+    category_pk = IntegerPrimaryKeyField(
+        queryset=EquipmentCategory.objects.all(), source="category"
+    )
+
     class Meta(EquipmentSerializer.Meta):
         fields = [
-            "id",
-            "category_id",
+            "pk",
+            "category_pk",
         ] + get_all_translatable_fields(EquipmentSerializer.Meta.model)
 
     def validate(self, data):
@@ -46,7 +52,7 @@ class EquipmentCategoryCreateSerializer(
     EquipmentCategorySerializer, PrimaryKeySerializer
 ):
     class Meta(EquipmentCategorySerializer.Meta):
-        fields = ["id"] + get_all_translatable_fields(EquipmentSerializer.Meta.model)
+        fields = ["pk"] + get_all_translatable_fields(EquipmentSerializer.Meta.model)
 
     def validate(self, data):
         name_fi = data.get("name_fi", getattr(self.instance, "name_fi", None))
@@ -85,22 +91,43 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
     max_reservation_duration = serializers.DurationField(required=False)
     min_reservation_duration = serializers.DurationField(required=False)
     max_persons = serializers.IntegerField(required=False)
-    space_ids = serializers.ListField(source="spaces", required=False)
-    resource_ids = serializers.ListField(source="resources", required=False)
-    purpose_ids = serializers.ListField(source="purposes", required=False)
-    equipment_ids = serializers.ListField(source="equipments", required=False)
-    service_ids = serializers.ListField(source="services", required=False)
-    reservation_unit_type_id = serializers.PrimaryKeyRelatedField(
+    space_pks = serializers.ListField(
+        child=IntegerPrimaryKeyField(queryset=Space.objects.all()),
+        source="spaces",
+        required=False,
+    )
+    resource_pks = serializers.ListField(
+        child=IntegerPrimaryKeyField(queryset=Resource.objects.all()),
+        source="resources",
+        required=False,
+    )
+    purpose_pks = serializers.ListField(
+        child=IntegerPrimaryKeyField(queryset=Purpose.objects.all()),
+        source="purposes",
+        required=False,
+    )
+    equipment_pks = serializers.ListField(
+        child=IntegerPrimaryKeyField(queryset=Equipment.objects.all()),
+        source="equipments",
+        required=False,
+    )
+    service_pks = serializers.ListField(
+        child=IntegerPrimaryKeyField(queryset=Service.objects.all()),
+        source="services",
+        required=False,
+    )
+    reservation_unit_type_pk = IntegerPrimaryKeyField(
         source="reservation_unit_type",
         required=False,
         queryset=ReservationUnitType.objects.all(),
     )
+    unit_pk = IntegerPrimaryKeyField(queryset=Unit.objects.all(), source="unit")
 
     translation_fields = get_all_translatable_fields(ReservationUnit)
 
     class Meta(ReservationUnitSerializer.Meta):
         fields = [
-            "id",
+            "pk",
             "spaces",
             "resources",
             "services",
@@ -111,22 +138,30 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
             "max_persons",
             "reservation_unit_type",
             "building",
-            "equipment_ids",
-            "unit_id",
+            "equipment_pks",
+            "unit_pk",
             "uuid",
             "max_reservation_duration",
             "min_reservation_duration",
             "is_draft",
-            "space_ids",
-            "resource_ids",
-            "purpose_ids",
-            "service_ids",
-            "reservation_unit_type_id",
+            "space_pks",
+            "resource_pks",
+            "purpose_pks",
+            "service_pks",
+            "reservation_unit_type_pk",
             "surface_area",
             "buffer_time_between_reservations",
         ] + get_all_translatable_fields(ReservationUnit)
 
-    def _check_id_list(self, id_list, field_name):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["equipment_pks"].write_only = True
+        self.fields["space_pks"].write_only = True
+        self.fields["resource_pks"].write_only = True
+        self.fields["purpose_pks"].write_only = True
+        self.fields["service_pks"].write_only = True
+
+    def _check_pk_list(self, id_list, field_name):
         for identifier in id_list:
             try:
                 int(identifier)
@@ -149,31 +184,6 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
                 )
 
         return data
-
-    def validate_space_ids(self, data):
-        self._check_id_list(data, "space_ids")
-        spaces = Space.objects.filter(id__in=data)
-        return spaces
-
-    def validate_resource_ids(self, data):
-        self._check_id_list(data, "resource_ids")
-        resources = Resource.objects.filter(id__in=data)
-        return resources
-
-    def validate_purpose_ids(self, data):
-        self._check_id_list(data, "purpose_ids")
-        purposes = Purpose.objects.filter(id__in=data)
-        return purposes
-
-    def validate_equipment_ids(self, data):
-        self._check_id_list(data, "equipment_ids")
-        equipments = Equipment.objects.filter(id__in=data)
-        return equipments
-
-    def validate_service_ids(self, data):
-        self._check_id_list(data, "service_ids")
-        services = Service.objects.filter(id__in=data)
-        return services
 
     def validate_for_publish(self, data):
         """Validates necessary fields for published reservation unit."""
@@ -206,7 +216,7 @@ class ReservationUnitUpdateSerializer(
 ):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["unit_id"].required = False
+        self.fields["unit_pk"].required = False
 
     class Meta(ReservationUnitCreateSerializer.Meta):
         fields = ReservationUnitCreateSerializer.Meta.fields + ["pk"]

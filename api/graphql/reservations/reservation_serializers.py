@@ -5,6 +5,7 @@ from api.graphql.base_serializers import (
     PrimaryKeySerializer,
     PrimaryKeyUpdateSerializer,
 )
+from api.graphql.primary_key_fields import IntegerPrimaryKeyField
 from reservation_units.models import ReservationUnit
 from reservation_units.utils.reservation_unit_reservation_scheduler import (
     ReservationUnitReservationScheduler,
@@ -13,7 +14,10 @@ from reservations.models import STATE_CHOICES, Reservation
 
 
 class ReservationCreateSerializer(PrimaryKeySerializer):
-    reservation_unit_ids = serializers.ListField(source="reservation_unit")
+    reservation_unit_pks = serializers.ListField(
+        child=IntegerPrimaryKeyField(queryset=ReservationUnit.objects.all()),
+        source="reservation_unit",
+    )
     priority = serializers.IntegerField()
 
     class Meta:
@@ -25,8 +29,12 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
             "end",
             "buffer_time_before",
             "buffer_time_after",
-            "reservation_unit_ids",
+            "reservation_unit_pks",
         ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["reservation_unit_pks"].write_only = True
 
     def validate(self, data):
         begin = data.get("begin", getattr(self.instance, "begin", None))
@@ -35,8 +43,10 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
         reservation_units = data.get(
             "reservation_unit", getattr(self.instance, "reservation_unit", None)
         )
+        if hasattr(reservation_units, "all"):
+            reservation_units = reservation_units.all()
 
-        for reservation_unit in reservation_units.all():
+        for reservation_unit in reservation_units:
             if reservation_unit.check_reservation_overlap(begin, end, self.instance):
                 raise serializers.ValidationError(
                     "Overlapping reservations are not allowed."
@@ -129,11 +139,6 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
                 "Reservation unit buffer time between reservations overlaps with current end time."
             )
 
-    def validate_reservation_unit_ids(self, data):
-        self._check_id_list(data, "space_ids")
-        reservation_units = ReservationUnit.objects.filter(id__in=data)
-        return reservation_units
-
     @property
     def validated_data(self):
         validated_data = super().validated_data
@@ -157,7 +162,7 @@ class ReservationUpdateSerializer(
         self.fields["end"].required = False
         self.fields["buffer_time_before"].required = False
         self.fields["buffer_time_after"].required = False
-        self.fields["reservation_unit_ids"].required = False
+        self.fields["reservation_unit_pks"].required = False
 
     def validate(self, data):
         if self.instance.state not in (STATE_CHOICES.CREATED, STATE_CHOICES.REQUESTED):

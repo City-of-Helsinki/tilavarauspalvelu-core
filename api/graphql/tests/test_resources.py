@@ -131,7 +131,7 @@ class ResourceCreateForPublishGraphQLTestCase(ResourceGraphQLBase):
     def get_create_query(self):
         return (
             "mutation createResource($input: ResourceCreateMutationInput!) "
-            "{createResource(input: $input){id errors{messages field}}}"
+            "{createResource(input: $input){pk errors{messages field}}}"
         )
 
     def get_valid_input_data(self):
@@ -142,7 +142,7 @@ class ResourceCreateForPublishGraphQLTestCase(ResourceGraphQLBase):
             "nameFi": "fina",
             "nameEn": "enna",
             "nameSv": "svna",
-            "spaceId": self.space.id,
+            "spacePk": self.space.id,
             "locationType": Resource.LOCATION_FIXED,
         }
 
@@ -194,7 +194,7 @@ class ResourceCreateForPublishGraphQLTestCase(ResourceGraphQLBase):
 
     def test_validation_error_when_no_space_and_fixed_location(self):
         data = self.get_valid_input_data()
-        data.pop("spaceId")
+        data.pop("spacePk")
         response = self.query(
             self.get_create_query(),
             input_data=data,
@@ -210,7 +210,7 @@ class ResourceCreateForPublishGraphQLTestCase(ResourceGraphQLBase):
 
     def test_created_when_no_space_and_movable_location(self):
         data = self.get_valid_input_data()
-        data.pop("spaceId")
+        data.pop("spacePk")
         data["locationType"] = Resource.LOCATION_MOVABLE
         response = self.query(
             self.get_create_query(),
@@ -264,7 +264,7 @@ class ResourceCreateAsDraftGraphQLTestCase(ResourceGraphQLBase):
     def get_create_query(self):
         return (
             "mutation createResource($input: ResourceCreateMutationInput!) "
-            "{createResource(input: $input){id errors{messages}}}"
+            "{createResource(input: $input){pk errors{messages}}}"
         )
 
     def get_valid_input_data(self):
@@ -275,7 +275,7 @@ class ResourceCreateAsDraftGraphQLTestCase(ResourceGraphQLBase):
             "nameFi": "fina",
             "nameEn": "enna",
             "nameSv": "svna",
-            "spaceId": self.space.id,
+            "spacePk": self.space.id,
             "locationType": Resource.LOCATION_FIXED,
             "isDraft": True,
         }
@@ -292,8 +292,8 @@ class ResourceCreateAsDraftGraphQLTestCase(ResourceGraphQLBase):
         assert_that(Resource.objects.exclude(id=self.resource.id).count()).is_equal_to(
             1
         )
-        res_id = content.get("data").get("createResource").get("id")
-        assert_that(Resource.objects.get(id=res_id))
+        res_pk = content.get("data").get("createResource").get("pk")
+        assert_that(Resource.objects.get(pk=res_pk))
 
     def test_created_when_missing_name_translation(self):
         data = self.get_valid_input_data()
@@ -309,8 +309,8 @@ class ResourceCreateAsDraftGraphQLTestCase(ResourceGraphQLBase):
         assert_that(Resource.objects.exclude(id=self.resource.id).count()).is_equal_to(
             1
         )
-        res_id = content.get("data").get("createResource").get("id")
-        assert_that(Resource.objects.get(id=res_id))
+        res_pk = content.get("data").get("createResource").get("pk")
+        assert_that(Resource.objects.get(pk=res_pk))
 
     def test_created_when_missing_description_translation(self):
         data = self.get_valid_input_data()
@@ -326,12 +326,12 @@ class ResourceCreateAsDraftGraphQLTestCase(ResourceGraphQLBase):
         assert_that(Resource.objects.exclude(id=self.resource.id).count()).is_equal_to(
             1
         )
-        res_id = content.get("data").get("createResource").get("id")
-        assert_that(Resource.objects.get(id=res_id))
+        res_pk = content.get("data").get("createResource").get("pk")
+        assert_that(Resource.objects.get(pk=res_pk))
 
     def test_created_when_no_space_and_fixed_location(self):
         data = self.get_valid_input_data()
-        data.pop("spaceId")
+        data.pop("spacePk")
         response = self.query(
             self.get_create_query(),
             input_data=self.get_valid_input_data(),
@@ -343,8 +343,8 @@ class ResourceCreateAsDraftGraphQLTestCase(ResourceGraphQLBase):
         assert_that(Resource.objects.exclude(id=self.resource.id).count()).is_equal_to(
             1
         )
-        res_id = content.get("data").get("createResource").get("id")
-        assert_that(Resource.objects.get(id=res_id))
+        res_pk = content.get("data").get("createResource").get("pk")
+        assert_that(Resource.objects.get(pk=res_pk))
 
     def test_regular_user_cannot_create(self):
         self._client.force_login(self.regular_joe)
@@ -373,7 +373,7 @@ class ResourceUpdateForPublishGraphQLTestCase(ResourceGraphQLBase):
     def get_update_query(self):
         return (
             "mutation updateResource($input: ResourceUpdateMutationInput!) "
-            "{updateResource(input: $input){id errors{messages}}}"
+            "{updateResource(input: $input){pk errors{messages}}}"
         )
 
     def get_valid_input_data(self):
@@ -385,7 +385,7 @@ class ResourceUpdateForPublishGraphQLTestCase(ResourceGraphQLBase):
             "nameFi": "fina",
             "nameEn": "enna",
             "nameSv": "svna",
-            "spaceId": self.space.id,
+            "spacePk": self.space.id,
             "locationType": Resource.LOCATION_FIXED,
         }
 
@@ -426,7 +426,7 @@ class ResourceUpdateForPublishGraphQLTestCase(ResourceGraphQLBase):
 
     def test_validation_error_when_try_to_null_space_and_fixed_location(self):
         data = self.get_valid_input_data()
-        data["spaceId"] = ""
+        data["spacePk"] = None
         response = self.query(self.get_update_query(), input_data=data)
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
@@ -438,7 +438,7 @@ class ResourceUpdateForPublishGraphQLTestCase(ResourceGraphQLBase):
 
     def test_space_not_in_data_and_fixed_location_space_not_nulled(self):
         data = self.get_valid_input_data()
-        data.pop("spaceId")
+        data.pop("spacePk")
         response = self.query(self.get_update_query(), input_data=data)
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
@@ -449,7 +449,7 @@ class ResourceUpdateForPublishGraphQLTestCase(ResourceGraphQLBase):
 
     def test_update_space_null_and_location_movable(self):
         data = self.get_valid_input_data()
-        data["spaceId"] = ""
+        data["spacePk"] = None
         data["locationType"] = Resource.LOCATION_MOVABLE
         response = self.query(self.get_update_query(), input_data=data)
         assert_that(response.status_code).is_equal_to(200)
@@ -493,7 +493,7 @@ class ResourceUpdateForPublishGraphQLTestCase(ResourceGraphQLBase):
         )
 
     def test_partial_update_fails_when_removing_space_from_fixed_location(self):
-        data = {"pk": self.resource.pk, "spaceId": ""}
+        data = {"pk": self.resource.pk, "spacePk": None}
         response = self.query(self.get_update_query(), input_data=data)
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
@@ -566,7 +566,7 @@ class ResourceUpdateAsDraftGraphQLTestCase(ResourceGraphQLBase):
 
     def test_updated_when_no_space_and_fixed_location(self):
         data = self.get_valid_input_data()
-        data["spaceId"] = ""
+        data["spacePk"] = None
         response = self.query(self.get_update_query(), input_data=data)
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)

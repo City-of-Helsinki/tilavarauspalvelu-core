@@ -20,7 +20,7 @@ class ResourceType(AuthNode, PrimaryKeyObjectType):
     class Meta:
         model = Resource
         fields = [
-            "id",
+            "pk",
             "location_type",
             "space",
             "buffer_time_before",

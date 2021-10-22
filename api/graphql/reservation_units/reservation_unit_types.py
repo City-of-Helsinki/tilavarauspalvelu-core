@@ -49,7 +49,7 @@ from spaces.models import Space
 class KeywordType(AuthNode, PrimaryKeyObjectType):
     class Meta:
         model = Keyword
-        fields = ["id", "pk"] + get_all_translatable_fields(model)
+        fields = ["pk"] + get_all_translatable_fields(model)
         filter_fields = ["name_fi", "name_sv", "name_en"]
         interfaces = (graphene.relay.Node,)
 
@@ -60,7 +60,7 @@ class KeywordGroupType(AuthNode, PrimaryKeyObjectType):
 
     class Meta:
         model = KeywordGroup
-        fields = ["id", "pk"] + get_all_translatable_fields(model)
+        fields = ["pk"] + get_all_translatable_fields(model)
         filter_fields = ["name_fi", "name_sv", "name_en"]
         interfaces = (graphene.relay.Node,)
 
@@ -73,7 +73,7 @@ class KeywordCategoryType(AuthNode, PrimaryKeyObjectType):
 
     class Meta:
         model = KeywordCategory
-        fields = ["id", "pk"] + get_all_translatable_fields(model)
+        fields = ["pk"] + get_all_translatable_fields(model)
         filter_fields = ["name_fi", "name_sv", "name_en"]
         interfaces = (graphene.relay.Node,)
 
@@ -88,7 +88,7 @@ class PurposeType(AuthNode, PrimaryKeyObjectType):
 
     class Meta:
         model = Purpose
-        fields = ["id"] + get_all_translatable_fields(model)
+        fields = ["pk"] + get_all_translatable_fields(model)
         filter_fields = ["name_fi", "name_en", "name_sv"]
         interfaces = (graphene.relay.Node,)
 
@@ -143,7 +143,7 @@ class ReservationUnitImageType(DjangoObjectType):
 class ReservationUnitTypeType(PrimaryKeyObjectType):
     class Meta:
         model = ReservationUnitTypeModel
-        fields = ["id"] + get_all_translatable_fields(model)
+        fields = ["pk"] + get_all_translatable_fields(model)
 
         interfaces = (graphene.relay.Node,)
 
@@ -157,7 +157,7 @@ class EquipmentCategoryType(AuthNode, PrimaryKeyObjectType):
 
     class Meta:
         model = EquipmentCategory
-        fields = ["id"] + get_all_translatable_fields(model)
+        fields = ["pk"] + get_all_translatable_fields(model)
 
         filter_fields = {
             "name_fi": ["exact", "icontains", "istartswith"],
@@ -176,7 +176,7 @@ class EquipmentType(AuthNode, PrimaryKeyObjectType):
 
     class Meta:
         model = Equipment
-        fields = ["id"] + get_all_translatable_fields(model)
+        fields = ["pk"] + get_all_translatable_fields(model)
 
         filter_fields = {
             "name_fi": ["exact", "icontains", "istartswith"],
@@ -224,7 +224,6 @@ class ApplicationRoundType(AuthNode, PrimaryKeyObjectType):
 
 
 class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
-    pk = graphene.Int()
     name_fi = graphene.String()
     name_sv = graphene.String()
     name_en = graphene.String()
@@ -259,7 +258,6 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
     class Meta:
         model = ReservationUnit
         fields = [
-            "id",
             "spaces",
             "resources",
             "services",
@@ -389,7 +387,7 @@ class ReservationUnitByPkType(ReservationUnitType, OpeningHoursMixin):
     class Meta:
         model = ReservationUnit
         fields = [
-            "id",
+            "pk",
             "spaces",
             "resources",
             "services",

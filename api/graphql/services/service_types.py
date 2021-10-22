@@ -12,7 +12,7 @@ class ServiceType(PrimaryKeyObjectType):
     class Meta:
         model = Service
         fields = [
-            "id",
+            "pk",
             "service_type",
             "buffer_time_before",
             "buffer_time_after",

@@ -78,7 +78,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
             "end": (datetime.datetime.now() + datetime.timedelta(hours=1)).strftime(
                 "%Y%m%dT%H%M%SZ"
             ),
-            "reservationUnitIds": [self.reservation_unit.pk],
+            "reservationUnitPks": [self.reservation_unit.pk],
         }
 
     def test_creating_reservation_succeed(self, mock_periods, mock_opening_hours):
