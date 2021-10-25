@@ -140,6 +140,13 @@ class ReservationQuerySet(models.QuerySet):
 class Reservation(models.Model):
     objects = ReservationQuerySet.as_manager()
 
+    name = models.CharField(
+        verbose_name=_("Name"), max_length=255, blank=True, default=""
+    )
+    description = models.CharField(
+        verbose_name=_("Description"), max_length=255, blank=True, default=""
+    )
+
     state = models.CharField(
         max_length=32,
         choices=STATE_CHOICES.STATE_CHOICES,
@@ -185,23 +192,39 @@ class Reservation(models.Model):
     )
 
     def get_location_string(self):
-        locations = [
-            reservation_unit.get_location().__str__()
-            for reservation_unit in self.reservation_unit.all()
-        ]
-        return f"{','.join(locations)}"
+        locations = []
+        for reservation_unit in self.reservation_unit.all():
+            location = reservation_unit.get_location()
+            if location is not None:
+                locations.append(str(location))
+        return f"{', '.join(locations)}"
+
+    def get_ical_summary(self) -> str:
+        if self.name:
+            return self.name
+        if self.recurring_reservation is not None:
+            return self.recurring_reservation.application_event.name
+        return ""
 
     def get_ical_description(self):
+        reservation_units = self.reservation_unit.all()
+        unit_names = [
+            reservation_unit.unit.name
+            for reservation_unit in reservation_units
+            if hasattr(reservation_unit, "unit")
+        ]
+
         if self.recurring_reservation is None:
-            return None
+            return (
+                f"{self.description}\n"
+                f"{', '.join([reservation_unit.name for reservation_unit in reservation_units])}\n"
+                f"{', '.join(unit_names)}\n"
+                f"{self.reservation_unit.unit if hasattr(self.reservation_unit, 'unit') else ''}"
+            )
+
         application = self.recurring_reservation.application
 
         application_event = self.recurring_reservation.application_event
-        unit_names = [
-            reservation_unit.unit.name
-            for reservation_unit in self.reservation_unit.all()
-            if hasattr(reservation_unit, "unit")
-        ]
         organisation = application.organisation
         contact_person = application.contact_person
 
@@ -214,8 +237,9 @@ class Reservation(models.Model):
         return (
             f"{applicant_name}\n"
             f"{application_event.name}\n"
-            f"{','.join([reservation_unit.name for reservation_unit in self.reservation_unit.all()])}\n"
-            f"{','.join(unit_names)}\n"
+            f"{self.description}\n"
+            f"{', '.join([reservation_unit.name for reservation_unit in reservation_units])}\n"
+            f"{', '.join(unit_names)}\n"
             f"{self.reservation_unit.unit if hasattr(self.reservation_unit, 'unit') else ''}"
         )
 

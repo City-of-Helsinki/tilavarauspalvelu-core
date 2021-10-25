@@ -245,7 +245,12 @@ def reservation(reservation_unit, user) -> Reservation:
     begin_time = timezone.datetime(2021, 12, 1, 0, 0, 0).astimezone()
     end_time = begin_time + datetime.timedelta(hours=1)
     reservation = Reservation.objects.create(
-        begin=begin_time, end=end_time, state="created", user=user
+        name="Test reservation",
+        description="Test description",
+        begin=begin_time,
+        end=end_time,
+        state="created",
+        user=user,
     )
     reservation.reservation_unit.set([reservation_unit])
     return reservation

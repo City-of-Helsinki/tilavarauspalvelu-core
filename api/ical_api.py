@@ -213,12 +213,7 @@ def export_reservation_unit_events(
 
 def export_reservation_events(reservation: Reservation, site_name: str, cal: Calendar):
     ical_event = Event()
-    ical_event.add(
-        "summary",
-        reservation.recurring_reservation.application_event.name
-        if reservation.recurring_reservation
-        else "",
-    )
+    ical_event.add("summary", reservation.get_ical_summary())
     ical_event.add("dtstart", reservation.begin)
     ical_event.add("dtend", reservation.end)
     ical_event.add("dtstamp", datetime.datetime.now())
