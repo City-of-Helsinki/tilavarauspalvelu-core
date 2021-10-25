@@ -10,6 +10,7 @@ from django.contrib.auth import get_user_model
 from django.utils.timezone import get_default_timezone
 
 from api.graphql.tests.base import GrapheneTestCaseBase
+from applications.models import PRIORITY_CONST
 from applications.tests.factories import ApplicationRoundFactory
 from opening_hours.enums import State
 from opening_hours.hours import TimeElement
@@ -73,7 +74,6 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
 
     def get_valid_input_data(self):
         return {
-            "priority": 100,
             "begin": datetime.datetime.now().strftime("%Y%m%dT%H%M%SZ"),
             "end": (datetime.datetime.now() + datetime.timedelta(hours=1)).strftime(
                 "%Y%m%dT%H%M%SZ"
@@ -98,6 +98,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         assert_that(reservation).is_not_none()
         assert_that(reservation.user).is_equal_to(self.regular_joe)
         assert_that(reservation.state).is_equal_to(STATE_CHOICES.CREATED)
+        assert_that(reservation.priority).is_equal_to(PRIORITY_CONST.PRIORITY_MEDIUM)
 
     def test_creating_reservation_with_pk_fails(self, mock_periods, mock_opening_hours):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
@@ -352,7 +353,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
             "Reservation duration less than one or more reservation unit's minimum duration."
         )
 
-    def test_update_fails_when_not_logged_in(self, mock_periods, mock_opening_hours):
+    def test_create_fails_when_not_logged_in(self, mock_periods, mock_opening_hours):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         response = self.query(
             self.get_create_query(), input_data=self.get_valid_input_data()

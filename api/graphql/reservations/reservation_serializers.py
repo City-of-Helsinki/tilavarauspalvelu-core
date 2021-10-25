@@ -18,7 +18,7 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
         child=IntegerPrimaryKeyField(queryset=ReservationUnit.objects.all()),
         source="reservation_unit",
     )
-    priority = serializers.IntegerField()
+    priority = serializers.IntegerField(required=False)
 
     class Meta:
         model = Reservation
