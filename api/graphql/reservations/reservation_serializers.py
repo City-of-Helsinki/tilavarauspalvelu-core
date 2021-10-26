@@ -14,6 +14,7 @@ from reservations.models import STATE_CHOICES, Reservation
 
 
 class ReservationCreateSerializer(PrimaryKeySerializer):
+    state = serializers.CharField()
     reservation_unit_pks = serializers.ListField(
         child=IntegerPrimaryKeyField(queryset=ReservationUnit.objects.all()),
         source="reservation_unit",
@@ -28,6 +29,7 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
             "reservee_phone",
             "name",
             "description",
+            "state",
             "priority",
             "begin",
             "end",
@@ -38,6 +40,7 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields["state"].read_only = True
         self.fields["reservation_unit_pks"].write_only = True
 
     def validate(self, data):
