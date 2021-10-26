@@ -83,7 +83,7 @@ const SpaceHead = ({
               <Prop $disabled={!unit}>
                 <IconLocation />{" "}
                 {unit ? (
-                  <Link to={`/unit/${unit?.pk}`}>{unit?.name}</Link>
+                  <Link to={`/unit/${unit?.pk}`}>{unit?.nameFi}</Link>
                 ) : (
                   t("SpaceEditor.noUnit")
                 )}

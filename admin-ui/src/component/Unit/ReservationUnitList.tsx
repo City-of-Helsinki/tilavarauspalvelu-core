@@ -26,7 +26,7 @@ const getFilterConfig = (units: ReservationUnitType[]): DataFilterConfig[] => {
     {
       title: "ReservationUnitList.typeFilter",
       filters: types.map((value) => ({
-        title: value?.name || "",
+        title: value?.nameFi || "",
         key: "reservationUnitType.pk",
         value: value?.pk as number,
       })),

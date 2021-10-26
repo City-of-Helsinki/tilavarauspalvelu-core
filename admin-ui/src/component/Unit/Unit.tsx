@@ -215,7 +215,7 @@ const Unit = (): JSX.Element | null => {
         <Ingress>
           <Image src="https://tilavaraus.hel.fi/v1/media/reservation_unit_images/liikumistila2.jfif.250x250_q85_crop.jpg" />
           <div>
-            <Name>{unit?.name}</Name>
+            <Name>{unit?.nameFi}</Name>
             {unit?.location ? (
               <Address>{parseAddress(unit?.location)}</Address>
             ) : (

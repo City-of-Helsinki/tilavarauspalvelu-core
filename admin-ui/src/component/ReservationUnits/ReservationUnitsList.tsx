@@ -12,7 +12,7 @@ import { H1 } from "../../styles/typography";
 import withMainMenu from "../withMainMenu";
 import Loader from "../Loader";
 import DataTable, { CellConfig } from "../DataTable";
-import { localizedValue } from "../../common/util";
+import { localizedPropValue } from "../../common/util";
 import { BasicLink, Strong } from "../../styles/util";
 import { RESERVATION_UNITS_QUERY } from "../../common/queries";
 import {
@@ -44,19 +44,22 @@ const getCellConfig = (
     cols: [
       {
         title: t("ReservationUnits.headings.name"),
-        key: "name",
-        transform: ({ name }: ReservationUnitType) => (
-          <Strong>{localizedValue(name, language)}</Strong>
+        key: "nameFi",
+        transform: ({ nameFi }: ReservationUnitType) => (
+          <Strong>{nameFi}</Strong>
         ),
       },
       {
         title: t("ReservationUnits.headings.unitName"),
-        key: "unit.name",
-        transform: ({ unit }: ReservationUnitType) => unit?.name || "?",
+        key: "unit.nameFi",
+        transform: (resUnit: ReservationUnitType) =>
+          localizedPropValue(resUnit, "unit.name", language),
       },
       {
         title: t("ReservationUnits.headings.district"),
-        key: "unit.district.name",
+        key: "unit.district.nameFi",
+        transform: (resUnit: ReservationUnitType) =>
+          localizedPropValue(resUnit, "unit.district.name", language),
       },
       {
         title: t("ReservationUnits.headings.reservationUnitType"),
@@ -69,7 +72,9 @@ const getCellConfig = (
               justifyContent: "space-between",
             }}
           >
-            <span>{reservationUnitType?.name || "?"}</span>
+            <span>
+              {localizedPropValue(reservationUnitType, "name", language)}
+            </span>
             <IconArrowRight />
           </div>
         ),
@@ -124,7 +129,7 @@ const getFilterConfig = (
 ): DataFilterConfig[] => {
   const types = uniq(
     reservationUnits.map(
-      (reservationUnit) => reservationUnit.reservationUnitType?.name
+      (reservationUnit) => reservationUnit.reservationUnitType?.nameFi
     )
   ).filter((n) => Boolean(n));
 

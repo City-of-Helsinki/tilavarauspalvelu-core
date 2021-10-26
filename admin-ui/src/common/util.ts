@@ -1,6 +1,7 @@
 import { format, parseISO } from "date-fns";
 import i18next from "i18next";
 import trim from "lodash/trim";
+import upperFirst from "lodash/upperFirst";
 import get from "lodash/get";
 import {
   AllocationResult,
@@ -287,6 +288,15 @@ export const localizedValue = (
   return name[lang as LocalizationLanguages] || "???";
 };
 
+export const localizedPropValue = (
+  // eslint-disable-next-line
+  o: any,
+  propName: string,
+  lang: string
+): string => {
+  return get(o, `${propName}${upperFirst(lang)}`, "???");
+};
+
 interface IAgeGroups {
   minimum?: number;
   maximum?: number;
@@ -300,8 +310,14 @@ export const parseAgeGroups = (ageGroups: IAgeGroups): string => {
 
 export const parseAddress = (location: Location | LocationType): string => {
   return trim(
-    `${location.addressStreet || ""}, ${location.addressZip || ""} ${
-      location.addressCity || ""
+    `${
+      (location as Location).addressStreet ||
+      (location as LocationType).addressStreetFi ||
+      ""
+    }, ${(location as Location).addressZip || ""} ${
+      (location as Location).addressCity ||
+      (location as LocationType).addressCityFi ||
+      ""
     }`,
     ", "
   );
@@ -320,13 +336,25 @@ export const isTranslationObject = (value: unknown): boolean => {
 export const parseAddressLine1 = (
   location: Location | LocationType
 ): string => {
-  return trim(`${location.addressStreet || ""}`);
+  return trim(
+    `${
+      (location as Location).addressStreet ||
+      (location as LocationType).addressStreetFi ||
+      ""
+    }`
+  );
 };
 
 export const parseAddressLine2 = (
   location: Location | LocationType
 ): string => {
-  return trim(`${location.addressZip || ""} ${location.addressCity || ""}`);
+  return trim(
+    `${location.addressZip || ""} ${
+      (location as Location).addressCity ||
+      (location as LocationType).addressCityFi ||
+      ""
+    }`
+  );
 };
 
 export const filterData = <T>(data: T[], filters: DataFilterOption[]): T[] => {

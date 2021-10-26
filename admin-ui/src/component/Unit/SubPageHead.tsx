@@ -51,7 +51,7 @@ const SubPageHead = ({ title, unit }: IProps): JSX.Element => {
         <Container>
           <LocationIcon />
           <div>
-            <Name>{unit.name}</Name>
+            <Name>{unit.nameFi}</Name>
             <Label>{t("Unit.address")}</Label>:{" "}
             {unit.location ? (
               <Address>{parseAddress(unit.location)}</Address>

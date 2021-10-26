@@ -34,12 +34,64 @@ export type Scalars = {
   UUID: any;
 };
 
+/** An enumeration. */
+export enum ApplicationRoundTargetGroup {
+  /** Kaikki */
+  All = 'ALL',
+  /** Internal */
+  Internal = 'INTERNAL',
+  /** Public */
+  Public = 'PUBLIC'
+}
+
+export type ApplicationRoundType = {
+  __typename?: 'ApplicationRoundType';
+  allocating: Scalars['Boolean'];
+  applicationPeriodBegin: Scalars['DateTime'];
+  applicationPeriodEnd: Scalars['DateTime'];
+  criteriaEn?: Maybe<Scalars['String']>;
+  criteriaFi?: Maybe<Scalars['String']>;
+  criteriaSv?: Maybe<Scalars['String']>;
+  nameEn?: Maybe<Scalars['String']>;
+  nameFi?: Maybe<Scalars['String']>;
+  nameSv?: Maybe<Scalars['String']>;
+  pk?: Maybe<Scalars['Int']>;
+  publicDisplayBegin: Scalars['DateTime'];
+  publicDisplayEnd: Scalars['DateTime'];
+  purposes: PurposeTypeConnection;
+  reservationPeriodBegin: Scalars['Date'];
+  reservationPeriodEnd: Scalars['Date'];
+  reservationUnits: ReservationUnitByPkTypeConnection;
+  targetGroup: ApplicationRoundTargetGroup;
+};
+
+
+export type ApplicationRoundTypePurposesArgs = {
+  after?: Maybe<Scalars['String']>;
+  before?: Maybe<Scalars['String']>;
+  first?: Maybe<Scalars['Int']>;
+  last?: Maybe<Scalars['Int']>;
+  nameEn?: Maybe<Scalars['String']>;
+  nameFi?: Maybe<Scalars['String']>;
+  nameSv?: Maybe<Scalars['String']>;
+};
+
+
+export type ApplicationRoundTypeReservationUnitsArgs = {
+  after?: Maybe<Scalars['String']>;
+  before?: Maybe<Scalars['String']>;
+  first?: Maybe<Scalars['Int']>;
+  last?: Maybe<Scalars['Int']>;
+};
+
 export type BuildingType = Node & {
   __typename?: 'BuildingType';
   district?: Maybe<DistrictType>;
   /** The ID of the object. */
   id: Scalars['ID'];
-  name: Scalars['String'];
+  nameEn?: Maybe<Scalars['String']>;
+  nameFi?: Maybe<Scalars['String']>;
+  nameSv?: Maybe<Scalars['String']>;
   pk?: Maybe<Scalars['Int']>;
   realEstate?: Maybe<RealEstateType>;
   surfaceArea?: Maybe<Scalars['Float']>;
@@ -49,15 +101,17 @@ export type DistrictType = Node & {
   __typename?: 'DistrictType';
   /** The ID of the object. */
   id: Scalars['ID'];
-  name: Scalars['String'];
+  nameEn?: Maybe<Scalars['String']>;
+  nameFi?: Maybe<Scalars['String']>;
+  nameSv?: Maybe<Scalars['String']>;
   pk?: Maybe<Scalars['Int']>;
 };
 
 export type EquipmentCategoryCreateMutationInput = {
   clientMutationId?: Maybe<Scalars['String']>;
-  name?: Maybe<Scalars['String']>;
   nameEn?: Maybe<Scalars['String']>;
   nameFi?: Maybe<Scalars['String']>;
+  nameSv?: Maybe<Scalars['String']>;
 };
 
 export type EquipmentCategoryCreateMutationPayload = {
@@ -67,9 +121,9 @@ export type EquipmentCategoryCreateMutationPayload = {
   /** May contain more than one error for same field. */
   errors?: Maybe<Array<Maybe<ErrorType>>>;
   id?: Maybe<Scalars['Int']>;
-  name?: Maybe<Scalars['String']>;
   nameEn?: Maybe<Scalars['String']>;
   nameFi?: Maybe<Scalars['String']>;
+  nameSv?: Maybe<Scalars['String']>;
 };
 
 export type EquipmentCategoryDeleteMutationInput = {
@@ -88,7 +142,9 @@ export type EquipmentCategoryType = Node & {
   __typename?: 'EquipmentCategoryType';
   /** The ID of the object. */
   id: Scalars['ID'];
-  name: Scalars['String'];
+  nameEn?: Maybe<Scalars['String']>;
+  nameFi?: Maybe<Scalars['String']>;
+  nameSv?: Maybe<Scalars['String']>;
   pk?: Maybe<Scalars['Int']>;
 };
 
@@ -111,9 +167,9 @@ export type EquipmentCategoryTypeEdge = {
 
 export type EquipmentCategoryUpdateMutationInput = {
   clientMutationId?: Maybe<Scalars['String']>;
-  name?: Maybe<Scalars['String']>;
   nameEn?: Maybe<Scalars['String']>;
   nameFi?: Maybe<Scalars['String']>;
+  nameSv?: Maybe<Scalars['String']>;
   pk: Scalars['Int'];
 };
 
@@ -124,18 +180,18 @@ export type EquipmentCategoryUpdateMutationPayload = {
   /** May contain more than one error for same field. */
   errors?: Maybe<Array<Maybe<ErrorType>>>;
   id?: Maybe<Scalars['Int']>;
-  name?: Maybe<Scalars['String']>;
   nameEn?: Maybe<Scalars['String']>;
   nameFi?: Maybe<Scalars['String']>;
+  nameSv?: Maybe<Scalars['String']>;
   pk?: Maybe<Scalars['Int']>;
 };
 
 export type EquipmentCreateMutationInput = {
   categoryId: Scalars['String'];
   clientMutationId?: Maybe<Scalars['String']>;
-  name?: Maybe<Scalars['String']>;
   nameEn?: Maybe<Scalars['String']>;
   nameFi?: Maybe<Scalars['String']>;
+  nameSv?: Maybe<Scalars['String']>;
 };
 
 export type EquipmentCreateMutationPayload = {
@@ -146,9 +202,9 @@ export type EquipmentCreateMutationPayload = {
   /** May contain more than one error for same field. */
   errors?: Maybe<Array<Maybe<ErrorType>>>;
   id?: Maybe<Scalars['Int']>;
-  name?: Maybe<Scalars['String']>;
   nameEn?: Maybe<Scalars['String']>;
   nameFi?: Maybe<Scalars['String']>;
+  nameSv?: Maybe<Scalars['String']>;
 };
 
 export type EquipmentDeleteMutationInput = {
@@ -168,7 +224,9 @@ export type EquipmentType = Node & {
   category?: Maybe<EquipmentCategoryType>;
   /** The ID of the object. */
   id: Scalars['ID'];
-  name: Scalars['String'];
+  nameEn?: Maybe<Scalars['String']>;
+  nameFi?: Maybe<Scalars['String']>;
+  nameSv?: Maybe<Scalars['String']>;
   pk?: Maybe<Scalars['Int']>;
 };
 
@@ -192,9 +250,9 @@ export type EquipmentTypeEdge = {
 export type EquipmentUpdateMutationInput = {
   categoryId: Scalars['String'];
   clientMutationId?: Maybe<Scalars['String']>;
-  name?: Maybe<Scalars['String']>;
   nameEn?: Maybe<Scalars['String']>;
   nameFi?: Maybe<Scalars['String']>;
+  nameSv?: Maybe<Scalars['String']>;
   pk: Scalars['Int'];
 };
 
@@ -206,9 +264,9 @@ export type EquipmentUpdateMutationPayload = {
   /** May contain more than one error for same field. */
   errors?: Maybe<Array<Maybe<ErrorType>>>;
   id?: Maybe<Scalars['Int']>;
-  name?: Maybe<Scalars['String']>;
   nameEn?: Maybe<Scalars['String']>;
   nameFi?: Maybe<Scalars['String']>;
+  nameSv?: Maybe<Scalars['String']>;
   pk?: Maybe<Scalars['Int']>;
 };
 
@@ -223,7 +281,9 @@ export type KeywordCategoryType = Node & {
   /** The ID of the object. */
   id: Scalars['ID'];
   keywordGroups?: Maybe<Array<Maybe<KeywordGroupType>>>;
-  name: Scalars['String'];
+  nameEn?: Maybe<Scalars['String']>;
+  nameFi?: Maybe<Scalars['String']>;
+  nameSv?: Maybe<Scalars['String']>;
   pk?: Maybe<Scalars['Int']>;
 };
 
@@ -249,7 +309,9 @@ export type KeywordGroupType = Node & {
   /** The ID of the object. */
   id: Scalars['ID'];
   keywords?: Maybe<Array<Maybe<KeywordType>>>;
-  name: Scalars['String'];
+  nameEn?: Maybe<Scalars['String']>;
+  nameFi?: Maybe<Scalars['String']>;
+  nameSv?: Maybe<Scalars['String']>;
   pk?: Maybe<Scalars['Int']>;
 };
 
@@ -274,7 +336,9 @@ export type KeywordType = Node & {
   __typename?: 'KeywordType';
   /** The ID of the object. */
   id: Scalars['ID'];
-  name: Scalars['String'];
+  nameEn?: Maybe<Scalars['String']>;
+  nameFi?: Maybe<Scalars['String']>;
+  nameSv?: Maybe<Scalars['String']>;
   pk?: Maybe<Scalars['Int']>;
 };
 
@@ -297,8 +361,12 @@ export type KeywordTypeEdge = {
 
 export type LocationType = Node & {
   __typename?: 'LocationType';
-  addressCity: Scalars['String'];
-  addressStreet: Scalars['String'];
+  addressCityEn?: Maybe<Scalars['String']>;
+  addressCityFi?: Maybe<Scalars['String']>;
+  addressCitySv?: Maybe<Scalars['String']>;
+  addressStreetEn?: Maybe<Scalars['String']>;
+  addressStreetFi?: Maybe<Scalars['String']>;
+  addressStreetSv?: Maybe<Scalars['String']>;
   addressZip: Scalars['String'];
   /** The ID of the object. */
   id: Scalars['ID'];
@@ -455,9 +523,13 @@ export type PageInfo = {
 
 export type PeriodType = {
   __typename?: 'PeriodType';
-  description?: Maybe<TranslatedStringType>;
+  descriptionEn?: Maybe<Scalars['String']>;
+  descriptionFi?: Maybe<Scalars['String']>;
+  descriptionSv?: Maybe<Scalars['String']>;
   endDate?: Maybe<Scalars['Date']>;
-  name?: Maybe<TranslatedStringType>;
+  nameEn?: Maybe<Scalars['String']>;
+  nameFi?: Maybe<Scalars['String']>;
+  nameSv?: Maybe<Scalars['String']>;
   periodId?: Maybe<Scalars['Int']>;
   resourceState?: Maybe<Scalars['String']>;
   startDate?: Maybe<Scalars['Date']>;
@@ -466,7 +538,9 @@ export type PeriodType = {
 
 export type PurposeCreateMutationInput = {
   clientMutationId?: Maybe<Scalars['String']>;
-  name: Scalars['String'];
+  nameEn?: Maybe<Scalars['String']>;
+  nameFi?: Maybe<Scalars['String']>;
+  nameSv?: Maybe<Scalars['String']>;
 };
 
 export type PurposeCreateMutationPayload = {
@@ -474,8 +548,9 @@ export type PurposeCreateMutationPayload = {
   clientMutationId?: Maybe<Scalars['String']>;
   /** May contain more than one error for same field. */
   errors?: Maybe<Array<Maybe<ErrorType>>>;
-  id?: Maybe<Scalars['Int']>;
-  name?: Maybe<Scalars['String']>;
+  nameEn?: Maybe<Scalars['String']>;
+  nameFi?: Maybe<Scalars['String']>;
+  nameSv?: Maybe<Scalars['String']>;
   purpose?: Maybe<PurposeType>;
 };
 
@@ -483,13 +558,34 @@ export type PurposeType = Node & {
   __typename?: 'PurposeType';
   /** The ID of the object. */
   id: Scalars['ID'];
-  name: Scalars['String'];
+  nameEn?: Maybe<Scalars['String']>;
+  nameFi?: Maybe<Scalars['String']>;
+  nameSv?: Maybe<Scalars['String']>;
   pk?: Maybe<Scalars['Int']>;
+};
+
+export type PurposeTypeConnection = {
+  __typename?: 'PurposeTypeConnection';
+  /** Contains the nodes in this connection. */
+  edges: Array<Maybe<PurposeTypeEdge>>;
+  /** Pagination data for this connection. */
+  pageInfo: PageInfo;
+};
+
+/** A Relay edge containing a `PurposeType` and its cursor. */
+export type PurposeTypeEdge = {
+  __typename?: 'PurposeTypeEdge';
+  /** A cursor for use in pagination */
+  cursor: Scalars['String'];
+  /** The item at the end of the edge */
+  node?: Maybe<PurposeType>;
 };
 
 export type PurposeUpdateMutationInput = {
   clientMutationId?: Maybe<Scalars['String']>;
-  name: Scalars['String'];
+  nameEn?: Maybe<Scalars['String']>;
+  nameFi?: Maybe<Scalars['String']>;
+  nameSv?: Maybe<Scalars['String']>;
   pk: Scalars['Int'];
 };
 
@@ -498,8 +594,9 @@ export type PurposeUpdateMutationPayload = {
   clientMutationId?: Maybe<Scalars['String']>;
   /** May contain more than one error for same field. */
   errors?: Maybe<Array<Maybe<ErrorType>>>;
-  id?: Maybe<Scalars['Int']>;
-  name?: Maybe<Scalars['String']>;
+  nameEn?: Maybe<Scalars['String']>;
+  nameFi?: Maybe<Scalars['String']>;
+  nameSv?: Maybe<Scalars['String']>;
   pk?: Maybe<Scalars['Int']>;
   purpose?: Maybe<PurposeType>;
 };
@@ -517,6 +614,7 @@ export type Query = {
   keywordCategories?: Maybe<KeywordCategoryTypeConnection>;
   keywordGroups?: Maybe<KeywordGroupTypeConnection>;
   keywords?: Maybe<KeywordTypeConnection>;
+  purposes?: Maybe<PurposeTypeConnection>;
   /** The ID of the object */
   reservationUnit?: Maybe<ReservationUnitType>;
   reservationUnitByPk?: Maybe<ReservationUnitByPkType>;
@@ -551,9 +649,15 @@ export type QueryEquipmentCategoriesArgs = {
   before?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Int']>;
   last?: Maybe<Scalars['Int']>;
-  name?: Maybe<Scalars['String']>;
-  name_Icontains?: Maybe<Scalars['String']>;
-  name_Istartswith?: Maybe<Scalars['String']>;
+  nameEn?: Maybe<Scalars['String']>;
+  nameEn_Icontains?: Maybe<Scalars['String']>;
+  nameEn_Istartswith?: Maybe<Scalars['String']>;
+  nameFi?: Maybe<Scalars['String']>;
+  nameFi_Icontains?: Maybe<Scalars['String']>;
+  nameFi_Istartswith?: Maybe<Scalars['String']>;
+  nameSv?: Maybe<Scalars['String']>;
+  nameSv_Icontains?: Maybe<Scalars['String']>;
+  nameSv_Istartswith?: Maybe<Scalars['String']>;
 };
 
 
@@ -572,9 +676,15 @@ export type QueryEquipmentsArgs = {
   before?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Int']>;
   last?: Maybe<Scalars['Int']>;
-  name?: Maybe<Scalars['String']>;
-  name_Icontains?: Maybe<Scalars['String']>;
-  name_Istartswith?: Maybe<Scalars['String']>;
+  nameEn?: Maybe<Scalars['String']>;
+  nameEn_Icontains?: Maybe<Scalars['String']>;
+  nameEn_Istartswith?: Maybe<Scalars['String']>;
+  nameFi?: Maybe<Scalars['String']>;
+  nameFi_Icontains?: Maybe<Scalars['String']>;
+  nameFi_Istartswith?: Maybe<Scalars['String']>;
+  nameSv?: Maybe<Scalars['String']>;
+  nameSv_Icontains?: Maybe<Scalars['String']>;
+  nameSv_Istartswith?: Maybe<Scalars['String']>;
 };
 
 
@@ -583,7 +693,9 @@ export type QueryKeywordCategoriesArgs = {
   before?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Int']>;
   last?: Maybe<Scalars['Int']>;
-  name?: Maybe<Scalars['String']>;
+  nameEn?: Maybe<Scalars['String']>;
+  nameFi?: Maybe<Scalars['String']>;
+  nameSv?: Maybe<Scalars['String']>;
 };
 
 
@@ -592,7 +704,9 @@ export type QueryKeywordGroupsArgs = {
   before?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Int']>;
   last?: Maybe<Scalars['Int']>;
-  name?: Maybe<Scalars['String']>;
+  nameEn?: Maybe<Scalars['String']>;
+  nameFi?: Maybe<Scalars['String']>;
+  nameSv?: Maybe<Scalars['String']>;
 };
 
 
@@ -601,7 +715,20 @@ export type QueryKeywordsArgs = {
   before?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Int']>;
   last?: Maybe<Scalars['Int']>;
-  name?: Maybe<Scalars['String']>;
+  nameEn?: Maybe<Scalars['String']>;
+  nameFi?: Maybe<Scalars['String']>;
+  nameSv?: Maybe<Scalars['String']>;
+};
+
+
+export type QueryPurposesArgs = {
+  after?: Maybe<Scalars['String']>;
+  before?: Maybe<Scalars['String']>;
+  first?: Maybe<Scalars['Int']>;
+  last?: Maybe<Scalars['Int']>;
+  nameEn?: Maybe<Scalars['String']>;
+  nameFi?: Maybe<Scalars['String']>;
+  nameSv?: Maybe<Scalars['String']>;
 };
 
 
@@ -623,6 +750,7 @@ export type QueryReservationUnitsArgs = {
   last?: Maybe<Scalars['Int']>;
   maxPersonsGte?: Maybe<Scalars['Float']>;
   maxPersonsLte?: Maybe<Scalars['Float']>;
+  purposes?: Maybe<Scalars['ID']>;
   reservationUnitType?: Maybe<Scalars['ID']>;
   textSearch?: Maybe<Scalars['String']>;
   unit?: Maybe<Scalars['ID']>;
@@ -644,9 +772,15 @@ export type QueryResourcesArgs = {
   before?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Int']>;
   last?: Maybe<Scalars['Int']>;
-  name?: Maybe<Scalars['String']>;
-  name_Icontains?: Maybe<Scalars['String']>;
-  name_Istartswith?: Maybe<Scalars['String']>;
+  nameEn?: Maybe<Scalars['String']>;
+  nameEn_Icontains?: Maybe<Scalars['String']>;
+  nameEn_Istartswith?: Maybe<Scalars['String']>;
+  nameFi?: Maybe<Scalars['String']>;
+  nameFi_Icontains?: Maybe<Scalars['String']>;
+  nameFi_Istartswith?: Maybe<Scalars['String']>;
+  nameSv?: Maybe<Scalars['String']>;
+  nameSv_Icontains?: Maybe<Scalars['String']>;
+  nameSv_Istartswith?: Maybe<Scalars['String']>;
 };
 
 
@@ -665,9 +799,15 @@ export type QuerySpacesArgs = {
   before?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Int']>;
   last?: Maybe<Scalars['Int']>;
-  name?: Maybe<Scalars['String']>;
-  name_Icontains?: Maybe<Scalars['String']>;
-  name_Istartswith?: Maybe<Scalars['String']>;
+  nameEn?: Maybe<Scalars['String']>;
+  nameEn_Icontains?: Maybe<Scalars['String']>;
+  nameEn_Istartswith?: Maybe<Scalars['String']>;
+  nameFi?: Maybe<Scalars['String']>;
+  nameFi_Icontains?: Maybe<Scalars['String']>;
+  nameFi_Istartswith?: Maybe<Scalars['String']>;
+  nameSv?: Maybe<Scalars['String']>;
+  nameSv_Icontains?: Maybe<Scalars['String']>;
+  nameSv_Istartswith?: Maybe<Scalars['String']>;
 };
 
 
@@ -686,9 +826,15 @@ export type QueryUnitsArgs = {
   before?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Int']>;
   last?: Maybe<Scalars['Int']>;
-  name?: Maybe<Scalars['String']>;
-  name_Icontains?: Maybe<Scalars['String']>;
-  name_Istartswith?: Maybe<Scalars['String']>;
+  nameEn?: Maybe<Scalars['String']>;
+  nameEn_Icontains?: Maybe<Scalars['String']>;
+  nameEn_Istartswith?: Maybe<Scalars['String']>;
+  nameFi?: Maybe<Scalars['String']>;
+  nameFi_Icontains?: Maybe<Scalars['String']>;
+  nameFi_Istartswith?: Maybe<Scalars['String']>;
+  nameSv?: Maybe<Scalars['String']>;
+  nameSv_Icontains?: Maybe<Scalars['String']>;
+  nameSv_Istartswith?: Maybe<Scalars['String']>;
 };
 
 export type RealEstateType = Node & {
@@ -696,7 +842,9 @@ export type RealEstateType = Node & {
   district?: Maybe<DistrictType>;
   /** The ID of the object. */
   id: Scalars['ID'];
-  name: Scalars['String'];
+  nameEn?: Maybe<Scalars['String']>;
+  nameFi?: Maybe<Scalars['String']>;
+  nameSv?: Maybe<Scalars['String']>;
   pk?: Maybe<Scalars['Int']>;
   surfaceArea?: Maybe<Scalars['Float']>;
 };
@@ -773,8 +921,13 @@ export type ReservationTypeReservationUnitArgs = {
 
 export type ReservationUnitByPkType = Node & {
   __typename?: 'ReservationUnitByPkType';
-  contactInformation: Scalars['String'];
-  description: Scalars['String'];
+  applicationRounds?: Maybe<Array<Maybe<ApplicationRoundType>>>;
+  contactInformationEn?: Maybe<Scalars['String']>;
+  contactInformationFi?: Maybe<Scalars['String']>;
+  contactInformationSv?: Maybe<Scalars['String']>;
+  descriptionEn?: Maybe<Scalars['String']>;
+  descriptionFi?: Maybe<Scalars['String']>;
+  descriptionSv?: Maybe<Scalars['String']>;
   equipment?: Maybe<Array<Maybe<EquipmentType>>>;
   haukiUrl?: Maybe<ReservationUnitHaukiUrlType>;
   /** The ID of the object. */
@@ -785,20 +938,30 @@ export type ReservationUnitByPkType = Node & {
   maxPersons?: Maybe<Scalars['Int']>;
   maxReservationDuration?: Maybe<Scalars['Time']>;
   minReservationDuration?: Maybe<Scalars['Time']>;
-  name: Scalars['String'];
+  nameEn?: Maybe<Scalars['String']>;
+  nameFi?: Maybe<Scalars['String']>;
+  nameSv?: Maybe<Scalars['String']>;
   nextAvailableSlot?: Maybe<Scalars['DateTime']>;
   openingHours?: Maybe<OpeningHoursType>;
   pk?: Maybe<Scalars['Int']>;
   purposes?: Maybe<Array<Maybe<PurposeType>>>;
   requireIntroduction: Scalars['Boolean'];
   reservationUnitType?: Maybe<ReservationUnitTypeType>;
+  reservations?: Maybe<Array<Maybe<ReservationType>>>;
   resources?: Maybe<Array<Maybe<ResourceType>>>;
   services?: Maybe<Array<Maybe<ServiceType>>>;
   spaces?: Maybe<Array<Maybe<SpaceType>>>;
   surfaceArea?: Maybe<Scalars['Int']>;
-  termsOfUse?: Maybe<Scalars['String']>;
+  termsOfUseEn?: Maybe<Scalars['String']>;
+  termsOfUseFi?: Maybe<Scalars['String']>;
+  termsOfUseSv?: Maybe<Scalars['String']>;
   unit?: Maybe<UnitType>;
   uuid: Scalars['UUID'];
+};
+
+
+export type ReservationUnitByPkTypeApplicationRoundsArgs = {
+  active?: Maybe<Scalars['Boolean']>;
 };
 
 
@@ -807,6 +970,13 @@ export type ReservationUnitByPkTypeOpeningHoursArgs = {
   openingTimes?: Maybe<Scalars['Boolean']>;
   periods?: Maybe<Scalars['Boolean']>;
   startDate?: Maybe<Scalars['Date']>;
+};
+
+
+export type ReservationUnitByPkTypeReservationsArgs = {
+  from?: Maybe<Scalars['Date']>;
+  state?: Maybe<Array<Maybe<Scalars['String']>>>;
+  to?: Maybe<Scalars['Date']>;
 };
 
 export type ReservationUnitByPkTypeConnection = {
@@ -829,9 +999,9 @@ export type ReservationUnitByPkTypeEdge = {
 export type ReservationUnitCreateMutationInput = {
   bufferTimeBetweenReservations?: Maybe<Scalars['String']>;
   clientMutationId?: Maybe<Scalars['String']>;
-  /** Contact information for this reservation unit. */
-  contactInformation?: Maybe<Scalars['String']>;
-  description?: Maybe<Scalars['String']>;
+  contactInformationEn?: Maybe<Scalars['String']>;
+  contactInformationFi?: Maybe<Scalars['String']>;
+  contactInformationSv?: Maybe<Scalars['String']>;
   descriptionEn?: Maybe<Scalars['String']>;
   descriptionFi?: Maybe<Scalars['String']>;
   descriptionSv?: Maybe<Scalars['String']>;
@@ -840,7 +1010,6 @@ export type ReservationUnitCreateMutationInput = {
   maxPersons?: Maybe<Scalars['Int']>;
   maxReservationDuration?: Maybe<Scalars['String']>;
   minReservationDuration?: Maybe<Scalars['String']>;
-  name?: Maybe<Scalars['String']>;
   nameEn?: Maybe<Scalars['String']>;
   nameFi?: Maybe<Scalars['String']>;
   nameSv?: Maybe<Scalars['String']>;
@@ -852,7 +1021,9 @@ export type ReservationUnitCreateMutationInput = {
   serviceIds?: Maybe<Array<Maybe<Scalars['String']>>>;
   spaceIds?: Maybe<Array<Maybe<Scalars['String']>>>;
   surfaceArea?: Maybe<Scalars['Float']>;
-  termsOfUse?: Maybe<Scalars['String']>;
+  termsOfUseEn?: Maybe<Scalars['String']>;
+  termsOfUseFi?: Maybe<Scalars['String']>;
+  termsOfUseSv?: Maybe<Scalars['String']>;
   unitId: Scalars['String'];
 };
 
@@ -861,9 +1032,9 @@ export type ReservationUnitCreateMutationPayload = {
   bufferTimeBetweenReservations?: Maybe<Scalars['String']>;
   building?: Maybe<Scalars['String']>;
   clientMutationId?: Maybe<Scalars['String']>;
-  /** Contact information for this reservation unit. */
-  contactInformation?: Maybe<Scalars['String']>;
-  description?: Maybe<Scalars['String']>;
+  contactInformationEn?: Maybe<Scalars['String']>;
+  contactInformationFi?: Maybe<Scalars['String']>;
+  contactInformationSv?: Maybe<Scalars['String']>;
   descriptionEn?: Maybe<Scalars['String']>;
   descriptionFi?: Maybe<Scalars['String']>;
   descriptionSv?: Maybe<Scalars['String']>;
@@ -879,7 +1050,6 @@ export type ReservationUnitCreateMutationPayload = {
   maxPersons?: Maybe<Scalars['Int']>;
   maxReservationDuration?: Maybe<Scalars['String']>;
   minReservationDuration?: Maybe<Scalars['String']>;
-  name?: Maybe<Scalars['String']>;
   nameEn?: Maybe<Scalars['String']>;
   nameFi?: Maybe<Scalars['String']>;
   nameSv?: Maybe<Scalars['String']>;
@@ -901,7 +1071,9 @@ export type ReservationUnitCreateMutationPayload = {
   /** Spaces included in the reservation unit as nested related objects. */
   spaces?: Maybe<Array<Maybe<SpaceType>>>;
   surfaceArea?: Maybe<Scalars['Float']>;
-  termsOfUse?: Maybe<Scalars['String']>;
+  termsOfUseEn?: Maybe<Scalars['String']>;
+  termsOfUseFi?: Maybe<Scalars['String']>;
+  termsOfUseSv?: Maybe<Scalars['String']>;
   unitId?: Maybe<Scalars['String']>;
   uuid?: Maybe<Scalars['String']>;
 };
@@ -933,9 +1105,14 @@ export type ReservationUnitImageType = {
 
 export type ReservationUnitType = Node & {
   __typename?: 'ReservationUnitType';
+  applicationRounds?: Maybe<Array<Maybe<ApplicationRoundType>>>;
   bufferTimeBetweenReservations?: Maybe<Scalars['Float']>;
-  contactInformation: Scalars['String'];
-  description: Scalars['String'];
+  contactInformationEn?: Maybe<Scalars['String']>;
+  contactInformationFi?: Maybe<Scalars['String']>;
+  contactInformationSv?: Maybe<Scalars['String']>;
+  descriptionEn?: Maybe<Scalars['String']>;
+  descriptionFi?: Maybe<Scalars['String']>;
+  descriptionSv?: Maybe<Scalars['String']>;
   equipment?: Maybe<Array<Maybe<EquipmentType>>>;
   /** The ID of the object. */
   id: Scalars['ID'];
@@ -946,18 +1123,35 @@ export type ReservationUnitType = Node & {
   maxPersons?: Maybe<Scalars['Int']>;
   maxReservationDuration?: Maybe<Scalars['Time']>;
   minReservationDuration?: Maybe<Scalars['Time']>;
-  name: Scalars['String'];
+  nameEn?: Maybe<Scalars['String']>;
+  nameFi?: Maybe<Scalars['String']>;
+  nameSv?: Maybe<Scalars['String']>;
   pk?: Maybe<Scalars['Int']>;
   purposes?: Maybe<Array<Maybe<PurposeType>>>;
   requireIntroduction: Scalars['Boolean'];
   reservationUnitType?: Maybe<ReservationUnitTypeType>;
+  reservations?: Maybe<Array<Maybe<ReservationType>>>;
   resources?: Maybe<Array<Maybe<ResourceType>>>;
   services?: Maybe<Array<Maybe<ServiceType>>>;
   spaces?: Maybe<Array<Maybe<SpaceType>>>;
   surfaceArea?: Maybe<Scalars['Int']>;
-  termsOfUse?: Maybe<Scalars['String']>;
+  termsOfUseEn?: Maybe<Scalars['String']>;
+  termsOfUseFi?: Maybe<Scalars['String']>;
+  termsOfUseSv?: Maybe<Scalars['String']>;
   unit?: Maybe<UnitType>;
   uuid: Scalars['UUID'];
+};
+
+
+export type ReservationUnitTypeApplicationRoundsArgs = {
+  active?: Maybe<Scalars['Boolean']>;
+};
+
+
+export type ReservationUnitTypeReservationsArgs = {
+  from?: Maybe<Scalars['Date']>;
+  state?: Maybe<Array<Maybe<Scalars['String']>>>;
+  to?: Maybe<Scalars['Date']>;
 };
 
 export type ReservationUnitTypeConnection = {
@@ -981,16 +1175,18 @@ export type ReservationUnitTypeType = Node & {
   __typename?: 'ReservationUnitTypeType';
   /** The ID of the object. */
   id: Scalars['ID'];
-  name: Scalars['String'];
+  nameEn?: Maybe<Scalars['String']>;
+  nameFi?: Maybe<Scalars['String']>;
+  nameSv?: Maybe<Scalars['String']>;
   pk?: Maybe<Scalars['Int']>;
 };
 
 export type ReservationUnitUpdateMutationInput = {
   bufferTimeBetweenReservations?: Maybe<Scalars['String']>;
   clientMutationId?: Maybe<Scalars['String']>;
-  /** Contact information for this reservation unit. */
-  contactInformation?: Maybe<Scalars['String']>;
-  description?: Maybe<Scalars['String']>;
+  contactInformationEn?: Maybe<Scalars['String']>;
+  contactInformationFi?: Maybe<Scalars['String']>;
+  contactInformationSv?: Maybe<Scalars['String']>;
   descriptionEn?: Maybe<Scalars['String']>;
   descriptionFi?: Maybe<Scalars['String']>;
   descriptionSv?: Maybe<Scalars['String']>;
@@ -999,7 +1195,6 @@ export type ReservationUnitUpdateMutationInput = {
   maxPersons?: Maybe<Scalars['Int']>;
   maxReservationDuration?: Maybe<Scalars['String']>;
   minReservationDuration?: Maybe<Scalars['String']>;
-  name?: Maybe<Scalars['String']>;
   nameEn?: Maybe<Scalars['String']>;
   nameFi?: Maybe<Scalars['String']>;
   nameSv?: Maybe<Scalars['String']>;
@@ -1012,7 +1207,9 @@ export type ReservationUnitUpdateMutationInput = {
   serviceIds?: Maybe<Array<Maybe<Scalars['String']>>>;
   spaceIds?: Maybe<Array<Maybe<Scalars['String']>>>;
   surfaceArea?: Maybe<Scalars['Float']>;
-  termsOfUse?: Maybe<Scalars['String']>;
+  termsOfUseEn?: Maybe<Scalars['String']>;
+  termsOfUseFi?: Maybe<Scalars['String']>;
+  termsOfUseSv?: Maybe<Scalars['String']>;
   unitId?: Maybe<Scalars['String']>;
 };
 
@@ -1021,9 +1218,9 @@ export type ReservationUnitUpdateMutationPayload = {
   bufferTimeBetweenReservations?: Maybe<Scalars['String']>;
   building?: Maybe<Scalars['String']>;
   clientMutationId?: Maybe<Scalars['String']>;
-  /** Contact information for this reservation unit. */
-  contactInformation?: Maybe<Scalars['String']>;
-  description?: Maybe<Scalars['String']>;
+  contactInformationEn?: Maybe<Scalars['String']>;
+  contactInformationFi?: Maybe<Scalars['String']>;
+  contactInformationSv?: Maybe<Scalars['String']>;
   descriptionEn?: Maybe<Scalars['String']>;
   descriptionFi?: Maybe<Scalars['String']>;
   descriptionSv?: Maybe<Scalars['String']>;
@@ -1039,7 +1236,6 @@ export type ReservationUnitUpdateMutationPayload = {
   maxPersons?: Maybe<Scalars['Int']>;
   maxReservationDuration?: Maybe<Scalars['String']>;
   minReservationDuration?: Maybe<Scalars['String']>;
-  name?: Maybe<Scalars['String']>;
   nameEn?: Maybe<Scalars['String']>;
   nameFi?: Maybe<Scalars['String']>;
   nameSv?: Maybe<Scalars['String']>;
@@ -1062,7 +1258,9 @@ export type ReservationUnitUpdateMutationPayload = {
   /** Spaces included in the reservation unit as nested related objects. */
   spaces?: Maybe<Array<Maybe<SpaceType>>>;
   surfaceArea?: Maybe<Scalars['Float']>;
-  termsOfUse?: Maybe<Scalars['String']>;
+  termsOfUseEn?: Maybe<Scalars['String']>;
+  termsOfUseFi?: Maybe<Scalars['String']>;
+  termsOfUseSv?: Maybe<Scalars['String']>;
   unitId?: Maybe<Scalars['String']>;
   uuid?: Maybe<Scalars['String']>;
 };
@@ -1078,7 +1276,6 @@ export type ResourceCreateMutationInput = {
   descriptionSv?: Maybe<Scalars['String']>;
   isDraft?: Maybe<Scalars['Boolean']>;
   locationType?: Maybe<Scalars['String']>;
-  name?: Maybe<Scalars['String']>;
   nameEn?: Maybe<Scalars['String']>;
   nameFi?: Maybe<Scalars['String']>;
   nameSv?: Maybe<Scalars['String']>;
@@ -1101,7 +1298,6 @@ export type ResourceCreateMutationPayload = {
   id?: Maybe<Scalars['Int']>;
   isDraft?: Maybe<Scalars['Boolean']>;
   locationType?: Maybe<Scalars['String']>;
-  name?: Maybe<Scalars['String']>;
   nameEn?: Maybe<Scalars['String']>;
   nameFi?: Maybe<Scalars['String']>;
   nameSv?: Maybe<Scalars['String']>;
@@ -1135,12 +1331,16 @@ export type ResourceType = Node & {
   bufferTimeAfter?: Maybe<Scalars['Float']>;
   bufferTimeBefore?: Maybe<Scalars['Float']>;
   building?: Maybe<Array<Maybe<BuildingType>>>;
-  description: Scalars['String'];
+  descriptionEn?: Maybe<Scalars['String']>;
+  descriptionFi?: Maybe<Scalars['String']>;
+  descriptionSv?: Maybe<Scalars['String']>;
   /** The ID of the object. */
   id: Scalars['ID'];
   isDraft: Scalars['Boolean'];
   locationType: ResourceLocationType;
-  name: Scalars['String'];
+  nameEn?: Maybe<Scalars['String']>;
+  nameFi?: Maybe<Scalars['String']>;
+  nameSv?: Maybe<Scalars['String']>;
   pk?: Maybe<Scalars['Int']>;
   space?: Maybe<SpaceType>;
 };
@@ -1173,7 +1373,6 @@ export type ResourceUpdateMutationInput = {
   descriptionSv?: Maybe<Scalars['String']>;
   isDraft?: Maybe<Scalars['Boolean']>;
   locationType?: Maybe<Scalars['String']>;
-  name?: Maybe<Scalars['String']>;
   nameEn?: Maybe<Scalars['String']>;
   nameFi?: Maybe<Scalars['String']>;
   nameSv?: Maybe<Scalars['String']>;
@@ -1197,7 +1396,6 @@ export type ResourceUpdateMutationPayload = {
   id?: Maybe<Scalars['Int']>;
   isDraft?: Maybe<Scalars['Boolean']>;
   locationType?: Maybe<Scalars['String']>;
-  name?: Maybe<Scalars['String']>;
   nameEn?: Maybe<Scalars['String']>;
   nameFi?: Maybe<Scalars['String']>;
   nameSv?: Maybe<Scalars['String']>;
@@ -1223,7 +1421,9 @@ export type ServiceType = Node & {
   bufferTimeBefore?: Maybe<Scalars['String']>;
   /** The ID of the object. */
   id: Scalars['ID'];
-  name: Scalars['String'];
+  nameEn?: Maybe<Scalars['String']>;
+  nameFi?: Maybe<Scalars['String']>;
+  nameSv?: Maybe<Scalars['String']>;
   pk?: Maybe<Scalars['Int']>;
   serviceType: ServiceServiceType;
 };
@@ -1234,7 +1434,6 @@ export type SpaceCreateMutationInput = {
   /** Id of district for this space. */
   districtId?: Maybe<Scalars['String']>;
   maxPersons?: Maybe<Scalars['Int']>;
-  name?: Maybe<Scalars['String']>;
   nameEn?: Maybe<Scalars['String']>;
   nameFi: Scalars['String'];
   nameSv?: Maybe<Scalars['String']>;
@@ -1242,7 +1441,9 @@ export type SpaceCreateMutationInput = {
   parentId?: Maybe<Scalars['String']>;
   /** Surface area of the space as square meters */
   surfaceArea?: Maybe<Scalars['Float']>;
-  termsOfUse?: Maybe<Scalars['String']>;
+  termsOfUseEn?: Maybe<Scalars['String']>;
+  termsOfUseFi?: Maybe<Scalars['String']>;
+  termsOfUseSv?: Maybe<Scalars['String']>;
   unitId?: Maybe<Scalars['String']>;
 };
 
@@ -1256,7 +1457,6 @@ export type SpaceCreateMutationPayload = {
   errors?: Maybe<Array<Maybe<ErrorType>>>;
   id?: Maybe<Scalars['Int']>;
   maxPersons?: Maybe<Scalars['Int']>;
-  name?: Maybe<Scalars['String']>;
   nameEn?: Maybe<Scalars['String']>;
   nameFi?: Maybe<Scalars['String']>;
   nameSv?: Maybe<Scalars['String']>;
@@ -1265,7 +1465,9 @@ export type SpaceCreateMutationPayload = {
   space?: Maybe<SpaceType>;
   /** Surface area of the space as square meters */
   surfaceArea?: Maybe<Scalars['Float']>;
-  termsOfUse?: Maybe<Scalars['String']>;
+  termsOfUseEn?: Maybe<Scalars['String']>;
+  termsOfUseFi?: Maybe<Scalars['String']>;
+  termsOfUseSv?: Maybe<Scalars['String']>;
   unitId?: Maybe<Scalars['String']>;
 };
 
@@ -1289,12 +1491,16 @@ export type SpaceType = Node & {
   /** The ID of the object. */
   id: Scalars['ID'];
   maxPersons?: Maybe<Scalars['Int']>;
-  name: Scalars['String'];
+  nameEn?: Maybe<Scalars['String']>;
+  nameFi?: Maybe<Scalars['String']>;
+  nameSv?: Maybe<Scalars['String']>;
   parent?: Maybe<SpaceType>;
   pk?: Maybe<Scalars['Int']>;
   resources?: Maybe<Array<Maybe<ResourceType>>>;
   surfaceArea?: Maybe<Scalars['Float']>;
-  termsOfUse: Scalars['String'];
+  termsOfUseEn?: Maybe<Scalars['String']>;
+  termsOfUseFi?: Maybe<Scalars['String']>;
+  termsOfUseSv?: Maybe<Scalars['String']>;
   unit?: Maybe<UnitByPkType>;
 };
 
@@ -1321,7 +1527,6 @@ export type SpaceUpdateMutationInput = {
   /** Id of district for this space. */
   districtId?: Maybe<Scalars['String']>;
   maxPersons?: Maybe<Scalars['Int']>;
-  name?: Maybe<Scalars['String']>;
   nameEn?: Maybe<Scalars['String']>;
   nameFi?: Maybe<Scalars['String']>;
   nameSv?: Maybe<Scalars['String']>;
@@ -1330,7 +1535,9 @@ export type SpaceUpdateMutationInput = {
   pk: Scalars['Int'];
   /** Surface area of the space as square meters */
   surfaceArea?: Maybe<Scalars['Float']>;
-  termsOfUse?: Maybe<Scalars['String']>;
+  termsOfUseEn?: Maybe<Scalars['String']>;
+  termsOfUseFi?: Maybe<Scalars['String']>;
+  termsOfUseSv?: Maybe<Scalars['String']>;
   unitId?: Maybe<Scalars['String']>;
 };
 
@@ -1344,7 +1551,6 @@ export type SpaceUpdateMutationPayload = {
   errors?: Maybe<Array<Maybe<ErrorType>>>;
   id?: Maybe<Scalars['Int']>;
   maxPersons?: Maybe<Scalars['Int']>;
-  name?: Maybe<Scalars['String']>;
   nameEn?: Maybe<Scalars['String']>;
   nameFi?: Maybe<Scalars['String']>;
   nameSv?: Maybe<Scalars['String']>;
@@ -1354,41 +1560,46 @@ export type SpaceUpdateMutationPayload = {
   space?: Maybe<SpaceType>;
   /** Surface area of the space as square meters */
   surfaceArea?: Maybe<Scalars['Float']>;
-  termsOfUse?: Maybe<Scalars['String']>;
+  termsOfUseEn?: Maybe<Scalars['String']>;
+  termsOfUseFi?: Maybe<Scalars['String']>;
+  termsOfUseSv?: Maybe<Scalars['String']>;
   unitId?: Maybe<Scalars['String']>;
 };
 
 export type TimeSpanType = {
   __typename?: 'TimeSpanType';
-  description?: Maybe<TranslatedStringType>;
+  descriptionEn?: Maybe<Scalars['String']>;
+  descriptionFi?: Maybe<Scalars['String']>;
+  descriptionSv?: Maybe<Scalars['String']>;
   endTime?: Maybe<Scalars['Time']>;
   endTimeOnNextDay?: Maybe<Scalars['Boolean']>;
-  name?: Maybe<TranslatedStringType>;
+  nameEn?: Maybe<Scalars['String']>;
+  nameFi?: Maybe<Scalars['String']>;
+  nameSv?: Maybe<Scalars['String']>;
   resourceState?: Maybe<Scalars['String']>;
   startTime?: Maybe<Scalars['Time']>;
   weekdays?: Maybe<Array<Maybe<Scalars['Int']>>>;
 };
 
-export type TranslatedStringType = {
-  __typename?: 'TranslatedStringType';
-  en?: Maybe<Scalars['String']>;
-  fi?: Maybe<Scalars['String']>;
-  sv?: Maybe<Scalars['String']>;
-};
-
 export type UnitByPkType = Node & {
   __typename?: 'UnitByPkType';
-  description: Scalars['String'];
+  descriptionEn?: Maybe<Scalars['String']>;
+  descriptionFi?: Maybe<Scalars['String']>;
+  descriptionSv?: Maybe<Scalars['String']>;
   email: Scalars['String'];
   /** The ID of the object. */
   id: Scalars['ID'];
   location?: Maybe<LocationType>;
-  name: Scalars['String'];
+  nameEn?: Maybe<Scalars['String']>;
+  nameFi?: Maybe<Scalars['String']>;
+  nameSv?: Maybe<Scalars['String']>;
   openingHours?: Maybe<OpeningHoursType>;
   phone: Scalars['String'];
   pk?: Maybe<Scalars['Int']>;
   reservationUnits?: Maybe<Array<Maybe<ReservationUnitType>>>;
-  shortDescription: Scalars['String'];
+  shortDescriptionEn?: Maybe<Scalars['String']>;
+  shortDescriptionFi?: Maybe<Scalars['String']>;
+  shortDescriptionSv?: Maybe<Scalars['String']>;
   spaces?: Maybe<Array<Maybe<SpaceType>>>;
   tprekId?: Maybe<Scalars['String']>;
   webPage: Scalars['String'];
@@ -1404,16 +1615,22 @@ export type UnitByPkTypeOpeningHoursArgs = {
 
 export type UnitType = Node & {
   __typename?: 'UnitType';
-  description: Scalars['String'];
+  descriptionEn?: Maybe<Scalars['String']>;
+  descriptionFi?: Maybe<Scalars['String']>;
+  descriptionSv?: Maybe<Scalars['String']>;
   email: Scalars['String'];
   /** The ID of the object. */
   id: Scalars['ID'];
   location?: Maybe<LocationType>;
-  name: Scalars['String'];
+  nameEn?: Maybe<Scalars['String']>;
+  nameFi?: Maybe<Scalars['String']>;
+  nameSv?: Maybe<Scalars['String']>;
   phone: Scalars['String'];
   pk?: Maybe<Scalars['Int']>;
   reservationUnits?: Maybe<Array<Maybe<ReservationUnitType>>>;
-  shortDescription: Scalars['String'];
+  shortDescriptionEn?: Maybe<Scalars['String']>;
+  shortDescriptionFi?: Maybe<Scalars['String']>;
+  shortDescriptionSv?: Maybe<Scalars['String']>;
   spaces?: Maybe<Array<Maybe<SpaceType>>>;
   tprekId?: Maybe<Scalars['String']>;
   webPage: Scalars['String'];
@@ -1438,12 +1655,18 @@ export type UnitTypeEdge = {
 
 export type UnitUpdateMutationInput = {
   clientMutationId?: Maybe<Scalars['String']>;
-  description?: Maybe<Scalars['String']>;
+  descriptionEn?: Maybe<Scalars['String']>;
+  descriptionFi?: Maybe<Scalars['String']>;
+  descriptionSv?: Maybe<Scalars['String']>;
   email?: Maybe<Scalars['String']>;
-  name?: Maybe<Scalars['String']>;
+  nameEn?: Maybe<Scalars['String']>;
+  nameFi?: Maybe<Scalars['String']>;
+  nameSv?: Maybe<Scalars['String']>;
   phone?: Maybe<Scalars['String']>;
   pk: Scalars['Int'];
-  shortDescription?: Maybe<Scalars['String']>;
+  shortDescriptionEn?: Maybe<Scalars['String']>;
+  shortDescriptionFi?: Maybe<Scalars['String']>;
+  shortDescriptionSv?: Maybe<Scalars['String']>;
   tprekId?: Maybe<Scalars['String']>;
   webPage?: Maybe<Scalars['String']>;
 };
@@ -1451,15 +1674,21 @@ export type UnitUpdateMutationInput = {
 export type UnitUpdateMutationPayload = {
   __typename?: 'UnitUpdateMutationPayload';
   clientMutationId?: Maybe<Scalars['String']>;
-  description?: Maybe<Scalars['String']>;
+  descriptionEn?: Maybe<Scalars['String']>;
+  descriptionFi?: Maybe<Scalars['String']>;
+  descriptionSv?: Maybe<Scalars['String']>;
   email?: Maybe<Scalars['String']>;
   /** May contain more than one error for same field. */
   errors?: Maybe<Array<Maybe<ErrorType>>>;
   id?: Maybe<Scalars['Int']>;
-  name?: Maybe<Scalars['String']>;
+  nameEn?: Maybe<Scalars['String']>;
+  nameFi?: Maybe<Scalars['String']>;
+  nameSv?: Maybe<Scalars['String']>;
   phone?: Maybe<Scalars['String']>;
   pk?: Maybe<Scalars['Int']>;
-  shortDescription?: Maybe<Scalars['String']>;
+  shortDescriptionEn?: Maybe<Scalars['String']>;
+  shortDescriptionFi?: Maybe<Scalars['String']>;
+  shortDescriptionSv?: Maybe<Scalars['String']>;
   tprekId?: Maybe<Scalars['String']>;
   unit?: Maybe<UnitType>;
   webPage?: Maybe<Scalars['String']>;

@@ -103,7 +103,7 @@ const ReservationUnitCard = ({
         <BasicLink
           to={`/unit/${unitId}/reservationUnit/edit/${reservationUnit.pk}`}
         >
-          <H2>{reservationUnit.name}</H2>
+          <H2>{reservationUnit.nameFi}</H2>
           <IconArrowRight />
         </BasicLink>
         <ComboType>
@@ -125,7 +125,7 @@ const ReservationUnitCard = ({
           </Prop>
           <Prop $disabled={!reservationUnit.reservationUnitType}>
             <IconHome />{" "}
-            {reservationUnit.reservationUnitType?.name ||
+            {reservationUnit.reservationUnitType?.nameFi ||
               t("ReservationUnitCard.noReservationUnitType")}
           </Prop>
           <Prop $disabled={!reservationUnit.maxPersons}>

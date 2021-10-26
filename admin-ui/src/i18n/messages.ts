@@ -865,6 +865,8 @@ const translations: ITranslations = {
     errorDataHeading: ["Datavirhe"],
     minReservationDurationLabel: ["Vuoron minimikesto"],
     maxReservationDurationLabel: ["Vuoron maksimikesto"],
+    tosLabel: ["Varausyksikkökohtaiset ohjeet {{lang}}"],
+    tosPlaceholder: ["Ohjeteksti {{language}}"],
     cancel: ["Peruuta"],
     save: ["Tallenna tiedot"],
     saved: ["Tiedot tallennettu."],

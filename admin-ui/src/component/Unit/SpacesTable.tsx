@@ -11,7 +11,7 @@ import PopupMenu from "./PopupMenu";
 import Modal, { useModal as useHDSModal } from "../HDSModal";
 import NewSpaceModal from "./NewSpaceModal";
 import ConfirmationDialog, { ModalRef } from "../ConfirmationDialog";
-import { localizedValue } from "../../common/util";
+
 import {
   SpaceDeleteMutationInput,
   SpaceDeleteMutationPayload,
@@ -82,8 +82,8 @@ const SpacesTable = ({
       {
         title: "Unit.headings.name",
         key: `name.${i18n.language}`,
-        transform: ({ name }: SpaceType) => (
-          <Name>{trim(localizedValue(name, i18n.language))}</Name>
+        transform: ({ nameFi }: SpaceType) => (
+          <Name>{trim(nameFi as string)}</Name>
         ),
       },
       {
@@ -142,7 +142,7 @@ const SpacesTable = ({
                         id: "confirmation-modal",
                         open: true,
                         heading: t("SpaceTable.removeConfirmationTitle", {
-                          name: localizedValue(space.name, i18n.language),
+                          name: space.nameFi,
                         }),
                         content: t("SpaceTable.removeConfirmationMessage"),
                         acceptLabel: t("SpaceTable.removeConfirmationAccept"),
