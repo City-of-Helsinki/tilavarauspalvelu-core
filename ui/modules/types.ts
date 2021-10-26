@@ -4,6 +4,8 @@ export type TranslationObject = {
   sv?: string;
 };
 
+export type Language = "fi" | "en" | "sv";
+
 export type ApplicationRound = {
   id: number;
   name: string;
@@ -103,6 +105,11 @@ export type Parameter = {
   name?: TranslationObject | string;
   minimum?: number;
   maximum?: number;
+};
+
+export type StringParameter = {
+  id: string;
+  name?: TranslationObject | string;
 };
 
 export type Address = {

@@ -117,7 +117,7 @@ const Head = (props: HeadProps): JSX.Element => {
 
   const handleSubmit = (event: React.FormEvent | React.MouseEvent) => {
     event.preventDefault();
-    router.push(`${singleSearchPrefix}?search=${searchTerm}`);
+    router.push(`${singleSearchPrefix}?textSearch=${searchTerm}`);
   };
 
   return (

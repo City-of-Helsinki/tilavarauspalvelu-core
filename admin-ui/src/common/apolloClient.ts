@@ -40,10 +40,16 @@ const authLink = setContext((ignore, { headers }) => {
 // eslint-disable-next-line consistent-return
 const errorLink = onError(({ graphQLErrors, operation, forward }) => {
   if (graphQLErrors) {
-    const hasAuthError = Boolean(
-      // TODO is this correct indicator !?
-      graphQLErrors.find((e) => e.message.indexOf("AnonymousUser") !== -1)
-    );
+    const autherror = graphQLErrors.find((e) => {
+      return (
+        e.message !== null &&
+        (e.message.indexOf("AnonymousUser") !== -1 ||
+          e.message.indexOf("has expired") !== -1 ||
+          e.message.indexOf("too old") !== -1)
+      );
+    });
+
+    const hasAuthError = Boolean(autherror !== undefined);
 
     if (hasAuthError) {
       return fromPromise(

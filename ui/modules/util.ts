@@ -6,6 +6,7 @@ import {
   startOfWeek as dateFnsStartOfWeek,
   endOfWeek as dateFnsEndOfWeek,
   parse,
+  isValid,
 } from "date-fns";
 import { i18n } from "next-i18next";
 import { TFunction } from "i18next";
@@ -29,6 +30,7 @@ import {
   Image,
   ApplicationStatus,
   ReducedApplicationStatus,
+  StringParameter,
 } from "./types";
 import {
   QueryReservationUnitsArgs,
@@ -65,7 +67,13 @@ export const applicationRoundState = (
 
 export const parseDate = (date: string): Date => parseISO(date);
 
-const toUIDate = (date: Date): string => {
+const isValidDate = (date: Date): boolean =>
+  isValid(date) && isAfter(date, new Date("1000-01-01"));
+
+export const toUIDate = (date: Date): string => {
+  if (!date || !isValidDate(date)) {
+    return "";
+  }
   return format(date, "d.M.yyyy");
 };
 
@@ -97,6 +105,10 @@ export const uiDateToApiDate = (date: string): string => {
     return date;
   }
   return toApiDate(fromUIDate(date));
+};
+
+export const isValidDateString = (date: string): boolean => {
+  return isValidDate(parse(date, "d.M.yyyy", new Date()));
 };
 
 export const formatDuration = (duration: string): string => {
@@ -157,7 +169,7 @@ const getLabel = (
 };
 
 export const mapOptions = (
-  src: Parameter[],
+  src: Parameter[] | StringParameter[],
   emptyOptionLabel?: string,
   lang = "fi"
 ): OptionType[] => {

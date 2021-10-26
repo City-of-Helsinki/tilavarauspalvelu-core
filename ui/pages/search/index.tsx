@@ -5,18 +5,18 @@ import styled from "styled-components";
 import queryString from "query-string";
 import { useRouter } from "next/router";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import Container from "../components/common/Container";
-import Breadcrumb from "../components/common/Breadcrumb";
-import SearchForm from "../components/search/SearchForm";
-import SearchResultList from "../components/search/SearchResultList";
+import Container from "../../components/common/Container";
+import Breadcrumb from "../../components/common/Breadcrumb";
+import SearchForm from "../../components/search/SearchForm";
+import SearchResultList from "../../components/search/SearchResultList";
 import {
   getReservationUnits,
   ReservationUnitsParameters,
-} from "../modules/api";
-import { ReservationUnit } from "../modules/types";
-import { searchUrl } from "../modules/util";
-import { isBrowser, searchPrefix } from "../modules/const";
-import { CenterSpinner } from "../components/common/common";
+} from "../../modules/api";
+import { ReservationUnit } from "../../modules/types";
+import { searchUrl } from "../../modules/util";
+import { isBrowser, searchPrefix } from "../../modules/const";
+import { CenterSpinner } from "../../components/common/common";
 
 const style = {
   fontSize: "var(--fontsize-heading-l)",

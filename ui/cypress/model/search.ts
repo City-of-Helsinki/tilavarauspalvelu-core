@@ -42,7 +42,13 @@ export function inputUnit(): Cypress.Chainable<JQuery<HTMLElement>> {
 }
 
 export function inputUnitToggler(): Cypress.Chainable<JQuery<HTMLElement>> {
-  return cy.get("#unitFilter-toggle-button");
+  return cy.get("#unitFilter");
+}
+
+export function inputUnitOption(
+  value: number
+): Cypress.Chainable<JQuery<HTMLElement>> {
+  return cy.get(`#unitFilter_${value}`);
 }
 
 export function filterTags(): Cypress.Chainable<JQuery<HTMLElement>> {

@@ -13,13 +13,13 @@ import SearchForm from "../../components/single-search/SearchForm";
 import SearchResultList from "../../components/single-search/SearchResultList";
 
 import { singleSearchUrl } from "../../modules/util";
-import { isBrowser, searchPrefix } from "../../modules/const";
+import { isBrowser, singleSearchPrefix } from "../../modules/const";
 import { CenterSpinner } from "../../components/common/common";
 import { Query, QueryReservationUnitsArgs } from "../../modules/gql-types";
 
 const RESERVATION_UNITS = gql`
   query SearchReservationUnits(
-    $search: String
+    $textSearch: String
     $minPersons: Float
     $maxPersons: Float
     $unit: ID
@@ -28,7 +28,7 @@ const RESERVATION_UNITS = gql`
     $after: String
   ) {
     reservationUnits(
-      textSearch: $search
+      textSearch: $textSearch
       maxPersonsGte: $minPersons
       maxPersonsLte: $maxPersons
       reservationUnitType: $reservationUnitType
@@ -94,7 +94,7 @@ export const getServerSideProps = async ({ locale }) => {
   };
 };
 
-const Search = (): JSX.Element => {
+const SearchSingle = (): JSX.Element => {
   const { t } = useTranslation();
 
   const [values, setValues] = useState({} as Record<string, string>);
@@ -131,21 +131,26 @@ const Search = (): JSX.Element => {
       if (!isEqual(values, newValues)) {
         setValues(newValues);
       }
+      refetch(newValues);
     }
-  }, [searchParams, values]);
+  }, [searchParams, values, refetch]);
 
   const history = useRouter();
 
   const onSearch = async (criteria: QueryReservationUnitsArgs) => {
     history.replace(singleSearchUrl(criteria));
-    refetch(criteria);
   };
 
   const onRemove = (key: string[]) => {
     const newValues = key ? omit(values, key) : {};
-    setValues(newValues);
-    history.replace(singleSearchUrl(newValues));
-    refetch(newValues);
+    history.replace(
+      singleSearchUrl({
+        ...newValues,
+        // a hacky way to bypass query cache
+        textSearch:
+          !key || key.includes("textSearch") ? "" : values.textSearch || "",
+      })
+    );
   };
 
   return (
@@ -154,7 +159,7 @@ const Search = (): JSX.Element => {
         <Container>
           <Breadcrumb
             root={{ label: "singleReservations" }}
-            current={{ label: "search", linkTo: searchPrefix }}
+            current={{ label: "search", linkTo: singleSearchPrefix }}
           />
           <Heading style={style}>{t("search:single.heading")}</Heading>
           <span className="text-lg">{t("search:single.text")}</span>
@@ -187,4 +192,4 @@ const Search = (): JSX.Element => {
   );
 };
 
-export default Search;
+export default SearchSingle;
