@@ -188,3 +188,19 @@ class ReservationUpdateSerializer(
         validated_data["state"] = self.instance.state
         validated_data["user"] = self.instance.user
         return validated_data
+
+
+class ReservationConfirmSerializer(ReservationUpdateSerializer):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # All fields should be read-only, except for the lookup
+        # field (PK) which should be included in the input
+        for field in self.fields:
+            self.fields[field].read_only = True
+        self.fields["pk"].read_only = False
+
+    @property
+    def validated_data(self):
+        validated_data = super().validated_data
+        validated_data["state"] = STATE_CHOICES.CONFIRMED
+        return validated_data
