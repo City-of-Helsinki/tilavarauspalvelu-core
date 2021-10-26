@@ -19,8 +19,8 @@ import styled from "styled-components";
 import { languages } from "../../common/const";
 import {
   EquipmentType,
+  PurposeType,
   Query,
-  QueryEquipmentsArgs,
   QueryReservationUnitByPkArgs,
   QueryUnitByPkArgs,
   ReservationUnitByPkType,
@@ -74,7 +74,9 @@ type Action =
   | { type: "setSpaces"; spaces: OptionType[] }
   | { type: "setResources"; resources: OptionType[] }
   | { type: "setEquipments"; equipments: OptionType[] }
-  | { type: "equipmentsLoaded"; equipments: EquipmentType[] };
+  | { type: "setPurposes"; purposes: OptionType[] }
+  | { type: "equipmentsLoaded"; equipments: EquipmentType[] }
+  | { type: "purposesLoaded"; purposes: PurposeType[] };
 
 type ReservationUnitEditorType = {
   pk: number;
@@ -87,6 +89,7 @@ type ReservationUnitEditorType = {
   spaceIds: number[];
   resourceIds: number[];
   equipmentIds: number[];
+  purposeIds: number[];
   maxPersons: number;
   surfaceArea: number;
   requireIntroduction: boolean;
@@ -113,6 +116,7 @@ type State = {
   spaceOptions: OptionType[];
   resourceOptions: OptionType[];
   equipmentOptions: OptionType[];
+  purposeOptions: OptionType[];
   unit?: UnitByPkType;
 };
 
@@ -129,6 +133,7 @@ const getInitialState = (reservationUnitId: number, unitId: number): State => ({
   spaceOptions: [],
   equipmentOptions: [],
   resourceOptions: [],
+  purposeOptions: [],
 });
 
 const newReservationUnit = {} as ReservationUnitEditorType;
@@ -140,7 +145,8 @@ const withLoadingStatus = (state: State): State => {
     !hasError &&
     (state.spaceOptions.length === 0 ||
       state.reservationUnitEdit === null ||
-      state.equipmentOptions.length === 0);
+      state.equipmentOptions.length === 0 ||
+      state.purposeOptions.length === 0);
 
   return {
     ...state,
@@ -203,6 +209,9 @@ const reducer = (state: State, action: Action): State => {
           equipmentIds: reservationUnit?.equipment?.map((s) =>
             Number(s?.pk)
           ) as number[],
+          purposeIds: reservationUnit?.purposes?.map((s) =>
+            Number(s?.pk)
+          ) as number[],
         },
         hasChanges: false,
       });
@@ -245,6 +254,16 @@ const reducer = (state: State, action: Action): State => {
       return withLoadingStatus({
         ...state,
         equipmentOptions: action.equipments.map((e) => ({
+          label: e.nameFi as string,
+          value: e.pk as number,
+        })),
+      });
+    }
+
+    case "purposesLoaded": {
+      return withLoadingStatus({
+        ...state,
+        purposeOptions: action.purposes.map((e) => ({
           label: e.nameFi as string,
           value: e.pk as number,
         })),
@@ -297,6 +316,11 @@ const reducer = (state: State, action: Action): State => {
     case "setEquipments": {
       return modifyEditorState(state, {
         equipmentIds: action.equipments.map((ot) => ot.value as number),
+      });
+    }
+    case "setPurposes": {
+      return modifyEditorState(state, {
+        purposeIds: action.purposes.map((ot) => ot.value as number),
       });
     }
     default:
@@ -356,38 +380,23 @@ const TextInputWithPadding = styled(TextInput)`
   padding-bottom: var(--spacing-m);
 `;
 
-const getSelectedSpaces = (state: State): OptionType[] => {
-  if (!state.spaceOptions || !state.reservationUnitEdit?.spaceIds) {
+const getSelectedOptions = (
+  state: State,
+  optionsPropertyName: string,
+  valuePropName: string
+): OptionType[] => {
+  const fullPropName = `reservationUnitEdit.${valuePropName}`;
+  const options = get(state, optionsPropertyName);
+
+  if (!options || !get(state, fullPropName)) {
     return [];
   }
-
-  return state.reservationUnitEdit?.spaceIds
-    .map((space) => state.spaceOptions.find((so) => so.value === space))
-    .filter(Boolean) as OptionType[];
-};
-
-const getSelectedResources = (state: State): OptionType[] => {
-  if (!state.resourceOptions || !state.reservationUnitEdit?.resourceIds) {
-    return [];
-  }
-
-  return state.reservationUnitEdit?.resourceIds
-    .map((resourceId) =>
-      state.resourceOptions.find((so) => so.value === resourceId)
-    )
-    .filter(Boolean) as OptionType[];
-};
-
-const getSelectedEquipments = (state: State): OptionType[] => {
-  if (!state.equipmentOptions || !state.reservationUnitEdit?.equipmentIds) {
-    return [];
-  }
-
-  return state.reservationUnitEdit?.equipmentIds
-    .map((equipmentId) =>
-      state.equipmentOptions.find((so) => so.value === equipmentId)
-    )
-    .filter(Boolean) as OptionType[];
+  return (
+    get(state, fullPropName)
+      // eslint-disable-next-line
+      .map((optionId: any) => options.find((so: any) => so.value === optionId))
+      .filter(Boolean) as OptionType[]
+  );
 };
 
 const getDuration = (duration: string | undefined): string => {
@@ -462,6 +471,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
         spaceIds: state.reservationUnitEdit?.spaceIds?.map(String),
         resourceIds: state.reservationUnitEdit?.resourceIds?.map(String),
         equipmentIds: state.reservationUnitEdit?.equipmentIds?.map(String),
+        purposeIds: state.reservationUnitEdit?.purposeIds?.map(String),
         isDraft: !publish,
       },
       [
@@ -485,6 +495,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
         "maxReservationDuration",
         "minReservationDuration",
         "requireIntroduction",
+        "purposeIds",
       ]
     );
 
@@ -544,14 +555,23 @@ const ReservationUnitEditor = (): JSX.Element | null => {
     },
   });
 
-  useQuery<Query, QueryEquipmentsArgs>(RESERVATION_UNIT_EDITOR_PARAMETERS, {
-    onCompleted: ({ equipments }) => {
+  useQuery<Query>(RESERVATION_UNIT_EDITOR_PARAMETERS, {
+    onCompleted: ({ equipments, purposes }) => {
       if (equipments) {
         dispatch({
           type: "equipmentsLoaded",
           equipments: equipments?.edges.map((e) => e?.node as EquipmentType),
         });
-      } else {
+      }
+
+      if (purposes) {
+        dispatch({
+          type: "purposesLoaded",
+          purposes: purposes?.edges.map((e) => e?.node as PurposeType),
+        });
+      }
+
+      if (!equipments || !purposes) {
         onDataError(t("ReservationUnitEditor.errorEquipmentsNotAvailable"));
       }
     },
@@ -672,7 +692,9 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                       dispatch({ type: "setSpaces", spaces })
                     }
                     disabled={state.spaceOptions.length === 0}
-                    value={[...getSelectedSpaces(state)]}
+                    value={[
+                      ...getSelectedOptions(state, "spaceOptions", "spaceIds"),
+                    ]}
                   />
                   <Combobox
                     multiselect
@@ -688,7 +710,13 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                       dispatch({ type: "setResources", resources })
                     }
                     disabled={state.resourceOptions.length === 0}
-                    value={[...getSelectedResources(state)]}
+                    value={[
+                      ...getSelectedOptions(
+                        state,
+                        "resourceOptions",
+                        "resourceIds"
+                      ),
+                    ]}
                   />
                 </EditorColumns>
                 <Checkbox
@@ -750,6 +778,27 @@ const ReservationUnitEditor = (): JSX.Element | null => {
               <EditorColumns>
                 <Combobox
                   multiselect
+                  label={t("ReservationUnitEditor.purposesLabel")}
+                  placeholder={t("ReservationUnitEditor.purposesPlaceholder")}
+                  options={state.purposeOptions}
+                  clearButtonAriaLabel={t("common.clearAllSelections")}
+                  selectedItemRemoveButtonAriaLabel={t("common.removeValue")}
+                  toggleButtonAriaLabel={t("common.toggleMenu")}
+                  onChange={(purposes) =>
+                    dispatch({ type: "setPurposes", purposes })
+                  }
+                  disabled={state.resourceOptions.length === 0}
+                  value={[
+                    ...getSelectedOptions(
+                      state,
+                      "purposeOptions",
+                      "purposeIds"
+                    ),
+                  ]}
+                />
+
+                <Combobox
+                  multiselect
                   label={t("ReservationUnitEditor.equipmentsLabel")}
                   placeholder={t("ReservationUnitEditor.equipmentsPlaceholder")}
                   options={state.equipmentOptions}
@@ -759,8 +808,14 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                   onChange={(equipments) =>
                     dispatch({ type: "setEquipments", equipments })
                   }
-                  disabled={state.resourceOptions.length === 0}
-                  value={[...getSelectedEquipments(state)]}
+                  disabled={state.equipmentOptions.length === 0}
+                  value={[
+                    ...getSelectedOptions(
+                      state,
+                      "equipmentOptions",
+                      "equipmentIds"
+                    ),
+                  ]}
                 />
               </EditorColumns>
               <EditorColumns>

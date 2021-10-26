@@ -273,6 +273,15 @@ export const RESERVATION_UNIT_EDITOR_PARAMETERS = gql`
         }
       }
     }
+
+    purposes {
+      edges {
+        node {
+          pk
+          nameFi
+        }
+      }
+    }
   }
 `;
 
