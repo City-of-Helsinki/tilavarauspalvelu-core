@@ -140,6 +140,13 @@ class ReservationQuerySet(models.QuerySet):
 class Reservation(models.Model):
     objects = ReservationQuerySet.as_manager()
 
+    reservee_name = models.CharField(
+        verbose_name=_("Reservee name"), max_length=255, blank=True, default=""
+    )
+    reservee_phone = models.CharField(
+        verbose_name=_("Reservee phone"), max_length=255, blank=True, default=""
+    )
+
     name = models.CharField(
         verbose_name=_("Name"), max_length=255, blank=True, default=""
     )
