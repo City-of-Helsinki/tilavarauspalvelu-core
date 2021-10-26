@@ -166,20 +166,20 @@ function App(): JSX.Element {
               />
               <PrivateRoute path="/resources" component={ResourcesList} />
               <PrivateRoute path="/units" component={Units} />
-              <PrivateRoute path="/unit/:unitId/map" component={UnitMap} />
+              <PrivateRoute path="/unit/:unitPk/map" component={UnitMap} />
               <PrivateRoute
-                path="/unit/:unitId/spacesResources"
+                path="/unit/:unitPk/spacesResources"
                 component={SpacesResources}
               />
               <PrivateRoute
-                path="/unit/:unitId/space/edit/:spaceId"
+                path="/unit/:unitPk/space/edit/:spacePk"
                 component={SpaceEditor}
               />
               <PrivateRoute
-                path="/unit/:unitId/reservationUnit/edit/:reservationUnitId?"
+                path="/unit/:unitPk/reservationUnit/edit/:reservationUnitPk?"
                 component={ReservationUnitEditor}
               />
-              <PrivateRoute path="/unit/:unitId" component={Unit} />
+              <PrivateRoute path="/unit/:unitPk" component={Unit} />
             </Switch>
           </PageWrapper>
           {modalContent && <Modal>{modalContent}</Modal>}

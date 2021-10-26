@@ -92,7 +92,11 @@ const SpaceHead = ({
                 <IconGroup /> {maxPersons || t("SpaceEditor.noMaxPersons")}
               </Prop>
               <Prop $disabled={!surfaceArea}>
-                {`${surfaceArea} m²` || t("SpaceEditor.noSurfaceArea")}
+                {`${
+                  surfaceArea
+                    ? `${surfaceArea} m²`
+                    : t("SpaceEditor.noSurfaceArea")
+                }`}
               </Prop>
             </Props>
           </div>

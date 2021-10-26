@@ -34,7 +34,7 @@ import {
 } from "../../common/gql-types";
 
 interface IProps {
-  unitId: string;
+  unitPk: string;
 }
 
 const Wrapper = styled.div``;
@@ -160,11 +160,11 @@ const Unit = (): JSX.Element | null => {
   const [hasSpacesResources, setSpacesResources] = useState(true);
 
   const { t } = useTranslation();
-  const unitId = Number(useParams<IProps>().unitId);
+  const unitPk = Number(useParams<IProps>().unitPk);
   const history = useHistory();
 
   useQuery<Query, QueryUnitByPkArgs>(UNIT_QUERY, {
-    variables: { pk: unitId },
+    variables: { pk: unitPk },
     fetchPolicy: "network-only",
     onCompleted: ({ unitByPk }) => {
       if (unitByPk) {
@@ -196,17 +196,17 @@ const Unit = (): JSX.Element | null => {
         <LinkPrev route="/units" />
         <Links>
           <SecondaryNavigation items={[]} />
-          <BasicLink to={`/unit/${unitId}/map`}>
+          <BasicLink to={`/unit/${unitPk}/map`}>
             <IconMap style={{ marginTop: "-2px" }} /> {t("Unit.showOnMap")}
           </BasicLink>
-          <BasicLink to={`/unit/${unitId}/openingHours`}>
+          <BasicLink to={`/unit/${unitPk}/openingHours`}>
             <IconClock style={{ marginTop: "-2px" }} />{" "}
             {t("Unit.showOpeningHours")}
           </BasicLink>
-          <BasicLink to={`/unit/${unitId}/spacesResources`}>
+          <BasicLink to={`/unit/${unitPk}/spacesResources`}>
             {t("Unit.showSpacesAndResources")}
           </BasicLink>
-          <BasicLink to={`/unit/${unitId}/configuration`}>
+          <BasicLink to={`/unit/${unitPk}/configuration`}>
             {t("Unit.showConfiguration")}
           </BasicLink>
         </Links>
@@ -281,7 +281,7 @@ const Unit = (): JSX.Element | null => {
             variant="supplementary"
             iconLeft={<IconPlusCircleFill />}
             onClick={() => {
-              history.push(`/unit/${unitId}/reservationUnit/edit/`);
+              history.push(`/unit/${unitPk}/reservationUnit/edit/`);
             }}
           >
             {t("Unit.reservationUnitCreate")}
@@ -293,7 +293,7 @@ const Unit = (): JSX.Element | null => {
           reservationUnits={
             (unit?.reservationUnits as ReservationUnitType[]) || []
           }
-          unitId={unitId}
+          unitId={unitPk}
         />
       ) : (
         <ContentContainer>
