@@ -24,6 +24,8 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
         model = Reservation
         fields = [
             "pk",
+            "reservee_name",
+            "reservee_phone",
             "name",
             "description",
             "priority",
@@ -159,6 +161,8 @@ class ReservationUpdateSerializer(
 ):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields["reservee_name"].required = False
+        self.fields["reservee_phone"].required = False
         self.fields["name"].required = False
         self.fields["description"].required = False
         self.fields["priority"].required = False
