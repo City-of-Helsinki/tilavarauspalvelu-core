@@ -74,7 +74,8 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
 
     def get_valid_input_data(self):
         return {
-            "reserveeName": "Test reservee",
+            "reserveeFirstName": "John",
+            "reserveeLastName": "Doe",
             "reserveePhone": "+358123456789",
             "name": "Test reservation",
             "description": "Test description",
@@ -102,7 +103,12 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         assert_that(reservation.user).is_equal_to(self.regular_joe)
         assert_that(reservation.state).is_equal_to(STATE_CHOICES.CREATED)
         assert_that(reservation.priority).is_equal_to(PRIORITY_CONST.PRIORITY_MEDIUM)
-        assert_that(reservation.reservee_name).is_equal_to(input_data["reserveeName"])
+        assert_that(reservation.reservee_first_name).is_equal_to(
+            input_data["reserveeFirstName"]
+        )
+        assert_that(reservation.reservee_last_name).is_equal_to(
+            input_data["reserveeLastName"]
+        )
         assert_that(reservation.reservee_phone).is_equal_to(input_data["reserveePhone"])
         assert_that(reservation.name).is_equal_to(input_data["name"])
         assert_that(reservation.description).is_equal_to(input_data["description"])
@@ -113,7 +119,13 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         self._client.force_login(self.regular_joe)
         input_data = self.get_valid_input_data()
-        optional_fields = ["reserveeName", "reserveePhone", "name", "description"]
+        optional_fields = [
+            "reserveeFirstName",
+            "reserveeLastName",
+            "reserveePhone",
+            "name",
+            "description",
+        ]
         for field in optional_fields:
             input_data.pop(field)
         response = self.query(self.get_create_query(), input_data=input_data)
