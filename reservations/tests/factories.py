@@ -18,6 +18,8 @@ class ReservationFactory(DjangoModelFactory):
     class Meta:
         model = "reservations.Reservation"
 
+    reservee_first_name = FuzzyText()
+    reservee_last_name = FuzzyText()
     name = FuzzyText()
     description = FuzzyText()
 
