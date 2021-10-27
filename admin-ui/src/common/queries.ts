@@ -116,7 +116,7 @@ export const SEARCH_RESERVATION_UNITS_QUERY = gql`
 export const CREATE_SPACE = gql`
   mutation createSpace($input: SpaceCreateMutationInput!) {
     createSpace(input: $input) {
-      id
+      pk
       errors {
         field
         messages
@@ -128,7 +128,7 @@ export const CREATE_SPACE = gql`
 export const UPDATE_SPACE = gql`
   mutation updateSpace($input: SpaceUpdateMutationInput!) {
     updateSpace(input: $input) {
-      id
+      pk
       errors {
         field
         messages
@@ -364,7 +364,7 @@ export const UPDATE_RESERVATION_UNIT = gql`
 export const CREATE_RESERVATION_UNIT = gql`
   mutation createReservationUnit($input: ReservationUnitCreateMutationInput!) {
     createReservationUnit(input: $input) {
-      id
+      pk
       errors {
         field
         messages

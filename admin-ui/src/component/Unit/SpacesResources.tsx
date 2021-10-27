@@ -32,7 +32,7 @@ import {
 } from "../../common/gql-types";
 
 interface IProps {
-  unitId: string;
+  unitPk: string;
 }
 
 type NotificationType = {
@@ -145,13 +145,13 @@ const SpacesResources = (): JSX.Element | null => {
   const { setModalContent } = useModal();
 
   const { t } = useTranslation();
-  const unitId = Number(useParams<IProps>().unitId);
+  const unitPk = Number(useParams<IProps>().unitPk);
 
   const newSpacesButtonRef = React.createRef<HTMLButtonElement>();
   const newResourceButtonRef = React.createRef<HTMLButtonElement>();
 
   useQuery<Query, QueryUnitByPkArgs>(UNIT_QUERY, {
-    variables: { pk: unitId },
+    variables: { pk: unitPk },
     fetchPolicy: "network-only",
     onCompleted: ({ unitByPk }) => {
       if (unitByPk) {
@@ -313,7 +313,7 @@ const SpacesResources = (): JSX.Element | null => {
               openWithContent(
                 <NewResourceModal
                   spaces={(state.unit?.spaces as SpaceType[]) || []}
-                  spaceId={0}
+                  spacePk={0}
                   unit={state.unit as UnitType}
                   closeModal={() => {
                     closeNewResourceModal();

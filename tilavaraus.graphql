@@ -1,3 +1,14 @@
+type AbilityGroupType {
+  name: String!
+  pk: Int
+}
+
+type AgeGroupType {
+  minimum: Int!
+  maximum: Int
+  pk: Int
+}
+
 """An enumeration."""
 enum ApplicationRoundTargetGroup {
   """Internal"""
@@ -31,14 +42,15 @@ type ApplicationRoundType {
 }
 
 type BuildingType implements Node {
-  """The ID of the object."""
-  id: ID!
   nameFi: String
   nameEn: String
   nameSv: String
   district: DistrictType
   realEstate: RealEstateType
   surfaceArea: Float
+
+  """The ID of the object."""
+  id: ID!
   pk: Int
 }
 
@@ -57,11 +69,12 @@ value as specified by
 scalar DateTime
 
 type DistrictType implements Node {
-  """The ID of the object."""
-  id: ID!
   nameFi: String
   nameEn: String
   nameSv: String
+
+  """The ID of the object."""
+  id: ID!
   pk: Int
 }
 
@@ -73,7 +86,7 @@ input EquipmentCategoryCreateMutationInput {
 }
 
 type EquipmentCategoryCreateMutationPayload {
-  id: Int
+  pk: Int
   nameFi: String
   nameEn: String
   nameSv: String
@@ -85,7 +98,7 @@ type EquipmentCategoryCreateMutationPayload {
 }
 
 input EquipmentCategoryDeleteMutationInput {
-  pk: ID
+  pk: Int!
   clientMutationId: String
 }
 
@@ -96,11 +109,12 @@ type EquipmentCategoryDeleteMutationPayload {
 }
 
 type EquipmentCategoryType implements Node {
-  """The ID of the object."""
-  id: ID!
   nameFi: String
   nameEn: String
   nameSv: String
+
+  """The ID of the object."""
+  id: ID!
   pk: Int
 }
 
@@ -122,19 +136,18 @@ type EquipmentCategoryTypeEdge {
 }
 
 input EquipmentCategoryUpdateMutationInput {
+  pk: Int!
   nameFi: String
   nameEn: String
   nameSv: String
-  pk: Int!
   clientMutationId: String
 }
 
 type EquipmentCategoryUpdateMutationPayload {
-  id: Int
+  pk: Int
   nameFi: String
   nameEn: String
   nameSv: String
-  pk: Int
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -143,7 +156,7 @@ type EquipmentCategoryUpdateMutationPayload {
 }
 
 input EquipmentCreateMutationInput {
-  categoryId: String!
+  categoryPk: Int!
   nameFi: String
   nameEn: String
   nameSv: String
@@ -151,8 +164,8 @@ input EquipmentCreateMutationInput {
 }
 
 type EquipmentCreateMutationPayload {
-  id: Int
-  categoryId: String
+  pk: Int
+  categoryPk: Int
   nameFi: String
   nameEn: String
   nameSv: String
@@ -164,7 +177,7 @@ type EquipmentCreateMutationPayload {
 }
 
 input EquipmentDeleteMutationInput {
-  pk: ID
+  pk: Int!
   clientMutationId: String
 }
 
@@ -175,11 +188,12 @@ type EquipmentDeleteMutationPayload {
 }
 
 type EquipmentType implements Node {
-  """The ID of the object."""
-  id: ID!
   nameFi: String
   nameEn: String
   nameSv: String
+
+  """The ID of the object."""
+  id: ID!
   pk: Int
   category: EquipmentCategoryType
 }
@@ -202,21 +216,20 @@ type EquipmentTypeEdge {
 }
 
 input EquipmentUpdateMutationInput {
-  categoryId: String!
+  pk: Int!
+  categoryPk: Int!
   nameFi: String
   nameEn: String
   nameSv: String
-  pk: Int!
   clientMutationId: String
 }
 
 type EquipmentUpdateMutationPayload {
-  id: Int
-  categoryId: String
+  pk: Int
+  categoryPk: Int
   nameFi: String
   nameEn: String
   nameSv: String
-  pk: Int
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -230,11 +243,12 @@ type ErrorType {
 }
 
 type KeywordCategoryType implements Node {
-  """The ID of the object."""
-  id: ID!
   nameFi: String
   nameEn: String
   nameSv: String
+
+  """The ID of the object."""
+  id: ID!
   pk: Int
   keywordGroups: [KeywordGroupType]
 }
@@ -257,11 +271,12 @@ type KeywordCategoryTypeEdge {
 }
 
 type KeywordGroupType implements Node {
-  """The ID of the object."""
-  id: ID!
   nameFi: String
   nameEn: String
   nameSv: String
+
+  """The ID of the object."""
+  id: ID!
   pk: Int
   keywords: [KeywordType]
 }
@@ -284,11 +299,12 @@ type KeywordGroupTypeEdge {
 }
 
 type KeywordType implements Node {
-  """The ID of the object."""
-  id: ID!
   nameFi: String
   nameEn: String
   nameSv: String
+
+  """The ID of the object."""
+  id: ID!
   pk: Int
 }
 
@@ -326,7 +342,8 @@ type LocationType implements Node {
 }
 
 type Mutation {
-  createReservation(input: ReservationMutationInput!): ReservationMutationPayload
+  createReservation(input: ReservationCreateMutationInput!): ReservationCreateMutationPayload
+  updateReservation(input: ReservationUpdateMutationInput!): ReservationUpdateMutationPayload
   createReservationUnit(input: ReservationUnitCreateMutationInput!): ReservationUnitCreateMutationPayload
   updateReservationUnit(input: ReservationUnitUpdateMutationInput!): ReservationUnitUpdateMutationPayload
   createPurpose(input: PurposeCreateMutationInput!): PurposeCreateMutationPayload
@@ -415,11 +432,12 @@ type PurposeCreateMutationPayload {
 }
 
 type PurposeType implements Node {
-  """The ID of the object."""
-  id: ID!
   nameFi: String
   nameEn: String
   nameSv: String
+
+  """The ID of the object."""
+  id: ID!
   pk: Int
 }
 
@@ -461,6 +479,7 @@ type PurposeUpdateMutationPayload {
 }
 
 type Query {
+  reservations(before: String, after: String, first: Int, last: Int, begin: DateTime, end: DateTime): ReservationTypeConnection
   reservationUnits(before: String, after: String, first: Int, last: Int, unit: ID, keywordGroups: ID, reservationUnitType: ID, maxPersonsGte: Float, maxPersonsLte: Float, textSearch: String, purposes: ID): ReservationUnitTypeConnection
 
   """The ID of the object"""
@@ -498,32 +517,47 @@ type Query {
 }
 
 type RealEstateType implements Node {
-  """The ID of the object."""
-  id: ID!
   nameFi: String
   nameEn: String
   nameSv: String
   district: DistrictType
   surfaceArea: Float
+
+  """The ID of the object."""
+  id: ID!
   pk: Int
 }
 
-input ReservationMutationInput {
-  state: String!
-  priority: String!
-  user: ID!
+type RecurringReservationType {
+  user: String
+  ageGroup: AgeGroupType
+  abilityGroup: AbilityGroupType
+  pk: Int
+  applicationPk: Int
+  applicationEventPk: Int
+}
+
+input ReservationCreateMutationInput {
+  priority: Int
   begin: DateTime!
   end: DateTime!
   bufferTimeBefore: String
   bufferTimeAfter: String
-  reservationUnit: [ID]!
-  id: ID
+  reservationUnitPks: [Int]!
   clientMutationId: String
 }
 
-type ReservationMutationPayload {
-  reservation: ReservationType
+type ReservationCreateMutationPayload {
+  pk: Int
+  priority: Int
+  begin: DateTime
+  end: DateTime
+  bufferTimeBefore: String
+  bufferTimeAfter: String
+
+  """May contain more than one error for same field."""
   errors: [ErrorType]
+  reservation: ReservationType
   clientMutationId: String
 }
 
@@ -539,45 +573,42 @@ enum ReservationPriority {
   A_300
 }
 
-"""An enumeration."""
-enum ReservationState {
-  """created"""
-  CREATED
-
-  """cancelled"""
-  CANCELLED
-
-  """confirmed"""
-  CONFIRMED
-
-  """denied"""
-  DENIED
-
-  """requested"""
-  REQUESTED
-
-  """waiting for payment"""
-  WAITING_FOR_PAYMENT
-}
-
 type ReservationType implements Node {
-  """The ID of the object."""
-  id: ID!
-  state: ReservationState!
+  state: String
   priority: ReservationPriority!
+  user: String
   begin: DateTime!
   end: DateTime!
   bufferTimeBefore: Float
   bufferTimeAfter: Float
-  reservationUnit(before: String, after: String, first: Int, last: Int): ReservationUnitByPkTypeConnection!
+  recurringReservation: RecurringReservationType
   numPersons: Int
+
+  """The ID of the object."""
+  id: ID!
   pk: Int
+  reservationUnits: [ReservationUnitType]
   calendarUrl: String
 }
 
+type ReservationTypeConnection {
+  """Pagination data for this connection."""
+  pageInfo: PageInfo!
+
+  """Contains the nodes in this connection."""
+  edges: [ReservationTypeEdge]!
+}
+
+"""A Relay edge containing a `ReservationType` and its cursor."""
+type ReservationTypeEdge {
+  """The item at the end of the edge"""
+  node: ReservationType
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
+
 type ReservationUnitByPkType implements Node {
-  """The ID of the object."""
-  id: ID!
   nameFi: String
   nameEn: String
   nameSv: String
@@ -601,6 +632,9 @@ type ReservationUnitByPkType implements Node {
   uuid: UUID!
   maxPersons: Int
   images: [ReservationUnitImageType]
+
+  """The ID of the object."""
+  id: ID!
   openingHours(openingTimes: Boolean, periods: Boolean, startDate: Date, endDate: Date): OpeningHoursType
   pk: Int
   location: LocationType
@@ -637,35 +671,35 @@ input ReservationUnitCreateMutationInput {
   """
   requireIntroduction: Boolean
   maxPersons: Int
-  equipmentIds: [String]
-  unitId: String!
+  equipmentPks: [Int]
+  unitPk: Int!
   maxReservationDuration: String
   minReservationDuration: String
   isDraft: Boolean
-  spaceIds: [String]
-  resourceIds: [String]
-  purposeIds: [String]
-  serviceIds: [String]
-  reservationUnitTypeId: String
+  spacePks: [Int]
+  resourcePks: [Int]
+  purposePks: [Int]
+  servicePks: [Int]
+  reservationUnitTypePk: Int
   surfaceArea: Float
   bufferTimeBetweenReservations: String
-  contactInformationFi: String
-  contactInformationEn: String
-  contactInformationSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
+  contactInformationFi: String
+  contactInformationEn: String
+  contactInformationSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
   clientMutationId: String
 }
 
 type ReservationUnitCreateMutationPayload {
-  id: Int
+  pk: Int
 
   """Spaces included in the reservation unit as nested related objects."""
   spaces: [SpaceType]
@@ -694,31 +728,26 @@ type ReservationUnitCreateMutationPayload {
   """Type of the reservation unit as nested related object."""
   reservationUnitType: ReservationUnitTypeType
   building: String
-  equipmentIds: [String]
-  unitId: String
+  unitPk: Int
   uuid: String
   maxReservationDuration: String
   minReservationDuration: String
   isDraft: Boolean
-  spaceIds: [String]
-  resourceIds: [String]
-  purposeIds: [String]
-  serviceIds: [String]
-  reservationUnitTypeId: String
+  reservationUnitTypePk: Int
   surfaceArea: Float
   bufferTimeBetweenReservations: String
-  contactInformationFi: String
-  contactInformationEn: String
-  contactInformationSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
+  contactInformationFi: String
+  contactInformationEn: String
+  contactInformationSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -753,8 +782,6 @@ type ReservationUnitImageType {
 }
 
 type ReservationUnitType implements Node {
-  """The ID of the object."""
-  id: ID!
   nameFi: String
   nameEn: String
   nameSv: String
@@ -782,6 +809,9 @@ type ReservationUnitType implements Node {
   bufferTimeBetweenReservations: Float
   images: [ReservationUnitImageType]
   applicationRounds(active: Boolean): [ApplicationRoundType]
+
+  """The ID of the object."""
+  id: ID!
   pk: Int
   location: LocationType
   equipment: [EquipmentType]
@@ -808,50 +838,52 @@ type ReservationUnitTypeEdge {
 }
 
 type ReservationUnitTypeType implements Node {
-  """The ID of the object."""
-  id: ID!
   nameFi: String
   nameEn: String
   nameSv: String
+
+  """The ID of the object."""
+  id: ID!
   pk: Int
 }
 
 input ReservationUnitUpdateMutationInput {
+  pk: Int!
+
   """
   Determines if introduction is required in order to reserve this reservation unit.
   """
   requireIntroduction: Boolean
   maxPersons: Int
-  equipmentIds: [String]
-  unitId: String
+  equipmentPks: [Int]
+  unitPk: Int
   maxReservationDuration: String
   minReservationDuration: String
   isDraft: Boolean
-  spaceIds: [String]
-  resourceIds: [String]
-  purposeIds: [String]
-  serviceIds: [String]
-  reservationUnitTypeId: String
+  spacePks: [Int]
+  resourcePks: [Int]
+  purposePks: [Int]
+  servicePks: [Int]
+  reservationUnitTypePk: Int
   surfaceArea: Float
   bufferTimeBetweenReservations: String
-  contactInformationFi: String
-  contactInformationEn: String
-  contactInformationSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
-  pk: Int!
+  contactInformationFi: String
+  contactInformationEn: String
+  contactInformationSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
   clientMutationId: String
 }
 
 type ReservationUnitUpdateMutationPayload {
-  id: Int
+  pk: Int
 
   """Spaces included in the reservation unit as nested related objects."""
   spaces: [SpaceType]
@@ -880,32 +912,26 @@ type ReservationUnitUpdateMutationPayload {
   """Type of the reservation unit as nested related object."""
   reservationUnitType: ReservationUnitTypeType
   building: String
-  equipmentIds: [String]
-  unitId: String
+  unitPk: Int
   uuid: String
   maxReservationDuration: String
   minReservationDuration: String
   isDraft: Boolean
-  spaceIds: [String]
-  resourceIds: [String]
-  purposeIds: [String]
-  serviceIds: [String]
-  reservationUnitTypeId: String
+  reservationUnitTypePk: Int
   surfaceArea: Float
   bufferTimeBetweenReservations: String
-  contactInformationFi: String
-  contactInformationEn: String
-  contactInformationSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
-  pk: Int
+  contactInformationFi: String
+  contactInformationEn: String
+  contactInformationSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -913,11 +939,36 @@ type ReservationUnitUpdateMutationPayload {
   clientMutationId: String
 }
 
+input ReservationUpdateMutationInput {
+  pk: Int!
+  priority: Int
+  begin: DateTime
+  end: DateTime
+  bufferTimeBefore: String
+  bufferTimeAfter: String
+  reservationUnitPks: [Int]
+  clientMutationId: String
+}
+
+type ReservationUpdateMutationPayload {
+  pk: Int
+  priority: Int
+  begin: DateTime
+  end: DateTime
+  bufferTimeBefore: String
+  bufferTimeAfter: String
+
+  """May contain more than one error for same field."""
+  errors: [ErrorType]
+  reservation: ReservationType
+  clientMutationId: String
+}
+
 input ResourceCreateMutationInput {
   locationType: String
 
-  """Id of related space for this resource."""
-  spaceId: String
+  """PK of the related space for this resource."""
+  spacePk: Int
 
   """
   Buffer time while reservation unit is unreservable after the reservation.
@@ -928,21 +979,21 @@ input ResourceCreateMutationInput {
   """Begin date and time of the reservation."""
   bufferTimeAfter: String
   isDraft: Boolean
-  nameFi: String
-  nameEn: String
-  nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
   clientMutationId: String
 }
 
 type ResourceCreateMutationPayload {
-  id: Int
+  pk: Int
   locationType: String
 
-  """Id of related space for this resource."""
-  spaceId: String
+  """PK of the related space for this resource."""
+  spacePk: Int
 
   """
   Buffer time while reservation unit is unreservable after the reservation.
@@ -953,12 +1004,12 @@ type ResourceCreateMutationPayload {
   """Begin date and time of the reservation."""
   bufferTimeAfter: String
   isDraft: Boolean
-  nameFi: String
-  nameEn: String
-  nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -967,7 +1018,7 @@ type ResourceCreateMutationPayload {
 }
 
 input ResourceDeleteMutationInput {
-  pk: ID
+  pk: Int!
   clientMutationId: String
 }
 
@@ -987,8 +1038,6 @@ enum ResourceLocationType {
 }
 
 type ResourceType implements Node {
-  """The ID of the object."""
-  id: ID!
   locationType: ResourceLocationType!
   nameFi: String
   nameEn: String
@@ -1000,6 +1049,9 @@ type ResourceType implements Node {
   bufferTimeBefore: Float
   bufferTimeAfter: Float
   isDraft: Boolean!
+
+  """The ID of the object."""
+  id: ID!
   pk: Int
   building: [BuildingType]
 }
@@ -1022,10 +1074,11 @@ type ResourceTypeEdge {
 }
 
 input ResourceUpdateMutationInput {
+  pk: Int!
   locationType: String
 
-  """Id of related space for this resource."""
-  spaceId: String
+  """PK of the related space for this resource."""
+  spacePk: Int
 
   """
   Buffer time while reservation unit is unreservable after the reservation.
@@ -1036,22 +1089,21 @@ input ResourceUpdateMutationInput {
   """Begin date and time of the reservation."""
   bufferTimeAfter: String
   isDraft: Boolean
-  nameFi: String
-  nameEn: String
-  nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
-  pk: Int!
+  nameFi: String
+  nameEn: String
+  nameSv: String
   clientMutationId: String
 }
 
 type ResourceUpdateMutationPayload {
-  id: Int
+  pk: Int
   locationType: String
 
-  """Id of related space for this resource."""
-  spaceId: String
+  """PK of the related space for this resource."""
+  spacePk: Int
 
   """
   Buffer time while reservation unit is unreservable after the reservation.
@@ -1062,13 +1114,12 @@ type ResourceUpdateMutationPayload {
   """Begin date and time of the reservation."""
   bufferTimeAfter: String
   isDraft: Boolean
-  nameFi: String
-  nameEn: String
-  nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
-  pk: Int
+  nameFi: String
+  nameEn: String
+  nameSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -1089,58 +1140,59 @@ enum ServiceServiceType {
 }
 
 type ServiceType implements Node {
-  """The ID of the object."""
-  id: ID!
   nameFi: String
   nameEn: String
   nameSv: String
   serviceType: ServiceServiceType!
   bufferTimeBefore: String
   bufferTimeAfter: String
+
+  """The ID of the object."""
+  id: ID!
   pk: Int
 }
 
 input SpaceCreateMutationInput {
-  """Id of parent space for this space."""
-  parentId: String
+  """PK of the parent space for this space."""
+  parentPk: Int
 
   """Surface area of the space as square meters"""
   surfaceArea: Float
 
-  """Id of district for this space."""
-  districtId: String
+  """PK of the district for this space."""
+  districtPk: Int
   maxPersons: Int
   code: String
-  unitId: String
-  nameFi: String!
-  nameEn: String
-  nameSv: String
+  unitPk: Int
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
+  nameFi: String!
+  nameEn: String
+  nameSv: String
   clientMutationId: String
 }
 
 type SpaceCreateMutationPayload {
-  id: Int
+  pk: Int
 
-  """Id of parent space for this space."""
-  parentId: String
+  """PK of the parent space for this space."""
+  parentPk: Int
 
   """Surface area of the space as square meters"""
   surfaceArea: Float
 
-  """Id of district for this space."""
-  districtId: String
+  """PK of the district for this space."""
+  districtPk: Int
   maxPersons: Int
   code: String
-  unitId: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
+  unitPk: Int
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -1149,7 +1201,7 @@ type SpaceCreateMutationPayload {
 }
 
 input SpaceDeleteMutationInput {
-  pk: ID
+  pk: Int!
   clientMutationId: String
 }
 
@@ -1160,8 +1212,6 @@ type SpaceDeleteMutationPayload {
 }
 
 type SpaceType implements Node {
-  """The ID of the object."""
-  id: ID!
   nameFi: String
   nameEn: String
   nameSv: String
@@ -1174,6 +1224,9 @@ type SpaceType implements Node {
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
+
+  """The ID of the object."""
+  id: ID!
   pk: Int
   children: [SpaceType]
   resources: [ResourceType]
@@ -1197,48 +1250,48 @@ type SpaceTypeEdge {
 }
 
 input SpaceUpdateMutationInput {
-  """Id of parent space for this space."""
-  parentId: String
+  pk: Int!
+
+  """PK of the parent space for this space."""
+  parentPk: Int
 
   """Surface area of the space as square meters"""
   surfaceArea: Float
 
-  """Id of district for this space."""
-  districtId: String
+  """PK of the district for this space."""
+  districtPk: Int
   maxPersons: Int
   code: String
-  unitId: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
+  unitPk: Int
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
-  pk: Int!
+  nameFi: String
+  nameEn: String
+  nameSv: String
   clientMutationId: String
 }
 
 type SpaceUpdateMutationPayload {
-  id: Int
+  pk: Int
 
-  """Id of parent space for this space."""
-  parentId: String
+  """PK of the parent space for this space."""
+  parentPk: Int
 
   """Surface area of the space as square meters"""
   surfaceArea: Float
 
-  """Id of district for this space."""
-  districtId: String
+  """PK of the district for this space."""
+  districtPk: Int
   maxPersons: Int
   code: String
-  unitId: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
+  unitPk: Int
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
-  pk: Int
+  nameFi: String
+  nameEn: String
+  nameSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -1268,8 +1321,6 @@ type TimeSpanType {
 }
 
 type UnitByPkType implements Node {
-  """The ID of the object."""
-  id: ID!
   tprekId: String
   nameFi: String
   nameEn: String
@@ -1283,6 +1334,9 @@ type UnitByPkType implements Node {
   webPage: String!
   email: String!
   phone: String!
+
+  """The ID of the object."""
+  id: ID!
   openingHours(openingTimes: Boolean, periods: Boolean, startDate: Date, endDate: Date): OpeningHoursType
   pk: Int
   reservationUnits: [ReservationUnitType]
@@ -1291,8 +1345,6 @@ type UnitByPkType implements Node {
 }
 
 type UnitType implements Node {
-  """The ID of the object."""
-  id: ID!
   tprekId: String
   nameFi: String
   nameEn: String
@@ -1306,6 +1358,9 @@ type UnitType implements Node {
   webPage: String!
   email: String!
   phone: String!
+
+  """The ID of the object."""
+  id: ID!
   pk: Int
   reservationUnits: [ReservationUnitType]
   spaces: [SpaceType]
@@ -1335,34 +1390,33 @@ input UnitUpdateMutationInput {
   webPage: String
   email: String
   phone: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
   shortDescriptionFi: String
   shortDescriptionEn: String
   shortDescriptionSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
   clientMutationId: String
 }
 
 type UnitUpdateMutationPayload {
-  id: Int
   pk: Int
   tprekId: String
   webPage: String
   email: String
   phone: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
   shortDescriptionFi: String
   shortDescriptionEn: String
   shortDescriptionSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]

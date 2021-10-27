@@ -48,8 +48,8 @@ import SubPageHead from "../Unit/SubPageHead";
 import withMainMenu from "../withMainMenu";
 
 interface IProps {
-  reservationUnitId?: string;
-  unitId: string;
+  reservationUnitPk?: string;
+  unitPk: string;
 }
 
 type NotificationType = {
@@ -86,10 +86,10 @@ type ReservationUnitEditorType = {
   descriptionFi: string;
   descriptionSv: string;
   descriptionEn: string;
-  spaceIds: number[];
-  resourceIds: number[];
-  equipmentIds: number[];
-  purposeIds: number[];
+  spacePks: number[];
+  resourcePks: number[];
+  equipmentPks: number[];
+  purposePks: number[];
   maxPersons: number;
   surfaceArea: number;
   requireIntroduction: boolean;
@@ -101,8 +101,8 @@ type ReservationUnitEditorType = {
 };
 
 type State = {
-  reservationUnitId?: number;
-  unitId: number;
+  reservationUnitPk?: number;
+  unitPk: number;
   notification: null | NotificationType;
   loading: boolean;
   reservationUnit: ReservationUnitByPkType | null;
@@ -120,9 +120,9 @@ type State = {
   unit?: UnitByPkType;
 };
 
-const getInitialState = (reservationUnitId: number, unitId: number): State => ({
-  reservationUnitId,
-  unitId,
+const getInitialState = (reservationUnitPk: number, unitPk: number): State => ({
+  reservationUnitPk,
+  unitPk,
   loading: true,
   notification: null,
   reservationUnit: null,
@@ -200,16 +200,16 @@ const reducer = (state: State, action: Action): State => {
             "minReservationDuration",
             "requireIntroduction",
           ]) as ReservationUnitEditorType),
-          spaceIds: reservationUnit?.spaces?.map((s) =>
+          spacePks: reservationUnit?.spaces?.map((s) =>
             Number(s?.pk)
           ) as number[],
-          resourceIds: reservationUnit?.resources?.map((s) =>
+          resourcePks: reservationUnit?.resources?.map((s) =>
             Number(s?.pk)
           ) as number[],
-          equipmentIds: reservationUnit?.equipment?.map((s) =>
+          equipmentPks: reservationUnit?.equipment?.map((s) =>
             Number(s?.pk)
           ) as number[],
-          purposeIds: reservationUnit?.purposes?.map((s) =>
+          purposePks: reservationUnit?.purposes?.map((s) =>
             Number(s?.pk)
           ) as number[],
         },
@@ -297,30 +297,30 @@ const reducer = (state: State, action: Action): State => {
       return modifyEditorState(state, { ...action.value });
     }
     case "setSpaces": {
-      const selectedSpaceIds = action.spaces.map((ot) => ot.value as number);
+      const selectedSpacePks = action.spaces.map((ot) => ot.value as number);
       const selectedSpaces = state.spaces.filter(
-        (s) => selectedSpaceIds.indexOf(Number(s.pk)) !== -1
+        (s) => selectedSpacePks.indexOf(Number(s.pk)) !== -1
       );
 
       return modifyEditorState(state, {
         surfaceArea: sumBy(selectedSpaces, "surfaceArea"),
         maxPersons: sumBy(selectedSpaces, "maxPersons"),
-        spaceIds: selectedSpaceIds,
+        spacePks: selectedSpacePks,
       });
     }
     case "setResources": {
       return modifyEditorState(state, {
-        resourceIds: action.resources.map((ot) => ot.value as number),
+        resourcePks: action.resources.map((ot) => ot.value as number),
       });
     }
     case "setEquipments": {
       return modifyEditorState(state, {
-        equipmentIds: action.equipments.map((ot) => ot.value as number),
+        equipmentPks: action.equipments.map((ot) => ot.value as number),
       });
     }
     case "setPurposes": {
       return modifyEditorState(state, {
-        purposeIds: action.purposes.map((ot) => ot.value as number),
+        purposePks: action.purposes.map((ot) => ot.value as number),
       });
     }
     default:
@@ -394,7 +394,7 @@ const getSelectedOptions = (
   return (
     get(state, fullPropName)
       // eslint-disable-next-line
-      .map((optionId: any) => options.find((so: any) => so.value === optionId))
+      .map((optionPk: any) => options.find((so: any) => so.value === optionPk))
       .filter(Boolean) as OptionType[]
   );
 };
@@ -413,13 +413,13 @@ const getDuration = (duration: string | undefined): string => {
 };
 
 const ReservationUnitEditor = (): JSX.Element | null => {
-  const { reservationUnitId, unitId } = useParams<IProps>();
+  const { reservationUnitPk, unitPk } = useParams<IProps>();
   const { t } = useTranslation();
   const history = useHistory();
 
   const [state, dispatch] = useReducer(
     reducer,
-    getInitialState(Number(reservationUnitId), Number(unitId))
+    getInitialState(Number(reservationUnitPk), Number(unitPk))
   );
 
   const onDataError = (text: string) => {
@@ -467,26 +467,25 @@ const ReservationUnitEditor = (): JSX.Element | null => {
     const input = pick(
       {
         ...state.reservationUnitEdit,
-        unitId: String(state.unitId),
-        spaceIds: state.reservationUnitEdit?.spaceIds?.map(String),
-        resourceIds: state.reservationUnitEdit?.resourceIds?.map(String),
-        equipmentIds: state.reservationUnitEdit?.equipmentIds?.map(String),
-        purposeIds: state.reservationUnitEdit?.purposeIds?.map(String),
+        spacePks: state.reservationUnitEdit?.spacePks?.map(String),
+        resourcePks: state.reservationUnitEdit?.resourcePks?.map(String),
+        equipmentPks: state.reservationUnitEdit?.equipmentPks?.map(String),
+        purposePks: state.reservationUnitEdit?.purposePks?.map(String),
         isDraft: !publish,
       },
       [
         "isDraft",
         "pk",
-        "unitId",
+        "unitPk",
         "nameFi",
         "nameSv",
         "nameEn",
         "descriptionFi",
         "descriptionSv",
         "descriptionEn",
-        "spaceIds",
-        "resourceIds",
-        "equipmentIds",
+        "spacePks",
+        "resourcePks",
+        "equipmentPks",
         "surfaceArea",
         "maxPersons",
         "termsOfUseFi",
@@ -495,12 +494,12 @@ const ReservationUnitEditor = (): JSX.Element | null => {
         "maxReservationDuration",
         "minReservationDuration",
         "requireIntroduction",
-        "purposeIds",
+        "purposePks",
       ]
     );
 
     try {
-      if (state.reservationUnitId) {
+      if (state.reservationUnitPk) {
         const res = await updateReservationUnit(
           input as ReservationUnitUpdateMutationInput
         );
@@ -517,7 +516,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
           onSave(t("ReservationUnitEditor.saved"));
           // todo notification
           history.replace(
-            `/unit/${unitId}/reservationUnit/edit/${res.data.createReservationUnit.id}`
+            `/unit/${unitPk}/reservationUnit/edit/${res.data.createReservationUnit.pk}`
           );
         }
       }
@@ -527,8 +526,8 @@ const ReservationUnitEditor = (): JSX.Element | null => {
   };
 
   useQuery<Query, QueryReservationUnitByPkArgs>(RESERVATIONUNIT_QUERY, {
-    variables: { pk: Number(reservationUnitId) },
-    skip: !reservationUnitId,
+    variables: { pk: Number(reservationUnitPk) },
+    skip: !reservationUnitPk,
     onCompleted: ({ reservationUnitByPk }) => {
       if (reservationUnitByPk) {
         dispatch({ type: "dataLoaded", reservationUnit: reservationUnitByPk });
@@ -542,7 +541,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
   });
 
   useQuery<Query, QueryUnitByPkArgs>(UNIT_WITH_SPACES_AND_RESOURCES, {
-    variables: { pk: Number(unitId) },
+    variables: { pk: Number(unitPk) },
     onCompleted: ({ unitByPk }) => {
       if (unitByPk) {
         dispatch({ type: "unitLoaded", unit: unitByPk });
@@ -581,10 +580,10 @@ const ReservationUnitEditor = (): JSX.Element | null => {
   });
 
   useEffect(() => {
-    if (!reservationUnitId) {
+    if (!reservationUnitPk) {
       dispatch({ type: "editNew" });
     }
-  }, [reservationUnitId]);
+  }, [reservationUnitPk]);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const setValue = (value: any) => {
@@ -693,7 +692,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                     }
                     disabled={state.spaceOptions.length === 0}
                     value={[
-                      ...getSelectedOptions(state, "spaceOptions", "spaceIds"),
+                      ...getSelectedOptions(state, "spaceOptions", "spacePks"),
                     ]}
                   />
                   <Combobox
@@ -714,7 +713,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                       ...getSelectedOptions(
                         state,
                         "resourceOptions",
-                        "resourceIds"
+                        "resourcePks"
                       ),
                     ]}
                   />
@@ -792,7 +791,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                     ...getSelectedOptions(
                       state,
                       "purposeOptions",
-                      "purposeIds"
+                      "purposePks"
                     ),
                   ]}
                 />
@@ -813,7 +812,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                     ...getSelectedOptions(
                       state,
                       "equipmentOptions",
-                      "equipmentIds"
+                      "equipmentPks"
                     ),
                   ]}
                 />
@@ -840,7 +839,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                 />
                 <TimeInput
                   id="maxReservationDuration"
-                  label={t("ReservationUnitEditor.minReservationDurationLabel")}
+                  label={t("ReservationUnitEditor.maxReservationDurationLabel")}
                   hoursLabel={t("common.hoursLabel")}
                   minutesLabel={t("common.minutesLabel")}
                   defaultValue={getDuration(
@@ -919,13 +918,13 @@ const ReservationUnitEditor = (): JSX.Element | null => {
               >
                 {t("ReservationUnitEditor.cancel")}
               </Button>
-              <Button
+              <SaveButton
                 disabled={!state.hasChanges}
                 variant="secondary"
                 onClick={() => createOrUpdateReservationUnit(false)}
               >
                 {t("ReservationUnitEditor.saveAsDraft")}
-              </Button>
+              </SaveButton>
 
               <SaveButton
                 disabled={!state.hasChanges}

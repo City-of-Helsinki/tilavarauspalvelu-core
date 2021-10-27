@@ -36,8 +36,8 @@ import {
 } from "../../common/gql-types";
 
 interface IProps {
-  unitId: string;
-  spaceId: string;
+  unitPk: string;
+  spacePk: string;
 }
 
 type NotificationType = {
@@ -68,11 +68,11 @@ type Action =
   | { type: "setSurfaceArea"; surfaceArea: number }
   | { type: "setCode"; code: string }
   | { type: "setTermsOfUse"; termsOfUse: string; lang: string }
-  | { type: "setParent"; parentId?: number };
+  | { type: "setParent"; parentPk?: number };
 
 type State = {
-  spaceId?: number;
-  unitId?: number;
+  spacePk?: number;
+  unitPk?: number;
   notification: null | NotificationType;
   loading: boolean;
   space: SpaceType | null;
@@ -86,9 +86,9 @@ type State = {
   parentOptions: ParentType[];
 };
 
-const getInitialState = (spaceId: number, unitId: number): State => ({
-  spaceId,
-  unitId,
+const getInitialState = (spacePk: number, unitPk: number): State => ({
+  spacePk,
+  unitPk,
   loading: true,
   notification: null,
   space: null,
@@ -125,7 +125,7 @@ const reducer = (state: State, action: Action): State => {
             "termsOfUseFi",
           ]),
           parentId: space.parent ? String(space.parent.pk) : undefined,
-          unitId: space.unit ? String(space.unit.pk) : undefined,
+          unitPk: space.unit ? String(space.unit.pk) : undefined,
         } as SpaceUpdateMutationInput,
         loading: false,
         hasChanges: false,
@@ -133,11 +133,11 @@ const reducer = (state: State, action: Action): State => {
     }
     case "hierarchyLoaded": {
       const unitSpaces = action.spaces.filter((space) => {
-        return space.unit?.pk === state.unitId;
+        return space.unit?.pk === state.unitPk;
       });
 
       const additionalOptions = unitSpaces
-        .filter((space) => space.pk !== state.spaceId)
+        .filter((space) => space.pk !== state.spacePk)
         .map((space) => ({
           label: space.nameFi as string,
           value: space,
@@ -168,7 +168,7 @@ const reducer = (state: State, action: Action): State => {
     }
     case "setParent": {
       return modified(
-        set({ ...state }, `spaceEdit.parentId`, action.parentId || null)
+        set({ ...state }, `spaceEdit.parentPk`, action.parentPk || null)
       );
     }
     case "setTermsOfUse": {
@@ -245,18 +245,18 @@ const SaveButton = styled(Button)`
   margin-left: auto;
 `;
 
-const getParent = (v: Maybe<string>, options: ParentType[]) => {
-  const p = options.find((po) => String(po.value?.pk) === v) || options[0];
+const getParent = (v: Maybe<number> | undefined, options: ParentType[]) => {
+  const p = options.find((po) => po.value?.pk === v) || options[0];
   return p;
 };
 
 const SpaceEditor = (): JSX.Element | null => {
-  const { spaceId, unitId } = useParams<IProps>();
+  const { spacePk, unitPk } = useParams<IProps>();
   const history = useHistory();
 
   const [state, dispatch] = useReducer(
     reducer,
-    getInitialState(Number(spaceId), Number(unitId))
+    getInitialState(Number(spacePk), Number(unitPk))
   );
 
   const onDataError = (text: string) => {
@@ -279,7 +279,7 @@ const SpaceEditor = (): JSX.Element | null => {
   const { t } = useTranslation();
 
   useQuery<Query, QuerySpaceByPkArgs>(SPACE_QUERY, {
-    variables: { pk: Number(spaceId) },
+    variables: { pk: Number(spacePk) },
     onCompleted: ({ spaceByPk }) => {
       if (spaceByPk) {
         dispatch({ type: "dataLoaded", space: spaceByPk });
@@ -381,13 +381,13 @@ const SpaceEditor = (): JSX.Element | null => {
                 helper={t("SpaceModal.page1.parentHelperText")}
                 options={state.parentOptions}
                 value={getParent(
-                  state.spaceEdit?.parentId || null,
+                  state.spaceEdit?.parentPk,
                   state.parentOptions
                 )}
                 onChange={(selected: ParentType) =>
                   dispatch({
                     type: "setParent",
-                    parentId: selected.value?.pk as number,
+                    parentPk: selected.value?.pk as number,
                   })
                 }
               />

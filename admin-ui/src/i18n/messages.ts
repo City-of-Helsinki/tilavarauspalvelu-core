@@ -722,6 +722,7 @@ const translations: ITranslations = {
   SpaceEditor: {
     noParent: ["Päätason tila"],
     noAddress: ["Toimipisteellä ei ole osoitetta"],
+    noSurfaceArea: ["Pinta-alaa ei ole asetettu"],
     details: ["Tilan tiedot"],
     hierarchy: ["Tilapuurakenne"],
     parent: ["Ylitila"],

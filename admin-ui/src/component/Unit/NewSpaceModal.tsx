@@ -16,19 +16,19 @@ import styled from "styled-components";
 import { FetchResult, useMutation } from "@apollo/client";
 import { useTranslation, TFunction } from "react-i18next";
 import { omit, set, startCase } from "lodash";
-import { Space } from "../../common/types";
 import { parseAddress } from "../../common/util";
 import { CREATE_SPACE } from "../../common/queries";
 import { CustomDialogHeader } from "./CustomDialogHeader";
 import { languages } from "../../common/const";
 import {
+  Maybe,
   SpaceCreateMutationInput,
   SpaceCreateMutationPayload,
   SpaceType,
   UnitByPkType,
 } from "../../common/gql-types";
 
-const defaultParentSpaceId = "1";
+const defaultParentSpacePk = 1;
 interface IProps {
   unit: UnitByPkType;
   parentSpace?: SpaceType;
@@ -41,10 +41,10 @@ type SpaceMutationInputWithKey<T> = Partial<T> & { key: string };
 
 type State = {
   numSpaces: number;
-  parentSpace?: Space | null;
+  parentSpace?: SpaceType | null;
   spaces: SpaceMutationInputWithKey<SpaceCreateMutationInput>[];
   page: number;
-  unitId: string;
+  unitPk: number;
 };
 
 type Action =
@@ -65,7 +65,7 @@ const initialState = {
   parentSpace: undefined,
   spaces: [],
   page: 0,
-  unitId: "0",
+  unitPk: 0,
 } as State;
 
 let id = -1;
@@ -75,15 +75,18 @@ const getId = (): string => {
   return String(id);
 };
 
-const initialSpace = (parentSpaceId: string | null, unitId: string) =>
+const initialSpace = (
+  parentSpacePk: Maybe<number> | undefined,
+  unitPk: number
+) =>
   ({
-    unitId,
+    unitPk,
     key: getId(),
     nameFi: "",
     surfaceArea: 0,
     maxPersons: 0,
     locationType: "fixed",
-    parentId: parentSpaceId, // WIP to be made optional in api
+    parentIPk: parentSpacePk,
   } as SpaceMutationInputWithKey<SpaceCreateMutationInput>);
 
 const reducer = (state: State, action: Action): State => {
@@ -116,7 +119,7 @@ const reducer = (state: State, action: Action): State => {
       );
     }
     case "setUnit": {
-      return set({ ...state }, "unitId", action.unit.pk);
+      return set({ ...state }, "unitPk", action.unit.pk);
     }
     case "setParentSpace": {
       return set({ ...state }, "parentSpace", action.parentSpace);
@@ -126,8 +129,8 @@ const reducer = (state: State, action: Action): State => {
         ...state,
         spaces: state.spaces.concat([
           initialSpace(
-            String(state.parentSpace?.id || defaultParentSpaceId),
-            state.unitId
+            state.parentSpace?.pk || defaultParentSpacePk,
+            state.unitPk
           ),
         ]),
       };
@@ -148,10 +151,7 @@ const reducer = (state: State, action: Action): State => {
       // populate initial data for spaces
       if (nextState.spaces.length === 0) {
         nextState.spaces = Array.from(Array(state.numSpaces).keys()).map(() =>
-          initialSpace(
-            String(state.parentSpace?.id || defaultParentSpaceId),
-            state.unitId
-          )
+          initialSpace(state.parentSpace?.pk, state.unitPk)
         );
       }
       return nextState;
@@ -291,7 +291,7 @@ function FirstPage({
           <div>
             <Name>{unit.nameFi}</Name>
             <Parent>
-              {editorState.parentSpace ? editorState.parentSpace.name.fi : null}
+              {editorState.parentSpace ? editorState.parentSpace.nameFi : null}
             </Parent>
           </div>
           {unit.location ? (
@@ -507,7 +507,7 @@ const SecondPage = ({
             <Name>{unit.nameFi}</Name>
             <Parent>
               {editorState.parentSpace
-                ? editorState.parentSpace.name.fi
+                ? editorState.parentSpace.nameFi
                 : t("SpaceModal.page2.newRootSpace")}
             </Parent>
           </div>
@@ -554,7 +554,7 @@ const SecondPage = ({
                     "locationType",
                     "parentId",
                   ]) as SpaceCreateMutationInput),
-                  unitId: editorState.unitId,
+                  unitPk: editorState.unitPk,
                 })
               )
             );

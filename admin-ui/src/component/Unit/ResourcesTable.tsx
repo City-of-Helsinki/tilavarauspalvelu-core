@@ -48,9 +48,9 @@ const ResourcesTable = ({
   >(DELETE_RESOURCE);
 
   const deleteResource = (
-    id: number
+    pk: number
   ): Promise<FetchResult<{ deleteSpace: ResourceDeleteMutationPayload }>> =>
-    deleteResourceMutation({ variables: { input: { pk: String(id) } } });
+    deleteResourceMutation({ variables: { input: { pk } } });
 
   const { t, i18n } = useTranslation();
 

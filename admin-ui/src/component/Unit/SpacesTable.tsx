@@ -69,9 +69,9 @@ const SpacesTable = ({
   >(DELETE_SPACE);
 
   const deleteSpace = (
-    id: number
+    pk: number
   ): Promise<FetchResult<{ deleteSpace: SpaceDeleteMutationPayload }>> =>
-    deleteSpaceMutation({ variables: { input: { pk: String(id) } } });
+    deleteSpaceMutation({ variables: { input: { pk } } });
 
   const modal = useRef<ModalRef>();
 

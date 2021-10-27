@@ -14,7 +14,7 @@ import Map from "./Map";
 import SubPageHead from "./SubPageHead";
 
 interface IProps {
-  unitId: string;
+  unitPk: string;
 }
 
 const Wrapper = styled.div``;
@@ -25,10 +25,10 @@ const UnitMap = (): JSX.Element => {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const { t } = useTranslation();
-  const unitId = Number(useParams<IProps>().unitId);
+  const unitPk = Number(useParams<IProps>().unitPk);
 
   useQuery<Query, QueryUnitByPkArgs>(UNIT_QUERY, {
-    variables: { pk: unitId },
+    variables: { pk: unitPk },
     onCompleted: ({ unitByPk }) => {
       if (unitByPk) {
         setUnit(unitByPk);

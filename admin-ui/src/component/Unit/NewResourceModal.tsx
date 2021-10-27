@@ -26,7 +26,7 @@ import {
 
 interface IProps {
   unit: UnitType;
-  spaceId: number;
+  spacePk: number;
   closeModal: () => void;
   onSave: () => void;
   spaces: SpaceType[];
@@ -40,7 +40,7 @@ type State = {
 
 type Action =
   | { type: "setResourceName"; lang: string; name: string }
-  | { type: "setSpaceId"; spaceId: number }
+  | { type: "setSpacePk"; spacePk: number }
   | { type: "setError"; error: string }
   | { type: "clearError" }
   | {
@@ -53,8 +53,8 @@ const initialState = { resource: {} } as State;
 
 const reducer = (state: State, action: Action): State => {
   switch (action.type) {
-    case "setSpaceId": {
-      return set({ ...state }, "resource.spaceId", action.spaceId);
+    case "setSpacePk": {
+      return set({ ...state }, "resource.spacePk", action.spacePk);
     }
     case "setResourceName": {
       return set(
@@ -125,17 +125,17 @@ const NewResourceModal = ({
   unit,
   closeModal,
   onSave,
-  spaceId,
+  spacePk,
   spaces,
 }: IProps): JSX.Element | null => {
   const [editorState, dispatch] = useReducer(reducer, initialState);
   const { t } = useTranslation();
 
   useEffect(() => {
-    if (spaceId) {
-      dispatch({ type: "setSpaceId", spaceId });
+    if (spacePk) {
+      dispatch({ type: "setSpacePk", spacePk });
     }
-  }, [spaceId]);
+  }, [spacePk]);
 
   const [createResourceMutation] = useMutation<Mutation>(CREATE_RESOURCE);
 
@@ -150,7 +150,7 @@ const NewResourceModal = ({
     editorState.resource.descriptionSv &&
     editorState.resource.descriptionEn;
 
-  const editDisabled = !editorState.resource.spaceId;
+  const editDisabled = !editorState.resource.spacePk;
 
   const create = async (resource: ResourceCreateMutationInput) => {
     try {
@@ -208,7 +208,7 @@ const NewResourceModal = ({
             })),
           ]}
           onChange={(v: { label: string; value: number }) =>
-            dispatch({ type: "setSpaceId", spaceId: v.value })
+            dispatch({ type: "setSpacePk", spacePk: v.value })
           }
         />
         <EditorContainer>
