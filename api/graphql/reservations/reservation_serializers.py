@@ -14,6 +14,7 @@ from reservations.models import STATE_CHOICES, Reservation
 
 
 class ReservationCreateSerializer(PrimaryKeySerializer):
+    state = serializers.CharField()
     reservation_unit_pks = serializers.ListField(
         child=IntegerPrimaryKeyField(queryset=ReservationUnit.objects.all()),
         source="reservation_unit",
@@ -29,6 +30,7 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
             "reservee_phone",
             "name",
             "description",
+            "state",
             "priority",
             "begin",
             "end",
@@ -39,6 +41,7 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields["state"].read_only = True
         self.fields["reservation_unit_pks"].write_only = True
 
     def validate(self, data):
@@ -186,4 +189,20 @@ class ReservationUpdateSerializer(
         validated_data = super().validated_data
         validated_data["state"] = self.instance.state
         validated_data["user"] = self.instance.user
+        return validated_data
+
+
+class ReservationConfirmSerializer(ReservationUpdateSerializer):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # All fields should be read-only, except for the lookup
+        # field (PK) which should be included in the input
+        for field in self.fields:
+            self.fields[field].read_only = True
+        self.fields["pk"].read_only = False
+
+    @property
+    def validated_data(self):
+        validated_data = super().validated_data
+        validated_data["state"] = STATE_CHOICES.CONFIRMED
         return validated_data
