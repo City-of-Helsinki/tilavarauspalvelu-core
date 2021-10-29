@@ -4,6 +4,7 @@ from unittest import mock
 from assertpy import assert_that
 from django.conf import settings
 from django.test.testcases import TestCase
+from django.utils.timezone import get_default_timezone
 
 from opening_hours.hours import TimeElement
 from opening_hours.utils.opening_hours_client import OpeningHoursClient
@@ -14,6 +15,8 @@ DATES = [
     datetime.datetime.strptime("2021-01-01", "%Y-%m-%d").date(),
     datetime.datetime.strptime("2021-01-02", "%Y-%m-%d").date(),
 ]
+
+DEFAULT_TIMEZONE = get_default_timezone()
 
 
 @mock.patch("opening_hours.utils.opening_hours_client.get_opening_hours")
@@ -27,6 +30,7 @@ class OpeningHoursClientTestCase(TestCase):
         resource_id = f"{settings.HAUKI_ORIGIN_ID}:{self.reservation_unit.uuid}"
         return [
             {
+                "timezone": DEFAULT_TIMEZONE,
                 "resource_id": resource_id,
                 "origin_id": str(self.reservation_unit.uuid),
                 "date": DATES[0],
@@ -39,6 +43,7 @@ class OpeningHoursClientTestCase(TestCase):
                 ],
             },
             {
+                "timezone": DEFAULT_TIMEZONE,
                 "resource_id": resource_id,
                 "origin_id": str(self.reservation_unit.uuid),
                 "date": DATES[1],
@@ -97,19 +102,11 @@ class OpeningHoursClientTestCase(TestCase):
         client = OpeningHoursClient(
             str(self.reservation_unit.uuid), DATES[0], DATES[1], single=True
         )
-        begin = datetime.datetime(
-            year=DATES[0].year,
-            month=DATES[0].month,
-            day=DATES[0].day,
-            hour=10,
-            minute=00,
+        begin = datetime.datetime.fromisoformat(
+            f"{DATES[0].year}-0{DATES[0].month}-0{DATES[0].day}T10:00"
         )
-        end = datetime.datetime(
-            year=DATES[0].year,
-            month=DATES[0].month,
-            day=DATES[0].day,
-            hour=12,
-            minute=00,
+        end = datetime.datetime.fromisoformat(
+            f"{DATES[0].year}-0{DATES[0].month}-0{DATES[0].day}T12:00"
         )
         is_open = client.is_resource_open(str(self.reservation_unit.uuid), begin, end)
         assert_that(is_open).is_true()
@@ -119,20 +116,42 @@ class OpeningHoursClientTestCase(TestCase):
         client = OpeningHoursClient(
             str(self.reservation_unit.uuid), DATES[0], DATES[1], single=True
         )
-        begin = datetime.datetime(
-            year=DATES[0].year,
-            month=DATES[0].month,
-            day=DATES[0].day,
-            hour=21,
-            minute=00,
+        begin = datetime.datetime.fromisoformat(
+            f"{DATES[0].year}-0{DATES[0].month}-0{DATES[0].day}T21:00"
         )
-        end = datetime.datetime(
-            year=DATES[0].year,
-            month=DATES[0].month,
-            day=DATES[0].day,
-            hour=23,
-            minute=00,
+        end = datetime.datetime.fromisoformat(
+            f"{DATES[0].year}-0{DATES[0].month}-0{DATES[0].day}T23:00"
         )
+        is_open = client.is_resource_open(str(self.reservation_unit.uuid), begin, end)
+        assert_that(is_open).is_false()
+
+    def test_is_resource_open_respects_timezone_is_true(self, mock):
+        mock.return_value = self.get_mocked_opening_hours()
+        client = OpeningHoursClient(
+            str(self.reservation_unit.uuid), DATES[0], DATES[1], single=True
+        )
+        begin = datetime.datetime.fromisoformat(
+            f"{DATES[0].year}-0{DATES[0].month}-0{DATES[0].day}T21:00+02:00"
+        )
+        end = datetime.datetime.fromisoformat(
+            f"{DATES[0].year}-0{DATES[0].month}-0{DATES[0].day}T23:00+02:00"
+        )
+
+        is_open = client.is_resource_open(str(self.reservation_unit.uuid), begin, end)
+        assert_that(is_open).is_true()
+
+    def test_is_resource_open_respects_timezone_is_false(self, mock):
+        mock.return_value = self.get_mocked_opening_hours()
+        client = OpeningHoursClient(
+            str(self.reservation_unit.uuid), DATES[0], DATES[1], single=True
+        )
+        begin = datetime.datetime.fromisoformat(
+            f"{DATES[0].year}-0{DATES[0].month}-0{DATES[0].day}T06:00+02:00"
+        )
+        end = datetime.datetime.fromisoformat(
+            f"{DATES[0].year}-0{DATES[0].month}-0{DATES[0].day}T07:00+02:00"
+        )
+
         is_open = client.is_resource_open(str(self.reservation_unit.uuid), begin, end)
         assert_that(is_open).is_false()
 

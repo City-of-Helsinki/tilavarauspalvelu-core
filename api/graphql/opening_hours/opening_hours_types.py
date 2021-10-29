@@ -96,8 +96,8 @@ class OpeningHoursMixin:
                 for time in times:
                     oh = OpeningTimesType(
                         date=date,
-                        start_time=time.start_time,
-                        end_time=time.end_time,
+                        start_time=time.start_time.time(),
+                        end_time=time.end_time.time(),
                         state=time.resource_state,
                         periods=time.periods,
                     )

@@ -6,6 +6,7 @@ import snapshottest
 from assertpy import assert_that
 from django.conf import settings
 from django.test import override_settings
+from django.utils.timezone import get_default_timezone
 from freezegun import freeze_time
 from rest_framework.test import APIClient
 
@@ -29,6 +30,8 @@ from reservations.tests.factories import ReservationFactory
 from resources.tests.factories import ResourceFactory
 from services.tests.factories import ServiceFactory
 from spaces.tests.factories import SpaceFactory, UnitFactory
+
+DEFAULT_TIMEZONE = get_default_timezone()
 
 
 @freeze_time("2021-05-03")
@@ -187,7 +190,7 @@ class ReservationUnitTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
             f"reservationUnitByPk(pk: {self.reservation_unit.id}) {{\n"
             f"id\n"
             f'openingHours(periods:true openingTimes:true startDate:"2020-01-01" endDate:"2022-01-01")'
-            f"{{openingTimes{{date}} openingTimePeriods{{timeSpans{{startTime}}}}"
+            f"{{openingTimes{{date startTime endTime}} openingTimePeriods{{timeSpans{{startTime}}}}"
             f"}}"
             f"}}"
             f"}}"
@@ -209,6 +212,12 @@ class ReservationUnitTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
             .get("openingHours")
             .get("openingTimes")
         ).is_not_empty()
+        assert_that(
+            content.get("data")
+            .get("reservationUnitByPk")
+            .get("openingHours")
+            .get("openingTimes")[0]["startTime"]
+        ).is_equal_to("10:00:00")
 
     def test_filtering_by_type(self):
         response = self.query(
@@ -700,6 +709,7 @@ def get_mocked_opening_hours(uuid):
     resource_id = f"{settings.HAUKI_ORIGIN_ID}:{uuid}"
     return [
         {
+            "timezone": DEFAULT_TIMEZONE,
             "resource_id": resource_id,
             "origin_id": str(uuid),
             "date": datetime.date(2020, 1, 1),
@@ -714,6 +724,7 @@ def get_mocked_opening_hours(uuid):
             ],
         },
         {
+            "timezone": DEFAULT_TIMEZONE,
             "resource_id": resource_id,
             "origin_id": str(uuid),
             "date": datetime.date(2020, 1, 2),

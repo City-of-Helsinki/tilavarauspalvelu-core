@@ -4,6 +4,8 @@ from django.utils.timezone import get_default_timezone
 
 from opening_hours.utils.opening_hours_client import OpeningHoursClient
 
+DEFAULT_TIMEZONE = get_default_timezone()
+
 
 class ReservationUnitReservationScheduler:
     APRIL = 4
@@ -22,8 +24,8 @@ class ReservationUnitReservationScheduler:
         else:
             self.reservation_duration = 1
 
-        self.start_time = datetime.datetime.now(
-            tz=get_default_timezone()
+        self.start_time = DEFAULT_TIMEZONE.localize(
+            datetime.datetime.now()
         ) + datetime.timedelta(hours=2)
         self.end_time = self.start_time + datetime.timedelta(
             hours=self.reservation_duration
@@ -63,13 +65,14 @@ class ReservationUnitReservationScheduler:
                     open_application_round.reservation_period_end
                     + datetime.timedelta(days=1)
                 )
-                self.start_time = datetime.datetime(
-                    self.start_time.year,
-                    self.start_time.month,
-                    self.start_time.day,
-                    0,
-                    0,
-                    tzinfo=get_default_timezone(),
+                self.start_time = DEFAULT_TIMEZONE.localize(
+                    datetime.datetime(
+                        self.start_time.year,
+                        self.start_time.month,
+                        self.start_time.day,
+                        0,
+                        0,
+                    )
                 )
 
             else:
@@ -125,16 +128,11 @@ class ReservationUnitReservationScheduler:
             if not times:
                 break
             try:
-                opening_hours = sorted([time.start_time.hour for time in times])
-                for hour in [hour for hour in opening_hours if hour >= start.hour]:
-                    matching = datetime.datetime(
-                        open_date.year,
-                        open_date.month,
-                        open_date.day,
-                        hour,
-                        0,
-                        tzinfo=get_default_timezone(),
-                    )
+                opening_hours = sorted([time.start_time for time in times])
+                for start_time in [
+                    start_time for start_time in opening_hours if start_time >= start
+                ]:
+                    matching = start_time
             except ValueError:
                 continue
             start = datetime.timedelta(days=1)
