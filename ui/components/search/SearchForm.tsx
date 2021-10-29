@@ -1,20 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "next-i18next";
-import { Select, TextInput, Button as HDSButton, IconSearch } from "hds-react";
+import { Select, TextInput, IconSearch } from "hds-react";
 import { useForm } from "react-hook-form";
 import styled from "styled-components";
+import { useUpdate } from "react-use";
 import { breakpoint } from "../../modules/style";
 import { getApplicationRounds, getParameters } from "../../modules/api";
 import { mapOptions, getSelectedOption } from "../../modules/util";
 import { emptyOption, participantCountOptions } from "../../modules/const";
 import { OptionType } from "../../modules/types";
+import { MediumButton } from "../../styles/util";
 
 type Props = {
   onSearch: (search: Record<string, string>) => void;
   formValues: { [key: string]: string };
 };
 
-const Button = styled(HDSButton)`
+const Button = styled(MediumButton)`
   margin-left: var(--spacing-m);
 `;
 
@@ -35,6 +37,14 @@ const Container = styled.div`
   font-size: var(--fontsize-body-m);
 `;
 
+const StyledSelect = styled(Select)`
+  @media (max-width: ${breakpoint.m}) {
+    height: unset;
+  }
+
+  height: 82px;
+`;
+
 const Hr = styled.hr`
   margin-top: var(--spacing-l);
 `;
@@ -47,7 +57,8 @@ const ButtonContainer = styled.div`
 
 const SearchForm = ({ onSearch, formValues }: Props): JSX.Element | null => {
   const { t, i18n } = useTranslation();
-  const [ready, setReady] = useState<boolean>(false);
+  const update = useUpdate();
+
   const [reservationUnitTypeOptions, setReservationUnitTypeOptions] = useState<
     OptionType[]
   >([]);
@@ -81,7 +92,6 @@ const SearchForm = ({ onSearch, formValues }: Props): JSX.Element | null => {
           i18n.language
         )
       );
-      setReady(true);
     }
     fetchData();
   }, [i18n, t]);
@@ -93,10 +103,6 @@ const SearchForm = ({ onSearch, formValues }: Props): JSX.Element | null => {
   const search = (criteria: Record<string, string>) => {
     onSearch(criteria);
   };
-
-  if (!ready) {
-    return null;
-  }
 
   return (
     <>
@@ -114,20 +120,21 @@ const SearchForm = ({ onSearch, formValues }: Props): JSX.Element | null => {
           }}
           defaultValue={formValues.search}
         />
-        <Select
+        <StyledSelect
           id="applicationRound"
           placeholder={t("common:select")}
           options={applicationPeriodOptions}
           onChange={(selection: OptionType): void => {
             setValue("applicationRound", selection.value);
+            update();
           }}
-          defaultValue={getSelectedOption(
+          value={getSelectedOption(
             getValues("applicationRound"),
             applicationPeriodOptions
           )}
           label={t("searchForm:roundLabel")}
         />
-        <Select
+        <StyledSelect
           id="participantCountFilter"
           placeholder={t("common:select")}
           options={[emptyOption(t("common:select"))].concat(
@@ -136,20 +143,22 @@ const SearchForm = ({ onSearch, formValues }: Props): JSX.Element | null => {
           label={t("searchForm:participantCountLabel")}
           onChange={(selection: OptionType): void => {
             setValue("maxPersons", selection.value);
+            update();
           }}
-          defaultValue={getSelectedOption(
+          value={getSelectedOption(
             getValues("maxPersons"),
             participantCountOptions
           )}
         />
-        <Select
+        <StyledSelect
           placeholder={t("common:select")}
           options={reservationUnitTypeOptions}
           label={t("searchForm:typeLabel")}
           onChange={(selection: OptionType): void => {
             setValue("reservationUnitType", selection.value);
+            update();
           }}
-          defaultValue={getSelectedOption(
+          value={getSelectedOption(
             getValues("reservationUnitType"),
             reservationUnitTypeOptions
           )}

@@ -1,12 +1,13 @@
-import { Button, IconGroup, IconLocation, IconHome } from "hds-react";
+import { IconGroup, IconLocation, IconHome } from "hds-react";
 import React from "react";
 import { useTranslation } from "next-i18next";
 import router from "next/router";
 import Link from "next/link";
 import styled from "styled-components";
 import { breakpoint } from "../../modules/style";
-import { getAddress, getMainImage, localizedValue } from "../../modules/util";
+import { getMainImage, getTranslation } from "../../modules/util";
 import IconWithText from "../common/IconWithText";
+import { MediumButton } from "../../styles/util";
 import { ReservationUnitType } from "../../modules/gql-types";
 
 interface Props {
@@ -78,6 +79,10 @@ const StyledIconWithText = styled(IconWithText)`
     margin-left: var(--spacing-2-xs);
     font-family: var(--font-medium);
     font-weight: 500;
+
+    @media (min-width: ${breakpoint.m}) {
+      white-space: nowrap;
+    }
   }
 `;
 
@@ -119,13 +124,18 @@ const Image = styled.img`
   }
 `;
 const ReservationUnitCard = ({ reservationUnit }: Props): JSX.Element => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
+
+  const link = `/reservation-unit/single/${reservationUnit.id}`;
+  const address = `${
+    getTranslation(reservationUnit.location, "addressStreet") || ""
+  }`;
 
   return (
     <Container>
       <Image
         alt={t("common:imgAltForSpace", {
-          name: localizedValue(reservationUnit.name, i18n.language),
+          name: getTranslation(reservationUnit, "name"),
         })}
         src={
           getMainImage(reservationUnit)?.mediumUrl ||
@@ -134,21 +144,16 @@ const ReservationUnitCard = ({ reservationUnit }: Props): JSX.Element => {
       />
       <MainContent>
         <Name>
-          <Link href={`../reservation-unit/${reservationUnit.id}`}>
-            {localizedValue(reservationUnit.name, i18n.language)}
-          </Link>
+          <Link href={link}>{getTranslation(reservationUnit, "name")}</Link>
         </Name>
         <Description>
-          {localizedValue(reservationUnit.unit?.name, i18n.language)}
+          {getTranslation(reservationUnit.unit, "name")}
         </Description>
         <Bottom>
           {reservationUnit.reservationUnitType && (
             <StyledIconWithText
               icon={<IconHome aria-label={t("reservationUnitCard:type")} />}
-              text={localizedValue(
-                reservationUnit.reservationUnitType?.name,
-                i18n.language
-              )}
+              text={getTranslation(reservationUnit.reservationUnitType, "name")}
             />
           )}
           {reservationUnit.maxPersons && (
@@ -163,27 +168,22 @@ const ReservationUnitCard = ({ reservationUnit }: Props): JSX.Element => {
               text={`${reservationUnit.maxPersons}`}
             />
           )}
-          {getAddress(reservationUnit) && (
+          {address && (
             <StyledIconWithText
               className="grow"
               icon={
                 <IconLocation aria-label={t("reservationUnitCard:address")} />
               }
-              text={getAddress(reservationUnit) || ""}
+              text={address}
             />
           )}
         </Bottom>
       </MainContent>
       <Actions>
         <div style={{ flexGrow: 1 }} />
-        <Button
-          variant="secondary"
-          onClick={() =>
-            router.push(`/single/reservation-unit/${reservationUnit.id}`)
-          }
-        >
+        <MediumButton variant="secondary" onClick={() => router.push(link)}>
           {t("reservationUnitCard:seeMore")}
-        </Button>
+        </MediumButton>
       </Actions>
     </Container>
   );

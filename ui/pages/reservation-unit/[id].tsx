@@ -1,45 +1,90 @@
 import React from "react";
+import { GetServerSideProps } from "next";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
+import { Koros } from "hds-react";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Container from "../../components/common/Container";
-import { ReservationUnit as ReservationUnitType } from "../../modules/types";
-import { getReservationUnit, getReservationUnits } from "../../modules/api";
 import Head from "../../components/reservation-unit/Head";
 import Address from "../../components/reservation-unit/Address";
-import Images from "../../components/reservation-unit/Images";
-import { SpanTwoColumns } from "../../components/common/common";
 import Sanitize from "../../components/common/Sanitize";
 import { breakpoint } from "../../modules/style";
 import RelatedUnits from "../../components/reservation-unit/RelatedUnits";
 import useReservationUnitsList from "../../hooks/useReservationUnitList";
 import StartApplicationBar from "../../components/common/StartApplicationBar";
 import { AccordionWithState as Accordion } from "../../components/common/Accordion";
+import apolloClient from "../../modules/apolloClient";
+import Map from "../../components/Map";
+import { H2 } from "../../modules/style/typography";
+import { getActiveOpeningTimes } from "../../modules/openingHours";
+import {
+  Query,
+  QueryReservationUnitByPkArgs,
+  QueryReservationUnitsArgs,
+  ReservationUnitByPkType,
+  ReservationUnitType,
+  ReservationUnitTypeEdge,
+} from "../../modules/gql-types";
+import { getTranslation } from "../../modules/util";
+import {
+  RELATED_RESERVATION_UNITS,
+  RESERVATION_UNIT,
+} from "../../modules/queries/reservationUnit";
 
 type Props = {
-  reservationUnit: ReservationUnitType | null;
+  reservationUnit: ReservationUnitByPkType | null;
   relatedReservationUnits: ReservationUnitType[];
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export const getServerSideProps = async ({ locale, params }) => {
+export const getServerSideProps: GetServerSideProps = async ({
+  locale,
+  params,
+}) => {
   const id = Number(params.id);
-
-  let reservationUnit = null;
   let relatedReservationUnits = [] as ReservationUnitType[];
 
   if (id) {
-    reservationUnit = await getReservationUnit(Number(id));
-    if (reservationUnit.id) {
-      relatedReservationUnits = (
-        await getReservationUnits({ unit: reservationUnit.unitId })
-      ).filter((u) => u.id !== Number(id));
+    const { data: reservationUnitData } = await apolloClient.query<
+      Query,
+      QueryReservationUnitByPkArgs
+    >({
+      query: RESERVATION_UNIT,
+      variables: {
+        pk: id,
+      },
+    });
+
+    if (reservationUnitData.reservationUnitByPk?.unit?.pk) {
+      const { data: relatedReservationUnitsData } = await apolloClient.query<
+        Query,
+        QueryReservationUnitsArgs
+      >({
+        query: RELATED_RESERVATION_UNITS,
+        variables: {
+          unit: String(reservationUnitData.reservationUnitByPk.unit.pk),
+        },
+      });
+
+      relatedReservationUnits =
+        relatedReservationUnitsData?.reservationUnits?.edges
+          .map((n: ReservationUnitTypeEdge) => n.node)
+          .filter(
+            (n: ReservationUnitType) =>
+              n.pk !== reservationUnitData.reservationUnitByPk.pk
+          );
+    }
+
+    if (!reservationUnitData.reservationUnitByPk?.pk) {
+      return {
+        notFound: true,
+      };
     }
 
     return {
       props: {
         ...(await serverSideTranslations(locale)),
-        reservationUnit,
+        reservationUnit: reservationUnitData.reservationUnitByPk,
         relatedReservationUnits,
       },
     };
@@ -52,9 +97,12 @@ const TwoColumnLayout = styled.div`
   display: grid;
   gap: var(--spacing-layout-s);
   grid-template-columns: 7fr 390px;
+  margin-top: var(--spacing-m);
+  margin-bottom: var(--spacing-xl);
 
   @media (max-width: ${breakpoint.l}) {
     grid-template-columns: 1fr;
+    margin-bottom: var(--spacing-m);
   }
 `;
 
@@ -62,11 +110,33 @@ const Content = styled.div`
   font-family: var(--font-regular);
 `;
 
-const Heading = styled.div`
-  margin-top: var(--spacing-s);
-  margin-bottom: var(--spacing-l);
-  font-size: var(--fontsize-heading-m);
-  font-family: var(--font-bold);
+const BottomWrapper = styled.div`
+  margin: 0;
+  padding: 0;
+  background-color: var(--color-silver-medium-light);
+`;
+
+const BottomContainer = styled(Container)`
+  background-color: var(--color-silver-medium-light);
+  margin-top: var(--spacing-layout-l);
+  margin-bottom: calc(var(--spacing-s) * -1 + var(--spacing-layout-xl) * -1);
+  padding-bottom: var(--spacing-layout-xl);
+`;
+
+const StyledKoros = styled(Koros).attrs({
+  type: "basic",
+})`
+  fill: var(--tilavaraus-gray);
+`;
+
+const StyledH2 = styled(H2)`
+  && {
+    margin-bottom: var(--spacing-xl);
+  }
+`;
+
+const MapWrapper = styled.div`
+  margin-bottom: var(--spacing-xl);
 `;
 
 const ReservationUnit = ({
@@ -75,42 +145,87 @@ const ReservationUnit = ({
 }: Props): JSX.Element | null => {
   const { t } = useTranslation();
 
+  const activeOpeningTimes = getActiveOpeningTimes(
+    reservationUnit.openingHours.openingTimePeriods
+  );
+
   const reservationUnitList = useReservationUnitsList();
+
+  const shouldDisplayBottomWrapper = relatedReservationUnits?.length > 0;
 
   return reservationUnit ? (
     <>
       <Head
         reservationUnit={reservationUnit}
+        activeOpeningTimes={activeOpeningTimes}
         reservationUnitList={reservationUnitList}
+        viewType="recurring"
       />
       <Container>
         <TwoColumnLayout>
           <div>
             <Accordion open heading={t("reservationUnit:description")}>
               <Content>
-                <Sanitize html={reservationUnit.description} />
-              </Content>
-            </Accordion>
-            <Accordion heading={t("reservationUnit:termsOfUse")}>
-              <Content>
-                <Sanitize html={reservationUnit.termsOfUse} />
+                <Sanitize
+                  html={getTranslation(reservationUnit, "description")}
+                />
               </Content>
             </Accordion>
           </div>
           <div>
             <Address reservationUnit={reservationUnit} />
-            <Images images={reservationUnit.images} />
           </div>
-          <SpanTwoColumns>
-            <Heading>{t("reservationUnitCard:RelatedUnits.heading")}</Heading>
-            <RelatedUnits
-              reservationUnitList={reservationUnitList}
-              units={[...relatedReservationUnits, ...relatedReservationUnits]}
-              viewType="recurring"
+        </TwoColumnLayout>
+        {reservationUnit.location && (
+          <MapWrapper>
+            <StyledH2>{t("common:location")}</StyledH2>
+            <Map
+              title={getTranslation(reservationUnit.unit, "name")}
+              latitude={Number(reservationUnit.location?.latitude)}
+              longitude={Number(reservationUnit.location?.longitude)}
             />
-          </SpanTwoColumns>
+          </MapWrapper>
+        )}
+        <TwoColumnLayout>
+          <Address reservationUnit={reservationUnit} />
+          <div />
+          <Accordion heading={t("reservationUnit:termsOfUse")}>
+            <Content>
+              <Sanitize html={getTranslation(reservationUnit, "termsOfUse")} />
+            </Content>
+          </Accordion>
+          <div />
+          <Accordion heading={t("reservationUnit:termsOfUseSpaces")}>
+            <Content>
+              {reservationUnit.spaces?.map((space) => (
+                <React.Fragment key={space.pk}>
+                  {reservationUnit.spaces.length > 1 && (
+                    <h3>{getTranslation(space, "name")}</h3>
+                  )}
+                  <p>
+                    <Sanitize html={getTranslation(space, "termsOfUse")} />
+                  </p>
+                </React.Fragment>
+              ))}
+            </Content>
+          </Accordion>
+          <div />
         </TwoColumnLayout>
       </Container>
+      <BottomWrapper>
+        {shouldDisplayBottomWrapper && (
+          <>
+            <StyledKoros flipHorizontal />
+            <BottomContainer>
+              <RelatedUnits
+                reservationUnitList={reservationUnitList}
+                units={relatedReservationUnits}
+                viewType="recurring"
+              />
+            </BottomContainer>
+          </>
+        )}
+      </BottomWrapper>
       <StartApplicationBar
         count={reservationUnitList.reservationUnits.length}
       />

@@ -3,6 +3,7 @@ import { Koros } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import queryString from "query-string";
+import { useLocalStorage } from "react-use";
 import { useRouter } from "next/router";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Container from "../../components/common/Container";
@@ -17,18 +18,31 @@ import { ReservationUnit } from "../../modules/types";
 import { searchUrl } from "../../modules/util";
 import { isBrowser, searchPrefix } from "../../modules/const";
 import { CenterSpinner } from "../../components/common/common";
-
-const style = {
-  fontSize: "var(--fontsize-heading-l)",
-} as React.CSSProperties;
+import ClientOnly from "../../components/ClientOnly";
+import { H1 } from "../../modules/style/typography";
 
 const HeadContainer = styled.div`
   background-color: white;
   padding-top: var(--spacing-layout-xs);
 `;
 
+const Title = styled(H1)`
+  && {
+    margin-top: var(--spacing-l);
+    margin-bottom: var(--spacing-xs);
+    font-size: var(--fontsize-heading-l);
+  }
+`;
+
+const Ingress = styled.div`
+  font-family: var(--font-regular);
+  font-size: var(--fontsize-body-xl);
+  margin-bottom: var(--spacing-layout-s);
+`;
+
 const StyledKoros = styled(Koros)`
   fill: white;
+  margin-bottom: var(--spacing-layout-l);
 `;
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -45,6 +59,7 @@ const Search = (): JSX.Element => {
 
   const [values, setValues] = useState({} as Record<string, string>);
   const [state, setState] = useState<"loading" | "done" | "error">("done");
+  const setStoredValues = useLocalStorage("reservationUnit-search", null)[1];
 
   const [reservationUnits, setReservationUnits] = useState<
     ReservationUnit[] | null
@@ -80,6 +95,11 @@ const Search = (): JSX.Element => {
     }
   }, [searchParams, setReservationUnits]);
 
+  useEffect(() => {
+    const params = queryString.parse(searchParams);
+    setStoredValues(params);
+  }, [setStoredValues, searchParams]);
+
   const history = useRouter();
 
   const onSearch = async (criteria: ReservationUnitsParameters) => {
@@ -91,20 +111,22 @@ const Search = (): JSX.Element => {
       <HeadContainer>
         <Container>
           <Breadcrumb current={{ label: "search", linkTo: searchPrefix }} />
-          <h1 style={style}>{t("search:recurring.heading")}</h1>
-          <span className="text-lg">{t("search:recurring.text")}</span>
+          <Title>{t("search:recurring.heading")}</Title>
+          <Ingress className="text-lg">{t("search:recurring.text")}</Ingress>
           <SearchForm onSearch={onSearch} formValues={values} />
         </Container>
       </HeadContainer>
       <StyledKoros type="wave" className="koros" flipHorizontal />
-      {state === "loading" ? (
-        <CenterSpinner />
-      ) : (
-        <SearchResultList
-          error={state === "error"}
-          reservationUnits={reservationUnits}
-        />
-      )}
+      <ClientOnly>
+        {state === "loading" ? (
+          <CenterSpinner style={{ marginTop: "var(--spacing-layout-xl)" }} />
+        ) : (
+          <SearchResultList
+            error={state === "error"}
+            reservationUnits={reservationUnits}
+          />
+        )}
+      </ClientOnly>
     </>
   );
 };

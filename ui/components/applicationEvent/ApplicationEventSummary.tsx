@@ -1,8 +1,7 @@
 import { differenceInWeeks } from "date-fns";
 import { IconArrowRedo, IconCalendar, IconClock, IconGroup } from "hds-react";
-import { TFunction } from "i18next";
 import React from "react";
-import { Trans, useTranslation } from "react-i18next";
+import { Trans, useTranslation, TFunction } from "react-i18next";
 import styled from "styled-components";
 import { ApplicationEvent } from "../../modules/types";
 import { apiDurationToMinutes, fromUIDate } from "../../modules/util";

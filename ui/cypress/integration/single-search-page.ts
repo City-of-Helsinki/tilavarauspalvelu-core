@@ -10,9 +10,16 @@ import {
   paginationButton,
   inputUnitToggler,
   inputUnitOption,
+  inputPurposeToggler,
+  inputPurposeOption,
+  inputUnit,
+  selectOptions,
+  inputPurpose,
+  selectClearButton,
+  inputReservationUnitTypeOption,
 } from "../model/search";
 
-describe("Tilavaraus ui search page", () => {
+describe("Tilavaraus ui search page (single)", () => {
   beforeEach(() => {
     cy.fixture("v1/parameters/reservation_unit_type").then((json) => {
       cy.intercept("GET", "/v1/parameters/reservation_unit_type/*", json);
@@ -45,15 +52,32 @@ describe("Tilavaraus ui search page", () => {
       .siblings("ul")
       .children("li:nth-of-type(4)")
       .click();
-    inputReservationUnitType()
-      .click()
-      .siblings("ul")
-      .children("li:nth-of-type(2)")
-      .click();
+    inputReservationUnitType().click();
+    inputReservationUnitTypeOption(1).click();
+    inputReservationUnitType().click();
+
     inputUnitToggler().click();
     inputUnitOption(1).click();
     inputUnitOption(3).click();
+    inputUnit().type("2");
+    expect(selectOptions("#unitFilter").should("have.length", 1));
+    selectClearButton("#unitFilter").click();
+    expect(selectOptions("#unitFilter").should("have.length", 3));
+    inputUnitOption(1).click();
+    inputUnitOption(3).click();
     inputUnitToggler().click();
+
+    inputPurposeToggler().click();
+    inputPurposeOption(1).click();
+    inputPurposeOption(3).click();
+    inputPurpose().type("1");
+    expect(selectOptions("#purposeFilter").should("have.length", 2));
+    selectClearButton("#purposeFilter").click();
+    expect(selectOptions("#purposeFilter").should("have.length", 4));
+    inputPurposeOption(1).click();
+    inputPurposeOption(3).click();
+    inputPurposeToggler().click();
+
     searchButton().click();
 
     filterTags().should("contain.text", `"${searchTerm}"`);

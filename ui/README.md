@@ -121,4 +121,5 @@ You can write handlers for rest and graphql requests in '/mocks/handlers.ts'. Ca
 | NEXT_PUBLIC_OIDC_SCOPE           | openid profile email https://api.hel.fi/auth/tilavarausapidev |
 | NEXT_PUBLIC_TILAVARAUS_API_SCOPE | https://api.hel.fi/auth/tilavarausapidev                      |
 | NEXT_PUBLIC_ENABLE_MATOMO        | 'true' enables matomo tracking                                |
+| NEXT_PUBLIC_MAPBOX_TOKEN         | token tor mapbox service                                |
 | NEXT_PUBLIC_MOCK_REQUESTS        | 'true' enables network level request mocking                                |

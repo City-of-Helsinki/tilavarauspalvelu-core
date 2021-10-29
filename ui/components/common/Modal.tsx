@@ -1,10 +1,10 @@
 import FocusTrap from "focus-trap-react";
-import { Button } from "hds-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { isBrowser } from "../../modules/const";
 import { breakpoint } from "../../modules/style";
+import { MediumButton } from "../../styles/util";
 
 type Props = {
   handleOk?: () => void;
@@ -106,13 +106,13 @@ const Modal = ({
           <MainContainer>{children}</MainContainer>
           <ButtonContainer>
             {handleOk ? (
-              <Button variant="primary" onClick={handleOk}>
+              <MediumButton variant="primary" onClick={handleOk}>
                 {t(okButtonKey)}
-              </Button>
+              </MediumButton>
             ) : null}
-            <Button variant="secondary" onClick={handleClose}>
+            <MediumButton variant="secondary" onClick={handleClose}>
               {t(closeButtonKey)}
-            </Button>
+            </MediumButton>
           </ButtonContainer>
         </ModalElement>
       </FocusTrap>

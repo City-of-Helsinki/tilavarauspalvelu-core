@@ -11,7 +11,11 @@ const AccordionElement = styled.div`
   padding-left: 0;
 `;
 
-const HeadingButton = styled(Button)`
+const HeadingButton = styled(Button).attrs({
+  style: {
+    "--color": "var(--color-black-90)",
+  } as React.CSSProperties,
+})`
   && {
     width: 100%;
     padding-left: 0;
@@ -21,6 +25,7 @@ const HeadingButton = styled(Button)`
       color: var(--color-black-90);
       font-size: var(--fontsize-heading-m);
       font-family: var(--font-bold);
+      font-weight: 700;
       padding: 0;
       margin: 0;
       margin-right: auto;

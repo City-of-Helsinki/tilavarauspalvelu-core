@@ -6,17 +6,57 @@ export type TranslationObject = {
 
 export type Language = "fi" | "en" | "sv";
 
+export type ApplicationRoundStatus =
+  | "draft"
+  | "in_review"
+  | "review_done"
+  | "allocated"
+  | "handled"
+  | "validated"
+  | "approved";
+
+export type CustomerType = "business" | "nonprofit" | "individual";
+
+export type ApplicationRoundBasket = {
+  id: number;
+  name: string;
+  purposeIds: number[];
+  mustBeMainPurposeOfApplicant: boolean;
+  customerType: CustomerType[] | null;
+  ageGroupIds: number[];
+  allocationPercentage: number;
+  orderNumber: number;
+  homeCityId: number | null;
+};
+
+export type ApplicationRoundAggregatedData = {
+  totalHourCapacity: number;
+  totalReservationDuration: number;
+  allocationDurationTotal: number;
+  allocationResultEventsCount: number;
+};
+
 export type ApplicationRound = {
   id: number;
   name: string;
+  aggregatedData: ApplicationRoundAggregatedData;
   reservationUnitIds: number[];
   applicationPeriodBegin: string;
   applicationPeriodEnd: string;
   reservationPeriodBegin: string;
   reservationPeriodEnd: string;
+  publicDisplayBegin: string;
+  publicDisplayEnd: string;
   purposeIds: number[];
-  criteria: string;
+  serviceSectorId: number;
+  applicationRoundBaskets: ApplicationRoundBasket[];
+  status: ApplicationRoundStatus;
+  statusTimestamp: string;
+  allocating: boolean;
+  isAdmin: boolean;
   approvedBy: string;
+  applicationsSent: boolean;
+  criteria: string;
 };
 
 export type Space = {
@@ -26,6 +66,7 @@ export type Space = {
   parentId: number;
   surfaceArea: null;
   districtId: number;
+  termsOfUse: string;
 };
 
 export type Resource = {
@@ -57,17 +98,13 @@ export type Service = {
   bufferTimeAfter: string;
 };
 
-export type Coordinates = {
-  latitude: number;
-  longitude: number;
-};
-
 export type Location = {
   id: number;
   addressStreet: string;
   addressZip: string;
   addressCity: string;
-  coordinates?: Coordinates;
+  latitude?: string;
+  longitude?: string;
 };
 
 export type Image = {
@@ -94,10 +131,15 @@ export type ReservationUnit = {
   images: Image[];
   location?: Location;
   reservationUnitType?: Parameter;
-  termsOfUse: string;
+  termsOfUse?: string;
   building: Building;
-  contactInformation: string;
+  contactInformation?: string;
   unitId: number;
+  minReservationDuration?: string;
+  maxReservationDuration?: string;
+  nextAvailableSlot?: string;
+  openingHours?: OpeningHours;
+  reservations?: Reservation[];
 };
 
 export type Parameter = {
@@ -223,6 +265,7 @@ export type ApplicationEventSchedule = {
 };
 
 export type ReservationState =
+  | "initial"
   | "created"
   | "cancelled"
   | "confirmed"
@@ -232,13 +275,21 @@ export type ReservationState =
 
 export type Reservation = {
   id: number;
-  applicationId: number;
-  applicationEventId: number;
+  applicationId?: number | null;
+  applicationEventId?: number | null;
   state: ReservationState;
-  priority: number;
+  priority: string;
   begin: string;
   end: string;
-  reservationUnit: ReservationUnit[];
+  reservationUnit?: ReservationUnit[];
+  numPersons?: number;
+  calendarUrl?: string;
+};
+
+export type PendingReservation = {
+  begin: string;
+  end: string;
+  state: "INITIAL";
 };
 
 export type RecurringReservation = {
@@ -302,6 +353,46 @@ export type UserProfile = {
   given_name: string;
   // eslint-disable-next-line camelcase
   family_name: string;
+  email: string;
+};
+
+export type TimeSpan = {
+  startTime: string;
+  endTime: string;
+  weekdays: number[];
+  resourceState: string;
+  endTimeOnNextDay: boolean;
+  name: TranslationObject;
+  description: TranslationObject;
+};
+
+export type OpeningHourTime = {
+  startTime: string;
+  endTime: string;
+  endTimeOnNextDay?: boolean;
+};
+
+export type OpeningTime = {
+  date: string;
+  startTime: string;
+  endTime: string;
+  state: string;
+  periods: number[] | null;
+};
+
+export type OpeningTimePeriod = {
+  periodId: number;
+  startDate: string;
+  endDate: string;
+  resourceState: string;
+  timeSpans: TimeSpan[];
+  name: TranslationObject;
+  description: TranslationObject;
+};
+
+export type OpeningHours = {
+  openingTimes?: OpeningTime[];
+  openingTimePeriods?: OpeningTimePeriod[];
 };
 
 export type Promotion = {

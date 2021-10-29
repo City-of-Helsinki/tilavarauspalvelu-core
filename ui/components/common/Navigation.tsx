@@ -1,19 +1,25 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Navigation as HDSNavigation } from "hds-react";
-import { useTranslation } from "next-i18next";
+import { useTranslation, TFunction } from "next-i18next";
 import { useLocalStorage } from "react-use";
 import { useRouter } from "next/router";
 import styled from "styled-components";
-import { TFunction } from "i18next";
 import { applicationsUrl } from "../../modules/util";
 import { authEnabled, isBrowser } from "../../modules/const";
 import { breakpoint } from "../../modules/style";
 import { UserProfile } from "../../modules/types";
+import RequireAuthentication from "./RequireAuthentication";
 
 interface LanguageOption {
   label: string;
   value: string;
 }
+
+type MenuItem = {
+  title: string;
+  path: string;
+  condition?: boolean;
+};
 
 const languageOptions: LanguageOption[] = [{ label: "Suomeksi", value: "fi" }];
 
@@ -27,7 +33,17 @@ const StyledNavigation = styled(HDSNavigation)`
 
   @media (max-width: ${breakpoint.s}) {
     position: fixed !important;
-    z-index: 10 !important;
+    z-index: 100 !important;
+  }
+`;
+
+const NaviItem = styled(HDSNavigation.Item)<{ $hidden: boolean }>`
+  --item-active-color: var(--color-bus);
+  ${({ $hidden }) => $hidden && `display: none !important;`}
+
+  span {
+    font-family: var(--font-medium);
+    font-weight: 500;
   }
 `;
 
@@ -62,15 +78,26 @@ const Navigation = ({ profile, logout }: Props): JSX.Element => {
     "userLocale",
     i18n.language
   );
+  const [shouldLogin, setShouldLogin] = React.useState(false);
 
   const formatSelectedValue = (lang = DEFAULT_LANGUAGE): string =>
     lang.toUpperCase();
 
-  useEffect(() => {
-    /* if (language) {
-      i18n.changeLanguage(language);
-    } */
-  }, [language, i18n]);
+  const menuItems: MenuItem[] = [
+    {
+      title: "reservationUnitSearch",
+      path: "/search/single",
+    },
+    {
+      title: "spaceReservation",
+      path: "/search",
+    },
+    {
+      title: "applications",
+      path: applicationsUrl,
+      condition: !!profile,
+    },
+  ];
 
   return (
     <>
@@ -82,31 +109,23 @@ const Navigation = ({ profile, logout }: Props): JSX.Element => {
         skipToContentLabel={t("navigation:skipToMainContent")}
       >
         <HDSNavigation.Row variant="inline">
-          <HDSNavigation.Item
-            label={t("navigation:Item.reservationUnitSearch")}
-            onClick={() => router.push("/search")}
-          />
-          <HDSNavigation.Item
-            label={t("navigation:Item.spaceReservation")}
-            onClick={() => router.push("/")}
-          />
-          {profile ? (
-            <HDSNavigation.Item
-              label={t("navigation:Item.applications")}
-              onClick={() => router.push(applicationsUrl)}
+          {menuItems.map((item) => (
+            <NaviItem
+              href="#"
+              key={`${item.title}${item.path}`}
+              label={t(`navigation:Item.${item.title}`)}
+              onClick={() => router.push(item.path)}
+              active={router.pathname === item.path}
+              $hidden={item.condition === false}
             />
-          ) : (
-            <span />
-          )}
+          ))}
         </HDSNavigation.Row>
         <HDSNavigation.Actions>
           <HDSNavigation.User
             userName={getUserName(profile, t)}
             authenticated={Boolean(profile)}
             label={t("common:login")}
-            onSignIn={() => {
-              router.push(applicationsUrl);
-            }}
+            onSignIn={() => setShouldLogin(true)}
           >
             <HDSNavigation.Item
               label={t("common:logout")}
@@ -130,6 +149,11 @@ const Navigation = ({ profile, logout }: Props): JSX.Element => {
         </HDSNavigation.Actions>
       </StyledNavigation>
       <PreContent />
+      {shouldLogin && (
+        <RequireAuthentication>
+          <div />
+        </RequireAuthentication>
+      )}
     </>
   );
 };

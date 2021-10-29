@@ -538,6 +538,11 @@ type RecurringReservationType {
 }
 
 input ReservationCreateMutationInput {
+  reserveeFirstName: String
+  reserveeLastName: String
+  reserveePhone: String
+  name: String
+  description: String
   priority: Int
   begin: DateTime!
   end: DateTime!
@@ -549,6 +554,11 @@ input ReservationCreateMutationInput {
 
 type ReservationCreateMutationPayload {
   pk: Int
+  reserveeFirstName: String
+  reserveeLastName: String
+  reserveePhone: String
+  name: String
+  description: String
   priority: Int
   begin: DateTime
   end: DateTime
@@ -574,6 +584,11 @@ enum ReservationPriority {
 }
 
 type ReservationType implements Node {
+  reserveeFirstName: String
+  reserveeLastName: String
+  reserveePhone: String
+  name: String
+  description: String
   state: String
   priority: ReservationPriority!
   user: String
@@ -683,18 +698,18 @@ input ReservationUnitCreateMutationInput {
   reservationUnitTypePk: Int
   surfaceArea: Float
   bufferTimeBetweenReservations: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
-  contactInformationFi: String
-  contactInformationEn: String
-  contactInformationSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
+  contactInformationFi: String
+  contactInformationEn: String
+  contactInformationSv: String
   clientMutationId: String
 }
 
@@ -736,18 +751,18 @@ type ReservationUnitCreateMutationPayload {
   reservationUnitTypePk: Int
   surfaceArea: Float
   bufferTimeBetweenReservations: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
-  contactInformationFi: String
-  contactInformationEn: String
-  contactInformationSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
+  contactInformationFi: String
+  contactInformationEn: String
+  contactInformationSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -867,18 +882,18 @@ input ReservationUnitUpdateMutationInput {
   reservationUnitTypePk: Int
   surfaceArea: Float
   bufferTimeBetweenReservations: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
-  contactInformationFi: String
-  contactInformationEn: String
-  contactInformationSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
+  contactInformationFi: String
+  contactInformationEn: String
+  contactInformationSv: String
   clientMutationId: String
 }
 
@@ -920,18 +935,18 @@ type ReservationUnitUpdateMutationPayload {
   reservationUnitTypePk: Int
   surfaceArea: Float
   bufferTimeBetweenReservations: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
-  contactInformationFi: String
-  contactInformationEn: String
-  contactInformationSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
+  contactInformationFi: String
+  contactInformationEn: String
+  contactInformationSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -941,6 +956,11 @@ type ReservationUnitUpdateMutationPayload {
 
 input ReservationUpdateMutationInput {
   pk: Int!
+  reserveeFirstName: String
+  reserveeLastName: String
+  reserveePhone: String
+  name: String
+  description: String
   priority: Int
   begin: DateTime
   end: DateTime
@@ -952,6 +972,11 @@ input ReservationUpdateMutationInput {
 
 type ReservationUpdateMutationPayload {
   pk: Int
+  reserveeFirstName: String
+  reserveeLastName: String
+  reserveePhone: String
+  name: String
+  description: String
   priority: Int
   begin: DateTime
   end: DateTime
@@ -1164,12 +1189,12 @@ input SpaceCreateMutationInput {
   maxPersons: Int
   code: String
   unitPk: Int
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
   nameFi: String!
   nameEn: String
   nameSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
   clientMutationId: String
 }
 
@@ -1187,12 +1212,12 @@ type SpaceCreateMutationPayload {
   maxPersons: Int
   code: String
   unitPk: Int
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -1263,12 +1288,12 @@ input SpaceUpdateMutationInput {
   maxPersons: Int
   code: String
   unitPk: Int
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
   clientMutationId: String
 }
 
@@ -1286,12 +1311,12 @@ type SpaceUpdateMutationPayload {
   maxPersons: Int
   code: String
   unitPk: Int
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -1390,15 +1415,15 @@ input UnitUpdateMutationInput {
   webPage: String
   email: String
   phone: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   shortDescriptionFi: String
   shortDescriptionEn: String
   shortDescriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   clientMutationId: String
 }
 
@@ -1408,15 +1433,15 @@ type UnitUpdateMutationPayload {
   webPage: String
   email: String
   phone: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   shortDescriptionFi: String
   shortDescriptionEn: String
   shortDescriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]

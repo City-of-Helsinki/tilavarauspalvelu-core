@@ -1,10 +1,10 @@
 import React from "react";
 import styled from "styled-components";
 import { useLocalStorage } from "react-use";
-import { Button } from "hds-react";
 import { useTranslation } from "next-i18next";
 import Container from "./Container";
 import { breakpoint } from "../../modules/style";
+import { MediumButton } from "../../styles/util";
 
 type MessageType = {
   id: number;
@@ -60,7 +60,7 @@ const ServiceNotification = (): JSX.Element | null => {
             }}
           >
             <Message>{displayMessage.content}</Message>
-            <Button>{t("common:close")}</Button>
+            <MediumButton>{t("common:close")}</MediumButton>
           </Content>
         </Container>
       </Banner>

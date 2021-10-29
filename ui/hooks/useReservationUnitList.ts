@@ -1,11 +1,33 @@
 import { useLocalStorage } from "react-use";
+import {
+  ReservationUnitByPkType,
+  ReservationUnitType,
+} from "../modules/gql-types";
 import { ReservationUnit } from "../modules/types";
 
 export type ReservationUnitList = {
-  reservationUnits: ReservationUnit[];
-  selectReservationUnit: (reservationUnit: ReservationUnit) => void;
-  containsReservationUnit: (reservationUnit: ReservationUnit) => boolean;
-  removeReservationUnit: (reservationUnit: ReservationUnit) => void;
+  reservationUnits:
+    | ReservationUnit[]
+    | ReservationUnitType[]
+    | ReservationUnitByPkType[];
+  selectReservationUnit: (
+    reservationUnit:
+      | ReservationUnit
+      | ReservationUnitType
+      | ReservationUnitByPkType
+  ) => void;
+  containsReservationUnit: (
+    reservationUnit:
+      | ReservationUnit
+      | ReservationUnitType
+      | ReservationUnitByPkType
+  ) => boolean;
+  removeReservationUnit: (
+    reservationUnit:
+      | ReservationUnit
+      | ReservationUnitType
+      | ReservationUnitByPkType
+  ) => void;
   clearSelections: () => void;
 };
 

@@ -46,6 +46,7 @@ export const HorisontalRule = styled.div`
   background-color: var(--color-black-60);
   margin-top: var(--spacing-layout-m);
 `;
+
 export const CenterSpinner = styled(LoadingSpinner)`
   margin: 0 auto var(--spacing-2-xl) auto;
 `;

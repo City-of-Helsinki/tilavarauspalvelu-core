@@ -1,12 +1,12 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { ReservationUnit } from "../../modules/types";
 import Container from "../common/Container";
 import RelatedUnits from "../reservation-unit/RelatedUnits";
+import { ReservationUnitType } from "../../modules/gql-types";
 
 type Props = {
-  recommendations: ReservationUnit[];
+  recommendations: ReservationUnitType[];
 };
 
 const Wrapper = styled.div`

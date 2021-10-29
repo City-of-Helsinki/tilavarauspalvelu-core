@@ -1,5 +1,4 @@
 import {
-  Button,
   IconArrowLeft,
   IconArrowRight,
   Notification as HDSNotification,
@@ -17,6 +16,7 @@ import {
 } from "../../modules/util";
 import { AccordionWithState as Accordion } from "../common/Accordion";
 import { breakpoint } from "../../modules/style";
+import { MediumButton } from "../../styles/util";
 
 type Props = {
   application: Application;
@@ -157,20 +157,20 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
         );
       })}
       <ButtonContainer>
-        <Button
+        <MediumButton
           variant="secondary"
           iconLeft={<IconArrowLeft />}
           onClick={() => history.push(`${application.id}/page1`)}
         >
           {t("common:prev")}
-        </Button>
-        <Button
+        </MediumButton>
+        <MediumButton
           id="next"
           iconRight={<IconArrowRight />}
           onClick={() => onSubmit()}
         >
           {t("common:next")}
-        </Button>
+        </MediumButton>
       </ButtonContainer>
     </>
   );

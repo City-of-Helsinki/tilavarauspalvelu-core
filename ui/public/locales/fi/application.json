@@ -2,6 +2,7 @@
   "error": {
     "saveFailed": "Hakemuksen tallennus ei onnistunut",
     "required": "Pakollinen",
+    "requiredField": "Kenttä on pakollinen",
     "pattern": "Tarkista muoto",
     "numPersonsMin": "Ryhmän koko virheellinen",
     "minDurationBiggerThanMaxDuration": "Minimikesto on suurempi kuin maksimikesto",

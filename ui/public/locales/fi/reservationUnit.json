@@ -11,5 +11,13 @@
   "images": "Kuvat",
   "description": "Kuvaus",
   "termsOfUse": "Käyttöehdot ja säännöt",
-  "backToSearch": "Takaisin hakutuloksiin"
+  "termsOfUseSpaces": "Tilakohtaiset ehdot",
+  "backToSearch": "Takaisin hakutuloksiin",
+  "reservationSuccessful": "Varaus onnistui",
+  "reservationReminderText": "Saat sähköpostiisi (<emailLink>{{profile.email}}</emailLink>) muistutuksen varauksesta.",
+  "loadReservationCalendar": "<calendarLink>Lataa tästä</calendarLink> kalenteriisi muistutus.",
+  "gotoApplications": "Siirry omiin varauksiin",
+  "openingTimes": "Aukioloajat",
+  "additionalInfo": "Varauksen lisätiedot",
+  "reservationFailed": "Varauksen luominen epäonnistui"
 }

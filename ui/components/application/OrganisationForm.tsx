@@ -20,7 +20,7 @@ import RadioButtons from "./RadioButtons";
 import EmailInput from "./EmailInput";
 import BillingAddress from "./BillingAddress";
 import Buttons from "./Buttons";
-import { deepCopy, errorText } from "../../modules/util";
+import { deepCopy, applicationErrorText } from "../../modules/util";
 import ControlledSelect from "../common/ControlledSelect";
 import { breakpoint } from "../../modules/style";
 
@@ -113,7 +113,10 @@ const OrganisationForm = ({
               name="organisation.name"
               required
               invalid={!!errors.organisation?.name?.type}
-              errorText={errorText(t, errors.organisation?.name?.type)}
+              errorText={applicationErrorText(
+                t,
+                errors.organisation?.name?.type
+              )}
             />
             <TextInput
               ref={register({ required: true })}
@@ -122,7 +125,10 @@ const OrganisationForm = ({
               name="organisation.coreBusiness"
               required
               invalid={!!errors.organisation?.coreBusiness?.type}
-              errorText={errorText(t, errors.organisation?.coreBusiness?.type)}
+              errorText={applicationErrorText(
+                t,
+                errors.organisation?.coreBusiness?.type
+              )}
             />
           </SpanTwoColumns>
           <ControlledSelect
@@ -131,7 +137,7 @@ const OrganisationForm = ({
             label={t("application:Page3.homeCity")}
             control={control}
             options={homeCityOptions}
-            error={errorText(t, errors.homeCityId?.type)}
+            error={applicationErrorText(t, errors.homeCityId?.type)}
           />
           <Placeholder />
           <TextInput
@@ -142,7 +148,10 @@ const OrganisationForm = ({
             required={hasRegistration}
             disabled={!hasRegistration}
             invalid={!!errors.organisation?.identifier?.type}
-            errorText={errorText(t, errors.organisation?.identifier?.type)}
+            errorText={applicationErrorText(
+              t,
+              errors.organisation?.identifier?.type
+            )}
           />
           <CheckboxWrapper>
             <Checkbox
@@ -160,7 +169,7 @@ const OrganisationForm = ({
             name="organisation.address.streetAddress"
             required
             invalid={!!errors.organisation?.address?.streetAddress?.type}
-            errorText={errorText(
+            errorText={applicationErrorText(
               t,
               errors.organisation?.address?.streetAddress?.type
             )}
@@ -172,7 +181,7 @@ const OrganisationForm = ({
             name="organisation.address.postCode"
             required
             invalid={!!errors.organisation?.address?.postCode?.type}
-            errorText={errorText(
+            errorText={applicationErrorText(
               t,
               errors.organisation?.address?.postCode?.type
             )}
@@ -184,7 +193,10 @@ const OrganisationForm = ({
             name="organisation.address.city"
             required
             invalid={!!errors.organisation?.address?.city?.type}
-            errorText={errorText(t, errors.organisation?.address?.city?.type)}
+            errorText={applicationErrorText(
+              t,
+              errors.organisation?.address?.city?.type
+            )}
           />
           <Checkbox
             label={t("application:Page3.organisation.separateInvoicingAddress")}
@@ -203,7 +215,10 @@ const OrganisationForm = ({
             name="contactPerson.phoneNumber"
             required
             invalid={!!errors.contactPerson?.phoneNumber?.type}
-            errorText={errorText(t, errors.contactPerson?.phoneNumber?.type)}
+            errorText={applicationErrorText(
+              t,
+              errors.contactPerson?.phoneNumber?.type
+            )}
           />
           <TextInput
             ref={register({ required: true })}
@@ -212,7 +227,10 @@ const OrganisationForm = ({
             name="contactPerson.firstName"
             required
             invalid={!!errors.contactPerson?.firstName?.type}
-            errorText={errorText(t, errors.contactPerson?.firstName?.type)}
+            errorText={applicationErrorText(
+              t,
+              errors.contactPerson?.firstName?.type
+            )}
           />
           <TextInput
             ref={register({ required: true })}
@@ -221,7 +239,10 @@ const OrganisationForm = ({
             name="contactPerson.lastName"
             required
             invalid={!!errors.contactPerson?.lastName?.type}
-            errorText={errorText(t, errors.contactPerson?.lastName?.type)}
+            errorText={applicationErrorText(
+              t,
+              errors.contactPerson?.lastName?.type
+            )}
           />
           <EmailInput register={register} errors={errors} />
         </TwoColumnContainer>

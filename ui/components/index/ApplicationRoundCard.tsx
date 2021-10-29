@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Container, IconArrowRight } from "hds-react";
+import { Container, IconArrowRight } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import styled from "styled-components";
@@ -8,6 +8,7 @@ import Card from "../common/Card";
 import { ApplicationRound } from "../../modules/types";
 import { applicationRoundState, searchUrl } from "../../modules/util";
 import { breakpoint } from "../../modules/style";
+import { MediumButton } from "../../styles/util";
 
 interface Props {
   applicationRound: ApplicationRound;
@@ -43,7 +44,7 @@ const Name = styled.div`
 `;
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const CardButton = styled(Button)`
+const CardButton = styled(MediumButton)`
   @media (max-width: ${breakpoint.s}) {
     justify-self: center;
   }

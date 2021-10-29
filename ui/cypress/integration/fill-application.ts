@@ -14,6 +14,7 @@ import {
 } from "../model/application";
 import {
   addReservationUnitButton,
+  searchButton,
   startApplicationButton,
 } from "../model/search";
 
@@ -42,12 +43,6 @@ describe("application", () => {
 
     cy.fixture("v1/application/138_page_1.json").then((json) => {
       cy.intercept("GET", "/v1/application/138/*", json).as("applicationPage1");
-    });
-
-    cy.fixture("v1/parameters/reservation_unit_type").then((json) => {
-      cy.intercept("GET", "/v1/parameters/reservation_unit_type/*", json).as(
-        "reservationUnitType"
-      );
     });
 
     cy.fixture("v1/parameters/ability_group").then((json) => {
@@ -80,22 +75,24 @@ describe("application", () => {
     addReservationUnitButton("Studiokompleksi").click();
     startApplicationButton().click();
 
-    cy.get("h1").should("contain", "Vakiovuorohakemus");
+    cy.get("h1").should("contain", "Vakiovuorojen tilat");
 
     cy.a11yCheck();
 
     selectApplicationRoundButton().click();
     firstAvailableApplicationRound().click();
     proceedToPage1Button().click();
-    cy.wait([
-      "@applicationPost",
-      "@applicationPage1",
-      "@applicationRound1",
-      "@purpose",
-      "@ageGroup",
-      "@abilityGroup",
-      "@reservationUnitType",
-    ]);
+    cy.wait(
+      [
+        "@applicationPost",
+        "@applicationPage1",
+        "@applicationRound1",
+        "@purpose",
+        "@ageGroup",
+        "@abilityGroup",
+      ],
+      { timeout: 20000 }
+    );
 
     cy.get("h1").should("contain", "Vakiovuoron luominen");
 

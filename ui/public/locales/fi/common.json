@@ -1,9 +1,15 @@
 {
-  "dateTime": "{{date, dd.MM.yyyy 'klo' HH:mm}}",
-  "date": "{{date, dd.MM.yy}}",
-  "dateLong": "{{date, dd.MM.yyyy}}",
-  "time": "{{date, HH:mm}}",
+  "dateTime": "{{date, d.M.yyyy 'klo' H.mm}}",
+  "dateWithWeekday": "{{date, cccccc d.M.yyyy}}",
+  "dateTimeNoYear": "{{date, d. MMMM 'klo' H.mm}}",
+  "date": "{{date, d.M.yy}}",
+  "dateLong": "{{date, d.M.yyyy}}",
+  "time": "{{date, H.mm}}",
+  "timeWithPrefix": "{{date, 'klo' H.mm}}",
   "today": "Tänään",
+  "day": "Päivä",
+  "week": "Viikko",
+  "month": "Kuukausi",
   "weekDayLong.0": "Sunnuntai",
   "weekDayLong.1": "Maanantai",
   "weekDayLong.2": "Tiistai",
@@ -18,6 +24,7 @@
   "weekDay.4": "To",
   "weekDay.5": "Pe",
   "weekDay.6": "La",
+  "weekDay.7": "Su",
   "month.0": "Tammikuu",
   "month.1": "Helmikuu",
   "month.2": "Maaliskuu",
@@ -32,12 +39,16 @@
   "month.11": "Joulukuu",
   "hour": "{{count}} tunti",
   "hour_plural": "{{count}} tuntia",
+  "minute": "{{count}} minuutti",
+  "minute_plural": "{{count}} minuuttia",
   "error": {
-    "dataError": "Tietoja ei saatu haettua"
+    "dataError": "Tietoja ei saatu haettua",
+    "error": "Virhe",
+    "closeErrorMsg": "Sulje virheilmoitus"
   },
   "applicationNavigationName": "Hakemus",
   "applicationName": "Varaamo",
-  "selectReservationUnit": "Valitse tila",
+  "selectReservationUnit": "Lisää tila hakemukselle",
   "removeReservationUnit": "Lisätty hakemukselle",
   "reservationUnitSelected": "Lisätty hakemukselle",
   "next": "Seuraava",
@@ -51,10 +62,11 @@
   "noResults": "Ei tuloksia",
   "select": "Valitse",
   "abbreviations": {
-    "hour": "t",
-    "minute": "min"
+    "hour": "{{count}} t",
+    "minute": "{{count}} min"
   },
   "login": "Kirjaudu",
+  "loginAlt": "Kirjaudu sisään",
   "logout": "Kirjaudu ulos",
   "cancel": "Peruuta",
   "imgAltForSpace": "Kuva tilasta {{name}}",
@@ -68,9 +80,15 @@
     "postCode": "Postinumero",
     "city": "Postitoimipaikka"
   },
+  "location": "Sijainti",
+  "phone": "Puhelin",
+  "thanksForUsingVaraamo": "Kiitos Varaamon käytöstä!",
+  "sendFeedback": "Lähetä palvelusta palautetta.",
+  "gotoFrontpage": "Palaa etusivulle",
   "readMore": "Lue lisää",
   "seeDetails": "Katso tiedot",
   "beginningWith": "Alkaen",
   "endingWith": "Päättyen",
-  "showMore": "Näytä enemmän"
+  "showMore": "Näytä enemmän",
+  "duration": "Kesto {{duration}}"
 }

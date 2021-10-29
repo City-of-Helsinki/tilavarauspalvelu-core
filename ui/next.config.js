@@ -16,6 +16,7 @@ module.exports = {
     oidcUrl: process.env.NEXT_PUBLIC_OIDC_URL,
     oidcScope: process.env.NEXT_PUBLIC_OIDC_SCOPE,
     apiScope: process.env.NEXT_PUBLIC_TILAVARAUS_API_SCOPE,
+    mapboxToken: process.env.NEXT_PUBLIC_MAPBOX_TOKEN,
     mockRequests: process.env.NEXT_PUBLIC_MOCK_REQUESTS === "true",
   },
 };

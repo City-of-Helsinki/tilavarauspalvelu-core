@@ -1,10 +1,10 @@
-import { ApplicationEventSchedule, Cell, DAY } from "./types";
+import { ApplicationEventSchedule, Cell, DAY } from "../types";
 import {
   cellsToApplicationEventSchedules,
   applicationEventSchedulesToCells,
   applicationRoundState,
   getComboboxValues,
-} from "./util";
+} from "../util";
 
 jest.mock("next/config", () => () => ({
   serverRuntimeConfig: {},

@@ -14,6 +14,7 @@ import {
   Application as ApplicationType,
   ApplicationRound,
   EditorState,
+  ReservationUnit,
 } from "../../modules/types";
 import ApplicationPage from "../../components/application/ApplicationPage";
 import Page1 from "../../components/application/Page1";
@@ -188,7 +189,7 @@ const Application = (): JSX.Element | null => {
           translationKeyPrefix="application:Page1"
         >
           <Page1
-            selectedReservationUnits={reservationUnits}
+            selectedReservationUnits={reservationUnits as ReservationUnit[]}
             applicationRound={
               applicationLoadingStatus.value?.applicationRound ||
               ({} as ApplicationRound)

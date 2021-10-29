@@ -5,6 +5,8 @@
     "hooks",
     "modules",
     "pages",
-    "mocks"
+    "styles",
+    "mocks",
+    "context"
   ],
 }

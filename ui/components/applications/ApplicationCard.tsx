@@ -1,14 +1,8 @@
 import React, { useRef, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { TFunction } from "i18next";
+import { useTranslation, TFunction } from "react-i18next";
 import styled from "styled-components";
 import { useRouter } from "next/router";
-import {
-  Button,
-  Card as HdsCard,
-  Notification,
-  Tag as HdsTag,
-} from "hds-react";
+import { Card as HdsCard, Notification, Tag as HdsTag } from "hds-react";
 import { parseISO } from "date-fns";
 import { Application, ApplicationRound } from "../../modules/types";
 import {
@@ -21,6 +15,7 @@ import { breakpoint } from "../../modules/style";
 import ConfirmationModal, { ModalRef } from "../common/ConfirmationModal";
 import { CenterSpinner } from "../common/common";
 import { cancelApplication } from "../../modules/api";
+import { MediumButton } from "../../styles/util";
 
 const Card = styled(HdsCard)`
   margin-bottom: var(--spacing-m);
@@ -83,7 +78,7 @@ const Modified = styled.div`
   font-family: var(--font-regular);
 `;
 
-const StyledButton = styled(Button)`
+const StyledButton = styled(MediumButton)`
   margin-right: var(--spacing-xs);
   font-size: var(--fontsize-body-m);
 

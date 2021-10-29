@@ -1,0 +1,8 @@
+{
+  "404": {
+    "body": "Sivua ei löytynyt"
+  },
+  "500": {
+    "body": "Jotain meni pieleen"
+  }
+}

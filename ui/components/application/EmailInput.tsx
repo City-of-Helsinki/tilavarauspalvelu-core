@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Notification, TextInput } from "hds-react";
 import { useForm } from "react-hook-form";
 import { SpanTwoColumns } from "../common/common";
-import { errorText } from "../../modules/util";
+import { applicationErrorText } from "../../modules/util";
 
 type Props = {
   register: ReturnType<typeof useForm>["register"];
@@ -35,7 +35,7 @@ const EmailInput = ({ register, errors }: Props): JSX.Element | null => {
           type="email"
           required
           invalid={!!errors.contactPerson?.email?.type}
-          errorText={errorText(t, errors.contactPerson?.email?.type)}
+          errorText={applicationErrorText(t, errors.contactPerson?.email?.type)}
         />
       </SpanTwoColumns>
     </>

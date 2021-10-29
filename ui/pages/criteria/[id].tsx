@@ -10,6 +10,7 @@ import { getApplicationRound } from "../../modules/api";
 import { CenterSpinner } from "../../components/common/common";
 import { ApplicationRound } from "../../modules/types";
 import Sanitize from "../../components/common/Sanitize";
+import Breadcrumb from "../../components/common/Breadcrumb";
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
@@ -72,6 +73,7 @@ const Criteria = (): JSX.Element => {
     <>
       <Head>
         <HeadContent>
+          <Breadcrumb current={{ label: "criteria" }} />
           <H1>
             {state === "done"
               ? `${applicationRound?.name} ${t("applicationRound:criteria")}`

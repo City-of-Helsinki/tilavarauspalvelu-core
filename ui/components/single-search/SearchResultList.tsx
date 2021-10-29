@@ -1,6 +1,11 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
-import { Notification as HDSNotification, Button, IconPlus } from "hds-react";
+import {
+  Notification as HDSNotification,
+  Button,
+  IconPlus,
+  LoadingSpinner,
+} from "hds-react";
 import styled from "styled-components";
 import Container from "../common/Container";
 import ReservationUnitCard from "./ReservationUnitCard";
@@ -11,6 +16,7 @@ interface Props {
   fetchMore: (arg: string) => void;
   pageInfo: PageInfo;
   error: boolean;
+  loading: boolean;
 }
 
 const Wrapper = styled.div`
@@ -35,6 +41,10 @@ const Notification = styled(HDSNotification)`
 
 const PaginationButton = styled(Button)`
   && {
+    &:disabled {
+      gap: var(--spacing-2-xs);
+    }
+
     > span {
       padding-left: var(--spacing-3-xs);
     }
@@ -54,6 +64,7 @@ const SearchResultList = ({
   reservationUnits,
   fetchMore,
   pageInfo,
+  loading,
 }: Props): JSX.Element => {
   const { t } = useTranslation();
   return (
@@ -80,8 +91,9 @@ const SearchResultList = ({
               {pageInfo?.hasNextPage && reservationUnits?.length > 0 && (
                 <PaginationButton
                   onClick={() => fetchMore(pageInfo.endCursor)}
-                  iconLeft={<IconPlus />}
+                  iconLeft={loading ? <LoadingSpinner small /> : <IconPlus />}
                   data-test-id="search-form__pagination-button"
+                  disabled={loading}
                 >
                   {t("common:showMore")}
                 </PaginationButton>

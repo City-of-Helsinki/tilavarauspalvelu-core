@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { breakpoint } from "../style";
 
 export const SubHeading = styled.div`
@@ -13,10 +13,41 @@ export const SubHeading = styled.div`
 
 export const Strong = styled.span`
   font-family: var(--font-bold);
+  font-size: 700;
 `;
 
 export const Regular = styled.span`
+  font-family: var(--font-regular);
+  font-size: 400;
+`;
+
+export const H1 = styled.h1`
+  font-size: 1.75rem;
   font-family: var(--font-bold);
+  font-weight: 700;
+  margin-bottom: var(--spacing-m);
+`;
+
+export const H2 = styled.h2`
+  font-size: var(--fontsize-heading-m);
+  font-family: var(--font-bold);
+  font-weight: 700;
+  margin-bottom: var(--spacing-m);
+`;
+
+export const fontRegular = css`
+  font-family: var(--font-regular);
+  font-weight: 400;
+`;
+
+export const fontMedium = css`
+  font-family: var(--font-medium);
+  font-weight: 500;
+`;
+
+export const fontBold = css`
+  font-family: var(--font-bold);
+  font-weight: 700;
 `;
 
 export const KebabHeading = styled.h2`

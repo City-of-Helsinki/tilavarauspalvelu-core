@@ -1,16 +1,17 @@
-import { Button as HDSButton, IconArrowRight } from "hds-react";
+import { IconArrowRight } from "hds-react";
 import React from "react";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import styled from "styled-components";
 import Container from "./Container";
+import { MediumButton } from "../../styles/util";
 
 const BackgroundContainer = styled.div`
   background-color: var(--color-bus);
   position: fixed;
   bottom: 0;
   width: 100%;
-  z-index: 2;
+  z-index: 20;
 `;
 
 const ReservationUnitCount = styled.div`
@@ -18,8 +19,7 @@ const ReservationUnitCount = styled.div`
   font-weight: 500;
 `;
 
-const Button = styled(HDSButton)`
-  font-family: var(--font-bold);
+const Button = styled(MediumButton)`
   background-color: var(--color-white) !important;
   margin-left: var(--spacing-m);
 `;

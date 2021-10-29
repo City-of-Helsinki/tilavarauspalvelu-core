@@ -1,5 +1,4 @@
 import {
-  Button,
   IconGroup,
   IconInfoCircle,
   IconLocation,
@@ -14,6 +13,7 @@ import { breakpoint } from "../../modules/style";
 import { ReservationUnit } from "../../modules/types";
 import { getAddress, getMainImage, localizedValue } from "../../modules/util";
 import IconWithText from "../common/IconWithText";
+import { MediumButton, pixel } from "../../styles/util";
 
 interface Props {
   reservationUnit: ReservationUnit;
@@ -50,9 +50,11 @@ const MainContent = styled.div`
 const Name = styled.span`
   font-size: var(--fontsize-heading-m);
   font-weight: 700;
+  margin-bottom: var(--spacing-2-xs);
 `;
 
 const Description = styled.span`
+  font-family: var(--font-regular);
   font-size: var(--fontsize-body-l);
   flex-grow: 1;
 `;
@@ -61,7 +63,9 @@ const Bottom = styled.span`
   display: flex;
   font-weight: 500;
   align-items: center;
+  gap: var(--spacing-l);
   font-size: var(--fontsize-body-m);
+  font-family: var(--font-medium);
 
   > div {
     margin: 5px;
@@ -71,7 +75,7 @@ const Bottom = styled.span`
     }
   }
 
-  @media (max-width: ${breakpoint.l}) {
+  @media (max-width: ${breakpoint.xl}) {
     display: block;
   }
 `;
@@ -101,6 +105,17 @@ const Image = styled.img`
     height: 50vw;
   }
 `;
+
+const Anchor = styled.a`
+  color: var(--color-black-90);
+`;
+
+const StyledIconWithText = styled(IconWithText)`
+  span {
+    margin-left: var(--spacing-2-xs);
+  }
+`;
+
 const ReservationUnitCard = ({
   reservationUnit,
   selectReservationUnit,
@@ -115,15 +130,14 @@ const ReservationUnitCard = ({
         alt={t("common:imgAltForSpace", {
           name: localizedValue(reservationUnit.name, i18n.language),
         })}
-        src={
-          getMainImage(reservationUnit)?.mediumUrl ||
-          "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
-        }
+        src={getMainImage(reservationUnit)?.mediumUrl || pixel}
       />
       <MainContent>
         <Name>
-          <Link href={`../reservation-unit/${reservationUnit.id}`}>
-            {localizedValue(reservationUnit.name, i18n.language)}
+          <Link href={`../reservation-unit/${reservationUnit.id}`} passHref>
+            <Anchor>
+              {localizedValue(reservationUnit.name, i18n.language)}
+            </Anchor>
           </Link>
         </Name>
         <Description>
@@ -131,7 +145,7 @@ const ReservationUnitCard = ({
         </Description>
         <Bottom>
           {reservationUnit.reservationUnitType ? (
-            <IconWithText
+            <StyledIconWithText
               icon={
                 <IconInfoCircle aria-label={t("reservationUnitCard:type")} />
               }
@@ -142,7 +156,7 @@ const ReservationUnitCard = ({
             />
           ) : null}
           {reservationUnit.maxPersons ? (
-            <IconWithText
+            <StyledIconWithText
               icon={
                 <IconGroup
                   aria-label={t("reservationUnitCard:maxPersons", {
@@ -154,7 +168,7 @@ const ReservationUnitCard = ({
             />
           ) : null}
           {getAddress(reservationUnit) ? (
-            <IconWithText
+            <StyledIconWithText
               className="grow"
               icon={
                 <IconLocation aria-label={t("reservationUnitCard:address")} />
@@ -166,22 +180,21 @@ const ReservationUnitCard = ({
       </MainContent>
       <Actions>
         <div style={{ flexGrow: 1 }} />
-
         {containsReservationUnit(reservationUnit) ? (
-          <Button
+          <MediumButton
             iconLeft={<IconCheck />}
             onClick={() => removeReservationUnit(reservationUnit)}
           >
             {t("common:removeReservationUnit")}
-          </Button>
+          </MediumButton>
         ) : (
-          <Button
+          <MediumButton
             iconLeft={<IconPlus />}
             onClick={() => selectReservationUnit(reservationUnit)}
             variant="secondary"
           >
             {t("common:selectReservationUnit")}
-          </Button>
+          </MediumButton>
         )}
       </Actions>
     </Container>

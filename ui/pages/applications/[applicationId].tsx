@@ -1,13 +1,11 @@
 import {
-  Button,
   IconCalendar,
   IconDownload,
   IconMenuHamburger,
   Notification,
 } from "hds-react";
-import { TFunction } from "i18next";
 import React, { useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation, TFunction } from "react-i18next";
 import dynamic from "next/dynamic";
 import styled from "styled-components";
 import { useRouter } from "next/router";
@@ -28,6 +26,7 @@ import Loader from "../../components/common/Loader";
 import { TwoColumnContainer } from "../../components/common/common";
 import ReservationsView from "../../components/applications/ReservationsView";
 import { isBrowser } from "../../modules/const";
+import { MediumButton } from "../../styles/util";
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
@@ -82,7 +81,7 @@ const Buttons = styled.div`
     width: 100%;
   }
 `;
-const ToggleButton = styled(Button)`
+const ToggleButton = styled(MediumButton)`
   margin-top: var(--spacing-m);
 
   @media (max-width: ${breakpoint.s}) {

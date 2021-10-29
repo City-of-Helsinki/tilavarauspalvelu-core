@@ -1,4 +1,4 @@
-import { Button, IconArrowRight, IconPlusCircleFill } from "hds-react";
+import { IconArrowRight, IconPlusCircleFill } from "hds-react";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
@@ -18,6 +18,7 @@ import { getParameters } from "../../modules/api";
 import { breakpoint } from "../../modules/style";
 import { participantCountOptions } from "../../modules/const";
 import { CenterSpinner } from "../common/common";
+import { MediumButton } from "../../styles/util";
 
 type Props = {
   applicationRound: ApplicationRound;
@@ -234,22 +235,22 @@ const Page1 = ({
         );
       })}
       <ButtonContainer>
-        <Button
+        <MediumButton
           id="addApplicationEvent"
           iconLeft={<IconPlusCircleFill />}
           onClick={() => form.handleSubmit(onAddApplicationEvent)()}
           disabled={addNewEventButtonDisabled}
         >
           {t("application:Page1.createNew")}
-        </Button>
-        <Button
+        </MediumButton>
+        <MediumButton
           id="next"
           iconRight={<IconArrowRight />}
           disabled={nextButtonDisabled}
           onClick={() => history.push(`${editorState.application.id}/page2`)}
         >
           {t("common:next")}
-        </Button>
+        </MediumButton>
       </ButtonContainer>
     </>
   );

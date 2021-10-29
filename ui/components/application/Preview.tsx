@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Checkbox, IconArrowLeft, Notification } from "hds-react";
+import { Checkbox, IconArrowLeft, Notification } from "hds-react";
 import { useTranslation } from "react-i18next";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -15,6 +15,7 @@ import { AccordionWithState as Accordion } from "../common/Accordion";
 import tos from "./tos";
 import spaceTos from "./space_tos";
 import { breakpoint } from "../../modules/style";
+import { MediumButton } from "../../styles/util";
 
 type Props = {
   application: Application;
@@ -322,14 +323,14 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
         {t("application:preview.notification.body")}
       </StyledNotification>
       <ButtonContainer>
-        <Button
+        <MediumButton
           variant="secondary"
           iconLeft={<IconArrowLeft />}
           onClick={() => router.push(`${application.id}/page3`)}
         >
           {t("common:prev")}
-        </Button>
-        <Button
+        </MediumButton>
+        <MediumButton
           id="submit"
           onClick={() => {
             onSubmit(application);
@@ -337,7 +338,7 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
           disabled={!acceptTermsOfUse}
         >
           {t("common:submit")}
-        </Button>
+        </MediumButton>
       </ButtonContainer>
     </>
   ) : null;

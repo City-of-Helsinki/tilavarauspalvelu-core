@@ -1,4 +1,3 @@
-import { Button } from "hds-react";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
@@ -6,6 +5,7 @@ import { ApplicationEventSchedule, Cell } from "../../modules/types";
 import TimePreview from "./TimePreview";
 import { weekdays } from "../../modules/const";
 import { breakpoint } from "../../modules/style";
+import { MediumButton } from "../../styles/util";
 
 type Props = {
   index: number;
@@ -262,9 +262,9 @@ const TimeSelector = ({
 
       {copyCells ? (
         <ButtonContainer>
-          <Button variant="secondary" onClick={() => copyCells(index)}>
+          <MediumButton variant="secondary" onClick={() => copyCells(index)}>
             {t("application:Page2.copyTimes")}
-          </Button>
+          </MediumButton>
         </ButtonContainer>
       ) : null}
     </>

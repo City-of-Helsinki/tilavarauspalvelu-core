@@ -11,7 +11,7 @@ interface Props {
 
 const Main = styled.main`
   font-size: var(--fontsize-body-m);
-  flex-grow: 1;
+  flex: 1 0 auto;
 `;
 
 const PageWrapper = (props: Props): JSX.Element => {

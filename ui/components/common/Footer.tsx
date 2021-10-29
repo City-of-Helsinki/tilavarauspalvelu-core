@@ -1,14 +1,20 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
 import { Footer as HDSFooter } from "hds-react";
+import styled from "styled-components";
 
 const linkIds: string[] = ["terms", "feedback"];
+
+const Wrapper = styled(HDSFooter)`
+  margin-top: var(--spacing-layout-xl);
+  flex-shrink: 0;
+`;
 
 const Footer = (): JSX.Element => {
   const { t } = useTranslation();
 
   return (
-    <HDSFooter
+    <Wrapper
       title={t("common:applicationName")}
       theme={{
         "--footer-background": "var(--tilavaraus-footer-background-color)",
@@ -47,7 +53,7 @@ const Footer = (): JSX.Element => {
           rel="noopener noreferrer"
         />
       </HDSFooter.Base>
-    </HDSFooter>
+    </Wrapper>
   );
 };
 

@@ -34,7 +34,13 @@ export function inputMaxPersons(): Cypress.Chainable<JQuery<HTMLElement>> {
 export function inputReservationUnitType(): Cypress.Chainable<
   JQuery<HTMLElement>
 > {
-  return cy.get("#reservationUnitTypeFilter-toggle-button");
+  return cy.get("#reservationUnitTypeFilter");
+}
+
+export function inputReservationUnitTypeOption(
+  value: number
+): Cypress.Chainable<JQuery<HTMLElement>> {
+  return cy.get(`#reservationUnitTypeFilter_${value}`);
 }
 
 export function inputUnit(): Cypress.Chainable<JQuery<HTMLElement>> {
@@ -49,6 +55,32 @@ export function inputUnitOption(
   value: number
 ): Cypress.Chainable<JQuery<HTMLElement>> {
   return cy.get(`#unitFilter_${value}`);
+}
+
+export function inputPurpose(): Cypress.Chainable<JQuery<HTMLElement>> {
+  return cy.get("#purposeFilter-input");
+}
+
+export function inputPurposeToggler(): Cypress.Chainable<JQuery<HTMLElement>> {
+  return cy.get("#purposeFilter");
+}
+
+export function inputPurposeOption(
+  value: number
+): Cypress.Chainable<JQuery<HTMLElement>> {
+  return cy.get(`#purposeFilter_${value}`);
+}
+
+export function selectOptions(
+  parent: string
+): Cypress.Chainable<JQuery<HTMLElement>> {
+  return cy.get(`${parent}`).next("div").find(`input[type="checkbox"]`);
+}
+
+export function selectClearButton(
+  parent: string
+): Cypress.Chainable<JQuery<HTMLElement>> {
+  return cy.get(`${parent}`).next("div").find(`button[type="button"]`);
 }
 
 export function filterTags(): Cypress.Chainable<JQuery<HTMLElement>> {

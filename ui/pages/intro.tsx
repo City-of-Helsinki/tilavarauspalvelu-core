@@ -1,4 +1,4 @@
-import { Button, Notification, Select } from "hds-react";
+import { Notification, Select } from "hds-react";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "next/router";
@@ -14,6 +14,7 @@ import { AccordionWithState as Accordion } from "../components/common/Accordion"
 import Loader from "../components/common/Loader";
 import { minimalApplicationForInitialSave } from "../modules/application/applicationInitializer";
 import ApplicationPage from "../components/application/ApplicationPage";
+import { MediumButton } from "../styles/util";
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
@@ -95,7 +96,7 @@ const Intro = (): JSX.Element => {
                 setApplicationRound(selection.value as number);
               }}
             />
-            <Button
+            <MediumButton
               id="start-application"
               disabled={!applicationRound || saving}
               onClick={() => {
@@ -103,7 +104,7 @@ const Intro = (): JSX.Element => {
               }}
             >
               {t("application:Intro.startNewApplication")}
-            </Button>
+            </MediumButton>
           </Loader>
         </Container>
       }
@@ -195,14 +196,14 @@ YRITYKSENÄ”. Ilmoita yhteystiedot ja sähköpostiosoite. Huomaa, että kaikki
       </Accordion>
       <Container>
         <Loader datas={[applicationRounds]}>
-          <Button
+          <MediumButton
             disabled={!applicationRound}
             onClick={() => {
               createNewApplication(applicationRound);
             }}
           >
             {t("application:Intro.startNewApplication")}
-          </Button>
+          </MediumButton>
         </Loader>
       </Container>
       {error ? (

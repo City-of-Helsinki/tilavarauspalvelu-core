@@ -3,10 +3,15 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import styled from "styled-components";
+import queryString from "query-string";
+import { useLocalStorage } from "react-use";
 
-const Button = styled(HDSButton)`
-  font-family: var(--font-bold);
-  font-size: var(--fontsize-body-s);
+const Button = styled(HDSButton).attrs({
+  style: {
+    "--color-bus": "var(--color-black)",
+  } as React.CSSProperties,
+})`
+  font-size: var(--fontsize-body-l);
   margin-left: 0;
   padding-left: 0;
   color: black;
@@ -18,25 +23,37 @@ const Button = styled(HDSButton)`
 `;
 
 type Props = {
+  link?: string;
   label?: string;
+  restore?: string;
 };
 
-const Back = ({ label = "common:prev" }: Props): JSX.Element => {
+const Back = ({ link, label = "common:prev", restore }: Props): JSX.Element => {
+  const [storedValues] = useLocalStorage(restore, null);
+
   const { t } = useTranslation();
-  const router = useRouter();
+  const { back, push } = useRouter();
+  const linkWithArgs =
+    restore && `${link}?${queryString.stringify(storedValues)}`;
 
   return (
-    <div>
-      <Button
-        aria-label={t(label)}
-        variant="supplementary"
-        type="button"
-        iconLeft={<IconArrowLeft />}
-        onClick={() => router.back()}
-      >
-        {t(label)}
-      </Button>
-    </div>
+    <Button
+      aria-label={t(label)}
+      variant="supplementary"
+      type="button"
+      iconLeft={<IconArrowLeft />}
+      onClick={
+        link
+          ? () => {
+              push(linkWithArgs);
+            }
+          : () => {
+              back();
+            }
+      }
+    >
+      {t(label)}
+    </Button>
   );
 };
 

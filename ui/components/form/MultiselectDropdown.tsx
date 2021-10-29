@@ -27,6 +27,7 @@ export interface MultiselectDropdownProps {
   showSearch?: boolean;
   title: string;
   value: string[];
+  className?: string;
 }
 
 const Wrapper = styled.div`
@@ -154,6 +155,7 @@ const MultiSelectDropdown: React.FC<MultiselectDropdownProps> = ({
   showSearch,
   title,
   value,
+  className,
 }) => {
   const { t } = useTranslation();
   const inputPlaceholderText = inputPlaceholder || t("forms:inputPlaceholder");
@@ -344,7 +346,7 @@ const MultiSelectDropdown: React.FC<MultiselectDropdownProps> = ({
   }, [handleInputValueChange, isMenuOpen]);
 
   return (
-    <Wrapper ref={dropdown}>
+    <Wrapper ref={dropdown} className={className}>
       <label htmlFor={id}>{title}</label>
       <ToggleButton
         id={id}

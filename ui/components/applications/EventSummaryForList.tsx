@@ -1,5 +1,4 @@
 import {
-  Button,
   IconArrowRight,
   IconCalendar,
   IconCalendarPlus,
@@ -26,6 +25,7 @@ import {
   ReservationUnit,
 } from "../../modules/types";
 import { parseDate, formatDurationMinutes } from "../../modules/util";
+import { MediumButton } from "../../styles/util";
 import { HorisontalRule, SpanTwoColumns } from "../common/common";
 import DefaultIconWithText from "../common/IconWithText";
 import Loader from "../common/Loader";
@@ -326,7 +326,7 @@ const ReservationUnitEventsSummaryForList = ({
                     </CalendarFeedLink>
                   </div>
                   <div>
-                    <Button
+                    <MediumButton
                       theme="black"
                       variant="supplementary"
                       iconLeft={<IconCalendar aria-hidden />}
@@ -338,7 +338,7 @@ const ReservationUnitEventsSummaryForList = ({
                       }
                     >
                       {t("eventSummary:showList")}
-                    </Button>
+                    </MediumButton>
                   </div>
                 </Actions>
                 <HorisontalRule />

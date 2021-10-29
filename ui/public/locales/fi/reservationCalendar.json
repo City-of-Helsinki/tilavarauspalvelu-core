@@ -3,6 +3,47 @@
   "linkToResourceUnitLabel": "Tutustu tilaan",
   "legend": {
     "okLabel": "Voimassa oleva varaus",
-    "cancelledLabel": "Peruttu varaus"
-  }
+    "cancelledLabel": "Peruttu varaus",
+    "free": "Vapaa",
+    "unavailable": "Ei varattavissa",
+    "busy": "Varattu"
+  },
+  "loginInfo": "Sinun täytyy kirjautua sisään, jotta voit tehdä varauksen tähän tilaan.",
+  "showCurrentDay": "Näytä nykyinen päivä",
+  "showPrevious": "Naytä edellinen {{view}}",
+  "showNext": "Naytä seuraava {{view}}",
+  "showView": "Näytä {{view}}näkymä",
+  "initialReservation": "Alustava varaus",
+  "makeReservation": "Tee varaus",
+  "newReservation": "Uusi varaus",
+  "reserverInfo": "Varaajan tiedot",
+  "reservationInfo": "Varauksen tiedot",
+  "notification": {
+    "reservationAlertTitle": "Varauksen nimi voi näkyä toimipisteen infonäytöllä.",
+    "reservationAlertBody": "Älä koskaan täytä henkilötietoja tai muita arkaluontoisia tietoja näihin kenttiin."
+  },
+  "label": {
+    "reserveeName": "Varaajan nimi",
+    "reserveeFirstName": "Varaajan etunimi",
+    "reserveeLastName": "Varaajan sukunimi",
+    "name": "Varauksen nimi (julkinen)",
+    "description": "Varauksen kuvaus",
+    "termsSpace": "Olen lukenut ja hyväksynyt käyttösäännöt",
+    "termsResource": "Olen lukenut ja hyväksynyt tilan resurssikohtaiset ehdot",
+    "reservationDate": "Varauksen ajankohta",
+    "reservationSpace": "Tila"
+  },
+  "heading": {
+    "termsOfUse": "Käyttö- ja varausehdot",
+    "resourceTerms": "Resurssikohtaiset ehdot"
+  },
+  "spaceTerms": "Musiikki, teatteri, liikunta\nTiloja vuokrataan sekä järjestöille että  yksityisille henkilöille. Käyttövuoroja jaettaessa ovat etusijalla helsinkiläiset nuorisojärjestöt ja nuorten ryhmät, joille käyttövuorot ovat maksuttomia.\n\n Lisätietoja saat myös nuorisotilasta.\nMuistattehan, että nuorisotalon tiloissa toiminta on päihteetöntä ja savutonta myös yksityistilaisuuksissa.",
+  "resourceTerms": "- Jos myöhästyt yli 15 minuuttia, varauksesi vapautetaan muiden käyttöön.\n- Mikäli työsi ei valmistu varaamasi ajan sisällä, työ keskeytetään seuraavan varauksen alkaessa.\n- Sinulla voi olla voimassa vain yksi varaus kerrallaan. Ylimääräiset varaukset poistetaan.",
+  "saveReservation": "Tallenna varaus",
+  "selectedTime": "Valittu aika",
+  "nextAvailableTime": "Seuraava vapaa aika",
+  "nextAvailableSlot": "Seuraava vapaa tunti",
+  "nextAvailableSlot_plural": "Seuraavat vapaat {{slot}}",
+  "showCalendar": "Näytä kalenteri",
+  "eventDuration": "Vuoron kesto"
 }

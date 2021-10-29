@@ -1,8 +1,4 @@
-import {
-  Button,
-  IconPlusCircle,
-  Notification as HDSNotification,
-} from "hds-react";
+import { IconPlusCircle, Notification as HDSNotification } from "hds-react";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
@@ -17,6 +13,7 @@ import {
 import Modal from "../common/Modal";
 import ReservationUnitModal from "./ReservationUnitModal";
 import ReservationUnitCard from "./ReservationUnitCard";
+import { MediumButton } from "../../styles/util";
 
 type OptionTypes = {
   purposeOptions: OptionType[];
@@ -182,13 +179,13 @@ const ReservationUnitList = ({
         );
       })}
       <ButtonContainer>
-        <Button
+        <MediumButton
           variant="supplementary"
           iconLeft={<IconPlusCircle aria-hidden />}
           onClick={() => setShowModal(true)}
         >
           {t("reservationUnitList:add")}
-        </Button>
+        </MediumButton>
       </ButtonContainer>
       <Modal
         handleClose={() => {

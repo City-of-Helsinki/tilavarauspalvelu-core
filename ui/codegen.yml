@@ -1,5 +1,5 @@
 schema: ../tilavaraus.graphql
-documents: "{pages,components}/**/*.tsx"
+documents: "{pages,components,modules}/**/*.{ts,tsx}"
 generates:
   ./modules/gql-types.ts:
     plugins:

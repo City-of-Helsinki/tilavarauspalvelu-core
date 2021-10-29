@@ -12,6 +12,7 @@ export const weekdays = [
 ];
 
 export const reservationUnitPrefix = "/reservation-unit";
+export const reservationUnitSinglePrefix = "/reservation-unit/single";
 export const searchPrefix = "/search";
 export const singleSearchPrefix = "/search/single";
 export const applicationsPrefix = "/applications";
@@ -40,8 +41,8 @@ export const mapStyle = {
   id: "hel-osm-light",
 };
 
-export const reservationUnitPath = (id: number): string =>
-  `${reservationUnitPrefix}/${id}`;
+export const reservationUnitPath = (id: number, isSingle = false): string =>
+  `${isSingle ? reservationUnitSinglePrefix : reservationUnitPrefix}/${id}`;
 
 export const emptyOption = (label: string): OptionType => ({
   label,
@@ -97,6 +98,7 @@ export const {
   oidcUrl,
   oidcScope,
   apiScope,
+  mapboxToken,
   mockRequests,
 } = publicRuntimeConfig;
 

@@ -1,7 +1,8 @@
-import { Button, Dialog } from "hds-react";
+import { Dialog } from "hds-react";
 import React, { forwardRef, useImperativeHandle, useState } from "react";
 import ReactDOM from "react-dom";
 import { useTranslation } from "react-i18next";
+import { MediumButton } from "../../styles/util";
 
 type Props = {
   okLabel?: string;
@@ -53,7 +54,7 @@ const ConfirmationModal = forwardRef(
           {content || t("confirm.text")}
         </Dialog.Content>
         <Dialog.ActionButtons>
-          <Button
+          <MediumButton
             variant="secondary"
             onClick={() => {
               setOpen(false);
@@ -63,8 +64,8 @@ const ConfirmationModal = forwardRef(
             }}
           >
             {t(cancelLabel)}
-          </Button>
-          <Button
+          </MediumButton>
+          <MediumButton
             onClick={() => {
               setOpen(false);
               if (onOk) {
@@ -73,7 +74,7 @@ const ConfirmationModal = forwardRef(
             }}
           >
             {t(okLabel)}
-          </Button>
+          </MediumButton>
         </Dialog.ActionButtons>
       </Dialog>,
       root

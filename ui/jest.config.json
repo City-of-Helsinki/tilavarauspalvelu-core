@@ -1,4 +1,0 @@
-{
-  "setupFilesAfterEnv": ["./setupTests.ts"],
-  "testEnvironment": "jsdom"
-}

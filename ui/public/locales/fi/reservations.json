@@ -9,5 +9,6 @@
   "showCalendar": "Näytä kalenterissa",
   "download": "Lataa päätös (.pdf)",
   "generating": "Dokumenttia luodaan",
-  "errorGeneratingPDF": "PDF Dokumenttia ei pystytty luomaan"
+  "errorGeneratingPDF": "PDF Dokumenttia ei pystytty luomaan",
+  "reservationCalendar": "Varauskalenteri"
 }

@@ -1,5 +1,4 @@
 import {
-  Button,
   IconArrowDown,
   IconArrowUp,
   IconGroup,
@@ -12,6 +11,7 @@ import styled from "styled-components";
 import { ReservationUnit } from "../../modules/types";
 import { getAddress, getMainImage, localizedValue } from "../../modules/util";
 import { breakpoint } from "../../modules/style";
+import { MediumButton } from "../../styles/util";
 
 type Props = {
   order: number;
@@ -112,6 +112,18 @@ const Circle = styled.div<{ passive: boolean }>`
   display: flex;
   justify-content: center;
   align-items: center;
+
+  button {
+    &:disabled {
+      color: var(--color-black-40);
+      cursor: default;
+    }
+
+    border: 0;
+    background-color: transparent;
+    color: white;
+    cursor: pointer;
+  }
 `;
 
 const ReservationUnitCard = ({
@@ -161,7 +173,7 @@ const ReservationUnitCard = ({
             </MaxPersonsCountContainer>
           </MaxPersonsContainer>
           <div>
-            <Button
+            <MediumButton
               variant="supplementary"
               iconLeft={<IconTrash aria-hidden />}
               onClick={() => {
@@ -169,7 +181,7 @@ const ReservationUnitCard = ({
               }}
             >
               {t("reservationUnitList:buttonRemove")}
-            </Button>
+            </MediumButton>
           </div>
         </CardContainer>
         <ArrowContainer>

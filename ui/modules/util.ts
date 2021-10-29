@@ -8,10 +8,9 @@ import {
   parse,
   isValid,
 } from "date-fns";
-import { i18n } from "next-i18next";
-import { TFunction } from "i18next";
-import { trim } from "lodash";
+import { i18n, TFunction } from "next-i18next";
 import { stringify } from "query-string";
+import { isNumber, trim } from "lodash";
 import { ReservationUnitsParameters } from "./api";
 import {
   searchPrefix,
@@ -32,11 +31,7 @@ import {
   ReducedApplicationStatus,
   StringParameter,
 } from "./types";
-import {
-  QueryReservationUnitsArgs,
-  ReservationUnitImageType,
-  ReservationUnitType,
-} from "./gql-types";
+import { ReservationUnitImageType, ReservationUnitType } from "./gql-types";
 
 export const isActive = (startDate: string, endDate: string): boolean => {
   const now = new Date().getTime();
@@ -70,30 +65,31 @@ export const parseDate = (date: string): Date => parseISO(date);
 const isValidDate = (date: Date): boolean =>
   isValid(date) && isAfter(date, new Date("1000-01-01"));
 
-export const toUIDate = (date: Date): string => {
+export const toUIDate = (date: Date, formatStr = "d.M.yyyy"): string => {
   if (!date || !isValidDate(date)) {
     return "";
   }
-  return format(date, "d.M.yyyy");
+  return format(date, formatStr);
 };
 
 const fromAPIDate = (date: string): Date => {
   const d = parse(date, "yyyy-MM-dd", new Date());
   return d;
 };
-export const formatDate = (date: string): string => {
+
+export const formatDate = (date: string, formatStr?: string): string => {
   if (!date) {
     return "-";
   }
-  return toUIDate(parseISO(date));
+  return toUIDate(parseISO(date), formatStr);
 };
 
 export const fromUIDate = (date: string): Date => {
   return parse(date, "d.M.yyyy", new Date());
 };
 
-const toApiDate = (date: Date): string => {
-  return format(date, "yyyy-MM-dd");
+export const toApiDate = (date: Date, formatStr = "yyyy-MM-dd"): string => {
+  return format(date, formatStr);
 };
 
 export const apiDateToUIDate = (date: string): string => {
@@ -107,25 +103,36 @@ export const uiDateToApiDate = (date: string): string => {
   return toApiDate(fromUIDate(date));
 };
 
-export const isValidDateString = (date: string): boolean => {
-  return isValidDate(parse(date, "d.M.yyyy", new Date()));
-};
-
-export const formatDuration = (duration: string): string => {
-  if (!duration) {
+export const formatDuration = (
+  duration: string,
+  abbreviated = true
+): string => {
+  if (!duration || isNumber(duration) || !duration?.includes(":")) {
     return "-";
   }
+
+  const hourKey = abbreviated ? "common:abbreviations.hour" : "common:hour";
+  const minuteKey = abbreviated
+    ? "common:abbreviations.minute"
+    : "common:minute";
+
   const time = duration.split(":");
   if (time.length < 3) {
     return "-";
   }
   return `${
     Number(time[0])
-      ? `${`${Number(time[0])} ${
-          i18n.t("common:hour") || "".toLocaleLowerCase()
-        }`} `
+      ? `${`${Number(time[0])} ${i18n.t(hourKey) || "".toLocaleLowerCase()}`} `
       : ""
-  }${Number(time[1]) ? time[1] + i18n.t("common:abbreviations.minute") : ""}`;
+  }${Number(time[1]) ? i18n.t(minuteKey, { count: Number(time[1]) }) : ""}`;
+};
+
+export const capitalize = (s: string): string => {
+  return s.charAt(0).toUpperCase() + s.slice(1);
+};
+
+export const isValidDateString = (date: string): boolean => {
+  return isValidDate(parse(date, "d.M.yyyy", new Date()));
 };
 
 export const formatApiDate = (date: string): string => {
@@ -140,19 +147,24 @@ export const localizedValue = (
   lang: string
 ): string => {
   if (!name) {
-    return "???";
+    return "";
   }
   // needed until api stabilizes
   if (typeof name === "string") {
     return name;
   }
   return (
-    name[lang as LocalizationLanguages] ||
-    name.fi ||
-    name.en ||
-    name.sv ||
-    "???"
+    name[lang as LocalizationLanguages] || name.fi || name.en || name.sv || ""
   );
+};
+
+export const getTranslation = (parent: unknown, key: string): string => {
+  const keyString = `${key}${capitalize(i18n.language)}`;
+  if (parent && parent[keyString]) {
+    return parent[keyString];
+  }
+
+  return "";
 };
 
 const getLabel = (
@@ -206,7 +218,7 @@ export const getComboboxValues = (
 export const searchUrl = (params: ReservationUnitsParameters): string =>
   `${searchPrefix}/?${stringify(params)}`;
 
-export const singleSearchUrl = (params: QueryReservationUnitsArgs): string =>
+export const singleSearchUrl = (params: unknown): string =>
   `${singleSearchPrefix}/?${stringify(params)}`;
 
 export const applicationsUrl = `${applicationsPrefix}/`;
@@ -315,24 +327,37 @@ export const getMainImage = (
   if (!ru.images || ru.images.length === 0) {
     return null;
   }
-  [...ru.images].sort((a, b) => {
+  const images = [...ru.images].sort((a, b) => {
     return (
       imagePriority.indexOf(a.imageType) - imagePriority.indexOf(b.imageType)
     );
   });
 
-  return ru.images[0];
+  return images[0];
 };
 
-export const getAddress = (
-  ru: ReservationUnit | ReservationUnitType
-): string | null => {
+export const getAddress = (ru: ReservationUnit): string | null => {
   if (!ru.location) {
     return null;
   }
 
   return trim(
-    `${ru.location.addressStreet || ""}, ${ru.location.addressCity || ""}`,
+    `${localizedValue(ru.location.addressStreet, i18n.language) || ""}, ${
+      localizedValue(ru.location.addressCity, i18n.language) || ""
+    }`,
+    ", "
+  );
+};
+
+export const getAddressAlt = (ru: ReservationUnitType): string | null => {
+  if (!ru.location) {
+    return null;
+  }
+
+  return trim(
+    `${getTranslation(ru.location, "addressStreet") || ""}, ${
+      getTranslation(ru.location, "addressCity") || ""
+    }`,
     ", "
   );
 };
@@ -340,8 +365,10 @@ export const getAddress = (
 export const applicationUrl = (id: number): string => `/application/${id}`;
 export const resolutionUrl = (id: number): string => `/applications/${id}`;
 
-export const errorText = (t: TFunction, key: string | undefined): string =>
-  key ? t(`application:error.${key}`) : "";
+export const applicationErrorText = (
+  t: TFunction,
+  key: string | undefined
+): string => (key ? t(`application:error.${key}`) : "");
 
 export const getReducedApplicationStatus = (
   status: ApplicationStatus
@@ -364,7 +391,10 @@ export const startOfWeek = (d: Date): Date =>
 export const endOfWeek = (d: Date): Date =>
   dateFnsEndOfWeek(d, { weekStartsOn: 1 });
 
-export const formatDurationMinutes = (duration: number): string => {
+export const formatDurationMinutes = (
+  duration: number,
+  abbreviated = true
+): string => {
   if (!duration) {
     return "-";
   }
@@ -372,15 +402,18 @@ export const formatDurationMinutes = (duration: number): string => {
   const hour = Math.floor(duration / 60);
   const min = Math.floor(duration % 60);
 
+  const hourKey = abbreviated ? "common:abbreviations.hour" : "common:hour";
+  const minuteKey = abbreviated
+    ? "common:abbreviations.minute"
+    : "common:minute";
+
   const p = [];
 
   if (hour) {
-    p.push(i18n.t("common:hour", { count: hour }).toLocaleLowerCase());
+    p.push(i18n.t(hourKey, { count: hour }).toLocaleLowerCase());
   }
   if (min) {
-    p.push(
-      `${min} ${i18n.t("common:abbreviations.minute").toLocaleLowerCase()}`
-    );
+    p.push(i18n.t(minuteKey, { count: min }).toLocaleLowerCase());
   }
 
   return p.join(" ");

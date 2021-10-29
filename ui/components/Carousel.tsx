@@ -1,20 +1,21 @@
 import React from "react";
 import NukaCarousel from "nuka-carousel";
-import { Button as HDSButton, IconAngleLeft, IconAngleRight } from "hds-react";
+import { IconAngleLeft, IconAngleRight } from "hds-react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { breakpoint } from "../modules/style";
+import { MediumButton } from "../styles/util";
 
 type Props = {
   children: React.ReactNode[];
   slidesToShow?: number;
-  slidesToScroll?: number | "auto";
+  slidesToScroll?: number;
   cellSpacing?: number;
   wrapAround?: boolean;
   hideCenterControls?: boolean;
 };
 
-const Button = styled(HDSButton).attrs({
+const Button = styled(MediumButton).attrs({
   style: {
     "--color-bus": "rgba(0,0,0,0.4)",
     "--color-bus-dark": "rgba(0,0,0,0.4)",
@@ -29,9 +30,11 @@ const Button = styled(HDSButton).attrs({
     & > span {
       padding: 0;
     }
+
     padding: 0;
     border-color: transparent !important;
   }
+
   button {
     padding: 0;
   }
@@ -41,12 +44,14 @@ const StyledCarousel = styled(NukaCarousel)<{ $showCenterControls: boolean }>`
   width: calc(100% + var(--spacing-xs) * 2) !important;
   margin-right: calc(var(--spacing-xs) * -1);
   margin-left: calc(var(--spacing-xs) * -1);
+
   .slider-control-bottomcenter {
     ${({ $showCenterControls }) => !$showCenterControls && "display: none;"}
     position: relative !important;
     bottom: unset !important;
     left: unset !important;
     transform: unset !important;
+
     ul {
       top: var(--spacing-m) !important;
       gap: var(--spacing-s);
@@ -54,6 +59,7 @@ const StyledCarousel = styled(NukaCarousel)<{ $showCenterControls: boolean }>`
       width: 100%;
       justify-content: center;
     }
+
     .paging-item {
       button {
         svg {
@@ -65,6 +71,7 @@ const StyledCarousel = styled(NukaCarousel)<{ $showCenterControls: boolean }>`
       }
     }
   }
+
   @media (min-width: ${breakpoint.m}) {
     width: 100% !important;
     margin: 0 !important;
@@ -118,7 +125,7 @@ const VerticalButton = styled(Button)<{
 const Carousel = ({
   children,
   slidesToShow = 1,
-  slidesToScroll = "auto",
+  slidesToScroll = 1,
   cellSpacing = 1,
   wrapAround = true,
   hideCenterControls = false,

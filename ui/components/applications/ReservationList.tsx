@@ -1,6 +1,5 @@
-import { TFunction } from "i18next";
 import React from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation, TFunction } from "react-i18next";
 import styled from "styled-components";
 import { Strong } from "../../modules/style/typography";
 import { Reservation } from "../../modules/types";

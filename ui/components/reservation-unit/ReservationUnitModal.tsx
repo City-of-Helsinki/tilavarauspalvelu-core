@@ -1,5 +1,4 @@
 import {
-  Button,
   IconArrowRight,
   IconGroup,
   IconInfoCircle,
@@ -23,6 +22,7 @@ import { breakpoint } from "../../modules/style";
 import { reservationUnitPath } from "../../modules/const";
 import { getAddress, getMainImage, localizedValue } from "../../modules/util";
 import IconWithText from "../common/IconWithText";
+import { MediumButton, pixel } from "../../styles/util";
 
 const Container = styled.div`
   width: 100%;
@@ -145,10 +145,7 @@ const ReservationUnitCard = ({
         alt={t("common:imgAltForSpace", {
           name: localizedValue(reservationUnit.name, i18n.language),
         })}
-        src={
-          getMainImage(reservationUnit)?.smallUrl ||
-          "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
-        }
+        src={getMainImage(reservationUnit)?.smallUrl || pixel}
       />
       <Main>
         <Name>{localizedValue(reservationUnit.name, i18n.language)}</Name>
@@ -188,13 +185,13 @@ const ReservationUnitCard = ({
         ) : null}
       </Props>
       <Actions>
-        <Button
+        <MediumButton
           iconRight={<IconArrowRight />}
           onClick={handle}
           variant={isSelected ? "danger" : "secondary"}
         >
           {buttonText}
-        </Button>
+        </MediumButton>
       </Actions>
     </Container>
   );
@@ -243,7 +240,7 @@ const ButtonContainer = styled.div`
   align-items: center;
 `;
 
-const SearchButton = styled(Button).attrs({
+const SearchButton = styled(MediumButton).attrs({
   type: "submit",
 })`
   margin-right: var(--spacing-m);

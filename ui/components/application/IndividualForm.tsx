@@ -13,7 +13,7 @@ import RadioButtons from "./RadioButtons";
 import EmailInput from "./EmailInput";
 import BillingAddress from "./BillingAddress";
 import Buttons from "./Buttons";
-import { deepCopy, errorText } from "../../modules/util";
+import { deepCopy, applicationErrorText } from "../../modules/util";
 
 type Props = {
   activeForm: FormType;
@@ -73,7 +73,10 @@ const IndividualForm = ({
             name="contactPerson.firstName"
             required
             invalid={!!errors.contactPerson?.firstName?.type}
-            errorText={errorText(t, errors.contactPerson?.firstName?.type)}
+            errorText={applicationErrorText(
+              t,
+              errors.contactPerson?.firstName?.type
+            )}
           />
           <TextInput
             ref={register({ required: true })}
@@ -82,7 +85,10 @@ const IndividualForm = ({
             name="contactPerson.lastName"
             required
             invalid={!!errors.contactPerson?.lastName?.type}
-            errorText={errorText(t, errors.contactPerson?.lastName?.type)}
+            errorText={applicationErrorText(
+              t,
+              errors.contactPerson?.lastName?.type
+            )}
           />
           <BillingAddress register={register} errors={errors} />
           <TextInput
@@ -92,7 +98,10 @@ const IndividualForm = ({
             name="contactPerson.phoneNumber"
             required
             invalid={!!errors.contactPerson?.phoneNumber?.type}
-            errorText={errorText(t, errors.contactPerson?.phoneNumber?.type)}
+            errorText={applicationErrorText(
+              t,
+              errors.contactPerson?.phoneNumber?.type
+            )}
           />
           <EmailInput register={register} errors={errors} />
         </TwoColumnContainer>

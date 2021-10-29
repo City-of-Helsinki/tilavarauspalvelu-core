@@ -1,10 +1,11 @@
-import React, { ReactElement } from "react";
+import React, { ReactElement, ReactNode } from "react";
 import styled from "styled-components";
+import { OpeningHourRow } from "../../modules/openingHours";
 
 type IconWithTextProps = {
-  icon: React.ReactElement;
-  text?: string | ReactElement;
-  texts?: string[][];
+  icon: ReactElement;
+  text?: string | ReactElement | ReactNode;
+  texts?: OpeningHourRow[];
   className?: string;
 };
 
@@ -22,6 +23,18 @@ const SpanTwoColumns = styled.span`
   grid-column-end: 4;
 `;
 
+const InnerGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-auto-rows: auto;
+  margin-left: var(--spacing-s);
+`;
+
+const MultilineWrapper = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+`;
+
 const IconWithText = ({
   icon,
   text = "",
@@ -37,15 +50,19 @@ const IconWithText = ({
     )}
     {texts.length > 0 && (
       <>
-        {texts.map(([day, time], index) => {
-          return (
-            <React.Fragment key={`${day}${time}`}>
-              {index === 0 ? icon : <div />}
-              <div>{day}</div>
-              <div>{time}</div>
-            </React.Fragment>
-          );
-        })}
+        {icon}
+        <InnerGrid>
+          {texts.map(({ label, value, index }) => {
+            return (
+              <MultilineWrapper key={`${index}${label}${value}`}>
+                <div>
+                  {index > 0 && texts[index - 1].label === label ? "" : label}
+                </div>
+                <div>{value}</div>
+              </MultilineWrapper>
+            );
+          })}
+        </InnerGrid>
       </>
     )}
   </Container>

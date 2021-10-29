@@ -29,4 +29,4 @@ jobs:
           yarn install --frozen-lockfile
           yarn lint
           yarn lint:css
-          # yarn test
+          yarn test
