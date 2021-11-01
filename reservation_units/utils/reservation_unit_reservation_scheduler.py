@@ -8,7 +8,11 @@ from opening_hours.utils.opening_hours_client import OpeningHoursClient
 class ReservationUnitReservationScheduler:
     APRIL = 4
 
-    def __init__(self, reservation_unit):
+    def __init__(
+        self,
+        reservation_unit,
+        opening_hours_end: datetime.date = None,
+    ):
         self.reservation_unit = reservation_unit
 
         if self.reservation_unit.max_reservation_duration:
@@ -29,7 +33,7 @@ class ReservationUnitReservationScheduler:
         self.opening_hours_client = OpeningHoursClient(
             str(self.reservation_unit.uuid),
             self.start_time.date(),
-            self.reservation_date_end,
+            opening_hours_end or self.reservation_date_end,
             single=True,
         )
 
