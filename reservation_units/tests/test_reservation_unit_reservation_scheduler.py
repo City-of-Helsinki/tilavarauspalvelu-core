@@ -27,6 +27,7 @@ class ReservationUnitSchedulerGetNextAvailableReservationTimeTestCase(TestCase):
     DATES = [
         datetime.datetime.strptime("2022-01-01", "%Y-%m-%d").date(),
         datetime.datetime.strptime("2022-01-02", "%Y-%m-%d").date(),
+        datetime.datetime.strptime("2023-07-01", "%Y-%m-%d").date(),
     ]
 
     @classmethod
@@ -50,7 +51,9 @@ class ReservationUnitSchedulerGetNextAvailableReservationTimeTestCase(TestCase):
     @mock.patch("opening_hours.utils.opening_hours_client.get_opening_hours")
     def setUp(self, mock) -> None:
         mock.return_value = self.get_mocked_opening_hours()
-        self.scheduler = ReservationUnitReservationScheduler(self.reservation_unit)
+        self.scheduler = ReservationUnitReservationScheduler(
+            self.reservation_unit, opening_hours_end=self.DATES[2]
+        )
         self.app_round.set_status(ApplicationRoundStatus.APPROVED)
 
     def get_mocked_opening_hours(self):
@@ -72,6 +75,18 @@ class ReservationUnitSchedulerGetNextAvailableReservationTimeTestCase(TestCase):
                 "resource_id": resource_id,
                 "origin_id": str(self.reservation_unit.uuid),
                 "date": self.DATES[1],
+                "times": [
+                    TimeElement(
+                        start_time=datetime.time(hour=10),
+                        end_time=datetime.time(hour=22),
+                        end_time_on_next_day=False,
+                    ),
+                ],
+            },
+            {
+                "resource_id": resource_id,
+                "origin_id": str(self.reservation_unit.uuid),
+                "date": self.DATES[2],
                 "times": [
                     TimeElement(
                         start_time=datetime.time(hour=10),

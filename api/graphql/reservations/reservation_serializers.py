@@ -60,7 +60,9 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
                     "Overlapping reservations are not allowed."
                 )
 
-            scheduler = ReservationUnitReservationScheduler(reservation_unit)
+            scheduler = ReservationUnitReservationScheduler(
+                reservation_unit, opening_hours_end=end.date()
+            )
             is_reservation_unit_open = scheduler.is_reservation_unit_open(begin, end)
             if not is_reservation_unit_open:
                 raise serializers.ValidationError(
