@@ -40,6 +40,7 @@
     "react-dom": "^17.0.1",
     "react-i18next": "^11.8.5",
     "react-map-gl": "5.3.16",
+    "react-quill": "beta",
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.3",
     "react-use": "^17.1.0",
@@ -58,7 +59,6 @@
     "eject": "react-scripts eject",
     "generate-gql-types": "graphql-codegen",
     "update-schema": "npx get-graphql-schema http://localhost:8000/graphql/ > ../tilavaraus.graphql"
-
   },
   "eslintConfig": {
     "extends": [

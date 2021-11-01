@@ -5,13 +5,12 @@ import {
   IconCheck,
   Notification,
   Select,
-  TextArea,
   TextInput,
 } from "hds-react";
 import styled from "styled-components";
 import { useMutation } from "@apollo/client";
 import { useTranslation } from "react-i18next";
-import { omit, set, startCase } from "lodash";
+import { get, omit, set, startCase, upperFirst } from "lodash";
 import { parseAddress } from "../../common/util";
 import { CREATE_RESOURCE } from "../../common/queries";
 import { CustomDialogHeader } from "./CustomDialogHeader";
@@ -23,6 +22,10 @@ import {
   SpaceType,
   UnitType,
 } from "../../common/gql-types";
+import RichTextInput from "../RichTextInput";
+
+// eslint-disable-next-line
+type EditorProp = any;
 
 interface IProps {
   unit: UnitType;
@@ -34,47 +37,33 @@ interface IProps {
 
 type State = {
   resource: ResourceCreateMutationInput;
-  spaceId: number;
+  spacePk: number;
   error?: string;
 };
 
 type Action =
-  | { type: "setResourceName"; lang: string; name: string }
-  | { type: "setSpacePk"; spacePk: number }
   | { type: "setError"; error: string }
   | { type: "clearError" }
-  | {
-      type: "setResourceDescription";
-      lang: string;
-      description: string;
-    };
+  | { type: "set"; value: EditorProp };
 
 const initialState = { resource: {} } as State;
 
+const modifyEditorState = (state: State, edit: EditorProp) => ({
+  ...state,
+  resource: { ...state.resource, ...edit },
+  hasChanges: true,
+});
+
 const reducer = (state: State, action: Action): State => {
   switch (action.type) {
-    case "setSpacePk": {
-      return set({ ...state }, "resource.spacePk", action.spacePk);
-    }
-    case "setResourceName": {
-      return set(
-        { ...state },
-        `resource.name${startCase(action.lang)}`,
-        action.name
-      );
-    }
-    case "setResourceDescription": {
-      return set(
-        { ...state },
-        `resource.description${startCase(action.lang)}`,
-        action.description
-      );
-    }
     case "setError": {
       return set({ ...state }, "error", action.error);
     }
     case "clearError": {
       return omit(state, ["error"]);
+    }
+    case "set": {
+      return modifyEditorState(state, { ...action.value });
     }
     default:
       return state;
@@ -121,6 +110,8 @@ const EditorColumns = styled.div`
   }
 `;
 
+const getInitialState = (): State => initialState;
+
 const NewResourceModal = ({
   unit,
   closeModal,
@@ -128,12 +119,15 @@ const NewResourceModal = ({
   spacePk,
   spaces,
 }: IProps): JSX.Element | null => {
-  const [editorState, dispatch] = useReducer(reducer, initialState);
+  const [editorState, dispatch] = useReducer(reducer, getInitialState());
   const { t } = useTranslation();
+
+  const setValue = (name: string, value: EditorProp) =>
+    dispatch({ type: "set", value: { [name]: value } });
 
   useEffect(() => {
     if (spacePk) {
-      dispatch({ type: "setSpacePk", spacePk });
+      setValue("spacePk", spacePk);
     }
   }, [spacePk]);
 
@@ -152,10 +146,10 @@ const NewResourceModal = ({
 
   const editDisabled = !editorState.resource.spacePk;
 
-  const create = async (resource: ResourceCreateMutationInput) => {
+  const create = async (res: ResourceCreateMutationInput) => {
     try {
       const { data } = await createResource({
-        ...resource,
+        ...res,
         locationType: "fixed",
       });
 
@@ -208,7 +202,7 @@ const NewResourceModal = ({
             })),
           ]}
           onChange={(v: { label: string; value: number }) =>
-            dispatch({ type: "setSpacePk", spacePk: v.value })
+            setValue("spacePk", v.value)
           }
         />
         <EditorContainer>
@@ -223,37 +217,30 @@ const NewResourceModal = ({
                 language: t(`language.${lang}`),
               })}
               onBlur={(e) => {
-                dispatch({
-                  type: "setResourceName",
-                  name: e.target.value,
-                  lang,
-                });
+                setValue(`name${startCase(lang)}`, e.target.value);
               }}
               defaultValue=""
             />
           ))}
-          <EditorColumns>
-            {languages.map((lang) => (
-              <TextArea
+          {languages.map((lang) => (
+            <>
+              <RichTextInput
                 disabled={editDisabled}
-                key={lang}
-                required
                 id={`description.${lang}`}
                 label={t("ResourceModal.descriptionLabel", { lang })}
-                placeholder={t("ResourceModal.descriptionPlaceholder", {
-                  language: t(`language.${lang}`),
-                })}
-                defaultValue=""
-                onChange={(e) => {
-                  dispatch({
-                    type: "setResourceDescription",
-                    description: e.target.value,
-                    lang,
-                  });
+                required
+                value={get(
+                  editorState.resource,
+                  `description${upperFirst(lang)}`,
+                  ""
+                )}
+                onChange={(description) => {
+                  setValue(`description${startCase(lang)}`, description);
                 }}
               />
-            ))}
-          </EditorColumns>
+            </>
+          ))}
+          <EditorColumns> </EditorColumns>
         </EditorContainer>
       </Dialog.Content>
       <ActionButtons>
