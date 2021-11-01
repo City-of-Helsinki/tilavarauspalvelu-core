@@ -6,7 +6,6 @@ import {
   Combobox,
   Notification,
   NumberInput,
-  TextArea,
   TextInput,
   TimeInput,
 } from "hds-react";
@@ -46,6 +45,7 @@ import { breakpoints } from "../../styles/util";
 import Loader from "../Loader";
 import SubPageHead from "../Unit/SubPageHead";
 import withMainMenu from "../withMainMenu";
+import RichTextInput from "../RichTextInput";
 
 interface IProps {
   reservationUnitPk?: string;
@@ -98,15 +98,15 @@ type ReservationUnitEditorType = {
   termsOfUseFi: string;
   termsOfUseSv: string;
   termsOfUseEn: string;
+  unitPk: number;
 };
 
 type State = {
   reservationUnitPk?: number;
-  unitPk: number;
   notification: null | NotificationType;
   loading: boolean;
   reservationUnit: ReservationUnitByPkType | null;
-  reservationUnitEdit: ReservationUnitEditorType | null;
+  reservationUnitEdit: Partial<ReservationUnitEditorType>;
   hasChanges: boolean;
   error?: {
     message: string;
@@ -120,21 +120,24 @@ type State = {
   unit?: UnitByPkType;
 };
 
-const getInitialState = (reservationUnitPk: number, unitPk: number): State => ({
-  reservationUnitPk,
-  unitPk,
-  loading: true,
-  notification: null,
-  reservationUnit: null,
-  reservationUnitEdit: null,
-  hasChanges: false,
-  resources: [],
-  spaces: [],
-  spaceOptions: [],
-  equipmentOptions: [],
-  resourceOptions: [],
-  purposeOptions: [],
-});
+const getInitialState = (reservationUnitPk: number): State => {
+  const state = {
+    reservationUnitPk,
+    loading: true,
+    notification: null,
+    reservationUnit: null,
+    reservationUnitEdit: {},
+    hasChanges: false,
+    resources: [],
+    spaces: [],
+    spaceOptions: [],
+    equipmentOptions: [],
+    resourceOptions: [],
+    purposeOptions: [],
+  };
+
+  return state;
+};
 
 const newReservationUnit = {} as ReservationUnitEditorType;
 
@@ -182,6 +185,7 @@ const reducer = (state: State, action: Action): State => {
             "nameFi",
             "nameSv",
             "nameEn",
+            "unitPk",
             "descriptionFi",
             "descriptionEn",
             "descriptionSv",
@@ -240,6 +244,10 @@ const reducer = (state: State, action: Action): State => {
       return withLoadingStatus({
         ...state,
         spaces: unit.spaces as SpaceType[],
+        reservationUnitEdit: {
+          ...state.reservationUnitEdit,
+          unitPk: unit.pk as number,
+        },
         resources:
           ((unit?.spaces &&
             unit.spaces.flatMap((s) => s?.resources)) as ResourceType[]) || [],
@@ -419,7 +427,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
 
   const [state, dispatch] = useReducer(
     reducer,
-    getInitialState(Number(reservationUnitPk), Number(unitPk))
+    getInitialState(Number(reservationUnitPk))
   );
 
   const onDataError = (text: string) => {
@@ -858,27 +866,21 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                 />
               </EditorColumns>
               {languages.map((lang) => (
-                <TextArea
+                <RichTextInput
                   key={lang}
                   required
                   id={`description.${lang}`}
                   label={t("ReservationUnitEditor.descriptionLabel", {
                     lang,
                   })}
-                  placeholder={t(
-                    "ReservationUnitEditor.descriptionPlaceholder",
-                    {
-                      language: t(`language.${lang}`),
-                    }
-                  )}
                   value={get(
                     state,
                     `reservationUnitEdit.description${upperFirst(lang)}`,
                     ""
                   )}
-                  onChange={(e) =>
+                  onChange={(value) =>
                     setValue({
-                      [`description${upperFirst(lang)}`]: e.target.value,
+                      [`description${upperFirst(lang)}`]: value,
                     })
                   }
                 />
@@ -887,24 +889,21 @@ const ReservationUnitEditor = (): JSX.Element | null => {
 
             <Accordion heading={t("ReservationUnitEditor.termsInstructions")}>
               {languages.map((lang) => (
-                <TextArea
+                <RichTextInput
                   key={lang}
                   required
                   id={`tos.${lang}`}
                   label={t("ReservationUnitEditor.tosLabel", {
                     lang,
                   })}
-                  placeholder={t("ReservationUnitEditor.tosPlaceholder", {
-                    language: t(`language.${lang}`),
-                  })}
                   value={get(
                     state,
                     `reservationUnitEdit.termsOfUse${upperFirst(lang)}`,
                     ""
                   )}
-                  onChange={(e) =>
+                  onChange={(value) =>
                     setValue({
-                      [`termsOfUse${upperFirst(lang)}`]: e.target.value,
+                      [`termsOfUse${upperFirst(lang)}`]: value,
                     })
                   }
                 />

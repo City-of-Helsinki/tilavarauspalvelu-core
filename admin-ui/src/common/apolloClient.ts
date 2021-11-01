@@ -45,7 +45,8 @@ const errorLink = onError(({ graphQLErrors, operation, forward }) => {
         e.message !== null &&
         (e.message.indexOf("AnonymousUser") !== -1 ||
           e.message.indexOf("has expired") !== -1 ||
-          e.message.indexOf("too old") !== -1)
+          e.message.indexOf("too old") !== -1 ||
+          e.message.indexOf("No permission to mutate") !== -1)
       );
     });
 
