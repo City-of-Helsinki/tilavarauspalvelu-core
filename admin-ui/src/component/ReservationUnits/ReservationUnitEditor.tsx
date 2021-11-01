@@ -120,24 +120,20 @@ type State = {
   unit?: UnitByPkType;
 };
 
-const getInitialState = (reservationUnitPk: number): State => {
-  const state = {
-    reservationUnitPk,
-    loading: true,
-    notification: null,
-    reservationUnit: null,
-    reservationUnitEdit: {},
-    hasChanges: false,
-    resources: [],
-    spaces: [],
-    spaceOptions: [],
-    equipmentOptions: [],
-    resourceOptions: [],
-    purposeOptions: [],
-  };
-
-  return state;
-};
+const getInitialState = (reservationUnitPk: number): State => ({
+  reservationUnitPk,
+  loading: true,
+  notification: null,
+  reservationUnit: null,
+  reservationUnitEdit: {},
+  hasChanges: false,
+  resources: [],
+  spaces: [],
+  spaceOptions: [],
+  equipmentOptions: [],
+  resourceOptions: [],
+  purposeOptions: [],
+});
 
 const newReservationUnit = {} as ReservationUnitEditorType;
 
