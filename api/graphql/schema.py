@@ -54,6 +54,9 @@ from api.graphql.spaces.space_mutations import (
 from api.graphql.spaces.space_types import SpaceType
 from api.graphql.units.unit_mutations import UnitUpdateMutation
 from api.graphql.units.unit_types import UnitByPkType, UnitType
+from permissions.api_permissions.graphene_field_decorators import (
+    check_resolver_permission,
+)
 from permissions.api_permissions.graphene_permissions import (
     EquipmentCategoryPermission,
     EquipmentPermission,
@@ -202,26 +205,32 @@ class Query(graphene.ObjectType):
 
     purposes = PurposeFilter(PurposeType)
 
+    @check_resolver_permission(ReservationUnitPermission)
     def resolve_reservation_unit_by_pk(self, info, **kwargs):
         pk = kwargs.get("pk")
         return get_object_or_404(ReservationUnit, pk=pk)
 
+    @check_resolver_permission(ResourcePermission)
     def resolve_resource_by_pk(self, info, **kwargs):
         pk = kwargs.get("pk")
         return get_object_or_404(Resource, pk=pk)
 
+    @check_resolver_permission(UnitPermission)
     def resolve_unit_by_pk(self, info, **kwargs):
         pk = kwargs.get("pk")
         return get_object_or_404(Unit, pk=pk)
 
+    @check_resolver_permission(SpacePermission)
     def resolve_space_by_pk(self, info, **kwargs):
         pk = kwargs.get("pk")
         return get_object_or_404(Space, pk=pk)
 
+    @check_resolver_permission(EquipmentPermission)
     def resolve_equipment_by_pk(self, info, **kwargs):
         pk = kwargs.get("pk")
         return get_object_or_404(Equipment, pk=pk)
 
+    @check_resolver_permission(EquipmentCategoryPermission)
     def resolve_equipment_category_by_pk(self, info, **kwargs):
         pk = kwargs.get("pk")
         return get_object_or_404(EquipmentCategory, pk=pk)

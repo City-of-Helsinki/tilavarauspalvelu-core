@@ -8,6 +8,7 @@ from rest_framework.reverse import reverse
 from api.graphql.base_type import PrimaryKeyObjectType
 from api.ical_api import hmac_signature
 from permissions.api_permissions.graphene_field_decorators import (
+    check_resolver_permission,
     recurring_reservation_non_public_field,
     reservation_non_public_field,
 )
@@ -16,6 +17,7 @@ from permissions.api_permissions.graphene_permissions import (
     AgeGroupPermission,
     RecurringReservationPermission,
     ReservationPermission,
+    ReservationUnitPermission,
 )
 from reservations.models import (
     AbilityGroup,
@@ -142,6 +144,7 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
 
     calendar_url = graphene.String()
 
+    @reservation_non_public_field
     def resolve_calendar_url(self, info: ResolveInfo) -> str:
         if self is None:
             return ""
@@ -157,5 +160,6 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
             return None
         return self.user.email
 
+    @check_resolver_permission(ReservationUnitPermission)
     def resolve_reservation_units(self, info: ResolveInfo):
         return self.reservation_unit.all()

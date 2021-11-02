@@ -73,6 +73,14 @@ class ResourcePermission(BasePermission):
 
 class ReservationPermission(BasePermission):
     @classmethod
+    def has_permission(cls, info: ResolveInfo) -> bool:
+        """Authenticated users can see reservations.
+
+        The reservation fields has own permission checks.
+        """
+        return info.context.user.is_authenticated
+
+    @classmethod
     def has_mutation_permission(cls, root: Any, info: ResolveInfo, input: dict) -> bool:
         pk = input.get("pk")
         if pk:
@@ -107,6 +115,10 @@ class RecurringReservationPermission(BasePermission):
 
 
 class PurposePermission(BasePermission):
+    @classmethod
+    def has_permission(cls, info: ResolveInfo) -> bool:
+        return True
+
     @classmethod
     def has_filter_permission(cls, info: ResolveInfo) -> bool:
         return True
@@ -148,6 +160,20 @@ class SpacePermission(BasePermission):
     @classmethod
     def has_mutation_permission(cls, root: Any, info: ResolveInfo, input: dict) -> bool:
         return can_manage_spaces(info.context.user)
+
+
+class ServicePermission(BasePermission):
+    @classmethod
+    def has_permission(cls, info: ResolveInfo) -> bool:
+        return True
+
+    @classmethod
+    def has_filter_permission(cls, info: ResolveInfo) -> bool:
+        return True
+
+    @classmethod
+    def has_mutation_permission(cls, root: Any, info: ResolveInfo, input: dict) -> bool:
+        return False
 
 
 class UnitPermission(BasePermission):
