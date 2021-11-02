@@ -6,7 +6,14 @@ from graphene_permissions.permissions import AllowAny
 from api.graphql.base_type import PrimaryKeyObjectType
 from api.graphql.opening_hours.opening_hours_types import OpeningHoursMixin
 from api.graphql.translate_fields import get_all_translatable_fields
-from permissions.api_permissions.graphene_permissions import UnitPermission
+from permissions.api_permissions.graphene_field_decorators import (
+    check_resolver_permission,
+)
+from permissions.api_permissions.graphene_permissions import (
+    ReservationUnitPermission,
+    SpacePermission,
+    UnitPermission,
+)
 from spaces.models import Unit
 
 
@@ -40,9 +47,11 @@ class UnitType(AuthNode, PrimaryKeyObjectType):
 
         interfaces = (graphene.relay.Node,)
 
+    @check_resolver_permission(ReservationUnitPermission)
     def resolve_reservation_units(self, info):
         return self.reservationunit_set.all()
 
+    @check_resolver_permission(SpacePermission)
     def resolve_spaces(self, info):
         return self.spaces.all()
 

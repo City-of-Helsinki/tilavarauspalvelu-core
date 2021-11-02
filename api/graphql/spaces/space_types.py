@@ -5,7 +5,13 @@ from graphene_permissions.permissions import AllowAny
 
 from api.graphql.base_type import PrimaryKeyObjectType
 from api.graphql.translate_fields import get_all_translatable_fields
-from permissions.api_permissions.graphene_permissions import SpacePermission
+from permissions.api_permissions.graphene_field_decorators import (
+    check_resolver_permission,
+)
+from permissions.api_permissions.graphene_permissions import (
+    ResourcePermission,
+    SpacePermission,
+)
 from spaces.models import Building, District, Location, RealEstate, Space
 
 
@@ -70,6 +76,7 @@ class SpaceType(AuthNode, PrimaryKeyObjectType):
     def resolve_children(self, info):
         return Space.objects.filter(parent=self)
 
+    @check_resolver_permission(ResourcePermission)
     def resolve_resources(self, info):
         return self.resource_set.all()
 

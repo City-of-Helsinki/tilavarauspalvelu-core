@@ -21,12 +21,20 @@ from api.graphql.units.unit_types import UnitType
 from applications.models import ApplicationRound
 from opening_hours.hauki_link_generator import generate_hauki_link
 from permissions.api_permissions.drf_permissions import ApplicationRoundPermission
+from permissions.api_permissions.graphene_field_decorators import (
+    check_resolver_permission,
+)
 from permissions.api_permissions.graphene_permissions import (
     EquipmentCategoryPermission,
     EquipmentPermission,
     PurposePermission,
+    ReservationPermission,
     ReservationUnitHaukiUrlPermission,
     ReservationUnitPermission,
+    ResourcePermission,
+    ServicePermission,
+    SpacePermission,
+    UnitPermission,
 )
 from reservation_units.models import (
     Equipment,
@@ -294,31 +302,37 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
     def resolve_location(self, info):
         return self.get_location()
 
+    @check_resolver_permission(SpacePermission)
     def resolve_spaces(self, info):
         return Space.objects.filter(reservation_units=self.id).select_related(
             "parent", "building"
         )
 
+    @check_resolver_permission(ServicePermission)
     def resolve_services(self, info):
         return self.services.all()
 
+    @check_resolver_permission(PurposePermission)
     def resolve_purposes(self, info):
         return Purpose.objects.filter(reservation_units=self.id)
 
     def resolve_images(self, info):
         return ReservationUnitImage.objects.filter(reservation_unit_id=self.id)
 
+    @check_resolver_permission(ResourcePermission)
     def resolve_resources(self, info):
         return Resource.objects.filter(reservation_units=self.id)
 
     def resolve_reservation_unit_type(self, info):
         return self.reservation_unit_type
 
+    @check_resolver_permission(EquipmentPermission)
     def resolve_equipment(self, info):
         if self.equipments is None:
             return []
         return self.equipments.all()
 
+    @check_resolver_permission(UnitPermission)
     def resolve_unit(self, info):
         return self.unit
 
@@ -349,6 +363,7 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
     def resolve_keyword_groups(self, info):
         return KeywordGroup.objects.filter(reservation_units=self.id)
 
+    @check_resolver_permission(ReservationPermission)
     def resolve_reservations(
         self,
         info: ResolveInfo,

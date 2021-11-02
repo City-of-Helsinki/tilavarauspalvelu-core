@@ -7,7 +7,6 @@ from assertpy import assert_that
 from django.conf import settings
 from django.test import override_settings
 from freezegun import freeze_time
-from graphene_django.utils import GraphQLTestCase
 from rest_framework.test import APIClient
 
 from api.graphql.tests.base import GrapheneTestCaseBase
@@ -31,9 +30,10 @@ from spaces.tests.factories import SpaceFactory, UnitFactory
 
 
 @freeze_time("2021-05-03")
-class ReservationUnitTestCase(GraphQLTestCase, snapshottest.TestCase):
+class ReservationUnitTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
     @classmethod
     def setUpTestData(cls):
+        super().setUpTestData()
         cls.type = ReservationUnitTypeFactory(name="Test type")
         large_space = SpaceFactory(
             max_persons=100, name="Large space", surface_area=100
@@ -50,6 +50,7 @@ class ReservationUnitTestCase(GraphQLTestCase, snapshottest.TestCase):
 
     def test_getting_reservation_units(self):
         self.maxDiff = None
+        self._client.force_login(self.regular_joe)
         response = self.query(
             """
             query {
@@ -522,6 +523,7 @@ class ReservationUnitTestCase(GraphQLTestCase, snapshottest.TestCase):
         )
         self.reservation_unit.save()
 
+        self._client.force_login(self.regular_joe)
         response = self.query(
             """
             query {
@@ -563,7 +565,7 @@ class ReservationUnitTestCase(GraphQLTestCase, snapshottest.TestCase):
             [matching_reservation, other_reservation]
         )
         self.reservation_unit.save()
-
+        self._client.force_login(self.regular_joe)
         response = self.query(
             """
             query {
@@ -610,6 +612,7 @@ class ReservationUnitTestCase(GraphQLTestCase, snapshottest.TestCase):
         )
         self.reservation_unit.save()
 
+        self._client.force_login(self.regular_joe)
         response = self.query(
             """
             query {
