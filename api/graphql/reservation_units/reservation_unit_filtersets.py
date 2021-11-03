@@ -35,6 +35,18 @@ class ReservationUnitsFilterSet(django_filters.FilterSet):
 
     purposes = ModelInFilter(field_name="purposes", queryset=Purpose.objects.all())
 
+    order_by = django_filters.OrderingFilter(
+        fields={
+            "name_fi": "nameFi",
+            "name_en": "nameEn",
+            "name_sv": "nameSv",
+            "reservation_unit_type__name_fi": "typeFi",
+            "reservation_unit_type__name_en": "typeEn",
+            "reservation_unit_type__name_sv": "typeSv",
+            "unit_id": "unit",
+        }
+    )
+
     class Meta:
         model = ReservationUnit
         fields = ["unit", "keyword_groups"]
