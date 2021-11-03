@@ -217,7 +217,13 @@ class ReservationUnitTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
             .get("reservationUnitByPk")
             .get("openingHours")
             .get("openingTimes")[0]["startTime"]
-        ).is_equal_to("10:00:00")
+        ).is_equal_to("10:00:00+00:00")
+        assert_that(
+            content.get("data")
+            .get("reservationUnitByPk")
+            .get("openingHours")
+            .get("openingTimes")[0]["endTime"]
+        ).is_equal_to("22:00:00+00:00")
 
     def test_filtering_by_type(self):
         response = self.query(
