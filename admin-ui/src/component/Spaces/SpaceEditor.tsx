@@ -4,9 +4,8 @@ import {
   TextInput,
   Select,
   Button,
-  TextArea,
 } from "hds-react";
-import { pick, set, upperFirst } from "lodash";
+import { get, pick, upperFirst } from "lodash";
 import React, { useReducer } from "react";
 import { FetchResult, useMutation, useQuery } from "@apollo/client";
 import { useTranslation } from "react-i18next";
@@ -34,6 +33,8 @@ import {
   SpaceUpdateMutationPayload,
   UnitType,
 } from "../../common/gql-types";
+import { languages } from "../../common/const";
+import RichTextInput from "../RichTextInput";
 
 interface IProps {
   unitPk: string;
@@ -63,12 +64,8 @@ type Action =
   | { type: "dataLoaded"; space: SpaceType }
   | { type: "hierarchyLoaded"; spaces: SpaceType[] }
   | { type: "dataLoadError"; message: string }
-  | { type: "setName"; name: string }
-  | { type: "setMaxPersons"; maxPersons: number }
-  | { type: "setSurfaceArea"; surfaceArea: number }
-  | { type: "setCode"; code: string }
-  | { type: "setTermsOfUse"; termsOfUse: string; lang: string }
-  | { type: "setParent"; parentPk?: number };
+  // eslint-disable-next-line
+  | { type: "set"; value: any };
 
 type State = {
   spacePk?: number;
@@ -119,13 +116,17 @@ const reducer = (state: State, action: Action): State => {
           ...pick({ ...space, pk: space.pk as number }, [
             "pk",
             "nameFi",
+            "nameSv",
+            "nameEn",
             "surfaceArea",
             "maxPersons",
             "code",
             "termsOfUseFi",
+            "termsOfUseSv",
+            "termsOfUseEn",
           ]),
-          parentId: space.parent ? String(space.parent.pk) : undefined,
-          unitPk: space.unit ? String(space.unit.pk) : undefined,
+          parentPk: space.parent ? space.parent?.pk : null,
+          unitPk: space.unit ? space.unit.pk : undefined,
         } as SpaceUpdateMutationInput,
         loading: false,
         hasChanges: false,
@@ -163,36 +164,14 @@ const reducer = (state: State, action: Action): State => {
         error: null,
       };
     }
-    case "setCode": {
-      return modified(set({ ...state }, `spaceEdit.code`, action.code));
+
+    case "set": {
+      return modified({
+        ...state,
+        spaceEdit: { ...state.spaceEdit, ...action.value },
+      });
     }
-    case "setParent": {
-      return modified(
-        set({ ...state }, `spaceEdit.parentPk`, action.parentPk || null)
-      );
-    }
-    case "setTermsOfUse": {
-      return modified(
-        set(
-          { ...state },
-          `spaceEdit.termsOfUse${upperFirst(action.lang)}`,
-          action.termsOfUse
-        )
-      );
-    }
-    case "setName": {
-      return modified(set({ ...state }, `spaceEdit.nameFi`, action.name));
-    }
-    case "setMaxPersons": {
-      return modified(
-        set({ ...state }, `spaceEdit.maxPersons`, action.maxPersons)
-      );
-    }
-    case "setSurfaceArea": {
-      return modified(
-        set({ ...state }, `spaceEdit.surfaceArea`, action.surfaceArea)
-      );
-    }
+
     default:
       return state;
   }
@@ -200,6 +179,9 @@ const reducer = (state: State, action: Action): State => {
 
 const Wrapper = styled.div``;
 
+const TextInputWithPadding = styled(TextInput)`
+  padding-bottom: var(--spacing-m);
+`;
 const StyledNotification = styled(Notification)`
   margin: var(--spacing-xs) var(--spacing-layout-2-xs);
   width: auto;
@@ -245,10 +227,8 @@ const SaveButton = styled(Button)`
   margin-left: auto;
 `;
 
-const getParent = (v: Maybe<number> | undefined, options: ParentType[]) => {
-  const p = options.find((po) => po.value?.pk === v) || options[0];
-  return p;
-};
+const getParent = (v: Maybe<number> | undefined, options: ParentType[]) =>
+  options.find((po) => po.value?.pk === v) || options[0];
 
 const SpaceEditor = (): JSX.Element | null => {
   const { spacePk, unitPk } = useParams<IProps>();
@@ -342,6 +322,11 @@ const SpaceEditor = (): JSX.Element | null => {
     return null;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const setValue = (value: any) => {
+    dispatch({ type: "set", value });
+  };
+
   return (
     <Wrapper>
       <SpaceHead
@@ -385,24 +370,32 @@ const SpaceEditor = (): JSX.Element | null => {
                   state.parentOptions
                 )}
                 onChange={(selected: ParentType) =>
-                  dispatch({
-                    type: "setParent",
-                    parentPk: selected.value?.pk as number,
-                  })
+                  setValue({ parentPk: selected.value?.pk })
                 }
               />
             </Section>
             <Section>
               <SubHeading>{t("SpaceEditor.other")}</SubHeading>
-              <TextInput
-                defaultValue={state.spaceEdit?.nameFi || "?"}
-                required
-                id="name"
-                label={t("SpaceModal.page2.nameLabel")}
-                onChange={(e) => {
-                  dispatch({ type: "setName", name: e.target.value });
-                }}
-              />
+              {languages.map((lang) => (
+                <TextInputWithPadding
+                  key={lang}
+                  required
+                  id={`name${lang}`}
+                  label={t("SpaceEditor.nameLabel", {
+                    lang,
+                  })}
+                  value={get(state, `spaceEdit.name${upperFirst(lang)}`, "")}
+                  placeholder={t("SpaceEditor.namePlaceholder", {
+                    language: t(`language.${lang}`),
+                  })}
+                  onChange={(e) =>
+                    setValue({
+                      [`name${upperFirst(lang)}`]: e.target.value,
+                    })
+                  }
+                />
+              ))}
+
               <EditorColumns>
                 <NumberInput
                   defaultValue={state.spaceEdit?.surfaceArea || undefined}
@@ -411,12 +404,9 @@ const SpaceEditor = (): JSX.Element | null => {
                   helperText={t("SpaceModal.page2.surfaceAreaHelperText")}
                   minusStepButtonAriaLabel={t("common.decreaseByOneAriaLabel")}
                   plusStepButtonAriaLabel={t("common.increaseByOneAriaLabel")}
-                  onChange={(e) => {
-                    dispatch({
-                      type: "setSurfaceArea",
-                      surfaceArea: Number(e.target.value),
-                    });
-                  }}
+                  onChange={(e) =>
+                    setValue({ surfaceArea: Number(e.target.value) })
+                  }
                   step={1}
                   type="number"
                   min={1}
@@ -428,12 +418,9 @@ const SpaceEditor = (): JSX.Element | null => {
                   label={t("SpaceModal.page2.maxPersonsLabel")}
                   minusStepButtonAriaLabel={t("common.decreaseByOneAriaLabel")}
                   plusStepButtonAriaLabel={t("common.increaseByOneAriaLabel")}
-                  onChange={(e) => {
-                    dispatch({
-                      type: "setMaxPersons",
-                      maxPersons: Number(e.target.value),
-                    });
-                  }}
+                  onChange={(e) =>
+                    setValue({ maxPersons: Number(e.target.value) })
+                  }
                   step={1}
                   type="number"
                   min={1}
@@ -445,28 +432,29 @@ const SpaceEditor = (): JSX.Element | null => {
                   label={t("SpaceModal.page2.codeLabel")}
                   placeholder={t("SpaceModal.page2.codePlaceholder")}
                   defaultValue={state.spaceEdit?.code || undefined}
-                  onChange={(e) => {
-                    dispatch({
-                      type: "setCode",
-                      code: e.target.value,
-                    });
-                  }}
+                  onChange={(e) => setValue({ code: e.target.value })}
                 />
               </EditorColumns>
-              <TextArea
-                required
-                id="termsOfUseFi"
-                label={t("SpaceEditor.termsOfUse")}
-                defaultValue={state.spaceEdit?.termsOfUseFi || undefined}
-                helperText={t("SpaceEditor.termsOfUseHelperText")}
-                onChange={(e) => {
-                  dispatch({
-                    type: "setTermsOfUse",
-                    lang: "fi",
-                    termsOfUse: e.target.value,
-                  });
-                }}
-              />
+              {languages.map((lang) => (
+                <RichTextInput
+                  key={lang}
+                  required
+                  id={`termsOfUse.${lang}`}
+                  label={t("SpaceEditor.touLabel", {
+                    lang,
+                  })}
+                  value={get(
+                    state,
+                    `spaceEdit.termsOfUse${upperFirst(lang)}`,
+                    ""
+                  )}
+                  onChange={(value) =>
+                    setValue({
+                      [`termsOfUse${upperFirst(lang)}`]: value,
+                    })
+                  }
+                />
+              ))}
             </Section>
             <Buttons>
               <Button
