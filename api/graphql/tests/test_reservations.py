@@ -296,12 +296,11 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
     ):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         input_data = self.get_valid_input_data()
-        input_data["begin"] = (
-            datetime.datetime.now() - datetime.timedelta(days=1)
-        ).strftime("%Y%m%dT%H%M%SZ")
-        input_data["end"] = (
-            datetime.datetime.now() - datetime.timedelta(hours=23)
-        ).strftime("%Y%m%dT%H%M%SZ")
+        today = datetime.date.today()
+        begin = datetime.datetime(today.year, today.month, today.day, 21, 0)
+        end = begin + datetime.timedelta(hours=2)
+        input_data["begin"] = begin.strftime("%Y%m%dT%H%M%SZ")
+        input_data["end"] = end.strftime("%Y%m%dT%H%M%SZ")
 
         self._client.force_login(self.regular_joe)
         response = self.query(self.get_create_query(), input_data=input_data)
@@ -397,6 +396,36 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         assert_that(content.get("errors")[0].get("message")).is_equal_to(
             "No permission to mutate"
         )
+
+    def test_create_success_when_reservation_date_over_next_spring(
+        self, mock_periods, mock_opening_hours
+    ):
+        """In reservation creation it is needed to use opening_hours_end date
+        parameter in ReservationUnitReservationScheduler initialization to get
+        the possible opening hours from beyond next spring which is what the scheduler
+        class defaults to.
+        """
+        opening_hours_data = self.get_mocked_opening_hours()
+        opening_hours_data[0]["date"] = datetime.date(2022, 6, 15)
+        mock_opening_hours.return_value = opening_hours_data
+
+        res_start = datetime.datetime(2022, 6, 15, 15, 0)
+        valid_data = self.get_valid_input_data()
+        valid_data["begin"] = res_start.strftime("%Y%m%dT%H%M%SZ")
+        valid_data["end"] = (res_start + datetime.timedelta(hours=1)).strftime(
+            "%Y%m%dT%H%M%SZ"
+        )
+        self._client.force_login(self.regular_joe)
+        response = self.query(self.get_create_query(), input_data=valid_data)
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_none()
+        assert_that(
+            content.get("data").get("createReservation").get("reservation").get("pk")
+        ).is_not_none()
+        pk = content.get("data").get("createReservation").get("reservation").get("pk")
+        reservation = Reservation.objects.get(id=pk)
+        assert_that(reservation).is_not_none()
 
 
 @freezegun.freeze_time("2021-10-12T12:00:00Z")
@@ -644,12 +673,11 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
     ):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         input_data = self.get_valid_update_data()
-        input_data["begin"] = (
-            datetime.datetime.now() - datetime.timedelta(days=1)
-        ).strftime("%Y%m%dT%H%M%SZ")
-        input_data["end"] = (
-            datetime.datetime.now() - datetime.timedelta(hours=23)
-        ).strftime("%Y%m%dT%H%M%SZ")
+        today = datetime.date.today()
+        begin = datetime.datetime(today.year, today.month, today.day, 21, 0)
+        end = begin + datetime.timedelta(hours=2)
+        input_data["begin"] = begin.strftime("%Y%m%dT%H%M%SZ")
+        input_data["end"] = end.strftime("%Y%m%dT%H%M%SZ")
 
         self._client.force_login(self.regular_joe)
         response = self.query(self.get_update_query(), input_data=input_data)
