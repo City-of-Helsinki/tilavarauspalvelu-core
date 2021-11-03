@@ -625,8 +625,6 @@ const ReservationUnitEditor = (): JSX.Element | null => {
     return null;
   }
 
-  console.log("rendering with state", state);
-
   return (
     <Wrapper>
       <IngressContainer>
