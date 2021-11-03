@@ -1,4 +1,4 @@
-import { FetchResult, useMutation, useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import {
   Accordion,
   Button,
@@ -10,7 +10,7 @@ import {
   TimeInput,
 } from "hds-react";
 import i18next from "i18next";
-import { get, pick, sumBy, upperFirst } from "lodash";
+import { get, isNull, omitBy, pick, sumBy, upperFirst } from "lodash";
 import React, { useEffect, useReducer } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams, useHistory } from "react-router-dom";
@@ -24,12 +24,13 @@ import {
   QueryUnitByPkArgs,
   ReservationUnitByPkType,
   ReservationUnitCreateMutationInput,
-  ReservationUnitCreateMutationPayload,
   ReservationUnitUpdateMutationInput,
-  ReservationUnitUpdateMutationPayload,
   ResourceType,
   SpaceType,
   UnitByPkType,
+  Mutation,
+  ErrorType,
+  Maybe,
 } from "../../common/gql-types";
 import {
   CREATE_RESERVATION_UNIT,
@@ -67,7 +68,7 @@ type Action =
   | { type: "clearError" }
   | { type: "dataLoaded"; reservationUnit: ReservationUnitByPkType }
   | { type: "unitLoaded"; unit: UnitByPkType }
-  | { type: "editNew" }
+  | { type: "editNew"; unitPk: number }
   | { type: "dataInitializationError"; message: string }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   | { type: "set"; value: any }
@@ -134,8 +135,6 @@ const getInitialState = (reservationUnitPk: number): State => ({
   resourceOptions: [],
   purposeOptions: [],
 });
-
-const newReservationUnit = {} as ReservationUnitEditorType;
 
 const withLoadingStatus = (state: State): State => {
   const hasError = typeof state.error?.message !== undefined;
@@ -278,7 +277,7 @@ const reducer = (state: State, action: Action): State => {
       return withLoadingStatus({
         ...state,
         reservationUnitEdit: {
-          ...newReservationUnit,
+          unitPk: action.unitPk,
         },
         hasChanges: false,
       });
@@ -443,34 +442,24 @@ const ReservationUnitEditor = (): JSX.Element | null => {
       },
     });
 
-  const [updateReservationUnitMutation] = useMutation<
-    { updateReservationUnit: ReservationUnitUpdateMutationPayload },
-    { input: ReservationUnitUpdateMutationInput }
-  >(UPDATE_RESERVATION_UNIT);
+  const [updateReservationUnitMutation] = useMutation<Mutation>(
+    UPDATE_RESERVATION_UNIT
+  );
 
-  const updateReservationUnit = (
-    input: ReservationUnitUpdateMutationInput
-  ): Promise<
-    FetchResult<{ updateReservationUnit: ReservationUnitUpdateMutationPayload }>
-  > => updateReservationUnitMutation({ variables: { input } });
+  const updateReservationUnit = (input: ReservationUnitUpdateMutationInput) =>
+    updateReservationUnitMutation({ variables: { input } });
 
-  const [createReservationUnitMutation] = useMutation<
-    { createReservationUnit: ReservationUnitCreateMutationPayload },
-    { input: ReservationUnitCreateMutationInput }
-  >(CREATE_RESERVATION_UNIT);
+  const [createReservationUnitMutation] = useMutation<Mutation>(
+    CREATE_RESERVATION_UNIT
+  );
 
-  const createReservationUnit = (
-    input: ReservationUnitCreateMutationInput
-  ): Promise<
-    FetchResult<{
-      createReservationUnit: ReservationUnitCreateMutationPayload;
-    }>
-  > => createReservationUnitMutation({ variables: { input } });
+  const createReservationUnit = (input: ReservationUnitCreateMutationInput) =>
+    createReservationUnitMutation({ variables: { input } });
 
   const createOrUpdateReservationUnit = async (publish: boolean) => {
     const input = pick(
       {
-        ...state.reservationUnitEdit,
+        ...omitBy(state.reservationUnitEdit, isNull),
         spacePks: state.reservationUnitEdit?.spacePks?.map(String),
         resourcePks: state.reservationUnitEdit?.resourcePks?.map(String),
         equipmentPks: state.reservationUnitEdit?.equipmentPks?.map(String),
@@ -502,27 +491,42 @@ const ReservationUnitEditor = (): JSX.Element | null => {
       ]
     );
 
+    let errors: Maybe<Maybe<ErrorType>[]> | undefined;
+
     try {
       if (state.reservationUnitPk) {
         const res = await updateReservationUnit(
           input as ReservationUnitUpdateMutationInput
         );
-
-        if (res.data?.updateReservationUnit.errors === null) {
-          onSave(t("ReservationUnitEditor.saved"));
-        }
+        errors = res.data?.updateReservationUnit?.errors;
       } else {
         const res = await createReservationUnit(
           input as ReservationUnitCreateMutationInput
         );
 
-        if (res.data?.createReservationUnit.errors === null) {
+        errors = res.data?.createReservationUnit?.errors;
+
+        if (res.data?.createReservationUnit?.errors === null) {
           onSave(t("ReservationUnitEditor.saved"));
           // todo notification
           history.replace(
             `/unit/${unitPk}/reservationUnit/edit/${res.data.createReservationUnit.pk}`
           );
         }
+      }
+      if (errors === null) {
+        onSave(t("ReservationUnitEditor.saved"));
+      } else {
+        const firstError = errors ? errors.find(() => true) : undefined;
+        const errorMessage = firstError
+          ? `${firstError.field} -${firstError.messages.find(() => true)}`
+          : "";
+
+        const errorTxt = t("ReservationUnitEditor.saveFailed", {
+          error: errorMessage,
+        });
+
+        onDataError(errorTxt);
       }
     } catch (error) {
       onDataError(t("ReservationUnitEditor.saveFailed", { error }));
@@ -585,9 +589,9 @@ const ReservationUnitEditor = (): JSX.Element | null => {
 
   useEffect(() => {
     if (!reservationUnitPk) {
-      dispatch({ type: "editNew" });
+      dispatch({ type: "editNew", unitPk: Number(unitPk) });
     }
-  }, [reservationUnitPk]);
+  }, [reservationUnitPk, unitPk]);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const setValue = (value: any) => {
@@ -621,6 +625,8 @@ const ReservationUnitEditor = (): JSX.Element | null => {
     return null;
   }
 
+  console.log("rendering with state", state);
+
   return (
     <Wrapper>
       <IngressContainer>
@@ -628,6 +634,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
           <StyledNotification
             type={state.notification.type}
             label={t(state.notification.title)}
+            position="top-center"
             dismissible
             closeButtonLabelText={`${t("common.close")}`}
             onClose={() => dispatch({ type: "clearNotification" })}
@@ -653,34 +660,26 @@ const ReservationUnitEditor = (): JSX.Element | null => {
               heading={t("ReservationUnitEditor.basicInformation")}
             >
               <Section>
-                <TextInputWithPadding
-                  value={state.reservationUnitEdit.nameFi || ""}
-                  required
-                  id="nameFi"
-                  label={t("ReservationUnitEditor.nameLabel")}
-                  helperText={t("ReservationUnitEditor.nameHelper")}
-                  onChange={(e) => {
-                    setValue({ nameFi: e.target.value });
-                  }}
-                />
-                <TextInputWithPadding
-                  value={state.reservationUnitEdit.nameSv || ""}
-                  required
-                  id="nameSv"
-                  label={t("ReservationUnitEditor.nameSvLabel")}
-                  onChange={(e) => {
-                    setValue({ nameSv: e.target.value });
-                  }}
-                />
-                <TextInputWithPadding
-                  value={state.reservationUnitEdit.nameEn || ""}
-                  required
-                  id="nameEn"
-                  label={t("ReservationUnitEditor.nameEnLabel")}
-                  onChange={(e) => {
-                    setValue({ nameEn: e.target.value });
-                  }}
-                />
+                {languages.map((lang) => (
+                  <TextInputWithPadding
+                    key={lang}
+                    required
+                    id={`name${lang}`}
+                    label={t("ReservationUnitEditor.nameLabel", {
+                      lang,
+                    })}
+                    value={get(
+                      state,
+                      `reservationUnitEdit.name${upperFirst(lang)}`,
+                      ""
+                    )}
+                    onChange={(e) =>
+                      setValue({
+                        [`name${upperFirst(lang)}`]: e.target.value,
+                      })
+                    }
+                  />
+                ))}
                 <EditorColumns>
                   <Combobox
                     multiselect
@@ -933,15 +932,14 @@ const ReservationUnitEditor = (): JSX.Element | null => {
       </ContentContainer>
       {state.error ? (
         <Wrapper>
+          <div>error</div>
           <Notification
             type="error"
             label={t("ReservationUnitEditor.errorDataHeading")}
             position="top-center"
-            autoClose={false}
             dismissible
             onClose={() => dispatch({ type: "clearError" })}
             closeButtonLabelText={t("common.close")}
-            displayAutoCloseProgress={false}
           >
             {t(state.error?.message)}
           </Notification>

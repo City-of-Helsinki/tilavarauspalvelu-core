@@ -842,9 +842,7 @@ const translations: ITranslations = {
     basicInformation: ["Perustiedot"],
     typesProperties: ["Tilatyyppi, ominaisuustieto ja varustelu"],
     termsInstructions: ["Ehdot ja ohjeet"],
-    nameLabel: ["Varausyksikön nimi"],
-    nameSvLabel: ["Varausyksikön nimi sv"],
-    nameEnLabel: ["Varausyksikön nimi en"],
+    nameLabel: ["Varausyksikön nimi {{lang}}"],
     nameHelper: ["Vinkki: hyvä nimi erottaa sen muista."],
     descriptionLabel: ["Kuvaus {{lang}}"],
     descriptionPlaceholder: ["Kuvaus {{language}}"],
@@ -877,6 +875,7 @@ const translations: ITranslations = {
     saved: ["Tiedot tallennettu."],
     saveAsDraft: ["Tallenna luonnoksena"],
     reservationUnitUpdatedNotification: ["Varausyksikön tiedot tallennettu."],
+    saveFailed: ["Varausyksikön tietoja ei saatu tallennettua. {{error}}"],
     saveAndPublish: ["Tallenna julkaistuna"],
   },
   ResourceModal: {
