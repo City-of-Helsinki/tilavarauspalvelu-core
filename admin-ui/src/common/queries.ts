@@ -399,10 +399,14 @@ export const SPACE_QUERY = gql`
     spaceByPk(pk: $pk) {
       pk
       nameFi
+      nameSv
+      nameEn
       surfaceArea
       maxPersons
       code
       termsOfUseFi
+      termsOfUseSv
+      termsOfUseEn
       unit {
         pk
         nameFi
