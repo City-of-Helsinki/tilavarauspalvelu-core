@@ -12,7 +12,9 @@ from rest_framework.test import APIClient
 from api.graphql.tests.base import GrapheneTestCaseBase
 from applications.tests.factories import ApplicationRoundFactory
 from opening_hours.enums import State
+from opening_hours.errors import HaukiAPIError
 from opening_hours.hours import TimeElement
+from opening_hours.resources import Resource as HaukiResource
 from reservation_units.models import ReservationUnit
 from reservation_units.tests.factories import (
     EquipmentFactory,
@@ -838,6 +840,27 @@ class ReservationUnitCreateAsDraftTestCase(ReservationUnitMutationsTestCaseBase)
         assert_that(res_unit).is_not_none()
         assert_that(res_unit.id).is_equal_to(res_unit_data.get("pk"))
 
+    @mock.patch(
+        "reservation_units.utils.hauki_exporter.ReservationUnitHaukiExporter.send_reservation_unit_to_hauki"
+    )
+    @override_settings(HAUKI_EXPORT_ENABLED=True)
+    def test_send_resource_to_hauki_is_not_called(self, send_resource_mock):
+        data = {
+            "isDraft": True,
+            "nameFi": "Resunit name",
+            "nameEn": "English name",
+            "descriptionFi": "desc",
+            "unitPk": self.unit.pk,
+        }
+
+        response = self.query(self.get_create_query(), input_data=data)
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
+        res_unit_data = content.get("data").get("createReservationUnit")
+        assert_that(content.get("errors")).is_none()
+        assert_that(res_unit_data.get("errors")).is_none()
+        assert_that(send_resource_mock.call_count).is_equal_to(0)
+
     def test_create_errors_without_unit_pk(self):
         data = {"isDraft": True, "nameFi": "Resunit name"}
         response = self.query(self.get_create_query(), input_data=data)
@@ -975,6 +998,59 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         assert_that(res_unit.buffer_time_between_reservations).is_equal_to(
             datetime.timedelta(hours=1)
         )
+
+    @mock.patch(
+        "reservation_units.utils.hauki_exporter.ReservationUnitHaukiExporter.send_reservation_unit_to_hauki"
+    )
+    @override_settings(HAUKI_EXPORTS_ENABLED=True)
+    def test_send_resource_to_hauki_called(self, send_resource_mock):
+        res = HaukiResource(
+            id=1,
+            name="",
+            description="",
+            address=None,
+            origin_data_source_name="Tilavarauspalvelu",
+            origin_data_source_id="tvp",
+            origin_id="",
+            organization="department_id",
+            parents=[],
+            children=[],
+            resource_type="",
+        )
+        send_resource_mock.return_value = res
+
+        data = self.get_valid_data()
+        response = self.query(self.get_create_query(), input_data=data)
+
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
+        res_unit_data = content.get("data").get("createReservationUnit")
+        assert_that(content.get("errors")).is_none()
+        assert_that(res_unit_data.get("errors")).is_none()
+        assert_that(send_resource_mock.call_count).is_equal_to(1)
+
+    @override_settings(HAUKI_EXPORTS_ENABLED=True)
+    @mock.patch(
+        "reservation_units.utils.hauki_exporter.ReservationUnitHaukiExporter.send_reservation_unit_to_hauki"
+    )
+    def test_send_resource_to_hauki_errors_returns_error_message(
+        self, send_resource_mock
+    ):
+        send_resource_mock.side_effect = HaukiAPIError()
+
+        data = self.get_valid_data()
+        response = self.query(self.get_create_query(), input_data=data)
+
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
+        res_unit_data = content.get("data").get("createReservationUnit")
+        assert_that(content.get("errors")).is_none()
+        assert_that(res_unit_data.get("errors")[0].get("messages")[0]).contains(
+            "Sending reservation unit as resource to HAUKI failed."
+        )
+        assert_that(send_resource_mock.call_count).is_equal_to(1)
+        res_unit = ReservationUnit.objects.first()
+        assert_that(res_unit.hauki_resource_id).is_none()
 
     def test_create_errors_on_empty_name_translations(self):
         data = self.get_valid_data()
@@ -1367,6 +1443,43 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
         self.res_unit.refresh_from_db()
         assert_that(self.res_unit.name).is_equal_to("Resunit name")
 
+    @mock.patch(
+        "reservation_units.utils.hauki_exporter.ReservationUnitHaukiExporter.send_reservation_unit_to_hauki"
+    )
+    @override_settings(HAUKI_EXPORTS_ENABLED=True)
+    def test_send_resource_to_hauki_called_when_resource_id_exists(
+        self, send_resource_mock
+    ):
+        self.res_unit.hauki_resource_id = "1"
+        self.res_unit.save()
+
+        data = self.get_valid_update_data()
+        response = self.query(self.get_update_query(), input_data=data)
+
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
+        res_unit_data = content.get("data").get("updateReservationUnit")
+        assert_that(content.get("errors")).is_none()
+        assert_that(res_unit_data.get("errors")).is_none()
+        assert_that(send_resource_mock.call_count).is_equal_to(1)
+
+    @mock.patch(
+        "reservation_units.utils.hauki_exporter.ReservationUnitHaukiExporter.send_reservation_unit_to_hauki"
+    )
+    @override_settings(HAUKI_EXPORTS_ENABLED=False)
+    def test_send_resource_to_hauki_not_called_when_exports_disabled(
+        self, send_resource_mock
+    ):
+        data = self.get_valid_update_data()
+        response = self.query(self.get_update_query(), input_data=data)
+
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
+        res_unit_data = content.get("data").get("updateReservationUnit")
+        assert_that(content.get("errors")).is_none()
+        assert_that(res_unit_data.get("errors")).is_none()
+        assert_that(send_resource_mock.call_count).is_equal_to(0)
+
 
 class ReservationUnitUpdateNotDraftTestCase(ReservationUnitMutationsTestCaseBase):
     """For published resunits"""
@@ -1393,6 +1506,11 @@ class ReservationUnitUpdateNotDraftTestCase(ReservationUnitMutationsTestCaseBase
         )
         cls.res_unit.spaces.add(cls.space)
         cls.res_unit.resources.add(cls.resource)
+
+    def setUp(self):
+        super().setUp()
+        self.res_unit.hauki_resource_id = None
+        self.res_unit.save()
 
     def get_update_query(self):
         return """
@@ -1422,6 +1540,79 @@ class ReservationUnitUpdateNotDraftTestCase(ReservationUnitMutationsTestCaseBase
         assert_that(res_unit_data.get("errors")).is_none()
         self.res_unit.refresh_from_db()
         assert_that(self.res_unit.name_fi).is_equal_to("New name")
+
+    @mock.patch(
+        "reservation_units.utils.hauki_exporter.ReservationUnitHaukiExporter.send_reservation_unit_to_hauki"
+    )
+    @override_settings(HAUKI_EXPORTS_ENABLED=True)
+    def test_send_resource_to_hauki_called_when_no_resource_id(
+        self, send_resource_mock
+    ):
+        res = HaukiResource(
+            id=1,
+            name="",
+            description="",
+            address=None,
+            origin_data_source_name="Tilavarauspalvelu",
+            origin_data_source_id="tvp",
+            origin_id="",
+            organization="department_id",
+            parents=[],
+            children=[],
+            resource_type="",
+        )
+        send_resource_mock.return_value = res
+
+        data = self.get_valid_update_data()
+        response = self.query(self.get_update_query(), input_data=data)
+
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
+        res_unit_data = content.get("data").get("updateReservationUnit")
+        assert_that(content.get("errors")).is_none()
+        assert_that(res_unit_data.get("errors")).is_none()
+        assert_that(send_resource_mock.call_count).is_equal_to(1)
+
+    @mock.patch(
+        "reservation_units.utils.hauki_exporter.ReservationUnitHaukiExporter.send_reservation_unit_to_hauki"
+    )
+    @override_settings(HAUKI_EXPORTS_ENABLED=True)
+    def test_send_resource_to_hauki_called_when_resource_id_exists(
+        self, send_resource_mock
+    ):
+        self.res_unit.hauki_resource_id = "1"
+        self.res_unit.save()
+
+        data = self.get_valid_update_data()
+        response = self.query(self.get_update_query(), input_data=data)
+
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
+        res_unit_data = content.get("data").get("updateReservationUnit")
+        assert_that(content.get("errors")).is_none()
+        assert_that(res_unit_data.get("errors")).is_none()
+        assert_that(send_resource_mock.call_count).is_equal_to(1)
+
+    @override_settings(HAUKI_EXPORTS_ENABLED=True)
+    @mock.patch(
+        "reservation_units.utils.hauki_exporter.ReservationUnitHaukiExporter.send_reservation_unit_to_hauki"
+    )
+    def test_send_resource_to_hauki_errors_returns_error_message(
+        self, send_resource_mock
+    ):
+        send_resource_mock.side_effect = HaukiAPIError()
+
+        data = self.get_valid_update_data()
+        response = self.query(self.get_update_query(), input_data=data)
+
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
+        res_unit_data = content.get("data").get("updateReservationUnit")
+        assert_that(content.get("errors")).is_none()
+        assert_that(res_unit_data.get("errors")[0].get("messages")[0]).contains(
+            "Sending reservation unit as resource to HAUKI failed."
+        )
+        assert_that(send_resource_mock.call_count).is_equal_to(1)
 
     def test_update_surface_area(self):
         expected_surface_area = 150
