@@ -5,7 +5,7 @@ import {
   Select,
   Button,
 } from "hds-react";
-import { get, pick, upperFirst } from "lodash";
+import { get, omitBy, pick, upperFirst } from "lodash";
 import React, { useReducer } from "react";
 import { FetchResult, useMutation, useQuery } from "@apollo/client";
 import { useTranslation } from "react-i18next";
@@ -398,7 +398,7 @@ const SpaceEditor = (): JSX.Element | null => {
 
               <EditorColumns>
                 <NumberInput
-                  defaultValue={state.spaceEdit?.surfaceArea || undefined}
+                  value={state.spaceEdit?.surfaceArea || 0}
                   id="surfaceArea"
                   label={t("SpaceModal.page2.surfaceAreaLabel")}
                   helperText={t("SpaceModal.page2.surfaceAreaHelperText")}
@@ -413,7 +413,7 @@ const SpaceEditor = (): JSX.Element | null => {
                   required
                 />
                 <NumberInput
-                  defaultValue={state.spaceEdit?.maxPersons || undefined}
+                  value={state.spaceEdit?.maxPersons || ""}
                   id="maxPersons"
                   label={t("SpaceModal.page2.maxPersonsLabel")}
                   minusStepButtonAriaLabel={t("common.decreaseByOneAriaLabel")}
@@ -431,7 +431,7 @@ const SpaceEditor = (): JSX.Element | null => {
                   id="code"
                   label={t("SpaceModal.page2.codeLabel")}
                   placeholder={t("SpaceModal.page2.codePlaceholder")}
-                  defaultValue={state.spaceEdit?.code || undefined}
+                  value={state.spaceEdit?.code || ""}
                   onChange={(e) => setValue({ code: e.target.value })}
                 />
               </EditorColumns>
@@ -469,7 +469,10 @@ const SpaceEditor = (): JSX.Element | null => {
                 onClick={async () => {
                   try {
                     const data = await updateSpace(
-                      state.spaceEdit as SpaceUpdateMutationInput
+                      omitBy(
+                        state.spaceEdit,
+                        (v) => v === ""
+                      ) as SpaceUpdateMutationInput
                     );
                     if (data?.data?.updateSpace.errors === null) {
                       onSave();
