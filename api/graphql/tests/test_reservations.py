@@ -444,7 +444,7 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
             reservation_unit=[self.reservation_unit],
             begin=self.reservation_begin,
             end=self.reservation_end,
-            state=STATE_CHOICES.REQUESTED,
+            state=STATE_CHOICES.CREATED,
             user=self.regular_joe,
             priority=100,
         )
@@ -494,7 +494,7 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         reservation = Reservation.objects.get(id=pk)
         assert_that(reservation).is_not_none()
         assert_that(reservation.user).is_equal_to(self.regular_joe)
-        assert_that(reservation.state).is_equal_to(STATE_CHOICES.REQUESTED)
+        assert_that(reservation.state).is_equal_to(STATE_CHOICES.CREATED)
         assert_that(reservation.priority).is_equal_to(
             self.get_valid_update_data()["priority"]
         )
@@ -787,6 +787,38 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         assert_that(content.get("errors")[0].get("message")).is_equal_to(
             "No permission to mutate"
         )
+
+    def test_update_to_cancelled_success(self, mock_periods, mock_opening_hours):
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+
+        input_data = self.get_valid_update_data()
+        input_data["state"] = STATE_CHOICES.CANCELLED
+        self._client.force_login(self.regular_joe)
+        response = self.query(self.get_update_query(), input_data=input_data)
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_none()
+        pk = content.get("data").get("updateReservation").get("reservation").get("pk")
+        reservation = Reservation.objects.get(id=pk)
+        assert_that(reservation).is_not_none()
+        assert_that(reservation.state).is_equal_to(STATE_CHOICES.CANCELLED)
+
+    def test_update_to_confirmed_fails(self, mock_periods, mock_opening_hours):
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+
+        input_data = self.get_valid_update_data()
+        input_data["state"] = STATE_CHOICES.CONFIRMED
+        self._client.force_login(self.regular_joe)
+        response = self.query(self.get_update_query(), input_data=input_data)
+        content = json.loads(response.content)
+        assert_that(
+            content.get("data").get("updateReservation").get("errors")
+        ).is_not_none()
+
+        err_msg = f"Setting the reservation state to {STATE_CHOICES.CONFIRMED} is not allowed."
+        assert_that(
+            content.get("data").get("updateReservation").get("errors")[0]["messages"][0]
+        ).contains(err_msg)
 
 
 @freezegun.freeze_time("2021-10-12T12:00:00Z")
