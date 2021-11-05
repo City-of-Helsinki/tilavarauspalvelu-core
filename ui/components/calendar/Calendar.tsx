@@ -52,6 +52,7 @@ type Props = {
   reservable?: boolean;
   draggable?: boolean;
   resizable?: boolean;
+  overflowBreakpoint?: string;
 };
 
 export const eventStyleGetter = ({
@@ -78,7 +79,7 @@ export const eventStyleGetter = ({
   };
 };
 
-const StyledCalendar = styled(BigCalendar)`
+const StyledCalendar = styled(BigCalendar)<{ overflowBreakpoint: string }>`
   .rbc-timeslot-group {
     border-bottom: 0;
 
@@ -170,6 +171,10 @@ const StyledCalendar = styled(BigCalendar)`
       z-index: 20;
       bottom: 0px;
       left: 0px;
+
+      @media (min-width: ${(props) => props.overflowBreakpoint}) {
+        height: 716px;
+      }
     }
   }
 
@@ -200,6 +205,10 @@ const StyledCalendar = styled(BigCalendar)`
     position: relative;
     overflow-x: scroll;
     width: 100%;
+
+    @media (min-width: ${(props) => props.overflowBreakpoint}) {
+      overflow-x: auto;
+    }
   }
 
   .rbc-month-view {
@@ -270,6 +279,7 @@ const Calendar = ({
   reservable = false,
   draggable = false,
   resizable = false,
+  overflowBreakpoint = "850px",
 }: Props): JSX.Element => {
   const { i18n } = useTranslation();
   const Component = draggable ? StyledCalendarDND : StyledCalendar;
@@ -302,6 +312,7 @@ const Calendar = ({
       resizable={resizable}
       draggableAccessor={draggableAccessor}
       resizableAccessor={resizableAccessor}
+      overflowBreakpoint={overflowBreakpoint}
     />
   );
 };

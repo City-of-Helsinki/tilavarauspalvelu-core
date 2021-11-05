@@ -12,6 +12,7 @@ import {
   Checkbox,
   IconArrowLeft,
   IconCheckCircle,
+  IconTicket,
 } from "hds-react";
 import { useForm } from "react-hook-form";
 import { GetServerSideProps } from "next";
@@ -322,6 +323,9 @@ const ReservationUnitReservation = ({
           <Description>
             <DescriptionItem data-test="reservation__time-range">
               <IconCalendar /> {capitalize(timeString)}
+            </DescriptionItem>
+            <DescriptionItem>
+              <IconTicket /> {t("reservationUnit:priceFree")}
             </DescriptionItem>
           </Description>
         </NarrowCenteredContainer>

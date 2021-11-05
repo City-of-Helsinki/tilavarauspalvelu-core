@@ -149,7 +149,10 @@ const Head = ({
               {getTranslation(reservationUnit.unit, "name")}
             </BuildingName>
             <JustForMobile style={{ marginTop: "var(--spacing-l)" }}>
-              <Images images={reservationUnit.images} />
+              <Images
+                images={reservationUnit.images}
+                contextName={getTranslation(reservationUnit, "name")}
+              />
             </JustForMobile>
             <Props>
               <div>
@@ -260,7 +263,10 @@ const Head = ({
             </ButtonContainer>
           </div>
           <JustForDesktop>
-            <Images images={reservationUnit.images} />
+            <Images
+              images={reservationUnit.images}
+              contextName={getTranslation(reservationUnit, "name")}
+            />
           </JustForDesktop>
         </RightContainer>
       </Container>

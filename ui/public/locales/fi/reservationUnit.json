@@ -19,5 +19,6 @@
   "gotoApplications": "Siirry omiin varauksiin",
   "openingTimes": "Aukioloajat",
   "additionalInfo": "Varauksen lisätiedot",
-  "reservationFailed": "Varauksen luominen epäonnistui"
+  "reservationFailed": "Varauksen luominen epäonnistui",
+  "priceFree": "Maksuton"
 }
