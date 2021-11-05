@@ -96,6 +96,14 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
 
             self.check_buffer_times(data, reservation_unit)
 
+        data["state"] = STATE_CHOICES.CREATED
+
+        user = self.context.get("request").user
+        if settings.TMP_PERMISSIONS_DISABLED and user.is_anonymous:
+            user = None
+
+        data["user"] = user
+
         return data
 
     def check_buffer_times(self, data, reservation_unit):
@@ -149,24 +157,14 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
                 "Reservation unit buffer time between reservations overlaps with current end time."
             )
 
-    @property
-    def validated_data(self):
-        validated_data = super().validated_data
-        validated_data["state"] = STATE_CHOICES.CREATED
-
-        user = self.context.get("request").user
-        if settings.TMP_PERMISSIONS_DISABLED and user.is_anonymous:
-            user = None
-
-        validated_data["user"] = user
-        return validated_data
-
 
 class ReservationUpdateSerializer(
     PrimaryKeyUpdateSerializer, ReservationCreateSerializer
 ):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields["state"].read_only = False
+        self.fields["state"].required = False
         self.fields["reservee_first_name"].required = False
         self.fields["reservee_last_name"].required = False
         self.fields["reservee_phone"].required = False
@@ -183,14 +181,21 @@ class ReservationUpdateSerializer(
         if self.instance.state not in (STATE_CHOICES.CREATED, STATE_CHOICES.REQUESTED):
             raise serializers.ValidationError("Reservation cannot be changed anymore.")
 
+        new_state = data.get("state", self.instance.state)
+        if new_state not in [STATE_CHOICES.CANCELLED, STATE_CHOICES.CREATED]:
+            raise serializers.ValidationError(
+                f"Setting the reservation state to {new_state} is not allowed."
+            )
+
         data = super().validate(data)
+        data["state"] = new_state
+
         return data
 
     @property
     def validated_data(self):
         validated_data = super().validated_data
-        validated_data["state"] = self.instance.state
-        validated_data["user"] = self.instance.user
+        validated_data["user"] = self.instance.user  # Do not change the user.
         return validated_data
 
 
