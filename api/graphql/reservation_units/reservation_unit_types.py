@@ -31,6 +31,7 @@ from permissions.api_permissions.graphene_permissions import (
     ReservationPermission,
     ReservationUnitHaukiUrlPermission,
     ReservationUnitPermission,
+    ReservationUnitPurposePermission,
     ResourcePermission,
     ServicePermission,
     SpacePermission,
@@ -45,6 +46,7 @@ from reservation_units.models import (
     Purpose,
     ReservationUnit,
     ReservationUnitImage,
+    ReservationUnitPurpose,
 )
 from reservation_units.models import ReservationUnitType as ReservationUnitTypeModel
 from reservation_units.utils.reservation_unit_reservation_scheduler import (
@@ -96,6 +98,20 @@ class PurposeType(AuthNode, PrimaryKeyObjectType):
 
     class Meta:
         model = Purpose
+        fields = ["pk"] + get_all_translatable_fields(model)
+        filter_fields = ["name_fi", "name_en", "name_sv"]
+        interfaces = (graphene.relay.Node,)
+
+
+class ReservationUnitPurposeType(AuthNode, PrimaryKeyObjectType):
+    permission_classes = (
+        (ReservationUnitPurposePermission,)
+        if not settings.TMP_PERMISSIONS_DISABLED
+        else (AllowAny,)
+    )
+
+    class Meta:
+        model = ReservationUnitPurpose
         fields = ["pk"] + get_all_translatable_fields(model)
         filter_fields = ["name_fi", "name_en", "name_sv"]
         interfaces = (graphene.relay.Node,)
@@ -238,7 +254,7 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
     spaces = graphene.List(SpaceType)
     resources = graphene.List(ResourceType)
     services = graphene.List(ServiceType)
-    purposes = graphene.List(PurposeType)
+    purposes = graphene.List(ReservationUnitPurposeType)
     images = graphene.List(ReservationUnitImageType)
     location = graphene.Field(LocationType)
     reservation_unit_type = graphene.Field(ReservationUnitTypeType)
@@ -312,9 +328,9 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
     def resolve_services(self, info):
         return self.services.all()
 
-    @check_resolver_permission(PurposePermission)
+    @check_resolver_permission(ReservationUnitPurposePermission)
     def resolve_purposes(self, info):
-        return Purpose.objects.filter(reservation_units=self.id)
+        return ReservationUnitPurpose.objects.filter(reservation_units=self.id)
 
     def resolve_images(self, info):
         return ReservationUnitImage.objects.filter(reservation_unit_id=self.id)
