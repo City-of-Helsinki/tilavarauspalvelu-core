@@ -185,7 +185,7 @@ class OpeningHoursClientTestCase(TestCase):
             DATES[0],
             DATES[0],
             single=True,
-            hauki_origin_id=self.unit.hauki_resource_origin_id,
+            hauki_origin_id=self.unit.hauki_resource_data_source_id,
         )
         origin_id = mock.call_args.args[3]
-        assert_that(origin_id).is_same_as(self.unit.hauki_resource_origin_id)
+        assert_that(origin_id).is_same_as(self.unit.hauki_resource_data_source_id)

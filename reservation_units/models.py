@@ -180,6 +180,10 @@ class ReservationUnit(models.Model):
         verbose_name=_("Buffer time between reservations"), blank=True, null=True
     )
 
+    hauki_resource_id = models.CharField(
+        verbose_name=_("Hauki resource id"), max_length=255, blank=True, null=True
+    )
+
     def __str__(self):
         return "{}".format(self.name)
 
@@ -257,11 +261,11 @@ class ReservationUnit(models.Model):
         ).distinct()
 
     @property
-    def hauki_resource_id(self):
+    def hauki_resource_origin_id(self):
         return str(self.uuid)
 
     @property
-    def hauki_resource_origin_id(self):
+    def hauki_resource_data_source_id(self):
         return settings.HAUKI_ORIGIN_ID
 
 

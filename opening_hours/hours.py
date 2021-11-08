@@ -3,30 +3,13 @@ import logging
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Union
 
-import requests
 from django.conf import settings
 
 from opening_hours.enums import State
-
-REQUESTS_TIMEOUT = 15
+from opening_hours.errors import HaukiConfigurationError
+from opening_hours.hauki_request import make_hauki_get_request
 
 logger = logging.getLogger(__name__)
-
-
-class HaukiError(Exception):
-    """Base class for all Hauki client errors"""
-
-
-class HaukiRequestError(HaukiError):
-    """Request to the Hauki API failed"""
-
-
-class HaukiAPIError(HaukiError):
-    """Request succeeded but Hauki API returned an error"""
-
-
-class HaukiConfigurationError(HaukiError):
-    """Request to the Hauki API failed"""
 
 
 @dataclass(order=True, frozen=True)
@@ -101,26 +84,6 @@ class Period:
     resource_state: State = State.UNDEFINED
 
 
-def make_hauki_request(url, params):
-    try:
-        response = requests.get(url, params=params, timeout=REQUESTS_TIMEOUT)
-    except Exception as e:
-        logger.error(f"Request to Hauki API failed: {e}")
-        raise HaukiRequestError("Resource opening hours request failed")
-    try:
-        days_data_in = response.json()
-    except ValueError as e:
-        logger.error(f"Could not read Hauki response as json: {e}")
-        raise HaukiRequestError("Resource opening hours response parsing failed")
-    if not response.ok:
-        if "detail" in days_data_in:
-            logger.error(f"Hauki API returned an error: {days_data_in['detail']}")
-        else:
-            logger.error("Hauki API returned an error")
-        raise HaukiAPIError("Hauki API returned an error")
-    return days_data_in
-
-
 def get_opening_hours(
     resource_id: Union[str, int, list],
     start_date: Union[str, datetime.date],
@@ -158,7 +121,7 @@ def get_opening_hours(
         "start_date": start_date,
         "end_date": end_date,
     }
-    days_data_in = make_hauki_request(resource_opening_hours_url, query_params)
+    days_data_in = make_hauki_get_request(resource_opening_hours_url, query_params)
 
     days_data_out = []
     for day_data_in in days_data_in["results"]:
@@ -214,7 +177,7 @@ def get_periods_for_resource(
         f"{settings.HAUKI_API_URL}/v1/date_period/?resource={resource_id}"
     )
 
-    periods_data_in = make_hauki_request(resource_periods_url, None)
+    periods_data_in = make_hauki_get_request(resource_periods_url, None)
 
     periods_data_out = []
     for period in periods_data_in:

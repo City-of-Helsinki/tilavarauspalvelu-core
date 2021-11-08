@@ -36,11 +36,17 @@ class Command(BaseCommand):
             "requests using the root url. Example: if given url is 'https://url.com and ids "
             "of 1,2,3,4 the requests would be https:/url.com/1, https://url.com/2 etc.",
         )
+        parser.add_argument(
+            "--import_hauki_resource_ids",
+            type=bool,
+            help="Should hauki resource ids for units be imported from hauki within the import.",
+        )
 
     def handle(self, url, *args, **options):
         field_map = options.get("field_map", None)
         ids = options.get("ids")
         use_field_map = field_map and isinstance(field_map, dict)
+        import_hauki_resource_ids = options.get("import_hauki_resource_ids", False)
 
         if use_field_map:
             importer = UnitImporter(
@@ -50,7 +56,7 @@ class Command(BaseCommand):
             importer = UnitImporter(url, single=options.get("single"))
 
         if not ids:
-            importer.import_units()
+            importer.import_units(import_hauki_resource_id=import_hauki_resource_ids)
             return
 
         if url[len(url) - 1] != "/":
@@ -59,7 +65,7 @@ class Command(BaseCommand):
 
         for id in ids:
             importer.url = "{}{}".format(url, id)
-            importer.import_units()
+            importer.import_units(import_hauki_resource_id=import_hauki_resource_ids)
 
     def get_version(self):
         """

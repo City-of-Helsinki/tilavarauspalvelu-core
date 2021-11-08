@@ -154,3 +154,18 @@ class FrequencyModifier(Enum):
     class Labels:
         EVEN = pgettext_lazy("FrequencyModifier", "Even")
         ODD = pgettext_lazy("FrequencyModifier", "Odd")
+
+
+class ResourceType(Enum):
+    UNIT = "unit"
+    SUBSECTION = "section"
+    SPECIAL_GROUP = "special_group"
+    CONTACT = "contact"
+    ONLINE_SERVICE = "online_service"
+    SERVICE = "service"
+    SERVICE_CHANNEL = "service_channel"
+    SERVICE_AT_UNIT = "service_at_unit"
+    RESERVABLE = "reservable"
+    BUILDING = "building"
+    AREA = "area"
+    ENTRANCE = "entrance_or_exit"

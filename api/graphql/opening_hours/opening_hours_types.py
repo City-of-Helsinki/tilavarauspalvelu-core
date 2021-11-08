@@ -77,19 +77,19 @@ class OpeningHoursMixin:
             init_times = False
 
         opening_hours_client = OpeningHoursClient(
-            self.hauki_resource_id,
+            self.hauki_resource_origin_id,
             start,
             end,
             single=True,
             init_periods=init_periods,
             init_opening_hours=init_times,
-            hauki_origin_id=self.hauki_resource_origin_id,
+            hauki_origin_id=self.hauki_resource_data_source_id,
         )
         return_object = OpeningHoursType()
 
         if init_times:
             hours = opening_hours_client.get_opening_hours_for_date_range(
-                str(self.hauki_resource_id), start, end
+                str(self.hauki_resource_origin_id), start, end
             )
             opening_hours = []
             for date, times in hours.items():
@@ -107,7 +107,7 @@ class OpeningHoursMixin:
         if init_periods:
             periods = []
             for period in opening_hours_client.get_resource_periods(
-                str(self.hauki_resource_id)
+                str(self.hauki_resource_origin_id)
             ):
                 time_spans = []
                 for time_span in period.time_spans:
