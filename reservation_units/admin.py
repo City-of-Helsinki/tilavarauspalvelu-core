@@ -13,6 +13,7 @@ from .models import (
     Period,
     Purpose,
     ReservationUnit,
+    ReservationUnitCancellationRule,
     ReservationUnitImage,
     ReservationUnitType,
 )
@@ -47,6 +48,11 @@ class ReservationUnitImageAdmin(admin.ModelAdmin):
 @admin.register(ReservationUnitType)
 class ReservationUnitTypeAdmin(admin.ModelAdmin):
     model = ReservationUnitType
+
+
+@admin.register(ReservationUnitCancellationRule)
+class ReservationUnitCancellationRuleAdmin(admin.ModelAdmin):
+    model = ReservationUnitCancellationRule
 
 
 @admin.register(Period)

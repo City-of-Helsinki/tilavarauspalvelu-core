@@ -9,6 +9,7 @@ from .models import (
     Period,
     Purpose,
     ReservationUnit,
+    ReservationUnitCancellationRule,
     ReservationUnitType,
 )
 
@@ -49,6 +50,10 @@ class EquipmentCategoryTranslationOptions(TranslationOptions):
     fields = ["name"]
 
 
+class ReservationUnitCancellationRuleTranslationOptions(TranslationOptions):
+    fields = ["name"]
+
+
 translator.register(ReservationUnit, ReservationUnitTranslationOptions)
 translator.register(ReservationUnitType, ReservationUnitTypeTranslationOptions)
 translator.register(KeywordCategory, KeywordCategoryTranslationOptions)
@@ -58,3 +63,6 @@ translator.register(Purpose, PurposeTranslationOptions)
 translator.register(Period, PeriodTranslationOptions)
 translator.register(Equipment, EquipmentTranslationOptions)
 translator.register(EquipmentCategory, EquipmentCategoryTranslationOptions)
+translator.register(
+    ReservationUnitCancellationRule, ReservationUnitCancellationRuleTranslationOptions
+)
