@@ -2,6 +2,7 @@ import pytest
 from django.urls import reverse
 
 from reservation_units.models import Equipment, EquipmentCategory, ReservationUnit
+from reservation_units.tests.factories import ReservationUnitPurposeFactory
 
 
 @pytest.mark.django_db
@@ -15,8 +16,10 @@ def test_reservation_unit_exists(user_api_client, reservation_unit):
 
 @pytest.mark.django_db
 def test_reservation_unit_purpose_filter(
-    user_api_client, reservation_unit, reservation_unit2, purpose, purpose2
+    user_api_client, reservation_unit, reservation_unit2
 ):
+    purpose = ReservationUnitPurposeFactory()
+    purpose2 = ReservationUnitPurposeFactory()
     reservation_unit.purposes.set([purpose])
     reservation_unit2.purposes.set([purpose2])
     response = user_api_client.get(reverse("reservationunit-list"))

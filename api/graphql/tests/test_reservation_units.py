@@ -20,8 +20,8 @@ from reservation_units.tests.factories import (
     EquipmentFactory,
     KeywordCategoryFactory,
     KeywordGroupFactory,
-    PurposeFactory,
     ReservationUnitFactory,
+    ReservationUnitPurposeFactory,
     ReservationUnitTypeFactory,
 )
 from reservations.models import STATE_CHOICES
@@ -231,7 +231,7 @@ class ReservationUnitTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_purpose(self):
-        purpose = PurposeFactory(name="Test purpose")
+        purpose = ReservationUnitPurposeFactory(name="Test purpose")
         self.reservation_unit.purposes.set([purpose])
         response = self.query(
             f"""
@@ -798,7 +798,7 @@ class ReservationUnitMutationsTestCaseBase(GrapheneTestCaseBase):
     def setUpTestData(cls):
         super().setUpTestData()
         cls.unit = UnitFactory()
-        cls.purpose = PurposeFactory()
+        cls.purpose = ReservationUnitPurposeFactory()
         cls.space = SpaceFactory(unit=cls.unit)
         cls.resource = ResourceFactory()
         cls.reservation_unit_type = ReservationUnitTypeFactory()
@@ -1257,7 +1257,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         )
 
     def test_create_with_multiple_purposes(self):
-        purposes = PurposeFactory.create_batch(5)
+        purposes = ReservationUnitPurposeFactory.create_batch(5)
         data = self.get_valid_data()
         data["purposePks"] = [purpose.id for purpose in purposes]
 

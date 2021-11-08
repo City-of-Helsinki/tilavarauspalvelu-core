@@ -8,8 +8,8 @@ from django_filters import CharFilter
 from api.common_filters import ModelInFilter
 from reservation_units.models import (
     KeywordGroup,
-    Purpose,
     ReservationUnit,
+    ReservationUnitPurpose,
     ReservationUnitType,
 )
 from spaces.models import Unit
@@ -33,7 +33,9 @@ class ReservationUnitsFilterSet(django_filters.FilterSet):
         field_name="keyword_groups", queryset=KeywordGroup.objects.all()
     )
 
-    purposes = ModelInFilter(field_name="purposes", queryset=Purpose.objects.all())
+    purposes = ModelInFilter(
+        field_name="purposes", queryset=ReservationUnitPurpose.objects.all()
+    )
 
     order_by = django_filters.OrderingFilter(
         fields={
