@@ -10,6 +10,7 @@ from applications.models import (
     ApplicationRound,
 )
 from reservation_units.models import ReservationUnit
+from tilavarauspalvelu.utils.auditlog_util import AuditLogger
 
 Q = models.Q
 User = get_user_model()
@@ -283,3 +284,6 @@ class ReservationPurpose(models.Model):
 
     def __str__(self) -> str:
         return self.name
+
+
+AuditLogger.register(Reservation)
