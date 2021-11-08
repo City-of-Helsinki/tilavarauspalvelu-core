@@ -418,3 +418,23 @@ export const formatDurationMinutes = (
 
   return p.join(" ");
 };
+
+interface HMS {
+  h?: number;
+  m?: number;
+  s?: number;
+}
+
+export const secondsToHms = (duration?: number | null): HMS => {
+  if (!duration || duration < 0) return {};
+  const h = Math.floor(duration / 3600);
+  const m = Math.floor((duration % 3600) / 60);
+  const s = Math.floor((duration % 3600) % 60);
+
+  return { h, m, s };
+};
+
+export const convertHMSToSeconds = (input: string): number | null => {
+  const result = Number(new Date(`1970-01-01T${input}Z`).getTime() / 1000);
+  return Number.isNaN(result) ? null : result;
+};

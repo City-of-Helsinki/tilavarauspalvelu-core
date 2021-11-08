@@ -10,6 +10,7 @@ import { ReservationUnitImageType } from "../../modules/gql-types";
 const Modal = dynamic(() => import("../common/Modal"));
 type Props = {
   images: ReservationUnitImageType[];
+  contextName?: string;
 };
 
 const StyledCarousel = styled(Carousel)`
@@ -79,7 +80,7 @@ const LargeImage = styled.img`
   max-height: calc(100vh - 16em);
 `;
 
-const Images = ({ images }: Props): JSX.Element => {
+const Images = ({ images, contextName }: Props): JSX.Element => {
   const { t } = useTranslation();
   const [showModal, setShowModal] = useState(false);
   const [currentImage, setCurrentImage] = useState<ReservationUnitImageType>();
@@ -91,15 +92,20 @@ const Images = ({ images }: Props): JSX.Element => {
   return (
     <>
       <StyledCarousel>
-        {images?.map((image) => (
+        {images?.map((image, index) => (
           <CarouselImage
             key={image.smallUrl}
-            alt={t("common:imgAltForSpace")}
+            alt={`${t("common:imgAltForSpace", { name: contextName })} #${
+              index + 1
+            }`}
             src={image.mediumUrl || pixel}
             onClick={() => {
               setCurrentImage(image);
               setShowModal(true);
             }}
+            aria-label={`${t("common:imgAltForSpace", {
+              name: contextName,
+            })} #${index + 1}`}
           />
         ))}
       </StyledCarousel>

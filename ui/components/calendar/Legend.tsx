@@ -14,10 +14,13 @@ type LegendItem = {
 
 const Wrapper = styled.div`
   display: flex;
+  align-items: flex-start;
   margin-bottom: var(--spacing-l);
   gap: var(--spacing-3-xl);
+  flex-wrap: wrap;
 
   @media (min-width: ${breakpoint.l}) {
+    margin-top: var(--spacing-m);
     justify-content: space-between;
   }
 `;

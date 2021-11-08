@@ -35,3 +35,29 @@ export function reservationTitle(): Cypress.Chainable<JQuery<HTMLElement>> {
 export function calendarUrlLink(): Cypress.Chainable<JQuery<HTMLElement>> {
   return cy.get('[data-test="reservation__confirmation--calendar-url"]');
 }
+
+export function dateSelector(): Cypress.Chainable<JQuery<HTMLElement>> {
+  return cy.get("#reservation__input--date");
+}
+
+export function hourSelectorToggle(): Cypress.Chainable<JQuery<HTMLElement>> {
+  return cy.get("#reservation__input--hours-toggle-button");
+}
+
+export function minuteSelectorToggle(): Cypress.Chainable<JQuery<HTMLElement>> {
+  return cy.get("#reservation__input--minutes-toggle-button");
+}
+
+export function durationSelectorToggle(): Cypress.Chainable<
+  JQuery<HTMLElement>
+> {
+  return cy.get("#reservation__input--duration-toggle-button");
+}
+
+export function reservationInfoPrice(): Cypress.Chainable<JQuery<HTMLElement>> {
+  return cy.get("[data-testid='reservation__price--value']");
+}
+
+export function reservationEvent(): Cypress.Chainable<JQuery<HTMLElement>> {
+  return cy.get(".rbc-event.rbc-event-movable");
+}

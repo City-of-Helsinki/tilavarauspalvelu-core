@@ -10,6 +10,8 @@
   "day": "Päivä",
   "week": "Viikko",
   "month": "Kuukausi",
+  "hours": "Tunnit",
+  "minutes": "Minuutit",
   "weekDayLong.0": "Sunnuntai",
   "weekDayLong.1": "Maanantai",
   "weekDayLong.2": "Tiistai",
