@@ -11,6 +11,11 @@ export const SubHeading = styled.div`
   }
 `;
 
+export const Strongish = styled.span`
+  font-family: var(--font-medium);
+  font-size: 500;
+`;
+
 export const Strong = styled.span`
   font-family: var(--font-bold);
   font-size: 700;
