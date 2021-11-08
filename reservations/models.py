@@ -39,6 +39,15 @@ class AbilityGroup(models.Model):
         return self.name
 
 
+class ReservationCancelReason(models.Model):
+    reason = models.CharField(
+        max_length=255,
+        null=False,
+        blank=False,
+        verbose_name=_("Reason for cancellation"),
+    )
+
+
 class RecurringReservation(models.Model):
     user = models.ForeignKey(
         User,
@@ -201,6 +210,19 @@ class Reservation(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
+    )
+
+    cancel_reason = models.ForeignKey(
+        ReservationCancelReason,
+        verbose_name=_("Reason for cancellation"),
+        related_name="reservations",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+    )
+
+    cancel_details = models.TextField(
+        verbose_name=_("Details for this reservation's cancellation"), blank=True
     )
 
     def get_location_string(self):
