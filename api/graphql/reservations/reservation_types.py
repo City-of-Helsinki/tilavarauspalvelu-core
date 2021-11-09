@@ -1,7 +1,7 @@
 import graphene
 from django.conf import settings
 from graphene_permissions.mixins import AuthNode
-from graphene_permissions.permissions import AllowAny
+from graphene_permissions.permissions import AllowAny, AllowAuthenticated
 from graphql.execution.base import ResolveInfo
 from rest_framework.reverse import reverse
 
@@ -26,6 +26,7 @@ from reservations.models import (
     AgeGroup,
     RecurringReservation,
     Reservation,
+    ReservationCancelReason,
     ReservationPurpose,
 )
 
@@ -182,3 +183,15 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
     @check_resolver_permission(ReservationUnitPermission)
     def resolve_reservation_units(self, info: ResolveInfo):
         return self.reservation_unit.all()
+
+
+class ReservationCancelReasonType(AuthNode, PrimaryKeyObjectType):
+    permission_classes = (
+        (AllowAuthenticated,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
+    )
+
+    class Meta:
+        model = ReservationCancelReason
+        fields = ["pk", "reason", "reason_fi", "reason_en", "reason_sv"]
+        filter_fields = ["reason"]
+        interfaces = (graphene.relay.Node,)
