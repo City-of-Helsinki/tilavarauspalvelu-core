@@ -48,6 +48,7 @@ import {
   triggerAllocation,
 } from "../../common/api";
 import SelectionActionBar from "../SelectionActionBar";
+import RecommendationDataTableGroup from "./RecommendationDataTableGroup";
 
 interface IProps {
   applicationRound: ApplicationRoundType;
@@ -301,6 +302,46 @@ const getCellConfig = (
   };
 };
 
+const renderGroup = (
+  group: any,
+  hasGrouping: boolean,
+  cellConfig: CellConfig,
+  groupIndex: number,
+  groupVisibility: boolean[],
+  setGroupVisibility: React.Dispatch<React.SetStateAction<boolean[]>>,
+  isSelectionActive: boolean,
+  groupRows: number[],
+  selectedRows: number[],
+  updateSelection: (
+    selection: number[],
+    method?: "add" | "remove" | undefined
+  ) => void,
+  children: any
+): JSX.Element => (
+  <RecommendationDataTableGroup
+    group={group}
+    hasGrouping={hasGrouping}
+    key={group.id || "group"}
+    cols={cellConfig.cols.length}
+    index={groupIndex}
+    isVisible={groupVisibility[groupIndex]}
+    toggleGroupVisibility={(): void => {
+      const tempGroupVisibility = [...groupVisibility];
+      tempGroupVisibility[groupIndex] = !tempGroupVisibility[groupIndex];
+      setGroupVisibility(tempGroupVisibility);
+    }}
+    isSelectionActive={isSelectionActive}
+    isSelected={
+      groupRows.length > 0 && groupRows.every((id) => selectedRows.includes(id))
+    }
+    toggleSelection={updateSelection}
+    groupRows={groupRows}
+    groupLink={cellConfig.groupLink}
+  >
+    {children}
+  </RecommendationDataTableGroup>
+);
+
 function Handling({
   applicationRound,
   setApplicationRound,
@@ -506,6 +547,7 @@ function Handling({
             <DataTable
               groups={prepareAllocationResults(recommendations)}
               setSelections={setSelections}
+              renderGroup={renderGroup}
               hasGrouping
               config={{
                 filtering: true,
