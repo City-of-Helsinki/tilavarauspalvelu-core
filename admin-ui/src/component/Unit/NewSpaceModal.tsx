@@ -12,21 +12,25 @@ import {
   Tag,
   TextInput,
 } from "hds-react";
+import i18next from "i18next";
 import styled from "styled-components";
-import { FetchResult, useMutation } from "@apollo/client";
+import { FetchResult, useMutation, useQuery } from "@apollo/client";
 import { useTranslation, TFunction } from "react-i18next";
 import { omit, set, startCase } from "lodash";
 import { parseAddress } from "../../common/util";
-import { CREATE_SPACE } from "../../common/queries";
+import { CREATE_SPACE, SPACE_HIERARCHY_QUERY } from "../../common/queries";
 import { CustomDialogHeader } from "./CustomDialogHeader";
 import { languages } from "../../common/const";
 import {
   Maybe,
+  Query,
   SpaceCreateMutationInput,
   SpaceCreateMutationPayload,
   SpaceType,
   UnitByPkType,
 } from "../../common/gql-types";
+
+type ParentType = { label: string; value: SpaceType | null };
 
 const defaultParentSpacePk = 1;
 interface IProps {
@@ -45,6 +49,8 @@ type State = {
   spaces: SpaceMutationInputWithKey<SpaceCreateMutationInput>[];
   page: number;
   unitPk: number;
+  unitSpaces?: SpaceType[];
+  parentOptions: ParentType[];
 };
 
 type Action =
@@ -58,7 +64,45 @@ type Action =
   | { type: "nextPage" }
   | { type: "prevPage" }
   | { type: "addRow" }
-  | { type: "delete"; index: number };
+  | { type: "delete"; index: number }
+  | { type: "hierarchyLoaded"; spaces: SpaceType[] };
+
+const recurse = (
+  parent: SpaceType,
+  spaces: SpaceType[],
+  depth: number,
+  paddingChar: string
+): SpaceType[] => {
+  const newParent = {
+    ...parent,
+    nameFi: "".padStart(depth, paddingChar) + parent.nameFi,
+  } as SpaceType;
+
+  const children = spaces.filter((e) => e.parent?.pk === parent.pk);
+
+  if (children.length === 0) {
+    return [newParent];
+  }
+  const c = children.flatMap((space) =>
+    recurse(space, spaces, depth + 1, paddingChar)
+  );
+  return [newParent, ...c];
+};
+
+const spacesAsHierarchy = (
+  spaces: SpaceType[],
+  paddingChar: string
+): SpaceType[] => {
+  const roots = spaces.filter((e) => e.parent === null);
+  return roots.flatMap((rootSpace) =>
+    recurse(rootSpace, spaces, 0, paddingChar)
+  );
+};
+
+const independentSpaceOption = {
+  label: i18next.t("SpaceEditor.noParent"),
+  value: null,
+};
 
 const initialState = {
   numSpaces: 0,
@@ -66,6 +110,8 @@ const initialState = {
   spaces: [],
   page: 0,
   unitPk: 0,
+  unitSpaces: [],
+  parentOptions: [independentSpaceOption],
 } as State;
 
 let id = -1;
@@ -86,7 +132,7 @@ const initialSpace = (
     surfaceArea: 0,
     maxPersons: 0,
     locationType: "fixed",
-    parentIPk: parentSpacePk,
+    parentPk: parentSpacePk,
   } as SpaceMutationInputWithKey<SpaceCreateMutationInput>);
 
 const reducer = (state: State, action: Action): State => {
@@ -158,6 +204,26 @@ const reducer = (state: State, action: Action): State => {
     }
     case "prevPage": {
       return set({ ...state }, "page", 0);
+    }
+
+    case "hierarchyLoaded": {
+      const unitSpaces = spacesAsHierarchy(
+        action.spaces.filter((space) => {
+          return space.unit?.pk === state.unitPk;
+        }),
+        "\u2007"
+      );
+
+      const additionalOptions = unitSpaces.map((space) => ({
+        label: space.nameFi as string,
+        value: space,
+      }));
+
+      return {
+        ...state,
+        unitSpaces,
+        parentOptions: [independentSpaceOption, ...additionalOptions],
+      };
     }
 
     default:
@@ -243,15 +309,6 @@ const IconDelete = styled(IconTrash)`
   padding-top: 2em;
 `;
 
-type ParentType = { label: string; value: SpaceType | null };
-
-const parentOptions = [
-  {
-    label: "Itsenäinen tila",
-    value: null,
-  },
-] as ParentType[];
-
 function FirstPage({
   editorState,
   unit,
@@ -327,7 +384,7 @@ function FirstPage({
               placeholder={t("SpaceModal.page1.parentPlaceholder")}
               required
               helper={t("SpaceModal.page1.parentHelperText")}
-              options={parentOptions}
+              options={editorState.parentOptions}
               onChange={(selected: ParentType) =>
                 dispatch({
                   type: "setParentSpace",
@@ -607,6 +664,21 @@ const NewSpaceModal = ({
       dispatch({ type: "setUnit", unit });
     }
   }, [unit]);
+
+  useQuery<Query>(SPACE_HIERARCHY_QUERY, {
+    onCompleted: ({ spaces }) => {
+      const result = spaces?.edges.map((s) => s?.node as SpaceType);
+      if (result) {
+        dispatch({
+          type: "hierarchyLoaded",
+          spaces: result,
+        });
+      }
+    },
+    onError: (e) => {
+      onDataError(t("errors.errorFetchingData", { error: e }));
+    },
+  });
 
   const createSpaceMutation = useMutation<
     { createSpace: SpaceCreateMutationPayload },
