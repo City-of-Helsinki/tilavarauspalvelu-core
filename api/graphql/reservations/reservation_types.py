@@ -6,6 +6,7 @@ from graphql.execution.base import ResolveInfo
 from rest_framework.reverse import reverse
 
 from api.graphql.base_type import PrimaryKeyObjectType
+from api.graphql.translate_fields import get_all_translatable_fields
 from api.ical_api import hmac_signature
 from permissions.api_permissions.graphene_field_decorators import (
     check_resolver_permission,
@@ -17,6 +18,7 @@ from permissions.api_permissions.graphene_permissions import (
     AgeGroupPermission,
     RecurringReservationPermission,
     ReservationPermission,
+    ReservationPurposePermission,
     ReservationUnitPermission,
 )
 from reservations.models import (
@@ -24,6 +26,7 @@ from reservations.models import (
     AgeGroup,
     RecurringReservation,
     Reservation,
+    ReservationPurpose,
 )
 
 
@@ -93,6 +96,20 @@ class RecurringReservationType(AuthNode, PrimaryKeyObjectType):
         return self.application_event_pk
 
 
+class ReservationPurposeType(AuthNode, PrimaryKeyObjectType):
+    permission_classes = (
+        (ReservationPurposePermission,)
+        if not settings.TMP_PERMISSIONS_DISABLED
+        else (AllowAny,)
+    )
+
+    class Meta:
+        model = ReservationPurpose
+        fields = ["pk"] + get_all_translatable_fields(model)
+        filter_fields = ["name_fi", "name_en", "name_sv"]
+        interfaces = (graphene.relay.Node,)
+
+
 class ReservationType(AuthNode, PrimaryKeyObjectType):
     permission_classes = (
         (ReservationPermission,)
@@ -130,6 +147,8 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
             "reservee_phone",
             "name",
             "description",
+            "purpose",
+            "purpose_pk",
         ]
         filter_fields = {
             "state": ["exact"],

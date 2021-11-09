@@ -27,6 +27,10 @@ GENERAL_PERMISSIONS = (
         _("Can create, edit and delete purposes in the whole system"),
     ),
     (
+        "can_manage_reservation_purposes",
+        _("Can create, edit and delete reservation purposes in the whole system"),
+    ),
+    (
         "can_manage_age_groups",
         _("Can create, edit and delete age groups in the whole system"),
     ),
