@@ -36,7 +36,7 @@ from reservation_units.models import (
     Purpose,
     ReservationUnit,
 )
-from reservations.models import AbilityGroup, AgeGroup, Reservation, ReservationPurpose
+from reservations.models import AbilityGroup, AgeGroup, Reservation
 from resources.models import Resource
 from spaces.models import District, Location, ServiceSector, Space, Unit, UnitGroup
 
@@ -403,11 +403,6 @@ def purpose() -> Purpose:
 @pytest.fixture
 def purpose2() -> Purpose:
     return Purpose.objects.create(name="Playing sports")
-
-
-@pytest.fixture
-def reservation_purpose(purpose, reservation) -> ReservationPurpose:
-    return ReservationPurpose.objects.create(purpose=purpose, reservation=reservation)
 
 
 @pytest.fixture

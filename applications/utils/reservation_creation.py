@@ -9,12 +9,7 @@ from applications.utils.aggregate_data import (
     ApplicationRoundAggregateDataCreator,
 )
 from opening_hours.hours import get_opening_hours
-from reservations.models import (
-    STATE_CHOICES,
-    RecurringReservation,
-    Reservation,
-    ReservationPurpose,
-)
+from reservations.models import STATE_CHOICES, RecurringReservation, Reservation
 from tilavarauspalvelu.utils.date_util import next_or_current_matching_weekday
 
 logger = logging.getLogger(__name__)
@@ -85,12 +80,9 @@ def create_reservation_from_schedule_result(result, application_event):
                 end=end if not is_unit_closed else res_end,
                 recurring_reservation=recurring_reservation,
                 num_persons=application_event.num_persons,
-            )
-            reservation.reservation_unit.add(result.allocated_reservation_unit)
-            ReservationPurpose.objects.create(
-                reservation=reservation,
                 purpose=application_event.purpose,
             )
+            reservation.reservation_unit.add(result.allocated_reservation_unit)
         except Error:
             logger.exception("Error while creating reservation")
         reservation_date = reservation_date + datetime.timedelta(days=interval)
