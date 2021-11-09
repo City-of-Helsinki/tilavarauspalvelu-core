@@ -112,7 +112,7 @@ class ReservationUnit(models.Model):
         blank=True,
     )
     purposes = models.ManyToManyField(
-        "ReservationUnitPurpose",
+        "Purpose",
         verbose_name=_("Purposes"),
         related_name="reservation_units",
         blank=True,
@@ -298,20 +298,9 @@ class ReservationUnitImage(models.Model):
 
 
 class Purpose(models.Model):
-    """Purpose for a particular reservation/events, e.g. "birthday party"."""
-
     name = models.CharField(max_length=200)
 
     def __str__(self):
-        return self.name
-
-
-class ReservationUnitPurpose(models.Model):
-    """Purpose a reservation unit can be used for, e.g. "sing, play or record"."""
-
-    name = models.CharField(max_length=200)
-
-    def __str__(self) -> str:
         return self.name
 
 

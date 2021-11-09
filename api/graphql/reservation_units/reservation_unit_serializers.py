@@ -16,7 +16,6 @@ from reservation_units.models import (
     EquipmentCategory,
     Purpose,
     ReservationUnit,
-    ReservationUnitPurpose,
     ReservationUnitType,
 )
 from resources.models import Resource
@@ -103,7 +102,7 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
         required=False,
     )
     purpose_pks = serializers.ListField(
-        child=IntegerPrimaryKeyField(queryset=ReservationUnitPurpose.objects.all()),
+        child=IntegerPrimaryKeyField(queryset=Purpose.objects.all()),
         source="purposes",
         required=False,
     )
