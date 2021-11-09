@@ -1,0 +1,124 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders correctly 1`] = `
+<DocumentFragment>
+  <div
+    class="Ticket__Wrapper-sc-16qon89-1 fgNrdJ"
+  >
+    <div
+      class="Ticket__PunchHole-sc-16qon89-0 fTTSRo"
+    />
+    <div
+      class="Ticket__Content-sc-16qon89-2"
+    >
+      <h1
+        class="typography__H1-sc-yczr8v-4 Ticket__Title-sc-16qon89-3 exespM cWvaak"
+      >
+        Ticket title
+      </h1>
+      <div
+        class="Ticket__Price-sc-16qon89-6 fmmCUq"
+      />
+    </div>
+    <div
+      class="Ticket__PunchHole-sc-16qon89-0 fTTSRo"
+    />
+  </div>
+</DocumentFragment>
+`;
+
+exports[`renders correctly 2`] = `
+<DocumentFragment>
+  <div
+    class="Ticket__Wrapper-sc-16qon89-1 fgNrdJ"
+  >
+    <div
+      class="Ticket__PunchHole-sc-16qon89-0 fTTSRo"
+    />
+    <div
+      class="Ticket__Content-sc-16qon89-2"
+    >
+      <h1
+        class="typography__H1-sc-yczr8v-4 Ticket__Title-sc-16qon89-3 exespM cWvaak"
+      >
+        Ticket title
+      </h1>
+      <div
+        class="Ticket__Price-sc-16qon89-6 ktLsEj"
+      >
+        <span
+          class="typography__Strongish-sc-yczr8v-1 pEndj"
+        >
+          reservationUnit:priceFree
+        </span>
+      </div>
+    </div>
+    <div
+      class="Ticket__PunchHole-sc-16qon89-0 fTTSRo"
+    />
+  </div>
+</DocumentFragment>
+`;
+
+exports[`renders correctly 3`] = `
+<DocumentFragment>
+  <div
+    class="Ticket__Wrapper-sc-16qon89-1 bFdlkI"
+  >
+    <div
+      class="Ticket__PunchHole-sc-16qon89-0 fmclZd"
+    />
+    <div
+      class="Ticket__Content-sc-16qon89-2"
+    >
+      <h1
+        class="typography__H1-sc-yczr8v-4 Ticket__Title-sc-16qon89-3 exespM cWvaak"
+      >
+        Backgstage huone
+      </h1>
+      <h2
+        class="typography__H2-sc-yczr8v-5 Ticket__Subtitle-sc-16qon89-4 dQVsnC cdeDAn"
+      >
+        Arabianrannan nuorisotalo
+      </h2>
+      <div
+        class="Ticket__Duration-sc-16qon89-5 eGJEwH"
+        data-test="reservation__time-range"
+      >
+        <svg
+          class="Icon-module_icon__1Jtzj icon_hds-icon__1YqNC Icon-module_s__2WGWe icon_hds-icon--size-s__2Lkik"
+          role="img"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <g
+            fill="none"
+            fill-rule="evenodd"
+          >
+            <path
+              d="M0 0h24v24H0z"
+            />
+            <path
+              d="M17 2a1 1 0 011 1v1h4v17H2V4h4V3a1 1 0 112 0v1h8V3a1 1 0 011-1zm3 9H4v8h16v-8zm0-5H4v3h16V6z"
+              fill="currentColor"
+            />
+          </g>
+        </svg>
+         Common:dateWithWeekday common:timeWithPrefix - common:time (common:duration)
+      </div>
+      <div
+        class="Ticket__Price-sc-16qon89-6 ktLsEj"
+      >
+        <span
+          class="typography__Strongish-sc-yczr8v-1 pEndj"
+        >
+          reservationUnit:priceFree
+        </span>
+      </div>
+    </div>
+    <div
+      class="Ticket__PunchHole-sc-16qon89-0 fmclZd"
+    />
+  </div>
+</DocumentFragment>
+`;
