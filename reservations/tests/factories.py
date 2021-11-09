@@ -14,6 +14,13 @@ class RecurringReservationFactory(DjangoModelFactory):
         model = "reservations.RecurringReservation"
 
 
+class ReservationPurposeFactory(DjangoModelFactory):
+    class Meta:
+        model = "reservations.ReservationPurpose"
+
+    name = FuzzyText()
+
+
 class ReservationFactory(DjangoModelFactory):
     class Meta:
         model = "reservations.Reservation"

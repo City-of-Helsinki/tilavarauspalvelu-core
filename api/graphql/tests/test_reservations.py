@@ -17,7 +17,7 @@ from opening_hours.hours import TimeElement
 from opening_hours.tests.test_get_periods import get_mocked_periods
 from reservation_units.tests.factories import ReservationUnitFactory
 from reservations.models import STATE_CHOICES, Reservation
-from reservations.tests.factories import ReservationFactory
+from reservations.tests.factories import ReservationFactory, ReservationPurposeFactory
 from spaces.tests.factories import SpaceFactory
 
 
@@ -28,6 +28,7 @@ class ReservationTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCase):
         super().setUpTestData()
         cls.space = SpaceFactory()
         cls.reservation_unit = ReservationUnitFactory(pk=1, spaces=[cls.space])
+        cls.purpose = ReservationPurposeFactory()
 
     def get_mocked_opening_hours(self):
         resource_id = f"{settings.HAUKI_ORIGIN_ID}:{self.reservation_unit.uuid}"
@@ -84,6 +85,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
                 "%Y%m%dT%H%M%SZ"
             ),
             "reservationUnitPks": [self.reservation_unit.pk],
+            "purposePk": self.purpose.pk,
         }
 
     def test_creating_reservation_succeed(self, mock_periods, mock_opening_hours):
@@ -112,6 +114,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         assert_that(reservation.reservee_phone).is_equal_to(input_data["reserveePhone"])
         assert_that(reservation.name).is_equal_to(input_data["name"])
         assert_that(reservation.description).is_equal_to(input_data["description"])
+        assert_that(reservation.purpose).is_equal_to(self.purpose)
 
     def test_creating_reservation_without_optional_fields_succeeds(
         self, mock_periods, mock_opening_hours
@@ -125,6 +128,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
             "reserveePhone",
             "name",
             "description",
+            "purposePk",
         ]
         for field in optional_fields:
             input_data.pop(field)
