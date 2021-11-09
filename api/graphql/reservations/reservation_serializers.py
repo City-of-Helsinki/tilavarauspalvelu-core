@@ -286,7 +286,7 @@ class ReservationCancellationSerializer(PrimaryKeyUpdateSerializer):
             )
             if must_be_cancelled_before < now:
                 raise serializers.ValidationError(
-                    "Reservation cannot be cancel time expired."
+                    "Reservation cannot be cancelled because the cancellation period has expired."
                 )
             if cancel_rule.needs_handling:
                 raise serializers.ValidationError(

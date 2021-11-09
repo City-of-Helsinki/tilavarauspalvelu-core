@@ -31,6 +31,7 @@ from api.graphql.reservation_units.reservation_unit_types import (
     KeywordType,
     PurposeType,
     ReservationUnitByPkType,
+    ReservationUnitCancellationRuleType,
     ReservationUnitType,
 )
 from api.graphql.reservations.reservation_filtersets import ReservationFilterSet
@@ -69,6 +70,7 @@ from permissions.api_permissions.graphene_permissions import (
     PurposePermission,
     ReservationPermission,
     ReservationPurposePermission,
+    ReservationUnitCancellationRulePermission,
     ReservationUnitPermission,
     ResourcePermission,
     SpacePermission,
@@ -188,6 +190,14 @@ class ReservationCancelReasonFilter(AuthFilter):
     )
 
 
+class ReservationUnitCancellationRulesFilter(AuthFilter):
+    permission_classes = (
+        (ReservationUnitCancellationRulePermission,)
+        if not settings.TMP_PERMISSIONS_DISABLED
+        else (AllowAny,)
+    )
+
+
 class Query(graphene.ObjectType):
     reservations = ReservationsFilter(
         ReservationType, filterset_class=ReservationFilterSet
@@ -201,6 +211,9 @@ class Query(graphene.ObjectType):
     )
     reservation_unit = relay.Node.Field(ReservationUnitType)
     reservation_unit_by_pk = Field(ReservationUnitByPkType, pk=graphene.Int())
+    reservation_unit_cancellation_rules = ReservationUnitCancellationRulesFilter(
+        ReservationUnitCancellationRuleType
+    )
 
     resources = ResourcesFilter(ResourceType)
     resource = relay.Node.Field(ResourceType)

@@ -318,7 +318,12 @@ snapshots['ReservationUnitTestCase::test_getting_reservation_units 1'] = {
                             }
                         ],
                         'surfaceArea': 150,
-                        'termsOfUseFi': None
+                        'termsOfUseFi': None,
+                        'cancellationRule': {
+                            'nameFi': 'fi',
+                            'nameEn': 'en',
+                            'nameSv': 'sv',
+                        }
                     }
                 }
             ]

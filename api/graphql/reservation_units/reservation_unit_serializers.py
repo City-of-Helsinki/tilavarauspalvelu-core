@@ -16,6 +16,7 @@ from reservation_units.models import (
     EquipmentCategory,
     Purpose,
     ReservationUnit,
+    ReservationUnitCancellationRule,
     ReservationUnitType,
 )
 from resources.models import Resource
@@ -122,6 +123,11 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
         queryset=ReservationUnitType.objects.all(),
     )
     unit_pk = IntegerPrimaryKeyField(queryset=Unit.objects.all(), source="unit")
+    cancellation_rule_pk = IntegerPrimaryKeyField(
+        queryset=ReservationUnitCancellationRule.objects.all(),
+        source="cancellation_rule",
+        required=False,
+    )
 
     translation_fields = get_all_translatable_fields(ReservationUnit)
 
@@ -151,6 +157,7 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
             "reservation_unit_type_pk",
             "surface_area",
             "buffer_time_between_reservations",
+            "cancellation_rule_pk",
         ] + get_all_translatable_fields(ReservationUnit)
 
     def __init__(self, *args, **kwargs):

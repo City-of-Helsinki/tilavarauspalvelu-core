@@ -29,6 +29,7 @@ from permissions.api_permissions.graphene_permissions import (
     EquipmentPermission,
     PurposePermission,
     ReservationPermission,
+    ReservationUnitCancellationRulePermission,
     ReservationUnitHaukiUrlPermission,
     ReservationUnitPermission,
     ResourcePermission,
@@ -44,6 +45,7 @@ from reservation_units.models import (
     KeywordGroup,
     Purpose,
     ReservationUnit,
+    ReservationUnitCancellationRule,
     ReservationUnitImage,
 )
 from reservation_units.models import ReservationUnitType as ReservationUnitTypeModel
@@ -146,6 +148,29 @@ class ReservationUnitImageType(DjangoObjectType):
         url = get_thumbnailer(self.image)["medium"].url
 
         return info.context.build_absolute_uri(url)
+
+
+class ReservationUnitCancellationRuleType(AuthNode, PrimaryKeyObjectType):
+    permission_classes = (
+        (ReservationUnitCancellationRulePermission,)
+        if not settings.TMP_PERMISSIONS_DISABLED
+        else (AllowAny,)
+    )
+
+    class Meta:
+        model = ReservationUnitCancellationRule
+        fields = [
+            "pk",
+            "can_be_cancelled_time_before",
+            "needs_handling",
+        ] + get_all_translatable_fields(model)
+        filter_fields = ["name"]
+        interfaces = (graphene.relay.Node,)
+
+    def resolve_can_be_cancelled_time_before(self, info: ResolveInfo):
+        if not self.can_be_cancelled_time_before:
+            return None
+        return self.can_be_cancelled_time_before.total_seconds()
 
 
 class ReservationUnitTypeType(PrimaryKeyObjectType):
@@ -256,6 +281,7 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
         state=graphene.List(graphene.String),
     )
     application_rounds = graphene.List(ApplicationRoundType, active=graphene.Boolean())
+    cancellation_rule = graphene.Field(ReservationUnitCancellationRuleType)
 
     permission_classes = (
         (ReservationUnitPermission,)
@@ -284,6 +310,7 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
             "buffer_time_between_reservations",
             "reservations",
             "application_rounds",
+            "cancellation_rule",
         ] + get_all_translatable_fields(model)
         filter_fields = {
             "name_fi": ["exact", "icontains", "istartswith"],
@@ -392,6 +419,10 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
             application_period_end__gte=now,
         )
         return application_rounds.filter(active_filter if active else ~active_filter)
+
+    @check_resolver_permission(ReservationUnitCancellationRulePermission)
+    def resolve_cancellation_rule(self, info: ResolveInfo):
+        return self.cancellation_rule
 
 
 class ReservationUnitByPkType(ReservationUnitType, OpeningHoursMixin):
