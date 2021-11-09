@@ -33,6 +33,13 @@ class PurposeFactory(DjangoModelFactory):
     name = FuzzyText()
 
 
+class ReservationUnitCancellationRuleFactory(DjangoModelFactory):
+    class Meta:
+        model = "reservation_units.ReservationUnitCancellationRule"
+
+    name = FuzzyText()
+
+
 class ReservationUnitFactory(DjangoModelFactory):
     class Meta:
         model = "reservation_units.ReservationUnit"

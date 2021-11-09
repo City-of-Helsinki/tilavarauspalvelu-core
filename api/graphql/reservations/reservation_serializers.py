@@ -1,3 +1,5 @@
+import datetime
+
 from django.conf import settings
 from django.utils.timezone import get_default_timezone
 from rest_framework import serializers
@@ -11,7 +13,12 @@ from reservation_units.models import ReservationUnit
 from reservation_units.utils.reservation_unit_reservation_scheduler import (
     ReservationUnitReservationScheduler,
 )
-from reservations.models import STATE_CHOICES, Reservation, ReservationPurpose
+from reservations.models import (
+    STATE_CHOICES,
+    Reservation,
+    ReservationCancelReason,
+    ReservationPurpose,
+)
 
 DEFAULT_TIMEZONE = get_default_timezone()
 
@@ -225,3 +232,65 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
         validated_data = super().validated_data
         validated_data["state"] = STATE_CHOICES.CONFIRMED
         return validated_data
+
+
+class ReservationCancellationSerializer(PrimaryKeyUpdateSerializer):
+    cancel_reason_pk = IntegerPrimaryKeyField(
+        queryset=ReservationCancelReason.objects.all(),
+        source="cancel_reason",
+        required=True,
+        help_text="Primary key for the pre-defined cancel reason.",
+    )
+    cancel_details = serializers.CharField(
+        help_text="Additional information for the cancellation.",
+        required=False,
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["state"].read_only = True
+
+    class Meta:
+        model = Reservation
+        fields = [
+            "pk",
+            "cancel_reason_pk",
+            "cancel_details",
+            "state",
+        ]
+
+    @property
+    def validated_data(self):
+        validated_data = super().validated_data
+        validated_data["state"] = STATE_CHOICES.CANCELLED
+        return validated_data
+
+    def validate(self, data):
+        data = super().validate(data)
+        if self.instance.state != STATE_CHOICES.CONFIRMED:
+            raise serializers.ValidationError(
+                "Only reservations in confirmed state can be cancelled through this."
+            )
+
+        now = datetime.datetime.now(tz=get_default_timezone())
+        if self.instance.begin < now:
+            raise serializers.ValidationError(
+                "Reservation cannot be cancelled when begin time is in past."
+            )
+        for reservation_unit in self.instance.reservation_unit.all():
+            cancel_rule = reservation_unit.cancellation_rule
+            if not cancel_rule:
+                continue
+            must_be_cancelled_before = (
+                self.instance.begin - cancel_rule.can_be_cancelled_time_before
+            )
+            if must_be_cancelled_before < now:
+                raise serializers.ValidationError(
+                    "Reservation cannot be cancel time expired."
+                )
+            if cancel_rule.needs_handling:
+                raise serializers.ValidationError(
+                    "Reservation cancellation needs manual handling."
+                )
+
+        return data

@@ -15,9 +15,16 @@ from applications.tests.factories import ApplicationRoundFactory
 from opening_hours.enums import State
 from opening_hours.hours import TimeElement
 from opening_hours.tests.test_get_periods import get_mocked_periods
-from reservation_units.tests.factories import ReservationUnitFactory
+from reservation_units.tests.factories import (
+    ReservationUnitCancellationRuleFactory,
+    ReservationUnitFactory,
+)
 from reservations.models import STATE_CHOICES, Reservation
-from reservations.tests.factories import ReservationFactory, ReservationPurposeFactory
+from reservations.tests.factories import (
+    ReservationCancelReasonFactory,
+    ReservationFactory,
+    ReservationPurposeFactory,
+)
 from spaces.tests.factories import SpaceFactory
 
 DEFAULT_TIMEZONE = get_default_timezone()
@@ -906,3 +913,191 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         assert_that(content.get("errors")).is_not_none()
         self.reservation.refresh_from_db()
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CREATED)
+
+
+@freezegun.freeze_time("2021-10-12T12:00:00Z")
+class ReservationCancellationTestCase(ReservationTestCaseBase):
+    def setUp(self):
+        super().setUp()
+        self.cancel_reason = ReservationCancelReasonFactory(reason="good_reason")
+        self.reservation = ReservationFactory(
+            reservation_unit=[self.reservation_unit],
+            begin=datetime.datetime.now(tz=get_default_timezone()),
+            end=(
+                datetime.datetime.now(tz=get_default_timezone())
+                + datetime.timedelta(hours=1)
+            ),
+            state=STATE_CHOICES.CONFIRMED,
+            user=self.regular_joe,
+        )
+
+    def get_cancel_query(self):
+        return """
+            mutation cancelReservation($input: ReservationCancellationMutationInput!) {
+                cancelReservation(input: $input) {
+                    state
+                    errors {
+                        field
+                        messages
+                    }
+                }
+            }
+        """
+
+    def get_valid_cancel_data(self):
+        return {"pk": self.reservation.pk, "cancelReasonPk": self.cancel_reason.id}
+
+    def test_cancel_reservation_changes_state(self):
+        self._client.force_login(self.regular_joe)
+        input_data = self.get_valid_cancel_data()
+        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
+        response = self.query(self.get_cancel_query(), input_data=input_data)
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        cancel_data = content.get("data").get("cancelReservation")
+        assert_that(cancel_data.get("errors")).is_none()
+        assert_that(cancel_data.get("state")).is_equal_to(
+            STATE_CHOICES.CANCELLED.upper()
+        )
+        self.reservation.refresh_from_db()
+        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CANCELLED)
+
+    def test_cancel_reservation_adds_reason(self):
+        self._client.force_login(self.regular_joe)
+        input_data = self.get_valid_cancel_data()
+        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
+        response = self.query(self.get_cancel_query(), input_data=input_data)
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        cancel_data = content.get("data").get("cancelReservation")
+        assert_that(cancel_data.get("errors")).is_none()
+        assert_that(cancel_data.get("state")).is_equal_to(
+            STATE_CHOICES.CANCELLED.upper()
+        )
+        self.reservation.refresh_from_db()
+        assert_that(self.reservation.cancel_reason).is_equal_to(self.cancel_reason)
+
+    def test_cancel_reservation_adds_cancel_details(self):
+        self._client.force_login(self.regular_joe)
+        input_data = self.get_valid_cancel_data()
+        details = "wantitso"
+        input_data["cancelDetails"] = details
+        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
+        response = self.query(self.get_cancel_query(), input_data=input_data)
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        cancel_data = content.get("data").get("cancelReservation")
+        assert_that(cancel_data.get("errors")).is_none()
+        assert_that(cancel_data.get("state")).is_equal_to(
+            STATE_CHOICES.CANCELLED.upper()
+        )
+        self.reservation.refresh_from_db()
+        assert_that(self.reservation.cancel_details).is_equal_to(details)
+
+    def test_cancel_reservation_fails_if_state_is_not_confirmed(self):
+        self._client.force_login(self.regular_joe)
+        self.reservation.state = STATE_CHOICES.CREATED
+        self.reservation.save()
+        input_data = self.get_valid_cancel_data()
+        response = self.query(self.get_cancel_query(), input_data=input_data)
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        cancel_data = content.get("data").get("cancelReservation")
+        assert_that(cancel_data.get("errors")).is_not_none()
+        self.reservation.refresh_from_db()
+        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CREATED)
+
+    def test_cancel_reservation_fails_if_cancel_reason_not_given(self):
+        self._client.force_login(self.regular_joe)
+        input_data = self.get_valid_cancel_data()
+        input_data.pop("cancelReasonPk")
+        response = self.query(self.get_cancel_query(), input_data=input_data)
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_not_none()
+        self.reservation.refresh_from_db()
+        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
+
+    def test_cancel_reservation_fails_on_wrong_user(self):
+        unauthorized_user = get_user_model().objects.create()
+        self._client.force_login(unauthorized_user)
+        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
+        input_data = self.get_valid_cancel_data()
+        response = self.query(self.get_cancel_query(), input_data=input_data)
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_not_none()
+        self.reservation.refresh_from_db()
+        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
+
+    def test_cancel_reservation_fails_with_rules_time_is_due(self):
+        rule = ReservationUnitCancellationRuleFactory(
+            can_be_cancelled_time_before=datetime.timedelta(hours=12)
+        )
+        self.reservation_unit.cancellation_rule = rule
+        self.reservation_unit.save()
+
+        self._client.force_login(self.regular_joe)
+        input_data = self.get_valid_cancel_data()
+        response = self.query(self.get_cancel_query(), input_data=input_data)
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        cancel_data = content.get("data").get("cancelReservation")
+        assert_that(cancel_data.get("errors")).is_not_none()
+        self.reservation.refresh_from_db()
+        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
+
+    def test_cancel_reservation_succeed_with_rule_set_and_in_time(self):
+        rule = ReservationUnitCancellationRuleFactory(
+            can_be_cancelled_time_before=datetime.timedelta(hours=1)
+        )
+        self.reservation_unit.cancellation_rule = rule
+        self.reservation_unit.save()
+
+        now = datetime.datetime.now(tz=get_default_timezone())
+        reservation = ReservationFactory(
+            reservation_unit=[self.reservation_unit],
+            begin=now + datetime.timedelta(hours=1),
+            end=(now + datetime.timedelta(hours=2)),
+            state=STATE_CHOICES.CONFIRMED,
+            user=self.regular_joe,
+        )
+
+        self._client.force_login(self.regular_joe)
+        input_data = self.get_valid_cancel_data()
+        input_data["pk"] = reservation.id
+        response = self.query(self.get_cancel_query(), input_data=input_data)
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        cancel_data = content.get("data").get("cancelReservation")
+        assert_that(cancel_data.get("errors")).is_none()
+        reservation.refresh_from_db()
+        assert_that(reservation.state).is_equal_to(STATE_CHOICES.CANCELLED)
+
+    def test_cancel_reservation_fails_when_reservation_in_past(self):
+        now = datetime.datetime.now(tz=get_default_timezone())
+        reservation = ReservationFactory(
+            reservation_unit=[self.reservation_unit],
+            begin=now - datetime.timedelta(hours=2),
+            end=now - datetime.timedelta(hours=1),
+            state=STATE_CHOICES.CONFIRMED,
+            user=self.regular_joe,
+        )
+
+        self._client.force_login(self.regular_joe)
+        input_data = self.get_valid_cancel_data()
+        input_data["pk"] = reservation.id
+        response = self.query(self.get_cancel_query(), input_data=input_data)
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        cancel_data = content.get("data").get("cancelReservation")
+        assert_that(cancel_data.get("errors")).is_not_none()
+        reservation.refresh_from_db()
+        assert_that(reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
