@@ -23,22 +23,20 @@
     "reservationAlertBody": "Älä koskaan täytä henkilötietoja tai muita arkaluontoisia tietoja näihin kenttiin."
   },
   "label": {
-    "reserveeName": "Varaajan nimi",
+    "reserveeName": "Varaaja",
     "reserveeFirstName": "Varaajan etunimi",
     "reserveeLastName": "Varaajan sukunimi",
     "name": "Varauksen nimi (julkinen)",
     "description": "Varauksen kuvaus",
-    "termsSpace": "Olen lukenut ja hyväksynyt käyttösäännöt",
-    "termsResource": "Olen lukenut ja hyväksynyt tilan resurssikohtaiset ehdot",
+    "termsSpace": "Olen lukenut ja hyväksynyt varauksen käyttösäännöt",
+    "termsResource": "Olen lukenut ja hyväksynyt varauksen resurssikohtaiset ehdot",
     "reservationDate": "Varauksen ajankohta",
     "reservationSpace": "Tila"
   },
   "heading": {
-    "termsOfUse": "Käyttö- ja varausehdot",
+    "termsOfUse": "Sopimusehdot",
     "resourceTerms": "Resurssikohtaiset ehdot"
   },
-  "spaceTerms": "Musiikki, teatteri, liikunta\nTiloja vuokrataan sekä järjestöille että  yksityisille henkilöille. Käyttövuoroja jaettaessa ovat etusijalla helsinkiläiset nuorisojärjestöt ja nuorten ryhmät, joille käyttövuorot ovat maksuttomia.\n\n Lisätietoja saat myös nuorisotilasta.\nMuistattehan, että nuorisotalon tiloissa toiminta on päihteetöntä ja savutonta myös yksityistilaisuuksissa.",
-  "resourceTerms": "- Jos myöhästyt yli 15 minuuttia, varauksesi vapautetaan muiden käyttöön.\n- Mikäli työsi ei valmistu varaamasi ajan sisällä, työ keskeytetään seuraavan varauksen alkaessa.\n- Sinulla voi olla voimassa vain yksi varaus kerrallaan. Ylimääräiset varaukset poistetaan.",
   "saveReservation": "Tallenna varaus",
   "selectedTime": "Valittu aika",
   "nextAvailableTime": "Seuraava vapaa aika",
@@ -51,5 +49,12 @@
   "durationFormatAssist": "Tunti:minuutit",
   "startDate": "Päivä",
   "startTime": "Aloitusaika",
-  "duration": "Kesto"
+  "duration": "Kesto",
+  "steps": {
+    "step1": "Varauksen tiedot",
+    "step2": "Varauksen ehdot",
+    "step3": "Varaus tehty"
+  },
+  "nextStep": "Jatka",
+  "reservationSummary": "Varauksen yhteenveto"
 }
