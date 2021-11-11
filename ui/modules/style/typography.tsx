@@ -40,6 +40,13 @@ export const H2 = styled.h2`
   margin-bottom: var(--spacing-m);
 `;
 
+export const H3 = styled.h2`
+  font-size: var(--fontsize-heading-s);
+  font-family: var(--font-bold);
+  font-weight: 700;
+  margin-bottom: var(--spacing-m);
+`;
+
 export const fontRegular = css`
   font-family: var(--font-regular);
   font-weight: 400;

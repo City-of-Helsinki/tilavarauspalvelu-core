@@ -94,34 +94,36 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
 
     reservationSubmitButton().click();
 
-    const formFieldsNValues = [
+    const form1 = [
       { label: "reserveeFirstName", value: "Etunimi" },
       { label: "reserveeLastName", value: "Sukunimi" },
       { label: "reserveePhone", value: "+3581234567" },
       { label: "name", value: "Varaus" },
       { label: "description", value: "Kuvaus" },
-      { label: "spaceTerms" },
-      { label: "resourceTerms" },
     ];
 
+    const form2 = [{ label: "spaceTerms" }, { label: "resourceTerms" }];
+
     updateButton().click();
-    formFieldsNValues.forEach((field) => {
+    form1.forEach((field) => {
       cy.get(`#${field.label}-error`).should("exist");
     });
 
-    formFieldsNValues.forEach((field) => {
-      if (field.value) {
-        formField(field.label).type(field.value);
-      } else {
-        formField(field.label).click();
-      }
+    form1.forEach((field) => {
+      formField(field.label).type(field.value);
     });
 
-    formFieldsNValues.forEach((field) => {
+    form1.forEach((field) => {
       cy.get(`#${field.label}-error`).should("not.exist");
     });
 
     cy.checkA11y(null, null, null, true);
+
+    updateButton().click();
+
+    form2.forEach((field) => {
+      formField(field.label).click();
+    });
 
     updateButton().click();
 
@@ -137,20 +139,17 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
       .parent()
       .find("span")
       .eq(1)
-      .should("have.text", formFieldsNValues[3].value);
+      .should("have.text", form1[3].value);
 
     confirmationParagraph()
       .eq(1)
       .find("span")
       .eq(0)
-      .should("have.text", "Varaajan nimi")
+      .should("have.text", "Varaaja")
       .parent()
       .find("span")
       .eq(1)
-      .should(
-        "have.text",
-        `${formFieldsNValues[0].value} ${formFieldsNValues[1].value}`
-      );
+      .should("have.text", `${form1[0].value} ${form1[1].value}`);
 
     confirmationParagraph()
       .eq(2)
@@ -160,7 +159,7 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
       .parent()
       .find("span")
       .eq(1)
-      .should("have.text", formFieldsNValues[4].value);
+      .should("have.text", form1[4].value);
 
     confirmationParagraph()
       .eq(3)
@@ -196,7 +195,7 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
       .parent()
       .find("span")
       .eq(1)
-      .should("have.text", formFieldsNValues[2].value);
+      .should("have.text", form1[2].value);
 
     cy.checkA11y(null, null, null, true);
   });

@@ -17,6 +17,7 @@ const Wrapper = styled.div`
   @media (min-width: ${breakpoint.m}) {
     background-image: url("images/hero-front@1x.jpg");
     background-size: cover;
+    background-color: var(--color-black);
 
     @media (-webkit-min-device-pixel-ratio: 2) {
       background-image: url("images/hero-front@2x.jpg");

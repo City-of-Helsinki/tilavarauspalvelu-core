@@ -247,19 +247,21 @@ const Head = ({
                     {t("common:selectReservationUnit")}
                   </MediumButton>
                 ))}
-              {viewType === "single" && (
-                <ThinButton
-                  onClick={() => {
-                    window.scroll({
-                      top: calendarRef.current.offsetTop - 20,
-                      left: 0,
-                      behavior: "smooth",
-                    });
-                  }}
-                >
-                  {t("reservationCalendar:showCalendar")}
-                </ThinButton>
-              )}
+              {viewType === "single" &&
+                reservationUnit.minReservationDuration &&
+                reservationUnit.maxReservationDuration && (
+                  <ThinButton
+                    onClick={() => {
+                      window.scroll({
+                        top: calendarRef.current.offsetTop - 20,
+                        left: 0,
+                        behavior: "smooth",
+                      });
+                    }}
+                  >
+                    {t("reservationCalendar:showCalendar")}
+                  </ThinButton>
+                )}
             </ButtonContainer>
           </div>
           <JustForDesktop>
