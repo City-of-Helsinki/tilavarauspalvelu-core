@@ -184,7 +184,7 @@ class ReservationUpdateSerializer(
         self.fields["reservation_unit_pks"].required = False
 
     def validate(self, data):
-        if self.instance.state not in (STATE_CHOICES.CREATED, STATE_CHOICES.REQUESTED):
+        if self.instance.state not in (STATE_CHOICES.CREATED,):
             raise serializers.ValidationError("Reservation cannot be changed anymore.")
 
         new_state = data.get("state", self.instance.state)

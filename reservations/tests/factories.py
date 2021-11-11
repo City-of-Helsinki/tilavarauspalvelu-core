@@ -29,8 +29,6 @@ class ReservationFactory(DjangoModelFactory):
             STATE_CHOICES.CANCELLED,
             STATE_CHOICES.CONFIRMED,
             STATE_CHOICES.DENIED,
-            STATE_CHOICES.REQUESTED,
-            STATE_CHOICES.WAITING_FOR_PAYMENT,
         )
     )
     priority = FuzzyInteger(

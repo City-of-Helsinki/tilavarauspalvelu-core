@@ -93,15 +93,11 @@ class STATE_CHOISE_CONST(object):
     CANCELLED = "cancelled"
     CONFIRMED = "confirmed"
     DENIED = "denied"
-    REQUESTED = "requested"
-    WAITING_FOR_PAYMENT = "waiting_for_payment"
     STATE_CHOICES = (
         (CREATED, _("created")),
         (CANCELLED, _("cancelled")),
         (CONFIRMED, _("confirmed")),
         (DENIED, _("denied")),
-        (REQUESTED, _("requested")),
-        (WAITING_FOR_PAYMENT, _("waiting for payment")),
     )
 
 
@@ -131,8 +127,6 @@ class ReservationQuerySet(models.QuerySet):
             state__in=(
                 STATE_CHOICES.CREATED,
                 STATE_CHOICES.CONFIRMED,
-                STATE_CHOICES.REQUESTED,
-                STATE_CHOICES.WAITING_FOR_PAYMENT,
             )
         )
 
