@@ -58,6 +58,7 @@ from api.graphql.spaces.space_mutations import (
     SpaceUpdateMutation,
 )
 from api.graphql.spaces.space_types import SpaceType
+from api.graphql.terms_of_use.terms_of_use_types import TermsOfUseType
 from api.graphql.units.unit_mutations import UnitUpdateMutation
 from api.graphql.units.unit_types import UnitByPkType, UnitType
 from permissions.api_permissions.graphene_field_decorators import (
@@ -74,6 +75,7 @@ from permissions.api_permissions.graphene_permissions import (
     ReservationUnitPermission,
     ResourcePermission,
     SpacePermission,
+    TermsOfUsePermission,
     UnitPermission,
 )
 from permissions.helpers import (
@@ -198,6 +200,14 @@ class ReservationUnitCancellationRulesFilter(AuthFilter):
     )
 
 
+class TermsOfUseFilter(AuthFilter):
+    permission_classes = (
+        (TermsOfUsePermission,)
+        if not settings.TMP_PERMISSIONS_DISABLED
+        else (AllowAny,)
+    )
+
+
 class Query(graphene.ObjectType):
     reservations = ReservationsFilter(
         ReservationType, filterset_class=ReservationFilterSet
@@ -241,6 +251,8 @@ class Query(graphene.ObjectType):
 
     purposes = PurposeFilter(PurposeType)
     reservation_purposes = ReservationPurposeFilter(ReservationPurposeType)
+
+    terms_of_use = TermsOfUseFilter(TermsOfUseType)
 
     @check_resolver_permission(ReservationUnitPermission)
     def resolve_reservation_unit_by_pk(self, info, **kwargs):
