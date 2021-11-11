@@ -4,7 +4,7 @@ import { convertHMSToSeconds, secondsToHms } from "./util";
 export const getDurationOptions = (
   minReservationDuration: string,
   maxReservationDuration: string,
-  step = "00:30:00"
+  step = "00:15:00"
 ): OptionType[] => {
   const minMinutes = convertHMSToSeconds(minReservationDuration);
   const maxMinutes = convertHMSToSeconds(maxReservationDuration);

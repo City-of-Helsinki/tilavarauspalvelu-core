@@ -236,7 +236,7 @@ const ReservationInfo = ({
     value: String(n),
   }));
 
-  const minuteOptions = [0, 30].map((n) => ({
+  const minuteOptions = [0, 15, 30, 45].map((n) => ({
     label: String(n).padEnd(2, "0"),
     value: String(n),
   }));

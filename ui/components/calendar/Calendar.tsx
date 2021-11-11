@@ -53,6 +53,7 @@ type Props = {
   draggable?: boolean;
   resizable?: boolean;
   overflowBreakpoint?: string;
+  step?: number;
 };
 
 export const eventStyleGetter = ({
@@ -79,16 +80,27 @@ export const eventStyleGetter = ({
   };
 };
 
-const StyledCalendar = styled(BigCalendar)<{ overflowBreakpoint: string }>`
+const StyledCalendar = styled(BigCalendar)<{
+  overflowBreakpoint: string;
+  step: number;
+}>`
   .rbc-timeslot-group {
     border-bottom: 0;
-
-    .rbc-time-slot {
-      &:first-of-type {
-        border-color: var(--color-black-20);
+    min-height: ${({ step }) => {
+      switch (step) {
+        case 15:
+          return "26px";
+        case 30:
+        default:
+          return "40px";
       }
+    }};
+    border-top-color: var(--color-black-10);
+  }
 
-      border-top-color: var(--color-black-10);
+  .rbc-today {
+    .rbc-timeslot-group {
+      background-color: var(--color-white);
     }
   }
 
@@ -109,6 +121,10 @@ const StyledCalendar = styled(BigCalendar)<{ overflowBreakpoint: string }>`
       .rbc-time-slot {
         &:first-of-type {
           border-color: var(--color-black-20);
+        }
+
+        &:last-of-type {
+          border: none;
         }
 
         border-top: 1px solid var(--color-black-10);
@@ -166,14 +182,47 @@ const StyledCalendar = styled(BigCalendar)<{ overflowBreakpoint: string }>`
       display: block;
       box-shadow: 5px 0px 13px 0px rgb(0 0 0 / 15%);
       width: 69px;
-      height: 733px;
+      height: ${({ step }) => {
+        switch (step) {
+          case 15:
+            return "935px";
+          case 30:
+          default:
+            return "730px";
+        }
+      }};
       position: absolute;
       z-index: 20;
       bottom: 0px;
       left: 0px;
 
       @media (min-width: ${(props) => props.overflowBreakpoint}) {
-        height: 716px;
+        height: ${({ step }) => {
+          switch (step) {
+            case 15:
+              return "921px";
+            case 30:
+            default:
+              return "716px";
+          }
+        }};
+      }
+    }
+
+    .rbc-day-slot {
+      .rbc-timeslot-group {
+        .rbc-time-slot.rbc-timeslot-inactive {
+          border-top: none;
+        }
+        &:nth-of-type(2n) {
+          .rbc-time-slot:last-of-type {
+            border-bottom: 1px solid var(--color-black-10);
+          }
+
+          .rbc-time-slot.rbc-timeslot-inactive:last-of-type {
+            border-bottom: 1px solid var(--color-black-20);
+          }
+        }
       }
     }
   }
@@ -280,6 +329,7 @@ const Calendar = ({
   draggable = false,
   resizable = false,
   overflowBreakpoint = "850px",
+  step = 30,
 }: Props): JSX.Element => {
   const { i18n } = useTranslation();
   const Component = draggable ? StyledCalendarDND : StyledCalendar;
@@ -313,6 +363,7 @@ const Calendar = ({
       draggableAccessor={draggableAccessor}
       resizableAccessor={resizableAccessor}
       overflowBreakpoint={overflowBreakpoint}
+      step={step}
     />
   );
 };
