@@ -53,6 +53,16 @@
         }
     },
     {
+        "model": "reservations.reservationcancelreason",
+        "pk": 1,
+        "fields": {
+            "reason": "Tuplabuukkaus",
+            "reason_fi": "Tuplabuukkaus",
+            "reason_en": "Double booking",
+            "reason_sv": "Double booking"
+        }
+    },
+    {
         "model": "reservations.reservation",
         "pk": 1,
         "fields": {
@@ -993,6 +1003,18 @@
             "name_sv": null
         }
     },
+    {
+        "model": "reservation_units.reservationunitcancellationrule",
+        "pk": 1,
+        "fields": {
+            "name": "Default rule",
+            "name_fi": "Oletussääntö",
+            "name_en": "Default rule",
+            "name_sv": "Default rule",
+            "can_be_cancelled_time_before": "1 00:00:00",
+            "needs_handling": false
+        }
+  },
     {
         "model": "reservation_units.reservationunit",
         "pk": 1,
