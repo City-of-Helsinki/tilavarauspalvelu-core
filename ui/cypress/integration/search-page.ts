@@ -19,11 +19,8 @@ describe("Tilavaraus ui search page (recurring)", () => {
     cy.get("#searchResultList").should("contain", "8 Hakutulosta");
   });
 
-  it("is accessible", () => {
-    cy.a11yCheck();
-  });
-
   it("search results is accessible", () => {
+    cy.a11yCheck();
     fullTextInput().type("search terms");
     searchButton().click();
     cy.a11yCheck();
