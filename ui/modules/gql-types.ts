@@ -391,6 +391,7 @@ export type LocationType = Node & {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  confirmReservation?: Maybe<ReservationConfirmMutationPayload>;
   createEquipment?: Maybe<EquipmentCreateMutationPayload>;
   createEquipmentCategory?: Maybe<EquipmentCategoryCreateMutationPayload>;
   createPurpose?: Maybe<PurposeCreateMutationPayload>;
@@ -410,6 +411,11 @@ export type Mutation = {
   updateResource?: Maybe<ResourceUpdateMutationPayload>;
   updateSpace?: Maybe<SpaceUpdateMutationPayload>;
   updateUnit?: Maybe<UnitUpdateMutationPayload>;
+};
+
+
+export type MutationConfirmReservationArgs = {
+  input: ReservationConfirmMutationInput;
 };
 
 
@@ -638,6 +644,7 @@ export type Query = {
   /** The ID of the object */
   reservationUnit?: Maybe<ReservationUnitType>;
   reservationUnitByPk?: Maybe<ReservationUnitByPkType>;
+  reservationUnitPurposes?: Maybe<ReservationUnitPurposeTypeConnection>;
   reservationUnits?: Maybe<ReservationUnitTypeConnection>;
   reservations?: Maybe<ReservationTypeConnection>;
   /** The ID of the object */
@@ -763,6 +770,17 @@ export type QueryReservationUnitByPkArgs = {
 };
 
 
+export type QueryReservationUnitPurposesArgs = {
+  after?: Maybe<Scalars['String']>;
+  before?: Maybe<Scalars['String']>;
+  first?: Maybe<Scalars['Int']>;
+  last?: Maybe<Scalars['Int']>;
+  nameEn?: Maybe<Scalars['String']>;
+  nameFi?: Maybe<Scalars['String']>;
+  nameSv?: Maybe<Scalars['String']>;
+};
+
+
 export type QueryReservationUnitsArgs = {
   after?: Maybe<Scalars['String']>;
   before?: Maybe<Scalars['String']>;
@@ -771,6 +789,7 @@ export type QueryReservationUnitsArgs = {
   last?: Maybe<Scalars['Int']>;
   maxPersonsGte?: Maybe<Scalars['Float']>;
   maxPersonsLte?: Maybe<Scalars['Float']>;
+  orderBy?: Maybe<Scalars['String']>;
   purposes?: Maybe<Scalars['ID']>;
   reservationUnitType?: Maybe<Scalars['ID']>;
   textSearch?: Maybe<Scalars['String']>;
@@ -890,6 +909,30 @@ export type RecurringReservationType = {
   user?: Maybe<Scalars['String']>;
 };
 
+export type ReservationConfirmMutationInput = {
+  clientMutationId?: Maybe<Scalars['String']>;
+  pk: Scalars['Int'];
+};
+
+export type ReservationConfirmMutationPayload = {
+  __typename?: 'ReservationConfirmMutationPayload';
+  begin?: Maybe<Scalars['DateTime']>;
+  bufferTimeAfter?: Maybe<Scalars['String']>;
+  bufferTimeBefore?: Maybe<Scalars['String']>;
+  clientMutationId?: Maybe<Scalars['String']>;
+  description?: Maybe<Scalars['String']>;
+  end?: Maybe<Scalars['DateTime']>;
+  /** May contain more than one error for same field. */
+  errors?: Maybe<Array<Maybe<ErrorType>>>;
+  name?: Maybe<Scalars['String']>;
+  pk?: Maybe<Scalars['Int']>;
+  priority?: Maybe<Scalars['Int']>;
+  reserveeFirstName?: Maybe<Scalars['String']>;
+  reserveeLastName?: Maybe<Scalars['String']>;
+  reserveePhone?: Maybe<Scalars['String']>;
+  state?: Maybe<Scalars['String']>;
+};
+
 export type ReservationCreateMutationInput = {
   begin: Scalars['DateTime'];
   bufferTimeAfter?: Maybe<Scalars['String']>;
@@ -922,6 +965,7 @@ export type ReservationCreateMutationPayload = {
   reserveeFirstName?: Maybe<Scalars['String']>;
   reserveeLastName?: Maybe<Scalars['String']>;
   reserveePhone?: Maybe<Scalars['String']>;
+  state?: Maybe<Scalars['String']>;
 };
 
 /** An enumeration. */
@@ -999,7 +1043,7 @@ export type ReservationUnitByPkType = Node & {
   nextAvailableSlot?: Maybe<Scalars['DateTime']>;
   openingHours?: Maybe<OpeningHoursType>;
   pk?: Maybe<Scalars['Int']>;
-  purposes?: Maybe<Array<Maybe<PurposeType>>>;
+  purposes?: Maybe<Array<Maybe<ReservationUnitPurposeType>>>;
   requireIntroduction: Scalars['Boolean'];
   reservationUnitType?: Maybe<ReservationUnitTypeType>;
   reservations?: Maybe<Array<Maybe<ReservationType>>>;
@@ -1107,7 +1151,7 @@ export type ReservationUnitCreateMutationPayload = {
   nameFi?: Maybe<Scalars['String']>;
   nameSv?: Maybe<Scalars['String']>;
   pk?: Maybe<Scalars['Int']>;
-  purposes?: Maybe<Array<Maybe<PurposeType>>>;
+  purposes?: Maybe<Array<Maybe<ReservationUnitPurposeType>>>;
   /** Determines if introduction is required in order to reserve this reservation unit. */
   requireIntroduction?: Maybe<Scalars['Boolean']>;
   reservationUnit?: Maybe<ReservationUnitType>;
@@ -1153,6 +1197,33 @@ export type ReservationUnitImageType = {
   smallUrl?: Maybe<Scalars['String']>;
 };
 
+export type ReservationUnitPurposeType = Node & {
+  __typename?: 'ReservationUnitPurposeType';
+  /** The ID of the object. */
+  id: Scalars['ID'];
+  nameEn?: Maybe<Scalars['String']>;
+  nameFi?: Maybe<Scalars['String']>;
+  nameSv?: Maybe<Scalars['String']>;
+  pk?: Maybe<Scalars['Int']>;
+};
+
+export type ReservationUnitPurposeTypeConnection = {
+  __typename?: 'ReservationUnitPurposeTypeConnection';
+  /** Contains the nodes in this connection. */
+  edges: Array<Maybe<ReservationUnitPurposeTypeEdge>>;
+  /** Pagination data for this connection. */
+  pageInfo: PageInfo;
+};
+
+/** A Relay edge containing a `ReservationUnitPurposeType` and its cursor. */
+export type ReservationUnitPurposeTypeEdge = {
+  __typename?: 'ReservationUnitPurposeTypeEdge';
+  /** A cursor for use in pagination */
+  cursor: Scalars['String'];
+  /** The item at the end of the edge */
+  node?: Maybe<ReservationUnitPurposeType>;
+};
+
 export type ReservationUnitType = Node & {
   __typename?: 'ReservationUnitType';
   applicationRounds?: Maybe<Array<Maybe<ApplicationRoundType>>>;
@@ -1177,7 +1248,7 @@ export type ReservationUnitType = Node & {
   nameFi?: Maybe<Scalars['String']>;
   nameSv?: Maybe<Scalars['String']>;
   pk?: Maybe<Scalars['Int']>;
-  purposes?: Maybe<Array<Maybe<PurposeType>>>;
+  purposes?: Maybe<Array<Maybe<ReservationUnitPurposeType>>>;
   requireIntroduction: Scalars['Boolean'];
   reservationUnitType?: Maybe<ReservationUnitTypeType>;
   reservations?: Maybe<Array<Maybe<ReservationType>>>;
@@ -1288,7 +1359,7 @@ export type ReservationUnitUpdateMutationPayload = {
   nameFi?: Maybe<Scalars['String']>;
   nameSv?: Maybe<Scalars['String']>;
   pk?: Maybe<Scalars['Int']>;
-  purposes?: Maybe<Array<Maybe<PurposeType>>>;
+  purposes?: Maybe<Array<Maybe<ReservationUnitPurposeType>>>;
   /** Determines if introduction is required in order to reserve this reservation unit. */
   requireIntroduction?: Maybe<Scalars['Boolean']>;
   reservationUnit?: Maybe<ReservationUnitType>;
@@ -1323,6 +1394,7 @@ export type ReservationUpdateMutationInput = {
   reserveeFirstName?: Maybe<Scalars['String']>;
   reserveeLastName?: Maybe<Scalars['String']>;
   reserveePhone?: Maybe<Scalars['String']>;
+  state?: Maybe<Scalars['String']>;
 };
 
 export type ReservationUpdateMutationPayload = {
@@ -1342,6 +1414,7 @@ export type ReservationUpdateMutationPayload = {
   reserveeFirstName?: Maybe<Scalars['String']>;
   reserveeLastName?: Maybe<Scalars['String']>;
   reserveePhone?: Maybe<Scalars['String']>;
+  state?: Maybe<Scalars['String']>;
 };
 
 export type ResourceCreateMutationInput = {
@@ -1908,6 +1981,7 @@ export const UpdateReservationDocument = gql`
     reservation {
       pk
       calendarUrl
+      state
     }
     errors {
       field
@@ -2275,7 +2349,7 @@ export type UpdateReservationMutationVariables = Exact<{
 }>;
 
 
-export type UpdateReservationMutation = { __typename?: 'Mutation', updateReservation?: { __typename?: 'ReservationUpdateMutationPayload', reservation?: { __typename?: 'ReservationType', pk?: number | null | undefined, calendarUrl?: string | null | undefined } | null | undefined, errors?: Array<{ __typename?: 'ErrorType', field: string, messages: Array<string> } | null | undefined> | null | undefined } | null | undefined };
+export type UpdateReservationMutation = { __typename?: 'Mutation', updateReservation?: { __typename?: 'ReservationUpdateMutationPayload', reservation?: { __typename?: 'ReservationType', pk?: number | null | undefined, calendarUrl?: string | null | undefined, state?: string | null | undefined } | null | undefined, errors?: Array<{ __typename?: 'ErrorType', field: string, messages: Array<string> } | null | undefined> | null | undefined } | null | undefined };
 
 export type ReservationUnitQueryVariables = Exact<{
   pk: Scalars['Int'];

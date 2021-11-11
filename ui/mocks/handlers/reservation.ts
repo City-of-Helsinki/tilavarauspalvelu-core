@@ -30,6 +30,7 @@ const updateReservation = graphql.mutation<
         reservation: {
           pk: input.pk,
           calendarUrl: `http://calendarUrl/${input.pk}`,
+          state: input.state || "",
         },
       },
     })

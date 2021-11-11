@@ -18,6 +18,7 @@ export const UPDATE_RESERVATION = gql`
       reservation {
         pk
         calendarUrl
+        state
       }
       errors {
         field

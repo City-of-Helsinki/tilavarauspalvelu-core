@@ -27,7 +27,7 @@ const selectedReservationUnitQuery = graphql.query<
     contactInformationEn: null,
     contactInformationSv: null,
     id: "UmVzZXJ2YXRpb25Vbml0QnlQa1R5cGU6MzY=",
-    pk: 48,
+    pk: 1,
     nameFi: "Pukinmäen nuorisotalon keittiö FI",
     nameEn: "Pukinmäen nuorisotalon keittiö EN",
     nameSv: "Pukinmäen nuorisotalon keittiö SV",

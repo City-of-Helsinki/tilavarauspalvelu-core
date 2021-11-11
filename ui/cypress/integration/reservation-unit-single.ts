@@ -1,5 +1,6 @@
 import { addDays, addHours, addMinutes, format } from "date-fns";
 import {
+  hzNavigationBack,
   hzNavigationFwd,
   reservationSubmitButton,
   timeColumn,
@@ -81,7 +82,7 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
   Cypress.config("defaultCommandTimeout", 20000);
 
   beforeEach(() => {
-    cy.visit("/reservation-unit/single/48");
+    cy.visit("/reservation-unit/single/1");
     cy.injectAxe();
   });
 
@@ -211,7 +212,11 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
 
     cancelButton().click();
 
-    cy.url().should("contain", "/reservation-unit/single/48");
+    hzNavigationBack().should("exist");
+
+    cy.url().should("contain", "/reservation-unit/single/1");
+
+    reservationEvent().should("not.exist");
   });
 
   it("can do the reservation with form inputs", () => {
