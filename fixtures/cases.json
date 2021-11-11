@@ -35,7 +35,90 @@
         "model": "reservations.abilitygroup",
         "pk": 1,
         "fields": {
-            "name": "Keskitaso"
+            "name": "Keskitaso",
+            "name_fi": "Keskitaso",
+            "name_en": null,
+            "name_sv": null
+        }
+    },
+    {
+        "model": "reservations.recurringreservation",
+        "pk": 1,
+        "fields": {
+            "user": null,
+            "application": 1,
+            "application_event": 1,
+            "age_group": 1,
+            "ability_group": 1
+        }
+    },
+    {
+        "model": "reservations.reservation",
+        "pk": 1,
+        "fields": {
+            "reservee_first_name": "",
+            "reservee_last_name": "",
+            "reservee_phone": "",
+            "name": "",
+            "description": "",
+            "state": "created",
+            "priority": 100,
+            "user": null,
+            "begin": "2021-04-28T04:23:20.521Z",
+            "end": "2021-04-28T08:23:20.521Z",
+            "buffer_time_before": null,
+            "buffer_time_after": null,
+            "recurring_reservation": 1,
+            "num_persons": null,
+            "reservation_unit": [
+                9
+            ]
+        }
+    },
+    {
+        "model": "reservations.reservation",
+        "pk": 2,
+        "fields": {
+            "reservee_first_name": "",
+            "reservee_last_name": "",
+            "reservee_phone": "",
+            "name": "",
+            "description": "",
+            "state": "created",
+            "priority": 100,
+            "user": null,
+            "begin": "2021-04-28T04:23:20.521Z",
+            "end": "2021-04-28T06:23:20.521Z",
+            "buffer_time_before": null,
+            "buffer_time_after": null,
+            "recurring_reservation": null,
+            "num_persons": null,
+            "reservation_unit": [
+                1
+            ]
+        }
+    },
+    {
+        "model": "reservations.reservation",
+        "pk": 3,
+        "fields": {
+            "reservee_first_name": "",
+            "reservee_last_name": "",
+            "reservee_phone": "",
+            "name": "",
+            "description": "",
+            "state": "created",
+            "priority": 100,
+            "user": null,
+            "begin": "2021-12-01T01:00:00Z",
+            "end": "2021-12-01T02:00:00Z",
+            "buffer_time_before": null,
+            "buffer_time_after": null,
+            "recurring_reservation": null,
+            "num_persons": null,
+            "reservation_unit": [
+                3
+            ]
         }
     },
     {
@@ -47,9 +130,14 @@
             "name_fi": "Kitara 1",
             "name_en": null,
             "name_sv": null,
+            "description": "",
+            "description_fi": "",
+            "description_en": "",
+            "description_sv": "",
             "space": 1,
             "buffer_time_before": null,
-            "buffer_time_after": null
+            "buffer_time_after": null,
+            "is_draft": false
         }
     },
     {
@@ -61,9 +149,14 @@
             "name_fi": "Basso 1",
             "name_en": null,
             "name_sv": null,
+            "description": "",
+            "description_fi": "",
+            "description_en": "",
+            "description_sv": "",
             "space": 1,
             "buffer_time_before": null,
-            "buffer_time_after": null
+            "buffer_time_after": null,
+            "is_draft": false
         }
     },
     {
@@ -207,15 +300,23 @@
         "pk": 1,
         "fields": {
             "tprek_id": null,
+            "tprek_department_id": null,
             "name": "Töölön kirjasto",
             "name_fi": "Töölön kirjasto",
             "name_en": null,
             "name_sv": null,
             "description": "",
+            "description_fi": "",
+            "description_en": "",
+            "description_sv": "",
             "short_description": "",
+            "short_description_fi": "",
+            "short_description_en": "",
+            "short_description_sv": "",
             "web_page": "",
             "email": "",
-            "phone": ""
+            "phone": "",
+            "hauki_resource_id": null
         }
     },
     {
@@ -223,15 +324,23 @@
         "pk": 2,
         "fields": {
             "tprek_id": null,
+            "tprek_department_id": null,
             "name": "Helsingin keskustakirjasto Oodi",
             "name_fi": "Helsingin keskustakirjasto Oodi",
             "name_en": null,
             "name_sv": null,
             "description": "",
+            "description_fi": "",
+            "description_en": "",
+            "description_sv": "",
             "short_description": "",
+            "short_description_fi": "",
+            "short_description_en": "",
+            "short_description_sv": "",
             "web_page": "",
             "email": "",
-            "phone": ""
+            "phone": "",
+            "hauki_resource_id": null
         }
     },
     {
@@ -239,15 +348,23 @@
         "pk": 3,
         "fields": {
             "tprek_id": null,
+            "tprek_department_id": null,
             "name": "Fredriksbergin talo",
             "name_fi": "Fredriksbergin talo",
             "name_en": null,
             "name_sv": null,
             "description": "",
+            "description_fi": "",
+            "description_en": "",
+            "description_sv": "",
             "short_description": "",
+            "short_description_fi": "",
+            "short_description_en": "",
+            "short_description_sv": "",
             "web_page": "",
             "email": "",
-            "phone": ""
+            "phone": "",
+            "hauki_resource_id": null
         }
     },
     {
@@ -255,15 +372,23 @@
         "pk": 4,
         "fields": {
             "tprek_id": null,
+            "tprek_department_id": null,
             "name": "Ympyrätalo",
             "name_fi": "Ympyrätalo",
             "name_en": null,
             "name_sv": null,
             "description": "",
+            "description_fi": "",
+            "description_en": "",
+            "description_sv": "",
             "short_description": "",
+            "short_description_fi": "",
+            "short_description_en": "",
+            "short_description_sv": "",
             "web_page": "",
             "email": "",
-            "phone": ""
+            "phone": "",
+            "hauki_resource_id": null
         }
     },
     {
@@ -271,6 +396,9 @@
         "pk": 1,
         "fields": {
             "name": "Fredriksbergin 2-talo",
+            "name_fi": "Fredriksbergin 2-talo",
+            "name_en": null,
+            "name_sv": null,
             "district": null,
             "real_estate": null,
             "surface_area": null
@@ -281,6 +409,9 @@
         "pk": 2,
         "fields": {
             "name": "Töölön kirjasto",
+            "name_fi": "Töölön kirjasto",
+            "name_en": null,
+            "name_sv": null,
             "district": 1,
             "real_estate": null,
             "surface_area": null
@@ -291,6 +422,9 @@
         "pk": 3,
         "fields": {
             "name": "Oodin kirjasto",
+            "name_fi": "Oodin kirjasto",
+            "name_en": null,
+            "name_sv": null,
             "district": 2,
             "real_estate": null,
             "surface_area": null
@@ -301,6 +435,9 @@
         "pk": 18,
         "fields": {
             "name": "Ympyrätalo",
+            "name_fi": "Ympyrätalo",
+            "name_en": null,
+            "name_sv": null,
             "district": 8,
             "real_estate": null,
             "surface_area": "2000.00"
@@ -320,6 +457,11 @@
             "unit": null,
             "surface_area": null,
             "max_persons": 20,
+            "code": "",
+            "terms_of_use": "",
+            "terms_of_use_fi": "",
+            "terms_of_use_en": "",
+            "terms_of_use_sv": "",
             "lft": 1,
             "rght": 10,
             "tree_id": 1,
@@ -340,6 +482,11 @@
             "unit": null,
             "surface_area": null,
             "max_persons": null,
+            "code": "",
+            "terms_of_use": "",
+            "terms_of_use_fi": "",
+            "terms_of_use_en": "",
+            "terms_of_use_sv": "",
             "lft": 1,
             "rght": 8,
             "tree_id": 2,
@@ -360,6 +507,11 @@
             "unit": null,
             "surface_area": null,
             "max_persons": null,
+            "code": "",
+            "terms_of_use": "",
+            "terms_of_use_fi": "",
+            "terms_of_use_en": "",
+            "terms_of_use_sv": "",
             "lft": 1,
             "rght": 4,
             "tree_id": 3,
@@ -380,6 +532,11 @@
             "unit": null,
             "surface_area": null,
             "max_persons": 33,
+            "code": "",
+            "terms_of_use": "",
+            "terms_of_use_fi": "",
+            "terms_of_use_en": "",
+            "terms_of_use_sv": "",
             "lft": 4,
             "rght": 5,
             "tree_id": 1,
@@ -400,6 +557,11 @@
             "unit": null,
             "surface_area": null,
             "max_persons": null,
+            "code": "",
+            "terms_of_use": "",
+            "terms_of_use_fi": "",
+            "terms_of_use_en": "",
+            "terms_of_use_sv": "",
             "lft": 2,
             "rght": 3,
             "tree_id": 1,
@@ -420,6 +582,11 @@
             "unit": null,
             "surface_area": null,
             "max_persons": null,
+            "code": "",
+            "terms_of_use": "",
+            "terms_of_use_fi": "",
+            "terms_of_use_en": "",
+            "terms_of_use_sv": "",
             "lft": 6,
             "rght": 7,
             "tree_id": 1,
@@ -440,6 +607,11 @@
             "unit": null,
             "surface_area": null,
             "max_persons": null,
+            "code": "",
+            "terms_of_use": "",
+            "terms_of_use_fi": "",
+            "terms_of_use_en": "",
+            "terms_of_use_sv": "",
             "lft": 2,
             "rght": 3,
             "tree_id": 2,
@@ -460,6 +632,11 @@
             "unit": null,
             "surface_area": null,
             "max_persons": null,
+            "code": "",
+            "terms_of_use": "",
+            "terms_of_use_fi": "",
+            "terms_of_use_en": "",
+            "terms_of_use_sv": "",
             "lft": 4,
             "rght": 5,
             "tree_id": 2,
@@ -480,6 +657,11 @@
             "unit": null,
             "surface_area": null,
             "max_persons": null,
+            "code": "",
+            "terms_of_use": "",
+            "terms_of_use_fi": "",
+            "terms_of_use_en": "",
+            "terms_of_use_sv": "",
             "lft": 6,
             "rght": 7,
             "tree_id": 2,
@@ -500,6 +682,11 @@
             "unit": null,
             "surface_area": null,
             "max_persons": null,
+            "code": "",
+            "terms_of_use": "",
+            "terms_of_use_fi": "",
+            "terms_of_use_en": "",
+            "terms_of_use_sv": "",
             "lft": 2,
             "rght": 3,
             "tree_id": 3,
@@ -520,6 +707,11 @@
             "unit": null,
             "surface_area": null,
             "max_persons": null,
+            "code": "",
+            "terms_of_use": "",
+            "terms_of_use_fi": "",
+            "terms_of_use_en": "",
+            "terms_of_use_sv": "",
             "lft": 8,
             "rght": 9,
             "tree_id": 1,
@@ -540,6 +732,11 @@
             "unit": null,
             "surface_area": "50.00",
             "max_persons": 10,
+            "code": "",
+            "terms_of_use": "",
+            "terms_of_use_fi": "",
+            "terms_of_use_en": "",
+            "terms_of_use_sv": "",
             "lft": 1,
             "rght": 2,
             "tree_id": 4,
@@ -551,8 +748,14 @@
         "pk": 1,
         "fields": {
             "address_street": "Jokukatu 5",
+            "address_street_fi": "Jokukatu 5",
+            "address_street_en": null,
+            "address_street_sv": null,
             "address_zip": "02600",
             "address_city": "Helsinki",
+            "address_city_fi": "Helsinki",
+            "address_city_en": null,
+            "address_city_sv": null,
             "space": 1,
             "building": null,
             "real_estate": null,
@@ -565,8 +768,14 @@
         "pk": 4,
         "fields": {
             "address_street": "Jokukatu 5",
+            "address_street_fi": "Jokukatu 5",
+            "address_street_en": null,
+            "address_street_sv": null,
             "address_zip": "02600",
             "address_city": "Helsinki",
+            "address_city_fi": "Helsinki",
+            "address_city_en": null,
+            "address_city_sv": null,
             "space": null,
             "building": 18,
             "real_estate": null,
@@ -579,8 +788,14 @@
         "pk": 5,
         "fields": {
             "address_street": "Jokukatu 5",
+            "address_street_fi": "Jokukatu 5",
+            "address_street_en": null,
+            "address_street_sv": null,
             "address_zip": "02600",
             "address_city": "Helsinki",
+            "address_city_fi": "Helsinki",
+            "address_city_en": null,
+            "address_city_sv": null,
             "space": 36,
             "building": null,
             "real_estate": null,
@@ -593,8 +808,14 @@
         "pk": 6,
         "fields": {
             "address_street": "Siltasaarenkatu 18-20",
+            "address_street_fi": "Siltasaarenkatu 18-20",
+            "address_street_en": null,
+            "address_street_sv": null,
             "address_zip": "00530",
             "address_city": "Helsinki",
+            "address_city_fi": "Helsinki",
+            "address_city_en": null,
+            "address_city_sv": null,
             "space": null,
             "building": null,
             "real_estate": null,
@@ -607,8 +828,14 @@
         "pk": 7,
         "fields": {
             "address_street": "Konepajankuja 1",
+            "address_street_fi": "Konepajankuja 1",
+            "address_street_en": null,
+            "address_street_sv": null,
             "address_zip": "00510",
             "address_city": "Helsinki",
+            "address_city_fi": "Helsinki",
+            "address_city_en": null,
+            "address_city_sv": null,
             "space": null,
             "building": null,
             "real_estate": null,
@@ -621,8 +848,14 @@
         "pk": 8,
         "fields": {
             "address_street": "Töölönlahdenkatu 4",
+            "address_street_fi": "Töölönlahdenkatu 4",
+            "address_street_en": null,
+            "address_street_sv": null,
             "address_zip": "00100",
             "address_city": "Helsinki",
+            "address_city_fi": "Helsinki",
+            "address_city_en": null,
+            "address_city_sv": null,
             "space": null,
             "building": null,
             "real_estate": null,
@@ -635,8 +868,14 @@
         "pk": 9,
         "fields": {
             "address_street": "Topeliuksenkatu 6",
+            "address_street_fi": "Topeliuksenkatu 6",
+            "address_street_en": null,
+            "address_street_sv": null,
             "address_zip": "00250",
             "address_city": "Helsinki",
+            "address_city_fi": "Helsinki",
+            "address_city_en": null,
+            "address_city_sv": null,
             "space": null,
             "building": null,
             "real_estate": null,
@@ -674,7 +913,10 @@
         "model": "reservation_units.equipmentcategory",
         "pk": 1,
         "fields": {
-            "name": "Studiolaitteet"
+            "name": "Studiolaitteet",
+            "name_fi": "Studiolaitteet",
+            "name_en": null,
+            "name_sv": null
         }
     },
     {
@@ -682,6 +924,9 @@
         "pk": 1,
         "fields": {
             "name": "Mikseri",
+            "name_fi": "Mikseri",
+            "name_en": null,
+            "name_sv": null,
             "category": 1
         }
     },
@@ -689,14 +934,20 @@
         "model": "reservation_units.reservationunittype",
         "pk": 1,
         "fields": {
-            "name": "Äänitysstudio"
+            "name": "Äänitysstudio",
+            "name_fi": "Äänitysstudio",
+            "name_en": null,
+            "name_sv": null
         }
     },
     {
         "model": "reservation_units.reservationunittype",
         "pk": 2,
         "fields": {
-            "name": "Kokoustila"
+            "name": "Kokoustila",
+            "name_fi": "Kokoustila",
+            "name_en": null,
+            "name_sv": null
         }
     },
     {
@@ -708,13 +959,32 @@
             "name_en": null,
             "name_sv": null,
             "description": "HUOMIOITHAN SEURAAVAT ASIAT, KUN KÄYTÄT TILAA KORONAPANDEMIAN AIKANA:\r\n- lähiopastusta ei voida antaa\r\n- tilaa käytetään omalla vastuulla (tilaa ja soittimia ei desinfioida varausten välissä)\r\n- muista turvavälit\r\n- pidä huolta käsihygieniasta\r\n- niistä tai yski kertakäyttönenäliinaan\r\n- älä käytä tilaa, jos olet sairas\r\nStudio 6 on 1-3:lle henkilölle soveltuva tila soittamiseen, laulamiseen ja DJ-käyttöön. Tilasta löytyy mm. piano, DJ-laitteet, kitaravahvistin ja Djembe. Studiossa ei ole tällä hetkellä äänitysmahdollisuutta.\r\n________________________________________________________________________\r\nTilan varustelu:\r\nYamaha U3, piano\r\nTechnics SL-1210GR (2kpl), levysoittimet\r\nPioneer CDJ-2000NXS2 (2kpl), DJ CD-soittimet\r\nPioneer DJM-900NXS2, DJ-mikseri\r\nVox VT20X, kitaravahvistin\r\nAmpeg BA-115, bassovahvistin\r\nOssi Percussion Djembe\r\nSinga -karaokestreamauspalvelu\r\n________________________________________________________________________\r\nLisätietoa: oodi.kaupunkiverstas@hel.fi",
+            "description_fi": "HUOMIOITHAN SEURAAVAT ASIAT, KUN KÄYTÄT TILAA KORONAPANDEMIAN AIKANA:\r\n- lähiopastusta ei voida antaa\r\n- tilaa käytetään omalla vastuulla (tilaa ja soittimia ei desinfioida varausten välissä)\r\n- muista turvavälit\r\n- pidä huolta käsihygieniasta\r\n- niistä tai yski kertakäyttönenäliinaan\r\n- älä käytä tilaa, jos olet sairas\r\nStudio 6 on 1-3:lle henkilölle soveltuva tila soittamiseen, laulamiseen ja DJ-käyttöön. Tilasta löytyy mm. piano, DJ-laitteet, kitaravahvistin ja Djembe. Studiossa ei ole tällä hetkellä äänitysmahdollisuutta.\r\n________________________________________________________________________\r\nTilan varustelu:\r\nYamaha U3, piano\r\nTechnics SL-1210GR (2kpl), levysoittimet\r\nPioneer CDJ-2000NXS2 (2kpl), DJ CD-soittimet\r\nPioneer DJM-900NXS2, DJ-mikseri\r\nVox VT20X, kitaravahvistin\r\nAmpeg BA-115, bassovahvistin\r\nOssi Percussion Djembe\r\nSinga -karaokestreamauspalvelu\r\n________________________________________________________________________\r\nLisätietoa: oodi.kaupunkiverstas@hel.fi",
+            "description_en": "",
+            "description_sv": "",
             "reservation_unit_type": 1,
             "require_introduction": true,
             "terms_of_use": "Kirjaston varattavien tilojen yleiset käyttösäännöt:\r\n1. Varattu tila kalusteineen on vuokralaisen käytettävissä sopimuksessa määriteltynä aikana.\r\n2. Mahdollisten alkuvalmistelujen ja loppusiivouksen tulee sisältyä varattuun aikaan. Varaus laskutetaan täysiltä tunneilta.\r\n3. Peruuttamatta jääneet varaukset laskutetaan.\r\n4. Vuokraajan tulee olla täysi-ikäinen.\r\n5. Kirjastossa ei voi järjestää kursseja tai toistuvia tilaisuuksia, joista otetaan pääsy- tai osallistumismaksu (koskien myös materiaalikuluja). Yksittäisiä osallistujille maksullisia tapahtumia voi järjestää.\r\n6. Vuokrausajan päättyessä vuokraajan tulee jättää tila samaan kuntoon kuin se oli vuokrausajan alkaessa.\r\n7. Vuokraaja on korvausvelvollinen, mikäli tilan käyttäjät aiheuttavat vahinkoa kiinteistölle tai irtaimistolle. Vahingoista on ilmoitettava välittömästi kirjaston henkilökunnalle.\r\n8. Vuokrattavassa tilassa järjestettävä tilaisuus ei saa häiritä muuta kirjaston toimintaa, asiakkaita tai käyttäjiä.\r\n9. Vuokrattavassa tilassa järjestettävän tilaisuuden sisältö tai luonne ei voi olla ristiriidassa Suomen lain kanssa tai hyvän tavan vastainen.\r\n10. Kirjastolla on tarvittaessa ja harkintansa mukaan oikeus evätä vuokralaisen pääsy vuokrattavaan tilaan tai keskeyttää vuokrattavassa tilassa järjestettävä tilaisuus, mikäli ilmenee, että edellä mainittuja sääntöjä rikotaan tai on rikottu.",
+            "terms_of_use_fi": "Kirjaston varattavien tilojen yleiset käyttösäännöt:\r\n1. Varattu tila kalusteineen on vuokralaisen käytettävissä sopimuksessa määriteltynä aikana.\r\n2. Mahdollisten alkuvalmistelujen ja loppusiivouksen tulee sisältyä varattuun aikaan. Varaus laskutetaan täysiltä tunneilta.\r\n3. Peruuttamatta jääneet varaukset laskutetaan.\r\n4. Vuokraajan tulee olla täysi-ikäinen.\r\n5. Kirjastossa ei voi järjestää kursseja tai toistuvia tilaisuuksia, joista otetaan pääsy- tai osallistumismaksu (koskien myös materiaalikuluja). Yksittäisiä osallistujille maksullisia tapahtumia voi järjestää.\r\n6. Vuokrausajan päättyessä vuokraajan tulee jättää tila samaan kuntoon kuin se oli vuokrausajan alkaessa.\r\n7. Vuokraaja on korvausvelvollinen, mikäli tilan käyttäjät aiheuttavat vahinkoa kiinteistölle tai irtaimistolle. Vahingoista on ilmoitettava välittömästi kirjaston henkilökunnalle.\r\n8. Vuokrattavassa tilassa järjestettävä tilaisuus ei saa häiritä muuta kirjaston toimintaa, asiakkaita tai käyttäjiä.\r\n9. Vuokrattavassa tilassa järjestettävän tilaisuuden sisältö tai luonne ei voi olla ristiriidassa Suomen lain kanssa tai hyvän tavan vastainen.\r\n10. Kirjastolla on tarvittaessa ja harkintansa mukaan oikeus evätä vuokralaisen pääsy vuokrattavaan tilaan tai keskeyttää vuokrattavassa tilassa järjestettävä tilaisuus, mikäli ilmenee, että edellä mainittuja sääntöjä rikotaan tai on rikottu.",
+            "terms_of_use_en": null,
+            "terms_of_use_sv": null,
             "unit": 2,
+            "contact_information": "",
+            "contact_information_fi": "",
+            "contact_information_en": "",
+            "contact_information_sv": "",
+            "max_reservation_duration": null,
+            "min_reservation_duration": null,
+            "uuid": "3bc5b647-8821-412b-89ce-2f9e88dc7d45",
+            "is_draft": false,
+            "max_persons": null,
+            "surface_area": null,
+            "buffer_time_between_reservations": null,
+            "hauki_resource_id": null,
             "spaces": [
                 4
             ],
+            "keyword_groups": [],
             "resources": [
                 1,
                 2
@@ -737,13 +1007,32 @@
             "name_en": null,
             "name_sv": null,
             "description": "HUOMIOITHAN SEURAAVAT ASIAT, KUN KÄYTÄT TILAA KORONAPANDEMIAN AIKANA:\r\n- lähiopastusta ei voida antaa\r\n- tilaa käytetään omalla vastuulla (tilaa ja soittimia ei desinfioida varausten välissä)\r\n- muista turvavälit\r\n- pidä huolta käsihygieniasta\r\n- niistä tai yski kertakäyttönenäliinaan\r\n- älä käytä tilaa, jos olet sairas\r\nStudio 6 on 1-3:lle henkilölle soveltuva tila soittamiseen, laulamiseen ja DJ-käyttöön. Tilasta löytyy mm. piano, DJ-laitteet, kitaravahvistin ja Djembe. Studiossa ei ole tällä hetkellä äänitysmahdollisuutta.\r\n________________________________________________________________________\r\nTilan varustelu:\r\nYamaha U3, piano\r\nTechnics SL-1210GR (2kpl), levysoittimet\r\nPioneer CDJ-2000NXS2 (2kpl), DJ CD-soittimet\r\nPioneer DJM-900NXS2, DJ-mikseri\r\nVox VT20X, kitaravahvistin\r\nAmpeg BA-115, bassovahvistin\r\nOssi Percussion Djembe\r\nSinga -karaokestreamauspalvelu\r\n________________________________________________________________________\r\nLisätietoa: oodi.kaupunkiverstas@hel.fi",
+            "description_fi": "HUOMIOITHAN SEURAAVAT ASIAT, KUN KÄYTÄT TILAA KORONAPANDEMIAN AIKANA:\r\n- lähiopastusta ei voida antaa\r\n- tilaa käytetään omalla vastuulla (tilaa ja soittimia ei desinfioida varausten välissä)\r\n- muista turvavälit\r\n- pidä huolta käsihygieniasta\r\n- niistä tai yski kertakäyttönenäliinaan\r\n- älä käytä tilaa, jos olet sairas\r\nStudio 6 on 1-3:lle henkilölle soveltuva tila soittamiseen, laulamiseen ja DJ-käyttöön. Tilasta löytyy mm. piano, DJ-laitteet, kitaravahvistin ja Djembe. Studiossa ei ole tällä hetkellä äänitysmahdollisuutta.\r\n________________________________________________________________________\r\nTilan varustelu:\r\nYamaha U3, piano\r\nTechnics SL-1210GR (2kpl), levysoittimet\r\nPioneer CDJ-2000NXS2 (2kpl), DJ CD-soittimet\r\nPioneer DJM-900NXS2, DJ-mikseri\r\nVox VT20X, kitaravahvistin\r\nAmpeg BA-115, bassovahvistin\r\nOssi Percussion Djembe\r\nSinga -karaokestreamauspalvelu\r\n________________________________________________________________________\r\nLisätietoa: oodi.kaupunkiverstas@hel.fi",
+            "description_en": "",
+            "description_sv": "",
             "reservation_unit_type": 1,
             "require_introduction": true,
             "terms_of_use": "Kirjaston varattavien tilojen yleiset käyttösäännöt:\r\n1. Varattu tila kalusteineen on vuokralaisen käytettävissä sopimuksessa määriteltynä aikana.\r\n2. Mahdollisten alkuvalmistelujen ja loppusiivouksen tulee sisältyä varattuun aikaan. Varaus laskutetaan täysiltä tunneilta.\r\n3. Peruuttamatta jääneet varaukset laskutetaan.\r\n4. Vuokraajan tulee olla täysi-ikäinen.\r\n5. Kirjastossa ei voi järjestää kursseja tai toistuvia tilaisuuksia, joista otetaan pääsy- tai osallistumismaksu (koskien myös materiaalikuluja). Yksittäisiä osallistujille maksullisia tapahtumia voi järjestää.\r\n6. Vuokrausajan päättyessä vuokraajan tulee jättää tila samaan kuntoon kuin se oli vuokrausajan alkaessa.\r\n7. Vuokraaja on korvausvelvollinen, mikäli tilan käyttäjät aiheuttavat vahinkoa kiinteistölle tai irtaimistolle. Vahingoista on ilmoitettava välittömästi kirjaston henkilökunnalle.\r\n8. Vuokrattavassa tilassa järjestettävä tilaisuus ei saa häiritä muuta kirjaston toimintaa, asiakkaita tai käyttäjiä.\r\n9. Vuokrattavassa tilassa järjestettävän tilaisuuden sisältö tai luonne ei voi olla ristiriidassa Suomen lain kanssa tai hyvän tavan vastainen.\r\n10. Kirjastolla on tarvittaessa ja harkintansa mukaan oikeus evätä vuokralaisen pääsy vuokrattavaan tilaan tai keskeyttää vuokrattavassa tilassa järjestettävä tilaisuus, mikäli ilmenee, että edellä mainittuja sääntöjä rikotaan tai on rikottu.",
+            "terms_of_use_fi": "Kirjaston varattavien tilojen yleiset käyttösäännöt:\r\n1. Varattu tila kalusteineen on vuokralaisen käytettävissä sopimuksessa määriteltynä aikana.\r\n2. Mahdollisten alkuvalmistelujen ja loppusiivouksen tulee sisältyä varattuun aikaan. Varaus laskutetaan täysiltä tunneilta.\r\n3. Peruuttamatta jääneet varaukset laskutetaan.\r\n4. Vuokraajan tulee olla täysi-ikäinen.\r\n5. Kirjastossa ei voi järjestää kursseja tai toistuvia tilaisuuksia, joista otetaan pääsy- tai osallistumismaksu (koskien myös materiaalikuluja). Yksittäisiä osallistujille maksullisia tapahtumia voi järjestää.\r\n6. Vuokrausajan päättyessä vuokraajan tulee jättää tila samaan kuntoon kuin se oli vuokrausajan alkaessa.\r\n7. Vuokraaja on korvausvelvollinen, mikäli tilan käyttäjät aiheuttavat vahinkoa kiinteistölle tai irtaimistolle. Vahingoista on ilmoitettava välittömästi kirjaston henkilökunnalle.\r\n8. Vuokrattavassa tilassa järjestettävä tilaisuus ei saa häiritä muuta kirjaston toimintaa, asiakkaita tai käyttäjiä.\r\n9. Vuokrattavassa tilassa järjestettävän tilaisuuden sisältö tai luonne ei voi olla ristiriidassa Suomen lain kanssa tai hyvän tavan vastainen.\r\n10. Kirjastolla on tarvittaessa ja harkintansa mukaan oikeus evätä vuokralaisen pääsy vuokrattavaan tilaan tai keskeyttää vuokrattavassa tilassa järjestettävä tilaisuus, mikäli ilmenee, että edellä mainittuja sääntöjä rikotaan tai on rikottu.",
+            "terms_of_use_en": null,
+            "terms_of_use_sv": null,
             "unit": 2,
+            "contact_information": "",
+            "contact_information_fi": "",
+            "contact_information_en": "",
+            "contact_information_sv": "",
+            "max_reservation_duration": null,
+            "min_reservation_duration": null,
+            "uuid": "9642f5ac-ec4e-43b0-9134-24be91a859db",
+            "is_draft": false,
+            "max_persons": null,
+            "surface_area": null,
+            "buffer_time_between_reservations": null,
+            "hauki_resource_id": null,
             "spaces": [
                 1
             ],
+            "keyword_groups": [],
             "resources": [],
             "services": [
                 2
@@ -763,21 +1052,37 @@
             "name_en": null,
             "name_sv": null,
             "description": "Mika Waltari -sali kirjaston 4. kerroksessa on vuokrattavissa sekä kokouksia että erilaisia tilaisuuk­sia ja tapahtumia varten. Mika Waltari -salissa on tilaa yhteensä sadalle hengelle. Tilan yhteydessä on keittiö. Salissa on Helsingin kaupungin langaton verkkoyhteys Stadinetti sekä data­projektori, langaton ClickShare-kuvansiirtojärjestelmä, kaiuttimet ja lehtiötaulu. Mika Waltari -sali on tarkoitettu lähinnä eri­laisten järjestöjen, yhdistys­ten ja muiden pienryhmien ei-kaupalliseen käyttöön, enintään kahdek­san tunnin ajaksi. Tilan vuokra on 40€/100 € alkavalta tunnilta. Mikäli tilassa halutaan järjestää avoin yleisötilai­suus yhteistyössä kirjas­ton kanssa, tulee asiasta sopia sähkö­postitse toolon_kirjasto@hel.fi",
+            "description_fi": "Mika Waltari -sali kirjaston 4. kerroksessa on vuokrattavissa sekä kokouksia että erilaisia tilaisuuk­sia ja tapahtumia varten. Mika Waltari -salissa on tilaa yhteensä sadalle hengelle. Tilan yhteydessä on keittiö. Salissa on Helsingin kaupungin langaton verkkoyhteys Stadinetti sekä data­projektori, langaton ClickShare-kuvansiirtojärjestelmä, kaiuttimet ja lehtiötaulu. Mika Waltari -sali on tarkoitettu lähinnä eri­laisten järjestöjen, yhdistys­ten ja muiden pienryhmien ei-kaupalliseen käyttöön, enintään kahdek­san tunnin ajaksi. Tilan vuokra on 40€/100 € alkavalta tunnilta. Mikäli tilassa halutaan järjestää avoin yleisötilai­suus yhteistyössä kirjas­ton kanssa, tulee asiasta sopia sähkö­postitse toolon_kirjasto@hel.fi",
+            "description_en": "",
+            "description_sv": "",
             "reservation_unit_type": 2,
             "require_introduction": false,
             "terms_of_use": "Kirjaston varattavien tilojen yleiset käyttösäännöt:\r\n1. Varattu tila kalusteineen on vuokralaisen käytettävissä sopimuksessa määriteltynä aikana.\r\n2. Mahdollisten alkuvalmistelujen ja loppusiivouksen tulee sisältyä varattuun aikaan. Varaus laskutetaan täysiltä tunneilta.\r\n3. Peruuttamatta jääneet varaukset laskutetaan.\r\n4. Vuokraajan tulee olla täysi-ikäinen.\r\n5. Kirjastossa ei voi järjestää kursseja tai toistuvia tilaisuuksia, joista otetaan pääsy- tai osallistumismaksu (koskien myös materiaalikuluja). Yksittäisiä osallistujille maksullisia tapahtumia voi järjestää.\r\n6. Vuokrausajan päättyessä vuokraajan tulee jättää tila samaan kuntoon kuin se oli vuokrausajan alkaessa.\r\n7. Vuokraaja on korvausvelvollinen, mikäli tilan käyttäjät aiheuttavat vahinkoa kiinteistölle tai irtaimistolle. Vahingoista on ilmoitettava välittömästi kirjaston henkilökunnalle.\r\n8. Vuokrattavassa tilassa järjestettävä tilaisuus ei saa häiritä muuta kirjaston toimintaa, asiakkaita tai käyttäjiä.\r\n9. Vuokrattavassa tilassa järjestettävän tilaisuuden sisältö tai luonne ei voi olla ristiriidassa Suomen lain kanssa tai hyvän tavan vastainen.\r\n10. Kirjastolla on tarvittaessa ja harkintansa mukaan oikeus evätä vuokralaisen pääsy vuokrattavaan tilaan tai keskeyttää vuokrattavassa tilassa järjestettävä tilaisuus, mikäli ilmenee, että edellä mainittuja sääntöjä rikotaan tai on rikottu.",
+            "terms_of_use_fi": "Kirjaston varattavien tilojen yleiset käyttösäännöt:\r\n1. Varattu tila kalusteineen on vuokralaisen käytettävissä sopimuksessa määriteltynä aikana.\r\n2. Mahdollisten alkuvalmistelujen ja loppusiivouksen tulee sisältyä varattuun aikaan. Varaus laskutetaan täysiltä tunneilta.\r\n3. Peruuttamatta jääneet varaukset laskutetaan.\r\n4. Vuokraajan tulee olla täysi-ikäinen.\r\n5. Kirjastossa ei voi järjestää kursseja tai toistuvia tilaisuuksia, joista otetaan pääsy- tai osallistumismaksu (koskien myös materiaalikuluja). Yksittäisiä osallistujille maksullisia tapahtumia voi järjestää.\r\n6. Vuokrausajan päättyessä vuokraajan tulee jättää tila samaan kuntoon kuin se oli vuokrausajan alkaessa.\r\n7. Vuokraaja on korvausvelvollinen, mikäli tilan käyttäjät aiheuttavat vahinkoa kiinteistölle tai irtaimistolle. Vahingoista on ilmoitettava välittömästi kirjaston henkilökunnalle.\r\n8. Vuokrattavassa tilassa järjestettävä tilaisuus ei saa häiritä muuta kirjaston toimintaa, asiakkaita tai käyttäjiä.\r\n9. Vuokrattavassa tilassa järjestettävän tilaisuuden sisältö tai luonne ei voi olla ristiriidassa Suomen lain kanssa tai hyvän tavan vastainen.\r\n10. Kirjastolla on tarvittaessa ja harkintansa mukaan oikeus evätä vuokralaisen pääsy vuokrattavaan tilaan tai keskeyttää vuokrattavassa tilassa järjestettävä tilaisuus, mikäli ilmenee, että edellä mainittuja sääntöjä rikotaan tai on rikottu.",
+            "terms_of_use_en": null,
+            "terms_of_use_sv": null,
             "unit": 1,
+            "contact_information": "",
+            "contact_information_fi": "",
+            "contact_information_en": "",
+            "contact_information_sv": "",
+            "max_reservation_duration": null,
+            "min_reservation_duration": null,
+            "uuid": "c64aa1f0-2a07-4d7c-ac94-71c3a2cb44e9",
+            "is_draft": false,
+            "max_persons": null,
+            "surface_area": null,
+            "buffer_time_between_reservations": null,
+            "hauki_resource_id": null,
             "spaces": [
                 7
             ],
+            "keyword_groups": [],
             "resources": [],
             "services": [
                 1
             ],
-            "purposes": [
-                2,
-                4
-            ],
+            "purposes": [],
             "equipments": []
         }
     },
@@ -790,21 +1095,37 @@
             "name_en": null,
             "name_sv": null,
             "description": "Mika Waltari -salissa, kirjaston suurimmassa tilassa, järjestetään paljon eri­laisia tapahtu­mia ja tilai­suuk­sia. Salia vuokrataan myöskin mm. erilaisten järjestöjen ja yhdistys­ten käyttöön.",
+            "description_fi": "Mika Waltari -salissa, kirjaston suurimmassa tilassa, järjestetään paljon eri­laisia tapahtu­mia ja tilai­suuk­sia. Salia vuokrataan myöskin mm. erilaisten järjestöjen ja yhdistys­ten käyttöön.",
+            "description_en": "",
+            "description_sv": "",
             "reservation_unit_type": 2,
             "require_introduction": false,
             "terms_of_use": "Kirjaston varattavien tilojen yleiset käyttösäännöt:\r\n1. Varattu tila kalusteineen on vuokralaisen käytettävissä sopimuksessa määriteltynä aikana.\r\n2. Mahdollisten alkuvalmistelujen ja loppusiivouksen tulee sisältyä varattuun aikaan. Varaus laskutetaan täysiltä tunneilta.\r\n3. Peruuttamatta jääneet varaukset laskutetaan.\r\n4. Vuokraajan tulee olla täysi-ikäinen.\r\n5. Kirjastossa ei voi järjestää kursseja tai toistuvia tilaisuuksia, joista otetaan pääsy- tai osallistumismaksu (koskien myös materiaalikuluja). Yksittäisiä osallistujille maksullisia tapahtumia voi järjestää.\r\n6. Vuokrausajan päättyessä vuokraajan tulee jättää tila samaan kuntoon kuin se oli vuokrausajan alkaessa.\r\n7. Vuokraaja on korvausvelvollinen, mikäli tilan käyttäjät aiheuttavat vahinkoa kiinteistölle tai irtaimistolle. Vahingoista on ilmoitettava välittömästi kirjaston henkilökunnalle.\r\n8. Vuokrattavassa tilassa järjestettävä tilaisuus ei saa häiritä muuta kirjaston toimintaa, asiakkaita tai käyttäjiä.\r\n9. Vuokrattavassa tilassa järjestettävän tilaisuuden sisältö tai luonne ei voi olla ristiriidassa Suomen lain kanssa tai hyvän tavan vastainen.\r\n10. Kirjastolla on tarvittaessa ja harkintansa mukaan oikeus evätä vuokralaisen pääsy vuokrattavaan tilaan tai keskeyttää vuokrattavassa tilassa järjestettävä tilaisuus, mikäli ilmenee, että edellä mainittuja sääntöjä rikotaan tai on rikottu.",
+            "terms_of_use_fi": "Kirjaston varattavien tilojen yleiset käyttösäännöt:\r\n1. Varattu tila kalusteineen on vuokralaisen käytettävissä sopimuksessa määriteltynä aikana.\r\n2. Mahdollisten alkuvalmistelujen ja loppusiivouksen tulee sisältyä varattuun aikaan. Varaus laskutetaan täysiltä tunneilta.\r\n3. Peruuttamatta jääneet varaukset laskutetaan.\r\n4. Vuokraajan tulee olla täysi-ikäinen.\r\n5. Kirjastossa ei voi järjestää kursseja tai toistuvia tilaisuuksia, joista otetaan pääsy- tai osallistumismaksu (koskien myös materiaalikuluja). Yksittäisiä osallistujille maksullisia tapahtumia voi järjestää.\r\n6. Vuokrausajan päättyessä vuokraajan tulee jättää tila samaan kuntoon kuin se oli vuokrausajan alkaessa.\r\n7. Vuokraaja on korvausvelvollinen, mikäli tilan käyttäjät aiheuttavat vahinkoa kiinteistölle tai irtaimistolle. Vahingoista on ilmoitettava välittömästi kirjaston henkilökunnalle.\r\n8. Vuokrattavassa tilassa järjestettävä tilaisuus ei saa häiritä muuta kirjaston toimintaa, asiakkaita tai käyttäjiä.\r\n9. Vuokrattavassa tilassa järjestettävän tilaisuuden sisältö tai luonne ei voi olla ristiriidassa Suomen lain kanssa tai hyvän tavan vastainen.\r\n10. Kirjastolla on tarvittaessa ja harkintansa mukaan oikeus evätä vuokralaisen pääsy vuokrattavaan tilaan tai keskeyttää vuokrattavassa tilassa järjestettävä tilaisuus, mikäli ilmenee, että edellä mainittuja sääntöjä rikotaan tai on rikottu.",
+            "terms_of_use_en": null,
+            "terms_of_use_sv": null,
             "unit": 1,
+            "contact_information": "",
+            "contact_information_fi": "",
+            "contact_information_en": "",
+            "contact_information_sv": "",
+            "max_reservation_duration": null,
+            "min_reservation_duration": null,
+            "uuid": "2e15ebea-4c53-45de-9432-3d9a2b34e6e6",
+            "is_draft": false,
+            "max_persons": null,
+            "surface_area": null,
+            "buffer_time_between_reservations": null,
+            "hauki_resource_id": null,
             "spaces": [
                 8
             ],
+            "keyword_groups": [],
             "resources": [],
             "services": [
                 1
             ],
-            "purposes": [
-                2,
-                4
-            ],
+            "purposes": [],
             "equipments": []
         }
     },
@@ -817,13 +1138,32 @@
             "name_en": null,
             "name_sv": null,
             "description": "Mika Waltari -salissa, kirjaston suurimmassa tilassa, järjestetään paljon eri­laisia tapahtu­mia ja tilai­suuk­sia. Salia vuokrataan myöskin mm. erilaisten järjestöjen ja yhdistys­ten käyttöön.",
+            "description_fi": "Mika Waltari -salissa, kirjaston suurimmassa tilassa, järjestetään paljon eri­laisia tapahtu­mia ja tilai­suuk­sia. Salia vuokrataan myöskin mm. erilaisten järjestöjen ja yhdistys­ten käyttöön.",
+            "description_en": "",
+            "description_sv": "",
             "reservation_unit_type": 2,
             "require_introduction": false,
             "terms_of_use": "Kirjaston varattavien tilojen yleiset käyttösäännöt:\r\n1. Varattu tila kalusteineen on vuokralaisen käytettävissä sopimuksessa määriteltynä aikana.\r\n2. Mahdollisten alkuvalmistelujen ja loppusiivouksen tulee sisältyä varattuun aikaan. Varaus laskutetaan täysiltä tunneilta.\r\n3. Peruuttamatta jääneet varaukset laskutetaan.\r\n4. Vuokraajan tulee olla täysi-ikäinen.\r\n5. Kirjastossa ei voi järjestää kursseja tai toistuvia tilaisuuksia, joista otetaan pääsy- tai osallistumismaksu (koskien myös materiaalikuluja). Yksittäisiä osallistujille maksullisia tapahtumia voi järjestää.\r\n6. Vuokrausajan päättyessä vuokraajan tulee jättää tila samaan kuntoon kuin se oli vuokrausajan alkaessa.\r\n7. Vuokraaja on korvausvelvollinen, mikäli tilan käyttäjät aiheuttavat vahinkoa kiinteistölle tai irtaimistolle. Vahingoista on ilmoitettava välittömästi kirjaston henkilökunnalle.\r\n8. Vuokrattavassa tilassa järjestettävä tilaisuus ei saa häiritä muuta kirjaston toimintaa, asiakkaita tai käyttäjiä.\r\n9. Vuokrattavassa tilassa järjestettävän tilaisuuden sisältö tai luonne ei voi olla ristiriidassa Suomen lain kanssa tai hyvän tavan vastainen.\r\n10. Kirjastolla on tarvittaessa ja harkintansa mukaan oikeus evätä vuokralaisen pääsy vuokrattavaan tilaan tai keskeyttää vuokrattavassa tilassa järjestettävä tilaisuus, mikäli ilmenee, että edellä mainittuja sääntöjä rikotaan tai on rikottu.",
+            "terms_of_use_fi": "Kirjaston varattavien tilojen yleiset käyttösäännöt:\r\n1. Varattu tila kalusteineen on vuokralaisen käytettävissä sopimuksessa määriteltynä aikana.\r\n2. Mahdollisten alkuvalmistelujen ja loppusiivouksen tulee sisältyä varattuun aikaan. Varaus laskutetaan täysiltä tunneilta.\r\n3. Peruuttamatta jääneet varaukset laskutetaan.\r\n4. Vuokraajan tulee olla täysi-ikäinen.\r\n5. Kirjastossa ei voi järjestää kursseja tai toistuvia tilaisuuksia, joista otetaan pääsy- tai osallistumismaksu (koskien myös materiaalikuluja). Yksittäisiä osallistujille maksullisia tapahtumia voi järjestää.\r\n6. Vuokrausajan päättyessä vuokraajan tulee jättää tila samaan kuntoon kuin se oli vuokrausajan alkaessa.\r\n7. Vuokraaja on korvausvelvollinen, mikäli tilan käyttäjät aiheuttavat vahinkoa kiinteistölle tai irtaimistolle. Vahingoista on ilmoitettava välittömästi kirjaston henkilökunnalle.\r\n8. Vuokrattavassa tilassa järjestettävä tilaisuus ei saa häiritä muuta kirjaston toimintaa, asiakkaita tai käyttäjiä.\r\n9. Vuokrattavassa tilassa järjestettävän tilaisuuden sisältö tai luonne ei voi olla ristiriidassa Suomen lain kanssa tai hyvän tavan vastainen.\r\n10. Kirjastolla on tarvittaessa ja harkintansa mukaan oikeus evätä vuokralaisen pääsy vuokrattavaan tilaan tai keskeyttää vuokrattavassa tilassa järjestettävä tilaisuus, mikäli ilmenee, että edellä mainittuja sääntöjä rikotaan tai on rikottu.",
+            "terms_of_use_en": null,
+            "terms_of_use_sv": null,
             "unit": 1,
+            "contact_information": "",
+            "contact_information_fi": "",
+            "contact_information_en": "",
+            "contact_information_sv": "",
+            "max_reservation_duration": null,
+            "min_reservation_duration": null,
+            "uuid": "e8271a1f-d99b-4fdd-8535-a91ac3090b02",
+            "is_draft": false,
+            "max_persons": null,
+            "surface_area": null,
+            "buffer_time_between_reservations": null,
+            "hauki_resource_id": null,
             "spaces": [
                 9
             ],
+            "keyword_groups": [],
             "resources": [],
             "services": [
                 1
@@ -841,13 +1181,32 @@
             "name_en": null,
             "name_sv": null,
             "description": "Mika Waltari -salissa, kirjaston suurimmassa tilassa, järjestetään paljon eri­laisia tapahtu­mia ja tilai­suuk­sia. Salia vuokrataan myöskin mm. erilaisten järjestöjen ja yhdistys­ten käyttöön.",
+            "description_fi": "Mika Waltari -salissa, kirjaston suurimmassa tilassa, järjestetään paljon eri­laisia tapahtu­mia ja tilai­suuk­sia. Salia vuokrataan myöskin mm. erilaisten järjestöjen ja yhdistys­ten käyttöön.",
+            "description_en": "",
+            "description_sv": "",
             "reservation_unit_type": 2,
             "require_introduction": false,
             "terms_of_use": "Kirjaston varattavien tilojen yleiset käyttösäännöt:\r\n1. Varattu tila kalusteineen on vuokralaisen käytettävissä sopimuksessa määriteltynä aikana.\r\n2. Mahdollisten alkuvalmistelujen ja loppusiivouksen tulee sisältyä varattuun aikaan. Varaus laskutetaan täysiltä tunneilta.\r\n3. Peruuttamatta jääneet varaukset laskutetaan.\r\n4. Vuokraajan tulee olla täysi-ikäinen.\r\n5. Kirjastossa ei voi järjestää kursseja tai toistuvia tilaisuuksia, joista otetaan pääsy- tai osallistumismaksu (koskien myös materiaalikuluja). Yksittäisiä osallistujille maksullisia tapahtumia voi järjestää.\r\n6. Vuokrausajan päättyessä vuokraajan tulee jättää tila samaan kuntoon kuin se oli vuokrausajan alkaessa.\r\n7. Vuokraaja on korvausvelvollinen, mikäli tilan käyttäjät aiheuttavat vahinkoa kiinteistölle tai irtaimistolle. Vahingoista on ilmoitettava välittömästi kirjaston henkilökunnalle.\r\n8. Vuokrattavassa tilassa järjestettävä tilaisuus ei saa häiritä muuta kirjaston toimintaa, asiakkaita tai käyttäjiä.\r\n9. Vuokrattavassa tilassa järjestettävän tilaisuuden sisältö tai luonne ei voi olla ristiriidassa Suomen lain kanssa tai hyvän tavan vastainen.\r\n10. Kirjastolla on tarvittaessa ja harkintansa mukaan oikeus evätä vuokralaisen pääsy vuokrattavaan tilaan tai keskeyttää vuokrattavassa tilassa järjestettävä tilaisuus, mikäli ilmenee, että edellä mainittuja sääntöjä rikotaan tai on rikottu.",
+            "terms_of_use_fi": "Kirjaston varattavien tilojen yleiset käyttösäännöt:\r\n1. Varattu tila kalusteineen on vuokralaisen käytettävissä sopimuksessa määriteltynä aikana.\r\n2. Mahdollisten alkuvalmistelujen ja loppusiivouksen tulee sisältyä varattuun aikaan. Varaus laskutetaan täysiltä tunneilta.\r\n3. Peruuttamatta jääneet varaukset laskutetaan.\r\n4. Vuokraajan tulee olla täysi-ikäinen.\r\n5. Kirjastossa ei voi järjestää kursseja tai toistuvia tilaisuuksia, joista otetaan pääsy- tai osallistumismaksu (koskien myös materiaalikuluja). Yksittäisiä osallistujille maksullisia tapahtumia voi järjestää.\r\n6. Vuokrausajan päättyessä vuokraajan tulee jättää tila samaan kuntoon kuin se oli vuokrausajan alkaessa.\r\n7. Vuokraaja on korvausvelvollinen, mikäli tilan käyttäjät aiheuttavat vahinkoa kiinteistölle tai irtaimistolle. Vahingoista on ilmoitettava välittömästi kirjaston henkilökunnalle.\r\n8. Vuokrattavassa tilassa järjestettävä tilaisuus ei saa häiritä muuta kirjaston toimintaa, asiakkaita tai käyttäjiä.\r\n9. Vuokrattavassa tilassa järjestettävän tilaisuuden sisältö tai luonne ei voi olla ristiriidassa Suomen lain kanssa tai hyvän tavan vastainen.\r\n10. Kirjastolla on tarvittaessa ja harkintansa mukaan oikeus evätä vuokralaisen pääsy vuokrattavaan tilaan tai keskeyttää vuokrattavassa tilassa järjestettävä tilaisuus, mikäli ilmenee, että edellä mainittuja sääntöjä rikotaan tai on rikottu.",
+            "terms_of_use_en": null,
+            "terms_of_use_sv": null,
             "unit": 1,
+            "contact_information": "",
+            "contact_information_fi": "",
+            "contact_information_en": "",
+            "contact_information_sv": "",
+            "max_reservation_duration": null,
+            "min_reservation_duration": null,
+            "uuid": "8cc82051-07ff-42b2-a3cb-7215c4bfdc3d",
+            "is_draft": false,
+            "max_persons": null,
+            "surface_area": null,
+            "buffer_time_between_reservations": null,
+            "hauki_resource_id": null,
             "spaces": [
                 2
             ],
+            "keyword_groups": [],
             "resources": [],
             "services": [
                 1
@@ -865,13 +1224,32 @@
             "name_en": null,
             "name_sv": null,
             "description": "Fredriksberg on elävä ja avoin kaupunkitila myös muille kuin siellä työskenteleville. Siellä on viihtyisä trendiravintola Alice Italian, joka palvelee yhtä lailla sekä toimistotalon vuokralaisia että kaikkia kaupunkilaisia. Ravintola on auki myös ilta-aikaan, mikä vilkastuttaa Fredriksbergin kulmia. B-talon ylimpään kerrokseen on avattu kesällä 2020 LoiLoi Rooftop Restaurant and Distillery. Fredriksbergin aulapalvelut on innovoitu aivan uudelle tasolle niin, että toimistotalossa työskentely on mahdollisimman helppoa ja vaivatonta. Wonderland on Fredriksbergin coworking-yhteisö, joka on uusi tapa tehdä töitä. Lyhytaikaiseen vuokraukseen tarkoitettu luova työtila on kaikkien käytössä. Lisäksi Fredriksbergistä löytyvät viihtyisät suihku- ja pukeutumistilat sekä runsaasti pyöräparkkitilaa työmatkapyöräilystä innostuneille. Sähköautot voi ladata helposti omissa latauspisteissään. Lähietäisyydellä on yli 100 ravintolaa ja palveluita tulee jatkuvasti lisää.",
+            "description_fi": "Fredriksberg on elävä ja avoin kaupunkitila myös muille kuin siellä työskenteleville. Siellä on viihtyisä trendiravintola Alice Italian, joka palvelee yhtä lailla sekä toimistotalon vuokralaisia että kaikkia kaupunkilaisia. Ravintola on auki myös ilta-aikaan, mikä vilkastuttaa Fredriksbergin kulmia. B-talon ylimpään kerrokseen on avattu kesällä 2020 LoiLoi Rooftop Restaurant and Distillery. Fredriksbergin aulapalvelut on innovoitu aivan uudelle tasolle niin, että toimistotalossa työskentely on mahdollisimman helppoa ja vaivatonta. Wonderland on Fredriksbergin coworking-yhteisö, joka on uusi tapa tehdä töitä. Lyhytaikaiseen vuokraukseen tarkoitettu luova työtila on kaikkien käytössä. Lisäksi Fredriksbergistä löytyvät viihtyisät suihku- ja pukeutumistilat sekä runsaasti pyöräparkkitilaa työmatkapyöräilystä innostuneille. Sähköautot voi ladata helposti omissa latauspisteissään. Lähietäisyydellä on yli 100 ravintolaa ja palveluita tulee jatkuvasti lisää.",
+            "description_en": "",
+            "description_sv": "",
             "reservation_unit_type": 2,
             "require_introduction": false,
             "terms_of_use": "",
+            "terms_of_use_fi": "",
+            "terms_of_use_en": null,
+            "terms_of_use_sv": null,
             "unit": 3,
+            "contact_information": "",
+            "contact_information_fi": "",
+            "contact_information_en": "",
+            "contact_information_sv": "",
+            "max_reservation_duration": null,
+            "min_reservation_duration": null,
+            "uuid": "8e5275aa-8625-4458-88b4-d5b1b2df6619",
+            "is_draft": false,
+            "max_persons": null,
+            "surface_area": null,
+            "buffer_time_between_reservations": null,
+            "hauki_resource_id": null,
             "spaces": [
                 10
             ],
+            "keyword_groups": [],
             "resources": [],
             "services": [
                 1
@@ -889,18 +1267,35 @@
             "name_en": null,
             "name_sv": null,
             "description": "",
+            "description_fi": "",
+            "description_en": "",
+            "description_sv": "",
             "reservation_unit_type": 2,
             "require_introduction": false,
             "terms_of_use": "",
+            "terms_of_use_fi": "",
+            "terms_of_use_en": null,
+            "terms_of_use_sv": null,
             "unit": 4,
+            "contact_information": "",
+            "contact_information_fi": "",
+            "contact_information_en": "",
+            "contact_information_sv": "",
+            "max_reservation_duration": null,
+            "min_reservation_duration": null,
+            "uuid": "9503a7ff-335e-4feb-8306-2f5712bfb4ad",
+            "is_draft": false,
+            "max_persons": null,
+            "surface_area": null,
+            "buffer_time_between_reservations": null,
+            "hauki_resource_id": null,
             "spaces": [
                 36
             ],
+            "keyword_groups": [],
             "resources": [],
             "services": [],
-            "purposes": [
-                4
-            ],
+            "purposes": [],
             "equipments": []
         }
     },
@@ -953,7 +1348,13 @@
             "start": "2021-01-01",
             "end": "2021-06-01",
             "name": "Alkuvuosi",
+            "name_fi": "Alkuvuosi",
+            "name_en": "",
+            "name_sv": "",
             "description": null,
+            "description_fi": null,
+            "description_en": null,
+            "description_sv": null,
             "closed": false
         }
     },
@@ -966,7 +1367,13 @@
             "start": "2020-12-18",
             "end": "2020-12-18",
             "name": "hretrthtr",
+            "name_fi": "hretrthtr",
+            "name_en": "",
+            "name_sv": "",
             "description": null,
+            "description_fi": null,
+            "description_en": null,
+            "description_sv": null,
             "closed": false
         }
     },
@@ -1061,13 +1468,6 @@
         }
     },
     {
-        "model": "applications.city",
-        "pk": 1,
-        "fields": {
-            "name": "Helsinki"
-        }
-    },
-    {
         "model": "applications.person",
         "pk": 1,
         "fields": {
@@ -1132,11 +1532,19 @@
         "pk": 1,
         "fields": {
             "name": "Kuperkeikkakamut",
+            "name_fi": "Kuperkeikkakamut",
+            "name_en": null,
+            "name_sv": null,
             "identifier": "1234567-8",
             "year_established": 1987,
             "address": null,
             "active_members": 20,
-            "core_business": ""
+            "core_business": "",
+            "core_business_fi": "",
+            "core_business_en": null,
+            "core_business_sv": null,
+            "organisation_type": "company",
+            "email": ""
         }
     },
     {
@@ -1144,11 +1552,19 @@
         "pk": 2,
         "fields": {
             "name": "Ninjat",
+            "name_fi": "Ninjat",
+            "name_en": null,
+            "name_sv": null,
             "identifier": "5346456-8",
             "year_established": 1950,
             "address": null,
             "active_members": 42,
-            "core_business": ""
+            "core_business": "",
+            "core_business_fi": "",
+            "core_business_en": null,
+            "core_business_sv": null,
+            "organisation_type": "company",
+            "email": ""
         }
     },
     {
@@ -1156,11 +1572,19 @@
         "pk": 3,
         "fields": {
             "name": "Merihaan shakkikerho",
+            "name_fi": "Merihaan shakkikerho",
+            "name_en": null,
+            "name_sv": null,
             "identifier": "2354524-2",
             "year_established": 1980,
             "address": null,
             "active_members": 3,
-            "core_business": ""
+            "core_business": "",
+            "core_business_fi": "",
+            "core_business_en": null,
+            "core_business_sv": null,
+            "organisation_type": "company",
+            "email": ""
         }
     },
     {
@@ -1188,6 +1612,9 @@
         "pk": 1,
         "fields": {
             "name": "Nuorten liikuntavuorot kevät 2021",
+            "name_fi": "Nuorten liikuntavuorot kevät 2021",
+            "name_en": null,
+            "name_sv": null,
             "target_group": "",
             "allocating": false,
             "application_period_begin": "2021-01-01T00:00:00Z",
@@ -1197,6 +1624,10 @@
             "public_display_begin": "2021-01-01T00:00:00Z",
             "public_display_end": "2021-01-31T00:00:00Z",
             "service_sector": null,
+            "criteria": "",
+            "criteria_fi": "",
+            "criteria_en": "",
+            "criteria_sv": "",
             "reservation_units": [
                 2,
                 6
@@ -1209,6 +1640,9 @@
         "pk": 2,
         "fields": {
             "name": "Toimistotilojen haku kevät 2021",
+            "name_fi": "Toimistotilojen haku kevät 2021",
+            "name_en": null,
+            "name_sv": null,
             "target_group": "",
             "allocating": false,
             "application_period_begin": "2020-12-18T08:01:01Z",
@@ -1218,6 +1652,10 @@
             "public_display_begin": "2020-12-18T00:00:00Z",
             "public_display_end": "2020-12-31T00:00:00Z",
             "service_sector": null,
+            "criteria": "",
+            "criteria_fi": "",
+            "criteria_en": "",
+            "criteria_sv": "",
             "reservation_units": [
                 6,
                 7,
@@ -1233,18 +1671,28 @@
         "model": "applications.applicationroundaggregatedata",
         "pk": 1,
         "fields": {
-            "application_round_id": 1,
             "name": "total_hour_capacity",
-            "value": 700
+            "value": 700.0,
+            "application_round": 1
         }
     },
     {
         "model": "applications.applicationroundaggregatedata",
         "pk": 2,
         "fields": {
-            "application_round_id": 1,
             "name": "total_reservation_duration",
-            "value": 70
+            "value": 70.0,
+            "application_round": 1
+        }
+    },
+    {
+        "model": "applications.city",
+        "pk": 1,
+        "fields": {
+            "name": "Helsinki",
+            "name_fi": "Helsinki",
+            "name_en": null,
+            "name_sv": null
         }
     },
     {
@@ -1252,11 +1700,19 @@
         "pk": 1,
         "fields": {
             "name": "Kori A",
-            "application_round_id": 1,
-            "purposes": [1],
-            "customer_type": ["nonprofit"],
+            "name_fi": "Kori A",
+            "name_en": null,
+            "name_sv": null,
+            "application_round": 1,
+            "must_be_main_purpose_of_applicant": false,
+            "customer_type": "[\"nonprofit\"]",
             "home_city": 1,
-            "order_number": 1
+            "allocation_percentage": 0,
+            "order_number": 1,
+            "purposes": [
+                1
+            ],
+            "age_groups": []
         }
     },
     {
@@ -1330,8 +1786,9 @@
             "application_round": 1,
             "billing_address": null,
             "cached_latest_status": "draft",
-            "created_date": "2021-03-11T00:00:00.000Z",
-            "last_modified_date": "2021-03-11T00:00:00.000Z"
+            "home_city": null,
+            "created_date": "2021-03-11T00:00:00Z",
+            "last_modified_date": "2021-03-11T00:00:00Z"
         }
     },
     {
@@ -1345,8 +1802,9 @@
             "application_round": 1,
             "billing_address": null,
             "cached_latest_status": "draft",
-            "created_date": "2021-03-11T00:00:00.000Z",
-            "last_modified_date": "2021-03-11T00:00:00.000Z"
+            "home_city": null,
+            "created_date": "2021-03-11T00:00:00Z",
+            "last_modified_date": "2021-03-11T00:00:00Z"
         }
     },
     {
@@ -1360,8 +1818,9 @@
             "application_round": 1,
             "billing_address": null,
             "cached_latest_status": "draft",
-            "created_date": "2021-03-11T00:00:00.000Z",
-            "last_modified_date": "2021-03-11T00:00:00.000Z"
+            "home_city": null,
+            "created_date": "2021-03-11T00:00:00Z",
+            "last_modified_date": "2021-03-11T00:00:00Z"
         }
     },
     {
@@ -1369,6 +1828,9 @@
         "pk": 1,
         "fields": {
             "name": "Treenivuorot",
+            "name_fi": "Treenivuorot",
+            "name_en": null,
+            "name_sv": null,
             "num_persons": 20,
             "age_group": 1,
             "ability_group": 1,
@@ -1380,7 +1842,9 @@
             "end": "2021-06-01",
             "application": 1,
             "district": 1,
-            "purpose": 1
+            "purpose": 1,
+            "uuid": "27731c95-a6ab-4af1-bec2-aacbced6c78b",
+            "declined_reservation_units": []
         }
     },
     {
@@ -1388,6 +1852,9 @@
         "pk": 2,
         "fields": {
             "name": "Trampoliinivuoro",
+            "name_fi": "Trampoliinivuoro",
+            "name_en": null,
+            "name_sv": null,
             "num_persons": 30,
             "age_group": 1,
             "ability_group": 1,
@@ -1399,7 +1866,9 @@
             "end": "2021-06-01",
             "application": 2,
             "district": 1,
-            "purpose": 1
+            "purpose": 1,
+            "uuid": "983cb0d8-7fce-449c-aebf-2a25a12d1c2b",
+            "declined_reservation_units": []
         }
     },
     {
@@ -1407,6 +1876,9 @@
         "pk": 3,
         "fields": {
             "name": "Viikkomatti",
+            "name_fi": "Viikkomatti",
+            "name_en": null,
+            "name_sv": null,
             "num_persons": 120,
             "age_group": 1,
             "ability_group": 1,
@@ -1418,7 +1890,9 @@
             "end": "2021-06-01",
             "application": 3,
             "district": 1,
-            "purpose": 1
+            "purpose": 1,
+            "uuid": "e665f8b1-ec52-4c60-95cb-821852e6dfe2",
+            "declined_reservation_units": []
         }
     },
     {
@@ -1455,80 +1929,17 @@
         }
     },
     {
-      "model": "applications.applicationeventscheduleresult",
-      "pk": 3,
-      "fields": {
-          "allocated_reservation_unit": 3,
-          "allocated_duration": "02:00:00",
-          "allocated_day": 3,
-          "allocated_begin": "15:00:00",
-          "allocated_end": "18:00:00",
-          "basket_id": 1
-      }
-    },
-    {
-        "model": "reservations.recurringreservation",
-        "pk": 1,
-        "fields": {
-            "user": null,
-            "application": 1,
-            "application_event": 1,
-            "age_group": 1,
-            "ability_group": 1
-        }
-    },
-    {
-        "model": "reservations.reservation",
-        "pk": 1,
-        "fields": {
-            "state": "created",
-            "priority": 100,
-            "user": null,
-            "begin": "2021-04-28T04:23:20.521Z",
-            "end": "2021-04-28T08:23:20.521Z",
-            "buffer_time_before": null,
-            "buffer_time_after": null,
-            "recurring_reservation": 1,
-            "num_persons": null,
-            "reservation_unit": [
-                9
-            ]
-        }
-    },
-    {
-        "model": "reservations.reservation",
-        "pk": 2,
-        "fields": {
-            "state": "created",
-            "priority": 100,
-            "user": null,
-            "begin": "2021-04-28T04:23:20.521Z",
-            "end": "2021-04-28T06:23:20.521Z",
-            "buffer_time_before": null,
-            "buffer_time_after": null,
-            "recurring_reservation": null,
-            "num_persons": null,
-            "reservation_unit": [
-                1
-            ]
-        }
-    },
-    {
-        "model": "reservations.reservation",
+        "model": "applications.applicationeventscheduleresult",
         "pk": 3,
         "fields": {
-            "state": "created",
-            "priority": 100,
-            "user": null,
-            "begin": "2021-12-01T01:00:00Z",
-            "end": "2021-12-01T02:00:00Z",
-            "buffer_time_before": null,
-            "buffer_time_after": null,
-            "recurring_reservation": null,
-            "num_persons": null,
-            "reservation_unit": [
-                3
-            ]
+            "accepted": false,
+            "declined": false,
+            "allocated_reservation_unit": 3,
+            "allocated_duration": "02:00:00",
+            "allocated_day": 3,
+            "allocated_begin": "15:00:00",
+            "allocated_end": "18:00:00",
+            "basket": 1
         }
     }
 ]
