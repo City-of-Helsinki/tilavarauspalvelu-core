@@ -5,6 +5,7 @@ import { fontMedium } from "../modules/style/typography";
 
 type Step = {
   label: string;
+  done?: boolean;
   error?: boolean;
 };
 
@@ -12,6 +13,7 @@ export type StepperHzProps = {
   steps: Step[];
   active?: number;
   bgColor?: string;
+  className?: string;
 };
 
 type StepState = "active" | "inactive" | "error" | "done";
@@ -33,7 +35,7 @@ const Wrapper = styled.div<{ $percentDone: number }>`
         var(--color-black-20) 100%
       );
     `}
-    z-index: -1;
+    z-index: 0;
   }
 
   display: flex;
@@ -44,6 +46,7 @@ const Wrapper = styled.div<{ $percentDone: number }>`
 const Rim = styled.div<{ $bgColor: string }>`
   border: 2px solid ${({ $bgColor }) => $bgColor};
   border-radius: 50%;
+  z-index: 1;
 `;
 
 const Step = styled.div<{ $state: StepState; $bgColor: string }>`
@@ -95,6 +98,7 @@ const StepperHz = ({
   steps,
   active,
   bgColor = "var(--color-white)",
+  className,
 }: StepperHzProps): JSX.Element => {
   const percentDone =
     steps.length - 1 === active
@@ -104,7 +108,7 @@ const StepperHz = ({
       : ((active + 1) / (steps.length + 1)) * 100;
 
   return (
-    <Wrapper $percentDone={percentDone} aria-hidden>
+    <Wrapper $percentDone={percentDone} aria-hidden className={className}>
       {steps.map((step, index) => {
         const numberLabel = step.label || (index + 1).toString();
         let label: string | ReactNode = numberLabel;
@@ -112,6 +116,9 @@ const StepperHz = ({
         if (step.error) {
           state = "error";
           label = <IconCross />;
+        } else if (step.done) {
+          state = "done";
+          label = <IconCheck />;
         } else if (active === index) {
           state = "active";
         } else if (active < index) {

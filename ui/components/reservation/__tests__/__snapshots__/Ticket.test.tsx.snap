@@ -3,25 +3,26 @@
 exports[`renders correctly 1`] = `
 <DocumentFragment>
   <div
-    class="Ticket__Wrapper-sc-16qon89-1 fgNrdJ"
+    class="Ticket__Wrapper-sc-16qon89-1 imynxF"
   >
     <div
-      class="Ticket__PunchHole-sc-16qon89-0 fTTSRo"
+      class="Ticket__PunchHole-sc-16qon89-0 kCZKkf"
     />
     <div
       class="Ticket__Content-sc-16qon89-2"
     >
       <h1
         class="typography__H1-sc-yczr8v-4 Ticket__Title-sc-16qon89-3 exespM cWvaak"
+        data-test="reservation__title"
       >
         Ticket title
       </h1>
       <div
-        class="Ticket__Price-sc-16qon89-6 fmmCUq"
+        class="Ticket__Price-sc-16qon89-6 iGKRoY"
       />
     </div>
     <div
-      class="Ticket__PunchHole-sc-16qon89-0 fTTSRo"
+      class="Ticket__PunchHole-sc-16qon89-0 kCZKkf"
     />
   </div>
 </DocumentFragment>
@@ -30,21 +31,22 @@ exports[`renders correctly 1`] = `
 exports[`renders correctly 2`] = `
 <DocumentFragment>
   <div
-    class="Ticket__Wrapper-sc-16qon89-1 fgNrdJ"
+    class="Ticket__Wrapper-sc-16qon89-1 imynxF"
   >
     <div
-      class="Ticket__PunchHole-sc-16qon89-0 fTTSRo"
+      class="Ticket__PunchHole-sc-16qon89-0 kCZKkf"
     />
     <div
       class="Ticket__Content-sc-16qon89-2"
     >
       <h1
         class="typography__H1-sc-yczr8v-4 Ticket__Title-sc-16qon89-3 exespM cWvaak"
+        data-test="reservation__title"
       >
         Ticket title
       </h1>
       <div
-        class="Ticket__Price-sc-16qon89-6 ktLsEj"
+        class="Ticket__Price-sc-16qon89-6 hBNSGZ"
       >
         <span
           class="typography__Strongish-sc-yczr8v-1 pEndj"
@@ -54,7 +56,7 @@ exports[`renders correctly 2`] = `
       </div>
     </div>
     <div
-      class="Ticket__PunchHole-sc-16qon89-0 fTTSRo"
+      class="Ticket__PunchHole-sc-16qon89-0 kCZKkf"
     />
   </div>
 </DocumentFragment>
@@ -63,16 +65,17 @@ exports[`renders correctly 2`] = `
 exports[`renders correctly 3`] = `
 <DocumentFragment>
   <div
-    class="Ticket__Wrapper-sc-16qon89-1 bFdlkI"
+    class="Ticket__Wrapper-sc-16qon89-1 eQvcao"
   >
     <div
-      class="Ticket__PunchHole-sc-16qon89-0 fmclZd"
+      class="Ticket__PunchHole-sc-16qon89-0 hgEUEW"
     />
     <div
       class="Ticket__Content-sc-16qon89-2"
     >
       <h1
         class="typography__H1-sc-yczr8v-4 Ticket__Title-sc-16qon89-3 exespM cWvaak"
+        data-test="reservation__title"
       >
         Backgstage huone
       </h1>
@@ -107,7 +110,7 @@ exports[`renders correctly 3`] = `
          Common:dateWithWeekday common:timeWithPrefix - common:time (common:duration)
       </div>
       <div
-        class="Ticket__Price-sc-16qon89-6 ktLsEj"
+        class="Ticket__Price-sc-16qon89-6 hBNSGZ"
       >
         <span
           class="typography__Strongish-sc-yczr8v-1 pEndj"
@@ -117,7 +120,7 @@ exports[`renders correctly 3`] = `
       </div>
     </div>
     <div
-      class="Ticket__PunchHole-sc-16qon89-0 fmclZd"
+      class="Ticket__PunchHole-sc-16qon89-0 hgEUEW"
     />
   </div>
 </DocumentFragment>

@@ -6,6 +6,7 @@ import { IconCalendar } from "hds-react";
 import { isFinite } from "lodash";
 import { H1, H2, fontMedium, Strongish } from "../../modules/style/typography";
 import { capitalize, formatDurationMinutes } from "../../modules/util";
+import { breakpoint } from "../../modules/style";
 
 export type TicketState = "incomplete" | "complete";
 
@@ -21,31 +22,58 @@ type Props = {
 
 const PunchHole = styled.div<{ $bgColor: string }>`
   &:last-of-type {
-    top: auto;
-    bottom: -30px;
+    right: -30px;
+    left: auto;
   }
 
   position: absolute;
-  width: 22px;
-  height: 40px;
-  top: -30px;
-  right: -10px;
+  width: 40px;
+  height: 22px;
+  bottom: -10px;
+  left: -30px;
   border-radius: 50%;
   z-index: 1;
   background-color: ${({ $bgColor }) => $bgColor};
+
+  @media (min-width: ${breakpoint.m}) {
+    width: 22px;
+    height: 40px;
+    top: -30px;
+    right: -10px;
+    bottom: auto;
+    left: auto;
+
+    &:last-of-type {
+      top: auto;
+      right: -10px;
+      bottom: -30px;
+    }
+  }
 `;
 
 const Wrapper = styled.div<{ $state: TicketState }>`
   &:after {
     content: "";
-    width: 60px;
-    height: 100%;
+    width: 100%;
+    height: 40px;
     position: absolute;
-    top: 0;
-    right: -60px;
+    bottom: -40px;
+    left: 0;
     background-color: inherit;
-    border-left: 2px dashed var(--color-white);
-    border-radius: 0 10px 10px 0;
+    border-radius: 0 0 10px 10px;
+    border-top: 2px dashed var(--color-white);
+
+    @media (min-width: ${breakpoint.m}) {
+      width: 60px;
+      height: 100%;
+      top: 0;
+      left: auto;
+      bottom: auto;
+      right: -60px;
+      border-top: none;
+      border-left: 2px dashed var(--color-white);
+      border-radius: 0 10px 10px 0;
+    }
   }
 
   ${({ $state }) => {
@@ -58,10 +86,18 @@ const Wrapper = styled.div<{ $state: TicketState }>`
     }
   }};
   box-sizing: border-box;
-  border-radius: 10px 0 0 10px;
+  border-radius: 10px 10px 0 0;
+  margin: 0 0 60px 0;
   padding: var(--spacing-m) var(--spacing-m);
   position: relative;
-  width: calc(100% - 60px);
+  width: 100%;
+  height: calc(100% + 40px);
+
+  @media (min-width: ${breakpoint.m}) {
+    margin: 0;
+    width: calc(100% - 60px);
+    border-radius: 10px 0 0 10px;
+  }
 `;
 
 const Content = styled.div``;
@@ -84,9 +120,13 @@ const Duration = styled.div`
 `;
 
 const Price = styled.div<{ $isFree: boolean }>`
-  margin-top: ${({ $isFree }) =>
-    $isFree ? "var(--spacing-layout-xl)" : "var(--spacing-3-xl)"};
+  margin-top: var(--spacing-m);
   margin-bottom: var(--spacing-s);
+
+  @media (min-width: ${breakpoint.m}) {
+    margin-top: ${({ $isFree }) =>
+      $isFree ? "var(--spacing-layout-xl)" : "var(--spacing-3-xl)"};
+  }
 `;
 
 const Ticket = ({
@@ -127,7 +167,7 @@ const Ticket = ({
     <Wrapper $state={state}>
       <PunchHole $bgColor={bgColor} />
       <Content>
-        <Title>{title}</Title>
+        <Title data-test="reservation__title">{title}</Title>
         {subtitle && <Subtitle>{subtitle}</Subtitle>}
         {isFinite(duration) && (
           <Duration data-test="reservation__time-range">

@@ -1,4 +1,4 @@
-name: ui-style-test
+name: ui-unit-test
 
 defaults:
   run:
@@ -8,12 +8,12 @@ on:
     branches: [main]
     paths:
       - "ui/**"
-      - ".github/workflows/ui-style-test.yml"
+      - ".github/workflows/ui-unit-test.yml"
   pull_request:
     branches: [main]
     paths:
       - "ui/**"
-      - ".github/workflows/ui-style-test.yml"
+      - ".github/workflows/ui-unit-test.yml"
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -24,8 +24,7 @@ jobs:
         uses: actions/setup-node@v2-beta
         with:
           node-version: "14"
-      - name: Run lint and style checks
+      - name: Run unit tests
         run: |
           yarn install --frozen-lockfile
-          yarn lint
-          yarn lint:css
+          yarn test

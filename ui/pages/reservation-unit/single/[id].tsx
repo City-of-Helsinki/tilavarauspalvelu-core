@@ -472,7 +472,7 @@ const ReservationUnit = ({
         <TwoColumnLayout>
           <Address reservationUnit={reservationUnit} />
           <div />
-          <Accordion heading={t("reservationUnit:termsOfUse")}>
+          <Accordion heading={t("reservationCalendar:heading.termsOfUse")}>
             <Content>
               <Sanitize html={getTranslation(reservationUnit, "termsOfUse")} />
             </Content>
