@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.utils.timezone import get_default_timezone
 from rest_framework import serializers
 
 from api.graphql.base_serializers import (
@@ -11,6 +12,8 @@ from reservation_units.utils.reservation_unit_reservation_scheduler import (
     ReservationUnitReservationScheduler,
 )
 from reservations.models import STATE_CHOICES, Reservation
+
+DEFAULT_TIMEZONE = get_default_timezone()
 
 
 class ReservationCreateSerializer(PrimaryKeySerializer):
@@ -47,6 +50,9 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
     def validate(self, data):
         begin = data.get("begin", getattr(self.instance, "begin", None))
         end = data.get("end", getattr(self.instance, "end", None))
+        begin = begin.astimezone(DEFAULT_TIMEZONE)
+        end = end.astimezone(DEFAULT_TIMEZONE)
+
         duration = end - begin
         reservation_units = data.get(
             "reservation_unit", getattr(self.instance, "reservation_unit", None)

@@ -1,7 +1,10 @@
 import graphene
 from django.conf import settings
+from django.utils.timezone import get_default_timezone
 
 from opening_hours.utils.opening_hours_client import OpeningHoursClient
+
+DEFAULT_TIMEZONE = get_default_timezone()
 
 
 class TimeSpanType(graphene.ObjectType):
@@ -16,6 +19,22 @@ class TimeSpanType(graphene.ObjectType):
     description_fi = graphene.String()
     description_en = graphene.String()
     description_sv = graphene.String()
+
+    def resolve_start_time(self, info):
+        if not self.start_time:
+            return None
+        tzinfo = self.start_time.tzinfo or DEFAULT_TIMEZONE
+        start = tzinfo.localize(self.start_time)
+
+        return start
+
+    def resolve_end_time(self, info):
+        if not self.end_time:
+            return None
+        tzinfo = self.start_time.tzinfo or DEFAULT_TIMEZONE
+        end = tzinfo.localize(self.end_time)
+
+        return end
 
 
 class PeriodType(graphene.ObjectType):
@@ -43,10 +62,20 @@ class OpeningTimesType(graphene.ObjectType):
         return self.date
 
     def resolve_start_time(self, info):
-        return self.start_time
+        if not self.start_time:
+            return None
+        tzinfo = self.start_time.tzinfo or DEFAULT_TIMEZONE
+        start = tzinfo.localize(self.start_time)
 
-    def resolve_end_Time(self, info):
-        return self.end_time
+        return start
+
+    def resolve_end_time(self, info):
+        if not self.end_time:
+            return None
+        tzinfo = self.start_time.tzinfo or DEFAULT_TIMEZONE
+        end = tzinfo.localize(self.end_time)
+
+        return end
 
     def resolve_periods(self, info, **kwargs):
         return self.periods
@@ -96,8 +125,8 @@ class OpeningHoursMixin:
                 for time in times:
                     oh = OpeningTimesType(
                         date=date,
-                        start_time=time.start_time,
-                        end_time=time.end_time,
+                        start_time=time.start_time.time(),
+                        end_time=time.end_time.time(),
                         state=time.resource_state,
                         periods=time.periods,
                     )

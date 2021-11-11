@@ -3,11 +3,16 @@ import logging
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Union
 
+import pytz
 from django.conf import settings
+from django.utils.timezone import get_default_timezone
 
 from opening_hours.enums import State
 from opening_hours.errors import HaukiConfigurationError
 from opening_hours.hauki_request import make_hauki_get_request
+
+REQUESTS_TIMEOUT = 15
+DEFAULT_TIMEZONE = get_default_timezone()
 
 logger = logging.getLogger(__name__)
 
@@ -125,8 +130,12 @@ def get_opening_hours(
 
     days_data_out = []
     for day_data_in in days_data_in["results"]:
+        timezone = pytz.timezone(
+            day_data_in.get("resource", {}).get("timezone", DEFAULT_TIMEZONE.zone)
+        )
         for opening_hours in day_data_in["opening_hours"]:
             day_data_out = {
+                "timezone": timezone,
                 "resource_id": day_data_in["resource"]["id"],
                 "origin_id": day_data_in["resource"]["origins"][0]["origin_id"],
                 "date": datetime.datetime.strptime(

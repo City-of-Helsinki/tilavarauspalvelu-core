@@ -20,6 +20,8 @@ from reservations.models import STATE_CHOICES, Reservation
 from reservations.tests.factories import ReservationFactory
 from spaces.tests.factories import SpaceFactory
 
+DEFAULT_TIMEZONE = get_default_timezone()
+
 
 @freezegun.freeze_time("2021-10-12T12:00:00Z")
 class ReservationTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCase):
@@ -33,6 +35,7 @@ class ReservationTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCase):
         resource_id = f"{settings.HAUKI_ORIGIN_ID}:{self.reservation_unit.uuid}"
         return [
             {
+                "timezone": DEFAULT_TIMEZONE,
                 "resource_id": resource_id,
                 "origin_id": str(self.reservation_unit.uuid),
                 "date": datetime.date.today(),
