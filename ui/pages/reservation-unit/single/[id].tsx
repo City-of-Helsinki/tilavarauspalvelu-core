@@ -438,6 +438,7 @@ const ReservationUnit = ({
                   resizableAccessor={({ event }: CalendarEvent) =>
                     (event.state as ReservationStateWithInitial) === "INITIAL"
                   }
+                  step={15}
                   aria-hidden
                 />
               </div>

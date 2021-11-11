@@ -14,8 +14,16 @@ test("getDurationOptions", () => {
       value: "0:30",
     },
     {
+      label: "0:45",
+      value: "0:45",
+    },
+    {
       label: "1:00",
       value: "1:00",
+    },
+    {
+      label: "1:15",
+      value: "1:15",
     },
     {
       label: "1:30",
