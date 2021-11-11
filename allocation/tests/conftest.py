@@ -13,7 +13,8 @@ from applications.models import (
     ApplicationRoundBasket,
     EventReservationUnit,
 )
-from reservation_units.models import Purpose, ReservationUnit
+from reservation_units.models import ReservationUnit
+from reservations.models import ReservationPurpose
 from spaces.models import Space
 
 
@@ -176,13 +177,13 @@ def not_matching_event_reservation_unit(
 
 
 @pytest.fixture
-def purpose() -> Purpose:
-    return Purpose.objects.create(name="Exercise")
+def purpose() -> ReservationPurpose:
+    return ReservationPurpose.objects.create(name="Exercise")
 
 
 @pytest.fixture
-def purpose2() -> Purpose:
-    return Purpose.objects.create(name="Playing sports")
+def purpose2() -> ReservationPurpose:
+    return ReservationPurpose.objects.create(name="Playing sports")
 
 
 @pytest.fixture

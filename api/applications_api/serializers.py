@@ -28,8 +28,8 @@ from applications.utils.reservation_creation import (
     create_reservations_from_allocation_results,
 )
 from permissions.helpers import can_handle_application
-from reservation_units.models import Purpose, ReservationUnit
-from reservations.models import AbilityGroup, AgeGroup
+from reservation_units.models import ReservationUnit
+from reservations.models import AbilityGroup, AgeGroup, ReservationPurpose
 
 MINIMUM_TIME = timezone.datetime(
     1970, 1, 1, 0, 0, 0, 3, timezone.get_default_timezone()
@@ -252,7 +252,7 @@ class ApplicationEventSerializer(serializers.ModelSerializer):
     )
 
     purpose_id = serializers.PrimaryKeyRelatedField(
-        queryset=Purpose.objects.all(),
+        queryset=ReservationPurpose.objects.all(),
         source="purpose",
         allow_null=True,
         help_text="Id of the use purpose for this event.",
