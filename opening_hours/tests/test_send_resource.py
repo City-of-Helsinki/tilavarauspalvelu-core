@@ -57,7 +57,7 @@ class SendResourceToHaukiTestCase(TestCase):
     def test_send(self, send_mock):
         send_mock.return_value = self.get_send_response()
         settings.HAUKI_API_URL = "themagicapiurl"
-        settings.HAUKI_SECRET = "verysecretcode"
+        settings.HAUKI_API_KEY = "verysecretcode"
         data = send_resource_to_hauki(self.resource)
         assert_that(data).is_not_none()
         assert_that(data.id).is_not_none()
@@ -81,7 +81,7 @@ class SendResourceToHaukiTestCase(TestCase):
 
         put_mock.return_value = self.get_send_response()
         settings.HAUKI_API_URL = "themagicapiurl"
-        settings.HAUKI_SECRET = "verysecretcode"
+        settings.HAUKI_API_KEY = "verysecretcode"
         data = update_hauki_resource(resource)
         assert_that(data).is_not_none()
         assert_that(data.id).is_not_none()
@@ -90,6 +90,6 @@ class SendResourceToHaukiTestCase(TestCase):
     def test_update_raises_when_no_resource_id(self, put_mock):
         put_mock.return_value = self.get_send_response()
         settings.HAUKI_API_URL = "themagicapiurl"
-        settings.HAUKI_SECRET = "verysecretcode"
+        settings.HAUKI_API_KEY = "verysecretcode"
         with self.assertRaises(ValueError):
             update_hauki_resource(self.resource)
