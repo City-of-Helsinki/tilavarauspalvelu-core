@@ -18,7 +18,7 @@ export const reservationUnitSearchHandlers = [
         edges: [
           {
             node: {
-              id: 48,
+              id: 1,
               nameFi: "Arabian nuorisotalon sali",
               nameEn: "Arabian nuorisotalon sali",
               nameSv: "Arabian nuorisotalon sali",

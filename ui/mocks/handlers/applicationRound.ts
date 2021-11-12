@@ -329,7 +329,7 @@ const applicationRounds = rest.get(
       {
         id: 5,
         name: "Arabian, Koskelan ja Pasilan nuorisotalojen vakiovuorot syksy 2021 - kevät 2022",
-        reservationUnitIds: [52, 48, 49, 50, 51, 53, 54],
+        reservationUnitIds: [52, 1, 49, 50, 51, 53, 54],
         applicationPeriodBegin: "2021-04-19T06:00:00Z",
         applicationPeriodEnd: "2021-12-30T13:00:00Z",
         reservationPeriodBegin: "2021-12-16",

@@ -243,7 +243,10 @@ const ReservationUnitReservation = ({
   profile,
 }: Props): JSX.Element => {
   const { t } = useTranslation();
-  const { reservation: reservationData } = useContext(DataContext);
+  const {
+    reservation: reservationData,
+    setReservation: setContextReservation,
+  } = useContext(DataContext);
 
   const [formStatus, setFormStatus] = useState<"pending" | "error" | "sent">(
     "pending"
@@ -266,14 +269,19 @@ const ReservationUnitReservation = ({
   useEffect(() => {
     if (!loading) {
       if (error || data?.updateReservation?.errors?.length > 0) {
-        setErrorMsg(t("reservationUnit:reservationFailed"));
+        setErrorMsg(t("reservationUnit:reservationUpdateFailed"));
       } else if (data) {
-        setReservation({
-          ...reservation,
-          calendarUrl: data?.updateReservation?.reservation?.calendarUrl,
-        });
-        setFormStatus("sent");
-        setStep(2);
+        if (data.updateReservation.reservation.state === "cancelled") {
+          setContextReservation(null);
+          router.push(`${reservationUnitSinglePrefix}/${reservationUnit.pk}`);
+        } else {
+          setReservation({
+            ...reservation,
+            calendarUrl: data?.updateReservation?.reservation?.calendarUrl,
+          });
+          setFormStatus("sent");
+          setStep(2);
+        }
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -327,6 +335,17 @@ const ReservationUnitReservation = ({
     updateReservation({
       variables: {
         input: reservation,
+      },
+    });
+  };
+
+  const cancelReservation = () => {
+    updateReservation({
+      variables: {
+        input: {
+          pk: reservationPk,
+          state: "cancelled",
+        },
       },
     });
   };
@@ -463,11 +482,9 @@ const ReservationUnitReservation = ({
                 <MediumButton
                   variant="secondary"
                   iconLeft={<IconArrowLeft />}
-                  onClick={() =>
-                    router.push(
-                      `${reservationUnitSinglePrefix}/${reservationUnit.pk}`
-                    )
-                  }
+                  onClick={() => {
+                    cancelReservation();
+                  }}
                   data-test="reservation__button--cancel"
                 >
                   {t("common:prev")}
