@@ -14,7 +14,6 @@ from .models import (
     Purpose,
     ReservationUnit,
     ReservationUnitImage,
-    ReservationUnitPurpose,
     ReservationUnitType,
 )
 
@@ -68,12 +67,6 @@ class DayPartAdmin(admin.ModelAdmin):
 @admin.register(Purpose)
 class PurposeAdmin(admin.ModelAdmin):
     model = Purpose
-    fields = ["name"]
-
-
-@admin.register(ReservationUnitPurpose)
-class ReservationUnitPurposeAdmin(admin.ModelAdmin):
-    model = ReservationUnitPurpose
     fields = ["name"]
 
 

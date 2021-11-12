@@ -4,13 +4,13 @@ import snapshottest
 from assertpy import assert_that
 
 from api.graphql.tests.base import GrapheneTestCaseBase
-from reservation_units.tests.factories import ReservationUnitPurposeFactory
+from reservations.tests.factories import ReservationPurposeFactory
 
 
-class ReservationUnitPurposeQueryTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
+class ReservationPurposeQueryTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.purpose = ReservationUnitPurposeFactory(
+        cls.purpose = ReservationPurposeFactory(
             name_fi="fi", name_sv="sv", name_en="en"
         )
 
@@ -18,7 +18,7 @@ class ReservationUnitPurposeQueryTestCase(GrapheneTestCaseBase, snapshottest.Tes
         response = self.query(
             """
             query {
-                reservationUnitPurposes {
+                reservationPurposes {
                     edges {
                         node {
                             nameFi

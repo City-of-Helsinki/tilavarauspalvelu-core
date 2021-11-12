@@ -14,8 +14,8 @@ from applications.models import (
     City,
     EventReservationUnit,
 )
-from reservation_units.models import Purpose, ReservationUnit
-from reservations.models import AgeGroup
+from reservation_units.models import ReservationUnit
+from reservations.models import AgeGroup, ReservationPurpose
 from spaces.models import Space
 
 
@@ -30,13 +30,13 @@ def disable_celery():
 
 
 @pytest.fixture
-def purpose() -> Purpose:
-    return Purpose.objects.create(name="Football")
+def purpose() -> ReservationPurpose:
+    return ReservationPurpose.objects.create(name="Football")
 
 
 @pytest.fixture
-def purpose_two() -> Purpose:
-    return Purpose.objects.create(name="Scating")
+def purpose_two() -> ReservationPurpose:
+    return ReservationPurpose.objects.create(name="Scating")
 
 
 @pytest.fixture

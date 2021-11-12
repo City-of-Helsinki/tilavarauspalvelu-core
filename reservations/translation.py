@@ -8,7 +8,7 @@ class AbilityGroupTranslationOptions(TranslationOptions):
 
 
 class ReservationPurposeTranslationOptions(TranslationOptions):
-    fields = ["custom_purpose"]
+    fields = ["name"]
 
 
 translator.register(AbilityGroup, AbilityGroupTranslationOptions)

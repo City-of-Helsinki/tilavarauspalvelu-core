@@ -59,7 +59,7 @@ class ServiceSector(models.Model):
         "Unit", verbose_name=_("Units"), related_name="service_sectors"
     )
     purposes = models.ManyToManyField(
-        "reservation_units.Purpose",
+        "reservations.ReservationPurpose",
         verbose_name=_("Purposes"),
         related_name="service_sectors",
     )

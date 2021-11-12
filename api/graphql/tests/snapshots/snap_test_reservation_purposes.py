@@ -7,9 +7,9 @@ from snapshottest import Snapshot
 
 snapshots = Snapshot()
 
-snapshots['ReservationUnitPurposeQueryTestCase::test_getting_reservation_unit_purposes 1'] = {
+snapshots['ReservationPurposeQueryTestCase::test_getting_reservation_unit_purposes 1'] = {
     'data': {
-        'reservationUnitPurposes': {
+        'reservationPurposes': {
             'edges': [
                 {
                     'node': {

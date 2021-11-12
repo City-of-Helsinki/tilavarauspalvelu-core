@@ -9,7 +9,7 @@ from applications.models import (
     ApplicationEvent,
     ApplicationRound,
 )
-from reservation_units.models import Purpose, ReservationUnit
+from reservation_units.models import ReservationUnit
 
 Q = models.Q
 User = get_user_model()
@@ -201,6 +201,14 @@ class Reservation(models.Model):
         verbose_name=_("Number of persons"), null=True, blank=True
     )
 
+    purpose = models.ForeignKey(
+        "ReservationPurpose",
+        verbose_name=_("Reservation purpose"),
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+
     def get_location_string(self):
         locations = []
         for reservation_unit in self.reservation_unit.all():
@@ -255,14 +263,7 @@ class Reservation(models.Model):
 
 
 class ReservationPurpose(models.Model):
-    reservation = models.OneToOneField(
-        Reservation, verbose_name=_("Reservation"), on_delete=models.CASCADE
-    )
-    purpose = models.ForeignKey(
-        Purpose,
-        verbose_name=_("Reservation purpose"),
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-    )
-    custom_purpose = models.TextField(verbose_name=_("Custom purpose"), blank=True)
+    name = models.CharField(max_length=200)
+
+    def __str__(self) -> str:
+        return self.name

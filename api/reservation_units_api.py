@@ -29,7 +29,6 @@ from reservation_units.models import (
     Purpose,
     ReservationUnit,
     ReservationUnitImage,
-    ReservationUnitPurpose,
     ReservationUnitType,
 )
 from reservations.models import Reservation
@@ -38,7 +37,7 @@ from spaces.models import District, Unit
 
 class ReservationUnitFilter(filters.FilterSet):
     purpose = filters.ModelMultipleChoiceFilter(
-        field_name="purposes", queryset=ReservationUnitPurpose.objects.all()
+        field_name="purposes", queryset=Purpose.objects.all()
     )
     application_round = filters.ModelMultipleChoiceFilter(
         field_name="application_rounds",
@@ -62,15 +61,6 @@ class ReservationUnitFilter(filters.FilterSet):
 class PurposeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Purpose
-        fields = [
-            "id",
-            "name",
-        ]
-
-
-class ReservationUnitPurposeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ReservationUnitPurpose
         fields = [
             "id",
             "name",
@@ -123,7 +113,7 @@ class ReservationUnitSerializer(TranslatedModelSerializer):
         many=True,
         help_text="Services included in the reservation unit as nested related objects.",
     )
-    purposes = ReservationUnitPurposeSerializer(many=True, read_only=True)
+    purposes = PurposeSerializer(many=True, read_only=True)
     images = ReservationUnitImageSerializer(
         read_only=True,
         many=True,

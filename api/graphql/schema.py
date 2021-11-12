@@ -31,7 +31,6 @@ from api.graphql.reservation_units.reservation_unit_types import (
     KeywordType,
     PurposeType,
     ReservationUnitByPkType,
-    ReservationUnitPurposeType,
     ReservationUnitType,
 )
 from api.graphql.reservations.reservation_filtersets import ReservationFilterSet
@@ -40,7 +39,10 @@ from api.graphql.reservations.reservation_mutations import (
     ReservationCreateMutation,
     ReservationUpdateMutation,
 )
-from api.graphql.reservations.reservation_types import ReservationType
+from api.graphql.reservations.reservation_types import (
+    ReservationPurposeType,
+    ReservationType,
+)
 from api.graphql.resources.resource_mutations import (
     ResourceCreateMutation,
     ResourceDeleteMutation,
@@ -64,8 +66,8 @@ from permissions.api_permissions.graphene_permissions import (
     KeywordPermission,
     PurposePermission,
     ReservationPermission,
+    ReservationPurposePermission,
     ReservationUnitPermission,
-    ReservationUnitPurposePermission,
     ResourcePermission,
     SpacePermission,
     UnitPermission,
@@ -170,9 +172,9 @@ class PurposeFilter(AuthFilter):
     )
 
 
-class ReservationUnitPurposeFilter(AuthFilter):
+class ReservationPurposeFilter(AuthFilter):
     permission_classes = (
-        (ReservationUnitPurposePermission,)
+        (ReservationPurposePermission,)
         if not settings.TMP_PERMISSIONS_DISABLED
         else (AllowAny,)
     )
@@ -214,7 +216,7 @@ class Query(graphene.ObjectType):
     keywords = KeywordFilter(KeywordType)
 
     purposes = PurposeFilter(PurposeType)
-    reservation_unit_purposes = ReservationUnitPurposeFilter(ReservationUnitPurposeType)
+    reservation_purposes = ReservationPurposeFilter(ReservationPurposeType)
 
     @check_resolver_permission(ReservationUnitPermission)
     def resolve_reservation_unit_by_pk(self, info, **kwargs):

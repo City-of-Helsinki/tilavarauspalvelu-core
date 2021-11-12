@@ -70,6 +70,7 @@
             "buffer_time_after": null,
             "recurring_reservation": 1,
             "num_persons": null,
+            "purpose": null,
             "reservation_unit": [
                 9
             ]
@@ -93,6 +94,7 @@
             "buffer_time_after": null,
             "recurring_reservation": null,
             "num_persons": null,
+            "purpose": null,
             "reservation_unit": [
                 1
             ]
@@ -116,9 +118,50 @@
             "buffer_time_after": null,
             "recurring_reservation": null,
             "num_persons": null,
+            "purpose": null,
             "reservation_unit": [
                 3
             ]
+        }
+    },
+    {
+        "model": "reservations.reservationpurpose",
+        "pk": 1,
+        "fields": {
+            "name": "Liikkua tai pelata",
+            "name_fi": "Liikkua tai pelata",
+            "name_en": null,
+            "name_sv": null
+        }
+    },
+    {
+        "model": "reservations.reservationpurpose",
+        "pk": 2,
+        "fields": {
+            "name": "Lukupiiri",
+            "name_fi": "Lukupiiri",
+            "name_en": null,
+            "name_sv": null
+        }
+    },
+    {
+        "model": "reservations.reservationpurpose",
+        "pk": 3,
+        "fields": {
+            "name": "Opastus",
+            "name_fi": "Opastus",
+            "name_en": null,
+            "name_sv": null
+        }
+    },
+    {
+        "model": "reservations.reservationpurpose",
+        "pk": 4,
+        "fields": {
+            "name": "Pitää kokous",
+            "name_fi": "Pitää kokous",
+            "name_en": null,
+            "name_sv": null
         }
     },
     {
@@ -1082,7 +1125,10 @@
             "services": [
                 1
             ],
-            "purposes": [],
+            "purposes": [
+                2,
+                4
+            ],
             "equipments": []
         }
     },
@@ -1125,7 +1171,10 @@
             "services": [
                 1
             ],
-            "purposes": [],
+            "purposes": [
+                2,
+                4
+            ],
             "equipments": []
         }
     },
@@ -1295,7 +1344,9 @@
             "keyword_groups": [],
             "resources": [],
             "services": [],
-            "purposes": [],
+            "purposes": [
+                4
+            ],
             "equipments": []
         }
     },
@@ -1303,8 +1354,8 @@
         "model": "reservation_units.purpose",
         "pk": 1,
         "fields": {
-            "name": "Liikkua tai pelata",
-            "name_fi": "Liikkua tai pelata",
+            "name": "Järjestä tapahtuma tai näytös",
+            "name_fi": "Järjestä tapahtuma tai näytös",
             "name_en": null,
             "name_sv": null
         }
@@ -1313,8 +1364,8 @@
         "model": "reservation_units.purpose",
         "pk": 2,
         "fields": {
-            "name": "Lukupiiri",
-            "name_fi": "Lukupiiri",
+            "name": "Sauno tai mökkeile",
+            "name_fi": "Sauno tai mökkeile",
             "name_en": null,
             "name_sv": null
         }
@@ -1323,8 +1374,8 @@
         "model": "reservation_units.purpose",
         "pk": 3,
         "fields": {
-            "name": "Opastus",
-            "name_fi": "Opastus",
+            "name": "Pidä kokous",
+            "name_fi": "Pidä kokous",
             "name_en": null,
             "name_sv": null
         }
@@ -1333,8 +1384,8 @@
         "model": "reservation_units.purpose",
         "pk": 4,
         "fields": {
-            "name": "Pitää kokous",
-            "name_fi": "Pitää kokous",
+            "name": "Vietä vapaa-aikaa",
+            "name_fi": "Vietä vapaa-aikaa",
             "name_en": null,
             "name_sv": null
         }

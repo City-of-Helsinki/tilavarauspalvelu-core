@@ -30,12 +30,7 @@ from permissions.models import (
     UnitRole,
     UnitRoleChoice,
 )
-from reservation_units.models import (
-    Equipment,
-    EquipmentCategory,
-    Purpose,
-    ReservationUnit,
-)
+from reservation_units.models import Equipment, EquipmentCategory, ReservationUnit
 from reservations.models import AbilityGroup, AgeGroup, Reservation, ReservationPurpose
 from resources.models import Resource
 from spaces.models import District, Location, ServiceSector, Space, Unit, UnitGroup
@@ -396,18 +391,13 @@ def sub_district(district):
 
 
 @pytest.fixture
-def purpose() -> Purpose:
-    return Purpose.objects.create(name="Exercise")
+def purpose() -> ReservationPurpose:
+    return ReservationPurpose.objects.create(name="Exercise")
 
 
 @pytest.fixture
-def purpose2() -> Purpose:
-    return Purpose.objects.create(name="Playing sports")
-
-
-@pytest.fixture
-def reservation_purpose(purpose, reservation) -> ReservationPurpose:
-    return ReservationPurpose.objects.create(purpose=purpose, reservation=reservation)
+def purpose2() -> ReservationPurpose:
+    return ReservationPurpose.objects.create(name="Playing sports")
 
 
 @pytest.fixture

@@ -9,7 +9,6 @@ from .models import (
     Period,
     Purpose,
     ReservationUnit,
-    ReservationUnitPurpose,
     ReservationUnitType,
 )
 
@@ -38,10 +37,6 @@ class PurposeTranslationOptions(TranslationOptions):
     fields = ["name"]
 
 
-class ReservationUnitPurposeTranslationOptions(TranslationOptions):
-    fields = ["name"]
-
-
 class PeriodTranslationOptions(TranslationOptions):
     fields = ["name", "description"]
 
@@ -60,7 +55,6 @@ translator.register(KeywordCategory, KeywordCategoryTranslationOptions)
 translator.register(KeywordGroup, KeywordGroupTranslationOptions)
 translator.register(Keyword, KeywordTranslationOptions)
 translator.register(Purpose, PurposeTranslationOptions)
-translator.register(ReservationUnitPurpose, ReservationUnitPurposeTranslationOptions)
 translator.register(Period, PeriodTranslationOptions)
 translator.register(Equipment, EquipmentTranslationOptions)
 translator.register(EquipmentCategory, EquipmentCategoryTranslationOptions)

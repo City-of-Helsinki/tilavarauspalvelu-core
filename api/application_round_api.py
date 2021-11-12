@@ -14,8 +14,8 @@ from applications.models import (
 )
 from permissions.api_permissions.drf_permissions import ApplicationRoundPermission
 from permissions.helpers import can_manage_service_sectors_application_rounds
-from reservation_units.models import Purpose, ReservationUnit
-from reservations.models import AgeGroup
+from reservation_units.models import ReservationUnit
+from reservations.models import AgeGroup, ReservationPurpose
 from spaces.models import ServiceSector
 
 logger = logging.getLogger(__name__)
@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 class ApplicationRoundBasketSerializer(serializers.ModelSerializer):
     purpose_ids = serializers.PrimaryKeyRelatedField(
-        queryset=Purpose.objects.all(), source="purposes", many=True
+        queryset=ReservationPurpose.objects.all(), source="purposes", many=True
     )
 
     age_group_ids = serializers.PrimaryKeyRelatedField(
@@ -80,7 +80,7 @@ class ApplicationRoundSerializer(serializers.ModelSerializer):
         queryset=ReservationUnit.objects.all(), source="reservation_units", many=True
     )
     purpose_ids = serializers.PrimaryKeyRelatedField(
-        queryset=Purpose.objects.all(), source="purposes", many=True
+        queryset=ReservationPurpose.objects.all(), source="purposes", many=True
     )
     status = serializers.ChoiceField(
         help_text="Status of this application round",

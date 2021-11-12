@@ -11,7 +11,7 @@ from reservation_units.models import ReservationUnit
 from reservation_units.utils.reservation_unit_reservation_scheduler import (
     ReservationUnitReservationScheduler,
 )
-from reservations.models import STATE_CHOICES, Reservation
+from reservations.models import STATE_CHOICES, Reservation, ReservationPurpose
 
 DEFAULT_TIMEZONE = get_default_timezone()
 
@@ -23,6 +23,9 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
         source="reservation_unit",
     )
     priority = serializers.IntegerField(required=False)
+    purpose_pk = IntegerPrimaryKeyField(
+        queryset=ReservationPurpose.objects.all(), source="purpose", allow_null=True
+    )
 
     class Meta:
         model = Reservation
@@ -40,12 +43,14 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
             "buffer_time_before",
             "buffer_time_after",
             "reservation_unit_pks",
+            "purpose_pk",
         ]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["state"].read_only = True
         self.fields["reservation_unit_pks"].write_only = True
+        self.fields["purpose_pk"].required = False
 
     def validate(self, data):
         begin = data.get("begin", getattr(self.instance, "begin", None))
@@ -182,6 +187,7 @@ class ReservationUpdateSerializer(
         self.fields["buffer_time_before"].required = False
         self.fields["buffer_time_after"].required = False
         self.fields["reservation_unit_pks"].required = False
+        self.fields["purpose_pk"].required = False
 
     def validate(self, data):
         if self.instance.state not in (STATE_CHOICES.CREATED, STATE_CHOICES.REQUESTED):

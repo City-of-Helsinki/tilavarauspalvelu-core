@@ -11,7 +11,7 @@ from permissions.helpers import (
     can_manage_equipment,
     can_manage_equipment_categories,
     can_manage_purposes,
-    can_manage_reservation_unit_purposes,
+    can_manage_reservation_purposes,
     can_manage_resources,
     can_manage_spaces,
     can_manage_units,
@@ -72,6 +72,20 @@ class ResourcePermission(BasePermission):
         return can_manage_resources(info.context.user)
 
 
+class ReservationPurposePermission(BasePermission):
+    @classmethod
+    def has_permission(cls, info: ResolveInfo) -> bool:
+        return True
+
+    @classmethod
+    def has_filter_permission(cls, info: ResolveInfo) -> bool:
+        return True
+
+    @classmethod
+    def has_mutation_permission(cls, root: Any, info: ResolveInfo, input: dict) -> bool:
+        return can_manage_reservation_purposes(info.context.user)
+
+
 class ReservationPermission(BasePermission):
     @classmethod
     def has_permission(cls, info: ResolveInfo) -> bool:
@@ -127,20 +141,6 @@ class PurposePermission(BasePermission):
     @classmethod
     def has_mutation_permission(cls, root: Any, info: ResolveInfo, input: dict) -> bool:
         return can_manage_purposes(info.context.user)
-
-
-class ReservationUnitPurposePermission(BasePermission):
-    @classmethod
-    def has_permission(cls, info: ResolveInfo) -> bool:
-        return True
-
-    @classmethod
-    def has_filter_permission(cls, info: ResolveInfo) -> bool:
-        return True
-
-    @classmethod
-    def has_mutation_permission(cls, root: Any, info: ResolveInfo, input: dict) -> bool:
-        return can_manage_reservation_unit_purposes(info.context.user)
 
 
 class AgeGroupPermission(BasePermission):

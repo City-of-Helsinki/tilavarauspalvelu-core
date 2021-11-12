@@ -385,8 +385,8 @@ def can_manage_purposes(user: User):
     return is_superuser(user) or has_general_permission(user, permission)
 
 
-def can_manage_reservation_unit_purposes(user: User):
-    permission = "can_manage_reservation_unit_purposes"
+def can_manage_reservation_purposes(user: User):
+    permission = "can_manage_reservation_purposes"
     return is_superuser(user) or has_general_permission(user, permission)
 
 

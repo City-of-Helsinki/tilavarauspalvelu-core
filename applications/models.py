@@ -19,7 +19,7 @@ from applications.utils.aggregate_data import (
     ApplicationAggregateDataCreator,
     ApplicationRoundAggregateDataCreator,
 )
-from reservation_units.models import Purpose, ReservationUnit
+from reservation_units.models import ReservationUnit
 from spaces.models import District
 from tilavarauspalvelu.utils.date_util import (
     next_or_current_matching_weekday,
@@ -283,8 +283,8 @@ class ApplicationRound(models.Model):
     )
 
     purposes = models.ManyToManyField(
-        Purpose,
-        verbose_name=_("Purposes"),
+        "reservations.ReservationPurpose",
+        verbose_name=_("Reservation purposes"),
         related_name="application_rounds",
     )
 
@@ -427,7 +427,9 @@ class ApplicationRoundBasket(CUSTOMER_TYPE_CONST, models.Model):
     )
 
     purposes = models.ManyToManyField(
-        "reservation_units.Purpose", verbose_name=_("Purposes"), blank=True
+        "reservations.ReservationPurpose",
+        verbose_name=_("Reservation purposes"),
+        blank=True,
     )
 
     must_be_main_purpose_of_applicant = models.BooleanField(
@@ -761,8 +763,8 @@ class ApplicationEvent(models.Model):
     )
 
     purpose = models.ForeignKey(
-        Purpose,
-        verbose_name=_("Purpose"),
+        "reservations.ReservationPurpose",
+        verbose_name=_("Reservation purpose"),
         on_delete=models.PROTECT,
         null=True,
         blank=False,
