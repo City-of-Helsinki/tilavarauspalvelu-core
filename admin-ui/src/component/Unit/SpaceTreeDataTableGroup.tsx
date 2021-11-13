@@ -194,14 +194,7 @@ function SpaceTreeDataTableGroup({
           <>
             <ParentRow
               key={root.pk}
-              onClick={(): void => {
-                if (cellConfig.rowLink) {
-                  const link: string = cellConfig.rowLink(root);
-                  console.log(link);
-                  // history.push(link);
-                }
-              }}
-              $clickable={!!cellConfig.rowLink}
+              $clickable={false}
               $disabled={false}
               $columnCount={cellConfig.cols.length}
             >

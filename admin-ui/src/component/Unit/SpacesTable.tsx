@@ -97,7 +97,7 @@ const renderGroup = (
     selection: number[],
     method?: "add" | "remove" | undefined
   ) => void,
-  children: any
+  children: React.ReactChild
 ): JSX.Element => (
   <SpaceTreeDataTableGroup
     cellConfig={cellConfig}

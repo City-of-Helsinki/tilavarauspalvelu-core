@@ -16,6 +16,7 @@ import {
   ApplicationRound as ApplicationRoundType,
   ApplicationRoundStatus,
   DataFilterConfig,
+  GroupedAllocationResult,
 } from "../../common/types";
 import { IngressContainer, NarrowContainer } from "../../styles/layout";
 import { InlineRowLink, breakpoints, BasicLink } from "../../styles/util";
@@ -303,7 +304,7 @@ const getCellConfig = (
 };
 
 const renderGroup = (
-  group: any,
+  group: GroupedAllocationResult,
   hasGrouping: boolean,
   cellConfig: CellConfig,
   groupIndex: number,
@@ -316,7 +317,7 @@ const renderGroup = (
     selection: number[],
     method?: "add" | "remove" | undefined
   ) => void,
-  children: any
+  children: React.ReactChild
 ): JSX.Element => (
   <RecommendationDataTableGroup
     group={group}

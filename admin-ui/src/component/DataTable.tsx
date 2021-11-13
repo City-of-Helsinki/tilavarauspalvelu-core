@@ -77,6 +77,7 @@ interface IProps {
   className?: string;
   noResultsKey?: string;
   renderGroup?: (
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     group: any,
     hasGrouping: boolean,
     cellConfig: CellConfig,
@@ -90,7 +91,7 @@ interface IProps {
       selection: number[],
       method?: "add" | "remove" | undefined
     ) => void,
-    children: any
+    children: React.ReactChild
   ) => JSX.Element;
 }
 
