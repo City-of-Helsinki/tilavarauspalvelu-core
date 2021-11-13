@@ -33,7 +33,6 @@ const ActionCol = styled.div`
 `;
 
 const GroupToggle = styled.button`
-  flex-shring: 1;
   display: flex;
   align-items: center;
   border: 0;
