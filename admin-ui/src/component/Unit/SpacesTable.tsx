@@ -71,17 +71,10 @@ const spacesAsGroups = (spaces: SpaceType[]): DataGroup[] => {
   const reconciled = buildTrees(spaces);
   const roots = reconciled.filter((e) => e.parent === null);
 
-  return roots.map((sp) => {
-    console.log(
-      "mapping",
-      sp.nameFi,
-      collectSubTree(sp).map((s) => s.nameFi)
-    );
-    return {
-      id: sp.pk as number,
-      data: collectSubTree(sp),
-    };
-  });
+  return roots.map((sp) => ({
+    id: sp.pk as number,
+    data: collectSubTree(sp),
+  }));
 };
 
 const countSubSpaces = (space: SpaceType): number =>
