@@ -39,7 +39,7 @@ def make_hauki_post_request(url: str, data: dict):
             timeout=REQUESTS_TIMEOUT,
             headers={
                 "Content-Type": "application/json",
-                "Authorization": settings.HAUKI_SECRET,
+                "Authorization": f"APIToken {settings.HAUKI_API_KEY}",
             },
         )
     except Exception as e:
@@ -67,7 +67,7 @@ def make_hauki_put_request(url: str, data: dict):
             timeout=REQUESTS_TIMEOUT,
             headers={
                 "Content-Type": "application/json",
-                "Authorization": settings.HAUKI_SECRET,
+                "Authorization": f"APIToken {settings.HAUKI_API_KEY}",
             },
         )
     except Exception as e:
