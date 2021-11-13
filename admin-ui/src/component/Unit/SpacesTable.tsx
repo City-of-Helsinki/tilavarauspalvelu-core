@@ -1,6 +1,6 @@
 import React, { useRef } from "react";
 import { IconGroup } from "hds-react";
-import { trim } from "lodash";
+import { clone, set, trim } from "lodash";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { FetchResult, useMutation } from "@apollo/client";
@@ -18,6 +18,8 @@ import {
   SpaceType,
   UnitByPkType,
 } from "../../common/gql-types";
+import { DataGroup } from "../../common/types";
+import SpaceTreeDataTableGroup from "./SpaceTreeDataTableGroup";
 
 interface IProps {
   spaces: SpaceType[];
@@ -47,6 +49,80 @@ const Prop = styled.div`
 const MaxPersons = styled.div`
   display: flex;
 `;
+
+const buildTrees = (spaces: SpaceType[]): SpaceType[] => {
+  const editedSpaces = spaces.map(clone);
+  editedSpaces.forEach((s) => {
+    const parent = editedSpaces.find((ps) => ps.pk === s.parent?.pk);
+    if (parent) {
+      set(s, "parent", parent);
+      set(parent, "children", (parent.children || []).concat(s));
+    }
+  });
+  return editedSpaces;
+};
+
+const collectSubTree = (space: SpaceType): SpaceType[] => {
+  const children = (space.children as SpaceType[]) || [];
+  return [space].concat(children.flatMap((c) => collectSubTree(c)));
+};
+
+const spacesAsGroups = (spaces: SpaceType[]): DataGroup[] => {
+  const reconciled = buildTrees(spaces);
+  const roots = reconciled.filter((e) => e.parent === null);
+
+  return roots.map((sp) => {
+    console.log(
+      "mapping",
+      sp.nameFi,
+      collectSubTree(sp).map((s) => s.nameFi)
+    );
+    return {
+      id: sp.pk as number,
+      data: collectSubTree(sp),
+    };
+  });
+};
+
+const countSubSpaces = (space: SpaceType): number =>
+  (space.children || []).reduce(
+    (p, c) => p + 1 + (c ? countSubSpaces(c) : 0),
+    0
+  );
+
+const renderGroup = (
+  group: { data: SpaceType[] },
+  hasGrouping: boolean,
+  cellConfig: CellConfig,
+  groupIndex: number,
+  groupVisibility: boolean[],
+  setGroupVisibility: React.Dispatch<React.SetStateAction<boolean[]>>,
+  isSelectionActive: boolean,
+  groupRows: number[],
+  selectedRows: number[],
+  updateSelection: (
+    selection: number[],
+    method?: "add" | "remove" | undefined
+  ) => void,
+  children: any
+): JSX.Element => (
+  <SpaceTreeDataTableGroup
+    cellConfig={cellConfig}
+    group={group}
+    hasGrouping={hasGrouping}
+    key={group.data[0].pk || "group"}
+    cols={cellConfig.cols.length}
+    index={groupIndex}
+    isVisible={groupVisibility[groupIndex]}
+    toggleGroupVisibility={(): void => {
+      const tempGroupVisibility = [...groupVisibility];
+      tempGroupVisibility[groupIndex] = !tempGroupVisibility[groupIndex];
+      setGroupVisibility(tempGroupVisibility);
+    }}
+  >
+    {children}
+  </SpaceTreeDataTableGroup>
+);
 
 const SpacesTable = ({
   spaces,
@@ -82,9 +158,9 @@ const SpacesTable = ({
       {
         title: "Unit.headings.name",
         key: `name.${i18n.language}`,
-        transform: ({ nameFi }: SpaceType) => (
-          <Name>{trim(nameFi as string)}</Name>
-        ),
+        transform: (space) => {
+          return <Name>{trim(space.nameFi as string)}</Name>;
+        },
       },
       {
         title: "Unit.headings.code",
@@ -94,7 +170,10 @@ const SpacesTable = ({
       {
         title: "Unit.headings.numSubSpaces",
         key: "numSubSpaces",
-        transform: () => 1,
+        transform: (space) => {
+          const count = countSubSpaces(space);
+          return `${count} ${t("SpaceTable.subSpaceCount", { count })}`;
+        },
       },
       {
         title: "Unit.headings.surfaceArea",
@@ -171,7 +250,6 @@ const SpacesTable = ({
       },
     ],
     index: "pk",
-    sorting: "name.fi",
     order: "asc",
     rowLink: ({ pk }: SpaceType) => `/unit/${unit.pk}/space/edit/${pk}`,
   } as CellConfig;
@@ -181,8 +259,9 @@ const SpacesTable = ({
   return (
     <Wrapper>
       <DataTable
-        groups={[{ id: 1, data: spaces }]}
-        hasGrouping={false}
+        groups={spacesAsGroups(spaces)}
+        hasGrouping
+        renderGroup={renderGroup}
         config={{
           filtering: false,
           rowFilters: false,

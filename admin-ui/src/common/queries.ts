@@ -215,8 +215,13 @@ export const UNIT_QUERY = gql`
       spaces {
         pk
         nameFi
+        code
         maxPersons
         surfaceArea
+        parent {
+          pk
+          nameFi
+        }
         resources {
           pk
           nameFi

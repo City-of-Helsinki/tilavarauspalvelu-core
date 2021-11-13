@@ -693,7 +693,7 @@ const translations: ITranslations = {
     ],
     reservationUnitTitle: ["Varausyksiköt"],
     reservationUnitReadMore: ["Lue lisää varausyksiköistä"],
-    hierarchyReadMore: ["Lue lisää hierarkiasta"],
+    hierarchyReadMore: ["Lue lisää tilojen hierarkiasta"],
     reservationUnitCreate: ["Luo uusi varausyksikkö"],
     noReservationUnitsTitle: ["Ei vielä luotuja varausyksiköitä."],
     noReservationUnitsInfo: [
@@ -782,6 +782,8 @@ const translations: ITranslations = {
     },
   },
   SpaceTable: {
+    subSpaceCount: ["alitila"],
+    subSpaceCount_plural: ["alitilaa"],
     menuAddSubSpace: ["Lisää alitiloja"],
     menuEditSpace: ["Muokkaa tilatietoja"],
     menuRemoveSpace: ["Poista tila"],

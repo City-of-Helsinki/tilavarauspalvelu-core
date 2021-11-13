@@ -40,7 +40,7 @@ import FilterContainer, { FilterBtn } from "./FilterContainer";
 
 export type OrderTypes = "asc" | "desc";
 
-interface Column {
+export interface Column {
   title: string;
   key: string;
   transform?: ({ args }: any) => string | JSX.Element; // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -140,7 +140,7 @@ const Table = styled.table`
   }
 `;
 
-const Cell = styled.td`
+export const Cell = styled.td`
   &:after {
     content: "";
     position: absolute;
