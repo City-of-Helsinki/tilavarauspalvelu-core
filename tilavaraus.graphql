@@ -34,7 +34,7 @@ type ApplicationRoundType {
   reservationPeriodEnd: Date!
   publicDisplayBegin: DateTime!
   publicDisplayEnd: DateTime!
-  purposes(before: String, after: String, first: Int, last: Int, nameFi: String, nameEn: String, nameSv: String): PurposeTypeConnection!
+  purposes(before: String, after: String, first: Int, last: Int, nameFi: String, nameEn: String, nameSv: String): ReservationPurposeTypeConnection!
   criteriaFi: String
   criteriaEn: String
   criteriaSv: String
@@ -530,7 +530,7 @@ type Query {
   keywordGroups(before: String, after: String, first: Int, last: Int, nameFi: String, nameSv: String, nameEn: String): KeywordGroupTypeConnection
   keywords(before: String, after: String, first: Int, last: Int, nameFi: String, nameSv: String, nameEn: String): KeywordTypeConnection
   purposes(before: String, after: String, first: Int, last: Int, nameFi: String, nameEn: String, nameSv: String): PurposeTypeConnection
-  reservationUnitPurposes(before: String, after: String, first: Int, last: Int, nameFi: String, nameEn: String, nameSv: String): ReservationUnitPurposeTypeConnection
+  reservationPurposes(before: String, after: String, first: Int, last: Int, nameFi: String, nameEn: String, nameSv: String): ReservationPurposeTypeConnection
 }
 
 type RealEstateType implements Node {
@@ -572,6 +572,7 @@ type ReservationConfirmMutationPayload {
   end: DateTime
   bufferTimeBefore: String
   bufferTimeAfter: String
+  purposePk: Int
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -590,6 +591,7 @@ input ReservationCreateMutationInput {
   bufferTimeBefore: String
   bufferTimeAfter: String
   reservationUnitPks: [Int]!
+  purposePk: Int
   clientMutationId: String
 }
 
@@ -606,6 +608,7 @@ type ReservationCreateMutationPayload {
   end: DateTime
   bufferTimeBefore: String
   bufferTimeAfter: String
+  purposePk: Int
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -625,6 +628,33 @@ enum ReservationPriority {
   A_300
 }
 
+type ReservationPurposeType implements Node {
+  nameFi: String
+  nameEn: String
+  nameSv: String
+
+  """The ID of the object."""
+  id: ID!
+  pk: Int
+}
+
+type ReservationPurposeTypeConnection {
+  """Pagination data for this connection."""
+  pageInfo: PageInfo!
+
+  """Contains the nodes in this connection."""
+  edges: [ReservationPurposeTypeEdge]!
+}
+
+"""A Relay edge containing a `ReservationPurposeType` and its cursor."""
+type ReservationPurposeTypeEdge {
+  """The item at the end of the edge"""
+  node: ReservationPurposeType
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
+
 type ReservationType implements Node {
   reserveeFirstName: String
   reserveeLastName: String
@@ -640,6 +670,7 @@ type ReservationType implements Node {
   bufferTimeAfter: Float
   recurringReservation: RecurringReservationType
   numPersons: Int
+  purpose: ReservationPurposeType
 
   """The ID of the object."""
   id: ID!
@@ -675,7 +706,7 @@ type ReservationUnitByPkType implements Node {
   spaces: [SpaceType]
   resources: [ResourceType]
   services: [ServiceType]
-  purposes: [ReservationUnitPurposeType]
+  purposes: [PurposeType]
   reservationUnitType: ReservationUnitTypeType
   requireIntroduction: Boolean!
   termsOfUseFi: String
@@ -740,18 +771,18 @@ input ReservationUnitCreateMutationInput {
   reservationUnitTypePk: Int
   surfaceArea: Float
   bufferTimeBetweenReservations: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
-  contactInformationFi: String
-  contactInformationEn: String
-  contactInformationSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
+  contactInformationFi: String
+  contactInformationEn: String
+  contactInformationSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   clientMutationId: String
 }
 
@@ -771,7 +802,7 @@ type ReservationUnitCreateMutationPayload {
   Determines if introduction is required in order to reserve this reservation unit.
   """
   requireIntroduction: Boolean
-  purposes: [ReservationUnitPurposeType]
+  purposes: [PurposeType]
 
   """Images of the reservation unit as nested related objects. """
   images: [ReservationUnitImageType]
@@ -793,18 +824,18 @@ type ReservationUnitCreateMutationPayload {
   reservationUnitTypePk: Int
   surfaceArea: Float
   bufferTimeBetweenReservations: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
-  contactInformationFi: String
-  contactInformationEn: String
-  contactInformationSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
+  contactInformationFi: String
+  contactInformationEn: String
+  contactInformationSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -838,33 +869,6 @@ type ReservationUnitImageType {
   smallUrl: String
 }
 
-type ReservationUnitPurposeType implements Node {
-  nameFi: String
-  nameEn: String
-  nameSv: String
-
-  """The ID of the object."""
-  id: ID!
-  pk: Int
-}
-
-type ReservationUnitPurposeTypeConnection {
-  """Pagination data for this connection."""
-  pageInfo: PageInfo!
-
-  """Contains the nodes in this connection."""
-  edges: [ReservationUnitPurposeTypeEdge]!
-}
-
-"""A Relay edge containing a `ReservationUnitPurposeType` and its cursor."""
-type ReservationUnitPurposeTypeEdge {
-  """The item at the end of the edge"""
-  node: ReservationUnitPurposeType
-
-  """A cursor for use in pagination"""
-  cursor: String!
-}
-
 type ReservationUnitType implements Node {
   nameFi: String
   nameEn: String
@@ -875,7 +879,7 @@ type ReservationUnitType implements Node {
   spaces: [SpaceType]
   resources: [ResourceType]
   services: [ServiceType]
-  purposes: [ReservationUnitPurposeType]
+  purposes: [PurposeType]
   reservationUnitType: ReservationUnitTypeType
   requireIntroduction: Boolean!
   termsOfUseFi: String
@@ -951,18 +955,18 @@ input ReservationUnitUpdateMutationInput {
   reservationUnitTypePk: Int
   surfaceArea: Float
   bufferTimeBetweenReservations: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
-  contactInformationFi: String
-  contactInformationEn: String
-  contactInformationSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
+  contactInformationFi: String
+  contactInformationEn: String
+  contactInformationSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   clientMutationId: String
 }
 
@@ -982,7 +986,7 @@ type ReservationUnitUpdateMutationPayload {
   Determines if introduction is required in order to reserve this reservation unit.
   """
   requireIntroduction: Boolean
-  purposes: [ReservationUnitPurposeType]
+  purposes: [PurposeType]
 
   """Images of the reservation unit as nested related objects. """
   images: [ReservationUnitImageType]
@@ -1004,18 +1008,18 @@ type ReservationUnitUpdateMutationPayload {
   reservationUnitTypePk: Int
   surfaceArea: Float
   bufferTimeBetweenReservations: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
-  contactInformationFi: String
-  contactInformationEn: String
-  contactInformationSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
+  contactInformationFi: String
+  contactInformationEn: String
+  contactInformationSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -1037,6 +1041,7 @@ input ReservationUpdateMutationInput {
   bufferTimeBefore: String
   bufferTimeAfter: String
   reservationUnitPks: [Int]
+  purposePk: Int
   clientMutationId: String
 }
 
@@ -1053,6 +1058,7 @@ type ReservationUpdateMutationPayload {
   end: DateTime
   bufferTimeBefore: String
   bufferTimeAfter: String
+  purposePk: Int
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -1486,15 +1492,15 @@ input UnitUpdateMutationInput {
   webPage: String
   email: String
   phone: String
-  shortDescriptionFi: String
-  shortDescriptionEn: String
-  shortDescriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  shortDescriptionFi: String
+  shortDescriptionEn: String
+  shortDescriptionSv: String
   clientMutationId: String
 }
 
@@ -1504,15 +1510,15 @@ type UnitUpdateMutationPayload {
   webPage: String
   email: String
   phone: String
-  shortDescriptionFi: String
-  shortDescriptionEn: String
-  shortDescriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  shortDescriptionFi: String
+  shortDescriptionEn: String
+  shortDescriptionSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]

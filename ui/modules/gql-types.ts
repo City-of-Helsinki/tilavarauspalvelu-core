@@ -74,7 +74,7 @@ export type ApplicationRoundType = {
   pk?: Maybe<Scalars['Int']>;
   publicDisplayBegin: Scalars['DateTime'];
   publicDisplayEnd: Scalars['DateTime'];
-  purposes: PurposeTypeConnection;
+  purposes: ReservationPurposeTypeConnection;
   reservationPeriodBegin: Scalars['Date'];
   reservationPeriodEnd: Scalars['Date'];
   reservationUnits: ReservationUnitByPkTypeConnection;
@@ -641,10 +641,10 @@ export type Query = {
   keywordGroups?: Maybe<KeywordGroupTypeConnection>;
   keywords?: Maybe<KeywordTypeConnection>;
   purposes?: Maybe<PurposeTypeConnection>;
+  reservationPurposes?: Maybe<ReservationPurposeTypeConnection>;
   /** The ID of the object */
   reservationUnit?: Maybe<ReservationUnitType>;
   reservationUnitByPk?: Maybe<ReservationUnitByPkType>;
-  reservationUnitPurposes?: Maybe<ReservationUnitPurposeTypeConnection>;
   reservationUnits?: Maybe<ReservationUnitTypeConnection>;
   reservations?: Maybe<ReservationTypeConnection>;
   /** The ID of the object */
@@ -760,17 +760,7 @@ export type QueryPurposesArgs = {
 };
 
 
-export type QueryReservationUnitArgs = {
-  id: Scalars['ID'];
-};
-
-
-export type QueryReservationUnitByPkArgs = {
-  pk?: Maybe<Scalars['Int']>;
-};
-
-
-export type QueryReservationUnitPurposesArgs = {
+export type QueryReservationPurposesArgs = {
   after?: Maybe<Scalars['String']>;
   before?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Int']>;
@@ -778,6 +768,16 @@ export type QueryReservationUnitPurposesArgs = {
   nameEn?: Maybe<Scalars['String']>;
   nameFi?: Maybe<Scalars['String']>;
   nameSv?: Maybe<Scalars['String']>;
+};
+
+
+export type QueryReservationUnitArgs = {
+  id: Scalars['ID'];
+};
+
+
+export type QueryReservationUnitByPkArgs = {
+  pk?: Maybe<Scalars['Int']>;
 };
 
 
@@ -927,6 +927,7 @@ export type ReservationConfirmMutationPayload = {
   name?: Maybe<Scalars['String']>;
   pk?: Maybe<Scalars['Int']>;
   priority?: Maybe<Scalars['Int']>;
+  purposePk?: Maybe<Scalars['Int']>;
   reserveeFirstName?: Maybe<Scalars['String']>;
   reserveeLastName?: Maybe<Scalars['String']>;
   reserveePhone?: Maybe<Scalars['String']>;
@@ -942,6 +943,7 @@ export type ReservationCreateMutationInput = {
   end: Scalars['DateTime'];
   name?: Maybe<Scalars['String']>;
   priority?: Maybe<Scalars['Int']>;
+  purposePk?: Maybe<Scalars['Int']>;
   reservationUnitPks: Array<Maybe<Scalars['Int']>>;
   reserveeFirstName?: Maybe<Scalars['String']>;
   reserveeLastName?: Maybe<Scalars['String']>;
@@ -961,6 +963,7 @@ export type ReservationCreateMutationPayload = {
   name?: Maybe<Scalars['String']>;
   pk?: Maybe<Scalars['Int']>;
   priority?: Maybe<Scalars['Int']>;
+  purposePk?: Maybe<Scalars['Int']>;
   reservation?: Maybe<ReservationType>;
   reserveeFirstName?: Maybe<Scalars['String']>;
   reserveeLastName?: Maybe<Scalars['String']>;
@@ -978,6 +981,33 @@ export enum ReservationPriority {
   A_300 = 'A_300'
 }
 
+export type ReservationPurposeType = Node & {
+  __typename?: 'ReservationPurposeType';
+  /** The ID of the object. */
+  id: Scalars['ID'];
+  nameEn?: Maybe<Scalars['String']>;
+  nameFi?: Maybe<Scalars['String']>;
+  nameSv?: Maybe<Scalars['String']>;
+  pk?: Maybe<Scalars['Int']>;
+};
+
+export type ReservationPurposeTypeConnection = {
+  __typename?: 'ReservationPurposeTypeConnection';
+  /** Contains the nodes in this connection. */
+  edges: Array<Maybe<ReservationPurposeTypeEdge>>;
+  /** Pagination data for this connection. */
+  pageInfo: PageInfo;
+};
+
+/** A Relay edge containing a `ReservationPurposeType` and its cursor. */
+export type ReservationPurposeTypeEdge = {
+  __typename?: 'ReservationPurposeTypeEdge';
+  /** A cursor for use in pagination */
+  cursor: Scalars['String'];
+  /** The item at the end of the edge */
+  node?: Maybe<ReservationPurposeType>;
+};
+
 export type ReservationType = Node & {
   __typename?: 'ReservationType';
   begin: Scalars['DateTime'];
@@ -992,6 +1022,7 @@ export type ReservationType = Node & {
   numPersons?: Maybe<Scalars['Int']>;
   pk?: Maybe<Scalars['Int']>;
   priority: ReservationPriority;
+  purpose?: Maybe<ReservationPurposeType>;
   recurringReservation?: Maybe<RecurringReservationType>;
   reservationUnits?: Maybe<Array<Maybe<ReservationUnitType>>>;
   reserveeFirstName?: Maybe<Scalars['String']>;
@@ -1043,7 +1074,7 @@ export type ReservationUnitByPkType = Node & {
   nextAvailableSlot?: Maybe<Scalars['DateTime']>;
   openingHours?: Maybe<OpeningHoursType>;
   pk?: Maybe<Scalars['Int']>;
-  purposes?: Maybe<Array<Maybe<ReservationUnitPurposeType>>>;
+  purposes?: Maybe<Array<Maybe<PurposeType>>>;
   requireIntroduction: Scalars['Boolean'];
   reservationUnitType?: Maybe<ReservationUnitTypeType>;
   reservations?: Maybe<Array<Maybe<ReservationType>>>;
@@ -1151,7 +1182,7 @@ export type ReservationUnitCreateMutationPayload = {
   nameFi?: Maybe<Scalars['String']>;
   nameSv?: Maybe<Scalars['String']>;
   pk?: Maybe<Scalars['Int']>;
-  purposes?: Maybe<Array<Maybe<ReservationUnitPurposeType>>>;
+  purposes?: Maybe<Array<Maybe<PurposeType>>>;
   /** Determines if introduction is required in order to reserve this reservation unit. */
   requireIntroduction?: Maybe<Scalars['Boolean']>;
   reservationUnit?: Maybe<ReservationUnitType>;
@@ -1197,33 +1228,6 @@ export type ReservationUnitImageType = {
   smallUrl?: Maybe<Scalars['String']>;
 };
 
-export type ReservationUnitPurposeType = Node & {
-  __typename?: 'ReservationUnitPurposeType';
-  /** The ID of the object. */
-  id: Scalars['ID'];
-  nameEn?: Maybe<Scalars['String']>;
-  nameFi?: Maybe<Scalars['String']>;
-  nameSv?: Maybe<Scalars['String']>;
-  pk?: Maybe<Scalars['Int']>;
-};
-
-export type ReservationUnitPurposeTypeConnection = {
-  __typename?: 'ReservationUnitPurposeTypeConnection';
-  /** Contains the nodes in this connection. */
-  edges: Array<Maybe<ReservationUnitPurposeTypeEdge>>;
-  /** Pagination data for this connection. */
-  pageInfo: PageInfo;
-};
-
-/** A Relay edge containing a `ReservationUnitPurposeType` and its cursor. */
-export type ReservationUnitPurposeTypeEdge = {
-  __typename?: 'ReservationUnitPurposeTypeEdge';
-  /** A cursor for use in pagination */
-  cursor: Scalars['String'];
-  /** The item at the end of the edge */
-  node?: Maybe<ReservationUnitPurposeType>;
-};
-
 export type ReservationUnitType = Node & {
   __typename?: 'ReservationUnitType';
   applicationRounds?: Maybe<Array<Maybe<ApplicationRoundType>>>;
@@ -1248,7 +1252,7 @@ export type ReservationUnitType = Node & {
   nameFi?: Maybe<Scalars['String']>;
   nameSv?: Maybe<Scalars['String']>;
   pk?: Maybe<Scalars['Int']>;
-  purposes?: Maybe<Array<Maybe<ReservationUnitPurposeType>>>;
+  purposes?: Maybe<Array<Maybe<PurposeType>>>;
   requireIntroduction: Scalars['Boolean'];
   reservationUnitType?: Maybe<ReservationUnitTypeType>;
   reservations?: Maybe<Array<Maybe<ReservationType>>>;
@@ -1359,7 +1363,7 @@ export type ReservationUnitUpdateMutationPayload = {
   nameFi?: Maybe<Scalars['String']>;
   nameSv?: Maybe<Scalars['String']>;
   pk?: Maybe<Scalars['Int']>;
-  purposes?: Maybe<Array<Maybe<ReservationUnitPurposeType>>>;
+  purposes?: Maybe<Array<Maybe<PurposeType>>>;
   /** Determines if introduction is required in order to reserve this reservation unit. */
   requireIntroduction?: Maybe<Scalars['Boolean']>;
   reservationUnit?: Maybe<ReservationUnitType>;
@@ -1390,6 +1394,7 @@ export type ReservationUpdateMutationInput = {
   name?: Maybe<Scalars['String']>;
   pk: Scalars['Int'];
   priority?: Maybe<Scalars['Int']>;
+  purposePk?: Maybe<Scalars['Int']>;
   reservationUnitPks?: Maybe<Array<Maybe<Scalars['Int']>>>;
   reserveeFirstName?: Maybe<Scalars['String']>;
   reserveeLastName?: Maybe<Scalars['String']>;
@@ -1410,6 +1415,7 @@ export type ReservationUpdateMutationPayload = {
   name?: Maybe<Scalars['String']>;
   pk?: Maybe<Scalars['Int']>;
   priority?: Maybe<Scalars['Int']>;
+  purposePk?: Maybe<Scalars['Int']>;
   reservation?: Maybe<ReservationType>;
   reserveeFirstName?: Maybe<Scalars['String']>;
   reserveeLastName?: Maybe<Scalars['String']>;
@@ -2118,7 +2124,7 @@ export type ReservationUnitQueryHookResult = ReturnType<typeof useReservationUni
 export type ReservationUnitLazyQueryHookResult = ReturnType<typeof useReservationUnitLazyQuery>;
 export type ReservationUnitQueryResult = Apollo.QueryResult<ReservationUnitQuery, ReservationUnitQueryVariables>;
 export const SearchReservationUnitsDocument = gql`
-    query SearchReservationUnits($textSearch: String, $minPersons: Float, $maxPersons: Float, $unit: ID, $reservationUnitType: ID, $purposes: ID, $first: Int, $after: String) {
+    query SearchReservationUnits($textSearch: String, $minPersons: Float, $maxPersons: Float, $unit: ID, $reservationUnitType: ID, $purposes: ID, $first: Int, $after: String, $orderBy: String) {
   reservationUnits(
     textSearch: $textSearch
     maxPersonsGte: $minPersons
@@ -2128,6 +2134,7 @@ export const SearchReservationUnitsDocument = gql`
     unit: $unit
     first: $first
     after: $after
+    orderBy: $orderBy
   ) {
     edges {
       node {
@@ -2187,6 +2194,7 @@ export const SearchReservationUnitsDocument = gql`
  *      purposes: // value for 'purposes'
  *      first: // value for 'first'
  *      after: // value for 'after'
+ *      orderBy: // value for 'orderBy'
  *   },
  * });
  */
@@ -2367,6 +2375,7 @@ export type SearchReservationUnitsQueryVariables = Exact<{
   purposes?: Maybe<Scalars['ID']>;
   first?: Maybe<Scalars['Int']>;
   after?: Maybe<Scalars['String']>;
+  orderBy?: Maybe<Scalars['String']>;
 }>;
 
 

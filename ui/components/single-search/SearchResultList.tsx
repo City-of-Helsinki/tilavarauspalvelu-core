@@ -17,11 +17,18 @@ interface Props {
   pageInfo: PageInfo;
   error: boolean;
   loading: boolean;
+  sortingComponent?: React.ReactNode;
 }
 
 const Wrapper = styled.div`
   margin-top: var(--spacing-layout-l);
   margin-bottom: var(--spacing-layout-xl);
+`;
+
+const TopWrapper = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 `;
 
 const HitCount = styled.h2`
@@ -65,8 +72,10 @@ const SearchResultList = ({
   fetchMore,
   pageInfo,
   loading,
+  sortingComponent,
 }: Props): JSX.Element => {
   const { t } = useTranslation();
+
   return (
     <Wrapper>
       <Container id="searchResultList">
@@ -77,13 +86,16 @@ const SearchResultList = ({
         ) : null}
         {reservationUnits !== null ? (
           <>
-            <HitCount>
-              {reservationUnits?.length
-                ? t("searchResultList:count", {
-                    count: reservationUnits.length,
-                  })
-                : t("searchResultList:noResults")}
-            </HitCount>
+            <TopWrapper>
+              <HitCount>
+                {reservationUnits?.length
+                  ? t("searchResultList:count", {
+                      count: reservationUnits.length,
+                    })
+                  : t("searchResultList:noResults")}
+              </HitCount>
+              {sortingComponent}
+            </TopWrapper>
             <ListContainer>
               {reservationUnits?.map((ru) => (
                 <ReservationUnitCard reservationUnit={ru} key={ru.id} />

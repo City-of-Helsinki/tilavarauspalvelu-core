@@ -6,5 +6,18 @@
   "single": {
     "heading": "Tarkennettu haku",
     "text": "Etsi sinulle sopivaa vuoroa"
+  },
+  "sorting": {
+    "action": {
+      "ascending": "Järjestä nousevasti",
+      "descending": "Järjestä laskevasti"
+    },
+    "ascendingLabel": "Nouseva järjestys",
+    "descendingLabel": "Laskeva järjestys",
+    "label": {
+      "name": "Nimen mukaan",
+      "type": "Tyypin mukaan",
+      "unit": "Toimipisteen mukaan"
+    }
   }
 }

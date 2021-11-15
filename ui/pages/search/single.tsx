@@ -2,17 +2,18 @@ import React, { useState, useEffect } from "react";
 import { Koros } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { useQuery } from "@apollo/client";
+import { GetServerSideProps } from "next";
 import styled from "styled-components";
 import queryString from "query-string";
 import { useRouter } from "next/router";
 import { useLocalStorage } from "react-use";
-import { isEqual, omit } from "lodash";
+import { isEqual, omit, pick } from "lodash";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Container from "../../components/common/Container";
 import Breadcrumb from "../../components/common/Breadcrumb";
 import SearchForm from "../../components/single-search/SearchForm";
 import SearchResultList from "../../components/single-search/SearchResultList";
-import { singleSearchUrl } from "../../modules/util";
+import { capitalize, singleSearchUrl } from "../../modules/util";
 import { isBrowser, singleSearchPrefix } from "../../modules/const";
 import { CenterSpinner } from "../../components/common/common";
 import {
@@ -23,6 +24,8 @@ import {
 } from "../../modules/gql-types";
 import { H1 } from "../../modules/style/typography";
 import { RESERVATION_UNITS } from "../../modules/queries/reservationUnit";
+import Sorting from "../../components/form/Sorting";
+import { OptionType } from "../../modules/types";
 
 const pagingLimit = 10;
 
@@ -47,8 +50,7 @@ const StyledKoros = styled(Koros)`
   fill: white;
 `;
 
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export const getServerSideProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       ...(await serverSideTranslations(locale)),
@@ -57,7 +59,22 @@ export const getServerSideProps = async ({ locale }) => {
 };
 
 const SearchSingle = (): JSX.Element => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+
+  const sortingOptions = [
+    {
+      label: t("search:sorting.label.name"),
+      value: `name${capitalize(i18n.language)}`,
+    },
+    {
+      label: t("search:sorting.label.type"),
+      value: `type${capitalize(i18n.language)}`,
+    },
+    {
+      label: t("search:sorting.label.unit"),
+      value: "unit",
+    },
+  ];
 
   const [values, setValues] = useState({} as Record<string, string>);
   const setStoredValues = useLocalStorage(
@@ -65,11 +82,15 @@ const SearchSingle = (): JSX.Element => {
     null
   )[1];
 
-  const { data, fetchMore, refetch, loading, error } = useQuery<
+  const { data, fetchMore, loading, error } = useQuery<
     Query,
     QueryReservationUnitsArgs
   >(RESERVATION_UNITS, {
-    variables: { ...values, first: pagingLimit },
+    variables: {
+      ...omit(values, ["order", "sort"]),
+      first: pagingLimit,
+      orderBy: values.order === "desc" ? `-${values.sort}` : values.sort,
+    },
     fetchPolicy: "network-only",
   });
 
@@ -78,10 +99,13 @@ const SearchSingle = (): JSX.Element => {
   const pageInfo: PageInfo = data?.reservationUnits?.pageInfo;
 
   const searchParams = isBrowser ? window.location.search : "";
+  const parsedParams = queryString.parse(searchParams);
 
   useEffect(() => {
-    if (searchParams) {
-      const parsed = queryString.parse(searchParams);
+    if (parsedParams) {
+      const parsed = parsedParams;
+      if (!parsed.sort) parsed.sort = "nameFi";
+      if (!parsed.order) parsed.order = "asc";
 
       const newValues = Object.keys(parsed).reduce((p, key) => {
         if (parsed[key]) {
@@ -96,9 +120,8 @@ const SearchSingle = (): JSX.Element => {
       if (!isEqual(values, newValues)) {
         setValues(newValues);
       }
-      refetch(newValues);
     }
-  }, [searchParams, values, refetch]);
+  }, [parsedParams, values]);
 
   useEffect(() => {
     const params = queryString.parse(searchParams);
@@ -108,20 +131,31 @@ const SearchSingle = (): JSX.Element => {
   const history = useRouter();
 
   const onSearch = async (criteria: QueryReservationUnitsArgs) => {
-    history.replace(singleSearchUrl(criteria));
+    const sortingCriteria = pick(queryString.parse(searchParams), [
+      "sort",
+      "order",
+    ]);
+    history.replace(singleSearchUrl({ ...criteria, ...sortingCriteria }));
   };
 
   const onRemove = (key: string[]) => {
     const newValues = key ? omit(values, key) : {};
+    const sortingCriteria = pick(queryString.parse(searchParams), [
+      "sort",
+      "order",
+    ]);
     history.replace(
       singleSearchUrl({
         ...newValues,
+        ...sortingCriteria,
         // a hacky way to bypass query cache
         textSearch:
           !key || key.includes("textSearch") ? "" : values.textSearch || "",
       })
     );
   };
+
+  const isOrderingAsc = values.order !== "desc";
 
   return (
     <>
@@ -135,7 +169,7 @@ const SearchSingle = (): JSX.Element => {
           <Subheading>{t("search:single.text")}</Subheading>
           <SearchForm
             onSearch={onSearch}
-            formValues={values}
+            formValues={omit(values, ["order", "sort"])}
             removeValue={onRemove}
           />
         </Container>
@@ -148,6 +182,27 @@ const SearchSingle = (): JSX.Element => {
           error={!!error}
           loading={loading}
           reservationUnits={reservationUnits}
+          sortingComponent={
+            <Sorting
+              value={values.sort}
+              sortingOptions={sortingOptions}
+              setSorting={(val: OptionType) => {
+                const params = {
+                  ...values,
+                  sort: String(val.value),
+                };
+                history.replace(singleSearchUrl(params));
+              }}
+              isOrderingAsc={isOrderingAsc}
+              setIsOrderingAsc={(isAsc: boolean) => {
+                const params = {
+                  ...values,
+                  order: isAsc ? "asc" : "desc",
+                };
+                history.replace(singleSearchUrl(params));
+              }}
+            />
+          }
           fetchMore={(cursor) => {
             const variables = {
               ...values,
