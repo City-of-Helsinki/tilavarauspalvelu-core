@@ -112,7 +112,6 @@ const StyledButton = styled(Button)`
 
 const TableHead = styled.div`
   display: flex;
-  border-bottom: 1px solid var(--color-silver);
   margin: 2em 0;
   padding-left: 2.5em;
 `;
