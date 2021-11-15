@@ -45,6 +45,7 @@ export const RESOURCES_QUERY = gql`
           space {
             unit {
               nameFi
+              pk
             }
             nameFi
             unit {
@@ -389,6 +390,17 @@ export const CREATE_RESOURCE = gql`
   }
 `;
 
+export const UPDATE_RESOURCE = gql`
+  mutation updateResource($input: ResourceUpdateMutationInput!) {
+    updateResource(input: $input) {
+      errors {
+        field
+        messages
+      }
+    }
+  }
+`;
+
 // WIP, no api yet
 export const DELETE_RESOURCE = gql`
   mutation deleteResource($input: ResourceDeleteMutationInput!) {
@@ -431,6 +443,23 @@ export const SPACE_QUERY = gql`
             nameFi
           }
         }
+      }
+    }
+  }
+`;
+
+export const RESOURCE_QUERY = gql`
+  query resource($pk: Int) {
+    resourceByPk(pk: $pk) {
+      pk
+      nameFi
+      nameSv
+      nameEn
+      descriptionFi
+      descriptionEn
+      descriptionSv
+      space {
+        pk
       }
     }
   }
