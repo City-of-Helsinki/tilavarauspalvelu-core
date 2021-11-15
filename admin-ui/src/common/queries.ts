@@ -45,6 +45,7 @@ export const RESOURCES_QUERY = gql`
           space {
             unit {
               nameFi
+              pk
             }
             nameFi
             unit {
