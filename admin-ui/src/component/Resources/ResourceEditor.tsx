@@ -201,10 +201,6 @@ const EditorColumns = styled.div`
   gap: 1em;
   margin-top: var(--spacing-s);
   padding-bottom: var(--spacing-m);
-
-  @media (min-width: ${breakpoints.m}) {
-    grid-template-columns: 1fr 1fr 1fr;
-  }
 `;
 
 const TextInputWithPadding = styled(TextInput)`
