@@ -13,10 +13,12 @@ import {
   ResourceDeleteMutationInput,
   ResourceDeleteMutationPayload,
   ResourceType,
+  UnitByPkType,
 } from "../../common/gql-types";
 
 interface IProps {
   resources: ResourceType[] | undefined;
+  unit: UnitByPkType;
   hasSpaces: boolean;
   onDelete: (text?: string) => void;
   onDataError: (error: string) => void;
@@ -38,6 +40,7 @@ const ResourceTypeName = styled.span``;
 
 const ResourcesTable = ({
   resources,
+  unit,
   hasSpaces,
   onDelete,
   onDataError,
@@ -123,7 +126,7 @@ const ResourcesTable = ({
     index: "pk",
     sorting: "name.fi",
     order: "asc",
-    // rowLink: ({ id }: Resource) => `/resource/${id}`,
+    rowLink: ({ pk }: ResourceType) => `/unit/${unit.pk}/resource/edit/${pk}`,
   } as CellConfig;
 
   return (

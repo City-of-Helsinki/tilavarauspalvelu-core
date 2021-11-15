@@ -11,6 +11,7 @@ import LinkPrev from "../LinkPrev";
 interface IProps {
   title: string;
   unit: UnitByPkType;
+  link?: string;
 }
 
 const Wrapper = styled.div`
@@ -38,13 +39,13 @@ const Label = styled(Address)`
   font-family: var(--tilavaraus-admin-font-bold);
 `;
 
-const SubPageHead = ({ title, unit }: IProps): JSX.Element => {
+const SubPageHead = ({ title, unit, link }: IProps): JSX.Element => {
   const { t } = useTranslation();
 
   return (
     <Wrapper>
       <ContentContainer>
-        <LinkPrev route={`/unit/${unit.pk}`} />
+        <LinkPrev route={link || `/unit/${unit.pk}`} />
       </ContentContainer>
       <IngressContainer>
         <H1>{title}</H1>

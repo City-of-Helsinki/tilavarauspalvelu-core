@@ -32,6 +32,7 @@ import Unit from "./component/Unit/Unit";
 import UnitMap from "./component/Unit/UnitMap";
 import SpacesResources from "./component/Unit/SpacesResources";
 import SpaceEditor from "./component/Spaces/SpaceEditor";
+import ResourceEditor from "./component/Resources/ResourceEditor";
 import ReservationUnitEditor from "./component/ReservationUnits/ReservationUnitEditor";
 import ResourcesList from "./component/Resources/ResourcesList";
 import ReservationUnitsList from "./component/ReservationUnits/ReservationUnitsList";
@@ -174,6 +175,10 @@ function App(): JSX.Element {
               <PrivateRoute
                 path="/unit/:unitPk/space/edit/:spacePk"
                 component={SpaceEditor}
+              />
+              <PrivateRoute
+                path="/unit/:unitPk/resource/edit/:resourcePk"
+                component={ResourceEditor}
               />
               <PrivateRoute
                 path="/unit/:unitPk/reservationUnit/edit/:reservationUnitPk?"

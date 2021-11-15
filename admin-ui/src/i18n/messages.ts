@@ -615,6 +615,10 @@ const translations: ITranslations = {
       resourceType: ["Resurssityyppi"],
     },
   },
+  ResourceEditor: {
+    resourceUpdated: ["Tiedot tallennettu."],
+    resourceUpdatedNotification: ["Resurssin tiedot tallennettu."],
+  },
   Applicant: {
     inAllocation: ["Mukana jaossa"],
   },
