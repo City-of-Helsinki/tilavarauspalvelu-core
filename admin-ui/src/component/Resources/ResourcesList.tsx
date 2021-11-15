@@ -97,7 +97,8 @@ const getCellConfig = (t: TFunction): CellConfig => {
     index: "pk",
     sorting: "name",
     order: "asc",
-    rowLink: ({ pk }: ResourceType) => `/resources/${pk}`,
+    rowLink: ({ space, pk }: ResourceType) =>
+      `/unit/${space?.unit?.pk}/resource/edit/${pk}`,
   };
 };
 
