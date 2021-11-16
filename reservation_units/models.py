@@ -83,6 +83,28 @@ class Keyword(models.Model):
         return "{}".format(self.name)
 
 
+class ReservationUnitCancellationRule(models.Model):
+    name = models.CharField(
+        verbose_name=_("Name for the rule"), max_length=255, null=False, blank=False
+    )
+    can_be_cancelled_time_before = models.DurationField(
+        verbose_name=_(
+            "Time before user can cancel reservations of this reservation unit"
+        ),
+        blank=True,
+        null=True,
+        default=datetime.timedelta(hours=24),
+        help_text="Seconds before reservations related to this cancellation rule can be cancelled without handling.",
+    )
+    needs_handling = models.BooleanField(
+        default=False,
+        verbose_name=_("Will the cancellation need manual staff handling"),
+    )
+
+    def __str__(self):
+        return self.name
+
+
 class ReservationUnit(models.Model):
     name = models.CharField(verbose_name=_("Name"), max_length=255)
     description = models.TextField(
@@ -182,6 +204,13 @@ class ReservationUnit(models.Model):
 
     hauki_resource_id = models.CharField(
         verbose_name=_("Hauki resource id"), max_length=255, blank=True, null=True
+    )
+
+    cancellation_rule = models.ForeignKey(
+        ReservationUnitCancellationRule,
+        blank=True,
+        null=True,
+        on_delete=models.PROTECT,
     )
 
     def __str__(self):

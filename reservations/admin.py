@@ -5,6 +5,7 @@ from .models import (
     AgeGroup,
     RecurringReservation,
     Reservation,
+    ReservationCancelReason,
     ReservationPurpose,
 )
 
@@ -37,3 +38,8 @@ class AgeGroupAdmin(admin.ModelAdmin):
 @admin.register(AbilityGroup)
 class AbilityGroupAdmin(admin.ModelAdmin):
     model = AbilityGroup
+
+
+@admin.register(ReservationCancelReason)
+class ReservationCancelReasonAdmin(admin.ModelAdmin):
+    model = ReservationCancelReason

@@ -31,15 +31,18 @@ from api.graphql.reservation_units.reservation_unit_types import (
     KeywordType,
     PurposeType,
     ReservationUnitByPkType,
+    ReservationUnitCancellationRuleType,
     ReservationUnitType,
 )
 from api.graphql.reservations.reservation_filtersets import ReservationFilterSet
 from api.graphql.reservations.reservation_mutations import (
+    ReservationCancellationMutation,
     ReservationConfirmMutation,
     ReservationCreateMutation,
     ReservationUpdateMutation,
 )
 from api.graphql.reservations.reservation_types import (
+    ReservationCancelReasonType,
     ReservationPurposeType,
     ReservationType,
 )
@@ -67,6 +70,7 @@ from permissions.api_permissions.graphene_permissions import (
     PurposePermission,
     ReservationPermission,
     ReservationPurposePermission,
+    ReservationUnitCancellationRulePermission,
     ReservationUnitPermission,
     ResourcePermission,
     SpacePermission,
@@ -180,9 +184,26 @@ class ReservationPurposeFilter(AuthFilter):
     )
 
 
+class ReservationCancelReasonFilter(AuthFilter):
+    permission_classes = (
+        (AllowAuthenticated,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
+    )
+
+
+class ReservationUnitCancellationRulesFilter(AuthFilter):
+    permission_classes = (
+        (ReservationUnitCancellationRulePermission,)
+        if not settings.TMP_PERMISSIONS_DISABLED
+        else (AllowAny,)
+    )
+
+
 class Query(graphene.ObjectType):
     reservations = ReservationsFilter(
         ReservationType, filterset_class=ReservationFilterSet
+    )
+    reservation_cancel_reasons = ReservationCancelReasonFilter(
+        ReservationCancelReasonType
     )
 
     reservation_units = ReservationUnitsFilter(
@@ -190,6 +211,9 @@ class Query(graphene.ObjectType):
     )
     reservation_unit = relay.Node.Field(ReservationUnitType)
     reservation_unit_by_pk = Field(ReservationUnitByPkType, pk=graphene.Int())
+    reservation_unit_cancellation_rules = ReservationUnitCancellationRulesFilter(
+        ReservationUnitCancellationRuleType
+    )
 
     resources = ResourcesFilter(ResourceType)
     resource = relay.Node.Field(ResourceType)
@@ -253,6 +277,7 @@ class Mutation(graphene.ObjectType):
     create_reservation = ReservationCreateMutation.Field()
     update_reservation = ReservationUpdateMutation.Field()
     confirm_reservation = ReservationConfirmMutation.Field()
+    cancel_reservation = ReservationCancellationMutation.Field()
 
     create_reservation_unit = ReservationUnitCreateMutation.Field()
     update_reservation_unit = ReservationUnitUpdateMutation.Field()

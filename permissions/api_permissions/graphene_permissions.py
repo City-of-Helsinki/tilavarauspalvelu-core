@@ -231,3 +231,17 @@ class EquipmentPermission(BasePermission):
     @classmethod
     def has_mutation_permission(cls, root: Any, info: ResolveInfo, input: dict) -> bool:
         return can_manage_equipment(info.context.user)
+
+
+class ReservationUnitCancellationRulePermission(BasePermission):
+    @classmethod
+    def has_permission(cls, info: ResolveInfo) -> bool:
+        return info.context.user.is_authenticated
+
+    @classmethod
+    def has_filter_permission(cls, info: ResolveInfo) -> bool:
+        return info.context.user.is_authenticated
+
+    @classmethod
+    def has_mutation_permission(cls, root: Any, info: ResolveInfo, input: dict) -> bool:
+        return False

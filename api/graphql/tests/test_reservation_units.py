@@ -22,6 +22,7 @@ from reservation_units.tests.factories import (
     KeywordCategoryFactory,
     KeywordGroupFactory,
     PurposeFactory,
+    ReservationUnitCancellationRuleFactory,
     ReservationUnitFactory,
     ReservationUnitTypeFactory,
 )
@@ -44,11 +45,15 @@ class ReservationUnitTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
             max_persons=100, name="Large space", surface_area=100
         )
         small_space = SpaceFactory(max_persons=10, name="Small space", surface_area=50)
+        rule = ReservationUnitCancellationRuleFactory(
+            name_fi="fi", name_en="en", name_sv="sv"
+        )
         cls.reservation_unit = ReservationUnitFactory(
             name="Test name",
             reservation_unit_type=cls.type,
             uuid="3774af34-9916-40f2-acc7-68db5a627710",
             spaces=[large_space, small_space],
+            cancellation_rule=rule,
         )
 
         cls.api_client = APIClient()
@@ -112,6 +117,11 @@ class ReservationUnitTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
                               publicDisplayBegin
                               publicDisplayEnd
                               criteriaFi
+                            }
+                            cancellationRule {
+                                nameFi
+                                nameEn
+                                nameSv
                             }
                           }
                         }
@@ -820,6 +830,11 @@ class ReservationUnitMutationsTestCaseBase(GrapheneTestCaseBase):
         cls.resource = ResourceFactory()
         cls.reservation_unit_type = ReservationUnitTypeFactory()
         cls.service = ServiceFactory()
+        cls.rule = ReservationUnitCancellationRuleFactory(
+            name_fi="fi",
+            name_en="en",
+            name_sv="sv",
+        )
 
     def setUp(self):
         self._client.force_login(self.general_admin)
@@ -983,6 +998,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
             "surfaceArea": 100,
             "maxPersons": 10,
             "bufferTimeBetweenReservations": "1:00:00",
+            "cancellationRulePk": self.rule.pk,
         }
 
     def test_create(self):
@@ -1015,6 +1031,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         assert_that(res_unit.buffer_time_between_reservations).is_equal_to(
             datetime.timedelta(hours=1)
         )
+        assert_that(res_unit.cancellation_rule).is_equal_to(self.rule)
 
     @mock.patch(
         "reservation_units.utils.hauki_exporter.ReservationUnitHaukiExporter.send_reservation_unit_to_hauki"
@@ -1656,6 +1673,28 @@ class ReservationUnitUpdateNotDraftTestCase(ReservationUnitMutationsTestCaseBase
         assert_that(res_unit_data.get("surfaceArea")).is_equal_to(expected_surface_area)
         self.res_unit.refresh_from_db()
         assert_that(self.res_unit.surface_area).is_equal_to(expected_surface_area)
+
+    def test_update_cancellation_rule(self):
+        data = self.get_valid_update_data()
+        data.update({"cancellationRulePk": self.rule.pk})
+        update_query = """
+                    mutation updateReservationUnit($input: ReservationUnitUpdateMutationInput!) {
+                        updateReservationUnit(input: $input) {
+                            errors {
+                                messages
+                                field
+                            }
+                        }
+                    }
+                """
+        response = self.query(update_query, input_data=data)
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        res_unit_data = content.get("data").get("updateReservationUnit")
+        assert_that(res_unit_data.get("errors")).is_none()
+        self.res_unit.refresh_from_db()
+        assert_that(self.res_unit.cancellation_rule).is_equal_to(self.rule)
 
     def test_errors_on_empty_name_translations(self):
         data = self.get_valid_update_data()

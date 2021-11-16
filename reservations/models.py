@@ -10,6 +10,7 @@ from applications.models import (
     ApplicationRound,
 )
 from reservation_units.models import ReservationUnit
+from tilavarauspalvelu.utils.auditlog_util import AuditLogger
 
 Q = models.Q
 User = get_user_model()
@@ -37,6 +38,15 @@ class AbilityGroup(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class ReservationCancelReason(models.Model):
+    reason = models.CharField(
+        max_length=255,
+        null=False,
+        blank=False,
+        verbose_name=_("Reason for cancellation"),
+    )
 
 
 class RecurringReservation(models.Model):
@@ -203,6 +213,19 @@ class Reservation(models.Model):
         blank=True,
     )
 
+    cancel_reason = models.ForeignKey(
+        ReservationCancelReason,
+        verbose_name=_("Reason for cancellation"),
+        related_name="reservations",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+    )
+
+    cancel_details = models.TextField(
+        verbose_name=_("Details for this reservation's cancellation"), blank=True
+    )
+
     def get_location_string(self):
         locations = []
         for reservation_unit in self.reservation_unit.all():
@@ -261,3 +284,6 @@ class ReservationPurpose(models.Model):
 
     def __str__(self) -> str:
         return self.name
+
+
+AuditLogger.register(Reservation)
