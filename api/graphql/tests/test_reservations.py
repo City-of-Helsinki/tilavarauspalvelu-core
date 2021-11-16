@@ -914,6 +914,19 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         self.reservation.refresh_from_db()
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CREATED)
 
+    def test_confirm_reservation_updates_confirmed_at(
+        self, mock_periods, mock_opening_hours
+    ):
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+        self._client.force_login(self.regular_joe)
+        input_data = self.get_valid_confirm_data()
+        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CREATED)
+        self.query(self.get_confirm_query(), input_data=input_data)
+        self.reservation.refresh_from_db()
+        assert_that(self.reservation.confirmed_at).is_equal_to(
+            datetime.datetime(2021, 10, 12, 12).astimezone()
+        )
+
 
 @freezegun.freeze_time("2021-10-12T12:00:00Z")
 class ReservationCancellationTestCase(ReservationTestCaseBase):

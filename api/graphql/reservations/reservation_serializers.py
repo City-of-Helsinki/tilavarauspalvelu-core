@@ -51,6 +51,7 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
             "buffer_time_after",
             "reservation_unit_pks",
             "purpose_pk",
+            "confirmed_at",
         ]
 
     def __init__(self, *args, **kwargs):
@@ -58,6 +59,7 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
         self.fields["state"].read_only = True
         self.fields["reservation_unit_pks"].write_only = True
         self.fields["purpose_pk"].required = False
+        self.fields["confirmed_at"].read_only = True
 
     def validate(self, data):
         begin = data.get("begin", getattr(self.instance, "begin", None))
@@ -215,6 +217,9 @@ class ReservationUpdateSerializer(
     def validated_data(self):
         validated_data = super().validated_data
         validated_data["user"] = self.instance.user  # Do not change the user.
+        validated_data["confirmed_at"] = datetime.datetime.now(
+            tz=get_default_timezone()
+        )
         return validated_data
 
 

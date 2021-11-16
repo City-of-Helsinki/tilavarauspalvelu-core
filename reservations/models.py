@@ -226,6 +226,8 @@ class Reservation(models.Model):
         verbose_name=_("Details for this reservation's cancellation"), blank=True
     )
 
+    confirmed_at = models.DateTimeField(verbose_name=_("Confirmed at"), null=True)
+
     def get_location_string(self):
         locations = []
         for reservation_unit in self.reservation_unit.all():
