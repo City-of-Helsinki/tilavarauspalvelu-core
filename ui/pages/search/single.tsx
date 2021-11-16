@@ -50,6 +50,14 @@ const StyledKoros = styled(Koros)`
   fill: white;
 `;
 
+const StyledSorting = styled(Sorting)`
+  display: block;
+
+  @media (min-width: 420px) {
+    display: flex;
+  }
+`;
+
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
@@ -183,7 +191,7 @@ const SearchSingle = (): JSX.Element => {
           loading={loading}
           reservationUnits={reservationUnits}
           sortingComponent={
-            <Sorting
+            <StyledSorting
               value={values.sort}
               sortingOptions={sortingOptions}
               setSorting={(val: OptionType) => {

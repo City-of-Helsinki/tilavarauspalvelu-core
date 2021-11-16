@@ -11,6 +11,7 @@ type Props = {
   setSorting: (option: OptionType) => void;
   isOrderingAsc: boolean;
   setIsOrderingAsc: (val: boolean) => void;
+  className?: string;
 };
 
 const Wrapper = styled.div`
@@ -52,11 +53,12 @@ const Sorting = ({
   setSorting,
   isOrderingAsc,
   setIsOrderingAsc,
+  className,
 }: Props): JSX.Element => {
   const { t } = useTranslation();
 
   return (
-    <Wrapper>
+    <Wrapper className={className}>
       <LeftBlock>
         <OrderBtn
           type="button"

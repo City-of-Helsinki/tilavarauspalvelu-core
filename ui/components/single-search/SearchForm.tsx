@@ -87,6 +87,7 @@ const ButtonContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
+  gap: var(--spacing-m);
 `;
 
 const TagControls = styled.div`
@@ -128,6 +129,14 @@ const StyledMultiSelectDropdown = styled(MultiSelectDropdown)`
 
   @media (min-width: ${breakpoint.xl}) {
     grid-column: 2/4;
+  }
+`;
+
+const SubmitButton = styled(MediumButton)`
+  width: 100%;
+
+  @media (min-width: ${breakpoint.s}) {
+    width: auto;
   }
 `;
 
@@ -344,13 +353,13 @@ const SearchForm = ({
             </>
           )}
         </TagControls>
-        <MediumButton
+        <SubmitButton
           id="searchButton"
           onClick={handleSubmit(search)}
           iconLeft={<IconSearch />}
         >
           {t("searchForm:searchButton")}
-        </MediumButton>
+        </SubmitButton>
       </ButtonContainer>
     </>
   );

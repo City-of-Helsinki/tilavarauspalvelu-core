@@ -10,6 +10,7 @@ import styled from "styled-components";
 import Container from "../common/Container";
 import ReservationUnitCard from "./ReservationUnitCard";
 import { PageInfo, ReservationUnitType } from "../../modules/gql-types";
+import { breakpoint } from "../../modules/style";
 
 interface Props {
   reservationUnits: ReservationUnitType[] | null;
@@ -26,9 +27,11 @@ const Wrapper = styled.div`
 `;
 
 const TopWrapper = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  @media (min-width: ${breakpoint.m}) {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
 `;
 
 const HitCount = styled.h2`
