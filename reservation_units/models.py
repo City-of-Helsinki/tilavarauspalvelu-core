@@ -10,6 +10,7 @@ from easy_thumbnails.fields import ThumbnailerImageField
 from resources.models import Resource
 from services.models import Service
 from spaces.models import Space, Unit
+from terms_of_use.models import TermsOfUse
 from tilavarauspalvelu.utils.auditlog_util import AuditLogger
 
 Q = models.Q
@@ -157,6 +158,30 @@ class ReservationUnit(models.Model):
     )
     terms_of_use = models.TextField(
         verbose_name=_("Terms of use"), blank=True, max_length=2000
+    )
+    payment_terms = models.ForeignKey(
+        TermsOfUse,
+        related_name="payment_terms_reservation_unit",
+        verbose_name=_("Payment terms"),
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+    )
+    cancellation_terms = models.ForeignKey(
+        TermsOfUse,
+        related_name="cancellation_terms_reservation_unit",
+        verbose_name=_("Cancellation terms"),
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+    )
+    service_specific_terms = models.ForeignKey(
+        TermsOfUse,
+        related_name="service_specific_terms_reservation_unit",
+        verbose_name=_("Service-specific terms"),
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
     )
     unit = models.ForeignKey(
         Unit,
