@@ -13,7 +13,7 @@ from .models import (
 
 
 class SpaceTranslationOptions(TranslationOptions):
-    fields = ["name", "terms_of_use"]
+    fields = ["name"]
 
 
 class UnitGroupTranslationOptions(TranslationOptions):

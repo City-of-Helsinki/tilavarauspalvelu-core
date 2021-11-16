@@ -225,12 +225,6 @@ class Space(MPTTModel):
         blank=True,
         default="",
     )
-    terms_of_use = models.TextField(
-        verbose_name=_("Terms of use"),
-        blank=True,
-        max_length=2000,
-        default="",
-    )
 
     def __str__(self):
         return "{} ({})".format(self.name, self.building.name if self.building else "")
