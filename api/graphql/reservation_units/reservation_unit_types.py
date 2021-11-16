@@ -119,7 +119,9 @@ class ReservationUnitHaukiUrlType(AuthNode, DjangoObjectType):
         fields = ("url",)
 
     def resolve_url(self, info):
-        return generate_hauki_link(self.uuid, info.context.user)
+        return generate_hauki_link(
+            self.uuid, info.context.user, self.unit.tprek_department_id
+        )
 
 
 class ReservationUnitImageType(DjangoObjectType):

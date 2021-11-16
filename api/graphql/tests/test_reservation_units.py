@@ -182,7 +182,8 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         settings.HAUKI_SECRET = "HAUKISECRET"
         settings.HAUKI_ADMIN_UI_URL = "https://test.com"
         settings.HAUKI_ORIGIN_ID = "origin"
-        settings.HAUKI_ORGANISATION_ID = "ORGANISATION"
+        self.reservation_unit.unit.tprek_department_id = "ORGANISATION"
+        self.reservation_unit.unit.save()
         self.maxDiff = None
         query = (
             f"{{\n"

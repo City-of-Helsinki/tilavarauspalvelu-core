@@ -10,12 +10,13 @@ from django.conf import settings
 from django.utils.timezone import get_default_timezone
 
 
-def generate_hauki_link(uuid: UUID, username: str) -> Union[None, str]:
+def generate_hauki_link(
+    uuid: UUID, username: str, organization_id: str
+) -> Union[None, str]:
     if not (
         settings.HAUKI_ADMIN_UI_URL
         and settings.HAUKI_SECRET
         and settings.HAUKI_ORIGIN_ID
-        and settings.HAUKI_ORGANISATION_ID
         and username
     ):
         return None
@@ -26,7 +27,7 @@ def generate_hauki_link(uuid: UUID, username: str) -> Union[None, str]:
 
     get_parameters_string = (
         f"hsa_source={settings.HAUKI_ORIGIN_ID}&hsa_username={username}"
-        f"&hsa_organization={settings.HAUKI_ORGANISATION_ID}"
+        f"&hsa_organization={organization_id}"
         f"&hsa_created_at={now}&hsa_valid_until={now + timedelta(minutes=HAUKI_EXPIRACY_TIME_MINUTES)}"
         f"&hsa_resource={settings.HAUKI_ORIGIN_ID}:{uuid}"
     )
