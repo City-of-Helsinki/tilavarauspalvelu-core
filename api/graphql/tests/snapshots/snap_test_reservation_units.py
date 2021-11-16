@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 
 from snapshottest import Snapshot
 
+
 snapshots = Snapshot()
 
 snapshots['ReservationUnitTestCase::test_filtering_by_active_application_rounds 1'] = {
@@ -288,6 +289,11 @@ snapshots['ReservationUnitTestCase::test_getting_reservation_units 1'] = {
                     'node': {
                         'applicationRounds': [
                         ],
+                        'cancellationRule': {
+                            'nameEn': 'en',
+                            'nameFi': 'fi',
+                            'nameSv': 'sv'
+                        },
                         'contactInformationFi': '',
                         'descriptionFi': '',
                         'equipment': [
@@ -318,11 +324,28 @@ snapshots['ReservationUnitTestCase::test_getting_reservation_units 1'] = {
                             }
                         ],
                         'surfaceArea': 150,
-                        'termsOfUseFi': None,
-                        'cancellationRule': {
-                            'nameFi': 'fi',
-                            'nameEn': 'en',
-                            'nameSv': 'sv',
+                        'termsOfUseFi': None
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitTestCase::test_getting_terms 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'cancellationTerms': {
+                            'textFi': 'Cancellation terms'
+                        },
+                        'paymentTerms': {
+                            'textFi': 'Payment terms'
+                        },
+                        'serviceSpecificTerms': {
+                            'textFi': 'Service-specific terms'
                         }
                     }
                 }

@@ -31,6 +31,8 @@ from reservations.tests.factories import ReservationFactory
 from resources.tests.factories import ResourceFactory
 from services.tests.factories import ServiceFactory
 from spaces.tests.factories import SpaceFactory, UnitFactory
+from terms_of_use.models import TermsOfUse
+from terms_of_use.tests.factories import TermsOfUseFactory
 
 DEFAULT_TIMEZONE = get_default_timezone()
 
@@ -709,6 +711,37 @@ class ReservationUnitTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
                     edges {
                         node {
                             surfaceArea
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(self.content_is_empty(content)).is_false()
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_getting_terms(self):
+        self.reservation_unit.payment_terms = TermsOfUseFactory(
+            text_fi="Payment terms", terms_type=TermsOfUse.TERMS_TYPE_CANCELLATION
+        )
+        self.reservation_unit.cancellation_terms = TermsOfUseFactory(
+            text_fi="Cancellation terms", terms_type=TermsOfUse.TERMS_TYPE_PAYMENT
+        )
+        self.reservation_unit.service_specific_terms = TermsOfUseFactory(
+            text_fi="Service-specific terms", terms_type=TermsOfUse.TERMS_TYPE_SERVICE
+        )
+        self.reservation_unit.save()
+        response = self.query(
+            """
+            query {
+                reservationUnits {
+                    edges {
+                        node {
+                            paymentTerms { textFi }
+                            cancellationTerms { textFi }
+                            serviceSpecificTerms { textFi }
                         }
                     }
                 }
