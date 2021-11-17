@@ -73,7 +73,6 @@ class DayPartAdmin(admin.ModelAdmin):
 @admin.register(Purpose)
 class PurposeAdmin(admin.ModelAdmin):
     model = Purpose
-    fields = ["name"]
 
 
 @admin.register(Equipment)
