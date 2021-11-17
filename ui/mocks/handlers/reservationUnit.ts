@@ -132,8 +132,8 @@ const selectedReservationUnitQuery = graphql.query<
           resourceState: null,
           timeSpans: [
             {
-              startTime: "09:00:00",
-              endTime: "12:00:00",
+              startTime: "09:00:00+00:00",
+              endTime: "12:00:00+00:00",
               weekdays: [6, 1, 7],
               resourceState: "open",
               endTimeOnNextDay: null,
@@ -145,8 +145,8 @@ const selectedReservationUnitQuery = graphql.query<
               descriptionSv: "Span desc Sv",
             },
             {
-              startTime: "12:00:00",
-              endTime: "21:00:00",
+              startTime: "12:00:00+00:00",
+              endTime: "21:00:00+00:00",
               weekdays: [7, 2],
               resourceState: "open",
               endTimeOnNextDay: null,
@@ -172,8 +172,8 @@ const selectedReservationUnitQuery = graphql.query<
           resourceState: null,
           timeSpans: [
             {
-              startTime: "09:00:00",
-              endTime: "21:00:00",
+              startTime: "09:00:00+00:00",
+              endTime: "21:00:00+00:00",
               weekdays: [4, 5, 6],
               resourceState: "open",
               endTimeOnNextDay: null,
@@ -185,8 +185,8 @@ const selectedReservationUnitQuery = graphql.query<
               descriptionSv: "Span desc Sv",
             },
             {
-              startTime: "09:00:00",
-              endTime: "21:00:00",
+              startTime: "09:00:00+00:00",
+              endTime: "21:00:00+00:00",
               weekdays: [7],
               resourceState: "open",
               endTimeOnNextDay: null,
@@ -239,8 +239,8 @@ const openingHoursQuery = graphql.query<
             pk: 5,
             state: "CREATED",
             priority: "A_200",
-            begin: "2021-10-27T12:50:31+00:00",
-            end: "2021-10-27T13:50:35+00:00",
+            begin: "2021-10-27T12:50:31.521000+00:00",
+            end: "2021-10-27T13:50:35.521000+00:00",
             numPersons: 3,
             calendarUrl:
               "http://localhost:8000/v1/reservation_calendar/5/?hash=aafe8cef803ea6aa3dc8c03307016b506554a62397a2c44828fc1d828fa7fee6",
@@ -250,8 +250,8 @@ const openingHoursQuery = graphql.query<
             pk: 6,
             state: "CREATED",
             priority: "A_200",
-            begin: "2021-11-27T12:50:31+00:00",
-            end: "2021-11-27T13:50:35+00:00",
+            begin: "2021-11-27T12:50:31.521000+00:00",
+            end: "2021-11-27T13:50:35.521000+00:00",
             numPersons: 3,
             calendarUrl:
               "http://localhost:8000/v1/reservation_calendar/5/?hash=aafe8cef803ea6aa3dc8c03307016b506554a62397a2c44828fc1d828fa7fee6",
