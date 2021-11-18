@@ -36,8 +36,10 @@ class ReservationTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCase):
     def setUpTestData(cls):
         super().setUpTestData()
         cls.space = SpaceFactory()
-        cls.reservation_unit = ReservationUnitFactory(pk=1, spaces=[cls.space])
-        cls.purpose = ReservationPurposeFactory()
+        cls.reservation_unit = ReservationUnitFactory(
+            pk=1, spaces=[cls.space], name="resunit"
+        )
+        cls.purpose = ReservationPurposeFactory(name="purpose")
 
     def get_mocked_opening_hours(self):
         resource_id = f"{settings.HAUKI_ORIGIN_ID}:{self.reservation_unit.uuid}"
@@ -58,6 +60,64 @@ class ReservationTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCase):
                 ],
             },
         ]
+
+
+class ReservationQueryTestCase(ReservationTestCaseBase):
+    def setUp(self):
+        super().setUp()
+        reservation_begin = datetime.datetime.now(tz=get_default_timezone())
+        reservation_end = datetime.datetime.now(
+            tz=get_default_timezone()
+        ) + datetime.timedelta(hours=1)
+        self.reservation = ReservationFactory(
+            reservee_first_name="Reser",
+            reservee_last_name="Vee",
+            name="movies",
+            description="movies&popcorn",
+            reservation_unit=[self.reservation_unit],
+            begin=reservation_begin,
+            end=reservation_end,
+            state=STATE_CHOICES.CREATED,
+            user=self.regular_joe,
+            priority=100,
+            purpose=self.purpose,
+        )
+
+    def test_reservation_query(self):
+        self.maxDiff = None
+        self._client.force_login(self.regular_joe)
+        response = self.query(
+            """
+            query {
+                reservations {
+                    edges {
+                        node {
+                            state
+                            priority
+                            user
+                            begin
+                            end
+                            bufferTimeBefore
+                            bufferTimeAfter
+                            reservationUnits{nameFi}
+                            recurringReservation{user}
+                            numPersons
+                            reserveeFirstName
+                            reserveeLastName
+                            reserveePhone
+                            name
+                            description
+                            purpose {nameFi}
+                          }
+                        }
+                    }
+                }
+            """
+        )
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
 
 
 @freezegun.freeze_time("2021-10-12T12:00:00Z")
