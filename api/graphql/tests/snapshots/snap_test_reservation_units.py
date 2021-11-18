@@ -25,6 +25,36 @@ snapshots['ReservationUnitTestCase::test_filtering_by_active_application_rounds 
     }
 }
 
+snapshots['ReservationUnitTestCase::test_filtering_by_is_draft_false 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'isDraft': False,
+                        'nameFi': 'Test name'
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitTestCase::test_filtering_by_is_draft_true 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'isDraft': True,
+                        'nameFi': 'Draft reservation unit'
+                    }
+                }
+            ]
+        }
+    }
+}
+
 snapshots['ReservationUnitTestCase::test_filtering_by_keyword_group 1'] = {
     'data': {
         'reservationUnits': {

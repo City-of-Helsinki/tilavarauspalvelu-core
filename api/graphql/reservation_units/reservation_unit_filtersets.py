@@ -35,6 +35,8 @@ class ReservationUnitsFilterSet(django_filters.FilterSet):
 
     purposes = ModelInFilter(field_name="purposes", queryset=Purpose.objects.all())
 
+    is_draft = django_filters.BooleanFilter(field_name="is_draft")
+
     order_by = django_filters.OrderingFilter(
         fields={
             "name_fi": "nameFi",
