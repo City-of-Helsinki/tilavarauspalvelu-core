@@ -16,6 +16,7 @@ from api.graphql.reservations.reservation_types import ReservationType
 from api.graphql.resources.resource_types import ResourceType
 from api.graphql.services.service_types import ServiceType
 from api.graphql.spaces.space_types import LocationType, SpaceType
+from api.graphql.terms_of_use.terms_of_use_types import TermsOfUseType
 from api.graphql.translate_fields import get_all_translatable_fields
 from api.graphql.units.unit_types import UnitType
 from applications.models import ApplicationRound
@@ -282,6 +283,9 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
     )
     application_rounds = graphene.List(ApplicationRoundType, active=graphene.Boolean())
     cancellation_rule = graphene.Field(ReservationUnitCancellationRuleType)
+    payment_terms = graphene.Field(TermsOfUseType)
+    cancellation_terms = graphene.Field(TermsOfUseType)
+    service_specific_terms = graphene.Field(TermsOfUseType)
 
     permission_classes = (
         (ReservationUnitPermission,)
@@ -311,6 +315,9 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
             "reservations",
             "application_rounds",
             "cancellation_rule",
+            "payment_terms",
+            "cancellation_terms",
+            "service_specific_terms",
         ] + get_all_translatable_fields(model)
         filter_fields = {
             "name_fi": ["exact", "icontains", "istartswith"],

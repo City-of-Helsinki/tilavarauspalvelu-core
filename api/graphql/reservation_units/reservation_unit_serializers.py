@@ -22,6 +22,7 @@ from reservation_units.models import (
 from resources.models import Resource
 from services.models import Service
 from spaces.models import Space, Unit
+from terms_of_use.models import TermsOfUse
 
 
 class EquipmentCreateSerializer(EquipmentSerializer, PrimaryKeySerializer):
@@ -128,6 +129,23 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
         source="cancellation_rule",
         required=False,
     )
+    payment_terms_pk = IntegerPrimaryKeyField(
+        queryset=TermsOfUse.objects.filter(terms_type=TermsOfUse.TERMS_TYPE_PAYMENT),
+        source="payment_terms",
+        required=False,
+    )
+    cancellation_terms_pk = IntegerPrimaryKeyField(
+        queryset=TermsOfUse.objects.filter(
+            terms_type=TermsOfUse.TERMS_TYPE_CANCELLATION
+        ),
+        source="cancellation_terms",
+        required=False,
+    )
+    service_specific_terms_pk = IntegerPrimaryKeyField(
+        queryset=TermsOfUse.objects.filter(terms_type=TermsOfUse.TERMS_TYPE_SERVICE),
+        source="service_specific_terms",
+        required=False,
+    )
 
     translation_fields = get_all_translatable_fields(ReservationUnit)
 
@@ -158,6 +176,9 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
             "surface_area",
             "buffer_time_between_reservations",
             "cancellation_rule_pk",
+            "payment_terms_pk",
+            "cancellation_terms_pk",
+            "service_specific_terms_pk",
         ] + get_all_translatable_fields(ReservationUnit)
 
     def __init__(self, *args, **kwargs):
@@ -167,6 +188,9 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
         self.fields["resource_pks"].write_only = True
         self.fields["purpose_pks"].write_only = True
         self.fields["service_pks"].write_only = True
+        self.fields["payment_terms_pk"].write_only = True
+        self.fields["cancellation_terms_pk"].write_only = True
+        self.fields["service_specific_terms_pk"].write_only = True
 
     def _check_pk_list(self, id_list, field_name):
         for identifier in id_list:

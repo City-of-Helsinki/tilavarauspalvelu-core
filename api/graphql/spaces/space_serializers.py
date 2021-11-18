@@ -31,9 +31,6 @@ class SpaceCreateSerializer(SpaceSerializer, PrimaryKeySerializer):
     )
     max_persons = serializers.IntegerField(required=False)
     code = serializers.CharField(required=False)
-    terms_of_use_fi = serializers.CharField(required=False, default="")
-    terms_of_use_sv = serializers.CharField(required=False, default="")
-    terms_of_use_en = serializers.CharField(required=False, default="")
     unit_pk = IntegerPrimaryKeyField(
         queryset=Unit.objects.all(), source="unit", required=False, allow_null=True
     )

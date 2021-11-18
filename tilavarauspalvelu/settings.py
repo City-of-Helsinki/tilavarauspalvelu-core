@@ -92,6 +92,7 @@ INSTALLED_APPS = [
     "tinymce",
     "easy_thumbnails",
     "django_celery_results",
+    "terms_of_use",
 ]
 
 MIDDLEWARE = [
