@@ -1,0 +1,2 @@
+class VerkkokauppaError(Exception):
+    pass
