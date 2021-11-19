@@ -123,7 +123,6 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
     )
 
     recurring_reservation = graphene.Field(RecurringReservationType)
-    state = graphene.String()
     reservee_first_name = graphene.String()
     reservee_last_name = graphene.String()
     reservee_phone = graphene.String()
