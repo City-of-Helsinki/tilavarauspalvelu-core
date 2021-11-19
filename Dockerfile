@@ -12,13 +12,14 @@ ARG BUILD_MODE
 
 RUN if [ "x$BUILD_MODE" = "xlocal" ] ;\
     then \
-    subscription-manager register --username $LOCAL_REDHAT_USERNAME --password $LOCAL_REDHAT_PASSWORD --auto-attach; \
+        subscription-manager register --username $LOCAL_REDHAT_USERNAME --password $LOCAL_REDHAT_PASSWORD --auto-attach; \
     else \
-    subscription-manager register --username ${REDHAT_USERNAME} --password ${REDHAT_PASSWORD} --auto-attach; \
+        subscription-manager register --username ${REDHAT_USERNAME} --password ${REDHAT_PASSWORD} --auto-attach; \
     fi
 
 RUN subscription-manager repos --enable codeready-builder-for-rhel-8-x86_64-rpms
-RUN subscription-manager refresh
+RUN subscription-manager repos --disable rhel-8-for-x86_64-baseos-beta-rpms
+RUN subscription-manager repos --disable rhel-8-for-x86_64-appstream-beta-rpms
 RUN yum -y update
 
 RUN rpm -Uvh https://download.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
