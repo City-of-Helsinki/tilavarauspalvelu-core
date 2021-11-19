@@ -83,6 +83,7 @@ from permissions.helpers import (
     get_units_where_can_view_reservations,
 )
 from reservation_units.models import Equipment, EquipmentCategory, ReservationUnit
+from reservations.models import Reservation
 from resources.models import Resource
 from spaces.models import ServiceSector, Space, Unit
 
@@ -212,6 +213,8 @@ class Query(graphene.ObjectType):
     reservations = ReservationsFilter(
         ReservationType, filterset_class=ReservationFilterSet
     )
+    reservation_by_pk = Field(ReservationType, pk=graphene.Int())
+
     reservation_cancel_reasons = ReservationCancelReasonFilter(
         ReservationCancelReasonType
     )
@@ -253,6 +256,11 @@ class Query(graphene.ObjectType):
     reservation_purposes = ReservationPurposeFilter(ReservationPurposeType)
 
     terms_of_use = TermsOfUseFilter(TermsOfUseType)
+
+    @check_resolver_permission(ReservationPermission)
+    def resolve_reservation_by_pk(self, info, **kwargs):
+        pk = kwargs.get("pk")
+        return get_object_or_404(Reservation, pk=pk)
 
     @check_resolver_permission(ReservationUnitPermission)
     def resolve_reservation_unit_by_pk(self, info, **kwargs):
