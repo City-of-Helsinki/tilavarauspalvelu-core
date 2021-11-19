@@ -178,6 +178,7 @@ class ReservationUnitTypeType(PrimaryKeyObjectType):
     class Meta:
         model = ReservationUnitTypeModel
         fields = ["pk"] + get_all_translatable_fields(model)
+        filter_fields = get_all_translatable_fields(model)
 
         interfaces = (graphene.relay.Node,)
 

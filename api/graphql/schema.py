@@ -33,6 +33,7 @@ from api.graphql.reservation_units.reservation_unit_types import (
     ReservationUnitByPkType,
     ReservationUnitCancellationRuleType,
     ReservationUnitType,
+    ReservationUnitTypeType,
 )
 from api.graphql.reservations.reservation_filtersets import ReservationFilterSet
 from api.graphql.reservations.reservation_mutations import (
@@ -134,6 +135,14 @@ class ReservationUnitsFilter(AuthFilter, django_filters.FilterSet):
     )
 
 
+class ReservationUnitTypesFilter(AuthFilter, django_filters.FilterSet):
+    permission_classes = (
+        (ReservationUnitPermission,)
+        if not settings.TMP_PERMISSIONS_DISABLED
+        else (AllowAny,)
+    )
+
+
 class ResourcesFilter(AuthFilter):
     permission_classes = (
         (ResourcePermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
@@ -224,6 +233,8 @@ class Query(graphene.ObjectType):
     reservation_unit_cancellation_rules = ReservationUnitCancellationRulesFilter(
         ReservationUnitCancellationRuleType
     )
+
+    reservation_unit_types = ReservationUnitTypesFilter(ReservationUnitTypeType)
 
     resources = ResourcesFilter(ResourceType)
     resource = relay.Node.Field(ResourceType)
