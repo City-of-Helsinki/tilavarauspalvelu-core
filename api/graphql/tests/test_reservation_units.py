@@ -1478,6 +1478,31 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
         self.res_unit.refresh_from_db()
         assert_that(self.res_unit.name_fi).is_equal_to("New name")
 
+    def test_update_with_terms_of_use_pks(self):
+        payment_terms = TermsOfUseFactory(terms_type=TermsOfUse.TERMS_TYPE_PAYMENT)
+        cancellation_terms = TermsOfUseFactory(
+            terms_type=TermsOfUse.TERMS_TYPE_CANCELLATION
+        )
+        service_specific_terms = TermsOfUseFactory(
+            terms_type=TermsOfUse.TERMS_TYPE_SERVICE
+        )
+        data = self.get_valid_update_data()
+        data["paymentTermsPk"] = payment_terms.pk
+        data["cancellationTermsPk"] = cancellation_terms.pk
+        data["serviceSpecificTermsPk"] = service_specific_terms.pk
+        response = self.query(self.get_update_query(), input_data=data)
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        res_unit_data = content.get("data").get("updateReservationUnit")
+        assert_that(res_unit_data.get("errors")).is_none()
+        self.res_unit.refresh_from_db()
+        assert_that(self.res_unit.payment_terms).is_equal_to(payment_terms)
+        assert_that(self.res_unit.cancellation_terms).is_equal_to(cancellation_terms)
+        assert_that(self.res_unit.service_specific_terms).is_equal_to(
+            service_specific_terms
+        )
+
     def test_update_errors_with_empty_name(self):
         data = self.get_valid_update_data()
         data["nameFi"] = ""
