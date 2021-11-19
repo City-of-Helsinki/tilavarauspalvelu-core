@@ -56,6 +56,7 @@ class ReservationUnitTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
             uuid="3774af34-9916-40f2-acc7-68db5a627710",
             spaces=[large_space, small_space],
             cancellation_rule=rule,
+            is_draft=False,
         )
 
         cls.api_client = APIClient()
@@ -698,6 +699,49 @@ class ReservationUnitTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
 
         content = json.loads(response.content)
         assert_that(self.content_is_empty(content)).is_false()
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filtering_by_is_draft_true(self):
+        ReservationUnitFactory(
+            name="Draft reservation unit",
+            is_draft=True,
+        )
+        response = self.query(
+            """
+            query {
+                reservationUnits(isDraft: true) {
+                    edges {
+                        node {
+                            nameFi
+                            isDraft
+                        }
+                    }
+                }
+            }
+            """
+        )
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filtering_by_is_draft_false(self):
+        response = self.query(
+            """
+            query {
+                reservationUnits(isDraft: false) {
+                    edges {
+                        node {
+                            nameFi
+                            isDraft
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
         self.assertMatchSnapshot(content)
 
