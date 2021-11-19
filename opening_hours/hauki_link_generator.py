@@ -1,9 +1,9 @@
 import datetime
 import hashlib
 import hmac
-import urllib.parse
 from datetime import timedelta
 from typing import Union
+from urllib.parse import quote_plus, urlencode
 from uuid import UUID
 
 from django.conf import settings
@@ -25,14 +25,17 @@ def generate_hauki_link(
 
     HAUKI_EXPIRACY_TIME_MINUTES = 30
 
-    get_parameters_string = (
-        f"hsa_source={settings.HAUKI_ORIGIN_ID}&hsa_username={username}"
-        f"&hsa_organization={organization_id}"
-        f"&hsa_created_at={now}&hsa_valid_until={now + timedelta(minutes=HAUKI_EXPIRACY_TIME_MINUTES)}"
-        f"&hsa_resource={settings.HAUKI_ORIGIN_ID}:{uuid}"
-    )
-
-    payload = dict(urllib.parse.parse_qsl(get_parameters_string))
+    get_parameters_dict = {
+        "hsa_source": settings.HAUKI_ORIGIN_ID,
+        "hsa_username": username,
+        "hsa_organization": organization_id,
+        "hsa_created_at": now.isoformat(),
+        "hsa_valid_until": (
+            now + timedelta(minutes=HAUKI_EXPIRACY_TIME_MINUTES)
+        ).isoformat(),
+        "hsa_resource": f"{settings.HAUKI_ORIGIN_ID}:{uuid}",
+        "hsa_has_organization_rights": "true",
+    }
 
     data_fields = [
         "hsa_source",
@@ -44,7 +47,13 @@ def generate_hauki_link(
         "hsa_has_organization_rights",
     ]
 
-    data_string = "".join([payload[field] for field in data_fields if field in payload])
+    data_string = "".join(
+        [
+            get_parameters_dict[field]
+            for field in data_fields
+            if field in get_parameters_dict
+        ]
+    )
 
     calculated_signature = hmac.new(
         key=settings.HAUKI_SECRET.encode("utf-8"),
@@ -52,7 +61,8 @@ def generate_hauki_link(
         digestmod=hashlib.sha256,
     ).hexdigest()
 
-    return (
-        f"{settings.HAUKI_ADMIN_UI_URL}/resource/"
-        f"{settings.HAUKI_ORIGIN_ID}:{uuid}/?{get_parameters_string}&hsa_signature={calculated_signature}"
-    )
+    get_parameters_dict["hsa_signature"] = calculated_signature
+    parameters = urlencode(get_parameters_dict)
+    base_url = f"{settings.HAUKI_ADMIN_UI_URL}/resource"
+    resource_url = quote_plus(f"{settings.HAUKI_ORIGIN_ID}:{uuid}")
+    return f"{base_url}/{resource_url}/?{parameters}"
