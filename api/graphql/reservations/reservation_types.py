@@ -1,3 +1,5 @@
+from typing import Optional
+
 import graphene
 from django.conf import settings
 from graphene_permissions.mixins import AuthNode
@@ -182,6 +184,18 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
     @check_resolver_permission(ReservationUnitPermission)
     def resolve_reservation_units(self, info: ResolveInfo):
         return self.reservation_unit.all()
+
+    @reservation_non_public_field
+    def resolve_reservee_first_name(self, info: ResolveInfo) -> Optional[str]:
+        return self.reservee_first_name
+
+    @reservation_non_public_field
+    def resolve_reservee_last_name(self, info: ResolveInfo) -> Optional[str]:
+        return self.reservee_last_name
+
+    @reservation_non_public_field
+    def resolve_reservee_phone(self, info: ResolveInfo) -> Optional[str]:
+        return self.reservee_phone
 
 
 class ReservationCancelReasonType(AuthNode, PrimaryKeyObjectType):

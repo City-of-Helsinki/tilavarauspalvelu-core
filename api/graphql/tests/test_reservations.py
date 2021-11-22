@@ -1174,3 +1174,45 @@ class ReservationCancellationTestCase(ReservationTestCaseBase):
         assert_that(cancel_data.get("errors")).is_not_none()
         reservation.refresh_from_db()
         assert_that(reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
+
+
+class ReservationByPkTestCase(ReservationTestCaseBase):
+    def setUp(self):
+        super().setUp()
+        self.reservation = ReservationFactory(
+            reservation_unit=[self.reservation_unit],
+            reservee_first_name="Joe",
+            reservee_last_name="Regular",
+            reservee_phone="+358123456789",
+            name="Test reservation",
+            user=self.regular_joe,
+        )
+
+    def get_query(self) -> str:
+        return f"""
+            {{
+                reservationByPk(pk: {self.reservation.pk}) {{
+                    reserveeFirstName
+                    reserveeLastName
+                    reserveePhone
+                    name
+                }}
+            }}
+        """
+
+    def test_getting_reservation_by_pk(self):
+        self._client.force_login(self.regular_joe)
+        response = self.query(self.get_query())
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_getting_reservation_of_another_user_by_pk_does_not_reveal_reservee_name(
+        self,
+    ):
+        unauthorized_user = get_user_model().objects.create()
+        self._client.force_login(unauthorized_user)
+        response = self.query(self.get_query())
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
