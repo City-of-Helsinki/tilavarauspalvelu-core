@@ -15,6 +15,7 @@ import os
 import subprocess  # nosec
 
 import environ
+import graphql
 import sentry_sdk
 from django.utils.translation import gettext_lazy as _
 from sentry_sdk.integrations.django import DjangoIntegration
@@ -22,6 +23,11 @@ from sentry_sdk.integrations.django import DjangoIntegration
 from tilavarauspalvelu.loggers import LOGGING_CONSOLE, LOGGING_ELASTIC
 
 logger = logging.getLogger("settings")
+
+
+# This is a temporary fix for graphene_permissions to avoid ImportError when importing ResolveInfo
+# This can be removed when graphene_permissions is updated to import ResolveInfo from the correct package.
+graphql.ResolveInfo = graphql.GraphQLResolveInfo
 
 
 def get_git_revision_hash() -> str:
