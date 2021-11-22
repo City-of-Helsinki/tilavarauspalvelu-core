@@ -400,6 +400,11 @@ THUMBNAIL_ALIASES = {
     },
 }
 
+# Do not try to chmod when uploading images.
+# Our environments uses persistent storage for media and operation will not be permitted.
+# https://dev.azure.com/City-of-Helsinki/devops-guides/_git/devops-handbook?path=/storage.md&_a=preview&anchor=operation-not-permitted
+FILE_UPLOAD_PERMISSIONS = None
+
 CELERY_ENABLED = env("CELERY_ENABLED")
 CELERY_RESULT_BACKEND = env("CELERY_RESULT_BACKEND")
 
