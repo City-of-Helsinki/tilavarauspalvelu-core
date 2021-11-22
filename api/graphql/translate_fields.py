@@ -3,7 +3,7 @@ from typing import List, Type
 from django.conf import settings
 from django.db import models
 from django.db.models import Model
-from graphql import ResolveInfo
+from graphene import ResolveInfo
 from modeltranslation.manager import get_translatable_fields_for_model
 
 LANGUAGE_CODES = [x[0] for x in settings.LANGUAGES]

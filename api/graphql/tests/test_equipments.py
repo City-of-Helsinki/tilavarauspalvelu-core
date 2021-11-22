@@ -92,7 +92,7 @@ class EquipmentUpdateTestCase(EquipmentBaseTestCase):
         assert_that(self.equipment.name).is_equal_to("Updated name")
 
     def test_updating_should_error_when_not_found(self):
-        data = {"pk": "1234", "nameFi": "Me errors", "categoryPk": self.category.id}
+        data = {"pk": 1234, "nameFi": "Me errors", "categoryPk": self.category.id}
         response = self.query(self.get_update_query(), input_data=data)
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
@@ -221,7 +221,7 @@ class EquipmentCategoryUpdateTestCase(EquipmentBaseTestCase):
         assert_that(self.equipment_category.name).is_equal_to("Updated name")
 
     def test_updating_should_error_when_not_found(self):
-        data = {"pk": "1234", "nameFi": "Me errors"}
+        data = {"pk": 1234, "nameFi": "Me errors"}
         response = self.query(self.get_update_query(), input_data=data)
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
