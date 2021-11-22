@@ -25,10 +25,10 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.8
-      - name: psycopg2 prerequisites
+      - name: psycopg2 and graphviz prerequisites
         run: |
           sudo apt update
-          sudo apt install python-dev libpq-dev gdal-bin -y
+          sudo apt install python-dev libpq-dev gdal-bin graphviz -y
       - name: Install dependencies
         run: |
           python3 -m pip install --upgrade pip

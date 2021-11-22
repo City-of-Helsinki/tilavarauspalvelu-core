@@ -449,3 +449,10 @@ if not all(
     logging.error(
         "Some of Tunnistamo environment variables are not set. Authentication may not work properly!"
     )
+
+
+# Settings for generating model visualizaxtion
+GRAPH_MODELS = {
+    "all_applications": True,
+    "group_models": True,
+}

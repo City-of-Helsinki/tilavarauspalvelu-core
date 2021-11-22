@@ -224,6 +224,8 @@ pycparser==2.20
     # via cffi
 pycryptodomex==3.10.1
     # via pyjwkest
+pydot==1.4.2
+    # via -r requirements.in
 pyflakes==2.2.0
     # via flake8
 pyjwkest==1.4.2
@@ -233,7 +235,9 @@ pyjwt==2.1.0
     #   django-graphql-jwt
     #   social-auth-core
 pyparsing==2.4.7
-    # via packaging
+    # via
+    #   packaging
+    #   pydot
 pyrsistent==0.17.3
     # via jsonschema
 pytest-cov==2.10.1

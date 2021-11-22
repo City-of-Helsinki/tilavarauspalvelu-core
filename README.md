@@ -102,4 +102,4 @@ For unknown reason separate user objects are created for JWT and Django Admin au
 For development purposes requirement to authenticate can be turned off by setting
 environment variable TMP_PERMISSIONS_DISABLED to True.
 
-![Tietokantakuvaus](tilavarauspalvelu_visualized.png)
+![Data model visualization](tilavarauspalvelu_visualized.svg)
