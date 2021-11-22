@@ -290,7 +290,9 @@ class ReservationCancellationSerializer(PrimaryKeyUpdateSerializer):
         for reservation_unit in self.instance.reservation_unit.all():
             cancel_rule = reservation_unit.cancellation_rule
             if not cancel_rule:
-                continue
+                raise serializers.ValidationError(
+                    "Reservation cannot be cancelled thus no cancellation rule."
+                )
             must_be_cancelled_before = (
                 self.instance.begin - cancel_rule.can_be_cancelled_time_before
             )
