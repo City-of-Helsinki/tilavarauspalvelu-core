@@ -4,7 +4,52 @@ from __future__ import unicode_literals
 
 from snapshottest import Snapshot
 
+
 snapshots = Snapshot()
+
+snapshots['ReservationByPkTestCase::test_getting_reservation_by_pk 1'] = {
+    'data': {
+        'reservationByPk': {
+            'name': 'Test reservation',
+            'reserveeFirstName': 'Joe',
+            'reserveeLastName': 'Regular',
+            'reserveePhone': '+358123456789'
+        }
+    }
+}
+
+snapshots['ReservationByPkTestCase::test_getting_reservation_of_another_user_by_pk_does_not_reveal_reservee_name 1'] = {
+    'data': {
+        'reservationByPk': {
+            'name': 'Test reservation',
+            'reserveeFirstName': None,
+            'reserveeLastName': None,
+            'reserveePhone': None
+        }
+    }
+}
+
+snapshots['ReservationQueryTestCase::test_getting_reservation_by_pk 1'] = {
+    'data': {
+        'reservationByPk': {
+            'name': 'Test reservation',
+            'reserveeFirstName': 'Joe',
+            'reserveeLastName': 'Regular',
+            'reserveePhone': '+358123456789'
+        }
+    }
+}
+
+snapshots['ReservationQueryTestCase::test_getting_reservation_of_another_user_by_pk_does_not_reveal_reservee_name 1'] = {
+    'data': {
+        'reservationByPk': {
+            'name': 'Test reservation',
+            'reserveeFirstName': None,
+            'reserveeLastName': None,
+            'reserveePhone': None
+        }
+    }
+}
 
 snapshots['ReservationQueryTestCase::test_reservation_query 1'] = {
     'data': {
@@ -37,28 +82,6 @@ snapshots['ReservationQueryTestCase::test_reservation_query 1'] = {
                     }
                 }
             ]
-        }
-    }
-}
-
-snapshots['ReservationQueryTestCase::test_getting_reservation_by_pk 1'] = {
-    'data': {
-        'reservationByPk': {
-            'name': 'Test reservation',
-            'reserveeFirstName': 'Joe',
-            'reserveeLastName': 'Regular',
-            'reserveePhone': '+358123456789'
-        }
-    }
-}
-
-snapshots['ReservationQueryTestCase::test_getting_reservation_of_another_user_by_pk_does_not_reveal_reservee_name 1'] = {
-    'data': {
-        'reservationByPk': {
-            'name': 'Test reservation',
-            'reserveeFirstName': None,
-            'reserveeLastName': None,
-            'reserveePhone': None
         }
     }
 }
