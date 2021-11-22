@@ -5,10 +5,10 @@ import graphene
 from django.conf import settings
 from django.db.models import Q, QuerySet, Sum
 from easy_thumbnails.files import get_thumbnailer
+from graphene import ResolveInfo
 from graphene_django import DjangoObjectType
 from graphene_permissions.mixins import AuthNode
 from graphene_permissions.permissions import AllowAny
-from graphql import ResolveInfo
 
 from api.graphql.base_type import PrimaryKeyObjectType
 from api.graphql.opening_hours.opening_hours_types import OpeningHoursMixin

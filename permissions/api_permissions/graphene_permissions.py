@@ -1,8 +1,8 @@
 from typing import Any
 
 from django.shortcuts import get_object_or_404
+from graphene import ResolveInfo
 from graphene_permissions.permissions import BasePermission
-from graphql import ResolveInfo
 
 from permissions.helpers import (
     can_create_reservation,

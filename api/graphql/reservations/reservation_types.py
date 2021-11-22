@@ -1,8 +1,8 @@
 import graphene
 from django.conf import settings
+from graphene import ResolveInfo
 from graphene_permissions.mixins import AuthNode
 from graphene_permissions.permissions import AllowAny, AllowAuthenticated
-from graphql.execution.base import ResolveInfo
 from rest_framework.reverse import reverse
 
 from api.graphql.base_type import PrimaryKeyObjectType

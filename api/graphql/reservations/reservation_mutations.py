@@ -1,7 +1,7 @@
 import graphene
+from graphene import ResolveInfo
 from graphene_django.rest_framework.mutation import SerializerMutation
 from graphene_permissions.permissions import AllowAny
-from graphql import ResolveInfo
 
 from api.graphql.base_mutations import AuthSerializerMutation
 from api.graphql.reservations.reservation_serializers import (
