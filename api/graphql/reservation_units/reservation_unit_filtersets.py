@@ -5,7 +5,6 @@ import django_filters
 from django.db.models import Q, Sum
 from django_filters import CharFilter
 
-from api.common_filters import ModelInFilter
 from reservation_units.models import (
     KeywordGroup,
     Purpose,
@@ -16,8 +15,10 @@ from spaces.models import Unit
 
 
 class ReservationUnitsFilterSet(django_filters.FilterSet):
-    unit = ModelInFilter(field_name="unit", queryset=Unit.objects.all())
-    reservation_unit_type = ModelInFilter(
+    unit = django_filters.ModelMultipleChoiceFilter(
+        field_name="unit", queryset=Unit.objects.all()
+    )
+    reservation_unit_type = django_filters.ModelMultipleChoiceFilter(
         field_name="reservation_unit_type", queryset=ReservationUnitType.objects.all()
     )
     max_persons_gte = django_filters.NumberFilter(
@@ -29,11 +30,13 @@ class ReservationUnitsFilterSet(django_filters.FilterSet):
 
     text_search = CharFilter(method="get_text_search")
 
-    keyword_groups = ModelInFilter(
+    keyword_groups = django_filters.ModelMultipleChoiceFilter(
         field_name="keyword_groups", queryset=KeywordGroup.objects.all()
     )
 
-    purposes = ModelInFilter(field_name="purposes", queryset=Purpose.objects.all())
+    purposes = django_filters.ModelMultipleChoiceFilter(
+        field_name="purposes", queryset=Purpose.objects.all()
+    )
 
     is_draft = django_filters.BooleanFilter(field_name="is_draft")
 
