@@ -129,19 +129,19 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
         source="cancellation_rule",
         required=False,
     )
-    payment_terms_pk = IntegerPrimaryKeyField(
+    payment_terms_pk = serializers.PrimaryKeyRelatedField(
         queryset=TermsOfUse.objects.filter(terms_type=TermsOfUse.TERMS_TYPE_PAYMENT),
         source="payment_terms",
         required=False,
     )
-    cancellation_terms_pk = IntegerPrimaryKeyField(
+    cancellation_terms_pk = serializers.PrimaryKeyRelatedField(
         queryset=TermsOfUse.objects.filter(
             terms_type=TermsOfUse.TERMS_TYPE_CANCELLATION
         ),
         source="cancellation_terms",
         required=False,
     )
-    service_specific_terms_pk = IntegerPrimaryKeyField(
+    service_specific_terms_pk = serializers.PrimaryKeyRelatedField(
         queryset=TermsOfUse.objects.filter(terms_type=TermsOfUse.TERMS_TYPE_SERVICE),
         source="service_specific_terms",
         required=False,
