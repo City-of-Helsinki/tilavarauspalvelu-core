@@ -52,6 +52,7 @@ class ReservationUnitTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
         )
         cls.reservation_unit = ReservationUnitFactory(
             name="Test name",
+            unit=UnitFactory(name_fi="Test unit"),
             reservation_unit_type=cls.type,
             uuid="3774af34-9916-40f2-acc7-68db5a627710",
             spaces=[large_space, small_space],
@@ -238,6 +239,54 @@ class ReservationUnitTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
             .get("openingTimes")[0]["endTime"]
         ).is_equal_to("22:00:00+00:00")
 
+    def test_filtering_by_unit(self):
+        ReservationUnitFactory(unit=UnitFactory())  # should be excluded
+        response = self.query(
+            f"""
+            query {{
+                reservationUnits(unit: {self.reservation_unit.unit.pk}) {{
+                    edges {{
+                        node {{
+                            nameFi
+                            unit {{
+                                nameFi
+                            }}
+                        }}
+                    }}
+                }}
+            }}
+            """
+        )
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filtering_by_multiple_units(self):
+        ReservationUnitFactory(unit=UnitFactory())  # should be excluded
+        other_unit = UnitFactory(name_fi="Other unit")
+        ReservationUnitFactory(name_fi="Other reservation unit", unit=other_unit)
+        response = self.query(
+            f"""
+            query {{
+                reservationUnits(unit: [{self.reservation_unit.unit.pk},{other_unit.pk}]) {{
+                    edges {{
+                        node {{
+                            nameFi
+                            unit {{
+                                nameFi
+                            }}
+                        }}
+                    }}
+                }}
+            }}
+            """
+        )
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
     def test_filtering_by_type(self):
         response = self.query(
             f"query {{"
@@ -258,6 +307,36 @@ class ReservationUnitTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
         assert_that(content.get("errors")).is_none()
         self.assertMatchSnapshot(content)
 
+    def test_filtering_by_multiple_types(self):
+        ReservationUnitFactory(unit=UnitFactory())  # should be excluded
+        other_type = ReservationUnitTypeFactory(name="Other type")
+        ReservationUnitFactory(
+            name="Other reservation unit",
+            reservation_unit_type=other_type,
+            uuid="25455dc2-5383-426d-b711-97b241710ace",
+            is_draft=True,
+        )
+        response = self.query(
+            f"""
+            query {{
+                reservationUnits(reservationUnitType: [{self.type.id},{other_type.id}]) {{
+                    edges {{
+                        node {{
+                            nameFi
+                            reservationUnitType {{
+                                nameFi
+                            }}
+                        }}
+                    }}
+                }}
+            }}
+            """
+        )
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
     def test_filtering_by_purpose(self):
         purpose = PurposeFactory(name="Test purpose")
         self.reservation_unit.purposes.set([purpose])
@@ -268,6 +347,33 @@ class ReservationUnitTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
                     edges {{
                         node {{
                             nameFi purposes {{
+                                nameFi
+                            }}
+                        }}
+                    }}
+                }}
+            }}
+            """
+        )
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filtering_by_multiple_purposes(self):
+        excluded = ReservationUnitFactory()  # should be excluded
+        excluded.purposes.set([PurposeFactory()])
+        purpose = PurposeFactory(name="Test purpose")
+        other_purpose = PurposeFactory(name="Other purpose")
+        self.reservation_unit.purposes.set([purpose])
+        response = self.query(
+            f"""
+            query {{
+                reservationUnits(purposes: [{purpose.pk},{other_purpose.pk}]) {{
+                    edges {{
+                        node {{
+                            nameFi
+                            purposes {{
                                 nameFi
                             }}
                         }}
@@ -535,6 +641,38 @@ class ReservationUnitTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
 
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_empty()
+
+    def test_filtering_by_multiple_keyword_groups(self):
+        category = KeywordCategoryFactory()
+        excluded = ReservationUnitFactory()  # should be excluded
+        excluded.keyword_groups.set([KeywordGroupFactory(keyword_category=category)])
+        keyword_group = KeywordGroupFactory(
+            name="Test group", keyword_category=category
+        )
+        other_keyword_group = KeywordGroupFactory(
+            name="Other group", keyword_category=category
+        )
+        self.reservation_unit.keyword_groups.set([keyword_group])
+        response = self.query(
+            f"""
+            query {{
+                reservationUnits(keywordGroups: [{keyword_group.pk},{other_keyword_group.pk}]) {{
+                    edges {{
+                        node {{
+                            nameFi
+                            keywordGroups {{
+                                nameFi
+                            }}
+                        }}
+                    }}
+                }}
+            }}
+            """
+        )
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
 
     def test_filtering_by_reservation_timestamps(self):
         now = datetime.datetime.now().astimezone()

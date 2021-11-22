@@ -4,7 +4,6 @@ from __future__ import unicode_literals
 
 from snapshottest import Snapshot
 
-
 snapshots = Snapshot()
 
 snapshots['ReservationUnitTestCase::test_filtering_by_active_application_rounds 1'] = {
@@ -98,6 +97,44 @@ snapshots['ReservationUnitTestCase::test_filtering_by_max_persons_not_found 1'] 
     }
 }
 
+snapshots['ReservationUnitTestCase::test_filtering_by_multiple_keyword_groups 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'keywordGroups': [
+                            {
+                                'nameFi': 'Test group'
+                            }
+                        ],
+                        'nameFi': 'Test name'
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitTestCase::test_filtering_by_multiple_purposes 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'nameFi': 'Test name',
+                        'purposes': [
+                            {
+                                'nameFi': 'Test purpose'
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    }
+}
+
 snapshots['ReservationUnitTestCase::test_filtering_by_multiple_reservation_states 1'] = {
     'data': {
         'reservationUnits': {
@@ -117,6 +154,56 @@ snapshots['ReservationUnitTestCase::test_filtering_by_multiple_reservation_state
                                 'state': 'CONFIRMED'
                             }
                         ]
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitTestCase::test_filtering_by_multiple_types 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'nameFi': 'Test name',
+                        'reservationUnitType': {
+                            'nameFi': 'Test type'
+                        }
+                    }
+                },
+                {
+                    'node': {
+                        'nameFi': 'Other reservation unit',
+                        'reservationUnitType': {
+                            'nameFi': 'Other type'
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitTestCase::test_filtering_by_multiple_units 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'nameFi': 'Test name',
+                        'unit': {
+                            'nameFi': 'Test unit'
+                        }
+                    }
+                },
+                {
+                    'node': {
+                        'nameFi': 'Other reservation unit',
+                        'unit': {
+                            'nameFi': 'Other unit'
+                        }
                     }
                 }
             ]
@@ -278,6 +365,23 @@ snapshots['ReservationUnitTestCase::test_filtering_by_type_text 1'] = {
                         'nameFi': 'Test name',
                         'reservationUnitType': {
                             'nameFi': 'Test type'
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitTestCase::test_filtering_by_unit 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'nameFi': 'Test name',
+                        'unit': {
+                            'nameFi': 'Test unit'
                         }
                     }
                 }
