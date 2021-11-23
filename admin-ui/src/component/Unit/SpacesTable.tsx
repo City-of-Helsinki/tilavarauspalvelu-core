@@ -252,6 +252,7 @@ const SpacesTable = ({
   return (
     <Wrapper>
       <DataTable
+        key={spaces.length}
         groups={spacesAsGroups(spaces)}
         hasGrouping
         renderGroup={renderGroup}
