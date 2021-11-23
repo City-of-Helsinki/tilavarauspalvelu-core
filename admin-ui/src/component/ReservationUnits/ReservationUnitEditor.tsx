@@ -150,7 +150,7 @@ const getInitialState = (reservationUnitPk: number): State => ({
 });
 
 const withLoadingStatus = (state: State): State => {
-  const hasError = state.notification?.type === "error";
+  const hasError = state.notification?.type === "error" || state.error;
 
   const newLoadingStatus =
     !hasError &&
@@ -320,12 +320,12 @@ const reducer = (state: State, action: Action): State => {
       });
     }
     case "dataInitializationError": {
-      return {
+      return withLoadingStatus({
         ...state,
         loading: false,
         hasChanges: false,
         error: { message: action.message },
-      };
+      });
     }
     case "clearError": {
       return {
@@ -671,6 +671,20 @@ const ReservationUnitEditor = (): JSX.Element | null => {
     state.reservationUnitEdit.nameFi &&
     state.reservationUnitEdit.nameSv &&
     state.reservationUnitEdit.nameEn;
+
+  if (state.error) {
+    return (
+      <Wrapper>
+        <Notification
+          type="error"
+          label={t("ReservationUnitEditor.errorDataHeading")}
+          position="top-center"
+        >
+          {t(state.error?.message)}
+        </Notification>
+      </Wrapper>
+    );
+  }
 
   if (state.reservationUnitEdit === null) {
     return null;
@@ -1055,21 +1069,6 @@ const ReservationUnitEditor = (): JSX.Element | null => {
           </Editor>
         </EditorContainer>
       </ContentContainer>
-      {state.error ? (
-        <Wrapper>
-          <div>error</div>
-          <Notification
-            type="error"
-            label={t("ReservationUnitEditor.errorDataHeading")}
-            position="top-center"
-            dismissible
-            onClose={() => dispatch({ type: "clearError" })}
-            closeButtonLabelText={t("common.close")}
-          >
-            {t(state.error?.message)}
-          </Notification>
-        </Wrapper>
-      ) : null}
     </Wrapper>
   );
 };
