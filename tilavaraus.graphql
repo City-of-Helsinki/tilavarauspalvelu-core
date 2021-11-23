@@ -482,19 +482,20 @@ type PurposeUpdateMutationPayload {
 
 type Query {
   reservations(before: String, after: String, first: Int, last: Int, begin: DateTime, end: DateTime): ReservationTypeConnection
+  reservationByPk(pk: Int): ReservationType
   reservationCancelReasons(before: String, after: String, first: Int, last: Int, reason: String): ReservationCancelReasonTypeConnection
   reservationUnits(
     before: String
     after: String
     first: Int
     last: Int
-    unit: ID
-    keywordGroups: ID
-    reservationUnitType: ID
+    unit: [ID]
+    keywordGroups: [ID]
+    reservationUnitType: [ID]
     maxPersonsGte: Float
     maxPersonsLte: Float
     textSearch: String
-    purposes: ID
+    purposes: [ID]
     isDraft: Boolean
 
     """Järjestys"""
@@ -505,6 +506,7 @@ type Query {
   reservationUnit(id: ID!): ReservationUnitType
   reservationUnitByPk(pk: Int): ReservationUnitByPkType
   reservationUnitCancellationRules(before: String, after: String, first: Int, last: Int, name: String): ReservationUnitCancellationRuleTypeConnection
+  reservationUnitTypes(before: String, after: String, first: Int, last: Int, nameFi: String, nameEn: String, nameSv: String): ReservationUnitTypeTypeConnection
   resources(before: String, after: String, first: Int, last: Int, nameFi: String, nameFi_Icontains: String, nameFi_Istartswith: String, nameSv: String, nameSv_Icontains: String, nameSv_Istartswith: String, nameEn: String, nameEn_Icontains: String, nameEn_Istartswith: String): ResourceTypeConnection
 
   """The ID of the object"""
@@ -896,12 +898,12 @@ input ReservationUnitCreateMutationInput {
   paymentTermsPk: String
   cancellationTermsPk: String
   serviceSpecificTermsPk: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
@@ -950,12 +952,12 @@ type ReservationUnitCreateMutationPayload {
   surfaceArea: Float
   bufferTimeBetweenReservations: String
   cancellationRulePk: Int
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
@@ -1065,6 +1067,23 @@ type ReservationUnitTypeType implements Node {
   pk: Int
 }
 
+type ReservationUnitTypeTypeConnection {
+  """Pagination data for this connection."""
+  pageInfo: PageInfo!
+
+  """Contains the nodes in this connection."""
+  edges: [ReservationUnitTypeTypeEdge]!
+}
+
+"""A Relay edge containing a `ReservationUnitTypeType` and its cursor."""
+type ReservationUnitTypeTypeEdge {
+  """The item at the end of the edge"""
+  node: ReservationUnitTypeType
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
+
 input ReservationUnitUpdateMutationInput {
   pk: Int!
 
@@ -1089,12 +1108,12 @@ input ReservationUnitUpdateMutationInput {
   paymentTermsPk: String
   cancellationTermsPk: String
   serviceSpecificTermsPk: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
@@ -1143,12 +1162,12 @@ type ReservationUnitUpdateMutationPayload {
   surfaceArea: Float
   bufferTimeBetweenReservations: String
   cancellationRulePk: Int
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
@@ -1684,12 +1703,12 @@ input UnitUpdateMutationInput {
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
-  shortDescriptionFi: String
-  shortDescriptionEn: String
-  shortDescriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  shortDescriptionFi: String
+  shortDescriptionEn: String
+  shortDescriptionSv: String
   clientMutationId: String
 }
 
@@ -1702,12 +1721,12 @@ type UnitUpdateMutationPayload {
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
-  shortDescriptionFi: String
-  shortDescriptionEn: String
-  shortDescriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  shortDescriptionFi: String
+  shortDescriptionEn: String
+  shortDescriptionSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
