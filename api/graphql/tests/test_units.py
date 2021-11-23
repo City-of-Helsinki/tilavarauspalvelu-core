@@ -39,7 +39,7 @@ class UnitsUpdateTestCase(GraphQLTestCase):
         return "mutation updateUnit($input: UnitUpdateMutationInput!) {updateUnit(input: $input){pk}}"
 
     def test_admin_can_update_unit(self):
-        self._client.force_login(self.unit_admin)
+        self.client.force_login(self.unit_admin)
         desc = "Awesomeunit"
         response = self.query(
             self.get_update_query(),
@@ -53,7 +53,7 @@ class UnitsUpdateTestCase(GraphQLTestCase):
         assert_that(Unit.objects.get(pk=self.unit.pk).description).is_equal_to(desc)
 
     def test_normal_user_cannot_update_unit(self):
-        self._client.force_login(self.regular_joe)
+        self.client.force_login(self.regular_joe)
         desc = "Awesomeunit"
         response = self.query(
             self.get_update_query(),

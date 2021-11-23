@@ -37,7 +37,7 @@ class SpaceMutationBaseTestCase(GraphQLTestCase):
 class DeleteSpaceTestCase(SpaceMutationBaseTestCase):
     def setUp(self) -> None:
         self.space = SpaceFactory(name="Test space")
-        self._client.force_login(self.general_admin)
+        self.client.force_login(self.general_admin)
 
     def get_delete_query(self):
         return (
@@ -76,7 +76,7 @@ class DeleteSpaceTestCase(SpaceMutationBaseTestCase):
         assert_that(Space.objects.filter(pk=self.space.pk).exists()).is_true()
 
     def test_space_not_deleted_when_no_credentials(self):
-        self._client.force_login(self.regular_user)
+        self.client.force_login(self.regular_user)
 
         app_round = ApplicationRoundFactory()
         resunit = ReservationUnitFactory(spaces=[self.space])
@@ -96,7 +96,7 @@ class DeleteSpaceTestCase(SpaceMutationBaseTestCase):
 
 class CreateSpaceTestCase(SpaceMutationBaseTestCase):
     def setUp(self) -> None:
-        self._client.force_login(self.general_admin)
+        self.client.force_login(self.general_admin)
 
     def get_create_query(self):
         return """
@@ -148,7 +148,7 @@ class CreateSpaceTestCase(SpaceMutationBaseTestCase):
         ).contains("nameFi cannot be empty.")
 
     def test_regular_user_cannot_create(self):
-        self._client.force_login(self.regular_user)
+        self.client.force_login(self.regular_user)
         data = {"nameFi": "Woohoo I created a space!"}
         response = self.query(self.get_create_query(), input_data=data)
         assert_that(response.status_code).is_equal_to(200)
@@ -164,7 +164,7 @@ class UpdateSpaceTestCase(SpaceMutationBaseTestCase):
         cls.space = SpaceFactory(name="Space1")
 
     def setUp(self) -> None:
-        self._client.force_login(self.general_admin)
+        self.client.force_login(self.general_admin)
 
     def get_update_query(self):
         return """
@@ -211,7 +211,7 @@ class UpdateSpaceTestCase(SpaceMutationBaseTestCase):
         ).contains("nameFi cannot be empty.")
 
     def test_regular_user_cannot_update(self):
-        self._client.force_login(self.regular_user)
+        self.client.force_login(self.regular_user)
         data = {"pk": self.space.pk, "nameFi": "Woohoo I created a space!"}
         response = self.query(self.get_update_query(), input_data=data)
         assert_that(response.status_code).is_equal_to(200)
