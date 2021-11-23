@@ -105,7 +105,7 @@ const independentSpaceOption = {
 };
 
 const initialState = {
-  numSpaces: 0,
+  numSpaces: 1,
   parentSpace: undefined,
   spaces: [],
   page: 0,
@@ -371,7 +371,7 @@ function FirstPage({
           }}
           step={1}
           type="number"
-          min={0}
+          min={1}
           max={10}
           required
         />
