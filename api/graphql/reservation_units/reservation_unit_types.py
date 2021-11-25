@@ -38,6 +38,7 @@ from permissions.api_permissions.graphene_permissions import (
     SpacePermission,
     UnitPermission,
 )
+from permissions.helpers import can_manage_units
 from reservation_units.models import (
     Equipment,
     EquipmentCategory,
@@ -119,9 +120,13 @@ class ReservationUnitHaukiUrlType(AuthNode, DjangoObjectType):
         fields = ("url",)
 
     def resolve_url(self, info):
-        return generate_hauki_link(
-            self.uuid, info.context.user, self.unit.tprek_department_id
-        )
+        if can_manage_units(info.context.user, self.unit):
+            return generate_hauki_link(
+                self.uuid,
+                getattr(info.context.user, "email", ""),
+                self.unit.tprek_department_id,
+            )
+        return None
 
 
 class ReservationUnitImageType(DjangoObjectType):

@@ -5,6 +5,7 @@ from unittest import mock
 import snapshottest
 from assertpy import assert_that
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.test import override_settings
 from django.utils.timezone import get_default_timezone
 from freezegun import freeze_time
@@ -16,6 +17,13 @@ from opening_hours.enums import State
 from opening_hours.errors import HaukiAPIError
 from opening_hours.hours import TimeElement
 from opening_hours.resources import Resource as HaukiResource
+from permissions.models import (
+    GeneralRoleChoice,
+    GeneralRolePermission,
+    UnitRole,
+    UnitRoleChoice,
+    UnitRolePermission,
+)
 from reservation_units.models import ReservationUnit
 from reservation_units.tests.factories import (
     EquipmentFactory,
@@ -178,20 +186,91 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             content.get("data").get("reservationUnitByPk").get("pk")
         ).is_equal_to(self.reservation_unit.id)
 
-    def test_getting_hauki_url(self):
+    def test_getting_hauki_url_is_none_when_regular_user(self):
         settings.HAUKI_SECRET = "HAUKISECRET"
         settings.HAUKI_ADMIN_UI_URL = "https://test.com"
         settings.HAUKI_ORIGIN_ID = "origin"
         self.reservation_unit.unit.tprek_department_id = "ORGANISATION"
         self.reservation_unit.unit.save()
         self.maxDiff = None
+        self.client.force_login(self.regular_joe)
         query = (
-            f"{{\n"
-            f"reservationUnitByPk(pk: {self.reservation_unit.id}) {{\n"
-            f"nameFi\n"
-            f"haukiUrl{{url}}"
-            f"}}"
-            f"}}"
+            """
+            query {
+                reservationUnitByPk(pk: %i) {
+                    nameFi
+                    haukiUrl {url}
+                }
+            }
+            """
+            % self.reservation_unit.id
+        )
+        response = self.query(query)
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_hauki_url_for_admin(self):
+        settings.HAUKI_SECRET = "HAUKISECRET"
+        settings.HAUKI_ADMIN_UI_URL = "https://test.com"
+        settings.HAUKI_ORIGIN_ID = "origin"
+        self.reservation_unit.unit.tprek_department_id = "ORGANISATION"
+        self.reservation_unit.unit.save()
+        self.maxDiff = None
+        gen_role_choice = GeneralRoleChoice.objects.get(code="admin")
+        GeneralRolePermission.objects.create(
+            role=gen_role_choice, permission="can_manage_units"
+        )
+        self.client.force_login(self.general_admin)
+        query = (
+            """
+                query {
+                    reservationUnitByPk(pk: %i) {
+                        nameFi
+                        haukiUrl {url}
+                    }
+                }
+                """
+            % self.reservation_unit.id
+        )
+        response = self.query(query)
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_hauki_url_for_unit_manager(self):
+        settings.HAUKI_SECRET = "HAUKISECRET"
+        settings.HAUKI_ADMIN_UI_URL = "https://test.com"
+        settings.HAUKI_ORIGIN_ID = "origin"
+        self.reservation_unit.unit.tprek_department_id = "ORGANISATION"
+        self.reservation_unit.unit.save()
+        self.maxDiff = None
+        unit_manager = get_user_model().objects.create(
+            username="res_admin",
+            first_name="unit",
+            last_name="adm",
+            email="unit.admin@foo.com",
+        )
+        unit_role_choice = UnitRoleChoice.objects.get(code="manager")
+        UnitRole.objects.create(
+            user=unit_manager, role=unit_role_choice, unit=self.reservation_unit.unit
+        )
+        UnitRolePermission.objects.create(
+            role=unit_role_choice, permission="can_manage_units"
+        )
+        self.client.force_login(unit_manager)
+        query = (
+            """
+                query {
+                    reservationUnitByPk(pk: %i) {
+                        nameFi
+                        haukiUrl {url}
+                    }
+                }
+                """
+            % self.reservation_unit.id
         )
         response = self.query(query)
 
