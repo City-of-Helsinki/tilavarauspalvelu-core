@@ -288,6 +288,16 @@ export const RESERVATION_UNIT_EDITOR_PARAMETERS = gql`
         }
       }
     }
+
+    termsOfUse {
+      edges {
+        node {
+          pk
+          nameFi
+          termsType
+        }
+      }
+    }
   }
 `;
 
@@ -350,6 +360,15 @@ export const RESERVATIONUNIT_QUERY = gql`
       descriptionFi
       descriptionSv
       descriptionEn
+      paymentTerms {
+        pk
+      }
+      cancellationTerms {
+        pk
+      }
+      serviceSpecificTerms {
+        pk
+      }
     }
   }
 `;

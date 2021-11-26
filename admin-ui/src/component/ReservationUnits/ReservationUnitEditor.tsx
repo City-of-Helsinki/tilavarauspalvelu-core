@@ -6,6 +6,7 @@ import {
   Combobox,
   Notification,
   NumberInput,
+  Select,
   TextInput,
   TimeInput,
 } from "hds-react";
@@ -17,8 +18,6 @@ import { useParams, useHistory } from "react-router-dom";
 import styled from "styled-components";
 import { languages } from "../../common/const";
 import {
-  EquipmentType,
-  PurposeType,
   Query,
   QueryReservationUnitByPkArgs,
   QueryUnitByPkArgs,
@@ -31,6 +30,10 @@ import {
   Mutation,
   ErrorType,
   Maybe,
+  EquipmentTypeEdge,
+  PurposeTypeEdge,
+  TermsOfUseTypeEdge,
+  TermsOfUseTermsType,
 } from "../../common/gql-types";
 import {
   CREATE_RESERVATION_UNIT,
@@ -76,31 +79,11 @@ type Action =
   | { type: "setResources"; resources: OptionType[] }
   | { type: "setEquipments"; equipments: OptionType[] }
   | { type: "setPurposes"; purposes: OptionType[] }
-  | { type: "equipmentsLoaded"; equipments: EquipmentType[] }
-  | { type: "purposesLoaded"; purposes: PurposeType[] };
+  | { type: "parametersLoaded"; parameters: Query };
 
-type ReservationUnitEditorType = {
-  pk: number;
-  nameFi: string;
-  nameSv: string;
-  nameEn: string;
-  descriptionFi: string;
-  descriptionSv: string;
-  descriptionEn: string;
-  spacePks: number[];
-  resourcePks: number[];
-  equipmentPks: number[];
-  purposePks: number[];
-  maxPersons: number;
-  surfaceArea: number;
-  requireIntroduction: boolean;
-  maxReservationDuration: string;
-  minReservationDuration: string;
-  termsOfUseFi: string;
-  termsOfUseSv: string;
-  termsOfUseEn: string;
-  unitPk: number;
-};
+type ReservationUnitEditorType =
+  | ReservationUnitUpdateMutationInput
+  | ReservationUnitCreateMutationInput;
 
 type State = {
   reservationUnitPk?: number;
@@ -118,7 +101,34 @@ type State = {
   resourceOptions: OptionType[];
   equipmentOptions: OptionType[];
   purposeOptions: OptionType[];
+  paymentTermsOptions: OptionType[];
+  cancellationTermsOptions: OptionType[];
+  serviceSpecificTermsOptions: OptionType[];
   unit?: UnitByPkType;
+};
+
+const makeOption = (e: { pk: number; nameFi: string }) => ({
+  label: String(e.nameFi),
+  value: e.pk,
+});
+
+const makeTermsOptions = (
+  action: {
+    type: "parametersLoaded";
+    parameters: Query;
+  },
+  termsType: TermsOfUseTermsType
+): OptionType[] => {
+  return (action.parameters.termsOfUse?.edges || ([] as TermsOfUseTypeEdge[]))
+    .filter((tou) => {
+      return termsType === tou?.node?.termsType;
+    })
+    .map((e) =>
+      makeOption({
+        pk: get(e, "node.pk", -1),
+        nameFi: get(e, "node.nameFi", "no-name"),
+      })
+    );
 };
 
 const getInitialState = (reservationUnitPk: number): State => ({
@@ -134,16 +144,20 @@ const getInitialState = (reservationUnitPk: number): State => ({
   equipmentOptions: [],
   resourceOptions: [],
   purposeOptions: [],
+  paymentTermsOptions: [],
+  cancellationTermsOptions: [],
+  serviceSpecificTermsOptions: [],
 });
 
 const withLoadingStatus = (state: State): State => {
-  const hasError = typeof state.error?.message !== undefined;
+  const hasError = state.notification?.type === "error";
 
   const newLoadingStatus =
     !hasError &&
     (state.spaceOptions.length === 0 ||
-      state.reservationUnitEdit === null ||
+      (state.reservationUnitPk && !get(state, "reservationUnitEdit.pk")) ||
       state.equipmentOptions.length === 0 ||
+      state.paymentTermsOptions.length === 0 ||
       state.purposeOptions.length === 0);
 
   return {
@@ -187,8 +201,6 @@ const reducer = (state: State, action: Action): State => {
             "termsOfUseFi",
             "termsOfUseSv",
             "termsOfUseEn",
-            "minReservationDuration",
-            "maxReservationDuration",
             "requireIntroduction",
             "descriptionFi",
             "descriptionSv",
@@ -211,6 +223,17 @@ const reducer = (state: State, action: Action): State => {
           purposePks: reservationUnit?.purposes?.map((s) =>
             Number(s?.pk)
           ) as number[],
+          paymentTermsPk: get(reservationUnit, "paymentTerms.pk", undefined),
+          cancellationTermsPk: get(
+            reservationUnit,
+            "cancellationTerms.pk",
+            undefined
+          ),
+          serviceSpecificTermsPk: get(
+            reservationUnit,
+            "serviceSpecificTerms.pk",
+            undefined
+          ),
         },
         hasChanges: false,
       });
@@ -253,23 +276,37 @@ const reducer = (state: State, action: Action): State => {
       });
     }
 
-    case "equipmentsLoaded": {
+    case "parametersLoaded": {
       return withLoadingStatus({
         ...state,
-        equipmentOptions: action.equipments.map((e) => ({
-          label: e.nameFi as string,
-          value: e.pk as number,
-        })),
-      });
-    }
-
-    case "purposesLoaded": {
-      return withLoadingStatus({
-        ...state,
-        purposeOptions: action.purposes.map((e) => ({
-          label: e.nameFi as string,
-          value: e.pk as number,
-        })),
+        equipmentOptions: (
+          action.parameters.equipments?.edges || ([] as EquipmentTypeEdge[])
+        ).map((e) =>
+          makeOption({
+            pk: get(e, "node.pk", -1),
+            nameFi: get(e, "node.nameFi", "no-name"),
+          })
+        ),
+        purposeOptions: (
+          action.parameters.purposes?.edges || ([] as PurposeTypeEdge[])
+        ).map((e) =>
+          makeOption({
+            pk: get(e, "node.pk", -1),
+            nameFi: get(e, "node.nameFi", "no-name"),
+          })
+        ),
+        paymentTermsOptions: makeTermsOptions(
+          action,
+          TermsOfUseTermsType.PaymentTerms
+        ),
+        serviceSpecificTermsOptions: makeTermsOptions(
+          action,
+          TermsOfUseTermsType.ServiceTerms
+        ),
+        cancellationTermsOptions: makeTermsOptions(
+          action,
+          TermsOfUseTermsType.CancellationTerms
+        ),
       });
     }
 
@@ -383,6 +420,10 @@ const TextInputWithPadding = styled(TextInput)`
   padding-bottom: var(--spacing-m);
 `;
 
+const SelectWithPadding = styled(Select)`
+  padding-bottom: var(--spacing-m);
+`;
+
 const getSelectedOptions = (
   state: State,
   optionsPropertyName: string,
@@ -402,7 +443,18 @@ const getSelectedOptions = (
   );
 };
 
-const getDuration = (duration: string | undefined): string => {
+const getSelectedOption = (
+  state: State,
+  optionsPropertyName: string,
+  valuePropName: string
+): OptionType => {
+  const fullPropName = `reservationUnitEdit.${valuePropName}`;
+  const propValue = get(state, fullPropName);
+  const options = get(state, optionsPropertyName);
+  return options.find((o: OptionType) => o.value === propValue);
+};
+
+const getDuration = (duration: Maybe<string> | undefined): string => {
   if (!duration) {
     return "00:00";
   }
@@ -488,6 +540,9 @@ const ReservationUnitEditor = (): JSX.Element | null => {
         "minReservationDuration",
         "requireIntroduction",
         "purposePks",
+        "paymentTermsPk",
+        "cancellationTermsPk",
+        "serviceSpecificTermsPk",
       ]
     );
 
@@ -563,23 +618,10 @@ const ReservationUnitEditor = (): JSX.Element | null => {
   });
 
   useQuery<Query>(RESERVATION_UNIT_EDITOR_PARAMETERS, {
-    onCompleted: ({ equipments, purposes }) => {
-      if (equipments) {
-        dispatch({
-          type: "equipmentsLoaded",
-          equipments: equipments?.edges.map((e) => e?.node as EquipmentType),
-        });
-      }
-
-      if (purposes) {
-        dispatch({
-          type: "purposesLoaded",
-          purposes: purposes?.edges.map((e) => e?.node as PurposeType),
-        });
-      }
-
-      if (!equipments || !purposes) {
-        onDataError(t("ReservationUnitEditor.errorEquipmentsNotAvailable"));
+    onCompleted: (query) => {
+      dispatch({ type: "parametersLoaded", parameters: query });
+      if (!(query.equipments && query.purposes && query.termsOfUse)) {
+        onDataError(t("ReservationUnitEditor.errorParamsNotAvailable"));
       }
     },
     onError: (e) => {
@@ -620,6 +662,14 @@ const ReservationUnitEditor = (): JSX.Element | null => {
       </Wrapper>
     );
   }
+
+  const isReadyToPublish =
+    state.reservationUnitEdit.descriptionFi &&
+    state.reservationUnitEdit.descriptionSv &&
+    state.reservationUnitEdit.descriptionEn &&
+    state.reservationUnitEdit.nameFi &&
+    state.reservationUnitEdit.nameSv &&
+    state.reservationUnitEdit.nameEn;
 
   if (state.reservationUnitEdit === null) {
     return null;
@@ -722,7 +772,9 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                 <Checkbox
                   id="requireIntroduction"
                   label={t("ReservationUnitEditor.requireIntroductionLabel")}
-                  checked={state.reservationUnitEdit.requireIntroduction}
+                  checked={
+                    state.reservationUnitEdit.requireIntroduction === true
+                  }
                   onClick={() =>
                     setValue({
                       requireIntroduction:
@@ -824,7 +876,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                   label={t("ReservationUnitEditor.minReservationDurationLabel")}
                   hoursLabel={t("common.hoursLabel")}
                   minutesLabel={t("common.minutesLabel")}
-                  defaultValue={getDuration(
+                  value={getDuration(
                     state.reservationUnitEdit.minReservationDuration
                   )}
                   onChange={(v) => {
@@ -843,7 +895,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                   label={t("ReservationUnitEditor.maxReservationDurationLabel")}
                   hoursLabel={t("common.hoursLabel")}
                   minutesLabel={t("common.minutesLabel")}
-                  defaultValue={getDuration(
+                  value={getDuration(
                     state.reservationUnitEdit.maxReservationDuration
                   )}
                   onChange={(v) => {
@@ -866,11 +918,13 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                   label={t("ReservationUnitEditor.descriptionLabel", {
                     lang,
                   })}
-                  value={get(
-                    state,
-                    `reservationUnitEdit.description${upperFirst(lang)}`,
-                    ""
-                  )}
+                  value={
+                    get(
+                      state,
+                      `reservationUnitEdit.description${upperFirst(lang)}`,
+                      ""
+                    ) || ""
+                  }
                   onChange={(value) =>
                     setValue({
                       [`description${upperFirst(lang)}`]: value,
@@ -901,6 +955,34 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                   }
                 />
               ))}
+              {["payment", "cancellation", "serviceSpecific"].map((name) => {
+                const options = get(state, `${name}TermsOptions`);
+                return (
+                  <SelectWithPadding
+                    key={name}
+                    label={t(`ReservationUnitEditor.${name}TermsLabel`)}
+                    placeholder={t(
+                      `ReservationUnitEditor.${name}TermsPlaceholder`
+                    )}
+                    options={options}
+                    onChange={(selectedTerms: unknown) => {
+                      const o = selectedTerms as OptionType;
+                      setValue({
+                        [`${name}TermsPk`]: o.value,
+                      });
+                    }}
+                    disabled={options.length === 0}
+                    helper={t(`ReservationUnitEditor.${name}TermsHelperText`)}
+                    value={
+                      getSelectedOption(
+                        state,
+                        `${name}TermsOptions`,
+                        `${name}TermsPk`
+                      ) || {}
+                    }
+                  />
+                );
+              })}
             </Accordion>
             <Buttons>
               <Button
@@ -919,7 +1001,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
               </SaveButton>
 
               <SaveButton
-                disabled={!state.hasChanges}
+                disabled={!isReadyToPublish}
                 onClick={() => createOrUpdateReservationUnit(true)}
               >
                 {t("ReservationUnitEditor.saveAndPublish")}
