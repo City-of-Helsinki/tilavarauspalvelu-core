@@ -17,6 +17,7 @@ import {
   emptyOption,
   applicationsPrefix,
   singleSearchPrefix,
+  reservationsPrefix,
 } from "./const";
 import {
   ApplicationEventSchedule,
@@ -222,6 +223,7 @@ export const singleSearchUrl = (params: unknown): string =>
   `${singleSearchPrefix}/?${stringify(params)}`;
 
 export const applicationsUrl = `${applicationsPrefix}/`;
+export const reservationsUrl = `${reservationsPrefix}/`;
 
 export function deepCopy<T>(src: T): T {
   return JSON.parse(JSON.stringify(src));

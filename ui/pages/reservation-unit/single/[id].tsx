@@ -107,7 +107,7 @@ export const getServerSideProps: GetServerSideProps = async ({
         endDate: lastOpeningPeriodEndDate,
         from: today,
         to: lastOpeningPeriodEndDate,
-        state: ["created"],
+        state: ["CREATED", "CONFIRMED"],
       },
     });
 
@@ -118,7 +118,7 @@ export const getServerSideProps: GetServerSideProps = async ({
       >({
         query: RELATED_RESERVATION_UNITS,
         variables: {
-          unit: String(reservationUnitData.reservationUnitByPk.unit.pk),
+          unit: [String(reservationUnitData.reservationUnitByPk.unit.pk)],
         },
       });
 
@@ -160,6 +160,10 @@ export const getServerSideProps: GetServerSideProps = async ({
   return { props: { ...(await serverSideTranslations(locale)), paramsId: id } };
 };
 
+const Wrapper = styled.div`
+  padding-bottom: var(--spacing-layout-xl);
+`;
+
 const TwoColumnLayout = styled.div`
   display: grid;
   gap: var(--spacing-layout-s);
@@ -175,6 +179,7 @@ const TwoColumnLayout = styled.div`
 
 const Content = styled.div`
   font-family: var(--font-regular);
+  white-space: pre-wrap;
 `;
 
 const CalendarFooter = styled.div`
@@ -377,7 +382,7 @@ const ReservationUnit = ({
   ));
 
   return reservationUnit ? (
-    <>
+    <Wrapper>
       <Head
         reservationUnit={reservationUnit}
         activeOpeningTimes={activeOpeningTimes}
@@ -390,9 +395,11 @@ const ReservationUnit = ({
           <div>
             <Accordion open heading={t("reservationUnit:description")}>
               <Content>
-                <Sanitize
-                  html={getTranslation(reservationUnit, "description")}
-                />
+                <p>
+                  <Sanitize
+                    html={getTranslation(reservationUnit, "description")}
+                  />
+                </p>
               </Content>
             </Accordion>
           </div>
@@ -475,25 +482,31 @@ const ReservationUnit = ({
           <div />
           <Accordion heading={t("reservationCalendar:heading.termsOfUse")}>
             <Content>
-              <Sanitize html={getTranslation(reservationUnit, "termsOfUse")} />
+              <p>
+                <Sanitize
+                  html={getTranslation(reservationUnit, "termsOfUse")}
+                />
+              </p>
             </Content>
           </Accordion>
           <div />
-          <Accordion heading={t("reservationUnit:termsOfUseSpaces")}>
-            <Content>
-              {reservationUnit.spaces?.map((space) => (
-                <React.Fragment key={space.pk}>
-                  {reservationUnit.spaces.length > 1 && (
-                    <h3>{getTranslation(space, "name")}</h3>
-                  )}
+          {reservationUnit.serviceSpecificTerms && (
+            <>
+              <Accordion heading={t("reservationUnit:termsOfUseSpaces")}>
+                <Content>
                   <p>
-                    <Sanitize html={getTranslation(space, "termsOfUse")} />
+                    <Sanitize
+                      html={getTranslation(
+                        reservationUnit.serviceSpecificTerms,
+                        "text"
+                      )}
+                    />
                   </p>
-                </React.Fragment>
-              ))}
-            </Content>
-          </Accordion>
-          <div />
+                </Content>
+              </Accordion>
+              <div />
+            </>
+          )}
         </TwoColumnLayout>
       </Container>
       <BottomWrapper>
@@ -515,7 +528,7 @@ const ReservationUnit = ({
           count={reservationUnitList.reservationUnits.length}
         />
       )}
-    </>
+    </Wrapper>
   ) : null;
 };
 

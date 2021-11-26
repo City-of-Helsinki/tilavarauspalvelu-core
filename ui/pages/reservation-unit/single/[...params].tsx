@@ -17,7 +17,6 @@ import { useForm } from "react-hook-form";
 import { GetServerSideProps } from "next";
 import { isFinite } from "lodash";
 import { Trans, useTranslation } from "react-i18next";
-import { UserProfile } from "../../../modules/types";
 import apolloClient from "../../../modules/apolloClient";
 import {
   fontRegular,
@@ -37,23 +36,26 @@ import {
   capitalize,
   getTranslation,
 } from "../../../modules/util";
-import WithUserProfile from "../../../components/WithUserProfile";
 import { MediumButton } from "../../../styles/util";
 import { DataContext } from "../../../context/DataContext";
 import {
+  ReservationConfirmMutationInput,
+  ReservationConfirmMutationPayload,
   ReservationUnitType,
   ReservationUpdateMutationInput,
   ReservationUpdateMutationPayload,
 } from "../../../modules/gql-types";
 import { RESERVATION_UNIT } from "../../../modules/queries/reservationUnit";
-import { UPDATE_RESERVATION } from "../../../modules/queries/reservation";
+import {
+  CONFIRM_RESERVATION,
+  UPDATE_RESERVATION,
+} from "../../../modules/queries/reservation";
 import StepperHz from "../../../components/StepperHz";
 import Ticket from "../../../components/reservation/Ticket";
 import Sanitize from "../../../components/common/Sanitize";
 
 type Props = {
   reservationUnit: ReservationUnitType;
-  profile: UserProfile | null;
 };
 
 type Inputs = {
@@ -76,8 +78,10 @@ type Reservation = {
   reserveeLastName: string;
   reserveePhone: string;
   name: string;
+  user?: string;
   description: string;
   calendarUrl?: string;
+  state?: string;
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -223,6 +227,8 @@ const ActionContainer = styled.div`
 `;
 
 const Paragraph = styled.p`
+  white-space: pre-line;
+
   & > span {
     display: block;
   }
@@ -240,7 +246,6 @@ const ValueParagraph = styled(Paragraph).attrs({
 
 const ReservationUnitReservation = ({
   reservationUnit,
-  profile,
 }: Props): JSX.Element => {
   const { t } = useTranslation();
   const {
@@ -256,36 +261,71 @@ const ReservationUnitReservation = ({
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const [areTermsSpaceAccepted, setAreTermsSpaceAccepted] = useState(false);
-  const [areTermsResourceAccepted, setAreTermsResourceAccepted] =
+  const [areServiceSpecificTermsAccepted, setAreServiceSpecificTermsAccepted] =
     useState(false);
 
   const { register, handleSubmit, errors } = useForm<Inputs>();
 
-  const [updateReservation, { data, loading, error }] = useMutation<
+  const [
+    updateReservation,
+    { data: updateData, loading: updateLoading, error: updateError },
+  ] = useMutation<
     { updateReservation: ReservationUpdateMutationPayload },
     { input: ReservationUpdateMutationInput }
   >(UPDATE_RESERVATION);
 
+  const [
+    confirmReservation,
+    { data: confirmData, loading: confirmLoading, error: confirmError },
+  ] = useMutation<
+    { confirmReservation: ReservationConfirmMutationPayload },
+    { input: ReservationConfirmMutationInput }
+  >(CONFIRM_RESERVATION);
+
   useEffect(() => {
-    if (!loading) {
-      if (error || data?.updateReservation?.errors?.length > 0) {
+    return () => {
+      setContextReservation(null);
+    };
+  }, [setContextReservation]);
+
+  useEffect(() => {
+    if (!updateLoading) {
+      if (updateError || updateData?.updateReservation?.errors?.length > 0) {
         setErrorMsg(t("reservationUnit:reservationUpdateFailed"));
-      } else if (data) {
-        if (data.updateReservation.reservation.state === "cancelled") {
+      } else if (updateData) {
+        if (updateData.updateReservation.reservation.state === "CANCELLED") {
           setContextReservation(null);
           router.push(`${reservationUnitSinglePrefix}/${reservationUnit.pk}`);
         } else {
           setReservation({
             ...reservation,
-            calendarUrl: data?.updateReservation?.reservation?.calendarUrl,
+            calendarUrl: updateData.updateReservation?.reservation?.calendarUrl,
           });
-          setFormStatus("sent");
-          setStep(2);
+          setStep(1);
+          window.scrollTo(0, 0);
         }
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data, loading, error]);
+  }, [updateData, updateLoading, updateError]);
+
+  useEffect(() => {
+    if (!confirmLoading) {
+      window.scrollTo(0, 0);
+
+      if (confirmError || confirmData?.confirmReservation?.errors?.length > 0) {
+        setErrorMsg(t("reservationUnit:reservationUpdateFailed"));
+      } else if (confirmData) {
+        setReservation({
+          ...reservation,
+          state: "CONFIRMED",
+        });
+        setFormStatus("sent");
+        setStep(2);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [confirmData, confirmLoading, confirmError]);
 
   if (
     isBrowser &&
@@ -328,13 +368,19 @@ const ReservationUnitReservation = ({
 
     setReservation(input);
 
-    setStep(1);
+    updateReservation({
+      variables: {
+        input,
+      },
+    });
   };
 
   const onSubmit2 = () => {
-    updateReservation({
+    confirmReservation({
       variables: {
-        input: reservation,
+        input: {
+          pk: reservationPk,
+        },
       },
     });
   };
@@ -344,7 +390,7 @@ const ReservationUnitReservation = ({
       variables: {
         input: {
           pk: reservationPk,
-          state: "cancelled",
+          state: "CANCELLED",
         },
       },
     });
@@ -557,25 +603,21 @@ const ReservationUnitReservation = ({
                     open
                     heading={t("reservationCalendar:heading.resourceTerms")}
                   >
-                    {reservationUnit.spaces?.map((space) => (
-                      <React.Fragment key={space.pk}>
-                        {reservationUnit.spaces.length > 1 && (
-                          <h3>{getTranslation(space, "name")}</h3>
+                    <p>
+                      <Sanitize
+                        html={getTranslation(
+                          reservationUnit.serviceSpecificTerms,
+                          "text"
                         )}
-                        <p>
-                          <Sanitize
-                            html={getTranslation(space, "termsOfUse")}
-                          />
-                        </p>
-                      </React.Fragment>
-                    ))}
+                      />
+                    </p>
                   </Accordion>
                   <Checkbox
                     id="resourceTerms"
                     name="resourceTerms"
-                    checked={areTermsResourceAccepted}
+                    checked={areServiceSpecificTermsAccepted}
                     onChange={(e) =>
-                      setAreTermsResourceAccepted(e.target.checked)
+                      setAreServiceSpecificTermsAccepted(e.target.checked)
                     }
                     label={`${t("reservationCalendar:label.termsResource")}*`}
                     ref={register({ required: true })}
@@ -617,10 +659,12 @@ const ReservationUnitReservation = ({
                 <Trans
                   i18nKey="reservationUnit:reservationReminderText"
                   t={t}
-                  values={{ profile }}
+                  values={{ user: reservation?.user }}
                   components={{
                     emailLink: (
-                      <a href={`mailto:${profile?.email}`}>{profile?.email}</a>
+                      <a href={`mailto:${reservation?.user}`}>
+                        {reservation?.user}
+                      </a>
                     ),
                   }}
                 />
@@ -724,4 +768,4 @@ const ReservationUnitReservation = ({
   );
 };
 
-export default WithUserProfile(ReservationUnitReservation);
+export default ReservationUnitReservation;

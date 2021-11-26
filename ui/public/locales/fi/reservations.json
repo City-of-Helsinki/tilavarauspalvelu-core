@@ -10,5 +10,21 @@
   "download": "Lataa päätös (.pdf)",
   "generating": "Dokumenttia luodaan",
   "errorGeneratingPDF": "PDF Dokumenttia ei pystytty luomaan",
-  "reservationCalendar": "Varauskalenteri"
+  "reservationCalendar": "Varauskalenteri",
+  "cancelReservation": "Peru varaus",
+  "redoReservation": "Varaa uudestaan",
+  "upcomingReservations": "Tulevat varaukset",
+  "pastReservations": "Menneet varaukset",
+  "upcomingSlug": "Tulossa",
+  "pastSlug": "Mennyt",
+  "modifyReservation": "Muokkaa varausta",
+  "backToReservations": "Palaa omiin varauksiin",
+  "cancelInfo": "Perumisen tiedot",
+  "cancelReason": "Perumisen syy",
+  "cancelDescription": "Perumisen kuvaus",
+  "cancelDescriptionPlaceholder": "Kuvaile tähän miksi perut varauksen",
+  "reservationCancelledTitle": "Varaus on peruttu",
+  "reservationCancellationFailed": "Varauksen peruminen epäonnistui",
+  "makeNewReservation": "Tee uusi varaus samaan tilaan",
+  "reservationInfo": "Varauksen lisätiedot"
 }

@@ -1,4 +1,5 @@
-import { getDurationOptions } from "../reservation";
+import { ReservationType } from "../gql-types";
+import { canUserCancelReservation, getDurationOptions } from "../reservation";
 
 jest.mock("next/config", () => () => ({
   serverRuntimeConfig: {},
@@ -52,4 +53,84 @@ test("getDurationOptions", () => {
       value: "8:30",
     },
   ]);
+});
+
+test("canUseCancelReservation that needs handling", () => {
+  const reservation = {
+    begin: new Date().toISOString(),
+    reservationUnits: [
+      {
+        cancellationRule: {
+          needsHandling: true,
+        },
+      },
+    ],
+  } as ReservationType;
+  expect(canUserCancelReservation(reservation)).toBe(false);
+});
+
+test("canUseCancelReservation that does not need handling", () => {
+  const reservation = {
+    begin: new Date().toISOString(),
+    reservationUnits: [
+      {
+        cancellationRule: {
+          needsHandling: false,
+        },
+      },
+    ],
+  } as ReservationType;
+  expect(canUserCancelReservation(reservation)).toBe(true);
+});
+
+test("canUseCancelReservation that does not need handling", () => {
+  const reservation = {
+    begin: new Date().toISOString(),
+    reservationUnits: [
+      {
+        cancellationRule: {
+          needsHandling: false,
+        },
+      },
+    ],
+  } as ReservationType;
+  expect(canUserCancelReservation(reservation)).toBe(true);
+});
+
+test("canUseCancelReservation with 0 secs of buffer time", () => {
+  const reservation = {
+    begin: new Date().toISOString(),
+    reservationUnits: [
+      {
+        cancellationRule: {
+          needsHandling: false,
+          canBeCancelledTimeBefore: 0,
+        },
+      },
+    ],
+  } as ReservationType;
+  expect(canUserCancelReservation(reservation)).toBe(true);
+});
+
+test("canUseCancelReservation with 1 sec of buffer time", () => {
+  const reservation = {
+    begin: new Date().toISOString(),
+    reservationUnits: [
+      {
+        cancellationRule: {
+          needsHandling: false,
+          canBeCancelledTimeBefore: 1,
+        },
+      },
+    ],
+  } as ReservationType;
+  expect(canUserCancelReservation(reservation)).toBe(false);
+});
+
+test("canUseCancelReservation without cancellation rule", () => {
+  const reservation = {
+    begin: new Date().toISOString(),
+    reservationUnits: [{}],
+  } as ReservationType;
+  expect(canUserCancelReservation(reservation)).toBe(false);
 });

@@ -62,7 +62,7 @@ export const getServerSideProps: GetServerSideProps = async ({
       >({
         query: RELATED_RESERVATION_UNITS,
         variables: {
-          unit: String(reservationUnitData.reservationUnitByPk.unit.pk),
+          unit: [String(reservationUnitData.reservationUnitByPk.unit.pk)],
         },
       });
 
@@ -192,21 +192,6 @@ const ReservationUnit = ({
           <Accordion heading={t("reservationUnit:termsOfUse")}>
             <Content>
               <Sanitize html={getTranslation(reservationUnit, "termsOfUse")} />
-            </Content>
-          </Accordion>
-          <div />
-          <Accordion heading={t("reservationUnit:termsOfUseSpaces")}>
-            <Content>
-              {reservationUnit.spaces?.map((space) => (
-                <React.Fragment key={space.pk}>
-                  {reservationUnit.spaces.length > 1 && (
-                    <h3>{getTranslation(space, "name")}</h3>
-                  )}
-                  <p>
-                    <Sanitize html={getTranslation(space, "termsOfUse")} />
-                  </p>
-                </React.Fragment>
-              ))}
             </Content>
           </Accordion>
           <div />

@@ -67,11 +67,11 @@ export const eventStyleGetter = ({
   } as Record<string, string>;
 
   style.backgroundColor =
-    event.state === "cancelled"
+    event.state.toLowerCase() === "cancelled"
       ? "var(--color-error-dark)"
       : "var(--color-success-dark)";
 
-  if (event.state === "cancelled") {
+  if (event.state.toLowerCase() === "cancelled") {
     style.textDecoration = "line-through";
   }
 
