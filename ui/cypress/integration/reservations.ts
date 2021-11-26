@@ -78,7 +78,6 @@ describe("Tilavaraus user reservations", () => {
       { slug: "name", value: "Reservation name" },
       { slug: "reserveeName", value: "First name Last name" },
       { slug: "description", value: "Reservation description" },
-      { slug: "date", value: "Ke 28.4.2021 klo 7.23 - 11.23" },
       { slug: "unit", value: "Toimistohuone 1" },
       { slug: "phone", value: "+358 123 4567" },
     ];

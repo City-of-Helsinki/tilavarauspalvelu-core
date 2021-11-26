@@ -1,5 +1,5 @@
 import React from "react";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { isAfter } from "date-fns";
 import { Tabs, TabList, Tab, TabPanel } from "hds-react";
@@ -17,7 +17,7 @@ import ReservationCard from "../../components/reservation/ReservationCard";
 import { fontMedium } from "../../modules/style/typography";
 import { breakpoint } from "../../modules/style";
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   const { data } = await apolloClient.query<Query, QueryReservationsArgs>({
     query: LIST_RESERVATIONS,
   });
