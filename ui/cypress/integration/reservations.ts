@@ -129,7 +129,7 @@ describe("Tilavaraus user reservations", () => {
 
     ticket().should("have.css", "background-color", "rgb(225, 245, 243)");
     cancelTitle().eq(0).should("have.text", "Toimistohuone 1");
-    cancelTitle().eq(1).should("have.text", "Peru varaus");
+    cancelTitle().eq(1).should("have.text", "Peruuta varaus");
     cancelCancelButton().should("be.disabled");
 
     backButton().click();
@@ -144,7 +144,7 @@ describe("Tilavaraus user reservations", () => {
 
     cancelCancelButton().click();
     ticket().should("have.css", "background-color", "rgb(255, 225, 225)");
-    cancelTitle().eq(1).should("have.text", "Varaus on peruttu");
+    cancelTitle().eq(1).should("have.text", "Varaus on peruutettu");
 
     secondBackButton().should("exist");
     reReserveButton().click();
