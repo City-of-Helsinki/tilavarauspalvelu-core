@@ -8,7 +8,7 @@ import { H1, H2, fontMedium, Strongish } from "../../modules/style/typography";
 import { capitalize, formatDurationMinutes } from "../../modules/util";
 import { breakpoint } from "../../modules/style";
 
-export type TicketState = "incomplete" | "complete";
+export type TicketState = "incomplete" | "complete" | "error";
 
 type Props = {
   state: TicketState;
@@ -80,6 +80,8 @@ const Wrapper = styled.div<{ $state: TicketState }>`
     switch ($state) {
       case "complete":
         return "background-color: #e1f5f3";
+      case "error":
+        return "background-color: #ffe1e1";
       case "incomplete":
       default:
         return "background-color: #e5f3fd";
@@ -91,11 +93,11 @@ const Wrapper = styled.div<{ $state: TicketState }>`
   padding: var(--spacing-m) var(--spacing-m);
   position: relative;
   width: 100%;
-  height: calc(100% + 40px);
 
   @media (min-width: ${breakpoint.m}) {
     margin: 0;
     width: calc(100% - 60px);
+    height: calc(100% + 40px);
     border-radius: 10px 0 0 10px;
   }
 `;
@@ -164,7 +166,7 @@ const Ticket = ({
   })})`;
 
   return (
-    <Wrapper $state={state}>
+    <Wrapper $state={state} data-testid="reservation__ticket--container">
       <PunchHole $bgColor={bgColor} />
       <Content>
         <Title data-test="reservation__title">{title}</Title>

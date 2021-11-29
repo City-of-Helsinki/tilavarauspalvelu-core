@@ -11,6 +11,7 @@ import {
   ReservationUnitByPkTypeReservationsArgs,
   ReservationUnitImageType,
   ReservationUnitTypeConnection,
+  TermsOfUseTermsOfUseTermsTypeChoices,
 } from "../../modules/gql-types";
 import { Parameter } from "../../modules/types";
 import { toApiDate } from "../../modules/util";
@@ -72,6 +73,17 @@ const selectedReservationUnitQuery = graphql.query<
       "<p>Nuorisotilojen yleiset varausehdot</p>\r\n<p><strong>1 Soveltamisala</strong></p>\r\n<p>N&auml;m&auml; varausehdot koskevat Helsingin kaupungin nuorisopalveluiden hallinnoimien tilojen ja laitteiden varaamista, k&auml;ytt&ouml;vuoron hakemista Tilavaraus-palvelun kautta sek&auml; nuorisopalveluiden hallinnoimien tilojen ja laitteiden k&auml;ytt&ouml;&auml;. N&auml;m&auml; varausehdot t&auml;ydent&auml;v&auml;t Helsingin kaupungin tilojen ja laitteiden varausehtoja. Varaamalla resurssin tai hakemalla k&auml;ytt&ouml;vuoroa hyv&auml;ksyt n&auml;m&auml; ehdot.</p> En",
     termsOfUseSv:
       "<p>Nuorisotilojen yleiset varausehdot</p>\r\n<p><strong>1 Soveltamisala</strong></p>\r\n<p>N&auml;m&auml; varausehdot koskevat Helsingin kaupungin nuorisopalveluiden hallinnoimien tilojen ja laitteiden varaamista, k&auml;ytt&ouml;vuoron hakemista Tilavaraus-palvelun kautta sek&auml; nuorisopalveluiden hallinnoimien tilojen ja laitteiden k&auml;ytt&ouml;&auml;. N&auml;m&auml; varausehdot t&auml;ydent&auml;v&auml;t Helsingin kaupungin tilojen ja laitteiden varausehtoja. Varaamalla resurssin tai hakemalla k&auml;ytt&ouml;vuoroa hyv&auml;ksyt n&auml;m&auml; ehdot.</p> Sv",
+    serviceSpecificTerms: {
+      id: "VGVybXNPZlVzZVR5cGU6Mw==",
+      termsType: "SERVICE_TERMS" as TermsOfUseTermsOfUseTermsTypeChoices,
+      nameFi: "Palveluehto FI",
+      nameEn: "Palveluehto EN",
+      nameSv: "Palveluehto SV",
+      textFi:
+        "Palveluehto Palveluehto Palveluehto Palveluehto Palveluehto Palveluehto Palveluehto",
+      textEn: "",
+      textSv: "",
+    },
     reservationUnitType: {
       id: "UmVzZXJ2YXRpb25Vbml0VHlwZVR5cGU6Mw==",
       nameFi: "Nuorisopalvelut Fi",
@@ -118,9 +130,6 @@ const selectedReservationUnitQuery = graphql.query<
         nameEn: "Sali En",
         nameSv: "Sali Sv",
         code: "",
-        termsOfUseFi: "TErms of USEE Fi",
-        termsOfUseEn: "TErms of USEE En",
-        termsOfUseSv: "TErms of USEE Sv",
       },
     ],
     openingHours: {
