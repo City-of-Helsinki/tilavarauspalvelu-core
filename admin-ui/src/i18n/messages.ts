@@ -890,6 +890,14 @@ const translations: ITranslations = {
     ],
     serviceSpecificTermsPlaceholder: ["Valitse"],
     serviceSpecificTermsHelperText: ["Valitse lorem ipsum tästä"],
+    openingHours: ["Aukioloajat"],
+    openingHoursHelperTextHasLink: [
+      "Varausyksikön aukioloajat määritellään HAUKI järjestelmässä. Voit siirtyä hauki järjestelmään alla näkyvällä linkillä.",
+    ],
+    openingHoursHelperTextNoLink: [
+      "Varausyksikön aukioloajat määritellään HAUKI järjestelmässä. Pääset muokkaamaan aukioloaikoja kun varausyksikkö on tallennettu.",
+    ],
+    openingTimesExternalLink: ["Aukioloajat HAUKI järjestelmässä"],
     cancel: ["Peruuta"],
     save: ["Tallenna tiedot"],
     saved: ["Tiedot tallennettu."],

@@ -4,6 +4,7 @@ import {
   Button,
   Checkbox,
   Combobox,
+  Link,
   Notification,
   NumberInput,
   Select,
@@ -1007,6 +1008,26 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                   />
                 );
               })}
+            </Accordion>
+            <Accordion heading={t("ReservationUnitEditor.openingHours")}>
+              {state.reservationUnit?.haukiUrl?.url ? (
+                <>
+                  <p>
+                    {t("ReservationUnitEditor.openingHoursHelperTextHasLink")}
+                  </p>
+                  <Link
+                    href={state.reservationUnit?.haukiUrl?.url}
+                    external
+                    openInNewTab
+                    size="M"
+                    style={{ display: "block", width: "fit-content" }}
+                  >
+                    {t("ReservationUnitEditor.openingTimesExternalLink")}
+                  </Link>
+                </>
+              ) : (
+                <p>{t("ReservationUnitEditor.openingHoursHelperTextNoLink")}</p>
+              )}
             </Accordion>
             <Buttons>
               <Button
