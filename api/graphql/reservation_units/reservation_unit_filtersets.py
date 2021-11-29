@@ -41,15 +41,15 @@ class ReservationUnitsFilterSet(django_filters.FilterSet):
     is_draft = django_filters.BooleanFilter(field_name="is_draft")
 
     order_by = django_filters.OrderingFilter(
-        fields={
-            "name_fi": "nameFi",
-            "name_en": "nameEn",
-            "name_sv": "nameSv",
-            "reservation_unit_type__name_fi": "typeFi",
-            "reservation_unit_type__name_en": "typeEn",
-            "reservation_unit_type__name_sv": "typeSv",
-            "unit_id": "unit",
-        }
+        fields=(
+            "name_fi",
+            "name_en",
+            "name_sv",
+            ("reservation_unit_type__name_fi", "type_fi"),
+            ("reservation_unit_type__name_en", "type_en"),
+            ("reservation_unit_type__name_sv", "type_sv"),
+            "unit",
+        )
     )
 
     class Meta:

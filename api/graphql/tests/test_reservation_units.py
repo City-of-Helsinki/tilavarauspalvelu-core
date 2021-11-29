@@ -42,7 +42,7 @@ class ReservationUnitTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        cls.type = ReservationUnitTypeFactory(name="Test type")
+        cls.type = ReservationUnitTypeFactory(name="test type", name_fi="test type")
         large_space = SpaceFactory(
             max_persons=100, name="Large space", surface_area=100
         )
@@ -51,8 +51,8 @@ class ReservationUnitTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
             name_fi="fi", name_en="en", name_sv="sv"
         )
         cls.reservation_unit = ReservationUnitFactory(
-            name="Test name",
-            unit=UnitFactory(name_fi="Test unit"),
+            name="test name",
+            unit=UnitFactory(name_fi="test unit", name="test unit"),
             reservation_unit_type=cls.type,
             uuid="3774af34-9916-40f2-acc7-68db5a627710",
             spaces=[large_space, small_space],
@@ -873,6 +873,183 @@ class ReservationUnitTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
                         node {
                             nameFi
                             isDraft
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_order_by_name_fi(self):
+        ReservationUnitFactory(
+            name="name_fi",
+            name_fi="name_fi",
+        )
+        response = self.query(
+            """
+            query {
+                reservationUnits(orderBy: "nameFi") {
+                    edges {
+                        node {
+                            nameFi
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_order_by_name_en(self):
+        ReservationUnitFactory(
+            name="name_en",
+            name_en="name_en",
+        )
+        response = self.query(
+            """
+            query {
+                reservationUnits(orderBy: "nameEn") {
+                    edges {
+                        node {
+                            nameEn
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_order_by_name_sv(self):
+        ReservationUnitFactory(
+            name="name_sv",
+            name_sv="name_sv",
+        )
+        response = self.query(
+            """
+            query {
+                reservationUnits(orderBy: "nameSv") {
+                    edges {
+                        node {
+                            nameSv
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_order_by_type_fi(self):
+        self.maxDiff = None
+        res_type = ReservationUnitTypeFactory(name="name_fi", name_fi="name_fi")
+        ReservationUnitFactory(
+            reservation_unit_type=res_type,
+        )
+        response = self.query(
+            """
+            query {
+                reservationUnits(orderBy: "typeFi") {
+                    edges {
+                        node {
+                            reservationUnitType {nameFi}
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_order_by_type_en(self):
+        res_type = ReservationUnitTypeFactory(name="name_en", name_fi="name_en")
+        ReservationUnitFactory(
+            reservation_unit_type=res_type,
+        )
+        response = self.query(
+            """
+            query {
+                reservationUnits(orderBy: "typeEn") {
+                    edges {
+                        node {
+                            reservationUnitType {nameEn}
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_order_by_type_sv(self):
+        res_type = ReservationUnitTypeFactory(name="name_sv", name_fi="name_sv")
+        ReservationUnitFactory(
+            reservation_unit_type=res_type,
+        )
+        response = self.query(
+            """
+            query {
+                reservationUnits(orderBy: "typeSv") {
+                    edges {
+                        node {
+                            reservationUnitType {nameSv}
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_order_by_unit(self):
+        unit = UnitFactory(name="testunit", name_fi="testunit")
+        ReservationUnitFactory(
+            unit=unit,
+        )
+        response = self.query(
+            """
+            query {
+                reservationUnits(orderBy: "unit") {
+                    edges {
+                        node {
+                            unit {nameFi}
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_order_by_unit_reverse_order(self):
+        unit = UnitFactory(name="testunit", name_fi="testunit")
+        ReservationUnitFactory(
+            unit=unit,
+        )
+        response = self.query(
+            """
+            query {
+                reservationUnits(orderBy: "-unit") {
+                    edges {
+                        node {
+                            unit {nameFi}
                         }
                     }
                 }
