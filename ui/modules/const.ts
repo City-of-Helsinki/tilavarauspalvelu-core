@@ -17,6 +17,7 @@ export const searchPrefix = "/search";
 export const singleSearchPrefix = "/search/single";
 export const applicationsPrefix = "/applications";
 export const applicationPrefix = "/application";
+export const reservationsPrefix = "/reservations";
 export const criteriaPrefix = "/criteria";
 
 export const mapStyle = {

@@ -20,6 +20,11 @@ jest.mock("next-i18next", () => ({
 }));
 
 test("renders correctly", () => {
+  const { asFragment } = render(<Ticket state="error" title="Ticket title" />);
+  expect(asFragment()).toMatchSnapshot();
+});
+
+test("renders correctly", () => {
   const { asFragment } = render(
     <Ticket state="incomplete" title="Ticket title" />
   );

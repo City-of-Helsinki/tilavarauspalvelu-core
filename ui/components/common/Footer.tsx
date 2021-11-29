@@ -6,7 +6,6 @@ import styled from "styled-components";
 const linkIds: string[] = ["terms", "feedback"];
 
 const Wrapper = styled(HDSFooter)`
-  margin-top: var(--spacing-layout-xl);
   flex-shrink: 0;
 `;
 

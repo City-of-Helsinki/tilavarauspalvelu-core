@@ -20,6 +20,14 @@ export const RESERVATION_UNIT = gql`
       termsOfUseFi
       termsOfUseEn
       termsOfUseSv
+      serviceSpecificTerms {
+        nameFi
+        nameEn
+        nameSv
+        textFi
+        textEn
+        textSv
+      }
       reservationUnitType {
         nameFi
         nameEn
@@ -52,9 +60,6 @@ export const RESERVATION_UNIT = gql`
         nameFi
         nameEn
         nameSv
-        termsOfUseFi
-        termsOfUseEn
-        termsOfUseSv
       }
       openingHours(openingTimes: false, periods: true) {
         openingTimePeriods {
@@ -79,9 +84,9 @@ export const RESERVATION_UNITS = gql`
     $textSearch: String
     $minPersons: Float
     $maxPersons: Float
-    $unit: ID
-    $reservationUnitType: ID
-    $purposes: ID
+    $unit: [ID]
+    $reservationUnitType: [ID]
+    $purposes: [ID]
     $first: Int
     $after: String
     $orderBy: String
@@ -136,7 +141,7 @@ export const RESERVATION_UNITS = gql`
 `;
 
 export const RELATED_RESERVATION_UNITS = gql`
-  query RelatedReservationUnits($unit: ID!) {
+  query RelatedReservationUnits($unit: [ID]!) {
     reservationUnits(unit: $unit) {
       edges {
         node {

@@ -19,7 +19,7 @@ import {
   minuteSelectorToggle,
   reservationEvent,
   durationSelectorToggle,
-} from "model/reservation";
+} from "model/reservation-creation";
 
 const matchEvent = (): void => {
   reservationEvent()
