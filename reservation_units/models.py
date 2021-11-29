@@ -238,6 +238,35 @@ class ReservationUnit(models.Model):
         on_delete=models.PROTECT,
     )
 
+    PRICE_UNIT_PER_HOUR = "per_hour"
+    PRICE_UNIT_PER_DAY = "per_day"
+    PRICE_UNIT_PER_WEEK = "per_week"
+    PRICE_UNIT_PER_PIECE = "per_piece"
+    PRICE_UNITS = (
+        (PRICE_UNIT_PER_HOUR, _("per hour")),
+        (PRICE_UNIT_PER_DAY, _("per day")),
+        (PRICE_UNIT_PER_WEEK, _("per week")),
+        (PRICE_UNIT_PER_PIECE, _("per piece")),
+    )
+    price_unit = models.CharField(
+        max_length=20,
+        verbose_name=_("Price unit"),
+        choices=PRICE_UNITS,
+        default=PRICE_UNIT_PER_HOUR,
+    )
+    lowest_price = models.DecimalField(
+        verbose_name=_("Lowest price"),
+        max_digits=10,
+        decimal_places=2,
+        default=0,
+    )
+    highest_price = models.DecimalField(
+        verbose_name=_("Highest price"),
+        max_digits=10,
+        decimal_places=2,
+        default=0,
+    )
+
     def __str__(self):
         return "{}".format(self.name)
 
