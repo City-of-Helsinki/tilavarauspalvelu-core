@@ -1322,7 +1322,7 @@ export type ReservationUnitCreateMutationPayload = {
   descriptionSv?: Maybe<Scalars['String']>;
   /** May contain more than one error for same field. */
   errors?: Maybe<Array<Maybe<ErrorType>>>;
-  /** Images of the reservation unit as nested related objects.  */
+  /** Images of the reservation unit as nested related objects. */
   images?: Maybe<Array<Maybe<ReservationUnitImageType>>>;
   isDraft?: Maybe<Scalars['Boolean']>;
   /** Location of this reservation unit. Dynamically determined from spaces of the reservation unit. */
@@ -1517,7 +1517,7 @@ export type ReservationUnitUpdateMutationPayload = {
   descriptionSv?: Maybe<Scalars['String']>;
   /** May contain more than one error for same field. */
   errors?: Maybe<Array<Maybe<ErrorType>>>;
-  /** Images of the reservation unit as nested related objects.  */
+  /** Images of the reservation unit as nested related objects. */
   images?: Maybe<Array<Maybe<ReservationUnitImageType>>>;
   isDraft?: Maybe<Scalars['Boolean']>;
   /** Location of this reservation unit. Dynamically determined from spaces of the reservation unit. */
