@@ -270,12 +270,18 @@ const ReservationCancellation = ({
             />
             <Heading>
               {formState === "unsent" ? (
-                <H1>{t("reservations:cancelReservation")}</H1>
+                <>
+                  <H1>{t("reservations:cancelReservation")}</H1>
+                  <p>{t("reservations:cancelReservationBody")}</p>
+                </>
               ) : (
-                <H1>
-                  <IconCheck size="l" />
-                  {t("reservations:reservationCancelledTitle")}
-                </H1>
+                <>
+                  <H1>
+                    <IconCheck size="l" />
+                    {t("reservations:reservationCancelledTitle")}
+                  </H1>
+                  <p>{t("reservations:reservationCancelledBody")}</p>
+                </>
               )}
             </Heading>
           </HeadColumns>
@@ -286,6 +292,7 @@ const ReservationCancellation = ({
         <Body>
           <BodyContainer>
             <H3>{t("reservations:cancelInfo")}</H3>
+            <p>{t("reservations:cancelInfoBody")}</p>
             <Form onSubmit={handleSubmit(onSubmit)}>
               <Controller
                 as={
