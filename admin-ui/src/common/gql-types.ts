@@ -644,12 +644,14 @@ export type Query = {
   keywordGroups?: Maybe<KeywordGroupTypeConnection>;
   keywords?: Maybe<KeywordTypeConnection>;
   purposes?: Maybe<PurposeTypeConnection>;
+  reservationByPk?: Maybe<ReservationType>;
   reservationCancelReasons?: Maybe<ReservationCancelReasonTypeConnection>;
   reservationPurposes?: Maybe<ReservationPurposeTypeConnection>;
   /** The ID of the object */
   reservationUnit?: Maybe<ReservationUnitType>;
   reservationUnitByPk?: Maybe<ReservationUnitByPkType>;
   reservationUnitCancellationRules?: Maybe<ReservationUnitCancellationRuleTypeConnection>;
+  reservationUnitTypes?: Maybe<ReservationUnitTypeTypeConnection>;
   reservationUnits?: Maybe<ReservationUnitTypeConnection>;
   reservations?: Maybe<ReservationTypeConnection>;
   /** The ID of the object */
@@ -766,6 +768,11 @@ export type QueryPurposesArgs = {
 };
 
 
+export type QueryReservationByPkArgs = {
+  pk?: Maybe<Scalars['Int']>;
+};
+
+
 export type QueryReservationCancelReasonsArgs = {
   after?: Maybe<Scalars['String']>;
   before?: Maybe<Scalars['String']>;
@@ -805,20 +812,31 @@ export type QueryReservationUnitCancellationRulesArgs = {
 };
 
 
+export type QueryReservationUnitTypesArgs = {
+  after?: Maybe<Scalars['String']>;
+  before?: Maybe<Scalars['String']>;
+  first?: Maybe<Scalars['Int']>;
+  last?: Maybe<Scalars['Int']>;
+  nameEn?: Maybe<Scalars['String']>;
+  nameFi?: Maybe<Scalars['String']>;
+  nameSv?: Maybe<Scalars['String']>;
+};
+
+
 export type QueryReservationUnitsArgs = {
   after?: Maybe<Scalars['String']>;
   before?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Int']>;
   isDraft?: Maybe<Scalars['Boolean']>;
-  keywordGroups?: Maybe<Scalars['ID']>;
+  keywordGroups?: Maybe<Array<Maybe<Scalars['ID']>>>;
   last?: Maybe<Scalars['Int']>;
   maxPersonsGte?: Maybe<Scalars['Float']>;
   maxPersonsLte?: Maybe<Scalars['Float']>;
   orderBy?: Maybe<Scalars['String']>;
-  purposes?: Maybe<Scalars['ID']>;
-  reservationUnitType?: Maybe<Scalars['ID']>;
+  purposes?: Maybe<Array<Maybe<Scalars['ID']>>>;
+  reservationUnitType?: Maybe<Array<Maybe<Scalars['ID']>>>;
   textSearch?: Maybe<Scalars['String']>;
-  unit?: Maybe<Scalars['ID']>;
+  unit?: Maybe<Array<Maybe<Scalars['ID']>>>;
 };
 
 
@@ -1447,6 +1465,23 @@ export type ReservationUnitTypeType = Node & {
   nameFi?: Maybe<Scalars['String']>;
   nameSv?: Maybe<Scalars['String']>;
   pk?: Maybe<Scalars['Int']>;
+};
+
+export type ReservationUnitTypeTypeConnection = {
+  __typename?: 'ReservationUnitTypeTypeConnection';
+  /** Contains the nodes in this connection. */
+  edges: Array<Maybe<ReservationUnitTypeTypeEdge>>;
+  /** Pagination data for this connection. */
+  pageInfo: PageInfo;
+};
+
+/** A Relay edge containing a `ReservationUnitTypeType` and its cursor. */
+export type ReservationUnitTypeTypeEdge = {
+  __typename?: 'ReservationUnitTypeTypeEdge';
+  /** A cursor for use in pagination */
+  cursor: Scalars['String'];
+  /** The item at the end of the edge */
+  node?: Maybe<ReservationUnitTypeType>;
 };
 
 export type ReservationUnitUpdateMutationInput = {
