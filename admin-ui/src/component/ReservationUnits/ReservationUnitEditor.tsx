@@ -30,9 +30,6 @@ import {
   Mutation,
   ErrorType,
   Maybe,
-  EquipmentTypeEdge,
-  PurposeTypeEdge,
-  TermsOfUseTypeEdge,
   TermsOfUseTermsType,
 } from "../../common/gql-types";
 import {
@@ -101,6 +98,7 @@ type State = {
   resourceOptions: OptionType[];
   equipmentOptions: OptionType[];
   purposeOptions: OptionType[];
+  reservationUnitTypeOptions: OptionType[];
   paymentTermsOptions: OptionType[];
   cancellationTermsOptions: OptionType[];
   serviceSpecificTermsOptions: OptionType[];
@@ -119,7 +117,7 @@ const makeTermsOptions = (
   },
   termsType: TermsOfUseTermsType
 ): OptionType[] => {
-  return (action.parameters.termsOfUse?.edges || ([] as TermsOfUseTypeEdge[]))
+  return (action.parameters.termsOfUse?.edges || [])
     .filter((tou) => {
       return termsType === tou?.node?.termsType;
     })
@@ -144,6 +142,7 @@ const getInitialState = (reservationUnitPk: number): State => ({
   equipmentOptions: [],
   resourceOptions: [],
   purposeOptions: [],
+  reservationUnitTypeOptions: [],
   paymentTermsOptions: [],
   cancellationTermsOptions: [],
   serviceSpecificTermsOptions: [],
@@ -223,16 +222,12 @@ const reducer = (state: State, action: Action): State => {
           purposePks: reservationUnit?.purposes?.map((s) =>
             Number(s?.pk)
           ) as number[],
-          paymentTermsPk: get(reservationUnit, "paymentTerms.pk", undefined),
-          cancellationTermsPk: get(
-            reservationUnit,
-            "cancellationTerms.pk",
-            undefined
-          ),
+          paymentTermsPk: get(reservationUnit, "paymentTerms.pk"),
+          reservationUnitTypePk: get(reservationUnit, "reservationUnitType.pk"),
+          cancellationTermsPk: get(reservationUnit, "cancellationTerms.pk"),
           serviceSpecificTermsPk: get(
             reservationUnit,
-            "serviceSpecificTerms.pk",
-            undefined
+            "serviceSpecificTerms.pk"
           ),
         },
         hasChanges: false,
@@ -279,16 +274,20 @@ const reducer = (state: State, action: Action): State => {
     case "parametersLoaded": {
       return withLoadingStatus({
         ...state,
-        equipmentOptions: (
-          action.parameters.equipments?.edges || ([] as EquipmentTypeEdge[])
-        ).map((e) =>
+        equipmentOptions: (action.parameters.equipments?.edges || []).map((e) =>
           makeOption({
             pk: get(e, "node.pk", -1),
             nameFi: get(e, "node.nameFi", "no-name"),
           })
         ),
-        purposeOptions: (
-          action.parameters.purposes?.edges || ([] as PurposeTypeEdge[])
+        purposeOptions: (action.parameters.purposes?.edges || []).map((e) =>
+          makeOption({
+            pk: get(e, "node.pk", -1),
+            nameFi: get(e, "node.nameFi", "no-name"),
+          })
+        ),
+        reservationUnitTypeOptions: (
+          action.parameters.reservationUnitTypes?.edges || []
         ).map((e) =>
           makeOption({
             pk: get(e, "node.pk", -1),
@@ -540,6 +539,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
         "minReservationDuration",
         "requireIntroduction",
         "purposePks",
+        "reservationUnitTypePk",
         "paymentTermsPk",
         "cancellationTermsPk",
         "serviceSpecificTermsPk",
@@ -828,6 +828,30 @@ const ReservationUnitEditor = (): JSX.Element | null => {
             </Accordion>
             <Accordion heading={t("ReservationUnitEditor.typesProperties")}>
               <EditorColumns>
+                <SelectWithPadding
+                  label={t(`ReservationUnitEditor.reservationUnitTypeLabel`)}
+                  placeholder={t(
+                    `ReservationUnitEditor.reservationUnitTypePlaceholder`
+                  )}
+                  options={state.reservationUnitTypeOptions}
+                  onChange={(selectedTerms: unknown) => {
+                    const o = selectedTerms as OptionType;
+                    setValue({
+                      [`reservationUnitTypePk`]: o.value,
+                    });
+                  }}
+                  disabled={state.reservationUnitTypeOptions.length === 0}
+                  helper={t(
+                    `ReservationUnitEditor.reservationUnitTypeHelperText`
+                  )}
+                  value={
+                    getSelectedOption(
+                      state,
+                      `reservationUnitTypeOptions`,
+                      `reservationUnitTypePk`
+                    ) || {}
+                  }
+                />
                 <Combobox
                   multiselect
                   label={t("ReservationUnitEditor.purposesLabel")}
