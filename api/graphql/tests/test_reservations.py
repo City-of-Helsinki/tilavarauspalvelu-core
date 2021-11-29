@@ -85,7 +85,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
 
     def test_reservation_query(self):
         self.maxDiff = None
-        self._client.force_login(self.regular_joe)
+        self.client.force_login(self.regular_joe)
         response = self.query(
             """
             query {
@@ -160,7 +160,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
 
     def test_creating_reservation_succeed(self, mock_periods, mock_opening_hours):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
-        self._client.force_login(self.regular_joe)
+        self.client.force_login(self.regular_joe)
         input_data = self.get_valid_input_data()
         response = self.query(self.get_create_query(), input_data=input_data)
         content = json.loads(response.content)
@@ -190,7 +190,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         self, mock_periods, mock_opening_hours
     ):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
-        self._client.force_login(self.regular_joe)
+        self.client.force_login(self.regular_joe)
         input_data = self.get_valid_input_data()
         optional_fields = [
             "reserveeFirstName",
@@ -209,7 +209,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
 
     def test_creating_reservation_with_pk_fails(self, mock_periods, mock_opening_hours):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
-        self._client.force_login(self.regular_joe)
+        self.client.force_login(self.regular_joe)
         input_data = self.get_valid_input_data()
         input_data["pk"] = 9999
         response = self.query(self.get_create_query(), input_data=input_data)
@@ -229,7 +229,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
             state=STATE_CHOICES.CONFIRMED,
         )
 
-        self._client.force_login(self.regular_joe)
+        self.client.force_login(self.regular_joe)
         response = self.query(
             self.get_create_query(), input_data=self.get_valid_input_data()
         )
@@ -257,7 +257,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
             state=STATE_CHOICES.CONFIRMED,
         )
 
-        self._client.force_login(self.regular_joe)
+        self.client.force_login(self.regular_joe)
         response = self.query(
             self.get_create_query(), input_data=self.get_valid_input_data()
         )
@@ -285,7 +285,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
             state=STATE_CHOICES.CONFIRMED,
         )
 
-        self._client.force_login(self.regular_joe)
+        self.client.force_login(self.regular_joe)
         response = self.query(
             self.get_create_query(), input_data=self.get_valid_input_data()
         )
@@ -316,7 +316,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
             state=STATE_CHOICES.CONFIRMED,
         )
 
-        self._client.force_login(self.regular_joe)
+        self.client.force_login(self.regular_joe)
         response = self.query(
             self.get_create_query(), input_data=self.get_valid_input_data()
         )
@@ -349,7 +349,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
             state=STATE_CHOICES.CONFIRMED,
         )
 
-        self._client.force_login(self.regular_joe)
+        self.client.force_login(self.regular_joe)
         response = self.query(
             self.get_create_query(), input_data=self.get_valid_input_data()
         )
@@ -376,7 +376,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         input_data["begin"] = begin.strftime("%Y%m%dT%H%M%SZ")
         input_data["end"] = end.strftime("%Y%m%dT%H%M%SZ")
 
-        self._client.force_login(self.regular_joe)
+        self.client.force_login(self.regular_joe)
         response = self.query(self.get_create_query(), input_data=input_data)
         content = json.loads(response.content)
 
@@ -398,7 +398,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
             reservation_period_end=datetime.date.today() + datetime.timedelta(days=10),
         )
 
-        self._client.force_login(self.regular_joe)
+        self.client.force_login(self.regular_joe)
         response = self.query(
             self.get_create_query(), input_data=self.get_valid_input_data()
         )
@@ -419,7 +419,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         self.reservation_unit.max_reservation_duration = datetime.timedelta(minutes=30)
         self.reservation_unit.save()
 
-        self._client.force_login(self.regular_joe)
+        self.client.force_login(self.regular_joe)
         response = self.query(
             self.get_create_query(), input_data=self.get_valid_input_data()
         )
@@ -443,7 +443,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         self.reservation_unit.min_reservation_duration = datetime.timedelta(hours=2)
         self.reservation_unit.save()
 
-        self._client.force_login(self.regular_joe)
+        self.client.force_login(self.regular_joe)
         response = self.query(
             self.get_create_query(), input_data=self.get_valid_input_data()
         )
@@ -489,7 +489,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         valid_data["end"] = (res_start + datetime.timedelta(hours=1)).strftime(
             "%Y%m%dT%H%M%SZ"
         )
-        self._client.force_login(self.regular_joe)
+        self.client.force_login(self.regular_joe)
         response = self.query(self.get_create_query(), input_data=valid_data)
         content = json.loads(response.content)
 
@@ -554,7 +554,7 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
 
     def test_updating_reservation_succeed(self, mock_periods, mock_opening_hours):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
-        self._client.force_login(self.regular_joe)
+        self.client.force_login(self.regular_joe)
         response = self.query(
             self.get_update_query(), input_data=self.get_valid_update_data()
         )
@@ -582,7 +582,7 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
     def test_updating_reservation_with_pk_fails(self, mock_periods, mock_opening_hours):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         new_pk = 9999
-        self._client.force_login(self.regular_joe)
+        self.client.force_login(self.regular_joe)
         input_data = self.get_valid_update_data()
         input_data["pk"] = new_pk
         response = self.query(self.get_update_query(), input_data=input_data)
@@ -602,7 +602,7 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
             state=STATE_CHOICES.CONFIRMED,
         )
 
-        self._client.force_login(self.regular_joe)
+        self.client.force_login(self.regular_joe)
         response = self.query(
             self.get_update_query(), input_data=self.get_valid_update_data()
         )
@@ -630,7 +630,7 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
             state=STATE_CHOICES.CONFIRMED,
         )
 
-        self._client.force_login(self.regular_joe)
+        self.client.force_login(self.regular_joe)
         response = self.query(
             self.get_update_query(),
             input_data={"pk": self.reservation.id, "priority": 200},
@@ -661,7 +661,7 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
             state=STATE_CHOICES.CONFIRMED,
         )
 
-        self._client.force_login(self.regular_joe)
+        self.client.force_login(self.regular_joe)
         response = self.query(
             self.get_update_query(), input_data=self.get_valid_update_data()
         )
@@ -692,7 +692,7 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
             state=STATE_CHOICES.CONFIRMED,
         )
 
-        self._client.force_login(self.regular_joe)
+        self.client.force_login(self.regular_joe)
         input_data = self.get_valid_update_data()
         input_data.pop("begin")
         input_data.pop("end")
@@ -726,7 +726,7 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
             state=STATE_CHOICES.CONFIRMED,
         )
 
-        self._client.force_login(self.regular_joe)
+        self.client.force_login(self.regular_joe)
         response = self.query(
             self.get_update_query(), input_data=self.get_valid_update_data()
         )
@@ -753,7 +753,7 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         input_data["begin"] = begin.strftime("%Y%m%dT%H%M%SZ")
         input_data["end"] = end.strftime("%Y%m%dT%H%M%SZ")
 
-        self._client.force_login(self.regular_joe)
+        self.client.force_login(self.regular_joe)
         response = self.query(self.get_update_query(), input_data=input_data)
         content = json.loads(response.content)
 
@@ -775,7 +775,7 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
             reservation_period_end=datetime.date.today() + datetime.timedelta(days=10),
         )
 
-        self._client.force_login(self.regular_joe)
+        self.client.force_login(self.regular_joe)
         response = self.query(
             self.get_update_query(), input_data=self.get_valid_update_data()
         )
@@ -796,7 +796,7 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         self.reservation_unit.max_reservation_duration = datetime.timedelta(minutes=30)
         self.reservation_unit.save()
 
-        self._client.force_login(self.regular_joe)
+        self.client.force_login(self.regular_joe)
         response = self.query(
             self.get_update_query(), input_data=self.get_valid_update_data()
         )
@@ -820,7 +820,7 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         self.reservation_unit.min_reservation_duration = datetime.timedelta(hours=2)
         self.reservation_unit.save()
 
-        self._client.force_login(self.regular_joe)
+        self.client.force_login(self.regular_joe)
         response = self.query(
             self.get_update_query(), input_data=self.get_valid_update_data()
         )
@@ -853,7 +853,7 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         )
         input_data = self.get_valid_update_data()
         input_data["pk"] = res.pk
-        self._client.force_login(self.regular_joe)
+        self.client.force_login(self.regular_joe)
         response = self.query(self.get_update_query(), input_data=input_data)
         content = json.loads(response.content)
 
@@ -867,7 +867,7 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
 
         input_data = self.get_valid_update_data()
         input_data["state"] = STATE_CHOICES.CANCELLED
-        self._client.force_login(self.regular_joe)
+        self.client.force_login(self.regular_joe)
         response = self.query(self.get_update_query(), input_data=input_data)
         content = json.loads(response.content)
 
@@ -882,7 +882,7 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
 
         input_data = self.get_valid_update_data()
         input_data["state"] = STATE_CHOICES.CONFIRMED
-        self._client.force_login(self.regular_joe)
+        self.client.force_login(self.regular_joe)
         response = self.query(self.get_update_query(), input_data=input_data)
         content = json.loads(response.content)
         assert_that(
@@ -932,7 +932,7 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
 
     def test_confirm_reservation_changes_state(self, mock_periods, mock_opening_hours):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
-        self._client.force_login(self.regular_joe)
+        self.client.force_login(self.regular_joe)
         input_data = self.get_valid_confirm_data()
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CREATED)
         response = self.query(self.get_confirm_query(), input_data=input_data)
@@ -948,7 +948,7 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         self, mock_periods, mock_opening_hours
     ):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
-        self._client.force_login(self.regular_joe)
+        self.client.force_login(self.regular_joe)
         self.reservation.state = STATE_CHOICES.DENIED
         self.reservation.save()
         input_data = self.get_valid_confirm_data()
@@ -965,7 +965,7 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
     ):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         unauthorized_user = get_user_model().objects.create()
-        self._client.force_login(unauthorized_user)
+        self.client.force_login(unauthorized_user)
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CREATED)
         input_data = self.get_valid_confirm_data()
         response = self.query(self.get_confirm_query(), input_data=input_data)
@@ -978,7 +978,7 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         self, mock_periods, mock_opening_hours
     ):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
-        self._client.force_login(self.regular_joe)
+        self.client.force_login(self.regular_joe)
         input_data = self.get_valid_confirm_data()
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CREATED)
         self.query(self.get_confirm_query(), input_data=input_data)
@@ -1028,7 +1028,7 @@ class ReservationCancellationTestCase(ReservationTestCaseBase):
         return {"pk": self.reservation.pk, "cancelReasonPk": self.cancel_reason.id}
 
     def test_cancel_reservation_changes_state(self):
-        self._client.force_login(self.regular_joe)
+        self.client.force_login(self.regular_joe)
         input_data = self.get_valid_cancel_data()
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
         response = self.query(self.get_cancel_query(), input_data=input_data)
@@ -1044,7 +1044,7 @@ class ReservationCancellationTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CANCELLED)
 
     def test_cancel_reservation_adds_reason(self):
-        self._client.force_login(self.regular_joe)
+        self.client.force_login(self.regular_joe)
         input_data = self.get_valid_cancel_data()
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
         response = self.query(self.get_cancel_query(), input_data=input_data)
@@ -1060,7 +1060,7 @@ class ReservationCancellationTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.cancel_reason).is_equal_to(self.cancel_reason)
 
     def test_cancel_reservation_adds_cancel_details(self):
-        self._client.force_login(self.regular_joe)
+        self.client.force_login(self.regular_joe)
         input_data = self.get_valid_cancel_data()
         details = "wantitso"
         input_data["cancelDetails"] = details
@@ -1078,7 +1078,7 @@ class ReservationCancellationTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.cancel_details).is_equal_to(details)
 
     def test_cancel_reservation_fails_if_state_is_not_confirmed(self):
-        self._client.force_login(self.regular_joe)
+        self.client.force_login(self.regular_joe)
         self.reservation.state = STATE_CHOICES.CREATED
         self.reservation.save()
         input_data = self.get_valid_cancel_data()
@@ -1092,7 +1092,7 @@ class ReservationCancellationTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CREATED)
 
     def test_cancel_reservation_fails_if_cancel_reason_not_given(self):
-        self._client.force_login(self.regular_joe)
+        self.client.force_login(self.regular_joe)
         input_data = self.get_valid_cancel_data()
         input_data.pop("cancelReasonPk")
         response = self.query(self.get_cancel_query(), input_data=input_data)
@@ -1104,7 +1104,7 @@ class ReservationCancellationTestCase(ReservationTestCaseBase):
 
     def test_cancel_reservation_fails_on_wrong_user(self):
         unauthorized_user = get_user_model().objects.create()
-        self._client.force_login(unauthorized_user)
+        self.client.force_login(unauthorized_user)
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
         input_data = self.get_valid_cancel_data()
         response = self.query(self.get_cancel_query(), input_data=input_data)
@@ -1121,7 +1121,7 @@ class ReservationCancellationTestCase(ReservationTestCaseBase):
         self.reservation_unit.cancellation_rule = rule
         self.reservation_unit.save()
 
-        self._client.force_login(self.regular_joe)
+        self.client.force_login(self.regular_joe)
         input_data = self.get_valid_cancel_data()
         response = self.query(self.get_cancel_query(), input_data=input_data)
 
@@ -1148,7 +1148,7 @@ class ReservationCancellationTestCase(ReservationTestCaseBase):
             user=self.regular_joe,
         )
 
-        self._client.force_login(self.regular_joe)
+        self.client.force_login(self.regular_joe)
         input_data = self.get_valid_cancel_data()
         input_data["pk"] = reservation.id
         response = self.query(self.get_cancel_query(), input_data=input_data)
@@ -1170,7 +1170,7 @@ class ReservationCancellationTestCase(ReservationTestCaseBase):
             user=self.regular_joe,
         )
 
-        self._client.force_login(self.regular_joe)
+        self.client.force_login(self.regular_joe)
         input_data = self.get_valid_cancel_data()
         input_data["pk"] = reservation.id
         response = self.query(self.get_cancel_query(), input_data=input_data)
@@ -1186,7 +1186,7 @@ class ReservationCancellationTestCase(ReservationTestCaseBase):
             self.reservation_unit.cancellation_rule = None
             self.reservation_unit.save()
 
-            self._client.force_login(self.regular_joe)
+            self.client.force_login(self.regular_joe)
             assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
             input_data = self.get_valid_cancel_data()
             response = self.query(self.get_cancel_query(), input_data=input_data)
@@ -1223,7 +1223,7 @@ class ReservationByPkTestCase(ReservationTestCaseBase):
         """
 
     def test_getting_reservation_by_pk(self):
-        self._client.force_login(self.regular_joe)
+        self.client.force_login(self.regular_joe)
         response = self.query(self.get_query())
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
@@ -1233,7 +1233,7 @@ class ReservationByPkTestCase(ReservationTestCaseBase):
         self,
     ):
         unauthorized_user = get_user_model().objects.create()
-        self._client.force_login(unauthorized_user)
+        self.client.force_login(unauthorized_user)
         response = self.query(self.get_query())
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()

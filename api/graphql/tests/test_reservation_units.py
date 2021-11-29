@@ -64,7 +64,7 @@ class ReservationUnitTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
 
     def test_getting_reservation_units(self):
         self.maxDiff = None
-        self._client.force_login(self.regular_joe)
+        self.client.force_login(self.regular_joe)
         response = self.query(
             """
             query {
@@ -691,7 +691,7 @@ class ReservationUnitTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
         )
         self.reservation_unit.save()
 
-        self._client.force_login(self.regular_joe)
+        self.client.force_login(self.regular_joe)
         response = self.query(
             """
             query {
@@ -733,7 +733,7 @@ class ReservationUnitTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
             [matching_reservation, other_reservation]
         )
         self.reservation_unit.save()
-        self._client.force_login(self.regular_joe)
+        self.client.force_login(self.regular_joe)
         response = self.query(
             """
             query {
@@ -780,7 +780,7 @@ class ReservationUnitTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
         )
         self.reservation_unit.save()
 
-        self._client.force_login(self.regular_joe)
+        self.client.force_login(self.regular_joe)
         response = self.query(
             """
             query {
@@ -1052,7 +1052,7 @@ class ReservationUnitMutationsTestCaseBase(GrapheneTestCaseBase):
         )
 
     def setUp(self):
-        self._client.force_login(self.general_admin)
+        self.client.force_login(self.general_admin)
 
 
 class ReservationUnitCreateAsDraftTestCase(ReservationUnitMutationsTestCaseBase):
@@ -1163,7 +1163,7 @@ class ReservationUnitCreateAsDraftTestCase(ReservationUnitMutationsTestCaseBase)
         assert_that(res_unit_data.get("errors")).is_not_none()
 
     def test_regular_user_cannot_create(self):
-        self._client.force_login(self.regular_joe)
+        self.client.force_login(self.regular_joe)
         data = {"isDraft": True, "nameFi": "Resunit name", "unitPk": self.unit.id}
         response = self.query(self.get_create_query(), input_data=data)
 
@@ -1609,7 +1609,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         assert_that(content.get("errors")).is_not_none()
 
     def test_regular_user_cannot_create(self):
-        self._client.force_login(self.regular_joe)
+        self.client.force_login(self.regular_joe)
         data = self.get_valid_data()
         response = self.query(self.get_create_query(), input_data=data)
 
@@ -1705,7 +1705,7 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
         assert_that(self.res_unit.name_fi).is_not_empty()
 
     def test_regular_user_cannot_update(self):
-        self._client.force_login(self.regular_joe)
+        self.client.force_login(self.regular_joe)
         data = self.get_valid_update_data()
         data["nameFi"] = "Better name in my opinion."
         response = self.query(self.get_update_query(), input_data=data)
@@ -2009,7 +2009,7 @@ class ReservationUnitUpdateNotDraftTestCase(ReservationUnitMutationsTestCaseBase
         assert_that(self.res_unit.reservation_unit_type).is_not_none()
 
     def test_regular_user_cannot_update(self):
-        self._client.force_login(self.regular_joe)
+        self.client.force_login(self.regular_joe)
         data = self.get_valid_update_data()
         data["nameFi"] = "Better name in my opinion."
         response = self.query(self.get_update_query(), input_data=data)

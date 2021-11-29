@@ -16,7 +16,7 @@ class PurposeTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
 
     def setUp(self) -> None:
         super().setUp()
-        self._client.force_login(self.general_admin)
+        self.client.force_login(self.general_admin)
 
     def get_create_query(self):
         return """
@@ -85,7 +85,7 @@ class PurposeTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
         self.assertMatchSnapshot(content)
 
     def test_normal_user_cannot_create(self):
-        self._client.force_login(self.regular_joe)
+        self.client.force_login(self.regular_joe)
         response = self.query(
             self.get_create_query(),
             input_data={"nameFi": "Created purpose"},
@@ -96,7 +96,7 @@ class PurposeTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
         assert_that(Purpose.objects.exclude(id=self.purpose.id).exists()).is_false()
 
     def test_normal_user_cannot_update(self):
-        self._client.force_login(self.regular_joe)
+        self.client.force_login(self.regular_joe)
         response = self.query(
             self.get_update_query(),
             input_data={"pk": self.purpose.id, "nameFi": "Updated name"},

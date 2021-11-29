@@ -18,7 +18,7 @@ class ReservationCancelReasonsQueryTestCase(
         )
 
     def test_getting_reservation_cancel_reasons_for_logged_in_user(self):
-        self._client.force_login(self.regular_joe)
+        self.client.force_login(self.regular_joe)
         response = self.query(
             """
             query {

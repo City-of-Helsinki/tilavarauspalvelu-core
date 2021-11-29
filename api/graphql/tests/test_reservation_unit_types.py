@@ -15,7 +15,7 @@ class ReservationUnitTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
 
     def test_getting_reservation_unit_types(self):
         self.maxDiff = None
-        self._client.force_login(self.regular_joe)
+        self.client.force_login(self.regular_joe)
         response = self.query(
             """
             query {

@@ -126,7 +126,7 @@ class ResourceGraphQLTestCase(ResourceGraphQLBase, snapshottest.TestCase):
 
 class ResourceCreateForPublishGraphQLTestCase(ResourceGraphQLBase):
     def setUp(self) -> None:
-        self._client.force_login(self.general_admin)
+        self.client.force_login(self.general_admin)
 
     def get_create_query(self):
         return (
@@ -225,7 +225,7 @@ class ResourceCreateForPublishGraphQLTestCase(ResourceGraphQLBase):
         )
 
     def test_regular_user_cannot_create(self):
-        self._client.force_login(self.regular_joe)
+        self.client.force_login(self.regular_joe)
         response = self.query(
             self.get_create_query(),
             input_data=self.get_valid_input_data(),
@@ -259,7 +259,7 @@ class ResourceCreateForPublishGraphQLTestCase(ResourceGraphQLBase):
 
 class ResourceCreateAsDraftGraphQLTestCase(ResourceGraphQLBase):
     def setUp(self) -> None:
-        self._client.force_login(self.general_admin)
+        self.client.force_login(self.general_admin)
 
     def get_create_query(self):
         return (
@@ -347,7 +347,7 @@ class ResourceCreateAsDraftGraphQLTestCase(ResourceGraphQLBase):
         assert_that(Resource.objects.get(pk=res_pk))
 
     def test_regular_user_cannot_create(self):
-        self._client.force_login(self.regular_joe)
+        self.client.force_login(self.regular_joe)
         response = self.query(
             self.get_create_query(),
             input_data=self.get_valid_input_data(),
@@ -362,7 +362,7 @@ class ResourceCreateAsDraftGraphQLTestCase(ResourceGraphQLBase):
 
 class ResourceUpdateForPublishGraphQLTestCase(ResourceGraphQLBase):
     def setUp(self) -> None:
-        self._client.force_login(self.general_admin)
+        self.client.force_login(self.general_admin)
 
     @classmethod
     def setUpTestData(cls):
@@ -460,7 +460,7 @@ class ResourceUpdateForPublishGraphQLTestCase(ResourceGraphQLBase):
         assert_that(self.resource.space).is_none()
 
     def test_regular_user_cannot_update(self):
-        self._client.force_login(self.regular_joe)
+        self.client.force_login(self.regular_joe)
         response = self.query(
             self.get_update_query(),
             input_data=self.get_valid_input_data(),
@@ -519,7 +519,7 @@ class ResourceUpdateForPublishGraphQLTestCase(ResourceGraphQLBase):
 
 class ResourceUpdateAsDraftGraphQLTestCase(ResourceGraphQLBase):
     def setUp(self):
-        self._client.force_login(self.general_admin)
+        self.client.force_login(self.general_admin)
 
     @classmethod
     def setUpTestData(cls):
@@ -574,7 +574,7 @@ class ResourceUpdateAsDraftGraphQLTestCase(ResourceGraphQLBase):
         assert_that(Resource.objects.get(id=self.resource.id).space).is_none()
 
     def test_regular_user_cannot_update(self):
-        self._client.force_login(self.regular_joe)
+        self.client.force_login(self.regular_joe)
         response = self.query(
             self.get_update_query(),
             input_data=self.get_valid_input_data(),
@@ -598,7 +598,7 @@ class ResourceDeleteGraphQLTestCase(ResourceGraphQLBase):
         )
 
     def test_resource_deleted(self):
-        self._client.force_login(self.general_admin)
+        self.client.force_login(self.general_admin)
         response = self.query(
             self.get_delete_query(), input_data={"pk": self.resource.pk}
         )
@@ -613,7 +613,7 @@ class ResourceDeleteGraphQLTestCase(ResourceGraphQLBase):
         assert_that(Resource.objects.filter(pk=self.resource.pk).exists()).is_false()
 
     def test_regular_user_cannot_delete(self):
-        self._client.force_login(self.regular_joe)
+        self.client.force_login(self.regular_joe)
         response = self.query(
             self.get_delete_query(), input_data={"pk": self.resource.pk}
         )

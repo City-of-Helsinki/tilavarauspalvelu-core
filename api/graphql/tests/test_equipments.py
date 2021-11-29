@@ -15,7 +15,7 @@ class EquipmentBaseTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
         cls.category = EquipmentCategoryFactory(name="Test Category")
 
     def setUp(self) -> None:
-        self._client.force_login(self.general_admin)
+        self.client.force_login(self.general_admin)
 
 
 class EquipmentCreateTestCase(EquipmentBaseTestCase):
@@ -41,7 +41,7 @@ class EquipmentCreateTestCase(EquipmentBaseTestCase):
         assert_that(content.get("data").get("createEquipment").get("pk")).is_not_none()
 
     def test_regular_user_cannot_create(self):
-        self._client.force_login(self.regular_joe)
+        self.client.force_login(self.regular_joe)
         data = {
             "nameFi": "Regular user created equipment",
             "categoryPk": self.category.id,
@@ -99,7 +99,7 @@ class EquipmentUpdateTestCase(EquipmentBaseTestCase):
         assert_that(content.get("errors")).is_not_none()
 
     def test_regular_user_cannot_update(self):
-        self._client.force_login(self.regular_joe)
+        self.client.force_login(self.regular_joe)
         name = self.equipment.name
         data = {
             "pk": self.equipment.pk,
@@ -175,7 +175,7 @@ class EquipmentCategoryCreateTestCase(EquipmentBaseTestCase):
         ).is_not_none()
 
     def test_regular_user_cannot_create(self):
-        self._client.force_login(self.regular_joe)
+        self.client.force_login(self.regular_joe)
         data = {
             "nameFi": "Regular user created equipment category",
         }
@@ -228,7 +228,7 @@ class EquipmentCategoryUpdateTestCase(EquipmentBaseTestCase):
         assert_that(content.get("errors")).is_not_none()
 
     def test_regular_user_cannot_update(self):
-        self._client.force_login(self.regular_joe)
+        self.client.force_login(self.regular_joe)
         name = self.equipment_category.name
         data = {
             "pk": self.equipment_category.pk,
