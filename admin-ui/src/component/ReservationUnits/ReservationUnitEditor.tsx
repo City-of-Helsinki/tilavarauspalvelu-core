@@ -48,6 +48,7 @@ import Loader from "../Loader";
 import SubPageHead from "../Unit/SubPageHead";
 import withMainMenu from "../withMainMenu";
 import RichTextInput from "../RichTextInput";
+import { useNotification } from "../../context/NotificationContext";
 
 interface IProps {
   reservationUnitPk?: string;
@@ -85,7 +86,6 @@ type ReservationUnitEditorType =
 
 type State = {
   reservationUnitPk?: number;
-  notification: null | NotificationType;
   loading: boolean;
   reservationUnit: ReservationUnitByPkType | null;
   reservationUnitEdit: Partial<ReservationUnitEditorType>;
@@ -133,7 +133,6 @@ const makeTermsOptions = (
 const getInitialState = (reservationUnitPk: number): State => ({
   reservationUnitPk,
   loading: true,
-  notification: null,
   reservationUnit: null,
   reservationUnitEdit: {},
   hasChanges: false,
@@ -150,7 +149,7 @@ const getInitialState = (reservationUnitPk: number): State => ({
 });
 
 const withLoadingStatus = (state: State): State => {
-  const hasError = state.notification?.type === "error";
+  const hasError = state.error;
 
   const newLoadingStatus =
     !hasError &&
@@ -175,12 +174,6 @@ const modifyEditorState = (state: State, edit: any) => ({
 
 const reducer = (state: State, action: Action): State => {
   switch (action.type) {
-    case "clearNotification": {
-      return { ...state, notification: null };
-    }
-    case "setNotification": {
-      return { ...state, notification: { ...action.notification } };
-    }
     case "dataLoaded": {
       const { reservationUnit } = action;
       return withLoadingStatus({
@@ -320,12 +313,12 @@ const reducer = (state: State, action: Action): State => {
       });
     }
     case "dataInitializationError": {
-      return {
+      return withLoadingStatus({
         ...state,
         loading: false,
         hasChanges: false,
         error: { message: action.message },
-      };
+      });
     }
     case "clearError": {
       return {
@@ -471,6 +464,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
   const { reservationUnitPk, unitPk } = useParams<IProps>();
   const { t } = useTranslation();
   const history = useHistory();
+  const { notification, setNotification } = useNotification();
 
   const [state, dispatch] = useReducer(
     reducer,
@@ -485,13 +479,10 @@ const ReservationUnitEditor = (): JSX.Element | null => {
   };
 
   const onSave = (text?: string) =>
-    dispatch({
-      type: "setNotification",
-      notification: {
-        type: "success",
-        title: text || t("ReservationUnitEditor.reservationUnitUpdated"),
-        text: "ReservationUnitEditor.reservationUnitUpdatedNotification",
-      },
+    setNotification({
+      type: "success",
+      title: text || t("ReservationUnitEditor.reservationUnitUpdated"),
+      message: t("ReservationUnitEditor.reservationUnitUpdatedNotification"),
     });
 
   const [updateReservationUnitMutation] = useMutation<Mutation>(
@@ -672,6 +663,20 @@ const ReservationUnitEditor = (): JSX.Element | null => {
     state.reservationUnitEdit.nameSv &&
     state.reservationUnitEdit.nameEn;
 
+  if (state.error) {
+    return (
+      <Wrapper>
+        <Notification
+          type="error"
+          label={t("ReservationUnitEditor.errorDataHeading")}
+          position="top-center"
+        >
+          {t(state.error?.message)}
+        </Notification>
+      </Wrapper>
+    );
+  }
+
   if (state.reservationUnitEdit === null) {
     return null;
   }
@@ -679,16 +684,16 @@ const ReservationUnitEditor = (): JSX.Element | null => {
   return (
     <Wrapper>
       <IngressContainer>
-        {state.notification ? (
+        {notification ? (
           <StyledNotification
-            type={state.notification.type}
-            label={t(state.notification.title)}
+            type={notification.type}
+            label={notification.title}
             position="top-center"
             dismissible
             closeButtonLabelText={`${t("common.close")}`}
             onClose={() => dispatch({ type: "clearNotification" })}
           >
-            {t(state.notification.text)}
+            {notification.message}
           </StyledNotification>
         ) : null}
       </IngressContainer>
@@ -1055,21 +1060,6 @@ const ReservationUnitEditor = (): JSX.Element | null => {
           </Editor>
         </EditorContainer>
       </ContentContainer>
-      {state.error ? (
-        <Wrapper>
-          <div>error</div>
-          <Notification
-            type="error"
-            label={t("ReservationUnitEditor.errorDataHeading")}
-            position="top-center"
-            dismissible
-            onClose={() => dispatch({ type: "clearError" })}
-            closeButtonLabelText={t("common.close")}
-          >
-            {t(state.error?.message)}
-          </Notification>
-        </Wrapper>
-      ) : null}
     </Wrapper>
   );
 };

@@ -3,7 +3,7 @@ import { trim } from "lodash";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { FetchResult, useMutation } from "@apollo/client";
-
+import { useHistory } from "react-router-dom";
 import DataTable, { CellConfig } from "../DataTable";
 import PopupMenu from "./PopupMenu";
 import ConfirmationDialog, { ModalRef } from "../ConfirmationDialog";
@@ -58,6 +58,7 @@ const ResourcesTable = ({
   const { t, i18n } = useTranslation();
 
   const modal = useRef<ModalRef>();
+  const history = useHistory();
 
   const cellConfig = {
     cols: [
@@ -90,8 +91,7 @@ const ResourcesTable = ({
                 {
                   name: t("ResourceTable.menuEditResource"),
                   onClick: () => {
-                    // eslint-disable-next-line no-console
-                    console.log("Edit resource todo");
+                    history.push(`/unit/${unit.pk}/resource/edit/${pk}`);
                   },
                 },
                 {

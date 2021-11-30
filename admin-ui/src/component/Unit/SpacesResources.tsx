@@ -4,9 +4,9 @@ import {
   IconPlusCircleFill,
   Notification,
 } from "hds-react";
-import React, { useReducer } from "react";
+import React, { useReducer, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { useParams, useHistory } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import styled from "styled-components";
 import { useQuery } from "@apollo/client";
 import { useModal } from "../../context/UIContext";
@@ -149,14 +149,10 @@ const SpacesResources = (): JSX.Element | null => {
   const newSpacesButtonRef = React.createRef<HTMLButtonElement>();
   const newResourceButtonRef = React.createRef<HTMLButtonElement>();
 
-  useQuery<Query, QueryUnitByPkArgs>(UNIT_QUERY, {
+  const { refetch, data } = useQuery<Query, QueryUnitByPkArgs>(UNIT_QUERY, {
     variables: { pk: unitPk },
     fetchPolicy: "network-only",
-    onCompleted: ({ unitByPk }) => {
-      if (unitByPk) {
-        dispatch({ type: "unitLoaded", unit: unitByPk });
-      }
-    },
+
     onError: () => {
       dispatch({
         type: "dataLoadError",
@@ -165,7 +161,11 @@ const SpacesResources = (): JSX.Element | null => {
     },
   });
 
-  const history = useHistory();
+  useEffect(() => {
+    if (data?.unitByPk) {
+      dispatch({ type: "unitLoaded", unit: data.unitByPk });
+    }
+  }, [data]);
 
   const {
     open: newSpaceDialogIsOpen,
@@ -203,25 +203,48 @@ const SpacesResources = (): JSX.Element | null => {
     );
   }
 
-  const saveSpaceSuccess = () =>
+  const dispatchNotification = (
+    title: string,
+    text: string,
+    type: "success" | "error"
+  ) => {
     dispatch({
       type: "setNotification",
       notification: {
-        type: "success",
-        title: "Unit.newSpacesCreatedTitle",
-        text: "Unit.newSpacesCreatedNotification",
+        type,
+        title,
+        text,
       },
     });
+  };
+
+  const saveSpaceSuccess = () =>
+    dispatchNotification(
+      "Unit.newSpacesCreatedTitle",
+      "Unit.newSpacesCreatedNotification",
+      "success"
+    );
+
+  const onSaveResourceSuccess = () =>
+    dispatchNotification(
+      "ResourceEditor.resourceUpdated",
+      "ResourceEditor.resourceUpdatedNotification",
+      "success"
+    );
+
+  const onDeleteResourceSuccess = (text?: string) =>
+    dispatchNotification(
+      text || t("Unit.spaceDeletedTitle"),
+      "Unit.spaceDeletedNotification",
+      "success"
+    );
 
   const onDeleteSpaceSuccess = (text?: string) =>
-    dispatch({
-      type: "setNotification",
-      notification: {
-        type: "success",
-        title: text || t("Unit.spaceDeletedTitle"),
-        text: "Unit.spaceDeletedNotification",
-      },
-    });
+    dispatchNotification(
+      text || t("Unit.resourceDeletedTitle"),
+      "Unit.resourceDeletedNotification",
+      "success"
+    );
 
   const onDataError = (text: string) => {
     dispatch({
@@ -250,9 +273,11 @@ const SpacesResources = (): JSX.Element | null => {
           unit={state.unit}
           closeModal={() => {
             closeNewSpaceModal();
-            history.go(0); // WIP is there better way to reload?
           }}
-          onSave={saveSpaceSuccess}
+          onSave={() => {
+            saveSpaceSuccess();
+            refetch();
+          }}
           onDataError={onDataError}
         />
       </Modal>
@@ -316,9 +341,11 @@ const SpacesResources = (): JSX.Element | null => {
                   unit={state.unit as UnitType}
                   closeModal={() => {
                     closeNewResourceModal();
-                    history.go(0); // WIP is there better way to reload?
                   }}
-                  onSave={saveSpaceSuccess}
+                  onSave={() => {
+                    onSaveResourceSuccess();
+                    refetch();
+                  }}
                 />
               )
             }
@@ -331,7 +358,7 @@ const SpacesResources = (): JSX.Element | null => {
         unit={state.unit}
         hasSpaces={Boolean(state.unit?.spaces?.length)}
         resources={resources}
-        onDelete={onDeleteSpaceSuccess}
+        onDelete={onDeleteResourceSuccess}
         onDataError={onDataError}
       />
       {state.error ? (

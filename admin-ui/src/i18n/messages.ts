@@ -722,6 +722,8 @@ const translations: ITranslations = {
     ],
     spacesDeletedTitle: ["Tila poistettu"],
     spacesDeletedNotification: ["Tila poistettu onnistuneesti"],
+    resourceDeletedTitle: ["Resurssi poistettu"],
+    resourceDeletedNotification: ["Resurssi poistettu onnistuneesti"],
   },
   SpaceEditor: {
     noParent: ["Päätason tila"],

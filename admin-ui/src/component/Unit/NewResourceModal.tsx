@@ -209,7 +209,7 @@ const NewResourceModal = ({
           {languages.map((lang) => (
             <TextInput
               disabled={editDisabled}
-              key={lang}
+              key={`name.${lang}`}
               required
               id={`name.${lang}`}
               label={t("ResourceModal.nameLabel", { lang })}
@@ -223,22 +223,21 @@ const NewResourceModal = ({
             />
           ))}
           {languages.map((lang) => (
-            <>
-              <RichTextInput
-                disabled={editDisabled}
-                id={`description.${lang}`}
-                label={t("ResourceModal.descriptionLabel", { lang })}
-                required
-                value={get(
-                  editorState.resource,
-                  `description${upperFirst(lang)}`,
-                  ""
-                )}
-                onChange={(description) => {
-                  setValue(`description${startCase(lang)}`, description);
-                }}
-              />
-            </>
+            <RichTextInput
+              key={`description.${lang}`}
+              disabled={editDisabled}
+              id={`description.${lang}`}
+              label={t("ResourceModal.descriptionLabel", { lang })}
+              required
+              value={get(
+                editorState.resource,
+                `description${upperFirst(lang)}`,
+                ""
+              )}
+              onChange={(description) => {
+                setValue(`description${startCase(lang)}`, description);
+              }}
+            />
           ))}
           <EditorColumns> </EditorColumns>
         </EditorContainer>
