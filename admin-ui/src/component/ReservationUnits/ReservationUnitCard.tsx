@@ -1,6 +1,12 @@
 import React from "react";
 import styled from "styled-components";
-import { IconArrowRight, IconLayers, IconHome, IconGroup } from "hds-react";
+import {
+  IconArrowRight,
+  IconLayers,
+  IconHome,
+  IconGroup,
+  Tag,
+} from "hds-react";
 import { useTranslation } from "react-i18next";
 import { H2 } from "../../styles/typography";
 import { BasicLink, breakpoints } from "../../styles/util";
@@ -8,6 +14,7 @@ import {
   ReservationUnitImageImageType,
   ReservationUnitType,
 } from "../../common/gql-types";
+import { ReactComponent as IconDraft } from "../../images/icon_draft.svg";
 
 interface IProps {
   reservationUnit: ReservationUnitType;
@@ -21,6 +28,9 @@ const Wrapper = styled.div`
 
   @media (min-width: ${breakpoints.l}) {
     grid-template-columns: 213px auto;
+  }
+  @media (min-width: ${breakpoints.xl}) {
+    width: 90%;
   }
 `;
 
@@ -64,14 +74,12 @@ const Props = styled.div`
     grid-template-columns: 1fr 1fr 1fr 1fr;
     gap: var(--spacing-m);
   }
-
-  @media (min-width: ${breakpoints.xl}) {
-    width: 80%;
-  }
 `;
 
 const Prop = styled.div<{ $disabled: boolean }>`
-  display: flex;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 32px 1fr;
   align-items: center;
   gap: var(--spacing-2-xs);
   font-family: var(--tilavaraus-admin-font-medium);
@@ -79,6 +87,19 @@ const Prop = styled.div<{ $disabled: boolean }>`
   margin-bottom: var(--spacing-xs);
 
   ${({ $disabled }) => $disabled && "opacity: 0.4;"}
+
+  &:last-child {
+    justify-self: end;
+  }
+`;
+
+const Published = styled(Tag)`
+  background-color: var(--color-success);
+  color: var(--color-white);
+`;
+
+const NoBr = styled.span`
+  white-space: nowrap;
 `;
 
 const ReservationUnitCard = ({
@@ -116,12 +137,14 @@ const ReservationUnitCard = ({
         <Props>
           <Prop $disabled={!hasPurposes}>
             <IconLayers />{" "}
-            {t(
-              hasPurposes
-                ? "ReservationUnitCard.purpose"
-                : "ReservationUnitCard.noPurpose",
-              { count: reservationUnit.purposes?.length }
-            )}
+            <NoBr>
+              {t(
+                hasPurposes
+                  ? "ReservationUnitCard.purpose"
+                  : "ReservationUnitCard.noPurpose",
+                { count: reservationUnit.purposes?.length }
+              )}
+            </NoBr>
           </Prop>
           <Prop $disabled={!reservationUnit.reservationUnitType}>
             <IconHome />{" "}
@@ -132,6 +155,19 @@ const ReservationUnitCard = ({
             <IconGroup />{" "}
             {reservationUnit.maxPersons ||
               t("ReservationUnitCard.noMaxPersons")}
+          </Prop>
+          <Prop $disabled={false}>
+            {reservationUnit.isDraft ? (
+              <>
+                <IconDraft />
+                {t("ReservationUnitCard.stateDraft")}
+              </>
+            ) : (
+              <>
+                <span />
+                <Published>{t("ReservationUnitCard.statePublished")}</Published>
+              </>
+            )}
           </Prop>
         </Props>
       </Content>

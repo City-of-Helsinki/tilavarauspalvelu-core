@@ -840,6 +840,8 @@ const translations: ITranslations = {
     noPurpose: ["Käyttötarkoitus puuttuu"],
     purpose: ["{{count}} käyttötarkoitus"],
     purpose_plural: ["{{count}} käyttötarkoitusta"],
+    statePublished: ["Julkaistu"],
+    stateDraft: ["Luonnos"],
   },
   ReservationUnitList: {
     typeFilter: ["Tyyppi"],
