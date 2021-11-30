@@ -200,6 +200,7 @@ export const UNIT_QUERY = gql`
         nameFi
         maxPersons
         surfaceArea
+        isDraft
         purposes {
           pk
           nameFi
