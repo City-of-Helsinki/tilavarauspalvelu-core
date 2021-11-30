@@ -34,7 +34,6 @@ import {
   UnitType,
 } from "../../common/gql-types";
 import { languages } from "../../common/const";
-import RichTextInput from "../RichTextInput";
 
 interface IProps {
   unitPk: string;
@@ -435,26 +434,6 @@ const SpaceEditor = (): JSX.Element | null => {
                   onChange={(e) => setValue({ code: e.target.value })}
                 />
               </EditorColumns>
-              {languages.map((lang) => (
-                <RichTextInput
-                  key={lang}
-                  required
-                  id={`termsOfUse.${lang}`}
-                  label={t("SpaceEditor.touLabel", {
-                    lang,
-                  })}
-                  value={get(
-                    state,
-                    `spaceEdit.termsOfUse${upperFirst(lang)}`,
-                    ""
-                  )}
-                  onChange={(value) =>
-                    setValue({
-                      [`termsOfUse${upperFirst(lang)}`]: value,
-                    })
-                  }
-                />
-              ))}
             </Section>
             <Buttons>
               <Button

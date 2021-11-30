@@ -453,9 +453,6 @@ export const SPACE_QUERY = gql`
       surfaceArea
       maxPersons
       code
-      termsOfUseFi
-      termsOfUseSv
-      termsOfUseEn
       unit {
         pk
         nameFi
