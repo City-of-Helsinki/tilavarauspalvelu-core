@@ -34,6 +34,7 @@ import {
   UnitType,
 } from "../../common/gql-types";
 import { languages } from "../../common/const";
+import { spacesAsHierarchy } from "./util";
 
 interface IProps {
   unitPk: string;
@@ -96,6 +97,17 @@ const getInitialState = (spacePk: number, unitPk: number): State => ({
 
 const modified = (d: State) => ({ ...d, hasChanges: true });
 
+const getChildrenFor = (space: SpaceType, hierarchy: SpaceType[]) => {
+  return hierarchy.filter((s) => s.parent?.pk === space.pk);
+};
+
+const getChildrenRecursive = (space: SpaceType, hierarchy: SpaceType[]) => {
+  const newChildren = getChildrenFor(space, hierarchy);
+  return newChildren.concat(
+    newChildren.flatMap((s) => getChildrenFor(s, hierarchy))
+  );
+};
+
 const reducer = (state: State, action: Action): State => {
   switch (action.type) {
     case "clearNotification": {
@@ -132,12 +144,21 @@ const reducer = (state: State, action: Action): State => {
       };
     }
     case "hierarchyLoaded": {
-      const unitSpaces = action.spaces.filter((space) => {
-        return space.unit?.pk === state.unitPk;
-      });
+      const unitSpaces = spacesAsHierarchy(
+        action.spaces.filter((space) => {
+          return space.unit?.pk === state.unitPk;
+        }),
+        "\u2007"
+      );
+
+      const children = getChildrenRecursive(
+        state.space as SpaceType,
+        unitSpaces
+      ).map((s) => s.pk);
 
       const additionalOptions = unitSpaces
         .filter((space) => space.pk !== state.spacePk)
+        .filter((space) => children.indexOf(space.pk) === -1)
         .map((space) => ({
           label: space.nameFi as string,
           value: space,
