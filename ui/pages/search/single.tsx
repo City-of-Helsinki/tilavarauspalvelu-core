@@ -98,6 +98,7 @@ const SearchSingle = (): JSX.Element => {
       ...omit(values, ["order", "sort"]),
       first: pagingLimit,
       orderBy: values.order === "desc" ? `-${values.sort}` : values.sort,
+      isDraft: false,
     },
     fetchPolicy: "network-only",
   });
