@@ -3,7 +3,8 @@
 exports[`renders correctly 1`] = `
 <DocumentFragment>
   <div
-    class="Ticket__Wrapper-sc-16qon89-1 imynxF"
+    class="Ticket__Wrapper-sc-16qon89-1 bxJppa"
+    data-testid="reservation__ticket--container"
   >
     <div
       class="Ticket__PunchHole-sc-16qon89-0 kCZKkf"
@@ -31,7 +32,37 @@ exports[`renders correctly 1`] = `
 exports[`renders correctly 2`] = `
 <DocumentFragment>
   <div
-    class="Ticket__Wrapper-sc-16qon89-1 imynxF"
+    class="Ticket__Wrapper-sc-16qon89-1 ktMrPx"
+    data-testid="reservation__ticket--container"
+  >
+    <div
+      class="Ticket__PunchHole-sc-16qon89-0 kCZKkf"
+    />
+    <div
+      class="Ticket__Content-sc-16qon89-2"
+    >
+      <h1
+        class="typography__H1-sc-yczr8v-4 Ticket__Title-sc-16qon89-3 exespM cWvaak"
+        data-test="reservation__title"
+      >
+        Ticket title
+      </h1>
+      <div
+        class="Ticket__Price-sc-16qon89-6 iGKRoY"
+      />
+    </div>
+    <div
+      class="Ticket__PunchHole-sc-16qon89-0 kCZKkf"
+    />
+  </div>
+</DocumentFragment>
+`;
+
+exports[`renders correctly 3`] = `
+<DocumentFragment>
+  <div
+    class="Ticket__Wrapper-sc-16qon89-1 ktMrPx"
+    data-testid="reservation__ticket--container"
   >
     <div
       class="Ticket__PunchHole-sc-16qon89-0 kCZKkf"
@@ -62,10 +93,11 @@ exports[`renders correctly 2`] = `
 </DocumentFragment>
 `;
 
-exports[`renders correctly 3`] = `
+exports[`renders correctly 4`] = `
 <DocumentFragment>
   <div
-    class="Ticket__Wrapper-sc-16qon89-1 eQvcao"
+    class="Ticket__Wrapper-sc-16qon89-1 cQAWtY"
+    data-testid="reservation__ticket--container"
   >
     <div
       class="Ticket__PunchHole-sc-16qon89-0 hgEUEW"

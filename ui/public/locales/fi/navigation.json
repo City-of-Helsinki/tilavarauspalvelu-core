@@ -3,6 +3,7 @@
   "Item": {
     "spaceReservation": "Vakiovuorot",
     "reservationUnitSearch": "Tilan varaus",
+    "reservations": "Omat varaukset",
     "applications": "Omat hakemukset"
   },
   "skipToMainContent": "Siirry sivun pääsisältöön"
