@@ -26,7 +26,7 @@ black==20.8b1
     # via -r requirements.in
 cachetools==4.2.2
     # via django-helusers
-celery==5.1.2
+celery==5.2.1
     # via
     #   -r requirements.in
     #   django-celery-results
@@ -39,13 +39,13 @@ cffi==1.14.5
     # via cryptography
 chardet==4.0.0
     # via requests
-click-didyoumean==0.0.3
+click-didyoumean==0.3.0
     # via celery
 click-plugins==1.1.1
     # via celery
 click-repl==0.2.0
     # via celery
-click==7.1.2
+click==8.0.3
     # via
     #   black
     #   celery
@@ -175,7 +175,7 @@ isort==5.6.4
     # via -r requirements.in
 jsonschema==3.2.0
     # via drf-spectacular
-kombu==5.1.0
+kombu==5.2.2
     # via celery
 mccabe==0.6.1
     # via flake8
@@ -203,7 +203,7 @@ pluggy==0.13.1
     # via pytest
 promise==2.3
     # via graphene-django
-prompt-toolkit==3.0.19
+prompt-toolkit==3.0.23
     # via click-repl
 protobuf==3.17.0
     # via ortools
