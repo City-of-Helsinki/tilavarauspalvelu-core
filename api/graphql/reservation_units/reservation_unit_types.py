@@ -319,6 +319,10 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
             "payment_terms",
             "cancellation_terms",
             "service_specific_terms",
+            "lowest_price",
+            "highest_price",
+            "price_unit",
+            "price",
         ] + get_all_translatable_fields(model)
         filter_fields = {
             "name_fi": ["exact", "icontains", "istartswith"],
@@ -458,6 +462,10 @@ class ReservationUnitByPkType(ReservationUnitType, OpeningHoursMixin):
             "next_available_slot",
             "hauki_url",
             "is_draft",
+            "lowest_price",
+            "highest_price",
+            "price_unit",
+            "price",
         ] + get_all_translatable_fields(model)
 
         interfaces = (graphene.relay.Node,)

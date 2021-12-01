@@ -147,6 +147,14 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
         source="service_specific_terms",
         required=False,
     )
+    lowest_price = serializers.DecimalField(
+        max_digits=10, decimal_places=2, required=False
+    )
+    highest_price = serializers.DecimalField(
+        max_digits=10, decimal_places=2, required=False
+    )
+    price_unit = serializers.CharField(required=False)
+    price = serializers.DecimalField(max_digits=10, decimal_places=2, required=False)
 
     translation_fields = get_all_translatable_fields(ReservationUnit)
 
@@ -180,6 +188,10 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
             "payment_terms_pk",
             "cancellation_terms_pk",
             "service_specific_terms_pk",
+            "lowest_price",
+            "highest_price",
+            "price_unit",
+            "price",
         ] + get_all_translatable_fields(ReservationUnit)
 
     def __init__(self, *args, **kwargs):
