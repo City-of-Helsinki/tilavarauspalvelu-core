@@ -57,6 +57,9 @@ class ReservationUnitTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
             uuid="3774af34-9916-40f2-acc7-68db5a627710",
             spaces=[large_space, small_space],
             cancellation_rule=rule,
+            additional_instructions_fi="Lisäohjeita",
+            additional_instructions_sv="Ytterligare instruktioner",
+            additional_instructions_en="Additional instructions",
             is_draft=False,
         )
 
@@ -105,6 +108,9 @@ class ReservationUnitTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
                               nameFi
                             }
                             contactInformationFi
+                            additionalInstructionsFi
+                            additionalInstructionsSv
+                            additionalInstructionsEn
                             reservations {
                               begin
                               end
@@ -2090,6 +2096,48 @@ class ReservationUnitUpdateNotDraftTestCase(ReservationUnitMutationsTestCaseBase
         assert_that(res_unit_data.get("surfaceArea")).is_equal_to(expected_surface_area)
         self.res_unit.refresh_from_db()
         assert_that(self.res_unit.surface_area).is_equal_to(expected_surface_area)
+
+    def test_update_additional_instructions(self):
+        expected_fi = "Lisätietoja"
+        expected_sv = "Ytterligare instruktioner"
+        expected_en = "Additional instructions"
+        data = self.get_valid_update_data()
+        data["additionalInstructionsFi"] = expected_fi
+        data["additionalInstructionsSv"] = expected_sv
+        data["additionalInstructionsEn"] = expected_en
+        update_query = """
+            mutation updateReservationUnit($input: ReservationUnitUpdateMutationInput!) {
+                updateReservationUnit(input: $input) {
+                    additionalInstructionsFi
+                    additionalInstructionsSv
+                    additionalInstructionsEn
+                    errors {
+                        messages
+                        field
+                    }
+                }
+            }
+        """
+        response = self.query(update_query, input_data=data)
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        res_unit_data = content.get("data").get("updateReservationUnit")
+        assert_that(content.get("errors")).is_none()
+        assert_that(res_unit_data.get("errors")).is_none()
+        assert_that(res_unit_data.get("additionalInstructionsFi")).is_equal_to(
+            expected_fi
+        )
+        assert_that(res_unit_data.get("additionalInstructionsSv")).is_equal_to(
+            expected_sv
+        )
+        assert_that(res_unit_data.get("additionalInstructionsEn")).is_equal_to(
+            expected_en
+        )
+        self.res_unit.refresh_from_db()
+        assert_that(self.res_unit.additional_instructions_fi).is_equal_to(expected_fi)
+        assert_that(self.res_unit.additional_instructions_sv).is_equal_to(expected_sv)
+        assert_that(self.res_unit.additional_instructions_en).is_equal_to(expected_en)
 
     def test_update_cancellation_rule(self):
         data = self.get_valid_update_data()

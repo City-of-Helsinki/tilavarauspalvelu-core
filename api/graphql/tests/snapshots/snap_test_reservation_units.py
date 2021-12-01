@@ -4,7 +4,6 @@ from __future__ import unicode_literals
 
 from snapshottest import Snapshot
 
-
 snapshots = Snapshot()
 
 snapshots['ReservationUnitTestCase::test_filtering_by_active_application_rounds 1'] = {
@@ -430,6 +429,9 @@ snapshots['ReservationUnitTestCase::test_getting_reservation_units 1'] = {
                             'nameSv': 'sv'
                         },
                         'contactInformationFi': '',
+                        'additionalInstructionsFi': 'Lisäohjeita',
+                        'additionalInstructionsSv': 'Ytterligare instruktioner',
+                        'additionalInstructionsEn': 'Additional instructions',
                         'descriptionFi': '',
                         'equipment': [
                         ],
