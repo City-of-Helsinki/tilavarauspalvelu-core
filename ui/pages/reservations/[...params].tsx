@@ -331,7 +331,7 @@ const ReservationCancellation = ({
                   variant="primary"
                   type="submit"
                   iconLeft={<IconCrossCircle />}
-                  disabled={!watch("reason")}
+                  disabled={!watch("reason")?.value}
                   data-testid="reservation-cancel__button--cancel"
                 >
                   {t("reservations:cancelReservation")}
