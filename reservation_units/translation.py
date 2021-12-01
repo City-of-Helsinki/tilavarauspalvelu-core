@@ -15,7 +15,13 @@ from .models import (
 
 
 class ReservationUnitTranslationOptions(TranslationOptions):
-    fields = ["name", "description", "terms_of_use", "contact_information"]
+    fields = [
+        "name",
+        "description",
+        "terms_of_use",
+        "contact_information",
+        "additional_instructions",
+    ]
 
 
 class ReservationUnitTypeTranslationOptions(TranslationOptions):
