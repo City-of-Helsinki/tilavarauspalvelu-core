@@ -228,6 +228,14 @@ class Reservation(models.Model):
 
     confirmed_at = models.DateTimeField(verbose_name=_("Confirmed at"), null=True)
 
+    price = models.DecimalField(
+        verbose_name=_("Price"),
+        max_digits=10,
+        decimal_places=2,
+        default=0,
+        help_text="The price of this particular reservation",
+    )
+
     def get_location_string(self):
         locations = []
         for reservation_unit in self.reservation_unit.all():
