@@ -218,9 +218,14 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
 
     def validate_for_publish(self, data):
         """Validates necessary fields for published reservation unit."""
+        allowed_empty_fields = [
+            "additional_instructions_fi",
+            "additional_instructions_sv",
+            "additional_instructions_en",
+        ]
         for field in self.translation_fields:
             value = data.get(field, getattr(self.instance, field, None))
-            if not value or value.isspace():
+            if field not in allowed_empty_fields and (not value or value.isspace()):
                 raise serializers.ValidationError(
                     f"Not draft state reservation units must have a translations. Missing translation for {field}."
                 )
