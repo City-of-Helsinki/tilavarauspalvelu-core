@@ -238,6 +238,51 @@ class ReservationUnit(models.Model):
         on_delete=models.PROTECT,
     )
 
+    PRICE_UNIT_PER_15_MINS = "per_15_mins"
+    PRICE_UNIT_PER_30_MINS = "per_30_mins"
+    PRICE_UNIT_PER_HOUR = "per_hour"
+    PRICE_UNIT_PER_HALF_DAY = "per_half_day"
+    PRICE_UNIT_PER_DAY = "per_day"
+    PRICE_UNIT_PER_WEEK = "per_week"
+    PRICE_UNIT_FIXED = "fixed"
+    PRICE_UNITS = (
+        (PRICE_UNIT_PER_15_MINS, _("per 15 minutes")),
+        (PRICE_UNIT_PER_30_MINS, _("per 30 minutes")),
+        (PRICE_UNIT_PER_HOUR, _("per hour")),
+        (PRICE_UNIT_PER_HALF_DAY, _("per half a day")),
+        (PRICE_UNIT_PER_DAY, _("per day")),
+        (PRICE_UNIT_PER_WEEK, _("per week")),
+        (PRICE_UNIT_FIXED, _("fixed")),
+    )
+    price_unit = models.CharField(
+        max_length=20,
+        verbose_name=_("Price unit"),
+        choices=PRICE_UNITS,
+        default=PRICE_UNIT_PER_HOUR,
+        help_text="Unit of the price",
+    )
+    lowest_price = models.DecimalField(
+        verbose_name=_("Lowest price"),
+        max_digits=10,
+        decimal_places=2,
+        default=0,
+        help_text="Minimum price of the reservation unit",
+    )
+    highest_price = models.DecimalField(
+        verbose_name=_("Highest price"),
+        max_digits=10,
+        decimal_places=2,
+        default=0,
+        help_text="Maximum price of the reservation unit",
+    )
+    price = models.DecimalField(
+        verbose_name=_("Price"),
+        max_digits=10,
+        decimal_places=2,
+        default=0,
+        help_text="The current list price for reservation units with a fixed price",
+    )
+
     def __str__(self):
         return "{}".format(self.name)
 
