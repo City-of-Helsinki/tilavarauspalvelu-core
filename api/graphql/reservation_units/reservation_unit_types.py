@@ -457,6 +457,7 @@ class ReservationUnitByPkType(ReservationUnitType, OpeningHoursMixin):
             "min_reservation_duration",
             "next_available_slot",
             "hauki_url",
+            "is_draft",
         ] + get_all_translatable_fields(model)
 
         interfaces = (graphene.relay.Node,)
