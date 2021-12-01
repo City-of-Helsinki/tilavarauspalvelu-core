@@ -66,8 +66,10 @@ type ReservationStateWithInitial = string;
 export const getServerSideProps: GetServerSideProps = async ({
   locale,
   params,
+  query,
 }) => {
   const id = Number(params.id);
+  const uuid = query.ru;
   const today: string = toApiDate(new Date());
 
   let relatedReservationUnits = [] as ReservationUnitType[];
@@ -87,6 +89,14 @@ export const getServerSideProps: GetServerSideProps = async ({
         pk: id,
       },
     });
+
+    const isDraft = reservationUnitData.reservationUnitByPk?.isDraft;
+
+    if (isDraft && uuid !== reservationUnitData.reservationUnitByPk.uuid) {
+      return {
+        notFound: true,
+      };
+    }
 
     const lastOpeningPeriodEndDate: string =
       reservationUnitData?.reservationUnitByPk?.openingHours?.openingTimePeriods
