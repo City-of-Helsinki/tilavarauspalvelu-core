@@ -256,7 +256,9 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
       .find('select[aria-label="Kuukausi"]')
       .invoke("val")
       .then((value) => {
-        expect(value).to.eq((new Date().getMonth() + 1).toString());
+        const monthNow = new Date().getMonth();
+        const monthNext = monthNow === 11 ? 0 : monthNow + 1;
+        expect(value).to.eq(monthNext.toString());
       });
 
     const nextWeek = format(addDays(new Date(), 7), "d.M.yyyy");
