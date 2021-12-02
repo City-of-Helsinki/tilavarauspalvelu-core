@@ -2113,6 +2113,33 @@ class ReservationUnitUpdateNotDraftTestCase(ReservationUnitMutationsTestCaseBase
         self.res_unit.refresh_from_db()
         assert_that(self.res_unit.cancellation_rule).is_equal_to(self.rule)
 
+    def test_update_cancellation_rule_to_null(self):
+        self.res_unit.cancellation_rule = self.rule
+        self.res_unit.save()
+        self.res_unit.refresh_from_db()
+        assert_that(self.res_unit.cancellation_rule).is_equal_to(self.rule)
+
+        data = self.get_valid_update_data()
+        data.update({"cancellationRulePk": None})
+        update_query = """
+                    mutation updateReservationUnit($input: ReservationUnitUpdateMutationInput!) {
+                        updateReservationUnit(input: $input) {
+                            errors {
+                                messages
+                                field
+                            }
+                        }
+                    }
+                """
+        response = self.query(update_query, input_data=data)
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        res_unit_data = content.get("data").get("updateReservationUnit")
+        assert_that(res_unit_data.get("errors")).is_none()
+        self.res_unit.refresh_from_db()
+        assert_that(self.res_unit.cancellation_rule).is_none()
+
     def test_errors_on_empty_name_translations(self):
         data = self.get_valid_update_data()
         data["nameEn"] = ""
