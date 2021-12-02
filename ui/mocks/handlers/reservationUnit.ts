@@ -23,7 +23,8 @@ const selectedReservationUnitQuery = graphql.query<
   const reservationUnitByPk: ReservationUnitByPkType = {
     resources: [],
     services: [],
-    uuid: "",
+    uuid: "8e5275aa-8625-4458-88b4-d5b1b2df6619",
+    isDraft: false,
     contactInformationFi: null,
     contactInformationEn: null,
     contactInformationSv: null,
@@ -219,6 +220,10 @@ const selectedReservationUnitQuery = graphql.query<
     requireIntroduction: false,
   };
 
+  if (req.variables.pk === 999) {
+    reservationUnitByPk.isDraft = true;
+  }
+
   return res(ctx.data({ reservationUnitByPk }));
 });
 
@@ -300,6 +305,7 @@ const openingHoursQuery = graphql.query<
     ctx.data({
       reservationUnitByPk: {
         id: "UmVzZXJ2YXRpb25Vbml0QnlQa1R5cGU6MzY=",
+        isDraft: false,
         contactInformationFi: "",
         contactInformationEn: "",
         contactInformationSv: "",

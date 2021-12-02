@@ -5,9 +5,11 @@ export const RESERVATION_UNIT = gql`
     reservationUnitByPk(pk: $pk) {
       id
       pk
+      uuid
       nameFi
       nameEn
       nameSv
+      isDraft
       images {
         imageUrl
         mediumUrl
