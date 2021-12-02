@@ -29,6 +29,7 @@ import {
   SpaceType,
   UnitByPkType,
 } from "../../common/gql-types";
+import { spacesAsHierarchy } from "../Spaces/util";
 
 type ParentType = { label: string; value: SpaceType | null };
 
@@ -66,38 +67,6 @@ type Action =
   | { type: "addRow" }
   | { type: "delete"; index: number }
   | { type: "hierarchyLoaded"; spaces: SpaceType[] };
-
-const recurse = (
-  parent: SpaceType,
-  spaces: SpaceType[],
-  depth: number,
-  paddingChar: string
-): SpaceType[] => {
-  const newParent = {
-    ...parent,
-    nameFi: "".padStart(depth, paddingChar) + parent.nameFi,
-  } as SpaceType;
-
-  const children = spaces.filter((e) => e.parent?.pk === parent.pk);
-
-  if (children.length === 0) {
-    return [newParent];
-  }
-  const c = children.flatMap((space) =>
-    recurse(space, spaces, depth + 1, paddingChar)
-  );
-  return [newParent, ...c];
-};
-
-const spacesAsHierarchy = (
-  spaces: SpaceType[],
-  paddingChar: string
-): SpaceType[] => {
-  const roots = spaces.filter((e) => e.parent === null);
-  return roots.flatMap((rootSpace) =>
-    recurse(rootSpace, spaces, 0, paddingChar)
-  );
-};
 
 const independentSpaceOption = {
   label: i18next.t("SpaceEditor.noParent"),
