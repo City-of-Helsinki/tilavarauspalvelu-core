@@ -128,6 +128,7 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
         queryset=ReservationUnitCancellationRule.objects.all(),
         source="cancellation_rule",
         required=False,
+        allow_null=True,
     )
     payment_terms_pk = serializers.PrimaryKeyRelatedField(
         queryset=TermsOfUse.objects.filter(terms_type=TermsOfUse.TERMS_TYPE_PAYMENT),
