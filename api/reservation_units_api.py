@@ -57,6 +57,8 @@ class ReservationUnitFilter(filters.FilterSet):
 
     ids = NumberInFilter(field_name="id", lookup_expr="in")
 
+    is_draft = filters.BooleanFilter(field_name="is_draft")
+
 
 class PurposeSerializer(serializers.ModelSerializer):
     class Meta:

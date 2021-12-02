@@ -131,6 +131,36 @@ def test_reservation_unit_max_persons_filter(
 
 
 @pytest.mark.django_db
+def test_reservation_unit_is_draft_filter_true(
+    user_api_client, reservation_unit, reservation_unit2
+):
+    response = user_api_client.get(reverse("reservationunit-list"))
+    assert response.status_code == 200
+    assert len(response.data) == 2
+
+    url = f"{reverse('reservationunit-list')}?is_draft=true"
+    response = user_api_client.get(url)
+
+    assert response.status_code == 200
+    assert len(response.data) == 0
+
+
+@pytest.mark.django_db
+def test_reservation_unit_is_draft_filter_false(
+    user_api_client, reservation_unit, reservation_unit2
+):
+    response = user_api_client.get(reverse("reservationunit-list"))
+    assert response.status_code == 200
+    assert len(response.data) == 2
+
+    url = f"{reverse('reservationunit-list')}?is_draft=false"
+    response = user_api_client.get(url)
+
+    assert response.status_code == 200
+    assert len(response.data) == 2
+
+
+@pytest.mark.django_db
 def test_reservation_unit_create(
     user, user_api_client, equipment_hammer, valid_reservation_unit_data
 ):
