@@ -37,12 +37,16 @@ from terms_of_use.tests.factories import TermsOfUseFactory
 DEFAULT_TIMEZONE = get_default_timezone()
 
 
-@freeze_time("2021-05-03")
-class ReservationUnitTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
+class ReservationUnitQueryTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        cls.type = ReservationUnitTypeFactory(name="test type", name_fi="test type")
+        cls.type = ReservationUnitTypeFactory(
+            name="test type fi",
+            name_fi="test type fi",
+            name_en="test type en",
+            name_sv="test type sv",
+        )
         large_space = SpaceFactory(
             max_persons=100, name="Large space", surface_area=100
         )
@@ -51,8 +55,16 @@ class ReservationUnitTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
             name_fi="fi", name_en="en", name_sv="sv"
         )
         cls.reservation_unit = ReservationUnitFactory(
-            name="test name",
-            unit=UnitFactory(name_fi="test unit", name="test unit"),
+            name="test name fi",
+            name_fi="test name fi",
+            name_en="test name en",
+            name_sv="test name sv",
+            unit=UnitFactory(
+                name="test unit fi",
+                name_fi="test unit fi",
+                name_en="test unit en",
+                name_sv="test unit sv",
+            ),
             reservation_unit_type=cls.type,
             uuid="3774af34-9916-40f2-acc7-68db5a627710",
             spaces=[large_space, small_space],
@@ -62,6 +74,12 @@ class ReservationUnitTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
 
         cls.api_client = APIClient()
 
+    def content_is_empty(self, content):
+        return len(content["data"]["reservationUnits"]["edges"]) == 0
+
+
+@freeze_time("2021-05-03")
+class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
     def test_getting_reservation_units(self):
         self.maxDiff = None
         self.client.force_login(self.regular_joe)
@@ -440,168 +458,6 @@ class ReservationUnitTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
         self.assertMatchSnapshot(content)
-
-    def content_is_empty(self, content):
-        return len(content["data"]["reservationUnits"]["edges"]) == 0
-
-    def test_filtering_by_type_text(self):
-        response = self.query(
-            """
-            query {
-                reservationUnits(textSearch:"Test type"){
-                edges {
-                    node {
-                        nameFi
-                        reservationUnitType {
-                            nameFi
-                        }
-                    }
-                }
-                }
-            }
-            """
-        )
-
-        content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_false()
-        assert_that(content.get("errors")).is_none()
-        self.assertMatchSnapshot(content)
-
-        response = self.query(
-            """
-            query {
-                reservationUnits(textSearch:"Nonexisting type"){
-                edges {
-                    node {
-                        nameFi
-                    }
-                }
-                }
-            }
-            """
-        )
-
-        content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_true()
-
-    def test_filtering_by_reservation_unit_name(self):
-        response = self.query(
-            """
-            query {
-                reservationUnits(textSearch:"Test name"){
-                edges {
-                    node {
-                        nameFi
-                    }
-                }
-                }
-            }
-            """
-        )
-
-        content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_false()
-        assert_that(content.get("errors")).is_none()
-        self.assertMatchSnapshot(content)
-
-        response = self.query(
-            """
-            query {
-                reservationUnits(textSearch:"Nonexisting name"){
-                edges {
-                    node {
-                        nameFi
-                    }
-                }
-                }
-            }
-            """
-        )
-
-        content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_true()
-
-    def test_filtering_by_reservation_unit_description(self):
-        self.reservation_unit.description_fi = "Lorem ipsum"
-        self.reservation_unit.save()
-        response = self.query(
-            """
-            query {
-                reservationUnits(textSearch:"Lorem ipsum"){
-                edges {
-                    node {
-                        nameFi
-                        descriptionFi
-                    }
-                }
-                }
-            }
-            """
-        )
-
-        content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_false()
-        assert_that(content.get("errors")).is_none()
-        self.assertMatchSnapshot(content)
-
-        response = self.query(
-            """
-            query {
-                reservationUnits(textSearch:"Dolor sit"){
-                edges {
-                    node {
-                        nameFi
-                    }
-                }
-                }
-            }
-            """
-        )
-
-        content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_true()
-
-    def test_filtering_by_space_name(self):
-        space = SpaceFactory(name="space name")
-        self.reservation_unit.spaces.set([space])
-        self.reservation_unit.save()
-
-        response = self.query(
-            """
-            query {
-                reservationUnits(textSearch:"space name"){
-                edges {
-                    node {
-                        nameFi
-                        spaces{nameFi}
-                    }
-                }
-                }
-            }
-            """
-        )
-
-        content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_false()
-        assert_that(content.get("errors")).is_none()
-        self.assertMatchSnapshot(content)
-
-        response = self.query(
-            """
-            query {
-                reservationUnits(textSearch:"not a space name"){
-                edges {
-                    node {
-                        nameFi
-                    }
-                }
-                }
-            }
-            """
-        )
-
-        content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_true()
 
     def test_filtering_by_keyword_group(self):
         category = KeywordCategoryFactory()
@@ -1107,6 +963,349 @@ class ReservationUnitTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
             }
             """
         )
+        content = json.loads(response.content)
+        assert_that(self.content_is_empty(content)).is_false()
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+
+class ReservationUnitsFilterTextSearchTestCase(ReservationUnitQueryTestCaseBase):
+    def test_filtering_by_type_fi(self):
+        response = self.query(
+            """
+            query {
+                reservationUnits(textSearch:"Test type fi"){
+                    edges {
+                        node {
+                            nameFi
+                            reservationUnitType {
+                                nameFi
+                            }
+                        }
+                    }
+                }
+            }
+            """
+        )
+
+        content = json.loads(response.content)
+        assert_that(self.content_is_empty(content)).is_false()
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+        response = self.query(
+            """
+            query {
+                reservationUnits(textSearch:"Nonexisting type"){
+                    edges {
+                        node {
+                            nameFi
+                        }
+                    }
+                }
+            }
+            """
+        )
+
+        content = json.loads(response.content)
+        assert_that(self.content_is_empty(content)).is_true()
+
+    def test_filtering_by_type_en(self):
+        response = self.query(
+            """
+            query {
+                reservationUnits(textSearch:"Test type en"){
+                    edges {
+                        node {
+                            nameFi
+                            reservationUnitType {
+                                nameEn
+                            }
+                        }
+                    }
+                }
+            }
+            """
+        )
+
+        content = json.loads(response.content)
+        assert_that(self.content_is_empty(content)).is_false()
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filtering_by_type_sv(self):
+        response = self.query(
+            """
+            query {
+                reservationUnits(textSearch:"Test type sv"){
+                    edges {
+                        node {
+                            nameFi
+                            reservationUnitType {
+                                nameSv
+                            }
+                        }
+                    }
+                }
+            }
+            """
+        )
+
+        content = json.loads(response.content)
+        assert_that(self.content_is_empty(content)).is_false()
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filtering_by_reservation_unit_name_fi(self):
+        response = self.query(
+            """
+            query {
+                reservationUnits(textSearch:"Test name fi"){
+                    edges {
+                        node {
+                            nameFi
+                        }
+                    }
+                }
+            }
+            """
+        )
+
+        content = json.loads(response.content)
+        assert_that(self.content_is_empty(content)).is_false()
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+        response = self.query(
+            """
+            query {
+                reservationUnits(textSearch:"Nonexisting name"){
+                    edges {
+                        node {
+                            nameFi
+                        }
+                    }
+                }
+            }
+            """
+        )
+
+        content = json.loads(response.content)
+        assert_that(self.content_is_empty(content)).is_true()
+
+    def test_filtering_by_reservation_unit_name_en(self):
+        response = self.query(
+            """
+            query {
+                reservationUnits(textSearch:"Test name en"){
+                    edges {
+                        node {
+                            nameEn
+                        }
+                    }
+                }
+            }
+            """
+        )
+
+        content = json.loads(response.content)
+        assert_that(self.content_is_empty(content)).is_false()
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filtering_by_reservation_unit_name_sv(self):
+        response = self.query(
+            """
+            query {
+                reservationUnits(textSearch:"Test name sv"){
+                    edges {
+                        node {
+                            nameSv
+                        }
+                    }
+                }
+            }
+            """
+        )
+
+        content = json.loads(response.content)
+        assert_that(self.content_is_empty(content)).is_false()
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filtering_by_reservation_unit_description_fi(self):
+        self.reservation_unit.description_fi = "Lorem ipsum fi"
+        self.reservation_unit.save()
+        response = self.query(
+            """
+            query {
+                reservationUnits(textSearch:"Lorem ipsum fi"){
+                    edges {
+                        node {
+                            nameFi
+                            descriptionFi
+                        }
+                    }
+                }
+            }
+            """
+        )
+
+        content = json.loads(response.content)
+        assert_that(self.content_is_empty(content)).is_false()
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+        response = self.query(
+            """
+            query {
+                reservationUnits(textSearch:"Dolor sit"){
+                    edges {
+                        node {
+                            nameFi
+                        }
+                    }
+                }
+            }
+            """
+        )
+
+        content = json.loads(response.content)
+        assert_that(self.content_is_empty(content)).is_true()
+
+    def test_filtering_by_reservation_unit_description_en(self):
+        self.reservation_unit.description_en = "Lorem ipsum en"
+        self.reservation_unit.save()
+        response = self.query(
+            """
+            query {
+                reservationUnits(textSearch:"Lorem ipsum en"){
+                    edges {
+                        node {
+                            nameFi
+                            descriptionEn
+                        }
+                    }
+                }
+            }
+            """
+        )
+
+        content = json.loads(response.content)
+        assert_that(self.content_is_empty(content)).is_false()
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filtering_by_reservation_unit_description_sv(self):
+        self.reservation_unit.description_sv = "Lorem ipsum sv"
+        self.reservation_unit.save()
+        response = self.query(
+            """
+            query {
+                reservationUnits(textSearch:"Lorem ipsum sv"){
+                    edges {
+                        node {
+                            nameFi
+                            descriptionFi
+                        }
+                    }
+                }
+            }
+            """
+        )
+
+        content = json.loads(response.content)
+        assert_that(self.content_is_empty(content)).is_false()
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filtering_by_space_name_fi(self):
+        space = SpaceFactory(name="space name fi")
+        self.reservation_unit.spaces.set([space])
+        self.reservation_unit.save()
+
+        response = self.query(
+            """
+            query {
+                reservationUnits(textSearch:"space name fi"){
+                    edges {
+                        node {
+                            nameFi
+                            spaces{nameFi}
+                        }
+                    }
+                }
+            }
+            """
+        )
+
+        content = json.loads(response.content)
+        assert_that(self.content_is_empty(content)).is_false()
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+        response = self.query(
+            """
+            query {
+                reservationUnits(textSearch:"not a space name"){
+                    edges {
+                        node {
+                            nameFi
+                        }
+                    }
+                }
+            }
+            """
+        )
+
+        content = json.loads(response.content)
+        assert_that(self.content_is_empty(content)).is_true()
+
+    def test_filtering_by_space_name_en(self):
+        space = SpaceFactory(name_en="space name en")
+        self.reservation_unit.spaces.set([space])
+        self.reservation_unit.save()
+
+        response = self.query(
+            """
+            query {
+                reservationUnits(textSearch:"space name en"){
+                    edges {
+                        node {
+                            nameFi
+                            spaces{nameEn}
+                        }
+                    }
+                }
+            }
+            """
+        )
+
+        content = json.loads(response.content)
+        assert_that(self.content_is_empty(content)).is_false()
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filtering_by_space_name_sv(self):
+        space = SpaceFactory(name_sv="space name sv")
+        self.reservation_unit.spaces.set([space])
+        self.reservation_unit.save()
+
+        response = self.query(
+            """
+            query {
+                reservationUnits(textSearch:"space name sv"){
+                    edges {
+                        node {
+                            nameFi
+                            spaces{nameSv}
+                        }
+                    }
+                }
+            }
+            """
+        )
+
         content = json.loads(response.content)
         assert_that(self.content_is_empty(content)).is_false()
         assert_that(content.get("errors")).is_none()

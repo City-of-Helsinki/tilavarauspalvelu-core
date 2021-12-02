@@ -7,7 +7,7 @@ from snapshottest import Snapshot
 
 snapshots = Snapshot()
 
-snapshots['ReservationUnitTestCase::test_filtering_by_active_application_rounds 1'] = {
+snapshots['ReservationUnitQueryTestCase::test_filtering_by_active_application_rounds 1'] = {
     'data': {
         'reservationUnits': {
             'edges': [
@@ -25,14 +25,14 @@ snapshots['ReservationUnitTestCase::test_filtering_by_active_application_rounds 
     }
 }
 
-snapshots['ReservationUnitTestCase::test_filtering_by_is_draft_false 1'] = {
+snapshots['ReservationUnitQueryTestCase::test_filtering_by_is_draft_false 1'] = {
     'data': {
         'reservationUnits': {
             'edges': [
                 {
                     'node': {
                         'isDraft': False,
-                        'nameFi': 'test name'
+                        'nameFi': 'test name fi'
                     }
                 }
             ]
@@ -40,7 +40,7 @@ snapshots['ReservationUnitTestCase::test_filtering_by_is_draft_false 1'] = {
     }
 }
 
-snapshots['ReservationUnitTestCase::test_filtering_by_is_draft_true 1'] = {
+snapshots['ReservationUnitQueryTestCase::test_filtering_by_is_draft_true 1'] = {
     'data': {
         'reservationUnits': {
             'edges': [
@@ -55,7 +55,7 @@ snapshots['ReservationUnitTestCase::test_filtering_by_is_draft_true 1'] = {
     }
 }
 
-snapshots['ReservationUnitTestCase::test_filtering_by_keyword_group 1'] = {
+snapshots['ReservationUnitQueryTestCase::test_filtering_by_keyword_group 1'] = {
     'data': {
         'reservationUnits': {
             'edges': [
@@ -66,7 +66,7 @@ snapshots['ReservationUnitTestCase::test_filtering_by_keyword_group 1'] = {
                                 'nameFi': 'Sports'
                             }
                         ],
-                        'nameFi': 'test name'
+                        'nameFi': 'test name fi'
                     }
                 }
             ]
@@ -74,14 +74,14 @@ snapshots['ReservationUnitTestCase::test_filtering_by_keyword_group 1'] = {
     }
 }
 
-snapshots['ReservationUnitTestCase::test_filtering_by_max_persons 1'] = {
+snapshots['ReservationUnitQueryTestCase::test_filtering_by_max_persons 1'] = {
     'data': {
         'reservationUnits': {
             'edges': [
                 {
                     'node': {
                         'maxPersons': 110,
-                        'nameFi': 'test name'
+                        'nameFi': 'test name fi'
                     }
                 }
             ]
@@ -89,7 +89,7 @@ snapshots['ReservationUnitTestCase::test_filtering_by_max_persons 1'] = {
     }
 }
 
-snapshots['ReservationUnitTestCase::test_filtering_by_max_persons_not_found 1'] = {
+snapshots['ReservationUnitQueryTestCase::test_filtering_by_max_persons_not_found 1'] = {
     'data': {
         'reservationUnits': {
             'edges': [
@@ -98,7 +98,7 @@ snapshots['ReservationUnitTestCase::test_filtering_by_max_persons_not_found 1'] 
     }
 }
 
-snapshots['ReservationUnitTestCase::test_filtering_by_multiple_keyword_groups 1'] = {
+snapshots['ReservationUnitQueryTestCase::test_filtering_by_multiple_keyword_groups 1'] = {
     'data': {
         'reservationUnits': {
             'edges': [
@@ -109,7 +109,7 @@ snapshots['ReservationUnitTestCase::test_filtering_by_multiple_keyword_groups 1'
                                 'nameFi': 'Test group'
                             }
                         ],
-                        'nameFi': 'test name'
+                        'nameFi': 'test name fi'
                     }
                 }
             ]
@@ -117,13 +117,13 @@ snapshots['ReservationUnitTestCase::test_filtering_by_multiple_keyword_groups 1'
     }
 }
 
-snapshots['ReservationUnitTestCase::test_filtering_by_multiple_purposes 1'] = {
+snapshots['ReservationUnitQueryTestCase::test_filtering_by_multiple_purposes 1'] = {
     'data': {
         'reservationUnits': {
             'edges': [
                 {
                     'node': {
-                        'nameFi': 'test name',
+                        'nameFi': 'test name fi',
                         'purposes': [
                             {
                                 'nameFi': 'Test purpose'
@@ -136,13 +136,13 @@ snapshots['ReservationUnitTestCase::test_filtering_by_multiple_purposes 1'] = {
     }
 }
 
-snapshots['ReservationUnitTestCase::test_filtering_by_multiple_reservation_states 1'] = {
+snapshots['ReservationUnitQueryTestCase::test_filtering_by_multiple_reservation_states 1'] = {
     'data': {
         'reservationUnits': {
             'edges': [
                 {
                     'node': {
-                        'nameFi': 'test name',
+                        'nameFi': 'test name fi',
                         'reservations': [
                             {
                                 'begin': '2021-05-03T00:00:00+00:00',
@@ -162,15 +162,15 @@ snapshots['ReservationUnitTestCase::test_filtering_by_multiple_reservation_state
     }
 }
 
-snapshots['ReservationUnitTestCase::test_filtering_by_multiple_types 1'] = {
+snapshots['ReservationUnitQueryTestCase::test_filtering_by_multiple_types 1'] = {
     'data': {
         'reservationUnits': {
             'edges': [
                 {
                     'node': {
-                        'nameFi': 'test name',
+                        'nameFi': 'test name fi',
                         'reservationUnitType': {
-                            'nameFi': 'test type'
+                            'nameFi': 'test type fi'
                         }
                     }
                 },
@@ -187,15 +187,15 @@ snapshots['ReservationUnitTestCase::test_filtering_by_multiple_types 1'] = {
     }
 }
 
-snapshots['ReservationUnitTestCase::test_filtering_by_multiple_units 1'] = {
+snapshots['ReservationUnitQueryTestCase::test_filtering_by_multiple_units 1'] = {
     'data': {
         'reservationUnits': {
             'edges': [
                 {
                     'node': {
-                        'nameFi': 'test name',
+                        'nameFi': 'test name fi',
                         'unit': {
-                            'nameFi': 'test unit'
+                            'nameFi': 'test unit fi'
                         }
                     }
                 },
@@ -212,13 +212,13 @@ snapshots['ReservationUnitTestCase::test_filtering_by_multiple_units 1'] = {
     }
 }
 
-snapshots['ReservationUnitTestCase::test_filtering_by_purpose 1'] = {
+snapshots['ReservationUnitQueryTestCase::test_filtering_by_purpose 1'] = {
     'data': {
         'reservationUnits': {
             'edges': [
                 {
                     'node': {
-                        'nameFi': 'test name',
+                        'nameFi': 'test name fi',
                         'purposes': [
                             {
                                 'nameFi': 'Test purpose'
@@ -231,13 +231,13 @@ snapshots['ReservationUnitTestCase::test_filtering_by_purpose 1'] = {
     }
 }
 
-snapshots['ReservationUnitTestCase::test_filtering_by_reservation_state 1'] = {
+snapshots['ReservationUnitQueryTestCase::test_filtering_by_reservation_state 1'] = {
     'data': {
         'reservationUnits': {
             'edges': [
                 {
                     'node': {
-                        'nameFi': 'test name',
+                        'nameFi': 'test name fi',
                         'reservations': [
                             {
                                 'begin': '2021-05-03T00:00:00+00:00',
@@ -252,13 +252,13 @@ snapshots['ReservationUnitTestCase::test_filtering_by_reservation_state 1'] = {
     }
 }
 
-snapshots['ReservationUnitTestCase::test_filtering_by_reservation_timestamps 1'] = {
+snapshots['ReservationUnitQueryTestCase::test_filtering_by_reservation_timestamps 1'] = {
     'data': {
         'reservationUnits': {
             'edges': [
                 {
                     'node': {
-                        'nameFi': 'test name',
+                        'nameFi': 'test name fi',
                         'reservations': [
                             {
                                 'begin': '2021-05-03T00:00:00+00:00',
@@ -273,74 +273,15 @@ snapshots['ReservationUnitTestCase::test_filtering_by_reservation_timestamps 1']
     }
 }
 
-snapshots['ReservationUnitTestCase::test_filtering_by_reservation_unit_description 1'] = {
+snapshots['ReservationUnitQueryTestCase::test_filtering_by_type 1'] = {
     'data': {
         'reservationUnits': {
             'edges': [
                 {
                     'node': {
-                        'descriptionFi': 'Lorem ipsum',
-                        'nameFi': 'test name'
-                    }
-                },
-                {
-                    'node': {
-                        'descriptionFi': 'Lorem ipsum',
-                        'nameFi': 'test name'
-                    }
-                }
-            ]
-        }
-    }
-}
-
-snapshots['ReservationUnitTestCase::test_filtering_by_reservation_unit_name 1'] = {
-    'data': {
-        'reservationUnits': {
-            'edges': [
-                {
-                    'node': {
-                        'nameFi': 'test name'
-                    }
-                },
-                {
-                    'node': {
-                        'nameFi': 'test name'
-                    }
-                }
-            ]
-        }
-    }
-}
-
-snapshots['ReservationUnitTestCase::test_filtering_by_space_name 1'] = {
-    'data': {
-        'reservationUnits': {
-            'edges': [
-                {
-                    'node': {
-                        'nameFi': 'test name',
-                        'spaces': [
-                            {
-                                'nameFi': 'space name'
-                            }
-                        ]
-                    }
-                }
-            ]
-        }
-    }
-}
-
-snapshots['ReservationUnitTestCase::test_filtering_by_type 1'] = {
-    'data': {
-        'reservationUnits': {
-            'edges': [
-                {
-                    'node': {
-                        'nameFi': 'test name',
+                        'nameFi': 'test name fi',
                         'reservationUnitType': {
-                            'nameFi': 'test type'
+                            'nameFi': 'test type fi'
                         }
                     }
                 }
@@ -349,40 +290,15 @@ snapshots['ReservationUnitTestCase::test_filtering_by_type 1'] = {
     }
 }
 
-snapshots['ReservationUnitTestCase::test_filtering_by_type_text 1'] = {
+snapshots['ReservationUnitQueryTestCase::test_filtering_by_unit 1'] = {
     'data': {
         'reservationUnits': {
             'edges': [
                 {
                     'node': {
-                        'nameFi': 'test name',
-                        'reservationUnitType': {
-                            'nameFi': 'test type'
-                        }
-                    }
-                },
-                {
-                    'node': {
-                        'nameFi': 'test name',
-                        'reservationUnitType': {
-                            'nameFi': 'test type'
-                        }
-                    }
-                }
-            ]
-        }
-    }
-}
-
-snapshots['ReservationUnitTestCase::test_filtering_by_unit 1'] = {
-    'data': {
-        'reservationUnits': {
-            'edges': [
-                {
-                    'node': {
-                        'nameFi': 'test name',
+                        'nameFi': 'test name fi',
                         'unit': {
-                            'nameFi': 'test unit'
+                            'nameFi': 'test unit fi'
                         }
                     }
                 }
@@ -391,18 +307,18 @@ snapshots['ReservationUnitTestCase::test_filtering_by_unit 1'] = {
     }
 }
 
-snapshots['ReservationUnitTestCase::test_getting_hauki_url 1'] = {
+snapshots['ReservationUnitQueryTestCase::test_getting_hauki_url 1'] = {
     'data': {
         'reservationUnitByPk': {
             'haukiUrl': {
                 'url': 'https://test.com/resource/origin:3774af34-9916-40f2-acc7-68db5a627710/?hsa_source=origin&hsa_username=AnonymousUser&hsa_organization=ORGANISATION&hsa_created_at=2021-05-03 00:00:00+00:00&hsa_valid_until=2021-05-03 00:30:00+00:00&hsa_resource=origin:3774af34-9916-40f2-acc7-68db5a627710&hsa_signature=8df8cd01df388f8f1aad70e82035eaae3a27d33c2f3e3583bb7f9bb7aca966f1'
             },
-            'nameFi': 'test name'
+            'nameFi': 'test name fi'
         }
     }
 }
 
-snapshots['ReservationUnitTestCase::test_getting_manually_given_surface_area 1'] = {
+snapshots['ReservationUnitQueryTestCase::test_getting_manually_given_surface_area 1'] = {
     'data': {
         'reservationUnits': {
             'edges': [
@@ -416,7 +332,7 @@ snapshots['ReservationUnitTestCase::test_getting_manually_given_surface_area 1']
     }
 }
 
-snapshots['ReservationUnitTestCase::test_getting_reservation_units 1'] = {
+snapshots['ReservationUnitQueryTestCase::test_getting_reservation_units 1'] = {
     'data': {
         'reservationUnits': {
             'edges': [
@@ -437,12 +353,12 @@ snapshots['ReservationUnitTestCase::test_getting_reservation_units 1'] = {
                         ],
                         'location': None,
                         'maxPersons': 110,
-                        'nameFi': 'test name',
+                        'nameFi': 'test name fi',
                         'purposes': [
                         ],
                         'requireIntroduction': False,
                         'reservationUnitType': {
-                            'nameFi': 'test type'
+                            'nameFi': 'test type fi'
                         },
                         'reservations': [
                         ],
@@ -467,7 +383,7 @@ snapshots['ReservationUnitTestCase::test_getting_reservation_units 1'] = {
     }
 }
 
-snapshots['ReservationUnitTestCase::test_getting_terms 1'] = {
+snapshots['ReservationUnitQueryTestCase::test_getting_terms 1'] = {
     'data': {
         'reservationUnits': {
             'edges': [
@@ -489,7 +405,7 @@ snapshots['ReservationUnitTestCase::test_getting_terms 1'] = {
     }
 }
 
-snapshots['ReservationUnitTestCase::test_order_by_name_en 1'] = {
+snapshots['ReservationUnitQueryTestCase::test_order_by_name_en 1'] = {
     'data': {
         'reservationUnits': {
             'edges': [
@@ -500,7 +416,7 @@ snapshots['ReservationUnitTestCase::test_order_by_name_en 1'] = {
                 },
                 {
                     'node': {
-                        'nameEn': None
+                        'nameEn': 'test name en'
                     }
                 }
             ]
@@ -508,7 +424,7 @@ snapshots['ReservationUnitTestCase::test_order_by_name_en 1'] = {
     }
 }
 
-snapshots['ReservationUnitTestCase::test_order_by_name_fi 1'] = {
+snapshots['ReservationUnitQueryTestCase::test_order_by_name_fi 1'] = {
     'data': {
         'reservationUnits': {
             'edges': [
@@ -519,7 +435,7 @@ snapshots['ReservationUnitTestCase::test_order_by_name_fi 1'] = {
                 },
                 {
                     'node': {
-                        'nameFi': 'test name'
+                        'nameFi': 'test name fi'
                     }
                 }
             ]
@@ -527,7 +443,7 @@ snapshots['ReservationUnitTestCase::test_order_by_name_fi 1'] = {
     }
 }
 
-snapshots['ReservationUnitTestCase::test_order_by_name_sv 1'] = {
+snapshots['ReservationUnitQueryTestCase::test_order_by_name_sv 1'] = {
     'data': {
         'reservationUnits': {
             'edges': [
@@ -538,7 +454,7 @@ snapshots['ReservationUnitTestCase::test_order_by_name_sv 1'] = {
                 },
                 {
                     'node': {
-                        'nameSv': None
+                        'nameSv': 'test name sv'
                     }
                 }
             ]
@@ -546,14 +462,14 @@ snapshots['ReservationUnitTestCase::test_order_by_name_sv 1'] = {
     }
 }
 
-snapshots['ReservationUnitTestCase::test_order_by_type_en 1'] = {
+snapshots['ReservationUnitQueryTestCase::test_order_by_type_en 1'] = {
     'data': {
         'reservationUnits': {
             'edges': [
                 {
                     'node': {
                         'reservationUnitType': {
-                            'nameEn': None
+                            'nameEn': 'test type en'
                         }
                     }
                 },
@@ -569,7 +485,7 @@ snapshots['ReservationUnitTestCase::test_order_by_type_en 1'] = {
     }
 }
 
-snapshots['ReservationUnitTestCase::test_order_by_type_fi 1'] = {
+snapshots['ReservationUnitQueryTestCase::test_order_by_type_fi 1'] = {
     'data': {
         'reservationUnits': {
             'edges': [
@@ -583,7 +499,7 @@ snapshots['ReservationUnitTestCase::test_order_by_type_fi 1'] = {
                 {
                     'node': {
                         'reservationUnitType': {
-                            'nameFi': 'test type'
+                            'nameFi': 'test type fi'
                         }
                     }
                 }
@@ -592,14 +508,14 @@ snapshots['ReservationUnitTestCase::test_order_by_type_fi 1'] = {
     }
 }
 
-snapshots['ReservationUnitTestCase::test_order_by_type_sv 1'] = {
+snapshots['ReservationUnitQueryTestCase::test_order_by_type_sv 1'] = {
     'data': {
         'reservationUnits': {
             'edges': [
                 {
                     'node': {
                         'reservationUnitType': {
-                            'nameSv': None
+                            'nameSv': 'test type sv'
                         }
                     }
                 },
@@ -615,14 +531,14 @@ snapshots['ReservationUnitTestCase::test_order_by_type_sv 1'] = {
     }
 }
 
-snapshots['ReservationUnitTestCase::test_order_by_unit 1'] = {
+snapshots['ReservationUnitQueryTestCase::test_order_by_unit 1'] = {
     'data': {
         'reservationUnits': {
             'edges': [
                 {
                     'node': {
                         'unit': {
-                            'nameFi': 'test unit'
+                            'nameFi': 'test unit fi'
                         }
                     }
                 },
@@ -638,7 +554,7 @@ snapshots['ReservationUnitTestCase::test_order_by_unit 1'] = {
     }
 }
 
-snapshots['ReservationUnitTestCase::test_order_by_unit_reverse_order 1'] = {
+snapshots['ReservationUnitQueryTestCase::test_order_by_unit_reverse_order 1'] = {
     'data': {
         'reservationUnits': {
             'edges': [
@@ -652,7 +568,259 @@ snapshots['ReservationUnitTestCase::test_order_by_unit_reverse_order 1'] = {
                 {
                     'node': {
                         'unit': {
-                            'nameFi': 'test unit'
+                            'nameFi': 'test unit fi'
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitsFilterTextSearchTestCase::test_filtering_by_reservation_unit_description_en 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'descriptionEn': 'Lorem ipsum en',
+                        'nameFi': 'test name fi'
+                    }
+                },
+                {
+                    'node': {
+                        'descriptionEn': 'Lorem ipsum en',
+                        'nameFi': 'test name fi'
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitsFilterTextSearchTestCase::test_filtering_by_reservation_unit_description_fi 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'descriptionFi': 'Lorem ipsum fi',
+                        'nameFi': 'test name fi'
+                    }
+                },
+                {
+                    'node': {
+                        'descriptionFi': 'Lorem ipsum fi',
+                        'nameFi': 'test name fi'
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitsFilterTextSearchTestCase::test_filtering_by_reservation_unit_description_sv 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'descriptionFi': 'Lorem ipsum fi',
+                        'nameFi': 'test name fi'
+                    }
+                },
+                {
+                    'node': {
+                        'descriptionFi': 'Lorem ipsum fi',
+                        'nameFi': 'test name fi'
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitsFilterTextSearchTestCase::test_filtering_by_reservation_unit_name_en 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'nameEn': 'test name en'
+                    }
+                },
+                {
+                    'node': {
+                        'nameEn': 'test name en'
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitsFilterTextSearchTestCase::test_filtering_by_reservation_unit_name_fi 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'nameFi': 'test name fi'
+                    }
+                },
+                {
+                    'node': {
+                        'nameFi': 'test name fi'
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitsFilterTextSearchTestCase::test_filtering_by_reservation_unit_name_sv 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'nameSv': 'test name sv'
+                    }
+                },
+                {
+                    'node': {
+                        'nameSv': 'test name sv'
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitsFilterTextSearchTestCase::test_filtering_by_space_name_en 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'nameFi': 'test name fi',
+                        'spaces': [
+                            {
+                                'nameEn': 'space name en'
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitsFilterTextSearchTestCase::test_filtering_by_space_name_fi 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'nameFi': 'test name fi',
+                        'spaces': [
+                            {
+                                'nameFi': 'space name fi'
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitsFilterTextSearchTestCase::test_filtering_by_space_name_sv 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'nameFi': 'test name fi',
+                        'spaces': [
+                            {
+                                'nameSv': 'space name sv'
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitsFilterTextSearchTestCase::test_filtering_by_type_en 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'nameFi': 'test name fi',
+                        'reservationUnitType': {
+                            'nameEn': 'test type en'
+                        }
+                    }
+                },
+                {
+                    'node': {
+                        'nameFi': 'test name fi',
+                        'reservationUnitType': {
+                            'nameEn': 'test type en'
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitsFilterTextSearchTestCase::test_filtering_by_type_fi 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'nameFi': 'test name fi',
+                        'reservationUnitType': {
+                            'nameFi': 'test type fi'
+                        }
+                    }
+                },
+                {
+                    'node': {
+                        'nameFi': 'test name fi',
+                        'reservationUnitType': {
+                            'nameFi': 'test type fi'
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitsFilterTextSearchTestCase::test_filtering_by_type_sv 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'nameFi': 'test name fi',
+                        'reservationUnitType': {
+                            'nameSv': 'test type sv'
+                        }
+                    }
+                },
+                {
+                    'node': {
+                        'nameFi': 'test name fi',
+                        'reservationUnitType': {
+                            'nameSv': 'test type sv'
                         }
                     }
                 }
