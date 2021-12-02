@@ -81,6 +81,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
             user=self.regular_joe,
             priority=100,
             purpose=self.purpose,
+            price=10,
         )
 
     def test_reservation_query(self):
@@ -108,6 +109,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
                             name
                             description
                             purpose {nameFi}
+                            price
                           }
                         }
                     }
@@ -206,6 +208,16 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
         assert_that(Reservation.objects.exists()).is_true()
+
+    def test_creating_reservation_price_fails(self, mock_periods, mock_opening_hours):
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+        self.client.force_login(self.regular_joe)
+        input_data = self.get_valid_input_data()
+        input_data["price"] = 10
+        response = self.query(self.get_create_query(), input_data=input_data)
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(Reservation.objects.exists()).is_false()
 
     def test_creating_reservation_with_pk_fails(self, mock_periods, mock_opening_hours):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
@@ -521,6 +533,7 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
             state=STATE_CHOICES.CREATED,
             user=self.regular_joe,
             priority=100,
+            price=10,
         )
 
     def get_update_query(self):
@@ -590,6 +603,20 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
 
         assert_that(content.get("errors")).is_not_none()
         assert_that(Reservation.objects.filter(pk=new_pk)).is_false()
+
+    def test_updating_reservation_with_price_fails(
+        self, mock_periods, mock_opening_hours
+    ):
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+        self.client.force_login(self.regular_joe)
+        input_data = self.get_valid_update_data()
+        input_data["price"] = 0
+        response = self.query(self.get_update_query(), input_data=input_data)
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_not_none()
+        self.reservation.refresh_from_db()
+        assert_that(self.reservation.price).is_not_equal_to(0)
 
     def test_update_fails_when_overlapping_reservation(
         self, mock_periods, mock_opening_hours
