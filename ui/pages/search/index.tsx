@@ -21,6 +21,10 @@ import { CenterSpinner } from "../../components/common/common";
 import ClientOnly from "../../components/ClientOnly";
 import { H1 } from "../../modules/style/typography";
 
+const Wrapper = styled.div`
+  margin-bottom: var(--spacing-layout-xl);
+`;
+
 const HeadContainer = styled.div`
   background-color: white;
   padding-top: var(--spacing-layout-xs);
@@ -83,7 +87,7 @@ const Search = (): JSX.Element => {
 
       setValues(newValues);
       setState("loading");
-      getReservationUnits(newValues)
+      getReservationUnits({ ...newValues, isDraft: false })
         .then((v) => {
           setReservationUnits(v);
           setState("done");
@@ -107,7 +111,7 @@ const Search = (): JSX.Element => {
   };
 
   return (
-    <>
+    <Wrapper>
       <HeadContainer>
         <Container>
           <Breadcrumb current={{ label: "search", linkTo: searchPrefix }} />
@@ -127,7 +131,7 @@ const Search = (): JSX.Element => {
           />
         )}
       </ClientOnly>
-    </>
+    </Wrapper>
   );
 };
 

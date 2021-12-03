@@ -5,6 +5,7 @@ import {
   reservationSubmitButton,
   timeColumn,
 } from "model/calendar";
+import { error404Body, error404Title } from "model/error";
 import {
   confirmationParagraph,
   reservationConfirmationTimeRange,
@@ -293,5 +294,24 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
     matchEvent();
 
     cy.checkA11y(null, null, null, true);
+  });
+});
+
+describe("Tilavaraus ui reservation unit page (single) preview", () => {
+  Cypress.config("defaultCommandTimeout", 20000);
+
+  it("should not display draft item", () => {
+    cy.visit("/reservation-unit/single/999", { failOnStatusCode: false });
+
+    error404Title().should("have.text", "404");
+    error404Body().should("have.text", "Sivua ei löytynyt");
+  });
+
+  it("should display draft item if uuid matches", () => {
+    cy.visit(
+      "/reservation-unit/single/999?ru=8e5275aa-8625-4458-88b4-d5b1b2df6619"
+    );
+
+    cy.get("h1").should("contain", "Pukinmäen nuorisotalon keittiö");
   });
 });

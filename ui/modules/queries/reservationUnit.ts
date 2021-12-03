@@ -5,9 +5,11 @@ export const RESERVATION_UNIT = gql`
     reservationUnitByPk(pk: $pk) {
       id
       pk
+      uuid
       nameFi
       nameEn
       nameSv
+      isDraft
       images {
         imageUrl
         mediumUrl
@@ -90,6 +92,7 @@ export const RESERVATION_UNITS = gql`
     $first: Int
     $after: String
     $orderBy: String
+    $isDraft: Boolean
   ) {
     reservationUnits(
       textSearch: $textSearch
@@ -101,6 +104,7 @@ export const RESERVATION_UNITS = gql`
       first: $first
       after: $after
       orderBy: $orderBy
+      isDraft: $isDraft
     ) {
       edges {
         node {

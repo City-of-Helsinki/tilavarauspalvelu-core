@@ -28,8 +28,8 @@ const Custom404 = ({ title, body }: Props): JSX.Element => {
   return (
     <Wrapper>
       <CenteredContainer>
-        <h1>{title || "404"}</h1>
-        <p>{body || t("404.body")}</p>
+        <h1 data-testid="error__404--title">{title || "404"}</h1>
+        <p data-testid="error__404--body">{body || t("404.body")}</p>
       </CenteredContainer>
     </Wrapper>
   );
