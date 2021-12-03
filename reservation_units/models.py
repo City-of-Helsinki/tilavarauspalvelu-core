@@ -288,6 +288,28 @@ class ReservationUnit(models.Model):
         help_text="The current list price for reservation units with a fixed price",
     )
 
+    RESERVATION_START_INTERVAL_15_MINUTES = "interval_15_mins"
+    RESERVATION_START_INTERVAL_30_MINUTES = "interval_30_mins"
+    RESERVATION_START_INTERVAL_60_MINUTES = "interval_60_mins"
+    RESERVATION_START_INTERVAL_90_MINUTES = "interval_90_mins"
+    RESERVATION_START_INTERVAL_CHOICES = (
+        (RESERVATION_START_INTERVAL_15_MINUTES, _("15 minutes")),
+        (RESERVATION_START_INTERVAL_30_MINUTES, _("30 minutes")),
+        (RESERVATION_START_INTERVAL_60_MINUTES, _("60 minutes")),
+        (RESERVATION_START_INTERVAL_90_MINUTES, _("90 minutes")),
+    )
+    reservation_start_interval = models.CharField(
+        max_length=20,
+        verbose_name=_("Reservation start interval"),
+        choices=RESERVATION_START_INTERVAL_CHOICES,
+        default=RESERVATION_START_INTERVAL_15_MINUTES,
+        help_text=(
+            "Determines the interval for the start time of the reservation. "
+            "For example an interval of 15 minutes means a reservation can "
+            "begin at minutes 0, 15, 30, or 45."
+        ),
+    )
+
     def __str__(self):
         return "{}".format(self.name)
 
