@@ -323,6 +323,7 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
             "highest_price",
             "price_unit",
             "price",
+            "reservation_start_interval",
         ] + get_all_translatable_fields(model)
         filter_fields = {
             "name_fi": ["exact", "icontains", "istartswith"],

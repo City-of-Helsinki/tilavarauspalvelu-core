@@ -172,6 +172,15 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
         required=False,
         help_text="The current list price for reservation units with a fixed price",
     )
+    reservation_start_interval = serializers.CharField(
+        required=False,
+        help_text=(
+            "Determines the interval for the start time of the reservation. "
+            "For example an interval of 15 minutes means a reservation can "
+            "begin at minutes 0, 15, 30, or 45. Possible values are "
+            f"{', '.join(value[0] for value in ReservationUnit.RESERVATION_START_INTERVAL_CHOICES)}."
+        ),
+    )
 
     translation_fields = get_all_translatable_fields(ReservationUnit)
 
@@ -209,6 +218,7 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
             "highest_price",
             "price_unit",
             "price",
+            "reservation_start_interval",
         ] + get_all_translatable_fields(ReservationUnit)
 
     def __init__(self, *args, **kwargs):

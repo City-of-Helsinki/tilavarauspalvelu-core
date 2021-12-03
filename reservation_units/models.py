@@ -306,7 +306,8 @@ class ReservationUnit(models.Model):
         help_text=(
             "Determines the interval for the start time of the reservation. "
             "For example an interval of 15 minutes means a reservation can "
-            "begin at minutes 0, 15, 30, or 45."
+            "begin at minutes 0, 15, 30, or 45. Possible values are "
+            f"{', '.join(value[0] for value in RESERVATION_START_INTERVAL_CHOICES)}."
         ),
     )
 
