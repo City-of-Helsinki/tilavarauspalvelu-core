@@ -49,13 +49,10 @@ export const updateApiAccessToken = async (
   return apiAccessToken;
 };
 
-export const ensureApiAccessTokenIsAvailable = (): void => {
+export const assertApiAccessTokenIsAvailable = (): void => {
   if (getApiAccessToken()) {
-    console.log("token available");
     return;
   }
 
-  updateApiAccessToken(getAccessToken())
-    .then(() => console.log("token fetched and available"))
-    .catch(() => "failed!");
+  updateApiAccessToken(getAccessToken());
 };
