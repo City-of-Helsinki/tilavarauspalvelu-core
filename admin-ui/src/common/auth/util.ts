@@ -23,8 +23,11 @@ export const getAccessToken = (): string | undefined => {
 };
 
 export const updateApiAccessToken = async (
-  accessToken: string
+  accessToken: string | undefined
 ): Promise<string> => {
+  if (!accessToken) {
+    throw new Error("Api access token not available. Cannot update");
+  }
   if (!apiScope) {
     throw new Error("Application configuration error, illegal api scope.");
   }
@@ -44,4 +47,15 @@ export const updateApiAccessToken = async (
   setApiAccessToken(apiAccessToken);
 
   return apiAccessToken;
+};
+
+export const ensureApiAccessTokenIsAvailable = (): void => {
+  if (getApiAccessToken()) {
+    console.log("token available");
+    return;
+  }
+
+  updateApiAccessToken(getAccessToken())
+    .then(() => console.log("token fetched and available"))
+    .catch(() => "failed!");
 };
