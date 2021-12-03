@@ -22,6 +22,9 @@ export const RESERVATION_UNIT = gql`
       termsOfUseFi
       termsOfUseEn
       termsOfUseSv
+      additionalInstructionsFi
+      additionalInstructionsEn
+      additionalInstructionsSv
       serviceSpecificTerms {
         nameFi
         nameEn

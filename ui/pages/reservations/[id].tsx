@@ -3,7 +3,6 @@ import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import styled from "styled-components";
 import router from "next/router";
-import { parseISO } from "date-fns";
 import { isFinite } from "lodash";
 import {
   Accordion,
@@ -16,15 +15,11 @@ import { Trans, useTranslation } from "react-i18next";
 import { ReservationType } from "../../modules/gql-types";
 import apolloClient from "../../modules/apolloClient";
 import { GET_RESERVATION } from "../../modules/queries/reservation";
-import { fontRegular, H1, H3, Strong } from "../../modules/style/typography";
+import { fontRegular, H1, H3 } from "../../modules/style/typography";
 import { NarrowCenteredContainer } from "../../modules/style/layout";
 import { breakpoint } from "../../modules/style";
 import Ticket from "../../components/reservation/Ticket";
-import {
-  capitalize,
-  getTranslation,
-  reservationsUrl,
-} from "../../modules/util";
+import { getTranslation, reservationsUrl } from "../../modules/util";
 import { TwoColumnContainer } from "../../components/common/common";
 import { MediumButton } from "../../styles/util";
 import Sanitize from "../../components/common/Sanitize";
@@ -157,24 +152,6 @@ const Reservation = ({ reservation }: Props): JSX.Element => {
 
   const reservationUnit = reservation.reservationUnits[0];
 
-  const { begin, end } = reservation;
-
-  const beginDate = t("common:dateWithWeekday", {
-    date: begin && parseISO(begin),
-  });
-
-  const beginTime = t("common:timeWithPrefix", {
-    date: begin && parseISO(begin),
-  });
-
-  const endDate = t("common:dateWithWeekday", {
-    date: end && parseISO(end),
-  });
-
-  const endTime = t("common:time", {
-    date: end && parseISO(end),
-  });
-
   const isReservationCancelled = reservation.state === "CANCELLED";
   const ticketState = isReservationCancelled ? "error" : "complete";
 
@@ -272,75 +249,46 @@ const Reservation = ({ reservation }: Props): JSX.Element => {
             {t("common:sendFeedback")}
           </a>
         </Paragraph>
-        <AccordionContainer>
-          <TermContainer>
-            <Accordion heading={t("reservations:reservationInfo")}>
-              <Paragraph data-testid="reservation__detail--name">
-                <Strong>{t("reservationCalendar:label.name")}</Strong>
-                <span>{reservation.name}</span>
-              </Paragraph>
-              <Paragraph data-testid="reservation__detail--reserveeName">
-                <Strong>{t("reservationCalendar:label.reserveeName")}</Strong>
-                <span>
-                  {`${reservation.reserveeFirstName || ""} ${
-                    reservation.reserveeLastName || ""
-                  }`.trim()}
-                </span>
-              </Paragraph>
-              <Paragraph data-testid="reservation__detail--description">
-                <Strong>{t("reservationCalendar:label.description")}</Strong>
-                <span>{reservation.description}</span>
-              </Paragraph>
-              <Paragraph data-testid="reservation__detail--date">
-                <Strong>
-                  {t("reservationCalendar:label.reservationDate")}
-                </Strong>
-                <span>
-                  {capitalize(
-                    `${beginDate} ${beginTime} -${
-                      endDate !== beginDate ? ` ${endDate}` : ""
-                    } ${endTime}`
+        {getTranslation(reservationUnit, "additionalInstructions") && (
+          <AccordionContainer>
+            <TermContainer>
+              <Accordion heading={t("reservations:reservationInfo")}>
+                {getTranslation(reservationUnit, "additionalInstructions")}
+              </Accordion>
+            </TermContainer>
+          </AccordionContainer>
+        )}
+        {getTranslation(reservationUnit, "termsOfUse") && (
+          <AccordionContainer>
+            <TermContainer>
+              <Accordion
+                initiallyOpen={false}
+                heading={t("reservationCalendar:heading.termsOfUse")}
+              >
+                <Sanitize
+                  html={getTranslation(reservationUnit, "termsOfUse")}
+                />
+              </Accordion>
+            </TermContainer>
+          </AccordionContainer>
+        )}
+        {getTranslation(reservationUnit.serviceSpecificTerms, "text") && (
+          <AccordionContainer>
+            <TermContainer>
+              <Accordion
+                initiallyOpen={false}
+                heading={t("reservationCalendar:heading.resourceTerms")}
+              >
+                <Sanitize
+                  html={getTranslation(
+                    reservationUnit.serviceSpecificTerms,
+                    "text"
                   )}
-                </span>
-              </Paragraph>
-              <Paragraph data-testid="reservation__detail--unit">
-                <Strong>
-                  {t("reservationCalendar:label.reservationSpace")}
-                </Strong>
-                <span>{getTranslation(reservationUnit, "name")}</span>
-              </Paragraph>
-              <Paragraph data-testid="reservation__detail--phone">
-                <Strong>{t("common:phone")}</Strong>
-                <span>{reservation.reserveePhone}</span>
-              </Paragraph>
-            </Accordion>
-          </TermContainer>
-        </AccordionContainer>
-        <AccordionContainer>
-          <TermContainer>
-            <Accordion
-              initiallyOpen={false}
-              heading={t("reservationCalendar:heading.termsOfUse")}
-            >
-              <Sanitize html={getTranslation(reservationUnit, "termsOfUse")} />
-            </Accordion>
-          </TermContainer>
-        </AccordionContainer>
-        <AccordionContainer>
-          <TermContainer>
-            <Accordion
-              initiallyOpen={false}
-              heading={t("reservationCalendar:heading.resourceTerms")}
-            >
-              <Sanitize
-                html={getTranslation(
-                  reservationUnit.serviceSpecificTerms,
-                  "text"
-                )}
-              />
-            </Accordion>
-          </TermContainer>
-        </AccordionContainer>
+                />
+              </Accordion>
+            </TermContainer>
+          </AccordionContainer>
+        )}
         <MediumButton
           variant="secondary"
           onClick={() => router.push(reservationsUrl)}

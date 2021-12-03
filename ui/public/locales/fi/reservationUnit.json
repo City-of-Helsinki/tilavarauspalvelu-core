@@ -16,9 +16,8 @@
   "reservationSuccessful": "Varaus onnistui",
   "reservationReminderText": "Saat sähköpostiisi (<emailLink>{{user}}</emailLink>) muistutuksen varauksesta.\nLöydät ne myös Varaamon omat varaukset sivulta.",
   "loadReservationCalendar": "<calendarLink>Lataa tästä</calendarLink> kalenteriisi muistutus.",
-  "gotoApplications": "Siirry omiin varauksiin",
   "openingTimes": "Aukioloajat",
-  "additionalInfo": "Varauksen lisätiedot",
+  "additionalInfo": "Varauksen tiedot",
   "reservationFailed": "Varauksen luominen epäonnistui",
   "reservationUpdateFailed": "Varauksen peruminen epäonnistui",
   "priceFree": "Maksuton"

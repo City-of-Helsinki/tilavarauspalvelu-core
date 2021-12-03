@@ -28,7 +28,7 @@
     "reserveeLastName": "Varaajan sukunimi",
     "name": "Varauksen nimi (julkinen)",
     "description": "Varauksen kuvaus",
-    "termsSpace": "Olen lukenut ja hyväksynyt varauksen käyttösäännöt",
+    "termsSpace": "Olen lukenut ja hyväksynyt varauksen sopimusehdot",
     "termsResource": "Olen lukenut ja hyväksynyt varauksen resurssikohtaiset ehdot",
     "reservationDate": "Varauksen ajankohta",
     "reservationSpace": "Tila"

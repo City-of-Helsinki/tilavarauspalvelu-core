@@ -35,6 +35,7 @@ import {
   applicationErrorText,
   capitalize,
   getTranslation,
+  reservationsUrl,
 } from "../../../modules/util";
 import { MediumButton } from "../../../styles/util";
 import { DataContext } from "../../../context/DataContext";
@@ -696,6 +697,16 @@ const ReservationUnitReservation = ({
                   {t("common:sendFeedback")}
                 </a>
               </Paragraph>
+              {getTranslation(reservationUnit, "additionalInstructions") && (
+                <>
+                  <H3 style={{ marginTop: "var(--spacing-xl)" }}>
+                    {t("reservations:reservationInfo")}
+                  </H3>
+                  <Paragraph>
+                    {getTranslation(reservationUnit, "additionalInstructions")}
+                  </Paragraph>
+                </>
+              )}
               <H3 style={{ marginTop: "var(--spacing-xl)" }}>
                 {t("reservationUnit:additionalInfo")}
               </H3>
@@ -738,6 +749,12 @@ const ReservationUnitReservation = ({
                 <span>{reservation.reserveePhone}</span>
               </ValueParagraph>
               <ActionContainer style={{ marginTop: "var(--spacing-3-xl)" }}>
+                <MediumButton
+                  variant="primary"
+                  onClick={() => router.push(reservationsUrl)}
+                >
+                  {t("reservations:gotoReservations")}
+                </MediumButton>
                 <MediumButton
                   variant="secondary"
                   onClick={() => router.push("/")}

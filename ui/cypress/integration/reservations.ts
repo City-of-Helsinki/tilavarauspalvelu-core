@@ -74,14 +74,6 @@ describe("Tilavaraus user reservations", () => {
   });
 
   it("should display reservation detail view", () => {
-    const details = [
-      { slug: "name", value: "Reservation name" },
-      { slug: "reserveeName", value: "First name Last name" },
-      { slug: "description", value: "Reservation description" },
-      { slug: "unit", value: "Toimistohuone 1" },
-      { slug: "phone", value: "+358 123 4567" },
-    ];
-
     detailButton().eq(0).click();
 
     cy.url({ timeout: 20000 }).should("match", /\/reservations\/4$/);
@@ -96,17 +88,9 @@ describe("Tilavaraus user reservations", () => {
       "Saat sähköpostiisi (user@gmail.com) muistutuksen varauksesta."
     );
 
-    details.forEach(({ slug, value }) => {
-      reservationDetail(slug)
-        .should("not.be.visible")
-        .find("span")
-        .eq(1)
-        .should("have.text", value);
-    });
+    cy.contains("div", "Additional Instructions FI").should("not.be.visible");
     accordionToggler().eq(0).click();
-    details.forEach(({ slug }) => {
-      reservationDetail(slug).should("be.visible");
-    });
+    cy.contains("div", "Additional Instructions FI").should("be.visible");
 
     cy.contains("div", "Terms of use FI").should("not.be.visible");
     accordionToggler().eq(1).click();

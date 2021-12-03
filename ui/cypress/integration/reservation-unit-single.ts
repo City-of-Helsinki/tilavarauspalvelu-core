@@ -133,6 +133,9 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
       .invoke("attr", "href")
       .should("eq", "http://calendarUrl/42");
 
+    cy.contains("h2", "Varauksen ohjeet").should("be.visible");
+    cy.contains("p", "Additional instructions FI").should("be.visible");
+
     confirmationParagraph()
       .eq(0)
       .find("span")
@@ -198,6 +201,10 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
       .find("span")
       .eq(1)
       .should("have.text", form1[2].value);
+
+    cy.contains("button", "Siirry omiin varauksiin").click();
+
+    cy.url().should("contain", "/reservations");
 
     cy.checkA11y(null, null, null, true);
   });
