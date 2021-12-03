@@ -148,13 +148,30 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
         required=False,
     )
     lowest_price = serializers.DecimalField(
-        max_digits=10, decimal_places=2, required=False
+        max_digits=10,
+        decimal_places=2,
+        required=False,
+        help_text="Minimum price of the reservation unit",
     )
     highest_price = serializers.DecimalField(
-        max_digits=10, decimal_places=2, required=False
+        max_digits=10,
+        decimal_places=2,
+        required=False,
+        help_text="Maximum price of the reservation unit",
     )
-    price_unit = serializers.CharField(required=False)
-    price = serializers.DecimalField(max_digits=10, decimal_places=2, required=False)
+    price_unit = serializers.CharField(
+        required=False,
+        help_text=(
+            "Unit of the price. "
+            f"Possible values are {', '.join(value for value, _ in ReservationUnit.PRICE_UNITS)}."
+        ),
+    )
+    price = serializers.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        required=False,
+        help_text="The current list price for reservation units with a fixed price",
+    )
 
     translation_fields = get_all_translatable_fields(ReservationUnit)
 
