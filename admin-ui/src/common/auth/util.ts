@@ -49,10 +49,16 @@ export const updateApiAccessToken = async (
   return apiAccessToken;
 };
 
-export const assertApiAccessTokenIsAvailable = (): void => {
+// XXX, TODO, some apis (for example reservationUnitCancellationRules)
+// require api authentication but don't notify the caller about missing
+// credentials. We need to hook this up properly but it will be done in
+// separate task.
+export const assertApiAccessTokenIsAvailable = (): Promise<boolean> => {
   if (getApiAccessToken()) {
-    return;
+    return Promise.resolve(false);
   }
 
-  updateApiAccessToken(getAccessToken());
+  return updateApiAccessToken(getAccessToken())
+    .then(() => true)
+    .finally(() => true);
 };

@@ -879,6 +879,9 @@ const translations: ITranslations = {
     errorNoResources: ["Toimipisteeseen ei ole liitetty yhtään resurssia"],
     errorNoSpaces: ["Toimipisteeseen ei ole liitetty yhtään tilaa"],
     errorDataHeading: ["Datavirhe"],
+    errorParamsNotAvailable: [
+      "Parametridataa puuttuu, osa lomakkeesta voi olla epäkunnossa",
+    ],
     minReservationDurationLabel: ["Vuoron minimikesto"],
     maxReservationDurationLabel: ["Vuoron maksimikesto"],
     tosLabel: ["Varausyksikkökohtaiset ohjeet {{lang}}"],
@@ -909,6 +912,9 @@ const translations: ITranslations = {
     reservationUnitUpdatedNotification: ["Varausyksikön tiedot tallennettu."],
     saveFailed: ["Varausyksikön tietoja ei saatu tallennettua. {{error}}"],
     saveAndPublish: ["Tallenna julkaistuna"],
+    settings: ["Varausasetukset"],
+    cancellationIsPossible: ["Asiakas voi peruuttaa varauksen"],
+    cancellationGroupLabel: ["Peruutuksen tiedot"],
   },
   ResourceModal: {
     modalTitle: ["Luo uusi resurssi tilalle"],
