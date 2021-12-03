@@ -21,6 +21,8 @@ export type Scalars = {
    * [iso8601](https://en.wikipedia.org/wiki/ISO_8601).
    */
   DateTime: any;
+  /** The `Decimal` scalar type represents a python Decimal. */
+  Decimal: any;
   /**
    * The `Time` scalar type represents a Time value as
    * specified by
@@ -28,7 +30,7 @@ export type Scalars = {
    */
   Time: any;
   /**
-   * Leverages the internal Python implmeentation of UUID (uuid.UUID) to provide native UUID objects
+   * Leverages the internal Python implementation of UUID (uuid.UUID) to provide native UUID objects
    * in fields, resolvers and input.
    */
   UUID: any;
@@ -46,16 +48,6 @@ export type AgeGroupType = {
   minimum: Scalars['Int'];
   pk?: Maybe<Scalars['Int']>;
 };
-
-/** An enumeration. */
-export enum ApplicationRoundTargetGroup {
-  /** Kaikki */
-  All = 'ALL',
-  /** Internal */
-  Internal = 'INTERNAL',
-  /** Public */
-  Public = 'PUBLIC'
-}
 
 export type ApplicationRoundType = {
   __typename?: 'ApplicationRoundType';
@@ -75,7 +67,7 @@ export type ApplicationRoundType = {
   reservationPeriodBegin: Scalars['Date'];
   reservationPeriodEnd: Scalars['Date'];
   reservationUnits: ReservationUnitByPkTypeConnection;
-  targetGroup: ApplicationRoundTargetGroup;
+  targetGroup: ApplicationsApplicationRoundTargetGroupChoices;
 };
 
 
@@ -87,6 +79,7 @@ export type ApplicationRoundTypePurposesArgs = {
   nameEn?: Maybe<Scalars['String']>;
   nameFi?: Maybe<Scalars['String']>;
   nameSv?: Maybe<Scalars['String']>;
+  offset?: Maybe<Scalars['Int']>;
 };
 
 
@@ -95,24 +88,35 @@ export type ApplicationRoundTypeReservationUnitsArgs = {
   before?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Int']>;
   last?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
 };
+
+/** An enumeration. */
+export enum ApplicationsApplicationRoundTargetGroupChoices {
+  /** Kaikki */
+  All = 'ALL',
+  /** Internal */
+  Internal = 'INTERNAL',
+  /** Public */
+  Public = 'PUBLIC'
+}
 
 export type BuildingType = Node & {
   __typename?: 'BuildingType';
   district?: Maybe<DistrictType>;
-  /** The ID of the object. */
+  /** The ID of the object */
   id: Scalars['ID'];
   nameEn?: Maybe<Scalars['String']>;
   nameFi?: Maybe<Scalars['String']>;
   nameSv?: Maybe<Scalars['String']>;
   pk?: Maybe<Scalars['Int']>;
   realEstate?: Maybe<RealEstateType>;
-  surfaceArea?: Maybe<Scalars['Float']>;
+  surfaceArea?: Maybe<Scalars['Decimal']>;
 };
 
 export type DistrictType = Node & {
   __typename?: 'DistrictType';
-  /** The ID of the object. */
+  /** The ID of the object */
   id: Scalars['ID'];
   nameEn?: Maybe<Scalars['String']>;
   nameFi?: Maybe<Scalars['String']>;
@@ -153,7 +157,7 @@ export type EquipmentCategoryDeleteMutationPayload = {
 
 export type EquipmentCategoryType = Node & {
   __typename?: 'EquipmentCategoryType';
-  /** The ID of the object. */
+  /** The ID of the object */
   id: Scalars['ID'];
   nameEn?: Maybe<Scalars['String']>;
   nameFi?: Maybe<Scalars['String']>;
@@ -234,7 +238,7 @@ export type EquipmentDeleteMutationPayload = {
 export type EquipmentType = Node & {
   __typename?: 'EquipmentType';
   category?: Maybe<EquipmentCategoryType>;
-  /** The ID of the object. */
+  /** The ID of the object */
   id: Scalars['ID'];
   nameEn?: Maybe<Scalars['String']>;
   nameFi?: Maybe<Scalars['String']>;
@@ -289,7 +293,7 @@ export type ErrorType = {
 
 export type KeywordCategoryType = Node & {
   __typename?: 'KeywordCategoryType';
-  /** The ID of the object. */
+  /** The ID of the object */
   id: Scalars['ID'];
   keywordGroups?: Maybe<Array<Maybe<KeywordGroupType>>>;
   nameEn?: Maybe<Scalars['String']>;
@@ -317,7 +321,7 @@ export type KeywordCategoryTypeEdge = {
 
 export type KeywordGroupType = Node & {
   __typename?: 'KeywordGroupType';
-  /** The ID of the object. */
+  /** The ID of the object */
   id: Scalars['ID'];
   keywords?: Maybe<Array<Maybe<KeywordType>>>;
   nameEn?: Maybe<Scalars['String']>;
@@ -345,7 +349,7 @@ export type KeywordGroupTypeEdge = {
 
 export type KeywordType = Node & {
   __typename?: 'KeywordType';
-  /** The ID of the object. */
+  /** The ID of the object */
   id: Scalars['ID'];
   nameEn?: Maybe<Scalars['String']>;
   nameFi?: Maybe<Scalars['String']>;
@@ -379,7 +383,7 @@ export type LocationType = Node & {
   addressStreetFi?: Maybe<Scalars['String']>;
   addressStreetSv?: Maybe<Scalars['String']>;
   addressZip: Scalars['String'];
-  /** The ID of the object. */
+  /** The ID of the object */
   id: Scalars['ID'];
   latitude?: Maybe<Scalars['String']>;
   longitude?: Maybe<Scalars['String']>;
@@ -518,7 +522,7 @@ export type MutationUpdateUnitArgs = {
 
 /** An object with an ID */
 export type Node = {
-  /** The ID of the object. */
+  /** The ID of the object */
   id: Scalars['ID'];
 };
 
@@ -585,7 +589,7 @@ export type PurposeCreateMutationPayload = {
 
 export type PurposeType = Node & {
   __typename?: 'PurposeType';
-  /** The ID of the object. */
+  /** The ID of the object */
   id: Scalars['ID'];
   nameEn?: Maybe<Scalars['String']>;
   nameFi?: Maybe<Scalars['String']>;
@@ -632,11 +636,9 @@ export type PurposeUpdateMutationPayload = {
 
 export type Query = {
   __typename?: 'Query';
-  /** The ID of the object */
   equipment?: Maybe<EquipmentType>;
   equipmentByPk?: Maybe<EquipmentType>;
   equipmentCategories?: Maybe<EquipmentCategoryTypeConnection>;
-  /** The ID of the object */
   equipmentCategory?: Maybe<EquipmentCategoryType>;
   equipmentCategoryByPk?: Maybe<EquipmentCategoryType>;
   equipments?: Maybe<EquipmentTypeConnection>;
@@ -647,23 +649,19 @@ export type Query = {
   reservationByPk?: Maybe<ReservationType>;
   reservationCancelReasons?: Maybe<ReservationCancelReasonTypeConnection>;
   reservationPurposes?: Maybe<ReservationPurposeTypeConnection>;
-  /** The ID of the object */
   reservationUnit?: Maybe<ReservationUnitType>;
   reservationUnitByPk?: Maybe<ReservationUnitByPkType>;
   reservationUnitCancellationRules?: Maybe<ReservationUnitCancellationRuleTypeConnection>;
   reservationUnitTypes?: Maybe<ReservationUnitTypeTypeConnection>;
   reservationUnits?: Maybe<ReservationUnitTypeConnection>;
   reservations?: Maybe<ReservationTypeConnection>;
-  /** The ID of the object */
   resource?: Maybe<ResourceType>;
   resourceByPk?: Maybe<ResourceType>;
   resources?: Maybe<ResourceTypeConnection>;
-  /** The ID of the object */
   space?: Maybe<SpaceType>;
   spaceByPk?: Maybe<SpaceType>;
   spaces?: Maybe<SpaceTypeConnection>;
   termsOfUse?: Maybe<TermsOfUseTypeConnection>;
-  /** The ID of the object */
   unit?: Maybe<UnitType>;
   unitByPk?: Maybe<UnitByPkType>;
   units?: Maybe<UnitTypeConnection>;
@@ -694,6 +692,7 @@ export type QueryEquipmentCategoriesArgs = {
   nameSv?: Maybe<Scalars['String']>;
   nameSv_Icontains?: Maybe<Scalars['String']>;
   nameSv_Istartswith?: Maybe<Scalars['String']>;
+  offset?: Maybe<Scalars['Int']>;
 };
 
 
@@ -721,6 +720,7 @@ export type QueryEquipmentsArgs = {
   nameSv?: Maybe<Scalars['String']>;
   nameSv_Icontains?: Maybe<Scalars['String']>;
   nameSv_Istartswith?: Maybe<Scalars['String']>;
+  offset?: Maybe<Scalars['Int']>;
 };
 
 
@@ -732,6 +732,7 @@ export type QueryKeywordCategoriesArgs = {
   nameEn?: Maybe<Scalars['String']>;
   nameFi?: Maybe<Scalars['String']>;
   nameSv?: Maybe<Scalars['String']>;
+  offset?: Maybe<Scalars['Int']>;
 };
 
 
@@ -743,6 +744,7 @@ export type QueryKeywordGroupsArgs = {
   nameEn?: Maybe<Scalars['String']>;
   nameFi?: Maybe<Scalars['String']>;
   nameSv?: Maybe<Scalars['String']>;
+  offset?: Maybe<Scalars['Int']>;
 };
 
 
@@ -754,6 +756,7 @@ export type QueryKeywordsArgs = {
   nameEn?: Maybe<Scalars['String']>;
   nameFi?: Maybe<Scalars['String']>;
   nameSv?: Maybe<Scalars['String']>;
+  offset?: Maybe<Scalars['Int']>;
 };
 
 
@@ -765,6 +768,7 @@ export type QueryPurposesArgs = {
   nameEn?: Maybe<Scalars['String']>;
   nameFi?: Maybe<Scalars['String']>;
   nameSv?: Maybe<Scalars['String']>;
+  offset?: Maybe<Scalars['Int']>;
 };
 
 
@@ -778,6 +782,7 @@ export type QueryReservationCancelReasonsArgs = {
   before?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Int']>;
   last?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
   reason?: Maybe<Scalars['String']>;
 };
 
@@ -790,6 +795,7 @@ export type QueryReservationPurposesArgs = {
   nameEn?: Maybe<Scalars['String']>;
   nameFi?: Maybe<Scalars['String']>;
   nameSv?: Maybe<Scalars['String']>;
+  offset?: Maybe<Scalars['Int']>;
 };
 
 
@@ -809,6 +815,7 @@ export type QueryReservationUnitCancellationRulesArgs = {
   first?: Maybe<Scalars['Int']>;
   last?: Maybe<Scalars['Int']>;
   name?: Maybe<Scalars['String']>;
+  offset?: Maybe<Scalars['Int']>;
 };
 
 
@@ -820,6 +827,7 @@ export type QueryReservationUnitTypesArgs = {
   nameEn?: Maybe<Scalars['String']>;
   nameFi?: Maybe<Scalars['String']>;
   nameSv?: Maybe<Scalars['String']>;
+  offset?: Maybe<Scalars['Int']>;
 };
 
 
@@ -832,6 +840,7 @@ export type QueryReservationUnitsArgs = {
   last?: Maybe<Scalars['Int']>;
   maxPersonsGte?: Maybe<Scalars['Float']>;
   maxPersonsLte?: Maybe<Scalars['Float']>;
+  offset?: Maybe<Scalars['Int']>;
   orderBy?: Maybe<Scalars['String']>;
   purposes?: Maybe<Array<Maybe<Scalars['ID']>>>;
   reservationUnitType?: Maybe<Array<Maybe<Scalars['ID']>>>;
@@ -847,6 +856,7 @@ export type QueryReservationsArgs = {
   end?: Maybe<Scalars['DateTime']>;
   first?: Maybe<Scalars['Int']>;
   last?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
 };
 
 
@@ -874,6 +884,7 @@ export type QueryResourcesArgs = {
   nameSv?: Maybe<Scalars['String']>;
   nameSv_Icontains?: Maybe<Scalars['String']>;
   nameSv_Istartswith?: Maybe<Scalars['String']>;
+  offset?: Maybe<Scalars['Int']>;
 };
 
 
@@ -901,6 +912,7 @@ export type QuerySpacesArgs = {
   nameSv?: Maybe<Scalars['String']>;
   nameSv_Icontains?: Maybe<Scalars['String']>;
   nameSv_Istartswith?: Maybe<Scalars['String']>;
+  offset?: Maybe<Scalars['Int']>;
 };
 
 
@@ -909,6 +921,7 @@ export type QueryTermsOfUseArgs = {
   before?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Int']>;
   last?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
   termsType?: Maybe<Scalars['String']>;
 };
 
@@ -937,18 +950,19 @@ export type QueryUnitsArgs = {
   nameSv?: Maybe<Scalars['String']>;
   nameSv_Icontains?: Maybe<Scalars['String']>;
   nameSv_Istartswith?: Maybe<Scalars['String']>;
+  offset?: Maybe<Scalars['Int']>;
 };
 
 export type RealEstateType = Node & {
   __typename?: 'RealEstateType';
   district?: Maybe<DistrictType>;
-  /** The ID of the object. */
+  /** The ID of the object */
   id: Scalars['ID'];
   nameEn?: Maybe<Scalars['String']>;
   nameFi?: Maybe<Scalars['String']>;
   nameSv?: Maybe<Scalars['String']>;
   pk?: Maybe<Scalars['Int']>;
-  surfaceArea?: Maybe<Scalars['Float']>;
+  surfaceArea?: Maybe<Scalars['Decimal']>;
 };
 
 export type RecurringReservationType = {
@@ -963,7 +977,7 @@ export type RecurringReservationType = {
 
 export type ReservationCancelReasonType = Node & {
   __typename?: 'ReservationCancelReasonType';
-  /** The ID of the object. */
+  /** The ID of the object */
   id: Scalars['ID'];
   pk?: Maybe<Scalars['Int']>;
   reason: Scalars['String'];
@@ -1077,19 +1091,9 @@ export type ReservationCreateMutationPayload = {
   state?: Maybe<Scalars['String']>;
 };
 
-/** An enumeration. */
-export enum ReservationPriority {
-  /** Low */
-  A_100 = 'A_100',
-  /** Medium */
-  A_200 = 'A_200',
-  /** High */
-  A_300 = 'A_300'
-}
-
 export type ReservationPurposeType = Node & {
   __typename?: 'ReservationPurposeType';
-  /** The ID of the object. */
+  /** The ID of the object */
   id: Scalars['ID'];
   nameEn?: Maybe<Scalars['String']>;
   nameFi?: Maybe<Scalars['String']>;
@@ -1114,18 +1118,6 @@ export type ReservationPurposeTypeEdge = {
   node?: Maybe<ReservationPurposeType>;
 };
 
-/** An enumeration. */
-export enum ReservationState {
-  /** cancelled */
-  Cancelled = 'CANCELLED',
-  /** confirmed */
-  Confirmed = 'CONFIRMED',
-  /** created */
-  Created = 'CREATED',
-  /** denied */
-  Denied = 'DENIED'
-}
-
 export type ReservationType = Node & {
   __typename?: 'ReservationType';
   begin: Scalars['DateTime'];
@@ -1134,19 +1126,19 @@ export type ReservationType = Node & {
   calendarUrl?: Maybe<Scalars['String']>;
   description?: Maybe<Scalars['String']>;
   end: Scalars['DateTime'];
-  /** The ID of the object. */
+  /** The ID of the object */
   id: Scalars['ID'];
   name?: Maybe<Scalars['String']>;
   numPersons?: Maybe<Scalars['Int']>;
   pk?: Maybe<Scalars['Int']>;
-  priority: ReservationPriority;
+  priority: ReservationsReservationPriorityChoices;
   purpose?: Maybe<ReservationPurposeType>;
   recurringReservation?: Maybe<RecurringReservationType>;
   reservationUnits?: Maybe<Array<Maybe<ReservationUnitType>>>;
   reserveeFirstName?: Maybe<Scalars['String']>;
   reserveeLastName?: Maybe<Scalars['String']>;
   reserveePhone?: Maybe<Scalars['String']>;
-  state: ReservationState;
+  state: ReservationsReservationStateChoices;
   user?: Maybe<Scalars['String']>;
 };
 
@@ -1169,6 +1161,9 @@ export type ReservationTypeEdge = {
 
 export type ReservationUnitByPkType = Node & {
   __typename?: 'ReservationUnitByPkType';
+  additionalInstructionsEn?: Maybe<Scalars['String']>;
+  additionalInstructionsFi?: Maybe<Scalars['String']>;
+  additionalInstructionsSv?: Maybe<Scalars['String']>;
   applicationRounds?: Maybe<Array<Maybe<ApplicationRoundType>>>;
   cancellationRule?: Maybe<ReservationUnitCancellationRuleType>;
   cancellationTerms?: Maybe<TermsOfUseType>;
@@ -1180,9 +1175,10 @@ export type ReservationUnitByPkType = Node & {
   descriptionSv?: Maybe<Scalars['String']>;
   equipment?: Maybe<Array<Maybe<EquipmentType>>>;
   haukiUrl?: Maybe<ReservationUnitHaukiUrlType>;
-  /** The ID of the object. */
+  /** The ID of the object */
   id: Scalars['ID'];
   images?: Maybe<Array<Maybe<ReservationUnitImageType>>>;
+  isDraft: Scalars['Boolean'];
   keywordGroups?: Maybe<Array<Maybe<KeywordGroupType>>>;
   location?: Maybe<LocationType>;
   maxPersons?: Maybe<Scalars['Int']>;
@@ -1252,7 +1248,7 @@ export type ReservationUnitCancellationRuleType = Node & {
   __typename?: 'ReservationUnitCancellationRuleType';
   /** Seconds before reservations related to this cancellation rule can be cancelled without handling. */
   canBeCancelledTimeBefore?: Maybe<Scalars['Float']>;
-  /** The ID of the object. */
+  /** The ID of the object */
   id: Scalars['ID'];
   nameEn?: Maybe<Scalars['String']>;
   nameFi?: Maybe<Scalars['String']>;
@@ -1279,6 +1275,9 @@ export type ReservationUnitCancellationRuleTypeEdge = {
 };
 
 export type ReservationUnitCreateMutationInput = {
+  additionalInstructionsEn?: Maybe<Scalars['String']>;
+  additionalInstructionsFi?: Maybe<Scalars['String']>;
+  additionalInstructionsSv?: Maybe<Scalars['String']>;
   bufferTimeBetweenReservations?: Maybe<Scalars['String']>;
   cancellationRulePk?: Maybe<Scalars['Int']>;
   cancellationTermsPk?: Maybe<Scalars['String']>;
@@ -1315,6 +1314,9 @@ export type ReservationUnitCreateMutationInput = {
 
 export type ReservationUnitCreateMutationPayload = {
   __typename?: 'ReservationUnitCreateMutationPayload';
+  additionalInstructionsEn?: Maybe<Scalars['String']>;
+  additionalInstructionsFi?: Maybe<Scalars['String']>;
+  additionalInstructionsSv?: Maybe<Scalars['String']>;
   bufferTimeBetweenReservations?: Maybe<Scalars['String']>;
   building?: Maybe<Scalars['String']>;
   cancellationRulePk?: Maybe<Scalars['Int']>;
@@ -1365,21 +1367,9 @@ export type ReservationUnitHaukiUrlType = {
   url?: Maybe<Scalars['String']>;
 };
 
-/** An enumeration. */
-export enum ReservationUnitImageImageType {
-  /** Ground plan */
-  GroundPlan = 'GROUND_PLAN',
-  /** Main image */
-  Main = 'MAIN',
-  /** Map */
-  Map = 'MAP',
-  /** Other */
-  Other = 'OTHER'
-}
-
 export type ReservationUnitImageType = {
   __typename?: 'ReservationUnitImageType';
-  imageType: ReservationUnitImageImageType;
+  imageType: ReservationUnitsReservationUnitImageImageTypeChoices;
   imageUrl?: Maybe<Scalars['String']>;
   mediumUrl?: Maybe<Scalars['String']>;
   smallUrl?: Maybe<Scalars['String']>;
@@ -1387,6 +1377,9 @@ export type ReservationUnitImageType = {
 
 export type ReservationUnitType = Node & {
   __typename?: 'ReservationUnitType';
+  additionalInstructionsEn?: Maybe<Scalars['String']>;
+  additionalInstructionsFi?: Maybe<Scalars['String']>;
+  additionalInstructionsSv?: Maybe<Scalars['String']>;
   applicationRounds?: Maybe<Array<Maybe<ApplicationRoundType>>>;
   bufferTimeBetweenReservations?: Maybe<Scalars['Float']>;
   cancellationRule?: Maybe<ReservationUnitCancellationRuleType>;
@@ -1398,7 +1391,7 @@ export type ReservationUnitType = Node & {
   descriptionFi?: Maybe<Scalars['String']>;
   descriptionSv?: Maybe<Scalars['String']>;
   equipment?: Maybe<Array<Maybe<EquipmentType>>>;
-  /** The ID of the object. */
+  /** The ID of the object */
   id: Scalars['ID'];
   images?: Maybe<Array<Maybe<ReservationUnitImageType>>>;
   isDraft: Scalars['Boolean'];
@@ -1459,7 +1452,7 @@ export type ReservationUnitTypeEdge = {
 
 export type ReservationUnitTypeType = Node & {
   __typename?: 'ReservationUnitTypeType';
-  /** The ID of the object. */
+  /** The ID of the object */
   id: Scalars['ID'];
   nameEn?: Maybe<Scalars['String']>;
   nameFi?: Maybe<Scalars['String']>;
@@ -1485,6 +1478,9 @@ export type ReservationUnitTypeTypeEdge = {
 };
 
 export type ReservationUnitUpdateMutationInput = {
+  additionalInstructionsEn?: Maybe<Scalars['String']>;
+  additionalInstructionsFi?: Maybe<Scalars['String']>;
+  additionalInstructionsSv?: Maybe<Scalars['String']>;
   bufferTimeBetweenReservations?: Maybe<Scalars['String']>;
   cancellationRulePk?: Maybe<Scalars['Int']>;
   cancellationTermsPk?: Maybe<Scalars['String']>;
@@ -1522,6 +1518,9 @@ export type ReservationUnitUpdateMutationInput = {
 
 export type ReservationUnitUpdateMutationPayload = {
   __typename?: 'ReservationUnitUpdateMutationPayload';
+  additionalInstructionsEn?: Maybe<Scalars['String']>;
+  additionalInstructionsFi?: Maybe<Scalars['String']>;
+  additionalInstructionsSv?: Maybe<Scalars['String']>;
   bufferTimeBetweenReservations?: Maybe<Scalars['String']>;
   building?: Maybe<Scalars['String']>;
   cancellationRulePk?: Maybe<Scalars['Int']>;
@@ -1567,6 +1566,18 @@ export type ReservationUnitUpdateMutationPayload = {
   uuid?: Maybe<Scalars['String']>;
 };
 
+/** An enumeration. */
+export enum ReservationUnitsReservationUnitImageImageTypeChoices {
+  /** Ground plan */
+  GroundPlan = 'GROUND_PLAN',
+  /** Main image */
+  Main = 'MAIN',
+  /** Map */
+  Map = 'MAP',
+  /** Other */
+  Other = 'OTHER'
+}
+
 export type ReservationUpdateMutationInput = {
   begin?: Maybe<Scalars['DateTime']>;
   bufferTimeAfter?: Maybe<Scalars['String']>;
@@ -1608,6 +1619,28 @@ export type ReservationUpdateMutationPayload = {
   /** String value for ReservationType's ReservationState enum. */
   state?: Maybe<Scalars['String']>;
 };
+
+/** An enumeration. */
+export enum ReservationsReservationPriorityChoices {
+  /** Low */
+  A_100 = 'A_100',
+  /** Medium */
+  A_200 = 'A_200',
+  /** High */
+  A_300 = 'A_300'
+}
+
+/** An enumeration. */
+export enum ReservationsReservationStateChoices {
+  /** cancelled */
+  Cancelled = 'CANCELLED',
+  /** confirmed */
+  Confirmed = 'CONFIRMED',
+  /** created */
+  Created = 'CREATED',
+  /** denied */
+  Denied = 'DENIED'
+}
 
 export type ResourceCreateMutationInput = {
   /** Begin date and time of the reservation. */
@@ -1662,14 +1695,6 @@ export type ResourceDeleteMutationPayload = {
   errors?: Maybe<Scalars['String']>;
 };
 
-/** An enumeration. */
-export enum ResourceLocationType {
-  /** Fixed */
-  Fixed = 'FIXED',
-  /** Movable */
-  Movable = 'MOVABLE'
-}
-
 export type ResourceType = Node & {
   __typename?: 'ResourceType';
   bufferTimeAfter?: Maybe<Scalars['Float']>;
@@ -1678,10 +1703,10 @@ export type ResourceType = Node & {
   descriptionEn?: Maybe<Scalars['String']>;
   descriptionFi?: Maybe<Scalars['String']>;
   descriptionSv?: Maybe<Scalars['String']>;
-  /** The ID of the object. */
+  /** The ID of the object */
   id: Scalars['ID'];
   isDraft: Scalars['Boolean'];
-  locationType: ResourceLocationType;
+  locationType: ResourcesResourceLocationTypeChoices;
   nameEn?: Maybe<Scalars['String']>;
   nameFi?: Maybe<Scalars['String']>;
   nameSv?: Maybe<Scalars['String']>;
@@ -1749,7 +1774,28 @@ export type ResourceUpdateMutationPayload = {
 };
 
 /** An enumeration. */
-export enum ServiceServiceType {
+export enum ResourcesResourceLocationTypeChoices {
+  /** Fixed */
+  Fixed = 'FIXED',
+  /** Movable */
+  Movable = 'MOVABLE'
+}
+
+export type ServiceType = Node & {
+  __typename?: 'ServiceType';
+  bufferTimeAfter?: Maybe<Scalars['String']>;
+  bufferTimeBefore?: Maybe<Scalars['String']>;
+  /** The ID of the object */
+  id: Scalars['ID'];
+  nameEn?: Maybe<Scalars['String']>;
+  nameFi?: Maybe<Scalars['String']>;
+  nameSv?: Maybe<Scalars['String']>;
+  pk?: Maybe<Scalars['Int']>;
+  serviceType: ServicesServiceServiceTypeChoices;
+};
+
+/** An enumeration. */
+export enum ServicesServiceServiceTypeChoices {
   /** Catering */
   Catering = 'CATERING',
   /** Configuration */
@@ -1757,19 +1803,6 @@ export enum ServiceServiceType {
   /** Introduction */
   Introduction = 'INTRODUCTION'
 }
-
-export type ServiceType = Node & {
-  __typename?: 'ServiceType';
-  bufferTimeAfter?: Maybe<Scalars['String']>;
-  bufferTimeBefore?: Maybe<Scalars['String']>;
-  /** The ID of the object. */
-  id: Scalars['ID'];
-  nameEn?: Maybe<Scalars['String']>;
-  nameFi?: Maybe<Scalars['String']>;
-  nameSv?: Maybe<Scalars['String']>;
-  pk?: Maybe<Scalars['Int']>;
-  serviceType: ServiceServiceType;
-};
 
 export type SpaceCreateMutationInput = {
   clientMutationId?: Maybe<Scalars['String']>;
@@ -1825,7 +1858,7 @@ export type SpaceType = Node & {
   building?: Maybe<BuildingType>;
   children?: Maybe<Array<Maybe<SpaceType>>>;
   code: Scalars['String'];
-  /** The ID of the object. */
+  /** The ID of the object */
   id: Scalars['ID'];
   maxPersons?: Maybe<Scalars['Int']>;
   nameEn?: Maybe<Scalars['String']>;
@@ -1834,7 +1867,7 @@ export type SpaceType = Node & {
   parent?: Maybe<SpaceType>;
   pk?: Maybe<Scalars['Int']>;
   resources?: Maybe<Array<Maybe<ResourceType>>>;
-  surfaceArea?: Maybe<Scalars['Float']>;
+  surfaceArea?: Maybe<Scalars['Decimal']>;
   unit?: Maybe<UnitByPkType>;
 };
 
@@ -1894,7 +1927,7 @@ export type SpaceUpdateMutationPayload = {
 };
 
 /** An enumeration. */
-export enum TermsOfUseTermsType {
+export enum TermsOfUseTermsOfUseTermsTypeChoices {
   /** Cancellation terms */
   CancellationTerms = 'CANCELLATION_TERMS',
   /** Generic terms */
@@ -1909,13 +1942,13 @@ export enum TermsOfUseTermsType {
 
 export type TermsOfUseType = Node & {
   __typename?: 'TermsOfUseType';
-  /** The ID of the object. */
+  /** The ID of the object */
   id: Scalars['ID'];
   nameEn?: Maybe<Scalars['String']>;
   nameFi?: Maybe<Scalars['String']>;
   nameSv?: Maybe<Scalars['String']>;
   pk?: Maybe<Scalars['String']>;
-  termsType: TermsOfUseTermsType;
+  termsType: TermsOfUseTermsOfUseTermsTypeChoices;
   textEn?: Maybe<Scalars['String']>;
   textFi?: Maybe<Scalars['String']>;
   textSv?: Maybe<Scalars['String']>;
@@ -1959,7 +1992,7 @@ export type UnitByPkType = Node & {
   descriptionFi?: Maybe<Scalars['String']>;
   descriptionSv?: Maybe<Scalars['String']>;
   email: Scalars['String'];
-  /** The ID of the object. */
+  /** The ID of the object */
   id: Scalars['ID'];
   location?: Maybe<LocationType>;
   nameEn?: Maybe<Scalars['String']>;
@@ -1991,7 +2024,7 @@ export type UnitType = Node & {
   descriptionFi?: Maybe<Scalars['String']>;
   descriptionSv?: Maybe<Scalars['String']>;
   email: Scalars['String'];
-  /** The ID of the object. */
+  /** The ID of the object */
   id: Scalars['ID'];
   location?: Maybe<LocationType>;
   nameEn?: Maybe<Scalars['String']>;

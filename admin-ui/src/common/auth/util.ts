@@ -23,8 +23,11 @@ export const getAccessToken = (): string | undefined => {
 };
 
 export const updateApiAccessToken = async (
-  accessToken: string
+  accessToken: string | undefined
 ): Promise<string> => {
+  if (!accessToken) {
+    throw new Error("Api access token not available. Cannot update");
+  }
   if (!apiScope) {
     throw new Error("Application configuration error, illegal api scope.");
   }
@@ -44,4 +47,18 @@ export const updateApiAccessToken = async (
   setApiAccessToken(apiAccessToken);
 
   return apiAccessToken;
+};
+
+// XXX, TODO, some apis (for example reservationUnitCancellationRules)
+// require api authentication but don't notify the caller about missing
+// credentials. We need to hook this up properly but it will be done in
+// separate task.
+export const assertApiAccessTokenIsAvailable = (): Promise<boolean> => {
+  if (getApiAccessToken()) {
+    return Promise.resolve(false);
+  }
+
+  return updateApiAccessToken(getAccessToken())
+    .then(() => true)
+    .finally(() => true);
 };

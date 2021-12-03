@@ -7,7 +7,9 @@ import {
   Link,
   Notification,
   NumberInput,
+  RadioButton,
   Select,
+  SelectionGroup,
   TextInput,
   TimeInput,
 } from "hds-react";
@@ -31,7 +33,7 @@ import {
   Mutation,
   ErrorType,
   Maybe,
-  TermsOfUseTermsType,
+  TermsOfUseTermsOfUseTermsTypeChoices,
 } from "../../common/gql-types";
 import {
   CREATE_RESERVATION_UNIT,
@@ -49,6 +51,8 @@ import SubPageHead from "../Unit/SubPageHead";
 import withMainMenu from "../withMainMenu";
 import RichTextInput from "../RichTextInput";
 import { useNotification } from "../../context/NotificationContext";
+import ActivationGroup from "./ActivationGroup";
+import { assertApiAccessTokenIsAvailable } from "../../common/auth/util";
 
 interface IProps {
   reservationUnitPk?: string;
@@ -103,6 +107,7 @@ type State = {
   paymentTermsOptions: OptionType[];
   cancellationTermsOptions: OptionType[];
   serviceSpecificTermsOptions: OptionType[];
+  cancellationRuleOptions: OptionType[];
   unit?: UnitByPkType;
 };
 
@@ -116,7 +121,7 @@ const makeTermsOptions = (
     type: "parametersLoaded";
     parameters: Query;
   },
-  termsType: TermsOfUseTermsType
+  termsType: TermsOfUseTermsOfUseTermsTypeChoices
 ): OptionType[] => {
   return (action.parameters.termsOfUse?.edges || [])
     .filter((tou) => {
@@ -146,6 +151,7 @@ const getInitialState = (reservationUnitPk: number): State => ({
   paymentTermsOptions: [],
   cancellationTermsOptions: [],
   serviceSpecificTermsOptions: [],
+  cancellationRuleOptions: [],
 });
 
 const withLoadingStatus = (state: State): State => {
@@ -219,6 +225,7 @@ const reducer = (state: State, action: Action): State => {
           paymentTermsPk: get(reservationUnit, "paymentTerms.pk"),
           reservationUnitTypePk: get(reservationUnit, "reservationUnitType.pk"),
           cancellationTermsPk: get(reservationUnit, "cancellationTerms.pk"),
+          cancellationRulePk: get(reservationUnit, "cancellationRule.pk"),
           serviceSpecificTermsPk: get(
             reservationUnit,
             "serviceSpecificTerms.pk"
@@ -290,15 +297,23 @@ const reducer = (state: State, action: Action): State => {
         ),
         paymentTermsOptions: makeTermsOptions(
           action,
-          TermsOfUseTermsType.PaymentTerms
+          TermsOfUseTermsOfUseTermsTypeChoices.PaymentTerms
         ),
         serviceSpecificTermsOptions: makeTermsOptions(
           action,
-          TermsOfUseTermsType.ServiceTerms
+          TermsOfUseTermsOfUseTermsTypeChoices.ServiceTerms
         ),
         cancellationTermsOptions: makeTermsOptions(
           action,
-          TermsOfUseTermsType.CancellationTerms
+          TermsOfUseTermsOfUseTermsTypeChoices.CancellationTerms
+        ),
+        cancellationRuleOptions: (
+          action.parameters.reservationUnitCancellationRules?.edges || []
+        ).map((e) =>
+          makeOption({
+            pk: get(e, "node.pk", -1),
+            nameFi: get(e, "node.nameFi", "no-name"),
+          })
         ),
       });
     }
@@ -460,6 +475,13 @@ const getDuration = (duration: Maybe<string> | undefined): string => {
   return duration;
 };
 
+const hasTranslations = (prefixes: string[], state: State): boolean =>
+  prefixes.every((p) =>
+    ["fi", "sv", "en"].every((l) =>
+      get(state, `reservationUnitEdit.${p}${upperFirst(l)}`)
+    )
+  );
+
 const ReservationUnitEditor = (): JSX.Element | null => {
   const { reservationUnitPk, unitPk } = useParams<IProps>();
   const { t } = useTranslation();
@@ -506,8 +528,8 @@ const ReservationUnitEditor = (): JSX.Element | null => {
         spacePks: state.reservationUnitEdit?.spacePks?.map(String),
         resourcePks: state.reservationUnitEdit?.resourcePks?.map(String),
         equipmentPks: state.reservationUnitEdit?.equipmentPks?.map(String),
-        purposePks: state.reservationUnitEdit?.purposePks?.map(String),
         isDraft: !publish,
+        cancellationRulePk: state.reservationUnitEdit?.cancellationRulePk,
       },
       [
         "isDraft",
@@ -520,6 +542,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
         "descriptionSv",
         "descriptionEn",
         "spacePks",
+        "purposePks",
         "resourcePks",
         "equipmentPks",
         "surfaceArea",
@@ -535,6 +558,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
         "paymentTermsPk",
         "cancellationTermsPk",
         "serviceSpecificTermsPk",
+        "cancellationRulePk",
       ]
     );
 
@@ -580,6 +604,15 @@ const ReservationUnitEditor = (): JSX.Element | null => {
     }
   };
 
+  useEffect(() => {
+    assertApiAccessTokenIsAvailable().then((keyUpdated) => {
+      if (keyUpdated) {
+        history.go(0);
+      }
+    });
+    // eslint-disable-next-line
+  }, []);
+
   useQuery<Query, QueryReservationUnitByPkArgs>(RESERVATIONUNIT_QUERY, {
     variables: { pk: Number(reservationUnitPk) },
     skip: !reservationUnitPk,
@@ -612,8 +645,19 @@ const ReservationUnitEditor = (): JSX.Element | null => {
   useQuery<Query>(RESERVATION_UNIT_EDITOR_PARAMETERS, {
     onCompleted: (query) => {
       dispatch({ type: "parametersLoaded", parameters: query });
-      if (!(query.equipments && query.purposes && query.termsOfUse)) {
-        onDataError(t("ReservationUnitEditor.errorParamsNotAvailable"));
+      if (
+        !(
+          query.equipments &&
+          query.purposes &&
+          query.termsOfUse &&
+          query.reservationUnitCancellationRules?.edges.length
+        )
+      ) {
+        setNotification({
+          type: "error",
+          title: t("ReservationUnitEditor.errorParamsNotAvailable"),
+          message: t("ReservationUnitEditor.errorParamsNotAvailable"),
+        });
       }
     },
     onError: (e) => {
@@ -655,13 +699,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
     );
   }
 
-  const isReadyToPublish =
-    state.reservationUnitEdit.descriptionFi &&
-    state.reservationUnitEdit.descriptionSv &&
-    state.reservationUnitEdit.descriptionEn &&
-    state.reservationUnitEdit.nameFi &&
-    state.reservationUnitEdit.nameSv &&
-    state.reservationUnitEdit.nameEn;
+  const isReadyToPublish = hasTranslations(["description", "name"], state);
 
   if (state.error) {
     return (
@@ -962,6 +1000,37 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                   }
                 />
               ))}
+            </Accordion>
+
+            <Accordion heading={t("ReservationUnitEditor.settings")}>
+              <ActivationGroup
+                id="cancellationIsPossible"
+                label={t("ReservationUnitEditor.cancellationIsPossible")}
+                initiallyOpen={Boolean(
+                  state.reservationUnitEdit.cancellationRulePk
+                )}
+                onClose={() => setValue({ cancellationRulePk: null })}
+              >
+                <SelectionGroup
+                  required
+                  label={t("ReservationUnitEditor.cancellationGroupLabel")}
+                >
+                  {state.cancellationRuleOptions.map((o) => (
+                    <RadioButton
+                      key={o.value}
+                      id={`cr-${o.value}`}
+                      value={o.value as string}
+                      label={o.label}
+                      onChange={(e) =>
+                        setValue({ cancellationRulePk: Number(e.target.value) })
+                      }
+                      checked={
+                        state.reservationUnitEdit.cancellationRulePk === o.value
+                      }
+                    />
+                  ))}
+                </SelectionGroup>
+              </ActivationGroup>
             </Accordion>
 
             <Accordion heading={t("ReservationUnitEditor.termsInstructions")}>

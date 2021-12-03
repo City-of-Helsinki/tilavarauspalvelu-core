@@ -308,6 +308,15 @@ export const RESERVATION_UNIT_EDITOR_PARAMETERS = gql`
         }
       }
     }
+
+    reservationUnitCancellationRules {
+      edges {
+        node {
+          nameFi
+          pk
+        }
+      }
+    }
   }
 `;
 
@@ -317,6 +326,9 @@ export const RESERVATIONUNIT_QUERY = gql`
     reservationUnitByPk(pk: $pk) {
       haukiUrl {
         url
+      }
+      cancellationRule {
+        pk
       }
       nameFi
       nameSv

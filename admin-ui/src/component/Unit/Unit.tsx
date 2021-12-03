@@ -239,7 +239,9 @@ const Unit = (): JSX.Element | null => {
             size="large"
           >
             {t("Unit.noSpacesResources")}{" "}
-            <BasicLink to="/create">{t("Unit.createSpaces")}</BasicLink>
+            <BasicLink to={`/unit/${unit.pk}/spacesResources`}>
+              {t("Unit.createSpaces")}
+            </BasicLink>
           </StyledNotification>
         ) : null}
         {!hasOpeningHours ? (

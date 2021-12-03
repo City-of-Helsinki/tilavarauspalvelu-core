@@ -14,14 +14,8 @@ import {
 } from "./auth/util";
 import { apiBaseUrl } from "./const";
 
-const getNewToken = (): Promise<string> => {
-  const accessToken = getAccessToken();
-  if (accessToken) {
-    return updateApiAccessToken(accessToken);
-  }
-
-  return Promise.reject(new Error("no access token available!"));
-};
+const getNewToken = (): Promise<string> =>
+  updateApiAccessToken(getAccessToken());
 
 const httpLink = new HttpLink({
   uri: `${apiBaseUrl}/graphql/`,
