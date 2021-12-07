@@ -14,6 +14,7 @@ First check out the latest version of the backend/api project from https://githu
 ```
 docker-compose up --build
 ```
+
 Make sure /etc/hosts point domain local-tilavaraus.hel.fi to 127.0.0.1. This is important because tunnistamo currently does not provide SameSite information for the cookies it uses. Some browsers (like Chrome) default the SameSite to be Lax. Because of this tunnistamo and the site it is authenticating for need to share same-site context. Without fulfilling this requirement the silent renew might not work properly due to browser blocking required cookies.
 
 ```
@@ -21,10 +22,10 @@ Make sure /etc/hosts point domain local-tilavaraus.hel.fi to 127.0.0.1. This is 
 ```
 
 Create a self-signed certificate for SSL connection on developpment server by running the following command in the common directory
+
 ```
 yarn generate-certificate
 ```
-
 
 ### Start UI
 
@@ -61,22 +62,24 @@ docker exec -ti tilavarauspalvelu-core_dev_1 python manage.py createsuperuser
 
 ### Graphql workflow
 
-When server has new api changes -> update schema & generate new types by running: ```yarn update-schema generate-gql-types```
+When server has new api changes -> update schema & generate new types by running: `yarn update-schema generate-gql-types`
 
-* Protip for VSCode users: install https://marketplace.visualstudio.com/items?itemName=GraphQL.vscode-graphql to get autocomplete suggestions and query validation when writing queries.
+- Protip for VSCode users: install https://marketplace.visualstudio.com/items?itemName=GraphQL.vscode-graphql to get autocomplete suggestions and query validation when writing queries.
+
 ## Configurable environment variables
 
 Use `.env.local` for development.
 
-| Name                           | Description                                                   |
-| -------------------------------| ------------------------------------------------------------- |
-| REACT_APP_TILAVARAUS_API_URL   | tilavaraus-core base url                                      |
-| REACT_APP_OIDC_CLIENT_ID       | Oidc client id                                                |
-| REACT_APP_OIDC_URL             | https://api.hel.fi/sso                                        |
-| REACT_APP_OIDC_SCOPE           | openid profile email https://api.hel.fi/auth/tilavarausapidev |
-| REACT_APP_TILAVARAUS_API_SCOPE | https://api.hel.fi/auth/tilavarausapidev                      |
-| REACT_APP_DISABLE_AUTH         | Flag to disable authentication                                |
-|
+| Name                                          | Description                                                      |
+| --------------------------------------------- | ---------------------------------------------------------------- |
+| REACT_APP_TILAVARAUS_API_URL                  | tilavaraus-core base url                                         |
+| REACT_APP_OIDC_CLIENT_ID                      | Oidc client id                                                   |
+| REACT_APP_OIDC_URL                            | https://api.hel.fi/sso                                           |
+| REACT_APP_OIDC_SCOPE                          | openid profile email https://api.hel.fi/auth/tilavarausapidev    |
+| REACT_APP_TILAVARAUS_API_SCOPE                | https://api.hel.fi/auth/tilavarausapidev                         |
+| REACT_APP_DISABLE_AUTH                        | Flag to disable authentication                                   |
+| REACT_APP_RESERVATION_UNIT_PREVIEW_URL_PREFIX | https://tvp-ui-dev.agw.arodevtest.hel.fi/reservation-unit/single |
+
 ## Available Scripts
 
 In the project directory, you can run:
@@ -100,7 +103,7 @@ Runs end to end tests againt local setup. Both ui and api must be running before
 
 ### `yarn lint`
 
-Runs eslint against *.ts and *.tsx files in `./src`.
+Runs eslint against _.ts and _.tsx files in `./src`.
 
 ### `yarn lint:css`
 

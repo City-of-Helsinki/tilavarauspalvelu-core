@@ -19,7 +19,7 @@ import React, { useEffect, useReducer } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams, useHistory } from "react-router-dom";
 import styled from "styled-components";
-import { languages } from "../../common/const";
+import { languages, previewUrlPrefix } from "../../common/const";
 import {
   Query,
   QueryReservationUnitByPkArgs,
@@ -422,6 +422,29 @@ const Buttons = styled.div`
 
 const SaveButton = styled(Button)`
   margin-left: auto;
+`;
+
+const Preview = styled.a<{ $disabled: boolean }>`
+  margin-left: auto;
+  padding: var(--spacing-m);
+  color: var(--color-white);
+  background-color: var(--color-bus);
+  text-decoration: none;
+  &:hover {
+    background-color: var(--color-bus-dark);
+  }
+  ${({ $disabled }) =>
+    $disabled
+      ? `
+    cursor: not-allowed;
+    background-color: var(--color-black-20);
+    &:hover {
+      background-color: var(--color-black-20);;
+
+  `
+      : `
+    cursor: pointer;
+  `}
 `;
 
 const TextInputWithPadding = styled(TextInput)`
@@ -1125,6 +1148,20 @@ const ReservationUnitEditor = (): JSX.Element | null => {
               >
                 {t("ReservationUnitEditor.saveAndPublish")}
               </SaveButton>
+              <Preview
+                target="_blank"
+                rel="noopener noreferrer"
+                $disabled={state.hasChanges}
+                href={`${previewUrlPrefix}/${state.reservationUnit?.pk}?ru=${state.reservationUnit?.uuid}`}
+                onClick={(e) => state.hasChanges && e.preventDefault()}
+                title={t(
+                  state.hasChanges
+                    ? "ReservationUnitEditor.noPreviewUnsavedChangesTooltip"
+                    : "ReservationUnitEditor.previewTooltip"
+                )}
+              >
+                {t("ReservationUnitEditor.preview")}
+              </Preview>
             </Buttons>
           </Editor>
         </EditorContainer>

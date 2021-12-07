@@ -907,6 +907,7 @@ const translations: ITranslations = {
     openingTimesExternalLink: ["Aukioloajat HAUKI järjestelmässä"],
     cancel: ["Peruuta"],
     save: ["Tallenna tiedot"],
+    preview: ["Esikatsele"],
     saved: ["Tiedot tallennettu."],
     saveAsDraft: ["Tallenna luonnoksena"],
     reservationUnitUpdatedNotification: ["Varausyksikön tiedot tallennettu."],
@@ -915,6 +916,8 @@ const translations: ITranslations = {
     settings: ["Varausasetukset"],
     cancellationIsPossible: ["Asiakas voi peruuttaa varauksen"],
     cancellationGroupLabel: ["Peruutuksen tiedot"],
+    noPreviewUnsavedChangesTooltip: ["Tallenna ensin muutokset"],
+    previewTooltip: ["Varausyksikön esikatselu"],
   },
   ResourceModal: {
     modalTitle: ["Luo uusi resurssi tilalle"],
