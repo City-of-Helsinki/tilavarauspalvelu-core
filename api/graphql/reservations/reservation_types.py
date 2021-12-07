@@ -151,6 +151,7 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
             "description",
             "purpose",
             "purpose_pk",
+            "price",
         ]
         filter_fields = {
             "state": ["exact"],

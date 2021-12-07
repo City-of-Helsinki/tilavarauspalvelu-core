@@ -54,6 +54,7 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
             "reservation_unit_pks",
             "purpose_pk",
             "confirmed_at",
+            "price",
         ]
 
     def __init__(self, *args, **kwargs):
@@ -62,6 +63,7 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
         self.fields["reservation_unit_pks"].write_only = True
         self.fields["purpose_pk"].required = False
         self.fields["confirmed_at"].read_only = True
+        self.fields["price"].read_only = True
 
     def validate(self, data):
         begin = data.get("begin", getattr(self.instance, "begin", None))

@@ -351,11 +351,15 @@ snapshots['ReservationUnitQueryTestCase::test_getting_reservation_units 1'] = {
                         'descriptionFi': '',
                         'equipment': [
                         ],
+                        'highestPrice': '20.00',
                         'images': [
                         ],
                         'location': None,
+                        'lowestPrice': '0.00',
                         'maxPersons': 110,
                         'nameFi': 'test name fi',
+                        'price': '10.00',
+                        'priceUnit': 'PER_HOUR',
                         'purposes': [
                         ],
                         'requireIntroduction': False,
