@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 
 from snapshottest import Snapshot
 
+
 snapshots = Snapshot()
 
 snapshots['ReservationUnitQueryTestCase::test_filtering_by_active_application_rounds 1'] = {
@@ -306,11 +307,11 @@ snapshots['ReservationUnitQueryTestCase::test_filtering_by_unit 1'] = {
     }
 }
 
-snapshots['ReservationUnitQueryTestCase::test_getting_hauki_url 1'] = {
+snapshots['ReservationUnitQueryTestCase::test_getting_hauki_url_is_none_when_regular_user 1'] = {
     'data': {
         'reservationUnitByPk': {
             'haukiUrl': {
-                'url': 'https://test.com/resource/origin:3774af34-9916-40f2-acc7-68db5a627710/?hsa_source=origin&hsa_username=AnonymousUser&hsa_organization=ORGANISATION&hsa_created_at=2021-05-03 00:00:00+00:00&hsa_valid_until=2021-05-03 00:30:00+00:00&hsa_resource=origin:3774af34-9916-40f2-acc7-68db5a627710&hsa_signature=8df8cd01df388f8f1aad70e82035eaae3a27d33c2f3e3583bb7f9bb7aca966f1'
+                'url': None
             },
             'nameFi': 'test name fi'
         }
@@ -337,6 +338,9 @@ snapshots['ReservationUnitQueryTestCase::test_getting_reservation_units 1'] = {
             'edges': [
                 {
                     'node': {
+                        'additionalInstructionsEn': 'Additional instructions',
+                        'additionalInstructionsFi': 'Lisäohjeita',
+                        'additionalInstructionsSv': 'Ytterligare instruktioner',
                         'applicationRounds': [
                         ],
                         'cancellationRule': {
@@ -345,9 +349,6 @@ snapshots['ReservationUnitQueryTestCase::test_getting_reservation_units 1'] = {
                             'nameSv': 'sv'
                         },
                         'contactInformationFi': '',
-                        'additionalInstructionsFi': 'Lisäohjeita',
-                        'additionalInstructionsSv': 'Ytterligare instruktioner',
-                        'additionalInstructionsEn': 'Additional instructions',
                         'descriptionFi': '',
                         'equipment': [
                         ],
@@ -408,6 +409,28 @@ snapshots['ReservationUnitQueryTestCase::test_getting_terms 1'] = {
                     }
                 }
             ]
+        }
+    }
+}
+
+snapshots['ReservationUnitQueryTestCase::test_hauki_url_for_admin 1'] = {
+    'data': {
+        'reservationUnitByPk': {
+            'haukiUrl': {
+                'url': 'https://test.com/resource/origin%3A3774af34-9916-40f2-acc7-68db5a627710/?hsa_source=origin&hsa_username=amin.general%40foo.com&hsa_organization=ORGANISATION&hsa_created_at=2021-05-03T00%3A00%3A00%2B00%3A00&hsa_valid_until=2021-05-03T00%3A30%3A00%2B00%3A00&hsa_resource=origin%3A3774af34-9916-40f2-acc7-68db5a627710&hsa_has_organization_rights=true&hsa_signature=33d060cef23cf643241390af20ff12fee22b71d9d0c65c86e7ae5617d429df97'
+            },
+            'nameFi': 'test name fi'
+        }
+    }
+}
+
+snapshots['ReservationUnitQueryTestCase::test_hauki_url_for_unit_manager 1'] = {
+    'data': {
+        'reservationUnitByPk': {
+            'haukiUrl': {
+                'url': 'https://test.com/resource/origin%3A3774af34-9916-40f2-acc7-68db5a627710/?hsa_source=origin&hsa_username=unit.admin%40foo.com&hsa_organization=ORGANISATION&hsa_created_at=2021-05-03T00%3A00%3A00%2B00%3A00&hsa_valid_until=2021-05-03T00%3A30%3A00%2B00%3A00&hsa_resource=origin%3A3774af34-9916-40f2-acc7-68db5a627710&hsa_has_organization_rights=true&hsa_signature=4fc177546e1d20a59564a088600053cd89afe6d992ffcc2cce2d6affeb19b10e'
+            },
+            'nameFi': 'test name fi'
         }
     }
 }
