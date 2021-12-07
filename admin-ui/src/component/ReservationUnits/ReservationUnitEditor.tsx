@@ -178,6 +178,9 @@ const modifyEditorState = (state: State, edit: any) => ({
   hasChanges: true,
 });
 
+const i18nFields = (baseName: string): string[] =>
+  languages.map((l) => baseName + upperFirst(l));
+
 const reducer = (state: State, action: Action): State => {
   switch (action.type) {
     case "dataLoaded": {
@@ -190,25 +193,17 @@ const reducer = (state: State, action: Action): State => {
         reservationUnitEdit: {
           ...(pick(reservationUnit, [
             "pk",
-            "nameFi",
-            "nameSv",
-            "nameEn",
             "unitPk",
-            "descriptionFi",
-            "descriptionEn",
-            "descriptionSv",
-            "termsOfUseFi",
-            "termsOfUseSv",
-            "termsOfUseEn",
             "requireIntroduction",
-            "descriptionFi",
-            "descriptionSv",
-            "descriptionEn",
             "surfaceArea",
             "maxPersons",
             "maxReservationDuration",
             "minReservationDuration",
             "requireIntroduction",
+            ...i18nFields("name"),
+            ...i18nFields("description"),
+            ...i18nFields("termsOfUse"),
+            ...i18nFields("additionalInstructions"),
           ]) as ReservationUnitEditorType),
           spacePks: reservationUnit?.spaces?.map((s) =>
             Number(s?.pk)
@@ -558,21 +553,12 @@ const ReservationUnitEditor = (): JSX.Element | null => {
         "isDraft",
         "pk",
         "unitPk",
-        "nameFi",
-        "nameSv",
-        "nameEn",
-        "descriptionFi",
-        "descriptionSv",
-        "descriptionEn",
         "spacePks",
         "purposePks",
         "resourcePks",
         "equipmentPks",
         "surfaceArea",
         "maxPersons",
-        "termsOfUseFi",
-        "termsOfUseSv",
-        "termsOfUseEn",
         "maxReservationDuration",
         "minReservationDuration",
         "requireIntroduction",
@@ -582,6 +568,10 @@ const ReservationUnitEditor = (): JSX.Element | null => {
         "cancellationTermsPk",
         "serviceSpecificTermsPk",
         "cancellationRulePk",
+        ...i18nFields("name"),
+        ...i18nFields("description"),
+        ...i18nFields("termsOfUse"),
+        ...i18nFields("additionalInstructions"),
       ]
     );
 
@@ -722,7 +712,10 @@ const ReservationUnitEditor = (): JSX.Element | null => {
     );
   }
 
-  const isReadyToPublish = hasTranslations(["description", "name"], state);
+  const isReadyToPublish = hasTranslations(
+    ["description", "name", "additionalInstructions"],
+    state
+  );
 
   if (state.error) {
     return (
@@ -1106,6 +1099,41 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                 );
               })}
             </Accordion>
+            <Accordion heading={t("ReservationUnitEditor.communication")}>
+              {languages.map((lang) => (
+                <TextInputWithPadding
+                  key={lang}
+                  required
+                  id={`additionalInstructions.${lang}`}
+                  label={t(
+                    "ReservationUnitEditor.additionalInstructionsLabel",
+                    {
+                      lang,
+                    }
+                  )}
+                  placeholder={t(
+                    "ReservationUnitEditor.additionalInstructionsPlaceholder",
+                    {
+                      language: t(`language.${lang}`),
+                    }
+                  )}
+                  value={get(
+                    state,
+                    `reservationUnitEdit.additionalInstructions${upperFirst(
+                      lang
+                    )}`,
+                    ""
+                  )}
+                  onChange={(e) =>
+                    setValue({
+                      [`additionalInstructions${upperFirst(lang)}`]:
+                        e.target.value,
+                    })
+                  }
+                />
+              ))}
+            </Accordion>
+
             <Accordion heading={t("ReservationUnitEditor.openingHours")}>
               {state.reservationUnit?.haukiUrl?.url ? (
                 <>
