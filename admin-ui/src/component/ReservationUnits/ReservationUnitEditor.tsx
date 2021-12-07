@@ -543,9 +543,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
     const input = pick(
       {
         ...omitBy(state.reservationUnitEdit, isNull),
-        spacePks: state.reservationUnitEdit?.spacePks?.map(String),
-        resourcePks: state.reservationUnitEdit?.resourcePks?.map(String),
-        equipmentPks: state.reservationUnitEdit?.equipmentPks?.map(String),
+        surfaceArea: Number(state.reservationUnitEdit?.surfaceArea),
         isDraft: !publish,
         cancellationRulePk: state.reservationUnitEdit?.cancellationRulePk,
       },
