@@ -354,6 +354,7 @@ export const RESERVATIONUNIT_QUERY = gql`
         pk
         nameFi
       }
+      uuid
       requireIntroduction
       termsOfUseFi
       termsOfUseSv

@@ -19,3 +19,5 @@ export const oidcUrl = process.env.REACT_APP_OIDC_URL;
 export const oidcScope = process.env.REACT_APP_OIDC_SCOPE;
 export const apiScope = process.env.REACT_APP_TILAVARAUS_API_SCOPE;
 export const publicUrl = process.env.PUBLIC_URL;
+export const previewUrlPrefix =
+  process.env.REACT_APP_RESERVATION_UNIT_PREVIEW_URL_PREFIX;
