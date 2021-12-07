@@ -132,6 +132,9 @@ export const GET_RESERVATION = gql`
         nameFi
         nameEn
         nameSv
+        additionalInstructionsFi
+        additionalInstructionsEn
+        additionalInstructionsSv
         termsOfUseFi
         termsOfUseEn
         termsOfUseSv

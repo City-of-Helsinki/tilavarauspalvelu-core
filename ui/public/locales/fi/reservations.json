@@ -29,5 +29,6 @@
   "reservationCancelledBody": "Varauksesi on nyt peruutettu. Voit tarkistaa maksu- ja peruutusehdot kohteen esittelystä. Ole tarvittaessa yhteydessä meihin. Yhteystiedot löydät varausvahvistuksesta.",
   "reservationCancellationFailed": "Varauksen peruuttaminen epäonnistui",
   "makeNewReservation": "Tee uusi varaus samaan tilaan",
-  "reservationInfo": "Varauksen lisätiedot"
+  "reservationInfo": "Varauksen ohjeet",
+  "gotoReservations": "Siirry omiin varauksiin"
 }

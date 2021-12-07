@@ -1164,6 +1164,9 @@ export type ReservationTypeEdge = {
 
 export type ReservationUnitByPkType = Node & {
   __typename?: 'ReservationUnitByPkType';
+  additionalInstructionsEn?: Maybe<Scalars['String']>;
+  additionalInstructionsFi?: Maybe<Scalars['String']>;
+  additionalInstructionsSv?: Maybe<Scalars['String']>;
   applicationRounds?: Maybe<Array<Maybe<ApplicationRoundType>>>;
   cancellationRule?: Maybe<ReservationUnitCancellationRuleType>;
   cancellationTerms?: Maybe<TermsOfUseType>;
@@ -1275,6 +1278,9 @@ export type ReservationUnitCancellationRuleTypeEdge = {
 };
 
 export type ReservationUnitCreateMutationInput = {
+  additionalInstructionsEn?: Maybe<Scalars['String']>;
+  additionalInstructionsFi?: Maybe<Scalars['String']>;
+  additionalInstructionsSv?: Maybe<Scalars['String']>;
   bufferTimeBetweenReservations?: Maybe<Scalars['String']>;
   cancellationRulePk?: Maybe<Scalars['Int']>;
   cancellationTermsPk?: Maybe<Scalars['String']>;
@@ -1311,6 +1317,9 @@ export type ReservationUnitCreateMutationInput = {
 
 export type ReservationUnitCreateMutationPayload = {
   __typename?: 'ReservationUnitCreateMutationPayload';
+  additionalInstructionsEn?: Maybe<Scalars['String']>;
+  additionalInstructionsFi?: Maybe<Scalars['String']>;
+  additionalInstructionsSv?: Maybe<Scalars['String']>;
   bufferTimeBetweenReservations?: Maybe<Scalars['String']>;
   building?: Maybe<Scalars['String']>;
   cancellationRulePk?: Maybe<Scalars['Int']>;
@@ -1371,6 +1380,9 @@ export type ReservationUnitImageType = {
 
 export type ReservationUnitType = Node & {
   __typename?: 'ReservationUnitType';
+  additionalInstructionsEn?: Maybe<Scalars['String']>;
+  additionalInstructionsFi?: Maybe<Scalars['String']>;
+  additionalInstructionsSv?: Maybe<Scalars['String']>;
   applicationRounds?: Maybe<Array<Maybe<ApplicationRoundType>>>;
   bufferTimeBetweenReservations?: Maybe<Scalars['Float']>;
   cancellationRule?: Maybe<ReservationUnitCancellationRuleType>;
@@ -1469,6 +1481,9 @@ export type ReservationUnitTypeTypeEdge = {
 };
 
 export type ReservationUnitUpdateMutationInput = {
+  additionalInstructionsEn?: Maybe<Scalars['String']>;
+  additionalInstructionsFi?: Maybe<Scalars['String']>;
+  additionalInstructionsSv?: Maybe<Scalars['String']>;
   bufferTimeBetweenReservations?: Maybe<Scalars['String']>;
   cancellationRulePk?: Maybe<Scalars['Int']>;
   cancellationTermsPk?: Maybe<Scalars['String']>;
@@ -1506,6 +1521,9 @@ export type ReservationUnitUpdateMutationInput = {
 
 export type ReservationUnitUpdateMutationPayload = {
   __typename?: 'ReservationUnitUpdateMutationPayload';
+  additionalInstructionsEn?: Maybe<Scalars['String']>;
+  additionalInstructionsFi?: Maybe<Scalars['String']>;
+  additionalInstructionsSv?: Maybe<Scalars['String']>;
   bufferTimeBetweenReservations?: Maybe<Scalars['String']>;
   building?: Maybe<Scalars['String']>;
   cancellationRulePk?: Maybe<Scalars['Int']>;
@@ -2557,6 +2575,7 @@ export const ReservationUnitDocument = gql`
     nameFi
     nameEn
     nameSv
+    isDraft
     images {
       imageUrl
       mediumUrl
@@ -2656,7 +2675,7 @@ export type ReservationUnitQueryHookResult = ReturnType<typeof useReservationUni
 export type ReservationUnitLazyQueryHookResult = ReturnType<typeof useReservationUnitLazyQuery>;
 export type ReservationUnitQueryResult = Apollo.QueryResult<ReservationUnitQuery, ReservationUnitQueryVariables>;
 export const SearchReservationUnitsDocument = gql`
-    query SearchReservationUnits($textSearch: String, $minPersons: Float, $maxPersons: Float, $unit: [ID], $reservationUnitType: [ID], $purposes: [ID], $first: Int, $after: String, $orderBy: String) {
+    query SearchReservationUnits($textSearch: String, $minPersons: Float, $maxPersons: Float, $unit: [ID], $reservationUnitType: [ID], $purposes: [ID], $first: Int, $after: String, $orderBy: String, $isDraft: Boolean) {
   reservationUnits(
     textSearch: $textSearch
     maxPersonsGte: $minPersons
@@ -2667,6 +2686,7 @@ export const SearchReservationUnitsDocument = gql`
     first: $first
     after: $after
     orderBy: $orderBy
+    isDraft: $isDraft
   ) {
     edges {
       node {
@@ -2727,6 +2747,7 @@ export const SearchReservationUnitsDocument = gql`
  *      first: // value for 'first'
  *      after: // value for 'after'
  *      orderBy: // value for 'orderBy'
+ *      isDraft: // value for 'isDraft'
  *   },
  * });
  */
@@ -2934,7 +2955,7 @@ export type ReservationUnitQueryVariables = Exact<{
 }>;
 
 
-export type ReservationUnitQuery = { __typename?: 'Query', reservationUnitByPk?: { __typename?: 'ReservationUnitByPkType', id: string, pk?: number | null | undefined, uuid: any, nameFi?: string | null | undefined, nameEn?: string | null | undefined, nameSv?: string | null | undefined, descriptionFi?: string | null | undefined, descriptionEn?: string | null | undefined, descriptionSv?: string | null | undefined, termsOfUseFi?: string | null | undefined, termsOfUseEn?: string | null | undefined, termsOfUseSv?: string | null | undefined, maxPersons?: number | null | undefined, minReservationDuration?: any | null | undefined, maxReservationDuration?: any | null | undefined, nextAvailableSlot?: any | null | undefined, images?: Array<{ __typename?: 'ReservationUnitImageType', imageUrl?: string | null | undefined, mediumUrl?: string | null | undefined, smallUrl?: string | null | undefined, imageType: ReservationUnitsReservationUnitImageImageTypeChoices } | null | undefined> | null | undefined, serviceSpecificTerms?: { __typename?: 'TermsOfUseType', nameFi?: string | null | undefined, nameEn?: string | null | undefined, nameSv?: string | null | undefined, textFi?: string | null | undefined, textEn?: string | null | undefined, textSv?: string | null | undefined } | null | undefined, reservationUnitType?: { __typename?: 'ReservationUnitTypeType', nameFi?: string | null | undefined, nameEn?: string | null | undefined, nameSv?: string | null | undefined } | null | undefined, unit?: { __typename?: 'UnitType', id: string, pk?: number | null | undefined, nameFi?: string | null | undefined, nameEn?: string | null | undefined, nameSv?: string | null | undefined } | null | undefined, location?: { __typename?: 'LocationType', latitude?: string | null | undefined, longitude?: string | null | undefined, addressStreetFi?: string | null | undefined, addressStreetEn?: string | null | undefined, addressStreetSv?: string | null | undefined, addressZip: string, addressCityFi?: string | null | undefined, addressCityEn?: string | null | undefined, addressCitySv?: string | null | undefined } | null | undefined, spaces?: Array<{ __typename?: 'SpaceType', pk?: number | null | undefined, nameFi?: string | null | undefined, nameEn?: string | null | undefined, nameSv?: string | null | undefined } | null | undefined> | null | undefined, openingHours?: { __typename?: 'OpeningHoursType', openingTimePeriods?: Array<{ __typename?: 'PeriodType', periodId?: number | null | undefined, startDate?: any | null | undefined, endDate?: any | null | undefined, resourceState?: string | null | undefined, timeSpans?: Array<{ __typename?: 'TimeSpanType', startTime?: any | null | undefined, endTime?: any | null | undefined, resourceState?: string | null | undefined, weekdays?: Array<number | null | undefined> | null | undefined } | null | undefined> | null | undefined } | null | undefined> | null | undefined } | null | undefined } | null | undefined };
+export type ReservationUnitQuery = { __typename?: 'Query', reservationUnitByPk?: { __typename?: 'ReservationUnitByPkType', id: string, pk?: number | null | undefined, uuid: any, nameFi?: string | null | undefined, nameEn?: string | null | undefined, nameSv?: string | null | undefined, isDraft: boolean, descriptionFi?: string | null | undefined, descriptionEn?: string | null | undefined, descriptionSv?: string | null | undefined, termsOfUseFi?: string | null | undefined, termsOfUseEn?: string | null | undefined, termsOfUseSv?: string | null | undefined, maxPersons?: number | null | undefined, minReservationDuration?: any | null | undefined, maxReservationDuration?: any | null | undefined, nextAvailableSlot?: any | null | undefined, images?: Array<{ __typename?: 'ReservationUnitImageType', imageUrl?: string | null | undefined, mediumUrl?: string | null | undefined, smallUrl?: string | null | undefined, imageType: ReservationUnitsReservationUnitImageImageTypeChoices } | null | undefined> | null | undefined, serviceSpecificTerms?: { __typename?: 'TermsOfUseType', nameFi?: string | null | undefined, nameEn?: string | null | undefined, nameSv?: string | null | undefined, textFi?: string | null | undefined, textEn?: string | null | undefined, textSv?: string | null | undefined } | null | undefined, reservationUnitType?: { __typename?: 'ReservationUnitTypeType', nameFi?: string | null | undefined, nameEn?: string | null | undefined, nameSv?: string | null | undefined } | null | undefined, unit?: { __typename?: 'UnitType', id: string, pk?: number | null | undefined, nameFi?: string | null | undefined, nameEn?: string | null | undefined, nameSv?: string | null | undefined } | null | undefined, location?: { __typename?: 'LocationType', latitude?: string | null | undefined, longitude?: string | null | undefined, addressStreetFi?: string | null | undefined, addressStreetEn?: string | null | undefined, addressStreetSv?: string | null | undefined, addressZip: string, addressCityFi?: string | null | undefined, addressCityEn?: string | null | undefined, addressCitySv?: string | null | undefined } | null | undefined, spaces?: Array<{ __typename?: 'SpaceType', pk?: number | null | undefined, nameFi?: string | null | undefined, nameEn?: string | null | undefined, nameSv?: string | null | undefined } | null | undefined> | null | undefined, openingHours?: { __typename?: 'OpeningHoursType', openingTimePeriods?: Array<{ __typename?: 'PeriodType', periodId?: number | null | undefined, startDate?: any | null | undefined, endDate?: any | null | undefined, resourceState?: string | null | undefined, timeSpans?: Array<{ __typename?: 'TimeSpanType', startTime?: any | null | undefined, endTime?: any | null | undefined, resourceState?: string | null | undefined, weekdays?: Array<number | null | undefined> | null | undefined } | null | undefined> | null | undefined } | null | undefined> | null | undefined } | null | undefined } | null | undefined };
 
 export type SearchReservationUnitsQueryVariables = Exact<{
   textSearch?: Maybe<Scalars['String']>;
@@ -2946,6 +2967,7 @@ export type SearchReservationUnitsQueryVariables = Exact<{
   first?: Maybe<Scalars['Int']>;
   after?: Maybe<Scalars['String']>;
   orderBy?: Maybe<Scalars['String']>;
+  isDraft?: Maybe<Scalars['Boolean']>;
 }>;
 
 

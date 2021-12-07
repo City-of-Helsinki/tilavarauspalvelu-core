@@ -138,6 +138,9 @@ const reservationByPk = graphql.query<Query, QueryReservationUnitByPkArgs>(
           termsOfUseFi: "Terms of use FI",
           termsOfUseEn: null,
           termsOfUseSv: null,
+          additionalInstructionsFi: "Additional Instructions FI",
+          additionalInstructionsEn: "Additional Instructions FI",
+          additionalInstructionsSv: "Additional Instructions FI",
           serviceSpecificTerms: {
             textFi: "Service specific terms FI",
             textEn: null,
