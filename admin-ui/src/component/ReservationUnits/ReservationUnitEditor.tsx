@@ -200,6 +200,9 @@ const reducer = (state: State, action: Action): State => {
             "termsOfUseFi",
             "termsOfUseSv",
             "termsOfUseEn",
+            "additionalInstructionsFi",
+            "additionalInstructionsSv",
+            "additionalInstructionsEn",
             "requireIntroduction",
             "descriptionFi",
             "descriptionSv",
@@ -573,6 +576,9 @@ const ReservationUnitEditor = (): JSX.Element | null => {
         "termsOfUseFi",
         "termsOfUseSv",
         "termsOfUseEn",
+        "additionalInstructionsFi",
+        "additionalInstructionsSv",
+        "additionalInstructionsEn",
         "maxReservationDuration",
         "minReservationDuration",
         "requireIntroduction",
@@ -722,7 +728,10 @@ const ReservationUnitEditor = (): JSX.Element | null => {
     );
   }
 
-  const isReadyToPublish = hasTranslations(["description", "name"], state);
+  const isReadyToPublish = hasTranslations(
+    ["description", "name", "additionalInstructions"],
+    state
+  );
 
   if (state.error) {
     return (
@@ -741,6 +750,8 @@ const ReservationUnitEditor = (): JSX.Element | null => {
   if (state.reservationUnitEdit === null) {
     return null;
   }
+
+  console.log("rendering with", state);
 
   return (
     <Wrapper>
@@ -1106,6 +1117,41 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                 );
               })}
             </Accordion>
+            <Accordion heading={t("ReservationUnitEditor.communication")}>
+              {languages.map((lang) => (
+                <TextInputWithPadding
+                  key={lang}
+                  required
+                  id={`additionalInstructions.${lang}`}
+                  label={t(
+                    "ReservationUnitEditor.additionalInstructionsLabel",
+                    {
+                      lang,
+                    }
+                  )}
+                  placeholder={t(
+                    "ReservationUnitEditor.additionalInstructionsPlaceholder",
+                    {
+                      language: t(`language.${lang}`),
+                    }
+                  )}
+                  value={get(
+                    state,
+                    `reservationUnitEdit.additionalInstructions${upperFirst(
+                      lang
+                    )}`,
+                    ""
+                  )}
+                  onChange={(e) =>
+                    setValue({
+                      [`additionalInstructions${upperFirst(lang)}`]:
+                        e.target.value,
+                    })
+                  }
+                />
+              ))}
+            </Accordion>
+
             <Accordion heading={t("ReservationUnitEditor.openingHours")}>
               {state.reservationUnit?.haukiUrl?.url ? (
                 <>
