@@ -78,6 +78,7 @@ class ReservationUnitQueryTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCa
             price_unit=ReservationUnit.PRICE_UNIT_PER_HOUR,
             price=10,
             is_draft=False,
+            reservation_start_interval=ReservationUnit.RESERVATION_START_INTERVAL_30_MINUTES,
         )
 
         cls.api_client = APIClient()
@@ -160,6 +161,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
                             highestPrice
                             priceUnit
                             price
+                            reservationStartInterval
                           }
                         }
                     }
@@ -1609,6 +1611,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
             "highestPrice": 20,
             "priceUnit": "per_hour",
             "price": 10,
+            "reservationStartInterval": ReservationUnit.RESERVATION_START_INTERVAL_60_MINUTES,
         }
 
     def test_create(self):
@@ -1646,6 +1649,9 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         assert_that(res_unit.highest_price).is_equal_to(data.get("highestPrice"))
         assert_that(res_unit.price_unit).is_equal_to(data.get("priceUnit"))
         assert_that(res_unit.price).is_equal_to(data.get("price"))
+        assert_that(res_unit.reservation_start_interval).is_equal_to(
+            data.get("reservationStartInterval")
+        )
 
     @mock.patch(
         "reservation_units.utils.hauki_exporter.ReservationUnitHaukiExporter.send_reservation_unit_to_hauki"
@@ -2522,6 +2528,36 @@ class ReservationUnitUpdateNotDraftTestCase(ReservationUnitMutationsTestCaseBase
 
         self.res_unit.refresh_from_db()
         assert_that(self.res_unit.reservation_unit_type).is_not_none()
+
+    def test_update_reservation_start_interval(self):
+        expected_interval = ReservationUnit.RESERVATION_START_INTERVAL_60_MINUTES
+        data = self.get_valid_update_data()
+        data["reservationStartInterval"] = expected_interval
+        update_query = """
+            mutation updateReservationUnit($input: ReservationUnitUpdateMutationInput!) {
+                updateReservationUnit(input: $input) {
+                    reservationStartInterval
+                    errors {
+                        messages
+                        field
+                    }
+                }
+            }
+        """
+        response = self.query(update_query, input_data=data)
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        res_unit_data = content.get("data").get("updateReservationUnit")
+        assert_that(content.get("errors")).is_none()
+        assert_that(res_unit_data.get("errors")).is_none()
+        assert_that(res_unit_data.get("reservationStartInterval")).is_equal_to(
+            expected_interval
+        )
+        self.res_unit.refresh_from_db()
+        assert_that(self.res_unit.reservation_start_interval).is_equal_to(
+            expected_interval
+        )
 
     def test_regular_user_cannot_update(self):
         self.client.force_login(self.regular_joe)

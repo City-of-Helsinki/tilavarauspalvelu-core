@@ -363,6 +363,7 @@ snapshots['ReservationUnitQueryTestCase::test_getting_reservation_units 1'] = {
                         'purposes': [
                         ],
                         'requireIntroduction': False,
+                        'reservationStartInterval': 'INTERVAL_30_MINS',
                         'reservationUnitType': {
                             'nameFi': 'test type fi'
                         },
