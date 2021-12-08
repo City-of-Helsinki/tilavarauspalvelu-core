@@ -42,6 +42,7 @@ const EnumSelect = ({
       options={options}
       value={options.find((o) => o.value === value)}
       id={id}
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       onChange={(e: any) => {
         onChange(e.value);
       }}
