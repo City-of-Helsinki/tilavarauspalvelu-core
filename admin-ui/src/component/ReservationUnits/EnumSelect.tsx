@@ -9,7 +9,7 @@ type OptionType = {
 };
 
 const StyledSelect = styled(Select)`
-  margin-top: var(--sacing-m);
+  padding-bottom: var(--spacing-m);
 `;
 
 const EnumSelect = ({
