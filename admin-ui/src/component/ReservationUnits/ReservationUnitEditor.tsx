@@ -479,7 +479,7 @@ const StyledButton = styled(HDSButton)<{
   margin-right: var(--spacing-l);
 `;
 
-const PublisingTime = styled.div`
+const PublishingTime = styled.div`
   flex-grow: 1;
   color: var(--color-white);
   display: flex;
@@ -1330,10 +1330,10 @@ const ReservationUnitEditor = (): JSX.Element | null => {
         >
           {t("ReservationUnitEditor.cancel")}
         </StyledButton>
-        <PublisingTime>
+        <PublishingTime>
           Varausyksikkö julkaistaan
           <br /> TODO
-        </PublisingTime>
+        </PublishingTime>
         <StyledButton
           disabled={!state.hasChanges}
           variant="secondary"
