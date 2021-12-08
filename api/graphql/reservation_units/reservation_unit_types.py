@@ -472,6 +472,7 @@ class ReservationUnitByPkType(ReservationUnitType, OpeningHoursMixin):
             "lowest_price",
             "highest_price",
             "price_unit",
+            "reservation_start_interval",
         ] + get_all_translatable_fields(model)
 
         interfaces = (graphene.relay.Node,)
