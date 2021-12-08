@@ -406,7 +406,11 @@ const EditorColumns = styled.div`
 
 const DenseEditorColumns = styled.div`
   display: block;
-  @media (min-width: ${breakpoints.l}) {
+  @media (min-width: ${breakpoints.m}) {
+    grid-template-columns: 1fr 1fr;
+    display: grid;
+  }
+  @media (min-width: ${breakpoints.xl}) {
     grid-template-columns: 1fr 1fr 1fr 1fr;
     display: grid;
   }
