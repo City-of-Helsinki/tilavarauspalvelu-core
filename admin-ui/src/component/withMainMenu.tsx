@@ -14,6 +14,14 @@ const InnerWrapper = styled.div`
     width: calc(100% - var(--main-menu-width) - 2.625rem);
   }
 `;
+export const MainMenuWrapper: React.FC = ({ children }) => {
+  return (
+    <Wrapper>
+      <MainMenu placement="default" />
+      <InnerWrapper>{children}</InnerWrapper>
+    </Wrapper>
+  );
+};
 
 function withMainMenu<TProps>(wrappedComponent: React.ComponentType<TProps>) {
   return function New(props: TProps): JSX.Element {
@@ -23,12 +31,9 @@ function withMainMenu<TProps>(wrappedComponent: React.ComponentType<TProps>) {
     const WrappedComponent = wrappedComponent;
 
     return (
-      <Wrapper>
-        <MainMenu placement="default" />
-        <InnerWrapper>
-          <WrappedComponent {...props} />
-        </InnerWrapper>
-      </Wrapper>
+      <MainMenuWrapper>
+        <WrappedComponent {...props} />
+      </MainMenuWrapper>
     );
   };
 }
