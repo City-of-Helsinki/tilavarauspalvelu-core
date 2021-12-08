@@ -1,0 +1,52 @@
+import React from "react";
+import { Select } from "hds-react";
+import styled from "styled-components";
+import { useTranslation } from "react-i18next";
+
+type OptionType = {
+  label: string;
+  value: string;
+};
+
+const StyledSelect = styled(Select)`
+  margin-top: var(--sacing-m);
+`;
+
+const EnumSelect = ({
+  id,
+  label,
+  onChange,
+  required = false,
+  value,
+  type,
+}: {
+  id: string;
+  label: string;
+  required?: boolean;
+  value: string;
+  onChange: (value: string) => void;
+  type: { [key: string]: string };
+}): JSX.Element => {
+  const { t } = useTranslation();
+  const options: OptionType[] = Object.keys(type)
+    .filter((key) => Number.isNaN(Number(type[key])))
+    .map((key) => ({
+      value: type[key],
+      label: t(`${id}.${type[key]}`),
+    }));
+
+  return (
+    <StyledSelect
+      label={label}
+      required={required}
+      options={options}
+      value={options.find((o) => o.value === value)}
+      id={id}
+      onChange={(e: any) => {
+        onChange(e.value);
+      }}
+    />
+  );
+};
+
+export default EnumSelect;

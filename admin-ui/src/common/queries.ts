@@ -323,6 +323,9 @@ export const RESERVATION_UNIT_EDITOR_PARAMETERS = gql`
 export const RESERVATIONUNIT_QUERY = gql`
   query reservationUnit($pk: Int) {
     reservationUnitByPk(pk: $pk) {
+      lowestPrice
+      highestPrice
+      priceUnit
       haukiUrl {
         url
       }
