@@ -329,7 +329,6 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
             "lowest_price",
             "highest_price",
             "price_unit",
-            "price",
             "reservation_start_interval",
         ] + get_all_translatable_fields(model)
         filter_fields = {
@@ -473,7 +472,6 @@ class ReservationUnitByPkType(ReservationUnitType, OpeningHoursMixin):
             "lowest_price",
             "highest_price",
             "price_unit",
-            "price",
         ] + get_all_translatable_fields(model)
 
         interfaces = (graphene.relay.Node,)

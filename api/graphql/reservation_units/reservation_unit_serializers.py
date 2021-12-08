@@ -166,12 +166,6 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
             f"Possible values are {', '.join(value for value, _ in ReservationUnit.PRICE_UNITS)}."
         ),
     )
-    price = serializers.DecimalField(
-        max_digits=10,
-        decimal_places=2,
-        required=False,
-        help_text="The current list price for reservation units with a fixed price",
-    )
     reservation_start_interval = serializers.CharField(
         required=False,
         help_text=(
@@ -217,7 +211,6 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
             "lowest_price",
             "highest_price",
             "price_unit",
-            "price",
             "reservation_start_interval",
         ] + get_all_translatable_fields(ReservationUnit)
 
