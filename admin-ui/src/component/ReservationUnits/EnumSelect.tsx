@@ -28,12 +28,10 @@ const EnumSelect = ({
   type: { [key: string]: string };
 }): JSX.Element => {
   const { t } = useTranslation();
-  const options: OptionType[] = Object.keys(type)
-    .filter((key) => Number.isNaN(Number(type[key])))
-    .map((key) => ({
-      value: type[key],
-      label: t(`${id}.${type[key]}`),
-    }));
+  const options: OptionType[] = Object.keys(type).map((key) => ({
+    value: type[key],
+    label: t(`${id}.${type[key]}`),
+  }));
 
   return (
     <StyledSelect
