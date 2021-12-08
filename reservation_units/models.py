@@ -280,13 +280,6 @@ class ReservationUnit(models.Model):
         default=0,
         help_text="Maximum price of the reservation unit",
     )
-    price = models.DecimalField(
-        verbose_name=_("Price"),
-        max_digits=10,
-        decimal_places=2,
-        default=0,
-        help_text="The current list price for reservation units with a fixed price",
-    )
 
     RESERVATION_START_INTERVAL_15_MINUTES = "interval_15_mins"
     RESERVATION_START_INTERVAL_30_MINUTES = "interval_30_mins"

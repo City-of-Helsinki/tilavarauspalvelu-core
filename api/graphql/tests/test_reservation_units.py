@@ -84,7 +84,6 @@ class ReservationUnitQueryTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCa
             lowest_price=0,
             highest_price=20,
             price_unit=ReservationUnit.PRICE_UNIT_PER_HOUR,
-            price=10,
             is_draft=False,
             reservation_start_interval=ReservationUnit.RESERVATION_START_INTERVAL_30_MINUTES,
         )
@@ -168,7 +167,6 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
                             lowestPrice
                             highestPrice
                             priceUnit
-                            price
                             reservationStartInterval
                           }
                         }
@@ -1690,7 +1688,6 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
             "lowestPrice": 0,
             "highestPrice": 20,
             "priceUnit": "per_hour",
-            "price": 10,
             "reservationStartInterval": ReservationUnit.RESERVATION_START_INTERVAL_60_MINUTES,
         }
 
@@ -1728,7 +1725,6 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         assert_that(res_unit.lowest_price).is_equal_to(data.get("lowestPrice"))
         assert_that(res_unit.highest_price).is_equal_to(data.get("highestPrice"))
         assert_that(res_unit.price_unit).is_equal_to(data.get("priceUnit"))
-        assert_that(res_unit.price).is_equal_to(data.get("price"))
         assert_that(res_unit.reservation_start_interval).is_equal_to(
             data.get("reservationStartInterval")
         )
@@ -2494,19 +2490,16 @@ class ReservationUnitUpdateNotDraftTestCase(ReservationUnitMutationsTestCaseBase
         expected_lowest_price = Decimal("0.00")
         expected_highest_price = Decimal("20.00")
         expected_price_unit = ReservationUnit.PRICE_UNIT_PER_HOUR
-        expected_price = Decimal("10.00")
         data = self.get_valid_update_data()
         data["lowestPrice"] = float(expected_lowest_price)
         data["highestPrice"] = float(expected_highest_price)
         data["priceUnit"] = expected_price_unit
-        data["price"] = float(expected_price)
         update_query = """
             mutation updateReservationUnit($input: ReservationUnitUpdateMutationInput!) {
                 updateReservationUnit(input: $input) {
                     lowestPrice
                     highestPrice
                     priceUnit
-                    price
                     errors {
                         messages
                         field
@@ -2530,12 +2523,10 @@ class ReservationUnitUpdateNotDraftTestCase(ReservationUnitMutationsTestCaseBase
         assert_that(res_unit_data.get("priceUnit")).is_equal_to(
             ReservationUnit.PRICE_UNIT_PER_HOUR
         )
-        assert_that(res_unit_data.get("price")).is_equal_to(float(expected_price))
         self.res_unit.refresh_from_db()
         assert_that(self.res_unit.lowest_price).is_equal_to(expected_lowest_price)
         assert_that(self.res_unit.highest_price).is_equal_to(expected_highest_price)
         assert_that(self.res_unit.price_unit).is_equal_to(expected_price_unit)
-        assert_that(self.res_unit.price).is_equal_to(expected_price)
 
     def test_errors_on_empty_name_translations(self):
         data = self.get_valid_update_data()
