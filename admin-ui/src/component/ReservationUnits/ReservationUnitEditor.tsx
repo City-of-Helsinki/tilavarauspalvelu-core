@@ -446,29 +446,23 @@ const StyledButton = styled(HDSButton)<{
   disabled: boolean;
   variant: "secondary" | "primary";
 }>`
-   {
-    --bg: var(--color-white);
-    --fg: var(--color-black);
-    --hbg: var(--fg);
-    --hfg: var(--bg);
-    --border-color: var(--color-white);
-  }
+  --bg: var(--color-white);
+  --fg: var(--color-black);
+  --hbg: var(--fg);
+  --hfg: var(--bg);
+  --border-color: var(--color-white);
 
   ${({ variant }) =>
     variant === "secondary"
-      ? `{
-    --fg: var(--color-white);
-    --bg: var(--color-bus-dark);
-
-  }`
+      ? `--fg: var(--color-white);
+    --bg: var(--color-bus-dark);`
       : null}
 
   ${({ disabled }) =>
     disabled
-      ? `{
-        --hbg: var(--bg);
+      ? `--hbg: var(--bg);
         --hfg: var(--fg);
-      }`
+      `
       : null}
 
 
