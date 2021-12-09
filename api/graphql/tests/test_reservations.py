@@ -15,6 +15,7 @@ from applications.tests.factories import ApplicationRoundFactory
 from opening_hours.enums import State
 from opening_hours.hours import TimeElement
 from opening_hours.tests.test_get_periods import get_mocked_periods
+from reservation_units.models import ReservationUnit
 from reservation_units.tests.factories import (
     ReservationUnitCancellationRuleFactory,
     ReservationUnitFactory,
@@ -37,7 +38,10 @@ class ReservationTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCase):
         super().setUpTestData()
         cls.space = SpaceFactory()
         cls.reservation_unit = ReservationUnitFactory(
-            pk=1, spaces=[cls.space], name="resunit"
+            pk=1,
+            spaces=[cls.space],
+            name="resunit",
+            reservation_start_interval=ReservationUnit.RESERVATION_START_INTERVAL_15_MINUTES,
         )
         cls.purpose = ReservationPurposeFactory(name="purpose")
 
@@ -470,6 +474,54 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         ).contains(
             "Reservation duration less than one or more reservation unit's minimum duration."
         )
+
+    def test_create_succeeds_when_start_time_matches_reservation_start_interval(
+        self, mock_periods, mock_opening_hours
+    ):
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+        self.client.force_login(self.regular_joe)
+        intervals = [
+            value for value, _ in ReservationUnit.RESERVATION_START_INTERVAL_CHOICES
+        ]
+        for interval, interval_minutes in zip(intervals, [15, 30, 60, 90]):
+            input_data = self.get_valid_input_data()
+            self.reservation_unit.reservation_start_interval = interval
+            self.reservation_unit.save(update_fields=["reservation_start_interval"])
+            begin = datetime.datetime.now() + datetime.timedelta(
+                minutes=interval_minutes
+            )
+            input_data["begin"] = begin.strftime("%Y%m%dT%H%M%SZ")
+            response = self.query(self.get_create_query(), input_data=input_data)
+            content = json.loads(response.content)
+            assert_that(content.get("errors")).is_none()
+            payload = content.get("data").get("createReservation", {})
+            assert_that(payload.get("errors")).is_none()
+            Reservation.objects.get(pk=payload["reservation"]["pk"]).delete()
+
+    def test_create_fails_when_start_time_does_not_match_reservation_start_interval(
+        self, mock_periods, mock_opening_hours
+    ):
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+        self.client.force_login(self.regular_joe)
+        intervals = [
+            value for value, _ in ReservationUnit.RESERVATION_START_INTERVAL_CHOICES
+        ]
+        for interval, interval_minutes in zip(intervals, [15, 30, 60, 90]):
+            input_data = self.get_valid_input_data()
+            self.reservation_unit.reservation_start_interval = interval
+            self.reservation_unit.save(update_fields=["reservation_start_interval"])
+            begin = datetime.datetime.now() + datetime.timedelta(
+                minutes=interval_minutes + 1
+            )
+            input_data["begin"] = begin.strftime("%Y%m%dT%H%M%SZ")
+            response = self.query(self.get_create_query(), input_data=input_data)
+            content = json.loads(response.content)
+            assert_that(content.get("errors")).is_none()
+            payload = content.get("data").get("createReservation", {})
+            assert_that(payload.get("errors")).is_not_none()
+            assert_that(payload.get("errors")[0]["messages"]).contains(
+                f"Reservation start time does not match the allowed interval of {interval_minutes} minutes."
+            )
 
     def test_create_fails_when_not_logged_in(self, mock_periods, mock_opening_hours):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
