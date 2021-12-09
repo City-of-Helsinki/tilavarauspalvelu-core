@@ -85,6 +85,8 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
             user=self.regular_joe,
             priority=100,
             purpose=self.purpose,
+            unit_price=10,
+            tax_percentage_value=24,
             price=10,
         )
 
@@ -113,6 +115,8 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
                             name
                             description
                             purpose {nameFi}
+                            unitPrice
+                            taxPercentageValue
                             price
                           }
                         }
@@ -652,6 +656,8 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
             state=STATE_CHOICES.CREATED,
             user=self.regular_joe,
             priority=100,
+            unit_price=10,
+            tax_percentage_value=24,
             price=10,
         )
 

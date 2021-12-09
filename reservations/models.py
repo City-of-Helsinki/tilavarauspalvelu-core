@@ -228,6 +228,20 @@ class Reservation(models.Model):
 
     confirmed_at = models.DateTimeField(verbose_name=_("Confirmed at"), null=True)
 
+    unit_price = models.DecimalField(
+        verbose_name=_("Unit price"),
+        max_digits=10,
+        decimal_places=2,
+        default=0,
+        help_text="The price of this particular reservation",
+    )
+    tax_percentage_value = models.DecimalField(
+        verbose_name=_("Tax percentage value"),
+        max_digits=5,
+        decimal_places=2,
+        default=0,
+        help_text="The value of the tax percentage for this particular reservation",
+    )
     price = models.DecimalField(
         verbose_name=_("Price"),
         max_digits=10,
