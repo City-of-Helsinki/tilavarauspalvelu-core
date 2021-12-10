@@ -19,7 +19,7 @@ from permissions.helpers import (
     can_modify_reservation,
     can_view_recurring_reservation,
 )
-from reservation_units.models import ReservationUnit
+from reservation_units.models import ReservationUnit, ReservationUnitImage
 from reservations.models import RecurringReservation, Reservation
 from spaces.models import Unit
 
@@ -56,6 +56,30 @@ class ReservationUnitPermission(BasePermission):
         if not unit_pk:
             return False
         unit = Unit.objects.filter(id=unit_pk).first()
+        return can_manage_units_reservation_units(info.context.user, unit)
+
+
+class ReservationUnitImagePermission(BasePermission):
+    @classmethod
+    def has_permission(cls, info: ResolveInfo) -> bool:
+        return False
+
+    @classmethod
+    def has_mutation_permission(cls, root: Any, info: ResolveInfo, input: dict) -> bool:
+        if input.get("pk"):
+            reservation_unit_pk = (
+                ReservationUnitImage.objects.filter(id=input.get("pk"))
+                .values_list("reservation_unit_id", flat=True)
+                .first()
+            )
+        else:
+            reservation_unit_pk = input.get("reservation_unit_pk")
+        if not reservation_unit_pk:
+            return False
+
+        unit = Unit.objects.filter(reservationunit=reservation_unit_pk).first()
+        if not unit:
+            return False
         return can_manage_units_reservation_units(info.context.user, unit)
 
 

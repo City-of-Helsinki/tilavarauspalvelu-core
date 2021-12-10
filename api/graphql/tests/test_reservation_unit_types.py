@@ -22,7 +22,6 @@ class ReservationUnitTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
                 reservationUnitTypes {
                     edges {
                         node {
-                            pk
                             nameFi
                             nameEn
                             nameSv
