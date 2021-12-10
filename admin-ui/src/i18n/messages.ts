@@ -587,6 +587,10 @@ const translations: ITranslations = {
     purposeCount: ["{{count}} käyttötarkoitus"],
     purposeCount_plural: ["{{count}} käyttötarkoitusta"],
     downloadSpaceCalendar: ["Lataa tilan kalenterimerkinnät (.ics)"],
+    isDraft: {
+      true: ["Luonnos"],
+      false: ["Julkaistu"],
+    },
   },
   Spaces: {
     spaceListHeading: ["Kaikki tilat"],
