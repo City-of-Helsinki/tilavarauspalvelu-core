@@ -34,6 +34,7 @@ import {
   ErrorType,
   Maybe,
   TermsOfUseTermsOfUseTermsTypeChoices,
+  ReservationUnitsReservationUnitPriceUnitChoices,
 } from "../../common/gql-types";
 import {
   CREATE_RESERVATION_UNIT,
@@ -53,6 +54,7 @@ import RichTextInput from "../RichTextInput";
 import { useNotification } from "../../context/NotificationContext";
 import ActivationGroup from "./ActivationGroup";
 import { assertApiAccessTokenIsAvailable } from "../../common/auth/util";
+import EnumSelect from "./EnumSelect";
 
 interface IProps {
   reservationUnitPk?: string;
@@ -200,6 +202,7 @@ const reducer = (state: State, action: Action): State => {
             "maxReservationDuration",
             "minReservationDuration",
             "requireIntroduction",
+            "priceUnit",
             ...i18nFields("name"),
             ...i18nFields("description"),
             ...i18nFields("termsOfUse"),
@@ -221,6 +224,8 @@ const reducer = (state: State, action: Action): State => {
           reservationUnitTypePk: get(reservationUnit, "reservationUnitType.pk"),
           cancellationTermsPk: get(reservationUnit, "cancellationTerms.pk"),
           cancellationRulePk: get(reservationUnit, "cancellationRule.pk"),
+          lowestPrice: Number(reservationUnit.lowestPrice || 0),
+          highestPrice: Number(reservationUnit.highestPrice || 0),
           serviceSpecificTermsPk: get(
             reservationUnit,
             "serviceSpecificTerms.pk"
@@ -399,6 +404,22 @@ const EditorColumns = styled.div`
   padding-bottom: var(--spacing-m);
 `;
 
+const DenseEditorColumns = styled.div`
+  display: block;
+  @media (min-width: ${breakpoints.m}) {
+    grid-template-columns: 1fr 1fr;
+    display: grid;
+  }
+  @media (min-width: ${breakpoints.xl}) {
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    display: grid;
+  }
+  align-items: baseline;
+  gap: 1em;
+  margin-top: var(--spacing-s);
+  padding-bottom: var(--spacing-m);
+`;
+
 const Editor = styled.div`
   @media (min-width: ${breakpoints.m}) {
     margin: 0 var(--spacing-layout-m);
@@ -566,6 +587,9 @@ const ReservationUnitEditor = (): JSX.Element | null => {
         "cancellationTermsPk",
         "serviceSpecificTermsPk",
         "cancellationRulePk",
+        "lowestPrice",
+        "highestPrice",
+        "priceUnit",
         ...i18nFields("name"),
         ...i18nFields("description"),
         ...i18nFields("termsOfUse"),
@@ -1045,6 +1069,57 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                   ))}
                 </SelectionGroup>
               </ActivationGroup>
+            </Accordion>
+            <Accordion heading={t("ReservationUnitEditor.pricing")}>
+              <DenseEditorColumns>
+                <NumberInput
+                  value={state.reservationUnitEdit.lowestPrice || 0}
+                  id="lowestPrice"
+                  label={t("ReservationUnitEditor.lowestPriceLabel")}
+                  helperText={t("ReservationUnitEditor.lowestPriceHelperText")}
+                  minusStepButtonAriaLabel={t("common.decreaseByOneAriaLabel")}
+                  plusStepButtonAriaLabel={t("common.increaseByOneAriaLabel")}
+                  onChange={(e) => {
+                    setValue({
+                      lowestPrice: Number(e.target.value),
+                      highestPrice: Math.max(
+                        Number(e.target.value),
+                        state.reservationUnitEdit.highestPrice || 0
+                      ),
+                    });
+                  }}
+                  step={1}
+                  type="number"
+                  min={0}
+                />
+                <NumberInput
+                  value={state.reservationUnitEdit.highestPrice || 0}
+                  id="highestPrice"
+                  label={t("ReservationUnitEditor.highestPriceLabel")}
+                  helperText={t("ReservationUnitEditor.highestPriceHelperText")}
+                  minusStepButtonAriaLabel={t("common.decreaseByOneAriaLabel")}
+                  plusStepButtonAriaLabel={t("common.increaseByOneAriaLabel")}
+                  onChange={(e) => {
+                    setValue({
+                      highestPrice: Number(e.target.value),
+                      lowestPrice: Math.min(
+                        Number(e.target.value),
+                        state.reservationUnitEdit.lowestPrice || 0
+                      ),
+                    });
+                  }}
+                  step={1}
+                  type="number"
+                  min={0}
+                />
+                <EnumSelect
+                  id="priceUnit"
+                  value={state.reservationUnitEdit.priceUnit as string}
+                  label={t("ReservationUnitEditor.priceUnitLabel")}
+                  type={ReservationUnitsReservationUnitPriceUnitChoices}
+                  onChange={(priceUnit) => setValue({ priceUnit })}
+                />
+              </DenseEditorColumns>
             </Accordion>
 
             <Accordion heading={t("ReservationUnitEditor.termsInstructions")}>

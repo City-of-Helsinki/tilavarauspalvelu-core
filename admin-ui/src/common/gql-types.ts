@@ -1043,6 +1043,8 @@ export type ReservationConfirmMutationPayload = {
   errors?: Maybe<Array<Maybe<ErrorType>>>;
   name?: Maybe<Scalars['String']>;
   pk?: Maybe<Scalars['Int']>;
+  /** The price of this particular reservation */
+  price?: Maybe<Scalars['Float']>;
   priority?: Maybe<Scalars['Int']>;
   purposePk?: Maybe<Scalars['Int']>;
   reserveeFirstName?: Maybe<Scalars['String']>;
@@ -1081,6 +1083,8 @@ export type ReservationCreateMutationPayload = {
   errors?: Maybe<Array<Maybe<ErrorType>>>;
   name?: Maybe<Scalars['String']>;
   pk?: Maybe<Scalars['Int']>;
+  /** The price of this particular reservation */
+  price?: Maybe<Scalars['Float']>;
   priority?: Maybe<Scalars['Int']>;
   purposePk?: Maybe<Scalars['Int']>;
   reservation?: Maybe<ReservationType>;
@@ -1131,6 +1135,8 @@ export type ReservationType = Node & {
   name?: Maybe<Scalars['String']>;
   numPersons?: Maybe<Scalars['Int']>;
   pk?: Maybe<Scalars['Int']>;
+  /** The price of this particular reservation */
+  price: Scalars['Decimal'];
   priority: ReservationsReservationPriorityChoices;
   purpose?: Maybe<ReservationPurposeType>;
   recurringReservation?: Maybe<RecurringReservationType>;
@@ -1175,12 +1181,16 @@ export type ReservationUnitByPkType = Node & {
   descriptionSv?: Maybe<Scalars['String']>;
   equipment?: Maybe<Array<Maybe<EquipmentType>>>;
   haukiUrl?: Maybe<ReservationUnitHaukiUrlType>;
+  /** Maximum price of the reservation unit */
+  highestPrice: Scalars['Decimal'];
   /** The ID of the object */
   id: Scalars['ID'];
   images?: Maybe<Array<Maybe<ReservationUnitImageType>>>;
   isDraft: Scalars['Boolean'];
   keywordGroups?: Maybe<Array<Maybe<KeywordGroupType>>>;
   location?: Maybe<LocationType>;
+  /** Minimum price of the reservation unit */
+  lowestPrice: Scalars['Decimal'];
   maxPersons?: Maybe<Scalars['Int']>;
   maxReservationDuration?: Maybe<Scalars['Time']>;
   minReservationDuration?: Maybe<Scalars['Time']>;
@@ -1191,8 +1201,12 @@ export type ReservationUnitByPkType = Node & {
   openingHours?: Maybe<OpeningHoursType>;
   paymentTerms?: Maybe<TermsOfUseType>;
   pk?: Maybe<Scalars['Int']>;
+  /** Unit of the price */
+  priceUnit: ReservationUnitsReservationUnitPriceUnitChoices;
   purposes?: Maybe<Array<Maybe<PurposeType>>>;
   requireIntroduction: Scalars['Boolean'];
+  /** Determines the interval for the start time of the reservation. For example an interval of 15 minutes means a reservation can begin at minutes 0, 15, 30, or 45. Possible values are interval_15_mins, interval_30_mins, interval_60_mins, interval_90_mins. */
+  reservationStartInterval: ReservationUnitsReservationUnitReservationStartIntervalChoices;
   reservationUnitType?: Maybe<ReservationUnitTypeType>;
   reservations?: Maybe<Array<Maybe<ReservationType>>>;
   resources?: Maybe<Array<Maybe<ResourceType>>>;
@@ -1289,7 +1303,11 @@ export type ReservationUnitCreateMutationInput = {
   descriptionFi?: Maybe<Scalars['String']>;
   descriptionSv?: Maybe<Scalars['String']>;
   equipmentPks?: Maybe<Array<Maybe<Scalars['Int']>>>;
+  /** Maximum price of the reservation unit */
+  highestPrice?: Maybe<Scalars['Float']>;
   isDraft?: Maybe<Scalars['Boolean']>;
+  /** Minimum price of the reservation unit */
+  lowestPrice?: Maybe<Scalars['Float']>;
   maxPersons?: Maybe<Scalars['Int']>;
   maxReservationDuration?: Maybe<Scalars['String']>;
   minReservationDuration?: Maybe<Scalars['String']>;
@@ -1297,9 +1315,13 @@ export type ReservationUnitCreateMutationInput = {
   nameFi?: Maybe<Scalars['String']>;
   nameSv?: Maybe<Scalars['String']>;
   paymentTermsPk?: Maybe<Scalars['String']>;
+  /** Unit of the price. Possible values are per_15_mins, per_30_mins, per_hour, per_half_day, per_day, per_week, fixed. */
+  priceUnit?: Maybe<Scalars['String']>;
   purposePks?: Maybe<Array<Maybe<Scalars['Int']>>>;
   /** Determines if introduction is required in order to reserve this reservation unit. */
   requireIntroduction?: Maybe<Scalars['Boolean']>;
+  /** Determines the interval for the start time of the reservation. For example an interval of 15 minutes means a reservation can begin at minutes 0, 15, 30, or 45. Possible values are interval_15_mins, interval_30_mins, interval_60_mins, interval_90_mins. */
+  reservationStartInterval?: Maybe<Scalars['String']>;
   reservationUnitTypePk?: Maybe<Scalars['Int']>;
   resourcePks?: Maybe<Array<Maybe<Scalars['Int']>>>;
   servicePks?: Maybe<Array<Maybe<Scalars['Int']>>>;
@@ -1329,11 +1351,15 @@ export type ReservationUnitCreateMutationPayload = {
   descriptionSv?: Maybe<Scalars['String']>;
   /** May contain more than one error for same field. */
   errors?: Maybe<Array<Maybe<ErrorType>>>;
+  /** Maximum price of the reservation unit */
+  highestPrice?: Maybe<Scalars['Float']>;
   /** Images of the reservation unit as nested related objects.  */
   images?: Maybe<Array<Maybe<ReservationUnitImageType>>>;
   isDraft?: Maybe<Scalars['Boolean']>;
   /** Location of this reservation unit. Dynamically determined from spaces of the reservation unit. */
   location?: Maybe<Scalars['String']>;
+  /** Minimum price of the reservation unit */
+  lowestPrice?: Maybe<Scalars['Float']>;
   maxPersons?: Maybe<Scalars['Int']>;
   maxReservationDuration?: Maybe<Scalars['String']>;
   minReservationDuration?: Maybe<Scalars['String']>;
@@ -1341,9 +1367,13 @@ export type ReservationUnitCreateMutationPayload = {
   nameFi?: Maybe<Scalars['String']>;
   nameSv?: Maybe<Scalars['String']>;
   pk?: Maybe<Scalars['Int']>;
+  /** Unit of the price. Possible values are per_15_mins, per_30_mins, per_hour, per_half_day, per_day, per_week, fixed. */
+  priceUnit?: Maybe<Scalars['String']>;
   purposes?: Maybe<Array<Maybe<PurposeType>>>;
   /** Determines if introduction is required in order to reserve this reservation unit. */
   requireIntroduction?: Maybe<Scalars['Boolean']>;
+  /** Determines the interval for the start time of the reservation. For example an interval of 15 minutes means a reservation can begin at minutes 0, 15, 30, or 45. Possible values are interval_15_mins, interval_30_mins, interval_60_mins, interval_90_mins. */
+  reservationStartInterval?: Maybe<Scalars['String']>;
   reservationUnit?: Maybe<ReservationUnitType>;
   /** Type of the reservation unit as nested related object. */
   reservationUnitType?: Maybe<ReservationUnitTypeType>;
@@ -1391,12 +1421,16 @@ export type ReservationUnitType = Node & {
   descriptionFi?: Maybe<Scalars['String']>;
   descriptionSv?: Maybe<Scalars['String']>;
   equipment?: Maybe<Array<Maybe<EquipmentType>>>;
+  /** Maximum price of the reservation unit */
+  highestPrice: Scalars['Decimal'];
   /** The ID of the object */
   id: Scalars['ID'];
   images?: Maybe<Array<Maybe<ReservationUnitImageType>>>;
   isDraft: Scalars['Boolean'];
   keywordGroups?: Maybe<Array<Maybe<KeywordGroupType>>>;
   location?: Maybe<LocationType>;
+  /** Minimum price of the reservation unit */
+  lowestPrice: Scalars['Decimal'];
   maxPersons?: Maybe<Scalars['Int']>;
   maxReservationDuration?: Maybe<Scalars['Time']>;
   minReservationDuration?: Maybe<Scalars['Time']>;
@@ -1405,8 +1439,12 @@ export type ReservationUnitType = Node & {
   nameSv?: Maybe<Scalars['String']>;
   paymentTerms?: Maybe<TermsOfUseType>;
   pk?: Maybe<Scalars['Int']>;
+  /** Unit of the price */
+  priceUnit: ReservationUnitsReservationUnitPriceUnitChoices;
   purposes?: Maybe<Array<Maybe<PurposeType>>>;
   requireIntroduction: Scalars['Boolean'];
+  /** Determines the interval for the start time of the reservation. For example an interval of 15 minutes means a reservation can begin at minutes 0, 15, 30, or 45. Possible values are interval_15_mins, interval_30_mins, interval_60_mins, interval_90_mins. */
+  reservationStartInterval: ReservationUnitsReservationUnitReservationStartIntervalChoices;
   reservationUnitType?: Maybe<ReservationUnitTypeType>;
   reservations?: Maybe<Array<Maybe<ReservationType>>>;
   resources?: Maybe<Array<Maybe<ResourceType>>>;
@@ -1492,7 +1530,11 @@ export type ReservationUnitUpdateMutationInput = {
   descriptionFi?: Maybe<Scalars['String']>;
   descriptionSv?: Maybe<Scalars['String']>;
   equipmentPks?: Maybe<Array<Maybe<Scalars['Int']>>>;
+  /** Maximum price of the reservation unit */
+  highestPrice?: Maybe<Scalars['Float']>;
   isDraft?: Maybe<Scalars['Boolean']>;
+  /** Minimum price of the reservation unit */
+  lowestPrice?: Maybe<Scalars['Float']>;
   maxPersons?: Maybe<Scalars['Int']>;
   maxReservationDuration?: Maybe<Scalars['String']>;
   minReservationDuration?: Maybe<Scalars['String']>;
@@ -1501,9 +1543,13 @@ export type ReservationUnitUpdateMutationInput = {
   nameSv?: Maybe<Scalars['String']>;
   paymentTermsPk?: Maybe<Scalars['String']>;
   pk: Scalars['Int'];
+  /** Unit of the price. Possible values are per_15_mins, per_30_mins, per_hour, per_half_day, per_day, per_week, fixed. */
+  priceUnit?: Maybe<Scalars['String']>;
   purposePks?: Maybe<Array<Maybe<Scalars['Int']>>>;
   /** Determines if introduction is required in order to reserve this reservation unit. */
   requireIntroduction?: Maybe<Scalars['Boolean']>;
+  /** Determines the interval for the start time of the reservation. For example an interval of 15 minutes means a reservation can begin at minutes 0, 15, 30, or 45. Possible values are interval_15_mins, interval_30_mins, interval_60_mins, interval_90_mins. */
+  reservationStartInterval?: Maybe<Scalars['String']>;
   reservationUnitTypePk?: Maybe<Scalars['Int']>;
   resourcePks?: Maybe<Array<Maybe<Scalars['Int']>>>;
   servicePks?: Maybe<Array<Maybe<Scalars['Int']>>>;
@@ -1533,11 +1579,15 @@ export type ReservationUnitUpdateMutationPayload = {
   descriptionSv?: Maybe<Scalars['String']>;
   /** May contain more than one error for same field. */
   errors?: Maybe<Array<Maybe<ErrorType>>>;
+  /** Maximum price of the reservation unit */
+  highestPrice?: Maybe<Scalars['Float']>;
   /** Images of the reservation unit as nested related objects.  */
   images?: Maybe<Array<Maybe<ReservationUnitImageType>>>;
   isDraft?: Maybe<Scalars['Boolean']>;
   /** Location of this reservation unit. Dynamically determined from spaces of the reservation unit. */
   location?: Maybe<Scalars['String']>;
+  /** Minimum price of the reservation unit */
+  lowestPrice?: Maybe<Scalars['Float']>;
   maxPersons?: Maybe<Scalars['Int']>;
   maxReservationDuration?: Maybe<Scalars['String']>;
   minReservationDuration?: Maybe<Scalars['String']>;
@@ -1545,9 +1595,13 @@ export type ReservationUnitUpdateMutationPayload = {
   nameFi?: Maybe<Scalars['String']>;
   nameSv?: Maybe<Scalars['String']>;
   pk?: Maybe<Scalars['Int']>;
+  /** Unit of the price. Possible values are per_15_mins, per_30_mins, per_hour, per_half_day, per_day, per_week, fixed. */
+  priceUnit?: Maybe<Scalars['String']>;
   purposes?: Maybe<Array<Maybe<PurposeType>>>;
   /** Determines if introduction is required in order to reserve this reservation unit. */
   requireIntroduction?: Maybe<Scalars['Boolean']>;
+  /** Determines the interval for the start time of the reservation. For example an interval of 15 minutes means a reservation can begin at minutes 0, 15, 30, or 45. Possible values are interval_15_mins, interval_30_mins, interval_60_mins, interval_90_mins. */
+  reservationStartInterval?: Maybe<Scalars['String']>;
   reservationUnit?: Maybe<ReservationUnitType>;
   /** Type of the reservation unit as nested related object. */
   reservationUnitType?: Maybe<ReservationUnitTypeType>;
@@ -1576,6 +1630,36 @@ export enum ReservationUnitsReservationUnitImageImageTypeChoices {
   Map = 'MAP',
   /** Other */
   Other = 'OTHER'
+}
+
+/** An enumeration. */
+export enum ReservationUnitsReservationUnitPriceUnitChoices {
+  /** fixed */
+  Fixed = 'FIXED',
+  /** per 15 minutes */
+  Per_15Mins = 'PER_15_MINS',
+  /** per 30 minutes */
+  Per_30Mins = 'PER_30_MINS',
+  /** per day */
+  PerDay = 'PER_DAY',
+  /** per half a day */
+  PerHalfDay = 'PER_HALF_DAY',
+  /** per hour */
+  PerHour = 'PER_HOUR',
+  /** per week */
+  PerWeek = 'PER_WEEK'
+}
+
+/** An enumeration. */
+export enum ReservationUnitsReservationUnitReservationStartIntervalChoices {
+  /** 15 minutes */
+  Interval_15Mins = 'INTERVAL_15_MINS',
+  /** 30 minutes */
+  Interval_30Mins = 'INTERVAL_30_MINS',
+  /** 60 minutes */
+  Interval_60Mins = 'INTERVAL_60_MINS',
+  /** 90 minutes */
+  Interval_90Mins = 'INTERVAL_90_MINS'
 }
 
 export type ReservationUpdateMutationInput = {
@@ -1610,6 +1694,8 @@ export type ReservationUpdateMutationPayload = {
   errors?: Maybe<Array<Maybe<ErrorType>>>;
   name?: Maybe<Scalars['String']>;
   pk?: Maybe<Scalars['Int']>;
+  /** The price of this particular reservation */
+  price?: Maybe<Scalars['Float']>;
   priority?: Maybe<Scalars['Int']>;
   purposePk?: Maybe<Scalars['Int']>;
   reservation?: Maybe<ReservationType>;
