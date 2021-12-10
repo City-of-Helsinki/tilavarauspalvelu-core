@@ -1,5 +1,5 @@
 import { IconSliders } from "hds-react";
-import { uniq } from "lodash";
+import { uniq, uniqBy } from "lodash";
 import React, { useMemo, useState } from "react";
 import i18next from "i18next";
 import { useTranslation } from "react-i18next";
@@ -19,20 +19,24 @@ interface IProps {
 }
 
 const getFilterConfig = (units: ReservationUnitType[]): DataFilterConfig[] => {
-  const types = uniq(units.map((unit) => unit.reservationUnitType));
+  const types = uniq(units.map((unit) => unit.reservationUnitType)).filter(
+    Boolean
+  );
   const status = uniq(units.map((unit) => unit.isDraft));
 
   return [
     {
       title: "ReservationUnitList.typeFilter",
-      filters: types.map((value) => ({
-        title: value?.nameFi || "",
-        key: "reservationUnitType.pk",
-        value: value?.pk as number,
-      })),
+      filters: uniqBy(
+        types.map((value) => ({
+          title: value?.nameFi || "",
+          key: "reservationUnitType.pk",
+          value: value?.pk as number,
+        })),
+        (f) => f.value
+      ),
     },
     {
-      // wip no api yet
       title: "ReservationUnitList.statusFilter",
       filters: status.map((value) => ({
         title: i18next.t(`ReservationUnit.isDraft.${value}`),
