@@ -39,3 +39,4 @@ social-auth-app-django==4.0.0
 uWSGI==2.0.19.1
 whitenoise==5.2.0
 pip-tools
+graphene-file-upload==1.3.0
