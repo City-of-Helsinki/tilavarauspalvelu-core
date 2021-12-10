@@ -3,6 +3,7 @@ from django.conf import settings
 from graphene import ClientIDMutation
 from graphene_django.rest_framework.mutation import SerializerMutation
 from graphene_django.types import ErrorType
+from graphene_file_upload.scalars import Upload
 from graphene_permissions.permissions import AllowAny
 from rest_framework.generics import get_object_or_404
 
@@ -15,12 +16,14 @@ from api.graphql.reservation_units.reservation_unit_serializers import (
     PurposeCreateSerializer,
     PurposeUpdateSerializer,
     ReservationUnitCreateSerializer,
+    ReservationUnitImageCreateSerializer,
     ReservationUnitUpdateSerializer,
 )
 from api.graphql.reservation_units.reservation_unit_types import (
     EquipmentCategoryType,
     EquipmentType,
     PurposeType,
+    ReservationUnitImageType,
     ReservationUnitType,
 )
 from opening_hours.errors import HaukiAPIError, HaukiRequestError
@@ -28,9 +31,15 @@ from permissions.api_permissions.graphene_permissions import (
     EquipmentCategoryPermission,
     EquipmentPermission,
     PurposePermission,
+    ReservationUnitImagePermission,
     ReservationUnitPermission,
 )
-from reservation_units.models import Equipment, EquipmentCategory, Purpose
+from reservation_units.models import (
+    Equipment,
+    EquipmentCategory,
+    Purpose,
+    ReservationUnitImage,
+)
 from reservation_units.utils.hauki_exporter import ReservationUnitHaukiExporter
 
 
@@ -207,3 +216,38 @@ class ReservationUnitUpdateMutation(
         model_operations = ["update"]
         lookup_field = "pk"
         serializer_class = ReservationUnitUpdateSerializer
+
+
+class ReservationUnitImageCreateMutation(AuthSerializerMutation, SerializerMutation):
+    reservation_unit_image = graphene.Field(ReservationUnitImageType)
+
+    class Input:
+        image = Upload()
+
+    permission_classes = (
+        (ReservationUnitImagePermission,)
+        if not settings.TMP_PERMISSIONS_DISABLED
+        else (AllowAny,)
+    )
+
+    class Meta:
+        model_operations = ["create"]
+        serializer_class = ReservationUnitImageCreateSerializer
+
+    def resolve_reservation_unit_image(self, info):
+        if self.pk:
+            return get_object_or_404(ReservationUnitImage, pk=self.pk)
+        return None
+
+
+class ReservationUnitImageDeleteMutation(AuthDeleteMutation, ClientIDMutation):
+    permission_classes = (
+        (ReservationUnitImagePermission,)
+        if not settings.TMP_PERMISSIONS_DISABLED
+        else (AllowAny,)
+    )
+    model = ReservationUnitImage
+
+    @classmethod
+    def validate(self, root, info, **input):
+        return None

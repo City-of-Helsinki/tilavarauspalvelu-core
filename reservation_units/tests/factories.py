@@ -89,6 +89,11 @@ class ReservationUnitFactory(DjangoModelFactory):
             self.equipments.add(equipment)
 
 
+class ReservationUnitImageFactory(DjangoModelFactory):
+    class Meta:
+        model = "reservation_units.ReservationUnitImage"
+
+
 class KeywordCategoryFactory(DjangoModelFactory):
     class Meta:
         model = "reservation_units.KeywordCategory"

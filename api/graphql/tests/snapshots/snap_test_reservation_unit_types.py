@@ -16,7 +16,6 @@ snapshots['ReservationUnitTestCase::test_getting_reservation_unit_types 1'] = {
                         'nameEn': 'en',
                         'nameFi': 'fi',
                         'nameSv': 'sv',
-                        'pk': 1
                     }
                 }
             ]

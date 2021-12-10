@@ -21,6 +21,8 @@ from api.graphql.reservation_units.reservation_unit_mutations import (
     PurposeCreateMutation,
     PurposeUpdateMutation,
     ReservationUnitCreateMutation,
+    ReservationUnitImageCreateMutation,
+    ReservationUnitImageDeleteMutation,
     ReservationUnitUpdateMutation,
 )
 from api.graphql.reservation_units.reservation_unit_types import (
@@ -312,6 +314,9 @@ class Mutation(graphene.ObjectType):
 
     create_reservation_unit = ReservationUnitCreateMutation.Field()
     update_reservation_unit = ReservationUnitUpdateMutation.Field()
+
+    create_reservation_unit_image = ReservationUnitImageCreateMutation.Field()
+    delete_reservation_unit_image = ReservationUnitImageDeleteMutation.Field()
 
     create_purpose = PurposeCreateMutation.Field()
     update_purpose = PurposeUpdateMutation.Field()
