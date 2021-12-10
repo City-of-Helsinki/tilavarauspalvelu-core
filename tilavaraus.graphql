@@ -842,8 +842,13 @@ type ReservationUnitByPkType implements Node {
   """Maximum price of the reservation unit"""
   highestPrice: Decimal!
 
-  """The current list price for reservation units with a fixed price"""
-  price: Decimal!
+  """
+  Determines the interval for the start time of the reservation. For example an
+  interval of 15 minutes means a reservation can begin at minutes 0, 15, 30, or
+  45. Possible values are interval_15_mins, interval_30_mins, interval_60_mins,
+  interval_90_mins.
+  """
+  reservationStartInterval: ReservationUnitsReservationUnitReservationStartIntervalChoices!
   images: [ReservationUnitImageType]
 
   """The ID of the object"""
@@ -951,23 +956,28 @@ input ReservationUnitCreateMutationInput {
   """
   priceUnit: String
 
-  """The current list price for reservation units with a fixed price"""
-  price: Float
+  """
+  Determines the interval for the start time of the reservation. For example an
+  interval of 15 minutes means a reservation can begin at minutes 0, 15, 30, or
+  45. Possible values are interval_15_mins, interval_30_mins, interval_60_mins,
+  interval_90_mins.
+  """
+  reservationStartInterval: String
   nameFi: String
   nameEn: String
   nameSv: String
-  additionalInstructionsFi: String
-  additionalInstructionsEn: String
-  additionalInstructionsSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
-  contactInformationFi: String
-  contactInformationEn: String
-  contactInformationSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  contactInformationFi: String
+  contactInformationEn: String
+  contactInformationSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
+  additionalInstructionsFi: String
+  additionalInstructionsEn: String
+  additionalInstructionsSv: String
   clientMutationId: String
 }
 
@@ -1022,23 +1032,28 @@ type ReservationUnitCreateMutationPayload {
   """
   priceUnit: String
 
-  """The current list price for reservation units with a fixed price"""
-  price: Float
+  """
+  Determines the interval for the start time of the reservation. For example an
+  interval of 15 minutes means a reservation can begin at minutes 0, 15, 30, or
+  45. Possible values are interval_15_mins, interval_30_mins, interval_60_mins,
+  interval_90_mins.
+  """
+  reservationStartInterval: String
   nameFi: String
   nameEn: String
   nameSv: String
-  additionalInstructionsFi: String
-  additionalInstructionsEn: String
-  additionalInstructionsSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
-  contactInformationFi: String
-  contactInformationEn: String
-  contactInformationSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  contactInformationFi: String
+  contactInformationEn: String
+  contactInformationSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
+  additionalInstructionsFi: String
+  additionalInstructionsEn: String
+  additionalInstructionsSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -1096,6 +1111,21 @@ enum ReservationUnitsReservationUnitPriceUnitChoices {
   FIXED
 }
 
+"""An enumeration."""
+enum ReservationUnitsReservationUnitReservationStartIntervalChoices {
+  """15 minutes"""
+  INTERVAL_15_MINS
+
+  """30 minutes"""
+  INTERVAL_30_MINS
+
+  """60 minutes"""
+  INTERVAL_60_MINS
+
+  """90 minutes"""
+  INTERVAL_90_MINS
+}
+
 type ReservationUnitType implements Node {
   nameFi: String
   nameEn: String
@@ -1139,8 +1169,13 @@ type ReservationUnitType implements Node {
   """Maximum price of the reservation unit"""
   highestPrice: Decimal!
 
-  """The current list price for reservation units with a fixed price"""
-  price: Decimal!
+  """
+  Determines the interval for the start time of the reservation. For example an
+  interval of 15 minutes means a reservation can begin at minutes 0, 15, 30, or
+  45. Possible values are interval_15_mins, interval_30_mins, interval_60_mins,
+  interval_90_mins.
+  """
+  reservationStartInterval: ReservationUnitsReservationUnitReservationStartIntervalChoices!
   images: [ReservationUnitImageType]
   applicationRounds(active: Boolean = null): [ApplicationRoundType]
 
@@ -1234,23 +1269,28 @@ input ReservationUnitUpdateMutationInput {
   """
   priceUnit: String
 
-  """The current list price for reservation units with a fixed price"""
-  price: Float
+  """
+  Determines the interval for the start time of the reservation. For example an
+  interval of 15 minutes means a reservation can begin at minutes 0, 15, 30, or
+  45. Possible values are interval_15_mins, interval_30_mins, interval_60_mins,
+  interval_90_mins.
+  """
+  reservationStartInterval: String
   nameFi: String
   nameEn: String
   nameSv: String
-  additionalInstructionsFi: String
-  additionalInstructionsEn: String
-  additionalInstructionsSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
-  contactInformationFi: String
-  contactInformationEn: String
-  contactInformationSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  contactInformationFi: String
+  contactInformationEn: String
+  contactInformationSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
+  additionalInstructionsFi: String
+  additionalInstructionsEn: String
+  additionalInstructionsSv: String
   clientMutationId: String
 }
 
@@ -1305,23 +1345,28 @@ type ReservationUnitUpdateMutationPayload {
   """
   priceUnit: String
 
-  """The current list price for reservation units with a fixed price"""
-  price: Float
+  """
+  Determines the interval for the start time of the reservation. For example an
+  interval of 15 minutes means a reservation can begin at minutes 0, 15, 30, or
+  45. Possible values are interval_15_mins, interval_30_mins, interval_60_mins,
+  interval_90_mins.
+  """
+  reservationStartInterval: String
   nameFi: String
   nameEn: String
   nameSv: String
-  additionalInstructionsFi: String
-  additionalInstructionsEn: String
-  additionalInstructionsSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
-  contactInformationFi: String
-  contactInformationEn: String
-  contactInformationSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  contactInformationFi: String
+  contactInformationEn: String
+  contactInformationSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
+  additionalInstructionsFi: String
+  additionalInstructionsEn: String
+  additionalInstructionsSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -1851,15 +1896,15 @@ input UnitUpdateMutationInput {
   webPage: String
   email: String
   phone: String
-  shortDescriptionFi: String
-  shortDescriptionEn: String
-  shortDescriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  shortDescriptionFi: String
+  shortDescriptionEn: String
+  shortDescriptionSv: String
   clientMutationId: String
 }
 
@@ -1869,15 +1914,15 @@ type UnitUpdateMutationPayload {
   webPage: String
   email: String
   phone: String
-  shortDescriptionFi: String
-  shortDescriptionEn: String
-  shortDescriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  shortDescriptionFi: String
+  shortDescriptionEn: String
+  shortDescriptionSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
