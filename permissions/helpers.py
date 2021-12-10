@@ -86,6 +86,8 @@ def can_manage_unit_roles(user: User, unit: Unit) -> bool:
 
 def can_manage_units(user: User, unit: Unit) -> bool:
     permission = "can_manage_units"
+    if user.is_anonymous:
+        return False
     return (
         is_superuser(user)
         or has_service_sector_permission(

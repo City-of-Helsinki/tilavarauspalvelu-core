@@ -120,7 +120,9 @@ class ReservationUnitHaukiUrlType(AuthNode, DjangoObjectType):
         fields = ("url",)
 
     def resolve_url(self, info):
-        if can_manage_units(info.context.user, self.unit):
+        if settings.TMP_PERMISSIONS_DISABLED or can_manage_units(
+            info.context.user, self.unit
+        ):
             return generate_hauki_link(
                 self.uuid,
                 getattr(info.context.user, "email", ""),
