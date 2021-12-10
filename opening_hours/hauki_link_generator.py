@@ -18,6 +18,7 @@ def generate_hauki_link(
         and settings.HAUKI_SECRET
         and settings.HAUKI_ORIGIN_ID
         and username
+        and organization_id
     ):
         return None
 

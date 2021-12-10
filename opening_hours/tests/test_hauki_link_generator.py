@@ -57,3 +57,9 @@ def test_hauki_link_with_missing_settings(setting, enable_hauki_admin_ui):
     )
 
     assert_that(link).is_none()
+
+
+@freeze_time("2021-01-01 12:00:00", tz_offset=2)
+def test_hauki_link_generation_when_organization_none(enable_hauki_admin_ui):
+    link = generate_hauki_link(uuid="123", username="foo@bar.com", organization_id=None)
+    assert_that(link).is_none()
