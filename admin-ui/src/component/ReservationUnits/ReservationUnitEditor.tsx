@@ -118,6 +118,12 @@ const makeOption = (e: { pk: number; nameFi: string }) => ({
   value: e.pk,
 });
 
+const optionMaker = (e: any) =>
+  makeOption({
+    pk: get(e, "node.pk", -1),
+    nameFi: get(e, "node.nameFi", "no-name"),
+  });
+
 const makeTermsOptions = (
   action: {
     type: "parametersLoaded";
@@ -125,16 +131,13 @@ const makeTermsOptions = (
   },
   termsType: TermsOfUseTermsOfUseTermsTypeChoices
 ): OptionType[] => {
-  return (action.parameters.termsOfUse?.edges || [])
+  const options = (action.parameters.termsOfUse?.edges || [])
     .filter((tou) => {
       return termsType === tou?.node?.termsType;
     })
-    .map((e) =>
-      makeOption({
-        pk: get(e, "node.pk", -1),
-        nameFi: get(e, "node.nameFi", "no-name"),
-      })
-    );
+    .map(optionMaker);
+
+  return [...options];
 };
 
 const getInitialState = (reservationUnitPk: number): State => ({
@@ -162,10 +165,8 @@ const withLoadingStatus = (state: State): State => {
   const newLoadingStatus =
     !hasError &&
     (state.spaceOptions.length === 0 ||
-      (state.reservationUnitPk && !get(state, "reservationUnitEdit.pk")) ||
-      state.equipmentOptions.length === 0 ||
-      state.paymentTermsOptions.length === 0 ||
-      state.purposeOptions.length === 0);
+      (state.reservationUnitPk !== undefined &&
+        !get(state, "reservationUnitEdit.pk")));
 
   return {
     ...state,
@@ -184,6 +185,7 @@ const i18nFields = (baseName: string): string[] =>
   languages.map((l) => baseName + upperFirst(l));
 
 const reducer = (state: State, action: Action): State => {
+  console.log("reducing", state, action);
   switch (action.type) {
     case "dataLoaded": {
       const { reservationUnit } = action;
@@ -275,26 +277,15 @@ const reducer = (state: State, action: Action): State => {
     case "parametersLoaded": {
       return withLoadingStatus({
         ...state,
-        equipmentOptions: (action.parameters.equipments?.edges || []).map((e) =>
-          makeOption({
-            pk: get(e, "node.pk", -1),
-            nameFi: get(e, "node.nameFi", "no-name"),
-          })
+        equipmentOptions: (action.parameters.equipments?.edges || []).map(
+          optionMaker
         ),
-        purposeOptions: (action.parameters.purposes?.edges || []).map((e) =>
-          makeOption({
-            pk: get(e, "node.pk", -1),
-            nameFi: get(e, "node.nameFi", "no-name"),
-          })
+        purposeOptions: (action.parameters.purposes?.edges || []).map(
+          optionMaker
         ),
         reservationUnitTypeOptions: (
           action.parameters.reservationUnitTypes?.edges || []
-        ).map((e) =>
-          makeOption({
-            pk: get(e, "node.pk", -1),
-            nameFi: get(e, "node.nameFi", "no-name"),
-          })
-        ),
+        ).map(optionMaker),
         paymentTermsOptions: makeTermsOptions(
           action,
           TermsOfUseTermsOfUseTermsTypeChoices.PaymentTerms
@@ -772,6 +763,8 @@ const ReservationUnitEditor = (): JSX.Element | null => {
     return <Loader />;
   }
 
+  console.log("rendering with ", state);
+
   if (state.error && !state.reservationUnit) {
     return (
       <Wrapper>
@@ -1050,50 +1043,6 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                     ]}
                   />
                 </EditorColumns>
-                <EditorColumns>
-                  <TimeInput
-                    id="minReservationDuration"
-                    label={t(
-                      "ReservationUnitEditor.minReservationDurationLabel"
-                    )}
-                    hoursLabel={t("common.hoursLabel")}
-                    minutesLabel={t("common.minutesLabel")}
-                    value={getDuration(
-                      state.reservationUnitEdit.minReservationDuration
-                    )}
-                    onChange={(v) => {
-                      if (
-                        typeof v.target.value === "string" &&
-                        v.target.value.length === 5
-                      ) {
-                        setValue({
-                          minReservationDuration: `${v.target.value}:00`,
-                        });
-                      }
-                    }}
-                  />
-                  <TimeInput
-                    id="maxReservationDuration"
-                    label={t(
-                      "ReservationUnitEditor.maxReservationDurationLabel"
-                    )}
-                    hoursLabel={t("common.hoursLabel")}
-                    minutesLabel={t("common.minutesLabel")}
-                    value={getDuration(
-                      state.reservationUnitEdit.maxReservationDuration
-                    )}
-                    onChange={(v) => {
-                      if (
-                        typeof v.target.value === "string" &&
-                        v.target.value.length === 5
-                      ) {
-                        setValue({
-                          maxReservationDuration: `${v.target.value}:00`,
-                        });
-                      }
-                    }}
-                  />
-                </EditorColumns>
                 {languages.map((lang) => (
                   <RichTextInput
                     key={lang}
@@ -1150,6 +1099,50 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                     ))}
                   </SelectionGroup>
                 </ActivationGroup>
+                <EditorColumns>
+                  <TimeInput
+                    id="minReservationDuration"
+                    label={t(
+                      "ReservationUnitEditor.minReservationDurationLabel"
+                    )}
+                    hoursLabel={t("common.hoursLabel")}
+                    minutesLabel={t("common.minutesLabel")}
+                    value={getDuration(
+                      state.reservationUnitEdit.minReservationDuration
+                    )}
+                    onChange={(v) => {
+                      if (
+                        typeof v.target.value === "string" &&
+                        v.target.value.length === 5
+                      ) {
+                        setValue({
+                          minReservationDuration: `${v.target.value}:00`,
+                        });
+                      }
+                    }}
+                  />
+                  <TimeInput
+                    id="maxReservationDuration"
+                    label={t(
+                      "ReservationUnitEditor.maxReservationDurationLabel"
+                    )}
+                    hoursLabel={t("common.hoursLabel")}
+                    minutesLabel={t("common.minutesLabel")}
+                    value={getDuration(
+                      state.reservationUnitEdit.maxReservationDuration
+                    )}
+                    onChange={(v) => {
+                      if (
+                        typeof v.target.value === "string" &&
+                        v.target.value.length === 5
+                      ) {
+                        setValue({
+                          maxReservationDuration: `${v.target.value}:00`,
+                        });
+                      }
+                    }}
+                  />
+                </EditorColumns>
               </Accordion>
               <Accordion heading={t("ReservationUnitEditor.pricing")}>
                 <DenseEditorColumns>
@@ -1232,34 +1225,40 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                     }
                   />
                 ))}
-                {["payment", "cancellation", "serviceSpecific"].map((name) => {
-                  const options = get(state, `${name}TermsOptions`);
-                  return (
-                    <SelectWithPadding
-                      key={name}
-                      label={t(`ReservationUnitEditor.${name}TermsLabel`)}
-                      placeholder={t(
-                        `ReservationUnitEditor.${name}TermsPlaceholder`
-                      )}
-                      options={options}
-                      onChange={(selectedTerms: unknown) => {
-                        const o = selectedTerms as OptionType;
-                        setValue({
-                          [`${name}TermsPk`]: o.value,
-                        });
-                      }}
-                      disabled={options.length === 0}
-                      helper={t(`ReservationUnitEditor.${name}TermsHelperText`)}
-                      value={
-                        getSelectedOption(
-                          state,
-                          `${name}TermsOptions`,
-                          `${name}TermsPk`
-                        ) || {}
-                      }
-                    />
-                  );
-                })}
+                <EditorColumns>
+                  {["serviceSpecific", "payment", "cancellation"].map(
+                    (name) => {
+                      const options = get(state, `${name}TermsOptions`);
+                      return (
+                        <SelectWithPadding
+                          key={name}
+                          label={t(`ReservationUnitEditor.${name}TermsLabel`)}
+                          placeholder={t(
+                            `ReservationUnitEditor.${name}TermsPlaceholder`
+                          )}
+                          options={options}
+                          onChange={(selectedTerms: unknown) => {
+                            const o = selectedTerms as OptionType;
+                            setValue({
+                              [`${name}TermsPk`]: o.value,
+                            });
+                          }}
+                          disabled={options.length === 0}
+                          helper={t(
+                            `ReservationUnitEditor.${name}TermsHelperText`
+                          )}
+                          value={
+                            getSelectedOption(
+                              state,
+                              `${name}TermsOptions`,
+                              `${name}TermsPk`
+                            ) || {}
+                          }
+                        />
+                      );
+                    }
+                  )}
+                </EditorColumns>
               </Accordion>
               <Accordion heading={t("ReservationUnitEditor.communication")}>
                 {languages.map((lang) => (
