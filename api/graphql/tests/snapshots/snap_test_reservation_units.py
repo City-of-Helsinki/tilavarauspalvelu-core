@@ -381,6 +381,9 @@ snapshots['ReservationUnitQueryTestCase::test_getting_reservation_units 1'] = {
                             }
                         ],
                         'surfaceArea': 150,
+                        'taxPercentage': {
+                            'value': '24.00'
+                        },
                         'termsOfUseFi': None
                     }
                 }
