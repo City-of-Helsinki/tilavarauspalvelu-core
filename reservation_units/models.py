@@ -582,4 +582,16 @@ class Introduction(models.Model):
     completed_at = models.DateTimeField(verbose_name=_("Completed at"))
 
 
+class TaxPercentage(models.Model):
+    value = models.DecimalField(
+        verbose_name=_("Tax percentage"),
+        max_digits=5,
+        decimal_places=2,
+        help_text="The tax percentage for a price",
+    )
+
+    def __str__(self) -> str:
+        return f"{self.value}%"
+
+
 AuditLogger.register(ReservationUnit)

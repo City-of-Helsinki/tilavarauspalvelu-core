@@ -16,6 +16,7 @@ from .models import (
     ReservationUnitCancellationRule,
     ReservationUnitImage,
     ReservationUnitType,
+    TaxPercentage,
 )
 
 
@@ -98,3 +99,8 @@ class KeywordGroupAdmin(admin.ModelAdmin):
 @admin.register(Keyword)
 class KeywordAdmin(admin.ModelAdmin):
     model = Keyword
+
+
+@admin.register(TaxPercentage)
+class TaxPercentageAdmin(admin.ModelAdmin):
+    model = TaxPercentage
