@@ -185,7 +185,6 @@ const i18nFields = (baseName: string): string[] =>
   languages.map((l) => baseName + upperFirst(l));
 
 const reducer = (state: State, action: Action): State => {
-  console.log("reducing", state, action);
   switch (action.type) {
     case "dataLoaded": {
       const { reservationUnit } = action;
@@ -762,8 +761,6 @@ const ReservationUnitEditor = (): JSX.Element | null => {
   if (state.loading) {
     return <Loader />;
   }
-
-  console.log("rendering with ", state);
 
   if (state.error && !state.reservationUnit) {
     return (
