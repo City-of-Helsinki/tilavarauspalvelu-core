@@ -321,7 +321,8 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
             "min_reservation_duration",
             "is_draft",
             "surface_area",
-            "buffer_time_between_reservations",
+            "buffer_time_before",
+            "buffer_time_after",
             "reservations",
             "application_rounds",
             "cancellation_rule",
@@ -475,6 +476,8 @@ class ReservationUnitByPkType(ReservationUnitType, OpeningHoursMixin):
             "highest_price",
             "price_unit",
             "reservation_start_interval",
+            "buffer_time_before",
+            "buffer_time_after",
         ] + get_all_translatable_fields(model)
 
         interfaces = (graphene.relay.Node,)

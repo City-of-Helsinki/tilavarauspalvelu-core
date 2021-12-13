@@ -319,7 +319,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         self, mock_periods, mock_opening_hours
     ):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
-        self.reservation_unit.buffer_time_between_reservations = datetime.timedelta(
+        self.reservation_unit.buffer_time_before = datetime.timedelta(
             hours=1, minutes=1
         )
         self.reservation_unit.save()
@@ -345,16 +345,14 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         assert_that(
             content.get("data").get("createReservation").get("errors")[0]["messages"][0]
         ).contains(
-            "Reservation unit buffer time between reservations overlaps with current begin time."
+            "Reservation unit buffer time before overlaps with current begin time."
         )
 
     def test_create_fails_when_reservation_unit_buffer_time_overlaps_with_existing_reservation_after(
         self, mock_periods, mock_opening_hours
     ):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
-        self.reservation_unit.buffer_time_between_reservations = datetime.timedelta(
-            hours=1, minutes=1
-        )
+        self.reservation_unit.buffer_time_after = datetime.timedelta(hours=1, minutes=1)
         self.reservation_unit.save()
         begin = datetime.datetime.now() + datetime.timedelta(hours=2)
         end = begin + datetime.timedelta(hours=1)
@@ -377,9 +375,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         ).is_not_none()
         assert_that(
             content.get("data").get("createReservation").get("errors")[0]["messages"][0]
-        ).contains(
-            "Reservation unit buffer time between reservations overlaps with current end time."
-        )
+        ).contains("Reservation unit buffer time after overlaps with current end time.")
 
     def test_create_fails_when_reservation_unit_closed_on_selected_time(
         self, mock_periods, mock_opening_hours
@@ -758,7 +754,7 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         self, mock_periods, mock_opening_hours
     ):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
-        self.reservation_unit.buffer_time_between_reservations = datetime.timedelta(
+        self.reservation_unit.buffer_time_before = datetime.timedelta(
             hours=1, minutes=1
         )
         self.reservation_unit.save()
@@ -785,16 +781,14 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         assert_that(
             content.get("data").get("updateReservation").get("errors")[0]["messages"][0]
         ).contains(
-            "Reservation unit buffer time between reservations overlaps with current begin time."
+            "Reservation unit buffer time before overlaps with current begin time."
         )
 
     def test_update_fails_when_reservation_unit_buffer_time_overlaps_with_existing_reservation_after(
         self, mock_periods, mock_opening_hours
     ):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
-        self.reservation_unit.buffer_time_between_reservations = datetime.timedelta(
-            hours=1, minutes=1
-        )
+        self.reservation_unit.buffer_time_after = datetime.timedelta(hours=1, minutes=1)
         self.reservation_unit.save()
         begin = datetime.datetime.now() + datetime.timedelta(hours=2)
         end = begin + datetime.timedelta(hours=1)
@@ -817,9 +811,7 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         ).is_not_none()
         assert_that(
             content.get("data").get("updateReservation").get("errors")[0]["messages"][0]
-        ).contains(
-            "Reservation unit buffer time between reservations overlaps with current end time."
-        )
+        ).contains("Reservation unit buffer time after overlaps with current end time.")
 
     def test_update_fails_when_reservation_unit_closed_on_selected_time(
         self, mock_periods, mock_opening_hours
