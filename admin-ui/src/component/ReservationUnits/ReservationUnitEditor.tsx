@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from "@apollo/client";
 import {
   Accordion,
-  Button,
+  Button as HDSButton,
   Checkbox,
   Combobox,
   Link,
@@ -49,7 +49,7 @@ import { ContentContainer, IngressContainer } from "../../styles/layout";
 import { breakpoints } from "../../styles/util";
 import Loader from "../Loader";
 import SubPageHead from "../Unit/SubPageHead";
-import withMainMenu from "../withMainMenu";
+import { MainMenuWrapper } from "../withMainMenu";
 import RichTextInput from "../RichTextInput";
 import { useNotification } from "../../context/NotificationContext";
 import ActivationGroup from "./ActivationGroup";
@@ -432,19 +432,71 @@ const Section = styled.div`
 `;
 
 const Buttons = styled.div`
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  right: 0;
   display: flex;
-  margin: var(--spacing-layout-m) 0;
+  padding: var(--spacing-xl);
+  background-color: var(--color-bus-dark);
+  z-index: 1000;
 `;
 
-const SaveButton = styled(Button)`
+const StyledButton = styled(HDSButton)<{
+  disabled: boolean;
+  variant: "secondary" | "primary";
+}>`
+  --bg: var(--color-white);
+  --fg: var(--color-black);
+  --hbg: var(--fg);
+  --hfg: var(--bg);
+  --border-color: var(--color-white);
+
+  ${({ variant }) =>
+    variant === "secondary"
+      ? `--fg: var(--color-white);
+    --bg: var(--color-bus-dark);`
+      : null}
+
+  ${({ disabled }) =>
+    disabled
+      ? `--hbg: var(--bg);
+        --hfg: var(--fg);
+      `
+      : null}
+
+
+  border: 2px var(--border-color) solid !important;
+
+  color: var(--fg) !important;
+  background-color: var(--bg) !important;
+
+  &:hover {
+    color: var(--hfg) !important;
+    background-color: var(--hbg) !important;
+  }
   margin-left: auto;
+  margin-right: var(--spacing-l);
+`;
+
+const PublishingTime = styled.div`
+  flex-grow: 1;
+  color: var(--color-white);
+  display: flex;
+  justify-content: right;
+  align-items: center;
+  flex-direction: row;
+  padding-right: var(--spacing-m);
+  text-align: end;
+  line-height: 1.3;
 `;
 
 const Preview = styled.a<{ $disabled: boolean }>`
   margin-left: auto;
   padding: var(--spacing-m);
-  color: var(--color-white);
-  background-color: var(--color-bus);
+  border-color: var(--color-white) !important;
+  border: 2px solid;
+  background-color: var(--color-bus-dark);
   text-decoration: none;
   &:hover {
     background-color: var(--color-bus-dark);
@@ -453,13 +505,18 @@ const Preview = styled.a<{ $disabled: boolean }>`
     $disabled
       ? `
     cursor: not-allowed;
-    background-color: var(--color-black-20);
+    color: var(--color-white);
     &:hover {
-      background-color: var(--color-black-20);;
-
-  `
+      background-color: var(--color-bus-dark);
+      }  `
       : `
+      color: var(--color-white);
     cursor: pointer;
+    &:hover {
+      background-color: var(--color-white);
+      color: var(--color-black);
+      }
+
   `}
 `;
 
@@ -759,516 +816,555 @@ const ReservationUnitEditor = (): JSX.Element | null => {
 
   return (
     <Wrapper>
-      <IngressContainer>
-        {notification ? (
-          <StyledNotification
-            type={notification.type}
-            label={notification.title}
-            position="top-center"
-            dismissible
-            closeButtonLabelText={`${t("common.close")}`}
-            onClose={() => dispatch({ type: "clearNotification" })}
-          >
-            {notification.message}
-          </StyledNotification>
-        ) : null}
-      </IngressContainer>
-      <ContentContainer>
-        {state.unit ? (
-          <SubPageHead
-            unit={state.unit}
-            title={
-              state.reservationUnitEdit.nameFi ||
-              t("ReservationUnitEditor.defaultHeading")
-            }
-          />
-        ) : null}
-        <EditorContainer>
-          <Editor>
-            <Accordion
-              initiallyOpen
-              heading={t("ReservationUnitEditor.basicInformation")}
+      <MainMenuWrapper>
+        <IngressContainer>
+          {notification ? (
+            <StyledNotification
+              type={notification.type}
+              label={notification.title}
+              position="top-center"
+              dismissible
+              closeButtonLabelText={`${t("common.close")}`}
+              onClose={() => dispatch({ type: "clearNotification" })}
             >
-              <Section>
-                {languages.map((lang) => (
-                  <TextInputWithPadding
-                    key={lang}
-                    required
-                    id={`name${lang}`}
-                    label={t("ReservationUnitEditor.nameLabel", {
-                      lang,
-                    })}
-                    value={get(
-                      state,
-                      `reservationUnitEdit.name${upperFirst(lang)}`,
-                      ""
-                    )}
-                    onChange={(e) =>
+              {notification.message}
+            </StyledNotification>
+          ) : null}
+        </IngressContainer>
+        <ContentContainer>
+          {state.unit ? (
+            <SubPageHead
+              unit={state.unit}
+              title={
+                state.reservationUnitEdit.nameFi ||
+                t("ReservationUnitEditor.defaultHeading")
+              }
+            />
+          ) : null}
+          <EditorContainer>
+            <Editor>
+              <Accordion
+                initiallyOpen
+                heading={t("ReservationUnitEditor.basicInformation")}
+              >
+                <Section>
+                  {languages.map((lang) => (
+                    <TextInputWithPadding
+                      key={lang}
+                      required
+                      id={`name${lang}`}
+                      label={t("ReservationUnitEditor.nameLabel", {
+                        lang,
+                      })}
+                      value={get(
+                        state,
+                        `reservationUnitEdit.name${upperFirst(lang)}`,
+                        ""
+                      )}
+                      onChange={(e) =>
+                        setValue({
+                          [`name${upperFirst(lang)}`]: e.target.value,
+                        })
+                      }
+                    />
+                  ))}
+                  <EditorColumns>
+                    <Combobox
+                      multiselect
+                      required
+                      label={t("ReservationUnitEditor.spacesLabel")}
+                      placeholder={t("ReservationUnitEditor.spacesPlaceholder")}
+                      options={state.spaceOptions}
+                      clearButtonAriaLabel={t("common.clearAllSelections")}
+                      selectedItemRemoveButtonAriaLabel={t(
+                        "common.removeValue"
+                      )}
+                      toggleButtonAriaLabel={t("common.toggleMenu")}
+                      onChange={(spaces) =>
+                        dispatch({ type: "setSpaces", spaces })
+                      }
+                      disabled={state.spaceOptions.length === 0}
+                      value={[
+                        ...getSelectedOptions(
+                          state,
+                          "spaceOptions",
+                          "spacePks"
+                        ),
+                      ]}
+                    />
+                    <Combobox
+                      multiselect
+                      label={t("ReservationUnitEditor.resourcesLabel")}
+                      placeholder={t(
+                        "ReservationUnitEditor.resourcesPlaceholder"
+                      )}
+                      options={state.resourceOptions}
+                      clearButtonAriaLabel={t("common.clearAllSelections")}
+                      selectedItemRemoveButtonAriaLabel={t(
+                        "common.removeValue"
+                      )}
+                      toggleButtonAriaLabel={t("common.toggleMenu")}
+                      onChange={(resources) =>
+                        dispatch({ type: "setResources", resources })
+                      }
+                      disabled={state.resourceOptions.length === 0}
+                      value={[
+                        ...getSelectedOptions(
+                          state,
+                          "resourceOptions",
+                          "resourcePks"
+                        ),
+                      ]}
+                    />
+                  </EditorColumns>
+                  <Checkbox
+                    id="requireIntroduction"
+                    label={t("ReservationUnitEditor.requireIntroductionLabel")}
+                    checked={
+                      state.reservationUnitEdit.requireIntroduction === true
+                    }
+                    onClick={() =>
                       setValue({
-                        [`name${upperFirst(lang)}`]: e.target.value,
+                        requireIntroduction:
+                          !state.reservationUnitEdit?.requireIntroduction,
                       })
                     }
                   />
-                ))}
+                  <EditorColumns>
+                    <NumberInput
+                      value={state.reservationUnitEdit.surfaceArea || 0}
+                      id="surfaceArea"
+                      label={t("ReservationUnitEditor.surfaceAreaLabel")}
+                      helperText={t(
+                        "ReservationUnitEditor.surfaceAreaHelperText"
+                      )}
+                      minusStepButtonAriaLabel={t(
+                        "common.decreaseByOneAriaLabel"
+                      )}
+                      plusStepButtonAriaLabel={t(
+                        "common.increaseByOneAriaLabel"
+                      )}
+                      onChange={(e) => {
+                        setValue({
+                          surfaceArea: Number(e.target.value),
+                        });
+                      }}
+                      step={1}
+                      type="number"
+                      min={1}
+                      required
+                    />
+                    <NumberInput
+                      value={state.reservationUnitEdit.maxPersons || 0}
+                      id="maxPersons"
+                      label={t("ReservationUnitEditor.maxPersonsLabel")}
+                      minusStepButtonAriaLabel={t(
+                        "common.decreaseByOneAriaLabel"
+                      )}
+                      plusStepButtonAriaLabel={t(
+                        "common.increaseByOneAriaLabel"
+                      )}
+                      onChange={(e) => {
+                        setValue({
+                          maxPersons: Number(e.target.value),
+                        });
+                      }}
+                      step={1}
+                      type="number"
+                      min={1}
+                      helperText={t(
+                        "ReservationUnitEditor.maxPersonsHelperText"
+                      )}
+                      required
+                    />
+                  </EditorColumns>
+                </Section>
+              </Accordion>
+              <Accordion heading={t("ReservationUnitEditor.typesProperties")}>
                 <EditorColumns>
-                  <Combobox
-                    multiselect
-                    required
-                    label={t("ReservationUnitEditor.spacesLabel")}
-                    placeholder={t("ReservationUnitEditor.spacesPlaceholder")}
-                    options={state.spaceOptions}
-                    clearButtonAriaLabel={t("common.clearAllSelections")}
-                    selectedItemRemoveButtonAriaLabel={t("common.removeValue")}
-                    toggleButtonAriaLabel={t("common.toggleMenu")}
-                    onChange={(spaces) =>
-                      dispatch({ type: "setSpaces", spaces })
+                  <SelectWithPadding
+                    label={t(`ReservationUnitEditor.reservationUnitTypeLabel`)}
+                    placeholder={t(
+                      `ReservationUnitEditor.reservationUnitTypePlaceholder`
+                    )}
+                    options={state.reservationUnitTypeOptions}
+                    onChange={(selectedTerms: unknown) => {
+                      const o = selectedTerms as OptionType;
+                      setValue({
+                        [`reservationUnitTypePk`]: o.value,
+                      });
+                    }}
+                    disabled={state.reservationUnitTypeOptions.length === 0}
+                    helper={t(
+                      `ReservationUnitEditor.reservationUnitTypeHelperText`
+                    )}
+                    value={
+                      getSelectedOption(
+                        state,
+                        `reservationUnitTypeOptions`,
+                        `reservationUnitTypePk`
+                      ) || {}
                     }
-                    disabled={state.spaceOptions.length === 0}
-                    value={[
-                      ...getSelectedOptions(state, "spaceOptions", "spacePks"),
-                    ]}
                   />
                   <Combobox
                     multiselect
-                    label={t("ReservationUnitEditor.resourcesLabel")}
-                    placeholder={t(
-                      "ReservationUnitEditor.resourcesPlaceholder"
-                    )}
-                    options={state.resourceOptions}
+                    label={t("ReservationUnitEditor.purposesLabel")}
+                    placeholder={t("ReservationUnitEditor.purposesPlaceholder")}
+                    options={state.purposeOptions}
                     clearButtonAriaLabel={t("common.clearAllSelections")}
                     selectedItemRemoveButtonAriaLabel={t("common.removeValue")}
                     toggleButtonAriaLabel={t("common.toggleMenu")}
-                    onChange={(resources) =>
-                      dispatch({ type: "setResources", resources })
+                    onChange={(purposes) =>
+                      dispatch({ type: "setPurposes", purposes })
                     }
                     disabled={state.resourceOptions.length === 0}
                     value={[
                       ...getSelectedOptions(
                         state,
-                        "resourceOptions",
-                        "resourcePks"
+                        "purposeOptions",
+                        "purposePks"
+                      ),
+                    ]}
+                  />
+
+                  <Combobox
+                    multiselect
+                    label={t("ReservationUnitEditor.equipmentsLabel")}
+                    placeholder={t(
+                      "ReservationUnitEditor.equipmentsPlaceholder"
+                    )}
+                    options={state.equipmentOptions}
+                    clearButtonAriaLabel={t("common.clearAllSelections")}
+                    selectedItemRemoveButtonAriaLabel={t("common.removeValue")}
+                    toggleButtonAriaLabel={t("common.toggleMenu")}
+                    onChange={(equipments) =>
+                      dispatch({ type: "setEquipments", equipments })
+                    }
+                    disabled={state.equipmentOptions.length === 0}
+                    value={[
+                      ...getSelectedOptions(
+                        state,
+                        "equipmentOptions",
+                        "equipmentPks"
                       ),
                     ]}
                   />
                 </EditorColumns>
-                <Checkbox
-                  id="requireIntroduction"
-                  label={t("ReservationUnitEditor.requireIntroductionLabel")}
-                  checked={
-                    state.reservationUnitEdit.requireIntroduction === true
-                  }
-                  onClick={() =>
-                    setValue({
-                      requireIntroduction:
-                        !state.reservationUnitEdit?.requireIntroduction,
-                    })
-                  }
-                />
                 <EditorColumns>
-                  <NumberInput
-                    value={state.reservationUnitEdit.surfaceArea || 0}
-                    id="surfaceArea"
-                    label={t("ReservationUnitEditor.surfaceAreaLabel")}
-                    helperText={t(
-                      "ReservationUnitEditor.surfaceAreaHelperText"
+                  <TimeInput
+                    id="minReservationDuration"
+                    label={t(
+                      "ReservationUnitEditor.minReservationDurationLabel"
                     )}
-                    minusStepButtonAriaLabel={t(
-                      "common.decreaseByOneAriaLabel"
+                    hoursLabel={t("common.hoursLabel")}
+                    minutesLabel={t("common.minutesLabel")}
+                    value={getDuration(
+                      state.reservationUnitEdit.minReservationDuration
                     )}
-                    plusStepButtonAriaLabel={t("common.increaseByOneAriaLabel")}
-                    onChange={(e) => {
-                      setValue({
-                        surfaceArea: Number(e.target.value),
-                      });
+                    onChange={(v) => {
+                      if (
+                        typeof v.target.value === "string" &&
+                        v.target.value.length === 5
+                      ) {
+                        setValue({
+                          minReservationDuration: `${v.target.value}:00`,
+                        });
+                      }
                     }}
-                    step={1}
-                    type="number"
-                    min={1}
-                    required
                   />
-                  <NumberInput
-                    value={state.reservationUnitEdit.maxPersons || 0}
-                    id="maxPersons"
-                    label={t("ReservationUnitEditor.maxPersonsLabel")}
-                    minusStepButtonAriaLabel={t(
-                      "common.decreaseByOneAriaLabel"
+                  <TimeInput
+                    id="maxReservationDuration"
+                    label={t(
+                      "ReservationUnitEditor.maxReservationDurationLabel"
                     )}
-                    plusStepButtonAriaLabel={t("common.increaseByOneAriaLabel")}
-                    onChange={(e) => {
-                      setValue({
-                        maxPersons: Number(e.target.value),
-                      });
+                    hoursLabel={t("common.hoursLabel")}
+                    minutesLabel={t("common.minutesLabel")}
+                    value={getDuration(
+                      state.reservationUnitEdit.maxReservationDuration
+                    )}
+                    onChange={(v) => {
+                      if (
+                        typeof v.target.value === "string" &&
+                        v.target.value.length === 5
+                      ) {
+                        setValue({
+                          maxReservationDuration: `${v.target.value}:00`,
+                        });
+                      }
                     }}
-                    step={1}
-                    type="number"
-                    min={1}
-                    helperText={t("ReservationUnitEditor.maxPersonsHelperText")}
-                    required
                   />
                 </EditorColumns>
-              </Section>
-            </Accordion>
-            <Accordion heading={t("ReservationUnitEditor.typesProperties")}>
-              <EditorColumns>
-                <SelectWithPadding
-                  label={t(`ReservationUnitEditor.reservationUnitTypeLabel`)}
-                  placeholder={t(
-                    `ReservationUnitEditor.reservationUnitTypePlaceholder`
-                  )}
-                  options={state.reservationUnitTypeOptions}
-                  onChange={(selectedTerms: unknown) => {
-                    const o = selectedTerms as OptionType;
-                    setValue({
-                      [`reservationUnitTypePk`]: o.value,
-                    });
-                  }}
-                  disabled={state.reservationUnitTypeOptions.length === 0}
-                  helper={t(
-                    `ReservationUnitEditor.reservationUnitTypeHelperText`
-                  )}
-                  value={
-                    getSelectedOption(
-                      state,
-                      `reservationUnitTypeOptions`,
-                      `reservationUnitTypePk`
-                    ) || {}
-                  }
-                />
-                <Combobox
-                  multiselect
-                  label={t("ReservationUnitEditor.purposesLabel")}
-                  placeholder={t("ReservationUnitEditor.purposesPlaceholder")}
-                  options={state.purposeOptions}
-                  clearButtonAriaLabel={t("common.clearAllSelections")}
-                  selectedItemRemoveButtonAriaLabel={t("common.removeValue")}
-                  toggleButtonAriaLabel={t("common.toggleMenu")}
-                  onChange={(purposes) =>
-                    dispatch({ type: "setPurposes", purposes })
-                  }
-                  disabled={state.resourceOptions.length === 0}
-                  value={[
-                    ...getSelectedOptions(
-                      state,
-                      "purposeOptions",
-                      "purposePks"
-                    ),
-                  ]}
-                />
-
-                <Combobox
-                  multiselect
-                  label={t("ReservationUnitEditor.equipmentsLabel")}
-                  placeholder={t("ReservationUnitEditor.equipmentsPlaceholder")}
-                  options={state.equipmentOptions}
-                  clearButtonAriaLabel={t("common.clearAllSelections")}
-                  selectedItemRemoveButtonAriaLabel={t("common.removeValue")}
-                  toggleButtonAriaLabel={t("common.toggleMenu")}
-                  onChange={(equipments) =>
-                    dispatch({ type: "setEquipments", equipments })
-                  }
-                  disabled={state.equipmentOptions.length === 0}
-                  value={[
-                    ...getSelectedOptions(
-                      state,
-                      "equipmentOptions",
-                      "equipmentPks"
-                    ),
-                  ]}
-                />
-              </EditorColumns>
-              <EditorColumns>
-                <TimeInput
-                  id="minReservationDuration"
-                  label={t("ReservationUnitEditor.minReservationDurationLabel")}
-                  hoursLabel={t("common.hoursLabel")}
-                  minutesLabel={t("common.minutesLabel")}
-                  value={getDuration(
-                    state.reservationUnitEdit.minReservationDuration
-                  )}
-                  onChange={(v) => {
-                    if (
-                      typeof v.target.value === "string" &&
-                      v.target.value.length === 5
-                    ) {
-                      setValue({
-                        minReservationDuration: `${v.target.value}:00`,
-                      });
-                    }
-                  }}
-                />
-                <TimeInput
-                  id="maxReservationDuration"
-                  label={t("ReservationUnitEditor.maxReservationDurationLabel")}
-                  hoursLabel={t("common.hoursLabel")}
-                  minutesLabel={t("common.minutesLabel")}
-                  value={getDuration(
-                    state.reservationUnitEdit.maxReservationDuration
-                  )}
-                  onChange={(v) => {
-                    if (
-                      typeof v.target.value === "string" &&
-                      v.target.value.length === 5
-                    ) {
-                      setValue({
-                        maxReservationDuration: `${v.target.value}:00`,
-                      });
-                    }
-                  }}
-                />
-              </EditorColumns>
-              {languages.map((lang) => (
-                <RichTextInput
-                  key={lang}
-                  required
-                  id={`description.${lang}`}
-                  label={t("ReservationUnitEditor.descriptionLabel", {
-                    lang,
-                  })}
-                  value={
-                    get(
-                      state,
-                      `reservationUnitEdit.description${upperFirst(lang)}`,
-                      ""
-                    ) || ""
-                  }
-                  onChange={(value) =>
-                    setValue({
-                      [`description${upperFirst(lang)}`]: value,
-                    })
-                  }
-                />
-              ))}
-            </Accordion>
-
-            <Accordion heading={t("ReservationUnitEditor.settings")}>
-              <ActivationGroup
-                id="cancellationIsPossible"
-                label={t("ReservationUnitEditor.cancellationIsPossible")}
-                initiallyOpen={Boolean(
-                  state.reservationUnitEdit.cancellationRulePk
-                )}
-                onClose={() => setValue({ cancellationRulePk: null })}
-              >
-                <SelectionGroup
-                  required
-                  label={t("ReservationUnitEditor.cancellationGroupLabel")}
-                >
-                  {state.cancellationRuleOptions.map((o) => (
-                    <RadioButton
-                      key={o.value}
-                      id={`cr-${o.value}`}
-                      value={o.value as string}
-                      label={o.label}
-                      onChange={(e) =>
-                        setValue({ cancellationRulePk: Number(e.target.value) })
-                      }
-                      checked={
-                        state.reservationUnitEdit.cancellationRulePk === o.value
-                      }
-                    />
-                  ))}
-                </SelectionGroup>
-              </ActivationGroup>
-            </Accordion>
-            <Accordion heading={t("ReservationUnitEditor.pricing")}>
-              <DenseEditorColumns>
-                <NumberInput
-                  value={state.reservationUnitEdit.lowestPrice || 0}
-                  id="lowestPrice"
-                  label={t("ReservationUnitEditor.lowestPriceLabel")}
-                  helperText={t("ReservationUnitEditor.lowestPriceHelperText")}
-                  minusStepButtonAriaLabel={t("common.decreaseByOneAriaLabel")}
-                  plusStepButtonAriaLabel={t("common.increaseByOneAriaLabel")}
-                  onChange={(e) => {
-                    setValue({
-                      lowestPrice: Number(e.target.value),
-                      highestPrice: Math.max(
-                        Number(e.target.value),
-                        state.reservationUnitEdit.highestPrice || 0
-                      ),
-                    });
-                  }}
-                  step={1}
-                  type="number"
-                  min={0}
-                />
-                <NumberInput
-                  value={state.reservationUnitEdit.highestPrice || 0}
-                  id="highestPrice"
-                  label={t("ReservationUnitEditor.highestPriceLabel")}
-                  helperText={t("ReservationUnitEditor.highestPriceHelperText")}
-                  minusStepButtonAriaLabel={t("common.decreaseByOneAriaLabel")}
-                  plusStepButtonAriaLabel={t("common.increaseByOneAriaLabel")}
-                  onChange={(e) => {
-                    setValue({
-                      highestPrice: Number(e.target.value),
-                      lowestPrice: Math.min(
-                        Number(e.target.value),
-                        state.reservationUnitEdit.lowestPrice || 0
-                      ),
-                    });
-                  }}
-                  step={1}
-                  type="number"
-                  min={0}
-                />
-                <EnumSelect
-                  id="priceUnit"
-                  value={state.reservationUnitEdit.priceUnit as string}
-                  label={t("ReservationUnitEditor.priceUnitLabel")}
-                  type={ReservationUnitsReservationUnitPriceUnitChoices}
-                  onChange={(priceUnit) => setValue({ priceUnit })}
-                />
-              </DenseEditorColumns>
-            </Accordion>
-
-            <Accordion heading={t("ReservationUnitEditor.termsInstructions")}>
-              {languages.map((lang) => (
-                <RichTextInput
-                  key={lang}
-                  required
-                  id={`tos.${lang}`}
-                  label={t("ReservationUnitEditor.tosLabel", {
-                    lang,
-                  })}
-                  value={get(
-                    state,
-                    `reservationUnitEdit.termsOfUse${upperFirst(lang)}`,
-                    ""
-                  )}
-                  onChange={(value) =>
-                    setValue({
-                      [`termsOfUse${upperFirst(lang)}`]: value,
-                    })
-                  }
-                />
-              ))}
-              {["payment", "cancellation", "serviceSpecific"].map((name) => {
-                const options = get(state, `${name}TermsOptions`);
-                return (
-                  <SelectWithPadding
-                    key={name}
-                    label={t(`ReservationUnitEditor.${name}TermsLabel`)}
-                    placeholder={t(
-                      `ReservationUnitEditor.${name}TermsPlaceholder`
-                    )}
-                    options={options}
-                    onChange={(selectedTerms: unknown) => {
-                      const o = selectedTerms as OptionType;
-                      setValue({
-                        [`${name}TermsPk`]: o.value,
-                      });
-                    }}
-                    disabled={options.length === 0}
-                    helper={t(`ReservationUnitEditor.${name}TermsHelperText`)}
+                {languages.map((lang) => (
+                  <RichTextInput
+                    key={lang}
+                    required
+                    id={`description.${lang}`}
+                    label={t("ReservationUnitEditor.descriptionLabel", {
+                      lang,
+                    })}
                     value={
-                      getSelectedOption(
+                      get(
                         state,
-                        `${name}TermsOptions`,
-                        `${name}TermsPk`
-                      ) || {}
+                        `reservationUnitEdit.description${upperFirst(lang)}`,
+                        ""
+                      ) || ""
+                    }
+                    onChange={(value) =>
+                      setValue({
+                        [`description${upperFirst(lang)}`]: value,
+                      })
                     }
                   />
-                );
-              })}
-            </Accordion>
-            <Accordion heading={t("ReservationUnitEditor.communication")}>
-              {languages.map((lang) => (
-                <TextInputWithPadding
-                  key={lang}
-                  required
-                  id={`additionalInstructions.${lang}`}
-                  label={t(
-                    "ReservationUnitEditor.additionalInstructionsLabel",
-                    {
-                      lang,
-                    }
-                  )}
-                  placeholder={t(
-                    "ReservationUnitEditor.additionalInstructionsPlaceholder",
-                    {
-                      language: t(`language.${lang}`),
-                    }
-                  )}
-                  value={get(
-                    state,
-                    `reservationUnitEdit.additionalInstructions${upperFirst(
-                      lang
-                    )}`,
-                    ""
-                  )}
-                  onChange={(e) =>
-                    setValue({
-                      [`additionalInstructions${upperFirst(lang)}`]:
-                        e.target.value,
-                    })
-                  }
-                />
-              ))}
-            </Accordion>
+                ))}
+              </Accordion>
 
-            <Accordion heading={t("ReservationUnitEditor.openingHours")}>
-              {state.reservationUnit?.haukiUrl?.url ? (
-                <>
-                  <p>
-                    {t("ReservationUnitEditor.openingHoursHelperTextHasLink")}
-                  </p>
-                  <Link
-                    href={state.reservationUnit?.haukiUrl?.url}
-                    external
-                    openInNewTab
-                    size="M"
-                    style={{ display: "block", width: "fit-content" }}
+              <Accordion heading={t("ReservationUnitEditor.settings")}>
+                <ActivationGroup
+                  id="cancellationIsPossible"
+                  label={t("ReservationUnitEditor.cancellationIsPossible")}
+                  initiallyOpen={Boolean(
+                    state.reservationUnitEdit.cancellationRulePk
+                  )}
+                  onClose={() => setValue({ cancellationRulePk: null })}
+                >
+                  <SelectionGroup
+                    required
+                    label={t("ReservationUnitEditor.cancellationGroupLabel")}
                   >
-                    {t("ReservationUnitEditor.openingTimesExternalLink")}
-                  </Link>
-                </>
-              ) : (
-                <p>{t("ReservationUnitEditor.openingHoursHelperTextNoLink")}</p>
-              )}
-            </Accordion>
-            <Buttons>
-              <Button
-                disabled={!state.hasChanges}
-                variant="secondary"
-                onClick={() => history.go(0)}
-              >
-                {t("ReservationUnitEditor.cancel")}
-              </Button>
-              <SaveButton
-                disabled={!state.hasChanges}
-                variant="secondary"
-                onClick={() => createOrUpdateReservationUnit(false)}
-              >
-                {t("ReservationUnitEditor.saveAsDraft")}
-              </SaveButton>
+                    {state.cancellationRuleOptions.map((o) => (
+                      <RadioButton
+                        key={o.value}
+                        id={`cr-${o.value}`}
+                        value={o.value as string}
+                        label={o.label}
+                        onChange={(e) =>
+                          setValue({
+                            cancellationRulePk: Number(e.target.value),
+                          })
+                        }
+                        checked={
+                          state.reservationUnitEdit.cancellationRulePk ===
+                          o.value
+                        }
+                      />
+                    ))}
+                  </SelectionGroup>
+                </ActivationGroup>
+              </Accordion>
+              <Accordion heading={t("ReservationUnitEditor.pricing")}>
+                <DenseEditorColumns>
+                  <NumberInput
+                    value={state.reservationUnitEdit.lowestPrice || 0}
+                    id="lowestPrice"
+                    label={t("ReservationUnitEditor.lowestPriceLabel")}
+                    helperText={t(
+                      "ReservationUnitEditor.lowestPriceHelperText"
+                    )}
+                    minusStepButtonAriaLabel={t(
+                      "common.decreaseByOneAriaLabel"
+                    )}
+                    plusStepButtonAriaLabel={t("common.increaseByOneAriaLabel")}
+                    onChange={(e) => {
+                      setValue({
+                        lowestPrice: Number(e.target.value),
+                        highestPrice: Math.max(
+                          Number(e.target.value),
+                          state.reservationUnitEdit.highestPrice || 0
+                        ),
+                      });
+                    }}
+                    step={1}
+                    type="number"
+                    min={0}
+                  />
+                  <NumberInput
+                    value={state.reservationUnitEdit.highestPrice || 0}
+                    id="highestPrice"
+                    label={t("ReservationUnitEditor.highestPriceLabel")}
+                    helperText={t(
+                      "ReservationUnitEditor.highestPriceHelperText"
+                    )}
+                    minusStepButtonAriaLabel={t(
+                      "common.decreaseByOneAriaLabel"
+                    )}
+                    plusStepButtonAriaLabel={t("common.increaseByOneAriaLabel")}
+                    onChange={(e) => {
+                      setValue({
+                        highestPrice: Number(e.target.value),
+                        lowestPrice: Math.min(
+                          Number(e.target.value),
+                          state.reservationUnitEdit.lowestPrice || 0
+                        ),
+                      });
+                    }}
+                    step={1}
+                    type="number"
+                    min={0}
+                  />
+                  <EnumSelect
+                    id="priceUnit"
+                    value={state.reservationUnitEdit.priceUnit as string}
+                    label={t("ReservationUnitEditor.priceUnitLabel")}
+                    type={ReservationUnitsReservationUnitPriceUnitChoices}
+                    onChange={(priceUnit) => setValue({ priceUnit })}
+                  />
+                </DenseEditorColumns>
+              </Accordion>
 
-              <SaveButton
-                disabled={!isReadyToPublish}
-                onClick={() => createOrUpdateReservationUnit(true)}
-              >
-                {t("ReservationUnitEditor.saveAndPublish")}
-              </SaveButton>
-              <Preview
-                target="_blank"
-                rel="noopener noreferrer"
-                $disabled={state.hasChanges}
-                href={`${previewUrlPrefix}/${state.reservationUnit?.pk}?ru=${state.reservationUnit?.uuid}`}
-                onClick={(e) => state.hasChanges && e.preventDefault()}
-                title={t(
-                  state.hasChanges
-                    ? "ReservationUnitEditor.noPreviewUnsavedChangesTooltip"
-                    : "ReservationUnitEditor.previewTooltip"
+              <Accordion heading={t("ReservationUnitEditor.termsInstructions")}>
+                {languages.map((lang) => (
+                  <RichTextInput
+                    key={lang}
+                    required
+                    id={`tos.${lang}`}
+                    label={t("ReservationUnitEditor.tosLabel", {
+                      lang,
+                    })}
+                    value={get(
+                      state,
+                      `reservationUnitEdit.termsOfUse${upperFirst(lang)}`,
+                      ""
+                    )}
+                    onChange={(value) =>
+                      setValue({
+                        [`termsOfUse${upperFirst(lang)}`]: value,
+                      })
+                    }
+                  />
+                ))}
+                {["payment", "cancellation", "serviceSpecific"].map((name) => {
+                  const options = get(state, `${name}TermsOptions`);
+                  return (
+                    <SelectWithPadding
+                      key={name}
+                      label={t(`ReservationUnitEditor.${name}TermsLabel`)}
+                      placeholder={t(
+                        `ReservationUnitEditor.${name}TermsPlaceholder`
+                      )}
+                      options={options}
+                      onChange={(selectedTerms: unknown) => {
+                        const o = selectedTerms as OptionType;
+                        setValue({
+                          [`${name}TermsPk`]: o.value,
+                        });
+                      }}
+                      disabled={options.length === 0}
+                      helper={t(`ReservationUnitEditor.${name}TermsHelperText`)}
+                      value={
+                        getSelectedOption(
+                          state,
+                          `${name}TermsOptions`,
+                          `${name}TermsPk`
+                        ) || {}
+                      }
+                    />
+                  );
+                })}
+              </Accordion>
+              <Accordion heading={t("ReservationUnitEditor.communication")}>
+                {languages.map((lang) => (
+                  <TextInputWithPadding
+                    key={lang}
+                    required
+                    id={`additionalInstructions.${lang}`}
+                    label={t(
+                      "ReservationUnitEditor.additionalInstructionsLabel",
+                      {
+                        lang,
+                      }
+                    )}
+                    placeholder={t(
+                      "ReservationUnitEditor.additionalInstructionsPlaceholder",
+                      {
+                        language: t(`language.${lang}`),
+                      }
+                    )}
+                    value={get(
+                      state,
+                      `reservationUnitEdit.additionalInstructions${upperFirst(
+                        lang
+                      )}`,
+                      ""
+                    )}
+                    onChange={(e) =>
+                      setValue({
+                        [`additionalInstructions${upperFirst(lang)}`]:
+                          e.target.value,
+                      })
+                    }
+                  />
+                ))}
+              </Accordion>
+
+              <Accordion heading={t("ReservationUnitEditor.openingHours")}>
+                {state.reservationUnit?.haukiUrl?.url ? (
+                  <>
+                    <p>
+                      {t("ReservationUnitEditor.openingHoursHelperTextHasLink")}
+                    </p>
+                    <Link
+                      href={state.reservationUnit?.haukiUrl?.url}
+                      external
+                      openInNewTab
+                      size="M"
+                      style={{ display: "block", width: "fit-content" }}
+                    >
+                      {t("ReservationUnitEditor.openingTimesExternalLink")}
+                    </Link>
+                  </>
+                ) : (
+                  <p>
+                    {t("ReservationUnitEditor.openingHoursHelperTextNoLink")}
+                  </p>
                 )}
-              >
-                {t("ReservationUnitEditor.preview")}
-              </Preview>
-            </Buttons>
-          </Editor>
-        </EditorContainer>
-      </ContentContainer>
+              </Accordion>
+            </Editor>
+          </EditorContainer>
+        </ContentContainer>
+      </MainMenuWrapper>
+      <Buttons>
+        <StyledButton
+          disabled={false}
+          variant="secondary"
+          onClick={() => history.go(-1)}
+        >
+          {t("ReservationUnitEditor.cancel")}
+        </StyledButton>
+        <PublishingTime>
+          Varausyksikkö julkaistaan
+          <br /> TODO
+        </PublishingTime>
+        <StyledButton
+          disabled={!state.hasChanges}
+          variant="secondary"
+          onClick={() => createOrUpdateReservationUnit(false)}
+        >
+          {t("ReservationUnitEditor.saveAsDraft")}
+        </StyledButton>
+        <StyledButton
+          variant="primary"
+          disabled={!isReadyToPublish}
+          onClick={() => createOrUpdateReservationUnit(true)}
+        >
+          {t("ReservationUnitEditor.saveAndPublish")}
+        </StyledButton>
+        <Preview
+          target="_blank"
+          rel="noopener noreferrer"
+          $disabled={state.hasChanges}
+          href={`${previewUrlPrefix}/${state.reservationUnit?.pk}?ru=${state.reservationUnit?.uuid}`}
+          onClick={(e) => state.hasChanges && e.preventDefault()}
+          title={t(
+            state.hasChanges
+              ? "ReservationUnitEditor.noPreviewUnsavedChangesTooltip"
+              : "ReservationUnitEditor.previewTooltip"
+          )}
+        >
+          {t("ReservationUnitEditor.preview")}
+        </Preview>
+      </Buttons>
     </Wrapper>
   );
 };
 
-export default withMainMenu(ReservationUnitEditor);
+export default ReservationUnitEditor;
