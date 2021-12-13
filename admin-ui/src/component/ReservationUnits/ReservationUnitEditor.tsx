@@ -118,6 +118,7 @@ const makeOption = (e: { pk: number; nameFi: string }) => ({
   value: e.pk,
 });
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const optionMaker = (e: any) =>
   makeOption({
     pk: get(e, "node.pk", -1),
