@@ -1,4 +1,5 @@
 import datetime
+from typing import Set
 
 from django.utils.timezone import get_default_timezone
 
@@ -145,3 +146,18 @@ class ReservationUnitReservationScheduler:
         return self.opening_hours_client.is_resource_open(
             str(self.reservation_unit.uuid), start, end
         )
+
+    def get_reservation_unit_possible_start_times(
+        self, date: datetime.date, interval: datetime.timedelta
+    ) -> Set[datetime.datetime]:
+        opening_hours = self.opening_hours_client.get_opening_hours_for_resource(
+            str(self.reservation_unit.uuid),
+            datetime.date(date.year, date.month, date.day),
+        )
+        possible_start_times = set()
+        for opening_hour in opening_hours:
+            start_time = opening_hour.start_time
+            while start_time < opening_hour.end_time:
+                possible_start_times.add(start_time)
+                start_time += interval
+        return possible_start_times

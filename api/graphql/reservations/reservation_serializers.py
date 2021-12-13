@@ -119,6 +119,7 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
                 )
 
             self.check_buffer_times(data, reservation_unit)
+            self.check_reservation_start_time(begin, scheduler)
 
         data["state"] = STATE_CHOICES.CREATED
 
@@ -179,6 +180,24 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
         ):
             raise serializers.ValidationError(
                 "Reservation unit buffer time between reservations overlaps with current end time."
+            )
+
+    def check_reservation_start_time(self, begin, scheduler):
+        interval_to_minutes = {
+            ReservationUnit.RESERVATION_START_INTERVAL_15_MINUTES: 15,
+            ReservationUnit.RESERVATION_START_INTERVAL_30_MINUTES: 30,
+            ReservationUnit.RESERVATION_START_INTERVAL_60_MINUTES: 60,
+            ReservationUnit.RESERVATION_START_INTERVAL_90_MINUTES: 90,
+        }
+        interval = scheduler.reservation_unit.reservation_start_interval
+        interval_minutes = interval_to_minutes[interval]
+        interval_timedelta = datetime.timedelta(minutes=interval_minutes)
+        possible_start_times = scheduler.get_reservation_unit_possible_start_times(
+            begin, interval_timedelta
+        )
+        if begin not in possible_start_times:
+            raise serializers.ValidationError(
+                f"Reservation start time does not match the allowed interval of {interval_minutes} minutes."
             )
 
 
