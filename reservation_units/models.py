@@ -106,6 +106,22 @@ class ReservationUnitCancellationRule(models.Model):
         return self.name
 
 
+class TaxPercentage(models.Model):
+    value = models.DecimalField(
+        verbose_name=_("Tax percentage"),
+        max_digits=5,
+        decimal_places=2,
+        help_text="The tax percentage for a price",
+    )
+
+    def __str__(self) -> str:
+        return f"{self.value}%"
+
+
+def get_default_tax_percentage() -> int:
+    return TaxPercentage.objects.order_by("value").first().pk
+
+
 class ReservationUnit(models.Model):
     name = models.CharField(verbose_name=_("Name"), max_length=255)
     description = models.TextField(
@@ -283,6 +299,15 @@ class ReservationUnit(models.Model):
         decimal_places=2,
         default=0,
         help_text="Maximum price of the reservation unit",
+    )
+
+    tax_percentage = models.ForeignKey(
+        TaxPercentage,
+        verbose_name=_("Tax percentage"),
+        related_name="reservation_units",
+        on_delete=models.PROTECT,
+        default=get_default_tax_percentage,
+        help_text="The percentage of tax included in the price",
     )
 
     RESERVATION_START_INTERVAL_15_MINUTES = "interval_15_mins"
@@ -580,18 +605,6 @@ class Introduction(models.Model):
     )
 
     completed_at = models.DateTimeField(verbose_name=_("Completed at"))
-
-
-class TaxPercentage(models.Model):
-    value = models.DecimalField(
-        verbose_name=_("Tax percentage"),
-        max_digits=5,
-        decimal_places=2,
-        help_text="The tax percentage for a price",
-    )
-
-    def __str__(self) -> str:
-        return f"{self.value}%"
 
 
 AuditLogger.register(ReservationUnit)
