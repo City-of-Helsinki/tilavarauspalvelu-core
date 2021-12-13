@@ -228,8 +228,12 @@ class ReservationUnit(models.Model):
         null=True,
     )
 
-    buffer_time_between_reservations = models.DurationField(
-        verbose_name=_("Buffer time between reservations"), blank=True, null=True
+    buffer_time_before = models.DurationField(
+        verbose_name=_("Buffer time before reservation"), blank=True, null=True
+    )
+
+    buffer_time_after = models.DurationField(
+        verbose_name=_("Buffer time after reservation"), blank=True, null=True
     )
 
     hauki_resource_id = models.CharField(

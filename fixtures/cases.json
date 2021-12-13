@@ -996,7 +996,8 @@
             "is_draft": false,
             "max_persons": null,
             "surface_area": null,
-            "buffer_time_between_reservations": null,
+            "buffer_time_after": null,
+            "buffer_time_before": null,
             "hauki_resource_id": null,
             "spaces": [
                 4
@@ -1044,7 +1045,8 @@
             "is_draft": false,
             "max_persons": null,
             "surface_area": null,
-            "buffer_time_between_reservations": null,
+            "buffer_time_after": null,
+            "buffer_time_before": null,
             "hauki_resource_id": null,
             "spaces": [
                 1
@@ -1089,7 +1091,8 @@
             "is_draft": false,
             "max_persons": null,
             "surface_area": null,
-            "buffer_time_between_reservations": null,
+            "buffer_time_after": null,
+            "buffer_time_before": null,
             "hauki_resource_id": null,
             "spaces": [
                 7
@@ -1135,7 +1138,8 @@
             "is_draft": false,
             "max_persons": null,
             "surface_area": null,
-            "buffer_time_between_reservations": null,
+            "buffer_time_after": null,
+            "buffer_time_before": null,
             "hauki_resource_id": null,
             "spaces": [
                 8
@@ -1181,7 +1185,8 @@
             "is_draft": false,
             "max_persons": null,
             "surface_area": null,
-            "buffer_time_between_reservations": null,
+            "buffer_time_after": null,
+            "buffer_time_before": null,
             "hauki_resource_id": null,
             "spaces": [
                 9
@@ -1224,7 +1229,8 @@
             "is_draft": false,
             "max_persons": null,
             "surface_area": null,
-            "buffer_time_between_reservations": null,
+            "buffer_time_after": null,
+            "buffer_time_before": null,
             "hauki_resource_id": null,
             "spaces": [
                 2
@@ -1267,7 +1273,8 @@
             "is_draft": false,
             "max_persons": null,
             "surface_area": null,
-            "buffer_time_between_reservations": null,
+            "buffer_time_after": null,
+            "buffer_time_before": null,
             "hauki_resource_id": null,
             "spaces": [
                 10
@@ -1310,7 +1317,8 @@
             "is_draft": false,
             "max_persons": null,
             "surface_area": null,
-            "buffer_time_between_reservations": null,
+            "buffer_time_after": null,
+            "buffer_time_before": null,
             "hauki_resource_id": null,
             "spaces": [
                 36
