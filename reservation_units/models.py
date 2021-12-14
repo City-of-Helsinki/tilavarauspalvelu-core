@@ -308,6 +308,35 @@ class ReservationUnit(models.Model):
         ),
     )
 
+    reservation_begins = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text=_(
+            "Time when making reservations become possible for this reservation unit."
+        ),
+    )
+    reservation_ends = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text=_(
+            "Time when making reservations become not possible for this reservation unit"
+        ),
+    )
+    publish_begins = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text=_(
+            "Time after this reservation unit should be publicly visible in UI."
+        ),
+    )
+    publish_ends = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text=_(
+            "Time after this reservation unit should not be publicly visible in UI."
+        ),
+    )
+
     def __str__(self):
         return "{}".format(self.name)
 
