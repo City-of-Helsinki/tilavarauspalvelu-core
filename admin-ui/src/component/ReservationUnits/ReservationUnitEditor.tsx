@@ -784,7 +784,6 @@ const ReservationUnitEditor = (): JSX.Element | null => {
   const setValue = (value: any) => {
     dispatch({ type: "set", value });
   };
-  console.log("rendering with", state);
 
   if (state.loading) {
     return <Loader />;
