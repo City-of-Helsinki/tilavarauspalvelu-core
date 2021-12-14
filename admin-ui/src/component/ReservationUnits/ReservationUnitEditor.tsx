@@ -14,7 +14,7 @@ import {
   TimeInput,
 } from "hds-react";
 import i18next from "i18next";
-import { get, isNull, omitBy, pick, sumBy, upperFirst } from "lodash";
+import { get, isNull, omitBy, pick, sumBy, uniq, upperFirst } from "lodash";
 import React, { useEffect, useReducer } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams, useHistory } from "react-router-dom";
@@ -35,6 +35,7 @@ import {
   Maybe,
   TermsOfUseTermsOfUseTermsTypeChoices,
   ReservationUnitsReservationUnitPriceUnitChoices,
+  ReservationUnitsReservationUnitReservationStartIntervalChoices,
 } from "../../common/gql-types";
 import {
   CREATE_RESERVATION_UNIT,
@@ -111,6 +112,7 @@ type State = {
   serviceSpecificTermsOptions: OptionType[];
   cancellationRuleOptions: OptionType[];
   unit?: UnitByPkType;
+  dataLoaded: LoadingCompleted[];
 };
 
 const makeOption = (e: { pk: number; nameFi: string }) => ({
@@ -140,7 +142,11 @@ const makeTermsOptions = (
 
   return [...options];
 };
-
+enum LoadingCompleted {
+  "UNIT",
+  "RESERVATION_UNIT",
+  "PARAMS",
+}
 const getInitialState = (reservationUnitPk: number): State => ({
   reservationUnitPk,
   loading: true,
@@ -158,19 +164,37 @@ const getInitialState = (reservationUnitPk: number): State => ({
   cancellationTermsOptions: [],
   serviceSpecificTermsOptions: [],
   cancellationRuleOptions: [],
+  dataLoaded: [],
 });
 
-const withLoadingStatus = (state: State): State => {
-  const hasError = state.error;
+const withLoadingStatus = (
+  type: LoadingCompleted | null,
+  state: State
+): State => {
+  const newDataLoaded =
+    type !== null ? uniq(state.dataLoaded.concat(type)) : state.dataLoaded;
+  const hasError = Boolean(state.error);
+  const isNew =
+    state.reservationUnitPk === undefined ||
+    Number.isNaN(state.reservationUnitPk);
 
-  const newLoadingStatus =
-    !hasError &&
-    (state.spaceOptions.length === 0 ||
-      (state.reservationUnitPk !== undefined &&
-        !get(state, "reservationUnitEdit.pk")));
+  let newLoadingStatus = state.loading;
+
+  if (hasError) {
+    newLoadingStatus = false;
+  }
+
+  if (newDataLoaded.length === 3) {
+    newLoadingStatus = false;
+  }
+
+  if (isNew && newDataLoaded.length === 2) {
+    newLoadingStatus = false;
+  }
 
   return {
     ...state,
+    dataLoaded: newDataLoaded,
     loading: newLoadingStatus,
   };
 };
@@ -189,7 +213,7 @@ const reducer = (state: State, action: Action): State => {
   switch (action.type) {
     case "dataLoaded": {
       const { reservationUnit } = action;
-      return withLoadingStatus({
+      return withLoadingStatus(LoadingCompleted.RESERVATION_UNIT, {
         ...state,
         reservationUnit: {
           ...reservationUnit,
@@ -203,6 +227,7 @@ const reducer = (state: State, action: Action): State => {
             "maxPersons",
             "maxReservationDuration",
             "minReservationDuration",
+            "reservationStartInterval",
             "requireIntroduction",
             "priceUnit",
             ...i18nFields("name"),
@@ -257,7 +282,7 @@ const reducer = (state: State, action: Action): State => {
           .map((r) => ({ label: String(r?.nameFi), value: Number(r?.pk) })) ||
         [];
 
-      return withLoadingStatus({
+      return withLoadingStatus(LoadingCompleted.UNIT, {
         ...state,
         spaces: unit.spaces as SpaceType[],
         reservationUnitEdit: {
@@ -275,7 +300,7 @@ const reducer = (state: State, action: Action): State => {
     }
 
     case "parametersLoaded": {
-      return withLoadingStatus({
+      return withLoadingStatus(LoadingCompleted.PARAMS, {
         ...state,
         equipmentOptions: (action.parameters.equipments?.edges || []).map(
           optionMaker
@@ -310,7 +335,7 @@ const reducer = (state: State, action: Action): State => {
     }
 
     case "editNew": {
-      return withLoadingStatus({
+      return withLoadingStatus(null, {
         ...state,
         reservationUnitEdit: {
           unitPk: action.unitPk,
@@ -319,12 +344,12 @@ const reducer = (state: State, action: Action): State => {
       });
     }
     case "dataInitializationError": {
-      return withLoadingStatus({
+      return {
         ...state,
         loading: false,
         hasChanges: false,
         error: { message: action.message },
-      });
+      };
     }
     case "clearError": {
       return {
@@ -628,6 +653,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
         "maxPersons",
         "maxReservationDuration",
         "minReservationDuration",
+        "reservationStartInterval",
         "requireIntroduction",
         "purposePks",
         "reservationUnitTypePk",
@@ -1139,6 +1165,22 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                         });
                       }
                     }}
+                  />
+                  <EnumSelect
+                    id="reservationStartInterval"
+                    value={
+                      state.reservationUnitEdit
+                        .reservationStartInterval as string
+                    }
+                    label={t(
+                      "ReservationUnitEditor.reservationStartIntervalLabel"
+                    )}
+                    type={
+                      ReservationUnitsReservationUnitReservationStartIntervalChoices
+                    }
+                    onChange={(reservationStartInterval) =>
+                      setValue({ reservationStartInterval })
+                    }
                   />
                 </EditorColumns>
               </Accordion>

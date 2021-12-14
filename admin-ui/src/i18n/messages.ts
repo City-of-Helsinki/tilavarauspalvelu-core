@@ -888,6 +888,7 @@ const translations: ITranslations = {
     ],
     minReservationDurationLabel: ["Vuoron minimikesto"],
     maxReservationDurationLabel: ["Vuoron maksimikesto"],
+    reservationStartIntervalLabel: ["Varauksen aloitukset"],
     tosLabel: ["Varausyksikkökohtaiset ohjeet {{lang}}"],
     tosPlaceholder: ["Ohjeteksti {{language}}"],
     paymentTermsLabel: ["Maksuehdot"],
@@ -938,6 +939,12 @@ const translations: ITranslations = {
     PER_HALF_DAY: ["Per puoli päivää"],
     PER_HOUR: ["Per tunti"],
     PER_WEEK: ["Per viikko"],
+  },
+  reservationStartInterval: {
+    INTERVAL_15_MINS: ["15 min välein"],
+    INTERVAL_30_MINS: ["30 min välein"],
+    INTERVAL_60_MINS: ["1 tunnin välein"],
+    INTERVAL_90_MINS: ["1,5 tunnin välein"],
   },
   ResourceModal: {
     modalTitle: ["Luo uusi resurssi tilalle"],

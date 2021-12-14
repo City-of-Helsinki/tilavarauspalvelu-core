@@ -367,6 +367,7 @@ export const RESERVATIONUNIT_QUERY = gql`
       contactInformationFi
       maxReservationDuration
       minReservationDuration
+      reservationStartInterval
       images {
         imageType
         imageUrl
