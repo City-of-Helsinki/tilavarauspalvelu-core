@@ -38,7 +38,6 @@ class ReservationTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCase):
         super().setUpTestData()
         cls.space = SpaceFactory()
         cls.reservation_unit = ReservationUnitFactory(
-            pk=1,
             spaces=[cls.space],
             name="resunit",
             reservation_start_interval=ReservationUnit.RESERVATION_START_INTERVAL_15_MINUTES,
@@ -47,23 +46,24 @@ class ReservationTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCase):
 
     def get_mocked_opening_hours(self):
         resource_id = f"{settings.HAUKI_ORIGIN_ID}:{self.reservation_unit.uuid}"
-        return [
-            {
-                "timezone": DEFAULT_TIMEZONE,
-                "resource_id": resource_id,
-                "origin_id": str(self.reservation_unit.uuid),
-                "date": datetime.date.today(),
-                "times": [
-                    TimeElement(
-                        start_time=datetime.time(hour=6),
-                        end_time=datetime.time(hour=22),
-                        end_time_on_next_day=False,
-                        resource_state=State.WITH_RESERVATION,
-                        periods=[],
-                    ),
-                ],
-            },
-        ]
+        return [self._get_single_opening_hour_block(resource_id, resource_id)]
+
+    def _get_single_opening_hour_block(self, resource_id, origin_id):
+        return {
+            "timezone": DEFAULT_TIMEZONE,
+            "resource_id": resource_id,
+            "origin_id": str(self.reservation_unit.uuid),
+            "date": datetime.date.today(),
+            "times": [
+                TimeElement(
+                    start_time=datetime.time(hour=6),
+                    end_time=datetime.time(hour=22),
+                    end_time_on_next_day=False,
+                    resource_state=State.WITH_RESERVATION,
+                    periods=[],
+                ),
+            ],
+        }
 
 
 class ReservationQueryTestCase(ReservationTestCaseBase):
@@ -164,6 +164,16 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
             "purposePk": self.purpose.pk,
         }
 
+    def setUp(self):
+        super().setUp()
+        self.reservation_unit = ReservationUnitFactory(
+            spaces=[self.space],
+            name="resunit",
+            reservation_start_interval=ReservationUnit.RESERVATION_START_INTERVAL_15_MINUTES,
+            buffer_time_before=datetime.timedelta(minutes=30),
+            buffer_time_after=datetime.timedelta(minutes=30),
+        )
+
     def test_creating_reservation_succeed(self, mock_periods, mock_opening_hours):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         self.client.force_login(self.regular_joe)
@@ -191,6 +201,67 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         assert_that(reservation.name).is_equal_to(input_data["name"])
         assert_that(reservation.description).is_equal_to(input_data["description"])
         assert_that(reservation.purpose).is_equal_to(self.purpose)
+        assert_that(reservation.buffer_time_after).is_equal_to(
+            self.reservation_unit.buffer_time_after
+        )
+        assert_that(reservation.buffer_time_before).is_equal_to(
+            self.reservation_unit.buffer_time_before
+        )
+
+    @patch(
+        "reservation_units.utils.reservation_unit_reservation_scheduler"
+        + ".ReservationUnitReservationScheduler.is_reservation_unit_open"
+    )
+    @patch(
+        "reservation_units.utils.reservation_unit_reservation_scheduler."
+        + "ReservationUnitReservationScheduler.get_conflicting_open_application_round"
+    )
+    @patch(
+        "reservation_units.utils.reservation_unit_reservation_scheduler."
+        + "ReservationUnitReservationScheduler.get_reservation_unit_possible_start_times"
+    )
+    def test_creating_reservation_copies_max_buffer_times_from_multiple_reservation_units(
+        self,
+        mock_get_reservation_unit_possible_start_times,
+        mock_get_conflicting_open_application_round,
+        mock_is_open,
+        mock_periods,
+        mock_opening_hours,
+    ):
+        mock_is_open.return_value = True
+        mock_get_conflicting_open_application_round.return_value = None
+        mock_get_reservation_unit_possible_start_times.return_value = [
+            datetime.datetime.now(tz=DEFAULT_TIMEZONE)
+        ]
+
+        res_unit_too = ReservationUnitFactory(
+            buffer_time_before=datetime.timedelta(minutes=90),
+            buffer_time_after=None,
+        )
+        res_unit_another = ReservationUnitFactory(
+            buffer_time_before=None,
+            buffer_time_after=datetime.timedelta(minutes=15),
+        )
+
+        self.client.force_login(self.regular_joe)
+        input_data = self.get_valid_input_data()
+        input_data["reservationUnitPks"].extend([res_unit_too.id, res_unit_another.id])
+        response = self.query(self.get_create_query(), input_data=input_data)
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_none()
+        assert_that(
+            content.get("data").get("createReservation").get("reservation").get("pk")
+        ).is_not_none()
+        pk = content.get("data").get("createReservation").get("reservation").get("pk")
+        reservation = Reservation.objects.get(id=pk)
+        assert_that(reservation).is_not_none()
+        assert_that(reservation.buffer_time_after).is_equal_to(
+            self.reservation_unit.buffer_time_after
+        )
+        assert_that(reservation.buffer_time_before).is_equal_to(
+            res_unit_too.buffer_time_before
+        )
 
     def test_creating_reservation_without_optional_fields_succeeds(
         self, mock_periods, mock_opening_hours

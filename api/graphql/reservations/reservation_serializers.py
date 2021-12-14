@@ -1,4 +1,5 @@
 import datetime
+from typing import List
 
 from django.conf import settings
 from django.utils.timezone import get_default_timezone
@@ -122,7 +123,16 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
             self.check_reservation_start_time(begin, scheduler)
 
         data["state"] = STATE_CHOICES.CREATED
-
+        data[
+            "buffer_time_before"
+        ] = self._get_biggest_buffer_time_from_reservation_units(
+            "buffer_time_before", reservation_units
+        )
+        data[
+            "buffer_time_after"
+        ] = self._get_biggest_buffer_time_from_reservation_units(
+            "buffer_time_after", reservation_units
+        )
         user = self.context.get("request").user
         if settings.TMP_PERMISSIONS_DISABLED and user.is_anonymous:
             user = None
@@ -130,6 +140,16 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
         data["user"] = user
 
         return data
+
+    def _get_biggest_buffer_time_from_reservation_units(
+        self, field: str, reservation_units: List[ReservationUnit]
+    ) -> [datetime.timedelta]:
+        buffer_times = [
+            getattr(res_unit, field)
+            for res_unit in reservation_units
+            if getattr(res_unit, field, None) is not None
+        ]
+        return max(buffer_times, default=None)
 
     def check_buffer_times(self, data, reservation_unit):
         begin = data.get("begin", getattr(self.instance, "begin", None))
