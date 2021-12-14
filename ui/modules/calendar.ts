@@ -10,14 +10,21 @@ import {
 } from "date-fns";
 import { TFunction } from "next-i18next";
 import { SlotProps } from "../components/calendar/Calendar";
-import { OpeningTimesType, ReservationType } from "./gql-types";
+import {
+  OpeningTimesType,
+  ReservationType,
+  ReservationUnitsReservationUnitReservationStartIntervalChoices,
+} from "./gql-types";
 import { ApplicationEvent, ApplicationRound, OptionType } from "./types";
 import {
   apiDurationToMinutes,
+  convertHMSToSeconds,
   endOfWeek,
   parseDate,
+  secondsToHms,
   startOfWeek,
   toApiDate,
+  toUIDate,
 } from "./util";
 
 export const longDate = (date: Date, t: TFunction): string =>
@@ -151,6 +158,65 @@ export const doReservationsCollide = (
   );
 };
 
+export const getDayIntervals = (
+  startTime: string,
+  endTime: string,
+  interval: ReservationUnitsReservationUnitReservationStartIntervalChoices
+): string[] => {
+  const start = convertHMSToSeconds(startTime);
+  const end = convertHMSToSeconds(endTime);
+  const intervals: string[] = [];
+
+  let intervalSeconds = 0;
+  switch (interval) {
+    case "INTERVAL_15_MINS":
+      intervalSeconds = 15 * 60;
+      break;
+    case "INTERVAL_30_MINS":
+      intervalSeconds = 30 * 60;
+      break;
+    case "INTERVAL_60_MINS":
+      intervalSeconds = 60 * 60;
+      break;
+    case "INTERVAL_90_MINS":
+      intervalSeconds = 90 * 60;
+      break;
+    default:
+  }
+
+  if (!intervalSeconds || start >= end) return [];
+
+  for (let i = start; i < end; i += intervalSeconds) {
+    const { h, m, s } = secondsToHms(i);
+    intervals.push(
+      `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}:${s
+        .toString()
+        .padStart(2, "0")}`
+    );
+  }
+
+  return intervals;
+};
+
+export const isStartTimeWithinInterval = (
+  start: Date,
+  openingTimes: OpeningTimesType[],
+  interval?: ReservationUnitsReservationUnitReservationStartIntervalChoices
+): boolean => {
+  if (openingTimes?.length < 1) return false;
+  if (!interval) return true;
+  const startTime = toUIDate(start, "HH:mm:ss");
+  const { startTime: dayStartTime, endTime: dayEndTime } = openingTimes.find(
+    (n) => n.date === toApiDate(start)
+  );
+
+  return getDayIntervals(
+    dayStartTime.substring(0, 5),
+    dayEndTime.substring(0, 5),
+    interval
+  ).includes(startTime);
+};
+
 export const getSlotPropGetter =
   (
     openingHours: OpeningTimesType[],
@@ -174,3 +240,17 @@ export const getSlotPropGetter =
         };
     }
   };
+
+export const getTimeslots = (
+  interval: ReservationUnitsReservationUnitReservationStartIntervalChoices
+): number => {
+  switch (interval) {
+    case "INTERVAL_90_MINS":
+      return 3;
+    case "INTERVAL_60_MINS":
+    case "INTERVAL_30_MINS":
+    case "INTERVAL_15_MINS":
+    default:
+      return 2;
+  }
+};

@@ -45,6 +45,13 @@ type Props = {
   onSelecting?: ({ start, end }: CalendarEvent) => void;
   onEventDrop?: (event: CalendarEvent) => void;
   onEventResize?: (event: CalendarEvent) => void;
+  onSelectSlot?: (
+    {
+      start,
+      action,
+    }: { start: Date; action: "select" | "click" | "doubleClick" },
+    skipLengthCheck: boolean
+  ) => void;
   draggableAccessor?: (event: CalendarEvent) => boolean;
   resizableAccessor?: (event: CalendarEvent) => boolean;
   toolbarComponent?: React.ReactNode;
@@ -54,6 +61,7 @@ type Props = {
   resizable?: boolean;
   overflowBreakpoint?: string;
   step?: number;
+  timeslots?: number;
 };
 
 export const eventStyleGetter = ({
@@ -83,13 +91,34 @@ export const eventStyleGetter = ({
 const StyledCalendar = styled(BigCalendar)<{
   overflowBreakpoint: string;
   step: number;
+  timeslots: number;
 }>`
+  ${({ timeslots }) => {
+    switch (timeslots) {
+      case 2:
+      default:
+        return ``;
+      case 3:
+        return `
+          .rbc-time-gutter > .rbc-timeslot-group {
+            .rbc-time-slot:not(:first-of-type) {
+                border: none;
+            }
+          }
+
+          .rbc-timeslot-group {
+            min-height: 29px !important;
+          }
+        `;
+    }
+  }}
+
   .rbc-timeslot-group {
     border-bottom: 0;
     min-height: ${({ step }) => {
       switch (step) {
         case 15:
-          return "26px";
+          return "23px";
         case 30:
         default:
           return "40px";
@@ -182,34 +211,17 @@ const StyledCalendar = styled(BigCalendar)<{
       display: block;
       box-shadow: 5px 0px 13px 0px rgb(0 0 0 / 15%);
       width: 69px;
-      height: ${({ step }) => {
-        switch (step) {
-          case 15:
-            return "935px";
-          case 30:
-          default:
-            return "730px";
-        }
-      }};
+      height: 100%;
       position: absolute;
       z-index: 20;
       bottom: 0px;
       left: 0px;
-
-      @media (min-width: ${(props) => props.overflowBreakpoint}) {
-        height: ${({ step }) => {
-          switch (step) {
-            case 15:
-              return "921px";
-            case 30:
-            default:
-              return "716px";
-          }
-        }};
-      }
     }
 
     .rbc-day-slot {
+      .rbc-events-container {
+        margin: 0;
+      }
       .rbc-timeslot-group {
         .rbc-time-slot.rbc-timeslot-inactive {
           border-top: none;
@@ -227,9 +239,29 @@ const StyledCalendar = styled(BigCalendar)<{
     }
   }
 
+  .rbc-time-view {
+    overflow-x: scroll;
+
+    @media (min-width: ${(props) => props.overflowBreakpoint}) {
+      overflow-x: auto;
+    }
+  }
+
   &.view-day {
     &:after {
-      height: 698px;
+      height: ${({ step }) => {
+        switch (step) {
+          case 15:
+            return "888px";
+          case 30:
+          default:
+            return "730px";
+        }
+      }};
+    }
+
+    .rbc-time-view {
+      overflow-x: unset !important;
     }
   }
 
@@ -247,17 +279,13 @@ const StyledCalendar = styled(BigCalendar)<{
   position: relative;
   margin-bottom: var(--spacing-l);
 
+  /* stylelint-disable */
   .rbc-time-view,
   .rbc-month-view {
     background-color: var(--color-white);
     border-color: var(--color-black-30);
     position: relative;
-    overflow-x: scroll;
     width: 100%;
-
-    @media (min-width: ${(props) => props.overflowBreakpoint}) {
-      overflow-x: auto;
-    }
   }
 
   .rbc-month-view {
@@ -322,6 +350,7 @@ const Calendar = ({
   onSelectEvent = () => {},
   onEventDrop = () => {},
   onEventResize = () => {},
+  onSelectSlot = () => {},
   draggableAccessor = () => false,
   resizableAccessor = () => false,
   showToolbar = false,
@@ -330,6 +359,7 @@ const Calendar = ({
   resizable = false,
   overflowBreakpoint = "850px",
   step = 30,
+  timeslots = 2,
 }: Props): JSX.Element => {
   const { i18n } = useTranslation();
   const Component = draggable ? StyledCalendarDND : StyledCalendar;
@@ -346,7 +376,7 @@ const Calendar = ({
       onNavigate={onNavigate}
       view={viewType}
       onView={onView}
-      min={addHours(startOfDay(begin), 7)}
+      min={addHours(startOfDay(begin), 6)}
       max={endOfMonth(begin)}
       localizer={localizer}
       toolbar={showToolbar}
@@ -354,6 +384,7 @@ const Calendar = ({
       className={`view-${viewType}`}
       components={{ toolbar: toolbarComponent }}
       onSelecting={onSelecting}
+      onSelectSlot={onSelectSlot}
       selectable={reservable}
       onSelectEvent={onSelectEvent}
       onEventResize={onEventResize}
@@ -364,6 +395,7 @@ const Calendar = ({
       resizableAccessor={resizableAccessor}
       overflowBreakpoint={overflowBreakpoint}
       step={step}
+      timeslots={timeslots}
     />
   );
 };

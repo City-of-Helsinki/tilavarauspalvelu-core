@@ -2,11 +2,16 @@ import { addDays, format } from "date-fns";
 import {
   areSlotsReservable,
   doReservationsCollide,
+  getDayIntervals,
   isReservationLongEnough,
   isReservationShortEnough,
   isSlotWithinTimeframe,
+  isStartTimeWithinInterval,
 } from "../calendar";
-import { ReservationType } from "../gql-types";
+import {
+  ReservationType,
+  ReservationUnitsReservationUnitReservationStartIntervalChoices,
+} from "../gql-types";
 import { ApplicationRound } from "../types";
 
 jest.mock("next/config", () => () => ({
@@ -149,4 +154,137 @@ test("doReservationsCollide", () => {
       end: new Date("2021-10-31T11:30:00+00:00"),
     })
   ).toBe(false);
+});
+
+describe("getDayIntervals", () => {
+  test("outputs sane results with 15min interval ", () => {
+    const result = getDayIntervals(
+      "09:00:00",
+      "12:00:00",
+      "INTERVAL_15_MINS" as ReservationUnitsReservationUnitReservationStartIntervalChoices
+    );
+
+    expect(result).toEqual([
+      "09:00:00",
+      "09:15:00",
+      "09:30:00",
+      "09:45:00",
+      "10:00:00",
+      "10:15:00",
+      "10:30:00",
+      "10:45:00",
+      "11:00:00",
+      "11:15:00",
+      "11:30:00",
+      "11:45:00",
+    ]);
+  });
+  test("outputs sane results with 90min interval", () => {
+    const result = getDayIntervals(
+      "09:00:00",
+      "21:00:00",
+      "INTERVAL_90_MINS" as ReservationUnitsReservationUnitReservationStartIntervalChoices
+    );
+
+    expect(result).toEqual([
+      "09:00:00",
+      "10:30:00",
+      "12:00:00",
+      "13:30:00",
+      "15:00:00",
+      "16:30:00",
+      "18:00:00",
+      "19:30:00",
+    ]);
+  });
+
+  test("outputs empty result", () => {
+    const result = getDayIntervals(
+      "09:00:00",
+      "09:00:00",
+      "INTERVAL_15_MINS" as ReservationUnitsReservationUnitReservationStartIntervalChoices
+    );
+
+    expect(result).toEqual([]);
+  });
+
+  test("outputs empty result", () => {
+    const result = getDayIntervals(
+      "09:00:00",
+      "21:00:00",
+      "INVALID_INTERVAL" as ReservationUnitsReservationUnitReservationStartIntervalChoices
+    );
+
+    expect(result).toEqual([]);
+  });
+});
+
+describe("isStartTimeWithinInterval", () => {
+  const openingTimes = [
+    {
+      date: "2019-09-21",
+      startTime: "06:00:00+00:00",
+      endTime: "18:00:00+00:00",
+      state: "open",
+      periods: [38600],
+    },
+    {
+      date: "2019-09-22",
+      startTime: "06:00:00+00:00",
+      endTime: "18:00:00+00:00",
+      state: "open",
+      periods: [38600],
+    },
+    {
+      date: "2019-09-28",
+      startTime: "06:00:00+00:00",
+      endTime: "18:00:00+00:00",
+      state: "open",
+      periods: [38600],
+    },
+  ];
+
+  test("returns sane results", () => {
+    expect(
+      isStartTimeWithinInterval(
+        new Date("2019-09-22T12:15:00+00:00"),
+        openingTimes,
+        "INTERVAL_15_MINS" as ReservationUnitsReservationUnitReservationStartIntervalChoices
+      )
+    ).toBe(true);
+  });
+
+  test("returns sane results", () => {
+    expect(
+      isStartTimeWithinInterval(
+        new Date("2019-09-22T12:10:00+00:00"),
+        openingTimes,
+        "INTERVAL_15_MINS" as ReservationUnitsReservationUnitReservationStartIntervalChoices
+      )
+    ).toBe(false);
+  });
+
+  test("returns sane results", () => {
+    expect(
+      isStartTimeWithinInterval(
+        new Date("2019-09-22T13:30:00+00:00"),
+        openingTimes,
+        "INTERVAL_90_MINS" as ReservationUnitsReservationUnitReservationStartIntervalChoices
+      )
+    ).toBe(true);
+  });
+
+  test("returns true without interval", () => {
+    expect(isStartTimeWithinInterval(new Date(), openingTimes)).toBe(true);
+  });
+
+  test("returns false without opening times", () => {
+    expect(
+      isStartTimeWithinInterval(
+        new Date(),
+        [],
+        "INTERVAL_15_MINS" as ReservationUnitsReservationUnitReservationStartIntervalChoices
+      )
+    ).toBe(false);
+  });
 });

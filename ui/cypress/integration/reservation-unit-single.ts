@@ -20,6 +20,7 @@ import {
   minuteSelectorToggle,
   reservationEvent,
   durationSelectorToggle,
+  notificationCloseButton,
 } from "model/reservation-creation";
 import { textWithIcon } from "model/search";
 
@@ -62,7 +63,7 @@ const drawReservation = (): void => {
 
   timeColumn(0).within(() => {
     cy.get(".rbc-time-slot")
-      .eq(6)
+      .eq(12)
       .trigger("mousedown", { force: true, button: 0 })
       .trigger("mousemove", 0, 400, { force: true });
     cy.get(".rbc-time-slot").eq(6).trigger("mouseup", { force: true });
@@ -71,10 +72,10 @@ const drawReservation = (): void => {
 
   timeColumn(1).within(() => {
     cy.get(".rbc-time-slot")
-      .eq(8)
+      .eq(12)
       .trigger("mousedown", { force: true, button: 0 })
       .trigger("mousemove", 0, 40, { force: true });
-    cy.get(".rbc-time-slot").eq(6).trigger("mouseup", { force: true });
+    cy.get(".rbc-time-slot").eq(16).trigger("mouseup", { force: true });
   });
   reservationSubmitButton().should("not.disabled");
   matchEvent();
@@ -103,7 +104,7 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
     reservationInfoPrice()
       .invoke("text")
       .then((text) => {
-        expect(text).to.contain("80\u00a0€");
+        expect(text).to.contain("100\u00a0€");
       });
 
     cy.checkA11y(null, null, null, true);
@@ -299,6 +300,15 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
       .siblings("ul")
       .children("li:nth-of-type(2)")
       .click();
+
+    notificationCloseButton().should("be.visible").click();
+
+    minuteSelectorToggle()
+      .click()
+      .siblings("ul")
+      .children("li:nth-of-type(1)")
+      .click();
+
     matchEvent();
 
     durationSelectorToggle()

@@ -61,3 +61,9 @@ export function reservationInfoPrice(): Cypress.Chainable<JQuery<HTMLElement>> {
 export function reservationEvent(): Cypress.Chainable<JQuery<HTMLElement>> {
   return cy.get(".rbc-event.rbc-event-movable");
 }
+
+export function notificationCloseButton(): Cypress.Chainable<
+  JQuery<HTMLElement>
+> {
+  return cy.get('[aria-label="Sulje virheilmoitus"]');
+}

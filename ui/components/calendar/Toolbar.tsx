@@ -20,12 +20,29 @@ const locales = {
 };
 
 const Wrapper = styled.div`
+  &:before {
+    content: "";
+    display: block;
+    background-color: var(--tilavaraus-gray);
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: -5px;
+    z-index: 21;
+  }
+
+  & > * {
+    z-index: 22;
+  }
   display: flex;
+  position: relative;
   justify-content: space-between;
-  margin-bottom: var(--spacing-xs);
+  padding-bottom: var(--spacing-xs);
+  margin-bottom: 0;
 
   @media (min-width: ${breakpoint.m}) {
-    margin-bottom: var(--spacing-xl);
+    padding-bottom: var(--spacing-xl);
   }
 
   .rbc-toolbar-label {

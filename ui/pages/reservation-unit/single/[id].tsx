@@ -26,9 +26,11 @@ import {
   areSlotsReservable,
   doReservationsCollide,
   getSlotPropGetter,
+  getTimeslots,
   isReservationLongEnough,
   isReservationShortEnough,
   isSlotWithinTimeframe,
+  isStartTimeWithinInterval,
 } from "../../../modules/calendar";
 import Toolbar, { ToolbarProps } from "../../../components/calendar/Toolbar";
 import { getActiveOpeningTimes } from "../../../modules/openingHours";
@@ -302,6 +304,11 @@ const ReservationUnit = ({
     if (
       !isValid(start) ||
       !isValid(end) ||
+      !isStartTimeWithinInterval(
+        start,
+        reservationUnit.openingHours?.openingTimes,
+        reservationUnit.reservationStartInterval
+      ) ||
       !areSlotsReservable(
         [new Date(start), subMinutes(new Date(end), 1)],
         reservationUnit.openingHours.openingTimes,
@@ -332,7 +339,33 @@ const ReservationUnit = ({
     skipLengthCheck = false
   ): boolean => {
     if (!isSlotReservable(start, end, skipLengthCheck)) {
-      setInitialReservation(null);
+      return false;
+    }
+
+    setInitialReservation({
+      begin: start.toISOString(),
+      end: end.toISOString(),
+      state: "INITIAL",
+    } as PendingReservation);
+    return true;
+  };
+
+  const handleSlotClick = (
+    { start, action },
+    skipLengthCheck = false
+  ): boolean => {
+    if (action !== "click") {
+      return false;
+    }
+    const [hours, minutes] = reservationUnit.minReservationDuration.split(":");
+
+    const end = new Date(start);
+    end.setHours(
+      start.getHours() + parseInt(hours, 10),
+      start.getMinutes() + parseInt(minutes, 10)
+    );
+
+    if (!isSlotReservable(start, end, skipLengthCheck)) {
       return false;
     }
 
@@ -445,6 +478,7 @@ const ReservationUnit = ({
                   draggable
                   onEventDrop={handleEventChange}
                   onEventResize={handleEventChange}
+                  onSelectSlot={handleSlotClick}
                   draggableAccessor={({ event }: CalendarEvent) =>
                     (event.state as ReservationStateWithInitial) === "INITIAL"
                   }
@@ -452,6 +486,9 @@ const ReservationUnit = ({
                     (event.state as ReservationStateWithInitial) === "INITIAL"
                   }
                   step={15}
+                  timeslots={getTimeslots(
+                    reservationUnit.reservationStartInterval
+                  )}
                   aria-hidden
                 />
               </div>
@@ -466,6 +503,7 @@ const ReservationUnit = ({
                       resetReservation={() => setInitialReservation(null)}
                       isSlotReservable={isSlotReservable}
                       setCalendarFocusDate={setFocusDate}
+                      activeApplicationRounds={activeApplicationRounds}
                     />
                   }
                 />

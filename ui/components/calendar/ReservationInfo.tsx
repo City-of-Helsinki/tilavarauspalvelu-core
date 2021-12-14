@@ -2,17 +2,16 @@ import { useRouter } from "next/router";
 import React, { useContext, useEffect, useState, useMemo } from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import {
-  set,
-  addHours,
-  addMinutes,
-  differenceInSeconds,
-  isValid,
-} from "date-fns";
+import { differenceInSeconds, isValid, subMinutes } from "date-fns";
 import { DateInput, Notification, Select } from "hds-react";
 import { useMutation } from "@apollo/client";
 import { breakpoint } from "../../modules/style";
-import { isReservationLongEnough } from "../../modules/calendar";
+import {
+  areSlotsReservable,
+  doReservationsCollide,
+  isReservationLongEnough,
+  isStartTimeWithinInterval,
+} from "../../modules/calendar";
 import { MediumButton } from "../../styles/util";
 import {
   ReservationCreateMutationInput,
@@ -22,7 +21,7 @@ import {
 import { DataContext } from "../../context/DataContext";
 import { CREATE_RESERVATION } from "../../modules/queries/reservation";
 import { fontBold, fontMedium } from "../../modules/style/typography";
-import { Language, OptionType } from "../../modules/types";
+import { ApplicationRound, Language, OptionType } from "../../modules/types";
 import {
   convertHMSToSeconds,
   secondsToHms,
@@ -38,6 +37,7 @@ type Props = {
   resetReservation: () => void;
   isSlotReservable: (start: Date, end: Date) => boolean;
   setCalendarFocusDate: (date: Date) => void;
+  activeApplicationRounds: ApplicationRound[];
 };
 
 const Wrapper = styled.div`
@@ -47,7 +47,7 @@ const Wrapper = styled.div`
   max-width: 300px;
 
   button {
-    order: 2;
+    order: unset;
   }
 
   h3 {
@@ -64,7 +64,6 @@ const Wrapper = styled.div`
     max-width: unset;
 
     button {
-      order: 1;
       max-width: 10rem;
     }
   }
@@ -117,6 +116,7 @@ const ReservationInfo = ({
   resetReservation,
   isSlotReservable,
   setCalendarFocusDate,
+  activeApplicationRounds,
 }: Props): JSX.Element => {
   const { t, i18n } = useTranslation();
   const router = useRouter();
@@ -211,27 +211,53 @@ const ReservationInfo = ({
 
   useEffect(() => {
     if (isValid(date) && hours && (minutes || minutes === "0") && duration) {
+      setErrorMsg(null);
+      const startDate = new Date(date);
+      const endDate = new Date(date);
       const [durationHours, durationMinutes] = String(duration.value).split(
         ":"
       );
-      const beginNew = set(date, {
-        hours: Number(hours),
-        minutes: Number(minutes),
-      });
-      const endNew = addMinutes(
-        addHours(beginNew, Number(durationHours)),
-        Number(durationMinutes)
+      startDate.setHours(Number(hours), Number(minutes));
+      endDate.setHours(
+        Number(hours) + Number(durationHours),
+        Number(minutes) + Number(durationMinutes)
       );
 
-      if (isSlotReservable(beginNew, endNew)) {
+      if (isSlotReservable(startDate, endDate)) {
         setReservation({
           pk: null,
-          begin: beginNew.toISOString(),
-          end: endNew.toISOString(),
+          begin: startDate.toISOString(),
+          end: endDate.toISOString(),
           price: null,
         });
       } else {
         setReservation({ pk: null, begin: null, end: null, price: null });
+        resetReservation();
+      }
+
+      if (
+        doReservationsCollide(reservationUnit.reservations, {
+          start: startDate,
+          end: endDate,
+        })
+      ) {
+        setErrorMsg(t(`reservationCalendar:errors.collision`));
+      } else if (
+        !areSlotsReservable(
+          [startDate, subMinutes(endDate, 1)],
+          reservationUnit.openingHours.openingTimes,
+          activeApplicationRounds
+        )
+      ) {
+        setErrorMsg(t(`reservationCalendar:errors.unavailable`));
+      } else if (
+        !isStartTimeWithinInterval(
+          startDate,
+          reservationUnit.openingHours?.openingTimes,
+          reservationUnit.reservationStartInterval
+        )
+      ) {
+        setErrorMsg(t(`reservationCalendar:errors.interval`));
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
