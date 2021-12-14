@@ -1,0 +1,14 @@
+{
+  "reservationUnitPriceLabel": "Varauksen hinta",
+  "priceUnits": {
+    "PER_15_MINS": "15 min",
+    "PER_30_MINS": "30 min",
+    "PER_HOUR": "t",
+    "PER_HALF_DAY": "½ pv",
+    "PER_DAY": "pv",
+    "PER_WEEK": "vk"
+  },
+  "priceFree": "Maksuton",
+  "taxPercentage": "alv {{count}}%",
+  "total": "Yhteensä"
+}

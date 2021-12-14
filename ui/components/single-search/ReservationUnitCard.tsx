@@ -1,4 +1,4 @@
-import { IconGroup, IconLocation, IconHome } from "hds-react";
+import { IconGroup, IconLocation, IconHome, IconTicket } from "hds-react";
 import React from "react";
 import { useTranslation } from "next-i18next";
 import router from "next/router";
@@ -9,6 +9,7 @@ import { getMainImage, getTranslation } from "../../modules/util";
 import IconWithText from "../common/IconWithText";
 import { MediumButton } from "../../styles/util";
 import { ReservationUnitType } from "../../modules/gql-types";
+import { getPrice } from "../../modules/reservationUnit";
 
 interface Props {
   reservationUnit: ReservationUnitType;
@@ -123,6 +124,7 @@ const Image = styled.img`
     height: 156px;
   }
 `;
+
 const ReservationUnitCard = ({ reservationUnit }: Props): JSX.Element => {
   const { t } = useTranslation();
 
@@ -130,6 +132,8 @@ const ReservationUnitCard = ({ reservationUnit }: Props): JSX.Element => {
   const address = `${
     getTranslation(reservationUnit.location, "addressStreet") || ""
   }`;
+
+  const unitPrice = getPrice(reservationUnit);
 
   return (
     <Container>
@@ -166,6 +170,16 @@ const ReservationUnitCard = ({ reservationUnit }: Props): JSX.Element => {
                 />
               }
               text={`${reservationUnit.maxPersons}`}
+            />
+          )}
+          {unitPrice && (
+            <StyledIconWithText
+              icon={
+                <IconTicket
+                  aria-label={t("prices:reservationUnitPriceLabel")}
+                />
+              }
+              text={unitPrice}
             />
           )}
           {address && (

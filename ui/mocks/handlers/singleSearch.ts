@@ -6,6 +6,7 @@ import {
   ReservationUnitImageType,
   Query,
   PurposeType,
+  ReservationUnitsReservationUnitPriceUnitChoices,
 } from "../../modules/gql-types";
 
 export const reservationUnitSearchHandlers = [
@@ -22,6 +23,10 @@ export const reservationUnitSearchHandlers = [
               nameFi: "Arabian nuorisotalon sali",
               nameEn: "Arabian nuorisotalon sali",
               nameSv: "Arabian nuorisotalon sali",
+              lowestPrice: 12.34,
+              highestPrice: 20,
+              priceUnit:
+                "PER_HOUR" as ReservationUnitsReservationUnitPriceUnitChoices,
               reservationUnitType: {
                 id: 3,
                 nameFi: "Nuorisopalvelut",
@@ -59,6 +64,10 @@ export const reservationUnitSearchHandlers = [
               nameFi: "Hertsin nuorisotalon sali",
               nameEn: "Hertsin nuorisotalon sali",
               nameSv: "Hertsin nuorisotalon sali",
+              lowestPrice: 0.0,
+              highestPrice: 20,
+              priceUnit:
+                "PER_HALF_DAY" as ReservationUnitsReservationUnitPriceUnitChoices,
               reservationUnitType: {
                 id: 3,
                 nameFi: "Nuorisopalvelut",
@@ -86,6 +95,10 @@ export const reservationUnitSearchHandlers = [
               nameFi: "Jakomäen sydämen liikkumistila",
               nameEn: "Jakomäen sydämen liikkumistila",
               nameSv: "Jakomäen sydämen liikkumistila",
+              lowestPrice: 0.0,
+              highestPrice: 0.0,
+              priceUnit:
+                "PER_HOUR" as ReservationUnitsReservationUnitPriceUnitChoices,
               reservationUnitType: {
                 id: 3,
                 nameFi: "Nuorisopalvelut",
@@ -113,6 +126,10 @@ export const reservationUnitSearchHandlers = [
               nameFi: "Pasilan nuorisotalon järjestötila",
               nameEn: "Pasilan nuorisotalon järjestötila",
               nameSv: "Pasilan nuorisotalon järjestötila",
+              lowestPrice: 0.0,
+              highestPrice: 0.0,
+              priceUnit:
+                "PER_HOUR" as ReservationUnitsReservationUnitPriceUnitChoices,
               reservationUnitType: {
                 id: 3,
                 nameFi: "Nuorisopalvelut",
@@ -140,6 +157,10 @@ export const reservationUnitSearchHandlers = [
               nameFi: "Koskelan nuorisotalon yläkerran ryhmätila 2",
               nameEn: "Koskelan nuorisotalon yläkerran ryhmätila 2",
               nameSv: "Koskelan nuorisotalon yläkerran ryhmätila 2",
+              lowestPrice: 0.0,
+              highestPrice: 0.0,
+              priceUnit:
+                "PER_HOUR" as ReservationUnitsReservationUnitPriceUnitChoices,
               reservationUnitType: {
                 id: 3,
                 nameFi: "Nuorisopalvelut",
@@ -167,6 +188,10 @@ export const reservationUnitSearchHandlers = [
               nameFi: "Koskelan nuorisotalon yläkerran ryhmätila 1",
               nameEn: "Koskelan nuorisotalon yläkerran ryhmätila 1",
               nameSv: "Koskelan nuorisotalon yläkerran ryhmätila 1",
+              lowestPrice: 0.0,
+              highestPrice: 0.0,
+              priceUnit:
+                "PER_HOUR" as ReservationUnitsReservationUnitPriceUnitChoices,
               reservationUnitType: {
                 id: 3,
                 nameFi: "Nuorisopalvelut",
@@ -194,6 +219,10 @@ export const reservationUnitSearchHandlers = [
               nameFi: "Malmin nuorisotalon alakerta",
               nameEn: "Malmin nuorisotalon alakerta",
               nameSv: "Malmin nuorisotalon alakerta",
+              lowestPrice: 0.0,
+              highestPrice: 0.0,
+              priceUnit:
+                "PER_HOUR" as ReservationUnitsReservationUnitPriceUnitChoices,
               reservationUnitType: {
                 id: 3,
                 nameFi: "Nuorisopalvelut",
@@ -221,6 +250,10 @@ export const reservationUnitSearchHandlers = [
               nameFi: "Ruoholahden nuorisotalon sali",
               nameEn: "Ruoholahden nuorisotalon sali",
               nameSv: "Ruoholahden nuorisotalon sali",
+              lowestPrice: 0.0,
+              highestPrice: 0.0,
+              priceUnit:
+                "PER_HOUR" as ReservationUnitsReservationUnitPriceUnitChoices,
               reservationUnitType: {
                 id: 3,
                 nameFi: "Nuorisopalvelut",
@@ -248,6 +281,10 @@ export const reservationUnitSearchHandlers = [
               nameFi: "Malmin nuorisotalon yläkerta",
               nameEn: "Malmin nuorisotalon yläkerta",
               nameSv: "Malmin nuorisotalon yläkerta",
+              lowestPrice: 0.0,
+              highestPrice: 0.0,
+              priceUnit:
+                "PER_HOUR" as ReservationUnitsReservationUnitPriceUnitChoices,
               reservationUnitType: {
                 id: 3,
                 nameFi: "Nuorisopalvelut",
@@ -275,6 +312,10 @@ export const reservationUnitSearchHandlers = [
               nameFi: "Jakomäen sydämen olohuone",
               nameEn: "Jakomäen sydämen olohuone",
               nameSv: "Jakomäen sydämen olohuone",
+              lowestPrice: 0.0,
+              highestPrice: 0.0,
+              priceUnit:
+                "PER_HOUR" as ReservationUnitsReservationUnitPriceUnitChoices,
               reservationUnitType: {
                 id: 3,
                 nameFi: "Nuorisopalvelut",

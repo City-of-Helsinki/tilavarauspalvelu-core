@@ -9,6 +9,7 @@ export type ReservationProps = {
   pk?: number | null;
   begin: string | null;
   end: string | null;
+  price: number | null;
 };
 
 export const DataContext = React.createContext<DataContextProps>({

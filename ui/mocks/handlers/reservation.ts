@@ -25,6 +25,7 @@ const createReservation = graphql.mutation<
     ctx.data({
       createReservation: {
         pk: 42,
+        price: 42.0,
         errors: null,
       },
     })
@@ -128,6 +129,7 @@ const reservationByPk = graphql.query<Query, QueryReservationUnitByPkArgs>(
       calendarUrl: `http://localhost:8000/v1/reservation_calendar/${pk}/?hash=12c580bc07340b05441feb8f261786a7ceabb5423a1966c7c13241f39916233c`,
       user: "user@gmail.com",
       state: "CONFIRMED",
+      price: 42.0,
       reservationUnits: [
         {
           id: "UmVzZXJ2YXRpb25Vbml0VHlwZTo5",
@@ -267,6 +269,7 @@ const listReservations = graphql.query<Query, QueryReservationUnitsArgs>(
                 end: addHours(addDays(new Date(), 1), 1).toISOString(),
                 user: "user@gmail.com",
                 state: "CONFIRMED",
+                price: 42.0,
                 reservationUnits: [
                   {
                     pk: 2,

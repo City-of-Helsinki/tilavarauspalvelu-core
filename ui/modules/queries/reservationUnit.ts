@@ -19,6 +19,9 @@ export const RESERVATION_UNIT = gql`
       descriptionFi
       descriptionEn
       descriptionSv
+      lowestPrice
+      highestPrice
+      priceUnit
       termsOfUseFi
       termsOfUseEn
       termsOfUseSv
@@ -115,6 +118,10 @@ export const RESERVATION_UNITS = gql`
           nameFi
           nameEn
           nameSv
+          lowestPrice
+          highestPrice
+          priceUnit
+          nameFi
           reservationUnitType {
             id: pk
             nameFi

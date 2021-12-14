@@ -12,6 +12,8 @@ import {
   ReservationUnitImageType,
   ReservationUnitTypeConnection,
   TermsOfUseTermsOfUseTermsTypeChoices,
+  ReservationUnitsReservationUnitPriceUnitChoices,
+  ReservationUnitsReservationUnitReservationStartIntervalChoices,
 } from "../../modules/gql-types";
 import { Parameter } from "../../modules/types";
 import { toApiDate } from "../../modules/util";
@@ -62,6 +64,9 @@ const selectedReservationUnitQuery = graphql.query<
         imageType: "OTHER",
       },
     ] as ReservationUnitImageType[],
+    lowestPrice: 20,
+    highestPrice: 20,
+    priceUnit: "PER_15_MINS" as ReservationUnitsReservationUnitPriceUnitChoices,
     descriptionFi:
       "<p>Sali sijaitsee nuorisotalon toisessa kerroksessa. Tilaan mahtuu 60 henkil&ouml;&auml;..</p> Fi",
     descriptionEn:
@@ -77,6 +82,8 @@ const selectedReservationUnitQuery = graphql.query<
     additionalInstructionsFi: "Additional instructions FI",
     additionalInstructionsEn: null,
     additionalInstructionsSv: null,
+    reservationStartInterval:
+      "INTERVAL_90_MINS" as ReservationUnitsReservationUnitReservationStartIntervalChoices,
     serviceSpecificTerms: {
       id: "VGVybXNPZlVzZVR5cGU6Mw==",
       termsType: "SERVICE_TERMS" as TermsOfUseTermsOfUseTermsTypeChoices,
@@ -322,7 +329,7 @@ const openingHoursQuery = graphql.query<
         uuid: "",
         openingHours: { openingTimes },
         reservations,
-      },
+      } as ReservationUnitByPkType,
     })
   );
 });
@@ -339,6 +346,10 @@ const relatedReservationUnitsData: ReservationUnitTypeConnection = {
         nameEn: "Pukinmäen nuorisotalon yläkerta En",
         nameSv: "Pukinmäen nuorisotalon yläkerta Sv",
         images: [],
+        lowestPrice: 12.34,
+        highestPrice: 20,
+        priceUnit:
+          "PER_HOUR" as ReservationUnitsReservationUnitPriceUnitChoices,
         unit: {
           id: "VW5pdFR5cGU6Nw==",
           pk: 7,
@@ -355,6 +366,8 @@ const relatedReservationUnitsData: ReservationUnitTypeConnection = {
           webPage: "http://pukinmaki.munstadi.fi/",
           phone: "",
         },
+        reservationStartInterval:
+          "INTERVAL_30_MINS" as ReservationUnitsReservationUnitReservationStartIntervalChoices,
         reservationUnitType: {
           id: "fj9023fjwifj",
           pk: 3,
@@ -403,6 +416,10 @@ const relatedReservationUnitsData: ReservationUnitTypeConnection = {
         nameFi: "Pukinmäen nuorisotalon sali Fi",
         nameEn: "Pukinmäen nuorisotalon sali En",
         nameSv: "Pukinmäen nuorisotalon sali Sv",
+        lowestPrice: 3.34,
+        highestPrice: 30,
+        priceUnit:
+          "PER_WEEK" as ReservationUnitsReservationUnitPriceUnitChoices,
         images: [
           {
             imageUrl:
@@ -442,6 +459,8 @@ const relatedReservationUnitsData: ReservationUnitTypeConnection = {
           webPage: "http://pukinmaki.munstadi.fi/",
           phone: "",
         },
+        reservationStartInterval:
+          "INTERVAL_30_MINS" as ReservationUnitsReservationUnitReservationStartIntervalChoices,
         reservationUnitType: {
           id: "fj9023fjwifj",
           pk: 3,

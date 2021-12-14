@@ -19,3 +19,9 @@ export function reservationDetail(
 ): Cypress.Chainable<JQuery<HTMLElement>> {
   return cy.get(`[data-testid='reservation__detail--${slug}']`);
 }
+
+export function reservationPriceContainer(): Cypress.Chainable<
+  JQuery<HTMLElement>
+> {
+  return cy.get("[data-testid='reservation__price--container']");
+}

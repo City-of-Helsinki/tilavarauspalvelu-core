@@ -20,7 +20,39 @@ exports[`renders correctly 1`] = `
       </h1>
       <div
         class="Ticket__Price-sc-16qon89-6 iGKRoY"
-      />
+        data-testid="reservation__price--container"
+      >
+        <div
+          class="Ticket__PriceRow-sc-16qon89-7 jRyEGg"
+        >
+          <div>
+            <span
+              class="typography__Strongish-sc-yczr8v-1 pEndj"
+            >
+              reservations:reservationDuration
+            </span>
+          </div>
+          <div />
+        </div>
+        <div
+          class="Ticket__PriceRow-sc-16qon89-7 jRyEGg"
+        >
+          <div>
+            <span
+              class="typography__Strongish-sc-yczr8v-1 pEndj"
+            >
+              prices:total
+            </span>
+          </div>
+          <div>
+            <span
+              class="typography__Strongish-sc-yczr8v-1 pEndj"
+            >
+              prices:priceFree
+            </span>
+          </div>
+        </div>
+      </div>
     </div>
     <div
       class="Ticket__PunchHole-sc-16qon89-0 kCZKkf"
@@ -49,7 +81,39 @@ exports[`renders correctly 2`] = `
       </h1>
       <div
         class="Ticket__Price-sc-16qon89-6 iGKRoY"
-      />
+        data-testid="reservation__price--container"
+      >
+        <div
+          class="Ticket__PriceRow-sc-16qon89-7 jRyEGg"
+        >
+          <div>
+            <span
+              class="typography__Strongish-sc-yczr8v-1 pEndj"
+            >
+              reservations:reservationDuration
+            </span>
+          </div>
+          <div />
+        </div>
+        <div
+          class="Ticket__PriceRow-sc-16qon89-7 jRyEGg"
+        >
+          <div>
+            <span
+              class="typography__Strongish-sc-yczr8v-1 pEndj"
+            >
+              prices:total
+            </span>
+          </div>
+          <div>
+            <span
+              class="typography__Strongish-sc-yczr8v-1 pEndj"
+            >
+              prices:priceFree
+            </span>
+          </div>
+        </div>
+      </div>
     </div>
     <div
       class="Ticket__PunchHole-sc-16qon89-0 kCZKkf"
@@ -78,6 +142,7 @@ exports[`renders correctly 3`] = `
       </h1>
       <div
         class="Ticket__Price-sc-16qon89-6 hBNSGZ"
+        data-testid="reservation__price--container"
       >
         <span
           class="typography__Strongish-sc-yczr8v-1 pEndj"
@@ -143,6 +208,7 @@ exports[`renders correctly 4`] = `
       </div>
       <div
         class="Ticket__Price-sc-16qon89-6 hBNSGZ"
+        data-testid="reservation__price--container"
       >
         <span
           class="typography__Strongish-sc-yczr8v-1 pEndj"

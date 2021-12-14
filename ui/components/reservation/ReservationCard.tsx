@@ -14,7 +14,10 @@ import IconWithText from "../common/IconWithText";
 import { MediumButton } from "../../styles/util";
 import { ReservationType } from "../../modules/gql-types";
 import { reservationUnitSinglePrefix } from "../../modules/const";
-import { canUserCancelReservation } from "../../modules/reservation";
+import {
+  canUserCancelReservation,
+  getReservationPrice,
+} from "../../modules/reservation";
 
 type CardType = "upcoming" | "past";
 
@@ -189,6 +192,7 @@ const ReservationCard = ({ reservation, type }: Props): JSX.Element => {
           <StyledIconWithText
             icon={<IconHome aria-label={t("reservationUnitCard:type")} />}
             text={getTranslation(reservationUnit.unit, "name")}
+            data-testid="reservation__card--unit"
           />
           {address && (
             <StyledIconWithText
@@ -197,11 +201,13 @@ const ReservationCard = ({ reservation, type }: Props): JSX.Element => {
                 <IconLocation aria-label={t("reservationUnitCard:address")} />
               }
               text={address}
+              data-testid="reservation__card--address"
             />
           )}
           <StyledIconWithText
             icon={<IconTicket aria-label={t("reservationUnit:price")} />}
-            text={t("reservationUnit:priceFree")}
+            text={getReservationPrice(reservation.price)}
+            data-testid="reservation__card--price"
           />
         </Bottom>
       </MainContent>

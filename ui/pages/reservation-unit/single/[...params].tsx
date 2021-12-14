@@ -54,6 +54,7 @@ import {
 import StepperHz from "../../../components/StepperHz";
 import Ticket from "../../../components/reservation/Ticket";
 import Sanitize from "../../../components/common/Sanitize";
+import { getPrice } from "../../../modules/reservationUnit";
 
 type Props = {
   reservationUnit: ReservationUnitType;
@@ -83,6 +84,7 @@ type Reservation = {
   description: string;
   calendarUrl?: string;
   state?: string;
+  price?: number;
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -413,7 +415,9 @@ const ReservationUnitReservation = ({
                 begin={begin}
                 end={end}
                 state={formStatus === "sent" ? "complete" : "incomplete"}
-                isFree
+                isFree={!getPrice(reservationUnit)}
+                reservationPrice={reservationData.price}
+                // taxPercentage={reservationUnit.taxPercentage}
               />
             </div>
             <div>

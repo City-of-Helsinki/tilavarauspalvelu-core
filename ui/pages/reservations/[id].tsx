@@ -166,7 +166,8 @@ const Reservation = ({ reservation }: Props): JSX.Element => {
               subtitle={getTranslation(reservationUnit.unit, "name")}
               begin={reservation.begin}
               end={reservation.end}
-              isFree
+              isFree={!reservation.price}
+              reservationPrice={reservation.price}
             />
             <div>
               <H1>

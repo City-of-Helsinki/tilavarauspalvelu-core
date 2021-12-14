@@ -7,6 +7,16 @@ import { isFinite } from "lodash";
 import { H1, H2, fontMedium, Strongish } from "../../modules/style/typography";
 import { capitalize, formatDurationMinutes } from "../../modules/util";
 import { breakpoint } from "../../modules/style";
+import {
+  ReservationUnitByPkType,
+  ReservationUnitsReservationUnitPriceUnitChoices,
+} from "../../modules/gql-types";
+import {
+  getPrice,
+  getPriceUnitMinutes,
+  getVolume,
+} from "../../modules/reservationUnit";
+import { getReservationPrice } from "../../modules/reservation";
 
 export type TicketState = "incomplete" | "complete" | "error";
 
@@ -18,6 +28,11 @@ type Props = {
   end?: string;
   isFree?: boolean;
   bgColor?: string;
+  reservationPrice?: number;
+  lowestPrice?: number;
+  highestPrice?: number;
+  priceUnit?: ReservationUnitsReservationUnitPriceUnitChoices;
+  taxPercentage?: number;
 };
 
 const PunchHole = styled.div<{ $bgColor: string }>`
@@ -131,6 +146,14 @@ const Price = styled.div<{ $isFree: boolean }>`
   }
 `;
 
+const PriceRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-m);
+  margin-bottom: var(--spacing-2-xs);
+`;
+
 const Ticket = ({
   state,
   title,
@@ -139,6 +162,11 @@ const Ticket = ({
   end,
   isFree,
   bgColor = "var(--color-white)",
+  reservationPrice,
+  lowestPrice,
+  highestPrice,
+  priceUnit,
+  taxPercentage,
 }: Props): JSX.Element => {
   const { t } = useTranslation();
 
@@ -158,12 +186,20 @@ const Ticket = ({
     date: end && parseISO(end),
   });
 
+  const reservationUnitPrices = {
+    lowestPrice,
+    highestPrice,
+    priceUnit,
+  };
+
   const duration = differenceInMinutes(new Date(end), new Date(begin));
   const timeString = `${beginDate} ${beginTime} - ${
     endDate !== beginDate ? endDate : ""
   }${endTime} (${t("common:duration", {
     duration: formatDurationMinutes(duration),
   })})`;
+
+  const multiplier = getVolume(duration, priceUnit);
 
   return (
     <Wrapper $state={state} data-testid="reservation__ticket--container">
@@ -176,8 +212,53 @@ const Ticket = ({
             <IconCalendar /> {capitalize(timeString)}
           </Duration>
         )}
-        <Price $isFree={isFree}>
-          {isFree && <Strongish>{t("reservationUnit:priceFree")}</Strongish>}
+        <Price $isFree={isFree} data-testid="reservation__price--container">
+          {isFree ? (
+            <Strongish>{t("reservationUnit:priceFree")}</Strongish>
+          ) : (
+            <>
+              <PriceRow>
+                <div>
+                  <Strongish>
+                    {t("reservations:reservationDuration", {
+                      duration: formatDurationMinutes(duration),
+                    })}
+                  </Strongish>
+                  {taxPercentage && (
+                    <span>
+                      (
+                      {t("prices:taxPercentage", {
+                        count: taxPercentage,
+                      })}
+                      )
+                    </span>
+                  )}
+                </div>
+                <div>
+                  {reservationUnitPrices.highestPrice && (
+                    <Strongish>
+                      {priceUnit !== "FIXED" && `${multiplier} * `}
+                      {getPrice(
+                        reservationUnitPrices as ReservationUnitByPkType,
+                        getPriceUnitMinutes(priceUnit),
+                        true
+                      )}
+                    </Strongish>
+                  )}
+                </div>
+              </PriceRow>
+              <PriceRow>
+                <div>
+                  <Strongish>{t("prices:total")}</Strongish>
+                </div>
+                <div>
+                  <Strongish>
+                    {getReservationPrice(reservationPrice, true)}
+                  </Strongish>
+                </div>
+              </PriceRow>
+            </>
+          )}
         </Price>
       </Content>
       <PunchHole $bgColor={bgColor} />

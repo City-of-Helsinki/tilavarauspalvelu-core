@@ -4,6 +4,7 @@ export const CREATE_RESERVATION = gql`
   mutation createReservation($input: ReservationCreateMutationInput!) {
     createReservation(input: $input) {
       pk
+      price
       errors {
         field
         messages
@@ -82,6 +83,7 @@ export const LIST_RESERVATIONS = gql`
           begin
           end
           state
+          price
           reservationUnits {
             pk
             nameFi

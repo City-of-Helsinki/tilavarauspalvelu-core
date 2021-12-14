@@ -6,6 +6,7 @@ import {
   IconGroup,
   IconInfoCircle,
   IconPlus,
+  IconTicket,
   Koros,
 } from "hds-react";
 import { parseISO } from "date-fns";
@@ -27,6 +28,7 @@ import {
 } from "../../modules/openingHours";
 import { MediumButton } from "../../styles/util";
 import { ReservationUnitByPkType } from "../../modules/gql-types";
+import { getPrice } from "../../modules/reservationUnit";
 
 interface PropsType {
   reservationUnit: ReservationUnitByPkType;
@@ -52,7 +54,9 @@ const RightContainer = styled.div`
   }
 `;
 
-const StyledIconWithText = styled(IconWithText)`
+const StyledIconWithText = styled(IconWithText).attrs({
+  "data-testid": "icon-with-text",
+})`
   margin-top: var(--spacing-m);
   display: flex;
   align-items: flex-start;
@@ -127,6 +131,8 @@ const Head = ({
     getDayOpeningTimes(openingTime, index)
   );
 
+  const unitPrice = getPrice(reservationUnit);
+
   return (
     <TopContainer>
       <Notification applicationRound={null} />
@@ -190,6 +196,16 @@ const Head = ({
                   )}
               </div>
               <div>
+                {viewType === "single" && unitPrice && (
+                  <StyledIconWithText
+                    icon={
+                      <IconTicket
+                        aria-label={t("prices:reservationUnitPriceLabel")}
+                      />
+                    }
+                    text={unitPrice}
+                  />
+                )}
                 {viewType === "single" &&
                   (reservationUnit.minReservationDuration ||
                     reservationUnit.maxReservationDuration) && (

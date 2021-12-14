@@ -3,8 +3,8 @@ import {
   modifyButton,
   cancelButton as detailCancelButton,
   accordionToggler,
-  reservationDetail,
   returnButton,
+  reservationPriceContainer,
 } from "model/reservation-detail";
 import {
   cancelButton,
@@ -54,6 +54,16 @@ describe("Tilavaraus user reservations", () => {
     cancelButton().eq(2).should("be.disabled");
     cancelButton().eq(3).should("not.be.disabled");
 
+    reservationCards()
+      .eq(0)
+      .find('[data-testid="reservation__card--price"]:nth-of-type(2)')
+      .should("contain.text", "42\u00a0€");
+
+    reservationCards()
+      .eq(1)
+      .find('[data-testid="reservation__card--price"]:nth-of-type(2)')
+      .should("contain.text", "Maksuton");
+
     tab(2).click();
 
     reservationCards().should("have.length", 2);
@@ -100,6 +110,11 @@ describe("Tilavaraus user reservations", () => {
     accordionToggler().eq(2).click();
     cy.contains("div", "Service specific terms FI").should("be.visible");
 
+    reservationPriceContainer()
+      .should("contain.text", "Varaus 4 t")
+      // .should("contain.text", "(alv %)")
+      .should("contain.text", "42,00\u00a0€");
+
     returnButton().click();
 
     cy.url({ timeout: 20000 }).should("match", /\/reservations$/);
@@ -135,6 +150,11 @@ describe("Tilavaraus user reservations", () => {
     cancelCancelButton().click();
     ticket().should("have.css", "background-color", "rgb(255, 225, 225)");
     cancelTitle().eq(1).should("have.text", "Varaus on peruutettu");
+
+    reservationPriceContainer()
+      .should("contain.text", "Varaus 2 t")
+      // .should("contain.text", "(alv %)")
+      .should("contain.text", "42,00\u00a0€");
 
     secondBackButton().should("exist");
     reReserveButton().click();

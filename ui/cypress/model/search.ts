@@ -98,3 +98,17 @@ export function formResetButton(): Cypress.Chainable<JQuery<HTMLElement>> {
 export function paginationButton(): Cypress.Chainable<JQuery<HTMLElement>> {
   return cy.get("[data-test-id='search-form__pagination-button']");
 }
+
+export function reservationUnitCards(
+  order: number
+): Cypress.Chainable<JQuery<HTMLElement>> {
+  return cy.get(
+    "#searchResultList > div:nth-of-type(2) > div:nth-of-type(" + order + ")"
+  );
+}
+
+export function textWithIcon(
+  order: number
+): Cypress.Chainable<JQuery<HTMLElement>> {
+  return cy.get("[data-testid='icon-with-text']").eq(order);
+}

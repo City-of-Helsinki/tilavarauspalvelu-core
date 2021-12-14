@@ -266,7 +266,8 @@ const ReservationCancellation = ({
               subtitle={getTranslation(reservationUnit.unit, "name")}
               begin={reservation.begin}
               end={reservation.end}
-              isFree
+              isFree={!reservation.price}
+              reservationPrice={reservation.price}
             />
             <Heading>
               {formState === "unsent" ? (

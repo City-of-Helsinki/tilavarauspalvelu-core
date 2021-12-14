@@ -17,6 +17,7 @@ import {
   inputPurpose,
   selectClearButton,
   inputReservationUnitTypeOption,
+  reservationUnitCards,
 } from "../model/search";
 
 describe("Tilavaraus ui search page (single)", () => {
@@ -36,6 +37,13 @@ describe("Tilavaraus ui search page (single)", () => {
 
   it("displays search results by default", () => {
     cy.get("#searchResultList").should("contain", "10 Hakutulosta");
+
+    reservationUnitCards(1).contains("12,34 - 20 € / t");
+    reservationUnitCards(1).contains("Arabianpolku 1 A 2");
+    reservationUnitCards(1).contains("Nuorisopalvelut");
+    reservationUnitCards(1).contains("100");
+    reservationUnitCards(2).contains("0 - 20 € / ½ p");
+    reservationUnitCards(3).contains("Maksuton");
   });
 
   it("displays search results on demand", () => {

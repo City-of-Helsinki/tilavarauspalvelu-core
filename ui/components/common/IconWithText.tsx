@@ -40,8 +40,9 @@ const IconWithText = ({
   text = "",
   texts = [],
   className,
+  ...rest
 }: IconWithTextProps): JSX.Element => (
-  <Container className={className}>
+  <Container className={className} {...rest}>
     {text && (
       <>
         {icon}

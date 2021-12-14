@@ -1,5 +1,7 @@
+import { addMonths } from "date-fns";
 import { rest } from "msw";
 import { ApplicationRound } from "../../modules/types";
+import { toApiDate } from "../../modules/util";
 
 const applicationRounds = rest.get(
   "http://localhost:8000/v1/application_round/",
@@ -332,8 +334,8 @@ const applicationRounds = rest.get(
         reservationUnitIds: [52, 1, 49, 50, 51, 53, 54],
         applicationPeriodBegin: "2021-04-19T06:00:00Z",
         applicationPeriodEnd: "2021-12-30T13:00:00Z",
-        reservationPeriodBegin: "2021-12-16",
-        reservationPeriodEnd: "2022-05-29",
+        reservationPeriodBegin: toApiDate(addMonths(new Date(), 1)),
+        reservationPeriodEnd: toApiDate(addMonths(new Date(), 5)),
         publicDisplayBegin: "2021-04-16T06:00:00Z",
         publicDisplayEnd: "2021-04-30T13:00:00Z",
         purposeIds: [5, 6, 7, 8],

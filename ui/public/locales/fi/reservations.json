@@ -30,5 +30,6 @@
   "reservationCancellationFailed": "Varauksen peruuttaminen epäonnistui",
   "makeNewReservation": "Tee uusi varaus samaan tilaan",
   "reservationInfo": "Varauksen ohjeet",
-  "gotoReservations": "Siirry omiin varauksiin"
+  "gotoReservations": "Siirry omiin varauksiin",
+  "reservationDuration": "Varaus {{duration}}"
 }

@@ -440,3 +440,43 @@ export const convertHMSToSeconds = (input: string): number | null => {
   const result = Number(new Date(`1970-01-01T${input}Z`).getTime() / 1000);
   return Number.isNaN(result) ? null : result;
 };
+
+export const getFormatters = (): {
+  [key: string]: Intl.NumberFormat;
+} => {
+  return {
+    default: new Intl.NumberFormat(),
+    currency: new Intl.NumberFormat(i18n.language, {
+      style: "currency",
+      currency: "EUR",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
+    }),
+    currencyWithDecimals: new Intl.NumberFormat(i18n.language, {
+      style: "currency",
+      currency: "EUR",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }),
+    whole: new Intl.NumberFormat(i18n.language, {
+      style: "decimal",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }),
+    oneDecimal: new Intl.NumberFormat(i18n.language, {
+      style: "decimal",
+      minimumFractionDigits: 1,
+      maximumFractionDigits: 1,
+    }),
+    twoDecimal: new Intl.NumberFormat(i18n.language, {
+      style: "decimal",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }),
+    strippedDecimal: new Intl.NumberFormat(i18n.language, {
+      style: "decimal",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
+    }),
+  };
+};
