@@ -20,6 +20,7 @@ from reservation_units.models import (
     ReservationUnitCancellationRule,
     ReservationUnitImage,
     ReservationUnitType,
+    TaxPercentage,
 )
 from resources.models import Resource
 from services.models import Service
@@ -177,6 +178,11 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
             f"{', '.join(value[0] for value in ReservationUnit.RESERVATION_START_INTERVAL_CHOICES)}."
         ),
     )
+    tax_percentage_pk = IntegerPrimaryKeyField(
+        queryset=TaxPercentage.objects.all(),
+        source="tax_percentage",
+        required=False,
+    )
 
     translation_fields = get_all_translatable_fields(ReservationUnit)
 
@@ -215,6 +221,7 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
             "highest_price",
             "price_unit",
             "reservation_start_interval",
+            "tax_percentage_pk",
         ] + get_all_translatable_fields(ReservationUnit)
 
     def __init__(self, *args, **kwargs):
@@ -227,6 +234,7 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
         self.fields["payment_terms_pk"].write_only = True
         self.fields["cancellation_terms_pk"].write_only = True
         self.fields["service_specific_terms_pk"].write_only = True
+        self.fields["tax_percentage_pk"].write_only = True
 
     def _check_pk_list(self, id_list, field_name):
         for identifier in id_list:

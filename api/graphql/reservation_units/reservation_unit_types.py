@@ -51,6 +51,7 @@ from reservation_units.models import (
     ReservationUnitImage,
 )
 from reservation_units.models import ReservationUnitType as ReservationUnitTypeModel
+from reservation_units.models import TaxPercentage
 from reservation_units.utils.reservation_unit_reservation_scheduler import (
     ReservationUnitReservationScheduler,
 )
@@ -63,6 +64,14 @@ class KeywordType(AuthNode, PrimaryKeyObjectType):
         model = Keyword
         fields = ["pk"] + get_all_translatable_fields(model)
         filter_fields = ["name_fi", "name_sv", "name_en"]
+        interfaces = (graphene.relay.Node,)
+
+
+class TaxPercentageType(AuthNode, PrimaryKeyObjectType):
+    class Meta:
+        model = TaxPercentage
+        fields = ["pk", "value"]
+        filter_fields = ["value"]
         interfaces = (graphene.relay.Node,)
 
 
@@ -296,6 +305,7 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
     payment_terms = graphene.Field(TermsOfUseType)
     cancellation_terms = graphene.Field(TermsOfUseType)
     service_specific_terms = graphene.Field(TermsOfUseType)
+    tax_percentage = graphene.Field(TaxPercentageType)
 
     permission_classes = (
         (ReservationUnitPermission,)
@@ -329,6 +339,7 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
             "payment_terms",
             "cancellation_terms",
             "service_specific_terms",
+            "tax_percentage",
             "lowest_price",
             "highest_price",
             "price_unit",
@@ -472,6 +483,7 @@ class ReservationUnitByPkType(ReservationUnitType, OpeningHoursMixin):
             "next_available_slot",
             "hauki_url",
             "is_draft",
+            "tax_percentage",
             "lowest_price",
             "highest_price",
             "price_unit",

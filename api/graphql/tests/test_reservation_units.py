@@ -25,7 +25,7 @@ from permissions.models import (
     UnitRoleChoice,
     UnitRolePermission,
 )
-from reservation_units.models import ReservationUnit
+from reservation_units.models import ReservationUnit, TaxPercentage
 from reservation_units.tests.factories import (
     EquipmentFactory,
     KeywordCategoryFactory,
@@ -81,6 +81,7 @@ class ReservationUnitQueryTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCa
             additional_instructions_fi="Lisäohjeita",
             additional_instructions_sv="Ytterligare instruktioner",
             additional_instructions_en="Additional instructions",
+            tax_percentage=TaxPercentage.objects.get(value=24),
             lowest_price=0,
             highest_price=20,
             price_unit=ReservationUnit.PRICE_UNIT_PER_HOUR,
@@ -168,6 +169,9 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
                             highestPrice
                             priceUnit
                             reservationStartInterval
+                            taxPercentage {
+                                value
+                            }
                           }
                         }
                     }
@@ -1690,6 +1694,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
             "highestPrice": 20,
             "priceUnit": "per_hour",
             "reservationStartInterval": ReservationUnit.RESERVATION_START_INTERVAL_60_MINUTES,
+            "taxPercentagePk": TaxPercentage.objects.get(value=24).pk,
         }
 
     def test_create(self):
@@ -1729,6 +1734,9 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         assert_that(res_unit.price_unit).is_equal_to(data.get("priceUnit"))
         assert_that(res_unit.reservation_start_interval).is_equal_to(
             data.get("reservationStartInterval")
+        )
+        assert_that(res_unit.tax_percentage).is_equal_to(
+            TaxPercentage.objects.get(value=24)
         )
 
     @mock.patch(
@@ -2142,6 +2150,19 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
 
         self.res_unit.refresh_from_db()
         assert_that(self.res_unit.name_fi).is_equal_to("New name")
+
+    def test_update_with_tax_percentage(self):
+        tax_percentage = TaxPercentage.objects.first()
+        data = self.get_valid_update_data()
+        data["taxPercentagePk"] = tax_percentage.pk
+        response = self.query(self.get_update_query(), input_data=data)
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        res_unit_data = content.get("data").get("updateReservationUnit")
+        assert_that(res_unit_data.get("errors")).is_none()
+        self.res_unit.refresh_from_db()
+        assert_that(self.res_unit.tax_percentage).is_equal_to(tax_percentage)
 
     def test_update_with_terms_of_use_pks(self):
         payment_terms = TermsOfUseFactory(terms_type=TermsOfUse.TERMS_TYPE_PAYMENT)
