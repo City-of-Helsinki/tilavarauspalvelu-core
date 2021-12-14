@@ -1683,7 +1683,8 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
             "reservationUnitTypePk": self.reservation_unit_type.id,
             "surfaceArea": 100,
             "maxPersons": 10,
-            "bufferTimeBetweenReservations": "1:00:00",
+            "bufferTimeAfter": "1:00:00",
+            "bufferTimeBefore": "1:00:00",
             "cancellationRulePk": self.rule.pk,
             "lowestPrice": 0,
             "highestPrice": 20,
@@ -1718,7 +1719,8 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         )
         assert_that(res_unit.surface_area).is_equal_to(data.get("surfaceArea"))
         assert_that(res_unit.max_persons).is_equal_to(data.get("maxPersons"))
-        assert_that(res_unit.buffer_time_between_reservations).is_equal_to(
+        assert_that(res_unit.buffer_time_after).is_equal_to(datetime.timedelta(hours=1))
+        assert_that(res_unit.buffer_time_before).is_equal_to(
             datetime.timedelta(hours=1)
         )
         assert_that(res_unit.cancellation_rule).is_equal_to(self.rule)
