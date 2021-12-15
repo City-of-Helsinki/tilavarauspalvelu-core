@@ -306,6 +306,8 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
     cancellation_terms = graphene.Field(TermsOfUseType)
     service_specific_terms = graphene.Field(TermsOfUseType)
     tax_percentage = graphene.Field(TaxPercentageType)
+    buffer_time_before = graphene.Time()
+    buffer_time_after = graphene.Time()
 
     permission_classes = (
         (ReservationUnitPermission,)
@@ -460,6 +462,18 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
     @check_resolver_permission(ReservationUnitCancellationRulePermission)
     def resolve_cancellation_rule(self, info: ResolveInfo):
         return self.cancellation_rule
+
+    def resolve_buffer_time_before(self, info: ResolveInfo):
+        if not self.buffer_time_before:
+            return None
+        duration = datetime.datetime(1, 1, 1) + self.buffer_time_before
+        return duration.time()
+
+    def resolve_buffer_time_after(self, info: ResolveInfo):
+        if not self.buffer_time_after:
+            return None
+        duration = datetime.datetime(1, 1, 1) + self.buffer_time_after
+        return duration.time()
 
 
 class ReservationUnitByPkType(ReservationUnitType, OpeningHoursMixin):
