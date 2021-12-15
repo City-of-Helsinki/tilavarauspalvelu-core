@@ -1253,10 +1253,9 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                   <SelectWithPadding
                     label={t(`ReservationUnitEditor.taxPercentageLabel`)}
                     options={state.taxPercentageOptions}
-                    onChange={(selectedTerms: unknown) => {
-                      const o = selectedTerms as OptionType;
+                    onChange={(selectedVat: unknown) => {
                       setValue({
-                        [`taxPercentagePk`]: o.value,
+                        [`taxPercentagePk`]: (selectedVat as OptionType).value,
                       });
                     }}
                     disabled={state.taxPercentageOptions.length === 0}
