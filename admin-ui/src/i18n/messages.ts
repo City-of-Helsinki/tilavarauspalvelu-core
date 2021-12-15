@@ -930,6 +930,7 @@ const translations: ITranslations = {
     highestPriceLabel: ["Ylin hinta"],
     highestPriceHelperText: ["euroa"],
     priceUnitLabel: ["Hinnan yksikö"],
+    taxPercentageLabel: ["Hinnan alv%"],
   },
   priceUnit: {
     FIXED: ["Per kerta"],
