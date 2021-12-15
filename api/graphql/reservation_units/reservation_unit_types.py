@@ -290,7 +290,7 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
     equipment = graphene.List(EquipmentType)
     unit = graphene.Field(UnitType)
     max_persons = graphene.Int()
-    surface_area = graphene.Int()
+    surface_area = graphene.Decimal()
     max_reservation_duration = graphene.Time()
     min_reservation_duration = graphene.Time()
     keyword_groups = graphene.List(KeywordGroupType)
