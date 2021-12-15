@@ -1014,10 +1014,9 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                       `ReservationUnitEditor.reservationUnitTypePlaceholder`
                     )}
                     options={state.reservationUnitTypeOptions}
-                    onChange={(selectedTerms: unknown) => {
-                      const o = selectedTerms as OptionType;
+                    onChange={(unitType: unknown) => {
                       setValue({
-                        reservationUnitTypePk: o.value,
+                        reservationUnitTypePk: (unitType as OptionType).value,
                       });
                     }}
                     disabled={state.reservationUnitTypeOptions.length === 0}
@@ -1304,9 +1303,9 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                           )}
                           options={options}
                           onChange={(selectedTerms: unknown) => {
-                            const o = selectedTerms as OptionType;
                             setValue({
-                              [`${name}TermsPk`]: o.value,
+                              [`${name}TermsPk`]: (selectedTerms as OptionType)
+                                .value,
                             });
                           }}
                           disabled={options.length === 0}
