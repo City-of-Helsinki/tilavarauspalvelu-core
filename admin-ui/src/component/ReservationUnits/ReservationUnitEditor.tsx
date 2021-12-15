@@ -1017,7 +1017,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                     onChange={(selectedTerms: unknown) => {
                       const o = selectedTerms as OptionType;
                       setValue({
-                        [`reservationUnitTypePk`]: o.value,
+                        reservationUnitTypePk: o.value,
                       });
                     }}
                     disabled={state.reservationUnitTypeOptions.length === 0}
@@ -1255,7 +1255,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                     options={state.taxPercentageOptions}
                     onChange={(selectedVat: unknown) => {
                       setValue({
-                        [`taxPercentagePk`]: (selectedVat as OptionType).value,
+                        taxPercentagePk: (selectedVat as OptionType).value,
                       });
                     }}
                     disabled={state.taxPercentageOptions.length === 0}
