@@ -40,12 +40,10 @@ export function dateSelector(): Cypress.Chainable<JQuery<HTMLElement>> {
   return cy.get("#reservation__input--date");
 }
 
-export function hourSelectorToggle(): Cypress.Chainable<JQuery<HTMLElement>> {
-  return cy.get("#reservation__input--hours-toggle-button");
-}
-
-export function minuteSelectorToggle(): Cypress.Chainable<JQuery<HTMLElement>> {
-  return cy.get("#reservation__input--minutes-toggle-button");
+export function startTimeSelectorToggle(): Cypress.Chainable<
+  JQuery<HTMLElement>
+> {
+  return cy.get("#reservation__input--start-time-toggle-button");
 }
 
 export function durationSelectorToggle(): Cypress.Chainable<

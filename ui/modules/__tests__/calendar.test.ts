@@ -177,6 +177,7 @@ describe("getDayIntervals", () => {
       "11:15:00",
       "11:30:00",
       "11:45:00",
+      "12:00:00",
     ]);
   });
   test("outputs sane results with 90min interval", () => {
@@ -195,6 +196,7 @@ describe("getDayIntervals", () => {
       "16:30:00",
       "18:00:00",
       "19:30:00",
+      "21:00:00",
     ]);
   });
 

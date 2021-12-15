@@ -4,13 +4,14 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { differenceInSeconds, isValid, subMinutes } from "date-fns";
 import { DateInput, Notification, Select } from "hds-react";
+import { trimStart } from "lodash";
 import { useMutation } from "@apollo/client";
 import { breakpoint } from "../../modules/style";
 import {
   areSlotsReservable,
   doReservationsCollide,
+  getDayIntervals,
   isReservationLongEnough,
-  isStartTimeWithinInterval,
 } from "../../modules/calendar";
 import { MediumButton } from "../../styles/util";
 import {
@@ -25,6 +26,7 @@ import { ApplicationRound, Language, OptionType } from "../../modules/types";
 import {
   convertHMSToSeconds,
   secondsToHms,
+  toApiDate,
   toUIDate,
 } from "../../modules/util";
 import { getDurationOptions } from "../../modules/reservation";
@@ -75,28 +77,6 @@ const Wrapper = styled.div`
   }
 `;
 
-const InputGroup = styled.div`
-  & > * {
-    &:nth-of-type(2) {
-      margin-left: -2px;
-    }
-
-    width: 50%;
-
-    @media (min-width: ${breakpoint.m}) {
-      width: 80px;
-    }
-  }
-
-  label {
-    white-space: nowrap;
-  }
-
-  display: flex;
-  flex-wrap: nowrap;
-  align-items: flex-end;
-`;
-
 const PriceWrapper = styled.div`
   ${fontMedium};
   font-size: 21px;
@@ -136,8 +116,7 @@ const ReservationInfo = ({
   const { reservation, setReservation } = useContext(DataContext);
   const [isRedirecting, setIsRedirecting] = useState<boolean>(false);
   const [date, setDate] = useState<Date | null>(new Date());
-  const [hours, setHours] = useState<string | null>(null);
-  const [minutes, setMinutes] = useState<string | null>(null);
+  const [startTime, setStartTime] = useState<string | null>(null);
   const [duration, setDuration] = useState<OptionType | null>(
     durationOptions[0]
   );
@@ -187,6 +166,10 @@ const ReservationInfo = ({
     if (begin && end) {
       const newDate = new Date(begin);
 
+      const newStartTime = `${newDate.getHours()}:${newDate
+        .getMinutes()
+        .toString()
+        .padEnd(2, "0")}`;
       const diff = secondsToHms(
         differenceInSeconds(new Date(end), new Date(begin))
       );
@@ -194,26 +177,17 @@ const ReservationInfo = ({
       const newDuration = durationOptions.find((n) => n.value === durationHMS);
 
       setDate(newDate);
-      setHours(String(newDate.getHours()));
-      setMinutes(String(newDate.getMinutes()));
+      setStartTime(newStartTime);
       setDuration(newDuration);
     }
-  }, [
-    begin,
-    end,
-    setDate,
-    setHours,
-    setMinutes,
-    setDuration,
-    durationOptions,
-    setReservation,
-  ]);
+  }, [begin, end, setDate, durationOptions]);
 
   useEffect(() => {
-    if (isValid(date) && hours && (minutes || minutes === "0") && duration) {
+    if (isValid(date) && startTime && duration) {
       setErrorMsg(null);
       const startDate = new Date(date);
       const endDate = new Date(date);
+      const [hours, minutes] = startTime.split(":");
       const [durationHours, durationMinutes] = String(duration.value).split(
         ":"
       );
@@ -250,32 +224,14 @@ const ReservationInfo = ({
         )
       ) {
         setErrorMsg(t(`reservationCalendar:errors.unavailable`));
-      } else if (
-        !isStartTimeWithinInterval(
-          startDate,
-          reservationUnit.openingHours?.openingTimes,
-          reservationUnit.reservationStartInterval
-        )
-      ) {
-        setErrorMsg(t(`reservationCalendar:errors.interval`));
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [date, hours, minutes, duration]);
+  }, [date, startTime, duration]);
 
   useEffect(() => {
     setReservation({ pk: null, begin: null, end: null, price: null });
   }, [setReservation]);
-
-  const hourOptions = Array.from(Array(24).keys()).map((n) => ({
-    label: String(n),
-    value: String(n),
-  }));
-
-  const minuteOptions = [0, 15, 30, 45].map((n) => ({
-    label: String(n).padEnd(2, "0"),
-    value: String(n),
-  }));
 
   const isReservable =
     begin &&
@@ -288,11 +244,29 @@ const ReservationInfo = ({
     !loading &&
     !isRedirecting;
 
+  const { startTime: dayStartTime, endTime: dayEndTime } =
+    reservationUnit.openingHours?.openingTimes.find(
+      (n) => n.date === toApiDate(date)
+    );
+
+  const startingTimesOptions: OptionType[] = getDayIntervals(
+    dayStartTime,
+    dayEndTime,
+    reservationUnit.reservationStartInterval
+  ).map((n) => ({
+    label: trimStart(n.substring(0, 5).replace(":", "."), "0"),
+    value: trimStart(n.substring(0, 5), "0"),
+  }));
+
   return (
     <Wrapper>
       <DateInput
         onChange={(val, valueAsDate) => {
-          if (!val || !isValid(valueAsDate) || valueAsDate < new Date()) {
+          if (
+            !val ||
+            !isValid(valueAsDate) ||
+            toApiDate(valueAsDate) < toApiDate(new Date())
+          ) {
             resetReservation();
           } else {
             setDate(valueAsDate);
@@ -306,28 +280,13 @@ const ReservationInfo = ({
         label={`${t("reservationCalendar:startDate")} *`}
         language={i18n.language as Language}
       />
-      <InputGroup>
-        <Select
-          id="reservation__input--hours"
-          label={`${t("reservationCalendar:startTime")} *`}
-          onChange={(val: OptionType) => {
-            setHours(val.value as string);
-          }}
-          options={hourOptions}
-          value={hourOptions.find((n) => n.value === hours)}
-          helper={t("common:hours")}
-        />
-        <Select
-          id="reservation__input--minutes"
-          label=""
-          onChange={(val: OptionType) => {
-            setMinutes(val.value as string);
-          }}
-          options={minuteOptions}
-          value={minuteOptions.find((n) => String(n.value) === minutes)}
-          helper={t("common:minutes")}
-        />
-      </InputGroup>
+      <Select
+        id="reservation__input--start-time"
+        label={`${t("reservationCalendar:startTime")} *`}
+        onChange={(val: OptionType) => setStartTime(val.value as string)}
+        options={startingTimesOptions}
+        value={startingTimesOptions.find((n) => n.value === startTime)}
+      />
       <Select
         id="reservation__input--duration"
         label={`${t("reservationCalendar:duration")} *`}
@@ -339,15 +298,14 @@ const ReservationInfo = ({
         helper={t("reservationCalendar:durationFormatAssist")}
       />
       <PriceWrapper>
-        {isReservable && (
+        {(isReservable || isRedirecting) && (
           <>
             <div>{t("reservationUnit:price")}:</div>
             <h3 data-testid="reservation__price--value">
-              {duration &&
-                getPrice(
-                  reservationUnit,
-                  convertHMSToSeconds(`0${duration.value}:00`) / 60
-                )}
+              {getPrice(
+                reservationUnit,
+                convertHMSToSeconds(`0${duration?.value}:00`) / 60
+              )}
             </h3>
           </>
         )}

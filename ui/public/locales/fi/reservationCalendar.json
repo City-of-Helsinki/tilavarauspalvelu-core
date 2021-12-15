@@ -59,7 +59,6 @@
   "reservationSummary": "Varauksen yhteenveto",
   "errors": {
     "collision": "Valittu aika on varattu. Valitse toinen aika.",
-    "unavailable": "Valittu aika ei ole varattavissa. Valitse toinen aika.",
-    "interval": "Väärä aloitusaika. Valitse toinen aika."
+    "unavailable": "Valittu aika ei ole varattavissa. Valitse toinen aloitusaika tai kesto."
   }
 }

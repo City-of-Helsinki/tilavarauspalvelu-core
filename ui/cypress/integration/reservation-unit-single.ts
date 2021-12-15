@@ -16,11 +16,10 @@ import {
   calendarUrlLink,
   reservationInfoPrice,
   dateSelector,
-  hourSelectorToggle,
-  minuteSelectorToggle,
   reservationEvent,
   durationSelectorToggle,
   notificationCloseButton,
+  startTimeSelectorToggle,
 } from "model/reservation-creation";
 import { textWithIcon } from "model/search";
 
@@ -30,29 +29,26 @@ const matchEvent = (): void => {
     .invoke("text")
     .then((text) => {
       const eventText = text.startsWith("0") ? text.substring(1) : text;
-      hourSelectorToggle()
+      startTimeSelectorToggle()
         .invoke("text")
-        .then((hours) => {
-          minuteSelectorToggle()
+        .then((startTimeLabel) => {
+          durationSelectorToggle()
             .invoke("text")
-            .then((minutes) => {
-              durationSelectorToggle()
-                .invoke("text")
-                .then((duration) => {
-                  const startTime = `${hours}.${minutes}`;
-                  const [durationHours, durationMinutes] = duration.split(":");
-                  const endTime = format(
-                    addMinutes(
-                      addHours(
-                        new Date().setHours(Number(hours), Number(minutes)),
-                        Number(durationHours)
-                      ),
-                      Number(durationMinutes)
-                    ),
-                    "H.mm"
-                  );
-                  expect(eventText).to.eq(`${startTime} – ${endTime}`);
-                });
+            .then((duration) => {
+              const [hours, minutes] = startTimeLabel.split(".");
+              const startTime = `${hours}.${minutes}`;
+              const [durationHours, durationMinutes] = duration.split(":");
+              const endTime = format(
+                addMinutes(
+                  addHours(
+                    new Date().setHours(Number(hours), Number(minutes)),
+                    Number(durationHours)
+                  ),
+                  Number(durationMinutes)
+                ),
+                "H.mm"
+              );
+              expect(eventText).to.eq(`${startTime} – ${endTime}`);
             });
         });
     });
@@ -282,33 +278,38 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
 
     dateSelector().clear().type(nextWeek);
 
-    hourSelectorToggle()
+    startTimeSelectorToggle()
       .click()
       .siblings("ul")
-      .children("li:nth-of-type(10)")
+      .children("li:last-of-type")
       .click();
 
-    minuteSelectorToggle()
+    durationSelectorToggle()
       .click()
       .siblings("ul")
-      .children("li:nth-of-type(1)")
-      .click();
-    matchEvent();
-
-    minuteSelectorToggle()
-      .click()
-      .siblings("ul")
-      .children("li:nth-of-type(2)")
+      .children("li:last-of-type")
       .click();
 
     notificationCloseButton().should("be.visible").click();
 
-    minuteSelectorToggle()
+    durationSelectorToggle()
       .click()
       .siblings("ul")
-      .children("li:nth-of-type(1)")
+      .children("li:first-of-type")
       .click();
+    matchEvent();
 
+    reservationInfoPrice()
+      .invoke("text")
+      .then((text) => {
+        expect(text).to.contain("80\u00a0€");
+      });
+
+    startTimeSelectorToggle()
+      .click()
+      .siblings("ul")
+      .children("li:first-of-type")
+      .click();
     matchEvent();
 
     durationSelectorToggle()
@@ -322,6 +323,19 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
       .invoke("text")
       .then((text) => {
         expect(text).to.contain("100\u00a0€");
+      });
+
+    durationSelectorToggle()
+      .click()
+      .siblings("ul")
+      .children("li:last-of-type")
+      .click();
+    matchEvent();
+
+    reservationInfoPrice()
+      .invoke("text")
+      .then((text) => {
+        expect(text).to.contain("120\u00a0€");
       });
 
     cy.checkA11y(null, null, null, true);

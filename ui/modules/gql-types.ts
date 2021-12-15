@@ -43,6 +43,11 @@ export type Scalars = {
    * in fields, resolvers and input.
    */
   UUID: any;
+  /**
+   * Create scalar that ignores normal serialization/deserialization, since
+   * that will be handled by the multipart request spec
+   */
+  Upload: any;
 };
 
 export type AbilityGroupType = {
@@ -406,10 +411,12 @@ export type Mutation = {
   createPurpose?: Maybe<PurposeCreateMutationPayload>;
   createReservation?: Maybe<ReservationCreateMutationPayload>;
   createReservationUnit?: Maybe<ReservationUnitCreateMutationPayload>;
+  createReservationUnitImage?: Maybe<ReservationUnitImageCreateMutationPayload>;
   createResource?: Maybe<ResourceCreateMutationPayload>;
   createSpace?: Maybe<SpaceCreateMutationPayload>;
   deleteEquipment?: Maybe<EquipmentDeleteMutationPayload>;
   deleteEquipmentCategory?: Maybe<EquipmentCategoryDeleteMutationPayload>;
+  deleteReservationUnitImage?: Maybe<ReservationUnitImageDeleteMutationPayload>;
   deleteResource?: Maybe<ResourceDeleteMutationPayload>;
   deleteSpace?: Maybe<SpaceDeleteMutationPayload>;
   updateEquipment?: Maybe<EquipmentUpdateMutationPayload>;
@@ -450,6 +457,10 @@ export type MutationCreateReservationUnitArgs = {
   input: ReservationUnitCreateMutationInput;
 };
 
+export type MutationCreateReservationUnitImageArgs = {
+  input: ReservationUnitImageCreateMutationInput;
+};
+
 export type MutationCreateResourceArgs = {
   input: ResourceCreateMutationInput;
 };
@@ -464,6 +475,10 @@ export type MutationDeleteEquipmentArgs = {
 
 export type MutationDeleteEquipmentCategoryArgs = {
   input: EquipmentCategoryDeleteMutationInput;
+};
+
+export type MutationDeleteReservationUnitImageArgs = {
+  input: ReservationUnitImageDeleteMutationInput;
 };
 
 export type MutationDeleteResourceArgs = {
@@ -647,6 +662,7 @@ export type Query = {
   space?: Maybe<SpaceType>;
   spaceByPk?: Maybe<SpaceType>;
   spaces?: Maybe<SpaceTypeConnection>;
+  taxPercentages?: Maybe<TaxPercentageTypeConnection>;
   termsOfUse?: Maybe<TermsOfUseTypeConnection>;
   unit?: Maybe<UnitType>;
   unitByPk?: Maybe<UnitByPkType>;
@@ -874,6 +890,15 @@ export type QuerySpacesArgs = {
   nameSv_Icontains?: Maybe<Scalars["String"]>;
   nameSv_Istartswith?: Maybe<Scalars["String"]>;
   offset?: Maybe<Scalars["Int"]>;
+};
+
+export type QueryTaxPercentagesArgs = {
+  after?: Maybe<Scalars["String"]>;
+  before?: Maybe<Scalars["String"]>;
+  first?: Maybe<Scalars["Int"]>;
+  last?: Maybe<Scalars["Int"]>;
+  offset?: Maybe<Scalars["Int"]>;
+  value?: Maybe<Scalars["Float"]>;
 };
 
 export type QueryTermsOfUseArgs = {
@@ -1128,6 +1153,8 @@ export type ReservationUnitByPkType = Node & {
   additionalInstructionsFi?: Maybe<Scalars["String"]>;
   additionalInstructionsSv?: Maybe<Scalars["String"]>;
   applicationRounds?: Maybe<Array<Maybe<ApplicationRoundType>>>;
+  bufferTimeAfter?: Maybe<Scalars["Float"]>;
+  bufferTimeBefore?: Maybe<Scalars["Float"]>;
   cancellationRule?: Maybe<ReservationUnitCancellationRuleType>;
   cancellationTerms?: Maybe<TermsOfUseType>;
   contactInformationEn?: Maybe<Scalars["String"]>;
@@ -1164,8 +1191,8 @@ export type ReservationUnitByPkType = Node & {
   requireIntroduction: Scalars["Boolean"];
   /**
    * Determines the interval for the start time of the reservation. For example an
-   * interval of 15 minutes means a reservation can begin at minutes 0, 15, 30, or
-   * 45. Possible values are interval_15_mins, interval_30_mins, interval_60_mins,
+   * interval of 15 minutes means a reservation can begin at minutes 15, 30, 60, or
+   * 90. Possible values are interval_15_mins, interval_30_mins, interval_60_mins,
    * interval_90_mins.
    */
   reservationStartInterval: ReservationUnitsReservationUnitReservationStartIntervalChoices;
@@ -1176,6 +1203,7 @@ export type ReservationUnitByPkType = Node & {
   services?: Maybe<Array<Maybe<ServiceType>>>;
   spaces?: Maybe<Array<Maybe<SpaceType>>>;
   surfaceArea?: Maybe<Scalars["Int"]>;
+  taxPercentage?: Maybe<TaxPercentageType>;
   termsOfUseEn?: Maybe<Scalars["String"]>;
   termsOfUseFi?: Maybe<Scalars["String"]>;
   termsOfUseSv?: Maybe<Scalars["String"]>;
@@ -1251,7 +1279,8 @@ export type ReservationUnitCreateMutationInput = {
   additionalInstructionsEn?: Maybe<Scalars["String"]>;
   additionalInstructionsFi?: Maybe<Scalars["String"]>;
   additionalInstructionsSv?: Maybe<Scalars["String"]>;
-  bufferTimeBetweenReservations?: Maybe<Scalars["String"]>;
+  bufferTimeAfter?: Maybe<Scalars["String"]>;
+  bufferTimeBefore?: Maybe<Scalars["String"]>;
   cancellationRulePk?: Maybe<Scalars["Int"]>;
   cancellationTermsPk?: Maybe<Scalars["String"]>;
   clientMutationId?: Maybe<Scalars["String"]>;
@@ -1292,6 +1321,7 @@ export type ReservationUnitCreateMutationInput = {
   serviceSpecificTermsPk?: Maybe<Scalars["String"]>;
   spacePks?: Maybe<Array<Maybe<Scalars["Int"]>>>;
   surfaceArea?: Maybe<Scalars["Float"]>;
+  taxPercentagePk?: Maybe<Scalars["Int"]>;
   termsOfUseEn?: Maybe<Scalars["String"]>;
   termsOfUseFi?: Maybe<Scalars["String"]>;
   termsOfUseSv?: Maybe<Scalars["String"]>;
@@ -1303,7 +1333,8 @@ export type ReservationUnitCreateMutationPayload = {
   additionalInstructionsEn?: Maybe<Scalars["String"]>;
   additionalInstructionsFi?: Maybe<Scalars["String"]>;
   additionalInstructionsSv?: Maybe<Scalars["String"]>;
-  bufferTimeBetweenReservations?: Maybe<Scalars["String"]>;
+  bufferTimeAfter?: Maybe<Scalars["String"]>;
+  bufferTimeBefore?: Maybe<Scalars["String"]>;
   building?: Maybe<Scalars["String"]>;
   cancellationRulePk?: Maybe<Scalars["Int"]>;
   clientMutationId?: Maybe<Scalars["String"]>;
@@ -1366,6 +1397,38 @@ export type ReservationUnitHaukiUrlType = {
   url?: Maybe<Scalars["String"]>;
 };
 
+export type ReservationUnitImageCreateMutationInput = {
+  clientMutationId?: Maybe<Scalars["String"]>;
+  image?: Maybe<Scalars["Upload"]>;
+  /** Type of image. Value is one of image_type enum values: MAIN, GROUND_PLAN, MAP, OTHER. */
+  imageType: Scalars["String"];
+  reservationUnitPk: Scalars["Int"];
+};
+
+export type ReservationUnitImageCreateMutationPayload = {
+  __typename?: "ReservationUnitImageCreateMutationPayload";
+  clientMutationId?: Maybe<Scalars["String"]>;
+  /** May contain more than one error for same field. */
+  errors?: Maybe<Array<Maybe<ErrorType>>>;
+  /** Type of image. Value is one of image_type enum values: MAIN, GROUND_PLAN, MAP, OTHER. */
+  imageType?: Maybe<Scalars["String"]>;
+  pk?: Maybe<Scalars["Int"]>;
+  reservationUnitImage?: Maybe<ReservationUnitImageType>;
+  reservationUnitPk?: Maybe<Scalars["Int"]>;
+};
+
+export type ReservationUnitImageDeleteMutationInput = {
+  clientMutationId?: Maybe<Scalars["String"]>;
+  pk: Scalars["Int"];
+};
+
+export type ReservationUnitImageDeleteMutationPayload = {
+  __typename?: "ReservationUnitImageDeleteMutationPayload";
+  clientMutationId?: Maybe<Scalars["String"]>;
+  deleted?: Maybe<Scalars["Boolean"]>;
+  errors?: Maybe<Scalars["String"]>;
+};
+
 export type ReservationUnitImageType = {
   __typename?: "ReservationUnitImageType";
   imageType: ReservationUnitsReservationUnitImageImageTypeChoices;
@@ -1380,7 +1443,8 @@ export type ReservationUnitType = Node & {
   additionalInstructionsFi?: Maybe<Scalars["String"]>;
   additionalInstructionsSv?: Maybe<Scalars["String"]>;
   applicationRounds?: Maybe<Array<Maybe<ApplicationRoundType>>>;
-  bufferTimeBetweenReservations?: Maybe<Scalars["Float"]>;
+  bufferTimeAfter?: Maybe<Scalars["Float"]>;
+  bufferTimeBefore?: Maybe<Scalars["Float"]>;
   cancellationRule?: Maybe<ReservationUnitCancellationRuleType>;
   cancellationTerms?: Maybe<TermsOfUseType>;
   contactInformationEn?: Maybe<Scalars["String"]>;
@@ -1414,8 +1478,8 @@ export type ReservationUnitType = Node & {
   requireIntroduction: Scalars["Boolean"];
   /**
    * Determines the interval for the start time of the reservation. For example an
-   * interval of 15 minutes means a reservation can begin at minutes 0, 15, 30, or
-   * 45. Possible values are interval_15_mins, interval_30_mins, interval_60_mins,
+   * interval of 15 minutes means a reservation can begin at minutes 15, 30, 60, or
+   * 90. Possible values are interval_15_mins, interval_30_mins, interval_60_mins,
    * interval_90_mins.
    */
   reservationStartInterval: ReservationUnitsReservationUnitReservationStartIntervalChoices;
@@ -1426,6 +1490,7 @@ export type ReservationUnitType = Node & {
   services?: Maybe<Array<Maybe<ServiceType>>>;
   spaces?: Maybe<Array<Maybe<SpaceType>>>;
   surfaceArea?: Maybe<Scalars["Int"]>;
+  taxPercentage?: Maybe<TaxPercentageType>;
   termsOfUseEn?: Maybe<Scalars["String"]>;
   termsOfUseFi?: Maybe<Scalars["String"]>;
   termsOfUseSv?: Maybe<Scalars["String"]>;
@@ -1491,7 +1556,8 @@ export type ReservationUnitUpdateMutationInput = {
   additionalInstructionsEn?: Maybe<Scalars["String"]>;
   additionalInstructionsFi?: Maybe<Scalars["String"]>;
   additionalInstructionsSv?: Maybe<Scalars["String"]>;
-  bufferTimeBetweenReservations?: Maybe<Scalars["String"]>;
+  bufferTimeAfter?: Maybe<Scalars["String"]>;
+  bufferTimeBefore?: Maybe<Scalars["String"]>;
   cancellationRulePk?: Maybe<Scalars["Int"]>;
   cancellationTermsPk?: Maybe<Scalars["String"]>;
   clientMutationId?: Maybe<Scalars["String"]>;
@@ -1533,6 +1599,7 @@ export type ReservationUnitUpdateMutationInput = {
   serviceSpecificTermsPk?: Maybe<Scalars["String"]>;
   spacePks?: Maybe<Array<Maybe<Scalars["Int"]>>>;
   surfaceArea?: Maybe<Scalars["Float"]>;
+  taxPercentagePk?: Maybe<Scalars["Int"]>;
   termsOfUseEn?: Maybe<Scalars["String"]>;
   termsOfUseFi?: Maybe<Scalars["String"]>;
   termsOfUseSv?: Maybe<Scalars["String"]>;
@@ -1544,7 +1611,8 @@ export type ReservationUnitUpdateMutationPayload = {
   additionalInstructionsEn?: Maybe<Scalars["String"]>;
   additionalInstructionsFi?: Maybe<Scalars["String"]>;
   additionalInstructionsSv?: Maybe<Scalars["String"]>;
-  bufferTimeBetweenReservations?: Maybe<Scalars["String"]>;
+  bufferTimeAfter?: Maybe<Scalars["String"]>;
+  bufferTimeBefore?: Maybe<Scalars["String"]>;
   building?: Maybe<Scalars["String"]>;
   cancellationRulePk?: Maybe<Scalars["Int"]>;
   clientMutationId?: Maybe<Scalars["String"]>;
@@ -2004,6 +2072,32 @@ export type SpaceUpdateMutationPayload = {
   /** Surface area of the space as square meters */
   surfaceArea?: Maybe<Scalars["Float"]>;
   unitPk?: Maybe<Scalars["Int"]>;
+};
+
+export type TaxPercentageType = Node & {
+  __typename?: "TaxPercentageType";
+  /** The ID of the object */
+  id: Scalars["ID"];
+  pk?: Maybe<Scalars["Int"]>;
+  /** The tax percentage for a price */
+  value: Scalars["Decimal"];
+};
+
+export type TaxPercentageTypeConnection = {
+  __typename?: "TaxPercentageTypeConnection";
+  /** Contains the nodes in this connection. */
+  edges: Array<Maybe<TaxPercentageTypeEdge>>;
+  /** Pagination data for this connection. */
+  pageInfo: PageInfo;
+};
+
+/** A Relay edge containing a `TaxPercentageType` and its cursor. */
+export type TaxPercentageTypeEdge = {
+  __typename?: "TaxPercentageTypeEdge";
+  /** A cursor for use in pagination */
+  cursor: Scalars["String"];
+  /** The item at the end of the edge */
+  node?: Maybe<TaxPercentageType>;
 };
 
 /** An enumeration. */
@@ -2852,6 +2946,7 @@ export const ReservationUnitDocument = gql`
       additionalInstructionsFi
       additionalInstructionsEn
       additionalInstructionsSv
+      reservationStartInterval
       serviceSpecificTerms {
         nameFi
         nameEn
@@ -3698,6 +3793,7 @@ export type ReservationUnitQuery = {
         additionalInstructionsFi?: string | null | undefined;
         additionalInstructionsEn?: string | null | undefined;
         additionalInstructionsSv?: string | null | undefined;
+        reservationStartInterval: ReservationUnitsReservationUnitReservationStartIntervalChoices;
         maxPersons?: number | null | undefined;
         minReservationDuration?: any | null | undefined;
         maxReservationDuration?: any | null | undefined;

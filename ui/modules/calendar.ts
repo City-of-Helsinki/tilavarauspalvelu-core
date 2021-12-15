@@ -186,7 +186,7 @@ export const getDayIntervals = (
 
   if (!intervalSeconds || start >= end) return [];
 
-  for (let i = start; i < end; i += intervalSeconds) {
+  for (let i = start; i <= end; i += intervalSeconds) {
     const { h, m, s } = secondsToHms(i);
     intervals.push(
       `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}:${s
@@ -206,13 +206,12 @@ export const isStartTimeWithinInterval = (
   if (openingTimes?.length < 1) return false;
   if (!interval) return true;
   const startTime = toUIDate(start, "HH:mm:ss");
-  const { startTime: dayStartTime, endTime: dayEndTime } = openingTimes.find(
-    (n) => n.date === toApiDate(start)
-  );
+  const { startTime: dayStartTime, endTime: dayEndTime } =
+    openingTimes.find((n) => n.date === toApiDate(start)) || {};
 
   return getDayIntervals(
-    dayStartTime.substring(0, 5),
-    dayEndTime.substring(0, 5),
+    dayStartTime?.substring(0, 5),
+    dayEndTime?.substring(0, 5),
     interval
   ).includes(startTime);
 };
