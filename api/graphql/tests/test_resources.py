@@ -168,7 +168,7 @@ class ResourceCreateForPublishGraphQLTestCase(ResourceGraphQLBase):
         assert_that(
             content.get("data").get("createResource").get("errors")[0].get("messages")
         ).contains(
-            "Not draft state resources must have a translations. Missing translation for name_sv."
+            "Not draft state resources must have a translations. Missing translation for nameSv."
         )
         assert_that(Resource.objects.exclude(id=self.resource.id).count()).is_equal_to(
             0
@@ -186,7 +186,7 @@ class ResourceCreateForPublishGraphQLTestCase(ResourceGraphQLBase):
         assert_that(
             content.get("data").get("createResource").get("errors")[0].get("messages")
         ).contains(
-            "Not draft state resources must have a translations. Missing translation for description_en."
+            "Not draft state resources must have a translations. Missing translation for descriptionEn."
         )
         assert_that(Resource.objects.exclude(id=self.resource.id).count()).is_equal_to(
             0
@@ -408,7 +408,7 @@ class ResourceUpdateForPublishGraphQLTestCase(ResourceGraphQLBase):
         assert_that(
             content.get("data").get("updateResource").get("errors")[0].get("messages")
         ).contains(
-            "Not draft state resources must have a translations. Missing translation for name_sv."
+            "Not draft state resources must have a translations. Missing translation for nameSv."
         )
 
     def test_validation_error_when_empty_description_translation(self):
@@ -421,7 +421,7 @@ class ResourceUpdateForPublishGraphQLTestCase(ResourceGraphQLBase):
         assert_that(
             content.get("data").get("updateResource").get("errors")[0].get("messages")
         ).contains(
-            "Not draft state resources must have a translations. Missing translation for description_fi."
+            "Not draft state resources must have a translations. Missing translation for descriptionFi."
         )
 
     def test_validation_error_when_try_to_null_space_and_fixed_location(self):
@@ -489,7 +489,7 @@ class ResourceUpdateForPublishGraphQLTestCase(ResourceGraphQLBase):
         assert_that(
             content.get("data").get("updateResource").get("errors")[0].get("messages")
         ).contains(
-            "Not draft state resources must have a translations. Missing translation for description_fi."
+            "Not draft state resources must have a translations. Missing translation for descriptionFi."
         )
 
     def test_partial_update_fails_when_removing_space_from_fixed_location(self):
