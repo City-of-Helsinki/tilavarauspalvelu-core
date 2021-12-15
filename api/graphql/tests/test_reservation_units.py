@@ -2575,6 +2575,19 @@ class ReservationUnitUpdateNotDraftTestCase(ReservationUnitMutationsTestCaseBase
         assert_that(self.res_unit.highest_price).is_equal_to(expected_highest_price)
         assert_that(self.res_unit.price_unit).is_equal_to(expected_price_unit)
 
+    def test_price_unit_cannot_be_invalid(self):
+        invalid_price_unit = "invalid"
+        data = self.get_valid_update_data()
+        data["priceUnit"] = invalid_price_unit
+        response = self.query(self.get_update_query(), input_data=data)
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        res_unit_data = content.get("data").get("updateReservationUnit")
+        assert_that(res_unit_data.get("errors")).is_not_none()
+        self.res_unit.refresh_from_db()
+        assert_that(self.res_unit.price_unit).is_not_equal_to(invalid_price_unit)
+
     def test_errors_on_empty_name_translations(self):
         data = self.get_valid_update_data()
         data["nameEn"] = ""

@@ -249,6 +249,14 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
                     f"Wrong type of id: {identifier} for {field_name}"
                 )
 
+    def validate_price_unit(self, value):
+        valid_values = [x[0] for x in ReservationUnit.PRICE_UNITS]
+        if value not in valid_values:
+            raise serializers.ValidationError(
+                f"Invalid price unit {value}. Valid values are {', '.join(valid_values)}"
+            )
+        return value
+
     def validate(self, data):
         is_draft = data.get("is_draft", getattr(self.instance, "is_draft", False))
 
