@@ -361,6 +361,18 @@ class ReservationUnit(models.Model):
             "Time after this reservation unit should not be publicly visible in UI."
         ),
     )
+    metadata_set = models.ForeignKey(
+        "reservations.ReservationMetadataSet",
+        verbose_name=_("Reservation metadata set"),
+        related_name="reservation_units",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        help_text=_(
+            "Reservation metadata set that defines the set of supported "
+            "and required form fields for this reservation unit."
+        ),
+    )
 
     def __str__(self):
         return "{}".format(self.name)
