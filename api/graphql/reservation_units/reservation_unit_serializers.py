@@ -222,6 +222,10 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
             "price_unit",
             "reservation_start_interval",
             "tax_percentage_pk",
+            "reservation_begins",
+            "reservation_ends",
+            "publish_begins",
+            "publish_ends",
         ] + get_all_translatable_fields(ReservationUnit)
 
     def __init__(self, *args, **kwargs):
