@@ -130,6 +130,9 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
     reservee_phone = graphene.String()
     name = graphene.String()
     description = graphene.String()
+    unit_price = graphene.Float()
+    tax_percentage_value = graphene.Decimal()
+    price = graphene.Float()
 
     class Meta:
         model = Reservation
@@ -151,6 +154,8 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
             "description",
             "purpose",
             "purpose_pk",
+            "unit_price",
+            "tax_percentage_value",
             "price",
         ]
         filter_fields = {
