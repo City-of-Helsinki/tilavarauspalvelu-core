@@ -111,6 +111,7 @@ type State = {
   cancellationTermsOptions: OptionType[];
   serviceSpecificTermsOptions: OptionType[];
   cancellationRuleOptions: OptionType[];
+  taxPercentageOptions: OptionType[];
   unit?: UnitByPkType;
   dataLoaded: LoadingCompleted[];
 };
@@ -164,6 +165,7 @@ const getInitialState = (reservationUnitPk: number): State => ({
   cancellationTermsOptions: [],
   serviceSpecificTermsOptions: [],
   cancellationRuleOptions: [],
+  taxPercentageOptions: [],
   dataLoaded: [],
 });
 
@@ -251,6 +253,7 @@ const reducer = (state: State, action: Action): State => {
           reservationUnitTypePk: get(reservationUnit, "reservationUnitType.pk"),
           cancellationTermsPk: get(reservationUnit, "cancellationTerms.pk"),
           cancellationRulePk: get(reservationUnit, "cancellationRule.pk"),
+          taxPercentagePk: get(reservationUnit, "taxPercentage.pk"),
           lowestPrice: Number(reservationUnit.lowestPrice || 0),
           highestPrice: Number(reservationUnit.highestPrice || 0),
           serviceSpecificTermsPk: get(
@@ -314,6 +317,11 @@ const reducer = (state: State, action: Action): State => {
         paymentTermsOptions: makeTermsOptions(
           action,
           TermsOfUseTermsOfUseTermsTypeChoices.PaymentTerms
+        ),
+        taxPercentageOptions: (
+          action.parameters.taxPercentages?.edges || []
+        ).map(
+          (v) => ({ value: v?.node?.pk, label: v?.node?.value } as OptionType)
         ),
         serviceSpecificTermsOptions: makeTermsOptions(
           action,
@@ -661,6 +669,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
         "cancellationTermsPk",
         "serviceSpecificTermsPk",
         "cancellationRulePk",
+        "taxPercentagePk",
         "lowestPrice",
         "highestPrice",
         "priceUnit",
@@ -1240,6 +1249,24 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                     label={t("ReservationUnitEditor.priceUnitLabel")}
                     type={ReservationUnitsReservationUnitPriceUnitChoices}
                     onChange={(priceUnit) => setValue({ priceUnit })}
+                  />
+                  <SelectWithPadding
+                    label={t(`ReservationUnitEditor.taxPercentageLabel`)}
+                    options={state.taxPercentageOptions}
+                    onChange={(selectedTerms: unknown) => {
+                      const o = selectedTerms as OptionType;
+                      setValue({
+                        [`taxPercentagePk`]: o.value,
+                      });
+                    }}
+                    disabled={state.taxPercentageOptions.length === 0}
+                    value={
+                      getSelectedOption(
+                        state,
+                        `taxPercentageOptions`,
+                        `taxPercentagePk`
+                      ) || {}
+                    }
                   />
                 </DenseEditorColumns>
               </Accordion>
