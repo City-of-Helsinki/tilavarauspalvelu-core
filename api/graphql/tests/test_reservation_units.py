@@ -87,6 +87,10 @@ class ReservationUnitQueryTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCa
             price_unit=ReservationUnit.PRICE_UNIT_PER_HOUR,
             is_draft=False,
             reservation_start_interval=ReservationUnit.RESERVATION_START_INTERVAL_30_MINUTES,
+            reservation_begins=datetime.datetime.now(),
+            reservation_ends=datetime.datetime.now(),
+            publish_begins=datetime.datetime.now(),
+            publish_ends=datetime.datetime.now(),
         )
 
         cls.api_client = APIClient()
@@ -172,6 +176,10 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
                             taxPercentage {
                                 value
                             }
+                            reservationBegins
+                            reservationEnds
+                            publishBegins
+                            publishEnds
                           }
                         }
                     }
@@ -1695,6 +1703,10 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
             "priceUnit": "per_hour",
             "reservationStartInterval": ReservationUnit.RESERVATION_START_INTERVAL_60_MINUTES,
             "taxPercentagePk": TaxPercentage.objects.get(value=24).pk,
+            "publishBegins": "2021-05-03T00:00:00+00:00",
+            "publishEnds": "2021-05-03T00:00:00+00:00",
+            "reservationBegins": "2021-05-03T00:00:00+00:00",
+            "reservationEnds": "2021-05-03T00:00:00+00:00",
         }
 
     def test_create(self):
@@ -1738,6 +1750,18 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         assert_that(res_unit.tax_percentage).is_equal_to(
             TaxPercentage.objects.get(value=24)
         )
+        publish_begins = datetime.datetime.fromisoformat(data.get("publishBegins"))
+        assert_that(res_unit.publish_begins).is_equal_to(publish_begins)
+        publish_ends = datetime.datetime.fromisoformat(data.get("publishEnds"))
+        assert_that(res_unit.publish_ends).is_equal_to(publish_ends)
+        reservation_begins = datetime.datetime.fromisoformat(
+            data.get("reservationBegins")
+        )
+        assert_that(res_unit.reservation_begins).is_equal_to(reservation_begins)
+        reservation_ends = datetime.datetime.fromisoformat(
+            data.get("reservationBegins")
+        )
+        assert_that(res_unit.reservation_ends).is_equal_to(reservation_ends)
 
     @mock.patch(
         "reservation_units.utils.hauki_exporter.ReservationUnitHaukiExporter.send_reservation_unit_to_hauki"

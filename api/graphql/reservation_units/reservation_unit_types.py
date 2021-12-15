@@ -344,6 +344,10 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
             "highest_price",
             "price_unit",
             "reservation_start_interval",
+            "reservation_begins",
+            "reservation_ends",
+            "publish_begins",
+            "publish_ends",
         ] + get_all_translatable_fields(model)
         filter_fields = {
             "name_fi": ["exact", "icontains", "istartswith"],

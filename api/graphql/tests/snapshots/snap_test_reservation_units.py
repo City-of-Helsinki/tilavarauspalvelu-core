@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 
 from snapshottest import Snapshot
 
+
 snapshots = Snapshot()
 
 snapshots['ReservationUnitQueryTestCase::test_filtering_by_active_application_rounds 1'] = {
@@ -359,9 +360,13 @@ snapshots['ReservationUnitQueryTestCase::test_getting_reservation_units 1'] = {
                         'maxPersons': 110,
                         'nameFi': 'test name fi',
                         'priceUnit': 'PER_HOUR',
+                        'publishBegins': '2021-05-03T00:00:00+00:00',
+                        'publishEnds': '2021-05-03T00:00:00+00:00',
                         'purposes': [
                         ],
                         'requireIntroduction': False,
+                        'reservationBegins': '2021-05-03T00:00:00+00:00',
+                        'reservationEnds': '2021-05-03T00:00:00+00:00',
                         'reservationStartInterval': 'INTERVAL_30_MINS',
                         'reservationUnitType': {
                             'nameFi': 'test type fi'
