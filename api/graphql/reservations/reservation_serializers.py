@@ -84,6 +84,16 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
             reservation_units = reservation_units.all()
 
         for reservation_unit in reservation_units:
+            if (
+                reservation_unit.reservation_begins
+                and begin < reservation_unit.reservation_begins
+            ) or (
+                reservation_unit.reservation_ends
+                and end > reservation_unit.reservation_ends
+            ):
+                raise serializers.ValidationError(
+                    "Reservation unit is not reservable within this reservation time."
+                )
             if reservation_unit.check_reservation_overlap(begin, end, self.instance):
                 raise serializers.ValidationError(
                     "Overlapping reservations are not allowed."
