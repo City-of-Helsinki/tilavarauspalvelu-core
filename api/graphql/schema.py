@@ -46,6 +46,7 @@ from api.graphql.reservations.reservation_mutations import (
     ReservationUpdateMutation,
 )
 from api.graphql.reservations.reservation_types import (
+    AgeGroupType,
     ReservationCancelReasonType,
     ReservationPurposeType,
     ReservationType,
@@ -69,6 +70,7 @@ from permissions.api_permissions.graphene_field_decorators import (
     check_resolver_permission,
 )
 from permissions.api_permissions.graphene_permissions import (
+    AgeGroupPermission,
     EquipmentCategoryPermission,
     EquipmentPermission,
     KeywordPermission,
@@ -230,6 +232,12 @@ class TaxPercentageFilter(AuthFilter):
     )
 
 
+class AgeGroupFilter(AuthFilter):
+    permission_classes = (
+        (AgeGroupPermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
+    )
+
+
 class Query(graphene.ObjectType):
     reservations = ReservationsFilter(
         ReservationType, filterset_class=ReservationFilterSet
@@ -280,6 +288,7 @@ class Query(graphene.ObjectType):
 
     terms_of_use = TermsOfUseFilter(TermsOfUseType)
     tax_percentages = TaxPercentageFilter(TaxPercentageType)
+    age_groups = AgeGroupFilter(AgeGroupType)
 
     @check_resolver_permission(ReservationPermission)
     def resolve_reservation_by_pk(self, info, **kwargs):

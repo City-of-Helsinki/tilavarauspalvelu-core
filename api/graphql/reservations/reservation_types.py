@@ -41,6 +41,8 @@ class AgeGroupType(AuthNode, PrimaryKeyObjectType):
     class Meta:
         model = AgeGroup
         fields = ["minimum", "maximum"]
+        filter_fields = []
+        interfaces = (graphene.relay.Node,)
 
 
 class AbilityGroupType(AuthNode, PrimaryKeyObjectType):
