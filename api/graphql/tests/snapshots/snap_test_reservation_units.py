@@ -343,6 +343,8 @@ snapshots['ReservationUnitQueryTestCase::test_getting_reservation_units 1'] = {
                         'additionalInstructionsSv': 'Ytterligare instruktioner',
                         'applicationRounds': [
                         ],
+                        'bufferTimeAfter': '00:15:00',
+                        'bufferTimeBefore': '00:15:00',
                         'cancellationRule': {
                             'nameEn': 'en',
                             'nameFi': 'fi',

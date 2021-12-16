@@ -91,6 +91,8 @@ class ReservationUnitQueryTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCa
             reservation_ends=datetime.datetime.now(),
             publish_begins=datetime.datetime.now(),
             publish_ends=datetime.datetime.now(),
+            buffer_time_before=datetime.timedelta(minutes=15),
+            buffer_time_after=datetime.timedelta(minutes=15),
         )
 
         cls.api_client = APIClient()
@@ -180,6 +182,8 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
                             reservationEnds
                             publishBegins
                             publishEnds
+                            bufferTimeBefore
+                            bufferTimeAfter
                           }
                         }
                     }
