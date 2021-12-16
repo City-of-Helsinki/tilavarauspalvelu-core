@@ -594,6 +594,100 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
                 f"Reservation start time does not match the allowed interval of {interval_minutes} minutes."
             )
 
+    def test_create_fails_when_reservation_unit_reservation_begin_in_future(
+        self, mock_periods, mock_opening_hours
+    ):
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+        self.reservation_unit.reservation_begins = datetime.datetime.now(
+            tz=DEFAULT_TIMEZONE
+        ) + datetime.timedelta(days=10)
+        self.reservation_unit.save()
+
+        self.client.force_login(self.regular_joe)
+        response = self.query(
+            self.get_create_query(), input_data=self.get_valid_input_data()
+        )
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_none()
+        assert_that(
+            content.get("data").get("createReservation").get("errors")
+        ).is_not_none()
+        assert_that(
+            content.get("data").get("createReservation").get("errors")[0]["messages"][0]
+        ).contains("Reservation unit is not reservable within this reservation time.")
+
+    def test_create_fails_when_reservation_unit_reservation_end_in_past(
+        self, mock_periods, mock_opening_hours
+    ):
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+        self.reservation_unit.reservation_ends = datetime.datetime.now(
+            tz=DEFAULT_TIMEZONE
+        ) - datetime.timedelta(days=10)
+        self.reservation_unit.save()
+
+        self.client.force_login(self.regular_joe)
+        response = self.query(
+            self.get_create_query(), input_data=self.get_valid_input_data()
+        )
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_none()
+        assert_that(
+            content.get("data").get("createReservation").get("errors")
+        ).is_not_none()
+        assert_that(
+            content.get("data").get("createReservation").get("errors")[0]["messages"][0]
+        ).contains("Reservation unit is not reservable within this reservation time.")
+
+    def test_create_success_when_reservation_unit_reservation_begin_in_past(
+        self, mock_periods, mock_opening_hours
+    ):
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+        self.reservation_unit.reservation_begins = datetime.datetime.now(
+            tz=DEFAULT_TIMEZONE
+        ) - datetime.timedelta(days=10)
+        self.reservation_unit.save()
+
+        self.client.force_login(self.regular_joe)
+        response = self.query(
+            self.get_create_query(), input_data=self.get_valid_input_data()
+        )
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_none()
+        assert_that(
+            content.get("data").get("createReservation").get("errors")
+        ).is_none()
+        reservation = Reservation.objects.filter(
+            id=content.get("data").get("createReservation").get("reservation").get("pk")
+        ).first()
+        assert_that(reservation).is_not_none()
+
+    def test_create_success_when_reservation_unit_reservation_end_in_future(
+        self, mock_periods, mock_opening_hours
+    ):
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+        self.reservation_unit.reservation_ends = datetime.datetime.now(
+            tz=DEFAULT_TIMEZONE
+        ) + datetime.timedelta(days=10)
+        self.reservation_unit.save()
+
+        self.client.force_login(self.regular_joe)
+        response = self.query(
+            self.get_create_query(), input_data=self.get_valid_input_data()
+        )
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_none()
+        assert_that(
+            content.get("data").get("createReservation").get("errors")
+        ).is_none()
+        reservation = Reservation.objects.filter(
+            id=content.get("data").get("createReservation").get("reservation").get("pk")
+        ).first()
+        assert_that(reservation).is_not_none()
+
     def test_create_fails_when_not_logged_in(self, mock_periods, mock_opening_hours):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         response = self.query(
