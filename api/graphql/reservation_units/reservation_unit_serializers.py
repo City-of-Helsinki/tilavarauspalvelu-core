@@ -1,4 +1,5 @@
 from django.core import validators
+from graphene.utils.str_converters import to_camel_case
 from rest_framework import serializers
 
 from api.graphql.base_serializers import (
@@ -293,7 +294,8 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
             value = data.get(field, getattr(self.instance, field, None))
             if field not in allowed_empty_fields and (not value or value.isspace()):
                 raise serializers.ValidationError(
-                    f"Not draft state reservation units must have a translations. Missing translation for {field}."
+                    f"Not draft state reservation units must have a translations. "
+                    f"Missing translation for {to_camel_case(field)}."
                 )
 
         spaces = data.get("spaces", getattr(self.instance, "spaces", None))

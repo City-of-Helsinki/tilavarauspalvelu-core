@@ -1,3 +1,4 @@
+from graphene.utils.str_converters import to_camel_case
 from rest_framework import serializers
 
 from api.graphql.base_serializers import (
@@ -66,7 +67,8 @@ class ResourceCreateSerializer(ResourceSerializer, PrimaryKeySerializer):
             value = data.get(field)
             if not value or value.isspace():
                 validation_errors[field] = serializers.ValidationError(
-                    f"Not draft state resources must have a translations. Missing translation for {field}."
+                    f"Not draft state resources must have a translations. "
+                    f"Missing translation for {to_camel_case(field)}."
                 )
 
         if data.get("location_type") == Resource.LOCATION_FIXED and not data.get(
@@ -100,7 +102,8 @@ class ResourceUpdateSerializer(PrimaryKeyUpdateSerializer, ResourceCreateSeriali
                 if field in self.translation_fields:
                     if not value or value == "" or value.isspace():
                         raise serializers.ValidationError(
-                            f"Not draft state resources must have a translations. Missing translation for {field}."
+                            f"Not draft state resources must have a translations. "
+                            f"Missing translation for {to_camel_case(field)}."
                         )
 
                 if field == "space":
