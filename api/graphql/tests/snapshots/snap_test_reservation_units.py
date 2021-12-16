@@ -324,7 +324,7 @@ snapshots['ReservationUnitQueryTestCase::test_getting_manually_given_surface_are
             'edges': [
                 {
                     'node': {
-                        'surfaceArea': 500
+                        'surfaceArea': '500.00'
                     }
                 }
             ]
@@ -387,7 +387,7 @@ snapshots['ReservationUnitQueryTestCase::test_getting_reservation_units 1'] = {
                                 'nameFi': 'Small space'
                             }
                         ],
-                        'surfaceArea': 150,
+                        'surfaceArea': '150.00',
                         'taxPercentage': {
                             'value': '24.00'
                         },
