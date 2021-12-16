@@ -8,6 +8,7 @@ from graphene_permissions.mixins import AuthFilter
 from graphene_permissions.permissions import AllowAny, AllowAuthenticated
 from rest_framework.generics import get_object_or_404
 
+from api.graphql.applications.application_types import CityType
 from api.graphql.reservation_units.reservation_unit_filtersets import (
     ReservationUnitsFilterSet,
 )
@@ -71,6 +72,7 @@ from permissions.api_permissions.graphene_field_decorators import (
 )
 from permissions.api_permissions.graphene_permissions import (
     AgeGroupPermission,
+    CityPermission,
     EquipmentCategoryPermission,
     EquipmentPermission,
     KeywordPermission,
@@ -238,6 +240,12 @@ class AgeGroupFilter(AuthFilter):
     )
 
 
+class CityFilter(AuthFilter):
+    permission_classes = (
+        (CityPermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
+    )
+
+
 class Query(graphene.ObjectType):
     reservations = ReservationsFilter(
         ReservationType, filterset_class=ReservationFilterSet
@@ -289,6 +297,7 @@ class Query(graphene.ObjectType):
     terms_of_use = TermsOfUseFilter(TermsOfUseType)
     tax_percentages = TaxPercentageFilter(TaxPercentageType)
     age_groups = AgeGroupFilter(AgeGroupType)
+    cities = CityFilter(CityType)
 
     @check_resolver_permission(ReservationPermission)
     def resolve_reservation_by_pk(self, info, **kwargs):
