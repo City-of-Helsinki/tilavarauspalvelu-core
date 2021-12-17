@@ -10,7 +10,7 @@ from django.contrib.auth import get_user_model
 from django.utils.timezone import get_default_timezone
 
 from api.graphql.tests.base import GrapheneTestCaseBase
-from applications.models import PRIORITY_CONST
+from applications.models import CUSTOMER_TYPES, PRIORITY_CONST, City
 from applications.tests.factories import ApplicationRoundFactory
 from opening_hours.enums import State
 from opening_hours.hours import TimeElement
@@ -20,7 +20,7 @@ from reservation_units.tests.factories import (
     ReservationUnitCancellationRuleFactory,
     ReservationUnitFactory,
 )
-from reservations.models import STATE_CHOICES, Reservation
+from reservations.models import STATE_CHOICES, AgeGroup, Reservation
 from reservations.tests.factories import (
     ReservationCancelReasonFactory,
     ReservationFactory,
@@ -76,6 +76,26 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         self.reservation = ReservationFactory(
             reservee_first_name="Reser",
             reservee_last_name="Vee",
+            reservee_type=CUSTOMER_TYPES.CUSTOMER_TYPE_INDIVIDUAL,
+            reservee_organisation_name="Test organisation",
+            reservee_address_street="Mannerheimintie 2",
+            reservee_address_city="Helsinki",
+            reservee_address_zip="00100",
+            reservee_phone="+358123456789",
+            reservee_email="reservee@example.com",
+            reservee_id="5727586-5",
+            reservee_is_unregistered_association=False,
+            home_city=City.objects.create(name="Test"),
+            applying_for_free_of_charge=True,
+            free_of_charge_reason="This is some reason.",
+            age_group=AgeGroup.objects.create(minimum=18, maximum=30),
+            billing_first_name="Reser",
+            billing_last_name="Vee",
+            billing_address_street="Aurakatu 12B",
+            billing_address_city="Turku",
+            billing_address_zip="20100",
+            billing_phone="+358234567890",
+            billing_email="billing@example.com",
             name="movies",
             description="movies&popcorn",
             reservation_unit=[self.reservation_unit],
@@ -111,7 +131,31 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
                             numPersons
                             reserveeFirstName
                             reserveeLastName
+                            reserveeType
+                            reserveeOrganisationName
+                            reserveeAddressStreet
+                            reserveeAddressCity
+                            reserveeAddressZip
                             reserveePhone
+                            reserveeEmail
+                            reserveeId
+                            reserveeIsUnregisteredAssociation
+                            homeCity {
+                                name
+                            }
+                            applyingForFreeOfCharge
+                            freeOfChargeReason
+                            ageGroup {
+                                minimum
+                                maximum
+                            }
+                            billingFirstName
+                            billingLastName
+                            billingAddressStreet
+                            billingAddressCity
+                            billingAddressZip
+                            billingPhone
+                            billingEmail
                             name
                             description
                             purpose {nameFi}
