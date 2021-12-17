@@ -36,7 +36,10 @@ from reservation_units.tests.factories import (
     ReservationUnitTypeFactory,
 )
 from reservations.models import STATE_CHOICES
-from reservations.tests.factories import ReservationFactory
+from reservations.tests.factories import (
+    ReservationFactory,
+    ReservationMetadataSetFactory,
+)
 from resources.tests.factories import ResourceFactory
 from services.tests.factories import ServiceFactory
 from spaces.tests.factories import SpaceFactory, UnitFactory
@@ -93,6 +96,7 @@ class ReservationUnitQueryTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCa
             publish_ends=datetime.datetime.now(),
             buffer_time_before=datetime.timedelta(minutes=15),
             buffer_time_after=datetime.timedelta(minutes=15),
+            metadata_set=ReservationMetadataSetFactory(name="Test form"),
         )
 
         cls.api_client = APIClient()
@@ -184,6 +188,11 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
                             publishEnds
                             bufferTimeBefore
                             bufferTimeAfter
+                            metadataSet {
+                              name
+                              supportedFields
+                              requiredFields
+                            }
                           }
                         }
                     }
@@ -1537,6 +1546,7 @@ class ReservationUnitMutationsTestCaseBase(GrapheneTestCaseBase):
             name_en="en",
             name_sv="sv",
         )
+        cls.metadata_set = ReservationMetadataSetFactory(name="Test form")
 
     def setUp(self):
         self.client.force_login(self.general_admin)
@@ -1711,6 +1721,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
             "publishEnds": "2021-05-03T00:00:00+00:00",
             "reservationBegins": "2021-05-03T00:00:00+00:00",
             "reservationEnds": "2021-05-03T00:00:00+00:00",
+            "metadataSetPk": self.metadata_set.pk,
         }
 
     def test_create(self):
@@ -1766,6 +1777,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
             data.get("reservationBegins")
         )
         assert_that(res_unit.reservation_ends).is_equal_to(reservation_ends)
+        assert_that(res_unit.metadata_set).is_equal_to(self.metadata_set)
 
     @mock.patch(
         "reservation_units.utils.hauki_exporter.ReservationUnitHaukiExporter.send_reservation_unit_to_hauki"
@@ -2191,6 +2203,19 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
         assert_that(res_unit_data.get("errors")).is_none()
         self.res_unit.refresh_from_db()
         assert_that(self.res_unit.tax_percentage).is_equal_to(tax_percentage)
+
+    def test_update_with_metadata_set(self):
+        metadata_set = ReservationMetadataSetFactory(name="New form")
+        data = self.get_valid_update_data()
+        data["metadataSetPk"] = metadata_set.pk
+        response = self.query(self.get_update_query(), input_data=data)
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        res_unit_data = content.get("data").get("updateReservationUnit")
+        assert_that(res_unit_data.get("errors")).is_none()
+        self.res_unit.refresh_from_db()
+        assert_that(self.res_unit.metadata_set).is_equal_to(metadata_set)
 
     def test_update_with_terms_of_use_pks(self):
         payment_terms = TermsOfUseFactory(terms_type=TermsOfUse.TERMS_TYPE_PAYMENT)

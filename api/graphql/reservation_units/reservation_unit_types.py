@@ -12,7 +12,10 @@ from graphene_permissions.permissions import AllowAny
 
 from api.graphql.base_type import PrimaryKeyObjectType
 from api.graphql.opening_hours.opening_hours_types import OpeningHoursMixin
-from api.graphql.reservations.reservation_types import ReservationType
+from api.graphql.reservations.reservation_types import (
+    ReservationMetadataSetType,
+    ReservationType,
+)
 from api.graphql.resources.resource_types import ResourceType
 from api.graphql.services.service_types import ServiceType
 from api.graphql.spaces.space_types import LocationType, SpaceType
@@ -308,6 +311,7 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
     tax_percentage = graphene.Field(TaxPercentageType)
     buffer_time_before = graphene.Time()
     buffer_time_after = graphene.Time()
+    metadata_set = graphene.Field(ReservationMetadataSetType)
 
     permission_classes = (
         (ReservationUnitPermission,)
@@ -350,6 +354,7 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
             "reservation_ends",
             "publish_begins",
             "publish_ends",
+            "metadata_set",
         ] + get_all_translatable_fields(model)
         filter_fields = {
             "name_fi": ["exact", "icontains", "istartswith"],
@@ -508,6 +513,7 @@ class ReservationUnitByPkType(ReservationUnitType, OpeningHoursMixin):
             "reservation_start_interval",
             "buffer_time_before",
             "buffer_time_after",
+            "metadata_set",
         ] + get_all_translatable_fields(model)
 
         interfaces = (graphene.relay.Node,)

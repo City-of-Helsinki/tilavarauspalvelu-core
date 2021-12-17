@@ -26,6 +26,13 @@ class ReservationPurposeFactory(DjangoModelFactory):
     name = FuzzyText()
 
 
+class ReservationMetadataSetFactory(DjangoModelFactory):
+    class Meta:
+        model = "reservations.ReservationMetadataSet"
+
+    name = FuzzyText()
+
+
 class ReservationFactory(DjangoModelFactory):
     class Meta:
         model = "reservations.Reservation"
