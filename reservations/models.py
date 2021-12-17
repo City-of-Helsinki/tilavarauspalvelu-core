@@ -4,10 +4,12 @@ from django.db.models import F, Sum
 from django.utils.translation import gettext_lazy as _
 
 from applications.models import (
+    CUSTOMER_TYPES,
     PRIORITIES,
     Application,
     ApplicationEvent,
     ApplicationRound,
+    City,
 )
 from reservation_units.models import ReservationUnit
 from tilavarauspalvelu.utils.auditlog_util import AuditLogger
@@ -144,14 +146,118 @@ class ReservationQuerySet(models.QuerySet):
 class Reservation(models.Model):
     objects = ReservationQuerySet.as_manager()
 
+    reservee_type = models.CharField(
+        max_length=50,
+        choices=CUSTOMER_TYPES.CUSTOMER_TYPE_CHOICES,
+        null=True,
+        blank=True,
+        help_text="Type of reservee",
+    )
     reservee_first_name = models.CharField(
         verbose_name=_("Reservee first name"), max_length=255, blank=True, default=""
     )
     reservee_last_name = models.CharField(
         verbose_name=_("Reservee last name"), max_length=255, blank=True, default=""
     )
+    reservee_organisation_name = models.CharField(
+        verbose_name=_("Reservee organisation name"),
+        max_length=255,
+        blank=True,
+        default="",
+    )
     reservee_phone = models.CharField(
         verbose_name=_("Reservee phone"), max_length=255, blank=True, default=""
+    )
+    reservee_email = models.EmailField(
+        verbose_name=_("Reservee email"), null=True, blank=True
+    )
+    reservee_id = models.CharField(
+        verbose_name=_("Reservee phone"),
+        max_length=10,
+        blank=True,
+        default="",
+        help_text="Reservee's business or association identity code",
+    )
+    reservee_is_unregistered_association = models.BooleanField(
+        verbose_name=_("Reservee is an unregistered association"),
+        null=False,
+        default=False,
+        blank=True,
+    )
+    reservee_address_street = models.CharField(
+        verbose_name=_("Reservee address street"),
+        max_length=255,
+        blank=True,
+        default="",
+    )
+    reservee_address_city = models.CharField(
+        verbose_name=_("Reservee address city"),
+        max_length=255,
+        blank=True,
+        default="",
+    )
+    reservee_address_zip = models.CharField(
+        verbose_name=_("Reservee address zip code"),
+        max_length=255,
+        blank=True,
+        default="",
+    )
+    billing_first_name = models.CharField(
+        verbose_name=_("Billing first name"), max_length=255, blank=True, default=""
+    )
+    billing_last_name = models.CharField(
+        verbose_name=_("Billing last name"), max_length=255, blank=True, default=""
+    )
+    billing_phone = models.CharField(
+        verbose_name=_("Billing phone"), max_length=255, blank=True, default=""
+    )
+    billing_email = models.EmailField(
+        verbose_name=_("Billing email"), null=True, blank=True
+    )
+    billing_address_street = models.CharField(
+        verbose_name=_("Reservee address street"),
+        max_length=255,
+        blank=True,
+        default="",
+    )
+    billing_address_city = models.CharField(
+        verbose_name=_("Billing address city"),
+        max_length=255,
+        blank=True,
+        default="",
+    )
+    billing_address_zip = models.CharField(
+        verbose_name=_("Reservee address zip code"),
+        max_length=255,
+        blank=True,
+        default="",
+    )
+    home_city = models.ForeignKey(
+        City,
+        verbose_name=_("Home city"),
+        related_name="home_city_reservation",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        help_text="Home city of the group or association",
+    )
+    age_group = models.ForeignKey(
+        AgeGroup,
+        verbose_name=_("Age group"),
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+    )
+    applying_for_free_of_charge = models.BooleanField(
+        verbose_name=_("Reservee is applying for a free-of-charge reservation"),
+        null=False,
+        default=False,
+        blank=True,
+    )
+    free_of_charge_reason = models.TextField(
+        verbose_name=_("Reason for applying for a free-of-charge reservation"),
+        null=True,
+        blank=True,
     )
 
     name = models.CharField(
@@ -305,6 +411,41 @@ class Reservation(models.Model):
 
 class ReservationPurpose(models.Model):
     name = models.CharField(max_length=200)
+
+    def __str__(self) -> str:
+        return self.name
+
+
+class ReservationMetadataField(models.Model):
+    field_name = models.CharField(
+        max_length=100, verbose_name=_("Field name"), unique=True
+    )
+
+    class Meta:
+        verbose_name = _("Reservation metadata field")
+        verbose_name_plural = _("Reservation metadata fields")
+
+    def __str__(self) -> str:
+        return self.field_name
+
+
+class ReservationMetadataSet(models.Model):
+    name = models.CharField(max_length=100, verbose_name=_("Name"), unique=True)
+    supported_fields = models.ManyToManyField(
+        ReservationMetadataField,
+        verbose_name=_("Supported fields"),
+        related_name="metadata_sets_supported",
+    )
+    required_fields = models.ManyToManyField(
+        ReservationMetadataField,
+        verbose_name=_("Required fields"),
+        related_name="metadata_sets_required",
+        blank=True,
+    )
+
+    class Meta:
+        verbose_name = _("Reservation metadata set")
+        verbose_name_plural = _("Reservation metadata sets")
 
     def __str__(self) -> str:
         return self.name
