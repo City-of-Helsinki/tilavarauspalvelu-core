@@ -136,6 +136,7 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
     unit_price = graphene.Float()
     tax_percentage_value = graphene.Decimal()
     price = graphene.Float()
+    age_group = graphene.Field(AgeGroupType)
 
     class Meta:
         model = Reservation
@@ -153,6 +154,25 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
             "reservee_first_name",
             "reservee_last_name",
             "reservee_phone",
+            "reservee_organisation_name",
+            "reservee_address_street",
+            "reservee_address_city",
+            "reservee_address_zip",
+            "reservee_email",
+            "reservee_type",
+            "reservee_id",
+            "reservee_is_unregistered_association",
+            "home_city",
+            "applying_for_free_of_charge",
+            "free_of_charge_reason",
+            "age_group",
+            "billing_first_name",
+            "billing_last_name",
+            "billing_address_street",
+            "billing_address_city",
+            "billing_address_zip",
+            "billing_phone",
+            "billing_email",
             "name",
             "description",
             "purpose",

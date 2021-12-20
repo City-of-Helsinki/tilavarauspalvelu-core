@@ -34,11 +34,27 @@ snapshots['ReservationQueryTestCase::test_reservation_query 1'] = {
             'edges': [
                 {
                     'node': {
+                        'applyingForFreeOfCharge': True,
+                        'ageGroup': {
+                            'maximum': 30,
+                            'minimum': 18
+                        },
                         'begin': '2021-10-12T12:00:00+00:00',
+                        'billingAddressCity': 'Turku',
+                        'billingAddressStreet': 'Aurakatu 12B',
+                        'billingAddressZip': '20100',
                         'bufferTimeAfter': None,
                         'bufferTimeBefore': None,
+                        'billingEmail': 'billing@example.com',
+                        'billingFirstName': 'Reser',
+                        'billingLastName': 'Vee',
+                        'billingPhone': '+358234567890',
                         'description': 'movies&popcorn',
                         'end': '2021-10-12T13:00:00+00:00',
+                        'freeOfChargeReason': 'This is some reason.',
+                        'homeCity': {
+                            'name': 'Test',
+                        },
                         'name': 'movies',
                         'numPersons': None,
                         'unitPrice': 10,
@@ -54,9 +70,17 @@ snapshots['ReservationQueryTestCase::test_reservation_query 1'] = {
                                 'nameFi': 'resunit'
                             }
                         ],
+                        'reserveeAddressCity': 'Helsinki',
+                        'reserveeAddressStreet': 'Mannerheimintie 2',
+                        'reserveeAddressZip': '00100',
+                        'reserveeEmail': 'reservee@example.com',
                         'reserveeFirstName': 'Reser',
+                        'reserveeId': '5727586-5',
+                        'reserveeIsUnregisteredAssociation': False,
                         'reserveeLastName': 'Vee',
-                        'reserveePhone': '',
+                        'reserveeOrganisationName': 'Test organisation',
+                        'reserveePhone': '+358123456789',
+                        'reserveeType': 'INDIVIDUAL',
                         'state': 'CREATED',
                         'user': 'joe.regularl@foo.com'
                     }

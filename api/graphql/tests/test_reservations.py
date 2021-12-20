@@ -10,7 +10,7 @@ from django.contrib.auth import get_user_model
 from django.utils.timezone import get_default_timezone
 
 from api.graphql.tests.base import GrapheneTestCaseBase
-from applications.models import PRIORITY_CONST
+from applications.models import CUSTOMER_TYPES, PRIORITY_CONST, City
 from applications.tests.factories import ApplicationRoundFactory
 from opening_hours.enums import State
 from opening_hours.hours import TimeElement
@@ -20,7 +20,7 @@ from reservation_units.tests.factories import (
     ReservationUnitCancellationRuleFactory,
     ReservationUnitFactory,
 )
-from reservations.models import STATE_CHOICES, Reservation
+from reservations.models import STATE_CHOICES, AgeGroup, Reservation
 from reservations.tests.factories import (
     ReservationCancelReasonFactory,
     ReservationFactory,
@@ -76,6 +76,26 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         self.reservation = ReservationFactory(
             reservee_first_name="Reser",
             reservee_last_name="Vee",
+            reservee_type=CUSTOMER_TYPES.CUSTOMER_TYPE_INDIVIDUAL,
+            reservee_organisation_name="Test organisation",
+            reservee_address_street="Mannerheimintie 2",
+            reservee_address_city="Helsinki",
+            reservee_address_zip="00100",
+            reservee_phone="+358123456789",
+            reservee_email="reservee@example.com",
+            reservee_id="5727586-5",
+            reservee_is_unregistered_association=False,
+            home_city=City.objects.create(name="Test"),
+            applying_for_free_of_charge=True,
+            free_of_charge_reason="This is some reason.",
+            age_group=AgeGroup.objects.create(minimum=18, maximum=30),
+            billing_first_name="Reser",
+            billing_last_name="Vee",
+            billing_address_street="Aurakatu 12B",
+            billing_address_city="Turku",
+            billing_address_zip="20100",
+            billing_phone="+358234567890",
+            billing_email="billing@example.com",
             name="movies",
             description="movies&popcorn",
             reservation_unit=[self.reservation_unit],
@@ -111,7 +131,31 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
                             numPersons
                             reserveeFirstName
                             reserveeLastName
+                            reserveeType
+                            reserveeOrganisationName
+                            reserveeAddressStreet
+                            reserveeAddressCity
+                            reserveeAddressZip
                             reserveePhone
+                            reserveeEmail
+                            reserveeId
+                            reserveeIsUnregisteredAssociation
+                            homeCity {
+                                name
+                            }
+                            applyingForFreeOfCharge
+                            freeOfChargeReason
+                            ageGroup {
+                                minimum
+                                maximum
+                            }
+                            billingFirstName
+                            billingLastName
+                            billingAddressStreet
+                            billingAddressCity
+                            billingAddressZip
+                            billingPhone
+                            billingEmail
                             name
                             description
                             purpose {nameFi}
@@ -155,17 +199,37 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
 
     def get_valid_input_data(self):
         return {
+            "reserveeType": "individual",
             "reserveeFirstName": "John",
             "reserveeLastName": "Doe",
+            "reserveeOrganisationName": "Test Organisation ry",
             "reserveePhone": "+358123456789",
+            "reserveeEmail": "john.doe@example.com",
+            "reserveeId": "2882333-2",
+            "reserveeIsUnregisteredAssociation": False,
+            "reserveeAddressStreet": "Mannerheimintie 2",
+            "reserveeAddressCity": "Helsinki",
+            "reserveeAddressZip": "00100",
+            "billingFirstName": "Jane",
+            "billingLastName": "Doe",
+            "billingPhone": "+358234567890",
+            "billingEmail": "jane.doe@example.com",
+            "billingAddressStreet": "Auratie 12B",
+            "billingAddressCity": "Turku",
+            "billingAddressZip": "20100",
+            "homeCityPk": City.objects.create(name="Helsinki").pk,
+            "ageGroupPk": AgeGroup.objects.create(minimum=18, maximum=30).pk,
+            "applyingForFreeOfCharge": True,
+            "freeOfChargeReason": "Some reason here.",
             "name": "Test reservation",
             "description": "Test description",
+            "numPersons": 1,
+            "purposePk": self.purpose.pk,
             "begin": datetime.datetime.now().strftime("%Y%m%dT%H%M%SZ"),
             "end": (datetime.datetime.now() + datetime.timedelta(hours=1)).strftime(
                 "%Y%m%dT%H%M%SZ"
             ),
             "reservationUnitPks": [self.reservation_unit.pk],
-            "purposePk": self.purpose.pk,
         }
 
     def setUp(self):
@@ -274,11 +338,31 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         self.client.force_login(self.regular_joe)
         input_data = self.get_valid_input_data()
         optional_fields = [
+            "reserveeType",
             "reserveeFirstName",
             "reserveeLastName",
+            "reserveeOrganisationName",
             "reserveePhone",
+            "reserveeEmail",
+            "reserveeId",
+            "reserveeIsUnregisteredAssociation",
+            "reserveeAddressStreet",
+            "reserveeAddressCity",
+            "reserveeAddressZip",
+            "billingFirstName",
+            "billingLastName",
+            "billingPhone",
+            "billingEmail",
+            "billingAddressStreet",
+            "billingAddressCity",
+            "billingAddressZip",
+            "homeCityPk",
+            "ageGroupPk",
+            "applyingForFreeOfCharge",
+            "freeOfChargeReason",
             "name",
             "description",
+            "numPersons",
             "purposePk",
         ]
         for field in optional_fields:
@@ -836,6 +920,25 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         assert_that(content.get("errors")).is_not_none()
         self.reservation.refresh_from_db()
         assert_that(self.reservation.price).is_not_equal_to(0)
+
+    def test_updating_reservation_with_invalid_reservee_type_fails(
+        self, mock_periods, mock_opening_hours
+    ):
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+        self.client.force_login(self.regular_joe)
+        invalid_reservee_type = "invalid"
+        data = self.get_valid_update_data()
+        data["reserveeType"] = invalid_reservee_type
+        response = self.query(self.get_update_query(), input_data=data)
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        assert_that(
+            content.get("data").get("updateReservation").get("errors")
+        ).is_not_none()
+        self.reservation.refresh_from_db()
+        assert_that(self.reservation.reservee_type).is_not_equal_to(
+            invalid_reservee_type
+        )
 
     def test_update_fails_when_overlapping_reservation(
         self, mock_periods, mock_opening_hours

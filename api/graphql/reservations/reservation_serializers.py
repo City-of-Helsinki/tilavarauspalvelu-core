@@ -10,12 +10,14 @@ from api.graphql.base_serializers import (
     PrimaryKeyUpdateSerializer,
 )
 from api.graphql.primary_key_fields import IntegerPrimaryKeyField
+from applications.models import CUSTOMER_TYPES, City
 from reservation_units.models import ReservationUnit
 from reservation_units.utils.reservation_unit_reservation_scheduler import (
     ReservationUnitReservationScheduler,
 )
 from reservations.models import (
     STATE_CHOICES,
+    AgeGroup,
     Reservation,
     ReservationCancelReason,
     ReservationPurpose,
@@ -36,6 +38,18 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
     purpose_pk = IntegerPrimaryKeyField(
         queryset=ReservationPurpose.objects.all(), source="purpose", allow_null=True
     )
+    home_city_pk = IntegerPrimaryKeyField(
+        queryset=City.objects.all(), source="home_city", allow_null=True
+    )
+    age_group_pk = IntegerPrimaryKeyField(
+        queryset=AgeGroup.objects.all(), source="age_group", allow_null=True
+    )
+    reservee_type = serializers.CharField(
+        help_text=(
+            "Type of the reservee. "
+            f"Possible values are {', '.join(value for value, _ in CUSTOMER_TYPES.CUSTOMER_TYPE_CHOICES)}."
+        )
+    )
 
     class Meta:
         model = Reservation
@@ -44,6 +58,26 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
             "reservee_first_name",
             "reservee_last_name",
             "reservee_phone",
+            "reservee_organisation_name",
+            "reservee_address_street",
+            "reservee_address_city",
+            "reservee_address_zip",
+            "reservee_email",
+            "reservee_type",
+            "reservee_id",
+            "reservee_is_unregistered_association",
+            "home_city_pk",
+            "applying_for_free_of_charge",
+            "free_of_charge_reason",
+            "age_group_pk",
+            "billing_first_name",
+            "billing_last_name",
+            "billing_address_street",
+            "billing_address_city",
+            "billing_address_zip",
+            "billing_phone",
+            "billing_email",
+            "num_persons",
             "name",
             "description",
             "state",
@@ -64,11 +98,46 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
         super().__init__(*args, **kwargs)
         self.fields["state"].read_only = True
         self.fields["reservation_unit_pks"].write_only = True
-        self.fields["purpose_pk"].required = False
         self.fields["confirmed_at"].read_only = True
         self.fields["unit_price"].read_only = True
         self.fields["tax_percentage_value"].read_only = True
         self.fields["price"].read_only = True
+
+        # Form/metadata fields should be optional by default
+        self.fields["reservee_type"].required = False
+        self.fields["reservee_first_name"].required = False
+        self.fields["reservee_last_name"].required = False
+        self.fields["reservee_organisation_name"].required = False
+        self.fields["reservee_phone"].required = False
+        self.fields["reservee_email"].required = False
+        self.fields["reservee_id"].required = False
+        self.fields["reservee_is_unregistered_association"].required = False
+        self.fields["reservee_address_street"].required = False
+        self.fields["reservee_address_city"].required = False
+        self.fields["reservee_address_zip"].required = False
+        self.fields["billing_first_name"].required = False
+        self.fields["billing_last_name"].required = False
+        self.fields["billing_phone"].required = False
+        self.fields["billing_email"].required = False
+        self.fields["billing_address_street"].required = False
+        self.fields["billing_address_city"].required = False
+        self.fields["billing_address_zip"].required = False
+        self.fields["home_city_pk"].required = False
+        self.fields["age_group_pk"].required = False
+        self.fields["applying_for_free_of_charge"].required = False
+        self.fields["free_of_charge_reason"].required = False
+        self.fields["name"].required = False
+        self.fields["description"].required = False
+        self.fields["num_persons"].required = False
+        self.fields["purpose_pk"].required = False
+
+    def validate_reservee_type(self, value):
+        valid_values = [x[0] for x in CUSTOMER_TYPES.CUSTOMER_TYPE_CHOICES]
+        if value not in valid_values:
+            raise serializers.ValidationError(
+                f"Invalid reservee type {value}. Valid values are {', '.join(valid_values)}"
+            )
+        return value
 
     def validate(self, data):
         begin = data.get("begin", getattr(self.instance, "begin", None))
