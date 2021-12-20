@@ -26,18 +26,17 @@ from permissions.api_permissions.drf_permissions import (
 from reservation_units.models import (
     Equipment,
     EquipmentCategory,
-    Purpose,
     ReservationUnit,
     ReservationUnitImage,
     ReservationUnitType,
 )
-from reservations.models import Reservation
+from reservations.models import Reservation, ReservationPurpose
 from spaces.models import District, Unit
 
 
 class ReservationUnitFilter(filters.FilterSet):
     purpose = filters.ModelMultipleChoiceFilter(
-        field_name="purposes", queryset=Purpose.objects.all()
+        field_name="reservation_purposes", queryset=ReservationPurpose.objects.all()
     )
     application_round = filters.ModelMultipleChoiceFilter(
         field_name="application_rounds",
@@ -60,9 +59,9 @@ class ReservationUnitFilter(filters.FilterSet):
     is_draft = filters.BooleanFilter(field_name="is_draft")
 
 
-class PurposeSerializer(serializers.ModelSerializer):
+class ReservationPurposeSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Purpose
+        model = ReservationPurpose
         fields = [
             "id",
             "name",
@@ -115,7 +114,9 @@ class ReservationUnitSerializer(TranslatedModelSerializer):
         many=True,
         help_text="Services included in the reservation unit as nested related objects.",
     )
-    purposes = PurposeSerializer(many=True, read_only=True)
+    purposes = ReservationPurposeSerializer(
+        many=True, read_only=True, source="reservation_purposes"
+    )
     images = ReservationUnitImageSerializer(
         read_only=True,
         many=True,
@@ -297,11 +298,11 @@ class ReservationUnitViewSet(viewsets.ModelViewSet):
         return Response(result_data)
 
 
-class PurposeViewSet(
+class ReservationPurposeViewSet(
     viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin
 ):
-    serializer_class = PurposeSerializer
-    queryset = Purpose.objects.all()
+    serializer_class = ReservationPurposeSerializer
+    queryset = ReservationPurpose.objects.all()
     permission_classes = (
         [PurposePermission]
         if not settings.TMP_PERMISSIONS_DISABLED
