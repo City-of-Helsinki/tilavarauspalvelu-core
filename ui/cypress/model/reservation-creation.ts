@@ -60,6 +60,12 @@ export function reservationEvent(): Cypress.Chainable<JQuery<HTMLElement>> {
   return cy.get(".rbc-event.rbc-event-movable");
 }
 
+export function notificationContainer(): Cypress.Chainable<
+  JQuery<HTMLElement>
+> {
+  return cy.get('[aria-label="Notification"]');
+}
+
 export function notificationCloseButton(): Cypress.Chainable<
   JQuery<HTMLElement>
 > {

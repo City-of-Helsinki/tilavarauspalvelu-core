@@ -129,6 +129,8 @@ const reservationByPk = graphql.query<Query, QueryReservationUnitByPkArgs>(
       calendarUrl: `http://localhost:8000/v1/reservation_calendar/${pk}/?hash=12c580bc07340b05441feb8f261786a7ceabb5423a1966c7c13241f39916233c`,
       user: "user@gmail.com",
       state: "CONFIRMED",
+      bufferTimeBefore: "01:00:00",
+      bufferTimeAfter: "00:30:00",
       price: 42.0,
       reservationUnits: [
         {
@@ -205,6 +207,8 @@ const listReservations = graphql.query<Query, QueryReservationUnitsArgs>(
                 end: "2021-04-28T06:23:20+00:00",
                 user: "user@gmail.com",
                 state: "CONFIRMED",
+                bufferTimeBefore: "01:00:00",
+                bufferTimeAfter: "00:30:00",
                 reservationUnits: [
                   {
                     pk: 1,
@@ -237,6 +241,8 @@ const listReservations = graphql.query<Query, QueryReservationUnitsArgs>(
                 end: "2021-04-28T08:23:20+00:00",
                 user: "user@gmail.com",
                 state: "CONFIRMED",
+                bufferTimeBefore: "01:00:00",
+                bufferTimeAfter: "00:30:00",
                 reservationUnits: [
                   {
                     pk: 9,
@@ -269,6 +275,8 @@ const listReservations = graphql.query<Query, QueryReservationUnitsArgs>(
                 end: addHours(addDays(new Date(), 1), 1).toISOString(),
                 user: "user@gmail.com",
                 state: "CONFIRMED",
+                bufferTimeBefore: "01:00:00",
+                bufferTimeAfter: "00:30:00",
                 price: 42.0,
                 reservationUnits: [
                   {
@@ -302,6 +310,8 @@ const listReservations = graphql.query<Query, QueryReservationUnitsArgs>(
                 end: "2021-11-27T16:00:00+00:00",
                 user: "user@email.com",
                 state: "CREATED",
+                bufferTimeBefore: "01:00:00",
+                bufferTimeAfter: "00:30:00",
                 reservationUnits: [
                   {
                     pk: 1,
@@ -334,6 +344,8 @@ const listReservations = graphql.query<Query, QueryReservationUnitsArgs>(
                 end: addHours(addDays(new Date(), 5), 2).toISOString(),
                 user: "user@email.com",
                 state: "CONFIRMED",
+                bufferTimeBefore: "01:00:00",
+                bufferTimeAfter: "00:30:00",
                 reservationUnits: [
                   {
                     pk: 4,
@@ -366,6 +378,8 @@ const listReservations = graphql.query<Query, QueryReservationUnitsArgs>(
                 end: "2021-11-28T09:00:00+00:00",
                 user: "user@gmail.com",
                 state: "CREATED",
+                bufferTimeBefore: "01:00:00",
+                bufferTimeAfter: "00:30:00",
                 reservationUnits: [
                   {
                     pk: 1,
@@ -398,6 +412,8 @@ const listReservations = graphql.query<Query, QueryReservationUnitsArgs>(
                 end: "2021-11-28T10:00:00+00:00",
                 user: "user@email.com",
                 state: "CREATED",
+                bufferTimeBefore: "01:00:00",
+                bufferTimeAfter: "00:30:00",
                 reservationUnits: [
                   {
                     pk: 1,
@@ -430,6 +446,8 @@ const listReservations = graphql.query<Query, QueryReservationUnitsArgs>(
                 end: "2021-11-28T12:00:00+00:00",
                 user: "user@email.com",
                 state: "CREATED",
+                bufferTimeBefore: "01:00:00",
+                bufferTimeAfter: "00:30:00",
                 reservationUnits: [
                   {
                     pk: 1,
@@ -462,6 +480,8 @@ const listReservations = graphql.query<Query, QueryReservationUnitsArgs>(
                 end: "2021-11-28T15:15:00+00:00",
                 user: "user@email.com",
                 state: "CREATED",
+                bufferTimeBefore: "01:00:00",
+                bufferTimeAfter: "00:30:00",
                 reservationUnits: [
                   {
                     pk: 1,
@@ -494,6 +514,8 @@ const listReservations = graphql.query<Query, QueryReservationUnitsArgs>(
                 end: "2021-11-28T18:15:00+00:00",
                 user: "user@email.com",
                 state: "CREATED",
+                bufferTimeBefore: "01:00:00",
+                bufferTimeAfter: "00:30:00",
                 reservationUnits: [
                   {
                     pk: 1,
@@ -526,6 +548,8 @@ const listReservations = graphql.query<Query, QueryReservationUnitsArgs>(
                 end: "2021-12-01T02:00:00+00:00",
                 user: "user@gmail.com",
                 state: "CANCELLED",
+                bufferTimeBefore: "01:00:00",
+                bufferTimeAfter: "00:30:00",
                 reservationUnits: [
                   {
                     pk: 3,
@@ -555,6 +579,8 @@ const listReservations = graphql.query<Query, QueryReservationUnitsArgs>(
                 end: addHours(addDays(new Date(), 10), 2).toISOString(),
                 user: "user@email.com",
                 state: "CONFIRMED",
+                bufferTimeBefore: "01:00:00",
+                bufferTimeAfter: "00:30:00",
                 reservationUnits: [
                   {
                     pk: 11,
@@ -584,6 +610,8 @@ const listReservations = graphql.query<Query, QueryReservationUnitsArgs>(
                 end: "2021-12-04T14:00:00+00:00",
                 user: "user@email.com",
                 state: "CREATED",
+                bufferTimeBefore: "01:00:00",
+                bufferTimeAfter: "00:30:00",
                 reservationUnits: [
                   {
                     pk: 1,
@@ -616,6 +644,8 @@ const listReservations = graphql.query<Query, QueryReservationUnitsArgs>(
                 end: "2021-12-04T16:15:00+00:00",
                 user: "user@email.com",
                 state: "CREATED",
+                bufferTimeBefore: "01:00:00",
+                bufferTimeAfter: "00:30:00",
                 reservationUnits: [
                   {
                     pk: 1,
@@ -648,6 +678,8 @@ const listReservations = graphql.query<Query, QueryReservationUnitsArgs>(
                 end: "2021-12-04T18:00:00+00:00",
                 user: "user@email.com",
                 state: "CREATED",
+                bufferTimeBefore: "01:00:00",
+                bufferTimeAfter: "00:30:00",
                 reservationUnits: [
                   {
                     pk: 1,
@@ -680,6 +712,8 @@ const listReservations = graphql.query<Query, QueryReservationUnitsArgs>(
                 end: "2021-12-04T19:00:00+00:00",
                 user: "user@email.com",
                 state: "CREATED",
+                bufferTimeBefore: "01:00:00",
+                bufferTimeAfter: "00:30:00",
                 reservationUnits: [
                   {
                     pk: 1,
@@ -712,6 +746,8 @@ const listReservations = graphql.query<Query, QueryReservationUnitsArgs>(
                 end: "2021-12-05T09:00:00+00:00",
                 user: "user@email.com",
                 state: "CANCELLED",
+                bufferTimeBefore: "01:00:00",
+                bufferTimeAfter: "00:30:00",
                 reservationUnits: [
                   {
                     pk: 1,
@@ -744,6 +780,8 @@ const listReservations = graphql.query<Query, QueryReservationUnitsArgs>(
                 end: "2021-12-05T11:00:00+00:00",
                 user: "user@email.com",
                 state: "CANCELLED",
+                bufferTimeBefore: "01:00:00",
+                bufferTimeAfter: "00:30:00",
                 reservationUnits: [
                   {
                     pk: 1,
@@ -776,6 +814,8 @@ const listReservations = graphql.query<Query, QueryReservationUnitsArgs>(
                 end: "2021-12-05T15:30:00+00:00",
                 user: "user@email.com",
                 state: "CREATED",
+                bufferTimeBefore: "01:00:00",
+                bufferTimeAfter: "00:30:00",
                 reservationUnits: [
                   {
                     pk: 1,
@@ -808,6 +848,8 @@ const listReservations = graphql.query<Query, QueryReservationUnitsArgs>(
                 end: "2021-12-12T10:00:00+00:00",
                 user: "user@email.com",
                 state: "CANCELLED",
+                bufferTimeBefore: "01:00:00",
+                bufferTimeAfter: "00:30:00",
                 reservationUnits: [
                   {
                     pk: 1,
@@ -840,6 +882,8 @@ const listReservations = graphql.query<Query, QueryReservationUnitsArgs>(
                 end: addHours(addDays(new Date(), 23), 2).toISOString(),
                 user: "user@email.com",
                 state: "CONFIRMED",
+                bufferTimeBefore: "01:00:00",
+                bufferTimeAfter: "00:30:00",
                 reservationUnits: [
                   {
                     pk: 3,

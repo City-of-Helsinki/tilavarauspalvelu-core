@@ -1,4 +1,4 @@
-import { addDays, addHours, addMinutes, format } from "date-fns";
+import { addDays, addHours, addMinutes, endOfWeek, format } from "date-fns";
 import {
   hzNavigationBack,
   hzNavigationFwd,
@@ -20,6 +20,7 @@ import {
   durationSelectorToggle,
   notificationCloseButton,
   startTimeSelectorToggle,
+  notificationContainer,
 } from "model/reservation-creation";
 import { textWithIcon } from "model/search";
 
@@ -274,9 +275,66 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
         expect(value).to.eq(monthNext.toString());
       });
 
-    const nextWeek = format(addDays(new Date(), 7), "d.M.yyyy");
+    const nextWeek = format(
+      endOfWeek(addDays(new Date(), 7), { weekStartsOn: 1 }),
+      "d.M.yyyy"
+    );
 
     dateSelector().clear().type(nextWeek);
+
+    startTimeSelectorToggle()
+      .click()
+      .siblings("ul")
+      .children("li:nth-of-type(6)")
+      .click();
+    matchEvent();
+
+    notificationContainer().should("not.exist");
+
+    durationSelectorToggle()
+      .click()
+      .siblings("ul")
+      .children("li:nth-of-type(2)")
+      .click();
+
+    notificationContainer().contains(
+      "Varauksen puskuriajan vaatimukset eivät täyty. Valitse toinen varausaika."
+    );
+
+    durationSelectorToggle()
+      .click()
+      .siblings("ul")
+      .children("li:first-of-type")
+      .click();
+
+    startTimeSelectorToggle()
+      .click()
+      .siblings("ul")
+      .children("li:nth-of-type(2)")
+      .click();
+    matchEvent();
+
+    notificationContainer().should("not.exist");
+
+    durationSelectorToggle()
+      .click()
+      .siblings("ul")
+      .children("li:nth-of-type(2)")
+      .click();
+
+    notificationContainer().contains(
+      "Varauksen puskuriajan vaatimukset eivät täyty. Valitse toinen varausaika."
+    );
+
+    startTimeSelectorToggle()
+      .click()
+      .siblings("ul")
+      .children("li:nth-of-type(4)")
+      .click();
+
+    notificationContainer().contains(
+      "Valittu aika on varattu. Valitse toinen aika."
+    );
 
     startTimeSelectorToggle()
       .click()

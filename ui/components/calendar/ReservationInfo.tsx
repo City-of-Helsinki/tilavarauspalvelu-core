@@ -9,6 +9,7 @@ import { useMutation } from "@apollo/client";
 import { breakpoint } from "../../modules/style";
 import {
   areSlotsReservable,
+  doBuffersCollide,
   doReservationsCollide,
   getDayIntervals,
   isReservationLongEnough,
@@ -207,6 +208,16 @@ const ReservationInfo = ({
       } else {
         setReservation({ pk: null, begin: null, end: null, price: null });
         resetReservation();
+      }
+      if (
+        doBuffersCollide(reservationUnit.reservations, {
+          start: startDate,
+          end: endDate,
+          bufferTimeBefore: reservationUnit.bufferTimeBefore,
+          bufferTimeAfter: reservationUnit.bufferTimeAfter,
+        })
+      ) {
+        setErrorMsg(t("reservationCalendar:errors.bufferCollision"));
       }
 
       if (

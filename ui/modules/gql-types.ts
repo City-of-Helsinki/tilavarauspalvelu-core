@@ -1107,8 +1107,8 @@ export type ReservationPurposeTypeEdge = {
 export type ReservationType = Node & {
   __typename?: "ReservationType";
   begin: Scalars["DateTime"];
-  bufferTimeAfter?: Maybe<Scalars["Float"]>;
-  bufferTimeBefore?: Maybe<Scalars["Float"]>;
+  bufferTimeAfter?: Maybe<Scalars["Time"]>;
+  bufferTimeBefore?: Maybe<Scalars["Time"]>;
   calendarUrl?: Maybe<Scalars["String"]>;
   description?: Maybe<Scalars["String"]>;
   end: Scalars["DateTime"];
@@ -1153,8 +1153,8 @@ export type ReservationUnitByPkType = Node & {
   additionalInstructionsFi?: Maybe<Scalars["String"]>;
   additionalInstructionsSv?: Maybe<Scalars["String"]>;
   applicationRounds?: Maybe<Array<Maybe<ApplicationRoundType>>>;
-  bufferTimeAfter?: Maybe<Scalars["Float"]>;
-  bufferTimeBefore?: Maybe<Scalars["Float"]>;
+  bufferTimeAfter?: Maybe<Scalars["Time"]>;
+  bufferTimeBefore?: Maybe<Scalars["Time"]>;
   cancellationRule?: Maybe<ReservationUnitCancellationRuleType>;
   cancellationTerms?: Maybe<TermsOfUseType>;
   contactInformationEn?: Maybe<Scalars["String"]>;
@@ -1443,8 +1443,8 @@ export type ReservationUnitType = Node & {
   additionalInstructionsFi?: Maybe<Scalars["String"]>;
   additionalInstructionsSv?: Maybe<Scalars["String"]>;
   applicationRounds?: Maybe<Array<Maybe<ApplicationRoundType>>>;
-  bufferTimeAfter?: Maybe<Scalars["Float"]>;
-  bufferTimeBefore?: Maybe<Scalars["Float"]>;
+  bufferTimeAfter?: Maybe<Scalars["Time"]>;
+  bufferTimeBefore?: Maybe<Scalars["Time"]>;
   cancellationRule?: Maybe<ReservationUnitCancellationRuleType>;
   cancellationTerms?: Maybe<TermsOfUseType>;
   contactInformationEn?: Maybe<Scalars["String"]>;
@@ -1839,8 +1839,8 @@ export type ResourceDeleteMutationPayload = {
 
 export type ResourceType = Node & {
   __typename?: "ResourceType";
-  bufferTimeAfter?: Maybe<Scalars["Float"]>;
-  bufferTimeBefore?: Maybe<Scalars["Float"]>;
+  bufferTimeAfter?: Maybe<Scalars["Time"]>;
+  bufferTimeBefore?: Maybe<Scalars["Time"]>;
   building?: Maybe<Array<Maybe<BuildingType>>>;
   descriptionEn?: Maybe<Scalars["String"]>;
   descriptionFi?: Maybe<Scalars["String"]>;

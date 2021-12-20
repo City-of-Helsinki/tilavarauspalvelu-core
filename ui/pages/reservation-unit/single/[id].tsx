@@ -24,7 +24,9 @@ import ReservationInfo from "../../../components/calendar/ReservationInfo";
 import { getTranslation, parseDate, toApiDate } from "../../../modules/util";
 import {
   areSlotsReservable,
+  doBuffersCollide,
   doReservationsCollide,
+  getEventBuffers,
   getSlotPropGetter,
   getTimeslots,
   isReservationLongEnough,
@@ -252,12 +254,16 @@ const eventStyleGetter = ({
   } as Record<string, string>;
   let className = "";
 
-  const state = event.state as ReservationStateWithInitial;
+  const state = event?.state as ReservationStateWithInitial;
 
   switch (state) {
     case "INITIAL":
       style.backgroundColor = "var(--color-success-dark)";
       className = "rbc-event-movable";
+      break;
+    case "BUFFER":
+      style.backgroundColor = "var(--color-black-10)";
+      className = "rbc-event-buffer";
       break;
     default:
       style.backgroundColor = "var(--color-brick-dark)";
@@ -304,6 +310,12 @@ const ReservationUnit = ({
     if (
       !isValid(start) ||
       !isValid(end) ||
+      doBuffersCollide(reservationUnit.reservations, {
+        start,
+        end,
+        bufferTimeBefore: reservationUnit.bufferTimeBefore,
+        bufferTimeAfter: reservationUnit.bufferTimeAfter,
+      }) ||
       !isStartTimeWithinInterval(
         start,
         reservationUnit.openingHours?.openingTimes,
@@ -391,7 +403,7 @@ const ReservationUnit = ({
 
   const shouldDisplayBottomWrapper = relatedReservationUnits?.length > 0;
 
-  const calendarEvents = reservationUnit?.reservations
+  const calendarEvents: CalendarEvent[] = reservationUnit?.reservations
     ? [...reservationUnit.reservations, initialReservation]
         .filter((n: ReservationType) => n)
         .map((n: ReservationType) => {
@@ -407,9 +419,20 @@ const ReservationUnit = ({
             event: n,
           };
 
-          return event as CalendarEvent;
+          return event;
         })
     : [];
+
+  const eventBuffers = getEventBuffers([
+    ...(calendarEvents.flatMap((e) => e.event) as ReservationType[]),
+    {
+      begin: initialReservation?.begin,
+      end: initialReservation?.end,
+      state: "INITIAL",
+      bufferTimeBefore: reservationUnit.bufferTimeBefore,
+      bufferTimeAfter: reservationUnit.bufferTimeAfter,
+    } as PendingReservation,
+  ]);
 
   const ToolbarWithProps = React.memo((props: ToolbarProps) => (
     <Toolbar
@@ -453,7 +476,7 @@ const ReservationUnit = ({
               <StyledH2>{t("reservations:reservationCalendar")}</StyledH2>
               <div aria-hidden>
                 <Calendar
-                  events={calendarEvents}
+                  events={[...calendarEvents, ...eventBuffers]}
                   begin={focusDate || new Date()}
                   onNavigate={(d: Date) => {
                     setFocusDate(d);

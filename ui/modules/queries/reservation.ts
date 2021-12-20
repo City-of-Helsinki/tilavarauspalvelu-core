@@ -84,6 +84,8 @@ export const LIST_RESERVATIONS = gql`
           end
           state
           price
+          bufferTimeBefore
+          bufferTimeAfter
           reservationUnits {
             pk
             nameFi
