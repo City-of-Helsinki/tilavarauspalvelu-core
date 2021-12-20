@@ -23,6 +23,7 @@ from reservation_units.models import (
     ReservationUnitType,
     TaxPercentage,
 )
+from reservations.models import ReservationMetadataSet
 from resources.models import Resource
 from services.models import Service
 from spaces.models import Space, Unit
@@ -184,6 +185,11 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
         source="tax_percentage",
         required=False,
     )
+    metadata_set_pk = IntegerPrimaryKeyField(
+        queryset=ReservationMetadataSet.objects.all(),
+        source="metadata_set",
+        required=False,
+    )
 
     translation_fields = get_all_translatable_fields(ReservationUnit)
 
@@ -227,6 +233,7 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
             "reservation_ends",
             "publish_begins",
             "publish_ends",
+            "metadata_set_pk",
         ] + get_all_translatable_fields(ReservationUnit)
 
     def __init__(self, *args, **kwargs):
@@ -240,6 +247,7 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
         self.fields["cancellation_terms_pk"].write_only = True
         self.fields["service_specific_terms_pk"].write_only = True
         self.fields["tax_percentage_pk"].write_only = True
+        self.fields["metadata_set_pk"].write_only = True
 
     def _check_pk_list(self, id_list, field_name):
         for identifier in id_list:
