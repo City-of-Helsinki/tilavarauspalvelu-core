@@ -29,6 +29,7 @@ from reservations.models import (
     RecurringReservation,
     Reservation,
     ReservationCancelReason,
+    ReservationMetadataSet,
     ReservationPurpose,
 )
 
@@ -215,4 +216,25 @@ class ReservationCancelReasonType(AuthNode, PrimaryKeyObjectType):
         model = ReservationCancelReason
         fields = ["pk", "reason", "reason_fi", "reason_en", "reason_sv"]
         filter_fields = ["reason"]
+        interfaces = (graphene.relay.Node,)
+
+
+class ReservationMetadataSetType(AuthNode, PrimaryKeyObjectType):
+    permission_classes = (
+        (AllowAuthenticated,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
+    )
+
+    supported_fields = graphene.List(graphene.String)
+    required_fields = graphene.List(graphene.String)
+
+    def resolve_supported_fields(self, info: ResolveInfo):
+        return self.supported_fields.all()
+
+    def resolve_required_fields(self, info: ResolveInfo):
+        return self.required_fields.all()
+
+    class Meta:
+        model = ReservationMetadataSet
+        fields = ["pk", "name", "supported_fields", "required_fields"]
+        filter_fields = []
         interfaces = (graphene.relay.Node,)
