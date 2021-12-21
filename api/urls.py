@@ -30,7 +30,7 @@ from .permissions_api import (
 from .reservation_units_api import (
     EquipmentCategoryViewSet,
     EquipmentViewSet,
-    PurposeViewSet,
+    ReservationPurposeViewSet,
     ReservationUnitTypeViewSet,
     ReservationUnitViewSet,
 )
@@ -101,7 +101,7 @@ router.register(
 
 router.register(r"opening_hour", OpeningHoursViewSet, "opening_hour")
 router.register(r"parameters/district", DistrictViewSet, "district")
-router.register(r"parameters/purpose", PurposeViewSet, "purpose")
+router.register(r"parameters/purpose", ReservationPurposeViewSet, "purpose")
 router.register(r"parameters/age_group", AgeGroupViewSet, "age_group")
 router.register(r"parameters/ability_group", AbilityGroupViewSet, "ability_group")
 router.register(
