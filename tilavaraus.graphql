@@ -9,10 +9,30 @@ type AbilityGroupType {
   pk: Int
 }
 
-type AgeGroupType {
+type AgeGroupType implements Node {
   minimum: Int!
   maximum: Int
+
+  """The ID of the object"""
+  id: ID!
   pk: Int
+}
+
+type AgeGroupTypeConnection {
+  """Pagination data for this connection."""
+  pageInfo: PageInfo!
+
+  """Contains the nodes in this connection."""
+  edges: [AgeGroupTypeEdge]!
+}
+
+"""A Relay edge containing a `AgeGroupType` and its cursor."""
+type AgeGroupTypeEdge {
+  """The item at the end of the edge"""
+  node: AgeGroupType
+
+  """A cursor for use in pagination"""
+  cursor: String!
 }
 
 type ApplicationRoundType {
@@ -58,6 +78,31 @@ type BuildingType implements Node {
   """The ID of the object"""
   id: ID!
   pk: Int
+}
+
+type CityType implements Node {
+  name: String!
+
+  """The ID of the object"""
+  id: ID!
+  pk: Int
+}
+
+type CityTypeConnection {
+  """Pagination data for this connection."""
+  pageInfo: PageInfo!
+
+  """Contains the nodes in this connection."""
+  edges: [CityTypeEdge]!
+}
+
+"""A Relay edge containing a `CityType` and its cursor."""
+type CityTypeEdge {
+  """The item at the end of the edge"""
+  node: CityType
+
+  """A cursor for use in pagination"""
+  cursor: String!
 }
 
 """
@@ -557,6 +602,9 @@ type Query {
   reservationPurposes(offset: Int = null, before: String = null, after: String = null, first: Int = null, last: Int = null, nameFi: String = null, nameEn: String = null, nameSv: String = null): ReservationPurposeTypeConnection
   termsOfUse(offset: Int = null, before: String = null, after: String = null, first: Int = null, last: Int = null, termsType: String = null): TermsOfUseTypeConnection
   taxPercentages(offset: Int = null, before: String = null, after: String = null, first: Int = null, last: Int = null, value: Float = null): TaxPercentageTypeConnection
+  ageGroups(offset: Int = null, before: String = null, after: String = null, first: Int = null, last: Int = null): AgeGroupTypeConnection
+  cities(offset: Int = null, before: String = null, after: String = null, first: Int = null, last: Int = null): CityTypeConnection
+  metadataSets(offset: Int = null, before: String = null, after: String = null, first: Int = null, last: Int = null): ReservationMetadataSetTypeConnection
 }
 
 type RealEstateType implements Node {
@@ -646,6 +694,32 @@ type ReservationConfirmMutationPayload {
   reserveeFirstName: String
   reserveeLastName: String
   reserveePhone: String
+  reserveeOrganisationName: String
+  reserveeAddressStreet: String
+  reserveeAddressCity: String
+  reserveeAddressZip: String
+  reserveeEmail: String
+
+  """
+  Type of the reservee. Possible values are business, nonprofit, individual.
+  """
+  reserveeType: String
+
+  """Reservee's business or association identity code"""
+  reserveeId: String
+  reserveeIsUnregisteredAssociation: Boolean
+  homeCityPk: Int
+  applyingForFreeOfCharge: Boolean
+  freeOfChargeReason: String
+  ageGroupPk: Int
+  billingFirstName: String
+  billingLastName: String
+  billingAddressStreet: String
+  billingAddressCity: String
+  billingAddressZip: String
+  billingPhone: String
+  billingEmail: String
+  numPersons: Int
   name: String
   description: String
 
@@ -660,6 +734,12 @@ type ReservationConfirmMutationPayload {
   confirmedAt: DateTime
 
   """The price of this particular reservation"""
+  unitPrice: Float
+
+  """The value of the tax percentage for this particular reservation"""
+  taxPercentageValue: Float
+
+  """The price of this particular reservation"""
   price: Float
 
   """May contain more than one error for same field."""
@@ -671,6 +751,32 @@ input ReservationCreateMutationInput {
   reserveeFirstName: String
   reserveeLastName: String
   reserveePhone: String
+  reserveeOrganisationName: String
+  reserveeAddressStreet: String
+  reserveeAddressCity: String
+  reserveeAddressZip: String
+  reserveeEmail: String
+
+  """
+  Type of the reservee. Possible values are business, nonprofit, individual.
+  """
+  reserveeType: String
+
+  """Reservee's business or association identity code"""
+  reserveeId: String
+  reserveeIsUnregisteredAssociation: Boolean
+  homeCityPk: Int
+  applyingForFreeOfCharge: Boolean
+  freeOfChargeReason: String
+  ageGroupPk: Int
+  billingFirstName: String
+  billingLastName: String
+  billingAddressStreet: String
+  billingAddressCity: String
+  billingAddressZip: String
+  billingPhone: String
+  billingEmail: String
+  numPersons: Int
   name: String
   description: String
   priority: Int
@@ -688,6 +794,32 @@ type ReservationCreateMutationPayload {
   reserveeFirstName: String
   reserveeLastName: String
   reserveePhone: String
+  reserveeOrganisationName: String
+  reserveeAddressStreet: String
+  reserveeAddressCity: String
+  reserveeAddressZip: String
+  reserveeEmail: String
+
+  """
+  Type of the reservee. Possible values are business, nonprofit, individual.
+  """
+  reserveeType: String
+
+  """Reservee's business or association identity code"""
+  reserveeId: String
+  reserveeIsUnregisteredAssociation: Boolean
+  homeCityPk: Int
+  applyingForFreeOfCharge: Boolean
+  freeOfChargeReason: String
+  ageGroupPk: Int
+  billingFirstName: String
+  billingLastName: String
+  billingAddressStreet: String
+  billingAddressCity: String
+  billingAddressZip: String
+  billingPhone: String
+  billingEmail: String
+  numPersons: Int
   name: String
   description: String
 
@@ -702,12 +834,45 @@ type ReservationCreateMutationPayload {
   confirmedAt: DateTime
 
   """The price of this particular reservation"""
+  unitPrice: Float
+
+  """The value of the tax percentage for this particular reservation"""
+  taxPercentageValue: Float
+
+  """The price of this particular reservation"""
   price: Float
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
   reservation: ReservationType
   clientMutationId: String
+}
+
+type ReservationMetadataSetType implements Node {
+  name: String!
+  supportedFields: [String]
+  requiredFields: [String]
+
+  """The ID of the object"""
+  id: ID!
+  pk: Int
+}
+
+type ReservationMetadataSetTypeConnection {
+  """Pagination data for this connection."""
+  pageInfo: PageInfo!
+
+  """Contains the nodes in this connection."""
+  edges: [ReservationMetadataSetTypeEdge]!
+}
+
+"""A Relay edge containing a `ReservationMetadataSetType` and its cursor."""
+type ReservationMetadataSetTypeEdge {
+  """The item at the end of the edge"""
+  node: ReservationMetadataSetType
+
+  """A cursor for use in pagination"""
+  cursor: String!
 }
 
 type ReservationPurposeType implements Node {
@@ -750,6 +915,18 @@ enum ReservationsReservationPriorityChoices {
 }
 
 """An enumeration."""
+enum ReservationsReservationReserveeTypeChoices {
+  """Business"""
+  BUSINESS
+
+  """Nonprofit"""
+  NONPROFIT
+
+  """Individual"""
+  INDIVIDUAL
+}
+
+"""An enumeration."""
 enum ReservationsReservationStateChoices {
   """created"""
   CREATED
@@ -765,9 +942,33 @@ enum ReservationsReservationStateChoices {
 }
 
 type ReservationType implements Node {
+  """Type of reservee"""
+  reserveeType: ReservationsReservationReserveeTypeChoices
   reserveeFirstName: String
   reserveeLastName: String
+  reserveeOrganisationName: String!
   reserveePhone: String
+  reserveeEmail: String
+
+  """Reservee's business or association identity code"""
+  reserveeId: String!
+  reserveeIsUnregisteredAssociation: Boolean!
+  reserveeAddressStreet: String!
+  reserveeAddressCity: String!
+  reserveeAddressZip: String!
+  billingFirstName: String!
+  billingLastName: String!
+  billingPhone: String!
+  billingEmail: String
+  billingAddressStreet: String!
+  billingAddressCity: String!
+  billingAddressZip: String!
+
+  """Home city of the group or association"""
+  homeCity: CityType
+  ageGroup: AgeGroupType
+  applyingForFreeOfCharge: Boolean!
+  freeOfChargeReason: String
   name: String
   description: String
   state: ReservationsReservationStateChoices!
@@ -780,9 +981,9 @@ type ReservationType implements Node {
   recurringReservation: RecurringReservationType
   numPersons: Int
   purpose: ReservationPurposeType
-
-  """The price of this particular reservation"""
-  price: Decimal!
+  unitPrice: Float
+  taxPercentageValue: Decimal
+  price: Float
 
   """The ID of the object"""
   id: ID!
@@ -835,8 +1036,8 @@ type ReservationUnitByPkType implements Node {
   uuid: UUID!
   isDraft: Boolean!
   maxPersons: Int
-  bufferTimeBefore: Float
-  bufferTimeAfter: Float
+  bufferTimeBefore: Time
+  bufferTimeAfter: Time
 
   """Unit of the price"""
   priceUnit: ReservationUnitsReservationUnitPriceUnitChoices!
@@ -855,6 +1056,7 @@ type ReservationUnitByPkType implements Node {
   interval_90_mins.
   """
   reservationStartInterval: ReservationUnitsReservationUnitReservationStartIntervalChoices!
+  metadataSet: ReservationMetadataSetType
   images: [ReservationUnitImageType]
 
   """The ID of the object"""
@@ -864,7 +1066,7 @@ type ReservationUnitByPkType implements Node {
   location: LocationType
   equipment: [EquipmentType]
   unit: UnitType
-  surfaceArea: Int
+  surfaceArea: Decimal
   keywordGroups: [KeywordGroupType]
   reservations(from: Date = null, to: Date = null, state: [String] = null): [ReservationType]
   applicationRounds(active: Boolean = null): [ApplicationRoundType]
@@ -971,21 +1173,38 @@ input ReservationUnitCreateMutationInput {
   """
   reservationStartInterval: String
   taxPercentagePk: Int
-  additionalInstructionsFi: String
-  additionalInstructionsEn: String
-  additionalInstructionsSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
+
+  """
+  Time when making reservations become possible for this reservation unit.
+  """
+  reservationBegins: DateTime
+
+  """
+  Time when making reservations become not possible for this reservation unit
+  """
+  reservationEnds: DateTime
+
+  """Time after this reservation unit should be publicly visible in UI."""
+  publishBegins: DateTime
+
+  """Time after this reservation unit should not be publicly visible in UI."""
+  publishEnds: DateTime
+  metadataSetPk: Int
   nameFi: String
   nameEn: String
   nameSv: String
   contactInformationFi: String
   contactInformationEn: String
   contactInformationSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
+  additionalInstructionsFi: String
+  additionalInstructionsEn: String
+  additionalInstructionsSv: String
   clientMutationId: String
 }
 
@@ -1048,21 +1267,37 @@ type ReservationUnitCreateMutationPayload {
   interval_90_mins.
   """
   reservationStartInterval: String
-  additionalInstructionsFi: String
-  additionalInstructionsEn: String
-  additionalInstructionsSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
+
+  """
+  Time when making reservations become possible for this reservation unit.
+  """
+  reservationBegins: DateTime
+
+  """
+  Time when making reservations become not possible for this reservation unit
+  """
+  reservationEnds: DateTime
+
+  """Time after this reservation unit should be publicly visible in UI."""
+  publishBegins: DateTime
+
+  """Time after this reservation unit should not be publicly visible in UI."""
+  publishEnds: DateTime
   nameFi: String
   nameEn: String
   nameSv: String
   contactInformationFi: String
   contactInformationEn: String
   contactInformationSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
+  additionalInstructionsFi: String
+  additionalInstructionsEn: String
+  additionalInstructionsSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -1202,9 +1437,9 @@ type ReservationUnitType implements Node {
   uuid: UUID!
   isDraft: Boolean!
   maxPersons: Int
-  surfaceArea: Int
-  bufferTimeBefore: Float
-  bufferTimeAfter: Float
+  surfaceArea: Decimal
+  bufferTimeBefore: Time
+  bufferTimeAfter: Time
   cancellationRule: ReservationUnitCancellationRuleType
 
   """Unit of the price"""
@@ -1224,6 +1459,23 @@ type ReservationUnitType implements Node {
   interval_90_mins.
   """
   reservationStartInterval: ReservationUnitsReservationUnitReservationStartIntervalChoices!
+
+  """
+  Time when making reservations become possible for this reservation unit.
+  """
+  reservationBegins: DateTime
+
+  """
+  Time when making reservations become not possible for this reservation unit
+  """
+  reservationEnds: DateTime
+
+  """Time after this reservation unit should be publicly visible in UI."""
+  publishBegins: DateTime
+
+  """Time after this reservation unit should not be publicly visible in UI."""
+  publishEnds: DateTime
+  metadataSet: ReservationMetadataSetType
   images: [ReservationUnitImageType]
   applicationRounds(active: Boolean = null): [ApplicationRoundType]
 
@@ -1326,21 +1578,38 @@ input ReservationUnitUpdateMutationInput {
   """
   reservationStartInterval: String
   taxPercentagePk: Int
-  additionalInstructionsFi: String
-  additionalInstructionsEn: String
-  additionalInstructionsSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
+
+  """
+  Time when making reservations become possible for this reservation unit.
+  """
+  reservationBegins: DateTime
+
+  """
+  Time when making reservations become not possible for this reservation unit
+  """
+  reservationEnds: DateTime
+
+  """Time after this reservation unit should be publicly visible in UI."""
+  publishBegins: DateTime
+
+  """Time after this reservation unit should not be publicly visible in UI."""
+  publishEnds: DateTime
+  metadataSetPk: Int
   nameFi: String
   nameEn: String
   nameSv: String
   contactInformationFi: String
   contactInformationEn: String
   contactInformationSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
+  additionalInstructionsFi: String
+  additionalInstructionsEn: String
+  additionalInstructionsSv: String
   clientMutationId: String
 }
 
@@ -1403,21 +1672,37 @@ type ReservationUnitUpdateMutationPayload {
   interval_90_mins.
   """
   reservationStartInterval: String
-  additionalInstructionsFi: String
-  additionalInstructionsEn: String
-  additionalInstructionsSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
+
+  """
+  Time when making reservations become possible for this reservation unit.
+  """
+  reservationBegins: DateTime
+
+  """
+  Time when making reservations become not possible for this reservation unit
+  """
+  reservationEnds: DateTime
+
+  """Time after this reservation unit should be publicly visible in UI."""
+  publishBegins: DateTime
+
+  """Time after this reservation unit should not be publicly visible in UI."""
+  publishEnds: DateTime
   nameFi: String
   nameEn: String
   nameSv: String
   contactInformationFi: String
   contactInformationEn: String
   contactInformationSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
+  additionalInstructionsFi: String
+  additionalInstructionsEn: String
+  additionalInstructionsSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -1430,6 +1715,32 @@ input ReservationUpdateMutationInput {
   reserveeFirstName: String
   reserveeLastName: String
   reserveePhone: String
+  reserveeOrganisationName: String
+  reserveeAddressStreet: String
+  reserveeAddressCity: String
+  reserveeAddressZip: String
+  reserveeEmail: String
+
+  """
+  Type of the reservee. Possible values are business, nonprofit, individual.
+  """
+  reserveeType: String
+
+  """Reservee's business or association identity code"""
+  reserveeId: String
+  reserveeIsUnregisteredAssociation: Boolean
+  homeCityPk: Int
+  applyingForFreeOfCharge: Boolean
+  freeOfChargeReason: String
+  ageGroupPk: Int
+  billingFirstName: String
+  billingLastName: String
+  billingAddressStreet: String
+  billingAddressCity: String
+  billingAddressZip: String
+  billingPhone: String
+  billingEmail: String
+  numPersons: Int
   name: String
   description: String
 
@@ -1450,6 +1761,32 @@ type ReservationUpdateMutationPayload {
   reserveeFirstName: String
   reserveeLastName: String
   reserveePhone: String
+  reserveeOrganisationName: String
+  reserveeAddressStreet: String
+  reserveeAddressCity: String
+  reserveeAddressZip: String
+  reserveeEmail: String
+
+  """
+  Type of the reservee. Possible values are business, nonprofit, individual.
+  """
+  reserveeType: String
+
+  """Reservee's business or association identity code"""
+  reserveeId: String
+  reserveeIsUnregisteredAssociation: Boolean
+  homeCityPk: Int
+  applyingForFreeOfCharge: Boolean
+  freeOfChargeReason: String
+  ageGroupPk: Int
+  billingFirstName: String
+  billingLastName: String
+  billingAddressStreet: String
+  billingAddressCity: String
+  billingAddressZip: String
+  billingPhone: String
+  billingEmail: String
+  numPersons: Int
   name: String
   description: String
 
@@ -1462,6 +1799,12 @@ type ReservationUpdateMutationPayload {
   bufferTimeAfter: String
   purposePk: Int
   confirmedAt: DateTime
+
+  """The price of this particular reservation"""
+  unitPrice: Float
+
+  """The value of the tax percentage for this particular reservation"""
+  taxPercentageValue: Float
 
   """The price of this particular reservation"""
   price: Float
