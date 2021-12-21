@@ -290,6 +290,8 @@ export type PendingReservation = {
   begin: string;
   end: string;
   state: "INITIAL";
+  bufferTimeBefore?: string;
+  bufferTimeAfter?: string;
 };
 
 export type RecurringReservation = {

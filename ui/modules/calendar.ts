@@ -1,5 +1,7 @@
 import {
   addDays,
+  addHours,
+  addMinutes,
   areIntervalsOverlapping,
   differenceInMinutes,
   getISODay,
@@ -9,13 +11,21 @@ import {
   startOfDay,
 } from "date-fns";
 import { TFunction } from "next-i18next";
-import { SlotProps } from "../components/calendar/Calendar";
+import {
+  CalendarEventBuffer,
+  SlotProps,
+} from "../components/calendar/Calendar";
 import {
   OpeningTimesType,
   ReservationType,
   ReservationUnitsReservationUnitReservationStartIntervalChoices,
 } from "./gql-types";
-import { ApplicationEvent, ApplicationRound, OptionType } from "./types";
+import {
+  ApplicationEvent,
+  ApplicationRound,
+  OptionType,
+  PendingReservation,
+} from "./types";
 import {
   apiDurationToMinutes,
   convertHMSToSeconds,
@@ -150,10 +160,11 @@ export const doReservationsCollide = (
   reservations: ReservationType[],
   newReservation: { start: Date; end: Date }
 ): boolean => {
+  const { start, end } = newReservation;
   return reservations.some((reservation) =>
     areIntervalsOverlapping(
       { start: new Date(reservation.begin), end: new Date(reservation.end) },
-      newReservation
+      { start, end }
     )
   );
 };
@@ -252,4 +263,111 @@ export const getTimeslots = (
     default:
       return 2;
   }
+};
+
+export const getBufferedEventTimes = (
+  start: Date,
+  end: Date,
+  bufferTimeBefore?: string,
+  bufferTimeAfter?: string
+): { start: Date; end: Date } => {
+  const [beforeHours, beforeMinutes]: number[] = bufferTimeBefore
+    ?.split(":")
+    .map(Number) || [0, 0];
+  const [afterHours, afterMinutes]: number[] = bufferTimeAfter
+    ?.split(":")
+    .map(Number) || [0, 0];
+  const before = addMinutes(
+    addHours(start, -1 * beforeHours),
+    -1 * beforeMinutes
+  );
+  const after = addMinutes(addHours(end, afterHours), afterMinutes);
+  return { start: before, end: after };
+};
+
+export const doesBufferCollide = (
+  reservation: ReservationType,
+  newReservation: {
+    start: Date;
+    end: Date;
+    bufferTimeBefore: string;
+    bufferTimeAfter: string;
+  }
+): boolean => {
+  const newReservationStartBuffer =
+    reservation.bufferTimeAfter > newReservation.bufferTimeBefore
+      ? reservation.bufferTimeAfter
+      : newReservation.bufferTimeBefore;
+  const newReservationEndBuffer =
+    reservation.bufferTimeBefore > newReservation.bufferTimeAfter
+      ? reservation.bufferTimeBefore
+      : newReservation.bufferTimeAfter;
+
+  const bufferedNewReservation = getBufferedEventTimes(
+    newReservation.start,
+    newReservation.end,
+    newReservationStartBuffer,
+    newReservationEndBuffer
+  );
+
+  const reservationInterval = {
+    start: new Date(reservation.begin),
+    end: new Date(reservation.end),
+  };
+
+  const bufferedNewReservationInterval = {
+    start: bufferedNewReservation.start,
+    end: bufferedNewReservation.end,
+  };
+
+  return areIntervalsOverlapping(
+    reservationInterval,
+    bufferedNewReservationInterval
+  );
+};
+
+export const doBuffersCollide = (
+  reservations: ReservationType[],
+  newReservation: {
+    start: Date;
+    end: Date;
+    bufferTimeBefore: string;
+    bufferTimeAfter: string;
+  }
+): boolean => {
+  return reservations.some((reservation) =>
+    doesBufferCollide(reservation, newReservation)
+  );
+};
+
+export const getEventBuffers = (
+  events: (PendingReservation | ReservationType)[]
+): CalendarEventBuffer[] => {
+  const buffers: CalendarEventBuffer[] = [];
+  events.forEach((event) => {
+    const { bufferTimeBefore, bufferTimeAfter } = event;
+    const begin = new Date(event.begin);
+    const end = new Date(event.end);
+
+    if (bufferTimeBefore) {
+      const [hours, minutes]: number[] = bufferTimeBefore
+        .split(":")
+        .map(Number);
+      buffers.push({
+        start: addMinutes(addHours(begin, -1 * hours), -1 * minutes),
+        end: begin,
+        event: { ...event, state: "BUFFER" },
+      });
+    }
+    if (bufferTimeAfter) {
+      const [hours, minutes]: number[] = bufferTimeAfter.split(":").map(Number);
+      buffers.push({
+        start: end,
+        end: addMinutes(addHours(end, hours), minutes),
+        event: { ...event, state: "BUFFER" },
+      });
+    }
+  });
+
+  return buffers;
 };

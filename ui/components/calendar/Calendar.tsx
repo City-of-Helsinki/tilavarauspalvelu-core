@@ -26,13 +26,23 @@ export type CalendarEvent = {
   event: Reservation | ReservationType;
 };
 
+export type CalendarBufferEvent = {
+  state: "BUFFER";
+};
+
+export type CalendarEventBuffer = {
+  start: Date;
+  end: Date;
+  event: CalendarBufferEvent;
+};
+
 export type SlotProps = {
   className?: string;
   style?: React.CSSProperties;
 };
 
 type Props = {
-  events: CalendarEvent[];
+  events: (CalendarEvent | CalendarEventBuffer)[];
   begin: Date;
   customEventStyleGetter?: ({ event }: CalendarEvent) => {
     style: React.CSSProperties;
@@ -114,6 +124,7 @@ const StyledCalendar = styled(BigCalendar)<{
   }}
 
   .rbc-timeslot-group {
+    z-index: 2;
     border-bottom: 0;
     min-height: ${({ step }) => {
       switch (step) {
@@ -320,6 +331,21 @@ const StyledCalendar = styled(BigCalendar)<{
         cursor: move;
       }
     }
+
+    width: 100% !important;
+    left: 0 !important;
+    z-index: 2 !important;
+  }
+
+  .rbc-event-buffer {
+    color: var(--color-black-10) !important;
+    border-top: none !important;
+    border-bottom: none !important;
+    border-color: var(--color-black-20) !important;
+    border-right-color: var(--color-black-10) !important;
+    border-left-color: var(--color-black-40) !important;
+    z-index: 1 !important;
+    opacity: 1 !important;
   }
 `;
 

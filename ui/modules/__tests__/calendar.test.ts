@@ -1,8 +1,13 @@
 import { addDays, format } from "date-fns";
 import {
   areSlotsReservable,
+  doBuffersCollide,
+  doesBufferCollide,
   doReservationsCollide,
+  getBufferedEventTimes,
   getDayIntervals,
+  getEventBuffers,
+  getTimeslots,
   isReservationLongEnough,
   isReservationShortEnough,
   isSlotWithinTimeframe,
@@ -288,5 +293,203 @@ describe("isStartTimeWithinInterval", () => {
         "INTERVAL_15_MINS" as ReservationUnitsReservationUnitReservationStartIntervalChoices
       )
     ).toBe(false);
+  });
+});
+
+describe("getTimeslots", () => {
+  test("returns 3 for 90min interval", () => {
+    expect(
+      getTimeslots(
+        ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_90Mins
+      )
+    ).toBe(3);
+  });
+
+  test("returns 2 for all rest", () => {
+    expect(
+      getTimeslots(
+        ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_15Mins
+      )
+    ).toBe(2);
+    expect(
+      getTimeslots(
+        ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_30Mins
+      )
+    ).toBe(2);
+    expect(
+      getTimeslots(
+        ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_60Mins
+      )
+    ).toBe(2);
+    expect(
+      getTimeslots(
+        "foo" as ReservationUnitsReservationUnitReservationStartIntervalChoices
+      )
+    ).toBe(2);
+    expect(
+      getTimeslots(
+        null as ReservationUnitsReservationUnitReservationStartIntervalChoices
+      )
+    ).toBe(2);
+  });
+});
+
+describe("getBufferedEventTimes", () => {
+  const start = new Date("2019-09-22T12:00:00+00:00");
+  const end = new Date("2019-09-22T13:00:00+00:00");
+
+  test("with a buffer", () => {
+    expect(getBufferedEventTimes(start, end, "00:30:00", "01:00:00")).toEqual({
+      start: new Date("2019-09-22T11:30:00+00:00"),
+      end: new Date("2019-09-22T14:00:00+00:00"),
+    });
+    expect(getBufferedEventTimes(start, end, null, "01:00:00")).toEqual({
+      start: new Date("2019-09-22T12:00:00+00:00"),
+      end: new Date("2019-09-22T14:00:00+00:00"),
+    });
+    expect(getBufferedEventTimes(start, end, "01:00:00")).toEqual({
+      start: new Date("2019-09-22T11:00:00+00:00"),
+      end: new Date("2019-09-22T13:00:00+00:00"),
+    });
+  });
+
+  test("without a buffer", () => {
+    expect(getBufferedEventTimes(start, end, null, null)).toEqual({
+      start,
+      end,
+    });
+
+    expect(getBufferedEventTimes(start, end)).toEqual({
+      start,
+      end,
+    });
+  });
+});
+
+describe("doesBuffer(s)Collide", () => {
+  const reservations = [
+    {
+      begin: new Date("2019-09-22T12:00:00+00:00"),
+      end: new Date("2019-09-22T13:00:00+00:00"),
+      bufferTimeBefore: "01:00:00",
+      bufferTimeAfter: "01:00:00",
+    },
+    {
+      begin: new Date("2019-09-22T16:00:00+00:00"),
+      end: new Date("2019-09-22T17:00:00+00:00"),
+      bufferTimeBefore: "01:00:00",
+      bufferTimeAfter: "01:00:00",
+    },
+  ] as ReservationType[];
+  test("detects collisions", () => {
+    expect(
+      doesBufferCollide(reservations[0], {
+        start: new Date("2019-09-22T14:00:00+00:00"),
+        end: new Date("2019-09-22T15:00:00+00:00"),
+        bufferTimeBefore: "01:30:00",
+        bufferTimeAfter: null,
+      })
+    ).toBe(true);
+
+    expect(
+      doesBufferCollide(reservations[0], {
+        start: new Date("2019-09-22T10:00:00+00:00"),
+        end: new Date("2019-09-22T10:30:00+00:00"),
+        bufferTimeBefore: null,
+        bufferTimeAfter: "01:30:00",
+      })
+    ).toBe(false);
+
+    expect(
+      doesBufferCollide(reservations[0], {
+        start: new Date("2019-09-22T10:00:00+00:00"),
+        end: new Date("2019-09-22T10:30:00+00:00"),
+        bufferTimeBefore: null,
+        bufferTimeAfter: "01:31:00",
+      })
+    ).toBe(true);
+
+    expect(
+      doBuffersCollide(reservations, {
+        start: new Date("2019-09-22T14:00:00+00:00"),
+        end: new Date("2019-09-22T14:15:00+00:00"),
+        bufferTimeBefore: "01:00:00",
+        bufferTimeAfter: null,
+      })
+    ).toBe(false);
+
+    expect(
+      doBuffersCollide(reservations, {
+        start: new Date("2019-09-22T14:00:00+00:00"),
+        end: new Date("2019-09-22T14:15:00+00:00"),
+        bufferTimeBefore: "01:01:00",
+        bufferTimeAfter: null,
+      })
+    ).toBe(true);
+
+    expect(
+      doBuffersCollide(reservations, {
+        start: new Date("2019-09-22T14:00:00+00:00"),
+        end: new Date("2019-09-22T15:00:00+00:00"),
+        bufferTimeBefore: "01:00:00",
+        bufferTimeAfter: null,
+      })
+    ).toBe(false);
+
+    expect(
+      doBuffersCollide(reservations, {
+        start: new Date("2019-09-22T14:00:00+00:00"),
+        end: new Date("2019-09-22T15:00:00+00:00"),
+        bufferTimeBefore: "01:00:00",
+        bufferTimeAfter: "01:01:00",
+      })
+    ).toBe(true);
+  });
+});
+
+describe("getEventBuffers", () => {
+  test("outputs correct buffers", () => {
+    const events = [
+      {
+        begin: new Date("2019-09-22T12:00:00+00:00"),
+        end: new Date("2019-09-22T13:00:00+00:00"),
+        bufferTimeBefore: "01:00:00",
+        bufferTimeAfter: "01:30:00",
+      },
+      {
+        begin: new Date("2019-09-22T15:00:00+00:00"),
+        end: new Date("2019-09-22T16:00:00+00:00"),
+        bufferTimeBefore: null,
+        bufferTimeAfter: "02:30:00",
+      },
+    ] as ReservationType[];
+
+    expect(getEventBuffers([])).toEqual([]);
+    expect(getEventBuffers(events)).toEqual([
+      {
+        start: new Date("2019-09-22T11:00:00+00:00"),
+        end: new Date("2019-09-22T12:00:00+00:00"),
+        event: {
+          ...events[0],
+          state: "BUFFER",
+        },
+      },
+      {
+        start: new Date("2019-09-22T13:00:00+00:00"),
+        end: new Date("2019-09-22T14:30:00+00:00"),
+        event: {
+          ...events[0],
+          state: "BUFFER",
+        },
+      },
+      {
+        start: new Date("2019-09-22T16:00:00+00:00"),
+        end: new Date("2019-09-22T18:30:00+00:00"),
+        event: {
+          ...events[1],
+          state: "BUFFER",
+        },
+      },
+    ]);
   });
 });
