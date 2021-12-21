@@ -243,38 +243,46 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
             begin, self.instance
         )
 
+        buffer_before = max(
+            [
+                buffer
+                for buffer in (
+                    getattr(reservation_before, "buffer_time_after", None),
+                    reservation_unit.buffer_time_before,
+                )
+                if buffer
+            ],
+            default=None,
+        )
+
+        buffer_after = max(
+            [
+                buffer
+                for buffer in (
+                    getattr(reservation_after, "buffer_time_before", None),
+                    reservation_unit.buffer_time_after,
+                )
+                if buffer
+            ],
+            default=None,
+        )
+
         if (
             reservation_before
-            and reservation_before.buffer_time_after
-            and (reservation_before.end + reservation_before.buffer_time_after) > begin
+            and buffer_before
+            and (reservation_before.end + buffer_before) > begin
         ):
             raise serializers.ValidationError(
-                "Existing reservation occurring before this has buffer time which overlaps this reservation."
+                "Reservation overlaps with reservation before due to buffer time."
             )
 
         if (
             reservation_after
-            and reservation_after.buffer_time_before
-            and (reservation_after.begin - reservation_after.buffer_time_before) < end
+            and buffer_after
+            and (reservation_after.begin - buffer_after) < end
         ):
             raise serializers.ValidationError(
-                "Existing reservation occurring after this has buffer time which overlaps this reservation."
-            )
-        if (
-            reservation_unit.buffer_time_before
-            and reservation_before
-            and (reservation_before.end + reservation_unit.buffer_time_before) > begin
-        ):
-            raise serializers.ValidationError(
-                "Reservation unit buffer time before overlaps with current begin time."
-            )
-        if (
-            reservation_unit.buffer_time_after
-            and reservation_after
-            and (reservation_after.begin - reservation_unit.buffer_time_after) < end
-        ):
-            raise serializers.ValidationError(
-                "Reservation unit buffer time after overlaps with current end time."
+                "Reservation overlaps with reservation after due to buffer time."
             )
 
     def check_reservation_start_time(self, begin, scheduler):

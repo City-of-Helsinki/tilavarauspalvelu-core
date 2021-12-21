@@ -444,7 +444,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         ).is_not_none()
         assert_that(
             content.get("data").get("createReservation").get("errors")[0]["messages"][0]
-        ).contains("before this has buffer time which overlaps this reservation.")
+        ).contains("Reservation overlaps with reservation before due to buffer time.")
 
     def test_create_fails_when_buffer_time_overlaps_reservation_after(
         self, mock_periods, mock_opening_hours
@@ -472,7 +472,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         ).is_not_none()
         assert_that(
             content.get("data").get("createReservation").get("errors")[0]["messages"][0]
-        ).contains("after this has buffer time which overlaps this reservation.")
+        ).contains("Reservation overlaps with reservation after due to buffer time.")
 
     def test_create_fails_when_reservation_unit_buffer_time_overlaps_with_existing_reservation_before(
         self, mock_periods, mock_opening_hours
@@ -503,9 +503,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         ).is_not_none()
         assert_that(
             content.get("data").get("createReservation").get("errors")[0]["messages"][0]
-        ).contains(
-            "Reservation unit buffer time before overlaps with current begin time."
-        )
+        ).contains("Reservation overlaps with reservation before due to buffer time.")
 
     def test_create_fails_when_reservation_unit_buffer_time_overlaps_with_existing_reservation_after(
         self, mock_periods, mock_opening_hours
@@ -534,7 +532,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         ).is_not_none()
         assert_that(
             content.get("data").get("createReservation").get("errors")[0]["messages"][0]
-        ).contains("Reservation unit buffer time after overlaps with current end time.")
+        ).contains("Reservation overlaps with reservation after due to buffer time.")
 
     def test_create_fails_when_reservation_unit_closed_on_selected_time(
         self, mock_periods, mock_opening_hours
@@ -992,7 +990,7 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         ).is_not_none()
         assert_that(
             content.get("data").get("updateReservation").get("errors")[0]["messages"][0]
-        ).contains("before this has buffer time which overlaps this reservation.")
+        ).contains("Reservation overlaps with reservation before due to buffer time.")
         self.reservation.refresh_from_db()
         assert_that(self.reservation.priority).is_equal_to(100)
 
@@ -1022,7 +1020,7 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         ).is_not_none()
         assert_that(
             content.get("data").get("updateReservation").get("errors")[0]["messages"][0]
-        ).contains("after this has buffer time which overlaps this reservation.")
+        ).contains("Reservation overlaps with reservation after due to buffer time.")
 
     def test_update_fails_when_reservation_unit_buffer_time_overlaps_with_existing_reservation_before(
         self, mock_periods, mock_opening_hours
@@ -1054,9 +1052,7 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         ).is_not_none()
         assert_that(
             content.get("data").get("updateReservation").get("errors")[0]["messages"][0]
-        ).contains(
-            "Reservation unit buffer time before overlaps with current begin time."
-        )
+        ).contains("Reservation overlaps with reservation before due to buffer time.")
 
     def test_update_fails_when_reservation_unit_buffer_time_overlaps_with_existing_reservation_after(
         self, mock_periods, mock_opening_hours
@@ -1085,7 +1081,7 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         ).is_not_none()
         assert_that(
             content.get("data").get("updateReservation").get("errors")[0]["messages"][0]
-        ).contains("Reservation unit buffer time after overlaps with current end time.")
+        ).contains("Reservation overlaps with reservation after due to buffer time.")
 
     def test_update_fails_when_reservation_unit_closed_on_selected_time(
         self, mock_periods, mock_opening_hours
