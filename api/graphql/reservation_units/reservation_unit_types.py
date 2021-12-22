@@ -355,6 +355,7 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
             "publish_begins",
             "publish_ends",
             "metadata_set",
+            "max_reservations_per_user",
         ] + get_all_translatable_fields(model)
         filter_fields = {
             "name_fi": ["exact", "icontains", "istartswith"],
@@ -518,6 +519,7 @@ class ReservationUnitByPkType(ReservationUnitType, OpeningHoursMixin):
             "reservation_ends",
             "publish_begins",
             "publish_ends",
+            "max_reservations_per_user",
         ] + get_all_translatable_fields(model)
 
         interfaces = (graphene.relay.Node,)
