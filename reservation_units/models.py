@@ -379,6 +379,11 @@ class ReservationUnit(models.Model):
             "and required form fields for this reservation unit."
         ),
     )
+    max_reservations_per_user = models.PositiveIntegerField(
+        verbose_name=_("Maximum number of active reservations per user"),
+        null=True,
+        blank=True,
+    )
 
     def __str__(self):
         return "{}".format(self.name)
