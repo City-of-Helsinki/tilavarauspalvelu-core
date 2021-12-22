@@ -359,6 +359,7 @@ snapshots['ReservationUnitQueryTestCase::test_getting_reservation_units 1'] = {
                         'location': None,
                         'lowestPrice': '0.00',
                         'maxPersons': 110,
+                        'maxReservationsPerUser': 5,
                         'metadataSet': {
                             'name': 'Test form',
                             'requiredFields': [],
