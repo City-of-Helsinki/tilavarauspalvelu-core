@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.db.models import F, Sum
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from applications.models import (
@@ -149,6 +150,9 @@ class ReservationQuerySet(models.QuerySet):
             reservation_unit__metadata_set__isnull=False,
             recurring_reservation=None,
         )
+
+    def active(self):
+        return self.filter(end__gte=timezone.now()).going_to_occur()
 
 
 class Reservation(models.Model):
