@@ -64,7 +64,7 @@ If you want to run background processes synchronously without celery,
 set environment variable CELERY_ENABLED to false.
 
 When developing locally without docker, you need to run celery worker manually
-by executing in the project root `celery -A tilavarauspalvelu worker` if you want to run background jobs with celery.
+by executing in the project root `celery -A tilavarauspalvelu worker --beat` if you want to run background jobs with celery.
 
 In development environments it's easiest to use file system backend (the current default),
 you need to create a queue and processed folders and update env variables 

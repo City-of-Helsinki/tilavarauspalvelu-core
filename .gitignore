@@ -25,3 +25,4 @@ perf*csv
 .DS_Store
 /staticroot/
 /broker
+celerybeat-schedule
