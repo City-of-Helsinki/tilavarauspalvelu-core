@@ -1,7 +1,10 @@
+from datetime import datetime, timedelta
+
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.db.models import F, Sum
 from django.utils import timezone
+from django.utils.timezone import get_current_timezone
 from django.utils.translation import gettext_lazy as _
 
 from applications.models import (
@@ -153,6 +156,13 @@ class ReservationQuerySet(models.QuerySet):
 
     def active(self):
         return self.filter(end__gte=timezone.now()).going_to_occur()
+
+    def inactive(self, older_than_minutes: int):
+        return self.filter(
+            state=STATE_CHOICES.CREATED,
+            created_at__lte=datetime.now(tz=get_current_timezone())
+            - timedelta(minutes=older_than_minutes),
+        )
 
 
 class Reservation(models.Model):
@@ -344,6 +354,9 @@ class Reservation(models.Model):
         verbose_name=_("Details for this reservation's cancellation"), blank=True
     )
 
+    created_at = models.DateTimeField(
+        verbose_name=_("Created at"), null=True, default=timezone.now
+    )
     confirmed_at = models.DateTimeField(verbose_name=_("Confirmed at"), null=True)
 
     unit_price = models.DecimalField(
