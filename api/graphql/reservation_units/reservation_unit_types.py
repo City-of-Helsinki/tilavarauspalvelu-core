@@ -514,6 +514,10 @@ class ReservationUnitByPkType(ReservationUnitType, OpeningHoursMixin):
             "buffer_time_before",
             "buffer_time_after",
             "metadata_set",
+            "reservation_begins",
+            "reservation_ends",
+            "publish_begins",
+            "publish_ends",
         ] + get_all_translatable_fields(model)
 
         interfaces = (graphene.relay.Node,)
