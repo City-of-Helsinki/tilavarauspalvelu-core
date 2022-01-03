@@ -71,3 +71,19 @@ export function notificationCloseButton(): Cypress.Chainable<
 > {
   return cy.get('[aria-label="Sulje virheilmoitus"]');
 }
+
+export function reservationStartNotification(): Cypress.Chainable<
+  JQuery<HTMLElement>
+> {
+  return cy.get(
+    '[data-testid="reservation-unit--notification__reservation-start"]'
+  );
+}
+
+export function gotoCalendarButton(): Cypress.Chainable<JQuery<HTMLElement>> {
+  return cy.get('[data-testid="reservation-unit__button--goto-calendar"]');
+}
+
+export function calendarWrapper(): Cypress.Chainable<JQuery<HTMLElement>> {
+  return cy.get('[data-testid="reservation-unit__calendar--wrapper"]');
+}

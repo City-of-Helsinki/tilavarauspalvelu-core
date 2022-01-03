@@ -21,6 +21,9 @@ import {
   notificationCloseButton,
   startTimeSelectorToggle,
   notificationContainer,
+  reservationStartNotification,
+  gotoCalendarButton,
+  calendarWrapper,
 } from "model/reservation-creation";
 import { textWithIcon } from "model/search";
 
@@ -95,6 +98,10 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
     textWithIcon(3).contains("Max 1 tunti 30 minuuttia");
     textWithIcon(4).contains("Nuorisopalvelut Fi");
     textWithIcon(5).contains("60 henkilöä");
+
+    gotoCalendarButton().should("exist");
+
+    calendarWrapper().should("exist");
 
     drawReservation();
 
@@ -416,5 +423,17 @@ describe("Tilavaraus ui reservation unit page (single) preview", () => {
     );
 
     cy.get("h1").should("contain", "Pukinmäen nuorisotalon keittiö");
+  });
+});
+
+describe("Tilavaraus ui reservation unit page (single) with reservation times", () => {
+  it("should display no calendar when off season", () => {
+    cy.visit("/reservation-unit/single/900");
+
+    gotoCalendarButton().should("not.exist");
+
+    calendarWrapper().should("not.exist");
+
+    reservationStartNotification().should("contain", "Varaaminen alkaa");
   });
 });

@@ -29,6 +29,7 @@ import {
 import { MediumButton } from "../../styles/util";
 import { ReservationUnitByPkType } from "../../modules/gql-types";
 import { getPrice } from "../../modules/reservationUnit";
+import { isReservationUnitReservable } from "../../modules/calendar";
 
 interface PropsType {
   reservationUnit: ReservationUnitByPkType;
@@ -172,13 +173,10 @@ const Head = ({
                 />
                 {viewType === "single" &&
                   reservationUnit.nextAvailableSlot &&
-                  reservationUnit.maxReservationDuration && (
+                  reservationUnit.maxReservationDuration &&
+                  isReservationUnitReservable(reservationUnit) && (
                     <StyledIconWithText
-                      icon={
-                        <IconCalendarClock
-                          aria-label={t("reservationUnit:type")}
-                        />
-                      }
+                      icon={<IconCalendarClock aria-label="" />}
                       text={`${t("reservationCalendar:nextAvailableSlot", {
                         count:
                           reservationUnit.maxReservationDuration.startsWith(
@@ -265,7 +263,8 @@ const Head = ({
                 ))}
               {viewType === "single" &&
                 reservationUnit.minReservationDuration &&
-                reservationUnit.maxReservationDuration && (
+                reservationUnit.maxReservationDuration &&
+                isReservationUnitReservable(reservationUnit) && (
                   <ThinButton
                     onClick={() => {
                       window.scroll({
@@ -274,6 +273,7 @@ const Head = ({
                         behavior: "smooth",
                       });
                     }}
+                    data-testid="reservation-unit__button--goto-calendar"
                   >
                     {t("reservationCalendar:showCalendar")}
                   </ThinButton>

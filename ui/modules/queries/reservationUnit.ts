@@ -31,6 +31,8 @@ export const RESERVATION_UNIT = gql`
       bufferTimeBefore
       bufferTimeAfter
       reservationStartInterval
+      reservationBegins
+      reservationEnds
       serviceSpecificTerms {
         nameFi
         nameEn
@@ -125,6 +127,8 @@ export const RESERVATION_UNITS = gql`
           highestPrice
           priceUnit
           nameFi
+          reservationBegins
+          reservationEnds
           reservationUnitType {
             id: pk
             nameFi

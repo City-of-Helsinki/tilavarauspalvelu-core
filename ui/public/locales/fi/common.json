@@ -92,5 +92,6 @@
   "beginningWith": "Alkaen",
   "endingWith": "Päättyen",
   "showMore": "Näytä enemmän",
-  "duration": "Kesto {{duration}}"
+  "duration": "Kesto {{duration}}",
+  "fyiLabel": "Tiedoksi"
 }

@@ -1056,6 +1056,22 @@ type ReservationUnitByPkType implements Node {
   interval_90_mins.
   """
   reservationStartInterval: ReservationUnitsReservationUnitReservationStartIntervalChoices!
+
+  """
+  Time when making reservations become possible for this reservation unit.
+  """
+  reservationBegins: DateTime
+
+  """
+  Time when making reservations become not possible for this reservation unit
+  """
+  reservationEnds: DateTime
+
+  """Time after this reservation unit should be publicly visible in UI."""
+  publishBegins: DateTime
+
+  """Time after this reservation unit should not be publicly visible in UI."""
+  publishEnds: DateTime
   metadataSet: ReservationMetadataSetType
   images: [ReservationUnitImageType]
 
@@ -1190,18 +1206,18 @@ input ReservationUnitCreateMutationInput {
   """Time after this reservation unit should not be publicly visible in UI."""
   publishEnds: DateTime
   metadataSetPk: Int
-  nameFi: String
-  nameEn: String
-  nameSv: String
-  contactInformationFi: String
-  contactInformationEn: String
-  contactInformationSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  contactInformationFi: String
+  contactInformationEn: String
+  contactInformationSv: String
   additionalInstructionsFi: String
   additionalInstructionsEn: String
   additionalInstructionsSv: String
@@ -1224,7 +1240,7 @@ type ReservationUnitCreateMutationPayload {
   Determines if introduction is required in order to reserve this reservation unit.
   """
   requireIntroduction: Boolean
-  purposes: [PurposeType]
+  purposes: [ReservationPurposeType]
 
   """Images of the reservation unit as nested related objects. """
   images: [ReservationUnitImageType]
@@ -1283,18 +1299,18 @@ type ReservationUnitCreateMutationPayload {
 
   """Time after this reservation unit should not be publicly visible in UI."""
   publishEnds: DateTime
-  nameFi: String
-  nameEn: String
-  nameSv: String
-  contactInformationFi: String
-  contactInformationEn: String
-  contactInformationSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  contactInformationFi: String
+  contactInformationEn: String
+  contactInformationSv: String
   additionalInstructionsFi: String
   additionalInstructionsEn: String
   additionalInstructionsSv: String
@@ -1595,18 +1611,18 @@ input ReservationUnitUpdateMutationInput {
   """Time after this reservation unit should not be publicly visible in UI."""
   publishEnds: DateTime
   metadataSetPk: Int
-  nameFi: String
-  nameEn: String
-  nameSv: String
-  contactInformationFi: String
-  contactInformationEn: String
-  contactInformationSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  contactInformationFi: String
+  contactInformationEn: String
+  contactInformationSv: String
   additionalInstructionsFi: String
   additionalInstructionsEn: String
   additionalInstructionsSv: String
@@ -1629,7 +1645,7 @@ type ReservationUnitUpdateMutationPayload {
   Determines if introduction is required in order to reserve this reservation unit.
   """
   requireIntroduction: Boolean
-  purposes: [PurposeType]
+  purposes: [ReservationPurposeType]
 
   """Images of the reservation unit as nested related objects. """
   images: [ReservationUnitImageType]
@@ -1688,18 +1704,18 @@ type ReservationUnitUpdateMutationPayload {
 
   """Time after this reservation unit should not be publicly visible in UI."""
   publishEnds: DateTime
-  nameFi: String
-  nameEn: String
-  nameSv: String
-  contactInformationFi: String
-  contactInformationEn: String
-  contactInformationSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  contactInformationFi: String
+  contactInformationEn: String
+  contactInformationSv: String
   additionalInstructionsFi: String
   additionalInstructionsEn: String
   additionalInstructionsSv: String
@@ -2316,15 +2332,15 @@ input UnitUpdateMutationInput {
   webPage: String
   email: String
   phone: String
-  shortDescriptionFi: String
-  shortDescriptionEn: String
-  shortDescriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  shortDescriptionFi: String
+  shortDescriptionEn: String
+  shortDescriptionSv: String
   clientMutationId: String
 }
 
@@ -2334,15 +2350,15 @@ type UnitUpdateMutationPayload {
   webPage: String
   email: String
   phone: String
-  shortDescriptionFi: String
-  shortDescriptionEn: String
-  shortDescriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  shortDescriptionFi: String
+  shortDescriptionEn: String
+  shortDescriptionSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]

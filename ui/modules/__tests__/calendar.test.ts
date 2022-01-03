@@ -1,4 +1,4 @@
-import { addDays, format } from "date-fns";
+import { addDays, format, addMinutes } from "date-fns";
 import {
   areSlotsReservable,
   doBuffersCollide,
@@ -10,12 +10,15 @@ import {
   getTimeslots,
   isReservationLongEnough,
   isReservationShortEnough,
+  isReservationStartInFuture,
+  isReservationUnitReservable,
   isSlotWithinTimeframe,
   isStartTimeWithinInterval,
 } from "../calendar";
 import {
   ReservationType,
   ReservationUnitsReservationUnitReservationStartIntervalChoices,
+  ReservationUnitType,
 } from "../gql-types";
 import { ApplicationRound } from "../types";
 
@@ -491,5 +494,77 @@ describe("getEventBuffers", () => {
         },
       },
     ]);
+  });
+});
+
+describe("isReservationUnitReservable", () => {
+  test("returns true for a unit that is reservable", () => {
+    expect(
+      isReservationUnitReservable({
+        reservationBegins: addMinutes(new Date(), -10),
+      } as ReservationUnitType)
+    ).toBe(true);
+
+    expect(
+      isReservationUnitReservable({
+        reservationEnds: addMinutes(new Date(), 10),
+      } as ReservationUnitType)
+    ).toBe(true);
+
+    expect(
+      isReservationUnitReservable({
+        reservationBegins: addMinutes(new Date(), -10),
+        reservationEnds: addMinutes(new Date(), 10),
+      } as ReservationUnitType)
+    ).toBe(true);
+
+    expect(isReservationUnitReservable({} as ReservationUnitType)).toBe(true);
+  });
+
+  test("returns false for a unit that is not reservable", () => {
+    expect(
+      isReservationUnitReservable({
+        reservationBegins: addMinutes(new Date(), 10),
+      } as ReservationUnitType)
+    ).toBe(false);
+
+    expect(
+      isReservationUnitReservable({
+        reservationEnds: addMinutes(new Date(), -10),
+      } as ReservationUnitType)
+    ).toBe(false);
+
+    expect(
+      isReservationUnitReservable({
+        reservationBegins: addMinutes(new Date(), -10),
+        reservationEnds: addMinutes(new Date(), -1),
+      } as ReservationUnitType)
+    ).toBe(false);
+  });
+});
+
+describe("isReservationStartInFuture", () => {
+  test("returns true for a reservation that starts in the future", () => {
+    expect(
+      isReservationStartInFuture({
+        reservationBegins: addMinutes(new Date(), 10),
+      } as ReservationUnitType)
+    ).toBe(true);
+  });
+
+  test("returns false for a reservation that starts in the past", () => {
+    expect(
+      isReservationStartInFuture({
+        reservationBegins: addMinutes(new Date(), -10),
+      } as ReservationUnitType)
+    ).toBe(false);
+
+    expect(
+      isReservationStartInFuture({
+        reservationBegins: new Date(),
+      } as ReservationUnitType)
+    ).toBe(false);
+
+    expect(isReservationStartInFuture({} as ReservationUnitType)).toBe(false);
   });
 });
