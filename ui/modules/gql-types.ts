@@ -1383,8 +1383,16 @@ export type ReservationUnitByPkType = Node & {
   pk?: Maybe<Scalars["Int"]>;
   /** Unit of the price */
   priceUnit: ReservationUnitsReservationUnitPriceUnitChoices;
+  /** Time after this reservation unit should be publicly visible in UI. */
+  publishBegins?: Maybe<Scalars["DateTime"]>;
+  /** Time after this reservation unit should not be publicly visible in UI. */
+  publishEnds?: Maybe<Scalars["DateTime"]>;
   purposes?: Maybe<Array<Maybe<PurposeType>>>;
   requireIntroduction: Scalars["Boolean"];
+  /** Time when making reservations become possible for this reservation unit. */
+  reservationBegins?: Maybe<Scalars["DateTime"]>;
+  /** Time when making reservations become not possible for this reservation unit */
+  reservationEnds?: Maybe<Scalars["DateTime"]>;
   /**
    * Determines the interval for the start time of the reservation. For example an
    * interval of 15 minutes means a reservation can begin at minutes 15, 30, 60, or
@@ -1573,7 +1581,7 @@ export type ReservationUnitCreateMutationPayload = {
   publishBegins?: Maybe<Scalars["DateTime"]>;
   /** Time after this reservation unit should not be publicly visible in UI. */
   publishEnds?: Maybe<Scalars["DateTime"]>;
-  purposes?: Maybe<Array<Maybe<PurposeType>>>;
+  purposes?: Maybe<Array<Maybe<ReservationPurposeType>>>;
   /** Determines if introduction is required in order to reserve this reservation unit. */
   requireIntroduction?: Maybe<Scalars["Boolean"]>;
   /** Time when making reservations become possible for this reservation unit. */
@@ -1877,7 +1885,7 @@ export type ReservationUnitUpdateMutationPayload = {
   publishBegins?: Maybe<Scalars["DateTime"]>;
   /** Time after this reservation unit should not be publicly visible in UI. */
   publishEnds?: Maybe<Scalars["DateTime"]>;
-  purposes?: Maybe<Array<Maybe<PurposeType>>>;
+  purposes?: Maybe<Array<Maybe<ReservationPurposeType>>>;
   /** Determines if introduction is required in order to reserve this reservation unit. */
   requireIntroduction?: Maybe<Scalars["Boolean"]>;
   /** Time when making reservations become possible for this reservation unit. */
@@ -3248,6 +3256,8 @@ export const ReservationUnitDocument = gql`
       bufferTimeBefore
       bufferTimeAfter
       reservationStartInterval
+      reservationBegins
+      reservationEnds
       serviceSpecificTerms {
         nameFi
         nameEn
@@ -3392,6 +3402,8 @@ export const SearchReservationUnitsDocument = gql`
           highestPrice
           priceUnit
           nameFi
+          reservationBegins
+          reservationEnds
           reservationUnitType {
             id: pk
             nameFi
@@ -4101,6 +4113,8 @@ export type ReservationUnitQuery = {
         bufferTimeBefore?: any | null | undefined;
         bufferTimeAfter?: any | null | undefined;
         reservationStartInterval: ReservationUnitsReservationUnitReservationStartIntervalChoices;
+        reservationBegins?: any | null | undefined;
+        reservationEnds?: any | null | undefined;
         maxPersons?: number | null | undefined;
         minReservationDuration?: any | null | undefined;
         maxReservationDuration?: any | null | undefined;
@@ -4254,6 +4268,8 @@ export type SearchReservationUnitsQuery = {
                     lowestPrice: any;
                     highestPrice: any;
                     priceUnit: ReservationUnitsReservationUnitPriceUnitChoices;
+                    reservationBegins?: any | null | undefined;
+                    reservationEnds?: any | null | undefined;
                     maxPersons?: number | null | undefined;
                     id?: number | null | undefined;
                     reservationUnitType?:

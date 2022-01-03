@@ -37,6 +37,8 @@ const selectedReservationUnitQuery = graphql.query<
     nameSv: "Pukinmäen nuorisotalon keittiö SV",
     bufferTimeBefore: "01:00:00",
     bufferTimeAfter: "00:30:00",
+    reservationBegins: addDays(new Date(), -1),
+    reservationEnds: addDays(new Date(), 1),
     images: [
       {
         imageUrl:
@@ -231,6 +233,11 @@ const selectedReservationUnitQuery = graphql.query<
     },
     requireIntroduction: false,
   };
+
+  if (req.variables.pk === 900) {
+    reservationUnitByPk.reservationBegins = addDays(new Date(), 1);
+    reservationUnitByPk.reservationEnds = addDays(new Date(), 10);
+  }
 
   if (req.variables.pk === 999) {
     reservationUnitByPk.isDraft = true;
