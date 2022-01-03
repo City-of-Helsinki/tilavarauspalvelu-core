@@ -932,6 +932,17 @@ const translations: ITranslations = {
     priceUnitLabel: ["Hinnan yksikö"],
     taxPercentageLabel: ["Hinnan alv%"],
   },
+  ImageEditor: {
+    imageType: ["Kuvan tyyppi"],
+    label: ["Varausyksikön kuvat"],
+    buttonLabel: ["Valitse ja lataa kuva"],
+    errorTitle: ["Tapahtui virhe"],
+    errorLoadingImages: ["Kuvia ei saatu haettua"],
+    addImage: ["Lisää kuva"],
+    deleteImage: ["poista"],
+    mainImage: ["Pääkuva"],
+    useAsMainImage: ["Käytä pääkuvana"],
+  },
   priceUnit: {
     FIXED: ["Per kerta"],
     PER_15_MINS: ["Per 15 min"],

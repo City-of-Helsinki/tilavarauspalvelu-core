@@ -329,6 +329,17 @@ export const RESERVATION_UNIT_EDITOR_PARAMETERS = gql`
   }
 `;
 
+export const RESERVATIONUNIT_IMAGES_QUERY = gql`
+  query reservationUnit($pk: Int) {
+    reservationUnitByPk(pk: $pk) {
+      images {
+        mediumUrl
+        imageType
+      }
+    }
+  }
+`;
+
 export const RESERVATIONUNIT_QUERY = gql`
   query reservationUnit($pk: Int) {
     reservationUnitByPk(pk: $pk) {
@@ -429,7 +440,6 @@ export const UPDATE_RESERVATION_UNIT = gql`
   }
 `;
 
-// WIP api incomplete
 export const CREATE_RESERVATION_UNIT = gql`
   mutation createReservationUnit($input: ReservationUnitCreateMutationInput!) {
     createReservationUnit(input: $input) {
@@ -464,12 +474,45 @@ export const UPDATE_RESOURCE = gql`
   }
 `;
 
-// WIP, no api yet
 export const DELETE_RESOURCE = gql`
   mutation deleteResource($input: ResourceDeleteMutationInput!) {
     deleteResource(input: $input) {
       deleted
       errors
+    }
+  }
+`;
+
+export const CREATE_IMAGE = gql`
+  mutation createReservationUnitImage(
+    $image: Upload!
+    $reservationUnitPk: Int!
+    $imageType: String!
+  ) {
+    createReservationUnitImage(
+      input: {
+        image: $image
+        reservationUnitPk: $reservationUnitPk
+        imageType: $imageType
+      }
+    ) {
+      pk
+      reservationUnitImage {
+        imageType
+        mediumUrl
+      }
+      errors {
+        field
+        messages
+      }
+    }
+  }
+`;
+
+export const DELETE_IMAGE = gql`
+  mutation deleteImage($input: ReservationUnitImageDeleteMutationInput!) {
+    deleteReservationUnitImage(input: $input) {
+      deleted
     }
   }
 `;

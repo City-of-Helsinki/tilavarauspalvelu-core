@@ -17,12 +17,16 @@ const EnumSelect = ({
   label,
   onChange,
   required = false,
+  disabled = false,
+  placeholder,
   value,
   type,
 }: {
   id: string;
   label: string;
   required?: boolean;
+  disabled?: boolean;
+  placeholder?: string;
   value: string;
   onChange: (value: string) => void;
   type: { [key: string]: string };
@@ -38,6 +42,8 @@ const EnumSelect = ({
       label={label}
       required={required}
       options={options}
+      placeholder={placeholder}
+      disabled={disabled}
       value={options.find((o) => o.value === value) || ""}
       id={id}
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
