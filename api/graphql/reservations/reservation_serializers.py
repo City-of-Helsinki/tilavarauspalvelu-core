@@ -3,6 +3,7 @@ from typing import List
 
 from django.conf import settings
 from django.utils.timezone import get_default_timezone
+from graphene.utils.str_converters import to_camel_case
 from rest_framework import serializers
 
 from api.graphql.base_serializers import (
@@ -204,6 +205,7 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
 
             self.check_buffer_times(data, reservation_unit)
             self.check_reservation_start_time(begin, scheduler)
+            self.check_metadata_fields(data, reservation_unit)
 
         data["state"] = STATE_CHOICES.CREATED
         data[
@@ -302,6 +304,16 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
             raise serializers.ValidationError(
                 f"Reservation start time does not match the allowed interval of {interval_minutes} minutes."
             )
+
+    def check_metadata_fields(self, data, reservation_unit) -> None:
+        metadata_set = reservation_unit.metadata_set
+        required_fields = metadata_set.required_fields.all() if metadata_set else []
+        for required_field in required_fields:
+            internal_field_name = required_field.field_name
+            if not data.get(internal_field_name):
+                raise serializers.ValidationError(
+                    f"Value for required field {to_camel_case(internal_field_name)} is missing."
+                )
 
 
 class ReservationUpdateSerializer(

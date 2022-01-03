@@ -20,7 +20,13 @@ from reservation_units.tests.factories import (
     ReservationUnitCancellationRuleFactory,
     ReservationUnitFactory,
 )
-from reservations.models import STATE_CHOICES, AgeGroup, Reservation
+from reservations.models import (
+    STATE_CHOICES,
+    AgeGroup,
+    Reservation,
+    ReservationMetadataField,
+    ReservationMetadataSet,
+)
 from reservations.tests.factories import (
     ReservationCancelReasonFactory,
     ReservationFactory,
@@ -837,6 +843,29 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
             price=10,
         )
 
+    def _create_metadata_set(self):
+        supported_fields = ReservationMetadataField.objects.filter(
+            field_name__in=[
+                "reservee_first_name",
+                "reservee_last_name",
+                "reservee_phone",
+                "home_city",
+                "age_group",
+            ]
+        )
+        required_fields = ReservationMetadataField.objects.filter(
+            field_name__in=[
+                "reservee_first_name",
+                "reservee_last_name",
+                "home_city",
+                "age_group",
+            ]
+        )
+        metadata_set = ReservationMetadataSet.objects.create(name="Test form")
+        metadata_set.supported_fields.set(supported_fields)
+        metadata_set.required_fields.set(required_fields)
+        return metadata_set
+
     def get_update_query(self):
         return """
             mutation updateReservation($input: ReservationUpdateMutationInput!) {
@@ -1234,6 +1263,90 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         assert_that(
             content.get("data").get("updateReservation").get("errors")[0]["messages"][0]
         ).contains(err_msg)
+
+    def test_update_succeeds_when_reservation_unit_has_no_metadata_set(
+        self, mock_periods, mock_opening_hours
+    ):
+        self.reservation_unit.metadata_set = None
+        self.reservation_unit.save(update_fields=["metadata_set"])
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+        input_data = self.get_valid_update_data()
+        input_data["reserveeFirstName"] = "John"
+        self.client.force_login(self.regular_joe)
+        response = self.query(self.get_update_query(), input_data=input_data)
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        assert_that(
+            content.get("data").get("updateReservation").get("errors")
+        ).is_none()
+        self.reservation.refresh_from_db()
+        assert_that(self.reservation.reservee_first_name).is_equal_to(
+            input_data["reserveeFirstName"]
+        )
+
+    def test_update_succeeds_when_all_required_fields_are_filled(
+        self, mock_periods, mock_opening_hours
+    ):
+        self.reservation_unit.metadata_set = self._create_metadata_set()
+        self.reservation_unit.save(update_fields=["metadata_set"])
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+        home_city = City.objects.create(name="Helsinki")
+        age_group = AgeGroup.objects.create(minimum=18, maximum=30)
+        input_data = self.get_valid_update_data()
+        input_data["reserveeFirstName"] = "John"
+        input_data["reserveeLastName"] = "Doe"
+        input_data["reserveePhone"] = "+358123456789"
+        input_data["homeCityPk"] = home_city.pk
+        input_data["ageGroupPk"] = age_group.pk
+        self.client.force_login(self.regular_joe)
+        response = self.query(self.get_update_query(), input_data=input_data)
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        assert_that(
+            content.get("data").get("updateReservation").get("errors")
+        ).is_none()
+        self.reservation.refresh_from_db()
+        assert_that(self.reservation.reservee_first_name).is_equal_to(
+            input_data["reserveeFirstName"]
+        )
+        assert_that(self.reservation.reservee_last_name).is_equal_to(
+            input_data["reserveeLastName"]
+        )
+        assert_that(self.reservation.reservee_phone).is_equal_to(
+            input_data["reserveePhone"]
+        )
+        assert_that(self.reservation.home_city).is_equal_to(home_city)
+        assert_that(self.reservation.age_group).is_equal_to(age_group)
+
+    def test_update_fails_when_some_required_fields_are_missing(
+        self, mock_periods, mock_opening_hours
+    ):
+        self.reservation_unit.metadata_set = self._create_metadata_set()
+        self.reservation_unit.save(update_fields=["metadata_set"])
+        home_city = City.objects.create(name="Helsinki")
+        age_group = AgeGroup.objects.create(minimum=18, maximum=30)
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+        input_data = self.get_valid_update_data()
+        input_data["reserveeLastName"] = "Doe"
+        input_data["reserveePhone"] = "+358123456789"
+        input_data["homeCityPk"] = home_city.pk
+        input_data["ageGroupPk"] = age_group.pk
+        self.client.force_login(self.regular_joe)
+        response = self.query(self.get_update_query(), input_data=input_data)
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        assert_that(
+            content.get("data").get("updateReservation").get("errors")
+        ).is_not_none()
+        self.reservation.refresh_from_db()
+        assert_that(self.reservation.reservee_last_name).is_not_equal_to(
+            input_data["reserveeLastName"]
+        )
+        assert_that(self.reservation.reservee_phone).is_not_equal_to(
+            input_data["reserveePhone"]
+        )
+        assert_that(self.reservation.home_city).is_not_equal_to(home_city)
+        assert_that(self.reservation.age_group).is_not_equal_to(age_group)
 
 
 @freezegun.freeze_time("2021-10-12T12:00:00Z")
