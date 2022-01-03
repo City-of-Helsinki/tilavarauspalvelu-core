@@ -6,6 +6,7 @@ from api.graphql.base_serializers import (
     PrimaryKeySerializer,
     PrimaryKeyUpdateSerializer,
 )
+from api.graphql.choice_char_field import ChoiceCharField
 from api.graphql.primary_key_fields import IntegerPrimaryKeyField
 from api.graphql.translate_fields import get_all_translatable_fields
 from api.reservation_units_api import (
@@ -164,20 +165,22 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
         required=False,
         help_text="Maximum price of the reservation unit",
     )
-    price_unit = serializers.CharField(
+    price_unit = ChoiceCharField(
         required=False,
+        choices=ReservationUnit.PRICE_UNITS,
         help_text=(
             "Unit of the price. "
-            f"Possible values are {', '.join(value for value, _ in ReservationUnit.PRICE_UNITS)}."
+            f"Possible values are {', '.join(value[0].upper() for value in ReservationUnit.PRICE_UNITS)}."
         ),
     )
-    reservation_start_interval = serializers.CharField(
+    reservation_start_interval = ChoiceCharField(
         required=False,
+        choices=ReservationUnit.RESERVATION_START_INTERVAL_CHOICES,
         help_text=(
             "Determines the interval for the start time of the reservation. "
             "For example an interval of 15 minutes means a reservation can "
             "begin at minutes 0, 15, 30, or 45. Possible values are "
-            f"{', '.join(value[0] for value in ReservationUnit.RESERVATION_START_INTERVAL_CHOICES)}."
+            f"{', '.join(value[0].upper() for value in ReservationUnit.RESERVATION_START_INTERVAL_CHOICES)}."
         ),
     )
     tax_percentage_pk = IntegerPrimaryKeyField(
@@ -257,24 +260,6 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
                 raise serializers.ValidationError(
                     f"Wrong type of id: {identifier} for {field_name}"
                 )
-
-    def validate_price_unit(self, value):
-        valid_values = [x[0] for x in ReservationUnit.PRICE_UNITS]
-        if value not in valid_values:
-            raise serializers.ValidationError(
-                f"Invalid price unit {value}. Valid values are {', '.join(valid_values)}"
-            )
-        return value
-
-    def validate_reservation_start_interval(self, value):
-        valid_values = [
-            x[0] for x in ReservationUnit.RESERVATION_START_INTERVAL_CHOICES
-        ]
-        if value not in valid_values:
-            raise serializers.ValidationError(
-                f"Invalid reservation start interval {value}. Valid values are {', '.join(valid_values)}"
-            )
-        return value
 
     def validate(self, data):
         is_draft = data.get("is_draft", getattr(self.instance, "is_draft", False))
