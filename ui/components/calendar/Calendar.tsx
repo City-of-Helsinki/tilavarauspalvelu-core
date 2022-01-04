@@ -138,12 +138,6 @@ const StyledCalendar = styled(BigCalendar)<{
     border-top-color: var(--color-black-10);
   }
 
-  .rbc-today {
-    .rbc-timeslot-group {
-      background-color: var(--color-white);
-    }
-  }
-
   .rbc-time-gutter {
     z-index: 4;
     position: sticky;
@@ -222,7 +216,7 @@ const StyledCalendar = styled(BigCalendar)<{
       display: block;
       box-shadow: 5px 0px 13px 0px rgb(0 0 0 / 15%);
       width: 69px;
-      height: 100%;
+      height: calc(100% - 90px);
       position: absolute;
       z-index: 20;
       bottom: 0px;
@@ -259,18 +253,6 @@ const StyledCalendar = styled(BigCalendar)<{
   }
 
   &.view-day {
-    &:after {
-      height: ${({ step }) => {
-        switch (step) {
-          case 15:
-            return "888px";
-          case 30:
-          default:
-            return "730px";
-        }
-      }};
-    }
-
     .rbc-time-view {
       overflow-x: unset !important;
     }

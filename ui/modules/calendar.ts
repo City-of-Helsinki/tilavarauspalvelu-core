@@ -347,6 +347,7 @@ export const getEventBuffers = (
 ): CalendarEventBuffer[] => {
   const buffers: CalendarEventBuffer[] = [];
   events.forEach((event) => {
+    if (!event.begin || !event.end) return;
     const { bufferTimeBefore, bufferTimeAfter } = event;
     const begin = new Date(event.begin);
     const end = new Date(event.end);
