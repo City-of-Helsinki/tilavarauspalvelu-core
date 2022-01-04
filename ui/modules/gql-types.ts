@@ -1372,6 +1372,7 @@ export type ReservationUnitByPkType = Node & {
   lowestPrice: Scalars["Decimal"];
   maxPersons?: Maybe<Scalars["Int"]>;
   maxReservationDuration?: Maybe<Scalars["Time"]>;
+  maxReservationsPerUser?: Maybe<Scalars["Int"]>;
   metadataSet?: Maybe<ReservationMetadataSetType>;
   minReservationDuration?: Maybe<Scalars["Time"]>;
   nameEn?: Maybe<Scalars["String"]>;
@@ -1502,6 +1503,7 @@ export type ReservationUnitCreateMutationInput = {
   lowestPrice?: Maybe<Scalars["Float"]>;
   maxPersons?: Maybe<Scalars["Int"]>;
   maxReservationDuration?: Maybe<Scalars["String"]>;
+  maxReservationsPerUser?: Maybe<Scalars["Int"]>;
   metadataSetPk?: Maybe<Scalars["Int"]>;
   minReservationDuration?: Maybe<Scalars["String"]>;
   nameEn?: Maybe<Scalars["String"]>;
@@ -1570,6 +1572,7 @@ export type ReservationUnitCreateMutationPayload = {
   lowestPrice?: Maybe<Scalars["Float"]>;
   maxPersons?: Maybe<Scalars["Int"]>;
   maxReservationDuration?: Maybe<Scalars["String"]>;
+  maxReservationsPerUser?: Maybe<Scalars["Int"]>;
   minReservationDuration?: Maybe<Scalars["String"]>;
   nameEn?: Maybe<Scalars["String"]>;
   nameFi?: Maybe<Scalars["String"]>;
@@ -1687,6 +1690,7 @@ export type ReservationUnitType = Node & {
   lowestPrice: Scalars["Decimal"];
   maxPersons?: Maybe<Scalars["Int"]>;
   maxReservationDuration?: Maybe<Scalars["Time"]>;
+  maxReservationsPerUser?: Maybe<Scalars["Int"]>;
   metadataSet?: Maybe<ReservationMetadataSetType>;
   minReservationDuration?: Maybe<Scalars["Time"]>;
   nameEn?: Maybe<Scalars["String"]>;
@@ -1805,6 +1809,7 @@ export type ReservationUnitUpdateMutationInput = {
   lowestPrice?: Maybe<Scalars["Float"]>;
   maxPersons?: Maybe<Scalars["Int"]>;
   maxReservationDuration?: Maybe<Scalars["String"]>;
+  maxReservationsPerUser?: Maybe<Scalars["Int"]>;
   metadataSetPk?: Maybe<Scalars["Int"]>;
   minReservationDuration?: Maybe<Scalars["String"]>;
   nameEn?: Maybe<Scalars["String"]>;
@@ -1874,6 +1879,7 @@ export type ReservationUnitUpdateMutationPayload = {
   lowestPrice?: Maybe<Scalars["Float"]>;
   maxPersons?: Maybe<Scalars["Int"]>;
   maxReservationDuration?: Maybe<Scalars["String"]>;
+  maxReservationsPerUser?: Maybe<Scalars["Int"]>;
   minReservationDuration?: Maybe<Scalars["String"]>;
   nameEn?: Maybe<Scalars["String"]>;
   nameFi?: Maybe<Scalars["String"]>;

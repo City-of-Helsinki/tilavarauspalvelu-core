@@ -40,9 +40,12 @@ import Toolbar, { ToolbarProps } from "../../../components/calendar/Toolbar";
 import { getActiveOpeningTimes } from "../../../modules/openingHours";
 import {
   Query,
+  QueryReservationsArgs,
   QueryReservationUnitByPkArgs,
   QueryReservationUnitsArgs,
+  ReservationsReservationStateChoices,
   ReservationType,
+  ReservationTypeEdge,
   ReservationUnitByPkType,
   ReservationUnitByPkTypeOpeningHoursArgs,
   ReservationUnitByPkTypeReservationsArgs,
@@ -56,11 +59,13 @@ import {
 } from "../../../modules/queries/reservationUnit";
 import { getApplicationRounds } from "../../../modules/api";
 import { DataContext } from "../../../context/DataContext";
+import { LIST_RESERVATIONS } from "../../../modules/queries/reservation";
 
 type Props = {
   reservationUnit: ReservationUnitByPkType | null;
   relatedReservationUnits: ReservationUnitType[];
   activeApplicationRounds: ApplicationRound[];
+  userReservations: ReservationType[];
 };
 
 type WeekOptions = "day" | "week" | "month";
@@ -93,6 +98,24 @@ export const getServerSideProps: GetServerSideProps = async ({
         pk: id,
       },
     });
+
+    const { data: userReservationData } = await apolloClient.query<
+      Query,
+      QueryReservationsArgs
+    >({
+      query: LIST_RESERVATIONS,
+      variables: {
+        begin: new Date().toISOString(),
+      },
+    });
+
+    const allowedReservationStates = [
+      ReservationsReservationStateChoices.Created,
+      ReservationsReservationStateChoices.Confirmed,
+    ];
+    const userReservations = userReservationData.reservations?.edges
+      .map((n: ReservationTypeEdge) => n.node)
+      .filter((n) => allowedReservationStates.includes(n.state));
 
     const isDraft = reservationUnitData.reservationUnitByPk?.isDraft;
 
@@ -142,7 +165,7 @@ export const getServerSideProps: GetServerSideProps = async ({
           .filter(
             (n: ReservationUnitType) =>
               n.pk !== reservationUnitData.reservationUnitByPk.pk
-          );
+          ) || [];
     }
 
     if (!reservationUnitData.reservationUnitByPk?.pk) {
@@ -167,6 +190,7 @@ export const getServerSideProps: GetServerSideProps = async ({
         },
         relatedReservationUnits,
         activeApplicationRounds,
+        userReservations,
       },
     };
   }
@@ -290,6 +314,7 @@ const ReservationUnit = ({
   reservationUnit,
   relatedReservationUnits,
   activeApplicationRounds,
+  userReservations,
 }: Props): JSX.Element | null => {
   const { t } = useTranslation();
 
@@ -414,36 +439,40 @@ const ReservationUnit = ({
 
   const shouldDisplayBottomWrapper = relatedReservationUnits?.length > 0;
 
-  const calendarEvents: CalendarEvent[] = reservationUnit?.reservations
-    ? [...reservationUnit.reservations, initialReservation]
-        .filter((n: ReservationType) => n)
-        .map((n: ReservationType) => {
-          const event = {
-            title: `${
-              n.state === "CANCELLED"
-                ? `${t("reservationCalendar:prefixForCancelled")}: `
-                : ""
-            }`,
-            start: parseDate(n.begin),
-            end: parseDate(n.end),
-            allDay: false,
-            event: n,
-          };
+  const calendarEvents: CalendarEvent[] = useMemo(() => {
+    return reservationUnit?.reservations
+      ? [...reservationUnit.reservations, initialReservation]
+          .filter((n: ReservationType) => n)
+          .map((n: ReservationType) => {
+            const event = {
+              title: `${
+                n.state === "CANCELLED"
+                  ? `${t("reservationCalendar:prefixForCancelled")}: `
+                  : ""
+              }`,
+              start: parseDate(n.begin),
+              end: parseDate(n.end),
+              allDay: false,
+              event: n,
+            };
 
-          return event;
-        })
-    : [];
+            return event;
+          })
+      : [];
+  }, [reservationUnit, t, initialReservation]);
 
-  const eventBuffers = getEventBuffers([
-    ...(calendarEvents.flatMap((e) => e.event) as ReservationType[]),
-    {
-      begin: initialReservation?.begin,
-      end: initialReservation?.end,
-      state: "INITIAL",
-      bufferTimeBefore: reservationUnit.bufferTimeBefore,
-      bufferTimeAfter: reservationUnit.bufferTimeAfter,
-    } as PendingReservation,
-  ]);
+  const eventBuffers = useMemo(() => {
+    return getEventBuffers([
+      ...(calendarEvents.flatMap((e) => e.event) as ReservationType[]),
+      {
+        begin: initialReservation?.begin,
+        end: initialReservation?.end,
+        state: "INITIAL",
+        bufferTimeBefore: reservationUnit.bufferTimeBefore,
+        bufferTimeAfter: reservationUnit.bufferTimeAfter,
+      } as PendingReservation,
+    ]);
+  }, [calendarEvents, initialReservation, reservationUnit]);
 
   const ToolbarWithProps = React.memo((props: ToolbarProps) => (
     <Toolbar
@@ -455,10 +484,21 @@ const ReservationUnit = ({
     />
   ));
 
-  const isReservable =
-    reservationUnit.minReservationDuration &&
-    reservationUnit.maxReservationDuration &&
-    isReservationUnitReservable(reservationUnit);
+  const isReservationQuotaReached = useMemo(() => {
+    return (
+      reservationUnit.maxReservationsPerUser &&
+      userReservations?.length >= reservationUnit.maxReservationsPerUser
+    );
+  }, [reservationUnit, userReservations]);
+
+  const isReservable = useMemo(() => {
+    return (
+      reservationUnit.minReservationDuration &&
+      reservationUnit.maxReservationDuration &&
+      isReservationUnitReservable(reservationUnit) &&
+      !isReservationQuotaReached
+    );
+  }, [reservationUnit, isReservationQuotaReached]);
 
   return reservationUnit ? (
     <Wrapper>
@@ -468,6 +508,7 @@ const ReservationUnit = ({
         reservationUnitList={reservationUnitList}
         viewType="single"
         calendarRef={calendarRef}
+        isReservable={isReservable}
       />
       <Container>
         <TwoColumnLayout>
@@ -558,6 +599,21 @@ const ReservationUnit = ({
                   date: parseISO(reservationUnit.reservationBegins),
                 }),
               })}
+            </span>
+          </StyledNotification>
+        )}
+        {reservationUnit.maxReservationsPerUser && (
+          <StyledNotification type="alert" label={t("common:fyiLabel")}>
+            <span data-testid="reservation-unit--notification__reservation-quota">
+              {t(
+                `reservationCalendar:reservationQuota${
+                  isReservationQuotaReached ? "Full" : ""
+                }`,
+                {
+                  count: userReservations?.length,
+                  total: reservationUnit.maxReservationsPerUser,
+                }
+              )}
             </span>
           </StyledNotification>
         )}
