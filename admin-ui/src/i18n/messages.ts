@@ -931,6 +931,10 @@ const translations: ITranslations = {
     highestPriceHelperText: ["euroa"],
     priceUnitLabel: ["Hinnan yksikö"],
     taxPercentageLabel: ["Hinnan alv%"],
+    bufferTimeBefore: ["Aseta ennen vuoroa tauko"],
+    bufferTimeBeforeDuration: ["Tauon kesto"],
+    bufferTimeAfter: ["Aseta vuoron jälkeen tauko"],
+    bufferTimeAfterDuration: ["Tauon kesto"],
   },
   ImageEditor: {
     imageType: ["Kuvan tyyppi"],

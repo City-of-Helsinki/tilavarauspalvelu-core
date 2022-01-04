@@ -8,18 +8,18 @@ import {
   Notification,
   NumberInput,
   RadioButton,
-  Select,
   SelectionGroup,
   TextInput,
   TimeInput,
 } from "hds-react";
 import i18next from "i18next";
-import { get, isNull, omitBy, pick, sumBy, uniq, upperFirst } from "lodash";
+import { get, omitBy, pick, sumBy, uniq, upperFirst } from "lodash";
 import React, { useEffect, useReducer } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams, useHistory } from "react-router-dom";
 import styled from "styled-components";
 import { languages, previewUrlPrefix } from "../../common/const";
+import Select from "./Select";
 import {
   Query,
   QueryReservationUnitByPkArgs,
@@ -144,11 +144,20 @@ const makeTermsOptions = (
 
   return [...options];
 };
+
 enum LoadingCompleted {
   "UNIT",
   "RESERVATION_UNIT",
   "PARAMS",
 }
+
+const durationOptions = [
+  { value: "00:15:00", label: "15 minuuttia" },
+  { value: "00:30:00", label: "30 minuuttia" },
+  { value: "01:00:00", label: "60 minuuttia" },
+  { value: "01:30:00", label: "90 minuuttia" },
+];
+
 const getInitialState = (reservationUnitPk: number): State => ({
   reservationUnitPk,
   loading: true,
@@ -232,6 +241,8 @@ const reducer = (state: State, action: Action): State => {
             "minReservationDuration",
             "reservationStartInterval",
             "requireIntroduction",
+            "bufferTimeBefore",
+            "bufferTimeAfter",
             "priceUnit",
             ...i18nFields("name"),
             ...i18nFields("description"),
@@ -549,10 +560,6 @@ const TextInputWithPadding = styled(TextInput)`
   padding-bottom: var(--spacing-m);
 `;
 
-const SelectWithPadding = styled(Select)`
-  padding-bottom: var(--spacing-m);
-`;
-
 const getSelectedOptions = (
   state: State,
   optionsPropertyName: string,
@@ -570,17 +577,6 @@ const getSelectedOptions = (
       .map((optionPk: any) => options.find((so: any) => so.value === optionPk))
       .filter(Boolean) as OptionType[]
   );
-};
-
-const getSelectedOption = (
-  state: State,
-  optionsPropertyName: string,
-  valuePropName: string
-): OptionType => {
-  const fullPropName = `reservationUnitEdit.${valuePropName}`;
-  const propValue = get(state, fullPropName);
-  const options = get(state, optionsPropertyName);
-  return options.find((o: OptionType) => o.value === propValue);
 };
 
 const getDuration = (duration: Maybe<string> | undefined): string => {
@@ -645,10 +641,13 @@ const ReservationUnitEditor = (): JSX.Element | null => {
   const createOrUpdateReservationUnit = async (publish: boolean) => {
     const input = pick(
       {
-        ...omitBy(state.reservationUnitEdit, isNull),
+        ...omitBy(state.reservationUnitEdit, (v) => v === ""),
         surfaceArea: Number(state.reservationUnitEdit?.surfaceArea),
         isDraft: !publish,
         cancellationRulePk: state.reservationUnitEdit?.cancellationRulePk,
+        priceUnit: state.reservationUnitEdit?.priceUnit?.toLocaleLowerCase(), /// due to api inconsistency
+        reservationStartInterval:
+          state.reservationUnitEdit?.reservationStartInterval?.toLocaleLowerCase(), /// due to api inconsistency
       },
       [
         "isDraft",
@@ -674,6 +673,8 @@ const ReservationUnitEditor = (): JSX.Element | null => {
         "lowestPrice",
         "highestPrice",
         "priceUnit",
+        "bufferTimeBefore",
+        "bufferTimeAfter",
         ...i18nFields("name"),
         ...i18nFields("description"),
         ...i18nFields("termsOfUse"),
@@ -1009,28 +1010,24 @@ const ReservationUnitEditor = (): JSX.Element | null => {
               </Accordion>
               <Accordion heading={t("ReservationUnitEditor.typesProperties")}>
                 <EditorColumns>
-                  <SelectWithPadding
+                  <Select
+                    id="reservationUnitType"
                     label={t(`ReservationUnitEditor.reservationUnitTypeLabel`)}
                     placeholder={t(
                       `ReservationUnitEditor.reservationUnitTypePlaceholder`
                     )}
                     options={state.reservationUnitTypeOptions}
-                    onChange={(unitType: unknown) => {
+                    onChange={(e) => {
                       setValue({
-                        reservationUnitTypePk: (unitType as OptionType).value,
+                        reservationUnitTypePk: e,
                       });
                     }}
-                    disabled={state.reservationUnitTypeOptions.length === 0}
                     helper={t(
                       `ReservationUnitEditor.reservationUnitTypeHelperText`
                     )}
-                    value={
-                      getSelectedOption(
-                        state,
-                        `reservationUnitTypeOptions`,
-                        `reservationUnitTypePk`
-                      ) || {}
-                    }
+                    value={Number(
+                      get(state.reservationUnitEdit, "reservationUnitTypePk")
+                    )}
                   />
                   <Combobox
                     multiselect
@@ -1195,6 +1192,42 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                     }
                   />
                 </EditorColumns>
+                <EditorColumns>
+                  <ActivationGroup
+                    id="bufferTimeBeforeGroup"
+                    label={t("ReservationUnitEditor.bufferTimeBefore")}
+                    initiallyOpen={Boolean(
+                      state.reservationUnitEdit.bufferTimeBefore
+                    )}
+                    onClose={() => setValue({ bufferTimeBefore: null })}
+                  >
+                    <Select
+                      id="bufferTimeBefore"
+                      options={durationOptions}
+                      label={t(
+                        "ReservationUnitEditor.bufferTimeBeforeDuration"
+                      )}
+                      onChange={(v) => setValue({ bufferTimeBefore: v })}
+                      value={state.reservationUnitEdit.bufferTimeBefore || ""}
+                    />
+                  </ActivationGroup>
+                  <ActivationGroup
+                    id="bufferTimeAfterGroup"
+                    label={t("ReservationUnitEditor.bufferTimeAfter")}
+                    initiallyOpen={Boolean(
+                      state.reservationUnitEdit.bufferTimeAfter
+                    )}
+                    onClose={() => setValue({ bufferTimeAfter: null })}
+                  >
+                    <Select
+                      id="bufferTimeAfter"
+                      options={durationOptions}
+                      label={t("ReservationUnitEditor.bufferTimeAfterDuration")}
+                      onChange={(v) => setValue({ bufferTimeAfter: v })}
+                      value={state.reservationUnitEdit.bufferTimeAfter || ""}
+                    />
+                  </ActivationGroup>
+                </EditorColumns>
               </Accordion>
               <Accordion heading={t("ReservationUnitEditor.pricing")}>
                 <DenseEditorColumns>
@@ -1253,21 +1286,20 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                     type={ReservationUnitsReservationUnitPriceUnitChoices}
                     onChange={(priceUnit) => setValue({ priceUnit })}
                   />
-                  <SelectWithPadding
+                  <Select
+                    id="taxPercentage"
                     label={t(`ReservationUnitEditor.taxPercentageLabel`)}
                     options={state.taxPercentageOptions}
-                    onChange={(selectedVat: unknown) => {
+                    onChange={(selectedVat) => {
                       setValue({
-                        taxPercentagePk: (selectedVat as OptionType).value,
+                        taxPercentagePk: selectedVat,
                       });
                     }}
-                    disabled={state.taxPercentageOptions.length === 0}
                     value={
-                      getSelectedOption(
-                        state,
-                        `taxPercentageOptions`,
-                        `taxPercentagePk`
-                      ) || {}
+                      get(
+                        state.reservationUnitEdit,
+                        "taxPercentagePk"
+                      ) as number
                     }
                   />
                 </DenseEditorColumns>
@@ -1298,31 +1330,25 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                   {["serviceSpecific", "payment", "cancellation"].map(
                     (name) => {
                       const options = get(state, `${name}TermsOptions`);
+                      const propName = `${name}TermsPk`;
                       return (
-                        <SelectWithPadding
+                        <Select
+                          id={name}
                           key={name}
                           label={t(`ReservationUnitEditor.${name}TermsLabel`)}
                           placeholder={t(
                             `ReservationUnitEditor.${name}TermsPlaceholder`
                           )}
                           options={options}
-                          onChange={(selectedTerms: unknown) => {
+                          onChange={(selection) => {
                             setValue({
-                              [`${name}TermsPk`]: (selectedTerms as OptionType)
-                                .value,
+                              [propName]: selection,
                             });
                           }}
-                          disabled={options.length === 0}
                           helper={t(
                             `ReservationUnitEditor.${name}TermsHelperText`
                           )}
-                          value={
-                            getSelectedOption(
-                              state,
-                              `${name}TermsOptions`,
-                              `${name}TermsPk`
-                            ) || {}
-                          }
+                          value={get(state.reservationUnitEdit, propName)}
                         />
                       );
                     }

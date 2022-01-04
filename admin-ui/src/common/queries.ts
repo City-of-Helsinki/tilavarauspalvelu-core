@@ -424,6 +424,8 @@ export const RESERVATIONUNIT_QUERY = gql`
       taxPercentage {
         pk
       }
+      bufferTimeBefore
+      bufferTimeAfter
     }
   }
 `;
