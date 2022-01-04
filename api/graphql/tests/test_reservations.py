@@ -30,6 +30,7 @@ from reservations.models import (
 from reservations.tests.factories import (
     ReservationCancelReasonFactory,
     ReservationFactory,
+    ReservationMetadataSetFactory,
     ReservationPurposeFactory,
 )
 from spaces.tests.factories import SpaceFactory
@@ -168,6 +169,66 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
                             unitPrice
                             taxPercentageValue
                             price
+                          }
+                        }
+                    }
+                }
+            """
+        )
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filter_handling_required_true(self):
+        self.maxDiff = None
+        self.client.force_login(self.general_admin)
+        metadata = ReservationMetadataSetFactory()
+        res_unit = ReservationUnitFactory(metadata_set=metadata)
+        ReservationFactory(
+            state=STATE_CHOICES.CONFIRMED,
+            reservation_unit=[res_unit],
+            recurring_reservation=None,
+            name="Show me",
+        )
+        response = self.query(
+            """
+            query {
+                reservations(handlingRequired: true) {
+                    edges {
+                        node {
+                            state
+                            name
+                          }
+                        }
+                    }
+                }
+            """
+        )
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filter_handling_required_false(self):
+        self.maxDiff = None
+        self.client.force_login(self.general_admin)
+        metadata = ReservationMetadataSetFactory()
+        res_unit = ReservationUnitFactory(metadata_set=metadata)
+        ReservationFactory(
+            state=STATE_CHOICES.CONFIRMED,
+            reservation_unit=[res_unit],
+            recurring_reservation=None,
+            name="Dont show me",
+        )
+        response = self.query(
+            """
+            query {
+                reservations(handlingRequired: false) {
+                    edges {
+                        node {
+                            state
+                            name
                           }
                         }
                     }
