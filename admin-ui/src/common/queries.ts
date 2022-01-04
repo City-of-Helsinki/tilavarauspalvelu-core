@@ -426,11 +426,14 @@ export const RESERVATIONUNIT_QUERY = gql`
       }
       bufferTimeBefore
       bufferTimeAfter
+      reservationBegins
+      reservationEnds
+      publishBegins
+      publishEnds
     }
   }
 `;
 
-// WIP api incomplete
 export const UPDATE_RESERVATION_UNIT = gql`
   mutation updateReservationUnit($input: ReservationUnitUpdateMutationInput!) {
     updateReservationUnit(input: $input) {

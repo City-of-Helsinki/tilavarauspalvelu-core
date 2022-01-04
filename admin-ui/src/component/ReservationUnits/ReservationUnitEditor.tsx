@@ -4,6 +4,7 @@ import {
   Button as HDSButton,
   Checkbox,
   Combobox,
+  Fieldset,
   Link,
   Notification,
   NumberInput,
@@ -57,6 +58,8 @@ import ActivationGroup from "./ActivationGroup";
 import { assertApiAccessTokenIsAvailable } from "../../common/auth/util";
 import EnumSelect from "./EnumSelect";
 import ImageEditor from "./ImageEditor";
+import DateTimeInput from "./DateTimeInput";
+import { EditorColumns } from "./editorComponents";
 
 interface IProps {
   reservationUnitPk?: string;
@@ -159,24 +162,24 @@ const durationOptions = [
 ];
 
 const getInitialState = (reservationUnitPk: number): State => ({
-  reservationUnitPk,
+  cancellationRuleOptions: [],
+  cancellationTermsOptions: [],
+  dataLoaded: [],
+  equipmentOptions: [],
+  hasChanges: false,
   loading: true,
+  paymentTermsOptions: [],
+  purposeOptions: [],
   reservationUnit: null,
   reservationUnitEdit: {},
-  hasChanges: false,
-  resources: [],
-  spaces: [],
-  spaceOptions: [],
-  equipmentOptions: [],
-  resourceOptions: [],
-  purposeOptions: [],
+  reservationUnitPk,
   reservationUnitTypeOptions: [],
-  paymentTermsOptions: [],
-  cancellationTermsOptions: [],
+  resourceOptions: [],
+  resources: [],
   serviceSpecificTermsOptions: [],
-  cancellationRuleOptions: [],
+  spaceOptions: [],
+  spaces: [],
   taxPercentageOptions: [],
-  dataLoaded: [],
 });
 
 const withLoadingStatus = (
@@ -232,22 +235,30 @@ const reducer = (state: State, action: Action): State => {
         },
         reservationUnitEdit: {
           ...(pick(reservationUnit, [
-            "pk",
-            "unitPk",
-            "requireIntroduction",
-            "surfaceArea",
+            "bufferTimeAfter",
+            "bufferTimeBefore",
             "maxPersons",
             "maxReservationDuration",
             "minReservationDuration",
+            "pk",
             "reservationStartInterval",
             "requireIntroduction",
             "bufferTimeBefore",
             "bufferTimeAfter",
             "priceUnit",
-            ...i18nFields("name"),
-            ...i18nFields("description"),
-            ...i18nFields("termsOfUse"),
+            "publishBegins",
+            "publishEnds",
+            "requireIntroduction",
+            "requireIntroduction",
+            "reservationBegins",
+            "reservationEnds",
+            "reservationStartInterval",
+            "surfaceArea",
+            "unitPk",
             ...i18nFields("additionalInstructions"),
+            ...i18nFields("description"),
+            ...i18nFields("name"),
+            ...i18nFields("termsOfUse"),
           ]) as ReservationUnitEditorType),
           spacePks: reservationUnit?.spaces?.map((s) =>
             Number(s?.pk)
@@ -426,18 +437,6 @@ const EditorContainer = styled.div`
   @media (min-width: ${breakpoints.l}) {
     margin: 0 var(--spacing-layout-m);
   }
-`;
-
-const EditorColumns = styled.div`
-  display: block;
-  @media (min-width: ${breakpoints.l}) {
-    grid-template-columns: 1fr 1fr;
-    display: grid;
-  }
-  align-items: baseline;
-  gap: 1em;
-  margin-top: var(--spacing-s);
-  padding-bottom: var(--spacing-m);
 `;
 
 const DenseEditorColumns = styled.div`
@@ -650,26 +649,38 @@ const ReservationUnitEditor = (): JSX.Element | null => {
           state.reservationUnitEdit?.reservationStartInterval?.toLocaleLowerCase(), /// due to api inconsistency
       },
       [
+        "bufferTimeAfter",
+        "bufferTimeBefore",
+        "highestPrice",
         "isDraft",
-        "pk",
-        "unitPk",
-        "spacePks",
-        "purposePks",
-        "resourcePks",
-        "equipmentPks",
-        "surfaceArea",
+        "lowestPrice",
         "maxPersons",
         "maxReservationDuration",
         "minReservationDuration",
-        "reservationStartInterval",
+        "pk",
+        "priceUnit",
+        "publishBegins",
+        "publishEnds",
         "requireIntroduction",
+        "reservationBegins",
+        "reservationEnds",
+        "reservationStartInterval",
+        "surfaceArea",
+        ...i18nFields("additionalInstructions"),
+        ...i18nFields("description"),
+        ...i18nFields("name"),
+        ...i18nFields("termsOfUse"),
+        "cancellationRulePk",
+        "cancellationTermsPk",
+        "equipmentPks",
+        "paymentTermsPk",
         "purposePks",
         "reservationUnitTypePk",
-        "paymentTermsPk",
-        "cancellationTermsPk",
+        "resourcePks",
         "serviceSpecificTermsPk",
-        "cancellationRulePk",
+        "spacePks",
         "taxPercentagePk",
+        "unitPk",
         "lowestPrice",
         "highestPrice",
         "priceUnit",
@@ -1101,37 +1112,117 @@ const ReservationUnitEditor = (): JSX.Element | null => {
               </Accordion>
 
               <Accordion heading={t("ReservationUnitEditor.settings")}>
-                <ActivationGroup
-                  id="cancellationIsPossible"
-                  label={t("ReservationUnitEditor.cancellationIsPossible")}
-                  initiallyOpen={Boolean(
-                    state.reservationUnitEdit.cancellationRulePk
-                  )}
-                  onClose={() => setValue({ cancellationRulePk: null })}
+                <Fieldset
+                  heading={t("ReservationUnitEditor.publishingSettings")}
                 >
-                  <SelectionGroup
-                    required
-                    label={t("ReservationUnitEditor.cancellationGroupLabel")}
+                  <ActivationGroup
+                    id="useScheduledPublishing"
+                    label={t("ReservationUnitEditor.scheduledPublishing")}
+                    initiallyOpen={
+                      Boolean(state.reservationUnitEdit.publishBegins) ||
+                      Boolean(state.reservationUnitEdit.publishEnds)
+                    }
+                    onClose={() =>
+                      setValue({ publishBegins: null, publishEnds: null })
+                    }
                   >
-                    {state.cancellationRuleOptions.map((o) => (
-                      <RadioButton
-                        key={o.value}
-                        id={`cr-${o.value}`}
-                        value={o.value as string}
-                        label={o.label}
-                        onChange={(e) =>
-                          setValue({
-                            cancellationRulePk: Number(e.target.value),
-                          })
-                        }
-                        checked={
-                          state.reservationUnitEdit.cancellationRulePk ===
-                          o.value
-                        }
-                      />
-                    ))}
-                  </SelectionGroup>
-                </ActivationGroup>
+                    <EditorColumns>
+                      <ActivationGroup
+                        id="publishBegins"
+                        label={t("ReservationUnitEditor.publishBegins")}
+                        initiallyOpen={Boolean(
+                          state.reservationUnitEdit.publishBegins
+                        )}
+                        onClose={() => setValue({ publishBegins: null })}
+                        noIndent
+                      >
+                        <DateTimeInput
+                          value={state.reservationUnitEdit.publishBegins}
+                          setValue={(v) =>
+                            setValue({
+                              publishBegins: v,
+                            })
+                          }
+                        />
+                      </ActivationGroup>
+                      <ActivationGroup
+                        id="publishEnds"
+                        label={t("ReservationUnitEditor.publishEnds")}
+                        initiallyOpen={Boolean(
+                          state.reservationUnitEdit.publishEnds
+                        )}
+                        onClose={() => setValue({ publishEnds: null })}
+                        noIndent
+                      >
+                        <DateTimeInput
+                          value={state.reservationUnitEdit.publishEnds}
+                          setValue={(v) =>
+                            setValue({
+                              publishEnds: v,
+                            })
+                          }
+                        />
+                      </ActivationGroup>
+                    </EditorColumns>
+                  </ActivationGroup>
+                </Fieldset>
+                <Fieldset
+                  heading={t("ReservationUnitEditor.reservationSettings")}
+                >
+                  <ActivationGroup
+                    id="useScheduledReservation"
+                    label={t("ReservationUnitEditor.scheduledReservation")}
+                    initiallyOpen={
+                      Boolean(state.reservationUnitEdit.reservationBegins) ||
+                      Boolean(state.reservationUnitEdit.reservationEnds)
+                    }
+                    onClose={() =>
+                      setValue({
+                        reservationBegins: null,
+                        reservationEnds: null,
+                      })
+                    }
+                  >
+                    <EditorColumns>
+                      <ActivationGroup
+                        id="reservationBegins"
+                        label={t("ReservationUnitEditor.reservationBegins")}
+                        initiallyOpen={Boolean(
+                          state.reservationUnitEdit.reservationBegins
+                        )}
+                        onClose={() => setValue({ reservationBegins: null })}
+                        noIndent
+                      >
+                        <DateTimeInput
+                          value={state.reservationUnitEdit.reservationBegins}
+                          setValue={(v) =>
+                            setValue({
+                              reservationBegins: v,
+                            })
+                          }
+                        />
+                      </ActivationGroup>
+                      <ActivationGroup
+                        id="reservationEnds"
+                        label={t("ReservationUnitEditor.publishEnds")}
+                        initiallyOpen={Boolean(
+                          state.reservationUnitEdit.reservationEnds
+                        )}
+                        onClose={() => setValue({ reservationEnds: null })}
+                        noIndent
+                      >
+                        <DateTimeInput
+                          value={state.reservationUnitEdit.reservationEnds}
+                          setValue={(v) =>
+                            setValue({
+                              reservationEnds: v,
+                            })
+                          }
+                        />
+                      </ActivationGroup>
+                    </EditorColumns>
+                  </ActivationGroup>
+                </Fieldset>
                 <EditorColumns>
                   <TimeInput
                     id="minReservationDuration"
@@ -1226,6 +1317,37 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                       onChange={(v) => setValue({ bufferTimeAfter: v })}
                       value={state.reservationUnitEdit.bufferTimeAfter || ""}
                     />
+                  </ActivationGroup>
+                  <ActivationGroup
+                    id="cancellationIsPossible"
+                    label={t("ReservationUnitEditor.cancellationIsPossible")}
+                    initiallyOpen={Boolean(
+                      state.reservationUnitEdit.cancellationRulePk
+                    )}
+                    onClose={() => setValue({ cancellationRulePk: null })}
+                  >
+                    <SelectionGroup
+                      required
+                      label={t("ReservationUnitEditor.cancellationGroupLabel")}
+                    >
+                      {state.cancellationRuleOptions.map((o) => (
+                        <RadioButton
+                          key={o.value}
+                          id={`cr-${o.value}`}
+                          value={o.value as string}
+                          label={o.label}
+                          onChange={(e) =>
+                            setValue({
+                              cancellationRulePk: Number(e.target.value),
+                            })
+                          }
+                          checked={
+                            state.reservationUnitEdit.cancellationRulePk ===
+                            o.value
+                          }
+                        />
+                      ))}
+                    </SelectionGroup>
                   </ActivationGroup>
                 </EditorColumns>
               </Accordion>

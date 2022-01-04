@@ -6,9 +6,9 @@ const Wrapper = styled.div`
   margin-top: var(--spacing-xs);
 `;
 
-const Indent = styled.div`
+const Indent = styled.div<{ $noIndent: boolean }>`
   margin-top: var(--spacing-m);
-  margin-left: var(--spacing-l);
+  ${({ $noIndent }) => ($noIndent ? null : `margin-left: var(--spacing-l);`)}
 `;
 
 const ActivationGroup = ({
@@ -16,12 +16,14 @@ const ActivationGroup = ({
   label,
   initiallyOpen,
   children,
+  noIndent = false,
   onClose,
 }: {
   id: string;
   label: string;
   initiallyOpen: boolean;
-  children: React.ReactChild;
+  children: React.ReactChild | React.ReactChild[];
+  noIndent?: boolean;
   onClose?: () => void;
 }): JSX.Element => {
   const [open, setOpen] = useState(initiallyOpen);
@@ -39,7 +41,7 @@ const ActivationGroup = ({
           }
         }}
       />
-      {open ? <Indent>{children}</Indent> : null}
+      {open ? <Indent $noIndent={noIndent}>{children}</Indent> : null}
     </Wrapper>
   );
 };
