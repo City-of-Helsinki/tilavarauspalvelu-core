@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 
 from snapshottest import Snapshot
 
+
 snapshots = Snapshot()
 
 snapshots['ReservationByPkTestCase::test_getting_reservation_by_pk 1'] = {
@@ -28,37 +29,65 @@ snapshots['ReservationByPkTestCase::test_getting_reservation_of_another_user_by_
     }
 }
 
+snapshots['ReservationQueryTestCase::test_filter_handling_required_false 1'] = {
+    'data': {
+        'reservations': {
+            'edges': [
+                {
+                    'node': {
+                        'name': 'movies',
+                        'state': 'CREATED'
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationQueryTestCase::test_filter_handling_required_true 1'] = {
+    'data': {
+        'reservations': {
+            'edges': [
+                {
+                    'node': {
+                        'name': 'Show me',
+                        'state': 'CONFIRMED'
+                    }
+                }
+            ]
+        }
+    }
+}
+
 snapshots['ReservationQueryTestCase::test_reservation_query 1'] = {
     'data': {
         'reservations': {
             'edges': [
                 {
                     'node': {
-                        'applyingForFreeOfCharge': True,
                         'ageGroup': {
                             'maximum': 30,
                             'minimum': 18
                         },
+                        'applyingForFreeOfCharge': True,
                         'begin': '2021-10-12T12:00:00+00:00',
                         'billingAddressCity': 'Turku',
                         'billingAddressStreet': 'Aurakatu 12B',
                         'billingAddressZip': '20100',
-                        'bufferTimeAfter': None,
-                        'bufferTimeBefore': None,
                         'billingEmail': 'billing@example.com',
                         'billingFirstName': 'Reser',
                         'billingLastName': 'Vee',
                         'billingPhone': '+358234567890',
+                        'bufferTimeAfter': None,
+                        'bufferTimeBefore': None,
                         'description': 'movies&popcorn',
                         'end': '2021-10-12T13:00:00+00:00',
                         'freeOfChargeReason': 'This is some reason.',
                         'homeCity': {
-                            'name': 'Test',
+                            'name': 'Test'
                         },
                         'name': 'movies',
                         'numPersons': None,
-                        'unitPrice': 10,
-                        'taxPercentageValue': '24.00',
                         'price': 10,
                         'priority': 'A_100',
                         'purpose': {
@@ -82,6 +111,8 @@ snapshots['ReservationQueryTestCase::test_reservation_query 1'] = {
                         'reserveePhone': '+358123456789',
                         'reserveeType': 'INDIVIDUAL',
                         'state': 'CREATED',
+                        'taxPercentageValue': '24.00',
+                        'unitPrice': 10,
                         'user': 'joe.regularl@foo.com'
                     }
                 }
