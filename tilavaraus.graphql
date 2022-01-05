@@ -1073,6 +1073,7 @@ type ReservationUnitByPkType implements Node {
   """Time after this reservation unit should not be publicly visible in UI."""
   publishEnds: DateTime
   metadataSet: ReservationMetadataSetType
+  maxReservationsPerUser: Int
   images: [ReservationUnitImageType]
 
   """The ID of the object"""
@@ -1206,18 +1207,19 @@ input ReservationUnitCreateMutationInput {
   """Time after this reservation unit should not be publicly visible in UI."""
   publishEnds: DateTime
   metadataSetPk: Int
-  contactInformationFi: String
-  contactInformationEn: String
-  contactInformationSv: String
-  additionalInstructionsFi: String
-  additionalInstructionsEn: String
-  additionalInstructionsSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
+  maxReservationsPerUser: Int
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
+  contactInformationFi: String
+  contactInformationEn: String
+  contactInformationSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  additionalInstructionsFi: String
+  additionalInstructionsEn: String
+  additionalInstructionsSv: String
   nameFi: String
   nameEn: String
   nameSv: String
@@ -1299,18 +1301,19 @@ type ReservationUnitCreateMutationPayload {
 
   """Time after this reservation unit should not be publicly visible in UI."""
   publishEnds: DateTime
-  contactInformationFi: String
-  contactInformationEn: String
-  contactInformationSv: String
-  additionalInstructionsFi: String
-  additionalInstructionsEn: String
-  additionalInstructionsSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
+  maxReservationsPerUser: Int
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
+  contactInformationFi: String
+  contactInformationEn: String
+  contactInformationSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  additionalInstructionsFi: String
+  additionalInstructionsEn: String
+  additionalInstructionsSv: String
   nameFi: String
   nameEn: String
   nameSv: String
@@ -1492,6 +1495,7 @@ type ReservationUnitType implements Node {
   """Time after this reservation unit should not be publicly visible in UI."""
   publishEnds: DateTime
   metadataSet: ReservationMetadataSetType
+  maxReservationsPerUser: Int
   images: [ReservationUnitImageType]
   applicationRounds(active: Boolean = null): [ApplicationRoundType]
 
@@ -1611,18 +1615,19 @@ input ReservationUnitUpdateMutationInput {
   """Time after this reservation unit should not be publicly visible in UI."""
   publishEnds: DateTime
   metadataSetPk: Int
-  contactInformationFi: String
-  contactInformationEn: String
-  contactInformationSv: String
-  additionalInstructionsFi: String
-  additionalInstructionsEn: String
-  additionalInstructionsSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
+  maxReservationsPerUser: Int
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
+  contactInformationFi: String
+  contactInformationEn: String
+  contactInformationSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  additionalInstructionsFi: String
+  additionalInstructionsEn: String
+  additionalInstructionsSv: String
   nameFi: String
   nameEn: String
   nameSv: String
@@ -1704,18 +1709,19 @@ type ReservationUnitUpdateMutationPayload {
 
   """Time after this reservation unit should not be publicly visible in UI."""
   publishEnds: DateTime
-  contactInformationFi: String
-  contactInformationEn: String
-  contactInformationSv: String
-  additionalInstructionsFi: String
-  additionalInstructionsEn: String
-  additionalInstructionsSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
+  maxReservationsPerUser: Int
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
+  contactInformationFi: String
+  contactInformationEn: String
+  contactInformationSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  additionalInstructionsFi: String
+  additionalInstructionsEn: String
+  additionalInstructionsSv: String
   nameFi: String
   nameEn: String
   nameSv: String
@@ -2332,15 +2338,15 @@ input UnitUpdateMutationInput {
   webPage: String
   email: String
   phone: String
+  shortDescriptionFi: String
+  shortDescriptionEn: String
+  shortDescriptionSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
-  shortDescriptionFi: String
-  shortDescriptionEn: String
-  shortDescriptionSv: String
   clientMutationId: String
 }
 
@@ -2350,15 +2356,15 @@ type UnitUpdateMutationPayload {
   webPage: String
   email: String
   phone: String
+  shortDescriptionFi: String
+  shortDescriptionEn: String
+  shortDescriptionSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
-  shortDescriptionFi: String
-  shortDescriptionEn: String
-  shortDescriptionSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]

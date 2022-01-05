@@ -62,5 +62,7 @@
     "collision": "Valittu aika on varattu. Valitse toinen aika.",
     "unavailable": "Valittu aika ei ole varattavissa. Valitse toinen aloitusaika tai kesto."
   },
-  "reservingStartsAt": "Varaaminen alkaa {{date}}"
+  "reservingStartsAt": "Varaaminen alkaa {{date}}",
+  "reservationQuota": "Sinulla on jo {{count}}/{{total}} varausta tähän tilaan.",
+  "reservationQuotaFull": "Sinulla on jo {{count}} varausta tähän tilaan. Et voi tehdä uusia varauksia."
 }

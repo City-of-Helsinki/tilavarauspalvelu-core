@@ -49,6 +49,7 @@ export const RESERVATION_UNIT = gql`
       maxPersons
       minReservationDuration
       maxReservationDuration
+      maxReservationsPerUser
       nextAvailableSlot
       unit {
         id

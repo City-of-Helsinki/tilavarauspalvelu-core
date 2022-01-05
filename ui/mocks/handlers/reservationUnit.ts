@@ -239,6 +239,14 @@ const selectedReservationUnitQuery = graphql.query<
     reservationUnitByPk.reservationEnds = addDays(new Date(), 10);
   }
 
+  if (req.variables.pk === 901) {
+    reservationUnitByPk.maxReservationsPerUser = 10;
+  }
+
+  if (req.variables.pk === 902) {
+    reservationUnitByPk.maxReservationsPerUser = 30;
+  }
+
   if (req.variables.pk === 999) {
     reservationUnitByPk.isDraft = true;
   }

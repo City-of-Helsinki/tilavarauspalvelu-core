@@ -80,6 +80,14 @@ export function reservationStartNotification(): Cypress.Chainable<
   );
 }
 
+export function reservationQuotaNotification(): Cypress.Chainable<
+  JQuery<HTMLElement>
+> {
+  return cy.get(
+    '[data-testid="reservation-unit--notification__reservation-quota"]'
+  );
+}
+
 export function gotoCalendarButton(): Cypress.Chainable<JQuery<HTMLElement>> {
   return cy.get('[data-testid="reservation-unit__button--goto-calendar"]');
 }

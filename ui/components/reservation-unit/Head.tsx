@@ -29,7 +29,6 @@ import {
 import { MediumButton } from "../../styles/util";
 import { ReservationUnitByPkType } from "../../modules/gql-types";
 import { getPrice } from "../../modules/reservationUnit";
-import { isReservationUnitReservable } from "../../modules/calendar";
 
 interface PropsType {
   reservationUnit: ReservationUnitByPkType;
@@ -37,6 +36,7 @@ interface PropsType {
   activeOpeningTimes: ActiveOpeningTime[];
   viewType: "recurring" | "single";
   calendarRef?: React.MutableRefObject<HTMLDivElement>;
+  isReservable?: boolean;
 }
 
 const TopContainer = styled.div`
@@ -109,6 +109,7 @@ const Head = ({
   activeOpeningTimes,
   viewType,
   calendarRef,
+  isReservable,
 }: PropsType): JSX.Element => {
   const {
     selectReservationUnit,
@@ -171,27 +172,23 @@ const Head = ({
                   }
                   texts={openingTimesTextArr}
                 />
-                {viewType === "single" &&
-                  reservationUnit.nextAvailableSlot &&
-                  reservationUnit.maxReservationDuration &&
-                  isReservationUnitReservable(reservationUnit) && (
-                    <StyledIconWithText
-                      icon={<IconCalendarClock aria-label="" />}
-                      text={`${t("reservationCalendar:nextAvailableSlot", {
-                        count:
-                          reservationUnit.maxReservationDuration.startsWith(
-                            "01:00:"
-                          )
-                            ? 1
-                            : 2,
-                        slot: maxReservationDuration,
-                      })}:
+                {viewType === "single" && isReservable && (
+                  <StyledIconWithText
+                    icon={<IconCalendarClock aria-label="" />}
+                    text={`${t("reservationCalendar:nextAvailableSlot", {
+                      count: reservationUnit.maxReservationDuration.startsWith(
+                        "01:00:"
+                      )
+                        ? 1
+                        : 2,
+                      slot: maxReservationDuration,
+                    })}:
                       ${t("common:dateTimeNoYear", {
                         date: parseISO(reservationUnit.nextAvailableSlot),
                       })}
                       `}
-                    />
-                  )}
+                  />
+                )}
               </div>
               <div>
                 {viewType === "single" && unitPrice && (
@@ -261,23 +258,20 @@ const Head = ({
                     {t("common:selectReservationUnit")}
                   </MediumButton>
                 ))}
-              {viewType === "single" &&
-                reservationUnit.minReservationDuration &&
-                reservationUnit.maxReservationDuration &&
-                isReservationUnitReservable(reservationUnit) && (
-                  <ThinButton
-                    onClick={() => {
-                      window.scroll({
-                        top: calendarRef.current.offsetTop - 20,
-                        left: 0,
-                        behavior: "smooth",
-                      });
-                    }}
-                    data-testid="reservation-unit__button--goto-calendar"
-                  >
-                    {t("reservationCalendar:showCalendar")}
-                  </ThinButton>
-                )}
+              {viewType === "single" && isReservable && (
+                <ThinButton
+                  onClick={() => {
+                    window.scroll({
+                      top: calendarRef.current.offsetTop - 20,
+                      left: 0,
+                      behavior: "smooth",
+                    });
+                  }}
+                  data-testid="reservation-unit__button--goto-calendar"
+                >
+                  {t("reservationCalendar:showCalendar")}
+                </ThinButton>
+              )}
             </ButtonContainer>
           </div>
           <JustForDesktop>

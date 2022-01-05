@@ -24,6 +24,7 @@ import {
   reservationStartNotification,
   gotoCalendarButton,
   calendarWrapper,
+  reservationQuotaNotification,
 } from "model/reservation-creation";
 import { textWithIcon } from "model/search";
 
@@ -102,6 +103,8 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
     gotoCalendarButton().should("exist");
 
     calendarWrapper().should("exist");
+
+    reservationQuotaNotification().should("not.exist");
 
     drawReservation();
 
@@ -435,5 +438,34 @@ describe("Tilavaraus ui reservation unit page (single) with reservation times", 
     calendarWrapper().should("not.exist");
 
     reservationStartNotification().should("contain", "Varaaminen alkaa");
+  });
+});
+
+describe("Tilavaraus ui reservation unit page (single) with reservation quota notification", () => {
+  it("should display apt notification if quota is set and full", () => {
+    cy.visit("/reservation-unit/single/901");
+
+    gotoCalendarButton().should("not.exist");
+
+    calendarWrapper().should("not.exist");
+
+    reservationQuotaNotification()
+      .invoke("text")
+      .should(
+        "match",
+        /^Sinulla on jo \d+ varausta tähän tilaan. Et voi tehdä uusia varauksia.$/
+      );
+  });
+
+  it("should display apt notification if quota is set but not full", () => {
+    cy.visit("/reservation-unit/single/902");
+
+    gotoCalendarButton().should("exist");
+
+    calendarWrapper().should("exist");
+
+    reservationQuotaNotification()
+      .invoke("text")
+      .should("match", /^Sinulla on jo \d+\/\d+ varausta tähän tilaan.$/);
   });
 });
