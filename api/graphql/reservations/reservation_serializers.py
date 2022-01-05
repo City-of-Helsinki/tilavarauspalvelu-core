@@ -10,6 +10,7 @@ from api.graphql.base_serializers import (
     PrimaryKeySerializer,
     PrimaryKeyUpdateSerializer,
 )
+from api.graphql.choice_char_field import ChoiceCharField
 from api.graphql.primary_key_fields import IntegerPrimaryKeyField
 from applications.models import CUSTOMER_TYPES, City
 from reservation_units.models import ReservationUnit
@@ -45,11 +46,12 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
     age_group_pk = IntegerPrimaryKeyField(
         queryset=AgeGroup.objects.all(), source="age_group", allow_null=True
     )
-    reservee_type = serializers.CharField(
+    reservee_type = ChoiceCharField(
+        choices=CUSTOMER_TYPES.CUSTOMER_TYPE_CHOICES,
         help_text=(
             "Type of the reservee. "
-            f"Possible values are {', '.join(value for value, _ in CUSTOMER_TYPES.CUSTOMER_TYPE_CHOICES)}."
-        )
+            f"Possible values are {', '.join(value[0].upper() for value in CUSTOMER_TYPES.CUSTOMER_TYPE_CHOICES)}."
+        ),
     )
 
     class Meta:

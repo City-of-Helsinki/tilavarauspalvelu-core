@@ -1714,8 +1714,8 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
             "cancellationRulePk": self.rule.pk,
             "lowestPrice": 0,
             "highestPrice": 20,
-            "priceUnit": "per_hour",
-            "reservationStartInterval": ReservationUnit.RESERVATION_START_INTERVAL_60_MINUTES,
+            "priceUnit": ReservationUnit.PRICE_UNIT_PER_HOUR.upper(),
+            "reservationStartInterval": ReservationUnit.RESERVATION_START_INTERVAL_60_MINUTES.upper(),
             "taxPercentagePk": TaxPercentage.objects.get(value=24).pk,
             "publishBegins": "2021-05-03T00:00:00+00:00",
             "publishEnds": "2021-05-03T00:00:00+00:00",
@@ -1758,8 +1758,8 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         assert_that(res_unit.cancellation_rule).is_equal_to(self.rule)
         assert_that(res_unit.lowest_price).is_equal_to(data.get("lowestPrice"))
         assert_that(res_unit.highest_price).is_equal_to(data.get("highestPrice"))
-        assert_that(res_unit.price_unit).is_equal_to(data.get("priceUnit"))
-        assert_that(res_unit.reservation_start_interval).is_equal_to(
+        assert_that(res_unit.price_unit.upper()).is_equal_to(data.get("priceUnit"))
+        assert_that(res_unit.reservation_start_interval.upper()).is_equal_to(
             data.get("reservationStartInterval")
         )
         assert_that(res_unit.tax_percentage).is_equal_to(
@@ -2569,7 +2569,7 @@ class ReservationUnitUpdateNotDraftTestCase(ReservationUnitMutationsTestCaseBase
         data = self.get_valid_update_data()
         data["lowestPrice"] = float(expected_lowest_price)
         data["highestPrice"] = float(expected_highest_price)
-        data["priceUnit"] = expected_price_unit
+        data["priceUnit"] = expected_price_unit.upper()
         update_query = """
             mutation updateReservationUnit($input: ReservationUnitUpdateMutationInput!) {
                 updateReservationUnit(input: $input) {
@@ -2597,7 +2597,7 @@ class ReservationUnitUpdateNotDraftTestCase(ReservationUnitMutationsTestCaseBase
             float(expected_highest_price)
         )
         assert_that(res_unit_data.get("priceUnit")).is_equal_to(
-            ReservationUnit.PRICE_UNIT_PER_HOUR
+            expected_price_unit.upper()
         )
         self.res_unit.refresh_from_db()
         assert_that(self.res_unit.lowest_price).is_equal_to(expected_lowest_price)
@@ -2707,7 +2707,7 @@ class ReservationUnitUpdateNotDraftTestCase(ReservationUnitMutationsTestCaseBase
     def test_update_reservation_start_interval(self):
         expected_interval = ReservationUnit.RESERVATION_START_INTERVAL_60_MINUTES
         data = self.get_valid_update_data()
-        data["reservationStartInterval"] = expected_interval
+        data["reservationStartInterval"] = expected_interval.upper()
         update_query = """
             mutation updateReservationUnit($input: ReservationUnitUpdateMutationInput!) {
                 updateReservationUnit(input: $input) {
@@ -2727,7 +2727,7 @@ class ReservationUnitUpdateNotDraftTestCase(ReservationUnitMutationsTestCaseBase
         assert_that(content.get("errors")).is_none()
         assert_that(res_unit_data.get("errors")).is_none()
         assert_that(res_unit_data.get("reservationStartInterval")).is_equal_to(
-            expected_interval
+            expected_interval.upper()
         )
         self.res_unit.refresh_from_db()
         assert_that(self.res_unit.reservation_start_interval).is_equal_to(
