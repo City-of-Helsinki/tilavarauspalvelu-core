@@ -97,6 +97,7 @@ class ReservationUnitQueryTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCa
             buffer_time_before=datetime.timedelta(minutes=15),
             buffer_time_after=datetime.timedelta(minutes=15),
             metadata_set=ReservationMetadataSetFactory(name="Test form"),
+            max_reservations_per_user=5,
         )
 
         cls.api_client = APIClient()
@@ -193,6 +194,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
                               supportedFields
                               requiredFields
                             }
+                            maxReservationsPerUser
                           }
                         }
                     }
@@ -1722,6 +1724,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
             "reservationBegins": "2021-05-03T00:00:00+00:00",
             "reservationEnds": "2021-05-03T00:00:00+00:00",
             "metadataSetPk": self.metadata_set.pk,
+            "maxReservationsPerUser": 2,
         }
 
     def test_create(self):
@@ -1778,6 +1781,9 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         )
         assert_that(res_unit.reservation_ends).is_equal_to(reservation_ends)
         assert_that(res_unit.metadata_set).is_equal_to(self.metadata_set)
+        assert_that(res_unit.max_reservations_per_user).is_equal_to(
+            data.get("maxReservationsPerUser")
+        )
 
     @mock.patch(
         "reservation_units.utils.hauki_exporter.ReservationUnitHaukiExporter.send_reservation_unit_to_hauki"
@@ -2512,6 +2518,36 @@ class ReservationUnitUpdateNotDraftTestCase(ReservationUnitMutationsTestCaseBase
         assert_that(self.res_unit.additional_instructions_fi).is_equal_to(expected_fi)
         assert_that(self.res_unit.additional_instructions_sv).is_equal_to(expected_sv)
         assert_that(self.res_unit.additional_instructions_en).is_equal_to(expected_en)
+
+    def test_update_max_reservations_per_user(self):
+        expected_max_reservations_per_user = 10
+        data = self.get_valid_update_data()
+        data["maxReservationsPerUser"] = expected_max_reservations_per_user
+        update_query = """
+            mutation updateReservationUnit($input: ReservationUnitUpdateMutationInput!) {
+                    updateReservationUnit(input: $input) {
+                        maxReservationsPerUser
+                        errors {
+                            messages
+                            field
+                        }
+                    }
+                }
+            """
+        response = self.query(update_query, input_data=data)
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        res_unit_data = content.get("data").get("updateReservationUnit")
+        assert_that(content.get("errors")).is_none()
+        assert_that(res_unit_data.get("errors")).is_none()
+        assert_that(res_unit_data.get("maxReservationsPerUser")).is_equal_to(
+            expected_max_reservations_per_user
+        )
+        self.res_unit.refresh_from_db()
+        assert_that(self.res_unit.max_reservations_per_user).is_equal_to(
+            expected_max_reservations_per_user
+        )
 
     def test_update_cancellation_rule(self):
         data = self.get_valid_update_data()
