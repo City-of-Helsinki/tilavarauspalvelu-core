@@ -381,6 +381,18 @@ class Reservation(models.Model):
         help_text="The price of this particular reservation",
     )
 
+    handled_at = models.DateTimeField(
+        verbose_name=_("Handled at"),
+        null=True,
+        blank=True,
+        help_text="When this reservation was handled.",
+    )
+    deny_details = models.TextField(
+        verbose_name=_("Deny details for this reservation"),
+        blank=True,
+        help_text="Additional details for denying the reservation",
+    )
+
     def get_location_string(self):
         locations = []
         for reservation_unit in self.reservation_unit.all():
