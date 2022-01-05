@@ -326,6 +326,15 @@ export const RESERVATION_UNIT_EDITOR_PARAMETERS = gql`
         }
       }
     }
+
+    metadataSets {
+      edges {
+        node {
+          name
+          pk
+        }
+      }
+    }
   }
 `;
 
@@ -430,6 +439,9 @@ export const RESERVATIONUNIT_QUERY = gql`
       reservationEnds
       publishBegins
       publishEnds
+      metadataSet {
+        pk
+      }
     }
   }
 `;

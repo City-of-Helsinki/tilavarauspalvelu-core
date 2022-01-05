@@ -943,6 +943,7 @@ const translations: ITranslations = {
     reservationSettings: ["Varaamisen näkyminen"],
     reservationBegins: ["Näytä varaaminen alkaen"],
     reservationEnds: ["Piilota varaaminen"],
+    metadataSet: ["Varauslomake"],
   },
   ImageEditor: {
     imageType: ["Kuvan tyyppi"],

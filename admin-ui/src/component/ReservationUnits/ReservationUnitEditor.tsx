@@ -116,6 +116,7 @@ type State = {
   serviceSpecificTermsOptions: OptionType[];
   cancellationRuleOptions: OptionType[];
   taxPercentageOptions: OptionType[];
+  metadataOptions: OptionType[];
   unit?: UnitByPkType;
   dataLoaded: LoadingCompleted[];
 };
@@ -161,6 +162,11 @@ const durationOptions = [
   { value: "01:30:00", label: "90 minuuttia" },
 ];
 
+const nullOption: OptionType = {
+  value: null,
+  label: i18next.t("common.select"),
+};
+
 const getInitialState = (reservationUnitPk: number): State => ({
   cancellationRuleOptions: [],
   cancellationTermsOptions: [],
@@ -180,6 +186,7 @@ const getInitialState = (reservationUnitPk: number): State => ({
   spaceOptions: [],
   spaces: [],
   taxPercentageOptions: [],
+  metadataOptions: [],
 });
 
 const withLoadingStatus = (
@@ -214,8 +221,10 @@ const withLoadingStatus = (
   };
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const modifyEditorState = (state: State, edit: any) => ({
+const modifyEditorState = (
+  state: State,
+  edit: Partial<ReservationUnitEditorType>
+) => ({
   ...state,
   reservationUnitEdit: { ...state.reservationUnitEdit, ...edit },
   hasChanges: true,
@@ -241,14 +250,9 @@ const reducer = (state: State, action: Action): State => {
             "maxReservationDuration",
             "minReservationDuration",
             "pk",
-            "reservationStartInterval",
-            "requireIntroduction",
-            "bufferTimeBefore",
-            "bufferTimeAfter",
             "priceUnit",
             "publishBegins",
             "publishEnds",
-            "requireIntroduction",
             "requireIntroduction",
             "reservationBegins",
             "reservationEnds",
@@ -283,6 +287,7 @@ const reducer = (state: State, action: Action): State => {
             reservationUnit,
             "serviceSpecificTerms.pk"
           ),
+          metadataSetPk: get(reservationUnit, "metadataSet.pk", null),
         },
         hasChanges: false,
       });
@@ -356,11 +361,14 @@ const reducer = (state: State, action: Action): State => {
         ),
         cancellationRuleOptions: (
           action.parameters.reservationUnitCancellationRules?.edges || []
-        ).map((e) =>
-          makeOption({
-            pk: get(e, "node.pk", -1),
-            nameFi: get(e, "node.nameFi", "no-name"),
-          })
+        ).map((e) => optionMaker(e)),
+        metadataOptions: [nullOption].concat(
+          (action.parameters.metadataSets?.edges || []).map((e) =>
+            makeOption({
+              pk: get(e, "node.pk", -1),
+              nameFi: get(e, "node.name", "no-name"),
+            })
+          )
         ),
       });
     }
@@ -643,7 +651,6 @@ const ReservationUnitEditor = (): JSX.Element | null => {
         ...omitBy(state.reservationUnitEdit, (v) => v === ""),
         surfaceArea: Number(state.reservationUnitEdit?.surfaceArea),
         isDraft: !publish,
-        cancellationRulePk: state.reservationUnitEdit?.cancellationRulePk,
         priceUnit: state.reservationUnitEdit?.priceUnit?.toLocaleLowerCase(), /// due to api inconsistency
         reservationStartInterval:
           state.reservationUnitEdit?.reservationStartInterval?.toLocaleLowerCase(), /// due to api inconsistency
@@ -651,45 +658,36 @@ const ReservationUnitEditor = (): JSX.Element | null => {
       [
         "bufferTimeAfter",
         "bufferTimeBefore",
+        "cancellationRulePk",
+        "cancellationTermsPk",
+        "equipmentPks",
         "highestPrice",
         "isDraft",
         "lowestPrice",
         "maxPersons",
-        "maxReservationDuration",
+        "metadataSetPk",
         "minReservationDuration",
+        "paymentTermsPk",
         "pk",
         "priceUnit",
         "publishBegins",
         "publishEnds",
+        "purposePks",
         "requireIntroduction",
         "reservationBegins",
         "reservationEnds",
         "reservationStartInterval",
-        "surfaceArea",
-        ...i18nFields("additionalInstructions"),
-        ...i18nFields("description"),
-        ...i18nFields("name"),
-        ...i18nFields("termsOfUse"),
-        "cancellationRulePk",
-        "cancellationTermsPk",
-        "equipmentPks",
-        "paymentTermsPk",
-        "purposePks",
         "reservationUnitTypePk",
         "resourcePks",
         "serviceSpecificTermsPk",
         "spacePks",
+        "surfaceArea",
         "taxPercentagePk",
         "unitPk",
-        "lowestPrice",
-        "highestPrice",
-        "priceUnit",
-        "bufferTimeBefore",
-        "bufferTimeAfter",
-        ...i18nFields("name"),
-        ...i18nFields("description"),
-        ...i18nFields("termsOfUse"),
         ...i18nFields("additionalInstructions"),
+        ...i18nFields("description"),
+        ...i18nFields("name"),
+        ...i18nFields("termsOfUse"),
       ]
     );
 
@@ -956,19 +954,6 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                       ]}
                     />
                   </EditorColumns>
-                  <Checkbox
-                    id="requireIntroduction"
-                    label={t("ReservationUnitEditor.requireIntroductionLabel")}
-                    checked={
-                      state.reservationUnitEdit.requireIntroduction === true
-                    }
-                    onClick={() =>
-                      setValue({
-                        requireIntroduction:
-                          !state.reservationUnitEdit?.requireIntroduction,
-                      })
-                    }
-                  />
                   <EditorColumns>
                     <NumberInput
                       value={state.reservationUnitEdit.surfaceArea || 0}
@@ -1350,6 +1335,28 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                     </SelectionGroup>
                   </ActivationGroup>
                 </EditorColumns>
+                <EditorColumns>
+                  <Select
+                    id="metadataSet"
+                    options={state.metadataOptions}
+                    label={t("ReservationUnitEditor.metadataSet")}
+                    onChange={(v) => setValue({ metadataSetPk: v })}
+                    value={state.reservationUnitEdit.metadataSetPk || null}
+                  />
+                </EditorColumns>
+                <Checkbox
+                  id="requireIntroduction"
+                  label={t("ReservationUnitEditor.requireIntroductionLabel")}
+                  checked={
+                    state.reservationUnitEdit.requireIntroduction === true
+                  }
+                  onClick={() =>
+                    setValue({
+                      requireIntroduction:
+                        !state.reservationUnitEdit?.requireIntroduction,
+                    })
+                  }
+                />
               </Accordion>
               <Accordion heading={t("ReservationUnitEditor.pricing")}>
                 <DenseEditorColumns>
