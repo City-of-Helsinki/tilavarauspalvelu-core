@@ -88,7 +88,7 @@ snapshots['ReservationQueryTestCase::test_reservation_query 1'] = {
                         },
                         'name': 'movies',
                         'numPersons': None,
-                        'price': 10,
+                        'price': 10.0,
                         'priority': 'A_100',
                         'purpose': {
                             'nameFi': 'purpose'
@@ -112,7 +112,7 @@ snapshots['ReservationQueryTestCase::test_reservation_query 1'] = {
                         'reserveeType': 'INDIVIDUAL',
                         'state': 'CREATED',
                         'taxPercentageValue': '24.00',
-                        'unitPrice': 10,
+                        'unitPrice': 10.0,
                         'user': 'joe.regularl@foo.com'
                     }
                 }
