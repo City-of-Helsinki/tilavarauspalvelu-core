@@ -8,10 +8,14 @@ from api.graphql.reservations.reservation_serializers import (
     ReservationCancellationSerializer,
     ReservationConfirmSerializer,
     ReservationCreateSerializer,
+    ReservationHandleSerializer,
     ReservationUpdateSerializer,
 )
 from api.graphql.reservations.reservation_types import ReservationType
-from permissions.api_permissions.graphene_permissions import ReservationPermission
+from permissions.api_permissions.graphene_permissions import (
+    ReservationHandlingPermission,
+    ReservationPermission,
+)
 from reservations.models import Reservation
 from tilavarauspalvelu import settings
 
@@ -75,3 +79,15 @@ class ReservationCancellationMutation(AuthSerializerMutation, SerializerMutation
     class Meta:
         lookup_field = "pk"
         serializer_class = ReservationCancellationSerializer
+
+
+class ReservationHandleMutation(AuthSerializerMutation, SerializerMutation):
+    permission_classes = (
+        (ReservationHandlingPermission,)
+        if not settings.TMP_PERMISSIONS_DISABLED
+        else (AllowAny,)
+    )
+
+    class Meta:
+        lookup_field = "pk"
+        serializer_class = ReservationHandleSerializer

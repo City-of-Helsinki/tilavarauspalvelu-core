@@ -464,3 +464,43 @@ class ReservationCancellationSerializer(PrimaryKeyUpdateSerializer):
                 )
 
         return data
+
+
+class ReservationHandleSerializer(PrimaryKeySerializer):
+    deny_details = serializers.CharField(
+        help_text="Additional information for denying (if approve is false)",
+        required=False,
+    )
+
+    approve = serializers.BooleanField(
+        help_text="Will this reservation be approved",
+        required=True,
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["state"].read_only = True
+        self.fields["handled_at"].read_only = True
+
+    class Meta:
+        model = Reservation
+        fields = ["pk", "state", "deny_details", "handled_at", "approve"]
+
+    @property
+    def validated_data(self):
+        validated_data = super().validated_data
+        if validated_data["approve"]:
+            validated_data.pop("deny_details", None)
+        else:
+            validated_data["state"] = STATE_CHOICES.DENIED
+        validated_data["handled_at"] = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
+        return validated_data
+
+    def validate(self, data):
+        data = super().validate(data)
+        if not self.instance.needs_handling:
+            raise serializers.ValidationError(
+                "This reservation does not need handling."
+            )
+
+        return data

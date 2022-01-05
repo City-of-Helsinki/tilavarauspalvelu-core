@@ -657,7 +657,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         assert_that(reservation).is_not_none()
 
     def test_creating_reservation_succeeds_when_under_max_reservations_per_user(
-            self, mock_periods, mock_opening_hours
+        self, mock_periods, mock_opening_hours
     ):
         self.reservation_unit.max_reservations_per_user = 1
         self.reservation_unit.save(update_fields=["max_reservations_per_user"])
@@ -674,7 +674,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         assert_that(Reservation.objects.exists()).is_true()
 
     def test_creating_reservation_fails_when_max_reservations_per_user_reached(
-            self, mock_periods, mock_opening_hours
+        self, mock_periods, mock_opening_hours
     ):
         self.reservation_unit.max_reservations_per_user = 1
         self.reservation_unit.save(update_fields=["max_reservations_per_user"])
@@ -705,7 +705,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         ).is_false()
 
     def test_old_reservations_are_not_counted_towards_max_reservations_per_user(
-            self, mock_periods, mock_opening_hours
+        self, mock_periods, mock_opening_hours
     ):
         self.reservation_unit.max_reservations_per_user = 1
         self.reservation_unit.save(update_fields=["max_reservations_per_user"])

@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 from django.db import models
 from django.db.models import F, Sum
 from django.utils import timezone
-from django.utils.timezone import get_current_timezone
+from django.utils.timezone import get_current_timezone, get_default_timezone
 from django.utils.translation import gettext_lazy as _
 
 from applications.models import (
@@ -444,6 +444,22 @@ class Reservation(models.Model):
             f"{', '.join(unit_names)}\n"
             f"{self.reservation_unit.unit if hasattr(self.reservation_unit, 'unit') else ''}"
         )
+
+    @property
+    def needs_handling(self):
+        """This `needs_handling` means reservations NOT going through application process
+        (and thus automatic allocation).
+
+        Reservations are generally considered requiring handling if one of their ReservationUnit have a metadata_set.
+        """
+        if (
+            self.state == STATE_CHOICES.CONFIRMED  # User has confirmed the reservation.
+            and self.begin
+            > datetime.now(tz=get_default_timezone())  # Time has not past.
+            and not self.recurring_reservation  # "Single reservations" shouldn't be recurring.
+        ):
+            return self.reservation_unit.filter(metadata_set__isnull=False).exists()
+        return False
 
 
 class ReservationPurpose(models.Model):
