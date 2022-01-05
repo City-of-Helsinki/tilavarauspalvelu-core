@@ -18,6 +18,7 @@ RUN if [ "x$BUILD_MODE" = "xlocal" ] ;\
     fi
 
 RUN subscription-manager repos --enable codeready-builder-for-rhel-8-x86_64-rpms
+RUN subscription-manager repos --disable rhel-8-for-x86_64-appstream-beta-rpms
 RUN yum -y update
 
 RUN rpm -Uvh https://download.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
