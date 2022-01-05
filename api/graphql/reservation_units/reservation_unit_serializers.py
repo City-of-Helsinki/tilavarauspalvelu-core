@@ -192,6 +192,7 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
         queryset=ReservationMetadataSet.objects.all(),
         source="metadata_set",
         required=False,
+        allow_null=True,
     )
 
     translation_fields = get_all_translatable_fields(ReservationUnit)
