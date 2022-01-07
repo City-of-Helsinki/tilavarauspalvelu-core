@@ -246,6 +246,7 @@ const reducer = (state: State, action: Action): State => {
           ...(pick(reservationUnit, [
             "bufferTimeAfter",
             "bufferTimeBefore",
+            "maxReservationsPerUser",
             "maxPersons",
             "maxReservationDuration",
             "minReservationDuration",
@@ -654,6 +655,10 @@ const ReservationUnitEditor = (): JSX.Element | null => {
         priceUnit: state.reservationUnitEdit?.priceUnit?.toLocaleLowerCase(), /// due to api inconsistency
         reservationStartInterval:
           state.reservationUnitEdit?.reservationStartInterval?.toLocaleLowerCase(), /// due to api inconsistency
+        maxReservationsPerUser: state.reservationUnitEdit
+          ?.maxReservationsPerUser
+          ? Number(state.reservationUnitEdit?.maxReservationsPerUser)
+          : undefined,
       },
       [
         "bufferTimeAfter",
@@ -665,6 +670,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
         "isDraft",
         "lowestPrice",
         "maxPersons",
+        "maxReservationsPerUser",
         "metadataSetPk",
         "minReservationDuration",
         "paymentTermsPk",
@@ -1342,6 +1348,20 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                     label={t("ReservationUnitEditor.metadataSet")}
                     onChange={(v) => setValue({ metadataSetPk: v })}
                     value={state.reservationUnitEdit.metadataSetPk || null}
+                  />
+                  <NumberInput
+                    id="maxReservationsPerUser"
+                    label={t("ReservationUnitEditor.maxReservationsPerUser")}
+                    min={1}
+                    max={15}
+                    value={
+                      state.reservationUnitEdit.maxReservationsPerUser || ""
+                    }
+                    onChange={(e) =>
+                      setValue({
+                        maxReservationsPerUser: e.target.value,
+                      })
+                    }
                   />
                 </EditorColumns>
                 <Checkbox
