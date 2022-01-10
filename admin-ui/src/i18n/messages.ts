@@ -886,8 +886,8 @@ const translations: ITranslations = {
     errorParamsNotAvailable: [
       "Parametridataa puuttuu, osa lomakkeesta voi olla epäkunnossa",
     ],
-    minReservationDurationLabel: ["Vuoron minimikesto"],
-    maxReservationDurationLabel: ["Vuoron maksimikesto"],
+    minReservationDurationLabel: ["Varauksen minimikesto"],
+    maxReservationDurationLabel: ["Varauksen maksimikesto"],
     reservationStartIntervalLabel: ["Varauksen aloitukset"],
     tosLabel: ["Varausyksikkökohtaiset ohjeet {{lang}}"],
     tosPlaceholder: ["Ohjeteksti {{language}}"],
