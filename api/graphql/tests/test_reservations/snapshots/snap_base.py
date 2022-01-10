@@ -4,7 +4,6 @@ from __future__ import unicode_literals
 
 from snapshottest import Snapshot
 
-
 snapshots = Snapshot()
 
 snapshots['ReservationByPkTestCase::test_getting_reservation_by_pk 1'] = {
@@ -91,8 +90,8 @@ snapshots['ReservationQueryTestCase::test_reservation_query 1'] = {
                         'billingFirstName': 'Reser',
                         'billingLastName': 'Vee',
                         'billingPhone': '+358234567890',
-                        'bufferTimeAfter': None,
-                        'bufferTimeBefore': None,
+                        'bufferTimeAfter': 1800,
+                        'bufferTimeBefore': 900,
                         'description': 'movies&popcorn',
                         'end': '2021-10-12T13:00:00+00:00',
                         'freeOfChargeReason': 'This is some reason.',

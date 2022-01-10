@@ -8,6 +8,7 @@ from graphene_permissions.permissions import AllowAny, AllowAuthenticated
 from rest_framework.reverse import reverse
 
 from api.graphql.base_type import PrimaryKeyObjectType
+from api.graphql.duration_field import Duration
 from api.graphql.translate_fields import get_all_translatable_fields
 from api.ical_api import hmac_signature
 from permissions.api_permissions.graphene_field_decorators import (
@@ -139,6 +140,8 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
     tax_percentage_value = graphene.Decimal()
     price = graphene.Float()
     age_group = graphene.Field(AgeGroupType)
+    buffer_time_before = Duration()
+    buffer_time_after = Duration()
 
     class Meta:
         model = Reservation

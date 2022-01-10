@@ -7,6 +7,7 @@ from api.graphql.base_serializers import (
     PrimaryKeyUpdateSerializer,
 )
 from api.graphql.choice_char_field import ChoiceCharField
+from api.graphql.duration_field import DurationField
 from api.graphql.primary_key_fields import IntegerPrimaryKeyField
 from api.graphql.translate_fields import get_all_translatable_fields
 from api.reservation_units_api import (
@@ -96,8 +97,10 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
     name_fi = serializers.CharField(required=False, allow_blank=True)
     name_sv = serializers.CharField(required=False, allow_blank=True)
     name_en = serializers.CharField(required=False, allow_blank=True)
-    max_reservation_duration = serializers.DurationField(required=False)
-    min_reservation_duration = serializers.DurationField(required=False)
+    max_reservation_duration = DurationField(required=False)
+    min_reservation_duration = DurationField(required=False)
+    buffer_time_before = DurationField(required=False)
+    buffer_time_after = DurationField(required=False)
     max_persons = serializers.IntegerField(required=False)
     space_pks = serializers.ListField(
         child=IntegerPrimaryKeyField(queryset=Space.objects.all()),

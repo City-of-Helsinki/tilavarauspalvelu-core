@@ -11,6 +11,7 @@ from api.graphql.base_serializers import (
     PrimaryKeyUpdateSerializer,
 )
 from api.graphql.choice_char_field import ChoiceCharField
+from api.graphql.duration_field import DurationField
 from api.graphql.primary_key_fields import IntegerPrimaryKeyField
 from applications.models import CUSTOMER_TYPES, City
 from reservation_units.models import ReservationUnit
@@ -55,6 +56,8 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
             f"Possible values are {', '.join(value[0].upper() for value in CUSTOMER_TYPES.CUSTOMER_TYPE_CHOICES)}."
         ),
     )
+    buffer_time_before = DurationField(required=False)
+    buffer_time_after = DurationField(required=False)
 
     class Meta:
         model = Reservation

@@ -59,6 +59,11 @@ class ReservationUnitQueryTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCa
             name_en="test type en",
             name_sv="test type sv",
         )
+        service = ServiceFactory(
+            name="Test Service",
+            buffer_time_before=datetime.timedelta(minutes=15),
+            buffer_time_after=datetime.timedelta(minutes=30),
+        )
         large_space = SpaceFactory(
             max_persons=100, name="Large space", surface_area=100
         )
@@ -80,6 +85,7 @@ class ReservationUnitQueryTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCa
             reservation_unit_type=cls.type,
             uuid="3774af34-9916-40f2-acc7-68db5a627710",
             spaces=[large_space, small_space],
+            services=[service],
             cancellation_rule=rule,
             additional_instructions_fi="Lisäohjeita",
             additional_instructions_sv="Ytterligare instruktioner",
@@ -97,6 +103,8 @@ class ReservationUnitQueryTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCa
             + datetime.timedelta(days=7),
             buffer_time_before=datetime.timedelta(minutes=15),
             buffer_time_after=datetime.timedelta(minutes=15),
+            min_reservation_duration=datetime.timedelta(minutes=10),
+            max_reservation_duration=datetime.timedelta(days=1),
             metadata_set=ReservationMetadataSetFactory(name="Test form"),
             max_reservations_per_user=5,
         )
@@ -128,6 +136,8 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
                             }
                             services {
                               nameFi
+                              bufferTimeBefore
+                              bufferTimeAfter
                             }
                             requireIntroduction
                             purposes {
@@ -190,6 +200,8 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
                             publishEnds
                             bufferTimeBefore
                             bufferTimeAfter
+                            minReservationDuration
+                            maxReservationDuration
                             metadataSet {
                               name
                               supportedFields
@@ -1752,8 +1764,8 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
             "reservationUnitTypePk": self.reservation_unit_type.id,
             "surfaceArea": 100,
             "maxPersons": 10,
-            "bufferTimeAfter": "1:00:00",
-            "bufferTimeBefore": "1:00:00",
+            "bufferTimeAfter": 3600,
+            "bufferTimeBefore": 3600,
             "cancellationRulePk": self.rule.pk,
             "lowestPrice": 0,
             "highestPrice": 20,
