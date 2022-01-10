@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 import styled from "styled-components";
 import { Button, IconCross } from "hds-react";
 import { useTranslation } from "react-i18next";
-import { useModal } from "../context/UIContext";
+import { useModal } from "../context/ModalContext";
 import { breakpoints, Seranwrap } from "../styles/util";
 
 interface IProps {

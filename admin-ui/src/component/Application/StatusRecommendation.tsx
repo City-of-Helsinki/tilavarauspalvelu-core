@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import { useModal } from "../../context/UIContext";
+import { useModal } from "../../context/ModalContext";
 import InfoBubble from "../InfoBubble";
 import StageInfo from "../ApplicationRound/StageInfo";
 import { ApplicationRound } from "../../common/types";

@@ -55,7 +55,6 @@ import { MainMenuWrapper } from "../withMainMenu";
 import RichTextInput from "../RichTextInput";
 import { useNotification } from "../../context/NotificationContext";
 import ActivationGroup from "./ActivationGroup";
-import { assertApiAccessTokenIsAvailable } from "../../common/auth/util";
 import EnumSelect from "./EnumSelect";
 import ImageEditor from "./ImageEditor";
 import DateTimeInput from "./DateTimeInput";
@@ -738,15 +737,6 @@ const ReservationUnitEditor = (): JSX.Element | null => {
       onDataError(t("ReservationUnitEditor.saveFailed", { error }));
     }
   };
-
-  useEffect(() => {
-    assertApiAccessTokenIsAvailable().then((keyUpdated) => {
-      if (keyUpdated) {
-        history.go(0);
-      }
-    });
-    // eslint-disable-next-line
-  }, []);
 
   useQuery<Query, QueryReservationUnitByPkArgs>(RESERVATIONUNIT_QUERY, {
     variables: { pk: Number(reservationUnitPk) },

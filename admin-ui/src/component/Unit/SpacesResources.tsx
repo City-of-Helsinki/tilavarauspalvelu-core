@@ -9,7 +9,7 @@ import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
 import { useQuery } from "@apollo/client";
-import { useModal } from "../../context/UIContext";
+import { useModal } from "../../context/ModalContext";
 import { IngressContainer, WideContainer } from "../../styles/layout";
 import Loader from "../Loader";
 import withMainMenu from "../withMainMenu";
