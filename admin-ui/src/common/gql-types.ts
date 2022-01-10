@@ -907,8 +907,10 @@ export type QueryReservationsArgs = {
   begin?: InputMaybe<Scalars["DateTime"]>;
   end?: InputMaybe<Scalars["DateTime"]>;
   first?: InputMaybe<Scalars["Int"]>;
+  handlingRequired?: InputMaybe<Scalars["Boolean"]>;
   last?: InputMaybe<Scalars["Int"]>;
   offset?: InputMaybe<Scalars["Int"]>;
+  state?: InputMaybe<Scalars["String"]>;
 };
 
 export type QueryResourceArgs = {
@@ -1121,7 +1123,7 @@ export type ReservationConfirmMutationPayload = {
   reserveeLastName?: Maybe<Scalars["String"]>;
   reserveeOrganisationName?: Maybe<Scalars["String"]>;
   reserveePhone?: Maybe<Scalars["String"]>;
-  /** Type of the reservee. Possible values are business, nonprofit, individual. */
+  /** Type of the reservee. Possible values are BUSINESS, NONPROFIT, INDIVIDUAL. */
   reserveeType?: Maybe<Scalars["String"]>;
   /** String value for ReservationType's ReservationState enum. */
   state?: Maybe<Scalars["String"]>;
@@ -1165,7 +1167,7 @@ export type ReservationCreateMutationInput = {
   reserveeLastName?: InputMaybe<Scalars["String"]>;
   reserveeOrganisationName?: InputMaybe<Scalars["String"]>;
   reserveePhone?: InputMaybe<Scalars["String"]>;
-  /** Type of the reservee. Possible values are business, nonprofit, individual. */
+  /** Type of the reservee. Possible values are BUSINESS, NONPROFIT, INDIVIDUAL. */
   reserveeType?: InputMaybe<Scalars["String"]>;
 };
 
@@ -1210,7 +1212,7 @@ export type ReservationCreateMutationPayload = {
   reserveeLastName?: Maybe<Scalars["String"]>;
   reserveeOrganisationName?: Maybe<Scalars["String"]>;
   reserveePhone?: Maybe<Scalars["String"]>;
-  /** Type of the reservee. Possible values are business, nonprofit, individual. */
+  /** Type of the reservee. Possible values are BUSINESS, NONPROFIT, INDIVIDUAL. */
   reserveeType?: Maybe<Scalars["String"]>;
   /** Read only string value for ReservationType's ReservationState enum. */
   state?: Maybe<Scalars["String"]>;
@@ -1370,6 +1372,7 @@ export type ReservationUnitByPkType = Node & {
   lowestPrice: Scalars["Decimal"];
   maxPersons?: Maybe<Scalars["Int"]>;
   maxReservationDuration?: Maybe<Scalars["Time"]>;
+  maxReservationsPerUser?: Maybe<Scalars["Int"]>;
   metadataSet?: Maybe<ReservationMetadataSetType>;
   minReservationDuration?: Maybe<Scalars["Time"]>;
   nameEn?: Maybe<Scalars["String"]>;
@@ -1495,13 +1498,14 @@ export type ReservationUnitCreateMutationInput = {
   lowestPrice?: InputMaybe<Scalars["Float"]>;
   maxPersons?: InputMaybe<Scalars["Int"]>;
   maxReservationDuration?: InputMaybe<Scalars["String"]>;
+  maxReservationsPerUser?: InputMaybe<Scalars["Int"]>;
   metadataSetPk?: InputMaybe<Scalars["Int"]>;
   minReservationDuration?: InputMaybe<Scalars["String"]>;
   nameEn?: InputMaybe<Scalars["String"]>;
   nameFi?: InputMaybe<Scalars["String"]>;
   nameSv?: InputMaybe<Scalars["String"]>;
   paymentTermsPk?: InputMaybe<Scalars["String"]>;
-  /** Unit of the price. Possible values are per_15_mins, per_30_mins, per_hour, per_half_day, per_day, per_week, fixed. */
+  /** Unit of the price. Possible values are PER_15_MINS, PER_30_MINS, PER_HOUR, PER_HALF_DAY, PER_DAY, PER_WEEK, FIXED. */
   priceUnit?: InputMaybe<Scalars["String"]>;
   /** Time after this reservation unit should be publicly visible in UI. */
   publishBegins?: InputMaybe<Scalars["DateTime"]>;
@@ -1514,7 +1518,7 @@ export type ReservationUnitCreateMutationInput = {
   reservationBegins?: InputMaybe<Scalars["DateTime"]>;
   /** Time when making reservations become not possible for this reservation unit */
   reservationEnds?: InputMaybe<Scalars["DateTime"]>;
-  /** Determines the interval for the start time of the reservation. For example an interval of 15 minutes means a reservation can begin at minutes 0, 15, 30, or 45. Possible values are interval_15_mins, interval_30_mins, interval_60_mins, interval_90_mins. */
+  /** Determines the interval for the start time of the reservation. For example an interval of 15 minutes means a reservation can begin at minutes 0, 15, 30, or 45. Possible values are INTERVAL_15_MINS, INTERVAL_30_MINS, INTERVAL_60_MINS, INTERVAL_90_MINS. */
   reservationStartInterval?: InputMaybe<Scalars["String"]>;
   reservationUnitTypePk?: InputMaybe<Scalars["Int"]>;
   resourcePks?: InputMaybe<Array<InputMaybe<Scalars["Int"]>>>;
@@ -1558,12 +1562,13 @@ export type ReservationUnitCreateMutationPayload = {
   lowestPrice?: Maybe<Scalars["Float"]>;
   maxPersons?: Maybe<Scalars["Int"]>;
   maxReservationDuration?: Maybe<Scalars["String"]>;
+  maxReservationsPerUser?: Maybe<Scalars["Int"]>;
   minReservationDuration?: Maybe<Scalars["String"]>;
   nameEn?: Maybe<Scalars["String"]>;
   nameFi?: Maybe<Scalars["String"]>;
   nameSv?: Maybe<Scalars["String"]>;
   pk?: Maybe<Scalars["Int"]>;
-  /** Unit of the price. Possible values are per_15_mins, per_30_mins, per_hour, per_half_day, per_day, per_week, fixed. */
+  /** Unit of the price. Possible values are PER_15_MINS, PER_30_MINS, PER_HOUR, PER_HALF_DAY, PER_DAY, PER_WEEK, FIXED. */
   priceUnit?: Maybe<Scalars["String"]>;
   /** Time after this reservation unit should be publicly visible in UI. */
   publishBegins?: Maybe<Scalars["DateTime"]>;
@@ -1576,7 +1581,7 @@ export type ReservationUnitCreateMutationPayload = {
   reservationBegins?: Maybe<Scalars["DateTime"]>;
   /** Time when making reservations become not possible for this reservation unit */
   reservationEnds?: Maybe<Scalars["DateTime"]>;
-  /** Determines the interval for the start time of the reservation. For example an interval of 15 minutes means a reservation can begin at minutes 0, 15, 30, or 45. Possible values are interval_15_mins, interval_30_mins, interval_60_mins, interval_90_mins. */
+  /** Determines the interval for the start time of the reservation. For example an interval of 15 minutes means a reservation can begin at minutes 0, 15, 30, or 45. Possible values are INTERVAL_15_MINS, INTERVAL_30_MINS, INTERVAL_60_MINS, INTERVAL_90_MINS. */
   reservationStartInterval?: Maybe<Scalars["String"]>;
   reservationUnit?: Maybe<ReservationUnitType>;
   /** Type of the reservation unit as nested related object. */
@@ -1670,6 +1675,7 @@ export type ReservationUnitType = Node & {
   lowestPrice: Scalars["Decimal"];
   maxPersons?: Maybe<Scalars["Int"]>;
   maxReservationDuration?: Maybe<Scalars["Time"]>;
+  maxReservationsPerUser?: Maybe<Scalars["Int"]>;
   metadataSet?: Maybe<ReservationMetadataSetType>;
   minReservationDuration?: Maybe<Scalars["Time"]>;
   nameEn?: Maybe<Scalars["String"]>;
@@ -1783,6 +1789,7 @@ export type ReservationUnitUpdateMutationInput = {
   lowestPrice?: InputMaybe<Scalars["Float"]>;
   maxPersons?: InputMaybe<Scalars["Int"]>;
   maxReservationDuration?: InputMaybe<Scalars["String"]>;
+  maxReservationsPerUser?: InputMaybe<Scalars["Int"]>;
   metadataSetPk?: InputMaybe<Scalars["Int"]>;
   minReservationDuration?: InputMaybe<Scalars["String"]>;
   nameEn?: InputMaybe<Scalars["String"]>;
@@ -1790,7 +1797,7 @@ export type ReservationUnitUpdateMutationInput = {
   nameSv?: InputMaybe<Scalars["String"]>;
   paymentTermsPk?: InputMaybe<Scalars["String"]>;
   pk: Scalars["Int"];
-  /** Unit of the price. Possible values are per_15_mins, per_30_mins, per_hour, per_half_day, per_day, per_week, fixed. */
+  /** Unit of the price. Possible values are PER_15_MINS, PER_30_MINS, PER_HOUR, PER_HALF_DAY, PER_DAY, PER_WEEK, FIXED. */
   priceUnit?: InputMaybe<Scalars["String"]>;
   /** Time after this reservation unit should be publicly visible in UI. */
   publishBegins?: InputMaybe<Scalars["DateTime"]>;
@@ -1803,7 +1810,7 @@ export type ReservationUnitUpdateMutationInput = {
   reservationBegins?: InputMaybe<Scalars["DateTime"]>;
   /** Time when making reservations become not possible for this reservation unit */
   reservationEnds?: InputMaybe<Scalars["DateTime"]>;
-  /** Determines the interval for the start time of the reservation. For example an interval of 15 minutes means a reservation can begin at minutes 0, 15, 30, or 45. Possible values are interval_15_mins, interval_30_mins, interval_60_mins, interval_90_mins. */
+  /** Determines the interval for the start time of the reservation. For example an interval of 15 minutes means a reservation can begin at minutes 0, 15, 30, or 45. Possible values are INTERVAL_15_MINS, INTERVAL_30_MINS, INTERVAL_60_MINS, INTERVAL_90_MINS. */
   reservationStartInterval?: InputMaybe<Scalars["String"]>;
   reservationUnitTypePk?: InputMaybe<Scalars["Int"]>;
   resourcePks?: InputMaybe<Array<InputMaybe<Scalars["Int"]>>>;
@@ -1847,12 +1854,13 @@ export type ReservationUnitUpdateMutationPayload = {
   lowestPrice?: Maybe<Scalars["Float"]>;
   maxPersons?: Maybe<Scalars["Int"]>;
   maxReservationDuration?: Maybe<Scalars["String"]>;
+  maxReservationsPerUser?: Maybe<Scalars["Int"]>;
   minReservationDuration?: Maybe<Scalars["String"]>;
   nameEn?: Maybe<Scalars["String"]>;
   nameFi?: Maybe<Scalars["String"]>;
   nameSv?: Maybe<Scalars["String"]>;
   pk?: Maybe<Scalars["Int"]>;
-  /** Unit of the price. Possible values are per_15_mins, per_30_mins, per_hour, per_half_day, per_day, per_week, fixed. */
+  /** Unit of the price. Possible values are PER_15_MINS, PER_30_MINS, PER_HOUR, PER_HALF_DAY, PER_DAY, PER_WEEK, FIXED. */
   priceUnit?: Maybe<Scalars["String"]>;
   /** Time after this reservation unit should be publicly visible in UI. */
   publishBegins?: Maybe<Scalars["DateTime"]>;
@@ -1865,7 +1873,7 @@ export type ReservationUnitUpdateMutationPayload = {
   reservationBegins?: Maybe<Scalars["DateTime"]>;
   /** Time when making reservations become not possible for this reservation unit */
   reservationEnds?: Maybe<Scalars["DateTime"]>;
-  /** Determines the interval for the start time of the reservation. For example an interval of 15 minutes means a reservation can begin at minutes 0, 15, 30, or 45. Possible values are interval_15_mins, interval_30_mins, interval_60_mins, interval_90_mins. */
+  /** Determines the interval for the start time of the reservation. For example an interval of 15 minutes means a reservation can begin at minutes 0, 15, 30, or 45. Possible values are INTERVAL_15_MINS, INTERVAL_30_MINS, INTERVAL_60_MINS, INTERVAL_90_MINS. */
   reservationStartInterval?: Maybe<Scalars["String"]>;
   reservationUnit?: Maybe<ReservationUnitType>;
   /** Type of the reservation unit as nested related object. */
@@ -1962,7 +1970,7 @@ export type ReservationUpdateMutationInput = {
   reserveeLastName?: InputMaybe<Scalars["String"]>;
   reserveeOrganisationName?: InputMaybe<Scalars["String"]>;
   reserveePhone?: InputMaybe<Scalars["String"]>;
-  /** Type of the reservee. Possible values are business, nonprofit, individual. */
+  /** Type of the reservee. Possible values are BUSINESS, NONPROFIT, INDIVIDUAL. */
   reserveeType?: InputMaybe<Scalars["String"]>;
   /** String value for ReservationType's ReservationState enum. */
   state?: InputMaybe<Scalars["String"]>;
@@ -2009,7 +2017,7 @@ export type ReservationUpdateMutationPayload = {
   reserveeLastName?: Maybe<Scalars["String"]>;
   reserveeOrganisationName?: Maybe<Scalars["String"]>;
   reserveePhone?: Maybe<Scalars["String"]>;
-  /** Type of the reservee. Possible values are business, nonprofit, individual. */
+  /** Type of the reservee. Possible values are BUSINESS, NONPROFIT, INDIVIDUAL. */
   reserveeType?: Maybe<Scalars["String"]>;
   /** String value for ReservationType's ReservationState enum. */
   state?: Maybe<Scalars["String"]>;

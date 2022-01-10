@@ -439,6 +439,7 @@ export const RESERVATIONUNIT_QUERY = gql`
       reservationEnds
       publishBegins
       publishEnds
+      maxReservationsPerUser
       metadataSet {
         pk
       }

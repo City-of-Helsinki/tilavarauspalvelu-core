@@ -944,6 +944,7 @@ const translations: ITranslations = {
     reservationBegins: ["Näytä varaaminen alkaen"],
     reservationEnds: ["Piilota varaaminen"],
     metadataSet: ["Varauslomake"],
+    maxReservationsPerUser: ["Max määrä varauksia per käyttäjä"],
   },
   ImageEditor: {
     imageType: ["Kuvan tyyppi"],
