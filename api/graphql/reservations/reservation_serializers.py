@@ -207,7 +207,6 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
 
             self.check_buffer_times(data, reservation_unit)
             self.check_reservation_start_time(begin, scheduler)
-            self.check_metadata_fields(data, reservation_unit)
             self.check_max_reservations_per_user(
                 self.context.get("request").user, reservation_unit
             )
@@ -319,16 +318,6 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
                 f"Reservation start time does not match the allowed interval of {interval_minutes} minutes."
             )
 
-    def check_metadata_fields(self, data, reservation_unit) -> None:
-        metadata_set = reservation_unit.metadata_set
-        required_fields = metadata_set.required_fields.all() if metadata_set else []
-        for required_field in required_fields:
-            internal_field_name = required_field.field_name
-            if not data.get(internal_field_name):
-                raise serializers.ValidationError(
-                    f"Value for required field {to_camel_case(internal_field_name)} is missing."
-                )
-
 
 class ReservationUpdateSerializer(
     PrimaryKeyUpdateSerializer, ReservationCreateSerializer
@@ -366,6 +355,15 @@ class ReservationUpdateSerializer(
         data = super().validate(data)
         data["state"] = new_state
 
+        reservation_units = data.get(
+            "reservation_unit", getattr(self.instance, "reservation_unit", None)
+        )
+        if hasattr(reservation_units, "all"):
+            reservation_units = reservation_units.all()
+
+        for reservation_unit in reservation_units:
+            self.check_metadata_fields(data, reservation_unit)
+
         return data
 
     @property
@@ -376,6 +374,16 @@ class ReservationUpdateSerializer(
             tz=get_default_timezone()
         )
         return validated_data
+
+    def check_metadata_fields(self, data, reservation_unit) -> None:
+        metadata_set = reservation_unit.metadata_set
+        required_fields = metadata_set.required_fields.all() if metadata_set else []
+        for required_field in required_fields:
+            internal_field_name = required_field.field_name
+            if not data.get(internal_field_name):
+                raise serializers.ValidationError(
+                    f"Value for required field {to_camel_case(internal_field_name)} is missing."
+                )
 
 
 class ReservationConfirmSerializer(ReservationUpdateSerializer):
