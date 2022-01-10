@@ -208,6 +208,9 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
             self.check_buffer_times(data, reservation_unit)
             self.check_reservation_start_time(begin, scheduler)
             self.check_metadata_fields(data, reservation_unit)
+            self.check_max_reservations_per_user(
+                self.context.get("request").user, reservation_unit
+            )
 
         data["state"] = STATE_CHOICES.CREATED
         data[
@@ -237,6 +240,15 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
             if getattr(res_unit, field, None) is not None
         ]
         return max(buffer_times, default=None)
+
+    def check_max_reservations_per_user(self, user, reservation_unit):
+        max_count = reservation_unit.max_reservations_per_user
+        if max_count is not None:
+            reservation_count = Reservation.objects.filter(user=user).active().count()
+            if reservation_count >= max_count:
+                raise serializers.ValidationError(
+                    "Maximum number of active reservations for this reservation unit exceeded."
+                )
 
     def check_buffer_times(self, data, reservation_unit):
         begin = data.get("begin", getattr(self.instance, "begin", None))
