@@ -15,7 +15,7 @@ import { useParams, useHistory } from "react-router-dom";
 import styled from "styled-components";
 import { UNIT_QUERY } from "../../common/queries";
 import { parseAddress } from "../../common/util";
-import { useModal } from "../../context/UIContext";
+import { useModal } from "../../context/ModalContext";
 import { ContentContainer, IngressContainer } from "../../styles/layout";
 import { H1 } from "../../styles/typography";
 import { BasicLink, breakpoints } from "../../styles/util";

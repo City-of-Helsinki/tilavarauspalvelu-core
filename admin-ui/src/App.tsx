@@ -1,13 +1,12 @@
-import React, { useState } from "react";
+import React from "react";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 // eslint-disable-next-line import/no-unresolved
-import { withOidcSecure, useReactOidc } from "@axa-fr/react-oidc-context";
+import { useReactOidc } from "@axa-fr/react-oidc-context";
 import { ApolloProvider } from "@apollo/client";
 import apolloClient from "./common/apolloClient";
 import ApplicationRound from "./component/ApplicationRound/ApplicationRound";
 import PageWrapper from "./component/PageWrapper";
 import "./i18n";
-import { UIContext, UIContextType } from "./context/UIContext";
 import Modal from "./component/Modal";
 import Application from "./component/Application/Application";
 import ApplicationDetails from "./component/Application/ApplicationDetails";
@@ -37,164 +36,129 @@ import ReservationUnitEditor from "./component/ReservationUnits/ReservationUnitE
 import ResourcesList from "./component/Resources/ResourcesList";
 import ReservationUnitsList from "./component/ReservationUnits/ReservationUnitsList";
 import ReservationUnitsSearch from "./component/ReservationUnits/ReservationUnitsSearch";
-import { NotificationContextProvider } from "./context/NotificationContext";
-
-interface IPrivateRouteProps {
-  path: string;
-  component: React.FunctionComponent;
-  exact?: boolean;
-}
-
-function PrivateRoute({ component, ...rest }: IPrivateRouteProps): JSX.Element {
-  return <Route {...rest} component={withOidcSecure(component)} />;
-}
+import { withGlobalContext } from "./context/GlobalContexts";
+import { useModal } from "./context/ModalContext";
+import PrivateRoute from "./common/PrivateRoute";
 
 function App(): JSX.Element {
   const { oidcUser } = useReactOidc();
-
-  const [modalContent, setModalContent] = useState<UIContextType | null>(null);
-
-  const toggleModal = (content: UIContextType): void => {
-    const bodyEl = document.getElementsByTagName("body")[0];
-    const classes = ["noScroll"];
-    if (
-      window.document.body.scrollHeight >
-      window.document.documentElement.clientHeight
-    ) {
-      classes.push("scrollbarActive");
-    }
-    if (content) {
-      bodyEl.classList.add(...classes);
-    } else {
-      bodyEl.classList.remove(...classes);
-    }
-    setModalContent(content);
-  };
+  const { modalContent } = useModal();
 
   return (
     <BrowserRouter basename={publicUrl}>
       <ApolloProvider client={apolloClient}>
-        <NotificationContextProvider>
-          <UIContext.Provider
-            value={{
-              modalContent: null,
-              setModalContent: toggleModal,
-            }}
-          >
-            <PageWrapper>
-              <Switch>
-                <Route
-                  exact
-                  path="/"
-                  component={oidcUser ? ApplicationRounds : MainLander}
-                />
-                <PrivateRoute
-                  exact
-                  path="/application/:applicationId"
-                  component={Application}
-                />
-                <PrivateRoute
-                  exact
-                  path="/application/:applicationId/details"
-                  component={ApplicationDetails}
-                />
-                <PrivateRoute
-                  exact
-                  path="/application/:applicationId/recurringReservation/:recurringReservationId"
-                  component={ReservationByApplicationEvent}
-                />
-                <PrivateRoute
-                  exact
-                  path="/applicationRounds"
-                  component={AllApplicationRounds}
-                />
-                <PrivateRoute
-                  exact
-                  path="/applicationRounds/approvals"
-                  component={ApplicationRoundApprovals}
-                />
-                <PrivateRoute
-                  path="/applicationRound/:applicationRoundId/applications"
-                  component={Applications}
-                />
-                <PrivateRoute
-                  path="/applicationRound/:applicationRoundId/resolution"
-                  component={ResolutionReport}
-                />
-                <PrivateRoute
-                  path="/applicationRound/:applicationRoundId/criteria"
-                  component={Criteria}
-                />
-                <PrivateRoute
-                  path="/applicationRound/:applicationRoundId/reservationUnit/:reservationUnitId/reservations/summary"
-                  component={ReservationSummariesByReservationUnit}
-                />
-                <PrivateRoute
-                  path="/applicationRound/:applicationRoundId/reservationUnit/:reservationUnitId/reservations"
-                  component={ReservationsByReservationUnit}
-                />
-                <PrivateRoute
-                  path="/applicationRound/:applicationRoundId/reservationUnit/:reservationUnitId"
-                  component={RecommendationsByReservationUnit}
-                />
-                <PrivateRoute
-                  path="/applicationRound/:applicationRoundId/applicant/:applicantId"
-                  component={RecommendationsByApplicant}
-                />
-                <PrivateRoute
-                  path="/applicationRound/:applicationRoundId/organisation/:organisationId"
-                  component={RecommendationsByApplicant}
-                />
-                <PrivateRoute
-                  path="/applicationRound/:applicationRoundId/recommendation/:applicationEventScheduleId"
-                  component={Recommendation}
-                />
-                <PrivateRoute
-                  path="/applicationRound/:applicationRoundId/approval"
-                  component={Approval}
-                />
-                <PrivateRoute
-                  path="/applicationRound/:applicationRoundId"
-                  component={ApplicationRound}
-                />
-                <PrivateRoute path="/spaces" component={SpacesList} />
-                <PrivateRoute
-                  path="/reservationUnits"
-                  component={ReservationUnitsList}
-                  exact
-                />
-                <PrivateRoute
-                  path="/reservationUnits/search"
-                  component={ReservationUnitsSearch}
-                />
-                <PrivateRoute path="/resources" component={ResourcesList} />
-                <PrivateRoute path="/units" component={Units} />
-                <PrivateRoute path="/unit/:unitPk/map" component={UnitMap} />
-                <PrivateRoute
-                  path="/unit/:unitPk/spacesResources"
-                  component={SpacesResources}
-                />
-                <PrivateRoute
-                  path="/unit/:unitPk/space/edit/:spacePk"
-                  component={SpaceEditor}
-                />
-                <PrivateRoute
-                  path="/unit/:unitPk/resource/edit/:resourcePk"
-                  component={ResourceEditor}
-                />
-                <PrivateRoute
-                  path="/unit/:unitPk/reservationUnit/edit/:reservationUnitPk?"
-                  component={ReservationUnitEditor}
-                />
-                <PrivateRoute path="/unit/:unitPk" component={Unit} />
-              </Switch>
-            </PageWrapper>
-            {modalContent && <Modal>{modalContent}</Modal>}
-          </UIContext.Provider>
-        </NotificationContextProvider>
+        <PageWrapper>
+          <Switch>
+            <Route
+              exact
+              path="/"
+              component={oidcUser ? ApplicationRounds : MainLander}
+            />
+            <PrivateRoute
+              exact
+              path="/application/:applicationId"
+              component={Application}
+            />
+            <PrivateRoute
+              exact
+              path="/application/:applicationId/details"
+              component={ApplicationDetails}
+            />
+            <PrivateRoute
+              exact
+              path="/application/:applicationId/recurringReservation/:recurringReservationId"
+              component={ReservationByApplicationEvent}
+            />
+            <PrivateRoute
+              exact
+              path="/applicationRounds"
+              component={AllApplicationRounds}
+            />
+            <PrivateRoute
+              exact
+              path="/applicationRounds/approvals"
+              component={ApplicationRoundApprovals}
+            />
+            <PrivateRoute
+              path="/applicationRound/:applicationRoundId/applications"
+              component={Applications}
+            />
+            <PrivateRoute
+              path="/applicationRound/:applicationRoundId/resolution"
+              component={ResolutionReport}
+            />
+            <PrivateRoute
+              path="/applicationRound/:applicationRoundId/criteria"
+              component={Criteria}
+            />
+            <PrivateRoute
+              path="/applicationRound/:applicationRoundId/reservationUnit/:reservationUnitId/reservations/summary"
+              component={ReservationSummariesByReservationUnit}
+            />
+            <PrivateRoute
+              path="/applicationRound/:applicationRoundId/reservationUnit/:reservationUnitId/reservations"
+              component={ReservationsByReservationUnit}
+            />
+            <PrivateRoute
+              path="/applicationRound/:applicationRoundId/reservationUnit/:reservationUnitId"
+              component={RecommendationsByReservationUnit}
+            />
+            <PrivateRoute
+              path="/applicationRound/:applicationRoundId/applicant/:applicantId"
+              component={RecommendationsByApplicant}
+            />
+            <PrivateRoute
+              path="/applicationRound/:applicationRoundId/organisation/:organisationId"
+              component={RecommendationsByApplicant}
+            />
+            <PrivateRoute
+              path="/applicationRound/:applicationRoundId/recommendation/:applicationEventScheduleId"
+              component={Recommendation}
+            />
+            <PrivateRoute
+              path="/applicationRound/:applicationRoundId/approval"
+              component={Approval}
+            />
+            <PrivateRoute
+              path="/applicationRound/:applicationRoundId"
+              component={ApplicationRound}
+            />
+            <PrivateRoute path="/spaces" component={SpacesList} />
+            <PrivateRoute
+              path="/reservationUnits"
+              component={ReservationUnitsList}
+              exact
+            />
+            <PrivateRoute
+              path="/reservationUnits/search"
+              component={ReservationUnitsSearch}
+            />
+            <PrivateRoute path="/resources" component={ResourcesList} />
+            <PrivateRoute path="/units" component={Units} />
+            <PrivateRoute path="/unit/:unitPk/map" component={UnitMap} />
+            <PrivateRoute
+              path="/unit/:unitPk/spacesResources"
+              component={SpacesResources}
+            />
+            <PrivateRoute
+              path="/unit/:unitPk/space/edit/:spacePk"
+              component={SpaceEditor}
+            />
+            <PrivateRoute
+              path="/unit/:unitPk/resource/edit/:resourcePk"
+              component={ResourceEditor}
+            />
+            <PrivateRoute
+              path="/unit/:unitPk/reservationUnit/edit/:reservationUnitPk?"
+              component={ReservationUnitEditor}
+            />
+            <PrivateRoute path="/unit/:unitPk" component={Unit} />
+          </Switch>
+        </PageWrapper>
+        {modalContent && <Modal>{modalContent}</Modal>}
       </ApolloProvider>
     </BrowserRouter>
   );
 }
 
-export default App;
+export default withGlobalContext(App);
