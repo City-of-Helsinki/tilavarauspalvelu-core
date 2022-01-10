@@ -2223,6 +2223,18 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
         self.res_unit.refresh_from_db()
         assert_that(self.res_unit.metadata_set).is_equal_to(metadata_set)
 
+    def test_update_with_null_metadata_set(self):
+        data = self.get_valid_update_data()
+        data["metadataSetPk"] = None
+        response = self.query(self.get_update_query(), input_data=data)
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        res_unit_data = content.get("data").get("updateReservationUnit")
+        assert_that(res_unit_data.get("errors")).is_none()
+        self.res_unit.refresh_from_db()
+        assert_that(self.res_unit.metadata_set).is_none()
+
     def test_update_with_terms_of_use_pks(self):
         payment_terms = TermsOfUseFactory(terms_type=TermsOfUse.TERMS_TYPE_PAYMENT)
         cancellation_terms = TermsOfUseFactory(
