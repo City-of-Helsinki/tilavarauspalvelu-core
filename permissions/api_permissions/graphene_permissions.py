@@ -6,6 +6,7 @@ from graphene_permissions.permissions import BasePermission
 
 from permissions.helpers import (
     can_create_reservation,
+    can_handle_reservation,
     can_manage_ability_groups,
     can_manage_age_groups,
     can_manage_equipment,
@@ -135,6 +136,16 @@ class ReservationPermission(BasePermission):
         The reservation fields has own permission checks.
         """
         return info.context.user.is_authenticated
+
+
+class ReservationHandlingPermission(BasePermission):
+    @classmethod
+    def has_mutation_permission(cls, root: Any, info: ResolveInfo, input: dict) -> bool:
+        pk = input.get("pk")
+        if pk:
+            reservation = get_object_or_404(Reservation, pk=pk)
+            return can_handle_reservation(info.context.user, reservation)
+        return False
 
 
 class RecurringReservationPermission(BasePermission):
