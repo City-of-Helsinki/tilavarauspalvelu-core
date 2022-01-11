@@ -150,7 +150,7 @@ class ReservationUnitImageType(PrimaryKeyObjectType):
 
     class Meta:
         model = ReservationUnitImage
-        fields = ("pk", "image_url", "medium_url", "small_url", "image_type")
+        fields = ["pk", "image_url", "medium_url", "small_url", "image_type"]
 
     def resolve_image_url(self, info):
         if not self.image:
