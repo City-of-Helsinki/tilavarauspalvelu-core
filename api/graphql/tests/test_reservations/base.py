@@ -10,6 +10,7 @@ from opening_hours.enums import State
 from opening_hours.hours import TimeElement
 from reservation_units.models import ReservationUnit
 from reservation_units.tests.factories import ReservationUnitFactory
+from reservations.models import ReservationMetadataField, ReservationMetadataSet
 from reservations.tests.factories import ReservationPurposeFactory
 from spaces.tests.factories import SpaceFactory
 
@@ -49,3 +50,26 @@ class ReservationTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCase):
                 ),
             ],
         }
+
+    def _create_metadata_set(self):
+        supported_fields = ReservationMetadataField.objects.filter(
+            field_name__in=[
+                "reservee_first_name",
+                "reservee_last_name",
+                "reservee_phone",
+                "home_city",
+                "age_group",
+            ]
+        )
+        required_fields = ReservationMetadataField.objects.filter(
+            field_name__in=[
+                "reservee_first_name",
+                "reservee_last_name",
+                "home_city",
+                "age_group",
+            ]
+        )
+        metadata_set = ReservationMetadataSet.objects.create(name="Test form")
+        metadata_set.supported_fields.set(supported_fields)
+        metadata_set.required_fields.set(required_fields)
+        return metadata_set
