@@ -58,7 +58,9 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         assert_that(content.get("errors")).is_none()
         confirm_data = content.get("data").get("confirmReservation")
         assert_that(confirm_data.get("errors")).is_none()
-        assert_that(confirm_data.get("state")).is_equal_to(STATE_CHOICES.CONFIRMED)
+        assert_that(confirm_data.get("state")).is_equal_to(
+            STATE_CHOICES.CONFIRMED.upper()
+        )
         self.reservation.refresh_from_db()
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
 
