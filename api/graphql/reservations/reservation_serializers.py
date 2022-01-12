@@ -29,8 +29,9 @@ DEFAULT_TIMEZONE = get_default_timezone()
 
 
 class ReservationCreateSerializer(PrimaryKeySerializer):
-    state = serializers.CharField(
-        help_text="Read only string value for ReservationType's ReservationState enum."
+    state = ChoiceCharField(
+        help_text="Read only string value for ReservationType's ReservationState enum.",
+        choices=STATE_CHOICES.STATE_CHOICES,
     )
     reservation_unit_pks = serializers.ListField(
         child=IntegerPrimaryKeyField(queryset=ReservationUnit.objects.all()),
@@ -326,9 +327,10 @@ class ReservationUpdateSerializer(
         super().__init__(*args, **kwargs)
         self.fields["state"].read_only = False
         self.fields["state"].required = False
-        self.fields[
-            "state"
-        ].help_text = "String value for ReservationType's ReservationState enum."
+        self.fields["state"].help_text = (
+            "String value for ReservationType's ReservationState enum. "
+            + f"Possible values are {', '.join(value[0].upper() for value in STATE_CHOICES.STATE_CHOICES)}."
+        )
         self.fields["reservee_first_name"].required = False
         self.fields["reservee_last_name"].required = False
         self.fields["reservee_phone"].required = False

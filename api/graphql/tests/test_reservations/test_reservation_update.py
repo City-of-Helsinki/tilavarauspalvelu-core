@@ -438,7 +438,7 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
 
         input_data = self.get_valid_update_data()
-        input_data["state"] = STATE_CHOICES.CANCELLED
+        input_data["state"] = STATE_CHOICES.CANCELLED.upper()
         self.client.force_login(self.regular_joe)
         response = self.query(self.get_update_query(), input_data=input_data)
         content = json.loads(response.content)
