@@ -129,6 +129,59 @@ class ReservationUnitImageCreateTestCase(
         assert_that(img).is_none()
 
 
+class ReservationUnitImageUpdateTestCase(GrapheneTestCaseBase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.res_unit = ReservationUnitFactory()
+        cls.res_unit_image = ReservationUnitImageFactory(
+            reservation_unit=cls.res_unit, image_type="main"
+        )
+
+    def get_update_query(self):
+        return """
+        mutation updateReservationUnitImage($input: ReservationUnitImageUpdateMutationInput!) {
+            updateReservationUnitImage(input: $input) {
+                pk
+                imageType
+                errors {
+                    messages field
+                }
+            }
+        }
+        """
+
+    def get_valid_input_data(self):
+        return {
+            "pk": self.res_unit_image.id,
+        }
+
+    def test_update_image_type_success(self):
+        self.client.force_login(self.general_admin)
+        input_data = self.get_valid_input_data()
+        input_data["imageType"] = "OTHER"
+
+        response = self.query(self.get_update_query(), input_data=input_data)
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        update_data = content.get("data").get("updateReservationUnitImage")
+        assert_that(update_data.get("errors")).is_none()
+        assert_that(update_data.get("imageType")).is_equal_to("OTHER")
+        self.res_unit_image.refresh_from_db()
+        assert_that(self.res_unit_image.image_type).is_equal_to("other")
+
+    def test_regular_user_cant_update(self):
+        self.client.force_login(self.regular_joe)
+        input_data = self.get_valid_input_data()
+        input_data["imageType"] = "OTHER"
+
+        response = self.query(self.get_update_query(), input_data=input_data)
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_not_none()
+
+
 class ReservationUnitImageDeleteGraphQLTestCase(GrapheneTestCaseBase):
     @classmethod
     def setUpTestData(cls):

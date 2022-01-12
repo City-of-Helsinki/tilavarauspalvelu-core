@@ -143,14 +143,14 @@ class ReservationUnitHaukiUrlType(AuthNode, DjangoObjectType):
         return None
 
 
-class ReservationUnitImageType(DjangoObjectType):
+class ReservationUnitImageType(PrimaryKeyObjectType):
     image_url = graphene.String()
     medium_url = graphene.String()
     small_url = graphene.String()
 
     class Meta:
         model = ReservationUnitImage
-        fields = ("image_url", "medium_url", "small_url", "image_type")
+        fields = ["pk", "image_url", "medium_url", "small_url", "image_type"]
 
     def resolve_image_url(self, info):
         if not self.image:

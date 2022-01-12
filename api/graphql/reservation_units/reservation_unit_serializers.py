@@ -358,3 +358,22 @@ class ReservationUnitImageCreateSerializer(PrimaryKeySerializer):
         data["image"] = image
 
         return data
+
+
+class ReservationUnitImageUpdateSerializer(PrimaryKeyUpdateSerializer):
+    reservation_unit_pk = IntegerPrimaryKeyField(
+        source="reservation_unit",
+        read_only=True,
+    )
+    image_type = ChoiceCharField(
+        required=False,
+        choices=ReservationUnitImage.TYPES,
+        help_text=(
+            "Type of image. Value is one of image_type enum values: "
+            f"{', '.join(value[0].upper() for value in ReservationUnitImage.TYPES)}."
+        ),
+    )
+
+    class Meta:
+        model = ReservationUnitImage
+        fields = ["pk", "reservation_unit_pk", "image_type"]

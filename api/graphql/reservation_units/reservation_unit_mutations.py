@@ -17,6 +17,7 @@ from api.graphql.reservation_units.reservation_unit_serializers import (
     PurposeUpdateSerializer,
     ReservationUnitCreateSerializer,
     ReservationUnitImageCreateSerializer,
+    ReservationUnitImageUpdateSerializer,
     ReservationUnitUpdateSerializer,
 )
 from api.graphql.reservation_units.reservation_unit_types import (
@@ -238,6 +239,21 @@ class ReservationUnitImageCreateMutation(AuthSerializerMutation, SerializerMutat
         if self.pk:
             return get_object_or_404(ReservationUnitImage, pk=self.pk)
         return None
+
+
+class ReservationUnitImageUpdateMutation(AuthSerializerMutation, SerializerMutation):
+    reservation_unit_image = graphene.Field(ReservationUnitImageType)
+
+    permission_classes = (
+        (ReservationUnitImagePermission,)
+        if not settings.TMP_PERMISSIONS_DISABLED
+        else (AllowAny,)
+    )
+
+    class Meta:
+        model_operations = ["update"]
+        lookup_field = "pk"
+        serializer_class = ReservationUnitImageUpdateSerializer
 
 
 class ReservationUnitImageDeleteMutation(AuthDeleteMutation, ClientIDMutation):
