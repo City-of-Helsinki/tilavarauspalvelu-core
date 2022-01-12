@@ -14,6 +14,11 @@ class ReservationCancelReasonFactory(DjangoModelFactory):
         model = "reservations.ReservationCancelReason"
 
 
+class ReservationDenyReasonFactory(DjangoModelFactory):
+    class Meta:
+        model = "reservations.ReservationDenyReason"
+
+
 class RecurringReservationFactory(DjangoModelFactory):
     class Meta:
         model = "reservations.RecurringReservation"

@@ -51,6 +51,7 @@ from api.graphql.reservations.reservation_mutations import (
 from api.graphql.reservations.reservation_types import (
     AgeGroupType,
     ReservationCancelReasonType,
+    ReservationDenyReasonType,
     ReservationMetadataSetType,
     ReservationPurposeType,
     ReservationType,
@@ -214,6 +215,12 @@ class ReservationCancelReasonFilter(AuthFilter):
     )
 
 
+class ReservationDenyReasonFilter(AuthFilter):
+    permission_classes = (
+        (AllowAuthenticated,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
+    )
+
+
 class ReservationUnitCancellationRulesFilter(AuthFilter):
     permission_classes = (
         (ReservationUnitCancellationRulePermission,)
@@ -267,6 +274,8 @@ class Query(graphene.ObjectType):
     reservation_cancel_reasons = ReservationCancelReasonFilter(
         ReservationCancelReasonType
     )
+
+    reservation_deny_reasons = ReservationDenyReasonFilter(ReservationDenyReasonType)
 
     reservation_units = ReservationUnitsFilter(
         ReservationUnitType, filterset_class=ReservationUnitsFilterSet
