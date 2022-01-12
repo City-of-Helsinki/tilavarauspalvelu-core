@@ -470,15 +470,17 @@ class ReservationCancellationSerializer(PrimaryKeyUpdateSerializer):
         return data
 
 
-class ReservationHandleSerializer(PrimaryKeySerializer):
-    handling_details = serializers.CharField(
-        help_text="Additional information for denying (if approve is false)",
-        required=False,
+class ReservationDenySerializer(PrimaryKeySerializer):
+    deny_reason_pk = IntegerPrimaryKeyField(
+        queryset=ReservationDenyReason.objects.all(),
+        source="deny_reason",
+        required=True,
+        help_text="Primary key for the pre-defined deny reason.",
     )
 
-    approve = serializers.BooleanField(
-        help_text="Will this reservation be approved",
-        required=True,
+    handling_details = serializers.CharField(
+        help_text="Additional information for denying.",
+        required=False,
     )
 
     def __init__(self, *args, **kwargs):
@@ -488,15 +490,18 @@ class ReservationHandleSerializer(PrimaryKeySerializer):
 
     class Meta:
         model = Reservation
-        fields = ["pk", "state", "handling_details", "handled_at", "approve"]
+        fields = [
+            "pk",
+            "state",
+            "handling_details",
+            "handled_at",
+            "deny_reason_pk",
+        ]
 
     @property
     def validated_data(self):
         validated_data = super().validated_data
-        if validated_data["approve"]:
-            validated_data.pop("deny_details", None)
-        else:
-            validated_data["state"] = STATE_CHOICES.DENIED
+        validated_data["state"] = STATE_CHOICES.DENIED
         validated_data["handled_at"] = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
         return validated_data
 
