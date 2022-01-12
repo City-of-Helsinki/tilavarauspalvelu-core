@@ -92,8 +92,9 @@ class ReservationUnitQueryTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCa
             reservation_start_interval=ReservationUnit.RESERVATION_START_INTERVAL_30_MINUTES,
             reservation_begins=datetime.datetime.now(),
             reservation_ends=datetime.datetime.now(),
-            publish_begins=datetime.datetime.now(),
-            publish_ends=datetime.datetime.now(),
+            publish_begins=datetime.datetime.now(tz=get_default_timezone()),
+            publish_ends=datetime.datetime.now(tz=get_default_timezone())
+            + datetime.timedelta(days=7),
             buffer_time_before=datetime.timedelta(minutes=15),
             buffer_time_after=datetime.timedelta(minutes=15),
             metadata_set=ReservationMetadataSetFactory(name="Test form"),
@@ -851,6 +852,46 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
                         node {
                             nameFi
                             isDraft
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filtering_by_is_visible_true(self):
+        response = self.query(
+            """
+            query {
+                reservationUnits(isVisible: true) {
+                    edges {
+                        node {
+                            nameFi
+                            publishBegins
+                            publishEnds
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filtering_by_is_visible_false(self):
+        response = self.query(
+            """
+            query {
+                reservationUnits(isVisible: false) {
+                    edges {
+                        node {
+                            nameFi
+                            publishBegins
+                            publishEnds
                         }
                     }
                 }

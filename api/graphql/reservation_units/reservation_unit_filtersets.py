@@ -1,8 +1,10 @@
+import datetime
 import operator
 from functools import reduce
 
 import django_filters
 from django.db.models import Q, Sum
+from django.utils.timezone import get_default_timezone
 from django_filters import CharFilter
 
 from reservation_units.models import (
@@ -39,6 +41,8 @@ class ReservationUnitsFilterSet(django_filters.FilterSet):
     )
 
     is_draft = django_filters.BooleanFilter(field_name="is_draft")
+
+    is_visible = django_filters.BooleanFilter(method="get_is_visible")
 
     order_by = django_filters.OrderingFilter(
         fields=(
@@ -106,3 +110,12 @@ class ReservationUnitsFilterSet(django_filters.FilterSet):
         return qs.annotate(max_person_sum=Sum("spaces__max_persons")).filter(
             max_person_sum__lte=value
         )
+
+    def get_is_visible(self, qs, property, value):
+        today = datetime.datetime.now(tz=get_default_timezone())
+        qs = qs.filter(is_draft=False)
+        published = Q(publish_begins__gte=today, publish_ends__gt=today)
+
+        if value:
+            return qs.filter(published)
+        return qs.exclude(published)
