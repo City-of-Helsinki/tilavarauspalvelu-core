@@ -22,6 +22,7 @@ from reservations.models import (
     AgeGroup,
     Reservation,
     ReservationCancelReason,
+    ReservationDenyReason,
     ReservationPurpose,
 )
 
@@ -470,7 +471,7 @@ class ReservationCancellationSerializer(PrimaryKeyUpdateSerializer):
 
 
 class ReservationHandleSerializer(PrimaryKeySerializer):
-    deny_details = serializers.CharField(
+    handling_details = serializers.CharField(
         help_text="Additional information for denying (if approve is false)",
         required=False,
     )
@@ -487,7 +488,7 @@ class ReservationHandleSerializer(PrimaryKeySerializer):
 
     class Meta:
         model = Reservation
-        fields = ["pk", "state", "deny_details", "handled_at", "approve"]
+        fields = ["pk", "state", "handling_details", "handled_at", "approve"]
 
     @property
     def validated_data(self):
