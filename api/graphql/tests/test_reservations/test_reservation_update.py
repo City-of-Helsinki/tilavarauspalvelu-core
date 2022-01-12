@@ -11,13 +11,7 @@ from api.graphql.tests.test_reservations.base import ReservationTestCaseBase
 from applications.models import City
 from applications.tests.factories import ApplicationRoundFactory
 from opening_hours.tests.test_get_periods import get_mocked_periods
-from reservations.models import (
-    STATE_CHOICES,
-    AgeGroup,
-    Reservation,
-    ReservationMetadataField,
-    ReservationMetadataSet,
-)
+from reservations.models import STATE_CHOICES, AgeGroup, Reservation
 from reservations.tests.factories import ReservationFactory
 
 
@@ -44,29 +38,6 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
             tax_percentage_value=24,
             price=10,
         )
-
-    def _create_metadata_set(self):
-        supported_fields = ReservationMetadataField.objects.filter(
-            field_name__in=[
-                "reservee_first_name",
-                "reservee_last_name",
-                "reservee_phone",
-                "home_city",
-                "age_group",
-            ]
-        )
-        required_fields = ReservationMetadataField.objects.filter(
-            field_name__in=[
-                "reservee_first_name",
-                "reservee_last_name",
-                "home_city",
-                "age_group",
-            ]
-        )
-        metadata_set = ReservationMetadataSet.objects.create(name="Test form")
-        metadata_set.supported_fields.set(supported_fields)
-        metadata_set.required_fields.set(required_fields)
-        return metadata_set
 
     def get_update_query(self):
         return """
@@ -529,6 +500,7 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         age_group = AgeGroup.objects.create(minimum=18, maximum=30)
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         input_data = self.get_valid_update_data()
+        input_data["reserveeFirstName"] = None
         input_data["reserveeLastName"] = "Doe"
         input_data["reserveePhone"] = "+358123456789"
         input_data["homeCityPk"] = home_city.pk

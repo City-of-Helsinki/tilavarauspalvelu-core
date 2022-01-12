@@ -382,7 +382,8 @@ class ReservationUpdateSerializer(
         required_fields = metadata_set.required_fields.all() if metadata_set else []
         for required_field in required_fields:
             internal_field_name = required_field.field_name
-            if not data.get(internal_field_name):
+            existing_value = getattr(self.instance, internal_field_name, None)
+            if not data.get(internal_field_name, existing_value):
                 raise serializers.ValidationError(
                     f"Value for required field {to_camel_case(internal_field_name)} is missing."
                 )
