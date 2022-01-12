@@ -11,7 +11,6 @@ import {
   RadioButton,
   SelectionGroup,
   TextInput,
-  TimeInput,
 } from "hds-react";
 import i18next from "i18next";
 import { get, omitBy, pick, sumBy, uniq, upperFirst } from "lodash";
@@ -153,6 +152,13 @@ enum LoadingCompleted {
   "RESERVATION_UNIT",
   "PARAMS",
 }
+
+const bufferTimeOptions = [
+  { value: "00:15:00", label: "15 minuuttia" },
+  { value: "00:30:00", label: "30 minuuttia" },
+  { value: "01:00:00", label: "60 minuuttia" },
+  { value: "01:30:00", label: "90 minuuttia" },
+];
 
 const durationOptions = [
   { value: "00:15:00", label: "15 minuuttia" },
@@ -586,19 +592,6 @@ const getSelectedOptions = (
   );
 };
 
-const getDuration = (duration: Maybe<string> | undefined): string => {
-  if (!duration) {
-    return "00:00";
-  }
-
-  const parts = duration.split(":");
-  if (parts.length === 3) {
-    return duration.substring(0, 5);
-  }
-
-  return duration;
-};
-
 const hasTranslations = (prefixes: string[], state: State): boolean =>
   prefixes.every((p) =>
     ["fi", "sv", "en"].every((l) =>
@@ -671,6 +664,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
         "maxPersons",
         "maxReservationsPerUser",
         "metadataSetPk",
+        "maxReservationDuration",
         "minReservationDuration",
         "paymentTermsPk",
         "pk",
@@ -1204,51 +1198,34 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                     </EditorColumns>
                   </ActivationGroup>
                 </Fieldset>
-                <EditorColumns>
-                  <TimeInput
+                <DenseEditorColumns>
+                  <Select
                     id="minReservationDuration"
+                    options={durationOptions}
+                    placeholder={t("common.select")}
                     label={t(
                       "ReservationUnitEditor.minReservationDurationLabel"
                     )}
-                    hoursLabel={t("common.hoursLabel")}
-                    minutesLabel={t("common.minutesLabel")}
-                    value={getDuration(
-                      state.reservationUnitEdit.minReservationDuration
-                    )}
-                    onChange={(v) => {
-                      if (
-                        typeof v.target.value === "string" &&
-                        v.target.value.length === 5
-                      ) {
-                        setValue({
-                          minReservationDuration: `${v.target.value}:00`,
-                        });
-                      }
-                    }}
+                    onChange={(v) => setValue({ minReservationDuration: v })}
+                    value={
+                      state.reservationUnitEdit.minReservationDuration || ""
+                    }
                   />
-                  <TimeInput
+                  <Select
                     id="maxReservationDuration"
+                    placeholder={t("common.select")}
+                    options={durationOptions}
                     label={t(
                       "ReservationUnitEditor.maxReservationDurationLabel"
                     )}
-                    hoursLabel={t("common.hoursLabel")}
-                    minutesLabel={t("common.minutesLabel")}
-                    value={getDuration(
-                      state.reservationUnitEdit.maxReservationDuration
-                    )}
-                    onChange={(v) => {
-                      if (
-                        typeof v.target.value === "string" &&
-                        v.target.value.length === 5
-                      ) {
-                        setValue({
-                          maxReservationDuration: `${v.target.value}:00`,
-                        });
-                      }
-                    }}
+                    onChange={(v) => setValue({ maxReservationDuration: v })}
+                    value={
+                      state.reservationUnitEdit.maxReservationDuration || ""
+                    }
                   />
                   <EnumSelect
                     id="reservationStartInterval"
+                    placeholder={t("common.select")}
                     value={
                       state.reservationUnitEdit
                         .reservationStartInterval as string
@@ -1263,7 +1240,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                       setValue({ reservationStartInterval })
                     }
                   />
-                </EditorColumns>
+                </DenseEditorColumns>
                 <EditorColumns>
                   <ActivationGroup
                     id="bufferTimeBeforeGroup"
@@ -1275,7 +1252,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                   >
                     <Select
                       id="bufferTimeBefore"
-                      options={durationOptions}
+                      options={bufferTimeOptions}
                       label={t(
                         "ReservationUnitEditor.bufferTimeBeforeDuration"
                       )}
@@ -1293,7 +1270,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                   >
                     <Select
                       id="bufferTimeAfter"
-                      options={durationOptions}
+                      options={bufferTimeOptions}
                       label={t("ReservationUnitEditor.bufferTimeAfterDuration")}
                       onChange={(v) => setValue({ bufferTimeAfter: v })}
                       value={state.reservationUnitEdit.bufferTimeAfter || ""}
