@@ -9,6 +9,7 @@ from .models import (
     RecurringReservation,
     Reservation,
     ReservationCancelReason,
+    ReservationDenyReason,
     ReservationMetadataField,
     ReservationMetadataSet,
     ReservationPurpose,
@@ -48,6 +49,11 @@ class AbilityGroupAdmin(admin.ModelAdmin):
 @admin.register(ReservationCancelReason)
 class ReservationCancelReasonAdmin(admin.ModelAdmin):
     model = ReservationCancelReason
+
+
+@admin.register(ReservationDenyReason)
+class ReservationDenyReasonAdmin(admin.ModelAdmin):
+    model = ReservationDenyReason
 
 
 class ReservationMetadataFieldForm(forms.ModelForm):

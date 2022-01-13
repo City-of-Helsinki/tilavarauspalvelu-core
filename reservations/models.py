@@ -55,6 +55,15 @@ class ReservationCancelReason(models.Model):
     )
 
 
+class ReservationDenyReason(models.Model):
+    reason = models.CharField(
+        max_length=255,
+        null=False,
+        blank=False,
+        verbose_name=_("Reason for deny"),
+    )
+
+
 class RecurringReservation(models.Model):
     user = models.ForeignKey(
         User,
@@ -387,6 +396,16 @@ class Reservation(models.Model):
         blank=True,
         help_text="When this reservation was handled.",
     )
+
+    deny_reason = models.ForeignKey(
+        ReservationDenyReason,
+        verbose_name=_("Reason for deny"),
+        related_name="reservations",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+    )
+
     deny_details = models.TextField(
         verbose_name=_("Deny details for this reservation"),
         blank=True,

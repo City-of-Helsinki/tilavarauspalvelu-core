@@ -29,6 +29,7 @@ from reservations.models import (
     RecurringReservation,
     Reservation,
     ReservationCancelReason,
+    ReservationDenyReason,
     ReservationMetadataSet,
     ReservationPurpose,
 )
@@ -234,6 +235,18 @@ class ReservationCancelReasonType(AuthNode, PrimaryKeyObjectType):
 
     class Meta:
         model = ReservationCancelReason
+        fields = ["pk", "reason", "reason_fi", "reason_en", "reason_sv"]
+        filter_fields = ["reason"]
+        interfaces = (graphene.relay.Node,)
+
+
+class ReservationDenyReasonType(AuthNode, PrimaryKeyObjectType):
+    permission_classes = (
+        (AllowAuthenticated,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
+    )
+
+    class Meta:
+        model = ReservationDenyReason
         fields = ["pk", "reason", "reason_fi", "reason_en", "reason_sv"]
         filter_fields = ["reason"]
         interfaces = (graphene.relay.Node,)
