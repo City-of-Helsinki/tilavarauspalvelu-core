@@ -461,11 +461,13 @@ export type Mutation = {
   deleteReservationUnitImage?: Maybe<ReservationUnitImageDeleteMutationPayload>;
   deleteResource?: Maybe<ResourceDeleteMutationPayload>;
   deleteSpace?: Maybe<SpaceDeleteMutationPayload>;
+  handleReservation?: Maybe<ReservationHandleMutationPayload>;
   updateEquipment?: Maybe<EquipmentUpdateMutationPayload>;
   updateEquipmentCategory?: Maybe<EquipmentCategoryUpdateMutationPayload>;
   updatePurpose?: Maybe<PurposeUpdateMutationPayload>;
   updateReservation?: Maybe<ReservationUpdateMutationPayload>;
   updateReservationUnit?: Maybe<ReservationUnitUpdateMutationPayload>;
+  updateReservationUnitImage?: Maybe<ReservationUnitImageUpdateMutationPayload>;
   updateResource?: Maybe<ResourceUpdateMutationPayload>;
   updateSpace?: Maybe<SpaceUpdateMutationPayload>;
   updateUnit?: Maybe<UnitUpdateMutationPayload>;
@@ -531,6 +533,10 @@ export type MutationDeleteSpaceArgs = {
   input: SpaceDeleteMutationInput;
 };
 
+export type MutationHandleReservationArgs = {
+  input: ReservationHandleMutationInput;
+};
+
 export type MutationUpdateEquipmentArgs = {
   input: EquipmentUpdateMutationInput;
 };
@@ -549,6 +555,10 @@ export type MutationUpdateReservationArgs = {
 
 export type MutationUpdateReservationUnitArgs = {
   input: ReservationUnitUpdateMutationInput;
+};
+
+export type MutationUpdateReservationUnitImageArgs = {
+  input: ReservationUnitImageUpdateMutationInput;
 };
 
 export type MutationUpdateResourceArgs = {
@@ -889,6 +899,7 @@ export type QueryReservationUnitsArgs = {
   before?: InputMaybe<Scalars["String"]>;
   first?: InputMaybe<Scalars["Int"]>;
   isDraft?: InputMaybe<Scalars["Boolean"]>;
+  isVisible?: InputMaybe<Scalars["Boolean"]>;
   keywordGroups?: InputMaybe<Array<InputMaybe<Scalars["ID"]>>>;
   last?: InputMaybe<Scalars["Int"]>;
   maxPersonsGte?: InputMaybe<Scalars["Float"]>;
@@ -1125,7 +1136,7 @@ export type ReservationConfirmMutationPayload = {
   reserveePhone?: Maybe<Scalars["String"]>;
   /** Type of the reservee. Possible values are BUSINESS, NONPROFIT, INDIVIDUAL. */
   reserveeType?: Maybe<Scalars["String"]>;
-  /** String value for ReservationType's ReservationState enum. */
+  /** String value for ReservationType's ReservationState enum. Possible values are CREATED, CANCELLED, CONFIRMED, DENIED. */
   state?: Maybe<Scalars["String"]>;
   /** The value of the tax percentage for this particular reservation */
   taxPercentageValue?: Maybe<Scalars["Float"]>;
@@ -1220,6 +1231,30 @@ export type ReservationCreateMutationPayload = {
   taxPercentageValue?: Maybe<Scalars["Float"]>;
   /** The price of this particular reservation */
   unitPrice?: Maybe<Scalars["Float"]>;
+};
+
+export type ReservationHandleMutationInput = {
+  /** Will this reservation be approved */
+  approve: Scalars["Boolean"];
+  clientMutationId?: InputMaybe<Scalars["String"]>;
+  /** Additional information for denying (if approve is false) */
+  denyDetails?: InputMaybe<Scalars["String"]>;
+  pk?: InputMaybe<Scalars["Int"]>;
+};
+
+export type ReservationHandleMutationPayload = {
+  __typename?: "ReservationHandleMutationPayload";
+  /** Will this reservation be approved */
+  approve?: Maybe<Scalars["Boolean"]>;
+  clientMutationId?: Maybe<Scalars["String"]>;
+  /** Additional information for denying (if approve is false) */
+  denyDetails?: Maybe<Scalars["String"]>;
+  /** May contain more than one error for same field. */
+  errors?: Maybe<Array<Maybe<ErrorType>>>;
+  /** When this reservation was handled. */
+  handledAt?: Maybe<Scalars["DateTime"]>;
+  pk?: Maybe<Scalars["Int"]>;
+  state?: Maybe<State>;
 };
 
 export type ReservationMetadataSetType = Node & {
@@ -1643,7 +1678,27 @@ export type ReservationUnitImageType = {
   imageType: ReservationUnitsReservationUnitImageImageTypeChoices;
   imageUrl?: Maybe<Scalars["String"]>;
   mediumUrl?: Maybe<Scalars["String"]>;
+  pk?: Maybe<Scalars["Int"]>;
   smallUrl?: Maybe<Scalars["String"]>;
+};
+
+export type ReservationUnitImageUpdateMutationInput = {
+  clientMutationId?: InputMaybe<Scalars["String"]>;
+  /** Type of image. Value is one of image_type enum values: MAIN, GROUND_PLAN, MAP, OTHER. */
+  imageType?: InputMaybe<Scalars["String"]>;
+  pk: Scalars["Int"];
+};
+
+export type ReservationUnitImageUpdateMutationPayload = {
+  __typename?: "ReservationUnitImageUpdateMutationPayload";
+  clientMutationId?: Maybe<Scalars["String"]>;
+  /** May contain more than one error for same field. */
+  errors?: Maybe<Array<Maybe<ErrorType>>>;
+  /** Type of image. Value is one of image_type enum values: MAIN, GROUND_PLAN, MAP, OTHER. */
+  imageType?: Maybe<Scalars["String"]>;
+  pk?: Maybe<Scalars["Int"]>;
+  reservationUnitImage?: Maybe<ReservationUnitImageType>;
+  reservationUnitPk?: Maybe<Scalars["Int"]>;
 };
 
 export type ReservationUnitType = Node & {
@@ -1972,7 +2027,7 @@ export type ReservationUpdateMutationInput = {
   reserveePhone?: InputMaybe<Scalars["String"]>;
   /** Type of the reservee. Possible values are BUSINESS, NONPROFIT, INDIVIDUAL. */
   reserveeType?: InputMaybe<Scalars["String"]>;
-  /** String value for ReservationType's ReservationState enum. */
+  /** String value for ReservationType's ReservationState enum. Possible values are CREATED, CANCELLED, CONFIRMED, DENIED. */
   state?: InputMaybe<Scalars["String"]>;
 };
 
@@ -2019,7 +2074,7 @@ export type ReservationUpdateMutationPayload = {
   reserveePhone?: Maybe<Scalars["String"]>;
   /** Type of the reservee. Possible values are BUSINESS, NONPROFIT, INDIVIDUAL. */
   reserveeType?: Maybe<Scalars["String"]>;
-  /** String value for ReservationType's ReservationState enum. */
+  /** String value for ReservationType's ReservationState enum. Possible values are CREATED, CANCELLED, CONFIRMED, DENIED. */
   state?: Maybe<Scalars["String"]>;
   /** The value of the tax percentage for this particular reservation */
   taxPercentageValue?: Maybe<Scalars["Float"]>;
