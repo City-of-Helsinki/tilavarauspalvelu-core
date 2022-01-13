@@ -5,12 +5,13 @@ import { Button as HDSButton, FileInput } from "hds-react";
 import { useMutation, useQuery } from "@apollo/client";
 import {
   CREATE_IMAGE,
+  DELETE_IMAGE,
   RESERVATIONUNIT_IMAGES_QUERY,
+  UPDATE_IMAGE_TYPE,
 } from "../../common/queries";
 import {
   Mutation,
   Query,
-  QueryReservationUnitByPkArgs,
   ReservationUnitImageCreateMutationInput,
   ReservationUnitImageType,
   ReservationUnitsReservationUnitImageImageTypeChoices,
@@ -93,7 +94,28 @@ const ImageEditor = ({
   const { t } = useTranslation();
   const [images, setImages] = useState<ReservationUnitImageType[]>([]);
 
-  useQuery<Query, QueryReservationUnitByPkArgs>(RESERVATIONUNIT_IMAGES_QUERY, {
+  const sortImages = (imagesToSort: ReservationUnitImageType[]) => {
+    imagesToSort.sort((a, b) => {
+      if (
+        a.imageType ===
+        ReservationUnitsReservationUnitImageImageTypeChoices.Main
+      ) {
+        return -1;
+      }
+      if (
+        b.imageType ===
+        ReservationUnitsReservationUnitImageImageTypeChoices.Main
+      ) {
+        return 1;
+      }
+
+      return 0;
+    });
+
+    return imagesToSort;
+  };
+
+  useQuery<Query>(RESERVATIONUNIT_IMAGES_QUERY, {
     variables: { pk: Number(reservationUnitPk) },
     onCompleted: ({ reservationUnitByPk }) => {
       if (reservationUnitByPk?.images) {
@@ -120,32 +142,107 @@ const ImageEditor = ({
     ReservationUnitImageCreateMutationInput
   >(CREATE_IMAGE);
 
-  const addImage = (files: File[]) => {
+  const [delImage] = useMutation<Mutation>(DELETE_IMAGE);
+  const [updateImagetype] = useMutation<Mutation>(UPDATE_IMAGE_TYPE);
+
+  const addImage = async (files: File[]) => {
     const imageType =
       images.length === 0
         ? ReservationUnitsReservationUnitImageImageTypeChoices.Main
         : ReservationUnitsReservationUnitImageImageTypeChoices.Other;
-    create({
-      variables: {
-        image: files[0],
-        reservationUnitPk,
-        imageType,
-      },
-    }).then((a) => {
-      if (!a.errors) {
+
+    try {
+      const result = await create({
+        variables: {
+          image: files[0],
+          reservationUnitPk,
+          imageType,
+        },
+      });
+      if (!result.data?.createReservationUnitImage?.errors) {
         const newImage =
-          a.data?.createReservationUnitImage?.reservationUnitImage;
+          result.data?.createReservationUnitImage?.reservationUnitImage;
         if (newImage) {
-          setImages([newImage].concat(images));
+          setImages(sortImages([newImage].concat(images)));
         }
+      }
+      return;
+    } catch (e) {
+      // dee below
+    }
+
+    setNotification({
+      title: t("ImageEditor.errorTitle"),
+      message: t("ImageEditor.errorSavingImage"),
+      type: "error",
+    });
+  };
+
+  const deleteImage = async (pk: number) => {
+    try {
+      const result = await delImage({
+        variables: {
+          pk,
+        },
+      });
+      if (!result.data?.deleteReservationUnitImage?.errors) {
+        setNotification({
+          title: t("ImageEditor.imageDeletedTitle"),
+          message: t("ImageEditor.imageDeleted"),
+          type: "success",
+        });
+        setImages(sortImages(images.filter((image) => image.pk !== pk)));
         return;
       }
-      setNotification({
-        title: t("ImageEditor.errorTitle"),
-        message: t("ImageEditor.errorSavingImage"),
-        type: "error",
+    } catch (e) {
+      // see below
+    }
+    setNotification({
+      title: t("ImageEditor.errorTitle"),
+      message: t("ImageEditor.errorDeletingImage"),
+      type: "error",
+    });
+  };
+
+  const setAsMainImage = async (pk: number) => {
+    const promises = images.map((image) => {
+      return updateImagetype({
+        variables: {
+          pk: image.pk,
+          imageType:
+            pk === image.pk
+              ? ReservationUnitsReservationUnitImageImageTypeChoices.Main
+              : ReservationUnitsReservationUnitImageImageTypeChoices.Other,
+        },
       });
     });
+
+    const results = await Promise.all(promises);
+    const hasError = results.find((result) =>
+      Boolean(result.data?.updateReservationUnitImage?.errors)
+    );
+
+    if (hasError) {
+      setNotification({
+        title: t("ImageEditor.errorTitle"),
+        message: t("ImageEditor.errorChangingImageType"),
+        type: "error",
+      });
+      return;
+    }
+
+    // all ok
+    setImages(
+      sortImages(
+        images.map((image) => ({
+          ...image,
+          imageType:
+            image.pk === pk
+              ? ReservationUnitsReservationUnitImageImageTypeChoices.Main
+              : ReservationUnitsReservationUnitImageImageTypeChoices.Other,
+        }))
+      )
+    );
   };
 
   return (
@@ -177,11 +274,17 @@ const ImageEditor = ({
             ReservationUnitsReservationUnitImageImageTypeChoices.Main ? (
               <span>{t("ImageEditor.mainImage")}</span>
             ) : (
-              <SmallButton variant="secondary">
+              <SmallButton
+                variant="secondary"
+                onClick={() => setAsMainImage(i.pk as number)}
+              >
                 {t("ImageEditor.useAsMainImage")}
               </SmallButton>
             )}
-            <SmallButton variant="secondary">
+            <SmallButton
+              variant="secondary"
+              onClick={() => deleteImage(i.pk as number)}
+            >
               {t("ImageEditor.deleteImage")}
             </SmallButton>
           </Actions>
