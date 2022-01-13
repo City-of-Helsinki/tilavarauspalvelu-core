@@ -461,6 +461,7 @@ export type Mutation = {
   deleteReservationUnitImage?: Maybe<ReservationUnitImageDeleteMutationPayload>;
   deleteResource?: Maybe<ResourceDeleteMutationPayload>;
   deleteSpace?: Maybe<SpaceDeleteMutationPayload>;
+  handleReservation?: Maybe<ReservationHandleMutationPayload>;
   updateEquipment?: Maybe<EquipmentUpdateMutationPayload>;
   updateEquipmentCategory?: Maybe<EquipmentCategoryUpdateMutationPayload>;
   updatePurpose?: Maybe<PurposeUpdateMutationPayload>;
@@ -529,6 +530,10 @@ export type MutationDeleteResourceArgs = {
 
 export type MutationDeleteSpaceArgs = {
   input: SpaceDeleteMutationInput;
+};
+
+export type MutationHandleReservationArgs = {
+  input: ReservationHandleMutationInput;
 };
 
 export type MutationUpdateEquipmentArgs = {
@@ -1220,6 +1225,30 @@ export type ReservationCreateMutationPayload = {
   taxPercentageValue?: Maybe<Scalars["Float"]>;
   /** The price of this particular reservation */
   unitPrice?: Maybe<Scalars["Float"]>;
+};
+
+export type ReservationHandleMutationInput = {
+  /** Will this reservation be approved */
+  approve: Scalars["Boolean"];
+  clientMutationId?: InputMaybe<Scalars["String"]>;
+  /** Additional information for denying (if approve is false) */
+  denyDetails?: InputMaybe<Scalars["String"]>;
+  pk?: InputMaybe<Scalars["Int"]>;
+};
+
+export type ReservationHandleMutationPayload = {
+  __typename?: "ReservationHandleMutationPayload";
+  /** Will this reservation be approved */
+  approve?: Maybe<Scalars["Boolean"]>;
+  clientMutationId?: Maybe<Scalars["String"]>;
+  /** Additional information for denying (if approve is false) */
+  denyDetails?: Maybe<Scalars["String"]>;
+  /** May contain more than one error for same field. */
+  errors?: Maybe<Array<Maybe<ErrorType>>>;
+  /** When this reservation was handled. */
+  handledAt?: Maybe<Scalars["DateTime"]>;
+  pk?: Maybe<Scalars["Int"]>;
+  state?: Maybe<State>;
 };
 
 export type ReservationMetadataSetType = Node & {

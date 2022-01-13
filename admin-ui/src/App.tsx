@@ -38,6 +38,7 @@ import ReservationUnitsSearch from "./component/ReservationUnits/ReservationUnit
 import { withGlobalContext } from "./context/GlobalContexts";
 import { useModal } from "./context/ModalContext";
 import PrivateRoute from "./common/PrivateRoute";
+import { SingleApplications } from "./component/SingleApplications";
 
 function App(): JSX.Element {
   const { oidcUser } = useReactOidc();
@@ -152,6 +153,10 @@ function App(): JSX.Element {
               component={ReservationUnitEditor}
             />
             <PrivateRoute path="/unit/:unitPk" component={Unit} />
+            <PrivateRoute
+              path="/singleApplications"
+              component={SingleApplications}
+            />
           </Switch>
         </PageWrapper>
         {modalContent && <Modal>{modalContent}</Modal>}

@@ -169,6 +169,10 @@ const menuTree: IMenuChild[] = [
     icon: <IconPremiseApplications aria-hidden />,
     items: [
       {
+        title: "MainMenu.singleApplications",
+        route: "/singleApplications",
+      },
+      {
         title: "MainMenu.handling",
         route: "/applicationRounds",
       },

@@ -400,9 +400,11 @@ type Mutation {
   updateReservation(input: ReservationUpdateMutationInput!): ReservationUpdateMutationPayload
   confirmReservation(input: ReservationConfirmMutationInput!): ReservationConfirmMutationPayload
   cancelReservation(input: ReservationCancellationMutationInput!): ReservationCancellationMutationPayload
+  handleReservation(input: ReservationHandleMutationInput!): ReservationHandleMutationPayload
   createReservationUnit(input: ReservationUnitCreateMutationInput!): ReservationUnitCreateMutationPayload
   updateReservationUnit(input: ReservationUnitUpdateMutationInput!): ReservationUnitUpdateMutationPayload
   createReservationUnitImage(input: ReservationUnitImageCreateMutationInput!): ReservationUnitImageCreateMutationPayload
+  updateReservationUnitImage(input: ReservationUnitImageUpdateMutationInput!): ReservationUnitImageUpdateMutationPayload
   deleteReservationUnitImage(input: ReservationUnitImageDeleteMutationInput!): ReservationUnitImageDeleteMutationPayload
   createPurpose(input: PurposeCreateMutationInput!): PurposeCreateMutationPayload
   updatePurpose(input: PurposeUpdateMutationInput!): PurposeUpdateMutationPayload
@@ -554,6 +556,7 @@ type Query {
     textSearch: String = null
     purposes: [ID] = null
     isDraft: Boolean = null
+    isVisible: Boolean = null
 
     """Järjestys"""
     orderBy: String = null
@@ -723,7 +726,9 @@ type ReservationConfirmMutationPayload {
   name: String
   description: String
 
-  """String value for ReservationType's ReservationState enum."""
+  """
+  String value for ReservationType's ReservationState enum. Possible values are CREATED, CANCELLED, CONFIRMED, DENIED.
+  """
   state: String
   priority: Int
   begin: DateTime
@@ -845,6 +850,35 @@ type ReservationCreateMutationPayload {
   """May contain more than one error for same field."""
   errors: [ErrorType]
   reservation: ReservationType
+  clientMutationId: String
+}
+
+input ReservationHandleMutationInput {
+  pk: Int
+
+  """Additional information for denying (if approve is false)"""
+  denyDetails: String
+
+  """Will this reservation be approved"""
+  approve: Boolean!
+  clientMutationId: String
+}
+
+type ReservationHandleMutationPayload {
+  pk: Int
+  state: state
+
+  """Additional information for denying (if approve is false)"""
+  denyDetails: String
+
+  """When this reservation was handled."""
+  handledAt: DateTime
+
+  """Will this reservation be approved"""
+  approve: Boolean
+
+  """May contain more than one error for same field."""
+  errors: [ErrorType]
   clientMutationId: String
 }
 
@@ -1208,21 +1242,21 @@ input ReservationUnitCreateMutationInput {
   publishEnds: DateTime
   metadataSetPk: Int
   maxReservationsPerUser: Int
-  nameFi: String
-  nameEn: String
-  nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
-  contactInformationFi: String
-  contactInformationEn: String
-  contactInformationSv: String
-  additionalInstructionsFi: String
-  additionalInstructionsEn: String
-  additionalInstructionsSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
+  additionalInstructionsFi: String
+  additionalInstructionsEn: String
+  additionalInstructionsSv: String
+  contactInformationFi: String
+  contactInformationEn: String
+  contactInformationSv: String
   clientMutationId: String
 }
 
@@ -1302,21 +1336,21 @@ type ReservationUnitCreateMutationPayload {
   """Time after this reservation unit should not be publicly visible in UI."""
   publishEnds: DateTime
   maxReservationsPerUser: Int
-  nameFi: String
-  nameEn: String
-  nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
-  contactInformationFi: String
-  contactInformationEn: String
-  contactInformationSv: String
-  additionalInstructionsFi: String
-  additionalInstructionsEn: String
-  additionalInstructionsSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
+  additionalInstructionsFi: String
+  additionalInstructionsEn: String
+  additionalInstructionsSv: String
+  contactInformationFi: String
+  contactInformationEn: String
+  contactInformationSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -1367,9 +1401,35 @@ type ReservationUnitImageDeleteMutationPayload {
 
 type ReservationUnitImageType {
   imageType: ReservationUnitsReservationUnitImageImageTypeChoices!
+  pk: Int
   imageUrl: String
   mediumUrl: String
   smallUrl: String
+}
+
+input ReservationUnitImageUpdateMutationInput {
+  pk: Int!
+
+  """
+  Type of image. Value is one of image_type enum values: MAIN, GROUND_PLAN, MAP, OTHER.
+  """
+  imageType: String
+  clientMutationId: String
+}
+
+type ReservationUnitImageUpdateMutationPayload {
+  pk: Int
+  reservationUnitPk: Int
+
+  """
+  Type of image. Value is one of image_type enum values: MAIN, GROUND_PLAN, MAP, OTHER.
+  """
+  imageType: String
+
+  """May contain more than one error for same field."""
+  errors: [ErrorType]
+  reservationUnitImage: ReservationUnitImageType
+  clientMutationId: String
 }
 
 """An enumeration."""
@@ -1616,21 +1676,21 @@ input ReservationUnitUpdateMutationInput {
   publishEnds: DateTime
   metadataSetPk: Int
   maxReservationsPerUser: Int
-  nameFi: String
-  nameEn: String
-  nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
-  contactInformationFi: String
-  contactInformationEn: String
-  contactInformationSv: String
-  additionalInstructionsFi: String
-  additionalInstructionsEn: String
-  additionalInstructionsSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
+  additionalInstructionsFi: String
+  additionalInstructionsEn: String
+  additionalInstructionsSv: String
+  contactInformationFi: String
+  contactInformationEn: String
+  contactInformationSv: String
   clientMutationId: String
 }
 
@@ -1710,21 +1770,21 @@ type ReservationUnitUpdateMutationPayload {
   """Time after this reservation unit should not be publicly visible in UI."""
   publishEnds: DateTime
   maxReservationsPerUser: Int
-  nameFi: String
-  nameEn: String
-  nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
-  contactInformationFi: String
-  contactInformationEn: String
-  contactInformationSv: String
-  additionalInstructionsFi: String
-  additionalInstructionsEn: String
-  additionalInstructionsSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
+  additionalInstructionsFi: String
+  additionalInstructionsEn: String
+  additionalInstructionsSv: String
+  contactInformationFi: String
+  contactInformationEn: String
+  contactInformationSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -1766,7 +1826,9 @@ input ReservationUpdateMutationInput {
   name: String
   description: String
 
-  """String value for ReservationType's ReservationState enum."""
+  """
+  String value for ReservationType's ReservationState enum. Possible values are CREATED, CANCELLED, CONFIRMED, DENIED.
+  """
   state: String
   priority: Int
   begin: DateTime
@@ -1812,7 +1874,9 @@ type ReservationUpdateMutationPayload {
   name: String
   description: String
 
-  """String value for ReservationType's ReservationState enum."""
+  """
+  String value for ReservationType's ReservationState enum. Possible values are CREATED, CANCELLED, CONFIRMED, DENIED.
+  """
   state: String
   priority: Int
   begin: DateTime
@@ -2338,15 +2402,15 @@ input UnitUpdateMutationInput {
   webPage: String
   email: String
   phone: String
+  shortDescriptionFi: String
+  shortDescriptionEn: String
+  shortDescriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
-  shortDescriptionFi: String
-  shortDescriptionEn: String
-  shortDescriptionSv: String
   clientMutationId: String
 }
 
@@ -2356,15 +2420,15 @@ type UnitUpdateMutationPayload {
   webPage: String
   email: String
   phone: String
+  shortDescriptionFi: String
+  shortDescriptionEn: String
+  shortDescriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
-  shortDescriptionFi: String
-  shortDescriptionEn: String
-  shortDescriptionSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]

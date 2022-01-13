@@ -585,3 +585,18 @@ export const RESOURCE_QUERY = gql`
     }
   }
 `;
+
+export const RESERVATIONS_QUERY = gql`
+  query reservations($handlingRequired: Boolean) {
+    reservations(handlingRequired: $handlingRequired) {
+      edges {
+        node {
+          pk
+          reservationUnits {
+            nameFi
+          }
+        }
+      }
+    }
+  }
+`;

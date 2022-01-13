@@ -22,7 +22,6 @@ import { BasicLink, breakpoints } from "../../styles/util";
 import LinkPrev from "../LinkPrev";
 import Loader from "../Loader";
 import ReservationUnitList from "./ReservationUnitList";
-import SecondaryNavigation from "../SecondaryNavigation";
 import withMainMenu from "../withMainMenu";
 import ExternalLink from "./ExternalLink";
 import InfoModalContent from "./InfoModalContent";
@@ -195,7 +194,6 @@ const Unit = (): JSX.Element | null => {
       <ContentContainer>
         <LinkPrev route="/units" />
         <Links>
-          <SecondaryNavigation items={[]} />
           <BasicLink to={`/unit/${unitPk}/map`}>
             <IconMap style={{ marginTop: "-2px" }} /> {t("Unit.showOnMap")}
           </BasicLink>

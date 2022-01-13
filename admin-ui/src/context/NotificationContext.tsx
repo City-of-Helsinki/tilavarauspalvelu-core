@@ -3,12 +3,13 @@ import React, { useContext } from "react";
 export type NotificationContextProps = {
   notification: NotificationType | null;
   setNotification: (notification: NotificationType) => void;
+  notifyError: (title: string, message?: string) => void;
   clearNotification: () => void;
 };
 
 export type NotificationType = {
   title: string;
-  message: string;
+  message: string | null;
   type: "error" | "success";
 };
 
@@ -17,6 +18,7 @@ export const NotificationContext =
     notification: null,
     setNotification: () => {},
     clearNotification: () => {},
+    notifyError: () => {},
   });
 
 export const useNotification = (): NotificationContextProps =>
@@ -36,6 +38,9 @@ export const NotificationContextProvider: React.FC = ({ children }) => {
           setTimeout(() => setNotification(null), 1000 * 5);
         },
         clearNotification,
+        notifyError: (title, message?) => {
+          setNotification({ type: "error", title, message: message || null });
+        },
       }}
     >
       {children}

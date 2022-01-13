@@ -159,7 +159,8 @@ const translations: ITranslations = {
     welcome: ["Tervetuloa"],
   },
   MainMenu: {
-    applications: ["Hakemukset"],
+    applications: ["Hyväksynnät"],
+    singleApplications: ["Anomukset"],
     handling: ["Käsittely"],
     approvals: ["Hyväksynnät"],
     clients: ["Asiakkaat"],
@@ -998,6 +999,11 @@ const translations: ITranslations = {
     removeConfirmationCancel: ["Kumoa"],
     removeFailed: ["Resurssin poistaminen ei onnistunut."],
     removeSuccess: ["Resurssi poistettu."],
+  },
+  SingleApplications: {
+    insightCountHandledApplications: ["tarkastettavaa anomusta"],
+    insightCountMonthlyHandledApplications: ["käsiteltyä anomuysta / kk"],
+    insightCountTotalApplications: ["anomusta yhteensä"],
   },
 };
 
