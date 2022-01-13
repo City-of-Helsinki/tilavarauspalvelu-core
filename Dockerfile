@@ -71,9 +71,9 @@ RUN python manage.py collectstatic --noinput
 RUN chgrp -R 0 /tvp
 RUN chmod g=u -R /tvp
 
-RUN mkdir -p /broker/queue && chown tvp /broker/queue
+RUN mkdir -p /broker/queue && chown tvp /broker/queue && chmod g+rw /broker/queue
 
-RUN mkdir -p /broker/processed && chown tvp /broker/queue
+RUN mkdir -p /broker/processed && chown tvp /broker/processed && chmod g+rw /broker/processed
 
 ENTRYPOINT ["/tvp/deploy/entrypoint.sh"]
 
