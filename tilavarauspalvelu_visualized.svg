@@ -1997,35 +1997,35 @@
 <text text-anchor="start" x="4960" y="-1863.6" font-family="Roboto" font-size="8.00">DateTimeField</text>
 <text text-anchor="start" x="5018" y="-1863.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
 <text text-anchor="start" x="4760" y="-1850.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="4774" y="-1850.6" font-family="Roboto" font-size="8.00" fill="#7b7b7b">deny_details</text>
-<text text-anchor="start" x="4826" y="-1850.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="4774" y="-1850.6" font-family="Roboto" font-size="8.00" fill="#7b7b7b">description</text>
+<text text-anchor="start" x="4820" y="-1850.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
 <text text-anchor="start" x="4946" y="-1850.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="4960" y="-1850.6" font-family="Roboto" font-size="8.00" fill="#7b7b7b">TextField</text>
-<text text-anchor="start" x="4995" y="-1850.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="4960" y="-1850.6" font-family="Roboto" font-size="8.00" fill="#7b7b7b">CharField</text>
+<text text-anchor="start" x="4998" y="-1850.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
 <text text-anchor="start" x="4760" y="-1837.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="4774" y="-1837.6" font-family="Roboto" font-size="8.00" fill="#7b7b7b">description</text>
-<text text-anchor="start" x="4820" y="-1837.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="4774" y="-1837.6" font-family="Roboto" font-size="8.00">end</text>
+<text text-anchor="start" x="4790" y="-1837.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
 <text text-anchor="start" x="4946" y="-1837.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="4960" y="-1837.6" font-family="Roboto" font-size="8.00" fill="#7b7b7b">CharField</text>
-<text text-anchor="start" x="4998" y="-1837.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="4960" y="-1837.6" font-family="Roboto" font-size="8.00">DateTimeField</text>
+<text text-anchor="start" x="5018" y="-1837.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
 <text text-anchor="start" x="4760" y="-1824.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="4774" y="-1824.6" font-family="Roboto" font-size="8.00">end</text>
-<text text-anchor="start" x="4790" y="-1824.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="4774" y="-1824.6" font-family="Roboto" font-size="8.00" fill="#7b7b7b">free_of_charge_reason</text>
+<text text-anchor="start" x="4868" y="-1824.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
 <text text-anchor="start" x="4946" y="-1824.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="4960" y="-1824.6" font-family="Roboto" font-size="8.00">DateTimeField</text>
-<text text-anchor="start" x="5018" y="-1824.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="4960" y="-1824.6" font-family="Roboto" font-size="8.00" fill="#7b7b7b">TextField</text>
+<text text-anchor="start" x="4995" y="-1824.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
 <text text-anchor="start" x="4760" y="-1811.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="4774" y="-1811.6" font-family="Roboto" font-size="8.00" fill="#7b7b7b">free_of_charge_reason</text>
-<text text-anchor="start" x="4868" y="-1811.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="4774" y="-1811.6" font-family="Roboto" font-size="8.00" fill="#7b7b7b">handled_at</text>
+<text text-anchor="start" x="4820" y="-1811.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
 <text text-anchor="start" x="4946" y="-1811.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="4960" y="-1811.6" font-family="Roboto" font-size="8.00" fill="#7b7b7b">TextField</text>
-<text text-anchor="start" x="4995" y="-1811.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="4960" y="-1811.6" font-family="Roboto" font-size="8.00" fill="#7b7b7b">DateTimeField</text>
+<text text-anchor="start" x="5018" y="-1811.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
 <text text-anchor="start" x="4760" y="-1798.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="4774" y="-1798.6" font-family="Roboto" font-size="8.00" fill="#7b7b7b">handled_at</text>
-<text text-anchor="start" x="4820" y="-1798.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="4774" y="-1798.6" font-family="Roboto" font-size="8.00" fill="#7b7b7b">handling_details</text>
+<text text-anchor="start" x="4842" y="-1798.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
 <text text-anchor="start" x="4946" y="-1798.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="4960" y="-1798.6" font-family="Roboto" font-size="8.00" fill="#7b7b7b">DateTimeField</text>
-<text text-anchor="start" x="5018" y="-1798.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="4960" y="-1798.6" font-family="Roboto" font-size="8.00" fill="#7b7b7b">TextField</text>
+<text text-anchor="start" x="4995" y="-1798.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
 <text text-anchor="start" x="4760" y="-1785.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
 <text text-anchor="start" x="4774" y="-1785.6" font-family="Roboto" font-size="8.00" fill="#7b7b7b">name</text>
 <text text-anchor="start" x="4798" y="-1785.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
