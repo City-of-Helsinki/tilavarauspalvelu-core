@@ -197,7 +197,7 @@ class Reservation(models.Model):
         verbose_name=_("Reservee email"), null=True, blank=True
     )
     reservee_id = models.CharField(
-        verbose_name=_("Reservee phone"),
+        verbose_name=_("Reservee ID"),
         max_length=10,
         blank=True,
         default="",
