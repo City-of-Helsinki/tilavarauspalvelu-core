@@ -510,10 +510,10 @@ class ReservationDenySerializer(PrimaryKeySerializer):
         return validated_data
 
     def validate(self, data):
-        data = super().validate(data)
-        if not self.instance.needs_handling:
+        if self.instance.state != STATE_CHOICES.REQUIRES_HANDLING:
             raise serializers.ValidationError(
-                "This reservation does not need handling."
+                f"Only reservations with state as {STATE_CHOICES.REQUIRES_HANDLING.upper()} can be denied."
             )
+        data = super().validate(data)
 
         return data
