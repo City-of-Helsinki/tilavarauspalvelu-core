@@ -116,11 +116,13 @@ class STATE_CHOISE_CONST(object):
 
     CREATED = "created"
     CANCELLED = "cancelled"
+    REQUIRES_HANDLING = "requires_handling"
     CONFIRMED = "confirmed"
     DENIED = "denied"
     STATE_CHOICES = (
         (CREATED, _("created")),
         (CANCELLED, _("cancelled")),
+        (REQUIRES_HANDLING, _("requires_handling")),
         (CONFIRMED, _("confirmed")),
         (DENIED, _("denied")),
     )
