@@ -157,14 +157,6 @@ class ReservationQuerySet(models.QuerySet):
             )
         )
 
-    def handling_required(self):
-        """These do not consider the application process (RecurringReservation)."""
-        return self.filter(
-            state=STATE_CHOICES.CONFIRMED,
-            reservation_unit__metadata_set__isnull=False,
-            recurring_reservation=None,
-        )
-
     def active(self):
         return self.filter(end__gte=timezone.now()).going_to_occur()
 
