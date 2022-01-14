@@ -406,10 +406,10 @@ class Reservation(models.Model):
         blank=True,
     )
 
-    deny_details = models.TextField(
-        verbose_name=_("Deny details for this reservation"),
+    handling_details = models.TextField(
+        verbose_name=_("Handling details for this reservation"),
         blank=True,
-        help_text="Additional details for denying the reservation",
+        help_text="Additional details for denying or approving the reservation",
     )
 
     def get_location_string(self):
