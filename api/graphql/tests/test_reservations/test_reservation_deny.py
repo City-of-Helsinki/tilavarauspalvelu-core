@@ -29,7 +29,7 @@ class ReservationDenyTestCase(ReservationTestCaseBase):
                 datetime.datetime.now(tz=get_default_timezone())
                 + datetime.timedelta(hours=2)
             ),
-            state=STATE_CHOICES.CONFIRMED,
+            state=STATE_CHOICES.REQUIRES_HANDLING,
             user=self.regular_joe,
         )
         self.reason = ReservationDenyReasonFactory(
@@ -59,7 +59,7 @@ class ReservationDenyTestCase(ReservationTestCaseBase):
     def test_deny_success_when_admin(self):
         self.client.force_login(self.general_admin)
         input_data = self.get_valid_deny_data()
-        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
+        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.REQUIRES_HANDLING)
         response = self.query(self.get_handle_query(), input_data=input_data)
 
         content = json.loads(response.content)
@@ -75,7 +75,7 @@ class ReservationDenyTestCase(ReservationTestCaseBase):
     def test_cant_deny_if_regular_user(self):
         self.client.force_login(self.regular_joe)
         input_data = self.get_valid_deny_data()
-        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
+        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.REQUIRES_HANDLING)
         response = self.query(self.get_handle_query(), input_data=input_data)
 
         content = json.loads(response.content)
@@ -83,9 +83,9 @@ class ReservationDenyTestCase(ReservationTestCaseBase):
         deny_data = content.get("data").get("denyReservation")
         assert_that(deny_data).is_none()
         self.reservation.refresh_from_db()
-        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
+        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.REQUIRES_HANDLING)
 
-    def test_cant_deny_if_status_not_confirmed(self):
+    def test_cant_deny_if_status_not_requires_handling(self):
         self.client.force_login(self.general_admin)
         input_data = self.get_valid_deny_data()
         self.reservation.state = STATE_CHOICES.CREATED
@@ -100,23 +100,6 @@ class ReservationDenyTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CREATED)
         assert_that(self.reservation.handling_details).is_empty()
 
-    def test_cant_deny_if_reservation_past(self):
-        self.client.force_login(self.general_admin)
-        input_data = self.get_valid_deny_data()
-        self.reservation.begin = datetime.datetime.now(
-            tz=get_default_timezone()
-        ) - datetime.timedelta(days=1)
-        self.reservation.save()
-        response = self.query(self.get_handle_query(), input_data=input_data)
-
-        content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        handle_data = content.get("data").get("denyReservation")
-        assert_that(handle_data.get("errors")).is_not_none()
-        self.reservation.refresh_from_db()
-        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
-        assert_that(self.reservation.handling_details).is_empty()
-
     def test_denying_fails_when_reason_missing(self):
         self.client.force_login(self.general_admin)
         input_data = self.get_valid_deny_data()
@@ -126,5 +109,5 @@ class ReservationDenyTestCase(ReservationTestCaseBase):
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_none()
         self.reservation.refresh_from_db()
-        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
+        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.REQUIRES_HANDLING)
         assert_that(self.reservation.handling_details).is_empty()

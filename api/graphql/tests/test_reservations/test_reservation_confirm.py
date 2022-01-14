@@ -11,7 +11,10 @@ from api.graphql.tests.test_reservations.base import ReservationTestCaseBase
 from applications.models import City
 from opening_hours.tests.test_get_periods import get_mocked_periods
 from reservations.models import STATE_CHOICES, AgeGroup
-from reservations.tests.factories import ReservationFactory
+from reservations.tests.factories import (
+    ReservationFactory,
+    ReservationMetadataSetFactory,
+)
 
 
 @freezegun.freeze_time("2021-10-12T12:00:00Z")
@@ -64,6 +67,26 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         )
         self.reservation.refresh_from_db()
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
+
+    def test_confirm_reservation_changes_state_to_requires_handling(
+        self, mock_periods, mock_opening_hours
+    ):
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+        self.reservation_unit.metadata_set = ReservationMetadataSetFactory(name="Form")
+        self.reservation_unit.save()
+        self.client.force_login(self.regular_joe)
+        input_data = self.get_valid_confirm_data()
+        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CREATED)
+        response = self.query(self.get_confirm_query(), input_data=input_data)
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        confirm_data = content.get("data").get("confirmReservation")
+        assert_that(confirm_data.get("errors")).is_none()
+        assert_that(confirm_data.get("state")).is_equal_to(
+            STATE_CHOICES.REQUIRES_HANDLING.upper()
+        )
+        self.reservation.refresh_from_db()
+        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.REQUIRES_HANDLING)
 
     def test_confirm_reservation_fails_if_state_is_not_created(
         self, mock_periods, mock_opening_hours

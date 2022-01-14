@@ -29,29 +29,14 @@ snapshots['ReservationByPkTestCase::test_getting_reservation_of_another_user_by_
     }
 }
 
-snapshots['ReservationQueryTestCase::test_filter_handling_required_false 1'] = {
-    'data': {
-        'reservations': {
-            'edges': [
-                {
-                    'node': {
-                        'name': 'movies',
-                        'state': 'CREATED'
-                    }
-                }
-            ]
-        }
-    }
-}
-
-snapshots['ReservationQueryTestCase::test_filter_handling_required_true 1'] = {
+snapshots['ReservationQueryTestCase::test_filter_reservation_state_requires_handling 1'] = {
     'data': {
         'reservations': {
             'edges': [
                 {
                     'node': {
                         'name': 'Show me',
-                        'state': 'CONFIRMED'
+                        'state': 'REQUIRES_HANDLING'
                     }
                 }
             ]

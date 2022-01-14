@@ -402,7 +402,11 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
     @property
     def validated_data(self):
         validated_data = super().validated_data
-        validated_data["state"] = STATE_CHOICES.CONFIRMED
+
+        if self.instance.reservation_unit.filter(metadata_set__isnull=False).exists():
+            validated_data["state"] = STATE_CHOICES.REQUIRES_HANDLING
+        else:
+            validated_data["state"] = STATE_CHOICES.CONFIRMED
         return validated_data
 
 
@@ -506,10 +510,10 @@ class ReservationDenySerializer(PrimaryKeySerializer):
         return validated_data
 
     def validate(self, data):
-        data = super().validate(data)
-        if not self.instance.needs_handling:
+        if self.instance.state != STATE_CHOICES.REQUIRES_HANDLING:
             raise serializers.ValidationError(
-                "This reservation does not need handling."
+                f"Only reservations with state as {STATE_CHOICES.REQUIRES_HANDLING.upper()} can be denied."
             )
+        data = super().validate(data)
 
         return data

@@ -122,13 +122,13 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         assert_that(content.get("errors")).is_none()
         self.assertMatchSnapshot(content)
 
-    def test_filter_handling_required_true(self):
+    def test_filter_reservation_state_requires_handling(self):
         self.maxDiff = None
         self.client.force_login(self.general_admin)
         metadata = ReservationMetadataSetFactory()
         res_unit = ReservationUnitFactory(metadata_set=metadata)
         ReservationFactory(
-            state=STATE_CHOICES.CONFIRMED,
+            state=STATE_CHOICES.REQUIRES_HANDLING,
             reservation_unit=[res_unit],
             recurring_reservation=None,
             name="Show me",
@@ -136,37 +136,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         response = self.query(
             """
             query {
-                reservations(handlingRequired: true) {
-                    edges {
-                        node {
-                            state
-                            name
-                          }
-                        }
-                    }
-                }
-            """
-        )
-
-        content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        self.assertMatchSnapshot(content)
-
-    def test_filter_handling_required_false(self):
-        self.maxDiff = None
-        self.client.force_login(self.general_admin)
-        metadata = ReservationMetadataSetFactory()
-        res_unit = ReservationUnitFactory(metadata_set=metadata)
-        ReservationFactory(
-            state=STATE_CHOICES.CONFIRMED,
-            reservation_unit=[res_unit],
-            recurring_reservation=None,
-            name="Dont show me",
-        )
-        response = self.query(
-            """
-            query {
-                reservations(handlingRequired: false) {
+                reservations(state: "REQUIRES_HANDLING") {
                     edges {
                         node {
                             state
