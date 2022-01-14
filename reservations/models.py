@@ -406,6 +406,14 @@ class Reservation(models.Model):
         help_text="Additional details for denying or approving the reservation",
     )
 
+    working_memo = models.TextField(
+        verbose_name=_("Working memo"),
+        null=True,
+        blank=True,
+        default="",
+        help_text="Working memo for staff users.",
+    )
+
     def get_location_string(self):
         locations = []
         for reservation_unit in self.reservation_unit.all():
