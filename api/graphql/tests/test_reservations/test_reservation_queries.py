@@ -153,6 +153,43 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         assert_that(content.get("errors")).is_none()
         self.assertMatchSnapshot(content)
 
+    def test_filter_requested(self):
+        self.maxDiff = None
+        self.client.force_login(self.general_admin)
+        metadata = ReservationMetadataSetFactory()
+        res_unit = ReservationUnitFactory(metadata_set=metadata)
+        ReservationFactory(
+            state=STATE_CHOICES.REQUIRES_HANDLING,
+            reservation_unit=[res_unit],
+            recurring_reservation=None,
+            name="This is requested",
+        )
+        ReservationFactory(
+            state=STATE_CHOICES.CONFIRMED,
+            reservation_unit=[res_unit],
+            recurring_reservation=None,
+            name="I'm requesting this to be dealt with. Oh this is already dealt with, nice!",
+            handled_at=datetime.datetime.now(tz=get_default_timezone()),
+        )
+        response = self.query(
+            """
+            query {
+                reservations(requested: true orderBy: "state") {
+                    edges {
+                        node {
+                            state
+                            name
+                          }
+                        }
+                    }
+                }
+            """
+        )
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
     def test_admin_can_read_working_memo(self):
         self.maxDiff = None
         self.client.force_login(self.general_admin)
