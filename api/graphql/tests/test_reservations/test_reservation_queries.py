@@ -57,6 +57,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
             unit_price=10,
             tax_percentage_value=24,
             price=10,
+            working_memo="i'm visible to staff users",
         )
 
     def test_reservation_query(self):
@@ -141,6 +142,48 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
                         node {
                             state
                             name
+                          }
+                        }
+                    }
+                }
+            """
+        )
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_admin_can_read_working_memo(self):
+        self.maxDiff = None
+        self.client.force_login(self.general_admin)
+        response = self.query(
+            """
+            query {
+                reservations {
+                    edges {
+                        node {
+                            workingMemo
+                          }
+                        }
+                    }
+                }
+            """
+        )
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_regular_user_cant_read_working_memo(self):
+        self.maxDiff = None
+        self.client.force_login(self.regular_joe)
+        response = self.query(
+            """
+            query {
+                reservations {
+                    edges {
+                        node {
+                            workingMemo
                           }
                         }
                     }

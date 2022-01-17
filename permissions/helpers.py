@@ -27,7 +27,7 @@ def has_unit_group_permission(
 
 
 def has_unit_permission(user: User, units: list, required_permission: str) -> bool:
-    if not units:
+    if not units or user.is_anonymous:
         return False
     unit_groups = []
     for unit in units:
@@ -42,7 +42,7 @@ def has_unit_permission(user: User, units: list, required_permission: str) -> bo
 def has_service_sector_permission(
     user: User, service_sectors: [ServiceSector], required_permission: str
 ) -> bool:
-    if not service_sectors:
+    if not service_sectors or user.is_anonymous:
         return False
     return user.service_sector_roles.filter(
         service_sector__in=service_sectors,

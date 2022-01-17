@@ -29,6 +29,20 @@ snapshots['ReservationByPkTestCase::test_getting_reservation_of_another_user_by_
     }
 }
 
+snapshots['ReservationQueryTestCase::test_admin_can_read_working_memo 1'] = {
+    'data': {
+        'reservations': {
+            'edges': [
+                {
+                    'node': {
+                        'workingMemo': "i'm visible to staff users"
+                    }
+                }
+            ]
+        }
+    }
+}
+
 snapshots['ReservationQueryTestCase::test_filter_reservation_state_requires_handling 1'] = {
     'data': {
         'reservations': {
@@ -37,6 +51,20 @@ snapshots['ReservationQueryTestCase::test_filter_reservation_state_requires_hand
                     'node': {
                         'name': 'Show me',
                         'state': 'REQUIRES_HANDLING'
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationQueryTestCase::test_regular_user_cant_read_working_memo 1'] = {
+    'data': {
+        'reservations': {
+            'edges': [
+                {
+                    'node': {
+                        'workingMemo': None
                     }
                 }
             ]
