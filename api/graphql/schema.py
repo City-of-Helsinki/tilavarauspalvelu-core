@@ -48,6 +48,7 @@ from api.graphql.reservations.reservation_mutations import (
     ReservationCreateMutation,
     ReservationDenyMutation,
     ReservationUpdateMutation,
+    ReservationWorkingMemoMutation,
 )
 from api.graphql.reservations.reservation_types import (
     AgeGroupType,
@@ -365,6 +366,7 @@ class Mutation(graphene.ObjectType):
     cancel_reservation = ReservationCancellationMutation.Field()
     deny_reservation = ReservationDenyMutation.Field()
     approve_reservation = ReservationApproveMutation.Field()
+    update_reservation_working_memo = ReservationWorkingMemoMutation.Field()
 
     create_reservation_unit = ReservationUnitCreateMutation.Field()
     update_reservation_unit = ReservationUnitUpdateMutation.Field()

@@ -23,6 +23,7 @@ from permissions.api_permissions.graphene_permissions import (
     ReservationPurposePermission,
     ReservationUnitPermission,
 )
+from permissions.helpers import can_handle_reservation
 from reservations.models import (
     AbilityGroup,
     AgeGroup,
@@ -138,6 +139,7 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
     tax_percentage_value = graphene.Decimal()
     price = graphene.Float()
     age_group = graphene.Field(AgeGroupType)
+    # working_memo = graphene.String()
 
     class Meta:
         model = Reservation
@@ -181,6 +183,7 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
             "unit_price",
             "tax_percentage_value",
             "price",
+            "working_memo",
         ]
         filter_fields = {
             "state": ["exact"],
@@ -226,6 +229,14 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
     @reservation_non_public_field
     def resolve_reservee_phone(self, info: ResolveInfo) -> Optional[str]:
         return self.reservee_phone
+
+    def resolve_working_memo(self, info: ResolveInfo) -> Optional[str]:
+        if (
+            can_handle_reservation(info.context.user, self)
+            or settings.TMP_PERMISSIONS_DISABLED
+        ):
+            return self.working_memo
+        return None
 
 
 class ReservationCancelReasonType(AuthNode, PrimaryKeyObjectType):
