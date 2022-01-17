@@ -517,3 +517,42 @@ class ReservationDenySerializer(PrimaryKeySerializer):
         data = super().validate(data)
 
         return data
+
+
+class ReservationApproveSerializer(PrimaryKeySerializer):
+    handling_details = serializers.CharField(
+        help_text="Additional information for approval.",
+        required=False,
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["state"].read_only = True
+        self.fields["handled_at"].read_only = True
+        self.fields["price"].required = True
+
+    class Meta:
+        model = Reservation
+        fields = [
+            "pk",
+            "state",
+            "handling_details",
+            "handled_at",
+            "price",
+        ]
+
+    @property
+    def validated_data(self):
+        validated_data = super().validated_data
+        validated_data["state"] = STATE_CHOICES.CONFIRMED
+        validated_data["handled_at"] = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
+        return validated_data
+
+    def validate(self, data):
+        if self.instance.state != STATE_CHOICES.REQUIRES_HANDLING:
+            raise serializers.ValidationError(
+                f"Only reservations with state as {STATE_CHOICES.REQUIRES_HANDLING.upper()} can be approved."
+            )
+        data = super().validate(data)
+
+        return data
