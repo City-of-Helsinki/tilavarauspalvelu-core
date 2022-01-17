@@ -43,6 +43,27 @@ snapshots['ReservationQueryTestCase::test_admin_can_read_working_memo 1'] = {
     }
 }
 
+snapshots['ReservationQueryTestCase::test_filter_applicable 1'] = {
+    'data': {
+        'reservations': {
+            'edges': [
+                {
+                    'node': {
+                        'name': "I'm applicable also",
+                        'state': 'CONFIRMED'
+                    }
+                },
+                {
+                    'node': {
+                        'name': "I'm applicable",
+                        'state': 'REQUIRES_HANDLING'
+                    }
+                }
+            ]
+        }
+    }
+}
+
 snapshots['ReservationQueryTestCase::test_filter_reservation_state_requires_handling 1'] = {
     'data': {
         'reservations': {
