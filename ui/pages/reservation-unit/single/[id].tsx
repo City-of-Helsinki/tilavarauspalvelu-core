@@ -284,9 +284,10 @@ const StyledNotification = styled(Notification)`
   }
 `;
 
-const eventStyleGetter = ({
-  event,
-}: CalendarEvent): { style: React.CSSProperties; className?: string } => {
+const eventStyleGetter = (
+  { event }: CalendarEvent,
+  draggable = true
+): { style: React.CSSProperties; className?: string } => {
   const style = {
     borderRadius: "0px",
     opacity: "0.8",
@@ -301,7 +302,7 @@ const eventStyleGetter = ({
   switch (state) {
     case "INITIAL":
       style.backgroundColor = "var(--color-success-dark)";
-      className = "rbc-event-movable";
+      className = draggable ? "rbc-event-movable" : "";
       break;
     case "BUFFER":
       style.backgroundColor = "var(--color-black-10)";
@@ -344,6 +345,13 @@ const ReservationUnit = ({
       ),
     [reservationUnit.openingHours.openingTimes, activeApplicationRounds]
   );
+
+  const isReservationQuotaReached = useMemo(() => {
+    return (
+      reservationUnit.maxReservationsPerUser &&
+      userReservations?.length >= reservationUnit.maxReservationsPerUser
+    );
+  }, [reservationUnit, userReservations]);
 
   const isSlotReservable = (
     start: Date,
@@ -393,7 +401,10 @@ const ReservationUnit = ({
     { start, end }: CalendarEvent,
     skipLengthCheck = false
   ): boolean => {
-    if (!isSlotReservable(start, end, skipLengthCheck)) {
+    if (
+      !isSlotReservable(start, end, skipLengthCheck) ||
+      isReservationQuotaReached
+    ) {
       return false;
     }
 
@@ -409,7 +420,7 @@ const ReservationUnit = ({
     { start, action },
     skipLengthCheck = false
   ): boolean => {
-    if (action !== "click") {
+    if (action !== "click" || isReservationQuotaReached) {
       return false;
     }
     const [hours, minutes] = reservationUnit.minReservationDuration.split(":");
@@ -487,21 +498,13 @@ const ReservationUnit = ({
     />
   ));
 
-  const isReservationQuotaReached = useMemo(() => {
-    return (
-      reservationUnit.maxReservationsPerUser &&
-      userReservations?.length >= reservationUnit.maxReservationsPerUser
-    );
-  }, [reservationUnit, userReservations]);
-
   const isReservable = useMemo(() => {
     return (
       reservationUnit.minReservationDuration &&
       reservationUnit.maxReservationDuration &&
-      isReservationUnitReservable(reservationUnit) &&
-      !isReservationQuotaReached
+      isReservationUnitReservable(reservationUnit)
     );
-  }, [reservationUnit, isReservationQuotaReached]);
+  }, [reservationUnit]);
 
   return reservationUnit ? (
     <Wrapper>
@@ -543,7 +546,9 @@ const ReservationUnit = ({
                 onNavigate={(d: Date) => {
                   setFocusDate(d);
                 }}
-                customEventStyleGetter={eventStyleGetter}
+                customEventStyleGetter={(event) =>
+                  eventStyleGetter(event, !isReservationQuotaReached)
+                }
                 slotPropGetter={slotPropGetter}
                 viewType={calendarViewType}
                 onView={(n: WeekOptions) => {
@@ -553,12 +558,12 @@ const ReservationUnit = ({
                   handleEventChange(event, true)
                 }
                 showToolbar
-                reservable
+                reservable={!isReservationQuotaReached}
                 toolbarComponent={
                   reservationUnit.nextAvailableSlot ? ToolbarWithProps : Toolbar
                 }
-                resizable
-                draggable
+                resizable={!isReservationQuotaReached}
+                draggable={!isReservationQuotaReached}
                 onEventDrop={handleEventChange}
                 onEventResize={handleEventChange}
                 onSelectSlot={handleSlotClick}
@@ -579,15 +584,17 @@ const ReservationUnit = ({
               <LoginFragment
                 text={t("reservationCalendar:loginInfo")}
                 componentIfAuthenticated={
-                  <ReservationInfo
-                    reservationUnit={reservationUnit}
-                    begin={initialReservation?.begin}
-                    end={initialReservation?.end}
-                    resetReservation={() => setInitialReservation(null)}
-                    isSlotReservable={isSlotReservable}
-                    setCalendarFocusDate={setFocusDate}
-                    activeApplicationRounds={activeApplicationRounds}
-                  />
+                  !isReservationQuotaReached && (
+                    <ReservationInfo
+                      reservationUnit={reservationUnit}
+                      begin={initialReservation?.begin}
+                      end={initialReservation?.end}
+                      resetReservation={() => setInitialReservation(null)}
+                      isSlotReservable={isSlotReservable}
+                      setCalendarFocusDate={setFocusDate}
+                      activeApplicationRounds={activeApplicationRounds}
+                    />
+                  )
                 }
               />
               <Legend />

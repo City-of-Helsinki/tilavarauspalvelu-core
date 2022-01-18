@@ -307,7 +307,7 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
       startTimeSelectorToggle()
         .click()
         .siblings("ul")
-        .children("li:nth-of-type(7)")
+        .children("li:nth-of-type(6)")
         .click();
       matchEvent();
 
@@ -332,7 +332,7 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
       startTimeSelectorToggle()
         .click()
         .siblings("ul")
-        .children("li:nth-of-type(3)")
+        .children("li:nth-of-type(6)")
         .click();
       matchEvent();
 
@@ -351,7 +351,7 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
       startTimeSelectorToggle()
         .click()
         .siblings("ul")
-        .children("li:nth-of-type(5)")
+        .children("li:nth-of-type(4)")
         .click();
 
       notificationContainer().contains(
@@ -361,7 +361,7 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
       startTimeSelectorToggle()
         .click()
         .siblings("ul")
-        .children("li:nth-of-type(7)")
+        .children("li:nth-of-type(6)")
         .click();
 
       durationSelectorToggle()
@@ -457,9 +457,11 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
     it("should display apt notification if quota is set and full", () => {
       cy.visit("/reservation-unit/single/901");
 
-      gotoCalendarButton().should("not.exist");
+      gotoCalendarButton().should("exist");
 
-      calendarWrapper().should("not.exist");
+      calendarWrapper().should("exist");
+
+      reservationSubmitButton().should("not.exist");
 
       reservationQuotaNotification()
         .invoke("text")
