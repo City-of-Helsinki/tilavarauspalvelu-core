@@ -4,14 +4,7 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { Koros, Notification } from "hds-react";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import {
-  addHours,
-  addMinutes,
-  addYears,
-  isValid,
-  parseISO,
-  subMinutes,
-} from "date-fns";
+import { addSeconds, addYears, isValid, parseISO, subMinutes } from "date-fns";
 import Container from "../../../components/common/Container";
 import { ApplicationRound, PendingReservation } from "../../../modules/types";
 import Head from "../../../components/reservation-unit/Head";
@@ -423,9 +416,11 @@ const ReservationUnit = ({
     if (action !== "click" || isReservationQuotaReached) {
       return false;
     }
-    const [hours, minutes] = reservationUnit.minReservationDuration.split(":");
 
-    const end = addMinutes(addHours(new Date(start), hours), minutes);
+    const end = addSeconds(
+      new Date(start),
+      reservationUnit.minReservationDuration || 0
+    );
 
     if (!isSlotReservable(start, end, skipLengthCheck)) {
       return false;

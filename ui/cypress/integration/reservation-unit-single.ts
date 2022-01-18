@@ -110,7 +110,7 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
     it("allows making a reservation", () => {
       cy.get("h1").should("contain", "Pukinmäen nuorisotalon keittiö");
 
-      textWithIcon(1).contains("Seuraavat vapaat 1 tunti 30 minuuttia:");
+      textWithIcon(1).contains("Seuraava vapaa aika:");
       textWithIcon(2).contains("20 € / 15 min");
       textWithIcon(3).contains("Min 1 tunti");
       textWithIcon(3).contains("Max 1 tunti 30 minuuttia");

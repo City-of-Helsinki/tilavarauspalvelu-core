@@ -1,9 +1,8 @@
 import {
   addDays,
-  addHours,
-  addMinutes,
+  addSeconds,
   areIntervalsOverlapping,
-  differenceInMinutes,
+  differenceInSeconds,
   format,
   getISODay,
   isAfter,
@@ -30,7 +29,6 @@ import {
   PendingReservation,
 } from "./types";
 import {
-  apiDurationToMinutes,
   convertHMSToSeconds,
   endOfWeek,
   parseDate,
@@ -80,31 +78,29 @@ export const displayDate = (date: Date, t: TFunction): string => {
 export const isReservationShortEnough = (
   start: Date,
   end: Date,
-  maxDuration: string
+  maxDuration: number
 ): boolean => {
   if (!maxDuration) return true;
 
-  const reservationDuration = differenceInMinutes(
+  const reservationDuration = differenceInSeconds(
     new Date(end),
     new Date(start)
   );
-  const maxMinutes = apiDurationToMinutes(maxDuration);
-  return reservationDuration <= maxMinutes;
+  return reservationDuration <= maxDuration;
 };
 
 export const isReservationLongEnough = (
   start: Date,
   end: Date,
-  minDuration: string
+  minDuration: number
 ): boolean => {
   if (!minDuration) return true;
 
-  const reservationDuration = differenceInMinutes(
+  const reservationDuration = differenceInSeconds(
     new Date(end),
     new Date(start)
   );
-  const minMinutes = apiDurationToMinutes(minDuration);
-  return reservationDuration >= minMinutes;
+  return reservationDuration >= minDuration;
 };
 
 const areOpeningTimesAvailable = (
@@ -272,20 +268,11 @@ export const getTimeslots = (
 export const getBufferedEventTimes = (
   start: Date,
   end: Date,
-  bufferTimeBefore?: string,
-  bufferTimeAfter?: string
+  bufferTimeBefore?: number,
+  bufferTimeAfter?: number
 ): { start: Date; end: Date } => {
-  const [beforeHours, beforeMinutes]: number[] = bufferTimeBefore
-    ?.split(":")
-    .map(Number) || [0, 0];
-  const [afterHours, afterMinutes]: number[] = bufferTimeAfter
-    ?.split(":")
-    .map(Number) || [0, 0];
-  const before = addMinutes(
-    addHours(start, -1 * beforeHours),
-    -1 * beforeMinutes
-  );
-  const after = addMinutes(addHours(end, afterHours), afterMinutes);
+  const before = addSeconds(start, -1 * bufferTimeBefore || 0);
+  const after = addSeconds(end, bufferTimeAfter || 0);
   return { start: before, end: after };
 };
 
@@ -294,8 +281,8 @@ export const doesBufferCollide = (
   newReservation: {
     start: Date;
     end: Date;
-    bufferTimeBefore: string;
-    bufferTimeAfter: string;
+    bufferTimeBefore: number;
+    bufferTimeAfter: number;
   }
 ): boolean => {
   const newReservationStartBuffer =
@@ -335,8 +322,8 @@ export const doBuffersCollide = (
   newReservation: {
     start: Date;
     end: Date;
-    bufferTimeBefore: string;
-    bufferTimeAfter: string;
+    bufferTimeBefore: number;
+    bufferTimeAfter: number;
   }
 ): boolean => {
   return reservations.some((reservation) =>
@@ -355,20 +342,16 @@ export const getEventBuffers = (
     const end = new Date(event.end);
 
     if (bufferTimeBefore) {
-      const [hours, minutes]: number[] = bufferTimeBefore
-        .split(":")
-        .map(Number);
       buffers.push({
-        start: addMinutes(addHours(begin, -1 * hours), -1 * minutes),
+        start: addSeconds(begin, -1 * bufferTimeBefore),
         end: begin,
         event: { ...event, state: "BUFFER" },
       });
     }
     if (bufferTimeAfter) {
-      const [hours, minutes]: number[] = bufferTimeAfter.split(":").map(Number);
       buffers.push({
         start: end,
-        end: addMinutes(addHours(end, hours), minutes),
+        end: addSeconds(end, bufferTimeAfter),
         event: { ...event, state: "BUFFER" },
       });
     }

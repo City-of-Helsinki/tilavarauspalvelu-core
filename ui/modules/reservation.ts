@@ -6,18 +6,23 @@ import { OptionType } from "./types";
 import { convertHMSToSeconds, getFormatters, secondsToHms } from "./util";
 
 export const getDurationOptions = (
-  minReservationDuration: string,
-  maxReservationDuration: string,
+  minReservationDuration: number,
+  maxReservationDuration: number,
   step = "00:15:00"
 ): OptionType[] => {
-  const minMinutes = convertHMSToSeconds(minReservationDuration);
-  const maxMinutes = convertHMSToSeconds(maxReservationDuration);
+  // const minMinutes = convertHMSToSeconds(minReservationDuration);
+  // const maxMinutes = convertHMSToSeconds(maxReservationDuration);
   const durationStep = convertHMSToSeconds(step);
 
-  if (!minMinutes || !maxMinutes || !durationStep) return [];
+  if (!minReservationDuration || !maxReservationDuration || !durationStep)
+    return [];
 
   const durationSteps = [];
-  for (let i = minMinutes; i <= maxMinutes; i += durationStep) {
+  for (
+    let i = minReservationDuration;
+    i <= maxReservationDuration;
+    i += durationStep
+  ) {
     durationSteps.push(i);
   }
   const timeOptions = durationSteps.map((n) => {

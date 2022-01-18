@@ -35,8 +35,8 @@ const selectedReservationUnitQuery = graphql.query<
     nameFi: "Pukinmäen nuorisotalon keittiö FI",
     nameEn: "Pukinmäen nuorisotalon keittiö EN",
     nameSv: "Pukinmäen nuorisotalon keittiö SV",
-    bufferTimeBefore: "01:00:00",
-    bufferTimeAfter: "00:30:00",
+    bufferTimeBefore: 3600,
+    bufferTimeAfter: 1800,
     reservationBegins: addDays(new Date(), -1),
     reservationEnds: addDays(new Date(), 1),
     images: [
@@ -134,8 +134,8 @@ const selectedReservationUnitQuery = graphql.query<
       addressCityEn: "Helsinki En",
       addressCitySv: "Helsinki Sv",
     },
-    minReservationDuration: "01:00:00",
-    maxReservationDuration: "01:30:00",
+    minReservationDuration: 3600,
+    maxReservationDuration: 5400,
     nextAvailableSlot: "2021-09-21T09:30:00Z",
     spaces: [
       {
@@ -335,8 +335,8 @@ const openingHoursQuery = graphql.query<
             numPersons: 3,
             calendarUrl:
               "http://localhost:8000/v1/reservation_calendar/5/?hash=aafe8cef803ea6aa3dc8c03307016b506554a62397a2c44828fc1d828fa7fee6",
-            bufferTimeBefore: "02:00:00",
-            bufferTimeAfter: "00:30:00",
+            bufferTimeBefore: 7200,
+            bufferTimeAfter: 1800,
           },
           {
             id: "UmV3ZXJ2YXRpb25UeXB3OjU=",
@@ -359,7 +359,7 @@ const openingHoursQuery = graphql.query<
             calendarUrl:
               "http://localhost:8000/v1/reservation_calendar/5/?hash=aafe8cef803ea6aa3dc8c03307016b506554a62397a2c44828fc1d828fa7fee6",
             bufferTimeBefore: null,
-            bufferTimeAfter: "00:30:00",
+            bufferTimeAfter: 1800,
           },
         ].map((n) => ({
           ...n,

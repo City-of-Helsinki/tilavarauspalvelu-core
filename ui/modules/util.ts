@@ -480,3 +480,15 @@ export const getFormatters = (): {
     }),
   };
 };
+
+export const formatSecondDuration = (
+  duration: number,
+  abbreviated = true
+): string => {
+  if (!duration || !isNumber(duration)) {
+    return "-";
+  }
+
+  const hms = secondsToHms(duration);
+  return formatDuration(`${hms.h}:${hms.m}:${hms.s}`, abbreviated);
+};

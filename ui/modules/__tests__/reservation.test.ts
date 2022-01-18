@@ -26,9 +26,10 @@ jest.mock("next/config", () => () => ({
 
 describe("getDurationOptions", () => {
   test("works", () => {
-    expect(getDurationOptions("0:30:00", "01:30:00")).toEqual([]);
-    expect(getDurationOptions("00:30:00", "1:30:00")).toEqual([]);
-    expect(getDurationOptions("00:30:00", "01:30:00")).toEqual([
+    expect(getDurationOptions(null, 5400)).toEqual([]);
+    expect(getDurationOptions(5400, null)).toEqual([]);
+    expect(getDurationOptions(null, null)).toEqual([]);
+    expect(getDurationOptions(1800, 5400)).toEqual([
       {
         label: "0:30",
         value: "0:30",
@@ -50,7 +51,7 @@ describe("getDurationOptions", () => {
         value: "1:30",
       },
     ]);
-    expect(getDurationOptions("00:30:00", "08:30:00", "02:00:00")).toEqual([
+    expect(getDurationOptions(1800, 30600, "02:00:00")).toEqual([
       {
         label: "0:30",
         value: "0:30",
