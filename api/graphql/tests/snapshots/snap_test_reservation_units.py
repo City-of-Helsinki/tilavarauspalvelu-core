@@ -368,8 +368,8 @@ snapshots['ReservationUnitQueryTestCase::test_getting_reservation_units 1'] = {
                         'additionalInstructionsSv': 'Ytterligare instruktioner',
                         'applicationRounds': [
                         ],
-                        'bufferTimeAfter': '00:15:00',
-                        'bufferTimeBefore': '00:15:00',
+                        'bufferTimeAfter': 900,
+                        'bufferTimeBefore': 900,
                         'cancellationRule': {
                             'nameEn': 'en',
                             'nameFi': 'fi',
@@ -385,6 +385,7 @@ snapshots['ReservationUnitQueryTestCase::test_getting_reservation_units 1'] = {
                         'location': None,
                         'lowestPrice': '0.00',
                         'maxPersons': 110,
+                        'maxReservationDuration': 86400,
                         'maxReservationsPerUser': 5,
                         'metadataSet': {
                             'name': 'Test form',
@@ -393,6 +394,7 @@ snapshots['ReservationUnitQueryTestCase::test_getting_reservation_units 1'] = {
                             'supportedFields': [
                             ]
                         },
+                        'minReservationDuration': 600,
                         'nameFi': 'test name fi',
                         'priceUnit': 'PER_HOUR',
                         'publishBegins': '2021-05-03T00:00:00+00:00',
@@ -411,6 +413,11 @@ snapshots['ReservationUnitQueryTestCase::test_getting_reservation_units 1'] = {
                         'resources': [
                         ],
                         'services': [
+                            {
+                                'bufferTimeAfter': 1800,
+                                'bufferTimeBefore': 900,
+                                'nameFi': 'Test Service'
+                            }
                         ],
                         'spaces': [
                             {

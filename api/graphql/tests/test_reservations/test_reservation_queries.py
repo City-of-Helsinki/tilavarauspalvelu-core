@@ -58,6 +58,8 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
             tax_percentage_value=24,
             price=10,
             working_memo="i'm visible to staff users",
+            buffer_time_before=datetime.timedelta(minutes=15),
+            buffer_time_after=datetime.timedelta(minutes=30),
         )
 
     def test_reservation_query(self):
@@ -112,6 +114,8 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
                             unitPrice
                             taxPercentageValue
                             price
+                            bufferTimeBefore
+                            bufferTimeAfter
                           }
                         }
                     }

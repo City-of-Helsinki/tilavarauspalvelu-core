@@ -11,6 +11,7 @@ from graphene_permissions.mixins import AuthNode
 from graphene_permissions.permissions import AllowAny
 
 from api.graphql.base_type import PrimaryKeyObjectType
+from api.graphql.duration_field import Duration
 from api.graphql.opening_hours.opening_hours_types import OpeningHoursMixin
 from api.graphql.reservations.reservation_types import (
     ReservationMetadataSetType,
@@ -294,8 +295,8 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
     unit = graphene.Field(UnitType)
     max_persons = graphene.Int()
     surface_area = graphene.Decimal()
-    max_reservation_duration = graphene.Time()
-    min_reservation_duration = graphene.Time()
+    max_reservation_duration = Duration()
+    min_reservation_duration = Duration()
     keyword_groups = graphene.List(KeywordGroupType)
     reservations = graphene.List(
         ReservationType,
@@ -309,8 +310,8 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
     cancellation_terms = graphene.Field(TermsOfUseType)
     service_specific_terms = graphene.Field(TermsOfUseType)
     tax_percentage = graphene.Field(TaxPercentageType)
-    buffer_time_before = graphene.Time()
-    buffer_time_after = graphene.Time()
+    buffer_time_before = Duration()
+    buffer_time_after = Duration()
     metadata_set = graphene.Field(ReservationMetadataSetType)
 
     permission_classes = (
@@ -420,18 +421,6 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
         surface_area = self.spaces.aggregate(total_surface_area=Sum("surface_area"))
         return surface_area.get("total_surface_area")
 
-    def resolve_max_reservation_duration(self, info):
-        if not self.max_reservation_duration:
-            return None
-        duration = datetime.datetime(1, 1, 1) + self.max_reservation_duration
-        return duration.time()
-
-    def resolve_min_reservation_duration(self, info):
-        if not self.min_reservation_duration:
-            return None
-        duration = datetime.datetime(1, 1, 1) + self.min_reservation_duration
-        return duration.time()
-
     def resolve_keyword_groups(self, info):
         return KeywordGroup.objects.filter(reservation_units=self.id)
 
@@ -468,18 +457,6 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
     @check_resolver_permission(ReservationUnitCancellationRulePermission)
     def resolve_cancellation_rule(self, info: ResolveInfo):
         return self.cancellation_rule
-
-    def resolve_buffer_time_before(self, info: ResolveInfo):
-        if not self.buffer_time_before:
-            return None
-        duration = datetime.datetime(1, 1, 1) + self.buffer_time_before
-        return duration.time()
-
-    def resolve_buffer_time_after(self, info: ResolveInfo):
-        if not self.buffer_time_after:
-            return None
-        duration = datetime.datetime(1, 1, 1) + self.buffer_time_after
-        return duration.time()
 
 
 class ReservationUnitByPkType(ReservationUnitType, OpeningHoursMixin):

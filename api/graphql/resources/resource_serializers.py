@@ -5,6 +5,7 @@ from api.graphql.base_serializers import (
     PrimaryKeySerializer,
     PrimaryKeyUpdateSerializer,
 )
+from api.graphql.duration_field import DurationField
 from api.graphql.primary_key_fields import IntegerPrimaryKeyField
 from api.graphql.translate_fields import get_all_translatable_fields
 from api.resources_api import ResourceSerializer
@@ -21,6 +22,20 @@ class ResourceCreateSerializer(ResourceSerializer, PrimaryKeySerializer):
     location_type = serializers.CharField(
         required=False
     )  # For some reason graphene blows up if this isn't defined here.
+    buffer_time_before = DurationField(
+        required=False,
+        help_text=(
+            "Buffer time while reservation unit is unreservable before the reservation. "
+            "Dynamically calculated from spaces and resources."
+        ),
+    )
+    buffer_time_after = DurationField(
+        required=False,
+        help_text=(
+            "Buffer time while reservation unit is unreservable after the reservation. "
+            "Dynamically calculated from spaces and resources."
+        ),
+    )
 
     class Meta(ResourceSerializer.Meta):
 
