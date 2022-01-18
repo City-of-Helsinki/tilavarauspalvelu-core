@@ -132,6 +132,12 @@ type DistrictType implements Node {
   pk: Int
 }
 
+"""
+The `Duration` scalar type represents a duration value as an integer in seconds.
+For example, a value of 900 means a duration of 15 minutes.
+"""
+scalar Duration
+
 input EquipmentCategoryCreateMutationInput {
   nameFi: String
   nameEn: String
@@ -733,8 +739,8 @@ type ReservationConfirmMutationPayload {
   priority: Int
   begin: DateTime
   end: DateTime
-  bufferTimeBefore: String
-  bufferTimeAfter: String
+  bufferTimeBefore: Int
+  bufferTimeAfter: Int
   purposePk: Int
   confirmedAt: DateTime
 
@@ -787,8 +793,8 @@ input ReservationCreateMutationInput {
   priority: Int
   begin: DateTime!
   end: DateTime!
-  bufferTimeBefore: String
-  bufferTimeAfter: String
+  bufferTimeBefore: Int
+  bufferTimeAfter: Int
   reservationUnitPks: [Int]!
   purposePk: Int
   clientMutationId: String
@@ -833,8 +839,8 @@ type ReservationCreateMutationPayload {
   priority: Int
   begin: DateTime
   end: DateTime
-  bufferTimeBefore: String
-  bufferTimeAfter: String
+  bufferTimeBefore: Int
+  bufferTimeAfter: Int
   purposePk: Int
   confirmedAt: DateTime
 
@@ -1010,8 +1016,8 @@ type ReservationType implements Node {
   user: String
   begin: DateTime!
   end: DateTime!
-  bufferTimeBefore: Float
-  bufferTimeAfter: Float
+  bufferTimeBefore: Duration
+  bufferTimeAfter: Duration
   recurringReservation: RecurringReservationType
   numPersons: Int
   purpose: ReservationPurposeType
@@ -1065,13 +1071,13 @@ type ReservationUnitByPkType implements Node {
   contactInformationFi: String
   contactInformationEn: String
   contactInformationSv: String
-  maxReservationDuration: Time
-  minReservationDuration: Time
+  maxReservationDuration: Duration
+  minReservationDuration: Duration
   uuid: UUID!
   isDraft: Boolean!
   maxPersons: Int
-  bufferTimeBefore: Time
-  bufferTimeAfter: Time
+  bufferTimeBefore: Duration
+  bufferTimeAfter: Duration
 
   """Unit of the price"""
   priceUnit: ReservationUnitsReservationUnitPriceUnitChoices!
@@ -1189,8 +1195,8 @@ input ReservationUnitCreateMutationInput {
   maxPersons: Int
   equipmentPks: [Int]
   unitPk: Int!
-  maxReservationDuration: String
-  minReservationDuration: String
+  maxReservationDuration: Int
+  minReservationDuration: Int
   isDraft: Boolean
   spacePks: [Int]
   resourcePks: [Int]
@@ -1198,8 +1204,8 @@ input ReservationUnitCreateMutationInput {
   servicePks: [Int]
   reservationUnitTypePk: Int
   surfaceArea: Float
-  bufferTimeBefore: String
-  bufferTimeAfter: String
+  bufferTimeBefore: Int
+  bufferTimeAfter: Int
   cancellationRulePk: Int
   paymentTermsPk: String
   cancellationTermsPk: String
@@ -1242,21 +1248,21 @@ input ReservationUnitCreateMutationInput {
   publishEnds: DateTime
   metadataSetPk: Int
   maxReservationsPerUser: Int
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
-  additionalInstructionsFi: String
-  additionalInstructionsEn: String
-  additionalInstructionsSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   contactInformationFi: String
   contactInformationEn: String
   contactInformationSv: String
+  additionalInstructionsFi: String
+  additionalInstructionsEn: String
+  additionalInstructionsSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
   clientMutationId: String
 }
 
@@ -1292,13 +1298,13 @@ type ReservationUnitCreateMutationPayload {
   building: String
   unitPk: Int
   uuid: String
-  maxReservationDuration: String
-  minReservationDuration: String
+  maxReservationDuration: Int
+  minReservationDuration: Int
   isDraft: Boolean
   reservationUnitTypePk: Int
   surfaceArea: Float
-  bufferTimeBefore: String
-  bufferTimeAfter: String
+  bufferTimeBefore: Int
+  bufferTimeAfter: Int
   cancellationRulePk: Int
 
   """Minimum price of the reservation unit"""
@@ -1336,21 +1342,21 @@ type ReservationUnitCreateMutationPayload {
   """Time after this reservation unit should not be publicly visible in UI."""
   publishEnds: DateTime
   maxReservationsPerUser: Int
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
-  additionalInstructionsFi: String
-  additionalInstructionsEn: String
-  additionalInstructionsSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   contactInformationFi: String
   contactInformationEn: String
   contactInformationSv: String
+  additionalInstructionsFi: String
+  additionalInstructionsEn: String
+  additionalInstructionsSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -1511,14 +1517,14 @@ type ReservationUnitType implements Node {
   contactInformationFi: String
   contactInformationEn: String
   contactInformationSv: String
-  maxReservationDuration: Time
-  minReservationDuration: Time
+  maxReservationDuration: Duration
+  minReservationDuration: Duration
   uuid: UUID!
   isDraft: Boolean!
   maxPersons: Int
   surfaceArea: Decimal
-  bufferTimeBefore: Time
-  bufferTimeAfter: Time
+  bufferTimeBefore: Duration
+  bufferTimeAfter: Duration
   cancellationRule: ReservationUnitCancellationRuleType
 
   """Unit of the price"""
@@ -1623,8 +1629,8 @@ input ReservationUnitUpdateMutationInput {
   maxPersons: Int
   equipmentPks: [Int]
   unitPk: Int
-  maxReservationDuration: String
-  minReservationDuration: String
+  maxReservationDuration: Int
+  minReservationDuration: Int
   isDraft: Boolean
   spacePks: [Int]
   resourcePks: [Int]
@@ -1632,8 +1638,8 @@ input ReservationUnitUpdateMutationInput {
   servicePks: [Int]
   reservationUnitTypePk: Int
   surfaceArea: Float
-  bufferTimeBefore: String
-  bufferTimeAfter: String
+  bufferTimeBefore: Int
+  bufferTimeAfter: Int
   cancellationRulePk: Int
   paymentTermsPk: String
   cancellationTermsPk: String
@@ -1676,21 +1682,21 @@ input ReservationUnitUpdateMutationInput {
   publishEnds: DateTime
   metadataSetPk: Int
   maxReservationsPerUser: Int
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
-  additionalInstructionsFi: String
-  additionalInstructionsEn: String
-  additionalInstructionsSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   contactInformationFi: String
   contactInformationEn: String
   contactInformationSv: String
+  additionalInstructionsFi: String
+  additionalInstructionsEn: String
+  additionalInstructionsSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
   clientMutationId: String
 }
 
@@ -1726,13 +1732,13 @@ type ReservationUnitUpdateMutationPayload {
   building: String
   unitPk: Int
   uuid: String
-  maxReservationDuration: String
-  minReservationDuration: String
+  maxReservationDuration: Int
+  minReservationDuration: Int
   isDraft: Boolean
   reservationUnitTypePk: Int
   surfaceArea: Float
-  bufferTimeBefore: String
-  bufferTimeAfter: String
+  bufferTimeBefore: Int
+  bufferTimeAfter: Int
   cancellationRulePk: Int
 
   """Minimum price of the reservation unit"""
@@ -1770,21 +1776,21 @@ type ReservationUnitUpdateMutationPayload {
   """Time after this reservation unit should not be publicly visible in UI."""
   publishEnds: DateTime
   maxReservationsPerUser: Int
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
-  additionalInstructionsFi: String
-  additionalInstructionsEn: String
-  additionalInstructionsSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   contactInformationFi: String
   contactInformationEn: String
   contactInformationSv: String
+  additionalInstructionsFi: String
+  additionalInstructionsEn: String
+  additionalInstructionsSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -1833,8 +1839,8 @@ input ReservationUpdateMutationInput {
   priority: Int
   begin: DateTime
   end: DateTime
-  bufferTimeBefore: String
-  bufferTimeAfter: String
+  bufferTimeBefore: Int
+  bufferTimeAfter: Int
   reservationUnitPks: [Int]
   purposePk: Int
   clientMutationId: String
@@ -1881,8 +1887,8 @@ type ReservationUpdateMutationPayload {
   priority: Int
   begin: DateTime
   end: DateTime
-  bufferTimeBefore: String
-  bufferTimeAfter: String
+  bufferTimeBefore: Int
+  bufferTimeAfter: Int
   purposePk: Int
   confirmedAt: DateTime
 
@@ -1908,20 +1914,23 @@ input ResourceCreateMutationInput {
   spacePk: Int
 
   """
+  Buffer time while reservation unit is unreservable before the reservation.
+  Dynamically calculated from spaces and resources.
+  """
+  bufferTimeBefore: Int
+
+  """
   Buffer time while reservation unit is unreservable after the reservation.
   Dynamically calculated from spaces and resources.
   """
-  bufferTimeBefore: String
-
-  """Begin date and time of the reservation."""
-  bufferTimeAfter: String
+  bufferTimeAfter: Int
   isDraft: Boolean
-  nameFi: String
-  nameEn: String
-  nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
   clientMutationId: String
 }
 
@@ -1933,20 +1942,23 @@ type ResourceCreateMutationPayload {
   spacePk: Int
 
   """
+  Buffer time while reservation unit is unreservable before the reservation.
+  Dynamically calculated from spaces and resources.
+  """
+  bufferTimeBefore: Int
+
+  """
   Buffer time while reservation unit is unreservable after the reservation.
   Dynamically calculated from spaces and resources.
   """
-  bufferTimeBefore: String
-
-  """Begin date and time of the reservation."""
-  bufferTimeAfter: String
+  bufferTimeAfter: Int
   isDraft: Boolean
-  nameFi: String
-  nameEn: String
-  nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -1983,8 +1995,8 @@ type ResourceType implements Node {
   descriptionEn: String
   descriptionSv: String
   space: SpaceType
-  bufferTimeBefore: Float
-  bufferTimeAfter: Float
+  bufferTimeBefore: Duration
+  bufferTimeAfter: Duration
   isDraft: Boolean!
 
   """The ID of the object"""
@@ -2018,20 +2030,23 @@ input ResourceUpdateMutationInput {
   spacePk: Int
 
   """
+  Buffer time while reservation unit is unreservable before the reservation.
+  Dynamically calculated from spaces and resources.
+  """
+  bufferTimeBefore: Int
+
+  """
   Buffer time while reservation unit is unreservable after the reservation.
   Dynamically calculated from spaces and resources.
   """
-  bufferTimeBefore: String
-
-  """Begin date and time of the reservation."""
-  bufferTimeAfter: String
+  bufferTimeAfter: Int
   isDraft: Boolean
-  nameFi: String
-  nameEn: String
-  nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
   clientMutationId: String
 }
 
@@ -2043,20 +2058,23 @@ type ResourceUpdateMutationPayload {
   spacePk: Int
 
   """
+  Buffer time while reservation unit is unreservable before the reservation.
+  Dynamically calculated from spaces and resources.
+  """
+  bufferTimeBefore: Int
+
+  """
   Buffer time while reservation unit is unreservable after the reservation.
   Dynamically calculated from spaces and resources.
   """
-  bufferTimeBefore: String
-
-  """Begin date and time of the reservation."""
-  bufferTimeAfter: String
+  bufferTimeAfter: Int
   isDraft: Boolean
-  nameFi: String
-  nameEn: String
-  nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -2081,8 +2099,8 @@ type ServiceType implements Node {
   nameEn: String
   nameSv: String
   serviceType: ServicesServiceServiceTypeChoices!
-  bufferTimeBefore: String
-  bufferTimeAfter: String
+  bufferTimeBefore: Duration
+  bufferTimeAfter: Duration
 
   """The ID of the object"""
   id: ID!
@@ -2405,12 +2423,12 @@ input UnitUpdateMutationInput {
   shortDescriptionFi: String
   shortDescriptionEn: String
   shortDescriptionSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
   clientMutationId: String
 }
 
@@ -2423,12 +2441,12 @@ type UnitUpdateMutationPayload {
   shortDescriptionFi: String
   shortDescriptionEn: String
   shortDescriptionSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]

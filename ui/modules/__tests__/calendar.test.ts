@@ -32,21 +32,21 @@ test("isReservationShortEnough", () => {
     isReservationShortEnough(
       new Date(2021, 11, 10, 12, 0, 0),
       new Date(2021, 11, 10, 12, 30, 0),
-      "1:30:00"
+      5400
     )
   ).toBe(true);
   expect(
     isReservationShortEnough(
       new Date(2021, 11, 10, 12, 0, 0),
       new Date(2021, 11, 10, 13, 30, 0),
-      "1:30:00"
+      5400
     )
   ).toBe(true);
   expect(
     isReservationShortEnough(
       new Date(2021, 11, 10, 12, 0, 0),
       new Date(2021, 11, 10, 13, 31, 0),
-      "1:30:00"
+      5400
     )
   ).toBe(false);
 });
@@ -56,21 +56,21 @@ test("isReservationLongEnough", () => {
     isReservationLongEnough(
       new Date(2021, 11, 10, 12, 0, 0),
       new Date(2021, 11, 10, 12, 30, 0),
-      "1:30:00"
+      5400
     )
   ).toBe(false);
   expect(
     isReservationLongEnough(
       new Date(2021, 11, 10, 12, 0, 0),
       new Date(2021, 11, 10, 13, 30, 0),
-      "1:30:00"
+      5400
     )
   ).toBe(true);
   expect(
     isReservationLongEnough(
       new Date(2021, 11, 10, 12, 0, 0),
       new Date(2021, 11, 10, 13, 31, 0),
-      "1:30:00"
+      5400
     )
   ).toBe(true);
 });
@@ -376,15 +376,15 @@ describe("getBufferedEventTimes", () => {
   const end = new Date("2019-09-22T13:00:00+00:00");
 
   test("with a buffer", () => {
-    expect(getBufferedEventTimes(start, end, "00:30:00", "01:00:00")).toEqual({
+    expect(getBufferedEventTimes(start, end, 1800, 3600)).toEqual({
       start: new Date("2019-09-22T11:30:00+00:00"),
       end: new Date("2019-09-22T14:00:00+00:00"),
     });
-    expect(getBufferedEventTimes(start, end, null, "01:00:00")).toEqual({
+    expect(getBufferedEventTimes(start, end, null, 3600)).toEqual({
       start: new Date("2019-09-22T12:00:00+00:00"),
       end: new Date("2019-09-22T14:00:00+00:00"),
     });
-    expect(getBufferedEventTimes(start, end, "01:00:00")).toEqual({
+    expect(getBufferedEventTimes(start, end, 3600)).toEqual({
       start: new Date("2019-09-22T11:00:00+00:00"),
       end: new Date("2019-09-22T13:00:00+00:00"),
     });
@@ -408,14 +408,14 @@ describe("doesBuffer(s)Collide", () => {
     {
       begin: new Date("2019-09-22T12:00:00+00:00"),
       end: new Date("2019-09-22T13:00:00+00:00"),
-      bufferTimeBefore: "01:00:00",
-      bufferTimeAfter: "01:00:00",
+      bufferTimeBefore: 3600,
+      bufferTimeAfter: 3600,
     },
     {
       begin: new Date("2019-09-22T16:00:00+00:00"),
       end: new Date("2019-09-22T17:00:00+00:00"),
-      bufferTimeBefore: "01:00:00",
-      bufferTimeAfter: "01:00:00",
+      bufferTimeBefore: 3600,
+      bufferTimeAfter: 3600,
     },
   ] as ReservationType[];
   test("detects collisions", () => {
@@ -423,7 +423,7 @@ describe("doesBuffer(s)Collide", () => {
       doesBufferCollide(reservations[0], {
         start: new Date("2019-09-22T14:00:00+00:00"),
         end: new Date("2019-09-22T15:00:00+00:00"),
-        bufferTimeBefore: "01:30:00",
+        bufferTimeBefore: 5400,
         bufferTimeAfter: null,
       })
     ).toBe(true);
@@ -433,7 +433,7 @@ describe("doesBuffer(s)Collide", () => {
         start: new Date("2019-09-22T10:00:00+00:00"),
         end: new Date("2019-09-22T10:30:00+00:00"),
         bufferTimeBefore: null,
-        bufferTimeAfter: "01:30:00",
+        bufferTimeAfter: 5400,
       })
     ).toBe(false);
 
@@ -442,7 +442,7 @@ describe("doesBuffer(s)Collide", () => {
         start: new Date("2019-09-22T10:00:00+00:00"),
         end: new Date("2019-09-22T10:30:00+00:00"),
         bufferTimeBefore: null,
-        bufferTimeAfter: "01:31:00",
+        bufferTimeAfter: 5460,
       })
     ).toBe(true);
 
@@ -450,7 +450,7 @@ describe("doesBuffer(s)Collide", () => {
       doBuffersCollide(reservations, {
         start: new Date("2019-09-22T14:00:00+00:00"),
         end: new Date("2019-09-22T14:15:00+00:00"),
-        bufferTimeBefore: "01:00:00",
+        bufferTimeBefore: 3600,
         bufferTimeAfter: null,
       })
     ).toBe(false);
@@ -459,7 +459,7 @@ describe("doesBuffer(s)Collide", () => {
       doBuffersCollide(reservations, {
         start: new Date("2019-09-22T14:00:00+00:00"),
         end: new Date("2019-09-22T14:15:00+00:00"),
-        bufferTimeBefore: "01:01:00",
+        bufferTimeBefore: 3660,
         bufferTimeAfter: null,
       })
     ).toBe(true);
@@ -468,7 +468,7 @@ describe("doesBuffer(s)Collide", () => {
       doBuffersCollide(reservations, {
         start: new Date("2019-09-22T14:00:00+00:00"),
         end: new Date("2019-09-22T15:00:00+00:00"),
-        bufferTimeBefore: "01:00:00",
+        bufferTimeBefore: 3600,
         bufferTimeAfter: null,
       })
     ).toBe(false);
@@ -477,8 +477,8 @@ describe("doesBuffer(s)Collide", () => {
       doBuffersCollide(reservations, {
         start: new Date("2019-09-22T14:00:00+00:00"),
         end: new Date("2019-09-22T15:00:00+00:00"),
-        bufferTimeBefore: "01:00:00",
-        bufferTimeAfter: "01:01:00",
+        bufferTimeBefore: 3600,
+        bufferTimeAfter: 3660,
       })
     ).toBe(true);
   });
@@ -491,15 +491,15 @@ describe("getEventBuffers", () => {
         id: "1234",
         begin: new Date("2019-09-22T12:00:00+00:00"),
         end: new Date("2019-09-22T13:00:00+00:00"),
-        bufferTimeBefore: "01:00:00",
-        bufferTimeAfter: "01:30:00",
+        bufferTimeBefore: 3600,
+        bufferTimeAfter: 5400,
       },
       {
         id: "3456",
         begin: new Date("2019-09-22T15:00:00+00:00"),
         end: new Date("2019-09-22T16:00:00+00:00"),
         bufferTimeBefore: null,
-        bufferTimeAfter: "02:30:00",
+        bufferTimeAfter: 9000,
       },
     ] as ReservationType[];
 
