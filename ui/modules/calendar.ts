@@ -4,6 +4,7 @@ import {
   addMinutes,
   areIntervalsOverlapping,
   differenceInMinutes,
+  format,
   getISODay,
   isAfter,
   isBefore,
@@ -112,13 +113,14 @@ const areOpeningTimesAvailable = (
 ) => {
   return !!openingHours?.some((oh) => {
     const startDate = oh.date;
-    const startTime = new Date(`${startDate}T${oh.startTime}`);
-    const endTime = new Date(`${startDate}T${oh.endTime}`);
+    const startDateTime = new Date(`${startDate}T${oh.startTime}`);
+    const endDateTime = new Date(`${startDate}T${oh.endTime}`);
     return (
       toApiDate(slotDate) === startDate.toString() &&
-      startTime.getDay() === slotDate.getDay() &&
-      startTime.getHours() <= slotDate.getHours() &&
-      endTime.getHours() >= slotDate.getHours()
+      slotDate < endDateTime &&
+      startDateTime.getDay() === slotDate.getDay() &&
+      startDateTime.getHours() <= slotDate.getHours() &&
+      endDateTime.getHours() >= slotDate.getHours()
     );
   });
 };
@@ -176,8 +178,8 @@ export const getDayIntervals = (
   endTime: string,
   interval: ReservationUnitsReservationUnitReservationStartIntervalChoices
 ): string[] => {
-  const start = convertHMSToSeconds(startTime);
-  const end = convertHMSToSeconds(endTime);
+  const start = convertHMSToSeconds(startTime?.substring(0, 5));
+  const end = convertHMSToSeconds(endTime?.substring(0, 5));
   const intervals: string[] = [];
 
   let intervalSeconds = 0;
@@ -208,7 +210,7 @@ export const getDayIntervals = (
     );
   }
 
-  return intervals;
+  return intervals.filter((n) => n.substring(0, 5) !== endTime);
 };
 
 export const isStartTimeWithinInterval = (
@@ -223,8 +225,8 @@ export const isStartTimeWithinInterval = (
     openingTimes.find((n) => n.date === toApiDate(start)) || {};
 
   return getDayIntervals(
-    dayStartTime?.substring(0, 5),
-    dayEndTime?.substring(0, 5),
+    format(new Date(`1970-01-01T${dayStartTime}`), "HH:mm"),
+    format(new Date(`1970-01-01T${dayEndTime}`), "HH:mm"),
     interval
   ).includes(startTime);
 };

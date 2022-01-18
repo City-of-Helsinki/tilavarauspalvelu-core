@@ -13,7 +13,7 @@ const config = {
 };
 const Sanitize = ({ html }: Props): JSX.Element | null =>
   html ? (
-    <div
+    <span
       // eslint-disable-next-line react/no-danger
       dangerouslySetInnerHTML={{
         // eslint-disable-next-line @typescript-eslint/naming-convention

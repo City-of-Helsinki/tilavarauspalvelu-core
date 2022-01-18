@@ -1,4 +1,10 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, {
+  Fragment,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import styled from "styled-components";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useMutation } from "@apollo/client";
@@ -12,10 +18,12 @@ import {
   IconArrowLeft,
   IconArrowRight,
   IconCheck,
+  RadioButton,
+  Select,
 } from "hds-react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { GetServerSideProps } from "next";
-import { isFinite } from "lodash";
+import { camelCase, get, isFinite, omit } from "lodash";
 import { Trans, useTranslation } from "react-i18next";
 import apolloClient from "../../../modules/apolloClient";
 import {
@@ -27,7 +35,10 @@ import {
   Strong,
 } from "../../../modules/style/typography";
 import { breakpoint } from "../../../modules/style";
-import { TwoColumnContainer } from "../../../components/common/common";
+import {
+  CheckboxWrapper,
+  TwoColumnContainer,
+} from "../../../components/common/common";
 import { NarrowCenteredContainer } from "../../../modules/style/layout";
 import { AccordionWithState as Accordion } from "../../../components/common/Accordion";
 import { isBrowser, reservationUnitSinglePrefix } from "../../../modules/const";
@@ -40,8 +51,16 @@ import {
 import { MediumButton } from "../../../styles/util";
 import { DataContext } from "../../../context/DataContext";
 import {
+  AgeGroupType,
+  CityType,
+  Query,
+  QueryAgeGroupsArgs,
+  QueryCitiesArgs,
+  QueryReservationPurposesArgs,
+  QueryReservationUnitByPkArgs,
   ReservationConfirmMutationInput,
   ReservationConfirmMutationPayload,
+  ReservationPurposeType,
   ReservationUnitType,
   ReservationUpdateMutationInput,
   ReservationUpdateMutationPayload,
@@ -49,15 +68,28 @@ import {
 import { RESERVATION_UNIT } from "../../../modules/queries/reservationUnit";
 import {
   CONFIRM_RESERVATION,
+  GET_CITIES,
   UPDATE_RESERVATION,
 } from "../../../modules/queries/reservation";
 import StepperHz from "../../../components/StepperHz";
 import Ticket from "../../../components/reservation/Ticket";
 import Sanitize from "../../../components/common/Sanitize";
 import { getPrice } from "../../../modules/reservationUnit";
+import {
+  getReservationApplicationFields,
+  getReservationApplicationMutatationValues,
+  ReserveeType,
+} from "../../../modules/reservation";
+import {
+  AGE_GROUPS,
+  RESERVATION_PURPOSES,
+} from "../../../modules/queries/params";
 
 type Props = {
   reservationUnit: ReservationUnitType;
+  reservationPurposes: ReservationPurposeType[];
+  ageGroups: AgeGroupType[];
+  cities: CityType[];
 };
 
 type Inputs = {
@@ -69,6 +101,25 @@ type Inputs = {
   description: string;
   spaceTerms: boolean;
   resourceTerms: boolean;
+  purpose: number;
+  numPersons: number;
+  ageGroup: number;
+  reserveeAddressStreet: string;
+  reserveeAddressZip: string;
+  reserveeAddressCity: string;
+  reserveeEmail: string;
+  reserveeOrganisationName: string;
+  showBillingAddress?: boolean;
+  billingFirstName: string;
+  billingLastName: string;
+  billingPhone: string;
+  billingEmail: string;
+  billingAddressStreet: string;
+  billingAddressCity: string;
+  billingAddressZip: string;
+  homeCity: number;
+  applyingForFreeOfCharge: boolean;
+  freeOfChargeReason: string;
 };
 
 type Reservation = {
@@ -76,15 +127,36 @@ type Reservation = {
   begin: string;
   end: string;
   reservationUnitPks: number[];
-  reserveeFirstName: string;
-  reserveeLastName: string;
-  reserveePhone: string;
-  name: string;
+  reserveeFirstName?: string;
+  reserveeLastName?: string;
+  reserveePhone?: string;
+  name?: string;
   user?: string;
-  description: string;
+  description?: string;
   calendarUrl?: string;
   state?: string;
   price?: number;
+  spaceTerms?: boolean;
+  resourceTerms?: boolean;
+  purpose?: number;
+  numPersons?: number;
+  ageGroup?: number;
+  reserveeAddressStreet?: string;
+  reserveeAddressZip?: string;
+  reserveeAddressCity?: string;
+  reserveeEmail?: string;
+  reserveeOrganisationName?: string;
+  showBillingAddress?: boolean;
+  billingFirstName?: string;
+  billingLastName?: string;
+  billingPhone?: string;
+  billingEmail?: string;
+  billingAddressStreet?: string;
+  billingAddressCity?: string;
+  billingAddressZip?: string;
+  homeCity?: number;
+  applyingForFreeOfCharge?: boolean;
+  freeOfChargeReason?: string;
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -94,18 +166,62 @@ export const getServerSideProps: GetServerSideProps = async ({
 }) => {
   const id = Number(params.params[0]);
   const path = params.params[1];
+  let reservationPurposes = [];
+  let ageGroups = [];
+  let cities = [];
 
   if (isFinite(id) && path === "reservation") {
-    const { data } = await apolloClient.query({
+    const { data: reservationUnitData } = await apolloClient.query<
+      Query,
+      QueryReservationUnitByPkArgs
+    >({
       query: RESERVATION_UNIT,
       variables: { pk: id },
     });
 
+    if (reservationUnitData?.reservationUnitByPk) {
+      if (reservationUnitData.reservationUnitByPk?.metadataSet) {
+        const { data: reservationPurposesData } = await apolloClient.query<
+          Query,
+          QueryReservationPurposesArgs
+        >({
+          query: RESERVATION_PURPOSES,
+        });
+        reservationPurposes =
+          reservationPurposesData.reservationPurposes.edges?.map(
+            (edge) => edge.node
+          );
+
+        const { data: ageGroupsData } = await apolloClient.query<
+          Query,
+          QueryAgeGroupsArgs
+        >({
+          query: AGE_GROUPS,
+        });
+        ageGroups = ageGroupsData.ageGroups.edges?.map((edge) => edge.node);
+
+        const { data: citiesData } = await apolloClient.query<
+          Query,
+          QueryCitiesArgs
+        >({
+          query: GET_CITIES,
+        });
+        cities = citiesData.cities.edges?.map((edge) => edge.node);
+      }
+
+      return {
+        props: {
+          reservationUnit: reservationUnitData.reservationUnitByPk,
+          reservationPurposes,
+          ageGroups,
+          cities,
+          ...(await serverSideTranslations(locale)),
+        },
+      };
+    }
+
     return {
-      props: {
-        reservationUnit: data.reservationUnitByPk,
-        ...(await serverSideTranslations(locale)),
-      },
+      notFound: true,
     };
   }
 
@@ -174,7 +290,15 @@ const BodyContainer = styled(NarrowCenteredContainer)`
   }
 `;
 
-const StyledTextInput = styled(TextInput)`
+const StyledTextInput = styled(TextInput)<{
+  $isWide?: boolean;
+  $hidden?: boolean;
+  $break?: boolean;
+}>`
+  ${({ $isWide }) => $isWide && "grid-column: 1 / -1"};
+  ${({ $hidden }) => $hidden && "display: none"};
+  ${({ $break }) => $break && "grid-column: 1 / -2"};
+
   label {
     ${fontMedium}
   }
@@ -206,6 +330,7 @@ const AccordionContainer = styled.div`
   }
 
   line-height: var(--lineheight-l);
+  white-space: pre-line;
 
   button {
     margin-bottom: var(--spacing-xs);
@@ -219,6 +344,8 @@ const TermContainer = styled.div`
 const ActionContainer = styled.div`
   display: grid;
   grid-template-columns: 1fr;
+  gap: var(--spacing-m);
+  margin-bottom: var(--spacing-layout-m);
 
   button {
     margin-bottom: var(--spacing-m);
@@ -226,6 +353,14 @@ const ActionContainer = styled.div`
     @media (min-width: ${breakpoint.m}) {
       width: 18rem;
     }
+  }
+
+  @media (min-width: ${breakpoint.m}) {
+    & > button:first-of-type {
+      order: 1;
+    }
+
+    grid-template-columns: 1fr 1fr;
   }
 `;
 
@@ -247,8 +382,29 @@ const ValueParagraph = styled(Paragraph).attrs({
   "data-test": "reservation__confirmation--paragraph",
 })``;
 
+const ApplicationForm = styled.form`
+  label {
+    ${fontMedium};
+
+    span {
+      line-height: unset;
+      transform: unset;
+      margin-left: 0;
+      display: inline;
+      font-size: unset;
+    }
+  }
+
+  input[type="radio"] + label {
+    ${fontRegular};
+  }
+`;
+
 const ReservationUnitReservation = ({
   reservationUnit,
+  reservationPurposes,
+  ageGroups,
+  cities,
 }: Props): JSX.Element => {
   const { t } = useTranslation();
   const {
@@ -267,7 +423,12 @@ const ReservationUnitReservation = ({
   const [areServiceSpecificTermsAccepted, setAreServiceSpecificTermsAccepted] =
     useState(false);
 
-  const { register, handleSubmit, errors } = useForm<Inputs>();
+  const [reserveeType, setReserveeType] = useState<ReserveeType>(null);
+
+  const { register, handleSubmit, watch, errors, control } = useForm<Inputs>();
+
+  const numFields = ["numPersons"];
+  const emailFields = ["reserveeEmail", "billingEmail"];
 
   const [
     updateReservation,
@@ -285,6 +446,8 @@ const ReservationUnitReservation = ({
     { input: ReservationConfirmMutationInput }
   >(CONFIRM_RESERVATION);
 
+  const doesReservationNeedApplication = !!reservationUnit?.metadataSet?.id;
+
   useEffect(() => {
     return () => {
       setContextReservation(null);
@@ -300,8 +463,16 @@ const ReservationUnitReservation = ({
           setContextReservation(null);
           router.push(`${reservationUnitSinglePrefix}/${reservationUnit.pk}`);
         } else {
+          const payload = {
+            ...omit(updateData.updateReservation.reservation, "__typename"),
+            purpose: updateData.updateReservation.reservation.purpose?.pk,
+            ageGroup: updateData.updateReservation.reservation.ageGroup?.pk,
+            homeCity: updateData.updateReservation.reservation.homeCity?.pk,
+            showBillingAddress: watch("showBillingAddress"),
+          };
           setReservation({
             ...reservation,
+            ...payload,
             calendarUrl: updateData.updateReservation?.reservation?.calendarUrl,
           });
           setStep(1);
@@ -330,6 +501,24 @@ const ReservationUnitReservation = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [confirmData, confirmLoading, confirmError]);
 
+  const options = useMemo(
+    () => ({
+      purpose: reservationPurposes.map((purpose) => ({
+        label: getTranslation(purpose, "name"),
+        value: purpose.pk,
+      })),
+      ageGroup: ageGroups.map((ageGroup) => ({
+        label: `${ageGroup.minimum} - ${ageGroup.maximum}`,
+        value: ageGroup.pk,
+      })),
+      homeCity: cities.map((city) => ({
+        label: city.name,
+        value: city.pk,
+      })),
+    }),
+    [reservationPurposes, ageGroups, cities]
+  );
+
   if (
     isBrowser &&
     (!reservationData?.pk || !reservationData?.begin || !reservationData?.end)
@@ -356,7 +545,7 @@ const ReservationUnitReservation = ({
     date: end && parseISO(end),
   });
 
-  const onSubmit1 = (payload) => {
+  const onSubmitOpen1 = (payload) => {
     const input = {
       pk: reservationPk,
       begin,
@@ -378,7 +567,7 @@ const ReservationUnitReservation = ({
     });
   };
 
-  const onSubmit2 = () => {
+  const onSubmitOpen2 = () => {
     confirmReservation({
       variables: {
         input: {
@@ -398,6 +587,48 @@ const ReservationUnitReservation = ({
       },
     });
   };
+
+  const onSubmitApplication1 = (payload) => {
+    if (!reserveeType) {
+      setErrorMsg(t("reservationApplication:errors.noFormType"));
+      return;
+    }
+
+    const normalizedPayload = Object.keys(payload).reduce((acc, key) => {
+      if (["showBillingAddress"].includes(key)) return acc;
+      acc[key] = {}.propertyIsEnumerable.call(payload[key] || {}, "value")
+        ? payload[key].value
+        : payload[key];
+      return acc;
+    }, {});
+
+    const input = getReservationApplicationMutatationValues(
+      normalizedPayload,
+      reservationUnit.metadataSet.supportedFields,
+      reserveeType
+    );
+
+    updateReservation({
+      variables: {
+        input: {
+          pk: reservationPk,
+          ...input,
+        },
+      },
+    });
+  };
+
+  const isWideRow = (field: string): boolean =>
+    [
+      "name",
+      "description",
+      "reserveeAddressStreet",
+      "reserveeOrganisationName",
+      "billingAddressStreet",
+    ].includes(field);
+
+  const isBreakingColumn = (field: string): boolean =>
+    ["showBillingAddress", "applyingForFreeOfCharge"].includes(field);
 
   if (!isBrowser) {
     return null;
@@ -421,7 +652,16 @@ const ReservationUnitReservation = ({
               />
             </div>
             <div>
-              {formStatus === "sent" ? (
+              {doesReservationNeedApplication ? (
+                formStatus === "sent" ? (
+                  <Title>
+                    <IconCheck size="l" />
+                    {t("reservationApplication:titleSent")}
+                  </Title>
+                ) : (
+                  <Title>{t("reservationApplication:title")}</Title>
+                )
+              ) : formStatus === "sent" ? (
                 <Title>
                   <IconCheck size="l" />
                   {t("reservationUnit:reservationSuccessful")}
@@ -447,8 +687,8 @@ const ReservationUnitReservation = ({
       </Head>
       {formStatus === "pending" && (
         <BodyContainer>
-          {step === 0 && (
-            <form onSubmit={handleSubmit(onSubmit1)}>
+          {step === 0 && !doesReservationNeedApplication && (
+            <form onSubmit={handleSubmit(onSubmitOpen1)}>
               <H2 style={{ marginTop: "var(--spacing-layout-m)" }}>
                 {t("reservationCalendar:reserverInfo")}
               </H2>
@@ -529,7 +769,7 @@ const ReservationUnitReservation = ({
                   data-test="reservation__button--update"
                 >
                   {t("reservationCalendar:nextStep")}
-                </MediumButton>
+                </MediumButton>{" "}
                 <MediumButton
                   variant="secondary"
                   iconLeft={<IconArrowLeft />}
@@ -543,42 +783,310 @@ const ReservationUnitReservation = ({
               </ActionContainer>
             </form>
           )}
+          {step === 0 && doesReservationNeedApplication && (
+            <ApplicationForm onSubmit={handleSubmit(onSubmitApplication1)}>
+              <H2
+                style={{
+                  margin: "var(--spacing-layout-m) 0 var(--spacing-xs)",
+                }}
+              >
+                {t("reservationApplication:applicationInfo")}
+              </H2>
+              <p>{t("reservationApplication:reserveeTypePrefix")}</p>
+              <OneColumnContainer
+                style={{
+                  width: "100%",
+                  gap: "var(--spacing-xs)",
+                  marginTop: "var(--spacing-xs)",
+                }}
+              >
+                {["nonprofit", "individual", "business"].map(
+                  (id: ReserveeType) => (
+                    <RadioButton
+                      key={id}
+                      name={id}
+                      id={id}
+                      label={t(
+                        `reservationApplication:reserveeTypes.labels.${id}`
+                      )}
+                      onClick={() => {
+                        setReserveeType(id);
+                      }}
+                      checked={reserveeType === id}
+                    />
+                  )
+                )}
+              </OneColumnContainer>
+              <StyledNotification
+                type="alert"
+                label={`${t(
+                  "reservationCalendar:notification.reservationApplicationAlertTitle"
+                )}`}
+              >
+                {t("reservationCalendar:notification.reservationAlertBody")}
+              </StyledNotification>
+              <TwoColumnContainer
+                style={{
+                  margin: "var(--spacing-layout-m) 0 var(--spacing-layout-xl)",
+                }}
+              >
+                {getReservationApplicationFields(
+                  reservationUnit.metadataSet?.supportedFields,
+                  reserveeType,
+                  true
+                ).map((field) => {
+                  const required = reservationUnit.metadataSet.requiredFields
+                    .map(camelCase)
+                    .includes(field);
+                  return Object.keys(options).includes(field) ? (
+                    <Controller
+                      as={
+                        <Select
+                          label={t(
+                            `reservationApplication:label.${reserveeType}.${field}`
+                          )}
+                          id={field}
+                          options={options[field]}
+                          defaultValue={options[field].find(
+                            (n) => n.value === get(reservation, field)
+                          )}
+                          error={get(errors, field) && t("forms:requiredField")}
+                          required={required}
+                          invalid={!!get(errors, field)}
+                        />
+                      }
+                      name={field}
+                      control={control}
+                      key={field}
+                      rules={{ required }}
+                    />
+                  ) : field === "applyingForFreeOfCharge" ? (
+                    <CheckboxWrapper
+                      key={field}
+                      $break={isBreakingColumn(field)}
+                    >
+                      <Controller
+                        name={field}
+                        control={control}
+                        defaultValue={get(reservation, field)}
+                        rules={{ required }}
+                        render={(props) => (
+                          <Checkbox
+                            id={field}
+                            onChange={(e) => props.onChange(e.target.checked)}
+                            checked={props.value}
+                            label={`${t(
+                              `reservationApplication:label.${reserveeType}.${field}`
+                            )}${required ? " * " : ""}`}
+                            errorText={
+                              get(errors, field) && t("forms:requiredField")
+                            }
+                          />
+                        )}
+                      />
+                    </CheckboxWrapper>
+                  ) : field === "reserveeIsUnregisteredAssociation" ? (
+                    <CheckboxWrapper key={field}>
+                      <Controller
+                        name={field}
+                        control={control}
+                        defaultValue={get(reservation, field)}
+                        rules={{ required }}
+                        render={(props) => (
+                          <Checkbox
+                            id={field}
+                            onChange={(e) => props.onChange(e.target.checked)}
+                            checked={props.value}
+                            defaultChecked={get(reservation, field)}
+                            label={`${t(
+                              `reservationApplication:label.${reserveeType}.${field}`
+                            )}${required ? " * " : ""}`}
+                            errorText={
+                              get(errors, field) && t("forms:requiredField")
+                            }
+                          />
+                        )}
+                      />
+                    </CheckboxWrapper>
+                  ) : field === "showBillingAddress" ? (
+                    <CheckboxWrapper
+                      key={field}
+                      $break={isBreakingColumn(field)}
+                    >
+                      <Controller
+                        name={field}
+                        control={control}
+                        defaultValue={get(reservation, field)}
+                        rules={{ required }}
+                        render={(props) => (
+                          <Checkbox
+                            id={field}
+                            onChange={(e) => props.onChange(e.target.checked)}
+                            checked={props.value}
+                            defaultChecked={get(reservation, field)}
+                            label={`${t(
+                              `reservationApplication:label.${reserveeType}.${field}`
+                            )}${required ? " * " : ""}`}
+                            errorText={
+                              get(errors, field) && t("forms:requiredField")
+                            }
+                          />
+                        )}
+                      />
+                    </CheckboxWrapper>
+                  ) : field === "freeOfChargeReason" ? (
+                    <StyledTextInput
+                      label={`${t(
+                        `reservationApplication:label.${reserveeType}.${field}`
+                      )}${required ? " * " : ""}`}
+                      id={field}
+                      name={field}
+                      ref={register({ required })}
+                      key={field}
+                      defaultValue={get(reservation, field) || ""}
+                      errorText={get(errors, field) && t("forms:requiredField")}
+                      invalid={!!get(errors, field)}
+                      $hidden={!watch("applyingForFreeOfCharge")}
+                      $isWide
+                    />
+                  ) : (
+                    <StyledTextInput
+                      label={`${t(
+                        `reservationApplication:label.${reserveeType}.${field}`
+                      )}${required ? " * " : ""}`}
+                      id={field}
+                      name={field}
+                      ref={register({
+                        required,
+                        ...(emailFields.includes(field) && {
+                          pattern: {
+                            value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                            message: "email",
+                          },
+                        }),
+                      })}
+                      key={field}
+                      type={numFields.includes(field) ? "number" : "text"}
+                      defaultValue={get(reservation, field)}
+                      errorText={
+                        get(errors, field) &&
+                        t(
+                          `forms:${
+                            get(errors, field)?.message === "email"
+                              ? "invalidEmail"
+                              : "requiredField"
+                          }`
+                        )
+                      }
+                      invalid={!!get(errors, field)}
+                      $isWide={isWideRow(field)}
+                      $hidden={
+                        field.includes("billing") &&
+                        watch("showBillingAddress") !== true
+                      }
+                      $break={isBreakingColumn(field)}
+                    />
+                  );
+                })}
+              </TwoColumnContainer>
+              <ActionContainer>
+                <MediumButton
+                  variant="primary"
+                  type="submit"
+                  iconRight={<IconArrowRight />}
+                  data-test="reservation__button--update"
+                >
+                  {t("reservationCalendar:nextStep")}
+                </MediumButton>
+                <MediumButton
+                  variant="secondary"
+                  iconLeft={<IconArrowLeft />}
+                  onClick={() => {
+                    cancelReservation();
+                  }}
+                  data-test="reservation__button--cancel"
+                >
+                  {t("common:prev")}
+                </MediumButton>
+              </ActionContainer>
+            </ApplicationForm>
+          )}
           {step === 1 && (
-            <form onSubmit={handleSubmit(onSubmit2)}>
+            <form onSubmit={handleSubmit(onSubmitOpen2)}>
               <H2>{t("reservationCalendar:reservationSummary")}</H2>
               <TwoColumnContainer style={{ marginBottom: "var(--spacing-l)" }}>
-                <ParagraphAlt>
-                  <div>
-                    <Strong>
-                      {t("reservationCalendar:label.reserveeName")}
-                    </Strong>
-                  </div>
-                  <div>
-                    {`${reservation.reserveeFirstName || ""} ${
-                      reservation.reserveeLastName || ""
-                    }`.trim()}
-                  </div>
-                </ParagraphAlt>
-                <ParagraphAlt>
-                  <div>
-                    <Strong>{t("common:phone")}</Strong>
-                    <div>{reservation.reserveePhone}</div>
-                  </div>
-                </ParagraphAlt>
-                <ParagraphAlt style={{ gridColumn: "1 / -1" }}>
-                  <div>
-                    <Strong>{t("reservationCalendar:label.name")}</Strong>
-                  </div>
-                  <div>{reservation.name}</div>
-                </ParagraphAlt>
-                <ParagraphAlt>
-                  <div>
-                    <Strong>
-                      {t("reservationCalendar:label.description")}
-                    </Strong>
-                  </div>
-                  <div>{reservation.description}</div>
-                </ParagraphAlt>
+                {doesReservationNeedApplication ? (
+                  <>
+                    {getReservationApplicationFields(
+                      reservationUnit.metadataSet?.supportedFields,
+                      reserveeType,
+                      true
+                    )
+                      .filter(
+                        (key) =>
+                          !["", undefined, false, 0, null].includes(
+                            get(reservation, key)
+                          )
+                      )
+                      .map((key) => {
+                        const rawValue = get(reservation, key);
+                        const value = get(options, key)
+                          ? get(options, key).find(
+                              (option) => option.value === rawValue
+                            )?.label
+                          : typeof rawValue === "boolean"
+                          ? t(`common:${String(rawValue)}`)
+                          : rawValue;
+                        return (
+                          <ParagraphAlt key={`summary_${key}`}>
+                            <div>
+                              <Strong>
+                                {t(
+                                  `reservationApplication:label.${reserveeType}.${key}`
+                                )}
+                              </Strong>
+                            </div>
+                            <div>{value}</div>
+                          </ParagraphAlt>
+                        );
+                      })}
+                  </>
+                ) : (
+                  <>
+                    <ParagraphAlt>
+                      <div>
+                        <Strong>
+                          {t("reservationCalendar:label.reserveeName")}
+                        </Strong>
+                      </div>
+                      <div>
+                        {`${reservation.reserveeFirstName || ""} ${
+                          reservation.reserveeLastName || ""
+                        }`.trim()}
+                      </div>
+                    </ParagraphAlt>
+                    <ParagraphAlt>
+                      <div>
+                        <Strong>{t("common:phone")}</Strong>
+                        <div>{reservation.reserveePhone}</div>
+                      </div>
+                    </ParagraphAlt>
+                    <ParagraphAlt style={{ gridColumn: "1 / -1" }}>
+                      <div>
+                        <Strong>{t("reservationCalendar:label.name")}</Strong>
+                      </div>
+                      <div>{reservation.name}</div>
+                    </ParagraphAlt>
+                    <ParagraphAlt>
+                      <div>
+                        <Strong>
+                          {t("reservationCalendar:label.description")}
+                        </Strong>
+                      </div>
+                      <div>{reservation.description}</div>
+                    </ParagraphAlt>
+                  </>
+                )}
               </TwoColumnContainer>
               <AccordionContainer>
                 <TermContainer>
@@ -595,7 +1103,7 @@ const ReservationUnitReservation = ({
                     name="spaceTerms"
                     checked={areTermsSpaceAccepted}
                     onChange={(e) => setAreTermsSpaceAccepted(e.target.checked)}
-                    label={`${t("reservationCalendar:label.termsSpace")}*`}
+                    label={`${t("reservationCalendar:label.termsSpace")} *`}
                     ref={register({ required: true })}
                     errorText={
                       !!errors.spaceTerms &&
@@ -624,7 +1132,7 @@ const ReservationUnitReservation = ({
                     onChange={(e) =>
                       setAreServiceSpecificTermsAccepted(e.target.checked)
                     }
-                    label={`${t("reservationCalendar:label.termsResource")}*`}
+                    label={`${t("reservationCalendar:label.termsResource")} *`}
                     ref={register({ required: true })}
                     errorText={
                       !!errors.resourceTerms &&
@@ -714,45 +1222,92 @@ const ReservationUnitReservation = ({
               <H3 style={{ marginTop: "var(--spacing-xl)" }}>
                 {t("reservationUnit:additionalInfo")}
               </H3>
-              <ValueParagraph>
-                <Strong>{t("reservationCalendar:label.name")}</Strong>
-                <span>{reservation.name}</span>
-              </ValueParagraph>
-              <ValueParagraph>
-                <Strong>{t("reservationCalendar:label.reserveeName")}</Strong>
-                <span>
-                  {`${reservation.reserveeFirstName || ""} ${
-                    reservation.reserveeLastName || ""
-                  }`.trim()}
-                </span>
-              </ValueParagraph>
-              <ValueParagraph>
-                <Strong>{t("reservationCalendar:label.description")}</Strong>
-                <span>{reservation.description}</span>
-              </ValueParagraph>
-              <ValueParagraph>
-                <Strong>
-                  {t("reservationCalendar:label.reservationDate")}
-                </Strong>
-                <span>
-                  {capitalize(
-                    `${beginDate} ${beginTime} -${
-                      endDate !== beginDate ? ` ${endDate}` : ""
-                    } ${endTime}`
-                  )}
-                </span>
-              </ValueParagraph>
-              <ValueParagraph>
-                <Strong>
-                  {t("reservationCalendar:label.reservationSpace")}
-                </Strong>
-                <span>{getTranslation(reservationUnit, "name")}</span>
-              </ValueParagraph>
-              <ValueParagraph>
-                <Strong>{t("common:phone")}</Strong>
-                <span>{reservation.reserveePhone}</span>
-              </ValueParagraph>
-              <ActionContainer style={{ marginTop: "var(--spacing-3-xl)" }}>
+              {doesReservationNeedApplication ? (
+                <>
+                  {getReservationApplicationFields(
+                    reservationUnit.metadataSet?.supportedFields,
+                    reserveeType,
+                    true
+                  )
+                    .filter(
+                      (key) =>
+                        !["", undefined, false, 0, null].includes(
+                          get(reservation, key)
+                        )
+                    )
+                    .map((key) => {
+                      const rawValue = get(reservation, key);
+                      const value = get(options, key)
+                        ? get(options, key).find(
+                            (option) => option.value === rawValue
+                          )?.label
+                        : typeof rawValue === "boolean"
+                        ? t(`common:${String(rawValue)}`)
+                        : rawValue;
+                      return (
+                        <ValueParagraph key={`summary_${key}`}>
+                          <Strong>
+                            {t(
+                              `reservationApplication:label.${reserveeType}.${key}`
+                            )}
+                          </Strong>
+                          <span>{value}</span>
+                        </ValueParagraph>
+                      );
+                    })}
+                </>
+              ) : (
+                <>
+                  <ValueParagraph>
+                    <Strong>{t("reservationCalendar:label.name")}</Strong>
+                    <span>{reservation.name}</span>
+                  </ValueParagraph>
+                  <ValueParagraph>
+                    <Strong>
+                      {t("reservationCalendar:label.reserveeName")}
+                    </Strong>
+                    <span>
+                      {`${reservation.reserveeFirstName || ""} ${
+                        reservation.reserveeLastName || ""
+                      }`.trim()}
+                    </span>
+                  </ValueParagraph>
+                  <ValueParagraph>
+                    <Strong>
+                      {t("reservationCalendar:label.description")}
+                    </Strong>
+                    <span>{reservation.description}</span>
+                  </ValueParagraph>
+                  <ValueParagraph>
+                    <Strong>
+                      {t("reservationCalendar:label.reservationDate")}
+                    </Strong>
+                    <span>
+                      {capitalize(
+                        `${beginDate} ${beginTime} -${
+                          endDate !== beginDate ? ` ${endDate}` : ""
+                        } ${endTime}`
+                      )}
+                    </span>
+                  </ValueParagraph>
+                  <ValueParagraph>
+                    <Strong>
+                      {t("reservationCalendar:label.reservationSpace")}
+                    </Strong>
+                    <span>{getTranslation(reservationUnit, "name")}</span>
+                  </ValueParagraph>
+                  <ValueParagraph>
+                    <Strong>{t("common:phone")}</Strong>
+                    <span>{reservation.reserveePhone}</span>
+                  </ValueParagraph>
+                </>
+              )}
+              <ActionContainer
+                style={{
+                  marginTop: "var(--spacing-3-xl)",
+                  gridTemplateColumns: "1fr",
+                }}
+              >
                 <MediumButton
                   variant="primary"
                   onClick={() => router.push(reservationsUrl)}
@@ -776,7 +1331,8 @@ const ReservationUnitReservation = ({
           type="error"
           label={t("common:error.error")}
           position="top-center"
-          autoClose={false}
+          autoClose
+          autoCloseDuration={2000}
           displayAutoCloseProgress={false}
           onClose={() => setErrorMsg(null)}
           dismissible

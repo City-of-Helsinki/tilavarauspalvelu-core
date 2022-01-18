@@ -4,7 +4,14 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { Koros, Notification } from "hds-react";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { isValid, parseISO, subMinutes } from "date-fns";
+import {
+  addHours,
+  addMinutes,
+  addYears,
+  isValid,
+  parseISO,
+  subMinutes,
+} from "date-fns";
 import Container from "../../../components/common/Container";
 import { ApplicationRound, PendingReservation } from "../../../modules/types";
 import Head from "../../../components/reservation-unit/Head";
@@ -129,7 +136,7 @@ export const getServerSideProps: GetServerSideProps = async ({
       reservationUnitData?.reservationUnitByPk?.openingHours?.openingTimePeriods
         .map((period) => period.endDate)
         .sort()
-        .reverse()[0] || toApiDate(new Date());
+        .reverse()[0] || toApiDate(addYears(new Date(), 1));
 
     const { data: additionalData } = await apolloClient.query<
       Query,
@@ -407,11 +414,7 @@ const ReservationUnit = ({
     }
     const [hours, minutes] = reservationUnit.minReservationDuration.split(":");
 
-    const end = new Date(start);
-    end.setHours(
-      start.getHours() + parseInt(hours, 10),
-      start.getMinutes() + parseInt(minutes, 10)
-    );
+    const end = addMinutes(addHours(new Date(start), hours), minutes);
 
     if (!isSlotReservable(start, end, skipLengthCheck)) {
       return false;
@@ -602,21 +605,22 @@ const ReservationUnit = ({
             </span>
           </StyledNotification>
         )}
-        {reservationUnit.maxReservationsPerUser && (
-          <StyledNotification type="alert" label={t("common:fyiLabel")}>
-            <span data-testid="reservation-unit--notification__reservation-quota">
-              {t(
-                `reservationCalendar:reservationQuota${
-                  isReservationQuotaReached ? "Full" : ""
-                }`,
-                {
-                  count: userReservations?.length,
-                  total: reservationUnit.maxReservationsPerUser,
-                }
-              )}
-            </span>
-          </StyledNotification>
-        )}
+        {reservationUnit.maxReservationsPerUser &&
+          userReservations?.length > 0 && (
+            <StyledNotification type="alert" label={t("common:fyiLabel")}>
+              <span data-testid="reservation-unit--notification__reservation-quota">
+                {t(
+                  `reservationCalendar:reservationQuota${
+                    isReservationQuotaReached ? "Full" : ""
+                  }`,
+                  {
+                    count: userReservations?.length,
+                    total: reservationUnit.maxReservationsPerUser,
+                  }
+                )}
+              </span>
+            </StyledNotification>
+          )}
         {reservationUnit.location && (
           <MapWrapper>
             <StyledH2>{t("common:location")}</StyledH2>

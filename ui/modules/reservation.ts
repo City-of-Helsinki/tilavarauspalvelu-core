@@ -1,5 +1,6 @@
 import { isAfter } from "date-fns";
 import { i18n } from "next-i18next";
+import camelCase from "lodash/camelCase";
 import { ReservationType } from "./gql-types";
 import { OptionType } from "./types";
 import { convertHMSToSeconds, getFormatters, secondsToHms } from "./util";
@@ -62,4 +63,135 @@ export const getReservationPrice = (
   return price
     ? getFormatters()[formatter].format(price)
     : i18n.t("prices:priceFree");
+};
+
+export type ReserveeType = "individual" | "nonprofit" | "business";
+
+const reservationApplicationFields = {
+  individual: [
+    "name",
+    "description",
+    "purpose",
+    "num_persons",
+    "age_group",
+    "reservee_first_name",
+    "reservee_last_name",
+    "reservee_address_street",
+    "reservee_address_zip",
+    "reservee_address_city",
+    "reservee_email",
+    "reservee_phone",
+    "applying_for_free_of_charge",
+    "free_of_charge_reason",
+    "billing_first_name",
+    "billing_last_name",
+    "billing_phone",
+    "billing_email",
+    "billing_address_street",
+    "billing_address_zip",
+    "billing_address_city",
+  ],
+  nonprofit: [
+    "name",
+    "description",
+    "purpose",
+    "num_persons",
+    "age_group",
+    "reservee_first_name",
+    "reservee_last_name",
+    "reservee_address_street",
+    "reservee_address_zip",
+    "reservee_address_city",
+    "reservee_email",
+    "reservee_phone",
+    "reservee_organisation_name",
+    "reservee_id",
+    "reservee_is_unregistered_association",
+    "home_city",
+    "applying_for_free_of_charge",
+    "free_of_charge_reason",
+    "billing_first_name",
+    "billing_last_name",
+    "billing_phone",
+    "billing_email",
+    "billing_address_street",
+    "billing_address_zip",
+    "billing_address_city",
+  ],
+  business: [
+    "name",
+    "description",
+    "purpose",
+    "num_persons",
+    "age_group",
+    "reservee_first_name",
+    "reservee_last_name",
+    "reservee_address_street",
+    "reservee_address_zip",
+    "reservee_address_city",
+    "reservee_email",
+    "reservee_phone",
+    "reservee_organisation_name",
+    "reservee_id",
+    "home_city",
+    "applying_for_free_of_charge",
+    "free_of_charge_reason",
+    "billing_first_name",
+    "billing_last_name",
+    "billing_phone",
+    "billing_email",
+    "billing_address_street",
+    "billing_address_zip",
+    "billing_address_city",
+  ],
+  common: ["reservee_type"],
+};
+
+export const getReservationApplicationFields = (
+  supportedFields: string[],
+  reserveeType: ReserveeType,
+  camelCaseOutput = false
+): string[] => {
+  if (supportedFields.length === 0 || !reserveeType) return [];
+
+  const fields = reservationApplicationFields[reserveeType].filter((field) =>
+    supportedFields.includes(field)
+  );
+
+  // eslint-disable-next-line no-plusplus
+  for (let i = 0; i < fields.length; i++) {
+    if (fields[i].includes("billing_")) {
+      fields.splice(i, 0, "show_billing_address");
+      break;
+    }
+  }
+
+  return camelCaseOutput ? fields.map(camelCase) : fields;
+};
+
+export const getReservationApplicationMutatationValues = (
+  payload: Record<string, string | number | boolean>,
+  supportedFields: string[],
+  reserveeType: ReserveeType
+): Record<string, string | number | boolean> => {
+  const result = { reserveeType };
+  const intValues = ["numPersons"];
+  const changes = [
+    { field: "homeCity", mutationField: "homeCityPk" },
+    { field: "ageGroup", mutationField: "ageGroupPk" },
+    { field: "purpose", mutationField: "purposePk" },
+  ];
+  const fields = getReservationApplicationFields(
+    supportedFields,
+    reserveeType
+  ).map(camelCase);
+
+  fields.forEach((field: string) => {
+    const key = changes.find((c) => c.field === field)?.mutationField || field;
+    result[key as string] = intValues.includes(field)
+      ? Number(payload[field])
+      : payload[field];
+  });
+
+  return result;
 };

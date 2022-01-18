@@ -20,6 +20,7 @@
   "reservationInfo": "Varauksen tiedot",
   "notification": {
     "reservationAlertTitle": "Varauksen nimi voi näkyä toimipisteen infonäytöllä.",
+    "reservationApplicationAlertTitle": "Huom. Julkiset kentät näkyvät huoneen näytöllä.",
     "reservationAlertBody": "Älä koskaan täytä henkilötietoja tai muita arkaluontoisia tietoja näihin kenttiin."
   },
   "label": {

@@ -3,6 +3,8 @@ import { ReservationType } from "../gql-types";
 import {
   canUserCancelReservation,
   getDurationOptions,
+  getReservationApplicationFields,
+  getReservationApplicationMutatationValues,
   getReservationPrice,
 } from "../reservation";
 import mockTranslations from "../../public/locales/fi/prices.json";
@@ -178,5 +180,64 @@ describe("getReservationPrice", () => {
 
   test("with a price and forced decimals", () => {
     expect(getReservationPrice(10, true)).toBe("10,00 €"); // contains non-breaking space
+  });
+});
+
+describe("getReservationApplicationFields", () => {
+  test("with emrty input", () => {
+    expect(getReservationApplicationFields([], "individual")).toEqual([]);
+  });
+
+  const fields = ["reservee_id", "reservee_organisation_name", "name"];
+
+  test("with individual input", () => {
+    expect(getReservationApplicationFields(fields, "individual")).toEqual([
+      "name",
+    ]);
+  });
+
+  test("with business input", () => {
+    expect(getReservationApplicationFields(fields, "business")).toEqual([
+      "name",
+      "reservee_organisation_name",
+      "reservee_id",
+    ]);
+  });
+
+  test("with nonprofit input, camelCased", () => {
+    expect(getReservationApplicationFields(fields, "nonprofit", true)).toEqual([
+      "name",
+      "reserveeOrganisationName",
+      "reserveeId",
+    ]);
+  });
+});
+
+describe("getReservationApplcationMutationValues", () => {
+  test("with empty input", () => {
+    expect(
+      getReservationApplicationMutatationValues({}, [], "individual")
+    ).toEqual({
+      reserveeType: "individual",
+    });
+  });
+
+  test("with sane input", () => {
+    const payload = {
+      name: "Nimi",
+      reserveeId: "123456-7",
+      reserveeFirstName: "Etunimi",
+    };
+    expect(
+      getReservationApplicationMutatationValues(
+        payload,
+        ["name", "reservee_id", "reservee_first_name"],
+        "individual"
+      )
+    ).toEqual({
+      name: "Nimi",
+      reserveeFirstName: "Etunimi",
+      reserveeType: "individual",
+    });
   });
 });

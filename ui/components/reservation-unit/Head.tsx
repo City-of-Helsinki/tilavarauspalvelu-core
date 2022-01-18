@@ -66,6 +66,10 @@ const StyledIconWithText = styled(IconWithText).attrs({
 `;
 
 const Props = styled.div`
+  & > div:empty {
+    display: none;
+  }
+
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--spacing-s);
@@ -164,14 +168,16 @@ const Head = ({
             </JustForMobile>
             <Props>
               <div>
-                <StyledIconWithText
-                  icon={
-                    <IconCalendar
-                      aria-label={t("reservationUnit:openingTimes")}
-                    />
-                  }
-                  texts={openingTimesTextArr}
-                />
+                {openingTimesTextArr?.length > 0 && (
+                  <StyledIconWithText
+                    icon={
+                      <IconCalendar
+                        aria-label={t("reservationUnit:openingTimes")}
+                      />
+                    }
+                    texts={openingTimesTextArr}
+                  />
+                )}
                 {viewType === "single" && isReservable && (
                   <StyledIconWithText
                     icon={<IconCalendarClock aria-label="" />}

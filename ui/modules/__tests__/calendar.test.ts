@@ -81,20 +81,23 @@ test("isSlotWithinTimeframe", () => {
   expect(isSlotWithinTimeframe(new Date(), -1)).toBe(true);
 });
 
-test("areSlotsReservable", () => {
+describe("areSlotsReservable", () => {
+  const tzOffset = new Date().getTimezoneOffset() / 60;
+  const tzOffsetHoursStr = Math.abs(tzOffset).toString().padStart(2, "0");
+
   const openingTimes = [
     {
       date: format(addDays(new Date(), 7), "yyyy-MM-dd"),
-      endTime: "21:00:00",
+      endTime: `21:00:00+${tzOffsetHoursStr}:00`,
       periods: null,
-      startTime: "09:00:00",
+      startTime: `09:00:00+${tzOffsetHoursStr}:00`,
       state: "open",
     },
     {
       date: format(addDays(new Date(), 8), "yyyy-MM-dd"),
-      endTime: "21:00:00",
+      endTime: `21:00:00+${tzOffsetHoursStr}:00`,
       periods: null,
-      startTime: "09:00:00",
+      startTime: `09:00:00+${tzOffsetHoursStr}:00`,
       state: "open",
     },
   ];
@@ -106,28 +109,55 @@ test("areSlotsReservable", () => {
     },
   ] as ApplicationRound[];
 
-  expect(areSlotsReservable([addDays(new Date(), 6)], openingTimes, [])).toBe(
-    false
-  );
-  expect(
-    areSlotsReservable([addDays(new Date().setHours(6), 7)], openingTimes, [])
-  ).toBe(false);
-  expect(
-    areSlotsReservable([addDays(new Date().setHours(9), 7)], openingTimes, [])
-  ).toBe(true);
-  expect(
-    areSlotsReservable([addDays(new Date().setHours(9), 8)], openingTimes, [])
-  ).toBe(true);
-  expect(
-    areSlotsReservable(
-      [addDays(new Date().setHours(9), 8)],
-      openingTimes,
-      activeApplicationRounds
-    )
-  ).toBe(false);
-  expect(areSlotsReservable([addDays(new Date(), 10)], openingTimes, [])).toBe(
-    false
-  );
+  test("Plus 7 days 09:00", () => {
+    const hours = 11 + tzOffset;
+    expect(
+      areSlotsReservable(
+        [addDays(new Date().setHours(hours), 7)],
+        openingTimes,
+        []
+      )
+    ).toBe(true);
+  });
+
+  test("Plus 7 days 10:00", () => {
+    const hours = 12 + tzOffset;
+    expect(
+      areSlotsReservable(
+        [addDays(new Date().setHours(hours), 7)],
+        openingTimes,
+        []
+      )
+    ).toBe(true);
+  });
+
+  test("Plus 8 days 11:00", () => {
+    const hours = 13 + tzOffset;
+    expect(
+      areSlotsReservable(
+        [addDays(new Date().setHours(hours), 8)],
+        openingTimes,
+        []
+      )
+    ).toBe(true);
+  });
+
+  test("Plus 8 days 09:00", () => {
+    const hours = 11 + tzOffset;
+    expect(
+      areSlotsReservable(
+        [addDays(new Date().setHours(hours), 8)],
+        openingTimes,
+        activeApplicationRounds
+      )
+    ).toBe(false);
+  });
+
+  test("Plus 10 days", () => {
+    expect(
+      areSlotsReservable([addDays(new Date(), 10)], openingTimes, [])
+    ).toBe(false);
+  });
 });
 
 test("doReservationsCollide", () => {
@@ -230,25 +260,29 @@ describe("getDayIntervals", () => {
 });
 
 describe("isStartTimeWithinInterval", () => {
+  const timeZoneHours = Math.abs(new Date().getTimezoneOffset() / 60)
+    .toString()
+    .padStart(2, "0");
+
   const openingTimes = [
     {
       date: "2019-09-21",
-      startTime: "06:00:00+00:00",
-      endTime: "18:00:00+00:00",
+      startTime: `06:00:00+${timeZoneHours}:00`,
+      endTime: `18:00:00+${timeZoneHours}:00`,
       state: "open",
       periods: [38600],
     },
     {
       date: "2019-09-22",
-      startTime: "06:00:00+00:00",
-      endTime: "18:00:00+00:00",
+      startTime: `06:00:00+${timeZoneHours}:00`,
+      endTime: `18:00:00+${timeZoneHours}:00`,
       state: "open",
       periods: [38600],
     },
     {
       date: "2019-09-28",
-      startTime: "06:00:00+00:00",
-      endTime: "18:00:00+00:00",
+      startTime: `06:00:00+${timeZoneHours}:00`,
+      endTime: `18:00:00+${timeZoneHours}:00`,
       state: "open",
       periods: [38600],
     },
@@ -257,7 +291,7 @@ describe("isStartTimeWithinInterval", () => {
   test("returns sane results", () => {
     expect(
       isStartTimeWithinInterval(
-        new Date("2019-09-22T12:15:00+00:00"),
+        new Date(`2019-09-22T12:15:00+${timeZoneHours}:00`),
         openingTimes,
         "INTERVAL_15_MINS" as ReservationUnitsReservationUnitReservationStartIntervalChoices
       )
@@ -267,7 +301,7 @@ describe("isStartTimeWithinInterval", () => {
   test("returns sane results", () => {
     expect(
       isStartTimeWithinInterval(
-        new Date("2019-09-22T12:10:00+00:00"),
+        new Date(`2019-09-22T12:10:00+${timeZoneHours}:00`),
         openingTimes,
         "INTERVAL_15_MINS" as ReservationUnitsReservationUnitReservationStartIntervalChoices
       )
@@ -277,11 +311,11 @@ describe("isStartTimeWithinInterval", () => {
   test("returns sane results", () => {
     expect(
       isStartTimeWithinInterval(
-        new Date("2019-09-22T13:30:00+00:00"),
+        new Date(`2019-09-22T11:30:00+${timeZoneHours}:00`),
         openingTimes,
         "INTERVAL_90_MINS" as ReservationUnitsReservationUnitReservationStartIntervalChoices
       )
-    ).toBe(true);
+    ).toBe(false);
   });
 
   test("returns true without interval", () => {
@@ -454,12 +488,14 @@ describe("getEventBuffers", () => {
   test("outputs correct buffers", () => {
     const events = [
       {
+        id: "1234",
         begin: new Date("2019-09-22T12:00:00+00:00"),
         end: new Date("2019-09-22T13:00:00+00:00"),
         bufferTimeBefore: "01:00:00",
         bufferTimeAfter: "01:30:00",
       },
       {
+        id: "3456",
         begin: new Date("2019-09-22T15:00:00+00:00"),
         end: new Date("2019-09-22T16:00:00+00:00"),
         bufferTimeBefore: null,

@@ -89,6 +89,13 @@ export const RESERVATION_UNIT = gql`
           }
         }
       }
+      metadataSet {
+        id
+        name
+        pk
+        supportedFields
+        requiredFields
+      }
     }
   }
 `;

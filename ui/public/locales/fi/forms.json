@@ -1,5 +1,7 @@
 {
   "clearSelection": "Tyhjennä valinnat",
   "selectAll": "Valitse kaikki",
-  "inputPlaceholder": "Kirjoita hakusana"
+  "inputPlaceholder": "Kirjoita hakusana",
+  "invalidEmail": "Virheellinen sähköpostiosoite",
+  "requiredField": "Kenttä on pakollinen"
 }
