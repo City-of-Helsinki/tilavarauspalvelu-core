@@ -457,9 +457,11 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
     it("should display apt notification if quota is set and full", () => {
       cy.visit("/reservation-unit/single/901");
 
-      gotoCalendarButton().should("not.exist");
+      gotoCalendarButton().should("exist");
 
-      calendarWrapper().should("not.exist");
+      calendarWrapper().should("exist");
+
+      reservationSubmitButton().should("not.exist");
 
       reservationQuotaNotification()
         .invoke("text")
