@@ -10,21 +10,46 @@ ARG LOCAL_REDHAT_USERNAME
 ARG LOCAL_REDHAT_PASSWORD
 ARG BUILD_MODE
 
-RUN if [ "x$BUILD_MODE" = "xlocal" ] ;\
+# Creating dummy directories
+RUN mkdir ./etc-pki-entitlement && mkdir ./rhsm-conf && mkdir ./rhsm-ca
+
+# Copy entitlements
+COPY ./etc-pki-entitlement /etc/pki/entitlement
+
+# Copy subscription manager configurations if required
+COPY ./rhsm-conf /etc/rhsm
+COPY ./rhsm-ca /etc/rhsm/ca
+
+RUN if [ "x$BUILD_MODE" = "xlocal" ]; \
     then \
         subscription-manager register --username $LOCAL_REDHAT_USERNAME --password $LOCAL_REDHAT_PASSWORD --auto-attach; \
     else \
-        subscription-manager register --username ${REDHAT_USERNAME} --password ${REDHAT_PASSWORD} --auto-attach; \
-    fi
+        subscription-manager register --auto-attach; \
+        # Delete /etc/rhsm-host to use entitlements from the build container
+        #rm /etc/rhsm-host; \
+        # Initialize /etc/yum.repos.d/redhat.repo
+        # See <https://access.redhat.com/solutions/1443553>
+        yum repolist --disablerepo=*; \
+    fi;
 
+# Enable the repos you need
 RUN subscription-manager repos --enable codeready-builder-for-rhel-8-x86_64-rpms
-RUN subscription-manager repos --disable rhel-8-for-x86_64-baseos-beta-rpms
-RUN subscription-manager repos --disable rhel-8-for-x86_64-appstream-beta-rpms
+#RUN subscription-manager repos --disable rhel-8-for-x86_64-baseos-beta-rpms
+#RUN subscription-manager repos --disable rhel-8-for-x86_64-appstream-beta-rpms
 RUN yum -y update
 
+# If needed, add additional packets
 RUN rpm -Uvh https://download.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
 
+# Install what you need
 RUN yum install -y gdal
+
+RUN if [ "x$BUILD_MODE" != "xlocal" ]; \
+    then \
+        # Remove entitlements and Subscription Manager configs
+        rm -rf /etc/pki/entitlement; \
+        rm -rf /etc/rhsm; \
+    fi;
 
 
 RUN useradd -ms /bin/bash -d /tvp tvp
