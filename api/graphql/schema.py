@@ -136,11 +136,14 @@ class ReservationsFilter(AuthFilter, django_filters.FilterSet):
             )
         elif user.is_anonymous:
             return queryset.none()
-        return queryset.filter(
+        qs = queryset.filter(
             Q(reservation_unit__unit__in=viewable_units)
             | Q(reservation_unit__unit__service_sectors__in=viewable_service_sectors)
             | Q(user=user)
-        ).order_by("begin")
+        ).distinct()
+        if not args.get("order_by", None):
+            qs = qs.order_by("begin")
+        return qs
 
 
 class ReservationUnitsFilter(AuthFilter, django_filters.FilterSet):
