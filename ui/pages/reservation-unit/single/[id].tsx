@@ -327,16 +327,16 @@ const ReservationUnit = ({
     useState<PendingReservation | null>(null);
 
   const activeOpeningTimes = getActiveOpeningTimes(
-    reservationUnit.openingHours.openingTimePeriods
+    reservationUnit.openingHours?.openingTimePeriods
   );
 
   const slotPropGetter = useMemo(
     () =>
       getSlotPropGetter(
-        reservationUnit.openingHours.openingTimes,
+        reservationUnit.openingHours?.openingTimes,
         activeApplicationRounds
       ),
-    [reservationUnit.openingHours.openingTimes, activeApplicationRounds]
+    [reservationUnit.openingHours?.openingTimes, activeApplicationRounds]
   );
 
   const isReservationQuotaReached = useMemo(() => {
@@ -367,7 +367,7 @@ const ReservationUnit = ({
       ) ||
       !areSlotsReservable(
         [new Date(start), subMinutes(new Date(end), 1)],
-        reservationUnit.openingHours.openingTimes,
+        reservationUnit.openingHours?.openingTimes,
         activeApplicationRounds
       ) ||
       (!skipLengthCheck &&
@@ -495,6 +495,7 @@ const ReservationUnit = ({
 
   const isReservable = useMemo(() => {
     return (
+      reservationUnit.openingHours?.openingTimes?.length > 0 &&
       reservationUnit.minReservationDuration &&
       reservationUnit.maxReservationDuration &&
       isReservationUnitReservable(reservationUnit)
