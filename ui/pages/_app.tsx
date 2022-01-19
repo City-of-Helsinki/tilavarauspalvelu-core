@@ -1,7 +1,7 @@
 import React from "react";
 import { appWithTranslation } from "next-i18next";
 import dynamic from "next/dynamic";
-import { format } from "date-fns";
+import { format, isValid } from "date-fns";
 import { AppProps } from "next/app";
 import { fi } from "date-fns/locale";
 import { ApolloProvider } from "@apollo/client";
@@ -69,8 +69,8 @@ export default appWithTranslation(MyApp, {
   interpolation: {
     format: (value, fmt, lng) => {
       const locales = { fi };
-      if (value instanceof Date)
-        return format(value, fmt || "dd.MM.YY", { locale: locales[lng] });
+      if (value instanceof Date && isValid(value))
+        return format(value, fmt || "d.M.yyyy", { locale: locales[lng] });
       return value;
     },
     escapeValue: false,
