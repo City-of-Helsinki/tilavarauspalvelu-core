@@ -587,14 +587,109 @@ export const RESOURCE_QUERY = gql`
 `;
 
 export const RESERVATIONS_QUERY = gql`
-  query reservations($handlingRequired: Boolean) {
-    reservations(handlingRequired: $handlingRequired) {
+  query reservations($state: String) {
+    reservations(state: $state) {
       edges {
         node {
           pk
+          workingMemo
           reservationUnits {
             nameFi
+            unit {
+              nameFi
+            }
           }
+          begin
+          end
+          reserveeFirstName
+          reserveeLastName
+          reserveeEmail
+          name
+          price
+        }
+      }
+    }
+  }
+`;
+
+export const RESERVATION_QUERY = gql`
+  query reservationByPk($pk: Int!) {
+    reservationByPk(pk: $pk) {
+      pk
+      workingMemo
+      reservationUnits {
+        nameFi
+        unit {
+          nameFi
+        }
+      }
+      ageGroup {
+        minimum
+        maximum
+      }
+      purpose {
+        nameFi
+      }
+      numPersons
+      name
+      price
+      unitPrice
+      description
+      reserveeFirstName
+      reserveeLastName
+      reserveePhone
+      begin
+      end
+      calendarUrl
+      user
+      state
+      reserveeOrganisationName
+      reserveeEmail
+      reserveeId
+      reserveeIsUnregisteredAssociation
+      reserveeAddressStreet
+      reserveeAddressCity
+      reserveeAddressZip
+      billingFirstName
+      billingLastName
+      billingPhone
+      billingEmail
+      billingAddressStreet
+      billingAddressCity
+      billingAddressZip
+    }
+  }
+`;
+
+export const APPROVE_RESERVATION = gql`
+  mutation approveReservation($input: ReservationApproveMutationInput!) {
+    approveReservation(input: $input) {
+      errors {
+        field
+        messages
+      }
+    }
+  }
+`;
+
+export const DENY_RESERVATION = gql`
+  mutation denyReservation($input: ReservationDenyMutationInput!) {
+    denyReservation(input: $input) {
+      errors {
+        field
+        messages
+      }
+    }
+  }
+`;
+
+export const RESERVATION_DENY_REASONS = gql`
+  query reservationDenyReasons {
+    reservationDenyReasons {
+      edges {
+        node {
+          pk
+          reasonFi
         }
       }
     }

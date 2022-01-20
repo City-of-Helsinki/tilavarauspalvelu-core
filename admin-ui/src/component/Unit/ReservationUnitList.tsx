@@ -87,15 +87,13 @@ const ReservationUnitList = ({
         </>
       </FilterContainer>
       <ContentContainer>
-        <div>
-          {filteredResults.map((resUnit) => (
-            <ReservationUnitCard
-              reservationUnit={resUnit}
-              unitId={unitId as number}
-              key={resUnit.pk}
-            />
-          ))}
-        </div>
+        {filteredResults.map((resUnit) => (
+          <ReservationUnitCard
+            reservationUnit={resUnit}
+            unitId={unitId as number}
+            key={resUnit.pk}
+          />
+        ))}
       </ContentContainer>
     </>
   );

@@ -25,7 +25,10 @@ import withMainMenu from "../withMainMenu";
 import ApplicationRoundNavi from "./ApplicationRoundNavi";
 import TimeframeStatus from "./TimeframeStatus";
 import { ContentHeading, H3 } from "../../styles/typography";
-import KorosHeading, { Heading, SubHeading } from "../KorosHeading";
+import KorosHeading, {
+  Heading as KorosHeadingHeading,
+  SubHeading,
+} from "../KorosHeading";
 import StatusCircle from "../StatusCircle";
 import AllocatingDialogContent from "./AllocatingDialogContent";
 import DataTable, { CellConfig } from "../DataTable";
@@ -49,6 +52,7 @@ import {
 } from "../../common/api";
 import SelectionActionBar from "../SelectionActionBar";
 import RecommendationDataTableGroup from "./RecommendationDataTableGroup";
+import Heading from "./Heading";
 
 interface IProps {
   applicationRound: ApplicationRoundType;
@@ -450,7 +454,9 @@ function Handling({
         <>
           {!isApplicationRoundApproved && (
             <StyledKorosHeading>
-              <Heading>{unhandledRecommendationCount}</Heading>
+              <KorosHeadingHeading>
+                {unhandledRecommendationCount}
+              </KorosHeadingHeading>
               <SubHeading>
                 {t("ApplicationRound.suffixUnhandledSuggestions")}
               </SubHeading>

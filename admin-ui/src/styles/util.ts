@@ -1,4 +1,10 @@
-import { Button, Checkbox, ErrorSummary, Navigation } from "hds-react";
+import {
+  Button,
+  Checkbox,
+  ErrorSummary,
+  Navigation,
+  Notification,
+} from "hds-react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 import {
@@ -216,4 +222,61 @@ export const NotificationBox = styled.div`
   white-space: pre-line;
   line-height: var(--lineheight-xl);
   margin-bottom: var(--spacing-5-xl);
+`;
+
+export const ButtonsStripe = styled.div`
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  justify-content: space-between;
+  right: 0;
+  display: flex;
+  padding: var(--spacing-s);
+  background-color: var(--color-bus-dark);
+  z-index: var(--tilavaraus-admin-button-stripe-stack);
+`;
+
+export const WhiteButton = styled(Button)<{
+  disabled: boolean;
+  variant: "secondary" | "primary";
+}>`
+  --bg: var(--color-white);
+  --fg: var(--color-black);
+  --hbg: var(--fg);
+  --hfg: var(--bg);
+  --border-color: var(--color-white);
+
+  ${({ variant }) =>
+    variant === "secondary"
+      ? `--fg: var(--color-white);
+    --bg: var(--color-bus-dark);`
+      : null}
+
+  ${({ disabled }) =>
+    disabled
+      ? `--hbg: var(--bg);
+        --hfg: var(--fg);
+      `
+      : null}
+
+
+  border: 2px var(--border-color) solid !important;
+
+  color: var(--fg) !important;
+  background-color: var(--bg) !important;
+
+  &:hover {
+    color: var(--hfg) !important;
+    background-color: var(--hbg) !important;
+  }
+  margin: 0;
+`;
+
+export const StyledNotification = styled(Notification)`
+  z-index: var(--tilavaraus-admin-notification-stack);
+  margin: var(--spacing-xs) var(--spacing-layout-2-xs);
+  width: auto;
+  @media (min-width: ${breakpoints.xl}) {
+    margin: var(--spacing-s) var(--spacing-layout-xl);
+  }
 `;

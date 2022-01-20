@@ -1,21 +1,26 @@
 import React, { useContext, useState } from "react";
 
 export type ModalContextProps = {
-  modalContent: JSX.Element | null;
-  setModalContent: (content: JSX.Element | null) => void;
+  modalContent: { isHds: boolean; content: JSX.Element | null };
+  setModalContent: (content: JSX.Element | null, isHds?: boolean) => void;
+  isOpen: boolean;
 };
 
 export const ModalContext = React.createContext<ModalContextProps>({
-  modalContent: null,
+  modalContent: { isHds: false, content: null },
   setModalContent: () => undefined,
+  isOpen: false,
 });
 
 export const useModal = (): ModalContextProps => useContext(ModalContext);
 
 export const ModalContextProvider: React.FC = ({ children }) => {
-  const [modalContent, setModalContent] = useState<JSX.Element | null>(null);
+  const [modalContent, setModalContent] = useState<{
+    isHds: boolean;
+    content: JSX.Element | null;
+  }>({ isHds: true, content: null });
 
-  const toggleModal = (content: JSX.Element | null): void => {
+  const toggleModal = (content: JSX.Element | null, isHds = false): void => {
     const bodyEl = document.getElementsByTagName("body")[0];
     const classes = ["noScroll"];
     if (
@@ -29,7 +34,7 @@ export const ModalContextProvider: React.FC = ({ children }) => {
     } else {
       bodyEl.classList.remove(...classes);
     }
-    setModalContent(content);
+    setModalContent({ isHds, content });
   };
 
   return (
@@ -37,6 +42,7 @@ export const ModalContextProvider: React.FC = ({ children }) => {
       value={{
         modalContent,
         setModalContent: toggleModal,
+        isOpen: modalContent !== null,
       }}
     >
       {children}

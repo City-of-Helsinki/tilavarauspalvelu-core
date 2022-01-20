@@ -1,0 +1,330 @@
+import { useQuery } from "@apollo/client";
+import {
+  Accordion,
+  Button,
+  IconCalendar,
+  IconLocation,
+  IconSpeechbubbleText,
+  IconTicket,
+  Tag,
+  TextArea,
+} from "hds-react";
+import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useParams } from "react-router-dom";
+import styled from "styled-components";
+import {
+  Maybe,
+  Query,
+  QueryReservationByPkArgs,
+  ReservationType,
+} from "../../common/gql-types";
+import { RESERVATION_QUERY } from "../../common/queries";
+import { useNotification } from "../../context/NotificationContext";
+import { ContentContainer } from "../../styles/layout";
+import {
+  breakpoints,
+  ButtonsStripe,
+  Divider,
+  WhiteButton,
+} from "../../styles/util";
+import LinkPrev from "../LinkPrev";
+import Loader from "../Loader";
+import withMainMenu from "../withMainMenu";
+import { ReactComponent as IconCustomers } from "../../images/icon_customers.svg";
+import { H1 } from "../../styles/typography";
+import { ageGroup, reservationDateTime, reservationPrice } from "./util";
+import { useModal } from "../../context/ModalContext";
+import DenyDialog from "./DenyDialog";
+import ApproveDialog from "./ApproveDialog";
+
+const ViewWrapper = styled.div`
+  display: grid;
+  grid-template-columns: 4em 1fr;
+  margin: var(--spacing-s);
+  align-items: flex-start;
+  gap: 0;
+
+  @media (max-width: ${breakpoints.m}) {
+    grid-template-columns: 0 1fr;
+    margin: 0;
+  }
+`;
+
+const IconContainer = styled.div`
+  margin-top: 1.75em;
+  display: flex;
+  flex-direction: column;
+  border-radius: 50%;
+  background: var(--color-silver);
+  aspect-ratio: 1;
+  justify-content: center;
+  align-items: center;
+  width: 2.5em;
+
+  @media (max-width: ${breakpoints.m}) {
+    display: none;
+  }
+`;
+
+const AlignVertically = styled.div`
+  display: flex;
+  gap: var(--spacing-m);
+  flex-direction: row;
+  align-items: center;
+`;
+
+const AlignVerticallySmallGap = styled(AlignVertically)`
+  margin-top: var(--spacing-3-xs);
+  gap: var(--spacing-2-xs);
+  margin-right: var(--spacing-l);
+`;
+
+const ReservationUnitName = styled.div`
+  font-weight: 600;
+`;
+
+const ApplicationContent = styled.div``;
+
+const ApplicationHeader = styled.div`
+  margin-bottom: var(--spacing-m);
+`;
+
+const ApplicationDatas = styled.div`
+  display: grid;
+  gap: var(--spacing-l);
+  grid-template-columns: 1fr 4fr;
+`;
+
+const StyledTag = styled(Tag)`
+  background: var(--tilavaraus-admin-status-not-handled);
+  color: white;
+  font-weight: 600;
+`;
+
+const WorkingMemoContainer = styled.div`
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  align-items: flex-start;
+  gap: var(--spacing-l);
+  button {
+    width: fit-content;
+  }
+`;
+
+const ApplicationData = ({
+  label,
+  data,
+  wide = false,
+}: {
+  label: string;
+  data?: Maybe<string> | number;
+  wide?: boolean;
+}) =>
+  data ? (
+    <div style={{ gridColumn: wide ? "1 / span 2" : "auto" }}>
+      <div>
+        <strong style={{ marginBottom: "0.5em" }}>{label}</strong>
+      </div>
+      {data}
+    </div>
+  ) : null;
+
+const SingleApplication = (): JSX.Element | null => {
+  const { reservationPk } = useParams() as { reservationPk: string };
+  const [reservation, setReservation] = useState<ReservationType>();
+  const { notifyError, notification } = useNotification();
+  const { t } = useTranslation();
+  const { setModalContent } = useModal();
+
+  const { loading } = useQuery<Query, QueryReservationByPkArgs>(
+    RESERVATION_QUERY,
+    {
+      skip: notification?.type === "error" || false,
+      variables: {
+        pk: Number(reservationPk),
+      },
+      onCompleted: ({ reservationByPk }) => {
+        if (reservationByPk) {
+          setReservation(reservationByPk);
+        }
+      },
+      onError: () => {
+        notifyError(t("SingleApplication.errorFetchingData"));
+      },
+    }
+  );
+
+  if (loading) {
+    return <Loader />;
+  }
+
+  if (!reservation) {
+    return null;
+  }
+
+  return (
+    <>
+      <ContentContainer style={{ minHeight: "100%" }}>
+        <LinkPrev route="/singleApplications" />
+        <ViewWrapper>
+          <IconContainer>
+            <IconCustomers />
+          </IconContainer>
+          <ApplicationContent>
+            <AlignVertically>
+              <H1>{t("SingleApplication.heading")}</H1>
+              <StyledTag>
+                {t(`SingleApplication.status.${reservation.state}`)}
+              </StyledTag>
+              <IconSpeechbubbleText style={{ minWidth: "1.5em" }} />
+            </AlignVertically>
+            <ApplicationHeader>
+              <ReservationUnitName>
+                {reservation?.reservationUnits
+                  ?.map((ru) => ru?.nameFi)
+                  .join(", ")}
+              </ReservationUnitName>
+              <AlignVerticallySmallGap>
+                <AlignVerticallySmallGap>
+                  <IconLocation />
+                  <span>
+                    {reservation?.reservationUnits
+                      ?.flatMap((ru) => ru?.unit?.nameFi)
+                      .join(", ")}
+                  </span>
+                </AlignVerticallySmallGap>
+                <AlignVerticallySmallGap>
+                  <IconCalendar />
+                  <span>
+                    {reservationDateTime(reservation.begin, reservation.end, t)}
+                  </span>
+                </AlignVerticallySmallGap>
+                <IconTicket />
+                <span>{reservationPrice(reservation, t)}</span>
+              </AlignVerticallySmallGap>
+            </ApplicationHeader>
+            <Accordion
+              heading={t("SingleApplication.workingMemo")}
+              initiallyOpen={reservation.workingMemo !== undefined}
+            >
+              <WorkingMemoContainer>
+                <TextArea
+                  id="workingMemo"
+                  helperText={t("SingleApplication.workingMemoHelperText")}
+                />
+                <Button>{t("SingleApplication.save")}</Button>
+              </WorkingMemoContainer>
+            </Accordion>
+            <Accordion heading={t("SingleApplication.calendar")}>
+              TODO
+            </Accordion>
+            <h2>{t("SingleApplication.summary")}</h2>
+            <ApplicationDatas>
+              <ApplicationData
+                label={t("SingleApplication.name")}
+                data={reservation.name}
+              />
+              <ApplicationData
+                label={t("SingleApplication.description")}
+                data={reservation.description}
+                wide
+              />
+              <ApplicationData
+                label={t("SingleApplication.purpose")}
+                data={reservation.purpose && String(reservation.purpose.nameFi)}
+                wide
+              />
+              <ApplicationData
+                label={t("SingleApplication.numPersons")}
+                data={reservation.numPersons}
+              />
+              <ApplicationData
+                label={t("SingleApplication.ageGroup")}
+                data={ageGroup(reservation.ageGroup)}
+              />
+              <ApplicationData
+                label={t("SingleApplication.reserveeFirstName")}
+                data={reservation.reserveeFirstName}
+              />
+              <ApplicationData
+                label={t("SingleApplication.reserveeLastName")}
+                data={reservation.reserveeLastName}
+              />
+              <ApplicationData
+                label={t("SingleApplication.reserveeAddressStreet")}
+                data={reservation.reserveeAddressStreet}
+                wide
+              />
+              <ApplicationData
+                label={t("SingleApplication.reserveeAddressZip")}
+                data={reservation.reserveeAddressZip}
+              />
+              <ApplicationData
+                label={t("SingleApplication.reserveeAddressCity")}
+                data={reservation.reserveeAddressCity}
+              />
+              <ApplicationData
+                label={t("SingleApplication.reserveeEmail")}
+                data={reservation.reserveeEmail}
+              />
+              <ApplicationData
+                label={t("SingleApplication.reserveePhone")}
+                data={reservation.reserveePhone}
+              />
+              <ApplicationData
+                label={t("SingleApplication.reserveeOrganisationName")}
+                data={reservation.reserveeOrganisationName}
+                wide
+              />
+              <ApplicationData
+                label={t("SingleApplication.reserveeId")}
+                data={reservation.reserveeId}
+                wide
+              />
+            </ApplicationDatas>
+            <Divider />
+          </ApplicationContent>
+        </ViewWrapper>
+        <ButtonsStripe>
+          <WhiteButton
+            variant="secondary"
+            disabled={false}
+            onClick={(e) => {
+              e.preventDefault();
+              setModalContent(
+                <DenyDialog
+                  reservation={reservation}
+                  onReject={() => setModalContent(null)}
+                  onClose={() => setModalContent(null)}
+                />,
+                true
+              );
+            }}
+          >
+            {t("SingleApplication.reject")}
+          </WhiteButton>
+          <WhiteButton
+            variant="primary"
+            disabled={false}
+            onClick={(e) => {
+              e.preventDefault();
+              setModalContent(
+                <ApproveDialog
+                  reservation={reservation}
+                  onAccept={() => setModalContent(null)}
+                  onClose={() => setModalContent(null)}
+                />,
+                true
+              );
+            }}
+          >
+            {t("SingleApplication.approve")}
+          </WhiteButton>
+        </ButtonsStripe>
+      </ContentContainer>
+    </>
+  );
+};
+
+export default withMainMenu(SingleApplication);

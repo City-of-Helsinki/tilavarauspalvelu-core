@@ -4,6 +4,7 @@ export type NotificationContextProps = {
   notification: NotificationType | null;
   setNotification: (notification: NotificationType) => void;
   notifyError: (title: string, message?: string) => void;
+  notifySuccess: (title: string, message?: string) => void;
   clearNotification: () => void;
 };
 
@@ -19,6 +20,7 @@ export const NotificationContext =
     setNotification: () => {},
     clearNotification: () => {},
     notifyError: () => {},
+    notifySuccess: () => {},
   });
 
 export const useNotification = (): NotificationContextProps =>
@@ -40,6 +42,9 @@ export const NotificationContextProvider: React.FC = ({ children }) => {
         clearNotification,
         notifyError: (title, message?) => {
           setNotification({ type: "error", title, message: message || null });
+        },
+        notifySuccess: (title, message?) => {
+          setNotification({ type: "success", title, message: message || null });
         },
       }}
     >

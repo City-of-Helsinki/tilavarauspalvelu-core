@@ -132,6 +132,12 @@ type DistrictType implements Node {
   pk: Int
 }
 
+"""
+The `Duration` scalar type represents a duration value as an integer in seconds.
+For example, a value of 900 means a duration of 15 minutes.
+"""
+scalar Duration
+
 input EquipmentCategoryCreateMutationInput {
   nameFi: String
   nameEn: String
@@ -400,7 +406,9 @@ type Mutation {
   updateReservation(input: ReservationUpdateMutationInput!): ReservationUpdateMutationPayload
   confirmReservation(input: ReservationConfirmMutationInput!): ReservationConfirmMutationPayload
   cancelReservation(input: ReservationCancellationMutationInput!): ReservationCancellationMutationPayload
-  handleReservation(input: ReservationHandleMutationInput!): ReservationHandleMutationPayload
+  denyReservation(input: ReservationDenyMutationInput!): ReservationDenyMutationPayload
+  approveReservation(input: ReservationApproveMutationInput!): ReservationApproveMutationPayload
+  updateReservationWorkingMemo(input: ReservationWorkingMemoMutationInput!): ReservationWorkingMemoMutationPayload
   createReservationUnit(input: ReservationUnitCreateMutationInput!): ReservationUnitCreateMutationPayload
   updateReservationUnit(input: ReservationUnitUpdateMutationInput!): ReservationUnitUpdateMutationPayload
   createReservationUnitImage(input: ReservationUnitImageCreateMutationInput!): ReservationUnitImageCreateMutationPayload
@@ -539,9 +547,10 @@ type PurposeUpdateMutationPayload {
 }
 
 type Query {
-  reservations(offset: Int = null, before: String = null, after: String = null, first: Int = null, last: Int = null, begin: DateTime = null, end: DateTime = null, handlingRequired: Boolean = null, state: String = null): ReservationTypeConnection
+  reservations(offset: Int = null, before: String = null, after: String = null, first: Int = null, last: Int = null, begin: DateTime = null, end: DateTime = null, state: String = null): ReservationTypeConnection
   reservationByPk(pk: Int = null): ReservationType
   reservationCancelReasons(offset: Int = null, before: String = null, after: String = null, first: Int = null, last: Int = null, reason: String = null): ReservationCancelReasonTypeConnection
+  reservationDenyReasons(offset: Int = null, before: String = null, after: String = null, first: Int = null, last: Int = null, reason: String = null): ReservationDenyReasonTypeConnection
   reservationUnits(
     offset: Int = null
     before: String = null
@@ -629,6 +638,35 @@ type RecurringReservationType {
   pk: Int
   applicationPk: Int
   applicationEventPk: Int
+}
+
+input ReservationApproveMutationInput {
+  pk: Int
+
+  """Additional information for approval."""
+  handlingDetails: String
+
+  """The price of this particular reservation"""
+  price: Float!
+  clientMutationId: String
+}
+
+type ReservationApproveMutationPayload {
+  pk: Int
+  state: state
+
+  """Additional information for approval."""
+  handlingDetails: String
+
+  """When this reservation was handled."""
+  handledAt: DateTime
+
+  """The price of this particular reservation"""
+  price: Float
+
+  """May contain more than one error for same field."""
+  errors: [ErrorType]
+  clientMutationId: String
 }
 
 input ReservationCancellationMutationInput {
@@ -727,14 +765,15 @@ type ReservationConfirmMutationPayload {
   description: String
 
   """
-  String value for ReservationType's ReservationState enum. Possible values are CREATED, CANCELLED, CONFIRMED, DENIED.
+  String value for ReservationType's ReservationState enum. Possible values are
+  CREATED, CANCELLED, REQUIRES_HANDLING, CONFIRMED, DENIED.
   """
   state: String
   priority: Int
   begin: DateTime
   end: DateTime
-  bufferTimeBefore: String
-  bufferTimeAfter: String
+  bufferTimeBefore: Int
+  bufferTimeAfter: Int
   purposePk: Int
   confirmedAt: DateTime
 
@@ -787,8 +826,8 @@ input ReservationCreateMutationInput {
   priority: Int
   begin: DateTime!
   end: DateTime!
-  bufferTimeBefore: String
-  bufferTimeAfter: String
+  bufferTimeBefore: Int
+  bufferTimeAfter: Int
   reservationUnitPks: [Int]!
   purposePk: Int
   clientMutationId: String
@@ -833,8 +872,8 @@ type ReservationCreateMutationPayload {
   priority: Int
   begin: DateTime
   end: DateTime
-  bufferTimeBefore: String
-  bufferTimeAfter: String
+  bufferTimeBefore: Int
+  bufferTimeAfter: Int
   purposePk: Int
   confirmedAt: DateTime
 
@@ -853,33 +892,61 @@ type ReservationCreateMutationPayload {
   clientMutationId: String
 }
 
-input ReservationHandleMutationInput {
+input ReservationDenyMutationInput {
   pk: Int
 
-  """Additional information for denying (if approve is false)"""
-  denyDetails: String
+  """Additional information for denying."""
+  handlingDetails: String
 
-  """Will this reservation be approved"""
-  approve: Boolean!
+  """Primary key for the pre-defined deny reason."""
+  denyReasonPk: Int!
   clientMutationId: String
 }
 
-type ReservationHandleMutationPayload {
+type ReservationDenyMutationPayload {
   pk: Int
   state: state
 
-  """Additional information for denying (if approve is false)"""
-  denyDetails: String
+  """Additional information for denying."""
+  handlingDetails: String
 
   """When this reservation was handled."""
   handledAt: DateTime
 
-  """Will this reservation be approved"""
-  approve: Boolean
+  """Primary key for the pre-defined deny reason."""
+  denyReasonPk: Int
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
   clientMutationId: String
+}
+
+type ReservationDenyReasonType implements Node {
+  reason: String!
+  reasonFi: String
+  reasonEn: String
+  reasonSv: String
+
+  """The ID of the object"""
+  id: ID!
+  pk: Int
+}
+
+type ReservationDenyReasonTypeConnection {
+  """Pagination data for this connection."""
+  pageInfo: PageInfo!
+
+  """Contains the nodes in this connection."""
+  edges: [ReservationDenyReasonTypeEdge]!
+}
+
+"""A Relay edge containing a `ReservationDenyReasonType` and its cursor."""
+type ReservationDenyReasonTypeEdge {
+  """The item at the end of the edge"""
+  node: ReservationDenyReasonType
+
+  """A cursor for use in pagination"""
+  cursor: String!
 }
 
 type ReservationMetadataSetType implements Node {
@@ -968,6 +1035,9 @@ enum ReservationsReservationStateChoices {
   """cancelled"""
   CANCELLED
 
+  """requires_handling"""
+  REQUIRES_HANDLING
+
   """confirmed"""
   CONFIRMED
 
@@ -1010,14 +1080,17 @@ type ReservationType implements Node {
   user: String
   begin: DateTime!
   end: DateTime!
-  bufferTimeBefore: Float
-  bufferTimeAfter: Float
+  bufferTimeBefore: Duration
+  bufferTimeAfter: Duration
   recurringReservation: RecurringReservationType
   numPersons: Int
   purpose: ReservationPurposeType
   unitPrice: Float
   taxPercentageValue: Decimal
   price: Float
+
+  """Working memo for staff users."""
+  workingMemo: String
 
   """The ID of the object"""
   id: ID!
@@ -1065,13 +1138,13 @@ type ReservationUnitByPkType implements Node {
   contactInformationFi: String
   contactInformationEn: String
   contactInformationSv: String
-  maxReservationDuration: Time
-  minReservationDuration: Time
+  maxReservationDuration: Duration
+  minReservationDuration: Duration
   uuid: UUID!
   isDraft: Boolean!
   maxPersons: Int
-  bufferTimeBefore: Time
-  bufferTimeAfter: Time
+  bufferTimeBefore: Duration
+  bufferTimeAfter: Duration
 
   """Unit of the price"""
   priceUnit: ReservationUnitsReservationUnitPriceUnitChoices!
@@ -1189,8 +1262,8 @@ input ReservationUnitCreateMutationInput {
   maxPersons: Int
   equipmentPks: [Int]
   unitPk: Int!
-  maxReservationDuration: String
-  minReservationDuration: String
+  maxReservationDuration: Int
+  minReservationDuration: Int
   isDraft: Boolean
   spacePks: [Int]
   resourcePks: [Int]
@@ -1198,8 +1271,8 @@ input ReservationUnitCreateMutationInput {
   servicePks: [Int]
   reservationUnitTypePk: Int
   surfaceArea: Float
-  bufferTimeBefore: String
-  bufferTimeAfter: String
+  bufferTimeBefore: Int
+  bufferTimeAfter: Int
   cancellationRulePk: Int
   paymentTermsPk: String
   cancellationTermsPk: String
@@ -1242,18 +1315,18 @@ input ReservationUnitCreateMutationInput {
   publishEnds: DateTime
   metadataSetPk: Int
   maxReservationsPerUser: Int
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
   additionalInstructionsFi: String
   additionalInstructionsEn: String
   additionalInstructionsSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   contactInformationFi: String
   contactInformationEn: String
   contactInformationSv: String
@@ -1292,13 +1365,13 @@ type ReservationUnitCreateMutationPayload {
   building: String
   unitPk: Int
   uuid: String
-  maxReservationDuration: String
-  minReservationDuration: String
+  maxReservationDuration: Int
+  minReservationDuration: Int
   isDraft: Boolean
   reservationUnitTypePk: Int
   surfaceArea: Float
-  bufferTimeBefore: String
-  bufferTimeAfter: String
+  bufferTimeBefore: Int
+  bufferTimeAfter: Int
   cancellationRulePk: Int
 
   """Minimum price of the reservation unit"""
@@ -1336,18 +1409,18 @@ type ReservationUnitCreateMutationPayload {
   """Time after this reservation unit should not be publicly visible in UI."""
   publishEnds: DateTime
   maxReservationsPerUser: Int
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
   additionalInstructionsFi: String
   additionalInstructionsEn: String
   additionalInstructionsSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   contactInformationFi: String
   contactInformationEn: String
   contactInformationSv: String
@@ -1511,14 +1584,14 @@ type ReservationUnitType implements Node {
   contactInformationFi: String
   contactInformationEn: String
   contactInformationSv: String
-  maxReservationDuration: Time
-  minReservationDuration: Time
+  maxReservationDuration: Duration
+  minReservationDuration: Duration
   uuid: UUID!
   isDraft: Boolean!
   maxPersons: Int
   surfaceArea: Decimal
-  bufferTimeBefore: Time
-  bufferTimeAfter: Time
+  bufferTimeBefore: Duration
+  bufferTimeAfter: Duration
   cancellationRule: ReservationUnitCancellationRuleType
 
   """Unit of the price"""
@@ -1623,8 +1696,8 @@ input ReservationUnitUpdateMutationInput {
   maxPersons: Int
   equipmentPks: [Int]
   unitPk: Int
-  maxReservationDuration: String
-  minReservationDuration: String
+  maxReservationDuration: Int
+  minReservationDuration: Int
   isDraft: Boolean
   spacePks: [Int]
   resourcePks: [Int]
@@ -1632,8 +1705,8 @@ input ReservationUnitUpdateMutationInput {
   servicePks: [Int]
   reservationUnitTypePk: Int
   surfaceArea: Float
-  bufferTimeBefore: String
-  bufferTimeAfter: String
+  bufferTimeBefore: Int
+  bufferTimeAfter: Int
   cancellationRulePk: Int
   paymentTermsPk: String
   cancellationTermsPk: String
@@ -1676,18 +1749,18 @@ input ReservationUnitUpdateMutationInput {
   publishEnds: DateTime
   metadataSetPk: Int
   maxReservationsPerUser: Int
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
   additionalInstructionsFi: String
   additionalInstructionsEn: String
   additionalInstructionsSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   contactInformationFi: String
   contactInformationEn: String
   contactInformationSv: String
@@ -1726,13 +1799,13 @@ type ReservationUnitUpdateMutationPayload {
   building: String
   unitPk: Int
   uuid: String
-  maxReservationDuration: String
-  minReservationDuration: String
+  maxReservationDuration: Int
+  minReservationDuration: Int
   isDraft: Boolean
   reservationUnitTypePk: Int
   surfaceArea: Float
-  bufferTimeBefore: String
-  bufferTimeAfter: String
+  bufferTimeBefore: Int
+  bufferTimeAfter: Int
   cancellationRulePk: Int
 
   """Minimum price of the reservation unit"""
@@ -1770,18 +1843,18 @@ type ReservationUnitUpdateMutationPayload {
   """Time after this reservation unit should not be publicly visible in UI."""
   publishEnds: DateTime
   maxReservationsPerUser: Int
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
   additionalInstructionsFi: String
   additionalInstructionsEn: String
   additionalInstructionsSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   contactInformationFi: String
   contactInformationEn: String
   contactInformationSv: String
@@ -1827,14 +1900,15 @@ input ReservationUpdateMutationInput {
   description: String
 
   """
-  String value for ReservationType's ReservationState enum. Possible values are CREATED, CANCELLED, CONFIRMED, DENIED.
+  String value for ReservationType's ReservationState enum. Possible values are
+  CREATED, CANCELLED, REQUIRES_HANDLING, CONFIRMED, DENIED.
   """
   state: String
   priority: Int
   begin: DateTime
   end: DateTime
-  bufferTimeBefore: String
-  bufferTimeAfter: String
+  bufferTimeBefore: Int
+  bufferTimeAfter: Int
   reservationUnitPks: [Int]
   purposePk: Int
   clientMutationId: String
@@ -1875,14 +1949,15 @@ type ReservationUpdateMutationPayload {
   description: String
 
   """
-  String value for ReservationType's ReservationState enum. Possible values are CREATED, CANCELLED, CONFIRMED, DENIED.
+  String value for ReservationType's ReservationState enum. Possible values are
+  CREATED, CANCELLED, REQUIRES_HANDLING, CONFIRMED, DENIED.
   """
   state: String
   priority: Int
   begin: DateTime
   end: DateTime
-  bufferTimeBefore: String
-  bufferTimeAfter: String
+  bufferTimeBefore: Int
+  bufferTimeAfter: Int
   purposePk: Int
   confirmedAt: DateTime
 
@@ -1901,6 +1976,27 @@ type ReservationUpdateMutationPayload {
   clientMutationId: String
 }
 
+input ReservationWorkingMemoMutationInput {
+  """Primary key of the reservation"""
+  pk: Int
+
+  """Working memo for staff users."""
+  workingMemo: String
+  clientMutationId: String
+}
+
+type ReservationWorkingMemoMutationPayload {
+  """Primary key of the reservation"""
+  pk: Int
+
+  """Working memo for staff users."""
+  workingMemo: String
+
+  """May contain more than one error for same field."""
+  errors: [ErrorType]
+  clientMutationId: String
+}
+
 input ResourceCreateMutationInput {
   locationType: String
 
@@ -1908,13 +2004,16 @@ input ResourceCreateMutationInput {
   spacePk: Int
 
   """
+  Buffer time while reservation unit is unreservable before the reservation.
+  Dynamically calculated from spaces and resources.
+  """
+  bufferTimeBefore: Int
+
+  """
   Buffer time while reservation unit is unreservable after the reservation.
   Dynamically calculated from spaces and resources.
   """
-  bufferTimeBefore: String
-
-  """Begin date and time of the reservation."""
-  bufferTimeAfter: String
+  bufferTimeAfter: Int
   isDraft: Boolean
   nameFi: String
   nameEn: String
@@ -1933,13 +2032,16 @@ type ResourceCreateMutationPayload {
   spacePk: Int
 
   """
+  Buffer time while reservation unit is unreservable before the reservation.
+  Dynamically calculated from spaces and resources.
+  """
+  bufferTimeBefore: Int
+
+  """
   Buffer time while reservation unit is unreservable after the reservation.
   Dynamically calculated from spaces and resources.
   """
-  bufferTimeBefore: String
-
-  """Begin date and time of the reservation."""
-  bufferTimeAfter: String
+  bufferTimeAfter: Int
   isDraft: Boolean
   nameFi: String
   nameEn: String
@@ -1983,8 +2085,8 @@ type ResourceType implements Node {
   descriptionEn: String
   descriptionSv: String
   space: SpaceType
-  bufferTimeBefore: Float
-  bufferTimeAfter: Float
+  bufferTimeBefore: Duration
+  bufferTimeAfter: Duration
   isDraft: Boolean!
 
   """The ID of the object"""
@@ -2018,13 +2120,16 @@ input ResourceUpdateMutationInput {
   spacePk: Int
 
   """
+  Buffer time while reservation unit is unreservable before the reservation.
+  Dynamically calculated from spaces and resources.
+  """
+  bufferTimeBefore: Int
+
+  """
   Buffer time while reservation unit is unreservable after the reservation.
   Dynamically calculated from spaces and resources.
   """
-  bufferTimeBefore: String
-
-  """Begin date and time of the reservation."""
-  bufferTimeAfter: String
+  bufferTimeAfter: Int
   isDraft: Boolean
   nameFi: String
   nameEn: String
@@ -2043,13 +2148,16 @@ type ResourceUpdateMutationPayload {
   spacePk: Int
 
   """
+  Buffer time while reservation unit is unreservable before the reservation.
+  Dynamically calculated from spaces and resources.
+  """
+  bufferTimeBefore: Int
+
+  """
   Buffer time while reservation unit is unreservable after the reservation.
   Dynamically calculated from spaces and resources.
   """
-  bufferTimeBefore: String
-
-  """Begin date and time of the reservation."""
-  bufferTimeAfter: String
+  bufferTimeAfter: Int
   isDraft: Boolean
   nameFi: String
   nameEn: String
@@ -2081,8 +2189,8 @@ type ServiceType implements Node {
   nameEn: String
   nameSv: String
   serviceType: ServicesServiceServiceTypeChoices!
-  bufferTimeBefore: String
-  bufferTimeAfter: String
+  bufferTimeBefore: Duration
+  bufferTimeAfter: Duration
 
   """The ID of the object"""
   id: ID!
@@ -2228,6 +2336,9 @@ enum state {
 
   """cancelled"""
   CANCELLED
+
+  """requires_handling"""
+  REQUIRES_HANDLING
 
   """confirmed"""
   CONFIRMED
@@ -2402,12 +2513,12 @@ input UnitUpdateMutationInput {
   webPage: String
   email: String
   phone: String
-  shortDescriptionFi: String
-  shortDescriptionEn: String
-  shortDescriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  shortDescriptionFi: String
+  shortDescriptionEn: String
+  shortDescriptionSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
@@ -2420,12 +2531,12 @@ type UnitUpdateMutationPayload {
   webPage: String
   email: String
   phone: String
-  shortDescriptionFi: String
-  shortDescriptionEn: String
-  shortDescriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  shortDescriptionFi: String
+  shortDescriptionEn: String
+  shortDescriptionSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
