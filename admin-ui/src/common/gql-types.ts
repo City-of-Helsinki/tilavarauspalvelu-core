@@ -1,5 +1,4 @@
 export type Maybe<T> = T | null;
-export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = {
   [K in keyof T]: T[K];
 };
@@ -30,6 +29,11 @@ export type Scalars = {
   DateTime: any;
   /** The `Decimal` scalar type represents a python Decimal. */
   Decimal: any;
+  /**
+   * The `Duration` scalar type represents a duration value as an integer in seconds.
+   * For example, a value of 900 means a duration of 15 minutes.
+   */
+  Duration: any;
   /**
    * The `Time` scalar type represents a Time value as
    * specified by
@@ -102,22 +106,22 @@ export type ApplicationRoundType = {
 };
 
 export type ApplicationRoundTypePurposesArgs = {
-  after?: InputMaybe<Scalars["String"]>;
-  before?: InputMaybe<Scalars["String"]>;
-  first?: InputMaybe<Scalars["Int"]>;
-  last?: InputMaybe<Scalars["Int"]>;
-  nameEn?: InputMaybe<Scalars["String"]>;
-  nameFi?: InputMaybe<Scalars["String"]>;
-  nameSv?: InputMaybe<Scalars["String"]>;
-  offset?: InputMaybe<Scalars["Int"]>;
+  after?: Maybe<Scalars["String"]>;
+  before?: Maybe<Scalars["String"]>;
+  first?: Maybe<Scalars["Int"]>;
+  last?: Maybe<Scalars["Int"]>;
+  nameEn?: Maybe<Scalars["String"]>;
+  nameFi?: Maybe<Scalars["String"]>;
+  nameSv?: Maybe<Scalars["String"]>;
+  offset?: Maybe<Scalars["Int"]>;
 };
 
 export type ApplicationRoundTypeReservationUnitsArgs = {
-  after?: InputMaybe<Scalars["String"]>;
-  before?: InputMaybe<Scalars["String"]>;
-  first?: InputMaybe<Scalars["Int"]>;
-  last?: InputMaybe<Scalars["Int"]>;
-  offset?: InputMaybe<Scalars["Int"]>;
+  after?: Maybe<Scalars["String"]>;
+  before?: Maybe<Scalars["String"]>;
+  first?: Maybe<Scalars["Int"]>;
+  last?: Maybe<Scalars["Int"]>;
+  offset?: Maybe<Scalars["Int"]>;
 };
 
 /** An enumeration. */
@@ -179,10 +183,10 @@ export type DistrictType = Node & {
 };
 
 export type EquipmentCategoryCreateMutationInput = {
-  clientMutationId?: InputMaybe<Scalars["String"]>;
-  nameEn?: InputMaybe<Scalars["String"]>;
-  nameFi?: InputMaybe<Scalars["String"]>;
-  nameSv?: InputMaybe<Scalars["String"]>;
+  clientMutationId?: Maybe<Scalars["String"]>;
+  nameEn?: Maybe<Scalars["String"]>;
+  nameFi?: Maybe<Scalars["String"]>;
+  nameSv?: Maybe<Scalars["String"]>;
 };
 
 export type EquipmentCategoryCreateMutationPayload = {
@@ -198,7 +202,7 @@ export type EquipmentCategoryCreateMutationPayload = {
 };
 
 export type EquipmentCategoryDeleteMutationInput = {
-  clientMutationId?: InputMaybe<Scalars["String"]>;
+  clientMutationId?: Maybe<Scalars["String"]>;
   pk: Scalars["Int"];
 };
 
@@ -237,10 +241,10 @@ export type EquipmentCategoryTypeEdge = {
 };
 
 export type EquipmentCategoryUpdateMutationInput = {
-  clientMutationId?: InputMaybe<Scalars["String"]>;
-  nameEn?: InputMaybe<Scalars["String"]>;
-  nameFi?: InputMaybe<Scalars["String"]>;
-  nameSv?: InputMaybe<Scalars["String"]>;
+  clientMutationId?: Maybe<Scalars["String"]>;
+  nameEn?: Maybe<Scalars["String"]>;
+  nameFi?: Maybe<Scalars["String"]>;
+  nameSv?: Maybe<Scalars["String"]>;
   pk: Scalars["Int"];
 };
 
@@ -258,10 +262,10 @@ export type EquipmentCategoryUpdateMutationPayload = {
 
 export type EquipmentCreateMutationInput = {
   categoryPk: Scalars["Int"];
-  clientMutationId?: InputMaybe<Scalars["String"]>;
-  nameEn?: InputMaybe<Scalars["String"]>;
-  nameFi?: InputMaybe<Scalars["String"]>;
-  nameSv?: InputMaybe<Scalars["String"]>;
+  clientMutationId?: Maybe<Scalars["String"]>;
+  nameEn?: Maybe<Scalars["String"]>;
+  nameFi?: Maybe<Scalars["String"]>;
+  nameSv?: Maybe<Scalars["String"]>;
 };
 
 export type EquipmentCreateMutationPayload = {
@@ -278,7 +282,7 @@ export type EquipmentCreateMutationPayload = {
 };
 
 export type EquipmentDeleteMutationInput = {
-  clientMutationId?: InputMaybe<Scalars["String"]>;
+  clientMutationId?: Maybe<Scalars["String"]>;
   pk: Scalars["Int"];
 };
 
@@ -319,10 +323,10 @@ export type EquipmentTypeEdge = {
 
 export type EquipmentUpdateMutationInput = {
   categoryPk: Scalars["Int"];
-  clientMutationId?: InputMaybe<Scalars["String"]>;
-  nameEn?: InputMaybe<Scalars["String"]>;
-  nameFi?: InputMaybe<Scalars["String"]>;
-  nameSv?: InputMaybe<Scalars["String"]>;
+  clientMutationId?: Maybe<Scalars["String"]>;
+  nameEn?: Maybe<Scalars["String"]>;
+  nameFi?: Maybe<Scalars["String"]>;
+  nameSv?: Maybe<Scalars["String"]>;
   pk: Scalars["Int"];
 };
 
@@ -446,6 +450,7 @@ export type LocationType = Node & {
 
 export type Mutation = {
   __typename?: "Mutation";
+  approveReservation?: Maybe<ReservationApproveMutationPayload>;
   cancelReservation?: Maybe<ReservationCancellationMutationPayload>;
   confirmReservation?: Maybe<ReservationConfirmMutationPayload>;
   createEquipment?: Maybe<EquipmentCreateMutationPayload>;
@@ -461,16 +466,21 @@ export type Mutation = {
   deleteReservationUnitImage?: Maybe<ReservationUnitImageDeleteMutationPayload>;
   deleteResource?: Maybe<ResourceDeleteMutationPayload>;
   deleteSpace?: Maybe<SpaceDeleteMutationPayload>;
-  handleReservation?: Maybe<ReservationHandleMutationPayload>;
+  denyReservation?: Maybe<ReservationDenyMutationPayload>;
   updateEquipment?: Maybe<EquipmentUpdateMutationPayload>;
   updateEquipmentCategory?: Maybe<EquipmentCategoryUpdateMutationPayload>;
   updatePurpose?: Maybe<PurposeUpdateMutationPayload>;
   updateReservation?: Maybe<ReservationUpdateMutationPayload>;
   updateReservationUnit?: Maybe<ReservationUnitUpdateMutationPayload>;
   updateReservationUnitImage?: Maybe<ReservationUnitImageUpdateMutationPayload>;
+  updateReservationWorkingMemo?: Maybe<ReservationWorkingMemoMutationPayload>;
   updateResource?: Maybe<ResourceUpdateMutationPayload>;
   updateSpace?: Maybe<SpaceUpdateMutationPayload>;
   updateUnit?: Maybe<UnitUpdateMutationPayload>;
+};
+
+export type MutationApproveReservationArgs = {
+  input: ReservationApproveMutationInput;
 };
 
 export type MutationCancelReservationArgs = {
@@ -533,8 +543,8 @@ export type MutationDeleteSpaceArgs = {
   input: SpaceDeleteMutationInput;
 };
 
-export type MutationHandleReservationArgs = {
-  input: ReservationHandleMutationInput;
+export type MutationDenyReservationArgs = {
+  input: ReservationDenyMutationInput;
 };
 
 export type MutationUpdateEquipmentArgs = {
@@ -559,6 +569,10 @@ export type MutationUpdateReservationUnitArgs = {
 
 export type MutationUpdateReservationUnitImageArgs = {
   input: ReservationUnitImageUpdateMutationInput;
+};
+
+export type MutationUpdateReservationWorkingMemoArgs = {
+  input: ReservationWorkingMemoMutationInput;
 };
 
 export type MutationUpdateResourceArgs = {
@@ -623,10 +637,10 @@ export type PeriodType = {
 };
 
 export type PurposeCreateMutationInput = {
-  clientMutationId?: InputMaybe<Scalars["String"]>;
-  nameEn?: InputMaybe<Scalars["String"]>;
-  nameFi?: InputMaybe<Scalars["String"]>;
-  nameSv?: InputMaybe<Scalars["String"]>;
+  clientMutationId?: Maybe<Scalars["String"]>;
+  nameEn?: Maybe<Scalars["String"]>;
+  nameFi?: Maybe<Scalars["String"]>;
+  nameSv?: Maybe<Scalars["String"]>;
 };
 
 export type PurposeCreateMutationPayload = {
@@ -668,10 +682,10 @@ export type PurposeTypeEdge = {
 };
 
 export type PurposeUpdateMutationInput = {
-  clientMutationId?: InputMaybe<Scalars["String"]>;
-  nameEn?: InputMaybe<Scalars["String"]>;
-  nameFi?: InputMaybe<Scalars["String"]>;
-  nameSv?: InputMaybe<Scalars["String"]>;
+  clientMutationId?: Maybe<Scalars["String"]>;
+  nameEn?: Maybe<Scalars["String"]>;
+  nameFi?: Maybe<Scalars["String"]>;
+  nameSv?: Maybe<Scalars["String"]>;
   pk: Scalars["Int"];
 };
 
@@ -704,6 +718,7 @@ export type Query = {
   purposes?: Maybe<PurposeTypeConnection>;
   reservationByPk?: Maybe<ReservationType>;
   reservationCancelReasons?: Maybe<ReservationCancelReasonTypeConnection>;
+  reservationDenyReasons?: Maybe<ReservationDenyReasonTypeConnection>;
   reservationPurposes?: Maybe<ReservationPurposeTypeConnection>;
   reservationUnit?: Maybe<ReservationUnitType>;
   reservationUnitByPk?: Maybe<ReservationUnitByPkType>;
@@ -725,19 +740,19 @@ export type Query = {
 };
 
 export type QueryAgeGroupsArgs = {
-  after?: InputMaybe<Scalars["String"]>;
-  before?: InputMaybe<Scalars["String"]>;
-  first?: InputMaybe<Scalars["Int"]>;
-  last?: InputMaybe<Scalars["Int"]>;
-  offset?: InputMaybe<Scalars["Int"]>;
+  after?: Maybe<Scalars["String"]>;
+  before?: Maybe<Scalars["String"]>;
+  first?: Maybe<Scalars["Int"]>;
+  last?: Maybe<Scalars["Int"]>;
+  offset?: Maybe<Scalars["Int"]>;
 };
 
 export type QueryCitiesArgs = {
-  after?: InputMaybe<Scalars["String"]>;
-  before?: InputMaybe<Scalars["String"]>;
-  first?: InputMaybe<Scalars["Int"]>;
-  last?: InputMaybe<Scalars["Int"]>;
-  offset?: InputMaybe<Scalars["Int"]>;
+  after?: Maybe<Scalars["String"]>;
+  before?: Maybe<Scalars["String"]>;
+  first?: Maybe<Scalars["Int"]>;
+  last?: Maybe<Scalars["Int"]>;
+  offset?: Maybe<Scalars["Int"]>;
 };
 
 export type QueryEquipmentArgs = {
@@ -745,24 +760,24 @@ export type QueryEquipmentArgs = {
 };
 
 export type QueryEquipmentByPkArgs = {
-  pk?: InputMaybe<Scalars["Int"]>;
+  pk?: Maybe<Scalars["Int"]>;
 };
 
 export type QueryEquipmentCategoriesArgs = {
-  after?: InputMaybe<Scalars["String"]>;
-  before?: InputMaybe<Scalars["String"]>;
-  first?: InputMaybe<Scalars["Int"]>;
-  last?: InputMaybe<Scalars["Int"]>;
-  nameEn?: InputMaybe<Scalars["String"]>;
-  nameEn_Icontains?: InputMaybe<Scalars["String"]>;
-  nameEn_Istartswith?: InputMaybe<Scalars["String"]>;
-  nameFi?: InputMaybe<Scalars["String"]>;
-  nameFi_Icontains?: InputMaybe<Scalars["String"]>;
-  nameFi_Istartswith?: InputMaybe<Scalars["String"]>;
-  nameSv?: InputMaybe<Scalars["String"]>;
-  nameSv_Icontains?: InputMaybe<Scalars["String"]>;
-  nameSv_Istartswith?: InputMaybe<Scalars["String"]>;
-  offset?: InputMaybe<Scalars["Int"]>;
+  after?: Maybe<Scalars["String"]>;
+  before?: Maybe<Scalars["String"]>;
+  first?: Maybe<Scalars["Int"]>;
+  last?: Maybe<Scalars["Int"]>;
+  nameEn?: Maybe<Scalars["String"]>;
+  nameEn_Icontains?: Maybe<Scalars["String"]>;
+  nameEn_Istartswith?: Maybe<Scalars["String"]>;
+  nameFi?: Maybe<Scalars["String"]>;
+  nameFi_Icontains?: Maybe<Scalars["String"]>;
+  nameFi_Istartswith?: Maybe<Scalars["String"]>;
+  nameSv?: Maybe<Scalars["String"]>;
+  nameSv_Icontains?: Maybe<Scalars["String"]>;
+  nameSv_Istartswith?: Maybe<Scalars["String"]>;
+  offset?: Maybe<Scalars["Int"]>;
 };
 
 export type QueryEquipmentCategoryArgs = {
@@ -770,100 +785,109 @@ export type QueryEquipmentCategoryArgs = {
 };
 
 export type QueryEquipmentCategoryByPkArgs = {
-  pk?: InputMaybe<Scalars["Int"]>;
+  pk?: Maybe<Scalars["Int"]>;
 };
 
 export type QueryEquipmentsArgs = {
-  after?: InputMaybe<Scalars["String"]>;
-  before?: InputMaybe<Scalars["String"]>;
-  first?: InputMaybe<Scalars["Int"]>;
-  last?: InputMaybe<Scalars["Int"]>;
-  nameEn?: InputMaybe<Scalars["String"]>;
-  nameEn_Icontains?: InputMaybe<Scalars["String"]>;
-  nameEn_Istartswith?: InputMaybe<Scalars["String"]>;
-  nameFi?: InputMaybe<Scalars["String"]>;
-  nameFi_Icontains?: InputMaybe<Scalars["String"]>;
-  nameFi_Istartswith?: InputMaybe<Scalars["String"]>;
-  nameSv?: InputMaybe<Scalars["String"]>;
-  nameSv_Icontains?: InputMaybe<Scalars["String"]>;
-  nameSv_Istartswith?: InputMaybe<Scalars["String"]>;
-  offset?: InputMaybe<Scalars["Int"]>;
+  after?: Maybe<Scalars["String"]>;
+  before?: Maybe<Scalars["String"]>;
+  first?: Maybe<Scalars["Int"]>;
+  last?: Maybe<Scalars["Int"]>;
+  nameEn?: Maybe<Scalars["String"]>;
+  nameEn_Icontains?: Maybe<Scalars["String"]>;
+  nameEn_Istartswith?: Maybe<Scalars["String"]>;
+  nameFi?: Maybe<Scalars["String"]>;
+  nameFi_Icontains?: Maybe<Scalars["String"]>;
+  nameFi_Istartswith?: Maybe<Scalars["String"]>;
+  nameSv?: Maybe<Scalars["String"]>;
+  nameSv_Icontains?: Maybe<Scalars["String"]>;
+  nameSv_Istartswith?: Maybe<Scalars["String"]>;
+  offset?: Maybe<Scalars["Int"]>;
 };
 
 export type QueryKeywordCategoriesArgs = {
-  after?: InputMaybe<Scalars["String"]>;
-  before?: InputMaybe<Scalars["String"]>;
-  first?: InputMaybe<Scalars["Int"]>;
-  last?: InputMaybe<Scalars["Int"]>;
-  nameEn?: InputMaybe<Scalars["String"]>;
-  nameFi?: InputMaybe<Scalars["String"]>;
-  nameSv?: InputMaybe<Scalars["String"]>;
-  offset?: InputMaybe<Scalars["Int"]>;
+  after?: Maybe<Scalars["String"]>;
+  before?: Maybe<Scalars["String"]>;
+  first?: Maybe<Scalars["Int"]>;
+  last?: Maybe<Scalars["Int"]>;
+  nameEn?: Maybe<Scalars["String"]>;
+  nameFi?: Maybe<Scalars["String"]>;
+  nameSv?: Maybe<Scalars["String"]>;
+  offset?: Maybe<Scalars["Int"]>;
 };
 
 export type QueryKeywordGroupsArgs = {
-  after?: InputMaybe<Scalars["String"]>;
-  before?: InputMaybe<Scalars["String"]>;
-  first?: InputMaybe<Scalars["Int"]>;
-  last?: InputMaybe<Scalars["Int"]>;
-  nameEn?: InputMaybe<Scalars["String"]>;
-  nameFi?: InputMaybe<Scalars["String"]>;
-  nameSv?: InputMaybe<Scalars["String"]>;
-  offset?: InputMaybe<Scalars["Int"]>;
+  after?: Maybe<Scalars["String"]>;
+  before?: Maybe<Scalars["String"]>;
+  first?: Maybe<Scalars["Int"]>;
+  last?: Maybe<Scalars["Int"]>;
+  nameEn?: Maybe<Scalars["String"]>;
+  nameFi?: Maybe<Scalars["String"]>;
+  nameSv?: Maybe<Scalars["String"]>;
+  offset?: Maybe<Scalars["Int"]>;
 };
 
 export type QueryKeywordsArgs = {
-  after?: InputMaybe<Scalars["String"]>;
-  before?: InputMaybe<Scalars["String"]>;
-  first?: InputMaybe<Scalars["Int"]>;
-  last?: InputMaybe<Scalars["Int"]>;
-  nameEn?: InputMaybe<Scalars["String"]>;
-  nameFi?: InputMaybe<Scalars["String"]>;
-  nameSv?: InputMaybe<Scalars["String"]>;
-  offset?: InputMaybe<Scalars["Int"]>;
+  after?: Maybe<Scalars["String"]>;
+  before?: Maybe<Scalars["String"]>;
+  first?: Maybe<Scalars["Int"]>;
+  last?: Maybe<Scalars["Int"]>;
+  nameEn?: Maybe<Scalars["String"]>;
+  nameFi?: Maybe<Scalars["String"]>;
+  nameSv?: Maybe<Scalars["String"]>;
+  offset?: Maybe<Scalars["Int"]>;
 };
 
 export type QueryMetadataSetsArgs = {
-  after?: InputMaybe<Scalars["String"]>;
-  before?: InputMaybe<Scalars["String"]>;
-  first?: InputMaybe<Scalars["Int"]>;
-  last?: InputMaybe<Scalars["Int"]>;
-  offset?: InputMaybe<Scalars["Int"]>;
+  after?: Maybe<Scalars["String"]>;
+  before?: Maybe<Scalars["String"]>;
+  first?: Maybe<Scalars["Int"]>;
+  last?: Maybe<Scalars["Int"]>;
+  offset?: Maybe<Scalars["Int"]>;
 };
 
 export type QueryPurposesArgs = {
-  after?: InputMaybe<Scalars["String"]>;
-  before?: InputMaybe<Scalars["String"]>;
-  first?: InputMaybe<Scalars["Int"]>;
-  last?: InputMaybe<Scalars["Int"]>;
-  nameEn?: InputMaybe<Scalars["String"]>;
-  nameFi?: InputMaybe<Scalars["String"]>;
-  nameSv?: InputMaybe<Scalars["String"]>;
-  offset?: InputMaybe<Scalars["Int"]>;
+  after?: Maybe<Scalars["String"]>;
+  before?: Maybe<Scalars["String"]>;
+  first?: Maybe<Scalars["Int"]>;
+  last?: Maybe<Scalars["Int"]>;
+  nameEn?: Maybe<Scalars["String"]>;
+  nameFi?: Maybe<Scalars["String"]>;
+  nameSv?: Maybe<Scalars["String"]>;
+  offset?: Maybe<Scalars["Int"]>;
 };
 
 export type QueryReservationByPkArgs = {
-  pk?: InputMaybe<Scalars["Int"]>;
+  pk?: Maybe<Scalars["Int"]>;
 };
 
 export type QueryReservationCancelReasonsArgs = {
-  after?: InputMaybe<Scalars["String"]>;
-  before?: InputMaybe<Scalars["String"]>;
-  first?: InputMaybe<Scalars["Int"]>;
-  last?: InputMaybe<Scalars["Int"]>;
-  offset?: InputMaybe<Scalars["Int"]>;
-  reason?: InputMaybe<Scalars["String"]>;
+  after?: Maybe<Scalars["String"]>;
+  before?: Maybe<Scalars["String"]>;
+  first?: Maybe<Scalars["Int"]>;
+  last?: Maybe<Scalars["Int"]>;
+  offset?: Maybe<Scalars["Int"]>;
+  reason?: Maybe<Scalars["String"]>;
+};
+
+export type QueryReservationDenyReasonsArgs = {
+  after?: Maybe<Scalars["String"]>;
+  before?: Maybe<Scalars["String"]>;
+  first?: Maybe<Scalars["Int"]>;
+  last?: Maybe<Scalars["Int"]>;
+  offset?: Maybe<Scalars["Int"]>;
+  reason?: Maybe<Scalars["String"]>;
 };
 
 export type QueryReservationPurposesArgs = {
-  after?: InputMaybe<Scalars["String"]>;
-  before?: InputMaybe<Scalars["String"]>;
-  first?: InputMaybe<Scalars["Int"]>;
-  last?: InputMaybe<Scalars["Int"]>;
-  nameEn?: InputMaybe<Scalars["String"]>;
-  nameFi?: InputMaybe<Scalars["String"]>;
-  nameSv?: InputMaybe<Scalars["String"]>;
-  offset?: InputMaybe<Scalars["Int"]>;
+  after?: Maybe<Scalars["String"]>;
+  before?: Maybe<Scalars["String"]>;
+  first?: Maybe<Scalars["Int"]>;
+  last?: Maybe<Scalars["Int"]>;
+  nameEn?: Maybe<Scalars["String"]>;
+  nameFi?: Maybe<Scalars["String"]>;
+  nameSv?: Maybe<Scalars["String"]>;
+  offset?: Maybe<Scalars["Int"]>;
 };
 
 export type QueryReservationUnitArgs = {
@@ -871,57 +895,56 @@ export type QueryReservationUnitArgs = {
 };
 
 export type QueryReservationUnitByPkArgs = {
-  pk?: InputMaybe<Scalars["Int"]>;
+  pk?: Maybe<Scalars["Int"]>;
 };
 
 export type QueryReservationUnitCancellationRulesArgs = {
-  after?: InputMaybe<Scalars["String"]>;
-  before?: InputMaybe<Scalars["String"]>;
-  first?: InputMaybe<Scalars["Int"]>;
-  last?: InputMaybe<Scalars["Int"]>;
-  name?: InputMaybe<Scalars["String"]>;
-  offset?: InputMaybe<Scalars["Int"]>;
+  after?: Maybe<Scalars["String"]>;
+  before?: Maybe<Scalars["String"]>;
+  first?: Maybe<Scalars["Int"]>;
+  last?: Maybe<Scalars["Int"]>;
+  name?: Maybe<Scalars["String"]>;
+  offset?: Maybe<Scalars["Int"]>;
 };
 
 export type QueryReservationUnitTypesArgs = {
-  after?: InputMaybe<Scalars["String"]>;
-  before?: InputMaybe<Scalars["String"]>;
-  first?: InputMaybe<Scalars["Int"]>;
-  last?: InputMaybe<Scalars["Int"]>;
-  nameEn?: InputMaybe<Scalars["String"]>;
-  nameFi?: InputMaybe<Scalars["String"]>;
-  nameSv?: InputMaybe<Scalars["String"]>;
-  offset?: InputMaybe<Scalars["Int"]>;
+  after?: Maybe<Scalars["String"]>;
+  before?: Maybe<Scalars["String"]>;
+  first?: Maybe<Scalars["Int"]>;
+  last?: Maybe<Scalars["Int"]>;
+  nameEn?: Maybe<Scalars["String"]>;
+  nameFi?: Maybe<Scalars["String"]>;
+  nameSv?: Maybe<Scalars["String"]>;
+  offset?: Maybe<Scalars["Int"]>;
 };
 
 export type QueryReservationUnitsArgs = {
-  after?: InputMaybe<Scalars["String"]>;
-  before?: InputMaybe<Scalars["String"]>;
-  first?: InputMaybe<Scalars["Int"]>;
-  isDraft?: InputMaybe<Scalars["Boolean"]>;
-  isVisible?: InputMaybe<Scalars["Boolean"]>;
-  keywordGroups?: InputMaybe<Array<InputMaybe<Scalars["ID"]>>>;
-  last?: InputMaybe<Scalars["Int"]>;
-  maxPersonsGte?: InputMaybe<Scalars["Float"]>;
-  maxPersonsLte?: InputMaybe<Scalars["Float"]>;
-  offset?: InputMaybe<Scalars["Int"]>;
-  orderBy?: InputMaybe<Scalars["String"]>;
-  purposes?: InputMaybe<Array<InputMaybe<Scalars["ID"]>>>;
-  reservationUnitType?: InputMaybe<Array<InputMaybe<Scalars["ID"]>>>;
-  textSearch?: InputMaybe<Scalars["String"]>;
-  unit?: InputMaybe<Array<InputMaybe<Scalars["ID"]>>>;
+  after?: Maybe<Scalars["String"]>;
+  before?: Maybe<Scalars["String"]>;
+  first?: Maybe<Scalars["Int"]>;
+  isDraft?: Maybe<Scalars["Boolean"]>;
+  isVisible?: Maybe<Scalars["Boolean"]>;
+  keywordGroups?: Maybe<Array<Maybe<Scalars["ID"]>>>;
+  last?: Maybe<Scalars["Int"]>;
+  maxPersonsGte?: Maybe<Scalars["Float"]>;
+  maxPersonsLte?: Maybe<Scalars["Float"]>;
+  offset?: Maybe<Scalars["Int"]>;
+  orderBy?: Maybe<Scalars["String"]>;
+  purposes?: Maybe<Array<Maybe<Scalars["ID"]>>>;
+  reservationUnitType?: Maybe<Array<Maybe<Scalars["ID"]>>>;
+  textSearch?: Maybe<Scalars["String"]>;
+  unit?: Maybe<Array<Maybe<Scalars["ID"]>>>;
 };
 
 export type QueryReservationsArgs = {
-  after?: InputMaybe<Scalars["String"]>;
-  before?: InputMaybe<Scalars["String"]>;
-  begin?: InputMaybe<Scalars["DateTime"]>;
-  end?: InputMaybe<Scalars["DateTime"]>;
-  first?: InputMaybe<Scalars["Int"]>;
-  handlingRequired?: InputMaybe<Scalars["Boolean"]>;
-  last?: InputMaybe<Scalars["Int"]>;
-  offset?: InputMaybe<Scalars["Int"]>;
-  state?: InputMaybe<Scalars["String"]>;
+  after?: Maybe<Scalars["String"]>;
+  before?: Maybe<Scalars["String"]>;
+  begin?: Maybe<Scalars["DateTime"]>;
+  end?: Maybe<Scalars["DateTime"]>;
+  first?: Maybe<Scalars["Int"]>;
+  last?: Maybe<Scalars["Int"]>;
+  offset?: Maybe<Scalars["Int"]>;
+  state?: Maybe<Scalars["String"]>;
 };
 
 export type QueryResourceArgs = {
@@ -929,24 +952,24 @@ export type QueryResourceArgs = {
 };
 
 export type QueryResourceByPkArgs = {
-  pk?: InputMaybe<Scalars["Int"]>;
+  pk?: Maybe<Scalars["Int"]>;
 };
 
 export type QueryResourcesArgs = {
-  after?: InputMaybe<Scalars["String"]>;
-  before?: InputMaybe<Scalars["String"]>;
-  first?: InputMaybe<Scalars["Int"]>;
-  last?: InputMaybe<Scalars["Int"]>;
-  nameEn?: InputMaybe<Scalars["String"]>;
-  nameEn_Icontains?: InputMaybe<Scalars["String"]>;
-  nameEn_Istartswith?: InputMaybe<Scalars["String"]>;
-  nameFi?: InputMaybe<Scalars["String"]>;
-  nameFi_Icontains?: InputMaybe<Scalars["String"]>;
-  nameFi_Istartswith?: InputMaybe<Scalars["String"]>;
-  nameSv?: InputMaybe<Scalars["String"]>;
-  nameSv_Icontains?: InputMaybe<Scalars["String"]>;
-  nameSv_Istartswith?: InputMaybe<Scalars["String"]>;
-  offset?: InputMaybe<Scalars["Int"]>;
+  after?: Maybe<Scalars["String"]>;
+  before?: Maybe<Scalars["String"]>;
+  first?: Maybe<Scalars["Int"]>;
+  last?: Maybe<Scalars["Int"]>;
+  nameEn?: Maybe<Scalars["String"]>;
+  nameEn_Icontains?: Maybe<Scalars["String"]>;
+  nameEn_Istartswith?: Maybe<Scalars["String"]>;
+  nameFi?: Maybe<Scalars["String"]>;
+  nameFi_Icontains?: Maybe<Scalars["String"]>;
+  nameFi_Istartswith?: Maybe<Scalars["String"]>;
+  nameSv?: Maybe<Scalars["String"]>;
+  nameSv_Icontains?: Maybe<Scalars["String"]>;
+  nameSv_Istartswith?: Maybe<Scalars["String"]>;
+  offset?: Maybe<Scalars["Int"]>;
 };
 
 export type QuerySpaceArgs = {
@@ -954,42 +977,42 @@ export type QuerySpaceArgs = {
 };
 
 export type QuerySpaceByPkArgs = {
-  pk?: InputMaybe<Scalars["Int"]>;
+  pk?: Maybe<Scalars["Int"]>;
 };
 
 export type QuerySpacesArgs = {
-  after?: InputMaybe<Scalars["String"]>;
-  before?: InputMaybe<Scalars["String"]>;
-  first?: InputMaybe<Scalars["Int"]>;
-  last?: InputMaybe<Scalars["Int"]>;
-  nameEn?: InputMaybe<Scalars["String"]>;
-  nameEn_Icontains?: InputMaybe<Scalars["String"]>;
-  nameEn_Istartswith?: InputMaybe<Scalars["String"]>;
-  nameFi?: InputMaybe<Scalars["String"]>;
-  nameFi_Icontains?: InputMaybe<Scalars["String"]>;
-  nameFi_Istartswith?: InputMaybe<Scalars["String"]>;
-  nameSv?: InputMaybe<Scalars["String"]>;
-  nameSv_Icontains?: InputMaybe<Scalars["String"]>;
-  nameSv_Istartswith?: InputMaybe<Scalars["String"]>;
-  offset?: InputMaybe<Scalars["Int"]>;
+  after?: Maybe<Scalars["String"]>;
+  before?: Maybe<Scalars["String"]>;
+  first?: Maybe<Scalars["Int"]>;
+  last?: Maybe<Scalars["Int"]>;
+  nameEn?: Maybe<Scalars["String"]>;
+  nameEn_Icontains?: Maybe<Scalars["String"]>;
+  nameEn_Istartswith?: Maybe<Scalars["String"]>;
+  nameFi?: Maybe<Scalars["String"]>;
+  nameFi_Icontains?: Maybe<Scalars["String"]>;
+  nameFi_Istartswith?: Maybe<Scalars["String"]>;
+  nameSv?: Maybe<Scalars["String"]>;
+  nameSv_Icontains?: Maybe<Scalars["String"]>;
+  nameSv_Istartswith?: Maybe<Scalars["String"]>;
+  offset?: Maybe<Scalars["Int"]>;
 };
 
 export type QueryTaxPercentagesArgs = {
-  after?: InputMaybe<Scalars["String"]>;
-  before?: InputMaybe<Scalars["String"]>;
-  first?: InputMaybe<Scalars["Int"]>;
-  last?: InputMaybe<Scalars["Int"]>;
-  offset?: InputMaybe<Scalars["Int"]>;
-  value?: InputMaybe<Scalars["Float"]>;
+  after?: Maybe<Scalars["String"]>;
+  before?: Maybe<Scalars["String"]>;
+  first?: Maybe<Scalars["Int"]>;
+  last?: Maybe<Scalars["Int"]>;
+  offset?: Maybe<Scalars["Int"]>;
+  value?: Maybe<Scalars["Float"]>;
 };
 
 export type QueryTermsOfUseArgs = {
-  after?: InputMaybe<Scalars["String"]>;
-  before?: InputMaybe<Scalars["String"]>;
-  first?: InputMaybe<Scalars["Int"]>;
-  last?: InputMaybe<Scalars["Int"]>;
-  offset?: InputMaybe<Scalars["Int"]>;
-  termsType?: InputMaybe<Scalars["String"]>;
+  after?: Maybe<Scalars["String"]>;
+  before?: Maybe<Scalars["String"]>;
+  first?: Maybe<Scalars["Int"]>;
+  last?: Maybe<Scalars["Int"]>;
+  offset?: Maybe<Scalars["Int"]>;
+  termsType?: Maybe<Scalars["String"]>;
 };
 
 export type QueryUnitArgs = {
@@ -997,24 +1020,24 @@ export type QueryUnitArgs = {
 };
 
 export type QueryUnitByPkArgs = {
-  pk?: InputMaybe<Scalars["Int"]>;
+  pk?: Maybe<Scalars["Int"]>;
 };
 
 export type QueryUnitsArgs = {
-  after?: InputMaybe<Scalars["String"]>;
-  before?: InputMaybe<Scalars["String"]>;
-  first?: InputMaybe<Scalars["Int"]>;
-  last?: InputMaybe<Scalars["Int"]>;
-  nameEn?: InputMaybe<Scalars["String"]>;
-  nameEn_Icontains?: InputMaybe<Scalars["String"]>;
-  nameEn_Istartswith?: InputMaybe<Scalars["String"]>;
-  nameFi?: InputMaybe<Scalars["String"]>;
-  nameFi_Icontains?: InputMaybe<Scalars["String"]>;
-  nameFi_Istartswith?: InputMaybe<Scalars["String"]>;
-  nameSv?: InputMaybe<Scalars["String"]>;
-  nameSv_Icontains?: InputMaybe<Scalars["String"]>;
-  nameSv_Istartswith?: InputMaybe<Scalars["String"]>;
-  offset?: InputMaybe<Scalars["Int"]>;
+  after?: Maybe<Scalars["String"]>;
+  before?: Maybe<Scalars["String"]>;
+  first?: Maybe<Scalars["Int"]>;
+  last?: Maybe<Scalars["Int"]>;
+  nameEn?: Maybe<Scalars["String"]>;
+  nameEn_Icontains?: Maybe<Scalars["String"]>;
+  nameEn_Istartswith?: Maybe<Scalars["String"]>;
+  nameFi?: Maybe<Scalars["String"]>;
+  nameFi_Icontains?: Maybe<Scalars["String"]>;
+  nameFi_Istartswith?: Maybe<Scalars["String"]>;
+  nameSv?: Maybe<Scalars["String"]>;
+  nameSv_Icontains?: Maybe<Scalars["String"]>;
+  nameSv_Istartswith?: Maybe<Scalars["String"]>;
+  offset?: Maybe<Scalars["Int"]>;
 };
 
 export type RealEstateType = Node & {
@@ -1037,6 +1060,30 @@ export type RecurringReservationType = {
   applicationPk?: Maybe<Scalars["Int"]>;
   pk?: Maybe<Scalars["Int"]>;
   user?: Maybe<Scalars["String"]>;
+};
+
+export type ReservationApproveMutationInput = {
+  clientMutationId?: Maybe<Scalars["String"]>;
+  /** Additional information for approval. */
+  handlingDetails?: Maybe<Scalars["String"]>;
+  pk?: Maybe<Scalars["Int"]>;
+  /** The price of this particular reservation */
+  price: Scalars["Float"];
+};
+
+export type ReservationApproveMutationPayload = {
+  __typename?: "ReservationApproveMutationPayload";
+  clientMutationId?: Maybe<Scalars["String"]>;
+  /** May contain more than one error for same field. */
+  errors?: Maybe<Array<Maybe<ErrorType>>>;
+  /** When this reservation was handled. */
+  handledAt?: Maybe<Scalars["DateTime"]>;
+  /** Additional information for approval. */
+  handlingDetails?: Maybe<Scalars["String"]>;
+  pk?: Maybe<Scalars["Int"]>;
+  /** The price of this particular reservation */
+  price?: Maybe<Scalars["Float"]>;
+  state?: Maybe<State>;
 };
 
 export type ReservationCancelReasonType = Node & {
@@ -1069,10 +1116,10 @@ export type ReservationCancelReasonTypeEdge = {
 
 export type ReservationCancellationMutationInput = {
   /** Additional information for the cancellation. */
-  cancelDetails?: InputMaybe<Scalars["String"]>;
+  cancelDetails?: Maybe<Scalars["String"]>;
   /** Primary key for the pre-defined cancel reason. */
   cancelReasonPk: Scalars["Int"];
-  clientMutationId?: InputMaybe<Scalars["String"]>;
+  clientMutationId?: Maybe<Scalars["String"]>;
   pk: Scalars["Int"];
 };
 
@@ -1090,7 +1137,7 @@ export type ReservationCancellationMutationPayload = {
 };
 
 export type ReservationConfirmMutationInput = {
-  clientMutationId?: InputMaybe<Scalars["String"]>;
+  clientMutationId?: Maybe<Scalars["String"]>;
   pk: Scalars["Int"];
 };
 
@@ -1106,8 +1153,8 @@ export type ReservationConfirmMutationPayload = {
   billingFirstName?: Maybe<Scalars["String"]>;
   billingLastName?: Maybe<Scalars["String"]>;
   billingPhone?: Maybe<Scalars["String"]>;
-  bufferTimeAfter?: Maybe<Scalars["String"]>;
-  bufferTimeBefore?: Maybe<Scalars["String"]>;
+  bufferTimeAfter?: Maybe<Scalars["Int"]>;
+  bufferTimeBefore?: Maybe<Scalars["Int"]>;
   clientMutationId?: Maybe<Scalars["String"]>;
   confirmedAt?: Maybe<Scalars["DateTime"]>;
   description?: Maybe<Scalars["String"]>;
@@ -1136,7 +1183,7 @@ export type ReservationConfirmMutationPayload = {
   reserveePhone?: Maybe<Scalars["String"]>;
   /** Type of the reservee. Possible values are BUSINESS, NONPROFIT, INDIVIDUAL. */
   reserveeType?: Maybe<Scalars["String"]>;
-  /** String value for ReservationType's ReservationState enum. Possible values are CREATED, CANCELLED, CONFIRMED, DENIED. */
+  /** String value for ReservationType's ReservationState enum. Possible values are CREATED, CANCELLED, REQUIRES_HANDLING, CONFIRMED, DENIED. */
   state?: Maybe<Scalars["String"]>;
   /** The value of the tax percentage for this particular reservation */
   taxPercentageValue?: Maybe<Scalars["Float"]>;
@@ -1145,41 +1192,41 @@ export type ReservationConfirmMutationPayload = {
 };
 
 export type ReservationCreateMutationInput = {
-  ageGroupPk?: InputMaybe<Scalars["Int"]>;
-  applyingForFreeOfCharge?: InputMaybe<Scalars["Boolean"]>;
+  ageGroupPk?: Maybe<Scalars["Int"]>;
+  applyingForFreeOfCharge?: Maybe<Scalars["Boolean"]>;
   begin: Scalars["DateTime"];
-  billingAddressCity?: InputMaybe<Scalars["String"]>;
-  billingAddressStreet?: InputMaybe<Scalars["String"]>;
-  billingAddressZip?: InputMaybe<Scalars["String"]>;
-  billingEmail?: InputMaybe<Scalars["String"]>;
-  billingFirstName?: InputMaybe<Scalars["String"]>;
-  billingLastName?: InputMaybe<Scalars["String"]>;
-  billingPhone?: InputMaybe<Scalars["String"]>;
-  bufferTimeAfter?: InputMaybe<Scalars["String"]>;
-  bufferTimeBefore?: InputMaybe<Scalars["String"]>;
-  clientMutationId?: InputMaybe<Scalars["String"]>;
-  description?: InputMaybe<Scalars["String"]>;
+  billingAddressCity?: Maybe<Scalars["String"]>;
+  billingAddressStreet?: Maybe<Scalars["String"]>;
+  billingAddressZip?: Maybe<Scalars["String"]>;
+  billingEmail?: Maybe<Scalars["String"]>;
+  billingFirstName?: Maybe<Scalars["String"]>;
+  billingLastName?: Maybe<Scalars["String"]>;
+  billingPhone?: Maybe<Scalars["String"]>;
+  bufferTimeAfter?: Maybe<Scalars["Int"]>;
+  bufferTimeBefore?: Maybe<Scalars["Int"]>;
+  clientMutationId?: Maybe<Scalars["String"]>;
+  description?: Maybe<Scalars["String"]>;
   end: Scalars["DateTime"];
-  freeOfChargeReason?: InputMaybe<Scalars["String"]>;
-  homeCityPk?: InputMaybe<Scalars["Int"]>;
-  name?: InputMaybe<Scalars["String"]>;
-  numPersons?: InputMaybe<Scalars["Int"]>;
-  priority?: InputMaybe<Scalars["Int"]>;
-  purposePk?: InputMaybe<Scalars["Int"]>;
-  reservationUnitPks: Array<InputMaybe<Scalars["Int"]>>;
-  reserveeAddressCity?: InputMaybe<Scalars["String"]>;
-  reserveeAddressStreet?: InputMaybe<Scalars["String"]>;
-  reserveeAddressZip?: InputMaybe<Scalars["String"]>;
-  reserveeEmail?: InputMaybe<Scalars["String"]>;
-  reserveeFirstName?: InputMaybe<Scalars["String"]>;
+  freeOfChargeReason?: Maybe<Scalars["String"]>;
+  homeCityPk?: Maybe<Scalars["Int"]>;
+  name?: Maybe<Scalars["String"]>;
+  numPersons?: Maybe<Scalars["Int"]>;
+  priority?: Maybe<Scalars["Int"]>;
+  purposePk?: Maybe<Scalars["Int"]>;
+  reservationUnitPks: Array<Maybe<Scalars["Int"]>>;
+  reserveeAddressCity?: Maybe<Scalars["String"]>;
+  reserveeAddressStreet?: Maybe<Scalars["String"]>;
+  reserveeAddressZip?: Maybe<Scalars["String"]>;
+  reserveeEmail?: Maybe<Scalars["String"]>;
+  reserveeFirstName?: Maybe<Scalars["String"]>;
   /** Reservee's business or association identity code */
-  reserveeId?: InputMaybe<Scalars["String"]>;
-  reserveeIsUnregisteredAssociation?: InputMaybe<Scalars["Boolean"]>;
-  reserveeLastName?: InputMaybe<Scalars["String"]>;
-  reserveeOrganisationName?: InputMaybe<Scalars["String"]>;
-  reserveePhone?: InputMaybe<Scalars["String"]>;
+  reserveeId?: Maybe<Scalars["String"]>;
+  reserveeIsUnregisteredAssociation?: Maybe<Scalars["Boolean"]>;
+  reserveeLastName?: Maybe<Scalars["String"]>;
+  reserveeOrganisationName?: Maybe<Scalars["String"]>;
+  reserveePhone?: Maybe<Scalars["String"]>;
   /** Type of the reservee. Possible values are BUSINESS, NONPROFIT, INDIVIDUAL. */
-  reserveeType?: InputMaybe<Scalars["String"]>;
+  reserveeType?: Maybe<Scalars["String"]>;
 };
 
 export type ReservationCreateMutationPayload = {
@@ -1194,8 +1241,8 @@ export type ReservationCreateMutationPayload = {
   billingFirstName?: Maybe<Scalars["String"]>;
   billingLastName?: Maybe<Scalars["String"]>;
   billingPhone?: Maybe<Scalars["String"]>;
-  bufferTimeAfter?: Maybe<Scalars["String"]>;
-  bufferTimeBefore?: Maybe<Scalars["String"]>;
+  bufferTimeAfter?: Maybe<Scalars["Int"]>;
+  bufferTimeBefore?: Maybe<Scalars["Int"]>;
   clientMutationId?: Maybe<Scalars["String"]>;
   confirmedAt?: Maybe<Scalars["DateTime"]>;
   description?: Maybe<Scalars["String"]>;
@@ -1233,28 +1280,56 @@ export type ReservationCreateMutationPayload = {
   unitPrice?: Maybe<Scalars["Float"]>;
 };
 
-export type ReservationHandleMutationInput = {
-  /** Will this reservation be approved */
-  approve: Scalars["Boolean"];
-  clientMutationId?: InputMaybe<Scalars["String"]>;
-  /** Additional information for denying (if approve is false) */
-  denyDetails?: InputMaybe<Scalars["String"]>;
-  pk?: InputMaybe<Scalars["Int"]>;
+export type ReservationDenyMutationInput = {
+  clientMutationId?: Maybe<Scalars["String"]>;
+  /** Primary key for the pre-defined deny reason. */
+  denyReasonPk: Scalars["Int"];
+  /** Additional information for denying. */
+  handlingDetails?: Maybe<Scalars["String"]>;
+  pk?: Maybe<Scalars["Int"]>;
 };
 
-export type ReservationHandleMutationPayload = {
-  __typename?: "ReservationHandleMutationPayload";
-  /** Will this reservation be approved */
-  approve?: Maybe<Scalars["Boolean"]>;
+export type ReservationDenyMutationPayload = {
+  __typename?: "ReservationDenyMutationPayload";
   clientMutationId?: Maybe<Scalars["String"]>;
-  /** Additional information for denying (if approve is false) */
-  denyDetails?: Maybe<Scalars["String"]>;
+  /** Primary key for the pre-defined deny reason. */
+  denyReasonPk?: Maybe<Scalars["Int"]>;
   /** May contain more than one error for same field. */
   errors?: Maybe<Array<Maybe<ErrorType>>>;
   /** When this reservation was handled. */
   handledAt?: Maybe<Scalars["DateTime"]>;
+  /** Additional information for denying. */
+  handlingDetails?: Maybe<Scalars["String"]>;
   pk?: Maybe<Scalars["Int"]>;
   state?: Maybe<State>;
+};
+
+export type ReservationDenyReasonType = Node & {
+  __typename?: "ReservationDenyReasonType";
+  /** The ID of the object */
+  id: Scalars["ID"];
+  pk?: Maybe<Scalars["Int"]>;
+  reason: Scalars["String"];
+  reasonEn?: Maybe<Scalars["String"]>;
+  reasonFi?: Maybe<Scalars["String"]>;
+  reasonSv?: Maybe<Scalars["String"]>;
+};
+
+export type ReservationDenyReasonTypeConnection = {
+  __typename?: "ReservationDenyReasonTypeConnection";
+  /** Contains the nodes in this connection. */
+  edges: Array<Maybe<ReservationDenyReasonTypeEdge>>;
+  /** Pagination data for this connection. */
+  pageInfo: PageInfo;
+};
+
+/** A Relay edge containing a `ReservationDenyReasonType` and its cursor. */
+export type ReservationDenyReasonTypeEdge = {
+  __typename?: "ReservationDenyReasonTypeEdge";
+  /** A cursor for use in pagination */
+  cursor: Scalars["String"];
+  /** The item at the end of the edge */
+  node?: Maybe<ReservationDenyReasonType>;
 };
 
 export type ReservationMetadataSetType = Node & {
@@ -1323,8 +1398,8 @@ export type ReservationType = Node & {
   billingFirstName: Scalars["String"];
   billingLastName: Scalars["String"];
   billingPhone: Scalars["String"];
-  bufferTimeAfter?: Maybe<Scalars["Float"]>;
-  bufferTimeBefore?: Maybe<Scalars["Float"]>;
+  bufferTimeAfter?: Maybe<Scalars["Duration"]>;
+  bufferTimeBefore?: Maybe<Scalars["Duration"]>;
   calendarUrl?: Maybe<Scalars["String"]>;
   description?: Maybe<Scalars["String"]>;
   end: Scalars["DateTime"];
@@ -1358,6 +1433,8 @@ export type ReservationType = Node & {
   taxPercentageValue?: Maybe<Scalars["Decimal"]>;
   unitPrice?: Maybe<Scalars["Float"]>;
   user?: Maybe<Scalars["String"]>;
+  /** Working memo for staff users. */
+  workingMemo?: Maybe<Scalars["String"]>;
 };
 
 export type ReservationTypeConnection = {
@@ -1383,8 +1460,8 @@ export type ReservationUnitByPkType = Node & {
   additionalInstructionsFi?: Maybe<Scalars["String"]>;
   additionalInstructionsSv?: Maybe<Scalars["String"]>;
   applicationRounds?: Maybe<Array<Maybe<ApplicationRoundType>>>;
-  bufferTimeAfter?: Maybe<Scalars["Time"]>;
-  bufferTimeBefore?: Maybe<Scalars["Time"]>;
+  bufferTimeAfter?: Maybe<Scalars["Duration"]>;
+  bufferTimeBefore?: Maybe<Scalars["Duration"]>;
   cancellationRule?: Maybe<ReservationUnitCancellationRuleType>;
   cancellationTerms?: Maybe<TermsOfUseType>;
   contactInformationEn?: Maybe<Scalars["String"]>;
@@ -1406,10 +1483,10 @@ export type ReservationUnitByPkType = Node & {
   /** Minimum price of the reservation unit */
   lowestPrice: Scalars["Decimal"];
   maxPersons?: Maybe<Scalars["Int"]>;
-  maxReservationDuration?: Maybe<Scalars["Time"]>;
+  maxReservationDuration?: Maybe<Scalars["Duration"]>;
   maxReservationsPerUser?: Maybe<Scalars["Int"]>;
   metadataSet?: Maybe<ReservationMetadataSetType>;
-  minReservationDuration?: Maybe<Scalars["Time"]>;
+  minReservationDuration?: Maybe<Scalars["Duration"]>;
   nameEn?: Maybe<Scalars["String"]>;
   nameFi?: Maybe<Scalars["String"]>;
   nameSv?: Maybe<Scalars["String"]>;
@@ -1447,20 +1524,20 @@ export type ReservationUnitByPkType = Node & {
 };
 
 export type ReservationUnitByPkTypeApplicationRoundsArgs = {
-  active?: InputMaybe<Scalars["Boolean"]>;
+  active?: Maybe<Scalars["Boolean"]>;
 };
 
 export type ReservationUnitByPkTypeOpeningHoursArgs = {
-  endDate?: InputMaybe<Scalars["Date"]>;
-  openingTimes?: InputMaybe<Scalars["Boolean"]>;
-  periods?: InputMaybe<Scalars["Boolean"]>;
-  startDate?: InputMaybe<Scalars["Date"]>;
+  endDate?: Maybe<Scalars["Date"]>;
+  openingTimes?: Maybe<Scalars["Boolean"]>;
+  periods?: Maybe<Scalars["Boolean"]>;
+  startDate?: Maybe<Scalars["Date"]>;
 };
 
 export type ReservationUnitByPkTypeReservationsArgs = {
-  from?: InputMaybe<Scalars["Date"]>;
-  state?: InputMaybe<Array<InputMaybe<Scalars["String"]>>>;
-  to?: InputMaybe<Scalars["Date"]>;
+  from?: Maybe<Scalars["Date"]>;
+  state?: Maybe<Array<Maybe<Scalars["String"]>>>;
+  to?: Maybe<Scalars["Date"]>;
 };
 
 export type ReservationUnitByPkTypeConnection = {
@@ -1511,60 +1588,60 @@ export type ReservationUnitCancellationRuleTypeEdge = {
 };
 
 export type ReservationUnitCreateMutationInput = {
-  additionalInstructionsEn?: InputMaybe<Scalars["String"]>;
-  additionalInstructionsFi?: InputMaybe<Scalars["String"]>;
-  additionalInstructionsSv?: InputMaybe<Scalars["String"]>;
-  bufferTimeAfter?: InputMaybe<Scalars["String"]>;
-  bufferTimeBefore?: InputMaybe<Scalars["String"]>;
-  cancellationRulePk?: InputMaybe<Scalars["Int"]>;
-  cancellationTermsPk?: InputMaybe<Scalars["String"]>;
-  clientMutationId?: InputMaybe<Scalars["String"]>;
-  contactInformationEn?: InputMaybe<Scalars["String"]>;
-  contactInformationFi?: InputMaybe<Scalars["String"]>;
-  contactInformationSv?: InputMaybe<Scalars["String"]>;
-  descriptionEn?: InputMaybe<Scalars["String"]>;
-  descriptionFi?: InputMaybe<Scalars["String"]>;
-  descriptionSv?: InputMaybe<Scalars["String"]>;
-  equipmentPks?: InputMaybe<Array<InputMaybe<Scalars["Int"]>>>;
+  additionalInstructionsEn?: Maybe<Scalars["String"]>;
+  additionalInstructionsFi?: Maybe<Scalars["String"]>;
+  additionalInstructionsSv?: Maybe<Scalars["String"]>;
+  bufferTimeAfter?: Maybe<Scalars["Int"]>;
+  bufferTimeBefore?: Maybe<Scalars["Int"]>;
+  cancellationRulePk?: Maybe<Scalars["Int"]>;
+  cancellationTermsPk?: Maybe<Scalars["String"]>;
+  clientMutationId?: Maybe<Scalars["String"]>;
+  contactInformationEn?: Maybe<Scalars["String"]>;
+  contactInformationFi?: Maybe<Scalars["String"]>;
+  contactInformationSv?: Maybe<Scalars["String"]>;
+  descriptionEn?: Maybe<Scalars["String"]>;
+  descriptionFi?: Maybe<Scalars["String"]>;
+  descriptionSv?: Maybe<Scalars["String"]>;
+  equipmentPks?: Maybe<Array<Maybe<Scalars["Int"]>>>;
   /** Maximum price of the reservation unit */
-  highestPrice?: InputMaybe<Scalars["Float"]>;
-  isDraft?: InputMaybe<Scalars["Boolean"]>;
+  highestPrice?: Maybe<Scalars["Float"]>;
+  isDraft?: Maybe<Scalars["Boolean"]>;
   /** Minimum price of the reservation unit */
-  lowestPrice?: InputMaybe<Scalars["Float"]>;
-  maxPersons?: InputMaybe<Scalars["Int"]>;
-  maxReservationDuration?: InputMaybe<Scalars["String"]>;
-  maxReservationsPerUser?: InputMaybe<Scalars["Int"]>;
-  metadataSetPk?: InputMaybe<Scalars["Int"]>;
-  minReservationDuration?: InputMaybe<Scalars["String"]>;
-  nameEn?: InputMaybe<Scalars["String"]>;
-  nameFi?: InputMaybe<Scalars["String"]>;
-  nameSv?: InputMaybe<Scalars["String"]>;
-  paymentTermsPk?: InputMaybe<Scalars["String"]>;
+  lowestPrice?: Maybe<Scalars["Float"]>;
+  maxPersons?: Maybe<Scalars["Int"]>;
+  maxReservationDuration?: Maybe<Scalars["Int"]>;
+  maxReservationsPerUser?: Maybe<Scalars["Int"]>;
+  metadataSetPk?: Maybe<Scalars["Int"]>;
+  minReservationDuration?: Maybe<Scalars["Int"]>;
+  nameEn?: Maybe<Scalars["String"]>;
+  nameFi?: Maybe<Scalars["String"]>;
+  nameSv?: Maybe<Scalars["String"]>;
+  paymentTermsPk?: Maybe<Scalars["String"]>;
   /** Unit of the price. Possible values are PER_15_MINS, PER_30_MINS, PER_HOUR, PER_HALF_DAY, PER_DAY, PER_WEEK, FIXED. */
-  priceUnit?: InputMaybe<Scalars["String"]>;
+  priceUnit?: Maybe<Scalars["String"]>;
   /** Time after this reservation unit should be publicly visible in UI. */
-  publishBegins?: InputMaybe<Scalars["DateTime"]>;
+  publishBegins?: Maybe<Scalars["DateTime"]>;
   /** Time after this reservation unit should not be publicly visible in UI. */
-  publishEnds?: InputMaybe<Scalars["DateTime"]>;
-  purposePks?: InputMaybe<Array<InputMaybe<Scalars["Int"]>>>;
+  publishEnds?: Maybe<Scalars["DateTime"]>;
+  purposePks?: Maybe<Array<Maybe<Scalars["Int"]>>>;
   /** Determines if introduction is required in order to reserve this reservation unit. */
-  requireIntroduction?: InputMaybe<Scalars["Boolean"]>;
+  requireIntroduction?: Maybe<Scalars["Boolean"]>;
   /** Time when making reservations become possible for this reservation unit. */
-  reservationBegins?: InputMaybe<Scalars["DateTime"]>;
+  reservationBegins?: Maybe<Scalars["DateTime"]>;
   /** Time when making reservations become not possible for this reservation unit */
-  reservationEnds?: InputMaybe<Scalars["DateTime"]>;
+  reservationEnds?: Maybe<Scalars["DateTime"]>;
   /** Determines the interval for the start time of the reservation. For example an interval of 15 minutes means a reservation can begin at minutes 0, 15, 30, or 45. Possible values are INTERVAL_15_MINS, INTERVAL_30_MINS, INTERVAL_60_MINS, INTERVAL_90_MINS. */
-  reservationStartInterval?: InputMaybe<Scalars["String"]>;
-  reservationUnitTypePk?: InputMaybe<Scalars["Int"]>;
-  resourcePks?: InputMaybe<Array<InputMaybe<Scalars["Int"]>>>;
-  servicePks?: InputMaybe<Array<InputMaybe<Scalars["Int"]>>>;
-  serviceSpecificTermsPk?: InputMaybe<Scalars["String"]>;
-  spacePks?: InputMaybe<Array<InputMaybe<Scalars["Int"]>>>;
-  surfaceArea?: InputMaybe<Scalars["Float"]>;
-  taxPercentagePk?: InputMaybe<Scalars["Int"]>;
-  termsOfUseEn?: InputMaybe<Scalars["String"]>;
-  termsOfUseFi?: InputMaybe<Scalars["String"]>;
-  termsOfUseSv?: InputMaybe<Scalars["String"]>;
+  reservationStartInterval?: Maybe<Scalars["String"]>;
+  reservationUnitTypePk?: Maybe<Scalars["Int"]>;
+  resourcePks?: Maybe<Array<Maybe<Scalars["Int"]>>>;
+  servicePks?: Maybe<Array<Maybe<Scalars["Int"]>>>;
+  serviceSpecificTermsPk?: Maybe<Scalars["String"]>;
+  spacePks?: Maybe<Array<Maybe<Scalars["Int"]>>>;
+  surfaceArea?: Maybe<Scalars["Float"]>;
+  taxPercentagePk?: Maybe<Scalars["Int"]>;
+  termsOfUseEn?: Maybe<Scalars["String"]>;
+  termsOfUseFi?: Maybe<Scalars["String"]>;
+  termsOfUseSv?: Maybe<Scalars["String"]>;
   unitPk: Scalars["Int"];
 };
 
@@ -1573,8 +1650,8 @@ export type ReservationUnitCreateMutationPayload = {
   additionalInstructionsEn?: Maybe<Scalars["String"]>;
   additionalInstructionsFi?: Maybe<Scalars["String"]>;
   additionalInstructionsSv?: Maybe<Scalars["String"]>;
-  bufferTimeAfter?: Maybe<Scalars["String"]>;
-  bufferTimeBefore?: Maybe<Scalars["String"]>;
+  bufferTimeAfter?: Maybe<Scalars["Int"]>;
+  bufferTimeBefore?: Maybe<Scalars["Int"]>;
   building?: Maybe<Scalars["String"]>;
   cancellationRulePk?: Maybe<Scalars["Int"]>;
   clientMutationId?: Maybe<Scalars["String"]>;
@@ -1596,9 +1673,9 @@ export type ReservationUnitCreateMutationPayload = {
   /** Minimum price of the reservation unit */
   lowestPrice?: Maybe<Scalars["Float"]>;
   maxPersons?: Maybe<Scalars["Int"]>;
-  maxReservationDuration?: Maybe<Scalars["String"]>;
+  maxReservationDuration?: Maybe<Scalars["Int"]>;
   maxReservationsPerUser?: Maybe<Scalars["Int"]>;
-  minReservationDuration?: Maybe<Scalars["String"]>;
+  minReservationDuration?: Maybe<Scalars["Int"]>;
   nameEn?: Maybe<Scalars["String"]>;
   nameFi?: Maybe<Scalars["String"]>;
   nameSv?: Maybe<Scalars["String"]>;
@@ -1642,8 +1719,8 @@ export type ReservationUnitHaukiUrlType = {
 };
 
 export type ReservationUnitImageCreateMutationInput = {
-  clientMutationId?: InputMaybe<Scalars["String"]>;
-  image?: InputMaybe<Scalars["Upload"]>;
+  clientMutationId?: Maybe<Scalars["String"]>;
+  image?: Maybe<Scalars["Upload"]>;
   /** Type of image. Value is one of image_type enum values: MAIN, GROUND_PLAN, MAP, OTHER. */
   imageType: Scalars["String"];
   reservationUnitPk: Scalars["Int"];
@@ -1662,7 +1739,7 @@ export type ReservationUnitImageCreateMutationPayload = {
 };
 
 export type ReservationUnitImageDeleteMutationInput = {
-  clientMutationId?: InputMaybe<Scalars["String"]>;
+  clientMutationId?: Maybe<Scalars["String"]>;
   pk: Scalars["Int"];
 };
 
@@ -1683,9 +1760,9 @@ export type ReservationUnitImageType = {
 };
 
 export type ReservationUnitImageUpdateMutationInput = {
-  clientMutationId?: InputMaybe<Scalars["String"]>;
+  clientMutationId?: Maybe<Scalars["String"]>;
   /** Type of image. Value is one of image_type enum values: MAIN, GROUND_PLAN, MAP, OTHER. */
-  imageType?: InputMaybe<Scalars["String"]>;
+  imageType?: Maybe<Scalars["String"]>;
   pk: Scalars["Int"];
 };
 
@@ -1707,8 +1784,8 @@ export type ReservationUnitType = Node & {
   additionalInstructionsFi?: Maybe<Scalars["String"]>;
   additionalInstructionsSv?: Maybe<Scalars["String"]>;
   applicationRounds?: Maybe<Array<Maybe<ApplicationRoundType>>>;
-  bufferTimeAfter?: Maybe<Scalars["Time"]>;
-  bufferTimeBefore?: Maybe<Scalars["Time"]>;
+  bufferTimeAfter?: Maybe<Scalars["Duration"]>;
+  bufferTimeBefore?: Maybe<Scalars["Duration"]>;
   cancellationRule?: Maybe<ReservationUnitCancellationRuleType>;
   cancellationTerms?: Maybe<TermsOfUseType>;
   contactInformationEn?: Maybe<Scalars["String"]>;
@@ -1729,10 +1806,10 @@ export type ReservationUnitType = Node & {
   /** Minimum price of the reservation unit */
   lowestPrice: Scalars["Decimal"];
   maxPersons?: Maybe<Scalars["Int"]>;
-  maxReservationDuration?: Maybe<Scalars["Time"]>;
+  maxReservationDuration?: Maybe<Scalars["Duration"]>;
   maxReservationsPerUser?: Maybe<Scalars["Int"]>;
   metadataSet?: Maybe<ReservationMetadataSetType>;
-  minReservationDuration?: Maybe<Scalars["Time"]>;
+  minReservationDuration?: Maybe<Scalars["Duration"]>;
   nameEn?: Maybe<Scalars["String"]>;
   nameFi?: Maybe<Scalars["String"]>;
   nameSv?: Maybe<Scalars["String"]>;
@@ -1768,13 +1845,13 @@ export type ReservationUnitType = Node & {
 };
 
 export type ReservationUnitTypeApplicationRoundsArgs = {
-  active?: InputMaybe<Scalars["Boolean"]>;
+  active?: Maybe<Scalars["Boolean"]>;
 };
 
 export type ReservationUnitTypeReservationsArgs = {
-  from?: InputMaybe<Scalars["Date"]>;
-  state?: InputMaybe<Array<InputMaybe<Scalars["String"]>>>;
-  to?: InputMaybe<Scalars["Date"]>;
+  from?: Maybe<Scalars["Date"]>;
+  state?: Maybe<Array<Maybe<Scalars["String"]>>>;
+  to?: Maybe<Scalars["Date"]>;
 };
 
 export type ReservationUnitTypeConnection = {
@@ -1822,62 +1899,62 @@ export type ReservationUnitTypeTypeEdge = {
 };
 
 export type ReservationUnitUpdateMutationInput = {
-  additionalInstructionsEn?: InputMaybe<Scalars["String"]>;
-  additionalInstructionsFi?: InputMaybe<Scalars["String"]>;
-  additionalInstructionsSv?: InputMaybe<Scalars["String"]>;
-  bufferTimeAfter?: InputMaybe<Scalars["String"]>;
-  bufferTimeBefore?: InputMaybe<Scalars["String"]>;
-  cancellationRulePk?: InputMaybe<Scalars["Int"]>;
-  cancellationTermsPk?: InputMaybe<Scalars["String"]>;
-  clientMutationId?: InputMaybe<Scalars["String"]>;
-  contactInformationEn?: InputMaybe<Scalars["String"]>;
-  contactInformationFi?: InputMaybe<Scalars["String"]>;
-  contactInformationSv?: InputMaybe<Scalars["String"]>;
-  descriptionEn?: InputMaybe<Scalars["String"]>;
-  descriptionFi?: InputMaybe<Scalars["String"]>;
-  descriptionSv?: InputMaybe<Scalars["String"]>;
-  equipmentPks?: InputMaybe<Array<InputMaybe<Scalars["Int"]>>>;
+  additionalInstructionsEn?: Maybe<Scalars["String"]>;
+  additionalInstructionsFi?: Maybe<Scalars["String"]>;
+  additionalInstructionsSv?: Maybe<Scalars["String"]>;
+  bufferTimeAfter?: Maybe<Scalars["Int"]>;
+  bufferTimeBefore?: Maybe<Scalars["Int"]>;
+  cancellationRulePk?: Maybe<Scalars["Int"]>;
+  cancellationTermsPk?: Maybe<Scalars["String"]>;
+  clientMutationId?: Maybe<Scalars["String"]>;
+  contactInformationEn?: Maybe<Scalars["String"]>;
+  contactInformationFi?: Maybe<Scalars["String"]>;
+  contactInformationSv?: Maybe<Scalars["String"]>;
+  descriptionEn?: Maybe<Scalars["String"]>;
+  descriptionFi?: Maybe<Scalars["String"]>;
+  descriptionSv?: Maybe<Scalars["String"]>;
+  equipmentPks?: Maybe<Array<Maybe<Scalars["Int"]>>>;
   /** Maximum price of the reservation unit */
-  highestPrice?: InputMaybe<Scalars["Float"]>;
-  isDraft?: InputMaybe<Scalars["Boolean"]>;
+  highestPrice?: Maybe<Scalars["Float"]>;
+  isDraft?: Maybe<Scalars["Boolean"]>;
   /** Minimum price of the reservation unit */
-  lowestPrice?: InputMaybe<Scalars["Float"]>;
-  maxPersons?: InputMaybe<Scalars["Int"]>;
-  maxReservationDuration?: InputMaybe<Scalars["String"]>;
-  maxReservationsPerUser?: InputMaybe<Scalars["Int"]>;
-  metadataSetPk?: InputMaybe<Scalars["Int"]>;
-  minReservationDuration?: InputMaybe<Scalars["String"]>;
-  nameEn?: InputMaybe<Scalars["String"]>;
-  nameFi?: InputMaybe<Scalars["String"]>;
-  nameSv?: InputMaybe<Scalars["String"]>;
-  paymentTermsPk?: InputMaybe<Scalars["String"]>;
+  lowestPrice?: Maybe<Scalars["Float"]>;
+  maxPersons?: Maybe<Scalars["Int"]>;
+  maxReservationDuration?: Maybe<Scalars["Int"]>;
+  maxReservationsPerUser?: Maybe<Scalars["Int"]>;
+  metadataSetPk?: Maybe<Scalars["Int"]>;
+  minReservationDuration?: Maybe<Scalars["Int"]>;
+  nameEn?: Maybe<Scalars["String"]>;
+  nameFi?: Maybe<Scalars["String"]>;
+  nameSv?: Maybe<Scalars["String"]>;
+  paymentTermsPk?: Maybe<Scalars["String"]>;
   pk: Scalars["Int"];
   /** Unit of the price. Possible values are PER_15_MINS, PER_30_MINS, PER_HOUR, PER_HALF_DAY, PER_DAY, PER_WEEK, FIXED. */
-  priceUnit?: InputMaybe<Scalars["String"]>;
+  priceUnit?: Maybe<Scalars["String"]>;
   /** Time after this reservation unit should be publicly visible in UI. */
-  publishBegins?: InputMaybe<Scalars["DateTime"]>;
+  publishBegins?: Maybe<Scalars["DateTime"]>;
   /** Time after this reservation unit should not be publicly visible in UI. */
-  publishEnds?: InputMaybe<Scalars["DateTime"]>;
-  purposePks?: InputMaybe<Array<InputMaybe<Scalars["Int"]>>>;
+  publishEnds?: Maybe<Scalars["DateTime"]>;
+  purposePks?: Maybe<Array<Maybe<Scalars["Int"]>>>;
   /** Determines if introduction is required in order to reserve this reservation unit. */
-  requireIntroduction?: InputMaybe<Scalars["Boolean"]>;
+  requireIntroduction?: Maybe<Scalars["Boolean"]>;
   /** Time when making reservations become possible for this reservation unit. */
-  reservationBegins?: InputMaybe<Scalars["DateTime"]>;
+  reservationBegins?: Maybe<Scalars["DateTime"]>;
   /** Time when making reservations become not possible for this reservation unit */
-  reservationEnds?: InputMaybe<Scalars["DateTime"]>;
+  reservationEnds?: Maybe<Scalars["DateTime"]>;
   /** Determines the interval for the start time of the reservation. For example an interval of 15 minutes means a reservation can begin at minutes 0, 15, 30, or 45. Possible values are INTERVAL_15_MINS, INTERVAL_30_MINS, INTERVAL_60_MINS, INTERVAL_90_MINS. */
-  reservationStartInterval?: InputMaybe<Scalars["String"]>;
-  reservationUnitTypePk?: InputMaybe<Scalars["Int"]>;
-  resourcePks?: InputMaybe<Array<InputMaybe<Scalars["Int"]>>>;
-  servicePks?: InputMaybe<Array<InputMaybe<Scalars["Int"]>>>;
-  serviceSpecificTermsPk?: InputMaybe<Scalars["String"]>;
-  spacePks?: InputMaybe<Array<InputMaybe<Scalars["Int"]>>>;
-  surfaceArea?: InputMaybe<Scalars["Float"]>;
-  taxPercentagePk?: InputMaybe<Scalars["Int"]>;
-  termsOfUseEn?: InputMaybe<Scalars["String"]>;
-  termsOfUseFi?: InputMaybe<Scalars["String"]>;
-  termsOfUseSv?: InputMaybe<Scalars["String"]>;
-  unitPk?: InputMaybe<Scalars["Int"]>;
+  reservationStartInterval?: Maybe<Scalars["String"]>;
+  reservationUnitTypePk?: Maybe<Scalars["Int"]>;
+  resourcePks?: Maybe<Array<Maybe<Scalars["Int"]>>>;
+  servicePks?: Maybe<Array<Maybe<Scalars["Int"]>>>;
+  serviceSpecificTermsPk?: Maybe<Scalars["String"]>;
+  spacePks?: Maybe<Array<Maybe<Scalars["Int"]>>>;
+  surfaceArea?: Maybe<Scalars["Float"]>;
+  taxPercentagePk?: Maybe<Scalars["Int"]>;
+  termsOfUseEn?: Maybe<Scalars["String"]>;
+  termsOfUseFi?: Maybe<Scalars["String"]>;
+  termsOfUseSv?: Maybe<Scalars["String"]>;
+  unitPk?: Maybe<Scalars["Int"]>;
 };
 
 export type ReservationUnitUpdateMutationPayload = {
@@ -1885,8 +1962,8 @@ export type ReservationUnitUpdateMutationPayload = {
   additionalInstructionsEn?: Maybe<Scalars["String"]>;
   additionalInstructionsFi?: Maybe<Scalars["String"]>;
   additionalInstructionsSv?: Maybe<Scalars["String"]>;
-  bufferTimeAfter?: Maybe<Scalars["String"]>;
-  bufferTimeBefore?: Maybe<Scalars["String"]>;
+  bufferTimeAfter?: Maybe<Scalars["Int"]>;
+  bufferTimeBefore?: Maybe<Scalars["Int"]>;
   building?: Maybe<Scalars["String"]>;
   cancellationRulePk?: Maybe<Scalars["Int"]>;
   clientMutationId?: Maybe<Scalars["String"]>;
@@ -1908,9 +1985,9 @@ export type ReservationUnitUpdateMutationPayload = {
   /** Minimum price of the reservation unit */
   lowestPrice?: Maybe<Scalars["Float"]>;
   maxPersons?: Maybe<Scalars["Int"]>;
-  maxReservationDuration?: Maybe<Scalars["String"]>;
+  maxReservationDuration?: Maybe<Scalars["Int"]>;
   maxReservationsPerUser?: Maybe<Scalars["Int"]>;
-  minReservationDuration?: Maybe<Scalars["String"]>;
+  minReservationDuration?: Maybe<Scalars["Int"]>;
   nameEn?: Maybe<Scalars["String"]>;
   nameFi?: Maybe<Scalars["String"]>;
   nameSv?: Maybe<Scalars["String"]>;
@@ -1991,44 +2068,44 @@ export enum ReservationUnitsReservationUnitReservationStartIntervalChoices {
 }
 
 export type ReservationUpdateMutationInput = {
-  ageGroupPk?: InputMaybe<Scalars["Int"]>;
-  applyingForFreeOfCharge?: InputMaybe<Scalars["Boolean"]>;
-  begin?: InputMaybe<Scalars["DateTime"]>;
-  billingAddressCity?: InputMaybe<Scalars["String"]>;
-  billingAddressStreet?: InputMaybe<Scalars["String"]>;
-  billingAddressZip?: InputMaybe<Scalars["String"]>;
-  billingEmail?: InputMaybe<Scalars["String"]>;
-  billingFirstName?: InputMaybe<Scalars["String"]>;
-  billingLastName?: InputMaybe<Scalars["String"]>;
-  billingPhone?: InputMaybe<Scalars["String"]>;
-  bufferTimeAfter?: InputMaybe<Scalars["String"]>;
-  bufferTimeBefore?: InputMaybe<Scalars["String"]>;
-  clientMutationId?: InputMaybe<Scalars["String"]>;
-  description?: InputMaybe<Scalars["String"]>;
-  end?: InputMaybe<Scalars["DateTime"]>;
-  freeOfChargeReason?: InputMaybe<Scalars["String"]>;
-  homeCityPk?: InputMaybe<Scalars["Int"]>;
-  name?: InputMaybe<Scalars["String"]>;
-  numPersons?: InputMaybe<Scalars["Int"]>;
+  ageGroupPk?: Maybe<Scalars["Int"]>;
+  applyingForFreeOfCharge?: Maybe<Scalars["Boolean"]>;
+  begin?: Maybe<Scalars["DateTime"]>;
+  billingAddressCity?: Maybe<Scalars["String"]>;
+  billingAddressStreet?: Maybe<Scalars["String"]>;
+  billingAddressZip?: Maybe<Scalars["String"]>;
+  billingEmail?: Maybe<Scalars["String"]>;
+  billingFirstName?: Maybe<Scalars["String"]>;
+  billingLastName?: Maybe<Scalars["String"]>;
+  billingPhone?: Maybe<Scalars["String"]>;
+  bufferTimeAfter?: Maybe<Scalars["Int"]>;
+  bufferTimeBefore?: Maybe<Scalars["Int"]>;
+  clientMutationId?: Maybe<Scalars["String"]>;
+  description?: Maybe<Scalars["String"]>;
+  end?: Maybe<Scalars["DateTime"]>;
+  freeOfChargeReason?: Maybe<Scalars["String"]>;
+  homeCityPk?: Maybe<Scalars["Int"]>;
+  name?: Maybe<Scalars["String"]>;
+  numPersons?: Maybe<Scalars["Int"]>;
   pk: Scalars["Int"];
-  priority?: InputMaybe<Scalars["Int"]>;
-  purposePk?: InputMaybe<Scalars["Int"]>;
-  reservationUnitPks?: InputMaybe<Array<InputMaybe<Scalars["Int"]>>>;
-  reserveeAddressCity?: InputMaybe<Scalars["String"]>;
-  reserveeAddressStreet?: InputMaybe<Scalars["String"]>;
-  reserveeAddressZip?: InputMaybe<Scalars["String"]>;
-  reserveeEmail?: InputMaybe<Scalars["String"]>;
-  reserveeFirstName?: InputMaybe<Scalars["String"]>;
+  priority?: Maybe<Scalars["Int"]>;
+  purposePk?: Maybe<Scalars["Int"]>;
+  reservationUnitPks?: Maybe<Array<Maybe<Scalars["Int"]>>>;
+  reserveeAddressCity?: Maybe<Scalars["String"]>;
+  reserveeAddressStreet?: Maybe<Scalars["String"]>;
+  reserveeAddressZip?: Maybe<Scalars["String"]>;
+  reserveeEmail?: Maybe<Scalars["String"]>;
+  reserveeFirstName?: Maybe<Scalars["String"]>;
   /** Reservee's business or association identity code */
-  reserveeId?: InputMaybe<Scalars["String"]>;
-  reserveeIsUnregisteredAssociation?: InputMaybe<Scalars["Boolean"]>;
-  reserveeLastName?: InputMaybe<Scalars["String"]>;
-  reserveeOrganisationName?: InputMaybe<Scalars["String"]>;
-  reserveePhone?: InputMaybe<Scalars["String"]>;
+  reserveeId?: Maybe<Scalars["String"]>;
+  reserveeIsUnregisteredAssociation?: Maybe<Scalars["Boolean"]>;
+  reserveeLastName?: Maybe<Scalars["String"]>;
+  reserveeOrganisationName?: Maybe<Scalars["String"]>;
+  reserveePhone?: Maybe<Scalars["String"]>;
   /** Type of the reservee. Possible values are BUSINESS, NONPROFIT, INDIVIDUAL. */
-  reserveeType?: InputMaybe<Scalars["String"]>;
-  /** String value for ReservationType's ReservationState enum. Possible values are CREATED, CANCELLED, CONFIRMED, DENIED. */
-  state?: InputMaybe<Scalars["String"]>;
+  reserveeType?: Maybe<Scalars["String"]>;
+  /** String value for ReservationType's ReservationState enum. Possible values are CREATED, CANCELLED, REQUIRES_HANDLING, CONFIRMED, DENIED. */
+  state?: Maybe<Scalars["String"]>;
 };
 
 export type ReservationUpdateMutationPayload = {
@@ -2043,8 +2120,8 @@ export type ReservationUpdateMutationPayload = {
   billingFirstName?: Maybe<Scalars["String"]>;
   billingLastName?: Maybe<Scalars["String"]>;
   billingPhone?: Maybe<Scalars["String"]>;
-  bufferTimeAfter?: Maybe<Scalars["String"]>;
-  bufferTimeBefore?: Maybe<Scalars["String"]>;
+  bufferTimeAfter?: Maybe<Scalars["Int"]>;
+  bufferTimeBefore?: Maybe<Scalars["Int"]>;
   clientMutationId?: Maybe<Scalars["String"]>;
   confirmedAt?: Maybe<Scalars["DateTime"]>;
   description?: Maybe<Scalars["String"]>;
@@ -2074,12 +2151,31 @@ export type ReservationUpdateMutationPayload = {
   reserveePhone?: Maybe<Scalars["String"]>;
   /** Type of the reservee. Possible values are BUSINESS, NONPROFIT, INDIVIDUAL. */
   reserveeType?: Maybe<Scalars["String"]>;
-  /** String value for ReservationType's ReservationState enum. Possible values are CREATED, CANCELLED, CONFIRMED, DENIED. */
+  /** String value for ReservationType's ReservationState enum. Possible values are CREATED, CANCELLED, REQUIRES_HANDLING, CONFIRMED, DENIED. */
   state?: Maybe<Scalars["String"]>;
   /** The value of the tax percentage for this particular reservation */
   taxPercentageValue?: Maybe<Scalars["Float"]>;
   /** The price of this particular reservation */
   unitPrice?: Maybe<Scalars["Float"]>;
+};
+
+export type ReservationWorkingMemoMutationInput = {
+  clientMutationId?: Maybe<Scalars["String"]>;
+  /** Primary key of the reservation */
+  pk?: Maybe<Scalars["Int"]>;
+  /** Working memo for staff users. */
+  workingMemo?: Maybe<Scalars["String"]>;
+};
+
+export type ReservationWorkingMemoMutationPayload = {
+  __typename?: "ReservationWorkingMemoMutationPayload";
+  clientMutationId?: Maybe<Scalars["String"]>;
+  /** May contain more than one error for same field. */
+  errors?: Maybe<Array<Maybe<ErrorType>>>;
+  /** Primary key of the reservation */
+  pk?: Maybe<Scalars["Int"]>;
+  /** Working memo for staff users. */
+  workingMemo?: Maybe<Scalars["String"]>;
 };
 
 /** An enumeration. */
@@ -2112,32 +2208,34 @@ export enum ReservationsReservationStateChoices {
   Created = "CREATED",
   /** denied */
   Denied = "DENIED",
+  /** requires_handling */
+  RequiresHandling = "REQUIRES_HANDLING",
 }
 
 export type ResourceCreateMutationInput = {
-  /** Begin date and time of the reservation. */
-  bufferTimeAfter?: InputMaybe<Scalars["String"]>;
   /** Buffer time while reservation unit is unreservable after the reservation. Dynamically calculated from spaces and resources. */
-  bufferTimeBefore?: InputMaybe<Scalars["String"]>;
-  clientMutationId?: InputMaybe<Scalars["String"]>;
-  descriptionEn?: InputMaybe<Scalars["String"]>;
-  descriptionFi?: InputMaybe<Scalars["String"]>;
-  descriptionSv?: InputMaybe<Scalars["String"]>;
-  isDraft?: InputMaybe<Scalars["Boolean"]>;
-  locationType?: InputMaybe<Scalars["String"]>;
-  nameEn?: InputMaybe<Scalars["String"]>;
-  nameFi?: InputMaybe<Scalars["String"]>;
-  nameSv?: InputMaybe<Scalars["String"]>;
+  bufferTimeAfter?: Maybe<Scalars["Int"]>;
+  /** Buffer time while reservation unit is unreservable before the reservation. Dynamically calculated from spaces and resources. */
+  bufferTimeBefore?: Maybe<Scalars["Int"]>;
+  clientMutationId?: Maybe<Scalars["String"]>;
+  descriptionEn?: Maybe<Scalars["String"]>;
+  descriptionFi?: Maybe<Scalars["String"]>;
+  descriptionSv?: Maybe<Scalars["String"]>;
+  isDraft?: Maybe<Scalars["Boolean"]>;
+  locationType?: Maybe<Scalars["String"]>;
+  nameEn?: Maybe<Scalars["String"]>;
+  nameFi?: Maybe<Scalars["String"]>;
+  nameSv?: Maybe<Scalars["String"]>;
   /** PK of the related space for this resource. */
-  spacePk?: InputMaybe<Scalars["Int"]>;
+  spacePk?: Maybe<Scalars["Int"]>;
 };
 
 export type ResourceCreateMutationPayload = {
   __typename?: "ResourceCreateMutationPayload";
-  /** Begin date and time of the reservation. */
-  bufferTimeAfter?: Maybe<Scalars["String"]>;
   /** Buffer time while reservation unit is unreservable after the reservation. Dynamically calculated from spaces and resources. */
-  bufferTimeBefore?: Maybe<Scalars["String"]>;
+  bufferTimeAfter?: Maybe<Scalars["Int"]>;
+  /** Buffer time while reservation unit is unreservable before the reservation. Dynamically calculated from spaces and resources. */
+  bufferTimeBefore?: Maybe<Scalars["Int"]>;
   clientMutationId?: Maybe<Scalars["String"]>;
   descriptionEn?: Maybe<Scalars["String"]>;
   descriptionFi?: Maybe<Scalars["String"]>;
@@ -2156,7 +2254,7 @@ export type ResourceCreateMutationPayload = {
 };
 
 export type ResourceDeleteMutationInput = {
-  clientMutationId?: InputMaybe<Scalars["String"]>;
+  clientMutationId?: Maybe<Scalars["String"]>;
   pk: Scalars["Int"];
 };
 
@@ -2169,8 +2267,8 @@ export type ResourceDeleteMutationPayload = {
 
 export type ResourceType = Node & {
   __typename?: "ResourceType";
-  bufferTimeAfter?: Maybe<Scalars["Float"]>;
-  bufferTimeBefore?: Maybe<Scalars["Float"]>;
+  bufferTimeAfter?: Maybe<Scalars["Duration"]>;
+  bufferTimeBefore?: Maybe<Scalars["Duration"]>;
   building?: Maybe<Array<Maybe<BuildingType>>>;
   descriptionEn?: Maybe<Scalars["String"]>;
   descriptionFi?: Maybe<Scalars["String"]>;
@@ -2204,30 +2302,30 @@ export type ResourceTypeEdge = {
 };
 
 export type ResourceUpdateMutationInput = {
-  /** Begin date and time of the reservation. */
-  bufferTimeAfter?: InputMaybe<Scalars["String"]>;
   /** Buffer time while reservation unit is unreservable after the reservation. Dynamically calculated from spaces and resources. */
-  bufferTimeBefore?: InputMaybe<Scalars["String"]>;
-  clientMutationId?: InputMaybe<Scalars["String"]>;
-  descriptionEn?: InputMaybe<Scalars["String"]>;
-  descriptionFi?: InputMaybe<Scalars["String"]>;
-  descriptionSv?: InputMaybe<Scalars["String"]>;
-  isDraft?: InputMaybe<Scalars["Boolean"]>;
-  locationType?: InputMaybe<Scalars["String"]>;
-  nameEn?: InputMaybe<Scalars["String"]>;
-  nameFi?: InputMaybe<Scalars["String"]>;
-  nameSv?: InputMaybe<Scalars["String"]>;
+  bufferTimeAfter?: Maybe<Scalars["Int"]>;
+  /** Buffer time while reservation unit is unreservable before the reservation. Dynamically calculated from spaces and resources. */
+  bufferTimeBefore?: Maybe<Scalars["Int"]>;
+  clientMutationId?: Maybe<Scalars["String"]>;
+  descriptionEn?: Maybe<Scalars["String"]>;
+  descriptionFi?: Maybe<Scalars["String"]>;
+  descriptionSv?: Maybe<Scalars["String"]>;
+  isDraft?: Maybe<Scalars["Boolean"]>;
+  locationType?: Maybe<Scalars["String"]>;
+  nameEn?: Maybe<Scalars["String"]>;
+  nameFi?: Maybe<Scalars["String"]>;
+  nameSv?: Maybe<Scalars["String"]>;
   pk: Scalars["Int"];
   /** PK of the related space for this resource. */
-  spacePk?: InputMaybe<Scalars["Int"]>;
+  spacePk?: Maybe<Scalars["Int"]>;
 };
 
 export type ResourceUpdateMutationPayload = {
   __typename?: "ResourceUpdateMutationPayload";
-  /** Begin date and time of the reservation. */
-  bufferTimeAfter?: Maybe<Scalars["String"]>;
   /** Buffer time while reservation unit is unreservable after the reservation. Dynamically calculated from spaces and resources. */
-  bufferTimeBefore?: Maybe<Scalars["String"]>;
+  bufferTimeAfter?: Maybe<Scalars["Int"]>;
+  /** Buffer time while reservation unit is unreservable before the reservation. Dynamically calculated from spaces and resources. */
+  bufferTimeBefore?: Maybe<Scalars["Int"]>;
   clientMutationId?: Maybe<Scalars["String"]>;
   descriptionEn?: Maybe<Scalars["String"]>;
   descriptionFi?: Maybe<Scalars["String"]>;
@@ -2255,8 +2353,8 @@ export enum ResourcesResourceLocationTypeChoices {
 
 export type ServiceType = Node & {
   __typename?: "ServiceType";
-  bufferTimeAfter?: Maybe<Scalars["String"]>;
-  bufferTimeBefore?: Maybe<Scalars["String"]>;
+  bufferTimeAfter?: Maybe<Scalars["Duration"]>;
+  bufferTimeBefore?: Maybe<Scalars["Duration"]>;
   /** The ID of the object */
   id: Scalars["ID"];
   nameEn?: Maybe<Scalars["String"]>;
@@ -2277,19 +2375,19 @@ export enum ServicesServiceServiceTypeChoices {
 }
 
 export type SpaceCreateMutationInput = {
-  clientMutationId?: InputMaybe<Scalars["String"]>;
-  code?: InputMaybe<Scalars["String"]>;
+  clientMutationId?: Maybe<Scalars["String"]>;
+  code?: Maybe<Scalars["String"]>;
   /** PK of the district for this space. */
-  districtPk?: InputMaybe<Scalars["Int"]>;
-  maxPersons?: InputMaybe<Scalars["Int"]>;
-  nameEn?: InputMaybe<Scalars["String"]>;
+  districtPk?: Maybe<Scalars["Int"]>;
+  maxPersons?: Maybe<Scalars["Int"]>;
+  nameEn?: Maybe<Scalars["String"]>;
   nameFi: Scalars["String"];
-  nameSv?: InputMaybe<Scalars["String"]>;
+  nameSv?: Maybe<Scalars["String"]>;
   /** PK of the parent space for this space. */
-  parentPk?: InputMaybe<Scalars["Int"]>;
+  parentPk?: Maybe<Scalars["Int"]>;
   /** Surface area of the space as square meters */
-  surfaceArea?: InputMaybe<Scalars["Float"]>;
-  unitPk?: InputMaybe<Scalars["Int"]>;
+  surfaceArea?: Maybe<Scalars["Float"]>;
+  unitPk?: Maybe<Scalars["Int"]>;
 };
 
 export type SpaceCreateMutationPayload = {
@@ -2314,7 +2412,7 @@ export type SpaceCreateMutationPayload = {
 };
 
 export type SpaceDeleteMutationInput = {
-  clientMutationId?: InputMaybe<Scalars["String"]>;
+  clientMutationId?: Maybe<Scalars["String"]>;
   pk: Scalars["Int"];
 };
 
@@ -2361,20 +2459,20 @@ export type SpaceTypeEdge = {
 };
 
 export type SpaceUpdateMutationInput = {
-  clientMutationId?: InputMaybe<Scalars["String"]>;
-  code?: InputMaybe<Scalars["String"]>;
+  clientMutationId?: Maybe<Scalars["String"]>;
+  code?: Maybe<Scalars["String"]>;
   /** PK of the district for this space. */
-  districtPk?: InputMaybe<Scalars["Int"]>;
-  maxPersons?: InputMaybe<Scalars["Int"]>;
-  nameEn?: InputMaybe<Scalars["String"]>;
-  nameFi?: InputMaybe<Scalars["String"]>;
-  nameSv?: InputMaybe<Scalars["String"]>;
+  districtPk?: Maybe<Scalars["Int"]>;
+  maxPersons?: Maybe<Scalars["Int"]>;
+  nameEn?: Maybe<Scalars["String"]>;
+  nameFi?: Maybe<Scalars["String"]>;
+  nameSv?: Maybe<Scalars["String"]>;
   /** PK of the parent space for this space. */
-  parentPk?: InputMaybe<Scalars["Int"]>;
+  parentPk?: Maybe<Scalars["Int"]>;
   pk: Scalars["Int"];
   /** Surface area of the space as square meters */
-  surfaceArea?: InputMaybe<Scalars["Float"]>;
-  unitPk?: InputMaybe<Scalars["Int"]>;
+  surfaceArea?: Maybe<Scalars["Float"]>;
+  unitPk?: Maybe<Scalars["Int"]>;
 };
 
 export type SpaceUpdateMutationPayload = {
@@ -2509,10 +2607,10 @@ export type UnitByPkType = Node & {
 };
 
 export type UnitByPkTypeOpeningHoursArgs = {
-  endDate?: InputMaybe<Scalars["Date"]>;
-  openingTimes?: InputMaybe<Scalars["Boolean"]>;
-  periods?: InputMaybe<Scalars["Boolean"]>;
-  startDate?: InputMaybe<Scalars["Date"]>;
+  endDate?: Maybe<Scalars["Date"]>;
+  openingTimes?: Maybe<Scalars["Boolean"]>;
+  periods?: Maybe<Scalars["Boolean"]>;
+  startDate?: Maybe<Scalars["Date"]>;
 };
 
 export type UnitType = Node & {
@@ -2556,21 +2654,21 @@ export type UnitTypeEdge = {
 };
 
 export type UnitUpdateMutationInput = {
-  clientMutationId?: InputMaybe<Scalars["String"]>;
-  descriptionEn?: InputMaybe<Scalars["String"]>;
-  descriptionFi?: InputMaybe<Scalars["String"]>;
-  descriptionSv?: InputMaybe<Scalars["String"]>;
-  email?: InputMaybe<Scalars["String"]>;
-  nameEn?: InputMaybe<Scalars["String"]>;
-  nameFi?: InputMaybe<Scalars["String"]>;
-  nameSv?: InputMaybe<Scalars["String"]>;
-  phone?: InputMaybe<Scalars["String"]>;
+  clientMutationId?: Maybe<Scalars["String"]>;
+  descriptionEn?: Maybe<Scalars["String"]>;
+  descriptionFi?: Maybe<Scalars["String"]>;
+  descriptionSv?: Maybe<Scalars["String"]>;
+  email?: Maybe<Scalars["String"]>;
+  nameEn?: Maybe<Scalars["String"]>;
+  nameFi?: Maybe<Scalars["String"]>;
+  nameSv?: Maybe<Scalars["String"]>;
+  phone?: Maybe<Scalars["String"]>;
   pk: Scalars["Int"];
-  shortDescriptionEn?: InputMaybe<Scalars["String"]>;
-  shortDescriptionFi?: InputMaybe<Scalars["String"]>;
-  shortDescriptionSv?: InputMaybe<Scalars["String"]>;
-  tprekId?: InputMaybe<Scalars["String"]>;
-  webPage?: InputMaybe<Scalars["String"]>;
+  shortDescriptionEn?: Maybe<Scalars["String"]>;
+  shortDescriptionFi?: Maybe<Scalars["String"]>;
+  shortDescriptionSv?: Maybe<Scalars["String"]>;
+  tprekId?: Maybe<Scalars["String"]>;
+  webPage?: Maybe<Scalars["String"]>;
 };
 
 export type UnitUpdateMutationPayload = {
@@ -2605,4 +2703,6 @@ export enum State {
   Created = "CREATED",
   /** denied */
   Denied = "DENIED",
+  /** requires_handling */
+  RequiresHandling = "REQUIRES_HANDLING",
 }
