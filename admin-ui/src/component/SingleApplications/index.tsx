@@ -6,6 +6,7 @@ import styled from "styled-components";
 import {
   Query,
   QueryReservationsArgs,
+  ReservationsReservationStateChoices,
   ReservationType,
 } from "../../common/gql-types";
 import { RESERVATIONS_QUERY } from "../../common/queries";
@@ -129,7 +130,9 @@ const SingleApplicationsView = (): JSX.Element => {
   const { loading } = useQuery<Query, QueryReservationsArgs>(
     RESERVATIONS_QUERY,
     {
-      variables: { handlingRequired: true },
+      variables: {
+        state: ReservationsReservationStateChoices.RequiresHandling,
+      },
       fetchPolicy: "network-only",
       onCompleted: ({ reservations }) => {
         if (reservations) {
