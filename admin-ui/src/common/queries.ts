@@ -607,6 +607,7 @@ export const RESERVATIONS_QUERY = gql`
         node {
           pk
           workingMemo
+          state
           reservationUnits {
             nameFi
             unit {
