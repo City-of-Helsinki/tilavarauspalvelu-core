@@ -47,6 +47,21 @@ const StyledDataTable = styled(DataTable)`
   }
 `;
 
+const RedDot = styled.div`
+  border-radius: 50%;
+  background-color: red;
+  width: 1em;
+  height: 1em;
+  margin-right: 0.5em;
+`;
+
+const AlignVertically = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+`;
+
 const getCellConfig = (t: TFunction): CellConfig => {
   return {
     cols: [
@@ -99,18 +114,25 @@ const getCellConfig = (t: TFunction): CellConfig => {
       },
       {
         title: t("SingleApplications.heading.price"),
-        key: "resourceType",
-        transform: ({ price }: ReservationType) => (
-          <div
-            style={{
-              display: "flex",
-              alignContent: "center",
-              justifyContent: "space-between",
-            }}
-          >
-            <span>{price || "-"}</span>
-            <IconArrowRight />
-          </div>
+        key: "price",
+        transform: ({ price }: ReservationType) => <div>{price || "-"}</div>,
+      },
+      {
+        title: t("SingleApplications.heading.state"),
+        key: "state",
+        transform: ({ state }: ReservationType) => (
+          <AlignVertically>
+            <AlignVertically>
+              {state ===
+              ReservationsReservationStateChoices.RequiresHandling ? (
+                <RedDot />
+              ) : (
+                <span />
+              )}
+              <div>{t(`SingleApplication.state.${state}`)}</div>
+            </AlignVertically>
+            <IconArrowRight size="m" style={{ marginLeft: "1em" }} />
+          </AlignVertically>
         ),
       },
     ],

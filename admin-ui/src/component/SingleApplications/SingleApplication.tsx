@@ -1,10 +1,10 @@
 import { useMutation, useQuery } from "@apollo/client";
+import { get } from "lodash";
 import {
   Accordion,
   Button,
   IconCalendar,
   IconLocation,
-  IconSpeechbubbleText,
   IconTicket,
   Tag,
   TextArea,
@@ -149,7 +149,6 @@ const SingleApplication = (): JSX.Element | null => {
       onCompleted: ({ reservationByPk }) => {
         if (reservationByPk) {
           setReservation(reservationByPk);
-          console.log("setting workingg memo to:", reservationByPk.workingMemo);
           setWorkingMemo(reservationByPk.workingMemo || "");
         }
       },
@@ -172,9 +171,6 @@ const SingleApplication = (): JSX.Element | null => {
     return null;
   }
 
-  console.log("rendering with", reservation);
-  console.log("working memo", workingMemo);
-
   return (
     <>
       <ContentContainer style={{ minHeight: "100%" }}>
@@ -187,9 +183,8 @@ const SingleApplication = (): JSX.Element | null => {
             <AlignVertically>
               <H1>{t("SingleApplication.heading")}</H1>
               <StyledTag>
-                {t(`SingleApplication.status.${reservation.state}`)}
+                {t(`SingleApplication.state.${reservation.state}`)}
               </StyledTag>
-              <IconSpeechbubbleText style={{ minWidth: "1.5em" }} />
             </AlignVertically>
             <ApplicationHeader>
               <ReservationUnitName>
@@ -218,7 +213,7 @@ const SingleApplication = (): JSX.Element | null => {
             </ApplicationHeader>
             <Accordion
               heading={t("SingleApplication.workingMemo")}
-              initiallyOpen={reservation.workingMemo !== undefined}
+              initiallyOpen={get(reservation, "workingMemo.length") > 0}
             >
               <WorkingMemoContainer>
                 <TextArea
@@ -333,8 +328,14 @@ const SingleApplication = (): JSX.Element | null => {
               setModalContent(
                 <DenyDialog
                   reservation={reservation}
-                  onReject={() => setModalContent(null)}
-                  onClose={() => setModalContent(null)}
+                  onReject={() => {
+                    setModalContent(null);
+                    refetch();
+                  }}
+                  onClose={() => {
+                    setModalContent(null);
+                    refetch();
+                  }}
                 />,
                 true
               );

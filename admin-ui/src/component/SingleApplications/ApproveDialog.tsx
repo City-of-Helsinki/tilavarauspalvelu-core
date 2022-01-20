@@ -44,7 +44,9 @@ const DialogContent = ({
     approveReservationMutation({ variables: { input } });
 
   const [price, setPrice] = useState<string>(String(reservation.price));
-  const [handlingDetails, setHandlingDetails] = useState<string>("");
+  const [handlingDetails, setHandlingDetails] = useState<string>(
+    reservation.workingMemo || ""
+  );
   const { notifyError, notifySuccess } = useNotification();
   const { t } = useTranslation();
 

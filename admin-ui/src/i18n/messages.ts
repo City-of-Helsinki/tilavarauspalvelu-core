@@ -1022,6 +1022,7 @@ const translations: ITranslations = {
       applicant: ["Tilan käyttäjä"],
       name: ["Varauksen nimi"],
       price: ["Hinta"],
+      state: ["Anomuksen tila"],
     },
   },
 
@@ -1030,9 +1031,10 @@ const translations: ITranslations = {
     heading: ["Anomuksen tarkastelu"],
     calendar: ["Varauskalenteri"],
     summary: ["Anomuksen yhteenveto"],
-    status: {
+    state: {
       REQUIRES_HANDLING: ["Käsittelemättä"],
       CONFIRMED: ["Käsitelty"],
+      DENIED: ["Hylätty"],
     },
     approve: ["Hyväksy anomus"],
     reject: ["Hylkää anomus"],
@@ -1055,12 +1057,13 @@ const translations: ITranslations = {
     reserveeId: ["Rekisteritunnus"],
     save: ["Tallenna"],
     workingMemo: ["Kommentit"],
-    workingMemoHelperText: ["Komnmentit näkyy vain henkilökunnalle"],
+    workingMemoHelperText: ["Kommentit näkyy vain henkilökunnalle"],
     savedWorkingMemo: ["Kommentti tallennettu"],
     errorSavingWorkingMemo: ["Kommentin tallennus ei onnistunut"],
     DenyDialog: {
       reject: ["Hylkää anomus"],
       denyReason: ["Hylkäyksen syy"],
+      denied: ["Anomus hylätty"],
       title: ["Vahvista hylkäys"],
       handlingDetails: ["Tarkempi syy hylkäykselle"],
     },

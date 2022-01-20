@@ -40,7 +40,9 @@ const DialogContent = ({
   const denyReservation = (input: ReservationDenyMutationInput) =>
     denyReservationMutation({ variables: { input } });
 
-  const [handlingDetails, setHandlingDetails] = useState<string>("");
+  const [handlingDetails, setHandlingDetails] = useState<string>(
+    reservation.workingMemo || ""
+  );
   const [denyReasonPk, setDenyReason] = useState<number | null>(null);
   const [denyReasonOptions, setDenyReasonOptions] = useState<OptionType[]>([]);
   const { notifyError, notifySuccess } = useNotification();
@@ -115,7 +117,7 @@ const DialogContent = ({
               if (res.errors) {
                 notifyError(t("SingleApplication.DenyDialog.errorSaving"));
               } else {
-                notifySuccess(t("SingleApplication.DenyDialog.approved"));
+                notifySuccess(t("SingleApplication.DenyDialog.denied"));
                 onReject();
               }
             } catch (e) {
