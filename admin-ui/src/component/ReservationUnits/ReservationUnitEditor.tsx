@@ -154,17 +154,17 @@ enum LoadingCompleted {
 }
 
 const bufferTimeOptions = [
-  { value: "00:15:00", label: "15 minuuttia" },
-  { value: "00:30:00", label: "30 minuuttia" },
-  { value: "01:00:00", label: "60 minuuttia" },
-  { value: "01:30:00", label: "90 minuuttia" },
+  { value: 900, label: "15 minuuttia" },
+  { value: 1800, label: "30 minuuttia" },
+  { value: 3600, label: "60 minuuttia" },
+  { value: 5400, label: "90 minuuttia" },
 ];
 
 const durationOptions = [
-  { value: "00:15:00", label: "15 minuuttia" },
-  { value: "00:30:00", label: "30 minuuttia" },
-  { value: "01:00:00", label: "60 minuuttia" },
-  { value: "01:30:00", label: "90 minuuttia" },
+  { value: 900, label: "15 minuuttia" },
+  { value: 1800, label: "30 minuuttia" },
+  { value: 3600, label: "60 minuuttia" },
+  { value: 5400, label: "90 minuuttia" },
 ];
 
 const nullOption: OptionType = {
@@ -830,6 +830,9 @@ const ReservationUnitEditor = (): JSX.Element | null => {
           type="error"
           label={t("ReservationUnitEditor.errorDataHeading")}
           position="top-center"
+          dismissible
+          closeButtonLabelText={t("common.close")}
+          onClose={() => dispatch({ type: "clearError" })}
         >
           {t(state.error?.message)}
         </Notification>
