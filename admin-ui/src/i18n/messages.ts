@@ -1056,6 +1056,8 @@ const translations: ITranslations = {
     save: ["Tallenna"],
     workingMemo: ["Kommentit"],
     workingMemoHelperText: ["Komnmentit näkyy vain henkilökunnalle"],
+    savedWorkingMemo: ["Kommentti tallennettu"],
+    errorSavingWorkingMemo: ["Kommentin tallennus ei onnistunut"],
     DenyDialog: {
       reject: ["Hylkää anomus"],
       denyReason: ["Hylkäyksen syy"],

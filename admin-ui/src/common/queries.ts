@@ -709,3 +709,15 @@ export const RESERVATION_DENY_REASONS = gql`
     }
   }
 `;
+
+export const UPDATE_WORKING_MEMO = gql`
+  mutation updateWorkingMemo($input: ReservationWorkingMemoMutationInput!) {
+    updateReservationWorkingMemo(input: $input) {
+      workingMemo
+      errors {
+        field
+        messages
+      }
+    }
+  }
+`;

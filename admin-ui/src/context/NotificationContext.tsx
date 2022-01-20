@@ -31,20 +31,30 @@ export const NotificationContextProvider: React.FC = ({ children }) => {
     React.useState<NotificationType | null>(null);
   const clearNotification = () => setNotification(null);
 
+  const showDisappearingNotification = (n: NotificationType) => {
+    setNotification(n);
+    setTimeout(() => setNotification(null), 1000 * 5);
+  };
+
   return (
     <NotificationContext.Provider
       value={{
         notification,
-        setNotification: (n) => {
-          setNotification(n);
-          setTimeout(() => setNotification(null), 1000 * 5);
-        },
+        setNotification: showDisappearingNotification,
         clearNotification,
         notifyError: (title, message?) => {
-          setNotification({ type: "error", title, message: message || null });
+          showDisappearingNotification({
+            type: "error",
+            title,
+            message: message || null,
+          });
         },
         notifySuccess: (title, message?) => {
-          setNotification({ type: "success", title, message: message || null });
+          showDisappearingNotification({
+            type: "success",
+            title,
+            message: message || null,
+          });
         },
       }}
     >

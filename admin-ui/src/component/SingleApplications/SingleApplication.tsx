@@ -1,4 +1,4 @@
-import { useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import {
   Accordion,
   Button,
@@ -15,11 +15,13 @@ import { useParams } from "react-router-dom";
 import styled from "styled-components";
 import {
   Maybe,
+  Mutation,
   Query,
   QueryReservationByPkArgs,
   ReservationType,
+  ReservationWorkingMemoMutationInput,
 } from "../../common/gql-types";
-import { RESERVATION_QUERY } from "../../common/queries";
+import { RESERVATION_QUERY, UPDATE_WORKING_MEMO } from "../../common/queries";
 import { useNotification } from "../../context/NotificationContext";
 import { ContentContainer } from "../../styles/layout";
 import {
@@ -133,20 +135,22 @@ const ApplicationData = ({
 const SingleApplication = (): JSX.Element | null => {
   const { reservationPk } = useParams() as { reservationPk: string };
   const [reservation, setReservation] = useState<ReservationType>();
-  const { notifyError, notification } = useNotification();
+  const [workingMemo, setWorkingMemo] = useState<string>();
+  const { notifyError, notifySuccess } = useNotification();
   const { t } = useTranslation();
   const { setModalContent } = useModal();
 
-  const { loading } = useQuery<Query, QueryReservationByPkArgs>(
+  const { loading, refetch } = useQuery<Query, QueryReservationByPkArgs>(
     RESERVATION_QUERY,
     {
-      skip: notification?.type === "error" || false,
       variables: {
         pk: Number(reservationPk),
       },
       onCompleted: ({ reservationByPk }) => {
         if (reservationByPk) {
           setReservation(reservationByPk);
+          console.log("setting workingg memo to:", reservationByPk.workingMemo);
+          setWorkingMemo(reservationByPk.workingMemo || "");
         }
       },
       onError: () => {
@@ -155,6 +159,11 @@ const SingleApplication = (): JSX.Element | null => {
     }
   );
 
+  const [updateWorkingMemo] = useMutation<Mutation>(UPDATE_WORKING_MEMO);
+
+  const updateMemo = (input: ReservationWorkingMemoMutationInput) =>
+    updateWorkingMemo({ variables: { input } });
+
   if (loading) {
     return <Loader />;
   }
@@ -162,6 +171,9 @@ const SingleApplication = (): JSX.Element | null => {
   if (!reservation) {
     return null;
   }
+
+  console.log("rendering with", reservation);
+  console.log("working memo", workingMemo);
 
   return (
     <>
@@ -212,8 +224,34 @@ const SingleApplication = (): JSX.Element | null => {
                 <TextArea
                   id="workingMemo"
                   helperText={t("SingleApplication.workingMemoHelperText")}
+                  value={workingMemo}
+                  onChange={(e) => setWorkingMemo(e.target.value)}
                 />
-                <Button>{t("SingleApplication.save")}</Button>
+                <Button
+                  onClick={async (e) => {
+                    e.preventDefault();
+                    try {
+                      const res = await updateMemo({
+                        pk: reservation.pk,
+                        workingMemo,
+                      });
+                      if (!res.errors) {
+                        refetch();
+                        notifySuccess(t("SingleApplication.savedWorkingMemo"));
+                      } else {
+                        notifyError(
+                          t("SingleApplication.errorSavingWorkingMemo")
+                        );
+                      }
+                    } catch (ex) {
+                      notifyError(
+                        t("SingleApplication.errorSavingWorkingMemo")
+                      );
+                    }
+                  }}
+                >
+                  {t("SingleApplication.save")}
+                </Button>
               </WorkingMemoContainer>
             </Accordion>
             <Accordion heading={t("SingleApplication.calendar")}>
