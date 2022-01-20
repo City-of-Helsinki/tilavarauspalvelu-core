@@ -199,6 +199,28 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         assert_that(content.get("errors")).is_none()
         self.assertMatchSnapshot(content)
 
+    def test_reservation_total_count(self):
+        self.maxDiff = None
+        self.client.force_login(self.regular_joe)
+        response = self.query(
+            """
+            query {
+                reservations {
+                    totalCount
+                    edges {
+                        node {
+                            state
+                          }
+                        }
+                    }
+                }
+            """
+        )
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
 
 class ReservationByPkTestCase(ReservationTestCaseBase):
     def setUp(self):
