@@ -1,6 +1,7 @@
 from unittest import mock
 
 from assertpy import assert_that
+from django.test import override_settings
 from django.test.testcases import TestCase
 
 from opening_hours.enums import ResourceType
@@ -91,23 +92,24 @@ class HaukiExporterTestCase(TestCase):
         self.reservation_unit.refresh_from_db()
         assert_that(self.reservation_unit.hauki_resource_id).is_equal_to("1")
 
-    @mock.patch("reservation_units.utils.hauki_exporter.update_hauki_resource")
+    @mock.patch("opening_hours.resources.make_hauki_put_request")
+    @override_settings(HAUKI_API_KEY="SECRET", HAUKI_API_URL="urli")
     def test_send_reservation_unit_to_hauki_update_existing_resource(
         self, send_mock, hauki_mock
     ):
-        send_mock.return_value = Resource(
-            id=1,
-            name="",
-            description="",
-            address="",
-            resource_type=ResourceType.RESERVABLE.value,
-            children=[],
-            parents=[],
-            organization="",
-            origin_id="",
-            origin_data_source_name="",
-            origin_data_source_id="",
-        )
+        send_mock.return_value = {
+            "id": 1,
+            "name": "",
+            "description": "",
+            "address": "",
+            "resource_type": ResourceType.RESERVABLE.value,
+            "children": [],
+            "parents": [],
+            "organization": "",
+            "origins": [
+                {"origin_id": "tvp", "data_source": {"name": "tvp", "id": "tvp"}}
+            ],
+        }
         self.reservation_unit.hauki_resource_id = 1
         exporter = ReservationUnitHaukiExporter(self.reservation_unit)
         exporter.send_reservation_unit_to_hauki()
