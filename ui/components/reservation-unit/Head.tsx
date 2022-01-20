@@ -15,7 +15,7 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import useReservationUnitList from "../../hooks/useReservationUnitList";
 import { breakpoint } from "../../modules/style";
-import { formatDuration, getTranslation } from "../../modules/util";
+import { formatSecondDuration, getTranslation } from "../../modules/util";
 import Back from "../common/Back";
 import Container from "../common/Container";
 import IconWithText from "../common/IconWithText";
@@ -66,6 +66,10 @@ const StyledIconWithText = styled(IconWithText).attrs({
 `;
 
 const Props = styled.div`
+  & > div:empty {
+    display: none;
+  }
+
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--spacing-s);
@@ -119,12 +123,12 @@ const Head = ({
 
   const { t } = useTranslation();
 
-  const minReservationDuration = formatDuration(
+  const minReservationDuration = formatSecondDuration(
     reservationUnit.minReservationDuration,
     false
   );
 
-  const maxReservationDuration = formatDuration(
+  const maxReservationDuration = formatSecondDuration(
     reservationUnit.maxReservationDuration,
     false
   );
@@ -164,25 +168,20 @@ const Head = ({
             </JustForMobile>
             <Props>
               <div>
-                <StyledIconWithText
-                  icon={
-                    <IconCalendar
-                      aria-label={t("reservationUnit:openingTimes")}
-                    />
-                  }
-                  texts={openingTimesTextArr}
-                />
+                {openingTimesTextArr?.length > 0 && (
+                  <StyledIconWithText
+                    icon={
+                      <IconCalendar
+                        aria-label={t("reservationUnit:openingTimes")}
+                      />
+                    }
+                    texts={openingTimesTextArr}
+                  />
+                )}
                 {viewType === "single" && isReservable && (
                   <StyledIconWithText
                     icon={<IconCalendarClock aria-label="" />}
-                    text={`${t("reservationCalendar:nextAvailableSlot", {
-                      count: reservationUnit.maxReservationDuration.startsWith(
-                        "01:00:"
-                      )
-                        ? 1
-                        : 2,
-                      slot: maxReservationDuration,
-                    })}:
+                    text={`${t("reservationCalendar:nextAvailableTime")}:
                       ${t("common:dateTimeNoYear", {
                         date: parseISO(reservationUnit.nextAvailableSlot),
                       })}

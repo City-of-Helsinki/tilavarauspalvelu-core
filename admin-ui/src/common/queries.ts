@@ -342,6 +342,7 @@ export const RESERVATIONUNIT_IMAGES_QUERY = gql`
   query reservationUnit($pk: Int) {
     reservationUnitByPk(pk: $pk) {
       images {
+        pk
         mediumUrl
         imageType
       }
@@ -516,6 +517,7 @@ export const CREATE_IMAGE = gql`
     ) {
       pk
       reservationUnitImage {
+        pk
         imageType
         mediumUrl
       }
@@ -528,9 +530,21 @@ export const CREATE_IMAGE = gql`
 `;
 
 export const DELETE_IMAGE = gql`
-  mutation deleteImage($input: ReservationUnitImageDeleteMutationInput!) {
-    deleteReservationUnitImage(input: $input) {
+  mutation deleteImage($pk: Int!) {
+    deleteReservationUnitImage(input: { pk: $pk }) {
+      errors
       deleted
+    }
+  }
+`;
+
+export const UPDATE_IMAGE_TYPE = gql`
+  mutation updateImage($pk: Int!, $imageType: String!) {
+    updateReservationUnitImage(input: { pk: $pk, imageType: $imageType }) {
+      errors {
+        messages
+        field
+      }
     }
   }
 `;

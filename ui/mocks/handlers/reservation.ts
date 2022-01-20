@@ -17,6 +17,11 @@ import {
   ReservationsReservationStateChoices,
   ReservationUnitType,
   ReservationTypeEdge,
+  QueryReservationPurposesArgs,
+  ReservationPurposeTypeConnection,
+  AgeGroupTypeConnection,
+  QueryCitiesArgs,
+  CityTypeConnection,
 } from "../../modules/gql-types";
 
 const createReservation = graphql.mutation<
@@ -47,6 +52,38 @@ const updateReservation = graphql.mutation<
           calendarUrl: `http://calendarUrl/${input.pk}`,
           state: input.state || "",
           user: "USER@NA.ME",
+          name: input.name,
+          description: input.description,
+          purpose: {
+            pk: input.purposePk,
+          },
+          numPersons: input.numPersons,
+          ageGroup: {
+            pk: input.ageGroupPk,
+          },
+          reserveeFirstName: input.reserveeFirstName,
+          reserveeLastName: input.reserveeLastName,
+          reserveeOrganisationName: input.reserveeOrganisationName,
+          reserveePhone: input.reserveePhone,
+          reserveeEmail: input.reserveeEmail,
+          reserveeId: input.reserveeId,
+          reserveeIsUnregisteredAssociation:
+            input.reserveeIsUnregisteredAssociation,
+          reserveeAddressStreet: input.reserveeAddressStreet,
+          reserveeAddressZip: input.reserveeAddressZip,
+          reserveeAddressCity: input.reserveeAddressCity,
+          billingFirstName: input.billingFirstName,
+          billingLastName: input.billingLastName,
+          billingPhone: input.billingPhone,
+          billingEmail: input.billingEmail,
+          billingAddressStreet: input.billingAddressStreet,
+          billingAddressZip: input.billingAddressZip,
+          billingAddressCity: input.billingAddressCity,
+          homeCity: {
+            pk: input.homeCityPk,
+          },
+          applyingForFreeOfCharge: input.applyingForFreeOfCharge,
+          freeOfChargeReason: input.freeOfChargeReason,
         },
       } as ReservationUpdateMutationPayload,
     })
@@ -115,6 +152,111 @@ const reservationCancelReasons = graphql.query<Query, null>(
   }
 );
 
+const reservationPurposes = graphql.query<Query, QueryReservationPurposesArgs>(
+  "ReservationPurposes",
+  (req, res, ctx) => {
+    return res(
+      ctx.data({
+        reservationPurposes: {
+          edges: [
+            {
+              node: {
+                pk: 1,
+                nameFi: "Liikkua tai pelata",
+                nameEn: null,
+                nameSv: null,
+              },
+            },
+            {
+              node: {
+                pk: 2,
+                nameFi: "Lukupiiri",
+                nameEn: null,
+                nameSv: null,
+              },
+            },
+            {
+              node: {
+                pk: 3,
+                nameFi: "Opastus",
+                nameEn: null,
+                nameSv: null,
+              },
+            },
+            {
+              node: {
+                pk: 4,
+                nameFi: "Pitää kokous",
+                nameEn: null,
+                nameSv: null,
+              },
+            },
+          ],
+        } as ReservationPurposeTypeConnection,
+      })
+    );
+  }
+);
+
+const ageGroups = graphql.query<Query, null>("AgeGroups", (req, res, ctx) => {
+  return res(
+    ctx.data({
+      ageGroups: {
+        edges: [
+          {
+            node: {
+              pk: 1,
+              minimum: 5,
+              maximum: 8,
+            },
+          },
+          {
+            node: {
+              pk: 2,
+              minimum: 9,
+              maximum: 12,
+            },
+          },
+          {
+            node: {
+              pk: 3,
+              minimum: 12,
+              maximum: 16,
+            },
+          },
+          {
+            node: {
+              pk: 4,
+              minimum: 17,
+              maximum: 20,
+            },
+          },
+        ],
+      } as AgeGroupTypeConnection,
+    })
+  );
+});
+
+const cities = graphql.query<Query, QueryCitiesArgs>(
+  "getCities",
+  (req, res, ctx) => {
+    return res(
+      ctx.data({
+        cities: {
+          edges: [
+            {
+              node: {
+                pk: 1,
+                name: "Helsinki",
+              },
+            },
+          ],
+        } as CityTypeConnection,
+      })
+    );
+  }
+);
+
 const reservationByPk = graphql.query<Query, QueryReservationUnitByPkArgs>(
   "reservationByPk",
   (req, res, ctx) => {
@@ -132,8 +274,8 @@ const reservationByPk = graphql.query<Query, QueryReservationUnitByPkArgs>(
       calendarUrl: `http://localhost:8000/v1/reservation_calendar/${pk}/?hash=12c580bc07340b05441feb8f261786a7ceabb5423a1966c7c13241f39916233c`,
       user: "user@gmail.com",
       state: ReservationsReservationStateChoices.Confirmed,
-      bufferTimeBefore: "01:00:00",
-      bufferTimeAfter: "00:30:00",
+      bufferTimeBefore: 3600,
+      bufferTimeAfter: 1800,
       price: 42.0,
       reservationUnits: [
         {
@@ -214,8 +356,8 @@ const listReservations = graphql.query<Query, QueryReservationUnitsArgs>(
                 end: "2021-04-28T06:23:20+00:00",
                 user: "user@gmail.com",
                 state: ReservationsReservationStateChoices.Confirmed,
-                bufferTimeBefore: "01:00:00",
-                bufferTimeAfter: "00:30:00",
+                bufferTimeBefore: 3600,
+                bufferTimeAfter: 1800,
                 reservationUnits: [
                   {
                     pk: 1,
@@ -248,8 +390,8 @@ const listReservations = graphql.query<Query, QueryReservationUnitsArgs>(
                 end: "2021-04-28T08:23:20+00:00",
                 user: "user@gmail.com",
                 state: ReservationsReservationStateChoices.Confirmed,
-                bufferTimeBefore: "01:00:00",
-                bufferTimeAfter: "00:30:00",
+                bufferTimeBefore: 3600,
+                bufferTimeAfter: 1800,
                 reservationUnits: [
                   {
                     pk: 9,
@@ -282,8 +424,8 @@ const listReservations = graphql.query<Query, QueryReservationUnitsArgs>(
                 end: addHours(addDays(new Date(), 1), 1).toISOString(),
                 user: "user@gmail.com",
                 state: ReservationsReservationStateChoices.Confirmed,
-                bufferTimeBefore: "01:00:00",
-                bufferTimeAfter: "00:30:00",
+                bufferTimeBefore: 3600,
+                bufferTimeAfter: 1800,
                 price: 42.0,
                 reservationUnits: [
                   {
@@ -317,8 +459,8 @@ const listReservations = graphql.query<Query, QueryReservationUnitsArgs>(
                 end: "2021-11-27T16:00:00+00:00",
                 user: "user@email.com",
                 state: ReservationsReservationStateChoices.Created,
-                bufferTimeBefore: "01:00:00",
-                bufferTimeAfter: "00:30:00",
+                bufferTimeBefore: 3600,
+                bufferTimeAfter: 1800,
                 reservationUnits: [
                   {
                     pk: 1,
@@ -351,8 +493,8 @@ const listReservations = graphql.query<Query, QueryReservationUnitsArgs>(
                 end: addHours(addDays(new Date(), 5), 2).toISOString(),
                 user: "user@email.com",
                 state: ReservationsReservationStateChoices.Confirmed,
-                bufferTimeBefore: "01:00:00",
-                bufferTimeAfter: "00:30:00",
+                bufferTimeBefore: 3600,
+                bufferTimeAfter: 1800,
                 reservationUnits: [
                   {
                     pk: 4,
@@ -385,8 +527,8 @@ const listReservations = graphql.query<Query, QueryReservationUnitsArgs>(
                 end: "2021-11-28T09:00:00+00:00",
                 user: "user@gmail.com",
                 state: ReservationsReservationStateChoices.Created,
-                bufferTimeBefore: "01:00:00",
-                bufferTimeAfter: "00:30:00",
+                bufferTimeBefore: 3600,
+                bufferTimeAfter: 1800,
                 reservationUnits: [
                   {
                     pk: 1,
@@ -419,8 +561,8 @@ const listReservations = graphql.query<Query, QueryReservationUnitsArgs>(
                 end: "2021-11-28T10:00:00+00:00",
                 user: "user@email.com",
                 state: ReservationsReservationStateChoices.Created,
-                bufferTimeBefore: "01:00:00",
-                bufferTimeAfter: "00:30:00",
+                bufferTimeBefore: 3600,
+                bufferTimeAfter: 1800,
                 reservationUnits: [
                   {
                     pk: 1,
@@ -453,8 +595,8 @@ const listReservations = graphql.query<Query, QueryReservationUnitsArgs>(
                 end: "2021-11-28T12:00:00+00:00",
                 user: "user@email.com",
                 state: ReservationsReservationStateChoices.Created,
-                bufferTimeBefore: "01:00:00",
-                bufferTimeAfter: "00:30:00",
+                bufferTimeBefore: 3600,
+                bufferTimeAfter: 1800,
                 reservationUnits: [
                   {
                     pk: 1,
@@ -487,8 +629,8 @@ const listReservations = graphql.query<Query, QueryReservationUnitsArgs>(
                 end: "2021-11-28T15:15:00+00:00",
                 user: "user@email.com",
                 state: ReservationsReservationStateChoices.Created,
-                bufferTimeBefore: "01:00:00",
-                bufferTimeAfter: "00:30:00",
+                bufferTimeBefore: 3600,
+                bufferTimeAfter: 1800,
                 reservationUnits: [
                   {
                     pk: 1,
@@ -521,8 +663,8 @@ const listReservations = graphql.query<Query, QueryReservationUnitsArgs>(
                 end: "2021-11-28T18:15:00+00:00",
                 user: "user@email.com",
                 state: ReservationsReservationStateChoices.Created,
-                bufferTimeBefore: "01:00:00",
-                bufferTimeAfter: "00:30:00",
+                bufferTimeBefore: 3600,
+                bufferTimeAfter: 1800,
                 reservationUnits: [
                   {
                     pk: 1,
@@ -555,8 +697,8 @@ const listReservations = graphql.query<Query, QueryReservationUnitsArgs>(
                 end: "2021-12-01T02:00:00+00:00",
                 user: "user@gmail.com",
                 state: "CANCELLED",
-                bufferTimeBefore: "01:00:00",
-                bufferTimeAfter: "00:30:00",
+                bufferTimeBefore: 3600,
+                bufferTimeAfter: 1800,
                 reservationUnits: [
                   {
                     pk: 3,
@@ -586,8 +728,8 @@ const listReservations = graphql.query<Query, QueryReservationUnitsArgs>(
                 end: addHours(addDays(new Date(), 10), 2).toISOString(),
                 user: "user@email.com",
                 state: ReservationsReservationStateChoices.Confirmed,
-                bufferTimeBefore: "01:00:00",
-                bufferTimeAfter: "00:30:00",
+                bufferTimeBefore: 3600,
+                bufferTimeAfter: 1800,
                 reservationUnits: [
                   {
                     pk: 11,
@@ -617,8 +759,8 @@ const listReservations = graphql.query<Query, QueryReservationUnitsArgs>(
                 end: "2021-12-04T14:00:00+00:00",
                 user: "user@email.com",
                 state: ReservationsReservationStateChoices.Created,
-                bufferTimeBefore: "01:00:00",
-                bufferTimeAfter: "00:30:00",
+                bufferTimeBefore: 3600,
+                bufferTimeAfter: 1800,
                 reservationUnits: [
                   {
                     pk: 1,
@@ -651,8 +793,8 @@ const listReservations = graphql.query<Query, QueryReservationUnitsArgs>(
                 end: "2021-12-04T16:15:00+00:00",
                 user: "user@email.com",
                 state: ReservationsReservationStateChoices.Created,
-                bufferTimeBefore: "01:00:00",
-                bufferTimeAfter: "00:30:00",
+                bufferTimeBefore: 3600,
+                bufferTimeAfter: 1800,
                 reservationUnits: [
                   {
                     pk: 1,
@@ -685,8 +827,8 @@ const listReservations = graphql.query<Query, QueryReservationUnitsArgs>(
                 end: "2021-12-04T18:00:00+00:00",
                 user: "user@email.com",
                 state: ReservationsReservationStateChoices.Created,
-                bufferTimeBefore: "01:00:00",
-                bufferTimeAfter: "00:30:00",
+                bufferTimeBefore: 3600,
+                bufferTimeAfter: 1800,
                 reservationUnits: [
                   {
                     pk: 1,
@@ -719,8 +861,8 @@ const listReservations = graphql.query<Query, QueryReservationUnitsArgs>(
                 end: "2021-12-04T19:00:00+00:00",
                 user: "user@email.com",
                 state: ReservationsReservationStateChoices.Created,
-                bufferTimeBefore: "01:00:00",
-                bufferTimeAfter: "00:30:00",
+                bufferTimeBefore: 3600,
+                bufferTimeAfter: 1800,
                 reservationUnits: [
                   {
                     pk: 1,
@@ -753,8 +895,8 @@ const listReservations = graphql.query<Query, QueryReservationUnitsArgs>(
                 end: "2021-12-05T09:00:00+00:00",
                 user: "user@email.com",
                 state: "CANCELLED",
-                bufferTimeBefore: "01:00:00",
-                bufferTimeAfter: "00:30:00",
+                bufferTimeBefore: 3600,
+                bufferTimeAfter: 1800,
                 reservationUnits: [
                   {
                     pk: 1,
@@ -787,8 +929,8 @@ const listReservations = graphql.query<Query, QueryReservationUnitsArgs>(
                 end: "2021-12-05T11:00:00+00:00",
                 user: "user@email.com",
                 state: "CANCELLED",
-                bufferTimeBefore: "01:00:00",
-                bufferTimeAfter: "00:30:00",
+                bufferTimeBefore: 3600,
+                bufferTimeAfter: 1800,
                 reservationUnits: [
                   {
                     pk: 1,
@@ -821,8 +963,8 @@ const listReservations = graphql.query<Query, QueryReservationUnitsArgs>(
                 end: "2021-12-05T15:30:00+00:00",
                 user: "user@email.com",
                 state: ReservationsReservationStateChoices.Created,
-                bufferTimeBefore: "01:00:00",
-                bufferTimeAfter: "00:30:00",
+                bufferTimeBefore: 3600,
+                bufferTimeAfter: 1800,
                 reservationUnits: [
                   {
                     pk: 1,
@@ -855,8 +997,8 @@ const listReservations = graphql.query<Query, QueryReservationUnitsArgs>(
                 end: "2021-12-12T10:00:00+00:00",
                 user: "user@email.com",
                 state: "CANCELLED",
-                bufferTimeBefore: "01:00:00",
-                bufferTimeAfter: "00:30:00",
+                bufferTimeBefore: 3600,
+                bufferTimeAfter: 1800,
                 reservationUnits: [
                   {
                     pk: 1,
@@ -889,8 +1031,8 @@ const listReservations = graphql.query<Query, QueryReservationUnitsArgs>(
                 end: addHours(addDays(new Date(), 23), 2).toISOString(),
                 user: "user@email.com",
                 state: ReservationsReservationStateChoices.Confirmed,
-                bufferTimeBefore: "01:00:00",
-                bufferTimeAfter: "00:30:00",
+                bufferTimeBefore: 3600,
+                bufferTimeAfter: 1800,
                 reservationUnits: [
                   {
                     pk: 3,
@@ -929,4 +1071,7 @@ export const reservationHandlers = [
   cancelReservation,
   listReservations,
   reservationCancelReasons,
+  reservationPurposes,
+  ageGroups,
+  cities,
 ];

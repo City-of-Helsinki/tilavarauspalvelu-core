@@ -4,7 +4,7 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { Koros, Notification } from "hds-react";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { isValid, parseISO, subMinutes } from "date-fns";
+import { addSeconds, addYears, isValid, parseISO, subMinutes } from "date-fns";
 import Container from "../../../components/common/Container";
 import { ApplicationRound, PendingReservation } from "../../../modules/types";
 import Head from "../../../components/reservation-unit/Head";
@@ -129,7 +129,7 @@ export const getServerSideProps: GetServerSideProps = async ({
       reservationUnitData?.reservationUnitByPk?.openingHours?.openingTimePeriods
         .map((period) => period.endDate)
         .sort()
-        .reverse()[0] || toApiDate(new Date());
+        .reverse()[0] || toApiDate(addYears(new Date(), 1));
 
     const { data: additionalData } = await apolloClient.query<
       Query,
@@ -277,9 +277,10 @@ const StyledNotification = styled(Notification)`
   }
 `;
 
-const eventStyleGetter = ({
-  event,
-}: CalendarEvent): { style: React.CSSProperties; className?: string } => {
+const eventStyleGetter = (
+  { event }: CalendarEvent,
+  draggable = true
+): { style: React.CSSProperties; className?: string } => {
   const style = {
     borderRadius: "0px",
     opacity: "0.8",
@@ -294,7 +295,7 @@ const eventStyleGetter = ({
   switch (state) {
     case "INITIAL":
       style.backgroundColor = "var(--color-success-dark)";
-      className = "rbc-event-movable";
+      className = draggable ? "rbc-event-movable" : "";
       break;
     case "BUFFER":
       style.backgroundColor = "var(--color-black-10)";
@@ -326,17 +327,24 @@ const ReservationUnit = ({
     useState<PendingReservation | null>(null);
 
   const activeOpeningTimes = getActiveOpeningTimes(
-    reservationUnit.openingHours.openingTimePeriods
+    reservationUnit.openingHours?.openingTimePeriods
   );
 
   const slotPropGetter = useMemo(
     () =>
       getSlotPropGetter(
-        reservationUnit.openingHours.openingTimes,
+        reservationUnit.openingHours?.openingTimes,
         activeApplicationRounds
       ),
-    [reservationUnit.openingHours.openingTimes, activeApplicationRounds]
+    [reservationUnit.openingHours?.openingTimes, activeApplicationRounds]
   );
+
+  const isReservationQuotaReached = useMemo(() => {
+    return (
+      reservationUnit.maxReservationsPerUser &&
+      userReservations?.length >= reservationUnit.maxReservationsPerUser
+    );
+  }, [reservationUnit, userReservations]);
 
   const isSlotReservable = (
     start: Date,
@@ -359,7 +367,7 @@ const ReservationUnit = ({
       ) ||
       !areSlotsReservable(
         [new Date(start), subMinutes(new Date(end), 1)],
-        reservationUnit.openingHours.openingTimes,
+        reservationUnit.openingHours?.openingTimes,
         activeApplicationRounds
       ) ||
       (!skipLengthCheck &&
@@ -386,7 +394,10 @@ const ReservationUnit = ({
     { start, end }: CalendarEvent,
     skipLengthCheck = false
   ): boolean => {
-    if (!isSlotReservable(start, end, skipLengthCheck)) {
+    if (
+      !isSlotReservable(start, end, skipLengthCheck) ||
+      isReservationQuotaReached
+    ) {
       return false;
     }
 
@@ -402,15 +413,13 @@ const ReservationUnit = ({
     { start, action },
     skipLengthCheck = false
   ): boolean => {
-    if (action !== "click") {
+    if (action !== "click" || isReservationQuotaReached) {
       return false;
     }
-    const [hours, minutes] = reservationUnit.minReservationDuration.split(":");
 
-    const end = new Date(start);
-    end.setHours(
-      start.getHours() + parseInt(hours, 10),
-      start.getMinutes() + parseInt(minutes, 10)
+    const end = addSeconds(
+      new Date(start),
+      reservationUnit.minReservationDuration || 0
     );
 
     if (!isSlotReservable(start, end, skipLengthCheck)) {
@@ -484,21 +493,14 @@ const ReservationUnit = ({
     />
   ));
 
-  const isReservationQuotaReached = useMemo(() => {
-    return (
-      reservationUnit.maxReservationsPerUser &&
-      userReservations?.length >= reservationUnit.maxReservationsPerUser
-    );
-  }, [reservationUnit, userReservations]);
-
   const isReservable = useMemo(() => {
     return (
+      reservationUnit.openingHours?.openingTimes?.length > 0 &&
       reservationUnit.minReservationDuration &&
       reservationUnit.maxReservationDuration &&
-      isReservationUnitReservable(reservationUnit) &&
-      !isReservationQuotaReached
+      isReservationUnitReservable(reservationUnit)
     );
-  }, [reservationUnit, isReservationQuotaReached]);
+  }, [reservationUnit]);
 
   return reservationUnit ? (
     <Wrapper>
@@ -540,7 +542,9 @@ const ReservationUnit = ({
                 onNavigate={(d: Date) => {
                   setFocusDate(d);
                 }}
-                customEventStyleGetter={eventStyleGetter}
+                customEventStyleGetter={(event) =>
+                  eventStyleGetter(event, !isReservationQuotaReached)
+                }
                 slotPropGetter={slotPropGetter}
                 viewType={calendarViewType}
                 onView={(n: WeekOptions) => {
@@ -550,12 +554,12 @@ const ReservationUnit = ({
                   handleEventChange(event, true)
                 }
                 showToolbar
-                reservable
+                reservable={!isReservationQuotaReached}
                 toolbarComponent={
                   reservationUnit.nextAvailableSlot ? ToolbarWithProps : Toolbar
                 }
-                resizable
-                draggable
+                resizable={!isReservationQuotaReached}
+                draggable={!isReservationQuotaReached}
                 onEventDrop={handleEventChange}
                 onEventResize={handleEventChange}
                 onSelectSlot={handleSlotClick}
@@ -576,15 +580,17 @@ const ReservationUnit = ({
               <LoginFragment
                 text={t("reservationCalendar:loginInfo")}
                 componentIfAuthenticated={
-                  <ReservationInfo
-                    reservationUnit={reservationUnit}
-                    begin={initialReservation?.begin}
-                    end={initialReservation?.end}
-                    resetReservation={() => setInitialReservation(null)}
-                    isSlotReservable={isSlotReservable}
-                    setCalendarFocusDate={setFocusDate}
-                    activeApplicationRounds={activeApplicationRounds}
-                  />
+                  !isReservationQuotaReached && (
+                    <ReservationInfo
+                      reservationUnit={reservationUnit}
+                      begin={initialReservation?.begin}
+                      end={initialReservation?.end}
+                      resetReservation={() => setInitialReservation(null)}
+                      isSlotReservable={isSlotReservable}
+                      setCalendarFocusDate={setFocusDate}
+                      activeApplicationRounds={activeApplicationRounds}
+                    />
+                  )
                 }
               />
               <Legend />
@@ -602,21 +608,22 @@ const ReservationUnit = ({
             </span>
           </StyledNotification>
         )}
-        {reservationUnit.maxReservationsPerUser && (
-          <StyledNotification type="alert" label={t("common:fyiLabel")}>
-            <span data-testid="reservation-unit--notification__reservation-quota">
-              {t(
-                `reservationCalendar:reservationQuota${
-                  isReservationQuotaReached ? "Full" : ""
-                }`,
-                {
-                  count: userReservations?.length,
-                  total: reservationUnit.maxReservationsPerUser,
-                }
-              )}
-            </span>
-          </StyledNotification>
-        )}
+        {reservationUnit.maxReservationsPerUser &&
+          userReservations?.length > 0 && (
+            <StyledNotification type="alert" label={t("common:fyiLabel")}>
+              <span data-testid="reservation-unit--notification__reservation-quota">
+                {t(
+                  `reservationCalendar:reservationQuota${
+                    isReservationQuotaReached ? "Full" : ""
+                  }`,
+                  {
+                    count: userReservations?.length,
+                    total: reservationUnit.maxReservationsPerUser,
+                  }
+                )}
+              </span>
+            </StyledNotification>
+          )}
         {reservationUnit.location && (
           <MapWrapper>
             <StyledH2>{t("common:location")}</StyledH2>

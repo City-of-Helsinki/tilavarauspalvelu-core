@@ -35,8 +35,8 @@ const selectedReservationUnitQuery = graphql.query<
     nameFi: "Pukinmäen nuorisotalon keittiö FI",
     nameEn: "Pukinmäen nuorisotalon keittiö EN",
     nameSv: "Pukinmäen nuorisotalon keittiö SV",
-    bufferTimeBefore: "01:00:00",
-    bufferTimeAfter: "00:30:00",
+    bufferTimeBefore: 3600,
+    bufferTimeAfter: 1800,
     reservationBegins: addDays(new Date(), -1),
     reservationEnds: addDays(new Date(), 1),
     images: [
@@ -134,8 +134,8 @@ const selectedReservationUnitQuery = graphql.query<
       addressCityEn: "Helsinki En",
       addressCitySv: "Helsinki Sv",
     },
-    minReservationDuration: "01:00:00",
-    maxReservationDuration: "01:30:00",
+    minReservationDuration: 3600,
+    maxReservationDuration: 5400,
     nextAvailableSlot: "2021-09-21T09:30:00Z",
     spaces: [
       {
@@ -247,6 +247,46 @@ const selectedReservationUnitQuery = graphql.query<
     reservationUnitByPk.maxReservationsPerUser = 30;
   }
 
+  if (req.variables.pk === 903) {
+    reservationUnitByPk.pk = 903;
+    reservationUnitByPk.lowestPrice = 0;
+    reservationUnitByPk.highestPrice = 0;
+    reservationUnitByPk.metadataSet = {
+      id: "UmVzZXJ2YXRpb25NZXRhZGF0YVNldFR5cGU6MQ==",
+      name: "Test",
+      supportedFields: [
+        "reservee_type",
+        "reservee_first_name",
+        "reservee_last_name",
+        "reservee_organisation_name",
+        "reservee_phone",
+        "reservee_email",
+        "reservee_id",
+        "reservee_is_unregistered_association",
+        "reservee_address_street",
+        "reservee_address_city",
+        "reservee_address_zip",
+        "billing_first_name",
+        "billing_last_name",
+        "billing_phone",
+        "billing_email",
+        "billing_address_street",
+        "billing_address_city",
+        "billing_address_zip",
+        "home_city",
+        "age_group",
+        "applying_for_free_of_charge",
+        "free_of_charge_reason",
+        "name",
+        "description",
+        "num_persons",
+        "purpose",
+      ],
+      requiredFields: ["reservee_first_name", "billing_last_name"],
+      pk: 1,
+    };
+  }
+
   if (req.variables.pk === 999) {
     reservationUnitByPk.isDraft = true;
   }
@@ -268,8 +308,8 @@ const openingHoursQuery = graphql.query<
         openingHours: {
           openingTimes: Array.from(Array(100)).map((val, index) => ({
             date: toApiDate(addDays(new Date(), index)),
-            startTime: "09:00:00",
-            endTime: "21:00:00",
+            startTime: "07:00:00+00:00",
+            endTime: "20:00:00+00:00",
             state: "open",
             periods: null,
           })),
@@ -295,8 +335,8 @@ const openingHoursQuery = graphql.query<
             numPersons: 3,
             calendarUrl:
               "http://localhost:8000/v1/reservation_calendar/5/?hash=aafe8cef803ea6aa3dc8c03307016b506554a62397a2c44828fc1d828fa7fee6",
-            bufferTimeBefore: "02:00:00",
-            bufferTimeAfter: "00:30:00",
+            bufferTimeBefore: 7200,
+            bufferTimeAfter: 1800,
           },
           {
             id: "UmV3ZXJ2YXRpb25UeXB3OjU=",
@@ -310,8 +350,8 @@ const openingHoursQuery = graphql.query<
               milliseconds: 0,
             }),
             end: set(endOfWeek(addDays(new Date(), 7), { weekStartsOn: 1 }), {
-              hours: 20,
-              minutes: 0,
+              hours: 19,
+              minutes: 30,
               seconds: 0,
               milliseconds: 0,
             }),
@@ -319,9 +359,29 @@ const openingHoursQuery = graphql.query<
             calendarUrl:
               "http://localhost:8000/v1/reservation_calendar/5/?hash=aafe8cef803ea6aa3dc8c03307016b506554a62397a2c44828fc1d828fa7fee6",
             bufferTimeBefore: null,
-            bufferTimeAfter: "00:30:00",
+            bufferTimeAfter: 1800,
           },
-        ] as ReservationType[],
+        ].map((n) => ({
+          ...n,
+          ageGroup: {
+            id: "1",
+            minimum: 3,
+          },
+          applyingForFreeOfCharge: undefined,
+          billingAddressStreet: "",
+          billingAddressZip: "",
+          billingAddressCity: "",
+          billingEmail: "",
+          billingFirstName: "",
+          billingLastName: "",
+          billingPhone: "",
+          reserveeId: "",
+          reserveeAddressStreet: "",
+          reserveeAddressZip: "",
+          reserveeAddressCity: "",
+          reserveeIsUnregisteredAssociation: undefined,
+          reserveeOrganisationName: "",
+        })) as ReservationType[],
       },
     },
   };

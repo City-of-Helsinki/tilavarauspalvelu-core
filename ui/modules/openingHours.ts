@@ -22,13 +22,20 @@ const reservableStates = ["open"];
 export const getActiveOpeningTimePeriod = (
   openingTimePeriods: PeriodType[],
   date: string
-): PeriodType | undefined =>
-  openingTimePeriods?.find((openingTimePeriod) =>
-    isWithinInterval(new Date(date), {
-      start: new Date(openingTimePeriod.startDate),
-      end: new Date(openingTimePeriod.endDate),
-    })
-  );
+): PeriodType | undefined => {
+  return openingTimePeriods?.find((openingTimePeriod) => {
+    const startDate = new Date(openingTimePeriod.startDate);
+    const endDate = new Date(openingTimePeriod.endDate);
+    return (
+      isWithinInterval(new Date(date), {
+        start: startDate,
+        end: endDate,
+      }) ||
+      ((openingTimePeriod.startDate === null || toApiDate(startDate) <= date) &&
+        (openingTimePeriod.endDate === null || toApiDate(endDate) >= date))
+    );
+  });
+};
 
 export const getActiveOpeningTimes = (
   openingTimePeriods?: PeriodType[]
@@ -38,6 +45,7 @@ export const getActiveOpeningTimes = (
     openingTimePeriods,
     toApiDate(new Date())
   );
+
   const timeSpans = activeOpeningTimePeriod?.timeSpans?.filter((timeSpan) =>
     reservableStates.includes(timeSpan.resourceState)
   );
@@ -67,16 +75,10 @@ export const getDayOpeningTimes = (
 ): OpeningHourRow => {
   const { label } = openingTime;
 
-  const from = openingTime.from.split(":");
-  const fromDate = new Date();
-  fromDate.setHours(Number(from[0]));
-  fromDate.setMinutes(Number(from[1]));
+  const fromDate = new Date(`1970-01-01T${openingTime.from}`);
   const fromStr = i18n.t("common:time", { date: fromDate });
 
-  const to = openingTime.to.split(":");
-  const toDate = new Date();
-  toDate.setHours(Number(to[0]));
-  toDate.setMinutes(Number(to[1]));
+  const toDate = new Date(`1970-01-01T${openingTime.to}`);
   const toStr = i18n.t("common:time", { date: toDate });
 
   return { label, value: `${fromStr} - ${toStr}`, index };

@@ -2,7 +2,7 @@ import { useRouter } from "next/router";
 import React, { useContext, useEffect, useState, useMemo } from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { differenceInSeconds, isValid, subMinutes } from "date-fns";
+import { differenceInSeconds, format, isValid, subMinutes } from "date-fns";
 import { DateInput, Notification, Select } from "hds-react";
 import { trimStart } from "lodash";
 import { useMutation } from "@apollo/client";
@@ -150,7 +150,7 @@ const ReservationInfo = ({
 
   const createReservation = () => {
     setErrorMsg(null);
-    const input = {
+    const input: ReservationCreateMutationInput = {
       begin,
       end,
       reservationUnitPks: [reservationUnit.pk],
@@ -244,30 +244,45 @@ const ReservationInfo = ({
     setReservation({ pk: null, begin: null, end: null, price: null });
   }, [setReservation]);
 
-  const isReservable =
-    begin &&
-    end &&
-    isReservationLongEnough(
-      new Date(begin),
-      new Date(end),
-      reservationUnit.minReservationDuration
-    ) &&
-    !loading &&
-    !isRedirecting;
-
-  const { startTime: dayStartTime, endTime: dayEndTime } =
-    reservationUnit.openingHours?.openingTimes.find(
-      (n) => n.date === toApiDate(date)
+  const isReservable = useMemo(() => {
+    return (
+      begin &&
+      end &&
+      isReservationLongEnough(
+        new Date(begin),
+        new Date(end),
+        reservationUnit.minReservationDuration
+      ) &&
+      !loading &&
+      !isRedirecting
     );
+  }, [
+    begin,
+    end,
+    isRedirecting,
+    loading,
+    reservationUnit.minReservationDuration,
+  ]);
 
-  const startingTimesOptions: OptionType[] = getDayIntervals(
-    dayStartTime,
-    dayEndTime,
-    reservationUnit.reservationStartInterval
-  ).map((n) => ({
-    label: trimStart(n.substring(0, 5).replace(":", "."), "0"),
-    value: trimStart(n.substring(0, 5), "0"),
-  }));
+  const { startTime: dayStartTime, endTime: dayEndTime } = useMemo(() => {
+    return (
+      reservationUnit.openingHours?.openingTimes?.find(
+        (n) => n.date === toApiDate(date)
+      ) || { startTime: null, endTime: null }
+    );
+  }, [reservationUnit.openingHours?.openingTimes, date]);
+
+  const startingTimesOptions: OptionType[] = useMemo(() => {
+    if (!dayStartTime || !dayEndTime) return [];
+    return getDayIntervals(
+      format(new Date(`1970-01-01T${dayStartTime}`), "HH:mm"),
+      format(new Date(`1970-01-01T${dayEndTime}`), "HH:mm"),
+      reservationUnit.reservationStartInterval
+    ).map((n) => ({
+      label: trimStart(n.substring(0, 5).replace(":", "."), "0"),
+      value: trimStart(n.substring(0, 5), "0"),
+    }));
+  }, [dayStartTime, dayEndTime, reservationUnit.reservationStartInterval]);
 
   return (
     <Wrapper>

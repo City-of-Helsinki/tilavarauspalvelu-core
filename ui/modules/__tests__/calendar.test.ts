@@ -32,21 +32,21 @@ test("isReservationShortEnough", () => {
     isReservationShortEnough(
       new Date(2021, 11, 10, 12, 0, 0),
       new Date(2021, 11, 10, 12, 30, 0),
-      "1:30:00"
+      5400
     )
   ).toBe(true);
   expect(
     isReservationShortEnough(
       new Date(2021, 11, 10, 12, 0, 0),
       new Date(2021, 11, 10, 13, 30, 0),
-      "1:30:00"
+      5400
     )
   ).toBe(true);
   expect(
     isReservationShortEnough(
       new Date(2021, 11, 10, 12, 0, 0),
       new Date(2021, 11, 10, 13, 31, 0),
-      "1:30:00"
+      5400
     )
   ).toBe(false);
 });
@@ -56,21 +56,21 @@ test("isReservationLongEnough", () => {
     isReservationLongEnough(
       new Date(2021, 11, 10, 12, 0, 0),
       new Date(2021, 11, 10, 12, 30, 0),
-      "1:30:00"
+      5400
     )
   ).toBe(false);
   expect(
     isReservationLongEnough(
       new Date(2021, 11, 10, 12, 0, 0),
       new Date(2021, 11, 10, 13, 30, 0),
-      "1:30:00"
+      5400
     )
   ).toBe(true);
   expect(
     isReservationLongEnough(
       new Date(2021, 11, 10, 12, 0, 0),
       new Date(2021, 11, 10, 13, 31, 0),
-      "1:30:00"
+      5400
     )
   ).toBe(true);
 });
@@ -81,20 +81,23 @@ test("isSlotWithinTimeframe", () => {
   expect(isSlotWithinTimeframe(new Date(), -1)).toBe(true);
 });
 
-test("areSlotsReservable", () => {
+describe("areSlotsReservable", () => {
+  const tzOffset = new Date().getTimezoneOffset() / 60;
+  const tzOffsetHoursStr = Math.abs(tzOffset).toString().padStart(2, "0");
+
   const openingTimes = [
     {
       date: format(addDays(new Date(), 7), "yyyy-MM-dd"),
-      endTime: "21:00:00",
+      endTime: `21:00:00+${tzOffsetHoursStr}:00`,
       periods: null,
-      startTime: "09:00:00",
+      startTime: `09:00:00+${tzOffsetHoursStr}:00`,
       state: "open",
     },
     {
       date: format(addDays(new Date(), 8), "yyyy-MM-dd"),
-      endTime: "21:00:00",
+      endTime: `21:00:00+${tzOffsetHoursStr}:00`,
       periods: null,
-      startTime: "09:00:00",
+      startTime: `09:00:00+${tzOffsetHoursStr}:00`,
       state: "open",
     },
   ];
@@ -106,28 +109,55 @@ test("areSlotsReservable", () => {
     },
   ] as ApplicationRound[];
 
-  expect(areSlotsReservable([addDays(new Date(), 6)], openingTimes, [])).toBe(
-    false
-  );
-  expect(
-    areSlotsReservable([addDays(new Date().setHours(6), 7)], openingTimes, [])
-  ).toBe(false);
-  expect(
-    areSlotsReservable([addDays(new Date().setHours(9), 7)], openingTimes, [])
-  ).toBe(true);
-  expect(
-    areSlotsReservable([addDays(new Date().setHours(9), 8)], openingTimes, [])
-  ).toBe(true);
-  expect(
-    areSlotsReservable(
-      [addDays(new Date().setHours(9), 8)],
-      openingTimes,
-      activeApplicationRounds
-    )
-  ).toBe(false);
-  expect(areSlotsReservable([addDays(new Date(), 10)], openingTimes, [])).toBe(
-    false
-  );
+  test("Plus 7 days 09:00", () => {
+    const hours = 11 + tzOffset;
+    expect(
+      areSlotsReservable(
+        [addDays(new Date().setHours(hours), 7)],
+        openingTimes,
+        []
+      )
+    ).toBe(true);
+  });
+
+  test("Plus 7 days 10:00", () => {
+    const hours = 12 + tzOffset;
+    expect(
+      areSlotsReservable(
+        [addDays(new Date().setHours(hours), 7)],
+        openingTimes,
+        []
+      )
+    ).toBe(true);
+  });
+
+  test("Plus 8 days 11:00", () => {
+    const hours = 13 + tzOffset;
+    expect(
+      areSlotsReservable(
+        [addDays(new Date().setHours(hours), 8)],
+        openingTimes,
+        []
+      )
+    ).toBe(true);
+  });
+
+  test("Plus 8 days 09:00", () => {
+    const hours = 11 + tzOffset;
+    expect(
+      areSlotsReservable(
+        [addDays(new Date().setHours(hours), 8)],
+        openingTimes,
+        activeApplicationRounds
+      )
+    ).toBe(false);
+  });
+
+  test("Plus 10 days", () => {
+    expect(
+      areSlotsReservable([addDays(new Date(), 10)], openingTimes, [])
+    ).toBe(false);
+  });
 });
 
 test("doReservationsCollide", () => {
@@ -230,25 +260,29 @@ describe("getDayIntervals", () => {
 });
 
 describe("isStartTimeWithinInterval", () => {
+  const timeZoneHours = Math.abs(new Date().getTimezoneOffset() / 60)
+    .toString()
+    .padStart(2, "0");
+
   const openingTimes = [
     {
       date: "2019-09-21",
-      startTime: "06:00:00+00:00",
-      endTime: "18:00:00+00:00",
+      startTime: `06:00:00+${timeZoneHours}:00`,
+      endTime: `18:00:00+${timeZoneHours}:00`,
       state: "open",
       periods: [38600],
     },
     {
       date: "2019-09-22",
-      startTime: "06:00:00+00:00",
-      endTime: "18:00:00+00:00",
+      startTime: `06:00:00+${timeZoneHours}:00`,
+      endTime: `18:00:00+${timeZoneHours}:00`,
       state: "open",
       periods: [38600],
     },
     {
       date: "2019-09-28",
-      startTime: "06:00:00+00:00",
-      endTime: "18:00:00+00:00",
+      startTime: `06:00:00+${timeZoneHours}:00`,
+      endTime: `18:00:00+${timeZoneHours}:00`,
       state: "open",
       periods: [38600],
     },
@@ -257,7 +291,7 @@ describe("isStartTimeWithinInterval", () => {
   test("returns sane results", () => {
     expect(
       isStartTimeWithinInterval(
-        new Date("2019-09-22T12:15:00+00:00"),
+        new Date(`2019-09-22T12:15:00+${timeZoneHours}:00`),
         openingTimes,
         "INTERVAL_15_MINS" as ReservationUnitsReservationUnitReservationStartIntervalChoices
       )
@@ -267,7 +301,7 @@ describe("isStartTimeWithinInterval", () => {
   test("returns sane results", () => {
     expect(
       isStartTimeWithinInterval(
-        new Date("2019-09-22T12:10:00+00:00"),
+        new Date(`2019-09-22T12:10:00+${timeZoneHours}:00`),
         openingTimes,
         "INTERVAL_15_MINS" as ReservationUnitsReservationUnitReservationStartIntervalChoices
       )
@@ -277,11 +311,11 @@ describe("isStartTimeWithinInterval", () => {
   test("returns sane results", () => {
     expect(
       isStartTimeWithinInterval(
-        new Date("2019-09-22T13:30:00+00:00"),
+        new Date(`2019-09-22T11:30:00+${timeZoneHours}:00`),
         openingTimes,
         "INTERVAL_90_MINS" as ReservationUnitsReservationUnitReservationStartIntervalChoices
       )
-    ).toBe(true);
+    ).toBe(false);
   });
 
   test("returns true without interval", () => {
@@ -342,15 +376,15 @@ describe("getBufferedEventTimes", () => {
   const end = new Date("2019-09-22T13:00:00+00:00");
 
   test("with a buffer", () => {
-    expect(getBufferedEventTimes(start, end, "00:30:00", "01:00:00")).toEqual({
+    expect(getBufferedEventTimes(start, end, 1800, 3600)).toEqual({
       start: new Date("2019-09-22T11:30:00+00:00"),
       end: new Date("2019-09-22T14:00:00+00:00"),
     });
-    expect(getBufferedEventTimes(start, end, null, "01:00:00")).toEqual({
+    expect(getBufferedEventTimes(start, end, null, 3600)).toEqual({
       start: new Date("2019-09-22T12:00:00+00:00"),
       end: new Date("2019-09-22T14:00:00+00:00"),
     });
-    expect(getBufferedEventTimes(start, end, "01:00:00")).toEqual({
+    expect(getBufferedEventTimes(start, end, 3600)).toEqual({
       start: new Date("2019-09-22T11:00:00+00:00"),
       end: new Date("2019-09-22T13:00:00+00:00"),
     });
@@ -374,14 +408,14 @@ describe("doesBuffer(s)Collide", () => {
     {
       begin: new Date("2019-09-22T12:00:00+00:00"),
       end: new Date("2019-09-22T13:00:00+00:00"),
-      bufferTimeBefore: "01:00:00",
-      bufferTimeAfter: "01:00:00",
+      bufferTimeBefore: 3600,
+      bufferTimeAfter: 3600,
     },
     {
       begin: new Date("2019-09-22T16:00:00+00:00"),
       end: new Date("2019-09-22T17:00:00+00:00"),
-      bufferTimeBefore: "01:00:00",
-      bufferTimeAfter: "01:00:00",
+      bufferTimeBefore: 3600,
+      bufferTimeAfter: 3600,
     },
   ] as ReservationType[];
   test("detects collisions", () => {
@@ -389,7 +423,7 @@ describe("doesBuffer(s)Collide", () => {
       doesBufferCollide(reservations[0], {
         start: new Date("2019-09-22T14:00:00+00:00"),
         end: new Date("2019-09-22T15:00:00+00:00"),
-        bufferTimeBefore: "01:30:00",
+        bufferTimeBefore: 5400,
         bufferTimeAfter: null,
       })
     ).toBe(true);
@@ -399,7 +433,7 @@ describe("doesBuffer(s)Collide", () => {
         start: new Date("2019-09-22T10:00:00+00:00"),
         end: new Date("2019-09-22T10:30:00+00:00"),
         bufferTimeBefore: null,
-        bufferTimeAfter: "01:30:00",
+        bufferTimeAfter: 5400,
       })
     ).toBe(false);
 
@@ -408,7 +442,7 @@ describe("doesBuffer(s)Collide", () => {
         start: new Date("2019-09-22T10:00:00+00:00"),
         end: new Date("2019-09-22T10:30:00+00:00"),
         bufferTimeBefore: null,
-        bufferTimeAfter: "01:31:00",
+        bufferTimeAfter: 5460,
       })
     ).toBe(true);
 
@@ -416,7 +450,7 @@ describe("doesBuffer(s)Collide", () => {
       doBuffersCollide(reservations, {
         start: new Date("2019-09-22T14:00:00+00:00"),
         end: new Date("2019-09-22T14:15:00+00:00"),
-        bufferTimeBefore: "01:00:00",
+        bufferTimeBefore: 3600,
         bufferTimeAfter: null,
       })
     ).toBe(false);
@@ -425,7 +459,7 @@ describe("doesBuffer(s)Collide", () => {
       doBuffersCollide(reservations, {
         start: new Date("2019-09-22T14:00:00+00:00"),
         end: new Date("2019-09-22T14:15:00+00:00"),
-        bufferTimeBefore: "01:01:00",
+        bufferTimeBefore: 3660,
         bufferTimeAfter: null,
       })
     ).toBe(true);
@@ -434,7 +468,7 @@ describe("doesBuffer(s)Collide", () => {
       doBuffersCollide(reservations, {
         start: new Date("2019-09-22T14:00:00+00:00"),
         end: new Date("2019-09-22T15:00:00+00:00"),
-        bufferTimeBefore: "01:00:00",
+        bufferTimeBefore: 3600,
         bufferTimeAfter: null,
       })
     ).toBe(false);
@@ -443,8 +477,8 @@ describe("doesBuffer(s)Collide", () => {
       doBuffersCollide(reservations, {
         start: new Date("2019-09-22T14:00:00+00:00"),
         end: new Date("2019-09-22T15:00:00+00:00"),
-        bufferTimeBefore: "01:00:00",
-        bufferTimeAfter: "01:01:00",
+        bufferTimeBefore: 3600,
+        bufferTimeAfter: 3660,
       })
     ).toBe(true);
   });
@@ -454,16 +488,18 @@ describe("getEventBuffers", () => {
   test("outputs correct buffers", () => {
     const events = [
       {
+        id: "1234",
         begin: new Date("2019-09-22T12:00:00+00:00"),
         end: new Date("2019-09-22T13:00:00+00:00"),
-        bufferTimeBefore: "01:00:00",
-        bufferTimeAfter: "01:30:00",
+        bufferTimeBefore: 3600,
+        bufferTimeAfter: 5400,
       },
       {
+        id: "3456",
         begin: new Date("2019-09-22T15:00:00+00:00"),
         end: new Date("2019-09-22T16:00:00+00:00"),
         bufferTimeBefore: null,
-        bufferTimeAfter: "02:30:00",
+        bufferTimeAfter: 9000,
       },
     ] as ReservationType[];
 

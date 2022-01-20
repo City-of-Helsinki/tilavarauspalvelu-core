@@ -25,7 +25,7 @@ jobs:
           docker build -t tilavaraus-ui -f ui/Dockerfile .
       - name: Start container
         run: |
-          docker run -e DISABLE_AUTH=true -e TILAVARAUS_API_URL=http://localhost:8000 -e NEXT_PUBLIC_MOCK_REQUESTS=true -p 3000:3000 -d --ipc=host --name tilavaraus-ui-server tilavaraus-ui
+          docker run -e TZ=Europe/Helsinki -e DISABLE_AUTH=true -e TILAVARAUS_API_URL=http://localhost:8000 -e NEXT_PUBLIC_MOCK_REQUESTS=true -p 3000:3000 -d --ipc=host --name tilavaraus-ui-server tilavaraus-ui
       - name: Cypress e2e & a11y
         uses: cypress-io/github-action@v2
         with:

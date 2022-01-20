@@ -17,6 +17,7 @@ import {
   getVolume,
 } from "../../modules/reservationUnit";
 import { getReservationPrice } from "../../modules/reservation";
+import { NoWrap } from "../../styles/util";
 
 export type TicketState = "incomplete" | "complete" | "error";
 
@@ -195,9 +196,7 @@ const Ticket = ({
   const duration = differenceInMinutes(new Date(end), new Date(begin));
   const timeString = `${beginDate} ${beginTime} - ${
     endDate !== beginDate ? endDate : ""
-  }${endTime} (${t("common:duration", {
-    duration: formatDurationMinutes(duration),
-  })})`;
+  }${endTime}`;
 
   const multiplier = getVolume(duration, priceUnit);
 
@@ -209,7 +208,17 @@ const Ticket = ({
         {subtitle && <Subtitle>{subtitle}</Subtitle>}
         {isFinite(duration) && (
           <Duration data-test="reservation__time-range">
-            <IconCalendar /> {capitalize(timeString)}
+            <IconCalendar />
+            <span>
+              {capitalize(timeString)}{" "}
+              <NoWrap>
+                (
+                {t("common:duration", {
+                  duration: formatDurationMinutes(duration),
+                })}
+                )
+              </NoWrap>
+            </span>
           </Duration>
         )}
         <Price $isFree={isFree} data-testid="reservation__price--container">

@@ -21,6 +21,37 @@ export const UPDATE_RESERVATION = gql`
         calendarUrl
         state
         user
+        name
+        description
+        purpose {
+          pk
+        }
+        numPersons
+        ageGroup {
+          pk
+        }
+        reserveeFirstName
+        reserveeLastName
+        reserveeOrganisationName
+        reserveePhone
+        reserveeEmail
+        reserveeId
+        reserveeIsUnregisteredAssociation
+        reserveeAddressStreet
+        reserveeAddressCity
+        reserveeAddressZip
+        billingFirstName
+        billingLastName
+        billingPhone
+        billingEmail
+        billingAddressStreet
+        billingAddressCity
+        billingAddressZip
+        homeCity {
+          pk
+        }
+        applyingForFreeOfCharge
+        freeOfChargeReason
       }
       errors {
         field
@@ -181,6 +212,19 @@ export const GET_RESERVATION_CANCEL_REASONS = gql`
           reasonFi
           reasonEn
           reasonSv
+        }
+      }
+    }
+  }
+`;
+
+export const GET_CITIES = gql`
+  query getCities {
+    cities {
+      edges {
+        node {
+          pk
+          name
         }
       }
     }

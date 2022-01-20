@@ -967,6 +967,9 @@ const translations: ITranslations = {
     deleteImage: ["poista"],
     mainImage: ["Pääkuva"],
     useAsMainImage: ["Käytä pääkuvana"],
+    imageDeletedTitle: ["Kuva poistettiin"],
+    imageDeleted: [""],
+    errorDeletingImage: ["Kuvan poistaminen ei onnistunut"],
   },
   priceUnit: {
     FIXED: ["Per kerta"],

@@ -13,3 +13,7 @@ export const pixel =
 export const MediumButton = styled(Button)`
   font-family: var(--font-medium);
 `;
+
+export const NoWrap = styled.span`
+  white-space: nowrap;
+`;

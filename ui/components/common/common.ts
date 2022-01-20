@@ -51,7 +51,8 @@ export const CenterSpinner = styled(LoadingSpinner)`
   margin: 0 auto var(--spacing-2-xl) auto;
 `;
 
-export const CheckboxWrapper = styled.div`
+export const CheckboxWrapper = styled.div<{ $break?: boolean }>`
+  ${({ $break }) => $break && "grid-column: 1 / -1"};
   margin-top: 2.5em;
   margin-bottom: auto;
 

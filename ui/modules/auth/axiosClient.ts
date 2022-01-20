@@ -1,62 +1,18 @@
 import axios, { AxiosRequestConfig } from "axios";
 import createAuthRefreshInterceptor from "axios-auth-refresh";
 import applyCaseMiddleware from "axios-case-converter";
+import { isBrowser, authEnabled } from "../const";
 import {
-  isBrowser,
-  authEnabled,
-  oidcUrl,
-  oidcClientId,
-  apiScope,
-} from "../const";
+  getAccessToken,
+  getApiAccessToken,
+  updateApiAccessToken,
+} from "./util";
 
 const axiosOptions = {
   timeout: 20000,
   headers: {
     "Content-Type": "application/json",
   },
-};
-
-const getApiAccessToken = () =>
-  sessionStorage.getItem(`oidc.apiToken.${apiScope}`);
-
-const setApiAccessToken = (accessToken: string) =>
-  sessionStorage.setItem(`oidc.apiToken.${apiScope}`, accessToken);
-
-const getAccessToken = () => {
-  const key = `oidc.user:${oidcUrl}/:${oidcClientId}`;
-  const data = sessionStorage.getItem(key);
-
-  if (data) {
-    try {
-      const parsed = JSON.parse(data);
-      return parsed.access_token;
-    } catch (Exception) {
-      return undefined;
-    }
-  }
-  return undefined;
-};
-
-const updateApiAccessToken = async (accessToken: string) => {
-  if (!apiScope) {
-    throw new Error("Application configuration error, illegal api scope.");
-  }
-  const response = await axios.request({
-    responseType: "json",
-    method: "POST",
-    url: `${oidcUrl}/api-tokens/`,
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-  });
-
-  const { data } = response;
-
-  const apiAccessToken = data[apiScope];
-  setApiAccessToken(apiAccessToken);
-
-  return apiAccessToken;
 };
 
 const axiosClient = applyCaseMiddleware(axios.create(axiosOptions));

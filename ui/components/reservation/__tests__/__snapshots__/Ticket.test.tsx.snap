@@ -204,7 +204,14 @@ exports[`renders correctly 4`] = `
             />
           </g>
         </svg>
-         Common:dateWithWeekday common:timeWithPrefix - common:time (common:duration)
+        <span>
+          Common:dateWithWeekday common:timeWithPrefix - common:time 
+          <span
+            class="util__NoWrap-sc-5wh4ks-1 kcHKKZ"
+          >
+            (common:duration)
+          </span>
+        </span>
       </div>
       <div
         class="Ticket__Price-sc-16qon89-6 hBNSGZ"

@@ -3,6 +3,8 @@ import { ReservationType } from "../gql-types";
 import {
   canUserCancelReservation,
   getDurationOptions,
+  getReservationApplicationFields,
+  getReservationApplicationMutatationValues,
   getReservationPrice,
 } from "../reservation";
 import mockTranslations from "../../public/locales/fi/prices.json";
@@ -24,9 +26,10 @@ jest.mock("next/config", () => () => ({
 
 describe("getDurationOptions", () => {
   test("works", () => {
-    expect(getDurationOptions("0:30:00", "01:30:00")).toEqual([]);
-    expect(getDurationOptions("00:30:00", "1:30:00")).toEqual([]);
-    expect(getDurationOptions("00:30:00", "01:30:00")).toEqual([
+    expect(getDurationOptions(null, 5400)).toEqual([]);
+    expect(getDurationOptions(5400, null)).toEqual([]);
+    expect(getDurationOptions(null, null)).toEqual([]);
+    expect(getDurationOptions(1800, 5400)).toEqual([
       {
         label: "0:30",
         value: "0:30",
@@ -48,7 +51,7 @@ describe("getDurationOptions", () => {
         value: "1:30",
       },
     ]);
-    expect(getDurationOptions("00:30:00", "08:30:00", "02:00:00")).toEqual([
+    expect(getDurationOptions(1800, 30600, "02:00:00")).toEqual([
       {
         label: "0:30",
         value: "0:30",
@@ -178,5 +181,64 @@ describe("getReservationPrice", () => {
 
   test("with a price and forced decimals", () => {
     expect(getReservationPrice(10, true)).toBe("10,00 €"); // contains non-breaking space
+  });
+});
+
+describe("getReservationApplicationFields", () => {
+  test("with emrty input", () => {
+    expect(getReservationApplicationFields([], "individual")).toEqual([]);
+  });
+
+  const fields = ["reservee_id", "reservee_organisation_name", "name"];
+
+  test("with individual input", () => {
+    expect(getReservationApplicationFields(fields, "individual")).toEqual([
+      "name",
+    ]);
+  });
+
+  test("with business input", () => {
+    expect(getReservationApplicationFields(fields, "business")).toEqual([
+      "name",
+      "reservee_organisation_name",
+      "reservee_id",
+    ]);
+  });
+
+  test("with nonprofit input, camelCased", () => {
+    expect(getReservationApplicationFields(fields, "nonprofit", true)).toEqual([
+      "name",
+      "reserveeOrganisationName",
+      "reserveeId",
+    ]);
+  });
+});
+
+describe("getReservationApplcationMutationValues", () => {
+  test("with empty input", () => {
+    expect(
+      getReservationApplicationMutatationValues({}, [], "individual")
+    ).toEqual({
+      reserveeType: "individual",
+    });
+  });
+
+  test("with sane input", () => {
+    const payload = {
+      name: "Nimi",
+      reserveeId: "123456-7",
+      reserveeFirstName: "Etunimi",
+    };
+    expect(
+      getReservationApplicationMutatationValues(
+        payload,
+        ["name", "reservee_id", "reservee_first_name"],
+        "individual"
+      )
+    ).toEqual({
+      name: "Nimi",
+      reserveeFirstName: "Etunimi",
+      reserveeType: "individual",
+    });
   });
 });

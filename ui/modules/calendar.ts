@@ -1,9 +1,9 @@
 import {
   addDays,
-  addHours,
-  addMinutes,
+  addSeconds,
   areIntervalsOverlapping,
-  differenceInMinutes,
+  differenceInSeconds,
+  format,
   getISODay,
   isAfter,
   isBefore,
@@ -29,7 +29,6 @@ import {
   PendingReservation,
 } from "./types";
 import {
-  apiDurationToMinutes,
   convertHMSToSeconds,
   endOfWeek,
   parseDate,
@@ -79,31 +78,29 @@ export const displayDate = (date: Date, t: TFunction): string => {
 export const isReservationShortEnough = (
   start: Date,
   end: Date,
-  maxDuration: string
+  maxDuration: number
 ): boolean => {
   if (!maxDuration) return true;
 
-  const reservationDuration = differenceInMinutes(
+  const reservationDuration = differenceInSeconds(
     new Date(end),
     new Date(start)
   );
-  const maxMinutes = apiDurationToMinutes(maxDuration);
-  return reservationDuration <= maxMinutes;
+  return reservationDuration <= maxDuration;
 };
 
 export const isReservationLongEnough = (
   start: Date,
   end: Date,
-  minDuration: string
+  minDuration: number
 ): boolean => {
   if (!minDuration) return true;
 
-  const reservationDuration = differenceInMinutes(
+  const reservationDuration = differenceInSeconds(
     new Date(end),
     new Date(start)
   );
-  const minMinutes = apiDurationToMinutes(minDuration);
-  return reservationDuration >= minMinutes;
+  return reservationDuration >= minDuration;
 };
 
 const areOpeningTimesAvailable = (
@@ -112,13 +109,14 @@ const areOpeningTimesAvailable = (
 ) => {
   return !!openingHours?.some((oh) => {
     const startDate = oh.date;
-    const startTime = new Date(`${startDate}T${oh.startTime}`);
-    const endTime = new Date(`${startDate}T${oh.endTime}`);
+    const startDateTime = new Date(`${startDate}T${oh.startTime}`);
+    const endDateTime = new Date(`${startDate}T${oh.endTime}`);
     return (
       toApiDate(slotDate) === startDate.toString() &&
-      startTime.getDay() === slotDate.getDay() &&
-      startTime.getHours() <= slotDate.getHours() &&
-      endTime.getHours() >= slotDate.getHours()
+      slotDate < endDateTime &&
+      startDateTime.getDay() === slotDate.getDay() &&
+      startDateTime.getHours() <= slotDate.getHours() &&
+      endDateTime.getHours() >= slotDate.getHours()
     );
   });
 };
@@ -176,8 +174,8 @@ export const getDayIntervals = (
   endTime: string,
   interval: ReservationUnitsReservationUnitReservationStartIntervalChoices
 ): string[] => {
-  const start = convertHMSToSeconds(startTime);
-  const end = convertHMSToSeconds(endTime);
+  const start = convertHMSToSeconds(startTime?.substring(0, 5));
+  const end = convertHMSToSeconds(endTime?.substring(0, 5));
   const intervals: string[] = [];
 
   let intervalSeconds = 0;
@@ -208,7 +206,7 @@ export const getDayIntervals = (
     );
   }
 
-  return intervals;
+  return intervals.filter((n) => n.substring(0, 5) !== endTime);
 };
 
 export const isStartTimeWithinInterval = (
@@ -223,8 +221,8 @@ export const isStartTimeWithinInterval = (
     openingTimes.find((n) => n.date === toApiDate(start)) || {};
 
   return getDayIntervals(
-    dayStartTime?.substring(0, 5),
-    dayEndTime?.substring(0, 5),
+    format(new Date(`1970-01-01T${dayStartTime}`), "HH:mm"),
+    format(new Date(`1970-01-01T${dayEndTime}`), "HH:mm"),
     interval
   ).includes(startTime);
 };
@@ -270,20 +268,11 @@ export const getTimeslots = (
 export const getBufferedEventTimes = (
   start: Date,
   end: Date,
-  bufferTimeBefore?: string,
-  bufferTimeAfter?: string
+  bufferTimeBefore?: number,
+  bufferTimeAfter?: number
 ): { start: Date; end: Date } => {
-  const [beforeHours, beforeMinutes]: number[] = bufferTimeBefore
-    ?.split(":")
-    .map(Number) || [0, 0];
-  const [afterHours, afterMinutes]: number[] = bufferTimeAfter
-    ?.split(":")
-    .map(Number) || [0, 0];
-  const before = addMinutes(
-    addHours(start, -1 * beforeHours),
-    -1 * beforeMinutes
-  );
-  const after = addMinutes(addHours(end, afterHours), afterMinutes);
+  const before = addSeconds(start, -1 * bufferTimeBefore || 0);
+  const after = addSeconds(end, bufferTimeAfter || 0);
   return { start: before, end: after };
 };
 
@@ -292,8 +281,8 @@ export const doesBufferCollide = (
   newReservation: {
     start: Date;
     end: Date;
-    bufferTimeBefore: string;
-    bufferTimeAfter: string;
+    bufferTimeBefore: number;
+    bufferTimeAfter: number;
   }
 ): boolean => {
   const newReservationStartBuffer =
@@ -333,8 +322,8 @@ export const doBuffersCollide = (
   newReservation: {
     start: Date;
     end: Date;
-    bufferTimeBefore: string;
-    bufferTimeAfter: string;
+    bufferTimeBefore: number;
+    bufferTimeAfter: number;
   }
 ): boolean => {
   return reservations.some((reservation) =>
@@ -353,20 +342,16 @@ export const getEventBuffers = (
     const end = new Date(event.end);
 
     if (bufferTimeBefore) {
-      const [hours, minutes]: number[] = bufferTimeBefore
-        .split(":")
-        .map(Number);
       buffers.push({
-        start: addMinutes(addHours(begin, -1 * hours), -1 * minutes),
+        start: addSeconds(begin, -1 * bufferTimeBefore),
         end: begin,
         event: { ...event, state: "BUFFER" },
       });
     }
     if (bufferTimeAfter) {
-      const [hours, minutes]: number[] = bufferTimeAfter.split(":").map(Number);
       buffers.push({
         start: end,
-        end: addMinutes(addHours(end, hours), minutes),
+        end: addSeconds(end, bufferTimeAfter),
         event: { ...event, state: "BUFFER" },
       });
     }

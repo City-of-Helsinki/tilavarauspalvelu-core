@@ -29,3 +29,32 @@ export const SEARCH_FORM_PARAMS_PURPOSE = gql`
     }
   }
 `;
+
+export const RESERVATION_PURPOSES = gql`
+  query ReservationPurposes {
+    reservationPurposes {
+      edges {
+        node {
+          pk
+          nameFi
+          nameEn
+          nameSv
+        }
+      }
+    }
+  }
+`;
+
+export const AGE_GROUPS = gql`
+  query AgeGroups {
+    ageGroups {
+      edges {
+        node {
+          pk
+          minimum
+          maximum
+        }
+      }
+    }
+  }
+`;
