@@ -84,7 +84,7 @@ def send_resource_to_hauki(resource: Resource):
 def update_hauki_resource(resource: Resource):
     if not (settings.HAUKI_API_URL and settings.HAUKI_API_KEY):
         raise HaukiConfigurationError(
-            "Both hauki api url and hauki secret need to be configured"
+            "Both hauki api url and hauki api key need to be configured"
         )
     if not resource.id:
         raise ValueError("Resource id must be set when updating resource in hauki.")

@@ -56,7 +56,7 @@ class ReservationUnitHaukiExporter:
         department_id = f"tprek:{department_id}"
 
         return Resource(
-            id=None,
+            id=self.reservation_unit.hauki_resource_id or None,
             name=self.reservation_unit.name,
             description=self.reservation_unit.description,
             address=None,
