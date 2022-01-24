@@ -627,6 +627,18 @@ export const RESERVATIONS_QUERY = gql`
   }
 `;
 
+export const HANDLING_COUNT_QUERY = gql`
+  query handlingCount {
+    reservations(state: "REQUIRES_HANDLING") {
+      edges {
+        node {
+          pk
+        }
+      }
+    }
+  }
+`;
+
 export const RESERVATION_QUERY = gql`
   query reservationByPk($pk: Int!) {
     reservationByPk(pk: $pk) {

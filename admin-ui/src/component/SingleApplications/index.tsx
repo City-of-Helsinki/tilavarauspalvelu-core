@@ -16,6 +16,7 @@ import KorosHeading, { Heading, SubHeading } from "../KorosHeading";
 import Loader from "../Loader";
 import withMainMenu from "../withMainMenu";
 import { reservationDateTime } from "./util";
+import { useData } from "../../context/DataContext";
 
 const Insight = ({
   count,
@@ -149,6 +150,8 @@ const SingleApplicationsView = (): JSX.Element => {
   const { t } = useTranslation();
   const [cellConfig] = useState<CellConfig>(getCellConfig(t));
 
+  const { handlingCount } = useData();
+
   const { loading } = useQuery<Query, QueryReservationsArgs>(
     RESERVATIONS_QUERY,
     {
@@ -174,7 +177,6 @@ const SingleApplicationsView = (): JSX.Element => {
   }
 
   const numApplications = 357;
-  const numUnhandledApplications = 2;
   const numHandledMonthlyApplications = 12;
 
   return (
@@ -182,8 +184,10 @@ const SingleApplicationsView = (): JSX.Element => {
       <KorosHeading>
         <Insights>
           <Insight
-            count={`${numUnhandledApplications} kpl`}
-            label={t("SingleApplications.insightCountHandledApplications")}
+            count={`${handlingCount} kpl`}
+            label={t("SingleApplications.insightCountHandledApplications", {
+              count: handlingCount,
+            })}
           />
           <Insight
             count={`${numHandledMonthlyApplications} kpl`}

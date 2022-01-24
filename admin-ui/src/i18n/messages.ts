@@ -1014,7 +1014,8 @@ const translations: ITranslations = {
     removeSuccess: ["Resurssi poistettu."],
   },
   SingleApplications: {
-    insightCountHandledApplications: ["tarkastettavaa anomusta"],
+    insightCountHandledApplications: ["tarkastettava anomus"],
+    insightCountHandledApplications_plural: ["tarkastettavaa anomusta"],
     insightCountMonthlyHandledApplications: ["käsiteltyä anomusta / kk"],
     insightCountTotalApplications: ["anomusta yhteensä"],
     heading: {

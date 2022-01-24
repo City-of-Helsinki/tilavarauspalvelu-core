@@ -11,6 +11,7 @@
   --tilavaraus-admin-gray: #efeff0;
   --tilavaraus-admin-gray-darker: #f0f1f4;
   --tilavaraus-ui-gray: var(--color-black-40);
+  --tilavaraus-admin-handling-count-color: #ff8003;
   --container-width-xxl: 1440px;
   --main-menu-width: 240px;
   --ingress-container-width: 1080px;
