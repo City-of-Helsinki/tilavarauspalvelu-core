@@ -77,9 +77,7 @@ const DialogContent = ({
   return (
     <>
       <Dialog.Content>
-        <p id="modal-description" className="text-body">
-          Lorem ipsum.
-        </p>
+        <p id="modal-description" className="text-body" />
         <Fields>
           <Select
             id="denyReason"
