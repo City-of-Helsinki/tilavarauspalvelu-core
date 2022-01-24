@@ -91,17 +91,17 @@ class PurposeUpdateSerializer(PrimaryKeyUpdateSerializer, PurposeCreateSerialize
 
 
 class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySerializer):
-    terms_of_use_fi = serializers.CharField(required=False)
-    terms_of_use_sv = serializers.CharField(required=False)
-    terms_of_use_en = serializers.CharField(required=False)
-    name_fi = serializers.CharField(required=False, allow_blank=True)
-    name_sv = serializers.CharField(required=False, allow_blank=True)
-    name_en = serializers.CharField(required=False, allow_blank=True)
-    max_reservation_duration = DurationField(required=False)
-    min_reservation_duration = DurationField(required=False)
-    buffer_time_before = DurationField(required=False)
-    buffer_time_after = DurationField(required=False)
-    max_persons = serializers.IntegerField(required=False)
+    terms_of_use_fi = serializers.CharField(required=False, allow_null=True)
+    terms_of_use_sv = serializers.CharField(required=False, allow_null=True)
+    terms_of_use_en = serializers.CharField(required=False, allow_null=True)
+    name_fi = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+    name_sv = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+    name_en = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+    max_reservation_duration = DurationField(required=False, allow_null=True)
+    min_reservation_duration = DurationField(required=False, allow_null=True)
+    buffer_time_before = DurationField(required=False, allow_null=True)
+    buffer_time_after = DurationField(required=False, allow_null=True)
+    max_persons = serializers.IntegerField(required=False, allow_null=True)
     space_pks = serializers.ListField(
         child=IntegerPrimaryKeyField(queryset=Space.objects.all()),
         source="spaces",
@@ -130,9 +130,15 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
     reservation_unit_type_pk = IntegerPrimaryKeyField(
         source="reservation_unit_type",
         required=False,
+        allow_null=True,
         queryset=ReservationUnitType.objects.all(),
     )
-    unit_pk = IntegerPrimaryKeyField(queryset=Unit.objects.all(), source="unit")
+    unit_pk = IntegerPrimaryKeyField(
+        queryset=Unit.objects.all(),
+        source="unit",
+        required=False,
+        allow_null=True,
+    )
     cancellation_rule_pk = IntegerPrimaryKeyField(
         queryset=ReservationUnitCancellationRule.objects.all(),
         source="cancellation_rule",
@@ -143,6 +149,7 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
         queryset=TermsOfUse.objects.filter(terms_type=TermsOfUse.TERMS_TYPE_PAYMENT),
         source="payment_terms",
         required=False,
+        allow_null=True,
     )
     cancellation_terms_pk = serializers.PrimaryKeyRelatedField(
         queryset=TermsOfUse.objects.filter(
@@ -150,11 +157,13 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
         ),
         source="cancellation_terms",
         required=False,
+        allow_null=True,
     )
     service_specific_terms_pk = serializers.PrimaryKeyRelatedField(
         queryset=TermsOfUse.objects.filter(terms_type=TermsOfUse.TERMS_TYPE_SERVICE),
         source="service_specific_terms",
         required=False,
+        allow_null=True,
     )
     lowest_price = serializers.DecimalField(
         max_digits=10,

@@ -1660,13 +1660,6 @@ class ReservationUnitCreateAsDraftTestCase(ReservationUnitMutationsTestCaseBase)
         assert_that(res_unit_data.get("errors")).is_none()
         assert_that(send_resource_mock.call_count).is_equal_to(0)
 
-    def test_create_errors_without_unit_pk(self):
-        data = {"isDraft": True, "nameFi": "Resunit name"}
-        response = self.query(self.get_create_query(), input_data=data)
-        assert_that(response.status_code).is_equal_to(400)
-        content = json.loads(response.content)
-        assert_that(content.get("errors")).is_not_none()
-
     def test_create_errors_on_empty_name(self):
         data = {
             "isDraft": True,
@@ -1955,16 +1948,6 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         assert_that(res_unit_data.get("errors")[0].get("messages")[0]).contains(
             "Not draft state reservation units must have a translations."
         )
-        assert_that(ReservationUnit.objects.exists()).is_false()
-
-    def test_create_errors_without_unit_pk(self):
-        data = self.get_valid_data()
-        data.pop("unitPk")
-
-        response = self.query(self.get_create_query(), input_data=data)
-        assert_that(response.status_code).is_equal_to(400)
-        content = json.loads(response.content)
-        assert_that(content.get("errors")).is_not_none()
         assert_that(ReservationUnit.objects.exists()).is_false()
 
     def test_create_errors_on_empty_space_and_missing_resource(self):
