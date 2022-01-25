@@ -74,6 +74,34 @@ snapshots['ReservationUnitQueryTestCase::test_filtering_by_is_visible_true 1'] =
                         'publishBegins': '2021-05-03T00:00:00+00:00',
                         'publishEnds': '2021-05-10T00:00:00+00:00'
                     }
+                },
+                {
+                    'node': {
+                        'nameFi': 'show me',
+                        'publishBegins': None,
+                        'publishEnds': None
+                    }
+                },
+                {
+                    'node': {
+                        'nameFi': 'show me too!',
+                        'publishBegins': '2021-04-28T00:00:00+00:00',
+                        'publishEnds': '2021-05-13T00:00:00+00:00'
+                    }
+                },
+                {
+                    'node': {
+                        'nameFi': 'Take me in!',
+                        'publishBegins': '2021-04-28T00:00:00+00:00',
+                        'publishEnds': None
+                    }
+                },
+                {
+                    'node': {
+                        'nameFi': 'Take me in too!',
+                        'publishBegins': None,
+                        'publishEnds': '2021-05-08T00:00:00+00:00'
+                    }
                 }
             ]
         }
