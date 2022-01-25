@@ -2,6 +2,7 @@
   --tilavaraus-admin-brand: #00005e;
   --tilavaraus-admin-blue: var(--color-bus);
   --tilavaraus-admin-blue-dark: #040091;
+  --tilavaraus-admin-status-not-handled: #0064b3;
   --tilavaraus-admin-header-background-color: var(--tilavaraus-admin-brand);
   --tilavaraus-admin-header-color: white;
   --tilavaraus-admin-background-color: white;
@@ -10,6 +11,7 @@
   --tilavaraus-admin-gray: #efeff0;
   --tilavaraus-admin-gray-darker: #f0f1f4;
   --tilavaraus-ui-gray: var(--color-black-40);
+  --tilavaraus-admin-handling-count-color: #ff8003;
   --container-width-xxl: 1440px;
   --main-menu-width: 240px;
   --ingress-container-width: 1080px;
@@ -19,6 +21,10 @@
   --tilavaraus-admin-stack-modal: 1000;
   --tilavaraus-admin-stack-seranwrap: 900;
   --tilavaraus-admin-stack-dialog: 800;
+  --tilavaraus-admin-button-stripe-stack: 799;  /* one under hds dialog backdrop */
+  --tilavaraus-admin-notification-stack: 801;
+
   --tilavaraus-admin-sticky-header: 700;
   --tilavaraus-admin-stack-main-menu: 500;
+
 }

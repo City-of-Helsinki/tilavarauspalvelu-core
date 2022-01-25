@@ -6,7 +6,7 @@ import { useReactOidc } from "@axa-fr/react-oidc-context";
 import { Button, IconArrowRight, IconGroup } from "hds-react";
 import { BrowserRouter } from "react-router-dom";
 import queryString from "query-string";
-import KorosHeading from "./KorosHeading";
+import KorosHeading, { Heading } from "./KorosHeading";
 import HeroImage from "../images/hero-user@1x.jpg";
 import { H2 } from "../styles/typography";
 import { breakpoints } from "../styles/util";
@@ -91,13 +91,10 @@ function MainLander({ withSiteWrapper = false }: IProps): JSX.Element {
 
   const Lander = (
     <Wrapper>
-      <KorosHeading
-        heading={t("common.applicationName")}
-        content={
-          <LoginBtn onClick={() => login()}>{t("Navigation.login")}</LoginBtn>
-        }
-        heroImage={HeroImage}
-      />
+      <KorosHeading heroImage={HeroImage}>
+        <Heading>{t("common.applicationName")}</Heading>
+        <LoginBtn onClick={() => login()}>{t("Navigation.login")}</LoginBtn>
+      </KorosHeading>
       <Content>
         <Ingress>{t("MainLander.ingress")}</Ingress>
         <Body>{t("MainLander.body")}</Body>

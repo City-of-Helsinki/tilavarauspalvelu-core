@@ -5,10 +5,8 @@ import { H1 } from "../styles/typography";
 import { breakpoints } from "../styles/util";
 
 interface IProps {
-  heading: string;
-  subheading?: string;
   heroImage?: string;
-  content?: ReactNode;
+  children?: ReactNode | ReactNode[];
   className?: string;
   style?: CSSProperties;
 }
@@ -33,20 +31,22 @@ const Wrapper = styled.div.attrs({
   flex-direction: column;
 `;
 
-const Heading = styled(H1)`
+export const Heading = styled(H1)`
   color: var(--color-white);
   margin: 0 var(--spacing-m);
+  margin-bottom: var(--spacing-xs);
 `;
 
-const SubHeading = styled.span`
+export const SubHeading = styled.span`
   font-size: var(--fontsize-heading-s);
   font-family: HelsinkiGroteskBold, var(--font-default);
   font-weight: bold;
+  letter-spacing: 1px;
   line-height: var(--lineheight-m);
   margin-top: var(--spacing-2-xs);
 `;
 
-const Content = styled.div<{ $heroImage: boolean }>`
+export const Content = styled.div<{ $heroImage: boolean }>`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -92,20 +92,14 @@ const StyledKoros = styled(Koros).attrs(({ flipHorizontal }) => ({
 `;
 
 function KorosHeading({
-  heading,
-  subheading,
   heroImage,
-  content,
   className,
   style,
+  children,
 }: IProps): JSX.Element {
   return (
     <Wrapper $image={heroImage} className={className} style={style}>
-      <Content $heroImage={!!heroImage}>
-        <Heading>{heading}</Heading>
-        <SubHeading>{subheading}</SubHeading>
-        {content}
-      </Content>
+      <Content $heroImage={!!heroImage}>{children}</Content>
       <StyledKoros
         type="pulse"
         flipHorizontal={!heroImage}

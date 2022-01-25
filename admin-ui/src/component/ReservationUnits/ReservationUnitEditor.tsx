@@ -1,7 +1,6 @@
 import { useMutation, useQuery } from "@apollo/client";
 import {
-  Accordion,
-  Button as HDSButton,
+  Accordion as HDSAccordion,
   Checkbox,
   Combobox,
   Fieldset,
@@ -47,7 +46,12 @@ import {
 import { OptionType } from "../../common/types";
 import { ContentContainer, IngressContainer } from "../../styles/layout";
 
-import { breakpoints } from "../../styles/util";
+import {
+  breakpoints,
+  ButtonsStripe,
+  StyledNotification,
+  WhiteButton,
+} from "../../styles/util";
 import Loader from "../Loader";
 import SubPageHead from "../Unit/SubPageHead";
 import { MainMenuWrapper } from "../withMainMenu";
@@ -439,11 +443,12 @@ const reducer = (state: State, action: Action): State => {
 
 const Wrapper = styled.div``;
 
-const StyledNotification = styled(Notification)`
-  margin: var(--spacing-xs) var(--spacing-layout-2-xs);
-  width: auto;
-  @media (min-width: ${breakpoints.xl}) {
-    margin: var(--spacing-s) var(--spacing-layout-xl);
+const Accordion = styled(HDSAccordion)`
+  > div:first-child {
+    position: sticky;
+    background: white;
+    top: 0;
+    z-index: 10;
   }
 `;
 
@@ -478,54 +483,6 @@ const Editor = styled.div`
 
 const Section = styled.div`
   margin: var(--spacing-layout-l) 0;
-`;
-
-const Buttons = styled.div`
-  position: sticky;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  display: flex;
-  padding: var(--spacing-xl);
-  background-color: var(--color-bus-dark);
-  z-index: 1000;
-`;
-
-const StyledButton = styled(HDSButton)<{
-  disabled: boolean;
-  variant: "secondary" | "primary";
-}>`
-  --bg: var(--color-white);
-  --fg: var(--color-black);
-  --hbg: var(--fg);
-  --hfg: var(--bg);
-  --border-color: var(--color-white);
-
-  ${({ variant }) =>
-    variant === "secondary"
-      ? `--fg: var(--color-white);
-    --bg: var(--color-bus-dark);`
-      : null}
-
-  ${({ disabled }) =>
-    disabled
-      ? `--hbg: var(--bg);
-        --hfg: var(--fg);
-      `
-      : null}
-
-
-  border: 2px var(--border-color) solid !important;
-
-  color: var(--fg) !important;
-  background-color: var(--bg) !important;
-
-  &:hover {
-    color: var(--hfg) !important;
-    background-color: var(--hbg) !important;
-  }
-  margin-left: auto;
-  margin-right: var(--spacing-l);
 `;
 
 const PublishingTime = styled.div`
@@ -1535,32 +1492,32 @@ const ReservationUnitEditor = (): JSX.Element | null => {
           </EditorContainer>
         </ContentContainer>
       </MainMenuWrapper>
-      <Buttons>
-        <StyledButton
+      <ButtonsStripe>
+        <WhiteButton
           disabled={false}
           variant="secondary"
           onClick={() => history.go(-1)}
         >
           {t("ReservationUnitEditor.cancel")}
-        </StyledButton>
+        </WhiteButton>
         <PublishingTime>
           Varausyksikkö julkaistaan
           <br /> TODO
         </PublishingTime>
-        <StyledButton
+        <WhiteButton
           disabled={!state.hasChanges}
           variant="secondary"
           onClick={() => createOrUpdateReservationUnit(false)}
         >
           {t("ReservationUnitEditor.saveAsDraft")}
-        </StyledButton>
-        <StyledButton
+        </WhiteButton>
+        <WhiteButton
           variant="primary"
           disabled={!isReadyToPublish}
           onClick={() => createOrUpdateReservationUnit(true)}
         >
           {t("ReservationUnitEditor.saveAndPublish")}
-        </StyledButton>
+        </WhiteButton>
         <Preview
           target="_blank"
           rel="noopener noreferrer"
@@ -1575,7 +1532,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
         >
           {t("ReservationUnitEditor.preview")}
         </Preview>
-      </Buttons>
+      </ButtonsStripe>
     </Wrapper>
   );
 };

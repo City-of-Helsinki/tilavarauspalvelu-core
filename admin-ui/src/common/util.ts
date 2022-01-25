@@ -25,6 +25,13 @@ export const formatDate = (
   return date ? format(parseISO(date), outputFormat) : null;
 };
 
+export const formatTime = (
+  date: string | null,
+  outputFormat = "HH.mm"
+): string | null => {
+  return date ? format(parseISO(date), outputFormat) : null;
+};
+
 export const formatNumber = (
   input?: number | null,
   suffix?: string

@@ -7,6 +7,7 @@ import { breakpoints } from "../styles/util";
 import { ReactComponent as IconPremiseApplications } from "../images/icon_premise-applications.svg";
 import { ReactComponent as IconPremises } from "../images/icon_premises.svg";
 import { truncatedText } from "../styles/typography";
+import { useData } from "../context/DataContext";
 
 const Wrapper = styled.ul<{ placement: string }>`
   display: flex;
@@ -78,7 +79,8 @@ const SubItemHeading = styled(NavLink).attrs({ exact: true })<{
   font-family: var(--tilavaraus-admin-font);
   font-weight: normal;
   padding-bottom: var(--spacing-2-xs);
-  display: inline-block;
+  display: inline-flex;
+  align-items: flex-start;
 `;
 
 const Toggler = styled.button`
@@ -95,6 +97,20 @@ const Toggler = styled.button`
     top: 0;
     right: 0;
   }
+`;
+
+const HandlingCount = styled.div`
+  display: inline-block;
+  border-radius: 50%;
+  background: var(--tilavaraus-admin-handling-count-color);
+  height: 1.6em;
+  text-align: center;
+  line-height: 1.6;
+  aspect-ratio: 1;
+  margin-left: var(--spacing-xs);
+  font-size: 0.6em;
+  color: white;
+  font-weight: 600;
 `;
 
 interface IMenuChild {
@@ -116,6 +132,7 @@ interface SubItemChild {
 interface SubItemProps {
   items?: SubItemChild[];
   parentTitleKey: string;
+  handlingCount: number;
   onItemSelection?: () => void;
 }
 
@@ -123,6 +140,7 @@ const SubItems = ({
   items,
   parentTitleKey,
   onItemSelection,
+  handlingCount,
 }: SubItemProps): JSX.Element | null => {
   const [isMenuOpen, toggleMenu] = useState(true);
 
@@ -155,6 +173,9 @@ const SubItems = ({
               >
                 {t(child.title)}
               </SubItemHeading>
+              {child.title === "MainMenu.singleApplications" ? (
+                <HandlingCount>{handlingCount}</HandlingCount>
+              ) : null}
             </li>
           ))}
         </SubItemList>
@@ -168,6 +189,10 @@ const menuTree: IMenuChild[] = [
     title: "MainMenu.applications",
     icon: <IconPremiseApplications aria-hidden />,
     items: [
+      {
+        title: "MainMenu.singleApplications",
+        route: "/singleApplications",
+      },
       {
         title: "MainMenu.handling",
         route: "/applicationRounds",
@@ -213,6 +238,8 @@ function MainMenu({
 }: MainMenuProps): JSX.Element {
   const { t } = useTranslation();
 
+  const { handlingCount } = useData();
+
   return (
     <Wrapper placement={placement}>
       {menuTree.map((menuItem: IMenuChild) =>
@@ -224,6 +251,7 @@ function MainMenu({
               items={menuItem.items}
               parentTitleKey={menuItem.title}
               onItemSelection={onItemSelection}
+              handlingCount={handlingCount}
             />
           </MenuItem>
         ) : null

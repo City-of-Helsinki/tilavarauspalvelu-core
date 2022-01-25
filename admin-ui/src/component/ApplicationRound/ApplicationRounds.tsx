@@ -2,10 +2,9 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { AxiosError } from "axios";
-// eslint-disable-next-line import/no-unresolved
 import { useReactOidc } from "@axa-fr/react-oidc-context";
 import { Notification } from "hds-react";
-import KorosHeading from "../KorosHeading";
+import KorosHeading, { Heading as KorosKorosHeading } from "../KorosHeading";
 import withMainMenu from "../withMainMenu";
 import ApplicationRoundCard from "./ApplicationRoundCard";
 import HeroImage from "../../images/hero-user@1x.jpg";
@@ -96,7 +95,9 @@ function ApplicationRounds(): JSX.Element {
 
   return (
     <Wrapper>
-      <KorosHeading heading={`${headingStr}!`} heroImage={HeroImage} />
+      <KorosHeading heroImage={HeroImage}>
+        <KorosKorosHeading>{headingStr}!</KorosKorosHeading>
+      </KorosHeading>
       <Ingress>{t("MainLander.ingress")}</Ingress>
       {approveRounds && approveRounds.length > 0 && (
         <Deck>
