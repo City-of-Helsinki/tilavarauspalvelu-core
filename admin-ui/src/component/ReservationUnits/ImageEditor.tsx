@@ -117,6 +117,7 @@ const ImageEditor = ({
 
   useQuery<Query>(RESERVATIONUNIT_IMAGES_QUERY, {
     variables: { pk: Number(reservationUnitPk) },
+    skip: !reservationUnitPk,
     onCompleted: ({ reservationUnitByPk }) => {
       if (reservationUnitByPk?.images) {
         setImages(reservationUnitByPk.images as ReservationUnitImageType[]);
