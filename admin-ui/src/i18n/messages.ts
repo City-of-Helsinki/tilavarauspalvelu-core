@@ -750,6 +750,7 @@ const translations: ITranslations = {
     other: ["Muut tiedot"],
     cancel: ["Palaa tallentamatta tietoja"],
     save: ["Tallenna tiedot"],
+    saveFailed: ["Tallennus ei onnistunut"],
     nameLabel: ["Tilan nimi {{lang}}"],
     namePlaceholder: ["Tilan nimi {{language}}"],
     touLabel: ["Tilan ohjeet {{lang}}"],
