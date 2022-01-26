@@ -215,6 +215,7 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
             self.check_max_reservations_per_user(
                 self.context.get("request").user, reservation_unit
             )
+            data["sku"] = reservation_unit.sku
 
         data["state"] = STATE_CHOICES.CREATED
         data[

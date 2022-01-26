@@ -727,3 +727,21 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
             content.get("data").get("createReservation").get("errors")
         ).is_none()
         assert_that(Reservation.objects.exists()).is_true()
+
+    def test_creating_reservation_copies_sku_from_reservation_unit(
+        self, mock_periods, mock_opening_hours
+    ):
+        self.reservation_unit.sku = "340026__2652000155___44_10000117"
+        self.reservation_unit.save(update_fields=["sku"])
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+        self.client.force_login(self.regular_joe)
+        response = self.query(
+            self.get_create_query(), input_data=self.get_valid_input_data()
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        assert_that(
+            content.get("data").get("createReservation").get("errors")
+        ).is_none()
+        reservation = Reservation.objects.get()
+        assert_that(reservation.sku).is_equal_to(self.reservation_unit.sku)
