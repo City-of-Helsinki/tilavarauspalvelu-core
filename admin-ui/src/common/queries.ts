@@ -10,11 +10,8 @@ export const SPACES_QUERY = gql`
           unit {
             pk
           }
-          building {
+          unit {
             nameFi
-            district {
-              nameFi
-            }
           }
           parent {
             nameFi

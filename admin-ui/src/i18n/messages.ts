@@ -611,7 +611,7 @@ const translations: ITranslations = {
     searchPlaceholder: ["Hae tiloja"],
     headings: {
       name: ["Nimi"],
-      building: ["Toimipiste"],
+      unit: ["Toimipiste"],
       district: ["Kaupunginosa"],
       volume: ["Vetoisuus"],
       size: ["Koko"],
