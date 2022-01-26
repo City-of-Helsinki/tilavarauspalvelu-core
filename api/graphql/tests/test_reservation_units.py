@@ -875,6 +875,45 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_is_visible_true(self):
+        today = datetime.datetime.now(tz=get_default_timezone())
+        # No publish times should be included in results.
+        ReservationUnitFactory(name_fi="show me")
+
+        # Publish begins before today should be included.
+        ReservationUnitFactory(
+            name_fi="show me too!",
+            publish_begins=today - datetime.timedelta(days=5),
+            publish_ends=today + datetime.timedelta(days=10),
+        )
+
+        # Publish begins after today should not be included.
+        ReservationUnitFactory(
+            name_fi="I'm invisible",
+            publish_begins=today + datetime.timedelta(days=5),
+            publish_ends=today + datetime.timedelta(days=10),
+        )
+
+        # Publish begin before and end time null should be included.
+        ReservationUnitFactory(
+            name_fi="Take me in!",
+            publish_begins=today - datetime.timedelta(days=5),
+            publish_ends=None,
+        )
+
+        # Publish end after today and begin time null should be included.
+        ReservationUnitFactory(
+            name_fi="Take me in too!",
+            publish_ends=today + datetime.timedelta(days=5),
+            publish_begins=None,
+        )
+
+        # Publish end after before today and begin time null shouldn't be included.
+        ReservationUnitFactory(
+            name_fi="I shouldn't be included!",
+            publish_ends=today - datetime.timedelta(days=1),
+            publish_begins=None,
+        )
+
         response = self.query(
             """
             query {
@@ -895,6 +934,9 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_is_visible_false(self):
+        # No publish time shouldn't include
+        ReservationUnitFactory(name_fi="testing is besthing")
+
         response = self.query(
             """
             query {

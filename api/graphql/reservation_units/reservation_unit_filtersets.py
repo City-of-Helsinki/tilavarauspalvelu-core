@@ -114,7 +114,9 @@ class ReservationUnitsFilterSet(django_filters.FilterSet):
     def get_is_visible(self, qs, property, value):
         today = datetime.datetime.now(tz=get_default_timezone())
         qs = qs.filter(is_draft=False)
-        published = Q(publish_begins__gte=today, publish_ends__gt=today)
+        published = (Q(publish_begins__lte=today) | Q(publish_begins__isnull=True)) & (
+            Q(publish_ends__gt=today) | Q(publish_ends__isnull=True)
+        )
 
         if value:
             return qs.filter(published)
