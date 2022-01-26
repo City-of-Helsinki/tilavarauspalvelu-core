@@ -735,8 +735,8 @@ const translations: ITranslations = {
     newSpacesCreatedNotification: [
       "Voit luoda tiloille alitiloja niin pitkälle kuin on tarpeellista.",
     ],
-    spacesDeletedTitle: ["Tila poistettu"],
-    spacesDeletedNotification: ["Tila poistettu onnistuneesti"],
+    spaceDeletedTitle: ["Tila poistettu"],
+    spaceDeletedNotification: ["Tila poistettu onnistuneesti"],
     resourceDeletedTitle: ["Resurssi poistettu"],
     resourceDeletedNotification: ["Resurssi poistettu onnistuneesti"],
   },
