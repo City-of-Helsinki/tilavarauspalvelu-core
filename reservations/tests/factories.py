@@ -44,6 +44,7 @@ class ReservationFactory(DjangoModelFactory):
 
     reservee_first_name = FuzzyText()
     reservee_last_name = FuzzyText()
+    sku = FuzzyText()
     name = FuzzyText()
     description = FuzzyText()
 

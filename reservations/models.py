@@ -285,6 +285,9 @@ class Reservation(models.Model):
         blank=True,
     )
 
+    sku = models.CharField(
+        verbose_name=_("SKU"), max_length=255, blank=True, default=""
+    )
     name = models.CharField(
         verbose_name=_("Name"), max_length=255, blank=True, default=""
     )
