@@ -43,6 +43,27 @@ snapshots['ReservationQueryTestCase::test_admin_can_read_working_memo 1'] = {
     }
 }
 
+snapshots['ReservationQueryTestCase::test_filter_requested 1'] = {
+    'data': {
+        'reservations': {
+            'edges': [
+                {
+                    'node': {
+                        'name': "I'm requesting this to be dealt with. Oh this is already dealt with, nice!",
+                        'state': 'CONFIRMED'
+                    }
+                },
+                {
+                    'node': {
+                        'name': 'This is requested',
+                        'state': 'REQUIRES_HANDLING'
+                    }
+                }
+            ]
+        }
+    }
+}
+
 snapshots['ReservationQueryTestCase::test_filter_reservation_state_requires_handling 1'] = {
     'data': {
         'reservations': {
