@@ -436,7 +436,9 @@ const reducer = (state: State, action: Action): State => {
   }
 };
 
-const Wrapper = styled.div``;
+const Wrapper = styled.div`
+  padding-bottom: 6em;
+`;
 
 const EditorContainer = styled.div`
   @media (min-width: ${breakpoints.l}) {
