@@ -2,6 +2,7 @@ import React from "react";
 import { Container, IconArrowRight } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
+import Link from "next/link";
 import styled from "styled-components";
 import { parseISO } from "date-fns";
 import Card from "../common/Card";
@@ -9,6 +10,7 @@ import { ApplicationRound } from "../../modules/types";
 import { applicationRoundState, searchUrl } from "../../modules/util";
 import { breakpoint } from "../../modules/style";
 import { MediumButton } from "../../styles/util";
+import { fontMedium } from "../../modules/style/typography";
 
 interface Props {
   applicationRound: ApplicationRound;
@@ -43,17 +45,30 @@ const Name = styled.div`
   font-weight: 500;
 `;
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const CardButton = styled(MediumButton)`
-  @media (max-width: ${breakpoint.s}) {
-    justify-self: center;
-  }
-
   justify-self: right;
+  width: 100%;
+
+  @media (min-width: ${breakpoint.s}) {
+    width: max-content;
+  }
+`;
+
+const StyledLink = styled.a`
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2-xs);
+  margin-top: var(--spacing-s);
+  ${fontMedium};
+
+  && {
+    color: var(--color-bus);
+  }
 `;
 
 const ApplicationRoundCard = ({ applicationRound }: Props): JSX.Element => {
   const { t } = useTranslation();
+
   const history = useRouter();
 
   const state = applicationRoundState(
@@ -85,13 +100,12 @@ const ApplicationRoundCard = ({ applicationRound }: Props): JSX.Element => {
               closingDate: parseISO(applicationRound.applicationPeriodEnd),
             })}
         </div>
-        <CardButton
-          variant="supplementary"
-          iconLeft={<IconArrowRight />}
-          onClick={() => history.push(`/criteria/${applicationRound.id}`)}
-        >
-          {t("applicationRound:card.criteria")}
-        </CardButton>
+        <Link href={`/criteria/${applicationRound.id}`} passHref>
+          <StyledLink>
+            <IconArrowRight />
+            {t("applicationRound:card.criteria")}
+          </StyledLink>
+        </Link>
       </StyledContainer>
       {state === "active" && (
         <CardButton
@@ -99,16 +113,7 @@ const ApplicationRoundCard = ({ applicationRound }: Props): JSX.Element => {
             history.push(searchUrl({ applicationRound: applicationRound.id }))
           }
         >
-          {t("applicationRound:card.applyButton")}
-        </CardButton>
-      )}
-      {state === "past" && (
-        <CardButton
-          onClick={() =>
-            history.push(searchUrl({ applicationRound: applicationRound.id }))
-          }
-        >
-          {t("applicationRound:card.displayPastButton")}
+          {t("application:Intro.startNewApplication")}
         </CardButton>
       )}
     </StyledCard>

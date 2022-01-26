@@ -1,20 +1,29 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useTranslation } from "react-i18next";
 import { Koros } from "hds-react";
 import { GetServerSideProps } from "next";
 import styled from "styled-components";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { useRouter } from "next/router";
 import Container from "../../components/common/Container";
 import { getApplicationRound } from "../../modules/api";
-import { CenterSpinner } from "../../components/common/common";
 import { ApplicationRound } from "../../modules/types";
 import Sanitize from "../../components/common/Sanitize";
 import Breadcrumb from "../../components/common/Breadcrumb";
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+type Props = {
+  applicationRound: ApplicationRound;
+};
+
+export const getServerSideProps: GetServerSideProps = async ({
+  locale,
+  params,
+}) => {
+  const id = Number(params.id);
+  const applicationRound = await getApplicationRound({ id });
+
   return {
     props: {
+      applicationRound,
       ...(await serverSideTranslations(locale)),
     },
   };
@@ -45,39 +54,16 @@ const Content = styled.div`
   font-size: var(--fontsize-body-l);
 `;
 
-const Criteria = (): JSX.Element => {
+const Criteria = ({ applicationRound }: Props): JSX.Element => {
   const { t } = useTranslation();
 
-  const router = useRouter();
-  const { id } = router.query;
-
-  const [applicationRound, setApplicationRound] = useState<ApplicationRound>();
-  const [state, setState] = useState<"loading" | "done" | "error">("loading");
-
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const round = await getApplicationRound({
-          id: Number(id),
-        });
-        setApplicationRound(round);
-        setState("done");
-      } catch (e) {
-        setState("error");
-      }
-    }
-    fetchData();
-  }, [id]);
-
-  return state !== "loading" ? (
+  return (
     <>
       <Head>
         <HeadContent>
           <Breadcrumb current={{ label: "criteria" }} />
           <H1>
-            {state === "done"
-              ? `${applicationRound?.name} ${t("applicationRound:criteria")}`
-              : t("common:error.dataError")}
+            {`${applicationRound?.name} ${t("applicationRound:criteria")}`}
           </H1>
         </HeadContent>
         <StyledKoros className="koros" type="wave" />
@@ -88,8 +74,6 @@ const Criteria = (): JSX.Element => {
         </Content>
       </Container>
     </>
-  ) : (
-    <CenterSpinner />
   );
 };
 

@@ -1,0 +1,11 @@
+{
+  "heading": "Vakiovuorot",
+  "subHeading": "Hae säännöllisiä vakiovuoroja Helsingin tiloihin ja tilakokonaisuuksiin.",
+  "ingress": "Vakiovuorojen haku on jaoteltu tilakokonaisuuksiin ja kausiin. Alla lista hakuajoista ja tilakokonaisuuksista.",
+  "roundHeadings": {
+    "active": "Käynnissä olevat haut",
+    "pending": "Tulevat haut"
+  },
+  "noRounds": "Ei aktiivisia tai tulevia hakuja.",
+  "browseAll": "Selaa kaikkia tiloja"
+}

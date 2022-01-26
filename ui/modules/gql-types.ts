@@ -453,6 +453,7 @@ export type LocationType = Node & {
 
 export type Mutation = {
   __typename?: "Mutation";
+  approveReservation?: Maybe<ReservationApproveMutationPayload>;
   cancelReservation?: Maybe<ReservationCancellationMutationPayload>;
   confirmReservation?: Maybe<ReservationConfirmMutationPayload>;
   createEquipment?: Maybe<EquipmentCreateMutationPayload>;
@@ -468,16 +469,21 @@ export type Mutation = {
   deleteReservationUnitImage?: Maybe<ReservationUnitImageDeleteMutationPayload>;
   deleteResource?: Maybe<ResourceDeleteMutationPayload>;
   deleteSpace?: Maybe<SpaceDeleteMutationPayload>;
-  handleReservation?: Maybe<ReservationHandleMutationPayload>;
+  denyReservation?: Maybe<ReservationDenyMutationPayload>;
   updateEquipment?: Maybe<EquipmentUpdateMutationPayload>;
   updateEquipmentCategory?: Maybe<EquipmentCategoryUpdateMutationPayload>;
   updatePurpose?: Maybe<PurposeUpdateMutationPayload>;
   updateReservation?: Maybe<ReservationUpdateMutationPayload>;
   updateReservationUnit?: Maybe<ReservationUnitUpdateMutationPayload>;
   updateReservationUnitImage?: Maybe<ReservationUnitImageUpdateMutationPayload>;
+  updateReservationWorkingMemo?: Maybe<ReservationWorkingMemoMutationPayload>;
   updateResource?: Maybe<ResourceUpdateMutationPayload>;
   updateSpace?: Maybe<SpaceUpdateMutationPayload>;
   updateUnit?: Maybe<UnitUpdateMutationPayload>;
+};
+
+export type MutationApproveReservationArgs = {
+  input: ReservationApproveMutationInput;
 };
 
 export type MutationCancelReservationArgs = {
@@ -540,8 +546,8 @@ export type MutationDeleteSpaceArgs = {
   input: SpaceDeleteMutationInput;
 };
 
-export type MutationHandleReservationArgs = {
-  input: ReservationHandleMutationInput;
+export type MutationDenyReservationArgs = {
+  input: ReservationDenyMutationInput;
 };
 
 export type MutationUpdateEquipmentArgs = {
@@ -566,6 +572,10 @@ export type MutationUpdateReservationUnitArgs = {
 
 export type MutationUpdateReservationUnitImageArgs = {
   input: ReservationUnitImageUpdateMutationInput;
+};
+
+export type MutationUpdateReservationWorkingMemoArgs = {
+  input: ReservationWorkingMemoMutationInput;
 };
 
 export type MutationUpdateResourceArgs = {
@@ -711,6 +721,7 @@ export type Query = {
   purposes?: Maybe<PurposeTypeConnection>;
   reservationByPk?: Maybe<ReservationType>;
   reservationCancelReasons?: Maybe<ReservationCancelReasonTypeConnection>;
+  reservationDenyReasons?: Maybe<ReservationDenyReasonTypeConnection>;
   reservationPurposes?: Maybe<ReservationPurposeTypeConnection>;
   reservationUnit?: Maybe<ReservationUnitType>;
   reservationUnitByPk?: Maybe<ReservationUnitByPkType>;
@@ -862,6 +873,15 @@ export type QueryReservationCancelReasonsArgs = {
   reason?: Maybe<Scalars["String"]>;
 };
 
+export type QueryReservationDenyReasonsArgs = {
+  after?: Maybe<Scalars["String"]>;
+  before?: Maybe<Scalars["String"]>;
+  first?: Maybe<Scalars["Int"]>;
+  last?: Maybe<Scalars["Int"]>;
+  offset?: Maybe<Scalars["Int"]>;
+  reason?: Maybe<Scalars["String"]>;
+};
+
 export type QueryReservationPurposesArgs = {
   after?: Maybe<Scalars["String"]>;
   before?: Maybe<Scalars["String"]>;
@@ -925,9 +945,10 @@ export type QueryReservationsArgs = {
   begin?: Maybe<Scalars["DateTime"]>;
   end?: Maybe<Scalars["DateTime"]>;
   first?: Maybe<Scalars["Int"]>;
-  handlingRequired?: Maybe<Scalars["Boolean"]>;
   last?: Maybe<Scalars["Int"]>;
   offset?: Maybe<Scalars["Int"]>;
+  orderBy?: Maybe<Scalars["String"]>;
+  requested?: Maybe<Scalars["Boolean"]>;
   state?: Maybe<Scalars["String"]>;
 };
 
@@ -1046,6 +1067,30 @@ export type RecurringReservationType = {
   user?: Maybe<Scalars["String"]>;
 };
 
+export type ReservationApproveMutationInput = {
+  clientMutationId?: Maybe<Scalars["String"]>;
+  /** Additional information for approval. */
+  handlingDetails?: Maybe<Scalars["String"]>;
+  pk?: Maybe<Scalars["Int"]>;
+  /** The price of this particular reservation */
+  price: Scalars["Float"];
+};
+
+export type ReservationApproveMutationPayload = {
+  __typename?: "ReservationApproveMutationPayload";
+  clientMutationId?: Maybe<Scalars["String"]>;
+  /** May contain more than one error for same field. */
+  errors?: Maybe<Array<Maybe<ErrorType>>>;
+  /** When this reservation was handled. */
+  handledAt?: Maybe<Scalars["DateTime"]>;
+  /** Additional information for approval. */
+  handlingDetails?: Maybe<Scalars["String"]>;
+  pk?: Maybe<Scalars["Int"]>;
+  /** The price of this particular reservation */
+  price?: Maybe<Scalars["Float"]>;
+  state?: Maybe<State>;
+};
+
 export type ReservationCancelReasonType = Node & {
   __typename?: "ReservationCancelReasonType";
   /** The ID of the object */
@@ -1143,7 +1188,10 @@ export type ReservationConfirmMutationPayload = {
   reserveePhone?: Maybe<Scalars["String"]>;
   /** Type of the reservee. Possible values are BUSINESS, NONPROFIT, INDIVIDUAL. */
   reserveeType?: Maybe<Scalars["String"]>;
-  /** String value for ReservationType's ReservationState enum. Possible values are CREATED, CANCELLED, CONFIRMED, DENIED. */
+  /**
+   * String value for ReservationType's ReservationState enum. Possible values are
+   * CREATED, CANCELLED, REQUIRES_HANDLING, CONFIRMED, DENIED.
+   */
   state?: Maybe<Scalars["String"]>;
   /** The value of the tax percentage for this particular reservation */
   taxPercentageValue?: Maybe<Scalars["Float"]>;
@@ -1240,28 +1288,56 @@ export type ReservationCreateMutationPayload = {
   unitPrice?: Maybe<Scalars["Float"]>;
 };
 
-export type ReservationHandleMutationInput = {
-  /** Will this reservation be approved */
-  approve: Scalars["Boolean"];
+export type ReservationDenyMutationInput = {
   clientMutationId?: Maybe<Scalars["String"]>;
-  /** Additional information for denying (if approve is false) */
-  denyDetails?: Maybe<Scalars["String"]>;
+  /** Primary key for the pre-defined deny reason. */
+  denyReasonPk: Scalars["Int"];
+  /** Additional information for denying. */
+  handlingDetails?: Maybe<Scalars["String"]>;
   pk?: Maybe<Scalars["Int"]>;
 };
 
-export type ReservationHandleMutationPayload = {
-  __typename?: "ReservationHandleMutationPayload";
-  /** Will this reservation be approved */
-  approve?: Maybe<Scalars["Boolean"]>;
+export type ReservationDenyMutationPayload = {
+  __typename?: "ReservationDenyMutationPayload";
   clientMutationId?: Maybe<Scalars["String"]>;
-  /** Additional information for denying (if approve is false) */
-  denyDetails?: Maybe<Scalars["String"]>;
+  /** Primary key for the pre-defined deny reason. */
+  denyReasonPk?: Maybe<Scalars["Int"]>;
   /** May contain more than one error for same field. */
   errors?: Maybe<Array<Maybe<ErrorType>>>;
   /** When this reservation was handled. */
   handledAt?: Maybe<Scalars["DateTime"]>;
+  /** Additional information for denying. */
+  handlingDetails?: Maybe<Scalars["String"]>;
   pk?: Maybe<Scalars["Int"]>;
   state?: Maybe<State>;
+};
+
+export type ReservationDenyReasonType = Node & {
+  __typename?: "ReservationDenyReasonType";
+  /** The ID of the object */
+  id: Scalars["ID"];
+  pk?: Maybe<Scalars["Int"]>;
+  reason: Scalars["String"];
+  reasonEn?: Maybe<Scalars["String"]>;
+  reasonFi?: Maybe<Scalars["String"]>;
+  reasonSv?: Maybe<Scalars["String"]>;
+};
+
+export type ReservationDenyReasonTypeConnection = {
+  __typename?: "ReservationDenyReasonTypeConnection";
+  /** Contains the nodes in this connection. */
+  edges: Array<Maybe<ReservationDenyReasonTypeEdge>>;
+  /** Pagination data for this connection. */
+  pageInfo: PageInfo;
+};
+
+/** A Relay edge containing a `ReservationDenyReasonType` and its cursor. */
+export type ReservationDenyReasonTypeEdge = {
+  __typename?: "ReservationDenyReasonTypeEdge";
+  /** A cursor for use in pagination */
+  cursor: Scalars["String"];
+  /** The item at the end of the edge */
+  node?: Maybe<ReservationDenyReasonType>;
 };
 
 export type ReservationMetadataSetType = Node & {
@@ -1365,6 +1441,8 @@ export type ReservationType = Node & {
   taxPercentageValue?: Maybe<Scalars["Decimal"]>;
   unitPrice?: Maybe<Scalars["Float"]>;
   user?: Maybe<Scalars["String"]>;
+  /** Working memo for staff users. */
+  workingMemo?: Maybe<Scalars["String"]>;
 };
 
 export type ReservationTypeConnection = {
@@ -1373,6 +1451,7 @@ export type ReservationTypeConnection = {
   edges: Array<Maybe<ReservationTypeEdge>>;
   /** Pagination data for this connection. */
   pageInfo: PageInfo;
+  totalCount?: Maybe<Scalars["Int"]>;
 };
 
 /** A Relay edge containing a `ReservationType` and its cursor. */
@@ -2064,7 +2143,10 @@ export type ReservationUpdateMutationInput = {
   reserveePhone?: Maybe<Scalars["String"]>;
   /** Type of the reservee. Possible values are BUSINESS, NONPROFIT, INDIVIDUAL. */
   reserveeType?: Maybe<Scalars["String"]>;
-  /** String value for ReservationType's ReservationState enum. Possible values are CREATED, CANCELLED, CONFIRMED, DENIED. */
+  /**
+   * String value for ReservationType's ReservationState enum. Possible values are
+   * CREATED, CANCELLED, REQUIRES_HANDLING, CONFIRMED, DENIED.
+   */
   state?: Maybe<Scalars["String"]>;
 };
 
@@ -2111,12 +2193,34 @@ export type ReservationUpdateMutationPayload = {
   reserveePhone?: Maybe<Scalars["String"]>;
   /** Type of the reservee. Possible values are BUSINESS, NONPROFIT, INDIVIDUAL. */
   reserveeType?: Maybe<Scalars["String"]>;
-  /** String value for ReservationType's ReservationState enum. Possible values are CREATED, CANCELLED, CONFIRMED, DENIED. */
+  /**
+   * String value for ReservationType's ReservationState enum. Possible values are
+   * CREATED, CANCELLED, REQUIRES_HANDLING, CONFIRMED, DENIED.
+   */
   state?: Maybe<Scalars["String"]>;
   /** The value of the tax percentage for this particular reservation */
   taxPercentageValue?: Maybe<Scalars["Float"]>;
   /** The price of this particular reservation */
   unitPrice?: Maybe<Scalars["Float"]>;
+};
+
+export type ReservationWorkingMemoMutationInput = {
+  clientMutationId?: Maybe<Scalars["String"]>;
+  /** Primary key of the reservation */
+  pk?: Maybe<Scalars["Int"]>;
+  /** Working memo for staff users. */
+  workingMemo?: Maybe<Scalars["String"]>;
+};
+
+export type ReservationWorkingMemoMutationPayload = {
+  __typename?: "ReservationWorkingMemoMutationPayload";
+  clientMutationId?: Maybe<Scalars["String"]>;
+  /** May contain more than one error for same field. */
+  errors?: Maybe<Array<Maybe<ErrorType>>>;
+  /** Primary key of the reservation */
+  pk?: Maybe<Scalars["Int"]>;
+  /** Working memo for staff users. */
+  workingMemo?: Maybe<Scalars["String"]>;
 };
 
 /** An enumeration. */
@@ -2149,6 +2253,8 @@ export enum ReservationsReservationStateChoices {
   Created = "CREATED",
   /** denied */
   Denied = "DENIED",
+  /** requires_handling */
+  RequiresHandling = "REQUIRES_HANDLING",
 }
 
 export type ResourceCreateMutationInput = {
@@ -2666,6 +2772,8 @@ export enum State {
   Created = "CREATED",
   /** denied */
   Denied = "DENIED",
+  /** requires_handling */
+  RequiresHandling = "REQUIRES_HANDLING",
 }
 
 export const SearchFormParamsUnitDocument = gql`

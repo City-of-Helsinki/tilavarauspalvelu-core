@@ -90,7 +90,7 @@ const Navigation = ({ profile, logout }: Props): JSX.Element => {
     },
     {
       title: "spaceReservation",
-      path: "/search",
+      path: "/recurring",
     },
     {
       title: "reservations",
