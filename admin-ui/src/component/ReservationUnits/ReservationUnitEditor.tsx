@@ -410,9 +410,18 @@ const reducer = (state: State, action: Action): State => {
         (s) => selectedSpacePks.indexOf(Number(s.pk)) !== -1
       );
 
+      const surfaceArea = sumBy(
+        selectedSpaces,
+        (s) => Number(s.surfaceArea) || 0
+      );
+      const maxPersons = sumBy(
+        selectedSpaces,
+        (s) => Number(s.maxPersons) || 0
+      );
+
       return modifyEditorState(state, {
-        surfaceArea: sumBy(selectedSpaces, "surfaceArea"),
-        maxPersons: sumBy(selectedSpaces, "maxPersons"),
+        surfaceArea,
+        maxPersons,
         spacePks: selectedSpacePks,
       });
     }
@@ -789,6 +798,16 @@ const ReservationUnitEditor = (): JSX.Element | null => {
     return null;
   }
 
+  const selectedSpaces = state.spaces.filter(
+    (s) => state?.reservationUnitEdit?.spacePks?.indexOf(Number(s.pk)) !== -1
+  );
+
+  const minSurfaceArea =
+    sumBy(selectedSpaces, (s) => Number(s.surfaceArea) || 0) || 1; // default is 1 if no spaces selected
+
+  const maxPersons =
+    sumBy(selectedSpaces, (s) => Number(s.maxPersons) || 0) || 20; // default is 20 is no spaces selected
+
   return (
     <Wrapper>
       <MainMenuWrapper>
@@ -899,7 +918,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                       }}
                       step={1}
                       type="number"
-                      min={1}
+                      min={minSurfaceArea}
                       required
                     />
                     <NumberInput
@@ -920,6 +939,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                       step={1}
                       type="number"
                       min={1}
+                      max={maxPersons}
                       helperText={t(
                         "ReservationUnitEditor.maxPersonsHelperText"
                       )}
