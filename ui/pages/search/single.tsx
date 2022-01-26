@@ -99,6 +99,7 @@ const SearchSingle = (): JSX.Element => {
       first: pagingLimit,
       orderBy: values.order === "desc" ? `-${values.sort}` : values.sort,
       isDraft: false,
+      isVisible: true,
     },
     fetchPolicy: "network-only",
   });
