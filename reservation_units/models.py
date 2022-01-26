@@ -123,6 +123,9 @@ def get_default_tax_percentage() -> int:
 
 
 class ReservationUnit(models.Model):
+    sku = models.CharField(
+        verbose_name=_("SKU"), max_length=255, blank=True, default=""
+    )
     name = models.CharField(verbose_name=_("Name"), max_length=255)
     description = models.TextField(
         verbose_name=_("Description"), blank=True, default=""
