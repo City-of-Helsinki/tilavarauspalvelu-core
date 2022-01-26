@@ -1,11 +1,9 @@
 import React from "react";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 import { useReactOidc } from "@axa-fr/react-oidc-context";
-import { useTranslation } from "react-i18next";
 import ApplicationRound from "./component/ApplicationRound/ApplicationRound";
 import PageWrapper from "./component/PageWrapper";
 import "./i18n";
-import Modal from "./component/Modal";
 import Application from "./component/Application/Application";
 import ApplicationDetails from "./component/Application/ApplicationDetails";
 import Recommendation from "./component/ApplicationRound/Recommendation";
@@ -35,18 +33,12 @@ import ResourcesList from "./component/Resources/ResourcesList";
 import ReservationUnitsList from "./component/ReservationUnits/ReservationUnitsList";
 import ReservationUnitsSearch from "./component/ReservationUnits/ReservationUnitsSearch";
 import { withGlobalContext } from "./context/GlobalContexts";
-import { useModal } from "./context/ModalContext";
 import PrivateRoute from "./common/PrivateRoute";
 import { SingleApplications } from "./component/SingleApplications";
 import SingleApplication from "./component/SingleApplications/SingleApplication";
-import { StyledNotification } from "./styles/util";
-import { useNotification } from "./context/NotificationContext";
 
 function App(): JSX.Element {
   const { oidcUser } = useReactOidc();
-  const { modalContent } = useModal();
-  const { notification, clearNotification } = useNotification();
-  const { t } = useTranslation();
 
   return (
     <BrowserRouter basename={publicUrl}>
@@ -166,25 +158,6 @@ function App(): JSX.Element {
           />
         </Switch>
       </PageWrapper>
-      {modalContent.content ? (
-        modalContent.isHds ? (
-          modalContent.content
-        ) : (
-          <Modal>{modalContent.content}</Modal>
-        )
-      ) : null}
-      {notification ? (
-        <StyledNotification
-          type={notification.type}
-          label={notification.title}
-          position="top-center"
-          dismissible
-          closeButtonLabelText={`${t("common.close")}`}
-          onClose={clearNotification}
-        >
-          {notification.message}
-        </StyledNotification>
-      ) : null}
     </BrowserRouter>
   );
 }

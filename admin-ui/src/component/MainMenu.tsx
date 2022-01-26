@@ -173,7 +173,8 @@ const SubItems = ({
               >
                 {t(child.title)}
               </SubItemHeading>
-              {child.title === "MainMenu.singleApplications" ? (
+              {child.title === "MainMenu.singleApplications" &&
+              handlingCount > 0 ? (
                 <HandlingCount>{handlingCount}</HandlingCount>
               ) : null}
             </li>

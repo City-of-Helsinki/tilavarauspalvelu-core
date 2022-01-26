@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from "@apollo/client";
 import {
-  Accordion as HDSAccordion,
+  Accordion,
   Checkbox,
   Combobox,
   Fieldset,
@@ -44,14 +44,9 @@ import {
   UPDATE_RESERVATION_UNIT,
 } from "../../common/queries";
 import { OptionType } from "../../common/types";
-import { ContentContainer, IngressContainer } from "../../styles/layout";
+import { ContentContainer } from "../../styles/layout";
 
-import {
-  breakpoints,
-  ButtonsStripe,
-  StyledNotification,
-  WhiteButton,
-} from "../../styles/util";
+import { breakpoints, ButtonsStripe, WhiteButton } from "../../styles/util";
 import Loader from "../Loader";
 import SubPageHead from "../Unit/SubPageHead";
 import { MainMenuWrapper } from "../withMainMenu";
@@ -443,15 +438,6 @@ const reducer = (state: State, action: Action): State => {
 
 const Wrapper = styled.div``;
 
-const Accordion = styled(HDSAccordion)`
-  > div:first-child {
-    position: sticky;
-    background: white;
-    top: 0;
-    z-index: 10;
-  }
-`;
-
 const EditorContainer = styled.div`
   @media (min-width: ${breakpoints.l}) {
     margin: 0 var(--spacing-layout-m);
@@ -560,7 +546,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
   const { reservationUnitPk, unitPk } = useParams<IProps>();
   const { t } = useTranslation();
   const history = useHistory();
-  const { notification, setNotification } = useNotification();
+  const { setNotification } = useNotification();
 
   const [state, dispatch] = useReducer(
     reducer,
@@ -804,20 +790,6 @@ const ReservationUnitEditor = (): JSX.Element | null => {
   return (
     <Wrapper>
       <MainMenuWrapper>
-        <IngressContainer>
-          {notification ? (
-            <StyledNotification
-              type={notification.type}
-              label={notification.title}
-              position="top-center"
-              dismissible
-              closeButtonLabelText={`${t("common.close")}`}
-              onClose={() => dispatch({ type: "clearNotification" })}
-            >
-              {notification.message}
-            </StyledNotification>
-          ) : null}
-        </IngressContainer>
         <ContentContainer>
           {state.unit ? (
             <SubPageHead
