@@ -611,7 +611,7 @@ const translations: ITranslations = {
     searchPlaceholder: ["Hae tiloja"],
     headings: {
       name: ["Nimi"],
-      building: ["Toimipiste"],
+      unit: ["Toimipiste"],
       district: ["Kaupunginosa"],
       volume: ["Vetoisuus"],
       size: ["Koko"],
@@ -735,8 +735,8 @@ const translations: ITranslations = {
     newSpacesCreatedNotification: [
       "Voit luoda tiloille alitiloja niin pitkälle kuin on tarpeellista.",
     ],
-    spacesDeletedTitle: ["Tila poistettu"],
-    spacesDeletedNotification: ["Tila poistettu onnistuneesti"],
+    spaceDeletedTitle: ["Tila poistettu"],
+    spaceDeletedNotification: ["Tila poistettu onnistuneesti"],
     resourceDeletedTitle: ["Resurssi poistettu"],
     resourceDeletedNotification: ["Resurssi poistettu onnistuneesti"],
   },
@@ -750,6 +750,7 @@ const translations: ITranslations = {
     other: ["Muut tiedot"],
     cancel: ["Palaa tallentamatta tietoja"],
     save: ["Tallenna tiedot"],
+    saveFailed: ["Tallennus ei onnistunut"],
     nameLabel: ["Tilan nimi {{lang}}"],
     namePlaceholder: ["Tilan nimi {{language}}"],
     touLabel: ["Tilan ohjeet {{lang}}"],

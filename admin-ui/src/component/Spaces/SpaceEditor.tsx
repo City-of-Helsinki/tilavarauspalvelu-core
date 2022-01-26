@@ -468,12 +468,13 @@ const SpaceEditor = (): JSX.Element | null => {
                 disabled={!state.hasChanges}
                 onClick={async () => {
                   try {
-                    const data = await updateSpace(
-                      omitBy(
+                    const data = await updateSpace({
+                      ...(omitBy(
                         state.spaceEdit,
                         (v) => v === ""
-                      ) as SpaceUpdateMutationInput
-                    );
+                      ) as SpaceUpdateMutationInput),
+                      surfaceArea: Number(state.spaceEdit?.surfaceArea),
+                    });
                     if (data?.data?.updateSpace.errors === null) {
                       onSave();
                     } else {

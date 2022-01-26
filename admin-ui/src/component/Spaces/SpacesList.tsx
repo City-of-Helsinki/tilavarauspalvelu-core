@@ -73,8 +73,8 @@ const getCellConfig = (t: TFunction): CellConfig => {
         transform: ({ nameFi }: SpaceType) => <Strong>{nameFi}</Strong>,
       },
       {
-        title: t("Spaces.headings.building"),
-        key: "building.nameFi",
+        title: t("Spaces.headings.unit"),
+        key: "unit.nameFi",
       },
       {
         title: t("Spaces.headings.district"),
@@ -127,34 +127,19 @@ const getFilterConfig = (
   spaces: SpaceType[],
   t: TFunction
 ): DataFilterConfig[] => {
-  const buildings = uniq(
-    spaces.map((space: SpaceType) => space?.building?.nameFi || "")
+  const units = uniq(
+    spaces.map((space: SpaceType) => space?.unit?.nameFi || "")
   ).filter((n) => n);
-  const districts = uniq(
-    spaces
-      .map((space: SpaceType) => space?.building?.district?.nameFi || "")
-      .filter((n) => n)
-  );
 
   return [
     {
-      title: t("Spaces.headings.building"),
+      title: t("Spaces.headings.unit"),
       filters:
-        buildings &&
-        buildings.map((building: string) => ({
-          title: building,
-          key: "building.name",
-          value: building,
-        })),
-    },
-    {
-      title: t("Spaces.headings.district"),
-      filters:
-        districts &&
-        districts.map((district: string) => ({
-          title: district,
-          key: "building.district.name",
-          value: district,
+        units &&
+        units.map((unit: string) => ({
+          title: unit,
+          key: "unit.nameFi",
+          value: unit,
         })),
     },
   ];
@@ -220,17 +205,12 @@ const SpacesList = (): JSX.Element => {
   const filteredSpaces = searchTerm
     ? spaces.filter((space: SpaceType) => {
         const searchTerms = searchTerm.toLowerCase().split(" ");
-        const { nameFi, building } = space;
-        const buildingName = building?.nameFi?.toLowerCase();
-        const districtName = building?.district?.nameFi?.toLowerCase();
+        const { nameFi, unit } = space;
+        const unitName = unit?.nameFi?.toLowerCase();
         const localizedName = String(nameFi).toLowerCase();
 
         return searchTerms.every((term: string) => {
-          return (
-            localizedName?.includes(term) ||
-            buildingName?.includes(term) ||
-            districtName?.includes(term)
-          );
+          return localizedName?.includes(term) || unitName?.includes(term);
         });
       })
     : spaces;

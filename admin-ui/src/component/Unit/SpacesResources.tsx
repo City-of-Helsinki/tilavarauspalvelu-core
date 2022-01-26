@@ -218,35 +218,7 @@ const SpacesResources = (): JSX.Element | null => {
     });
   };
 
-  const saveSpaceSuccess = () =>
-    dispatchNotification(
-      "Unit.newSpacesCreatedTitle",
-      "Unit.newSpacesCreatedNotification",
-      "success"
-    );
-
-  const onSaveResourceSuccess = () =>
-    dispatchNotification(
-      "ResourceEditor.resourceUpdated",
-      "ResourceEditor.resourceUpdatedNotification",
-      "success"
-    );
-
-  const onDeleteResourceSuccess = (text?: string) =>
-    dispatchNotification(
-      text || t("Unit.spaceDeletedTitle"),
-      "Unit.spaceDeletedNotification",
-      "success"
-    );
-
-  const onDeleteSpaceSuccess = (text?: string) =>
-    dispatchNotification(
-      text || t("Unit.resourceDeletedTitle"),
-      "Unit.resourceDeletedNotification",
-      "success"
-    );
-
-  const onDataError = (text: string) => {
+  const showDataError = (text: string) => {
     dispatch({
       type: "dataLoadError",
       message: text,
@@ -261,6 +233,43 @@ const SpacesResources = (): JSX.Element | null => {
     (s) => s?.resources
   ) as ResourceType[];
 
+  const onSaveSpace = () => {
+    dispatchNotification(
+      "Unit.newSpacesCreatedTitle",
+      "Unit.newSpacesCreatedNotification",
+      "success"
+    );
+    refetch();
+  };
+
+  const onDeleteSpace = () => {
+    dispatchNotification(
+      t("Unit.spaceDeletedTitle"),
+      "Unit.spaceDeletedNotification",
+      "success"
+    );
+
+    refetch();
+  };
+
+  const onSaveResource = () => {
+    dispatchNotification(
+      "ResourceEditor.resourceUpdated",
+      "ResourceEditor.resourceUpdatedNotification",
+      "success"
+    );
+    refetch();
+  };
+
+  const onDeleteResource = () => {
+    dispatchNotification(
+      t("Unit.resourceDeletedTitle"),
+      "Unit.resourceDeletedNotification",
+      "success"
+    );
+    refetch();
+  };
+
   return (
     <Wrapper>
       <Modal
@@ -274,11 +283,8 @@ const SpacesResources = (): JSX.Element | null => {
           closeModal={() => {
             closeNewSpaceModal();
           }}
-          onSave={() => {
-            saveSpaceSuccess();
-            refetch();
-          }}
-          onDataError={onDataError}
+          onSave={onSaveSpace}
+          onDataError={showDataError}
         />
       </Modal>
       <SubPageHead title={t("Unit.spacesAndResources")} unit={state.unit} />
@@ -318,13 +324,13 @@ const SpacesResources = (): JSX.Element | null => {
             {t("Unit.addSpace")}
           </ActionButton>
         </TableHead>
-      </WideContainer>{" "}
+      </WideContainer>
       <SpacesTable
         spaces={state.unit.spaces as SpaceType[]}
         unit={state.unit}
-        onSave={saveSpaceSuccess}
-        onDelete={onDeleteSpaceSuccess}
-        onDataError={onDataError}
+        onSave={onSaveSpace}
+        onDelete={onDeleteSpace}
+        onDataError={showDataError}
       />
       <WideContainer>
         <TableHead>
@@ -342,10 +348,7 @@ const SpacesResources = (): JSX.Element | null => {
                   closeModal={() => {
                     closeNewResourceModal();
                   }}
-                  onSave={() => {
-                    onSaveResourceSuccess();
-                    refetch();
-                  }}
+                  onSave={onSaveResource}
                 />
               )
             }
@@ -358,8 +361,8 @@ const SpacesResources = (): JSX.Element | null => {
         unit={state.unit}
         hasSpaces={Boolean(state.unit?.spaces?.length)}
         resources={resources}
-        onDelete={onDeleteResourceSuccess}
-        onDataError={onDataError}
+        onDelete={onDeleteResource}
+        onDataError={showDataError}
       />
       {state.error ? (
         <Wrapper>
