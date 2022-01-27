@@ -77,7 +77,7 @@ import Sanitize from "../../../components/common/Sanitize";
 import { getPrice } from "../../../modules/reservationUnit";
 import {
   getReservationApplicationFields,
-  getReservationApplicationMutatationValues,
+  getReservationApplicationMutationValues,
   ReserveeType,
 } from "../../../modules/reservation";
 import {
@@ -446,7 +446,9 @@ const ReservationUnitReservation = ({
     { input: ReservationConfirmMutationInput }
   >(CONFIRM_RESERVATION);
 
-  const doesReservationNeedApplication = !!reservationUnit?.metadataSet?.id;
+  const doesReservationNeedApplication =
+    !!reservationUnit?.requireReservationHandling;
+  const hasMetadataSet = !!reservationUnit?.metadataSet?.supportedFields;
 
   useEffect(() => {
     return () => {
@@ -602,7 +604,7 @@ const ReservationUnitReservation = ({
       return acc;
     }, {});
 
-    const input = getReservationApplicationMutatationValues(
+    const input = getReservationApplicationMutationValues(
       normalizedPayload,
       reservationUnit.metadataSet.supportedFields,
       reserveeType
@@ -687,7 +689,7 @@ const ReservationUnitReservation = ({
       </Head>
       {formStatus === "pending" && (
         <BodyContainer>
-          {step === 0 && !doesReservationNeedApplication && (
+          {step === 0 && !hasMetadataSet && (
             <form onSubmit={handleSubmit(onSubmitOpen1)}>
               <H2 style={{ marginTop: "var(--spacing-layout-m)" }}>
                 {t("reservationCalendar:reserverInfo")}
@@ -783,14 +785,18 @@ const ReservationUnitReservation = ({
               </ActionContainer>
             </form>
           )}
-          {step === 0 && doesReservationNeedApplication && (
+          {step === 0 && hasMetadataSet && (
             <ApplicationForm onSubmit={handleSubmit(onSubmitApplication1)}>
               <H2
                 style={{
                   margin: "var(--spacing-layout-m) 0 var(--spacing-xs)",
                 }}
               >
-                {t("reservationApplication:applicationInfo")}
+                {t(
+                  doesReservationNeedApplication
+                    ? "reservationApplication:applicationInfo"
+                    : "reservationCalendar:reserverInfo"
+                )}
               </H2>
               <p>{t("reservationApplication:reserveeTypePrefix")}</p>
               <OneColumnContainer
@@ -1015,7 +1021,7 @@ const ReservationUnitReservation = ({
             <form onSubmit={handleSubmit(onSubmitOpen2)}>
               <H2>{t("reservationCalendar:reservationSummary")}</H2>
               <TwoColumnContainer style={{ marginBottom: "var(--spacing-l)" }}>
-                {doesReservationNeedApplication ? (
+                {hasMetadataSet ? (
                   <>
                     {getReservationApplicationFields(
                       reservationUnit.metadataSet?.supportedFields,
@@ -1222,7 +1228,7 @@ const ReservationUnitReservation = ({
               <H3 style={{ marginTop: "var(--spacing-xl)" }}>
                 {t("reservationUnit:additionalInfo")}
               </H3>
-              {doesReservationNeedApplication ? (
+              {hasMetadataSet ? (
                 <>
                   {getReservationApplicationFields(
                     reservationUnit.metadataSet?.supportedFields,

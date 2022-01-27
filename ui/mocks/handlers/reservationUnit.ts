@@ -232,6 +232,7 @@ const selectedReservationUnitQuery = graphql.query<
       ],
     },
     requireIntroduction: false,
+    requireReservationHandling: false,
   };
 
   if (req.variables.pk === 900) {
@@ -285,6 +286,11 @@ const selectedReservationUnitQuery = graphql.query<
       requiredFields: ["reservee_first_name", "billing_last_name"],
       pk: 1,
     };
+  }
+
+  if (req.variables.pk === 904) {
+    reservationUnitByPk.pk = 904;
+    reservationUnitByPk.requireReservationHandling = true;
   }
 
   if (req.variables.pk === 999) {
@@ -505,6 +511,7 @@ const relatedReservationUnitsData: ReservationUnitTypeConnection = {
         contactInformationFi: "",
         contactInformationEn: "",
         contactInformationSv: "",
+        requireReservationHandling: false,
       },
       cursor: "YXJyYXljb25uZWN0aW9uOjA=",
     },
@@ -598,6 +605,7 @@ const relatedReservationUnitsData: ReservationUnitTypeConnection = {
         contactInformationFi: "",
         contactInformationEn: "",
         contactInformationSv: "",
+        requireReservationHandling: false,
       },
       cursor: "YXJyYXljb25uZWN0aW9uOjE=",
     },
