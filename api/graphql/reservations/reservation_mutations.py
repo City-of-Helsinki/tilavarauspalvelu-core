@@ -10,6 +10,7 @@ from api.graphql.reservations.reservation_serializers import (
     ReservationConfirmSerializer,
     ReservationCreateSerializer,
     ReservationDenySerializer,
+    ReservationRequiresHandlingSerializer,
     ReservationUpdateSerializer,
     ReservationWorkingMemoSerializer,
 )
@@ -105,6 +106,18 @@ class ReservationApproveMutation(AuthSerializerMutation, SerializerMutation):
     class Meta:
         lookup_field = "pk"
         serializer_class = ReservationApproveSerializer
+
+
+class ReservationRequiresHandlingMutation(AuthSerializerMutation, SerializerMutation):
+    permission_classes = (
+        (ReservationHandlingPermission,)
+        if not settings.TMP_PERMISSIONS_DISABLED
+        else (AllowAny,)
+    )
+
+    class Meta:
+        lookup_field = "pk"
+        serializer_class = ReservationRequiresHandlingSerializer
 
 
 class ReservationWorkingMemoMutation(AuthSerializerMutation, SerializerMutation):
