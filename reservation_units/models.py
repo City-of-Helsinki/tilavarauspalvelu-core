@@ -388,6 +388,15 @@ class ReservationUnit(models.Model):
         blank=True,
     )
 
+    require_reservation_handling = models.BooleanField(
+        verbose_name=_("Does the reservations of this require a handling"),
+        default=False,
+        blank=True,
+        help_text=_(
+            "Does reservations of this reservation unit need to be handled before they're confirmed."
+        ),
+    )
+
     def __str__(self):
         return "{}".format(self.name)
 
