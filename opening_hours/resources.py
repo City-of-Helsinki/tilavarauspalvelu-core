@@ -89,7 +89,7 @@ def update_hauki_resource(resource: Resource):
     if not resource.id:
         raise ValueError("Resource id must be set when updating resource in hauki.")
 
-    resources_url = urljoin(settings.HAUKI_API_URL, f"/v1/resource/{resource.id}")
+    resources_url = urljoin(settings.HAUKI_API_URL, f"/v1/resource/{resource.id}/")
 
     data = resource.convert_to_request_data()
 
