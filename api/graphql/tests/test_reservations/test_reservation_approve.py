@@ -113,3 +113,17 @@ class ReservationApproveTestCase(ReservationTestCaseBase):
         self.reservation.refresh_from_db()
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.REQUIRES_HANDLING)
         assert_that(self.reservation.handling_details).is_empty()
+
+    def test_handling_details_saves_to_working_memo_also(self):
+        self.client.force_login(self.general_admin)
+        input_data = self.get_valid_approve_data()
+        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.REQUIRES_HANDLING)
+        response = self.query(self.get_handle_query(), input_data=input_data)
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.reservation.refresh_from_db()
+        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
+        assert_that(self.reservation.handling_details).is_equal_to(
+            self.reservation.working_memo
+        )
