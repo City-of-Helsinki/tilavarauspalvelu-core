@@ -44,6 +44,7 @@ class ReservationUnitFactory(DjangoModelFactory):
     class Meta:
         model = "reservation_units.ReservationUnit"
 
+    sku = FuzzyText()
     name = FuzzyText()
     reservation_unit_type = SubFactory(ReservationUnitTypeFactory)
     unit = SubFactory(UnitFactory)
