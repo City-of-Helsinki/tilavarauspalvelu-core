@@ -11,10 +11,7 @@ from api.graphql.tests.test_reservations.base import ReservationTestCaseBase
 from applications.models import City
 from opening_hours.tests.test_get_periods import get_mocked_periods
 from reservations.models import STATE_CHOICES, AgeGroup
-from reservations.tests.factories import (
-    ReservationFactory,
-    ReservationMetadataSetFactory,
-)
+from reservations.tests.factories import ReservationFactory
 
 
 @freezegun.freeze_time("2021-10-12T12:00:00Z")
@@ -72,7 +69,7 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         self, mock_periods, mock_opening_hours
     ):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
-        self.reservation_unit.metadata_set = ReservationMetadataSetFactory(name="Form")
+        self.reservation_unit.require_reservation_handling = True
         self.reservation_unit.save()
         self.client.force_login(self.regular_joe)
         input_data = self.get_valid_confirm_data()
