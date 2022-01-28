@@ -174,7 +174,7 @@ export const getReservationApplicationFields = (
   return camelCaseOutput ? fields.map(camelCase) : fields;
 };
 
-export const getReservationApplicationMutatationValues = (
+export const getReservationApplicationMutationValues = (
   payload: Record<string, string | number | boolean>,
   supportedFields: string[],
   reserveeType: ReserveeType

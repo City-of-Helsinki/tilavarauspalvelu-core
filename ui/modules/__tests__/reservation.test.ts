@@ -4,7 +4,7 @@ import {
   canUserCancelReservation,
   getDurationOptions,
   getReservationApplicationFields,
-  getReservationApplicationMutatationValues,
+  getReservationApplicationMutationValues,
   getReservationPrice,
 } from "../reservation";
 import mockTranslations from "../../public/locales/fi/prices.json";
@@ -217,7 +217,7 @@ describe("getReservationApplicationFields", () => {
 describe("getReservationApplcationMutationValues", () => {
   test("with empty input", () => {
     expect(
-      getReservationApplicationMutatationValues({}, [], "individual")
+      getReservationApplicationMutationValues({}, [], "individual")
     ).toEqual({
       reserveeType: "individual",
     });
@@ -230,7 +230,7 @@ describe("getReservationApplcationMutationValues", () => {
       reserveeFirstName: "Etunimi",
     };
     expect(
-      getReservationApplicationMutatationValues(
+      getReservationApplicationMutationValues(
         payload,
         ["name", "reservee_id", "reservee_first_name"],
         "individual"

@@ -102,9 +102,11 @@ describe("Tilavaraus user reservations", () => {
     accordionToggler().eq(0).click();
     cy.contains("div", "Additional Instructions FI").should("be.visible");
 
-    cy.contains("div", "Terms of use FI").should("not.be.visible");
+    cy.contains("div", "Sopparijuttuja").should("not.be.visible");
+    cy.contains("div", "Toinen rivi").should("not.be.visible");
     accordionToggler().eq(1).click();
-    cy.contains("div", "Terms of use FI").should("be.visible");
+    cy.contains("div", "Sopparijuttuja").should("be.visible");
+    cy.contains("div", "Toinen rivi").should("be.visible");
 
     cy.contains("div", "Service specific terms FI").should("not.be.visible");
     accordionToggler().eq(2).click();

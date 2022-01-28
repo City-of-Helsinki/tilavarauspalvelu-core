@@ -14,6 +14,8 @@ import {
   TermsOfUseTermsOfUseTermsTypeChoices,
   ReservationUnitsReservationUnitPriceUnitChoices,
   ReservationUnitsReservationUnitReservationStartIntervalChoices,
+  QueryTermsOfUseArgs,
+  TermsOfUseTypeConnection,
 } from "../../modules/gql-types";
 import { Parameter } from "../../modules/types";
 import { toApiDate } from "../../modules/util";
@@ -632,9 +634,85 @@ const reservationUnitTypes = rest.get<Parameter[]>(
   }
 );
 
+const termsOfUseData: TermsOfUseTypeConnection = {
+  edges: [
+    {
+      node: {
+        id: "123235423",
+        nameFi: "Perumisehto FI",
+        nameEn: "Perumisehto EN",
+        nameSv: "Perumisehto SV",
+        textFi:
+          "PerumisehtoPerumisehtoPerumisehtoPerumisehto PerumisehtoPerumisehtoPerumisehtoPerumisehto",
+        textEn: "",
+        textSv: "",
+        termsType: TermsOfUseTermsOfUseTermsTypeChoices.CancellationTerms,
+      },
+      cursor: null,
+    },
+    {
+      node: {
+        id: "1232354fawregra23",
+        nameFi: "Maksuehto FI",
+        nameEn: "Maksuehto EN",
+        nameSv: "Maksuehto SV",
+        textFi: "Maksuehto Maksuehto MaksuehtoMaksuehtoMaksuehto",
+        textEn: "",
+        textSv: "",
+        termsType: TermsOfUseTermsOfUseTermsTypeChoices.PaymentTerms,
+      },
+      cursor: null,
+    },
+    {
+      node: {
+        id: "1232vaw4fw4gbreag35423",
+        nameFi: "Palveluehto FI",
+        nameEn: "Palveluehto EN",
+        nameSv: "Palveluehto SV",
+        textFi:
+          "Palveluehto Palveluehto Palveluehto Palveluehto Palveluehto Palveluehto Palveluehto",
+        textEn: "",
+        textSv: "",
+        termsType: TermsOfUseTermsOfUseTermsTypeChoices.ServiceTerms,
+      },
+      cursor: null,
+    },
+    {
+      node: {
+        id: "1232354q234rt5eyge5rgt23",
+        nameFi: "Sopimusehdot FI",
+        nameEn: "Sopimusehdot EN",
+        nameSv: "Sopimusehdot SV",
+        textFi: "Sopparijuttuja \r\n\r\nToinen rivi",
+        textEn: "Sopparijuttuja \r\n\r\nToinen rivi",
+        textSv: "Sopparijuttuja \r\n\r\nToinen rivi",
+        termsType: TermsOfUseTermsOfUseTermsTypeChoices.GenericTerms,
+      },
+      cursor: null,
+    },
+  ],
+  pageInfo: null,
+};
+
+export const termsOfUse = graphql.query<Query, QueryTermsOfUseArgs>(
+  "TermsOfUse",
+  (req, res, ctx) => {
+    const { termsType } = req.variables;
+    const result = termsType
+      ? ({
+          edges: termsOfUseData.edges.filter(
+            (n) => n.node.termsType === termsType.toUpperCase()
+          ),
+        } as TermsOfUseTypeConnection)
+      : termsOfUseData;
+    return res(ctx.data({ termsOfUse: result }));
+  }
+);
+
 export const reservationUnitHandlers = [
   selectedReservationUnitQuery,
   openingHoursQuery,
   relatedReservationUnits,
   reservationUnitTypes,
+  termsOfUse,
 ];
