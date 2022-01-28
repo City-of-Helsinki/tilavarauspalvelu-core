@@ -11,146 +11,52 @@ import {
   SelectionGroup,
   TextInput,
 } from "hds-react";
-import i18next from "i18next";
-import { get, omitBy, pick, sumBy, uniq, upperFirst } from "lodash";
-import React, { useEffect, useReducer } from "react";
+import { get, omitBy, pick, sumBy, upperFirst } from "lodash";
+import React, { useEffect, useReducer, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams, useHistory } from "react-router-dom";
 import styled from "styled-components";
-import { languages, previewUrlPrefix } from "../../common/const";
+import { languages, previewUrlPrefix } from "../../../common/const";
 import Select from "./Select";
 import {
   Query,
   QueryReservationUnitByPkArgs,
   QueryUnitByPkArgs,
-  ReservationUnitByPkType,
   ReservationUnitCreateMutationInput,
   ReservationUnitUpdateMutationInput,
-  ResourceType,
-  SpaceType,
-  UnitByPkType,
   Mutation,
   ErrorType,
   Maybe,
-  TermsOfUseTermsOfUseTermsTypeChoices,
   ReservationUnitsReservationUnitPriceUnitChoices,
   ReservationUnitsReservationUnitReservationStartIntervalChoices,
-} from "../../common/gql-types";
+  ReservationUnitImageCreateMutationInput,
+} from "../../../common/gql-types";
 import {
   CREATE_RESERVATION_UNIT,
   RESERVATION_UNIT_EDITOR_PARAMETERS,
   RESERVATIONUNIT_QUERY,
   UNIT_WITH_SPACES_AND_RESOURCES,
   UPDATE_RESERVATION_UNIT,
-} from "../../common/queries";
-import { OptionType } from "../../common/types";
-import { ContentContainer } from "../../styles/layout";
+  CREATE_IMAGE,
+  DELETE_IMAGE,
+  UPDATE_IMAGE_TYPE,
+} from "../../../common/queries";
+import { OptionType } from "../../../common/types";
+import { ContentContainer } from "../../../styles/layout";
 
-import { breakpoints, ButtonsStripe, WhiteButton } from "../../styles/util";
-import Loader from "../Loader";
-import SubPageHead from "../Unit/SubPageHead";
-import { MainMenuWrapper } from "../withMainMenu";
-import RichTextInput from "../RichTextInput";
-import { useNotification } from "../../context/NotificationContext";
+import { breakpoints, ButtonsStripe, WhiteButton } from "../../../styles/util";
+import Loader from "../../Loader";
+import SubPageHead from "../../Unit/SubPageHead";
+import { MainMenuWrapper } from "../../withMainMenu";
+import RichTextInput from "../../RichTextInput";
+import { useNotification } from "../../../context/NotificationContext";
 import ActivationGroup from "./ActivationGroup";
 import EnumSelect from "./EnumSelect";
 import ImageEditor from "./ImageEditor";
 import DateTimeInput from "./DateTimeInput";
 import { EditorColumns } from "./editorComponents";
-
-interface IProps {
-  reservationUnitPk?: string;
-  unitPk: string;
-}
-
-type NotificationType = {
-  title: string;
-  text: string;
-  type: "success" | "error";
-};
-
-type Action =
-  | {
-      type: "setNotification";
-      notification: NotificationType;
-    }
-  | { type: "clearNotification" }
-  | { type: "clearError" }
-  | { type: "dataLoaded"; reservationUnit: ReservationUnitByPkType }
-  | { type: "unitLoaded"; unit: UnitByPkType }
-  | { type: "editNew"; unitPk: number }
-  | { type: "dataInitializationError"; message: string }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  | { type: "set"; value: any }
-  | { type: "setSpaces"; spaces: OptionType[] }
-  | { type: "setResources"; resources: OptionType[] }
-  | { type: "setEquipments"; equipments: OptionType[] }
-  | { type: "setPurposes"; purposes: OptionType[] }
-  | { type: "parametersLoaded"; parameters: Query };
-
-type ReservationUnitEditorType =
-  | ReservationUnitUpdateMutationInput
-  | ReservationUnitCreateMutationInput;
-
-type State = {
-  reservationUnitPk?: number;
-  loading: boolean;
-  reservationUnit: ReservationUnitByPkType | null;
-  reservationUnitEdit: Partial<ReservationUnitEditorType>;
-  hasChanges: boolean;
-  error?: {
-    message: string;
-  };
-  spaces: SpaceType[];
-  resources: ResourceType[];
-  spaceOptions: OptionType[];
-  resourceOptions: OptionType[];
-  equipmentOptions: OptionType[];
-  purposeOptions: OptionType[];
-  reservationUnitTypeOptions: OptionType[];
-  paymentTermsOptions: OptionType[];
-  cancellationTermsOptions: OptionType[];
-  serviceSpecificTermsOptions: OptionType[];
-  cancellationRuleOptions: OptionType[];
-  taxPercentageOptions: OptionType[];
-  metadataOptions: OptionType[];
-  unit?: UnitByPkType;
-  dataLoaded: LoadingCompleted[];
-};
-
-const makeOption = (e: { pk: number; nameFi: string }) => ({
-  label: String(e.nameFi),
-  value: e.pk,
-});
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const optionMaker = (e: any) =>
-  makeOption({
-    pk: get(e, "node.pk", -1),
-    nameFi: get(e, "node.nameFi", "no-name"),
-  });
-
-const makeTermsOptions = (
-  action: {
-    type: "parametersLoaded";
-    parameters: Query;
-  },
-  termsType: TermsOfUseTermsOfUseTermsTypeChoices
-): OptionType[] => {
-  const options = (action.parameters.termsOfUse?.edges || [])
-    .filter((tou) => {
-      return termsType === tou?.node?.termsType;
-    })
-    .map(optionMaker);
-
-  return [...options];
-};
-
-enum LoadingCompleted {
-  "UNIT",
-  "RESERVATION_UNIT",
-  "PARAMS",
-}
+import { IProps, ReservationUnitEditorType, State } from "./types";
+import { getInitialState, i18nFields, reducer } from "./reducer";
 
 const bufferTimeOptions = [
   { value: 900, label: "15 minuuttia" },
@@ -165,285 +71,6 @@ const durationOptions = [
   { value: 3600, label: "60 minuuttia" },
   { value: 5400, label: "90 minuuttia" },
 ];
-
-const nullOption: OptionType = {
-  value: null,
-  label: i18next.t("common.select"),
-};
-
-const getInitialState = (reservationUnitPk: number): State => ({
-  cancellationRuleOptions: [],
-  cancellationTermsOptions: [],
-  dataLoaded: [],
-  equipmentOptions: [],
-  hasChanges: false,
-  loading: true,
-  paymentTermsOptions: [],
-  purposeOptions: [],
-  reservationUnit: null,
-  reservationUnitEdit: {},
-  reservationUnitPk,
-  reservationUnitTypeOptions: [],
-  resourceOptions: [],
-  resources: [],
-  serviceSpecificTermsOptions: [],
-  spaceOptions: [],
-  spaces: [],
-  taxPercentageOptions: [],
-  metadataOptions: [],
-});
-
-const withLoadingStatus = (
-  type: LoadingCompleted | null,
-  state: State
-): State => {
-  const newDataLoaded =
-    type !== null ? uniq(state.dataLoaded.concat(type)) : state.dataLoaded;
-  const hasError = Boolean(state.error);
-  const isNew =
-    state.reservationUnitPk === undefined ||
-    Number.isNaN(state.reservationUnitPk);
-
-  let newLoadingStatus = state.loading;
-
-  if (hasError) {
-    newLoadingStatus = false;
-  }
-
-  if (newDataLoaded.length === 3) {
-    newLoadingStatus = false;
-  }
-
-  if (isNew && newDataLoaded.length === 2) {
-    newLoadingStatus = false;
-  }
-
-  return {
-    ...state,
-    dataLoaded: newDataLoaded,
-    loading: newLoadingStatus,
-  };
-};
-
-const modifyEditorState = (
-  state: State,
-  edit: Partial<ReservationUnitEditorType>
-) => ({
-  ...state,
-  reservationUnitEdit: { ...state.reservationUnitEdit, ...edit },
-  hasChanges: true,
-});
-
-const i18nFields = (baseName: string): string[] =>
-  languages.map((l) => baseName + upperFirst(l));
-
-const reducer = (state: State, action: Action): State => {
-  switch (action.type) {
-    case "dataLoaded": {
-      const { reservationUnit } = action;
-      return withLoadingStatus(LoadingCompleted.RESERVATION_UNIT, {
-        ...state,
-        reservationUnit: {
-          ...reservationUnit,
-        },
-        reservationUnitEdit: {
-          ...(pick(reservationUnit, [
-            "bufferTimeAfter",
-            "bufferTimeBefore",
-            "maxReservationsPerUser",
-            "maxPersons",
-            "maxReservationDuration",
-            "minReservationDuration",
-            "pk",
-            "priceUnit",
-            "publishBegins",
-            "publishEnds",
-            "requireIntroduction",
-            "reservationBegins",
-            "reservationEnds",
-            "reservationStartInterval",
-            "surfaceArea",
-            "unitPk",
-            ...i18nFields("additionalInstructions"),
-            ...i18nFields("description"),
-            ...i18nFields("name"),
-            ...i18nFields("termsOfUse"),
-          ]) as ReservationUnitEditorType),
-          spacePks: reservationUnit?.spaces?.map((s) =>
-            Number(s?.pk)
-          ) as number[],
-          resourcePks: reservationUnit?.resources?.map((s) =>
-            Number(s?.pk)
-          ) as number[],
-          equipmentPks: reservationUnit?.equipment?.map((s) =>
-            Number(s?.pk)
-          ) as number[],
-          purposePks: reservationUnit?.purposes?.map((s) =>
-            Number(s?.pk)
-          ) as number[],
-          paymentTermsPk: get(reservationUnit, "paymentTerms.pk"),
-          reservationUnitTypePk: get(reservationUnit, "reservationUnitType.pk"),
-          cancellationTermsPk: get(reservationUnit, "cancellationTerms.pk"),
-          cancellationRulePk: get(reservationUnit, "cancellationRule.pk"),
-          taxPercentagePk: get(reservationUnit, "taxPercentage.pk"),
-          lowestPrice: Number(reservationUnit.lowestPrice || 0),
-          highestPrice: Number(reservationUnit.highestPrice || 0),
-          serviceSpecificTermsPk: get(
-            reservationUnit,
-            "serviceSpecificTerms.pk"
-          ),
-          metadataSetPk: get(reservationUnit, "metadataSet.pk", null),
-        },
-        hasChanges: false,
-      });
-    }
-    case "unitLoaded": {
-      const { unit } = action;
-
-      let errorKey: string | undefined;
-
-      const spaceOptions =
-        unit?.spaces?.map((s) => ({
-          label: String(s?.nameFi),
-          value: Number(s?.pk),
-        })) || [];
-
-      if (spaceOptions.length === 0) {
-        errorKey = "ReservationUnitEditor.errorNoSpaces";
-      }
-
-      const resourceOptions =
-        unit?.spaces
-          ?.flatMap((s) => s?.resources)
-          .map((r) => ({ label: String(r?.nameFi), value: Number(r?.pk) })) ||
-        [];
-
-      return withLoadingStatus(LoadingCompleted.UNIT, {
-        ...state,
-        spaces: unit.spaces as SpaceType[],
-        reservationUnitEdit: {
-          ...state.reservationUnitEdit,
-          unitPk: unit.pk as number,
-        },
-        resources:
-          ((unit?.spaces &&
-            unit.spaces.flatMap((s) => s?.resources)) as ResourceType[]) || [],
-        spaceOptions,
-        unit,
-        resourceOptions,
-        error: errorKey ? { message: i18next.t(errorKey) } : state.error,
-      });
-    }
-
-    case "parametersLoaded": {
-      return withLoadingStatus(LoadingCompleted.PARAMS, {
-        ...state,
-        equipmentOptions: (action.parameters.equipments?.edges || []).map(
-          optionMaker
-        ),
-        purposeOptions: (action.parameters.purposes?.edges || []).map(
-          optionMaker
-        ),
-        reservationUnitTypeOptions: (
-          action.parameters.reservationUnitTypes?.edges || []
-        ).map(optionMaker),
-        paymentTermsOptions: makeTermsOptions(
-          action,
-          TermsOfUseTermsOfUseTermsTypeChoices.PaymentTerms
-        ),
-        taxPercentageOptions: (
-          action.parameters.taxPercentages?.edges || []
-        ).map(
-          (v) => ({ value: v?.node?.pk, label: v?.node?.value } as OptionType)
-        ),
-        serviceSpecificTermsOptions: makeTermsOptions(
-          action,
-          TermsOfUseTermsOfUseTermsTypeChoices.ServiceTerms
-        ),
-        cancellationTermsOptions: makeTermsOptions(
-          action,
-          TermsOfUseTermsOfUseTermsTypeChoices.CancellationTerms
-        ),
-        cancellationRuleOptions: (
-          action.parameters.reservationUnitCancellationRules?.edges || []
-        ).map((e) => optionMaker(e)),
-        metadataOptions: [nullOption].concat(
-          (action.parameters.metadataSets?.edges || []).map((e) =>
-            makeOption({
-              pk: get(e, "node.pk", -1),
-              nameFi: get(e, "node.name", "no-name"),
-            })
-          )
-        ),
-      });
-    }
-
-    case "editNew": {
-      return withLoadingStatus(null, {
-        ...state,
-        reservationUnitEdit: {
-          unitPk: action.unitPk,
-        },
-        hasChanges: false,
-      });
-    }
-    case "dataInitializationError": {
-      return {
-        ...state,
-        loading: false,
-        hasChanges: false,
-        error: { message: action.message },
-      };
-    }
-    case "clearError": {
-      return {
-        ...state,
-        error: undefined,
-      };
-    }
-    case "set": {
-      return modifyEditorState(state, { ...action.value });
-    }
-    case "setSpaces": {
-      const selectedSpacePks = action.spaces.map((ot) => ot.value as number);
-      const selectedSpaces = state.spaces.filter(
-        (s) => selectedSpacePks.indexOf(Number(s.pk)) !== -1
-      );
-
-      const surfaceArea = sumBy(
-        selectedSpaces,
-        (s) => Number(s.surfaceArea) || 0
-      );
-      const maxPersons = sumBy(
-        selectedSpaces,
-        (s) => Number(s.maxPersons) || 0
-      );
-
-      return modifyEditorState(state, {
-        surfaceArea,
-        maxPersons,
-        spacePks: selectedSpacePks,
-      });
-    }
-    case "setResources": {
-      return modifyEditorState(state, {
-        resourcePks: action.resources.map((ot) => ot.value as number),
-      });
-    }
-    case "setEquipments": {
-      return modifyEditorState(state, {
-        equipmentPks: action.equipments.map((ot) => ot.value as number),
-      });
-    }
-    case "setPurposes": {
-      return modifyEditorState(state, {
-        purposePks: action.purposes.map((ot) => ot.value as number),
-      });
-    }
-    default:
-      return state;
-  }
-};
 
 const Wrapper = styled.div`
   padding-bottom: 6em;
@@ -476,6 +103,11 @@ const Editor = styled.div`
     margin: 0 var(--spacing-layout-m);
   }
   max-width: 52rem;
+`;
+
+const ButtonsContainer = styled.div`
+  display: flex;
+  gap: var(--spacing-m);
 `;
 
 const Section = styled.div`
@@ -555,9 +187,10 @@ const hasTranslations = (prefixes: string[], state: State): boolean =>
 
 const ReservationUnitEditor = (): JSX.Element | null => {
   const { reservationUnitPk, unitPk } = useParams<IProps>();
+  const [saving, setSaving] = useState(false);
   const { t } = useTranslation();
   const history = useHistory();
-  const { setNotification } = useNotification();
+  const { notifySuccess, notifyError } = useNotification();
 
   const [state, dispatch] = useReducer(
     reducer,
@@ -570,13 +203,6 @@ const ReservationUnitEditor = (): JSX.Element | null => {
       message: text || t("ReservationUnitEditor.dataLoadFailedMessage"),
     });
   };
-
-  const onSave = (text?: string) =>
-    setNotification({
-      type: "success",
-      title: text || t("ReservationUnitEditor.reservationUnitUpdated"),
-      message: t("ReservationUnitEditor.reservationUnitUpdatedNotification"),
-    });
 
   const [updateReservationUnitMutation] = useMutation<Mutation>(
     UPDATE_RESERVATION_UNIT
@@ -592,7 +218,10 @@ const ReservationUnitEditor = (): JSX.Element | null => {
   const createReservationUnit = (input: ReservationUnitCreateMutationInput) =>
     createReservationUnitMutation({ variables: { input } });
 
-  const createOrUpdateReservationUnit = async (publish: boolean) => {
+  const createOrUpdateReservationUnit = async (
+    reservationUnit: Partial<ReservationUnitEditorType>,
+    publish: boolean
+  ): Promise<number | undefined> => {
     const input = pick(
       {
         ...omitBy(state.reservationUnitEdit, (v) => v === ""),
@@ -646,6 +275,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
 
     let errors: Maybe<Maybe<ErrorType>[]> | undefined;
 
+    let resUnitPk: number | undefined = state.reservationUnitPk;
     try {
       if (state.reservationUnitPk) {
         const res = await updateReservationUnit(
@@ -660,33 +290,32 @@ const ReservationUnitEditor = (): JSX.Element | null => {
         errors = res.data?.createReservationUnit?.errors;
 
         if (res.data?.createReservationUnit?.errors === null) {
-          onSave(t("ReservationUnitEditor.saved"));
-          // todo notification
-          history.replace(
-            `/unit/${unitPk}/reservationUnit/edit/${res.data.createReservationUnit.pk}`
-          );
+          resUnitPk = res.data.createReservationUnit.pk as number;
         }
       }
       if (errors === null) {
-        onSave(t("ReservationUnitEditor.saved"));
-      } else {
-        const firstError = errors ? errors.find(() => true) : undefined;
-        const errorMessage = firstError
-          ? `${firstError.field} -${firstError.messages.find(() => true)}`
-          : "";
-
-        const errorTxt = t("ReservationUnitEditor.saveFailed", {
-          error: errorMessage,
-        });
-
-        onDataError(errorTxt);
+        return resUnitPk;
       }
+      const firstError = errors ? errors.find(() => true) : undefined;
+      const errorMessage = firstError
+        ? `${firstError.field} -${firstError.messages.find(() => true)}`
+        : "";
+
+      onDataError(
+        t("ReservationUnitEditor.saveFailed", {
+          error: errorMessage,
+        })
+      );
     } catch (error) {
       onDataError(t("ReservationUnitEditor.saveFailed", { error }));
     }
+    return undefined;
   };
 
-  useQuery<Query, QueryReservationUnitByPkArgs>(RESERVATIONUNIT_QUERY, {
+  const { refetch: refetchReservationUnit } = useQuery<
+    Query,
+    QueryReservationUnitByPkArgs
+  >(RESERVATIONUNIT_QUERY, {
     variables: { pk: Number(reservationUnitPk) },
     skip: !reservationUnitPk,
     onCompleted: ({ reservationUnitByPk }) => {
@@ -726,17 +355,146 @@ const ReservationUnitEditor = (): JSX.Element | null => {
           query.reservationUnitCancellationRules?.edges.length
         )
       ) {
-        setNotification({
-          type: "error",
-          title: t("ReservationUnitEditor.errorParamsNotAvailable"),
-          message: t("ReservationUnitEditor.errorParamsNotAvailable"),
-        });
+        notifyError(t("ReservationUnitEditor.errorParamsNotAvailable"));
       }
     },
     onError: (e) => {
       onDataError(t("errors.errorFetchingData", { error: e }));
     },
   });
+
+  const [createImage] = useMutation<
+    Mutation,
+    ReservationUnitImageCreateMutationInput
+  >(CREATE_IMAGE);
+
+  const [delImage] = useMutation<Mutation>(DELETE_IMAGE);
+  const [updateImagetype] = useMutation<Mutation>(UPDATE_IMAGE_TYPE);
+
+  const reconcileImageChanges = async (resUnitPk: number): Promise<boolean> => {
+    // delete deleted images
+    try {
+      const deletePromises = state.images
+        .filter((image) => image.deleted)
+        .map((image) =>
+          delImage({
+            variables: {
+              pk: image.pk,
+            },
+          })
+        );
+      const res = await Promise.all(deletePromises);
+      const hasErrors = Boolean(
+        res
+          .map(
+            (singleRes) =>
+              singleRes?.data?.deleteReservationUnitImage?.errors?.length
+          )
+          .find((r) => r && r > 0)
+      );
+      if (hasErrors) {
+        return false;
+      }
+    } catch (e) {
+      return false;
+    }
+
+    // create images
+    try {
+      const addPromises = state.images
+        .filter((image) => (image.pk as number) < 0)
+        .map((image) =>
+          createImage({
+            variables: {
+              image: image.bytes,
+              reservationUnitPk: resUnitPk,
+              imageType: image.imageType as string,
+            },
+          })
+        );
+
+      const res = await Promise.all(addPromises);
+      const hasErrors = Boolean(
+        res
+          .map(
+            (singleRes) =>
+              singleRes?.data?.createReservationUnitImage?.errors?.length
+          )
+          .find((r) => r && r > 0)
+      );
+      if (hasErrors) {
+        return false;
+      }
+    } catch (e) {
+      return false;
+    }
+
+    // change imagetypes
+    try {
+      const changeTypePromises = state.images
+        .filter((image) => !image.deleted)
+        .filter((image) => image.pk && image.pk > 0)
+        .filter((image) => image.imageType !== image.originalImageType)
+        .map((image) => {
+          console.log("changing type of ", image);
+          return updateImagetype({
+            variables: {
+              pk: image.pk,
+              imageType: image.imageType,
+            },
+          });
+        });
+
+      const res = await Promise.all(changeTypePromises);
+      const hasErrors = Boolean(
+        res
+          .map(
+            (singleRes) =>
+              singleRes?.data?.updateReservationUnitImage?.errors?.length
+          )
+          .find((r) => r && r > 0)
+      );
+      if (hasErrors) {
+        return false;
+      }
+    } catch (e) {
+      return false;
+    }
+
+    return true;
+  };
+
+  const saveReservationUnit = async (publish: boolean) => {
+    setSaving(true);
+    try {
+      const resUnitPk = await createOrUpdateReservationUnit(
+        state.reservationUnitEdit,
+        publish
+      );
+      if (resUnitPk) {
+        // res unit is saved, we can save changes to images
+        const success = await reconcileImageChanges(resUnitPk);
+        if (success) {
+          refetchReservationUnit();
+          if (!state.reservationUnitPk) {
+            // create, redirect to edit
+            history.replace(
+              `/unit/${unitPk}/reservationUnit/edit/${resUnitPk}`
+            );
+          }
+          notifySuccess(
+            t("ReservationUnitEditor.saved"),
+            t("ReservationUnitEditor.reservationUnitUpdatedNotification")
+          );
+        } else {
+          notifyError("jokin meni pieleen");
+        }
+      }
+    } catch (e) {
+      // todo
+    }
+    setSaving(false);
+  };
 
   useEffect(() => {
     if (!reservationUnitPk) {
@@ -776,6 +534,8 @@ const ReservationUnitEditor = (): JSX.Element | null => {
     ["description", "name", "additionalInstructions"],
     state
   );
+
+  const { hasChanges } = state;
 
   if (state.error) {
     return (
@@ -1036,7 +796,10 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                   />
                 ))}
                 <ImageEditor
-                  reservationUnitPk={Number(state.reservationUnitPk)}
+                  images={state.images}
+                  setImages={(images) =>
+                    dispatch({ type: "setImages", images })
+                  }
                 />
               </Accordion>
 
@@ -1488,44 +1251,45 @@ const ReservationUnitEditor = (): JSX.Element | null => {
       </MainMenuWrapper>
       <ButtonsStripe>
         <WhiteButton
-          disabled={false}
+          disabled={saving}
           variant="secondary"
           onClick={() => history.go(-1)}
         >
           {t("ReservationUnitEditor.cancel")}
         </WhiteButton>
-        <PublishingTime>
-          Varausyksikkö julkaistaan
-          <br /> TODO
-        </PublishingTime>
-        <WhiteButton
-          disabled={!state.hasChanges}
-          variant="secondary"
-          onClick={() => createOrUpdateReservationUnit(false)}
-        >
-          {t("ReservationUnitEditor.saveAsDraft")}
-        </WhiteButton>
-        <WhiteButton
-          variant="primary"
-          disabled={!isReadyToPublish}
-          onClick={() => createOrUpdateReservationUnit(true)}
-        >
-          {t("ReservationUnitEditor.saveAndPublish")}
-        </WhiteButton>
-        <Preview
-          target="_blank"
-          rel="noopener noreferrer"
-          $disabled={state.hasChanges}
-          href={`${previewUrlPrefix}/${state.reservationUnit?.pk}?ru=${state.reservationUnit?.uuid}`}
-          onClick={(e) => state.hasChanges && e.preventDefault()}
-          title={t(
-            state.hasChanges
-              ? "ReservationUnitEditor.noPreviewUnsavedChangesTooltip"
-              : "ReservationUnitEditor.previewTooltip"
-          )}
-        >
-          {t("ReservationUnitEditor.preview")}
-        </Preview>
+        <ButtonsContainer>
+          <PublishingTime />
+          <WhiteButton
+            disabled={!hasChanges}
+            variant="secondary"
+            isLoading={saving}
+            loadingText={t("ReservationUnitEditor.saving")}
+            onClick={() => saveReservationUnit(false)}
+          >
+            {t("ReservationUnitEditor.saveAsDraft")}
+          </WhiteButton>
+          <WhiteButton
+            variant="primary"
+            disabled={!isReadyToPublish || saving}
+            onClick={() => saveReservationUnit(true)}
+          >
+            {t("ReservationUnitEditor.saveAndPublish")}
+          </WhiteButton>
+          <Preview
+            target="_blank"
+            rel="noopener noreferrer"
+            $disabled={state.hasChanges}
+            href={`${previewUrlPrefix}/${state.reservationUnit?.pk}?ru=${state.reservationUnit?.uuid}`}
+            onClick={(e) => state.hasChanges && e.preventDefault()}
+            title={t(
+              state.hasChanges
+                ? "ReservationUnitEditor.noPreviewUnsavedChangesTooltip"
+                : "ReservationUnitEditor.previewTooltip"
+            )}
+          >
+            {t("ReservationUnitEditor.preview")}
+          </Preview>
+        </ButtonsContainer>
       </ButtonsStripe>
     </Wrapper>
   );

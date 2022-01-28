@@ -923,6 +923,7 @@ const translations: ITranslations = {
     cancel: ["Palaa tallentamatta muutoksia"],
     save: ["Tallenna tiedot"],
     preview: ["Esikatselu"],
+    saving: ["Tallennetaan..."],
     saved: ["Tiedot tallennettu."],
     saveAsDraft: ["Tallenna luonnoksena"],
     reservationUnitUpdatedNotification: ["Varausyksikön tiedot tallennettu."],
