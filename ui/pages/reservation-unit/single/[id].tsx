@@ -43,6 +43,7 @@ import {
   QueryReservationsArgs,
   QueryReservationUnitByPkArgs,
   QueryReservationUnitsArgs,
+  QueryTermsOfUseArgs,
   ReservationsReservationStateChoices,
   ReservationType,
   ReservationTypeEdge,
@@ -51,11 +52,13 @@ import {
   ReservationUnitByPkTypeReservationsArgs,
   ReservationUnitType,
   ReservationUnitTypeEdge,
+  TermsOfUseType,
 } from "../../../modules/gql-types";
 import {
   OPENING_HOURS,
   RELATED_RESERVATION_UNITS,
   RESERVATION_UNIT,
+  TERMS_OF_USE,
 } from "../../../modules/queries/reservationUnit";
 import { getApplicationRounds } from "../../../modules/api";
 import { DataContext } from "../../../context/DataContext";
@@ -66,6 +69,7 @@ type Props = {
   relatedReservationUnits: ReservationUnitType[];
   activeApplicationRounds: ApplicationRound[];
   userReservations: ReservationType[];
+  termsOfUse: Record<string, TermsOfUseType>;
 };
 
 type WeekOptions = "day" | "week" | "month";
@@ -98,6 +102,17 @@ export const getServerSideProps: GetServerSideProps = async ({
         pk: id,
       },
     });
+
+    const { data: genericTermsData } = await apolloClient.query<
+      Query,
+      QueryTermsOfUseArgs
+    >({
+      query: TERMS_OF_USE,
+      variables: {
+        termsType: "generic_terms",
+      },
+    });
+    const genericTerms = genericTermsData.termsOfUse?.edges[0]?.node || {};
 
     const { data: userReservationData } = await apolloClient.query<
       Query,
@@ -191,6 +206,7 @@ export const getServerSideProps: GetServerSideProps = async ({
         relatedReservationUnits,
         activeApplicationRounds,
         userReservations,
+        termsOfUse: { genericTerms },
       },
     };
   }
@@ -316,6 +332,7 @@ const ReservationUnit = ({
   relatedReservationUnits,
   activeApplicationRounds,
   userReservations,
+  termsOfUse,
 }: Props): JSX.Element | null => {
   const { t } = useTranslation();
 
@@ -641,29 +658,35 @@ const ReservationUnit = ({
             <Content>
               <p>
                 <Sanitize
-                  html={getTranslation(reservationUnit, "termsOfUse")}
+                  html={getTranslation(termsOfUse.genericTerms, "text")}
                 />
               </p>
             </Content>
           </Accordion>
           <div />
-          {reservationUnit.serviceSpecificTerms && (
-            <>
-              <Accordion heading={t("reservationUnit:termsOfUseSpaces")}>
-                <Content>
-                  <p>
-                    <Sanitize
-                      html={getTranslation(
-                        reservationUnit.serviceSpecificTerms,
-                        "text"
-                      )}
-                    />
-                  </p>
-                </Content>
-              </Accordion>
-              <div />
-            </>
-          )}
+          {getTranslation(reservationUnit, "termsOfUse") &&
+            reservationUnit.serviceSpecificTerms && (
+              <>
+                <Accordion heading={t("reservationUnit:termsOfUseSpaces")}>
+                  <Content>
+                    <p>
+                      <Sanitize
+                        html={getTranslation(reservationUnit, "termsOfUse")}
+                      />
+                    </p>
+                    <p>
+                      <Sanitize
+                        html={getTranslation(
+                          reservationUnit.serviceSpecificTerms,
+                          "text"
+                        )}
+                      />
+                    </p>
+                  </Content>
+                </Accordion>
+                <div />
+              </>
+            )}
         </TwoColumnLayout>
       </Container>
       <BottomWrapper>

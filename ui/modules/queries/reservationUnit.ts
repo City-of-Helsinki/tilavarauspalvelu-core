@@ -246,3 +246,21 @@ export const OPENING_HOURS = gql`
     }
   }
 `;
+
+export const TERMS_OF_USE = gql`
+  query TermsOfUse($termsType: String) {
+    termsOfUse(termsType: $termsType) {
+      edges {
+        node {
+          nameFi
+          nameEn
+          nameSv
+          textFi
+          textEn
+          textSv
+          termsType
+        }
+      }
+    }
+  }
+`;

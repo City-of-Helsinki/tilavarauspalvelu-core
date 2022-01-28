@@ -12,7 +12,12 @@ import {
   Koros,
 } from "hds-react";
 import { Trans, useTranslation } from "react-i18next";
-import { ReservationType } from "../../modules/gql-types";
+import {
+  Query,
+  QueryTermsOfUseArgs,
+  ReservationType,
+  TermsOfUseType,
+} from "../../modules/gql-types";
 import apolloClient from "../../modules/apolloClient";
 import { GET_RESERVATION } from "../../modules/queries/reservation";
 import { fontRegular, H1, H3 } from "../../modules/style/typography";
@@ -24,9 +29,11 @@ import { TwoColumnContainer } from "../../components/common/common";
 import { MediumButton } from "../../styles/util";
 import Sanitize from "../../components/common/Sanitize";
 import { canUserCancelReservation } from "../../modules/reservation";
+import { TERMS_OF_USE } from "../../modules/queries/reservationUnit";
 
 type Props = {
   reservation: ReservationType;
+  termsOfUse: Record<string, TermsOfUseType>;
 };
 
 export const getServerSideProps: GetServerSideProps = async ({
@@ -41,11 +48,25 @@ export const getServerSideProps: GetServerSideProps = async ({
       variables: { pk: id },
     });
 
+    const { data: genericTermsData } = await apolloClient.query<
+      Query,
+      QueryTermsOfUseArgs
+    >({
+      query: TERMS_OF_USE,
+      variables: {
+        termsType: "generic_terms",
+      },
+    });
+    const genericTerms = genericTermsData?.termsOfUse?.edges[0]?.node || {};
+
     if (data) {
       return {
         props: {
           ...(await serverSideTranslations(locale)),
           reservation: data.reservationByPk,
+          termsOfUse: {
+            genericTerms,
+          },
         },
       };
     }
@@ -147,7 +168,7 @@ const TermContainer = styled.div`
   }
 `;
 
-const Reservation = ({ reservation }: Props): JSX.Element => {
+const Reservation = ({ reservation, termsOfUse }: Props): JSX.Element => {
   const { t } = useTranslation();
 
   const reservationUnit = reservation.reservationUnits[0];
@@ -267,7 +288,7 @@ const Reservation = ({ reservation }: Props): JSX.Element => {
                 heading={t("reservationCalendar:heading.termsOfUse")}
               >
                 <Sanitize
-                  html={getTranslation(reservationUnit, "termsOfUse")}
+                  html={getTranslation(termsOfUse?.genericTerms, "text")}
                 />
               </Accordion>
             </TermContainer>
@@ -280,12 +301,19 @@ const Reservation = ({ reservation }: Props): JSX.Element => {
                 initiallyOpen={false}
                 heading={t("reservationCalendar:heading.resourceTerms")}
               >
-                <Sanitize
-                  html={getTranslation(
-                    reservationUnit.serviceSpecificTerms,
-                    "text"
-                  )}
-                />
+                <p>
+                  <Sanitize
+                    html={getTranslation(reservationUnit, "termsOfUse")}
+                  />
+                </p>
+                <p>
+                  <Sanitize
+                    html={getTranslation(
+                      reservationUnit.serviceSpecificTerms,
+                      "text"
+                    )}
+                  />
+                </p>
               </Accordion>
             </TermContainer>
           </AccordionContainer>

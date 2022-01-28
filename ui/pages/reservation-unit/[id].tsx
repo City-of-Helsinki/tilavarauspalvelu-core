@@ -21,19 +21,23 @@ import {
   Query,
   QueryReservationUnitByPkArgs,
   QueryReservationUnitsArgs,
+  QueryTermsOfUseArgs,
   ReservationUnitByPkType,
   ReservationUnitType,
   ReservationUnitTypeEdge,
+  TermsOfUseType,
 } from "../../modules/gql-types";
 import { getTranslation } from "../../modules/util";
 import {
   RELATED_RESERVATION_UNITS,
   RESERVATION_UNIT,
+  TERMS_OF_USE,
 } from "../../modules/queries/reservationUnit";
 
 type Props = {
   reservationUnit: ReservationUnitByPkType | null;
   relatedReservationUnits: ReservationUnitType[];
+  termsOfUse: Record<string, TermsOfUseType>;
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -54,6 +58,17 @@ export const getServerSideProps: GetServerSideProps = async ({
         pk: id,
       },
     });
+
+    const { data: genericTermsData } = await apolloClient.query<
+      Query,
+      QueryTermsOfUseArgs
+    >({
+      query: TERMS_OF_USE,
+      variables: {
+        termsType: "generic_terms",
+      },
+    });
+    const genericTerms = genericTermsData.termsOfUse?.edges[0]?.node || {};
 
     if (reservationUnitData.reservationUnitByPk?.unit?.pk) {
       const { data: relatedReservationUnitsData } = await apolloClient.query<
@@ -86,6 +101,7 @@ export const getServerSideProps: GetServerSideProps = async ({
         ...(await serverSideTranslations(locale)),
         reservationUnit: reservationUnitData.reservationUnitByPk,
         relatedReservationUnits,
+        termsOfUse: { genericTerms },
       },
     };
   }
@@ -108,11 +124,12 @@ const TwoColumnLayout = styled.div`
 
 const Content = styled.div`
   font-family: var(--font-regular);
+  white-space: pre-wrap;
 `;
 
 const BottomWrapper = styled.div`
   margin: 0;
-  padding: 0;
+  padding: 0 0 var(--spacing-layout-xl);
   background-color: var(--color-silver-medium-light);
 `;
 
@@ -142,6 +159,7 @@ const MapWrapper = styled.div`
 const ReservationUnit = ({
   reservationUnit,
   relatedReservationUnits,
+  termsOfUse,
 }: Props): JSX.Element | null => {
   const { t } = useTranslation();
 
@@ -191,10 +209,37 @@ const ReservationUnit = ({
           <div />
           <Accordion heading={t("reservationUnit:termsOfUse")}>
             <Content>
-              <Sanitize html={getTranslation(reservationUnit, "termsOfUse")} />
+              <p>
+                <Sanitize
+                  html={getTranslation(termsOfUse?.genericTerms, "text")}
+                />
+              </p>
             </Content>
           </Accordion>
           <div />
+          {getTranslation(reservationUnit, "termsOfUse") &&
+            reservationUnit.serviceSpecificTerms && (
+              <>
+                <Accordion heading={t("reservationUnit:termsOfUseSpaces")}>
+                  <Content>
+                    <p>
+                      <Sanitize
+                        html={getTranslation(reservationUnit, "termsOfUse")}
+                      />
+                    </p>
+                    <p>
+                      <Sanitize
+                        html={getTranslation(
+                          reservationUnit.serviceSpecificTerms,
+                          "text"
+                        )}
+                      />
+                    </p>
+                  </Content>
+                </Accordion>
+                <div />
+              </>
+            )}
         </TwoColumnLayout>
       </Container>
       <BottomWrapper>

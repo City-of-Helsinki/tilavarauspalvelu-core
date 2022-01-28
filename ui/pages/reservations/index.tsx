@@ -26,7 +26,9 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
     props: {
       reservations: data?.reservations?.edges
         ?.map((edge) => edge?.node)
-        .filter((node) => node?.state === "CONFIRMED"),
+        .filter((node) =>
+          ["CONFIRMED", "REQUIRES_HANDLING"].includes(node?.state)
+        ),
       ...(await serverSideTranslations(locale)),
     },
   };

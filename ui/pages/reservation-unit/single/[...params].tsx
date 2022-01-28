@@ -58,14 +58,19 @@ import {
   QueryCitiesArgs,
   QueryReservationPurposesArgs,
   QueryReservationUnitByPkArgs,
+  QueryTermsOfUseArgs,
   ReservationConfirmMutationInput,
   ReservationConfirmMutationPayload,
   ReservationPurposeType,
   ReservationUnitType,
   ReservationUpdateMutationInput,
   ReservationUpdateMutationPayload,
+  TermsOfUseType,
 } from "../../../modules/gql-types";
-import { RESERVATION_UNIT } from "../../../modules/queries/reservationUnit";
+import {
+  RESERVATION_UNIT,
+  TERMS_OF_USE,
+} from "../../../modules/queries/reservationUnit";
 import {
   CONFIRM_RESERVATION,
   GET_CITIES,
@@ -77,7 +82,7 @@ import Sanitize from "../../../components/common/Sanitize";
 import { getPrice } from "../../../modules/reservationUnit";
 import {
   getReservationApplicationFields,
-  getReservationApplicationMutatationValues,
+  getReservationApplicationMutationValues,
   ReserveeType,
 } from "../../../modules/reservation";
 import {
@@ -90,6 +95,7 @@ type Props = {
   reservationPurposes: ReservationPurposeType[];
   ageGroups: AgeGroupType[];
   cities: CityType[];
+  termsOfUse: Record<string, TermsOfUseType>;
 };
 
 type Inputs = {
@@ -179,6 +185,17 @@ export const getServerSideProps: GetServerSideProps = async ({
       variables: { pk: id },
     });
 
+    const { data: genericTermsData } = await apolloClient.query<
+      Query,
+      QueryTermsOfUseArgs
+    >({
+      query: TERMS_OF_USE,
+      variables: {
+        termsType: "generic_terms",
+      },
+    });
+    const genericTerms = genericTermsData.termsOfUse?.edges[0]?.node || {};
+
     if (reservationUnitData?.reservationUnitByPk) {
       if (reservationUnitData.reservationUnitByPk?.metadataSet) {
         const { data: reservationPurposesData } = await apolloClient.query<
@@ -215,6 +232,7 @@ export const getServerSideProps: GetServerSideProps = async ({
           reservationPurposes,
           ageGroups,
           cities,
+          genericTerms,
           ...(await serverSideTranslations(locale)),
         },
       };
@@ -405,6 +423,7 @@ const ReservationUnitReservation = ({
   reservationPurposes,
   ageGroups,
   cities,
+  termsOfUse,
 }: Props): JSX.Element => {
   const { t } = useTranslation();
   const {
@@ -602,7 +621,7 @@ const ReservationUnitReservation = ({
       return acc;
     }, {});
 
-    const input = getReservationApplicationMutatationValues(
+    const input = getReservationApplicationMutationValues(
       normalizedPayload,
       reservationUnit.metadataSet.supportedFields,
       reserveeType
@@ -1094,9 +1113,7 @@ const ReservationUnitReservation = ({
                     open
                     heading={t("reservationCalendar:heading.termsOfUse")}
                   >
-                    <Sanitize
-                      html={getTranslation(reservationUnit, "termsOfUse")}
-                    />
+                    <Sanitize html={getTranslation(termsOfUse, "text")} />
                   </Accordion>
                   <Checkbox
                     id="spaceTerms"
@@ -1116,6 +1133,11 @@ const ReservationUnitReservation = ({
                     open
                     heading={t("reservationCalendar:heading.resourceTerms")}
                   >
+                    <p>
+                      <Sanitize
+                        html={getTranslation(reservationUnit, "termsOfUse")}
+                      />
+                    </p>
                     <p>
                       <Sanitize
                         html={getTranslation(
