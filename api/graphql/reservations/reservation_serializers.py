@@ -160,6 +160,7 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
         if hasattr(reservation_units, "all"):
             reservation_units = reservation_units.all()
 
+        sku = None
         for reservation_unit in reservation_units:
             if (
                 reservation_unit.reservation_begins
@@ -215,8 +216,10 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
             self.check_max_reservations_per_user(
                 self.context.get("request").user, reservation_unit
             )
-            data["sku"] = reservation_unit.sku
+            self.check_sku(sku, reservation_unit.sku)
+            sku = reservation_unit.sku
 
+        data["sku"] = sku
         data["state"] = STATE_CHOICES.CREATED
         data[
             "buffer_time_before"
@@ -245,6 +248,12 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
             if getattr(res_unit, field, None) is not None
         ]
         return max(buffer_times, default=None)
+
+    def check_sku(self, current_sku, new_sku):
+        if current_sku is not None and current_sku != new_sku:
+            raise serializers.ValidationError(
+                "An ambiguous SKU cannot be assigned for this reservation."
+            )
 
     def check_max_reservations_per_user(self, user, reservation_unit):
         max_count = reservation_unit.max_reservations_per_user
