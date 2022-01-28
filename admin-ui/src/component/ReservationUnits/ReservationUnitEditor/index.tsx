@@ -436,7 +436,6 @@ const ReservationUnitEditor = (): JSX.Element | null => {
         .filter((image) => image.pk && image.pk > 0)
         .filter((image) => image.imageType !== image.originalImageType)
         .map((image) => {
-          console.log("changing type of ", image);
           return updateImagetype({
             variables: {
               pk: image.pk,
