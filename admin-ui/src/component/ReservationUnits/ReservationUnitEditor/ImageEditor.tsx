@@ -60,7 +60,6 @@ const FileInputContainer = styled.div`
   div > div > div > div:nth-of-type(1) {
     display: none;
   }
-  }
   #file-input-success {
     display: none;
   }
