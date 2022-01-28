@@ -521,3 +521,21 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         )
         assert_that(self.reservation.home_city).is_not_equal_to(home_city)
         assert_that(self.reservation.age_group).is_not_equal_to(age_group)
+
+    def test_update_reservation_succeeds_when_max_reservations_per_user_reached(
+        self, mock_periods, mock_opening_hours
+    ):
+        self.reservation_unit.max_reservations_per_user = 1
+        self.reservation_unit.save(update_fields=["max_reservations_per_user"])
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+        self.client.force_login(self.regular_joe)
+        update_data = self.get_valid_update_data()
+        response = self.query(self.get_update_query(), input_data=update_data)
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        assert_that(
+            content.get("data").get("updateReservation").get("errors")
+        ).is_none()
+        self.reservation.refresh_from_db()
+        assert_that(self.reservation).is_not_none()
+        assert_that(self.reservation.priority).is_equal_to(update_data["priority"])

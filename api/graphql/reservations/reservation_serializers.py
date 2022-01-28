@@ -258,7 +258,13 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
     def check_max_reservations_per_user(self, user, reservation_unit):
         max_count = reservation_unit.max_reservations_per_user
         if max_count is not None:
-            reservation_count = Reservation.objects.filter(user=user).active().count()
+            current_reservation_pk = getattr(self.instance, "pk", None)
+            reservation_count = (
+                Reservation.objects.filter(user=user)
+                .exclude(pk=current_reservation_pk)
+                .active()
+                .count()
+            )
             if reservation_count >= max_count:
                 raise serializers.ValidationError(
                     "Maximum number of active reservations for this reservation unit exceeded."
