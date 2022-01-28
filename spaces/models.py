@@ -63,6 +63,7 @@ class ServiceSector(models.Model):
         verbose_name=_("Purposes"),
         related_name="service_sectors",
     )
+    merchant_id = models.UUIDField(verbose_name=_("Merchant ID"), blank=True, null=True)
 
     def __str__(self):
         return self.name
