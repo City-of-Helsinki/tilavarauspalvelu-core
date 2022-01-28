@@ -145,14 +145,18 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         mock_get_reservation_unit_possible_start_times.return_value = [
             datetime.datetime.now(tz=DEFAULT_TIMEZONE)
         ]
-
+        sku = "340026__2652000155___44_10000100"
+        self.reservation_unit.sku = sku
+        self.reservation_unit.save(update_fields=["sku"])
         res_unit_too = ReservationUnitFactory(
             buffer_time_before=datetime.timedelta(minutes=90),
             buffer_time_after=None,
+            sku=sku,
         )
         res_unit_another = ReservationUnitFactory(
             buffer_time_before=None,
             buffer_time_after=datetime.timedelta(minutes=15),
+            sku=sku,
         )
 
         self.client.force_login(self.regular_joe)
@@ -727,3 +731,46 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
             content.get("data").get("createReservation").get("errors")
         ).is_none()
         assert_that(Reservation.objects.exists()).is_true()
+
+    def test_creating_reservation_copies_sku_from_reservation_unit(
+        self, mock_periods, mock_opening_hours
+    ):
+        self.reservation_unit.sku = "340026__2652000155___44_10000117"
+        self.reservation_unit.save(update_fields=["sku"])
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+        self.client.force_login(self.regular_joe)
+        response = self.query(
+            self.get_create_query(), input_data=self.get_valid_input_data()
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        assert_that(
+            content.get("data").get("createReservation").get("errors")
+        ).is_none()
+        reservation = Reservation.objects.get()
+        assert_that(reservation.sku).is_equal_to(self.reservation_unit.sku)
+
+    def test_creating_reservation_fails_if_sku_is_ambiguous(
+        self, mock_periods, mock_opening_hours
+    ):
+        resunit1 = ReservationUnitFactory(sku="340026__2652000155___44_10000001")
+        resunit2 = ReservationUnitFactory(sku="340026__2652000155___44_10000002")
+        input_data = self.get_valid_input_data()
+        input_data["reservationUnitPks"] = [resunit1.pk, resunit2.pk]
+
+        def get_mocked_opening_hours(origin_ids, *args):
+            if str(resunit1.uuid) in origin_ids:
+                return self.get_mocked_opening_hours(resunit1)
+            return self.get_mocked_opening_hours(resunit2)
+
+        mock_opening_hours.side_effect = get_mocked_opening_hours
+        self.client.force_login(self.regular_joe)
+        response = self.query(self.get_create_query(), input_data=input_data)
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        assert_that(
+            content.get("data").get("createReservation").get("errors")
+        ).is_not_none()
+        assert_that(
+            content.get("data").get("createReservation").get("errors")[0]["messages"]
+        ).contains("An ambiguous SKU cannot be assigned for this reservation.")

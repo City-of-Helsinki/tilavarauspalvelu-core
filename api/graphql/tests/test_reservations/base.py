@@ -1,4 +1,5 @@
 import datetime
+from typing import Optional
 
 import freezegun
 import snapshottest
@@ -30,15 +31,20 @@ class ReservationTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCase):
         )
         cls.purpose = ReservationPurposeFactory(name="purpose")
 
-    def get_mocked_opening_hours(self):
-        resource_id = f"{settings.HAUKI_ORIGIN_ID}:{self.reservation_unit.uuid}"
-        return [self._get_single_opening_hour_block(resource_id, resource_id)]
+    def get_mocked_opening_hours(
+        self, reservation_unit: Optional[ReservationUnit] = None
+    ):
+        if reservation_unit is None:
+            reservation_unit = self.reservation_unit
+        resource_id = f"{settings.HAUKI_ORIGIN_ID}:{reservation_unit.uuid}"
+        origin_id = str(reservation_unit.uuid)
+        return [self._get_single_opening_hour_block(resource_id, origin_id)]
 
     def _get_single_opening_hour_block(self, resource_id, origin_id):
         return {
             "timezone": DEFAULT_TIMEZONE,
             "resource_id": resource_id,
-            "origin_id": str(self.reservation_unit.uuid),
+            "origin_id": origin_id,
             "date": datetime.date.today(),
             "times": [
                 TimeElement(
