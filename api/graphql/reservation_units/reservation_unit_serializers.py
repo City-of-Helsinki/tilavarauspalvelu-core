@@ -251,6 +251,7 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
             "publish_ends",
             "metadata_set_pk",
             "max_reservations_per_user",
+            "require_reservation_handling",
         ] + get_all_translatable_fields(ReservationUnit)
 
     def __init__(self, *args, **kwargs):
