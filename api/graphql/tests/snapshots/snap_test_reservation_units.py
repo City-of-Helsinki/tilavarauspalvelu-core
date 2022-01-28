@@ -430,6 +430,7 @@ snapshots['ReservationUnitQueryTestCase::test_getting_reservation_units 1'] = {
                         'purposes': [
                         ],
                         'requireIntroduction': False,
+                        'requireReservationHandling': False,
                         'reservationBegins': '2021-05-03T00:00:00+00:00',
                         'reservationEnds': '2021-05-03T00:00:00+00:00',
                         'reservationStartInterval': 'INTERVAL_30_MINS',

@@ -208,6 +208,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
                               requiredFields
                             }
                             maxReservationsPerUser
+                            requireReservationHandling
                           }
                         }
                     }
@@ -1813,6 +1814,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
             "reservationEnds": "2021-05-03T00:00:00+00:00",
             "metadataSetPk": self.metadata_set.pk,
             "maxReservationsPerUser": 2,
+            "requireReservationHandling": True,
         }
 
     def test_create(self):
@@ -1872,6 +1874,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         assert_that(res_unit.max_reservations_per_user).is_equal_to(
             data.get("maxReservationsPerUser")
         )
+        assert_that(res_unit.require_reservation_handling).is_equal_to(True)
 
     @mock.patch(
         "reservation_units.utils.hauki_exporter.ReservationUnitHaukiExporter.send_reservation_unit_to_hauki"
