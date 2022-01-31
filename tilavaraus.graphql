@@ -408,6 +408,7 @@ type Mutation {
   cancelReservation(input: ReservationCancellationMutationInput!): ReservationCancellationMutationPayload
   denyReservation(input: ReservationDenyMutationInput!): ReservationDenyMutationPayload
   approveReservation(input: ReservationApproveMutationInput!): ReservationApproveMutationPayload
+  requireHandlingForReservation(input: ReservationRequiresHandlingMutationInput!): ReservationRequiresHandlingMutationPayload
   updateReservationWorkingMemo(input: ReservationWorkingMemoMutationInput!): ReservationWorkingMemoMutationPayload
   createReservationUnit(input: ReservationUnitCreateMutationInput!): ReservationUnitCreateMutationPayload
   updateReservationUnit(input: ReservationUnitUpdateMutationInput!): ReservationUnitUpdateMutationPayload
@@ -1016,6 +1017,20 @@ type ReservationPurposeTypeEdge {
   cursor: String!
 }
 
+input ReservationRequiresHandlingMutationInput {
+  pk: Int
+  clientMutationId: String
+}
+
+type ReservationRequiresHandlingMutationPayload {
+  pk: Int
+  state: state
+
+  """May contain more than one error for same field."""
+  errors: [ErrorType]
+  clientMutationId: String
+}
+
 """An enumeration."""
 enum ReservationsReservationPriorityChoices {
   """Low"""
@@ -1195,6 +1210,11 @@ type ReservationUnitByPkType implements Node {
   publishEnds: DateTime
   metadataSet: ReservationMetadataSetType
   maxReservationsPerUser: Int
+
+  """
+  Does reservations of this reservation unit need to be handled before they're confirmed.
+  """
+  requireReservationHandling: Boolean!
   images: [ReservationUnitImageType]
 
   """The ID of the object"""
@@ -1275,7 +1295,7 @@ input ReservationUnitCreateMutationInput {
   requireIntroduction: Boolean
   maxPersons: Int
   equipmentPks: [Int]
-  unitPk: Int!
+  unitPk: Int
   maxReservationDuration: Int
   minReservationDuration: Int
   isDraft: Boolean
@@ -1329,21 +1349,26 @@ input ReservationUnitCreateMutationInput {
   publishEnds: DateTime
   metadataSetPk: Int
   maxReservationsPerUser: Int
-  nameFi: String
-  nameEn: String
-  nameSv: String
-  additionalInstructionsFi: String
-  additionalInstructionsEn: String
-  additionalInstructionsSv: String
+
+  """
+  Does reservations of this reservation unit need to be handled before they're confirmed.
+  """
+  requireReservationHandling: Boolean
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
   contactInformationFi: String
   contactInformationEn: String
   contactInformationSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
+  additionalInstructionsFi: String
+  additionalInstructionsEn: String
+  additionalInstructionsSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
   clientMutationId: String
 }
 
@@ -1423,21 +1448,26 @@ type ReservationUnitCreateMutationPayload {
   """Time after this reservation unit should not be publicly visible in UI."""
   publishEnds: DateTime
   maxReservationsPerUser: Int
-  nameFi: String
-  nameEn: String
-  nameSv: String
-  additionalInstructionsFi: String
-  additionalInstructionsEn: String
-  additionalInstructionsSv: String
+
+  """
+  Does reservations of this reservation unit need to be handled before they're confirmed.
+  """
+  requireReservationHandling: Boolean
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
   contactInformationFi: String
   contactInformationEn: String
   contactInformationSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
+  additionalInstructionsFi: String
+  additionalInstructionsEn: String
+  additionalInstructionsSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -1643,6 +1673,11 @@ type ReservationUnitType implements Node {
   publishEnds: DateTime
   metadataSet: ReservationMetadataSetType
   maxReservationsPerUser: Int
+
+  """
+  Does reservations of this reservation unit need to be handled before they're confirmed.
+  """
+  requireReservationHandling: Boolean!
   images: [ReservationUnitImageType]
   applicationRounds(active: Boolean = null): [ApplicationRoundType]
 
@@ -1763,21 +1798,26 @@ input ReservationUnitUpdateMutationInput {
   publishEnds: DateTime
   metadataSetPk: Int
   maxReservationsPerUser: Int
-  nameFi: String
-  nameEn: String
-  nameSv: String
-  additionalInstructionsFi: String
-  additionalInstructionsEn: String
-  additionalInstructionsSv: String
+
+  """
+  Does reservations of this reservation unit need to be handled before they're confirmed.
+  """
+  requireReservationHandling: Boolean
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
   contactInformationFi: String
   contactInformationEn: String
   contactInformationSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
+  additionalInstructionsFi: String
+  additionalInstructionsEn: String
+  additionalInstructionsSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
   clientMutationId: String
 }
 
@@ -1857,21 +1897,26 @@ type ReservationUnitUpdateMutationPayload {
   """Time after this reservation unit should not be publicly visible in UI."""
   publishEnds: DateTime
   maxReservationsPerUser: Int
-  nameFi: String
-  nameEn: String
-  nameSv: String
-  additionalInstructionsFi: String
-  additionalInstructionsEn: String
-  additionalInstructionsSv: String
+
+  """
+  Does reservations of this reservation unit need to be handled before they're confirmed.
+  """
+  requireReservationHandling: Boolean
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
   contactInformationFi: String
   contactInformationEn: String
   contactInformationSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
+  additionalInstructionsFi: String
+  additionalInstructionsEn: String
+  additionalInstructionsSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -2029,12 +2074,12 @@ input ResourceCreateMutationInput {
   """
   bufferTimeAfter: Int
   isDraft: Boolean
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   clientMutationId: String
 }
 
@@ -2057,12 +2102,12 @@ type ResourceCreateMutationPayload {
   """
   bufferTimeAfter: Int
   isDraft: Boolean
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -2145,12 +2190,12 @@ input ResourceUpdateMutationInput {
   """
   bufferTimeAfter: Int
   isDraft: Boolean
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   clientMutationId: String
 }
 
@@ -2173,12 +2218,12 @@ type ResourceUpdateMutationPayload {
   """
   bufferTimeAfter: Int
   isDraft: Boolean
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -2530,12 +2575,12 @@ input UnitUpdateMutationInput {
   nameFi: String
   nameEn: String
   nameSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   shortDescriptionFi: String
   shortDescriptionEn: String
   shortDescriptionSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   clientMutationId: String
 }
 
@@ -2548,12 +2593,12 @@ type UnitUpdateMutationPayload {
   nameFi: String
   nameEn: String
   nameSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   shortDescriptionFi: String
   shortDescriptionEn: String
   shortDescriptionSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]

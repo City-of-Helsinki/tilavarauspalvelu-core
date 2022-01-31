@@ -89,6 +89,7 @@ export const RESERVATION_UNIT = gql`
           }
         }
       }
+      requireReservationHandling
       metadataSet {
         id
         name
