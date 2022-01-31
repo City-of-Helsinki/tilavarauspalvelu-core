@@ -269,6 +269,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
         ...i18nFields("additionalInstructions"),
         ...i18nFields("description"),
         ...i18nFields("name"),
+        ...i18nFields("contactInformation"),
         ...i18nFields("termsOfUse"),
       ]
     );
@@ -530,7 +531,13 @@ const ReservationUnitEditor = (): JSX.Element | null => {
   }
 
   const isReadyToPublish = hasTranslations(
-    ["description", "name", "additionalInstructions"],
+    [
+      "description",
+      "name",
+      "additionalInstructions",
+      "contactInformation",
+      "termsOfUse",
+    ],
     state
   );
 
@@ -1215,6 +1222,29 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                     onChange={(e) =>
                       setValue({
                         [`additionalInstructions${upperFirst(lang)}`]:
+                          e.target.value,
+                      })
+                    }
+                  />
+                ))}
+                {languages.map((lang) => (
+                  <TextInputWithPadding
+                    key={lang}
+                    required
+                    id={`contactInformation${lang}`}
+                    label={t("ReservationUnitEditor.contactInformationLabel", {
+                      lang,
+                    })}
+                    value={get(
+                      state,
+                      `reservationUnitEdit.contactInformation${upperFirst(
+                        lang
+                      )}`,
+                      ""
+                    )}
+                    onChange={(e) =>
+                      setValue({
+                        [`contactInformation${upperFirst(lang)}`]:
                           e.target.value,
                       })
                     }

@@ -164,6 +164,7 @@ export const reducer = (state: State, action: Action): State => {
             "surfaceArea",
             "unitPk",
             ...i18nFields("additionalInstructions"),
+            ...i18nFields("contactInformation"),
             ...i18nFields("description"),
             ...i18nFields("name"),
             ...i18nFields("termsOfUse"),

@@ -355,7 +355,6 @@ export const RESERVATIONUNIT_QUERY = gql`
       nameFi
       nameSv
       nameEn
-      descriptionFi
       spaces {
         pk
         nameFi
@@ -427,6 +426,9 @@ export const RESERVATIONUNIT_QUERY = gql`
       bufferTimeBefore
       bufferTimeAfter
       reservationBegins
+      contactInformationFi
+      contactInformationEn
+      contactInformationSv
       reservationEnds
       publishBegins
       publishEnds
