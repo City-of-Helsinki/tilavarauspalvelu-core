@@ -17,7 +17,7 @@ import {
 } from "../../common/queries";
 import { useNotification } from "../../context/NotificationContext";
 import Loader from "../Loader";
-import Select from "../ReservationUnits/Select";
+import Select from "../ReservationUnits/ReservationUnitEditor/Select";
 import { OptionType } from "../../common/types";
 
 const Fields = styled.div`

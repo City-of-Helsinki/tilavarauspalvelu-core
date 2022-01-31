@@ -335,24 +335,17 @@ export const RESERVATION_UNIT_EDITOR_PARAMETERS = gql`
   }
 `;
 
-export const RESERVATIONUNIT_IMAGES_QUERY = gql`
-  query reservationUnit($pk: Int) {
-    reservationUnitByPk(pk: $pk) {
-      images {
-        pk
-        mediumUrl
-        imageType
-      }
-    }
-  }
-`;
-
 export const RESERVATIONUNIT_QUERY = gql`
   query reservationUnit($pk: Int) {
     reservationUnitByPk(pk: $pk) {
       lowestPrice
       highestPrice
       priceUnit
+      images {
+        pk
+        mediumUrl
+        imageType
+      }
       haukiUrl {
         url
       }

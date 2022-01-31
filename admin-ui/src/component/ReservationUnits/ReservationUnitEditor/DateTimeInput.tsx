@@ -3,7 +3,7 @@ import { DateInput, TimeInput } from "hds-react";
 import { useTranslation } from "react-i18next";
 import { parse } from "date-fns";
 import { EditorColumns } from "./editorComponents";
-import { formatDate } from "../../common/util";
+import { formatDate } from "../../../common/util";
 
 /* Convert api datetime to date required by date input, defaults to current date */
 export const valueForDateInput = (from: string): string => {

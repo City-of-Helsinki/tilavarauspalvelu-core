@@ -1,6 +1,6 @@
 import React from "react";
 import { Select as HDSSelect } from "hds-react";
-import { OptionType } from "../../common/types";
+import { OptionType } from "../../../common/types";
 
 type NullableStringOrNumber = string | number | null;
 
