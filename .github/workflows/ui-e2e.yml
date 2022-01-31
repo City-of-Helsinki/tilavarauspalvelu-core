@@ -6,6 +6,7 @@ on:
     paths:
       - "ui/**"
       - ".github/workflows/ui-e2e.yml"
+      - "yarn.lock"
   pull_request:
     branches: [main]
     paths:

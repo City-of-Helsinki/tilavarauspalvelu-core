@@ -8,10 +8,12 @@ on:
     branches: [main]
     paths:
       - "common/**"
+      - "yarn.lock"
       - ".github/workflows/common-style-test.yml"
   pull_request:
     paths:
       - "common/**"
+      - "yarn.lock"
       - ".github/workflows/common-style-test.yml"
 
 jobs:
