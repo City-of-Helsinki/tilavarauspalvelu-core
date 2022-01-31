@@ -397,6 +397,16 @@ class ReservationUnit(models.Model):
         ),
     )
 
+    AUTHENTICATION_TYPES = (("weak", _("Weak")), ("strong", _("Strong")))
+    authentication = models.CharField(
+        blank=False,
+        verbose_name=_("Authentication"),
+        max_length=20,
+        choices=AUTHENTICATION_TYPES,
+        default="weak",
+        help_text=_("Authentication required for reserving this reservation unit."),
+    )
+
     def __str__(self):
         return "{}".format(self.name)
 
