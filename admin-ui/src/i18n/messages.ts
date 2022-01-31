@@ -935,6 +935,8 @@ const translations: ITranslations = {
     communication: ["Viestintä"],
     additionalInstructionsLabel: ["Sähköpostin lisäohjeteksti {{lang}}"],
     additionalInstructionsPlaceholder: ["Lisäohjeteksti {{language}}"],
+    contactInformationLabel: ["Vastuuhenkilön yhteystiedot {{lang}}"],
+    contactInformationPlaceholder: ["Vastuuhenkilön yhteystiedot {{language}}"],
     noPreviewUnsavedChangesTooltip: ["Tallenna ensin muutokset"],
     previewTooltip: ["Varausyksikön esikatselu"],
     pricing: ["Hinnoittelu"],
