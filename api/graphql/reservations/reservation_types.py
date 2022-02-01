@@ -182,7 +182,6 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
             "name",
             "description",
             "purpose",
-            "purpose_pk",
             "unit_price",
             "tax_percentage_value",
             "price",
