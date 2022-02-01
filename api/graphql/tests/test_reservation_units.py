@@ -1424,7 +1424,7 @@ class ReservationUnitsFilterTextSearchTestCase(ReservationUnitQueryTestCaseBase)
                     edges {
                         node {
                             nameFi
-                            descriptionFi
+                            descriptionSv
                         }
                     }
                 }
