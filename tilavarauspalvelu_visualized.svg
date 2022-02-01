@@ -3512,29 +3512,8 @@
 <ellipse fill="black" stroke="black" cx="8782.95" cy="-2421.66" rx="4" ry="4"/>
 <text text-anchor="middle" x="7175.5" y="-1505.6" font-family="Roboto" font-size="8.00"> user (introduction)</text>
 </g>
-<!-- applications_models_AggregateDataBase -->
-<g id="node44" class="node">
-<title>applications_models_AggregateDataBase</title>
-<polygon fill="white" stroke="transparent" points="6136.5,-2401 6136.5,-2450 6291.5,-2450 6291.5,-2401 6136.5,-2401"/>
-<polygon fill="#1b563f" stroke="transparent" points="6138,-2427.5 6138,-2448.5 6291,-2448.5 6291,-2427.5 6138,-2427.5"/>
-<text text-anchor="start" x="6143" y="-2436.5" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="6157" y="-2436.5" font-family="Roboto" font-weight="bold" font-size="10.00" fill="white"> &#160;&#160;&#160;&#160;&#160;AggregateDataBase &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="6140" y="-2420.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="6154" y="-2420.1" font-family="Roboto" font-size="8.00">name</text>
-<text text-anchor="start" x="6175" y="-2420.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="6209" y="-2420.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="6223" y="-2420.1" font-family="Roboto" font-size="8.00">CharField</text>
-<text text-anchor="start" x="6258" y="-2420.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="6140" y="-2407.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="6154" y="-2407.1" font-family="Roboto" font-size="8.00">value</text>
-<text text-anchor="start" x="6174" y="-2407.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="6209" y="-2407.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="6223" y="-2407.1" font-family="Roboto" font-size="8.00">FloatField</text>
-<text text-anchor="start" x="6259" y="-2407.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<polygon fill="none" stroke="black" points="6136.5,-2401 6136.5,-2450 6291.5,-2450 6291.5,-2401 6136.5,-2401"/>
-</g>
 <!-- applications_base_models_ContactInformation -->
-<g id="node45" class="node">
+<g id="node44" class="node">
 <title>applications_base_models_ContactInformation</title>
 <polygon fill="white" stroke="transparent" points="6163,-941.5 6163,-990.5 6321,-990.5 6321,-941.5 6163,-941.5"/>
 <polygon fill="#1b563f" stroke="transparent" points="6164,-968 6164,-989 6320,-989 6320,-968 6164,-968"/>
@@ -3553,6 +3532,27 @@
 <text text-anchor="start" x="6266" y="-947.6" font-family="Roboto" font-size="8.00" fill="#7b7b7b">TextField</text>
 <text text-anchor="start" x="6299" y="-947.6" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
 <polygon fill="none" stroke="black" points="6163,-941.5 6163,-990.5 6321,-990.5 6321,-941.5 6163,-941.5"/>
+</g>
+<!-- applications_models_AggregateDataBase -->
+<g id="node45" class="node">
+<title>applications_models_AggregateDataBase</title>
+<polygon fill="white" stroke="transparent" points="6136.5,-2401 6136.5,-2450 6291.5,-2450 6291.5,-2401 6136.5,-2401"/>
+<polygon fill="#1b563f" stroke="transparent" points="6138,-2427.5 6138,-2448.5 6291,-2448.5 6291,-2427.5 6138,-2427.5"/>
+<text text-anchor="start" x="6143" y="-2436.5" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="6157" y="-2436.5" font-family="Roboto" font-weight="bold" font-size="10.00" fill="white"> &#160;&#160;&#160;&#160;&#160;AggregateDataBase &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="6140" y="-2420.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="6154" y="-2420.1" font-family="Roboto" font-size="8.00">name</text>
+<text text-anchor="start" x="6175" y="-2420.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="6209" y="-2420.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="6223" y="-2420.1" font-family="Roboto" font-size="8.00">CharField</text>
+<text text-anchor="start" x="6258" y="-2420.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="6140" y="-2407.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="6154" y="-2407.1" font-family="Roboto" font-size="8.00">value</text>
+<text text-anchor="start" x="6174" y="-2407.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="6209" y="-2407.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="6223" y="-2407.1" font-family="Roboto" font-size="8.00">FloatField</text>
+<text text-anchor="start" x="6259" y="-2407.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<polygon fill="none" stroke="black" points="6136.5,-2401 6136.5,-2450 6291.5,-2450 6291.5,-2401 6136.5,-2401"/>
 </g>
 <!-- applications_models_Address -->
 <g id="node46" class="node">
