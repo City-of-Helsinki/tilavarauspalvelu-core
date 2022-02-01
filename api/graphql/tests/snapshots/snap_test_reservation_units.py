@@ -4,7 +4,6 @@ from __future__ import unicode_literals
 
 from snapshottest import Snapshot
 
-
 snapshots = Snapshot()
 
 snapshots['ReservationUnitQueryTestCase::test_filtering_by_active_application_rounds 1'] = {
@@ -732,13 +731,13 @@ snapshots['ReservationUnitsFilterTextSearchTestCase::test_filtering_by_reservati
             'edges': [
                 {
                     'node': {
-                        'descriptionFi': 'Lorem ipsum fi',
+                        'descriptionSv': 'Lorem ipsum sv',
                         'nameFi': 'test name fi'
                     }
                 },
                 {
                     'node': {
-                        'descriptionFi': 'Lorem ipsum fi',
+                        'descriptionSv': 'Lorem ipsum sv',
                         'nameFi': 'test name fi'
                     }
                 }
