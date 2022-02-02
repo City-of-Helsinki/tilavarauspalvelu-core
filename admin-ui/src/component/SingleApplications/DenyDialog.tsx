@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { useMutation, useQuery } from "@apollo/client";
-import { Button, Dialog, IconInfoCircle, IconTrash, TextArea } from "hds-react";
+import { Button, Dialog, IconInfoCircle, TextArea } from "hds-react";
 import {
   Mutation,
   Query,
@@ -103,7 +103,6 @@ const DialogContent = ({
         <Button
           disabled={!denyReasonPk}
           variant="danger"
-          iconLeft={<IconTrash />}
           onClick={async () => {
             try {
               const res = await denyReservation({

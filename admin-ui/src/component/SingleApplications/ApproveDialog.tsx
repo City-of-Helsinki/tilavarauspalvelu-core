@@ -2,14 +2,7 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { useMutation } from "@apollo/client";
-import {
-  Button,
-  Dialog,
-  IconCheckCircleFill,
-  IconInfoCircle,
-  TextArea,
-  TextInput,
-} from "hds-react";
+import { Button, Dialog, IconInfoCircle, TextArea, TextInput } from "hds-react";
 import {
   Mutation,
   ReservationApproveMutationInput,
@@ -88,7 +81,6 @@ const DialogContent = ({
 
         <Button
           disabled={!priceIsValid}
-          iconLeft={<IconCheckCircleFill />}
           onClick={async () => {
             try {
               const res = await approveReservation({
