@@ -238,9 +238,6 @@ const ReservationUnitEditor = (): JSX.Element | null => {
       [
         "bufferTimeAfter",
         "bufferTimeBefore",
-        "cancellationRulePk",
-        "cancellationTermsPk",
-        "equipmentPks",
         "highestPrice",
         "isDraft",
         "lowestPrice",
@@ -249,16 +246,19 @@ const ReservationUnitEditor = (): JSX.Element | null => {
         "metadataSetPk",
         "maxReservationDuration",
         "minReservationDuration",
-        "paymentTermsPk",
         "pk",
         "priceUnit",
         "publishBegins",
         "publishEnds",
-        "purposePks",
         "requireIntroduction",
         "reservationBegins",
         "reservationEnds",
         "reservationStartInterval",
+        "purposePks",
+        "cancellationRulePk",
+        "cancellationTermsPk",
+        "equipmentPks",
+        "paymentTermsPk",
         "reservationUnitTypePk",
         "resourcePks",
         "serviceSpecificTermsPk",
@@ -266,6 +266,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
         "surfaceArea",
         "taxPercentagePk",
         "unitPk",
+        "requireReservationHandling",
         ...i18nFields("additionalInstructions"),
         ...i18nFields("description"),
         ...i18nFields("name"),
@@ -1050,6 +1051,23 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                     onChange={(e) =>
                       setValue({
                         maxReservationsPerUser: e.target.value,
+                      })
+                    }
+                  />
+                  <Checkbox
+                    id="requireReservationHandling"
+                    label={t(
+                      "ReservationUnitEditor.requireReservationHandling"
+                    )}
+                    checked={
+                      state.reservationUnitEdit.requireReservationHandling ===
+                      true
+                    }
+                    onClick={() =>
+                      setValue({
+                        requireReservationHandling:
+                          !state.reservationUnitEdit
+                            ?.requireReservationHandling,
                       })
                     }
                   />

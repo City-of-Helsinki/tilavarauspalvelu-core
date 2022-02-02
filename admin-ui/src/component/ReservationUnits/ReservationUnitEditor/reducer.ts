@@ -158,6 +158,7 @@ export const reducer = (state: State, action: Action): State => {
             "publishBegins",
             "publishEnds",
             "requireIntroduction",
+            "requireReservationHandling",
             "reservationBegins",
             "reservationEnds",
             "reservationStartInterval",

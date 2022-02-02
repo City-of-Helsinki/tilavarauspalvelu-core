@@ -883,6 +883,7 @@ const translations: ITranslations = {
     purposesPlaceholder: ["Valitse mitä tarkoitusta tuetaan"],
     resourcesLabel: ["Resurssit"],
     resourcesPlaceholder: ["Liitä tarvittavat resurssit"],
+    requireReservationHandling: ["Haluan käsitellä kaikki varausanomukset"],
     requireIntroductionLabel: ["Varausyksikkö vaatii pakollisen perehdytyksen"],
     surfaceAreaLabel: ["Pinta-ala"],
     surfaceAreaHelperText: [
