@@ -1,6 +1,6 @@
 import { useQuery } from "@apollo/client";
 
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { Query, QueryReservationsArgs } from "../common/gql-types";
 import { HANDLING_COUNT_QUERY } from "../common/queries";
 
@@ -21,12 +21,19 @@ export const DataContextProvider: React.FC = ({ children }) => {
 
   const { refetch } = useQuery<Query, QueryReservationsArgs>(
     HANDLING_COUNT_QUERY,
+
     {
+      fetchPolicy: "no-cache",
       onCompleted: ({ reservations }) => {
         setHandlingCount(reservations?.edges?.length || 0);
       },
     }
   );
+
+  useEffect(() => {
+    const timer = setInterval(refetch, 30000);
+    return () => clearTimeout(timer);
+  });
 
   return (
     <DataContext.Provider

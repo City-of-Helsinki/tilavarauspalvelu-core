@@ -676,6 +676,8 @@ export const RESERVATION_QUERY = gql`
       billingAddressStreet
       billingAddressCity
       billingAddressZip
+      freeOfChargeReason
+      applyingForFreeOfCharge
     }
   }
 `;
@@ -694,6 +696,17 @@ export const APPROVE_RESERVATION = gql`
 export const DENY_RESERVATION = gql`
   mutation denyReservation($input: ReservationDenyMutationInput!) {
     denyReservation(input: $input) {
+      errors {
+        field
+        messages
+      }
+    }
+  }
+`;
+
+export const REQUIRE_HANDLING_RESERVATION = gql`
+  mutation requireHandling($input: ReservationRequiresHandlingMutationInput!) {
+    requireHandlingForReservation(input: $input) {
       errors {
         field
         messages

@@ -467,6 +467,7 @@ export type Mutation = {
   deleteResource?: Maybe<ResourceDeleteMutationPayload>;
   deleteSpace?: Maybe<SpaceDeleteMutationPayload>;
   denyReservation?: Maybe<ReservationDenyMutationPayload>;
+  requireHandlingForReservation?: Maybe<ReservationRequiresHandlingMutationPayload>;
   updateEquipment?: Maybe<EquipmentUpdateMutationPayload>;
   updateEquipmentCategory?: Maybe<EquipmentCategoryUpdateMutationPayload>;
   updatePurpose?: Maybe<PurposeUpdateMutationPayload>;
@@ -545,6 +546,10 @@ export type MutationDeleteSpaceArgs = {
 
 export type MutationDenyReservationArgs = {
   input: ReservationDenyMutationInput;
+};
+
+export type MutationRequireHandlingForReservationArgs = {
+  input: ReservationRequiresHandlingMutationInput;
 };
 
 export type MutationUpdateEquipmentArgs = {
@@ -944,6 +949,8 @@ export type QueryReservationsArgs = {
   first?: Maybe<Scalars["Int"]>;
   last?: Maybe<Scalars["Int"]>;
   offset?: Maybe<Scalars["Int"]>;
+  orderBy?: Maybe<Scalars["String"]>;
+  requested?: Maybe<Scalars["Boolean"]>;
   state?: Maybe<Scalars["String"]>;
 };
 
@@ -1386,6 +1393,20 @@ export type ReservationPurposeTypeEdge = {
   node?: Maybe<ReservationPurposeType>;
 };
 
+export type ReservationRequiresHandlingMutationInput = {
+  clientMutationId?: Maybe<Scalars["String"]>;
+  pk?: Maybe<Scalars["Int"]>;
+};
+
+export type ReservationRequiresHandlingMutationPayload = {
+  __typename?: "ReservationRequiresHandlingMutationPayload";
+  clientMutationId?: Maybe<Scalars["String"]>;
+  /** May contain more than one error for same field. */
+  errors?: Maybe<Array<Maybe<ErrorType>>>;
+  pk?: Maybe<Scalars["Int"]>;
+  state?: Maybe<State>;
+};
+
 export type ReservationType = Node & {
   __typename?: "ReservationType";
   ageGroup?: Maybe<AgeGroupType>;
@@ -1443,6 +1464,7 @@ export type ReservationTypeConnection = {
   edges: Array<Maybe<ReservationTypeEdge>>;
   /** Pagination data for this connection. */
   pageInfo: PageInfo;
+  totalCount?: Maybe<Scalars["Int"]>;
 };
 
 /** A Relay edge containing a `ReservationType` and its cursor. */
@@ -1502,6 +1524,8 @@ export type ReservationUnitByPkType = Node & {
   publishEnds?: Maybe<Scalars["DateTime"]>;
   purposes?: Maybe<Array<Maybe<PurposeType>>>;
   requireIntroduction: Scalars["Boolean"];
+  /** Does reservations of this reservation unit need to be handled before they're confirmed. */
+  requireReservationHandling: Scalars["Boolean"];
   /** Time when making reservations become possible for this reservation unit. */
   reservationBegins?: Maybe<Scalars["DateTime"]>;
   /** Time when making reservations become not possible for this reservation unit */
@@ -1626,6 +1650,8 @@ export type ReservationUnitCreateMutationInput = {
   purposePks?: Maybe<Array<Maybe<Scalars["Int"]>>>;
   /** Determines if introduction is required in order to reserve this reservation unit. */
   requireIntroduction?: Maybe<Scalars["Boolean"]>;
+  /** Does reservations of this reservation unit need to be handled before they're confirmed. */
+  requireReservationHandling?: Maybe<Scalars["Boolean"]>;
   /** Time when making reservations become possible for this reservation unit. */
   reservationBegins?: Maybe<Scalars["DateTime"]>;
   /** Time when making reservations become not possible for this reservation unit */
@@ -1642,7 +1668,7 @@ export type ReservationUnitCreateMutationInput = {
   termsOfUseEn?: Maybe<Scalars["String"]>;
   termsOfUseFi?: Maybe<Scalars["String"]>;
   termsOfUseSv?: Maybe<Scalars["String"]>;
-  unitPk: Scalars["Int"];
+  unitPk?: Maybe<Scalars["Int"]>;
 };
 
 export type ReservationUnitCreateMutationPayload = {
@@ -1689,6 +1715,8 @@ export type ReservationUnitCreateMutationPayload = {
   purposes?: Maybe<Array<Maybe<ReservationPurposeType>>>;
   /** Determines if introduction is required in order to reserve this reservation unit. */
   requireIntroduction?: Maybe<Scalars["Boolean"]>;
+  /** Does reservations of this reservation unit need to be handled before they're confirmed. */
+  requireReservationHandling?: Maybe<Scalars["Boolean"]>;
   /** Time when making reservations become possible for this reservation unit. */
   reservationBegins?: Maybe<Scalars["DateTime"]>;
   /** Time when making reservations become not possible for this reservation unit */
@@ -1823,6 +1851,8 @@ export type ReservationUnitType = Node & {
   publishEnds?: Maybe<Scalars["DateTime"]>;
   purposes?: Maybe<Array<Maybe<PurposeType>>>;
   requireIntroduction: Scalars["Boolean"];
+  /** Does reservations of this reservation unit need to be handled before they're confirmed. */
+  requireReservationHandling: Scalars["Boolean"];
   /** Time when making reservations become possible for this reservation unit. */
   reservationBegins?: Maybe<Scalars["DateTime"]>;
   /** Time when making reservations become not possible for this reservation unit */
@@ -1938,6 +1968,8 @@ export type ReservationUnitUpdateMutationInput = {
   purposePks?: Maybe<Array<Maybe<Scalars["Int"]>>>;
   /** Determines if introduction is required in order to reserve this reservation unit. */
   requireIntroduction?: Maybe<Scalars["Boolean"]>;
+  /** Does reservations of this reservation unit need to be handled before they're confirmed. */
+  requireReservationHandling?: Maybe<Scalars["Boolean"]>;
   /** Time when making reservations become possible for this reservation unit. */
   reservationBegins?: Maybe<Scalars["DateTime"]>;
   /** Time when making reservations become not possible for this reservation unit */
@@ -2001,6 +2033,8 @@ export type ReservationUnitUpdateMutationPayload = {
   purposes?: Maybe<Array<Maybe<ReservationPurposeType>>>;
   /** Determines if introduction is required in order to reserve this reservation unit. */
   requireIntroduction?: Maybe<Scalars["Boolean"]>;
+  /** Does reservations of this reservation unit need to be handled before they're confirmed. */
+  requireReservationHandling?: Maybe<Scalars["Boolean"]>;
   /** Time when making reservations become possible for this reservation unit. */
   reservationBegins?: Maybe<Scalars["DateTime"]>;
   /** Time when making reservations become not possible for this reservation unit */

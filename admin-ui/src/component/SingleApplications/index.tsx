@@ -156,7 +156,7 @@ const SingleApplicationsView = (): JSX.Element => {
     RESERVATIONS_QUERY,
     {
       variables: {
-        state: ReservationsReservationStateChoices.RequiresHandling,
+        requested: true,
       },
       fetchPolicy: "network-only",
       onCompleted: ({ reservations }) => {
