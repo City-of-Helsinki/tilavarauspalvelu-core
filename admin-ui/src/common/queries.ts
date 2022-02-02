@@ -352,6 +352,7 @@ export const RESERVATIONUNIT_QUERY = gql`
       cancellationRule {
         pk
       }
+      requireReservationHandling
       nameFi
       nameSv
       nameEn
