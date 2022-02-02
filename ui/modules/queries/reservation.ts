@@ -157,6 +157,7 @@ export const GET_RESERVATION = gql`
       reserveeFirstName
       reserveeLastName
       reserveePhone
+      reserveeType
       begin
       end
       calendarUrl
@@ -198,6 +199,25 @@ export const GET_RESERVATION = gql`
           nameEn
           nameSv
         }
+        metadataSet {
+          supportedFields
+          requiredFields
+        }
+      }
+      purpose {
+        pk
+        nameFi
+        nameEn
+        nameSv
+      }
+      ageGroup {
+        pk
+        minimum
+        maximum
+      }
+      homeCity {
+        pk
+        name
       }
     }
   }

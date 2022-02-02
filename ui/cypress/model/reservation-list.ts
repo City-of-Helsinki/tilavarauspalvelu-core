@@ -25,7 +25,7 @@ export function redoReservationButton(): Cypress.Chainable<
 }
 
 export function timeStrip(): Cypress.Chainable<JQuery<HTMLElement>> {
-  return cy.get("[data-testid='reservation-card__time']");
+  return cy.get("[data-testid='reservation__card--time']");
 }
 
 export function ticket(): Cypress.Chainable<JQuery<HTMLElement>> {

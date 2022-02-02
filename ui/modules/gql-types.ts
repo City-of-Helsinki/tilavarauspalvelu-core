@@ -4116,6 +4116,72 @@ export type ReservationUnitOpeningHoursQueryResult = Apollo.QueryResult<
   ReservationUnitOpeningHoursQuery,
   ReservationUnitOpeningHoursQueryVariables
 >;
+export const TermsOfUseDocument = gql`
+  query TermsOfUse($termsType: String) {
+    termsOfUse(termsType: $termsType) {
+      edges {
+        node {
+          nameFi
+          nameEn
+          nameSv
+          textFi
+          textEn
+          textSv
+          termsType
+        }
+      }
+    }
+  }
+`;
+
+/**
+ * __useTermsOfUseQuery__
+ *
+ * To run a query within a React component, call `useTermsOfUseQuery` and pass it any options that fit your needs.
+ * When your component renders, `useTermsOfUseQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useTermsOfUseQuery({
+ *   variables: {
+ *      termsType: // value for 'termsType'
+ *   },
+ * });
+ */
+export function useTermsOfUseQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    TermsOfUseQuery,
+    TermsOfUseQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<TermsOfUseQuery, TermsOfUseQueryVariables>(
+    TermsOfUseDocument,
+    options
+  );
+}
+export function useTermsOfUseLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    TermsOfUseQuery,
+    TermsOfUseQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<TermsOfUseQuery, TermsOfUseQueryVariables>(
+    TermsOfUseDocument,
+    options
+  );
+}
+export type TermsOfUseQueryHookResult = ReturnType<typeof useTermsOfUseQuery>;
+export type TermsOfUseLazyQueryHookResult = ReturnType<
+  typeof useTermsOfUseLazyQuery
+>;
+export type TermsOfUseQueryResult = Apollo.QueryResult<
+  TermsOfUseQuery,
+  TermsOfUseQueryVariables
+>;
 export type SearchFormParamsUnitQueryVariables = Exact<{
   [key: string]: never;
 }>;
@@ -5043,6 +5109,40 @@ export type ReservationUnitOpeningHoursQuery = {
             >
           | null
           | undefined;
+      }
+    | null
+    | undefined;
+};
+
+export type TermsOfUseQueryVariables = Exact<{
+  termsType?: Maybe<Scalars["String"]>;
+}>;
+
+export type TermsOfUseQuery = {
+  __typename?: "Query";
+  termsOfUse?:
+    | {
+        __typename?: "TermsOfUseTypeConnection";
+        edges: Array<
+          | {
+              __typename?: "TermsOfUseTypeEdge";
+              node?:
+                | {
+                    __typename?: "TermsOfUseType";
+                    nameFi?: string | null | undefined;
+                    nameEn?: string | null | undefined;
+                    nameSv?: string | null | undefined;
+                    textFi?: string | null | undefined;
+                    textEn?: string | null | undefined;
+                    textSv?: string | null | undefined;
+                    termsType: TermsOfUseTermsOfUseTermsTypeChoices;
+                  }
+                | null
+                | undefined;
+            }
+          | null
+          | undefined
+        >;
       }
     | null
     | undefined;

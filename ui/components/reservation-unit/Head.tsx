@@ -178,16 +178,18 @@ const Head = ({
                     texts={openingTimesTextArr}
                   />
                 )}
-                {viewType === "single" && isReservable && (
-                  <StyledIconWithText
-                    icon={<IconCalendarClock aria-label="" />}
-                    text={`${t("reservationCalendar:nextAvailableTime")}:
+                {viewType === "single" &&
+                  isReservable &&
+                  reservationUnit.nextAvailableSlot && (
+                    <StyledIconWithText
+                      icon={<IconCalendarClock aria-label="" />}
+                      text={`${t("reservationCalendar:nextAvailableTime")}:
                       ${t("common:dateTimeNoYear", {
                         date: parseISO(reservationUnit.nextAvailableSlot),
                       })}
                       `}
-                  />
-                )}
+                    />
+                  )}
               </div>
               <div>
                 {viewType === "single" && unitPrice && (

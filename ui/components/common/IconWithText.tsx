@@ -18,7 +18,7 @@ const Container = styled.div`
 `;
 
 const SpanTwoColumns = styled.span`
-  margin-left: var(--spacing-s);
+  margin-left: var(--spacing-xs);
   grid-column-start: 2;
   grid-column-end: 4;
 `;

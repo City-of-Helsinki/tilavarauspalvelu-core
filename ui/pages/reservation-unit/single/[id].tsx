@@ -201,7 +201,9 @@ export const getServerSideProps: GetServerSideProps = async ({
               null,
           },
           reservations:
-            additionalData?.reservationUnitByPk?.reservations?.filter((n) => n),
+            additionalData?.reservationUnitByPk?.reservations?.filter(
+              (n) => n
+            ) || [],
         },
         relatedReservationUnits,
         activeApplicationRounds,

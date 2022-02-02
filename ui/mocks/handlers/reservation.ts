@@ -445,7 +445,26 @@ const listReservations = graphql.query<Query, QueryReservationUnitsArgs>(
                       needsHandling: false,
                     },
                     location: null,
-                    images: [],
+                    images: [
+                      {
+                        imageUrl:
+                          "https://tvp-core-dev.agw.arodevtest.hel.fi/media/reservation_unit_images/Leikkipuisto_2_4SSB34h.jpg",
+                        mediumUrl:
+                          "https://tvp-core-dev.agw.arodevtest.hel.fi/media/reservation_unit_images/Leikkipuisto_2_4SSB34h.jpg.384x384_q85_crop.jpg",
+                        smallUrl:
+                          "https://tvp-core-dev.agw.arodevtest.hel.fi/media/reservation_unit_images/Leikkipuisto_2_4SSB34h.jpg.250x250_q85_crop.jpg",
+                        imageType: "OTHER",
+                      },
+                      {
+                        imageUrl:
+                          "https://tvp-core-dev.agw.arodevtest.hel.fi/media/reservation_unit_images/Musiikki_2.jpg",
+                        mediumUrl:
+                          "https://tvp-core-dev.agw.arodevtest.hel.fi/media/reservation_unit_images/Musiikki_2.jpg.384x384_q85_crop.jpg",
+                        smallUrl:
+                          "https://tvp-core-dev.agw.arodevtest.hel.fi/media/reservation_unit_images/Musiikki_2.jpg.250x250_q85_crop.jpg",
+                        imageType: "MAIN",
+                      },
+                    ],
                   } as ReservationUnitType,
                 ],
               },
@@ -728,6 +747,37 @@ const listReservations = graphql.query<Query, QueryReservationUnitsArgs>(
                 end: addHours(addDays(new Date(), 10), 2).toISOString(),
                 user: "user@email.com",
                 state: ReservationsReservationStateChoices.Confirmed,
+                bufferTimeBefore: 3600,
+                bufferTimeAfter: 1800,
+                reservationUnits: [
+                  {
+                    pk: 11,
+                    nameFi: "Studiohuone 11 + soittimet",
+                    nameEn: null,
+                    nameSv: null,
+                    termsOfUseFi:
+                      "Kirjaston varattavien tilojen yleiset käyttösäännöt:\r\n1. Varattu tila kalusteineen on vuokralaisen käytettävissä sopimuksessa määriteltynä aikana.\r\n2. Mahdollisten alkuvalmistelujen ja loppusiivouksen tulee sisältyä varattuun aikaan. Varaus laskutetaan täysiltä tunneilta.\r\n3. Peruuttamatta jääneet varaukset laskutetaan.\r\n4. Vuokraajan tulee olla täysi-ikäinen.\r\n5. Kirjastossa ei voi järjestää kursseja tai toistuvia tilaisuuksia, joista otetaan pääsy- tai osallistumismaksu (koskien myös materiaalikuluja). Yksittäisiä osallistujille maksullisia tapahtumia voi järjestää.\r\n6. Vuokrausajan päättyessä vuokraajan tulee jättää tila samaan kuntoon kuin se oli vuokrausajan alkaessa.\r\n7. Vuokraaja on korvausvelvollinen, mikäli tilan käyttäjät aiheuttavat vahinkoa kiinteistölle tai irtaimistolle. Vahingoista on ilmoitettava välittömästi kirjaston henkilökunnalle.\r\n8. Vuokrattavassa tilassa järjestettävä tilaisuus ei saa häiritä muuta kirjaston toimintaa, asiakkaita tai käyttäjiä.\r\n9. Vuokrattavassa tilassa järjestettävän tilaisuuden sisältö tai luonne ei voi olla ristiriidassa Suomen lain kanssa tai hyvän tavan vastainen.\r\n10. Kirjastolla on tarvittaessa ja harkintansa mukaan oikeus evätä vuokralaisen pääsy vuokrattavaan tilaan tai keskeyttää vuokrattavassa tilassa järjestettävä tilaisuus, mikäli ilmenee, että edellä mainittuja sääntöjä rikotaan tai on rikottu.",
+                    unit: {
+                      nameFi: "Helsingin keskustakirjasto Oodi",
+                      nameEn: null,
+                      nameSv: null,
+                    },
+                    cancellationRule: null,
+                    location: null,
+                    images: [],
+                  } as ReservationUnitType,
+                ],
+              },
+            },
+            {
+              node: {
+                id: "UmVzZX43tfgrb25UeXBlOjE0",
+                pk: 14,
+                name: "",
+                begin: addDays(new Date(), 40).toISOString(),
+                end: addHours(addDays(new Date(), 40), 2).toISOString(),
+                user: "user@email.com",
+                state: ReservationsReservationStateChoices.RequiresHandling,
                 bufferTimeBefore: 3600,
                 bufferTimeAfter: 1800,
                 reservationUnits: [

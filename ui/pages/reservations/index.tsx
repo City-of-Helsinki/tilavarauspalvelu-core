@@ -77,6 +77,10 @@ const StyledTabPanel = styled(TabPanel)`
   margin-top: var(--spacing-layout-l);
 `;
 
+const EmptyMessage = styled.div`
+  margin-left: var(--spacing-xl);
+`;
+
 const Reservations = ({ reservations }: Props): JSX.Element => {
   const { t } = useTranslation();
 
@@ -106,22 +110,38 @@ const Reservations = ({ reservations }: Props): JSX.Element => {
             </StyledTab>
           </StyledTabList>
           <StyledTabPanel>
-            {upcomingReservations?.map((reservation) => (
-              <ReservationCard
-                key={reservation.pk}
-                reservation={reservation}
-                type="upcoming"
-              />
-            ))}
+            {upcomingReservations.length > 0 ? (
+              upcomingReservations?.map((reservation) => (
+                <ReservationCard
+                  key={reservation.pk}
+                  reservation={reservation}
+                  type={
+                    reservation.state === "REQUIRES_HANDLING"
+                      ? "requiresHandling"
+                      : "upcoming"
+                  }
+                />
+              ))
+            ) : (
+              <EmptyMessage>
+                {t("reservations:noUpcomingReservations")}
+              </EmptyMessage>
+            )}
           </StyledTabPanel>
           <StyledTabPanel>
-            {pastReservations?.map((reservation) => (
-              <ReservationCard
-                key={reservation.pk}
-                reservation={reservation}
-                type="past"
-              />
-            ))}
+            {pastReservations.length > 0 ? (
+              pastReservations?.map((reservation) => (
+                <ReservationCard
+                  key={reservation.pk}
+                  reservation={reservation}
+                  type="past"
+                />
+              ))
+            ) : (
+              <EmptyMessage>
+                {t("reservations:noPastReservations")}
+              </EmptyMessage>
+            )}
           </StyledTabPanel>
         </Tabs>
       </Heading>

@@ -232,7 +232,7 @@ export const getServerSideProps: GetServerSideProps = async ({
           reservationPurposes,
           ageGroups,
           cities,
-          genericTerms,
+          termsOfUse: { genericTerms },
           ...(await serverSideTranslations(locale)),
         },
       };
@@ -1119,7 +1119,9 @@ const ReservationUnitReservation = ({
                     open
                     heading={t("reservationCalendar:heading.termsOfUse")}
                   >
-                    <Sanitize html={getTranslation(termsOfUse, "text")} />
+                    <Sanitize
+                      html={getTranslation(termsOfUse.genericTerms, "text")}
+                    />
                   </Accordion>
                   <Checkbox
                     id="spaceTerms"

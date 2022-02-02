@@ -121,11 +121,15 @@ export const formatDuration = (
   if (time.length < 3) {
     return "-";
   }
+
+  const hours = Number(time[0]);
+  const minutes = Number(time[1]);
+
   return `${
-    Number(time[0])
-      ? `${`${Number(time[0])} ${i18n.t(hourKey) || "".toLocaleLowerCase()}`} `
+    hours
+      ? `${`${i18n.t(hourKey, { count: hours }) || "".toLocaleLowerCase()}`} `
       : ""
-  }${Number(time[1]) ? i18n.t(minuteKey, { count: Number(time[1]) }) : ""}`;
+  }${minutes ? i18n.t(minuteKey, { count: minutes }) : ""}`.trim();
 };
 
 export const capitalize = (s: string): string => {

@@ -34,7 +34,7 @@ describe("Tilavaraus user reservations", () => {
     tab(1)
       .invoke("text")
       .then((text) => {
-        expect(text).to.eq("Tulevat varaukset (4)");
+        expect(text).to.eq("Tulevat varaukset (5)");
       });
     tab(2)
       .invoke("text")
@@ -42,27 +42,33 @@ describe("Tilavaraus user reservations", () => {
         expect(text).to.eq("Menneet varaukset (2)");
       });
 
-    reservationCards().should("have.length", 4);
+    reservationCards().should("have.length", 5);
     timeStrip()
-      .should("have.length", 4)
-      .each(($el) => {
-        expect($el).to.contain("Tulossa");
+      .should("have.length", 5)
+      .each(($el, $i) => {
+        if ([0, 1, 2, 4].includes($i)) {
+          expect($el).to.contain("Tulossa");
+        } else {
+          expect($el).to.contain("Varaus käsiteltävänä");
+        }
       });
 
-    cancelButton().eq(0).should("be.disabled");
-    cancelButton().eq(1).should("be.disabled");
-    cancelButton().eq(2).should("be.disabled");
-    cancelButton().eq(3).should("not.be.disabled");
+    cancelButton().should("have.length", 1);
 
     reservationCards()
       .eq(0)
-      .find('[data-testid="reservation__card--price"]:nth-of-type(2)')
+      .find('[data-testid="reservation__card--price"]')
       .should("contain.text", "42\u00a0€");
 
     reservationCards()
       .eq(1)
-      .find('[data-testid="reservation__card--price"]:nth-of-type(2)')
+      .find('[data-testid="reservation__card--price"]')
       .should("contain.text", "Maksuton");
+
+    reservationCards()
+      .eq(3)
+      .find('[data-testid="reservation__card--time"]')
+      .should("contain.text", "Varaus käsiteltävänä");
 
     tab(2).click();
 
@@ -98,18 +104,16 @@ describe("Tilavaraus user reservations", () => {
       "Saat sähköpostiisi (user@gmail.com) muistutuksen varauksesta."
     );
 
-    cy.contains("div", "Additional Instructions FI").should("not.be.visible");
-    accordionToggler().eq(0).click();
     cy.contains("div", "Additional Instructions FI").should("be.visible");
 
     cy.contains("div", "Sopparijuttuja").should("not.be.visible");
     cy.contains("div", "Toinen rivi").should("not.be.visible");
-    accordionToggler().eq(1).click();
+    accordionToggler().eq(0).click();
     cy.contains("div", "Sopparijuttuja").should("be.visible");
     cy.contains("div", "Toinen rivi").should("be.visible");
 
     cy.contains("div", "Service specific terms FI").should("not.be.visible");
-    accordionToggler().eq(2).click();
+    accordionToggler().eq(1).click();
     cy.contains("div", "Service specific terms FI").should("be.visible");
 
     reservationPriceContainer()
@@ -123,7 +127,7 @@ describe("Tilavaraus user reservations", () => {
   });
 
   it("should do cancellation", () => {
-    detailButton().eq(3).click();
+    detailButton().eq(4).click();
     cy.url({ timeout: 20000 }).should("match", /\/reservations\/21$/);
     detailCancelButton().click();
     cy.url({ timeout: 20000 }).should("match", /\/reservations\/21\/cancel$/);
@@ -136,7 +140,7 @@ describe("Tilavaraus user reservations", () => {
     backButton().click();
     cy.url({ timeout: 20000 }).should("match", /\/reservations$/);
 
-    detailButton().eq(3).click();
+    detailButton().eq(4).click();
     detailCancelButton().click();
     cy.url({ timeout: 20000 }).should("match", /\/reservations\/21\/cancel$/);
 

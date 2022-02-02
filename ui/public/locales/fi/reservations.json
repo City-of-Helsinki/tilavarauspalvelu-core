@@ -12,6 +12,7 @@
   "errorGeneratingPDF": "PDF Dokumenttia ei pystytty luomaan",
   "reservationCalendar": "Varauskalenteri",
   "cancelReservation": "Peruuta varaus",
+  "cancelApplication": "Peruuta anomus",
   "cancelReservationBody": "Olet peruuttamassa tekemääsi varausta. Tutustuthan ensin huolellisesti varauksen peruutusehtoihin.",
   "redoReservation": "Varaa uudestaan",
   "upcomingReservations": "Tulevat varaukset",
@@ -19,6 +20,7 @@
   "upcomingSlug": "Tulossa",
   "pastSlug": "Mennyt",
   "modifyReservation": "Muokkaa varausta",
+  "modifyApplication": "Muokkaa anomusta",
   "backToReservations": "Palaa omiin varauksiin",
   "cancelInfo": "Peruutuksen tiedot",
   "cancelInfoBody": "Voidaksemme jatkossa palvella sinua paremmin, kertoisitko meille syyn varauksen peruuttamiseen.",
@@ -31,5 +33,7 @@
   "makeNewReservation": "Tee uusi varaus samaan tilaan",
   "reservationInfo": "Varauksen ohjeet",
   "gotoReservations": "Siirry omiin varauksiin",
-  "reservationDuration": "Varaus {{duration}}"
+  "reservationDuration": "Varaus {{duration}}",
+  "noUpcomingReservations": "Ei tulevia varauksia",
+  "noPastReservations": "Ei menneitä varauksia"
 }
