@@ -173,7 +173,10 @@ const ReservationUnitCard = ({
               icon={
                 <IconLocation aria-label={t("reservationUnitCard:address")} />
               }
-              text={getAddress(reservationUnit) || ""}
+              text={localizedValue(
+                reservationUnit.location?.addressStreet,
+                i18n.language
+              )}
             />
           ) : null}{" "}
         </Bottom>
