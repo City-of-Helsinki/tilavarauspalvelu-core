@@ -395,6 +395,7 @@ snapshots['ReservationUnitQueryTestCase::test_getting_reservation_units 1'] = {
                         'additionalInstructionsSv': 'Ytterligare instruktioner',
                         'applicationRounds': [
                         ],
+                        'authentication': 'WEAK',
                         'bufferTimeAfter': 900,
                         'bufferTimeBefore': 900,
                         'cancellationRule': {

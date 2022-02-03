@@ -209,6 +209,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
                             }
                             maxReservationsPerUser
                             requireReservationHandling
+                            authentication
                           }
                         }
                     }
@@ -1815,6 +1816,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
             "metadataSetPk": self.metadata_set.pk,
             "maxReservationsPerUser": 2,
             "requireReservationHandling": True,
+            "authentication": "STRONG",
         }
 
     def test_create(self):
@@ -1875,6 +1877,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
             data.get("maxReservationsPerUser")
         )
         assert_that(res_unit.require_reservation_handling).is_equal_to(True)
+        assert_that(res_unit.authentication).is_equal_to("strong")
 
     @mock.patch(
         "reservation_units.utils.hauki_exporter.ReservationUnitHaukiExporter.send_reservation_unit_to_hauki"
@@ -2340,6 +2343,33 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
         assert_that(self.res_unit.service_specific_terms).is_equal_to(
             service_specific_terms
         )
+
+    def test_update_with_authentication(self):
+        data = self.get_valid_update_data()
+        data["authentication"] = "STRONG"
+        response = self.query(self.get_update_query(), input_data=data)
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        res_unit_data = content.get("data").get("updateReservationUnit")
+        assert_that(res_unit_data.get("errors")).is_none()
+        self.res_unit.refresh_from_db()
+        assert_that(self.res_unit.authentication).is_equal_to("strong")
+
+    def test_update_errors_with_invalid_authentication(self):
+        data = self.get_valid_update_data()
+        data["authentication"] = "invalid"
+        response = self.query(self.get_update_query(), input_data=data)
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        res_unit_data = content.get("data").get("updateReservationUnit")
+        assert_that(res_unit_data.get("errors")).is_not_none()
+        assert_that(res_unit_data.get("errors")[0].get("messages")[0]).contains(
+            'Choice "invalid" is not allowed.'
+        )
+        self.res_unit.refresh_from_db()
+        assert_that(self.res_unit.authentication).is_not_equal_to("invalid")
 
     def test_update_errors_with_empty_name(self):
         data = self.get_valid_update_data()
