@@ -51,6 +51,7 @@ class SpaceType(AuthNode, PrimaryKeyObjectType):
     )
     children = graphene.List(lambda: SpaceType)
     resources = graphene.List("api.graphql.resources.resource_types.ResourceType")
+    surface_area = graphene.Float()
 
     class Meta:
         model = Space
