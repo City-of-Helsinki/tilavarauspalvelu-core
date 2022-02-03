@@ -109,6 +109,10 @@ export const getServerSideProps: GetServerSideProps = async ({
   return { props: { ...(await serverSideTranslations(locale)), paramsId: id } };
 };
 
+const Wrapper = styled.div`
+  padding-bottom: var(--spacing-layout-xl);
+`;
+
 const TwoColumnLayout = styled.div`
   display: grid;
   gap: var(--spacing-layout-s);
@@ -129,7 +133,7 @@ const Content = styled.div`
 
 const BottomWrapper = styled.div`
   margin: 0;
-  padding: 0 0 var(--spacing-layout-xl);
+  padding: 0;
   background-color: var(--color-silver-medium-light);
 `;
 
@@ -172,7 +176,7 @@ const ReservationUnit = ({
   const shouldDisplayBottomWrapper = relatedReservationUnits?.length > 0;
 
   return reservationUnit ? (
-    <>
+    <Wrapper>
       <Head
         reservationUnit={reservationUnit}
         activeOpeningTimes={activeOpeningTimes}
@@ -184,9 +188,11 @@ const ReservationUnit = ({
           <div>
             <Accordion open heading={t("reservationUnit:description")}>
               <Content>
-                <Sanitize
-                  html={getTranslation(reservationUnit, "description")}
-                />
+                <p>
+                  <Sanitize
+                    html={getTranslation(reservationUnit, "description")}
+                  />
+                </p>
               </Content>
             </Accordion>
           </div>
@@ -194,13 +200,13 @@ const ReservationUnit = ({
             <Address reservationUnit={reservationUnit} />
           </div>
         </TwoColumnLayout>
-        {reservationUnit.location && (
+        {reservationUnit.unit?.location && (
           <MapWrapper>
             <StyledH2>{t("common:location")}</StyledH2>
             <Map
               title={getTranslation(reservationUnit.unit, "name")}
-              latitude={Number(reservationUnit.location?.latitude)}
-              longitude={Number(reservationUnit.location?.longitude)}
+              latitude={Number(reservationUnit.unit.location.latitude)}
+              longitude={Number(reservationUnit.unit.location.longitude)}
             />
           </MapWrapper>
         )}
@@ -259,7 +265,7 @@ const ReservationUnit = ({
       <StartApplicationBar
         count={reservationUnitList.reservationUnits.length}
       />
-    </>
+    </Wrapper>
   ) : null;
 };
 

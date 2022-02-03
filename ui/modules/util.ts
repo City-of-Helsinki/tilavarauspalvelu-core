@@ -356,13 +356,13 @@ export const getAddress = (ru: ReservationUnit): string | null => {
 };
 
 export const getAddressAlt = (ru: ReservationUnitType): string | null => {
-  if (!ru.location) {
+  if (!ru.unit?.location) {
     return null;
   }
 
   return trim(
-    `${getTranslation(ru.location, "addressStreet") || ""}, ${
-      getTranslation(ru.location, "addressCity") || ""
+    `${getTranslation(ru.unit.location, "addressStreet") || ""}, ${
+      getTranslation(ru.unit.location, "addressCity") || ""
     }`,
     ", "
   );

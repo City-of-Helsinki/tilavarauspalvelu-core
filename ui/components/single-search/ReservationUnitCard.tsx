@@ -130,7 +130,7 @@ const ReservationUnitCard = ({ reservationUnit }: Props): JSX.Element => {
 
   const link = `/reservation-unit/single/${reservationUnit.id}`;
   const address = `${
-    getTranslation(reservationUnit.location, "addressStreet") || ""
+    getTranslation(reservationUnit.unit?.location, "addressStreet") || ""
   }`;
 
   const unitPrice = getPrice(reservationUnit);

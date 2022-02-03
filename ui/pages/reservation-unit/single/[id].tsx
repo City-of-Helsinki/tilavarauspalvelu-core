@@ -643,13 +643,13 @@ const ReservationUnit = ({
               </span>
             </StyledNotification>
           )}
-        {reservationUnit.location && (
+        {reservationUnit.unit?.location && (
           <MapWrapper>
             <StyledH2>{t("common:location")}</StyledH2>
             <Map
               title={getTranslation(reservationUnit.unit, "name")}
-              latitude={Number(reservationUnit.location?.latitude)}
-              longitude={Number(reservationUnit.location?.longitude)}
+              latitude={Number(reservationUnit.unit.location.latitude)}
+              longitude={Number(reservationUnit.unit.location.longitude)}
             />
           </MapWrapper>
         )}

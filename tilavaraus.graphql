@@ -1354,21 +1354,21 @@ input ReservationUnitCreateMutationInput {
   Does reservations of this reservation unit need to be handled before they're confirmed.
   """
   requireReservationHandling: Boolean
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
   contactInformationFi: String
   contactInformationEn: String
   contactInformationSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
   additionalInstructionsFi: String
   additionalInstructionsEn: String
   additionalInstructionsSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
   clientMutationId: String
 }
 
@@ -1453,21 +1453,21 @@ type ReservationUnitCreateMutationPayload {
   Does reservations of this reservation unit need to be handled before they're confirmed.
   """
   requireReservationHandling: Boolean
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
   contactInformationFi: String
   contactInformationEn: String
   contactInformationSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
   additionalInstructionsFi: String
   additionalInstructionsEn: String
   additionalInstructionsSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -1803,21 +1803,21 @@ input ReservationUnitUpdateMutationInput {
   Does reservations of this reservation unit need to be handled before they're confirmed.
   """
   requireReservationHandling: Boolean
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
   contactInformationFi: String
   contactInformationEn: String
   contactInformationSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
   additionalInstructionsFi: String
   additionalInstructionsEn: String
   additionalInstructionsSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
   clientMutationId: String
 }
 
@@ -1902,21 +1902,21 @@ type ReservationUnitUpdateMutationPayload {
   Does reservations of this reservation unit need to be handled before they're confirmed.
   """
   requireReservationHandling: Boolean
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
   contactInformationFi: String
   contactInformationEn: String
   contactInformationSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
   additionalInstructionsFi: String
   additionalInstructionsEn: String
   additionalInstructionsSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -2575,12 +2575,12 @@ input UnitUpdateMutationInput {
   nameFi: String
   nameEn: String
   nameSv: String
-  shortDescriptionFi: String
-  shortDescriptionEn: String
-  shortDescriptionSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  shortDescriptionFi: String
+  shortDescriptionEn: String
+  shortDescriptionSv: String
   clientMutationId: String
 }
 
@@ -2593,12 +2593,12 @@ type UnitUpdateMutationPayload {
   nameFi: String
   nameEn: String
   nameSv: String
-  shortDescriptionFi: String
-  shortDescriptionEn: String
-  shortDescriptionSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  shortDescriptionFi: String
+  shortDescriptionEn: String
+  shortDescriptionSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]

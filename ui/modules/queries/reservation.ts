@@ -126,15 +126,15 @@ export const LIST_RESERVATIONS = gql`
               nameFi
               nameEn
               nameSv
+              location {
+                addressStreetFi
+                addressStreetEn
+                addressStreetSv
+              }
             }
             cancellationRule {
               canBeCancelledTimeBefore
               needsHandling
-            }
-            location {
-              addressStreetFi
-              addressStreetEn
-              addressStreetSv
             }
             images {
               imageType
@@ -183,15 +183,15 @@ export const GET_RESERVATION = gql`
           nameFi
           nameEn
           nameSv
+          location {
+            addressStreetFi
+            addressStreetEn
+            addressStreetSv
+          }
         }
         cancellationRule {
           canBeCancelledTimeBefore
           needsHandling
-        }
-        location {
-          addressStreetFi
-          addressStreetEn
-          addressStreetSv
         }
         spaces {
           pk

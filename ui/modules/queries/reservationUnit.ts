@@ -57,17 +57,17 @@ export const RESERVATION_UNIT = gql`
         nameFi
         nameEn
         nameSv
-      }
-      location {
-        latitude
-        longitude
-        addressStreetFi
-        addressStreetEn
-        addressStreetSv
-        addressZip
-        addressCityFi
-        addressCityEn
-        addressCitySv
+        location {
+          latitude
+          longitude
+          addressStreetFi
+          addressStreetEn
+          addressStreetSv
+          addressZip
+          addressCityFi
+          addressCityEn
+          addressCitySv
+        }
       }
       spaces {
         pk
@@ -151,13 +151,13 @@ export const RESERVATION_UNITS = gql`
             nameFi
             nameEn
             nameSv
+            location {
+              addressStreetFi
+              addressStreetEn
+              addressStreetSv
+            }
           }
           maxPersons
-          location {
-            addressStreetFi
-            addressStreetEn
-            addressStreetSv
-          }
           images {
             imageType
             mediumUrl
@@ -191,6 +191,11 @@ export const RELATED_RESERVATION_UNITS = gql`
             nameFi
             nameEn
             nameSv
+            location {
+              addressStreetFi
+              addressStreetEn
+              addressStreetSv
+            }
           }
           reservationUnitType {
             nameFi
@@ -198,11 +203,6 @@ export const RELATED_RESERVATION_UNITS = gql`
             nameSv
           }
           maxPersons
-          location {
-            addressStreetFi
-            addressStreetEn
-            addressStreetSv
-          }
         }
       }
     }

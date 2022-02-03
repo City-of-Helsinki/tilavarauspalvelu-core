@@ -3351,15 +3351,15 @@ export const ListReservationsDocument = gql`
               nameFi
               nameEn
               nameSv
+              location {
+                addressStreetFi
+                addressStreetEn
+                addressStreetSv
+              }
             }
             cancellationRule {
               canBeCancelledTimeBefore
               needsHandling
-            }
-            location {
-              addressStreetFi
-              addressStreetEn
-              addressStreetSv
             }
             images {
               imageType
@@ -3437,6 +3437,7 @@ export const ReservationByPkDocument = gql`
       reserveeFirstName
       reserveeLastName
       reserveePhone
+      reserveeType
       begin
       end
       calendarUrl
@@ -3462,15 +3463,15 @@ export const ReservationByPkDocument = gql`
           nameFi
           nameEn
           nameSv
+          location {
+            addressStreetFi
+            addressStreetEn
+            addressStreetSv
+          }
         }
         cancellationRule {
           canBeCancelledTimeBefore
           needsHandling
-        }
-        location {
-          addressStreetFi
-          addressStreetEn
-          addressStreetSv
         }
         spaces {
           pk
@@ -3478,6 +3479,25 @@ export const ReservationByPkDocument = gql`
           nameEn
           nameSv
         }
+        metadataSet {
+          supportedFields
+          requiredFields
+        }
+      }
+      purpose {
+        pk
+        nameFi
+        nameEn
+        nameSv
+      }
+      ageGroup {
+        pk
+        minimum
+        maximum
+      }
+      homeCity {
+        pk
+        name
       }
     }
   }
@@ -3711,17 +3731,17 @@ export const ReservationUnitDocument = gql`
         nameFi
         nameEn
         nameSv
-      }
-      location {
-        latitude
-        longitude
-        addressStreetFi
-        addressStreetEn
-        addressStreetSv
-        addressZip
-        addressCityFi
-        addressCityEn
-        addressCitySv
+        location {
+          latitude
+          longitude
+          addressStreetFi
+          addressStreetEn
+          addressStreetSv
+          addressZip
+          addressCityFi
+          addressCityEn
+          addressCitySv
+        }
       }
       spaces {
         pk
@@ -3743,6 +3763,7 @@ export const ReservationUnitDocument = gql`
           }
         }
       }
+      requireReservationHandling
       metadataSet {
         id
         name
@@ -3854,13 +3875,13 @@ export const SearchReservationUnitsDocument = gql`
             nameFi
             nameEn
             nameSv
+            location {
+              addressStreetFi
+              addressStreetEn
+              addressStreetSv
+            }
           }
           maxPersons
-          location {
-            addressStreetFi
-            addressStreetEn
-            addressStreetSv
-          }
           images {
             imageType
             mediumUrl
@@ -3954,6 +3975,11 @@ export const RelatedReservationUnitsDocument = gql`
             nameFi
             nameEn
             nameSv
+            location {
+              addressStreetFi
+              addressStreetEn
+              addressStreetSv
+            }
           }
           reservationUnitType {
             nameFi
@@ -3961,11 +3987,6 @@ export const RelatedReservationUnitsDocument = gql`
             nameSv
           }
           maxPersons
-          location {
-            addressStreetFi
-            addressStreetEn
-            addressStreetSv
-          }
         }
       }
     }
@@ -4506,6 +4527,24 @@ export type ListReservationsQuery = {
                                     nameFi?: string | null | undefined;
                                     nameEn?: string | null | undefined;
                                     nameSv?: string | null | undefined;
+                                    location?:
+                                      | {
+                                          __typename?: "LocationType";
+                                          addressStreetFi?:
+                                            | string
+                                            | null
+                                            | undefined;
+                                          addressStreetEn?:
+                                            | string
+                                            | null
+                                            | undefined;
+                                          addressStreetSv?:
+                                            | string
+                                            | null
+                                            | undefined;
+                                        }
+                                      | null
+                                      | undefined;
                                   }
                                 | null
                                 | undefined;
@@ -4517,15 +4556,6 @@ export type ListReservationsQuery = {
                                       | null
                                       | undefined;
                                     needsHandling: boolean;
-                                  }
-                                | null
-                                | undefined;
-                              location?:
-                                | {
-                                    __typename?: "LocationType";
-                                    addressStreetFi?: string | null | undefined;
-                                    addressStreetEn?: string | null | undefined;
-                                    addressStreetSv?: string | null | undefined;
                                   }
                                 | null
                                 | undefined;
@@ -4575,6 +4605,10 @@ export type ReservationByPkQuery = {
         reserveeFirstName?: string | null | undefined;
         reserveeLastName?: string | null | undefined;
         reserveePhone?: string | null | undefined;
+        reserveeType?:
+          | ReservationsReservationReserveeTypeChoices
+          | null
+          | undefined;
         begin: any;
         end: any;
         calendarUrl?: string | null | undefined;
@@ -4609,6 +4643,15 @@ export type ReservationByPkQuery = {
                         nameFi?: string | null | undefined;
                         nameEn?: string | null | undefined;
                         nameSv?: string | null | undefined;
+                        location?:
+                          | {
+                              __typename?: "LocationType";
+                              addressStreetFi?: string | null | undefined;
+                              addressStreetEn?: string | null | undefined;
+                              addressStreetSv?: string | null | undefined;
+                            }
+                          | null
+                          | undefined;
                       }
                     | null
                     | undefined;
@@ -4617,15 +4660,6 @@ export type ReservationByPkQuery = {
                         __typename?: "ReservationUnitCancellationRuleType";
                         canBeCancelledTimeBefore?: number | null | undefined;
                         needsHandling: boolean;
-                      }
-                    | null
-                    | undefined;
-                  location?:
-                    | {
-                        __typename?: "LocationType";
-                        addressStreetFi?: string | null | undefined;
-                        addressStreetEn?: string | null | undefined;
-                        addressStreetSv?: string | null | undefined;
                       }
                     | null
                     | undefined;
@@ -4643,10 +4677,51 @@ export type ReservationByPkQuery = {
                       >
                     | null
                     | undefined;
+                  metadataSet?:
+                    | {
+                        __typename?: "ReservationMetadataSetType";
+                        supportedFields?:
+                          | Array<string | null | undefined>
+                          | null
+                          | undefined;
+                        requiredFields?:
+                          | Array<string | null | undefined>
+                          | null
+                          | undefined;
+                      }
+                    | null
+                    | undefined;
                 }
               | null
               | undefined
             >
+          | null
+          | undefined;
+        purpose?:
+          | {
+              __typename?: "ReservationPurposeType";
+              pk?: number | null | undefined;
+              nameFi?: string | null | undefined;
+              nameEn?: string | null | undefined;
+              nameSv?: string | null | undefined;
+            }
+          | null
+          | undefined;
+        ageGroup?:
+          | {
+              __typename?: "AgeGroupType";
+              pk?: number | null | undefined;
+              minimum: number;
+              maximum?: number | null | undefined;
+            }
+          | null
+          | undefined;
+        homeCity?:
+          | {
+              __typename?: "CityType";
+              pk?: number | null | undefined;
+              name: string;
+            }
           | null
           | undefined;
       }
@@ -4750,6 +4825,7 @@ export type ReservationUnitQuery = {
         maxReservationDuration?: any | null | undefined;
         maxReservationsPerUser?: number | null | undefined;
         nextAvailableSlot?: any | null | undefined;
+        requireReservationHandling: boolean;
         images?:
           | Array<
               | {
@@ -4793,21 +4869,21 @@ export type ReservationUnitQuery = {
               nameFi?: string | null | undefined;
               nameEn?: string | null | undefined;
               nameSv?: string | null | undefined;
-            }
-          | null
-          | undefined;
-        location?:
-          | {
-              __typename?: "LocationType";
-              latitude?: string | null | undefined;
-              longitude?: string | null | undefined;
-              addressStreetFi?: string | null | undefined;
-              addressStreetEn?: string | null | undefined;
-              addressStreetSv?: string | null | undefined;
-              addressZip: string;
-              addressCityFi?: string | null | undefined;
-              addressCityEn?: string | null | undefined;
-              addressCitySv?: string | null | undefined;
+              location?:
+                | {
+                    __typename?: "LocationType";
+                    latitude?: string | null | undefined;
+                    longitude?: string | null | undefined;
+                    addressStreetFi?: string | null | undefined;
+                    addressStreetEn?: string | null | undefined;
+                    addressStreetSv?: string | null | undefined;
+                    addressZip: string;
+                    addressCityFi?: string | null | undefined;
+                    addressCityEn?: string | null | undefined;
+                    addressCitySv?: string | null | undefined;
+                  }
+                | null
+                | undefined;
             }
           | null
           | undefined;
@@ -4938,15 +5014,15 @@ export type SearchReservationUnitsQuery = {
                           nameEn?: string | null | undefined;
                           nameSv?: string | null | undefined;
                           id?: number | null | undefined;
-                        }
-                      | null
-                      | undefined;
-                    location?:
-                      | {
-                          __typename?: "LocationType";
-                          addressStreetFi?: string | null | undefined;
-                          addressStreetEn?: string | null | undefined;
-                          addressStreetSv?: string | null | undefined;
+                          location?:
+                            | {
+                                __typename?: "LocationType";
+                                addressStreetFi?: string | null | undefined;
+                                addressStreetEn?: string | null | undefined;
+                                addressStreetSv?: string | null | undefined;
+                              }
+                            | null
+                            | undefined;
                         }
                       | null
                       | undefined;
@@ -5019,6 +5095,15 @@ export type RelatedReservationUnitsQuery = {
                           nameFi?: string | null | undefined;
                           nameEn?: string | null | undefined;
                           nameSv?: string | null | undefined;
+                          location?:
+                            | {
+                                __typename?: "LocationType";
+                                addressStreetFi?: string | null | undefined;
+                                addressStreetEn?: string | null | undefined;
+                                addressStreetSv?: string | null | undefined;
+                              }
+                            | null
+                            | undefined;
                         }
                       | null
                       | undefined;
@@ -5028,15 +5113,6 @@ export type RelatedReservationUnitsQuery = {
                           nameFi?: string | null | undefined;
                           nameEn?: string | null | undefined;
                           nameSv?: string | null | undefined;
-                        }
-                      | null
-                      | undefined;
-                    location?:
-                      | {
-                          __typename?: "LocationType";
-                          addressStreetFi?: string | null | undefined;
-                          addressStreetEn?: string | null | undefined;
-                          addressStreetSv?: string | null | undefined;
                         }
                       | null
                       | undefined;

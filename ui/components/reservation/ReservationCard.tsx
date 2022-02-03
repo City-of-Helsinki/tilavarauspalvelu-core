@@ -206,7 +206,7 @@ const ReservationCard = ({ reservation, type }: Props): JSX.Element => {
   const reservationUnit = reservation.reservationUnits[0];
   const link = `/reservations/${reservation.pk}`;
   const address = `${
-    getTranslation(reservationUnit.location, "addressStreet") || ""
+    getTranslation(reservationUnit.unit?.location, "addressStreet") || ""
   }`;
 
   const timeStripContent = useMemo(() => {

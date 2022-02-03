@@ -74,13 +74,11 @@ const mapUrl = (location: LocationType): string | null => {
 const Address = ({ reservationUnit }: Props): JSX.Element => {
   const { t, i18n } = useTranslation();
 
-  const addressStreet = getTranslation(
-    reservationUnit.location,
-    "addressStreet"
-  );
-  const addressCity = getTranslation(reservationUnit.location, "addressCity");
+  const location = reservationUnit.unit?.location;
+  const addressStreet = getTranslation(location, "addressStreet");
+  const addressCity = getTranslation(location, "addressCity");
 
-  if (!reservationUnit?.location || !addressStreet || !addressCity) {
+  if (!location || !addressStreet || !addressCity) {
     return <div />;
   }
 
@@ -88,22 +86,20 @@ const Address = ({ reservationUnit }: Props): JSX.Element => {
     <Container>
       <Name>{getTranslation(reservationUnit, "name")}</Name>
       {addressStreet && <AddressLine>{addressStreet}</AddressLine>}
-      {reservationUnit.location?.addressZip && addressCity && (
-        <AddressLine>
-          {`${reservationUnit.location?.addressZip} ${addressCity}`}
-        </AddressLine>
+      {location?.addressZip && addressCity && (
+        <AddressLine>{`${location?.addressZip} ${addressCity}`}</AddressLine>
       )}
       <Links>
         <ExternalLink
-          href={mapUrl(reservationUnit.location)}
+          href={mapUrl(location)}
           name={t("reservationUnit:linkMap")}
         />
         <ExternalLink
-          href={googleUrl(reservationUnit.location)}
+          href={googleUrl(location)}
           name={t("reservationUnit:linkGoogle")}
         />
         <ExternalLink
-          href={hslUrl(i18n.language, reservationUnit.location)}
+          href={hslUrl(i18n.language, location)}
           name={t("reservationUnit:linkHSL")}
         />
       </Links>
