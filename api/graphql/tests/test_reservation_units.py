@@ -1091,17 +1091,24 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.assertMatchSnapshot(content)
 
     def test_order_by_unit(self):
-        unit = UnitFactory(name="testunit", name_fi="testunit")
-        ReservationUnitFactory(
-            unit=unit,
-        )
+        ReservationUnit.objects.all().delete()
+        ReservationUnitFactory(unit=UnitFactory(name_fi="2", name_sv="2", name_en="_"))
+        ReservationUnitFactory(unit=UnitFactory(name_fi="3", name_sv="_", name_en="2"))
+        ReservationUnitFactory(unit=UnitFactory(name_fi="2", name_sv="1", name_en="_"))
+        ReservationUnitFactory(unit=UnitFactory(name_fi="3", name_sv="_", name_en="1"))
+        ReservationUnitFactory(unit=UnitFactory(name_fi="1", name_sv="_", name_en="_"))
+        self.client.force_login(self.regular_joe)
         response = self.query(
             """
             query {
-                reservationUnits(orderBy: "unit") {
+                reservationUnits(orderBy: "unitNameFi,unitNameSv,unitNameEn") {
                     edges {
                         node {
-                            unit {nameFi}
+                            unit {
+                                nameFi
+                                nameSv
+                                nameEn
+                            }
                         }
                     }
                 }
@@ -1113,17 +1120,24 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.assertMatchSnapshot(content)
 
     def test_order_by_unit_reverse_order(self):
-        unit = UnitFactory(name="testunit", name_fi="testunit")
-        ReservationUnitFactory(
-            unit=unit,
-        )
+        ReservationUnit.objects.all().delete()
+        ReservationUnitFactory(unit=UnitFactory(name_fi="2", name_sv="2", name_en="_"))
+        ReservationUnitFactory(unit=UnitFactory(name_fi="3", name_sv="_", name_en="2"))
+        ReservationUnitFactory(unit=UnitFactory(name_fi="2", name_sv="1", name_en="_"))
+        ReservationUnitFactory(unit=UnitFactory(name_fi="3", name_sv="_", name_en="1"))
+        ReservationUnitFactory(unit=UnitFactory(name_fi="1", name_sv="_", name_en="_"))
+        self.client.force_login(self.regular_joe)
         response = self.query(
             """
             query {
-                reservationUnits(orderBy: "-unit") {
+                reservationUnits(orderBy: "-unitNameFi,-unitNameSv,-unitNameEn") {
                     edges {
                         node {
-                            unit {nameFi}
+                            unit {
+                                nameFi
+                                nameSv
+                                nameEn
+                            }
                         }
                     }
                 }
