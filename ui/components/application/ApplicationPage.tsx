@@ -4,7 +4,6 @@ import styled from "styled-components";
 import { breakpoint } from "../../modules/style";
 import { Application } from "../../modules/types";
 import Container from "../common/Container";
-import RequireAuthentication from "../common/RequireAuthentication";
 import Head from "./Head";
 import Stepper from "./Stepper";
 
@@ -47,7 +46,7 @@ const ApplicationPage = ({
   const { t } = useTranslation();
 
   return (
-    <RequireAuthentication>
+    <>
       <Head
         heading={t(`${translationKeyPrefix}.heading`)}
         breadCrumbText={breadCrumbText || ""}
@@ -60,7 +59,7 @@ const ApplicationPage = ({
           <Main>{children}</Main>
         </InnerContainer>
       </Container>
-    </RequireAuthentication>
+    </>
   );
 };
 
