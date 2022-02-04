@@ -52,7 +52,9 @@ class ReservationUnitsFilterSet(django_filters.FilterSet):
             ("reservation_unit_type__name_fi", "type_fi"),
             ("reservation_unit_type__name_en", "type_en"),
             ("reservation_unit_type__name_sv", "type_sv"),
-            "unit",
+            ("unit__name_fi", "unit_name_fi"),
+            ("unit__name_en", "unit_name_en"),
+            ("unit__name_sv", "unit_name_sv"),
         )
     )
 
