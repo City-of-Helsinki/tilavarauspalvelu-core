@@ -53,9 +53,15 @@ async function request<T>(requestConfig: AxiosRequestConfig): Promise<T> {
   } catch (error) {
     const errorMessage: string | undefined = error.response?.data?.detail;
     if (errorMessage) {
-      throw new ApiError(errorMessage, error.response?.status);
+      throw new ApiError(
+        `${errorMessage} url:'${requestConfig.url}'`,
+        error.response?.status
+      );
     } else {
-      throw new ApiError("ApiError 'no message'", error.response?.status);
+      throw new ApiError(
+        `ApiError url:'${requestConfig.url}' `,
+        error.response?.status
+      );
     }
   }
 }
