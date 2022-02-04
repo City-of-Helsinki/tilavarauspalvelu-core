@@ -168,7 +168,7 @@ const ReservationUnit = ({
   const { t } = useTranslation();
 
   const activeOpeningTimes = getActiveOpeningTimes(
-    reservationUnit.openingHours.openingTimePeriods
+    reservationUnit.openingHours?.openingTimePeriods
   );
 
   const reservationUnitList = useReservationUnitsList();
