@@ -1,9 +1,11 @@
 import json
 
+import snapshottest
 from assertpy import assert_that
 from django.contrib.auth import get_user_model
 from graphene_django.utils import GraphQLTestCase
 
+from api.graphql.tests.base import GrapheneTestCaseBase
 from applications.tests.factories import ApplicationRoundFactory
 from permissions.models import GeneralRole, GeneralRoleChoice
 from reservation_units.tests.factories import ReservationUnitFactory
@@ -147,6 +149,17 @@ class CreateSpaceTestCase(SpaceMutationBaseTestCase):
             content["data"]["createSpace"]["errors"][0]["messages"][0]
         ).contains("nameFi cannot be empty.")
 
+    def test_surface_area(self):
+        data = {"nameFi": "SpaceName", "surfaceArea": 40.0}
+        response = self.query(self.get_create_query(), input_data=data)
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        assert_that(content["data"]["createSpace"]["errors"]).is_none()
+        space = Space.objects.filter(id=content["data"]["createSpace"]["pk"]).first()
+        assert_that(space).is_not_none()
+        assert_that(space.surface_area).is_equal_to(40)
+
     def test_regular_user_cannot_create(self):
         self.client.force_login(self.regular_user)
         data = {"nameFi": "Woohoo I created a space!"}
@@ -219,3 +232,33 @@ class UpdateSpaceTestCase(SpaceMutationBaseTestCase):
         assert_that(content.get("errors")).is_not_none()
         self.space.refresh_from_db()
         assert_that(self.space.name_fi).is_equal_to("Space1")
+
+
+class SpacesQueryTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.space = SpaceFactory(name_fi="outerspace", surface_area=40.5)
+
+    def test_spaces_query(self):
+        self.maxDiff = None
+        self.client.force_login(self.regular_joe)
+        response = self.query(
+            """
+            query {
+                spaces {
+                    edges {
+                        node {
+                            nameFi
+                            surfaceArea
+                            code
+                            maxPersons
+                          }
+                        }
+                    }
+                }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
