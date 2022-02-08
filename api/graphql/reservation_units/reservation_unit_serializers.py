@@ -206,6 +206,14 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
         required=False,
         allow_null=True,
     )
+    authentication = ChoiceCharField(
+        required=False,
+        choices=ReservationUnit.AUTHENTICATION_TYPES,
+        help_text=(
+            "Authentication required for reserving this reservation unit. Possible values are "
+            f"{', '.join(value[0].upper() for value in ReservationUnit.AUTHENTICATION_TYPES)}."
+        ),
+    )
 
     translation_fields = get_all_translatable_fields(ReservationUnit)
 
@@ -252,6 +260,7 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
             "metadata_set_pk",
             "max_reservations_per_user",
             "require_reservation_handling",
+            "authentication",
         ] + get_all_translatable_fields(ReservationUnit)
 
     def __init__(self, *args, **kwargs):
