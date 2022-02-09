@@ -403,7 +403,7 @@ snapshots['ReservationUnitQueryTestCase::test_getting_reservation_units 1'] = {
                             'nameFi': 'fi',
                             'nameSv': 'sv'
                         },
-                        'contactInformationFi': '',
+                        'contactInformation': '',
                         'descriptionFi': '',
                         'equipment': [
                         ],

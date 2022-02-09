@@ -233,6 +233,7 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
             "equipment_pks",
             "unit_pk",
             "uuid",
+            "contact_information",
             "max_reservation_duration",
             "min_reservation_duration",
             "is_draft",
