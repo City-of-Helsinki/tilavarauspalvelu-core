@@ -1215,6 +1215,9 @@ type ReservationUnitByPkType implements Node {
   Does reservations of this reservation unit need to be handled before they're confirmed.
   """
   requireReservationHandling: Boolean!
+
+  """Authentication required for reserving this reservation unit."""
+  authentication: ReservationUnitsReservationUnitAuthenticationChoices!
   images: [ReservationUnitImageType]
 
   """The ID of the object"""
@@ -1354,18 +1357,23 @@ input ReservationUnitCreateMutationInput {
   Does reservations of this reservation unit need to be handled before they're confirmed.
   """
   requireReservationHandling: Boolean
+
+  """
+  Authentication required for reserving this reservation unit. Possible values are WEAK, STRONG.
+  """
+  authentication: String
   nameFi: String
   nameEn: String
   nameSv: String
   contactInformationFi: String
   contactInformationEn: String
   contactInformationSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
   additionalInstructionsFi: String
   additionalInstructionsEn: String
   additionalInstructionsSv: String
@@ -1453,18 +1461,23 @@ type ReservationUnitCreateMutationPayload {
   Does reservations of this reservation unit need to be handled before they're confirmed.
   """
   requireReservationHandling: Boolean
+
+  """
+  Authentication required for reserving this reservation unit. Possible values are WEAK, STRONG.
+  """
+  authentication: String
   nameFi: String
   nameEn: String
   nameSv: String
   contactInformationFi: String
   contactInformationEn: String
   contactInformationSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
   additionalInstructionsFi: String
   additionalInstructionsEn: String
   additionalInstructionsSv: String
@@ -1547,6 +1560,15 @@ type ReservationUnitImageUpdateMutationPayload {
   errors: [ErrorType]
   reservationUnitImage: ReservationUnitImageType
   clientMutationId: String
+}
+
+"""An enumeration."""
+enum ReservationUnitsReservationUnitAuthenticationChoices {
+  """Weak"""
+  WEAK
+
+  """Strong"""
+  STRONG
 }
 
 """An enumeration."""
@@ -1678,6 +1700,9 @@ type ReservationUnitType implements Node {
   Does reservations of this reservation unit need to be handled before they're confirmed.
   """
   requireReservationHandling: Boolean!
+
+  """Authentication required for reserving this reservation unit."""
+  authentication: ReservationUnitsReservationUnitAuthenticationChoices!
   images: [ReservationUnitImageType]
   applicationRounds(active: Boolean = null): [ApplicationRoundType]
 
@@ -1803,18 +1828,23 @@ input ReservationUnitUpdateMutationInput {
   Does reservations of this reservation unit need to be handled before they're confirmed.
   """
   requireReservationHandling: Boolean
+
+  """
+  Authentication required for reserving this reservation unit. Possible values are WEAK, STRONG.
+  """
+  authentication: String
   nameFi: String
   nameEn: String
   nameSv: String
   contactInformationFi: String
   contactInformationEn: String
   contactInformationSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
   additionalInstructionsFi: String
   additionalInstructionsEn: String
   additionalInstructionsSv: String
@@ -1902,18 +1932,23 @@ type ReservationUnitUpdateMutationPayload {
   Does reservations of this reservation unit need to be handled before they're confirmed.
   """
   requireReservationHandling: Boolean
+
+  """
+  Authentication required for reserving this reservation unit. Possible values are WEAK, STRONG.
+  """
+  authentication: String
   nameFi: String
   nameEn: String
   nameSv: String
   contactInformationFi: String
   contactInformationEn: String
   contactInformationSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
   additionalInstructionsFi: String
   additionalInstructionsEn: String
   additionalInstructionsSv: String
@@ -2074,12 +2109,12 @@ input ResourceCreateMutationInput {
   """
   bufferTimeAfter: Int
   isDraft: Boolean
-  nameFi: String
-  nameEn: String
-  nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
   clientMutationId: String
 }
 
@@ -2102,12 +2137,12 @@ type ResourceCreateMutationPayload {
   """
   bufferTimeAfter: Int
   isDraft: Boolean
-  nameFi: String
-  nameEn: String
-  nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -2190,12 +2225,12 @@ input ResourceUpdateMutationInput {
   """
   bufferTimeAfter: Int
   isDraft: Boolean
-  nameFi: String
-  nameEn: String
-  nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
   clientMutationId: String
 }
 
@@ -2218,12 +2253,12 @@ type ResourceUpdateMutationPayload {
   """
   bufferTimeAfter: Int
   isDraft: Boolean
-  nameFi: String
-  nameEn: String
-  nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -2316,7 +2351,7 @@ type SpaceType implements Node {
   parent: SpaceType
   building: BuildingType
   unit: UnitByPkType
-  surfaceArea: Decimal
+  surfaceArea: Float
   maxPersons: Int
   code: String!
 
@@ -2572,12 +2607,12 @@ input UnitUpdateMutationInput {
   webPage: String
   email: String
   phone: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
   shortDescriptionFi: String
   shortDescriptionEn: String
   shortDescriptionSv: String
@@ -2590,12 +2625,12 @@ type UnitUpdateMutationPayload {
   webPage: String
   email: String
   phone: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
   shortDescriptionFi: String
   shortDescriptionEn: String
   shortDescriptionSv: String

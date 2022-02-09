@@ -356,6 +356,7 @@ export const RESERVATIONUNIT_QUERY = gql`
       nameFi
       nameSv
       nameEn
+      authentication
       spaces {
         pk
         nameFi

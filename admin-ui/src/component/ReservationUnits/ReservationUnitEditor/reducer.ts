@@ -147,6 +147,7 @@ export const reducer = (state: State, action: Action): State => {
         },
         reservationUnitEdit: {
           ...(pick(reservationUnit, [
+            "authentication",
             "bufferTimeAfter",
             "bufferTimeBefore",
             "maxReservationsPerUser",

@@ -30,6 +30,7 @@ import {
   ReservationUnitsReservationUnitPriceUnitChoices,
   ReservationUnitsReservationUnitReservationStartIntervalChoices,
   ReservationUnitImageCreateMutationInput,
+  ReservationUnitsReservationUnitAuthenticationChoices,
 } from "../../../common/gql-types";
 import {
   CREATE_RESERVATION_UNIT,
@@ -236,6 +237,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
           : undefined,
       },
       [
+        "authentication",
         "bufferTimeAfter",
         "bufferTimeBefore",
         "highestPrice",
@@ -1084,6 +1086,13 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                         !state.reservationUnitEdit?.requireIntroduction,
                     })
                   }
+                />
+                <EnumSelect
+                  id="authentication"
+                  value={state.reservationUnitEdit.authentication || "WEAK"}
+                  label={t("ReservationUnitEditor.authenticationLabel")}
+                  type={ReservationUnitsReservationUnitAuthenticationChoices}
+                  onChange={(authentication) => setValue({ authentication })}
                 />
               </Accordion>
               <Accordion heading={t("ReservationUnitEditor.pricing")}>
