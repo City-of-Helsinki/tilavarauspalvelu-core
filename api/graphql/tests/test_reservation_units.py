@@ -237,6 +237,22 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             content.get("data").get("reservationUnitByPk").get("pk")
         ).is_equal_to(self.reservation_unit.id)
 
+    def test_getting_authentication_by_pk(self):
+        response = self.query(
+            f"""
+            {{
+                reservationUnitByPk(pk: {self.reservation_unit.id}) {{
+                    authentication
+                }}
+            }}
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        assert_that(
+            content.get("data").get("reservationUnitByPk").get("authentication")
+        ).is_equal_to("WEAK")
+
     def test_getting_hauki_url_is_none_when_regular_user(self):
         settings.HAUKI_SECRET = "HAUKISECRET"
         settings.HAUKI_ADMIN_UI_URL = "https://test.com"
