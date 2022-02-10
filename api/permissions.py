@@ -1,6 +1,5 @@
+from django.conf import settings
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
-
-from tilavarauspalvelu import settings
 
 
 class AuthenticationOffOrAuthenticatedForWrite(IsAuthenticatedOrReadOnly):
