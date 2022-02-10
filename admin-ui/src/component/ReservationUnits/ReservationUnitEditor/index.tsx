@@ -15,7 +15,7 @@ import { get, omitBy, pick, sumBy, upperFirst } from "lodash";
 import React, { useEffect, useReducer, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams, useHistory } from "react-router-dom";
-import styled from "styled-components";
+
 import { languages, previewUrlPrefix } from "../../../common/const";
 import Select from "./Select";
 import {
@@ -30,21 +30,16 @@ import {
   ReservationUnitsReservationUnitPriceUnitChoices,
   ReservationUnitsReservationUnitReservationStartIntervalChoices,
   ReservationUnitImageCreateMutationInput,
+  ReservationUnitsReservationUnitAuthenticationChoices,
 } from "../../../common/gql-types";
 import {
-  CREATE_RESERVATION_UNIT,
   RESERVATION_UNIT_EDITOR_PARAMETERS,
-  RESERVATIONUNIT_QUERY,
   UNIT_WITH_SPACES_AND_RESOURCES,
-  UPDATE_RESERVATION_UNIT,
-  CREATE_IMAGE,
-  DELETE_IMAGE,
-  UPDATE_IMAGE_TYPE,
 } from "../../../common/queries";
 import { OptionType } from "../../../common/types";
 import { ContentContainer } from "../../../styles/layout";
 
-import { breakpoints, ButtonsStripe, WhiteButton } from "../../../styles/util";
+import { ButtonsStripe, WhiteButton } from "../../../styles/util";
 import Loader from "../../Loader";
 import SubPageHead from "../../Unit/SubPageHead";
 import { MainMenuWrapper } from "../../withMainMenu";
@@ -54,9 +49,28 @@ import ActivationGroup from "./ActivationGroup";
 import EnumSelect from "./EnumSelect";
 import ImageEditor from "./ImageEditor";
 import DateTimeInput from "./DateTimeInput";
-import { EditorColumns } from "./editorComponents";
+import {
+  ButtonsContainer,
+  Dense,
+  Editor,
+  EditorContainer,
+  EditorGrid,
+  Normal,
+  Preview,
+  PublishingTime,
+  Wide,
+  Wrapper,
+} from "./reservationUnitEditor";
 import { IProps, ReservationUnitEditorType, State } from "./types";
 import { getInitialState, i18nFields, reducer } from "./reducer";
+import {
+  CREATE_IMAGE,
+  CREATE_RESERVATION_UNIT,
+  DELETE_IMAGE,
+  RESERVATIONUNIT_QUERY,
+  UPDATE_IMAGE_TYPE,
+  UPDATE_RESERVATION_UNIT,
+} from "./queries";
 
 const bufferTimeOptions = [
   { value: 900, label: "15 minuuttia" },
@@ -71,93 +85,6 @@ const durationOptions = [
   { value: 3600, label: "60 minuuttia" },
   { value: 5400, label: "90 minuuttia" },
 ];
-
-const Wrapper = styled.div`
-  padding-bottom: 6em;
-`;
-
-const EditorContainer = styled.div`
-  @media (min-width: ${breakpoints.l}) {
-    margin: 0 var(--spacing-layout-m);
-  }
-`;
-
-const DenseEditorColumns = styled.div`
-  display: block;
-  @media (min-width: ${breakpoints.m}) {
-    grid-template-columns: 1fr 1fr;
-    display: grid;
-  }
-  @media (min-width: ${breakpoints.xl}) {
-    grid-template-columns: 1fr 1fr 1fr 1fr;
-    display: grid;
-  }
-  align-items: baseline;
-  gap: 1em;
-  margin-top: var(--spacing-s);
-  padding-bottom: var(--spacing-m);
-`;
-
-const Editor = styled.div`
-  @media (min-width: ${breakpoints.m}) {
-    margin: 0 var(--spacing-layout-m);
-  }
-  max-width: 52rem;
-`;
-
-const ButtonsContainer = styled.div`
-  display: flex;
-  gap: var(--spacing-m);
-`;
-
-const Section = styled.div`
-  margin: var(--spacing-layout-l) 0;
-`;
-
-const PublishingTime = styled.div`
-  flex-grow: 1;
-  color: var(--color-white);
-  display: flex;
-  justify-content: right;
-  align-items: center;
-  flex-direction: row;
-  padding-right: var(--spacing-m);
-  text-align: end;
-  line-height: 1.3;
-`;
-
-const Preview = styled.a<{ $disabled: boolean }>`
-  margin-left: auto;
-  padding: var(--spacing-m);
-  border-color: var(--color-white) !important;
-  border: 2px solid;
-  background-color: var(--color-bus-dark);
-  text-decoration: none;
-  &:hover {
-    background-color: var(--color-bus-dark);
-  }
-  ${({ $disabled }) =>
-    $disabled
-      ? `
-    cursor: not-allowed;
-    color: var(--color-white);
-    &:hover {
-      background-color: var(--color-bus-dark);
-      }  `
-      : `
-      color: var(--color-white);
-    cursor: pointer;
-    &:hover {
-      background-color: var(--color-white);
-      color: var(--color-black);
-      }
-
-  `}
-`;
-
-const TextInputWithPadding = styled(TextInput)`
-  padding-bottom: var(--spacing-m);
-`;
 
 const getSelectedOptions = (
   state: State,
@@ -236,6 +163,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
           : undefined,
       },
       [
+        "authentication",
         "bufferTimeAfter",
         "bufferTimeBefore",
         "highestPrice",
@@ -594,28 +522,30 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                 initiallyOpen
                 heading={t("ReservationUnitEditor.basicInformation")}
               >
-                <Section>
+                <EditorGrid>
                   {languages.map((lang) => (
-                    <TextInputWithPadding
-                      key={lang}
-                      required
-                      id={`name${lang}`}
-                      label={t("ReservationUnitEditor.nameLabel", {
-                        lang,
-                      })}
-                      value={get(
-                        state,
-                        `reservationUnitEdit.name${upperFirst(lang)}`,
-                        ""
-                      )}
-                      onChange={(e) =>
-                        setValue({
-                          [`name${upperFirst(lang)}`]: e.target.value,
-                        })
-                      }
-                    />
+                    <Wide>
+                      <TextInput
+                        key={lang}
+                        required
+                        id={`name${lang}`}
+                        label={t("ReservationUnitEditor.nameLabel", {
+                          lang,
+                        })}
+                        value={get(
+                          state,
+                          `reservationUnitEdit.name${upperFirst(lang)}`,
+                          ""
+                        )}
+                        onChange={(e) =>
+                          setValue({
+                            [`name${upperFirst(lang)}`]: e.target.value,
+                          })
+                        }
+                      />
+                    </Wide>
                   ))}
-                  <EditorColumns>
+                  <Normal>
                     <Combobox
                       multiselect
                       required
@@ -639,6 +569,8 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                         ),
                       ]}
                     />
+                  </Normal>
+                  <Normal>
                     <Combobox
                       multiselect
                       label={t("ReservationUnitEditor.resourcesLabel")}
@@ -663,8 +595,8 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                         ),
                       ]}
                     />
-                  </EditorColumns>
-                  <EditorColumns>
+                  </Normal>
+                  <Dense>
                     <NumberInput
                       value={state.reservationUnitEdit.surfaceArea || 0}
                       id="surfaceArea"
@@ -688,6 +620,8 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                       min={minSurfaceArea}
                       required
                     />
+                  </Dense>
+                  <Dense>
                     <NumberInput
                       value={state.reservationUnitEdit.maxPersons || 0}
                       id="maxPersons"
@@ -712,562 +646,646 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                       )}
                       required
                     />
-                  </EditorColumns>
-                </Section>
+                  </Dense>
+                </EditorGrid>
               </Accordion>
               <Accordion heading={t("ReservationUnitEditor.typesProperties")}>
-                <EditorColumns>
-                  <Select
-                    id="reservationUnitType"
-                    label={t(`ReservationUnitEditor.reservationUnitTypeLabel`)}
-                    placeholder={t(
-                      `ReservationUnitEditor.reservationUnitTypePlaceholder`
-                    )}
-                    options={state.reservationUnitTypeOptions}
-                    onChange={(e) => {
-                      setValue({
-                        reservationUnitTypePk: e,
-                      });
-                    }}
-                    helper={t(
-                      `ReservationUnitEditor.reservationUnitTypeHelperText`
-                    )}
-                    value={Number(
-                      get(state.reservationUnitEdit, "reservationUnitTypePk")
-                    )}
-                  />
-                  <Combobox
-                    multiselect
-                    label={t("ReservationUnitEditor.purposesLabel")}
-                    placeholder={t("ReservationUnitEditor.purposesPlaceholder")}
-                    options={state.purposeOptions}
-                    clearButtonAriaLabel={t("common.clearAllSelections")}
-                    selectedItemRemoveButtonAriaLabel={t("common.removeValue")}
-                    toggleButtonAriaLabel={t("common.toggleMenu")}
-                    onChange={(purposes) =>
-                      dispatch({ type: "setPurposes", purposes })
-                    }
-                    disabled={state.resourceOptions.length === 0}
-                    value={[
-                      ...getSelectedOptions(
-                        state,
-                        "purposeOptions",
-                        "purposePks"
-                      ),
-                    ]}
-                  />
-
-                  <Combobox
-                    multiselect
-                    label={t("ReservationUnitEditor.equipmentsLabel")}
-                    placeholder={t(
-                      "ReservationUnitEditor.equipmentsPlaceholder"
-                    )}
-                    options={state.equipmentOptions}
-                    clearButtonAriaLabel={t("common.clearAllSelections")}
-                    selectedItemRemoveButtonAriaLabel={t("common.removeValue")}
-                    toggleButtonAriaLabel={t("common.toggleMenu")}
-                    onChange={(equipments) =>
-                      dispatch({ type: "setEquipments", equipments })
-                    }
-                    disabled={state.equipmentOptions.length === 0}
-                    value={[
-                      ...getSelectedOptions(
-                        state,
-                        "equipmentOptions",
-                        "equipmentPks"
-                      ),
-                    ]}
-                  />
-                </EditorColumns>
-                {languages.map((lang) => (
-                  <RichTextInput
-                    key={lang}
-                    required
-                    id={`description.${lang}`}
-                    label={t("ReservationUnitEditor.descriptionLabel", {
-                      lang,
-                    })}
-                    value={
-                      get(
-                        state,
-                        `reservationUnitEdit.description${upperFirst(lang)}`,
-                        ""
-                      ) || ""
-                    }
-                    onChange={(value) =>
-                      setValue({
-                        [`description${upperFirst(lang)}`]: value,
-                      })
-                    }
-                  />
-                ))}
-                <ImageEditor
-                  images={state.images}
-                  setImages={(images) =>
-                    dispatch({ type: "setImages", images })
-                  }
-                />
-              </Accordion>
-
-              <Accordion heading={t("ReservationUnitEditor.settings")}>
-                <Fieldset
-                  heading={t("ReservationUnitEditor.publishingSettings")}
-                >
-                  <ActivationGroup
-                    id="useScheduledPublishing"
-                    label={t("ReservationUnitEditor.scheduledPublishing")}
-                    initiallyOpen={
-                      Boolean(state.reservationUnitEdit.publishBegins) ||
-                      Boolean(state.reservationUnitEdit.publishEnds)
-                    }
-                    onClose={() =>
-                      setValue({ publishBegins: null, publishEnds: null })
-                    }
-                  >
-                    <EditorColumns>
-                      <ActivationGroup
-                        id="publishBegins"
-                        label={t("ReservationUnitEditor.publishBegins")}
-                        initiallyOpen={Boolean(
-                          state.reservationUnitEdit.publishBegins
-                        )}
-                        onClose={() => setValue({ publishBegins: null })}
-                        noIndent
-                      >
-                        <DateTimeInput
-                          value={state.reservationUnitEdit.publishBegins}
-                          setValue={(v) =>
-                            setValue({
-                              publishBegins: v,
-                            })
-                          }
-                        />
-                      </ActivationGroup>
-                      <ActivationGroup
-                        id="publishEnds"
-                        label={t("ReservationUnitEditor.publishEnds")}
-                        initiallyOpen={Boolean(
-                          state.reservationUnitEdit.publishEnds
-                        )}
-                        onClose={() => setValue({ publishEnds: null })}
-                        noIndent
-                      >
-                        <DateTimeInput
-                          value={state.reservationUnitEdit.publishEnds}
-                          setValue={(v) =>
-                            setValue({
-                              publishEnds: v,
-                            })
-                          }
-                        />
-                      </ActivationGroup>
-                    </EditorColumns>
-                  </ActivationGroup>
-                </Fieldset>
-                <Fieldset
-                  heading={t("ReservationUnitEditor.reservationSettings")}
-                >
-                  <ActivationGroup
-                    id="useScheduledReservation"
-                    label={t("ReservationUnitEditor.scheduledReservation")}
-                    initiallyOpen={
-                      Boolean(state.reservationUnitEdit.reservationBegins) ||
-                      Boolean(state.reservationUnitEdit.reservationEnds)
-                    }
-                    onClose={() =>
-                      setValue({
-                        reservationBegins: null,
-                        reservationEnds: null,
-                      })
-                    }
-                  >
-                    <EditorColumns>
-                      <ActivationGroup
-                        id="reservationBegins"
-                        label={t("ReservationUnitEditor.reservationBegins")}
-                        initiallyOpen={Boolean(
-                          state.reservationUnitEdit.reservationBegins
-                        )}
-                        onClose={() => setValue({ reservationBegins: null })}
-                        noIndent
-                      >
-                        <DateTimeInput
-                          value={state.reservationUnitEdit.reservationBegins}
-                          setValue={(v) =>
-                            setValue({
-                              reservationBegins: v,
-                            })
-                          }
-                        />
-                      </ActivationGroup>
-                      <ActivationGroup
-                        id="reservationEnds"
-                        label={t("ReservationUnitEditor.publishEnds")}
-                        initiallyOpen={Boolean(
-                          state.reservationUnitEdit.reservationEnds
-                        )}
-                        onClose={() => setValue({ reservationEnds: null })}
-                        noIndent
-                      >
-                        <DateTimeInput
-                          value={state.reservationUnitEdit.reservationEnds}
-                          setValue={(v) =>
-                            setValue({
-                              reservationEnds: v,
-                            })
-                          }
-                        />
-                      </ActivationGroup>
-                    </EditorColumns>
-                  </ActivationGroup>
-                </Fieldset>
-                <DenseEditorColumns>
-                  <Select
-                    id="minReservationDuration"
-                    options={durationOptions}
-                    placeholder={t("common.select")}
-                    label={t(
-                      "ReservationUnitEditor.minReservationDurationLabel"
-                    )}
-                    onChange={(v) => setValue({ minReservationDuration: v })}
-                    value={
-                      state.reservationUnitEdit.minReservationDuration || ""
-                    }
-                  />
-                  <Select
-                    id="maxReservationDuration"
-                    placeholder={t("common.select")}
-                    options={durationOptions}
-                    label={t(
-                      "ReservationUnitEditor.maxReservationDurationLabel"
-                    )}
-                    onChange={(v) => setValue({ maxReservationDuration: v })}
-                    value={
-                      state.reservationUnitEdit.maxReservationDuration || ""
-                    }
-                  />
-                  <EnumSelect
-                    id="reservationStartInterval"
-                    placeholder={t("common.select")}
-                    value={
-                      state.reservationUnitEdit
-                        .reservationStartInterval as string
-                    }
-                    label={t(
-                      "ReservationUnitEditor.reservationStartIntervalLabel"
-                    )}
-                    type={
-                      ReservationUnitsReservationUnitReservationStartIntervalChoices
-                    }
-                    onChange={(reservationStartInterval) =>
-                      setValue({ reservationStartInterval })
-                    }
-                  />
-                </DenseEditorColumns>
-                <EditorColumns>
-                  <ActivationGroup
-                    id="bufferTimeBeforeGroup"
-                    label={t("ReservationUnitEditor.bufferTimeBefore")}
-                    initiallyOpen={Boolean(
-                      state.reservationUnitEdit.bufferTimeBefore
-                    )}
-                    onClose={() => setValue({ bufferTimeBefore: null })}
-                  >
+                <EditorGrid>
+                  <Normal>
                     <Select
-                      id="bufferTimeBefore"
-                      options={bufferTimeOptions}
+                      id="reservationUnitType"
                       label={t(
-                        "ReservationUnitEditor.bufferTimeBeforeDuration"
+                        `ReservationUnitEditor.reservationUnitTypeLabel`
                       )}
-                      onChange={(v) => setValue({ bufferTimeBefore: v })}
-                      value={state.reservationUnitEdit.bufferTimeBefore || ""}
+                      placeholder={t(
+                        `ReservationUnitEditor.reservationUnitTypePlaceholder`
+                      )}
+                      options={state.reservationUnitTypeOptions}
+                      onChange={(e) => {
+                        setValue({
+                          reservationUnitTypePk: e,
+                        });
+                      }}
+                      helper={t(
+                        `ReservationUnitEditor.reservationUnitTypeHelperText`
+                      )}
+                      value={Number(
+                        get(state.reservationUnitEdit, "reservationUnitTypePk")
+                      )}
                     />
-                  </ActivationGroup>
-                  <ActivationGroup
-                    id="bufferTimeAfterGroup"
-                    label={t("ReservationUnitEditor.bufferTimeAfter")}
-                    initiallyOpen={Boolean(
-                      state.reservationUnitEdit.bufferTimeAfter
-                    )}
-                    onClose={() => setValue({ bufferTimeAfter: null })}
-                  >
-                    <Select
-                      id="bufferTimeAfter"
-                      options={bufferTimeOptions}
-                      label={t("ReservationUnitEditor.bufferTimeAfterDuration")}
-                      onChange={(v) => setValue({ bufferTimeAfter: v })}
-                      value={state.reservationUnitEdit.bufferTimeAfter || ""}
+                  </Normal>
+                  <Normal>
+                    <Combobox
+                      multiselect
+                      label={t("ReservationUnitEditor.purposesLabel")}
+                      placeholder={t(
+                        "ReservationUnitEditor.purposesPlaceholder"
+                      )}
+                      options={state.purposeOptions}
+                      clearButtonAriaLabel={t("common.clearAllSelections")}
+                      selectedItemRemoveButtonAriaLabel={t(
+                        "common.removeValue"
+                      )}
+                      toggleButtonAriaLabel={t("common.toggleMenu")}
+                      onChange={(purposes) =>
+                        dispatch({ type: "setPurposes", purposes })
+                      }
+                      disabled={state.resourceOptions.length === 0}
+                      value={[
+                        ...getSelectedOptions(
+                          state,
+                          "purposeOptions",
+                          "purposePks"
+                        ),
+                      ]}
                     />
-                  </ActivationGroup>
-                  <ActivationGroup
-                    id="cancellationIsPossible"
-                    label={t("ReservationUnitEditor.cancellationIsPossible")}
-                    initiallyOpen={Boolean(
-                      state.reservationUnitEdit.cancellationRulePk
-                    )}
-                    onClose={() => setValue({ cancellationRulePk: null })}
-                  >
-                    <SelectionGroup
-                      required
-                      label={t("ReservationUnitEditor.cancellationGroupLabel")}
+                  </Normal>
+                  <Normal>
+                    <Combobox
+                      multiselect
+                      label={t("ReservationUnitEditor.equipmentsLabel")}
+                      placeholder={t(
+                        "ReservationUnitEditor.equipmentsPlaceholder"
+                      )}
+                      options={state.equipmentOptions}
+                      clearButtonAriaLabel={t("common.clearAllSelections")}
+                      selectedItemRemoveButtonAriaLabel={t(
+                        "common.removeValue"
+                      )}
+                      toggleButtonAriaLabel={t("common.toggleMenu")}
+                      onChange={(equipments) =>
+                        dispatch({ type: "setEquipments", equipments })
+                      }
+                      disabled={state.equipmentOptions.length === 0}
+                      value={[
+                        ...getSelectedOptions(
+                          state,
+                          "equipmentOptions",
+                          "equipmentPks"
+                        ),
+                      ]}
+                    />
+                  </Normal>
+                  {languages.map((lang) => (
+                    <Wide>
+                      <RichTextInput
+                        key={lang}
+                        required
+                        id={`description.${lang}`}
+                        label={t("ReservationUnitEditor.descriptionLabel", {
+                          lang,
+                        })}
+                        value={
+                          get(
+                            state,
+                            `reservationUnitEdit.description${upperFirst(
+                              lang
+                            )}`,
+                            ""
+                          ) || ""
+                        }
+                        onChange={(value) =>
+                          setValue({
+                            [`description${upperFirst(lang)}`]: value,
+                          })
+                        }
+                      />
+                    </Wide>
+                  ))}
+                  <Wide>
+                    <ImageEditor
+                      images={state.images}
+                      setImages={(images) =>
+                        dispatch({ type: "setImages", images })
+                      }
+                    />
+                  </Wide>
+                </EditorGrid>
+              </Accordion>
+              <Accordion heading={t("ReservationUnitEditor.settings")}>
+                <EditorGrid>
+                  <Wide>
+                    <Fieldset
+                      heading={t("ReservationUnitEditor.publishingSettings")}
                     >
-                      {state.cancellationRuleOptions.map((o) => (
-                        <RadioButton
-                          key={o.value}
-                          id={`cr-${o.value}`}
-                          value={o.value as string}
-                          label={o.label}
-                          onChange={(e) =>
-                            setValue({
-                              cancellationRulePk: Number(e.target.value),
-                            })
-                          }
-                          checked={
-                            state.reservationUnitEdit.cancellationRulePk ===
-                            o.value
-                          }
-                        />
-                      ))}
-                    </SelectionGroup>
-                  </ActivationGroup>
-                </EditorColumns>
-                <EditorColumns>
-                  <Select
-                    id="metadataSet"
-                    options={state.metadataOptions}
-                    label={t("ReservationUnitEditor.metadataSet")}
-                    onChange={(v) => setValue({ metadataSetPk: v })}
-                    value={state.reservationUnitEdit.metadataSetPk || null}
-                  />
-                  <NumberInput
-                    id="maxReservationsPerUser"
-                    label={t("ReservationUnitEditor.maxReservationsPerUser")}
-                    min={1}
-                    max={15}
-                    value={
-                      state.reservationUnitEdit.maxReservationsPerUser || ""
-                    }
-                    onChange={(e) =>
-                      setValue({
-                        maxReservationsPerUser: e.target.value,
-                      })
-                    }
-                  />
-                  <Checkbox
-                    id="requireReservationHandling"
-                    label={t(
-                      "ReservationUnitEditor.requireReservationHandling"
-                    )}
-                    checked={
-                      state.reservationUnitEdit.requireReservationHandling ===
-                      true
-                    }
-                    onClick={() =>
-                      setValue({
-                        requireReservationHandling:
-                          !state.reservationUnitEdit
-                            ?.requireReservationHandling,
-                      })
-                    }
-                  />
-                </EditorColumns>
-                <Checkbox
-                  id="requireIntroduction"
-                  label={t("ReservationUnitEditor.requireIntroductionLabel")}
-                  checked={
-                    state.reservationUnitEdit.requireIntroduction === true
-                  }
-                  onClick={() =>
-                    setValue({
-                      requireIntroduction:
-                        !state.reservationUnitEdit?.requireIntroduction,
-                    })
-                  }
-                />
+                      <ActivationGroup
+                        id="useScheduledPublishing"
+                        label={t("ReservationUnitEditor.scheduledPublishing")}
+                        initiallyOpen={
+                          Boolean(state.reservationUnitEdit.publishBegins) ||
+                          Boolean(state.reservationUnitEdit.publishEnds)
+                        }
+                        onClose={() =>
+                          setValue({
+                            publishBegins: null,
+                            publishEnds: null,
+                          })
+                        }
+                      >
+                        <ActivationGroup
+                          id="publishBegins"
+                          label={t("ReservationUnitEditor.publishBegins")}
+                          initiallyOpen={Boolean(
+                            state.reservationUnitEdit.publishBegins
+                          )}
+                          onClose={() => setValue({ publishBegins: null })}
+                          noIndent
+                        >
+                          <DateTimeInput
+                            value={state.reservationUnitEdit.publishBegins}
+                            setValue={(v) =>
+                              setValue({
+                                publishBegins: v,
+                              })
+                            }
+                          />
+                        </ActivationGroup>
+
+                        <ActivationGroup
+                          id="publishEnds"
+                          label={t("ReservationUnitEditor.publishEnds")}
+                          initiallyOpen={Boolean(
+                            state.reservationUnitEdit.publishEnds
+                          )}
+                          onClose={() => setValue({ publishEnds: null })}
+                          noIndent
+                        >
+                          <DateTimeInput
+                            value={state.reservationUnitEdit.publishEnds}
+                            setValue={(v) =>
+                              setValue({
+                                publishEnds: v,
+                              })
+                            }
+                          />
+                        </ActivationGroup>
+                      </ActivationGroup>
+                    </Fieldset>
+                  </Wide>
+                  <Wide>
+                    <Fieldset
+                      heading={t("ReservationUnitEditor.reservationSettings")}
+                    >
+                      <ActivationGroup
+                        id="useScheduledReservation"
+                        label={t("ReservationUnitEditor.scheduledReservation")}
+                        initiallyOpen={
+                          Boolean(
+                            state.reservationUnitEdit.reservationBegins
+                          ) ||
+                          Boolean(state.reservationUnitEdit.reservationEnds)
+                        }
+                        onClose={() =>
+                          setValue({
+                            reservationBegins: null,
+                            reservationEnds: null,
+                          })
+                        }
+                      >
+                        <ActivationGroup
+                          id="reservationBegins"
+                          label={t("ReservationUnitEditor.reservationBegins")}
+                          initiallyOpen={Boolean(
+                            state.reservationUnitEdit.reservationBegins
+                          )}
+                          onClose={() => setValue({ reservationBegins: null })}
+                          noIndent
+                        >
+                          <DateTimeInput
+                            value={state.reservationUnitEdit.reservationBegins}
+                            setValue={(v) =>
+                              setValue({
+                                reservationBegins: v,
+                              })
+                            }
+                          />
+                        </ActivationGroup>
+                        <ActivationGroup
+                          id="reservationEnds"
+                          label={t("ReservationUnitEditor.publishEnds")}
+                          initiallyOpen={Boolean(
+                            state.reservationUnitEdit.reservationEnds
+                          )}
+                          onClose={() => setValue({ reservationEnds: null })}
+                          noIndent
+                        >
+                          <DateTimeInput
+                            value={state.reservationUnitEdit.reservationEnds}
+                            setValue={(v) =>
+                              setValue({
+                                reservationEnds: v,
+                              })
+                            }
+                          />
+                        </ActivationGroup>
+                      </ActivationGroup>
+                    </Fieldset>
+                  </Wide>
+                  <Dense>
+                    <Select
+                      id="minReservationDuration"
+                      options={durationOptions}
+                      placeholder={t("common.select")}
+                      label={t(
+                        "ReservationUnitEditor.minReservationDurationLabel"
+                      )}
+                      onChange={(v) => setValue({ minReservationDuration: v })}
+                      value={
+                        state.reservationUnitEdit.minReservationDuration || ""
+                      }
+                    />
+                  </Dense>
+                  <Dense>
+                    <Select
+                      id="maxReservationDuration"
+                      placeholder={t("common.select")}
+                      options={durationOptions}
+                      label={t(
+                        "ReservationUnitEditor.maxReservationDurationLabel"
+                      )}
+                      onChange={(v) => setValue({ maxReservationDuration: v })}
+                      value={
+                        state.reservationUnitEdit.maxReservationDuration || ""
+                      }
+                    />
+                  </Dense>
+                  <Dense>
+                    <EnumSelect
+                      id="reservationStartInterval"
+                      placeholder={t("common.select")}
+                      value={
+                        state.reservationUnitEdit
+                          .reservationStartInterval as string
+                      }
+                      label={t(
+                        "ReservationUnitEditor.reservationStartIntervalLabel"
+                      )}
+                      type={
+                        ReservationUnitsReservationUnitReservationStartIntervalChoices
+                      }
+                      onChange={(reservationStartInterval) =>
+                        setValue({ reservationStartInterval })
+                      }
+                    />
+                  </Dense>
+                  <Normal>
+                    <ActivationGroup
+                      id="bufferTimeBeforeGroup"
+                      label={t("ReservationUnitEditor.bufferTimeBefore")}
+                      initiallyOpen={Boolean(
+                        state.reservationUnitEdit.bufferTimeBefore
+                      )}
+                      onClose={() => setValue({ bufferTimeBefore: null })}
+                    >
+                      <Select
+                        id="bufferTimeBefore"
+                        options={bufferTimeOptions}
+                        label={t(
+                          "ReservationUnitEditor.bufferTimeBeforeDuration"
+                        )}
+                        onChange={(v) => setValue({ bufferTimeBefore: v })}
+                        value={state.reservationUnitEdit.bufferTimeBefore || ""}
+                      />
+                    </ActivationGroup>
+                  </Normal>
+                  <Normal>
+                    <ActivationGroup
+                      id="bufferTimeAfterGroup"
+                      label={t("ReservationUnitEditor.bufferTimeAfter")}
+                      initiallyOpen={Boolean(
+                        state.reservationUnitEdit.bufferTimeAfter
+                      )}
+                      onClose={() => setValue({ bufferTimeAfter: null })}
+                    >
+                      <Select
+                        id="bufferTimeAfter"
+                        options={bufferTimeOptions}
+                        label={t(
+                          "ReservationUnitEditor.bufferTimeAfterDuration"
+                        )}
+                        onChange={(v) => setValue({ bufferTimeAfter: v })}
+                        value={state.reservationUnitEdit.bufferTimeAfter || ""}
+                      />
+                    </ActivationGroup>
+                  </Normal>
+                  <Wide>
+                    <ActivationGroup
+                      id="cancellationIsPossible"
+                      label={t("ReservationUnitEditor.cancellationIsPossible")}
+                      initiallyOpen={Boolean(
+                        state.reservationUnitEdit.cancellationRulePk
+                      )}
+                      onClose={() => setValue({ cancellationRulePk: null })}
+                    >
+                      <SelectionGroup
+                        required
+                        label={t(
+                          "ReservationUnitEditor.cancellationGroupLabel"
+                        )}
+                      >
+                        {state.cancellationRuleOptions.map((o) => (
+                          <RadioButton
+                            key={o.value}
+                            id={`cr-${o.value}`}
+                            value={o.value as string}
+                            label={o.label}
+                            onChange={(e) =>
+                              setValue({
+                                cancellationRulePk: Number(e.target.value),
+                              })
+                            }
+                            checked={
+                              state.reservationUnitEdit.cancellationRulePk ===
+                              o.value
+                            }
+                          />
+                        ))}
+                      </SelectionGroup>
+                    </ActivationGroup>
+                  </Wide>
+                  <Normal>
+                    <Select
+                      id="metadataSet"
+                      options={state.metadataOptions}
+                      label={t("ReservationUnitEditor.metadataSet")}
+                      onChange={(v) => setValue({ metadataSetPk: v })}
+                      value={state.reservationUnitEdit.metadataSetPk || null}
+                    />
+                  </Normal>
+                  <Normal>
+                    <NumberInput
+                      id="maxReservationsPerUser"
+                      label={t("ReservationUnitEditor.maxReservationsPerUser")}
+                      min={1}
+                      max={15}
+                      value={
+                        state.reservationUnitEdit.maxReservationsPerUser || ""
+                      }
+                      onChange={(e) =>
+                        setValue({
+                          maxReservationsPerUser: e.target.value,
+                        })
+                      }
+                    />
+                  </Normal>
+                  <Wide>
+                    <Checkbox
+                      id="requireReservationHandling"
+                      label={t(
+                        "ReservationUnitEditor.requireReservationHandling"
+                      )}
+                      checked={
+                        state.reservationUnitEdit.requireReservationHandling ===
+                        true
+                      }
+                      onClick={() =>
+                        setValue({
+                          requireReservationHandling:
+                            !state.reservationUnitEdit
+                              ?.requireReservationHandling,
+                        })
+                      }
+                    />
+                  </Wide>
+                  <Wide>
+                    <EnumSelect
+                      id="authentication"
+                      value={state.reservationUnitEdit.authentication || "WEAK"}
+                      label={t("ReservationUnitEditor.authenticationLabel")}
+                      type={
+                        ReservationUnitsReservationUnitAuthenticationChoices
+                      }
+                      onChange={(authentication) =>
+                        setValue({ authentication })
+                      }
+                    />
+                  </Wide>{" "}
+                  <Wide>
+                    <Checkbox
+                      id="requireIntroduction"
+                      label={t(
+                        "ReservationUnitEditor.requireIntroductionLabel"
+                      )}
+                      checked={
+                        state.reservationUnitEdit.requireIntroduction === true
+                      }
+                      onClick={() =>
+                        setValue({
+                          requireIntroduction:
+                            !state.reservationUnitEdit?.requireIntroduction,
+                        })
+                      }
+                    />
+                  </Wide>
+                </EditorGrid>
               </Accordion>
               <Accordion heading={t("ReservationUnitEditor.pricing")}>
-                <DenseEditorColumns>
-                  <NumberInput
-                    value={state.reservationUnitEdit.lowestPrice || 0}
-                    id="lowestPrice"
-                    label={t("ReservationUnitEditor.lowestPriceLabel")}
-                    helperText={t(
-                      "ReservationUnitEditor.lowestPriceHelperText"
-                    )}
-                    minusStepButtonAriaLabel={t(
-                      "common.decreaseByOneAriaLabel"
-                    )}
-                    plusStepButtonAriaLabel={t("common.increaseByOneAriaLabel")}
-                    onChange={(e) => {
-                      setValue({
-                        lowestPrice: Number(e.target.value),
-                        highestPrice: Math.max(
-                          Number(e.target.value),
-                          state.reservationUnitEdit.highestPrice || 0
-                        ),
-                      });
-                    }}
-                    step={1}
-                    type="number"
-                    min={0}
-                  />
-                  <NumberInput
-                    value={state.reservationUnitEdit.highestPrice || 0}
-                    id="highestPrice"
-                    label={t("ReservationUnitEditor.highestPriceLabel")}
-                    helperText={t(
-                      "ReservationUnitEditor.highestPriceHelperText"
-                    )}
-                    minusStepButtonAriaLabel={t(
-                      "common.decreaseByOneAriaLabel"
-                    )}
-                    plusStepButtonAriaLabel={t("common.increaseByOneAriaLabel")}
-                    onChange={(e) => {
-                      setValue({
-                        highestPrice: Number(e.target.value),
-                        lowestPrice: Math.min(
-                          Number(e.target.value),
-                          state.reservationUnitEdit.lowestPrice || 0
-                        ),
-                      });
-                    }}
-                    step={1}
-                    type="number"
-                    min={0}
-                  />
-                  <EnumSelect
-                    id="priceUnit"
-                    value={state.reservationUnitEdit.priceUnit as string}
-                    label={t("ReservationUnitEditor.priceUnitLabel")}
-                    type={ReservationUnitsReservationUnitPriceUnitChoices}
-                    onChange={(priceUnit) => setValue({ priceUnit })}
-                  />
-                  <Select
-                    id="taxPercentage"
-                    label={t(`ReservationUnitEditor.taxPercentageLabel`)}
-                    options={state.taxPercentageOptions}
-                    onChange={(selectedVat) => {
-                      setValue({
-                        taxPercentagePk: selectedVat,
-                      });
-                    }}
-                    value={
-                      get(
-                        state.reservationUnitEdit,
-                        "taxPercentagePk"
-                      ) as number
-                    }
-                  />
-                </DenseEditorColumns>
+                <EditorGrid>
+                  <Dense>
+                    <NumberInput
+                      value={state.reservationUnitEdit.lowestPrice || 0}
+                      id="lowestPrice"
+                      label={t("ReservationUnitEditor.lowestPriceLabel")}
+                      helperText={t(
+                        "ReservationUnitEditor.lowestPriceHelperText"
+                      )}
+                      minusStepButtonAriaLabel={t(
+                        "common.decreaseByOneAriaLabel"
+                      )}
+                      plusStepButtonAriaLabel={t(
+                        "common.increaseByOneAriaLabel"
+                      )}
+                      onChange={(e) => {
+                        setValue({
+                          lowestPrice: Number(e.target.value),
+                          highestPrice: Math.max(
+                            Number(e.target.value),
+                            state.reservationUnitEdit.highestPrice || 0
+                          ),
+                        });
+                      }}
+                      step={1}
+                      type="number"
+                      min={0}
+                    />
+                  </Dense>
+                  <Dense>
+                    <NumberInput
+                      value={state.reservationUnitEdit.highestPrice || 0}
+                      id="highestPrice"
+                      label={t("ReservationUnitEditor.highestPriceLabel")}
+                      helperText={t(
+                        "ReservationUnitEditor.highestPriceHelperText"
+                      )}
+                      minusStepButtonAriaLabel={t(
+                        "common.decreaseByOneAriaLabel"
+                      )}
+                      plusStepButtonAriaLabel={t(
+                        "common.increaseByOneAriaLabel"
+                      )}
+                      onChange={(e) => {
+                        setValue({
+                          highestPrice: Number(e.target.value),
+                          lowestPrice: Math.min(
+                            Number(e.target.value),
+                            state.reservationUnitEdit.lowestPrice || 0
+                          ),
+                        });
+                      }}
+                      step={1}
+                      type="number"
+                      min={0}
+                    />
+                  </Dense>
+                  <Dense>
+                    <EnumSelect
+                      id="priceUnit"
+                      value={state.reservationUnitEdit.priceUnit as string}
+                      label={t("ReservationUnitEditor.priceUnitLabel")}
+                      type={ReservationUnitsReservationUnitPriceUnitChoices}
+                      onChange={(priceUnit) => setValue({ priceUnit })}
+                    />
+                  </Dense>
+                  <Dense>
+                    <Select
+                      id="taxPercentage"
+                      label={t(`ReservationUnitEditor.taxPercentageLabel`)}
+                      options={state.taxPercentageOptions}
+                      onChange={(selectedVat) => {
+                        setValue({
+                          taxPercentagePk: selectedVat,
+                        });
+                      }}
+                      value={
+                        get(
+                          state.reservationUnitEdit,
+                          "taxPercentagePk"
+                        ) as number
+                      }
+                    />
+                  </Dense>
+                </EditorGrid>
               </Accordion>
 
               <Accordion heading={t("ReservationUnitEditor.termsInstructions")}>
-                {languages.map((lang) => (
-                  <RichTextInput
-                    key={lang}
-                    required
-                    id={`tos.${lang}`}
-                    label={t("ReservationUnitEditor.tosLabel", {
-                      lang,
-                    })}
-                    value={get(
-                      state,
-                      `reservationUnitEdit.termsOfUse${upperFirst(lang)}`,
-                      ""
-                    )}
-                    onChange={(value) =>
-                      setValue({
-                        [`termsOfUse${upperFirst(lang)}`]: value,
-                      })
-                    }
-                  />
-                ))}
-                <EditorColumns>
+                <EditorGrid>
+                  {languages.map((lang) => (
+                    <Wide>
+                      <RichTextInput
+                        key={lang}
+                        required
+                        id={`tos.${lang}`}
+                        label={t("ReservationUnitEditor.tosLabel", {
+                          lang,
+                        })}
+                        value={get(
+                          state,
+                          `reservationUnitEdit.termsOfUse${upperFirst(lang)}`,
+                          ""
+                        )}
+                        onChange={(value) =>
+                          setValue({
+                            [`termsOfUse${upperFirst(lang)}`]: value,
+                          })
+                        }
+                      />
+                    </Wide>
+                  ))}
                   {["serviceSpecific", "payment", "cancellation"].map(
                     (name) => {
                       const options = get(state, `${name}TermsOptions`);
                       const propName = `${name}TermsPk`;
                       return (
-                        <Select
-                          id={name}
-                          key={name}
-                          label={t(`ReservationUnitEditor.${name}TermsLabel`)}
-                          placeholder={t(
-                            `ReservationUnitEditor.${name}TermsPlaceholder`
-                          )}
-                          options={options}
-                          onChange={(selection) => {
-                            setValue({
-                              [propName]: selection,
-                            });
-                          }}
-                          helper={t(
-                            `ReservationUnitEditor.${name}TermsHelperText`
-                          )}
-                          value={get(state.reservationUnitEdit, propName)}
-                        />
+                        <Normal>
+                          <Select
+                            id={name}
+                            key={name}
+                            label={t(`ReservationUnitEditor.${name}TermsLabel`)}
+                            placeholder={t(
+                              `ReservationUnitEditor.${name}TermsPlaceholder`
+                            )}
+                            options={options}
+                            onChange={(selection) => {
+                              setValue({
+                                [propName]: selection,
+                              });
+                            }}
+                            helper={t(
+                              `ReservationUnitEditor.${name}TermsHelperText`
+                            )}
+                            value={get(state.reservationUnitEdit, propName)}
+                          />
+                        </Normal>
                       );
                     }
                   )}
-                </EditorColumns>
+                </EditorGrid>
               </Accordion>
               <Accordion heading={t("ReservationUnitEditor.communication")}>
-                {languages.map((lang) => (
-                  <TextInputWithPadding
-                    key={lang}
-                    required
-                    id={`additionalInstructions.${lang}`}
-                    label={t(
-                      "ReservationUnitEditor.additionalInstructionsLabel",
-                      {
-                        lang,
-                      }
-                    )}
-                    placeholder={t(
-                      "ReservationUnitEditor.additionalInstructionsPlaceholder",
-                      {
-                        language: t(`language.${lang}`),
-                      }
-                    )}
-                    value={get(
-                      state,
-                      `reservationUnitEdit.additionalInstructions${upperFirst(
-                        lang
-                      )}`,
-                      ""
-                    )}
-                    onChange={(e) =>
-                      setValue({
-                        [`additionalInstructions${upperFirst(lang)}`]:
-                          e.target.value,
-                      })
-                    }
-                  />
-                ))}
-                {languages.map((lang) => (
-                  <TextInputWithPadding
-                    key={lang}
-                    required
-                    id={`contactInformation${lang}`}
-                    label={t("ReservationUnitEditor.contactInformationLabel", {
-                      lang,
-                    })}
-                    value={get(
-                      state,
-                      `reservationUnitEdit.contactInformation${upperFirst(
-                        lang
-                      )}`,
-                      ""
-                    )}
-                    onChange={(e) =>
-                      setValue({
-                        [`contactInformation${upperFirst(lang)}`]:
-                          e.target.value,
-                      })
-                    }
-                  />
-                ))}
+                <EditorGrid>
+                  {languages.map((lang) => (
+                    <Wide>
+                      <TextInput
+                        key={lang}
+                        required
+                        id={`additionalInstructions.${lang}`}
+                        label={t(
+                          "ReservationUnitEditor.additionalInstructionsLabel",
+                          {
+                            lang,
+                          }
+                        )}
+                        placeholder={t(
+                          "ReservationUnitEditor.additionalInstructionsPlaceholder",
+                          {
+                            language: t(`language.${lang}`),
+                          }
+                        )}
+                        value={get(
+                          state,
+                          `reservationUnitEdit.additionalInstructions${upperFirst(
+                            lang
+                          )}`,
+                          ""
+                        )}
+                        onChange={(e) =>
+                          setValue({
+                            [`additionalInstructions${upperFirst(lang)}`]:
+                              e.target.value,
+                          })
+                        }
+                      />
+                    </Wide>
+                  ))}
+                  {languages.map((lang) => (
+                    <Wide>
+                      <TextInput
+                        key={lang}
+                        required
+                        id={`contactInformation${lang}`}
+                        label={t(
+                          "ReservationUnitEditor.contactInformationLabel",
+                          {
+                            lang,
+                          }
+                        )}
+                        value={get(
+                          state,
+                          `reservationUnitEdit.contactInformation${upperFirst(
+                            lang
+                          )}`,
+                          ""
+                        )}
+                        onChange={(e) =>
+                          setValue({
+                            [`contactInformation${upperFirst(lang)}`]:
+                              e.target.value,
+                          })
+                        }
+                      />
+                    </Wide>
+                  ))}
+                </EditorGrid>
               </Accordion>
 
               <Accordion heading={t("ReservationUnitEditor.openingHours")}>

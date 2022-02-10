@@ -2,7 +2,6 @@ import React from "react";
 import { DateInput, TimeInput } from "hds-react";
 import { useTranslation } from "react-i18next";
 import { parse } from "date-fns";
-import { EditorColumns } from "./editorComponents";
 import { formatDate } from "../../../common/util";
 
 /* Convert api datetime to date required by date input, defaults to current date */
@@ -29,7 +28,13 @@ const DateTimeInput = ({
 }): JSX.Element => {
   const { t } = useTranslation();
   return (
-    <EditorColumns style={{ gridTemplateColumns: "4fr 3fr" }}>
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "4fr 3fr",
+        gap: "var(--spacing-m)",
+      }}
+    >
       <DateInput
         language="fi"
         disableConfirmation
@@ -53,7 +58,7 @@ const DateTimeInput = ({
           setValue(dateTime(valueForDateInput(value), e.target.value));
         }}
       />
-    </EditorColumns>
+    </div>
   );
 };
 

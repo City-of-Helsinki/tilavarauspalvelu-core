@@ -32,7 +32,6 @@ const Select = ({
 }): JSX.Element => {
   return (
     <HDSSelect
-      style={{ paddingBottom: "var(--spacing-m)" }}
       id={id}
       label={label}
       placeholder={placeholder}

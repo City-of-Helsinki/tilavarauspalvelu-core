@@ -1482,6 +1482,8 @@ export type ReservationUnitByPkType = Node & {
   additionalInstructionsFi?: Maybe<Scalars["String"]>;
   additionalInstructionsSv?: Maybe<Scalars["String"]>;
   applicationRounds?: Maybe<Array<Maybe<ApplicationRoundType>>>;
+  /** Authentication required for reserving this reservation unit. */
+  authentication: ReservationUnitsReservationUnitAuthenticationChoices;
   bufferTimeAfter?: Maybe<Scalars["Duration"]>;
   bufferTimeBefore?: Maybe<Scalars["Duration"]>;
   cancellationRule?: Maybe<ReservationUnitCancellationRuleType>;
@@ -1615,6 +1617,8 @@ export type ReservationUnitCreateMutationInput = {
   additionalInstructionsEn?: Maybe<Scalars["String"]>;
   additionalInstructionsFi?: Maybe<Scalars["String"]>;
   additionalInstructionsSv?: Maybe<Scalars["String"]>;
+  /** Authentication required for reserving this reservation unit. Possible values are WEAK, STRONG. */
+  authentication?: Maybe<Scalars["String"]>;
   bufferTimeAfter?: Maybe<Scalars["Int"]>;
   bufferTimeBefore?: Maybe<Scalars["Int"]>;
   cancellationRulePk?: Maybe<Scalars["Int"]>;
@@ -1676,6 +1680,8 @@ export type ReservationUnitCreateMutationPayload = {
   additionalInstructionsEn?: Maybe<Scalars["String"]>;
   additionalInstructionsFi?: Maybe<Scalars["String"]>;
   additionalInstructionsSv?: Maybe<Scalars["String"]>;
+  /** Authentication required for reserving this reservation unit. Possible values are WEAK, STRONG. */
+  authentication?: Maybe<Scalars["String"]>;
   bufferTimeAfter?: Maybe<Scalars["Int"]>;
   bufferTimeBefore?: Maybe<Scalars["Int"]>;
   building?: Maybe<Scalars["String"]>;
@@ -1812,6 +1818,8 @@ export type ReservationUnitType = Node & {
   additionalInstructionsFi?: Maybe<Scalars["String"]>;
   additionalInstructionsSv?: Maybe<Scalars["String"]>;
   applicationRounds?: Maybe<Array<Maybe<ApplicationRoundType>>>;
+  /** Authentication required for reserving this reservation unit. */
+  authentication: ReservationUnitsReservationUnitAuthenticationChoices;
   bufferTimeAfter?: Maybe<Scalars["Duration"]>;
   bufferTimeBefore?: Maybe<Scalars["Duration"]>;
   cancellationRule?: Maybe<ReservationUnitCancellationRuleType>;
@@ -1932,6 +1940,8 @@ export type ReservationUnitUpdateMutationInput = {
   additionalInstructionsEn?: Maybe<Scalars["String"]>;
   additionalInstructionsFi?: Maybe<Scalars["String"]>;
   additionalInstructionsSv?: Maybe<Scalars["String"]>;
+  /** Authentication required for reserving this reservation unit. Possible values are WEAK, STRONG. */
+  authentication?: Maybe<Scalars["String"]>;
   bufferTimeAfter?: Maybe<Scalars["Int"]>;
   bufferTimeBefore?: Maybe<Scalars["Int"]>;
   cancellationRulePk?: Maybe<Scalars["Int"]>;
@@ -1994,6 +2004,8 @@ export type ReservationUnitUpdateMutationPayload = {
   additionalInstructionsEn?: Maybe<Scalars["String"]>;
   additionalInstructionsFi?: Maybe<Scalars["String"]>;
   additionalInstructionsSv?: Maybe<Scalars["String"]>;
+  /** Authentication required for reserving this reservation unit. Possible values are WEAK, STRONG. */
+  authentication?: Maybe<Scalars["String"]>;
   bufferTimeAfter?: Maybe<Scalars["Int"]>;
   bufferTimeBefore?: Maybe<Scalars["Int"]>;
   building?: Maybe<Scalars["String"]>;
@@ -2058,6 +2070,14 @@ export type ReservationUnitUpdateMutationPayload = {
   unitPk?: Maybe<Scalars["Int"]>;
   uuid?: Maybe<Scalars["String"]>;
 };
+
+/** An enumeration. */
+export enum ReservationUnitsReservationUnitAuthenticationChoices {
+  /** Strong */
+  Strong = "STRONG",
+  /** Weak */
+  Weak = "WEAK",
+}
 
 /** An enumeration. */
 export enum ReservationUnitsReservationUnitImageImageTypeChoices {
@@ -2471,7 +2491,7 @@ export type SpaceType = Node & {
   parent?: Maybe<SpaceType>;
   pk?: Maybe<Scalars["Int"]>;
   resources?: Maybe<Array<Maybe<ResourceType>>>;
-  surfaceArea?: Maybe<Scalars["Decimal"]>;
+  surfaceArea?: Maybe<Scalars["Float"]>;
   unit?: Maybe<UnitByPkType>;
 };
 

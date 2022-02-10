@@ -37,7 +37,10 @@ const translations: ITranslations = {
     5: ["La"],
     6: ["Su"],
   },
-
+  authentication: {
+    WEAK: ["Heikko tunnistautuminen"],
+    STRONG: ["Vahva tunnistautuminen"],
+  },
   language: {
     fi: ["suomeksi"],
     sv: ["ruotsiksi"],
@@ -864,6 +867,7 @@ const translations: ITranslations = {
     statusFilter: ["Tila"],
   },
   ReservationUnitEditor: {
+    authenticationLabel: ["Tunnistautuminen"],
     defaultHeading: ["Uusi varausyksikkö"],
     basicInformation: ["Perustiedot"],
     typesProperties: ["Varustelu ja kuvaus"],

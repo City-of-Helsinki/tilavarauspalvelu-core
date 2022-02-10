@@ -24,7 +24,6 @@ const Container = styled.div<{ $disabled: boolean }>`
     ${({ $disabled }) =>
       $disabled ? "background-color: var(--color-black-10);" : ""}
   }
-  padding-bottom: var(--spacing-m);
 `;
 
 const Label = styled.label`
