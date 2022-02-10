@@ -645,14 +645,45 @@ snapshots['ReservationUnitQueryTestCase::test_order_by_unit 1'] = {
                 {
                     'node': {
                         'unit': {
-                            'nameFi': 'test unit fi'
+                            'nameEn': '_',
+                            'nameFi': '1',
+                            'nameSv': '_'
                         }
                     }
                 },
                 {
                     'node': {
                         'unit': {
-                            'nameFi': 'testunit'
+                            'nameEn': '_',
+                            'nameFi': '2',
+                            'nameSv': '1'
+                        }
+                    }
+                },
+                {
+                    'node': {
+                        'unit': {
+                            'nameEn': '_',
+                            'nameFi': '2',
+                            'nameSv': '2'
+                        }
+                    }
+                },
+                {
+                    'node': {
+                        'unit': {
+                            'nameEn': '1',
+                            'nameFi': '3',
+                            'nameSv': '_'
+                        }
+                    }
+                },
+                {
+                    'node': {
+                        'unit': {
+                            'nameEn': '2',
+                            'nameFi': '3',
+                            'nameSv': '_'
                         }
                     }
                 }
@@ -668,14 +699,45 @@ snapshots['ReservationUnitQueryTestCase::test_order_by_unit_reverse_order 1'] = 
                 {
                     'node': {
                         'unit': {
-                            'nameFi': 'testunit'
+                            'nameEn': '2',
+                            'nameFi': '3',
+                            'nameSv': '_'
                         }
                     }
                 },
                 {
                     'node': {
                         'unit': {
-                            'nameFi': 'test unit fi'
+                            'nameEn': '1',
+                            'nameFi': '3',
+                            'nameSv': '_'
+                        }
+                    }
+                },
+                {
+                    'node': {
+                        'unit': {
+                            'nameEn': '_',
+                            'nameFi': '2',
+                            'nameSv': '2'
+                        }
+                    }
+                },
+                {
+                    'node': {
+                        'unit': {
+                            'nameEn': '_',
+                            'nameFi': '2',
+                            'nameSv': '1'
+                        }
+                    }
+                },
+                {
+                    'node': {
+                        'unit': {
+                            'nameEn': '_',
+                            'nameFi': '1',
+                            'nameSv': '_'
                         }
                     }
                 }
