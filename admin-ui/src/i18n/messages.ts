@@ -905,6 +905,7 @@ const translations: ITranslations = {
     ],
     minReservationDurationLabel: ["Varauksen minimikesto"],
     maxReservationDurationLabel: ["Varauksen maksimikesto"],
+    durationHours: ["{{hours}} tuntia"],
     reservationStartIntervalLabel: ["Varauksen aloitukset"],
     tosLabel: ["Varausyksikkökohtaiset ohjeet {{lang}}"],
     tosPlaceholder: ["Ohjeteksti {{language}}"],
