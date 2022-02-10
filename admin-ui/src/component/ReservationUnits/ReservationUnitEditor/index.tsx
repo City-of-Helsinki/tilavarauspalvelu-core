@@ -472,8 +472,6 @@ const ReservationUnitEditor = (): JSX.Element | null => {
 
   const { hasChanges } = state;
 
-  console.log("rendering with", state);
-
   if (state.error) {
     return (
       <Wrapper>
