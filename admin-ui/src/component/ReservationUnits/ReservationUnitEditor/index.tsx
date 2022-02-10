@@ -86,7 +86,7 @@ const durationOptions = [
   { value: 3600, label: "60 minuuttia" },
   { value: 5400, label: "90 minuuttia" },
 ].concat(
-  Array.from({ length: (24 - 2) * 2 })
+  Array.from({ length: (23 - 2) * 2 + 1 })
     .map((v, i) => 3600 * 2 + i * 1800)
     .map((v) => ({
       value: v,
