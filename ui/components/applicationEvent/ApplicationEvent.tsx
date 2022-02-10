@@ -32,6 +32,7 @@ import { defaultDuration, durationOptions } from "../../modules/const";
 import { after, before } from "../../modules/validation";
 import ConfirmationModal, { ModalRef } from "../common/ConfirmationModal";
 import { MediumButton } from "../../styles/util";
+import { fontMedium } from "../../modules/style/typography";
 
 type OptionTypes = {
   ageGroupOptions: OptionType[];
@@ -67,6 +68,10 @@ const TwoColumnContainer = styled.div`
   grid-template-columns: 1fr 1fr;
   gap: var(--spacing-l);
 
+  label {
+    ${fontMedium}
+  }
+
   @media (max-width: ${breakpoint.m}) {
     grid-template-columns: 1fr;
     gap: 0;
@@ -80,6 +85,10 @@ const PeriodContainer = styled.div`
   gap: var(--spacing-m);
   align-items: baseline;
   margin-bottom: var(--spacing-layout-s);
+
+  label {
+    ${fontMedium}
+  }
 
   @media (max-width: ${breakpoint.m}) {
     grid-template-columns: 1fr;
@@ -483,17 +492,27 @@ const ApplicationEvent = ({
           <Controller
             control={form.control}
             name={fieldName("biweekly")}
-            render={(props) => {
+            // render={(props) => {
+            //   return (
+            //     <CheckboxWrapper>
+            //       <Checkbox
+            //         {...props}
+            //         id={fieldName("biweekly")}
+            //         checked={props.value}
+            //         onChange={() => props.onChange(!props.value)}
+            //         label={t("application:Page1.biweekly")}
+            //       />
+            //     </CheckboxWrapper>
+            //   );
+            // }}
+            render={() => {
               return (
-                <CheckboxWrapper>
-                  <Checkbox
-                    {...props}
-                    id={fieldName("biweekly")}
-                    checked={props.value}
-                    onChange={() => props.onChange(!props.value)}
-                    label={t("application:Page1.biweekly")}
-                  />
-                </CheckboxWrapper>
+                <input
+                  type="hidden"
+                  id={fieldName("biweekly")}
+                  name={fieldName("biweekly")}
+                  value=""
+                />
               );
             }}
           />

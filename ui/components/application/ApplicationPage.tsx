@@ -20,6 +20,7 @@ const InnerContainer = styled.div`
   display: grid;
   gap: 1em;
   grid-template-columns: 18em 1fr;
+  margin-top: var(--spacing-l);
 
   @media (max-width: ${breakpoint.l}) {
     grid-template-columns: 1fr;

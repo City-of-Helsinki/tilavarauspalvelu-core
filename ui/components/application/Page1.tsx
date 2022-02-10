@@ -47,7 +47,7 @@ type OptionTypes = {
 const ButtonContainer = styled.div`
   display: flex;
   flex-direction: row;
-  margin-top: var(--spacing-layout-l);
+  margin: var(--spacing-layout-l) 0;
   justify-content: flex-end;
 
   > button {

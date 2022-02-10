@@ -30,6 +30,7 @@ const NameCardContainer = styled.div`
 
 const PreCardLabel = styled.div`
   font-size: var(--fontsize-heading-xs);
+  font-family: var(--font-bold);
   font-weight: 700;
 `;
 

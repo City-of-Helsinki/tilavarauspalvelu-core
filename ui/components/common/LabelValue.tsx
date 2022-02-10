@@ -8,8 +8,6 @@ const LabelElement = styled.div`
 `;
 const ValueElement = styled.div`
   margin-top: var(--spacing-2-xs);
-  font-family: var(--font-bold);
-  font-size: var(--fontsize-body-m);
 `;
 
 const LabelValue = ({

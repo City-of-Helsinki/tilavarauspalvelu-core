@@ -26,7 +26,7 @@ const ApplicantInfoPreview = ({
             label={t("application:preview.applicantTypeLabel")}
             value={String(
               t(
-                `Application.preview.applicantType.${application.applicantType}`
+                `application:preview.applicantType.${application.applicantType}`
               )
             )}
           />
