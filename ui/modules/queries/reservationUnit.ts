@@ -265,3 +265,18 @@ export const TERMS_OF_USE = gql`
     }
   }
 `;
+
+export const RESERVATION_UNIT_TYPES = gql`
+  query ReservationUnitTypes {
+    reservationUnitTypes {
+      edges {
+        node {
+          pk
+          nameFi
+          nameEn
+          nameSv
+        }
+      }
+    }
+  }
+`;

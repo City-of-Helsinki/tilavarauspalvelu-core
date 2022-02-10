@@ -16,6 +16,7 @@ import {
   ReservationUnitsReservationUnitReservationStartIntervalChoices,
   QueryTermsOfUseArgs,
   TermsOfUseTypeConnection,
+  QueryReservationUnitTypesArgs,
 } from "../../modules/gql-types";
 import { Parameter } from "../../modules/types";
 import { toApiDate } from "../../modules/util";
@@ -635,12 +636,36 @@ const relatedReservationUnits = graphql.query<Query, QueryReservationUnitsArgs>(
   }
 );
 
-const reservationUnitTypes = rest.get<Parameter[]>(
+const reservationUnitTypesRest = rest.get<Parameter[]>(
   "http://localhost:8000/v1/parameters/reservation_unit_type/",
   (req, res, ctx) => {
     return res(ctx.json(reservationUnitTypeData));
   }
 );
+
+const reservationUnitTypes = graphql.query<
+  Query,
+  QueryReservationUnitTypesArgs
+>("ReservationUnitTypes", (req, res, ctx) => {
+  const data = {
+    edges: reservationUnitTypeData.map((item) => ({
+      node: {
+        id: item.id.toString(),
+        pk: item.id,
+        nameFi: item.name as string,
+        nameEn: `${item.name} EN`,
+        nameSv: `${item.name} SV`,
+      },
+      cursor: "YXJyYXljb25uZWN0aW9uVHlwZTo=",
+    })),
+    pageInfo: {
+      hasNextPage: false,
+      hasPreviousPage: false,
+    },
+  };
+
+  return res(ctx.data({ reservationUnitTypes: data }));
+});
 
 const termsOfUseData: TermsOfUseTypeConnection = {
   edges: [
@@ -721,6 +746,7 @@ export const reservationUnitHandlers = [
   selectedReservationUnitQuery,
   openingHoursQuery,
   relatedReservationUnits,
+  reservationUnitTypesRest,
   reservationUnitTypes,
   termsOfUse,
 ];

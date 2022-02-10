@@ -4203,6 +4203,70 @@ export type TermsOfUseQueryResult = Apollo.QueryResult<
   TermsOfUseQuery,
   TermsOfUseQueryVariables
 >;
+export const ReservationUnitTypesDocument = gql`
+  query ReservationUnitTypes {
+    reservationUnitTypes {
+      edges {
+        node {
+          pk
+          nameFi
+          nameEn
+          nameSv
+        }
+      }
+    }
+  }
+`;
+
+/**
+ * __useReservationUnitTypesQuery__
+ *
+ * To run a query within a React component, call `useReservationUnitTypesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useReservationUnitTypesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useReservationUnitTypesQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useReservationUnitTypesQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    ReservationUnitTypesQuery,
+    ReservationUnitTypesQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    ReservationUnitTypesQuery,
+    ReservationUnitTypesQueryVariables
+  >(ReservationUnitTypesDocument, options);
+}
+export function useReservationUnitTypesLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    ReservationUnitTypesQuery,
+    ReservationUnitTypesQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    ReservationUnitTypesQuery,
+    ReservationUnitTypesQueryVariables
+  >(ReservationUnitTypesDocument, options);
+}
+export type ReservationUnitTypesQueryHookResult = ReturnType<
+  typeof useReservationUnitTypesQuery
+>;
+export type ReservationUnitTypesLazyQueryHookResult = ReturnType<
+  typeof useReservationUnitTypesLazyQuery
+>;
+export type ReservationUnitTypesQueryResult = Apollo.QueryResult<
+  ReservationUnitTypesQuery,
+  ReservationUnitTypesQueryVariables
+>;
 export type SearchFormParamsUnitQueryVariables = Exact<{
   [key: string]: never;
 }>;
@@ -5212,6 +5276,37 @@ export type TermsOfUseQuery = {
                     textEn?: string | null | undefined;
                     textSv?: string | null | undefined;
                     termsType: TermsOfUseTermsOfUseTermsTypeChoices;
+                  }
+                | null
+                | undefined;
+            }
+          | null
+          | undefined
+        >;
+      }
+    | null
+    | undefined;
+};
+
+export type ReservationUnitTypesQueryVariables = Exact<{
+  [key: string]: never;
+}>;
+
+export type ReservationUnitTypesQuery = {
+  __typename?: "Query";
+  reservationUnitTypes?:
+    | {
+        __typename?: "ReservationUnitTypeTypeConnection";
+        edges: Array<
+          | {
+              __typename?: "ReservationUnitTypeTypeEdge";
+              node?:
+                | {
+                    __typename?: "ReservationUnitTypeType";
+                    pk?: number | null | undefined;
+                    nameFi?: string | null | undefined;
+                    nameEn?: string | null | undefined;
+                    nameSv?: string | null | undefined;
                   }
                 | null
                 | undefined;

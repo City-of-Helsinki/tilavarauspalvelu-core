@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Koros } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { useQuery } from "@apollo/client";
@@ -69,20 +69,23 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
 const SearchSingle = (): JSX.Element => {
   const { t, i18n } = useTranslation();
 
-  const sortingOptions = [
-    {
-      label: t("search:sorting.label.name"),
-      value: `name${capitalize(i18n.language)}`,
-    },
-    {
-      label: t("search:sorting.label.type"),
-      value: `type${capitalize(i18n.language)}`,
-    },
-    {
-      label: t("search:sorting.label.unit"),
-      value: "unit",
-    },
-  ];
+  const sortingOptions = useMemo(
+    () => [
+      {
+        label: t("search:sorting.label.name"),
+        value: `name${capitalize(i18n.language)}`,
+      },
+      {
+        label: t("search:sorting.label.type"),
+        value: `type${capitalize(i18n.language)}`,
+      },
+      {
+        label: t("search:sorting.label.unit"),
+        value: `unitName${capitalize(i18n.language)}`,
+      },
+    ],
+    [t, i18n.language]
+  );
 
   const [values, setValues] = useState({} as Record<string, string>);
   const setStoredValues = useLocalStorage(

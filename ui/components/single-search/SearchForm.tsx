@@ -6,7 +6,6 @@ import styled from "styled-components";
 import { useQuery } from "@apollo/client";
 import { sortBy } from "lodash";
 import { breakpoint } from "../../modules/style";
-import { getParameters } from "../../modules/api";
 import {
   mapOptions,
   getSelectedOption,
@@ -21,6 +20,7 @@ import {
   SEARCH_FORM_PARAMS_PURPOSE,
   SEARCH_FORM_PARAMS_UNIT,
 } from "../../modules/queries/params";
+import { RESERVATION_UNIT_TYPES } from "../../modules/queries/reservationUnit";
 
 type Props = {
   onSearch: (search: Record<string, string>) => void;
@@ -179,6 +179,16 @@ const SearchForm = ({
     },
   });
 
+  useQuery<Query>(RESERVATION_UNIT_TYPES, {
+    onCompleted: (res) => {
+      const types = res?.reservationUnitTypes?.edges?.map(({ node }) => ({
+        id: String(node.pk),
+        name: getTranslation(node, "name"),
+      }));
+      setReservationUnitTypeOptions(mapOptions(sortBy(types, "name")));
+    },
+  });
+
   const { register, watch, handleSubmit, setValue, getValues } = useForm();
 
   useEffect(() => {
@@ -188,25 +198,6 @@ const SearchForm = ({
     register({ name: "reservationUnitType" });
     register({ name: "purposes" });
   }, [register]);
-
-  useEffect(() => {
-    async function fetchData() {
-      const fetchedReservationUnitTypes = await getParameters(
-        "reservation_unit_type"
-      );
-
-      setReservationUnitTypeOptions(
-        mapOptions(
-          fetchedReservationUnitTypes.map((n) => ({
-            id: String(n.id),
-            name: n.name,
-          }))
-        )
-      );
-    }
-
-    fetchData();
-  }, [t]);
 
   useEffect(() => {
     Object.keys(formValues).forEach((p) => setValue(p, formValues[p]));
