@@ -1,16 +1,11 @@
 import React from "react";
 import { Select } from "hds-react";
-import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 
 type OptionType = {
   label: string;
   value: string;
 };
-
-const StyledSelect = styled(Select)`
-  padding-bottom: var(--spacing-m);
-`;
 
 const EnumSelect = ({
   id,
@@ -38,7 +33,7 @@ const EnumSelect = ({
   }));
 
   return (
-    <StyledSelect
+    <Select
       label={label}
       required={required}
       options={options}
