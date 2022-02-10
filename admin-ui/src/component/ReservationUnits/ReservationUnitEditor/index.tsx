@@ -33,14 +33,8 @@ import {
   ReservationUnitsReservationUnitAuthenticationChoices,
 } from "../../../common/gql-types";
 import {
-  CREATE_RESERVATION_UNIT,
   RESERVATION_UNIT_EDITOR_PARAMETERS,
-  RESERVATIONUNIT_QUERY,
   UNIT_WITH_SPACES_AND_RESOURCES,
-  UPDATE_RESERVATION_UNIT,
-  CREATE_IMAGE,
-  DELETE_IMAGE,
-  UPDATE_IMAGE_TYPE,
 } from "../../../common/queries";
 import { OptionType } from "../../../common/types";
 import { ContentContainer } from "../../../styles/layout";
@@ -69,6 +63,14 @@ import {
 } from "./reservationUnitEditor";
 import { IProps, ReservationUnitEditorType, State } from "./types";
 import { getInitialState, i18nFields, reducer } from "./reducer";
+import {
+  CREATE_IMAGE,
+  CREATE_RESERVATION_UNIT,
+  DELETE_IMAGE,
+  RESERVATIONUNIT_QUERY,
+  UPDATE_IMAGE_TYPE,
+  UPDATE_RESERVATION_UNIT,
+} from "./queries";
 
 const bufferTimeOptions = [
   { value: 900, label: "15 minuuttia" },
