@@ -49,7 +49,7 @@ const Head = ({
         <Heading>{heading}</Heading>
         {children || null}
       </Content>
-      <StyledKoros flipHorizontal className="koros" type="storm" />
+      <StyledKoros flipHorizontal className="koros" type="pulse" />
     </Container>
   );
 };

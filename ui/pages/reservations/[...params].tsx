@@ -287,7 +287,7 @@ const ReservationCancellation = ({
             </Heading>
           </HeadColumns>
         </HeadWrapper>
-        <StyledKoros className="koros" type="wave" />
+        <StyledKoros className="koros" type="pulse" />
       </Head>
       {formState === "unsent" ? (
         <Body>

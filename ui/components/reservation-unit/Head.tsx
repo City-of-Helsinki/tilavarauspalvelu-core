@@ -283,7 +283,7 @@ const Head = ({
           </JustForDesktop>
         </RightContainer>
       </Container>
-      <StyledKoros className="koros" type="wave" />
+      <StyledKoros className="koros" type="pulse" />
     </TopContainer>
   );
 };

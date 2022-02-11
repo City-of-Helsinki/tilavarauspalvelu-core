@@ -120,7 +120,7 @@ const Search = (): JSX.Element => {
           <SearchForm onSearch={onSearch} formValues={values} />
         </Container>
       </HeadContainer>
-      <StyledKoros type="wave" className="koros" flipHorizontal />
+      <StyledKoros type="pulse" className="koros" flipHorizontal />
       <ClientOnly>
         {state === "loading" ? (
           <CenterSpinner style={{ marginTop: "var(--spacing-layout-xl)" }} />

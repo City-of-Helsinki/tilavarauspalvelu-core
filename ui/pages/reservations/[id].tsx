@@ -277,7 +277,7 @@ const Reservation = ({ reservation, termsOfUse }: Props): JSX.Element => {
             </div>
           </HeadColumns>
         </HeadWrapper>
-        <StyledKoros className="koros" type="wave" />
+        <StyledKoros className="koros" type="pulse" />
       </Head>
       <BodyContainer>
         <H2>{t(subHeadingSlug)}</H2>
