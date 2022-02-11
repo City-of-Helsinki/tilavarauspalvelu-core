@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import styled from "styled-components";
 import { getParameters } from "../../modules/api";
 import {
   Application,
@@ -25,6 +26,10 @@ const typeForm = {
   community: "organisation",
 };
 
+const Wrapper = styled.div`
+  margin-bottom: var(--spacing-layout-l);
+`;
+
 const Page3 = ({ onNext, application }: Props): JSX.Element | null => {
   const [activeForm, setActiveForm] = useState(
     (application.applicantType
@@ -49,7 +54,7 @@ const Page3 = ({ onNext, application }: Props): JSX.Element | null => {
   }, []);
 
   return state !== "loading" ? (
-    <>
+    <Wrapper>
       {activeForm === "individual" ? (
         <IndividualForm
           activeForm={activeForm}
@@ -80,7 +85,7 @@ const Page3 = ({ onNext, application }: Props): JSX.Element | null => {
           {null}
         </RadioButtons>
       ) : null}
-    </>
+    </Wrapper>
   ) : (
     <CenterSpinner />
   );

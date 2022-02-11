@@ -23,6 +23,7 @@ import { reservationUnitPath } from "../../modules/const";
 import { getAddress, getMainImage, localizedValue } from "../../modules/util";
 import IconWithText from "../common/IconWithText";
 import { MediumButton, pixel } from "../../styles/util";
+import { fontMedium } from "../../modules/style/typography";
 
 const Container = styled.div`
   width: 100%;
@@ -231,6 +232,10 @@ const Filters = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--spacing-m);
+
+  label {
+    ${fontMedium}
+  }
 `;
 
 const ButtonContainer = styled.div`

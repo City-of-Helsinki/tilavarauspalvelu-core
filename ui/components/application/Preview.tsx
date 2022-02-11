@@ -35,7 +35,7 @@ const mapArrayById = (
 const ButtonContainer = styled.div`
   display: flex;
   flex-direction: row;
-  margin-top: var(--spacing-layout-l);
+  margin: var(--spacing-layout-l) 0;
   justify-content: flex-end;
 
   button {
@@ -224,7 +224,7 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
                     } - ${ageGroupOptions[applicationEvent.ageGroupId].maximum}`
                   : ""
               }
-            />{" "}
+            />
             <LabelValue
               label={t("application:preview.applicationEvent.purpose")}
               value={
@@ -235,7 +235,7 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
                     )
                   : ""
               }
-            />{" "}
+            />
             <LabelValue
               label={t("application:preview.applicationEvent.begin")}
               value={applicationEvent.begin || ""}
@@ -256,10 +256,11 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
               label={t("application:preview.applicationEvent.eventsPerWeek")}
               value={applicationEvent.eventsPerWeek}
             />
-            <LabelValue
+            <div />
+            {/* <LabelValue
               label={t("application:preview.applicationEvent.biweekly")}
               value={t(`common:${applicationEvent.biweekly}`) as string}
-            />
+            /> */}
             {applicationEvent.eventReservationUnits.map(
               (reservationUnit, index) => (
                 <LabelValue

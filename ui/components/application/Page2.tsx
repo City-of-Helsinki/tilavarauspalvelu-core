@@ -27,10 +27,14 @@ const Notification = styled(HDSNotification)`
   z-index: 0;
 `;
 
+const StyledNotification = styled(Notification)`
+  margin-top: var(--spacing-m);
+`;
+
 const ButtonContainer = styled.div`
   display: flex;
   flex-direction: row;
-  margin-top: var(--spacing-layout-l);
+  margin: var(--spacing-layout-l) 0;
   justify-content: flex-end;
 
   @media (max-width: ${breakpoint.m}) {
@@ -117,7 +121,7 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
         >
           {t(msg)}
         </Notification>
-      ) : null}{" "}
+      ) : null}
       {application.applicationEvents.map((event, index) => {
         return (
           <Accordion
@@ -126,7 +130,7 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
             id={`timeSelector-${index}`}
             heading={event.name || undefined}
           >
-            <Notification
+            <StyledNotification
               label={t("application:Page2.info")}
               size="small"
               type="info"
@@ -140,7 +144,7 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
                   {" "}
                 </a>
               </Trans>
-            </Notification>{" "}
+            </StyledNotification>
             <TimeSelector
               key={event.id || "NEW"}
               index={index}

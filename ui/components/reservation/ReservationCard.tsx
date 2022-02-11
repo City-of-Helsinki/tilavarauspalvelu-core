@@ -74,6 +74,7 @@ const Details = styled.div`
 
 const Name = styled.span`
   font-size: var(--fontsize-heading-m);
+  font-family: var(--font-bold);
   font-weight: 700;
   margin-bottom: 0;
 

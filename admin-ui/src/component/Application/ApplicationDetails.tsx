@@ -360,10 +360,10 @@ function ApplicationDetails(): JSX.Element | null {
                       label={t("ApplicationEvent.eventsPerWeek")}
                       value={`${applicationEvent.eventsPerWeek}`}
                     />
-                    <ValueBox
+                    {/* <ValueBox
                       label={t("ApplicationEvent.biweekly")}
                       value={t(`common.${applicationEvent.biweekly}`)}
-                    />
+                    /> */}
                     {applicationEvent.eventReservationUnits.map(
                       (reservationUnit, index) => (
                         <ValueBox
