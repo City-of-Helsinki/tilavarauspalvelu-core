@@ -558,6 +558,14 @@ class ReservationDenySerializer(PrimaryKeySerializer):
 
         return data
 
+    def save(self, **kwargs):
+        instance = super().save(**kwargs)
+        if instance.state in RESERVATION_STATE_EMAIL_TYPE_MAP.keys():
+            send_reservation_email_task.delay(
+                instance.id, RESERVATION_STATE_EMAIL_TYPE_MAP[instance.state]
+            )
+        return instance
+
 
 class ReservationApproveSerializer(PrimaryKeySerializer):
     handling_details = serializers.CharField(
