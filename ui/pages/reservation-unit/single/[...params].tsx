@@ -704,7 +704,7 @@ const ReservationUnitReservation = ({
             </div>
           </HeadColumns>
         </HeadWrapper>
-        <StyledKoros className="koros" type="wave" />
+        <StyledKoros className="koros" type="pulse" />
       </Head>
       {formStatus === "pending" && (
         <BodyContainer>

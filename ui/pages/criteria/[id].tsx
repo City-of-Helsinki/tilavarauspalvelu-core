@@ -30,11 +30,12 @@ export const getServerSideProps: GetServerSideProps = async ({
 };
 
 const Head = styled.div`
-  background-color: var(--color-white);
+  background-color: var(--tilavaraus-hero-background-color);
+  color: var(--color-white);
 `;
 
 const HeadContent = styled.div`
-  padding: var(--spacing-l) var(--spacing-m) 0;
+  padding: var(--spacing-l) var(--spacing-m) var(--spacing-l);
   max-width: var(--container-width-xl);
   margin: 0 auto var(--spacing-2-xl) auto;
   font-size: var(--fontsize-body-xl);
@@ -66,7 +67,7 @@ const Criteria = ({ applicationRound }: Props): JSX.Element => {
             {`${applicationRound?.name} ${t("applicationRound:criteria")}`}
           </H1>
         </HeadContent>
-        <StyledKoros className="koros" type="wave" />
+        <StyledKoros className="koros" type="pulse" />
       </Head>
       <Container>
         <Content>

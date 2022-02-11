@@ -16,6 +16,7 @@ import { LIST_RESERVATIONS } from "../../modules/queries/reservation";
 import ReservationCard from "../../components/reservation/ReservationCard";
 import { fontMedium } from "../../modules/style/typography";
 import { breakpoint } from "../../modules/style";
+import Head from "../../components/reservations/Head";
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   const { data } = await apolloClient.query<Query, QueryReservationsArgs>({
@@ -97,55 +98,58 @@ const Reservations = ({ reservations }: Props): JSX.Element => {
   );
 
   return (
-    <Wrapper>
-      <Heading>
-        <Tabs>
-          <StyledTabList>
-            <StyledTab>
-              {t("reservations:upcomingReservations")} (
-              {upcomingReservations.length})
-            </StyledTab>
-            <StyledTab>
-              {t("reservations:pastReservations")} ({pastReservations.length})
-            </StyledTab>
-          </StyledTabList>
-          <StyledTabPanel>
-            {upcomingReservations.length > 0 ? (
-              upcomingReservations?.map((reservation) => (
-                <ReservationCard
-                  key={reservation.pk}
-                  reservation={reservation}
-                  type={
-                    reservation.state === "REQUIRES_HANDLING"
-                      ? "requiresHandling"
-                      : "upcoming"
-                  }
-                />
-              ))
-            ) : (
-              <EmptyMessage>
-                {t("reservations:noUpcomingReservations")}
-              </EmptyMessage>
-            )}
-          </StyledTabPanel>
-          <StyledTabPanel>
-            {pastReservations.length > 0 ? (
-              pastReservations?.map((reservation) => (
-                <ReservationCard
-                  key={reservation.pk}
-                  reservation={reservation}
-                  type="past"
-                />
-              ))
-            ) : (
-              <EmptyMessage>
-                {t("reservations:noPastReservations")}
-              </EmptyMessage>
-            )}
-          </StyledTabPanel>
-        </Tabs>
-      </Heading>
-    </Wrapper>
+    <>
+      <Head heading={t(`navigation:Item.reservations`)} />
+      <Wrapper>
+        <Heading>
+          <Tabs>
+            <StyledTabList>
+              <StyledTab>
+                {t("reservations:upcomingReservations")} (
+                {upcomingReservations.length})
+              </StyledTab>
+              <StyledTab>
+                {t("reservations:pastReservations")} ({pastReservations.length})
+              </StyledTab>
+            </StyledTabList>
+            <StyledTabPanel>
+              {upcomingReservations.length > 0 ? (
+                upcomingReservations?.map((reservation) => (
+                  <ReservationCard
+                    key={reservation.pk}
+                    reservation={reservation}
+                    type={
+                      reservation.state === "REQUIRES_HANDLING"
+                        ? "requiresHandling"
+                        : "upcoming"
+                    }
+                  />
+                ))
+              ) : (
+                <EmptyMessage>
+                  {t("reservations:noUpcomingReservations")}
+                </EmptyMessage>
+              )}
+            </StyledTabPanel>
+            <StyledTabPanel>
+              {pastReservations.length > 0 ? (
+                pastReservations?.map((reservation) => (
+                  <ReservationCard
+                    key={reservation.pk}
+                    reservation={reservation}
+                    type="past"
+                  />
+                ))
+              ) : (
+                <EmptyMessage>
+                  {t("reservations:noPastReservations")}
+                </EmptyMessage>
+              )}
+            </StyledTabPanel>
+          </Tabs>
+        </Heading>
+      </Wrapper>
+    </>
   );
 };
 

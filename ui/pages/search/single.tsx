@@ -206,7 +206,7 @@ const SearchSingle = (): JSX.Element => {
           />
         </Container>
       </HeadContainer>
-      <StyledKoros type="wave" className="koros" flipHorizontal />
+      <StyledKoros type="pulse" className="koros" flipHorizontal />
       {loading ? (
         <CenterSpinner style={{ marginTop: "var(--spacing-xl)" }} />
       ) : (

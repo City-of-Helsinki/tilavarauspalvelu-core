@@ -43,7 +43,8 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
 const Wrapper = styled.div``;
 
 const HeadWrapper = styled.div`
-  background-color: var(--tilavaraus-header-background-color);
+  background-color: var(--tilavaraus-hero-background-color);
+  color: var(--color-white);
 `;
 
 const Head = styled.div`
@@ -65,7 +66,7 @@ const Ingress = styled.p``;
 
 const StyledKoros = styled(Koros)`
   width: 100%;
-  background-color: var(--tilavaraus-header-background-color);
+  background-color: var(--tilavaraus-hero-background-color);
   fill: var(--tilavaraus-gray);
 `;
 
@@ -170,7 +171,7 @@ const RecurringLander = ({ applicationRounds }: Props): JSX.Element => {
           <Ingress>{t("recurringLander:ingress")}</Ingress>
         </Head>
       </HeadWrapper>
-      <StyledKoros type="wave" />
+      <StyledKoros type="pulse" />
       <Content>
         {activeApplicationRounds?.length > 0 && (
           <RoundList>
