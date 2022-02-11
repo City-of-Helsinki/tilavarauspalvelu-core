@@ -54,6 +54,7 @@ export const RESERVATION_UNIT = gql`
       unit {
         id
         pk
+        tprekId
         nameFi
         nameEn
         nameSv

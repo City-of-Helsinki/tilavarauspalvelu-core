@@ -3,7 +3,11 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { getTranslation } from "../../modules/util";
 import ExternalLink from "./ExternalLink";
-import { LocationType, ReservationUnitByPkType } from "../../modules/gql-types";
+import {
+  LocationType,
+  ReservationUnitByPkType,
+  UnitType,
+} from "../../modules/gql-types";
 
 type Props = {
   reservationUnit: ReservationUnitByPkType;
@@ -60,15 +64,12 @@ const googleUrl = (location: LocationType): string | null => {
   )},${getTranslation(location, "addressCity")}`;
 };
 
-const mapUrl = (location: LocationType): string | null => {
-  if (!location) {
+const mapUrl = (unit: UnitType): string | null => {
+  if (!unit?.tprekId) {
     return null;
   }
 
-  return `https://maps.google.com/?q=${getTranslation(
-    location,
-    "addressStreet"
-  )},${getTranslation(location, "addressCity")}`;
+  return `https://palvelukartta.hel.fi/fi/unit/${unit.tprekId}`;
 };
 
 const Address = ({ reservationUnit }: Props): JSX.Element => {
@@ -83,7 +84,7 @@ const Address = ({ reservationUnit }: Props): JSX.Element => {
   }
 
   return (
-    <Container>
+    <Container data-testid="reservation-unit__address--container">
       <Name>{getTranslation(reservationUnit, "name")}</Name>
       {addressStreet && <AddressLine>{addressStreet}</AddressLine>}
       {location?.addressZip && addressCity && (
@@ -91,7 +92,7 @@ const Address = ({ reservationUnit }: Props): JSX.Element => {
       )}
       <Links>
         <ExternalLink
-          href={mapUrl(location)}
+          href={mapUrl(reservationUnit.unit)}
           name={t("reservationUnit:linkMap")}
         />
         <ExternalLink
