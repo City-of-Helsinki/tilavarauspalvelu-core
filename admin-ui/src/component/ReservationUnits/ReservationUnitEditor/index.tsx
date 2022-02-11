@@ -12,6 +12,7 @@ import {
   TextInput,
 } from "hds-react";
 import { get, omitBy, pick, sumBy, upperFirst } from "lodash";
+import i18next from "i18next";
 import React, { useEffect, useReducer, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams, useHistory } from "react-router-dom";
@@ -84,7 +85,16 @@ const durationOptions = [
   { value: 1800, label: "30 minuuttia" },
   { value: 3600, label: "60 minuuttia" },
   { value: 5400, label: "90 minuuttia" },
-];
+].concat(
+  Array.from({ length: (23 - 2) * 2 + 1 })
+    .map((v, i) => 3600 * 2 + i * 1800)
+    .map((v) => ({
+      value: v,
+      label: i18next.t("ReservationUnitEditor.durationHours", {
+        hours: (v / 3600).toLocaleString("fi"),
+      }),
+    }))
+);
 
 const getSelectedOptions = (
   state: State,
