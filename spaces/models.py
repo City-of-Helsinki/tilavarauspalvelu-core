@@ -72,6 +72,9 @@ class UnitGroup(models.Model):
     name = models.CharField(verbose_name=_("Name"), max_length=255)
     units = models.ManyToManyField("Unit", related_name="unit_groups")
 
+    def __str__(self):
+        return f"{self.name}"
+
 
 class Unit(models.Model):
     """
