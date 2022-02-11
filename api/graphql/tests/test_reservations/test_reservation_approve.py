@@ -4,9 +4,13 @@ from decimal import Decimal
 
 import freezegun
 from assertpy import assert_that
+from django.core import mail
+from django.test import override_settings
 from django.utils.timezone import get_default_timezone
 
 from api.graphql.tests.test_reservations.base import ReservationTestCaseBase
+from email_notification.models import EmailType
+from email_notification.tests.factories import EmailTemplateFactory
 from reservations.models import STATE_CHOICES
 from reservations.tests.factories import (
     ReservationFactory,
@@ -31,6 +35,12 @@ class ReservationApproveTestCase(ReservationTestCaseBase):
             ),
             state=STATE_CHOICES.REQUIRES_HANDLING,
             user=self.regular_joe,
+            reservee_email="email@reservee",
+        )
+        EmailTemplateFactory(
+            type=EmailType.RESERVATION_HANDLED_AND_CONFIRMED,
+            content="",
+            subject="approved",
         )
 
     def get_handle_query(self):
@@ -53,6 +63,11 @@ class ReservationApproveTestCase(ReservationTestCaseBase):
             "price": 10.59,  # This floating point number will float somewhere 10.58999...
         }
 
+    @override_settings(
+        CELERY_TASK_ALWAYS_EAGER=True,
+        SEND_RESERVATION_NOTIFICATION_EMAILS=True,
+        EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
+    )
     def test_approve_success_when_admin(self):
         self.client.force_login(self.general_admin)
         input_data = self.get_valid_approve_data()
@@ -73,6 +88,8 @@ class ReservationApproveTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.price).is_equal_to(
             Decimal("10.59")
         )  # Float does not cause abnormality.
+        assert_that(len(mail.outbox)).is_equal_to(1)
+        assert_that(mail.outbox[0].subject).is_equal_to("approved")
 
     def test_cant_approve_if_regular_user(self):
         self.client.force_login(self.regular_joe)
@@ -114,6 +131,10 @@ class ReservationApproveTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.REQUIRES_HANDLING)
         assert_that(self.reservation.handling_details).is_empty()
 
+    @override_settings(
+        CELERY_TASK_ALWAYS_EAGER=True,
+        SEND_RESERVATION_NOTIFICATION_EMAILS=False,
+    )
     def test_handling_details_saves_to_working_memo_also(self):
         self.client.force_login(self.general_admin)
         input_data = self.get_valid_approve_data()
