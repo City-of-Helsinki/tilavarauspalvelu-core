@@ -17,6 +17,7 @@ from permissions.helpers import (
     can_manage_spaces,
     can_manage_units,
     can_manage_units_reservation_units,
+    can_manage_units_spaces,
     can_modify_reservation,
     can_view_recurring_reservation,
 )
@@ -210,6 +211,14 @@ class SpacePermission(BasePermission):
 
     @classmethod
     def has_mutation_permission(cls, root: Any, info: ResolveInfo, input: dict) -> bool:
+        unit_id = input.get("unit_pk")
+        if unit_id:
+            try:
+                unit = Unit.objects.get(id=unit_id)
+            except Unit.DoesNotExist:
+                pass
+            else:
+                return can_manage_units_spaces(info.context.user, unit)
         return can_manage_spaces(info.context.user)
 
 

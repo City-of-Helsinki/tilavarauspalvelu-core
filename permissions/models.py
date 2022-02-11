@@ -114,6 +114,10 @@ UNIT_PERMISSIONS = (
     ),
     ("can_validate_applications", _("Can validate applications")),
     ("can_manage_units", _("Can edit unit information")),
+    (
+        "can_manage_spaces",
+        _("Can create, edit and delete spaces in the unit"),
+    ),
 )
 
 SERVICE_SECTOR_PERMISSIONS = (
@@ -143,6 +147,10 @@ SERVICE_SECTOR_PERMISSIONS = (
     (
         "can_allocate_applications",
         _("Can allocate applications in the service sector"),
+    ),
+    (
+        "can_manage_spaces",
+        _("Can create, edit and delete spaces in the service sector"),
     ),
 )
 
