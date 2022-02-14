@@ -4,13 +4,7 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import styled from "styled-components";
 import router from "next/router";
 import { get, isFinite } from "lodash";
-import {
-  Accordion,
-  IconArrowLeft,
-  IconCrossCircle,
-  IconPen,
-  Koros,
-} from "hds-react";
+import { Accordion, IconArrowLeft, IconCrossCircle, IconPen } from "hds-react";
 import { Trans, useTranslation } from "react-i18next";
 import {
   Query,
@@ -40,6 +34,7 @@ import {
   ReserveeType,
 } from "../../modules/reservation";
 import { TERMS_OF_USE } from "../../modules/queries/reservationUnit";
+import KorosPulseEasy from "../../components/common/KorosPulseEasy";
 
 type Props = {
   reservation: ReservationType;
@@ -129,9 +124,8 @@ const Actions = styled.div`
   }
 `;
 
-const StyledKoros = styled(Koros)`
+const StyledKoros = styled(KorosPulseEasy)`
   margin-top: var(--spacing-layout-xl);
-  fill: var(--tilavaraus-gray);
 `;
 
 const BodyContainer = styled(NarrowCenteredContainer)`
@@ -277,7 +271,7 @@ const Reservation = ({ reservation, termsOfUse }: Props): JSX.Element => {
             </div>
           </HeadColumns>
         </HeadWrapper>
-        <StyledKoros className="koros" type="pulse" />
+        <StyledKoros from="white" to="var(--tilavaraus-gray)" />
       </Head>
       <BodyContainer>
         <H2>{t(subHeadingSlug)}</H2>

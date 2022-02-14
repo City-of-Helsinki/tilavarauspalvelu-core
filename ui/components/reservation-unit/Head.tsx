@@ -7,7 +7,6 @@ import {
   IconInfoCircle,
   IconPlus,
   IconTicket,
-  Koros,
 } from "hds-react";
 import { parseISO } from "date-fns";
 import React from "react";
@@ -29,6 +28,7 @@ import {
 import { MediumButton } from "../../styles/util";
 import { ReservationUnitByPkType } from "../../modules/gql-types";
 import { getPrice } from "../../modules/reservationUnit";
+import KorosPulseEasy from "../common/KorosPulseEasy";
 
 interface PropsType {
   reservationUnit: ReservationUnitByPkType;
@@ -102,9 +102,8 @@ const ThinButton = styled(MediumButton).attrs({
   height: 35px;
 `;
 
-const StyledKoros = styled(Koros)`
+const StyledKorosPulseEasy = styled(KorosPulseEasy)`
   margin-top: var(--spacing-l);
-  fill: var(--tilavaraus-gray);
 `;
 
 const Head = ({
@@ -283,7 +282,7 @@ const Head = ({
           </JustForDesktop>
         </RightContainer>
       </Container>
-      <StyledKoros className="koros" type="pulse" />
+      <StyledKorosPulseEasy from="white" to="var(--tilavaraus-gray)" />
     </TopContainer>
   );
 };

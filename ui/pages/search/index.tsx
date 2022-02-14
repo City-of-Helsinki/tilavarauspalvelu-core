@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { Koros } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import queryString from "query-string";
@@ -20,6 +19,7 @@ import { isBrowser, searchPrefix } from "../../modules/const";
 import { CenterSpinner } from "../../components/common/common";
 import ClientOnly from "../../components/ClientOnly";
 import { H1 } from "../../modules/style/typography";
+import KorosPulseEasy from "../../components/common/KorosPulseEasy";
 
 const Wrapper = styled.div`
   margin-bottom: var(--spacing-layout-xl);
@@ -44,8 +44,7 @@ const Ingress = styled.div`
   margin-bottom: var(--spacing-layout-s);
 `;
 
-const StyledKoros = styled(Koros)`
-  fill: white;
+const StyledKoros = styled(KorosPulseEasy)`
   margin-bottom: var(--spacing-layout-l);
 `;
 
@@ -120,7 +119,7 @@ const Search = (): JSX.Element => {
           <SearchForm onSearch={onSearch} formValues={values} />
         </Container>
       </HeadContainer>
-      <StyledKoros type="pulse" className="koros" flipHorizontal />
+      <StyledKoros from="white" to="var(--tilavaraus-gray)" />
       <ClientOnly>
         {state === "loading" ? (
           <CenterSpinner style={{ marginTop: "var(--spacing-layout-xl)" }} />

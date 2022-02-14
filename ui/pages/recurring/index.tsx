@@ -2,7 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import { useRouter } from "next/router";
 import { GetServerSideProps } from "next";
-import { IconSearch, ImageWithCard, Koros } from "hds-react";
+import { IconSearch, ImageWithCard } from "hds-react";
 import { sortBy } from "lodash";
 import { useTranslation } from "react-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
@@ -14,6 +14,7 @@ import ApplicationRoundCard from "../../components/index/ApplicationRoundCard";
 import { applicationRoundState } from "../../modules/util";
 import { MediumButton } from "../../styles/util";
 import { searchPrefix } from "../../modules/const";
+import KorosPulseEasy from "../../components/common/KorosPulseEasy";
 
 type Props = {
   applicationRounds: ApplicationRound[];
@@ -63,12 +64,6 @@ const Heading = styled(H1)`
 `;
 
 const Ingress = styled.p``;
-
-const StyledKoros = styled(Koros)`
-  width: 100%;
-  background-color: var(--tilavaraus-hero-background-color);
-  fill: var(--tilavaraus-gray);
-`;
 
 const Content = styled.div`
   padding: var(--spacing-s) var(--spacing-m) var(--spacing-xl);
@@ -171,7 +166,10 @@ const RecurringLander = ({ applicationRounds }: Props): JSX.Element => {
           <Ingress>{t("recurringLander:ingress")}</Ingress>
         </Head>
       </HeadWrapper>
-      <StyledKoros type="pulse" />
+      <KorosPulseEasy
+        from="var(--tilavaraus-hero-background-color)"
+        to="var(--tilavaraus-gray)"
+      />
       <Content>
         {activeApplicationRounds?.length > 0 && (
           <RoundList>

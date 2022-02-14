@@ -11,7 +11,6 @@ import {
   IconCheck,
   IconCrossCircle,
   IconPlusCircle,
-  Koros,
   Notification,
   Select,
   TextArea,
@@ -48,6 +47,7 @@ import { TwoColumnContainer } from "../../components/common/common";
 import { MediumButton } from "../../styles/util";
 import { OptionType } from "../../modules/types";
 import { emptyOption, reservationUnitSinglePrefix } from "../../modules/const";
+import KorosPulseEasy from "../../components/common/KorosPulseEasy";
 
 type Props = {
   reservation: ReservationType;
@@ -154,9 +154,7 @@ const Actions = styled.div`
   }
 `;
 
-const StyledKoros = styled(Koros)`
-  fill: var(--tilavaraus-gray);
-
+const StyledKoros = styled(KorosPulseEasy)`
   @media (min-width: ${breakpoint.m}) {
     margin-top: var(--spacing-layout-xl);
   }
@@ -287,7 +285,7 @@ const ReservationCancellation = ({
             </Heading>
           </HeadColumns>
         </HeadWrapper>
-        <StyledKoros className="koros" type="pulse" />
+        <StyledKoros from="white" to="var(--tilavaraus-gray)" />
       </Head>
       {formState === "unsent" ? (
         <Body>

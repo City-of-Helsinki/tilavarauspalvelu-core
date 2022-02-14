@@ -1,6 +1,6 @@
 import React from "react";
-import { Koros } from "hds-react";
 import styled from "styled-components";
+import KorosPulseEasy from "../common/KorosPulseEasy";
 
 type Props = {
   heading: string;
@@ -22,18 +22,16 @@ const Content = styled.div`
   font-size: var(--fontsize-heading-m);
 `;
 
-const StyledKoros = styled(Koros)`
-  background-color: var(--tilavaraus-gray);
-  fill: var(--tilavaraus-hero-background-color);
-`;
-
 const Head = ({ heading }: Props): JSX.Element => {
   return (
     <Container>
       <Content>
         <Heading>{heading}</Heading>
       </Content>
-      <StyledKoros flipHorizontal className="koros" type="pulse" />
+      <KorosPulseEasy
+        from="var(--tilavaraus-hero-background-color)"
+        to="var(--tilavaraus-gray)"
+      />
     </Container>
   );
 };

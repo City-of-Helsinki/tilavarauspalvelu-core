@@ -27,6 +27,7 @@ export const getStaticProps: GetStaticProps = async ({ locale }) => {
 
 const Container = styled.div`
   margin-top: var(--spacing-layout-m);
+  padding-bottom: var(--spacing-layout-xl);
   font-size: var(--fontsize-body-m);
   gap: var(--spacing-l);
   display: grid;
