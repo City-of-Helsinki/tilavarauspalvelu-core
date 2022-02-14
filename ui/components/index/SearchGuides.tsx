@@ -22,6 +22,7 @@ const StyledImageWithCard = styled(ImageWithCard)`
     --card-background-primary: var(--color-copper-medium-light);
     --card-background-secondary: var(--color-fog-medium-light);
     max-width: 100%;
+    width: unset;
     margin-bottom: var(--spacing-layout-xl);
 
     > :nth-child(2) > div {

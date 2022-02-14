@@ -1,8 +1,8 @@
 import React from "react";
-import { Koros } from "hds-react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import Breadcrumb from "../common/Breadcrumb";
+import KorosPulseEasy from "../common/KorosPulseEasy";
 
 type HeadProps = {
   heading: string;
@@ -26,9 +26,8 @@ const Content = styled.div`
   font-weight: 500;
 `;
 
-const StyledKoros = styled(Koros)`
-  background-color: var(--tilavaraus-gray);
-  fill: var(--tilavaraus-header-background-color);
+const StyledKoros = styled(KorosPulseEasy)`
+  margin-top: var(--spacing-layout-m);
 `;
 
 const Head = ({
@@ -49,7 +48,7 @@ const Head = ({
         <Heading>{heading}</Heading>
         {children || null}
       </Content>
-      <StyledKoros flipHorizontal className="koros" type="pulse" />
+      <StyledKoros from="white" to="var(--tilavaraus-gray)" />
     </Container>
   );
 };

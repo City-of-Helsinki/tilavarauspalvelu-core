@@ -24,9 +24,7 @@ type MenuItem = {
 const languageOptions: LanguageOption[] = [{ label: "Suomeksi", value: "fi" }];
 
 const StyledNavigation = styled(HDSNavigation)`
-  --header-background-color: var(
-    --tilavaraus-header-background-color
-  )
+  --header-background-color: var(--tilavaraus-header-background-color);
   --header-divider-color: var(--color-black-20);
 
   color: var(--tilavaraus-header-color);

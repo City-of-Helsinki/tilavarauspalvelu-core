@@ -5,6 +5,8 @@ import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { breakpoint } from "../../modules/style";
 import { singleSearchPrefix } from "../../modules/const";
+import Container from "../common/Container";
+import { fontRegular } from "../../modules/style/typography";
 
 interface HeadProps {
   heading: string;
@@ -13,11 +15,32 @@ interface HeadProps {
 
 const Wrapper = styled.div`
   width: 100%;
+  background-color: var(--tilavaraus-hero-background-color);
+  color: var(--color-white);
+  font-size: var(--fontsize-heading-s);
+`;
+
+const Content = styled(Container)`
+  display: grid;
+  padding: var(--spacing-layout-l) var(--spacing-m) var(--spacing-layout-m);
 
   @media (min-width: ${breakpoint.m}) {
-    background-image: url("images/hero-front@1x.jpg");
+    padding: var(--spacing-layout-xl) var(--spacing-m) var(--spacing-layout-xl);
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-3-xl);
+    min-height: 380px;
+  }
+`;
+
+const Image = styled.div`
+  display: none;
+
+  @media (min-width: ${breakpoint.m}) {
+    display: block;
+    background-image: url("/images/hero-front@1x.jpg");
     background-size: cover;
-    background-color: var(--color-black);
+    max-width: 100%;
+    height: 100%;
 
     @media (-webkit-min-device-pixel-ratio: 2) {
       background-image: url("images/hero-front@2x.jpg");
@@ -25,33 +48,10 @@ const Wrapper = styled.div`
   }
 `;
 
-const Content = styled.div`
-  font-size: var(--fontsize-body-xl);
-  background-color: var(--tilavaraus-header-background-color);
-  padding: var(--spacing-m) 0 var(--spacing-xl);
-
-  @media (min-width: ${breakpoint.m}) {
-    background-color: transparent;
-    display: flex;
-    max-width: var(--container-width-xl);
-    padding: var(--spacing-layout-xl) var(--spacing-m) var(--spacing-3-xl);
-    justify-content: center;
-    margin: 0 auto;
-    padding-bottom: var(--spacing-layout-2-xl);
-  }
-`;
-
-const Box = styled.div`
-  padding: var(--spacing-m) var(--spacing-s) 0;
-  font-family: var(--font-regular);
-
-  @media (min-width: ${breakpoint.m}) {
-    text-align: center;
-    background-color: rgba(0, 0, 0, 0.75);
-    width: 620px;
-    color: var(--color-white);
-    padding: var(--spacing-l) var(--spacing-3-xl) var(--spacing-3-xl);
-  }
+const Left = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 `;
 
 const StyledTextInput = styled(TextInput)`
@@ -60,6 +60,7 @@ const StyledTextInput = styled(TextInput)`
       border-color: var(--color-black-90);
       font-size: var(--fontsize-heading-xs);
       padding: 0 var(--spacing-layout-m) 0 var(--spacing-s);
+      --placeholder-color: var(--tilavaraus-content-text-color);
 
       @media (min-width: ${breakpoint.m}) {
         height: 80px;
@@ -69,7 +70,8 @@ const StyledTextInput = styled(TextInput)`
     }
   }
 
-  margin-top: var(--spacing-xl);
+  margin-top: var(--spacing-m);
+  max-width: 480px;
 
   label {
     svg {
@@ -84,26 +86,27 @@ const StyledTextInput = styled(TextInput)`
   }
 
   @media (min-width: ${breakpoint.m}) {
-    padding: var(--spacing-m);
+    max-width: unset;
 
     label {
       svg {
         --icon-size: var(--spacing-l) !important;
       }
 
-      right: var(--spacing-3-xl);
-      top: 37%;
+      right: var(--spacing-l);
+      top: 32%;
     }
   }
 `;
 
 const H1 = styled.h1`
-  font-size: var(--fontsize-heading-l);
+  ${fontRegular}
+  font-size: var(--fontsize-heading-xl);
   margin-top: 0;
   margin-bottom: 0;
 
   @media (min-width: ${breakpoint.m}) {
-    font-size: var(--fontsize-heading-xl);
+    font-size: 4rem;
   }
 `;
 
@@ -124,9 +127,11 @@ const Head = (props: HeadProps): JSX.Element => {
   return (
     <Wrapper>
       <Content>
-        <Box>
-          <H1>{props.heading}</H1>
-          <p>{props.text}</p>
+        <Left>
+          <div>
+            <H1>{props.heading}</H1>
+            <p>{props.text}</p>
+          </div>
           <form onSubmit={(e) => handleSubmit(e)}>
             <StyledTextInput
               id="searchInput--frontpage"
@@ -142,7 +147,8 @@ const Head = (props: HeadProps): JSX.Element => {
               }
             />
           </form>
-        </Box>
+        </Left>
+        <Image />
       </Content>
     </Wrapper>
   );

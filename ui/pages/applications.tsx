@@ -28,7 +28,7 @@ export async function getStaticProps({ locale }) {
 }
 
 const Container = styled.div`
-  padding: var(--spacing-l) var(--spacing-m) var(--spacing-m);
+  padding: 0 var(--spacing-m) var(--spacing-m);
   max-width: var(--container-width-xl);
   margin: 0 auto var(--spacing-2-xl) auto;
   font-size: var(--fontsize-body-xl);

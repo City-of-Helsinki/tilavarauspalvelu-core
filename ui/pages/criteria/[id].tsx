@@ -1,6 +1,5 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { Koros } from "hds-react";
 import { GetServerSideProps } from "next";
 import styled from "styled-components";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
@@ -9,6 +8,7 @@ import { getApplicationRound } from "../../modules/api";
 import { ApplicationRound } from "../../modules/types";
 import Sanitize from "../../components/common/Sanitize";
 import Breadcrumb from "../../components/common/Breadcrumb";
+import KorosPulseEasy from "../../components/common/KorosPulseEasy";
 
 type Props = {
   applicationRound: ApplicationRound;
@@ -45,10 +45,6 @@ const H1 = styled.h1`
   font-size: var(--fontsize-heading-l);
 `;
 
-const StyledKoros = styled(Koros)`
-  fill: var(--tilavaraus-gray);
-`;
-
 const Content = styled.div`
   max-width: var(--container-width-l);
   font-family: var(--font-regular);
@@ -67,7 +63,10 @@ const Criteria = ({ applicationRound }: Props): JSX.Element => {
             {`${applicationRound?.name} ${t("applicationRound:criteria")}`}
           </H1>
         </HeadContent>
-        <StyledKoros className="koros" type="pulse" />
+        <KorosPulseEasy
+          from="var(--tilavaraus-hero-background-color)"
+          to="var(--tilavaraus-gray)"
+        />
       </Head>
       <Container>
         <Content>

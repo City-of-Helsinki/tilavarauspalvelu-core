@@ -11,7 +11,6 @@ import { useMutation } from "@apollo/client";
 import router from "next/router";
 import { parseISO } from "date-fns";
 import {
-  Koros,
   Notification,
   TextInput,
   Checkbox,
@@ -89,6 +88,7 @@ import {
   AGE_GROUPS,
   RESERVATION_PURPOSES,
 } from "../../../modules/queries/params";
+import KorosPulseEasy from "../../../components/common/KorosPulseEasy";
 
 type Props = {
   reservationUnit: ReservationUnitType;
@@ -289,9 +289,8 @@ const Stepper = styled(StepperHz)`
   margin-bottom: var(--spacing-l);
 `;
 
-const StyledKoros = styled(Koros)`
-  margin-top: var(--spacing-l);
-  fill: var(--tilavaraus-gray);
+const StyledKoros = styled(KorosPulseEasy)`
+  margin-top: var(--spacing-layout-l);
 `;
 
 const BodyContainer = styled(NarrowCenteredContainer)`
@@ -704,7 +703,7 @@ const ReservationUnitReservation = ({
             </div>
           </HeadColumns>
         </HeadWrapper>
-        <StyledKoros className="koros" type="pulse" />
+        <StyledKoros from="white" to="var(--tilavaraus-gray)" />
       </Head>
       {formStatus === "pending" && (
         <BodyContainer>

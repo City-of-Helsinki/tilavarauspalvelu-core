@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { Koros } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { useQuery } from "@apollo/client";
 import { GetServerSideProps } from "next";
@@ -26,6 +25,7 @@ import { H1 } from "../../modules/style/typography";
 import { RESERVATION_UNITS } from "../../modules/queries/reservationUnit";
 import Sorting from "../../components/form/Sorting";
 import { OptionType } from "../../modules/types";
+import KorosPulseEasy from "../../components/common/KorosPulseEasy";
 
 const pagingLimit = 10;
 
@@ -46,16 +46,16 @@ const Subheading = styled.span`
   font-size: var(--fontsize-heading-s);
 `;
 
-const StyledKoros = styled(Koros)`
-  fill: white;
-`;
-
 const StyledSorting = styled(Sorting)`
   display: block;
 
   @media (min-width: 420px) {
     display: flex;
   }
+`;
+
+const StyledKorosPulseEasy = styled(KorosPulseEasy)`
+  padding-top: var(--spacing-l);
 `;
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
@@ -206,7 +206,7 @@ const SearchSingle = (): JSX.Element => {
           />
         </Container>
       </HeadContainer>
-      <StyledKoros type="pulse" className="koros" flipHorizontal />
+      <StyledKorosPulseEasy from="white" to="var(--tilavaraus-gray)" />
       {loading ? (
         <CenterSpinner style={{ marginTop: "var(--spacing-xl)" }} />
       ) : (
