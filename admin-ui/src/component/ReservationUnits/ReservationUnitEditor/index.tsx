@@ -205,10 +205,10 @@ const ReservationUnitEditor = (): JSX.Element | null => {
         "taxPercentagePk",
         "unitPk",
         "requireReservationHandling",
+        "contactInformation",
         ...i18nFields("additionalInstructions"),
         ...i18nFields("description"),
         ...i18nFields("name"),
-        ...i18nFields("contactInformation"),
         ...i18nFields("termsOfUse"),
       ]
     );
@@ -1267,34 +1267,19 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                       />
                     </Wide>
                   ))}
-                  {languages.map((lang) => (
-                    <Wide>
-                      <TextInput
-                        key={lang}
-                        required
-                        id={`contactInformation${lang}`}
-                        label={t(
-                          "ReservationUnitEditor.contactInformationLabel",
-                          {
-                            lang,
-                          }
-                        )}
-                        value={get(
-                          state,
-                          `reservationUnitEdit.contactInformation${upperFirst(
-                            lang
-                          )}`,
-                          ""
-                        )}
-                        onChange={(e) =>
-                          setValue({
-                            [`contactInformation${upperFirst(lang)}`]:
-                              e.target.value,
-                          })
-                        }
-                      />
-                    </Wide>
-                  ))}
+                  <Wide>
+                    <TextInput
+                      required
+                      id="contactInformation"
+                      label={t("ReservationUnitEditor.contactInformationLabel")}
+                      value={state.reservationUnitEdit.contactInformation || ""}
+                      onChange={(e) =>
+                        setValue({
+                          contactInformation: e.target.value,
+                        })
+                      }
+                    />
+                  </Wide>
                 </EditorGrid>
               </Accordion>
 
