@@ -19,7 +19,6 @@ class ReservationUnitTranslationOptions(TranslationOptions):
         "name",
         "description",
         "terms_of_use",
-        "contact_information",
         "additional_instructions",
     ]
 

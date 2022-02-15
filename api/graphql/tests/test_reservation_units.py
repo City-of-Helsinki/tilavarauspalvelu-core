@@ -161,7 +161,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
                             equipment {
                               nameFi
                             }
-                            contactInformationFi
+                            contactInformation
                             additionalInstructionsFi
                             additionalInstructionsSv
                             additionalInstructionsEn
@@ -1821,9 +1821,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
             "termsOfUseFi": "termsFi",
             "termsOfUseEn": "termsEn",
             "termsOfUseSv": "termsSv",
-            "contactInformationFi": "contactFi",
-            "contactInformationEn": "contactEn",
-            "contactInformationSv": "contactSv",
+            "contactInformation": "contact",
             "spacePks": [self.space.id],
             "resourcePks": [self.resource.id],
             "servicePks": [self.service.id],
@@ -2488,9 +2486,7 @@ class ReservationUnitUpdateNotDraftTestCase(ReservationUnitMutationsTestCaseBase
             terms_of_use_fi="Terms",
             terms_of_use_sv="Terms",
             terms_of_use_en="Terms",
-            contact_information_fi="Info",
-            contact_information_sv="Info",
-            contact_information_en="Info",
+            contact_information="Info",
             reservation_unit_type=cls.reservation_unit_type,
             unit=cls.unit,
         )
