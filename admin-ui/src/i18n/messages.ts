@@ -743,8 +743,13 @@ const translations: ITranslations = {
     resourceDeletedTitle: ["Resurssi poistettu"],
     resourceDeletedNotification: ["Resurssi poistettu onnistuneesti"],
   },
+  SpaceEditorView: {
+    illegalSpace: ["Virheellinen tilan tunniste"],
+    illegalUnit: ["Virheellinen toimipisteen tunniste"],
+  },
   SpaceEditor: {
     noParent: ["Päätason tila"],
+    noUnit: ["Tilaa ei ole liitetty toimipisteeseen"],
     noAddress: ["Toimipisteellä ei ole osoitetta"],
     noSurfaceArea: ["Pinta-alaa ei ole asetettu"],
     details: ["Tilan tiedot"],
@@ -754,13 +759,24 @@ const translations: ITranslations = {
     cancel: ["Palaa tallentamatta tietoja"],
     save: ["Tallenna tiedot"],
     saveFailed: ["Tallennus ei onnistunut"],
-    nameLabel: ["Tilan nimi {{lang}}"],
+    label: {
+      nameFi: ["Tilan nimi suomeksi"],
+      nameEn: ["Tilan nimi englanniksi"],
+      nameSv: ["Tilan nimi ruotsiksi"],
+      surfaceArea: ["Pinta-ala"],
+      maxPersons: ["Maksimihenkilömäärä"],
+    },
     namePlaceholder: ["Tilan nimi {{language}}"],
     touLabel: ["Tilan ohjeet {{lang}}"],
     termsOfUseHelperText: ["Tilan käyttöehdot..."],
     noMaxPersons: ["Henkilömäärää ei asetettu"],
     spaceUpdated: ["Tiedot tallennettu"],
     spaceUpdatedNotification: ["Tilan tiedot tallennettu"],
+    area: ["{{surfaceArea}} m²"],
+  },
+  FormErrorSummary: {
+    label: ["Korjaa ensin lomakkeen virheet"],
+    errorLabel: ["Virhe {{index}}"],
   },
   SpaceModal: {
     phase: ["Vaihe"],
@@ -1101,6 +1117,16 @@ const translations: ITranslations = {
       accept: ["Palauta käsiteltäväksi"],
       returned: ["Anomus palautettu käsiteltäväksi"],
       errorSaving: ["Palauttaminen ei onnistunut"],
+    },
+  },
+  validation: {
+    string: {
+      max: ["Kenttään {{fieldName}} voi lisätä korkeintaan {{limit}} merkkiä."],
+      empty: ["{{fieldName}} on pakollinen tieto"],
+    },
+    number: {
+      empty: ["{{fieldName}} on pakollinen tieto"],
+      min: ["{{fieldName}} pitää olla vähintään {{limit}}"],
     },
   },
 };

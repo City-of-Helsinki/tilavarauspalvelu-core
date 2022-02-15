@@ -3,11 +3,11 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
-import { UnitType } from "../../common/gql-types";
-import { parseAddress } from "../../common/util";
-import { ContentContainer, IngressContainer } from "../../styles/layout";
-import { breakpoints } from "../../styles/util";
-import LinkPrev from "../LinkPrev";
+import { UnitType } from "../../../common/gql-types";
+import { parseAddress } from "../../../common/util";
+import { ContentContainer, IngressContainer } from "../../../styles/layout";
+import { breakpoints } from "../../../styles/util";
+import LinkPrev from "../../LinkPrev";
 
 interface IProps {
   title: string;
@@ -57,7 +57,7 @@ const Prop = styled.div<{ $disabled: boolean }>`
   ${({ $disabled }) => $disabled && "opacity: 0.4;"}
 `;
 
-const SpaceHead = ({
+const Head = ({
   title,
   unit,
   surfaceArea,
@@ -94,7 +94,7 @@ const SpaceHead = ({
               <Prop $disabled={!surfaceArea}>
                 {`${
                   surfaceArea
-                    ? `${surfaceArea} m²`
+                    ? t("SpaceEditor.area", { surfaceArea })
                     : t("SpaceEditor.noSurfaceArea")
                 }`}
               </Prop>
@@ -106,4 +106,4 @@ const SpaceHead = ({
   );
 };
 
-export default SpaceHead;
+export default Head;

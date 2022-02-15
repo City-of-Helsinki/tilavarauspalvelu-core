@@ -26,16 +26,17 @@ import Units from "./component/Unit/Units";
 import Unit from "./component/Unit/Unit";
 import UnitMap from "./component/Unit/UnitMap";
 import SpacesResources from "./component/Unit/SpacesResources";
-import SpaceEditor from "./component/Spaces/SpaceEditor";
+import SpaceEditorView from "./component/Spaces/space-editor/SpaceEditorView";
 import ResourceEditor from "./component/Resources/ResourceEditor";
 import ReservationUnitEditor from "./component/ReservationUnits/ReservationUnitEditor";
 import ResourcesList from "./component/Resources/ResourcesList";
 import ReservationUnitsList from "./component/ReservationUnits/ReservationUnitsList";
 import ReservationUnitsSearch from "./component/ReservationUnits/ReservationUnitsSearch";
 import { withGlobalContext } from "./context/GlobalContexts";
-import PrivateRoute from "./common/PrivateRoute";
+
 import { SingleApplications } from "./component/SingleApplications";
 import SingleApplication from "./component/SingleApplications/SingleApplication";
+import PrivateRoutes from "./common/PrivateRoutes";
 
 function App(): JSX.Element {
   const { oidcUser } = useReactOidc();
@@ -49,113 +50,113 @@ function App(): JSX.Element {
             path="/"
             component={oidcUser ? ApplicationRounds : MainLander}
           />
-          <PrivateRoute
-            exact
-            path="/application/:applicationId"
-            component={Application}
-          />
-          <PrivateRoute
-            exact
-            path="/application/:applicationId/details"
-            component={ApplicationDetails}
-          />
-          <PrivateRoute
-            exact
-            path="/application/:applicationId/recurringReservation/:recurringReservationId"
-            component={ReservationByApplicationEvent}
-          />
-          <PrivateRoute
-            exact
-            path="/applicationRounds"
-            component={AllApplicationRounds}
-          />
-          <PrivateRoute
-            exact
-            path="/applicationRounds/approvals"
-            component={ApplicationRoundApprovals}
-          />
-          <PrivateRoute
-            path="/applicationRound/:applicationRoundId/applications"
-            component={Applications}
-          />
-          <PrivateRoute
-            path="/applicationRound/:applicationRoundId/resolution"
-            component={ResolutionReport}
-          />
-          <PrivateRoute
-            path="/applicationRound/:applicationRoundId/criteria"
-            component={Criteria}
-          />
-          <PrivateRoute
-            path="/applicationRound/:applicationRoundId/reservationUnit/:reservationUnitId/reservations/summary"
-            component={ReservationSummariesByReservationUnit}
-          />
-          <PrivateRoute
-            path="/applicationRound/:applicationRoundId/reservationUnit/:reservationUnitId/reservations"
-            component={ReservationsByReservationUnit}
-          />
-          <PrivateRoute
-            path="/applicationRound/:applicationRoundId/reservationUnit/:reservationUnitId"
-            component={RecommendationsByReservationUnit}
-          />
-          <PrivateRoute
-            path="/applicationRound/:applicationRoundId/applicant/:applicantId"
-            component={RecommendationsByApplicant}
-          />
-          <PrivateRoute
-            path="/applicationRound/:applicationRoundId/organisation/:organisationId"
-            component={RecommendationsByApplicant}
-          />
-          <PrivateRoute
-            path="/applicationRound/:applicationRoundId/recommendation/:applicationEventScheduleId"
-            component={Recommendation}
-          />
-          <PrivateRoute
-            path="/applicationRound/:applicationRoundId/approval"
-            component={Approval}
-          />
-          <PrivateRoute
-            path="/applicationRound/:applicationRoundId"
-            component={ApplicationRound}
-          />
-          <PrivateRoute path="/spaces" component={SpacesList} />
-          <PrivateRoute
-            path="/reservationUnits"
-            component={ReservationUnitsList}
-            exact
-          />
-          <PrivateRoute
-            path="/reservationUnits/search"
-            component={ReservationUnitsSearch}
-          />
-          <PrivateRoute path="/resources" component={ResourcesList} />
-          <PrivateRoute path="/units" component={Units} />
-          <PrivateRoute path="/unit/:unitPk/map" component={UnitMap} />
-          <PrivateRoute
-            path="/unit/:unitPk/spacesResources"
-            component={SpacesResources}
-          />
-          <PrivateRoute
-            path="/unit/:unitPk/space/edit/:spacePk"
-            component={SpaceEditor}
-          />
-          <PrivateRoute
-            path="/unit/:unitPk/resource/edit/:resourcePk"
-            component={ResourceEditor}
-          />
-          <PrivateRoute
-            path="/unit/:unitPk/reservationUnit/edit/:reservationUnitPk?"
-            component={ReservationUnitEditor}
-          />
-          <PrivateRoute path="/unit/:unitPk" component={Unit} />
-          <PrivateRoute
-            path="/singleApplications/:reservationPk"
-            component={SingleApplication}
-          />
-          <PrivateRoute
-            path="/singleApplications"
-            component={SingleApplications}
-          />
+          <PrivateRoutes>
+            <Route
+              exact
+              path="/application/:applicationId"
+              component={Application}
+            />
+            <Route
+              exact
+              path="/application/:applicationId/details"
+              component={ApplicationDetails}
+            />
+            <Route
+              exact
+              path="/application/:applicationId/recurringReservation/:recurringReservationId"
+              component={ReservationByApplicationEvent}
+            />
+            <Route
+              exact
+              path="/applicationRounds"
+              component={AllApplicationRounds}
+            />
+            <Route
+              exact
+              path="/applicationRounds/approvals"
+              component={ApplicationRoundApprovals}
+            />
+            <Route
+              path="/applicationRound/:applicationRoundId/applications"
+              component={Applications}
+            />
+            <Route
+              path="/applicationRound/:applicationRoundId/resolution"
+              component={ResolutionReport}
+            />
+            <Route
+              path="/applicationRound/:applicationRoundId/criteria"
+              component={Criteria}
+            />
+            <Route
+              path="/applicationRound/:applicationRoundId/reservationUnit/:reservationUnitId/reservations/summary"
+              component={ReservationSummariesByReservationUnit}
+            />
+            <Route
+              path="/applicationRound/:applicationRoundId/reservationUnit/:reservationUnitId/reservations"
+              component={ReservationsByReservationUnit}
+            />
+            <Route
+              path="/applicationRound/:applicationRoundId/reservationUnit/:reservationUnitId"
+              component={RecommendationsByReservationUnit}
+            />
+            <Route
+              path="/applicationRound/:applicationRoundId/applicant/:applicantId"
+              component={RecommendationsByApplicant}
+            />
+            <Route
+              path="/applicationRound/:applicationRoundId/organisation/:organisationId"
+              component={RecommendationsByApplicant}
+            />
+            <Route
+              path="/applicationRound/:applicationRoundId/recommendation/:applicationEventScheduleId"
+              component={Recommendation}
+            />
+            <Route
+              path="/applicationRound/:applicationRoundId/approval"
+              component={Approval}
+            />
+            <Route
+              path="/applicationRound/:applicationRoundId"
+              component={ApplicationRound}
+            />
+            <Route path="/spaces" component={SpacesList} />
+            <Route
+              path="/reservationUnits"
+              component={ReservationUnitsList}
+              exact
+            />
+            <Route
+              path="/reservationUnits/search"
+              component={ReservationUnitsSearch}
+            />
+            <Route path="/resources" component={ResourcesList} />
+            <Route path="/units" component={Units} />
+            <Route path="/unit/:unitPk/map" component={UnitMap} />
+            <Route
+              path="/unit/:unitPk/spacesResources"
+              component={SpacesResources}
+              exact
+            />
+            <Route
+              path="/unit/:unitPk/space/edit/:spacePk"
+              component={SpaceEditorView}
+            />
+            <Route
+              path="/unit/:unitPk/resource/edit/:resourcePk"
+              component={ResourceEditor}
+            />
+            <Route
+              path="/unit/:unitPk/reservationUnit/edit/:reservationUnitPk?"
+              component={ReservationUnitEditor}
+            />
+            <Route path="/unit/:unitPk" component={Unit} exact />
+            <Route
+              path="/singleApplications/:reservationPk"
+              component={SingleApplication}
+            />
+            <Route path="/singleApplications" component={SingleApplications} />
+          </PrivateRoutes>
         </Switch>
       </PageWrapper>
     </BrowserRouter>
