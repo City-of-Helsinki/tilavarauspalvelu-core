@@ -19,7 +19,7 @@
     "@apollo/client": "^3.4.13",
     "@axa-fr/react-oidc-context": "^3.1.6",
     "@react-pdf/renderer": "^2.0.15",
-    "@sentry/react": "^6.6.0",
+    "@sentry/nextjs": "^6.17.7",
     "axios": "^0.21.1",
     "axios-auth-refresh": "^3.1.0",
     "axios-case-converter": "^0.7.0",
