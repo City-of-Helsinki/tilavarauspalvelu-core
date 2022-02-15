@@ -1488,9 +1488,7 @@ export type ReservationUnitByPkType = Node & {
   bufferTimeBefore?: Maybe<Scalars["Duration"]>;
   cancellationRule?: Maybe<ReservationUnitCancellationRuleType>;
   cancellationTerms?: Maybe<TermsOfUseType>;
-  contactInformationEn?: Maybe<Scalars["String"]>;
-  contactInformationFi?: Maybe<Scalars["String"]>;
-  contactInformationSv?: Maybe<Scalars["String"]>;
+  contactInformation: Scalars["String"];
   descriptionEn?: Maybe<Scalars["String"]>;
   descriptionFi?: Maybe<Scalars["String"]>;
   descriptionSv?: Maybe<Scalars["String"]>;
@@ -1624,9 +1622,8 @@ export type ReservationUnitCreateMutationInput = {
   cancellationRulePk?: Maybe<Scalars["Int"]>;
   cancellationTermsPk?: Maybe<Scalars["String"]>;
   clientMutationId?: Maybe<Scalars["String"]>;
-  contactInformationEn?: Maybe<Scalars["String"]>;
-  contactInformationFi?: Maybe<Scalars["String"]>;
-  contactInformationSv?: Maybe<Scalars["String"]>;
+  /** Contact information for this reservation unit. */
+  contactInformation?: Maybe<Scalars["String"]>;
   descriptionEn?: Maybe<Scalars["String"]>;
   descriptionFi?: Maybe<Scalars["String"]>;
   descriptionSv?: Maybe<Scalars["String"]>;
@@ -1687,9 +1684,8 @@ export type ReservationUnitCreateMutationPayload = {
   building?: Maybe<Scalars["String"]>;
   cancellationRulePk?: Maybe<Scalars["Int"]>;
   clientMutationId?: Maybe<Scalars["String"]>;
-  contactInformationEn?: Maybe<Scalars["String"]>;
-  contactInformationFi?: Maybe<Scalars["String"]>;
-  contactInformationSv?: Maybe<Scalars["String"]>;
+  /** Contact information for this reservation unit. */
+  contactInformation?: Maybe<Scalars["String"]>;
   descriptionEn?: Maybe<Scalars["String"]>;
   descriptionFi?: Maybe<Scalars["String"]>;
   descriptionSv?: Maybe<Scalars["String"]>;
@@ -1824,9 +1820,7 @@ export type ReservationUnitType = Node & {
   bufferTimeBefore?: Maybe<Scalars["Duration"]>;
   cancellationRule?: Maybe<ReservationUnitCancellationRuleType>;
   cancellationTerms?: Maybe<TermsOfUseType>;
-  contactInformationEn?: Maybe<Scalars["String"]>;
-  contactInformationFi?: Maybe<Scalars["String"]>;
-  contactInformationSv?: Maybe<Scalars["String"]>;
+  contactInformation: Scalars["String"];
   descriptionEn?: Maybe<Scalars["String"]>;
   descriptionFi?: Maybe<Scalars["String"]>;
   descriptionSv?: Maybe<Scalars["String"]>;
@@ -1947,9 +1941,8 @@ export type ReservationUnitUpdateMutationInput = {
   cancellationRulePk?: Maybe<Scalars["Int"]>;
   cancellationTermsPk?: Maybe<Scalars["String"]>;
   clientMutationId?: Maybe<Scalars["String"]>;
-  contactInformationEn?: Maybe<Scalars["String"]>;
-  contactInformationFi?: Maybe<Scalars["String"]>;
-  contactInformationSv?: Maybe<Scalars["String"]>;
+  /** Contact information for this reservation unit. */
+  contactInformation?: Maybe<Scalars["String"]>;
   descriptionEn?: Maybe<Scalars["String"]>;
   descriptionFi?: Maybe<Scalars["String"]>;
   descriptionSv?: Maybe<Scalars["String"]>;
@@ -2011,9 +2004,8 @@ export type ReservationUnitUpdateMutationPayload = {
   building?: Maybe<Scalars["String"]>;
   cancellationRulePk?: Maybe<Scalars["Int"]>;
   clientMutationId?: Maybe<Scalars["String"]>;
-  contactInformationEn?: Maybe<Scalars["String"]>;
-  contactInformationFi?: Maybe<Scalars["String"]>;
-  contactInformationSv?: Maybe<Scalars["String"]>;
+  /** Contact information for this reservation unit. */
+  contactInformation?: Maybe<Scalars["String"]>;
   descriptionEn?: Maybe<Scalars["String"]>;
   descriptionFi?: Maybe<Scalars["String"]>;
   descriptionSv?: Maybe<Scalars["String"]>;
