@@ -80,11 +80,11 @@ class UnitImporter:
             self.field_map = field_map
 
         self.imported_unit_ids = []
+        self.creation_counter = 0
+        self.update_counter = 0
 
     @transaction.atomic
     def import_units(self, import_hauki_resource_id=False):
-        self.creation_counter = 0
-        self.update_counter = 0
         self.import_hauki_resource_ids = import_hauki_resource_id
 
         resp = requests.get(self.url)
@@ -94,7 +94,7 @@ class UnitImporter:
         if self.single:
             unit_data = [unit_data]
 
-        for row in unit_data:
+        for row in filter(lambda data: data is not None, unit_data):
             created = self.create_unit(row)
             self._update_counters(created)
 
