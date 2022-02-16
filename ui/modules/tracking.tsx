@@ -1,37 +1,6 @@
 import React, { useEffect } from "react";
-import * as Sentry from "@sentry/react";
 import { useRouter } from "next/router";
-import {
-  sentryDSN,
-  sentryEnvironment,
-  matomoEnabled,
-  isBrowser,
-} from "./const";
-
-const initSentry = () => {
-  if (sentryDSN) {
-    // eslint-disable-next-line no-console
-    console.debug("Initializing sentry.", sentryDSN);
-    try {
-      Sentry.init({
-        dsn: sentryDSN,
-        environment: sentryEnvironment,
-        release: `tilavarauspalvelu-ui@${process.env.npm_package_version}`,
-        integrations: [
-          new Sentry.Integrations.GlobalHandlers({
-            onunhandledrejection: true,
-            onerror: true,
-          }),
-        ],
-      });
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.error("Could not initialize sentry:", e);
-    }
-  }
-};
-
-// const matomoBaseUrl = "https://webanalytics.digiaiiris.com/js/";
+import { matomoEnabled, isBrowser } from "./const";
 
 const initMatomo = () => {
   if (!isBrowser || !matomoEnabled) {
@@ -77,7 +46,6 @@ export const TrackingWrapper = ({
 }: TrackingWrapperProps): JSX.Element => {
   const router = useRouter();
 
-  useEffect(initSentry, []);
   useEffect(initMatomo, []);
 
   useEffect(() => {
