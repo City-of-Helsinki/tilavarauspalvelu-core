@@ -17,6 +17,7 @@ import {
   QueryTermsOfUseArgs,
   TermsOfUseTypeConnection,
   QueryReservationUnitTypesArgs,
+  ReservationUnitsReservationUnitAuthenticationChoices,
 } from "../../modules/gql-types";
 import { Parameter } from "../../modules/types";
 import { toApiDate } from "../../modules/util";
@@ -30,9 +31,8 @@ const selectedReservationUnitQuery = graphql.query<
     services: [],
     uuid: "8e5275aa-8625-4458-88b4-d5b1b2df6619",
     isDraft: false,
-    contactInformationFi: null,
-    contactInformationEn: null,
-    contactInformationSv: null,
+    contactInformation: null,
+    authentication: ReservationUnitsReservationUnitAuthenticationChoices.Weak,
     id: "UmVzZXJ2YXRpb25Vbml0QnlQa1R5cGU6MzY=",
     pk: 1,
     nameFi: "Pukinmäen nuorisotalon keittiö FI",
@@ -427,9 +427,7 @@ const openingHoursQuery = graphql.query<
       reservationUnitByPk: {
         id: "UmVzZXJ2YXRpb25Vbml0QnlQa1R5cGU6MzY=",
         isDraft: false,
-        contactInformationFi: "",
-        contactInformationEn: "",
-        contactInformationSv: "",
+        contactInformation: "",
         descriptionFi: "",
         descriptionEn: "",
         descriptionSv: "",
@@ -456,6 +454,8 @@ const relatedReservationUnitsData: ReservationUnitTypeConnection = {
         nameFi: "Pukinmäen nuorisotalon yläkerta Fi",
         nameEn: "Pukinmäen nuorisotalon yläkerta En",
         nameSv: "Pukinmäen nuorisotalon yläkerta Sv",
+        authentication:
+          ReservationUnitsReservationUnitAuthenticationChoices.Weak,
         images: [],
         lowestPrice: 12.34,
         highestPrice: 20,
@@ -513,9 +513,7 @@ const relatedReservationUnitsData: ReservationUnitTypeConnection = {
           },
         ],
         resources: [],
-        contactInformationFi: "",
-        contactInformationEn: "",
-        contactInformationSv: "",
+        contactInformation: "",
         requireReservationHandling: false,
       },
       cursor: "YXJyYXljb25uZWN0aW9uOjA=",
@@ -529,6 +527,8 @@ const relatedReservationUnitsData: ReservationUnitTypeConnection = {
         nameFi: "Pukinmäen nuorisotalon sali Fi",
         nameEn: "Pukinmäen nuorisotalon sali En",
         nameSv: "Pukinmäen nuorisotalon sali Sv",
+        authentication:
+          ReservationUnitsReservationUnitAuthenticationChoices.Weak,
         lowestPrice: 3.34,
         highestPrice: 30,
         priceUnit:
@@ -607,9 +607,7 @@ const relatedReservationUnitsData: ReservationUnitTypeConnection = {
           },
         ],
         resources: [],
-        contactInformationFi: "",
-        contactInformationEn: "",
-        contactInformationSv: "",
+        contactInformation: "",
         requireReservationHandling: false,
       },
       cursor: "YXJyYXljb25uZWN0aW9uOjE=",

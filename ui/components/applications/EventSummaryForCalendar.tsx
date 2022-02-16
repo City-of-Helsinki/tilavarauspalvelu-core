@@ -2,7 +2,6 @@ import {
   Card as HDSCard,
   IconCalendar,
   IconHome,
-  IconInfoCircle,
   IconLocation,
   Select,
 } from "hds-react";
@@ -72,7 +71,6 @@ const ReservationUnitName = styled.div`
   font-size: var(--fontsize-heading-m);
   font-family: var(--font-bold);
 `;
-const ContactInfo = styled.div``;
 
 const BuildingName = styled.div`
   font-size: var(--fontsize-heading-s);
@@ -197,10 +195,6 @@ const ReservationUnitEventsSummaryForCalendar = ({
                       <ReservationUnitName>
                         {reservationUnit.name.fi}
                       </ReservationUnitName>
-                      <IconInfoCircle />
-                      <ContactInfo>
-                        {reservationUnit.contactInformation}
-                      </ContactInfo>
                       <IconLocation />
                       <div>
                         <BuildingName>
