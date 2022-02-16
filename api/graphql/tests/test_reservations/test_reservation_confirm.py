@@ -5,10 +5,14 @@ from unittest.mock import patch
 import freezegun
 from assertpy import assert_that
 from django.contrib.auth import get_user_model
+from django.core import mail
+from django.test import override_settings
 from django.utils.timezone import get_default_timezone
 
 from api.graphql.tests.test_reservations.base import ReservationTestCaseBase
 from applications.models import City
+from email_notification.models import EmailType
+from email_notification.tests.factories import EmailTemplateFactory
 from opening_hours.tests.test_get_periods import get_mocked_periods
 from reservations.models import STATE_CHOICES, AgeGroup
 from reservations.tests.factories import ReservationFactory
@@ -31,6 +35,13 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
             ),
             state=STATE_CHOICES.CREATED,
             user=self.regular_joe,
+            reservee_email="email@reservee",
+        )
+        EmailTemplateFactory(
+            type=EmailType.RESERVATION_CONFIRMED, content="", subject="confirmed"
+        )
+        EmailTemplateFactory(
+            type=EmailType.HANDLING_REQUIRED_RESERVATION, content="", subject="handling"
         )
 
     def get_confirm_query(self):
@@ -49,6 +60,11 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
     def get_valid_confirm_data(self):
         return {"pk": self.reservation.pk}
 
+    @override_settings(
+        CELERY_TASK_ALWAYS_EAGER=True,
+        SEND_RESERVATION_NOTIFICATION_EMAILS=True,
+        EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
+    )
     def test_confirm_reservation_changes_state(self, mock_periods, mock_opening_hours):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         self.client.force_login(self.regular_joe)
@@ -64,7 +80,14 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         )
         self.reservation.refresh_from_db()
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
+        assert_that(len(mail.outbox)).is_equal_to(1)
+        assert_that(mail.outbox[0].subject).is_equal_to("confirmed")
 
+    @override_settings(
+        CELERY_TASK_ALWAYS_EAGER=True,
+        SEND_RESERVATION_NOTIFICATION_EMAILS=True,
+        EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
+    )
     def test_confirm_reservation_changes_state_to_requires_handling(
         self, mock_periods, mock_opening_hours
     ):
@@ -84,6 +107,8 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         )
         self.reservation.refresh_from_db()
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.REQUIRES_HANDLING)
+        assert_that(len(mail.outbox)).is_equal_to(1)
+        assert_that(mail.outbox[0].subject).is_equal_to("handling")
 
     def test_confirm_reservation_fails_if_state_is_not_created(
         self, mock_periods, mock_opening_hours
@@ -128,6 +153,7 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
             datetime.datetime(2021, 10, 12, 12).astimezone()
         )
 
+    @override_settings(CELERY_TASK_ALWAYS_EAGER=True)
     def test_confirm_reservation_succeeds_if_reservation_already_has_required_fields(
         self, mock_periods, mock_opening_hours
     ):

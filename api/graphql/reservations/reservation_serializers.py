@@ -14,6 +14,8 @@ from api.graphql.choice_char_field import ChoiceCharField
 from api.graphql.duration_field import DurationField
 from api.graphql.primary_key_fields import IntegerPrimaryKeyField
 from applications.models import CUSTOMER_TYPES, City
+from email_notification.models import EmailType
+from email_notification.tasks import send_reservation_email_task
 from reservation_units.models import ReservationUnit
 from reservation_units.utils.reservation_unit_reservation_scheduler import (
     ReservationUnitReservationScheduler,
@@ -28,6 +30,14 @@ from reservations.models import (
 )
 
 DEFAULT_TIMEZONE = get_default_timezone()
+
+RESERVATION_STATE_EMAIL_TYPE_MAP = {
+    STATE_CHOICES.CONFIRMED: EmailType.RESERVATION_CONFIRMED,
+    STATE_CHOICES.REQUIRES_HANDLING: EmailType.HANDLING_REQUIRED_RESERVATION,
+    STATE_CHOICES.CANCELLED: EmailType.RESERVATION_CANCELLED,
+    STATE_CHOICES.DENIED: EmailType.RESERVATION_REJECTED,
+    "APPROVED": EmailType.RESERVATION_HANDLED_AND_CONFIRMED,
+}
 
 
 class ReservationCreateSerializer(PrimaryKeySerializer):
@@ -430,6 +440,14 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
             validated_data["state"] = STATE_CHOICES.CONFIRMED
         return validated_data
 
+    def save(self, **kwargs):
+        instance = super().save(**kwargs)
+        if instance.state in RESERVATION_STATE_EMAIL_TYPE_MAP.keys():
+            send_reservation_email_task.delay(
+                instance.id, RESERVATION_STATE_EMAIL_TYPE_MAP[instance.state]
+            )
+        return instance
+
 
 class ReservationCancellationSerializer(PrimaryKeyUpdateSerializer):
     cancel_reason_pk = IntegerPrimaryKeyField(
@@ -541,6 +559,14 @@ class ReservationDenySerializer(PrimaryKeySerializer):
 
         return data
 
+    def save(self, **kwargs):
+        instance = super().save(**kwargs)
+        if instance.state in RESERVATION_STATE_EMAIL_TYPE_MAP.keys():
+            send_reservation_email_task.delay(
+                instance.id, RESERVATION_STATE_EMAIL_TYPE_MAP[instance.state]
+            )
+        return instance
+
 
 class ReservationApproveSerializer(PrimaryKeySerializer):
     handling_details = serializers.CharField(
@@ -582,6 +608,14 @@ class ReservationApproveSerializer(PrimaryKeySerializer):
 
         return data
 
+    def save(self, **kwargs):
+        instance = super().save(**kwargs)
+        if instance.state == STATE_CHOICES.CONFIRMED:
+            send_reservation_email_task.delay(
+                instance.id, RESERVATION_STATE_EMAIL_TYPE_MAP["APPROVED"]
+            )
+        return instance
+
 
 class ReservationRequiresHandlingSerializer(PrimaryKeySerializer):
     class Meta:
@@ -609,6 +643,14 @@ class ReservationRequiresHandlingSerializer(PrimaryKeySerializer):
             )
         data = super().validate(data)
         return data
+
+    def save(self, **kwargs):
+        instance = super().save(**kwargs)
+        if instance.state in RESERVATION_STATE_EMAIL_TYPE_MAP.keys():
+            send_reservation_email_task.delay(
+                instance.id, RESERVATION_STATE_EMAIL_TYPE_MAP[instance.state]
+            )
+        return instance
 
 
 class ReservationWorkingMemoSerializer(PrimaryKeySerializer):

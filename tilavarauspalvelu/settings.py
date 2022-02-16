@@ -17,6 +17,8 @@ import subprocess  # nosec
 import environ
 import graphql
 import sentry_sdk
+from django.conf.global_settings import DEFAULT_FROM_EMAIL as django_default_from_email
+from django.conf.global_settings import EMAIL_PORT as django_default_email_port
 from django.utils.translation import gettext_lazy as _
 from sentry_sdk.integrations.django import DjangoIntegration
 
@@ -96,6 +98,7 @@ INSTALLED_APPS = [
     "easy_thumbnails",
     "django_celery_results",
     "terms_of_use",
+    "email_notification",
 ]
 
 MIDDLEWARE = [
@@ -195,6 +198,11 @@ env = environ.Env(
     VERKKOKAUPPA_PRODUCT_API_URL=(str, None),
     VERKKOKAUPPA_ORDER_API_URL=(str, None),
     VERKKOKAUPPA_PAYMENT_API_URL=(str, None),
+    # Email
+    EMAIL_HOST=(str, None),
+    EMAIL_PORT=(str, django_default_email_port),
+    SEND_RESERVATION_NOTIFICATION_EMAILS=(str, False),
+    DEFAULT_FROM_EMAIL=(str, django_default_from_email),
 )
 
 environ.Env.read_env()
@@ -259,6 +267,21 @@ CORS_ALLOWED_ORIGINS = env("CORS_ALLOWED_ORIGINS")
 CSRF_TRUSTED_ORIGINS = env("CSRF_TRUSTED_ORIGINS")
 
 AUDIT_LOGGING_ENABLED = env("AUDIT_LOGGING_ENABLED")
+
+# Email settings
+EMAIL_HOST = env("EMAIL_HOST")
+EMAIL_PORT = env("EMAIL_PORT")
+DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL")
+EMAIL_TEMPLATE_CONTEXT_ATTRS = [
+    "reservee_name",
+    "name",
+    "begin_date",
+    "begin_time",
+    "end_date",
+    "end_time",
+    "reservation_number",
+]
+SEND_RESERVATION_NOTIFICATION_EMAILS = env("SEND_RESERVATION_NOTIFICATION_EMAILS")
 
 # Configure sentry
 if env("SENTRY_DSN"):

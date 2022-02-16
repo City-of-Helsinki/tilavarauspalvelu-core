@@ -3,9 +3,13 @@ import json
 
 import freezegun
 from assertpy import assert_that
+from django.core import mail
+from django.test import override_settings
 from django.utils.timezone import get_default_timezone
 
 from api.graphql.tests.test_reservations.base import ReservationTestCaseBase
+from email_notification.models import EmailType
+from email_notification.tests.factories import EmailTemplateFactory
 from reservations.models import STATE_CHOICES
 from reservations.tests.factories import (
     ReservationDenyReasonFactory,
@@ -31,9 +35,13 @@ class ReservationDenyTestCase(ReservationTestCaseBase):
             ),
             state=STATE_CHOICES.REQUIRES_HANDLING,
             user=self.regular_joe,
+            reservee_email="email@reservee",
         )
         self.reason = ReservationDenyReasonFactory(
             reason_fi="syy", reason_en="reason", reason_sv="resonera"
+        )
+        EmailTemplateFactory(
+            type=EmailType.RESERVATION_REJECTED, content="", subject="denied"
         )
 
     def get_handle_query(self):
@@ -56,6 +64,11 @@ class ReservationDenyTestCase(ReservationTestCaseBase):
             "denyReasonPk": self.reason.pk,
         }
 
+    @override_settings(
+        CELERY_TASK_ALWAYS_EAGER=True,
+        SEND_RESERVATION_NOTIFICATION_EMAILS=True,
+        EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
+    )
     def test_deny_success_when_admin(self):
         self.client.force_login(self.general_admin)
         input_data = self.get_valid_deny_data()
@@ -71,6 +84,8 @@ class ReservationDenyTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.DENIED)
         assert_that(self.reservation.handling_details).is_equal_to("no can do")
         assert_that(self.reservation.handled_at).is_not_none()
+        assert_that(len(mail.outbox)).is_equal_to(1)
+        assert_that(mail.outbox[0].subject).is_equal_to("denied")
 
     def test_cant_deny_if_regular_user(self):
         self.client.force_login(self.regular_joe)
@@ -112,6 +127,10 @@ class ReservationDenyTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.REQUIRES_HANDLING)
         assert_that(self.reservation.handling_details).is_empty()
 
+    @override_settings(
+        CELERY_TASK_ALWAYS_EAGER=True,
+        SEND_RESERVATION_NOTIFICATION_EMAILS=False,
+    )
     def test_handling_details_saves_to_working_memo_also(self):
         self.client.force_login(self.general_admin)
         input_data = self.get_valid_deny_data()

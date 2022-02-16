@@ -3,9 +3,13 @@ import json
 
 import freezegun
 from assertpy import assert_that
+from django.core import mail
+from django.test import override_settings
 from django.utils.timezone import get_default_timezone
 
 from api.graphql.tests.test_reservations.base import ReservationTestCaseBase
+from email_notification.models import EmailType
+from email_notification.tests.factories import EmailTemplateFactory
 from reservation_units.tests.factories import ReservationUnitFactory
 from reservations.models import STATE_CHOICES
 from reservations.tests.factories import (
@@ -15,7 +19,7 @@ from reservations.tests.factories import (
 
 
 @freezegun.freeze_time("2021-10-12T12:00:00Z")
-class ReservationApproveTestCase(ReservationTestCaseBase):
+class RequireHandlingForReservationTestCase(ReservationTestCaseBase):
     def setUp(self):
         super().setUp()
         metadata = ReservationMetadataSetFactory()
@@ -32,6 +36,7 @@ class ReservationApproveTestCase(ReservationTestCaseBase):
             ),
             state=STATE_CHOICES.CONFIRMED,
             user=self.regular_joe,
+            reservee_email="email@reservee",
         )
         self.denied_reservation = ReservationFactory(
             reservation_unit=[reservation_unit],
@@ -43,6 +48,13 @@ class ReservationApproveTestCase(ReservationTestCaseBase):
             ),
             state=STATE_CHOICES.DENIED,
             user=self.regular_joe,
+            reservee_email="email@reservee",
+        )
+
+        EmailTemplateFactory(
+            type=EmailType.HANDLING_REQUIRED_RESERVATION,
+            content="",
+            subject="handling",
         )
 
     def get_require_handling_query(self):
@@ -58,6 +70,11 @@ class ReservationApproveTestCase(ReservationTestCaseBase):
             }
         """
 
+    @override_settings(
+        CELERY_TASK_ALWAYS_EAGER=True,
+        SEND_RESERVATION_NOTIFICATION_EMAILS=True,
+        EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
+    )
     def test_require_handling_succeed_on_confirmed_reservation(self):
         self.client.force_login(self.general_admin)
         input_data = {"pk": self.confirmed_reservation.id}
@@ -77,7 +94,14 @@ class ReservationApproveTestCase(ReservationTestCaseBase):
         assert_that(self.confirmed_reservation.state).is_equal_to(
             STATE_CHOICES.REQUIRES_HANDLING
         )
+        assert_that(len(mail.outbox)).is_equal_to(1)
+        assert_that(mail.outbox[0].subject).is_equal_to("handling")
 
+    @override_settings(
+        CELERY_TASK_ALWAYS_EAGER=True,
+        SEND_RESERVATION_NOTIFICATION_EMAILS=True,
+        EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
+    )
     def test_require_handling_succeed_on_denied_reservation(self):
         self.client.force_login(self.general_admin)
         input_data = {"pk": self.denied_reservation.id}
@@ -95,6 +119,8 @@ class ReservationApproveTestCase(ReservationTestCaseBase):
         assert_that(self.denied_reservation.state).is_equal_to(
             STATE_CHOICES.REQUIRES_HANDLING
         )
+        assert_that(len(mail.outbox)).is_equal_to(1)
+        assert_that(mail.outbox[0].subject).is_equal_to("handling")
 
     def test_cant_deny_if_regular_user(self):
         self.client.force_login(self.regular_joe)

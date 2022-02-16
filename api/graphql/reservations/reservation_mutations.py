@@ -1,4 +1,5 @@
 import graphene
+from django.conf import settings
 from graphene import ResolveInfo
 from graphene_django.rest_framework.mutation import SerializerMutation
 from graphene_permissions.permissions import AllowAny
@@ -20,7 +21,6 @@ from permissions.api_permissions.graphene_permissions import (
     ReservationPermission,
 )
 from reservations.models import Reservation
-from tilavarauspalvelu import settings
 
 
 class ReservationCreateMutation(AuthSerializerMutation, SerializerMutation):
