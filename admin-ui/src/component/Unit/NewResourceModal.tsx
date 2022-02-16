@@ -13,7 +13,7 @@ import { useTranslation } from "react-i18next";
 import { get, omit, set, startCase, upperFirst } from "lodash";
 import { parseAddress } from "../../common/util";
 import { CREATE_RESOURCE } from "../../common/queries";
-import { CustomDialogHeader } from "./CustomDialogHeader";
+import { CustomDialogHeader } from "../CustomDialogHeader";
 import { breakpoints } from "../../styles/util";
 import { languages } from "../../common/const";
 import {

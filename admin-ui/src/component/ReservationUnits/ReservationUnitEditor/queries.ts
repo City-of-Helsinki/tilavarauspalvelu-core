@@ -50,7 +50,6 @@ export const RESERVATIONUNIT_QUERY = gql`
       additionalInstructionsFi
       additionalInstructionsSv
       additionalInstructionsEn
-      contactInformationFi
       maxReservationDuration
       minReservationDuration
       reservationStartInterval
@@ -93,9 +92,7 @@ export const RESERVATIONUNIT_QUERY = gql`
       bufferTimeBefore
       bufferTimeAfter
       reservationBegins
-      contactInformationFi
-      contactInformationEn
-      contactInformationSv
+      contactInformation
       reservationEnds
       publishBegins
       publishEnds

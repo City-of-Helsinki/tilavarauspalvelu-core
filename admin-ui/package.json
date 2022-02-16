@@ -33,6 +33,7 @@
     "hds-react": "^1.5.0",
     "http-proxy-middleware": "^1.0.6",
     "i18next": "^19.8.4",
+    "joi": "^17.6.0",
     "lodash": "^4.17.20",
     "mapbox-gl": "2.4.0",
     "node-sass": "7.0.0",

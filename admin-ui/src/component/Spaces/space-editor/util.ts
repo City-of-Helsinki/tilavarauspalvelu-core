@@ -1,4 +1,5 @@
-import { SpaceType } from "../../common/gql-types";
+import Joi from "joi";
+import { SpaceType } from "../../../common/gql-types";
 
 const recurse = (
   parent: SpaceType,
@@ -31,3 +32,17 @@ export const spacesAsHierarchy = (
     recurse(rootSpace, spaces, 0, paddingChar)
   );
 };
+
+export const schema = Joi.object({
+  nameFi: Joi.string().max(80),
+  nameSv: Joi.string().allow("").allow(null).optional().max(80),
+  nameEn: Joi.string().allow("").allow(null).optional().max(80),
+  surfaceArea: Joi.number().min(1),
+  maxPersons: Joi.number().min(1),
+  unitPk: Joi.number(),
+  pk: Joi.number(),
+  parentPk: Joi.number().allow(null),
+  code: Joi.string().allow("").allow(null).optional(),
+}).options({
+  abortEarly: false,
+});

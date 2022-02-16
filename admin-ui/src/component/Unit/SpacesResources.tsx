@@ -18,7 +18,7 @@ import ResourcesTable from "./ResourcesTable";
 import SpacesTable from "./SpacesTable";
 import SubPageHead from "./SubPageHead";
 import Modal, { useModal as useHDSModal } from "../HDSModal";
-import NewSpaceModal from "./NewSpaceModal";
+import NewSpaceModal from "../Spaces/space-editor/new-space-modal/NewSpaceModal";
 import { breakpoints } from "../../styles/util";
 import NewResourceModal from "./NewResourceModal";
 import { UNIT_QUERY } from "../../common/queries";
