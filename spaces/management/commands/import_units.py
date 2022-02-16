@@ -66,9 +66,12 @@ class Command(BaseCommand):
         for id in ids:
             importer.url = "{}{}".format(url, id)
             importer.import_units(import_hauki_resource_id=import_hauki_resource_ids)
+        return (
+            f"Created: {importer.creation_counter} Updated: {importer.update_counter}"
+        )
 
     def get_version(self):
         """
         Custom version for devops etc scenarios to know which version running.
         """
-        return "0.0.1"
+        return "0.0.2"
