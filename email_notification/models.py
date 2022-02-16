@@ -36,7 +36,7 @@ class EmailTemplate(models.Model):
     content = models.TextField(
         verbose_name=_("Content"),
         help_text=_(
-            "Email body content. Use curly brackets to indicate data specific fields e.g {{ reservee_name }}."
+            "Email body content. Use curly brackets to indicate data specific fields e.g {{reservee_name}}."
         ),
         null=False,
         blank=False,
