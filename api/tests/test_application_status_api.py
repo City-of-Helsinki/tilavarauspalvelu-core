@@ -282,6 +282,13 @@ class ApplicationEventStatusApiPermissionsTestCase(ApplicationStatusBaseTestCase
             .status
         ).is_equal_to(ApplicationEventStatus.VALIDATED)
 
+    def test_status_change_with_empty_data_returns_403(self):
+        response = self.applicant_api_client.post(
+            reverse("application_event_status-list"),
+            data={},
+        )
+        assert_that(response.status_code).is_equal_to(403)
+
 
 @mock.patch(
     "applications.utils.reservation_creation.ReservationScheduler",
