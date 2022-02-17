@@ -203,6 +203,8 @@ env = environ.Env(
     EMAIL_PORT=(str, django_default_email_port),
     SEND_RESERVATION_NOTIFICATION_EMAILS=(str, False),
     DEFAULT_FROM_EMAIL=(str, django_default_from_email),
+    # Tprek
+    TPREK_UNIT_URL=(str, "https://www.hel.fi/palvelukarttaws/rest/v4/unit/"),
 )
 
 environ.Env.read_env()
@@ -282,6 +284,9 @@ EMAIL_TEMPLATE_CONTEXT_ATTRS = [
     "reservation_number",
 ]
 SEND_RESERVATION_NOTIFICATION_EMAILS = env("SEND_RESERVATION_NOTIFICATION_EMAILS")
+
+# TPREK
+TPREK_UNIT_URL = env("TPREK_UNIT_URL")
 
 # Configure sentry
 if env("SENTRY_DSN"):
