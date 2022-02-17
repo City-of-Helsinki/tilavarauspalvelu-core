@@ -18,7 +18,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       CYPRESS_BASE_URL: http://localhost:3000
-
+    environment:
+      name: actions
     steps:
       - uses: actions/checkout@v2
       - name: Build image
