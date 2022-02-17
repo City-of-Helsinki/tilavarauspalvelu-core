@@ -251,6 +251,8 @@ class ApplicationEventStatusPermission(permissions.BasePermission):
         return self.check_permissions_for_single(request, status, application_event_id)
 
     def check_permissions_for_single(self, request, status, application_event_id):
+        if not application_event_id:
+            return False
         try:
             service_sector = ServiceSector.objects.get(
                 applicationround=ApplicationRound.objects.get(
