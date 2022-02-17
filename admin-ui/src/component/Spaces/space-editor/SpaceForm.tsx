@@ -58,7 +58,7 @@ const SpaceForm = ({
           const fieldName = `name${upperFirst(lang)}`;
           return (
             <TextInput
-              key={lang}
+              key={fieldName}
               required={lang === "fi"}
               id={fieldName}
               label={t(`SpaceEditor.label.${fieldName}`)}

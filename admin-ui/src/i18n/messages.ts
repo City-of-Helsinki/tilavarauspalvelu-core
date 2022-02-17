@@ -634,8 +634,20 @@ const translations: ITranslations = {
     },
   },
   ResourceEditor: {
+    defaultHeading: ["(nimetön resurssi)"],
     resourceUpdated: ["Tiedot tallennettu."],
+    saveFailed: ["Tallennus epäonnistui"],
     resourceUpdatedNotification: ["Resurssin tiedot tallennettu."],
+    label: {
+      spacePk: ["Tila"],
+      nameFi: ["Resurssin nimi suomeksi"],
+      nameSv: ["Resurssin nimi ruotsiksi"],
+      nameEn: ["Resurssin nimi englanniksi"],
+    },
+  },
+  ResourceEditorView: {
+    illegalResource: ["Virheellinen resurssin tunniste"],
+    illegalUnit: ["Virheellinen toimipisteen tunniste"],
   },
   Applicant: {
     inAllocation: ["Mukana jaossa"],
@@ -1018,7 +1030,6 @@ const translations: ITranslations = {
       "Voit luoda kerralla yhden tilan resurssin. Niitä voivat olla esim. laitteet tai tarvikkeet.",
     ],
     selectSpace: ["Valitse tila"],
-    nameLabel: ["Resurssin nimi {{lang}}"],
     namePlaceholder: ["Resurssin nimi  {{language}}"],
     descriptionLabel: ["Resurssin kuvaus {{lang}}"],
     descriptionPlaceholder: ["Kuvaile resurssia {{language}}"],
@@ -1028,6 +1039,7 @@ const translations: ITranslations = {
     saveError: ["Tietojen tallennus epäonnistui."],
   },
   ResourceTable: {
+    noDistrict: ["(Ei aluetta)"],
     menuEditResource: ["Muokkaa resurssia"],
     menuRemoveResource: ["Poista resurssi"],
     removeConfirmationTitle: ["Haluatko varmasti poistaa resurssin {{name}}?"],
@@ -1123,10 +1135,17 @@ const translations: ITranslations = {
     string: {
       max: ["Kenttään {{fieldName}} voi lisätä korkeintaan {{limit}} merkkiä."],
       empty: ["{{fieldName}} on pakollinen tieto"],
+      base: ["{{fieldName}} on pakollinen tieto"],
+    },
+    object: {
+      unknown: ["{{fieldName}} tuntematon"],
     },
     number: {
       empty: ["{{fieldName}} on pakollinen tieto"],
       min: ["{{fieldName}} pitää olla vähintään {{limit}}"],
+    },
+    any: {
+      required: ["{{fieldName}} on pakollinen tieto"],
     },
   },
 };

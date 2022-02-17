@@ -291,50 +291,11 @@ export const RESERVATION_UNIT_EDITOR_PARAMETERS = gql`
   }
 `;
 
-export const CREATE_RESOURCE = gql`
-  mutation createResource($input: ResourceCreateMutationInput!) {
-    createResource(input: $input) {
-      errors {
-        field
-        messages
-      }
-    }
-  }
-`;
-
-export const UPDATE_RESOURCE = gql`
-  mutation updateResource($input: ResourceUpdateMutationInput!) {
-    updateResource(input: $input) {
-      errors {
-        field
-        messages
-      }
-    }
-  }
-`;
-
 export const DELETE_RESOURCE = gql`
   mutation deleteResource($input: ResourceDeleteMutationInput!) {
     deleteResource(input: $input) {
       deleted
       errors
-    }
-  }
-`;
-
-export const RESOURCE_QUERY = gql`
-  query resource($pk: Int) {
-    resourceByPk(pk: $pk) {
-      pk
-      nameFi
-      nameSv
-      nameEn
-      descriptionFi
-      descriptionEn
-      descriptionSv
-      space {
-        pk
-      }
     }
   }
 `;

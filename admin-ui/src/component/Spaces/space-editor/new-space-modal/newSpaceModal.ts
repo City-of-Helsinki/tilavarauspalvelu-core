@@ -78,7 +78,8 @@ export const RoundTag = styled(Tag)`
 `;
 
 export const IconDelete = styled(IconTrash)`
-  padding-top: --var(--spacing-l);
+  margin: var(--spacing-m) 0 0 var(--spacing-s);
+  padding: var(--spacing-s);
 `;
 
 export type SpaceMutationInputWithKey<T> = Partial<T> & { key: string };

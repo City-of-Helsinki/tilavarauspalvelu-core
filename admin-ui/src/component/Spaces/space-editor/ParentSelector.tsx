@@ -2,15 +2,19 @@ import React, { useState } from "react";
 import { useQuery } from "@apollo/client";
 import { Select } from "hds-react";
 import i18next from "i18next";
-import { useTranslation } from "react-i18next";
 import { Maybe, Query, SpaceType } from "../../../common/gql-types";
 import { SPACE_HIERARCHY_QUERY } from "./queries";
 import { spacesAsHierarchy } from "./util";
 
 type Props = {
   unitPk: number;
-  spacePk: number | null;
+  spacePk?: number | null;
   parentPk: number | null;
+  label: string;
+  placeholder?: string;
+  helperText?: string;
+  disableNull?: boolean;
+  errorText?: string;
   onChange: (val: number | null, name?: string) => void;
 };
 
@@ -40,12 +44,13 @@ const ParentSelector = ({
   spacePk,
   onChange,
   parentPk,
-}: Props): JSX.Element => {
-  const [parentOptions, setParentOptions] = useState([
-    independentSpaceOption,
-  ] as ParentType[]);
-
-  const { t } = useTranslation();
+  label,
+  placeholder,
+  disableNull = false,
+  helperText,
+  errorText,
+}: Props): JSX.Element | null => {
+  const [parentOptions, setParentOptions] = useState([] as ParentType[]);
 
   useQuery<Query>(SPACE_HIERARCHY_QUERY, {
     onCompleted: ({ spaces }) => {
@@ -70,23 +75,42 @@ const ParentSelector = ({
             value: space.pk as number,
           }));
 
-        setParentOptions([independentSpaceOption, ...additionalOptions]);
+        const options = [] as {
+          label: string;
+          value: number | null;
+        }[];
+
+        if (!disableNull) {
+          options.push(independentSpaceOption);
+        }
+
+        setParentOptions(options.concat(additionalOptions));
       }
     },
   });
 
+  if (parentOptions.length === 0) {
+    return null;
+  }
+
   return (
     <Select
       id="parent"
-      label={t("SpaceModal.page1.parentLabel")}
-      placeholder={t("SpaceModal.page1.parentPlaceholder")}
+      label={label}
+      placeholder={placeholder}
       required
-      helper={t("SpaceModal.page1.parentHelperText")}
+      helper={helperText}
       options={parentOptions}
-      value={getParent(parentPk, parentOptions)}
+      value={
+        parentPk || !disableNull
+          ? getParent(parentPk, parentOptions)
+          : undefined
+      }
       onChange={(selected: ParentType) =>
         onChange(selected.value, selected.label)
       }
+      error={errorText}
+      invalid={!!errorText}
     />
   );
 };

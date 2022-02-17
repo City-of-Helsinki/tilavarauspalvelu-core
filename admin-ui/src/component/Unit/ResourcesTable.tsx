@@ -78,7 +78,7 @@ const ResourcesTable = ({
       {
         title: "Resource.area",
         key: "area",
-        transform: () => "Töölö WIP",
+        transform: () => t("ResourceTable.noDistrict"),
       },
       {
         title: "Resource.type",

@@ -48,18 +48,20 @@ const SpaceEditor = ({
 }) => {
   return (
     <div
-      style={{ display: "grid", gridTemplateColumns: "1fr var(--spacing-xl" }}
+      style={{ display: "grid", gridTemplateColumns: "1fr var(--spacing-2-xl" }}
     >
       <SpaceForm
         data={space}
         setValue={(value) => dispatch({ type: "set", index, value })}
         getValidationError={getValidationError}
       />
-      <IconDelete
-        tabIndex={0}
-        onKeyPress={() => dispatch({ type: "delete", index })}
-        onClick={() => dispatch({ type: "delete", index })}
-      />
+      {index > 0 ? (
+        <IconDelete
+          tabIndex={0}
+          onKeyPress={() => dispatch({ type: "delete", index })}
+          onClick={() => dispatch({ type: "delete", index })}
+        />
+      ) : null}
     </div>
   );
 };
@@ -173,6 +175,7 @@ const Page2 = ({
         {editorState.spaces.map((space, i) => (
           <div key={space.key}>
             <FormErrorSummary
+              fieldNamePrefix="SpaceEditor.label."
               validationErrors={editorState.validationErrors[i] || null}
               linkToError={false}
             />

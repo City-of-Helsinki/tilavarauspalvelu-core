@@ -342,7 +342,10 @@ const SpaceEditor = ({ space, unit }: Props): JSX.Element | null => {
         <EditorContainer>
           <H1>{t("SpaceEditor.details")}</H1>
           <Editor>
-            <FormErrorSummary validationErrors={state.validationErrors} />
+            <FormErrorSummary
+              fieldNamePrefix="SpaceEditor.label."
+              validationErrors={state.validationErrors}
+            />
 
             <Section>
               <SubHeading>{t("SpaceEditor.hierarchy")}</SubHeading>
@@ -351,9 +354,12 @@ const SpaceEditor = ({ space, unit }: Props): JSX.Element | null => {
                 unitSpaces={state.unitSpaces}
               />
               <ParentSelector
+                helperText={t("SpaceModal.page1.parentHelperText")}
+                label={t("SpaceModal.page1.parentLabel")}
                 onChange={(parentPk) => setValue({ parentPk })}
                 parentPk={state.spaceEdit?.parentPk as number}
                 spacePk={space}
+                placeholder={t("SpaceModal.page1.parentPlaceholder")}
                 unitPk={unit}
               />
             </Section>

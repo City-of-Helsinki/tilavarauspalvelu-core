@@ -95,6 +95,7 @@ const Page1 = ({
           <>
             <br />
             <ParentSelector
+              label={t("SpaceModal.page1.parentLabel")}
               unitPk={unit.pk as number}
               spacePk={null}
               parentPk={editorState.parentPk || null}
