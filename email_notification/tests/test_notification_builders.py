@@ -2,7 +2,7 @@ from assertpy import assert_that
 from django.conf import settings
 from django.test import override_settings
 
-from email_notification.models import EmailType
+from email_notification.models import EmailTemplate, EmailType
 from email_notification.sender.email_notification_builder import (
     EmailBuilderConfigError,
     EmailTemplateValidationError,
@@ -95,3 +95,37 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
         )
         builder = ReservationEmailNotificationBuilder(self.reservation, template)
         assert_that(builder.get_content()).is_equal_to(compiled_content)
+
+    def test_padding_does_not_matter_in_curly_brackets(self):
+        EmailTemplate.objects.all().delete()
+        content_with_padding = "I have {{ reservation_number }} padding"
+        compiled_content_with_padding = (
+            f"I have {str(self.reservation.id).zfill(10)} padding"
+        )
+        template = EmailTemplateFactory(
+            type=EmailType.RESERVATION_MODIFIED,
+            content=content_with_padding,
+            subject="subject",
+        )
+        builder = ReservationEmailNotificationBuilder(self.reservation, template)
+        actual_compiled_content_with_padding = builder.get_content()
+        assert_that(actual_compiled_content_with_padding).is_equal_to(
+            compiled_content_with_padding
+        )
+
+        content_without_padding = "I have {{reservation_number}} padding"
+        compiled_content_without_padding = (
+            f"I have {str(self.reservation.id).zfill(10)} padding"
+        )
+        template.content = content_without_padding
+        template.save()
+        builder = ReservationEmailNotificationBuilder(self.reservation, template)
+        actual_compiled_content_without_padding = builder.get_content()
+        assert_that(actual_compiled_content_without_padding).is_equal_to(
+            compiled_content_without_padding
+        )
+
+        # Assert actually does not matter
+        assert_that(actual_compiled_content_without_padding).is_equal_to(
+            actual_compiled_content_with_padding
+        )
