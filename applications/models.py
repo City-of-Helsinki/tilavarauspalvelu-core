@@ -358,6 +358,9 @@ class ApplicationRoundAggregateData(AggregateDataBase):
 class City(models.Model):
     name = models.CharField(verbose_name=_("Name"), max_length=100)
 
+    def __str__(self):
+        return self.name
+
 
 class CUSTOMER_TYPE_CONST(object):
     __slots__ = ()
