@@ -9,6 +9,7 @@ import {
 import {
   cancelButton,
   detailButton,
+  loader,
   redoReservationButton,
   reservationCards,
   tab,
@@ -44,6 +45,10 @@ describe("Tilavaraus user reservations", () => {
   });
 
   it("should list proper items with correct button states and link to reservation unit", () => {
+    loader().should("exist");
+
+    loader().should("not.exist");
+
     reservationCards().should("have.length", 5);
     timeStrip()
       .should("have.length", 5)
@@ -66,7 +71,7 @@ describe("Tilavaraus user reservations", () => {
         expect(text).to.eq("Menneet varaukset (2)");
       });
 
-    cancelButton().should("have.length", 1);
+    cancelButton().should("have.length", 2);
 
     reservationCards()
       .eq(0)
