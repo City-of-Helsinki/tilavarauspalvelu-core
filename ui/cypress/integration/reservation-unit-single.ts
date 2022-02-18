@@ -464,37 +464,6 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
     });
   });
 
-  describe("with reservation quota notification", () => {
-    it("should display apt notification if quota is set and full", () => {
-      cy.visit("/reservation-unit/single/901");
-
-      gotoCalendarButton().should("exist");
-
-      calendarWrapper().should("exist");
-
-      reservationSubmitButton().should("not.exist");
-
-      reservationQuotaNotification()
-        .invoke("text")
-        .should(
-          "match",
-          /^Sinulla on jo \d+ varausta tähän tilaan. Et voi tehdä uusia varauksia.$/
-        );
-    });
-
-    it("should display apt notification if quota is set but not full", () => {
-      cy.visit("/reservation-unit/single/902");
-
-      gotoCalendarButton().should("exist");
-
-      calendarWrapper().should("exist");
-
-      reservationQuotaNotification()
-        .invoke("text")
-        .should("match", /^Sinulla on jo \d+\/\d+ varausta tähän tilaan.$/);
-    });
-  });
-
   describe("with metadataset", () => {
     Cypress.config("defaultCommandTimeout", 20000);
     beforeEach(() => {

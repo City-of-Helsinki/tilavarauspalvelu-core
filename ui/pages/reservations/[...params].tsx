@@ -1,8 +1,8 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import styled from "styled-components";
-import { useMutation } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import router from "next/router";
 import { isFinite } from "lodash";
 import { Controller, useForm } from "react-hook-form";
@@ -43,14 +43,17 @@ import {
   getTranslation,
   reservationsUrl,
 } from "../../modules/util";
-import { TwoColumnContainer } from "../../components/common/common";
+import {
+  CenterSpinner,
+  TwoColumnContainer,
+} from "../../components/common/common";
 import { MediumButton } from "../../styles/util";
 import { OptionType } from "../../modules/types";
 import { emptyOption, reservationUnitSinglePrefix } from "../../modules/const";
 import KorosPulseEasy from "../../components/common/KorosPulseEasy";
 
 type Props = {
-  reservation: ReservationType;
+  id: number;
   reasons: OptionType[];
 };
 
@@ -61,37 +64,26 @@ export const getServerSideProps: GetServerSideProps = async ({
   const id = Number(query.params[0]);
 
   if (isFinite(id)) {
-    const { data } = await apolloClient.query({
-      query: GET_RESERVATION,
-      variables: { pk: id },
+    const { data: reasonsData } = await apolloClient.query<
+      Query,
+      QueryReservationCancelReasonsArgs
+    >({
+      query: GET_RESERVATION_CANCEL_REASONS,
     });
 
-    if (data && data.reservationByPk.state !== "CANCELLED") {
-      const { data: reasonsData } = await apolloClient.query<
-        Query,
-        QueryReservationCancelReasonsArgs
-      >({
-        query: GET_RESERVATION_CANCEL_REASONS,
-      });
-
-      const reasons = reasonsData.reservationCancelReasons.edges.map(
-        (reason) => ({
-          label: getTranslation(reason.node, "reason"),
-          value: reason.node.pk,
-        })
-      );
-
-      return {
-        props: {
-          ...(await serverSideTranslations(locale)),
-          reservation: data.reservationByPk,
-          reasons,
-        },
-      };
-    }
+    const reasons = reasonsData.reservationCancelReasons.edges.map(
+      (reason) => ({
+        label: getTranslation(reason.node, "reason"),
+        value: reason.node.pk,
+      })
+    );
 
     return {
-      notFound: true,
+      props: {
+        ...(await serverSideTranslations(locale)),
+        reasons,
+        id,
+      },
     };
   }
 
@@ -99,6 +91,10 @@ export const getServerSideProps: GetServerSideProps = async ({
     notFound: true,
   };
 };
+
+const Spinner = styled(CenterSpinner)`
+  margin: var(--spacing-layout-xl) auto;
+`;
 
 const Head = styled.div`
   padding: var(--spacing-layout-m) 0 0;
@@ -202,16 +198,22 @@ const ButtonContainer = styled.div`
   }
 `;
 
-const ReservationCancellation = ({
-  reservation,
-  reasons,
-}: Props): JSX.Element => {
+const ReservationCancellation = ({ id, reasons }: Props): JSX.Element => {
   const { t } = useTranslation();
 
-  const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
-  const [formState, setFormState] = React.useState<"unsent" | "sent">("unsent");
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [formState, setFormState] = useState<"unsent" | "sent">("unsent");
+  const [reservation, setReservation] = useState<ReservationType>();
 
-  const reservationUnit = reservation.reservationUnits[0];
+  useQuery(GET_RESERVATION, {
+    fetchPolicy: "no-cache",
+    variables: {
+      pk: id,
+    },
+    onCompleted: (data) => {
+      setReservation(data.reservationByPk);
+    },
+  });
 
   const [cancelReservation, { data, loading, error }] = useMutation<
     { cancelReservation: ReservationCancellationMutationPayload },
@@ -220,22 +222,6 @@ const ReservationCancellation = ({
 
   const { register, handleSubmit, getValues, setValue, watch, control } =
     useForm();
-
-  const onSubmit = (formData: {
-    reason: { value: number };
-    description?: string;
-  }) => {
-    const { reason, description } = formData;
-    cancelReservation({
-      variables: {
-        input: {
-          pk: reservation.pk,
-          cancelReasonPk: reason.value,
-          cancelDetails: description,
-        },
-      },
-    });
-  };
 
   useEffect(() => {
     if (!loading) {
@@ -252,6 +238,28 @@ const ReservationCancellation = ({
     register({ name: "reason", required: true });
     register({ name: "description" });
   }, [register]);
+
+  if (!reservation) {
+    return <Spinner />;
+  }
+
+  const reservationUnit = reservation.reservationUnits[0];
+
+  const onSubmit = (formData: {
+    reason: { value: number };
+    description?: string;
+  }) => {
+    const { reason, description } = formData;
+    cancelReservation({
+      variables: {
+        input: {
+          pk: reservation.pk,
+          cancelReasonPk: reason.value,
+          cancelDetails: description,
+        },
+      },
+    });
+  };
 
   return (
     <>

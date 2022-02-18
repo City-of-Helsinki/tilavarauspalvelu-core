@@ -4,8 +4,11 @@ import { oidcUrl, oidcClientId, apiScope, isBrowser } from "../const";
 export const getApiAccessToken = (): string | null =>
   isBrowser && sessionStorage.getItem(`oidc.apiToken.${apiScope}`);
 
-const setApiAccessToken = (accessToken: string) =>
+const setApiAccessToken = (accessToken: string): void =>
   isBrowser && sessionStorage.setItem(`oidc.apiToken.${apiScope}`, accessToken);
+
+export const clearApiAccessToken = (): void =>
+  isBrowser && sessionStorage.removeItem(`oidc.apiToken.${apiScope}`);
 
 export const getAccessToken = (): string | null => {
   const key = `oidc.user:${oidcUrl}/:${oidcClientId}`;

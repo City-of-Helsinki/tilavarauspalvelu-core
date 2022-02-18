@@ -27,21 +27,23 @@ import {
 
 describe("Tilavaraus user reservations", () => {
   beforeEach(() => {
+    cy.window().then(() => {
+      sessionStorage.setItem(
+        `oidc.apiToken.${Cypress.env("API_SCOPE")}`,
+        "foobar"
+      );
+    });
+
     cy.visit("/reservations");
   });
 
-  it("should list proper items with correct button states and link to reservation unit", () => {
-    tab(1)
-      .invoke("text")
-      .then((text) => {
-        expect(text).to.eq("Tulevat varaukset (5)");
-      });
-    tab(2)
-      .invoke("text")
-      .then((text) => {
-        expect(text).to.eq("Menneet varaukset (2)");
-      });
+  afterEach(() => {
+    cy.window().then(() => {
+      sessionStorage.removeItem(`oidc.apiToken.${Cypress.env("API_SCOPE")}`);
+    });
+  });
 
+  it("should list proper items with correct button states and link to reservation unit", () => {
     reservationCards().should("have.length", 5);
     timeStrip()
       .should("have.length", 5)
@@ -51,6 +53,17 @@ describe("Tilavaraus user reservations", () => {
         } else {
           expect($el).to.contain("Varaus käsiteltävänä");
         }
+      });
+
+    tab(1)
+      .invoke("text")
+      .then((text) => {
+        expect(text).to.eq("Tulevat varaukset (5)");
+      });
+    tab(2)
+      .invoke("text")
+      .then((text) => {
+        expect(text).to.eq("Menneet varaukset (2)");
       });
 
     cancelButton().should("have.length", 1);

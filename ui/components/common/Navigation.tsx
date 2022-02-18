@@ -9,6 +9,7 @@ import { authEnabled, isBrowser } from "../../modules/const";
 import { breakpoint } from "../../modules/style";
 import { UserProfile } from "../../modules/types";
 import RequireAuthentication from "./RequireAuthentication";
+import { clearApiAccessToken } from "../../modules/auth/util";
 
 interface LanguageOption {
   label: string;
@@ -180,7 +181,15 @@ const NavigationWithProfileAndLogout = (): JSX.Element => {
       render={(props: {
         profile: UserProfile | null;
         logout: (() => void) | undefined;
-      }) => <Navigation profile={props.profile} logout={props.logout} />}
+      }) => (
+        <Navigation
+          profile={props.profile}
+          logout={() => {
+            clearApiAccessToken();
+            props.logout();
+          }}
+        />
+      )}
     />
   );
 };

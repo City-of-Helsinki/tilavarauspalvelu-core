@@ -300,7 +300,7 @@ const ReservationCard = ({ reservation, type }: Props): JSX.Element => {
             onClick={() => router.push(link)}
             data-testid="reservation-card__button--goto-reservation"
           >
-            {t("reservationUnitCard:seeMore")}
+            {t("reservationList:seeMore")}
           </MediumButton>
         </Actions>
       </MainContent>
