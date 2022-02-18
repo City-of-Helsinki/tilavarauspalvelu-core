@@ -160,7 +160,7 @@ class Organisation(models.Model):
     email = models.EmailField(
         verbose_name=_("Email"),
         default="",
-        blank=False,
+        blank=True,
     )
 
     def __str__(self):

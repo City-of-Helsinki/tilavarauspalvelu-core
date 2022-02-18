@@ -118,6 +118,36 @@ def test_application_create_organization_can_be_null(
 
 
 @pytest.mark.django_db
+def test_application_create_organization_email_can_be_empty(
+    valid_application_data, user_api_client
+):
+    valid_application_data["organisation"].update({"email": ""})
+
+    response = user_api_client.post(
+        reverse("application-list"),
+        data=valid_application_data,
+        format="json",
+    )
+
+    assert_that(response.status_code).is_equal_to(201)
+
+
+@pytest.mark.django_db
+def test_application_create_organization_email_cannot_be_null(
+    valid_application_data, user_api_client
+):
+    valid_application_data["organisation"].update({"email": None})
+
+    response = user_api_client.post(
+        reverse("application-list"),
+        data=valid_application_data,
+        format="json",
+    )
+
+    assert_that(response.status_code).is_equal_to(400)
+
+
+@pytest.mark.django_db
 @freeze_time("2021-01-15")
 def test_application_update_should_update_organisation_and_contact_person(
     user_api_client, application, organisation, person, purpose, application_round
