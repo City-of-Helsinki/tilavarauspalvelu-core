@@ -12,6 +12,7 @@ on:
     paths:
       - "ui/**"
       - ".github/workflows/ui-e2e.yml"
+      - "yarn.lock"
 
 jobs:
   build:
