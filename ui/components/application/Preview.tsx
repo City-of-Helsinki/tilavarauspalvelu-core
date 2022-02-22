@@ -280,7 +280,7 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
                     <BuildingName>
                       {localizedValue(
                         reservationUnits[reservationUnit.reservationUnitId]
-                          .building.name,
+                          .building?.name,
                         i18n.language
                       )}
                     </BuildingName>,
