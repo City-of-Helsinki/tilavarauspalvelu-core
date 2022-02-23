@@ -79,6 +79,7 @@ function App(): JSX.Element {
             <Route
               path="/applicationRound/:applicationRoundId/applications"
               component={Applications}
+              exact
             />
             <Route
               path="/applicationRound/:applicationRoundId/resolution"
@@ -119,6 +120,7 @@ function App(): JSX.Element {
             <Route
               path="/applicationRound/:applicationRoundId"
               component={ApplicationRound}
+              exact
             />
             <Route path="/spaces" component={SpacesList} />
             <Route
