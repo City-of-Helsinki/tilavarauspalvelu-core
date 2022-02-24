@@ -466,6 +466,13 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
 
   describe("with reservation quota notification", () => {
     it("should display apt notification if quota is set and full", () => {
+      cy.window().then(() => {
+        sessionStorage.setItem(
+          `oidc.apiToken.${Cypress.env("API_SCOPE")}`,
+          "foobar"
+        );
+      });
+
       cy.visit("/reservation-unit/single/901");
 
       gotoCalendarButton().should("exist");
@@ -480,9 +487,20 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
           "match",
           /^Sinulla on jo \d+ varausta tähän tilaan. Et voi tehdä uusia varauksia.$/
         );
+
+      cy.window().then(() => {
+        sessionStorage.removeItem(`oidc.apiToken.${Cypress.env("API_SCOPE")}`);
+      });
     });
 
     it("should display apt notification if quota is set but not full", () => {
+      cy.window().then(() => {
+        sessionStorage.setItem(
+          `oidc.apiToken.${Cypress.env("API_SCOPE")}`,
+          "foobar"
+        );
+      });
+
       cy.visit("/reservation-unit/single/902");
 
       gotoCalendarButton().should("exist");
@@ -492,6 +510,10 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
       reservationQuotaNotification()
         .invoke("text")
         .should("match", /^Sinulla on jo \d+\/\d+ varausta tähän tilaan.$/);
+
+      cy.window().then(() => {
+        sessionStorage.removeItem(`oidc.apiToken.${Cypress.env("API_SCOPE")}`);
+      });
     });
   });
 

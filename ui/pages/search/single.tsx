@@ -208,7 +208,11 @@ const SearchSingle = (): JSX.Element => {
       </HeadContainer>
       <StyledKorosPulseEasy from="white" to="var(--tilavaraus-gray)" />
       {loading ? (
-        <CenterSpinner style={{ marginTop: "var(--spacing-xl)" }} />
+        <CenterSpinner
+          style={{
+            margin: "var(--spacing-xl) auto var(--spacing-layout-2-xl)",
+          }}
+        />
       ) : (
         <SearchResultList
           error={!!error}

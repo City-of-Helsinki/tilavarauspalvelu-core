@@ -31,3 +31,7 @@ export function timeStrip(): Cypress.Chainable<JQuery<HTMLElement>> {
 export function ticket(): Cypress.Chainable<JQuery<HTMLElement>> {
   return cy.get("[data-testid='reservation__ticket--container']");
 }
+
+export function loader(): Cypress.Chainable<JQuery<HTMLElement>> {
+  return cy.get("[data-testid='loading-spinner']");
+}

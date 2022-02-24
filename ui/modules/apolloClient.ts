@@ -4,9 +4,9 @@ import {
   fromPromise,
   HttpLink,
   InMemoryCache,
+  from,
 } from "@apollo/client";
 import { relayStylePagination } from "@apollo/client/utilities";
-import { setContext } from "@apollo/client/link/context";
 import { onError } from "@apollo/client/link/error";
 import {
   getAccessToken,
@@ -15,24 +15,54 @@ import {
 } from "./auth/util";
 import { apiBaseUrl } from "./const";
 
+// list of operations that need authentication
+const needsAuthentication = ["listReservations", "reservationByPk"];
+
 const getNewToken = (): Promise<string> =>
   updateApiAccessToken(getAccessToken());
 
-const authLink = setContext((req, ctx) => {
+const authLink = new ApolloLink((operation, forward) => {
   const token = getApiAccessToken();
 
-  return {
+  if (!token) {
+    return fromPromise(
+      getNewToken().catch(() => {
+        // TODO Handle token refresh error
+        if (needsAuthentication.includes(operation.operationName)) {
+          return false;
+        }
+
+        return forward(operation);
+      })
+    )
+      .filter((value) => Boolean(value))
+      .flatMap((accessToken) => {
+        const oldHeaders = operation.getContext().headers;
+        operation.setContext({
+          headers: {
+            ...oldHeaders,
+            authorization: `Bearer ${accessToken}`,
+          },
+        });
+
+        return forward(operation);
+      });
+  }
+
+  operation.setContext(({ headers }) => ({
     headers: {
-      ...ctx.headers,
+      ...headers,
       authorization: token ? `Bearer ${token}` : "",
     },
-  };
+  }));
+
+  return forward(operation);
 });
 
 // eslint-disable-next-line consistent-return
 const errorLink = onError(({ graphQLErrors, operation, forward }) => {
   if (graphQLErrors) {
-    const autherror = graphQLErrors.find((e) => {
+    const authError = graphQLErrors.find((e) => {
       return (
         e.message !== null &&
         (e.message.indexOf("AnonymousUser") !== -1 ||
@@ -42,7 +72,7 @@ const errorLink = onError(({ graphQLErrors, operation, forward }) => {
       );
     });
 
-    const hasAuthError = Boolean(autherror !== undefined);
+    const hasAuthError = Boolean(authError !== undefined);
 
     if (hasAuthError) {
       return fromPromise(
@@ -79,7 +109,7 @@ const client = new ApolloClient({
       },
     },
   }),
-  link: ApolloLink.from([errorLink, authLink, httpLink]),
+  link: from([errorLink, authLink, httpLink]),
   ssrMode: true,
   defaultOptions: {
     watchQuery: {

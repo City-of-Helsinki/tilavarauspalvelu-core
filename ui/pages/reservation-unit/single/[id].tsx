@@ -2,6 +2,7 @@ import React, { useContext, useMemo, useRef, useState } from "react";
 import { GetServerSideProps } from "next";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
+import { useQuery } from "@apollo/client";
 import { Koros, Notification } from "hds-react";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { addSeconds, addYears, isValid, parseISO, subMinutes } from "date-fns";
@@ -46,7 +47,6 @@ import {
   QueryTermsOfUseArgs,
   ReservationsReservationStateChoices,
   ReservationType,
-  ReservationTypeEdge,
   ReservationUnitByPkType,
   ReservationUnitByPkTypeOpeningHoursArgs,
   ReservationUnitByPkTypeReservationsArgs,
@@ -68,7 +68,6 @@ type Props = {
   reservationUnit: ReservationUnitByPkType | null;
   relatedReservationUnits: ReservationUnitType[];
   activeApplicationRounds: ApplicationRound[];
-  userReservations: ReservationType[];
   termsOfUse: Record<string, TermsOfUseType>;
 };
 
@@ -113,24 +112,6 @@ export const getServerSideProps: GetServerSideProps = async ({
       },
     });
     const genericTerms = genericTermsData.termsOfUse?.edges[0]?.node || {};
-
-    const { data: userReservationData } = await apolloClient.query<
-      Query,
-      QueryReservationsArgs
-    >({
-      query: LIST_RESERVATIONS,
-      variables: {
-        begin: new Date().toISOString(),
-      },
-    });
-
-    const allowedReservationStates = [
-      ReservationsReservationStateChoices.Created,
-      ReservationsReservationStateChoices.Confirmed,
-    ];
-    const userReservations = userReservationData.reservations?.edges
-      .map((n: ReservationTypeEdge) => n.node)
-      .filter((n) => allowedReservationStates.includes(n.state));
 
     const isDraft = reservationUnitData.reservationUnitByPk?.isDraft;
 
@@ -207,7 +188,6 @@ export const getServerSideProps: GetServerSideProps = async ({
         },
         relatedReservationUnits,
         activeApplicationRounds,
-        userReservations,
         termsOfUse: { genericTerms },
       },
     };
@@ -333,17 +313,38 @@ const ReservationUnit = ({
   reservationUnit,
   relatedReservationUnits,
   activeApplicationRounds,
-  userReservations,
   termsOfUse,
 }: Props): JSX.Element | null => {
   const { t } = useTranslation();
+  const now = useMemo(() => new Date().toISOString(), []);
 
   const { reservation } = useContext(DataContext);
 
+  const [userReservations, setUserReservations] = useState<ReservationType[]>(
+    []
+  );
   const [focusDate, setFocusDate] = useState(new Date());
   const [calendarViewType, setCalendarViewType] = useState<WeekOptions>("week");
   const [initialReservation, setInitialReservation] =
     useState<PendingReservation | null>(null);
+
+  useQuery<Query, QueryReservationsArgs>(LIST_RESERVATIONS, {
+    fetchPolicy: "no-cache",
+    variables: {
+      begin: now,
+    },
+    onCompleted: (res) => {
+      const allowedReservationStates = [
+        ReservationsReservationStateChoices.Created,
+        ReservationsReservationStateChoices.Confirmed,
+        ReservationsReservationStateChoices.RequiresHandling,
+      ];
+      const reservations = res?.reservations?.edges
+        ?.map(({ node }) => node)
+        .filter((n) => allowedReservationStates.includes(n.state));
+      setUserReservations(reservations);
+    },
+  });
 
   const activeOpeningTimes = getActiveOpeningTimes(
     reservationUnit.openingHours?.openingTimePeriods

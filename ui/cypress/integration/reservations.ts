@@ -9,6 +9,7 @@ import {
 import {
   cancelButton,
   detailButton,
+  loader,
   redoReservationButton,
   reservationCards,
   tab,
@@ -27,20 +28,26 @@ import {
 
 describe("Tilavaraus user reservations", () => {
   beforeEach(() => {
+    cy.window().then(() => {
+      sessionStorage.setItem(
+        `oidc.apiToken.${Cypress.env("API_SCOPE")}`,
+        "foobar"
+      );
+    });
+
     cy.visit("/reservations");
   });
 
+  afterEach(() => {
+    cy.window().then(() => {
+      sessionStorage.removeItem(`oidc.apiToken.${Cypress.env("API_SCOPE")}`);
+    });
+  });
+
   it("should list proper items with correct button states and link to reservation unit", () => {
-    tab(1)
-      .invoke("text")
-      .then((text) => {
-        expect(text).to.eq("Tulevat varaukset (5)");
-      });
-    tab(2)
-      .invoke("text")
-      .then((text) => {
-        expect(text).to.eq("Menneet varaukset (2)");
-      });
+    loader().should("exist");
+
+    loader().should("not.exist");
 
     reservationCards().should("have.length", 5);
     timeStrip()
@@ -53,7 +60,18 @@ describe("Tilavaraus user reservations", () => {
         }
       });
 
-    cancelButton().should("have.length", 1);
+    tab(1)
+      .invoke("text")
+      .then((text) => {
+        expect(text).to.eq("Tulevat varaukset (5)");
+      });
+    tab(2)
+      .invoke("text")
+      .then((text) => {
+        expect(text).to.eq("Menneet varaukset (2)");
+      });
+
+    cancelButton().should("have.length", 2);
 
     reservationCards()
       .eq(0)

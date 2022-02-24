@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { isAfter } from "date-fns";
+import { useQuery } from "@apollo/client";
 import { Tabs, TabList, Tab, TabPanel } from "hds-react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
@@ -11,32 +12,19 @@ import {
   QueryReservationsArgs,
   ReservationType,
 } from "../../modules/gql-types";
-import apolloClient from "../../modules/apolloClient";
 import { LIST_RESERVATIONS } from "../../modules/queries/reservation";
 import ReservationCard from "../../components/reservation/ReservationCard";
 import { fontMedium } from "../../modules/style/typography";
 import { breakpoint } from "../../modules/style";
 import Head from "../../components/reservations/Head";
+import { CenterSpinner } from "../../components/common/common";
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
-  const { data } = await apolloClient.query<Query, QueryReservationsArgs>({
-    query: LIST_RESERVATIONS,
-  });
-
   return {
     props: {
-      reservations: data?.reservations?.edges
-        ?.map((edge) => edge?.node)
-        .filter((node) =>
-          ["CONFIRMED", "REQUIRES_HANDLING"].includes(node?.state)
-        ),
       ...(await serverSideTranslations(locale)),
     },
   };
-};
-
-type Props = {
-  reservations: ReservationType[];
 };
 
 const Wrapper = styled(Container)``;
@@ -82,20 +70,42 @@ const EmptyMessage = styled.div`
   margin-left: var(--spacing-xl);
 `;
 
-const Reservations = ({ reservations }: Props): JSX.Element => {
+const Reservations = (): JSX.Element => {
   const { t } = useTranslation();
 
-  const [upcomingReservations, pastReservations] = reservations?.reduce(
-    (acc, reservation) => {
-      if (isAfter(new Date(reservation?.begin), new Date())) {
-        acc[0].push(reservation);
-      } else {
-        acc[1].push(reservation);
-      }
-      return acc;
-    },
-    [[], []] as ReservationType[][]
+  const [upcomingReservations, setUpcomingReservations] = useState<
+    ReservationType[]
+  >([]);
+  const [pastReservations, setPastReservations] = useState<ReservationType[]>(
+    []
   );
+  const [isLoadingReservations, setIsLoadingReservations] =
+    useState<boolean>(true);
+
+  useQuery<Query, QueryReservationsArgs>(LIST_RESERVATIONS, {
+    fetchPolicy: "no-cache",
+    onCompleted: (data) => {
+      const reservations = data?.reservations?.edges
+        ?.map((edge) => edge?.node)
+        .filter((node) =>
+          ["CONFIRMED", "REQUIRES_HANDLING"].includes(node?.state)
+        )
+        .reduce(
+          (acc, reservation) => {
+            if (isAfter(new Date(reservation?.begin), new Date())) {
+              acc[0].push(reservation);
+            } else {
+              acc[1].push(reservation);
+            }
+            return acc;
+          },
+          [[], []] as ReservationType[][]
+        );
+      setUpcomingReservations(reservations[0]);
+      setPastReservations(reservations[1]);
+      setIsLoadingReservations(false);
+    },
+  });
 
   return (
     <>
@@ -105,46 +115,51 @@ const Reservations = ({ reservations }: Props): JSX.Element => {
           <Tabs>
             <StyledTabList>
               <StyledTab>
-                {t("reservations:upcomingReservations")} (
-                {upcomingReservations.length})
+                {t("reservations:upcomingReservations")}
+                {isLoadingReservations
+                  ? ""
+                  : ` (${upcomingReservations.length})`}
               </StyledTab>
               <StyledTab>
-                {t("reservations:pastReservations")} ({pastReservations.length})
+                {t("reservations:pastReservations")}
+                {isLoadingReservations ? "" : ` (${pastReservations.length})`}
               </StyledTab>
             </StyledTabList>
             <StyledTabPanel>
-              {upcomingReservations.length > 0 ? (
-                upcomingReservations?.map((reservation) => (
-                  <ReservationCard
-                    key={reservation.pk}
-                    reservation={reservation}
-                    type={
-                      reservation.state === "REQUIRES_HANDLING"
-                        ? "requiresHandling"
-                        : "upcoming"
-                    }
-                  />
-                ))
-              ) : (
-                <EmptyMessage>
-                  {t("reservations:noUpcomingReservations")}
-                </EmptyMessage>
-              )}
+              {isLoadingReservations && <CenterSpinner />}
+              {upcomingReservations.length > 0
+                ? upcomingReservations?.map((reservation) => (
+                    <ReservationCard
+                      key={reservation.pk}
+                      reservation={reservation}
+                      type={
+                        reservation.state === "REQUIRES_HANDLING"
+                          ? "requiresHandling"
+                          : "upcoming"
+                      }
+                    />
+                  ))
+                : !isLoadingReservations && (
+                    <EmptyMessage>
+                      {t("reservations:noUpcomingReservations")}
+                    </EmptyMessage>
+                  )}
             </StyledTabPanel>
             <StyledTabPanel>
-              {pastReservations.length > 0 ? (
-                pastReservations?.map((reservation) => (
-                  <ReservationCard
-                    key={reservation.pk}
-                    reservation={reservation}
-                    type="past"
-                  />
-                ))
-              ) : (
-                <EmptyMessage>
-                  {t("reservations:noPastReservations")}
-                </EmptyMessage>
-              )}
+              {isLoadingReservations && <CenterSpinner />}
+              {pastReservations.length > 0
+                ? pastReservations?.map((reservation) => (
+                    <ReservationCard
+                      key={reservation.pk}
+                      reservation={reservation}
+                      type="past"
+                    />
+                  ))
+                : !isLoadingReservations && (
+                    <EmptyMessage>
+                      {t("reservations:noPastReservations")}
+                    </EmptyMessage>
+                  )}
             </StyledTabPanel>
           </Tabs>
         </Heading>

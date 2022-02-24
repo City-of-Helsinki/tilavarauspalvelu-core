@@ -3,5 +3,6 @@
   "denied": "Poikkeukset, jolloin vakiovuoro ei ole käytettävissänne",
   "headerWeekday": "Viikonpäivä",
   "headerDate": "Päivämäärä",
-  "headerTime": "Kellonaika"
+  "headerTime": "Kellonaika",
+  "seeMore": "Näytä varaus"
 }
