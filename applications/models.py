@@ -643,6 +643,13 @@ class Application(APPLICANT_TYPE_CONST, models.Model):
         null=True,
     )
 
+    additional_information = models.TextField(
+        verbose_name=_("Additional information"),
+        null=True,
+        blank=True,
+        help_text="Additional information about the application",
+    )
+
     created_date = models.DateTimeField(auto_now_add=True)
     last_modified_date = models.DateTimeField(auto_now=True)
 
