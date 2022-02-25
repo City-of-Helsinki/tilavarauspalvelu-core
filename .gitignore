@@ -4,6 +4,7 @@ db.sqlite3
 *.mo
 *.sqlite
 data/
+exports/
 media/
 static/
 .django_secret
