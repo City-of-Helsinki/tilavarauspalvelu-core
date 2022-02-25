@@ -7,14 +7,20 @@ import {
   selectOption,
   acceptAndSaveEvent,
   nextButton,
-  randomApplicationEventScheduleButton,
+  timeSelectorButton,
   fillAsIndividual,
   acceptTerms,
   submitApplication,
+  selectPriority,
+  timeSummary,
+  resetButton,
+  addNewApplicationButton,
+  notificationTitle,
+  applicationEventAccordion,
+  copyCellsButton,
 } from "../model/application";
 import {
   addReservationUnitButton,
-  searchButton,
   startApplicationButton,
 } from "../model/search";
 
@@ -98,27 +104,115 @@ describe("application", () => {
 
     cy.a11yCheck();
 
-    applicationName().clear().type("Kurikan Vimma");
-    numPersons().type("3");
+    applicationName(0).clear().type("Kurikan Vimma");
+    numPersons(0).type("3");
     selectOption("applicationEvents[0].ageGroupId", 1);
     selectOption("applicationEvents[0].purposeId", 1);
-    acceptAndSaveEvent().click();
+    acceptAndSaveEvent(0).click();
 
-    cy.fixture("v1/application/138_page_2").then((json) => {
-      cy.intercept("GET", "/v1/application/138/*", json);
-    });
+    cy.intercept("PUT", "/v1/application/*").as("savePage1");
+    cy.wait("@savePage1");
+
+    addNewApplicationButton().click();
+    applicationName(1).clear().type("Toca");
+    numPersons(1).type("4");
+    selectOption("applicationEvents[1].ageGroupId", 2);
+    selectOption("applicationEvents[1].purposeId", 2);
+    acceptAndSaveEvent(1).click();
 
     nextButton().click();
 
-    cy.wait(["@applicationRound1"]);
+    cy.fixture("v1/application/138_page_2").then((json) => {
+      cy.intercept("GET", "/v1/application/138/*", json).as("page2");
+    });
+
+    cy.wait(["@page2"]);
 
     cy.get("h1").should("contain", "ajankohta");
 
     cy.a11yCheck();
 
-    randomApplicationEventScheduleButton().click();
-    randomApplicationEventScheduleButton().click();
-    randomApplicationEventScheduleButton().click();
+    timeSelectorButton(0, 7, 0).click();
+    timeSelectorButton(0, 8, 0).click();
+    timeSelectorButton(0, 9, 0).click();
+
+    timeSummary(0, 0).should(
+      "contain.text",
+      "Ensisijaiset aikatoiveetMaanantai:7-10TiistaiKeskiviikkoTorstaiPerjantaiLauantaiSunnuntai"
+    );
+
+    selectPriority(0, 1);
+
+    timeSelectorButton(0, 9, 0).click();
+    timeSelectorButton(0, 8, 3).click();
+    timeSelectorButton(0, 9, 3).click();
+
+    timeSummary(0, 0).should(
+      "contain.text",
+      "Ensisijaiset aikatoiveetMaanantai:7-9TiistaiKeskiviikkoTorstaiPerjantaiLauantaiSunnuntai"
+    );
+    timeSummary(0, 1).should(
+      "contain.text",
+      "Muut aikatoiveetMaanantai:9-10TiistaiKeskiviikkoTorstai:8-10PerjantaiLauantaiSunnuntai"
+    );
+
+    resetButton(0).click();
+
+    timeSummary(0, 0).should(
+      "contain.text",
+      "Ensisijaiset aikatoiveetMaanantaiTiistaiKeskiviikkoTorstaiPerjantaiLauantaiSunnuntai"
+    );
+    timeSummary(0, 1).should(
+      "contain.text",
+      "Muut aikatoiveetMaanantaiTiistaiKeskiviikkoTorstaiPerjantaiLauantaiSunnuntai"
+    );
+
+    timeSelectorButton(0, 10, 1).click();
+
+    cy.wait(100);
+
+    timeSummary(0, 0).should(
+      "contain.text",
+      "Ensisijaiset aikatoiveetMaanantaiTiistaiKeskiviikkoTorstaiPerjantaiLauantaiSunnuntai"
+    );
+    timeSummary(0, 1).should(
+      "contain.text",
+      "Muut aikatoiveetMaanantaiTiistai:10-11KeskiviikkoTorstaiPerjantaiLauantaiSunnuntai"
+    );
+
+    nextButton().click();
+
+    notificationTitle().should(
+      "contain.text",
+      "Lisää kaikille vakiovuoroille vähintään yksi aika"
+    );
+
+    applicationEventAccordion(1).click();
+
+    timeSummary(1, 0).should(
+      "contain.text",
+      "Ensisijaiset aikatoiveetMaanantaiTiistaiKeskiviikkoTorstaiPerjantaiLauantaiSunnuntai"
+    );
+    timeSummary(1, 1).should(
+      "contain.text",
+      "Muut aikatoiveetMaanantaiTiistaiKeskiviikkoTorstaiPerjantaiLauantaiSunnuntai"
+    );
+
+    copyCellsButton(0).click();
+
+    timeSummary(1, 0).should(
+      "contain.text",
+      "Ensisijaiset aikatoiveetMaanantaiTiistaiKeskiviikkoTorstaiPerjantaiLauantaiSunnuntai"
+    );
+    timeSummary(1, 1).should(
+      "contain.text",
+      "Muut aikatoiveetMaanantaiTiistai:10-11KeskiviikkoTorstaiPerjantaiLauantaiSunnuntai"
+    );
+
+    notificationTitle().should(
+      "contain.text",
+      "Ajat on kopioitu onnistuneesti kaikille vuorotoiveille"
+    );
 
     nextButton().click();
 
@@ -138,6 +232,15 @@ describe("application", () => {
     cy.wait(["@purpose", "@city", "@ageGroup"]);
 
     cy.get("h1").should("contain", "Hakemuksen lähe");
+
+    timeSummary(0, 0).should(
+      "contain.text",
+      "Ensisijaiset aikatoiveetMaanantaiTiistai:10-11KeskiviikkoTorstai:15-16PerjantaiLauantaiSunnuntai"
+    );
+    timeSummary(0, 1).should(
+      "contain.text",
+      "Muut aikatoiveetMaanantaiTiistaiKeskiviikkoTorstaiPerjantaiLauantai:17-18Sunnuntai"
+    );
 
     acceptTerms();
 

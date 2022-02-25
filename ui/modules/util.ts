@@ -31,6 +31,7 @@ import {
   ApplicationStatus,
   ReducedApplicationStatus,
   StringParameter,
+  ApplicationEventSchedulePriority,
 } from "./types";
 import { ReservationUnitImageType, ReservationUnitType } from "./gql-types";
 
@@ -243,7 +244,11 @@ export const apiDurationToMinutes = (duration: string): number => {
 
 const formatNumber = (n: number): string => `0${n > 23 ? 0 : n}`.slice(-2);
 
-type Timespan = { begin: number; end: number };
+type Timespan = {
+  begin: number;
+  end: number;
+  priority: ApplicationEventSchedulePriority;
+};
 
 export const cellsToApplicationEventSchedules = (
   cells: Cell[][]
@@ -253,30 +258,41 @@ export const cellsToApplicationEventSchedules = (
     const dayCells = cells[day];
     dayCells
       .filter((cell) => cell.state)
-      .map((cell) => ({ begin: cell.hour, end: cell.hour + 1 } as Timespan))
+      .map(
+        (cell) =>
+          ({
+            begin: cell.hour,
+            end: cell.hour + 1,
+            priority: cell.state,
+          } as Timespan)
+      )
       .reduce((prev, current) => {
         if (!prev.length) {
           return [current];
         }
-        if (prev[prev.length - 1].end === current.begin) {
+        if (
+          prev[prev.length - 1].end === current.begin &&
+          prev[prev.length - 1].priority === current.priority
+        ) {
           return [
             ...prev.slice(0, prev.length - 1),
             {
               begin: prev[prev.length - 1].begin,
               end: prev[prev.length - 1].end + 1,
+              priority: prev[prev.length - 1].priority,
             },
           ];
         }
         return prev.concat([current]);
       }, [] as Timespan[])
-      .map(
-        (cell) =>
-          ({
-            day,
-            begin: `${formatNumber(cell.begin)}:00`,
-            end: `${formatNumber(cell.end)}:00`,
-          } as ApplicationEventSchedule)
-      )
+      .map((cell) => {
+        return {
+          day,
+          begin: `${formatNumber(cell.begin)}:00`,
+          end: `${formatNumber(cell.end)}:00`,
+          priority: cell.priority,
+        } as ApplicationEventSchedule;
+      })
       .forEach((e) => daySchedules.push(e));
   }
   return daySchedules;
@@ -318,7 +334,7 @@ export const applicationEventSchedulesToCells = (
 
     for (let h = hourBegin; h < hourEnd; h += 1) {
       const cell = cells[day][h];
-      cell.state = true;
+      cell.state = applicationEventSchedule.priority;
     }
   });
 

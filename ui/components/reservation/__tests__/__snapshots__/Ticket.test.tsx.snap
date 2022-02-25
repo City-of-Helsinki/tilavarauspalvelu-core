@@ -207,7 +207,7 @@ exports[`renders correctly 4`] = `
         <span>
           Common:dateWithWeekday common:timeWithPrefix - common:time 
           <span
-            class="util__NoWrap-sc-5wh4ks-1 SOiPT"
+            class="util__NoWrap-sc-5wh4ks-2 jbues"
           >
             (common:duration)
           </span>
