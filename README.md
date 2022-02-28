@@ -26,6 +26,24 @@ Then you can run docker image with
 
 `docker-compose up dev`
 
+### Potential build problems
+
+Docker compose might fail building with an error about missing source files. This is fixed by creating hte following directories (empty dirs are fine).
+
+```sh
+$ mkdir ./etc-pki-entitlement && mkdir ./rhsm-conf && mkdir ./rhsm-ca
+```
+
+Some RHEL repos can cause build to fail. These can be added or removed with these lines in the `Dockerfile` before `RUN yum -y update` line.
+
+```docker
+RUN subscription-manager repos --enable codeready-builder-for-rhel-8-x86_64-rpms
+RUN subscription-manager repos --disable rhel-8-for-x86_64-baseos-beta-rpms
+RUN subscription-manager repos --disable rhel-8-for-x86_64-appstream-beta-rpms
+```
+
+If a build fails, remove the failed `dev` docker container and all intermediary related containers. When docker containers has been cleaned, try the build again with one of the repo enabled/disabled (depending on what settings you had when first building the project).
+
 # Running tests and formatting
 
 Tests are run with pytest. Use `pytest` to run all tests. Use `pytest -W default` to show third party warnings ignored in `pytest.ini`.
@@ -41,7 +59,7 @@ Locally:
 `deploy/entrypoint.sh test`
 
 
-##Requirements
+## Requirements
 
 Workflow with requirements is as follows.
 
@@ -75,11 +93,17 @@ Default value is ./broker/queue/ for in and out and ./broker/processed/ for proc
 
 ## Environmental variables
 
-See [.env.example](.env.example) for environment variable documentation
+For detailed documentation about specific environment variables, see [.env.example](.env.example).
+
+For this project, `.env.example` must be copied both to the root directory as `.env` and to the `tilavarauspalvelu` directory (as `.env` as well). To reduce confusion and potential misconfiguration, it is advisable to only have `.env` as a file in the root directory. The `.env` file can then be symlinked to `tilavarauspalvelu` directory with the commands:
+```sh
+$ cd tilavarauspalvelu
+$ ln -s ../.env .env
+```
 
 ## Database requirements
 
-Postgresql 11 database with postgis extension.
+Postgresql 11 database with postgis extension. Find postgis installation instructions [here](https://postgis.net/install/).
  
 # Authentication
 
