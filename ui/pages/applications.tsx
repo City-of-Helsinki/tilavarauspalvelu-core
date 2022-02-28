@@ -87,7 +87,7 @@ const Applications = (): JSX.Element => {
 
   return (
     <>
-      <Head heading={t("applications:heading")} />
+      <Head />
       <RequireAuthentication>
         <Container>
           <Loader datas={[applications, rounds]}>

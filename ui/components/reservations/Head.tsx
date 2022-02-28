@@ -1,14 +1,9 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import KorosPulseEasy from "../common/KorosPulseEasy";
-
-type Props = {
-  heading: string;
-};
-
-const Heading = styled.h1`
-  font-size: var(--fontsize-heading-l);
-`;
+import { breakpoint } from "../../modules/style";
+import { H1, HeroSubheading } from "../../modules/style/typography";
+import KorosDefault from "../common/KorosDefault";
 
 const Container = styled.div`
   background-color: var(--tilavaraus-hero-background-color);
@@ -16,19 +11,26 @@ const Container = styled.div`
 `;
 
 const Content = styled.div`
-  padding: var(--spacing-l) var(--spacing-m) var(--spacing-m);
-  max-width: var(--container-width-xl);
-  margin: 0 auto;
-  font-size: var(--fontsize-heading-m);
+  padding: var(--spacing-s) var(--spacing-m) var(--spacing-xl);
+
+  @media (min-width: ${breakpoint.m}) {
+    max-width: var(--container-width-xl);
+    padding: var(--spacing-m);
+    margin: 0 auto;
+    padding-bottom: var(--spacing-layout-l);
+  }
 `;
 
-const Head = ({ heading }: Props): JSX.Element => {
+const Head = (): JSX.Element => {
+  const { t } = useTranslation();
+
   return (
     <Container>
       <Content>
-        <Heading>{heading}</Heading>
+        <H1>{t(`navigation:Item.reservations`)}</H1>
+        <HeroSubheading>{t(`reservations:subHeading`)}</HeroSubheading>
       </Content>
-      <KorosPulseEasy
+      <KorosDefault
         from="var(--tilavaraus-hero-background-color)"
         to="var(--tilavaraus-gray)"
       />

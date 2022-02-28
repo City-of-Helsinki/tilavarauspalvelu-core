@@ -8,7 +8,7 @@ import { getApplicationRound } from "../../modules/api";
 import { ApplicationRound } from "../../modules/types";
 import Sanitize from "../../components/common/Sanitize";
 import Breadcrumb from "../../components/common/Breadcrumb";
-import KorosPulseEasy from "../../components/common/KorosPulseEasy";
+import KorosDefault from "../../components/common/KorosDefault";
 
 type Props = {
   applicationRound: ApplicationRound;
@@ -63,7 +63,7 @@ const Criteria = ({ applicationRound }: Props): JSX.Element => {
             {`${applicationRound?.name} ${t("applicationRound:criteria")}`}
           </H1>
         </HeadContent>
-        <KorosPulseEasy
+        <KorosDefault
           from="var(--tilavaraus-hero-background-color)"
           to="var(--tilavaraus-gray)"
         />

@@ -50,7 +50,7 @@ import {
 import { MediumButton } from "../../styles/util";
 import { OptionType } from "../../modules/types";
 import { emptyOption, reservationUnitSinglePrefix } from "../../modules/const";
-import KorosPulseEasy from "../../components/common/KorosPulseEasy";
+import KorosDefault from "../../components/common/KorosDefault";
 
 type Props = {
   id: number;
@@ -62,8 +62,9 @@ export const getServerSideProps: GetServerSideProps = async ({
   query,
 }) => {
   const id = Number(query.params[0]);
+  const slug = query.params[1];
 
-  if (isFinite(id)) {
+  if (isFinite(id) && slug === "cancel") {
     const { data: reasonsData } = await apolloClient.query<
       Query,
       QueryReservationCancelReasonsArgs
@@ -102,10 +103,11 @@ const Head = styled.div`
 `;
 
 const HeadWrapper = styled(NarrowCenteredContainer)`
-  padding: 0 var(--spacing-m);
+  padding: 0 var(--spacing-m) var(--spacing-layout-m);
 
   @media (min-width: ${breakpoint.m}) {
     max-width: 1000px;
+    margin-bottom: var(--spacing-layout-l);
   }
 `;
 
@@ -131,7 +133,10 @@ const Heading = styled.div`
     display: flex;
     align-items: center;
     gap: var(--spacing-xs);
-    font-size: 32px;
+    font-size: 1.75rem;
+    font-family: var(--font-bold);
+    font-weight: 700;
+    margin-bottom: var(--spacing-m);
   }
 `;
 
@@ -150,7 +155,7 @@ const Actions = styled.div`
   }
 `;
 
-const StyledKoros = styled(KorosPulseEasy)`
+const StyledKoros = styled(KorosDefault)`
   @media (min-width: ${breakpoint.m}) {
     margin-top: var(--spacing-layout-xl);
   }

@@ -2,7 +2,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import Breadcrumb from "../common/Breadcrumb";
-import KorosPulseEasy from "../common/KorosPulseEasy";
+import KorosDefault from "../common/KorosDefault";
 
 type HeadProps = {
   heading: string;
@@ -19,14 +19,14 @@ const Container = styled.div`
 `;
 
 const Content = styled.div`
-  padding: var(--spacing-l) var(--spacing-m) var(--spacing-m);
+  padding: var(--spacing-l) var(--spacing-m) var(--spacing-layout-xl);
   max-width: var(--container-width-xl);
   margin: 0 auto;
   font-size: var(--fontsize-heading-m);
   font-weight: 500;
 `;
 
-const StyledKoros = styled(KorosPulseEasy)`
+const StyledKoros = styled(KorosDefault)`
   margin-top: var(--spacing-layout-m);
 `;
 

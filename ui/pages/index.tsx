@@ -6,7 +6,7 @@ import Header from "../components/index/Header";
 import SearchGuides from "../components/index/SearchGuides";
 import ServiceInfo from "../components/index/ServiceInfo";
 import { StyledKoros } from "../modules/style";
-import KorosPulseEasy from "../components/common/KorosPulseEasy";
+import KorosDefault from "../components/common/KorosDefault";
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
@@ -22,7 +22,7 @@ const Home = (): JSX.Element => {
   return (
     <>
       <Header heading={t("head.heading")} text={t("head.text")} />
-      <KorosPulseEasy
+      <KorosDefault
         from="var(--tilavaraus-hero-background-color)"
         to="var(--tilavaraus-gray)"
       />

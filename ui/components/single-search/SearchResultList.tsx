@@ -22,7 +22,6 @@ interface Props {
 }
 
 const Wrapper = styled.div`
-  margin-top: var(--spacing-layout-l);
   margin-bottom: var(--spacing-layout-xl);
 `;
 

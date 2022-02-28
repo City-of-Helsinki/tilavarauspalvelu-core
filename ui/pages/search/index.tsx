@@ -6,7 +6,6 @@ import { useLocalStorage } from "react-use";
 import { useRouter } from "next/router";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Container from "../../components/common/Container";
-import Breadcrumb from "../../components/common/Breadcrumb";
 import SearchForm from "../../components/search/SearchForm";
 import SearchResultList from "../../components/search/SearchResultList";
 import {
@@ -15,11 +14,11 @@ import {
 } from "../../modules/api";
 import { ReservationUnit } from "../../modules/types";
 import { searchUrl } from "../../modules/util";
-import { isBrowser, searchPrefix } from "../../modules/const";
+import { isBrowser } from "../../modules/const";
 import { CenterSpinner } from "../../components/common/common";
 import ClientOnly from "../../components/ClientOnly";
-import { H1 } from "../../modules/style/typography";
-import KorosPulseEasy from "../../components/common/KorosPulseEasy";
+import { H1, HeroSubheading } from "../../modules/style/typography";
+import KorosDefault from "../../components/common/KorosDefault";
 
 const Wrapper = styled.div`
   margin-bottom: var(--spacing-layout-xl);
@@ -30,22 +29,10 @@ const HeadContainer = styled.div`
   padding-top: var(--spacing-layout-xs);
 `;
 
-const Title = styled(H1)`
-  && {
-    margin-top: var(--spacing-l);
-    margin-bottom: var(--spacing-xs);
-    font-size: var(--fontsize-heading-l);
-  }
-`;
+const Title = styled(H1)``;
 
-const Ingress = styled.div`
-  font-family: var(--font-regular);
-  font-size: var(--fontsize-body-xl);
-  margin-bottom: var(--spacing-layout-s);
-`;
-
-const StyledKoros = styled(KorosPulseEasy)`
-  margin-bottom: var(--spacing-layout-l);
+const Ingress = styled(HeroSubheading)`
+  margin-bottom: var(--spacing-xl);
 `;
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -113,13 +100,12 @@ const Search = (): JSX.Element => {
     <Wrapper>
       <HeadContainer>
         <Container>
-          <Breadcrumb current={{ label: "search", linkTo: searchPrefix }} />
           <Title>{t("search:recurring.heading")}</Title>
-          <Ingress className="text-lg">{t("search:recurring.text")}</Ingress>
+          <Ingress>{t("search:recurring.text")}</Ingress>
           <SearchForm onSearch={onSearch} formValues={values} />
         </Container>
       </HeadContainer>
-      <StyledKoros from="white" to="var(--tilavaraus-gray)" />
+      <KorosDefault from="white" to="var(--tilavaraus-gray)" />
       <ClientOnly>
         {state === "loading" ? (
           <CenterSpinner style={{ marginTop: "var(--spacing-layout-xl)" }} />

@@ -27,16 +27,17 @@ export const Regular = styled.span`
 `;
 
 export const H1 = styled.h1`
-  font-size: 1.75rem;
-  font-family: var(--font-bold);
-  font-weight: 700;
-  margin-bottom: var(--spacing-m);
+  font-size: 3rem;
+  font-family: var(--font-regular);
+  font-weight: 400;
+  line-height: var(--lineheight-s);
+  margin: var(--spacing-s) 0 var(--spacing-m);
 `;
 
 export const H2 = styled.h2`
-  font-size: var(--fontsize-heading-m);
-  font-family: var(--font-bold);
-  font-weight: 700;
+  font-size: 2rem;
+  font-family: var(--font-regular);
+  font-weight: 400;
   margin-bottom: var(--spacing-m);
 `;
 
@@ -45,6 +46,11 @@ export const H3 = styled.h2`
   font-family: var(--font-bold);
   font-weight: 700;
   margin-bottom: var(--spacing-m);
+`;
+
+export const HeroSubheading = styled.p`
+  font-size: var(--fontsize-body-l);
+  line-height: var(--lineheight-xl);
 `;
 
 export const fontRegular = css`

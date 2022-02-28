@@ -38,7 +38,7 @@ import {
   ReserveeType,
 } from "../../modules/reservation";
 import { TERMS_OF_USE } from "../../modules/queries/reservationUnit";
-import KorosPulseEasy from "../../components/common/KorosPulseEasy";
+import KorosDefault from "../../components/common/KorosDefault";
 
 type Props = {
   termsOfUse: Record<string, TermsOfUseType>;
@@ -89,11 +89,19 @@ const Head = styled.div`
 `;
 
 const HeadWrapper = styled(NarrowCenteredContainer)`
-  padding: 0 var(--spacing-m);
+  padding: 0 var(--spacing-m) var(--spacing-layout-m);
 
   @media (min-width: ${breakpoint.m}) {
     max-width: 1000px;
+    margin-bottom: var(--spacing-layout-l);
   }
+`;
+
+const Heading = styled(H1)`
+  font-size: 1.75rem;
+  font-family: var(--font-bold);
+  font-weight: 700;
+  margin-bottom: var(--spacing-m);
 `;
 
 const HeadColumns = styled(TwoColumnContainer)`
@@ -121,7 +129,7 @@ const Actions = styled.div`
   }
 `;
 
-const StyledKoros = styled(KorosPulseEasy)`
+const StyledKoros = styled(KorosDefault)`
   margin-top: var(--spacing-layout-xl);
 `;
 
@@ -138,6 +146,12 @@ const BodyContainer = styled(NarrowCenteredContainer)`
     max-width: 791px;
     padding-right: 219px;
   }
+`;
+
+const ContentHeading = styled(H2)`
+  font-size: var(--fontsize-heading-m);
+  font-family: var(--font-bold);
+  font-weight: 700;
 `;
 
 const Paragraph = styled.p`
@@ -246,7 +260,7 @@ const Reservation = ({ termsOfUse, id }: Props): JSX.Element => {
               reservationPrice={reservation.price}
             />
             <div>
-              <H1>{t(headingSlug)}</H1>
+              <Heading>{t(headingSlug)}</Heading>
               <Actions>
                 <MediumButton
                   variant="secondary"
@@ -287,7 +301,7 @@ const Reservation = ({ termsOfUse, id }: Props): JSX.Element => {
         <StyledKoros from="white" to="var(--tilavaraus-gray)" />
       </Head>
       <BodyContainer>
-        <H2>{t(subHeadingSlug)}</H2>
+        <ContentHeading>{t(subHeadingSlug)}</ContentHeading>
         {isBeingHandled ? (
           <Paragraph>{t("reservationApplication:summaryIngress")}</Paragraph>
         ) : (

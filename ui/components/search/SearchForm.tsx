@@ -10,6 +10,7 @@ import { mapOptions, getSelectedOption } from "../../modules/util";
 import { emptyOption, participantCountOptions } from "../../modules/const";
 import { OptionType } from "../../modules/types";
 import { MediumButton } from "../../styles/util";
+import { fontMedium } from "../../modules/style/typography";
 
 type Props = {
   onSearch: (search: Record<string, string>) => void;
@@ -27,6 +28,10 @@ const Container = styled.div`
 
   @media (max-width: ${breakpoint.m}) {
     grid-template-columns: 1fr;
+  }
+
+  label {
+    ${fontMedium};
   }
 
   margin-top: var(--spacing-s);
@@ -50,7 +55,7 @@ const Hr = styled.hr`
 `;
 
 const ButtonContainer = styled.div`
-  margin-top: var(--spacing-l);
+  margin: var(--spacing-l) 0;
   display: flex;
   justify-content: flex-end;
 `;
@@ -110,7 +115,7 @@ const SearchForm = ({ onSearch, formValues }: Props): JSX.Element | null => {
         <TextInput
           id="search"
           name="search"
-          label="&nbsp;"
+          label={t("searchForm:textSearchLabel")}
           ref={register()}
           placeholder={t("searchForm:searchTermPlaceholder")}
           onKeyDown={(e) => {
