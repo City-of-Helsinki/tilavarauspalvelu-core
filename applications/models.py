@@ -992,7 +992,7 @@ class ApplicationEventSchedule(models.Model):
     )
 
     priority = models.IntegerField(
-        choices=PRIORITIES.PRIORITY_CHOICES, default=PRIORITIES.PRIORITY_MEDIUM
+        choices=PRIORITIES.PRIORITY_CHOICES, default=PRIORITIES.PRIORITY_HIGH
     )
 
     application_event = models.ForeignKey(
