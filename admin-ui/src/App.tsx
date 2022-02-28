@@ -28,7 +28,7 @@ import UnitMap from "./component/Unit/UnitMap";
 import SpacesResources from "./component/Unit/SpacesResources";
 import SpaceEditorView from "./component/Spaces/space-editor/SpaceEditorView";
 import ResourceEditorView from "./component/Resources/resource-editor/ResourceEditorView";
-import ReservationUnitEditor from "./component/ReservationUnits/ReservationUnitEditor";
+import ReservationUnitEditor from "./component/ReservationUnits/ReservationUnitEditor/ReservationUnitEditor";
 import ResourcesList from "./component/Resources/ResourcesList";
 import ReservationUnitsList from "./component/ReservationUnits/ReservationUnitsList";
 import ReservationUnitsSearch from "./component/ReservationUnits/ReservationUnitsSearch";

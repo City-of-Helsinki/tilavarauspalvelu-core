@@ -9,6 +9,7 @@ import {
   NumberInput,
   RadioButton,
   SelectionGroup,
+  TextArea,
   TextInput,
 } from "hds-react";
 import { get, omitBy, pick, sumBy, upperFirst } from "lodash";
@@ -62,7 +63,7 @@ import {
   Wide,
   Wrapper,
 } from "./reservationUnitEditor";
-import { IProps, ReservationUnitEditorType, State } from "./types";
+import { IProps, ReservationUnitEditorType, schema, State } from "./types";
 import { getInitialState, i18nFields, reducer } from "./reducer";
 import {
   CREATE_IMAGE,
@@ -72,6 +73,7 @@ import {
   UPDATE_IMAGE_TYPE,
   UPDATE_RESERVATION_UNIT,
 } from "./queries";
+import FormErrorSummary from "../../../common/FormErrorSummary";
 
 const bufferTimeOptions = [
   { value: 900, label: "15 minuuttia" },
@@ -114,13 +116,6 @@ const getSelectedOptions = (
       .filter(Boolean) as OptionType[]
   );
 };
-
-const hasTranslations = (prefixes: string[], state: State): boolean =>
-  prefixes.every((p) =>
-    ["fi", "sv", "en"].every((l) =>
-      get(state, `reservationUnitEdit.${p}${upperFirst(l)}`)
-    )
-  );
 
 const ReservationUnitEditor = (): JSX.Element | null => {
   const { reservationUnitPk, unitPk } = useParams<IProps>();
@@ -469,17 +464,6 @@ const ReservationUnitEditor = (): JSX.Element | null => {
     );
   }
 
-  const isReadyToPublish = hasTranslations(
-    [
-      "description",
-      "name",
-      "additionalInstructions",
-      "contactInformation",
-      "termsOfUse",
-    ],
-    state
-  );
-
   const { hasChanges } = state;
 
   if (state.error) {
@@ -503,6 +487,18 @@ const ReservationUnitEditor = (): JSX.Element | null => {
     return null;
   }
 
+  const getValidationError = (name: string): string | undefined => {
+    const error = state.validationErrors?.error?.details.find((errorDetail) =>
+      errorDetail.path.find((path) => path === name)
+    );
+
+    if (!error) {
+      return undefined;
+    }
+
+    return t(`validation.${error.type}`, { ...error.context });
+  };
+
   const selectedSpaces = state.spaces.filter(
     (s) => state?.reservationUnitEdit?.spacePks?.indexOf(Number(s.pk)) !== -1
   );
@@ -511,10 +507,10 @@ const ReservationUnitEditor = (): JSX.Element | null => {
     sumBy(selectedSpaces, (s) => Number(s.surfaceArea) || 0) || 1; // default is 1 if no spaces selected
 
   const maxPersons =
-    sumBy(selectedSpaces, (s) => Number(s.maxPersons) || 0) || 20; // default is 20 is no spaces selected
+    sumBy(selectedSpaces, (s) => Number(s.maxPersons) || 0) || 20; // default is 20 if no spaces selected
 
   return (
-    <Wrapper>
+    <Wrapper key={JSON.stringify(state.validationErrors)}>
       <MainMenuWrapper>
         <ContentContainer>
           {state.unit ? (
@@ -527,39 +523,55 @@ const ReservationUnitEditor = (): JSX.Element | null => {
             />
           ) : null}
           <EditorContainer>
-            <Editor>
+            <FormErrorSummary
+              fieldNamePrefix="ReservationUnitEditor.label."
+              validationErrors={state.validationErrors}
+              useDerivedIdsFor={[
+                "reservationUnitTypePk",
+                "metadataSetPk",
+                "minReservationDuration",
+                "maxReservationDuration",
+                "spacePks",
+              ]}
+            />
+
+            <Editor key={JSON.stringify(state.validationErrors)}>
               <Accordion
                 initiallyOpen
                 heading={t("ReservationUnitEditor.basicInformation")}
               >
                 <EditorGrid>
-                  {languages.map((lang) => (
-                    <Wide>
-                      <TextInput
-                        key={lang}
-                        required
-                        id={`name${lang}`}
-                        label={t("ReservationUnitEditor.nameLabel", {
-                          lang,
-                        })}
-                        value={get(
-                          state,
-                          `reservationUnitEdit.name${upperFirst(lang)}`,
-                          ""
-                        )}
-                        onChange={(e) =>
-                          setValue({
-                            [`name${upperFirst(lang)}`]: e.target.value,
-                          })
-                        }
-                      />
-                    </Wide>
-                  ))}
+                  {languages.map((lang) => {
+                    const fieldName = `name${upperFirst(lang)}`;
+                    return (
+                      <Wide>
+                        <TextInput
+                          key={lang}
+                          required
+                          id={fieldName}
+                          label={t(`ReservationUnitEditor.label.${fieldName}`)}
+                          value={get(
+                            state,
+                            `reservationUnitEdit.${fieldName}`,
+                            ""
+                          )}
+                          onChange={(e) =>
+                            setValue({
+                              [fieldName]: e.target.value,
+                            })
+                          }
+                          errorText={getValidationError(fieldName)}
+                          invalid={!!getValidationError(fieldName)}
+                        />
+                      </Wide>
+                    );
+                  })}
                   <Normal>
                     <Combobox
+                      id="spacePks"
                       multiselect
                       required
-                      label={t("ReservationUnitEditor.spacesLabel")}
+                      label={t("ReservationUnitEditor.label.spacePks")}
                       placeholder={t("ReservationUnitEditor.spacesPlaceholder")}
                       options={state.spaceOptions}
                       clearButtonAriaLabel={t("common.clearAllSelections")}
@@ -578,12 +590,15 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                           "spacePks"
                         ),
                       ]}
+                      error={getValidationError("spacePks")}
+                      invalid={!!getValidationError("spacePks")}
                     />
                   </Normal>
                   <Normal>
                     <Combobox
+                      id="resourcePks"
                       multiselect
-                      label={t("ReservationUnitEditor.resourcesLabel")}
+                      label={t("ReservationUnitEditor.label.resourcePks")}
                       placeholder={t(
                         "ReservationUnitEditor.resourcesPlaceholder"
                       )}
@@ -604,13 +619,15 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                           "resourcePks"
                         ),
                       ]}
+                      error={getValidationError("resourcePks")}
+                      invalid={!!getValidationError("resourcePks")}
                     />
                   </Normal>
                   <Dense>
                     <NumberInput
                       value={state.reservationUnitEdit.surfaceArea || 0}
                       id="surfaceArea"
-                      label={t("ReservationUnitEditor.surfaceAreaLabel")}
+                      label={t("ReservationUnitEditor.label.surfaceArea")}
                       helperText={t(
                         "ReservationUnitEditor.surfaceAreaHelperText"
                       )}
@@ -629,13 +646,15 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                       type="number"
                       min={minSurfaceArea}
                       required
+                      errorText={getValidationError("surfaceArea")}
+                      invalid={!!getValidationError("surfaceArea")}
                     />
                   </Dense>
                   <Dense>
                     <NumberInput
                       value={state.reservationUnitEdit.maxPersons || 0}
                       id="maxPersons"
-                      label={t("ReservationUnitEditor.maxPersonsLabel")}
+                      label={t("ReservationUnitEditor.label.maxPersons")}
                       minusStepButtonAriaLabel={t(
                         "common.decreaseByOneAriaLabel"
                       )}
@@ -654,18 +673,24 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                       helperText={t(
                         "ReservationUnitEditor.maxPersonsHelperText"
                       )}
+                      errorText={getValidationError("maxPersons")}
+                      invalid={!!getValidationError("maxPersons")}
                       required
                     />
                   </Dense>
                 </EditorGrid>
               </Accordion>
-              <Accordion heading={t("ReservationUnitEditor.typesProperties")}>
+              <Accordion
+                initiallyOpen={state.validationErrors != null}
+                heading={t("ReservationUnitEditor.typesProperties")}
+              >
                 <EditorGrid>
                   <Normal>
                     <Select
-                      id="reservationUnitType"
+                      required
+                      id="reservationUnitTypePk"
                       label={t(
-                        `ReservationUnitEditor.reservationUnitTypeLabel`
+                        `ReservationUnitEditor.label.reservationUnitTypePk`
                       )}
                       placeholder={t(
                         `ReservationUnitEditor.reservationUnitTypePlaceholder`
@@ -682,6 +707,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                       value={Number(
                         get(state.reservationUnitEdit, "reservationUnitTypePk")
                       )}
+                      errorText={getValidationError("reservationUnitTypePk")}
                     />
                   </Normal>
                   <Normal>
@@ -736,32 +762,32 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                       ]}
                     />
                   </Normal>
-                  {languages.map((lang) => (
-                    <Wide>
-                      <RichTextInput
-                        key={lang}
-                        required
-                        id={`description.${lang}`}
-                        label={t("ReservationUnitEditor.descriptionLabel", {
-                          lang,
-                        })}
-                        value={
-                          get(
-                            state,
-                            `reservationUnitEdit.description${upperFirst(
-                              lang
-                            )}`,
-                            ""
-                          ) || ""
-                        }
-                        onChange={(value) =>
-                          setValue({
-                            [`description${upperFirst(lang)}`]: value,
-                          })
-                        }
-                      />
-                    </Wide>
-                  ))}
+                  {languages.map((lang) => {
+                    const fieldName = `description${upperFirst(lang)}`;
+                    return (
+                      <Wide>
+                        <RichTextInput
+                          key={lang}
+                          required
+                          id={fieldName}
+                          label={t(`ReservationUnitEditor.label.${fieldName}`)}
+                          value={
+                            get(
+                              state,
+                              `reservationUnitEdit.${fieldName}`,
+                              ""
+                            ) || ""
+                          }
+                          onChange={(value) =>
+                            setValue({
+                              [fieldName]: value,
+                            })
+                          }
+                          errorText={getValidationError(fieldName)}
+                        />
+                      </Wide>
+                    );
+                  })}
                   <Wide>
                     <ImageEditor
                       images={state.images}
@@ -772,7 +798,10 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                   </Wide>
                 </EditorGrid>
               </Accordion>
-              <Accordion heading={t("ReservationUnitEditor.settings")}>
+              <Accordion
+                initiallyOpen={state.validationErrors != null}
+                heading={t("ReservationUnitEditor.settings")}
+              >
                 <EditorGrid>
                   <Wide>
                     <Fieldset
@@ -896,39 +925,44 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                       id="minReservationDuration"
                       options={durationOptions}
                       placeholder={t("common.select")}
+                      required
                       label={t(
-                        "ReservationUnitEditor.minReservationDurationLabel"
+                        "ReservationUnitEditor.label.minReservationDuration"
                       )}
                       onChange={(v) => setValue({ minReservationDuration: v })}
                       value={
                         state.reservationUnitEdit.minReservationDuration || ""
                       }
+                      errorText={getValidationError("minReservationDuration")}
                     />
                   </Dense>
                   <Dense>
                     <Select
                       id="maxReservationDuration"
                       placeholder={t("common.select")}
+                      required
                       options={durationOptions}
                       label={t(
-                        "ReservationUnitEditor.maxReservationDurationLabel"
+                        "ReservationUnitEditor.label.maxReservationDuration"
                       )}
                       onChange={(v) => setValue({ maxReservationDuration: v })}
                       value={
                         state.reservationUnitEdit.maxReservationDuration || ""
                       }
+                      errorText={getValidationError("maxReservationDuration")}
                     />
                   </Dense>
                   <Dense>
                     <EnumSelect
                       id="reservationStartInterval"
                       placeholder={t("common.select")}
+                      required
                       value={
                         state.reservationUnitEdit
                           .reservationStartInterval as string
                       }
                       label={t(
-                        "ReservationUnitEditor.reservationStartIntervalLabel"
+                        "ReservationUnitEditor.label.reservationStartInterval"
                       )}
                       type={
                         ReservationUnitsReservationUnitReservationStartIntervalChoices
@@ -936,6 +970,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                       onChange={(reservationStartInterval) =>
                         setValue({ reservationStartInterval })
                       }
+                      errorText={getValidationError("reservationStartInterval")}
                     />
                   </Dense>
                   <Normal>
@@ -1015,11 +1050,13 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                   </Wide>
                   <Normal>
                     <Select
-                      id="metadataSet"
+                      id="metadataSetPk"
+                      required
                       options={state.metadataOptions}
-                      label={t("ReservationUnitEditor.metadataSet")}
+                      label={t("ReservationUnitEditor.label.metadataSetPk")}
                       onChange={(v) => setValue({ metadataSetPk: v })}
                       value={state.reservationUnitEdit.metadataSetPk || null}
+                      errorText={getValidationError("metadataSetPk")}
                     />
                   </Normal>
                   <Normal>
@@ -1060,6 +1097,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                   <Wide>
                     <EnumSelect
                       id="authentication"
+                      required
                       value={state.reservationUnitEdit.authentication || "WEAK"}
                       label={t("ReservationUnitEditor.authenticationLabel")}
                       type={
@@ -1089,13 +1127,16 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                   </Wide>
                 </EditorGrid>
               </Accordion>
-              <Accordion heading={t("ReservationUnitEditor.pricing")}>
+              <Accordion
+                initiallyOpen={state.validationErrors != null}
+                heading={t("ReservationUnitEditor.pricing")}
+              >
                 <EditorGrid>
                   <Dense>
                     <NumberInput
                       value={state.reservationUnitEdit.lowestPrice || 0}
                       id="lowestPrice"
-                      label={t("ReservationUnitEditor.lowestPriceLabel")}
+                      label={t("ReservationUnitEditor.label.lowestPrice")}
                       helperText={t(
                         "ReservationUnitEditor.lowestPriceHelperText"
                       )}
@@ -1117,13 +1158,15 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                       step={1}
                       type="number"
                       min={0}
+                      errorText={getValidationError("lowestPrice")}
+                      invalid={!!getValidationError("lowestPrice")}
                     />
                   </Dense>
                   <Dense>
                     <NumberInput
                       value={state.reservationUnitEdit.highestPrice || 0}
                       id="highestPrice"
-                      label={t("ReservationUnitEditor.highestPriceLabel")}
+                      label={t("ReservationUnitEditor.label.highestPrice")}
                       helperText={t(
                         "ReservationUnitEditor.highestPriceHelperText"
                       )}
@@ -1145,6 +1188,8 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                       step={1}
                       type="number"
                       min={0}
+                      errorText={getValidationError("highestPrice")}
+                      invalid={!!getValidationError("highestPrice")}
                     />
                   </Dense>
                   <Dense>
@@ -1177,30 +1222,35 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                 </EditorGrid>
               </Accordion>
 
-              <Accordion heading={t("ReservationUnitEditor.termsInstructions")}>
+              <Accordion
+                initiallyOpen={state.validationErrors != null}
+                heading={t("ReservationUnitEditor.termsInstructions")}
+              >
                 <EditorGrid>
-                  {languages.map((lang) => (
-                    <Wide>
-                      <RichTextInput
-                        key={lang}
-                        required
-                        id={`tos.${lang}`}
-                        label={t("ReservationUnitEditor.tosLabel", {
-                          lang,
-                        })}
-                        value={get(
-                          state,
-                          `reservationUnitEdit.termsOfUse${upperFirst(lang)}`,
-                          ""
-                        )}
-                        onChange={(value) =>
-                          setValue({
-                            [`termsOfUse${upperFirst(lang)}`]: value,
-                          })
-                        }
-                      />
-                    </Wide>
-                  ))}
+                  {languages.map((lang) => {
+                    const fieldName = `termsOfUse${upperFirst(lang)}`;
+                    return (
+                      <Wide>
+                        <RichTextInput
+                          key={lang}
+                          required
+                          id={fieldName}
+                          label={t(`ReservationUnitEditor.label.${fieldName}`)}
+                          value={get(
+                            state,
+                            `reservationUnitEdit.${fieldName}`,
+                            ""
+                          )}
+                          onChange={(value) =>
+                            setValue({
+                              [fieldName]: value,
+                            })
+                          }
+                          errorText={getValidationError(fieldName)}
+                        />
+                      </Wide>
+                    );
+                  })}
                   {["serviceSpecific", "payment", "cancellation"].map(
                     (name) => {
                       const options = get(state, `${name}TermsOptions`);
@@ -1210,7 +1260,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                           <Select
                             id={name}
                             key={name}
-                            label={t(`ReservationUnitEditor.${name}TermsLabel`)}
+                            label={t(`ReservationUnitEditor.label.${propName}`)}
                             placeholder={t(
                               `ReservationUnitEditor.${name}TermsPlaceholder`
                             )}
@@ -1231,45 +1281,47 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                   )}
                 </EditorGrid>
               </Accordion>
-              <Accordion heading={t("ReservationUnitEditor.communication")}>
+              <Accordion
+                initiallyOpen={state.validationErrors != null}
+                heading={t("ReservationUnitEditor.communication")}
+              >
                 <EditorGrid>
-                  {languages.map((lang) => (
-                    <Wide>
-                      <TextInput
-                        key={lang}
-                        required
-                        id={`additionalInstructions.${lang}`}
-                        label={t(
-                          "ReservationUnitEditor.additionalInstructionsLabel",
-                          {
-                            lang,
+                  {languages.map((lang) => {
+                    const fieldName = `additionalInstructions${upperFirst(
+                      lang
+                    )}`;
+                    return (
+                      <Wide>
+                        <TextArea
+                          key={lang}
+                          id={fieldName}
+                          label={t(`ReservationUnitEditor.label.${fieldName}`)}
+                          placeholder={t(
+                            "ReservationUnitEditor.additionalInstructionsPlaceholder",
+                            {
+                              language: t(`language.${lang}`),
+                            }
+                          )}
+                          value={get(
+                            state,
+                            `reservationUnitEdit.additionalInstructions${upperFirst(
+                              lang
+                            )}`,
+                            ""
+                          )}
+                          onChange={(e) =>
+                            setValue({
+                              [fieldName]: e.target.value,
+                            })
                           }
-                        )}
-                        placeholder={t(
-                          "ReservationUnitEditor.additionalInstructionsPlaceholder",
-                          {
-                            language: t(`language.${lang}`),
-                          }
-                        )}
-                        value={get(
-                          state,
-                          `reservationUnitEdit.additionalInstructions${upperFirst(
-                            lang
-                          )}`,
-                          ""
-                        )}
-                        onChange={(e) =>
-                          setValue({
-                            [`additionalInstructions${upperFirst(lang)}`]:
-                              e.target.value,
-                          })
-                        }
-                      />
-                    </Wide>
-                  ))}
+                          errorText={getValidationError(fieldName)}
+                          invalid={!!getValidationError(fieldName)}
+                        />
+                      </Wide>
+                    );
+                  })}
                   <Wide>
                     <TextInput
-                      required
                       id="contactInformation"
                       label={t("ReservationUnitEditor.contactInformationLabel")}
                       value={state.reservationUnitEdit.contactInformation || ""}
@@ -1283,7 +1335,10 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                 </EditorGrid>
               </Accordion>
 
-              <Accordion heading={t("ReservationUnitEditor.openingHours")}>
+              <Accordion
+                initiallyOpen={state.validationErrors != null}
+                heading={t("ReservationUnitEditor.openingHours")}
+              >
                 {state.reservationUnit?.haukiUrl?.url ? (
                   <>
                     <p>
@@ -1324,14 +1379,33 @@ const ReservationUnitEditor = (): JSX.Element | null => {
             variant="secondary"
             isLoading={saving}
             loadingText={t("ReservationUnitEditor.saving")}
-            onClick={() => saveReservationUnit(false)}
+            onClick={(e) => {
+              e.preventDefault();
+              saveReservationUnit(false);
+              dispatch({ type: "setValidatioErrors", validationErrors: null });
+            }}
           >
             {t("ReservationUnitEditor.saveAsDraft")}
           </WhiteButton>
           <WhiteButton
             variant="primary"
-            disabled={!isReadyToPublish || saving}
-            onClick={() => saveReservationUnit(true)}
+            disabled={saving}
+            onClick={(e) => {
+              e.preventDefault();
+              const validationErrors = schema.validate(
+                state.reservationUnitEdit
+              );
+
+              if (validationErrors.error) {
+                dispatch({ type: "setValidatioErrors", validationErrors });
+              } else {
+                saveReservationUnit(true);
+                dispatch({
+                  type: "setValidatioErrors",
+                  validationErrors: null,
+                });
+              }
+            }}
           >
             {t("ReservationUnitEditor.saveAndPublish")}
           </WhiteButton>

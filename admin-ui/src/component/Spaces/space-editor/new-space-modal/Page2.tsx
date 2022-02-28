@@ -33,7 +33,7 @@ import { parseAddress } from "../../../../common/util";
 
 import SpaceForm from "../SpaceForm";
 import { schema } from "../util";
-import FormErrorSummary from "../FormErrorSummary";
+import FormErrorSummary from "../../../../common/FormErrorSummary";
 
 const SpaceEditor = ({
   space,

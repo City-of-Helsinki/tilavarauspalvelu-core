@@ -7,6 +7,7 @@ import styled from "styled-components";
 type Props = {
   validationErrors: Joi.ValidationResult | null;
   linkToError?: boolean;
+  useDerivedIdsFor?: string[];
   fieldNamePrefix: string;
 };
 
@@ -18,6 +19,7 @@ const FormErrorSummary = ({
   validationErrors,
   linkToError = true,
   fieldNamePrefix = "",
+  useDerivedIdsFor = [],
 }: Props): JSX.Element | null => {
   const { t } = useTranslation();
 
@@ -33,9 +35,12 @@ const FormErrorSummary = ({
             const label = t(`FormErrorSummary.errorLabel`, {
               index: index + 1,
             });
+            const id = useDerivedIdsFor.includes(String(error.path))
+              ? `${error.path}-toggle-button`
+              : error.path;
             return (
               <li key={String(error.path)}>
-                {linkToError ? <a href={`#${error.path}`}>{label}</a> : label}
+                {linkToError ? <a href={`#${id}`}>{label}</a> : label}
                 {": "}
                 {t(`validation.${error.type}`, {
                   ...error.context,

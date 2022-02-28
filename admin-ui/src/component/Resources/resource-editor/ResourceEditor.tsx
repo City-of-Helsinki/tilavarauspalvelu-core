@@ -32,7 +32,7 @@ import {
   schema,
 } from "./resourceEditor";
 
-import FormErrorSummary from "../../Spaces/space-editor/FormErrorSummary";
+import FormErrorSummary from "../../../common/FormErrorSummary";
 
 type State = {
   resourceEdit: ResourceUpdateMutationInput;

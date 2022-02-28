@@ -1,3 +1,4 @@
+import { IconAlertCircleFill } from "hds-react";
 import React from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
@@ -10,6 +11,7 @@ type Props = {
   value: string;
   id: string;
   onChange: (v: string) => void;
+  errorText?: string;
 };
 
 const Container = styled.div<{ $disabled: boolean }>`
@@ -42,9 +44,27 @@ const Asterix = styled.span`
   transform: translateY(var(--spacing-3-xs));
 `;
 
-const StyledReactQuill = styled(ReactQuill)`
-  border: 2px solid var(--color-black-50);
+const ErrorText = styled.div`
+  color: var(--color-error);
+  display: block;
+  font-size: var(--fontsize-body-m);
+  line-height: var(--lineheight-l);
+  margin-top: var(--spacing-3-xs);
+  padding-left: var(--spacing-2-xs);
+  white-space: pre-line;
+`;
 
+const AlignVertically = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+`;
+
+const StyledReactQuill = styled(ReactQuill)<{
+  $error?: boolean;
+}>`
+  border: 2px solid
+    ${({ $error }) => ($error ? "var(--color-error)" : "var(--color-black-50)")};
   > div {
     font-size: var(--fontsize-body-l);
     font-family: var(--tilavaraus-admin-font);
@@ -57,6 +77,7 @@ const RichTextInput = ({
   disabled = false,
   label = "",
   id,
+  errorText,
   onChange,
 }: Props): JSX.Element => {
   return (
@@ -69,7 +90,16 @@ const RichTextInput = ({
         id={id}
         value={value}
         onChange={onChange}
+        $error={errorText !== undefined}
       />
+      {errorText ? (
+        <AlignVertically>
+          <IconAlertCircleFill color="var(--color-error)" />
+          <ErrorText className="hds-text-input--invalid">{errorText}</ErrorText>
+        </AlignVertically>
+      ) : (
+        ""
+      )}
     </Container>
   );
 };

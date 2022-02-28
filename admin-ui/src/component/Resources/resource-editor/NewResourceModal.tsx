@@ -24,7 +24,7 @@ import {
   SaveButton,
   schema,
 } from "./resourceEditor";
-import FormErrorSummary from "../../Spaces/space-editor/FormErrorSummary";
+import FormErrorSummary from "../../../common/FormErrorSummary";
 
 // eslint-disable-next-line
 type EditorProp = any;

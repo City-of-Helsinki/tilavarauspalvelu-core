@@ -16,6 +16,7 @@ const EnumSelect = ({
   placeholder,
   value,
   type,
+  errorText,
 }: {
   id: string;
   label: string;
@@ -25,6 +26,7 @@ const EnumSelect = ({
   value: string;
   onChange: (value: string) => void;
   type: { [key: string]: string };
+  errorText?: string;
 }): JSX.Element => {
   const { t } = useTranslation();
   const options: OptionType[] = Object.keys(type).map((key) => ({
@@ -45,6 +47,8 @@ const EnumSelect = ({
       onChange={(e: any) => {
         onChange(e.value);
       }}
+      error={errorText}
+      invalid={!!errorText}
     />
   );
 };

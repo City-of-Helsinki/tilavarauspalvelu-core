@@ -20,6 +20,7 @@ const Select = ({
   options,
   placeholder,
   helper,
+  errorText,
 }: {
   id: string;
   label: string;
@@ -29,6 +30,7 @@ const Select = ({
   options: OptionType[];
   placeholder?: string;
   helper?: string;
+  errorText?: string;
 }): JSX.Element => {
   return (
     <HDSSelect
@@ -45,6 +47,8 @@ const Select = ({
       disabled={options.length === 0}
       helper={helper}
       value={getSelectedOption(options, value)}
+      error={errorText}
+      invalid={!!errorText}
     />
   );
 };
