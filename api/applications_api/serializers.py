@@ -152,7 +152,7 @@ class ApplicationEventScheduleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ApplicationEventSchedule
-        fields = ["id", "day", "begin", "end"]
+        fields = ["id", "day", "begin", "end", "priority"]
         extra_kwargs = {
             "day": {
                 "help_text": "Day of requested reservation allocation time slot for event represented as number. "
@@ -163,6 +163,11 @@ class ApplicationEventScheduleSerializer(serializers.ModelSerializer):
             },
             "end": {
                 "help_text": "End time of requested reservation allocation slot.",
+            },
+            "priority": {
+                "help_text": (
+                    "Priority of requested reservation allocation slot as an integer."
+                ),
             },
         }
 
