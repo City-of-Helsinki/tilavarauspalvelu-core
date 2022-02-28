@@ -726,7 +726,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                       onChange={(purposes) =>
                         dispatch({ type: "setPurposes", purposes })
                       }
-                      disabled={state.resourceOptions.length === 0}
+                      disabled={state.purposeOptions.length === 0}
                       value={[
                         ...getSelectedOptions(
                           state,
