@@ -32,7 +32,7 @@ describe("Tilavaraus ui search page (single)", () => {
   const searchTerm = "tila";
 
   it("contains page name", () => {
-    cy.get("h1").should("contain", "Tarkennettu haku");
+    cy.get("h1").should("contain", "Varaa tiloja ja laitteita");
   });
 
   it("displays search results by default", () => {

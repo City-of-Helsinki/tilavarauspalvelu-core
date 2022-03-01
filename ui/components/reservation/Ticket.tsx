@@ -121,6 +121,9 @@ const Wrapper = styled.div<{ $state: TicketState }>`
 const Content = styled.div``;
 
 const Title = styled(H1)`
+  font-size: 1.75rem;
+  font-family: var(--font-bold);
+  font-weight: 700;
   margin: 0 0 var(--spacing-s) 0;
 `;
 

@@ -83,7 +83,7 @@ const Hr = styled.hr`
 `;
 
 const ButtonContainer = styled.div`
-  margin-top: var(--spacing-l);
+  margin: var(--spacing-l) 0;
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;

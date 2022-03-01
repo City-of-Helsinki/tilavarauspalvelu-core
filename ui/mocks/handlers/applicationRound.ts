@@ -1,4 +1,4 @@
-import { addMonths } from "date-fns";
+import { addDays, addMonths } from "date-fns";
 import { rest } from "msw";
 import { ApplicationRound } from "../../modules/types";
 import { toApiDate } from "../../modules/util";
@@ -16,7 +16,7 @@ const applicationRounds = rest.get(
         reservationPeriodBegin: "2021-08-16",
         reservationPeriodEnd: "2022-05-29",
         publicDisplayBegin: "2021-04-16T06:00:00Z",
-        publicDisplayEnd: "2021-04-30T13:00:00Z",
+        publicDisplayEnd: addDays(new Date(), 7).toISOString(),
         purposeIds: [5, 6, 7, 8],
         serviceSectorId: 1,
         status: "allocated",

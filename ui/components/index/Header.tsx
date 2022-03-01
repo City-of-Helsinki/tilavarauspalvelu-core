@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 import { breakpoint } from "../../modules/style";
 import { singleSearchPrefix } from "../../modules/const";
 import Container from "../common/Container";
-import { fontRegular } from "../../modules/style/typography";
+import { fontRegular, H1 } from "../../modules/style/typography";
 
 interface HeadProps {
   heading: string;
@@ -99,7 +99,7 @@ const StyledTextInput = styled(TextInput)`
   }
 `;
 
-const H1 = styled.h1`
+const Title = styled(H1)`
   ${fontRegular}
   font-size: var(--fontsize-heading-xl);
   margin-top: 0;
@@ -129,7 +129,7 @@ const Head = (props: HeadProps): JSX.Element => {
       <Content>
         <Left>
           <div>
-            <H1>{props.heading}</H1>
+            <Title>{props.heading}</Title>
             <p>{props.text}</p>
           </div>
           <form onSubmit={(e) => handleSubmit(e)}>

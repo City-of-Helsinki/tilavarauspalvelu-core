@@ -88,7 +88,7 @@ import {
   AGE_GROUPS,
   RESERVATION_PURPOSES,
 } from "../../../modules/queries/params";
-import KorosPulseEasy from "../../../components/common/KorosPulseEasy";
+import KorosDefault from "../../../components/common/KorosDefault";
 
 type Props = {
   reservationUnit: ReservationUnitType;
@@ -289,7 +289,7 @@ const Stepper = styled(StepperHz)`
   margin-bottom: var(--spacing-l);
 `;
 
-const StyledKoros = styled(KorosPulseEasy)`
+const StyledKoros = styled(KorosDefault)`
   margin-top: var(--spacing-layout-l);
 `;
 

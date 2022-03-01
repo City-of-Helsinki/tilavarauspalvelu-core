@@ -30,7 +30,7 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
 const Wrapper = styled(Container)``;
 
 const Heading = styled.div`
-  margin: var(--spacing-l) 0 var(--spacing-layout-l);
+  margin-bottom: var(--spacing-layout-l);
 `;
 
 const StyledTabList = styled(TabList)`
@@ -109,7 +109,7 @@ const Reservations = (): JSX.Element => {
 
   return (
     <>
-      <Head heading={t(`navigation:Item.reservations`)} />
+      <Head />
       <Wrapper>
         <Heading>
           <Tabs>

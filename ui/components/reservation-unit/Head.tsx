@@ -28,7 +28,7 @@ import {
 import { MediumButton } from "../../styles/util";
 import { ReservationUnitByPkType } from "../../modules/gql-types";
 import { getPrice } from "../../modules/reservationUnit";
-import KorosPulseEasy from "../common/KorosPulseEasy";
+import KorosDefault from "../common/KorosDefault";
 
 interface PropsType {
   reservationUnit: ReservationUnitByPkType;
@@ -88,7 +88,7 @@ const BuildingName = styled.div`
 `;
 
 const ButtonContainer = styled.div`
-  margin-top: var(--spacing-layout-m);
+  margin: var(--spacing-layout-m) 0;
 
   & > button {
     margin: 0;
@@ -102,7 +102,7 @@ const ThinButton = styled(MediumButton).attrs({
   height: 35px;
 `;
 
-const StyledKorosPulseEasy = styled(KorosPulseEasy)`
+const StyledKorosDefault = styled(KorosDefault)`
   margin-top: var(--spacing-l);
 `;
 
@@ -282,7 +282,7 @@ const Head = ({
           </JustForDesktop>
         </RightContainer>
       </Container>
-      <StyledKorosPulseEasy from="white" to="var(--tilavaraus-gray)" />
+      <StyledKorosDefault from="white" to="var(--tilavaraus-gray)" />
     </TopContainer>
   );
 };

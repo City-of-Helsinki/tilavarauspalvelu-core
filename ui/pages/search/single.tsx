@@ -9,11 +9,10 @@ import { useLocalStorage } from "react-use";
 import { isEqual, omit, pick } from "lodash";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Container from "../../components/common/Container";
-import Breadcrumb from "../../components/common/Breadcrumb";
 import SearchForm from "../../components/single-search/SearchForm";
 import SearchResultList from "../../components/single-search/SearchResultList";
 import { capitalize, singleSearchUrl } from "../../modules/util";
-import { isBrowser, singleSearchPrefix } from "../../modules/const";
+import { isBrowser } from "../../modules/const";
 import { CenterSpinner } from "../../components/common/common";
 import {
   PageInfo,
@@ -21,11 +20,11 @@ import {
   QueryReservationUnitsArgs,
   ReservationUnitType,
 } from "../../modules/gql-types";
-import { H1 } from "../../modules/style/typography";
+import { H1, HeroSubheading } from "../../modules/style/typography";
 import { RESERVATION_UNITS } from "../../modules/queries/reservationUnit";
 import Sorting from "../../components/form/Sorting";
 import { OptionType } from "../../modules/types";
-import KorosPulseEasy from "../../components/common/KorosPulseEasy";
+import KorosDefault from "../../components/common/KorosDefault";
 
 const pagingLimit = 10;
 
@@ -34,16 +33,10 @@ const HeadContainer = styled.div`
   padding-top: var(--spacing-layout-xs);
 `;
 
-const Heading = styled(H1)`
-  && {
-    margin-top: var(--spacing-l);
-    margin-bottom: var(--spacing-xs);
-    font-size: var(--fontsize-heading-l);
-  }
-`;
+const Heading = styled(H1)``;
 
-const Subheading = styled.span`
-  font-size: var(--fontsize-heading-s);
+const Subheading = styled(HeroSubheading)`
+  margin-bottom: var(--spacing-xl);
 `;
 
 const StyledSorting = styled(Sorting)`
@@ -54,9 +47,7 @@ const StyledSorting = styled(Sorting)`
   }
 `;
 
-const StyledKorosPulseEasy = styled(KorosPulseEasy)`
-  padding-top: var(--spacing-l);
-`;
+const StyledKorosDefault = styled(KorosDefault)``;
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
@@ -193,10 +184,6 @@ const SearchSingle = (): JSX.Element => {
     <>
       <HeadContainer>
         <Container>
-          <Breadcrumb
-            root={{ label: "singleReservations" }}
-            current={{ label: "search", linkTo: singleSearchPrefix }}
-          />
           <Heading>{t("search:single.heading")}</Heading>
           <Subheading>{t("search:single.text")}</Subheading>
           <SearchForm
@@ -206,7 +193,7 @@ const SearchSingle = (): JSX.Element => {
           />
         </Container>
       </HeadContainer>
-      <StyledKorosPulseEasy from="white" to="var(--tilavaraus-gray)" />
+      <StyledKorosDefault from="white" to="var(--tilavaraus-gray)" />
       {loading ? (
         <CenterSpinner
           style={{
