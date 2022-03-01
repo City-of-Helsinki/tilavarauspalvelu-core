@@ -7,6 +7,7 @@ from factory.fuzzy import FuzzyChoice, FuzzyDate, FuzzyDateTime, FuzzyInteger, F
 from pytz import UTC
 
 from applications.models import (
+    PRIORITIES,
     Application,
     ApplicationEventStatus,
     ApplicationRound,
@@ -168,6 +169,9 @@ class ApplicationEventScheduleFactory(DjangoModelFactory):
     begin = datetime.time(12, 0, tzinfo=get_default_timezone())
     end = datetime.time(14, 0, tzinfo=get_default_timezone())
     application_event = SubFactory(ApplicationEventFactory)
+    priority = FuzzyChoice(
+        choices=[choice[0] for choice in PRIORITIES.PRIORITY_CHOICES]
+    )
 
 
 class ApplicationEventScheduleResultFactory(DjangoModelFactory):
