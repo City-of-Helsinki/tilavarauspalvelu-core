@@ -307,6 +307,9 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
             "additional_instructions_fi",
             "additional_instructions_sv",
             "additional_instructions_en",
+            "terms_of_use_fi",
+            "terms_of_use_en",
+            "terms_of_use_sv",
         ]
         for field in self.translation_fields:
             value = data.get(field, getattr(self.instance, field, None))
