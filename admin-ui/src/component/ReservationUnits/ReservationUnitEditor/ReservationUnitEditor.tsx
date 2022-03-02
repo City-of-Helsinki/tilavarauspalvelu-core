@@ -1233,7 +1233,6 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                       <Wide>
                         <RichTextInput
                           key={lang}
-                          required
                           id={fieldName}
                           label={t(`ReservationUnitEditor.label.${fieldName}`)}
                           value={get(
