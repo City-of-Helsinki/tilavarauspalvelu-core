@@ -501,6 +501,7 @@ class ApplicationSerializer(serializers.ModelSerializer):
             "home_city_id",
             "created_date",
             "last_modified_date",
+            "additional_information",
         ]
 
     def set_home_city(self, obj: Application):
