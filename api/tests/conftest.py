@@ -18,6 +18,7 @@ from applications.models import (
     ApplicationRound,
     ApplicationRoundBasket,
     City,
+    EventReservationUnit,
     Organisation,
     Person,
     Recurrence,
@@ -100,6 +101,13 @@ def unit(service_sector):
 
 
 @pytest.fixture
+def unit_too(service_sector):
+    test_unit = Unit.objects.create(name="Test unit too")
+    test_unit.service_sectors.set([service_sector])
+    return test_unit
+
+
+@pytest.fixture
 def unit_group(unit):
     unit_group = UnitGroup.objects.create(name="Test group")
     unit_group.units.add(unit)
@@ -138,6 +146,14 @@ def reservation_unit(resource, space, unit):
     )
     reservation_unit.resources.set([resource])
     reservation_unit.spaces.set([space])
+    return reservation_unit
+
+
+@pytest.fixture
+def reservation_unit_too(resource, unit_too):
+    reservation_unit = ReservationUnit.objects.create(
+        name_en="Test reservation unit too", require_introduction=False, unit=unit_too
+    )
     return reservation_unit
 
 
@@ -460,6 +476,40 @@ def application_event(
         begin=datetime.date(year=2020, month=1, day=1),
         end=datetime.date(year=2020, month=6, day=1),
         biweekly=False,
+    )
+
+
+@pytest.fixture
+def application_event_too(
+    application2, purpose, ten_to_15_age_group, hobbyist_ability_group
+) -> ApplicationEvent:
+    return ApplicationEvent.objects.create(
+        application=application2,
+        num_persons=10,
+        min_duration=datetime.timedelta(hours=1),
+        max_duration=datetime.timedelta(hours=2),
+        purpose=purpose,
+        name="Football",
+        age_group=ten_to_15_age_group,
+        ability_group=hobbyist_ability_group,
+        events_per_week=2,
+        begin=datetime.date(year=2020, month=1, day=1),
+        end=datetime.date(year=2020, month=6, day=1),
+        biweekly=False,
+    )
+
+
+@pytest.fixture
+def event_reservation_unit(application_event, reservation_unit):
+    return EventReservationUnit.objects.create(
+        application_event=application_event, reservation_unit=reservation_unit
+    )
+
+
+@pytest.fixture
+def event_reservation_unit_too(application_event_too, reservation_unit_too):
+    return EventReservationUnit.objects.create(
+        application_event=application_event_too, reservation_unit=reservation_unit_too
     )
 
 
