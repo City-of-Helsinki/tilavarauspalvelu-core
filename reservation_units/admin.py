@@ -22,7 +22,7 @@ from .models import (
 
 class ReservationUnitAdminForm(ModelForm):
     description = CharField(widget=TinyMCE())
-    terms_of_use = CharField(widget=TinyMCE())
+    terms_of_use = CharField(widget=TinyMCE(), required=False)
 
     class Meta:
         model = ReservationUnit

@@ -182,7 +182,10 @@ class ReservationUnit(models.Model):
         blank=True,
     )
     terms_of_use = models.TextField(
-        verbose_name=_("Terms of use"), blank=True, max_length=2000
+        verbose_name=_("Terms of use"),
+        blank=True,
+        max_length=2000,
+        null=True,
     )
     payment_terms = models.ForeignKey(
         TermsOfUse,
