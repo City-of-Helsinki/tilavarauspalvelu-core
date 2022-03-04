@@ -49,10 +49,8 @@ const ConfirmationModal = forwardRef(
         aria-labelledby={`${id}-header`}
         aria-describedby={`${id}-content`}
       >
-        <Dialog.Header id="header" title={heading || t("confirm.heading")} />
-        <Dialog.Content id={`${id}-content`}>
-          {content || t("confirm.text")}
-        </Dialog.Content>
+        <Dialog.Header id="header" title={heading} />
+        <Dialog.Content id={`${id}-content`}>{content}</Dialog.Content>
         <Dialog.ActionButtons>
           <MediumButton
             variant="secondary"

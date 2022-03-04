@@ -8,7 +8,7 @@ import {
   ContactPerson,
   FormType,
 } from "../../modules/types";
-import { TwoColumnContainer } from "../common/common";
+import { SpanTwoColumns, TwoColumnContainer } from "../common/common";
 import RadioButtons from "./RadioButtons";
 import EmailInput from "./EmailInput";
 import BillingAddress from "./BillingAddress";
@@ -34,6 +34,7 @@ const IndividualForm = ({
     defaultValues: {
       contactPerson: { ...application.contactPerson } as ContactPerson,
       billingAddress: { ...application.billingAddress } as Address,
+      additionalInformation: application.additionalInformation,
     },
   });
 
@@ -52,6 +53,7 @@ const IndividualForm = ({
 
     applicationCopy.organisation = null;
     applicationCopy.billingAddress = data.billingAddress;
+    applicationCopy.additionalInformation = data.additionalInformation;
 
     return applicationCopy;
   };
@@ -103,6 +105,14 @@ const IndividualForm = ({
               errors.contactPerson?.phoneNumber?.type
             )}
           />
+          <SpanTwoColumns>
+            <TextInput
+              ref={register({ required: false })}
+              label={t("application:Page3.additionalInformation")}
+              id="additionalInformation"
+              name="additionalInformation"
+            />
+          </SpanTwoColumns>
           <EmailInput register={register} errors={errors} />
         </TwoColumnContainer>
       </RadioButtons>

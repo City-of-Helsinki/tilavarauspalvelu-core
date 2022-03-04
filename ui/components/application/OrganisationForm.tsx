@@ -92,6 +92,7 @@ const OrganisationForm = ({
     }
 
     applicationCopy.homeCityId = data.homeCityId;
+    applicationCopy.additionalInformation = null;
 
     return applicationCopy;
   };

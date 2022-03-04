@@ -547,8 +547,8 @@ const ApplicationEvent = ({
           <ConfirmationModal
             id="application-event-confirmation"
             cancelLabel="common:close"
-            heading={t("DeleteEvent.heading")}
-            content={t("DeleteEvent.text")}
+            heading={t("application:Page1.deleteEvent")}
+            content=""
             onOk={del}
             ref={modalRef}
           />

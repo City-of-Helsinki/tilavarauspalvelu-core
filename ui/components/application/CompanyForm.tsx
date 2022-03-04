@@ -60,6 +60,8 @@ const CompanyForm = ({
       applicationCopy.billingAddress = null;
     }
 
+    applicationCopy.additionalInformation = null;
+
     return applicationCopy;
   };
 
