@@ -200,6 +200,7 @@ export type Application = {
   homeCityId: number | null;
   createdDate?: string;
   lastModifiedDate?: string;
+  additionalInformation?: string;
 };
 
 export type Organisation = {
