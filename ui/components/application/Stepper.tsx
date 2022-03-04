@@ -23,7 +23,6 @@ const Container = styled.nav`
   font-size: var(--fontsize-body-l);
   padding: 0;
   list-style-type: none;
-  font-family: var(--font-reqular);
   font-family: var(--font-bold);
 `;
 const Number = styled.div<{ $current: boolean; $disabled: boolean }>`
@@ -59,7 +58,6 @@ ${({ $disabled, $current }) =>
 
 const Step = styled.button<{ $clickable: boolean }>`
   border: none;
-  background: none;
   width: 100%;
   display: flex;
   line-height: 1;
