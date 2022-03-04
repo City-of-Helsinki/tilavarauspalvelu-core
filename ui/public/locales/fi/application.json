@@ -80,10 +80,11 @@
     "email": "Hakemukselle liitettävä sähköpostiosoite",
     "emailNotification": "Kaikki hakemukseen liittyvät viestit lähetetään alla olevaan sähköpostiin",
     "as": {
+      "prefix": "Luon hakemuksen",
       "type": {
-        "organisation": "Luon hakemuksen yhdistyksen, järjestön, ryhmän tai yhteisön puolesta",
-        "company": "Luon hakemuksen yrityksen puolesta",
-        "individual": "Luon hakemuksen yksityishenkilönä"
+        "organisation": "järjestön, ryhmän tai yhteisön puolesta",
+        "company": "yrityksen puolesta",
+        "individual": "yksityishenkilönä"
       }
     },
     "contactPerson": {
@@ -102,9 +103,9 @@
       "registrationNumber": "Y-tunnus"
     },
     "organisation": {
-      "name": "Yhdistyksen, järjestön, ryhmän tai yhteisön virallinen nimi",
-      "coreBusiness": "Yhdistyksen tai seuran ydintoiminta",
-      "registrationNumber": "Rekisterinumero",
+      "name": "Yhdistyksen virallinen nimi",
+      "coreBusiness": "Yhdistyksen ydintoiminta",
+      "registrationNumber": "Y-tunnus",
       "streetAddress": "Katuosoite",
       "postCode": "Postinumero",
       "city": "Postitoimipaikka",
