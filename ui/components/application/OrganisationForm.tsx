@@ -199,13 +199,17 @@ const OrganisationForm = ({
               errors.organisation?.address?.city?.type
             )}
           />
-          <Checkbox
-            label={t("application:Page3.organisation.separateInvoicingAddress")}
-            id="organisation.hasInvoicingAddress"
-            name="organisation.hasInvoicingAddress"
-            checked={hasBillingAddress}
-            onClick={() => setHasBillingAddress(!hasBillingAddress)}
-          />
+          <CheckboxWrapper>
+            <Checkbox
+              label={t(
+                "application:Page3.organisation.separateInvoicingAddress"
+              )}
+              id="organisation.hasInvoicingAddress"
+              name="organisation.hasInvoicingAddress"
+              checked={hasBillingAddress}
+              onClick={() => setHasBillingAddress(!hasBillingAddress)}
+            />
+          </CheckboxWrapper>
           {hasBillingAddress ? (
             <BillingAddress register={register} errors={errors} />
           ) : null}

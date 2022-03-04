@@ -2,6 +2,7 @@ import { RadioButton } from "hds-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
+import { fontRegular } from "../../modules/style/typography";
 import { FormType } from "../../modules/types";
 
 type Props = {
@@ -14,6 +15,10 @@ const Container = styled.div`
   margin-top: var(--spacing-m);
 `;
 
+const Prefix = styled.h3`
+  ${fontRegular}
+`;
+
 const RadioButtons = ({
   activeForm,
   children,
@@ -23,6 +28,7 @@ const RadioButtons = ({
 
   return (
     <>
+      <Prefix>{t("application:Page3.as.prefix")}</Prefix>
       {["organisation", "individual", "company"].map((id: string) => (
         <Container key={id}>
           <RadioButton

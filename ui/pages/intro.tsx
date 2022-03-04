@@ -152,7 +152,7 @@ Oletuskausi on valmiiksi annettu. Jos haluat hakea lyhyempää kautta, muuta alo
 6. AIKATOIVE
 Valitse kalenterista KAIKKI ne ajankohdat, jolle vuorosi voidaan sijoittaa. Mitä useamman ajankohdan valitset, sitä helpommin löydämme sinulle vuoron toivomastasi tilasta.
 
-7. Valitse ”LUON HAKEMUKSEN YHDISTYKSEN, JÄRJESTÖN, RYHMÄN TAI YHTEISÖN PUOLESTA”. Ilmoita yhteystiedot ja sähköpostiosoite. Huomaa, että kaikki hakemukseen liittyvät viestit lähetetään tähän sähköpostiin. Jos yhteystietosi muuttuvat kesken kauden, ota yhteyttä toimipisteeseen!
+7. Valitse ”LUON HAKEMUKSEN JÄRJESTÖN, RYHMÄN TAI YHTEISÖN PUOLESTA”. Ilmoita yhteystiedot ja sähköpostiosoite. Huomaa, että kaikki hakemukseen liittyvät viestit lähetetään tähän sähköpostiin. Jos yhteystietosi muuttuvat kesken kauden, ota yhteyttä toimipisteeseen!
 
 8. Tarkista hakemuksesi tiedot, lue ja hyväksy käyttöehdot ja lähetä hakemus. Hakemuksesi käsitellään hakuajan päätyttyä.
 `}
@@ -186,12 +186,12 @@ NÄIN HAET VUOROA YKSITYISHENKILÖNÄ TAI YRITYKSENÄ:
 4. TILATOIVEET
 Lisää hakemukselle KAIKKI tilat, josta haluat anoa vakiovuoroa. Järjestä ne toivejärjestykseen nuolilla, ensisijaisin tila ylimmäiseksi.
 
-5. KAUSI JA KESTOOletuskausi on valmiiksi annettu. Jos haluat hakea lyhyempää kautta, muuta aloitus- ja lopetuspäivää. Valitse vuoron kesto ja määrä viikossa. Valitse vuoron kesto siten, että ehdit tehdä alkuvalmistelun ja loppusiivouksen vuoron aikana.
+5. KAUSI JA KESTO Oletuskausi on valmiiksi annettu. Jos haluat hakea lyhyempää kautta, muuta aloitus- ja lopetuspäivää. Valitse vuoron kesto ja määrä viikossa. Valitse vuoron kesto siten, että ehdit tehdä alkuvalmistelun ja loppusiivouksen vuoron aikana.
 
 6. AIKATOIVE
 Valitse kalenterista KAIKKI ne ajankohdat, jolle vuorosi voidaan sijoittaa. Mitä useamman ajankohdan valitset ja joustavampi olet, sitä helpommin löydämme sinulle vuoron toivomastasi tilasta.
 
-7. Valitse ”LUON HAKEMUKSEN YKSITYISHENILÖNÄ” tai ”LUON HAKEMUKSEN
+7. Valitse ”LUON HAKEMUKSEN YKSITYISHENKILÖNÄ” tai ”LUON HAKEMUKSEN
 YRITYKSENÄ”. Ilmoita yhteystiedot ja sähköpostiosoite. Huomaa, että kaikki hakemukseen liittyvät viestit lähetetään tähän sähköpostiin. Jos yhteystietosi muuttuvat kesken kauden, ota yhteyttä toimipisteeseen!
 
 8. Tarkista hakemuksesi tiedot, lue ja hyväksy käyttöehdot ja lähetä hakemus. Hakemuksesi käsitellään hakuajan päätyttyä.`}
