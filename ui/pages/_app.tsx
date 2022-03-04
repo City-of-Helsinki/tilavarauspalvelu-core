@@ -54,7 +54,7 @@ function MyApp({ Component, pageProps }: AppProps) {
           callbackComponentOverride={LoggingIn}
         >
           <ApolloProvider client={apolloClient}>
-            <PageWrapper>
+            <PageWrapper {...pageProps}>
               <Component {...pageProps} />
             </PageWrapper>
           </ApolloProvider>
