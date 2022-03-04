@@ -5,6 +5,7 @@ import {
   AuthenticationProvider,
   // eslint-disable-next-line import/no-unresolved
 } from "@axa-fr/react-oidc-context";
+import * as Sentry from "@sentry/react";
 import oidcConfiguration from "./common/auth/configuration";
 import "./index.scss";
 import App from "./App";
@@ -13,6 +14,18 @@ import Authenticating from "./component/Authentication/Authenticating";
 import AuthorizationNeeded from "./component/Authentication/AuthorizationNeeded";
 import { authEnabled } from "./common/const";
 import MainLander from "./component/MainLander";
+
+const dsn = process.env.REACT_APP_SENTRY_DSN;
+const environment = process.env.REACT_APP_SENTRY_ENVIRONMENT;
+const release = process.env.REACT_APP_SENTRY_RELEASE;
+
+if (dsn) {
+  Sentry.init({
+    dsn,
+    environment,
+    release,
+  });
+}
 
 ReactDOM.render(
   <React.StrictMode>
