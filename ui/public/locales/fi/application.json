@@ -64,10 +64,26 @@
   },
   "Page2": {
     "heading": "2. Vakiovuoron ajankohta",
+    "subHeading": "Valitse kaikki ne ajankohdat, joille toivot varauksesi asettuvan.",
     "info": "Tarkista tilakohtaiset aukioloajat <0>hakuohjeista<0>",
     "text": "Anna toivomasi ajankohta jokaiselle luomallesi vakiovuorolle.",
     "copyTimes": "Kopioi ajat kaikille vakiovuoroille",
-    "summary": "Yhteenveto"
+    "resetTimes": "Tyhjennä kalenteri",
+    "summary": "Yhteenveto",
+    "priorityLabels": {
+      "300": "Valitse ensisijaiset aikatoiveet",
+      "200": "Valitse muut aikatoiveet"
+    },
+    "legend": {
+      "unavailable": "Ei varattavissa",
+      "selected-1": "Ensisijainen toive",
+      "selected-2": "Muu toive"
+    },
+    "primarySchedules": "Ensisijaiset aikatoiveet",
+    "secondarySchedules": "Muut aikatoiveet",
+    "notification": {
+      "copyCells": "Ajat on kopioitu onnistuneesti kaikille vuorotoiveille"
+    }
   },
   "Page3": {
     "heading": "3. Varaajan perustiedot",

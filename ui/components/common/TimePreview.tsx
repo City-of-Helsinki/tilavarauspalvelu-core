@@ -1,45 +1,88 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { IconClock } from "hds-react";
 import styled from "styled-components";
 import { weekdays } from "../../modules/const";
-import LabelValue from "./LabelValue";
 import { ApplicationEventSchedule } from "../../modules/types";
+import { fontBold, H3 } from "../../modules/style/typography";
+import { breakpoint } from "../../modules/style";
 
 type Props = {
-  applicationEventSchedules: ApplicationEventSchedule[];
+  applicationEventSchedules: [
+    ApplicationEventSchedule[],
+    ApplicationEventSchedule[]
+  ];
+};
+
+const WeekWrapper = styled.div`
+  display: flex;
+  line-height: 2.2;
+`;
+
+const Label = styled.div`
+  ${fontBold};
+  padding-right: 4px;
+`;
+
+const Weekdays = ({ schedules }) => {
+  const { t } = useTranslation();
+  return (
+    <>
+      {weekdays.map((day, index) => {
+        const value = schedules
+          .filter((s) => s.day === index)
+          .map(
+            (cur) =>
+              `${Number(cur.begin.substring(0, 2))}-${Number(
+                cur.end.substring(0, 2) === "00" ? 24 : cur.end.substring(0, 2)
+              )}`
+          )
+          .join(", ");
+        return (
+          <WeekWrapper key={day}>
+            <Label>
+              {t(`calendar:${day}`)}
+              {value && ":"}
+            </Label>
+            <div>{value}</div>
+          </WeekWrapper>
+        );
+      })}
+    </>
+  );
 };
 
 const Wrapper = styled.div`
-  display: flex;
+  border: 2px solid var(--color-black);
+  padding: var(--spacing-m);
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-l);
+  background: var(--color-white);
+
+  @media (min-width: ${breakpoint.m}) {
+    grid-template-columns: 1fr 1fr;
+  }
 `;
 
-const StyledIconClock = styled(IconClock)`
-  min-width: 24px;
-  margin: 5px 6px 0 0;
+const Heading = styled(H3)`
+  margin-top: 0;
 `;
 
 const TimePreview = ({ applicationEventSchedules }: Props): JSX.Element => {
   const { t } = useTranslation();
+  const [primarySchedules, secondarySchedules] = applicationEventSchedules;
 
   return (
-    <>
-      {weekdays.map((day, index) => (
-        <Wrapper key={day}>
-          <StyledIconClock aria-hidden="true" />
-          <LabelValue
-            label={t(`calendar:${day}`)}
-            value={applicationEventSchedules
-              .filter((s) => s.day === index)
-              .map(
-                (cur) =>
-                  `${cur.begin.substring(0, 5)} - ${cur.end.substring(0, 5)}`
-              )
-              .join(", ")}
-          />
-        </Wrapper>
-      ))}
-    </>
+    <Wrapper>
+      <div>
+        <Heading>{t("application:Page2.primarySchedules")}</Heading>
+        <Weekdays schedules={primarySchedules} />
+      </div>
+      <div>
+        <Heading>{t("application:Page2.secondarySchedules")}</Heading>
+        <Weekdays schedules={secondarySchedules} />
+      </div>
+    </Wrapper>
   );
 };
 

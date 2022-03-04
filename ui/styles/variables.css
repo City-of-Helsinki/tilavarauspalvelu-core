@@ -10,7 +10,8 @@
   --tilavaraus-blue: #0072c6;
   --tilavaraus-green: #007a64;
   --tilavaraus-yellow: #ffda07;
-  --tilavaraus-calendar-selected: var(--tilavaraus-blue);
+  --tilavaraus-calendar-selected: #0000ff;
+  --tilavaraus-calendar-selected-secondary: #ffe977;
   --font-regular: HelsinkiGrotesk, var(--font-default);
   --font-medium: HelsinkiGrotesk-Medium, var(--font-default);
   --font-bold: HelsinkiGrotesk-Bold, var(--font-default);

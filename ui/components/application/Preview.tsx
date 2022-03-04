@@ -62,7 +62,9 @@ const SmallSubHeadline = styled.div`
   font-size: var(--fontsize-heading-m);
 `;
 
-const TimePreviewContainer = styled(TwoColumnContainer)`
+const TimePreviewContainer = styled.div`
+  margin: var(--spacing-xl) 0;
+
   svg {
     margin-top: 2px;
   }
@@ -199,109 +201,123 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
       >
         <ApplicantInfoPreview cities={cities} application={application} />
       </Accordion>
-      {application.applicationEvents.map((applicationEvent, i) => (
-        <Accordion
-          open
-          id={`applicationEvent-${i}`}
-          key={applicationEvent.id}
-          heading={applicationEvent.name || ""}
-        >
-          <TwoColumnContainer>
-            <LabelValue
-              label={t("application:preview.applicationEvent.name")}
-              value={applicationEvent.name}
-            />
-            <LabelValue
-              label={t("application:preview.applicationEvent.numPersons")}
-              value={applicationEvent.numPersons}
-            />
-            <LabelValue
-              label={t("application:preview.applicationEvent.ageGroup")}
-              value={
-                applicationEvent.ageGroupId
-                  ? `${
-                      ageGroupOptions[applicationEvent.ageGroupId].minimum
-                    } - ${ageGroupOptions[applicationEvent.ageGroupId].maximum}`
-                  : ""
-              }
-            />
-            <LabelValue
-              label={t("application:preview.applicationEvent.purpose")}
-              value={
-                applicationEvent.purposeId != null
-                  ? localizedValue(
-                      purposeOptions[applicationEvent.purposeId].name,
-                      i18n.language
-                    )
-                  : ""
-              }
-            />
-            <LabelValue
-              label={t("application:preview.applicationEvent.begin")}
-              value={applicationEvent.begin || ""}
-            />
-            <LabelValue
-              label={t("application:preview.applicationEvent.end")}
-              value={applicationEvent.end || ""}
-            />
-            <LabelValue
-              label={t("application:preview.applicationEvent.minDuration")}
-              value={formatDuration(applicationEvent.minDuration as string)}
-            />
-            <LabelValue
-              label={t("application:preview.applicationEvent.maxDuration")}
-              value={formatDuration(applicationEvent.maxDuration as string)}
-            />
-            <LabelValue
-              label={t("application:preview.applicationEvent.eventsPerWeek")}
-              value={applicationEvent.eventsPerWeek}
-            />
-            <div />
-            {/* <LabelValue
+      {application.applicationEvents.map((applicationEvent, i) => {
+        const summaryDataPrimary =
+          applicationEvent.applicationEventSchedules.filter(
+            (n) => n.priority === 300
+          );
+        const summaryDataSecondary =
+          applicationEvent.applicationEventSchedules.filter(
+            (n) => n.priority === 200
+          );
+
+        return (
+          <Accordion
+            open
+            id={`applicationEvent-${i}`}
+            key={applicationEvent.id}
+            heading={applicationEvent.name || ""}
+          >
+            <TwoColumnContainer>
+              <LabelValue
+                label={t("application:preview.applicationEvent.name")}
+                value={applicationEvent.name}
+              />
+              <LabelValue
+                label={t("application:preview.applicationEvent.numPersons")}
+                value={applicationEvent.numPersons}
+              />
+              <LabelValue
+                label={t("application:preview.applicationEvent.ageGroup")}
+                value={
+                  applicationEvent.ageGroupId
+                    ? `${
+                        ageGroupOptions[applicationEvent.ageGroupId].minimum
+                      } - ${
+                        ageGroupOptions[applicationEvent.ageGroupId].maximum
+                      }`
+                    : ""
+                }
+              />
+              <LabelValue
+                label={t("application:preview.applicationEvent.purpose")}
+                value={
+                  applicationEvent.purposeId != null
+                    ? localizedValue(
+                        purposeOptions[applicationEvent.purposeId].name,
+                        i18n.language
+                      )
+                    : ""
+                }
+              />
+              <LabelValue
+                label={t("application:preview.applicationEvent.begin")}
+                value={applicationEvent.begin || ""}
+              />
+              <LabelValue
+                label={t("application:preview.applicationEvent.end")}
+                value={applicationEvent.end || ""}
+              />
+              <LabelValue
+                label={t("application:preview.applicationEvent.minDuration")}
+                value={formatDuration(applicationEvent.minDuration as string)}
+              />
+              <LabelValue
+                label={t("application:preview.applicationEvent.maxDuration")}
+                value={formatDuration(applicationEvent.maxDuration as string)}
+              />
+              <LabelValue
+                label={t("application:preview.applicationEvent.eventsPerWeek")}
+                value={applicationEvent.eventsPerWeek}
+              />
+              <div />
+              {/* <LabelValue
               label={t("application:preview.applicationEvent.biweekly")}
               value={t(`common:${applicationEvent.biweekly}`) as string}
             /> */}
-            {applicationEvent.eventReservationUnits.map(
-              (reservationUnit, index) => (
-                <LabelValue
-                  key={reservationUnit.reservationUnitId}
-                  label={t(
-                    "application:preview.applicationEvent.reservationUnit",
-                    { order: index + 1 }
-                  )}
-                  value={[
-                    <UnitName>
-                      {localizedValue(
-                        reservationUnits[reservationUnit.reservationUnitId]
-                          .name,
-                        i18n.language
-                      )}
-                    </UnitName>,
-                    <BuildingName>
-                      {localizedValue(
-                        reservationUnits[reservationUnit.reservationUnitId]
-                          .building?.name,
-                        i18n.language
-                      )}
-                    </BuildingName>,
-                  ]}
-                />
-              )
-            )}
-          </TwoColumnContainer>
-          <Ruler />
-          <SmallSubHeadline>
-            {t("application:preview.applicationEventSchedules")}
-          </SmallSubHeadline>
-          <TimePreviewContainer>
-            <TimePreview
-              applicationEventSchedules={
-                applicationEvent.applicationEventSchedules
-              }
-            />
-          </TimePreviewContainer>
-        </Accordion>
-      ))}
+              {applicationEvent.eventReservationUnits.map(
+                (reservationUnit, index) => (
+                  <LabelValue
+                    key={reservationUnit.reservationUnitId}
+                    label={t(
+                      "application:preview.applicationEvent.reservationUnit",
+                      { order: index + 1 }
+                    )}
+                    value={[
+                      <UnitName>
+                        {localizedValue(
+                          reservationUnits[reservationUnit.reservationUnitId]
+                            .name,
+                          i18n.language
+                        )}
+                      </UnitName>,
+                      <BuildingName>
+                        {localizedValue(
+                          reservationUnits[reservationUnit.reservationUnitId]
+                            .building?.name,
+                          i18n.language
+                        )}
+                      </BuildingName>,
+                    ]}
+                  />
+                )
+              )}
+            </TwoColumnContainer>
+            <Ruler />
+            <SmallSubHeadline>
+              {t("application:preview.applicationEventSchedules")}
+            </SmallSubHeadline>
+            <TimePreviewContainer data-testid={`time-selector__preview-${i}`}>
+              <TimePreview
+                applicationEventSchedules={[
+                  summaryDataPrimary,
+                  summaryDataSecondary,
+                ]}
+              />
+            </TimePreviewContainer>
+          </Accordion>
+        );
+      })}
       <SmallSubHeadline>
         {t("application:preview.termsOfService")}
       </SmallSubHeadline>
