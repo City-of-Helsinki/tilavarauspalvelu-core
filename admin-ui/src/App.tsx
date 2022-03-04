@@ -1,26 +1,26 @@
 import React from "react";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 import { useReactOidc } from "@axa-fr/react-oidc-context";
-import ApplicationRound from "./component/ApplicationRound/ApplicationRound";
+import ApplicationRound from "./component/recurring-reservations/ApplicationRound";
 import PageWrapper from "./component/PageWrapper";
 import "./i18n";
-import Application from "./component/Application/Application";
-import ApplicationDetails from "./component/Application/ApplicationDetails";
-import Recommendation from "./component/ApplicationRound/Recommendation";
-import RecommendationsByApplicant from "./component/ApplicationRound/RecommendationsByApplicant";
-import ApplicationRounds from "./component/ApplicationRound/ApplicationRounds";
-import AllApplicationRounds from "./component/ApplicationRound/AllApplicationRounds";
+import Application from "./component/applications/Application";
+import ApplicationDetails from "./component/applications/ApplicationDetails";
+import Recommendation from "./component/recurring-reservations/Recommendation";
+import RecommendationsByApplicant from "./component/recurring-reservations/RecommendationsByApplicant";
+import ApplicationRounds from "./component/recurring-reservations/ApplicationRounds";
+import AllApplicationRounds from "./component/recurring-reservations/AllApplicationRounds";
 import MainLander from "./component/MainLander";
-import Approval from "./component/ApplicationRound/Approval";
-import Applications from "./component/Application/Applications";
-import Criteria from "./component/ApplicationRound/Criteria";
-import RecommendationsByReservationUnit from "./component/ApplicationRound/RecommendationsByReservationUnit";
-import ApplicationRoundApprovals from "./component/ApplicationRound/ApplicationRoundApprovals";
+import Approval from "./component/decisions/Approval";
+import Applications from "./component/applications/Applications";
+import Criteria from "./component/recurring-reservations/Criteria";
+import RecommendationsByReservationUnit from "./component/recurring-reservations/RecommendationsByReservationUnit";
+import ApplicationRoundApprovals from "./component/decisions/ApplicationRoundApprovals";
 import { publicUrl } from "./common/const";
-import ResolutionReport from "./component/ApplicationRound/ResolutionReport";
-import ReservationsByReservationUnit from "./component/ApplicationRound/ReservationsByReservationUnit";
-import ReservationSummariesByReservationUnit from "./component/ApplicationRound/ReservationSummariesByReservationUnit";
-import ReservationByApplicationEvent from "./component/Application/ReservationByApplicationEvent";
+import ResolutionReport from "./component/recurring-reservations/ResolutionReport";
+import ReservationsByReservationUnit from "./component/recurring-reservations/ReservationsByReservationUnit";
+import ReservationSummariesByReservationUnit from "./component/recurring-reservations/ReservationSummariesByReservationUnit";
+import ReservationByApplicationEvent from "./component/applications/ReservationByApplicationEvent";
 import SpacesList from "./component/Spaces/SpacesList";
 import Units from "./component/Unit/Units";
 import Unit from "./component/Unit/Unit";
@@ -34,9 +34,10 @@ import ReservationUnitsList from "./component/ReservationUnits/ReservationUnitsL
 import ReservationUnitsSearch from "./component/ReservationUnits/ReservationUnitsSearch";
 import { withGlobalContext } from "./context/GlobalContexts";
 
-import { SingleApplications } from "./component/SingleApplications";
-import SingleApplication from "./component/SingleApplications/SingleApplication";
+import RequestedReservations from "./component/reservations/requested/RequestedReservations";
+import RequestedReservation from "./component/reservations/requested/RequestedReservation";
 import PrivateRoutes from "./common/PrivateRoutes";
+import { prefixes } from "./common/urls";
 
 function App(): JSX.Element {
   const { oidcUser } = useReactOidc();
@@ -53,75 +54,82 @@ function App(): JSX.Element {
           <PrivateRoutes>
             <Route
               exact
-              path="/application/:applicationId"
+              path={`${prefixes.applications}/:applicationId`}
               component={Application}
             />
             <Route
               exact
-              path="/application/:applicationId/details"
+              path={`${prefixes.applications}/:applicationId/details`}
               component={ApplicationDetails}
             />
             <Route
               exact
-              path="/application/:applicationId/recurringReservation/:recurringReservationId"
+              path={`${prefixes.applications}/:applicationId/recurringReservation/:recurringReservationId`}
               component={ReservationByApplicationEvent}
             />
             <Route
               exact
-              path="/applicationRounds"
+              path={`${prefixes.recurringReservations}/application-rounds`}
               component={AllApplicationRounds}
             />
             <Route
               exact
-              path="/applicationRounds/approvals"
+              path={`${prefixes.recurringReservations}/decisions`}
               component={ApplicationRoundApprovals}
             />
             <Route
-              path="/applicationRound/:applicationRoundId/applications"
+              path={`${prefixes.recurringReservations}/decisions/:applicationRoundId/approval`}
+              component={Approval}
+              exact
+            />
+
+            <Route
+              path={`${prefixes.recurringReservations}/application-rounds/:applicationRoundId/applications`}
               component={Applications}
               exact
             />
             <Route
-              path="/applicationRound/:applicationRoundId/resolution"
+              path={`${prefixes.recurringReservations}/application-rounds/:applicationRoundId/resolution`}
               component={ResolutionReport}
               exact
             />
             <Route
-              path="/applicationRound/:applicationRoundId/criteria"
+              path={`${prefixes.recurringReservations}/application-rounds/:applicationRoundId/criteria`}
               component={Criteria}
               exact
             />
             <Route
-              path="/applicationRound/:applicationRoundId/reservationUnit/:reservationUnitId/reservations/summary"
+              path={`${prefixes.recurringReservations}/application-rounds/:applicationRoundId/reservationUnit/:reservationUnitId/reservations/summary`}
               component={ReservationSummariesByReservationUnit}
-            />
-            <Route
-              path="/applicationRound/:applicationRoundId/reservationUnit/:reservationUnitId/reservations"
-              component={ReservationsByReservationUnit}
-            />
-            <Route
-              path="/applicationRound/:applicationRoundId/reservationUnit/:reservationUnitId"
-              component={RecommendationsByReservationUnit}
-            />
-            <Route
-              path="/applicationRound/:applicationRoundId/applicant/:applicantId"
-              component={RecommendationsByApplicant}
-            />
-            <Route
-              path="/applicationRound/:applicationRoundId/organisation/:organisationId"
-              component={RecommendationsByApplicant}
-            />
-            <Route
-              path="/applicationRound/:applicationRoundId/recommendation/:applicationEventScheduleId"
-              component={Recommendation}
-            />
-            <Route
-              path="/applicationRound/:applicationRoundId/approval"
-              component={Approval}
               exact
             />
             <Route
-              path="/applicationRound/:applicationRoundId"
+              path={`${prefixes.recurringReservations}/application-rounds/:applicationRoundId/reservationUnit/:reservationUnitId/reservations`}
+              component={ReservationsByReservationUnit}
+              exact
+            />
+            <Route
+              path={`${prefixes.recurringReservations}/application-rounds/:applicationRoundId/reservationUnit/:reservationUnitId`}
+              component={RecommendationsByReservationUnit}
+              exact
+            />
+            <Route
+              path={`${prefixes.recurringReservations}/application-rounds/:applicationRoundId/applicant/:applicantId`}
+              component={RecommendationsByApplicant}
+              exact
+            />
+            <Route
+              path={`${prefixes.recurringReservations}/application-rounds/:applicationRoundId/organisation/:organisationId`}
+              component={RecommendationsByApplicant}
+              exact
+            />
+            <Route
+              path={`${prefixes.recurringReservations}/application-rounds/:applicationRoundId/recommendation/:applicationEventScheduleId`}
+              component={Recommendation}
+              exact
+            />
+            <Route
+              path={`${prefixes.recurringReservations}/application-rounds/:applicationRoundId`}
               component={ApplicationRound}
               exact
             />
@@ -157,14 +165,14 @@ function App(): JSX.Element {
             />
             <Route path="/unit/:unitPk" component={Unit} exact />
             <Route
-              path="/singleApplications/:reservationPk"
-              component={SingleApplication}
+              path="/reservations/requested/:reservationPk"
+              component={RequestedReservation}
               exact
             />
             <Route
-              path="/singleApplications"
+              path="/reservations/requested"
               exact
-              component={SingleApplications}
+              component={RequestedReservations}
             />
           </PrivateRoutes>
         </Switch>

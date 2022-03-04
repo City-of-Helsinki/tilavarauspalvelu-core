@@ -172,10 +172,11 @@ const translations: ITranslations = {
     welcome: ["Tervetuloa"],
   },
   MainMenu: {
-    applications: ["Hyväksynnät"],
-    singleApplications: ["Anomukset"],
-    handling: ["Käsittely"],
-    approvals: ["Hyväksynnät"],
+    reservations: ["Varaukset"],
+    requestedReservations: ["Alustavat varaukset"],
+    recurringReservations: ["Kausivaraaminen"],
+    applicatioNROunds: ["Hakukierrokset"],
+    decisions: ["Päätöksenteko"],
     clients: ["Asiakkaat"],
     archive: ["Arkisto"],
     premisesAndSettings: ["Tilat ja asetukset"],
@@ -1063,7 +1064,7 @@ const translations: ITranslations = {
     removeFailed: ["Resurssin poistaminen ei onnistunut."],
     removeSuccess: ["Resurssi poistettu."],
   },
-  SingleApplications: {
+  RequestedReservations: {
     insightCountHandledApplications: ["tarkastettava anomus"],
     insightCountHandledApplications_plural: ["tarkastettavaa anomusta"],
     insightCountMonthlyHandledApplications: ["käsiteltyä anomusta / kk"],
@@ -1077,7 +1078,7 @@ const translations: ITranslations = {
     },
   },
 
-  SingleApplication: {
+  RequestedReservation: {
     errorFetchingData: ["Tietoja ei saatu haettua"],
     heading: ["Anomuksen tarkastelu"],
     calendar: ["Varauskalenteri"],
@@ -1086,6 +1087,7 @@ const translations: ITranslations = {
       REQUIRES_HANDLING: ["Käsittelemättä"],
       CONFIRMED: ["Hyväksytty"],
       DENIED: ["Hylätty"],
+      CANCELLED: ["Peruutettu"],
     },
     approve: ["Hyväksy anomus"],
     reject: ["Hylkää anomus"],

@@ -88,7 +88,7 @@ export type Image = {
 export type ReservationUnitBuilding = {
   id: number;
   district: District;
-  name: string | null;
+  name: TranslationObject;
   realEstate: string | null;
   surfaceArea: string | null;
 };
