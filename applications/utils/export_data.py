@@ -3,9 +3,16 @@ from pathlib import Path
 from typing import List
 
 from django.conf import settings
+from django.db.models import OuterRef, Subquery
 from django.utils import timezone
 
-from ..models import ApplicationEvent, ApplicationEventSchedule, EventReservationUnit
+from ..models import (
+    PRIORITIES,
+    Application,
+    ApplicationEvent,
+    ApplicationEventSchedule,
+    EventReservationUnit,
+)
 
 
 class ApplicationDataExporter:
@@ -13,130 +20,218 @@ class ApplicationDataExporter:
     def export_application_data(cls, application_round: int) -> None:
         now = timezone.now()
         root = Path(settings.BASE_DIR)
-        file_name = (
-            f"application_data_round_{application_round}_{now.strftime('%d-%m-%Y')}.csv"
-        )
-        path = root / "exports"
+        path = root / "exports" / f"{now.strftime('%d-%m-%Y')}"
         path.mkdir(parents=True, exist_ok=True)
 
-        application_events: List[ApplicationEvent] = list(
+        application_events_base_query = (
             ApplicationEvent.objects.filter(
                 application__application_round=application_round
             )
             .select_related(
                 "application",
                 "application__organisation",
+                "application__contact_person",
+                "application__application_round",
+                "purpose",
+                "age_group",
             )
             .order_by("application__organisation__name")
         )
 
-        if len(application_events):
-            with open(path / file_name, "w", newline="") as applications_file:
-                applications_writer = writer(applications_file)
+        # Loop through all priorities to write one file for each of the priority level
+        for priority_constant, _ in PRIORITIES.PRIORITY_CHOICES:
+            application_events: List[ApplicationEvent] = list(
+                application_events_base_query.alias(
+                    first_schedule_id=Subquery(
+                        ApplicationEventSchedule.objects.filter(
+                            application_event=OuterRef("id"), priority=priority_constant
+                        ).values("id")[:1]
+                    )
+                ).filter(first_schedule_id__isnull=False)
+            )
 
-                # Write header rows
-                applications_writer.writerow(["", "", "", "", "", "", "haetut ajat"])
-                applications_writer.writerow(["", "", "", "", "", "", "KAIKKI TILAT"])
-                applications_writer.writerow(
-                    [
-                        "hakija",
-                        "vuoroja, kpl / vko",
-                        "aika",
-                        "tilatoive 1",
-                        "tilatoive 2",
-                        "tilatoive 3",
-                        "ma",
-                        "ti",
-                        "ke",
-                        "to",
-                        "pe",
-                        "la",
-                        "su",
-                    ]
+            if len(application_events):
+                priority_name = PRIORITIES.get_priority_name_from_constant(
+                    priority_constant
+                ).upper()
+                file_name = (
+                    "application_data"
+                    f"_round_{application_round}"
+                    f"_priority_{priority_name}"
+                    ".csv"
                 )
 
-                for event in application_events:
-                    min_duration_string = (
-                        cls._get_duration_string(event.min_duration.seconds)
-                        if event.min_duration
-                        else ""
-                    )
-                    max_duration_string = (
-                        cls._get_duration_string(event.max_duration.seconds)
-                        if event.max_duration
-                        else ""
-                    )
-                    duration_range_string = cls._get_time_range_string(
-                        min_duration_string, max_duration_string
-                    )
-                    event_schedules = {
-                        0: "",
-                        1: "",
-                        2: "",
-                        3: "",
-                        4: "",
-                        5: "",
-                        6: "",
-                    }
-                    reservation_units = {
-                        0: "",
-                        1: "",
-                        2: "",
-                    }
+                with open(path / file_name, "w", newline="") as applications_file:
+                    applications_writer = writer(applications_file)
 
-                    # Loop through requested schedules and update
-                    # the correct time range string depending on day integer
-                    schedule: ApplicationEventSchedule
-                    for schedule in (
-                        event.application_event_schedules.all()
-                        .order_by("begin")
-                        .only("begin", "end", "day")
-                    ):
-                        time_range_string = cls._get_time_range_string(
-                            schedule.begin.strftime("%H:%M"),
-                            schedule.end.strftime("%H:%M"),
+                    cls._write_header_row(applications_writer, priority_name)
+
+                    for event in application_events:
+                        application: Application = event.application
+                        min_duration_string = (
+                            cls._get_duration_string(event.min_duration.seconds)
+                            if event.min_duration
+                            else ""
                         )
+                        max_duration_string = (
+                            cls._get_duration_string(event.max_duration.seconds)
+                            if event.max_duration
+                            else ""
+                        )
+                        duration_range_string = cls._get_time_range_string(
+                            min_duration_string, max_duration_string
+                        )
+                        event_schedules = {
+                            0: "",
+                            1: "",
+                            2: "",
+                            3: "",
+                            4: "",
+                            5: "",
+                            6: "",
+                        }
+                        reservation_units = {
+                            0: "",
+                            1: "",
+                            2: "",
+                        }
 
-                        # For multiple schedules on the same day, separate them by comma
-                        if event_schedules[schedule.day]:
-                            time_range_string = (
-                                f"{event_schedules[schedule.day]}, {time_range_string}"
+                        # Loop through requested schedules and update
+                        # the correct time range string depending on day integer
+                        schedule: ApplicationEventSchedule
+                        for schedule in (
+                            event.application_event_schedules.filter(
+                                priority=priority_constant
+                            )
+                            .order_by("begin")
+                            .only("begin", "end", "day")
+                        ):
+                            time_range_string = cls._get_time_range_string(
+                                schedule.begin.strftime("%H:%M"),
+                                schedule.end.strftime("%H:%M"),
                             )
 
-                        event_schedules.update({schedule.day: time_range_string})
+                            # For multiple schedules on the same day, separate them by comma
+                            if event_schedules[schedule.day]:
+                                time_range_string = f"{event_schedules[schedule.day]}, {time_range_string}"
 
-                    # Loop through event reservation units and update strings
-                    # by priority.
-                    # Limit reservation units to three first units.
-                    event_reservation_unit: EventReservationUnit
-                    for i, event_reservation_unit in enumerate(
-                        event.event_reservation_units.all()
-                        .select_related("reservation_unit")
-                        .order_by("priority")
-                        .only("reservation_unit__name")[:3]
-                    ):
-                        reservation_units[
-                            i
-                        ] = event_reservation_unit.reservation_unit.name
+                            event_schedules.update({schedule.day: time_range_string})
 
-                    # Write application event to CSV file
-                    applications_writer.writerow(
-                        [
-                            event.application.organisation.name,
-                            event.events_per_week,
-                            duration_range_string,
-                            reservation_units[0],
-                            reservation_units[1],
-                            reservation_units[2],
-                            event_schedules[0],
-                            event_schedules[1],
-                            event_schedules[2],
-                            event_schedules[3],
-                            event_schedules[4],
-                            event_schedules[5],
-                            event_schedules[6],
-                        ]
-                    )
+                        # Loop through event reservation units and update strings
+                        # by priority.
+                        # Limit reservation units to three first units.
+                        event_reservation_unit: EventReservationUnit
+                        for i, event_reservation_unit in enumerate(
+                            event.event_reservation_units.all()
+                            .select_related("reservation_unit")
+                            .order_by("priority")
+                            .only("reservation_unit__name")[:3]
+                        ):
+                            reservation_units[
+                                i
+                            ] = event_reservation_unit.reservation_unit.name
+
+                        # Write application event to CSV file
+                        applications_writer.writerow(
+                            [
+                                application.id,
+                                getattr(application.organisation, "name", ""),
+                                application.contact_person.first_name,
+                                application.contact_person.last_name,
+                                application.contact_person.email,
+                                event.name,
+                                application.application_round.name,
+                                getattr(application.home_city, "name", ""),
+                                getattr(event.purpose, "name", ""),
+                                event.age_group,
+                                application.applicant_type,
+                                event.events_per_week,
+                                duration_range_string,
+                                reservation_units[0],
+                                reservation_units[1],
+                                reservation_units[2],
+                                event_schedules[0],
+                                event_schedules[1],
+                                event_schedules[2],
+                                event_schedules[3],
+                                event_schedules[4],
+                                event_schedules[5],
+                                event_schedules[6],
+                            ]
+                        )
+
+    @staticmethod
+    def _write_header_row(writer, priority: str):
+        # Write header rows
+        writer.writerow(
+            [
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                f"haetut ajat prioriteetilla: {priority}",
+            ]
+        )
+        writer.writerow(
+            [
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "KAIKKI TILAT",
+            ]
+        )
+        writer.writerow(
+            [
+                "hakemuksen numero",
+                "hakija",
+                "yhteyshenkilö etunimi",
+                "yhteyshenkilö sukunimi",
+                "sähköpostiosoite",
+                "varauksen nimi",
+                "hakijan ilmoittama kausi",
+                "kotikunta",
+                "vuoronkäyttötarkoitus",
+                "ikäryhmä",
+                "hakijan tyyppi",
+                "vuoroja, kpl / vko",
+                "aika",
+                "tilatoive 1",
+                "tilatoive 2",
+                "tilatoive 3",
+                "ma",
+                "ti",
+                "ke",
+                "to",
+                "pe",
+                "la",
+                "su",
+            ]
+        )
 
     @staticmethod
     def _get_duration_string(total_seconds: int) -> str:

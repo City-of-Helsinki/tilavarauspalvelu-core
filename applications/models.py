@@ -179,6 +179,14 @@ class PRIORITY_CONST(object):
         (PRIORITY_HIGH, _("High")),
     )
 
+    @classmethod
+    def get_priority_name_from_constant(cls, constant: int):
+        for priority_constant, priority_name in cls.PRIORITY_CHOICES:
+            if priority_constant == constant:
+                return priority_name
+
+        return ""
+
 
 PRIORITIES = PRIORITY_CONST()
 

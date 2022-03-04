@@ -31,6 +31,14 @@ class ReservationPurposeFactory(DjangoModelFactory):
     name = FuzzyText()
 
 
+class AgeGroupFactory(DjangoModelFactory):
+    class Meta:
+        model = "reservations.AgeGroup"
+
+    minimum = FuzzyInteger(low=0, high=100)
+    maximum = FuzzyInteger(low=0, high=100)
+
+
 class ReservationMetadataSetFactory(DjangoModelFactory):
     class Meta:
         model = "reservations.ReservationMetadataSet"

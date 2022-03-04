@@ -1,8 +1,9 @@
 import datetime
 
 from django.utils.timezone import get_default_timezone
-from factory import SubFactory, post_generation
+from factory import LazyAttribute, SubFactory, post_generation
 from factory.django import DjangoModelFactory
+from factory.faker import Faker
 from factory.fuzzy import FuzzyChoice, FuzzyDate, FuzzyDateTime, FuzzyInteger, FuzzyText
 from pytz import UTC
 
@@ -15,6 +16,7 @@ from applications.models import (
     Organisation,
 )
 from reservation_units.tests.factories import ReservationUnitFactory
+from reservations.tests.factories import AgeGroupFactory, ReservationPurposeFactory
 from spaces.tests.factories import ServiceSectorFactory
 
 
@@ -50,6 +52,12 @@ class OrganisationFactory(DjangoModelFactory):
 
 
 class PersonFactory(DjangoModelFactory):
+    first_name = Faker("first_name")
+    last_name = Faker("last_name")
+    email = LazyAttribute(
+        lambda o: f"{o.first_name.lower()}.{o.last_name.lower()}@example.com"
+    )
+
     class Meta:
         model = "applications.Person"
 
@@ -108,6 +116,13 @@ class ApplicationRoundFactory(DjangoModelFactory):
             self.reservation_units.add(reservation_unit)
 
 
+class CityFactory(DjangoModelFactory):
+    name = FuzzyText(length=20)
+
+    class Meta:
+        model = "applications.City"
+
+
 class ApplicationFactory(DjangoModelFactory):
     class Meta:
         model = "applications.Application"
@@ -124,6 +139,7 @@ class ApplicationFactory(DjangoModelFactory):
     organisation = SubFactory(OrganisationFactory)
     contact_person = SubFactory(PersonFactory)
     application_round = SubFactory(ApplicationRoundFactory)
+    home_city = SubFactory(CityFactory)
 
 
 class ApplicationEventFactory(DjangoModelFactory):
@@ -135,6 +151,8 @@ class ApplicationEventFactory(DjangoModelFactory):
     min_duration = "01:00"
     max_duration = "02:00"
     events_per_week = FuzzyInteger(low=1, high=4)
+    purpose = SubFactory(ReservationPurposeFactory)
+    age_group = SubFactory(AgeGroupFactory)
 
     @post_generation
     def declined_reservation_units(self, create, declined_reservation_units, **kwargs):
