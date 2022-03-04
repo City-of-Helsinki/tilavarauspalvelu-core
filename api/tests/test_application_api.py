@@ -1017,3 +1017,25 @@ def test_application_status_set_sent_assigns_when_not_in_review_nor_draft(
     assert response.status_code == 200
     application.refresh_from_db()
     assert application.status == ApplicationStatus.SENT
+
+
+@pytest.mark.django_db
+def test_application_filter_by_units(
+    event_reservation_unit, event_reservation_unit_too, user_api_client
+):
+    unit_id_one = event_reservation_unit.reservation_unit.unit.id
+    unit_id_two = event_reservation_unit_too.reservation_unit.unit.id
+    application_id_one = event_reservation_unit.application_event.application_id
+    application_id_too = event_reservation_unit_too.application_event.application_id
+
+    response = user_api_client.get(
+        f"{reverse('application-list')}?unit={unit_id_one}&unit={unit_id_two}"
+    )
+    assert_that(response.status_code).is_equal_to(200)
+    assert_that(response.data).is_length(2)
+    assert_that(
+        response.data[0]["id"] in [application_id_one, application_id_too]
+    ).is_true()
+    assert_that(
+        response.data[1]["id"] in [application_id_one, application_id_too]
+    ).is_true()
