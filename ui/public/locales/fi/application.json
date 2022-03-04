@@ -110,7 +110,8 @@
       "city": "Postitoimipaikka",
       "notRegistered": "Yhdistystä ei ole rekisteröity",
       "separateInvoicingAddress": "Laskutusosoite on eri kuin tämä"
-    }
+    },
+    "additionalInformation": "Lisätiedot"
   },
   "preview": {
     "applicantType": {
@@ -128,6 +129,7 @@
     "applicantTypeLabel": "Hakijan tyyppi",
     "email": "Sähköpostiosoite",
     "phoneNumber": "Puhelinumero",
+    "additionalInformation": "Lisätiedot",
     "organisation": {
       "name": "Hakijan nimi",
       "coreBusiness": "Ydintoiminta"

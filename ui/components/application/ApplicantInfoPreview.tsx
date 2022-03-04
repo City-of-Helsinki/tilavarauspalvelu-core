@@ -73,10 +73,16 @@ const ApplicantInfoPreview = ({
         value={application.contactPerson?.phoneNumber}
       />
       {application.applicantType === "individual" ? (
-        <Address
-          address={application.billingAddress}
-          i18nMessagePrefix="common:address"
-        />
+        <>
+          <Address
+            address={application.billingAddress}
+            i18nMessagePrefix="common:address"
+          />
+          <LabelValue
+            label={t("application:preview.additionalInformation")}
+            value={application.additionalInformation}
+          />
+        </>
       ) : null}
     </TwoColumnContainer>
   );

@@ -15,6 +15,8 @@ export const TwoColumnContainer = styled.div`
 `;
 
 export const SpanTwoColumns = styled.span`
+  display: grid;
+  gap: var(--spacing-m);
   grid-column-start: 1;
   grid-column-end: 3;
 
