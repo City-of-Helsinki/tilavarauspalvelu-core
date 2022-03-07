@@ -220,20 +220,16 @@ class UnitRole(BaseRole):
         UnitRoleChoice, verbose_name=_("Role"), on_delete=models.CASCADE
     )
 
-    unit_group = models.ForeignKey(
+    unit_group = models.ManyToManyField(
         UnitGroup,
         verbose_name=_("Unit group"),
         related_name="roles",
-        on_delete=models.CASCADE,
-        null=True,
         blank=True,
     )
-    unit = models.ForeignKey(
+    unit = models.ManyToManyField(
         Unit,
         verbose_name=_("Unit"),
         related_name="roles",
-        on_delete=models.CASCADE,
-        null=True,
         blank=True,
     )
     user = models.ForeignKey(
