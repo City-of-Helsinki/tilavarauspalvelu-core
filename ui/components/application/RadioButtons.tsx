@@ -15,9 +15,8 @@ const Container = styled.div`
   margin-top: var(--spacing-m);
 `;
 
-const Prefix = styled.h2`
-  font-size: var(--font-size-m);
-  ${fontRegular};
+const Prefix = styled.p`
+  ${fontRegular}
 `;
 
 const RadioButtons = ({

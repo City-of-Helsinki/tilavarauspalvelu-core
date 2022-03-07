@@ -4,7 +4,8 @@ import { useTranslation } from "react-i18next";
 import { NavLink, RouteProps } from "react-router-dom";
 import styled from "styled-components";
 import { breakpoints } from "../styles/util";
-import { ReactComponent as IconPremiseApplications } from "../images/icon_premise-applications.svg";
+import { ReactComponent as IconCalendar } from "../images/icon_calendar.svg";
+import { ReactComponent as IconIndividualReservation } from "../images/icon_individual-reservation.svg";
 import { ReactComponent as IconPremises } from "../images/icon_premises.svg";
 import { truncatedText } from "../styles/typography";
 import { useData } from "../context/DataContext";
@@ -127,12 +128,12 @@ interface SubItemChild {
   route: string;
   routeParams?: RouteProps;
   items?: SubItemChild[];
+  postFix?: JSX.Element;
 }
 
 interface SubItemProps {
   items?: SubItemChild[];
   parentTitleKey: string;
-  handlingCount: number;
   onItemSelection?: () => void;
 }
 
@@ -140,7 +141,6 @@ const SubItems = ({
   items,
   parentTitleKey,
   onItemSelection,
-  handlingCount,
 }: SubItemProps): JSX.Element | null => {
   const [isMenuOpen, toggleMenu] = useState(true);
 
@@ -167,16 +167,16 @@ const SubItems = ({
           {items.map((child: SubItemChild) => (
             <li key={child.title}>
               <SubItemHeading
+                isActive={(match, location) => {
+                  return location.pathname.startsWith(child.route);
+                }}
                 $disabled={child.route === ""}
                 to={child.route}
                 onClick={() => onItemSelection && onItemSelection()}
               >
                 {t(child.title)}
               </SubItemHeading>
-              {child.title === "MainMenu.singleApplications" &&
-              handlingCount > 0 ? (
-                <HandlingCount>{handlingCount}</HandlingCount>
-              ) : null}
+              {child.postFix}
             </li>
           ))}
         </SubItemList>
@@ -187,20 +187,27 @@ const SubItems = ({
 
 const menuTree: IMenuChild[] = [
   {
-    title: "MainMenu.applications",
-    icon: <IconPremiseApplications aria-hidden />,
+    title: "MainMenu.reservations",
+    icon: <IconIndividualReservation aria-hidden />,
     items: [
       {
-        title: "MainMenu.singleApplications",
-        route: "/singleApplications",
+        title: "MainMenu.requestedReservations",
+        route: "/reservations/requested",
+      },
+    ],
+  },
+
+  {
+    title: "MainMenu.recurringReservations",
+    icon: <IconCalendar aria-hidden />,
+    items: [
+      {
+        title: "MainMenu.applicationRounds",
+        route: "/recurring-reservations/application-rounds",
       },
       {
-        title: "MainMenu.handling",
-        route: "/applicationRounds",
-      },
-      {
-        title: "MainMenu.approvals",
-        route: "/applicationRounds/approvals",
+        title: "MainMenu.decisions",
+        route: "/recurring-reservations/decisions",
       },
     ],
   },
@@ -241,6 +248,10 @@ function MainMenu({
 
   const { handlingCount } = useData();
 
+  const count = handlingCount ? (
+    <HandlingCount>{handlingCount}</HandlingCount>
+  ) : undefined;
+
   return (
     <Wrapper placement={placement}>
       {menuTree.map((menuItem: IMenuChild) =>
@@ -249,10 +260,13 @@ function MainMenu({
             <Icon>{menuItem.icon}</Icon>
             <Heading>{t(menuItem.title)}</Heading>
             <SubItems
-              items={menuItem.items}
+              items={menuItem.items?.map((child) =>
+                child.title === "MainMenu.requestedReservations"
+                  ? { ...child, postFix: count }
+                  : child
+              )}
               parentTitleKey={menuItem.title}
               onItemSelection={onItemSelection}
-              handlingCount={handlingCount}
             />
           </MenuItem>
         ) : null

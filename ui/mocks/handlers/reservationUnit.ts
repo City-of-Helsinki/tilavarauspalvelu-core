@@ -498,7 +498,6 @@ const relatedReservationUnitsData: ReservationUnitTypeConnection = {
           nameSv: "Nuorisopalvelut Sv",
         },
         maxPersons: 45,
-
         descriptionFi: "",
         descriptionEn: "",
         descriptionSv: "",
