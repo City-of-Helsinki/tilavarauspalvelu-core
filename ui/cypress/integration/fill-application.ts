@@ -108,10 +108,11 @@ describe("application", () => {
     numPersons(0).type("3");
     selectOption("applicationEvents[0].ageGroupId", 1);
     selectOption("applicationEvents[0].purposeId", 1);
-    acceptAndSaveEvent(0).click();
 
     cy.intercept("PUT", "/v1/application/*").as("savePage1");
-    cy.wait("@savePage1");
+    acceptAndSaveEvent(0).click();
+
+    cy.wait("@savePage1", { timeout: 20000 });
 
     addNewApplicationButton().click();
     applicationName(1).clear().type("Toca");
@@ -120,11 +121,11 @@ describe("application", () => {
     selectOption("applicationEvents[1].purposeId", 2);
     acceptAndSaveEvent(1).click();
 
-    nextButton().click();
-
     cy.fixture("v1/application/138_page_2").then((json) => {
       cy.intercept("GET", "/v1/application/138/*", json).as("page2");
     });
+
+    nextButton().click();
 
     cy.wait(["@page2"]);
 

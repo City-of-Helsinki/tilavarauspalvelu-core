@@ -87,11 +87,34 @@ type Props = {
   application?: Application;
 };
 
+const checkReady = (application: Application, index: number): boolean => {
+  switch (index) {
+    case 0: {
+      return (
+        application.applicationEvents.length > 0 &&
+        application.applicationEvents[0].id > 0
+      );
+    }
+    case 1: {
+      return (
+        application.applicationEvents?.[0]?.applicationEventSchedules.length > 0
+      );
+    }
+    case 2: {
+      return application.applicantType !== null;
+    }
+
+    default:
+      return false;
+  }
+};
+
 const Stepper = ({ application }: Props): JSX.Element => {
   const { t } = useTranslation();
   const { asPath, push } = useRouter();
   let maxPage = -1;
   if (application) {
+    maxPage = 0;
     if (
       application.applicationEvents.length > 0 &&
       application.applicationEvents[0].id
@@ -109,15 +132,17 @@ const Stepper = ({ application }: Props): JSX.Element => {
   }
   const pages = ["page1", "page2", "page3", "preview"];
 
+  console.log("rendering with ", application);
+
   return (
     <Container aria-label={t("common:applicationNavigationName")}>
       <>
         {pages.map((page, index) => {
           const isCurrent = asPath.indexOf(page) !== -1;
           const isDisabled = index > maxPage;
-          const isReady = !isDisabled && !isCurrent;
+          const isReady = checkReady(application, index);
           return (
-            <StepContainer $disabled={maxPage <= index} key={page}>
+            <StepContainer $disabled={index >= maxPage} key={page}>
               <Step
                 key={page}
                 onClick={() => {
@@ -128,7 +153,11 @@ const Stepper = ({ application }: Props): JSX.Element => {
                 $clickable={!isDisabled && !isCurrent}
                 disabled={isDisabled || isCurrent}
               >
-                <Number $disabled={isDisabled} $current={isCurrent}>
+                <Number
+                  $disabled={isDisabled}
+                  $current={isCurrent}
+                  aria-hidden="true"
+                >
                   {isReady ? <IconCheck /> : index + 1}
                 </Number>
                 <Name $current={isCurrent} $disabled={isDisabled}>
