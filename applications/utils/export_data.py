@@ -95,6 +95,20 @@ class ApplicationDataExporter:
                             1: "",
                             2: "",
                         }
+                        contact_person_first_name = ""
+                        contact_person_last_name = ""
+                        contact_person_email = ""
+
+                        if application.contact_person:
+                            contact_person_first_name = (
+                                application.contact_person.first_name
+                            )
+                            contact_person_last_name = (
+                                application.contact_person.last_name
+                            )
+                            contact_person_email = getattr(
+                                application.contact_person, "email", ""
+                            )
 
                         # Loop through requested schedules and update
                         # the correct time range string depending on day integer
@@ -136,9 +150,9 @@ class ApplicationDataExporter:
                             [
                                 application.id,
                                 getattr(application.organisation, "name", ""),
-                                application.contact_person.first_name,
-                                application.contact_person.last_name,
-                                application.contact_person.email,
+                                contact_person_first_name,
+                                contact_person_last_name,
+                                contact_person_email,
                                 event.name,
                                 application.application_round.name,
                                 getattr(application.home_city, "name", ""),

@@ -635,6 +635,60 @@ class ApplicationDataExporterTestCase(TestCase):
         assert_that(not_existing_file_medium.is_file()).is_false()
         assert_that(not_existing_file_low.is_file()).is_false()
 
+    def test_application_export__no_contact_person(self):
+        self.application_event.application.contact_person = None
+        self.application_event.application.save()
+
+        call_command("export_applications", self.application_round_id)
+
+        event: ApplicationEvent = self.application_event
+        application: Application = event.application
+
+        expected_row = [
+            str(application.id),
+            application.organisation.name,
+            "",
+            "",
+            "",
+            event.name,
+            application.application_round.name,
+            application.home_city.name,
+            event.purpose.name,
+            str(event.age_group),
+            application.applicant_type,
+            str(event.events_per_week),
+            "1 h - 2 h",
+            f"{self.event_reservation_unit_2.reservation_unit.name}",
+            f"{self.event_reservation_unit_3.reservation_unit.name}",
+            f"{self.event_reservation_unit_1.reservation_unit.name}",
+            "",
+            "12:00 - 14:00",
+            "",
+            "",
+            "",
+            "",
+            "",
+        ]
+
+        file_name = self._get_filename_for_round_and_priority(
+            self.application_round_id, "HIGH"
+        )
+        self._test_first_data_line(file_name, expected_row)
+
+        # These files should not have been written.
+        # Check that they do not exist!
+        not_existing_file_medium = self._get_filename_for_round_and_priority(
+            self.application_round_id, "MEDIUM"
+        )
+        not_existing_file_low = self._get_filename_for_round_and_priority(
+            self.application_round_id, "LOW"
+        )
+        not_existing_file_medium = self.export_dir / not_existing_file_medium
+        not_existing_file_low = self.export_dir / not_existing_file_low
+
+        assert_that(not_existing_file_medium.is_file()).is_false()
+        assert_that(not_existing_file_low.is_file()).is_false()
+
     def test_application_export__empty_home_city(self):
         self.application_event.application.home_city = None
         self.application_event.application.save()
