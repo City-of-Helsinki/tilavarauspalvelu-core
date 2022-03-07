@@ -60,7 +60,7 @@ export const reservationUnitSearchHandlers = [
           },
           {
             node: {
-              id: 45,
+              id: 2,
               nameFi: "Hertsin nuorisotalon sali",
               nameEn: "Hertsin nuorisotalon sali",
               nameSv: "Hertsin nuorisotalon sali",

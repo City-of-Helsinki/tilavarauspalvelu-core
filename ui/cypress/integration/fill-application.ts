@@ -36,10 +36,6 @@ describe("application", () => {
       );
     });
 
-    cy.fixture("v1/reservation_unit").then((json) => {
-      cy.intercept("GET", "/v1/reservation_unit/*", json).as("reservationUnit");
-    });
-
     cy.fixture("v1/application/post").then((json) => {
       cy.intercept("POST", "/v1/application/", json).as("applicationPost");
     });
@@ -77,11 +73,10 @@ describe("application", () => {
   });
 
   it("can be submitted and is accessible", () => {
-    cy.wait("@reservationUnit");
-    addReservationUnitButton("Studiokompleksi").click();
+    addReservationUnitButton(2).click();
     startApplicationButton().click();
 
-    cy.get("h1").should("contain", "Vakiovuorojen tilat");
+    cy.get("h1").should("contain", "Varaa tila koko kaudeksi");
 
     cy.a11yCheck();
 

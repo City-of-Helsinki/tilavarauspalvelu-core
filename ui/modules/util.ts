@@ -11,7 +11,6 @@ import {
 import { i18n, TFunction } from "next-i18next";
 import { stringify } from "query-string";
 import { isNumber, trim } from "lodash";
-import { ReservationUnitsParameters } from "./api";
 import {
   searchPrefix,
   emptyOption,
@@ -221,7 +220,7 @@ export const getComboboxValues = (
     : [getSelectedOption(value, options)];
 };
 
-export const searchUrl = (params: ReservationUnitsParameters): string =>
+export const searchUrl = (params: unknown): string =>
   `${searchPrefix}/?${stringify(params)}`;
 
 export const singleSearchUrl = (params: unknown): string =>
