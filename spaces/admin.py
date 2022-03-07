@@ -57,6 +57,7 @@ class UnitAdmin(admin.ModelAdmin):
     model = Unit
     inlines = [LocationInline]
     actions = ["update_from_tprek"]
+    search_fields = ["name", "tprek_id"]
 
     @admin.action
     def update_from_tprek(self, request, queryset):
@@ -76,6 +77,7 @@ class UnitAdmin(admin.ModelAdmin):
 @admin.register(UnitGroup)
 class UnitGroupAdmin(admin.ModelAdmin):
     model = UnitGroup
+    search_fields = ["name"]
 
 
 @admin.register(ServiceSector)
