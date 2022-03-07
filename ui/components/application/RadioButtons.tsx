@@ -15,7 +15,7 @@ const Container = styled.div`
   margin-top: var(--spacing-m);
 `;
 
-const Prefix = styled.h3`
+const Prefix = styled.p`
   ${fontRegular}
 `;
 

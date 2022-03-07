@@ -48,7 +48,8 @@ COPY --from=builder /app/node_modules /app/node_modules
 COPY --from=builder /app/ui/package.json /app/ui/package.json
 COPY --from=builder /app/package.json /app/package.json
 
-USER default
+# Add images directory and fix group permissions
+RUN install -d -o default -g root /app/ui/.next/cache/images && chmod g+w -R /app/ui/.next
 
 EXPOSE 3000
 
