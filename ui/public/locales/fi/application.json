@@ -186,9 +186,9 @@
     "faq3Question": "Kohtuullistaminen, vuoron peruutus ja muutoksenhaku"
   },
   "navigation": {
-    "page1": "Vakiovuoron perustiedot",
-    "page2": "Vakiovuoron ajankohta",
-    "page3": "Varaajan perustiedot",
-    "preview": "Tarkista ja lähetä käsiteltäväksi"
+    "page1": "Varauksen tiedot",
+    "page2": "Varauksen ajankohta",
+    "page3": "Varaajan tiedot",
+    "preview": "Tarkista ja lähetä"
   }
 }

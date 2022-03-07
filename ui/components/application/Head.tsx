@@ -8,6 +8,7 @@ type HeadProps = {
   heading: string;
   breadCrumbText?: string;
   children?: React.ReactNode;
+  noKoros?: boolean;
 };
 
 const Heading = styled.h1`
@@ -34,6 +35,7 @@ const Head = ({
   children,
   heading,
   breadCrumbText,
+  noKoros = false,
 }: HeadProps): JSX.Element => {
   const { t } = useTranslation();
   return (
@@ -48,7 +50,9 @@ const Head = ({
         <Heading>{heading}</Heading>
         {children || null}
       </Content>
-      <StyledKoros from="white" to="var(--tilavaraus-gray)" />
+      {noKoros ? null : (
+        <StyledKoros from="white" to="var(--tilavaraus-gray)" />
+      )}
     </Container>
   );
 };

@@ -7,11 +7,13 @@ import Title from "./Title";
 
 interface Props {
   children: React.ReactNode;
+  overrideBackgroundColor?: string;
 }
 
-const Main = styled.main`
+const Main = styled.main<{ $bgColor?: string }>`
   font-size: var(--fontsize-body-m);
   flex: 1 0 auto;
+  ${({ $bgColor }) => ($bgColor ? `background: ${$bgColor}` : ``)}
 `;
 
 const PageWrapper = (props: Props): JSX.Element => {
@@ -20,7 +22,11 @@ const PageWrapper = (props: Props): JSX.Element => {
       <Title>Tilavarauspalvelu</Title>
       <Navigation />
       <ServiceNotification />
-      <Main id="main" style={{ marginBottom: "-14px" }}>
+      <Main
+        $bgColor={props.overrideBackgroundColor}
+        id="main"
+        style={{ marginBottom: "-14px" }}
+      >
         {props.children}
       </Main>
       <Footer />
