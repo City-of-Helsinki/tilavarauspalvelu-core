@@ -1,7 +1,7 @@
 {
   "textSearchLabel": "Vapaasanahaku",
   "searchTermPlaceholder": "Hae sanalla",
-  "searchButton": "Hae tilaa",
+  "searchButton": "Hae tiloja",
   "purposeLabel": "Käyttötarkoitus",
   "roundLabel": "Hakukierros",
   "districtLabel": "Kaupunginosa",
@@ -15,6 +15,7 @@
   "purposesFilter": "Käyttötarkoitus",
   "resetForm": "Tyhjennä hakuehdot",
   "filters": {
+    "applicationRound": "Hakukierros",
     "textSearch": "\"{{value}}\"",
     "minPersons": "Henkilömäärä min",
     "maxPersons": "Henkilömäärä max",

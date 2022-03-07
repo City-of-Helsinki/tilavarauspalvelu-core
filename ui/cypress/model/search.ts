@@ -7,12 +7,10 @@ export function fullTextInput(): Cypress.Chainable<JQuery<HTMLElement>> {
 }
 
 export function addReservationUnitButton(
-  name: string
+  order: number
 ): Cypress.Chainable<JQuery<HTMLElement>> {
   return cy
-    .get("#searchResultList > div > div")
-    .filter((i, e) => e.innerHTML.indexOf(name) !== -1)
-    .first()
+    .get(`#searchResultList > div:nth-of-type(2) > div:nth-of-type(${order})`)
     .find("button:not(:disabled)")
     .should("be.visible");
 }

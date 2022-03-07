@@ -8,7 +8,7 @@ const applicationRounds = rest.get(
   (req, res, ctx) => {
     const result: ApplicationRound[] = [
       {
-        id: 10,
+        id: 2,
         name: "Ruoholahden nuorisotalon vakiovuorot syksy 2021 - kevät 2022",
         reservationUnitIds: [32, 33],
         applicationPeriodBegin: "2021-04-19T06:00:00Z",
@@ -59,7 +59,7 @@ const applicationRounds = rest.get(
         applicationsSent: false,
       },
       {
-        id: 6,
+        id: 3,
         name: "Jakomäen nuorisotalon vakiovuorot syksy 2021 - kevät 2022",
         reservationUnitIds: [40, 41, 42, 43],
         applicationPeriodBegin: "2021-04-19T06:00:00Z",
@@ -265,7 +265,7 @@ const applicationRounds = rest.get(
       {
         id: 1,
         name: "Nuorten liikuntavuorot kevät 2021",
-        reservationUnitIds: [2, 6],
+        reservationUnitIds: [1, 2, 6],
         applicationPeriodBegin: "2021-01-01T00:00:00Z",
         applicationPeriodEnd: "2021-01-31T00:00:00Z",
         reservationPeriodBegin: "2021-01-01",
