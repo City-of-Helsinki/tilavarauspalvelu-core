@@ -1,7 +1,8 @@
 from datetime import datetime
+from typing import List, Union
 
 from django.contrib.auth.models import User
-from django.db.models import Q
+from django.db.models import Q, QuerySet
 from django.utils import timezone
 
 from applications.models import Application, ApplicationRound
@@ -72,14 +73,13 @@ def can_manage_service_sector_roles(user: User, service_sector: ServiceSector) -
     )
 
 
-def can_manage_unit_roles(user: User, unit: Unit) -> bool:
+def can_manage_unit_roles(user: User, units: List[Unit]) -> bool:
     permission = "can_manage_unit_roles"
+    service_sectors = ServiceSector.objects.filter(units__in=units)
     return (
         is_superuser(user)
-        or has_service_sector_permission(
-            user, list(unit.service_sectors.all()), permission
-        )
-        or has_unit_permission(user, [unit], permission)
+        or has_service_sector_permission(user, list(service_sectors.all()), permission)
+        or has_unit_permission(user, units, permission)
         or has_general_permission(user, permission)
     )
 
@@ -98,11 +98,11 @@ def can_manage_units(user: User, unit: Unit) -> bool:
     )
 
 
-def can_manage_unit_group_roles(user: User, unit_group: UnitGroup) -> bool:
+def can_manage_unit_group_roles(user: User, unit_group: List[UnitGroup]) -> bool:
     permission = "can_manage_unit_roles"
     return (
         is_superuser(user)
-        or has_unit_group_permission(user, [unit_group], permission)
+        or has_unit_group_permission(user, unit_group, permission)
         or has_general_permission(user, permission)
     )
 
@@ -245,19 +245,17 @@ def get_service_sectors_where_can_view_applications(user: User) -> list:
     )
 
 
-def get_units_where_can_view_reservations(user: User) -> list:
+def get_units_where_can_view_reservations(user: User) -> Union[list, QuerySet]:
     permission = "can_view_reservations"
     if user.is_anonymous:
         return []
     if has_general_permission(user, permission) or is_superuser(user):
         return list(Unit.objects.all())
 
-    return list(
-        map(
-            lambda role: role.unit,
-            user.unit_roles.filter(role__permissions__permission=permission),
-        )
-    )
+    units = user.unit_roles.filter(
+        role__permissions__permission=permission
+    ).values_list("unit", flat=True)
+    return units
 
 
 def get_service_sectors_where_can_view_reservations(user: User) -> list:

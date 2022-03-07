@@ -109,11 +109,11 @@ class ApplicationStatusBaseTestCase(TestCase):
             last_name="ler",
             email="hand.ler.person@foo.com",
         )
-        UnitRole.objects.create(
+        unit_role = UnitRole.objects.create(
             user=cls.unit_handler_user,
             role=UnitRoleChoice.objects.get(code="manager"),
-            unit=event_res_unit.reservation_unit.unit,
         )
+        unit_role.unit.add(event_res_unit.reservation_unit.unit)
         cls.unit_handler_client = APIClient()
         cls.unit_handler_client.force_authenticate(cls.unit_handler_user)
 

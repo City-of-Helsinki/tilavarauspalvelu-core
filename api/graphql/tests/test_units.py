@@ -21,9 +21,8 @@ class UnitsUpdateTestCase(GraphQLTestCase):
             email="amin.general@foo.com",
         )
         unit_role_choice = UnitRoleChoice.objects.get(code="admin")
-        UnitRole.objects.create(
-            user=cls.unit_admin, role=unit_role_choice, unit=cls.unit
-        )
+        unit_role = UnitRole.objects.create(user=cls.unit_admin, role=unit_role_choice)
+        unit_role.unit.add(cls.unit)
         UnitRolePermission.objects.create(
             role=unit_role_choice, permission="can_manage_units"
         )
