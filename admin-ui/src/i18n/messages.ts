@@ -231,7 +231,6 @@ const translations: ITranslations = {
       customer: ["Asiakas"],
       participants: ["Harrastajat"],
       applicantType: ["Asiakastyyppi"],
-      coreActivity: ["Ydintoiminta"],
       applicationCount: ["Hakumäärä"],
       applicationStatus: ["Hakemuksen status"],
       reviewStatus: ["Esitarkastuksen tulos"],
@@ -241,6 +240,7 @@ const translations: ITranslations = {
       purpose: ["Käyttötarkoitus"],
       ageGroup: ["Ikäluokka"],
       recommendations: ["Ehdotukset"],
+      additionalinformation: ["Lisätiedot"],
     },
     statuses: {
       draft: ["Luonnos"],

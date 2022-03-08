@@ -132,8 +132,6 @@ const Stepper = ({ application }: Props): JSX.Element => {
   }
   const pages = ["page1", "page2", "page3", "preview"];
 
-  console.log("rendering with ", application);
-
   return (
     <Container aria-label={t("common:applicationNavigationName")}>
       <>
