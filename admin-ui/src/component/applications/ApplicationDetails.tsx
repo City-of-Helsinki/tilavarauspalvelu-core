@@ -267,10 +267,6 @@ function ApplicationDetails(): JSX.Element | null {
                       label={t("Application.identificationNumber")}
                       value={application.organisation?.identifier || "-"}
                     />
-                    <ValueBox
-                      label={t("Application.headings.coreActivity")}
-                      value={application.organisation?.coreBusiness || "-"}
-                    />
                     {billingAddress && (
                       <>
                         <StyledDivider />
@@ -282,6 +278,10 @@ function ApplicationDetails(): JSX.Element | null {
                     )}
                   </>
                 )}
+                <ValueBox
+                  label={t("Application.headings.additionalInformation")}
+                  value={application.additionalInformation || "-"}
+                />
               </AccordionContent>
             </StyledAccordion>
             {application.applicationEvents.map((applicationEvent) => {

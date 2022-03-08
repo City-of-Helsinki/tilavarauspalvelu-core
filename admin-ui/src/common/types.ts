@@ -158,6 +158,7 @@ export type Application = {
   aggregatedData: ApplicationAggregatedData;
   createdDate: string | null;
   lastModifiedDate: string | null;
+  additionalInformation?: string;
 };
 
 export type Organisation = {
