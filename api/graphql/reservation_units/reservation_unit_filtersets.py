@@ -101,7 +101,7 @@ class ReservationUnitsFilterSet(django_filters.FilterSet):
             )
         query = reduce(operator.or_, (query for query in queries))
 
-        return qs.filter(query)
+        return qs.filter(query).distinct()
 
     def get_max_persons_gte(self, qs, property, value):
         return qs.annotate(max_person_sum=Sum("spaces__max_persons")).filter(
