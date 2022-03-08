@@ -21,7 +21,7 @@ describe("Tilavaraus ui front page", () => {
   });
 
   it("displays browsing buttons", () => {
-    browseSingleReservationUnitsButton().should("exist");
+    browseSingleReservationUnitsButton().should("not.exist");
     browseRecurringReservationUnitsButton().should("exist");
   });
 

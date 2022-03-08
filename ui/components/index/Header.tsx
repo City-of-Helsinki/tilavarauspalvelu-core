@@ -4,7 +4,7 @@ import router from "next/router";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { breakpoint } from "../../modules/style";
-import { singleSearchPrefix } from "../../modules/const";
+import { searchPrefix } from "../../modules/const";
 import Container from "../common/Container";
 import { fontRegular, H1 } from "../../modules/style/typography";
 
@@ -121,7 +121,7 @@ const Head = (props: HeadProps): JSX.Element => {
 
   const handleSubmit = (event: React.FormEvent | React.MouseEvent) => {
     event.preventDefault();
-    router.push(`${singleSearchPrefix}?textSearch=${searchTerm}`);
+    router.push(`${searchPrefix}?textSearch=${searchTerm}`);
   };
 
   return (
