@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 
 from snapshottest import Snapshot
 
+
 snapshots = Snapshot()
 
 snapshots['ReservationUnitQueryTestCase::test_filtering_by_active_application_rounds 1'] = {
@@ -755,12 +756,6 @@ snapshots['ReservationUnitsFilterTextSearchTestCase::test_filtering_by_reservati
                         'descriptionEn': 'Lorem ipsum en',
                         'nameFi': 'test name fi'
                     }
-                },
-                {
-                    'node': {
-                        'descriptionEn': 'Lorem ipsum en',
-                        'nameFi': 'test name fi'
-                    }
                 }
             ]
         }
@@ -771,12 +766,6 @@ snapshots['ReservationUnitsFilterTextSearchTestCase::test_filtering_by_reservati
     'data': {
         'reservationUnits': {
             'edges': [
-                {
-                    'node': {
-                        'descriptionFi': 'Lorem ipsum fi',
-                        'nameFi': 'test name fi'
-                    }
-                },
                 {
                     'node': {
                         'descriptionFi': 'Lorem ipsum fi',
@@ -797,12 +786,6 @@ snapshots['ReservationUnitsFilterTextSearchTestCase::test_filtering_by_reservati
                         'descriptionSv': 'Lorem ipsum sv',
                         'nameFi': 'test name fi'
                     }
-                },
-                {
-                    'node': {
-                        'descriptionSv': 'Lorem ipsum sv',
-                        'nameFi': 'test name fi'
-                    }
                 }
             ]
         }
@@ -813,11 +796,6 @@ snapshots['ReservationUnitsFilterTextSearchTestCase::test_filtering_by_reservati
     'data': {
         'reservationUnits': {
             'edges': [
-                {
-                    'node': {
-                        'nameEn': 'test name en'
-                    }
-                },
                 {
                     'node': {
                         'nameEn': 'test name en'
@@ -836,11 +814,6 @@ snapshots['ReservationUnitsFilterTextSearchTestCase::test_filtering_by_reservati
                     'node': {
                         'nameFi': 'test name fi'
                     }
-                },
-                {
-                    'node': {
-                        'nameFi': 'test name fi'
-                    }
                 }
             ]
         }
@@ -851,11 +824,6 @@ snapshots['ReservationUnitsFilterTextSearchTestCase::test_filtering_by_reservati
     'data': {
         'reservationUnits': {
             'edges': [
-                {
-                    'node': {
-                        'nameSv': 'test name sv'
-                    }
-                },
                 {
                     'node': {
                         'nameSv': 'test name sv'
@@ -934,14 +902,6 @@ snapshots['ReservationUnitsFilterTextSearchTestCase::test_filtering_by_type_en 1
                             'nameEn': 'test type en'
                         }
                     }
-                },
-                {
-                    'node': {
-                        'nameFi': 'test name fi',
-                        'reservationUnitType': {
-                            'nameEn': 'test type en'
-                        }
-                    }
                 }
             ]
         }
@@ -959,14 +919,6 @@ snapshots['ReservationUnitsFilterTextSearchTestCase::test_filtering_by_type_fi 1
                             'nameFi': 'test type fi'
                         }
                     }
-                },
-                {
-                    'node': {
-                        'nameFi': 'test name fi',
-                        'reservationUnitType': {
-                            'nameFi': 'test type fi'
-                        }
-                    }
                 }
             ]
         }
@@ -977,14 +929,6 @@ snapshots['ReservationUnitsFilterTextSearchTestCase::test_filtering_by_type_sv 1
     'data': {
         'reservationUnits': {
             'edges': [
-                {
-                    'node': {
-                        'nameFi': 'test name fi',
-                        'reservationUnitType': {
-                            'nameSv': 'test type sv'
-                        }
-                    }
-                },
                 {
                     'node': {
                         'nameFi': 'test name fi',
