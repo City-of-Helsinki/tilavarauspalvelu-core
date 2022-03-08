@@ -744,11 +744,10 @@ def unit_admin(unit):
         email="amin.u@foo.com",
     )
 
-    UnitRole.objects.create(
-        user=user,
-        role=UnitRoleChoice.objects.get(code="admin"),
-        unit=unit,
+    unit_role = UnitRole.objects.create(
+        user=user, role=UnitRoleChoice.objects.get(code="admin")
     )
+    unit_role.unit.add(unit)
 
     return user
 
@@ -770,11 +769,11 @@ def unit_manager(unit):
         email="mangus.u@foo.com",
     )
 
-    UnitRole.objects.create(
+    unit_role = UnitRole.objects.create(
         user=user,
         role=UnitRoleChoice.objects.get(code="manager"),
-        unit=unit,
     )
+    unit_role.unit.add(unit)
 
     return user
 
@@ -796,11 +795,10 @@ def unit_viewer(unit):
         email="ville.u@foo.com",
     )
 
-    UnitRole.objects.create(
-        user=user,
-        role=UnitRoleChoice.objects.get(code="viewer"),
-        unit=unit,
+    unit_role = UnitRole.objects.create(
+        user=user, role=UnitRoleChoice.objects.get(code="viewer")
     )
+    unit_role.unit.add(unit)
 
     return user
 
@@ -822,11 +820,10 @@ def unit_group_admin(unit_group):
         email="amin.ug@foo.com",
     )
 
-    UnitRole.objects.create(
-        user=user,
-        role=UnitRoleChoice.objects.get(code="admin"),
-        unit_group=unit_group,
+    unit_role = UnitRole.objects.create(
+        user=user, role=UnitRoleChoice.objects.get(code="admin")
     )
+    unit_role.unit_group.add(unit_group)
 
     return user
 
@@ -893,22 +890,22 @@ def valid_service_sector_application_manager_data(user, service_sector):
 
 @pytest.fixture
 def valid_unit_admin_data(user, unit):
-    return {"user_id": user.id, "role": "admin", "unit_id": unit.id}
+    return {"user_id": user.id, "role": "admin", "unit_id": [unit.id]}
 
 
 @pytest.fixture
 def valid_unit_group_admin_data(user, unit_group):
-    return {"user_id": user.id, "role": "admin", "unit_group_id": unit_group.id}
+    return {"user_id": user.id, "role": "admin", "unit_group_id": [unit_group.id]}
 
 
 @pytest.fixture
 def valid_unit_manager_data(user, unit):
-    return {"user_id": user.id, "role": "manager", "unit_id": unit.id}
+    return {"user_id": user.id, "role": "manager", "unit_id": [unit.id]}
 
 
 @pytest.fixture
 def valid_unit_viewer_data(user, unit):
-    return {"user_id": user.id, "role": "viewer", "unit_id": unit.id}
+    return {"user_id": user.id, "role": "viewer", "unit_id": [unit.id]}
 
 
 @pytest.fixture(autouse=True)

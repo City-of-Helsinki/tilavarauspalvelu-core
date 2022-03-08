@@ -321,9 +321,8 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             email="unit.admin@foo.com",
         )
         unit_role_choice = UnitRoleChoice.objects.get(code="manager")
-        UnitRole.objects.create(
-            user=unit_manager, role=unit_role_choice, unit=self.reservation_unit.unit
-        )
+        unit_role = UnitRole.objects.create(user=unit_manager, role=unit_role_choice)
+        unit_role.unit.add(self.reservation_unit.unit)
         UnitRolePermission.objects.create(
             role=unit_role_choice, permission="can_manage_units"
         )

@@ -173,9 +173,8 @@ def test_reservation_unit_create(
     assert response.status_code == 403
 
     # Test with unit manager role
-    user.unit_roles.create(
-        unit_id=valid_reservation_unit_data["unit_id"], user=user, role_id="manager"
-    )
+    unit_role = user.unit_roles.create(user=user, role_id="manager")
+    unit_role.unit.add(valid_reservation_unit_data["unit_id"])
     response = user_api_client.post(
         reverse("reservationunit-list"), data=valid_reservation_unit_data, format="json"
     )

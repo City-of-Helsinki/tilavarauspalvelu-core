@@ -30,10 +30,10 @@ class BaseRoleSerializer(TranslatedModelSerializer):
 
 class UnitRoleSerializer(BaseRoleSerializer):
     unit_group_id = serializers.PrimaryKeyRelatedField(
-        queryset=UnitGroup.objects.all(), source="unit_group", required=False
+        queryset=UnitGroup.objects.all(), source="unit_group", required=False, many=True
     )
     unit_id = serializers.PrimaryKeyRelatedField(
-        queryset=Unit.objects.all(), source="unit", required=False
+        queryset=Unit.objects.all(), source="unit", required=False, many=True
     )
     user_id = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.all(), source="user"

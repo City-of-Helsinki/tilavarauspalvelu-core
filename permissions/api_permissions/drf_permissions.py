@@ -136,14 +136,14 @@ class UnitRolePermission(permissions.BasePermission):
 
     def has_permission(self, request, view):
         if request.method == "POST":
-            unit_id = request.data.get("unit_id", None)
-            unit_group_id = request.data.get("unit_group_id", None)
-            if unit_id:
-                unit = Unit.objects.get(pk=unit_id)
-                return can_manage_unit_roles(request.user, unit)
-            elif unit_group_id:
-                unit_group = UnitGroup.objects.get(pk=unit_group_id)
-                return can_manage_unit_group_roles(request.user, unit_group)
+            unit_ids = request.data.get("unit_id", None)
+            unit_group_ids = request.data.get("unit_group_id", None)
+            if unit_ids:
+                units = Unit.objects.filter(pk__in=unit_ids)
+                return can_manage_unit_roles(request.user, units)
+            elif unit_group_ids:
+                unit_groups = UnitGroup.objects.filter(pk__in=unit_group_ids)
+                return can_manage_unit_group_roles(request.user, unit_groups)
         return request.method in permissions.SAFE_METHODS
 
 

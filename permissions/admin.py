@@ -53,7 +53,7 @@ class UnitRoleAdmin(admin.ModelAdmin):
         "user__first_name",
         "user__last_name",
     ]
-    autocomplete_fields = ["user"]
+    autocomplete_fields = ["user", "unit", "unit_group"]
 
 
 @admin.register(GeneralRole)
