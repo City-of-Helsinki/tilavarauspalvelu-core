@@ -21,11 +21,8 @@ import {
   ReservationType,
   ReservationWorkingMemoMutationInput,
   ReservationsReservationStateChoices,
+  ReservationsReservationReserveeTypeChoices,
 } from "../../../common/gql-types";
-import {
-  RESERVATION_QUERY,
-  UPDATE_WORKING_MEMO,
-} from "../../../common/queries";
 import { useNotification } from "../../../context/NotificationContext";
 import { ContentContainer } from "../../../styles/layout";
 import {
@@ -39,11 +36,17 @@ import Loader from "../../Loader";
 import withMainMenu from "../../withMainMenu";
 import { ReactComponent as IconCustomers } from "../../../images/icon_customers.svg";
 import { H1 } from "../../../styles/typography";
-import { ageGroup, reservationDateTime, reservationPrice } from "./util";
+import {
+  ageGroup,
+  getTranslationKeyForType,
+  reservationDateTime,
+  reservationPrice,
+} from "./util";
 import { useModal } from "../../../context/ModalContext";
 import DenyDialog from "./DenyDialog";
 import ApproveDialog from "./ApproveDialog";
 import ReturnToRequiredHandlingDialog from "./ReturnToRequiresHandlingDialog";
+import { RESERVATION_QUERY, UPDATE_WORKING_MEMO } from "./queries";
 
 const ViewWrapper = styled.div`
   display: grid;
@@ -272,6 +275,18 @@ const RequestedReservation = (): JSX.Element | null => {
             </Accordion>
             <h2>{t("RequestedReservation.summary")}</h2>
             <ApplicationDatas>
+              <ApplicationData
+                wide
+                label={t("RequestedReservation.applicantType")}
+                data={
+                  t(
+                    getTranslationKeyForType(
+                      reservation.reserveeType as ReservationsReservationReserveeTypeChoices,
+                      reservation.reserveeIsUnregisteredAssociation
+                    )
+                  ) as string
+                }
+              />
               <ApplicationData
                 label={t("RequestedReservation.name")}
                 data={reservation.name}

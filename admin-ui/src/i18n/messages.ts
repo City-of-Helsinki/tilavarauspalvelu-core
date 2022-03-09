@@ -41,6 +41,14 @@ const translations: ITranslations = {
     WEAK: ["Heikko tunnistautuminen"],
     STRONG: ["Vahva tunnistautuminen"],
   },
+  ReserveeType: {
+    INDIVIDUAL: ["Yksityishenkilö"],
+    BUSINESS: ["Yritys"],
+    NONPROFIT: {
+      REGISTERED: ["Yhditys, rekisteröity"],
+      UNREGISTERED: ["Yhdistys, rekisteröimätön"],
+    },
+  },
   language: {
     fi: ["suomeksi"],
     sv: ["ruotsiksi"],
@@ -240,7 +248,7 @@ const translations: ITranslations = {
       purpose: ["Käyttötarkoitus"],
       ageGroup: ["Ikäluokka"],
       recommendations: ["Ehdotukset"],
-      additionalinformation: ["Lisätiedot"],
+      additionalInformation: ["Lisätiedot"],
     },
     statuses: {
       draft: ["Luonnos"],
@@ -274,16 +282,15 @@ const translations: ITranslations = {
     contactForename: ["Yhteyshenkilön etunimi"],
     contactSurname: ["Yhteyshenkilön sukunimi"],
     organisationCoreActivity: ["Yhdistyksen tai seuran ydintoiminta"],
+
     applicantTypes: {
       individual: ["Yksityishenkilö"],
       company: ["Yritys"],
-      unregisteredAssociation: ["Rekisteröimätön yhdistys"],
-      nonprofit: ["Voittoa tavoittelematon yhdistys"],
-      community: ["Rekisteröimätön yhdistys"],
-      association: ["Rekisteröity yhdistys"],
+      community: ["Yhditys, rekisteröity"],
+      association: ["Yhdistys, rekisteröimätön"],
     },
     contactPerson: ["Yhteyshenkilö"],
-    identificationNumber: ["Rekisterinumero"],
+    identificationNumber: ["Y-tunnus"],
     applicationsSelected: ["{{count}} hakemus valittu"],
     applicationsSelected_plural: ["{{count}} hakemusta valittu"],
     allApplications: ["Kaikki hakemukset"],
@@ -904,7 +911,7 @@ const translations: ITranslations = {
       spacePks: ["Tilat"],
       resourcePks: ["Resurssit"],
       surfaceArea: ["Pinta-ala"],
-      maxPersons: ["Maksimihenkilkömäärä"],
+      maxPersons: ["Maksimihenkilömäärä"],
       reservationUnitTypePk: ["Tilatyyppi"],
       descriptionFi: ["Kuvaus fi"],
       descriptionSv: ["Kuvaus sv"],
@@ -1077,7 +1084,6 @@ const translations: ITranslations = {
       state: ["Anomuksen tila"],
     },
   },
-
   RequestedReservation: {
     errorFetchingData: ["Tietoja ei saatu haettua"],
     heading: ["Anomuksen tarkastelu"],
@@ -1094,6 +1100,7 @@ const translations: ITranslations = {
     returnToHandling: ["Palauta käsiteltäväksi"],
     cancel: ["Takaisin"],
     noPrice: ["ilmainen"],
+    applicantType: ["Asiakastyyppi"],
     name: ["Varauksen nimi"],
     description: ["Varauksen kuvaus"],
     purpose: ["Varauksen käyttötarkoitus"],
@@ -1116,7 +1123,7 @@ const translations: ITranslations = {
     billingPhone: ["Laskutuksen puhelin"],
     applyingForFreeOfCharge: ["Hakee ilmaista vuoroa"],
     freeOfChargeReason: ["Perustelu ilmaiselle vuorolle"],
-    reserveeId: ["Rekisteritunnus"],
+    reserveeId: ["Y-tunnus"],
     save: ["Tallenna"],
     workingMemo: ["Kommentit"],
     workingMemoHelperText: ["Kommentit näkyy vain henkilökunnalle"],

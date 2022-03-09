@@ -8,7 +8,7 @@ import {
   ReservationType,
 } from "../../../common/gql-types";
 import { useModal } from "../../../context/ModalContext";
-import { REQUIRE_HANDLING_RESERVATION } from "../../../common/queries";
+import { REQUIRE_HANDLING_RESERVATION } from "./queries";
 import { useNotification } from "../../../context/NotificationContext";
 
 const DialogContent = ({

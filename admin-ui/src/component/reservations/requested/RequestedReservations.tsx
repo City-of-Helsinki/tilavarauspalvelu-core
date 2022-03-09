@@ -9,7 +9,7 @@ import {
   ReservationsReservationStateChoices,
   ReservationType,
 } from "../../../common/gql-types";
-import { RESERVATIONS_QUERY } from "../../../common/queries";
+import { RESERVATIONS_QUERY } from "./queries";
 import { useNotification } from "../../../context/NotificationContext";
 import DataTable, { CellConfig } from "../../DataTable";
 import KorosHeading, { Heading, SubHeading } from "../../KorosHeading";

@@ -17,4 +17,4 @@ export const applicationDetailsUrl = (applicationId: number | string): string =>
 
 export const applicationRoundApplications = (
   applicationRoundId: number | string | null
-): string => `${applicationRoundUrl(String(applicationRoundId))}/applicarions`;
+): string => `${applicationRoundUrl(String(applicationRoundId))}/applications`;
