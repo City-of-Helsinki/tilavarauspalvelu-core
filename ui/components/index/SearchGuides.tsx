@@ -1,12 +1,11 @@
 import React from "react";
 import { useRouter } from "next/router";
 import styled from "styled-components";
-import { useTranslation } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 import { Button, IconArrowRight, ImageWithCard } from "hds-react";
 import { breakpoint } from "../../modules/style";
 import Container from "../common/Container";
-import { singleSearchPrefix } from "../../modules/const";
-import { H2 } from "../../modules/style/typography";
+import { fontMedium, H2 } from "../../modules/style/typography";
 
 const Wrapper = styled(Container)`
   padding-top: var(--spacing-xl);
@@ -51,6 +50,11 @@ const InfoContainer = styled.div`
   flex-direction: column;
   align-content: space-between;
   word-break: break-word;
+
+  a {
+    ${fontMedium}
+    text-decoration: underline;
+  }
 `;
 
 const ButtonContainer = styled.div`
@@ -77,17 +81,18 @@ const SearchGuides = (): JSX.Element => {
         <InfoContainer data-test-id="search-guide__single">
           <div>
             <Heading>{t("info.heading")}</Heading>
-            <p>{t("info.text")}</p>
+            <p>
+              <Trans i18nKey="home:info.text">
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href="https://varaamo.hel.fi/"
+                >
+                  {" "}
+                </a>
+              </Trans>
+            </p>
           </div>
-          <ButtonContainer>
-            <Button
-              id="browseSingleReservationUnits"
-              onClick={() => router.push(singleSearchPrefix)}
-              iconRight={<IconArrowRight />}
-            >
-              {t("browseReservationsButton")}
-            </Button>
-          </ButtonContainer>
         </InfoContainer>
       </StyledImageWithCard>
       <StyledImageWithCard
