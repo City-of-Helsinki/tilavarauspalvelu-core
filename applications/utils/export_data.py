@@ -98,6 +98,16 @@ class ApplicationDataExporter:
                         contact_person_first_name = ""
                         contact_person_last_name = ""
                         contact_person_email = ""
+                        event_begin = (
+                            f"{event.begin.day}.{event.begin.month}.{event.begin.year}"
+                            if event.begin
+                            else ""
+                        )
+                        event_end = (
+                            f"{event.end.day}.{event.end.month}.{event.end.year}"
+                            if event.end
+                            else ""
+                        )
 
                         if application.contact_person:
                             contact_person_first_name = (
@@ -154,7 +164,7 @@ class ApplicationDataExporter:
                                 contact_person_last_name,
                                 contact_person_email,
                                 event.name,
-                                application.application_round.name,
+                                cls._get_time_range_string(event_begin, event_end),
                                 getattr(application.home_city, "name", ""),
                                 getattr(event.purpose, "name", ""),
                                 event.age_group,
