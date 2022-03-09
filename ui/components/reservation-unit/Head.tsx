@@ -191,7 +191,7 @@ const Head = ({
                   )}
               </div>
               <div>
-                {viewType === "single" && unitPrice && (
+                {unitPrice && (
                   <StyledIconWithText
                     icon={
                       <IconTicket
