@@ -153,6 +153,14 @@ class ApplicationEventFactory(DjangoModelFactory):
     events_per_week = FuzzyInteger(low=1, high=4)
     purpose = SubFactory(ReservationPurposeFactory)
     age_group = SubFactory(AgeGroupFactory)
+    begin = FuzzyDate(
+        start_date=datetime.date.today(),
+        end_date=datetime.date.today(),
+    )
+    end = FuzzyDate(
+        start_date=datetime.date.today(),
+        end_date=(datetime.date.today() + datetime.timedelta(weeks=4)),
+    )
 
     @post_generation
     def declined_reservation_units(self, create, declined_reservation_units, **kwargs):
