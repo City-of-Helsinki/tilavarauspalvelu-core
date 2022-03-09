@@ -255,6 +255,8 @@ const StyledKoros = styled(Koros).attrs({
 const StyledH2 = styled(H2)`
   && {
     margin-bottom: var(--spacing-xl);
+    font-size: var(--fontsize-heading-m);
+    font-family: var(--font-bold);
   }
 `;
 
@@ -657,7 +659,7 @@ const ReservationUnit = ({
         <TwoColumnLayout>
           <Address reservationUnit={reservationUnit} />
           <div />
-          <Accordion heading={t("reservationCalendar:heading.termsOfUse")}>
+          <Accordion heading={t("reservationUnit:termsOfUse")}>
             <Content>
               <p>
                 <Sanitize
