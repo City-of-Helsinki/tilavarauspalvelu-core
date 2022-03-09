@@ -28,7 +28,7 @@ import {
   RoundTag,
   State,
   UnitInfo,
-} from "./newSpaceModal";
+} from "./modules/newSpaceModal";
 import { parseAddress } from "../../../../common/util";
 
 import SpaceForm from "../SpaceForm";
