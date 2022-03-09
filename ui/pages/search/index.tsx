@@ -6,13 +6,17 @@ import queryString from "query-string";
 import { useLocalStorage } from "react-use";
 import { useRouter } from "next/router";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { isEqual, omit, pick } from "lodash";
+import { isEqual, omit, pick, sortBy } from "lodash";
 import { useQuery } from "@apollo/client";
 import Container from "../../components/common/Container";
 import SearchForm from "../../components/search/SearchForm";
 import SearchResultList from "../../components/search/SearchResultList";
 import { ApplicationRound, OptionType } from "../../modules/types";
-import { capitalize, searchUrl } from "../../modules/util";
+import {
+  applicationRoundState,
+  capitalize,
+  searchUrl,
+} from "../../modules/util";
 import { isBrowser } from "../../modules/const";
 import { CenterSpinner } from "../../components/common/common";
 import ClientOnly from "../../components/ClientOnly";
@@ -33,11 +37,25 @@ type Props = {
 };
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+  const now = new Date();
   const applicationRounds = await getApplicationRounds();
+
+  const activeApplicationRounds = sortBy(
+    applicationRounds.filter(
+      (applicationRound) =>
+        new Date(applicationRound.publicDisplayBegin) <= now &&
+        new Date(applicationRound.publicDisplayEnd) >= now &&
+        applicationRoundState(
+          applicationRound.applicationPeriodBegin,
+          applicationRound.applicationPeriodEnd
+        ) === "active"
+    ),
+    ["id"]
+  );
 
   return {
     props: {
-      applicationRounds,
+      applicationRounds: activeApplicationRounds,
       ...(await serverSideTranslations(locale)),
     },
   };

@@ -30,7 +30,7 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
         new Date(applicationRound.publicDisplayBegin) <= now &&
         new Date(applicationRound.publicDisplayEnd) >= now
     ),
-    ["applicationPeriodBegin", "publicDisplayBegin"]
+    ["id"]
   );
 
   return {
