@@ -5,6 +5,8 @@
   "group": {
     "draft": "Luonnokset",
     "processing": "Käsittelyssä",
-    "sent": "Käsitelty"
+    "sent": "Käsitelty",
+    "declined": "Hylätty",
+    "cancelled": "Peruutettu"
   }
 }
