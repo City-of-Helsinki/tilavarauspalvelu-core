@@ -79,3 +79,21 @@ export const getPrice = (
 
   return i18n.t("prices:priceFree");
 };
+
+export const isReservationUnitPublished = (
+  reservationUnit: ReservationUnitType | ReservationUnitByPkType
+): boolean => {
+  const now = new Date();
+  let beginOK = true;
+  let endOK = true;
+
+  if (reservationUnit.publishBegins) {
+    beginOK = new Date(reservationUnit.publishBegins) <= now;
+  }
+
+  if (reservationUnit.publishEnds) {
+    endOK = new Date(reservationUnit.publishEnds) >= now;
+  }
+
+  return beginOK && endOK;
+};

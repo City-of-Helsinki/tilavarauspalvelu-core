@@ -1,6 +1,7 @@
 import { get as mockGet } from "lodash";
+import { addMinutes } from "date-fns";
 import { ReservationUnitByPkType } from "../gql-types";
-import { getPrice } from "../reservationUnit";
+import { getPrice, isReservationUnitPublished } from "../reservationUnit";
 import mockTranslations from "../../public/locales/fi/prices.json";
 
 jest.mock("next/config", () => () => ({
@@ -97,5 +98,86 @@ describe("getPrice", () => {
     expect(
       getPrice(reservationUnit as ReservationUnitByPkType, 180, true)
     ).toBe("0 - 606,00 €");
+  });
+});
+
+describe("isReservationPublished", () => {
+  expect(isReservationUnitPublished({} as ReservationUnitByPkType)).toBe(true);
+
+  test("with just publishBegins", () => {
+    expect(
+      isReservationUnitPublished({
+        publishBegins: addMinutes(new Date(), -1),
+      } as ReservationUnitByPkType)
+    ).toBe(true);
+
+    expect(
+      isReservationUnitPublished({
+        publishBegins: addMinutes(new Date(), 1),
+      } as ReservationUnitByPkType)
+    ).toBe(false);
+
+    expect(
+      isReservationUnitPublished({
+        publishBegins: new Date(),
+      } as ReservationUnitByPkType)
+    ).toBe(true);
+  });
+
+  test("with just publishEnds", () => {
+    expect(
+      isReservationUnitPublished({
+        publishEnds: addMinutes(new Date(), -1),
+      } as ReservationUnitByPkType)
+    ).toBe(false);
+
+    expect(
+      isReservationUnitPublished({
+        publishEnds: addMinutes(new Date(), 1),
+      } as ReservationUnitByPkType)
+    ).toBe(true);
+
+    expect(
+      isReservationUnitPublished({
+        publishEnds: new Date(),
+      } as ReservationUnitByPkType)
+    ).toBe(true);
+  });
+
+  test("with both dates", () => {
+    expect(
+      isReservationUnitPublished({
+        publishBegins: new Date(),
+        publishEnds: new Date(),
+      } as ReservationUnitByPkType)
+    ).toBe(true);
+
+    expect(
+      isReservationUnitPublished({
+        publishBegins: addMinutes(new Date(), -1),
+        publishEnds: new Date(),
+      } as ReservationUnitByPkType)
+    ).toBe(true);
+
+    expect(
+      isReservationUnitPublished({
+        publishBegins: addMinutes(new Date(), 1),
+        publishEnds: new Date(),
+      } as ReservationUnitByPkType)
+    ).toBe(false);
+
+    expect(
+      isReservationUnitPublished({
+        publishBegins: new Date(),
+        publishEnds: addMinutes(new Date(), -1),
+      } as ReservationUnitByPkType)
+    ).toBe(false);
+
+    expect(
+      isReservationUnitPublished({
+        publishBegins: new Date(),
+        publishEnds: addMinutes(new Date(), 1),
+      } as ReservationUnitByPkType)
+    ).toBe(true);
   });
 });

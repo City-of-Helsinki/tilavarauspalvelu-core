@@ -33,6 +33,7 @@ import {
   RESERVATION_UNIT,
   TERMS_OF_USE,
 } from "../../modules/queries/reservationUnit";
+import { isReservationUnitPublished } from "../../modules/reservationUnit";
 
 type Props = {
   reservationUnit: ReservationUnitByPkType | null;
@@ -43,8 +44,10 @@ type Props = {
 export const getServerSideProps: GetServerSideProps = async ({
   locale,
   params,
+  query,
 }) => {
   const id = Number(params.id);
+  const uuid = query.ru;
   let relatedReservationUnits = [] as ReservationUnitType[];
 
   if (id) {
@@ -57,6 +60,20 @@ export const getServerSideProps: GetServerSideProps = async ({
         pk: id,
       },
     });
+
+    if (!isReservationUnitPublished(reservationUnitData.reservationUnitByPk)) {
+      return {
+        notFound: true,
+      };
+    }
+
+    const isDraft = reservationUnitData.reservationUnitByPk?.isDraft;
+
+    if (isDraft && uuid !== reservationUnitData.reservationUnitByPk.uuid) {
+      return {
+        notFound: true,
+      };
+    }
 
     const { data: genericTermsData } = await apolloClient.query<
       Query,

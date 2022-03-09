@@ -63,6 +63,7 @@ import {
 import { getApplicationRounds } from "../../../modules/api";
 import { DataContext } from "../../../context/DataContext";
 import { LIST_RESERVATIONS } from "../../../modules/queries/reservation";
+import { isReservationUnitPublished } from "../../../modules/reservationUnit";
 
 type Props = {
   reservationUnit: ReservationUnitByPkType | null;
@@ -102,6 +103,20 @@ export const getServerSideProps: GetServerSideProps = async ({
       },
     });
 
+    if (!isReservationUnitPublished(reservationUnitData.reservationUnitByPk)) {
+      return {
+        notFound: true,
+      };
+    }
+
+    const isDraft = reservationUnitData.reservationUnitByPk?.isDraft;
+
+    if (isDraft && uuid !== reservationUnitData.reservationUnitByPk.uuid) {
+      return {
+        notFound: true,
+      };
+    }
+
     const { data: genericTermsData } = await apolloClient.query<
       Query,
       QueryTermsOfUseArgs
@@ -112,14 +127,6 @@ export const getServerSideProps: GetServerSideProps = async ({
       },
     });
     const genericTerms = genericTermsData.termsOfUse?.edges[0]?.node || {};
-
-    const isDraft = reservationUnitData.reservationUnitByPk?.isDraft;
-
-    if (isDraft && uuid !== reservationUnitData.reservationUnitByPk.uuid) {
-      return {
-        notFound: true,
-      };
-    }
 
     const lastOpeningPeriodEndDate: string =
       reservationUnitData?.reservationUnitByPk?.openingHours?.openingTimePeriods

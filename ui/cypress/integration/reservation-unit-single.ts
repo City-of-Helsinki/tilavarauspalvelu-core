@@ -807,4 +807,22 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
       cy.checkA11y(null, null, null, true);
     });
   });
+
+  describe("publish times", () => {
+    Cypress.config("defaultCommandTimeout", 20000);
+
+    it("should not display unpublished item", () => {
+      cy.visit("/reservation-unit/single/905", { failOnStatusCode: false });
+
+      error404Title().should("have.text", "404");
+      error404Body().should("have.text", "Sivua ei löytynyt");
+    });
+
+    it("should not display unpublished item", () => {
+      cy.visit("/reservation-unit/single/906", { failOnStatusCode: false });
+
+      error404Title().should("have.text", "404");
+      error404Body().should("have.text", "Sivua ei löytynyt");
+    });
+  });
 });
