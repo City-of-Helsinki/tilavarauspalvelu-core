@@ -22,6 +22,7 @@
     "eslint-config-airbnb-typescript-prettier": "^4.2.0",
     "eslint-plugin-jsx-a11y": "^6.4.1",
     "jest": "^27.0.4",
+    "mkdirp": "^1.0.4",
     "prettier": "^2.3.1",
     "stylelint": "^13.13.1",
     "stylelint-config-recommended": "^5.0.0",
@@ -33,7 +34,7 @@
     "start": "react-scripts start",
     "test": "react-scripts test",
     "lint": "eslint --ext ts,tsx .",
-    "generate-certificate": "echo \"[dn]\nCN=local-tilavaraus\n[req]\ndistinguished_name = dn\n[EXT]\nsubjectAltName=DNS:local-tilavaraus\nkeyUsage=digitalSignature\nextendedKeyUsage=serverAuth\"| openssl req -x509 -out certificates/local-tilavaraus.crt -keyout certificates/local-tilavaraus.key -newkey rsa:2048 -nodes -sha256 -subj '/CN=local-tilavaraus' -extensions EXT -config /dev/stdin"
+    "generate-certificate": "mkdirp certificates && echo \"[dn]\nCN=local-tilavaraus\n[req]\ndistinguished_name = dn\n[EXT]\nsubjectAltName=DNS:local-tilavaraus\nkeyUsage=digitalSignature\nextendedKeyUsage=serverAuth\"| openssl req -x509 -out certificates/local-tilavaraus.crt -keyout certificates/local-tilavaraus.key -newkey rsa:2048 -nodes -sha256 -subj '/CN=local-tilavaraus' -extensions EXT -config /dev/stdin"
   },
   "browserslist": {
     "production": [
