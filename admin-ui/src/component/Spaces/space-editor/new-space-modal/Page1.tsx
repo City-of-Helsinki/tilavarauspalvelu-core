@@ -21,7 +21,7 @@ import {
   State,
   Title,
   UnitInfo,
-} from "./newSpaceModal";
+} from "./modules/newSpaceModal";
 import { parseAddress } from "../../../../common/util";
 
 const Page1 = ({

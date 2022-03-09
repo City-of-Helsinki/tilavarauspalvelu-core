@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { breakpoints } from "../../../styles/util";
+import { breakpoints } from "../../../../styles/util";
 
 export const EditorGrid = styled.div`
   display: grid;
