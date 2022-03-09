@@ -911,7 +911,7 @@ const translations: ITranslations = {
       spacePks: ["Tilat"],
       resourcePks: ["Resurssit"],
       surfaceArea: ["Pinta-ala"],
-      maxPersons: ["Maksimihenkilkömäärä"],
+      maxPersons: ["Maksimihenkilömäärä"],
       reservationUnitTypePk: ["Tilatyyppi"],
       descriptionFi: ["Kuvaus fi"],
       descriptionSv: ["Kuvaus sv"],
