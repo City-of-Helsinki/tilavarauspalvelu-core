@@ -40,7 +40,6 @@ type Props = {
   termsOfUse: Record<string, TermsOfUseType>;
 };
 
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const getServerSideProps: GetServerSideProps = async ({
   locale,
   params,
