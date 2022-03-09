@@ -34,7 +34,7 @@ yarn generate-certificate
 ### Start UI
 
 ```
-yarn start
+yarn dev
 ```
 
 ### Generate new gql types
