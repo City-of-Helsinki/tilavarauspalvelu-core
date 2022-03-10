@@ -88,7 +88,7 @@ class ApplicationDataExporterTestCase(TestCase):
         if self.export_dir.is_dir():
             shutil.rmtree(self.export_dir)
 
-    def test_application_export__basic_case(self):
+    def test_basic_case(self):
         call_command("export_applications", self.application_round_id)
 
         event: ApplicationEvent = self.application_event
@@ -101,7 +101,10 @@ class ApplicationDataExporterTestCase(TestCase):
             application.contact_person.last_name,
             application.contact_person.email,
             event.name,
-            application.application_round.name,
+            (
+                f"{event.begin.day}.{event.begin.month}.{event.begin.year}"
+                f" - {event.end.day}.{event.end.month}.{event.end.year}"
+            ),
             application.home_city.name,
             event.purpose.name,
             str(event.age_group),
@@ -139,7 +142,7 @@ class ApplicationDataExporterTestCase(TestCase):
         assert_that(not_existing_file_medium.is_file()).is_false()
         assert_that(not_existing_file_low.is_file()).is_false()
 
-    def test_application_export__no_time_range(self):
+    def test_no_time_range(self):
         self.application_event.max_duration = timedelta(hours=1)
         self.application_event.save()
 
@@ -155,7 +158,10 @@ class ApplicationDataExporterTestCase(TestCase):
             application.contact_person.last_name,
             application.contact_person.email,
             event.name,
-            application.application_round.name,
+            (
+                f"{event.begin.day}.{event.begin.month}.{event.begin.year}"
+                f" - {event.end.day}.{event.end.month}.{event.end.year}"
+            ),
             application.home_city.name,
             event.purpose.name,
             str(event.age_group),
@@ -193,7 +199,7 @@ class ApplicationDataExporterTestCase(TestCase):
         assert_that(not_existing_file_medium.is_file()).is_false()
         assert_that(not_existing_file_low.is_file()).is_false()
 
-    def test_application_export__only_one_distinct_duration(self):
+    def test_only_one_distinct_duration(self):
         self.application_event.max_duration = timedelta(hours=1)
         self.application_event.save()
 
@@ -209,7 +215,10 @@ class ApplicationDataExporterTestCase(TestCase):
             application.contact_person.last_name,
             application.contact_person.email,
             event.name,
-            application.application_round.name,
+            (
+                f"{event.begin.day}.{event.begin.month}.{event.begin.year}"
+                f" - {event.end.day}.{event.end.month}.{event.end.year}"
+            ),
             application.home_city.name,
             event.purpose.name,
             str(event.age_group),
@@ -247,7 +256,7 @@ class ApplicationDataExporterTestCase(TestCase):
         assert_that(not_existing_file_medium.is_file()).is_false()
         assert_that(not_existing_file_low.is_file()).is_false()
 
-    def test_application_export__minutes_in_duration(self):
+    def test_minutes_in_duration(self):
         self.application_event.max_duration = timedelta(hours=1, minutes=30)
         self.application_event.save()
 
@@ -263,7 +272,10 @@ class ApplicationDataExporterTestCase(TestCase):
             application.contact_person.last_name,
             application.contact_person.email,
             event.name,
-            application.application_round.name,
+            (
+                f"{event.begin.day}.{event.begin.month}.{event.begin.year}"
+                f" - {event.end.day}.{event.end.month}.{event.end.year}"
+            ),
             application.home_city.name,
             event.purpose.name,
             str(event.age_group),
@@ -301,7 +313,7 @@ class ApplicationDataExporterTestCase(TestCase):
         assert_that(not_existing_file_medium.is_file()).is_false()
         assert_that(not_existing_file_low.is_file()).is_false()
 
-    def test_application_export__only_minutes_in_duration(self):
+    def test_only_minutes_in_duration(self):
         self.application_event.min_duration = timedelta(minutes=30)
         self.application_event.save()
 
@@ -317,7 +329,10 @@ class ApplicationDataExporterTestCase(TestCase):
             application.contact_person.last_name,
             application.contact_person.email,
             event.name,
-            application.application_round.name,
+            (
+                f"{event.begin.day}.{event.begin.month}.{event.begin.year}"
+                f" - {event.end.day}.{event.end.month}.{event.end.year}"
+            ),
             application.home_city.name,
             event.purpose.name,
             str(event.age_group),
@@ -355,7 +370,7 @@ class ApplicationDataExporterTestCase(TestCase):
         assert_that(not_existing_file_medium.is_file()).is_false()
         assert_that(not_existing_file_low.is_file()).is_false()
 
-    def test_application_export__multiple_schedules_on_same_day(self):
+    def test_multiple_schedules_on_same_day(self):
         ApplicationEventScheduleFactory(
             application_event=self.application_event,
             day=1,
@@ -376,7 +391,10 @@ class ApplicationDataExporterTestCase(TestCase):
             application.contact_person.last_name,
             application.contact_person.email,
             event.name,
-            application.application_round.name,
+            (
+                f"{event.begin.day}.{event.begin.month}.{event.begin.year}"
+                f" - {event.end.day}.{event.end.month}.{event.end.year}"
+            ),
             application.home_city.name,
             event.purpose.name,
             str(event.age_group),
@@ -414,7 +432,7 @@ class ApplicationDataExporterTestCase(TestCase):
         assert_that(not_existing_file_medium.is_file()).is_false()
         assert_that(not_existing_file_low.is_file()).is_false()
 
-    def test_application_export__multiple_schedules_different_days(self):
+    def test_multiple_schedules_different_days(self):
         ApplicationEventScheduleFactory(
             application_event=self.application_event,
             day=3,
@@ -435,7 +453,10 @@ class ApplicationDataExporterTestCase(TestCase):
             application.contact_person.last_name,
             application.contact_person.email,
             event.name,
-            application.application_round.name,
+            (
+                f"{event.begin.day}.{event.begin.month}.{event.begin.year}"
+                f" - {event.end.day}.{event.end.month}.{event.end.year}"
+            ),
             application.home_city.name,
             event.purpose.name,
             str(event.age_group),
@@ -473,7 +494,7 @@ class ApplicationDataExporterTestCase(TestCase):
         assert_that(not_existing_file_medium.is_file()).is_false()
         assert_that(not_existing_file_low.is_file()).is_false()
 
-    def test_application_export__empty_min_duration(self):
+    def test_empty_min_duration(self):
         self.application_event.min_duration = None
         self.application_event.save()
 
@@ -489,7 +510,10 @@ class ApplicationDataExporterTestCase(TestCase):
             application.contact_person.last_name,
             application.contact_person.email,
             event.name,
-            application.application_round.name,
+            (
+                f"{event.begin.day}.{event.begin.month}.{event.begin.year}"
+                f" - {event.end.day}.{event.end.month}.{event.end.year}"
+            ),
             application.home_city.name,
             event.purpose.name,
             str(event.age_group),
@@ -527,7 +551,7 @@ class ApplicationDataExporterTestCase(TestCase):
         assert_that(not_existing_file_medium.is_file()).is_false()
         assert_that(not_existing_file_low.is_file()).is_false()
 
-    def test_application_export__empty_max_duration(self):
+    def test_empty_max_duration(self):
         self.application_event.max_duration = None
         self.application_event.save()
 
@@ -543,7 +567,10 @@ class ApplicationDataExporterTestCase(TestCase):
             application.contact_person.last_name,
             application.contact_person.email,
             event.name,
-            application.application_round.name,
+            (
+                f"{event.begin.day}.{event.begin.month}.{event.begin.year}"
+                f" - {event.end.day}.{event.end.month}.{event.end.year}"
+            ),
             application.home_city.name,
             event.purpose.name,
             str(event.age_group),
@@ -581,7 +608,7 @@ class ApplicationDataExporterTestCase(TestCase):
         assert_that(not_existing_file_medium.is_file()).is_false()
         assert_that(not_existing_file_low.is_file()).is_false()
 
-    def test_application_export__empty_contact_person_email(self):
+    def test_empty_contact_person_email(self):
         self.application_event.application.contact_person.email = None
         self.application_event.application.contact_person.save()
 
@@ -597,7 +624,10 @@ class ApplicationDataExporterTestCase(TestCase):
             application.contact_person.last_name,
             "",
             event.name,
-            application.application_round.name,
+            (
+                f"{event.begin.day}.{event.begin.month}.{event.begin.year}"
+                f" - {event.end.day}.{event.end.month}.{event.end.year}"
+            ),
             application.home_city.name,
             event.purpose.name,
             str(event.age_group),
@@ -635,7 +665,7 @@ class ApplicationDataExporterTestCase(TestCase):
         assert_that(not_existing_file_medium.is_file()).is_false()
         assert_that(not_existing_file_low.is_file()).is_false()
 
-    def test_application_export__no_contact_person(self):
+    def test_no_contact_person(self):
         self.application_event.application.contact_person = None
         self.application_event.application.save()
 
@@ -651,7 +681,10 @@ class ApplicationDataExporterTestCase(TestCase):
             "",
             "",
             event.name,
-            application.application_round.name,
+            (
+                f"{event.begin.day}.{event.begin.month}.{event.begin.year}"
+                f" - {event.end.day}.{event.end.month}.{event.end.year}"
+            ),
             application.home_city.name,
             event.purpose.name,
             str(event.age_group),
@@ -689,7 +722,7 @@ class ApplicationDataExporterTestCase(TestCase):
         assert_that(not_existing_file_medium.is_file()).is_false()
         assert_that(not_existing_file_low.is_file()).is_false()
 
-    def test_application_export__empty_home_city(self):
+    def test_empty_home_city(self):
         self.application_event.application.home_city = None
         self.application_event.application.save()
 
@@ -705,7 +738,10 @@ class ApplicationDataExporterTestCase(TestCase):
             application.contact_person.last_name,
             application.contact_person.email,
             event.name,
-            application.application_round.name,
+            (
+                f"{event.begin.day}.{event.begin.month}.{event.begin.year}"
+                f" - {event.end.day}.{event.end.month}.{event.end.year}"
+            ),
             "",
             event.purpose.name,
             str(event.age_group),
@@ -743,7 +779,7 @@ class ApplicationDataExporterTestCase(TestCase):
         assert_that(not_existing_file_medium.is_file()).is_false()
         assert_that(not_existing_file_low.is_file()).is_false()
 
-    def test_application_export__empty_purpose(self):
+    def test_empty_purpose(self):
         self.application_event.purpose = None
         self.application_event.save()
 
@@ -759,7 +795,10 @@ class ApplicationDataExporterTestCase(TestCase):
             application.contact_person.last_name,
             application.contact_person.email,
             event.name,
-            application.application_round.name,
+            (
+                f"{event.begin.day}.{event.begin.month}.{event.begin.year}"
+                f" - {event.end.day}.{event.end.month}.{event.end.year}"
+            ),
             application.home_city.name,
             "",
             str(event.age_group),
@@ -797,7 +836,170 @@ class ApplicationDataExporterTestCase(TestCase):
         assert_that(not_existing_file_medium.is_file()).is_false()
         assert_that(not_existing_file_low.is_file()).is_false()
 
-    def test_application_export__medium_priority_time(self):
+    def test_empty_event_begin_time(self):
+        event: ApplicationEvent = self.application_event
+        event.begin = None
+        event.save()
+
+        call_command("export_applications", self.application_round_id)
+
+        application: Application = event.application
+
+        expected_row = [
+            str(application.id),
+            application.organisation.name,
+            application.contact_person.first_name,
+            application.contact_person.last_name,
+            application.contact_person.email,
+            event.name,
+            f"{event.end.day}.{event.end.month}.{event.end.year}",
+            application.home_city.name,
+            event.purpose.name,
+            str(event.age_group),
+            application.applicant_type,
+            str(event.events_per_week),
+            "1 h - 2 h",
+            f"{self.event_reservation_unit_2.reservation_unit.name}",
+            f"{self.event_reservation_unit_3.reservation_unit.name}",
+            f"{self.event_reservation_unit_1.reservation_unit.name}",
+            "",
+            "12:00 - 14:00",
+            "",
+            "",
+            "",
+            "",
+            "",
+        ]
+
+        file_name = self._get_filename_for_round_and_priority(
+            self.application_round_id, "HIGH"
+        )
+        self._test_first_data_line(file_name, expected_row)
+
+        # These files should not have been written.
+        # Check that they do not exist!
+        not_existing_file_medium = self._get_filename_for_round_and_priority(
+            self.application_round_id, "MEDIUM"
+        )
+        not_existing_file_low = self._get_filename_for_round_and_priority(
+            self.application_round_id, "LOW"
+        )
+        not_existing_file_medium = self.export_dir / not_existing_file_medium
+        not_existing_file_low = self.export_dir / not_existing_file_low
+
+        assert_that(not_existing_file_medium.is_file()).is_false()
+        assert_that(not_existing_file_low.is_file()).is_false()
+
+    def test_empty_event_end_time(self):
+        event: ApplicationEvent = self.application_event
+        event.end = None
+        event.save()
+
+        call_command("export_applications", self.application_round_id)
+
+        application: Application = event.application
+
+        expected_row = [
+            str(application.id),
+            application.organisation.name,
+            application.contact_person.first_name,
+            application.contact_person.last_name,
+            application.contact_person.email,
+            event.name,
+            f"{event.begin.day}.{event.begin.month}.{event.begin.year}",
+            application.home_city.name,
+            event.purpose.name,
+            str(event.age_group),
+            application.applicant_type,
+            str(event.events_per_week),
+            "1 h - 2 h",
+            f"{self.event_reservation_unit_2.reservation_unit.name}",
+            f"{self.event_reservation_unit_3.reservation_unit.name}",
+            f"{self.event_reservation_unit_1.reservation_unit.name}",
+            "",
+            "12:00 - 14:00",
+            "",
+            "",
+            "",
+            "",
+            "",
+        ]
+
+        file_name = self._get_filename_for_round_and_priority(
+            self.application_round_id, "HIGH"
+        )
+        self._test_first_data_line(file_name, expected_row)
+
+        # These files should not have been written.
+        # Check that they do not exist!
+        not_existing_file_medium = self._get_filename_for_round_and_priority(
+            self.application_round_id, "MEDIUM"
+        )
+        not_existing_file_low = self._get_filename_for_round_and_priority(
+            self.application_round_id, "LOW"
+        )
+        not_existing_file_medium = self.export_dir / not_existing_file_medium
+        not_existing_file_low = self.export_dir / not_existing_file_low
+
+        assert_that(not_existing_file_medium.is_file()).is_false()
+        assert_that(not_existing_file_low.is_file()).is_false()
+
+    def test_empty_event_end_and_begin_time(self):
+        event: ApplicationEvent = self.application_event
+        event.begin = None
+        event.end = None
+        event.save()
+
+        call_command("export_applications", self.application_round_id)
+
+        application: Application = event.application
+
+        expected_row = [
+            str(application.id),
+            application.organisation.name,
+            application.contact_person.first_name,
+            application.contact_person.last_name,
+            application.contact_person.email,
+            event.name,
+            "",
+            application.home_city.name,
+            event.purpose.name,
+            str(event.age_group),
+            application.applicant_type,
+            str(event.events_per_week),
+            "1 h - 2 h",
+            f"{self.event_reservation_unit_2.reservation_unit.name}",
+            f"{self.event_reservation_unit_3.reservation_unit.name}",
+            f"{self.event_reservation_unit_1.reservation_unit.name}",
+            "",
+            "12:00 - 14:00",
+            "",
+            "",
+            "",
+            "",
+            "",
+        ]
+
+        file_name = self._get_filename_for_round_and_priority(
+            self.application_round_id, "HIGH"
+        )
+        self._test_first_data_line(file_name, expected_row)
+
+        # These files should not have been written.
+        # Check that they do not exist!
+        not_existing_file_medium = self._get_filename_for_round_and_priority(
+            self.application_round_id, "MEDIUM"
+        )
+        not_existing_file_low = self._get_filename_for_round_and_priority(
+            self.application_round_id, "LOW"
+        )
+        not_existing_file_medium = self.export_dir / not_existing_file_medium
+        not_existing_file_low = self.export_dir / not_existing_file_low
+
+        assert_that(not_existing_file_medium.is_file()).is_false()
+        assert_that(not_existing_file_low.is_file()).is_false()
+
+    def test_medium_priority_time(self):
         ApplicationEventScheduleFactory(
             application_event=self.application_event,
             day=2,
@@ -816,7 +1018,10 @@ class ApplicationDataExporterTestCase(TestCase):
             application.contact_person.last_name,
             application.contact_person.email,
             event.name,
-            application.application_round.name,
+            (
+                f"{event.begin.day}.{event.begin.month}.{event.begin.year}"
+                f" - {event.end.day}.{event.end.month}.{event.end.year}"
+            ),
             application.home_city.name,
             event.purpose.name,
             str(event.age_group),
@@ -841,7 +1046,10 @@ class ApplicationDataExporterTestCase(TestCase):
             application.contact_person.last_name,
             application.contact_person.email,
             event.name,
-            application.application_round.name,
+            (
+                f"{event.begin.day}.{event.begin.month}.{event.begin.year}"
+                f" - {event.end.day}.{event.end.month}.{event.end.year}"
+            ),
             application.home_city.name,
             event.purpose.name,
             str(event.age_group),
@@ -877,7 +1085,7 @@ class ApplicationDataExporterTestCase(TestCase):
         not_existing_file_low = self.export_dir / not_existing_file_low
         assert_that(not_existing_file_low.is_file()).is_false()
 
-    def test_application_export__low_priority_time(self):
+    def test_low_priority_time(self):
         ApplicationEventScheduleFactory(
             application_event=self.application_event,
             day=2,
@@ -896,7 +1104,10 @@ class ApplicationDataExporterTestCase(TestCase):
             application.contact_person.last_name,
             application.contact_person.email,
             event.name,
-            application.application_round.name,
+            (
+                f"{event.begin.day}.{event.begin.month}.{event.begin.year}"
+                f" - {event.end.day}.{event.end.month}.{event.end.year}"
+            ),
             application.home_city.name,
             event.purpose.name,
             str(event.age_group),
@@ -921,7 +1132,10 @@ class ApplicationDataExporterTestCase(TestCase):
             application.contact_person.last_name,
             application.contact_person.email,
             event.name,
-            application.application_round.name,
+            (
+                f"{event.begin.day}.{event.begin.month}.{event.begin.year}"
+                f" - {event.end.day}.{event.end.month}.{event.end.year}"
+            ),
             application.home_city.name,
             event.purpose.name,
             str(event.age_group),
