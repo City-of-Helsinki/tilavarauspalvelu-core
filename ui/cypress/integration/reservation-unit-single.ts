@@ -811,6 +811,22 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
   describe("publish times", () => {
     Cypress.config("defaultCommandTimeout", 20000);
 
+    it("should display draft item with non-matching publish range", () => {
+      cy.visit(
+        "/reservation-unit/single/907?ru=8e5275aa-8625-4458-88b4-d5b1b2df6619",
+        { failOnStatusCode: false }
+      );
+
+      cy.get("h1").should("contain", "Pukinmäen nuorisotalon keittiö");
+    });
+
+    it("should not display draft item with non-matching publish range without valid uuid", () => {
+      cy.visit("/reservation-unit/single/907", { failOnStatusCode: false });
+
+      error404Title().should("have.text", "404");
+      error404Body().should("have.text", "Sivua ei löytynyt");
+    });
+
     it("should not display unpublished item", () => {
       cy.visit("/reservation-unit/single/905", { failOnStatusCode: false });
 
