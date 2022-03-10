@@ -31,6 +31,8 @@ export const RESERVATION_UNIT = gql`
       bufferTimeBefore
       bufferTimeAfter
       reservationStartInterval
+      publishBegins
+      publishEnds
       reservationBegins
       reservationEnds
       serviceSpecificTerms {

@@ -1,4 +1,4 @@
-import { addDays, endOfWeek, set } from "date-fns";
+import { addDays, addMinutes, endOfWeek, set } from "date-fns";
 import { graphql, rest } from "msw";
 import {
   OpeningTimesType,
@@ -242,14 +242,18 @@ const selectedReservationUnitQuery = graphql.query<
   if (req.variables.pk === 900) {
     reservationUnitByPk.reservationBegins = addDays(new Date(), 1);
     reservationUnitByPk.reservationEnds = addDays(new Date(), 10);
+    reservationUnitByPk.publishBegins = addMinutes(new Date(), -10);
+    reservationUnitByPk.publishEnds = addMinutes(new Date(), 10);
   }
 
   if (req.variables.pk === 901) {
     reservationUnitByPk.maxReservationsPerUser = 10;
+    reservationUnitByPk.publishBegins = addMinutes(new Date(), -10);
   }
 
   if (req.variables.pk === 902) {
     reservationUnitByPk.maxReservationsPerUser = 30;
+    reservationUnitByPk.publishEnds = addMinutes(new Date(), 10);
   }
 
   if (req.variables.pk === 903) {
@@ -295,6 +299,14 @@ const selectedReservationUnitQuery = graphql.query<
   if (req.variables.pk === 904) {
     reservationUnitByPk.pk = 904;
     reservationUnitByPk.requireReservationHandling = true;
+  }
+
+  if (req.variables.pk === 905) {
+    reservationUnitByPk.publishBegins = addMinutes(new Date(), 10);
+  }
+
+  if (req.variables.pk === 906) {
+    reservationUnitByPk.publishEnds = addMinutes(new Date(), -10);
   }
 
   if (req.variables.pk === 999) {
