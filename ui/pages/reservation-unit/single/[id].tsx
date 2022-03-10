@@ -103,15 +103,19 @@ export const getServerSideProps: GetServerSideProps = async ({
       },
     });
 
-    if (!isReservationUnitPublished(reservationUnitData.reservationUnitByPk)) {
+    const previewPass = uuid === reservationUnitData.reservationUnitByPk.uuid;
+
+    if (
+      !isReservationUnitPublished(reservationUnitData.reservationUnitByPk) &&
+      !previewPass
+    ) {
       return {
         notFound: true,
       };
     }
 
     const isDraft = reservationUnitData.reservationUnitByPk?.isDraft;
-
-    if (isDraft && uuid !== reservationUnitData.reservationUnitByPk.uuid) {
+    if (isDraft && !previewPass) {
       return {
         notFound: true,
       };

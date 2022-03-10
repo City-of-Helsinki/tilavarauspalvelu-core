@@ -309,6 +309,12 @@ const selectedReservationUnitQuery = graphql.query<
     reservationUnitByPk.publishEnds = addMinutes(new Date(), -10);
   }
 
+  if (req.variables.pk === 907) {
+    reservationUnitByPk.isDraft = true;
+    reservationUnitByPk.publishBegins = addMinutes(new Date(), 10);
+    reservationUnitByPk.publishEnds = addMinutes(new Date(), 20);
+  }
+
   if (req.variables.pk === 999) {
     reservationUnitByPk.isDraft = true;
   }
