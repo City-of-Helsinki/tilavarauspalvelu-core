@@ -44,7 +44,7 @@
   "nextAvailableSlot": "Seuraava vapaa tunti",
   "nextAvailableSlot_plural": "Seuraavat vapaat {{slot}}",
   "showCalendar": "Näytä kalenteri",
-  "eventDuration": "Vuoron kesto",
+  "eventDuration": "Varauksen kesto",
   "dateFormatAssist": "Käytä muotoa p.k.vvvv",
   "timeFormatAssist": "Tunti/minuutit",
   "durationFormatAssist": "Tunti:minuutit",
