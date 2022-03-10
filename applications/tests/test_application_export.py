@@ -21,7 +21,10 @@ from .factories import (
 
 class ApplicationDataExporterTestCase(TestCase):
     export_dir = (
-        Path(settings.BASE_DIR) / "exports" / f"{datetime.now().strftime('%d-%m-%Y')}"
+        Path(settings.BASE_DIR)
+        / "exports"
+        / "applications"
+        / f"{datetime.now().strftime('%d-%m-%Y')}"
     )
     application_round_id = None
     random_empty_application_round_id = None

@@ -20,7 +20,7 @@ class ApplicationDataExporter:
     def export_application_data(cls, application_round: int) -> None:
         now = timezone.now()
         root = Path(settings.BASE_DIR)
-        path = root / "exports" / f"{now.strftime('%d-%m-%Y')}"
+        path = root / "exports" / "applications" / f"{now.strftime('%d-%m-%Y')}"
         path.mkdir(parents=True, exist_ok=True)
 
         application_events_base_query = (
