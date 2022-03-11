@@ -95,7 +95,7 @@ describe("application", () => {
       { timeout: 20000 }
     );
 
-    cy.get("h1").should("contain", "Kausivarauksen luominen");
+    cy.get("h1").should("contain", "Kausivarauksen tekeminen");
 
     cy.a11yCheck();
 
@@ -207,7 +207,7 @@ describe("application", () => {
 
     notificationTitle().should(
       "contain.text",
-      "Ajat on kopioitu onnistuneesti kaikille vuorotoiveille"
+      "Ajat kopioitu onnistuneesti kaikille varaustoiveille"
     );
 
     nextButton().click();
