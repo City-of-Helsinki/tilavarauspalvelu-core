@@ -13,6 +13,7 @@ from api.common_filters import NumberInFilter
 from api.resources_api import ResourceSerializer
 from api.services_api import ServiceSerializer
 from api.space_api import BuildingSerializer, LocationSerializer, SpaceSerializer
+from api.units_api.serializers import UnitSerializer
 from applications.models import ApplicationRound
 from opening_hours.errors import HaukiRequestError
 from opening_hours.utils.summaries import get_resources_total_hours_per_resource
@@ -148,6 +149,10 @@ class ReservationUnitSerializer(TranslatedModelSerializer):
 
     uuid = serializers.UUIDField(read_only=True)
 
+    unit = UnitSerializer(
+        read_only=True, help_text="Unit linked to this reservation unit."
+    )
+
     class Meta:
         model = ReservationUnit
         fields = [
@@ -169,6 +174,7 @@ class ReservationUnitSerializer(TranslatedModelSerializer):
             "unit_id",
             "uuid",
             "contact_information",
+            "unit",
         ]
         extra_kwargs = {
             "name": {
