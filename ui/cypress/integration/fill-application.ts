@@ -212,7 +212,7 @@ describe("application", () => {
 
     nextButton().click();
 
-    cy.get("h1").should("contain", "Varaajan tiedot");
+    cy.get("h1").should("contain", "varaajan tiedot");
 
     cy.a11yCheck();
 
