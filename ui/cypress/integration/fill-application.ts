@@ -212,7 +212,7 @@ describe("application", () => {
 
     nextButton().click();
 
-    cy.get("h1").should("contain", "Varaajan perus");
+    cy.get("h1").should("contain", "Varaajan tiedot");
 
     cy.a11yCheck();
 
@@ -227,7 +227,7 @@ describe("application", () => {
     nextButton().click();
     cy.wait(["@purpose", "@city", "@ageGroup"]);
 
-    cy.get("h1").should("contain", "Hakemuksen lähe");
+    cy.get("h1").should("contain", "lähetä hakemus");
 
     timeSummary(0, 0).should(
       "contain.text",
