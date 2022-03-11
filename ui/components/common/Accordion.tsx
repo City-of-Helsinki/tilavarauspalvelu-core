@@ -37,6 +37,10 @@ const HeadingButton = styled(Button).attrs({
   }
 `;
 
+const Content = styled.div<{ $open: boolean }>`
+  display: ${({ $open }) => ($open ? "block" : "none")};
+`;
+
 type Props = {
   heading?: string;
   open?: boolean;
@@ -79,7 +83,7 @@ const Accordion = ({
       >
         {heading}
       </HeadingButton>
-      {isOpen ? children : null}
+      <Content $open={isOpen}>{children}</Content>
     </AccordionElement>
   );
 };
