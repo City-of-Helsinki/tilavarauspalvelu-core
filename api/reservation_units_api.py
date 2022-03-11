@@ -146,6 +146,11 @@ class ReservationUnitSerializer(TranslatedModelSerializer):
     unit_id = serializers.PrimaryKeyRelatedField(
         queryset=Unit.objects.all(), source="unit"
     )
+    unit_details = UnitSerializer(
+        read_only=True,
+        source="unit",
+        help_text="The unit of the reservation unit.",
+    )
 
     uuid = serializers.UUIDField(read_only=True)
 
@@ -172,6 +177,7 @@ class ReservationUnitSerializer(TranslatedModelSerializer):
             "terms_of_use",
             "equipment_ids",
             "unit_id",
+            "unit_details",
             "uuid",
             "contact_information",
             "unit",
