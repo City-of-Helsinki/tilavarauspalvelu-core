@@ -96,8 +96,8 @@ class ReservationUnitQueryTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCa
             price_unit=ReservationUnit.PRICE_UNIT_PER_HOUR,
             is_draft=False,
             reservation_start_interval=ReservationUnit.RESERVATION_START_INTERVAL_30_MINUTES,
-            reservation_begins=datetime.datetime.now(),
-            reservation_ends=datetime.datetime.now(),
+            reservation_begins=datetime.datetime.now(tz=get_default_timezone()),
+            reservation_ends=datetime.datetime.now(tz=get_default_timezone()),
             publish_begins=datetime.datetime.now(tz=get_default_timezone()),
             publish_ends=datetime.datetime.now(tz=get_default_timezone())
             + datetime.timedelta(days=7),
@@ -683,7 +683,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_reservation_timestamps(self):
-        now = datetime.datetime.now().astimezone()
+        now = datetime.datetime.now(get_default_timezone())
         one_hour = datetime.timedelta(hours=1)
         matching_reservation = ReservationFactory(
             begin=now,
@@ -725,7 +725,8 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_reservation_state(self):
-        now = datetime.datetime.now().astimezone()
+        self.maxDiff = None
+        now = datetime.datetime.now(tz=get_default_timezone())
         one_hour = datetime.timedelta(hours=1)
         matching_reservation = ReservationFactory(
             begin=now,
@@ -767,7 +768,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_multiple_reservation_states(self):
-        now = datetime.datetime.now().astimezone()
+        now = datetime.datetime.now(tz=get_default_timezone())
         one_hour = datetime.timedelta(hours=1)
         two_hours = datetime.timedelta(hours=2)
         matching_reservations = [

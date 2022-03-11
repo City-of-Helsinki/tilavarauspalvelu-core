@@ -495,7 +495,7 @@ snapshots['ReservationUnitQueryTestCase::test_hauki_url_for_admin 1'] = {
     'data': {
         'reservationUnitByPk': {
             'haukiUrl': {
-                'url': 'https://test.com/resource/origin%3A3774af34-9916-40f2-acc7-68db5a627710/?hsa_source=origin&hsa_username=amin.general%40foo.com&hsa_organization=ORGANISATION&hsa_created_at=2021-05-03T00%3A00%3A00%2B00%3A00&hsa_valid_until=2021-05-03T00%3A30%3A00%2B00%3A00&hsa_resource=origin%3A3774af34-9916-40f2-acc7-68db5a627710&hsa_has_organization_rights=true&hsa_signature=33d060cef23cf643241390af20ff12fee22b71d9d0c65c86e7ae5617d429df97'
+                'url': 'https://test.com/resource/origin%3A3774af34-9916-40f2-acc7-68db5a627710/?hsa_source=origin&hsa_username=amin.general%40foo.com&hsa_organization=ORGANISATION&hsa_created_at=2021-05-03T03%3A00%3A00%2B03%3A00&hsa_valid_until=2021-05-03T03%3A30%3A00%2B03%3A00&hsa_resource=origin%3A3774af34-9916-40f2-acc7-68db5a627710&hsa_has_organization_rights=true&hsa_signature=cf94d68d518855b144ac5f10b0a8ee7f9ad3dfc14af94333a4d5fe961d65c069'
             },
             'nameFi': 'test name fi'
         }
@@ -506,7 +506,7 @@ snapshots['ReservationUnitQueryTestCase::test_hauki_url_for_unit_manager 1'] = {
     'data': {
         'reservationUnitByPk': {
             'haukiUrl': {
-                'url': 'https://test.com/resource/origin%3A3774af34-9916-40f2-acc7-68db5a627710/?hsa_source=origin&hsa_username=unit.admin%40foo.com&hsa_organization=ORGANISATION&hsa_created_at=2021-05-03T00%3A00%3A00%2B00%3A00&hsa_valid_until=2021-05-03T00%3A30%3A00%2B00%3A00&hsa_resource=origin%3A3774af34-9916-40f2-acc7-68db5a627710&hsa_has_organization_rights=true&hsa_signature=4fc177546e1d20a59564a088600053cd89afe6d992ffcc2cce2d6affeb19b10e'
+                'url': 'https://test.com/resource/origin%3A3774af34-9916-40f2-acc7-68db5a627710/?hsa_source=origin&hsa_username=unit.admin%40foo.com&hsa_organization=ORGANISATION&hsa_created_at=2021-05-03T03%3A00%3A00%2B03%3A00&hsa_valid_until=2021-05-03T03%3A30%3A00%2B03%3A00&hsa_resource=origin%3A3774af34-9916-40f2-acc7-68db5a627710&hsa_has_organization_rights=true&hsa_signature=1b61fc678411c21464160a489f22b369c6e2345c1711314dea5f447bd00a3641'
             },
             'nameFi': 'test name fi'
         }

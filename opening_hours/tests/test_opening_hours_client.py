@@ -131,10 +131,10 @@ class OpeningHoursClientTestCase(TestCase):
             str(self.reservation_unit.uuid), DATES[0], DATES[1], single=True
         )
         begin = datetime.datetime.fromisoformat(
-            f"{DATES[0].year}-0{DATES[0].month}-0{DATES[0].day}T21:00+02:00"
+            f"{DATES[0].year}-0{DATES[0].month}-0{DATES[0].day}T21:00+04:00"
         )
         end = datetime.datetime.fromisoformat(
-            f"{DATES[0].year}-0{DATES[0].month}-0{DATES[0].day}T23:00+02:00"
+            f"{DATES[0].year}-0{DATES[0].month}-0{DATES[0].day}T23:00+04:00"
         )
 
         is_open = client.is_resource_open(str(self.reservation_unit.uuid), begin, end)

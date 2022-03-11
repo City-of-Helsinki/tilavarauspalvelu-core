@@ -61,10 +61,10 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
             "pk": self.reservation.pk,
             "priority": 200,
             "begin": (self.reservation_begin + datetime.timedelta(hours=1)).strftime(
-                "%Y%m%dT%H%M%SZ"
+                "%Y%m%dT%H%M%S%zZ"
             ),
             "end": (self.reservation_end + datetime.timedelta(hours=1)).strftime(
-                "%Y%m%dT%H%M%SZ"
+                "%Y%m%dT%H%M%S%zZ"
             ),
         }
 
@@ -146,8 +146,9 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         ReservationFactory(
             reservation_unit=[self.reservation_unit],
-            begin=datetime.datetime.now(),
-            end=datetime.datetime.now() + datetime.timedelta(hours=2),
+            begin=datetime.datetime.now(tz=get_default_timezone()),
+            end=datetime.datetime.now(tz=get_default_timezone())
+            + datetime.timedelta(hours=2),
             state=STATE_CHOICES.CONFIRMED,
         )
 
@@ -169,7 +170,9 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         self, mock_periods, mock_opening_hours
     ):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
-        begin = datetime.datetime.now() - datetime.timedelta(hours=2)
+        begin = datetime.datetime.now(tz=get_default_timezone()) - datetime.timedelta(
+            hours=2
+        )
         end = begin + datetime.timedelta(hours=1)
         ReservationFactory(
             reservation_unit=[self.reservation_unit],
@@ -200,7 +203,9 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         self, mock_periods, mock_opening_hours
     ):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
-        begin = datetime.datetime.now() + datetime.timedelta(hours=2)
+        begin = datetime.datetime.now(tz=get_default_timezone()) + datetime.timedelta(
+            hours=2
+        )
         end = begin + datetime.timedelta(hours=1)
         ReservationFactory(
             reservation_unit=[self.reservation_unit],
@@ -262,7 +267,9 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         self.reservation_unit.buffer_time_after = datetime.timedelta(hours=1, minutes=1)
         self.reservation_unit.save()
-        begin = datetime.datetime.now() + datetime.timedelta(hours=2)
+        begin = datetime.datetime.now(tz=get_default_timezone()) + datetime.timedelta(
+            hours=2
+        )
         end = begin + datetime.timedelta(hours=1)
         ReservationFactory(
             reservation_unit=[self.reservation_unit],

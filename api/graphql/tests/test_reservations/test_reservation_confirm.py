@@ -150,7 +150,7 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         self.query(self.get_confirm_query(), input_data=input_data)
         self.reservation.refresh_from_db()
         assert_that(self.reservation.confirmed_at).is_equal_to(
-            datetime.datetime(2021, 10, 12, 12).astimezone()
+            datetime.datetime(2021, 10, 12, 12).astimezone(get_default_timezone())
         )
 
     @override_settings(CELERY_TASK_ALWAYS_EAGER=True)

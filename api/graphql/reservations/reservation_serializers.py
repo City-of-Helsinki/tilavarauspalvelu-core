@@ -402,8 +402,8 @@ class ReservationUpdateSerializer(
     def validated_data(self):
         validated_data = super().validated_data
         validated_data["user"] = self.instance.user  # Do not change the user.
-        validated_data["confirmed_at"] = datetime.datetime.now(
-            tz=get_default_timezone()
+        validated_data["confirmed_at"] = datetime.datetime.now().astimezone(
+            get_default_timezone()
         )
         return validated_data
 
