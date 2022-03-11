@@ -1,10 +1,25 @@
+import datetime
+
 import graphene
+import pytz
 from django.conf import settings
 from django.utils.timezone import get_default_timezone
 
 from opening_hours.utils.opening_hours_client import OpeningHoursClient
 
 DEFAULT_TIMEZONE = get_default_timezone()
+
+
+def get_time_as_utc(time: datetime.time, date: datetime.date, tz_info: pytz.timezone):
+    """Gets utc time from given time, date and timezone information.
+    Graphene seems to render time with offset info (e.g 10:00:00+00:00) for localized to UTC only.
+    So with e.g time zone being 'Europe/Helsinki' just don't work for some reason not yet known.
+    So for now we render all as UTC using this little helper.
+    """
+    start_dt = datetime.datetime.combine(date, time)
+    start_dt = tz_info.localize(start_dt)
+    start_dt = start_dt.astimezone(pytz.UTC)
+    return start_dt.timetz()
 
 
 class TimeSpanType(graphene.ObjectType):
@@ -24,16 +39,14 @@ class TimeSpanType(graphene.ObjectType):
         if not self.start_time:
             return None
         tzinfo = self.start_time.tzinfo or DEFAULT_TIMEZONE
-        start = tzinfo.localize(self.start_time)
-
+        start = get_time_as_utc(self.start_time, datetime.date.today(), tzinfo)
         return start
 
     def resolve_end_time(self, info):
         if not self.end_time:
             return None
         tzinfo = self.start_time.tzinfo or DEFAULT_TIMEZONE
-        end = tzinfo.localize(self.end_time)
-
+        end = get_time_as_utc(self.end_time, datetime.date.today(), tzinfo)
         return end
 
 
@@ -65,16 +78,14 @@ class OpeningTimesType(graphene.ObjectType):
         if not self.start_time:
             return None
         tzinfo = self.start_time.tzinfo or DEFAULT_TIMEZONE
-        start = tzinfo.localize(self.start_time)
-
+        start = get_time_as_utc(self.start_time, self.date, tzinfo)
         return start
 
     def resolve_end_time(self, info):
         if not self.end_time:
             return None
         tzinfo = self.start_time.tzinfo or DEFAULT_TIMEZONE
-        end = tzinfo.localize(self.end_time)
-
+        end = get_time_as_utc(self.end_time, self.date, tzinfo)
         return end
 
     def resolve_periods(self, info, **kwargs):

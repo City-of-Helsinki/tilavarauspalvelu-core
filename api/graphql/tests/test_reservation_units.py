@@ -401,13 +401,13 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             .get("reservationUnitByPk")
             .get("openingHours")
             .get("openingTimes")[0]["startTime"]
-        ).is_equal_to("10:00:00+00:00")
+        ).is_equal_to("08:00:00+00:00")
         assert_that(
             content.get("data")
             .get("reservationUnitByPk")
             .get("openingHours")
             .get("openingTimes")[0]["endTime"]
-        ).is_equal_to("22:00:00+00:00")
+        ).is_equal_to("20:00:00+00:00")
 
     def test_filtering_by_unit(self):
         ReservationUnitFactory(unit=UnitFactory())  # should be excluded
