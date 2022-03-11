@@ -95,7 +95,7 @@ describe("application", () => {
       { timeout: 20000 }
     );
 
-    cy.get("h1").should("contain", "Kausivarauksen tekeminen");
+    cy.get("h1").should("contain", "Kausivaraushakemus");
 
     cy.a11yCheck();
 
