@@ -65,7 +65,7 @@
   "Page2": {
     "heading": "2. Valitse varauksen ajankohta",
     "subHeading": "Valitse kaikki ne ajankohdat, joille toivot varauksesi asettuvan.",
-    "info": "Tarkista tilakohtaiset aukioloajat <0>hakuohjeista<0>",
+    "info": "Tarkista tilakohtaiset aukioloajat <0>hakuohjeista<0>. Valitse ajat, joita ensisijaisesti toivot. Valitse myös toissijaisia aikoja, jotka sopivat sinulle.",
     "text": "Ilmoita toivomasi ajankohdat kausivaraukselle",
     "copyTimes": "Kopioi ajat kaikille varaustoiveille",
     "resetTimes": "Tyhjennä kalenteri",
@@ -119,13 +119,13 @@
       "registrationNumber": "Y-tunnus"
     },
     "organisation": {
-      "name": "Yhdistyksen virallinen nimi",
-      "coreBusiness": "Yhdistyksen ydintoiminta",
+      "name": "Virallinen nimi",
+      "coreBusiness": "Ydintoiminta",
       "registrationNumber": "Y-tunnus",
       "streetAddress": "Katuosoite",
       "postCode": "Postinumero",
       "city": "Postitoimipaikka",
-      "notRegistered": "Yhdistystä ei ole rekisteröity",
+      "notRegistered": "Ei y-tunnusta",
       "separateInvoicingAddress": "Laskutusosoite eri kuin postiosoite"
     },
     "additionalInformation": "Lisätiedot"
