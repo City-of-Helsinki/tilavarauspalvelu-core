@@ -1039,3 +1039,34 @@ def test_application_filter_by_units(
     assert_that(
         response.data[1]["id"] in [application_id_one, application_id_too]
     ).is_true()
+
+
+@pytest.mark.django_db
+def test_unit_cannot_be_updated_through_application(
+    valid_application_data,
+    valid_application_event_data,
+    reservation_unit,
+    user_api_client,
+):
+    unit = reservation_unit.unit
+
+    # Update data in objects, that should not result in db updates
+    valid_application_event_data["event_reservation_units"][0].update(
+        {
+            "reservation_unit_details": {
+                "id": 1,
+                "unit_details": {"id": unit.id, "email": "should_not_update@test.com"},
+            }
+        }
+    )
+    valid_application_data.update(
+        {"application_events": [valid_application_event_data]}
+    )
+
+    user_api_client.post(
+        reverse("application-list"), valid_application_data, format="json"
+    )
+
+    # Refresh unit from DB to make sure save did not go through
+    unit.refresh_from_db()
+    assert unit.email == ""
