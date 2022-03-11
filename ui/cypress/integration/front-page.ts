@@ -16,7 +16,7 @@ describe("Tilavaraus ui front page", () => {
     );
     cy.get('[data-test-id="search-guide__recurring"] h2').should(
       "contain",
-      "Vakiovuoron hakeminen"
+      "Kausivarauksen tekeminen"
     );
   });
 

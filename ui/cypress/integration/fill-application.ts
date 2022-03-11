@@ -95,7 +95,7 @@ describe("application", () => {
       { timeout: 20000 }
     );
 
-    cy.get("h1").should("contain", "Vakiovuoron luominen");
+    cy.get("h1").should("contain", "Kausivarauksen luominen");
 
     cy.a11yCheck();
 
@@ -180,7 +180,7 @@ describe("application", () => {
 
     notificationTitle().should(
       "contain.text",
-      "Lisää kaikille vakiovuoroille vähintään yksi aika"
+      "Lisää kaikille kausivarauksille vähintään yksi aika"
     );
 
     applicationEventAccordion(1).click();
