@@ -180,7 +180,7 @@ const Application = (): JSX.Element | null => {
   }
 
   return (
-    <RequireAuthentication>
+    <>
       {pageId === "page1" && (
         <ApplicationPage
           application={state.application}
@@ -258,8 +258,14 @@ const Application = (): JSX.Element | null => {
           {error}
         </Notification>
       ) : null}
-    </RequireAuthentication>
+    </>
   );
 };
 
-export default Application;
+const AppWithAuthentication = (): JSX.Element => (
+  <RequireAuthentication>
+    <Application />
+  </RequireAuthentication>
+);
+
+export default AppWithAuthentication;
