@@ -333,6 +333,7 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
       notificationContainer().contains(
         "Varauksen puskuriajan vaatimukset eivät täyty. Valitse toinen varausaika."
       );
+      notificationCloseButton().click();
 
       durationSelectorToggle()
         .click()
@@ -358,6 +359,7 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
       notificationContainer().contains(
         "Varauksen puskuriajan vaatimukset eivät täyty. Valitse toinen varausaika."
       );
+      notificationCloseButton().click();
 
       startTimeSelectorToggle()
         .click()
@@ -368,6 +370,7 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
       notificationContainer().contains(
         "Valittu aika on varattu. Valitse toinen aika."
       );
+      notificationCloseButton().click();
 
       startTimeSelectorToggle()
         .click()
@@ -399,7 +402,7 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
       startTimeSelectorToggle()
         .click()
         .siblings("ul")
-        .children("li:first-of-type")
+        .children("li:nth-of-type(2)")
         .click();
       matchEvent();
 
@@ -408,26 +411,8 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
         .siblings("ul")
         .children("li:nth-of-type(2)")
         .click();
-      matchEvent();
 
-      reservationInfoPrice()
-        .invoke("text")
-        .then((text) => {
-          expect(text).to.contain("100\u00a0€");
-        });
-
-      durationSelectorToggle()
-        .click()
-        .siblings("ul")
-        .children("li:last-of-type")
-        .click();
-      matchEvent();
-
-      reservationInfoPrice()
-        .invoke("text")
-        .then((text) => {
-          expect(text).to.contain("120\u00a0€");
-        });
+      notificationCloseButton().should("be.visible").click();
 
       cy.checkA11y(null, null, null, true);
     });
