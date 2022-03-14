@@ -59,7 +59,7 @@ export function timeSelectorButton(
   day: number
 ): Cypress.Chainable<JQuery<HTMLElement>> {
   return cy.get(
-    `#timeSelector-${index} > div > div > button[data-testid="time-selector__button--${hour}-${day}"]`
+    `#timeSelector-${index} button[data-testid="time-selector__button--${hour}-${day}"]`
   );
 }
 
