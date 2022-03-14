@@ -1,4 +1,4 @@
-from csv import writer
+from csv import QUOTE_ALL, writer
 from pathlib import Path
 from typing import List
 
@@ -21,7 +21,9 @@ class ReservationUnitExporter:
             file_name = f"reservation_units__{now.strftime('%d-%m-%Y')}.csv"
 
             with open(path / file_name, "w", newline="") as reservations_file:
-                reservations_writer = writer(reservations_file)
+                reservations_writer = writer(
+                    reservations_file, "excel", quoting=QUOTE_ALL
+                )
 
                 cls._write_header_row(reservations_writer)
 
