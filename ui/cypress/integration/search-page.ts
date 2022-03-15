@@ -2,10 +2,6 @@ import { searchButton, fullTextInput } from "../model/search";
 
 describe("Tilavaraus ui search page (recurring)", () => {
   beforeEach(() => {
-    cy.fixture("v1/reservation_unit").then((json) => {
-      cy.intercept("GET", "/v1/reservation_unit/*", json).as("reservationUnit");
-    });
-
     cy.visit("/search");
   });
 

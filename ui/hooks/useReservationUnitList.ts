@@ -1,4 +1,4 @@
-import { useLocalStorage } from "react-use";
+import { useSessionStorage } from "react-use";
 import {
   ReservationUnitByPkType,
   ReservationUnitType,
@@ -32,7 +32,7 @@ export type ReservationUnitList = {
 };
 
 const useReservationUnitsList = (): ReservationUnitList => {
-  const [reservationUnits, setReservationUnits] = useLocalStorage(
+  const [reservationUnits, setReservationUnits] = useSessionStorage(
     "reservationUnitList",
     [] as ReservationUnit[]
   );
