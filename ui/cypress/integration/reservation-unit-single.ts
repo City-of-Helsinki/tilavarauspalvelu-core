@@ -333,6 +333,7 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
       notificationContainer().contains(
         "Varauksen puskuriajan vaatimukset eivät täyty. Valitse toinen varausaika."
       );
+      notificationCloseButton().click();
 
       durationSelectorToggle()
         .click()
@@ -358,6 +359,7 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
       notificationContainer().contains(
         "Varauksen puskuriajan vaatimukset eivät täyty. Valitse toinen varausaika."
       );
+      notificationCloseButton().click();
 
       startTimeSelectorToggle()
         .click()
@@ -368,6 +370,7 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
       notificationContainer().contains(
         "Valittu aika on varattu. Valitse toinen aika."
       );
+      notificationCloseButton().click();
 
       startTimeSelectorToggle()
         .click()
