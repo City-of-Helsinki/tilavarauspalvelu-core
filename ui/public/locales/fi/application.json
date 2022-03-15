@@ -5,24 +5,24 @@
     "requiredField": "Kenttä on pakollinen",
     "pattern": "Tarkista muoto",
     "numPersonsMin": "Ryhmän koko virheellinen",
-    "minDurationBiggerThanMaxDuration": "Minimikesto on suurempi kuin maksimikesto",
-    "maxDurationSmallerThanMinDuration": "Maksimikesto on pienempi kuin minimikesto",
-    "eventsPerWeekMin": "Minimissään yksi vuoro viikossa",
+    "minDurationBiggerThanMaxDuration": "Vähimmäiskesto on suurempi kuin enimmäiskesto",
+    "maxDurationSmallerThanMinDuration": "Enimmäiskesto on pienempi kuin vähimmäiskesto",
+    "eventsPerWeekMin": "Vähintään yksi varaus viikossa",
     "beginAfterEnd": "Kauden aloituspäivä myöhempi kuin lopetuspäivä",
     "beginBeforePeriodBegin": "Kauden aloituspäivä on liian aikainen",
     "beginAfterPeriodEnd": "Kauden aloituspäivä on liian myöhäinen",
     "endAfterPeriodEnd": "Kauden lopetuspäivä on liian myöhäinen",
     "endBeforeBegin": "Kauden lopetuspäivä on aikaisempi kuin aloituspäivä",
     "endBeforePeriodBegin": "Kauden lopetuspäivä on liian aikainen",
-    "missingSchedule": "Lisää kaikille vakiovuoroille vähintään yksi aika",
+    "missingSchedule": "Lisää kaikille kausivarauksille vähintään yksi aika",
     "reservationUnitTooSmall": "Tila on liian pieni ryhmän käyttöön",
     "otherEventsHaveErrors": "Korjaa ensin validaatiovirheet",
     "noReservationUnits": "Lisää hakemukselle yksi tai useampi tila",
-    "noEvents": "Lisää hakemukselle yksi tai useampi vakiovuoro"
+    "noEvents": "Lisää hakemukselle yksi tai useampi kausivaraus"
   },
   "Intro": {
-    "startNewApplication": "Aloita hakemuksen täyttäminen",
-    "heading": "Vakiovuorohakemus",
+    "startNewApplication": "Täytä hakemus",
+    "heading": "Kausivaraushakemus",
     "createFailedHeading": "Hakemuksen luominen epäonnistui",
     "createFailedContent": "Yritä myöhemmin uudelleen",
     "faq1": {
@@ -33,41 +33,41 @@
     },
 
     "faq3": {
-      "question": "Kuinka täytän vakiovuorohakemuksen yksityishenkilönä?"
+      "question": "Kuinka täytän kausivaraushakemuksen yksityishenkilönä?"
     }
   },
-  "applicationEventSaved": "Vakiovuoro tallennettu hakemukselle",
+  "applicationEventSaved": "Kausivaraus tallennettu hakemukselle",
   "Page1": {
-    "heading": "1. Vakiovuoron luominen",
-    "text": "Perustiedot",
-    "basicInformationSubHeading": "Perustiedot",
-    "name": "Vakiovuoron nimi",
+    "heading": "1. Täytä varauksen tiedot",
+    "text": "Lisää hakemukselle ensi kauden varaustoiveesi",
+    "basicInformationSubHeading": "Varauksen perustiedot",
+    "name": "Kausivarauksen nimi",
     "groupSize": "Ryhmän koko",
     "ageGroup": "Ikäryhmä",
     "abilityGroup": "Tasoryhmä",
-    "purpose": "Vuoron käyttötarkoitus / toiminnan sisältö",
+    "purpose": "Varauksen käyttötarkoitus",
     "spacesSubHeading": "Toivotut tilat",
-    "applicationRoundSubHeading": "Vakiovuoron kausi",
+    "applicationRoundSubHeading": "Varauskausi",
     "periodStartDate": "Kauden aloituspäivä",
     "periodEndDate": "Kauden päätöspäivä",
-    "minDuration": "Vuoron minimikesto",
-    "maxDuration": "Vuoron maksimikesto",
-    "eventsPerWeek": "Vuorojen määrä viikossa",
-    "biweekly": "Vuoro vain joka toinen viikko",
+    "minDuration": "Varauksen vähimmäiskesto",
+    "maxDuration": "Varauksen enimmäiskesto",
+    "eventsPerWeek": "Varausten määrä viikossa",
+    "biweekly": "Varaus vain joka toinen viikko",
     "defaultDurationLabel": "1 tunti 30 min",
-    "createNew": "Lisää uusi vakiovuoro hakemukselle",
-    "applicationEventName": "Nimetön vakiovuoro",
+    "createNew": "Lisää uusi kausivaraus",
+    "applicationEventName": "Nimetön kausivaraus",
     "applicationEventSummary": "Yhteenveto",
-    "applicationEventSaved": "Vakiovuoro tallennettu hakemukselle",
-    "saveEvent": "Hyväksy ja tallenna vakiovuoro",
-    "deleteEvent": "Poista vakiovuoro"
+    "applicationEventSaved": "Kausivaraustoive tallennettu hakemukselle",
+    "saveEvent": "Tallenna",
+    "deleteEvent": "Peru"
   },
   "Page2": {
-    "heading": "2. Vakiovuoron ajankohta",
+    "heading": "2. Valitse varauksen ajankohta",
     "subHeading": "Valitse kaikki ne ajankohdat, joille toivot varauksesi asettuvan.",
-    "info": "Tarkista tilakohtaiset aukioloajat <0>hakuohjeista<0>",
-    "text": "Anna toivomasi ajankohta jokaiselle luomallesi vakiovuorolle.",
-    "copyTimes": "Kopioi ajat kaikille vakiovuoroille",
+    "info": "Tarkista tilakohtaiset aukioloajat <0>hakuohjeista<0>. Valitse ajat, joita ensisijaisesti toivot. Valitse myös toissijaisia aikoja, jotka sopivat sinulle.",
+    "text": "Ilmoita toivomasi ajankohdat kausivaraukselle",
+    "copyTimes": "Kopioi ajat kaikille varaustoiveille",
     "resetTimes": "Tyhjennä kalenteri",
     "summary": "Yhteenveto",
     "priorityLabels": {
@@ -82,12 +82,12 @@
     "primarySchedules": "Ensisijaiset aikatoiveet",
     "secondarySchedules": "Muut aikatoiveet",
     "notification": {
-      "copyCells": "Ajat on kopioitu onnistuneesti kaikille vuorotoiveille"
+      "copyCells": "Ajat kopioitu onnistuneesti kaikille varaustoiveille"
     }
   },
   "Page3": {
-    "heading": "3. Varaajan perustiedot",
-    "text": "Varaavan yhteisön ja yhteyshenkilön perustiedot",
+    "heading": "3. Täytä varaajan tiedot",
+    "text": "Voit jättää hakemuksen yhteisönä, yksityishenkilönä tai yrityksenä. Viimeisin hakemus on voimassa.",
     "asPrivatePersonSubHeading": "Varaan yksityishenkilönä",
     "firstName": "Etunimi",
     "homeCity": "Kotipaikka",
@@ -119,14 +119,14 @@
       "registrationNumber": "Y-tunnus"
     },
     "organisation": {
-      "name": "Yhdistyksen virallinen nimi",
-      "coreBusiness": "Yhdistyksen ydintoiminta",
+      "name": "Virallinen nimi",
+      "coreBusiness": "Ydintoiminta",
       "registrationNumber": "Y-tunnus",
       "streetAddress": "Katuosoite",
       "postCode": "Postinumero",
       "city": "Postitoimipaikka",
-      "notRegistered": "Yhdistystä ei ole rekisteröity",
-      "separateInvoicingAddress": "Laskutusosoite on eri kuin tämä"
+      "notRegistered": "Ei y-tunnusta",
+      "separateInvoicingAddress": "Laskutusosoite eri kuin postiosoite"
     },
     "additionalInformation": "Lisätiedot"
   },
@@ -138,9 +138,9 @@
       "association": "Rekisteröity yhdistys"
     },
     "homeCity": "Kotipaikka",
-    "heading": "4. Hakemuksen lähettäminen",
-    "text": "Yhteenveto hakemuksestasi",
-    "basicInfoSubHeading": "Varaajan perustiedot",
+    "heading": "4. Tarkista ja lähetä hakemus",
+    "text": "Alla yhteenveto hakemuksestasi",
+    "basicInfoSubHeading": "Varaajan tiedot",
     "firstName": "Yhteyshenkilön etunimi",
     "lastName": "Yhteyshenkilön sukunimi",
     "applicantTypeLabel": "Hakijan tyyppi",
@@ -152,18 +152,18 @@
       "coreBusiness": "Ydintoiminta"
     },
     "applicationEvent": {
-      "name": "Vakiovuoron nimi",
+      "name": "Kausivarauksen nimi",
       "numPersons": "Ryhmän koko",
       "ageGroup": "Ikäryhmä",
       "abilityGroup": "Tasoryhmä",
-      "purpose": "Vuoron käyttötarkoitus",
-      "additionalInfo": "Lisätietoja vuoroon liittyen",
+      "purpose": "Varauksen käyttötarkoitus",
+      "additionalInfo": "Lisätietoja varaukseen liittyen",
       "begin": "Kauden aloituspäivä",
       "end": "Kauden päätöspäivä",
-      "minDuration": "Minimikesto",
-      "maxDuration": "Maksimikesto",
-      "eventsPerWeek": "Vuorojen määrä viikossa",
-      "biweekly": "Vakiovuorot vain joka toinen viikko",
+      "minDuration": "Varauksen vähimmäiskesto",
+      "maxDuration": "Varauksen enimmäiskesto",
+      "eventsPerWeek": "Varausten määrä viikossa",
+      "biweekly": "Kausivaraukset vain joka toinen viikko",
       "reservationUnit": "Vaihtoehto {{order}}."
     },
     "applicationEventSchedules": "Toivotut ajat",
@@ -177,13 +177,13 @@
     },
     "reservationUnitTerms": "Täydentävät varausehdot",
     "termsOfService": "Helsingin kaupungin tilojen ja laitteiden varausehdot",
-    "userAcceptsTerms": "Olen lukenut ja hyväksyn palveluehdot ja tilojen varausehdot."
+    "userAcceptsTerms": "Olen lukenut ja hyväksyn sopimusehdot ja täydentävät varausehdot."
   },
   "sent": {
     "heading": "Hakemuksesi on lähetetty käsiteltäväksi",
     "faq1Question": "Kuinka hakemuksen käsittely etenee?",
     "faq2Question": "Kuinka hakemuksen käsittely tapahtuu?",
-    "faq3Question": "Kohtuullistaminen, vuoron peruutus ja muutoksenhaku"
+    "faq3Question": "Kohtuullistaminen, varauksen peruutus ja muutoksenhaku"
   },
   "navigation": {
     "page1": "Varauksen tiedot",

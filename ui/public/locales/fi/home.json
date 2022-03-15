@@ -1,7 +1,7 @@
 {
   "head": {
     "heading": "Varaa tiloja ja laitteita",
-    "text": "Varaamosta voit varata julkisia tiloja ja laitteita omaan käyttöösi",
+    "text": "Varaamosta voit varata julkisia tiloja ja laitteita käyttöösi",
     "searchPlaceholder": "Hae tiloja tai laitetta"
   },
   "info": {
@@ -9,18 +9,18 @@
     "text": "Yksittäisen varauksen voit tehdä osoitteessa <0>varaamo.hel.fi</0>."
   },
   "infoRecurring": {
-    "heading": "Vakiovuoron hakeminen",
-    "text": "Vakiovuoroja haetaan yleisen haun kautta. Voit selata tiloja valmiiksi, mutta hakemuksen voi jättää vain hakuajan puitteissa."
+    "heading": "Kausivarauksen tekeminen",
+    "text": "Hae Helsingin kaupungin tiloja säännölliseen käyttöön. Voit tutustua tiloihin etukäteen ennen hakuaikaa."
   },
   "browseReservationsButton": "Selaa varausyksiköitä",
-  "browseRecurringReservationsButton": "Hae vakiovuoroa",
+  "browseRecurringReservationsButton": "Tutustu hakuaikoihin",
   "applicationTimes": {
-    "heading": "Vakiovuorojen hakuajat",
-    "text": "Vakiovuoroihin on hakuaika kaksi kertaa vuodessa. Ajankohta vaihtelee palvelusta ja toimialasta riippuen."
+    "heading": "Kausivarauksen hakuajat",
+    "text": "Kausivarauksen hakuaika on kaksi kertaa vuodessa. Ajankohta vaihtelee palvelusta ja toimialasta riippuen."
   },
   "footer": {
     "heading": "Palvelusta",
-    "body": "Varaamo on Helsingin kaupungin ylläpitämä verkkopalvelu, jonka kautta voi varata kaupungin julkisia tiloja sekä työpisteitä yksityiseen käyttöön.\n\nTilavarausjärjestelmä on testausvaiheessa, eikä pilottikäytössä olevassa versiossa ole vielä kaikkia suunnitteilla olevia ominaisuuksia ja toiminnallisuuksia."
+    "body": "Varaamo on Helsingin kaupungin ylläpitämä verkkopalvelu, jonka kautta voit varata kaupungin julkisia tiloja sekä työpisteitä käyttöösi.\n\nUudistettu tilavarauspalvelu on testausvaiheessa. Uudet ominaisuudet ja toiminnallisuudet otetaan käyttöön vähitellen."
   },
   "shortcutsHeadingMobile": "Tai valitse mitä haluat tehdä",
   "shortcutsHeading": "Valitse mitä haluat tehdä",
