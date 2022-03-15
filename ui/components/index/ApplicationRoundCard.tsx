@@ -10,24 +10,23 @@ import { ApplicationRound } from "../../modules/types";
 import { applicationRoundState, searchUrl } from "../../modules/util";
 import { breakpoint } from "../../modules/style";
 import { MediumButton } from "../../styles/util";
-import { fontMedium } from "../../modules/style/typography";
+import { fontMedium, H4 } from "../../modules/style/typography";
 
 interface Props {
   applicationRound: ApplicationRound;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const StyledCard = styled(({ act, ...rest }) => <Card {...rest} />)`
+const StyledCard = styled(Card)`
   && {
-    max-width: var(--container-width-m);
+    --background-color: var(--color-black-8);
+    --border-color: var(--color-black-8);
     display: grid;
     grid-template-columns: 2fr 1fr;
     grid-gap: var(--spacing-m);
     align-items: start;
     padding: var(--spacing-m);
-    margin-bottom: var(--spacing-s);
-    border-color: ${(props) => props.act && "var(--tilavaraus-green)"};
-    background-color: ${(props) => props.act && "var(--tilavaraus-cyan)"};
+    margin-bottom: var(--spacing-m);
 
     @media (max-width: ${breakpoint.s}) {
       grid-template-columns: 1fr;
@@ -36,21 +35,20 @@ const StyledCard = styled(({ act, ...rest }) => <Card {...rest} />)`
 `;
 
 const StyledContainer = styled(Container)`
-  line-height: var(--lineheight-xl);
+  line-height: var(--lineheight-l);
   max-width: 100%;
 `;
 
-const Name = styled.div`
-  font-size: var(--fontsize-body-xl);
-  font-weight: 500;
+const Name = styled(H4)`
+  margin-top: 0;
+  margin-bottom: var(--spacing-2-xs);
 `;
 
 const CardButton = styled(MediumButton)`
-  justify-self: right;
-  width: 100%;
+  width: max-content;
 
   @media (min-width: ${breakpoint.s}) {
-    width: max-content;
+    justify-self: right;
   }
 `;
 
@@ -63,6 +61,11 @@ const StyledLink = styled.a`
 
   && {
     color: var(--color-bus);
+  }
+
+  @media (min-width: ${breakpoint.s}) {
+    margin-top: var(--spacing-l);
+    margin-bottom: var(--spacing-s);
   }
 `;
 
@@ -77,11 +80,7 @@ const ApplicationRoundCard = ({ applicationRound }: Props): JSX.Element => {
   );
 
   return (
-    <StyledCard
-      aria-label={applicationRound.name}
-      border
-      act={state === "active" ? true : undefined}
-    >
+    <StyledCard aria-label={applicationRound.name} border>
       <StyledContainer>
         <Name>{applicationRound.name}</Name>
         <div>
@@ -100,12 +99,14 @@ const ApplicationRoundCard = ({ applicationRound }: Props): JSX.Element => {
               closingDate: parseISO(applicationRound.applicationPeriodEnd),
             })}
         </div>
-        <Link href={`/criteria/${applicationRound.id}`} passHref>
-          <StyledLink>
-            <IconArrowRight />
-            {t("applicationRound:card.criteria")}
-          </StyledLink>
-        </Link>
+        {state !== "past" && (
+          <Link href={`/criteria/${applicationRound.id}`} passHref>
+            <StyledLink>
+              <IconArrowRight />
+              {t("applicationRound:card.criteria")}
+            </StyledLink>
+          </Link>
+        )}
       </StyledContainer>
       {state === "active" && (
         <CardButton

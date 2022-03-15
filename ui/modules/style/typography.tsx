@@ -41,11 +41,29 @@ export const H2 = styled.h2`
   margin-bottom: var(--spacing-m);
 `;
 
-export const H3 = styled.h2`
-  font-size: var(--fontsize-heading-s);
-  font-family: var(--font-bold);
-  font-weight: 700;
+export const H3 = styled.h3`
+  font-size: var(--fontsize-heading-m);
+  font-family: var(--font-regular);
+  font-weight: 400;
+  line-height: 2rem;
   margin-bottom: var(--spacing-m);
+
+  @media (min-width: ${breakpoint.s}) {
+    font-size: 2rem;
+  }
+`;
+
+export const H4 = styled.h4`
+  font-size: var(--fontsize-heading-s);
+  font-family: var(--font-regular);
+  font-weight: 400;
+  line-height: 1.625;
+  margin-bottom: var(--spacing-s);
+
+  @media (min-width: ${breakpoint.s}) {
+    font-size: var(--fontsize-heading-m);
+    line-height: var(--lineheight-xl);
+  }
 `;
 
 export const HeroSubheading = styled.p`

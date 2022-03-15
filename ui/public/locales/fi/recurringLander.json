@@ -3,8 +3,8 @@
   "subHeading": "Hae Helsingin kaupungin tiloja säännölliseen käyttöön. Tutustu tiloihin ja hakuaikoihin tällä sivulla.",
   "roundHeadings": {
     "active": "Käynnissä olevat haut",
-    "pending": "Tulevat haut"
+    "pending": "Tulevat haut",
+    "past": "Päättyneet haut"
   },
-  "noRounds": "Ei aktiivisia tai tulevia hakuja.",
-  "browseAll": "Selaa kaikkia tiloja"
+  "noRounds": "Ei aktiivisia tai tulevia hakuja."
 }

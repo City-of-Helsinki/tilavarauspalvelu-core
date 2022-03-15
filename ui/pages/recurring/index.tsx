@@ -1,19 +1,15 @@
 import React from "react";
 import styled from "styled-components";
-import { useRouter } from "next/router";
 import { GetServerSideProps } from "next";
-import { IconSearch, ImageWithCard } from "hds-react";
 import { sortBy } from "lodash";
 import { useTranslation } from "react-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { H1, HeroSubheading } from "../../modules/style/typography";
+import { H1, H3, HeroSubheading } from "../../modules/style/typography";
 import { breakpoint } from "../../modules/style";
 import { getApplicationRounds } from "../../modules/api";
 import { ApplicationRound } from "../../modules/types";
 import ApplicationRoundCard from "../../components/index/ApplicationRoundCard";
 import { applicationRoundState } from "../../modules/util";
-import { MediumButton } from "../../styles/util";
-import { searchPrefix } from "../../modules/const";
 import KorosDefault from "../../components/common/KorosDefault";
 
 type Props = {
@@ -21,17 +17,9 @@ type Props = {
 };
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
-  const now = new Date();
   const applicationRounds = await getApplicationRounds();
 
-  const filteredApplicationRounds = sortBy(
-    applicationRounds.filter(
-      (applicationRound) =>
-        new Date(applicationRound.publicDisplayBegin) <= now &&
-        new Date(applicationRound.publicDisplayEnd) >= now
-    ),
-    ["id"]
-  );
+  const filteredApplicationRounds = sortBy(applicationRounds, ["id"]);
 
   return {
     props: {
@@ -41,7 +29,9 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   };
 };
 
-const Wrapper = styled.div``;
+const Wrapper = styled.div`
+  background-color: var(--color-white);
+`;
 
 const HeadWrapper = styled.div`
   background-color: var(--tilavaraus-hero-background-color);
@@ -64,86 +54,27 @@ const Heading = styled(H1)``;
 const SubHeading = styled(HeroSubheading)``;
 
 const Content = styled.div`
-  padding: var(--spacing-s) var(--spacing-m) var(--spacing-xl);
+  padding: 0 var(--spacing-m) var(--spacing-xl);
+  background-color: var(--color-white);
 
   @media (min-width: ${breakpoint.m}) {
     max-width: var(--container-width-xl);
-    padding: var(--spacing-m);
     margin: 0 auto;
     padding-bottom: var(--spacing-layout-xl);
   }
 `;
 
 const RoundList = styled.div`
-  margin-bottom: var(--spacing-xl);
+  margin-bottom: var(--spacing-layout-l);
 `;
 
-const RoundHeading = styled(H1)`
-  font-size: 1.75rem;
-  font-family: var(--font-bold);
-  font-weight: 700;
-  margin-bottom: var(--spacing-m);
-`;
-
-const StyledImageWithCard = styled(ImageWithCard)`
-  && {
-    --card-color-primary: var(--color-black-90);
-    --card-background-primary: var(--color-copper-medium-light);
-    --card-background-secondary: var(--color-fog-medium-light);
-    max-width: 100%;
-    margin-top: var(--spacing-layout-xl);
-    margin-bottom: var(--spacing-layout-xl);
-    margin-left: 0;
-
-    > :nth-child(2) > div {
-      min-height: unset;
-    }
-
-    @media (max-width: ${breakpoint.m}) {
-      && {
-        > :nth-child(1),
-        > :nth-child(2) > div {
-          margin-right: 0;
-          margin-left: 0;
-        }
-      }
-    }
-  }
-`;
-
-const InfoContainer = styled.div`
-  margin-top: var(--spacing-s);
-  margin-bottom: var(--spacing-m);
-  display: flex;
-  flex-direction: column;
-  align-content: space-between;
-  word-break: break-word;
-`;
-
-const ButtonContainer = styled.div`
-  margin-top: var(--spacing-m);
-
-  button {
-    --border-color: var(--color-black);
-    --color: var(--color-black);
-  }
-
-  @media (max-width: ${breakpoint.s}) {
-    display: flex;
-    flex-direction: column;
-  }
-`;
-
-const CardHeading = styled(H1)`
-  font-size: 1.75rem;
-  font-family: var(--font-bold);
-  font-weight: 700;
+const RoundHeading = styled(H3)`
+  margin-top: 0;
   margin-bottom: var(--spacing-m);
 `;
 
 const RecurringLander = ({ applicationRounds }: Props): JSX.Element => {
   const { t } = useTranslation();
-  const router = useRouter();
 
   const activeApplicationRounds = applicationRounds.filter(
     (applicationRound) =>
@@ -161,6 +92,14 @@ const RecurringLander = ({ applicationRounds }: Props): JSX.Element => {
       ) === "pending"
   );
 
+  const pastApplicationRounds = applicationRounds.filter(
+    (applicationRound) =>
+      applicationRoundState(
+        applicationRound.applicationPeriodBegin,
+        applicationRound.applicationPeriodEnd
+      ) === "past"
+  );
+
   return (
     <Wrapper>
       <HeadWrapper>
@@ -171,11 +110,11 @@ const RecurringLander = ({ applicationRounds }: Props): JSX.Element => {
       </HeadWrapper>
       <KorosDefault
         from="var(--tilavaraus-hero-background-color)"
-        to="var(--tilavaraus-gray)"
+        to="var(--color-white)"
       />
       <Content>
-        {activeApplicationRounds?.length > 0 && (
-          <RoundList>
+        {activeApplicationRounds?.length > 0 ? (
+          <RoundList data-testid="recurring-lander__application-round-container--active">
             <RoundHeading>
               {t("recurringLander:roundHeadings.active")}
             </RoundHeading>
@@ -186,9 +125,16 @@ const RecurringLander = ({ applicationRounds }: Props): JSX.Element => {
               />
             ))}
           </RoundList>
+        ) : (
+          <RoundList data-testid="recurring-lander__application-round-container--active-empty">
+            <RoundHeading>
+              {t("recurringLander:roundHeadings.active")}
+            </RoundHeading>
+            {t("recurringLander:noRounds")}
+          </RoundList>
         )}
         {pendingApplicationRounds?.length > 0 && (
-          <RoundList>
+          <RoundList data-testid="recurring-lander__application-round-container--pending">
             <RoundHeading>
               {t("recurringLander:roundHeadings.pending")}
             </RoundHeading>
@@ -200,32 +146,19 @@ const RecurringLander = ({ applicationRounds }: Props): JSX.Element => {
             ))}
           </RoundList>
         )}
-        {applicationRounds?.length < 1 && (
-          <RoundList>{t("recurringLander:noRounds")}</RoundList>
+        {pastApplicationRounds?.length > 0 && (
+          <RoundList data-testid="recurring-lander__application-round-container--past">
+            <RoundHeading>
+              {t("recurringLander:roundHeadings.past")}
+            </RoundHeading>
+            {pastApplicationRounds.map((applicationRound) => (
+              <ApplicationRoundCard
+                key={applicationRound.id}
+                applicationRound={applicationRound}
+              />
+            ))}
+          </RoundList>
         )}
-        <StyledImageWithCard
-          cardAlignment="right"
-          cardLayout="hover"
-          color="secondary"
-          src="images/guide-recurring2.jpg"
-        >
-          <InfoContainer data-test-id="search-guide__recurring">
-            <div>
-              <CardHeading>{t("home:infoRecurring.heading")}</CardHeading>
-              <p>{t("home:infoRecurring.text")}</p>
-            </div>
-            <ButtonContainer>
-              <MediumButton
-                id="browseRecurringReservationUnits"
-                onClick={() => router.push(searchPrefix)}
-                variant="secondary"
-                iconLeft={<IconSearch />}
-              >
-                {t("recurringLander:browseAll")}
-              </MediumButton>
-            </ButtonContainer>
-          </InfoContainer>
-        </StyledImageWithCard>
       </Content>
     </Wrapper>
   );

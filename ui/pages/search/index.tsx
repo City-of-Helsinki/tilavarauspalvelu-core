@@ -157,7 +157,7 @@ const Search = ({ applicationRounds }: Props): JSX.Element => {
         const applicationRound = applicationRounds.find(
           (ar) => ar.id === Number(parsedParams.applicationRound)
         );
-        return applicationRound.reservationUnitIds.includes(
+        return applicationRound?.reservationUnitIds.includes(
           Number(reservationUnit.id)
         );
       }
