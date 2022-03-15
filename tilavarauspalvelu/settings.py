@@ -342,6 +342,8 @@ LOGIN_REDIRECT_URL = "/admin/"
 LOGOUT_REDIRECT_URL = "/admin/"
 
 SESSION_SERIALIZER = "django.contrib.sessions.serializers.PickleSerializer"
+SESSION_COOKIE_AGE = 12 * 60 * 60  # 12 hours in seconds
+SESSION_COOKIE_SECURE = True
 
 OIDC_API_TOKEN_AUTH = {
     "AUDIENCE": env("TUNNISTAMO_JWT_AUDIENCE"),
