@@ -179,10 +179,13 @@ const Application = (): JSX.Element | null => {
     );
   }
 
+  const rerender = state.application.applicationEvents.length; // rerender every time event count is changed so that form state stays in sync
+
   return (
-    <RequireAuthentication>
+    <>
       {pageId === "page1" && (
         <ApplicationPage
+          key={rerender}
           application={state.application}
           breadCrumbText={applicationRoundName}
           overrideText={applicationRoundName}
@@ -258,8 +261,14 @@ const Application = (): JSX.Element | null => {
           {error}
         </Notification>
       ) : null}
-    </RequireAuthentication>
+    </>
   );
 };
 
-export default Application;
+const AppWithAuthentication = (): JSX.Element => (
+  <RequireAuthentication>
+    <Application />
+  </RequireAuthentication>
+);
+
+export default AppWithAuthentication;

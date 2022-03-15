@@ -138,6 +138,7 @@ const Navigation = ({ profile, logout }: Props): JSX.Element => {
             {languageOptions.map((languageOption) => (
               <HDSNavigation.Item
                 key={languageOption.value}
+                lang={languageOption.value}
                 label={languageOption.label}
                 onClick={(
                   e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>
