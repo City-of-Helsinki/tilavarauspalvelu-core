@@ -27,18 +27,29 @@ export const Regular = styled.span`
 `;
 
 export const H1 = styled.h1`
-  font-size: 3rem;
+  font-size: 2.5em;
   font-family: var(--font-regular);
   font-weight: 400;
   line-height: var(--lineheight-s);
   margin: var(--spacing-s) 0 var(--spacing-m);
+
+  @media (min-width: ${breakpoint.s}) {
+    font-size: 3em;
+    line-height: var(--lineheight-s);
+  }
 `;
 
 export const H2 = styled.h2`
-  font-size: 2rem;
+  font-size: var(--fontsize-heading-m);
   font-family: var(--font-regular);
   font-weight: 400;
+  line-height: var(--lineheight-s);
   margin-bottom: var(--spacing-m);
+
+  @media (min-width: ${breakpoint.s}) {
+    font-size: 2em;
+    line-height: var(--lineheight-m);
+  }
 `;
 
 export const H3 = styled.h3`

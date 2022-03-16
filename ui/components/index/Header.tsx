@@ -26,9 +26,18 @@ const Content = styled(Container)`
 
   @media (min-width: ${breakpoint.m}) {
     padding: var(--spacing-layout-xl) var(--spacing-m) var(--spacing-layout-xl);
+    gap: var(--spacing-xl);
     grid-template-columns: 1fr 1fr;
-    gap: var(--spacing-3-xl);
     min-height: 380px;
+  }
+
+  @media (min-width: ${breakpoint.l}) {
+    gap: var(--spacing-layout-2-xl);
+    grid-template-columns: 1fr 1fr;
+  }
+
+  @media (min-width: 1050px) {
+    grid-template-columns: 1fr 572px;
   }
 `;
 
@@ -41,6 +50,7 @@ const Image = styled.div`
     background-size: cover;
     max-width: 100%;
     height: 100%;
+    max-height: 377px;
 
     @media (-webkit-min-device-pixel-ratio: 2) {
       background-image: url("images/hero-front@2x.jpg");
@@ -51,26 +61,24 @@ const Image = styled.div`
 const Left = styled.div`
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
 `;
 
 const StyledTextInput = styled(TextInput)`
   && {
     input {
       border-color: var(--color-black-90);
-      font-size: var(--fontsize-heading-xs);
+      font-size: var(--fontsize-body-m);
       padding: 0 var(--spacing-layout-m) 0 var(--spacing-s);
-      --placeholder-color: var(--tilavaraus-content-text-color);
+      --placeholder-color: var(--color-black-60);
 
       @media (min-width: ${breakpoint.m}) {
-        height: 80px;
-        font-size: var(--fontsize-heading-m);
-        padding: 0 var(--spacing-layout-xl) 0 var(--spacing-l);
+        font-size: var(--fontsize-body-m);
+        padding: 0 var(--spacing-2-xl) 0 var(--spacing-s);
       }
     }
   }
 
-  margin-top: var(--spacing-m);
+  margin-top: var(--spacing-l);
   max-width: 480px;
 
   label {
@@ -81,33 +89,26 @@ const StyledTextInput = styled(TextInput)`
 
     position: absolute;
     right: var(--spacing-s);
-    top: 28%;
+    top: 30%;
     z-index: 1;
   }
 
   @media (min-width: ${breakpoint.m}) {
-    max-width: unset;
-
-    label {
-      svg {
-        --icon-size: var(--spacing-l) !important;
-      }
-
-      right: var(--spacing-l);
-      top: 32%;
-    }
+    max-width: 245px;
   }
 `;
 
 const Title = styled(H1)`
   ${fontRegular}
-  font-size: var(--fontsize-heading-xl);
-  margin-top: 0;
   margin-bottom: 0;
 
   @media (min-width: ${breakpoint.m}) {
-    font-size: 4rem;
+    margin-top: var(--spacing-l);
   }
+`;
+
+const Ingress = styled.p`
+  margin: var(--spacing-l) 0;
 `;
 
 const SubmitIcon = styled(IconSearch)<{ $active: boolean }>`
@@ -130,7 +131,7 @@ const Head = (props: HeadProps): JSX.Element => {
         <Left>
           <div>
             <Title>{props.heading}</Title>
-            <p>{props.text}</p>
+            <Ingress>{props.text}</Ingress>
           </div>
           <form onSubmit={(e) => handleSubmit(e)}>
             <StyledTextInput

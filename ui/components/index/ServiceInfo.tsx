@@ -1,16 +1,15 @@
 import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import { Button } from "hds-react";
-import router from "next/router";
 import { CenteredContainer } from "../common/Container";
+import { H3 } from "../../modules/style/typography";
 
 const BottomContainer = styled.div`
-  background-color: var(--color-white);
+  background-color: var(--color-black-5);
 `;
 
 const StyledCenteredContainer = styled(CenteredContainer)`
-  padding: var(--spacing-s) var(--spacing-s) var(--spacing-layout-2-xl);
+  padding: var(--spacing-s) var(--spacing-s) var(--spacing-3-xl);
 
   p {
     font-family: var(--font-regular);
@@ -27,11 +26,8 @@ const ServiceInfo = (): JSX.Element => {
   return (
     <BottomContainer>
       <StyledCenteredContainer>
-        <h1>{t("footer.heading")}</h1>
+        <H3>{t("footer.heading")}</H3>
         <p>{t("footer.body")}</p>
-        <Button variant="secondary" onClick={() => router.push("/about")}>
-          {t("common:readMore")}
-        </Button>
       </StyledCenteredContainer>
     </BottomContainer>
   );
