@@ -226,7 +226,7 @@ const SearchForm = ({
         <Group>
           <Select
             id="participantMinCountFilter"
-            placeholder={t("common:beginningWith")}
+            placeholder={t("common:minimum")}
             options={[emptyOption(t("common:select"))].concat(
               participantCountOptions
             )}
@@ -243,7 +243,7 @@ const SearchForm = ({
           />
           <Select
             id="participantMaxCountFilter"
-            placeholder={t("common:endingWith")}
+            placeholder={t("common:maximum")}
             options={[emptyOption(t("common:select"))].concat(
               participantCountOptions
             )}

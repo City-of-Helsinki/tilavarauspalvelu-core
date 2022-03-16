@@ -21,6 +21,7 @@ import {
 } from "../model/application";
 import {
   addReservationUnitButton,
+  clearSelectionsButton,
   startApplicationButton,
 } from "../model/search";
 
@@ -69,10 +70,21 @@ describe("application", () => {
       cy.intercept("GET", "/v1/reservation_unit/2/*", json);
     });
 
-    cy.visit("/search/?search=");
+    cy.window().then((win) => {
+      win.sessionStorage.clear();
+      cy.visit("/search/?search=");
+    });
   });
 
   it("can be submitted and is accessible", () => {
+    startApplicationButton().should("not.exist");
+    addReservationUnitButton(2).click();
+    clearSelectionsButton().click();
+    startApplicationButton().should("not.exist");
+    addReservationUnitButton(2).click();
+    startApplicationButton().should("exist");
+    addReservationUnitButton(2).click();
+    startApplicationButton().should("not.exist");
     addReservationUnitButton(2).click();
     startApplicationButton().click();
 

@@ -82,6 +82,7 @@ const SearchResultList = ({
     selectReservationUnit,
     removeReservationUnit,
     containsReservationUnit,
+    clearSelections,
   } = useReservationUnitsList();
 
   const { t } = useTranslation();
@@ -129,7 +130,10 @@ const SearchResultList = ({
           </>
         ) : null}
       </Container>
-      <StartApplicationBar count={selectedReservationUnits.length} />
+      <StartApplicationBar
+        count={selectedReservationUnits.length}
+        clearSelections={clearSelections}
+      />
     </Wrapper>
   );
 };

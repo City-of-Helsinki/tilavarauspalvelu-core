@@ -286,6 +286,7 @@ const ReservationUnit = ({
       </BottomWrapper>
       <StartApplicationBar
         count={reservationUnitList.reservationUnits.length}
+        clearSelections={reservationUnitList.clearSelections}
       />
     </Wrapper>
   ) : null;
