@@ -68,11 +68,6 @@ const Ingress = styled(H2)`
   line-height: 1.8125rem;
 `;
 
-const Body = styled.p`
-  line-height: var(--lineheight-l);
-  margin-top: var(--spacing-xl);
-`;
-
 function MainLander({ withSiteWrapper = false }: IProps): JSX.Element {
   const { t } = useTranslation();
   const { login, oidcUser } = useReactOidc();
@@ -97,7 +92,6 @@ function MainLander({ withSiteWrapper = false }: IProps): JSX.Element {
       </KorosHeading>
       <Content>
         <Ingress>{t("MainLander.ingress")}</Ingress>
-        <Body>{t("MainLander.body")}</Body>
       </Content>
       <Footer />
     </Wrapper>
