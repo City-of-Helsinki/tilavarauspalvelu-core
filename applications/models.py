@@ -69,7 +69,7 @@ class Address(models.Model):
 
     post_code = models.CharField(
         verbose_name=_("Post code"),
-        max_length=5,
+        max_length=32,
         null=False,
         blank=False,
     )
