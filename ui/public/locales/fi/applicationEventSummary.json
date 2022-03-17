@@ -1,7 +1,7 @@
 {
-  "message": "Olet hakemassa vakiovuoroa {{name}} kaudella {{startDate}} - {{endDate}}. Haet yhteensä vähintään {{hours}} tuntia vakiovuoroaikaa.",
+  "message": "Olet tekemässä varausta {{name}} kaudeksi {{startDate}} - {{endDate}}. Varausten yhteenlaskettu kesto on vähintään {{hours}}.",
   "numPersons": "Ryhmän koko on <1>{{numPersons}} henkilöä<1>",
-  "minDuration": "Yhden vuoron kesto minimissään {{minDuration}}",
-  "eventsPerWeek": "<0>{{eventsPerWeek}}</0> vuoro viikossa",
-  "eventsPerWeek_plural": "<0>{{eventsPerWeek}}</0> vuoroa viikossa"
+  "minDuration": "Yhden varauksen kesto vähintään {{minDuration}}",
+  "eventsPerWeek": "<0>{{eventsPerWeek}}</0> varaus viikossa",
+  "eventsPerWeek_plural": "<0>{{eventsPerWeek}}</0> varausta viikossa"
 }

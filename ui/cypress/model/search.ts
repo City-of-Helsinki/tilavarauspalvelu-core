@@ -18,7 +18,15 @@ export function addReservationUnitButton(
 export function startApplicationButton(): Cypress.Chainable<
   JQuery<HTMLElement>
 > {
-  return cy.get("#startApplicationButton").should("be.visible");
+  return cy.get("#startApplicationButton");
+}
+
+export function clearSelectionsButton(): Cypress.Chainable<
+  JQuery<HTMLElement>
+> {
+  return cy.get(
+    "[data-testid='start-application-bar__button--clear-selections']"
+  );
 }
 
 export function inputMinPersons(): Cypress.Chainable<JQuery<HTMLElement>> {

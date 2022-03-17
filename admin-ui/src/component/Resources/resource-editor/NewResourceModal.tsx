@@ -23,7 +23,7 @@ import {
   EditorContainer,
   SaveButton,
   schema,
-} from "./resourceEditor";
+} from "./modules/resourceEditor";
 import FormErrorSummary from "../../../common/FormErrorSummary";
 
 // eslint-disable-next-line

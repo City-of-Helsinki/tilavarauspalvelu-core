@@ -5,7 +5,7 @@ import {
   SpaceCreateMutationInput,
   SpaceType,
   UnitByPkType,
-} from "../../../../common/gql-types";
+} from "../../../../../common/gql-types";
 
 export const Title = styled.div`
   font-family: var(--tilavaraus-admin-font-bold);

@@ -33,6 +33,7 @@ import {
   RESERVATION_UNIT,
   TERMS_OF_USE,
 } from "../../modules/queries/reservationUnit";
+import { isReservationUnitPublished } from "../../modules/reservationUnit";
 
 type Props = {
   reservationUnit: ReservationUnitByPkType | null;
@@ -40,12 +41,13 @@ type Props = {
   termsOfUse: Record<string, TermsOfUseType>;
 };
 
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const getServerSideProps: GetServerSideProps = async ({
   locale,
   params,
+  query,
 }) => {
   const id = Number(params.id);
+  const uuid = query.ru;
   let relatedReservationUnits = [] as ReservationUnitType[];
 
   if (id) {
@@ -58,6 +60,24 @@ export const getServerSideProps: GetServerSideProps = async ({
         pk: id,
       },
     });
+
+    const previewPass = uuid === reservationUnitData.reservationUnitByPk.uuid;
+
+    if (
+      !isReservationUnitPublished(reservationUnitData.reservationUnitByPk) &&
+      !previewPass
+    ) {
+      return {
+        notFound: true,
+      };
+    }
+
+    const isDraft = reservationUnitData.reservationUnitByPk?.isDraft;
+    if (isDraft && !previewPass) {
+      return {
+        notFound: true,
+      };
+    }
 
     const { data: genericTermsData } = await apolloClient.query<
       Query,
@@ -266,6 +286,7 @@ const ReservationUnit = ({
       </BottomWrapper>
       <StartApplicationBar
         count={reservationUnitList.reservationUnits.length}
+        clearSelections={reservationUnitList.clearSelections}
       />
     </Wrapper>
   ) : null;

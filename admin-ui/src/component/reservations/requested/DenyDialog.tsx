@@ -11,10 +11,7 @@ import {
   ReservationType,
 } from "../../../common/gql-types";
 import { useModal } from "../../../context/ModalContext";
-import {
-  DENY_RESERVATION,
-  RESERVATION_DENY_REASONS,
-} from "../../../common/queries";
+import { DENY_RESERVATION, RESERVATION_DENY_REASONS } from "./queries";
 import { useNotification } from "../../../context/NotificationContext";
 import Loader from "../../Loader";
 import Select from "../../ReservationUnits/ReservationUnitEditor/Select";

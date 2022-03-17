@@ -1,7 +1,7 @@
 import { Button } from "hds-react";
 import Joi from "joi";
 import styled from "styled-components";
-import { breakpoints } from "../../../styles/util";
+import { breakpoints } from "../../../../styles/util";
 
 export const schema = Joi.object({
   spacePk: Joi.number().required(),

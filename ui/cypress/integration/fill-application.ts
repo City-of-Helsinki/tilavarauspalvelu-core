@@ -21,6 +21,7 @@ import {
 } from "../model/application";
 import {
   addReservationUnitButton,
+  clearSelectionsButton,
   startApplicationButton,
 } from "../model/search";
 
@@ -69,10 +70,21 @@ describe("application", () => {
       cy.intercept("GET", "/v1/reservation_unit/2/*", json);
     });
 
-    cy.visit("/search/?search=");
+    cy.window().then((win) => {
+      win.sessionStorage.clear();
+      cy.visit("/search/?search=");
+    });
   });
 
   it("can be submitted and is accessible", () => {
+    startApplicationButton().should("not.exist");
+    addReservationUnitButton(2).click();
+    clearSelectionsButton().click();
+    startApplicationButton().should("not.exist");
+    addReservationUnitButton(2).click();
+    startApplicationButton().should("exist");
+    addReservationUnitButton(2).click();
+    startApplicationButton().should("not.exist");
     addReservationUnitButton(2).click();
     startApplicationButton().click();
 
@@ -95,7 +107,7 @@ describe("application", () => {
       { timeout: 20000 }
     );
 
-    cy.get("h1").should("contain", "Vakiovuoron luominen");
+    cy.get("h1").should("contain", "varauksen tiedot");
 
     cy.a11yCheck();
 
@@ -180,7 +192,7 @@ describe("application", () => {
 
     notificationTitle().should(
       "contain.text",
-      "Lisää kaikille vakiovuoroille vähintään yksi aika"
+      "Lisää kaikille kausivarauksille vähintään yksi aika"
     );
 
     applicationEventAccordion(1).click();
@@ -207,12 +219,12 @@ describe("application", () => {
 
     notificationTitle().should(
       "contain.text",
-      "Ajat on kopioitu onnistuneesti kaikille vuorotoiveille"
+      "Ajat kopioitu onnistuneesti kaikille varaustoiveille"
     );
 
     nextButton().click();
 
-    cy.get("h1").should("contain", "Varaajan perus");
+    cy.get("h1").should("contain", "varaajan tiedot");
 
     cy.a11yCheck();
 
@@ -227,7 +239,7 @@ describe("application", () => {
     nextButton().click();
     cy.wait(["@purpose", "@city", "@ageGroup"]);
 
-    cy.get("h1").should("contain", "Hakemuksen lähe");
+    cy.get("h1").should("contain", "lähetä hakemus");
 
     timeSummary(0, 0).should(
       "contain.text",

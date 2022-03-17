@@ -1,11 +1,12 @@
 {
   "card": {
     "applyButton": "Hae tiloja",
+    "searchButton": "Selaa tiloja",
     "displayPastButton": "Näytä tilat",
-    "criteria": "Hakukriteerit",
+    "criteria": "Hakuehdot",
     "pending": "Haku avautuu {{openingDateTime}}",
     "open": "Haku auki {{until, d.M.yyyy 'klo' H.mm}} saakka",
     "past": "Haku sulkeutui {{closingDate, d.M.yyyy 'klo' H.mm}}"
   },
-  "criteria": "hakukriteerit"
+  "criteria": "hakuehdot"
 }

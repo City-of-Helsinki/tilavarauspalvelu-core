@@ -1,7 +1,7 @@
 {
-  "home": "Vakiovuorot",
+  "home": "Kausivaraus",
   "search": "Haku",
-  "application": "Vakiovuorohakemus",
-  "criteria": "Hakukriteerit",
+  "application": "Kausivaraushakemus",
+  "criteria": "Hakuehdot",
   "singleReservations": "Yksittäisvaraukset"
 }

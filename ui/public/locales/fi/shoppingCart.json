@@ -1,5 +1,10 @@
 {
-  "next": "Jatka seuraavaan",
+  "next": "Jatka täyttämään hakemusta",
+  "nextShort": "Jatka",
   "count_plural": "{{count}} tilaa valittuna",
-  "count": "{{count}} tila valittuna"
+  "count": "{{count}} tila valittuna",
+  "countShort_plural": "{{count}} tilaa",
+  "countShort": "{{count}} tila",
+  "deleteSelections": "Poista tilat",
+  "deleteSelectionsShort": "Poista"
 }

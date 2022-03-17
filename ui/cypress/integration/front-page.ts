@@ -16,12 +16,12 @@ describe("Tilavaraus ui front page", () => {
     );
     cy.get('[data-test-id="search-guide__recurring"] h2').should(
       "contain",
-      "Vakiovuoron hakeminen"
+      "Kausivarauksen tekeminen"
     );
   });
 
   it("displays browsing buttons", () => {
-    browseSingleReservationUnitsButton().should("exist");
+    browseSingleReservationUnitsButton().should("not.exist");
     browseRecurringReservationUnitsButton().should("exist");
   });
 

@@ -62,7 +62,7 @@ import {
   PublishingTime,
   Wide,
   Wrapper,
-} from "./reservationUnitEditor";
+} from "./modules/reservationUnitEditor";
 import { IProps, ReservationUnitEditorType, schema, State } from "./types";
 import { getInitialState, i18nFields, reducer } from "./reducer";
 import {

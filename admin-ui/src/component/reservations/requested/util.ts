@@ -3,6 +3,7 @@ import { TFunction } from "i18next";
 import {
   AgeGroupType,
   Maybe,
+  ReservationsReservationReserveeTypeChoices,
   ReservationType,
 } from "../../../common/gql-types";
 import { formatDate, formatTime } from "../../../common/util";
@@ -40,3 +41,19 @@ export const ageGroup = (
   group: Maybe<AgeGroupType> | undefined
 ): string | null =>
   group ? `${group.minimum} - ${group.maximum || ""}` : null;
+
+export const getTranslationKeyForType = (
+  type: ReservationsReservationReserveeTypeChoices,
+  isUnregisteredAssociation: boolean
+): string => {
+  switch (type) {
+    case ReservationsReservationReserveeTypeChoices.Business:
+    case ReservationsReservationReserveeTypeChoices.Individual: {
+      return `ReserveeType.${type}`;
+    }
+    default:
+      return `ReserveeType.${type}.${
+        isUnregisteredAssociation ? "UNREGISTERED" : "REGISTERED"
+      }`;
+  }
+};

@@ -9,7 +9,7 @@ import {
   ReservationType,
 } from "../../../common/gql-types";
 import { useModal } from "../../../context/ModalContext";
-import { APPROVE_RESERVATION } from "../../../common/queries";
+import { APPROVE_RESERVATION } from "./queries";
 import { useNotification } from "../../../context/NotificationContext";
 
 const Fields = styled.div`

@@ -4,7 +4,7 @@ import { useTranslation, TFunction } from "next-i18next";
 import { useLocalStorage } from "react-use";
 import { useRouter } from "next/router";
 import styled from "styled-components";
-import { applicationsUrl, reservationsUrl } from "../../modules/util";
+import { applicationsUrl } from "../../modules/util";
 import { authEnabled, isBrowser } from "../../modules/const";
 import { breakpoint } from "../../modules/style";
 import { UserProfile } from "../../modules/types";
@@ -90,17 +90,8 @@ const Navigation = ({ profile, logout }: Props): JSX.Element => {
 
   const menuItems: MenuItem[] = [
     {
-      title: "reservationUnitSearch",
-      path: "/search/single",
-    },
-    {
       title: "spaceReservation",
       path: "/recurring",
-    },
-    {
-      title: "reservations",
-      path: reservationsUrl,
-      condition: !!profile,
     },
     {
       title: "applications",
@@ -147,6 +138,7 @@ const Navigation = ({ profile, logout }: Props): JSX.Element => {
             {languageOptions.map((languageOption) => (
               <HDSNavigation.Item
                 key={languageOption.value}
+                lang={languageOption.value}
                 label={languageOption.label}
                 onClick={(
                   e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>

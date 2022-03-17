@@ -752,7 +752,7 @@ const listReservations = graphql.query<Query, QueryReservationUnitsArgs>(
                 reservationUnits: [
                   {
                     pk: 11,
-                    nameFi: "Studiohuone 11 + soittimet",
+                    nameFi: "Studiohuone 111 + soittimet",
                     nameEn: null,
                     nameSv: null,
                     termsOfUseFi:
@@ -771,8 +771,8 @@ const listReservations = graphql.query<Query, QueryReservationUnitsArgs>(
             },
             {
               node: {
-                id: "UmVzZX43tfgrb25UeXBlOjE0",
-                pk: 14,
+                id: "UmVzZX43tfgrb25UeXBlOjE2",
+                pk: 124,
                 name: "",
                 begin: addDays(new Date(), 40).toISOString(),
                 end: addHours(addDays(new Date(), 40), 2).toISOString(),
