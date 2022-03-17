@@ -64,6 +64,27 @@ snapshots['ReservationQueryTestCase::test_filter_requested 1'] = {
     }
 }
 
+snapshots['ReservationQueryTestCase::test_filter_reservation_state_accepts_multiple_values 1'] = {
+    'data': {
+        'reservations': {
+            'edges': [
+                {
+                    'node': {
+                        'name': 'Show me',
+                        'state': 'REQUIRES_HANDLING'
+                    }
+                },
+                {
+                    'node': {
+                        'name': 'Show me too',
+                        'state': 'CANCELLED'
+                    }
+                }
+            ]
+        }
+    }
+}
+
 snapshots['ReservationQueryTestCase::test_filter_reservation_state_requires_handling 1'] = {
     'data': {
         'reservations': {
