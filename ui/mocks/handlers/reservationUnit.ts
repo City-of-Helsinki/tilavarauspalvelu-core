@@ -688,7 +688,8 @@ const termsOfUseData: TermsOfUseTypeConnection = {
   edges: [
     {
       node: {
-        id: "123235423",
+        id: "1",
+        pk: "123235423",
         nameFi: "Perumisehto FI",
         nameEn: "Perumisehto EN",
         nameSv: "Perumisehto SV",
@@ -702,7 +703,8 @@ const termsOfUseData: TermsOfUseTypeConnection = {
     },
     {
       node: {
-        id: "1232354fawregra23",
+        id: "2",
+        pk: "1232354fawregra23",
         nameFi: "Maksuehto FI",
         nameEn: "Maksuehto EN",
         nameSv: "Maksuehto SV",
@@ -715,7 +717,8 @@ const termsOfUseData: TermsOfUseTypeConnection = {
     },
     {
       node: {
-        id: "1232vaw4fw4gbreag35423",
+        id: "3",
+        pk: "KUVAnupa",
         nameFi: "Palveluehto FI",
         nameEn: "Palveluehto EN",
         nameSv: "Palveluehto SV",
@@ -729,7 +732,8 @@ const termsOfUseData: TermsOfUseTypeConnection = {
     },
     {
       node: {
-        id: "1232354q234rt5eyge5rgt23",
+        id: "4",
+        pk: "generic1",
         nameFi: "Sopimusehdot FI",
         nameEn: "Sopimusehdot EN",
         nameSv: "Sopimusehdot SV",

@@ -290,9 +290,9 @@ const Application = ({ tos }: Props): JSX.Element | null => {
   );
 };
 
-const AppWithAuthentication = (): JSX.Element => (
+const AppWithAuthentication = ({ tos }: Props): JSX.Element => (
   <RequireAuthentication>
-    <Application />
+    <Application tos={tos} />
   </RequireAuthentication>
 );
 
