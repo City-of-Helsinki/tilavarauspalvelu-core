@@ -168,7 +168,7 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
                 <a
                   target="_blank"
                   rel="noopener noreferrer"
-                  href="https://www.hel.fi/static/liitteet-2019/KuVa/nuoriso/Vakiovuorojen_sahkoinen_hakuohje2021.pdf"
+                  href="/Tilavarauspalvelu_Varausyksikoiden-aukioloajat.pdf"
                 >
                   {" "}
                 </a>
