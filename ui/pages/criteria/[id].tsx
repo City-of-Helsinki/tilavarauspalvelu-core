@@ -57,8 +57,11 @@ const Criteria = ({ applicationRound }: Props): JSX.Element => {
   return (
     <>
       <Head>
+        <Breadcrumb
+          root={{ label: "home", linkTo: "/recurring" }}
+          current={{ label: "criteria" }}
+        />
         <HeadContent>
-          <Breadcrumb current={{ label: "criteria" }} />
           <H1>
             {`${applicationRound?.name} ${t("applicationRound:criteria")}`}
           </H1>

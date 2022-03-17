@@ -17,7 +17,7 @@ import { deepCopy, mapOptions } from "../../modules/util";
 import { getParameters } from "../../modules/api";
 import { breakpoint } from "../../modules/style";
 import { participantCountOptions } from "../../modules/const";
-import { CenterSpinner } from "../common/common";
+import { CenterSpinner, HorisontalRule } from "../common/common";
 import { MediumButton } from "../../styles/util";
 
 type Props = {
@@ -234,9 +234,11 @@ const Page1 = ({
           />
         );
       })}
+      <HorisontalRule />
       <ButtonContainer>
         <MediumButton
           id="addApplicationEvent"
+          variant="secondary"
           iconLeft={<IconPlusCircleFill />}
           onClick={() => form.handleSubmit(onAddApplicationEvent)()}
           disabled={addNewEventButtonDisabled}

@@ -1,5 +1,11 @@
 import React, { useRef } from "react";
-import { Checkbox, DateInput, Notification, TextInput } from "hds-react";
+import {
+  Checkbox,
+  DateInput,
+  Notification,
+  NumberInput,
+  TextInput,
+} from "hds-react";
 import { useTranslation } from "react-i18next";
 import { useForm, Controller } from "react-hook-form";
 import styled from "styled-components";
@@ -24,15 +30,15 @@ import {
   uiDateToApiDate,
 } from "../../modules/util";
 import { breakpoint } from "../../modules/style";
-import { CheckboxWrapper, HorisontalRule } from "../common/common";
+import { CheckboxWrapper } from "../common/common";
 import ApplicationEventSummary from "./ApplicationEventSummary";
 import ControlledSelect from "../common/ControlledSelect";
 import Accordion from "../common/Accordion";
-import { defaultDuration, durationOptions } from "../../modules/const";
+import { durationOptions } from "../../modules/const";
 import { after, before } from "../../modules/validation";
 import ConfirmationModal, { ModalRef } from "../common/ConfirmationModal";
 import { MediumButton } from "../../styles/util";
-import { fontMedium } from "../../modules/style/typography";
+import { fontRegular, H4 } from "../../modules/style/typography";
 
 type OptionTypes = {
   ageGroupOptions: OptionType[];
@@ -55,11 +61,10 @@ type Props = {
   onDeleteEvent: () => void;
 };
 
-const SubHeadLine = styled.h2`
-  font-family: var(--font-bold);
+const SubHeadLine = styled(H4).attrs({
+  as: "h2",
+})`
   margin-top: var(--spacing-layout-m);
-  font-weight: 700;
-  font-size: var(--fontsize-heading-m);
 `;
 
 const TwoColumnContainer = styled.div`
@@ -69,7 +74,7 @@ const TwoColumnContainer = styled.div`
   gap: var(--spacing-l);
 
   label {
-    ${fontMedium}
+    ${fontRegular};
   }
 
   @media (max-width: ${breakpoint.m}) {
@@ -81,13 +86,13 @@ const TwoColumnContainer = styled.div`
 const PeriodContainer = styled.div`
   margin-top: var(--spacing-m);
   display: grid;
-  grid-template-columns: 2fr 2fr 3fr;
+  grid-template-columns: 1fr 1fr;
   gap: var(--spacing-m);
   align-items: baseline;
   margin-bottom: var(--spacing-layout-s);
 
   label {
-    ${fontMedium}
+    ${fontRegular};
   }
 
   @media (max-width: ${breakpoint.m}) {
@@ -95,23 +100,24 @@ const PeriodContainer = styled.div`
   }
 `;
 
-const SpanTwoColumns = styled.span`
-  grid-column-start: 1;
-  grid-column-end: 3;
+const ActionContainer = styled.div`
+  display: flex;
+  flex-direction: column-reverse;
+  margin-top: var(--spacing-layout-l);
+  gap: var(--spacing-l);
 
-  @media (max-width: ${breakpoint.m}) {
-    grid-column-start: 1;
-    grid-column-end: 2;
+  @media (min-width: ${breakpoint.m}) {
+    flex-direction: row;
+    justify-content: flex-end;
+    gap: var(--spacing-l);
   }
 `;
 
 const Button = styled(MediumButton)`
-  margin-top: var(--spacing-layout-l);
+  width: 100%;
 
-  @media (max-width: ${breakpoint.s}) {
-    margin-top: var(--spacing-layout-s);
-    margin-left: auto;
-    margin-right: auto;
+  @media (min-width: ${breakpoint.m}) {
+    width: 250px;
   }
 `;
 
@@ -179,8 +185,6 @@ const ApplicationEvent = ({
   const eventName = form.watch(fieldName("name"));
   const applicationPeriodBegin = form.watch(fieldName("begin"));
   const applicationPeriodEnd = form.watch(fieldName("end"));
-  const durationMin = form.watch(fieldName("minDuration"));
-  const durationMax = form.watch(fieldName("maxDuration"));
   const numPersons = form.watch(fieldName("numPersons"));
   form.watch(fieldName("eventsPerWeek"));
   form.watch(fieldName("biweekly"));
@@ -190,11 +194,6 @@ const ApplicationEvent = ({
   const selectDefaultPeriod = (): void => {
     form.setValue(fieldName("begin"), apiDateToUIDate(periodStartDate));
     form.setValue(fieldName("end"), apiDateToUIDate(periodEndDate));
-  };
-
-  const selectDefaultDuration = (): void => {
-    form.setValue(fieldName("minDuration"), defaultDuration);
-    form.setValue(fieldName("maxDuration"), defaultDuration);
   };
 
   const del = () => {
@@ -212,9 +211,6 @@ const ApplicationEvent = ({
     uiDateToApiDate(applicationPeriodBegin) === periodStartDate &&
     uiDateToApiDate(applicationPeriodEnd) === periodEndDate;
 
-  const selectionIsDefaultDuration =
-    durationMin === defaultDuration && durationMax === defaultDuration;
-
   return (
     <>
       <Accordion
@@ -226,6 +222,7 @@ const ApplicationEvent = ({
         }
         open={isOpen(applicationEvent.id, editorState.accordionStates)}
         heading={`${eventName}` || t("application:Page1.applicationEventName")}
+        theme="thin"
       >
         <SubHeadLine>
           {t("application:Page1.basicInformationSubHeading")}
@@ -246,8 +243,9 @@ const ApplicationEvent = ({
             />
           </div>
           <div>
-            <TextInput
-              type="number"
+            <NumberInput
+              id={fieldName("numPersons")}
+              name={fieldName("numPersons")}
               required
               ref={form.register({
                 validate: {
@@ -256,15 +254,17 @@ const ApplicationEvent = ({
                 },
               })}
               label={t("application:Page1.groupSize")}
-              id={fieldName("numPersons")}
-              name={fieldName("numPersons")}
-              invalid={
-                !!form.errors.applicationEvents?.[index]?.numPersons?.type
-              }
+              min={0}
+              minusStepButtonAriaLabel={t("common:subtract")}
+              plusStepButtonAriaLabel={t("common:add")}
+              step={1}
               errorText={applicationErrorText(
                 t,
                 form.errors.applicationEvents?.[index]?.numPersons?.type
               )}
+              invalid={
+                !!form.errors.applicationEvents?.[index]?.numPersons?.type
+              }
             />
           </div>
           <ControlledSelect
@@ -290,7 +290,6 @@ const ApplicationEvent = ({
             )}
           />
         </TwoColumnContainer>
-        <HorisontalRule />
         <SubHeadLine>{t("application:Page1.spacesSubHeading")}</SubHeadLine>
         <ReservationUnitList
           selectedReservationUnits={selectedReservationUnits}
@@ -305,10 +304,23 @@ const ApplicationEvent = ({
             participantCountOptions,
           }}
         />
-        <HorisontalRule />
         <SubHeadLine>
           {t("application:Page1.applicationRoundSubHeading")}
         </SubHeadLine>
+        <CheckboxWrapper>
+          <Checkbox
+            id="defaultPeriod"
+            checked={selectionIsDefaultPeriod}
+            label={`${formatDate(
+              applicationRound.reservationPeriodBegin
+            )} - ${formatDate(applicationRound.reservationPeriodEnd)}`}
+            onChange={() => {
+              form.clearErrors([fieldName("begin"), fieldName("end")]);
+              selectDefaultPeriod();
+            }}
+            disabled={selectionIsDefaultPeriod}
+          />
+        </CheckboxWrapper>
         <PeriodContainer>
           <DateInput
             disableConfirmation
@@ -395,20 +407,6 @@ const ApplicationEvent = ({
               form.errors.applicationEvents?.[index]?.end?.type
             )}
           />
-          <CheckboxWrapper>
-            <Checkbox
-              id="defaultPeriod"
-              checked={selectionIsDefaultPeriod}
-              label={`${formatDate(
-                applicationRound.reservationPeriodBegin
-              )} - ${formatDate(applicationRound.reservationPeriodEnd)}`}
-              onChange={() => {
-                form.clearErrors([fieldName("begin"), fieldName("end")]);
-                selectDefaultPeriod();
-              }}
-              disabled={selectionIsDefaultPeriod}
-            />
-          </CheckboxWrapper>
           <ControlledSelect
             name={fieldName("minDuration")}
             required
@@ -455,40 +453,28 @@ const ApplicationEvent = ({
                 ),
             }}
           />
-          <CheckboxWrapper>
-            <Checkbox
-              id="durationCheckbox"
-              checked={selectionIsDefaultDuration}
-              label={t("application:Page1.defaultDurationLabel")}
-              onChange={() => {
-                clearDurationErrors(form, fieldName);
-                selectDefaultDuration();
-              }}
-              disabled={selectionIsDefaultDuration}
-            />
-          </CheckboxWrapper>
-          <SpanTwoColumns>
-            <TextInput
-              ref={form.register({
-                validate: {
-                  eventsPerWeekMin: (val) => Number(val) > 0,
-                },
-              })}
-              label={t("application:Page1.eventsPerWeek")}
-              id={fieldName("eventsPerWeek")}
-              name={fieldName("eventsPerWeek")}
-              type="number"
-              required
-              min={1}
-              invalid={
-                !!form.errors.applicationEvents?.[index]?.eventsPerWeek?.type
-              }
-              errorText={applicationErrorText(
-                t,
-                form.errors.applicationEvents?.[index]?.eventsPerWeek?.type
-              )}
-            />
-          </SpanTwoColumns>
+          <NumberInput
+            id={fieldName("eventsPerWeek")}
+            name={fieldName("eventsPerWeek")}
+            required
+            ref={form.register({
+              validate: {
+                eventsPerWeekMin: (val) => Number(val) > 0,
+              },
+            })}
+            label={t("application:Page1.eventsPerWeek")}
+            min={1}
+            minusStepButtonAriaLabel={t("common:subtract")}
+            plusStepButtonAriaLabel={t("common:add")}
+            step={1}
+            invalid={
+              !!form.errors.applicationEvents?.[index]?.eventsPerWeek?.type
+            }
+            errorText={applicationErrorText(
+              t,
+              form.errors.applicationEvents?.[index]?.eventsPerWeek?.type
+            )}
+          />
           <Controller
             control={form.control}
             name={fieldName("biweekly")}
@@ -517,8 +503,6 @@ const ApplicationEvent = ({
             }}
           />
         </PeriodContainer>
-
-        <HorisontalRule />
         <ApplicationEventSummary
           applicationEvent={getApplicationEventData(
             applicationEvent,
@@ -526,14 +510,7 @@ const ApplicationEvent = ({
           )}
           name={eventName}
         />
-        <TwoColumnContainer>
-          <Button
-            type="submit"
-            id={`applicationEvents[${index}].save`}
-            onClick={onSave}
-          >
-            {t("application:Page1.saveEvent")}
-          </Button>
+        <ActionContainer>
           <Button
             type="button"
             variant="secondary"
@@ -544,6 +521,13 @@ const ApplicationEvent = ({
           >
             {t("application:Page1.deleteEvent")}
           </Button>
+          <Button
+            type="submit"
+            id={`applicationEvents[${index}].save`}
+            onClick={onSave}
+          >
+            {t("application:Page1.saveEvent")}
+          </Button>
           <ConfirmationModal
             id="application-event-confirmation"
             cancelLabel="common:close"
@@ -552,7 +536,7 @@ const ApplicationEvent = ({
             onOk={del}
             ref={modalRef}
           />
-        </TwoColumnContainer>
+        </ActionContainer>
       </Accordion>
       {editorState.savedEventId &&
       editorState.savedEventId === applicationEvent.id ? (

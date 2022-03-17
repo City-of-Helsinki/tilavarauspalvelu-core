@@ -16,6 +16,10 @@ type ApplicationPageProps = {
   headContent?: React.ReactNode;
 };
 
+const StyledContainer = styled(Container)`
+  background-color: var(--color-white);
+`;
+
 const InnerContainer = styled.div`
   display: grid;
   gap: 1em;
@@ -54,12 +58,12 @@ const ApplicationPage = ({
       >
         {headContent || overrideText || t(`${translationKeyPrefix}.text`)}
       </Head>
-      <Container main>
+      <StyledContainer main>
         <InnerContainer>
           <Stepper application={application} />
           <Main>{children}</Main>
         </InnerContainer>
-      </Container>
+      </StyledContainer>
     </>
   );
 };

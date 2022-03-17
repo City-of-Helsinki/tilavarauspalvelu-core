@@ -233,6 +233,7 @@ export const getServerSideProps: GetServerSideProps = async ({
           ageGroups,
           cities,
           termsOfUse: { genericTerms },
+          overrideBackgroundColor: "var(--tilavaraus-gray)",
           ...(await serverSideTranslations(locale)),
         },
       };

@@ -47,9 +47,6 @@ const ButtonContainer = styled.div`
     margin-left: var(--spacing-layout-xs);
   }
 `;
-const BuildingName = styled.div`
-  font-family: var(--font-regular);
-`;
 
 const UnitName = styled.div`
   font-family: var(--font-bold);
@@ -299,13 +296,6 @@ const Preview = ({ onNext, application, tos }: Props): JSX.Element | null => {
                           i18n.language
                         )}
                       </UnitName>,
-                      <BuildingName>
-                        {localizedValue(
-                          reservationUnits[reservationUnit.reservationUnitId]
-                            .building?.name,
-                          i18n.language
-                        )}
-                      </BuildingName>,
                     ]}
                   />
                 )

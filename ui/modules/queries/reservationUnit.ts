@@ -163,6 +163,7 @@ export const RESERVATION_UNITS = gql`
           maxPersons
           images {
             imageType
+            smallUrl
             mediumUrl
           }
         }

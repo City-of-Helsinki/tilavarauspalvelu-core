@@ -21,6 +21,7 @@ import RequireAuthentication from "../components/common/RequireAuthentication";
 export async function getStaticProps({ locale }) {
   return {
     props: {
+      overrideBackgroundColor: "var(--tilavaraus-gray)",
       ...(await serverSideTranslations(locale)),
     },
     revalidate: 100, // In seconds

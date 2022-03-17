@@ -1,3 +1,5 @@
+import { trim } from "lodash";
+import { useRouter } from "next/router";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
@@ -15,8 +17,11 @@ const Heading = styled.h1`
   font-size: var(--fontsize-heading-l);
 `;
 
-const Container = styled.div`
-  background-color: var(--tilavaraus-header-background-color);
+const Container = styled.div<{ $white: boolean }>`
+  background-color: ${({ $white }) =>
+    $white ? "var(--color-white)" : "var(--tilavaraus-hero-background-color)"};
+  color: ${({ $white }) =>
+    $white ? "var(--color-black)" : "var(--color-white)"};
 `;
 
 const Content = styled.div`
@@ -38,20 +43,32 @@ const Head = ({
   noKoros = false,
 }: HeadProps): JSX.Element => {
   const { t } = useTranslation();
+  const router = useRouter();
+
   return (
-    <Container>
+    <Container $white={router.route === "/intro"}>
+      <Breadcrumb
+        root={{
+          label: "home",
+          linkTo: "/recurring",
+        }}
+        current={{
+          label: trim(
+            `${t("breadcrumb:application")} - ${breadCrumbText}`,
+            " - "
+          ),
+          linkTo: "#",
+        }}
+      />
       <Content>
-        <Breadcrumb
-          current={{
-            label: `${t("breadcrumb:application")} - ${breadCrumbText}`,
-            linkTo: "#",
-          }}
-        />
         <Heading>{heading}</Heading>
         {children || null}
       </Content>
       {noKoros ? null : (
-        <StyledKoros from="white" to="var(--tilavaraus-gray)" />
+        <StyledKoros
+          from="var(--tilavaraus-hero-background-color)"
+          to="var(--color-white)"
+        />
       )}
     </Container>
   );

@@ -3,9 +3,9 @@ import { IconArrowRedo, IconCalendar, IconClock, IconGroup } from "hds-react";
 import React from "react";
 import { Trans, useTranslation, TFunction } from "react-i18next";
 import styled from "styled-components";
+import { H4 } from "../../modules/style/typography";
 import { ApplicationEvent } from "../../modules/types";
 import { apiDurationToMinutes, fromUIDate } from "../../modules/util";
-import { TwoColumnContainer } from "../common/common";
 import IconWithText from "../common/IconWithText";
 
 type Props = {
@@ -14,19 +14,26 @@ type Props = {
 };
 
 const Message = styled.div`
-  margin-top: var(--spacing-s);
-  font-size: var(--fontsize-body-xl);
+  font-size: var(--fontsize-body-l);
+  margin-bottom: var(--spacing-m);
 `;
 
 const CustomIconWithText = styled(IconWithText)`
-  font-size: var(--fontsize-body-l);
+  font-size: var(--fontsize-body-m);
+  margin-top: var(--spacing-2-xs);
 `;
 
-const SubHeadLine = styled.h2`
-  font-family: var(--font-bold);
+const SubHeadLine = styled(H4).attrs({
+  as: "h2",
+})`
   margin-top: var(--spacing-layout-m);
-  font-weight: 700;
-  font-size: var(--fontsize-heading-m);
+`;
+
+const Box = styled.div`
+  border: 2px solid var(--color-black);
+  padding: var(--spacing-l) var(--spacing-m);
+  white-space: pre-line;
+  line-height: var(--lineheight-xl);
 `;
 
 const numHours = (
@@ -44,16 +51,12 @@ const numHours = (
   return hours;
 };
 
-function displayDuration(applicationEvent: ApplicationEvent, t: TFunction) {
-  const displayHours = Number(
-    (applicationEvent.minDuration || "00:00:00").split(":")[0]
-  );
-  const displayMinutes = Number(
-    (applicationEvent.minDuration || "00:00:00").split(":")[1]
-  );
+function displayDuration(duration: string, t: TFunction) {
+  const displayHours = Number((duration || "00:00:00").split(":")[0]);
+  const displayMinutes = Number((duration || "00:00:00").split(":")[1]);
 
-  return `${displayHours} ${t("common:abbreviations.hour")} ${
-    displayMinutes ? displayMinutes + t("common:abbreviations.minute") : ""
+  return `${t("common:hour", { count: displayHours })} ${
+    displayMinutes ? t("common:minute", { count: displayMinutes }) : ""
   }`;
 }
 
@@ -74,7 +77,11 @@ const ApplicationEventSummary = ({
   const minDuration = apiDurationToMinutes(
     applicationEvent.minDuration || "00:00:00"
   );
+  const maxDuration = apiDurationToMinutes(
+    applicationEvent.maxDuration || "00:00:00"
+  );
   const numPersons = Number(applicationEvent.numPersons);
+  const hours = numHours(begin, end, biweekly, eventsPerWeek, minDuration);
 
   if (!begin || !end || !minDuration) {
     return null;
@@ -85,51 +92,52 @@ const ApplicationEventSummary = ({
       <SubHeadLine>
         {t("application:Page1.applicationEventSummary")}
       </SubHeadLine>
-
-      <Message>
-        {t("applicationEventSummary:message", {
-          name,
-          startDate: begin,
-          endDate: end,
-          hours: numHours(begin, end, biweekly, eventsPerWeek, minDuration),
-        })}
-      </Message>
-      <TwoColumnContainer>
+      <Box>
+        <Message>
+          <Trans i18nKey="applicationEventSummary:message" count={hours}>
+            Olet tekemässä varausta {{ name }} kaudeksi{" "}
+            <strong>
+              {{ startDate: begin }} - {{ endDate: end }}
+            </strong>
+            .\nVarausten yhteenlaskettu kesto on vähintään{" "}
+            <strong>
+              {{
+                hours,
+              }}{" "}
+              tuntia
+            </strong>
+            .
+          </Trans>
+        </Message>
         <CustomIconWithText
           icon={<IconGroup aria-hidden />}
-          text={
-            <Trans
-              i18nKey="applicationEventSummary:numPersons"
-              count={numPersons}
-            >
-              Ryhmän koko on <strong>{{ numPersons }}</strong>
-            </Trans>
-          }
+          text={t("applicationEventSummary:numPersons", { count: numPersons })}
         />
         <CustomIconWithText
           icon={<IconClock aria-hidden />}
-          text={t("applicationEventSummary:minDuration", {
-            minDuration: displayDuration(applicationEvent, t),
-          })}
+          text={t(
+            `applicationEventSummary:${
+              minDuration === maxDuration ? "minDuration" : "durations"
+            }`,
+            {
+              minDuration: displayDuration(applicationEvent.minDuration, t),
+              maxDuration: displayDuration(applicationEvent.maxDuration, t),
+            }
+          )}
         />
         <CustomIconWithText
           icon={<IconCalendar aria-hidden />}
-          text={
-            <Trans
-              count={eventsPerWeek}
-              i18nKey="applicationEventSummary:eventsPerWeek"
-            >
-              <strong>{{ eventsPerWeek }}</strong> vuoro viikossa
-            </Trans>
-          }
+          text={t("applicationEventSummary:eventsPerWeek", {
+            count: eventsPerWeek,
+          })}
         />
         {biweekly ? (
           <CustomIconWithText
-            icon={<IconArrowRedo />}
+            icon={<IconArrowRedo aria-hidden />}
             text={<strong>{t("application:Page1.biweekly")}</strong>}
           />
         ) : null}
-      </TwoColumnContainer>
+      </Box>
     </>
   );
 };
