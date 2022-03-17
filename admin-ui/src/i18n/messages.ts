@@ -237,6 +237,7 @@ const translations: ITranslations = {
     authenticatedUser: ["Tunnistautunut käyttäjä"],
     headings: {
       customer: ["Asiakas"],
+      unit: ["Toimipiste"],
       participants: ["Harrastajat"],
       applicantType: ["Asiakastyyppi"],
       applicationCount: ["Hakumäärä"],

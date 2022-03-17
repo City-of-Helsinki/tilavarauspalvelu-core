@@ -5,6 +5,7 @@ import { TFunction } from "i18next";
 import { Button, Checkbox, Notification } from "hds-react";
 import uniq from "lodash/uniq";
 import trim from "lodash/trim";
+import { uniqBy } from "lodash";
 import withMainMenu from "../withMainMenu";
 import Heading from "./Heading";
 import { ContentHeading, H2 } from "../../styles/typography";
@@ -17,6 +18,7 @@ import {
   ApplicationStatusPayload,
 } from "../../common/api";
 import {
+  Application,
   Application as ApplicationType,
   ApplicationRound as ApplicationRoundType,
   ApplicationRoundStatus,
@@ -127,6 +129,27 @@ const getFilterConfig = (
           value: status,
         };
       }),
+    },
+    {
+      title: "Application.headings.unit",
+      filters: uniqBy(
+        applications
+          .flatMap((a) => a.applicationEvents)
+          .flatMap((ae) => ae.eventReservationUnits)
+          .flatMap((eru) => eru.reservationUnitDetails.unit),
+        "id"
+      ).map((unit) => ({
+        title: unit.name.fi,
+        function: (application: Application) =>
+          Boolean(
+            application.applicationEvents
+              .flatMap((ae) => ae.eventReservationUnits)
+              .flatMap((eru) => eru.reservationUnitDetails.unit)
+              .find((u) => {
+                return u.id === unit.id;
+              })
+          ),
+      })),
     },
   ];
 };

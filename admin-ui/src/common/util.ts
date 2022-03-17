@@ -367,7 +367,11 @@ export const parseAddressLine2 = (
 export const filterData = <T>(data: T[], filters: DataFilterOption[]): T[] => {
   return data.filter(
     (row) =>
-      filters.filter((filter) => get(row, filter.key) === filter.value)
-        .length === filters.length
+      filters.filter((filter) => {
+        if (filter.function) {
+          return filter.function(row);
+        }
+        return get(row, filter.key as string) === filter.value;
+      }).length === filters.length
   );
 };

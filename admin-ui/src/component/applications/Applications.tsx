@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { uniqBy } from "lodash";
 import { useTranslation } from "react-i18next";
 import { TFunction } from "i18next";
 import { useParams } from "react-router-dom";
@@ -13,6 +14,7 @@ import withMainMenu from "../withMainMenu";
 import { H1, H3 } from "../../styles/typography";
 import { getApplicationRound, getApplications } from "../../common/api";
 import {
+  Application,
   Application as ApplicationType,
   ApplicationRound as ApplicationRoundType,
   ApplicationRoundStatus,
@@ -81,6 +83,27 @@ const getFilterConfig = (
           value: status,
         };
       }),
+    },
+    {
+      title: "Application.headings.unit",
+      filters: uniqBy(
+        applications
+          .flatMap((a) => a.applicationEvents)
+          .flatMap((ae) => ae.eventReservationUnits)
+          .flatMap((eru) => eru.reservationUnitDetails.unit),
+        "id"
+      ).map((unit) => ({
+        title: unit.name.fi,
+        function: (application: Application) =>
+          Boolean(
+            application.applicationEvents
+              .flatMap((ae) => ae.eventReservationUnits)
+              .flatMap((eru) => eru.reservationUnitDetails.unit)
+              .find((u) => {
+                return u.id === unit.id;
+              })
+          ),
+      })),
     },
   ];
 };
