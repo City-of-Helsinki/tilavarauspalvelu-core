@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { uniqBy } from "lodash";
 import { useTranslation } from "react-i18next";
 import { TFunction } from "i18next";
 import { useParams } from "react-router-dom";
@@ -17,6 +18,9 @@ import {
   ApplicationRound as ApplicationRoundType,
   ApplicationRoundStatus,
   DataFilterConfig,
+  ApplicationStatus,
+  ApplicationEventStatus,
+  Unit,
 } from "../../common/types";
 import Loader from "../Loader";
 import DataTable, { CellConfig } from "../DataTable";
@@ -50,12 +54,26 @@ const ApplicationCount = styled(H3)`
   text-transform: lowercase;
 `;
 
+type ApplicationView = {
+  id: number;
+  applicant: string;
+  type: string;
+  units: Unit[];
+  unitsSort: string;
+  applicationCount: string;
+  applicationCountSort: number;
+  status: ApplicationStatus | ApplicationEventStatus;
+};
+
 const getFilterConfig = (
-  applications: ApplicationType[],
-  applicationRound: ApplicationRoundType
+  applications: ApplicationView[]
 ): DataFilterConfig[] => {
-  const applicantTypes = uniq(applications.map((app) => app.applicantType));
+  const applicantTypes = uniq(applications.map((app) => app.type));
   const statuses = uniq(applications.map((app) => app.status));
+  const units = uniqBy(
+    applications.flatMap((app) => app.units),
+    "id"
+  );
 
   return [
     {
@@ -63,91 +81,113 @@ const getFilterConfig = (
       filters: applicantTypes
         .filter((n) => n)
         .map((value) => ({
-          title: `Application.applicantTypes.${value}`,
-          key: "applicantType",
+          title: value,
+          key: "type",
           value: value || "",
         })),
     },
     {
       title: "Application.headings.applicationStatus",
-      filters: statuses.map((status) => {
-        const normalizedStatus = getNormalizedApplicationStatus(
-          status,
-          applicationRound.status
-        );
-        return {
-          title: `Application.statuses.${normalizedStatus}`,
-          key: "status",
-          value: status,
-        };
-      }),
+      filters: statuses.map((status) => ({
+        title: `Application.statuses.${status}`,
+        key: "status",
+        value: status,
+      })),
+    },
+    {
+      title: "Application.headings.unit",
+      filters: units.map((unit) => ({
+        title: unit.name.fi,
+        function: (application: ApplicationView) =>
+          Boolean(application.units.find((u) => u.id === unit.id)),
+      })),
     },
   ];
 };
 
-const getCellConfig = (
-  applicationRound: ApplicationRoundType,
+const appMapper = (
+  round: ApplicationRoundType,
+  app: ApplicationType,
   t: TFunction
-): CellConfig => {
-  let statusTitle: string;
+): ApplicationView => {
   let applicationStatusView: ApplicationRoundStatus;
-  switch (applicationRound.status) {
+  switch (round.status) {
     case "approved":
-      statusTitle = "Application.headings.resolutionStatus";
       applicationStatusView = "approved";
       break;
     default:
-      statusTitle = "Application.headings.reviewStatus";
       applicationStatusView = "in_review";
+  }
+
+  const units = uniqBy(
+    app.applicationEvents
+      .flatMap((ae) => ae.eventReservationUnits)
+      .flatMap((eru) => eru.reservationUnitDetails.unit),
+    "id"
+  );
+
+  return {
+    id: app.id,
+    applicant:
+      app.applicantType === "individual"
+        ? app.applicantName || ""
+        : app.organisation?.name || "",
+    type: app.applicantType
+      ? t(`Application.applicantTypes.${app.applicantType}`)
+      : "",
+    unitsSort: units.find(() => true)?.name.fi || "",
+    units,
+    status: getNormalizedApplicationStatus(app.status, applicationStatusView),
+    applicationCount: trim(
+      `${formatNumber(
+        app.aggregatedData?.appliedReservationsTotal,
+        t("common.volumeUnit")
+      )} / ${parseDuration(app.aggregatedData?.appliedMinDurationTotal)}`,
+      " / "
+    ),
+    applicationCountSort: app.aggregatedData?.appliedReservationsTotal || 0,
+  };
+};
+
+const getCellConfig = (applicationRound: ApplicationRoundType): CellConfig => {
+  let statusTitle: string;
+  switch (applicationRound.status) {
+    case "approved":
+      statusTitle = "Application.headings.resolutionStatus";
+      break;
+    default:
+      statusTitle = "Application.headings.reviewStatus";
   }
 
   return {
     cols: [
       {
         title: "Application.headings.customer",
-        key: "organisation.name",
-        transform: ({
-          applicantName,
-          applicantType,
-          organisation,
-        }: ApplicationType) =>
-          applicantType === "individual"
-            ? applicantName || ""
-            : organisation?.name || "",
+        key: "name",
       },
       {
         title: "Application.headings.applicantType",
-        key: "applicantType",
-        transform: ({ applicantType }: ApplicationType) =>
-          applicantType ? t(`Application.applicantTypes.${applicantType}`) : "",
+        key: "type",
+      },
+      {
+        title: "Application.headings.unit",
+        key: "unitsSort",
+        transform: ({ units }: ApplicationView) =>
+          units.map((u) => u.name.fi).join(", "),
       },
       {
         title: "Application.headings.applicationCount",
-        key: "aggregatedData.appliedReservationsTotal",
-        transform: ({ aggregatedData }: ApplicationType) => (
-          <>
-            {trim(
-              `${formatNumber(
-                aggregatedData?.appliedReservationsTotal,
-                t("common.volumeUnit")
-              )} / ${parseDuration(aggregatedData?.appliedMinDurationTotal)}`,
-              " / "
-            )}
-          </>
-        ),
+        key: "applicationCountSort",
+        transform: ({ applicationCount }: ApplicationView) => applicationCount,
       },
       {
         title: statusTitle,
         key: "status",
-        transform: ({ status }: ApplicationType) => {
-          const normalizedStatus = getNormalizedApplicationStatus(
-            status,
-            applicationStatusView
-          );
+        transform: ({ status }: ApplicationView) => {
           return (
             <StatusCell
-              status={normalizedStatus}
-              text={`Application.statuses.${normalizedStatus}`}
+              status={status}
+              text={`Application.statuses.${status}`}
               type="application"
             />
           );
@@ -165,7 +205,7 @@ function Applications(): JSX.Element {
   const [isLoading, setIsLoading] = useState(true);
   const [applicationRound, setApplicationRound] =
     useState<ApplicationRoundType | null>(null);
-  const [applications, setApplications] = useState<ApplicationType[] | []>([]);
+  const [applications, setApplications] = useState<ApplicationView[] | []>([]);
   const [cellConfig, setCellConfig] = useState<CellConfig | null>(null);
   const [filterConfig, setFilterConfig] = useState<DataFilterConfig[] | null>(
     null
@@ -209,13 +249,13 @@ function Applications(): JSX.Element {
           applicationRound: ar.id,
           status: "in_review,review_done,declined,sent",
         });
-        setCellConfig(getCellConfig(ar, t));
-        setFilterConfig(getFilterConfig(result, ar));
-        setApplications(result);
-        setIsLoading(false);
+        const mapped = result.map((app) => appMapper(ar, app, t));
+        setCellConfig(getCellConfig(ar));
+        setFilterConfig(getFilterConfig(mapped));
+        setApplications(mapped);
       } catch (error) {
-        const msg = "errors.errorFetchingApplications";
-        setErrorMsg(msg);
+        setErrorMsg("errors.errorFetchingApplications");
+      } finally {
         setIsLoading(false);
       }
     };
