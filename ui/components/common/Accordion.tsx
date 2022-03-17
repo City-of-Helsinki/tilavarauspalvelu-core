@@ -1,10 +1,19 @@
 import React, { useEffect, useState } from "react";
-
 import { Button, IconAngleDown, IconAngleUp, useAccordion } from "hds-react";
 import styled from "styled-components";
 
+type Theme = "default" | "thin";
+
+type Props = {
+  heading?: string;
+  open?: boolean;
+  children: React.ReactNode;
+  onToggle?: () => void;
+  id?: string;
+  theme?: Theme;
+};
+
 const AccordionElement = styled.div`
-  border-bottom: 1px solid var(--color-black-60);
   padding-bottom: var(--spacing-xs);
   margin-bottom: var(--spacing-layout-xs);
   margin-left: 0;
@@ -15,17 +24,33 @@ const HeadingButton = styled(Button).attrs({
   style: {
     "--color": "var(--color-black-90)",
   } as React.CSSProperties,
-})`
+})<{ theme: Theme }>`
   && {
     width: 100%;
     padding-left: 0;
     border-left: 0;
+    border-bottom: 1px solid var(--color-black-60) !important;
 
     span {
+      ${({ theme }) => {
+        switch (theme) {
+          case "thin":
+            return `
+              font-size: var(--fontsize-heading-s);
+              font-family: var(--font-regular);
+              font-weight: 400;
+            `;
+          case "default":
+          default:
+            return `
+              font-size: var(--fontsize-heading-m);
+              font-family: var(--font-bold);
+              font-weight: 700;
+            `;
+        }
+      }};
+
       color: var(--color-black-90);
-      font-size: var(--fontsize-heading-m);
-      font-family: var(--font-bold);
-      font-weight: 700;
       padding: 0;
       margin: 0;
       margin-right: auto;
@@ -41,20 +66,13 @@ const Content = styled.div<{ $open: boolean }>`
   display: ${({ $open }) => ($open ? "block" : "none")};
 `;
 
-type Props = {
-  heading?: string;
-  open?: boolean;
-  children: React.ReactNode;
-  onToggle?: () => void;
-  id?: string;
-};
-
 const Accordion = ({
   heading,
   open = false,
   children,
   onToggle,
   id,
+  theme = "default",
 }: Props): JSX.Element => {
   const { isOpen, openAccordion, closeAccordion } = useAccordion({
     initiallyOpen: open,
@@ -80,6 +98,7 @@ const Accordion = ({
         variant="supplementary"
         iconRight={icon}
         onClick={onToggle}
+        theme={theme}
       >
         {heading}
       </HeadingButton>

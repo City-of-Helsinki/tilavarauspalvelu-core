@@ -184,6 +184,7 @@ export const getServerSideProps: GetServerSideProps = async ({
     return {
       props: {
         ...(await serverSideTranslations(locale)),
+        overrideBackgroundColor: "var(--tilavaraus-gray)",
         reservationUnit: {
           ...reservationUnitData?.reservationUnitByPk,
           openingHours: {

@@ -29,7 +29,7 @@ const Number = styled.div<{ $current: boolean; $disabled: boolean }>`
   border-radius: 50%;
   width: 32px;
   height: 32px;
-  margin-right: 1em;
+  margin-right: var(--spacing-xs);
   text-align: center;
   align-self: flex-end;
   border: 2px solid var(--color-bus);
@@ -53,7 +53,7 @@ const Number = styled.div<{ $current: boolean; $disabled: boolean }>`
 ${({ $disabled, $current }) =>
     !$disabled && !$current
       ? "background: var(--color-bus); color: white;"
-      : ``}
+      : `background: var(--color-white);`}
 `;
 
 const Step = styled.button<{ $clickable: boolean }>`
@@ -63,7 +63,7 @@ const Step = styled.button<{ $clickable: boolean }>`
   line-height: 1;
   align-content: flex-start;
   align-items: center;
-  background: var(--tilavaraus-gray);
+  background: transparent;
 
   ${({ $clickable }) => ($clickable ? "cursor: pointer;" : "cursor: normal;")}
 `;
@@ -159,7 +159,7 @@ const Stepper = ({ application }: Props): JSX.Element => {
                   {isReady ? <IconCheck /> : index + 1}
                 </Number>
                 <Name $current={isCurrent} $disabled={isDisabled}>
-                  {index + 1}. {t(`application:navigation.${page}`)}
+                  {t(`application:navigation.${page}`)}
                 </Name>
               </Step>
             </StepContainer>

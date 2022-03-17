@@ -70,10 +70,6 @@ const Name = styled.span`
   }
 `;
 
-const Description = styled.div`
-  font-size: var(--fontsize-body-l);
-`;
-
 const Main = styled.span`
   grid-area: name;
 `;
@@ -150,9 +146,6 @@ const ReservationUnitCard = ({
       />
       <Main>
         <Name>{localizedValue(reservationUnit.name, i18n.language)}</Name>
-        <Description>
-          {localizedValue(reservationUnit.spaces[0]?.name, i18n.language)}
-        </Description>
         <Link href={reservationUnitPath(reservationUnit.id)}>
           <a target="_blank">
             <LinkContent>

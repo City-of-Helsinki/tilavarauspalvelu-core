@@ -95,5 +95,7 @@
   "maximum": "Enintään",
   "showMore": "Näytä enemmän",
   "duration": "Kesto {{duration}}",
-  "fyiLabel": "Tiedoksi"
+  "fyiLabel": "Tiedoksi",
+  "add": "Lisää",
+  "subtract": "Vähennä"
 }

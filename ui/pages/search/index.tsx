@@ -55,6 +55,7 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
 
   return {
     props: {
+      overrideBackgroundColor: "var(--tilavaraus-gray)",
       applicationRounds: activeApplicationRounds,
       ...(await serverSideTranslations(locale)),
     },
@@ -65,6 +66,7 @@ const pagingLimit = 10;
 
 const Wrapper = styled.div`
   margin-bottom: var(--spacing-layout-xl);
+  background-color: var(--tilavaraus-gray);
 `;
 
 const HeadContainer = styled.div`

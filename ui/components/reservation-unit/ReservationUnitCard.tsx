@@ -2,16 +2,21 @@ import {
   IconArrowDown,
   IconArrowUp,
   IconGroup,
-  IconTrash,
+  IconCross,
   Notification,
 } from "hds-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { ReservationUnit } from "../../modules/types";
-import { getAddress, getMainImage, localizedValue } from "../../modules/util";
+import {
+  getMainImage,
+  getTranslation,
+  localizedValue,
+} from "../../modules/util";
 import { breakpoint } from "../../modules/style";
 import { MediumButton } from "../../styles/util";
+import { fontBold } from "../../modules/style/typography";
 
 type Props = {
   order: number;
@@ -29,7 +34,7 @@ const NameCardContainer = styled.div`
 `;
 
 const PreCardLabel = styled.div`
-  font-size: var(--fontsize-heading-xs);
+  font-size: var(--fontsize-heading-s);
   font-family: var(--font-bold);
   font-weight: 700;
 `;
@@ -46,11 +51,11 @@ const CardButtonContainer = styled.div`
 `;
 
 const CardContainer = styled.div`
-  gap: var(--spacing-s);
-  background-color: white;
+  gap: var(--spacing-m);
+  background-color: var(--tilavaraus-gray);
   display: grid;
-  grid-template-columns: 76px 5fr 1fr 1fr;
-  align-items: center;
+  grid-template-columns: 163px 5fr 1fr;
+  align-items: flex-start;
 
   @media (max-width: ${breakpoint.m}) {
     grid-template-columns: 1fr 2fr;
@@ -58,40 +63,35 @@ const CardContainer = styled.div`
   }
 `;
 
-const Image = styled.img`
-  width: 76px;
-  height: 99px;
-  object-fit: cover;
+const PaddedCell = styled.div`
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-m) 0;
+  gap: var(--spacing-s);
+`;
 
-  @media (max-width: ${breakpoint.s}) {
-    width: 50px;
-    height: auto;
-  }
+const Image = styled.img`
+  width: 100%;
+  max-height: 120px;
 `;
 
 const Name = styled.div`
-  font-size: var(--fontsize-heading-m);
-  font-family: var(--font-bold);
-`;
-
-const BuildingName = styled.div`
-  font-family: var(--font-bold);
-  font-size: var(--fontsize-body-l);
-`;
-
-const Address = styled.div`
-  font-size: var(--fontsize-body-s);
+  ${fontBold};
+  font-size: var(--fontsize-heading-s);
 `;
 
 const MaxPersonsContainer = styled.div`
   display: flex;
-  justify-items: center;
-  font-size: var(--fontsize-body-l);
-  font-weight: bold;
+  align-items: center;
+  font-size: var(--fontsize-body-m);
+
+  svg {
+    margin-right: var(--spacing-2-xs);
+  }
 `;
 
-const MaxPersonsCountContainer = styled.span`
-  margin-left: var(--spacing-xs);
+const DeleteButton = styled(MediumButton)`
+  margin-right: var(--spacing-s);
 `;
 
 const ArrowContainer = styled.div`
@@ -107,8 +107,13 @@ const Circle = styled.div<{ passive: boolean }>`
   height: var(--spacing-layout-m);
   width: var(--spacing-layout-m);
   background-color: ${(props) =>
+    props.passive ? "var(--color-black-10)" : "var(--color-white)"};
+  color: ${(props) =>
+    props.passive ? "var(--color-black-50)" : "var(--color-bus)"};
+  border-width: 2px;
+  border-style: solid;
+  border-color: ${(props) =>
     props.passive ? "var(--color-black-10)" : "var(--color-bus)"};
-  color: ${(props) => (props.passive ? "var(--color-black-50)" : "white")};
   border-radius: 50%;
   display: flex;
   justify-content: center;
@@ -122,7 +127,7 @@ const Circle = styled.div<{ passive: boolean }>`
 
     border: 0;
     background-color: transparent;
-    color: white;
+    color: var(--color-bus);
     cursor: pointer;
   }
 `;
@@ -137,7 +142,7 @@ const ReservationUnitCard = ({
   onMoveDown,
   invalid,
 }: Props): JSX.Element => {
-  const { i18n, t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   return (
     <NameCardContainer>
@@ -148,42 +153,39 @@ const ReservationUnitCard = ({
         <Notification
           type="error"
           label={t("application:error.reservationUnitTooSmall")}
-        >
-          {t("application:error.reservationUnitTooSmall")}
-        </Notification>
+        />
       ) : null}
       <CardButtonContainer>
         <CardContainer>
-          <Image
-            src={getMainImage(reservationUnit)?.smallUrl}
-            alt={t("common:imgAltForSpace", {
-              name: localizedValue(reservationUnit.name, i18n.language),
-            })}
-          />
-          <div>
-            <Name>{localizedValue(reservationUnit.name, i18n.language)}</Name>
-            <BuildingName>
-              {localizedValue(reservationUnit.building?.name, i18n.language)}
-            </BuildingName>
-            <Address>{getAddress(reservationUnit)}</Address>
-          </div>
-          <MaxPersonsContainer>
-            <IconGroup aria-hidden />
-            <MaxPersonsCountContainer>
-              {reservationUnit.maxPersons}
-            </MaxPersonsCountContainer>
-          </MaxPersonsContainer>
-          <div>
-            <MediumButton
+          <Image src={getMainImage(reservationUnit)?.smallUrl} alt="" />
+          <PaddedCell>
+            <Name>
+              {getTranslation(reservationUnit, "name") ||
+                localizedValue(reservationUnit.name, i18n.language)}
+            </Name>
+            <MaxPersonsContainer>
+              {reservationUnit.maxPersons && (
+                <>
+                  <IconGroup aria-hidden />
+                  {t("reservationUnitCard:maxPersons", {
+                    count: reservationUnit.maxPersons,
+                  })}
+                </>
+              )}
+            </MaxPersonsContainer>
+          </PaddedCell>
+          <PaddedCell>
+            <DeleteButton
               variant="supplementary"
-              iconLeft={<IconTrash aria-hidden />}
+              iconLeft={<IconCross aria-hidden />}
+              size="small"
               onClick={() => {
                 onDelete(reservationUnit);
               }}
             >
               {t("reservationUnitList:buttonRemove")}
-            </MediumButton>
-          </div>
+            </DeleteButton>
+          </PaddedCell>
         </CardContainer>
         <ArrowContainer>
           <Circle passive={first}>

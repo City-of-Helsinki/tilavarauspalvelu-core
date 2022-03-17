@@ -1,7 +1,9 @@
 {
-  "message": "Olet tekemässä varausta {{name}} kaudeksi {{startDate}} - {{endDate}}. Varausten yhteenlaskettu kesto on vähintään {{hours}}.",
-  "numPersons": "Ryhmän koko on <1>{{numPersons}} henkilöä<1>",
+  "message": "Olet tekemässä varausta <1>{{name}}</1> kaudeksi <4>{{startDate}} - {{endDate}}</4>.\nVarausten yhteenlaskettu kesto on vähintään <4>{{hours}} tunti</4>.",
+  "message_plural": "Olet tekemässä varausta <1>{{name}}</1> kaudeksi <4>{{startDate}} - {{endDate}}</4>.\nVarausten yhteenlaskettu kesto on vähintään <4>{{hours}} tuntia</4>.",
+  "numPersons": "Ryhmän koko on {{count}} henkilöä",
   "minDuration": "Yhden varauksen kesto vähintään {{minDuration}}",
-  "eventsPerWeek": "<0>{{eventsPerWeek}}</0> varaus viikossa",
-  "eventsPerWeek_plural": "<0>{{eventsPerWeek}}</0> varausta viikossa"
+  "durations": "Yhden varauksen kesto vähintään {{minDuration}} ja enintään {{maxDuration}}",
+  "eventsPerWeek": "{{count}} varaus viikossa",
+  "eventsPerWeek_plural": "{{count}} varausta viikossa"
 }
