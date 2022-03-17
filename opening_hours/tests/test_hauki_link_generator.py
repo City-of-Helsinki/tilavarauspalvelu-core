@@ -9,7 +9,7 @@ from freezegun import freeze_time
 from opening_hours.hauki_link_generator import generate_hauki_link
 
 valid_signature = "3a8841996f4635970cc5a1d5dda58aaad4e2dd3cbb2857720939362792905b31"
-VALID_SIGNATURE = "b73b5d0a92326c74151d07a9e84c9906734b39aa81f44843116ce4a3c9ee3110"
+VALID_SIGNATURE = "1e52776ccc95118a29835938593c277bbddca384317820eb5e59835f36307ba6"
 ORGANIZATION = "parent-organisation"
 
 
@@ -29,7 +29,7 @@ def test_comparing_signature_with_different_date(enable_hauki_admin_ui):
     )
     params = dict(parse.parse_qsl(link))
     assert_that(
-        hmac.compare_digest(valid_signature, params["hsa_signature"])
+        hmac.compare_digest(VALID_SIGNATURE, params["hsa_signature"])
     ).is_false()
 
 

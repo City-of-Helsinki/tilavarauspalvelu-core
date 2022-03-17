@@ -109,7 +109,13 @@ class ReservationUnitSchedulerGetNextAvailableReservationTimeTestCase(TestCase):
         assert_that(end).is_not_none()
 
         assert_that(begin).is_equal_to(
-            datetime.datetime(2022, 1, 1, 10, 0, tzinfo=DEFAULT_TIMEZONE)
+            datetime.datetime(
+                2022,
+                1,
+                1,
+                10,
+                0,
+            ).astimezone(DEFAULT_TIMEZONE)
         )
 
     def test_reservations_overlapping(self, mock):
@@ -125,7 +131,7 @@ class ReservationUnitSchedulerGetNextAvailableReservationTimeTestCase(TestCase):
         assert_that(end).is_not_none()
 
         assert_that(begin).is_equal_to(
-            datetime.datetime(2022, 1, 2, 10, 0, tzinfo=DEFAULT_TIMEZONE)
+            datetime.datetime(2022, 1, 2, 10, 0).astimezone(DEFAULT_TIMEZONE)
         )
 
     def test_no_opening_hours(self, mock):
@@ -144,7 +150,7 @@ class ReservationUnitSchedulerGetNextAvailableReservationTimeTestCase(TestCase):
         begin, end = self.scheduler.get_next_available_reservation_time()
 
         assert_that(begin).is_equal_to(
-            datetime.datetime(2022, 1, 2, 10, 0, tzinfo=DEFAULT_TIMEZONE)
+            datetime.datetime(2022, 1, 2, 10, 0).astimezone(DEFAULT_TIMEZONE)
         )
 
     def test_application_round_is_open_no_opening_times_after(self, mock):
@@ -182,13 +188,13 @@ class ReservationUnitSchedulerGetNextAvailableReservationTimeTestCase(TestCase):
         )
         assert_that(possible_start_times).is_equal_to(
             {
-                datetime.datetime(2022, 1, 1, 10, 0, tzinfo=DEFAULT_TIMEZONE),
-                datetime.datetime(2022, 1, 1, 11, 30, tzinfo=DEFAULT_TIMEZONE),
-                datetime.datetime(2022, 1, 1, 13, 00, tzinfo=DEFAULT_TIMEZONE),
-                datetime.datetime(2022, 1, 1, 14, 30, tzinfo=DEFAULT_TIMEZONE),
-                datetime.datetime(2022, 1, 1, 16, 00, tzinfo=DEFAULT_TIMEZONE),
-                datetime.datetime(2022, 1, 1, 17, 30, tzinfo=DEFAULT_TIMEZONE),
-                datetime.datetime(2022, 1, 1, 19, 00, tzinfo=DEFAULT_TIMEZONE),
-                datetime.datetime(2022, 1, 1, 20, 30, tzinfo=DEFAULT_TIMEZONE),
+                datetime.datetime(2022, 1, 1, 10, 0).astimezone(DEFAULT_TIMEZONE),
+                datetime.datetime(2022, 1, 1, 11, 30).astimezone(DEFAULT_TIMEZONE),
+                datetime.datetime(2022, 1, 1, 13, 00).astimezone(DEFAULT_TIMEZONE),
+                datetime.datetime(2022, 1, 1, 14, 30).astimezone(DEFAULT_TIMEZONE),
+                datetime.datetime(2022, 1, 1, 16, 00).astimezone(DEFAULT_TIMEZONE),
+                datetime.datetime(2022, 1, 1, 17, 30).astimezone(DEFAULT_TIMEZONE),
+                datetime.datetime(2022, 1, 1, 19, 00).astimezone(DEFAULT_TIMEZONE),
+                datetime.datetime(2022, 1, 1, 20, 30).astimezone(DEFAULT_TIMEZONE),
             }
         )
