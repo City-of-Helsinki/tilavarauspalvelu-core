@@ -116,10 +116,10 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
                             price
                             bufferTimeBefore
                             bufferTimeAfter
-                          }
                         }
                     }
                 }
+            }
             """
         )
 
@@ -146,10 +146,10 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
                         node {
                             state
                             name
-                          }
                         }
                     }
                 }
+            }
             """
         )
 
@@ -219,10 +219,10 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
                         node {
                             state
                             name
-                          }
                         }
                     }
                 }
+            }
             """
         )
 
@@ -240,10 +240,10 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
                     edges {
                         node {
                             workingMemo
-                          }
                         }
                     }
                 }
+            }
             """
         )
 
@@ -261,10 +261,10 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
                     edges {
                         node {
                             workingMemo
-                          }
                         }
                     }
                 }
+            }
             """
         )
 
@@ -283,10 +283,10 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
                     edges {
                         node {
                             state
-                          }
                         }
                     }
                 }
+            }
             """
         )
 
