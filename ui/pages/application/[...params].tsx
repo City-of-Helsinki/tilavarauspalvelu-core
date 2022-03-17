@@ -27,16 +27,40 @@ import Sent from "../../components/application/Sent";
 import { CenterSpinner } from "../../components/common/common";
 import { apiDateToUIDate, deepCopy, uiDateToApiDate } from "../../modules/util";
 import RequireAuthentication from "../../components/common/RequireAuthentication";
+import {
+  Query,
+  QueryTermsOfUseArgs,
+  TermsOfUseType,
+  TermsOfUseTypeEdge,
+} from "../../modules/gql-types";
+import { TERMS_OF_USE } from "../../modules/queries/reservationUnit";
+import apolloClient from "../../modules/apolloClient";
+
+type Props = {
+  tos: TermsOfUseType[];
+};
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+  const { data: tosData } = await apolloClient.query<
+    Query,
+    QueryTermsOfUseArgs
+  >({
+    query: TERMS_OF_USE,
+  });
+
+  const tos = tosData?.termsOfUse?.edges
+    .map((n: TermsOfUseTypeEdge) => n.node)
+    .filter((n) => ["KUVAnupa", "generic1"].includes(n.pk));
+
   return {
     props: {
+      tos,
       ...(await serverSideTranslations(locale)),
     },
   };
 };
 
-const Application = (): JSX.Element | null => {
+const Application = ({ tos }: Props): JSX.Element | null => {
   const { t } = useTranslation();
 
   const [error, setError] = useState<string | null>();
@@ -241,6 +265,7 @@ const Application = (): JSX.Element | null => {
           <Preview
             application={state.application}
             onNext={saveAndNavigate("sent")}
+            tos={tos}
           />
         </ApplicationPage>
       )}
