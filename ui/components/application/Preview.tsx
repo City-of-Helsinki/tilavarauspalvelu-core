@@ -5,21 +5,26 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import styled from "styled-components";
 import { Application, ReservationUnit, Parameter } from "../../modules/types";
-import { deepCopy, formatDuration, localizedValue } from "../../modules/util";
+import {
+  deepCopy,
+  formatDuration,
+  getTranslation,
+  localizedValue,
+} from "../../modules/util";
 import { getParameters, getReservationUnit } from "../../modules/api";
 import LabelValue from "../common/LabelValue";
 import TimePreview from "../common/TimePreview";
 import ApplicantInfoPreview from "./ApplicantInfoPreview";
 import { TwoColumnContainer } from "../common/common";
 import { AccordionWithState as Accordion } from "../common/Accordion";
-import tos from "./tos";
-import spaceTos from "./space_tos";
 import { breakpoint } from "../../modules/style";
 import { MediumButton } from "../../styles/util";
+import { TermsOfUseType } from "../../modules/gql-types";
 
 type Props = {
   application: Application;
   onNext: (application: Application) => void;
+  tos: TermsOfUseType[];
 };
 
 const mapArrayById = (
@@ -103,7 +108,7 @@ const Terms = styled.div`
   }
 `;
 
-const Preview = ({ onNext, application }: Props): JSX.Element | null => {
+const Preview = ({ onNext, application, tos }: Props): JSX.Element | null => {
   const [ready, setReady] = useState(false);
 
   const [ageGroupOptions, setAgeGroupOptions] = useState<{
@@ -191,6 +196,9 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
       </>
     );
   }
+
+  const tos1 = tos.find((n) => n.pk === "generic1");
+  const tos2 = tos.find((n) => n.pk === "KUVAnupa");
 
   return ready ? (
     <>
@@ -318,14 +326,12 @@ const Preview = ({ onNext, application }: Props): JSX.Element | null => {
           </Accordion>
         );
       })}
-      <SmallSubHeadline>
-        {t("application:preview.termsOfService")}
-      </SmallSubHeadline>
-      <Terms tabIndex={0}>{tos}</Terms>
+      <SmallSubHeadline>{t("reservationUnit:termsOfUse")}</SmallSubHeadline>
+      <Terms tabIndex={0}>{getTranslation(tos1, "text")}</Terms>
       <SmallSubHeadline>
         {t("application:preview.reservationUnitTerms")}
       </SmallSubHeadline>
-      <Terms tabIndex={0}>{spaceTos}</Terms>
+      <Terms tabIndex={0}>{getTranslation(tos2, "text")}</Terms>
       <CheckboxContainer>
         <Checkbox
           id="preview.acceptTermsOfUse"

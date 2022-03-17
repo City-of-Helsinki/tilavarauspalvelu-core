@@ -256,6 +256,7 @@ export const TERMS_OF_USE = gql`
     termsOfUse(termsType: $termsType) {
       edges {
         node {
+          pk
           nameFi
           nameEn
           nameSv
