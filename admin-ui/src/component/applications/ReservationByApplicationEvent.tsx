@@ -187,7 +187,7 @@ function ReservationByApplicationEvent(): JSX.Element | null {
               <Location>
                 <IconLocation />
                 <H2>
-                  {localizedValue(reservationUnit.building.name, i18n.language)}
+                  {localizedValue(reservationUnit.unit?.name.fi, i18n.language)}
                 </H2>
                 <span>
                   {localizedValue(reservationUnit.name, i18n.language)}

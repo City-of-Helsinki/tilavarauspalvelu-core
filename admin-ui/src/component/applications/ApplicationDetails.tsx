@@ -371,7 +371,7 @@ function ApplicationDetails(): JSX.Element | null {
                           key={reservationUnit.id}
                           label={`${t("common.option")} ${index + 1}.`}
                           value={`${
-                            reservationUnit.reservationUnitDetails.building.name
+                            reservationUnit.reservationUnitDetails.unit?.name.fi
                           }, ${localizedValue(
                             reservationUnit.reservationUnitDetails.name,
                             i18n.language

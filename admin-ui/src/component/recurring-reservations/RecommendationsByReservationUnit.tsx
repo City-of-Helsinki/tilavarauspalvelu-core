@@ -496,7 +496,7 @@ function RecommendationsByReservationUnit(): JSX.Element {
                     <Props>
                       <Prop>
                         <IconLocation aria-hidden />{" "}
-                        {reservationUnit.building.name}
+                        {reservationUnit.unit?.name.fi}
                       </Prop>
                       {reservationUnit.purposes && (
                         <Prop>

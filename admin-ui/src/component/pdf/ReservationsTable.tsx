@@ -105,7 +105,7 @@ const ReservationsTable = ({
           </Td>
           <Td w={width[1]}>
             <Text>
-              {reservationUnit.name.fi}, {reservationUnit.building.name}
+              {reservationUnit.name.fi}, {reservationUnit.unit?.name.fi}
             </Text>
           </Td>
           <Td w={width[2]}>

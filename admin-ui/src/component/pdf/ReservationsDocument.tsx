@@ -79,7 +79,7 @@ const ReservationsDocument = ({
               </Text>
               <View style={{ fontSize: SIZE_MEDIUM }}>
                 <B>{resUnit.name.fi}</B>
-                <Text>{resUnit.building.name}</Text>
+                <Text>{resUnit.unit?.name.fi}</Text>
               </View>
               <P />
               <ReservationsTable
