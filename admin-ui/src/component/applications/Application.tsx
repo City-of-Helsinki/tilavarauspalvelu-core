@@ -674,8 +674,8 @@ function Application(): JSX.Element | null {
                                           <td>
                                             {trim(
                                               `${
-                                                reservationUnit.building
-                                                  ?.name || ""
+                                                reservationUnit.unit?.name.fi ||
+                                                ""
                                               }, ${
                                                 localizedValue(
                                                   reservationUnit.name,
