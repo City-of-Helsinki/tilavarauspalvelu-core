@@ -1,9 +1,9 @@
 import React from "react";
 import Script from "next/script";
-import { isBrowser } from "../modules/const";
+import { matomoEnabled, isBrowser } from "../modules/const";
 
 const ExternalScripts = (): JSX.Element | null => {
-  if (!isBrowser) {
+  if (!isBrowser || !matomoEnabled) {
     return null;
   }
 
