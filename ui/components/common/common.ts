@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import { LoadingSpinner, Notification as HDSNotification } from "hds-react";
 import { breakpoint } from "../../modules/style";
+import { H5 } from "../../modules/style/typography";
 
 export const TwoColumnContainer = styled.div`
   @media (max-width: ${breakpoint.m}) {
@@ -23,6 +24,15 @@ export const SpanTwoColumns = styled.span`
   @media (max-width: ${breakpoint.m}) {
     grid-column-start: 1;
     grid-column-end: 2;
+  }
+`;
+
+export const FormSubHeading = styled(H5)`
+  @media (min-width: ${breakpoint.m}) {
+    grid-column-start: 1;
+    grid-column-end: 3;
+    margin-top: var(--spacing-m);
+    margin-bottom: var(--spacing-2-xs);
   }
 `;
 

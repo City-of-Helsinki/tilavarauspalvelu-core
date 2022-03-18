@@ -3,7 +3,7 @@ import { IconArrowRedo, IconCalendar, IconClock, IconGroup } from "hds-react";
 import React from "react";
 import { Trans, useTranslation, TFunction } from "react-i18next";
 import styled from "styled-components";
-import { H4 } from "../../modules/style/typography";
+import { H5 } from "../../modules/style/typography";
 import { ApplicationEvent } from "../../modules/types";
 import { apiDurationToMinutes, fromUIDate } from "../../modules/util";
 import IconWithText from "../common/IconWithText";
@@ -23,7 +23,7 @@ const CustomIconWithText = styled(IconWithText)`
   margin-top: var(--spacing-2-xs);
 `;
 
-const SubHeadLine = styled(H4).attrs({
+const SubHeadLine = styled(H5).attrs({
   as: "h2",
 })`
   margin-top: var(--spacing-layout-m);

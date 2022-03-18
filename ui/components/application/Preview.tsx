@@ -15,11 +15,12 @@ import { getParameters, getReservationUnit } from "../../modules/api";
 import LabelValue from "../common/LabelValue";
 import TimePreview from "../common/TimePreview";
 import ApplicantInfoPreview from "./ApplicantInfoPreview";
-import { TwoColumnContainer } from "../common/common";
+import { FormSubHeading, TwoColumnContainer } from "../common/common";
 import { AccordionWithState as Accordion } from "../common/Accordion";
 import { breakpoint } from "../../modules/style";
 import { MediumButton } from "../../styles/util";
 import { TermsOfUseType } from "../../modules/gql-types";
+import { fontRegular } from "../../modules/style/typography";
 
 type Props = {
   application: Application;
@@ -48,20 +49,19 @@ const ButtonContainer = styled.div`
   }
 `;
 
-const UnitName = styled.div`
-  font-family: var(--font-bold);
+const UnitList = styled.ol`
+  margin: 0;
+  padding: 0;
+  ${fontRegular};
+  width: 100%;
+  list-style: none;
 `;
 
-const Ruler = styled.hr`
-  margin-top: var(--spacing-layout-m);
-  border-left: none;
-  border-right: none;
-`;
-
-const SmallSubHeadline = styled.div`
-  font-family: var(--font-bold);
-  margin-top: var(--spacing-layout-m);
-  font-size: var(--fontsize-heading-m);
+const UnitName = styled.li`
+  padding: var(--spacing-m) var(--spacing-xs);
+  border-bottom: 1px solid var(--color-black-20);
+  display: flex;
+  gap: var(--spacing-xl);
 `;
 
 const TimePreviewContainer = styled.div`
@@ -73,7 +73,7 @@ const TimePreviewContainer = styled.div`
 `;
 
 const CheckboxContainer = styled.div`
-  margin-top: var(--spacing-layout-l);
+  margin-top: var(--spacing-m);
   display: flex;
   align-items: center;
 `;
@@ -88,6 +88,8 @@ const StyledNotification = styled(Notification)`
   }
 `;
 
+const StyledLabelValue = styled(LabelValue).attrs({ theme: "thin" })``;
+
 const Terms = styled.div`
   margin-top: var(--spacing-s);
   width: (--container-width-m);
@@ -96,6 +98,7 @@ const Terms = styled.div`
   overflow-y: scroll;
   background-color: var(--color-white);
   padding: var(--spacing-s);
+  border: 1px solid var(--color-black-90);
 
   @media (max-width: ${breakpoint.m}) {
     height: auto;
@@ -203,6 +206,7 @@ const Preview = ({ onNext, application, tos }: Props): JSX.Element | null => {
         open
         id="basicInfo"
         heading={t("application:preview.basicInfoSubHeading")}
+        theme="thin"
       >
         <ApplicantInfoPreview cities={cities} application={application} />
       </Accordion>
@@ -222,17 +226,21 @@ const Preview = ({ onNext, application, tos }: Props): JSX.Element | null => {
             id={`applicationEvent-${i}`}
             key={applicationEvent.id}
             heading={applicationEvent.name || ""}
+            theme="thin"
           >
             <TwoColumnContainer>
-              <LabelValue
+              <FormSubHeading>
+                {t("application:preview.subHeading.applicationInfo")}
+              </FormSubHeading>
+              <StyledLabelValue
                 label={t("application:preview.applicationEvent.name")}
                 value={applicationEvent.name}
               />
-              <LabelValue
+              <StyledLabelValue
                 label={t("application:preview.applicationEvent.numPersons")}
                 value={applicationEvent.numPersons}
               />
-              <LabelValue
+              <StyledLabelValue
                 label={t("application:preview.applicationEvent.ageGroup")}
                 value={
                   applicationEvent.ageGroupId
@@ -244,7 +252,7 @@ const Preview = ({ onNext, application, tos }: Props): JSX.Element | null => {
                     : ""
                 }
               />
-              <LabelValue
+              <StyledLabelValue
                 label={t("application:preview.applicationEvent.purpose")}
                 value={
                   applicationEvent.purposeId != null
@@ -255,56 +263,57 @@ const Preview = ({ onNext, application, tos }: Props): JSX.Element | null => {
                     : ""
                 }
               />
-              <LabelValue
+              <StyledLabelValue
                 label={t("application:preview.applicationEvent.begin")}
                 value={applicationEvent.begin || ""}
               />
-              <LabelValue
+              <StyledLabelValue
                 label={t("application:preview.applicationEvent.end")}
                 value={applicationEvent.end || ""}
               />
-              <LabelValue
+              <StyledLabelValue
                 label={t("application:preview.applicationEvent.minDuration")}
                 value={formatDuration(applicationEvent.minDuration as string)}
               />
-              <LabelValue
+              <StyledLabelValue
                 label={t("application:preview.applicationEvent.maxDuration")}
                 value={formatDuration(applicationEvent.maxDuration as string)}
               />
-              <LabelValue
+              <StyledLabelValue
                 label={t("application:preview.applicationEvent.eventsPerWeek")}
                 value={applicationEvent.eventsPerWeek}
               />
               <div />
-              {/* <LabelValue
+              {/* <StyledLabelValue
               label={t("application:preview.applicationEvent.biweekly")}
               value={t(`common:${applicationEvent.biweekly}`) as string}
             /> */}
+            </TwoColumnContainer>
+
+            <FormSubHeading>
+              {t("application:Page1.spacesSubHeading")}
+            </FormSubHeading>
+            <UnitList>
               {applicationEvent.eventReservationUnits.map(
                 (reservationUnit, index) => (
-                  <LabelValue
-                    key={reservationUnit.reservationUnitId}
-                    label={t(
-                      "application:preview.applicationEvent.reservationUnit",
-                      { order: index + 1 }
-                    )}
-                    value={[
-                      <UnitName>
+                  <React.Fragment key={reservationUnit.reservationUnitId}>
+                    <UnitName>
+                      <div>{index + 1}</div>
+                      <div>
                         {localizedValue(
                           reservationUnits[reservationUnit.reservationUnitId]
                             .name,
                           i18n.language
                         )}
-                      </UnitName>,
-                    ]}
-                  />
+                      </div>
+                    </UnitName>
+                  </React.Fragment>
                 )
               )}
-            </TwoColumnContainer>
-            <Ruler />
-            <SmallSubHeadline>
+            </UnitList>
+            <FormSubHeading>
               {t("application:preview.applicationEventSchedules")}
-            </SmallSubHeadline>
+            </FormSubHeading>
             <TimePreviewContainer data-testid={`time-selector__preview-${i}`}>
               <TimePreview
                 applicationEventSchedules={[
@@ -316,11 +325,11 @@ const Preview = ({ onNext, application, tos }: Props): JSX.Element | null => {
           </Accordion>
         );
       })}
-      <SmallSubHeadline>{t("reservationUnit:termsOfUse")}</SmallSubHeadline>
+      <FormSubHeading>{t("reservationUnit:termsOfUse")}</FormSubHeading>
       <Terms tabIndex={0}>{getTranslation(tos1, "text")}</Terms>
-      <SmallSubHeadline>
+      <FormSubHeading>
         {t("application:preview.reservationUnitTerms")}
-      </SmallSubHeadline>
+      </FormSubHeading>
       <Terms tabIndex={0}>{getTranslation(tos2, "text")}</Terms>
       <CheckboxContainer>
         <Checkbox

@@ -23,9 +23,11 @@ const AccordionElement = styled.div`
 const HeadingButton = styled(Button).attrs({
   style: {
     "--color": "var(--color-black-90)",
+    "--background-color-hover": "transparent",
+    "--background-color-hover-focus": "transparent",
   } as React.CSSProperties,
 })<{ theme: Theme }>`
-  && {
+  &&& {
     width: 100%;
     padding-left: 0;
     border-left: 0;
@@ -36,9 +38,9 @@ const HeadingButton = styled(Button).attrs({
         switch (theme) {
           case "thin":
             return `
-              font-size: var(--fontsize-heading-s);
-              font-family: var(--font-regular);
-              font-weight: 400;
+              font-size: var(--fontsize-heading-m);
+              font-family: var(--font-medium);
+              font-weight: 500;
             `;
           case "default":
           default:
@@ -58,6 +60,10 @@ const HeadingButton = styled(Button).attrs({
 
     :focus {
       outline: 2px solid var(--color-coat-of-arms);
+    }
+
+    :not(:disabled):hover {
+      border-bottom-color: var(--color-coat-of-arms) !important;
     }
   }
 `;

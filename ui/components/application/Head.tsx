@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
+import { H1 } from "../../modules/style/typography";
 import Breadcrumb from "../common/Breadcrumb";
 import KorosDefault from "../common/KorosDefault";
 
@@ -13,9 +14,7 @@ type HeadProps = {
   noKoros?: boolean;
 };
 
-const Heading = styled.h1`
-  font-size: var(--fontsize-heading-l);
-`;
+const Heading = styled(H1)``;
 
 const Container = styled.div<{ $white: boolean }>`
   background-color: ${({ $white }) =>
@@ -28,7 +27,7 @@ const Content = styled.div`
   padding: var(--spacing-l) var(--spacing-m) var(--spacing-layout-xl);
   max-width: var(--container-width-xl);
   margin: 0 auto;
-  font-size: var(--fontsize-heading-m);
+  font-size: var(--fontsize-heading-xs);
   font-weight: 500;
 `;
 
