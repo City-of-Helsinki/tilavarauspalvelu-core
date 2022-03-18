@@ -116,10 +116,10 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
                             price
                             bufferTimeBefore
                             bufferTimeAfter
-                          }
                         }
                     }
                 }
+            }
             """
         )
 
@@ -146,10 +146,46 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
                         node {
                             state
                             name
-                          }
                         }
                     }
                 }
+            }
+            """
+        )
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filter_reservation_state_accepts_multiple_values(self):
+        self.maxDiff = None
+        self.client.force_login(self.general_admin)
+        metadata = ReservationMetadataSetFactory()
+        res_unit = ReservationUnitFactory(metadata_set=metadata)
+        ReservationFactory(
+            state=STATE_CHOICES.REQUIRES_HANDLING,
+            reservation_unit=[res_unit],
+            recurring_reservation=None,
+            name="Show me",
+        )
+        ReservationFactory(
+            state=STATE_CHOICES.CANCELLED,
+            reservation_unit=[res_unit],
+            recurring_reservation=None,
+            name="Show me too",
+        )
+        response = self.query(
+            """
+            query {
+                reservations(state: ["REQUIRES_HANDLING", "CANCELLED"]) {
+                    edges {
+                        node {
+                            state
+                            name
+                        }
+                    }
+                }
+            }
             """
         )
 
@@ -183,10 +219,10 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
                         node {
                             state
                             name
-                          }
                         }
                     }
                 }
+            }
             """
         )
 
@@ -204,10 +240,10 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
                     edges {
                         node {
                             workingMemo
-                          }
                         }
                     }
                 }
+            }
             """
         )
 
@@ -225,10 +261,10 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
                     edges {
                         node {
                             workingMemo
-                          }
                         }
                     }
                 }
+            }
             """
         )
 
@@ -247,10 +283,10 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
                     edges {
                         node {
                             state
-                          }
                         }
                     }
                 }
+            }
             """
         )
 

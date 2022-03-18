@@ -7,7 +7,17 @@ from reservations.models import STATE_CHOICES, Reservation
 class ReservationFilterSet(django_filters.FilterSet):
     begin = django_filters.DateTimeFilter(field_name="begin", lookup_expr="gte")
     end = django_filters.DateTimeFilter(field_name="end", lookup_expr="lte")
-    state = django_filters.CharFilter(field_name="state", lookup_expr="iexact")
+    state = django_filters.MultipleChoiceFilter(
+        field_name="state",
+        lookup_expr="iexact",
+        choices=tuple(
+            (
+                key.upper(),  # Must use upper case characters to comply with GraphQL Enum
+                value,
+            )
+            for key, value in STATE_CHOICES.STATE_CHOICES
+        ),
+    )
 
     # Filter for displaying reservations which requires or had required handling.
     requested = django_filters.BooleanFilter(method="get_requested")
