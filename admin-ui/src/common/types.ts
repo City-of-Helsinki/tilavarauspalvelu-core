@@ -111,6 +111,12 @@ export type ReservationUnit = {
   reservationUnitType: Parameter;
   building: ReservationUnitBuilding;
   purposes: Parameter[];
+  unit: Unit;
+};
+
+export type Unit = {
+  name: TranslationObject;
+  id: number;
 };
 
 export type Parameter = {
@@ -255,7 +261,9 @@ export interface ReservationUnitsParameters {
 }
 
 export interface DataFilterOption {
-  key: string;
+  key?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  function?: (row: any) => boolean;
   value?: string | number | boolean;
   title: string | null;
 }

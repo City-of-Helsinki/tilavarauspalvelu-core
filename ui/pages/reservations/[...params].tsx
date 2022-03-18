@@ -82,6 +82,7 @@ export const getServerSideProps: GetServerSideProps = async ({
     return {
       props: {
         ...(await serverSideTranslations(locale)),
+        overrideBackgroundColor: "var(--tilavaraus-gray)",
         reasons,
         id,
       },

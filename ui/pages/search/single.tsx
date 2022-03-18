@@ -52,6 +52,7 @@ const StyledKorosDefault = styled(KorosDefault)``;
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
+      overrideBackgroundColor: "var(--tilavaraus-gray)",
       ...(await serverSideTranslations(locale)),
     },
   };

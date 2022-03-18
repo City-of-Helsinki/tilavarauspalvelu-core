@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { weekdays } from "../../modules/const";
 import { ApplicationEventSchedule } from "../../modules/types";
-import { fontBold, H3 } from "../../modules/style/typography";
+import { fontBold, H4 } from "../../modules/style/typography";
 import { breakpoint } from "../../modules/style";
 
 type Props = {
@@ -64,7 +64,11 @@ const Wrapper = styled.div`
   }
 `;
 
-const Heading = styled(H3)`
+const Heading = styled(H4).attrs({
+  as: "div",
+})`
+  ${fontBold};
+  font-size: var(--fontsize-heading-s);
   margin-top: 0;
 `;
 
