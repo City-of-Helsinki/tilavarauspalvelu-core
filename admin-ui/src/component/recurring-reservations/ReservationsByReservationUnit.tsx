@@ -184,7 +184,7 @@ function ReservationsByReservationUnit(): JSX.Element | null {
               <Location>
                 <IconLocation aria-hidden />
                 <div>
-                  <H2>{reservationUnit.building.name}</H2>
+                  <H2>{reservationUnit.unit?.name.fi}</H2>
                   <Space>
                     {localizedValue(reservationUnit.name, i18n.language)}
                   </Space>

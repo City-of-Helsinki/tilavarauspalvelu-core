@@ -109,7 +109,6 @@ export type ReservationUnit = {
   images: Image[];
   location: Location;
   reservationUnitType: Parameter;
-  building: ReservationUnitBuilding;
   purposes: Parameter[];
   unit: Unit;
 };

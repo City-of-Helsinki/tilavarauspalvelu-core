@@ -422,7 +422,7 @@ function Criteria(): JSX.Element {
                         <div>
                           <Strong>
                             {localizedValue(
-                              reservationUnit.building.name,
+                              reservationUnit.unit?.name.fi,
                               i18n.language
                             )}
                           </Strong>
