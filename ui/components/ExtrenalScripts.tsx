@@ -2,7 +2,7 @@ import React from "react";
 import Script from "next/script";
 import { isBrowser } from "../modules/const";
 
-const ExternalScripts = () => {
+const ExternalScripts = (): JSX.Element | null => {
   if (!isBrowser) {
     return null;
   }
