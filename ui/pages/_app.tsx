@@ -16,6 +16,7 @@ import "../styles/global.scss";
 import { TrackingWrapper } from "../modules/tracking";
 import { FullscreenSpinner } from "../components/common/FullscreenSpinner";
 import { DataContextProvider } from "../context/DataContext";
+import ExternalScripts from "../components/ExtrenalScripts";
 
 if (mockRequests) {
   require("../mocks");
@@ -43,24 +44,27 @@ function MyApp({ Component, pageProps }: AppProps) {
   );
 
   return (
-    <DataContextProvider>
-      <TrackingWrapper>
-        <AuthenticationProvider
-          authenticating={FullscreenSpinner}
-          notAuthenticated={SessionLost}
-          sessionLostComponent={SessionLost}
-          configuration={oidcConfiguration}
-          isEnabled={authEnabled}
-          callbackComponentOverride={LoggingIn}
-        >
-          <ApolloProvider client={apolloClient}>
-            <PageWrapper {...pageProps}>
-              <Component {...pageProps} />
-            </PageWrapper>
-          </ApolloProvider>
-        </AuthenticationProvider>
-      </TrackingWrapper>
-    </DataContextProvider>
+    <>
+      <DataContextProvider>
+        <TrackingWrapper>
+          <AuthenticationProvider
+            authenticating={FullscreenSpinner}
+            notAuthenticated={SessionLost}
+            sessionLostComponent={SessionLost}
+            configuration={oidcConfiguration}
+            isEnabled={authEnabled}
+            callbackComponentOverride={LoggingIn}
+          >
+            <ApolloProvider client={apolloClient}>
+              <PageWrapper {...pageProps}>
+                <Component {...pageProps} />
+              </PageWrapper>
+            </ApolloProvider>
+          </AuthenticationProvider>
+        </TrackingWrapper>
+      </DataContextProvider>
+      <ExternalScripts />
+    </>
   );
 }
 
