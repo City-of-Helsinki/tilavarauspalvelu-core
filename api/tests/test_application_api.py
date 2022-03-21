@@ -1039,3 +1039,18 @@ def test_application_filter_by_units(
     assert_that(
         response.data[1]["id"] in [application_id_one, application_id_too]
     ).is_true()
+
+
+@pytest.mark.django_db
+def test_application_filter_by_user(
+    general_admin_api_client, application, user, user_2
+):
+    response = general_admin_api_client.get(
+        f"{reverse('application-list')}?user={user.id}", format="json"
+    )
+    assert_that(response.data).is_length(1)
+
+    response = general_admin_api_client.get(
+        f"{reverse('application-list')}?user={user_2.id}", format="json"
+    )
+    assert_that(response.data).is_length(0)

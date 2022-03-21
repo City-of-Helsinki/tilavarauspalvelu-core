@@ -1,6 +1,6 @@
 from django_filters import rest_framework as filters
 
-from applications.models import ApplicationEvent, ApplicationRound
+from applications.models import ApplicationEvent, ApplicationRound, User
 from spaces.models import Unit
 
 
@@ -12,6 +12,7 @@ class ApplicationFilter(filters.FilterSet):
     unit = filters.ModelMultipleChoiceFilter(
         method="filter_by_possible_units", queryset=Unit.objects.all()
     )
+    user = filters.ModelChoiceFilter(field_name="user", queryset=User.objects.all())
 
     def filter_by_possible_units(self, qs, property, value):
         if not value:
