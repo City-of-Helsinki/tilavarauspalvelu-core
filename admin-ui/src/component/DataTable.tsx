@@ -226,6 +226,16 @@ export const Heading = styled.thead`
   }
 `;
 
+const A = styled.a`
+  &,
+  :visited,
+  :hover,
+  :active {
+    text-decoration: inherit;
+    color: inherit;
+  }
+`;
+
 const Body = styled.tbody`
   ${Row} {
     &:hover {
@@ -739,6 +749,7 @@ function DataTable({
                         return (
                           <Row
                             key={rowKey}
+                            $clickable={!!cellConfig.rowLink}
                             onClick={(): void => {
                               if (isSelectionActive) {
                                 if (!isRowDisabled(row)) {
@@ -754,7 +765,6 @@ function DataTable({
                                 history.push(link);
                               }
                             }}
-                            $clickable={!!cellConfig.rowLink}
                             $disabled={
                               isSelectionActive &&
                               isRowDisabled &&
@@ -790,17 +800,34 @@ function DataTable({
                                 />
                               </SelectionCell>
                             )}
-                            {cellConfig.cols.map((col: Column): JSX.Element => {
-                              const colKey = `${rowKey}${col.key}`;
-                              const value = col.transform
-                                ? col.transform(row)
-                                : get(row, col.key);
-                              return (
-                                <Cell key={colKey}>
-                                  <span className="cellContent">{value}</span>
-                                </Cell>
-                              );
-                            })}
+                            {cellConfig.cols.map(
+                              (col: Column, index: number): JSX.Element => {
+                                const colKey = `${rowKey}${col.key}`;
+                                const value = col.transform
+                                  ? col.transform(row)
+                                  : get(row, col.key);
+
+                                const link =
+                                  index === 0 && cellConfig?.rowLink
+                                    ? cellConfig.rowLink(row)
+                                    : null;
+                                return (
+                                  <Cell key={colKey}>
+                                    {link ? (
+                                      <A href={link} className="cellContent">
+                                        <span className="cellContent">
+                                          {value}
+                                        </span>
+                                      </A>
+                                    ) : (
+                                      <span className="cellContent">
+                                        {value}
+                                      </span>
+                                    )}
+                                  </Cell>
+                                );
+                              }
+                            )}
                           </Row>
                         );
                       }
