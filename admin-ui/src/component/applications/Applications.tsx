@@ -163,7 +163,7 @@ const getCellConfig = (applicationRound: ApplicationRoundType): CellConfig => {
     cols: [
       {
         title: "Application.headings.customer",
-        key: "name",
+        key: "applicant",
       },
       {
         title: "Application.headings.applicantType",
