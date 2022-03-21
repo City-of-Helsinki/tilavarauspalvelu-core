@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { TextInput } from "hds-react";
 import { useForm } from "react-hook-form";
 import { applicationErrorText } from "../../modules/util";
+import { FormSubHeading } from "../common/common";
 
 type Props = {
   register: ReturnType<typeof useForm>["register"];
@@ -13,6 +14,9 @@ const BillingAddress = ({ register, errors }: Props): JSX.Element | null => {
   const { t } = useTranslation();
   return (
     <>
+      <FormSubHeading>
+        {t("application:Page3.subHeading.billingAddress")}
+      </FormSubHeading>
       <TextInput
         ref={register({ required: true })}
         label={t("application:Page3.billingAddress.streetAddress")}

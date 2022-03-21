@@ -37,7 +37,7 @@ import { durationOptions } from "../../modules/const";
 import { after, before } from "../../modules/validation";
 import ConfirmationModal, { ModalRef } from "../common/ConfirmationModal";
 import { MediumButton } from "../../styles/util";
-import { fontRegular, H4 } from "../../modules/style/typography";
+import { fontRegular, H5 } from "../../modules/style/typography";
 import { ReservationUnitType } from "../../modules/gql-types";
 
 type OptionTypes = {
@@ -61,7 +61,7 @@ type Props = {
   onDeleteEvent: () => void;
 };
 
-const SubHeadLine = styled(H4).attrs({
+const SubHeadLine = styled(H5).attrs({
   as: "h2",
 })`
   margin-top: var(--spacing-layout-m);
