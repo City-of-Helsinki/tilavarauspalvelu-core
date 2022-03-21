@@ -138,7 +138,7 @@ const ReservationUnitCard = ({
       />
       <MainContent>
         <Name>
-          <Link href={`../reservation-unit/${reservationUnit.id}`} passHref>
+          <Link href={`../reservation-unit/${reservationUnit.pk}`} passHref>
             <Anchor>{getTranslation(reservationUnit, "name")}</Anchor>
           </Link>
         </Name>

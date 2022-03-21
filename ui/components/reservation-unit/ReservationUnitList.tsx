@@ -3,17 +3,23 @@ import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { getReservationUnit } from "../../modules/api";
 import {
   ApplicationEvent,
   ApplicationRound,
   OptionType,
-  ReservationUnit,
 } from "../../modules/types";
 import Modal from "../common/Modal";
 import ReservationUnitModal from "./ReservationUnitModal";
 import ReservationUnitCard from "./ReservationUnitCard";
 import { MediumButton } from "../../styles/util";
+import {
+  Query,
+  QueryReservationUnitsArgs,
+  ReservationUnitByPkType,
+  ReservationUnitType,
+} from "../../modules/gql-types";
+import { RESERVATION_UNITS } from "../../modules/queries/reservationUnit";
+import apolloClient from "../../modules/apolloClient";
 
 type OptionTypes = {
   purposeOptions: OptionType[];
@@ -22,7 +28,7 @@ type OptionTypes = {
 };
 
 type Props = {
-  selectedReservationUnits: ReservationUnit[];
+  selectedReservationUnits: ReservationUnitType[] | ReservationUnitByPkType;
   applicationEvent: ApplicationEvent;
   fieldName: string;
   form: ReturnType<typeof useForm>;
@@ -54,14 +60,14 @@ const ReservationUnitList = ({
 }: Props): JSX.Element => {
   const [showModal, setShowModal] = useState(false);
   const [reservationUnits, setReservationUnits] = useState(
-    [] as ReservationUnit[]
+    [] as ReservationUnitType[]
   );
 
-  const handleAdd = (ru: ReservationUnit) => {
+  const handleAdd = (ru: ReservationUnitType) => {
     setReservationUnits([...reservationUnits, ru]);
   };
 
-  const isValid = (units: ReservationUnit[]) => {
+  const isValid = (units: ReservationUnitType[]) => {
     const error = units
       .map((resUnit) => minSize && resUnit.maxPersons < minSize)
       .find((a) => a);
@@ -73,7 +79,7 @@ const ReservationUnitList = ({
       fieldName,
       reservationUnits.map((resUnit, index) => {
         return {
-          reservationUnitId: resUnit.id,
+          reservationUnitId: resUnit.pk,
           priority: index,
           maxPersons: resUnit.maxPersons,
         };
@@ -99,15 +105,23 @@ const ReservationUnitList = ({
       if (applicationEvent.eventReservationUnits?.length === 0) {
         data = selectedReservationUnits;
       } else {
-        const promises = applicationEvent.eventReservationUnits.map(
-          (eventUnit) => getReservationUnit(eventUnit.reservationUnitId)
+        const eventUniIds = applicationEvent.eventReservationUnits.map(
+          (n) => n.reservationUnitId
         );
-        data = await Promise.all(promises);
+        const { data: reservationUnitData } = await apolloClient.query<
+          Query,
+          QueryReservationUnitsArgs
+        >({
+          query: RESERVATION_UNITS,
+        });
+        data = reservationUnitData?.reservationUnits?.edges
+          .map((n) => n.node)
+          .filter((n) => eventUniIds.includes(n.pk));
       }
       if (isMounted) {
         setReservationUnits(
           data.filter((ru) =>
-            applicationRound.reservationUnitIds.includes(ru.id)
+            applicationRound.reservationUnitIds.includes(ru.pk)
           )
         );
       }
@@ -124,10 +138,10 @@ const ReservationUnitList = ({
   ]);
 
   const move = (
-    units: ReservationUnit[],
+    units: ReservationUnitType[],
     from: number,
     to: number
-  ): ReservationUnit[] => {
+  ): ReservationUnitType[] => {
     const copy = [...units];
     const i = units[from];
     copy.splice(from, 1);
@@ -135,19 +149,19 @@ const ReservationUnitList = ({
     return copy;
   };
 
-  const remove = (reservationUnit: ReservationUnit) => {
+  const remove = (reservationUnit: ReservationUnitType) => {
     setReservationUnits([
-      ...reservationUnits.filter((ru) => ru.id !== reservationUnit.id),
+      ...reservationUnits.filter((ru) => ru.pk !== reservationUnit.pk),
     ]);
   };
 
-  const moveUp = (reservationUnit: ReservationUnit) => {
+  const moveUp = (reservationUnit: ReservationUnitType) => {
     const from = reservationUnits.indexOf(reservationUnit);
     const to = from - 1;
     setReservationUnits(move(reservationUnits, from, to));
   };
 
-  const moveDown = (reservationUnit: ReservationUnit) => {
+  const moveDown = (reservationUnit: ReservationUnitType) => {
     const from = reservationUnits.indexOf(reservationUnit);
     const to = from + 1;
     setReservationUnits(move(reservationUnits, from, to));
@@ -166,7 +180,7 @@ const ReservationUnitList = ({
       {reservationUnits.map((ru, index, all) => {
         return (
           <ReservationUnitCard
-            key={ru.id}
+            key={ru.pk}
             invalid={(minSize && ru.maxPersons < minSize) || false}
             onDelete={remove}
             reservationUnit={ru}

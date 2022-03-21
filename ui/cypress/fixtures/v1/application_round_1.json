@@ -1,1 +1,38 @@
-{"id":1,"name":"Nuorten liikuntavuorot kevät 2021","reservation_unit_ids":[2,6],"application_period_begin":"2021-01-01T00:00:00Z","application_period_end":"2022-06-09T00:00:00Z","reservation_period_begin":"2021-01-01","reservation_period_end":"2021-06-01","public_display_begin":"2021-01-01T00:00:00Z","public_display_end":"2021-01-31T00:00:00Z","purpose_ids":[1,2,3,4],"service_sector_id":1,"status":"draft","status_timestamp":"2021-03-11T06:20:53.219000Z","application_round_baskets":[{"id":1,"name":"Kori A","purpose_ids":[1],"must_be_main_purpose_of_applicant":false,"customer_type":["nonprofit"],"age_group_ids":[1,2,3,4],"home_city_id":1,"allocation_percentage":0,"order_number":1}],"allocating":false,"criteria":"<p>xd</p>","is_admin":false,"aggregated_data":{"allocation_result_events_count":null,"allocation_duration_total":null,"total_reservation_duration":70.0,"total_hour_capacity":700.0},"approved_by":""}
+{
+  "id": 1,
+  "name": "Nuorten liikuntavuorot kevät 2021",
+  "reservation_unit_ids": [2, 6],
+  "application_period_begin": "2021-01-01T00:00:00Z",
+  "application_period_end": "2022-06-09T00:00:00Z",
+  "reservation_period_begin": "2021-01-01",
+  "reservation_period_end": "2021-06-01",
+  "public_display_begin": "2021-01-01T00:00:00Z",
+  "public_display_end": "2021-01-31T00:00:00Z",
+  "purpose_ids": [1, 2, 3, 4],
+  "service_sector_id": 1,
+  "status": "draft",
+  "status_timestamp": "2021-03-11T06:20:53.219000Z",
+  "application_round_baskets": [
+    {
+      "id": 1,
+      "name": "Kori A",
+      "purpose_ids": [1],
+      "must_be_main_purpose_of_applicant": false,
+      "customer_type": ["nonprofit"],
+      "age_group_ids": [1, 2, 3, 4],
+      "home_city_id": 1,
+      "allocation_percentage": 0,
+      "order_number": 1
+    }
+  ],
+  "allocating": false,
+  "criteria": "<p>xd</p>",
+  "is_admin": false,
+  "aggregated_data": {
+    "allocation_result_events_count": null,
+    "allocation_duration_total": null,
+    "total_reservation_duration": 70.0,
+    "total_hour_capacity": 700.0
+  },
+  "approved_by": ""
+}

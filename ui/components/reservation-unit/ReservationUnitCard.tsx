@@ -8,24 +8,20 @@ import {
 import React from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { ReservationUnit } from "../../modules/types";
-import {
-  getMainImage,
-  getTranslation,
-  localizedValue,
-} from "../../modules/util";
+import { getMainImage, getTranslation } from "../../modules/util";
 import { breakpoint } from "../../modules/style";
 import { MediumButton } from "../../styles/util";
 import { fontBold } from "../../modules/style/typography";
+import { ReservationUnitType } from "../../modules/gql-types";
 
 type Props = {
   order: number;
-  reservationUnit: ReservationUnit;
-  onDelete: (reservationUnit: ReservationUnit) => void;
+  reservationUnit: ReservationUnitType;
+  onDelete: (reservationUnit: ReservationUnitType) => void;
   first: boolean;
   last: boolean;
-  onMoveUp: (reservationUnit: ReservationUnit) => void;
-  onMoveDown: (reservationUnit: ReservationUnit) => void;
+  onMoveUp: (reservationUnit: ReservationUnitType) => void;
+  onMoveDown: (reservationUnit: ReservationUnitType) => void;
   invalid: boolean;
 };
 
@@ -142,7 +138,7 @@ const ReservationUnitCard = ({
   onMoveDown,
   invalid,
 }: Props): JSX.Element => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
 
   return (
     <NameCardContainer>
@@ -159,10 +155,7 @@ const ReservationUnitCard = ({
         <CardContainer>
           <Image src={getMainImage(reservationUnit)?.smallUrl} alt="" />
           <PaddedCell>
-            <Name>
-              {getTranslation(reservationUnit, "name") ||
-                localizedValue(reservationUnit.name, i18n.language)}
-            </Name>
+            <Name>{getTranslation(reservationUnit, "name")}</Name>
             <MaxPersonsContainer>
               {reservationUnit.maxPersons && (
                 <>

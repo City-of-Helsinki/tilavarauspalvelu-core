@@ -74,7 +74,7 @@ const drawReservation = (): void => {
 
   timeColumn(0).within(() => {
     cy.get(".rbc-time-slot")
-      .eq(12)
+      .eq(18)
       .trigger("mousedown", { force: true, button: 0 })
       .trigger("mousemove", 0, 400, { force: true });
     cy.get(".rbc-time-slot").eq(6).trigger("mouseup", { force: true });
@@ -83,7 +83,7 @@ const drawReservation = (): void => {
 
   timeColumn(1).within(() => {
     cy.get(".rbc-time-slot")
-      .eq(12)
+      .eq(18)
       .trigger("mousedown", { force: true, button: 0 })
       .trigger("mousemove", 0, 40, { force: true });
     cy.get(".rbc-time-slot").eq(16).trigger("mouseup", { force: true });

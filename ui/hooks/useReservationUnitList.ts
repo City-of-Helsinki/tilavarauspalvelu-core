@@ -3,30 +3,17 @@ import {
   ReservationUnitByPkType,
   ReservationUnitType,
 } from "../modules/gql-types";
-import { ReservationUnit } from "../modules/types";
 
 export type ReservationUnitList = {
-  reservationUnits:
-    | ReservationUnit[]
-    | ReservationUnitType[]
-    | ReservationUnitByPkType[];
+  reservationUnits: ReservationUnitType[] | ReservationUnitByPkType[];
   selectReservationUnit: (
-    reservationUnit:
-      | ReservationUnit
-      | ReservationUnitType
-      | ReservationUnitByPkType
+    reservationUnit: ReservationUnitType | ReservationUnitByPkType
   ) => void;
   containsReservationUnit: (
-    reservationUnit:
-      | ReservationUnit
-      | ReservationUnitType
-      | ReservationUnitByPkType
+    reservationUnit: ReservationUnitType | ReservationUnitByPkType
   ) => boolean;
   removeReservationUnit: (
-    reservationUnit:
-      | ReservationUnit
-      | ReservationUnitType
-      | ReservationUnitByPkType
+    reservationUnit: ReservationUnitType | ReservationUnitByPkType
   ) => void;
   clearSelections: () => void;
 };
@@ -34,22 +21,22 @@ export type ReservationUnitList = {
 const useReservationUnitsList = (): ReservationUnitList => {
   const [reservationUnits, setReservationUnits] = useSessionStorage(
     "reservationUnitList",
-    [] as ReservationUnit[]
+    [] as ReservationUnitType[]
   );
 
-  const selectReservationUnit = (reservationUnit: ReservationUnit) => {
+  const selectReservationUnit = (reservationUnit: ReservationUnitType) => {
     setReservationUnits([
-      ...(reservationUnits as ReservationUnit[]),
+      ...(reservationUnits as ReservationUnitType[]),
       reservationUnit,
     ]);
   };
 
-  const removeReservationUnit = (reservationUnit: ReservationUnit) => {
+  const removeReservationUnit = (reservationUnit: ReservationUnitType) => {
     if (!reservationUnits) {
       return;
     }
     setReservationUnits(
-      reservationUnits.filter((unit) => unit.id !== reservationUnit.id)
+      reservationUnits.filter((unit) => unit.pk !== reservationUnit.pk)
     );
   };
 
@@ -57,9 +44,11 @@ const useReservationUnitsList = (): ReservationUnitList => {
     setReservationUnits([]);
   };
 
-  const containsReservationUnit = (reservationUnit: ReservationUnit): boolean =>
+  const containsReservationUnit = (
+    reservationUnit: ReservationUnitType
+  ): boolean =>
     reservationUnits
-      ? reservationUnits.some((ru) => ru.id === reservationUnit.id)
+      ? reservationUnits.some((ru) => ru.pk === reservationUnit.pk)
       : false;
 
   return {

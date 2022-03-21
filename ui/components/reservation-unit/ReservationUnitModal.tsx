@@ -8,22 +8,28 @@ import {
   LoadingSpinner,
   IconLinkExternal,
 } from "hds-react";
-import React, { ChangeEvent, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
+import { useQuery } from "@apollo/client";
 import styled from "styled-components";
-import { getReservationUnits } from "../../modules/api";
-import {
-  ApplicationRound,
-  OptionType,
-  ReservationUnit,
-} from "../../modules/types";
+import { ApplicationRound, OptionType } from "../../modules/types";
 import { breakpoint } from "../../modules/style";
 import { reservationUnitPath } from "../../modules/const";
-import { getAddress, getMainImage, localizedValue } from "../../modules/util";
+import {
+  getAddressAlt,
+  getMainImage,
+  getTranslation,
+} from "../../modules/util";
 import IconWithText from "../common/IconWithText";
 import { MediumButton, pixel } from "../../styles/util";
 import { fontMedium } from "../../modules/style/typography";
+import {
+  Query,
+  QueryReservationUnitsArgs,
+  ReservationUnitType,
+} from "../../modules/gql-types";
+import { RESERVATION_UNITS } from "../../modules/queries/reservationUnit";
 
 const Container = styled.div`
   width: 100%;
@@ -123,12 +129,12 @@ const ReservationUnitCard = ({
   handleRemove,
   isSelected,
 }: {
-  reservationUnit: ReservationUnit;
+  reservationUnit: ReservationUnitType;
   isSelected: boolean;
-  handleAdd: (ru: ReservationUnit) => void;
-  handleRemove: (ru: ReservationUnit) => void;
+  handleAdd: (ru: ReservationUnitType) => void;
+  handleRemove: (ru: ReservationUnitType) => void;
 }) => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
 
   const handle = () =>
     isSelected ? handleRemove(reservationUnit) : handleAdd(reservationUnit);
@@ -140,13 +146,13 @@ const ReservationUnitCard = ({
     <Container>
       <Image
         alt={t("common:imgAltForSpace", {
-          name: localizedValue(reservationUnit.name, i18n.language),
+          name: getTranslation(reservationUnit, "name"),
         })}
         src={getMainImage(reservationUnit)?.smallUrl || pixel}
       />
       <Main>
-        <Name>{localizedValue(reservationUnit.name, i18n.language)}</Name>
-        <Link href={reservationUnitPath(reservationUnit.id)}>
+        <Name>{getTranslation(reservationUnit, "name")}</Name>
+        <Link href={reservationUnitPath(reservationUnit.pk)}>
           <a target="_blank">
             <LinkContent>
               <IconLinkExternal />
@@ -159,10 +165,7 @@ const ReservationUnitCard = ({
         {reservationUnit.reservationUnitType ? (
           <IconWithText
             icon={<IconInfoCircle />}
-            text={localizedValue(
-              reservationUnit.reservationUnitType?.name,
-              i18n.language
-            )}
+            text={getTranslation(reservationUnit.reservationUnitType, "name")}
           />
         ) : null}
         {reservationUnit.maxPersons ? (
@@ -171,10 +174,10 @@ const ReservationUnitCard = ({
             text={`${reservationUnit.maxPersons}`}
           />
         ) : null}
-        {getAddress(reservationUnit) ? (
+        {getAddressAlt(reservationUnit) ? (
           <IconWithText
             icon={<IconLocation />}
-            text={getAddress(reservationUnit) || ""}
+            text={getAddressAlt(reservationUnit) || ""}
           />
         ) : null}
       </Props>
@@ -273,20 +276,19 @@ const ReservationUnitModal = ({
   options,
 }: {
   applicationRound: ApplicationRound;
-  handleAdd: (ru: ReservationUnit) => void;
-  handleRemove: (ru: ReservationUnit) => void;
-  currentReservationUnits: ReservationUnit[];
+  handleAdd: (ru: ReservationUnitType) => void;
+  handleRemove: (ru: ReservationUnitType) => void;
+  currentReservationUnits: ReservationUnitType[];
   options: OptionsType;
 }): JSX.Element => {
   const [searchTerm, setSearchTerm] = useState<string | undefined>(undefined);
   const [reservationUnitType, setReservationUnitType] = useState<
     OptionType | undefined
   >(undefined);
-  const [results, setResults] = useState<ReservationUnit[]>([]);
+  const [results, setResults] = useState<ReservationUnitType[]>([]);
   const [maxPersons, setMaxPersons] = useState<OptionType | undefined>(
     undefined
   );
-  const [searching, setSearching] = useState<boolean>(false);
 
   const reservationUnitTypeOptions = [emptyOption].concat(
     options.reservationUnitTypeOptions
@@ -298,23 +300,30 @@ const ReservationUnitModal = ({
 
   const { t } = useTranslation();
 
-  const searchResults = async () => {
-    setSearching(true);
-    const searchCriteria = {
-      applicationRound: applicationRound.id,
-      ...(searchTerm && { search: searchTerm }),
-      ...(maxPersons && { maxPersons: maxPersons.value }),
-      ...(reservationUnitType && {
-        reservationUnitType: reservationUnitType.value,
-      }),
-    };
+  const { data, refetch, loading } = useQuery<Query, QueryReservationUnitsArgs>(
+    RESERVATION_UNITS,
+    {
+      variables: {
+        textSearch: searchTerm,
+        maxPersonsGte: Number(maxPersons?.value),
+        reservationUnitType: reservationUnitType?.value
+          ? [reservationUnitType?.value?.toString()]
+          : [],
+        orderBy: "nameFi",
+        isDraft: false,
+        isVisible: true,
+      },
+      notifyOnNetworkStatusChange: true,
+    }
+  );
 
-    const reservationUnits = await getReservationUnits(searchCriteria);
+  useEffect(() => {
+    const reservationUnits = data?.reservationUnits.edges
+      .map((n) => n.node)
+      .filter((n) => applicationRound.reservationUnitIds.includes(n.pk));
     setResults(reservationUnits);
-    setSearching(false);
-  };
+  }, [data, applicationRound.reservationUnitIds]);
 
-  if (results === undefined && searching === false) searchResults();
   const emptyResult = results?.length === 0 && (
     <div>{t("common:noResults")}</div>
   );
@@ -356,12 +365,13 @@ const ReservationUnitModal = ({
         <SearchButton
           onClick={(e) => {
             e.preventDefault();
-            searchResults();
+
+            refetch();
           }}
         >
           {t("common:search")}
         </SearchButton>
-        {searching && <StyledLoadingSpinner />}
+        {loading && <StyledLoadingSpinner />}
       </ButtonContainer>
       <Ruler />
       <Results>
@@ -376,11 +386,11 @@ const ReservationUnitModal = ({
                     handleRemove(ru);
                   }}
                   isSelected={
-                    currentReservationUnits.find((i) => i.id === ru.id) !==
+                    currentReservationUnits.find((i) => i.pk === ru.pk) !==
                     undefined
                   }
                   reservationUnit={ru}
-                  key={ru.id}
+                  key={ru.pk}
                 />
               );
             })

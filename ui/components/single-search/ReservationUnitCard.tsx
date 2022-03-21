@@ -128,7 +128,7 @@ const Image = styled.img`
 const ReservationUnitCard = ({ reservationUnit }: Props): JSX.Element => {
   const { t } = useTranslation();
 
-  const link = `/reservation-unit/single/${reservationUnit.id}`;
+  const link = `/reservation-unit/single/${reservationUnit.pk}`;
   const address = `${
     getTranslation(reservationUnit.unit?.location, "addressStreet") || ""
   }`;

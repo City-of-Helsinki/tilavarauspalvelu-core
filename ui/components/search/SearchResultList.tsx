@@ -94,7 +94,7 @@ const SearchResultList = ({
             {t("searchResultList:error")}
           </Notification>
         ) : null}
-        {reservationUnits !== null ? (
+        {reservationUnits ? (
           <>
             <TopWrapper>
               <HitCount>
