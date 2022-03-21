@@ -1,9 +1,12 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
+import styled from "styled-components";
 import { Application, Parameter } from "../../modules/types";
 import { SpanTwoColumns, TwoColumnContainer } from "../common/common";
 import LabelValue from "../common/LabelValue";
 import Address from "./AddressPreview";
+
+const StyledLabelValue = styled(LabelValue).attrs({ theme: "thin" })``;
 
 const ApplicantInfoPreview = ({
   application,
@@ -18,11 +21,11 @@ const ApplicantInfoPreview = ({
     <TwoColumnContainer>
       {application.applicantType !== "individual" ? (
         <>
-          <LabelValue
+          <StyledLabelValue
             label={t("application:preview.organisation.name")}
             value={application.organisation?.name}
           />
-          <LabelValue
+          <StyledLabelValue
             label={t("application:preview.applicantTypeLabel")}
             value={String(
               t(
@@ -31,13 +34,13 @@ const ApplicantInfoPreview = ({
             )}
           />
           <SpanTwoColumns>
-            <LabelValue
+            <StyledLabelValue
               label={t("application:preview.organisation.coreBusiness")}
               value={application.organisation?.coreBusiness}
             />
           </SpanTwoColumns>
           <SpanTwoColumns>
-            <LabelValue
+            <StyledLabelValue
               label={t("application:preview.homeCity")}
               value={
                 application.homeCityId
@@ -56,19 +59,19 @@ const ApplicantInfoPreview = ({
           />
         </>
       ) : null}
-      <LabelValue
+      <StyledLabelValue
         label={t("application:preview.firstName")}
         value={application.contactPerson?.firstName}
       />
-      <LabelValue
+      <StyledLabelValue
         label={t("application:preview.lastName")}
         value={application.contactPerson?.lastName}
       />
-      <LabelValue
+      <StyledLabelValue
         label={t("application:preview.email")}
         value={application.contactPerson?.email}
       />
-      <LabelValue
+      <StyledLabelValue
         label={t("application:preview.phoneNumber")}
         value={application.contactPerson?.phoneNumber}
       />
@@ -78,7 +81,7 @@ const ApplicantInfoPreview = ({
             address={application.billingAddress}
             i18nMessagePrefix="common:address"
           />
-          <LabelValue
+          <StyledLabelValue
             label={t("application:preview.additionalInformation")}
             value={application.additionalInformation}
           />

@@ -95,6 +95,12 @@
     "phoneNumber": "Puhelinumero",
     "email": "Hakemukselle liitettävä sähköpostiosoite",
     "emailNotification": "Kaikki hakemukseen liittyvät viestit lähetetään alla olevaan sähköpostiin",
+    "subHeading": {
+      "basicInfo": "Varaajan perustiedot",
+      "postalAddress": "Postiosoite",
+      "billingAddress": "Laskutusosoite",
+      "contactInfo": "Yhteyshenkilön tiedot"
+    },
     "as": {
       "prefix": "Luon hakemuksen",
       "type": {
@@ -177,7 +183,10 @@
     },
     "reservationUnitTerms": "Täydentävät varausehdot",
     "termsOfService": "Helsingin kaupungin tilojen ja laitteiden varausehdot",
-    "userAcceptsTerms": "Olen lukenut ja hyväksyn sopimusehdot ja täydentävät varausehdot."
+    "userAcceptsTerms": "Olen lukenut ja hyväksyn sopimusehdot ja täydentävät varausehdot.",
+    "subHeading": {
+      "applicationInfo": "Varauksen tiedot"
+    }
   },
   "sent": {
     "heading": "Hakemuksesi on lähetetty käsiteltäväksi",

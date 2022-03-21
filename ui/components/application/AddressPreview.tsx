@@ -1,8 +1,11 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
+import styled from "styled-components";
 import { Address as AddressType } from "../../modules/types";
 import { SpanTwoColumns } from "../common/common";
 import LabelValue from "../common/LabelValue";
+
+const StyledLabelValue = styled(LabelValue).attrs({ theme: "thin" })``;
 
 const Address = ({
   address,
@@ -19,16 +22,16 @@ const Address = ({
 
   return (
     <>
-      <LabelValue
+      <StyledLabelValue
         label={t(`${i18nMessagePrefix}.streetAddress`)}
         value={address.streetAddress}
       />
-      <LabelValue
+      <StyledLabelValue
         label={t(`${i18nMessagePrefix}.postCode`)}
         value={address.postCode}
       />
       <SpanTwoColumns>
-        <LabelValue
+        <StyledLabelValue
           label={t(`${i18nMessagePrefix}.city`)}
           value={address.city}
         />

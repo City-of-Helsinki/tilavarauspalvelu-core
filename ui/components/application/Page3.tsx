@@ -28,6 +28,7 @@ const typeForm = {
 
 const Wrapper = styled.div`
   margin-bottom: var(--spacing-layout-l);
+  padding-bottom: var(--spacing-l);
 `;
 
 const Page3 = ({ onNext, application }: Props): JSX.Element | null => {
@@ -55,35 +56,21 @@ const Page3 = ({ onNext, application }: Props): JSX.Element | null => {
 
   return state !== "loading" ? (
     <Wrapper>
+      <RadioButtons activeForm={activeForm} setActiveForm={setActiveForm}>
+        {null}
+      </RadioButtons>
       {activeForm === "individual" ? (
-        <IndividualForm
-          activeForm={activeForm}
-          setActiveForm={setActiveForm}
-          application={application}
-          onNext={onNext}
-        />
+        <IndividualForm application={application} onNext={onNext} />
       ) : null}
       {activeForm === "organisation" ? (
         <OrganisationForm
           homeCityOptions={homeCityOptions}
-          activeForm={activeForm}
-          setActiveForm={setActiveForm}
           application={application}
           onNext={onNext}
         />
       ) : null}
       {activeForm === "company" ? (
-        <CompanyForm
-          activeForm={activeForm}
-          setActiveForm={setActiveForm}
-          application={application}
-          onNext={onNext}
-        />
-      ) : null}
-      {activeForm === undefined ? (
-        <RadioButtons activeForm={activeForm} setActiveForm={setActiveForm}>
-          {null}
-        </RadioButtons>
+        <CompanyForm application={application} onNext={onNext} />
       ) : null}
     </Wrapper>
   ) : (

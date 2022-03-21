@@ -2,32 +2,23 @@ import React from "react";
 import { TextInput } from "hds-react";
 import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
+import { Address, Application, ContactPerson } from "../../modules/types";
 import {
-  Address,
-  Application,
-  ContactPerson,
-  FormType,
-} from "../../modules/types";
-import { SpanTwoColumns, TwoColumnContainer } from "../common/common";
-import RadioButtons from "./RadioButtons";
+  FormSubHeading,
+  SpanTwoColumns,
+  TwoColumnContainer,
+} from "../common/common";
 import EmailInput from "./EmailInput";
 import BillingAddress from "./BillingAddress";
 import Buttons from "./Buttons";
 import { deepCopy, applicationErrorText } from "../../modules/util";
 
 type Props = {
-  activeForm: FormType;
-  setActiveForm: (id: FormType) => void;
   application: Application;
   onNext: (appToSave: Application) => void;
 };
 
-const IndividualForm = ({
-  activeForm,
-  setActiveForm,
-  application,
-  onNext,
-}: Props): JSX.Element | null => {
+const IndividualForm = ({ application, onNext }: Props): JSX.Element | null => {
   const { t } = useTranslation();
 
   const { register, handleSubmit, errors } = useForm({
@@ -66,56 +57,60 @@ const IndividualForm = ({
 
   return (
     <form>
-      <RadioButtons activeForm={activeForm} setActiveForm={setActiveForm}>
-        <TwoColumnContainer>
+      <TwoColumnContainer>
+        <FormSubHeading>
+          {t("application:Page3.subHeading.basicInfo")}
+        </FormSubHeading>
+        <TextInput
+          ref={register({ required: true })}
+          label={t("application:Page3.firstName")}
+          id="contactPerson.firstName"
+          name="contactPerson.firstName"
+          required
+          invalid={!!errors.contactPerson?.firstName?.type}
+          errorText={applicationErrorText(
+            t,
+            errors.contactPerson?.firstName?.type
+          )}
+        />
+        <TextInput
+          ref={register({ required: true })}
+          label={t("application:Page3.lastName")}
+          id="contactPerson.lastName"
+          name="contactPerson.lastName"
+          required
+          invalid={!!errors.contactPerson?.lastName?.type}
+          errorText={applicationErrorText(
+            t,
+            errors.contactPerson?.lastName?.type
+          )}
+        />
+        <BillingAddress register={register} errors={errors} />
+        <FormSubHeading>
+          {t("application:Page3.subHeading.contactInfo")}
+        </FormSubHeading>
+        <TextInput
+          ref={register({ required: true })}
+          label={t("application:Page3.phoneNumber")}
+          id="contactPerson.phoneNumber"
+          name="contactPerson.phoneNumber"
+          required
+          invalid={!!errors.contactPerson?.phoneNumber?.type}
+          errorText={applicationErrorText(
+            t,
+            errors.contactPerson?.phoneNumber?.type
+          )}
+        />
+        <SpanTwoColumns>
           <TextInput
-            ref={register({ required: true })}
-            label={t("application:Page3.firstName")}
-            id="contactPerson.firstName"
-            name="contactPerson.firstName"
-            required
-            invalid={!!errors.contactPerson?.firstName?.type}
-            errorText={applicationErrorText(
-              t,
-              errors.contactPerson?.firstName?.type
-            )}
+            ref={register({ required: false })}
+            label={t("application:Page3.additionalInformation")}
+            id="additionalInformation"
+            name="additionalInformation"
           />
-          <TextInput
-            ref={register({ required: true })}
-            label={t("application:Page3.lastName")}
-            id="contactPerson.lastName"
-            name="contactPerson.lastName"
-            required
-            invalid={!!errors.contactPerson?.lastName?.type}
-            errorText={applicationErrorText(
-              t,
-              errors.contactPerson?.lastName?.type
-            )}
-          />
-          <BillingAddress register={register} errors={errors} />
-          <TextInput
-            ref={register({ required: true })}
-            label={t("application:Page3.phoneNumber")}
-            id="contactPerson.phoneNumber"
-            name="contactPerson.phoneNumber"
-            required
-            invalid={!!errors.contactPerson?.phoneNumber?.type}
-            errorText={applicationErrorText(
-              t,
-              errors.contactPerson?.phoneNumber?.type
-            )}
-          />
-          <SpanTwoColumns>
-            <TextInput
-              ref={register({ required: false })}
-              label={t("application:Page3.additionalInformation")}
-              id="additionalInformation"
-              name="additionalInformation"
-            />
-          </SpanTwoColumns>
-          <EmailInput register={register} errors={errors} />
-        </TwoColumnContainer>
-      </RadioButtons>
+        </SpanTwoColumns>
+        <EmailInput register={register} errors={errors} />
+      </TwoColumnContainer>
       <Buttons
         onSubmit={handleSubmit(onSubmit)}
         applicationId={application.id}

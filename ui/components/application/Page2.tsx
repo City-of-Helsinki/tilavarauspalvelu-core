@@ -157,6 +157,7 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
             key={event.id}
             id={`timeSelector-${index}`}
             heading={event.name || undefined}
+            theme="thin"
           >
             <SubHeading>{t("application:Page2.subHeading")}</SubHeading>
             <StyledNotification
