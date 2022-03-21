@@ -11,7 +11,6 @@ import {
   ApplicationRound,
   EditorState,
   OptionType,
-  ReservationUnit,
 } from "../../modules/types";
 import { deepCopy, mapOptions } from "../../modules/util";
 import { getParameters } from "../../modules/api";
@@ -19,11 +18,12 @@ import { breakpoint } from "../../modules/style";
 import { participantCountOptions } from "../../modules/const";
 import { CenterSpinner, HorisontalRule } from "../common/common";
 import { MediumButton } from "../../styles/util";
+import { ReservationUnitType } from "../../modules/gql-types";
 
 type Props = {
   applicationRound: ApplicationRound;
   editorState: EditorState;
-  selectedReservationUnits: ReservationUnit[];
+  selectedReservationUnits: ReservationUnitType[];
   save: ({
     application,
     eventId,

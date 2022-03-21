@@ -14,7 +14,6 @@ import {
   Application as ApplicationType,
   ApplicationRound,
   EditorState,
-  ReservationUnit,
 } from "../../modules/types";
 import ApplicationPage from "../../components/application/ApplicationPage";
 import Page1 from "../../components/application/Page1";
@@ -30,6 +29,7 @@ import RequireAuthentication from "../../components/common/RequireAuthentication
 import {
   Query,
   QueryTermsOfUseArgs,
+  ReservationUnitType,
   TermsOfUseType,
   TermsOfUseTypeEdge,
 } from "../../modules/gql-types";
@@ -216,7 +216,7 @@ const Application = ({ tos }: Props): JSX.Element | null => {
           translationKeyPrefix="application:Page1"
         >
           <Page1
-            selectedReservationUnits={reservationUnits as ReservationUnit[]}
+            selectedReservationUnits={reservationUnits as ReservationUnitType[]}
             applicationRound={
               applicationLoadingStatus.value?.applicationRound ||
               ({} as ApplicationRound)

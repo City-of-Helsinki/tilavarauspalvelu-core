@@ -117,7 +117,7 @@ describe("areSlotsReservable", () => {
         openingTimes,
         []
       )
-    ).toBe(false);
+    ).toBe(true);
   });
 
   test("Plus 7 days 10:00", () => {
