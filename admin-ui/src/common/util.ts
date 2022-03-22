@@ -3,6 +3,7 @@ import i18next from "i18next";
 import trim from "lodash/trim";
 import upperFirst from "lodash/upperFirst";
 import get from "lodash/get";
+import { uniqBy } from "lodash";
 import {
   AllocationResult,
   ApplicationEventSchedule,
@@ -365,6 +366,7 @@ export const parseAddressLine2 = (
 };
 
 export const filterData = <T>(data: T[], filters: DataFilterOption[]): T[] => {
+  const len = uniqBy(filters, "key").length;
   return data.filter(
     (row) =>
       filters.filter((filter) => {
@@ -372,6 +374,6 @@ export const filterData = <T>(data: T[], filters: DataFilterOption[]): T[] => {
           return filter.function(row);
         }
         return get(row, filter.key as string) === filter.value;
-      }).length === filters.length
+      }).length === len
   );
 };
