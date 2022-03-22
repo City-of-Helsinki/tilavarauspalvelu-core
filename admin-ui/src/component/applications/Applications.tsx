@@ -97,6 +97,7 @@ const getFilterConfig = (
     {
       title: "Application.headings.unit",
       filters: units.map((unit) => ({
+        key: "unit",
         title: unit.name.fi,
         function: (application: ApplicationView) =>
           Boolean(application.units.find((u) => u.id === unit.id)),
