@@ -70,14 +70,14 @@ snapshots['ReservationQueryTestCase::test_filter_reservation_state_accepts_multi
             'edges': [
                 {
                     'node': {
-                        'name': 'Show me',
-                        'state': 'REQUIRES_HANDLING'
+                        'name': 'Show me too',
+                        'state': 'CANCELLED'
                     }
                 },
                 {
                     'node': {
-                        'name': 'Show me too',
-                        'state': 'CANCELLED'
+                        'name': 'Show me',
+                        'state': 'REQUIRES_HANDLING'
                     }
                 }
             ]

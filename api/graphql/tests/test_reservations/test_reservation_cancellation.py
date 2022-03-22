@@ -4,9 +4,13 @@ import json
 import freezegun
 from assertpy import assert_that
 from django.contrib.auth import get_user_model
+from django.core import mail
+from django.test import override_settings
 from django.utils.timezone import get_default_timezone
 
 from api.graphql.tests.test_reservations.base import ReservationTestCaseBase
+from email_notification.models import EmailType
+from email_notification.tests.factories import EmailTemplateFactory
 from reservation_units.tests.factories import ReservationUnitCancellationRuleFactory
 from reservations.models import STATE_CHOICES
 from reservations.tests.factories import (
@@ -36,6 +40,13 @@ class ReservationCancellationTestCase(ReservationTestCaseBase):
             ),
             state=STATE_CHOICES.CONFIRMED,
             user=self.regular_joe,
+            reservee_email="email@reservee",
+        )
+
+        EmailTemplateFactory(
+            type=EmailType.RESERVATION_CANCELLED,
+            content="",
+            subject="cancelled",
         )
 
     def get_cancel_query(self):
@@ -54,6 +65,10 @@ class ReservationCancellationTestCase(ReservationTestCaseBase):
     def get_valid_cancel_data(self):
         return {"pk": self.reservation.pk, "cancelReasonPk": self.cancel_reason.id}
 
+    @override_settings(
+        CELERY_TASK_ALWAYS_EAGER=True,
+        SEND_RESERVATION_NOTIFICATION_EMAILS=False,
+    )
     def test_cancel_reservation_changes_state(self):
         self.client.force_login(self.regular_joe)
         input_data = self.get_valid_cancel_data()
@@ -70,6 +85,10 @@ class ReservationCancellationTestCase(ReservationTestCaseBase):
         self.reservation.refresh_from_db()
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CANCELLED)
 
+    @override_settings(
+        CELERY_TASK_ALWAYS_EAGER=True,
+        SEND_RESERVATION_NOTIFICATION_EMAILS=False,
+    )
     def test_cancel_reservation_adds_reason(self):
         self.client.force_login(self.regular_joe)
         input_data = self.get_valid_cancel_data()
@@ -86,6 +105,10 @@ class ReservationCancellationTestCase(ReservationTestCaseBase):
         self.reservation.refresh_from_db()
         assert_that(self.reservation.cancel_reason).is_equal_to(self.cancel_reason)
 
+    @override_settings(
+        CELERY_TASK_ALWAYS_EAGER=True,
+        SEND_RESERVATION_NOTIFICATION_EMAILS=False,
+    )
     def test_cancel_reservation_adds_cancel_details(self):
         self.client.force_login(self.regular_joe)
         input_data = self.get_valid_cancel_data()
@@ -159,6 +182,10 @@ class ReservationCancellationTestCase(ReservationTestCaseBase):
         self.reservation.refresh_from_db()
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
 
+    @override_settings(
+        CELERY_TASK_ALWAYS_EAGER=True,
+        SEND_RESERVATION_NOTIFICATION_EMAILS=False,
+    )
     def test_cancel_reservation_succeed_with_rule_set_and_in_time(self):
         rule = ReservationUnitCancellationRuleFactory(
             can_be_cancelled_time_before=datetime.timedelta(hours=1)
@@ -223,3 +250,21 @@ class ReservationCancellationTestCase(ReservationTestCaseBase):
         assert_that(cancel_data.get("errors")).is_not_none()
         self.reservation.refresh_from_db()
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
+
+    @override_settings(
+        CELERY_TASK_ALWAYS_EAGER=True,
+        SEND_RESERVATION_NOTIFICATION_EMAILS=True,
+        EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
+    )
+    def test_cancellation_sends_email_notification(self):
+        self.client.force_login(self.regular_joe)
+        input_data = self.get_valid_cancel_data()
+        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
+        response = self.query(self.get_cancel_query(), input_data=input_data)
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        cancel_data = content.get("data").get("cancelReservation")
+        assert_that(cancel_data.get("errors")).is_none()
+        assert_that(len(mail.outbox)).is_equal_to(1)
+        assert_that(mail.outbox[0].subject).is_equal_to("cancelled")
