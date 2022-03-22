@@ -76,6 +76,10 @@ const Name = styled.span`
   }
 `;
 
+const Unit = styled.div`
+  margin-top: var(--spacing-2-xs);
+`;
+
 const Main = styled.span`
   grid-area: name;
 `;
@@ -152,6 +156,7 @@ const ReservationUnitCard = ({
       />
       <Main>
         <Name>{getTranslation(reservationUnit, "name")}</Name>
+        <Unit>{getTranslation(reservationUnit.unit, "name")}</Unit>
         <Link href={reservationUnitPath(reservationUnit.pk)}>
           <a target="_blank">
             <LinkContent>
@@ -365,7 +370,6 @@ const ReservationUnitModal = ({
         <SearchButton
           onClick={(e) => {
             e.preventDefault();
-
             refetch();
           }}
         >
