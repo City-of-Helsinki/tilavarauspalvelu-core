@@ -19,7 +19,6 @@ import {
   EditorState,
   LocalizationLanguages,
   OptionType,
-  ReservationUnit,
 } from "../../modules/types";
 import {
   apiDateToUIDate,
@@ -39,6 +38,7 @@ import { after, before } from "../../modules/validation";
 import ConfirmationModal, { ModalRef } from "../common/ConfirmationModal";
 import { MediumButton } from "../../styles/util";
 import { fontRegular, H5 } from "../../modules/style/typography";
+import { ReservationUnitType } from "../../modules/gql-types";
 
 type OptionTypes = {
   ageGroupOptions: OptionType[];
@@ -53,7 +53,7 @@ type Props = {
   index: number;
   applicationRound: ApplicationRound;
   form: ReturnType<typeof useForm>;
-  selectedReservationUnits: ReservationUnit[];
+  selectedReservationUnits: ReservationUnitType[];
   optionTypes: OptionTypes;
   editorState: EditorState;
   dispatch: React.Dispatch<Action>;

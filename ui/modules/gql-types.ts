@@ -4799,6 +4799,7 @@ export type SearchReservationUnitsQuery = {
       __typename?: "ReservationUnitTypeEdge";
       node?: {
         __typename?: "ReservationUnitType";
+        pk?: number | null;
         nameFi?: string | null;
         nameEn?: string | null;
         nameSv?: string | null;

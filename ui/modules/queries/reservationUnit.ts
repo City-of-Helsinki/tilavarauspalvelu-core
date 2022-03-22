@@ -133,7 +133,8 @@ export const RESERVATION_UNITS = gql`
     ) {
       edges {
         node {
-          id: pk
+          id
+          pk
           nameFi
           nameEn
           nameSv
@@ -181,6 +182,7 @@ export const RELATED_RESERVATION_UNITS = gql`
     reservationUnits(unit: $unit) {
       edges {
         node {
+          id
           pk
           nameFi
           nameEn

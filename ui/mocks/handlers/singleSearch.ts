@@ -20,6 +20,7 @@ export const reservationUnitSearchHandlers = [
           {
             node: {
               id: 1,
+              pk: 1,
               nameFi: "Arabian nuorisotalon sali",
               nameEn: "Arabian nuorisotalon sali",
               nameSv: "Arabian nuorisotalon sali",
@@ -61,6 +62,7 @@ export const reservationUnitSearchHandlers = [
           {
             node: {
               id: 2,
+              pk: 2,
               nameFi: "Hertsin nuorisotalon sali",
               nameEn: "Hertsin nuorisotalon sali",
               nameSv: "Hertsin nuorisotalon sali",
@@ -92,6 +94,7 @@ export const reservationUnitSearchHandlers = [
           {
             node: {
               id: 40,
+              pk: 40,
               nameFi: "Jakomäen sydämen liikkumistila",
               nameEn: "Jakomäen sydämen liikkumistila",
               nameSv: "Jakomäen sydämen liikkumistila",
@@ -123,6 +126,7 @@ export const reservationUnitSearchHandlers = [
           {
             node: {
               id: 53,
+              pk: 53,
               nameFi: "Pasilan nuorisotalon järjestötila",
               nameEn: "Pasilan nuorisotalon järjestötila",
               nameSv: "Pasilan nuorisotalon järjestötila",
@@ -154,6 +158,7 @@ export const reservationUnitSearchHandlers = [
           {
             node: {
               id: 52,
+              pk: 52,
               nameFi: "Koskelan nuorisotalon yläkerran ryhmätila 2",
               nameEn: "Koskelan nuorisotalon yläkerran ryhmätila 2",
               nameSv: "Koskelan nuorisotalon yläkerran ryhmätila 2",
@@ -185,6 +190,7 @@ export const reservationUnitSearchHandlers = [
           {
             node: {
               id: 51,
+              pk: 51,
               nameFi: "Koskelan nuorisotalon yläkerran ryhmätila 1",
               nameEn: "Koskelan nuorisotalon yläkerran ryhmätila 1",
               nameSv: "Koskelan nuorisotalon yläkerran ryhmätila 1",
@@ -217,6 +223,7 @@ export const reservationUnitSearchHandlers = [
           {
             node: {
               id: 35,
+              pk: 35,
               nameFi: "Malmin nuorisotalon alakerta",
               nameEn: "Malmin nuorisotalon alakerta",
               nameSv: "Malmin nuorisotalon alakerta",
@@ -248,6 +255,7 @@ export const reservationUnitSearchHandlers = [
           {
             node: {
               id: 32,
+              pk: 32,
               nameFi: "Ruoholahden nuorisotalon sali",
               nameEn: "Ruoholahden nuorisotalon sali",
               nameSv: "Ruoholahden nuorisotalon sali",
@@ -279,6 +287,7 @@ export const reservationUnitSearchHandlers = [
           {
             node: {
               id: 34,
+              pk: 34,
               nameFi: "Malmin nuorisotalon yläkerta",
               nameEn: "Malmin nuorisotalon yläkerta",
               nameSv: "Malmin nuorisotalon yläkerta",
@@ -310,6 +319,7 @@ export const reservationUnitSearchHandlers = [
           {
             node: {
               id: 42,
+              pk: 42,
               nameFi: "Jakomäen sydämen olohuone",
               nameEn: "Jakomäen sydämen olohuone",
               nameSv: "Jakomäen sydämen olohuone",
