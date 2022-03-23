@@ -1,11 +1,12 @@
-import { trim } from "lodash";
+import { flatten, trim, uniq } from "lodash";
 import { i18n } from "next-i18next";
 import {
+  EquipmentType,
   ReservationUnitByPkType,
   ReservationUnitsReservationUnitPriceUnitChoices,
   ReservationUnitType,
 } from "./gql-types";
-import { getFormatters as formatters } from "./util";
+import { getFormatters as formatters, getTranslation } from "./util";
 
 export const getPriceUnitMinutes = (
   unit: ReservationUnitsReservationUnitPriceUnitChoices
@@ -96,4 +97,59 @@ export const isReservationUnitPublished = (
   }
 
   return beginOK && endOK;
+};
+
+const equipmentCategoryOrder = [
+  "Huonekalut",
+  "Keittiö",
+  "Liikunta- ja pelivälineet",
+  "Tekniikka",
+  "Pelikonsoli",
+  "Liittimet",
+  "Muu",
+];
+
+export const getEquipmentCategories = (
+  equipment: EquipmentType[]
+): string[] => {
+  if (!equipment || equipment.length === 0) {
+    return [];
+  }
+
+  const categories: string[] = [...equipment].map((n) =>
+    equipmentCategoryOrder.includes(n.category.nameFi)
+      ? n.category.nameFi
+      : "Muu"
+  );
+
+  categories.sort((a, b) => {
+    const left = equipmentCategoryOrder.indexOf(a);
+    const right = equipmentCategoryOrder.indexOf(b);
+    return left - right;
+  });
+
+  return uniq(categories);
+};
+
+export const getEquipmentList = (equipment: EquipmentType[]): string[] => {
+  if (!equipment || equipment.length === 0) {
+    return [];
+  }
+
+  const categories = getEquipmentCategories(equipment);
+
+  const sortedEquipment: EquipmentType[] = flatten(
+    categories.map((category) => {
+      const eq: EquipmentType[] = [...equipment].filter(
+        (n) =>
+          n.category.nameFi === category ||
+          (category === "Muu" &&
+            !equipmentCategoryOrder.includes(n.category.nameFi))
+      );
+      eq.sort((a, b) => a.nameFi.localeCompare(b.nameFi));
+      return eq;
+    })
+  );
+
+  return sortedEquipment.map((n) => getTranslation(n, "name"));
 };

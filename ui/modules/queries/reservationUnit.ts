@@ -100,6 +100,17 @@ export const RESERVATION_UNIT = gql`
         supportedFields
         requiredFields
       }
+      equipment {
+        pk
+        nameFi
+        nameEn
+        nameSv
+        category {
+          nameFi
+          nameEn
+          nameSv
+        }
+      }
     }
   }
 `;

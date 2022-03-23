@@ -955,7 +955,7 @@ export type QueryReservationsArgs = {
   offset?: InputMaybe<Scalars["Int"]>;
   orderBy?: InputMaybe<Scalars["String"]>;
   requested?: InputMaybe<Scalars["Boolean"]>;
-  state?: InputMaybe<Scalars["String"]>;
+  state?: InputMaybe<Array<InputMaybe<Scalars["String"]>>>;
 };
 
 export type QueryResourceArgs = {
@@ -3718,6 +3718,8 @@ export const ReservationUnitDocument = gql`
       bufferTimeBefore
       bufferTimeAfter
       reservationStartInterval
+      publishBegins
+      publishEnds
       reservationBegins
       reservationEnds
       serviceSpecificTerms {
@@ -3784,6 +3786,17 @@ export const ReservationUnitDocument = gql`
         pk
         supportedFields
         requiredFields
+      }
+      equipment {
+        pk
+        nameFi
+        nameEn
+        nameSv
+        category {
+          nameFi
+          nameEn
+          nameSv
+        }
       }
     }
   }
@@ -3868,7 +3881,8 @@ export const SearchReservationUnitsDocument = gql`
     ) {
       edges {
         node {
-          id: pk
+          id
+          pk
           nameFi
           nameEn
           nameSv
@@ -3898,6 +3912,7 @@ export const SearchReservationUnitsDocument = gql`
           maxPersons
           images {
             imageType
+            smallUrl
             mediumUrl
           }
         }
@@ -3975,6 +3990,7 @@ export const RelatedReservationUnitsDocument = gql`
     reservationUnits(unit: $unit) {
       edges {
         node {
+          id
           pk
           nameFi
           nameEn
@@ -4156,6 +4172,7 @@ export const TermsOfUseDocument = gql`
     termsOfUse(termsType: $termsType) {
       edges {
         node {
+          pk
           nameFi
           nameEn
           nameSv
@@ -4685,6 +4702,8 @@ export type ReservationUnitQuery = {
     bufferTimeBefore?: any | null;
     bufferTimeAfter?: any | null;
     reservationStartInterval: ReservationUnitsReservationUnitReservationStartIntervalChoices;
+    publishBegins?: any | null;
+    publishEnds?: any | null;
     reservationBegins?: any | null;
     reservationEnds?: any | null;
     maxPersons?: number | null;
@@ -4768,6 +4787,19 @@ export type ReservationUnitQuery = {
       supportedFields?: Array<string | null> | null;
       requiredFields?: Array<string | null> | null;
     } | null;
+    equipment?: Array<{
+      __typename?: "EquipmentType";
+      pk?: number | null;
+      nameFi?: string | null;
+      nameEn?: string | null;
+      nameSv?: string | null;
+      category?: {
+        __typename?: "EquipmentCategoryType";
+        nameFi?: string | null;
+        nameEn?: string | null;
+        nameSv?: string | null;
+      } | null;
+    } | null> | null;
   } | null;
 };
 
@@ -4799,6 +4831,7 @@ export type SearchReservationUnitsQuery = {
       __typename?: "ReservationUnitTypeEdge";
       node?: {
         __typename?: "ReservationUnitType";
+        id: string;
         pk?: number | null;
         nameFi?: string | null;
         nameEn?: string | null;
@@ -4809,7 +4842,6 @@ export type SearchReservationUnitsQuery = {
         reservationBegins?: any | null;
         reservationEnds?: any | null;
         maxPersons?: number | null;
-        id?: number | null;
         reservationUnitType?: {
           __typename?: "ReservationUnitTypeType";
           nameFi?: string | null;
@@ -4833,6 +4865,7 @@ export type SearchReservationUnitsQuery = {
         images?: Array<{
           __typename?: "ReservationUnitImageType";
           imageType: ReservationUnitsReservationUnitImageImageTypeChoices;
+          smallUrl?: string | null;
           mediumUrl?: string | null;
         } | null> | null;
       } | null;
@@ -4857,6 +4890,7 @@ export type RelatedReservationUnitsQuery = {
       __typename?: "ReservationUnitTypeEdge";
       node?: {
         __typename?: "ReservationUnitType";
+        id: string;
         pk?: number | null;
         nameFi?: string | null;
         nameEn?: string | null;
@@ -4945,6 +4979,7 @@ export type TermsOfUseQuery = {
       __typename?: "TermsOfUseTypeEdge";
       node?: {
         __typename?: "TermsOfUseType";
+        pk?: string | null;
         nameFi?: string | null;
         nameEn?: string | null;
         nameSv?: string | null;

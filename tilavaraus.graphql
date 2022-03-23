@@ -556,7 +556,7 @@ type Query {
     last: Int = null
     begin: DateTime = null
     end: DateTime = null
-    state: String = null
+    state: [String] = null
     requested: Boolean = null
 
     """Järjestys"""
@@ -1363,18 +1363,18 @@ input ReservationUnitCreateMutationInput {
   Authentication required for reserving this reservation unit. Possible values are WEAK, STRONG.
   """
   authentication: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
-  additionalInstructionsFi: String
-  additionalInstructionsEn: String
-  additionalInstructionsSv: String
   nameFi: String
   nameEn: String
   nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  additionalInstructionsFi: String
+  additionalInstructionsEn: String
+  additionalInstructionsSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
   clientMutationId: String
 }
 
@@ -1467,18 +1467,18 @@ type ReservationUnitCreateMutationPayload {
   Authentication required for reserving this reservation unit. Possible values are WEAK, STRONG.
   """
   authentication: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
-  additionalInstructionsFi: String
-  additionalInstructionsEn: String
-  additionalInstructionsSv: String
   nameFi: String
   nameEn: String
   nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  additionalInstructionsFi: String
+  additionalInstructionsEn: String
+  additionalInstructionsSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -1832,18 +1832,18 @@ input ReservationUnitUpdateMutationInput {
   Authentication required for reserving this reservation unit. Possible values are WEAK, STRONG.
   """
   authentication: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
-  additionalInstructionsFi: String
-  additionalInstructionsEn: String
-  additionalInstructionsSv: String
   nameFi: String
   nameEn: String
   nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  additionalInstructionsFi: String
+  additionalInstructionsEn: String
+  additionalInstructionsSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
   clientMutationId: String
 }
 
@@ -1936,18 +1936,18 @@ type ReservationUnitUpdateMutationPayload {
   Authentication required for reserving this reservation unit. Possible values are WEAK, STRONG.
   """
   authentication: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
-  additionalInstructionsFi: String
-  additionalInstructionsEn: String
-  additionalInstructionsSv: String
   nameFi: String
   nameEn: String
   nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  additionalInstructionsFi: String
+  additionalInstructionsEn: String
+  additionalInstructionsSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -2606,12 +2606,12 @@ input UnitUpdateMutationInput {
   nameFi: String
   nameEn: String
   nameSv: String
-  shortDescriptionFi: String
-  shortDescriptionEn: String
-  shortDescriptionSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  shortDescriptionFi: String
+  shortDescriptionEn: String
+  shortDescriptionSv: String
   clientMutationId: String
 }
 
@@ -2624,12 +2624,12 @@ type UnitUpdateMutationPayload {
   nameFi: String
   nameEn: String
   nameSv: String
-  shortDescriptionFi: String
-  shortDescriptionEn: String
-  shortDescriptionSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  shortDescriptionFi: String
+  shortDescriptionEn: String
+  shortDescriptionSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]

@@ -29,6 +29,7 @@ import { MediumButton } from "../../styles/util";
 import { ReservationUnitByPkType } from "../../modules/gql-types";
 import { getPrice } from "../../modules/reservationUnit";
 import KorosDefault from "../common/KorosDefault";
+import { H1, H2 } from "../../modules/style/typography";
 
 interface PropsType {
   reservationUnit: ReservationUnitByPkType;
@@ -77,14 +78,10 @@ const Props = styled.div`
   font-weight: 500;
 `;
 
-const ReservationUnitName = styled.h1`
-  font-size: var(--fontsize-heading-l);
-  margin: var(--spacing-2-xs) 0 var(--spacing-xs);
-`;
+const ReservationUnitName = styled(H1)``;
 
-const BuildingName = styled.div`
-  font-size: var(--fontsize-heading-m);
-  font-family: var(--font-bold);
+const UnitName = styled(H2)`
+  margin-top: 0;
 `;
 
 const ButtonContainer = styled.div`
@@ -156,9 +153,7 @@ const Head = ({
             <ReservationUnitName>
               {getTranslation(reservationUnit, "name")}
             </ReservationUnitName>
-            <BuildingName>
-              {getTranslation(reservationUnit.unit, "name")}
-            </BuildingName>
+            <UnitName>{getTranslation(reservationUnit.unit, "name")}</UnitName>
             <JustForMobile style={{ marginTop: "var(--spacing-l)" }}>
               <Images
                 images={reservationUnit.images}

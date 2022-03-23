@@ -31,7 +31,7 @@ import {
   calendarWrapper,
   reservationQuotaNotification,
 } from "model/reservation-creation";
-import { addressContainer } from "model/reservation-unit";
+import { accordion, addressContainer } from "model/reservation-unit";
 import { textWithIcon } from "model/search";
 
 const matchEvent = (): void => {
@@ -110,6 +110,12 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
 
     it("contains default elements", () => {
       cy.get("h1").should("contain", "Pukinmäen nuorisotalon keittiö");
+
+      accordion("description").contains(
+        "Sali sijaitsee nuorisotalon toisessa kerroksessa. Tilaan mahtuu 60 henkilöä.."
+      );
+
+      accordion("equipment").contains("Tuoli FiKattila FiJoku muu Fi");
 
       addressContainer().should("have.length", 2);
 
@@ -434,6 +440,18 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
       //   });
 
       cy.checkA11y(null, null, null, true);
+    });
+  });
+
+  describe("without equipment", () => {
+    it("doesn't display equipment accordion", () => {
+      cy.visit("/reservation-unit/single/800");
+
+      accordion("description").contains(
+        "Sali sijaitsee nuorisotalon toisessa kerroksessa. Tilaan mahtuu 60 henkilöä.."
+      );
+
+      accordion("equipment").should("not.exist");
     });
   });
 
