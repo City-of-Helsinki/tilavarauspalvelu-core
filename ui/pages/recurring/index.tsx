@@ -17,9 +17,14 @@ type Props = {
 };
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+  const now = new Date();
   const applicationRounds = await getApplicationRounds();
 
-  const filteredApplicationRounds = sortBy(applicationRounds, ["id"]);
+  const filteredApplicationRounds = sortBy(applicationRounds, ["id"]).filter(
+    (applicationRound) =>
+      new Date(applicationRound.publicDisplayBegin) <= now &&
+      new Date(applicationRound.publicDisplayEnd) >= now
+  );
 
   return {
     props: {

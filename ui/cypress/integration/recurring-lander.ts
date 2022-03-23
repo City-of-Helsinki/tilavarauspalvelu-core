@@ -4,6 +4,7 @@ describe("recurring search lander", () => {
   beforeEach(() => {
     cy.visit("/recurring");
     cy.injectAxe();
+    Cypress.config("defaultCommandTimeout", 20000);
   });
 
   it("displays correct application rounds", () => {
