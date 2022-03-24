@@ -37,6 +37,7 @@ import {
   filterData,
 } from "../common/util";
 import FilterContainer, { FilterBtn } from "./FilterContainer";
+import { publicUrl } from "../common/const";
 
 export type OrderTypes = "asc" | "desc";
 
@@ -814,7 +815,10 @@ function DataTable({
                                 return (
                                   <Cell key={colKey}>
                                     {link ? (
-                                      <A href={link} className="cellContent">
+                                      <A
+                                        href={`${publicUrl}${link}`}
+                                        className="cellContent"
+                                      >
                                         <span className="cellContent">
                                           {value}
                                         </span>
