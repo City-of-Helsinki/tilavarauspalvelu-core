@@ -112,8 +112,8 @@ export const RESERVATION_DENY_REASONS = gql`
 `;
 
 export const RESERVATIONS_QUERY = gql`
-  query reservations($state: String) {
-    reservations(state: $state) {
+  query reservations {
+    reservations {
       edges {
         node {
           pk
