@@ -160,6 +160,12 @@ export function getRecurringReservations(
   });
 }
 
+export const getCurrentUser = async (): Promise<User> => {
+  return apiGet<User>({
+    path: `v1/${userBasePath}/current`,
+  });
+};
+
 export async function getDecisionMaker(
   applicationEventId: number
 ): Promise<User | null> {
@@ -214,9 +220,12 @@ export function getApplication(id: number): Promise<Application> {
   });
 }
 
-export function getApplications(): Promise<Application[]> {
+export function getApplications(user?: number): Promise<Application[]> {
   return apiGet<Application[]>({
     path: `v1/${applicationBasePath}`,
+    parameters: {
+      ...(user && { user }),
+    },
   });
 }
 
