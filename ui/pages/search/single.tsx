@@ -67,6 +67,7 @@ const processVariables = (values: Record<string, string>) => {
       "maxPersons",
       "purposes",
       "unit",
+      "reservationUnitType",
     ]),
     ...(values.minPersons && {
       minPersons: parseInt(values.minPersons, 10),
@@ -79,6 +80,9 @@ const processVariables = (values: Record<string, string>) => {
     }),
     ...(values.unit && {
       unit: values.unit.split(","),
+    }),
+    ...(values.reservationUnitType && {
+      reservationUnitType: values.reservationUnitType.split(","),
     }),
     first: pagingLimit,
     orderBy: values.order === "desc" ? `-${values.sort}` : values.sort,

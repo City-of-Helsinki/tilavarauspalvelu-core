@@ -97,6 +97,7 @@ const processVariables = (values: Record<string, string>) => {
       "maxPersons",
       "purposes",
       "unit",
+      "reservationUnitType",
       "applicationRound", // TODO: use application round in variables
     ]),
     ...(values.minPersons && {
@@ -110,6 +111,9 @@ const processVariables = (values: Record<string, string>) => {
     }),
     ...(values.unit && {
       unit: values.unit.split(","),
+    }),
+    ...(values.reservationUnitType && {
+      reservationUnitType: values.reservationUnitType.split(","),
     }),
     first: pagingLimit,
     orderBy: values.order === "desc" ? `-${values.sort}` : values.sort,
