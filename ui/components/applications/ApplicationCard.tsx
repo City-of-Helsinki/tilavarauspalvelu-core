@@ -8,7 +8,6 @@ import { Application, ApplicationRound } from "../../modules/types";
 import {
   isActive,
   applicationUrl,
-  resolutionUrl,
   getReducedApplicationStatus,
 } from "../../modules/util";
 import { breakpoint } from "../../modules/style";
@@ -187,14 +186,6 @@ const ApplicationCard = ({
             {t("applicationCard:cancel")}
           </StyledButton>
         )}
-        <StyledButton
-          disabled={!(reducedApplicationStatus === "sent")}
-          onClick={() => {
-            router.push(`${resolutionUrl(application.id as number)}`);
-          }}
-        >
-          {t("applicationCard:reservations")}
-        </StyledButton>
       </Buttons>
       <ConfirmationModal
         id="application-card-modal"
