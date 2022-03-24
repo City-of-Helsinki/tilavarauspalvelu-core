@@ -58,6 +58,35 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   };
 };
 
+const processVariables = (values: Record<string, string>) => {
+  return {
+    ...omit(values, [
+      "order",
+      "sort",
+      "minPersons",
+      "maxPersons",
+      "purposes",
+      "unit",
+    ]),
+    ...(values.minPersons && {
+      minPersons: parseInt(values.minPersons, 10),
+    }),
+    ...(values.maxPersons && {
+      maxPersons: parseInt(values.maxPersons, 10),
+    }),
+    ...(values.purposes && {
+      purposes: values.purposes.split(","),
+    }),
+    ...(values.unit && {
+      unit: values.unit.split(","),
+    }),
+    first: pagingLimit,
+    orderBy: values.order === "desc" ? `-${values.sort}` : values.sort,
+    isDraft: false,
+    isVisible: true,
+  };
+};
+
 const SearchSingle = (): JSX.Element => {
   const { t, i18n } = useTranslation();
 
@@ -89,32 +118,7 @@ const SearchSingle = (): JSX.Element => {
     Query,
     QueryReservationUnitsArgs
   >(RESERVATION_UNITS, {
-    variables: {
-      ...omit(values, [
-        "order",
-        "sort",
-        "minPersons",
-        "maxPersons",
-        "purposes",
-        "unit",
-      ]),
-      ...(values.minPersons && {
-        minPersons: parseInt(values.minPersons, 10),
-      }),
-      ...(values.maxPersons && {
-        maxPersons: parseInt(values.maxPersons, 10),
-      }),
-      ...(values.purposes && {
-        purposes: values.purposes.split(","),
-      }),
-      ...(values.unit && {
-        unit: values.unit.split(","),
-      }),
-      first: pagingLimit,
-      orderBy: values.order === "desc" ? `-${values.sort}` : values.sort,
-      isDraft: false,
-      isVisible: true,
-    },
+    variables: processVariables(values),
     fetchPolicy: "network-only",
   });
 
@@ -233,7 +237,7 @@ const SearchSingle = (): JSX.Element => {
               after: cursor,
             };
             fetchMore({
-              variables,
+              variables: processVariables(variables),
             });
           }}
           pageInfo={pageInfo}
