@@ -167,12 +167,14 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
             reservation_unit=[res_unit],
             recurring_reservation=None,
             name="Show me",
+            begin=datetime.datetime.now() + datetime.timedelta(days=2),
         )
         ReservationFactory(
             state=STATE_CHOICES.CANCELLED,
             reservation_unit=[res_unit],
             recurring_reservation=None,
             name="Show me too",
+            begin=datetime.datetime.now() + datetime.timedelta(days=1),
         )
         response = self.query(
             """
