@@ -18,9 +18,55 @@ import {
   TermsOfUseTypeConnection,
   QueryReservationUnitTypesArgs,
   ReservationUnitsReservationUnitAuthenticationChoices,
+  EquipmentCategoryType,
 } from "../../modules/gql-types";
 import { Parameter } from "../../modules/types";
 import { toApiDate } from "../../modules/util";
+
+const equipmentCategories: EquipmentCategoryType[] = [
+  {
+    id: "gaiperjg9raepg",
+    nameFi: "Huonekalut",
+    nameEn: "Huonekalut En",
+    nameSv: "Huonekalut Sv",
+  },
+  {
+    id: "gawipgm4iaoe",
+    nameFi: "Keittiö",
+    nameEn: "Keittiö En",
+    nameSv: "Keittiö Sv",
+  },
+  {
+    id: "jbs8e905ujs8934jeg",
+    nameFi: "Liikunta- ja pelivälineet",
+    nameEn: "Liikunta- ja pelivälineet En",
+    nameSv: "Liikunta- ja pelivälineet Sv",
+  },
+  {
+    id: "w45oijgeiorg",
+    nameFi: "Tekniikka",
+    nameEn: "Tekniikka En",
+    nameSv: "Tekniikka Sv",
+  },
+  {
+    id: "w45oijgeiorg",
+    nameFi: "Pelikonsoli",
+    nameEn: "Pelikonsoli En",
+    nameSv: "Pelikonsoli Sv",
+  },
+  {
+    id: "w45oijgeiorg",
+    nameFi: "Liittimet",
+    nameEn: "Liittimet En",
+    nameSv: "Liittimet Sv",
+  },
+  {
+    id: "w45oijgeiorg",
+    nameFi: "Muu",
+    nameEn: "Muu En",
+    nameSv: "Muu Sv",
+  },
+];
 
 const selectedReservationUnitQuery = graphql.query<
   Query,
@@ -237,7 +283,42 @@ const selectedReservationUnitQuery = graphql.query<
     },
     requireIntroduction: false,
     requireReservationHandling: false,
+    equipment: [
+      {
+        id: "RXVhY2tldFZhbHVlOjA=",
+        pk: 1,
+        nameFi: "Joku muu Fi",
+        nameEn: "Joku muu En",
+        nameSv: "Joku muu Sv",
+        category: {
+          id: "RXVhY2tldFZhbHVlOjB=",
+          nameFi: "Muu kategoria",
+          nameEn: "Muu kategoria EN",
+          nameSv: "Muu kategoria SV",
+        },
+      },
+      {
+        id: "RXVhY2tldFZhbHVlOjE=",
+        pk: 1,
+        nameFi: "Kattila Fi",
+        nameEn: "Kattila En",
+        nameSv: "Kattila Sv",
+        category: equipmentCategories[1],
+      },
+      {
+        id: "RXVhY2tldFZhbHVlOjD=",
+        pk: 1,
+        nameFi: "Tuoli Fi",
+        nameEn: "Tuoli En",
+        nameSv: "Tuoli Sv",
+        category: equipmentCategories[0],
+      },
+    ],
   };
+
+  if (req.variables.pk === 800) {
+    reservationUnitByPk.equipment = [];
+  }
 
   if (req.variables.pk === 900) {
     reservationUnitByPk.reservationBegins = addDays(new Date(), 1);

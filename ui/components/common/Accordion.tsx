@@ -58,6 +58,10 @@ const HeadingButton = styled(Button).attrs({
       margin-right: auto;
     }
 
+    > div {
+      margin-right: 0;
+    }
+
     :focus {
       outline: 2px solid var(--color-coat-of-arms);
     }
@@ -79,6 +83,7 @@ const Accordion = ({
   onToggle,
   id,
   theme = "default",
+  ...rest
 }: Props): JSX.Element => {
   const { isOpen, openAccordion, closeAccordion } = useAccordion({
     initiallyOpen: open,
@@ -99,7 +104,7 @@ const Accordion = ({
     <IconAngleDown aria-hidden />
   );
   return (
-    <AccordionElement id={id}>
+    <AccordionElement id={id} {...rest}>
       <HeadingButton
         variant="supplementary"
         iconRight={icon}

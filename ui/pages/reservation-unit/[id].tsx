@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { GetServerSideProps } from "next";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
@@ -33,7 +33,10 @@ import {
   RESERVATION_UNIT,
   TERMS_OF_USE,
 } from "../../modules/queries/reservationUnit";
-import { isReservationUnitPublished } from "../../modules/reservationUnit";
+import {
+  getEquipmentList,
+  isReservationUnitPublished,
+} from "../../modules/reservationUnit";
 
 type Props = {
   reservationUnit: ReservationUnitByPkType | null;
@@ -148,8 +151,12 @@ const TwoColumnLayout = styled.div`
 `;
 
 const Content = styled.div`
-  font-family: var(--font-regular);
-  white-space: pre-wrap;
+  & p {
+    font-size: var(--fontsize-body-l);
+    line-height: var(--lineheight-xl);
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
 `;
 
 const BottomWrapper = styled.div`
@@ -171,11 +178,30 @@ const StyledKoros = styled(Koros).attrs({
   fill: var(--tilavaraus-gray);
 `;
 
-const StyledH2 = styled(H2)`
-  && {
-    margin-bottom: var(--spacing-xl);
-    font-size: var(--fontsize-heading-m);
-    font-family: var(--font-bold);
+const StyledH2 = styled(H2)``;
+
+const EquipmentList = styled.ul`
+  list-style: none;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-2-xs) var(--spacing-m);
+  padding: 0;
+
+  @media (min-width: ${breakpoint.s}) {
+    grid-template-columns: 1fr 1fr;
+    row-gap: var(--spacing-s);
+  }
+
+  @media (min-width: ${breakpoint.m}) {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+`;
+
+const EquipmentItem = styled.li`
+  font-size: var(--fontsize-body-m);
+
+  @media (min-width: ${breakpoint.s}) {
+    font-size: var(--fontsize-body-l);
   }
 `;
 
@@ -198,6 +224,10 @@ const ReservationUnit = ({
 
   const shouldDisplayBottomWrapper = relatedReservationUnits?.length > 0;
 
+  const equipmentList = useMemo(() => {
+    return getEquipmentList(reservationUnit.equipment);
+  }, [reservationUnit.equipment]);
+
   return reservationUnit ? (
     <Wrapper>
       <Head
@@ -209,7 +239,12 @@ const ReservationUnit = ({
       <Container>
         <TwoColumnLayout>
           <div>
-            <Accordion open heading={t("reservationUnit:description")}>
+            <Accordion
+              open
+              heading={t("reservationUnit:description")}
+              theme="thin"
+              data-testid="reservation-unit__accordion--description"
+            >
               <Content>
                 <p>
                   <Sanitize
@@ -218,6 +253,22 @@ const ReservationUnit = ({
                 </p>
               </Content>
             </Accordion>
+            {equipmentList?.length > 0 && (
+              <Accordion
+                open
+                heading={t("reservationUnit:equipment")}
+                theme="thin"
+                data-testid="reservation-unit__accordion--equipment"
+              >
+                <Content>
+                  <EquipmentList>
+                    {equipmentList.map((equipment) => (
+                      <EquipmentItem key={equipment}>{equipment}</EquipmentItem>
+                    ))}
+                  </EquipmentList>
+                </Content>
+              </Accordion>
+            )}
           </div>
           <div>
             <Address reservationUnit={reservationUnit} />
@@ -236,7 +287,7 @@ const ReservationUnit = ({
         <TwoColumnLayout>
           <Address reservationUnit={reservationUnit} />
           <div />
-          <Accordion heading={t("reservationUnit:termsOfUse")}>
+          <Accordion heading={t("reservationUnit:termsOfUse")} theme="thin">
             <Content>
               <p>
                 <Sanitize
@@ -249,7 +300,10 @@ const ReservationUnit = ({
           {getTranslation(reservationUnit, "termsOfUse") &&
             reservationUnit.serviceSpecificTerms && (
               <>
-                <Accordion heading={t("reservationUnit:termsOfUseSpaces")}>
+                <Accordion
+                  heading={t("reservationUnit:termsOfUseSpaces")}
+                  theme="thin"
+                >
                   <Content>
                     <p>
                       <Sanitize

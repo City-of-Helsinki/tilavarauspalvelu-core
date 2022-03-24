@@ -8,6 +8,7 @@ import {
   ReservationUnitByPkType,
   UnitType,
 } from "../../modules/gql-types";
+import { H4 } from "../../modules/style/typography";
 
 type Props = {
   reservationUnit: ReservationUnitByPkType;
@@ -18,10 +19,8 @@ const Container = styled.div`
   margin-bottom: var(--spacing-layout-l);
 `;
 
-const Name = styled.div`
-  font-size: var(--fontsize-heading-m);
-  font-family: var(--font-bold);
-  margin-bottom: var(--spacing-m);
+const Name = styled(H4)`
+  margin-top: 0;
 `;
 
 const AddressLine = styled.div`

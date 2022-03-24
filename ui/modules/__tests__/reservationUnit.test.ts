@@ -1,7 +1,12 @@
 import { get as mockGet } from "lodash";
 import { addMinutes } from "date-fns";
-import { ReservationUnitByPkType } from "../gql-types";
-import { getPrice, isReservationUnitPublished } from "../reservationUnit";
+import { EquipmentType, ReservationUnitByPkType } from "../gql-types";
+import {
+  getEquipmentCategories,
+  getEquipmentList,
+  getPrice,
+  isReservationUnitPublished,
+} from "../reservationUnit";
 import mockTranslations from "../../public/locales/fi/prices.json";
 
 jest.mock("next/config", () => () => ({
@@ -179,5 +184,249 @@ describe("isReservationPublished", () => {
         publishEnds: addMinutes(new Date(), 1),
       } as ReservationUnitByPkType)
     ).toBe(true);
+  });
+});
+
+describe("getEquipmentCategories", () => {
+  test("with equipment out of predefined order", () => {
+    const equipment: EquipmentType[] = [
+      {
+        id: "1",
+        nameFi: "Item A",
+        category: {
+          id: "1",
+          nameFi: "Category A",
+        },
+      },
+      {
+        id: "2",
+        nameFi: "Item B",
+        category: {
+          id: "2",
+          nameFi: "Category B",
+        },
+      },
+      {
+        id: "3",
+        nameFi: "Item C",
+        category: {
+          id: "3",
+          nameFi: "Category C",
+        },
+      },
+    ];
+
+    expect(getEquipmentCategories(equipment)).toStrictEqual(["Muu"]);
+  });
+
+  test("with equipment in predefined order", () => {
+    const equipment: EquipmentType[] = [
+      {
+        id: "1",
+        nameFi: "Item A",
+        category: {
+          id: "1",
+          nameFi: "Liittimet",
+        },
+      },
+      {
+        id: "2",
+        nameFi: "Item B",
+        category: {
+          id: "2",
+          nameFi: "Keittiö",
+        },
+      },
+      {
+        id: "3",
+        nameFi: "Item C",
+        category: {
+          id: "3",
+          nameFi: "Foobar",
+        },
+      },
+      {
+        id: "4",
+        nameFi: "Item D",
+        category: {
+          id: "4",
+          nameFi: "Pelikonsoli",
+        },
+      },
+      {
+        id: "5",
+        nameFi: "Item ABC 2",
+        category: {
+          id: "2",
+          nameFi: "Keittiö",
+        },
+      },
+      {
+        id: "6",
+        nameFi: "Item ABC 1",
+        category: {
+          id: "2",
+          nameFi: "Keittiö",
+        },
+      },
+    ];
+
+    expect(getEquipmentCategories(equipment)).toStrictEqual([
+      "Keittiö",
+      "Pelikonsoli",
+      "Liittimet",
+      "Muu",
+    ]);
+  });
+
+  test("without categories", () => {
+    expect(getEquipmentCategories([])).toStrictEqual([]);
+  });
+});
+
+describe("getEquipmentList", () => {
+  test("with equipment out of predefined order", () => {
+    const equipment: EquipmentType[] = [
+      {
+        id: "1",
+        nameFi: "Item A",
+        category: {
+          id: "1",
+          nameFi: "Category A",
+        },
+      },
+      {
+        id: "2",
+        nameFi: "Item B",
+        category: {
+          id: "2",
+          nameFi: "Category B",
+        },
+      },
+      {
+        id: "3",
+        nameFi: "Item C",
+        category: {
+          id: "3",
+          nameFi: "Category C",
+        },
+      },
+    ];
+
+    expect(getEquipmentList(equipment)).toStrictEqual([
+      "Item A",
+      "Item B",
+      "Item C",
+    ]);
+  });
+
+  test("with equipment out of predefined order", () => {
+    const equipment: EquipmentType[] = [
+      {
+        id: "1",
+        nameFi: "Item A",
+        category: {
+          id: "1",
+          nameFi: "Category C",
+        },
+      },
+      {
+        id: "2",
+        nameFi: "Item B",
+        category: {
+          id: "2",
+          nameFi: "Category B",
+        },
+      },
+      {
+        id: "3",
+        nameFi: "Item C",
+        category: {
+          id: "3",
+          nameFi: "Category A",
+        },
+      },
+    ];
+
+    expect(getEquipmentList(equipment)).toStrictEqual([
+      "Item A",
+      "Item B",
+      "Item C",
+    ]);
+  });
+
+  test("with equipment in predefined order", () => {
+    const equipment: EquipmentType[] = [
+      {
+        id: "1",
+        nameFi: "Item A",
+        category: {
+          id: "1",
+          nameFi: "Liittimet",
+        },
+      },
+      {
+        id: "2",
+        nameFi: "Item B",
+        category: {
+          id: "2",
+          nameFi: "Keittiö",
+        },
+      },
+      {
+        id: "3",
+        nameFi: "Item C 2",
+        category: {
+          id: "3",
+          nameFi: "Foobar",
+        },
+      },
+      {
+        id: "4",
+        nameFi: "Item D",
+        category: {
+          id: "4",
+          nameFi: "Pelikonsoli",
+        },
+      },
+      {
+        id: "5",
+        nameFi: "Item ABC 2",
+        category: {
+          id: "2",
+          nameFi: "Keittiö",
+        },
+      },
+      {
+        id: "6",
+        nameFi: "Item ABC 1",
+        category: {
+          id: "2",
+          nameFi: "Keittiö",
+        },
+      },
+      {
+        id: "6",
+        nameFi: "Item C 1",
+        category: {
+          id: "2",
+          nameFi: "Barfoo",
+        },
+      },
+    ];
+
+    expect(getEquipmentList(equipment)).toStrictEqual([
+      "Item ABC 1",
+      "Item ABC 2",
+      "Item B",
+      "Item D",
+      "Item A",
+      "Item C 1",
+      "Item C 2",
+    ]);
+  });
+
+  test("without equipment", () => {
+    expect(getEquipmentList([])).toStrictEqual([]);
   });
 });

@@ -1,5 +1,5 @@
 import { error404Body, error404Title } from "model/error";
-import { addressContainer } from "model/reservation-unit";
+import { accordion, addressContainer } from "model/reservation-unit";
 import { textWithIcon } from "model/search";
 
 describe("Tilavaraus ui reservation unit page (recurring)", () => {
@@ -12,6 +12,12 @@ describe("Tilavaraus ui reservation unit page (recurring)", () => {
     textWithIcon(2).contains("Nuorisopalvelut Fi");
     textWithIcon(3).contains("60 henkilöä");
 
+    accordion("description").contains(
+      "Sali sijaitsee nuorisotalon toisessa kerroksessa. Tilaan mahtuu 60 henkilöä.."
+    );
+
+    accordion("equipment").contains("Tuoli FiKattila FiJoku muu Fi");
+
     addressContainer().should("have.length", 2);
 
     addressContainer(1).should("contain", "Säterintie 2 Fi");
@@ -19,6 +25,18 @@ describe("Tilavaraus ui reservation unit page (recurring)", () => {
     addressContainer(1).should("contain", "Avaa kartta uuteen ikkunaan");
     addressContainer(1).should("contain", "Google reittiohjeet");
     addressContainer(1).should("contain", "HSL Reittiopas");
+  });
+
+  describe("without equipment", () => {
+    it("doesn't display equipment accordion", () => {
+      cy.visit("/reservation-unit/800");
+
+      accordion("description").contains(
+        "Sali sijaitsee nuorisotalon toisessa kerroksessa. Tilaan mahtuu 60 henkilöä.."
+      );
+
+      accordion("equipment").should("not.exist");
+    });
   });
 
   describe("with publish times", () => {
