@@ -23,9 +23,7 @@ from api.graphql.spaces.space_types import LocationType, SpaceType
 from api.graphql.terms_of_use.terms_of_use_types import TermsOfUseType
 from api.graphql.translate_fields import get_all_translatable_fields
 from api.graphql.units.unit_types import UnitType
-from applications.models import ApplicationRound
 from opening_hours.hauki_link_generator import generate_hauki_link
-from permissions.api_permissions.drf_permissions import ApplicationRoundPermission
 from permissions.api_permissions.graphene_field_decorators import (
     check_resolver_permission,
 )
@@ -262,39 +260,6 @@ class EquipmentType(AuthNode, PrimaryKeyObjectType):
         return self.category
 
 
-class ApplicationRoundType(AuthNode, PrimaryKeyObjectType):
-    permission_classes = (
-        (ApplicationRoundPermission,)
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else (AllowAny,)
-    )
-
-    class Input:
-        active = graphene.Field(graphene.Boolean)
-
-    class Meta:
-        model = ApplicationRound
-        fields = [
-            "target_group",
-            "allocating",
-            "reservation_units",
-            "application_period_begin",
-            "application_period_end",
-            "reservation_period_begin",
-            "reservation_period_end",
-            "public_display_begin",
-            "public_display_end",
-            "purposes",
-            "service_sector",
-        ] + get_all_translatable_fields(model)
-
-        filter_fields = {
-            "name_fi": ["exact", "icontains", "istartswith"],
-            "name_sv": ["exact", "icontains", "istartswith"],
-            "name_en": ["exact", "icontains", "istartswith"],
-        }
-
-
 class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
     name_fi = graphene.String()
     name_sv = graphene.String()
@@ -319,7 +284,10 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
         to=graphene.Date(),
         state=graphene.List(graphene.String),
     )
-    application_rounds = graphene.List(ApplicationRoundType, active=graphene.Boolean())
+    application_rounds = graphene.List(
+        "api.graphql.application_rounds.application_round_types.ApplicationRoundType",
+        active=graphene.Boolean(),
+    )
     cancellation_rule = graphene.Field(ReservationUnitCancellationRuleType)
     payment_terms = graphene.Field(TermsOfUseType)
     cancellation_terms = graphene.Field(TermsOfUseType)
