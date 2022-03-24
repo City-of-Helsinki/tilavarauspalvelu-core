@@ -31,6 +31,8 @@ import {
 import { RESERVATION_UNITS } from "../../modules/queries/reservationUnit";
 import Sorting from "../../components/form/Sorting";
 import { getApplicationRounds } from "../../modules/api";
+import Breadcrumb from "../../components/common/Breadcrumb";
+import { breakpoint } from "../../modules/style";
 
 type Props = {
   applicationRounds: ApplicationRound[];
@@ -72,6 +74,10 @@ const Wrapper = styled.div`
 const HeadContainer = styled.div`
   background-color: white;
   padding-top: var(--spacing-layout-xs);
+
+  @media (min-width: ${breakpoint.m}) {
+    padding-top: 0;
+  }
 `;
 
 const Title = styled(H1)``;
@@ -226,6 +232,10 @@ const Search = ({ applicationRounds }: Props): JSX.Element => {
   return (
     <Wrapper>
       <HeadContainer>
+        <Breadcrumb
+          root={{ label: "home", linkTo: "/recurring" }}
+          current={{ label: "search" }}
+        />
         <Container>
           <Title>{t("search:recurring.heading")}</Title>
           <Ingress>{t("search:recurring.text")}</Ingress>
