@@ -94,6 +94,40 @@ const StyledSorting = styled(Sorting)`
   }
 `;
 
+const processVariables = (values: Record<string, string>) => {
+  return {
+    ...omit(values, [
+      "order",
+      "sort",
+      "minPersons",
+      "maxPersons",
+      "purposes",
+      "unit",
+      "reservationUnitType",
+      "applicationRound", // TODO: use application round in variables
+    ]),
+    ...(values.minPersons && {
+      minPersons: parseInt(values.minPersons, 10),
+    }),
+    ...(values.maxPersons && {
+      maxPersons: parseInt(values.maxPersons, 10),
+    }),
+    ...(values.purposes && {
+      purposes: values.purposes.split(","),
+    }),
+    ...(values.unit && {
+      unit: values.unit.split(","),
+    }),
+    ...(values.reservationUnitType && {
+      reservationUnitType: values.reservationUnitType.split(","),
+    }),
+    first: pagingLimit,
+    orderBy: values.order === "desc" ? `-${values.sort}` : values.sort,
+    isDraft: false,
+    isVisible: true,
+  };
+};
+
 const Search = ({ applicationRounds }: Props): JSX.Element => {
   const { t, i18n } = useTranslation();
 
@@ -125,33 +159,7 @@ const Search = ({ applicationRounds }: Props): JSX.Element => {
     Query,
     QueryReservationUnitsArgs
   >(RESERVATION_UNITS, {
-    variables: {
-      ...omit(values, [
-        "order",
-        "sort",
-        "minPersons",
-        "maxPersons",
-        "purposes",
-        "unit",
-        "applicationRound", // TODO: use application round in variables
-      ]),
-      ...(values.minPersons && {
-        minPersons: parseInt(values.minPersons, 10),
-      }),
-      ...(values.maxPersons && {
-        maxPersons: parseInt(values.maxPersons, 10),
-      }),
-      ...(values.purposes && {
-        purposes: values.purposes.split(","),
-      }),
-      ...(values.unit && {
-        unit: values.unit.split(","),
-      }),
-      first: pagingLimit,
-      orderBy: values.order === "desc" ? `-${values.sort}` : values.sort,
-      isDraft: false,
-      isVisible: true,
-    },
+    variables: processVariables(values),
     fetchPolicy: "network-only",
   });
 
@@ -287,7 +295,7 @@ const Search = ({ applicationRounds }: Props): JSX.Element => {
                 after: cursor,
               };
               fetchMore({
-                variables,
+                variables: processVariables(variables),
               });
             }}
             pageInfo={pageInfo}
