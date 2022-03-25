@@ -1,24 +1,28 @@
-import React from "react";
-import { groupBy } from "lodash";
+import React, { useEffect, useState } from "react";
+import { GetStaticProps } from "next";
+import { Dictionary, groupBy } from "lodash";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { TFunction } from "next-i18next";
-import { useApiData } from "../hooks/useApiData";
-import { getApplicationRounds, getApplications } from "../modules/api";
+import {
+  getApplicationRounds,
+  getApplications,
+  getCurrentUser,
+} from "../modules/api";
 import {
   Application,
   ApplicationRound,
   ReducedApplicationStatus,
+  User,
 } from "../modules/types";
 import { getReducedApplicationStatus } from "../modules/util";
 import Head from "../components/applications/Head";
-import Loader from "../components/common/Loader";
 import ApplicationsGroup from "../components/applications/ApplicationsGroup";
 import RequireAuthentication from "../components/common/RequireAuthentication";
+import { CenterSpinner } from "../components/common/common";
 
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export async function getStaticProps({ locale }) {
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       overrideBackgroundColor: "var(--tilavaraus-gray)",
@@ -26,7 +30,7 @@ export async function getStaticProps({ locale }) {
     },
     revalidate: 100, // In seconds
   };
-}
+};
 
 const Container = styled.div`
   padding: 0 var(--spacing-m) var(--spacing-m);
@@ -73,31 +77,64 @@ function ApplicationGroups({
 const Applications = (): JSX.Element => {
   const { t } = useTranslation();
 
-  const applications = useApiData(getApplications, {}, (apps) =>
-    groupBy(
-      apps.filter((app) => app.status !== "cancelled"),
-      (a) => getReducedApplicationStatus(a.status)
-    )
-  );
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [applications, setApplications] =
+    useState<Dictionary<[Application, ...Application[]]>>(null);
+  const [rounds, setRounds] = useState(null);
 
-  const rounds = useApiData(getApplicationRounds, {}, (applicationRounds) =>
-    applicationRounds.reduce((prev, current) => {
-      return { ...prev, [current.id]: current };
-    }, {} as { [key: number]: ApplicationRound })
-  );
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      const user = await getCurrentUser();
+      setCurrentUser(user);
+    };
+
+    if (currentUser === null) {
+      fetchCurrentUser();
+    }
+  }, [currentUser]);
+
+  useEffect(() => {
+    const fetchApplications = async () => {
+      const apps = await getApplications(currentUser.id);
+      const filteredApps = groupBy(
+        apps.filter((app) => app.status !== "cancelled"),
+        (a) => getReducedApplicationStatus(a.status)
+      );
+      setApplications(filteredApps);
+    };
+
+    if (currentUser?.id) {
+      fetchApplications();
+    }
+  }, [currentUser]);
+
+  useEffect(() => {
+    const fetchRounds = async () => {
+      const data = await getApplicationRounds();
+      setRounds(
+        data.reduce((prev, current) => {
+          return { ...prev, [current.id]: current };
+        }, {} as { [key: number]: ApplicationRound })
+      );
+    };
+
+    fetchRounds();
+  }, []);
 
   return (
     <>
       <Head />
       <RequireAuthentication>
         <Container>
-          <Loader datas={[applications, rounds]}>
+          {applications && rounds ? (
             <ApplicationGroups
               t={t}
-              rounds={rounds.transformed || {}}
-              applications={applications.transformed || {}}
+              rounds={rounds}
+              applications={applications}
             />
-          </Loader>
+          ) : (
+            <CenterSpinner />
+          )}
         </Container>
       </RequireAuthentication>
     </>
