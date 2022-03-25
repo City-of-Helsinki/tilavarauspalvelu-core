@@ -105,13 +105,14 @@ MIDDLEWARE = [
     "tilavarauspalvelu.multi_proxy_middleware.MultipleProxyMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    # Keep this after security middleware, correct place according to whitenoise documentation
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",
     "auditlog.middleware.AuditlogMiddleware",
 ]
 
@@ -238,6 +239,8 @@ MEDIA_ROOT = env("MEDIA_ROOT")
 
 STATIC_URL = env("STATIC_URL")
 MEDIA_URL = env("MEDIA_URL")
+
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 HAUKI_API_URL = env("HAUKI_API_URL")
 HAUKI_ORIGIN_ID = env("HAUKI_ORIGIN_ID")
