@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { IconSearch, TextInput } from "hds-react";
 import router from "next/router";
+import Image from "next/image";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { breakpoint } from "../../modules/style";
@@ -41,20 +42,15 @@ const Content = styled(Container)`
   }
 `;
 
-const Image = styled.div`
+const ImageWrapper = styled.div`
   display: none;
+  position: relative;
 
   @media (min-width: ${breakpoint.m}) {
     display: block;
-    background-image: url("/images/hero-front@1x.jpg");
-    background-size: cover;
     max-width: 100%;
     height: 100%;
     max-height: 377px;
-
-    @media (-webkit-min-device-pixel-ratio: 2) {
-      background-image: url("images/hero-front@2x.jpg");
-    }
   }
 `;
 
@@ -149,7 +145,15 @@ const Head = (props: HeadProps): JSX.Element => {
             />
           </form>
         </Left>
-        <Image />
+        <ImageWrapper>
+          <Image
+            alt=""
+            src="/images/hero-front.png"
+            layout="fill"
+            objectFit="cover"
+            quality={90}
+          />
+        </ImageWrapper>
       </Content>
     </Wrapper>
   );
