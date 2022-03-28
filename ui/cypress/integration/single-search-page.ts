@@ -36,7 +36,7 @@ describe("Tilavaraus ui search page (single)", () => {
   });
 
   it("displays search results by default", () => {
-    cy.get("#searchResultList").should("contain", "10 Hakutulosta");
+    cy.get("#searchResultList").should("not.contain", "10 Hakutulosta");
 
     reservationUnitCards(1).contains("12,34 - 20 € / t");
     reservationUnitCards(1).contains("Arabianpolku 1 A 2");
@@ -93,7 +93,7 @@ describe("Tilavaraus ui search page (single)", () => {
     filterTags().should("contain.text", "Henkilömäärä max");
     filterTags().should("contain.text", "Tilan tyyppi");
     filterTags().should("contain.text", "Toimipiste");
-    cy.get("#searchResultList").should("contain", "10 Hakutulosta");
+    cy.get("#searchResultList").should("not.contain", "10 Hakutulosta");
 
     filterTag("maxPersons").children("button").click();
 
@@ -102,12 +102,12 @@ describe("Tilavaraus ui search page (single)", () => {
     filterTags().should("not.contain.text", "Henkilömäärä max");
     filterTags().should("contain.text", "Tilan tyyppi");
     filterTags().should("contain.text", "Toimipiste");
-    cy.get("#searchResultList").should("contain", "10 Hakutulosta");
+    cy.get("#searchResultList").should("not.contain", "10 Hakutulosta");
 
     formResetButton().click();
 
     filterTags().should("not.exist");
-    cy.get("#searchResultList").should("contain", "10 Hakutulosta");
+    cy.get("#searchResultList").should("not.contain", "10 Hakutulosta");
     formResetButton().should("not.be.exist");
 
     paginationButton().should("exist");

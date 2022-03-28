@@ -97,13 +97,11 @@ const SearchResultList = ({
         {reservationUnits ? (
           <>
             <TopWrapper>
-              <HitCount>
-                {reservationUnits.length
-                  ? t("searchResultList:count", {
-                      count: reservationUnits.length,
-                    })
-                  : t("searchResultList:noResults")}
-              </HitCount>
+              {reservationUnits?.length ? (
+                <div />
+              ) : (
+                <HitCount>{t("searchResultList:noResults")}</HitCount>
+              )}
               {sortingComponent}
             </TopWrapper>
             <ListContainer>
