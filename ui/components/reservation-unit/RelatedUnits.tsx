@@ -131,7 +131,7 @@ const RelatedUnits = ({
         {units.map((unit) => (
           <Unit key={unit.pk}>
             <Image
-              src={getMainImage(unit)?.imageUrl}
+              src={getMainImage(unit)?.mediumUrl}
               alt=""
               style={{ marginTop: 0 }}
             />

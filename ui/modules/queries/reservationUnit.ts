@@ -199,7 +199,7 @@ export const RELATED_RESERVATION_UNITS = gql`
           nameEn
           nameSv
           images {
-            imageUrl
+            mediumUrl
             smallUrl
             imageType
           }

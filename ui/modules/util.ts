@@ -340,7 +340,9 @@ export const applicationEventSchedulesToCells = (
   return cells;
 };
 
-const imagePriority = ["main", "map", "ground_plan", "other"];
+const imagePriority = ["main", "map", "ground_plan", "other"].map((n) =>
+  n.toUpperCase()
+);
 
 export const getMainImage = (
   ru: ReservationUnit | ReservationUnitType
@@ -355,6 +357,21 @@ export const getMainImage = (
   });
 
   return images[0];
+};
+
+export const orderImages = (
+  images: ReservationUnitImageType[]
+): ReservationUnitImageType[] => {
+  if (!images || images.length === 0) {
+    return [];
+  }
+  const result = [...images].sort((a, b) => {
+    return (
+      imagePriority.indexOf(a.imageType) - imagePriority.indexOf(b.imageType)
+    );
+  });
+
+  return result;
 };
 
 export const getAddress = (ru: ReservationUnit): string | null => {
