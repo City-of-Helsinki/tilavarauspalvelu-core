@@ -929,6 +929,7 @@ export type QueryReservationUnitTypesArgs = {
 
 export type QueryReservationUnitsArgs = {
   after?: InputMaybe<Scalars["String"]>;
+  applicationRound?: InputMaybe<Array<InputMaybe<Scalars["ID"]>>>;
   before?: InputMaybe<Scalars["String"]>;
   first?: InputMaybe<Scalars["Int"]>;
   isDraft?: InputMaybe<Scalars["Boolean"]>;
@@ -3855,6 +3856,7 @@ export type ReservationUnitQueryResult = Apollo.QueryResult<
 export const SearchReservationUnitsDocument = gql`
   query SearchReservationUnits(
     $textSearch: String
+    $applicationRound: [ID]
     $minPersons: Float
     $maxPersons: Float
     $unit: [ID]
@@ -3868,6 +3870,7 @@ export const SearchReservationUnitsDocument = gql`
   ) {
     reservationUnits(
       textSearch: $textSearch
+      applicationRound: $applicationRound
       maxPersonsGte: $minPersons
       maxPersonsLte: $maxPersons
       reservationUnitType: $reservationUnitType
@@ -3938,6 +3941,7 @@ export const SearchReservationUnitsDocument = gql`
  * const { data, loading, error } = useSearchReservationUnitsQuery({
  *   variables: {
  *      textSearch: // value for 'textSearch'
+ *      applicationRound: // value for 'applicationRound'
  *      minPersons: // value for 'minPersons'
  *      maxPersons: // value for 'maxPersons'
  *      unit: // value for 'unit'
@@ -3996,7 +4000,7 @@ export const RelatedReservationUnitsDocument = gql`
           nameEn
           nameSv
           images {
-            imageUrl
+            mediumUrl
             smallUrl
             imageType
           }
@@ -4805,6 +4809,9 @@ export type ReservationUnitQuery = {
 
 export type SearchReservationUnitsQueryVariables = Exact<{
   textSearch?: InputMaybe<Scalars["String"]>;
+  applicationRound?: InputMaybe<
+    Array<InputMaybe<Scalars["ID"]>> | InputMaybe<Scalars["ID"]>
+  >;
   minPersons?: InputMaybe<Scalars["Float"]>;
   maxPersons?: InputMaybe<Scalars["Float"]>;
   unit?: InputMaybe<
@@ -4898,7 +4905,7 @@ export type RelatedReservationUnitsQuery = {
         maxPersons?: number | null;
         images?: Array<{
           __typename?: "ReservationUnitImageType";
-          imageUrl?: string | null;
+          mediumUrl?: string | null;
           smallUrl?: string | null;
           imageType: ReservationUnitsReservationUnitImageImageTypeChoices;
         } | null> | null;
