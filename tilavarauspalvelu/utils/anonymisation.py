@@ -1,5 +1,4 @@
 import random
-import string
 import uuid
 
 from auditlog.models import LogEntry
@@ -60,19 +59,16 @@ LAST_NAMES = [
 ]
 
 
-def get_random_text(length=32):
-    str = ""
-    for i in range(length):
-        str += random.choice(string.ascii_letters)
-    return str
-
-
 def get_first_name():
-    return random.choice(FIRST_NAMES)
+    # Random library isn't safe for security / cryptography thus the nosec line.
+    # We anonymize data and clean traces so getting random string from a list is not back traceable.
+    return random.choice(FIRST_NAMES)  # nosec
 
 
 def get_last_name():
-    return random.choice(LAST_NAMES)
+    # Random library isn't safe for security / cryptography thus the nosec line.
+    # We anonymize data and clean traces so getting random string from a list is not back traceable.
+    return random.choice(LAST_NAMES)  # nosec
 
 
 def anonymize_user(user):
