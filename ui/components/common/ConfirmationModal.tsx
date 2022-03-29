@@ -23,6 +23,10 @@ type Props = {
 };
 
 const StyledDialog = styled(Dialog)`
+  button {
+    font-size: var(--fontsize-body-m);
+  }
+
   > div:last-of-type {
     padding-top: var(--spacing-layout-m);
     display: flex;
@@ -52,10 +56,6 @@ const StyledDialog = styled(Dialog)`
     @media (min-width: ${breakpoint.s}) {
       font-size: 2rem;
     }
-  }
-
-  button {
-    font-size: var(--fontsize-body-m);
   }
 `;
 
