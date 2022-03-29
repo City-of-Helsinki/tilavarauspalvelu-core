@@ -27,6 +27,8 @@ import {
 
 describe("application", () => {
   beforeEach(() => {
+    Cypress.config("defaultCommandTimeout", 20000);
+
     cy.fixture("v1/application_round").then((json) => {
       cy.intercept("GET", "/v1/application_round/*", json);
     });

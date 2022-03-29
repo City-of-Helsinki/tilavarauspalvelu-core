@@ -26,7 +26,7 @@ import Sorting from "../../components/form/Sorting";
 import { OptionType } from "../../modules/types";
 import KorosDefault from "../../components/common/KorosDefault";
 
-const pagingLimit = 10;
+const pagingLimit = 25;
 
 const HeadContainer = styled.div`
   background-color: white;
@@ -55,6 +55,39 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
       overrideBackgroundColor: "var(--tilavaraus-gray)",
       ...(await serverSideTranslations(locale)),
     },
+  };
+};
+
+const processVariables = (values: Record<string, string>) => {
+  return {
+    ...omit(values, [
+      "order",
+      "sort",
+      "minPersons",
+      "maxPersons",
+      "purposes",
+      "unit",
+      "reservationUnitType",
+    ]),
+    ...(values.minPersons && {
+      minPersons: parseInt(values.minPersons, 10),
+    }),
+    ...(values.maxPersons && {
+      maxPersons: parseInt(values.maxPersons, 10),
+    }),
+    ...(values.purposes && {
+      purposes: values.purposes.split(","),
+    }),
+    ...(values.unit && {
+      unit: values.unit.split(","),
+    }),
+    ...(values.reservationUnitType && {
+      reservationUnitType: values.reservationUnitType.split(","),
+    }),
+    first: pagingLimit,
+    orderBy: values.order === "desc" ? `-${values.sort}` : values.sort,
+    isDraft: false,
+    isVisible: true,
   };
 };
 
@@ -89,32 +122,7 @@ const SearchSingle = (): JSX.Element => {
     Query,
     QueryReservationUnitsArgs
   >(RESERVATION_UNITS, {
-    variables: {
-      ...omit(values, [
-        "order",
-        "sort",
-        "minPersons",
-        "maxPersons",
-        "purposes",
-        "unit",
-      ]),
-      ...(values.minPersons && {
-        minPersons: parseInt(values.minPersons, 10),
-      }),
-      ...(values.maxPersons && {
-        maxPersons: parseInt(values.maxPersons, 10),
-      }),
-      ...(values.purposes && {
-        purposes: values.purposes.split(","),
-      }),
-      ...(values.unit && {
-        unit: values.unit.split(","),
-      }),
-      first: pagingLimit,
-      orderBy: values.order === "desc" ? `-${values.sort}` : values.sort,
-      isDraft: false,
-      isVisible: true,
-    },
+    variables: processVariables(values),
     fetchPolicy: "network-only",
   });
 
@@ -233,7 +241,7 @@ const SearchSingle = (): JSX.Element => {
               after: cursor,
             };
             fetchMore({
-              variables,
+              variables: processVariables(variables),
             });
           }}
           pageInfo={pageInfo}

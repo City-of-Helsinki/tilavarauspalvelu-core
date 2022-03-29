@@ -14,7 +14,11 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import useReservationUnitList from "../../hooks/useReservationUnitList";
 import { breakpoint } from "../../modules/style";
-import { formatSecondDuration, getTranslation } from "../../modules/util";
+import {
+  formatSecondDuration,
+  getTranslation,
+  orderImages,
+} from "../../modules/util";
 import Back from "../common/Back";
 import Container from "../common/Container";
 import IconWithText from "../common/IconWithText";
@@ -156,7 +160,7 @@ const Head = ({
             <UnitName>{getTranslation(reservationUnit.unit, "name")}</UnitName>
             <JustForMobile style={{ marginTop: "var(--spacing-l)" }}>
               <Images
-                images={reservationUnit.images}
+                images={orderImages(reservationUnit.images)}
                 contextName={getTranslation(reservationUnit, "name")}
               />
             </JustForMobile>
@@ -271,7 +275,7 @@ const Head = ({
           </div>
           <JustForDesktop>
             <Images
-              images={reservationUnit.images}
+              images={orderImages(reservationUnit.images)}
               contextName={getTranslation(reservationUnit, "name")}
             />
           </JustForDesktop>

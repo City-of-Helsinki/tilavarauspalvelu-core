@@ -12,7 +12,7 @@ describe("Tilavaraus ui search page (recurring)", () => {
   it("displays search results when search button is clicked", () => {
     fullTextInput().type("search terms");
     searchButton().click();
-    cy.get("#searchResultList").should("contain", "10 Hakutulosta");
+    cy.get("#searchResultList").should("not.contain", "10 Hakutulosta");
   });
 
   it("search results is accessible", () => {

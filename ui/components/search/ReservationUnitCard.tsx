@@ -134,7 +134,7 @@ const ReservationUnitCard = ({
         alt={t("common:imgAltForSpace", {
           name: getTranslation(reservationUnit, "name"),
         })}
-        src={getMainImage(reservationUnit)?.mediumUrl || pixel}
+        src={getMainImage(reservationUnit)?.smallUrl || pixel}
       />
       <MainContent>
         <Name>

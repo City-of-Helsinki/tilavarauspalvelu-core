@@ -136,7 +136,8 @@ const Carousel = ({
   return (
     <StyledCarousel
       renderCenterLeftControls={({ currentSlide, previousSlide }) => {
-        const isDisabled = !wrapAround && currentSlide === 0;
+        const isDisabled =
+          (!wrapAround && currentSlide === 0) || children.length < 2;
         return (
           <VerticalButton
             $disabled={isDisabled}
@@ -155,7 +156,9 @@ const Carousel = ({
         slideCount,
         nextSlide,
       }) => {
-        const isDisabled = !wrapAround && currentSlide + sts >= slideCount;
+        const isDisabled =
+          (!wrapAround && currentSlide + sts >= slideCount) ||
+          children.length < 2;
         return (
           <VerticalButton
             $disabled={isDisabled}
