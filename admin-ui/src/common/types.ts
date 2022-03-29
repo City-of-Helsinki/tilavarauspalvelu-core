@@ -250,6 +250,7 @@ export type ApplicationEventSchedule = {
   day: DAY;
   begin: string;
   end: string;
+  priority: number;
 };
 
 export interface ReservationUnitsParameters {

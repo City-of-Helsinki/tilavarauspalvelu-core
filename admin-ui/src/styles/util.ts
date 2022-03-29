@@ -12,6 +12,7 @@ import {
   ApplicationStatus,
   NormalizedApplicationRoundStatus,
 } from "../common/types";
+import { getApplicationStatusColor } from "../component/applications/util";
 
 export const breakpoints = {
   xs: "320px",
@@ -24,40 +25,6 @@ export const breakpoints = {
 export const getGridFraction = (space: number, columns = 12): number => {
   const fraction = (space / columns) * 100;
   return fraction > 0 ? fraction : 0;
-};
-
-export const getApplicationStatusColor = (
-  status: ApplicationStatus,
-  size: "s" | "l"
-): string => {
-  let color = "";
-  switch (status) {
-    case "draft":
-    case "in_review":
-      color = "var(--color-info)";
-      break;
-    case "review_done":
-      color = "var(--color-success)";
-      break;
-    case "approved":
-    case "sent":
-      color = "var(--color-white)";
-      break;
-    case "declined":
-    case "cancelled":
-      switch (size) {
-        case "s":
-          color = "var(--color-error)";
-          break;
-        case "l":
-        default:
-          color = "var(--color-error-dark)";
-      }
-      break;
-    default:
-  }
-
-  return color;
 };
 
 export const getApplicationEventStatusColor = (

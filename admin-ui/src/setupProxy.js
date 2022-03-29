@@ -4,11 +4,14 @@ module.exports = function (app) {
   app.use(
     "/api",
     createProxyMiddleware({
-      target: "http://localhost:8000",
+      target: "https://tilavaraus.hel.fi",
       pathRewrite: {
         "^/api/": "/",
       },
       changeOrigin: true,
+      /*      onProxyReq: (preq, req, res) => {
+              preq.removeHeader("Authorization");
+            }*/
     })
   );
 };

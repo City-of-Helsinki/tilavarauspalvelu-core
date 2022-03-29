@@ -10,7 +10,6 @@ import {
   ApplicationEventStatus,
   ApplicationRound,
   ApplicationRoundStatus,
-  ApplicationStatus,
   DataFilterOption,
   LocalizationLanguages,
   Location,
@@ -57,24 +56,6 @@ export const formatDuration = (time: string): IFormatDurationOutput => {
     hours: Number(hours),
     minutes: Number(minutes),
   };
-};
-
-export const getNormalizedApplicationStatus = (
-  status: ApplicationStatus,
-  view: ApplicationRoundStatus
-): ApplicationStatus => {
-  let normalizedStatus: ApplicationStatus = status;
-  if (["draft", "in_review", "allocated"].includes(view)) {
-    if (status === "in_review") {
-      normalizedStatus = "review_done";
-    }
-  } else if (view === "approved") {
-    if (["in_review", "review_done"].includes(normalizedStatus)) {
-      normalizedStatus = "approved";
-    }
-  }
-
-  return normalizedStatus;
 };
 
 export const getNormalizedApplicationEventStatus = (
@@ -137,26 +118,16 @@ export const getNormalizedApplicationRoundStatus = (
 
 export const parseApplicationEventSchedules = (
   applicationEventSchedules: ApplicationEventSchedule[],
-  index: number
+  index: number,
+  priority: number
 ): string => {
-  return (
-    applicationEventSchedules
-      .filter((s) => s.day === index)
-      .reduce((acc: string, cur: ApplicationEventSchedule) => {
-        let begin = cur.begin.substring(0, 5);
-        const end = cur.end.substring(0, 5);
-        let prev = acc;
-        let rangeChar = " - ";
-        let divider = prev.length ? ", " : "";
-        if (acc.endsWith(begin)) {
-          begin = "";
-          prev = `${prev.slice(0, -5)}`;
-          rangeChar = "";
-          divider = "";
-        }
-        return `${prev}${divider}${begin}${rangeChar}${end}`;
-      }, "") || "-"
-  );
+  const schedules = applicationEventSchedules
+    .filter((s) => s.day === index)
+    .filter((s) => s.priority === priority);
+
+  return schedules
+    .map((s) => `${s.begin.substring(0, 2)}-${s.end.substring(0, 2)}`)
+    .join(", ");
 };
 
 interface HMS {

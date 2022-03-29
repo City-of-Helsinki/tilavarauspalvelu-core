@@ -26,6 +26,7 @@ import { Divider, Strong } from "../../styles/util";
 import { formatDate, localizedValue } from "../../common/util";
 import { weekdays } from "../../common/const";
 import { applicationUrl } from "../../common/urls";
+import { applicantName } from "./util";
 
 interface IRouteParams {
   applicationId: string;
@@ -150,10 +151,7 @@ function ReservationByApplicationEvent(): JSX.Element | null {
     return <Loader />;
   }
 
-  const customerName =
-    application?.applicantType === "individual"
-      ? application?.applicantName
-      : application?.organisation?.name;
+  const customerName = applicantName(application);
 
   const applicationEvent: ApplicationEvent | undefined =
     application?.applicationEvents.find(
