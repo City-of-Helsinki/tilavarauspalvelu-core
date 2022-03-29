@@ -1,4 +1,4 @@
-import { IconArrowRight, IconPlusCircleFill } from "hds-react";
+import { IconArrowRight, IconPlusCircle } from "hds-react";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
@@ -234,17 +234,20 @@ const Page1 = ({
           />
         );
       })}
-      <HorisontalRule />
-      <ButtonContainer>
+      {!addNewEventButtonDisabled && (
         <MediumButton
           id="addApplicationEvent"
-          variant="secondary"
-          iconLeft={<IconPlusCircleFill />}
+          variant="supplementary"
+          iconLeft={<IconPlusCircle />}
           onClick={() => form.handleSubmit(onAddApplicationEvent)()}
-          disabled={addNewEventButtonDisabled}
+          size="small"
+          style={{ gap: "var(--spacing-s)" }}
         >
           {t("application:Page1.createNew")}
         </MediumButton>
+      )}
+      <HorisontalRule />
+      <ButtonContainer>
         <MediumButton
           id="next"
           iconRight={<IconArrowRight />}
