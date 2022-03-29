@@ -7,6 +7,7 @@ from django.db.models import Q, Sum
 from django.utils.timezone import get_default_timezone
 from django_filters import CharFilter
 
+from applications.models import ApplicationRound
 from reservation_units.models import (
     KeywordGroup,
     Purpose,
@@ -43,6 +44,10 @@ class ReservationUnitsFilterSet(django_filters.FilterSet):
     is_draft = django_filters.BooleanFilter(field_name="is_draft")
 
     is_visible = django_filters.BooleanFilter(method="get_is_visible")
+
+    application_round = django_filters.ModelMultipleChoiceFilter(
+        field_name="application_rounds", queryset=ApplicationRound.objects.all()
+    )
 
     order_by = django_filters.OrderingFilter(
         fields=(

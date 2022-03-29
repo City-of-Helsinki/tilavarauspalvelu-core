@@ -151,6 +151,25 @@ snapshots['ReservationUnitQueryTestCase::test_filtering_by_max_persons_not_found
     }
 }
 
+snapshots['ReservationUnitQueryTestCase::test_filtering_by_multiple_application_round 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'nameFi': 'Reservation unit',
+                    }
+                },
+                {
+                    'node': {
+                        'nameFi': 'The Other reservation unit',
+                    }
+                }
+            ]
+        }
+    }
+}
+
 snapshots['ReservationUnitQueryTestCase::test_filtering_by_multiple_keyword_groups 1'] = {
     'data': {
         'reservationUnits': {

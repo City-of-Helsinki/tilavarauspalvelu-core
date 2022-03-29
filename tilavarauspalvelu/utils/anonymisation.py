@@ -60,13 +60,13 @@ LAST_NAMES = [
 
 
 def get_first_name():
-    # Random library isn't safe for security / cryptography thus the nosec line.
+    # Random library isn't safe for security / cryptography thus the nosec line to skip the bandit check.
     # We anonymize data and clean traces so getting random string from a list is not back traceable.
     return random.choice(FIRST_NAMES)  # nosec
 
 
 def get_last_name():
-    # Random library isn't safe for security / cryptography thus the nosec line.
+    # Random library isn't safe for security / cryptography thus the nosec line to skip the bandit check.
     # We anonymize data and clean traces so getting random string from a list is not back traceable.
     return random.choice(LAST_NAMES)  # nosec
 

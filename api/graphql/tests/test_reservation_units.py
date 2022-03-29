@@ -457,6 +457,30 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         assert_that(content.get("errors")).is_none()
         self.assertMatchSnapshot(content)
 
+    def test_filtering_by_multiple_application_round(self):
+        res_unit = ReservationUnitFactory(name_fi="Reservation unit")
+        other_res_unit = ReservationUnitFactory(name_fi="The Other reservation unit")
+        ReservationUnitFactory(name_fi="Reservation unit too")
+        app_round = ApplicationRoundFactory(reservation_units=[res_unit])
+        app_round_too = ApplicationRoundFactory(reservation_units=[other_res_unit])
+        response = self.query(
+            f"""
+            query {{
+                reservationUnits(applicationRound: [{app_round.id},{app_round_too.id}]) {{
+                    edges {{
+                        node {{
+                            nameFi
+                        }}
+                    }}
+                }}
+            }}
+            """
+        )
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
     def test_filtering_by_type(self):
         response = self.query(
             f"query {{"
