@@ -64,7 +64,7 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   };
 };
 
-const pagingLimit = 10;
+const pagingLimit = 25;
 
 const Wrapper = styled.div`
   margin-bottom: var(--spacing-layout-xl);

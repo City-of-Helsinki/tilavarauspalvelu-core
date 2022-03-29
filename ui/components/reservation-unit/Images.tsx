@@ -98,7 +98,7 @@ const Images = ({ images, contextName }: Props): JSX.Element => {
             alt={`${t("common:imgAltForSpace", { name: contextName })} #${
               index + 1
             }`}
-            src={image.mediumUrl || pixel}
+            src={image.imageUrl || pixel}
             onClick={() => {
               setCurrentImage(image);
               setShowModal(true);

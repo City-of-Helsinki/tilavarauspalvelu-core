@@ -26,7 +26,7 @@ import Sorting from "../../components/form/Sorting";
 import { OptionType } from "../../modules/types";
 import KorosDefault from "../../components/common/KorosDefault";
 
-const pagingLimit = 10;
+const pagingLimit = 25;
 
 const HeadContainer = styled.div`
   background-color: white;
