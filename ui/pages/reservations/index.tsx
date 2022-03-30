@@ -85,12 +85,12 @@ const Reservations = (): JSX.Element => {
 
   useQuery<Query, QueryReservationsArgs>(LIST_RESERVATIONS, {
     fetchPolicy: "no-cache",
+    variables: {
+      state: ["CONFIRMED", "REQUIRES_HANDLING"],
+    },
     onCompleted: (data) => {
       const reservations = data?.reservations?.edges
         ?.map((edge) => edge?.node)
-        .filter((node) =>
-          ["CONFIRMED", "REQUIRES_HANDLING"].includes(node?.state)
-        )
         .reduce(
           (acc, reservation) => {
             if (isAfter(new Date(reservation?.begin), new Date())) {

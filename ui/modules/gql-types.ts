@@ -3337,6 +3337,7 @@ export const ListReservationsDocument = gql`
     $last: Int
     $begin: DateTime
     $end: DateTime
+    $state: [String]
   ) {
     reservations(
       before: $before
@@ -3345,6 +3346,7 @@ export const ListReservationsDocument = gql`
       last: $last
       begin: $begin
       end: $end
+      state: $state
     ) {
       edges {
         node {
@@ -3405,6 +3407,7 @@ export const ListReservationsDocument = gql`
  *      last: // value for 'last'
  *      begin: // value for 'begin'
  *      end: // value for 'end'
+ *      state: // value for 'state'
  *   },
  * });
  */
@@ -4496,6 +4499,9 @@ export type ListReservationsQueryVariables = Exact<{
   last?: InputMaybe<Scalars["Int"]>;
   begin?: InputMaybe<Scalars["DateTime"]>;
   end?: InputMaybe<Scalars["DateTime"]>;
+  state?: InputMaybe<
+    Array<InputMaybe<Scalars["String"]>> | InputMaybe<Scalars["String"]>
+  >;
 }>;
 
 export type ListReservationsQuery = {
