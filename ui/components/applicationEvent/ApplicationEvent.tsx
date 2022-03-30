@@ -311,7 +311,7 @@ const ApplicationEvent = ({
           <Checkbox
             id="defaultPeriod"
             checked={selectionIsDefaultPeriod}
-            label={`${formatDate(
+            label={`${t("application:Page1.defaultPeriodPrefix")} ${formatDate(
               applicationRound.reservationPeriodBegin
             )} - ${formatDate(applicationRound.reservationPeriodEnd)}`}
             onChange={() => {
@@ -357,6 +357,8 @@ const ApplicationEvent = ({
             name={fieldName("begin")}
             value={form.getValues(fieldName("begin"))}
             required
+            minDate={new Date(applicationRound.reservationPeriodBegin)}
+            maxDate={new Date(applicationRound.reservationPeriodEnd)}
             invalid={!!form.errors.applicationEvents?.[index]?.begin?.type}
             errorText={applicationErrorText(
               t,
@@ -401,6 +403,8 @@ const ApplicationEvent = ({
             id={fieldName("end")}
             name={fieldName("end")}
             required
+            minDate={new Date(applicationRound.reservationPeriodBegin)}
+            maxDate={new Date(applicationRound.reservationPeriodEnd)}
             invalid={form.errors.applicationEvents?.[index]?.end?.type}
             errorText={applicationErrorText(
               t,

@@ -47,6 +47,7 @@
     "abilityGroup": "Tasoryhmä",
     "purpose": "Varauksen käyttötarkoitus",
     "spacesSubHeading": "Toivotut tilat",
+    "defaultPeriodPrefix": "Käytä varauskauden oletuskestoa",
     "applicationRoundSubHeading": "Varauskausi",
     "periodStartDate": "Kauden aloituspäivä",
     "periodEndDate": "Kauden päätöspäivä",

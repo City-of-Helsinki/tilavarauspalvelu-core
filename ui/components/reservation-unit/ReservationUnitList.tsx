@@ -20,6 +20,7 @@ import {
 } from "../../modules/gql-types";
 import { RESERVATION_UNITS } from "../../modules/queries/reservationUnit";
 import apolloClient from "../../modules/apolloClient";
+import { CenterSpinner } from "../common/common";
 
 type OptionTypes = {
   purposeOptions: OptionType[];
@@ -59,9 +60,10 @@ const ReservationUnitList = ({
   minSize,
 }: Props): JSX.Element => {
   const [showModal, setShowModal] = useState(false);
-  const [reservationUnits, setReservationUnits] = useState(
-    [] as ReservationUnitType[]
-  );
+  const [reservationUnits, setReservationUnits] = useState<
+    ReservationUnitType[]
+  >([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const handleAdd = (ru: ReservationUnitType) => {
     setReservationUnits([...reservationUnits, ru]);
@@ -102,6 +104,7 @@ const ReservationUnitList = ({
     let isMounted = true;
     let data;
     const fetchData = async () => {
+      setIsLoading(true);
       if (applicationEvent.eventReservationUnits?.length === 0) {
         data = selectedReservationUnits;
       } else {
@@ -124,6 +127,7 @@ const ReservationUnitList = ({
             applicationRound.reservationUnitIds.includes(ru.pk)
           )
         );
+        setIsLoading(false);
       }
     };
 
@@ -168,6 +172,10 @@ const ReservationUnitList = ({
   };
 
   const { t } = useTranslation();
+
+  if (isLoading) {
+    return <CenterSpinner />;
+  }
 
   return (
     <MainContainer>
