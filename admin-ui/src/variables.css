@@ -28,5 +28,7 @@
   --tilavaraus-admin-stack-main-menu: 500;
   --tilavaraus-calendar-selected: #0000ff;
   --tilavaraus-calendar-selected-secondary: #ffe977;
-
+  --font-regular: HelsinkiGrotesk, var(--font-default);
+  --font-medium: HelsinkiGrotesk-Medium, var(--font-default);
+  --font-bold: HelsinkiGrotesk-Bold, var(--font-default);
 }

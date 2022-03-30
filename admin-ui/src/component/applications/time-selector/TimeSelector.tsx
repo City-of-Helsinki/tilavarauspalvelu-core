@@ -48,7 +48,6 @@ const TimeSelectionButton = styled.div<{
 
   text-align: center;
   font-family: var(--font-bold);
-  font-size: var(--fontsize-m);
   font-weight: bold;
   color: ${(props) =>
     props.state ? "var(--color-white)" : "var(--color-black)"};
