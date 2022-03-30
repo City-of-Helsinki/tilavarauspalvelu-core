@@ -61,6 +61,10 @@ type Props = {
   onDeleteEvent: () => void;
 };
 
+const Wrapper = styled.div`
+  margin-bottom: var(--spacing-s);
+`;
+
 const SubHeadLine = styled(H5).attrs({
   as: "h2",
 })`
@@ -108,7 +112,7 @@ const ActionContainer = styled.div`
 
   @media (min-width: ${breakpoint.m}) {
     flex-direction: row;
-    justify-content: flex-end;
+    justify-content: space-between;
     gap: var(--spacing-l);
   }
 `;
@@ -212,7 +216,7 @@ const ApplicationEvent = ({
     uiDateToApiDate(applicationPeriodEnd) === periodEndDate;
 
   return (
-    <>
+    <Wrapper>
       <Accordion
         onToggle={() =>
           dispatch({
@@ -534,11 +538,13 @@ const ApplicationEvent = ({
           </Button>
           <ConfirmationModal
             id="application-event-confirmation"
-            cancelLabel="common:close"
-            heading={t("application:Page1.deleteEvent")}
-            content=""
+            okLabel="application:Page1.deleteEvent"
+            cancelLabel="application:Page1.deleteEventCancel"
+            heading={t("application:Page1.deleteEventHeading")}
+            content={t("application:Page1.deleteEventContent")}
             onOk={del}
             ref={modalRef}
+            type="confirm"
           />
         </ActionContainer>
       </Accordion>
@@ -548,11 +554,12 @@ const ApplicationEvent = ({
           size="small"
           type="success"
           label={t("application:applicationEventSaved")}
+          autoClose
         >
           {t("application:applicationEventSaved")}
         </Notification>
       ) : null}
-    </>
+    </Wrapper>
   );
 };
 

@@ -90,6 +90,9 @@ const Intro = (): JSX.Element => {
               onChange={(selection: OptionType): void => {
                 setApplicationRound(selection.value as number);
               }}
+              value={applicationRounds.transformed?.find(
+                (n) => n.value === applicationRound
+              )}
             />
             <MediumButton
               id="start-application"
