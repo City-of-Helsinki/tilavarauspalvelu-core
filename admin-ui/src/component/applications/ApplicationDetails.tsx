@@ -19,7 +19,7 @@ import {
   Parameter,
 } from "../../common/types";
 import { IngressContainer } from "../../styles/layout";
-import { H2, H4, H5, H5Top } from "../../styles/typography";
+import { H2, H4, H5 } from "../../styles/new-typography";
 import withMainMenu from "../withMainMenu";
 import {
   formatNumber,
@@ -37,6 +37,8 @@ import {
 } from "./util";
 import ApplicationStatusBlock from "./ApplicationStatusBlock";
 import { useNotification } from "../../context/NotificationContext";
+import TimeSelector from "./time-selector/TimeSelector";
+import { breakpoints } from "../../styles/util";
 
 interface IRouteParams {
   applicationId: string;
@@ -65,7 +67,6 @@ const EventProps = styled.div`
 `;
 
 const DefinitionList = styled.div`
-  font-size: var(--fontsize-body-s);
   line-height: var(--lineheight-l);
   display: flex;
   gap: var(--spacing-s);
@@ -83,9 +84,13 @@ const StyledAccordion = styled(Accordion).attrs({
   style: {
     "--header-font-size": "var(--fontsize-heading-m)",
     "--button-size": "var(--fontsize-heading-l)",
-    "--border-color": "var(--tilavaraus-ui-gray)",
   } as React.CSSProperties,
-})``;
+})`
+  margin-top: 48px;
+  h4 {
+    margin-top: 4rem;
+  }
+`;
 
 const PreCard = styled.div`
   font-size: var(--fontsize-body-s);
@@ -104,6 +109,32 @@ const StyledTable = styled(Table)`
 `;
 
 const EventSchedules = styled.div`
+  gap: var(--spacing-2-xl);
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+
+  @media (min-width: ${breakpoints.xl}) {
+    display: grid;
+    grid-template-columns: 1fr 15em;
+  }
+`;
+
+const SchedulesCardContainer = styled.div`
+  gap: var(--spacing-2-xl);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: 100%;
+  @media (min-width: ${breakpoints.xl}) {
+    display: flex;
+    flex-direction: column;
+  }
+  h5:nth-of-type(1) {
+    margin-top: 0;
+  }
+`;
+
+const EventSchedule = styled.div`
   font-size: var(--fontsize-body-l);
   line-height: 2em;
 `;
@@ -175,14 +206,14 @@ function ApplicationDetails(): JSX.Element | null {
     return <Loader />;
   }
 
-  /** laskutusosoite näytetään aina henkilöhakijalle (koska ei muuta osoitetta ja silloin jos organisaation laskutusosoite on eri kuin normiosoite ) */
-
-  const hasBillingAddress = !isEqual(
-    omit(application?.billingAddress, "id"),
-    omit(application?.organisation?.address, "id")
-  );
-
   const isOrganisation = Boolean(application?.organisation);
+
+  const hasBillingAddress =
+    application?.billingAddress &&
+    !isEqual(
+      omit(application?.billingAddress, "id"),
+      omit(application?.organisation?.address, "id")
+    );
 
   const customerName = applicantName(application);
 
@@ -211,7 +242,7 @@ function ApplicationDetails(): JSX.Element | null {
             </PreCard>
             <Card
               theme={{
-                "--background-color": "var(--color-black-10)",
+                "--background-color": "var(--color-black-5)",
                 "--padding-horizontal": "var(--spacing-m)",
                 "--padding-vertical": "var(--spacing-m)",
               }}
@@ -325,30 +356,39 @@ function ApplicationDetails(): JSX.Element | null {
                     indexKey="id"
                   />
                   <H4>{t("ApplicationEvent.requestedTimes")}</H4>
-                  <Card border>
-                    <H5Top>{t("ApplicationEvent.primarySchedules")}</H5Top>
-                    {weekdays.map((day, index) => (
-                      <EventSchedules>
-                        {t(`calendar.${day}`)},{" "}
-                        {parseApplicationEventSchedules(
-                          applicationEvent.applicationEventSchedules,
-                          index,
-                          200
-                        )}
-                      </EventSchedules>
-                    ))}
-                    <H5>{t("ApplicationEvent.secondarySchedules")}</H5>
-                    {weekdays.map((day, index) => (
-                      <EventSchedules>
-                        {t(`calendar.${day}`)},{" "}
-                        {parseApplicationEventSchedules(
-                          applicationEvent.applicationEventSchedules,
-                          index,
-                          300
-                        )}
-                      </EventSchedules>
-                    ))}
-                  </Card>
+                  <EventSchedules>
+                    <TimeSelector applicationEvent={applicationEvent} />
+                    <Card border>
+                      <SchedulesCardContainer>
+                        <div>
+                          <H5>{t("ApplicationEvent.primarySchedules")}</H5>
+                          {weekdays.map((day, index) => (
+                            <EventSchedule>
+                              {t(`calendar.${day}`)},{" "}
+                              {parseApplicationEventSchedules(
+                                applicationEvent.applicationEventSchedules,
+                                index,
+                                300
+                              )}
+                            </EventSchedule>
+                          ))}
+                        </div>
+                        <div>
+                          <H5>{t("ApplicationEvent.secondarySchedules")}</H5>
+                          {weekdays.map((day, index) => (
+                            <EventSchedule>
+                              {t(`calendar.${day}`)},{" "}
+                              {parseApplicationEventSchedules(
+                                applicationEvent.applicationEventSchedules,
+                                index,
+                                200
+                              )}
+                            </EventSchedule>
+                          ))}
+                        </div>
+                      </SchedulesCardContainer>
+                    </Card>
+                  </EventSchedules>
                 </StyledAccordion>
               );
             })}

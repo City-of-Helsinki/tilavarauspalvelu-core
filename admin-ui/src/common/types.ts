@@ -245,12 +245,14 @@ export type EventReservationUnit = {
 
 type DAY = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
+export type ApplicationEventSchedulePriority = 100 | 200 | 300;
+
 export type ApplicationEventSchedule = {
   id: number;
   day: DAY;
   begin: string;
   end: string;
-  priority: number;
+  priority?: ApplicationEventSchedulePriority;
 };
 
 export interface ReservationUnitsParameters {

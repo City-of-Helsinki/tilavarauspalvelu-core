@@ -26,5 +26,7 @@
 
   --tilavaraus-admin-sticky-header: 700;
   --tilavaraus-admin-stack-main-menu: 500;
+  --tilavaraus-calendar-selected: #0000ff;
+  --tilavaraus-calendar-selected-secondary: #ffe977;
 
 }

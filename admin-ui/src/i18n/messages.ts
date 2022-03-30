@@ -320,6 +320,10 @@ const translations: ITranslations = {
     ],
     gotoLink: ["Tarkastele hakemusta"],
   },
+  TimeSelector: {
+    primary: ["Ensisijainen toive"],
+    secondary: ["Muu toive"],
+  },
   ApplicationRound: {
     titleAllRecurringApplicationRounds: ["Kaikki vakiovuorojen hakukierrokset"],
     browseAllApplicationRounds: ["Selaa kaikkia"],
