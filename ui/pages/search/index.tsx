@@ -104,7 +104,7 @@ const processVariables = (values: Record<string, string>) => {
       "purposes",
       "unit",
       "reservationUnitType",
-      "applicationRound", // TODO: use application round in variables
+      "applicationRound",
     ]),
     ...(values.minPersons && {
       minPersons: parseInt(values.minPersons, 10),
@@ -120,6 +120,9 @@ const processVariables = (values: Record<string, string>) => {
     }),
     ...(values.reservationUnitType && {
       reservationUnitType: values.reservationUnitType.split(","),
+    }),
+    ...(values.applicationRound && {
+      applicationRound: values.applicationRound.split(","),
     }),
     first: pagingLimit,
     orderBy: values.order === "desc" ? `-${values.sort}` : values.sort,
@@ -166,19 +169,9 @@ const Search = ({ applicationRounds }: Props): JSX.Element => {
   const searchParams = isBrowser ? window.location.search : "";
   const parsedParams = queryString.parse(searchParams);
 
-  const reservationUnits: ReservationUnitType[] = data?.reservationUnits?.edges
-    ?.map((edge) => edge.node)
-    .filter((reservationUnit) => {
-      if (parsedParams.applicationRound) {
-        const applicationRound = applicationRounds.find(
-          (ar) => ar.id === Number(parsedParams.applicationRound)
-        );
-        return applicationRound?.reservationUnitIds.includes(
-          Number(reservationUnit.pk)
-        );
-      }
-      return true;
-    });
+  const reservationUnits: ReservationUnitType[] =
+    data?.reservationUnits?.edges?.map((edge) => edge.node);
+
   const pageInfo: PageInfo = data?.reservationUnits?.pageInfo;
 
   useEffect(() => {

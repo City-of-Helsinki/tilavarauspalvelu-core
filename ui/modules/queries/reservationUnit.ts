@@ -118,6 +118,7 @@ export const RESERVATION_UNIT = gql`
 export const RESERVATION_UNITS = gql`
   query SearchReservationUnits(
     $textSearch: String
+    $applicationRound: [ID]
     $minPersons: Float
     $maxPersons: Float
     $unit: [ID]
@@ -131,6 +132,7 @@ export const RESERVATION_UNITS = gql`
   ) {
     reservationUnits(
       textSearch: $textSearch
+      applicationRound: $applicationRound
       maxPersonsGte: $minPersons
       maxPersonsLte: $maxPersons
       reservationUnitType: $reservationUnitType
