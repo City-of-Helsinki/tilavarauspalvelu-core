@@ -43,6 +43,7 @@ export const H4 = styled.h4`
   font-family: var(--font-medium);
   line-height: var(--lineheight-m);
   margin-bottom: var(--spacing-s);
+  font-weight: 500;
 
   @media (min-width: ${breakpoints.s}) {
     font-size: var(--fontsize-heading-m);

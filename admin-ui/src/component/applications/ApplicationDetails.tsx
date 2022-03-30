@@ -231,7 +231,8 @@ function ApplicationDetails(): JSX.Element | null {
               view={applicationRound.status}
             />
             <H2
-              style={{ margin: "0.5em 0" }}
+              as="h1"
+              style={{ margin: "1rem 0" }}
               data-testid="application-details__heading--main"
             >
               {customerName}
