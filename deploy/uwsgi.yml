@@ -3,11 +3,33 @@ uwsgi:
   # python docker image cannot use that due to linker mishaps
   # plugins: python3,http
   wsgi-file: tilavarauspalvelu/wsgi.py
-  processes: $(UWSGI_NUM_PROCESSES)
-  threads: 1
-  master: true
   #uid: tvp
   umask: 022
   reload-on-rss: 300
   http: :8000
+
+  # Workload settings
+  # Automatically scales up worker count when application is
+  # under load.
+  master: true
+  threads: 1
+  cheaper-algo: busyness
+  cheaper-overload: 5
+  cheaper-busyness-backlog-alert: 20
+  cheaper-busyness-backlog-step: 4
+  cheaper: $(UWSGI_MIN_NUM_PROCESSES)
+  cheaper-initial: $(UWSGI_MIN_NUM_PROCESSES)
+  processes: $(UWSGI_MAX_NUM_PROCESSES)
+  cheaper-step: 2
+
+  # Offload static file serving to separate threads
+  # Application logic can then always be handled
+  file-serve-mode: offloading
+  offload-threads: 8
   static-map: $(MEDIA_URL)=$(MEDIA_ROOT)
+
+  # Ignore logging errors for cases when http pipes are closed
+  # before workers has had the time to serve content to the pipe
+  ignore-sigpipe: true
+  ignore-write-errors: true
+  disable-write-exception: true

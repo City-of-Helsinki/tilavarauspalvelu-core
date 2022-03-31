@@ -127,3 +127,11 @@ For development purposes requirement to authenticate can be turned off by settin
 environment variable TMP_PERMISSIONS_DISABLED to True.
 
 ![Data model visualization](tilavarauspalvelu_visualized.svg)
+
+## Deployed application settings & static files
+
+Contrary to more common set-ups, this application does not have a reverse proxy serving static files. Instead, static files are served by both Django and uwsgi.
+
+Static files are served by the [Whitenoise](https://whitenoise.evans.io/en/stable/) package. These are all files that are not uploaded by the users in Django Admin pages.
+
+Media files are served by the [uwsgi static files implementation](https://uwsgi-docs.readthedocs.io/en/latest/StaticFiles.html) offloaded to threads. These are all files uploaded by users in Django Admin pages. If there are performance issues (I.E. 502 errors from the Application Gateway) it is very likely process count and or process scale-up must be tweaked higher.
