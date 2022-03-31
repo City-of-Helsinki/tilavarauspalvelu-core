@@ -405,8 +405,9 @@ export const resolutionUrl = (id: number): string => `/applications/${id}`;
 
 export const applicationErrorText = (
   t: TFunction,
-  key: string | undefined
-): string => (key ? t(`application:error.${key}`) : "");
+  key: string | undefined,
+  attrs: { [key: string]: string | number } = {}
+): string => (key ? t(`application:error.${key}`, attrs) : "");
 
 export const getReducedApplicationStatus = (
   status: ApplicationStatus

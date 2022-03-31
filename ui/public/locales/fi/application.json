@@ -18,7 +18,8 @@
     "reservationUnitTooSmall": "Tila on liian pieni ryhmän käyttöön",
     "otherEventsHaveErrors": "Korjaa ensin validaatiovirheet",
     "noReservationUnits": "Lisää hakemukselle yksi tai useampi tila",
-    "noEvents": "Lisää hakemukselle yksi tai useampi kausivaraus"
+    "noEvents": "Lisää hakemukselle yksi tai useampi kausivaraus",
+    "maxLength": "Enimmäismerkkimäärä: {{count}}"
   },
   "Intro": {
     "startNewApplication": "Täytä hakemus",

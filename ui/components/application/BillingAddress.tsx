@@ -12,6 +12,7 @@ type Props = {
 
 const BillingAddress = ({ register, errors }: Props): JSX.Element | null => {
   const { t } = useTranslation();
+
   return (
     <>
       <FormSubHeading>
@@ -30,7 +31,7 @@ const BillingAddress = ({ register, errors }: Props): JSX.Element | null => {
         )}
       />
       <TextInput
-        ref={register({ required: true })}
+        ref={register({ required: true, maxLength: 32 })}
         label={t("application:Page3.billingAddress.postCode")}
         id="billingAddress.postCode"
         name="billingAddress.postCode"
@@ -38,7 +39,8 @@ const BillingAddress = ({ register, errors }: Props): JSX.Element | null => {
         invalid={!!errors.billingAddress?.postCode?.type}
         errorText={applicationErrorText(
           t,
-          errors.billingAddress?.postCode?.type
+          errors.billingAddress?.postCode?.type,
+          { count: 32 }
         )}
       />
       <TextInput

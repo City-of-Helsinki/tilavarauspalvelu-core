@@ -172,7 +172,7 @@ const OrganisationForm = ({
           )}
         />
         <TextInput
-          ref={register({ required: true })}
+          ref={register({ required: true, maxLength: 32 })}
           label={t("application:Page3.organisation.postCode")}
           id="organisation.address.postCode"
           name="organisation.address.postCode"
@@ -180,7 +180,8 @@ const OrganisationForm = ({
           invalid={!!errors.organisation?.address?.postCode?.type}
           errorText={applicationErrorText(
             t,
-            errors.organisation?.address?.postCode?.type
+            errors.organisation?.address?.postCode?.type,
+            { count: 32 }
           )}
         />
         <TextInput
