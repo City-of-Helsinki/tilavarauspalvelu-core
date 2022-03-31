@@ -24,13 +24,10 @@ import {
 } from "../../common/types";
 import Loader from "../Loader";
 import DataTable, { CellConfig } from "../DataTable";
-import {
-  formatNumber,
-  getNormalizedApplicationStatus,
-  parseDuration,
-} from "../../common/util";
+import { formatNumber, parseDuration } from "../../common/util";
 import StatusCell from "../StatusCell";
 import { applicationUrl } from "../../common/urls";
+import { getNormalizedApplicationStatus } from "./util";
 
 interface IRouteParams {
   applicationRoundId: string;

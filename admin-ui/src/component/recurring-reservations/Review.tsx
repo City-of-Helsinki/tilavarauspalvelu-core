@@ -29,14 +29,11 @@ import {
 import TimeframeStatus from "./TimeframeStatus";
 import Loader from "../Loader";
 import StatusCell from "../StatusCell";
-import {
-  formatNumber,
-  getNormalizedApplicationStatus,
-  parseDuration,
-} from "../../common/util";
+import { formatNumber, parseDuration } from "../../common/util";
 import StatusRecommendation from "../applications/StatusRecommendation";
 import ApplicationRoundNavi from "./ApplicationRoundNavi";
 import { applicationUrl } from "../../common/urls";
+import { getNormalizedApplicationStatus } from "../applications/util";
 
 interface IProps {
   applicationRound: ApplicationRoundType;

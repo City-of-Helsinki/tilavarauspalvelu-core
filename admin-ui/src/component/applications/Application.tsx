@@ -45,7 +45,6 @@ import { ReactComponent as IconCustomers } from "../../images/icon_customers.svg
 import {
   formatDate,
   formatNumber,
-  getNormalizedApplicationStatus,
   localizedValue,
   parseDuration,
 } from "../../common/util";
@@ -58,6 +57,7 @@ import {
   applicationRoundUrl,
   applicationUrl,
 } from "../../common/urls";
+import { applicantName, getNormalizedApplicationStatus } from "./util";
 
 interface IRouteParams {
   applicationId: string;
@@ -388,10 +388,7 @@ function Application(): JSX.Element | null {
         }
       : undefined;
 
-  const customerName: string | null | undefined =
-    application?.applicantType === "individual"
-      ? application?.applicantName
-      : application?.organisation?.name;
+  const customerName = applicantName(application);
 
   const isApplicationRoundApproved: boolean | null =
     applicationRound && ["approved", "sent"].includes(applicationRound.status);

@@ -25,8 +25,6 @@ const Wrapper = styled.div<{ $color: string; $hasIcon: boolean }>`
     ].includes($color)
       ? "var(--color-black-90)"
       : "var(--color-white)"};
-  font-family: var(--tilavaraus-admin-font-bold);
-  font-weight: bold;
   font-size: var(--fontsize-body-s);
   white-space: nowrap;
 
