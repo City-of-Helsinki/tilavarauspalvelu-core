@@ -85,35 +85,18 @@ const TimeSelectionButton = styled.div<{
   `};
   white-space: nowrap;
   position: relative;
-  cursor: pointer;
 `;
 
 const Day = ({ head, cells }: { head: string; cells: Cell[] }): JSX.Element => {
-  const { t } = useTranslation();
-
   return (
     <div>
       <CalendarHead>{head}</CalendarHead>
       {cells.map((cell, cellIndex) => {
-        let ariaLabel = "";
-        switch (cell.state) {
-          case 300:
-            ariaLabel = t("TimeSelector.primary");
-            break;
-          case 200:
-            ariaLabel = t("TimeSelector.secondary");
-            break;
-          default:
-        }
-
         return (
           <TimeSelectionButton
             key={cell.key}
             state={cell.state}
             firstRow={cellIndex === 0}
-            role="option"
-            aria-label={ariaLabel}
-            aria-selected={!!cell.state}
             data-testid={`time-selector__button--${cell.key}`}
           >
             {cell.label}

@@ -505,6 +505,7 @@ const translations: ITranslations = {
     gotoLink: ["Tarkastele vuoroehdotusta"],
     primarySchedules: ["Ensisijaiset aikatoiveet"],
     secondarySchedules: ["Muut aikatoiveet"],
+    noSchedule: ["ei aikatoiveita"],
   },
   Organisation: {
     activeParticipants: ["Aktiiviharrastajat"],

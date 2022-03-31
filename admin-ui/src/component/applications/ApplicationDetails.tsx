@@ -109,19 +109,19 @@ const StyledTable = styled(Table)`
 `;
 
 const EventSchedules = styled.div`
-  gap: var(--spacing-2-xl);
+  gap: var(--spacing-l);
   display: flex;
   flex-direction: column;
   width: 100%;
 
   @media (min-width: ${breakpoints.xl}) {
     display: grid;
-    grid-template-columns: 1fr 15em;
+    grid-template-columns: 1fr 16em;
   }
 `;
 
 const SchedulesCardContainer = styled.div`
-  gap: var(--spacing-2-xl);
+  gap: var(--spacing-m);
   display: grid;
   grid-template-columns: 1fr 1fr;
   width: 100%;
@@ -135,8 +135,14 @@ const SchedulesCardContainer = styled.div`
 `;
 
 const EventSchedule = styled.div`
-  font-size: var(--fontsize-body-l);
+  font-size: var(--fontsize-body-m);
   line-height: 2em;
+`;
+
+const StyledH5 = styled(H5)`
+  font-size: var(--fontsize-heading-xs);
+  font-family: (--font-bold);
+  margin-bottom: var(--spacing-2-xs);
 `;
 
 const KV = ({
@@ -231,7 +237,6 @@ function ApplicationDetails(): JSX.Element | null {
               view={applicationRound.status}
             />
             <H2
-              as="h1"
               style={{ margin: "1rem 0" }}
               data-testid="application-details__heading--main"
             >
@@ -359,13 +364,22 @@ function ApplicationDetails(): JSX.Element | null {
                   <H4>{t("ApplicationEvent.requestedTimes")}</H4>
                   <EventSchedules>
                     <TimeSelector applicationEvent={applicationEvent} />
-                    <Card border>
+                    <Card
+                      border
+                      theme={{
+                        "--background-color": "var(--color-black-5)",
+                        "--padding-horizontal": "var(--spacing-m)",
+                        "--padding-vertical": "var(--spacing-m)",
+                      }}
+                    >
                       <SchedulesCardContainer>
                         <div>
-                          <H5>{t("ApplicationEvent.primarySchedules")}</H5>
+                          <StyledH5>
+                            {t("ApplicationEvent.primarySchedules")}
+                          </StyledH5>
                           {weekdays.map((day, index) => (
                             <EventSchedule>
-                              {t(`calendar.${day}`)},{" "}
+                              <strong>{t(`calendar.${day}`)}</strong>,{" "}
                               {parseApplicationEventSchedules(
                                 applicationEvent.applicationEventSchedules,
                                 index,
@@ -375,15 +389,17 @@ function ApplicationDetails(): JSX.Element | null {
                           ))}
                         </div>
                         <div>
-                          <H5>{t("ApplicationEvent.secondarySchedules")}</H5>
+                          <StyledH5>
+                            {t("ApplicationEvent.secondarySchedules")}
+                          </StyledH5>
                           {weekdays.map((day, index) => (
                             <EventSchedule>
-                              {t(`calendar.${day}`)},{" "}
+                              <strong>{t(`calendar.${day}`)}</strong>,{" "}
                               {parseApplicationEventSchedules(
                                 applicationEvent.applicationEventSchedules,
                                 index,
                                 200
-                              )}
+                              ) || t("ApplicationEvent.noSchedule")}
                             </EventSchedule>
                           ))}
                         </div>
