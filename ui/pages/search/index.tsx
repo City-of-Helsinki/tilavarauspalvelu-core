@@ -164,6 +164,7 @@ const Search = ({ applicationRounds }: Props): JSX.Element => {
   >(RESERVATION_UNITS, {
     variables: processVariables(values),
     fetchPolicy: "network-only",
+    skip: Object.keys(values).length === 0,
   });
 
   const searchParams = isBrowser ? window.location.search : "";
@@ -177,7 +178,7 @@ const Search = ({ applicationRounds }: Props): JSX.Element => {
   useEffect(() => {
     if (parsedParams) {
       const parsed = parsedParams;
-      if (!parsed.sort) parsed.sort = "nameFi";
+      if (!parsed.sort) parsed.sort = `name${capitalize(i18n.language)}`;
       if (!parsed.order) parsed.order = "asc";
 
       const newValues = Object.keys(parsed).reduce((p, key) => {
@@ -194,7 +195,7 @@ const Search = ({ applicationRounds }: Props): JSX.Element => {
         setValues(newValues);
       }
     }
-  }, [parsedParams, values]);
+  }, [parsedParams, values, i18n.language]);
 
   useEffect(() => {
     const params = queryString.parse(searchParams);

@@ -1,0 +1,23 @@
+{
+  "dateTypeAll": "Anytime",
+  "dateTypeThisWeek": "This week",
+  "dateTypeToday": "Today",
+  "dateTypeTomorrow": "Tomorrow",
+  "dateTypeWeekend": "Weekend",
+  "infoDate": "pp.kk.vvvv",
+  "labelEndDate": "End date",
+  "labelStartDate": "Start date",
+  "errorEndDateBeforeStartDate": "Start date must be before end date",
+  "errorDateFormat": "Date must be in format: dd.mm.yyyy",
+  "menu": {
+    "buttonBack": "Back",
+    "buttonClose": "Close",
+    "buttonCustom": "Select dates"
+  },
+  "title": "Select dates",
+  "accessibility": {
+    "chooseDayPrefix": "Choose",
+    "nextMonth": "Next month",
+    "previousMonth": "Prev month"
+  }
+}

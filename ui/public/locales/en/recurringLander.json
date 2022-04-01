@@ -1,0 +1,10 @@
+{
+  "heading": "Seasonal booking",
+  "subHeading": "Apply for the regular use of City of Helsinki spaces. Learn about the spaces and application deadlines on this page.",
+  "roundHeadings": {
+    "active": "Ongoing application rounds",
+    "pending": "Upcoming application rounds",
+    "past": "Past application rounds"
+  },
+  "noRounds": "No active or upcoming application rounds."
+}

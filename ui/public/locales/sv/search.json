@@ -1,0 +1,23 @@
+{
+  "recurring": {
+    "heading": "Boka lokalen för hela säsongen",
+    "text": "Välj lokaler till ansökningen som du vill använda regelbundet under kommande säsong."
+  },
+  "single": {
+    "heading": "Boka lokaler och utrustning",
+    "text": "Hitta en lämplig utrymme eller utrustning för dina behov"
+  },
+  "sorting": {
+    "action": {
+      "ascending": "Ordna stigande",
+      "descending": "Ordna sjunkande"
+    },
+    "ascendingLabel": "Stigande ordning",
+    "descendingLabel": "Sjunkande ordning",
+    "label": {
+      "name": "Namn",
+      "type": "Typ",
+      "unit": "Verksamhetsställe"
+    }
+  }
+}

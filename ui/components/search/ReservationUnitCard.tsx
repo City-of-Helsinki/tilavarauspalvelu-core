@@ -130,12 +130,16 @@ const ReservationUnitCard = ({
 
   return (
     <Container>
-      <Image
-        alt={t("common:imgAltForSpace", {
-          name: getTranslation(reservationUnit, "name"),
-        })}
-        src={getMainImage(reservationUnit)?.smallUrl || pixel}
-      />
+      <Link href={`../reservation-unit/${reservationUnit.pk}`} passHref>
+        <Anchor>
+          <Image
+            alt={t("common:imgAltForSpace", {
+              name: getTranslation(reservationUnit, "name"),
+            })}
+            src={getMainImage(reservationUnit)?.smallUrl || pixel}
+          />
+        </Anchor>
+      </Link>
       <MainContent>
         <Name>
           <Link href={`../reservation-unit/${reservationUnit.pk}`} passHref>

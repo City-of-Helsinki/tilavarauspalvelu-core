@@ -1,0 +1,33 @@
+{
+  "textSearchLabel": "Fritextsökning",
+  "searchTermPlaceholder": "Sök med nyckelord",
+  "searchButton": "Sök",
+  "purposeLabel": "Användningsändamål",
+  "roundLabel": "Ansökningsrunda",
+  "districtLabel": "Stadsdel",
+  "priceLabel": "Pris",
+  "participantCountLabel": "Personantal minst",
+  "participantCountCombined": "Personantal",
+  "typeLabel": "Lokaltyp",
+  "showMoreFilters": "Detaljerad sökning",
+  "showLessFilters": "Visa färre alternativ",
+  "unitFilter": "Verksamhetsställe",
+  "purposesFilter": "Användningsändamål",
+  "resetForm": "Töm sökkriterierna",
+  "filters": {
+    "applicationRound": "Ansökningsrunda",
+    "textSearch": "\"{{value}}\"",
+    "minPersons": "Personantal min",
+    "maxPersons": "Personantal max",
+    "purposes": "Användningsändamål",
+    "reservationUnitType": "Lokaltyp",
+    "unit": "Verksamhetsställe"
+  },
+  "all": "Alla",
+  "clearSelections": "Redigera",
+  "removeSelection": "Redigera",
+  "selectedElement": "Val",
+  "openCombobox": "Öppna kryssrutan",
+  "searchForValue": "Sök",
+  "removeFilter": "Redigera \"{{value}}\""
+}

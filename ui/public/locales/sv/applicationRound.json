@@ -1,0 +1,11 @@
+{
+  "card": {
+    "applyButton": "Sök lokaler",
+    "displayPastButton": "Visa lokalerna",
+    "criteria": "Ansökningsvillkor",
+    "pending": "Ansökningsperioden öppnas {{openingDateTime}}",
+    "open": "Ansökningsperioden öppen till {{until, d.M.yyyy 'kl' H.mm}}",
+    "past": "Ansökningsperioden stängdes {{closingDate, d.M.yyyy 'kl' H.mm}}"
+  },
+  "criteria": "ansökningsvillkor"
+}

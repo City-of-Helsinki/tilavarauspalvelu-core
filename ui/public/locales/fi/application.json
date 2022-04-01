@@ -16,7 +16,7 @@
     "endBeforePeriodBegin": "Kauden lopetuspäivä on liian aikainen",
     "missingSchedule": "Lisää kaikille kausivarauksille vähintään yksi aika",
     "reservationUnitTooSmall": "Tila on liian pieni ryhmän käyttöön",
-    "otherEventsHaveErrors": "Korjaa ensin validaatiovirheet",
+    "otherEventsHaveErrors": "Korjaa virheellisesti täytetyt kentät",
     "noReservationUnits": "Lisää hakemukselle yksi tai useampi tila",
     "noEvents": "Lisää hakemukselle yksi tai useampi kausivaraus",
     "maxLength": "Enimmäismerkkimäärä: {{count}}"
@@ -48,7 +48,7 @@
     "abilityGroup": "Tasoryhmä",
     "purpose": "Varauksen käyttötarkoitus",
     "spacesSubHeading": "Toivotut tilat",
-    "defaultPeriodPrefix": "Käytä varauskauden oletuskestoa",
+    "defaultPeriodPrefix": "Käytä oletuskestoa",
     "applicationRoundSubHeading": "Varauskausi",
     "periodStartDate": "Kauden aloituspäivä",
     "periodEndDate": "Kauden päätöspäivä",
@@ -93,7 +93,6 @@
   "Page3": {
     "heading": "3. Täytä varaajan tiedot",
     "text": "Voit jättää hakemuksen yhteisönä, yksityishenkilönä tai yrityksenä. Viimeisin hakemus on voimassa.",
-    "asPrivatePersonSubHeading": "Varaan yksityishenkilönä",
     "firstName": "Etunimi",
     "homeCity": "Kotipaikka",
     "lastName": "Sukunimi",
@@ -150,7 +149,7 @@
     },
     "homeCity": "Kotipaikka",
     "heading": "4. Tarkista ja lähetä hakemus",
-    "text": "Alla yhteenveto hakemuksestasi",
+    "text": "Yhteenveto hakemuksestasi",
     "basicInfoSubHeading": "Varaajan tiedot",
     "firstName": "Yhteyshenkilön etunimi",
     "lastName": "Yhteyshenkilön sukunimi",
@@ -173,14 +172,12 @@
       "end": "Kauden päätöspäivä",
       "minDuration": "Varauksen vähimmäiskesto",
       "maxDuration": "Varauksen enimmäiskesto",
-      "eventsPerWeek": "Varausten määrä viikossa",
-      "biweekly": "Kausivaraukset vain joka toinen viikko",
-      "reservationUnit": "Vaihtoehto {{order}}."
+      "eventsPerWeek": "Varausten määrä viikossa"
     },
     "applicationEventSchedules": "Toivotut ajat",
     "noData": {
       "heading": "Lomakkeen tietoja ei ole vielä olemassa",
-      "text": "Täytä ensin lomake."
+      "text": "Täytä ensin lomake"
     },
     "notification": {
       "processing": "Käsittely",
@@ -194,10 +191,9 @@
     }
   },
   "sent": {
-    "heading": "Hakemuksesi on lähetetty käsiteltäväksi",
-    "faq1Question": "Kuinka hakemuksen käsittely etenee?",
-    "faq2Question": "Kuinka hakemuksen käsittely tapahtuu?",
-    "faq3Question": "Kohtuullistaminen, varauksen peruutus ja muutoksenhaku"
+    "heading": "Kiitos hakemuksesta!",
+    "subHeading": "Hakemuksesi on vastaanotettu ja siirtyy käsiteltäväksi hakuajan päätyttyä.",
+    "body": "Voit halutessasi muokata hakemustasi ennen hakuajan päättymistä. Vain viimeisin lähetetty hakemus huomioidaan. Poistathan aiemmin lähetetyt hakemukset.\n\nLähetetyn hakemuksen tunnistat sinisestä Käsittelyssä-symbolista."
   },
   "navigation": {
     "page1": "Varauksen tiedot",

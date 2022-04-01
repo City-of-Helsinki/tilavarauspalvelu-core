@@ -1,0 +1,32 @@
+{
+  "textSearchLabel": "Search term",
+  "searchTermPlaceholder": "Search with keyword",
+  "searchButton": "Search",
+  "purposeLabel": "Purpose of use",
+  "roundLabel": "Application round",
+  "districtLabel": "District",
+  "priceLabel": "Price",
+  "participantCountLabel": "Number of participants at least",
+  "participantCountCombined": "Number of participants",
+  "typeLabel": "Type of space",
+  "showMoreFilters": "Advanced search",
+  "showLessFilters": "Show less options",
+  "unitFilter": "Location",
+  "purposesFilter": "Purpose of use",
+  "resetForm": "Clear the filters",
+  "filters": {
+    "applicationRound": "Application round",
+    "textSearch": "\"{{value}}\"",
+    "minPersons": "Participants min",
+    "maxPersons": "Participants max",
+    "purposes": "Purpose",
+    "reservationUnitType": "Type",
+    "unit": "Location"
+  },
+  "all": "All",
+  "clearSelections": "Clear selections",
+  "removeSelection": "Clear selection",
+  "selectedElement": "Selection",
+  "searchForValue": "Search",
+  "removeFilter": "Remove filter \"{{value}}\""
+}

@@ -1,0 +1,69 @@
+{
+  "prefixForCancelled": "",
+  "linkToResourceUnitLabel": "",
+  "legend": {
+    "okLabel": "",
+    "cancelledLabel": "",
+    "free": "",
+    "unavailable": "",
+    "busy": ""
+  },
+  "loginInfo": "",
+  "showCurrentDay": "",
+  "showPrevious": "",
+  "showNext": "",
+  "showView": "",
+  "initialReservation": "",
+  "makeReservation": "",
+  "newReservation": "",
+  "reserverInfo": "",
+  "reservationInfo": "",
+  "notification": {
+    "reservationAlertTitle": "",
+    "reservationApplicationAlertTitle": "",
+    "reservationAlertBody": ""
+  },
+  "label": {
+    "reserveeName": "",
+    "reserveeFirstName": "",
+    "reserveeLastName": "",
+    "name": "",
+    "description": "",
+    "termsSpace": "",
+    "termsResource": "",
+    "reservationDate": "",
+    "reservationSpace": ""
+  },
+  "heading": {
+    "termsOfUse": "",
+    "resourceTerms": ""
+  },
+  "saveReservation": "",
+  "selectedTime": "",
+  "nextAvailableTime": "",
+  "nextAvailableSlot": "",
+  "nextAvailableSlot_plural": "",
+  "showCalendar": "",
+  "eventDuration": "",
+  "dateFormatAssist": "",
+  "timeFormatAssist": "",
+  "durationFormatAssist": "",
+  "startDate": "",
+  "startTime": "",
+  "duration": "",
+  "steps": {
+    "step1": "",
+    "step2": "",
+    "step3": ""
+  },
+  "nextStep": "",
+  "reservationSummary": "",
+  "errors": {
+    "bufferCollision": "",
+    "collision": "",
+    "unavailable": ""
+  },
+  "reservingStartsAt": "",
+  "reservationQuota": "",
+  "reservationQuotaFull": ""
+}

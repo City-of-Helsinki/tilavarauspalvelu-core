@@ -1,0 +1,32 @@
+{
+  "head": {
+    "heading": "Boka lokaler och utrustning",
+    "text": "Via Varaamo kan du boka offentliga lokaler eller utrustning för tillfällig eller regelbunden bruk",
+    "searchPlaceholder": "Sök lokaler eller utrustning"
+  },
+  "info": {
+    "heading": "Enstaka bokningar",
+    "text": "Ifall du vill göra enstaka bokningar kan du använda <0>varaamo.hel.fi</0>."
+  },
+  "infoRecurring": {
+    "heading": "Säsongsbokning",
+    "text": "Här kan du boka och få mer information om säsongbokningen och ansökningstider."
+  },
+  "browseRecurringReservationsButton": "Se ansökningstider",
+  "footer": {
+    "heading": "Om Varaamo",
+    "body": "Varaamo är en nättjänst som upprätthålls av Helsingfors stad, genom vilken du kan boka stadens offentliga lokaler samt arbetspunkter för ditt bruk. \n\nDen förnyade lokalbokningstjänsten befinner sig i testskedet. De nya egenskaperna och funktionerna tas i användning så småningom."
+  },
+  "shortcutsHeadingMobile": "",
+  "shortcutsHeading": "",
+  "shortcuts": {
+    "organizeEvent": "",
+    "pictureOrSound": "",
+    "sports": "",
+    "tutoring": "",
+    "working": "",
+    "sauna": "",
+    "workshop": ""
+  },
+  "recommendations": "Rekommendationer"
+}

@@ -1,0 +1,10 @@
+{
+  "count_plural": "{{count}} results",
+  "count": "{{count}} result",
+  "noResults": "No search results",
+  "error": "Error occurred when searching for spaces. Please try again!",
+  "listButton": "Show in list",
+  "mapButton": "Show on map",
+  "sortButtonLabel": "Sort by",
+  "sortButtonPlaceholder": "Sort by location"
+}

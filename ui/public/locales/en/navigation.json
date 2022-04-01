@@ -1,0 +1,10 @@
+{
+  "userNoName": "Anonymous User",
+  "Item": {
+    "spaceReservation": "Seasonal booking",
+    "reservationUnitSearch": "Single booking",
+    "reservations": "My bookings",
+    "applications": "My applications"
+  },
+  "skipToMainContent": "Skip to main content of the page"
+}

@@ -1,0 +1,14 @@
+{
+  "space": "Lokal",
+  "purpose": "Användningsändamål",
+  "begin": "Start tid",
+  "end": "Slutar",
+  "weekDay": "Dag",
+  "time": "Tid",
+  "notAvailable": "Undantag, då säsongsbokning inte står till ert förfogande",
+  "duration": "Bokningens varaktighet {{duration}}",
+  "everyWeek": "Varje vecka",
+  "everyOtherWeek": "Varannan vecka",
+  "showList": "Visa detaljerad bokningslista",
+  "downloadCalendarFeed": "Ladda kalenderanteckningarna (.ics)"
+}

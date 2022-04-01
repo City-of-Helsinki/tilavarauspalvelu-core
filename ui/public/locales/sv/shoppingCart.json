@@ -1,0 +1,10 @@
+{
+  "next": "Fyll i ansökan",
+  "nextShort": "Fyll i",
+  "count_plural": "{{count}} lokaler valda",
+  "count": "{{count}} lokal vald",
+  "countShort_plural": "{{count}} valda",
+  "countShort": "{{count}} vald",
+  "deleteSelections": "Töm valen",
+  "deleteSelectionsShort": "Töm valen"
+}

@@ -1,0 +1,21 @@
+{
+  "cancelHeading": "Är du säker på att du vill ångra din ansökan?",
+  "cancelContent": "Om du ångrar din ansökan kan du inte längre redigera eller skicka den.",
+  "cancelFailed": "Ansökningen kunde inte ångras",
+  "edit": "Redigera din ansökan",
+  "cancel": "Ångra ansökan",
+  "status": {
+    "draft": "Inte slutförd",
+    "processing": "I behandling",
+    "sent": "Behandlad"
+  },
+  "reservations": "Bokningar",
+  "saved": "Senast sparad: {{date, dd.MM.yyyy 'kl' HH:mm}}",
+  "person": "Ansökan skapad: som privatperson",
+  "organisation": "Ansökan skapad: {{type}}, {{name}}",
+  "applicantType": {
+    "community": "förening",
+    "association": "för en registrerad förening",
+    "company": "företag"
+  }
+}

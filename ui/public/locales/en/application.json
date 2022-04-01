@@ -1,0 +1,201 @@
+{
+  "error": {
+    "saveFailed": "Application could not be saved",
+    "required": "Required",
+    "requiredField": "Application could not be saved",
+    "pattern": "Check format",
+    "numPersonsMin": "Group size incorrect",
+    "minDurationBiggerThanMaxDuration": "Minimum duration is greater than maximum duration",
+    "maxDurationSmallerThanMinDuration": "Maximum duration is less than minimum duration",
+    "eventsPerWeekMin": "At least one booking per week",
+    "beginAfterEnd": "Season start date is later than end date",
+    "beginBeforePeriodBegin": "Season start date is too early",
+    "beginAfterPeriodEnd": "Season start date is too late",
+    "endAfterPeriodEnd": "Season end date is too late",
+    "endBeforeBegin": "Season end date is earlier than start date",
+    "endBeforePeriodBegin": "Season end date is too early",
+    "missingSchedule": "Add at least one time slot for all season bookings",
+    "reservationUnitTooSmall": "This space is too small for group",
+    "otherEventsHaveErrors": "Fix incorrectly filled fields",
+    "noReservationUnits": "Add one or more spaces to the application",
+    "noEvents": "Add one or more seasonal bookings to the application",
+    "maxLength": "Maximum length: {{count}}"
+  },
+  "Intro": {
+    "startNewApplication": "Apply",
+    "heading": "Seasonal booking application",
+    "createFailedHeading": "Application creation failed",
+    "createFailedContent": "Application creation failed",
+    "faq1": {
+      "question": ""
+    },
+    "faq2": {
+      "question": ""
+    },
+
+    "faq3": {
+      "question": ""
+    }
+  },
+  "applicationEventSaved": "Booking saved",
+  "Page1": {
+    "heading": "1. Fill in the booking details",
+    "text": "Add your booking requests for next season",
+    "basicInformationSubHeading": "Basic booking information",
+    "name": "Name of seasonal booking",
+    "groupSize": "Group size",
+    "ageGroup": "Age group",
+    "abilityGroup": "",
+    "purpose": "Booking purpose",
+    "spacesSubHeading": "Requested spaces",
+    "defaultPeriodPrefix": "Use the default booking period",
+    "applicationRoundSubHeading": "Period",
+    "periodStartDate": "Start date",
+    "periodEndDate": "End date",
+    "minDuration": "Minimum duration",
+    "maxDuration": "Maximum duration",
+    "eventsPerWeek": "Number of bookings per week",
+    "biweekly": "",
+    "defaultDurationLabel": "1 hour 30 min",
+    "createNew": "Create a new season booking",
+    "applicationEventName": "Untitled booking",
+    "applicationEventSummary": "Summary",
+    "applicationEventSaved": "Seasonal booking request saved",
+    "saveEvent": "Save",
+    "deleteEvent": "Cancel"
+  },
+  "Page2": {
+    "heading": "2. Select booking dates",
+    "subHeading": "Select all dates for which you want to book spaces",
+    "info": "Check available time slots <0>here<0> (Fin). Select your preferred times. Also select other times that suit you.",
+    "text": "Indicate your preferred dates for the seasonal booking",
+    "copyTimes": "Copy times for all booking requests",
+    "resetTimes": "Clear calendar",
+    "summary": "Summary",
+    "priorityLabels": {
+      "300": "Select preferred time slots",
+      "200": "Select other time slots"
+    },
+    "legend": {
+      "unavailable": "Not available",
+      "selected-1": "Preferred time slots",
+      "selected-2": "Other request"
+    },
+    "primarySchedules": "Preferred time slots",
+    "secondarySchedules": "Other time slots",
+    "notification": {
+      "copyCells": "Times successfully copied for all booking requests"
+    }
+  },
+  "Page3": {
+    "heading": "3. Customer details",
+    "text": "You can apply as a community, private person or company. The latest application is valid.",
+    "firstName": "First name",
+    "homeCity": "City",
+    "lastName": "Surname",
+    "phoneNumber": "Phone number",
+    "email": "Email address to be attached to the application",
+    "emailNotification": "All messages concerning the application will be sent to the email address below",
+    "subHeading": {
+      "basicInfo": "Basic information",
+      "postalAddress": "Postal address",
+      "billingAddress": "Billing address",
+      "contactInfo": "Contact information"
+    },
+    "as": {
+      "prefix": "I create the application...",
+      "type": {
+        "organisation": "on behalf of an organisation, group or community",
+        "company": "on behalf of the company",
+        "individual": "as a private person"
+      }
+    },
+    "contactPerson": {
+      "firstName": "Contact person's first name ",
+      "lastName": "Contact person's surname ",
+      "phoneNumber": "Contact person's phone number"
+    },
+    "billingAddress": {
+      "streetAddress": "Address",
+      "postCode": "Postal code",
+      "city": "City"
+    },
+    "company": {
+      "name": "Company’s official name",
+      "coreBusiness": "Company’s core business",
+      "registrationNumber": "Business ID"
+    },
+    "organisation": {
+      "name": "Official name",
+      "coreBusiness": "Core business",
+      "registrationNumber": "Business ID",
+      "streetAddress": "Address",
+      "postCode": "Postal code",
+      "city": "City",
+      "notRegistered": "No business ID",
+      "separateInvoicingAddress": "Billing address different to postal address"
+    },
+    "additionalInformation": "Additional details"
+  },
+  "preview": {
+    "applicantType": {
+      "community": "Unregistered association",
+      "company": "Company",
+      "individual": "Private customer",
+      "association": "Registered association"
+    },
+    "homeCity": "City",
+    "heading": "4. Review and submit the application",
+    "text": "See a summary of the application below",
+    "basicInfoSubHeading": "Applicant information",
+    "firstName": "Contact person's first name ",
+    "lastName": "Contact person's surname",
+    "applicantTypeLabel": "Applicant type",
+    "email": "Email ",
+    "phoneNumber": "Telephone number",
+    "additionalInformation": "Additional details",
+    "organisation": {
+      "name": "Applicant name",
+      "coreBusiness": "Core business"
+    },
+    "applicationEvent": {
+      "name": "Application name",
+      "numPersons": "Group size",
+      "ageGroup": "Age group",
+      "abilityGroup": "",
+      "purpose": "Booking purpose",
+      "additionalInfo": "",
+      "begin": "Start date",
+      "end": "End date",
+      "minDuration": "Minimum duration",
+      "maxDuration": "Maximum duration",
+      "eventsPerWeek": "Number of bookings per week"
+    },
+    "applicationEventSchedules": "Requested time slots",
+    "noData": {
+      "heading": "Information on form does not yet exist",
+      "text": "First fill in the form"
+    },
+    "notification": {
+      "processing": "Processing",
+      "body": "Processing of applications will start once the application deadline has passed. We will notify you of the different steps at the email address you provide."
+    },
+    "reservationUnitTerms": "Additional booking conditions",
+    "termsOfService": "Booking conditions for City of Helsinki spaces and equipment",
+    "userAcceptsTerms": "I have read and I accept the terms and conditions and the supplementary booking conditions.",
+    "subHeading": {
+      "applicationInfo": "Application information"
+    }
+  },
+  "sent": {
+    "heading": "Thank you for the application",
+    "subHeading": "Your application has been received and will be processed at the end of the application round.",
+    "body": "If necessary, you can edit your application within the application round. Only the most recent application will be processed. Please delete previously submitted applications.\n\nSubmitted applications are marked with a blue In process icon."
+  },
+  "navigation": {
+    "page1": "Booking details",
+    "page2": "Booking dates",
+    "page3": "Customer information",
+    "preview": "Preview and send"
+  }
+}

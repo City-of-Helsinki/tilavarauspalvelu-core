@@ -1,0 +1,14 @@
+{
+  "reservationUnitPriceLabel": "Pris",
+  "priceUnits": {
+    "PER_15_MINS": "15 min",
+    "PER_30_MINS": "30 min",
+    "PER_HOUR": "h",
+    "PER_HALF_DAY": "½ dag",
+    "PER_DAY": "dag",
+    "PER_WEEK": "v"
+  },
+  "priceFree": "Avgiftsfri",
+  "taxPercentage": "moms {{count}}%",
+  "total": "Totalt"
+}

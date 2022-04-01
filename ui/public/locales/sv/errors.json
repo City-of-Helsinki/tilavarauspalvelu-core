@@ -1,0 +1,8 @@
+{
+  "404": {
+    "body": "Sidan kan inte hittas"
+  },
+  "500": {
+    "body": "Något oväntat hände"
+  }
+}

@@ -2,7 +2,7 @@
   "count_plural": "{{count}} Hakutulosta",
   "count": "{{count}} Hakutulos",
   "noResults": "Ei hakutuloksia",
-  "error": "Tapahtui virhe haettaessa tiloja",
+  "error": "Tapahtui virhe haettaessa tiloja. Yritä uudelleen!",
   "listButton": "Näytä listassa",
   "mapButton": "Näytä kartalla",
   "sortButtonLabel": "Järjestä",

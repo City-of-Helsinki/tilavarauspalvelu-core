@@ -97,6 +97,7 @@ describe("application", () => {
     selectApplicationRoundButton().click();
     firstAvailableApplicationRound().click();
     proceedToPage1Button().click();
+
     cy.wait(
       [
         "@applicationPost",
@@ -231,7 +232,6 @@ describe("application", () => {
     cy.a11yCheck();
 
     fillAsIndividual();
-    cy.wait(["@city"]);
 
     cy.fixture("v1/application/put_page_3").then((json) => {
       cy.intercept("PUT", "/v1/application/138", json);
@@ -239,7 +239,6 @@ describe("application", () => {
     });
 
     nextButton().click();
-    cy.wait(["@purpose", "@city", "@ageGroup"]);
 
     cy.get("h1").should("contain", "lähetä hakemus");
 
@@ -256,6 +255,6 @@ describe("application", () => {
 
     submitApplication();
 
-    cy.get("h1").should("contain", "Hakemuksesi on");
+    cy.get("h1").should("contain", "Kiitos hakemuksesta!");
   });
 });

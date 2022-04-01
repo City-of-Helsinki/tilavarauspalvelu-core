@@ -143,12 +143,7 @@ const EventReservationUnitDetails = (): JSX.Element | null => {
       <RoundName>{applicationRound?.name}</RoundName>
       <HorisontalRule />
       <IconWithText
-        icon={
-          <IconLocation
-            size="s"
-            aria-label="{t('eventReservationUnitDetails:ariaLabelLocation')}"
-          />
-        }
+        icon={<IconLocation size="s" aria-hidden />}
         text={
           <div>
             <BuildingName>{reservationUnit?.building.name}</BuildingName>

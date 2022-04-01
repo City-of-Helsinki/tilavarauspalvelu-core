@@ -94,7 +94,7 @@ const StyledTextInput = styled(TextInput)`
   }
 
   @media (min-width: ${breakpoint.m}) {
-    max-width: 245px;
+    max-width: 300px;
   }
 `;
 

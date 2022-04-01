@@ -1,0 +1,12 @@
+{
+  "heading": "Egna ansökningar",
+  "subHeading": "Hantera dina egna ansökningar",
+  "noApplications": "Det finns inga ansökningar",
+  "group": {
+    "draft": "Utkast",
+    "processing": "I behandling",
+    "sent": "Behandlad",
+    "declined": "Avvisad",
+    "cancelled": "Ångrad"
+  }
+}

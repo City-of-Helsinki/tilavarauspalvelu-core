@@ -1,0 +1,10 @@
+{
+  "maxPersons": "{{count}} person",
+  "maxPersons_plural": "{{count}} personer",
+  "RelatedUnits": {
+    "heading": "Se även"
+  },
+  "address": "Adress",
+  "type": "",
+  "seeMore": "Visa mer"
+}

@@ -1,0 +1,102 @@
+{
+  "title": "",
+  "titleSent": "",
+  "applicationInfo": "",
+  "applicationSummary": "",
+  "summaryIngress": "",
+  "reserveeTypePrefix": "",
+  "reserveeTypes": {
+    "labels": {
+      "nonprofit": "",
+      "business": "",
+      "individual": ""
+    }
+  },
+  "label": {
+    "nonprofit": {
+      "name": "",
+      "description": "",
+      "purpose": "",
+      "numPersons": "",
+      "ageGroup": "",
+      "reserveeFirstName": "",
+      "reserveeLastName": "",
+      "reserveeAddressStreet": "",
+      "reserveeAddressZip": "",
+      "reserveeAddressCity": "",
+      "reserveeEmail": "",
+      "reserveePhone": "",
+      "reserveeOrganisationName": "",
+      "reserveeId": "",
+      "reserveeIsUnregisteredAssociation": "",
+      "homeCity": "",
+      "applyingForFreeOfCharge": "",
+      "freeOfChargeReason": "",
+      "showBillingAddress": "",
+      "billingFirstName": "",
+      "billingLastName": "",
+      "billingPhone": "",
+      "billingEmail": "",
+      "billingAddressStreet": "",
+      "billingAddressZip": "",
+      "billingAddressCity": ""
+    },
+    "individual": {
+      "name": "",
+      "description": "",
+      "purpose": "",
+      "numPersons": "",
+      "ageGroup": "",
+      "reserveeFirstName": "",
+      "reserveeLastName": "",
+      "reserveeAddressStreet": "",
+      "reserveeAddressZip": "",
+      "reserveeAddressCity": "",
+      "reserveeEmail": "",
+      "reserveePhone": "",
+      "applyingForFreeOfCharge": "",
+      "freeOfChargeReason": "",
+      "showBillingAddress": "",
+      "billingFirstName": "",
+      "billingLastName": "",
+      "billingPhone": "",
+      "billingEmail": "",
+      "billingAddressStreet": "",
+      "billingAddressZip": "",
+      "billingAddressCity": ""
+    },
+    "business": {
+      "name": "",
+      "description": "",
+      "purpose": "",
+      "numPersons": "",
+      "ageGroup": "",
+      "reserveeFirstName": "",
+      "reserveeLastName": "",
+      "reserveeAddressStreet": "",
+      "reserveeAddressZip": "",
+      "reserveeAddressCity": "",
+      "reserveeEmail": "",
+      "reserveePhone": "",
+      "reserveeOrganisationName": "",
+      "reserveeId": "",
+      "homeCity": "",
+      "applyingForFreeOfCharge": "",
+      "freeOfChargeReason": "",
+      "showBillingAddress": "",
+      "billingFirstName": "",
+      "billingLastName": "",
+      "billingPhone": "",
+      "billingEmail": "",
+      "billingAddressStreet": "",
+      "billingAddressZip": "",
+      "billingAddressCity": ""
+    }
+  },
+  "processLabels": {
+    "handlingRequired": ""
+  },
+  "errors": {
+    "noFormType": ""
+  }
+}

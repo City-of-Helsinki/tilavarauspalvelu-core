@@ -124,6 +124,7 @@ const SearchSingle = (): JSX.Element => {
   >(RESERVATION_UNITS, {
     variables: processVariables(values),
     fetchPolicy: "network-only",
+    skip: Object.keys(values).length === 0,
   });
 
   const reservationUnits: ReservationUnitType[] =

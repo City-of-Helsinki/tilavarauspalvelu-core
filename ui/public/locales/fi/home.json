@@ -1,7 +1,7 @@
 {
   "head": {
     "heading": "Varaa tiloja ja laitteita",
-    "text": "Varaamosta voit varata julkisia tiloja ja laitteita käyttöösi",
+    "text": "Varaamosta voit varata julkisia tiloja ja laitteita satunnaiseen tai säännölliseen käyttöön",
     "searchPlaceholder": "Hae tiloja tai laitetta"
   },
   "info": {
@@ -12,12 +12,7 @@
     "heading": "Kausivarauksen tekeminen",
     "text": "Hae Helsingin kaupungin tiloja säännölliseen käyttöön. Voit tutustua tiloihin etukäteen ennen hakuaikaa."
   },
-  "browseReservationsButton": "Selaa varausyksiköitä",
   "browseRecurringReservationsButton": "Tutustu hakuaikoihin",
-  "applicationTimes": {
-    "heading": "Kausivarauksen hakuajat",
-    "text": "Kausivarauksen hakuaika on kaksi kertaa vuodessa. Ajankohta vaihtelee palvelusta ja toimialasta riippuen."
-  },
   "footer": {
     "heading": "Palvelusta",
     "body": "Varaamo on Helsingin kaupungin ylläpitämä verkkopalvelu, jonka kautta voit varata kaupungin julkisia tiloja sekä työpisteitä käyttöösi.\n\nUudistettu tilavarauspalvelu on testausvaiheessa. Uudet ominaisuudet ja toiminnallisuudet otetaan käyttöön vähitellen."

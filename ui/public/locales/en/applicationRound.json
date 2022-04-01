@@ -1,0 +1,11 @@
+{
+  "card": {
+    "applyButton": "Search",
+    "displayPastButton": "Show spaces",
+    "criteria": "Application criteria",
+    "pending": "Application round opens {{openingDateTime}}",
+    "open": "Application round open until {{until, d.M.yyyy',' H.mm}}",
+    "past": "Application round closed {{closingDate, d.M.yyyy',' H.mm}}"
+  },
+  "criteria": "application criteria"
+}

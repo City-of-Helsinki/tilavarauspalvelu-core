@@ -1,0 +1,10 @@
+{
+  "maxPersons": "{{count}} person",
+  "maxPersons_plural": "{{count}} persons",
+  "RelatedUnits": {
+    "heading": "Similar"
+  },
+  "address": "Address",
+  "type": "",
+  "seeMore": "Show more"
+}

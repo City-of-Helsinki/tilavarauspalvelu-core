@@ -1,7 +1,6 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Navigation as HDSNavigation } from "hds-react";
 import { useTranslation, TFunction } from "next-i18next";
-import { useLocalStorage } from "react-use";
 import { useRouter } from "next/router";
 import styled from "styled-components";
 import { applicationsUrl } from "../../modules/util";
@@ -21,8 +20,6 @@ type MenuItem = {
   path: string;
   condition?: boolean;
 };
-
-const languageOptions: LanguageOption[] = [{ label: "Suomeksi", value: "fi" }];
 
 const StyledNavigation = styled(HDSNavigation)`
   --header-background-color: var(--tilavaraus-header-background-color);
@@ -58,8 +55,6 @@ const PreContent = styled.div`
   }
 `;
 
-const DEFAULT_LANGUAGE = "fi";
-
 type Props = {
   profile: UserProfile | null;
   logout?: () => void;
@@ -79,13 +74,19 @@ const getUserName = (profile: UserProfile | null, t: TFunction) => {
 const Navigation = ({ profile, logout }: Props): JSX.Element => {
   const { t, i18n } = useTranslation(["common", "navigation"]);
   const router = useRouter();
-  const [language, setLanguage] = useLocalStorage<string>(
-    "userLocale",
-    i18n.language
-  );
+
   const [shouldLogin, setShouldLogin] = React.useState(false);
 
-  const formatSelectedValue = (lang = DEFAULT_LANGUAGE): string =>
+  const languageOptions: LanguageOption[] = useMemo(
+    () => [
+      { label: "Suomeksi", value: "fi" },
+      { label: "English", value: "en" },
+      { label: "Svenska", value: "sv" },
+    ],
+    []
+  );
+
+  const formatSelectedValue = (lang = router.defaultLocale): string =>
     lang.toUpperCase();
 
   const menuItems: MenuItem[] = [
@@ -134,7 +135,9 @@ const Navigation = ({ profile, logout }: Props): JSX.Element => {
               onClick={() => logout && logout()}
             />
           </HDSNavigation.User>
-          <HDSNavigation.LanguageSelector label={formatSelectedValue(language)}>
+          <HDSNavigation.LanguageSelector
+            label={formatSelectedValue(i18n.language)}
+          >
             {languageOptions.map((languageOption) => (
               <HDSNavigation.Item
                 key={languageOption.value}
@@ -144,7 +147,9 @@ const Navigation = ({ profile, logout }: Props): JSX.Element => {
                   e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>
                 ): void => {
                   e.preventDefault();
-                  setLanguage(languageOption.value);
+                  router.push(router.pathname, router.asPath, {
+                    locale: languageOption.value,
+                  });
                 }}
               />
             ))}

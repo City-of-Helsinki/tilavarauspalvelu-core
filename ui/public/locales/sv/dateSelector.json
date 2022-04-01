@@ -1,0 +1,23 @@
+{
+  "dateTypeAll": "",
+  "dateTypeThisWeek": "",
+  "dateTypeToday": "",
+  "dateTypeTomorrow": "",
+  "dateTypeWeekend": "",
+  "infoDate": "",
+  "labelEndDate": "",
+  "labelStartDate": "",
+  "errorEndDateBeforeStartDate": "",
+  "errorDateFormat": "",
+  "menu": {
+    "buttonBack": "",
+    "buttonClose": "",
+    "buttonCustom": ""
+  },
+  "title": "",
+  "accessibility": {
+    "chooseDayPrefix": "",
+    "nextMonth": "",
+    "previousMonth": ""
+  }
+}

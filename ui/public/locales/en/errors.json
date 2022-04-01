@@ -1,0 +1,8 @@
+{
+  "404": {
+    "body": "Page not found"
+  },
+  "500": {
+    "body": "Something unexpected happened"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "granted": "Beviljad för grupp {{groupName}}",
+  "denied": "Undantag, då säsongsbokning inte står till ert förfogande",
+  "headerWeekday": "Veckodag",
+  "headerDate": "Datum",
+  "headerTime": "Tid",
+  "seeMore": "Visa bokning"
+}

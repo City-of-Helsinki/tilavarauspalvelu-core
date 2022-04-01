@@ -1,0 +1,26 @@
+{
+  "Navigation": {
+    "feedback": {
+      "label": "Send feedback",
+      "href": "https://app.helmet-kirjasto.fi/forms/?site=varaamopalaute&lang=en&ref=https://tilavaraus.hel.fi/"
+    },
+    "terms": {
+      "label": "General Terms of Service (FI)",
+      "href": "/Tilavarauspalvelu_Yleisetpalveluehdot4_21.pdf"
+    }
+  },
+  "Base": {
+    "Item": {
+      "privacyStatement": {
+        "label": "Privacy Statement (FI)",
+        "href": "https://www.hel.fi/static/liitteet-2019/Kaupunginkanslia/Rekisteriselosteet/Kuva/Tilanvaraus-%20ja%20tietokantarekisteri,%20Varaamo%20ja%20Respa.pdf"
+      },
+      "accessibilityStatement": {
+        "label": "Privacy Statement (FI)",
+        "href": "/Tilavarauspalvelu_saavutettavuusseloste.pdf"
+      }
+    },
+    "copyrightHolder": "City of Helsinki",
+    "copyrightText": "All rights reserved"
+  }
+}

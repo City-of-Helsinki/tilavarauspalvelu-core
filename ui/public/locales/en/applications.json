@@ -1,0 +1,12 @@
+{
+  "heading": "My applications",
+  "subHeading": "Manage your own applications",
+  "noApplications": "No applications",
+  "group": {
+    "draft": "Drafts",
+    "processing": "In process",
+    "sent": "Processed",
+    "declined": "Denied",
+    "cancelled": "Cancelled"
+  }
+}
