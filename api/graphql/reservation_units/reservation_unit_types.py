@@ -148,15 +148,30 @@ class ReservationUnitImageType(PrimaryKeyObjectType):
     image_url = graphene.String()
     medium_url = graphene.String()
     small_url = graphene.String()
+    large_url = graphene.String()
 
     class Meta:
         model = ReservationUnitImage
-        fields = ["pk", "image_url", "medium_url", "small_url", "image_type"]
+        fields = [
+            "pk",
+            "image_url",
+            "large_url",
+            "medium_url",
+            "small_url",
+            "image_type",
+        ]
 
     def resolve_image_url(self, info):
         if not self.image:
             return None
         return info.context.build_absolute_uri(self.image.url)
+
+    def resolve_large_url(self, info):
+        if not self.image:
+            return None
+        url = get_thumbnailer(self.image)["large"].url
+
+        return info.context.build_absolute_uri(url)
 
     def resolve_small_url(self, info):
         if not self.image:
