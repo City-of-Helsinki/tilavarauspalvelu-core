@@ -1,8 +1,4 @@
-import {
-  IconArrowLeft,
-  IconArrowRight,
-  Notification as HDSNotification,
-} from "hds-react";
+import { IconArrowRight, Notification as HDSNotification } from "hds-react";
 import React, { useState } from "react";
 import { Trans, useTranslation } from "react-i18next";
 import { useRouter } from "next/router";
@@ -15,8 +11,8 @@ import {
   applicationEventSchedulesToCells,
 } from "../../modules/util";
 import { AccordionWithState as Accordion } from "../common/Accordion";
-import { breakpoint } from "../../modules/style";
 import { MediumButton } from "../../styles/util";
+import { ButtonContainer } from "../common/common";
 
 type Props = {
   application: Application;
@@ -33,18 +29,6 @@ const Notification = styled(HDSNotification)`
 
 const StyledNotification = styled(Notification)`
   margin-top: var(--spacing-m);
-`;
-
-const ButtonContainer = styled.div`
-  display: flex;
-  gap: var(--spacing-m);
-  flex-direction: column-reverse;
-  margin: var(--spacing-layout-l) 0;
-  justify-content: flex-end;
-
-  @media (min-width: ${breakpoint.s}) {
-    flex-direction: row;
-  }
 `;
 
 const Page2 = ({ application, onNext }: Props): JSX.Element => {
@@ -192,7 +176,6 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
       <ButtonContainer>
         <MediumButton
           variant="secondary"
-          iconLeft={<IconArrowLeft />}
           onClick={() => history.push(`${application.id}/page1`)}
         >
           {t("common:prev")}
