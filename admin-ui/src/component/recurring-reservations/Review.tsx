@@ -1,101 +1,101 @@
-import React, { useState, useEffect } from "react";
-import styled from "styled-components";
+import { IconSliders, Table, Tabs } from "hds-react";
+import { uniq, uniqBy } from "lodash";
+import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { TFunction } from "i18next";
-import { Button, Checkbox, Notification } from "hds-react";
-import uniq from "lodash/uniq";
-import trim from "lodash/trim";
-import { uniqBy } from "lodash";
-import withMainMenu from "../withMainMenu";
-import Heading from "./Heading";
-import { ContentHeading, H2 } from "../../styles/typography";
-import { breakpoints } from "../../styles/util";
-import { IngressContainer } from "../../styles/layout";
-import DataTable, { CellConfig } from "../DataTable";
+import { Link } from "react-router-dom";
+import styled from "styled-components";
+import { getApplications } from "../../common/api";
 import {
-  getApplications,
-  setApplicationStatuses,
-  ApplicationStatusPayload,
-} from "../../common/api";
-import {
-  Application as ApplicationType,
-  ApplicationEventStatus,
   ApplicationRound as ApplicationRoundType,
-  ApplicationRoundStatus,
-  ApplicationStatus,
   DataFilterConfig,
-  Unit,
+  DataFilterOption,
 } from "../../common/types";
-import TimeframeStatus from "./TimeframeStatus";
-import Loader from "../Loader";
-import StatusCell from "../StatusCell";
-import { formatNumber, parseDuration } from "../../common/util";
+import { applicationDetailsUrl, applicationRoundUrl } from "../../common/urls";
+import { filterData } from "../../common/util";
+import { useNotification } from "../../context/NotificationContext";
+import { IngressContainer } from "../../styles/layout";
+import { H2 } from "../../styles/new-typography";
 import StatusRecommendation from "../applications/StatusRecommendation";
-import ApplicationRoundNavi from "./ApplicationRoundNavi";
-import { applicationUrl } from "../../common/urls";
-import { getNormalizedApplicationStatus } from "../applications/util";
+import { FilterBtn } from "../FilterContainer";
+import FilterControls from "../FilterControls";
+import Loader from "../Loader";
+import withMainMenu from "../withMainMenu";
+import { NaviItem } from "./ApplicationRoundNavi";
+import ApplicationRoundStatusBlock from "./ApplicationRoundStatusBlock";
+import TimeframeStatus from "./TimeframeStatus";
+import { ApplicationView, appMapper, truncate } from "./util";
 
 interface IProps {
   applicationRound: ApplicationRoundType;
-  setApplicationRoundStatus: (status: ApplicationRoundStatus) => Promise<void>;
 }
 
 const Wrapper = styled.div`
   width: 100%;
+  margin-top: var(--spacing-m);
   margin-bottom: var(--spacing-layout-xl);
 `;
 
 const Content = styled.div``;
 
-const Details = styled.div`
-  & > div {
-    margin-bottom: var(--spacing-3-xl);
-  }
-
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--spacing-s);
-
-  @media (min-width: ${breakpoints.l}) {
-    & > div {
-      &:nth-of-type(even) {
-        justify-self: end;
-      }
-    }
-
-    grid-template-columns: 1fr 1fr;
-  }
-`;
-
-const Recommendation = styled.div`
-  margin: var(--spacing-m) 0 0 var(--spacing-xl);
-`;
-
-const RecommendationLabel = styled.label`
-  font-family: var(--tilavaraus-admin-font-bold);
-  font-size: 1.375rem;
-  font-weight: bold;
-`;
-
 const RecommendationValue = styled.div`
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  margin-top: var(--spacing-3-xs);
+  margin-top: var(--spacing-layout-m);
+  margin-bottom: var(--spacing-l);
 `;
 
-const SubmitButton = styled(Button)`
-  margin-bottom: var(--spacing-s);
+const StyledH2 = styled(H2)`
+  margin: 0 0 var(--spacing-xs) 0;
+  line-height: 1;
 `;
 
-const StyledCheckbox = styled(Checkbox)`
-  label {
-    user-select: none;
+const TabContent = styled.div`
+  margin-top: var(--spacing-l);
+  line-height: 1;
+`;
+
+const ApplicationRoundName = styled.div`
+  font-size: var(--fontsize-body-xl);
+  margin: var(--spacing-s) 0;
+  line-height: var(--lineheight-m);
+`;
+
+const StyledLink = styled(Link)`
+  color: black;
+`;
+
+const StyledApplicationRoundStatusBlock = styled(ApplicationRoundStatusBlock)`
+  margin: 0;
+`;
+
+const TableWrapper = styled.div`
+  width: 100%;
+
+  caption {
+    text-align: end;
+  }
+  table {
+    min-width: 1000px;
+    overflow: scroll;
+    th {
+      font-family: var(--font-bold);
+    }
+    td {
+      white-space: nowrap;
+    }
   }
 `;
 
-const ApplicationCount = styled(H2)`
-  text-transform: lowercase;
+const FilterContainer = styled.div`
+  background-color: white;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  height: 56px;
+  position: sticky;
+  top: 0;
+  z-index: var(--tilavaraus-admin-sticky-header);
 `;
 
 const getFilterConfig = (
@@ -139,139 +139,28 @@ const getFilterConfig = (
   ];
 };
 
-const getCellConfig = (applicationRound: ApplicationRoundType): CellConfig => {
-  let statusTitle: string;
-  switch (applicationRound.status) {
-    case "approved":
-      statusTitle = "Application.headings.resolutionStatus";
-      break;
-    default:
-      statusTitle = "Application.headings.reviewStatus";
-  }
-
-  return {
-    cols: [
-      {
-        title: "Application.headings.customer",
-        key: "applicant",
-      },
-      {
-        title: "Application.headings.applicantType",
-        key: "type",
-      },
-      {
-        title: "Application.headings.unit",
-        key: "unitsSort",
-        transform: ({ units }: ApplicationView) =>
-          units.map((u) => u.name.fi).join(", "),
-      },
-      {
-        title: "Application.headings.applicationCount",
-        key: "applicationCountSort",
-        transform: ({ applicationCount }: ApplicationView) => applicationCount,
-      },
-      {
-        title: statusTitle,
-        key: "status",
-        transform: ({ status }: ApplicationView) => {
-          return (
-            <StatusCell
-              status={status}
-              text={`Application.statuses.${status}`}
-              type="application"
-            />
-          );
-        },
-      },
-    ],
-    index: "id",
-    sorting: "organisation.name",
-    order: "asc",
-    rowLink: ({ id }) => applicationUrl(id),
-  };
-};
-type ApplicationView = {
-  id: number;
-  applicant: string;
-  type: string;
-  units: Unit[];
-  unitsSort: string;
-  applicationCount: string;
-  applicationCountSort: number;
-  status: ApplicationStatus | ApplicationEventStatus;
-  statusType: ApplicationStatus;
-};
-
-const appMapper = (
-  round: ApplicationRoundType,
-  app: ApplicationType,
-  t: TFunction
-): ApplicationView => {
-  let applicationStatusView: ApplicationRoundStatus;
-  switch (round.status) {
-    case "approved":
-      applicationStatusView = "approved";
-      break;
-    default:
-      applicationStatusView = "in_review";
-  }
-
-  const units = uniqBy(
-    app.applicationEvents
-      .flatMap((ae) => ae.eventReservationUnits)
-      .flatMap((eru) => eru.reservationUnitDetails.unit),
-    "id"
-  );
-
-  return {
-    id: app.id,
-    applicant:
-      app.applicantType === "individual"
-        ? app.applicantName || ""
-        : app.organisation?.name || "",
-    type: app.applicantType
-      ? t(`Application.applicantTypes.${app.applicantType}`)
-      : "",
-    unitsSort: units.find(() => true)?.name.fi || "",
-    units,
-    status: getNormalizedApplicationStatus(app.status, applicationStatusView),
-    statusType: app.status,
-    applicationCount: trim(
-      `${formatNumber(
-        app.aggregatedData?.appliedReservationsTotal,
-        t("common.volumeUnit")
-      )} / ${parseDuration(app.aggregatedData?.appliedMinDurationTotal)}`,
-      " / "
-    ),
-    applicationCountSort: app.aggregatedData?.appliedReservationsTotal || 0,
-  };
-};
-
-function Review({
-  applicationRound,
-  setApplicationRoundStatus,
-}: IProps): JSX.Element {
+function Review({ applicationRound }: IProps): JSX.Element | null {
   const [isLoading, setIsLoading] = useState(true);
   const [applications, setApplications] = useState<ApplicationView[]>([]);
-  const [cellConfig, setCellConfig] = useState<CellConfig | null>(null);
+  const [applicationEvents, setApplicationEvents] = useState<ApplicationView[]>(
+    []
+  );
   const [filterConfig, setFilterConfig] = useState<DataFilterConfig[] | null>(
     null
   );
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [isApplicationChecked, toggleIsApplicationChecked] = useState(false);
+  const { notifyError } = useNotification();
+  const [filters, setFilters] = useState<DataFilterOption[]>([]);
+  const [filtersAreVisible, toggleFilterVisibility] = useState(false);
 
   const { t } = useTranslation();
 
-  const setApplicationRoundAsReviewed = async (applicationIds: number[]) => {
-    const payload = applicationIds.map(
-      (applicationId: number): ApplicationStatusPayload => ({
-        status: "review_done" as ApplicationStatus,
-        applicationId,
-      })
-    );
-    await setApplicationRoundStatus("review_done");
-    await setApplicationStatuses(payload);
-  };
+  const filteredApplications = useMemo(
+    () => ({
+      applications: filterData(applications, filters),
+      applicationEvents: filterData(applicationEvents, filters),
+    }),
+    [applications, applicationEvents, filters]
+  );
 
   useEffect(() => {
     const fetchApplications = async (ar: ApplicationRoundType) => {
@@ -281,11 +170,20 @@ function Review({
           status: "in_review,review_done,declined",
         });
         const mapped = result.map((app) => appMapper(ar, app, t));
-        setCellConfig(getCellConfig(ar));
         setFilterConfig(getFilterConfig(mapped));
         setApplications(mapped);
+        setApplicationEvents(
+          result
+            .flatMap((a) =>
+              a.applicationEvents.map((ae) => ({
+                ...a,
+                applicationEvents: [ae],
+              }))
+            )
+            .map((app) => appMapper(ar, app, t))
+        );
       } catch (error) {
-        setErrorMsg("errors.errorFetchingApplications");
+        notifyError(t("errors.errorFetchingApplications"));
       } finally {
         setIsLoading(false);
       }
@@ -294,102 +192,265 @@ function Review({
     if (typeof applicationRound?.id === "number") {
       fetchApplications(applicationRound);
     }
-  }, [applicationRound, t]);
+  }, [applicationRound, notifyError, t]);
 
   if (isLoading) {
     return <Loader />;
   }
 
-  const greenApplicationIds: number[] = applications
-    .filter((application) => !["declined"].includes(application.statusType))
-    .map((application) => application.id);
+  const ready = applicationRound && filterConfig;
+
+  if (!ready) {
+    return null;
+  }
 
   return (
     <Wrapper>
-      <Heading />
-      {applicationRound && cellConfig && filterConfig && (
-        <>
-          <IngressContainer>
-            <ApplicationRoundNavi
-              applicationRoundId={applicationRound.id}
-              hideAllApplications
-            />
-            <Content>
-              <ContentHeading>{applicationRound.name}</ContentHeading>
-              <Details>
-                <div>
-                  <TimeframeStatus
-                    applicationPeriodBegin={
-                      applicationRound.applicationPeriodBegin
-                    }
-                    applicationPeriodEnd={applicationRound.applicationPeriodEnd}
-                  />
-                  <Recommendation>
-                    <RecommendationLabel>
-                      {t("Application.recommendedStage")}:
-                    </RecommendationLabel>
-                    <RecommendationValue>
-                      <StatusRecommendation
-                        status="in_review"
-                        applicationRound={applicationRound}
-                      />
-                    </RecommendationValue>
-                  </Recommendation>
-                </div>
-                <div>
-                  <SubmitButton
-                    disabled={!isApplicationChecked}
-                    onClick={() =>
-                      setApplicationRoundAsReviewed(greenApplicationIds)
-                    }
-                  >
-                    {t("Application.gotoSplitPreparation")}
-                  </SubmitButton>
-                  <div>
-                    <StyledCheckbox
-                      id="applicationsChecked"
-                      checked={isApplicationChecked}
-                      onClick={() =>
-                        toggleIsApplicationChecked(!isApplicationChecked)
-                      }
-                      label={t("Application.iHaveCheckedApplications")}
-                    />
-                  </div>
-                </div>
-              </Details>
-              <ApplicationCount data-testid="application-count">
-                {applications.length}{" "}
-                {t("Application.application", { count: applications.length })}
-              </ApplicationCount>
-            </Content>
-          </IngressContainer>
-          <DataTable
-            groups={[{ id: 1, data: applications }]}
-            hasGrouping={false}
-            config={{
-              filtering: true,
-              rowFilters: true,
-              selection: false,
+      <>
+        <IngressContainer>
+          <div
+            style={{
+              width: "100%",
+              display: "flex",
+              justifyContent: "space-between",
             }}
-            cellConfig={cellConfig}
-            filterConfig={filterConfig}
-          />
-        </>
-      )}
-      {errorMsg && (
-        <Notification
-          type="error"
-          label={t("errors.functionFailed")}
-          position="top-center"
-          autoClose={false}
-          dismissible
-          closeButtonLabelText={t("common.close")}
-          displayAutoCloseProgress={false}
-          onClose={() => setErrorMsg(null)}
-        >
-          {t(errorMsg)}
-        </Notification>
-      )}
+          >
+            <StyledApplicationRoundStatusBlock
+              applicationRound={applicationRound}
+            />
+            <NaviItem
+              to={`${applicationRoundUrl(applicationRound.id)}/criteria`}
+            >
+              {t("ApplicationRound.roundCriteria")}
+            </NaviItem>
+          </div>
+          <Content>
+            <ApplicationRoundName>{applicationRound.name}</ApplicationRoundName>
+            <StyledH2>{t("ApplicationRound.applicants")}</StyledH2>
+            <TimeframeStatus
+              applicationPeriodBegin={applicationRound.applicationPeriodBegin}
+              applicationPeriodEnd={applicationRound.applicationPeriodEnd}
+            />
+            <RecommendationValue>
+              <StatusRecommendation
+                status="in_review"
+                applicationRound={applicationRound}
+              />
+            </RecommendationValue>
+          </Content>
+          <Tabs>
+            <Tabs.TabList>
+              <Tabs.Tab>{t("ApplicationRound.applications")}</Tabs.Tab>
+              <Tabs.Tab>{t("ApplicationRound.appliedReservations")}</Tabs.Tab>
+            </Tabs.TabList>
+            <Tabs.TabPanel>
+              <TabContent>
+                <FilterContainer>
+                  <>
+                    <FilterBtn
+                      data-testid="data-table__button--filter-toggle"
+                      iconLeft={<IconSliders aria-hidden />}
+                      onClick={(): void =>
+                        toggleFilterVisibility(!filtersAreVisible)
+                      }
+                      className={
+                        filtersAreVisible ? "filterControlsAreOpen" : ""
+                      }
+                      $filterControlsAreOpen={filtersAreVisible}
+                      $filtersActive={filterConfig.length > 0}
+                      title={t(
+                        `${
+                          filters.length > 0
+                            ? "common.filtered"
+                            : "common.filter"
+                        }`
+                      )}
+                    >
+                      {t(
+                        `${
+                          filters.length > 0
+                            ? "common.filtered"
+                            : "common.filter"
+                        }`
+                      )}
+                    </FilterBtn>
+                    <FilterControls
+                      filters={filters}
+                      visible={filtersAreVisible}
+                      applyFilters={setFilters}
+                      config={filterConfig}
+                    />
+                  </>
+                </FilterContainer>
+                <TableWrapper>
+                  <Table
+                    ariaLabelSortButtonAscending="Sorted in ascending order"
+                    ariaLabelSortButtonDescending="Sorted in descending order"
+                    ariaLabelSortButtonUnset="Not sorted"
+                    initialSortingColumnKey="applicantSort"
+                    initialSortingOrder="asc"
+                    caption={t("Application.unhandledApplications", {
+                      count: filteredApplications.applications.length,
+                      of: filteredApplications.applications.length,
+                    })}
+                    cols={[
+                      {
+                        headerName: t("Application.headings.customer"),
+                        isSortable: true,
+                        key: "applicantSort",
+                        transform: ({ applicant, id }) => (
+                          <StyledLink to={applicationDetailsUrl(id)}>
+                            {truncate(applicant, 20)}
+                          </StyledLink>
+                        ),
+                      },
+                      {
+                        headerName: t("Application.headings.applicantType"),
+                        isSortable: true,
+                        key: "type",
+                      },
+                      {
+                        headerName: t("Application.headings.unit"),
+                        isSortable: true,
+                        key: "unitsSort",
+                        transform: ({ units }: ApplicationView) =>
+                          truncate(
+                            units
+                              .filter((u, i) => i < 2)
+                              .map((u) => u.name.fi)
+                              .join(", "),
+                            20
+                          ),
+                      },
+                      {
+                        headerName: t("Application.headings.applicationCount"),
+                        isSortable: true,
+                        key: "applicationCountSort",
+                        sortIconType: "other",
+                        transform: ({ applicationCount }: ApplicationView) =>
+                          applicationCount,
+                      },
+                      {
+                        headerName: t("Application.headings.phase"),
+                        key: "status",
+                        transform: ({ statusView }: ApplicationView) =>
+                          statusView,
+                      },
+                    ]}
+                    indexKey="id"
+                    rows={filteredApplications.applications}
+                    variant="light"
+                  />
+                </TableWrapper>
+              </TabContent>
+            </Tabs.TabPanel>
+            <Tabs.TabPanel>
+              <TabContent>
+                <FilterContainer>
+                  <>
+                    <FilterBtn
+                      data-testid="data-table__button--filter-toggle"
+                      iconLeft={<IconSliders aria-hidden />}
+                      onClick={(): void =>
+                        toggleFilterVisibility(!filtersAreVisible)
+                      }
+                      className={
+                        filtersAreVisible ? "filterControlsAreOpen" : ""
+                      }
+                      $filterControlsAreOpen={filtersAreVisible}
+                      $filtersActive={filterConfig.length > 0}
+                      title={t(
+                        `${
+                          filters.length > 0
+                            ? "common.filtered"
+                            : "common.filter"
+                        }`
+                      )}
+                    >
+                      {t(
+                        `${
+                          filters.length > 0
+                            ? "common.filtered"
+                            : "common.filter"
+                        }`
+                      )}
+                    </FilterBtn>
+                    <FilterControls
+                      filters={filters}
+                      visible={filtersAreVisible}
+                      applyFilters={setFilters}
+                      config={filterConfig}
+                    />
+                  </>
+                </FilterContainer>
+                <TableWrapper>
+                  <Table
+                    ariaLabelSortButtonAscending="Sorted in ascending order"
+                    ariaLabelSortButtonDescending="Sorted in descending order"
+                    ariaLabelSortButtonUnset="Not sorted"
+                    initialSortingColumnKey="applicantSort"
+                    initialSortingOrder="asc"
+                    caption={t("Application.unhandledApplications", {
+                      count: applicationEvents.length,
+                      of: applicationEvents.length,
+                    })}
+                    cols={[
+                      {
+                        headerName: t("Application.headings.customer"),
+                        isSortable: true,
+                        key: "applicantSort",
+                        transform: ({ applicant, id, eventId }) => (
+                          <StyledLink
+                            to={`${applicationDetailsUrl(id)}#${eventId}`}
+                          >
+                            {applicant}
+                          </StyledLink>
+                        ),
+                      },
+                      {
+                        headerName: t("Application.headings.name"),
+                        isSortable: true,
+                        transform: ({ name }) => truncate(name, 20),
+                        key: "nameSort",
+                      },
+                      {
+                        headerName: t("Application.headings.unit"),
+                        isSortable: true,
+                        key: "unitsSort",
+                        transform: ({ units }: ApplicationView) =>
+                          truncate(
+                            units
+                              .filter((u, i) => i < 2)
+                              .map((u) => u.name.fi)
+                              .join(", "),
+                            20
+                          ),
+                      },
+                      {
+                        headerName: t("Application.headings.applicationCount"),
+                        isSortable: true,
+                        key: "applicationCountSort",
+                        sortIconType: "other",
+                        transform: ({ applicationCount }: ApplicationView) =>
+                          applicationCount,
+                      },
+                      {
+                        headerName: t("Application.headings.phase"),
+                        key: "status",
+                        transform: ({ statusView }: ApplicationView) =>
+                          statusView,
+                      },
+                    ]}
+                    indexKey="key"
+                    rows={filteredApplications.applicationEvents}
+                    variant="light"
+                  />
+                </TableWrapper>
+              </TabContent>
+            </Tabs.TabPanel>
+          </Tabs>
+        </IngressContainer>
+      </>
     </Wrapper>
   );
 }

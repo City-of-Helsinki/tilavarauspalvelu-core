@@ -1,7 +1,6 @@
-import React, { ReactNode, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Notification } from "hds-react";
 import { AxiosError } from "axios";
 import Review from "./Review";
 import Allocation from "./Allocation";
@@ -16,6 +15,7 @@ import {
   patchApplicationRoundStatus,
 } from "../../common/api";
 import Loader from "../Loader";
+import { useNotification } from "../../context/NotificationContext";
 
 interface IProps {
   applicationRoundId: string;
@@ -23,7 +23,7 @@ interface IProps {
 
 function ApplicationRound(): JSX.Element | null {
   const [isLoading, setIsLoading] = useState(true);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const { notifyError } = useNotification();
   const [applicationRound, setApplicationRound] =
     useState<ApplicationRoundType | null>(null);
 
@@ -38,13 +38,12 @@ function ApplicationRound(): JSX.Element | null {
       const result = await patchApplicationRoundStatus(id, status);
       setApplicationRound(result);
     } catch (error) {
-      setErrorMsg("errors.errorSavingData");
+      notifyError(t("errors.errorSavingData"));
     }
   };
 
   useEffect(() => {
     const fetchApplicationRound = async () => {
-      setErrorMsg(null);
       setIsLoading(true);
 
       try {
@@ -52,100 +51,63 @@ function ApplicationRound(): JSX.Element | null {
           id: Number(applicationRoundId),
         });
         setApplicationRound(result);
-        setIsLoading(false);
       } catch (error) {
         const msg =
           (error as AxiosError).response?.status === 404
             ? "errors.applicationRoundNotFound"
             : "errors.errorFetchingData";
-        setErrorMsg(msg);
+        notifyError(t(msg));
+      } finally {
         setIsLoading(false);
       }
     };
 
     fetchApplicationRound();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [applicationRoundId]);
 
   if (isLoading) {
     return <Loader />;
   }
 
-  let content: ReactNode;
+  switch (applicationRound?.status) {
+    case "review_done":
+      return (
+        <Allocation
+          applicationRound={applicationRound}
+          setApplicationRoundStatus={(status: ApplicationRoundStatus) =>
+            setApplicationRoundStatus(Number(applicationRoundId), status)
+          }
+        />
+      );
+    case "allocated":
+    case "approved":
+      return (
+        <Handling
+          applicationRound={applicationRound}
+          setApplicationRound={setApplicationRound}
+          setApplicationRoundStatus={(status: ApplicationRoundStatus) =>
+            setApplicationRoundStatus(Number(applicationRoundId), status)
+          }
+        />
+      );
+    case "handled":
+    case "validated":
+      return (
+        <PreApproval
+          applicationRound={applicationRound}
+          setApplicationRoundStatus={(status: ApplicationRoundStatus) =>
+            setApplicationRoundStatus(Number(applicationRoundId), status)
+          }
+        />
+      );
+    case "draft":
+    case "in_review":
+      return <Review applicationRound={applicationRound} />;
 
-  if (applicationRound?.status === "review_done") {
-    content = (
-      <Allocation
-        applicationRound={applicationRound}
-        setApplicationRoundStatus={(status: ApplicationRoundStatus) =>
-          setApplicationRoundStatus(Number(applicationRoundId), status)
-        }
-      />
-    );
-  } else if (applicationRound?.status === "allocated") {
-    content = (
-      <Handling
-        applicationRound={applicationRound}
-        setApplicationRound={setApplicationRound}
-        setApplicationRoundStatus={(status: ApplicationRoundStatus) =>
-          setApplicationRoundStatus(Number(applicationRoundId), status)
-        }
-      />
-    );
-  } else if (
-    applicationRound &&
-    ["handled", "validated"].includes(applicationRound.status)
-  ) {
-    content = (
-      <PreApproval
-        applicationRound={applicationRound}
-        setApplicationRoundStatus={(status: ApplicationRoundStatus) =>
-          setApplicationRoundStatus(Number(applicationRoundId), status)
-        }
-      />
-    );
-  } else if (applicationRound?.status === "approved") {
-    content = (
-      <Handling
-        applicationRound={applicationRound}
-        setApplicationRound={setApplicationRound}
-        setApplicationRoundStatus={(status: ApplicationRoundStatus) =>
-          setApplicationRoundStatus(Number(applicationRoundId), status)
-        }
-      />
-    );
-  } else if (
-    applicationRound &&
-    ["draft", "in_review"].includes(applicationRound.status)
-  ) {
-    content = (
-      <Review
-        applicationRound={applicationRound}
-        setApplicationRoundStatus={(status: ApplicationRoundStatus) =>
-          setApplicationRoundStatus(Number(applicationRoundId), status)
-        }
-      />
-    );
+    default:
+      return null;
   }
-
-  return (
-    <>
-      {content}
-      {errorMsg && (
-        <Notification
-          type="error"
-          label={t("errors.functionFailed")}
-          position="top-center"
-          autoClose={false}
-          dismissible
-          closeButtonLabelText={t("common.close")}
-          displayAutoCloseProgress={false}
-          onClose={() => setErrorMsg(null)}
-        >
-          {t(errorMsg)}
-        </Notification>
-      )}
-    </>
-  );
 }
 
 export default ApplicationRound;
