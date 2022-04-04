@@ -51,7 +51,7 @@ const StyledH2 = styled(H2)`
 `;
 
 const TabContent = styled.div`
-  margin-top: var(--spacing-l);
+  margin-top: var(--spacing-s);
   line-height: 1;
 `;
 
@@ -83,6 +83,7 @@ const TableWrapper = styled.div`
     }
     td {
       white-space: nowrap;
+      padding: var(--spacing-xs);
     }
   }
 `;
@@ -96,6 +97,10 @@ const FilterContainer = styled.div`
   position: sticky;
   top: 0;
   z-index: var(--tilavaraus-admin-sticky-header);
+  justify-content: space-between;
+  :nth-child(1) {
+    text-align: right;
+  }
 `;
 
 const getFilterConfig = (
@@ -248,6 +253,7 @@ function Review({ applicationRound }: IProps): JSX.Element | null {
                 <FilterContainer>
                   <>
                     <FilterBtn
+                      variant="supplementary"
                       data-testid="data-table__button--filter-toggle"
                       iconLeft={<IconSliders aria-hidden />}
                       onClick={(): void =>
@@ -281,6 +287,10 @@ function Review({ applicationRound }: IProps): JSX.Element | null {
                       config={filterConfig}
                     />
                   </>
+                  {t("Application.unhandledApplications", {
+                    count: filteredApplications.applications.length,
+                    of: filteredApplications.applications.length,
+                  })}
                 </FilterContainer>
                 <TableWrapper>
                   <Table
@@ -289,10 +299,6 @@ function Review({ applicationRound }: IProps): JSX.Element | null {
                     ariaLabelSortButtonUnset="Not sorted"
                     initialSortingColumnKey="applicantSort"
                     initialSortingOrder="asc"
-                    caption={t("Application.unhandledApplications", {
-                      count: filteredApplications.applications.length,
-                      of: filteredApplications.applications.length,
-                    })}
                     cols={[
                       {
                         headerName: t("Application.headings.customer"),
@@ -319,7 +325,7 @@ function Review({ applicationRound }: IProps): JSX.Element | null {
                               .filter((u, i) => i < 2)
                               .map((u) => u.name.fi)
                               .join(", "),
-                            20
+                            23
                           ),
                       },
                       {
@@ -349,6 +355,7 @@ function Review({ applicationRound }: IProps): JSX.Element | null {
                 <FilterContainer>
                   <>
                     <FilterBtn
+                      variant="supplementary"
                       data-testid="data-table__button--filter-toggle"
                       iconLeft={<IconSliders aria-hidden />}
                       onClick={(): void =>
@@ -382,6 +389,10 @@ function Review({ applicationRound }: IProps): JSX.Element | null {
                       config={filterConfig}
                     />
                   </>
+                  {t("Application.unhandledApplications", {
+                    count: filteredApplications.applications.length,
+                    of: filteredApplications.applications.length,
+                  })}
                 </FilterContainer>
                 <TableWrapper>
                   <Table
@@ -390,10 +401,6 @@ function Review({ applicationRound }: IProps): JSX.Element | null {
                     ariaLabelSortButtonUnset="Not sorted"
                     initialSortingColumnKey="applicantSort"
                     initialSortingOrder="asc"
-                    caption={t("Application.unhandledApplications", {
-                      count: applicationEvents.length,
-                      of: applicationEvents.length,
-                    })}
                     cols={[
                       {
                         headerName: t("Application.headings.customer"),
@@ -423,7 +430,7 @@ function Review({ applicationRound }: IProps): JSX.Element | null {
                               .filter((u, i) => i < 2)
                               .map((u) => u.name.fi)
                               .join(", "),
-                            20
+                            23
                           ),
                       },
                       {
