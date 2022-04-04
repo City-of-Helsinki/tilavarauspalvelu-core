@@ -92,7 +92,6 @@ const FilterContainer = styled.div`
   background-color: white;
   display: flex;
   align-items: center;
-  justify-content: flex-start;
   height: 56px;
   position: sticky;
   top: 0;

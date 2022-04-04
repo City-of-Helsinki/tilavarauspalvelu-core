@@ -17,7 +17,6 @@ const Wrapper = styled.div`
   align-items: center;
   justify-content: space-between;
   color: var(--tilavaraus-admin-content-text-color);
-  // gap: var(--spacing-3-xs);
 
   ${StatusDot} {
     margin-right: 0.625em;
@@ -27,7 +26,6 @@ const Wrapper = styled.div`
 const Status = styled.div`
   display: inline-flex;
   align-items: center;
-  // gap: var(--spacing-xs);
 `;
 
 const StatusCell = ({
