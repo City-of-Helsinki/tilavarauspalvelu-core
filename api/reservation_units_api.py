@@ -73,10 +73,11 @@ class ReservationUnitImageSerializer(serializers.ModelSerializer):
     image_url = serializers.ImageField(source="image", use_url=True)
     medium_url = serializers.SerializerMethodField()
     small_url = serializers.SerializerMethodField()
+    large_url = serializers.SerializerMethodField()
 
     class Meta:
         model = ReservationUnitImage
-        fields = ["image_url", "medium_url", "small_url", "image_type"]
+        fields = ["image_url", "large_url", "medium_url", "small_url", "image_type"]
 
     def get_small_url(self, obj):
         if not obj.image:
@@ -89,6 +90,13 @@ class ReservationUnitImageSerializer(serializers.ModelSerializer):
         if not obj.image:
             return None
         url = get_thumbnailer(obj.image)["medium"].url
+        request = self.context.get("request")
+        return request.build_absolute_uri(url)
+
+    def get_large_url(self, obj):
+        if not obj.image:
+            return None
+        url = get_thumbnailer(obj.image)["large"].url
         request = self.context.get("request")
         return request.build_absolute_uri(url)
 
