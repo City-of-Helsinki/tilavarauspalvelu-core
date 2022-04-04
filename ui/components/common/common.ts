@@ -28,11 +28,11 @@ export const SpanTwoColumns = styled.span`
 `;
 
 export const FormSubHeading = styled(H5)`
+  margin: var(--spacing-m) 0 0 0;
+
   @media (min-width: ${breakpoint.m}) {
     grid-column-start: 1;
     grid-column-end: 3;
-    margin-top: var(--spacing-m);
-    margin-bottom: var(--spacing-2-xs);
   }
 `;
 
@@ -43,12 +43,15 @@ export const Notification = styled(HDSNotification)`
 
 export const ButtonContainer = styled.div`
   display: flex;
-  flex-direction: row;
+  flex-direction: column-reverse;
   margin-top: var(--spacing-layout-l);
-  justify-content: flex-end;
+  padding: var(--spacing-l) 0 var(--spacing-layout-l) 0;
+  justify-content: space-between;
+  gap: var(--spacing-m);
+  border-top: 1px solid var(--color-black-60);
 
-  button {
-    margin-left: var(--spacing-layout-xs);
+  @media (min-width: ${breakpoint.m}) {
+    flex-direction: row;
   }
 `;
 

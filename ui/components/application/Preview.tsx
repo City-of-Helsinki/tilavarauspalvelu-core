@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Checkbox, IconArrowLeft, Notification } from "hds-react";
+import { Checkbox, Notification } from "hds-react";
 import { useTranslation } from "react-i18next";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -15,7 +15,11 @@ import { getParameters, getReservationUnit } from "../../modules/api";
 import LabelValue from "../common/LabelValue";
 import TimePreview from "../common/TimePreview";
 import ApplicantInfoPreview from "./ApplicantInfoPreview";
-import { FormSubHeading, TwoColumnContainer } from "../common/common";
+import {
+  ButtonContainer,
+  FormSubHeading,
+  TwoColumnContainer,
+} from "../common/common";
 import { AccordionWithState as Accordion } from "../common/Accordion";
 import { breakpoint } from "../../modules/style";
 import { MediumButton } from "../../styles/util";
@@ -37,17 +41,6 @@ const mapArrayById = (
     return prev;
   }, {} as { [key: number]: Parameter | ReservationUnit });
 };
-
-const ButtonContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  margin: var(--spacing-layout-l) 0;
-  justify-content: flex-end;
-
-  button {
-    margin-left: var(--spacing-layout-xs);
-  }
-`;
 
 const UnitList = styled.ol`
   margin: 0;
@@ -347,7 +340,6 @@ const Preview = ({ onNext, application, tos }: Props): JSX.Element | null => {
       <ButtonContainer>
         <MediumButton
           variant="secondary"
-          iconLeft={<IconArrowLeft />}
           onClick={() => router.push(`${application.id}/page3`)}
         >
           {t("common:prev")}

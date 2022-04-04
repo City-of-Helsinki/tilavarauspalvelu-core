@@ -24,7 +24,7 @@ const Container = styled.div<{ $white: boolean }>`
 `;
 
 const Content = styled.div`
-  padding: var(--spacing-l) var(--spacing-m) var(--spacing-layout-xl);
+  padding: var(--spacing-l) var(--spacing-m) var(--spacing-layout-l);
   max-width: var(--container-width-xl);
   margin: 0 auto;
   font-size: var(--fontsize-heading-xs);

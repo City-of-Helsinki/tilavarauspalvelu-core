@@ -11,7 +11,7 @@ import styled from "styled-components";
 import { getMainImage, getTranslation } from "../../modules/util";
 import { breakpoint } from "../../modules/style";
 import { MediumButton } from "../../styles/util";
-import { fontBold } from "../../modules/style/typography";
+import { fontBold, H6 } from "../../modules/style/typography";
 import { ReservationUnitType } from "../../modules/gql-types";
 
 type Props = {
@@ -29,51 +29,61 @@ const NameCardContainer = styled.div`
   margin-top: var(--spacing-l);
 `;
 
-const PreCardLabel = styled.div`
-  font-size: var(--fontsize-heading-s);
-  font-family: var(--font-bold);
-  font-weight: 700;
-`;
+const PreCardLabel = styled(H6).attrs({ as: "h3" })``;
 
 const CardButtonContainer = styled.div`
   display: grid;
   grid-template-columns: 4fr 1fr;
   margin-top: var(--spacing-s);
   align-items: center;
+  position: relative;
 
   @media (max-width: ${breakpoint.s}) {
-    grid-template-columns: 3fr 1fr;
+    grid-template-columns: 1fr;
   }
 `;
 
 const CardContainer = styled.div`
-  gap: var(--spacing-m);
   background-color: var(--tilavaraus-gray);
   display: grid;
-  grid-template-columns: 163px 5fr 1fr;
   align-items: flex-start;
+  grid-template-columns: 1fr;
 
-  @media (max-width: ${breakpoint.m}) {
-    grid-template-columns: 1fr 2fr;
+  @media (min-width: ${breakpoint.s}) {
+    grid-template-columns: 163px 5fr 1fr;
     gap: var(--spacing-xs);
   }
 `;
 
 const PaddedCell = styled.div`
-  display: flex;
-  flex-direction: column;
+  &:first-of-type {
+    padding: var(--spacing-s);
+  }
+
   padding: var(--spacing-m) 0;
-  gap: var(--spacing-s);
+
+  @media (min-width: ${breakpoint.s}) {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-s);
+  }
 `;
 
 const Image = styled.img`
   width: 100%;
-  max-height: 120px;
+  max-height: 200px;
+  object-fit: cover;
 `;
 
 const Name = styled.div`
   ${fontBold};
   font-size: var(--fontsize-heading-s);
+  line-height: var(--lineheight-xl);
+  margin-bottom: var(--spacing-xs);
+
+  @media (min-width: ${breakpoint.s}) {
+    margin-bottom: 0;
+  }
 `;
 
 const MaxPersonsContainer = styled.div`
@@ -92,9 +102,13 @@ const DeleteButton = styled(MediumButton)`
 
 const ArrowContainer = styled.div`
   display: flex;
+  flex-direction: row;
+  position: absolute;
+  right: var(--spacing-m);
+  bottom: var(--spacing-m);
 
-  @media (max-width: ${breakpoint.s}) {
-    flex-direction: column;
+  @media (min-width: ${breakpoint.s}) {
+    position: static;
   }
 `;
 
@@ -153,7 +167,7 @@ const ReservationUnitCard = ({
       ) : null}
       <CardButtonContainer>
         <CardContainer>
-          <Image src={getMainImage(reservationUnit)?.smallUrl} alt="" />
+          <Image src={getMainImage(reservationUnit)?.mediumUrl} alt="" />
           <PaddedCell>
             <Name>{getTranslation(reservationUnit, "name")}</Name>
             <MaxPersonsContainer>

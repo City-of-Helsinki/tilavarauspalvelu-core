@@ -4,11 +4,12 @@ import styled from "styled-components";
 import { IconCheck } from "hds-react";
 import { useRouter } from "next/router";
 import { Application } from "../../modules/types";
+import { fontBold } from "../../modules/style/typography";
 
 const StepContainer = styled.div<{ $disabled: boolean }>`
   ${({ $disabled }) =>
     $disabled
-      ? `background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='80' width='100'%3E%3Cg fill='none' stroke='rgb(120,120,120)' stroke-width='3'%3E%3Cpath  d='M24 0 l0 80' /%3E%3C/g%3E%3C/svg%3E");`
+      ? `background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='80' width='100'%3E%3Cg fill='none' stroke='rgb(204,204,204)' stroke-width='3'%3E%3Cpath  d='M24 0 l0 80' /%3E%3C/g%3E%3C/svg%3E");`
       : `background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='80' width='100'%3E%3Cg fill='none' stroke='rgb(0,0,191)' stroke-width='3'%3E%3Cpath  d='M24 0 l0 80' /%3E%3C/g%3E%3C/svg%3E");`}
 
   background-repeat: repeat-y;
@@ -18,13 +19,14 @@ const StepContainer = styled.div<{ $disabled: boolean }>`
     height: auto;
   }
 `;
+
 const Container = styled.nav`
   margin: var(--spacing-m) 0;
   font-size: var(--fontsize-body-l);
   padding: 0;
   list-style-type: none;
-  font-family: var(--font-bold);
 `;
+
 const Number = styled.div<{ $current: boolean; $disabled: boolean }>`
   border-radius: 50%;
   width: 32px;
@@ -42,15 +44,11 @@ const Number = styled.div<{ $current: boolean; $disabled: boolean }>`
     $current
       ? "outline-color: var(--color-coat-of-arms);"
       : "outline-color: var(--tilavaraus-gray);"}
-
   ${({ $disabled }) =>
     $disabled
       ? "border-color: var(--color-black-20);"
-      : `
-      color: var(--color-bus);
-      `}
-
-${({ $disabled, $current }) =>
+      : `color: var(--color-bus);`}
+  ${({ $disabled, $current }) =>
     !$disabled && !$current
       ? "background: var(--color-bus); color: white;"
       : `background: var(--color-white);`}
@@ -69,18 +67,14 @@ const Step = styled.button<{ $clickable: boolean }>`
 `;
 
 const Name = styled.div<{ $disabled: boolean; $current: boolean }>`
-  text-decoration: underline;
-
   ${({ $current }) =>
     $current
-      ? `text-decoration: none;
-      color: var(--color-black-90);`
+      ? `
+      color: var(--color-black-90);
+      ${fontBold};
+    `
       : `color: var(--color-bus);`}
-  ${({ $disabled }) =>
-    $disabled
-      ? `      text-decoration: none;
-      color: var(--color-black-40);`
-      : ``}
+  ${({ $disabled }) => ($disabled ? `color: var(--color-black-40);` : ``)}
 `;
 
 type Props = {
