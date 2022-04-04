@@ -20,12 +20,12 @@ uwsgi:
   cheaper: $(UWSGI_MIN_NUM_PROCESSES)
   cheaper-initial: $(UWSGI_MIN_NUM_PROCESSES)
   processes: $(UWSGI_MAX_NUM_PROCESSES)
-  cheaper-step: 2
+  cheaper-step: $(UWSGI_PROCESSES_STEP_COUNT)
 
   # Offload static file serving to separate threads
   # Application logic can then always be handled
   file-serve-mode: offloading
-  offload-threads: 8
+  offload-threads: $(UWSGI_NUM_OFFLOAD_THREADS)
   static-map: $(MEDIA_URL)=$(MEDIA_ROOT)
 
   # Ignore logging errors for cases when http pipes are closed
