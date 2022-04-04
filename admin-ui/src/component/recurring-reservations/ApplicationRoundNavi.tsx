@@ -24,7 +24,7 @@ const Wrapper = styled.div`
   }
 `;
 
-const NaviItem = styled(BasicLink)`
+export const NaviItem = styled(BasicLink)`
   &:first-of-type {
     margin-left: 0;
   }

@@ -1,5 +1,5 @@
 import { differenceInWeeks } from "date-fns";
-import { isEqual, trim } from "lodash";
+import { isEqual, sum, trim } from "lodash";
 import { TFunction } from "react-i18next";
 import {
   Application,
@@ -97,6 +97,26 @@ export const appEventHours = (
     (turns * eventsPerWeek * apiDurationToMinutes(minDuration)) / 60;
   return hours;
 };
+
+export const applicationHours = (application: Application): number =>
+  sum(
+    application.applicationEvents.map((ae) =>
+      appEventHours(
+        ae.begin as string,
+        ae.end as string,
+        ae.biweekly,
+        ae.eventsPerWeek,
+        ae.minDuration as string
+      )
+    )
+  );
+
+export const applicationTurns = (application: Application): number =>
+  sum(
+    application.applicationEvents.map((ae) =>
+      numTurns(ae.begin as string, ae.end as string, ae.biweekly)
+    )
+  );
 
 const parseDuration = (
   duration: string | null,

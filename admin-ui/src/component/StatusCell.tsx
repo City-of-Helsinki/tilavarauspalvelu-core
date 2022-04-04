@@ -9,6 +9,7 @@ interface IStatusCellProps {
   text: string;
   status?: ApplicationStatus | ApplicationEventStatus;
   type: "application" | "applicationEvent";
+  withArrow?: boolean;
 }
 
 const Wrapper = styled.div`
@@ -16,7 +17,6 @@ const Wrapper = styled.div`
   align-items: center;
   justify-content: space-between;
   color: var(--tilavaraus-admin-content-text-color);
-  gap: var(--spacing-3-xs);
 
   ${StatusDot} {
     margin-right: 0.625em;
@@ -26,14 +26,14 @@ const Wrapper = styled.div`
 const Status = styled.div`
   display: inline-flex;
   align-items: center;
-  gap: var(--spacing-xs);
 `;
 
-export default function StatusCell({
+const StatusCell = ({
   text,
   status,
   type,
-}: IStatusCellProps): JSX.Element | null {
+  withArrow = true,
+}: IStatusCellProps): JSX.Element => {
   const { t } = useTranslation();
 
   let icon: ReactNode;
@@ -69,16 +69,20 @@ export default function StatusCell({
     default:
   }
 
-  return status ? (
+  return (
     <Wrapper>
       <Status>
         {icon}
         <span>{t(text)}</span>
       </Status>
-      <IconArrowRight
-        aria-label={t(linkText)}
-        data-testid="status-cell__link--icon"
-      />
+      {withArrow && (
+        <IconArrowRight
+          aria-label={t(linkText)}
+          data-testid="status-cell__link--icon"
+        />
+      )}
     </Wrapper>
-  ) : null;
-}
+  );
+};
+
+export default StatusCell;
