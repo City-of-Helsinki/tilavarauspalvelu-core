@@ -2,6 +2,8 @@ import { IconArrowRight, IconPlusCircle } from "hds-react";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
+import { useQuery } from "@apollo/client";
+import { sortBy } from "lodash";
 import { useRouter } from "next/router";
 import styled from "styled-components";
 import ApplicationEvent from "../applicationEvent/ApplicationEvent";
@@ -11,14 +13,16 @@ import {
   ApplicationRound,
   EditorState,
   OptionType,
+  StringParameter,
 } from "../../modules/types";
-import { deepCopy, mapOptions } from "../../modules/util";
+import { deepCopy, getTranslation, mapOptions } from "../../modules/util";
 import { getParameters } from "../../modules/api";
 import { breakpoint } from "../../modules/style";
 import { participantCountOptions } from "../../modules/const";
 import { CenterSpinner, HorisontalRule } from "../common/common";
 import { MediumButton } from "../../styles/util";
-import { ReservationUnitType } from "../../modules/gql-types";
+import { Query, ReservationUnitType } from "../../modules/gql-types";
+import { SEARCH_FORM_PARAMS_PURPOSE } from "../../modules/queries/params";
 
 type Props = {
   applicationRound: ApplicationRound;
@@ -38,7 +42,6 @@ type Props = {
 
 type OptionTypes = {
   ageGroupOptions: OptionType[];
-  purposeOptions: OptionType[];
   abilityGroupOptions: OptionType[];
   reservationUnitTypeOptions: OptionType[];
   participantCountOptions: OptionType[];
@@ -88,11 +91,25 @@ const Page1 = ({
   const [ready, setReady] = useState(false);
   const [options, setOptions] = useState<OptionTypes>();
 
+  const [purposeOptions, setPurposeOptions] = useState<OptionType[]>([]);
+
   const history = useRouter();
 
   const { t } = useTranslation();
 
   const { application } = editorState;
+
+  useQuery<Query>(SEARCH_FORM_PARAMS_PURPOSE, {
+    onCompleted: (res) => {
+      const purposes = res?.purposes?.edges?.map(({ node }) => ({
+        id: String(node.pk),
+        name: getTranslation(node, "name"),
+      }));
+      setPurposeOptions(
+        mapOptions(sortBy(purposes, "name") as StringParameter[])
+      );
+    },
+  });
 
   const form = useForm({
     mode: "onChange",
@@ -107,12 +124,10 @@ const Page1 = ({
       const [
         fetchedAbilityGroupOptions,
         fetchedAgeGroupOptions,
-        fetchedPurposeOptions,
         fetchedReservationUnitType,
       ] = await Promise.all([
         getParameters("ability_group"),
         getParameters("age_group"),
-        getParameters("purpose"),
         getParameters("reservation_unit_type"),
       ]);
 
@@ -123,7 +138,6 @@ const Page1 = ({
       setOptions({
         ageGroupOptions: mapOptions(fetchedAgeGroupOptions),
         abilityGroupOptions: mapOptions(fetchedAbilityGroupOptions),
-        purposeOptions: mapOptions(fetchedPurposeOptions),
         reservationUnitTypeOptions: mapOptions(fetchedReservationUnitType),
         participantCountOptions,
       });
@@ -223,7 +237,10 @@ const Page1 = ({
             applicationEvent={event}
             index={index}
             applicationRound={applicationRound}
-            optionTypes={options}
+            optionTypes={{
+              ...options,
+              purposeOptions,
+            }}
             selectedReservationUnits={selectedReservationUnits}
             onSave={form.handleSubmit((app: Application) =>
               onSubmit(app, event.id)

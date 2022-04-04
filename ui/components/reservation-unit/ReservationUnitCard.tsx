@@ -50,7 +50,7 @@ const CardContainer = styled.div`
   gap: var(--spacing-m);
   background-color: var(--tilavaraus-gray);
   display: grid;
-  grid-template-columns: 163px 5fr 1fr;
+  grid-template-columns: 163px 4fr 2fr;
   align-items: flex-start;
 
   @media (max-width: ${breakpoint.m}) {
