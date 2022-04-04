@@ -64,10 +64,6 @@ describe("application", () => {
       cy.intercept("GET", "/v1/parameters/city/*", json).as("city");
     });
 
-    cy.fixture("v1/parameters/purpose").then((json) => {
-      cy.intercept("GET", "/v1/parameters/purpose/*", json).as("purpose");
-    });
-
     cy.fixture("v1/reservation_unit/2").then((json) => {
       cy.intercept("GET", "/v1/reservation_unit/2/*", json);
     });
@@ -103,7 +99,6 @@ describe("application", () => {
         "@applicationPost",
         "@applicationPage1",
         "@applicationRound1",
-        "@purpose",
         "@ageGroup",
         "@abilityGroup",
       ],

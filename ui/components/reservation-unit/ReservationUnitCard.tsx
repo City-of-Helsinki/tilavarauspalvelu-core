@@ -50,7 +50,7 @@ const CardContainer = styled.div`
   grid-template-columns: 1fr;
 
   @media (min-width: ${breakpoint.s}) {
-    grid-template-columns: 163px 5fr 1fr;
+    grid-template-columns: 163px 4fr 2fr;
     gap: var(--spacing-xs);
   }
 `;
