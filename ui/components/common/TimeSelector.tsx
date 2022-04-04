@@ -386,7 +386,6 @@ const TimeSelector = ({
           />
         ))}
       </CalendarContainer>
-
       <LegendContainer>
         <div>
           {cellTypes.map((cell) => (
@@ -396,7 +395,6 @@ const TimeSelector = ({
             </Legend>
           ))}
         </div>
-
         <ResetButton
           id={`time-selector__button--reset-${index}`}
           variant="supplementary"
@@ -406,13 +404,11 @@ const TimeSelector = ({
           {t("application:Page2.resetTimes")}
         </ResetButton>
       </LegendContainer>
-
       <TimePreviewContainer data-testid={`time-selector__preview-${index}`}>
         <TimePreview applicationEventSchedules={summaryData} />
       </TimePreviewContainer>
-
-      <ButtonContainer>
-        {copyCells && (
+      {copyCells && (
+        <ButtonContainer>
           <MediumButton
             id={`time-selector__button--copy-cells-${index}`}
             variant="secondary"
@@ -420,8 +416,8 @@ const TimeSelector = ({
           >
             {t("application:Page2.copyTimes")}
           </MediumButton>
-        )}
-      </ButtonContainer>
+        </ButtonContainer>
+      )}
     </>
   );
 };

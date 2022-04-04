@@ -83,7 +83,6 @@ const TwoColumnContainer = styled.div`
 
   @media (max-width: ${breakpoint.m}) {
     grid-template-columns: 1fr;
-    gap: 0;
   }
 `;
 
@@ -91,7 +90,7 @@ const PeriodContainer = styled.div`
   margin-top: var(--spacing-m);
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: var(--spacing-m);
+  gap: var(--spacing-l);
   align-items: baseline;
   margin-bottom: var(--spacing-layout-s);
 

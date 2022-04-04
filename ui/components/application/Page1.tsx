@@ -5,7 +5,6 @@ import { useForm } from "react-hook-form";
 import { useQuery } from "@apollo/client";
 import { sortBy } from "lodash";
 import { useRouter } from "next/router";
-import styled from "styled-components";
 import ApplicationEvent from "../applicationEvent/ApplicationEvent";
 import {
   Action,
@@ -17,9 +16,8 @@ import {
 } from "../../modules/types";
 import { deepCopy, getTranslation, mapOptions } from "../../modules/util";
 import { getParameters } from "../../modules/api";
-import { breakpoint } from "../../modules/style";
 import { participantCountOptions } from "../../modules/const";
-import { CenterSpinner, HorisontalRule } from "../common/common";
+import { ButtonContainer, CenterSpinner } from "../common/common";
 import { MediumButton } from "../../styles/util";
 import { Query, ReservationUnitType } from "../../modules/gql-types";
 import { SEARCH_FORM_PARAMS_PURPOSE } from "../../modules/queries/params";
@@ -46,38 +44,6 @@ type OptionTypes = {
   reservationUnitTypeOptions: OptionType[];
   participantCountOptions: OptionType[];
 };
-
-const ButtonContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  margin: var(--spacing-layout-l) 0;
-  justify-content: flex-end;
-
-  > button {
-    margin-left: var(--spacing-m);
-  }
-
-  > :nth-child(0) {
-    margin-right: auto;
-    margin-left: 0;
-  }
-
-  @media (max-width: ${breakpoint.m}) {
-    flex-direction: column;
-    margin-top: var(--spacing-layout-xs);
-
-    > button {
-      margin-top: var(--spacing-m);
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    :nth-child(1) {
-      margin-left: auto;
-      margin-right: auto;
-    }
-  }
-`;
 
 const Page1 = ({
   save,
@@ -263,8 +229,8 @@ const Page1 = ({
           {t("application:Page1.createNew")}
         </MediumButton>
       )}
-      <HorisontalRule />
-      <ButtonContainer>
+      <ButtonContainer style={{ marginTop: "var(--spacing-s)" }}>
+        <div />
         <MediumButton
           id="next"
           iconRight={<IconArrowRight />}

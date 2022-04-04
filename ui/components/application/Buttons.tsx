@@ -1,6 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { IconArrowLeft, IconArrowRight } from "hds-react";
+import { IconArrowRight } from "hds-react";
 import { useRouter } from "next/router";
 import { ButtonContainer } from "../common/common";
 import { MediumButton } from "../../styles/util";
@@ -18,7 +18,6 @@ const Buttons = ({ onSubmit, applicationId }: Props): JSX.Element | null => {
     <ButtonContainer>
       <MediumButton
         variant="secondary"
-        iconLeft={<IconArrowLeft />}
         onClick={() => router.push(`${applicationId}/page2`)}
       >
         {t("common:prev")}

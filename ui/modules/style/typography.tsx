@@ -90,6 +90,19 @@ export const H5 = styled.h5`
   }
 `;
 
+export const H6 = styled.h6`
+  font-size: var(--fontsize-heading-xs);
+  font-family: var(--font-bold);
+  font-weight: 700;
+  line-height: 1.4;
+  margin-bottom: var(--spacing-m);
+
+  @media (min-width: ${breakpoint.s}) {
+    font-size: var(--fontsize-heading-xs);
+    line-height: 1.35;
+  }
+`;
+
 export const HeroSubheading = styled.p`
   font-size: var(--fontsize-body-l);
   line-height: var(--lineheight-xl);
