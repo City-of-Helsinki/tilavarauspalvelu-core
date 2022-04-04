@@ -21,8 +21,12 @@ class UnitImporterBaseTestCase(TestCase):
                 "latitude": 78.123456,
                 "longitude": 24.654321,
                 "street_address_fi": "Teststreet 1",
+                "street_address_en": "Teststreet 1",
+                "street_address_sv": "Testvägen 1",
                 "address_zip": "00002",
                 "address_city_fi": "Helsinki",
+                "address_city_en": "Helsinki",
+                "address_city_sv": "Helsingfors",
                 "phone": "+358 1 234 45678, +358 9 876 54321",
                 "email": "email@example.fi",
                 "www_fi": "https://www.example.fi",
@@ -36,8 +40,12 @@ class UnitImporterBaseTestCase(TestCase):
                 "latitude": 77.123456,
                 "longitude": 22.654321,
                 "street_address_fi": "Testikuja 2",
+                "street_address_en": "Testikuja 2",
+                "street_address_sv": "Testigränd 2",
                 "address_zip": "00002",
                 "address_city_fi": "Helsinki",
+                "address_city_en": "Helsinki",
+                "address_city_sv": "Helsingfors",
                 "phone": "+358 1 234 45678, +358 9 876 54321",
                 "email": "email@example.fi",
                 "www_fi": "https://www.example.fi",
@@ -63,9 +71,19 @@ class UnitImporterBaseTestCase(TestCase):
 
     def check_location_values_vs_data_values(self, location, expected_values):
         """Helper method to assert the location values against expected values"""
-        self.assertEqual(location.address_street, expected_values["street_address_fi"])
+        self.assertEqual(
+            location.address_street_fi, expected_values["street_address_fi"]
+        )
+        self.assertEqual(
+            location.address_street_en, expected_values["street_address_en"]
+        )
+        self.assertEqual(
+            location.address_street_sv, expected_values["street_address_sv"]
+        )
         self.assertEqual(location.address_zip, expected_values["address_zip"])
-        self.assertEqual(location.address_city, expected_values["address_city_fi"])
+        self.assertEqual(location.address_city_fi, expected_values["address_city_fi"])
+        self.assertEqual(location.address_city_en, expected_values["address_city_en"])
+        self.assertEqual(location.address_city_sv, expected_values["address_city_sv"])
         self.assertEqual(location.coordinates.x, expected_values["longitude"])
         self.assertEqual(location.coordinates.y, expected_values["latitude"])
 
