@@ -33,7 +33,7 @@ import { CheckboxWrapper } from "../common/common";
 import ApplicationEventSummary from "./ApplicationEventSummary";
 import ControlledSelect from "../common/ControlledSelect";
 import Accordion from "../common/Accordion";
-import { durationOptions } from "../../modules/const";
+import { getDurationOptions } from "../../modules/const";
 import { after, before } from "../../modules/validation";
 import ConfirmationModal, { ModalRef } from "../common/ConfirmationModal";
 import { MediumButton } from "../../styles/util";
@@ -419,7 +419,7 @@ const ApplicationEvent = ({
             required
             label={t("application:Page1.minDuration")}
             control={form.control}
-            options={durationOptions}
+            options={getDurationOptions()}
             error={applicationErrorText(
               t,
               form.errors.applicationEvents?.[index]?.minDuration?.type
@@ -442,7 +442,7 @@ const ApplicationEvent = ({
             required
             label={t("application:Page1.maxDuration")}
             control={form.control}
-            options={durationOptions}
+            options={getDurationOptions()}
             error={applicationErrorText(
               t,
               form.errors.applicationEvents?.[index]?.maxDuration?.type

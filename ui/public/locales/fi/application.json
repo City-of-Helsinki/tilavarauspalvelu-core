@@ -70,7 +70,7 @@
   "Page2": {
     "heading": "2. Valitse varauksen ajankohta",
     "subHeading": "Valitse kaikki ne ajankohdat, joille toivot varauksesi asettuvan.",
-    "info": "Tarkista tilakohtaiset aukioloajat <0>hakuohjeista<0>. Valitse ajat, joita ensisijaisesti toivot. Valitse myös toissijaisia aikoja, jotka sopivat sinulle.",
+    "info": "Tarkista tilakohtaiset aukioloajat <0>koosteesta</0> tai tilan sivulta. Valitse ajat, joita ensisijaisesti toivot. Valitse myös toissijaisia aikoja, jotka sopivat sinulle.",
     "text": "Ilmoita toivomasi ajankohdat kausivaraukselle",
     "copyTimes": "Kopioi ajat kaikille varaustoiveille",
     "resetTimes": "Tyhjennä kalenteri",
@@ -135,10 +135,10 @@
       "streetAddress": "Katuosoite",
       "postCode": "Postinumero",
       "city": "Postitoimipaikka",
-      "notRegistered": "Ei y-tunnusta",
+      "notRegistered": "Ei Y-tunnusta",
       "separateInvoicingAddress": "Laskutusosoite eri kuin postiosoite"
     },
-    "additionalInformation": "Lisätiedot"
+    "additionalInformation": "Lisätietoja varauksen käyttötarkoituksesta"
   },
   "preview": {
     "applicantType": {
@@ -156,7 +156,7 @@
     "applicantTypeLabel": "Hakijan tyyppi",
     "email": "Sähköpostiosoite",
     "phoneNumber": "Puhelinumero",
-    "additionalInformation": "Lisätiedot",
+    "additionalInformation": "Lisätietoja varauksen käyttötarkoituksesta",
     "organisation": {
       "name": "Hakijan nimi",
       "coreBusiness": "Ydintoiminta"
