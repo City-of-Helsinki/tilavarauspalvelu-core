@@ -246,7 +246,7 @@ function ApplicationDetails(): JSX.Element | null {
             </H2>
             <PreCard>
               {t("Application.applicationReceivedTime")}{" "}
-              {formatDate(application.createdDate, "d.M.yyyy")}
+              {formatDate(application.createdDate, "d.M.yyyy HH:mm")}
             </PreCard>
             <Card
               theme={{
