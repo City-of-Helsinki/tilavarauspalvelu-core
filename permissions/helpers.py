@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List, Union
+from typing import Iterable, List, Union
 
 from django.contrib.auth.models import User
 from django.db.models import Q, QuerySet
@@ -27,7 +27,9 @@ def has_unit_group_permission(
     ).exists()
 
 
-def has_unit_permission(user: User, units: list, required_permission: str) -> bool:
+def has_unit_permission(
+    user: User, units: Iterable[Unit], required_permission: str
+) -> bool:
     if not units or user.is_anonymous:
         return False
     unit_groups = []
@@ -194,7 +196,7 @@ def can_manage_service_sectors_applications(
     )
 
 
-def can_validate_unit_applications(user: User, units: [Unit]) -> bool:
+def can_validate_unit_applications(user: User, units: Iterable[Unit]) -> bool:
     permission = "can_validate_applications"
     return (
         is_superuser(user)
@@ -224,6 +226,7 @@ def can_read_application(user: User, application: Application) -> bool:
         or can_manage_service_sectors_applications(
             user, application.application_round.service_sector
         )
+        or can_validate_unit_applications(user, application.units)
     )
 
 

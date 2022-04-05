@@ -30,6 +30,7 @@ from permissions.models import (
     ServiceSectorRoleChoice,
     UnitRole,
     UnitRoleChoice,
+    UnitRolePermission,
 )
 from reservation_units.models import Equipment, EquipmentCategory, ReservationUnit
 from reservations.models import AbilityGroup, AgeGroup, Reservation, ReservationPurpose
@@ -743,10 +744,12 @@ def unit_admin(unit):
         last_name="Uuu",
         email="amin.u@foo.com",
     )
-
-    unit_role = UnitRole.objects.create(
-        user=user, role=UnitRoleChoice.objects.get(code="admin")
+    admin_role_choice = UnitRoleChoice.objects.get(code="admin")
+    UnitRolePermission.objects.create(
+        role=admin_role_choice, permission="can_validate_applications"
     )
+    unit_role = UnitRole.objects.create(user=user, role=admin_role_choice)
+
     unit_role.unit.add(unit)
 
     return user

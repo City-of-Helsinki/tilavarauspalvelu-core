@@ -32,6 +32,7 @@ from permissions.api_permissions.drf_permissions import (
     ApplicationStatusPermission,
 )
 from permissions.helpers import get_service_sectors_where_can_view_applications
+from spaces.models import Unit
 
 
 class ApplicationViewSet(viewsets.ModelViewSet):
@@ -51,12 +52,19 @@ class ApplicationViewSet(viewsets.ModelViewSet):
             return queryset
 
         user = self.request.user
+        unit_ids = user.unit_roles.filter(
+            role__permissions__permission="can_validate_applications"
+        ).values_list("unit", flat=True)
+        units = Unit.objects.filter(id__in=unit_ids)
 
         return queryset.filter(
             Q(
                 application_round__service_sector__in=get_service_sectors_where_can_view_applications(
                     user
                 )
+            )
+            | Q(
+                application_events__event_reservation_units__reservation_unit__unit__in=units
             )
             | Q(user=user)
         )
