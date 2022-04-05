@@ -8,6 +8,7 @@ import recurrence
 from django.contrib.auth import get_user_model
 from django.contrib.postgres.fields import ArrayField
 from django.db import Error, models
+from django.db.models import QuerySet
 from django.utils.text import format_lazy
 from django.utils.translation import gettext_lazy as _
 from recurrence.fields import RecurrenceField
@@ -20,7 +21,7 @@ from applications.utils.aggregate_data import (
     ApplicationRoundAggregateDataCreator,
 )
 from reservation_units.models import ReservationUnit
-from spaces.models import District
+from spaces.models import District, Unit
 from tilavarauspalvelu.utils.date_util import (
     next_or_current_matching_weekday,
     previous_or_current_matching_weekday,
@@ -695,6 +696,14 @@ class Application(APPLICANT_TYPE_CONST, models.Model):
         for row in self.aggregated_data.all():
             ret_dict[row.name] = row.value
         return ret_dict
+
+    @property
+    def units(self) -> QuerySet[Unit]:
+        res_unit_ids = EventReservationUnit.objects.filter(
+            application_event__in=self.application_events.all()
+        ).values_list("reservation_unit_id", flat=True)
+        units = Unit.objects.filter(reservationunit__in=res_unit_ids)
+        return units
 
 
 class ApplicationAggregateData(AggregateDataBase):

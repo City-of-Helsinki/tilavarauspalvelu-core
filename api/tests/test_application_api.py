@@ -1,3 +1,5 @@
+import json
+
 import pytest
 from assertpy import assert_that
 from freezegun import freeze_time
@@ -736,6 +738,63 @@ def test_wrong_service_sector_admin_cannot_create_or_update_application(
         format="json",
     )
     assert response.status_code == 404
+
+
+@pytest.mark.django_db
+def test_unit_admin_can_view_application(
+    unit_admin_api_client, application, event_reservation_unit
+):
+    response = unit_admin_api_client.get(
+        reverse("application-detail", kwargs={"pk": application.id}),
+        format="json",
+    )
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_unit_admin_cant_view_application(
+    unit_admin_api_client, application2, event_reservation_unit_too
+):
+    response = unit_admin_api_client.get(
+        reverse("application-detail", kwargs={"pk": application2.id}),
+        format="json",
+    )
+    assert response.status_code == 404
+
+
+@pytest.mark.django_db
+def test_unit_admin_sees_only_application_for_unit(
+    unit_admin_api_client,
+    application,
+    event_reservation_unit,
+    application2,
+    event_reservation_unit_too,
+):
+    response = unit_admin_api_client.get(
+        reverse("application-list"),
+        format="json",
+    )
+    data = json.loads(response.content)
+    assert response.status_code == 200
+    assert len(data) == 1
+    assert data[0]["id"] == application.id
+
+
+@pytest.mark.django_db
+def test_sector_admin_sees_all_applications(
+    service_sector_admin_api_client,
+    application,
+    event_reservation_unit,
+    application2,
+    event_reservation_unit_too,
+):
+    response = service_sector_admin_api_client.get(
+        reverse("application-list"),
+        format="json",
+    )
+    data = json.loads(response.content)
+    assert len(data) == 2
+    assert response.status_code == 200
 
 
 @pytest.mark.django_db
