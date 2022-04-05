@@ -377,7 +377,7 @@ function ApplicationDetails(): JSX.Element | null {
                                     applicationEvent.applicationEventSchedules,
                                     index,
                                     300
-                                  )}
+                                  ) || t("ApplicationEvent.noSchedule")}
                                 </EventSchedule>
                               ))}
                             </div>
