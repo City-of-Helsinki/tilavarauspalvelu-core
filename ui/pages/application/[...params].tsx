@@ -5,14 +5,9 @@ import { useRouter } from "next/router";
 import { useTranslation } from "react-i18next";
 import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import {
-  saveApplication,
-  getApplication,
-  getApplicationRound,
-} from "../../modules/api";
+import { saveApplication, getApplication } from "../../modules/api";
 import {
   Application as ApplicationType,
-  ApplicationRound,
   EditorState,
 } from "../../modules/types";
 import ApplicationPage from "../../components/application/ApplicationPage";
@@ -24,10 +19,17 @@ import applicationReducer from "../../modules/application/applicationReducer";
 import useReservationUnitList from "../../hooks/useReservationUnitList";
 import Sent from "../../components/application/Sent";
 import { CenterSpinner } from "../../components/common/common";
-import { apiDateToUIDate, deepCopy, uiDateToApiDate } from "../../modules/util";
+import {
+  apiDateToUIDate,
+  deepCopy,
+  getTranslation,
+  uiDateToApiDate,
+} from "../../modules/util";
 import RequireAuthentication from "../../components/common/RequireAuthentication";
 import {
+  ApplicationRoundType,
   Query,
+  QueryApplicationRoundsArgs,
   QueryTermsOfUseArgs,
   ReservationUnitType,
   TermsOfUseType,
@@ -35,6 +37,7 @@ import {
 } from "../../modules/gql-types";
 import { TERMS_OF_USE } from "../../modules/queries/reservationUnit";
 import apolloClient from "../../modules/apolloClient";
+import { APPLICATION_ROUNDS } from "../../modules/queries/applicationRound";
 
 type Props = {
   tos: TermsOfUseType[];
@@ -82,9 +85,18 @@ const Application = ({ tos }: Props): JSX.Element | null => {
     if (applicationId && Number(applicationId)) {
       try {
         const application = await getApplication(Number(applicationId));
-        const applicationRound = await getApplicationRound({
-          id: application.applicationRoundId,
+        // const applicationRound = await getApplicationRound({
+        //   id: application.applicationRoundId,
+        // });
+        const { data } = await apolloClient.query<
+          Query,
+          QueryApplicationRoundsArgs
+        >({
+          query: APPLICATION_ROUNDS,
         });
+        const applicationRound = data.applicationRounds?.edges
+          ?.map((n) => n.node)
+          .find((n) => n.pk === application.applicationRoundId);
 
         // convert dates
         application.applicationEvents.forEach((ae, i) => {
@@ -183,7 +195,8 @@ const Application = ({ tos }: Props): JSX.Element | null => {
   };
 
   const applicationRoundName =
-    applicationLoadingStatus.value?.applicationRound.name || "";
+    getTranslation(applicationLoadingStatus.value?.applicationRound, "name") ||
+    "";
 
   const ready = !applicationLoadingStatus.loading && state.loading === false;
 
@@ -219,7 +232,7 @@ const Application = ({ tos }: Props): JSX.Element | null => {
             selectedReservationUnits={reservationUnits as ReservationUnitType[]}
             applicationRound={
               applicationLoadingStatus.value?.applicationRound ||
-              ({} as ApplicationRound)
+              ({} as ApplicationRoundType)
             }
             dispatch={dispatch}
             editorState={state}

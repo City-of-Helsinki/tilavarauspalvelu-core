@@ -4,14 +4,20 @@ import { GetServerSideProps } from "next";
 import styled from "styled-components";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Container from "../../components/common/Container";
-import { getApplicationRound } from "../../modules/api";
-import { ApplicationRound } from "../../modules/types";
+import apolloClient from "../../modules/apolloClient";
 import Sanitize from "../../components/common/Sanitize";
 import Breadcrumb from "../../components/common/Breadcrumb";
 import KorosDefault from "../../components/common/KorosDefault";
+import { getTranslation } from "../../modules/util";
+import {
+  ApplicationRoundType,
+  Query,
+  QueryApplicationRoundsArgs,
+} from "../../modules/gql-types";
+import { APPLICATION_ROUNDS } from "../../modules/queries/applicationRound";
 
 type Props = {
-  applicationRound: ApplicationRound;
+  applicationRound: ApplicationRoundType;
 };
 
 export const getServerSideProps: GetServerSideProps = async ({
@@ -19,7 +25,12 @@ export const getServerSideProps: GetServerSideProps = async ({
   params,
 }) => {
   const id = Number(params.id);
-  const applicationRound = await getApplicationRound({ id });
+  const { data } = await apolloClient.query<Query, QueryApplicationRoundsArgs>({
+    query: APPLICATION_ROUNDS,
+  });
+  const applicationRound = data?.applicationRounds?.edges
+    .map((n) => n.node)
+    .find((n) => n.pk === id);
 
   return {
     props: {
@@ -63,7 +74,9 @@ const Criteria = ({ applicationRound }: Props): JSX.Element => {
         />
         <HeadContent>
           <H1>
-            {`${applicationRound?.name} ${t("applicationRound:criteria")}`}
+            {`${getTranslation(applicationRound, "name")} ${t(
+              "applicationRound:criteria"
+            )}`}
           </H1>
         </HeadContent>
         <KorosDefault
@@ -73,7 +86,7 @@ const Criteria = ({ applicationRound }: Props): JSX.Element => {
       </Head>
       <Container>
         <Content>
-          <Sanitize html={applicationRound?.criteria || ""} />
+          <Sanitize html={getTranslation(applicationRound, "criteria") || ""} />
         </Content>
       </Container>
     </>

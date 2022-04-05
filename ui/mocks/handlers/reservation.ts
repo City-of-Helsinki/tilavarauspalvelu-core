@@ -162,33 +162,33 @@ const reservationPurposes = graphql.query<Query, QueryReservationPurposesArgs>(
             {
               node: {
                 pk: 1,
-                nameFi: "Liikkua tai pelata",
-                nameEn: null,
-                nameSv: null,
+                nameFi: "Liikkua tai pelata FI",
+                nameEn: "Liikkua tai pelata EN",
+                nameSv: "Liikkua tai pelata SV",
               },
             },
             {
               node: {
                 pk: 2,
-                nameFi: "Lukupiiri",
-                nameEn: null,
-                nameSv: null,
+                nameFi: "Lukupiiri FI",
+                nameEn: "Lukupiiri EN",
+                nameSv: "Lukupiiri SV",
               },
             },
             {
               node: {
                 pk: 3,
-                nameFi: "Opastus",
-                nameEn: null,
-                nameSv: null,
+                nameFi: "Opastus FI",
+                nameEn: "Opastus EN",
+                nameSv: "Opastus SV",
               },
             },
             {
               node: {
                 pk: 4,
-                nameFi: "Pitää kokous",
-                nameEn: null,
-                nameSv: null,
+                nameFi: "Pitää kokous FI",
+                nameEn: "Pitää kokous EN",
+                nameSv: "Pitää kokous SV",
               },
             },
           ],

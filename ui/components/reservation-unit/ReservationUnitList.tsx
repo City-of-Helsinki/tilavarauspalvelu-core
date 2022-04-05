@@ -3,16 +3,13 @@ import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import {
-  ApplicationEvent,
-  ApplicationRound,
-  OptionType,
-} from "../../modules/types";
+import { ApplicationEvent, OptionType } from "../../modules/types";
 import Modal from "../common/Modal";
 import ReservationUnitModal from "./ReservationUnitModal";
 import ReservationUnitCard from "./ReservationUnitCard";
 import { MediumButton } from "../../styles/util";
 import {
+  ApplicationRoundType,
   Query,
   QueryReservationUnitsArgs,
   ReservationUnitByPkType,
@@ -33,7 +30,7 @@ type Props = {
   applicationEvent: ApplicationEvent;
   fieldName: string;
   form: ReturnType<typeof useForm>;
-  applicationRound: ApplicationRound;
+  applicationRound: ApplicationRoundType;
   options: OptionTypes;
   minSize?: number;
 };
@@ -124,7 +121,7 @@ const ReservationUnitList = ({
       if (isMounted) {
         setReservationUnits(
           data.filter((ru) =>
-            applicationRound.reservationUnitIds.includes(ru.pk)
+            applicationRound.reservationUnits.map((n) => n.pk).includes(ru.pk)
           )
         );
         setIsLoading(false);

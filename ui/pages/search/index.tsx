@@ -11,7 +11,7 @@ import { useQuery } from "@apollo/client";
 import Container from "../../components/common/Container";
 import SearchForm from "../../components/search/SearchForm";
 import SearchResultList from "../../components/search/SearchResultList";
-import { ApplicationRound, OptionType } from "../../modules/types";
+import { OptionType } from "../../modules/types";
 import {
   applicationRoundState,
   capitalize,
@@ -23,24 +23,31 @@ import ClientOnly from "../../components/ClientOnly";
 import { H1, HeroSubheading } from "../../modules/style/typography";
 import KorosDefault from "../../components/common/KorosDefault";
 import {
+  ApplicationRoundType,
   PageInfo,
   Query,
+  QueryApplicationRoundsArgs,
   QueryReservationUnitsArgs,
   ReservationUnitType,
 } from "../../modules/gql-types";
 import { RESERVATION_UNITS } from "../../modules/queries/reservationUnit";
 import Sorting from "../../components/form/Sorting";
-import { getApplicationRounds } from "../../modules/api";
 import Breadcrumb from "../../components/common/Breadcrumb";
 import { breakpoint } from "../../modules/style";
+import apolloClient from "../../modules/apolloClient";
+import { APPLICATION_ROUNDS } from "../../modules/queries/applicationRound";
 
 type Props = {
-  applicationRounds: ApplicationRound[];
+  applicationRounds: ApplicationRoundType[];
 };
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   const now = new Date();
-  const applicationRounds = await getApplicationRounds();
+
+  const { data } = await apolloClient.query<Query, QueryApplicationRoundsArgs>({
+    query: APPLICATION_ROUNDS,
+  });
+  const applicationRounds = data.applicationRounds?.edges?.map((n) => n.node);
 
   const activeApplicationRounds = sortBy(
     applicationRounds.filter(
@@ -52,7 +59,7 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
           applicationRound.applicationPeriodEnd
         ) === "active"
     ),
-    ["id"]
+    ["pk"]
   );
 
   return {

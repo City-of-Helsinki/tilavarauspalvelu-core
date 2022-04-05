@@ -159,7 +159,7 @@
       "coreBusiness": "Kärnverksamhet"
     },
     "applicationEvent": {
-      "name": "Titel",
+      "name": "Säsongbokningens namn",
       "numPersons": "Gruppstorlek",
       "ageGroup": "Åldersgrupp",
       "abilityGroup": "",
@@ -168,7 +168,7 @@
       "begin": "Start datum",
       "end": "Slutdatum",
       "minDuration": "Minsta bokningslängden",
-      "maxDuration": "Maximal bokningslängden",
+      "maxDuration": "Maximala bokningslängden",
       "eventsPerWeek": "Antal bokningar per vecka"
     },
     "applicationEventSchedules": "Önskade tider",
@@ -180,7 +180,7 @@
       "processing": "Behandling",
       "body": "Behandlingen av ansökningarna börjar när ansökningstiden har löpt ut. Vi informerar dig om de olika skedena på e-postadressen som du har angett."
     },
-    "reservationUnitTerms": "Kompletterande bokningsuppgifter",
+    "reservationUnitTerms": "Kompletterande bokningssvillkor",
     "termsOfService": "Bokningsvillkor för Helsingfors stads lokaler och utrustning",
     "userAcceptsTerms": "Jag har läst avtalsvillkoren och de kompletterande bokningsvillkoren och godkänner dessa.",
     "subHeading": {

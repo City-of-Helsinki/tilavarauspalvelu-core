@@ -4,17 +4,19 @@ import styled from "styled-components";
 import { useRouter } from "next/router";
 import { Card as HdsCard, Notification, Tag as HdsTag } from "hds-react";
 import { parseISO } from "date-fns";
-import { Application, ApplicationRound } from "../../modules/types";
+import { Application } from "../../modules/types";
 import {
   isActive,
   applicationUrl,
   getReducedApplicationStatus,
+  getTranslation,
 } from "../../modules/util";
 import { breakpoint } from "../../modules/style";
 import ConfirmationModal, { ModalRef } from "../common/ConfirmationModal";
 import { CenterSpinner } from "../common/common";
 import { cancelApplication } from "../../modules/api";
 import { MediumButton } from "../../styles/util";
+import { ApplicationRoundType } from "../../modules/gql-types";
 
 const Card = styled(HdsCard)`
   margin-bottom: var(--spacing-m);
@@ -89,7 +91,7 @@ const StyledButton = styled(MediumButton)`
 `;
 type Props = {
   application: Application;
-  applicationRound: ApplicationRound;
+  applicationRound: ApplicationRoundType;
 };
 
 const getApplicant = (application: Application, t: TFunction): string => {
@@ -114,8 +116,8 @@ const ApplicationCard = ({
   const { t } = useTranslation();
   const router = useRouter();
   const editable = isActive(
-    applicationRound.applicationPeriodBegin,
-    applicationRound.applicationPeriodEnd
+    applicationRound?.applicationPeriodBegin,
+    applicationRound?.applicationPeriodEnd
   );
 
   const reducedApplicationStatus = getReducedApplicationStatus(
@@ -145,7 +147,7 @@ const ApplicationCard = ({
     <Card border key={application.id}>
       <div>
         <C>{t(`applicationCard:status.${reducedApplicationStatus}`)}</C>
-        <RoundName>{applicationRound.name}</RoundName>
+        <RoundName>{getTranslation(applicationRound, "name")}</RoundName>
         <Applicant>
           {application.applicantType !== null
             ? getApplicant(application, t)

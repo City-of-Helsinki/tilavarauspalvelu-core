@@ -34,7 +34,7 @@ import { breakpoint } from "../../modules/style";
 import { MediumButton } from "../../styles/util";
 import { Query, TermsOfUseType } from "../../modules/gql-types";
 import { fontRegular } from "../../modules/style/typography";
-import { SEARCH_FORM_PARAMS_PURPOSE } from "../../modules/queries/params";
+import { RESERVATION_PURPOSES } from "../../modules/queries/params";
 
 type Props = {
   application: Application;
@@ -130,9 +130,9 @@ const Preview = ({ onNext, application, tos }: Props): JSX.Element | null => {
   const { i18n } = useTranslation();
   const router = useRouter();
 
-  useQuery<Query>(SEARCH_FORM_PARAMS_PURPOSE, {
+  useQuery<Query>(RESERVATION_PURPOSES, {
     onCompleted: (res) => {
-      const purposes = res?.purposes?.edges?.map(({ node }) => ({
+      const purposes = res?.reservationPurposes?.edges?.map(({ node }) => ({
         id: String(node.pk),
         name: getTranslation(node, "name"),
       }));

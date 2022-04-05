@@ -6,19 +6,27 @@ import { useTranslation } from "react-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { H1, H3, HeroSubheading } from "../../modules/style/typography";
 import { breakpoint } from "../../modules/style";
-import { getApplicationRounds } from "../../modules/api";
-import { ApplicationRound } from "../../modules/types";
 import ApplicationRoundCard from "../../components/index/ApplicationRoundCard";
 import { applicationRoundState } from "../../modules/util";
 import KorosDefault from "../../components/common/KorosDefault";
+import apolloClient from "../../modules/apolloClient";
+import {
+  ApplicationRoundType,
+  Query,
+  QueryApplicationRoundsArgs,
+} from "../../modules/gql-types";
+import { APPLICATION_ROUNDS } from "../../modules/queries/applicationRound";
 
 type Props = {
-  applicationRounds: ApplicationRound[];
+  applicationRounds: ApplicationRoundType[];
 };
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   const now = new Date();
-  const applicationRounds = await getApplicationRounds();
+  const { data } = await apolloClient.query<Query, QueryApplicationRoundsArgs>({
+    query: APPLICATION_ROUNDS,
+  });
+  const applicationRounds = data?.applicationRounds?.edges.map((n) => n.node);
 
   const filteredApplicationRounds = sortBy(applicationRounds, ["id"]).filter(
     (applicationRound) =>
@@ -125,7 +133,7 @@ const RecurringLander = ({ applicationRounds }: Props): JSX.Element => {
             </RoundHeading>
             {activeApplicationRounds.map((applicationRound) => (
               <ApplicationRoundCard
-                key={applicationRound.id}
+                key={applicationRound.pk}
                 applicationRound={applicationRound}
               />
             ))}
@@ -145,7 +153,7 @@ const RecurringLander = ({ applicationRounds }: Props): JSX.Element => {
             </RoundHeading>
             {pendingApplicationRounds.map((applicationRound) => (
               <ApplicationRoundCard
-                key={applicationRound.id}
+                key={applicationRound.pk}
                 applicationRound={applicationRound}
               />
             ))}
@@ -158,7 +166,7 @@ const RecurringLander = ({ applicationRounds }: Props): JSX.Element => {
             </RoundHeading>
             {pastApplicationRounds.map((applicationRound) => (
               <ApplicationRoundCard
-                key={applicationRound.id}
+                key={applicationRound.pk}
                 applicationRound={applicationRound}
               />
             ))}

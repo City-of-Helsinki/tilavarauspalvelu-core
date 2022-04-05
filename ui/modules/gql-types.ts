@@ -88,44 +88,59 @@ export type AgeGroupTypeEdge = {
   node?: Maybe<AgeGroupType>;
 };
 
-export type ApplicationRoundType = {
+export type AggregatedDataType = {
+  __typename?: "AggregatedDataType";
+  allocationDurationTotal?: Maybe<Scalars["Int"]>;
+  allocationResultEventsCount?: Maybe<Scalars["Int"]>;
+  totalHourCapacity?: Maybe<Scalars["Int"]>;
+  totalReservationDuration?: Maybe<Scalars["Int"]>;
+};
+
+export type ApplicationRoundType = Node & {
   __typename?: "ApplicationRoundType";
+  aggregatedData?: Maybe<AggregatedDataType>;
   allocating: Scalars["Boolean"];
   applicationPeriodBegin: Scalars["DateTime"];
   applicationPeriodEnd: Scalars["DateTime"];
+  applicationsSent?: Maybe<Scalars["Boolean"]>;
+  approvedBy?: Maybe<Scalars["String"]>;
   criteriaEn?: Maybe<Scalars["String"]>;
   criteriaFi?: Maybe<Scalars["String"]>;
   criteriaSv?: Maybe<Scalars["String"]>;
+  /** The ID of the object */
+  id: Scalars["ID"];
+  isAdmin?: Maybe<Scalars["Boolean"]>;
   nameEn?: Maybe<Scalars["String"]>;
   nameFi?: Maybe<Scalars["String"]>;
   nameSv?: Maybe<Scalars["String"]>;
   pk?: Maybe<Scalars["Int"]>;
   publicDisplayBegin: Scalars["DateTime"];
   publicDisplayEnd: Scalars["DateTime"];
-  purposes: ReservationPurposeTypeConnection;
+  purposes?: Maybe<Array<Maybe<ReservationPurposeType>>>;
   reservationPeriodBegin: Scalars["Date"];
   reservationPeriodEnd: Scalars["Date"];
-  reservationUnits: ReservationUnitByPkTypeConnection;
-  targetGroup: ApplicationsApplicationRoundTargetGroupChoices;
+  reservationUnits?: Maybe<Array<Maybe<ReservationUnitType>>>;
+  serviceSector?: Maybe<ServiceSectorType>;
+  status?: Maybe<Status>;
+  statusTimestamp?: Maybe<Scalars["DateTime"]>;
 };
 
-export type ApplicationRoundTypePurposesArgs = {
-  after?: InputMaybe<Scalars["String"]>;
-  before?: InputMaybe<Scalars["String"]>;
-  first?: InputMaybe<Scalars["Int"]>;
-  last?: InputMaybe<Scalars["Int"]>;
-  nameEn?: InputMaybe<Scalars["String"]>;
-  nameFi?: InputMaybe<Scalars["String"]>;
-  nameSv?: InputMaybe<Scalars["String"]>;
-  offset?: InputMaybe<Scalars["Int"]>;
+export type ApplicationRoundTypeConnection = {
+  __typename?: "ApplicationRoundTypeConnection";
+  /** Contains the nodes in this connection. */
+  edges: Array<Maybe<ApplicationRoundTypeEdge>>;
+  /** Pagination data for this connection. */
+  pageInfo: PageInfo;
+  totalCount?: Maybe<Scalars["Int"]>;
 };
 
-export type ApplicationRoundTypeReservationUnitsArgs = {
-  after?: InputMaybe<Scalars["String"]>;
-  before?: InputMaybe<Scalars["String"]>;
-  first?: InputMaybe<Scalars["Int"]>;
-  last?: InputMaybe<Scalars["Int"]>;
-  offset?: InputMaybe<Scalars["Int"]>;
+/** A Relay edge containing a `ApplicationRoundType` and its cursor. */
+export type ApplicationRoundTypeEdge = {
+  __typename?: "ApplicationRoundTypeEdge";
+  /** A cursor for use in pagination */
+  cursor: Scalars["String"];
+  /** The item at the end of the edge */
+  node?: Maybe<ApplicationRoundType>;
 };
 
 /** An enumeration. */
@@ -713,6 +728,7 @@ export type PurposeUpdateMutationPayload = {
 export type Query = {
   __typename?: "Query";
   ageGroups?: Maybe<AgeGroupTypeConnection>;
+  applicationRounds?: Maybe<ApplicationRoundTypeConnection>;
   cities?: Maybe<CityTypeConnection>;
   equipment?: Maybe<EquipmentType>;
   equipmentByPk?: Maybe<EquipmentType>;
@@ -749,6 +765,14 @@ export type Query = {
 };
 
 export type QueryAgeGroupsArgs = {
+  after?: InputMaybe<Scalars["String"]>;
+  before?: InputMaybe<Scalars["String"]>;
+  first?: InputMaybe<Scalars["Int"]>;
+  last?: InputMaybe<Scalars["Int"]>;
+  offset?: InputMaybe<Scalars["Int"]>;
+};
+
+export type QueryApplicationRoundsArgs = {
   after?: InputMaybe<Scalars["String"]>;
   before?: InputMaybe<Scalars["String"]>;
   first?: InputMaybe<Scalars["Int"]>;
@@ -1484,12 +1508,53 @@ export type ReservationTypeEdge = {
   node?: Maybe<ReservationType>;
 };
 
+export type ReservationUnitApplicationRoundType = {
+  __typename?: "ReservationUnitApplicationRoundType";
+  allocating: Scalars["Boolean"];
+  applicationPeriodBegin: Scalars["DateTime"];
+  applicationPeriodEnd: Scalars["DateTime"];
+  criteriaEn?: Maybe<Scalars["String"]>;
+  criteriaFi?: Maybe<Scalars["String"]>;
+  criteriaSv?: Maybe<Scalars["String"]>;
+  nameEn?: Maybe<Scalars["String"]>;
+  nameFi?: Maybe<Scalars["String"]>;
+  nameSv?: Maybe<Scalars["String"]>;
+  pk?: Maybe<Scalars["Int"]>;
+  publicDisplayBegin: Scalars["DateTime"];
+  publicDisplayEnd: Scalars["DateTime"];
+  purposes: ReservationPurposeTypeConnection;
+  reservationPeriodBegin: Scalars["Date"];
+  reservationPeriodEnd: Scalars["Date"];
+  reservationUnits: ReservationUnitByPkTypeConnection;
+  serviceSector?: Maybe<ServiceSectorType>;
+  targetGroup: ApplicationsApplicationRoundTargetGroupChoices;
+};
+
+export type ReservationUnitApplicationRoundTypePurposesArgs = {
+  after?: InputMaybe<Scalars["String"]>;
+  before?: InputMaybe<Scalars["String"]>;
+  first?: InputMaybe<Scalars["Int"]>;
+  last?: InputMaybe<Scalars["Int"]>;
+  nameEn?: InputMaybe<Scalars["String"]>;
+  nameFi?: InputMaybe<Scalars["String"]>;
+  nameSv?: InputMaybe<Scalars["String"]>;
+  offset?: InputMaybe<Scalars["Int"]>;
+};
+
+export type ReservationUnitApplicationRoundTypeReservationUnitsArgs = {
+  after?: InputMaybe<Scalars["String"]>;
+  before?: InputMaybe<Scalars["String"]>;
+  first?: InputMaybe<Scalars["Int"]>;
+  last?: InputMaybe<Scalars["Int"]>;
+  offset?: InputMaybe<Scalars["Int"]>;
+};
+
 export type ReservationUnitByPkType = Node & {
   __typename?: "ReservationUnitByPkType";
   additionalInstructionsEn?: Maybe<Scalars["String"]>;
   additionalInstructionsFi?: Maybe<Scalars["String"]>;
   additionalInstructionsSv?: Maybe<Scalars["String"]>;
-  applicationRounds?: Maybe<Array<Maybe<ApplicationRoundType>>>;
+  applicationRounds?: Maybe<Array<Maybe<ReservationUnitApplicationRoundType>>>;
   /** Authentication required for reserving this reservation unit. */
   authentication: ReservationUnitsReservationUnitAuthenticationChoices;
   bufferTimeAfter?: Maybe<Scalars["Duration"]>;
@@ -1836,7 +1901,7 @@ export type ReservationUnitType = Node & {
   additionalInstructionsEn?: Maybe<Scalars["String"]>;
   additionalInstructionsFi?: Maybe<Scalars["String"]>;
   additionalInstructionsSv?: Maybe<Scalars["String"]>;
-  applicationRounds?: Maybe<Array<Maybe<ApplicationRoundType>>>;
+  applicationRounds?: Maybe<Array<Maybe<ReservationUnitApplicationRoundType>>>;
   /** Authentication required for reserving this reservation unit. */
   authentication: ReservationUnitsReservationUnitAuthenticationChoices;
   bufferTimeAfter?: Maybe<Scalars["Duration"]>;
@@ -2465,6 +2530,13 @@ export enum ResourcesResourceLocationTypeChoices {
   Movable = "MOVABLE",
 }
 
+export type ServiceSectorType = Node & {
+  __typename?: "ServiceSectorType";
+  /** The ID of the object */
+  id: Scalars["ID"];
+  pk?: Maybe<Scalars["Int"]>;
+};
+
 export type ServiceType = Node & {
   __typename?: "ServiceType";
   bufferTimeAfter?: Maybe<Scalars["Duration"]>;
@@ -2821,6 +2893,139 @@ export enum State {
   RequiresHandling = "REQUIRES_HANDLING",
 }
 
+/** An enumeration. */
+export enum Status {
+  Allocated = "allocated",
+  Approved = "approved",
+  Draft = "draft",
+  Handled = "handled",
+  InReview = "in_review",
+  ReviewDone = "review_done",
+  Validated = "validated",
+}
+
+export const ApplicationRoundsDocument = gql`
+  query ApplicationRounds {
+    applicationRounds {
+      edges {
+        node {
+          pk
+          nameFi
+          nameEn
+          nameSv
+          reservationPeriodBegin
+          reservationPeriodEnd
+          publicDisplayBegin
+          publicDisplayEnd
+          applicationPeriodBegin
+          applicationPeriodEnd
+          status
+        }
+      }
+    }
+  }
+`;
+
+/**
+ * __useApplicationRoundsQuery__
+ *
+ * To run a query within a React component, call `useApplicationRoundsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useApplicationRoundsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useApplicationRoundsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useApplicationRoundsQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    ApplicationRoundsQuery,
+    ApplicationRoundsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    ApplicationRoundsQuery,
+    ApplicationRoundsQueryVariables
+  >(ApplicationRoundsDocument, options);
+}
+export function useApplicationRoundsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    ApplicationRoundsQuery,
+    ApplicationRoundsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    ApplicationRoundsQuery,
+    ApplicationRoundsQueryVariables
+  >(ApplicationRoundsDocument, options);
+}
+export type ApplicationRoundsQueryHookResult = ReturnType<
+  typeof useApplicationRoundsQuery
+>;
+export type ApplicationRoundsLazyQueryHookResult = ReturnType<
+  typeof useApplicationRoundsLazyQuery
+>;
+export type ApplicationRoundsQueryResult = Apollo.QueryResult<
+  ApplicationRoundsQuery,
+  ApplicationRoundsQueryVariables
+>;
+export const CitiesDocument = gql`
+  query Cities {
+    cities {
+      edges {
+        node {
+          pk
+        }
+      }
+    }
+  }
+`;
+
+/**
+ * __useCitiesQuery__
+ *
+ * To run a query within a React component, call `useCitiesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCitiesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCitiesQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useCitiesQuery(
+  baseOptions?: Apollo.QueryHookOptions<CitiesQuery, CitiesQueryVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<CitiesQuery, CitiesQueryVariables>(
+    CitiesDocument,
+    options
+  );
+}
+export function useCitiesLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<CitiesQuery, CitiesQueryVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<CitiesQuery, CitiesQueryVariables>(
+    CitiesDocument,
+    options
+  );
+}
+export type CitiesQueryHookResult = ReturnType<typeof useCitiesQuery>;
+export type CitiesLazyQueryHookResult = ReturnType<typeof useCitiesLazyQuery>;
+export type CitiesQueryResult = Apollo.QueryResult<
+  CitiesQuery,
+  CitiesQueryVariables
+>;
 export const SearchFormParamsUnitDocument = gql`
   query SearchFormParamsUnit {
     units {
@@ -4305,6 +4510,45 @@ export type ReservationUnitTypesQueryResult = Apollo.QueryResult<
   ReservationUnitTypesQuery,
   ReservationUnitTypesQueryVariables
 >;
+export type ApplicationRoundsQueryVariables = Exact<{ [key: string]: never }>;
+
+export type ApplicationRoundsQuery = {
+  __typename?: "Query";
+  applicationRounds?: {
+    __typename?: "ApplicationRoundTypeConnection";
+    edges: Array<{
+      __typename?: "ApplicationRoundTypeEdge";
+      node?: {
+        __typename?: "ApplicationRoundType";
+        pk?: number | null;
+        nameFi?: string | null;
+        nameEn?: string | null;
+        nameSv?: string | null;
+        reservationPeriodBegin: any;
+        reservationPeriodEnd: any;
+        publicDisplayBegin: any;
+        publicDisplayEnd: any;
+        applicationPeriodBegin: any;
+        applicationPeriodEnd: any;
+        status?: Status | null;
+      } | null;
+    } | null>;
+  } | null;
+};
+
+export type CitiesQueryVariables = Exact<{ [key: string]: never }>;
+
+export type CitiesQuery = {
+  __typename?: "Query";
+  cities?: {
+    __typename?: "CityTypeConnection";
+    edges: Array<{
+      __typename?: "CityTypeEdge";
+      node?: { __typename?: "CityType"; pk?: number | null } | null;
+    } | null>;
+  } | null;
+};
+
 export type SearchFormParamsUnitQueryVariables = Exact<{
   [key: string]: never;
 }>;

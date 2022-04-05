@@ -95,13 +95,7 @@ describe("application", () => {
     proceedToPage1Button().click();
 
     cy.wait(
-      [
-        "@applicationPost",
-        "@applicationPage1",
-        "@applicationRound1",
-        "@ageGroup",
-        "@abilityGroup",
-      ],
+      ["@applicationPost", "@applicationPage1", "@ageGroup", "@abilityGroup"],
       { timeout: 20000 }
     );
 

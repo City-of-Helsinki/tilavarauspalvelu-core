@@ -15,7 +15,6 @@ import {
   Action,
   Application,
   ApplicationEvent as ApplicationEventType,
-  ApplicationRound,
   EditorState,
   LocalizationLanguages,
   OptionType,
@@ -38,7 +37,10 @@ import { after, before } from "../../modules/validation";
 import ConfirmationModal, { ModalRef } from "../common/ConfirmationModal";
 import { MediumButton } from "../../styles/util";
 import { fontRegular, H5 } from "../../modules/style/typography";
-import { ReservationUnitType } from "../../modules/gql-types";
+import {
+  ApplicationRoundType,
+  ReservationUnitType,
+} from "../../modules/gql-types";
 
 type OptionTypes = {
   ageGroupOptions: OptionType[];
@@ -51,7 +53,7 @@ type OptionTypes = {
 type Props = {
   applicationEvent: ApplicationEventType;
   index: number;
-  applicationRound: ApplicationRound;
+  applicationRound: ApplicationRoundType;
   form: ReturnType<typeof useForm>;
   selectedReservationUnits: ReservationUnitType[];
   optionTypes: OptionTypes;
