@@ -66,8 +66,8 @@
   },
   "Page2": {
     "heading": "2. Välj bokningens tidpunkt",
-    "subHeading": "Välj alla de tidpunkter som du vill ha din bokning på.",
-    "info": "Kontrollera öppethållningstiderna för de enskilda lokalerna i <0>ansökningsanvisningarna (FI)<0>. Välj de tider som du i första hand önskar. Välj också tider som alternativt passar för dig.",
+    "subHeading": "Välj alla de tidpunkter som din bokning kan ställas på.",
+    "info": "Kontrollera öppethållningstiderna för de enskilda lokalerna i <0>ansökningsanvisningarna (FI)</0>. Välj de tider som du i första hand önskar. Välj också tider som alternativt passar för dig.",
     "text": "Ange de tidpunkter du önskar för säsongbokningen",
     "copyTimes": "Kopiera tiderna till alla önskemål",
     "resetTimes": "Töm kalendern",
@@ -88,13 +88,13 @@
     }
   },
   "Page3": {
-    "heading": "3. Kunduppgifter",
+    "heading": "3. Kontaktuppgifter",
     "text": "Du kan lämna ansökningen som ett samfund, en privatperson eller ett företag. Den senaste ansökningen gäller.",
     "firstName": "Förnamn",
     "homeCity": "Hemort",
     "lastName": "Efternamn",
     "phoneNumber": "Telefonnummer",
-    "email": "En e-postadress måste anges i ansökningen",
+    "email": "Email",
     "emailNotification": "Alla meddelanden som har att göra med ansökningen skickas till nedanstående e-postadress",
     "subHeading": {
       "basicInfo": "Bokningsinformation",
@@ -112,7 +112,7 @@
     },
     "contactPerson": {
       "firstName": "Kontaktpersonens förnamn",
-      "lastName": "Kontaktpersonens förnamn",
+      "lastName": "Kontaktpersonens efternamn",
       "phoneNumber": "Kontaktpersonens telefonnummer"
     },
     "billingAddress": {
@@ -123,7 +123,7 @@
     "company": {
       "name": "Företagets officiella namn",
       "coreBusiness": "Företagets kärnverksamhet",
-      "registrationNumber": "Företagets kärnverksamhet"
+      "registrationNumber": "FO-nummer"
     },
     "organisation": {
       "name": "Officiella namnet",
@@ -135,7 +135,7 @@
       "notRegistered": "Inget FO-nummer",
       "separateInvoicingAddress": "Faktureringsadressen avviker från postadressen"
     },
-    "additionalInformation": "Tilläggsinformation"
+    "additionalInformation": "Tilläggsinformation om bokningens ändamål"
   },
   "preview": {
     "applicantType": {
@@ -153,7 +153,7 @@
     "applicantTypeLabel": "Typ av ansökare",
     "email": "E-postadress",
     "phoneNumber": "Telefonnummer",
-    "additionalInformation": "Tilläggsinformation",
+    "additionalInformation": "Tilläggsinformation om bokningens ändamål",
     "organisation": {
       "name": "Ansökarens namn",
       "coreBusiness": "Kärnverksamhet"

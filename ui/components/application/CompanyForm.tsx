@@ -158,18 +158,6 @@ const CompanyForm = ({ application, onNext }: Props): JSX.Element | null => {
         </FormSubHeading>
         <TextInput
           ref={register({ required: true })}
-          label={t("application:Page3.contactPerson.phoneNumber")}
-          id="contactPerson.phoneNumber"
-          name="contactPerson.phoneNumber"
-          required
-          invalid={!!errors.contactPerson?.phoneNumber?.type}
-          errorText={applicationErrorText(
-            t,
-            errors.contactPerson?.phoneNumber?.type
-          )}
-        />
-        <TextInput
-          ref={register({ required: true })}
           label={t("application:Page3.contactPerson.firstName")}
           id="contactPerson.firstName"
           name="contactPerson.firstName"
@@ -190,6 +178,18 @@ const CompanyForm = ({ application, onNext }: Props): JSX.Element | null => {
           errorText={applicationErrorText(
             t,
             errors.contactPerson?.lastName?.type
+          )}
+        />
+        <TextInput
+          ref={register({ required: true })}
+          label={t("application:Page3.contactPerson.phoneNumber")}
+          id="contactPerson.phoneNumber"
+          name="contactPerson.phoneNumber"
+          required
+          invalid={!!errors.contactPerson?.phoneNumber?.type}
+          errorText={applicationErrorText(
+            t,
+            errors.contactPerson?.phoneNumber?.type
           )}
         />
         <EmailInput register={register} errors={errors} />
