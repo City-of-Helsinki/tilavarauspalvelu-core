@@ -80,6 +80,7 @@ const TableWrapper = styled.div`
     overflow: scroll;
     th {
       font-family: var(--font-bold);
+      padding: var(--spacing-xs);
     }
     td {
       white-space: nowrap;
