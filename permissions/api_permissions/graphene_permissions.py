@@ -26,6 +26,16 @@ from reservations.models import RecurringReservation, Reservation
 from spaces.models import Unit
 
 
+class ApplicationRoundPermission(BasePermission):
+    @classmethod
+    def has_permission(cls, info: ResolveInfo) -> bool:
+        return True
+
+    @classmethod
+    def has_mutation_permission(cls, root: Any, info: ResolveInfo, input: dict) -> bool:
+        return False
+
+
 class ReservationUnitHaukiUrlPermission(BasePermission):
     """Check permissions in resolver level. Cannot figure out the permissions without knowing unit."""
 

@@ -228,6 +228,22 @@ class ApplicationStatusFactory(DjangoModelFactory):
     application = SubFactory(ApplicationFactory)
 
 
+class ApplicationRoundStatusFactory(DjangoModelFactory):
+    class Meta:
+        model = "applications.ApplicationRoundStatus"
+
+    status = FuzzyChoice(
+        choices=[
+            ApplicationStatus.DRAFT,
+            ApplicationStatus.IN_REVIEW,
+            ApplicationStatus.REVIEW_DONE,
+            ApplicationStatus.DECLINED,
+            ApplicationStatus.CANCELLED,
+        ]
+    )
+    application_round = SubFactory(ApplicationRoundFactory)
+
+
 class ApplicationEventStatusFactory(DjangoModelFactory):
     class Meta:
         model = "applications.ApplicationEventStatus"

@@ -79,6 +79,7 @@ from permissions.api_permissions.graphene_field_decorators import (
 )
 from permissions.api_permissions.graphene_permissions import (
     AgeGroupPermission,
+    ApplicationRoundPermission,
     CityPermission,
     EquipmentCategoryPermission,
     EquipmentPermission,
@@ -104,9 +105,19 @@ from reservations.models import Reservation
 from resources.models import Resource
 from spaces.models import ServiceSector, Space, Unit
 
+from .application_rounds.application_round_types import ApplicationRoundType
+
 
 class AllowAuthenticatedFilter(AuthFilter):
     permission_classes = (AllowAuthenticated,)
+
+
+class ApplicationRoundFilter(AuthFilter, django_filters.FilterSet):
+    permission_classes = (
+        (ApplicationRoundPermission,)
+        if not settings.TMP_PERMISSIONS_DISABLED
+        else [AllowAny]
+    )
 
 
 class ReservationsFilter(AuthFilter, django_filters.FilterSet):
@@ -272,6 +283,8 @@ class ReservationMetadataSetFilter(AuthFilter):
 
 
 class Query(graphene.ObjectType):
+    application_rounds = ApplicationRoundFilter(ApplicationRoundType)
+
     reservations = ReservationsFilter(
         ReservationType, filterset_class=ReservationFilterSet
     )
