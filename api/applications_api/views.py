@@ -67,7 +67,7 @@ class ApplicationViewSet(viewsets.ModelViewSet):
                 application_events__event_reservation_units__reservation_unit__unit__in=units
             )
             | Q(user=user)
-        )
+        ).distinct()
 
 
 class ApplicationEventViewSet(viewsets.ModelViewSet):
