@@ -9,6 +9,7 @@ import ApplicationEvent from "../applicationEvent/ApplicationEvent";
 import {
   Action,
   Application,
+  ApplicationStatus,
   EditorState,
   OptionType,
   StringParameter,
@@ -129,11 +130,16 @@ const Page1 = ({
   };
 
   const onSubmit = (data: Application, eventId?: number) => {
-    const appToSave = prepareData(data);
+    const appToSave = {
+      ...prepareData(data),
+      // override status in order to validate correctly when modifying existing application
+      status: "draft" as ApplicationStatus,
+    };
     if (appToSave.applicationEvents.length === 0) {
       setError(t("application:error.noEvents"));
       return;
     }
+
     if (
       appToSave.applicationEvents.filter(
         (ae) => ae.eventReservationUnits.length === 0
