@@ -87,7 +87,7 @@ class ApplicationRoundFactory(DjangoModelFactory):
         start_date=datetime.date.today(), end_date=datetime.date.today()
     )
     reservation_period_end = FuzzyDate(
-        start_date=datetime.date.today(),
+        start_date=(datetime.date.today() + datetime.timedelta(days=1)),
         end_date=(datetime.date.today() + datetime.timedelta(weeks=4)),
     )
     public_display_begin = FuzzyDateTime(
@@ -158,7 +158,7 @@ class ApplicationEventFactory(DjangoModelFactory):
         end_date=datetime.date.today(),
     )
     end = FuzzyDate(
-        start_date=datetime.date.today(),
+        start_date=(datetime.date.today() + datetime.timedelta(days=1)),
         end_date=(datetime.date.today() + datetime.timedelta(weeks=4)),
     )
 
