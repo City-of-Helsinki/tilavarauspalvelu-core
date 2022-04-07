@@ -265,8 +265,10 @@ const Preview = ({ onNext, application, tos }: Props): JSX.Element | null => {
               <StyledLabelValue
                 label={t("application:preview.applicationEvent.purpose")}
                 value={
-                  applicationEvent.purposeId != null
-                    ? purposeOptions[applicationEvent.purposeId].label
+                  applicationEvent.purposeId
+                    ? purposeOptions.find(
+                        (n) => n.value === applicationEvent.purposeId.toString()
+                      )?.label
                     : ""
                 }
               />
