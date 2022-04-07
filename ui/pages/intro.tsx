@@ -55,10 +55,13 @@ const Intro = (): JSX.Element => {
 
   useQuery<Query, QueryApplicationRoundsArgs>(APPLICATION_ROUNDS, {
     onCompleted: (data) => {
+      const now = new Date();
       const ars = data?.applicationRounds?.edges
         ?.map((n) => n.node)
         .filter(
           (ar) =>
+            new Date(ar.publicDisplayBegin) <= now &&
+            new Date(ar.publicDisplayEnd) >= now &&
             applicationRoundState(
               ar.applicationPeriodBegin,
               ar.applicationPeriodEnd
@@ -96,30 +99,32 @@ const Intro = (): JSX.Element => {
       <Head noKoros heading={t("application:Intro.heading")} breadCrumbText="">
         <Container>
           {applicationRounds.length > 0 ? (
-            <Select
-              id="applicationRoundSelect"
-              placeholder={t("common:select")}
-              options={applicationRounds as OptionType[]}
-              label=""
-              onChange={(selection: OptionType): void => {
-                setApplicationRound(selection.value as number);
-              }}
-              value={applicationRounds?.find(
-                (n) => n.value === applicationRound
-              )}
-            />
+            <>
+              <Select
+                id="applicationRoundSelect"
+                placeholder={t("common:select")}
+                options={applicationRounds as OptionType[]}
+                label=""
+                onChange={(selection: OptionType): void => {
+                  setApplicationRound(selection.value as number);
+                }}
+                value={applicationRounds?.find(
+                  (n) => n.value === applicationRound
+                )}
+              />
+              <MediumButton
+                id="start-application"
+                disabled={!applicationRound || saving}
+                onClick={() => {
+                  createNewApplication(applicationRound);
+                }}
+              >
+                {t("application:Intro.startNewApplication")}
+              </MediumButton>
+            </>
           ) : (
             <CenterSpinner />
           )}
-          <MediumButton
-            id="start-application"
-            disabled={!applicationRound || saving}
-            onClick={() => {
-              createNewApplication(applicationRound);
-            }}
-          >
-            {t("application:Intro.startNewApplication")}
-          </MediumButton>
         </Container>
       </Head>
       {error ? (
