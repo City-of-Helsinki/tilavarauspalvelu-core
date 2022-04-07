@@ -69,7 +69,7 @@
   },
   "Page2": {
     "heading": "2. Välj bokningens tidpunkt",
-    "subHeading": "Välj alla de tidpunkter som din bokning kan ställas på.",
+    "subHeading": "Välj alla tidpunkter som du önskar att din bokning faller in på.",
     "info": "Kontrollera öppethållningstiderna för de enskilda lokalerna i <0>ansökningsanvisningarna (FI)</0>. Välj de tider som du i första hand önskar. Välj också tider som alternativt passar för dig.",
     "text": "Ange de tidpunkter du önskar för säsongbokningen",
     "copyTimes": "Kopiera tiderna till alla önskemål",
@@ -97,7 +97,7 @@
     "homeCity": "Hemort",
     "lastName": "Efternamn",
     "phoneNumber": "Telefonnummer",
-    "email": "Email",
+    "email": "E-postadress som skall bifogas till ansökan",
     "emailNotification": "Alla meddelanden som har att göra med ansökningen skickas till nedanstående e-postadress",
     "subHeading": {
       "basicInfo": "Bokningsinformation",
@@ -181,7 +181,7 @@
     },
     "notification": {
       "processing": "Behandling",
-      "body": "Behandlingen av ansökningarna börjar när ansökningstiden har löpt ut. Vi informerar dig om de olika skedena på e-postadressen som du har angett."
+      "body": "Behandlingen av ansökningarna börjar när ansökningstiden har löpt ut. Vi skickar meddelanden till e-postadressen du har angett med information om de olika skedena."
     },
     "reservationUnitTerms": "Kompletterande bokningssvillkor",
     "termsOfService": "Bokningsvillkor för Helsingfors stads lokaler och utrustning",
