@@ -62,7 +62,10 @@
     "applicationEventSummary": "Summary",
     "applicationEventSaved": "Seasonal booking request saved",
     "saveEvent": "Save",
-    "deleteEvent": "Cancel"
+    "deleteEvent": "Remove",
+    "deleteEventCancel": "Cancel",
+    "deleteEventHeading": "Are you sure you want to remove the application?",
+    "deleteEventContent": "Once removed, the application cannot be restored."
   },
   "Page2": {
     "heading": "2. Select booking dates",

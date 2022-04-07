@@ -62,7 +62,10 @@
     "applicationEventSummary": "Sammanfattning",
     "applicationEventSaved": "Säsongbokningsönskemål sparat på ansökningen",
     "saveEvent": "Spara",
-    "deleteEvent": "Ångra"
+    "deleteEvent": "Radera",
+    "deleteEventCancel": "Tillbaka",
+    "deleteEventHeading": "Är du säker på att du vill radera ansökningen?",
+    "deleteEventContent": "Ansökningens information kan inte återställas då ansökningen har raderats."
   },
   "Page2": {
     "heading": "2. Välj bokningens tidpunkt",
