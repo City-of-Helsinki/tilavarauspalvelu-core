@@ -252,7 +252,7 @@ const translations: ITranslations = {
       purpose: ["Käyttötarkoitus"],
       ageGroup: ["Ikäluokka"],
       recommendations: ["Ehdotukset"],
-      additionalInformation: ["Lisätiedot"],
+      additionalInformation: ["Lisätiedot (yksityishenkilö)"],
     },
     statuses: {
       draft: ["Luonnos"],
@@ -295,8 +295,8 @@ const translations: ITranslations = {
     applicantTypes: {
       individual: ["Yksityishenkilö"],
       company: ["Yritys"],
-      community: ["Yhditys, rekisteröity"],
-      association: ["Yhdistys, rekisteröimätön"],
+      community: ["Yhditys, rekisteröimäton"],
+      association: ["Yhdistys, rekisteröity"],
     },
     contactPerson: ["Yhteyshenkilö"],
     identificationNumber: ["Y-tunnus"],
