@@ -301,7 +301,7 @@ const Preview = ({ onNext, application, tos }: Props): JSX.Element | null => {
               {t("application:Page1.spacesSubHeading")}
             </FormSubHeading>
             <UnitList>
-              {applicationEvent.eventReservationUnits.map(
+              {sortBy(applicationEvent.eventReservationUnits, "priority").map(
                 (reservationUnit, index) => (
                   <React.Fragment key={reservationUnit.reservationUnitId}>
                     <UnitName>

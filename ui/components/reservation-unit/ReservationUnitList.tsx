@@ -2,6 +2,7 @@ import { IconPlusCircle, Notification as HDSNotification } from "hds-react";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
+import { sortBy } from "lodash";
 import styled from "styled-components";
 import { ApplicationEvent, OptionType } from "../../modules/types";
 import Modal from "../common/Modal";
@@ -105,9 +106,10 @@ const ReservationUnitList = ({
       if (applicationEvent.eventReservationUnits?.length === 0) {
         data = selectedReservationUnits;
       } else {
-        const eventUniIds = applicationEvent.eventReservationUnits.map(
-          (n) => n.reservationUnitId
-        );
+        const eventUniIds = sortBy(
+          applicationEvent.eventReservationUnits,
+          "priority"
+        ).map((n) => n.reservationUnitId);
         const { data: reservationUnitData } = await apolloClient.query<
           Query,
           QueryReservationUnitsArgs
@@ -116,7 +118,10 @@ const ReservationUnitList = ({
         });
         data = reservationUnitData?.reservationUnits?.edges
           .map((n) => n.node)
-          .filter((n) => eventUniIds.includes(n.pk));
+          .filter((n) => eventUniIds.includes(n.pk))
+          .sort(
+            (a, b) => eventUniIds.indexOf(a.pk) - eventUniIds.indexOf(b.pk)
+          );
       }
       if (isMounted) {
         setReservationUnits(
