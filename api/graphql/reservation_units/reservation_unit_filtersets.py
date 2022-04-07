@@ -18,6 +18,9 @@ from spaces.models import Unit
 
 
 class ReservationUnitsFilterSet(django_filters.FilterSet):
+    pk = django_filters.ModelMultipleChoiceFilter(
+        field_name="pk", method="filter_by_pk", queryset=ReservationUnit.objects.all()
+    )
     unit = django_filters.ModelMultipleChoiceFilter(
         field_name="unit", queryset=Unit.objects.all()
     )
@@ -65,7 +68,7 @@ class ReservationUnitsFilterSet(django_filters.FilterSet):
 
     class Meta:
         model = ReservationUnit
-        fields = ["unit", "keyword_groups"]
+        fields = ["pk", "unit", "keyword_groups"]
 
     def get_text_search(self, qs, property, value: str):
 
@@ -107,6 +110,12 @@ class ReservationUnitsFilterSet(django_filters.FilterSet):
         query = reduce(operator.or_, (query for query in queries))
 
         return qs.filter(query).distinct()
+
+    def filter_by_pk(self, qs, property, value):
+        if value:
+            return qs.filter(id__in=[model.id for model in value])
+
+        return qs
 
     def get_max_persons_gte(self, qs, property, value):
         return qs.annotate(max_person_sum=Sum("spaces__max_persons")).filter(
