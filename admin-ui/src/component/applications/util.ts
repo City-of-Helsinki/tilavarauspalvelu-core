@@ -71,10 +71,12 @@ export const getNormalizedApplicationStatus = (
 export const numTurns = (
   startDate: string,
   endDate: string,
-  biWeekly: boolean
+  biWeekly: boolean,
+  eventsPerWeek: number
 ): number =>
-  differenceInWeeks(new Date(endDate), new Date(startDate)) /
-  (biWeekly ? 2 : 1);
+  (differenceInWeeks(new Date(endDate), new Date(startDate)) /
+    (biWeekly ? 2 : 1)) *
+  eventsPerWeek;
 
 export const apiDurationToMinutes = (duration: string): number => {
   if (!duration) {
@@ -91,7 +93,7 @@ export const appEventHours = (
   eventsPerWeek: number,
   minDuration: string
 ): number => {
-  const turns = numTurns(startDate, endDate, biWeekly);
+  const turns = numTurns(startDate, endDate, biWeekly, eventsPerWeek);
 
   const hours =
     (turns * eventsPerWeek * apiDurationToMinutes(minDuration)) / 60;
@@ -114,7 +116,12 @@ export const applicationHours = (application: Application): number =>
 export const applicationTurns = (application: Application): number =>
   sum(
     application.applicationEvents.map((ae) =>
-      numTurns(ae.begin as string, ae.end as string, ae.biweekly)
+      numTurns(
+        ae.begin as string,
+        ae.end as string,
+        ae.biweekly,
+        ae.eventsPerWeek
+      )
     )
   );
 
