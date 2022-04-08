@@ -2,17 +2,15 @@ import { IconPlusCircle, Notification as HDSNotification } from "hds-react";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
+import { sortBy } from "lodash";
 import styled from "styled-components";
-import {
-  ApplicationEvent,
-  ApplicationRound,
-  OptionType,
-} from "../../modules/types";
+import { ApplicationEvent, OptionType } from "../../modules/types";
 import Modal from "../common/Modal";
 import ReservationUnitModal from "./ReservationUnitModal";
 import ReservationUnitCard from "./ReservationUnitCard";
 import { MediumButton } from "../../styles/util";
 import {
+  ApplicationRoundType,
   Query,
   QueryReservationUnitsArgs,
   ReservationUnitByPkType,
@@ -33,7 +31,7 @@ type Props = {
   applicationEvent: ApplicationEvent;
   fieldName: string;
   form: ReturnType<typeof useForm>;
-  applicationRound: ApplicationRound;
+  applicationRound: ApplicationRoundType;
   options: OptionTypes;
   minSize?: number;
 };
@@ -108,9 +106,10 @@ const ReservationUnitList = ({
       if (applicationEvent.eventReservationUnits?.length === 0) {
         data = selectedReservationUnits;
       } else {
-        const eventUniIds = applicationEvent.eventReservationUnits.map(
-          (n) => n.reservationUnitId
-        );
+        const eventUniIds = sortBy(
+          applicationEvent.eventReservationUnits,
+          "priority"
+        ).map((n) => n.reservationUnitId);
         const { data: reservationUnitData } = await apolloClient.query<
           Query,
           QueryReservationUnitsArgs
@@ -119,12 +118,15 @@ const ReservationUnitList = ({
         });
         data = reservationUnitData?.reservationUnits?.edges
           .map((n) => n.node)
-          .filter((n) => eventUniIds.includes(n.pk));
+          .filter((n) => eventUniIds.includes(n.pk))
+          .sort(
+            (a, b) => eventUniIds.indexOf(a.pk) - eventUniIds.indexOf(b.pk)
+          );
       }
       if (isMounted) {
         setReservationUnits(
           data.filter((ru) =>
-            applicationRound.reservationUnitIds.includes(ru.pk)
+            applicationRound.reservationUnits.map((n) => n.pk).includes(ru.pk)
           )
         );
         setIsLoading(false);

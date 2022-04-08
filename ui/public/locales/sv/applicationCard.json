@@ -5,7 +5,7 @@
   "edit": "Redigera din ansökan",
   "cancel": "Ångra ansökan",
   "status": {
-    "draft": "Inte slutförd",
+    "draft": "Utkast",
     "processing": "I behandling",
     "sent": "Behandlad"
   },

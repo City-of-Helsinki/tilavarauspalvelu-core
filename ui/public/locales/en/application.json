@@ -62,12 +62,15 @@
     "applicationEventSummary": "Summary",
     "applicationEventSaved": "Seasonal booking request saved",
     "saveEvent": "Save",
-    "deleteEvent": "Cancel"
+    "deleteEvent": "Remove",
+    "deleteEventCancel": "Cancel",
+    "deleteEventHeading": "Are you sure you want to remove the application?",
+    "deleteEventContent": "Once removed, the application cannot be restored."
   },
   "Page2": {
     "heading": "2. Select booking dates",
-    "subHeading": "Select all dates for which you want to book spaces",
-    "info": "Check available time slots <0>here<0> (Fin). Select your preferred times. Also select other times that suit you.",
+    "subHeading": "Select all times for which you want to book spaces",
+    "info": "Check available time slots <0>here</0> (Fin). Select your preferred times. Also select other times that suit you.",
     "text": "Indicate your preferred dates for the seasonal booking",
     "copyTimes": "Copy times for all booking requests",
     "resetTimes": "Clear calendar",
@@ -88,7 +91,7 @@
     }
   },
   "Page3": {
-    "heading": "3. Customer details",
+    "heading": "3. Customer information",
     "text": "You can apply as a community, private person or company. The latest application is valid.",
     "firstName": "First name",
     "homeCity": "City",
@@ -135,7 +138,7 @@
       "notRegistered": "No business ID",
       "separateInvoicingAddress": "Billing address different to postal address"
     },
-    "additionalInformation": "Additional details"
+    "additionalInformation": "Additional details about the purpose of the booking"
   },
   "preview": {
     "applicantType": {
@@ -146,14 +149,14 @@
     },
     "homeCity": "City",
     "heading": "4. Review and submit the application",
-    "text": "See a summary of the application below",
+    "text": "Summary of your application",
     "basicInfoSubHeading": "Applicant information",
     "firstName": "Contact person's first name ",
     "lastName": "Contact person's surname",
     "applicantTypeLabel": "Applicant type",
     "email": "Email ",
     "phoneNumber": "Telephone number",
-    "additionalInformation": "Additional details",
+    "additionalInformation": "Additional details about the purpose of the booking",
     "organisation": {
       "name": "Applicant name",
       "coreBusiness": "Core business"
@@ -182,7 +185,7 @@
     },
     "reservationUnitTerms": "Additional booking conditions",
     "termsOfService": "Booking conditions for City of Helsinki spaces and equipment",
-    "userAcceptsTerms": "I have read and I accept the terms and conditions and the supplementary booking conditions.",
+    "userAcceptsTerms": "I have read and I accept the Terms of Agreement and the Additional booking conditions.",
     "subHeading": {
       "applicationInfo": "Application information"
     }

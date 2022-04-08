@@ -35,24 +35,58 @@ type AgeGroupTypeEdge {
   cursor: String!
 }
 
-type ApplicationRoundType {
+type AggregatedDataType {
+  allocationResultEventsCount: Int
+  allocationDurationTotal: Int
+  totalReservationDuration: Int
+  totalHourCapacity: Int
+}
+
+type ApplicationRoundType implements Node {
   nameFi: String
   nameEn: String
   nameSv: String
-  targetGroup: ApplicationsApplicationRoundTargetGroupChoices!
   allocating: Boolean!
-  reservationUnits(offset: Int = null, before: String = null, after: String = null, first: Int = null, last: Int = null): ReservationUnitByPkTypeConnection!
+  reservationUnits: [ReservationUnitType]
   applicationPeriodBegin: DateTime!
   applicationPeriodEnd: DateTime!
   reservationPeriodBegin: Date!
   reservationPeriodEnd: Date!
   publicDisplayBegin: DateTime!
   publicDisplayEnd: DateTime!
-  purposes(offset: Int = null, before: String = null, after: String = null, first: Int = null, last: Int = null, nameFi: String = null, nameEn: String = null, nameSv: String = null): ReservationPurposeTypeConnection!
+  purposes: [ReservationPurposeType]
+  serviceSector: ServiceSectorType
   criteriaFi: String
   criteriaEn: String
   criteriaSv: String
+
+  """The ID of the object"""
+  id: ID!
+  aggregatedData: AggregatedDataType
   pk: Int
+  status: status
+  statusTimestamp: DateTime
+  isAdmin: Boolean
+  approvedBy: String
+  applicationsSent: Boolean
+}
+
+type ApplicationRoundTypeConnection {
+  """Pagination data for this connection."""
+  pageInfo: PageInfo!
+
+  """Contains the nodes in this connection."""
+  edges: [ApplicationRoundTypeEdge]!
+  totalCount: Int
+}
+
+"""A Relay edge containing a `ApplicationRoundType` and its cursor."""
+type ApplicationRoundTypeEdge {
+  """The item at the end of the edge"""
+  node: ApplicationRoundType
+
+  """A cursor for use in pagination"""
+  cursor: String!
 }
 
 """An enumeration."""
@@ -548,6 +582,7 @@ type PurposeUpdateMutationPayload {
 }
 
 type Query {
+  applicationRounds(offset: Int = null, before: String = null, after: String = null, first: Int = null, last: Int = null): ApplicationRoundTypeConnection
   reservations(
     offset: Int = null
     before: String = null
@@ -1146,6 +1181,27 @@ type ReservationTypeEdge {
   cursor: String!
 }
 
+type ReservationUnitApplicationRoundType {
+  nameFi: String
+  nameEn: String
+  nameSv: String
+  targetGroup: ApplicationsApplicationRoundTargetGroupChoices!
+  allocating: Boolean!
+  reservationUnits(offset: Int = null, before: String = null, after: String = null, first: Int = null, last: Int = null): ReservationUnitByPkTypeConnection!
+  applicationPeriodBegin: DateTime!
+  applicationPeriodEnd: DateTime!
+  reservationPeriodBegin: Date!
+  reservationPeriodEnd: Date!
+  publicDisplayBegin: DateTime!
+  publicDisplayEnd: DateTime!
+  purposes(offset: Int = null, before: String = null, after: String = null, first: Int = null, last: Int = null, nameFi: String = null, nameEn: String = null, nameSv: String = null): ReservationPurposeTypeConnection!
+  serviceSector: ServiceSectorType
+  criteriaFi: String
+  criteriaEn: String
+  criteriaSv: String
+  pk: Int
+}
+
 type ReservationUnitByPkType implements Node {
   nameFi: String
   nameEn: String
@@ -1229,7 +1285,7 @@ type ReservationUnitByPkType implements Node {
   surfaceArea: Decimal
   keywordGroups: [KeywordGroupType]
   reservations(from: Date = null, to: Date = null, state: [String] = null): [ReservationType]
-  applicationRounds(active: Boolean = null): [ApplicationRoundType]
+  applicationRounds(active: Boolean = null): [ReservationUnitApplicationRoundType]
   cancellationRule: ReservationUnitCancellationRuleType
   paymentTerms: TermsOfUseType
   cancellationTerms: TermsOfUseType
@@ -1367,15 +1423,15 @@ input ReservationUnitCreateMutationInput {
   nameFi: String
   nameEn: String
   nameSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
   additionalInstructionsFi: String
   additionalInstructionsEn: String
   additionalInstructionsSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
   clientMutationId: String
 }
 
@@ -1471,15 +1527,15 @@ type ReservationUnitCreateMutationPayload {
   nameFi: String
   nameEn: String
   nameSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
   additionalInstructionsFi: String
   additionalInstructionsEn: String
   additionalInstructionsSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -1701,7 +1757,7 @@ type ReservationUnitType implements Node {
   """Authentication required for reserving this reservation unit."""
   authentication: ReservationUnitsReservationUnitAuthenticationChoices!
   images: [ReservationUnitImageType]
-  applicationRounds(active: Boolean = null): [ApplicationRoundType]
+  applicationRounds(active: Boolean = null): [ReservationUnitApplicationRoundType]
 
   """The ID of the object"""
   id: ID!
@@ -1836,15 +1892,15 @@ input ReservationUnitUpdateMutationInput {
   nameFi: String
   nameEn: String
   nameSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
   additionalInstructionsFi: String
   additionalInstructionsEn: String
   additionalInstructionsSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
   clientMutationId: String
 }
 
@@ -1940,15 +1996,15 @@ type ReservationUnitUpdateMutationPayload {
   nameFi: String
   nameEn: String
   nameSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
   additionalInstructionsFi: String
   additionalInstructionsEn: String
   additionalInstructionsSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -2263,6 +2319,12 @@ type ResourceUpdateMutationPayload {
   clientMutationId: String
 }
 
+type ServiceSectorType implements Node {
+  """The ID of the object"""
+  id: ID!
+  pk: Int
+}
+
 """An enumeration."""
 enum ServicesServiceServiceTypeChoices {
   """Introduction"""
@@ -2438,6 +2500,17 @@ enum state {
   DENIED
 }
 
+"""An enumeration."""
+enum status {
+  draft
+  in_review
+  review_done
+  allocated
+  handled
+  validated
+  approved
+}
+
 type TaxPercentageType implements Node {
   """The tax percentage for a price"""
   value: Decimal!
@@ -2607,12 +2680,12 @@ input UnitUpdateMutationInput {
   nameFi: String
   nameEn: String
   nameSv: String
-  shortDescriptionFi: String
-  shortDescriptionEn: String
-  shortDescriptionSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  shortDescriptionFi: String
+  shortDescriptionEn: String
+  shortDescriptionSv: String
   clientMutationId: String
 }
 
@@ -2625,12 +2698,12 @@ type UnitUpdateMutationPayload {
   nameFi: String
   nameEn: String
   nameSv: String
-  shortDescriptionFi: String
-  shortDescriptionEn: String
-  shortDescriptionSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  shortDescriptionFi: String
+  shortDescriptionEn: String
+  shortDescriptionSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]

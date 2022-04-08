@@ -62,12 +62,15 @@
     "applicationEventSummary": "Sammanfattning",
     "applicationEventSaved": "Säsongbokningsönskemål sparat på ansökningen",
     "saveEvent": "Spara",
-    "deleteEvent": "Ångra"
+    "deleteEvent": "Radera",
+    "deleteEventCancel": "Tillbaka",
+    "deleteEventHeading": "Är du säker på att du vill radera ansökningen?",
+    "deleteEventContent": "Ansökningens information kan inte återställas då ansökningen har raderats."
   },
   "Page2": {
     "heading": "2. Välj bokningens tidpunkt",
-    "subHeading": "Välj alla de tidpunkter som du vill ha din bokning på.",
-    "info": "Kontrollera öppethållningstiderna för de enskilda lokalerna i <0>ansökningsanvisningarna (FI)<0>. Välj de tider som du i första hand önskar. Välj också tider som alternativt passar för dig.",
+    "subHeading": "Välj alla tidpunkter som du önskar att din bokning faller in på.",
+    "info": "Kontrollera öppethållningstiderna för de enskilda lokalerna i <0>ansökningsanvisningarna (FI)</0>. Välj de tider som du i första hand önskar. Välj också tider som alternativt passar för dig.",
     "text": "Ange de tidpunkter du önskar för säsongbokningen",
     "copyTimes": "Kopiera tiderna till alla önskemål",
     "resetTimes": "Töm kalendern",
@@ -88,13 +91,13 @@
     }
   },
   "Page3": {
-    "heading": "3. Kunduppgifter",
+    "heading": "3. Kontaktuppgifter",
     "text": "Du kan lämna ansökningen som ett samfund, en privatperson eller ett företag. Den senaste ansökningen gäller.",
     "firstName": "Förnamn",
     "homeCity": "Hemort",
     "lastName": "Efternamn",
     "phoneNumber": "Telefonnummer",
-    "email": "En e-postadress måste anges i ansökningen",
+    "email": "E-postadress som skall bifogas till ansökan",
     "emailNotification": "Alla meddelanden som har att göra med ansökningen skickas till nedanstående e-postadress",
     "subHeading": {
       "basicInfo": "Bokningsinformation",
@@ -112,7 +115,7 @@
     },
     "contactPerson": {
       "firstName": "Kontaktpersonens förnamn",
-      "lastName": "Kontaktpersonens förnamn",
+      "lastName": "Kontaktpersonens efternamn",
       "phoneNumber": "Kontaktpersonens telefonnummer"
     },
     "billingAddress": {
@@ -123,7 +126,7 @@
     "company": {
       "name": "Företagets officiella namn",
       "coreBusiness": "Företagets kärnverksamhet",
-      "registrationNumber": "Företagets kärnverksamhet"
+      "registrationNumber": "FO-nummer"
     },
     "organisation": {
       "name": "Officiella namnet",
@@ -135,7 +138,7 @@
       "notRegistered": "Inget FO-nummer",
       "separateInvoicingAddress": "Faktureringsadressen avviker från postadressen"
     },
-    "additionalInformation": "Tilläggsinformation"
+    "additionalInformation": "Tilläggsinformation om bokningens ändamål"
   },
   "preview": {
     "applicantType": {
@@ -153,13 +156,13 @@
     "applicantTypeLabel": "Typ av ansökare",
     "email": "E-postadress",
     "phoneNumber": "Telefonnummer",
-    "additionalInformation": "Tilläggsinformation",
+    "additionalInformation": "Tilläggsinformation om bokningens ändamål",
     "organisation": {
       "name": "Ansökarens namn",
       "coreBusiness": "Kärnverksamhet"
     },
     "applicationEvent": {
-      "name": "Titel",
+      "name": "Säsongbokningens namn",
       "numPersons": "Gruppstorlek",
       "ageGroup": "Åldersgrupp",
       "abilityGroup": "",
@@ -168,7 +171,7 @@
       "begin": "Start datum",
       "end": "Slutdatum",
       "minDuration": "Minsta bokningslängden",
-      "maxDuration": "Maximal bokningslängden",
+      "maxDuration": "Maximala bokningslängden",
       "eventsPerWeek": "Antal bokningar per vecka"
     },
     "applicationEventSchedules": "Önskade tider",
@@ -178,9 +181,9 @@
     },
     "notification": {
       "processing": "Behandling",
-      "body": "Behandlingen av ansökningarna börjar när ansökningstiden har löpt ut. Vi informerar dig om de olika skedena på e-postadressen som du har angett."
+      "body": "Behandlingen av ansökningarna börjar när ansökningstiden har löpt ut. Vi skickar meddelanden till e-postadressen du har angett med information om de olika skedena."
     },
-    "reservationUnitTerms": "Kompletterande bokningsuppgifter",
+    "reservationUnitTerms": "Kompletterande bokningssvillkor",
     "termsOfService": "Bokningsvillkor för Helsingfors stads lokaler och utrustning",
     "userAcceptsTerms": "Jag har läst avtalsvillkoren och de kompletterande bokningsvillkoren och godkänner dessa.",
     "subHeading": {

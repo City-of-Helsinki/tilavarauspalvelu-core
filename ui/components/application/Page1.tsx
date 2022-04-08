@@ -9,7 +9,7 @@ import ApplicationEvent from "../applicationEvent/ApplicationEvent";
 import {
   Action,
   Application,
-  ApplicationRound,
+  ApplicationStatus,
   EditorState,
   OptionType,
   StringParameter,
@@ -19,11 +19,15 @@ import { getParameters } from "../../modules/api";
 import { participantCountOptions } from "../../modules/const";
 import { ButtonContainer, CenterSpinner } from "../common/common";
 import { MediumButton } from "../../styles/util";
-import { Query, ReservationUnitType } from "../../modules/gql-types";
-import { SEARCH_FORM_PARAMS_PURPOSE } from "../../modules/queries/params";
+import {
+  Query,
+  ApplicationRoundType,
+  ReservationUnitType,
+} from "../../modules/gql-types";
+import { RESERVATION_PURPOSES } from "../../modules/queries/params";
 
 type Props = {
-  applicationRound: ApplicationRound;
+  applicationRound: ApplicationRoundType;
   editorState: EditorState;
   selectedReservationUnits: ReservationUnitType[];
   save: ({
@@ -65,9 +69,9 @@ const Page1 = ({
 
   const { application } = editorState;
 
-  useQuery<Query>(SEARCH_FORM_PARAMS_PURPOSE, {
+  useQuery<Query>(RESERVATION_PURPOSES, {
     onCompleted: (res) => {
-      const purposes = res?.purposes?.edges?.map(({ node }) => ({
+      const purposes = res?.reservationPurposes?.edges?.map(({ node }) => ({
         id: String(node.pk),
         name: getTranslation(node, "name"),
       }));
@@ -126,11 +130,16 @@ const Page1 = ({
   };
 
   const onSubmit = (data: Application, eventId?: number) => {
-    const appToSave = prepareData(data);
+    const appToSave = {
+      ...prepareData(data),
+      // override status in order to validate correctly when modifying existing application
+      status: "draft" as ApplicationStatus,
+    };
     if (appToSave.applicationEvents.length === 0) {
       setError(t("application:error.noEvents"));
       return;
     }
+
     if (
       appToSave.applicationEvents.filter(
         (ae) => ae.eventReservationUnits.length === 0

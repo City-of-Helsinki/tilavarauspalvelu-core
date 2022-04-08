@@ -1,6 +1,7 @@
 import React from "react";
 import styled from "styled-components";
-import { Application, ApplicationRound } from "../../modules/types";
+import { ApplicationRoundType } from "../../modules/gql-types";
+import { Application } from "../../modules/types";
 import ApplicationCard from "./ApplicationCard";
 
 const GroupName = styled.h2`
@@ -9,7 +10,7 @@ const GroupName = styled.h2`
 
 type Props = {
   name: string;
-  rounds: { [key: number]: ApplicationRound };
+  rounds: { [key: number]: ApplicationRoundType };
   applications: Application[];
 };
 

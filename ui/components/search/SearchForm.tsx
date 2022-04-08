@@ -13,12 +13,8 @@ import {
 } from "../../modules/util";
 import { emptyOption, participantCountOptions } from "../../modules/const";
 import { MediumButton, truncatedText } from "../../styles/util";
-import {
-  ApplicationRound,
-  OptionType,
-  StringParameter,
-} from "../../modules/types";
-import { Query } from "../../modules/gql-types";
+import { OptionType, StringParameter } from "../../modules/types";
+import { ApplicationRoundType, Query } from "../../modules/gql-types";
 import MultiSelectDropdown from "../form/MultiselectDropdown";
 import {
   SEARCH_FORM_PARAMS_PURPOSE,
@@ -30,7 +26,7 @@ type Props = {
   onSearch: (search: Record<string, string>) => void;
   formValues: { [key: string]: string };
   removeValue: (key?: string[]) => void;
-  applicationRounds: ApplicationRound[];
+  applicationRounds: ApplicationRoundType[];
 };
 
 const Container = styled.div`
@@ -155,8 +151,8 @@ const SearchForm = ({
 
   const applicationPeriodOptions = useMemo(() => {
     return applicationRounds.map((applicationRound) => ({
-      value: applicationRound.id,
-      label: applicationRound.name,
+      value: applicationRound.pk,
+      label: getTranslation(applicationRound, "name"),
     }));
   }, [applicationRounds]);
 
@@ -221,11 +217,12 @@ const SearchForm = ({
           onChange={(selection: OptionType): void => {
             setValue("applicationRound", selection.value);
           }}
-          value={getSelectedOption(
+          defaultValue={getSelectedOption(
             getValues("applicationRound"),
             applicationPeriodOptions
           )}
           label={t("searchForm:roundLabel")}
+          key={`minPersons${getValues("applicationRound")}`}
         />
         <TextInput
           id="search"

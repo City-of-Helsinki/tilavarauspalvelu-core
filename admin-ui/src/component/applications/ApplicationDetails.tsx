@@ -246,7 +246,7 @@ function ApplicationDetails(): JSX.Element | null {
             </H2>
             <PreCard>
               {t("Application.applicationReceivedTime")}{" "}
-              {formatDate(application.createdDate, "d.M.yyyy")}
+              {formatDate(application.lastModifiedDate, "d.M.yyyy HH:mm")}
             </PreCard>
             <Card
               theme={{
@@ -267,7 +267,7 @@ function ApplicationDetails(): JSX.Element | null {
                   <KV k={t("common.homeCity")} v={homeCity?.name} />
                   <KV
                     k={t("Application.coreActivity")}
-                    v={application.additionalInformation}
+                    v={application.organisation?.coreBusiness || "-"}
                   />
                 </DefinitionList>
                 <DefinitionList>
@@ -370,31 +370,41 @@ function ApplicationDetails(): JSX.Element | null {
                               <StyledH5>
                                 {t("ApplicationEvent.primarySchedules")}
                               </StyledH5>
-                              {weekdays.map((day, index) => (
-                                <EventSchedule key={day}>
-                                  <strong>{t(`calendar.${day}`)}</strong>,{" "}
-                                  {parseApplicationEventSchedules(
+                              {weekdays.map((day, index) => {
+                                const schedulesTxt =
+                                  parseApplicationEventSchedules(
                                     applicationEvent.applicationEventSchedules,
                                     index,
                                     300
-                                  ) || t("ApplicationEvent.noSchedule")}
-                                </EventSchedule>
-                              ))}
+                                  );
+
+                                return (
+                                  <EventSchedule key={day}>
+                                    <strong>{t(`calendar.${day}`)}</strong>
+                                    {schedulesTxt ? `,${schedulesTxt}` : ""}
+                                  </EventSchedule>
+                                );
+                              })}
                             </div>
                             <div>
                               <StyledH5>
                                 {t("ApplicationEvent.secondarySchedules")}
                               </StyledH5>
-                              {weekdays.map((day, index) => (
-                                <EventSchedule key={day}>
-                                  <strong>{t(`calendar.${day}`)}</strong>,{" "}
-                                  {parseApplicationEventSchedules(
+                              {weekdays.map((day, index) => {
+                                const schedulesTxt =
+                                  parseApplicationEventSchedules(
                                     applicationEvent.applicationEventSchedules,
                                     index,
                                     200
-                                  ) || t("ApplicationEvent.noSchedule")}
-                                </EventSchedule>
-                              ))}
+                                  );
+
+                                return (
+                                  <EventSchedule key={day}>
+                                    <strong>{t(`calendar.${day}`)}</strong>
+                                    {schedulesTxt ? `,${schedulesTxt}` : ""}
+                                  </EventSchedule>
+                                );
+                              })}
                             </div>
                           </SchedulesCardContainer>
                         </Card>
@@ -421,13 +431,17 @@ function ApplicationDetails(): JSX.Element | null {
                 value={application.organisation?.name}
               />
               <ValueBox
-                label={t("Application.headings.additionalInformation")}
-                value={application.additionalInformation}
+                label={t("Application.coreActivity")}
+                value={application.organisation?.coreBusiness}
               />
               <ValueBox label={t("common.homeCity")} value={homeCity?.name} />
               <ValueBox
                 label={t("Application.identificationNumber")}
                 value={application.organisation?.identifier}
+              />
+              <ValueBox
+                label={t("Application.headings.additionalInformation")}
+                value={application.additionalInformation}
               />
             </EventProps>
             <H4>{t("Application.contactPersonInformation")}</H4>

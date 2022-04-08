@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Container, IconArrowRight } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
@@ -6,14 +6,18 @@ import Link from "next/link";
 import styled from "styled-components";
 import { parseISO } from "date-fns";
 import Card from "../common/Card";
-import { ApplicationRound } from "../../modules/types";
-import { applicationRoundState, searchUrl } from "../../modules/util";
+import {
+  applicationRoundState,
+  getTranslation,
+  searchUrl,
+} from "../../modules/util";
 import { breakpoint } from "../../modules/style";
 import { MediumButton } from "../../styles/util";
 import { fontMedium, H4 } from "../../modules/style/typography";
+import { ApplicationRoundType } from "../../modules/gql-types";
 
 interface Props {
-  applicationRound: ApplicationRound;
+  applicationRound: ApplicationRoundType;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -79,10 +83,15 @@ const ApplicationRoundCard = ({ applicationRound }: Props): JSX.Element => {
     applicationRound.applicationPeriodEnd
   );
 
+  const name = useMemo(
+    () => getTranslation(applicationRound, "name"),
+    [applicationRound]
+  );
+
   return (
-    <StyledCard aria-label={applicationRound.name} border>
+    <StyledCard aria-label={name} border>
       <StyledContainer>
-        <Name>{applicationRound.name}</Name>
+        <Name>{name}</Name>
         <div>
           {state === "pending" &&
             t("applicationRound:card.pending", {
@@ -100,7 +109,7 @@ const ApplicationRoundCard = ({ applicationRound }: Props): JSX.Element => {
             })}
         </div>
         {state !== "past" && (
-          <Link href={`/criteria/${applicationRound.id}`} passHref>
+          <Link href={`/criteria/${applicationRound.pk}`} passHref>
             <StyledLink>
               <IconArrowRight />
               {t("applicationRound:card.criteria")}
@@ -111,7 +120,7 @@ const ApplicationRoundCard = ({ applicationRound }: Props): JSX.Element => {
       {state === "active" && (
         <CardButton
           onClick={() =>
-            history.push(searchUrl({ applicationRound: applicationRound.id }))
+            history.push(searchUrl({ applicationRound: applicationRound.pk }))
           }
         >
           {t("application:Intro.startNewApplication")}

@@ -5,22 +5,20 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { TFunction } from "next-i18next";
-import {
-  getApplicationRounds,
-  getApplications,
-  getCurrentUser,
-} from "../modules/api";
-import {
-  Application,
-  ApplicationRound,
-  ReducedApplicationStatus,
-  User,
-} from "../modules/types";
+import { getApplications, getCurrentUser } from "../modules/api";
+import { Application, ReducedApplicationStatus, User } from "../modules/types";
 import { getReducedApplicationStatus } from "../modules/util";
 import Head from "../components/applications/Head";
 import ApplicationsGroup from "../components/applications/ApplicationsGroup";
 import RequireAuthentication from "../components/common/RequireAuthentication";
 import { CenterSpinner } from "../components/common/common";
+import apolloClient from "../modules/apolloClient";
+import {
+  ApplicationRoundType,
+  Query,
+  QueryApplicationRoundsArgs,
+} from "../modules/gql-types";
+import { APPLICATION_ROUNDS } from "../modules/queries/applicationRound";
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
@@ -53,7 +51,7 @@ function ApplicationGroups({
   applications,
   t,
 }: {
-  rounds: { [key: number]: ApplicationRound };
+  rounds: { [key: number]: ApplicationRoundType };
   applications: { [key: string]: Application[] };
   t: TFunction;
 }): JSX.Element {
@@ -110,11 +108,19 @@ const Applications = (): JSX.Element => {
 
   useEffect(() => {
     const fetchRounds = async () => {
-      const data = await getApplicationRounds();
+      const { data } = await apolloClient.query<
+        Query,
+        QueryApplicationRoundsArgs
+      >({
+        query: APPLICATION_ROUNDS,
+      });
+      const applicationRounds = data.applicationRounds?.edges?.map(
+        (n) => n.node
+      );
       setRounds(
-        data.reduce((prev, current) => {
-          return { ...prev, [current.id]: current };
-        }, {} as { [key: number]: ApplicationRound })
+        applicationRounds.reduce((prev, current) => {
+          return { ...prev, [current.pk]: current };
+        }, {} as { [key: number]: ApplicationRoundType })
       );
     };
 

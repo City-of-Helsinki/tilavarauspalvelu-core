@@ -15,7 +15,6 @@ import {
   Action,
   Application,
   ApplicationEvent as ApplicationEventType,
-  ApplicationRound,
   EditorState,
   LocalizationLanguages,
   OptionType,
@@ -33,12 +32,15 @@ import { CheckboxWrapper } from "../common/common";
 import ApplicationEventSummary from "./ApplicationEventSummary";
 import ControlledSelect from "../common/ControlledSelect";
 import Accordion from "../common/Accordion";
-import { durationOptions } from "../../modules/const";
+import { getDurationOptions } from "../../modules/const";
 import { after, before } from "../../modules/validation";
 import ConfirmationModal, { ModalRef } from "../common/ConfirmationModal";
 import { MediumButton } from "../../styles/util";
 import { fontRegular, H5 } from "../../modules/style/typography";
-import { ReservationUnitType } from "../../modules/gql-types";
+import {
+  ApplicationRoundType,
+  ReservationUnitType,
+} from "../../modules/gql-types";
 
 type OptionTypes = {
   ageGroupOptions: OptionType[];
@@ -51,7 +53,7 @@ type OptionTypes = {
 type Props = {
   applicationEvent: ApplicationEventType;
   index: number;
-  applicationRound: ApplicationRound;
+  applicationRound: ApplicationRoundType;
   form: ReturnType<typeof useForm>;
   selectedReservationUnits: ReservationUnitType[];
   optionTypes: OptionTypes;
@@ -419,7 +421,7 @@ const ApplicationEvent = ({
             required
             label={t("application:Page1.minDuration")}
             control={form.control}
-            options={durationOptions}
+            options={getDurationOptions()}
             error={applicationErrorText(
               t,
               form.errors.applicationEvents?.[index]?.minDuration?.type
@@ -442,7 +444,7 @@ const ApplicationEvent = ({
             required
             label={t("application:Page1.maxDuration")}
             control={form.control}
-            options={durationOptions}
+            options={getDurationOptions()}
             error={applicationErrorText(
               t,
               form.errors.applicationEvents?.[index]?.maxDuration?.type

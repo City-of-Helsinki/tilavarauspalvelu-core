@@ -1,3 +1,4 @@
+import { i18n } from "next-i18next";
 import getConfig from "next/config";
 import { OptionType } from "./types";
 
@@ -67,24 +68,29 @@ const option = (label: string, value: string): OptionType => {
 
 const formatNumber = (n: number): string => `00${n}`.slice(-2);
 
-export const durationOptions = [] as OptionType[];
-
-let h = 1;
-let m = 30;
-
-for (let i = 0; i < 35; i += 1) {
-  durationOptions.push(
-    option(
-      `${h} ${h === 1 ? "tunti" : "tuntia"} ${m ? `${m} min` : ""}`,
-      `${formatNumber(h)}:${formatNumber(m)}:00`
-    )
-  );
-  m += 15;
-  if (m === 60) {
-    m = 0;
-    h += 1;
+export const getDurationOptions = (): OptionType[] => {
+  const result = [] as OptionType[];
+  let h = 1;
+  let m = 30;
+  for (let i = 0; i < 35; i += 1) {
+    result.push(
+      option(
+        `${i18n.t("common:abbreviations.hour", { count: h })} ${
+          m ? `${i18n.t("common:abbreviations.minute", { count: m })}` : ""
+        }`,
+        `${formatNumber(h)}:${formatNumber(m)}:00`
+      )
+    );
+    m += 15;
+    if (m === 60) {
+      m = 0;
+      h += 1;
+    }
   }
-}
+
+  return result;
+};
+
 export const defaultDuration = "01:30:00";
 
 export const isBrowser = typeof window !== "undefined";

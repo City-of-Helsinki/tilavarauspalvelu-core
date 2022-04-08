@@ -13,7 +13,7 @@ import Link from "next/link";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@apollo/client";
 import styled from "styled-components";
-import { ApplicationRound, OptionType } from "../../modules/types";
+import { OptionType } from "../../modules/types";
 import { breakpoint } from "../../modules/style";
 import { reservationUnitPath } from "../../modules/const";
 import {
@@ -25,6 +25,7 @@ import IconWithText from "../common/IconWithText";
 import { MediumButton, pixel } from "../../styles/util";
 import { fontMedium } from "../../modules/style/typography";
 import {
+  ApplicationRoundType,
   Query,
   QueryReservationUnitsArgs,
   ReservationUnitType,
@@ -280,7 +281,7 @@ const ReservationUnitModal = ({
   currentReservationUnits,
   options,
 }: {
-  applicationRound: ApplicationRound;
+  applicationRound: ApplicationRoundType;
   handleAdd: (ru: ReservationUnitType) => void;
   handleRemove: (ru: ReservationUnitType) => void;
   currentReservationUnits: ReservationUnitType[];
@@ -325,9 +326,11 @@ const ReservationUnitModal = ({
   useEffect(() => {
     const reservationUnits = data?.reservationUnits.edges
       .map((n) => n.node)
-      .filter((n) => applicationRound.reservationUnitIds.includes(n.pk));
+      .filter((n) =>
+        applicationRound.reservationUnits.map((ru) => ru.pk).includes(n.pk)
+      );
     setResults(reservationUnits);
-  }, [data, applicationRound.reservationUnitIds]);
+  }, [data, applicationRound.reservationUnits]);
 
   const emptyResult = results?.length === 0 && (
     <div>{t("common:noResults")}</div>
@@ -336,7 +339,7 @@ const ReservationUnitModal = ({
   return (
     <MainContainer>
       <Heading>{t("reservationUnitModal:heading")}</Heading>
-      <Text>{applicationRound.name}</Text>
+      <Text>{getTranslation(applicationRound, "name")}</Text>
       <Filters>
         <TextInput
           id="reservationUnitSearch.search"
