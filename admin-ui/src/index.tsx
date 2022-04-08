@@ -1,5 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import { Redirect } from "react-router-dom";
 import {
   oidcLog,
   AuthenticationProvider,
@@ -14,6 +15,7 @@ import Authenticating from "./component/Authentication/Authenticating";
 import AuthorizationNeeded from "./component/Authentication/AuthorizationNeeded";
 import { authEnabled } from "./common/const";
 import MainLander from "./component/MainLander";
+import CustomUserStore from "./common/auth/CustomUserStore";
 
 const dsn = process.env.REACT_APP_SENTRY_DSN;
 const environment = process.env.REACT_APP_SENTRY_ENVIRONMENT;
@@ -30,7 +32,7 @@ if (dsn) {
 ReactDOM.render(
   <React.StrictMode>
     <AuthenticationProvider
-      notAuthenticated={() => <MainLander withSiteWrapper />}
+      notAuthenticated={() => <Redirect to="/" />}
       notAuthorized={() => <AuthorizationNeeded />}
       authenticating={() => <Authenticating noNavigation />}
       configuration={oidcConfiguration}
@@ -38,6 +40,7 @@ ReactDOM.render(
       isEnabled={authEnabled}
       callbackComponentOverride={() => <Authenticating />}
       sessionLostComponent={() => <MainLander withSiteWrapper />}
+      UserStore={CustomUserStore}
     >
       <App />
     </AuthenticationProvider>

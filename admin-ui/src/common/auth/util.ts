@@ -1,25 +1,17 @@
 import axios from "axios";
-import { oidcUrl, oidcClientId, apiScope } from "../const";
+import CustomUserStore from "./CustomUserStore";
+import { oidcUrl, apiScope } from "../const";
+
+const apiAccessTokenStorage = localStorage;
 
 export const getApiAccessToken = (): string | null =>
-  sessionStorage.getItem(`oidc.apiToken.${apiScope}`);
+  apiAccessTokenStorage.getItem(`oidc.apiToken.${apiScope}`);
 
 export const setApiAccessToken = (accessToken: string): void =>
-  sessionStorage.setItem(`oidc.apiToken.${apiScope}`, accessToken);
+  apiAccessTokenStorage.setItem(`oidc.apiToken.${apiScope}`, accessToken);
 
 export const getAccessToken = (): string | undefined => {
-  const key = `oidc.user:${oidcUrl}/:${oidcClientId}`;
-  const data = sessionStorage.getItem(key);
-
-  if (data) {
-    try {
-      const parsed = JSON.parse(data);
-      return parsed.access_token;
-    } catch (Exception) {
-      return undefined;
-    }
-  }
-  return undefined;
+  return new CustomUserStore().getAccessToken();
 };
 
 export const updateApiAccessToken = async (
@@ -47,6 +39,14 @@ export const updateApiAccessToken = async (
   setApiAccessToken(apiAccessToken);
 
   return apiAccessToken;
+};
+
+export const localLogout = () => {
+  Object.keys(apiAccessTokenStorage).forEach((key) => {
+    if (key != null && key.startsWith("oidc.api")) {
+      apiAccessTokenStorage.removeItem(key);
+    }
+  });
 };
 
 // XXX, TODO, some apis (for example reservationUnitCancellationRules)

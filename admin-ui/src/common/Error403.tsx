@@ -4,6 +4,7 @@ import React from "react";
 import styled from "styled-components";
 import { H1 } from "../styles/new-typography";
 import { breakpoints } from "../styles/util";
+import { localLogout } from "./auth/util";
 
 const Wrapper = styled.div`
   margin: 0 var(--spacing-s);
@@ -36,7 +37,7 @@ const Content = styled.div`
 
 const Image = styled.img`
   width: 100%;
-  max-width: 600px;
+  max-width: 400px;
   @media (min-width: ${breakpoints.l}) {
     width: auto;
   }
@@ -47,7 +48,7 @@ const ButtonContainer = styled.div`
 `;
 
 const Error403 = (): JSX.Element => {
-  const { logout } = useReactOidc();
+  const { oidcUser, logout } = useReactOidc();
 
   return (
     <Wrapper>
@@ -69,9 +70,18 @@ const Error403 = (): JSX.Element => {
         >
           Anna palautetta
         </Link>
-        <ButtonContainer>
-          <Button onClick={() => logout()}>Kirjaudu ulos</Button>
-        </ButtonContainer>
+        {oidcUser && (
+          <ButtonContainer>
+            <Button
+              onClick={() => {
+                localLogout();
+                logout();
+              }}
+            >
+              Kirjaudu ulos
+            </Button>
+          </ButtonContainer>
+        )}
       </Content>
       <Image src="/403.png" />
     </Wrapper>

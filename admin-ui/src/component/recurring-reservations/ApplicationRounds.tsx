@@ -10,12 +10,14 @@ import HeroImage from "../../images/hero-user@1x.jpg";
 import { H1, H2 } from "../../styles/typography";
 import { WideContainer, IngressContainer } from "../../styles/layout";
 import { ApplicationRound as ApplicationRoundType } from "../../common/types";
-import { getApplicationRounds, getCurrentUser } from "../../common/api";
+import { getApplicationRounds } from "../../common/api";
+
 import Loader from "../Loader";
 import { NotificationBox } from "../../styles/util";
 import { applicationRoundUrl, prefixes } from "../../common/urls";
 import { useNotification } from "../../context/NotificationContext";
-import Error403 from "../../common/403";
+import { useData } from "../../context/DataContext";
+import Error403 from "../../common/Error403";
 
 const Wrapper = styled.div``;
 
@@ -40,7 +42,7 @@ const Deck = styled.div`
 `;
 
 function ApplicationRounds(): JSX.Element {
-  const [permissions, setPermissions] = useState<boolean>();
+  const { hasAnyPermissions } = useData();
   const { notifyError } = useNotification();
   const [isLoading, setIsLoading] = useState(true);
   const [applicationRounds, setApplicationRounds] = useState<
@@ -69,17 +71,7 @@ function ApplicationRounds(): JSX.Element {
       }
     };
 
-    getCurrentUser()
-      .then((cu) => {
-        const hasSomePermissions =
-          cu.generalRoles.length > 0 ||
-          cu.serviceSectorRoles.length > 0 ||
-          cu.unitRoles.length > 0 ||
-          cu.isSuperuser;
-        setPermissions(hasSomePermissions);
-        fetchApplicationRound();
-      })
-      .catch(() => setPermissions(false));
+    fetchApplicationRound();
   }, [notifyError]);
 
   const isWaitingForApproval = (
@@ -96,11 +88,11 @@ function ApplicationRounds(): JSX.Element {
     )
   );
 
-  if (permissions === false) {
+  if (hasAnyPermissions() === false) {
     return <Error403 />;
   }
 
-  if (isLoading || permissions === undefined) {
+  if (isLoading) {
     return <Loader />;
   }
 
