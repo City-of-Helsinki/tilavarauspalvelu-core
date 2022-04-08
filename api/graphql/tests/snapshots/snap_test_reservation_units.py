@@ -7,6 +7,39 @@ from snapshottest import Snapshot
 
 snapshots = Snapshot()
 
+snapshots['ReservationUnitQueryTestCase::test_filter_by_pk_multiple_values 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'nameFi': 'Second unit'
+                    }
+                },
+                {
+                    'node': {
+                        'nameFi': 'test name fi'
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitQueryTestCase::test_filter_by_pk_single_value 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'nameFi': 'test name fi'
+                    }
+                }
+            ]
+        }
+    }
+}
+
 snapshots['ReservationUnitQueryTestCase::test_filtering_by_active_application_rounds 1'] = {
     'data': {
         'reservationUnits': {
@@ -157,12 +190,12 @@ snapshots['ReservationUnitQueryTestCase::test_filtering_by_multiple_application_
             'edges': [
                 {
                     'node': {
-                        'nameFi': 'Reservation unit',
+                        'nameFi': 'Reservation unit'
                     }
                 },
                 {
                     'node': {
-                        'nameFi': 'The Other reservation unit',
+                        'nameFi': 'The Other reservation unit'
                     }
                 }
             ]

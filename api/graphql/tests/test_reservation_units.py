@@ -1241,6 +1241,62 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         assert_that(content.get("errors")).is_none()
         self.assertMatchSnapshot(content)
 
+    def test_filter_by_pk_single_value(self):
+        response = self.query(
+            f"""
+            query {{
+                reservationUnits(pk: {self.reservation_unit.id}) {{
+                    edges {{
+                        node {{
+                            nameFi
+                        }}
+                    }}
+                }}
+            }}
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(self.content_is_empty(content)).is_false()
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filter_by_pk_multiple_values(self):
+        second_reservation_unit = ReservationUnitFactory(name_fi="Second unit")
+        response = self.query(
+            f"""
+            query {{
+                reservationUnits(pk: [{self.reservation_unit.id}, {second_reservation_unit.id}]) {{
+                    edges {{
+                        node {{
+                            nameFi
+                        }}
+                    }}
+                }}
+            }}
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(self.content_is_empty(content)).is_false()
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_that_filter_by_invalid_pk_returns_error(self):
+        response = self.query(
+            """
+            query {
+                reservationUnits(pk: 5) {
+                    edges {
+                        node {
+                            nameFi
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_not_empty()
+
 
 class ReservationUnitsFilterTextSearchTestCase(ReservationUnitQueryTestCaseBase):
     def test_filtering_by_type_fi(self):
