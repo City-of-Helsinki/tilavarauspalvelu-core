@@ -166,6 +166,8 @@ export const getServerSideProps: GetServerSideProps = async ({
         query: RELATED_RESERVATION_UNITS,
         variables: {
           unit: [String(reservationUnitData.reservationUnitByPk.unit.pk)],
+          isDraft: false,
+          isVisible: true,
         },
       });
 

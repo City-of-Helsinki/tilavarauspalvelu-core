@@ -191,8 +191,12 @@ export const RESERVATION_UNITS = gql`
 `;
 
 export const RELATED_RESERVATION_UNITS = gql`
-  query RelatedReservationUnits($unit: [ID]!) {
-    reservationUnits(unit: $unit) {
+  query RelatedReservationUnits(
+    $unit: [ID]!
+    $isDraft: Boolean
+    $isVisible: Boolean
+  ) {
+    reservationUnits(unit: $unit, isDraft: $isDraft, isVisible: $isVisible) {
       edges {
         node {
           id
@@ -222,6 +226,9 @@ export const RELATED_RESERVATION_UNITS = gql`
             nameSv
           }
           maxPersons
+          publishBegins
+          publishEnds
+          isDraft
         }
       }
     }
