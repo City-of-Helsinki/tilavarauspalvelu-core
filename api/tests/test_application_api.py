@@ -752,10 +752,32 @@ def test_unit_admin_can_view_application(
 
 
 @pytest.mark.django_db
-def test_unit_admin_cant_view_application(
+def test_unit_group_admin_can_view_application(
+    unit_group_admin_api_client, application, event_reservation_unit
+):
+    response = unit_group_admin_api_client.get(
+        reverse("application-detail", kwargs={"pk": application.id}),
+        format="json",
+    )
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_unit_admin_cant_view_application_not_for_unit(
     unit_admin_api_client, application2, event_reservation_unit_too
 ):
     response = unit_admin_api_client.get(
+        reverse("application-detail", kwargs={"pk": application2.id}),
+        format="json",
+    )
+    assert response.status_code == 404
+
+
+@pytest.mark.django_db
+def test_unit_group_admin_cant_view_application_not_for_unit_group(
+    unit_group_admin_api_client, application2, event_reservation_unit_too
+):
+    response = unit_group_admin_api_client.get(
         reverse("application-detail", kwargs={"pk": application2.id}),
         format="json",
     )
@@ -771,6 +793,24 @@ def test_unit_admin_sees_only_application_for_unit(
     event_reservation_unit_too,
 ):
     response = unit_admin_api_client.get(
+        reverse("application-list"),
+        format="json",
+    )
+    data = json.loads(response.content)
+    assert response.status_code == 200
+    assert len(data) == 1
+    assert data[0]["id"] == application.id
+
+
+@pytest.mark.django_db
+def test_unit_group_admin_sees_only_application_for_unit(
+    unit_group_admin_api_client,
+    application,
+    event_reservation_unit,
+    application2,
+    event_reservation_unit_too,
+):
+    response = unit_group_admin_api_client.get(
         reverse("application-list"),
         format="json",
     )
@@ -1055,6 +1095,27 @@ def test_application_status_set_sent_from_draft_fails(
     )
 
     assert response.status_code == 400
+    application.refresh_from_db()
+    assert application.status == ApplicationStatus.DRAFT
+
+
+@freeze_time("2021-01-29")
+@pytest.mark.django_db
+def test_application_status_set_draft_from_in_review_success(
+    user_api_client, application, valid_application_data
+):
+    assert Application.objects.count() == 1
+    application.set_status(ApplicationStatus.IN_REVIEW)
+    application.refresh_from_db()
+    valid_application_data["status"] = ApplicationStatus.DRAFT
+
+    response = user_api_client.put(
+        reverse("application-detail", kwargs={"pk": application.id}),
+        data=valid_application_data,
+        format="json",
+    )
+
+    assert response.status_code == 200
     application.refresh_from_db()
     assert application.status == ApplicationStatus.DRAFT
 
