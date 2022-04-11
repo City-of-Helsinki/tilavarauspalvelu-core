@@ -320,6 +320,7 @@ const ReservationUnitModal = ({
         isVisible: true,
       },
       notifyOnNetworkStatusChange: true,
+      fetchPolicy: "no-cache",
     }
   );
 
