@@ -823,9 +823,12 @@ def unit_group_admin(unit_group):
         email="amin.ug@foo.com",
     )
 
-    unit_role = UnitRole.objects.create(
-        user=user, role=UnitRoleChoice.objects.get(code="admin")
+    admin_role_choice = UnitRoleChoice.objects.get(code="admin")
+    UnitRolePermission.objects.create(
+        role=admin_role_choice, permission="can_validate_applications"
     )
+    unit_role = UnitRole.objects.create(user=user, role=admin_role_choice)
+
     unit_role.unit_group.add(unit_group)
 
     return user

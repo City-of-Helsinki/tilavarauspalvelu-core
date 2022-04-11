@@ -55,9 +55,15 @@ class ApplicationViewSet(viewsets.ModelViewSet):
         unit_ids = user.unit_roles.filter(
             role__permissions__permission="can_validate_applications"
         ).values_list("unit", flat=True)
-        units = Unit.objects.filter(id__in=unit_ids)
+        group_ids = user.unit_roles.filter(
+            role__permissions__permission="can_validate_applications"
+        ).values_list("unit_group", flat=True)
 
-        return queryset.filter(
+        units = Unit.objects.filter(
+            Q(id__in=unit_ids) | Q(unit_groups__in=group_ids)
+        ).values_list("id", flat=True)
+
+        qs = queryset.filter(
             Q(
                 application_round__service_sector__in=get_service_sectors_where_can_view_applications(
                     user
@@ -68,6 +74,7 @@ class ApplicationViewSet(viewsets.ModelViewSet):
             )
             | Q(user=user)
         ).distinct()
+        return qs
 
 
 class ApplicationEventViewSet(viewsets.ModelViewSet):
