@@ -9,12 +9,17 @@ import {
 } from "../../common/types";
 import { formatDuration } from "../../common/util";
 
-export const applicantName = (
-  application: Application | null
-): string | null | undefined =>
-  application?.applicantType === "individual"
-    ? application?.applicantName
-    : application?.organisation?.name;
+export const applicantName = (app: Application | null): string => {
+  if (app === null) {
+    return "null";
+  }
+
+  return app.applicantType === "individual"
+    ? `${app.contactPerson?.firstName || "-"} ${
+        app.contactPerson?.lastName || "-"
+      }`
+    : app.organisation?.name || "-";
+};
 
 export const getApplicationStatusColor = (
   status: ApplicationStatus,
