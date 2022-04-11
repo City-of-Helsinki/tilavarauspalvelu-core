@@ -9,7 +9,7 @@ import {
 } from "./util";
 
 const axiosOptions = {
-  timeout: 20000,
+  timeout: 30000,
   headers: {
     "Content-Type": "application/json",
   },
