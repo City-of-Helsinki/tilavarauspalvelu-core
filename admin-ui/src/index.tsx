@@ -1,6 +1,5 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { Redirect } from "react-router-dom";
 import {
   oidcLog,
   AuthenticationProvider,
@@ -32,7 +31,7 @@ if (dsn) {
 ReactDOM.render(
   <React.StrictMode>
     <AuthenticationProvider
-      notAuthenticated={() => <Redirect to="/" />}
+      notAuthenticated={() => <MainLander withSiteWrapper />}
       notAuthorized={() => <AuthorizationNeeded />}
       authenticating={() => <Authenticating noNavigation />}
       configuration={oidcConfiguration}

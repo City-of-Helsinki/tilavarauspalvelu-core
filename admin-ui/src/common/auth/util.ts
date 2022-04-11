@@ -3,6 +3,7 @@ import CustomUserStore from "./CustomUserStore";
 import { oidcUrl, apiScope } from "../const";
 
 const apiAccessTokenStorage = localStorage;
+const customUserStore = new CustomUserStore();
 
 export const getApiAccessToken = (): string | null =>
   apiAccessTokenStorage.getItem(`oidc.apiToken.${apiScope}`);
@@ -11,7 +12,7 @@ export const setApiAccessToken = (accessToken: string): void =>
   apiAccessTokenStorage.setItem(`oidc.apiToken.${apiScope}`, accessToken);
 
 export const getAccessToken = (): string | undefined => {
-  return new CustomUserStore().getAccessToken();
+  return customUserStore.getAccessToken();
 };
 
 export const updateApiAccessToken = async (
@@ -41,7 +42,7 @@ export const updateApiAccessToken = async (
   return apiAccessToken;
 };
 
-export const localLogout = () => {
+export const localLogout = (): void => {
   Object.keys(apiAccessTokenStorage).forEach((key) => {
     if (key != null && key.startsWith("oidc.api")) {
       apiAccessTokenStorage.removeItem(key);
