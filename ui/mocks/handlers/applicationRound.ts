@@ -6,6 +6,7 @@ import {
   QueryApplicationRoundsArgs,
   ReservationUnitType,
   Status,
+  ApplicationsApplicationRoundTargetGroupChoices,
 } from "../../modules/gql-types";
 import { ApplicationRound } from "../../modules/types";
 import { toApiDate } from "../../modules/util";
@@ -19,6 +20,7 @@ const applicationRoundsGQL = graphql.query<Query, QueryApplicationRoundsArgs>(
           node: {
             id: "fq02394feaw",
             pk: 2,
+            targetGroup: ApplicationsApplicationRoundTargetGroupChoices.Public,
             nameFi:
               "Ruoholahden nuorisotalon vakiovuorot syksy 2021 - kevät 2022 FI",
             nameEn:
@@ -51,6 +53,7 @@ const applicationRoundsGQL = graphql.query<Query, QueryApplicationRoundsArgs>(
           node: {
             id: "fm8q904wfj",
             pk: 3,
+            targetGroup: ApplicationsApplicationRoundTargetGroupChoices.Public,
             nameFi:
               "Jakomäen nuorisotalon vakiovuorot syksy 2021 - kevät 2022 FI",
             nameEn:
@@ -83,6 +86,7 @@ const applicationRoundsGQL = graphql.query<Query, QueryApplicationRoundsArgs>(
           node: {
             id: "fgnq8793e4airug",
             pk: 8,
+            targetGroup: ApplicationsApplicationRoundTargetGroupChoices.Public,
             nameFi:
               "Fallkullan, Malmin ja Pukinmäen nuorisotalojen vakiovuorot syksy 2021 - kevät 2022 FI",
             nameEn:
@@ -112,6 +116,7 @@ const applicationRoundsGQL = graphql.query<Query, QueryApplicationRoundsArgs>(
           node: {
             id: "fnvq9384ahwefjcd",
             pk: 9,
+            targetGroup: ApplicationsApplicationRoundTargetGroupChoices.Public,
             nameFi:
               "Nuorten ympäristötilan (Laajasalo) vakiovuorot syksy 2021 - kevät 2022 FI",
             nameEn:
@@ -147,6 +152,7 @@ const applicationRoundsGQL = graphql.query<Query, QueryApplicationRoundsArgs>(
           node: {
             id: "g9834jg8934gjh",
             pk: 7,
+            targetGroup: ApplicationsApplicationRoundTargetGroupChoices.Public,
             nameFi:
               "Hertsin nuorisotalon vakiovuorot syksy 2021 - kevät 2022 FI",
             nameEn:
@@ -182,6 +188,7 @@ const applicationRoundsGQL = graphql.query<Query, QueryApplicationRoundsArgs>(
           node: {
             id: "woeis4gjmfiogmiero",
             pk: 1,
+            targetGroup: ApplicationsApplicationRoundTargetGroupChoices.Public,
             nameFi: "Nuorten liikuntavuorot kevät 2021 FI",
             nameEn: "Nuorten liikuntavuorot kevät 2021 EN",
             nameSv: "Nuorten liikuntavuorot kevät 2021 SV",
@@ -214,6 +221,7 @@ const applicationRoundsGQL = graphql.query<Query, QueryApplicationRoundsArgs>(
           node: {
             id: "v3j45098t",
             pk: 2,
+            targetGroup: ApplicationsApplicationRoundTargetGroupChoices.Public,
             nameFi: "Toimistotilojen haku kevät 2021 FI",
             nameEn: "Toimistotilojen haku kevät 2021 EN",
             nameSv: "Toimistotilojen haku kevät 2021 SV",
@@ -246,6 +254,7 @@ const applicationRoundsGQL = graphql.query<Query, QueryApplicationRoundsArgs>(
           node: {
             id: "g083rejioadmv",
             pk: 5,
+            targetGroup: ApplicationsApplicationRoundTargetGroupChoices.Public,
             nameFi:
               "Arabian, Koskelan ja Pasilan nuorisotalojen vakiovuorot syksy 2021 - kevät 2022 FI",
             nameEn:
