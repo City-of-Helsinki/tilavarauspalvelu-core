@@ -426,10 +426,10 @@ SPECTACULAR_SETTINGS = {
 
 THUMBNAIL_ALIASES = {
     "": {
+        # Currently, all custom sized images are wanted to be cropped.
         "small": {"size": (250, 250), "crop": True},
         "medium": {"size": (384, 384), "crop": True},
-        # Large image size not to be cropped by design.
-        "large": {"size": (728, 728)},
+        "large": {"size": (728, 728), "crop": True},
     },
 }
 
