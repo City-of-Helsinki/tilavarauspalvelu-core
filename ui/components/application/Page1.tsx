@@ -169,7 +169,10 @@ const Page1 = ({
       validationErrors.filter((i) => i !== index).length === 0;
 
     if (otherEventsAreValid) {
-      const appToSave = prepareData(form.getValues() as Application);
+      const appToSave = {
+        ...prepareData(form.getValues() as Application),
+        status: "draft" as ApplicationStatus,
+      };
       appToSave.applicationEvents = appToSave.applicationEvents.filter(
         (ae) => ae.id !== eventId
       );
