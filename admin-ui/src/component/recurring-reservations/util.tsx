@@ -71,20 +71,19 @@ export const appMapper = (
     app.status,
     applicationStatusView
   );
+
+  const applicantName =
+    app.applicantType === "individual"
+      ? `${app.contactPerson?.firstName || "-"} ${
+          app.contactPerson?.lastName || "-"
+        }`
+      : app.organisation?.name || "-";
   return {
     key: `${app.id}-${eventId || "-"} `,
     id: app.id,
     eventId,
-    applicant:
-      app.applicantType === "individual"
-        ? `${app.contactPerson?.firstName || "-"} ${
-            app.contactPerson?.lastName || "-"
-          }`
-        : app.organisation?.name || "",
-    applicantSort: (app.applicantType === "individual"
-      ? app.applicantName || ""
-      : app.organisation?.name || ""
-    ).toLowerCase(),
+    applicant: applicantName,
+    applicantSort: applicantName.toLowerCase(),
     type: app.applicantType
       ? t(`Application.applicantTypes.${app.applicantType}`)
       : "",
