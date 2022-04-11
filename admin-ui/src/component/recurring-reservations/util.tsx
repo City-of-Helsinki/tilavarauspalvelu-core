@@ -77,7 +77,9 @@ export const appMapper = (
     eventId,
     applicant:
       app.applicantType === "individual"
-        ? app.applicantName || ""
+        ? `${app.contactPerson?.firstName || "-"} ${
+            app.contactPerson?.lastName || "-"
+          }`
         : app.organisation?.name || "",
     applicantSort: (app.applicantType === "individual"
       ? app.applicantName || ""
