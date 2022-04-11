@@ -45,7 +45,7 @@ const translations: ITranslations = {
     INDIVIDUAL: ["Yksityishenkilö"],
     BUSINESS: ["Yritys"],
     NONPROFIT: {
-      REGISTERED: ["Yhditys, rekisteröity"],
+      REGISTERED: ["Yhdistys, rekisteröity"],
       UNREGISTERED: ["Yhdistys, rekisteröimätön"],
     },
   },
@@ -295,7 +295,7 @@ const translations: ITranslations = {
     applicantTypes: {
       individual: ["Yksityishenkilö"],
       company: ["Yritys"],
-      community: ["Yhditys, rekisteröimäton"],
+      community: ["Yhdistys, rekisteröimäton"],
       association: ["Yhdistys, rekisteröity"],
     },
     contactPerson: ["Yhteyshenkilö"],
