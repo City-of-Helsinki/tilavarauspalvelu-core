@@ -9,6 +9,7 @@ import { useHistory } from "react-router-dom";
 import MainMenu from "./MainMenu";
 import { breakpoints, StyledHDSNavigation } from "../styles/util";
 import { authEnabled } from "../common/const";
+import { localLogout } from "../common/auth/util";
 
 interface NavigationProps {
   profile: Profile | null;
@@ -99,7 +100,10 @@ const NavigationWithProfileAndLogout = authEnabled
         <Navigation
           profile={profile}
           login={() => login()}
-          logout={() => logout()}
+          logout={() => {
+            localLogout();
+            logout();
+          }}
         />
       );
     }
