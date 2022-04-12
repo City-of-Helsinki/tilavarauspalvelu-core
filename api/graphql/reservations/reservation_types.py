@@ -186,6 +186,7 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
             "tax_percentage_value",
             "price",
             "working_memo",
+            "cancel_details",
         ]
         filter_fields = {
             "state": ["exact"],
@@ -240,6 +241,70 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
         ):
             return self.working_memo
         return None
+
+    @reservation_non_public_field
+    def resolve_reservee_email(self, info: ResolveInfo) -> Optional[str]:
+        return self.reservee_email
+
+    @reservation_non_public_field
+    def resolve_reservee_address_street(self, info: ResolveInfo) -> Optional[str]:
+        return self.reservee_address_street
+
+    @reservation_non_public_field
+    def resolve_reservee_address_city(self, info: ResolveInfo) -> Optional[str]:
+        return self.reservee_address_city
+
+    @reservation_non_public_field
+    def resolve_reservee_address_zip(self, info: ResolveInfo) -> Optional[str]:
+        return self.reservee_address_zip
+
+    @reservation_non_public_field
+    def resolve_reservee_organisation_name(self, info: ResolveInfo) -> Optional[str]:
+        return self.reservee_organisation_name
+
+    @reservation_non_public_field
+    def resolve_free_of_charge_reason(self, info: ResolveInfo) -> Optional[str]:
+        return self.free_of_charge_reason
+
+    @reservation_non_public_field
+    def resolve_billing_first_name(self, info: ResolveInfo) -> Optional[str]:
+        return self.billing_first_name
+
+    @reservation_non_public_field
+    def resolve_billing_last_name(self, info: ResolveInfo) -> Optional[str]:
+        return self.billing_last_name
+
+    @reservation_non_public_field
+    def resolve_billing_address_street(self, info: ResolveInfo) -> Optional[str]:
+        return self.billing_address_street
+
+    @reservation_non_public_field
+    def resolve_billing_address_city(self, info: ResolveInfo) -> Optional[str]:
+        return self.billing_address_city
+
+    @reservation_non_public_field
+    def resolve_billing_address_zip(self, info: ResolveInfo) -> Optional[str]:
+        return self.billing_address_zip
+
+    @reservation_non_public_field
+    def resolve_billing_phone(self, info: ResolveInfo) -> Optional[str]:
+        return self.billing_phone
+
+    @reservation_non_public_field
+    def resolve_billing_email(self, info: ResolveInfo) -> Optional[str]:
+        return self.billing_email
+
+    @reservation_non_public_field
+    def resolve_description(self, info: ResolveInfo) -> Optional[str]:
+        return self.description
+
+    @reservation_non_public_field
+    def resolve_reservee_id(self, info: ResolveInfo) -> Optional[str]:
+        return self.reservee_id
+
+    @reservation_non_public_field
+    def resolve_cancel_details(self, info: ResolveInfo) -> Optional[str]:
+        return self.cancel_details
 
 
 class ReservationCancelReasonType(AuthNode, PrimaryKeyObjectType):
