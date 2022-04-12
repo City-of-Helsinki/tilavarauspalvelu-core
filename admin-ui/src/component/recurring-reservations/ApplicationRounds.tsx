@@ -3,18 +3,21 @@ import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { AxiosError } from "axios";
 import { useReactOidc } from "@axa-fr/react-oidc-context";
-import { Notification } from "hds-react";
 import KorosHeading, { Heading as KorosKorosHeading } from "../KorosHeading";
-import withMainMenu from "../withMainMenu";
+import { MainMenuWrapper } from "../withMainMenu";
 import ApplicationRoundCard from "./ApplicationRoundCard";
 import HeroImage from "../../images/hero-user@1x.jpg";
 import { H1, H2 } from "../../styles/typography";
 import { WideContainer, IngressContainer } from "../../styles/layout";
 import { ApplicationRound as ApplicationRoundType } from "../../common/types";
 import { getApplicationRounds } from "../../common/api";
+
 import Loader from "../Loader";
 import { NotificationBox } from "../../styles/util";
 import { applicationRoundUrl, prefixes } from "../../common/urls";
+import { useNotification } from "../../context/NotificationContext";
+import { useData } from "../../context/DataContext";
+import Error403 from "../../common/Error403";
 
 const Wrapper = styled.div``;
 
@@ -39,11 +42,12 @@ const Deck = styled.div`
 `;
 
 function ApplicationRounds(): JSX.Element {
+  const { hasAnyPermissions } = useData();
+  const { notifyError } = useNotification();
   const [isLoading, setIsLoading] = useState(true);
   const [applicationRounds, setApplicationRounds] = useState<
     ApplicationRoundType[] | null
   >(null);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const { t } = useTranslation();
   const { oidcUser } = useReactOidc();
@@ -51,7 +55,6 @@ function ApplicationRounds(): JSX.Element {
 
   useEffect(() => {
     const fetchApplicationRound = async () => {
-      setErrorMsg(null);
       setIsLoading(true);
 
       try {
@@ -63,13 +66,13 @@ function ApplicationRounds(): JSX.Element {
           (error as AxiosError).response?.status === 404
             ? "errors.applicationRoundNotFound"
             : "errors.errorFetchingData";
-        setErrorMsg(msg);
+        notifyError(msg);
         setIsLoading(false);
       }
     };
 
     fetchApplicationRound();
-  }, []);
+  }, [notifyError]);
 
   const isWaitingForApproval = (
     applicationRound: ApplicationRoundType
@@ -85,6 +88,10 @@ function ApplicationRounds(): JSX.Element {
     )
   );
 
+  if (hasAnyPermissions() === false) {
+    return <Error403 />;
+  }
+
   if (isLoading) {
     return <Loader />;
   }
@@ -95,86 +102,74 @@ function ApplicationRounds(): JSX.Element {
   }
 
   return (
-    <Wrapper>
-      <KorosHeading heroImage={HeroImage}>
-        <KorosKorosHeading>{headingStr}!</KorosKorosHeading>
-      </KorosHeading>
-      <Ingress>{t("MainLander.ingress")}</Ingress>
-      {approveRounds && approveRounds.length > 0 && (
-        <Deck>
-          <IngressContainer>
-            <Heading>{t("ApplicationRound.listApprovalTitle")}</Heading>
-            <RoundTypeIngress>
-              {t("ApplicationRound.listApprovalIngress", {
-                count: approveRounds.length,
+    <MainMenuWrapper>
+      <Wrapper>
+        <KorosHeading heroImage={HeroImage}>
+          <KorosKorosHeading>{headingStr}!</KorosKorosHeading>
+        </KorosHeading>
+        <Ingress>{t("MainLander.ingress")}</Ingress>
+        {approveRounds && approveRounds.length > 0 && (
+          <Deck>
+            <IngressContainer>
+              <Heading>{t("ApplicationRound.listApprovalTitle")}</Heading>
+              <RoundTypeIngress>
+                {t("ApplicationRound.listApprovalIngress", {
+                  count: approveRounds.length,
+                })}
+              </RoundTypeIngress>
+            </IngressContainer>
+            <WideContainer>
+              {approveRounds.map((applicationRound) => {
+                return (
+                  <ApplicationRoundCard
+                    applicationRound={applicationRound}
+                    key={applicationRound.id}
+                    getRoute={(id) => {
+                      return applicationRound.isAdmin
+                        ? `${prefixes.recurringReservations}/decisions/${id}/approval`
+                        : applicationRoundUrl(id);
+                    }}
+                  />
+                );
               })}
-            </RoundTypeIngress>
-          </IngressContainer>
-          <WideContainer>
-            {approveRounds.map((applicationRound) => {
-              return (
-                <ApplicationRoundCard
-                  applicationRound={applicationRound}
-                  key={applicationRound.id}
-                  getRoute={(id) => {
-                    return applicationRound.isAdmin
-                      ? `${prefixes.recurringReservations}/decisions/${id}/approval`
-                      : applicationRoundUrl(id);
-                  }}
-                />
-              );
-            })}
-          </WideContainer>
-        </Deck>
-      )}
-      {handleRounds && (
-        <Deck>
-          <IngressContainer>
-            <Heading>{t("ApplicationRound.listHandlingTitle")}</Heading>
-            <RoundTypeIngress>
-              {t(
-                `ApplicationRound.listHandlingIngress${
-                  handleRounds.length === 0 ? "Empty" : ""
-                }`,
-                {
-                  count: handleRounds.length,
-                }
+            </WideContainer>
+          </Deck>
+        )}
+        {handleRounds && (
+          <Deck>
+            <IngressContainer>
+              <Heading>{t("ApplicationRound.listHandlingTitle")}</Heading>
+              <RoundTypeIngress>
+                {t(
+                  `ApplicationRound.listHandlingIngress${
+                    handleRounds.length === 0 ? "Empty" : ""
+                  }`,
+                  {
+                    count: handleRounds.length,
+                  }
+                )}
+              </RoundTypeIngress>
+            </IngressContainer>
+            <WideContainer>
+              {handleRounds.length > 0 ? (
+                handleRounds.map((applicationRound) => (
+                  <ApplicationRoundCard
+                    applicationRound={applicationRound}
+                    key={applicationRound.id}
+                    getRoute={applicationRoundUrl}
+                  />
+                ))
+              ) : (
+                <NotificationBox>
+                  {t("ApplicationRound.listHandlingPlaceholder")}
+                </NotificationBox>
               )}
-            </RoundTypeIngress>
-          </IngressContainer>
-          <WideContainer>
-            {handleRounds.length > 0 ? (
-              handleRounds.map((applicationRound) => (
-                <ApplicationRoundCard
-                  applicationRound={applicationRound}
-                  key={applicationRound.id}
-                  getRoute={applicationRoundUrl}
-                />
-              ))
-            ) : (
-              <NotificationBox>
-                {t("ApplicationRound.listHandlingPlaceholder")}
-              </NotificationBox>
-            )}
-          </WideContainer>
-        </Deck>
-      )}
-      {errorMsg && (
-        <Notification
-          type="error"
-          label={t("errors.functionFailed")}
-          position="top-center"
-          autoClose={false}
-          dismissible
-          closeButtonLabelText={t("common.close")}
-          displayAutoCloseProgress={false}
-          onClose={() => setErrorMsg(null)}
-        >
-          {t(errorMsg)}
-        </Notification>
-      )}
-    </Wrapper>
+            </WideContainer>
+          </Deck>
+        )}
+      </Wrapper>
+    </MainMenuWrapper>
   );
 }
 
-export default withMainMenu(ApplicationRounds);
+export default ApplicationRounds;

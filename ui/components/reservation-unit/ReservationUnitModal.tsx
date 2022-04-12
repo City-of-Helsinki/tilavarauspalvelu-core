@@ -315,6 +315,7 @@ const ReservationUnitModal = ({
         reservationUnitType: reservationUnitType?.value
           ? [reservationUnitType?.value?.toString()]
           : [],
+        applicationRound: [applicationRound.pk.toString()],
         orderBy: "nameFi",
         isDraft: false,
         isVisible: true,

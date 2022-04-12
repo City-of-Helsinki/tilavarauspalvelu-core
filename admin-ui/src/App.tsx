@@ -38,6 +38,7 @@ import RequestedReservations from "./component/reservations/requested/RequestedR
 import RequestedReservation from "./component/reservations/requested/RequestedReservation";
 import PrivateRoutes from "./common/PrivateRoutes";
 import { prefixes } from "./common/urls";
+import Error403 from "./common/Error403";
 
 function App(): JSX.Element {
   const { oidcUser } = useReactOidc();
@@ -51,6 +52,7 @@ function App(): JSX.Element {
             path="/"
             component={oidcUser ? ApplicationRounds : MainLander}
           />
+          <Route exact path="/403" component={Error403} />
           <PrivateRoutes>
             <Route
               exact

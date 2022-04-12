@@ -118,6 +118,7 @@ export const RESERVATION_UNIT = gql`
 export const RESERVATION_UNITS = gql`
   query SearchReservationUnits(
     $textSearch: String
+    $pk: [ID]
     $applicationRound: [ID]
     $minPersons: Float
     $maxPersons: Float
@@ -132,6 +133,7 @@ export const RESERVATION_UNITS = gql`
   ) {
     reservationUnits(
       textSearch: $textSearch
+      pk: $pk
       applicationRound: $applicationRound
       maxPersonsGte: $minPersons
       maxPersonsLte: $maxPersons
@@ -191,8 +193,12 @@ export const RESERVATION_UNITS = gql`
 `;
 
 export const RELATED_RESERVATION_UNITS = gql`
-  query RelatedReservationUnits($unit: [ID]!) {
-    reservationUnits(unit: $unit) {
+  query RelatedReservationUnits(
+    $unit: [ID]!
+    $isDraft: Boolean
+    $isVisible: Boolean
+  ) {
+    reservationUnits(unit: $unit, isDraft: $isDraft, isVisible: $isVisible) {
       edges {
         node {
           id
@@ -222,6 +228,9 @@ export const RELATED_RESERVATION_UNITS = gql`
             nameSv
           }
           maxPersons
+          publishBegins
+          publishEnds
+          isDraft
         }
       }
     }

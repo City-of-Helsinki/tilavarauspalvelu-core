@@ -116,6 +116,9 @@ const ReservationUnitList = ({
         >({
           query: RESERVATION_UNITS,
           fetchPolicy: "no-cache",
+          variables: {
+            pk: eventUniIds.map(String),
+          },
         });
         data = reservationUnitData?.reservationUnits?.edges
           .map((n) => n.node)

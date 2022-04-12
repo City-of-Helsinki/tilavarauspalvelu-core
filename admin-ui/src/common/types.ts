@@ -198,6 +198,26 @@ export type ApplicationEventAggregatedData = {
   allocationResultsDurationTotal: number;
   allocationResultsReservationsTotal: number;
 };
+export type GeneralRole = {
+  role: string;
+};
+
+export type UnitRole = {
+  role: string;
+};
+
+export type ServiceSectorRole = {
+  role: string;
+};
+
+export type CurrentUser = {
+  isSuperuser: boolean;
+  firstName: string;
+  lastName: string;
+  generalRoles: GeneralRole[];
+  serviceSectorRoles: ServiceSectorRole[];
+  unitRoles: UnitRole[];
+};
 
 export type ApplicationEvent = {
   id: number;

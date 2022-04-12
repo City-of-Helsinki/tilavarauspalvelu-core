@@ -14,6 +14,7 @@ import Authenticating from "./component/Authentication/Authenticating";
 import AuthorizationNeeded from "./component/Authentication/AuthorizationNeeded";
 import { authEnabled } from "./common/const";
 import MainLander from "./component/MainLander";
+import CustomUserStore from "./common/auth/CustomUserStore";
 
 const dsn = process.env.REACT_APP_SENTRY_DSN;
 const environment = process.env.REACT_APP_SENTRY_ENVIRONMENT;
@@ -38,6 +39,7 @@ ReactDOM.render(
       isEnabled={authEnabled}
       callbackComponentOverride={() => <Authenticating />}
       sessionLostComponent={() => <MainLander withSiteWrapper />}
+      UserStore={CustomUserStore}
     >
       <App />
     </AuthenticationProvider>
