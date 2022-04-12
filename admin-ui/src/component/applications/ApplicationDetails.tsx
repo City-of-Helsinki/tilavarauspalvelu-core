@@ -214,6 +214,10 @@ function ApplicationDetails(): JSX.Element | null {
     return <Loader />;
   }
 
+  if (!application) {
+    return null;
+  }
+
   const isOrganisation = Boolean(application?.organisation);
 
   const hasBillingAddress =

@@ -378,6 +378,10 @@ function Application(): JSX.Element | null {
     return <Loader />;
   }
 
+  if (!application) {
+    return null;
+  }
+
   const notificationContent: { heading: string; body: string } | undefined =
     statusNotification
       ? {

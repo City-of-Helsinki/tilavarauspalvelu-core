@@ -9,11 +9,7 @@ import {
 } from "../../common/types";
 import { formatDuration } from "../../common/util";
 
-export const applicantName = (app: Application | null): string => {
-  if (app === null) {
-    return "null";
-  }
-
+export const applicantName = (app: Application): string => {
   return app.applicantType === "individual"
     ? `${app.contactPerson?.firstName || "-"} ${
         app.contactPerson?.lastName || "-"

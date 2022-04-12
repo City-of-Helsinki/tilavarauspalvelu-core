@@ -151,6 +151,10 @@ function ReservationByApplicationEvent(): JSX.Element | null {
     return <Loader />;
   }
 
+  if (!application) {
+    return null;
+  }
+
   const customerName = applicantName(application);
 
   const applicationEvent: ApplicationEvent | undefined =
