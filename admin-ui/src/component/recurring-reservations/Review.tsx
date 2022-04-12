@@ -410,7 +410,7 @@ function Review({ applicationRound }: IProps): JSX.Element | null {
                           <StyledLink
                             to={`${applicationDetailsUrl(id)}#${eventId}`}
                           >
-                            {applicant}
+                            {truncate(applicant, 20)}
                           </StyledLink>
                         ),
                       },

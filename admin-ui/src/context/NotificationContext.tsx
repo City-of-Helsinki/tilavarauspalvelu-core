@@ -36,26 +36,30 @@ export const NotificationContextProvider: React.FC = ({ children }) => {
     setTimeout(() => setNotification(null), 1000 * 5);
   };
 
+  function notifyError(title: string, message?: string) {
+    showDisappearingNotification({
+      type: "error",
+      title,
+      message: message || null,
+    });
+  }
+
+  function notifySuccess(title: string, message?: string) {
+    showDisappearingNotification({
+      type: "success",
+      title,
+      message: message || null,
+    });
+  }
+
   return (
     <NotificationContext.Provider
       value={{
         notification,
         setNotification: showDisappearingNotification,
         clearNotification,
-        notifyError: (title, message?) => {
-          showDisappearingNotification({
-            type: "error",
-            title,
-            message: message || null,
-          });
-        },
-        notifySuccess: (title, message?) => {
-          showDisappearingNotification({
-            type: "success",
-            title,
-            message: message || null,
-          });
-        },
+        notifyError,
+        notifySuccess,
       }}
     >
       {children}

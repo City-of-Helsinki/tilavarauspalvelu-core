@@ -11,6 +11,7 @@ import {
   Unit,
 } from "../../common/types";
 import {
+  applicantName,
   applicationHours,
   applicationTurns,
   getNormalizedApplicationStatus,
@@ -71,18 +72,14 @@ export const appMapper = (
     app.status,
     applicationStatusView
   );
+
+  const applicant = applicantName(app);
   return {
     key: `${app.id}-${eventId || "-"} `,
     id: app.id,
     eventId,
-    applicant:
-      app.applicantType === "individual"
-        ? app.applicantName || ""
-        : app.organisation?.name || "",
-    applicantSort: (app.applicantType === "individual"
-      ? app.applicantName || ""
-      : app.organisation?.name || ""
-    ).toLowerCase(),
+    applicant,
+    applicantSort: applicant.toLowerCase(),
     type: app.applicantType
       ? t(`Application.applicantTypes.${app.applicantType}`)
       : "",
