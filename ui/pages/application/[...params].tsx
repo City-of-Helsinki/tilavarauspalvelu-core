@@ -93,6 +93,7 @@ const Application = ({ tos }: Props): JSX.Element | null => {
           QueryApplicationRoundsArgs
         >({
           query: APPLICATION_ROUNDS,
+          fetchPolicy: "no-cache",
         });
         const applicationRound = data.applicationRounds?.edges
           ?.map((n) => n.node)
