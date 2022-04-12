@@ -42,10 +42,27 @@ type AggregatedDataType {
   totalHourCapacity: Int
 }
 
+type ApplicationRoundBasketType implements Node {
+  """The ID of the object"""
+  id: ID!
+  name: String!
+  mustBeMainPurposeOfApplicant: Boolean!
+  customerType: [String]!
+  allocationPercentage: Int!
+  orderNumber: Int!
+  pk: Int
+  purposeIds: [Int]
+  ageGroupIds: [Int]
+  homeCityId: Int
+}
+
 type ApplicationRoundType implements Node {
+  """The ID of the object"""
+  id: ID!
   nameFi: String
   nameEn: String
   nameSv: String
+  targetGroup: ApplicationsApplicationRoundTargetGroupChoices!
   allocating: Boolean!
   reservationUnits: [ReservationUnitType]
   applicationPeriodBegin: DateTime!
@@ -59,14 +76,11 @@ type ApplicationRoundType implements Node {
   criteriaFi: String
   criteriaEn: String
   criteriaSv: String
-
-  """The ID of the object"""
-  id: ID!
   aggregatedData: AggregatedDataType
+  applicationRoundBaskets: [ApplicationRoundBasketType]
   pk: Int
   status: status
   statusTimestamp: DateTime
-  isAdmin: Boolean
   approvedBy: String
   applicationsSent: Boolean
 }
@@ -582,7 +596,7 @@ type PurposeUpdateMutationPayload {
 }
 
 type Query {
-  applicationRounds(offset: Int = null, before: String = null, after: String = null, first: Int = null, last: Int = null): ApplicationRoundTypeConnection
+  applicationRounds(offset: Int = null, before: String = null, after: String = null, first: Int = null, last: Int = null, nameFi: String = null, nameFi_Icontains: String = null, nameFi_Istartswith: String = null, nameSv: String = null, nameSv_Icontains: String = null, nameSv_Istartswith: String = null, nameEn: String = null, nameEn_Icontains: String = null, nameEn_Istartswith: String = null): ApplicationRoundTypeConnection
   reservations(
     offset: Int = null
     before: String = null
@@ -606,6 +620,7 @@ type Query {
     after: String = null
     first: Int = null
     last: Int = null
+    pk: [ID] = null
     unit: [ID] = null
     keywordGroups: [ID] = null
     reservationUnitType: [ID] = null
@@ -1181,27 +1196,6 @@ type ReservationTypeEdge {
   cursor: String!
 }
 
-type ReservationUnitApplicationRoundType {
-  nameFi: String
-  nameEn: String
-  nameSv: String
-  targetGroup: ApplicationsApplicationRoundTargetGroupChoices!
-  allocating: Boolean!
-  reservationUnits(offset: Int = null, before: String = null, after: String = null, first: Int = null, last: Int = null): ReservationUnitByPkTypeConnection!
-  applicationPeriodBegin: DateTime!
-  applicationPeriodEnd: DateTime!
-  reservationPeriodBegin: Date!
-  reservationPeriodEnd: Date!
-  publicDisplayBegin: DateTime!
-  publicDisplayEnd: DateTime!
-  purposes(offset: Int = null, before: String = null, after: String = null, first: Int = null, last: Int = null, nameFi: String = null, nameEn: String = null, nameSv: String = null): ReservationPurposeTypeConnection!
-  serviceSector: ServiceSectorType
-  criteriaFi: String
-  criteriaEn: String
-  criteriaSv: String
-  pk: Int
-}
-
 type ReservationUnitByPkType implements Node {
   nameFi: String
   nameEn: String
@@ -1285,30 +1279,13 @@ type ReservationUnitByPkType implements Node {
   surfaceArea: Decimal
   keywordGroups: [KeywordGroupType]
   reservations(from: Date = null, to: Date = null, state: [String] = null): [ReservationType]
-  applicationRounds(active: Boolean = null): [ReservationUnitApplicationRoundType]
+  applicationRounds(active: Boolean = null): [ApplicationRoundType]
   cancellationRule: ReservationUnitCancellationRuleType
   paymentTerms: TermsOfUseType
   cancellationTerms: TermsOfUseType
   serviceSpecificTerms: TermsOfUseType
   nextAvailableSlot: DateTime
   haukiUrl: ReservationUnitHaukiUrlType
-}
-
-type ReservationUnitByPkTypeConnection {
-  """Pagination data for this connection."""
-  pageInfo: PageInfo!
-
-  """Contains the nodes in this connection."""
-  edges: [ReservationUnitByPkTypeEdge]!
-}
-
-"""A Relay edge containing a `ReservationUnitByPkType` and its cursor."""
-type ReservationUnitByPkTypeEdge {
-  """The item at the end of the edge"""
-  node: ReservationUnitByPkType
-
-  """A cursor for use in pagination"""
-  cursor: String!
 }
 
 type ReservationUnitCancellationRuleType implements Node {
@@ -1420,18 +1397,18 @@ input ReservationUnitCreateMutationInput {
   Authentication required for reserving this reservation unit. Possible values are WEAK, STRONG.
   """
   authentication: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
   additionalInstructionsFi: String
   additionalInstructionsEn: String
   additionalInstructionsSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   clientMutationId: String
 }
 
@@ -1524,18 +1501,18 @@ type ReservationUnitCreateMutationPayload {
   Authentication required for reserving this reservation unit. Possible values are WEAK, STRONG.
   """
   authentication: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
   additionalInstructionsFi: String
   additionalInstructionsEn: String
   additionalInstructionsSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -1590,6 +1567,7 @@ type ReservationUnitImageType {
   imageUrl: String
   mediumUrl: String
   smallUrl: String
+  largeUrl: String
 }
 
 input ReservationUnitImageUpdateMutationInput {
@@ -1757,7 +1735,7 @@ type ReservationUnitType implements Node {
   """Authentication required for reserving this reservation unit."""
   authentication: ReservationUnitsReservationUnitAuthenticationChoices!
   images: [ReservationUnitImageType]
-  applicationRounds(active: Boolean = null): [ReservationUnitApplicationRoundType]
+  applicationRounds(active: Boolean = null): [ApplicationRoundType]
 
   """The ID of the object"""
   id: ID!
@@ -1889,18 +1867,18 @@ input ReservationUnitUpdateMutationInput {
   Authentication required for reserving this reservation unit. Possible values are WEAK, STRONG.
   """
   authentication: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
   additionalInstructionsFi: String
   additionalInstructionsEn: String
   additionalInstructionsSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   clientMutationId: String
 }
 
@@ -1993,18 +1971,18 @@ type ReservationUnitUpdateMutationPayload {
   Authentication required for reserving this reservation unit. Possible values are WEAK, STRONG.
   """
   authentication: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
   additionalInstructionsFi: String
   additionalInstructionsEn: String
   additionalInstructionsSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -2677,15 +2655,15 @@ input UnitUpdateMutationInput {
   webPage: String
   email: String
   phone: String
+  shortDescriptionFi: String
+  shortDescriptionEn: String
+  shortDescriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
-  shortDescriptionFi: String
-  shortDescriptionEn: String
-  shortDescriptionSv: String
   clientMutationId: String
 }
 
@@ -2695,15 +2673,15 @@ type UnitUpdateMutationPayload {
   webPage: String
   email: String
   phone: String
+  shortDescriptionFi: String
+  shortDescriptionEn: String
+  shortDescriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
-  shortDescriptionFi: String
-  shortDescriptionEn: String
-  shortDescriptionSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]

@@ -96,12 +96,28 @@ export type AggregatedDataType = {
   totalReservationDuration?: Maybe<Scalars["Int"]>;
 };
 
+export type ApplicationRoundBasketType = Node & {
+  __typename?: "ApplicationRoundBasketType";
+  ageGroupIds?: Maybe<Array<Maybe<Scalars["Int"]>>>;
+  allocationPercentage: Scalars["Int"];
+  customerType: Array<Maybe<Scalars["String"]>>;
+  homeCityId?: Maybe<Scalars["Int"]>;
+  /** The ID of the object */
+  id: Scalars["ID"];
+  mustBeMainPurposeOfApplicant: Scalars["Boolean"];
+  name: Scalars["String"];
+  orderNumber: Scalars["Int"];
+  pk?: Maybe<Scalars["Int"]>;
+  purposeIds?: Maybe<Array<Maybe<Scalars["Int"]>>>;
+};
+
 export type ApplicationRoundType = Node & {
   __typename?: "ApplicationRoundType";
   aggregatedData?: Maybe<AggregatedDataType>;
   allocating: Scalars["Boolean"];
   applicationPeriodBegin: Scalars["DateTime"];
   applicationPeriodEnd: Scalars["DateTime"];
+  applicationRoundBaskets?: Maybe<Array<Maybe<ApplicationRoundBasketType>>>;
   applicationsSent?: Maybe<Scalars["Boolean"]>;
   approvedBy?: Maybe<Scalars["String"]>;
   criteriaEn?: Maybe<Scalars["String"]>;
@@ -109,7 +125,6 @@ export type ApplicationRoundType = Node & {
   criteriaSv?: Maybe<Scalars["String"]>;
   /** The ID of the object */
   id: Scalars["ID"];
-  isAdmin?: Maybe<Scalars["Boolean"]>;
   nameEn?: Maybe<Scalars["String"]>;
   nameFi?: Maybe<Scalars["String"]>;
   nameSv?: Maybe<Scalars["String"]>;
@@ -123,6 +138,7 @@ export type ApplicationRoundType = Node & {
   serviceSector?: Maybe<ServiceSectorType>;
   status?: Maybe<Status>;
   statusTimestamp?: Maybe<Scalars["DateTime"]>;
+  targetGroup: ApplicationsApplicationRoundTargetGroupChoices;
 };
 
 export type ApplicationRoundTypeConnection = {
@@ -777,6 +793,15 @@ export type QueryApplicationRoundsArgs = {
   before?: InputMaybe<Scalars["String"]>;
   first?: InputMaybe<Scalars["Int"]>;
   last?: InputMaybe<Scalars["Int"]>;
+  nameEn?: InputMaybe<Scalars["String"]>;
+  nameEn_Icontains?: InputMaybe<Scalars["String"]>;
+  nameEn_Istartswith?: InputMaybe<Scalars["String"]>;
+  nameFi?: InputMaybe<Scalars["String"]>;
+  nameFi_Icontains?: InputMaybe<Scalars["String"]>;
+  nameFi_Istartswith?: InputMaybe<Scalars["String"]>;
+  nameSv?: InputMaybe<Scalars["String"]>;
+  nameSv_Icontains?: InputMaybe<Scalars["String"]>;
+  nameSv_Istartswith?: InputMaybe<Scalars["String"]>;
   offset?: InputMaybe<Scalars["Int"]>;
 };
 
@@ -964,6 +989,7 @@ export type QueryReservationUnitsArgs = {
   maxPersonsLte?: InputMaybe<Scalars["Float"]>;
   offset?: InputMaybe<Scalars["Int"]>;
   orderBy?: InputMaybe<Scalars["String"]>;
+  pk?: InputMaybe<Array<InputMaybe<Scalars["ID"]>>>;
   purposes?: InputMaybe<Array<InputMaybe<Scalars["ID"]>>>;
   reservationUnitType?: InputMaybe<Array<InputMaybe<Scalars["ID"]>>>;
   textSearch?: InputMaybe<Scalars["String"]>;
@@ -1508,53 +1534,12 @@ export type ReservationTypeEdge = {
   node?: Maybe<ReservationType>;
 };
 
-export type ReservationUnitApplicationRoundType = {
-  __typename?: "ReservationUnitApplicationRoundType";
-  allocating: Scalars["Boolean"];
-  applicationPeriodBegin: Scalars["DateTime"];
-  applicationPeriodEnd: Scalars["DateTime"];
-  criteriaEn?: Maybe<Scalars["String"]>;
-  criteriaFi?: Maybe<Scalars["String"]>;
-  criteriaSv?: Maybe<Scalars["String"]>;
-  nameEn?: Maybe<Scalars["String"]>;
-  nameFi?: Maybe<Scalars["String"]>;
-  nameSv?: Maybe<Scalars["String"]>;
-  pk?: Maybe<Scalars["Int"]>;
-  publicDisplayBegin: Scalars["DateTime"];
-  publicDisplayEnd: Scalars["DateTime"];
-  purposes: ReservationPurposeTypeConnection;
-  reservationPeriodBegin: Scalars["Date"];
-  reservationPeriodEnd: Scalars["Date"];
-  reservationUnits: ReservationUnitByPkTypeConnection;
-  serviceSector?: Maybe<ServiceSectorType>;
-  targetGroup: ApplicationsApplicationRoundTargetGroupChoices;
-};
-
-export type ReservationUnitApplicationRoundTypePurposesArgs = {
-  after?: InputMaybe<Scalars["String"]>;
-  before?: InputMaybe<Scalars["String"]>;
-  first?: InputMaybe<Scalars["Int"]>;
-  last?: InputMaybe<Scalars["Int"]>;
-  nameEn?: InputMaybe<Scalars["String"]>;
-  nameFi?: InputMaybe<Scalars["String"]>;
-  nameSv?: InputMaybe<Scalars["String"]>;
-  offset?: InputMaybe<Scalars["Int"]>;
-};
-
-export type ReservationUnitApplicationRoundTypeReservationUnitsArgs = {
-  after?: InputMaybe<Scalars["String"]>;
-  before?: InputMaybe<Scalars["String"]>;
-  first?: InputMaybe<Scalars["Int"]>;
-  last?: InputMaybe<Scalars["Int"]>;
-  offset?: InputMaybe<Scalars["Int"]>;
-};
-
 export type ReservationUnitByPkType = Node & {
   __typename?: "ReservationUnitByPkType";
   additionalInstructionsEn?: Maybe<Scalars["String"]>;
   additionalInstructionsFi?: Maybe<Scalars["String"]>;
   additionalInstructionsSv?: Maybe<Scalars["String"]>;
-  applicationRounds?: Maybe<Array<Maybe<ReservationUnitApplicationRoundType>>>;
+  applicationRounds?: Maybe<Array<Maybe<ApplicationRoundType>>>;
   /** Authentication required for reserving this reservation unit. */
   authentication: ReservationUnitsReservationUnitAuthenticationChoices;
   bufferTimeAfter?: Maybe<Scalars["Duration"]>;
@@ -1640,23 +1625,6 @@ export type ReservationUnitByPkTypeReservationsArgs = {
   from?: InputMaybe<Scalars["Date"]>;
   state?: InputMaybe<Array<InputMaybe<Scalars["String"]>>>;
   to?: InputMaybe<Scalars["Date"]>;
-};
-
-export type ReservationUnitByPkTypeConnection = {
-  __typename?: "ReservationUnitByPkTypeConnection";
-  /** Contains the nodes in this connection. */
-  edges: Array<Maybe<ReservationUnitByPkTypeEdge>>;
-  /** Pagination data for this connection. */
-  pageInfo: PageInfo;
-};
-
-/** A Relay edge containing a `ReservationUnitByPkType` and its cursor. */
-export type ReservationUnitByPkTypeEdge = {
-  __typename?: "ReservationUnitByPkTypeEdge";
-  /** A cursor for use in pagination */
-  cursor: Scalars["String"];
-  /** The item at the end of the edge */
-  node?: Maybe<ReservationUnitByPkType>;
 };
 
 export type ReservationUnitCancellationRuleType = Node & {
@@ -1872,6 +1840,7 @@ export type ReservationUnitImageType = {
   __typename?: "ReservationUnitImageType";
   imageType: ReservationUnitsReservationUnitImageImageTypeChoices;
   imageUrl?: Maybe<Scalars["String"]>;
+  largeUrl?: Maybe<Scalars["String"]>;
   mediumUrl?: Maybe<Scalars["String"]>;
   pk?: Maybe<Scalars["Int"]>;
   smallUrl?: Maybe<Scalars["String"]>;
@@ -1901,7 +1870,7 @@ export type ReservationUnitType = Node & {
   additionalInstructionsEn?: Maybe<Scalars["String"]>;
   additionalInstructionsFi?: Maybe<Scalars["String"]>;
   additionalInstructionsSv?: Maybe<Scalars["String"]>;
-  applicationRounds?: Maybe<Array<Maybe<ReservationUnitApplicationRoundType>>>;
+  applicationRounds?: Maybe<Array<Maybe<ApplicationRoundType>>>;
   /** Authentication required for reserving this reservation unit. */
   authentication: ReservationUnitsReservationUnitAuthenticationChoices;
   bufferTimeAfter?: Maybe<Scalars["Duration"]>;
@@ -2920,6 +2889,12 @@ export const ApplicationRoundsDocument = gql`
           applicationPeriodBegin
           applicationPeriodEnd
           status
+          criteriaFi
+          criteriaEn
+          criteriaSv
+          reservationUnits {
+            pk
+          }
         }
       }
     }
@@ -2974,57 +2949,6 @@ export type ApplicationRoundsLazyQueryHookResult = ReturnType<
 export type ApplicationRoundsQueryResult = Apollo.QueryResult<
   ApplicationRoundsQuery,
   ApplicationRoundsQueryVariables
->;
-export const CitiesDocument = gql`
-  query Cities {
-    cities {
-      edges {
-        node {
-          pk
-        }
-      }
-    }
-  }
-`;
-
-/**
- * __useCitiesQuery__
- *
- * To run a query within a React component, call `useCitiesQuery` and pass it any options that fit your needs.
- * When your component renders, `useCitiesQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useCitiesQuery({
- *   variables: {
- *   },
- * });
- */
-export function useCitiesQuery(
-  baseOptions?: Apollo.QueryHookOptions<CitiesQuery, CitiesQueryVariables>
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<CitiesQuery, CitiesQueryVariables>(
-    CitiesDocument,
-    options
-  );
-}
-export function useCitiesLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<CitiesQuery, CitiesQueryVariables>
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<CitiesQuery, CitiesQueryVariables>(
-    CitiesDocument,
-    options
-  );
-}
-export type CitiesQueryHookResult = ReturnType<typeof useCitiesQuery>;
-export type CitiesLazyQueryHookResult = ReturnType<typeof useCitiesLazyQuery>;
-export type CitiesQueryResult = Apollo.QueryResult<
-  CitiesQuery,
-  CitiesQueryVariables
 >;
 export const SearchFormParamsUnitDocument = gql`
   query SearchFormParamsUnit {
@@ -4531,20 +4455,14 @@ export type ApplicationRoundsQuery = {
         applicationPeriodBegin: any;
         applicationPeriodEnd: any;
         status?: Status | null;
+        criteriaFi?: string | null;
+        criteriaEn?: string | null;
+        criteriaSv?: string | null;
+        reservationUnits?: Array<{
+          __typename?: "ReservationUnitType";
+          pk?: number | null;
+        } | null> | null;
       } | null;
-    } | null>;
-  } | null;
-};
-
-export type CitiesQueryVariables = Exact<{ [key: string]: never }>;
-
-export type CitiesQuery = {
-  __typename?: "Query";
-  cities?: {
-    __typename?: "CityTypeConnection";
-    edges: Array<{
-      __typename?: "CityTypeEdge";
-      node?: { __typename?: "CityType"; pk?: number | null } | null;
     } | null>;
   } | null;
 };

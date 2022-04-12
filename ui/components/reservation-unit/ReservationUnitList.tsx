@@ -115,6 +115,9 @@ const ReservationUnitList = ({
           QueryReservationUnitsArgs
         >({
           query: RESERVATION_UNITS,
+          variables: {
+            pk: eventUniIds.map(String),
+          },
         });
         data = reservationUnitData?.reservationUnits?.edges
           .map((n) => n.node)

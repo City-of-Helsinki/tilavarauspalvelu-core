@@ -64,6 +64,7 @@ const ButtonContainer = styled.div`
   @media (max-width: ${breakpoint.s}) {
     width: calc(100% - 2 * var(--spacing-layout-xs));
     padding: var(--spacing-layout-xs);
+    grid-template-columns: 1fr;
 
     > button {
       margin: 0;
