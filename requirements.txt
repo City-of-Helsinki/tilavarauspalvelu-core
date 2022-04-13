@@ -68,6 +68,8 @@ django-celery-results==2.2.0
     # via -r requirements.in
 django-cors-headers==3.6.0
     # via -r requirements.in
+django-debug-toolbar==3.2.4
+    # via -r requirements.in
 django-enumfields==2.0.0
     # via -r requirements.in
 django-environ==0.4.5
@@ -100,6 +102,7 @@ django==3.2.13
     # via
     #   -r requirements.in
     #   django-cors-headers
+    #   django-debug-toolbar
     #   django-extra-fields
     #   django-filter
     #   django-graphql-jwt
@@ -304,7 +307,9 @@ social-auth-app-django==4.0.0
 social-auth-core==4.1.0
     # via social-auth-app-django
 sqlparse==0.4.2
-    # via django
+    # via
+    #   django
+    #   django-debug-toolbar
 termcolor==1.1.0
     # via snapshottest
 text-unidecode==1.3
