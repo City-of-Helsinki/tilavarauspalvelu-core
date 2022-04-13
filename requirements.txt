@@ -96,7 +96,7 @@ django-recurrence==1.10.3
     # via -r requirements.in
 django-tinymce==3.4.0
     # via -r requirements.in
-django==3.2.12
+django==3.2.13
     # via
     #   -r requirements.in
     #   django-cors-headers
