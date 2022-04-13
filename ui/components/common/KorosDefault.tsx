@@ -12,6 +12,7 @@ const Wrapper = styled.div<{ $from: string; $to: string }>`
     background-color: ${$from};
     fill: ${$to};
   `}
+  margin-bottom: -1px;
 `;
 
 const KorosDefault = ({ from, to }: Props): JSX.Element => {

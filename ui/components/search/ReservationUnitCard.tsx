@@ -90,6 +90,10 @@ const Actions = styled.div`
   padding: var(--spacing-s) var(--spacing-m);
   align-items: flex-end;
 
+  > button {
+    white-space: nowrap;
+  }
+
   @media (max-width: ${breakpoint.m}) {
     display: block;
   }
