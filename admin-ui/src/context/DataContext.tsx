@@ -59,7 +59,7 @@ export const DataContextProvider: React.FC = ({ children }) => {
     if (permissions) {
       const timer = setInterval(() => {
         refetch();
-      }, 30000);
+      }, 5 * 60000); // 5 min
       return () => clearTimeout(timer);
     }
     return undefined;
