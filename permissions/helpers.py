@@ -11,12 +11,12 @@ from reservations.models import RecurringReservation, Reservation
 from spaces.models import ServiceSector, Unit, UnitGroup
 
 
-def is_superuser(user: User):
+def is_superuser(user: User) -> bool:
     return user.is_superuser
 
 
 def has_unit_group_permission(
-    user: User, unit_groups: list, required_permission: str
+    user: User, unit_groups: Union[List[int], QuerySet], required_permission: str
 ) -> bool:
     if not unit_groups:
         return False
@@ -28,13 +28,12 @@ def has_unit_group_permission(
 
 
 def has_unit_permission(
-    user: User, units: Iterable[Unit], required_permission: str
+    user: User, units: Union[List[int], QuerySet], required_permission: str
 ) -> bool:
     if not units or user.is_anonymous:
         return False
-    unit_groups = []
-    for unit in units:
-        unit_groups += list(unit.unit_groups.all())
+
+    unit_groups = UnitGroup.objects.filter(units__in=units)
 
     return user.unit_roles.filter(
         Q(unit__in=units) | Q(unit_group__in=unit_groups),
@@ -43,7 +42,7 @@ def has_unit_permission(
 
 
 def has_service_sector_permission(
-    user: User, service_sectors: [ServiceSector], required_permission: str
+    user: User, service_sectors: Union[List[int], QuerySet], required_permission: str
 ) -> bool:
     if not service_sectors or user.is_anonymous:
         return False
@@ -71,16 +70,16 @@ def can_manage_service_sector_roles(user: User, service_sector: ServiceSector) -
     return (
         is_superuser(user)
         or has_general_permission(user, permission)
-        or has_service_sector_permission(user, [service_sector], permission)
+        or has_service_sector_permission(user, [service_sector.id], permission)
     )
 
 
-def can_manage_unit_roles(user: User, units: List[Unit]) -> bool:
+def can_manage_unit_roles(user: User, units: Union[List[Unit], QuerySet]) -> bool:
     permission = "can_manage_unit_roles"
     service_sectors = ServiceSector.objects.filter(units__in=units)
     return (
         is_superuser(user)
-        or has_service_sector_permission(user, list(service_sectors.all()), permission)
+        or has_service_sector_permission(user, service_sectors.all(), permission)
         or has_unit_permission(user, units, permission)
         or has_general_permission(user, permission)
     )
@@ -92,15 +91,15 @@ def can_manage_units(user: User, unit: Unit) -> bool:
         return False
     return (
         is_superuser(user)
-        or has_service_sector_permission(
-            user, list(unit.service_sectors.all()), permission
-        )
-        or has_unit_permission(user, [unit], permission)
+        or has_service_sector_permission(user, unit.service_sectors.all(), permission)
+        or has_unit_permission(user, [unit.id], permission)
         or has_general_permission(user, permission)
     )
 
 
-def can_manage_unit_group_roles(user: User, unit_group: List[UnitGroup]) -> bool:
+def can_manage_unit_group_roles(
+    user: User, unit_group: Union[List[int], QuerySet]
+) -> bool:
     permission = "can_manage_unit_roles"
     return (
         is_superuser(user)
@@ -113,10 +112,8 @@ def can_manage_units_reservation_units(user: User, unit: Unit) -> bool:
     permission = "can_manage_reservation_units"
     return (
         is_superuser(user)
-        or has_service_sector_permission(
-            user, list(unit.service_sectors.all()), permission
-        )
-        or has_unit_permission(user, [unit], permission)
+        or has_service_sector_permission(user, unit.service_sectors.all(), permission)
+        or has_unit_permission(user, [unit.id], permission)
         or has_general_permission(user, permission)
     )
 
@@ -134,7 +131,7 @@ def can_handle_application(user: User, application: Application) -> bool:
     return (
         is_superuser(user)
         or has_service_sector_permission(
-            user, [application.application_round.service_sector], permission
+            user, [application.application_round.service_sector.id], permission
         )
         or has_general_permission(user, permission)
     )
@@ -148,7 +145,7 @@ def can_manage_service_sectors_application_rounds(
         is_superuser(user)
         or (
             service_sector is not None
-            and has_service_sector_permission(user, [service_sector], permission)
+            and has_service_sector_permission(user, [service_sector.id], permission)
         )
         or has_general_permission(user, permission)
     )
@@ -171,7 +168,7 @@ def can_allocate_service_sector_allocations(
         or has_general_permission(user, permission)
         or (
             service_sector is not None
-            and has_service_sector_permission(user, [service_sector], permission)
+            and has_service_sector_permission(user, [service_sector.id], permission)
         )
     )
 
@@ -180,7 +177,7 @@ def can_allocate_allocation_request(user: User, service_sector: ServiceSector) -
     permission = "can_allocate_applications"
     return (
         is_superuser(user)
-        or has_service_sector_permission(user, [service_sector], permission)
+        or has_service_sector_permission(user, [service_sector.id], permission)
         or has_general_permission(user, permission)
     )
 
@@ -192,7 +189,7 @@ def can_manage_service_sectors_applications(
     return (
         is_superuser(user)
         or has_general_permission(user, permission)
-        or has_service_sector_permission(user, [service_sector], permission)
+        or has_service_sector_permission(user, [service_sector.id], permission)
     )
 
 
@@ -235,44 +232,45 @@ def can_modify_city(user: User):
     return is_superuser(user) or has_general_permission(user, permission)
 
 
-def get_service_sectors_where_can_view_applications(user: User) -> list:
+def get_service_sectors_where_can_view_applications(user: User) -> QuerySet:
     permission = "can_handle_applications"
+
     if has_general_permission(user, permission) or is_superuser(user):
-        return list(ServiceSector.objects.all())
+        return ServiceSector.objects.all().values_list("id", flat=True)
 
-    return list(
-        map(
-            lambda role: role.service_sector,
-            user.service_sector_roles.filter(role__permissions__permission=permission),
-        )
-    )
+    return user.service_sector_roles.filter(
+        role__permissions__permission=permission
+    ).values_list("service_sector__id", flat=True)
 
 
-def get_units_where_can_view_reservations(user: User) -> Union[list, QuerySet]:
+def get_units_where_can_view_reservations(user: User) -> QuerySet:
     permission = "can_view_reservations"
+
     if user.is_anonymous:
-        return []
+        return Unit.objects.none()
+
     if has_general_permission(user, permission) or is_superuser(user):
-        return list(Unit.objects.all())
+        return Unit.objects.all()
 
     units = user.unit_roles.filter(
         role__permissions__permission=permission
     ).values_list("unit", flat=True)
+
     return units
 
 
 def get_service_sectors_where_can_view_reservations(user: User) -> list:
     permission = "can_view_reservations"
+
     if user.is_anonymous:
         return []
+
     if has_general_permission(user, permission) or is_superuser(user):
-        return list(ServiceSector.objects.all())
-    return list(
-        map(
-            lambda role: role.service_sector,
-            user.service_sector_roles.filter(role__permissions__permission=permission),
-        )
-    )
+        return ServiceSector.objects.all()
+
+    return user.service_sector_roles.filter(
+        role__permissions__permission=permission
+    ).values_list("service_sector", flat=True)
 
 
 def can_view_reservation(user: User, reservation: Reservation) -> bool:
@@ -282,13 +280,8 @@ def can_view_reservation(user: User, reservation: Reservation) -> bool:
     if user.is_anonymous:
         return False
 
-    units = []
-    service_sectors = []
-    for reservation_unit in reservation_units:
-        if reservation_unit.unit:
-            units.append(reservation_unit.unit)
-    for unit in units:
-        service_sectors += list(unit.service_sectors.all())
+    units = Unit.objects.filter(reservationunit__in=reservation_units)
+    service_sectors = ServiceSector.objects.filter(units__in=units)
 
     return (
         is_superuser(user)
@@ -308,13 +301,8 @@ def can_modify_reservation(user: User, reservation: Reservation) -> bool:
     permission = "can_manage_reservations"
     reservation_units = reservation.reservation_unit.all()
 
-    units = []
-    service_sectors = []
-    for reservation_unit in reservation_units:
-        if reservation_unit.unit:
-            units.append(reservation_unit.unit)
-    for unit in units:
-        service_sectors += list(unit.service_sectors.all())
+    units = Unit.objects.filter(reservationunit__in=reservation_units)
+    service_sectors = ServiceSector.objects.filter(units__in=units)
 
     return (
         is_superuser(user)
@@ -329,13 +317,8 @@ def can_handle_reservation(user: User, reservation: Reservation) -> bool:
     permission = "can_manage_reservations"
     reservation_units = reservation.reservation_unit.all()
 
-    units = []
-    service_sectors = []
-    for reservation_unit in reservation_units:
-        if reservation_unit.unit:
-            units.append(reservation_unit.unit)
-    for unit in units:
-        service_sectors += list(unit.service_sectors.all())
+    units = Unit.objects.filter(reservationunit__in=reservation_units)
+    service_sectors = ServiceSector.objects.filter(units__in=units)
 
     return (
         is_superuser(user)
@@ -356,13 +339,8 @@ def can_view_recurring_reservation(
         "reservation_unit", flat=True
     )
     reservation_units = ReservationUnit.objects.filter(id__in=res_unit_ids)
-    units = []
-    service_sectors = []
-    for reservation_unit in reservation_units:
-        if reservation_unit.unit:
-            units.append(reservation_unit.unit)
-    for unit in units:
-        service_sectors += list(unit.service_sectors.all())
+    units = Unit.objects.filter(reservationunit__in=reservation_units)
+    service_sectors = ServiceSector.objects.filter(units__in=units)
 
     return (
         is_superuser(user)
@@ -381,13 +359,8 @@ def can_modify_recurring_reservation(
         "reservation_unit", flat=True
     )
     reservation_units = ReservationUnit.objects.filter(id__in=res_unit_ids)
-    units = []
-    service_sectors = []
-    for reservation_unit in reservation_units:
-        if reservation_unit.unit:
-            units.append(reservation_unit.unit)
-    for unit in units:
-        service_sectors += list(unit.service_sectors.all())
+    units = Unit.objects.filter(reservationunit__in=reservation_units)
+    service_sectors = ServiceSector.objects.filter(units__in=units)
 
     return (
         is_superuser(user)
