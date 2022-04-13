@@ -9,8 +9,12 @@ import { fontBold } from "../../modules/style/typography";
 const StepContainer = styled.div<{ $disabled: boolean }>`
   ${({ $disabled }) =>
     $disabled
-      ? `background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='80' width='100'%3E%3Cg fill='none' stroke='rgb(204,204,204)' stroke-width='3'%3E%3Cpath  d='M24 0 l0 80' /%3E%3C/g%3E%3C/svg%3E");`
-      : `background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='80' width='100'%3E%3Cg fill='none' stroke='rgb(0,0,191)' stroke-width='3'%3E%3Cpath  d='M24 0 l0 80' /%3E%3C/g%3E%3C/svg%3E");`}
+      ? `background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='70' width='100'%3E%3Cg fill='none' stroke='rgb(204,204,204)' stroke-width='3'%3E%3Cpath  d='M24 0 l0 70' /%3E%3C/g%3E%3C/svg%3E");`
+      : `background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='70' width='100'%3E%3Cg fill='none' stroke='rgb(0,0,191)' stroke-width='3'%3E%3Cpath  d='M24 0 l0 70' /%3E%3C/g%3E%3C/svg%3E");`}
+
+  &:last-of-type {
+    background-image: none;
+  }
 
   background-repeat: repeat-y;
   height: 70px;
@@ -35,15 +39,10 @@ const Number = styled.div<{ $current: boolean; $disabled: boolean }>`
   text-align: center;
   align-self: flex-end;
   border: 2px solid var(--color-bus);
-  outline: 2px solid;
   display: flex;
   justify-content: center;
   align-items: center;
   color: var(--color-black-40);
-  ${({ $current }) =>
-    $current
-      ? "outline-color: var(--color-coat-of-arms);"
-      : "outline-color: var(--tilavaraus-gray);"}
   ${({ $disabled }) =>
     $disabled
       ? "border-color: var(--color-black-20);"
@@ -62,6 +61,7 @@ const Step = styled.button<{ $clickable: boolean }>`
   align-content: flex-start;
   align-items: center;
   background: transparent;
+  padding-top: 0;
 
   ${({ $clickable }) => ($clickable ? "cursor: pointer;" : "cursor: normal;")}
 `;
