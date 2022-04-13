@@ -12,6 +12,7 @@ export const RESERVATION_UNIT = gql`
       isDraft
       images {
         imageUrl
+        largeUrl
         mediumUrl
         smallUrl
         imageType

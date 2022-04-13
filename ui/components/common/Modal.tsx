@@ -36,7 +36,7 @@ const ModalElement = styled.div`
   z-index: 101;
   display: flex;
   flex-direction: column;
-  max-height: 100%;
+  max-height: 90%;
   overflow-y: auto;
 
   @media (max-width: ${breakpoint.s}) {
@@ -57,8 +57,8 @@ const ButtonContainer = styled.div`
   padding-top: var(--spacing-layout-s);
 
   > button {
-    left: auto;
-    right: auto;
+    width: fit-content;
+    min-width: 9rem;
   }
 
   @media (max-width: ${breakpoint.s}) {

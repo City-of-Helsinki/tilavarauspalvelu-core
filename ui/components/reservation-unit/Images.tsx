@@ -38,6 +38,10 @@ const CarouselImage = styled.img`
 `;
 
 const ThumbnailImage = styled.img`
+  &:hover {
+    opacity: 0.9;
+  }
+
   object-fit: cover;
   width: 122px;
   height: 122px;
@@ -49,14 +53,14 @@ const ThumbnailImage = styled.img`
 `;
 
 const ModalContent = styled.div`
-  max-width: 94vw;
+  max-width: 578px;
 
   @media (max-width: ${breakpoint.s}) {
     margin: 0.5em;
   }
 `;
 
-const StyledButton = styled.button`
+const ThumbnailButton = styled.button`
   cursor: pointer;
   border: 0;
   background-color: transparent;
@@ -66,6 +70,8 @@ const StyledButton = styled.button`
 const ModalImages = styled.div`
   margin-top: var(--spacing-layout-s);
   display: flex;
+  max-width: 100%;
+  overflow-x: auto;
 
   button {
     margin-right: 1em;
@@ -75,9 +81,9 @@ const ModalImages = styled.div`
     margin-top: 0.25em;
   }
 `;
+
 const LargeImage = styled.img`
-  max-width: 90vw;
-  max-height: calc(100vh - 16em);
+  max-width: 100%;
 `;
 
 const Images = ({ images, contextName }: Props): JSX.Element => {
@@ -98,7 +104,7 @@ const Images = ({ images, contextName }: Props): JSX.Element => {
             alt={`${t("common:imgAltForSpace", { name: contextName })} #${
               index + 1
             }`}
-            src={image.imageUrl || pixel}
+            src={image.largeUrl || pixel}
             onClick={() => {
               setCurrentImage(image);
               setShowModal(true);
@@ -120,12 +126,12 @@ const Images = ({ images, contextName }: Props): JSX.Element => {
           {currentImage ? (
             <LargeImage
               alt={t("common:imgAltForSpace")}
-              src={currentImage.imageUrl}
+              src={currentImage.largeUrl}
             />
           ) : null}
           <ModalImages>
             {images?.map((image) => (
-              <StyledButton
+              <ThumbnailButton
                 key={image.smallUrl}
                 type="button"
                 onClick={() => {
@@ -136,7 +142,7 @@ const Images = ({ images, contextName }: Props): JSX.Element => {
                   alt={t("common:imgAltForSpace")}
                   src={image.smallUrl}
                 />
-              </StyledButton>
+              </ThumbnailButton>
             ))}
           </ModalImages>
         </ModalContent>

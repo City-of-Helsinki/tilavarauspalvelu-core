@@ -1480,6 +1480,7 @@ export type ReservationType = Node & {
   bufferTimeAfter?: Maybe<Scalars["Duration"]>;
   bufferTimeBefore?: Maybe<Scalars["Duration"]>;
   calendarUrl?: Maybe<Scalars["String"]>;
+  cancelDetails: Scalars["String"];
   description?: Maybe<Scalars["String"]>;
   end: Scalars["DateTime"];
   freeOfChargeReason?: Maybe<Scalars["String"]>;
@@ -3988,6 +3989,7 @@ export type ReservationUnitQueryResult = Apollo.QueryResult<
 export const SearchReservationUnitsDocument = gql`
   query SearchReservationUnits(
     $textSearch: String
+    $pk: [ID]
     $applicationRound: [ID]
     $minPersons: Float
     $maxPersons: Float
@@ -4002,6 +4004,7 @@ export const SearchReservationUnitsDocument = gql`
   ) {
     reservationUnits(
       textSearch: $textSearch
+      pk: $pk
       applicationRound: $applicationRound
       maxPersonsGte: $minPersons
       maxPersonsLte: $maxPersons
@@ -4073,6 +4076,7 @@ export const SearchReservationUnitsDocument = gql`
  * const { data, loading, error } = useSearchReservationUnitsQuery({
  *   variables: {
  *      textSearch: // value for 'textSearch'
+ *      pk: // value for 'pk'
  *      applicationRound: // value for 'applicationRound'
  *      minPersons: // value for 'minPersons'
  *      maxPersons: // value for 'maxPersons'
@@ -4122,8 +4126,12 @@ export type SearchReservationUnitsQueryResult = Apollo.QueryResult<
   SearchReservationUnitsQueryVariables
 >;
 export const RelatedReservationUnitsDocument = gql`
-  query RelatedReservationUnits($unit: [ID]!) {
-    reservationUnits(unit: $unit) {
+  query RelatedReservationUnits(
+    $unit: [ID]!
+    $isDraft: Boolean
+    $isVisible: Boolean
+  ) {
+    reservationUnits(unit: $unit, isDraft: $isDraft, isVisible: $isVisible) {
       edges {
         node {
           id
@@ -4153,6 +4161,9 @@ export const RelatedReservationUnitsDocument = gql`
             nameSv
           }
           maxPersons
+          publishBegins
+          publishEnds
+          isDraft
         }
       }
     }
@@ -4172,6 +4183,8 @@ export const RelatedReservationUnitsDocument = gql`
  * const { data, loading, error } = useRelatedReservationUnitsQuery({
  *   variables: {
  *      unit: // value for 'unit'
+ *      isDraft: // value for 'isDraft'
+ *      isVisible: // value for 'isVisible'
  *   },
  * });
  */
@@ -4977,6 +4990,7 @@ export type ReservationUnitQuery = {
 
 export type SearchReservationUnitsQueryVariables = Exact<{
   textSearch?: InputMaybe<Scalars["String"]>;
+  pk?: InputMaybe<Array<InputMaybe<Scalars["ID"]>> | InputMaybe<Scalars["ID"]>>;
   applicationRound?: InputMaybe<
     Array<InputMaybe<Scalars["ID"]>> | InputMaybe<Scalars["ID"]>
   >;
@@ -5055,6 +5069,8 @@ export type SearchReservationUnitsQuery = {
 
 export type RelatedReservationUnitsQueryVariables = Exact<{
   unit: Array<InputMaybe<Scalars["ID"]>> | InputMaybe<Scalars["ID"]>;
+  isDraft?: InputMaybe<Scalars["Boolean"]>;
+  isVisible?: InputMaybe<Scalars["Boolean"]>;
 }>;
 
 export type RelatedReservationUnitsQuery = {
@@ -5071,6 +5087,9 @@ export type RelatedReservationUnitsQuery = {
         nameEn?: string | null;
         nameSv?: string | null;
         maxPersons?: number | null;
+        publishBegins?: any | null;
+        publishEnds?: any | null;
+        isDraft: boolean;
         images?: Array<{
           __typename?: "ReservationUnitImageType";
           mediumUrl?: string | null;
