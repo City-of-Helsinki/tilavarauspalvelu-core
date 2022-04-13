@@ -129,9 +129,9 @@ class GeneralRolePermission(permissions.BasePermission):
 class UnitRolePermission(permissions.BasePermission):
     def has_object_permission(self, request, view, unit_role):
         if unit_role.unit_group:
-            return can_manage_unit_group_roles(request.user, unit_role.unit_group)
+            return can_manage_unit_group_roles(request.user, [unit_role.unit_group.id])
         if unit_role.unit:
-            return can_manage_unit_roles(request.user, unit_role.unit)
+            return can_manage_unit_roles(request.user, [unit_role.unit.id])
         return False
 
     def has_permission(self, request, view):
