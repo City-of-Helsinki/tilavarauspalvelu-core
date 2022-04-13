@@ -53,6 +53,8 @@ function ApplicationRounds(): JSX.Element {
   const { oidcUser } = useReactOidc();
   const profile = oidcUser ? oidcUser.profile : null;
 
+  const hasPermissions = hasAnyPermissions();
+
   useEffect(() => {
     const fetchApplicationRound = async () => {
       setIsLoading(true);
@@ -71,8 +73,10 @@ function ApplicationRounds(): JSX.Element {
       }
     };
 
-    fetchApplicationRound();
-  }, [notifyError]);
+    if (hasPermissions) {
+      fetchApplicationRound();
+    }
+  }, [notifyError, hasPermissions]);
 
   const isWaitingForApproval = (
     applicationRound: ApplicationRoundType

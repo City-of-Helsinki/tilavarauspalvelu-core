@@ -28,6 +28,7 @@ export const DataContextProvider: React.FC = ({ children }) => {
     HANDLING_COUNT_QUERY,
 
     {
+      skip: !permissions,
       fetchPolicy: "no-cache",
       onCompleted: ({ reservations }) => {
         setHandlingCount(reservations?.edges?.length || 0);
@@ -55,9 +56,14 @@ export const DataContextProvider: React.FC = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    const timer = setInterval(refetch, 30000);
-    return () => clearTimeout(timer);
-  }, [refetch]);
+    if (permissions) {
+      const timer = setInterval(() => {
+        refetch();
+      }, 30000);
+      return () => clearTimeout(timer);
+    }
+    return undefined;
+  }, [permissions, refetch]);
 
   if (permissions === undefined) {
     return null;
