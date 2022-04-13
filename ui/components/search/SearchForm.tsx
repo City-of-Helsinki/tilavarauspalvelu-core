@@ -37,10 +37,6 @@ const Container = styled.div`
   grid-gap: var(--spacing-m);
   font-size: var(--fontsize-body-m);
 
-  #applicationRound-toggle-button > span {
-    ${truncatedText}
-  }
-
   label {
     font-family: var(--font-medium);
     font-weight: 500;
@@ -75,9 +71,20 @@ const StyledSelect = styled(Select)`
     display: grid;
     text-align: left;
   }
+
+  span {
+    ${truncatedText}
+  }
 `;
 
 const Group = styled.div<{ children: ReactNode[]; $gap?: string }>`
+  /* stylelint-disable-next-line no-descending-specificity */
+  > div:first-of-type {
+    label {
+      width: calc(${({ children }) => children.length} * 100%);
+    }
+  }
+
   display: grid;
   grid-template-columns: repeat(${({ children }) => children.length}, 1fr);
   ${({ $gap }) => $gap && `gap: ${$gap};`}

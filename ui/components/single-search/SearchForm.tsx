@@ -12,7 +12,7 @@ import {
   getTranslation,
 } from "../../modules/util";
 import { emptyOption, participantCountOptions } from "../../modules/const";
-import { MediumButton } from "../../styles/util";
+import { MediumButton, truncatedText } from "../../styles/util";
 import { OptionType, StringParameter } from "../../modules/types";
 import { Query } from "../../modules/gql-types";
 import MultiSelectDropdown from "../form/MultiselectDropdown";
@@ -72,10 +72,25 @@ const Container = styled.div`
   }
 `;
 
+const StyledSelect = styled(Select)`
+  button {
+    display: grid;
+    text-align: left;
+  }
+
+  span {
+    ${truncatedText}
+  }
+`;
+
 const Group = styled.div<{ children: ReactNode[]; $gap?: string }>`
   display: grid;
   grid-template-columns: repeat(${({ children }) => children.length}, 1fr);
   ${({ $gap }) => $gap && `gap: ${$gap};`}
+
+  label {
+    width: 200%;
+  }
 `;
 
 const Hr = styled.hr`
@@ -224,7 +239,7 @@ const SearchForm = ({
           defaultValue={formValues.textSearch}
         />
         <Group>
-          <Select
+          <StyledSelect
             id="participantMinCountFilter"
             placeholder={t("common:minimum")}
             options={[emptyOption(t("common:select"))].concat(
@@ -241,7 +256,7 @@ const SearchForm = ({
             key={`minPersons${getValues("minPersons")}`}
             className="inputSm inputGroupStart"
           />
-          <Select
+          <StyledSelect
             id="participantMaxCountFilter"
             placeholder={t("common:maximum")}
             options={[emptyOption(t("common:select"))].concat(
