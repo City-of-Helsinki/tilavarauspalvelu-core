@@ -56,6 +56,7 @@ const translations: ITranslations = {
   },
   common: {
     clearAllSelections: ["Tyhjennä valinnat"],
+    clear: ["Tyhjennä"],
     removeValue: ["Poista arvo"],
     toggleMenu: ["Vaihda valikon tila"],
     hoursLabel: ["Tunnit"],

@@ -3,7 +3,7 @@ import i18next from "i18next";
 import trim from "lodash/trim";
 import upperFirst from "lodash/upperFirst";
 import get from "lodash/get";
-import { uniqBy } from "lodash";
+import { groupBy } from "lodash";
 import {
   AllocationResult,
   ApplicationEventSchedule,
@@ -336,15 +336,23 @@ export const parseAddressLine2 = (
   );
 };
 
+/** Filtering logic "OR within the group, AND between groups" */
 export const filterData = <T>(data: T[], filters: DataFilterOption[]): T[] => {
-  const len = uniqBy(filters, "key").length;
-  return data.filter(
-    (row) =>
-      filters.filter((filter) => {
+  const groups = groupBy(filters, "key");
+  const groupCount = Object.keys(groups).length;
+
+  return data.filter((row) => {
+    const groupsNames = Object.keys(groups);
+    const groupsMatched = groupsNames.filter((name) => {
+      const found = groups[name].find((filter) => {
         if (filter.function) {
           return filter.function(row);
         }
         return get(row, filter.key as string) === filter.value;
-      }).length === len
-  );
+      });
+      return Boolean(found);
+    });
+
+    return groupsMatched.length === groupCount;
+  });
 };

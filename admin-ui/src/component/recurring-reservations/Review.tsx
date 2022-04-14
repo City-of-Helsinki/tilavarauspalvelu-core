@@ -1,5 +1,5 @@
-import { Select, Table, Tabs } from "hds-react";
-import { memoize, uniq, uniqBy } from "lodash";
+import { Button, IconCross, Select, Table, Tabs, Tag } from "hds-react";
+import { memoize, sortBy, uniq, uniqBy } from "lodash";
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
@@ -62,6 +62,11 @@ const ApplicationRoundName = styled.div`
   line-height: var(--lineheight-m);
 `;
 
+const RoundTag = styled(Tag)`
+  border-radius: 30px;
+  padding: 0 1em;
+`;
+
 const StyledLink = styled(Link)`
   color: black;
 `;
@@ -71,17 +76,23 @@ const StyledApplicationRoundStatusBlock = styled(ApplicationRoundStatusBlock)`
 `;
 
 const TableWrapper = styled.div`
-  width: 100%;
+  div {
+    overflow: unset !important;
+  }
 
   caption {
     text-align: end;
   }
   table {
-    min-width: 1000px;
-    overflow: scroll;
+    max-width: var(--container-width-l);
+
     th {
       font-family: var(--font-bold);
       padding: var(--spacing-xs);
+      background: white;
+      position: sticky;
+      top: 0; /* Don't forget this, required for the stickiness */
+      box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4);
     }
     td {
       white-space: nowrap;
@@ -96,12 +107,24 @@ const FiltersContainer = styled.div`
   grid-template-columns: 20em 20em 1fr;
   gap: 2em;
   top: 0;
-  padding-bottom: 2em;
-  border-bottom: 1px solid var(--color-black-20);
 `;
 
 const ApplicationCount = styled.div`
   line-height: 1.5;
+`;
+
+const FilterTags = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1em;
+  flex-wrap: wrap;
+  border-bottom: 1px solid var(--color-black-20);
+  padding-bottom: 1rem;
+`;
+
+const ClearTagsButton = styled(Button)`
+  height: 0;
+  border: 0;
 `;
 
 type FilterOption = {
@@ -211,31 +234,79 @@ function Review({ applicationRound }: IProps): JSX.Element | null {
     return null;
   }
 
+  function deleteFilterTag(tag: FilterOption) {
+    const reducedUnitFilters = unitFilters.filter(
+      (uf) => uf.label !== tag.label
+    );
+
+    if (reducedUnitFilters.length !== unitFilters.length) {
+      setUnitFilters(reducedUnitFilters);
+    }
+
+    const reducedTypeFilters = typeFilters.filter(
+      (uf) => uf.label !== tag.label
+    );
+
+    if (reducedTypeFilters.length !== typeFilters.length) {
+      setTypeFilters(reducedTypeFilters);
+    }
+  }
+
+  const clearFilterTags = () => {
+    setUnitFilters([]);
+    setTypeFilters([]);
+  };
+
+  const tags = memoize((units, types) =>
+    sortBy(units, "label").concat(sortBy(types, "label"))
+  )(unitFilters, typeFilters);
+
   const filterControls = (
-    <FiltersContainer>
-      <Select
-        clearButtonAriaLabel={t("common.clearAllSelections")}
-        selectedItemRemoveButtonAriaLabel={t("common.removeValue")}
-        id="application-unit-filter"
-        label={t("Application.headings.unit")}
-        multiselect
-        placeholder={t("common.filter")}
-        options={getUnitOptions(applications)}
-        value={[...unitFilters]}
-        onChange={(v) => setUnitFilters(v)}
-      />
-      <Select
-        clearButtonAriaLabel={t("common.clearAllSelections")}
-        selectedItemRemoveButtonAriaLabel={t("common.removeValue")}
-        id="application-type-filter"
-        label={t("Application.headings.applicantType")}
-        placeholder={t("common.filter")}
-        multiselect
-        options={getApplicantTypeOptions(applications)}
-        value={[...typeFilters]}
-        onChange={setTypeFilters}
-      />
-    </FiltersContainer>
+    <>
+      <FiltersContainer>
+        <Select
+          clearButtonAriaLabel={t("common.clearAllSelections")}
+          selectedItemRemoveButtonAriaLabel={t("common.removeValue")}
+          id="application-unit-filter"
+          label={t("Application.headings.unit")}
+          multiselect
+          placeholder={t("common.filter")}
+          options={getUnitOptions(applications)}
+          value={[...unitFilters]}
+          onChange={(v) => setUnitFilters(v)}
+        />
+        <Select
+          clearButtonAriaLabel={t("common.clearAllSelections")}
+          selectedItemRemoveButtonAriaLabel={t("common.removeValue")}
+          id="application-type-filter"
+          label={t("Application.headings.applicantType")}
+          placeholder={t("common.filter")}
+          multiselect
+          options={getApplicantTypeOptions(applications)}
+          value={[...typeFilters]}
+          onChange={setTypeFilters}
+        />
+      </FiltersContainer>
+      <FilterTags>
+        {tags.map((tag) => (
+          <RoundTag key={tag.label} onDelete={() => deleteFilterTag(tag)}>
+            {tag.label}
+          </RoundTag>
+        ))}{" "}
+        {tags.length > 0 ? (
+          <ClearTagsButton
+            iconLeft={<IconCross />}
+            variant="supplementary"
+            type="button"
+            theme="black"
+            onClick={clearFilterTags}
+            size="small"
+          >
+            {t("common.clear")}
+          </ClearTagsButton>
+        ) : null}
+      </FilterTags>
+    </>
   );
 
   return (
@@ -362,6 +433,7 @@ function Review({ applicationRound }: IProps): JSX.Element | null {
                     count: filteredApplications.applications.length,
                   })}
                 </ApplicationCount>
+
                 <TableWrapper>
                   <Table
                     ariaLabelSortButtonAscending="Sorted in ascending order"
