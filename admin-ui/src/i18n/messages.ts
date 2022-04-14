@@ -234,7 +234,7 @@ const translations: ITranslations = {
     numTurns: ["Vuorojen määrä"],
     basket: ["Kori"],
     authenticatedUser: ["Tunnistautunut käyttäjä"],
-    unhandledApplications: ["Käsittelemättömät hakemukset {{count}}/{{of}}"],
+    unhandledApplications: ["{{count}} hakemusta"],
     headings: {
       customer: ["Hakija"],
       unit: ["Toimipiste"],

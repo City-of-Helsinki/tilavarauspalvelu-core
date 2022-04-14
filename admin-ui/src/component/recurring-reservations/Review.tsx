@@ -1,5 +1,5 @@
-import { IconSliders, Table, Tabs } from "hds-react";
-import { uniq, uniqBy } from "lodash";
+import { Select, Table, Tabs } from "hds-react";
+import { memoize, uniq, uniqBy } from "lodash";
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
@@ -7,8 +7,8 @@ import styled from "styled-components";
 import { getApplications } from "../../common/api";
 import {
   ApplicationRound as ApplicationRoundType,
-  DataFilterConfig,
   DataFilterOption,
+  Unit,
 } from "../../common/types";
 import { applicationDetailsUrl, applicationRoundUrl } from "../../common/urls";
 import { filterData } from "../../common/util";
@@ -16,8 +16,6 @@ import { useNotification } from "../../context/NotificationContext";
 import { IngressContainer } from "../../styles/layout";
 import { H2 } from "../../styles/new-typography";
 import StatusRecommendation from "../applications/StatusRecommendation";
-import { FilterBtn } from "../FilterContainer";
-import FilterControls from "../FilterControls";
 import Loader from "../Loader";
 import withMainMenu from "../withMainMenu";
 import { NaviItem } from "./ApplicationRoundNavi";
@@ -51,6 +49,9 @@ const StyledH2 = styled(H2)`
 `;
 
 const TabContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-m);
   margin-top: var(--spacing-s);
   line-height: 1;
 `;
@@ -89,60 +90,62 @@ const TableWrapper = styled.div`
   }
 `;
 
-const FilterContainer = styled.div`
-  background-color: white;
-  display: flex;
-  align-items: center;
-  height: 56px;
-  position: sticky;
+const FiltersContainer = styled.div`
+  z-index: 10000;
+  display: grid;
+  grid-template-columns: 20em 20em 1fr;
+  gap: 2em;
   top: 0;
-  z-index: var(--tilavaraus-admin-sticky-header);
-  justify-content: space-between;
-  :nth-child(1) {
-    text-align: right;
-  }
+  padding-bottom: 2em;
+  border-bottom: 1px solid var(--color-black-20);
 `;
 
-const getFilterConfig = (
-  applications: ApplicationView[]
-): DataFilterConfig[] => {
-  const applicantTypes = uniq(applications.map((app) => app.type));
-  const statuses = uniq(applications.map((app) => app.status));
-  const units = uniqBy(
-    applications.flatMap((app) => app.units),
-    "id"
-  );
+const ApplicationCount = styled.div`
+  line-height: 1.5;
+`;
 
-  return [
-    {
-      title: "Application.headings.applicantType",
-      filters: applicantTypes
-        .filter((n) => n)
-        .map((value) => ({
-          title: value,
-          key: "type",
-          value: value || "",
-        })),
-    },
-    {
-      title: "Application.headings.applicationStatus",
-      filters: statuses.map((status) => ({
-        title: `Application.statuses.${status}`,
-        key: "status",
-        value: status,
-      })),
-    },
-    {
-      title: "Application.headings.unit",
-      filters: units.map((unit) => ({
+type FilterOption = {
+  label: string;
+  value: DataFilterOption;
+};
+
+const getUnitOptions = memoize(
+  (applications: ApplicationView[]): FilterOption[] => {
+    const units = uniqBy(
+      applications.flatMap((app) => app.units),
+      "id"
+    );
+
+    units.sort((u1: Unit, u2: Unit) =>
+      u1.name.fi.toLowerCase().localeCompare(u2.name.fi.toLowerCase())
+    );
+
+    return units.map((unit) => ({
+      label: unit.name.fi,
+      value: {
         title: unit.name.fi,
         key: "unit",
         function: (application: ApplicationView) =>
           Boolean(application.units.find((u) => u.id === unit.id)),
-      })),
-    },
-  ];
-};
+      },
+    }));
+  }
+);
+
+const getApplicantTypeOptions = memoize(
+  (applications: ApplicationView[]): FilterOption[] => {
+    const applicantTypes = uniq(applications.map((app) => app.type));
+
+    return applicantTypes.map((value) => ({
+      label: value,
+      value: {
+        title: value,
+        key: "type",
+        value,
+      },
+    }));
+  }
+);
 
 function Review({ applicationRound }: IProps): JSX.Element | null {
   const [isLoading, setIsLoading] = useState(true);
@@ -150,22 +153,22 @@ function Review({ applicationRound }: IProps): JSX.Element | null {
   const [applicationEvents, setApplicationEvents] = useState<ApplicationView[]>(
     []
   );
-  const [filterConfig, setFilterConfig] = useState<DataFilterConfig[] | null>(
-    null
-  );
+
+  const [unitFilters, setUnitFilters] = useState<FilterOption[]>([]);
+  const [typeFilters, setTypeFilters] = useState<FilterOption[]>([]);
   const { notifyError } = useNotification();
-  const [filters, setFilters] = useState<DataFilterOption[]>([]);
-  const [filtersAreVisible, toggleFilterVisibility] = useState(false);
 
   const { t } = useTranslation();
 
-  const filteredApplications = useMemo(
-    () => ({
+  const filteredApplications = useMemo(() => {
+    const filters = unitFilters
+      .map((f) => f.value)
+      .concat(typeFilters.map((f) => f.value));
+    return {
       applications: filterData(applications, filters),
       applicationEvents: filterData(applicationEvents, filters),
-    }),
-    [applications, applicationEvents, filters]
-  );
+    };
+  }, [applications, applicationEvents, typeFilters, unitFilters]);
 
   useEffect(() => {
     const fetchApplications = async (ar: ApplicationRoundType) => {
@@ -175,7 +178,6 @@ function Review({ applicationRound }: IProps): JSX.Element | null {
           status: "in_review,review_done,declined",
         });
         const mapped = result.map((app) => appMapper(ar, app, t));
-        setFilterConfig(getFilterConfig(mapped));
         setApplications(mapped);
         setApplicationEvents(
           result
@@ -203,11 +205,38 @@ function Review({ applicationRound }: IProps): JSX.Element | null {
     return <Loader />;
   }
 
-  const ready = applicationRound && filterConfig;
+  const ready = applicationRound;
 
   if (!ready) {
     return null;
   }
+
+  const filterControls = (
+    <FiltersContainer>
+      <Select
+        clearButtonAriaLabel={t("common.clearAllSelections")}
+        selectedItemRemoveButtonAriaLabel={t("common.removeValue")}
+        id="application-unit-filter"
+        label={t("Application.headings.unit")}
+        multiselect
+        placeholder={t("common.filter")}
+        options={getUnitOptions(applications)}
+        value={[...unitFilters]}
+        onChange={(v) => setUnitFilters(v)}
+      />
+      <Select
+        clearButtonAriaLabel={t("common.clearAllSelections")}
+        selectedItemRemoveButtonAriaLabel={t("common.removeValue")}
+        id="application-type-filter"
+        label={t("Application.headings.applicantType")}
+        placeholder={t("common.filter")}
+        multiselect
+        options={getApplicantTypeOptions(applications)}
+        value={[...typeFilters]}
+        onChange={setTypeFilters}
+      />
+    </FiltersContainer>
+  );
 
   return (
     <Wrapper>
@@ -250,48 +279,12 @@ function Review({ applicationRound }: IProps): JSX.Element | null {
             </Tabs.TabList>
             <Tabs.TabPanel>
               <TabContent>
-                <FilterContainer>
-                  <>
-                    <FilterBtn
-                      variant="supplementary"
-                      data-testid="data-table__button--filter-toggle"
-                      iconLeft={<IconSliders aria-hidden />}
-                      onClick={(): void =>
-                        toggleFilterVisibility(!filtersAreVisible)
-                      }
-                      className={
-                        filtersAreVisible ? "filterControlsAreOpen" : ""
-                      }
-                      $filterControlsAreOpen={filtersAreVisible}
-                      $filtersActive={filterConfig.length > 0}
-                      title={t(
-                        `${
-                          filters.length > 0
-                            ? "common.filtered"
-                            : "common.filter"
-                        }`
-                      )}
-                    >
-                      {t(
-                        `${
-                          filters.length > 0
-                            ? "common.filtered"
-                            : "common.filter"
-                        }`
-                      )}
-                    </FilterBtn>
-                    <FilterControls
-                      filters={filters}
-                      visible={filtersAreVisible}
-                      applyFilters={setFilters}
-                      config={filterConfig}
-                    />
-                  </>
+                {filterControls}
+                <ApplicationCount>
                   {t("Application.unhandledApplications", {
                     count: filteredApplications.applications.length,
-                    of: filteredApplications.applications.length,
                   })}
-                </FilterContainer>
+                </ApplicationCount>
                 <TableWrapper>
                   <Table
                     ariaLabelSortButtonAscending="Sorted in ascending order"
@@ -306,7 +299,9 @@ function Review({ applicationRound }: IProps): JSX.Element | null {
                         key: "applicantSort",
                         transform: ({ applicant, id }) => (
                           <StyledLink to={applicationDetailsUrl(id)}>
-                            {truncate(applicant, 20)}
+                            <span title={applicant}>
+                              {truncate(applicant, 20)}
+                            </span>
                           </StyledLink>
                         ),
                       },
@@ -319,14 +314,23 @@ function Review({ applicationRound }: IProps): JSX.Element | null {
                         headerName: t("Application.headings.unit"),
                         isSortable: true,
                         key: "unitsSort",
-                        transform: ({ units }: ApplicationView) =>
-                          truncate(
-                            units
-                              .filter((u, i) => i < 2)
-                              .map((u) => u.name.fi)
-                              .join(", "),
-                            23
-                          ),
+                        transform: ({ units }: ApplicationView) => {
+                          const allUnits = units
+                            .map((u) => u.name.fi)
+                            .join(", ");
+
+                          return (
+                            <span title={allUnits}>
+                              {truncate(
+                                units
+                                  .filter((u, i) => i < 2)
+                                  .map((u) => u.name.fi)
+                                  .join(", "),
+                                23
+                              )}
+                            </span>
+                          );
+                        },
                       },
                       {
                         headerName: t("Application.headings.applicationCount"),
@@ -352,53 +356,16 @@ function Review({ applicationRound }: IProps): JSX.Element | null {
             </Tabs.TabPanel>
             <Tabs.TabPanel>
               <TabContent>
-                <FilterContainer>
-                  <>
-                    <FilterBtn
-                      variant="supplementary"
-                      data-testid="data-table__button--filter-toggle"
-                      iconLeft={<IconSliders aria-hidden />}
-                      onClick={(): void =>
-                        toggleFilterVisibility(!filtersAreVisible)
-                      }
-                      className={
-                        filtersAreVisible ? "filterControlsAreOpen" : ""
-                      }
-                      $filterControlsAreOpen={filtersAreVisible}
-                      $filtersActive={filterConfig.length > 0}
-                      title={t(
-                        `${
-                          filters.length > 0
-                            ? "common.filtered"
-                            : "common.filter"
-                        }`
-                      )}
-                    >
-                      {t(
-                        `${
-                          filters.length > 0
-                            ? "common.filtered"
-                            : "common.filter"
-                        }`
-                      )}
-                    </FilterBtn>
-                    <FilterControls
-                      filters={filters}
-                      visible={filtersAreVisible}
-                      applyFilters={setFilters}
-                      config={filterConfig}
-                    />
-                  </>
+                {filterControls}
+                <ApplicationCount>
                   {t("Application.unhandledApplications", {
                     count: filteredApplications.applications.length,
-                    of: filteredApplications.applications.length,
                   })}
-                </FilterContainer>
+                </ApplicationCount>
                 <TableWrapper>
                   <Table
                     ariaLabelSortButtonAscending="Sorted in ascending order"
                     ariaLabelSortButtonDescending="Sorted in descending order"
-                    ariaLabelSortButtonUnset="Not sorted"
                     initialSortingColumnKey="applicantSort"
                     initialSortingOrder="asc"
                     cols={[
@@ -410,7 +377,9 @@ function Review({ applicationRound }: IProps): JSX.Element | null {
                           <StyledLink
                             to={`${applicationDetailsUrl(id)}#${eventId}`}
                           >
-                            {truncate(applicant, 20)}
+                            <span title={applicant}>
+                              {truncate(applicant, 20)}
+                            </span>
                           </StyledLink>
                         ),
                       },
@@ -424,14 +393,23 @@ function Review({ applicationRound }: IProps): JSX.Element | null {
                         headerName: t("Application.headings.unit"),
                         isSortable: true,
                         key: "unitsSort",
-                        transform: ({ units }: ApplicationView) =>
-                          truncate(
-                            units
-                              .filter((u, i) => i < 2)
-                              .map((u) => u.name.fi)
-                              .join(", "),
-                            23
-                          ),
+                        transform: ({ units }: ApplicationView) => {
+                          const allUnits = units
+                            .map((u) => u.name.fi)
+                            .join(", ");
+
+                          return (
+                            <span title={allUnits}>
+                              {truncate(
+                                units
+                                  .filter((u, i) => i < 2)
+                                  .map((u) => u.name.fi)
+                                  .join(", "),
+                                23
+                              )}
+                            </span>
+                          );
+                        },
                       },
                       {
                         headerName: t("Application.headings.applicationCount"),
