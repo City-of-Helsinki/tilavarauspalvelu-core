@@ -15,6 +15,7 @@ import { filterData } from "../../common/util";
 import { useNotification } from "../../context/NotificationContext";
 import { IngressContainer } from "../../styles/layout";
 import { H2 } from "../../styles/new-typography";
+import { breakpoints } from "../../styles/util";
 import StatusRecommendation from "../applications/StatusRecommendation";
 import Loader from "../Loader";
 import withMainMenu from "../withMainMenu";
@@ -77,7 +78,10 @@ const StyledApplicationRoundStatusBlock = styled(ApplicationRoundStatusBlock)`
 
 const TableWrapper = styled.div`
   div {
-    overflow: unset !important;
+    overflow-x: auto;
+    @media (min-width: ${breakpoints.xl}) {
+      overflow-x: unset !important;
+    }
   }
 
   caption {
@@ -91,7 +95,7 @@ const TableWrapper = styled.div`
       padding: var(--spacing-xs);
       background: white;
       position: sticky;
-      top: 0; /* Don't forget this, required for the stickiness */
+      top: 0;
       box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4);
     }
     td {
@@ -103,8 +107,9 @@ const TableWrapper = styled.div`
 
 const FiltersContainer = styled.div`
   z-index: 10000;
+  max-width: var(--container-width-l);
   display: grid;
-  grid-template-columns: 20em 20em 1fr;
+  grid-template-columns: 1fr 1fr;
   gap: 2em;
   top: 0;
 `;
