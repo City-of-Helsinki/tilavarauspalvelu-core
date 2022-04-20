@@ -349,7 +349,12 @@ class ApplicationEventSerializer(serializers.ModelSerializer):
         }
 
     def get_weekly_amount_reductions_count(self, obj):
-        return obj.weekly_amount_reductions.count()
+        # TODO: this can be optimized everywhere by annotating Count("weekly_amount_reductions") to queries
+        return (
+            obj.weekly_amount_reductions__count
+            if hasattr(obj, "weekly_amount_reductions__count")
+            else obj.weekly_amount_reductions.count()
+        )
 
     def get_purpose_name(self, obj):
         if obj.purpose:

@@ -5,6 +5,7 @@ Django==3.2.13
 django-auditlog==1.0a1
 django-celery-results
 django-cors-headers==3.6.0
+django-debug-toolbar
 django-enumfields==2.0.0
 django-environ==0.4.5
 django-extensions==3.0.9

@@ -129,9 +129,9 @@ class GeneralRolePermission(permissions.BasePermission):
 class UnitRolePermission(permissions.BasePermission):
     def has_object_permission(self, request, view, unit_role):
         if unit_role.unit_group:
-            return can_manage_unit_group_roles(request.user, unit_role.unit_group)
+            return can_manage_unit_group_roles(request.user, [unit_role.unit_group.id])
         if unit_role.unit:
-            return can_manage_unit_roles(request.user, unit_role.unit)
+            return can_manage_unit_roles(request.user, [unit_role.unit.id])
         return False
 
     def has_permission(self, request, view):
@@ -216,13 +216,11 @@ class ApplicationStatusPermission(permissions.BasePermission):
     def check_permissions_for_single(self, request, application_id):
         try:
             service_sector = ServiceSector.objects.get(
-                applicationround=ApplicationRound.objects.get(
+                applicationround=ApplicationRound.objects.filter(
                     applications=application_id
-                )
+                )[:1]
             )
             return can_manage_service_sectors_applications(request.user, service_sector)
-        except ApplicationRound.DoesNotExist:
-            return False
         except ServiceSector.DoesNotExist:
             return False
 
@@ -254,12 +252,12 @@ class ApplicationEventStatusPermission(permissions.BasePermission):
         if not application_event_id:
             return False
         try:
-            service_sector = ServiceSector.objects.get(
-                applicationround=ApplicationRound.objects.get(
-                    applications=Application.objects.get(
+            service_sector = ServiceSector.objects.filter(
+                applicationround=ApplicationRound.objects.filter(
+                    applications=Application.objects.filter(
                         application_events=application_event_id
-                    )
-                )
+                    )[:1]
+                )[:1]
             )
 
             if status in (
@@ -267,20 +265,23 @@ class ApplicationEventStatusPermission(permissions.BasePermission):
                 ApplicationEventStatus.DECLINED,
             ):
                 return can_manage_service_sectors_applications(
-                    request.user, service_sector
+                    request.user, service_sector.first()
                 )
             elif status == ApplicationEventStatus.VALIDATED:
                 application_event = ApplicationEvent.objects.get(
                     id=application_event_id
                 )
-                units = [
-                    event_res_unit.reservation_unit.unit
-                    for event_res_unit in application_event.event_reservation_units.all()
-                ]
+                units = Unit.objects.filter(
+                    reservationunit__eventreservationunit__id__in=(
+                        application_event.event_reservation_units.all().values_list(
+                            "id", flat=True
+                        )
+                    )
+                )
                 return can_validate_unit_applications(
                     request.user, units
                 ) or can_manage_service_sectors_applications(
-                    request.user, service_sector
+                    request.user, service_sector.first()
                 )
         except (
             Application.DoesNotExist,

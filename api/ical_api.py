@@ -95,7 +95,7 @@ class ReservationUnitCalendarUrlViewSet(
     mixins.RetrieveModelMixin,
 ):
     serializer_class = ReservationUnitCalendarUrlSerializer
-    queryset = ReservationUnit.objects.all()
+    queryset = ReservationUnit.objects.all().prefetch_related("unit")
     permission_classes = (
         [ReservationUnitCalendarUrlPermission]
         if not settings.TMP_PERMISSIONS_DISABLED

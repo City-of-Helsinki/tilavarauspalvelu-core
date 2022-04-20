@@ -8,7 +8,7 @@ import recurrence
 from django.contrib.auth import get_user_model
 from django.contrib.postgres.fields import ArrayField
 from django.db import Error, models
-from django.db.models import QuerySet
+from django.db.models import OuterRef, QuerySet, Subquery
 from django.utils.text import format_lazy
 from django.utils.translation import gettext_lazy as _
 from recurrence.fields import RecurrenceField
@@ -590,6 +590,21 @@ class ApplicationEventStatus(models.Model):
         return [s[0] for s in cls.STATUS_CHOICES]
 
 
+class ApplicationManager(models.Manager):
+    def get_queryset(self) -> QuerySet:
+        return (
+            super()
+            .get_queryset()
+            .annotate(
+                latest_status=Subquery(
+                    ApplicationStatus.objects.filter(application__id=OuterRef("id"))
+                    .order_by("-id")
+                    .values("status")[:1]
+                )
+            )
+        )
+
+
 class Application(APPLICANT_TYPE_CONST, models.Model):
 
     applicant_type = models.CharField(
@@ -662,9 +677,17 @@ class Application(APPLICANT_TYPE_CONST, models.Model):
     created_date = models.DateTimeField(auto_now_add=True)
     last_modified_date = models.DateTimeField(auto_now=True)
 
+    objects = ApplicationManager()
+
+    def refresh_from_db(self, using=None, fields=None) -> None:
+        super().refresh_from_db(using, fields)
+
+        if hasattr(self, "latest_status"):
+            delattr(self, "latest_status")
+
     @property
     def status(self):
-        return self.get_status().status
+        return self.get_status()
 
     @status.setter
     def status(self, status):
@@ -672,15 +695,25 @@ class Application(APPLICANT_TYPE_CONST, models.Model):
 
     @status.getter
     def status(self):
-        return self.get_status().status
+        return self.get_status()
 
     def set_status(self, status, user=None):
         if status not in ApplicationStatus.get_statuses():
             raise ValidationError(_("Invalid application status"))
         ApplicationStatus.objects.create(application=self, status=status, user=user)
+        self.latest_status = status
 
     def get_status(self):
-        return self.statuses.last()
+        if hasattr(self, "latest_status"):
+            return self.latest_status
+
+        status = self.statuses.values("status").last()
+        if status:
+            status = status.get("status")
+
+        self.latest_status = status
+
+        return status
 
     def validate_review(self):
         if not hasattr(self, "contact_person"):
@@ -715,6 +748,23 @@ class ApplicationAggregateData(AggregateDataBase):
     application = models.ForeignKey(
         Application, on_delete=models.CASCADE, related_name="aggregated_data"
     )
+
+
+class ApplicationEventManager(models.Manager):
+    def get_queryset(self) -> QuerySet:
+        return (
+            super()
+            .get_queryset()
+            .annotate(
+                latest_status=Subquery(
+                    ApplicationEventStatus.objects.filter(
+                        application_event__id=OuterRef("id")
+                    )
+                    .order_by("-id")
+                    .values("status")[:1]
+                )
+            )
+        )
 
 
 class ApplicationEvent(models.Model):
@@ -805,9 +855,17 @@ class ApplicationEvent(models.Model):
 
     uuid = models.UUIDField(default=uuid.uuid4, null=False, editable=False, unique=True)
 
+    objects = ApplicationEventManager()
+
+    def refresh_from_db(self, using=None, fields=None) -> None:
+        super().refresh_from_db(using, fields)
+
+        if hasattr(self, "latest_status"):
+            delattr(self, "latest_status")
+
     @property
     def status(self):
-        return self.get_status().status
+        return self.get_status()
 
     @status.setter
     def status(self, status):
@@ -815,7 +873,7 @@ class ApplicationEvent(models.Model):
 
     @status.getter
     def status(self):
-        return self.get_status().status
+        return self.get_status()
 
     def set_status(self, status, user=None):
         if status not in ApplicationEventStatus.get_statuses():
@@ -823,9 +881,19 @@ class ApplicationEvent(models.Model):
         ApplicationEventStatus.objects.create(
             application_event=self, status=status, user=user
         )
+        self.latest_status = status
 
     def get_status(self):
-        return self.statuses.last()
+        if hasattr(self, "latest_status"):
+            return self.latest_status
+
+        status = self.statuses.values("status").last()
+        if status:
+            status = status.get("status")
+
+        self.latest_status = status
+
+        return status
 
     @property
     def is_approved(self):

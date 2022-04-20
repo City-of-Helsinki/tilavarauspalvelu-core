@@ -206,6 +206,7 @@ env = environ.Env(
     DEFAULT_FROM_EMAIL=(str, django_default_from_email),
     # Tprek
     TPREK_UNIT_URL=(str, "https://www.hel.fi/palvelukarttaws/rest/v4/unit/"),
+    USE_DEBUG_TOOLBAR=(bool, False),
 )
 
 environ.Env.read_env()
@@ -496,3 +497,16 @@ GRAPH_MODELS = {
 }
 
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
+
+USE_DEBUG_TOOLBAR = env("USE_DEBUG_TOOLBAR")
+if DEBUG and USE_DEBUG_TOOLBAR:
+    # Hardcode to internal IPs as debug toolbar will expose internal information
+    INTERNAL_IPS = ["127.0.0.1", "localhost"]
+    INSTALLED_APPS.append("debug_toolbar")
+
+    # According to documentation, this should be as early as possible in the middleware tree
+    MIDDLEWARE.insert(0, "debug_toolbar.middleware.DebugToolbarMiddleware")
+
+    # NOTE: If you run this in docker,
+    # here is additional information for set-up: https://django-debug-toolbar.readthedocs.io/en/latest/installation.html
+    # right before "Troubleshooting"
