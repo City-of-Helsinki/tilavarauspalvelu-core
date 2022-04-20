@@ -76,6 +76,10 @@ const StyledApplicationRoundStatusBlock = styled(ApplicationRoundStatusBlock)`
   margin: 0;
 `;
 
+const NoDataMessage = styled.span`
+  line-height: 4;
+`;
+
 const TableWrapper = styled.div`
   div {
     overflow-x: auto;
@@ -175,6 +179,30 @@ const getApplicantTypeOptions = memoize(
   }
 );
 
+function DataOrMessage({
+  data,
+  filteredData,
+  children,
+  noData,
+  noFilteredData,
+}: {
+  data: ApplicationView[];
+  filteredData: ApplicationView[];
+  children: JSX.Element;
+  noData: string;
+  noFilteredData: string;
+}) {
+  if (filteredData.length) {
+    return children;
+  }
+
+  if (data.length === 0) {
+    return <NoDataMessage>{noData}</NoDataMessage>;
+  }
+
+  return <NoDataMessage>{noFilteredData}</NoDataMessage>;
+}
+
 function Review({ applicationRound }: IProps): JSX.Element | null {
   const [isLoading, setIsLoading] = useState(true);
   const [applications, setApplications] = useState<ApplicationView[]>([]);
@@ -266,7 +294,9 @@ function Review({ applicationRound }: IProps): JSX.Element | null {
     sortBy(units, "label").concat(sortBy(types, "label"))
   )(unitFilters, typeFilters);
 
-  const filterControls = (
+  const hasApplications = applications.length > 0;
+
+  const filterControls = hasApplications && (
     <>
       <FiltersContainer>
         <Select
@@ -356,157 +386,182 @@ function Review({ applicationRound }: IProps): JSX.Element | null {
             <Tabs.TabPanel>
               <TabContent>
                 {filterControls}
-                <ApplicationCount>
-                  {t("Application.unhandledApplications", {
-                    count: filteredApplications.applications.length,
-                  })}
-                </ApplicationCount>
+                {filteredApplications.applications.length > 0 && (
+                  <ApplicationCount>
+                    {t("Application.unhandledApplications", {
+                      count: filteredApplications.applications.length,
+                    })}
+                  </ApplicationCount>
+                )}
                 <TableWrapper>
-                  <Table
-                    ariaLabelSortButtonAscending="Sorted in ascending order"
-                    ariaLabelSortButtonDescending="Sorted in descending order"
-                    ariaLabelSortButtonUnset="Not sorted"
-                    initialSortingColumnKey="applicantSort"
-                    initialSortingOrder="asc"
-                    cols={[
-                      {
-                        headerName: t("Application.headings.customer"),
-                        isSortable: true,
-                        key: "applicantSort",
-                        transform: ({ applicant, id }) => (
-                          <StyledLink to={applicationDetailsUrl(id)}>
-                            <span title={applicant}>
-                              {truncate(applicant, 20)}
-                            </span>
-                          </StyledLink>
-                        ),
-                      },
-                      {
-                        headerName: t("Application.headings.applicantType"),
-                        isSortable: true,
-                        key: "type",
-                      },
-                      {
-                        headerName: t("Application.headings.unit"),
-                        isSortable: true,
-                        key: "unitsSort",
-                        transform: ({ units }: ApplicationView) => {
-                          const allUnits = units
-                            .map((u) => u.name.fi)
-                            .join(", ");
-
-                          return (
-                            <span title={allUnits}>
-                              {truncate(
-                                units
-                                  .filter((u, i) => i < 2)
-                                  .map((u) => u.name.fi)
-                                  .join(", "),
-                                23
-                              )}
-                            </span>
-                          );
+                  <DataOrMessage
+                    data={applications}
+                    filteredData={filteredApplications.applications}
+                    noData={t("ApplicationRound.noApplications")}
+                    noFilteredData={t(
+                      "ApplicationRound.noFilteredApplications"
+                    )}
+                  >
+                    <Table
+                      ariaLabelSortButtonAscending="Sorted in ascending order"
+                      ariaLabelSortButtonDescending="Sorted in descending order"
+                      ariaLabelSortButtonUnset="Not sorted"
+                      initialSortingColumnKey="applicantSort"
+                      initialSortingOrder="asc"
+                      cols={[
+                        {
+                          headerName: t("Application.headings.customer"),
+                          isSortable: true,
+                          key: "applicantSort",
+                          transform: ({ applicant, id }) => (
+                            <StyledLink to={applicationDetailsUrl(id)}>
+                              <span title={applicant}>
+                                {truncate(applicant, 20)}
+                              </span>
+                            </StyledLink>
+                          ),
                         },
-                      },
-                      {
-                        headerName: t("Application.headings.applicationCount"),
-                        isSortable: true,
-                        key: "applicationCountSort",
-                        sortIconType: "other",
-                        transform: ({ applicationCount }: ApplicationView) =>
-                          applicationCount,
-                      },
-                      {
-                        headerName: t("Application.headings.phase"),
-                        key: "status",
-                        transform: ({ statusView }: ApplicationView) =>
-                          statusView,
-                      },
-                    ]}
-                    indexKey="id"
-                    rows={filteredApplications.applications}
-                    variant="light"
-                  />
+                        {
+                          headerName: t("Application.headings.applicantType"),
+                          isSortable: true,
+                          key: "type",
+                        },
+                        {
+                          headerName: t("Application.headings.unit"),
+                          isSortable: true,
+                          key: "unitsSort",
+                          transform: ({ units }: ApplicationView) => {
+                            const allUnits = units
+                              .map((u) => u.name.fi)
+                              .join(", ");
+
+                            return (
+                              <span title={allUnits}>
+                                {truncate(
+                                  units
+                                    .filter((u, i) => i < 2)
+                                    .map((u) => u.name.fi)
+                                    .join(", "),
+                                  23
+                                )}
+                              </span>
+                            );
+                          },
+                        },
+                        {
+                          headerName: t(
+                            "Application.headings.applicationCount"
+                          ),
+                          isSortable: true,
+                          key: "applicationCountSort",
+                          sortIconType: "other",
+                          transform: ({ applicationCount }: ApplicationView) =>
+                            applicationCount,
+                        },
+                        {
+                          headerName: t("Application.headings.phase"),
+                          key: "status",
+                          transform: ({ statusView }: ApplicationView) =>
+                            statusView,
+                        },
+                      ]}
+                      indexKey="id"
+                      rows={filteredApplications.applications}
+                      variant="light"
+                    />
+                  </DataOrMessage>
                 </TableWrapper>
               </TabContent>
             </Tabs.TabPanel>
             <Tabs.TabPanel>
               <TabContent>
                 {filterControls}
-                <ApplicationCount>
-                  {t("Application.unhandledApplications", {
-                    count: filteredApplications.applications.length,
-                  })}
-                </ApplicationCount>
-
+                {filteredApplications.applicationEvents.length > 0 && (
+                  <ApplicationCount>
+                    {t("Application.unhandledApplicationEvents", {
+                      count: filteredApplications.applicationEvents.length,
+                    })}
+                  </ApplicationCount>
+                )}
                 <TableWrapper>
-                  <Table
-                    ariaLabelSortButtonAscending="Sorted in ascending order"
-                    ariaLabelSortButtonDescending="Sorted in descending order"
-                    initialSortingColumnKey="applicantSort"
-                    initialSortingOrder="asc"
-                    cols={[
-                      {
-                        headerName: t("Application.headings.customer"),
-                        isSortable: true,
-                        key: "applicantSort",
-                        transform: ({ applicant, id, eventId }) => (
-                          <StyledLink
-                            to={`${applicationDetailsUrl(id)}#${eventId}`}
-                          >
-                            <span title={applicant}>
-                              {truncate(applicant, 20)}
-                            </span>
-                          </StyledLink>
-                        ),
-                      },
-                      {
-                        headerName: t("Application.headings.name"),
-                        isSortable: true,
-                        transform: ({ name }) => truncate(name, 20),
-                        key: "nameSort",
-                      },
-                      {
-                        headerName: t("Application.headings.unit"),
-                        isSortable: true,
-                        key: "unitsSort",
-                        transform: ({ units }: ApplicationView) => {
-                          const allUnits = units
-                            .map((u) => u.name.fi)
-                            .join(", ");
-
-                          return (
-                            <span title={allUnits}>
-                              {truncate(
-                                units
-                                  .filter((u, i) => i < 2)
-                                  .map((u) => u.name.fi)
-                                  .join(", "),
-                                23
-                              )}
-                            </span>
-                          );
+                  <DataOrMessage
+                    data={applications}
+                    filteredData={filteredApplications.applications}
+                    noData={t("ApplicationRound.noApplicationEvents")}
+                    noFilteredData={t(
+                      "ApplicationRound.noFilteredApplicationEvents"
+                    )}
+                  >
+                    <Table
+                      ariaLabelSortButtonAscending="Sorted in ascending order"
+                      ariaLabelSortButtonDescending="Sorted in descending order"
+                      initialSortingColumnKey="applicantSort"
+                      initialSortingOrder="asc"
+                      cols={[
+                        {
+                          headerName: t("Application.headings.customer"),
+                          isSortable: true,
+                          key: "applicantSort",
+                          transform: ({ applicant, id, eventId }) => (
+                            <StyledLink
+                              to={`${applicationDetailsUrl(id)}#${eventId}`}
+                            >
+                              <span title={applicant}>
+                                {truncate(applicant, 20)}
+                              </span>
+                            </StyledLink>
+                          ),
                         },
-                      },
-                      {
-                        headerName: t("Application.headings.applicationCount"),
-                        isSortable: true,
-                        key: "applicationCountSort",
-                        sortIconType: "other",
-                        transform: ({ applicationCount }: ApplicationView) =>
-                          applicationCount,
-                      },
-                      {
-                        headerName: t("Application.headings.phase"),
-                        key: "status",
-                        transform: ({ statusView }: ApplicationView) =>
-                          statusView,
-                      },
-                    ]}
-                    indexKey="key"
-                    rows={filteredApplications.applicationEvents}
-                    variant="light"
-                  />
+                        {
+                          headerName: t("Application.headings.name"),
+                          isSortable: true,
+                          transform: ({ name }) => truncate(name, 20),
+                          key: "nameSort",
+                        },
+                        {
+                          headerName: t("Application.headings.unit"),
+                          isSortable: true,
+                          key: "unitsSort",
+                          transform: ({ units }: ApplicationView) => {
+                            const allUnits = units
+                              .map((u) => u.name.fi)
+                              .join(", ");
+
+                            return (
+                              <span title={allUnits}>
+                                {truncate(
+                                  units
+                                    .filter((u, i) => i < 2)
+                                    .map((u) => u.name.fi)
+                                    .join(", "),
+                                  23
+                                )}
+                              </span>
+                            );
+                          },
+                        },
+                        {
+                          headerName: t(
+                            "Application.headings.applicationCount"
+                          ),
+                          isSortable: true,
+                          key: "applicationCountSort",
+                          sortIconType: "other",
+                          transform: ({ applicationCount }: ApplicationView) =>
+                            applicationCount,
+                        },
+                        {
+                          headerName: t("Application.headings.phase"),
+                          key: "status",
+                          transform: ({ statusView }: ApplicationView) =>
+                            statusView,
+                        },
+                      ]}
+                      indexKey="key"
+                      rows={filteredApplications.applicationEvents}
+                      variant="light"
+                    />
+                  </DataOrMessage>
                 </TableWrapper>
               </TabContent>
             </Tabs.TabPanel>

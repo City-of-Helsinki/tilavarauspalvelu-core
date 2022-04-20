@@ -236,6 +236,7 @@ const translations: ITranslations = {
     basket: ["Kori"],
     authenticatedUser: ["Tunnistautunut käyttäjä"],
     unhandledApplications: ["{{count}} hakemusta"],
+    unhandledApplicationEvents: ["{{count}} haettua vuoroa"],
     headings: {
       customer: ["Hakija"],
       unit: ["Toimipiste"],
@@ -490,6 +491,14 @@ const translations: ITranslations = {
     notificationResolutionDoneHeading: ["Esihenkilöhyväksyntä ja päätös tehty"],
     notificationResolutionDoneBody: [
       "Voit hallita asiakkaille lähetettäviä päätöksiä täältä.",
+    ],
+    noApplications: ["Hakukierroksella ei ole vielä hakemuksia."],
+    noApplicationEvents: ["Hakukierroksella ei ole vielä haettuja vuoroja."],
+    noFilteredApplications: [
+      "Valituilla suodattimilla ei löytynyt yhtään hakemusta. Valitse suodattimia uudelleen tai tyhjennä kaikki suodattimet.",
+    ],
+    noFilteredApplicationEvents: [
+      "Valituilla suodattimilla ei löytynyt yhtään haettua vuoroa. Valitse suodattimia uudelleen tai tyhjennä kaikki suodattimet.",
     ],
   },
   Basket: {
