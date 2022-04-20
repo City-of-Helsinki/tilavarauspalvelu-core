@@ -1,13 +1,15 @@
 {
-  "name": "@tilavarauspalvelu/common",
+  "name": "common",
   "version": "0.1.0",
   "private": true,
   "module": "index.ts",
   "main": "index.ts",
   "dependencies": {
+    "hds-react": "^1.12.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "react-scripts": "4.0.3"
+    "react-scripts": "4.0.3",
+    "styled-components": "^5.3.5"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^5.11.4",

@@ -6,7 +6,6 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Container from "../../components/common/Container";
 import apolloClient from "../../modules/apolloClient";
 import Sanitize from "../../components/common/Sanitize";
-import Breadcrumb from "../../components/common/Breadcrumb";
 import KorosDefault from "../../components/common/KorosDefault";
 import { getTranslation } from "../../modules/util";
 import {
@@ -15,6 +14,7 @@ import {
   QueryApplicationRoundsArgs,
 } from "../../modules/gql-types";
 import { APPLICATION_ROUNDS } from "../../modules/queries/applicationRound";
+import Breadcrumb from "../../components/common/Breadcrumb";
 
 type Props = {
   applicationRound: ApplicationRoundType;

@@ -23,9 +23,10 @@ USER default
 # Install dependencies
 RUN yarn --frozen-lockfile
 
-WORKDIR /opt/app-root/src/admin-ui
-
 # Copy all files
+WORKDIR /opt/app-root/src/common
+COPY common .
+WORKDIR /opt/app-root/src/admin-ui
 COPY admin-ui .
 
 # Build application

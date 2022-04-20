@@ -1,5 +1,5 @@
 {
-  "name": "@tilavarauspalvelu/admin-ui",
+  "name": "admin-ui",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -26,6 +26,8 @@
     "axios-auth-refresh": "^3.1.0",
     "axios-case-converter": "^0.8.1",
     "classnames": "^2.2.6",
+    "common": "^0.1.0",
+    "customize-cra": "^1.0.0",
     "date-fns": "^2.16.1",
     "focus-trap-react": "^8.7.1",
     "graphql": "^15.5.1",
@@ -41,6 +43,7 @@
     "oidc-client": "^1.11.5",
     "query-string": "^7.0.0",
     "react": "^17.0.1",
+    "react-app-rewired": "^2.2.1",
     "react-dom": "^17.0.1",
     "react-i18next": "^11.8.5",
     "react-map-gl": "5.3.16",
@@ -53,9 +56,9 @@
     "web-vitals": "^0.2.4"
   },
   "scripts": {
-    "start": "HOST=local-tilavaraus.hel.fi HTTPS=true SSL_CRT_FILE=../common/certificates/local-tilavaraus.crt SSL_KEY_FILE=../common/certificates/local-tilavaraus.key react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
+    "start": "HOST=local-tilavaraus.hel.fi HTTPS=true SSL_CRT_FILE=../common/certificates/local-tilavaraus.crt SSL_KEY_FILE=../common/certificates/local-tilavaraus.key react-app-rewired start",
+    "build": "react-app-rewired build",
+    "test": "react-app-rewired test",
     "test:e2e-local": "testcafe --skip-js-errors \"chrome --window-size='1920,1080'\" e2e/tests",
     "lint": "eslint --ext ts,tsx src",
     "lint:css": "stylelint './src/**/*.tsx'",

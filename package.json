@@ -1,5 +1,5 @@
 {
-  "name": "tilavarauspalvelu",
+  "name": "tilavaraus",
   "private": true,
   "workspaces": [
     "common",
