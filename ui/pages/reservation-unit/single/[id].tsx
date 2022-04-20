@@ -271,6 +271,7 @@ const StyledKoros = styled(Koros).attrs({
   type: "basic",
 })`
   fill: var(--tilavaraus-gray);
+  margin-bottom: -1px;
 `;
 
 const StyledH2 = styled(H2)``;

@@ -17,4 +17,6 @@ export const StyledKoros = styled(Koros)<{
     background-color: ${$from};
     fill: ${$to};
   `}
+
+  margin-bottom: -1px;
 `;
