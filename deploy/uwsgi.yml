@@ -7,6 +7,7 @@ uwsgi:
   umask: 022
   reload-on-rss: 300
   http: :8000
+  buffer-size: 8192
 
   # Workload settings
   # Automatically scales up worker count when application is
