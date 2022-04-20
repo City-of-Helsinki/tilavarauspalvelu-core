@@ -242,7 +242,7 @@ class ReservationUnitViewSet(viewsets.ModelViewSet):
         qs = (
             ReservationUnit.objects.annotate(max_persons_sum=Sum("spaces__max_persons"))
             .all()
-            .prefetch_related("spaces", "resources", "services")
+            .prefetch_related("spaces", "resources", "services", "unit")
         )
         return qs
 
