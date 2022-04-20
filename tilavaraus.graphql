@@ -1164,6 +1164,7 @@ type ReservationType implements Node {
   recurringReservation: RecurringReservationType
   numPersons: Int
   purpose: ReservationPurposeType
+  cancelDetails: String!
   unitPrice: Float
   taxPercentageValue: Decimal
   price: Float
@@ -1397,18 +1398,18 @@ input ReservationUnitCreateMutationInput {
   Authentication required for reserving this reservation unit. Possible values are WEAK, STRONG.
   """
   authentication: String
-  additionalInstructionsFi: String
-  additionalInstructionsEn: String
-  additionalInstructionsSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
+  additionalInstructionsFi: String
+  additionalInstructionsEn: String
+  additionalInstructionsSv: String
   clientMutationId: String
 }
 
@@ -1501,18 +1502,18 @@ type ReservationUnitCreateMutationPayload {
   Authentication required for reserving this reservation unit. Possible values are WEAK, STRONG.
   """
   authentication: String
-  additionalInstructionsFi: String
-  additionalInstructionsEn: String
-  additionalInstructionsSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
+  additionalInstructionsFi: String
+  additionalInstructionsEn: String
+  additionalInstructionsSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -1867,18 +1868,18 @@ input ReservationUnitUpdateMutationInput {
   Authentication required for reserving this reservation unit. Possible values are WEAK, STRONG.
   """
   authentication: String
-  additionalInstructionsFi: String
-  additionalInstructionsEn: String
-  additionalInstructionsSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
+  additionalInstructionsFi: String
+  additionalInstructionsEn: String
+  additionalInstructionsSv: String
   clientMutationId: String
 }
 
@@ -1971,18 +1972,18 @@ type ReservationUnitUpdateMutationPayload {
   Authentication required for reserving this reservation unit. Possible values are WEAK, STRONG.
   """
   authentication: String
-  additionalInstructionsFi: String
-  additionalInstructionsEn: String
-  additionalInstructionsSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
+  additionalInstructionsFi: String
+  additionalInstructionsEn: String
+  additionalInstructionsSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
