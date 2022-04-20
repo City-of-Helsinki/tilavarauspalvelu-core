@@ -50,4 +50,16 @@ test("filterData", () => {
       [{ title: "", key: "name", value: "bar" }]
     )
   ).toEqual([{ name: "bar" }]);
+  expect(
+    filterData(
+      [
+        { name: "bar", size: 4 },
+        { name: "bar", size: 5 },
+      ],
+      [
+        { title: "", key: "name", value: "bar" },
+        { title: "", key: "size", value: 5 },
+      ]
+    )
+  ).toEqual([{ name: "bar", size: 5 }]);
 });
