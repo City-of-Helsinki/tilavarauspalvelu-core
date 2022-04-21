@@ -9,23 +9,25 @@ from assertpy import assert_that
 from django.conf import settings
 from django.core.management import call_command
 from django.test.testcases import TestCase
-from factory.fuzzy import FuzzyInteger
+from factory.fuzzy import FuzzyChoice, FuzzyInteger
 
-from ..models import PRIORITIES, Application, ApplicationEvent, ApplicationRound
+from ..models import (
+    PRIORITIES,
+    Application,
+    ApplicationEvent,
+    ApplicationRound,
+    ApplicationStatus,
+)
 from .factories import (
     ApplicationEventFactory,
     ApplicationEventScheduleFactory,
+    ApplicationStatusFactory,
     EventReservationUnitFactory,
 )
 
 
 class ApplicationDataExporterTestCase(TestCase):
-    export_dir = (
-        Path(settings.BASE_DIR)
-        / "exports"
-        / "applications"
-        / f"{datetime.now().strftime('%d-%m-%Y')}"
-    )
+    export_dir = Path(settings.BASE_DIR) / "exports" / "applications"
     application_round_id = None
     random_empty_application_round_id = None
 
@@ -49,6 +51,19 @@ class ApplicationDataExporterTestCase(TestCase):
             priority=PRIORITIES.PRIORITY_HIGH,
         )
 
+        cls.application_status = ApplicationStatusFactory(
+            application=cls.application_event.application,
+            status=FuzzyChoice(
+                choices=[
+                    # Exclude DRAFT status, as these will not be present in exports
+                    ApplicationStatus.IN_REVIEW,
+                    ApplicationStatus.REVIEW_DONE,
+                    ApplicationStatus.DECLINED,
+                    ApplicationStatus.CANCELLED,
+                ]
+            ),
+        )
+
         cls.application_round_id = (
             cls.application_event.application.application_round.id
         )
@@ -69,8 +84,10 @@ class ApplicationDataExporterTestCase(TestCase):
                 break
 
     @staticmethod
-    def _get_filename_for_round_and_priority(round: int, priority: str):
-        return f"application_data_round_{round}_priority_{priority}.csv"
+    def _get_filename_for_round(round: int):
+        return (
+            f"application_data_round_{round}_{datetime.now().strftime('%d-%m-%Y')}.csv"
+        )
 
     @classmethod
     def _test_first_data_line(cls, file_name: str, expected_row: List[Any]):
@@ -99,6 +116,7 @@ class ApplicationDataExporterTestCase(TestCase):
 
         expected_row = [
             str(application.id),
+            self.application_status.status,
             application.organisation.name,
             application.contact_person.first_name,
             application.contact_person.last_name,
@@ -124,26 +142,24 @@ class ApplicationDataExporterTestCase(TestCase):
             "",
             "",
             "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
         ]
 
-        file_name = self._get_filename_for_round_and_priority(
-            self.application_round_id, "HIGH"
-        )
+        file_name = self._get_filename_for_round(self.application_round_id)
         self._test_first_data_line(file_name, expected_row)
-
-        # These files should not have been written.
-        # Check that they do not exist!
-        not_existing_file_medium = self._get_filename_for_round_and_priority(
-            self.application_round_id, "MEDIUM"
-        )
-        not_existing_file_low = self._get_filename_for_round_and_priority(
-            self.application_round_id, "LOW"
-        )
-        not_existing_file_medium = self.export_dir / not_existing_file_medium
-        not_existing_file_low = self.export_dir / not_existing_file_low
-
-        assert_that(not_existing_file_medium.is_file()).is_false()
-        assert_that(not_existing_file_low.is_file()).is_false()
 
     def test_no_time_range(self):
         self.application_event.max_duration = timedelta(hours=1)
@@ -156,6 +172,7 @@ class ApplicationDataExporterTestCase(TestCase):
 
         expected_row = [
             str(application.id),
+            self.application_status.status,
             application.organisation.name,
             application.contact_person.first_name,
             application.contact_person.last_name,
@@ -181,26 +198,24 @@ class ApplicationDataExporterTestCase(TestCase):
             "",
             "",
             "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
         ]
 
-        file_name = self._get_filename_for_round_and_priority(
-            self.application_round_id, "HIGH"
-        )
+        file_name = self._get_filename_for_round(self.application_round_id)
         self._test_first_data_line(file_name, expected_row)
-
-        # These files should not have been written.
-        # Check that they do not exist!
-        not_existing_file_medium = self._get_filename_for_round_and_priority(
-            self.application_round_id, "MEDIUM"
-        )
-        not_existing_file_low = self._get_filename_for_round_and_priority(
-            self.application_round_id, "LOW"
-        )
-        not_existing_file_medium = self.export_dir / not_existing_file_medium
-        not_existing_file_low = self.export_dir / not_existing_file_low
-
-        assert_that(not_existing_file_medium.is_file()).is_false()
-        assert_that(not_existing_file_low.is_file()).is_false()
 
     def test_only_one_distinct_duration(self):
         self.application_event.max_duration = timedelta(hours=1)
@@ -213,6 +228,7 @@ class ApplicationDataExporterTestCase(TestCase):
 
         expected_row = [
             str(application.id),
+            self.application_status.status,
             application.organisation.name,
             application.contact_person.first_name,
             application.contact_person.last_name,
@@ -238,26 +254,24 @@ class ApplicationDataExporterTestCase(TestCase):
             "",
             "",
             "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
         ]
 
-        file_name = self._get_filename_for_round_and_priority(
-            self.application_round_id, "HIGH"
-        )
+        file_name = self._get_filename_for_round(self.application_round_id)
         self._test_first_data_line(file_name, expected_row)
-
-        # These files should not have been written.
-        # Check that they do not exist!
-        not_existing_file_medium = self._get_filename_for_round_and_priority(
-            self.application_round_id, "MEDIUM"
-        )
-        not_existing_file_low = self._get_filename_for_round_and_priority(
-            self.application_round_id, "LOW"
-        )
-        not_existing_file_medium = self.export_dir / not_existing_file_medium
-        not_existing_file_low = self.export_dir / not_existing_file_low
-
-        assert_that(not_existing_file_medium.is_file()).is_false()
-        assert_that(not_existing_file_low.is_file()).is_false()
 
     def test_minutes_in_duration(self):
         self.application_event.max_duration = timedelta(hours=1, minutes=30)
@@ -270,6 +284,7 @@ class ApplicationDataExporterTestCase(TestCase):
 
         expected_row = [
             str(application.id),
+            self.application_status.status,
             application.organisation.name,
             application.contact_person.first_name,
             application.contact_person.last_name,
@@ -295,26 +310,24 @@ class ApplicationDataExporterTestCase(TestCase):
             "",
             "",
             "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
         ]
 
-        file_name = self._get_filename_for_round_and_priority(
-            self.application_round_id, "HIGH"
-        )
+        file_name = self._get_filename_for_round(self.application_round_id)
         self._test_first_data_line(file_name, expected_row)
-
-        # These files should not have been written.
-        # Check that they do not exist!
-        not_existing_file_medium = self._get_filename_for_round_and_priority(
-            self.application_round_id, "MEDIUM"
-        )
-        not_existing_file_low = self._get_filename_for_round_and_priority(
-            self.application_round_id, "LOW"
-        )
-        not_existing_file_medium = self.export_dir / not_existing_file_medium
-        not_existing_file_low = self.export_dir / not_existing_file_low
-
-        assert_that(not_existing_file_medium.is_file()).is_false()
-        assert_that(not_existing_file_low.is_file()).is_false()
 
     def test_only_minutes_in_duration(self):
         self.application_event.min_duration = timedelta(minutes=30)
@@ -327,6 +340,7 @@ class ApplicationDataExporterTestCase(TestCase):
 
         expected_row = [
             str(application.id),
+            self.application_status.status,
             application.organisation.name,
             application.contact_person.first_name,
             application.contact_person.last_name,
@@ -352,26 +366,24 @@ class ApplicationDataExporterTestCase(TestCase):
             "",
             "",
             "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
         ]
 
-        file_name = self._get_filename_for_round_and_priority(
-            self.application_round_id, "HIGH"
-        )
+        file_name = self._get_filename_for_round(self.application_round_id)
         self._test_first_data_line(file_name, expected_row)
-
-        # These files should not have been written.
-        # Check that they do not exist!
-        not_existing_file_medium = self._get_filename_for_round_and_priority(
-            self.application_round_id, "MEDIUM"
-        )
-        not_existing_file_low = self._get_filename_for_round_and_priority(
-            self.application_round_id, "LOW"
-        )
-        not_existing_file_medium = self.export_dir / not_existing_file_medium
-        not_existing_file_low = self.export_dir / not_existing_file_low
-
-        assert_that(not_existing_file_medium.is_file()).is_false()
-        assert_that(not_existing_file_low.is_file()).is_false()
 
     def test_multiple_schedules_on_same_day(self):
         ApplicationEventScheduleFactory(
@@ -389,6 +401,7 @@ class ApplicationDataExporterTestCase(TestCase):
 
         expected_row = [
             str(application.id),
+            self.application_status.status,
             application.organisation.name,
             application.contact_person.first_name,
             application.contact_person.last_name,
@@ -414,26 +427,24 @@ class ApplicationDataExporterTestCase(TestCase):
             "",
             "",
             "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
         ]
 
-        file_name = self._get_filename_for_round_and_priority(
-            self.application_round_id, "HIGH"
-        )
+        file_name = self._get_filename_for_round(self.application_round_id)
         self._test_first_data_line(file_name, expected_row)
-
-        # These files should not have been written.
-        # Check that they do not exist!
-        not_existing_file_medium = self._get_filename_for_round_and_priority(
-            self.application_round_id, "MEDIUM"
-        )
-        not_existing_file_low = self._get_filename_for_round_and_priority(
-            self.application_round_id, "LOW"
-        )
-        not_existing_file_medium = self.export_dir / not_existing_file_medium
-        not_existing_file_low = self.export_dir / not_existing_file_low
-
-        assert_that(not_existing_file_medium.is_file()).is_false()
-        assert_that(not_existing_file_low.is_file()).is_false()
 
     def test_multiple_schedules_different_days(self):
         ApplicationEventScheduleFactory(
@@ -451,6 +462,7 @@ class ApplicationDataExporterTestCase(TestCase):
 
         expected_row = [
             str(application.id),
+            self.application_status.status,
             application.organisation.name,
             application.contact_person.first_name,
             application.contact_person.last_name,
@@ -476,26 +488,24 @@ class ApplicationDataExporterTestCase(TestCase):
             "",
             "",
             "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
         ]
 
-        file_name = self._get_filename_for_round_and_priority(
-            self.application_round_id, "HIGH"
-        )
+        file_name = self._get_filename_for_round(self.application_round_id)
         self._test_first_data_line(file_name, expected_row)
-
-        # These files should not have been written.
-        # Check that they do not exist!
-        not_existing_file_medium = self._get_filename_for_round_and_priority(
-            self.application_round_id, "MEDIUM"
-        )
-        not_existing_file_low = self._get_filename_for_round_and_priority(
-            self.application_round_id, "LOW"
-        )
-        not_existing_file_medium = self.export_dir / not_existing_file_medium
-        not_existing_file_low = self.export_dir / not_existing_file_low
-
-        assert_that(not_existing_file_medium.is_file()).is_false()
-        assert_that(not_existing_file_low.is_file()).is_false()
 
     def test_empty_min_duration(self):
         self.application_event.min_duration = None
@@ -508,6 +518,7 @@ class ApplicationDataExporterTestCase(TestCase):
 
         expected_row = [
             str(application.id),
+            self.application_status.status,
             application.organisation.name,
             application.contact_person.first_name,
             application.contact_person.last_name,
@@ -533,26 +544,24 @@ class ApplicationDataExporterTestCase(TestCase):
             "",
             "",
             "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
         ]
 
-        file_name = self._get_filename_for_round_and_priority(
-            self.application_round_id, "HIGH"
-        )
+        file_name = self._get_filename_for_round(self.application_round_id)
         self._test_first_data_line(file_name, expected_row)
-
-        # These files should not have been written.
-        # Check that they do not exist!
-        not_existing_file_medium = self._get_filename_for_round_and_priority(
-            self.application_round_id, "MEDIUM"
-        )
-        not_existing_file_low = self._get_filename_for_round_and_priority(
-            self.application_round_id, "LOW"
-        )
-        not_existing_file_medium = self.export_dir / not_existing_file_medium
-        not_existing_file_low = self.export_dir / not_existing_file_low
-
-        assert_that(not_existing_file_medium.is_file()).is_false()
-        assert_that(not_existing_file_low.is_file()).is_false()
 
     def test_empty_max_duration(self):
         self.application_event.max_duration = None
@@ -565,6 +574,7 @@ class ApplicationDataExporterTestCase(TestCase):
 
         expected_row = [
             str(application.id),
+            self.application_status.status,
             application.organisation.name,
             application.contact_person.first_name,
             application.contact_person.last_name,
@@ -590,26 +600,24 @@ class ApplicationDataExporterTestCase(TestCase):
             "",
             "",
             "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
         ]
 
-        file_name = self._get_filename_for_round_and_priority(
-            self.application_round_id, "HIGH"
-        )
+        file_name = self._get_filename_for_round(self.application_round_id)
         self._test_first_data_line(file_name, expected_row)
-
-        # These files should not have been written.
-        # Check that they do not exist!
-        not_existing_file_medium = self._get_filename_for_round_and_priority(
-            self.application_round_id, "MEDIUM"
-        )
-        not_existing_file_low = self._get_filename_for_round_and_priority(
-            self.application_round_id, "LOW"
-        )
-        not_existing_file_medium = self.export_dir / not_existing_file_medium
-        not_existing_file_low = self.export_dir / not_existing_file_low
-
-        assert_that(not_existing_file_medium.is_file()).is_false()
-        assert_that(not_existing_file_low.is_file()).is_false()
 
     def test_empty_contact_person_email(self):
         self.application_event.application.contact_person.email = None
@@ -622,6 +630,7 @@ class ApplicationDataExporterTestCase(TestCase):
 
         expected_row = [
             str(application.id),
+            self.application_status.status,
             application.organisation.name,
             application.contact_person.first_name,
             application.contact_person.last_name,
@@ -647,26 +656,24 @@ class ApplicationDataExporterTestCase(TestCase):
             "",
             "",
             "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
         ]
 
-        file_name = self._get_filename_for_round_and_priority(
-            self.application_round_id, "HIGH"
-        )
+        file_name = self._get_filename_for_round(self.application_round_id)
         self._test_first_data_line(file_name, expected_row)
-
-        # These files should not have been written.
-        # Check that they do not exist!
-        not_existing_file_medium = self._get_filename_for_round_and_priority(
-            self.application_round_id, "MEDIUM"
-        )
-        not_existing_file_low = self._get_filename_for_round_and_priority(
-            self.application_round_id, "LOW"
-        )
-        not_existing_file_medium = self.export_dir / not_existing_file_medium
-        not_existing_file_low = self.export_dir / not_existing_file_low
-
-        assert_that(not_existing_file_medium.is_file()).is_false()
-        assert_that(not_existing_file_low.is_file()).is_false()
 
     def test_no_contact_person(self):
         self.application_event.application.contact_person = None
@@ -679,6 +686,7 @@ class ApplicationDataExporterTestCase(TestCase):
 
         expected_row = [
             str(application.id),
+            self.application_status.status,
             application.organisation.name,
             "",
             "",
@@ -704,26 +712,137 @@ class ApplicationDataExporterTestCase(TestCase):
             "",
             "",
             "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
         ]
 
-        file_name = self._get_filename_for_round_and_priority(
-            self.application_round_id, "HIGH"
-        )
+        file_name = self._get_filename_for_round(self.application_round_id)
         self._test_first_data_line(file_name, expected_row)
 
-        # These files should not have been written.
-        # Check that they do not exist!
-        not_existing_file_medium = self._get_filename_for_round_and_priority(
-            self.application_round_id, "MEDIUM"
-        )
-        not_existing_file_low = self._get_filename_for_round_and_priority(
-            self.application_round_id, "LOW"
-        )
-        not_existing_file_medium = self.export_dir / not_existing_file_medium
-        not_existing_file_low = self.export_dir / not_existing_file_low
+    def test_no_organisation_default_to_contact_person(self):
+        self.application_event.application.organisation = None
+        self.application_event.application.save()
 
-        assert_that(not_existing_file_medium.is_file()).is_false()
-        assert_that(not_existing_file_low.is_file()).is_false()
+        call_command("export_applications", self.application_round_id)
+
+        event: ApplicationEvent = self.application_event
+        application: Application = event.application
+
+        expected_row = [
+            str(application.id),
+            self.application_status.status,
+            f"{application.contact_person.first_name} {application.contact_person.last_name}",
+            application.contact_person.first_name,
+            application.contact_person.last_name,
+            application.contact_person.email,
+            event.name,
+            (
+                f"{event.begin.day}.{event.begin.month}.{event.begin.year}"
+                f" - {event.end.day}.{event.end.month}.{event.end.year}"
+            ),
+            application.home_city.name,
+            event.purpose.name,
+            str(event.age_group),
+            application.applicant_type,
+            str(event.events_per_week),
+            "1 h - 2 h",
+            f"{self.event_reservation_unit_2.reservation_unit.name}",
+            f"{self.event_reservation_unit_3.reservation_unit.name}",
+            f"{self.event_reservation_unit_1.reservation_unit.name}",
+            "",
+            "12:00 - 14:00",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+        ]
+
+        file_name = self._get_filename_for_round(self.application_round_id)
+        self._test_first_data_line(file_name, expected_row)
+
+    def test_no_organisation_and_no_contact_person(self):
+        self.application_event.application.organisation = None
+        self.application_event.application.contact_person = None
+        self.application_event.application.save()
+
+        call_command("export_applications", self.application_round_id)
+
+        event: ApplicationEvent = self.application_event
+        application: Application = event.application
+
+        expected_row = [
+            str(application.id),
+            self.application_status.status,
+            "",
+            "",
+            "",
+            "",
+            event.name,
+            (
+                f"{event.begin.day}.{event.begin.month}.{event.begin.year}"
+                f" - {event.end.day}.{event.end.month}.{event.end.year}"
+            ),
+            application.home_city.name,
+            event.purpose.name,
+            str(event.age_group),
+            application.applicant_type,
+            str(event.events_per_week),
+            "1 h - 2 h",
+            f"{self.event_reservation_unit_2.reservation_unit.name}",
+            f"{self.event_reservation_unit_3.reservation_unit.name}",
+            f"{self.event_reservation_unit_1.reservation_unit.name}",
+            "",
+            "12:00 - 14:00",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+        ]
+
+        file_name = self._get_filename_for_round(self.application_round_id)
+        self._test_first_data_line(file_name, expected_row)
 
     def test_empty_home_city(self):
         self.application_event.application.home_city = None
@@ -736,6 +855,7 @@ class ApplicationDataExporterTestCase(TestCase):
 
         expected_row = [
             str(application.id),
+            self.application_status.status,
             application.organisation.name,
             application.contact_person.first_name,
             application.contact_person.last_name,
@@ -761,26 +881,24 @@ class ApplicationDataExporterTestCase(TestCase):
             "",
             "",
             "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
         ]
 
-        file_name = self._get_filename_for_round_and_priority(
-            self.application_round_id, "HIGH"
-        )
+        file_name = self._get_filename_for_round(self.application_round_id)
         self._test_first_data_line(file_name, expected_row)
-
-        # These files should not have been written.
-        # Check that they do not exist!
-        not_existing_file_medium = self._get_filename_for_round_and_priority(
-            self.application_round_id, "MEDIUM"
-        )
-        not_existing_file_low = self._get_filename_for_round_and_priority(
-            self.application_round_id, "LOW"
-        )
-        not_existing_file_medium = self.export_dir / not_existing_file_medium
-        not_existing_file_low = self.export_dir / not_existing_file_low
-
-        assert_that(not_existing_file_medium.is_file()).is_false()
-        assert_that(not_existing_file_low.is_file()).is_false()
 
     def test_empty_purpose(self):
         self.application_event.purpose = None
@@ -793,6 +911,7 @@ class ApplicationDataExporterTestCase(TestCase):
 
         expected_row = [
             str(application.id),
+            self.application_status.status,
             application.organisation.name,
             application.contact_person.first_name,
             application.contact_person.last_name,
@@ -818,26 +937,24 @@ class ApplicationDataExporterTestCase(TestCase):
             "",
             "",
             "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
         ]
 
-        file_name = self._get_filename_for_round_and_priority(
-            self.application_round_id, "HIGH"
-        )
+        file_name = self._get_filename_for_round(self.application_round_id)
         self._test_first_data_line(file_name, expected_row)
-
-        # These files should not have been written.
-        # Check that they do not exist!
-        not_existing_file_medium = self._get_filename_for_round_and_priority(
-            self.application_round_id, "MEDIUM"
-        )
-        not_existing_file_low = self._get_filename_for_round_and_priority(
-            self.application_round_id, "LOW"
-        )
-        not_existing_file_medium = self.export_dir / not_existing_file_medium
-        not_existing_file_low = self.export_dir / not_existing_file_low
-
-        assert_that(not_existing_file_medium.is_file()).is_false()
-        assert_that(not_existing_file_low.is_file()).is_false()
 
     def test_empty_event_begin_time(self):
         event: ApplicationEvent = self.application_event
@@ -850,6 +967,7 @@ class ApplicationDataExporterTestCase(TestCase):
 
         expected_row = [
             str(application.id),
+            self.application_status.status,
             application.organisation.name,
             application.contact_person.first_name,
             application.contact_person.last_name,
@@ -872,26 +990,24 @@ class ApplicationDataExporterTestCase(TestCase):
             "",
             "",
             "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
         ]
 
-        file_name = self._get_filename_for_round_and_priority(
-            self.application_round_id, "HIGH"
-        )
+        file_name = self._get_filename_for_round(self.application_round_id)
         self._test_first_data_line(file_name, expected_row)
-
-        # These files should not have been written.
-        # Check that they do not exist!
-        not_existing_file_medium = self._get_filename_for_round_and_priority(
-            self.application_round_id, "MEDIUM"
-        )
-        not_existing_file_low = self._get_filename_for_round_and_priority(
-            self.application_round_id, "LOW"
-        )
-        not_existing_file_medium = self.export_dir / not_existing_file_medium
-        not_existing_file_low = self.export_dir / not_existing_file_low
-
-        assert_that(not_existing_file_medium.is_file()).is_false()
-        assert_that(not_existing_file_low.is_file()).is_false()
 
     def test_empty_event_end_time(self):
         event: ApplicationEvent = self.application_event
@@ -904,6 +1020,7 @@ class ApplicationDataExporterTestCase(TestCase):
 
         expected_row = [
             str(application.id),
+            self.application_status.status,
             application.organisation.name,
             application.contact_person.first_name,
             application.contact_person.last_name,
@@ -926,26 +1043,24 @@ class ApplicationDataExporterTestCase(TestCase):
             "",
             "",
             "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
         ]
 
-        file_name = self._get_filename_for_round_and_priority(
-            self.application_round_id, "HIGH"
-        )
+        file_name = self._get_filename_for_round(self.application_round_id)
         self._test_first_data_line(file_name, expected_row)
-
-        # These files should not have been written.
-        # Check that they do not exist!
-        not_existing_file_medium = self._get_filename_for_round_and_priority(
-            self.application_round_id, "MEDIUM"
-        )
-        not_existing_file_low = self._get_filename_for_round_and_priority(
-            self.application_round_id, "LOW"
-        )
-        not_existing_file_medium = self.export_dir / not_existing_file_medium
-        not_existing_file_low = self.export_dir / not_existing_file_low
-
-        assert_that(not_existing_file_medium.is_file()).is_false()
-        assert_that(not_existing_file_low.is_file()).is_false()
 
     def test_empty_event_end_and_begin_time(self):
         event: ApplicationEvent = self.application_event
@@ -959,6 +1074,7 @@ class ApplicationDataExporterTestCase(TestCase):
 
         expected_row = [
             str(application.id),
+            self.application_status.status,
             application.organisation.name,
             application.contact_person.first_name,
             application.contact_person.last_name,
@@ -981,26 +1097,24 @@ class ApplicationDataExporterTestCase(TestCase):
             "",
             "",
             "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
         ]
 
-        file_name = self._get_filename_for_round_and_priority(
-            self.application_round_id, "HIGH"
-        )
+        file_name = self._get_filename_for_round(self.application_round_id)
         self._test_first_data_line(file_name, expected_row)
-
-        # These files should not have been written.
-        # Check that they do not exist!
-        not_existing_file_medium = self._get_filename_for_round_and_priority(
-            self.application_round_id, "MEDIUM"
-        )
-        not_existing_file_low = self._get_filename_for_round_and_priority(
-            self.application_round_id, "LOW"
-        )
-        not_existing_file_medium = self.export_dir / not_existing_file_medium
-        not_existing_file_low = self.export_dir / not_existing_file_low
-
-        assert_that(not_existing_file_medium.is_file()).is_false()
-        assert_that(not_existing_file_low.is_file()).is_false()
 
     def test_medium_priority_time(self):
         ApplicationEventScheduleFactory(
@@ -1014,8 +1128,9 @@ class ApplicationDataExporterTestCase(TestCase):
         event: ApplicationEvent = self.application_event
         application: Application = event.application
 
-        expected_row_high_prio = [
+        expected_row = [
             str(application.id),
+            self.application_status.status,
             application.organisation.name,
             application.contact_person.first_name,
             application.contact_person.last_name,
@@ -1041,27 +1156,6 @@ class ApplicationDataExporterTestCase(TestCase):
             "",
             "",
             "",
-        ]
-        expected_row_medium_prio = [
-            str(application.id),
-            application.organisation.name,
-            application.contact_person.first_name,
-            application.contact_person.last_name,
-            application.contact_person.email,
-            event.name,
-            (
-                f"{event.begin.day}.{event.begin.month}.{event.begin.year}"
-                f" - {event.end.day}.{event.end.month}.{event.end.year}"
-            ),
-            application.home_city.name,
-            event.purpose.name,
-            str(event.age_group),
-            application.applicant_type,
-            str(event.events_per_week),
-            "1 h - 2 h",
-            f"{self.event_reservation_unit_2.reservation_unit.name}",
-            f"{self.event_reservation_unit_3.reservation_unit.name}",
-            f"{self.event_reservation_unit_1.reservation_unit.name}",
             "",
             "",
             "12:00 - 14:00",
@@ -1069,24 +1163,17 @@ class ApplicationDataExporterTestCase(TestCase):
             "",
             "",
             "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
         ]
 
-        file_name_high_prio = self._get_filename_for_round_and_priority(
-            self.application_round_id, "HIGH"
-        )
-        file_name_medium_prio = self._get_filename_for_round_and_priority(
-            self.application_round_id, "MEDIUM"
-        )
-        self._test_first_data_line(file_name_high_prio, expected_row_high_prio)
-        self._test_first_data_line(file_name_medium_prio, expected_row_medium_prio)
-
-        # These files should not have been written.
-        # Check that they do not exist!
-        not_existing_file_low = self._get_filename_for_round_and_priority(
-            self.application_round_id, "LOW"
-        )
-        not_existing_file_low = self.export_dir / not_existing_file_low
-        assert_that(not_existing_file_low.is_file()).is_false()
+        file_name = self._get_filename_for_round(self.application_round_id)
+        self._test_first_data_line(file_name, expected_row)
 
     def test_low_priority_time(self):
         ApplicationEventScheduleFactory(
@@ -1100,8 +1187,9 @@ class ApplicationDataExporterTestCase(TestCase):
         event: ApplicationEvent = self.application_event
         application: Application = event.application
 
-        expected_row_high_prio = [
+        expected_row = [
             str(application.id),
+            self.application_status.status,
             application.organisation.name,
             application.contact_person.first_name,
             application.contact_person.last_name,
@@ -1127,27 +1215,13 @@ class ApplicationDataExporterTestCase(TestCase):
             "",
             "",
             "",
-        ]
-        expected_row_low_prio = [
-            str(application.id),
-            application.organisation.name,
-            application.contact_person.first_name,
-            application.contact_person.last_name,
-            application.contact_person.email,
-            event.name,
-            (
-                f"{event.begin.day}.{event.begin.month}.{event.begin.year}"
-                f" - {event.end.day}.{event.end.month}.{event.end.year}"
-            ),
-            application.home_city.name,
-            event.purpose.name,
-            str(event.age_group),
-            application.applicant_type,
-            str(event.events_per_week),
-            "1 h - 2 h",
-            f"{self.event_reservation_unit_2.reservation_unit.name}",
-            f"{self.event_reservation_unit_3.reservation_unit.name}",
-            f"{self.event_reservation_unit_1.reservation_unit.name}",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
             "",
             "",
             "12:00 - 14:00",
@@ -1157,43 +1231,29 @@ class ApplicationDataExporterTestCase(TestCase):
             "",
         ]
 
-        file_name_high_prio = self._get_filename_for_round_and_priority(
-            self.application_round_id, "HIGH"
-        )
-        file_name_low_prio = self._get_filename_for_round_and_priority(
-            self.application_round_id, "LOW"
-        )
-        self._test_first_data_line(file_name_high_prio, expected_row_high_prio)
-        self._test_first_data_line(file_name_low_prio, expected_row_low_prio)
-
-        # These files should not have been written.
-        # Check that they do not exist!
-        not_existing_file_medium = self._get_filename_for_round_and_priority(
-            self.application_round_id, "MEDIUM"
-        )
-        not_existing_file_medium = self.export_dir / not_existing_file_medium
-        assert_that(not_existing_file_medium.is_file()).is_false()
+        file_name = self._get_filename_for_round(self.application_round_id)
+        self._test_first_data_line(file_name, expected_row)
 
     def test_empty_round_does_not_write_file(self):
         call_command("export_applications", self.random_empty_application_round_id)
 
-        file_name_high = self._get_filename_for_round_and_priority(
-            self.random_empty_application_round_id, "HIGH"
-        )
-        file_name_medium = self._get_filename_for_round_and_priority(
-            self.random_empty_application_round_id, "MEDIUM"
-        )
-        file_name_low = self._get_filename_for_round_and_priority(
-            self.random_empty_application_round_id, "LOW"
-        )
+        file_name = self._get_filename_for_round(self.application_round_id)
 
-        not_existing_file_high = self.export_dir / file_name_high
-        not_existing_file_medium = self.export_dir / file_name_medium
-        not_existing_file_low = self.export_dir / file_name_low
+        not_existing_file = self.export_dir / file_name
 
-        assert_that(not_existing_file_high.is_file()).is_false()
-        assert_that(not_existing_file_medium.is_file()).is_false()
-        assert_that(not_existing_file_low.is_file()).is_false()
+        assert_that(not_existing_file.is_file()).is_false()
+
+    def test_draft_applications_in_round_does_not_write_file(self):
+        self.application_status.status = ApplicationStatus.DRAFT
+        self.application_status.save()
+
+        call_command("export_applications", self.application_round_id)
+
+        file_name = self._get_filename_for_round(self.application_round_id)
+
+        not_existing_file = self.export_dir / file_name
+
+        assert_that(not_existing_file.is_file()).is_false()
 
     def test_several_rounds_can_be_given_as_arguments(self):
         call_command(
@@ -1202,43 +1262,16 @@ class ApplicationDataExporterTestCase(TestCase):
             self.random_empty_application_round_id,
         )
 
-        # Only high priority file should exist
-        existing_file_name_high = self._get_filename_for_round_and_priority(
-            self.application_round_id, "HIGH"
-        )
-        not_existing_file_name_medium = self._get_filename_for_round_and_priority(
-            self.application_round_id, "MEDIUM"
-        )
-        not_existing_file_name_low = self._get_filename_for_round_and_priority(
-            self.application_round_id, "LOW"
+        existing_file_name = self._get_filename_for_round(self.application_round_id)
+        empty_file_name = self._get_filename_for_round(
+            self.random_empty_application_round_id
         )
 
-        existing_file = self.export_dir / existing_file_name_high
-        not_existing_file_medium = self.export_dir / not_existing_file_name_medium
-        not_existing_file_low = self.export_dir / not_existing_file_name_low
+        existing_file = self.export_dir / existing_file_name
+        not_existing_file_high = self.export_dir / empty_file_name
 
         assert_that(existing_file.is_file()).is_true()
-        assert_that(not_existing_file_medium.is_file()).is_false()
-        assert_that(not_existing_file_low.is_file()).is_false()
-
-        # All of random empty round files should not exist
-        empty_file_name_high = self._get_filename_for_round_and_priority(
-            self.random_empty_application_round_id, "HIGH"
-        )
-        empty_file_name_medium = self._get_filename_for_round_and_priority(
-            self.random_empty_application_round_id, "MEDIUM"
-        )
-        empty_file_name_low = self._get_filename_for_round_and_priority(
-            self.random_empty_application_round_id, "LOW"
-        )
-
-        not_existing_file_high = self.export_dir / empty_file_name_high
-        not_existing_file_medium = self.export_dir / empty_file_name_medium
-        not_existing_file_low = self.export_dir / empty_file_name_low
-
         assert_that(not_existing_file_high.is_file()).is_false()
-        assert_that(not_existing_file_medium.is_file()).is_false()
-        assert_that(not_existing_file_low.is_file()).is_false()
 
     def test_empty_arguments_throw_error(self):
         with pytest.raises(Exception):
