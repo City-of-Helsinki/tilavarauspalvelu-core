@@ -1,3 +1,4 @@
+import Breadcrumb from "./src/breadcrumb/Breadcrumb";
 import ExampleCommonComponent from "./src/ExampleCommonComponent";
 
-export { ExampleCommonComponent };
+export { Breadcrumb, ExampleCommonComponent };

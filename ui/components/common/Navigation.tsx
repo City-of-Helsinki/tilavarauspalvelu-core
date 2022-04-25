@@ -26,6 +26,7 @@ const StyledNavigation = styled(HDSNavigation)`
   --header-divider-color: var(--color-black-20);
 
   color: var(--tilavaraus-header-color);
+  min-width: ${breakpoint.xs};
 
   .btn-logout {
     display: flex;
@@ -33,7 +34,7 @@ const StyledNavigation = styled(HDSNavigation)`
     cursor: pointer;
   }
 
-  @media (max-width: ${breakpoint.s}) {
+  @media (max-width: ${breakpoint.xs}) {
     position: fixed !important;
     z-index: 100 !important;
   }
@@ -50,8 +51,8 @@ const NaviItem = styled(HDSNavigation.Item)<{ $hidden: boolean }>`
 `;
 
 const PreContent = styled.div`
-  @media (max-width: ${breakpoint.s}) {
-    margin-top: var(--spacing-layout-m);
+  @media (max-width: ${breakpoint.xs}) {
+    margin-top: var(--spacing-layout-l);
   }
 `;
 

@@ -3,31 +3,31 @@
 exports[`renders correctly 1`] = `
 <DocumentFragment>
   <div
-    class="Ticket__Wrapper-sc-16qon89-1 lLgEg"
+    class="Ticket__Wrapper-sc-1svriai-1 bdoffB"
     data-testid="reservation__ticket--container"
   >
     <div
-      class="Ticket__PunchHole-sc-16qon89-0 gIogyp"
+      class="Ticket__PunchHole-sc-1svriai-0 cPFeBc"
     />
     <div
-      class="Ticket__Content-sc-16qon89-2"
+      class="Ticket__Content-sc-1svriai-2"
     >
       <h1
-        class="typography__H1-sc-yczr8v-4 Ticket__Title-sc-16qon89-3 NnSRP hHhVbN"
+        class="typography__H1-sc-1yt5fo8-4 Ticket__Title-sc-1svriai-3 iRakjT efOTNE"
         data-test="reservation__title"
       >
         Ticket title
       </h1>
       <div
-        class="Ticket__Price-sc-16qon89-6 ilVEgG"
+        class="Ticket__Price-sc-1svriai-6 dpMzv"
         data-testid="reservation__price--container"
       >
         <div
-          class="Ticket__PriceRow-sc-16qon89-7 bhMqie"
+          class="Ticket__PriceRow-sc-1svriai-7 jYjrMn"
         >
           <div>
             <span
-              class="typography__Strongish-sc-yczr8v-1 jipjPt"
+              class="typography__Strongish-sc-1yt5fo8-1 glpVaJ"
             >
               reservations:reservationDuration
             </span>
@@ -35,18 +35,18 @@ exports[`renders correctly 1`] = `
           <div />
         </div>
         <div
-          class="Ticket__PriceRow-sc-16qon89-7 bhMqie"
+          class="Ticket__PriceRow-sc-1svriai-7 jYjrMn"
         >
           <div>
             <span
-              class="typography__Strongish-sc-yczr8v-1 jipjPt"
+              class="typography__Strongish-sc-1yt5fo8-1 glpVaJ"
             >
               prices:total
             </span>
           </div>
           <div>
             <span
-              class="typography__Strongish-sc-yczr8v-1 jipjPt"
+              class="typography__Strongish-sc-1yt5fo8-1 glpVaJ"
             >
               prices:priceFree
             </span>
@@ -55,7 +55,7 @@ exports[`renders correctly 1`] = `
       </div>
     </div>
     <div
-      class="Ticket__PunchHole-sc-16qon89-0 gIogyp"
+      class="Ticket__PunchHole-sc-1svriai-0 cPFeBc"
     />
   </div>
 </DocumentFragment>
@@ -64,31 +64,31 @@ exports[`renders correctly 1`] = `
 exports[`renders correctly 2`] = `
 <DocumentFragment>
   <div
-    class="Ticket__Wrapper-sc-16qon89-1 eOXurf"
+    class="Ticket__Wrapper-sc-1svriai-1 iXIsru"
     data-testid="reservation__ticket--container"
   >
     <div
-      class="Ticket__PunchHole-sc-16qon89-0 gIogyp"
+      class="Ticket__PunchHole-sc-1svriai-0 cPFeBc"
     />
     <div
-      class="Ticket__Content-sc-16qon89-2"
+      class="Ticket__Content-sc-1svriai-2"
     >
       <h1
-        class="typography__H1-sc-yczr8v-4 Ticket__Title-sc-16qon89-3 NnSRP hHhVbN"
+        class="typography__H1-sc-1yt5fo8-4 Ticket__Title-sc-1svriai-3 iRakjT efOTNE"
         data-test="reservation__title"
       >
         Ticket title
       </h1>
       <div
-        class="Ticket__Price-sc-16qon89-6 ilVEgG"
+        class="Ticket__Price-sc-1svriai-6 dpMzv"
         data-testid="reservation__price--container"
       >
         <div
-          class="Ticket__PriceRow-sc-16qon89-7 bhMqie"
+          class="Ticket__PriceRow-sc-1svriai-7 jYjrMn"
         >
           <div>
             <span
-              class="typography__Strongish-sc-yczr8v-1 jipjPt"
+              class="typography__Strongish-sc-1yt5fo8-1 glpVaJ"
             >
               reservations:reservationDuration
             </span>
@@ -96,18 +96,18 @@ exports[`renders correctly 2`] = `
           <div />
         </div>
         <div
-          class="Ticket__PriceRow-sc-16qon89-7 bhMqie"
+          class="Ticket__PriceRow-sc-1svriai-7 jYjrMn"
         >
           <div>
             <span
-              class="typography__Strongish-sc-yczr8v-1 jipjPt"
+              class="typography__Strongish-sc-1yt5fo8-1 glpVaJ"
             >
               prices:total
             </span>
           </div>
           <div>
             <span
-              class="typography__Strongish-sc-yczr8v-1 jipjPt"
+              class="typography__Strongish-sc-1yt5fo8-1 glpVaJ"
             >
               prices:priceFree
             </span>
@@ -116,7 +116,7 @@ exports[`renders correctly 2`] = `
       </div>
     </div>
     <div
-      class="Ticket__PunchHole-sc-16qon89-0 gIogyp"
+      class="Ticket__PunchHole-sc-1svriai-0 cPFeBc"
     />
   </div>
 </DocumentFragment>
@@ -125,34 +125,34 @@ exports[`renders correctly 2`] = `
 exports[`renders correctly 3`] = `
 <DocumentFragment>
   <div
-    class="Ticket__Wrapper-sc-16qon89-1 eOXurf"
+    class="Ticket__Wrapper-sc-1svriai-1 iXIsru"
     data-testid="reservation__ticket--container"
   >
     <div
-      class="Ticket__PunchHole-sc-16qon89-0 gIogyp"
+      class="Ticket__PunchHole-sc-1svriai-0 cPFeBc"
     />
     <div
-      class="Ticket__Content-sc-16qon89-2"
+      class="Ticket__Content-sc-1svriai-2"
     >
       <h1
-        class="typography__H1-sc-yczr8v-4 Ticket__Title-sc-16qon89-3 NnSRP hHhVbN"
+        class="typography__H1-sc-1yt5fo8-4 Ticket__Title-sc-1svriai-3 iRakjT efOTNE"
         data-test="reservation__title"
       >
         Ticket title
       </h1>
       <div
-        class="Ticket__Price-sc-16qon89-6 iRiYIP"
+        class="Ticket__Price-sc-1svriai-6 gCUcHm"
         data-testid="reservation__price--container"
       >
         <span
-          class="typography__Strongish-sc-yczr8v-1 jipjPt"
+          class="typography__Strongish-sc-1yt5fo8-1 glpVaJ"
         >
           reservationUnit:priceFree
         </span>
       </div>
     </div>
     <div
-      class="Ticket__PunchHole-sc-16qon89-0 gIogyp"
+      class="Ticket__PunchHole-sc-1svriai-0 cPFeBc"
     />
   </div>
 </DocumentFragment>
@@ -161,28 +161,28 @@ exports[`renders correctly 3`] = `
 exports[`renders correctly 4`] = `
 <DocumentFragment>
   <div
-    class="Ticket__Wrapper-sc-16qon89-1 iwnydW"
+    class="Ticket__Wrapper-sc-1svriai-1 khqbSD"
     data-testid="reservation__ticket--container"
   >
     <div
-      class="Ticket__PunchHole-sc-16qon89-0 EkbHM"
+      class="Ticket__PunchHole-sc-1svriai-0 eWgkOB"
     />
     <div
-      class="Ticket__Content-sc-16qon89-2"
+      class="Ticket__Content-sc-1svriai-2"
     >
       <h1
-        class="typography__H1-sc-yczr8v-4 Ticket__Title-sc-16qon89-3 NnSRP hHhVbN"
+        class="typography__H1-sc-1yt5fo8-4 Ticket__Title-sc-1svriai-3 iRakjT efOTNE"
         data-test="reservation__title"
       >
         Backgstage huone
       </h1>
       <h2
-        class="typography__H2-sc-yczr8v-5 Ticket__Subtitle-sc-16qon89-4 ikszLZ hkZgxB"
+        class="typography__H2-sc-1yt5fo8-5 Ticket__Subtitle-sc-1svriai-4 eWybbF fQtuCM"
       >
         Arabianrannan nuorisotalo
       </h2>
       <div
-        class="Ticket__Duration-sc-16qon89-5 qbsUd"
+        class="Ticket__Duration-sc-1svriai-5 jSyvHM"
         data-test="reservation__time-range"
       >
         <svg
@@ -207,25 +207,25 @@ exports[`renders correctly 4`] = `
         <span>
           Common:dateWithWeekday common:timeWithPrefix - common:time 
           <span
-            class="util__NoWrap-sc-5wh4ks-2 jbues"
+            class="util__NoWrap-sc-167ctya-2 bwknGR"
           >
             (common:duration)
           </span>
         </span>
       </div>
       <div
-        class="Ticket__Price-sc-16qon89-6 iRiYIP"
+        class="Ticket__Price-sc-1svriai-6 gCUcHm"
         data-testid="reservation__price--container"
       >
         <span
-          class="typography__Strongish-sc-yczr8v-1 jipjPt"
+          class="typography__Strongish-sc-1yt5fo8-1 glpVaJ"
         >
           reservationUnit:priceFree
         </span>
       </div>
     </div>
     <div
-      class="Ticket__PunchHole-sc-16qon89-0 EkbHM"
+      class="Ticket__PunchHole-sc-1svriai-0 eWgkOB"
     />
   </div>
 </DocumentFragment>
