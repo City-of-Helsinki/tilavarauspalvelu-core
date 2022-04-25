@@ -2,7 +2,7 @@ import datetime
 import logging
 import math
 import uuid
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, TypeVar
 
 import recurrence
 from django.contrib.auth import get_user_model
@@ -454,6 +454,9 @@ class CUSTOMER_TYPE_CONST(object):
 
 
 CUSTOMER_TYPES = CUSTOMER_TYPE_CONST()
+_CustomerTypes = TypeVar(
+    "_CustomerTypes", *[name for name, _ in CUSTOMER_TYPES.CUSTOMER_TYPE_CHOICES]
+)
 
 
 class APPLICANT_TYPE_CONST(object):
@@ -472,11 +475,14 @@ class APPLICANT_TYPE_CONST(object):
 
 
 APPLICANT_TYPES = APPLICANT_TYPE_CONST()
+_ApplicantTypes = TypeVar(
+    "_ApplicantTypes", *[name for name, _ in APPLICANT_TYPES.APPLICANT_TYPE_CHOICES]
+)
 
 
 def customer_types_to_applicant_types(
-    customer_types: [CUSTOMER_TYPES],
-) -> APPLICANT_TYPES:
+    customer_types: List[_CustomerTypes],
+) -> List[_ApplicantTypes]:
     applicant_types = []
     switcher = {
         CUSTOMER_TYPES.CUSTOMER_TYPE_BUSINESS: [APPLICANT_TYPES.APPLICANT_TYPE_COMPANY],
@@ -1138,7 +1144,7 @@ class EventOccurrence(object):
         weekday: int,
         begin: datetime.time,
         end: datetime.time,
-        occurrences: [datetime.datetime],
+        occurrences: List[datetime.datetime],
     ):
         self.weekday = weekday
         self.begin = begin
@@ -1173,7 +1179,7 @@ class ApplicationEventSchedule(models.Model):
         related_name="application_event_schedules",
     )
 
-    def get_occurences(self) -> [EventOccurrence]:
+    def get_occurences(self) -> List[EventOccurrence]:
         first_matching_day = next_or_current_matching_weekday(
             self.application_event.begin, self.day
         )
@@ -1277,7 +1283,7 @@ class ApplicationEventScheduleResult(models.Model):
             ret_dict[row.name] = row.value
         return ret_dict
 
-    def get_result_occurrences(self) -> [EventOccurrence]:
+    def get_result_occurrences(self) -> List[EventOccurrence]:
         application_event = self.application_event_schedule.application_event
         begin = application_event.begin
         end = application_event.end
