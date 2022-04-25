@@ -317,6 +317,20 @@ snapshots['ReservationUnitQueryTestCase::test_filtering_by_multiple_units 1'] = 
     }
 }
 
+snapshots['ReservationUnitQueryTestCase::test_filtering_by_name_fi 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'nameFi': 'show only me',
+                    }
+                }
+            ]
+        }
+    }
+}
+
 snapshots['ReservationUnitQueryTestCase::test_filtering_by_purpose 1'] = {
     'data': {
         'reservationUnits': {
@@ -371,6 +385,30 @@ snapshots['ReservationUnitQueryTestCase::test_filtering_by_reservation_timestamp
                                 'state': 'CREATED'
                             }
                         ]
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitQueryTestCase::test_filtering_by_surface_area 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'surfaceArea': '120.00'
+                    }
+                },
+                {
+                    'node': {
+                        'surfaceArea': '90.00'
+                    }
+                },
+                {
+                    'node': {
+                        'surfaceArea': '60.00'
                     }
                 }
             ]
@@ -565,6 +603,198 @@ snapshots['ReservationUnitQueryTestCase::test_hauki_url_for_unit_manager 1'] = {
     }
 }
 
+snapshots['ReservationUnitQueryTestCase::test_order_by_max_persons 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'maxPersons': 1
+                    }
+                },
+                {
+                    'node': {
+                        'maxPersons': 2
+                    }
+                },
+                {
+                    'node': {
+                        'maxPersons': 3
+                    }
+                },
+                {
+                    'node': {
+                        'maxPersons': 4
+                    }
+                },
+                {
+                    'node': {
+                        'maxPersons': 5
+                    }
+                },
+                {
+                    'node': {
+                        'maxPersons': 110
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitQueryTestCase::test_order_by_max_persons_reverse_order 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'maxPersons': 110
+                    }
+                },
+                {
+                    'node': {
+                        'maxPersons': 5
+                    }
+                },
+                {
+                    'node': {
+                        'maxPersons': 4
+                    }
+                },
+                {
+                    'node': {
+                        'maxPersons': 3
+                    }
+                },
+                {
+                    'node': {
+                        'maxPersons': 2
+                    }
+                },
+                {
+                    'node': {
+                        'maxPersons': 1
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitQueryTestCase::test_order_by_name_and_unit_name 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'nameFi': 'a',
+                        'unit': {
+                            'nameFi': '2'
+                        }
+                    }
+                },
+                {
+                    'node': {
+                        'nameFi': 'a',
+                        'unit': {
+                            'nameFi': '3'
+                        }
+                    }
+                },
+                {
+                    'node': {
+                        'nameFi': 'b',
+                        'unit': {
+                            'nameFi': '1'
+                        }
+                    }
+                },
+                {
+                    'node': {
+                        'nameFi': 'b',
+                        'unit': {
+                            'nameFi': '2'
+                        }
+                    }
+                },
+                {
+                    'node': {
+                        'nameFi': 'b',
+                        'unit': {
+                            'nameFi': '3'
+                        }
+                    }
+                },
+                {
+                    'node': {
+                        'nameFi': 'test name fi',
+                        'unit': {
+                            'nameFi': 'test unit fi'
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitQueryTestCase::test_order_by_name_and_unit_name_reversed 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'nameFi': 'test name fi',
+                        'unit': {
+                            'nameFi': 'test unit fi'
+                        }
+                    }
+                },
+                {
+                    'node': {
+                        'nameFi': 'b',
+                        'unit': {
+                            'nameFi': '3'
+                        }
+                    }
+                },
+                {
+                    'node': {
+                        'nameFi': 'b',
+                        'unit': {
+                            'nameFi': '2'
+                        }
+                    }
+                },
+                {
+                    'node': {
+                        'nameFi': 'b',
+                        'unit': {
+                            'nameFi': '1'
+                        }
+                    }
+                },
+                {
+                    'node': {
+                        'nameFi': 'a',
+                        'unit': {
+                            'nameFi': '3'
+                        }
+                    }
+                },
+                {
+                    'node': {
+                        'nameFi': 'a',
+                        'unit': {
+                            'nameFi': '2'
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}
+
 snapshots['ReservationUnitQueryTestCase::test_order_by_name_en 1'] = {
     'data': {
         'reservationUnits': {
@@ -615,6 +845,84 @@ snapshots['ReservationUnitQueryTestCase::test_order_by_name_sv 1'] = {
                 {
                     'node': {
                         'nameSv': 'test name sv'
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitQueryTestCase::test_order_by_surface_area 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'surfaceArea': '150.00'
+                    }
+                },
+                {
+                    'node': {
+                        'surfaceArea': '1.00'
+                    }
+                },
+                {
+                    'node': {
+                        'surfaceArea': '2.00'
+                    }
+                },
+                {
+                    'node': {
+                        'surfaceArea': '3.00'
+                    }
+                },
+                {
+                    'node': {
+                        'surfaceArea': '4.00'
+                    }
+                },
+                {
+                    'node': {
+                        'surfaceArea': '5.00'
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitQueryTestCase::test_order_by_surface_area_reverse_order 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'surfaceArea': '150.00'
+                    }
+                },
+                {
+                    'node': {
+                        'surfaceArea': '1.00'
+                    }
+                },
+                {
+                    'node': {
+                        'surfaceArea': '2.00'
+                    }
+                },
+                {
+                    'node': {
+                        'surfaceArea': '3.00'
+                    }
+                },
+                {
+                    'node': {
+                        'surfaceArea': '4.00'
+                    }
+                },
+                {
+                    'node': {
+                        'surfaceArea': '5.00'
                     }
                 }
             ]
@@ -739,6 +1047,15 @@ snapshots['ReservationUnitQueryTestCase::test_order_by_unit 1'] = {
                             'nameSv': '_'
                         }
                     }
+                },
+                {
+                    'node': {
+                        'unit': {
+                            'nameEn': 'test unit en',
+                            'nameFi': 'test unit fi',
+                            'nameSv': 'test unit sv'
+                        }
+                    }
                 }
             ]
         }
@@ -749,6 +1066,15 @@ snapshots['ReservationUnitQueryTestCase::test_order_by_unit_reverse_order 1'] = 
     'data': {
         'reservationUnits': {
             'edges': [
+                {
+                    'node': {
+                        'unit': {
+                            'nameEn': 'test unit en',
+                            'nameFi': 'test unit fi',
+                            'nameSv': 'test unit sv'
+                        }
+                    }
+                },
                 {
                     'node': {
                         'unit': {
