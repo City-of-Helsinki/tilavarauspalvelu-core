@@ -12,6 +12,7 @@ from applications.models import (
     Application,
     ApplicationEventStatus,
     ApplicationRound,
+    ApplicationRoundStatus,
     ApplicationStatus,
     Organisation,
 )
@@ -234,11 +235,13 @@ class ApplicationRoundStatusFactory(DjangoModelFactory):
 
     status = FuzzyChoice(
         choices=[
-            ApplicationStatus.DRAFT,
-            ApplicationStatus.IN_REVIEW,
-            ApplicationStatus.REVIEW_DONE,
-            ApplicationStatus.DECLINED,
-            ApplicationStatus.CANCELLED,
+            ApplicationRoundStatus.DRAFT,
+            ApplicationRoundStatus.IN_REVIEW,
+            ApplicationRoundStatus.REVIEW_DONE,
+            ApplicationRoundStatus.ALLOCATED,
+            ApplicationRoundStatus.HANDLED,
+            ApplicationRoundStatus.VALIDATED,
+            ApplicationRoundStatus.APPROVED,
         ]
     )
     application_round = SubFactory(ApplicationRoundFactory)
