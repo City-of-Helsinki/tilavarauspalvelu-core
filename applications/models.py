@@ -244,6 +244,9 @@ class ApplicationRoundStatus(models.Model, StatusMixin):
 
     timestamp = models.DateTimeField(verbose_name=_("Timestamp"), auto_now_add=True)
 
+    class Meta:
+        ordering = ("id",)
+
     @classmethod
     def get_statuses(cls):
         return [s[0] for s in cls.STATUS_CHOICES]
@@ -606,6 +609,9 @@ class ApplicationStatus(models.Model, StatusMixin):
 
     timestamp = models.DateTimeField(verbose_name=_("Timestamp"), auto_now_add=True)
 
+    class Meta:
+        ordering = ("id",)
+
     @classmethod
     def get_statuses(cls):
         return [s[0] for s in cls.STATUS_CHOICES]
@@ -650,6 +656,9 @@ class ApplicationEventStatus(models.Model, StatusMixin):
     )
 
     timestamp = models.DateTimeField(verbose_name=_("Timestamp"), auto_now_add=True)
+
+    class Meta:
+        ordering = ("id",)
 
     @classmethod
     def get_statuses(cls):
@@ -922,6 +931,9 @@ class ApplicationEvent(models.Model):
     uuid = models.UUIDField(default=uuid.uuid4, null=False, editable=False, unique=True)
 
     objects = ApplicationEventManager()
+
+    class Meta:
+        ordering = ("id",)
 
     def refresh_from_db(self, using=None, fields=None) -> None:
         super().refresh_from_db(using, fields)
@@ -1367,3 +1379,6 @@ class ApplicationEventWeeklyAmountReduction(models.Model):
     )
 
     created_date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ("id",)
