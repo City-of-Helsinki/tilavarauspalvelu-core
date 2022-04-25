@@ -5,7 +5,6 @@ from functools import reduce
 import django_filters
 from django.db.models import Q, Sum
 from django.utils.timezone import get_default_timezone
-from django_filters import CharFilter
 
 from applications.models import ApplicationRound
 from reservation_units.models import (
@@ -34,7 +33,7 @@ class ReservationUnitsFilterSet(django_filters.FilterSet):
         field_name="max_persons", method="get_max_persons_lte"
     )
 
-    text_search = CharFilter(method="get_text_search")
+    text_search = django_filters.CharFilter(method="get_text_search")
 
     keyword_groups = django_filters.ModelMultipleChoiceFilter(
         field_name="keyword_groups", queryset=KeywordGroup.objects.all()
@@ -52,6 +51,17 @@ class ReservationUnitsFilterSet(django_filters.FilterSet):
         field_name="application_rounds", queryset=ApplicationRound.objects.all()
     )
 
+    name_fi = django_filters.CharFilter(field_name="name_fi", lookup_expr="istartswith")
+    name_en = django_filters.CharFilter(field_name="name_en", lookup_expr="istartswith")
+    name_sv = django_filters.CharFilter(field_name="name_sv", lookup_expr="istartswith")
+
+    surface_area_gte = django_filters.NumberFilter(
+        field_name="surface_area", lookup_expr="gte"
+    )
+    surface_area_lte = django_filters.NumberFilter(
+        field_name="surface_area", lookup_expr="lte"
+    )
+
     order_by = django_filters.OrderingFilter(
         fields=(
             "name_fi",
@@ -63,6 +73,8 @@ class ReservationUnitsFilterSet(django_filters.FilterSet):
             ("unit__name_fi", "unit_name_fi"),
             ("unit__name_en", "unit_name_en"),
             ("unit__name_sv", "unit_name_sv"),
+            "max_persons",
+            "surface_area",
         )
     )
 

@@ -706,6 +706,50 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         assert_that(content.get("errors")).is_none()
         self.assertMatchSnapshot(content)
 
+    def test_filtering_by_name_fi(self):
+        ReservationUnit.objects.exclude(id=self.reservation_unit.id).delete()
+        ReservationUnitFactory(name_fi="show only me")
+        response = self.query(
+            """
+            query {
+                reservationUnits(nameFi: "show") {
+                    edges {
+                        node{
+                            nameFi
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filtering_by_surface_area(self):
+        ReservationUnit.objects.exclude(id=self.reservation_unit.id).delete()
+        ReservationUnitFactory(surface_area=121)  # Do not include
+        ReservationUnitFactory(surface_area=120)
+        ReservationUnitFactory(surface_area=90)
+        ReservationUnitFactory(surface_area=60)
+        ReservationUnitFactory(surface_area=59)  # Do not include
+        response = self.query(
+            """
+            query {
+                reservationUnits(surfaceAreaLte:120, surfaceAreaGte:60) {
+                    edges {
+                        node{
+                            surfaceArea
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
     def test_filtering_by_reservation_timestamps(self):
         now = datetime.datetime.now(get_default_timezone())
         one_hour = datetime.timedelta(hours=1)
@@ -1132,7 +1176,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.assertMatchSnapshot(content)
 
     def test_order_by_unit(self):
-        ReservationUnit.objects.all().delete()
+        ReservationUnit.objects.exclude(id=self.reservation_unit.id).delete()
         ReservationUnitFactory(unit=UnitFactory(name_fi="2", name_sv="2", name_en="_"))
         ReservationUnitFactory(unit=UnitFactory(name_fi="3", name_sv="_", name_en="2"))
         ReservationUnitFactory(unit=UnitFactory(name_fi="2", name_sv="1", name_en="_"))
@@ -1161,7 +1205,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.assertMatchSnapshot(content)
 
     def test_order_by_unit_reverse_order(self):
-        ReservationUnit.objects.all().delete()
+        ReservationUnit.objects.exclude(id=self.reservation_unit.id).delete()
         ReservationUnitFactory(unit=UnitFactory(name_fi="2", name_sv="2", name_en="_"))
         ReservationUnitFactory(unit=UnitFactory(name_fi="3", name_sv="_", name_en="2"))
         ReservationUnitFactory(unit=UnitFactory(name_fi="2", name_sv="1", name_en="_"))
@@ -1178,6 +1222,162 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
                                 nameFi
                                 nameSv
                                 nameEn
+                            }
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_order_by_max_persons(self):
+        ReservationUnit.objects.exclude(id=self.reservation_unit.id).delete()
+        ReservationUnitFactory(max_persons=1)
+        ReservationUnitFactory(max_persons=2)
+        ReservationUnitFactory(max_persons=3)
+        ReservationUnitFactory(max_persons=4)
+        ReservationUnitFactory(max_persons=5)
+        self.client.force_login(self.regular_joe)
+        response = self.query(
+            """
+            query {
+                reservationUnits(orderBy: "maxPersons") {
+                    edges {
+                        node {
+                            maxPersons
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_order_by_max_persons_reverse_order(self):
+        ReservationUnit.objects.exclude(id=self.reservation_unit.id).delete()
+        ReservationUnitFactory(max_persons=1)
+        ReservationUnitFactory(max_persons=2)
+        ReservationUnitFactory(max_persons=3)
+        ReservationUnitFactory(max_persons=4)
+        ReservationUnitFactory(max_persons=5)
+        self.client.force_login(self.regular_joe)
+        response = self.query(
+            """
+            query {
+                reservationUnits(orderBy: "-maxPersons") {
+                    edges {
+                        node {
+                            maxPersons
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_order_by_surface_area(self):
+        ReservationUnit.objects.exclude(id=self.reservation_unit.id).delete()
+        ReservationUnitFactory(surface_area=1)
+        ReservationUnitFactory(surface_area=2)
+        ReservationUnitFactory(surface_area=3)
+        ReservationUnitFactory(surface_area=4)
+        ReservationUnitFactory(surface_area=5)
+        self.client.force_login(self.regular_joe)
+        response = self.query(
+            """
+            query {
+                reservationUnits(orderBy: "maxPersons") {
+                    edges {
+                        node {
+                            surfaceArea
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_order_by_surface_area_reverse_order(self):
+        ReservationUnit.objects.exclude(id=self.reservation_unit.id).delete()
+        ReservationUnitFactory(surface_area=1)
+        ReservationUnitFactory(surface_area=2)
+        ReservationUnitFactory(surface_area=3)
+        ReservationUnitFactory(surface_area=4)
+        ReservationUnitFactory(surface_area=5)
+        self.client.force_login(self.regular_joe)
+        response = self.query(
+            """
+            query {
+                reservationUnits(orderBy: "-maxPersons") {
+                    edges {
+                        node {
+                            surfaceArea
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_order_by_name_and_unit_name(self):
+        ReservationUnit.objects.exclude(id=self.reservation_unit.id).delete()
+        ReservationUnitFactory(name="a", unit=UnitFactory(name_fi="2"))
+        ReservationUnitFactory(name="a", unit=UnitFactory(name_fi="3"))
+        ReservationUnitFactory(name="b", unit=UnitFactory(name_fi="2"))
+        ReservationUnitFactory(name="b", unit=UnitFactory(name_fi="3"))
+        ReservationUnitFactory(name="b", unit=UnitFactory(name_fi="1"))
+        self.client.force_login(self.regular_joe)
+        response = self.query(
+            """
+            query {
+                reservationUnits(orderBy: "nameFi,unitNameFi") {
+                    edges {
+                        node {
+                            nameFi
+                            unit {
+                                nameFi
+                            }
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_order_by_name_and_unit_name_reversed(self):
+        ReservationUnit.objects.exclude(id=self.reservation_unit.id).delete()
+        ReservationUnitFactory(name="a", unit=UnitFactory(name_fi="2"))
+        ReservationUnitFactory(name="a", unit=UnitFactory(name_fi="3"))
+        ReservationUnitFactory(name="b", unit=UnitFactory(name_fi="2"))
+        ReservationUnitFactory(name="b", unit=UnitFactory(name_fi="3"))
+        ReservationUnitFactory(name="b", unit=UnitFactory(name_fi="1"))
+        self.client.force_login(self.regular_joe)
+        response = self.query(
+            """
+            query {
+                reservationUnits(orderBy: "-nameFi,-unitNameFi") {
+                    edges {
+                        node {
+                            nameFi
+                            unit {
+                                nameFi
                             }
                         }
                     }
