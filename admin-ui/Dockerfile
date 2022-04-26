@@ -7,7 +7,6 @@ RUN yum -y install yarn
 
 # Offical image has npm log verbosity as info. More info - https://github.com/nodejs/docker-node#verbosity
 ENV NPM_CONFIG_LOGLEVEL warn
-ENV NODE_ENV=production
 
 # Yarn
 RUN yarn set version 1.22.10

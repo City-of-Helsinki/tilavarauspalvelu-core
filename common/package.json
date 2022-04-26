@@ -2,8 +2,26 @@
   "name": "common",
   "version": "0.1.0",
   "private": true,
-  "module": "index.ts",
   "main": "index.ts",
+  "module": "index.ts",
+  "scripts": {
+    "generate-certificate": "mkdirp certificates && echo \"[dn]\nCN=local-tilavaraus\n[req]\ndistinguished_name = dn\n[EXT]\nsubjectAltName=DNS:local-tilavaraus\nkeyUsage=digitalSignature\nextendedKeyUsage=serverAuth\"| openssl req -x509 -out certificates/local-tilavaraus.crt -keyout certificates/local-tilavaraus.key -newkey rsa:2048 -nodes -sha256 -subj '/CN=local-tilavaraus' -extensions EXT -config /dev/stdin",
+    "lint": "eslint --ext ts,tsx .",
+    "start": "react-scripts start",
+    "test": "react-scripts test"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
   "dependencies": {
     "hds-react": "^1.12.0",
     "react": "^17.0.2",
@@ -31,23 +49,5 @@
     "stylelint-config-styled-components": "^0.1.1",
     "stylelint-processor-styled-components": "^1.10.0",
     "typescript": "^4.3.4"
-  },
-  "scripts": {
-    "start": "react-scripts start",
-    "test": "react-scripts test",
-    "lint": "eslint --ext ts,tsx .",
-    "generate-certificate": "mkdirp certificates && echo \"[dn]\nCN=local-tilavaraus\n[req]\ndistinguished_name = dn\n[EXT]\nsubjectAltName=DNS:local-tilavaraus\nkeyUsage=digitalSignature\nextendedKeyUsage=serverAuth\"| openssl req -x509 -out certificates/local-tilavaraus.crt -keyout certificates/local-tilavaraus.key -newkey rsa:2048 -nodes -sha256 -subj '/CN=local-tilavaraus' -extensions EXT -config /dev/stdin"
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
   }
 }
