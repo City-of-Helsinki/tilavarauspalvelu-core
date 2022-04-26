@@ -21,7 +21,9 @@ class CitiesGraphQLTestCase(GraphQLTestCase, snapshottest.TestCase):
                 cities {
                     edges {
                         node {
-                            name
+                            nameFi
+                            nameEn
+                            nameSv
                         }
                     }
                 }
