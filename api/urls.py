@@ -15,6 +15,7 @@ from .applications_api.views import (
 )
 from .city_api import CityViewSet
 from .declined_reservation_units_api import DeclinedReservationUnitViewSet
+from .gdpr import TilavarauspalveluGDPRAPIView
 from .hauki_api import OpeningHoursViewSet
 from .ical_api import (
     ApplicationEventIcalViewset,
@@ -125,4 +126,9 @@ router.register(r"parameters/city", CityViewSet, "city")
 
 urlpatterns = [
     path("graphql/", csrf_exempt(FileUploadGraphQLView.as_view(graphiql=True))),
+    path(
+        "gdpr/v1/user/<str:uuid>/",
+        TilavarauspalveluGDPRAPIView.as_view(),
+        name="gdpr_v1",
+    ),
 ]
