@@ -4,9 +4,6 @@ from django.db.models import Sum
 from graphene_permissions.mixins import AuthNode
 from graphene_permissions.permissions import AllowAny
 
-from api.graphql.application_rounds.application_round_connection import (
-    ApplicationRoundConnection,
-)
 from api.graphql.base_type import PrimaryKeyObjectType
 from api.graphql.reservation_units.reservation_unit_types import ReservationUnitType
 from api.graphql.translate_fields import get_all_translatable_fields
@@ -20,6 +17,7 @@ from applications.models import (
 from permissions.api_permissions.graphene_permissions import ApplicationRoundPermission
 from spaces.models import ServiceSector
 
+from ..base_connection import TilavarausBaseConnection
 from ..reservations.reservation_types import ReservationPurposeType
 
 
@@ -41,6 +39,7 @@ class ServiceSectorType(AuthNode, PrimaryKeyObjectType):
         model = ServiceSector
         fields = ("id",)
         interfaces = (graphene.relay.Node,)
+        connection_class = TilavarausBaseConnection
 
 
 class ApplicationRoundBasketType(AuthNode, PrimaryKeyObjectType):
@@ -68,6 +67,7 @@ class ApplicationRoundBasketType(AuthNode, PrimaryKeyObjectType):
             "order_number",
         )
         interfaces = (graphene.relay.Node,)
+        connection_class = TilavarausBaseConnection
 
     def resolve_purpose_ids(self, info: graphene.ResolveInfo):
         return self.purposes.all().values_list("id", flat=True)
@@ -133,7 +133,7 @@ class ApplicationRoundType(AuthNode, PrimaryKeyObjectType):
         }
 
         interfaces = (graphene.relay.Node,)
-        connection_class = ApplicationRoundConnection
+        connection_class = TilavarausBaseConnection
 
     def resolve_aggregated_data(self, info: graphene.ResolveInfo):
         events_count = (

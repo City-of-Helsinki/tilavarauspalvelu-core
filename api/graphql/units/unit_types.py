@@ -3,6 +3,7 @@ from django.conf import settings
 from graphene_permissions.mixins import AuthNode
 from graphene_permissions.permissions import AllowAny
 
+from api.graphql.base_connection import TilavarausBaseConnection
 from api.graphql.base_type import PrimaryKeyObjectType
 from api.graphql.opening_hours.opening_hours_types import OpeningHoursMixin
 from api.graphql.translate_fields import get_all_translatable_fields
@@ -46,6 +47,7 @@ class UnitType(AuthNode, PrimaryKeyObjectType):
         }
 
         interfaces = (graphene.relay.Node,)
+        connection_class = TilavarausBaseConnection
 
     @check_resolver_permission(ReservationUnitPermission)
     def resolve_reservation_units(self, info):
@@ -76,3 +78,4 @@ class UnitByPkType(UnitType, OpeningHoursMixin):
         ] + get_all_translatable_fields(model)
 
         interfaces = (graphene.relay.Node,)
+        connection_class = TilavarausBaseConnection

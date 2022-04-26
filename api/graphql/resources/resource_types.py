@@ -3,6 +3,7 @@ from django.conf import settings
 from graphene_permissions.mixins import AuthNode
 from graphene_permissions.permissions import AllowAny
 
+from api.graphql.base_connection import TilavarausBaseConnection
 from api.graphql.base_type import PrimaryKeyObjectType
 from api.graphql.duration_field import Duration
 from api.graphql.spaces.space_types import BuildingType
@@ -38,3 +39,4 @@ class ResourceType(AuthNode, PrimaryKeyObjectType):
         }
 
         interfaces = (graphene.relay.Node,)
+        connection_class = TilavarausBaseConnection

@@ -3,6 +3,7 @@ from django.conf import settings
 from graphene_permissions.mixins import AuthNode
 from graphene_permissions.permissions import AllowAny
 
+from api.graphql.base_connection import TilavarausBaseConnection
 from api.graphql.base_type import PrimaryKeyObjectType
 from api.graphql.translate_fields import get_all_translatable_fields
 from permissions.api_permissions.graphene_field_decorators import (
@@ -27,6 +28,7 @@ class RealEstateType(PrimaryKeyObjectType):
         model = RealEstate
         fields = ["pk", "district", "surface_area"] + get_all_translatable_fields(model)
         interfaces = (graphene.relay.Node,)
+        connection_class = TilavarausBaseConnection
 
 
 class BuildingType(PrimaryKeyObjectType):
@@ -42,6 +44,7 @@ class BuildingType(PrimaryKeyObjectType):
             "surface_area",
         ] + get_all_translatable_fields(model)
         interfaces = (graphene.relay.Node,)
+        connection_class = TilavarausBaseConnection
 
 
 class SpaceType(AuthNode, PrimaryKeyObjectType):
@@ -73,6 +76,7 @@ class SpaceType(AuthNode, PrimaryKeyObjectType):
         }
 
         interfaces = (graphene.relay.Node,)
+        connection_class = TilavarausBaseConnection
 
     def resolve_children(self, info):
         return Space.objects.filter(parent=self)
@@ -101,3 +105,4 @@ class LocationType(PrimaryKeyObjectType):
         ] + get_all_translatable_fields(model)
 
         interfaces = (graphene.relay.Node,)
+        connection_class = TilavarausBaseConnection

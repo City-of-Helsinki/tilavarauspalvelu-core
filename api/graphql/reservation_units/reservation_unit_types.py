@@ -10,6 +10,7 @@ from graphene_django import DjangoObjectType
 from graphene_permissions.mixins import AuthNode
 from graphene_permissions.permissions import AllowAny
 
+from api.graphql.base_connection import TilavarausBaseConnection
 from api.graphql.base_type import PrimaryKeyObjectType
 from api.graphql.duration_field import Duration
 from api.graphql.opening_hours.opening_hours_types import OpeningHoursMixin
@@ -67,6 +68,7 @@ class KeywordType(AuthNode, PrimaryKeyObjectType):
         fields = ["pk"] + get_all_translatable_fields(model)
         filter_fields = ["name_fi", "name_sv", "name_en"]
         interfaces = (graphene.relay.Node,)
+        connection_class = TilavarausBaseConnection
 
 
 class TaxPercentageType(AuthNode, PrimaryKeyObjectType):
@@ -75,6 +77,7 @@ class TaxPercentageType(AuthNode, PrimaryKeyObjectType):
         fields = ["pk", "value"]
         filter_fields = ["value"]
         interfaces = (graphene.relay.Node,)
+        connection_class = TilavarausBaseConnection
 
 
 class KeywordGroupType(AuthNode, PrimaryKeyObjectType):
@@ -86,6 +89,7 @@ class KeywordGroupType(AuthNode, PrimaryKeyObjectType):
         fields = ["pk"] + get_all_translatable_fields(model)
         filter_fields = ["name_fi", "name_sv", "name_en"]
         interfaces = (graphene.relay.Node,)
+        connection_class = TilavarausBaseConnection
 
     def resolve_keywords(self, info):
         return self.keywords.all()
@@ -99,6 +103,7 @@ class KeywordCategoryType(AuthNode, PrimaryKeyObjectType):
         fields = ["pk"] + get_all_translatable_fields(model)
         filter_fields = ["name_fi", "name_sv", "name_en"]
         interfaces = (graphene.relay.Node,)
+        connection_class = TilavarausBaseConnection
 
     def resolve_keyword_groups(self, info):
         return self.keyword_groups.all()
@@ -114,6 +119,7 @@ class PurposeType(AuthNode, PrimaryKeyObjectType):
         fields = ["pk"] + get_all_translatable_fields(model)
         filter_fields = ["name_fi", "name_en", "name_sv"]
         interfaces = (graphene.relay.Node,)
+        connection_class = TilavarausBaseConnection
 
 
 class ReservationUnitHaukiUrlType(AuthNode, DjangoObjectType):
@@ -129,6 +135,7 @@ class ReservationUnitHaukiUrlType(AuthNode, DjangoObjectType):
     class Meta:
         model = ReservationUnit
         fields = ("url",)
+        connection_class = TilavarausBaseConnection
 
     def resolve_url(self, info):
         if settings.TMP_PERMISSIONS_DISABLED or can_manage_units(
@@ -158,6 +165,7 @@ class ReservationUnitImageType(PrimaryKeyObjectType):
             "small_url",
             "image_type",
         ]
+        connection_class = TilavarausBaseConnection
 
     def resolve_image_url(self, info):
         if not self.image:
@@ -202,6 +210,7 @@ class ReservationUnitCancellationRuleType(AuthNode, PrimaryKeyObjectType):
         ] + get_all_translatable_fields(model)
         filter_fields = ["name"]
         interfaces = (graphene.relay.Node,)
+        connection_class = TilavarausBaseConnection
 
     def resolve_can_be_cancelled_time_before(self, info: ResolveInfo):
         if not self.can_be_cancelled_time_before:
@@ -216,6 +225,7 @@ class ReservationUnitTypeType(PrimaryKeyObjectType):
         filter_fields = get_all_translatable_fields(model)
 
         interfaces = (graphene.relay.Node,)
+        connection_class = TilavarausBaseConnection
 
 
 class EquipmentCategoryType(AuthNode, PrimaryKeyObjectType):
@@ -236,6 +246,7 @@ class EquipmentCategoryType(AuthNode, PrimaryKeyObjectType):
         }
 
         interfaces = (graphene.relay.Node,)
+        connection_class = TilavarausBaseConnection
 
 
 class EquipmentType(AuthNode, PrimaryKeyObjectType):
@@ -255,6 +266,7 @@ class EquipmentType(AuthNode, PrimaryKeyObjectType):
         }
 
         interfaces = (graphene.relay.Node,)
+        connection_class = TilavarausBaseConnection
 
     def resolve_category(self, info):
         return self.category
@@ -354,6 +366,7 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
         }
 
         interfaces = (graphene.relay.Node,)
+        connection_class = TilavarausBaseConnection
 
     def resolve_pk(self, info):
         return self.id
@@ -489,6 +502,7 @@ class ReservationUnitByPkType(ReservationUnitType, OpeningHoursMixin):
         ] + get_all_translatable_fields(model)
 
         interfaces = (graphene.relay.Node,)
+        connection_class = TilavarausBaseConnection
 
     def resolve_next_available_slot(self, info):
         scheduler = ReservationUnitReservationScheduler(self)
