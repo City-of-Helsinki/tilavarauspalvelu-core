@@ -58,7 +58,7 @@ const IndividualForm = ({ application, onNext }: Props): JSX.Element | null => {
   return (
     <form>
       <TwoColumnContainer>
-        <FormSubHeading>
+        <FormSubHeading as="h2">
           {t("application:Page3.subHeading.basicInfo")}
         </FormSubHeading>
         <TextInput
