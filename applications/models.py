@@ -53,6 +53,18 @@ def year_not_in_future(year: Optional[int]):
         raise ValidationError(format_lazy("{year} {msg}", year=year, msg=msg))
 
 
+class StatusMixin:
+    STATUS_CHOICES = ()
+
+    @classmethod
+    def get_verbose_status(cls, status: str) -> str:
+        for choice, verbose_status in cls.STATUS_CHOICES:
+            if choice == status:
+                return verbose_status
+
+        return status
+
+
 class AggregateDataBase(models.Model):
     class Meta:
         abstract = True
@@ -192,7 +204,7 @@ class PRIORITY_CONST(object):
 PRIORITIES = PRIORITY_CONST()
 
 
-class ApplicationRoundStatus(models.Model):
+class ApplicationRoundStatus(models.Model, StatusMixin):
     DRAFT = "draft"
     IN_REVIEW = "in_review"
     REVIEW_DONE = "review_done"
@@ -501,7 +513,7 @@ class ApplicationRoundBasket(CUSTOMER_TYPE_CONST, models.Model):
         return "{} ({})".format(self.name, self.application_round.name)
 
 
-class ApplicationStatus(models.Model):
+class ApplicationStatus(models.Model, StatusMixin):
     DRAFT = "draft"
     IN_REVIEW = "in_review"
     REVIEW_DONE = "review_done"
@@ -548,7 +560,7 @@ class ApplicationStatus(models.Model):
         return "{} ({})".format(self.get_status_display(), self.application.id)
 
 
-class ApplicationEventStatus(models.Model):
+class ApplicationEventStatus(models.Model, StatusMixin):
     CREATED = "created"
     ALLOCATED = "allocated"
     VALIDATED = "validated"
