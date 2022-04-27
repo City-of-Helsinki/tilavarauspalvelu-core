@@ -186,7 +186,7 @@ class ApplicationDataExporter:
                     applications_writer.writerow(
                         [
                             application.id,
-                            event.current_status,
+                            ApplicationStatus.get_verbose_status(event.current_status),
                             applicant,
                             contact_person_first_name,
                             contact_person_last_name,

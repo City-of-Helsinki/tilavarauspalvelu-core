@@ -116,7 +116,7 @@ class ApplicationDataExporterTestCase(TestCase):
 
         expected_row = [
             str(application.id),
-            self.application_status.status,
+            ApplicationStatus.get_verbose_status(self.application_status.status),
             application.organisation.name,
             application.contact_person.first_name,
             application.contact_person.last_name,
@@ -172,7 +172,7 @@ class ApplicationDataExporterTestCase(TestCase):
 
         expected_row = [
             str(application.id),
-            self.application_status.status,
+            ApplicationStatus.get_verbose_status(self.application_status.status),
             application.organisation.name,
             application.contact_person.first_name,
             application.contact_person.last_name,
@@ -228,7 +228,7 @@ class ApplicationDataExporterTestCase(TestCase):
 
         expected_row = [
             str(application.id),
-            self.application_status.status,
+            ApplicationStatus.get_verbose_status(self.application_status.status),
             application.organisation.name,
             application.contact_person.first_name,
             application.contact_person.last_name,
@@ -284,7 +284,7 @@ class ApplicationDataExporterTestCase(TestCase):
 
         expected_row = [
             str(application.id),
-            self.application_status.status,
+            ApplicationStatus.get_verbose_status(self.application_status.status),
             application.organisation.name,
             application.contact_person.first_name,
             application.contact_person.last_name,
@@ -340,7 +340,7 @@ class ApplicationDataExporterTestCase(TestCase):
 
         expected_row = [
             str(application.id),
-            self.application_status.status,
+            ApplicationStatus.get_verbose_status(self.application_status.status),
             application.organisation.name,
             application.contact_person.first_name,
             application.contact_person.last_name,
@@ -401,7 +401,7 @@ class ApplicationDataExporterTestCase(TestCase):
 
         expected_row = [
             str(application.id),
-            self.application_status.status,
+            ApplicationStatus.get_verbose_status(self.application_status.status),
             application.organisation.name,
             application.contact_person.first_name,
             application.contact_person.last_name,
@@ -462,7 +462,7 @@ class ApplicationDataExporterTestCase(TestCase):
 
         expected_row = [
             str(application.id),
-            self.application_status.status,
+            ApplicationStatus.get_verbose_status(self.application_status.status),
             application.organisation.name,
             application.contact_person.first_name,
             application.contact_person.last_name,
@@ -518,7 +518,7 @@ class ApplicationDataExporterTestCase(TestCase):
 
         expected_row = [
             str(application.id),
-            self.application_status.status,
+            ApplicationStatus.get_verbose_status(self.application_status.status),
             application.organisation.name,
             application.contact_person.first_name,
             application.contact_person.last_name,
@@ -574,7 +574,7 @@ class ApplicationDataExporterTestCase(TestCase):
 
         expected_row = [
             str(application.id),
-            self.application_status.status,
+            ApplicationStatus.get_verbose_status(self.application_status.status),
             application.organisation.name,
             application.contact_person.first_name,
             application.contact_person.last_name,
@@ -630,7 +630,7 @@ class ApplicationDataExporterTestCase(TestCase):
 
         expected_row = [
             str(application.id),
-            self.application_status.status,
+            ApplicationStatus.get_verbose_status(self.application_status.status),
             application.organisation.name,
             application.contact_person.first_name,
             application.contact_person.last_name,
@@ -686,7 +686,7 @@ class ApplicationDataExporterTestCase(TestCase):
 
         expected_row = [
             str(application.id),
-            self.application_status.status,
+            ApplicationStatus.get_verbose_status(self.application_status.status),
             application.organisation.name,
             "",
             "",
@@ -742,7 +742,7 @@ class ApplicationDataExporterTestCase(TestCase):
 
         expected_row = [
             str(application.id),
-            self.application_status.status,
+            ApplicationStatus.get_verbose_status(self.application_status.status),
             f"{application.contact_person.first_name} {application.contact_person.last_name}",
             application.contact_person.first_name,
             application.contact_person.last_name,
@@ -799,7 +799,7 @@ class ApplicationDataExporterTestCase(TestCase):
 
         expected_row = [
             str(application.id),
-            self.application_status.status,
+            ApplicationStatus.get_verbose_status(self.application_status.status),
             "",
             "",
             "",
@@ -855,7 +855,7 @@ class ApplicationDataExporterTestCase(TestCase):
 
         expected_row = [
             str(application.id),
-            self.application_status.status,
+            ApplicationStatus.get_verbose_status(self.application_status.status),
             application.organisation.name,
             application.contact_person.first_name,
             application.contact_person.last_name,
@@ -911,7 +911,7 @@ class ApplicationDataExporterTestCase(TestCase):
 
         expected_row = [
             str(application.id),
-            self.application_status.status,
+            ApplicationStatus.get_verbose_status(self.application_status.status),
             application.organisation.name,
             application.contact_person.first_name,
             application.contact_person.last_name,
@@ -967,7 +967,7 @@ class ApplicationDataExporterTestCase(TestCase):
 
         expected_row = [
             str(application.id),
-            self.application_status.status,
+            ApplicationStatus.get_verbose_status(self.application_status.status),
             application.organisation.name,
             application.contact_person.first_name,
             application.contact_person.last_name,
@@ -1020,7 +1020,7 @@ class ApplicationDataExporterTestCase(TestCase):
 
         expected_row = [
             str(application.id),
-            self.application_status.status,
+            ApplicationStatus.get_verbose_status(self.application_status.status),
             application.organisation.name,
             application.contact_person.first_name,
             application.contact_person.last_name,
@@ -1074,7 +1074,7 @@ class ApplicationDataExporterTestCase(TestCase):
 
         expected_row = [
             str(application.id),
-            self.application_status.status,
+            ApplicationStatus.get_verbose_status(self.application_status.status),
             application.organisation.name,
             application.contact_person.first_name,
             application.contact_person.last_name,
@@ -1130,7 +1130,7 @@ class ApplicationDataExporterTestCase(TestCase):
 
         expected_row = [
             str(application.id),
-            self.application_status.status,
+            ApplicationStatus.get_verbose_status(self.application_status.status),
             application.organisation.name,
             application.contact_person.first_name,
             application.contact_person.last_name,
@@ -1189,7 +1189,7 @@ class ApplicationDataExporterTestCase(TestCase):
 
         expected_row = [
             str(application.id),
-            self.application_status.status,
+            ApplicationStatus.get_verbose_status(self.application_status.status),
             application.organisation.name,
             application.contact_person.first_name,
             application.contact_person.last_name,
