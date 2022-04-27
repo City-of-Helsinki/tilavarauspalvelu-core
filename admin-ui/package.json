@@ -2,76 +2,27 @@
   "name": "admin-ui",
   "version": "0.1.0",
   "private": true,
-  "dependencies": {
-    "@apollo/client": "3.5.9",
-    "@axa-fr/react-oidc-context": "^3.1.6",
-    "@n8tb1t/use-scroll-position": "^2.0.3",
-    "@react-pdf/renderer": "^2.0.15",
-    "@sentry/react": "^6.18.1",
-    "@testing-library/jest-dom": "^5.11.4",
-    "@testing-library/react": "^11.1.0",
-    "@testing-library/user-event": "^12.1.10",
-    "@types/apollo-upload-client": "^14.1.0",
-    "@types/jest": "^26.0.15",
-    "@types/lodash": "^4.14.168",
-    "@types/node": "^12.0.0",
-    "@types/react": "^16.9.53",
-    "@types/react-dom": "^16.9.8",
-    "@types/react-map-gl": "5.2.10",
-    "@types/react-router-dom": "^5.1.7",
-    "@types/styled-components": "^5.1.7",
-    "apollo-link-token-refresh": "^0.3.2",
-    "apollo-upload-client": "17.0.0",
-    "axios": "^0.21.1",
-    "axios-auth-refresh": "^3.1.0",
-    "axios-case-converter": "^0.8.1",
-    "classnames": "^2.2.6",
-    "common": "^0.1.0",
-    "customize-cra": "^1.0.0",
-    "date-fns": "^2.16.1",
-    "focus-trap-react": "^8.7.1",
-    "graphql": "^15.5.1",
-    "hds-core": "^1.5.0",
-    "hds-design-tokens": "^1.5.0",
-    "hds-react": "^1.5.0",
-    "http-proxy-middleware": "^1.0.6",
-    "i18next": "^19.8.4",
-    "joi": "^17.6.0",
-    "lodash": "^4.17.20",
-    "mapbox-gl": "2.4.0",
-    "node-sass": "7.0.0",
-    "oidc-client": "^1.11.5",
-    "query-string": "^7.0.0",
-    "react": "^17.0.1",
-    "react-app-rewired": "^2.2.1",
-    "react-dom": "^17.0.1",
-    "react-i18next": "^11.8.5",
-    "react-map-gl": "5.3.16",
-    "react-quill": "beta",
-    "react-router-dom": "^5.2.0",
-    "react-scripts": "4.0.3",
-    "react-use": "^17.1.0",
-    "styled-components": "^5.2.1",
-    "typescript": "^4.3.4",
-    "web-vitals": "^0.2.4"
-  },
   "scripts": {
-    "start": "HOST=local-tilavaraus.hel.fi HTTPS=true SSL_CRT_FILE=../common/certificates/local-tilavaraus.crt SSL_KEY_FILE=../common/certificates/local-tilavaraus.key react-app-rewired start",
     "build": "react-app-rewired build",
-    "test": "react-app-rewired test",
-    "test:e2e-local": "testcafe --skip-js-errors \"chrome --window-size='1920,1080'\" e2e/tests",
-    "lint": "eslint --ext ts,tsx src",
-    "lint:css": "stylelint './src/**/*.tsx'",
-    "ts-check": "tsc --noEmit --project tsconfig.json",
     "eject": "react-scripts eject",
     "generate-gql-types": "graphql-codegen && prettier --write 'src/common/gql-types.ts'",
+    "lint": "eslint --ext ts,tsx src",
+    "lint:css": "stylelint './src/**/*.tsx'",
+    "start": "HOST=local-tilavaraus.hel.fi HTTPS=true SSL_CRT_FILE=../common/certificates/local-tilavaraus.crt SSL_KEY_FILE=../common/certificates/local-tilavaraus.key react-app-rewired start",
+    "test": "react-app-rewired test",
+    "test:e2e-local": "testcafe --skip-js-errors \"chrome --window-size='1920,1080'\" e2e/tests",
+    "ts-check": "tsc --noEmit --project tsconfig.json",
     "update-schema": "npx get-graphql-schema http://localhost:8000/graphql/ > ../tilavaraus.graphql"
   },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{js,css,md,ts,tsx}": "prettier --write",
+    "*.{js,ts,tsx}": "eslint --cache",
+    "*.{tsx,css,scss}": "stylelint"
   },
   "browserslist": {
     "production": [
@@ -85,10 +36,64 @@
       "last 1 safari version"
     ]
   },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "dependencies": {
+    "@apollo/client": "^3.4.13",
+    "@axa-fr/react-oidc-context": "^3.1.6",
+    "@n8tb1t/use-scroll-position": "^2.0.3",
+    "@react-pdf/renderer": "2.0.15",
+    "@sentry/react": "^6.18.1",
+    "apollo-link-token-refresh": "^0.3.2",
+    "apollo-upload-client": "17.0.0",
+    "axios": "^0.21.1",
+    "axios-auth-refresh": "^3.1.0",
+    "axios-case-converter": "^0.8.1",
+    "classnames": "^2.2.6",
+    "common": "^0.1.0",
+    "date-fns": "^2.16.1",
+    "focus-trap-react": "^8.7.1",
+    "graphql": "^15.5.1",
+    "hds-react": "^1.5.0",
+    "http-proxy-middleware": "^1.0.6",
+    "i18next": "^19.8.4",
+    "joi": "^17.6.0",
+    "lodash": "^4.17.20",
+    "mapbox-gl": "2.4.0",
+    "oidc-client": "^1.11.5",
+    "query-string": "^7.0.0",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-i18next": "^11.8.5",
+    "react-map-gl": "5.3.16",
+    "react-quill": "beta",
+    "react-router-dom": "^5.2.0",
+    "react-scripts": "4.0.3",
+    "react-use": "^17.1.0",
+    "styled-components": "^5.2.1",
+    "web-vitals": "^0.2.4"
+  },
   "devDependencies": {
     "@graphql-codegen/cli": "^2.2.0",
     "@graphql-codegen/typescript": "^2.2.2",
+    "@testing-library/jest-dom": "^5.11.4",
+    "@testing-library/react": "^11.1.0",
+    "@testing-library/user-event": "^12.1.10",
+    "@types/apollo-upload-client": "17.0.0",
+    "@types/jest": "^26.0.15",
     "@types/jest-axe": "^3.5.1",
+    "@types/lodash": "^4.14.168",
+    "@types/node": "^12.0.0",
+    "@types/react": "^17.0.38",
+    "@types/react-dom": "^17.0.6",
+    "@types/react-map-gl": "5.2.10",
+    "@types/react-router-dom": "^5.1.7",
+    "@types/styled-components": "^5.1.7",
+    "customize-cra": "^1.0.0",
     "eslint-config-airbnb-typescript-prettier": "^4.1.0",
     "eslint-plugin-jsx-a11y": "^6.4.1",
     "eslint-plugin-testcafe": "^0.2.1",
@@ -96,22 +101,15 @@
     "jest-axe": "^5.0.1",
     "lint-staged": "^10.5.4",
     "prettier": "^2.2.1",
+    "react-app-rewired": "^2.2.1",
     "stylelint": "^13.9.0",
     "stylelint-config-recommended": "^3.0.0",
     "stylelint-config-standard": "^20.0.0",
     "stylelint-config-styled-components": "^0.1.1",
     "stylelint-processor-styled-components": "^1.10.0",
     "stylelint-value-no-unknown-custom-properties": "^3.0.0",
-    "testcafe": "^1.11.0"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
-  "lint-staged": {
-    "*.{tsx,css,scss}": "stylelint",
-    "*.{js,css,md,ts,tsx}": "prettier --write",
-    "*.{js,ts,tsx}": "eslint --cache"
+    "testcafe": "^1.11.0",
+    "typescript": "^4.3.4"
   }
+
 }
