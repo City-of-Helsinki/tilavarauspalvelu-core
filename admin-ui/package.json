@@ -43,7 +43,7 @@
     ]
   },
   "dependencies": {
-    "@apollo/client": "3.5.10",
+    "@apollo/client": "^3.4.13",
     "@axa-fr/react-oidc-context": "^3.1.6",
     "@n8tb1t/use-scroll-position": "^2.0.3",
     "@react-pdf/renderer": "2.0.15",
