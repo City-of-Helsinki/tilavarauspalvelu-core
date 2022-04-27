@@ -7,9 +7,9 @@ from graphene_permissions.mixins import AuthNode
 from graphene_permissions.permissions import AllowAny, AllowAuthenticated
 from rest_framework.reverse import reverse
 
+from api.graphql.base_connection import TilavarausBaseConnection
 from api.graphql.base_type import PrimaryKeyObjectType
 from api.graphql.duration_field import Duration
-from api.graphql.reservations.reservation_connection import ReservationConnection
 from api.graphql.translate_fields import get_all_translatable_fields
 from api.ical_api import hmac_signature
 from permissions.api_permissions.graphene_field_decorators import (
@@ -194,7 +194,7 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
             "begin": ["exact", "gte", "lte"],
         }
         interfaces = (graphene.relay.Node,)
-        connection_class = ReservationConnection
+        connection_class = TilavarausBaseConnection
 
     class Input:
         from_ = graphene.Field(graphene.Date, name="from")

@@ -3,6 +3,7 @@ from django.conf import settings
 from graphene_permissions.mixins import AuthNode
 from graphene_permissions.permissions import AllowAny
 
+from api.graphql.base_connection import TilavarausBaseConnection
 from api.graphql.base_type import PrimaryKeyObjectType
 from applications.models import City
 from permissions.api_permissions.graphene_permissions import CityPermission
@@ -18,3 +19,4 @@ class CityType(AuthNode, PrimaryKeyObjectType):
         fields = ["name"]
         filter_fields = []
         interfaces = (graphene.relay.Node,)
+        connection_class = TilavarausBaseConnection
