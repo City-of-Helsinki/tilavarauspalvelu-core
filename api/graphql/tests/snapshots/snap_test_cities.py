@@ -13,7 +13,9 @@ snapshots['CitiesGraphQLTestCase::test_getting_cities 1'] = {
             'edges': [
                 {
                     'node': {
-                        'name': 'Helsinki'
+                        'nameEn': None,
+                        'nameFi': 'Helsinki',
+                        'nameSv': None
                     }
                 }
             ]
