@@ -16,6 +16,7 @@ import {
   QueryApplicationRoundsArgs,
 } from "../../modules/gql-types";
 import { APPLICATION_ROUNDS } from "../../modules/queries/applicationRound";
+import BreadcrumbWrapper from "../../components/common/BreadcrumbWrapper";
 
 type Props = {
   applicationRounds: ApplicationRoundType[];
@@ -116,6 +117,7 @@ const RecurringLander = ({ applicationRounds }: Props): JSX.Element => {
 
   return (
     <Wrapper>
+      <BreadcrumbWrapper route={["recurring"]} />
       <HeadWrapper>
         <Head>
           <Heading>{t("recurringLander:heading")}</Heading>

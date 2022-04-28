@@ -38,7 +38,7 @@ const BreadcrumbWrapper = ({ route, aliases }: Props): JSX.Element => {
     <Wrapper>
       <Breadcrumb
         routes={[{ title: t("breadcrumb:frontpage"), slug: "/" }, ...routes]}
-        className={isMobile ? "isMobile" : ""}
+        isMobile={isMobile}
       />
     </Wrapper>
   );

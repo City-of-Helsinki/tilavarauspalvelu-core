@@ -96,7 +96,7 @@ const Intro = (): JSX.Element => {
 
   return (
     <RequireAuthentication>
-      <Head noKoros heading={t("application:Intro.heading")} breadCrumbText="">
+      <Head noKoros heading={t("application:Intro.heading")}>
         <Container>
           {applicationRounds.length > 0 ? (
             <>

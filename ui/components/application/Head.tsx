@@ -1,15 +1,12 @@
-import { trim } from "lodash";
-import { useRouter } from "next/router";
 import React from "react";
-import { useTranslation } from "react-i18next";
+import { useRouter } from "next/router";
 import styled from "styled-components";
 import { H1 } from "../../modules/style/typography";
-import Breadcrumb from "../common/Breadcrumb";
+import BreadcrumbWrapper from "../common/BreadcrumbWrapper";
 import KorosDefault from "../common/KorosDefault";
 
 type HeadProps = {
   heading: string;
-  breadCrumbText?: string;
   children?: React.ReactNode;
   noKoros?: boolean;
 };
@@ -38,27 +35,13 @@ const StyledKoros = styled(KorosDefault)`
 const Head = ({
   children,
   heading,
-  breadCrumbText,
   noKoros = false,
 }: HeadProps): JSX.Element => {
-  const { t } = useTranslation();
   const router = useRouter();
 
   return (
     <Container $white={router.route === "/intro"}>
-      <Breadcrumb
-        root={{
-          label: "home",
-          linkTo: "/recurring",
-        }}
-        current={{
-          label: trim(
-            `${t("breadcrumb:application")} - ${breadCrumbText}`,
-            " - "
-          ),
-          linkTo: "#",
-        }}
-      />
+      <BreadcrumbWrapper route={["/recurring", "application"]} />
       <Content>
         <Heading>{heading}</Heading>
         {children || null}

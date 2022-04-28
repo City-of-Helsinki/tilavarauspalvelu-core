@@ -3,5 +3,9 @@
   "search": "Search",
   "application": "Seasonal booking application",
   "criteria": "Search criteria",
-  "singleReservations": "Single bookings"
+  "singleReservations": "Single bookings",
+  "frontpage": "Home",
+  "recurring": "Seasonal booking",
+  "applications": "My applications",
+  "reservationUnit": "Reservation unit"
 }

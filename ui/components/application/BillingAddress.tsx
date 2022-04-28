@@ -15,7 +15,7 @@ const BillingAddress = ({ register, errors }: Props): JSX.Element | null => {
 
   return (
     <>
-      <FormSubHeading>
+      <FormSubHeading as="h2">
         {t("application:Page3.subHeading.billingAddress")}
       </FormSubHeading>
       <TextInput

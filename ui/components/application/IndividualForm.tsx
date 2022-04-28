@@ -86,7 +86,7 @@ const IndividualForm = ({ application, onNext }: Props): JSX.Element | null => {
           )}
         />
         <BillingAddress register={register} errors={errors} />
-        <FormSubHeading>
+        <FormSubHeading as="h2">
           {t("application:Page3.subHeading.contactInfo")}
         </FormSubHeading>
         <TextInput

@@ -10,7 +10,6 @@ import Stepper from "./Stepper";
 type ApplicationPageProps = {
   application?: Application;
   translationKeyPrefix: string;
-  breadCrumbText?: string;
   overrideText?: string;
   children?: React.ReactNode;
   headContent?: React.ReactNode;
@@ -43,7 +42,6 @@ const Main = styled.div`
 const ApplicationPage = ({
   application,
   translationKeyPrefix,
-  breadCrumbText,
   headContent,
   overrideText,
   children,
@@ -52,10 +50,7 @@ const ApplicationPage = ({
 
   return (
     <>
-      <Head
-        heading={t(`${translationKeyPrefix}.heading`)}
-        breadCrumbText={breadCrumbText || ""}
-      >
+      <Head heading={t(`${translationKeyPrefix}.heading`)}>
         {headContent || overrideText || t(`${translationKeyPrefix}.text`)}
       </Head>
       <StyledContainer main>

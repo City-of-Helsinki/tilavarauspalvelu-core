@@ -3,5 +3,9 @@
   "search": "Sök",
   "application": "Säsongbokningsansökan",
   "criteria": "Ansökningsvillkor",
-  "singleReservations": "Enstaka bokningar"
+  "singleReservations": "Enstaka bokningar",
+  "frontpage": "Hemsidan",
+  "recurring": "Säsongbokning",
+  "applications": "Mina bokningar",
+  "reservationUnit": "Bokningsenhet"
 }

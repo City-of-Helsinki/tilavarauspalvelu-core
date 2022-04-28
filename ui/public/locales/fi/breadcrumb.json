@@ -5,5 +5,7 @@
   "criteria": "Hakuehdot",
   "singleReservations": "Yksittäisvaraukset",
   "frontpage": "Etusivu",
-  "recurring": "Kausivaraus"
+  "recurring": "Kausivaraus",
+  "applications": "Omat hakemukset",
+  "reservationUnit": "Varausyksikkö"
 }

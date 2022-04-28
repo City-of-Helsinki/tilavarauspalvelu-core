@@ -225,7 +225,6 @@ const Application = ({ tos }: Props): JSX.Element | null => {
         <ApplicationPage
           key={rerender}
           application={state.application}
-          breadCrumbText={applicationRoundName}
           overrideText={applicationRoundName}
           translationKeyPrefix="application:Page1"
         >
@@ -253,7 +252,6 @@ const Application = ({ tos }: Props): JSX.Element | null => {
         <ApplicationPage
           application={state.application}
           translationKeyPrefix="application:Page2"
-          breadCrumbText={applicationRoundName}
         >
           <Page2
             application={state.application}
@@ -265,7 +263,6 @@ const Application = ({ tos }: Props): JSX.Element | null => {
         <ApplicationPage
           application={state.application}
           translationKeyPrefix="application:Page3"
-          breadCrumbText={applicationRoundName}
         >
           <Page3
             application={state.application}
@@ -277,7 +274,6 @@ const Application = ({ tos }: Props): JSX.Element | null => {
         <ApplicationPage
           application={state.application}
           translationKeyPrefix="application:preview"
-          breadCrumbText={applicationRoundName}
         >
           <Preview
             application={state.application}
@@ -286,7 +282,7 @@ const Application = ({ tos }: Props): JSX.Element | null => {
           />
         </ApplicationPage>
       )}
-      {pageId === "sent" && <Sent breadCrumbText={applicationRoundName} />}
+      {pageId === "sent" && <Sent />}
 
       {error ? (
         <Notification

@@ -27,19 +27,21 @@ const BreadcrumbWrapper = ({ route, aliases }: Props): JSX.Element => {
   const isMobile = useMedia(`(max-width: ${breakpoint.m})`);
 
   const routes =
-    route?.map((n) => ({
-      title:
-        aliases?.find((alias) => alias.slug === n)?.title ||
-        t(`breadcrumb:${trim(n, "/")}`),
-      ...(n.includes("/") && { slug: n }),
-    })) || [];
+    route
+      ?.filter((n) => n)
+      .map((n) => ({
+        title:
+          aliases?.find((alias) => alias.slug === n)?.title ||
+          t(`breadcrumb:${trim(n, "/")}`),
+        ...(n.includes("/") && { slug: n }),
+      })) || [];
 
   return (
     <Wrapper>
       <Breadcrumb
         linkComponent={Link}
         routes={[{ title: t("breadcrumb:frontpage"), slug: "/" }, ...routes]}
-        className={isMobile && "isMobile"}
+        isMobile={isMobile}
       />
     </Wrapper>
   );

@@ -32,10 +32,10 @@ import {
 } from "../../modules/gql-types";
 import { RESERVATION_UNITS } from "../../modules/queries/reservationUnit";
 import Sorting from "../../components/form/Sorting";
-import Breadcrumb from "../../components/common/Breadcrumb";
 import { breakpoint } from "../../modules/style";
 import apolloClient from "../../modules/apolloClient";
 import { APPLICATION_ROUNDS } from "../../modules/queries/applicationRound";
+import BreadcrumbWrapper from "../../components/common/BreadcrumbWrapper";
 
 type Props = {
   applicationRounds: ApplicationRoundType[];
@@ -160,10 +160,7 @@ const Search = ({ applicationRounds }: Props): JSX.Element => {
   );
 
   const [values, setValues] = useState({} as Record<string, string>);
-  const setStoredValues = useLocalStorage(
-    "reservationUnit-search-single",
-    null
-  )[1];
+  const setStoredValues = useLocalStorage("reservationUnit-search", null)[1];
 
   const { data, fetchMore, loading, error } = useQuery<
     Query,
@@ -241,10 +238,7 @@ const Search = ({ applicationRounds }: Props): JSX.Element => {
   return (
     <Wrapper>
       <HeadContainer>
-        <Breadcrumb
-          root={{ label: "home", linkTo: "/recurring" }}
-          current={{ label: "search" }}
-        />
+        <BreadcrumbWrapper route={["/recurring", "search"]} />
         <Container>
           <Title>{t("search:recurring.heading")}</Title>
           <Ingress>{t("search:recurring.text")}</Ingress>

@@ -8,10 +8,6 @@ import { applicationsUrl } from "../../modules/util";
 import Container from "../common/Container";
 import Head from "./Head";
 
-type Props = {
-  breadCrumbText: string;
-};
-
 const Paragraph = styled.p`
   white-space: pre-wrap;
   margin-bottom: var(--spacing-xl);
@@ -25,16 +21,13 @@ const StyledButton = styled(Button)`
   margin-bottom: var(--spacing-layout-l);
 `;
 
-const Sent = ({ breadCrumbText }: Props): JSX.Element => {
+const Sent = (): JSX.Element => {
   const { t } = useTranslation();
   const router = useRouter();
 
   return (
     <>
-      <Head
-        heading={t("application:sent.heading")}
-        breadCrumbText={breadCrumbText}
-      >
+      <Head heading={t("application:sent.heading")}>
         <p>{t("application:sent.subHeading")}</p>
       </Head>
       <Container main>

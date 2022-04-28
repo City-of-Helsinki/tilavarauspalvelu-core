@@ -138,6 +138,7 @@ const Navigation = ({ profile, logout }: Props): JSX.Element => {
           </HDSNavigation.User>
           <HDSNavigation.LanguageSelector
             label={formatSelectedValue(i18n.language)}
+            className="navigation__language-selector--button"
           >
             {languageOptions.map((languageOption) => (
               <HDSNavigation.Item

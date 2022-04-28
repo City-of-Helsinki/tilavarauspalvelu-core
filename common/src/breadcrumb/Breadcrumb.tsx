@@ -9,6 +9,7 @@ export type RouteItem = {
 
 type Props = {
   routes: RouteItem[];
+  isMobile: boolean;
   linkComponent?: ElementType;
   className?: string;
 };
@@ -18,18 +19,7 @@ const limits = {
   current: 40,
 };
 
-const MobileWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  max-width: 100%;
-`;
-
-const DesktopWrapper = styled.div`
-  display: flex;
-  align-items: center;
-`;
-
-const Wrapper = styled.nav`
+const Wrapper = styled.nav<{ $isMobile: boolean }>`
   background-color: var(--color-white);
   font-size: var(--fontsize-body-m);
   display: flex;
@@ -45,27 +35,24 @@ const Wrapper = styled.nav`
     text-decoration: underline;
   }
 
-  ${MobileWrapper} {
-    display: none;
-  }
-
-  &.isMobile {
-    padding-left: var(--spacing-xs);
-
-    ${MobileWrapper} {
-      display: flex;
-    }
-    ${DesktopWrapper} {
-      display: none;
-    }
-  }
+  ${({ $isMobile }) =>
+    $isMobile &&
+    `
+      padding-left: var(--spacing-xs);
+    `};
 
   svg {
     margin: 0 var(--spacing-3-xs);
   }
 `;
 
-const Anchor = styled.a<{ $current?: boolean }>`
+const Item = styled.div`
+  display: flex;
+  align-items: center;
+  max-width: 100%;
+`;
+
+const Anchor = styled.a<{ $current?: boolean; $isMobile?: boolean }>`
   &&& {
     ${({ $current }) => {
       switch ($current) {
@@ -85,10 +72,13 @@ const Anchor = styled.a<{ $current?: boolean }>`
     }}
   }
 
-  ${MobileWrapper} & {
+  ${({ $isMobile }) =>
+    $isMobile &&
+    `
     overflow: hidden;
     text-overflow: ellipsis;
   }
+  `};
 
   white-space: nowrap;
 `;
@@ -113,6 +103,7 @@ const Slug = styled.span<{ $current?: boolean }>`
 
 const Breadcrumb = ({
   routes = [],
+  isMobile,
   linkComponent,
   className,
 }: Props): JSX.Element => {
@@ -123,37 +114,56 @@ const Breadcrumb = ({
   const lastRouteWithSlug = routesWithSlug[routesWithSlug.length - 1];
 
   return (
-    <Wrapper className={className}>
-      {routesWithSlug.length > 1 && lastRoute.slug !== lastRouteWithSlug.slug && (
-        <MobileWrapper>
-          <IconAngleLeft size="s" aria-hidden className="angleLeft" />
-          <Link
-            {...(linkComponent && {
-              href: lastRouteWithSlug?.slug,
-              passHref: true,
-            })}
-          >
-            <Anchor
-              {...(!linkComponent && { href: lastRouteWithSlug?.slug })}
-              title={lastRouteWithSlug.title}
+    <Wrapper
+      className={className}
+      data-testid="breadcrumb__wrapper"
+      $isMobile={isMobile}
+    >
+      {isMobile &&
+        routesWithSlug.length > 1 &&
+        lastRoute.slug !== lastRouteWithSlug.slug && (
+          <Item>
+            <IconAngleLeft size="s" aria-hidden className="angleLeft" />
+            <Link
+              {...(linkComponent && {
+                href: lastRouteWithSlug?.slug,
+                passHref: true,
+              })}
             >
-              {lastRouteWithSlug.title}
-            </Anchor>
-          </Link>
-        </MobileWrapper>
-      )}
-      {routes?.map((item, index) => (
-        <DesktopWrapper key={`${item.title}${item.slug}`}>
-          {index > 0 && (
-            <IconAngleRight size="s" aria-hidden className="angleRight" />
-          )}
-          {item.slug ? (
-            <Link {...(linkComponent && { href: item.slug, passHref: true })}>
               <Anchor
-                {...(!linkComponent && { href: item.slug })}
-                title={item.title}
-                $current={index === routes.length - 1}
+                {...(!linkComponent && { href: lastRouteWithSlug?.slug })}
+                title={lastRouteWithSlug.title}
+                $isMobile
               >
+                {lastRouteWithSlug.title}
+              </Anchor>
+            </Link>
+          </Item>
+        )}
+      {!isMobile &&
+        routes?.map((item, index) => (
+          <Item key={`${item.title}${item.slug}`}>
+            {index > 0 && (
+              <IconAngleRight size="s" aria-hidden className="angleRight" />
+            )}
+            {item.slug ? (
+              <Link {...(linkComponent && { href: item.slug, passHref: true })}>
+                <Anchor
+                  {...(!linkComponent && { href: item.slug })}
+                  title={item.title}
+                  $current={index === routes.length - 1}
+                >
+                  {index === routes.length - 1
+                    ? item.title.length > limits.current
+                      ? `${item.title.slice(0, limits.current)}...`
+                      : item.title
+                    : item.title.length > limits.default
+                    ? `${item.title.slice(0, limits.default)}...`
+                    : item.title}
+                </Anchor>
+              </Link>
+            ) : (
+              <Slug $current={index === routes.length - 1} title={item.title}>
                 {index === routes.length - 1
                   ? item.title.length > limits.current
                     ? `${item.title.slice(0, limits.current)}...`
@@ -161,21 +171,10 @@ const Breadcrumb = ({
                   : item.title.length > limits.default
                   ? `${item.title.slice(0, limits.default)}...`
                   : item.title}
-              </Anchor>
-            </Link>
-          ) : (
-            <Slug $current={index === routes.length - 1} title={item.title}>
-              {index === routes.length - 1
-                ? item.title.length > limits.current
-                  ? `${item.title.slice(0, limits.current)}...`
-                  : item.title
-                : item.title.length > limits.default
-                ? `${item.title.slice(0, limits.default)}...`
-                : item.title}
-            </Slug>
-          )}
-        </DesktopWrapper>
-      ))}
+              </Slug>
+            )}
+          </Item>
+        ))}
     </Wrapper>
   );
 };

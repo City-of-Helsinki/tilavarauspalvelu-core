@@ -20,8 +20,6 @@ const StyledCarousel = styled(Carousel)`
   @media (min-width: ${breakpoint.m}) {
     order: unset !important;
     margin-bottom: unset !important;
-    position: relative;
-    top: calc(var(--spacing-2-xl) * -1);
     margin-right: var(--spacing-l) !important;
   }
 `;

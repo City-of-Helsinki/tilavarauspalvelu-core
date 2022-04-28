@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { breakpoint } from "../../modules/style";
 import { H1, HeroSubheading } from "../../modules/style/typography";
+import BreadcrumbWrapper from "../common/BreadcrumbWrapper";
 import KorosDefault from "../common/KorosDefault";
 
 const Heading = styled(H1)``;
@@ -30,6 +31,7 @@ const Head = (): JSX.Element => {
 
   return (
     <Container>
+      <BreadcrumbWrapper route={["applications"]} />
       <Content>
         <Heading>{t("applications:heading")}</Heading>
         <HeroSubheading>{t("applications:subHeading")}</HeroSubheading>

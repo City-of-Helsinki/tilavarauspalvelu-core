@@ -3,6 +3,7 @@ import { reservationUnitHandlers } from "./handlers/reservationUnit";
 import { reservationUnitSearchHandlers } from "./handlers/singleSearch";
 import { applicationRoundHandlers } from "./handlers/applicationRound";
 import { reservationHandlers } from "./handlers/reservation";
+import { applicationHandlers } from "./handlers/application";
 
 export const handlers = [
   ...reservationUnitSearchHandlers,
@@ -10,4 +11,6 @@ export const handlers = [
   ...reservationUnitHandlers,
   ...applicationRoundHandlers,
   ...reservationHandlers,
+  ...applicationRoundHandlers,
+  ...applicationHandlers,
 ];
