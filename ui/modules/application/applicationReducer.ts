@@ -94,6 +94,8 @@ const reducer = (state: EditorState, action: Action): EditorState => {
       return nextState;
     }
     case "save": {
+      action.application.applicationEvents.sort((ae1, ae2) => ae1.id - ae2.id);
+
       const nextState = {
         ...state,
         application: { ...action.application } as Application,
