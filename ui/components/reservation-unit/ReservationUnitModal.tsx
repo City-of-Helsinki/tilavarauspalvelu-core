@@ -268,6 +268,7 @@ type OptionsType = {
   purposeOptions: OptionType[];
   reservationUnitTypeOptions: OptionType[];
   participantCountOptions: OptionType[];
+  unitOptions: OptionType[];
 };
 
 const emptyOption = {
@@ -291,6 +292,7 @@ const ReservationUnitModal = ({
   const [reservationUnitType, setReservationUnitType] = useState<
     OptionType | undefined
   >(undefined);
+  const [unit, setUnit] = useState<OptionType | undefined>(undefined);
   const [results, setResults] = useState<ReservationUnitType[]>([]);
   const [maxPersons, setMaxPersons] = useState<OptionType | undefined>(
     undefined
@@ -304,6 +306,8 @@ const ReservationUnitModal = ({
     options.participantCountOptions
   );
 
+  const unitOptions = [emptyOption].concat(options.unitOptions);
+
   const { t } = useTranslation();
 
   const { data, refetch, loading } = useQuery<Query, QueryReservationUnitsArgs>(
@@ -316,6 +320,7 @@ const ReservationUnitModal = ({
           ? [reservationUnitType?.value?.toString()]
           : [],
         applicationRound: [applicationRound.pk.toString()],
+        unit: unit?.value ? [unit?.value?.toString()] : [],
         orderBy: "nameFi",
         isDraft: false,
         isVisible: true,
@@ -367,6 +372,16 @@ const ReservationUnitModal = ({
           label={t("searchForm:participantCountLabel")}
           onChange={(selection: OptionType): void => {
             setMaxPersons(selection);
+          }}
+          defaultValue={emptyOption}
+        />
+        <Select
+          id="reservationUnitSearch.unit"
+          placeholder={t("common:select")}
+          options={unitOptions}
+          label={t("reservationUnitModal:searchReservationUnitTypeLabel")}
+          onChange={(selection: OptionType): void => {
+            setUnit(selection);
           }}
           defaultValue={emptyOption}
         />

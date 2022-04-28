@@ -48,6 +48,7 @@ type OptionTypes = {
   abilityGroupOptions: OptionType[];
   reservationUnitTypeOptions: OptionType[];
   participantCountOptions: OptionType[];
+  unitOptions: OptionType[];
 };
 
 type Props = {
@@ -171,6 +172,7 @@ const ApplicationEvent = ({
     purposeOptions,
     reservationUnitTypeOptions,
     participantCountOptions,
+    unitOptions,
   } = optionTypes;
 
   const { t, i18n } = useTranslation();
@@ -307,6 +309,7 @@ const ApplicationEvent = ({
             purposeOptions,
             reservationUnitTypeOptions,
             participantCountOptions,
+            unitOptions,
           }}
         />
         <SubHeadLine>
