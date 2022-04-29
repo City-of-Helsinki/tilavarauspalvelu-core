@@ -37,9 +37,15 @@ const applicationRoundsGQL = graphql.query<Query, QueryApplicationRoundsArgs>(
             reservationUnits: [
               {
                 pk: 2,
+                unit: {
+                  pk: 3,
+                },
               } as ReservationUnitType,
               {
                 pk: 6,
+                unit: {
+                  pk: 2,
+                },
               } as ReservationUnitType,
             ],
             allocating: false,
@@ -70,9 +76,15 @@ const applicationRoundsGQL = graphql.query<Query, QueryApplicationRoundsArgs>(
             reservationUnits: [
               {
                 pk: 7,
+                unit: {
+                  pk: 5,
+                },
               } as ReservationUnitType,
               {
                 pk: 1,
+                unit: {
+                  pk: 3,
+                },
               } as ReservationUnitType,
             ],
             allocating: false,
@@ -103,6 +115,9 @@ const applicationRoundsGQL = graphql.query<Query, QueryApplicationRoundsArgs>(
             reservationUnits: [
               {
                 pk: 7,
+                unit: {
+                  pk: 5,
+                },
               } as ReservationUnitType,
             ],
             allocating: false,
@@ -133,12 +148,21 @@ const applicationRoundsGQL = graphql.query<Query, QueryApplicationRoundsArgs>(
             reservationUnits: [
               {
                 pk: 9,
+                unit: {
+                  pk: 5,
+                },
               } as ReservationUnitType,
               {
                 pk: 6,
+                unit: {
+                  pk: 5,
+                },
               } as ReservationUnitType,
               {
                 pk: 7,
+                unit: {
+                  pk: 5,
+                },
               } as ReservationUnitType,
             ],
             allocating: false,
@@ -169,12 +193,21 @@ const applicationRoundsGQL = graphql.query<Query, QueryApplicationRoundsArgs>(
             reservationUnits: [
               {
                 pk: 9,
+                unit: {
+                  pk: 5,
+                },
               } as ReservationUnitType,
               {
                 pk: 6,
+                unit: {
+                  pk: 5,
+                },
               } as ReservationUnitType,
               {
                 pk: 7,
+                unit: {
+                  pk: 5,
+                },
               } as ReservationUnitType,
             ],
             allocating: false,
@@ -202,12 +235,21 @@ const applicationRoundsGQL = graphql.query<Query, QueryApplicationRoundsArgs>(
             reservationUnits: [
               {
                 pk: 2,
+                unit: {
+                  pk: 1,
+                },
               } as ReservationUnitType,
               {
                 pk: 6,
+                unit: {
+                  pk: 2,
+                },
               } as ReservationUnitType,
               {
                 pk: 7,
+                unit: {
+                  pk: 3,
+                },
               } as ReservationUnitType,
             ],
             allocating: false,
@@ -235,12 +277,21 @@ const applicationRoundsGQL = graphql.query<Query, QueryApplicationRoundsArgs>(
             reservationUnits: [
               {
                 pk: 9,
+                unit: {
+                  pk: 5,
+                },
               } as ReservationUnitType,
               {
                 pk: 6,
+                unit: {
+                  pk: 5,
+                },
               } as ReservationUnitType,
               {
                 pk: 7,
+                unit: {
+                  pk: 5,
+                },
               } as ReservationUnitType,
             ],
             allocating: false,
@@ -271,12 +322,21 @@ const applicationRoundsGQL = graphql.query<Query, QueryApplicationRoundsArgs>(
             reservationUnits: [
               {
                 pk: 9,
+                unit: {
+                  pk: 5,
+                },
               } as ReservationUnitType,
               {
                 pk: 6,
+                unit: {
+                  pk: 5,
+                },
               } as ReservationUnitType,
               {
                 pk: 7,
+                unit: {
+                  pk: 5,
+                },
               } as ReservationUnitType,
             ],
             allocating: false,

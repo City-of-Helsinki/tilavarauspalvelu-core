@@ -21,6 +21,9 @@ export const APPLICATION_ROUNDS = gql`
           criteriaSv
           reservationUnits {
             pk
+            unit {
+              pk
+            }
           }
         }
       }
