@@ -24,6 +24,7 @@ type OptionTypes = {
   purposeOptions: OptionType[];
   reservationUnitTypeOptions: OptionType[];
   participantCountOptions: OptionType[];
+  unitOptions: OptionType[];
 };
 
 type Props = {

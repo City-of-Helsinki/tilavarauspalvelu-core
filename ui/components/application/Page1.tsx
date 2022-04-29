@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { useQuery } from "@apollo/client";
-import { sortBy } from "lodash";
+import { sortBy, uniq } from "lodash";
 import { useRouter } from "next/router";
 import ApplicationEvent from "../applicationEvent/ApplicationEvent";
 import {
@@ -24,7 +24,10 @@ import {
   ApplicationRoundType,
   ReservationUnitType,
 } from "../../modules/gql-types";
-import { RESERVATION_PURPOSES } from "../../modules/queries/params";
+import {
+  RESERVATION_PURPOSES,
+  SEARCH_FORM_PARAMS_UNIT,
+} from "../../modules/queries/params";
 
 type Props = {
   applicationRound: ApplicationRoundType;
@@ -62,12 +65,28 @@ const Page1 = ({
   const [options, setOptions] = useState<OptionTypes>();
 
   const [purposeOptions, setPurposeOptions] = useState<OptionType[]>([]);
+  const [unitOptions, setUnitOptions] = useState<OptionType[]>([]);
 
   const history = useRouter();
 
   const { t } = useTranslation();
 
   const { application } = editorState;
+
+  useQuery<Query>(SEARCH_FORM_PARAMS_UNIT, {
+    onCompleted: (res) => {
+      const unitsInApplicationRound = uniq(
+        applicationRound.reservationUnits.flatMap((resUnit) => resUnit.unit.pk)
+      );
+      const units = res?.units?.edges
+        ?.filter(({ node }) => unitsInApplicationRound.includes(node.pk))
+        .map(({ node }) => ({
+          id: String(node.pk),
+          name: getTranslation(node, "name"),
+        }));
+      setUnitOptions(mapOptions(sortBy(units, "name") as StringParameter[]));
+    },
+  });
 
   useQuery<Query>(RESERVATION_PURPOSES, {
     onCompleted: (res) => {
@@ -79,6 +98,7 @@ const Page1 = ({
         mapOptions(sortBy(purposes, "name") as StringParameter[])
       );
     },
+    skip: unitOptions.length < 1,
   });
 
   const form = useForm({
@@ -218,6 +238,7 @@ const Page1 = ({
             optionTypes={{
               ...options,
               purposeOptions,
+              unitOptions,
             }}
             selectedReservationUnits={selectedReservationUnits}
             onSave={form.handleSubmit((app: Application) =>
