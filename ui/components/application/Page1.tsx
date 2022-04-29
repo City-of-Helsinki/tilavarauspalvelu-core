@@ -73,18 +73,6 @@ const Page1 = ({
 
   const { application } = editorState;
 
-  useQuery<Query>(RESERVATION_PURPOSES, {
-    onCompleted: (res) => {
-      const purposes = res?.reservationPurposes?.edges?.map(({ node }) => ({
-        id: String(node.pk),
-        name: getTranslation(node, "name"),
-      }));
-      setPurposeOptions(
-        mapOptions(sortBy(purposes, "name") as StringParameter[])
-      );
-    },
-  });
-
   useQuery<Query>(SEARCH_FORM_PARAMS_UNIT, {
     onCompleted: (res) => {
       const unitsInApplicationRound = uniq(
@@ -98,6 +86,19 @@ const Page1 = ({
         }));
       setUnitOptions(mapOptions(sortBy(units, "name") as StringParameter[]));
     },
+  });
+
+  useQuery<Query>(RESERVATION_PURPOSES, {
+    onCompleted: (res) => {
+      const purposes = res?.reservationPurposes?.edges?.map(({ node }) => ({
+        id: String(node.pk),
+        name: getTranslation(node, "name"),
+      }));
+      setPurposeOptions(
+        mapOptions(sortBy(purposes, "name") as StringParameter[])
+      );
+    },
+    skip: unitOptions.length < 1,
   });
 
   const form = useForm({
