@@ -4,6 +4,7 @@ from django.shortcuts import get_object_or_404
 from graphene import ResolveInfo
 from graphene_permissions.permissions import BasePermission
 
+from applications.models import Application
 from permissions.helpers import (
     can_create_reservation,
     can_handle_reservation,
@@ -19,6 +20,7 @@ from permissions.helpers import (
     can_manage_units_reservation_units,
     can_manage_units_spaces,
     can_modify_reservation,
+    can_read_application,
     can_view_recurring_reservation,
 )
 from reservation_units.models import ReservationUnit, ReservationUnitImage
@@ -27,6 +29,55 @@ from spaces.models import Unit
 
 
 class ApplicationRoundPermission(BasePermission):
+    @classmethod
+    def has_permission(cls, info: ResolveInfo) -> bool:
+        return True
+
+    @classmethod
+    def has_mutation_permission(cls, root: Any, info: ResolveInfo, input: dict) -> bool:
+        return False
+
+
+class ApplicationPermission(BasePermission):
+    @classmethod
+    def has_permission(cls, info: ResolveInfo) -> bool:
+        return info.context.user.is_authenticated
+
+    @classmethod
+    def has_node_permission(cls, info: ResolveInfo, id: str) -> bool:
+        user = info.context.user
+        application = Application.objects.filter(id=id)
+
+        if application:
+            return user.is_authenticated and can_read_application(user, application)
+
+        return False
+
+    @classmethod
+    def has_mutation_permission(cls, root: Any, info: ResolveInfo, input: dict) -> bool:
+        return False
+
+    @classmethod
+    def has_filter_permission(cls, info: ResolveInfo) -> bool:
+        return info.context.user.is_authenticated
+
+
+class OrganisationPermission(BasePermission):
+    @classmethod
+    def has_permission(cls, info: ResolveInfo) -> bool:
+        return info.context.user.is_authenticated
+
+    @classmethod
+    def has_node_permission(cls, info: ResolveInfo, id: str) -> bool:
+        user = info.context.user
+        return user.is_authenticated
+
+    @classmethod
+    def has_mutation_permission(cls, root: Any, info: ResolveInfo, input: dict) -> bool:
+        return False
+
+
+class AddressPermission(BasePermission):
     @classmethod
     def has_permission(cls, info: ResolveInfo) -> bool:
         return True
