@@ -7,6 +7,7 @@ import {
   ApplicationEvent,
   EditorState,
 } from "../types";
+import { deepCopy } from "../util";
 
 const applicationEvent = (
   applicationId?: number,
@@ -94,11 +95,12 @@ const reducer = (state: EditorState, action: Action): EditorState => {
       return nextState;
     }
     case "save": {
-      action.application.applicationEvents.sort((ae1, ae2) => ae1.id - ae2.id);
+      const editedApplication = deepCopy(action.application);
+      editedApplication.applicationEvents.sort((ae1, ae2) => ae1.id - ae2.id);
 
       const nextState = {
         ...state,
-        application: { ...action.application } as Application,
+        application: editedApplication,
         savedEventId: action.savedEventId,
         accordionStates:
           action.application?.applicationEvents.map((ae) => ({
