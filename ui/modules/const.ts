@@ -99,6 +99,7 @@ const { serverRuntimeConfig, publicRuntimeConfig } = getConfig();
 
 export const {
   sentryDSN,
+  cookiehubEnabled,
   matomoEnabled,
   hotjarEnabled,
   sentryEnvironment,
