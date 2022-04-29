@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { GetStaticProps } from "next";
 import { Dictionary, groupBy } from "lodash";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { Notification } from "hds-react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { TFunction } from "next-i18next";
@@ -77,13 +78,19 @@ const Applications = (): JSX.Element => {
 
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [applications, setApplications] =
-    useState<Dictionary<[Application, ...Application[]]>>(null);
+    useState<Dictionary<Application[]>>(null);
   const [rounds, setRounds] = useState(null);
+
+  const [state, setState] = useState<"loading" | "error" | "done">("loading");
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
-      const user = await getCurrentUser();
-      setCurrentUser(user);
+      try {
+        const user = await getCurrentUser();
+        setCurrentUser(user);
+      } catch (e) {
+        setState("error");
+      }
     };
 
     if (currentUser === null) {
@@ -125,19 +132,33 @@ const Applications = (): JSX.Element => {
     };
 
     fetchRounds();
-  }, []);
+  }, [currentUser]);
+
+  useEffect(() => {
+    if (applications && rounds) {
+      setState("done");
+    }
+  }, [applications, rounds]);
 
   return (
     <>
       <Head />
       <RequireAuthentication>
         <Container>
-          {applications && rounds ? (
+          {state === "done" ? (
             <ApplicationGroups
               t={t}
               rounds={rounds}
               applications={applications}
             />
+          ) : state === "error" ? (
+            <Notification
+              type="error"
+              label={t("common:error.error")}
+              position="top-center"
+            >
+              {t("common:error.dataError")}
+            </Notification>
           ) : (
             <CenterSpinner />
           )}
