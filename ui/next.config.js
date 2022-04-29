@@ -15,6 +15,7 @@ const moduleExports = {
     sentryDSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
     sentryEnvironment: process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT,
     matomoEnabled: process.env.NEXT_PUBLIC_ENABLE_MATOMO === "true",
+    hotjarEnabled: process.env.NEXT_PUBLIC_ENABLE_HOTJAR === "true",
     oidcClientId: process.env.NEXT_PUBLIC_OIDC_CLIENT_ID,
     oidcUrl: process.env.NEXT_PUBLIC_OIDC_URL,
     oidcScope: process.env.NEXT_PUBLIC_OIDC_SCOPE,

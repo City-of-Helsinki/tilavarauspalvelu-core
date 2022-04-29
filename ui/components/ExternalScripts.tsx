@@ -1,9 +1,9 @@
 import React from "react";
 import Script from "next/script";
-import { matomoEnabled, isBrowser } from "../modules/const";
+import { matomoEnabled, hotjarEnabled, isBrowser } from "../modules/const";
 
 const ExternalScripts = (): JSX.Element | null => {
-  if (!isBrowser || !matomoEnabled) {
+  if (!isBrowser) {
     return null;
   }
 
@@ -15,7 +15,7 @@ const ExternalScripts = (): JSX.Element | null => {
         dangerouslySetInnerHTML={{
           // eslint-disable-next-line
           __html: `
-var cpm = {};
+var cpm = {cookie:{domain:''}};
 (function(h,u,b){
 var d=h.getElementsByTagName("script")[0],e=h.createElement("script");
 e.async=true;e.src='https://cookiehub.net/c2/c7e96adf.js';
@@ -25,14 +25,15 @@ d.parentNode.insertBefore(e,d);
 `,
         }}
       />
-      <Script
-        data-consent="analytics"
-        type="text/plain"
-        strategy="afterInteractive"
-        id="matomo"
-        dangerouslySetInnerHTML={{
-          // eslint-disable-next-line
-          __html: `
+      {matomoEnabled && (
+        <Script
+          data-consent="analytics"
+          type="text/plain"
+          strategy="afterInteractive"
+          id="matomo"
+          dangerouslySetInnerHTML={{
+            // eslint-disable-next-line
+            __html: `
 (function () {
   var _paq = (window._paq = window._paq || []);
   _paq.push(["requireCookieConsent"]);
@@ -50,16 +51,18 @@ d.parentNode.insertBefore(e,d);
   s.parentNode.insertBefore(g, s);
 })();
   `,
-        }}
-      />
-      <Script
-        id="hotjar"
-        strategy="afterInteractive"
-        data-consent="analytics"
-        type="text/plain"
-        dangerouslySetInnerHTML={{
-          // eslint-disable-next-line
-          __html: `
+          }}
+        />
+      )}
+      {hotjarEnabled && (
+        <Script
+          id="hotjar"
+          strategy="afterInteractive"
+          data-consent="analytics"
+          type="text/plain"
+          dangerouslySetInnerHTML={{
+            // eslint-disable-next-line
+            __html: `
 (function(h,o,t,j,a,r){
   h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
   h._hjSettings={hjid:2913591,hjsv:6};
@@ -69,8 +72,9 @@ d.parentNode.insertBefore(e,d);
   a.appendChild(r);
 })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
           `,
-        }}
-      />
+          }}
+        />
+      )}
     </>
   );
 };
