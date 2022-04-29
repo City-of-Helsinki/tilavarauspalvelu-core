@@ -34,7 +34,7 @@ import { breakpoint } from "../../modules/style";
 import { MediumButton } from "../../styles/util";
 import { Query, TermsOfUseType } from "../../modules/gql-types";
 import { fontRegular } from "../../modules/style/typography";
-import { RESERVATION_PURPOSES } from "../../modules/queries/params";
+import { CITIES, RESERVATION_PURPOSES } from "../../modules/queries/params";
 
 type Props = {
   application: Application;
@@ -120,11 +120,9 @@ const Preview = ({ onNext, application, tos }: Props): JSX.Element | null => {
   const [reservationUnits, setReservationUnits] = useState<{
     [key: number]: ReservationUnit;
   }>({});
-  const [cities, setCities] = useState<{
-    [key: number]: Parameter;
-  }>({});
 
   const [purposeOptions, setPurposeOptions] = useState<OptionType[]>([]);
+  const [citiesOptions, setCitiesOptions] = useState<OptionType[]>([]);
 
   const [acceptTermsOfUse, setAcceptTermsOfUse] = useState(false);
   const { i18n } = useTranslation();
@@ -139,6 +137,16 @@ const Preview = ({ onNext, application, tos }: Props): JSX.Element | null => {
       setPurposeOptions(
         mapOptions(sortBy(purposes, "name") as StringParameter[])
       );
+    },
+  });
+
+  useQuery<Query>(CITIES, {
+    onCompleted: (res) => {
+      const cities = res?.cities?.edges?.map(({ node }) => ({
+        id: String(node.pk),
+        name: getTranslation(node, "name"),
+      }));
+      setCitiesOptions(mapOptions(sortBy(cities, "id") as StringParameter[]));
     },
   });
 
@@ -168,10 +176,6 @@ const Preview = ({ onNext, application, tos }: Props): JSX.Element | null => {
       const fetchedAgeGroupOptions = await getParameters("age_group");
       if (mounted) {
         setAgeGroupOptions(mapArrayById(fetchedAgeGroupOptions));
-      }
-      const fetchedCityOptions = await getParameters("city");
-      if (mounted) {
-        setCities(mapArrayById(fetchedCityOptions));
         setReady(true);
       }
     }
@@ -218,7 +222,10 @@ const Preview = ({ onNext, application, tos }: Props): JSX.Element | null => {
         heading={t("application:preview.basicInfoSubHeading")}
         theme="thin"
       >
-        <ApplicantInfoPreview cities={cities} application={application} />
+        <ApplicantInfoPreview
+          cities={citiesOptions}
+          application={application}
+        />
       </Accordion>
       {application.applicationEvents.map((applicationEvent, i) => {
         const summaryDataPrimary =

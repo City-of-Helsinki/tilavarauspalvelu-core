@@ -130,6 +130,9 @@ type BuildingType implements Node {
 
 type CityType implements Node {
   name: String!
+  nameFi: String
+  nameEn: String
+  nameSv: String
 
   """The ID of the object"""
   id: ID!
@@ -142,6 +145,7 @@ type CityTypeConnection {
 
   """Contains the nodes in this connection."""
   edges: [CityTypeEdge]!
+  totalCount: Int
 }
 
 """A Relay edge containing a `CityType` and its cursor."""
@@ -232,6 +236,7 @@ type EquipmentCategoryTypeConnection {
 
   """Contains the nodes in this connection."""
   edges: [EquipmentCategoryTypeEdge]!
+  totalCount: Int
 }
 
 """A Relay edge containing a `EquipmentCategoryType` and its cursor."""
@@ -312,6 +317,7 @@ type EquipmentTypeConnection {
 
   """Contains the nodes in this connection."""
   edges: [EquipmentTypeEdge]!
+  totalCount: Int
 }
 
 """A Relay edge containing a `EquipmentType` and its cursor."""
@@ -367,6 +373,7 @@ type KeywordCategoryTypeConnection {
 
   """Contains the nodes in this connection."""
   edges: [KeywordCategoryTypeEdge]!
+  totalCount: Int
 }
 
 """A Relay edge containing a `KeywordCategoryType` and its cursor."""
@@ -395,6 +402,7 @@ type KeywordGroupTypeConnection {
 
   """Contains the nodes in this connection."""
   edges: [KeywordGroupTypeEdge]!
+  totalCount: Int
 }
 
 """A Relay edge containing a `KeywordGroupType` and its cursor."""
@@ -422,6 +430,7 @@ type KeywordTypeConnection {
 
   """Contains the nodes in this connection."""
   edges: [KeywordTypeEdge]!
+  totalCount: Int
 }
 
 """A Relay edge containing a `KeywordType` and its cursor."""
@@ -564,6 +573,7 @@ type PurposeTypeConnection {
 
   """Contains the nodes in this connection."""
   edges: [PurposeTypeEdge]!
+  totalCount: Int
 }
 
 """A Relay edge containing a `PurposeType` and its cursor."""
@@ -631,6 +641,11 @@ type Query {
     isDraft: Boolean = null
     isVisible: Boolean = null
     applicationRound: [ID] = null
+    nameFi: String = null
+    nameEn: String = null
+    nameSv: String = null
+    surfaceAreaGte: Float = null
+    surfaceAreaLte: Float = null
 
     """Järjestys"""
     orderBy: String = null
@@ -1311,6 +1326,7 @@ type ReservationUnitCancellationRuleTypeConnection {
 
   """Contains the nodes in this connection."""
   edges: [ReservationUnitCancellationRuleTypeEdge]!
+  totalCount: Int
 }
 
 """
@@ -1398,15 +1414,15 @@ input ReservationUnitCreateMutationInput {
   Authentication required for reserving this reservation unit. Possible values are WEAK, STRONG.
   """
   authentication: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   additionalInstructionsFi: String
   additionalInstructionsEn: String
   additionalInstructionsSv: String
@@ -1502,15 +1518,15 @@ type ReservationUnitCreateMutationPayload {
   Authentication required for reserving this reservation unit. Possible values are WEAK, STRONG.
   """
   authentication: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   additionalInstructionsFi: String
   additionalInstructionsEn: String
   additionalInstructionsSv: String
@@ -1754,6 +1770,7 @@ type ReservationUnitTypeConnection {
 
   """Contains the nodes in this connection."""
   edges: [ReservationUnitTypeEdge]!
+  totalCount: Int
 }
 
 """A Relay edge containing a `ReservationUnitType` and its cursor."""
@@ -1781,6 +1798,7 @@ type ReservationUnitTypeTypeConnection {
 
   """Contains the nodes in this connection."""
   edges: [ReservationUnitTypeTypeEdge]!
+  totalCount: Int
 }
 
 """A Relay edge containing a `ReservationUnitTypeType` and its cursor."""
@@ -1868,15 +1886,15 @@ input ReservationUnitUpdateMutationInput {
   Authentication required for reserving this reservation unit. Possible values are WEAK, STRONG.
   """
   authentication: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   additionalInstructionsFi: String
   additionalInstructionsEn: String
   additionalInstructionsSv: String
@@ -1972,15 +1990,15 @@ type ReservationUnitUpdateMutationPayload {
   Authentication required for reserving this reservation unit. Possible values are WEAK, STRONG.
   """
   authentication: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   additionalInstructionsFi: String
   additionalInstructionsEn: String
   additionalInstructionsSv: String
@@ -2227,6 +2245,7 @@ type ResourceTypeConnection {
 
   """Contains the nodes in this connection."""
   edges: [ResourceTypeEdge]!
+  totalCount: Int
 }
 
 """A Relay edge containing a `ResourceType` and its cursor."""
@@ -2406,6 +2425,7 @@ type SpaceTypeConnection {
 
   """Contains the nodes in this connection."""
   edges: [SpaceTypeEdge]!
+  totalCount: Int
 }
 
 """A Relay edge containing a `SpaceType` and its cursor."""
@@ -2505,6 +2525,7 @@ type TaxPercentageTypeConnection {
 
   """Contains the nodes in this connection."""
   edges: [TaxPercentageTypeEdge]!
+  totalCount: Int
 }
 
 """A Relay edge containing a `TaxPercentageType` and its cursor."""
@@ -2554,6 +2575,7 @@ type TermsOfUseTypeConnection {
 
   """Contains the nodes in this connection."""
   edges: [TermsOfUseTypeEdge]!
+  totalCount: Int
 }
 
 """A Relay edge containing a `TermsOfUseType` and its cursor."""
@@ -2639,6 +2661,7 @@ type UnitTypeConnection {
 
   """Contains the nodes in this connection."""
   edges: [UnitTypeEdge]!
+  totalCount: Int
 }
 
 """A Relay edge containing a `UnitType` and its cursor."""
@@ -2656,15 +2679,15 @@ input UnitUpdateMutationInput {
   webPage: String
   email: String
   phone: String
-  shortDescriptionFi: String
-  shortDescriptionEn: String
-  shortDescriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  shortDescriptionFi: String
+  shortDescriptionEn: String
+  shortDescriptionSv: String
   clientMutationId: String
 }
 
@@ -2674,15 +2697,15 @@ type UnitUpdateMutationPayload {
   webPage: String
   email: String
   phone: String
-  shortDescriptionFi: String
-  shortDescriptionEn: String
-  shortDescriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  shortDescriptionFi: String
+  shortDescriptionEn: String
+  shortDescriptionSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
