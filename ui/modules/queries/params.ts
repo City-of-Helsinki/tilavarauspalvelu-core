@@ -58,3 +58,18 @@ export const AGE_GROUPS = gql`
     }
   }
 `;
+
+export const CITIES = gql`
+  query Cities {
+    cities {
+      edges {
+        node {
+          pk
+          nameFi
+          nameEn
+          nameSv
+        }
+      }
+    }
+  }
+`;

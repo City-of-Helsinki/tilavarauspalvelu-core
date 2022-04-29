@@ -1,7 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { Application, Parameter } from "../../modules/types";
+import { Application, OptionType } from "../../modules/types";
 import { SpanTwoColumns, TwoColumnContainer } from "../common/common";
 import LabelValue from "../common/LabelValue";
 import Address from "./AddressPreview";
@@ -13,7 +13,7 @@ const ApplicantInfoPreview = ({
   cities,
 }: {
   application: Application;
-  cities: { [key: number]: Parameter };
+  cities: OptionType[];
 }): JSX.Element | null => {
   const { t } = useTranslation();
 
@@ -44,7 +44,9 @@ const ApplicantInfoPreview = ({
               label={t("application:preview.homeCity")}
               value={
                 application.homeCityId
-                  ? (cities[application.homeCityId].name as string)
+                  ? cities.find(
+                      (city) => city.value === application.homeCityId.toString()
+                    )?.label
                   : ""
               }
             />

@@ -187,6 +187,9 @@ export type CityType = Node & {
   /** The ID of the object */
   id: Scalars["ID"];
   name: Scalars["String"];
+  nameEn?: Maybe<Scalars["String"]>;
+  nameFi?: Maybe<Scalars["String"]>;
+  nameSv?: Maybe<Scalars["String"]>;
   pk?: Maybe<Scalars["Int"]>;
 };
 
@@ -196,6 +199,7 @@ export type CityTypeConnection = {
   edges: Array<Maybe<CityTypeEdge>>;
   /** Pagination data for this connection. */
   pageInfo: PageInfo;
+  totalCount?: Maybe<Scalars["Int"]>;
 };
 
 /** A Relay edge containing a `CityType` and its cursor. */
@@ -264,6 +268,7 @@ export type EquipmentCategoryTypeConnection = {
   edges: Array<Maybe<EquipmentCategoryTypeEdge>>;
   /** Pagination data for this connection. */
   pageInfo: PageInfo;
+  totalCount?: Maybe<Scalars["Int"]>;
 };
 
 /** A Relay edge containing a `EquipmentCategoryType` and its cursor. */
@@ -345,6 +350,7 @@ export type EquipmentTypeConnection = {
   edges: Array<Maybe<EquipmentTypeEdge>>;
   /** Pagination data for this connection. */
   pageInfo: PageInfo;
+  totalCount?: Maybe<Scalars["Int"]>;
 };
 
 /** A Relay edge containing a `EquipmentType` and its cursor. */
@@ -401,6 +407,7 @@ export type KeywordCategoryTypeConnection = {
   edges: Array<Maybe<KeywordCategoryTypeEdge>>;
   /** Pagination data for this connection. */
   pageInfo: PageInfo;
+  totalCount?: Maybe<Scalars["Int"]>;
 };
 
 /** A Relay edge containing a `KeywordCategoryType` and its cursor. */
@@ -429,6 +436,7 @@ export type KeywordGroupTypeConnection = {
   edges: Array<Maybe<KeywordGroupTypeEdge>>;
   /** Pagination data for this connection. */
   pageInfo: PageInfo;
+  totalCount?: Maybe<Scalars["Int"]>;
 };
 
 /** A Relay edge containing a `KeywordGroupType` and its cursor. */
@@ -456,6 +464,7 @@ export type KeywordTypeConnection = {
   edges: Array<Maybe<KeywordTypeEdge>>;
   /** Pagination data for this connection. */
   pageInfo: PageInfo;
+  totalCount?: Maybe<Scalars["Int"]>;
 };
 
 /** A Relay edge containing a `KeywordType` and its cursor. */
@@ -710,6 +719,7 @@ export type PurposeTypeConnection = {
   edges: Array<Maybe<PurposeTypeEdge>>;
   /** Pagination data for this connection. */
   pageInfo: PageInfo;
+  totalCount?: Maybe<Scalars["Int"]>;
 };
 
 /** A Relay edge containing a `PurposeType` and its cursor. */
@@ -987,11 +997,16 @@ export type QueryReservationUnitsArgs = {
   last?: InputMaybe<Scalars["Int"]>;
   maxPersonsGte?: InputMaybe<Scalars["Float"]>;
   maxPersonsLte?: InputMaybe<Scalars["Float"]>;
+  nameEn?: InputMaybe<Scalars["String"]>;
+  nameFi?: InputMaybe<Scalars["String"]>;
+  nameSv?: InputMaybe<Scalars["String"]>;
   offset?: InputMaybe<Scalars["Int"]>;
   orderBy?: InputMaybe<Scalars["String"]>;
   pk?: InputMaybe<Array<InputMaybe<Scalars["ID"]>>>;
   purposes?: InputMaybe<Array<InputMaybe<Scalars["ID"]>>>;
   reservationUnitType?: InputMaybe<Array<InputMaybe<Scalars["ID"]>>>;
+  surfaceAreaGte?: InputMaybe<Scalars["Float"]>;
+  surfaceAreaLte?: InputMaybe<Scalars["Float"]>;
   textSearch?: InputMaybe<Scalars["String"]>;
   unit?: InputMaybe<Array<InputMaybe<Scalars["ID"]>>>;
 };
@@ -1647,6 +1662,7 @@ export type ReservationUnitCancellationRuleTypeConnection = {
   edges: Array<Maybe<ReservationUnitCancellationRuleTypeEdge>>;
   /** Pagination data for this connection. */
   pageInfo: PageInfo;
+  totalCount?: Maybe<Scalars["Int"]>;
 };
 
 /** A Relay edge containing a `ReservationUnitCancellationRuleType` and its cursor. */
@@ -1955,6 +1971,7 @@ export type ReservationUnitTypeConnection = {
   edges: Array<Maybe<ReservationUnitTypeEdge>>;
   /** Pagination data for this connection. */
   pageInfo: PageInfo;
+  totalCount?: Maybe<Scalars["Int"]>;
 };
 
 /** A Relay edge containing a `ReservationUnitType` and its cursor. */
@@ -1982,6 +1999,7 @@ export type ReservationUnitTypeTypeConnection = {
   edges: Array<Maybe<ReservationUnitTypeTypeEdge>>;
   /** Pagination data for this connection. */
   pageInfo: PageInfo;
+  totalCount?: Maybe<Scalars["Int"]>;
 };
 
 /** A Relay edge containing a `ReservationUnitTypeType` and its cursor. */
@@ -2427,6 +2445,7 @@ export type ResourceTypeConnection = {
   edges: Array<Maybe<ResourceTypeEdge>>;
   /** Pagination data for this connection. */
   pageInfo: PageInfo;
+  totalCount?: Maybe<Scalars["Int"]>;
 };
 
 /** A Relay edge containing a `ResourceType` and its cursor. */
@@ -2603,6 +2622,7 @@ export type SpaceTypeConnection = {
   edges: Array<Maybe<SpaceTypeEdge>>;
   /** Pagination data for this connection. */
   pageInfo: PageInfo;
+  totalCount?: Maybe<Scalars["Int"]>;
 };
 
 /** A Relay edge containing a `SpaceType` and its cursor. */
@@ -2667,6 +2687,7 @@ export type TaxPercentageTypeConnection = {
   edges: Array<Maybe<TaxPercentageTypeEdge>>;
   /** Pagination data for this connection. */
   pageInfo: PageInfo;
+  totalCount?: Maybe<Scalars["Int"]>;
 };
 
 /** A Relay edge containing a `TaxPercentageType` and its cursor. */
@@ -2712,6 +2733,7 @@ export type TermsOfUseTypeConnection = {
   edges: Array<Maybe<TermsOfUseTypeEdge>>;
   /** Pagination data for this connection. */
   pageInfo: PageInfo;
+  totalCount?: Maybe<Scalars["Int"]>;
 };
 
 /** A Relay edge containing a `TermsOfUseType` and its cursor. */
@@ -2798,6 +2820,7 @@ export type UnitTypeConnection = {
   edges: Array<Maybe<UnitTypeEdge>>;
   /** Pagination data for this connection. */
   pageInfo: PageInfo;
+  totalCount?: Maybe<Scalars["Int"]>;
 };
 
 /** A Relay edge containing a `UnitType` and its cursor. */
@@ -3833,6 +3856,7 @@ export const ReservationUnitDocument = gql`
       isDraft
       images {
         imageUrl
+        largeUrl
         mediumUrl
         smallUrl
         imageType
@@ -4900,6 +4924,7 @@ export type ReservationUnitQuery = {
     images?: Array<{
       __typename?: "ReservationUnitImageType";
       imageUrl?: string | null;
+      largeUrl?: string | null;
       mediumUrl?: string | null;
       smallUrl?: string | null;
       imageType: ReservationUnitsReservationUnitImageImageTypeChoices;

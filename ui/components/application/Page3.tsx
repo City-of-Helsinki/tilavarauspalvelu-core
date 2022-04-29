@@ -1,13 +1,16 @@
-import React, { useEffect, useState } from "react";
+import { useQuery } from "@apollo/client";
+import { sortBy } from "lodash";
+import React, { useState } from "react";
 import styled from "styled-components";
-import { getParameters } from "../../modules/api";
+import { Query } from "../../modules/gql-types";
+import { CITIES } from "../../modules/queries/params";
 import {
   Application,
   Application as ApplicationType,
   FormType,
   OptionType,
 } from "../../modules/types";
-import { mapOptions } from "../../modules/util";
+import { getTranslation, mapOptions } from "../../modules/util";
 import { CenterSpinner } from "../common/common";
 import CompanyForm from "./CompanyForm";
 import IndividualForm from "./IndividualForm";
@@ -41,18 +44,19 @@ const Page3 = ({ onNext, application }: Props): JSX.Element | null => {
   const [homeCityOptions, setHomeCityOptions] = useState([] as OptionType[]);
   const [state, setState] = useState<"loading" | "done" | "error">("loading");
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const fetchedHomeCityOptions = await getParameters("city");
-        setHomeCityOptions(mapOptions(fetchedHomeCityOptions));
-        setState("done");
-      } catch (e) {
-        setState("error");
-      }
-    }
-    fetchData();
-  }, []);
+  useQuery<Query>(CITIES, {
+    onCompleted: (res) => {
+      const cities = res?.cities?.edges?.map(({ node }) => ({
+        id: String(node.pk),
+        name: getTranslation(node, "name"),
+      }));
+      setHomeCityOptions(mapOptions(sortBy(cities, "id")));
+      setState("done");
+    },
+    onError: () => {
+      setState("error");
+    },
+  });
 
   return state !== "loading" ? (
     <Wrapper>
