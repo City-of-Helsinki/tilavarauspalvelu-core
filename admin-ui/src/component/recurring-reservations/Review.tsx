@@ -255,7 +255,8 @@ function Review({ applicationRound }: IProps): JSX.Element | null {
     if (typeof applicationRound?.id === "number") {
       fetchApplications(applicationRound);
     }
-  }, [applicationRound, notifyError, t]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [applicationRound]);
 
   if (isLoading) {
     return <Loader />;
