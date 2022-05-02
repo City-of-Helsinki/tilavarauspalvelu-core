@@ -12,6 +12,8 @@ export const pixel =
 
 export const MediumButton = styled(Button)`
   font-family: var(--font-medium);
+  font-size: var(--fontsize-body-m);
+  font-weight: 500;
 `;
 
 export const SupplementaryButton = styled(Button).attrs({

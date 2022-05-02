@@ -20,6 +20,7 @@ type Props = {
 const Wrapper = styled.div`
   display: block;
   background-color: var(--color-white);
+  border-bottom: 1px solid var(--color-black-20);
 `;
 
 const BreadcrumbWrapper = ({ route, aliases }: Props): JSX.Element => {

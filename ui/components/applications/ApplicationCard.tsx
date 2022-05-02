@@ -18,19 +18,27 @@ import { cancelApplication } from "../../modules/api";
 import { MediumButton } from "../../styles/util";
 import { ApplicationRoundType } from "../../modules/gql-types";
 
-const Card = styled(HdsCard)`
+const Card = styled(HdsCard).attrs({
+  style: {
+    "--border-width": 0,
+    "--padding-vertical": "var(--spacing-s)",
+    "--padding-horizontal": "var(--spacing-s)",
+  },
+})`
   margin-bottom: var(--spacing-m);
-
-  @media (max-width: ${breakpoint.l}) {
-    grid-template-columns: 1fr;
-  }
-
   width: auto;
+  grid-template-columns: 1fr;
+  display: block;
+
+  @media (min-width: ${breakpoint.m}) {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: var(--spacing-m);
+  }
 `;
 
 const Tag = styled(HdsTag)`
   && {
-    margin-top: var(--spacing-xs);
     color: var(--color-white);
     background-color: var(--tilavaraus-blue);
     font-family: var(--font-regular);
@@ -54,6 +62,19 @@ const Buttons = styled.div`
   font-family: var(--font-medium);
   font-size: var(--fontsize-body-s);
   margin-top: var(--spacing-m);
+  display: flex;
+  flex-direction: column-reverse;
+  gap: var(--spacing-xs);
+
+  @media (min-width: ${breakpoint.s}) {
+    flex-direction: row;
+    gap: var(--spacing-s);
+  }
+
+  @media (min-width: ${breakpoint.m}) {
+    align-items: flex-end;
+    justify-content: flex-end;
+  }
 `;
 
 const Applicant = styled.div`
@@ -61,6 +82,7 @@ const Applicant = styled.div`
   font-size: var(--fontsize-body-m);
   margin-top: var(--spacing-xs);
   margin-bottom: var(--spacing-s);
+  padding-right: var(--spacing-m);
 `;
 
 const RoundName = styled.div`
@@ -77,15 +99,18 @@ const RoundName = styled.div`
 const Modified = styled.div`
   font-size: var(--fontsize-body-m);
   font-family: var(--font-regular);
+  color: var(--color-black-70);
+  margin-top: var(--spacing-l);
+
+  @media (min-width: ${breakpoint.s}) {
+    margin-top: var(--spacing-xl);
+  }
 `;
 
 const StyledButton = styled(MediumButton)`
-  margin-right: var(--spacing-xs);
-  font-size: var(--fontsize-body-m);
+  white-space: nowrap;
 
   @media (max-width: ${breakpoint.s}) {
-    margin-top: var(--spacing-xs);
-    margin-right: 0;
     width: 100%;
   }
 `;
@@ -167,27 +192,31 @@ const ApplicationCard = ({
         ) : null}
       </div>
       <Buttons>
+        {state === "cancelling" ? (
+          <CenterSpinner />
+        ) : (
+          editable && (
+            <StyledButton
+              aria-label={t("applicationCard:cancel")}
+              onClick={() => {
+                modal?.current?.open();
+              }}
+              variant="secondary"
+            >
+              {t("applicationCard:cancel")}
+            </StyledButton>
+          )
+        )}
         <StyledButton
+          aria-label={t("applicationCard:edit")}
           disabled={!editable}
           onClick={() => {
             router.push(`${applicationUrl(application.id as number)}/page1`);
           }}
+          variant="primary"
         >
           {t("applicationCard:edit")}
         </StyledButton>
-        {state === "cancelling" ? (
-          <CenterSpinner />
-        ) : (
-          <StyledButton
-            disabled={!editable}
-            onClick={() => {
-              modal?.current?.open();
-            }}
-            variant="danger"
-          >
-            {t("applicationCard:cancel")}
-          </StyledButton>
-        )}
       </Buttons>
       <ConfirmationModal
         id="application-card-modal"

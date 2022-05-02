@@ -33,12 +33,12 @@ const PreCardLabel = styled(H6).attrs({ as: "h3" })``;
 
 const CardButtonContainer = styled.div`
   display: grid;
-  grid-template-columns: 4fr 1fr;
+  grid-template-columns: 8fr 1fr;
   margin-top: var(--spacing-s);
   align-items: center;
   position: relative;
 
-  @media (max-width: ${breakpoint.s}) {
+  @media (max-width: ${breakpoint.m}) {
     grid-template-columns: 1fr;
   }
 `;
@@ -49,30 +49,35 @@ const CardContainer = styled.div`
   align-items: flex-start;
   grid-template-columns: 1fr;
 
-  @media (min-width: ${breakpoint.s}) {
-    grid-template-columns: 163px 4fr 2fr;
+  @media (min-width: ${breakpoint.m}) {
+    grid-template-columns: 163px 6fr 2fr;
     gap: var(--spacing-xs);
   }
 `;
 
 const PaddedCell = styled.div`
-  &:first-of-type {
-    padding: var(--spacing-s);
-  }
-
   padding: var(--spacing-m) 0;
 
   @media (min-width: ${breakpoint.s}) {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-s);
+    gap: var(--spacing-xs);
   }
 `;
 
-const Image = styled.img`
+const ExtraPaddedCell = styled(PaddedCell)`
+  padding: var(--spacing-s);
+`;
+
+const ImageCell = styled.div<{ $src: string }>`
+  background-image: url(${(props) => props.$src});
   width: 100%;
-  max-height: 200px;
-  object-fit: cover;
+  height: 150px;
+  background-size: cover;
+
+  @media (min-width: ${breakpoint.m}) {
+    height: 100%;
+  }
 `;
 
 const Name = styled.div`
@@ -89,15 +94,16 @@ const Name = styled.div`
 const MaxPersonsContainer = styled.div`
   display: flex;
   align-items: center;
-  font-size: var(--fontsize-body-m);
-
-  svg {
-    margin-right: var(--spacing-2-xs);
-  }
+  gap: var(--spacing-xs);
+  font-size: var(--fontsize-body-s);
+  padding-bottom: var(--spacing-2-xs);
 `;
 
 const DeleteButton = styled(MediumButton)`
-  margin-right: var(--spacing-s);
+  white-space: nowrap;
+  margin: var(--spacing-s) var(--spacing-s) var(--spacing-s) 0;
+  align-self: flex-end;
+  justify-self: flex-start;
 `;
 
 const ArrowContainer = styled.div`
@@ -107,8 +113,11 @@ const ArrowContainer = styled.div`
   right: var(--spacing-m);
   bottom: var(--spacing-m);
 
-  @media (min-width: ${breakpoint.s}) {
+  @media (min-width: ${breakpoint.m}) {
     position: static;
+    flex-direction: column;
+    gap: var(--spacing-s);
+    justify-self: flex-end;
   }
 `;
 
@@ -167,32 +176,30 @@ const ReservationUnitCard = ({
       ) : null}
       <CardButtonContainer>
         <CardContainer>
-          <Image src={getMainImage(reservationUnit)?.mediumUrl} alt="" />
-          <PaddedCell>
+          <ImageCell $src={getMainImage(reservationUnit)?.mediumUrl} />
+          <ExtraPaddedCell>
             <Name>{getTranslation(reservationUnit, "name")}</Name>
             <MaxPersonsContainer>
               {reservationUnit.maxPersons && (
                 <>
-                  <IconGroup aria-hidden />
+                  <IconGroup aria-hidden size="s" />
                   {t("reservationUnitCard:maxPersons", {
                     count: reservationUnit.maxPersons,
                   })}
                 </>
               )}
             </MaxPersonsContainer>
-          </PaddedCell>
-          <PaddedCell>
-            <DeleteButton
-              variant="supplementary"
-              iconLeft={<IconCross aria-hidden />}
-              size="small"
-              onClick={() => {
-                onDelete(reservationUnit);
-              }}
-            >
-              {t("reservationUnitList:buttonRemove")}
-            </DeleteButton>
-          </PaddedCell>
+          </ExtraPaddedCell>
+          <DeleteButton
+            variant="supplementary"
+            iconLeft={<IconCross aria-hidden />}
+            size="small"
+            onClick={() => {
+              onDelete(reservationUnit);
+            }}
+          >
+            {t("reservationUnitList:buttonRemove")}
+          </DeleteButton>
         </CardContainer>
         <ArrowContainer>
           <Circle passive={first}>

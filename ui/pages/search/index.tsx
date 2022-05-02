@@ -80,14 +80,15 @@ const Wrapper = styled.div`
 
 const HeadContainer = styled.div`
   background-color: white;
-  padding-top: var(--spacing-layout-xs);
 
   @media (min-width: ${breakpoint.m}) {
     padding-top: 0;
   }
 `;
 
-const Title = styled(H1)``;
+const Title = styled(H1)`
+  margin-top: var(--spacing-xl);
+`;
 
 const Ingress = styled(HeroSubheading)`
   margin-bottom: var(--spacing-xl);

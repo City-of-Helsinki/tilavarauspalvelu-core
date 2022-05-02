@@ -1,13 +1,8 @@
-import {
-  IconGroup,
-  IconInfoCircle,
-  IconLocation,
-  IconCheck,
-  IconPlus,
-} from "hds-react";
-import React from "react";
+import { IconGroup, IconCheck, IconPlus } from "hds-react";
+import React, { useMemo } from "react";
 import { useTranslation } from "next-i18next";
 import Link from "next/link";
+import NextImage from "next/image";
 import styled from "styled-components";
 import { breakpoint } from "../../modules/style";
 import {
@@ -16,8 +11,10 @@ import {
   getTranslation,
 } from "../../modules/util";
 import IconWithText from "../common/IconWithText";
-import { MediumButton, pixel } from "../../styles/util";
+import { MediumButton, pixel, truncatedText } from "../../styles/util";
 import { ReservationUnitType } from "../../modules/gql-types";
+import { H5, Strongish } from "../../modules/style/typography";
+import { reservationUnitPrefix } from "../../modules/const";
 
 interface Props {
   reservationUnit: ReservationUnitType;
@@ -27,100 +24,120 @@ interface Props {
 }
 
 const Container = styled.div`
-  display: grid;
+  display: block;
   background-color: var(--color-white);
   margin-top: var(--spacing-s);
-  grid-template-columns: 250px 5fr 3fr;
 
-  @media (max-width: ${breakpoint.m}) {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  @media (max-width: ${breakpoint.s}) {
-    display: block;
+  @media (min-width: ${breakpoint.s}) {
+    display: grid;
+    grid-template-columns: 226px auto;
   }
 `;
 
 const MainContent = styled.div`
-  display: flex;
-  flex-direction: column;
-  margin: var(--spacing-m);
+  display: grid;
+  margin: var(--spacing-s);
 
-  @media (max-width: ${breakpoint.s}) {
-    margin: var(--spacing-xs);
+  @media (min-width: ${breakpoint.s}) and (max-width: ${breakpoint.m}) {
+    margin-bottom: 0;
   }
 `;
 
-const Name = styled.span`
-  font-size: var(--fontsize-heading-m);
+const Name = styled(H5).attrs({ as: "h2" })`
+  font-family: var(--font-bold);
   font-weight: 700;
-  margin-bottom: var(--spacing-2-xs);
+  margin: 0 0 var(--spacing-2-xs);
+  line-height: var(--lineheight-m);
+
+  @media (min-width: ${breakpoint.s}) {
+    ${truncatedText};
+  }
 `;
 
 const Description = styled.span`
   font-family: var(--font-regular);
-  font-size: var(--fontsize-body-l);
+  font-size: var(--fontsize-body-m);
   flex-grow: 1;
+  height: 40px;
+
+  @media (min-width: ${breakpoint.m}) {
+    height: unset;
+  }
 `;
 
 const Bottom = styled.span`
-  display: flex;
-  font-weight: 500;
-  align-items: center;
-  gap: var(--spacing-l);
-  font-size: var(--fontsize-body-m);
-  font-family: var(--font-medium);
+  display: block;
 
   > div {
-    margin: 5px;
-
     :last-child {
       flex-grow: 1;
     }
   }
 
-  @media (max-width: ${breakpoint.xl}) {
-    display: block;
+  @media (min-width: ${breakpoint.m}) {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: var(--spacing-l);
+  }
+`;
+
+const Props = styled.div`
+  display: block;
+
+  @media (min-width: ${breakpoint.l}) {
+    display: flex;
+    gap: var(--spacing-l);
   }
 `;
 
 const Actions = styled.div`
-  display: flex;
-  flex-direction: column;
-  padding: var(--spacing-s) var(--spacing-m);
-  align-items: flex-end;
+  display: block;
+  padding: var(--spacing-s) var(--spacing-s) var(--spacing-s) 0;
 
   > button {
     white-space: nowrap;
   }
 
-  @media (max-width: ${breakpoint.m}) {
-    display: block;
-  }
-
-  @media (max-width: ${breakpoint.m}) {
-    padding: 0 var(--spacing-xs) var(--spacing-xs) var(--spacing-xs);
+  @media (min-width: ${breakpoint.m}) {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    padding: 0;
   }
 `;
 
 const Image = styled.img`
-  width: 240px;
+  width: 100%;
+  height: 50vw;
   object-fit: cover;
-  height: 156px;
+  max-width: 100%;
 
-  @media (max-width: ${breakpoint.s}) {
-    width: 100%;
-    height: 50vw;
+  @media (min-width: ${breakpoint.s}) {
+    max-height: 250px;
+    height: 100%;
+  }
+
+  @media (min-width: ${breakpoint.m}) {
+    max-height: 182px;
+  }
+
+  @media (min-width: ${breakpoint.l}) {
+    max-height: 150px;
   }
 `;
 
 const Anchor = styled.a`
   color: var(--color-black-90);
+  display: inline;
 `;
 
 const StyledIconWithText = styled(IconWithText)`
+  margin-top: var(--spacing-xs);
+
   span {
     margin-left: var(--spacing-2-xs);
+    font-size: var(--fontsize-body-s);
+    ${truncatedText}
   }
 `;
 
@@ -132,10 +149,20 @@ const ReservationUnitCard = ({
 }: Props): JSX.Element => {
   const { t } = useTranslation();
 
+  const addressString = useMemo(
+    () => getAddressAlt(reservationUnit),
+    [reservationUnit]
+  );
+
+  const link = useMemo(
+    () => `${reservationUnitPrefix}/${reservationUnit.pk}`,
+    [reservationUnit]
+  );
+
   return (
     <Container>
-      <Link href={`../reservation-unit/${reservationUnit.pk}`} passHref>
-        <Anchor>
+      <Link href={link} passHref>
+        <Anchor style={{ display: "flex" }}>
           <Image
             alt={t("common:imgAltForSpace", {
               name: getTranslation(reservationUnit, "name"),
@@ -146,64 +173,76 @@ const ReservationUnitCard = ({
       </Link>
       <MainContent>
         <Name>
-          <Link href={`../reservation-unit/${reservationUnit.pk}`} passHref>
-            <Anchor>{getTranslation(reservationUnit, "name")}</Anchor>
+          <Link href={link} passHref>
+            <Anchor title={getTranslation(reservationUnit, "name")}>
+              {getTranslation(reservationUnit, "name")}
+            </Anchor>
           </Link>
         </Name>
         <Description>
           {getTranslation(reservationUnit.unit, "name")}
+          {addressString && (
+            <>
+              {", "}
+              <Strongish>{addressString}</Strongish>
+            </>
+          )}
         </Description>
         <Bottom>
-          {reservationUnit.reservationUnitType ? (
-            <StyledIconWithText
-              icon={
-                <IconInfoCircle aria-label={t("reservationUnitCard:type")} />
-              }
-              text={getTranslation(reservationUnit.reservationUnitType, "name")}
-            />
-          ) : null}
-          {reservationUnit.maxPersons ? (
-            <StyledIconWithText
-              icon={
-                <IconGroup
-                  aria-label={t("reservationUnitCard:maxPersons", {
-                    maxPersons: reservationUnit.maxPersons,
-                  })}
-                />
-              }
-              text={`${reservationUnit.maxPersons}`}
-            />
-          ) : null}
-          {getAddressAlt(reservationUnit) ? (
-            <StyledIconWithText
-              className="grow"
-              icon={
-                <IconLocation aria-label={t("reservationUnitCard:address")} />
-              }
-              text={getAddressAlt(reservationUnit)}
-            />
-          ) : null}{" "}
+          <Props>
+            {reservationUnit.reservationUnitType ? (
+              <StyledIconWithText
+                icon={
+                  <NextImage
+                    src="/icons/icon_premises.svg"
+                    width="24"
+                    height="24"
+                    aria-label={t("reservationUnitCard:type")}
+                  />
+                }
+                text={getTranslation(
+                  reservationUnit.reservationUnitType,
+                  "name"
+                )}
+              />
+            ) : null}
+            {reservationUnit.maxPersons ? (
+              <StyledIconWithText
+                icon={
+                  <IconGroup
+                    aria-label={t("reservationUnitCard:maxPersons", {
+                      maxPersons: reservationUnit.maxPersons,
+                    })}
+                    size="s"
+                  />
+                }
+                text={`${t("reservationUnitCard:maxPersons", {
+                  count: reservationUnit.maxPersons,
+                })}`}
+              />
+            ) : null}
+          </Props>
+          <Actions>
+            <div style={{ flexGrow: 1 }} />
+            {containsReservationUnit(reservationUnit) ? (
+              <MediumButton
+                iconLeft={<IconCheck />}
+                onClick={() => removeReservationUnit(reservationUnit)}
+              >
+                {t("common:removeReservationUnit")}
+              </MediumButton>
+            ) : (
+              <MediumButton
+                iconLeft={<IconPlus />}
+                onClick={() => selectReservationUnit(reservationUnit)}
+                variant="secondary"
+              >
+                {t("common:selectReservationUnit")}
+              </MediumButton>
+            )}
+          </Actions>
         </Bottom>
       </MainContent>
-      <Actions>
-        <div style={{ flexGrow: 1 }} />
-        {containsReservationUnit(reservationUnit) ? (
-          <MediumButton
-            iconLeft={<IconCheck />}
-            onClick={() => removeReservationUnit(reservationUnit)}
-          >
-            {t("common:removeReservationUnit")}
-          </MediumButton>
-        ) : (
-          <MediumButton
-            iconLeft={<IconPlus />}
-            onClick={() => selectReservationUnit(reservationUnit)}
-            variant="secondary"
-          >
-            {t("common:selectReservationUnit")}
-          </MediumButton>
-        )}
-      </Actions>
     </Container>
   );
 };
