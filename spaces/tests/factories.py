@@ -25,6 +25,19 @@ class UnitFactory(DjangoModelFactory):
         model = "spaces.Unit"
 
 
+class UnitGroupFactory(DjangoModelFactory):
+    class Meta:
+        model = "spaces.UnitGroup"
+
+    @post_generation
+    def units(self, create, units, **kwargs):
+        if not create or not units:
+            return
+
+        for unit in units:
+            self.units.add(unit)
+
+
 class SpaceFactory(DjangoModelFactory):
     class Meta:
         model = "spaces.Space"

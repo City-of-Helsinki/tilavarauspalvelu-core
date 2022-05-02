@@ -83,3 +83,10 @@ class ReservationFactory(DjangoModelFactory):
 
         for resunit in reservation_units:
             self.reservation_unit.add(resunit)
+
+
+class AbilityGroupFactory(DjangoModelFactory):
+    class Meta:
+        model = "reservations.AbilityGroup"
+
+    name = FuzzyText()
