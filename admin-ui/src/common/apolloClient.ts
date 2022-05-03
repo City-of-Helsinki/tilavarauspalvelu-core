@@ -9,16 +9,11 @@ import { setContext } from "@apollo/client/link/context";
 import { onError } from "@apollo/client/link/error";
 import { set } from "lodash";
 
-import {
-  getAccessToken,
-  getApiAccessToken,
-  updateApiAccessToken,
-} from "./auth/util";
+import { getApiAccessToken, updateApiAccessToken } from "./auth/util";
 import { apiBaseUrl } from "./const";
 import { CustomFormData } from "./CustomFormData";
 
-const getNewToken = (): Promise<string> =>
-  updateApiAccessToken(getAccessToken());
+const getNewToken = () => updateApiAccessToken();
 
 const uploadLinkOptions = {
   uri: `${apiBaseUrl}/graphql/`,
