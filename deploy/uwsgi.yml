@@ -1,13 +1,24 @@
 uwsgi:
+  strict: true
+  need-app: true
+  single-interpreter: true
+  die-on-term: true
   # Needed plugins if running against Debian uwsgi-package
   # python docker image cannot use that due to linker mishaps
   # plugins: python3,http
   wsgi-file: tilavarauspalvelu/wsgi.py
   #uid: tvp
   umask: 022
-  reload-on-rss: 300
   http: :8000
   buffer-size: 8192
+  log-x-forwarded-for: true
+
+  # Reload workers regularly to keep memory fresh
+  # and ease potential memory leaks
+  max-requests: 1000                  # Restart workers after this many requests
+  max-worker-lifetime: 3600           # Restart workers after this many seconds
+  reload-on-rss: 300                  # Restart workers after this much resident memory
+  worker-reload-mercy: 60             # How long to wait before forcefully killing workers
 
   # Workload settings
   # Automatically scales up worker count when application is
