@@ -6,12 +6,20 @@ from django.contrib.auth import get_user_model
 from freezegun import freeze_time
 
 from api.graphql.tests.base import GrapheneTestCaseBase
-from applications.models import ApplicationRound, ApplicationRoundStatus
+from applications.models import (
+    ApplicationRound,
+    ApplicationRoundStatus,
+    ApplicationStatus,
+)
 from applications.tests.factories import (
+    ApplicationFactory,
     ApplicationRoundFactory,
     ApplicationRoundStatusFactory,
+    ApplicationStatusFactory,
 )
 from permissions.models import GeneralRole, GeneralRoleChoice
+from reservation_units.tests.factories import ReservationUnitFactory
+from spaces.tests.factories import ServiceSectorFactory
 
 
 @freeze_time("2021-05-03 03:21:34")
@@ -31,7 +39,8 @@ class ApplicationRoundQueryTestCase(GrapheneTestCaseBase, snapshottest.TestCase)
             user=cls.general_admin,
             role=GeneralRoleChoice.objects.get(code="admin"),
         )
-
+        reservation_unit = ReservationUnitFactory(name_fi="test reservation unit")
+        service_sector = ServiceSectorFactory(name_fi="service test sector")
         cls.application_round = ApplicationRoundFactory(
             name="Test application round",
             name_fi="Test application round fi",
@@ -41,12 +50,16 @@ class ApplicationRoundQueryTestCase(GrapheneTestCaseBase, snapshottest.TestCase)
             criteria_en="Criteria en",
             criteria_sv="Criteria sv",
             target_group=ApplicationRound.TARGET_GROUP_ALL,
+            reservation_units=[reservation_unit],
+            service_sector=service_sector,
         )
         cls.application_round_status = ApplicationRoundStatusFactory(
             application_round=cls.application_round,
             user=cls.general_admin,
             status=ApplicationRoundStatus.DRAFT,
         )
+        app = ApplicationFactory(application_round=cls.application_round)
+        ApplicationStatusFactory(application=app, status=ApplicationStatus.IN_REVIEW)
 
     def test_getting_application_rounds(self):
         self.client.force_login(self.regular_joe)
@@ -89,6 +102,38 @@ class ApplicationRoundQueryTestCase(GrapheneTestCaseBase, snapshottest.TestCase)
                             approvedBy
                             applicationsSent
                             targetGroup
+                            applicationsCount
+                            reservationUnitCount
+                            serviceSector {
+                                nameFi
+                                nameEn
+                                nameSv
+                            }
+                        }
+                    }
+                }
+            }
+            """
+        )
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_applications_count_does_not_include_draft_applications(self):
+        application = ApplicationFactory(application_round=self.application_round)
+        ApplicationStatus(application=application, status=ApplicationStatus.DRAFT)
+
+        self.client.force_login(self.regular_joe)
+
+        response = self.query(
+            """
+            query {
+                applicationRounds {
+                    totalCount
+                    edges {
+                        node {
+                            applicationsCount
                         }
                     }
                 }

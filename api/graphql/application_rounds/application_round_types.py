@@ -37,7 +37,7 @@ class ServiceSectorType(AuthNode, PrimaryKeyObjectType):
 
     class Meta:
         model = ServiceSector
-        fields = ("id",)
+        fields = ["id"] + get_all_translatable_fields(model)
         interfaces = (graphene.relay.Node,)
         connection_class = TilavarausBaseConnection
 
@@ -99,6 +99,8 @@ class ApplicationRoundType(AuthNode, PrimaryKeyObjectType):
     aggregated_data = graphene.Field(AggregatedDataType)
     approved_by = graphene.String()
     applications_sent = graphene.Boolean()
+    applications_count = graphene.Int()
+    reservation_unit_count = graphene.Int()
 
     class Input:
         active = graphene.Field(graphene.Boolean)
@@ -194,3 +196,15 @@ class ApplicationRoundType(AuthNode, PrimaryKeyObjectType):
 
     def resolve_application_round_baskets(self, info: graphene.ResolveInfo):
         return self.application_round_baskets.all()
+
+    def resolve_applications_count(self, info: graphene.ResolveInfo):
+        applications_count = self.applications.exclude(
+            cached_latest_status=ApplicationStatus.DRAFT
+        ).count()
+
+        return applications_count
+
+    def resolve_reservation_unit_count(self, info: graphene.ResolveInfo):
+        reservation_units_count = self.reservation_units.all().count()
+
+        return reservation_units_count
