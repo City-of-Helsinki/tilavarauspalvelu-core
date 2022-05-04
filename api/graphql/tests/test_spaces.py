@@ -3,10 +3,15 @@ import json
 import snapshottest
 from assertpy import assert_that
 from django.contrib.auth import get_user_model
+from factory.fuzzy import FuzzyChoice
 from graphene_django.utils import GraphQLTestCase
 
 from api.graphql.tests.base import GrapheneTestCaseBase
-from applications.tests.factories import ApplicationRoundFactory
+from applications.models import ApplicationRoundStatus
+from applications.tests.factories import (
+    ApplicationRoundFactory,
+    ApplicationRoundStatusFactory,
+)
 from permissions.models import GeneralRole, GeneralRoleChoice
 from reservation_units.tests.factories import ReservationUnitFactory
 from spaces.models import Space
@@ -38,7 +43,25 @@ class SpaceMutationBaseTestCase(GraphQLTestCase):
 
 class DeleteSpaceTestCase(SpaceMutationBaseTestCase):
     def setUp(self) -> None:
+        not_approved_status = ApplicationRoundStatusFactory(
+            status=FuzzyChoice(
+                choices=[
+                    choice
+                    for choice, _ in ApplicationRoundStatus.STATUS_CHOICES
+                    if choice != ApplicationRoundStatus.APPROVED
+                ]
+            )
+        )
+        approved_status = ApplicationRoundStatusFactory(
+            status=ApplicationRoundStatus.APPROVED
+        )
         self.space = SpaceFactory(name="Test space")
+        self.app_round = ApplicationRoundFactory()
+        resunit = ReservationUnitFactory(spaces=[self.space])
+        self.app_round.reservation_units.add(resunit)
+        self.app_round.statuses.add(not_approved_status)
+        self.app_round.statuses.add(approved_status)
+
         self.client.force_login(self.general_admin)
 
     def get_delete_query(self):
@@ -62,9 +85,7 @@ class DeleteSpaceTestCase(SpaceMutationBaseTestCase):
         assert_that(Space.objects.filter(pk=self.space.pk).exists()).is_false()
 
     def test_space_not_deleted_because_in_active_round(self):
-        app_round = ApplicationRoundFactory()
-        resunit = ReservationUnitFactory(spaces=[self.space])
-        app_round.reservation_units.add(resunit)
+        self.app_round.statuses.filter(status=ApplicationRoundStatus.APPROVED).delete()
 
         response = self.query(self.get_delete_query())
         assert_that(response.status_code).is_equal_to(200)
@@ -79,10 +100,6 @@ class DeleteSpaceTestCase(SpaceMutationBaseTestCase):
 
     def test_space_not_deleted_when_no_credentials(self):
         self.client.force_login(self.regular_user)
-
-        app_round = ApplicationRoundFactory()
-        resunit = ReservationUnitFactory(spaces=[self.space])
-        app_round.reservation_units.add(resunit)
 
         response = self.query(self.get_delete_query())
         assert_that(response.status_code).is_equal_to(200)

@@ -1,4 +1,5 @@
 import datetime
+from typing import List
 
 import pytest
 from django.urls import reverse
@@ -149,7 +150,7 @@ def test_reservation_fetch_filtering_by_reservation_unit(
     confirmed_reservation,
     reservation_in_second_unit,
 ):
-    def to_reservation_unit_ids(data: [Reservation]) -> [int]:
+    def to_reservation_unit_ids(data: List[Reservation]) -> List[int]:
         unit_ids = []
         for res in data:
             for unit in res["reservation_unit"]:
@@ -369,6 +370,12 @@ def test_service_sector_application_manager_cannot_view_or_update_users_reservat
     )
     assert response.status_code == 404
 
+    response = service_sector_application_manager_api_client.get(
+        reverse("reservation-detail", kwargs={"pk": reservation.id}),
+        format="json",
+    )
+    assert response.status_code == 404
+
 
 @pytest.mark.django_db
 def test_wrong_service_sectors_admin_cannot_view_or_update_users_reservation(
@@ -377,6 +384,12 @@ def test_wrong_service_sectors_admin_cannot_view_or_update_users_reservation(
     response = service_sector_2_admin_api_client.put(
         reverse("reservation-detail", kwargs={"pk": reservation.id}),
         data=valid_reservation_data,
+        format="json",
+    )
+    assert response.status_code == 404
+
+    response = service_sector_2_admin_api_client.get(
+        reverse("reservation-detail", kwargs={"pk": reservation.id}),
         format="json",
     )
     assert response.status_code == 404
