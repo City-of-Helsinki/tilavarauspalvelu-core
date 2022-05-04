@@ -750,6 +750,30 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         assert_that(content.get("errors")).is_none()
         self.assertMatchSnapshot(content)
 
+    def test_filtering_by_rank(self):
+        ReservationUnit.objects.exclude(id=self.reservation_unit.id).delete()
+        ReservationUnitFactory(rank=1)  # Do not include
+        ReservationUnitFactory(rank=2)
+        ReservationUnitFactory(rank=3)
+        ReservationUnitFactory(rank=4)
+        ReservationUnitFactory(rank=5)  # Do not include
+        response = self.query(
+            """
+            query {
+                reservationUnits(rankLte:4, rankGte:2) {
+                    edges {
+                        node{
+                            rank
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
     def test_filtering_by_reservation_timestamps(self):
         now = datetime.datetime.now(get_default_timezone())
         one_hour = datetime.timedelta(hours=1)
@@ -1379,6 +1403,32 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
                             unit {
                                 nameFi
                             }
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_order_by_rank(self):
+        ReservationUnit.objects.exclude(id=self.reservation_unit.id).delete()
+        ReservationUnitFactory(rank=5)
+        ReservationUnitFactory(rank=3)
+        ReservationUnitFactory(rank=1)
+        ReservationUnitFactory(rank=2)
+        ReservationUnitFactory(rank=4)
+
+        self.client.force_login(self.regular_joe)
+        response = self.query(
+            """
+            query {
+                reservationUnits(orderBy: "rank") {
+                    edges {
+                        node {
+                            rank
                         }
                     }
                 }

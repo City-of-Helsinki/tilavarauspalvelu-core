@@ -62,6 +62,9 @@ class ReservationUnitsFilterSet(django_filters.FilterSet):
         field_name="surface_area", lookup_expr="lte"
     )
 
+    rank_gte = django_filters.NumberFilter(field_name="rank", lookup_expr="gte")
+    rank_lte = django_filters.NumberFilter(field_name="rank", lookup_expr="lte")
+
     order_by = django_filters.OrderingFilter(
         fields=(
             "name_fi",
@@ -75,6 +78,7 @@ class ReservationUnitsFilterSet(django_filters.FilterSet):
             ("unit__name_sv", "unit_name_sv"),
             "max_persons",
             "surface_area",
+            "rank",
         )
     )
 
