@@ -410,6 +410,16 @@ class ReservationUnit(models.Model):
         help_text=_("Authentication required for reserving this reservation unit."),
     )
 
+    rank = models.PositiveIntegerField(
+        blank=True,
+        null=True,
+        verbose_name=_("Order number"),
+        help_text=_("Order number to be use in api sorting."),
+    )
+
+    class Meta:
+        ordering = ("id",)
+
     def __str__(self):
         return "{}".format(self.name)
 

@@ -13,14 +13,14 @@ snapshots['ReservationUnitQueryTestCase::test_filter_by_pk_multiple_values 1'] =
             'edges': [
                 {
                     'node': {
-                        'nameFi': 'Second unit'
+                        'nameFi': 'test name fi'
                     }
                 },
                 {
                     'node': {
-                        'nameFi': 'test name fi'
+                        'nameFi': 'Second unit'
                     }
-                }
+                },
             ]
         }
     }
@@ -323,7 +323,7 @@ snapshots['ReservationUnitQueryTestCase::test_filtering_by_name_fi 1'] = {
             'edges': [
                 {
                     'node': {
-                        'nameFi': 'show only me',
+                        'nameFi': 'show only me'
                     }
                 }
             ]
@@ -343,6 +343,30 @@ snapshots['ReservationUnitQueryTestCase::test_filtering_by_purpose 1'] = {
                                 'nameFi': 'Test purpose'
                             }
                         ]
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitQueryTestCase::test_filtering_by_rank 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'rank': 2
+                    }
+                },
+                {
+                    'node': {
+                        'rank': 3
+                    }
+                },
+                {
+                    'node': {
+                        'rank': 4
                     }
                 }
             ]
@@ -845,6 +869,45 @@ snapshots['ReservationUnitQueryTestCase::test_order_by_name_sv 1'] = {
                 {
                     'node': {
                         'nameSv': 'test name sv'
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitQueryTestCase::test_order_by_rank 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'rank': 1
+                    }
+                },
+                {
+                    'node': {
+                        'rank': 2
+                    }
+                },
+                {
+                    'node': {
+                        'rank': 3
+                    }
+                },
+                {
+                    'node': {
+                        'rank': 4
+                    }
+                },
+                {
+                    'node': {
+                        'rank': 5
+                    }
+                },
+                {
+                    'node': {
+                        'rank': None
                     }
                 }
             ]
