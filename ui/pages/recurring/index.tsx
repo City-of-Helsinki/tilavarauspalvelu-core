@@ -83,7 +83,7 @@ const RoundList = styled.div`
   margin-bottom: var(--spacing-layout-l);
 `;
 
-const RoundHeading = styled(H3)`
+const RoundHeading = styled(H3).attrs({ as: "h2" })`
   margin-top: 0;
   margin-bottom: var(--spacing-m);
 `;

@@ -317,7 +317,7 @@ const ApplicationEvent = ({
         </SubHeadLine>
         <CheckboxWrapper>
           <Checkbox
-            id="defaultPeriod"
+            id={fieldName("defaultPeriod")}
             checked={selectionIsDefaultPeriod}
             label={`${t("application:Page1.defaultPeriodPrefix")} ${formatDate(
               applicationRound.reservationPeriodBegin

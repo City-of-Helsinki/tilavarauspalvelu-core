@@ -150,7 +150,7 @@ const Stepper = ({ application }: Props): JSX.Element => {
                   $current={isCurrent}
                   aria-hidden="true"
                 >
-                  {isReady ? <IconCheck /> : index + 1}
+                  {isReady ? <IconCheck aria-hidden="true" /> : index + 1}
                 </Number>
                 <Name $current={isCurrent} $disabled={isDisabled}>
                   {t(`application:navigation.${page}`)}
