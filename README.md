@@ -135,3 +135,52 @@ Contrary to more common set-ups, this application does not have a reverse proxy 
 Static files are served by the [Whitenoise](https://whitenoise.evans.io/en/stable/) package. These are all files that are not uploaded by the users in Django Admin pages.
 
 Media files are served by the [uwsgi static files implementation](https://uwsgi-docs.readthedocs.io/en/latest/StaticFiles.html) offloaded to threads. These are all files uploaded by users in Django Admin pages. If there are performance issues (I.E. 502 errors from the Application Gateway) it is very likely process count and or process scale-up must be tweaked higher.
+
+# Performance testing and optimization
+
+To debug REST API endpoints, the [Django debug toolbar](https://django-debug-toolbar.readthedocs.io/en/latest/) package can be used. The debug toolbar will gather information of code execution and database interactions with which it is possible to optimize both code and query usage. A similar package is available for GraphQL endpoint optimization, the [Django GraphQL Debug Toolbar](https://github.com/flavors/django-graphiql-debug-toolbar). These are not currently installed in the project. When optimization is done, these must be installed first before proceeding to the next steps.
+
+### Django Debug Toolbar
+To set-up django debug toolbar, these settings are needed.
+
+```py
+# Hardcode to internal IPs as debug toolbar will expose internal information
+INTERNAL_IPS = ["127.0.0.1", "localhost"]
+INSTALLED_APPS.append("debug_toolbar")
+
+# According to documentation, this should be as early as possible in the middleware tree
+MIDDLEWARE.insert(0, "debug_toolbar.middleware.DebugToolbarMiddleware")
+```
+
+Also, add the following line to the end of the tilavarauspalvelu [urls.py](./api/urls.py) file:
+
+```py
+urlpatterns += [path("__debug__/", include("debug_toolbar.urls"))]
+```
+
+When the lines above are added to the bottom of [settings.py](./tilavarauspalvelu/settings.py), the debug toolbar will be visible when a REST API endpoint is loaded in any browser.
+
+### GraphQL Debug Toolbar
+To set-up Django GraphQL debug toolbar, copy the following lines of code to the end of [settings.py](./tilavarauspalvelu/settings.py). Please make sure to remove all "debug toolbar" related lines first as they do not work together! Yes, the lines below are correct, debug_toolbar must be in installed apps but its middleware cannot be added.
+
+```py
+# Hardcode to internal IPs as debug toolbar will expose internal information
+INTERNAL_IPS = ["127.0.0.1", "localhost"]
+
+# Graphene debug settings
+GRAPHENE["MIDDLEWARE"] += ["graphene_django.debug.DjangoDebugMiddleware"]
+
+INSTALLED_APPS.append("debug_toolbar")
+INSTALLED_APPS.append("graphiql_debug_toolbar")
+
+# According to documentation, this should be as early as possible in the middleware tree
+MIDDLEWARE.insert(0, "graphiql_debug_toolbar.middleware.DebugToolbarMiddleware")
+```
+
+Also, add the following line to the end of the "tilavarauspalvelu" [urls.py](./api/urls.py) file:
+
+```py
+urlpatterns += [path("__debug__/", include("debug_toolbar.urls"))]
+```
+
+When the lines above have been added and the server has been re-/started, the django debug toolbar will load in `/graphql/` endpoint.
