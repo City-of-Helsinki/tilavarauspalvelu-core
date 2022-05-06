@@ -5,7 +5,6 @@ Django==3.2.13
 django-auditlog==1.0a1
 django-celery-results
 django-cors-headers==3.6.0
-django-debug-toolbar
 django-enumfields==2.0.0
 django-environ==0.4.5
 django-extensions==3.0.9
@@ -24,6 +23,7 @@ easy-thumbnails==2.7.1
 flake8==3.8.4
 freezegun==0.3.14
 graphene-django==3.0.0b7
+graphene-django-optimizer~=0.9.1
 graphene_permissions==1.1.4
 helsinki-profile-gdpr-api
 icalendar==4.0.7
