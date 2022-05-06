@@ -43,7 +43,7 @@ const StyledContainer = styled(Container)`
   max-width: 100%;
 `;
 
-const Name = styled(H4)`
+const Name = styled(H4).attrs({ as: "h3" })`
   margin-top: 0;
   margin-bottom: var(--spacing-2-xs);
 `;
@@ -111,7 +111,7 @@ const ApplicationRoundCard = ({ applicationRound }: Props): JSX.Element => {
         {state !== "past" && (
           <Link href={`/criteria/${applicationRound.pk}`} passHref>
             <StyledLink>
-              <IconArrowRight />
+              <IconArrowRight aria-hidden="true" />
               {t("applicationRound:card.criteria")}
             </StyledLink>
           </Link>

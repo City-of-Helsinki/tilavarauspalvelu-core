@@ -158,12 +158,10 @@ const Head = ({
       <BreadcrumbWrapper
         route={[
           viewType === "recurring" ? "/recurring" : "",
-          `/${searchUrlWithParams}`,
+          searchUrlWithParams,
           "reservationUnit",
         ]}
-        aliases={[
-          { slug: `/${searchUrlWithParams}`, title: t("breadcrumb:search") },
-        ]}
+        aliases={[{ slug: searchUrlWithParams, title: t("breadcrumb:search") }]}
       />
       <TopContainer>
         <Container>
