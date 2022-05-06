@@ -1,4 +1,5 @@
 import React from "react";
+import { memoize } from "lodash";
 import { Select as HDSSelect } from "hds-react";
 import { OptionType } from "../../../common/types";
 
@@ -21,6 +22,7 @@ const Select = ({
   placeholder,
   helper,
   errorText,
+  sort = false,
 }: {
   id: string;
   label: string;
@@ -31,13 +33,24 @@ const Select = ({
   placeholder?: string;
   helper?: string;
   errorText?: string;
+  sort?: boolean;
 }): JSX.Element => {
+  const sortedOpts = memoize((originalOptions) => {
+    const opts = [...originalOptions];
+    if (sort) {
+      opts.sort((a, b) =>
+        a.label.toLowerCase().localeCompare(b.label.toLowerCase())
+      );
+    }
+    return opts;
+  })(options);
+
   return (
     <HDSSelect
       id={id}
       label={label}
       placeholder={placeholder}
-      options={options}
+      options={sortedOpts}
       required={required}
       onChange={(e: OptionType) => {
         if (typeof e.value !== "undefined") {

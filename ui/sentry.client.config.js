@@ -13,6 +13,4 @@ Sentry.init({
   dsn: SENTRY_DSN,
   environment: SENTRY_ENVIRONMENT,
   release: `tilavarauspalvelu-ui@${VERSION}`,
-  // Adjust this value in production, or use tracesSampler for greater control
-  tracesSampleRate: 1.0,
 });

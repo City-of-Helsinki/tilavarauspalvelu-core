@@ -115,7 +115,7 @@ const ApplicationRoundCard = ({ applicationRound }: Props): JSX.Element => {
           <Link href={`/criteria/${applicationRound.pk}`} passHref>
             <StyledLink>
               {t("applicationRound:card.criteria")}
-              <IconArrowRight />
+              <IconArrowRight aria-hidden="true" />
             </StyledLink>
           </Link>
         )}

@@ -19,7 +19,7 @@ const Container = styled.div`
   margin-bottom: var(--spacing-layout-l);
 `;
 
-const Name = styled(H4)`
+const Name = styled(H4).attrs({ as: "h3" })`
   margin-top: 0;
 `;
 

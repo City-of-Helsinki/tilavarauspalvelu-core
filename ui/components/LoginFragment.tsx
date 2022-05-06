@@ -69,7 +69,7 @@ const LoginFragment = ({
         return !profile && authEnabled ? (
           <Wrapper>
             <MediumButton
-              iconLeft={<IconSignin />}
+              iconLeft={<IconSignin aria-hidden="true" />}
               onClick={() => setShouldLogin(true)}
               aria-label={t("common:loginAlt")}
             >

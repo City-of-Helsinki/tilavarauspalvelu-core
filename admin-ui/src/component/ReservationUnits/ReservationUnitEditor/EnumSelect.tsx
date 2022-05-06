@@ -17,6 +17,7 @@ const EnumSelect = ({
   value,
   type,
   errorText,
+  sort = false,
 }: {
   id: string;
   label: string;
@@ -27,12 +28,19 @@ const EnumSelect = ({
   onChange: (value: string) => void;
   type: { [key: string]: string };
   errorText?: string;
+  sort?: boolean;
 }): JSX.Element => {
   const { t } = useTranslation();
+
   const options: OptionType[] = Object.keys(type).map((key) => ({
     value: type[key],
     label: t(`${id}.${type[key]}`),
   }));
+  if (sort) {
+    options.sort((a, b) =>
+      a.label.toLowerCase().localeCompare(b.label.toLowerCase())
+    );
+  }
 
   return (
     <Select

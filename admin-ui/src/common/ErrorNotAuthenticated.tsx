@@ -1,21 +1,14 @@
-import React, { useEffect } from "react";
-import styled from "styled-components";
-import { useTranslation } from "react-i18next";
 // eslint-disable-next-line import/no-unresolved
 import { Button, IconArrowRight, IconGroup } from "hds-react";
-import { BrowserRouter } from "react-router-dom";
-import queryString from "query-string";
-import KorosHeading, { Heading } from "./KorosHeading";
+import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
+import styled from "styled-components";
+import Footer from "../component/Footer";
+import KorosHeading, { Heading } from "../component/KorosHeading";
+import { useAuthState } from "../context/AuthStateContext";
 import HeroImage from "../images/hero-user@1x.jpg";
 import { H2 } from "../styles/typography";
 import { breakpoints } from "../styles/util";
-import Footer from "./Footer";
-import PageWrapper from "./PageWrapper";
-import { useAuthState } from "../context/AuthStateContext";
-
-interface IProps {
-  withSiteWrapper?: boolean;
-}
 
 const Wrapper = styled.div``;
 
@@ -68,27 +61,19 @@ const Ingress = styled(H2)`
   line-height: 1.8125rem;
 `;
 
-function MainLander({ withSiteWrapper = false }: IProps): JSX.Element {
+function ErrorNotLoggedIn(): JSX.Element {
   const { t } = useTranslation();
   const { authState } = useAuthState();
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (authState.sid) {
-      const search = queryString.parse(window.location.search);
-      if (typeof search.path === "string") {
-        if (window.history) {
-          window.history.pushState({}, "", search.path);
-        }
-      }
-      window.location.reload();
-    }
-  }, [authState]);
-  const Lander = (
+  return (
     <Wrapper>
       <KorosHeading heroImage={HeroImage}>
         <Heading>{t("common.applicationName")}</Heading>
         <LoginBtn
+          isLoading={loading}
           onClick={() => {
+            setLoading(true);
             const { login } = authState;
             if (login) {
               login();
@@ -104,14 +89,6 @@ function MainLander({ withSiteWrapper = false }: IProps): JSX.Element {
       <Footer />
     </Wrapper>
   );
-
-  return withSiteWrapper ? (
-    <BrowserRouter>
-      <PageWrapper>{Lander}</PageWrapper>
-    </BrowserRouter>
-  ) : (
-    Lander
-  );
 }
 
-export default MainLander;
+export default ErrorNotLoggedIn;

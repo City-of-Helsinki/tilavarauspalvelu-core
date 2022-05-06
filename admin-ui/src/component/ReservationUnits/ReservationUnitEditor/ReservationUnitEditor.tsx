@@ -2,7 +2,6 @@ import { useMutation, useQuery } from "@apollo/client";
 import {
   Accordion,
   Checkbox,
-  Combobox,
   Fieldset,
   Link,
   Notification,
@@ -74,6 +73,7 @@ import {
   UPDATE_RESERVATION_UNIT,
 } from "./queries";
 import FormErrorSummary from "../../../common/FormErrorSummary";
+import SortedCompobox from "./SortedCompobox";
 
 const bufferTimeOptions = [
   { value: 900, label: "15 minuuttia" },
@@ -567,7 +567,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                     );
                   })}
                   <Normal>
-                    <Combobox
+                    <SortedCompobox
                       id="spacePks"
                       multiselect
                       required
@@ -595,7 +595,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                     />
                   </Normal>
                   <Normal>
-                    <Combobox
+                    <SortedCompobox
                       id="resourcePks"
                       multiselect
                       label={t("ReservationUnitEditor.label.resourcePks")}
@@ -687,6 +687,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                 <EditorGrid>
                   <Normal>
                     <Select
+                      sort
                       required
                       id="reservationUnitTypePk"
                       label={t(
@@ -711,7 +712,8 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                     />
                   </Normal>
                   <Normal>
-                    <Combobox
+                    <SortedCompobox
+                      sort
                       multiselect
                       label={t("ReservationUnitEditor.purposesLabel")}
                       placeholder={t(
@@ -737,7 +739,8 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                     />
                   </Normal>
                   <Normal>
-                    <Combobox
+                    <SortedCompobox
+                      sort
                       multiselect
                       label={t("ReservationUnitEditor.equipmentsLabel")}
                       placeholder={t(
@@ -1051,6 +1054,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                   <Normal>
                     <Select
                       id="metadataSetPk"
+                      sort
                       required
                       options={state.metadataOptions}
                       label={t("ReservationUnitEditor.label.metadataSetPk")}
@@ -1096,6 +1100,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                   </Wide>
                   <Wide>
                     <EnumSelect
+                      sort
                       id="authentication"
                       required
                       value={state.reservationUnitEdit.authentication || "WEAK"}
@@ -1257,6 +1262,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                       return (
                         <Normal>
                           <Select
+                            sort
                             id={name}
                             key={name}
                             label={t(`ReservationUnitEditor.label.${propName}`)}

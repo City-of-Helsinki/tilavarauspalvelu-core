@@ -5,61 +5,71 @@ import { oidcUrl, apiScope } from "../const";
 const apiAccessTokenStorage = localStorage;
 const customUserStore = new CustomUserStore();
 
-export const getApiAccessToken = (): string | null =>
-  apiAccessTokenStorage.getItem(`oidc.apiToken.${apiScope}`);
+const storageKey = `oidc.apiToken.${apiScope}`;
 
-export const setApiAccessToken = (accessToken: string): void =>
-  apiAccessTokenStorage.setItem(`oidc.apiToken.${apiScope}`, accessToken);
+export const getApiAccessToken = (): string | null =>
+  apiAccessTokenStorage.getItem(storageKey);
+
+const setApiAccessToken = (accessToken: string): void =>
+  apiAccessTokenStorage.setItem(storageKey, accessToken);
+
+export const clearApiAccessToken = (): void =>
+  apiAccessTokenStorage.removeItem(storageKey);
 
 export const getAccessToken = (): string | undefined => {
   return customUserStore.getAccessToken();
 };
 
-export const updateApiAccessToken = async (
-  accessToken: string | undefined
-): Promise<string> => {
+/**
+ *
+ * @param accessToken
+ * @returns
+ */
+export const updateApiAccessToken = async (): Promise<string | undefined> => {
+  const accessToken = getAccessToken();
   if (!accessToken) {
-    throw new Error("Api access token not available. Cannot update");
+    throw new Error("Access token not available. Cannot update");
   }
   if (!apiScope) {
     throw new Error("Application configuration error, illegal api scope.");
   }
-  const response = await axios.request({
-    responseType: "json",
-    method: "POST",
-    url: `${oidcUrl}/api-tokens/`,
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-  });
+  try {
+    const response = await axios.request({
+      responseType: "json",
+      method: "POST",
+      url: `${oidcUrl}/api-tokens/`,
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    });
 
-  const { data } = response;
+    const { data } = response;
 
-  const apiAccessToken = data[apiScope];
-  setApiAccessToken(apiAccessToken);
-
-  return apiAccessToken;
+    const apiAccessToken = data[apiScope];
+    setApiAccessToken(apiAccessToken);
+    return apiAccessToken;
+  } catch (ex) {
+    throw new Error("No Token");
+  }
 };
 
-export const localLogout = (): void => {
+export const localLogout = (clearAll = false): void => {
   Object.keys(apiAccessTokenStorage).forEach((key) => {
-    if (key != null && key.startsWith("oidc.api")) {
+    if (key != null && key.startsWith(clearAll ? "oidc." : "oidc.api")) {
       apiAccessTokenStorage.removeItem(key);
     }
   });
 };
 
-// XXX, TODO, some apis (for example reservationUnitCancellationRules)
-// require api authentication but don't notify the caller about missing
-// credentials. We need to hook this up properly but it will be done in
-// separate task.
-export const assertApiAccessTokenIsAvailable = (): Promise<boolean> => {
-  if (getApiAccessToken()) {
-    return Promise.resolve(false);
-  }
+export type ApiAccessTokenAvailable = "Available" | "Error";
 
-  return updateApiAccessToken(getAccessToken())
-    .then(() => true)
-    .finally(() => true);
-};
+export const assertApiAccessTokenIsAvailableAndFresh =
+  async (): Promise<ApiAccessTokenAvailable> => {
+    try {
+      await updateApiAccessToken();
+      return "Available";
+    } catch (e) {
+      return "Error";
+    }
+  };
