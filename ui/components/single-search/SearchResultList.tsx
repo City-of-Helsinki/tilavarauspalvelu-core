@@ -33,7 +33,7 @@ const TopWrapper = styled.div`
   }
 `;
 
-const HitCount = styled.h2`
+const HitCount = styled.div`
   margin-top: var(--spacing-layout-s);
   font-weight: 700;
   font-size: var(--fontsize-heading-m);

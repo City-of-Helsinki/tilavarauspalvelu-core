@@ -115,12 +115,18 @@ const Applications = (): JSX.Element => {
 
   useEffect(() => {
     const fetchRounds = async () => {
-      const { data } = await apolloClient.query<
+      const { data, error } = await apolloClient.query<
         Query,
         QueryApplicationRoundsArgs
       >({
         query: APPLICATION_ROUNDS,
       });
+
+      if (error) {
+        setState("error");
+        return;
+      }
+
       const applicationRounds = data.applicationRounds?.edges?.map(
         (n) => n.node
       );

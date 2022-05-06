@@ -48,6 +48,7 @@ interface PropsType {
 
 const TopContainer = styled.div`
   background-color: white;
+  padding-top: var(--spacing-m);
 `;
 
 const RightContainer = styled.div`

@@ -13,7 +13,7 @@ import {
 } from "../../modules/util";
 import { breakpoint } from "../../modules/style";
 import { MediumButton } from "../../styles/util";
-import { fontMedium, H4 } from "../../modules/style/typography";
+import { fontMedium, H5 } from "../../modules/style/typography";
 import { ApplicationRoundType } from "../../modules/gql-types";
 
 interface Props {
@@ -29,7 +29,7 @@ const StyledCard = styled(Card)`
     grid-template-columns: 2fr 1fr;
     grid-gap: var(--spacing-m);
     align-items: start;
-    padding: var(--spacing-m);
+    padding: var(--spacing-s);
     margin-bottom: var(--spacing-m);
 
     @media (max-width: ${breakpoint.s}) {
@@ -43,23 +43,27 @@ const StyledContainer = styled(Container)`
   max-width: 100%;
 `;
 
-const Name = styled(H4).attrs({ as: "h3" })`
-  margin-top: 0;
-  margin-bottom: var(--spacing-2-xs);
+const Name = styled(H5)`
+  && {
+    margin-top: 0;
+    margin-bottom: var(--spacing-2-xs);
+  }
 `;
 
 const CardButton = styled(MediumButton)`
-  width: max-content;
+  width: 100%;
+  align-self: flex-end;
 
   @media (min-width: ${breakpoint.s}) {
     justify-self: right;
+    width: max-content;
   }
 `;
 
 const StyledLink = styled.a`
   display: flex;
   align-items: center;
-  gap: var(--spacing-2-xs);
+  gap: var(--spacing-xs);
   margin-top: var(--spacing-s);
   ${fontMedium};
 
@@ -69,7 +73,6 @@ const StyledLink = styled.a`
 
   @media (min-width: ${breakpoint.s}) {
     margin-top: var(--spacing-l);
-    margin-bottom: var(--spacing-s);
   }
 `;
 
@@ -111,8 +114,8 @@ const ApplicationRoundCard = ({ applicationRound }: Props): JSX.Element => {
         {state !== "past" && (
           <Link href={`/criteria/${applicationRound.pk}`} passHref>
             <StyledLink>
-              <IconArrowRight aria-hidden="true" />
               {t("applicationRound:card.criteria")}
+              <IconArrowRight aria-hidden="true" />
             </StyledLink>
           </Link>
         )}
