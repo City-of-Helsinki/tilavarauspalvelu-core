@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.db.models import Q
+from django.db.models import Prefetch, Q
+from django.utils.timezone import localtime
 from django_filters import rest_framework as filters
 from drf_extra_fields.relations import PresentablePrimaryKeyRelatedField
 from drf_spectacular.utils import extend_schema
@@ -18,7 +19,7 @@ from permissions.helpers import (
     get_service_sectors_where_can_view_reservations,
     get_units_where_can_view_reservations,
 )
-from reservation_units.models import ReservationUnit
+from reservation_units.models import Equipment, ReservationUnit
 from reservations.models import (
     STATE_CHOICES,
     AbilityGroup,
@@ -26,6 +27,8 @@ from reservations.models import (
     RecurringReservation,
     Reservation,
 )
+from resources.models import Resource
+from spaces.models import Space
 
 from .common_filters import ModelInFilter
 from .reservation_units_api import ReservationUnitSerializer
@@ -233,8 +236,41 @@ class ReservationViewSet(viewsets.ModelViewSet):
     filterset_class = ReservationFilter
     queryset = (
         Reservation.objects.all()
-        .prefetch_related("reservation_unit")
-        .select_related("recurring_reservation")
+        .select_related(
+            "user",
+            "recurring_reservation",
+            "recurring_reservation__application",
+            "recurring_reservation__application__organisation",
+            "recurring_reservation__application_event",
+        )
+        .prefetch_related(
+            Prefetch(
+                "reservation_unit",
+                queryset=(
+                    ReservationUnit.objects.all()
+                    .select_related("reservation_unit_type", "unit")
+                    .prefetch_related(
+                        "services",
+                        "reservation_purposes",
+                        "images",
+                        "unit",
+                        Prefetch(
+                            "equipments", queryset=Equipment.objects.all().only("id")
+                        ),
+                        Prefetch(
+                            "spaces",
+                            queryset=Space.objects.all().select_related(
+                                "building", "location"
+                            ),
+                        ),
+                        Prefetch(
+                            "resources",
+                            queryset=Resource.objects.all().select_related("space"),
+                        ),
+                    )
+                ),
+            )
+        )
     )
 
     def perform_create(self, serializer):
@@ -242,8 +278,10 @@ class ReservationViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
+
         if settings.TMP_PERMISSIONS_DISABLED:
             return queryset
+
         user = self.request.user
         return queryset.filter(
             Q(reservation_unit__unit__in=get_units_where_can_view_reservations(user))
@@ -319,28 +357,34 @@ class RecurringReservationSerializer(serializers.ModelSerializer):
         }
 
     def get_begin_weekday(self, instance):
-        try:
-            reservation = instance.reservations.all().earliest("begin")
-        except Reservation.DoesNotExist:
-            return None
-        if reservation:
-            return reservation.begin.weekday()
+        reservations = instance.reservations.all()
+
+        if reservations:
+            reservations = sorted(reservations, key=lambda res: res.begin)
+
+            return reservations[0].begin.weekday()
+
+        return None
 
     def get_first_reservation_begin(self, instance):
-        try:
-            reservation = instance.reservations.all().earliest("begin")
-        except Reservation.DoesNotExist:
-            return None
+        reservations = instance.reservations.all()
 
-        return reservation.begin
+        if reservations:
+            reservations = sorted(reservations, key=lambda res: res.begin)
+
+            return localtime(reservations[0].begin)
+
+        return None
 
     def get_last_reservation_end(self, instance):
-        try:
-            reservation = instance.reservations.all().earliest("end")
-        except Reservation.DoesNotExist:
-            return None
+        reservations = instance.reservations.all()
 
-        return reservation.end
+        if reservations:
+            reservations = sorted(reservations, key=lambda res: res.end)
+
+            return localtime(reservations[0].end)
+
+        return None
 
     def get_purpose_name(self, instance):
         purpose = instance.application_event.purpose
@@ -381,8 +425,58 @@ class RecurringReservationViewSet(viewsets.ReadOnlyModelViewSet):
     )
     queryset = (
         RecurringReservation.objects.all()
-        .prefetch_related("reservations")
-        .select_related("application", "application_event")
+        .select_related(
+            "application",
+            "application_event",
+            "application_event__purpose",
+            "age_group",
+        )
+        .prefetch_related(
+            Prefetch(
+                "reservations",
+                queryset=(
+                    Reservation.objects.all()
+                    .select_related(
+                        "user",
+                        "recurring_reservation",
+                        "recurring_reservation__application",
+                        "recurring_reservation__application__organisation",
+                        "recurring_reservation__application_event",
+                    )
+                    .prefetch_related(
+                        Prefetch(
+                            "reservation_unit",
+                            queryset=(
+                                ReservationUnit.objects.all()
+                                .select_related("reservation_unit_type", "unit")
+                                .prefetch_related(
+                                    "services",
+                                    "reservation_purposes",
+                                    "images",
+                                    "unit",
+                                    Prefetch(
+                                        "equipments",
+                                        queryset=Equipment.objects.all().only("id"),
+                                    ),
+                                    Prefetch(
+                                        "spaces",
+                                        queryset=Space.objects.all().select_related(
+                                            "building", "location"
+                                        ),
+                                    ),
+                                    Prefetch(
+                                        "resources",
+                                        queryset=Resource.objects.all().select_related(
+                                            "space"
+                                        ),
+                                    ),
+                                )
+                            ),
+                        )
+                    )
+                ),
+            )
+        )
     )
     filter_backends = [
         drf_filters.OrderingFilter,

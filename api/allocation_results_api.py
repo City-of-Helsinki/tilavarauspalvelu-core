@@ -1,13 +1,21 @@
 from django.conf import settings
+from django.db.models import Count, Prefetch
 from django_filters import rest_framework as filters
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import mixins, permissions, serializers, viewsets
 
 from api.applications_api.serializers import ApplicationEventSerializer
 from api.common_filters import ModelInFilter
-from applications.models import ApplicationEvent, ApplicationEventScheduleResult
+from applications.models import (
+    Application,
+    ApplicationEvent,
+    ApplicationEventSchedule,
+    ApplicationEventScheduleResult,
+    EventReservationUnit,
+)
 from permissions.api_permissions.drf_permissions import AllocationResultsPermission
 from reservation_units.models import ReservationUnit
+from spaces.models import Space
 
 
 class ApplicationEventScheduleResultSerializer(serializers.ModelSerializer):
@@ -148,9 +156,6 @@ class AllocationResultsFilter(filters.FilterSet):
 class AllocationResultViewSet(
     viewsets.ReadOnlyModelViewSet, mixins.DestroyModelMixin, mixins.UpdateModelMixin
 ):
-    queryset = ApplicationEventScheduleResult.objects.all().order_by(
-        "application_event_schedule__application_event_id"
-    )
     serializer_class = ApplicationEventScheduleResultSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = AllocationResultsFilter
@@ -158,4 +163,77 @@ class AllocationResultViewSet(
         [AllocationResultsPermission]
         if not settings.TMP_PERMISSIONS_DISABLED
         else [permissions.AllowAny]
+    )
+    queryset = (
+        ApplicationEventScheduleResult.objects.all()
+        .select_related(
+            "basket",
+            "allocated_reservation_unit",
+            "allocated_reservation_unit__unit",
+        )
+        .prefetch_related(
+            "aggregated_data",
+            Prefetch(
+                "application_event_schedule",
+                queryset=(
+                    ApplicationEventSchedule.objects.all().prefetch_related(
+                        Prefetch(
+                            "application_event",
+                            queryset=(
+                                ApplicationEvent.objects.all()
+                                .annotate(Count("weekly_amount_reductions"))
+                                .select_related(
+                                    "age_group",
+                                    "ability_group",
+                                    "purpose",
+                                )
+                                .prefetch_related(
+                                    "aggregated_data",
+                                    "application_event_schedules",
+                                    Prefetch(
+                                        "application",
+                                        queryset=(
+                                            Application.objects.all()
+                                            .select_related("user", "organisation")
+                                            .prefetch_related("aggregated_data")
+                                        ),
+                                    ),
+                                    Prefetch(
+                                        "declined_reservation_units",
+                                        queryset=ReservationUnit.objects.all().only(
+                                            "id"
+                                        ),
+                                    ),
+                                    Prefetch(
+                                        "event_reservation_units",
+                                        queryset=(
+                                            EventReservationUnit.objects.all()
+                                            .select_related(
+                                                "reservation_unit",
+                                                "reservation_unit__reservation_unit_type",
+                                                "reservation_unit__unit",
+                                            )
+                                            .prefetch_related(
+                                                "reservation_unit__resources",
+                                                "reservation_unit__services",
+                                                "reservation_unit__reservation_purposes",
+                                                "reservation_unit__images",
+                                                "reservation_unit__equipments",
+                                                Prefetch(
+                                                    "reservation_unit__spaces",
+                                                    queryset=Space.objects.all().select_related(
+                                                        "building", "location"
+                                                    ),
+                                                ),
+                                            )
+                                        ),
+                                    ),
+                                )
+                            ),
+                        )
+                    )
+                ),
+            ),
+        )
+        .order_by("application_event_schedule__application_event_id")
     )

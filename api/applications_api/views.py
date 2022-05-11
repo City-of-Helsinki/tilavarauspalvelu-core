@@ -164,8 +164,50 @@ class ApplicationEventViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
+
+        # Subqueries for optimization formation
+        declined_reservation_units_qs = ReservationUnit.objects.all().only("id")
+        spaces_qs = Space.objects.all().select_related("building", "location")
+        event_reservation_units_qs = (
+            EventReservationUnit.objects.all()
+            .select_related(
+                "reservation_unit",
+                "reservation_unit__reservation_unit_type",
+                "reservation_unit__unit",
+            )
+            .prefetch_related(
+                "reservation_unit__resources",
+                "reservation_unit__services",
+                "reservation_unit__reservation_purposes",
+                "reservation_unit__images",
+                "reservation_unit__equipments",
+                Prefetch(
+                    "reservation_unit__spaces",
+                    queryset=spaces_qs,
+                ),
+            )
+        )
+
+        queryset = (
+            queryset.annotate(Count("weekly_amount_reductions"))
+            .select_related("age_group", "ability_group", "purpose")
+            .prefetch_related(
+                "application_event_schedules",
+                "aggregated_data",
+                Prefetch(
+                    "event_reservation_units",
+                    queryset=event_reservation_units_qs,
+                ),
+                Prefetch(
+                    "declined_reservation_units",
+                    queryset=declined_reservation_units_qs,
+                ),
+            )
+        )
+
         if settings.TMP_PERMISSIONS_DISABLED:
             return queryset
+
         user = self.request.user
 
         return queryset.filter(

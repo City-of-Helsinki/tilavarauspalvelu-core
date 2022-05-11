@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.db.models import Prefetch
 from drf_spectacular.utils import extend_schema
 from rest_framework import permissions, serializers, viewsets
 
@@ -26,10 +27,15 @@ class DeclinedReservationUnitSerializer(serializers.ModelSerializer):
 @extend_schema(description="Declined reservation units for application event.")
 class DeclinedReservationUnitViewSet(viewsets.ModelViewSet):
     serializer_class = DeclinedReservationUnitSerializer
-    queryset = ApplicationEvent.objects.all()
     http_method_names = ["put", "get"]
     permission_classes = (
         [ApplicationEventPermission]
         if not settings.TMP_PERMISSIONS_DISABLED
         else [permissions.AllowAny]
+    )
+    queryset = ApplicationEvent.objects.all().prefetch_related(
+        Prefetch(
+            "declined_reservation_units",
+            queryset=ReservationUnit.objects.all().only("id"),
+        )
     )

@@ -1,10 +1,14 @@
 import logging
 
 from django.conf import settings
-from django.db.models import Sum
+from django.db.models import Case, Exists, OuterRef, Prefetch, Subquery, Sum
+from django.db.models import Value as V
+from django.db.models import When
+from django.db.models.functions import Coalesce, Concat
 from rest_framework import permissions, serializers, viewsets
 
 from applications.models import (
+    Application,
     ApplicationEventAggregateData,
     ApplicationRound,
     ApplicationRoundBasket,
@@ -213,23 +217,42 @@ class ApplicationRoundSerializer(serializers.ModelSerializer):
     def get_approved_by(self, instance):
         request = self.context.get("request", None)
         request_user = getattr(request, "user", None)
+
         if not request_user or not request_user.is_authenticated:
             return ""
+
+        if hasattr(instance, "approved_by"):
+            return instance.approved_by
 
         approved_status = instance.statuses.filter(
             status=ApplicationRoundStatus.APPROVED
         ).first()
-        if not getattr(approved_status, "user", None):
-            return ""
+        if getattr(approved_status, "user", None):
+            return approved_status.user.get_full_name()
 
-        return approved_status.user.get_full_name()
+        return ""
 
     def get_aggregated_data(self, instance):
-        allocation_result_dict = self._get_allocation_result_summary(instance)
+        allocation_result_dict = {}
+
+        # CASE: Instances fetched from database
+        if hasattr(instance, "events_count") and hasattr(instance, "duration_total"):
+            allocation_result_dict = {
+                "allocation_result_events_count": instance.events_count,
+                "allocation_duration_total": instance.duration_total,
+            }
+
+        # CASE: Instance Created/Updated, must calculate again
+        else:
+            allocation_result_dict = self._get_allocation_result_summary(instance)
+
         allocation_result_dict.update(instance.aggregated_data_dict)
         return allocation_result_dict
 
     def get_applications_sent(self, instance: ApplicationRound):
+        if hasattr(instance, "applications_sent"):
+            return instance.applications_sent
+
         not_sent = instance.applications.filter(
             cached_latest_status__in=[
                 ApplicationStatus.IN_REVIEW,
@@ -339,10 +362,86 @@ class ApplicationRoundSerializer(serializers.ModelSerializer):
 
 
 class ApplicationRoundViewSet(viewsets.ModelViewSet):
-    queryset = ApplicationRound.objects.all()
     serializer_class = ApplicationRoundSerializer
     permission_classes = (
         [ApplicationRoundPermission]
         if not settings.TMP_PERMISSIONS_DISABLED
         else [permissions.AllowAny]
+    )
+    queryset = (
+        ApplicationRound.objects.all()
+        .annotate(
+            events_count=Subquery(
+                ApplicationEventAggregateData.objects.filter(
+                    application_event__application__application_round__id=OuterRef(
+                        "id"
+                    ),
+                    name="allocation_results_reservations_total",
+                )
+                .distinct()
+                .values("application_event__application__application_round__id")
+                .annotate(events_count=Sum("value"))
+                .values("events_count")
+            ),
+            duration_total=Subquery(
+                ApplicationEventAggregateData.objects.filter(
+                    application_event__application__application_round__id=OuterRef(
+                        "id"
+                    ),
+                    name="allocation_results_duration_total",
+                )
+                .distinct()
+                .values("application_event__application__application_round__id")
+                .annotate(duration_total=Sum("value"))
+                .values("duration_total")
+            ),
+            approved_by=Coalesce(
+                Subquery(
+                    ApplicationRoundStatus.objects.filter(
+                        application_round__id=OuterRef("id"),
+                        status=ApplicationRoundStatus.APPROVED,
+                    )
+                    .annotate(
+                        user_fullname=Case(
+                            When(
+                                user__isnull=True,
+                                then=V(""),
+                            ),
+                            default=Concat(
+                                "user__first_name",
+                                V(" "),
+                                "user__last_name",
+                            ),
+                        )
+                    )
+                    .order_by("id")
+                    .values("user_fullname")[:1]
+                ),
+                V(""),
+            ),
+            applications_sent=Case(
+                When(
+                    Exists(
+                        Application.objects.filter(
+                            application_round__id=OuterRef("id"),
+                            cached_latest_status__in=[
+                                ApplicationStatus.IN_REVIEW,
+                                ApplicationStatus.REVIEW_DONE,
+                            ],
+                        )
+                    ),
+                    then=False,
+                ),
+                default=True,
+            ),
+        )
+        .select_related("service_sector")
+        .prefetch_related(
+            "aggregated_data",
+            "application_round_baskets",
+            Prefetch("purposes", queryset=ReservationPurpose.objects.all().only("id")),
+            Prefetch(
+                "reservation_units", queryset=ReservationUnit.objects.all().only("id")
+            ),
+        )
     )

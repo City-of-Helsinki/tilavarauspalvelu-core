@@ -1,6 +1,6 @@
 from dateutil.parser import parse
 from django.conf import settings
-from django.db.models import Sum
+from django.db.models import Prefetch, Sum
 from django_filters import rest_framework as filters
 from easy_thumbnails.files import get_thumbnailer
 from rest_framework import filters as drf_filters
@@ -32,7 +32,8 @@ from reservation_units.models import (
     ReservationUnitType,
 )
 from reservations.models import Reservation, ReservationPurpose
-from spaces.models import District, Unit
+from resources.models import Resource
+from spaces.models import District, Space, Unit
 
 
 class ReservationUnitFilter(filters.FilterSet):
@@ -242,7 +243,21 @@ class ReservationUnitViewSet(viewsets.ModelViewSet):
         qs = (
             ReservationUnit.objects.annotate(max_persons_sum=Sum("spaces__max_persons"))
             .all()
-            .prefetch_related("spaces", "resources", "services", "unit")
+            .select_related("reservation_unit_type", "unit")
+            .prefetch_related(
+                "services",
+                "reservation_purposes",
+                "images",
+                "unit",
+                Prefetch("equipments", queryset=Equipment.objects.all().only("id")),
+                Prefetch(
+                    "spaces",
+                    queryset=Space.objects.all().select_related("building", "location"),
+                ),
+                Prefetch(
+                    "resources", queryset=Resource.objects.all().select_related("space")
+                ),
+            )
         )
         return qs
 
