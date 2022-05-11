@@ -17,6 +17,7 @@ import { IngressContainer } from "../../styles/layout";
 import { H2 } from "../../styles/new-typography";
 import { breakpoints } from "../../styles/util";
 import StatusRecommendation from "../applications/StatusRecommendation";
+import BreadcrumbWrapper from "../BreadcrumbWrapper";
 import Loader from "../Loader";
 import withMainMenu from "../withMainMenu";
 import { NaviItem } from "./ApplicationRoundNavi";
@@ -30,11 +31,12 @@ interface IProps {
 
 const Wrapper = styled.div`
   width: 100%;
-  margin-top: var(--spacing-m);
   margin-bottom: var(--spacing-layout-xl);
 `;
 
-const Content = styled.div``;
+const Content = styled.div`
+  margin-top: var(--spacing-l);
+`;
 
 const RecommendationValue = styled.div`
   display: flex;
@@ -73,7 +75,7 @@ const StyledLink = styled(Link)`
 `;
 
 const StyledApplicationRoundStatusBlock = styled(ApplicationRoundStatusBlock)`
-  margin: 0;
+  margin: var(--spacing-l) 0 0 0;
 `;
 
 const NoDataMessage = styled.span`
@@ -347,6 +349,14 @@ function Review({ applicationRound }: IProps): JSX.Element | null {
 
   return (
     <Wrapper>
+      <BreadcrumbWrapper
+        route={[
+          "recurring-reservations",
+          "/recurring-reservations/application-rounds",
+          "application-round",
+        ]}
+        aliases={[{ slug: "application-round", title: applicationRound.name }]}
+      />
       <>
         <IngressContainer>
           <div

@@ -41,6 +41,7 @@ import { useNotification } from "../../context/NotificationContext";
 import TimeSelector from "./time-selector/TimeSelector";
 import { breakpoints } from "../../styles/util";
 import ScrollIntoView from "../../common/ScrollIntoView";
+import BreadcrumbWrapper from "../BreadcrumbWrapper";
 
 interface IRouteParams {
   applicationId: string;
@@ -48,10 +49,11 @@ interface IRouteParams {
 
 const StyledApplicationStatusBlock = styled(ApplicationStatusBlock)`
   margin: 0;
+  margin-top: var(--spacing-l);
 `;
 
 const Wrapper = styled.div`
-  margin: var(--spacing-layout-m) 0;
+  margin: 0 0 var(--spacing-layout-m) 0;
   width: 100%;
   padding-bottom: var(--spacing-5-xl);
 `;
@@ -127,6 +129,7 @@ const SchedulesCardContainer = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
   width: 100%;
+
   @media (min-width: ${breakpoints.xl}) {
     display: flex;
     flex-direction: column;
@@ -237,6 +240,19 @@ function ApplicationDetails(): JSX.Element | null {
     <Wrapper>
       {application && applicationRound && (
         <>
+          <BreadcrumbWrapper
+            route={[
+              "recurring-reservations",
+              "/recurring-reservations/application-rounds",
+              `/recurring-reservations/application-rounds/${applicationRound.id}`,
+              `application`,
+            ]}
+            aliases={[
+              { slug: "application-round", title: applicationRound.name },
+              { slug: `${applicationRound.id}`, title: applicationRound.name },
+              { slug: "application", title: customerName },
+            ]}
+          />
           <IngressContainer>
             <StyledApplicationStatusBlock
               status={application.status}

@@ -8,7 +8,7 @@ import { breakpoints } from "../styles/util";
 
 type Alias = {
   slug: string;
-  title: string;
+  title: string | undefined;
 };
 
 type Props = {
@@ -19,6 +19,13 @@ type Props = {
 const Wrapper = styled.div`
   display: block;
   background-color: var(--color-white);
+  border-bottom: 1px solid var(--color-black-20);
+`;
+
+const StyledBreadcrumb = styled(Breadcrumb)`
+  line-height: 64px;
+  margin: 0 0 0 var(--spacing-2-xs);
+  overflow: hidden;
 `;
 
 const BreadcrumbWrapper = ({ route, aliases }: Props): JSX.Element => {
@@ -26,18 +33,21 @@ const BreadcrumbWrapper = ({ route, aliases }: Props): JSX.Element => {
   const isMobile = useMedia(`(max-width: ${breakpoints.s})`, true);
 
   const routes =
-    route?.map((n) => ({
-      title:
-        aliases?.find((alias) => alias.slug === n)?.title ||
-        t(`breadcrumb:${trim(n, "/")}`) ||
-        "",
-      slug: n.includes("/") ? n : "",
-    })) || [];
+    route?.map((n) => {
+      const title = n.split("/").pop();
+      return {
+        title:
+          aliases?.find((alias) => alias.slug === title)?.title ||
+          t(`breadcrumb.${trim(title, "/")}`) ||
+          "",
+        slug: n.includes("/") ? n : "",
+      };
+    }) || [];
 
   return (
     <Wrapper>
-      <Breadcrumb
-        routes={[{ title: t("breadcrumb:frontpage"), slug: "/" }, ...routes]}
+      <StyledBreadcrumb
+        routes={[{ title: t("breadcrumb.frontpage"), slug: "/" }, ...routes]}
         isMobile={isMobile}
       />
     </Wrapper>
