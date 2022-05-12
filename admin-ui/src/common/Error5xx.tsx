@@ -1,10 +1,8 @@
-import { Button, Link } from "hds-react";
+import { Link } from "hds-react";
 import React from "react";
 import styled from "styled-components";
-import { useAuthState } from "../context/AuthStateContext";
 import { H1 } from "../styles/new-typography";
 import { breakpoints } from "../styles/util";
-import { localLogout } from "./auth/util";
 import { publicUrl } from "./const";
 
 const Wrapper = styled.div`
@@ -44,23 +42,14 @@ const Image = styled.img`
   }
 `;
 
-const ButtonContainer = styled.div`
-  margin-top: var(--spacing-s);
-`;
-
-const Error403 = (): JSX.Element => {
-  const { authState } = useAuthState();
-
+const Error5xx = (): JSX.Element => {
   return (
     <Wrapper>
       <Content>
-        <H1>
-          403 - Sinulla ei ole käyt&shy;tö&shy;oi&shy;keuk&shy;sia tälle sivulle
-        </H1>
+        <H1>Jokin meni vikaan</H1>
         <p>
-          Sivu on nähtävillä vain kirjautuneille käyttäjille. Voit nähdä sivun
-          sisällön jos kirjaudut sisään ja sinulla on riittävän laajat
-          käyttöoikeudet.
+          Pahoittelut, emme valitettavasti pysty näyttämään sivua juuri nyt.
+          Yritä myöhemmin uudelleen!
         </p>
         <Link external href="/">
           Siirry Varaamon etusivulle
@@ -71,21 +60,10 @@ const Error403 = (): JSX.Element => {
         >
           Anna palautetta
         </Link>
-        {authState.state !== "NotAutenticated" && (
-          <ButtonContainer>
-            <Button
-              onClick={() => {
-                localLogout();
-              }}
-            >
-              Kirjaudu ulos
-            </Button>
-          </ButtonContainer>
-        )}
       </Content>
-      <Image src={`${publicUrl}/403.png`} />
+      <Image src={`${publicUrl}/5xx.png`} />
     </Wrapper>
   );
 };
 
-export default Error403;
+export default Error5xx;

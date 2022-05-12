@@ -81,7 +81,7 @@ const Sorting = ({
             />
           )}
         </OrderBtn>
-        <label htmlFor="search-form__button--sorting">
+        <label htmlFor="search-form__button--sorting-toggle-button">
           {t("searchResultList:sortButtonLabel")}:
         </label>
       </LeftBlock>

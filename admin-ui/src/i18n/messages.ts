@@ -41,6 +41,7 @@ const translations: ITranslations = {
     WEAK: ["Heikko tunnistautuminen"],
     STRONG: ["Vahva tunnistautuminen"],
   },
+  AuthState: { initializing: ["Alustetaan..."] },
   ReserveeType: {
     INDIVIDUAL: ["Yksityishenkilö"],
     BUSINESS: ["Yritys"],
@@ -169,6 +170,18 @@ const translations: ITranslations = {
     errorStartingAllocation: ["Allokoinnin käynnistys epäonnistui"],
     errorSavingData: ["Virhe tallennettaessa tietoja"],
   },
+  breadcrumb: {
+    frontpage: ["Etusivu"],
+    "recurring-reservations": ["Kausivaraaminen"],
+    "application-rounds": ["Hakukierrokset"],
+    criteria: ["Kriteerit"],
+    recommendation: ["Ehdotus"],
+    "spaces-n-settings": ["Tilat ja asetukset"],
+    "reservation-units": ["Varausyksiköt"],
+    spaces: ["Tilat"],
+    resources: ["Resurssit"],
+    units: ["Toimipisteet"],
+  },
   MainLander: {
     ingress: [
       "Tässä palvelussa voit käsitellä Helsingin kaupungin tilavaraushakemuksia sekä asettaa tiloja ja laitteita varattaviksi.",
@@ -202,6 +215,7 @@ const translations: ITranslations = {
   },
   Navigation: {
     login: ["Kirjaudu sisään", "Login", "Logga in"],
+    logging: ["Odota...", "Please hold", "Please hold"],
     logout: ["Kirjaudu ulos", "Logout", "Logga ut"],
     profile: ["Profiili", "Profile", "Profil"],
     languageSelection: ["Kielen valinta", "Language selection", "Språkval"],

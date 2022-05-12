@@ -21,7 +21,14 @@ const ExternalScripts = (): JSX.Element | null => {
           dangerouslySetInnerHTML={{
             // eslint-disable-next-line
             __html: `
-var cpm = {cookie:{domain:''}};
+var cpm = {
+  cookie: {
+    domain: ''
+  },
+  language: document.documentElement.lang !== null
+    ? document.documentElement.lang.substr(0, 2)
+    : "fi",
+};
 (function(h,u,b){
 var d=h.getElementsByTagName("script")[0],e=h.createElement("script");
 e.async=true;e.src='https://cookiehub.net/c2/c7e96adf.js';

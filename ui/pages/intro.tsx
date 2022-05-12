@@ -39,6 +39,10 @@ const Container = styled.div`
   display: grid;
   grid-template-columns: 1fr 382px;
 
+  #applicationRoundSelect-label {
+    display: none;
+  }
+
   @media (max-width: ${breakpoint.l}) {
     grid-template-columns: 1fr;
   }
@@ -104,7 +108,7 @@ const Intro = (): JSX.Element => {
                 id="applicationRoundSelect"
                 placeholder={t("common:select")}
                 options={applicationRounds as OptionType[]}
-                label=""
+                label={t("common:select")}
                 onChange={(selection: OptionType): void => {
                   setApplicationRound(selection.value as number);
                 }}

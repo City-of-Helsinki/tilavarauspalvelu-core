@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { AxiosError } from "axios";
-import { useReactOidc } from "@axa-fr/react-oidc-context";
 import KorosHeading, { Heading as KorosKorosHeading } from "../KorosHeading";
 import { MainMenuWrapper } from "../withMainMenu";
 import ApplicationRoundCard from "./ApplicationRoundCard";
@@ -16,8 +15,7 @@ import Loader from "../Loader";
 import { NotificationBox } from "../../styles/util";
 import { applicationRoundUrl, prefixes } from "../../common/urls";
 import { useNotification } from "../../context/NotificationContext";
-import { useData } from "../../context/DataContext";
-import Error403 from "../../common/Error403";
+import { useAuthState } from "../../context/AuthStateContext";
 
 const Wrapper = styled.div``;
 
@@ -42,7 +40,7 @@ const Deck = styled.div`
 `;
 
 function ApplicationRounds(): JSX.Element {
-  const { hasAnyPermissions } = useData();
+  const { authState } = useAuthState();
   const { notifyError } = useNotification();
   const [isLoading, setIsLoading] = useState(true);
   const [applicationRounds, setApplicationRounds] = useState<
@@ -50,10 +48,6 @@ function ApplicationRounds(): JSX.Element {
   >(null);
 
   const { t } = useTranslation();
-  const { oidcUser } = useReactOidc();
-  const profile = oidcUser ? oidcUser.profile : null;
-
-  const hasPermissions = hasAnyPermissions();
 
   useEffect(() => {
     const fetchApplicationRound = async () => {
@@ -73,10 +67,10 @@ function ApplicationRounds(): JSX.Element {
       }
     };
 
-    if (hasPermissions) {
+    if (authState.state === "HasPermissions") {
       fetchApplicationRound();
     }
-  }, [notifyError, hasPermissions]);
+  }, [notifyError, authState]);
 
   const isWaitingForApproval = (
     applicationRound: ApplicationRoundType
@@ -92,17 +86,14 @@ function ApplicationRounds(): JSX.Element {
     )
   );
 
-  if (hasAnyPermissions() === false) {
-    return <Error403 />;
-  }
-
   if (isLoading) {
     return <Loader />;
   }
 
   let headingStr = t("User.welcome");
-  if (profile?.given_name) {
-    headingStr += `, ${profile.given_name}`;
+  const name = authState.user?.firstName;
+  if (name) {
+    headingStr += `, ${name}`;
   }
 
   return (

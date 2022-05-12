@@ -1,11 +1,10 @@
-import { oidcClientId, oidcUrl, apiScope } from "../const";
+import { oidcClientId, oidcUrl } from "../const";
 
 export default class CustomUserStore {
   storage = window.localStorage;
 
   setItem(key: string, value: string): void {
     this.storage.setItem(key, value);
-    this.storage.removeItem(`oidc.apiToken.${apiScope}`); // side effect, make sure api access token is cleared
   }
 
   getItem(key: string): string | null {

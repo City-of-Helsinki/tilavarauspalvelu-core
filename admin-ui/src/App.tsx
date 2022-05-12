@@ -1,6 +1,5 @@
 import React from "react";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
-import { useReactOidc } from "@axa-fr/react-oidc-context";
 import ApplicationRound from "./component/recurring-reservations/ApplicationRound";
 import PageWrapper from "./component/PageWrapper";
 import "./i18n";
@@ -10,7 +9,6 @@ import Recommendation from "./component/recurring-reservations/Recommendation";
 import RecommendationsByApplicant from "./component/recurring-reservations/RecommendationsByApplicant";
 import ApplicationRounds from "./component/recurring-reservations/ApplicationRounds";
 import AllApplicationRounds from "./component/recurring-reservations/AllApplicationRounds";
-import MainLander from "./component/MainLander";
 import Approval from "./component/decisions/Approval";
 import Applications from "./component/applications/Applications";
 import Criteria from "./component/recurring-reservations/Criteria";
@@ -38,22 +36,14 @@ import RequestedReservations from "./component/reservations/requested/RequestedR
 import RequestedReservation from "./component/reservations/requested/RequestedReservation";
 import PrivateRoutes from "./common/PrivateRoutes";
 import { prefixes } from "./common/urls";
-import Error403 from "./common/Error403";
 
 function App(): JSX.Element {
-  const { oidcUser } = useReactOidc();
-
   return (
     <BrowserRouter basename={publicUrl}>
       <PageWrapper>
         <Switch>
-          <Route
-            exact
-            path="/"
-            component={oidcUser ? ApplicationRounds : MainLander}
-          />
-          <Route exact path="/403" component={Error403} />
           <PrivateRoutes>
+            <Route exact path="/" component={ApplicationRounds} />
             <Route
               exact
               path={`${prefixes.applications}/:applicationId`}

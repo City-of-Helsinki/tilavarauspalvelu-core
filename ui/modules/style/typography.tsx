@@ -79,8 +79,8 @@ export const H4 = styled.h4`
 
 export const H5 = styled.h5`
   font-size: var(--fontsize-heading-xs);
-  font-family: var(--font-medium);
-  font-weight: 500;
+  font-family: var(--font-bold);
+  font-weight: 700;
   line-height: 1.625;
   margin-bottom: var(--spacing-m);
 

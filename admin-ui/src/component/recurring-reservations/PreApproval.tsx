@@ -19,7 +19,6 @@ import {
 } from "../../common/types";
 import { IngressContainer, NarrowContainer } from "../../styles/layout";
 import { breakpoints } from "../../styles/util";
-import Heading from "./Heading";
 import StatusRecommendation from "../applications/StatusRecommendation";
 import withMainMenu from "../withMainMenu";
 import ApplicationRoundNavi from "./ApplicationRoundNavi";
@@ -38,6 +37,7 @@ import BigRadio from "../BigRadio";
 import { getAllocationResults, getApplications } from "../../common/api";
 import Loader from "../Loader";
 import { applicationDetailsUrl, applicationRoundUrl } from "../../common/urls";
+import BreadcrumbWrapper from "../BreadcrumbWrapper";
 
 interface IProps {
   applicationRound: ApplicationRoundType;
@@ -438,7 +438,14 @@ function PreApproval({
 
   return (
     <Wrapper>
-      <Heading />
+      <BreadcrumbWrapper
+        route={[
+          "recurring-reservations",
+          "/recurring-reservations/application-rounds",
+          "application-round",
+        ]}
+        aliases={[{ slug: "application-round", title: applicationRound.name }]}
+      />
       {recommendations &&
         unAllocatedCellConfig &&
         allocatedCellConfig &&

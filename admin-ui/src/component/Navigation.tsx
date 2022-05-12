@@ -1,21 +1,11 @@
 import React, { useState } from "react";
 import { Navigation as HDSNavigation } from "hds-react";
-// eslint-disable-next-line import/no-unresolved
-import { useReactOidc } from "@axa-fr/react-oidc-context";
-import { Profile } from "oidc-client";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { useHistory } from "react-router-dom";
 import MainMenu from "./MainMenu";
+import { useAuthState } from "../context/AuthStateContext";
 import { breakpoints, StyledHDSNavigation } from "../styles/util";
-import { authEnabled } from "../common/const";
-import { localLogout } from "../common/auth/util";
-
-interface NavigationProps {
-  profile: Profile | null;
-  login?: () => void;
-  logout?: () => void;
-}
 
 const MobileNavigation = styled.div`
   @media (min-width: ${breakpoints.m}) {
@@ -40,15 +30,16 @@ const UserMenu = styled(HDSNavigation.User)`
   }
 `;
 
-const Navigation = ({
-  profile,
-  login,
-  logout,
-}: NavigationProps): JSX.Element => {
+const Navigation = (): JSX.Element => {
   const { t } = useTranslation();
+  const { authState } = useAuthState();
+
+  const [loggingIn, setLoggingIn] = useState(false);
 
   const [isMenuOpen, setMenuState] = useState(false);
   const history = useHistory();
+
+  const { state, user, login, logout } = authState;
 
   return (
     <StyledHDSNavigation
@@ -72,41 +63,31 @@ const Navigation = ({
             onItemSelection={() => setMenuState(false)}
           />
         </MobileNavigation>
-        <UserMenu
-          userName={`${profile?.given_name || ""} ${
-            profile?.family_name || ""
-          }`.trim()}
-          authenticated={Boolean(profile)}
-          label={t("Navigation.login")}
-          onSignIn={() => login && login()}
-        >
-          <HDSNavigation.Item
-            label={t("Navigation.logout")}
-            onClick={() => logout && logout()}
-            variant="primary"
-          />
-        </UserMenu>
+        {state !== "Unknown" && (
+          <UserMenu
+            userName={`${user?.firstName || ""} ${user?.lastName || ""}`.trim()}
+            authenticated={state === "HasPermissions"}
+            label={t(loggingIn ? "Navigation.logging" : "Navigation.login")}
+            onSignIn={() => {
+              setLoggingIn(true);
+              if (login) {
+                setLoggingIn(true);
+                login();
+              } else {
+                throw Error("cannot log in");
+              }
+            }}
+          >
+            <HDSNavigation.Item
+              label={t("Navigation.logout")}
+              onClick={() => logout && logout()}
+              variant="primary"
+            />
+          </UserMenu>
+        )}
       </HDSNavigation.Actions>
     </StyledHDSNavigation>
   );
 };
 
-const NavigationWithProfileAndLogout = authEnabled
-  ? () => {
-      const { oidcUser, login, logout } = useReactOidc();
-      const profile = oidcUser ? oidcUser.profile : null;
-
-      return (
-        <Navigation
-          profile={profile}
-          login={() => login()}
-          logout={() => {
-            localLogout();
-            logout();
-          }}
-        />
-      );
-    }
-  : () => <Navigation profile={null} />;
-
-export default NavigationWithProfileAndLogout;
+export default Navigation;

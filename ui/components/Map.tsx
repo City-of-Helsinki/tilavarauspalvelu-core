@@ -57,7 +57,7 @@ const Map = ({
     >
       <NavigationControl style={navControlStyle} showCompass={false} />
       <Marker key={title} longitude={longitude} latitude={latitude}>
-        <Image src="/mapMarkerIcon.svg" height="42" width="32" alt="" />
+        <Image src="/icons/map_marker_icon.svg" height="42" width="32" alt="" />
       </Marker>
       <GeolocateControl
         style={geolocateControlStyle}

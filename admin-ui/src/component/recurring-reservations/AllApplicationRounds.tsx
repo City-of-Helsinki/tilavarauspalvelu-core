@@ -11,8 +11,8 @@ import { ApplicationRound as ApplicationRoundType } from "../../common/types";
 import { getApplicationRounds } from "../../common/api";
 import Loader from "../Loader";
 import { NotificationBox } from "../../styles/util";
-import Heading from "./Heading";
 import { applicationRoundUrl, prefixes } from "../../common/urls";
+import BreadcrumbWrapper from "../BreadcrumbWrapper";
 
 const Wrapper = styled.div``;
 
@@ -67,7 +67,9 @@ function AllApplicationRounds(): JSX.Element {
 
   return (
     <Wrapper>
-      <Heading hideAllRoundsLink />
+      <BreadcrumbWrapper
+        route={["recurring-reservations", "application-rounds"]}
+      />
       {applicationRounds && (
         <>
           <IngressContainer>

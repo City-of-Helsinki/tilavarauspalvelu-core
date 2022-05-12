@@ -48,6 +48,7 @@ interface PropsType {
 
 const TopContainer = styled.div`
   background-color: white;
+  padding-top: var(--spacing-m);
 `;
 
 const RightContainer = styled.div`
@@ -158,12 +159,10 @@ const Head = ({
       <BreadcrumbWrapper
         route={[
           viewType === "recurring" ? "/recurring" : "",
-          `/${searchUrlWithParams}`,
+          searchUrlWithParams,
           "reservationUnit",
         ]}
-        aliases={[
-          { slug: `/${searchUrlWithParams}`, title: t("breadcrumb:search") },
-        ]}
+        aliases={[{ slug: searchUrlWithParams, title: t("breadcrumb:search") }]}
       />
       <TopContainer>
         <Container>

@@ -25,6 +25,8 @@ describe("Tilavaraus ui reservation unit page (recurring)", () => {
     addressContainer(1).should("contain", "Avaa kartta uuteen ikkunaan");
     addressContainer(1).should("contain", "Google reittiohjeet");
     addressContainer(1).should("contain", "HSL Reittiopas");
+
+    cy.injectAxe();
   });
 
   describe("without equipment", () => {

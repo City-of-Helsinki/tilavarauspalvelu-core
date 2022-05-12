@@ -19,7 +19,7 @@ describe("recurring search lander", () => {
       .find("button")
       .should("contain.text", "Täytä hakemus");
     applicationRoundContainer("active")
-      .children("h3")
+      .children("h2")
       .should("contain.text", "Käynnissä olevat haut");
 
     applicationRoundContainer("pending")
@@ -28,7 +28,7 @@ describe("recurring search lander", () => {
       .find("button")
       .should("not.exist");
     applicationRoundContainer("pending")
-      .children("h3")
+      .children("h2")
       .should("contain.text", "Tulevat haut");
 
     applicationRoundContainer("past")
@@ -37,7 +37,7 @@ describe("recurring search lander", () => {
       .find("button")
       .should("not.exist");
     applicationRoundContainer("past")
-      .children("h3")
+      .children("h2")
       .should("contain.text", "Päättyneet haut");
 
     cy.checkA11y(null, null, null, true);
