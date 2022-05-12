@@ -76,40 +76,6 @@ export const RESERVATION_UNITS_QUERY = gql`
   }
 `;
 
-export const SEARCH_RESERVATION_UNITS_QUERY = gql`
-  query reservationUnits(
-    $textSearch: String
-    $maxPersonsGte: Float
-    $maxPersonsLte: Float
-  ) {
-    reservationUnits(
-      textSearch: $textSearch
-      maxPersonsGte: $maxPersonsGte
-      maxPersonsLte: $maxPersonsLte
-    ) {
-      edges {
-        node {
-          pk
-          nameFi
-          unit {
-            nameFi
-            pk
-          }
-          reservationUnitType {
-            nameFi
-          }
-          images {
-            imageType
-            mediumUrl
-          }
-          maxPersons
-          surfaceArea
-        }
-      }
-    }
-  }
-`;
-
 export const UNITS_QUERY = gql`
   query units {
     units {

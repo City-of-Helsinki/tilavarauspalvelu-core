@@ -9,6 +9,7 @@ import { ReactComponent as IconIndividualReservation } from "../images/icon_indi
 import { ReactComponent as IconPremises } from "../images/icon_premises.svg";
 import { truncatedText } from "../styles/typography";
 import { useData } from "../context/DataContext";
+import { prefixes } from "../common/urls";
 
 const Wrapper = styled.ul<{ placement: string }>`
   display: flex;
@@ -217,7 +218,7 @@ const menuTree: IMenuChild[] = [
     items: [
       {
         title: "MainMenu.reservationUnits",
-        route: "/reservationUnits",
+        route: prefixes.reservationUnits,
       },
       {
         title: "MainMenu.spaces",

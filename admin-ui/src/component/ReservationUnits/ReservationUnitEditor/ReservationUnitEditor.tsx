@@ -574,11 +574,6 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                       label={t("ReservationUnitEditor.label.spacePks")}
                       placeholder={t("ReservationUnitEditor.spacesPlaceholder")}
                       options={state.spaceOptions}
-                      clearButtonAriaLabel={t("common.clearAllSelections")}
-                      selectedItemRemoveButtonAriaLabel={t(
-                        "common.removeValue"
-                      )}
-                      toggleButtonAriaLabel={t("common.toggleMenu")}
                       onChange={(spaces) =>
                         dispatch({ type: "setSpaces", spaces })
                       }
@@ -603,11 +598,6 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                         "ReservationUnitEditor.resourcesPlaceholder"
                       )}
                       options={state.resourceOptions}
-                      clearButtonAriaLabel={t("common.clearAllSelections")}
-                      selectedItemRemoveButtonAriaLabel={t(
-                        "common.removeValue"
-                      )}
-                      toggleButtonAriaLabel={t("common.toggleMenu")}
                       onChange={(resources) =>
                         dispatch({ type: "setResources", resources })
                       }
@@ -720,11 +710,6 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                         "ReservationUnitEditor.purposesPlaceholder"
                       )}
                       options={state.purposeOptions}
-                      clearButtonAriaLabel={t("common.clearAllSelections")}
-                      selectedItemRemoveButtonAriaLabel={t(
-                        "common.removeValue"
-                      )}
-                      toggleButtonAriaLabel={t("common.toggleMenu")}
                       onChange={(purposes) =>
                         dispatch({ type: "setPurposes", purposes })
                       }
@@ -747,11 +732,6 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                         "ReservationUnitEditor.equipmentsPlaceholder"
                       )}
                       options={state.equipmentOptions}
-                      clearButtonAriaLabel={t("common.clearAllSelections")}
-                      selectedItemRemoveButtonAriaLabel={t(
-                        "common.removeValue"
-                      )}
-                      toggleButtonAriaLabel={t("common.toggleMenu")}
                       onChange={(equipments) =>
                         dispatch({ type: "setEquipments", equipments })
                       }
