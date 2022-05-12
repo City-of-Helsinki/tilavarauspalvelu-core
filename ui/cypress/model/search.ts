@@ -102,7 +102,7 @@ export function formResetButton(): Cypress.Chainable<JQuery<HTMLElement>> {
 }
 
 export function paginationButton(): Cypress.Chainable<JQuery<HTMLElement>> {
-  return cy.get("[data-test-id='search-form__pagination-button']");
+  return cy.get("[data-test-id='list-with-pagination__button--paginate']");
 }
 
 export function reservationUnitCards(

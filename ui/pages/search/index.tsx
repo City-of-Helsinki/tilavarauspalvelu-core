@@ -4,13 +4,13 @@ import styled from "styled-components";
 import { GetServerSideProps } from "next";
 import queryString from "query-string";
 import { useLocalStorage } from "react-use";
+import { Notification } from "hds-react";
 import { useRouter } from "next/router";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { isEqual, omit, pick, sortBy } from "lodash";
-import { useQuery } from "@apollo/client";
+import { NetworkStatus, useQuery } from "@apollo/client";
 import Container from "../../components/common/Container";
 import SearchForm from "../../components/search/SearchForm";
-import SearchResultList from "../../components/search/SearchResultList";
 import { OptionType } from "../../modules/types";
 import {
   applicationRoundState,
@@ -18,7 +18,6 @@ import {
   searchUrl,
 } from "../../modules/util";
 import { isBrowser } from "../../modules/const";
-import { CenterSpinner } from "../../components/common/common";
 import ClientOnly from "../../components/ClientOnly";
 import { H1, HeroSubheading } from "../../modules/style/typography";
 import KorosDefault from "../../components/common/KorosDefault";
@@ -36,6 +35,10 @@ import { breakpoint } from "../../modules/style";
 import apolloClient from "../../modules/apolloClient";
 import { APPLICATION_ROUNDS } from "../../modules/queries/applicationRound";
 import BreadcrumbWrapper from "../../components/common/BreadcrumbWrapper";
+import ReservationUnitCard from "../../components/search/ReservationUnitCard";
+import useReservationUnitsList from "../../hooks/useReservationUnitList";
+import ListWithPagination from "../../components/common/ListWithPagination";
+import StartApplicationBar from "../../components/common/StartApplicationBar";
 
 type Props = {
   applicationRounds: ApplicationRoundType[];
@@ -71,10 +74,10 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   };
 };
 
-const pagingLimit = 25;
+const pagingLimit = 36;
 
 const Wrapper = styled.div`
-  margin-bottom: var(--spacing-layout-xl);
+  margin-bottom: var(--spacing-layout-l);
   background-color: var(--tilavaraus-gray);
 `;
 
@@ -140,6 +143,14 @@ const processVariables = (values: Record<string, string>) => {
 };
 
 const Search = ({ applicationRounds }: Props): JSX.Element => {
+  const {
+    reservationUnits: selectedReservationUnits,
+    selectReservationUnit,
+    removeReservationUnit,
+    containsReservationUnit,
+    clearSelections,
+  } = useReservationUnitsList();
+
   const { t, i18n } = useTranslation();
 
   const sortingOptions = useMemo(
@@ -163,13 +174,14 @@ const Search = ({ applicationRounds }: Props): JSX.Element => {
   const [values, setValues] = useState({} as Record<string, string>);
   const setStoredValues = useLocalStorage("reservationUnit-search", null)[1];
 
-  const { data, fetchMore, loading, error } = useQuery<
+  const { data, fetchMore, loading, error, networkStatus } = useQuery<
     Query,
     QueryReservationUnitsArgs
   >(RESERVATION_UNITS, {
     variables: processVariables(values),
-    fetchPolicy: "network-only",
+    fetchPolicy: "cache-and-network",
     skip: Object.keys(values).length === 0,
+    notifyOnNetworkStatusChange: true,
   });
 
   const searchParams = isBrowser ? window.location.search : "";
@@ -177,6 +189,7 @@ const Search = ({ applicationRounds }: Props): JSX.Element => {
 
   const reservationUnits: ReservationUnitType[] =
     data?.reservationUnits?.edges?.map((edge) => edge.node);
+  const totalCount = data?.reservationUnits?.totalCount;
 
   const pageInfo: PageInfo = data?.reservationUnits?.pageInfo;
 
@@ -206,6 +219,11 @@ const Search = ({ applicationRounds }: Props): JSX.Element => {
     const params = queryString.parse(searchParams);
     setStoredValues(params);
   }, [setStoredValues, searchParams]);
+
+  const loadingMore = useMemo(
+    () => networkStatus === NetworkStatus.fetchMore,
+    [networkStatus]
+  );
 
   const history = useRouter();
 
@@ -238,6 +256,11 @@ const Search = ({ applicationRounds }: Props): JSX.Element => {
 
   return (
     <Wrapper>
+      {error ? (
+        <Notification size="small" type="alert">
+          {t("searchResultList:error")}
+        </Notification>
+      ) : null}
       <HeadContainer>
         <BreadcrumbWrapper route={["/recurring", "search"]} />
         <Container>
@@ -253,17 +276,31 @@ const Search = ({ applicationRounds }: Props): JSX.Element => {
       </HeadContainer>
       <KorosDefault from="white" to="var(--tilavaraus-gray)" />
       <ClientOnly>
-        {loading ? (
-          <CenterSpinner
-            style={{
-              margin: "var(--spacing-xl) auto var(--spacing-layout-2-xl)",
-            }}
-          />
-        ) : (
-          <SearchResultList
-            error={!!error}
+        <>
+          <ListWithPagination
+            id="searchResultList"
+            items={reservationUnits?.map((ru) => (
+              <ReservationUnitCard
+                selectReservationUnit={selectReservationUnit}
+                containsReservationUnit={containsReservationUnit}
+                removeReservationUnit={removeReservationUnit}
+                reservationUnit={ru}
+                key={ru.id}
+              />
+            ))}
             loading={loading}
-            reservationUnits={reservationUnits}
+            loadingMore={loadingMore}
+            pageInfo={pageInfo}
+            totalCount={totalCount}
+            fetchMore={(cursor) => {
+              const variables = {
+                ...values,
+                after: cursor,
+              };
+              fetchMore({
+                variables: processVariables(variables),
+              });
+            }}
             sortingComponent={
               <StyledSorting
                 value={values.sort}
@@ -285,18 +322,12 @@ const Search = ({ applicationRounds }: Props): JSX.Element => {
                 }}
               />
             }
-            fetchMore={(cursor) => {
-              const variables = {
-                ...values,
-                after: cursor,
-              };
-              fetchMore({
-                variables: processVariables(variables),
-              });
-            }}
-            pageInfo={pageInfo}
           />
-        )}
+          <StartApplicationBar
+            count={selectedReservationUnits.length}
+            clearSelections={clearSelections}
+          />
+        </>
       </ClientOnly>
     </Wrapper>
   );

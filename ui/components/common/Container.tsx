@@ -7,6 +7,7 @@ interface Props {
   main?: boolean;
   style?: React.CSSProperties;
   id?: string;
+  className?: string;
 }
 
 const styles = `

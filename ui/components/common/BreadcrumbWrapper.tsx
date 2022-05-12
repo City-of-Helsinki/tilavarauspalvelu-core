@@ -25,7 +25,7 @@ const Wrapper = styled.div`
 
 const BreadcrumbWrapper = ({ route, aliases }: Props): JSX.Element => {
   const { t } = useTranslation();
-  const isMobile = useMedia(`(max-width: ${breakpoint.m})`);
+  const isMobile = useMedia(`(max-width: ${breakpoint.m})`, false);
 
   const routes =
     route
