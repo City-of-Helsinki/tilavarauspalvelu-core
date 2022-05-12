@@ -19,7 +19,6 @@ import { useModal } from "../../context/ModalContext";
 import { ContentContainer, IngressContainer } from "../../styles/layout";
 import { H1 } from "../../styles/typography";
 import { BasicLink, breakpoints } from "../../styles/util";
-import LinkPrev from "../LinkPrev";
 import Loader from "../Loader";
 import ReservationUnitList from "./ReservationUnitList";
 import withMainMenu from "../withMainMenu";
@@ -31,6 +30,7 @@ import {
   ReservationUnitType,
   UnitByPkType,
 } from "../../common/gql-types";
+import BreadcrumbWrapper from "../BreadcrumbWrapper";
 
 interface IProps {
   unitPk: string;
@@ -191,8 +191,11 @@ const Unit = (): JSX.Element | null => {
 
   return (
     <Wrapper>
+      <BreadcrumbWrapper
+        route={["spaces-n-settings", "/units", "route"]}
+        aliases={[{ slug: "route", title: unit?.nameFi || "" }]}
+      />
       <ContentContainer>
-        <LinkPrev route="/units" />
         <Links>
           <BasicLink to={`/unit/${unitPk}/map`}>
             <IconMap style={{ marginTop: "-2px" }} /> {t("Unit.showOnMap")}

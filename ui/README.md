@@ -120,7 +120,9 @@ You can write handlers for rest and graphql requests in '/mocks/handlers.ts'. Ca
 | NEXT_PUBLIC_OIDC_URL             | https://api.hel.fi/sso                                        |
 | NEXT_PUBLIC_OIDC_SCOPE           | openid profile email https://api.hel.fi/auth/tilavarausapidev |
 | NEXT_PUBLIC_TILAVARAUS_API_SCOPE | https://api.hel.fi/auth/tilavarausapidev                      |
-| NEXT_PUBLIC_ENABLE_MATOMO        | 'true' enables matomo tracking                                |
 | NEXT_PUBLIC_MAPBOX_TOKEN         | token tor mapbox service                                      |
 | NEXT_PUBLIC_MOCK_REQUESTS        | 'true' enables network level request mocking                  |
+| NEXT_PUBLIC_COOKIEHUB_ENABLED    | 'true' enables cookiehub consent module                       |
+| NEXT_PUBLIC_MATOMO_ENABLED       | 'true' enables matomo tracking                                |
+| NEXT_PUBLIC_HOTJAR_ENABLED       | 'true' enables hotjar tracking                                |
 | SENTRY_AUTH_TOKEN                | auth token for sentry cli                                     |

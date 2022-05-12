@@ -189,6 +189,7 @@ export const RESERVATION_UNITS = gql`
         endCursor
         hasNextPage
       }
+      totalCount
     }
   }
 `;

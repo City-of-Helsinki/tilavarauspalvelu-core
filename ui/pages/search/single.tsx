@@ -1,19 +1,18 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useTranslation } from "next-i18next";
-import { useQuery } from "@apollo/client";
+import { NetworkStatus, useQuery } from "@apollo/client";
 import { GetServerSideProps } from "next";
 import styled from "styled-components";
 import queryString from "query-string";
 import { useRouter } from "next/router";
+import { Notification } from "hds-react";
 import { useLocalStorage } from "react-use";
 import { isEqual, omit, pick } from "lodash";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Container from "../../components/common/Container";
 import SearchForm from "../../components/single-search/SearchForm";
-import SearchResultList from "../../components/single-search/SearchResultList";
 import { capitalize, singleSearchUrl } from "../../modules/util";
 import { isBrowser } from "../../modules/const";
-import { CenterSpinner } from "../../components/common/common";
 import {
   PageInfo,
   Query,
@@ -25,8 +24,16 @@ import { RESERVATION_UNITS } from "../../modules/queries/reservationUnit";
 import Sorting from "../../components/form/Sorting";
 import { OptionType } from "../../modules/types";
 import KorosDefault from "../../components/common/KorosDefault";
+import ClientOnly from "../../components/ClientOnly";
+import ListWithPagination from "../../components/common/ListWithPagination";
+import ReservationUnitCard from "../../components/single-search/ReservationUnitCard";
 
-const pagingLimit = 25;
+const pagingLimit = 36;
+
+const Wrapper = styled.div`
+  margin-bottom: var(--spacing-layout-l);
+  background-color: var(--tilavaraus-gray);
+`;
 
 const HeadContainer = styled.div`
   background-color: white;
@@ -46,8 +53,6 @@ const StyledSorting = styled(Sorting)`
     display: flex;
   }
 `;
-
-const StyledKorosDefault = styled(KorosDefault)``;
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
@@ -118,17 +123,20 @@ const SearchSingle = (): JSX.Element => {
     null
   )[1];
 
-  const { data, fetchMore, loading, error } = useQuery<
+  const { data, fetchMore, loading, error, networkStatus } = useQuery<
     Query,
     QueryReservationUnitsArgs
   >(RESERVATION_UNITS, {
     variables: processVariables(values),
-    fetchPolicy: "network-only",
+    fetchPolicy: "cache-and-network",
     skip: Object.keys(values).length === 0,
+    notifyOnNetworkStatusChange: true,
   });
 
   const reservationUnits: ReservationUnitType[] =
     data?.reservationUnits?.edges?.map((edge) => edge.node);
+  const totalCount = data?.reservationUnits?.totalCount;
+
   const pageInfo: PageInfo = data?.reservationUnits?.pageInfo;
 
   const searchParams = isBrowser ? window.location.search : "";
@@ -161,6 +169,11 @@ const SearchSingle = (): JSX.Element => {
     setStoredValues(params);
   }, [setStoredValues, searchParams]);
 
+  const loadingMore = useMemo(
+    () => networkStatus === NetworkStatus.fetchMore,
+    [networkStatus]
+  );
+
   const history = useRouter();
 
   const onSearch = async (criteria: QueryReservationUnitsArgs) => {
@@ -191,7 +204,12 @@ const SearchSingle = (): JSX.Element => {
   const isOrderingAsc = values.order !== "desc";
 
   return (
-    <>
+    <Wrapper>
+      {error ? (
+        <Notification size="small" type="alert">
+          {t("searchResultList:error")}
+        </Notification>
+      ) : null}
       <HeadContainer>
         <Container>
           <Heading>{t("search:single.heading")}</Heading>
@@ -203,52 +221,52 @@ const SearchSingle = (): JSX.Element => {
           />
         </Container>
       </HeadContainer>
-      <StyledKorosDefault from="white" to="var(--tilavaraus-gray)" />
-      {loading ? (
-        <CenterSpinner
-          style={{
-            margin: "var(--spacing-xl) auto var(--spacing-layout-2-xl)",
-          }}
-        />
-      ) : (
-        <SearchResultList
-          error={!!error}
-          loading={loading}
-          reservationUnits={reservationUnits}
-          sortingComponent={
-            <StyledSorting
-              value={values.sort}
-              sortingOptions={sortingOptions}
-              setSorting={(val: OptionType) => {
-                const params = {
-                  ...values,
-                  sort: String(val.value),
-                };
-                history.replace(singleSearchUrl(params));
-              }}
-              isOrderingAsc={isOrderingAsc}
-              setIsOrderingAsc={(isAsc: boolean) => {
-                const params = {
-                  ...values,
-                  order: isAsc ? "asc" : "desc",
-                };
-                history.replace(singleSearchUrl(params));
-              }}
-            />
-          }
-          fetchMore={(cursor) => {
-            const variables = {
-              ...values,
-              after: cursor,
-            };
-            fetchMore({
-              variables: processVariables(variables),
-            });
-          }}
-          pageInfo={pageInfo}
-        />
-      )}
-    </>
+      <KorosDefault from="white" to="var(--tilavaraus-gray)" />
+      <ClientOnly>
+        <>
+          <ListWithPagination
+            id="searchResultList"
+            items={reservationUnits?.map((ru) => (
+              <ReservationUnitCard reservationUnit={ru} key={ru.id} />
+            ))}
+            loading={loading}
+            loadingMore={loadingMore}
+            pageInfo={pageInfo}
+            totalCount={totalCount}
+            fetchMore={(cursor) => {
+              const variables = {
+                ...values,
+                after: cursor,
+              };
+              fetchMore({
+                variables: processVariables(variables),
+              });
+            }}
+            sortingComponent={
+              <StyledSorting
+                value={values.sort}
+                sortingOptions={sortingOptions}
+                setSorting={(val: OptionType) => {
+                  const params = {
+                    ...values,
+                    sort: String(val.value),
+                  };
+                  history.replace(singleSearchUrl(params));
+                }}
+                isOrderingAsc={isOrderingAsc}
+                setIsOrderingAsc={(isAsc: boolean) => {
+                  const params = {
+                    ...values,
+                    order: isAsc ? "asc" : "desc",
+                  };
+                  history.replace(singleSearchUrl(params));
+                }}
+              />
+            }
+          />
+        </>
+      </ClientOnly>
+    </Wrapper>
   );
 };
 

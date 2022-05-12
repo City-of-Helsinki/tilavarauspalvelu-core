@@ -118,6 +118,7 @@ export type ApplicationRoundType = Node & {
   applicationPeriodBegin: Scalars["DateTime"];
   applicationPeriodEnd: Scalars["DateTime"];
   applicationRoundBaskets?: Maybe<Array<Maybe<ApplicationRoundBasketType>>>;
+  applicationsCount?: Maybe<Scalars["Int"]>;
   applicationsSent?: Maybe<Scalars["Boolean"]>;
   approvedBy?: Maybe<Scalars["String"]>;
   criteriaEn?: Maybe<Scalars["String"]>;
@@ -134,6 +135,7 @@ export type ApplicationRoundType = Node & {
   purposes?: Maybe<Array<Maybe<ReservationPurposeType>>>;
   reservationPeriodBegin: Scalars["Date"];
   reservationPeriodEnd: Scalars["Date"];
+  reservationUnitCount?: Maybe<Scalars["Int"]>;
   reservationUnits?: Maybe<Array<Maybe<ReservationUnitType>>>;
   serviceSector?: Maybe<ServiceSectorType>;
   status?: Maybe<Status>;
@@ -2523,6 +2525,9 @@ export type ServiceSectorType = Node & {
   __typename?: "ServiceSectorType";
   /** The ID of the object */
   id: Scalars["ID"];
+  nameEn?: Maybe<Scalars["String"]>;
+  nameFi?: Maybe<Scalars["String"]>;
+  nameSv?: Maybe<Scalars["String"]>;
   pk?: Maybe<Scalars["Int"]>;
 };
 
@@ -2918,6 +2923,9 @@ export const ApplicationRoundsDocument = gql`
           criteriaSv
           reservationUnits {
             pk
+            unit {
+              pk
+            }
           }
         }
       }
@@ -3223,6 +3231,60 @@ export type AgeGroupsLazyQueryHookResult = ReturnType<
 export type AgeGroupsQueryResult = Apollo.QueryResult<
   AgeGroupsQuery,
   AgeGroupsQueryVariables
+>;
+export const CitiesDocument = gql`
+  query Cities {
+    cities {
+      edges {
+        node {
+          pk
+          nameFi
+          nameEn
+          nameSv
+        }
+      }
+    }
+  }
+`;
+
+/**
+ * __useCitiesQuery__
+ *
+ * To run a query within a React component, call `useCitiesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCitiesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCitiesQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useCitiesQuery(
+  baseOptions?: Apollo.QueryHookOptions<CitiesQuery, CitiesQueryVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<CitiesQuery, CitiesQueryVariables>(
+    CitiesDocument,
+    options
+  );
+}
+export function useCitiesLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<CitiesQuery, CitiesQueryVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<CitiesQuery, CitiesQueryVariables>(
+    CitiesDocument,
+    options
+  );
+}
+export type CitiesQueryHookResult = ReturnType<typeof useCitiesQuery>;
+export type CitiesLazyQueryHookResult = ReturnType<typeof useCitiesLazyQuery>;
+export type CitiesQueryResult = Apollo.QueryResult<
+  CitiesQuery,
+  CitiesQueryVariables
 >;
 export const CreateReservationDocument = gql`
   mutation createReservation($input: ReservationCreateMutationInput!) {
@@ -4498,6 +4560,7 @@ export type ApplicationRoundsQuery = {
         reservationUnits?: Array<{
           __typename?: "ReservationUnitType";
           pk?: number | null;
+          unit?: { __typename?: "UnitType"; pk?: number | null } | null;
         } | null> | null;
       } | null;
     } | null>;
@@ -4578,6 +4641,25 @@ export type AgeGroupsQuery = {
         pk?: number | null;
         minimum: number;
         maximum?: number | null;
+      } | null;
+    } | null>;
+  } | null;
+};
+
+export type CitiesQueryVariables = Exact<{ [key: string]: never }>;
+
+export type CitiesQuery = {
+  __typename?: "Query";
+  cities?: {
+    __typename?: "CityTypeConnection";
+    edges: Array<{
+      __typename?: "CityTypeEdge";
+      node?: {
+        __typename?: "CityType";
+        pk?: number | null;
+        nameFi?: string | null;
+        nameEn?: string | null;
+        nameSv?: string | null;
       } | null;
     } | null>;
   } | null;

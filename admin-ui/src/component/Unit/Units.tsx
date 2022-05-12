@@ -22,6 +22,7 @@ import { ReactComponent as MapMarker } from "../../images/map_marker.svg";
 import { BasicLink, breakpoints } from "../../styles/util";
 import { UNITS_QUERY } from "../../common/queries";
 import { Query, UnitType } from "../../common/gql-types";
+import BreadcrumbWrapper from "../BreadcrumbWrapper";
 
 const Wrapper = styled.div``;
 
@@ -129,6 +130,7 @@ const Units = (): JSX.Element => {
 
   return (
     <Wrapper>
+      <BreadcrumbWrapper route={["spaces-n-settings", "units"]} />
       <Map
         markers={filteredResults
           .filter((r) => r.location?.latitude && r.location?.longitude)
