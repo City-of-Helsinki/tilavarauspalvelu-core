@@ -85,44 +85,77 @@ export type AgeGroupTypeEdge = {
   node?: Maybe<AgeGroupType>;
 };
 
-export type ApplicationRoundType = {
+export type AggregatedDataType = {
+  __typename?: "AggregatedDataType";
+  allocationDurationTotal?: Maybe<Scalars["Int"]>;
+  allocationResultEventsCount?: Maybe<Scalars["Int"]>;
+  totalHourCapacity?: Maybe<Scalars["Int"]>;
+  totalReservationDuration?: Maybe<Scalars["Int"]>;
+};
+
+export type ApplicationRoundBasketType = Node & {
+  __typename?: "ApplicationRoundBasketType";
+  ageGroupIds?: Maybe<Array<Maybe<Scalars["Int"]>>>;
+  allocationPercentage: Scalars["Int"];
+  customerType: Array<Maybe<Scalars["String"]>>;
+  homeCityId?: Maybe<Scalars["Int"]>;
+  /** The ID of the object */
+  id: Scalars["ID"];
+  mustBeMainPurposeOfApplicant: Scalars["Boolean"];
+  name: Scalars["String"];
+  orderNumber: Scalars["Int"];
+  pk?: Maybe<Scalars["Int"]>;
+  purposeIds?: Maybe<Array<Maybe<Scalars["Int"]>>>;
+};
+
+export type ApplicationRoundType = Node & {
   __typename?: "ApplicationRoundType";
+  aggregatedData?: Maybe<AggregatedDataType>;
   allocating: Scalars["Boolean"];
   applicationPeriodBegin: Scalars["DateTime"];
   applicationPeriodEnd: Scalars["DateTime"];
+  applicationRoundBaskets?: Maybe<Array<Maybe<ApplicationRoundBasketType>>>;
+  applicationsCount?: Maybe<Scalars["Int"]>;
+  applicationsSent?: Maybe<Scalars["Boolean"]>;
+  approvedBy?: Maybe<Scalars["String"]>;
   criteriaEn?: Maybe<Scalars["String"]>;
   criteriaFi?: Maybe<Scalars["String"]>;
   criteriaSv?: Maybe<Scalars["String"]>;
+  /** The ID of the object */
+  id: Scalars["ID"];
   nameEn?: Maybe<Scalars["String"]>;
   nameFi?: Maybe<Scalars["String"]>;
   nameSv?: Maybe<Scalars["String"]>;
   pk?: Maybe<Scalars["Int"]>;
   publicDisplayBegin: Scalars["DateTime"];
   publicDisplayEnd: Scalars["DateTime"];
-  purposes: ReservationPurposeTypeConnection;
+  purposes?: Maybe<Array<Maybe<ReservationPurposeType>>>;
   reservationPeriodBegin: Scalars["Date"];
   reservationPeriodEnd: Scalars["Date"];
-  reservationUnits: ReservationUnitByPkTypeConnection;
+  reservationUnitCount?: Maybe<Scalars["Int"]>;
+  reservationUnits?: Maybe<Array<Maybe<ReservationUnitType>>>;
+  serviceSector?: Maybe<ServiceSectorType>;
+  status?: Maybe<Status>;
+  statusTimestamp?: Maybe<Scalars["DateTime"]>;
   targetGroup: ApplicationsApplicationRoundTargetGroupChoices;
 };
 
-export type ApplicationRoundTypePurposesArgs = {
-  after?: InputMaybe<Scalars["String"]>;
-  before?: InputMaybe<Scalars["String"]>;
-  first?: InputMaybe<Scalars["Int"]>;
-  last?: InputMaybe<Scalars["Int"]>;
-  nameEn?: InputMaybe<Scalars["String"]>;
-  nameFi?: InputMaybe<Scalars["String"]>;
-  nameSv?: InputMaybe<Scalars["String"]>;
-  offset?: InputMaybe<Scalars["Int"]>;
+export type ApplicationRoundTypeConnection = {
+  __typename?: "ApplicationRoundTypeConnection";
+  /** Contains the nodes in this connection. */
+  edges: Array<Maybe<ApplicationRoundTypeEdge>>;
+  /** Pagination data for this connection. */
+  pageInfo: PageInfo;
+  totalCount?: Maybe<Scalars["Int"]>;
 };
 
-export type ApplicationRoundTypeReservationUnitsArgs = {
-  after?: InputMaybe<Scalars["String"]>;
-  before?: InputMaybe<Scalars["String"]>;
-  first?: InputMaybe<Scalars["Int"]>;
-  last?: InputMaybe<Scalars["Int"]>;
-  offset?: InputMaybe<Scalars["Int"]>;
+/** A Relay edge containing a `ApplicationRoundType` and its cursor. */
+export type ApplicationRoundTypeEdge = {
+  __typename?: "ApplicationRoundTypeEdge";
+  /** A cursor for use in pagination */
+  cursor: Scalars["String"];
+  /** The item at the end of the edge */
+  node?: Maybe<ApplicationRoundType>;
 };
 
 /** An enumeration. */
@@ -153,6 +186,9 @@ export type CityType = Node & {
   /** The ID of the object */
   id: Scalars["ID"];
   name: Scalars["String"];
+  nameEn?: Maybe<Scalars["String"]>;
+  nameFi?: Maybe<Scalars["String"]>;
+  nameSv?: Maybe<Scalars["String"]>;
   pk?: Maybe<Scalars["Int"]>;
 };
 
@@ -162,6 +198,7 @@ export type CityTypeConnection = {
   edges: Array<Maybe<CityTypeEdge>>;
   /** Pagination data for this connection. */
   pageInfo: PageInfo;
+  totalCount?: Maybe<Scalars["Int"]>;
 };
 
 /** A Relay edge containing a `CityType` and its cursor. */
@@ -230,6 +267,7 @@ export type EquipmentCategoryTypeConnection = {
   edges: Array<Maybe<EquipmentCategoryTypeEdge>>;
   /** Pagination data for this connection. */
   pageInfo: PageInfo;
+  totalCount?: Maybe<Scalars["Int"]>;
 };
 
 /** A Relay edge containing a `EquipmentCategoryType` and its cursor. */
@@ -311,6 +349,7 @@ export type EquipmentTypeConnection = {
   edges: Array<Maybe<EquipmentTypeEdge>>;
   /** Pagination data for this connection. */
   pageInfo: PageInfo;
+  totalCount?: Maybe<Scalars["Int"]>;
 };
 
 /** A Relay edge containing a `EquipmentType` and its cursor. */
@@ -367,6 +406,7 @@ export type KeywordCategoryTypeConnection = {
   edges: Array<Maybe<KeywordCategoryTypeEdge>>;
   /** Pagination data for this connection. */
   pageInfo: PageInfo;
+  totalCount?: Maybe<Scalars["Int"]>;
 };
 
 /** A Relay edge containing a `KeywordCategoryType` and its cursor. */
@@ -395,6 +435,7 @@ export type KeywordGroupTypeConnection = {
   edges: Array<Maybe<KeywordGroupTypeEdge>>;
   /** Pagination data for this connection. */
   pageInfo: PageInfo;
+  totalCount?: Maybe<Scalars["Int"]>;
 };
 
 /** A Relay edge containing a `KeywordGroupType` and its cursor. */
@@ -422,6 +463,7 @@ export type KeywordTypeConnection = {
   edges: Array<Maybe<KeywordTypeEdge>>;
   /** Pagination data for this connection. */
   pageInfo: PageInfo;
+  totalCount?: Maybe<Scalars["Int"]>;
 };
 
 /** A Relay edge containing a `KeywordType` and its cursor. */
@@ -676,6 +718,7 @@ export type PurposeTypeConnection = {
   edges: Array<Maybe<PurposeTypeEdge>>;
   /** Pagination data for this connection. */
   pageInfo: PageInfo;
+  totalCount?: Maybe<Scalars["Int"]>;
 };
 
 /** A Relay edge containing a `PurposeType` and its cursor. */
@@ -710,6 +753,7 @@ export type PurposeUpdateMutationPayload = {
 export type Query = {
   __typename?: "Query";
   ageGroups?: Maybe<AgeGroupTypeConnection>;
+  applicationRounds?: Maybe<ApplicationRoundTypeConnection>;
   cities?: Maybe<CityTypeConnection>;
   equipment?: Maybe<EquipmentType>;
   equipmentByPk?: Maybe<EquipmentType>;
@@ -750,6 +794,23 @@ export type QueryAgeGroupsArgs = {
   before?: InputMaybe<Scalars["String"]>;
   first?: InputMaybe<Scalars["Int"]>;
   last?: InputMaybe<Scalars["Int"]>;
+  offset?: InputMaybe<Scalars["Int"]>;
+};
+
+export type QueryApplicationRoundsArgs = {
+  after?: InputMaybe<Scalars["String"]>;
+  before?: InputMaybe<Scalars["String"]>;
+  first?: InputMaybe<Scalars["Int"]>;
+  last?: InputMaybe<Scalars["Int"]>;
+  nameEn?: InputMaybe<Scalars["String"]>;
+  nameEn_Icontains?: InputMaybe<Scalars["String"]>;
+  nameEn_Istartswith?: InputMaybe<Scalars["String"]>;
+  nameFi?: InputMaybe<Scalars["String"]>;
+  nameFi_Icontains?: InputMaybe<Scalars["String"]>;
+  nameFi_Istartswith?: InputMaybe<Scalars["String"]>;
+  nameSv?: InputMaybe<Scalars["String"]>;
+  nameSv_Icontains?: InputMaybe<Scalars["String"]>;
+  nameSv_Istartswith?: InputMaybe<Scalars["String"]>;
   offset?: InputMaybe<Scalars["Int"]>;
 };
 
@@ -926,6 +987,7 @@ export type QueryReservationUnitTypesArgs = {
 
 export type QueryReservationUnitsArgs = {
   after?: InputMaybe<Scalars["String"]>;
+  applicationRound?: InputMaybe<Array<InputMaybe<Scalars["ID"]>>>;
   before?: InputMaybe<Scalars["String"]>;
   first?: InputMaybe<Scalars["Int"]>;
   isDraft?: InputMaybe<Scalars["Boolean"]>;
@@ -934,10 +996,18 @@ export type QueryReservationUnitsArgs = {
   last?: InputMaybe<Scalars["Int"]>;
   maxPersonsGte?: InputMaybe<Scalars["Float"]>;
   maxPersonsLte?: InputMaybe<Scalars["Float"]>;
+  nameEn?: InputMaybe<Scalars["String"]>;
+  nameFi?: InputMaybe<Scalars["String"]>;
+  nameSv?: InputMaybe<Scalars["String"]>;
   offset?: InputMaybe<Scalars["Int"]>;
   orderBy?: InputMaybe<Scalars["String"]>;
+  pk?: InputMaybe<Array<InputMaybe<Scalars["ID"]>>>;
   purposes?: InputMaybe<Array<InputMaybe<Scalars["ID"]>>>;
+  rankGte?: InputMaybe<Scalars["Float"]>;
+  rankLte?: InputMaybe<Scalars["Float"]>;
   reservationUnitType?: InputMaybe<Array<InputMaybe<Scalars["ID"]>>>;
+  surfaceAreaGte?: InputMaybe<Scalars["Float"]>;
+  surfaceAreaLte?: InputMaybe<Scalars["Float"]>;
   textSearch?: InputMaybe<Scalars["String"]>;
   unit?: InputMaybe<Array<InputMaybe<Scalars["ID"]>>>;
 };
@@ -1423,6 +1493,7 @@ export type ReservationType = Node & {
   bufferTimeAfter?: Maybe<Scalars["Duration"]>;
   bufferTimeBefore?: Maybe<Scalars["Duration"]>;
   calendarUrl?: Maybe<Scalars["String"]>;
+  cancelDetails: Scalars["String"];
   description?: Maybe<Scalars["String"]>;
   end: Scalars["DateTime"];
   freeOfChargeReason?: Maybe<Scalars["String"]>;
@@ -1565,23 +1636,6 @@ export type ReservationUnitByPkTypeReservationsArgs = {
   to?: InputMaybe<Scalars["Date"]>;
 };
 
-export type ReservationUnitByPkTypeConnection = {
-  __typename?: "ReservationUnitByPkTypeConnection";
-  /** Contains the nodes in this connection. */
-  edges: Array<Maybe<ReservationUnitByPkTypeEdge>>;
-  /** Pagination data for this connection. */
-  pageInfo: PageInfo;
-};
-
-/** A Relay edge containing a `ReservationUnitByPkType` and its cursor. */
-export type ReservationUnitByPkTypeEdge = {
-  __typename?: "ReservationUnitByPkTypeEdge";
-  /** A cursor for use in pagination */
-  cursor: Scalars["String"];
-  /** The item at the end of the edge */
-  node?: Maybe<ReservationUnitByPkType>;
-};
-
 export type ReservationUnitCancellationRuleType = Node & {
   __typename?: "ReservationUnitCancellationRuleType";
   /** Seconds before reservations related to this cancellation rule can be cancelled without handling. */
@@ -1601,6 +1655,7 @@ export type ReservationUnitCancellationRuleTypeConnection = {
   edges: Array<Maybe<ReservationUnitCancellationRuleTypeEdge>>;
   /** Pagination data for this connection. */
   pageInfo: PageInfo;
+  totalCount?: Maybe<Scalars["Int"]>;
 };
 
 /** A Relay edge containing a `ReservationUnitCancellationRuleType` and its cursor. */
@@ -1785,6 +1840,7 @@ export type ReservationUnitImageType = {
   __typename?: "ReservationUnitImageType";
   imageType: ReservationUnitsReservationUnitImageImageTypeChoices;
   imageUrl?: Maybe<Scalars["String"]>;
+  largeUrl?: Maybe<Scalars["String"]>;
   mediumUrl?: Maybe<Scalars["String"]>;
   pk?: Maybe<Scalars["Int"]>;
   smallUrl?: Maybe<Scalars["String"]>;
@@ -1853,6 +1909,8 @@ export type ReservationUnitType = Node & {
   /** Time after this reservation unit should not be publicly visible in UI. */
   publishEnds?: Maybe<Scalars["DateTime"]>;
   purposes?: Maybe<Array<Maybe<PurposeType>>>;
+  /** Order number to be use in api sorting. */
+  rank?: Maybe<Scalars["Int"]>;
   requireIntroduction: Scalars["Boolean"];
   /** Does reservations of this reservation unit need to be handled before they're confirmed. */
   requireReservationHandling: Scalars["Boolean"];
@@ -1893,6 +1951,7 @@ export type ReservationUnitTypeConnection = {
   edges: Array<Maybe<ReservationUnitTypeEdge>>;
   /** Pagination data for this connection. */
   pageInfo: PageInfo;
+  totalCount?: Maybe<Scalars["Int"]>;
 };
 
 /** A Relay edge containing a `ReservationUnitType` and its cursor. */
@@ -1920,6 +1979,7 @@ export type ReservationUnitTypeTypeConnection = {
   edges: Array<Maybe<ReservationUnitTypeTypeEdge>>;
   /** Pagination data for this connection. */
   pageInfo: PageInfo;
+  totalCount?: Maybe<Scalars["Int"]>;
 };
 
 /** A Relay edge containing a `ReservationUnitTypeType` and its cursor. */
@@ -2337,6 +2397,7 @@ export type ResourceTypeConnection = {
   edges: Array<Maybe<ResourceTypeEdge>>;
   /** Pagination data for this connection. */
   pageInfo: PageInfo;
+  totalCount?: Maybe<Scalars["Int"]>;
 };
 
 /** A Relay edge containing a `ResourceType` and its cursor. */
@@ -2397,6 +2458,16 @@ export enum ResourcesResourceLocationTypeChoices {
   /** Movable */
   Movable = "MOVABLE",
 }
+
+export type ServiceSectorType = Node & {
+  __typename?: "ServiceSectorType";
+  /** The ID of the object */
+  id: Scalars["ID"];
+  nameEn?: Maybe<Scalars["String"]>;
+  nameFi?: Maybe<Scalars["String"]>;
+  nameSv?: Maybe<Scalars["String"]>;
+  pk?: Maybe<Scalars["Int"]>;
+};
 
 export type ServiceType = Node & {
   __typename?: "ServiceType";
@@ -2494,6 +2565,7 @@ export type SpaceTypeConnection = {
   edges: Array<Maybe<SpaceTypeEdge>>;
   /** Pagination data for this connection. */
   pageInfo: PageInfo;
+  totalCount?: Maybe<Scalars["Int"]>;
 };
 
 /** A Relay edge containing a `SpaceType` and its cursor. */
@@ -2558,6 +2630,7 @@ export type TaxPercentageTypeConnection = {
   edges: Array<Maybe<TaxPercentageTypeEdge>>;
   /** Pagination data for this connection. */
   pageInfo: PageInfo;
+  totalCount?: Maybe<Scalars["Int"]>;
 };
 
 /** A Relay edge containing a `TaxPercentageType` and its cursor. */
@@ -2603,6 +2676,7 @@ export type TermsOfUseTypeConnection = {
   edges: Array<Maybe<TermsOfUseTypeEdge>>;
   /** Pagination data for this connection. */
   pageInfo: PageInfo;
+  totalCount?: Maybe<Scalars["Int"]>;
 };
 
 /** A Relay edge containing a `TermsOfUseType` and its cursor. */
@@ -2689,6 +2763,7 @@ export type UnitTypeConnection = {
   edges: Array<Maybe<UnitTypeEdge>>;
   /** Pagination data for this connection. */
   pageInfo: PageInfo;
+  totalCount?: Maybe<Scalars["Int"]>;
 };
 
 /** A Relay edge containing a `UnitType` and its cursor. */
@@ -2752,4 +2827,15 @@ export enum State {
   Denied = "DENIED",
   /** requires_handling */
   RequiresHandling = "REQUIRES_HANDLING",
+}
+
+/** An enumeration. */
+export enum Status {
+  Allocated = "allocated",
+  Approved = "approved",
+  Draft = "draft",
+  Handled = "handled",
+  InReview = "in_review",
+  ReviewDone = "review_done",
+  Validated = "validated",
 }

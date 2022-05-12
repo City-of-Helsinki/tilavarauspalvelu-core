@@ -29,14 +29,9 @@ import {
 } from "../../common/types";
 import { formatNumber, parseAgeGroups, parseDuration } from "../../common/util";
 import { processAllocationResult } from "../../common/AllocationResult";
-import {
-  ContentContainer,
-  IngressContainer,
-  NarrowContainer,
-} from "../../styles/layout";
+import { IngressContainer, NarrowContainer } from "../../styles/layout";
 import { H1, H2, H3 } from "../../styles/typography";
 import { BasicLink, breakpoints, Divider } from "../../styles/util";
-import LinkPrev from "../LinkPrev";
 import Loader from "../Loader";
 import withMainMenu from "../withMainMenu";
 import ApplicantBox from "./ApplicantBox";
@@ -44,6 +39,8 @@ import RecommendedSlot from "./RecommendedSlot";
 import ApplicationEventStatusBlock from "../applications/ApplicationEventStatusBlock";
 import Dialog from "../Dialog";
 import { applicationRoundUrl } from "../../common/urls";
+import BreadcrumbWrapper from "../BreadcrumbWrapper";
+import { applicantName } from "../applications/util";
 
 interface IRouteParams {
   applicationRoundId: string;
@@ -68,6 +65,7 @@ const Top = styled.div`
   }
 
   display: grid;
+  margin-top: var(--spacing-l);
 
   @media (min-width: ${breakpoints.l}) {
     & > div {
@@ -479,9 +477,23 @@ function Recommendation(): JSX.Element {
 
   return (
     <Wrapper>
-      <ContentContainer>
-        <LinkPrev route={applicationRoundUrl(applicationRoundId)} />
-      </ContentContainer>
+      <BreadcrumbWrapper
+        route={[
+          "recurring-reservations",
+          "/recurring-reservations/application-rounds",
+          `/recurring-reservations/application-rounds/${applicationRound?.id}`,
+          `/application/${application?.id}/details`,
+          "recommendation",
+        ]}
+        aliases={[
+          { slug: "application-round", title: applicationRound?.name },
+          { slug: `${applicationRound?.id}`, title: applicationRound?.name },
+          {
+            slug: "details",
+            title: applicantName(application as ApplicationType),
+          },
+        ]}
+      />
       {application && recommendation && (
         <>
           <IngressContainer>

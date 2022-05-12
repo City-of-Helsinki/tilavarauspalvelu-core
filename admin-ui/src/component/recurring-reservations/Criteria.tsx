@@ -20,13 +20,13 @@ import {
   ReservationUnit as ReservationUnitType,
 } from "../../common/types";
 import Loader from "../Loader";
-import LinkPrev from "../LinkPrev";
 import TimeframeStatus from "./TimeframeStatus";
 import { breakpoints, Strong } from "../../styles/util";
 import { ReactComponent as RecurringReservationIcon } from "../../images/icon_recurring-reservation.svg";
 import Accordion from "../Accordion";
 import { formatDate, localizedValue, parseAgeGroups } from "../../common/util";
 import i18n from "../../i18n";
+import BreadcrumbWrapper from "../BreadcrumbWrapper";
 
 interface IRouteParams {
   applicationRoundId: string;
@@ -270,7 +270,21 @@ function Criteria(): JSX.Element {
       {applicationRound && ageGroups && purposes && cities && reservationUnits && (
         <>
           <ContentContainer>
-            <LinkPrev />
+            <BreadcrumbWrapper
+              route={[
+                "recurring-reservations",
+                "/recurring-reservations/application-rounds",
+                `/recurring-reservations/application-rounds/${applicationRound.id}`,
+                "criteria",
+              ]}
+              aliases={[
+                { slug: "application-round", title: applicationRound.name },
+                {
+                  slug: `${applicationRound.id}`,
+                  title: applicationRound.name,
+                },
+              ]}
+            />
           </ContentContainer>
           <IngressContainer>
             <Title>{applicationRound.name}</Title>

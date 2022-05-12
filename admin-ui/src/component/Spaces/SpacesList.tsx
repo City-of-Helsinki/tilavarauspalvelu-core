@@ -22,9 +22,10 @@ import { breakpoints, Strong } from "../../styles/util";
 import ClearButton from "../ClearButton";
 import { SPACES_QUERY } from "../../common/queries";
 import { Query, SpaceType } from "../../common/gql-types";
+import BreadcrumbWrapper from "../BreadcrumbWrapper";
 
 const Wrapper = styled.div`
-  padding: var(--spacing-layout-2-xl) 0;
+  padding: var(--spacing-layout-xl) 0;
 `;
 
 const SearchContainer = styled.div`
@@ -216,42 +217,45 @@ const SpacesList = (): JSX.Element => {
     : spaces;
 
   return (
-    <Wrapper>
-      <IngressContainer>
-        <H1>{t("Spaces.spaceListHeading")}</H1>
-        <p>{t("Spaces.spaceListDescription")}</p>
-        <SearchContainer>
-          <IconSearch className="searchIcon" />
-          <StyledInput
-            id="spacesSearch"
-            placeholder={t("Spaces.searchPlaceholder")}
-            onChange={(event: ChangeEvent<HTMLInputElement>) => {
-              cancelTypeahead();
-              setSearchValue(event.target.value);
-            }}
-            value={searchValue || ""}
-          />
-          {searchValue && (
-            <ClearButton
-              onClick={() => {
-                setSearchTerm(null);
-                setSearchValue(null);
+    <>
+      <BreadcrumbWrapper route={["spaces-n-settings", "spaces"]} />
+      <Wrapper>
+        <IngressContainer>
+          <H1>{t("Spaces.spaceListHeading")}</H1>
+          <p>{t("Spaces.spaceListDescription")}</p>
+          <SearchContainer>
+            <IconSearch className="searchIcon" />
+            <StyledInput
+              id="spacesSearch"
+              placeholder={t("Spaces.searchPlaceholder")}
+              onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                cancelTypeahead();
+                setSearchValue(event.target.value);
               }}
+              value={searchValue || ""}
             />
-          )}
-        </SearchContainer>
-        <SpaceCount>
-          {spaces.length} {t("common.volumeUnit")}
-        </SpaceCount>
-      </IngressContainer>
-      <DataTable
-        groups={[{ id: 1, data: filteredSpaces }]}
-        hasGrouping={false}
-        config={{ filtering: true, rowFilters: true }}
-        cellConfig={cellConfig}
-        filterConfig={filterConfig}
-      />
-    </Wrapper>
+            {searchValue && (
+              <ClearButton
+                onClick={() => {
+                  setSearchTerm(null);
+                  setSearchValue(null);
+                }}
+              />
+            )}
+          </SearchContainer>
+          <SpaceCount>
+            {spaces.length} {t("common.volumeUnit")}
+          </SpaceCount>
+        </IngressContainer>
+        <DataTable
+          groups={[{ id: 1, data: filteredSpaces }]}
+          hasGrouping={false}
+          config={{ filtering: true, rowFilters: true }}
+          cellConfig={cellConfig}
+          filterConfig={filterConfig}
+        />
+      </Wrapper>
+    </>
   );
 };
 
