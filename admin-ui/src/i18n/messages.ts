@@ -942,8 +942,8 @@ const translations: ITranslations = {
     moreFilters: ["Näytä lisää suodattimia"],
     lessFilters: ["Näytä vähemmän suodattimia"],
     filter: {
-      maxPersonsGte: ["Maksimi henkilömäärä"],
-      maxPersonsLte: ["Minimi henkilömäärä"],
+      maxPersonsGte: ["Minimi henkilömäärä"],
+      maxPersonsLte: ["Maksimi henkilömäärä"],
       surfaceAreaGte: ["Minimi pinta-ala"],
       surfaceAreaLte: ["Maksimi pinta-ala"],
     },

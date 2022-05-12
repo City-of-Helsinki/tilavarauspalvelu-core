@@ -57,7 +57,7 @@ const RangeContrainer = styled.div`
 
 const Tags = styled.div`
   display: flex;
-  gap: var(--spacing-3-xl);
+  gap: var(--spacing-s);
   flex-wrap: wrap;
 `;
 
