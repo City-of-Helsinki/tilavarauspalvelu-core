@@ -170,6 +170,18 @@ const translations: ITranslations = {
     errorStartingAllocation: ["Allokoinnin käynnistys epäonnistui"],
     errorSavingData: ["Virhe tallennettaessa tietoja"],
   },
+  breadcrumb: {
+    frontpage: ["Etusivu"],
+    "recurring-reservations": ["Kausivaraaminen"],
+    "application-rounds": ["Hakukierrokset"],
+    criteria: ["Kriteerit"],
+    recommendation: ["Ehdotus"],
+    "spaces-n-settings": ["Tilat ja asetukset"],
+    "reservation-units": ["Varausyksiköt"],
+    spaces: ["Tilat"],
+    resources: ["Resurssit"],
+    units: ["Toimipisteet"],
+  },
   MainLander: {
     ingress: [
       "Tässä palvelussa voit käsitellä Helsingin kaupungin tilavaraushakemuksia sekä asettaa tiloja ja laitteita varattaviksi.",

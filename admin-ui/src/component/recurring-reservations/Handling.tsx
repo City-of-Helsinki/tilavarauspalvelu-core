@@ -52,11 +52,11 @@ import {
 } from "../../common/api";
 import SelectionActionBar from "../SelectionActionBar";
 import RecommendationDataTableGroup from "./RecommendationDataTableGroup";
-import Heading from "./Heading";
 import {
   applicationRoundApplications,
   applicationRoundUrl,
 } from "../../common/urls";
+import BreadcrumbWrapper from "../BreadcrumbWrapper";
 
 interface IProps {
   applicationRound: ApplicationRoundType;
@@ -457,7 +457,14 @@ function Handling({
 
   return (
     <Wrapper>
-      <Heading />
+      <BreadcrumbWrapper
+        route={[
+          "recurring-reservations",
+          "/recurring-reservations/application-rounds",
+          "application-round",
+        ]}
+        aliases={[{ slug: "application-round", title: applicationRound.name }]}
+      />
       {applicationRound && (
         <>
           {!isApplicationRoundApproved && (

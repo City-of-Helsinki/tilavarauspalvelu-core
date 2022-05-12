@@ -20,9 +20,10 @@ import {
   QueryReservationUnitArgs,
   ReservationUnitType,
 } from "../../common/gql-types";
+import BreadcrumbWrapper from "../BreadcrumbWrapper";
 
 const Wrapper = styled.div`
-  padding: var(--spacing-layout-2-xl) 0;
+  padding: var(--spacing-layout-xl) 0;
 `;
 
 const SearchContainer = styled.div`
@@ -197,28 +198,31 @@ const ReservationUnitsList = (): JSX.Element => {
   }
 
   return (
-    <Wrapper>
-      <IngressContainer>
-        <H1>{t("ReservationUnits.reservationUnitListHeading")}</H1>
-        <p>{t("ReservationUnits.reservationUnitListDescription")}</p>
-        <SearchContainer>
-          <BasicLink to="/reservationUnits/search">
-            <IconSearch />
-            {t("ReservationUnits.switchToSearch")}
-          </BasicLink>
-        </SearchContainer>
-        <ReservationUnitCount>
-          {reservationUnits.length} {t("common.volumeUnit")}
-        </ReservationUnitCount>
-      </IngressContainer>
-      <DataTable
-        groups={[{ id: 1, data: reservationUnits }]}
-        hasGrouping={false}
-        config={{ filtering: true, rowFilters: true }}
-        cellConfig={cellConfig}
-        filterConfig={filterConfig}
-      />
-    </Wrapper>
+    <>
+      <BreadcrumbWrapper route={["spaces-n-settings", "reservation-units"]} />
+      <Wrapper>
+        <IngressContainer>
+          <H1>{t("ReservationUnits.reservationUnitListHeading")}</H1>
+          <p>{t("ReservationUnits.reservationUnitListDescription")}</p>
+          <SearchContainer>
+            <BasicLink to="/reservationUnits/search">
+              <IconSearch />
+              {t("ReservationUnits.switchToSearch")}
+            </BasicLink>
+          </SearchContainer>
+          <ReservationUnitCount>
+            {reservationUnits.length} {t("common.volumeUnit")}
+          </ReservationUnitCount>
+        </IngressContainer>
+        <DataTable
+          groups={[{ id: 1, data: reservationUnits }]}
+          hasGrouping={false}
+          config={{ filtering: true, rowFilters: true }}
+          cellConfig={cellConfig}
+          filterConfig={filterConfig}
+        />
+      </Wrapper>
+    </>
   );
 };
 
