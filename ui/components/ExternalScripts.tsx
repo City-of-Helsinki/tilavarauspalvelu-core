@@ -1,21 +1,30 @@
 import React from "react";
 import Script from "next/script";
-import { matomoEnabled, isBrowser } from "../modules/const";
+import {
+  matomoEnabled,
+  cookiehubEnabled,
+  hotjarEnabled,
+  isBrowser,
+} from "../modules/const";
 
 const ExternalScripts = (): JSX.Element | null => {
-  if (!isBrowser || !matomoEnabled) {
+  if (!isBrowser) {
     return null;
   }
 
   return (
     <>
-      <Script
-        id="cookiehub"
-        strategy="afterInteractive"
-        dangerouslySetInnerHTML={{
-          // eslint-disable-next-line
-          __html: `
+      {cookiehubEnabled && (
+        <Script
+          id="cookiehub"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            // eslint-disable-next-line
+            __html: `
 var cpm = {
+  cookie: {
+    domain: ''
+  },
   language: document.documentElement.lang !== null
     ? document.documentElement.lang.substr(0, 2)
     : "fi",
@@ -27,16 +36,18 @@ e.onload=function(){u.cookiehub.load(b);}
 d.parentNode.insertBefore(e,d);
 })(document,window,cpm);
 `,
-        }}
-      />
-      <Script
-        data-consent="analytics"
-        type="text/plain"
-        strategy="afterInteractive"
-        id="matomo"
-        dangerouslySetInnerHTML={{
-          // eslint-disable-next-line
-          __html: `
+          }}
+        />
+      )}
+      {matomoEnabled && (
+        <Script
+          data-consent="analytics"
+          type="text/plain"
+          strategy="afterInteractive"
+          id="matomo"
+          dangerouslySetInnerHTML={{
+            // eslint-disable-next-line
+            __html: `
 (function () {
   var _paq = (window._paq = window._paq || []);
   _paq.push(["requireCookieConsent"]);
@@ -54,8 +65,30 @@ d.parentNode.insertBefore(e,d);
   s.parentNode.insertBefore(g, s);
 })();
   `,
-        }}
-      />
+          }}
+        />
+      )}
+      {hotjarEnabled && (
+        <Script
+          id="hotjar"
+          strategy="afterInteractive"
+          data-consent="analytics"
+          type="text/plain"
+          dangerouslySetInnerHTML={{
+            // eslint-disable-next-line
+            __html: `
+(function(h,o,t,j,a,r){
+  h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+  h._hjSettings={hjid:2913591,hjsv:6};
+  a=o.getElementsByTagName('head')[0];
+  r=o.createElement('script');r.async=1;
+  r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+  a.appendChild(r);
+})(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
+          `,
+          }}
+        />
+      )}
     </>
   );
 };
