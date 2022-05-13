@@ -9,6 +9,16 @@ type AbilityGroupType {
   pk: Int
 }
 
+type AddressType implements Node {
+  streetAddress: String!
+  postCode: String!
+  city: String!
+
+  """The ID of the object"""
+  id: ID!
+  pk: Int
+}
+
 type AgeGroupType implements Node {
   minimum: Int!
   maximum: Int
@@ -35,7 +45,68 @@ type AgeGroupTypeEdge {
   cursor: String!
 }
 
-type AggregatedDataType {
+type ApplicationAggregatedDataType {
+  appliedMinDurationTotal: Float
+  appliedReservationsTotal: Float
+  createdReservationsTotal: Float
+  reservationsDurationTotal: Float
+}
+
+type ApplicationEventAggregatedDataType {
+  durationTotal: Float
+  reservationsTotal: Float
+  allocationResultsDurationTotal: Float
+  allocationResultsReservationsTotal: Float
+}
+
+type ApplicationEventScheduleType implements Node {
+  """The ID of the object"""
+  id: ID!
+  day: ApplicationsApplicationEventScheduleDayChoices!
+  begin: Time!
+  end: Time!
+  priority: ApplicationsApplicationEventSchedulePriorityChoices!
+  pk: Int
+}
+
+"""An enumeration."""
+enum applicationEventStatus {
+  created
+  allocated
+  validated
+  approved
+  declined
+}
+
+type ApplicationEventType implements Node {
+  """The ID of the object"""
+  id: ID!
+  name: String!
+  numPersons: Int
+  abilityGroup: AbilityGroupType
+  minDuration: Float
+  maxDuration: Float
+  eventsPerWeek: Int
+  biweekly: Boolean!
+  begin: Date
+  end: Date
+  purpose: ReservationPurposeType
+  uuid: UUID!
+  aggregatedData: ApplicationEventAggregatedDataType
+  eventReservationUnits: [EventReservationUnitType!]
+  applicationEventSchedules: [ApplicationEventScheduleType!]
+  pk: Int
+  ageGroupId: Int
+  abilityGroupId: Int
+  applicationId: Int
+  purposeId: Int
+  ageGroupDisplay: AgeGroupType
+  status: applicationEventStatus
+  weeklyAmountReductionsCount: Int
+  declinedReservationUnits: [ReservationUnitType!]
+}
+
+type ApplicationRoundAggregatedDataType {
   allocationResultEventsCount: Int
   allocationDurationTotal: Int
   totalReservationDuration: Int
@@ -54,6 +125,17 @@ type ApplicationRoundBasketType implements Node {
   purposeIds: [Int]
   ageGroupIds: [Int]
   homeCityId: Int
+}
+
+"""An enumeration."""
+enum applicationRoundStatus {
+  draft
+  in_review
+  review_done
+  allocated
+  handled
+  validated
+  approved
 }
 
 type ApplicationRoundType implements Node {
@@ -76,10 +158,10 @@ type ApplicationRoundType implements Node {
   criteriaFi: String
   criteriaEn: String
   criteriaSv: String
-  aggregatedData: AggregatedDataType
+  aggregatedData: ApplicationRoundAggregatedDataType
   applicationRoundBaskets: [ApplicationRoundBasketType]
   pk: Int
-  status: status
+  status: applicationRoundStatus
   statusTimestamp: DateTime
   approvedBy: String
   applicationsSent: Boolean
@@ -106,6 +188,57 @@ type ApplicationRoundTypeEdge {
 }
 
 """An enumeration."""
+enum ApplicationsApplicationApplicantTypeChoices {
+  """Individual"""
+  INDIVIDUAL
+
+  """Association"""
+  ASSOCIATION
+
+  """Community"""
+  COMMUNITY
+
+  """Company"""
+  COMPANY
+}
+
+"""An enumeration."""
+enum ApplicationsApplicationEventScheduleDayChoices {
+  """maanantai"""
+  A_0
+
+  """tiistai"""
+  A_1
+
+  """keskiviikko"""
+  A_2
+
+  """torstai"""
+  A_3
+
+  """perjantai"""
+  A_4
+
+  """lauantai"""
+  A_5
+
+  """sunnuntai"""
+  A_6
+}
+
+"""An enumeration."""
+enum ApplicationsApplicationEventSchedulePriorityChoices {
+  """Low"""
+  A_100
+
+  """Medium"""
+  A_200
+
+  """High"""
+  A_300
+}
+
+"""An enumeration."""
 enum ApplicationsApplicationRoundTargetGroupChoices {
   """Internal"""
   INTERNAL
@@ -115,6 +248,78 @@ enum ApplicationsApplicationRoundTargetGroupChoices {
 
   """Kaikki"""
   ALL
+}
+
+"""An enumeration."""
+enum ApplicationsOrganisationOrganisationTypeChoices {
+  """Company"""
+  COMPANY
+
+  """Registered association"""
+  REGISTERED_ASSOCIATION
+
+  """Public association"""
+  PUBLIC_ASSOCIATION
+
+  """Unregistered association"""
+  UNREGISTERED_ASSOCIATION
+
+  """Municipality consortium"""
+  MUNICIPALITY_CONSORTIUM
+
+  """Religious community"""
+  RELIGIOUS_COMMUNITY
+}
+
+"""An enumeration."""
+enum applicationStatus {
+  draft
+  in_review
+  review_done
+  sent
+  declined
+  cancelled
+}
+
+type ApplicationType implements Node {
+  """The ID of the object"""
+  id: ID!
+  applicantType: ApplicationsApplicationApplicantTypeChoices
+  organisation: OrganisationType
+  contactPerson: PersonType
+  billingAddress: AddressType
+  homeCity: CityType
+
+  """Additional information about the application"""
+  additionalInformation: String
+  createdDate: DateTime!
+  lastModifiedDate: DateTime!
+  aggregatedData: ApplicationAggregatedDataType
+  applicationEvents: [ApplicationEventType!]
+  pk: Int
+  applicationRoundId: Int
+  status: applicationStatus
+  applicantId: Int
+  applicantName: String
+  applicantEmail: String
+}
+
+type ApplicationTypeConnection {
+  """Pagination data for this connection."""
+  pageInfo: PageInfo!
+
+  """Contains the nodes in this connection."""
+  edges: [ApplicationTypeEdge]!
+  totalCount: Int
+}
+
+"""A Relay edge containing a `ApplicationType` and its cursor."""
+type ApplicationTypeEdge {
+  """The item at the end of the edge"""
+  node: ApplicationType
+
+  """A cursor for use in pagination"""
+  cursor: String!
 }
 
 type BuildingType implements Node {
@@ -358,6 +563,15 @@ type ErrorType {
   messages: [String!]!
 }
 
+type EventReservationUnitType implements Node {
+  """The ID of the object"""
+  id: ID!
+  priority: Int
+  pk: Int
+  reservationUnitId: Int
+  reservationUnitDetails: ReservationUnitType
+}
+
 type KeywordCategoryType implements Node {
   nameFi: String
   nameEn: String
@@ -510,6 +724,20 @@ type OpeningTimesType {
   periods: [Int]
 }
 
+type OrganisationType implements Node {
+  """The ID of the object"""
+  id: ID!
+  name: String!
+  identifier: String
+  yearEstablished: Int
+  address: AddressType
+  activeMembers: Int
+  coreBusiness: String!
+  organisationType: ApplicationsOrganisationOrganisationTypeChoices!
+  email: String!
+  pk: Int
+}
+
 """
 The Relay compliant `PageInfo` type, containing data necessary to paginate this connection.
 """
@@ -539,6 +767,16 @@ type PeriodType {
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+}
+
+type PersonType implements Node {
+  """The ID of the object"""
+  id: ID!
+  email: String
+  phoneNumber: String
+  firstName: String!
+  lastName: String!
+  pk: Int
 }
 
 input PurposeCreateMutationInput {
@@ -608,6 +846,7 @@ type PurposeUpdateMutationPayload {
 }
 
 type Query {
+  applications(offset: Int = null, before: String = null, after: String = null, first: Int = null, last: Int = null, applicationRound: ID = null, status: [String] = null, unit: [ID] = null, user: ID = null): ApplicationTypeConnection
   applicationRounds(offset: Int = null, before: String = null, after: String = null, first: Int = null, last: Int = null, nameFi: String = null, nameFi_Icontains: String = null, nameFi_Istartswith: String = null, nameSv: String = null, nameSv_Icontains: String = null, nameSv_Istartswith: String = null, nameEn: String = null, nameEn_Icontains: String = null, nameEn_Istartswith: String = null): ApplicationRoundTypeConnection
   reservations(
     offset: Int = null
@@ -1421,15 +1660,15 @@ input ReservationUnitCreateMutationInput {
   additionalInstructionsFi: String
   additionalInstructionsEn: String
   additionalInstructionsSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
   nameFi: String
   nameEn: String
   nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
   clientMutationId: String
 }
 
@@ -1525,15 +1764,15 @@ type ReservationUnitCreateMutationPayload {
   additionalInstructionsFi: String
   additionalInstructionsEn: String
   additionalInstructionsSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
   nameFi: String
   nameEn: String
   nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -1896,15 +2135,15 @@ input ReservationUnitUpdateMutationInput {
   additionalInstructionsFi: String
   additionalInstructionsEn: String
   additionalInstructionsSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
   nameFi: String
   nameEn: String
   nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
   clientMutationId: String
 }
 
@@ -2000,15 +2239,15 @@ type ReservationUnitUpdateMutationPayload {
   additionalInstructionsFi: String
   additionalInstructionsEn: String
   additionalInstructionsSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
   nameFi: String
   nameEn: String
   nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -2509,17 +2748,6 @@ enum state {
   DENIED
 }
 
-"""An enumeration."""
-enum status {
-  draft
-  in_review
-  review_done
-  allocated
-  handled
-  validated
-  approved
-}
-
 type TaxPercentageType implements Node {
   """The tax percentage for a price"""
   value: Decimal!
@@ -2692,12 +2920,12 @@ input UnitUpdateMutationInput {
   nameFi: String
   nameEn: String
   nameSv: String
-  shortDescriptionFi: String
-  shortDescriptionEn: String
-  shortDescriptionSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  shortDescriptionFi: String
+  shortDescriptionEn: String
+  shortDescriptionSv: String
   clientMutationId: String
 }
 
@@ -2710,12 +2938,12 @@ type UnitUpdateMutationPayload {
   nameFi: String
   nameEn: String
   nameSv: String
-  shortDescriptionFi: String
-  shortDescriptionEn: String
-  shortDescriptionSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  shortDescriptionFi: String
+  shortDescriptionEn: String
+  shortDescriptionSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]

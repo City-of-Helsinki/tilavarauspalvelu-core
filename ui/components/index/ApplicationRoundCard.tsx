@@ -43,7 +43,7 @@ const StyledContainer = styled(Container)`
   max-width: 100%;
 `;
 
-const Name = styled(H5)`
+const Name = styled(H5).attrs({ as: "h3" })`
   && {
     margin-top: 0;
     margin-bottom: var(--spacing-2-xs);
