@@ -233,6 +233,7 @@ const translations: ITranslations = {
     ],
     expandMenu: ['Laajenna valikko "{{title}}"', 'Expand menu "{{title}}"'],
     shrinkMenu: ['Pienennä valikko "{{title}}"', 'Shrink menu "{{title}}"'],
+    noName: ["Ei nimeä"],
   },
   Application: {
     application: ["Hakemus", "Application"],
