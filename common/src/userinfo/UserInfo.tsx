@@ -9,7 +9,6 @@ type Props = {
 
 const Wrapper = styled.div`
   word-break: break-all;
-  color: var(--color-black);
   padding: 0 0 var(--spacing-s) 36px;
   border: 0;
 
@@ -21,11 +20,13 @@ const Wrapper = styled.div`
 
 const Name = styled.div`
   display: none;
+  color: var(--color-black-90);
   @media (min-width: ${breakpoints.m}) {
     display: block;
   }
 `;
 const Email = styled.div`
+  color: var(--color-black-70);
   font-size: var(--fontsize-body-s);
   width: 100%;
   @media (min-width: ${breakpoints.m}) {
