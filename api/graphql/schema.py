@@ -10,6 +10,7 @@ from rest_framework.generics import get_object_or_404
 
 from api.graphql.applications.application_types import CityType
 from api.graphql.reservation_units.reservation_unit_filtersets import (
+    EquipmentFilterSet,
     ReservationUnitsFilterSet,
 )
 from api.graphql.reservation_units.reservation_unit_mutations import (
@@ -311,7 +312,7 @@ class Query(graphene.ObjectType):
     resource = relay.Node.Field(ResourceType)
     resource_by_pk = Field(ResourceType, pk=graphene.Int())
 
-    equipments = EquipmentFilter(EquipmentType)
+    equipments = EquipmentFilter(EquipmentType, filterset_class=EquipmentFilterSet)
     equipment = relay.Node.Field((EquipmentType))
     equipment_by_pk = Field(EquipmentType, pk=graphene.Int())
 

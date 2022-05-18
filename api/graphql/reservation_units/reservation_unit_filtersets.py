@@ -8,6 +8,7 @@ from django.utils.timezone import get_default_timezone
 
 from applications.models import ApplicationRound
 from reservation_units.models import (
+    Equipment,
     KeywordGroup,
     Purpose,
     ReservationUnit,
@@ -153,3 +154,20 @@ class ReservationUnitsFilterSet(django_filters.FilterSet):
         if value:
             return qs.filter(published)
         return qs.exclude(published)
+
+
+class EquipmentFilterSet(django_filters.FilterSet):
+    rank_gte = django_filters.NumberFilter(
+        field_name="category__rank", lookup_expr="gte"
+    )
+    rank_lte = django_filters.NumberFilter(
+        field_name="category__rank", lookup_expr="lte"
+    )
+
+    order_by = django_filters.OrderingFilter(
+        fields=("name", ("category__rank", "category_rank")),
+    )
+
+    class Meta:
+        model = Equipment
+        fields = ["name"]
