@@ -4,7 +4,14 @@ from django.utils.timezone import get_default_timezone
 from factory import LazyAttribute, SubFactory, post_generation
 from factory.django import DjangoModelFactory
 from factory.faker import Faker
-from factory.fuzzy import FuzzyChoice, FuzzyDate, FuzzyDateTime, FuzzyInteger, FuzzyText
+from factory.fuzzy import (
+    FuzzyChoice,
+    FuzzyDate,
+    FuzzyDateTime,
+    FuzzyFloat,
+    FuzzyInteger,
+    FuzzyText,
+)
 from pytz import UTC
 
 from applications.models import (
@@ -261,3 +268,11 @@ class ApplicationEventStatusFactory(DjangoModelFactory):
         ]
     )
     application_event = SubFactory(ApplicationEventFactory)
+
+
+class ApplicationAggregateDataFactory(DjangoModelFactory):
+    class Meta:
+        model = "applications.ApplicationAggregateData"
+
+    name = FuzzyText(length=20)
+    value = FuzzyFloat(low=0, high=255)

@@ -273,9 +273,6 @@ class EquipmentType(AuthNode, PrimaryKeyObjectType):
 
 
 class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
-    name_fi = graphene.String()
-    name_sv = graphene.String()
-    name_en = graphene.String()
     spaces = graphene.List(SpaceType)
     resources = graphene.List(ResourceType)
     services = graphene.List(ServiceType)

@@ -21,7 +21,7 @@ from ..base_connection import TilavarausBaseConnection
 from ..reservations.reservation_types import ReservationPurposeType
 
 
-class AggregatedDataType(graphene.ObjectType):
+class ApplicationRoundAggregatedDataType(graphene.ObjectType):
     allocation_result_events_count = graphene.Int()
     allocation_duration_total = graphene.Int()
     total_reservation_duration = graphene.Int()
@@ -88,7 +88,7 @@ class ApplicationRoundType(AuthNode, PrimaryKeyObjectType):
 
     service_sector = graphene.Field(ServiceSectorType)
     status = graphene.Field(
-        graphene.Enum("status", ApplicationRoundStatus.STATUS_CHOICES)
+        graphene.Enum("applicationRoundStatus", ApplicationRoundStatus.STATUS_CHOICES)
     )
     status_timestamp = graphene.DateTime()
 
@@ -96,7 +96,7 @@ class ApplicationRoundType(AuthNode, PrimaryKeyObjectType):
     purposes = graphene.List(ReservationPurposeType)
     reservation_units = graphene.List(ReservationUnitType)
     application_round_baskets = graphene.List(ApplicationRoundBasketType)
-    aggregated_data = graphene.Field(AggregatedDataType)
+    aggregated_data = graphene.Field(ApplicationRoundAggregatedDataType)
     approved_by = graphene.String()
     applications_sent = graphene.Boolean()
     applications_count = graphene.Int()

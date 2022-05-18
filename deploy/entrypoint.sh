@@ -47,7 +47,7 @@ elif [ "$1" = "test" ]; then
         exit $exitcode
     fi
     _log_boxed "Running tests"
-    pytest --cov-report= --cov=tilavaraus
+    pytest --cov-report=html --cov
     exitcode=$?
     if [ $exitcode -ne 0 ]; then
         exit $exitcode

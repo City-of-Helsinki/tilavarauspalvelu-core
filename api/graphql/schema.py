@@ -1,5 +1,6 @@
 import django_filters
 import graphene
+import graphene_django_optimizer as gql_optimizer
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db.models import Q
@@ -8,7 +9,8 @@ from graphene_permissions.mixins import AuthFilter
 from graphene_permissions.permissions import AllowAny, AllowAuthenticated
 from rest_framework.generics import get_object_or_404
 
-from api.graphql.applications.application_types import CityType
+from api.graphql.applications.application_filtersets import ApplicationFilterSet
+from api.graphql.applications.application_types import ApplicationType, CityType
 from api.graphql.reservation_units.reservation_unit_filtersets import (
     ReservationUnitsFilterSet,
 )
@@ -74,11 +76,13 @@ from api.graphql.spaces.space_types import SpaceType
 from api.graphql.terms_of_use.terms_of_use_types import TermsOfUseType
 from api.graphql.units.unit_mutations import UnitUpdateMutation
 from api.graphql.units.unit_types import UnitByPkType, UnitType
+from applications.models import Application
 from permissions.api_permissions.graphene_field_decorators import (
     check_resolver_permission,
 )
 from permissions.api_permissions.graphene_permissions import (
     AgeGroupPermission,
+    ApplicationPermission,
     ApplicationRoundPermission,
     CityPermission,
     EquipmentCategoryPermission,
@@ -97,6 +101,7 @@ from permissions.api_permissions.graphene_permissions import (
     UnitPermission,
 )
 from permissions.helpers import (
+    get_service_sectors_where_can_view_applications,
     get_service_sectors_where_can_view_reservations,
     get_units_where_can_view_reservations,
 )
@@ -118,6 +123,49 @@ class ApplicationRoundFilter(AuthFilter, django_filters.FilterSet):
         if not settings.TMP_PERMISSIONS_DISABLED
         else [AllowAny]
     )
+
+
+class ApplicationsFilter(AuthFilter, django_filters.FilterSet):
+    permission_classes = (
+        (ApplicationPermission,)
+        if not settings.TMP_PERMISSIONS_DISABLED
+        else [AllowAny]
+    )
+
+    @classmethod
+    def resolve_queryset(
+        cls, connection, iterable, info, args, filtering_args, filterset_class
+    ):
+        queryset = super().resolve_queryset(
+            connection, iterable, info, args, filtering_args, filterset_class
+        )
+
+        if settings.TMP_PERMISSIONS_DISABLED:
+            return queryset
+
+        # Filtering queries formation
+        user = info.context.user
+        unit_ids = user.unit_roles.filter(
+            role__permissions__permission="can_validate_applications"
+        ).values_list("unit", flat=True)
+        group_ids = user.unit_roles.filter(
+            role__permissions__permission="can_validate_applications"
+        ).values_list("unit_group", flat=True)
+        units = Unit.objects.filter(
+            Q(id__in=unit_ids) | Q(unit_groups__in=group_ids)
+        ).values_list("id", flat=True)
+
+        return queryset.filter(
+            Q(
+                application_round__service_sector__in=get_service_sectors_where_can_view_applications(
+                    user
+                )
+            )
+            | Q(
+                application_events__event_reservation_units__reservation_unit__unit__in=units
+            )
+            | Q(user=user)
+        ).distinct()
 
 
 class ReservationsFilter(AuthFilter, django_filters.FilterSet):
@@ -283,6 +331,9 @@ class ReservationMetadataSetFilter(AuthFilter):
 
 
 class Query(graphene.ObjectType):
+    applications = ApplicationsFilter(
+        ApplicationType, filterset_class=ApplicationFilterSet
+    )
     application_rounds = ApplicationRoundFilter(ApplicationRoundType)
 
     reservations = ReservationsFilter(
@@ -374,6 +425,9 @@ class Query(graphene.ObjectType):
     def resolve_equipment_category_by_pk(self, info, **kwargs):
         pk = kwargs.get("pk")
         return get_object_or_404(EquipmentCategory, pk=pk)
+
+    def resolve_applications(self, info: graphene.ResolveInfo, **kwargs):
+        return gql_optimizer.query(Application.objects.all(), info)
 
 
 class Mutation(graphene.ObjectType):
