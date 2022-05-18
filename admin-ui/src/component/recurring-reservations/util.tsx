@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { trim, uniqBy } from "lodash";
+import { orderBy, trim, uniqBy } from "lodash";
 import { TFunction } from "react-i18next";
 import {
   Application as ApplicationType,
@@ -51,11 +51,18 @@ export const appMapper = (
       applicationStatusView = "in_review";
   }
 
-  const units = uniqBy(
-    app.applicationEvents
-      .flatMap((ae) => ae.eventReservationUnits)
-      .flatMap((eru) => eru.reservationUnitDetails.unit),
-    "id"
+  const units = orderBy(
+    uniqBy(
+      app.applicationEvents
+        .flatMap((ae) => ae.eventReservationUnits)
+        .flatMap((eru) => ({
+          ...eru.reservationUnitDetails.unit,
+          priority: eru.priority,
+        })),
+      "id"
+    ),
+    "priority",
+    "asc"
   );
 
   const name = app.applicationEvents.find(() => true)?.name || "-";
@@ -74,6 +81,7 @@ export const appMapper = (
   );
 
   const applicant = applicantName(app);
+
   return {
     key: `${app.id}-${eventId || "-"} `,
     id: app.id,
