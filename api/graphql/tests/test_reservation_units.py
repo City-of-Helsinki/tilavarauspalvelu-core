@@ -774,6 +774,42 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         assert_that(content.get("errors")).is_none()
         self.assertMatchSnapshot(content)
 
+    def test_filtering_by_type_rank(self):
+        ReservationUnit.objects.exclude(id=self.reservation_unit.id).delete()
+        rank1 = ReservationUnitTypeFactory(rank=1)  # Do not include
+        rank2 = ReservationUnitTypeFactory(rank=2)
+        rank3 = ReservationUnitTypeFactory(rank=3)
+        rank4 = ReservationUnitTypeFactory(rank=4)
+        rank5 = ReservationUnitTypeFactory(rank=5)  # Do not include
+        ReservationUnitFactory(
+            reservation_unit_type=rank1, name_fi="Rank 1"
+        )  # Do not include
+        ReservationUnitFactory(reservation_unit_type=rank2, name_fi="Rank 2")
+        ReservationUnitFactory(reservation_unit_type=rank3, name_fi="Rank 3")
+        ReservationUnitFactory(reservation_unit_type=rank4, name_fi="Rank 4")
+        ReservationUnitFactory(
+            reservation_unit_type=rank5, name_fi="Rank 5"
+        )  # Do not include
+        response = self.query(
+            """
+            query {
+                reservationUnits(typeRankLte:4, typeRankGte:2) {
+                    edges {
+                        node{
+                            nameFi
+                            reservationUnitType {
+                                rank
+                            }
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
     def test_filtering_by_reservation_timestamps(self):
         now = datetime.datetime.now(get_default_timezone())
         one_hour = datetime.timedelta(hours=1)
@@ -1429,6 +1465,39 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
                     edges {
                         node {
                             rank
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_order_by_type_rank(self):
+        ReservationUnit.objects.exclude(id=self.reservation_unit.id).delete()
+        rank5 = ReservationUnitTypeFactory(rank=5)
+        rank3 = ReservationUnitTypeFactory(rank=3)
+        rank1 = ReservationUnitTypeFactory(rank=1)
+        rank2 = ReservationUnitTypeFactory(rank=2)
+        rank4 = ReservationUnitTypeFactory(rank=4)
+        ReservationUnitFactory(name="Fifth", reservation_unit_type=rank5)
+        ReservationUnitFactory(name="Third", reservation_unit_type=rank3)
+        ReservationUnitFactory(name="First", reservation_unit_type=rank1)
+        ReservationUnitFactory(name="Second", reservation_unit_type=rank2)
+        ReservationUnitFactory(name="Fourth", reservation_unit_type=rank4)
+
+        self.client.force_login(self.regular_joe)
+        response = self.query(
+            """
+            query {
+                reservationUnits(orderBy: "typeRank") {
+                    edges {
+                        node {
+                            reservationUnitType {
+                                rank
+                            }
                         }
                     }
                 }

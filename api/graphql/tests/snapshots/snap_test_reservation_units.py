@@ -20,7 +20,7 @@ snapshots['ReservationUnitQueryTestCase::test_filter_by_pk_multiple_values 1'] =
                     'node': {
                         'nameFi': 'Second unit'
                     }
-                },
+                }
             ]
         }
     }
@@ -449,6 +449,39 @@ snapshots['ReservationUnitQueryTestCase::test_filtering_by_type 1'] = {
                         'nameFi': 'test name fi',
                         'reservationUnitType': {
                             'nameFi': 'test type fi'
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitQueryTestCase::test_filtering_by_type_rank 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'nameFi': 'Rank 2',
+                        'reservationUnitType': {
+                            'rank': 2
+                        }
+                    }
+                },
+                {
+                    'node': {
+                        'nameFi': 'Rank 3',
+                        'reservationUnitType': {
+                            'rank': 3
+                        }
+                    }
+                },
+                {
+                    'node': {
+                        'nameFi': 'Rank 4',
+                        'reservationUnitType': {
+                            'rank': 4
                         }
                     }
                 }
@@ -1031,6 +1064,57 @@ snapshots['ReservationUnitQueryTestCase::test_order_by_type_fi 1'] = {
                     'node': {
                         'reservationUnitType': {
                             'nameFi': 'test type fi'
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitQueryTestCase::test_order_by_type_rank 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'reservationUnitType': {
+                            'rank': 1
+                        }
+                    }
+                },
+                {
+                    'node': {
+                        'reservationUnitType': {
+                            'rank': 2
+                        }
+                    }
+                },
+                {
+                    'node': {
+                        'reservationUnitType': {
+                            'rank': 3
+                        }
+                    }
+                },
+                {
+                    'node': {
+                        'reservationUnitType': {
+                            'rank': 4
+                        }
+                    }
+                },
+                {
+                    'node': {
+                        'reservationUnitType': {
+                            'rank': 5
+                        }
+                    }
+                },
+                {
+                    'node': {
+                        'reservationUnitType': {
+                            'rank': None
                         }
                     }
                 }
