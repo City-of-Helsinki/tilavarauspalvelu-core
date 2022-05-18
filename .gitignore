@@ -27,3 +27,4 @@ perf*csv
 /staticroot/
 /broker
 celerybeat-schedule
+.python-version
