@@ -2,10 +2,11 @@
   "card": {
     "applyButton": "Sök lokaler",
     "displayPastButton": "Visa lokalerna",
-    "criteria": "Ansökningsvillkor",
+    "criteria": "Se ansökningsvillkor",
     "pending": "Ansökningsperioden öppnas {{openingDateTime}}",
     "open": "Ansökningsperioden öppen till {{until, d.M.yyyy 'kl' H.mm}}",
-    "past": "Ansökningsperioden stängdes {{closingDate, d.M.yyyy 'kl' H.mm}}"
+    "past": "Ansökningsperioden stängdes {{closingDate, d.M.yyyy 'kl' H.mm}}",
+    "reservationPeriod": "Lokaler kan bokas för perioden {{reservationPeriodBegin, d.M.yyyy}} - {{reservationPeriodEnd, d.M.yyyy}}"
   },
   "criteria": "ansökningsvillkor"
 }
