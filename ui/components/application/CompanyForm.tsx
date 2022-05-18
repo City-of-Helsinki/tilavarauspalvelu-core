@@ -68,16 +68,18 @@ const CompanyForm = ({ application, onNext }: Props): JSX.Element | null => {
           {t("application:Page3.subHeading.basicInfo")}
         </FormSubHeading>
         <TextInput
-          ref={register({ required: true })}
+          ref={register({ required: true, maxLength: 255 })}
           label={t("application:Page3.company.name")}
           id="organisation.name"
           name="organisation.name"
           required
           invalid={!!errors.organisation?.name?.type}
-          errorText={applicationErrorText(t, errors.organisation?.name?.type)}
+          errorText={applicationErrorText(t, errors.organisation?.name?.type, {
+            count: 255,
+          })}
         />
         <TextInput
-          ref={register({ required: true })}
+          ref={register({ required: true, maxLength: 255 })}
           label={t("application:Page3.company.coreBusiness")}
           id="organisation.coreBusiness"
           name="organisation.coreBusiness"
@@ -85,11 +87,14 @@ const CompanyForm = ({ application, onNext }: Props): JSX.Element | null => {
           invalid={!!errors.organisation?.coreBusiness?.type}
           errorText={applicationErrorText(
             t,
-            errors.organisation?.coreBusiness?.type
+            errors.organisation?.coreBusiness?.type,
+            {
+              count: 255,
+            }
           )}
         />
         <TextInput
-          ref={register({ required: true })}
+          ref={register({ required: true, maxLength: 255 })}
           label={t("application:Page3.company.registrationNumber")}
           id="organisation.identifier"
           name="organisation.identifier"
@@ -97,7 +102,10 @@ const CompanyForm = ({ application, onNext }: Props): JSX.Element | null => {
           invalid={!!errors.organisation?.identifier?.type}
           errorText={applicationErrorText(
             t,
-            errors.organisation?.identifier?.type
+            errors.organisation?.identifier?.type,
+            {
+              count: 255,
+            }
           )}
         />
         <span />
@@ -105,7 +113,7 @@ const CompanyForm = ({ application, onNext }: Props): JSX.Element | null => {
           {t("application:Page3.subHeading.postalAddress")}
         </FormSubHeading>
         <TextInput
-          ref={register({ required: true })}
+          ref={register({ required: true, maxLength: 255 })}
           label={t("application:Page3.organisation.streetAddress")}
           id="organisation.address.streetAddress"
           name="organisation.address.streetAddress"
@@ -113,7 +121,10 @@ const CompanyForm = ({ application, onNext }: Props): JSX.Element | null => {
           invalid={!!errors.organisation?.address?.streetAddress?.type}
           errorText={applicationErrorText(
             t,
-            errors.organisation?.address?.streetAddress?.type
+            errors.organisation?.address?.streetAddress?.type,
+            {
+              count: 255,
+            }
           )}
         />
         <TextInput
@@ -130,7 +141,7 @@ const CompanyForm = ({ application, onNext }: Props): JSX.Element | null => {
           )}
         />
         <TextInput
-          ref={register({ required: true })}
+          ref={register({ required: true, maxLength: 255 })}
           label={t("application:Page3.organisation.city")}
           id="organisation.address.city"
           name="organisation.address.city"
@@ -138,7 +149,10 @@ const CompanyForm = ({ application, onNext }: Props): JSX.Element | null => {
           invalid={!!errors.organisation?.address?.city?.type}
           errorText={applicationErrorText(
             t,
-            errors.organisation?.address?.city?.type
+            errors.organisation?.address?.city?.type,
+            {
+              count: 255,
+            }
           )}
         />
         <CheckboxWrapper>
@@ -157,7 +171,7 @@ const CompanyForm = ({ application, onNext }: Props): JSX.Element | null => {
           {t("application:Page3.subHeading.contactInfo")}
         </FormSubHeading>
         <TextInput
-          ref={register({ required: true })}
+          ref={register({ required: true, maxLength: 255 })}
           label={t("application:Page3.contactPerson.firstName")}
           id="contactPerson.firstName"
           name="contactPerson.firstName"
@@ -165,11 +179,14 @@ const CompanyForm = ({ application, onNext }: Props): JSX.Element | null => {
           invalid={!!errors.contactPerson?.firstName?.type}
           errorText={applicationErrorText(
             t,
-            errors.contactPerson?.firstName?.type
+            errors.contactPerson?.firstName?.type,
+            {
+              count: 255,
+            }
           )}
         />
         <TextInput
-          ref={register({ required: true })}
+          ref={register({ required: true, maxLength: 255 })}
           label={t("application:Page3.contactPerson.lastName")}
           id="contactPerson.lastName"
           name="contactPerson.lastName"
@@ -177,11 +194,14 @@ const CompanyForm = ({ application, onNext }: Props): JSX.Element | null => {
           invalid={!!errors.contactPerson?.lastName?.type}
           errorText={applicationErrorText(
             t,
-            errors.contactPerson?.lastName?.type
+            errors.contactPerson?.lastName?.type,
+            {
+              count: 255,
+            }
           )}
         />
         <TextInput
-          ref={register({ required: true })}
+          ref={register({ required: true, maxLength: 255 })}
           label={t("application:Page3.contactPerson.phoneNumber")}
           id="contactPerson.phoneNumber"
           name="contactPerson.phoneNumber"
@@ -189,7 +209,10 @@ const CompanyForm = ({ application, onNext }: Props): JSX.Element | null => {
           invalid={!!errors.contactPerson?.phoneNumber?.type}
           errorText={applicationErrorText(
             t,
-            errors.contactPerson?.phoneNumber?.type
+            errors.contactPerson?.phoneNumber?.type,
+            {
+              count: 255,
+            }
           )}
         />
         <EmailInput register={register} errors={errors} />
