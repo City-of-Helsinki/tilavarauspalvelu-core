@@ -108,6 +108,14 @@ class RecurringReservation(models.Model):
 
     @property
     def denied_reservations(self):
+        # Avoid a query to the database if we have fetched list already
+        if "reservations" in self._prefetched_objects_cache:
+            return [
+                reservation
+                for reservation in self.reservations.all()
+                if reservation.state == STATE_CHOICES.DENIED
+            ]
+
         return self.reservations.filter(state=STATE_CHOICES.DENIED)
 
 

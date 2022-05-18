@@ -252,6 +252,30 @@ class ApplicationRoundStatus(models.Model, StatusMixin):
         return "{} ({})".format(self.get_status_display(), self.application_round.id)
 
 
+class ApplicationRoundManager(models.Manager):
+    def get_queryset(self) -> QuerySet:
+        return (
+            super()
+            .get_queryset()
+            .annotate(
+                latest_status=Subquery(
+                    ApplicationRoundStatus.objects.filter(
+                        application_round__id=OuterRef("id")
+                    )
+                    .order_by("-id")
+                    .values("status")[:1]
+                ),
+                latest_status_timestamp=Subquery(
+                    ApplicationRoundStatus.objects.filter(
+                        application_round__id=OuterRef("id")
+                    )
+                    .order_by("-id")
+                    .values("timestamp")[:1]
+                ),
+            )
+        )
+
+
 class ApplicationRound(models.Model):
     TARGET_GROUP_INTERNAL = "internal"
     TARGET_GROUP_PUBLIC = "public"
@@ -319,18 +343,38 @@ class ApplicationRound(models.Model):
 
     criteria = models.TextField(default="")
 
+    objects = ApplicationRoundManager()
+
     def __str__(self):
         return "{} ({} - {})".format(
             self.name, self.reservation_period_begin, self.reservation_period_end
         )
 
+    def refresh_from_db(self, using=None, fields=None) -> None:
+        super().refresh_from_db(using, fields)
+
+        if hasattr(self, "latest_status"):
+            delattr(self, "latest_status")
+
+        if hasattr(self, "latest_status_timestamp"):
+            delattr(self, "latest_status_timestamp")
+
     @property
     def status(self):
-        return self.get_status().status
+        return self.get_status()
 
     @property
     def status_timestamp(self):
-        return self.get_status().timestamp
+        if hasattr(self, "latest_status_timestamp"):
+            return self.latest_status_timestamp
+
+        status_timestamp = self.statuses.values("timestamp").last()
+        if status_timestamp:
+            status_timestamp = status_timestamp.get("status")
+
+            self.latest_status = status_timestamp
+
+        return status_timestamp
 
     @status.setter
     def status(self, status):
@@ -338,7 +382,7 @@ class ApplicationRound(models.Model):
 
     @status.getter
     def status(self):
-        return self.get_status().status
+        return self.get_status()
 
     def set_status(self, status, user=None):
         if status not in ApplicationRoundStatus.get_statuses():
@@ -346,9 +390,19 @@ class ApplicationRound(models.Model):
         ApplicationRoundStatus.objects.create(
             application_round=self, status=status, user=user
         )
+        self.latest_status = status
 
     def get_status(self):
-        return self.statuses.last()
+        if hasattr(self, "latest_status"):
+            return self.latest_status
+
+        status = self.statuses.values("status").last()
+        if status:
+            status = status.get("status")
+
+            self.latest_status = status
+
+        return status
 
     def get_application_events_by_basket(self):
 

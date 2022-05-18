@@ -74,7 +74,9 @@ class UserViewSet(
     viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin
 ):
     serializer_class = UserSerializer
-    queryset = User.objects.all()
+    queryset = User.objects.all().prefetch_related(
+        "general_roles", "service_sector_roles", "unit_roles"
+    )
     permission_classes = [UserPermission]
 
     @action(detail=False, methods=["get"])

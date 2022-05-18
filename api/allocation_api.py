@@ -1,6 +1,7 @@
 import threading
 
 from django.conf import settings
+from django.db.models import Prefetch
 from django.utils.datetime_safe import datetime
 from rest_framework import permissions, serializers, viewsets
 from rest_framework.exceptions import ValidationError
@@ -55,7 +56,7 @@ class AllocationRequestSerializer(serializers.ModelSerializer):
 
         application_round = ApplicationRound.objects.get(pk=application_round_id)
 
-        if application_round.get_status().status not in [
+        if application_round.status not in [
             ApplicationRoundStatus.REVIEW_DONE,
             ApplicationRoundStatus.ALLOCATED,
         ]:
@@ -85,7 +86,12 @@ class AllocationRequestSerializer(serializers.ModelSerializer):
 
 
 class AllocationRequestViewSet(viewsets.ModelViewSet):
-    queryset = AllocationRequest.objects.all()
+    queryset = AllocationRequest.objects.all().prefetch_related(
+        Prefetch(
+            "application_round_baskets",
+            queryset=ApplicationRoundBasket.objects.all().only("id"),
+        )
+    )
     serializer_class = AllocationRequestSerializer
     permission_classes = (
         [AllocationRequestPermission]

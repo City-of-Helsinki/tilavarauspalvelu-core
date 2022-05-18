@@ -60,7 +60,11 @@ class ReservationIcalViewset(ViewSet):
     queryset = Reservation.objects.all()
 
     def get_object(self):
-        return Reservation.objects.get(pk=self.kwargs["pk"])
+        return (
+            Reservation.objects.filter(pk=self.kwargs["pk"])
+            .prefetch_related("reservation_unit")
+            .first()
+        )
 
     def retrieve(self, request, *args, **kwargs):
         hash = request.query_params.get("hash", None)
@@ -166,11 +170,20 @@ class ApplicationEventIcalViewset(ViewSet):
         )
 
     def get_object(self):
-        try:
-            application_event = ApplicationEvent.objects.get(uuid=self.kwargs["pk"])
+        application_event = (
+            ApplicationEvent.objects.filter(uuid=self.kwargs["pk"])
+            .select_related(
+                "application",
+                "application__organisation",
+                "application__contact_person",
+            )
+            .first()
+        )
+
+        if application_event:
             return application_event
-        except ApplicationEvent.DoesNotExist:
-            raise Http404
+
+        raise Http404
 
 
 ICAL_VERSION = "2.0"
@@ -203,9 +216,9 @@ def application_event_calendar(application_event: ApplicationEvent) -> Calendar:
 
 
 def export_reservation_unit_events(
-    reserlation_unit: ReservationUnit, site_name: str, cal: Calendar
+    reservation_unit: ReservationUnit, site_name: str, cal: Calendar
 ):
-    reservations = Reservation.objects.filter(reservation_unit=reserlation_unit)
+    reservations = Reservation.objects.filter(reservation_unit=reservation_unit)
     for reservation in reservations:
         export_reservation_events(reservation, site_name, cal)
     return cal

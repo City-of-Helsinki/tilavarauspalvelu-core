@@ -41,7 +41,7 @@ class OpeningHoursViewSet(viewsets.ViewSet):
     def retrieve(self, request, pk=None):
         start_date = self.request.query_params.get("start_date")
         end_date = self.request.query_params.get("end_date")
-        unit = ReservationUnit.objects.get(pk=pk)
+        unit = ReservationUnit.objects.select_related("unit").get(pk=pk)
         return Response(
             OpeningHoursSerializer(
                 instance=OpeningHours(
