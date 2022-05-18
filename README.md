@@ -73,6 +73,14 @@ In development and testing, to update a package update it in requirements.in and
 
 To remove a dependency, remove it from requirements.in, run pip-compile and then pip-sync. If everything works as expected, commit the changes.
 
+### Installation issue on Mac
+You need to have PostgreSQL installed or installing the packages from `requirements.txt` will fail. You can install the database with `brew install postgresql`
+
+You might also get an issue with psycopg2. For that you need to install OpenSSL and then update the LIBRARY_PATH env:
+```
+brew install openssl
+export LIBRARY_PATH=$LIBRARY_PATH:/usr/local/opt/openssl/lib/
+```
 
 # Background processing
 
