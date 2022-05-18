@@ -154,7 +154,11 @@ const Applications = (): JSX.Element => {
   }, [roundsError, appError]);
 
   useEffect(() => {
-    if (appData?.applications?.edges && Object.keys(rounds).length > 0) {
+    if (
+      appData?.applications?.edges &&
+      rounds &&
+      Object.keys(rounds).length > 0
+    ) {
       setState("done");
     }
   }, [appData, applications, rounds]);
