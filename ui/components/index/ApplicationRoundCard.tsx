@@ -26,14 +26,14 @@ const StyledCard = styled(Card)`
     --background-color: var(--color-black-8);
     --border-color: var(--color-black-8);
     display: grid;
-    grid-template-columns: 2fr 1fr;
+    grid-template-columns: 1fr;
     grid-gap: var(--spacing-m);
     align-items: start;
     padding: var(--spacing-s);
     margin-bottom: var(--spacing-m);
 
-    @media (max-width: ${breakpoint.s}) {
-      grid-template-columns: 1fr;
+    @media (min-width: ${breakpoint.s}) {
+      grid-template-columns: 1fr auto;
     }
   }
 `;
