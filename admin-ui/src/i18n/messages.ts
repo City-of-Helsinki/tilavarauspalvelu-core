@@ -201,7 +201,6 @@ const translations: ITranslations = {
     requestedReservations: ["Alustavat varaukset"],
     recurringReservations: ["Kausivaraaminen"],
     applicatioNROunds: ["Hakukierrokset"],
-    decisions: ["Päätöksenteko"],
     clients: ["Asiakkaat"],
     archive: ["Arkisto"],
     premisesAndSettings: ["Tilat ja asetukset"],
@@ -387,12 +386,6 @@ const translations: ITranslations = {
       ],
       approvalPreparation: [
         "Lähetä koko käsittelyn lopputulos esihenkilöllesi hyväksyttäväksi.",
-      ],
-      approval: [
-        "Odota esihenkilösi hyväksyntää tai mahdollisia muutospyyntöjä.",
-      ],
-      supervisorApproval: [
-        "Tarkasta vuorojakopäätös (esim. toimipisteitä suodattamalla) ja toimita päätökset asiakkaille.",
       ],
     },
     roundCriteria: ["Kierroksen kriteerit"],

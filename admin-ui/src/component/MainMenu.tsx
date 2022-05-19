@@ -206,10 +206,6 @@ const menuTree: IMenuChild[] = [
         title: "MainMenu.applicationRounds",
         route: "/recurring-reservations/application-rounds",
       },
-      {
-        title: "MainMenu.decisions",
-        route: "/recurring-reservations/decisions",
-      },
     ],
   },
   {
