@@ -1,9 +1,15 @@
 import json
 
 from assertpy import assert_that
+from django.contrib.auth import get_user_model
 
 from applications.models import Application, ApplicationStatus
-from applications.tests.factories import ApplicationFactory, ApplicationStatusFactory
+from applications.tests.factories import (
+    ApplicationFactory,
+    ApplicationStatusFactory,
+    OrganisationFactory,
+    PersonFactory,
+)
 
 from .base import ApplicationTestCaseBase
 
@@ -14,9 +20,20 @@ class ApplicationsGraphQLFiltersTestCase(ApplicationTestCaseBase):
 
         self.client.force_login(self.general_admin)
 
+        zzz_user = get_user_model().objects.create(
+            username="zzzuser",
+            first_name="Zzz",
+            last_name="tester",
+            email="zzz.tester@foo.com",
+        )
+
         # This application should not be in any of the test queries
         application = ApplicationFactory(
-            applicant_type=Application.APPLICANT_TYPE_ASSOCIATION
+            applicant_type=Application.APPLICANT_TYPE_ASSOCIATION,
+            additional_information="Not visible in filter queries but visible in order by",
+            contact_person=None,
+            organisation=None,
+            user=zzz_user,
         )
 
         ApplicationStatusFactory(
@@ -111,6 +128,174 @@ class ApplicationsGraphQLFiltersTestCase(ApplicationTestCaseBase):
                     }}
                 }}
             }}
+        """
+
+        response = self.query(query)
+        assert_that(response.status_code).is_equal_to(200)
+
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_order_by_pk_asc(self):
+        application_1 = ApplicationFactory(additional_information="Test application 1")
+        application_2 = ApplicationFactory(additional_information="Test application 2")
+
+        application_1.status = ApplicationStatus.IN_REVIEW
+        application_2.status = ApplicationStatus.IN_REVIEW
+
+        application_1.save()
+        application_2.save()
+
+        query = """
+            query {
+                applications(orderBy: "pk") {
+                    edges {
+                        node {
+                            additionalInformation
+                        }
+                    }
+                }
+            }
+        """
+
+        response = self.query(query)
+        assert_that(response.status_code).is_equal_to(200)
+
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_order_by_pk_desc(self):
+        application_1 = ApplicationFactory(additional_information="Test application 1")
+        application_2 = ApplicationFactory(additional_information="Test application 2")
+
+        application_1.status = ApplicationStatus.IN_REVIEW
+        application_2.status = ApplicationStatus.IN_REVIEW
+
+        application_1.save()
+        application_2.save()
+
+        query = """
+            query {
+                applications(orderBy: "-pk") {
+                    edges {
+                        node {
+                            additionalInformation
+                        }
+                    }
+                }
+            }
+        """
+
+        response = self.query(query)
+        assert_that(response.status_code).is_equal_to(200)
+
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_order_by_applicant_asc(self):
+        bbb_user = get_user_model().objects.create(
+            username="bbbuser",
+            first_name="Bbb",
+            last_name="tester",
+            email="bbb.tester@foo.com",
+        )
+        ccc_person = PersonFactory(
+            first_name="Ccc",
+            last_name="tester",
+        )
+        application_1 = ApplicationFactory(
+            additional_information="Test application 1",
+            contact_person=None,
+            organisation=None,
+            user=bbb_user,
+        )
+        application_2 = ApplicationFactory(
+            additional_information="Test application 2",
+            contact_person=ccc_person,
+            organisation=None,
+            user=bbb_user,
+        )
+        application_3 = ApplicationFactory(
+            additional_information="Test application 3",
+            contact_person=None,
+            organisation=OrganisationFactory(name="AAA Organisation"),
+            user=bbb_user,
+        )
+
+        application_1.status = ApplicationStatus.IN_REVIEW
+        application_2.status = ApplicationStatus.IN_REVIEW
+        application_3.status = ApplicationStatus.IN_REVIEW
+
+        query = """
+            query {
+                applications(orderBy: "applicant") {
+                    edges {
+                        node {
+                            additionalInformation
+                        }
+                    }
+                }
+            }
+        """
+
+        response = self.query(query)
+        assert_that(response.status_code).is_equal_to(200)
+
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_order_by_applicant_desc(self):
+        bbb_user = get_user_model().objects.create(
+            username="bbbuser",
+            first_name="Bbb",
+            last_name="tester",
+            email="bbb.tester@foo.com",
+        )
+        ccc_person = PersonFactory(
+            first_name="Ccc",
+            last_name="tester",
+        )
+        application_1 = ApplicationFactory(
+            additional_information="Test application 1",
+            contact_person=None,
+            organisation=None,
+            user=bbb_user,
+        )
+        application_2 = ApplicationFactory(
+            additional_information="Test application 2",
+            contact_person=ccc_person,
+            organisation=None,
+            user=bbb_user,
+        )
+        application_3 = ApplicationFactory(
+            additional_information="Test application 3",
+            contact_person=None,
+            organisation=OrganisationFactory(name="AAA Organisation"),
+            user=bbb_user,
+        )
+
+        application_1.status = ApplicationStatus.IN_REVIEW
+        application_2.status = ApplicationStatus.IN_REVIEW
+        application_3.status = ApplicationStatus.IN_REVIEW
+
+        query = """
+            query {
+                applications(orderBy: "-applicant") {
+                    edges {
+                        node {
+                            additionalInformation
+                        }
+                    }
+                }
+            }
         """
 
         response = self.query(query)

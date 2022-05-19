@@ -75,6 +75,132 @@ snapshots['ApplicationsGraphQLFiltersTestCase::test_application_filter_by_user 1
     }
 }
 
+snapshots['ApplicationsGraphQLFiltersTestCase::test_order_by_applicant_asc 1'] = {
+    'data': {
+        'applications': {
+            'edges': [
+                {
+                    'node': {
+                        'additionalInformation': 'Test application 3'
+                    }
+                },
+                {
+                    'node': {
+                        'additionalInformation': 'Test application 1'
+                    }
+                },
+                {
+                    'node': {
+                        'additionalInformation': 'Test application 2'
+                    }
+                },
+                {
+                    'node': {
+                        'additionalInformation': 'Something to fill the field with text'
+                    }
+                },
+                {
+                    'node': {
+                        'additionalInformation': 'Not visible in filter queries but visible in order by'
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ApplicationsGraphQLFiltersTestCase::test_order_by_applicant_desc 1'] = {
+    'data': {
+        'applications': {
+            'edges': [
+                {
+                    'node': {
+                        'additionalInformation': 'Not visible in filter queries but visible in order by'
+                    }
+                },
+                {
+                    'node': {
+                        'additionalInformation': 'Something to fill the field with text'
+                    }
+                },
+                {
+                    'node': {
+                        'additionalInformation': 'Test application 2'
+                    }
+                },
+                {
+                    'node': {
+                        'additionalInformation': 'Test application 1'
+                    }
+                },
+                {
+                    'node': {
+                        'additionalInformation': 'Test application 3'
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ApplicationsGraphQLFiltersTestCase::test_order_by_pk_asc 1'] = {
+    'data': {
+        'applications': {
+            'edges': [
+                {
+                    'node': {
+                        'additionalInformation': 'Something to fill the field with text'
+                    }
+                },
+                {
+                    'node': {
+                        'additionalInformation': 'Not visible in filter queries but visible in order by'
+                    }
+                },
+                {
+                    'node': {
+                        'additionalInformation': 'Test application 1'
+                    }
+                },
+                {
+                    'node': {
+                        'additionalInformation': 'Test application 2'
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ApplicationsGraphQLFiltersTestCase::test_order_by_pk_desc 1'] = {
+    'data': {
+        'applications': {
+            'edges': [
+                {
+                    'node': {
+                        'additionalInformation': 'Test application 2'
+                    }
+                },
+                {
+                    'node': {
+                        'additionalInformation': 'Test application 1'
+                    }
+                },
+                {
+                    'node': {
+                        'additionalInformation': 'Not visible in filter queries but visible in order by'
+                    }
+                },
+                {
+                    'node': {
+                        'additionalInformation': 'Something to fill the field with text'
+                    }
+                }
+            ]
+        }
+    }
+}
+
 snapshots['ApplicationsGraphQLPermissionsTestCase::test_regular_user_can_view_only_own_application 1'] = {
     'data': {
         'applications': {
