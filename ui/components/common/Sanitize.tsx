@@ -8,7 +8,7 @@ type Props = {
 const config = {
   allowedTags: ["ol", "ul", "li", "b", "i", "p", "em", "strong", "a", "br"],
   allowedAttributes: {
-    a: ["href"],
+    a: ["href", "target", "rel"],
   },
 };
 const Sanitize = ({ html }: Props): JSX.Element | null =>
