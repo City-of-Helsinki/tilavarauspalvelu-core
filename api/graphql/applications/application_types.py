@@ -1,5 +1,6 @@
 import graphene
 from django.conf import settings
+from django.db.models import Count
 from graphene_django import DjangoListField
 from graphene_permissions.mixins import AuthNode
 from graphene_permissions.permissions import AllowAny, AllowAuthenticated
@@ -34,6 +35,8 @@ from permissions.api_permissions.graphene_permissions import (
     CityPermission,
     OrganisationPermission,
 )
+from spaces.models import Space
+from utils.query_performance import QueryPerformanceOptimizerMixin
 
 
 class CityType(AuthNode, PrimaryKeyObjectType):
@@ -230,7 +233,7 @@ class ApplicationAggregatedDataType(graphene.ObjectType):
     reservations_duration_total = graphene.Float()
 
 
-class ApplicationType(AuthNode, PrimaryKeyObjectType):
+class ApplicationType(QueryPerformanceOptimizerMixin, AuthNode, PrimaryKeyObjectType):
     permission_classes = (
         (ApplicationPermission,)
         if not settings.TMP_PERMISSIONS_DISABLED
@@ -284,6 +287,106 @@ class ApplicationType(AuthNode, PrimaryKeyObjectType):
         )
         interfaces = (graphene.relay.Node,)
         connection_class = TilavarausBaseConnection
+
+    class QueryOptimization:
+        field_name = "applications"
+        query_optimization = {
+            "contactPerson": ("select", "contact_person"),
+            "organisation": ("select", "organisation"),
+            "applicantName": ("select", "user"),
+            "applicantEmail": ("select", "user"),
+            "aggregatedData": ("prefetch", "aggregated_data"),
+            "applicationEvents": (
+                "prefetch",
+                {
+                    "field_name": "application_events",
+                    "base_queryset": ApplicationEvent.objects.all(),
+                    "child_optimizations": {
+                        "ageGroupDisplay": ("select", "age_group"),
+                        "abilityGroup": ("select", "ability_group"),
+                        "purpose": ("select", "purpose"),
+                        "weeklyAmountReductionsCount": (
+                            "annotate",
+                            Count("weekly_amount_reductions"),
+                        ),
+                        "applicationEventSchedules": (
+                            "prefetch",
+                            "application_event_schedules",
+                        ),
+                        "aggregatedData": ("prefetch", "aggregated_data"),
+                        "eventReservationUnits": (
+                            "prefetch",
+                            {
+                                "field_name": "event_reservation_units",
+                                "base_queryset": EventReservationUnit.objects.all(),
+                                "child_optimizations": {
+                                    "reservationUnitDetails": (
+                                        "select_with_child_optimizations",
+                                        {
+                                            "field_name": "reservation_unit",
+                                            "child_optimizations": {
+                                                "reservationUnitType": (
+                                                    "select_for_parent",
+                                                    "reservation_unit__reservation_unit_type",
+                                                ),
+                                                "unit": (
+                                                    "select_for_parent",
+                                                    "reservation_unit__unit",
+                                                ),
+                                                "resources": (
+                                                    "prefetch_for_parent",
+                                                    "reservation_unit__resources",
+                                                ),
+                                                "services": (
+                                                    "prefetch_for_parent",
+                                                    "reservation_unit__services",
+                                                ),
+                                                "reservationPurposes": (
+                                                    "prefetch_for_parent",
+                                                    "reservation_unit__reservation_purposes",
+                                                ),
+                                                "images": (
+                                                    "prefetch_for_parent",
+                                                    "reservation_unit__images",
+                                                ),
+                                                "equipments": (
+                                                    "prefetch_for_parent",
+                                                    "reservation_unit__equipments",
+                                                ),
+                                                "spaces": (
+                                                    "prefetch_for_parent",
+                                                    {
+                                                        "field_name": "reservation_unit__spaces",
+                                                        "always_prefetch": True,
+                                                        "base_queryset": Space.objects.all().select_related(
+                                                            "location",
+                                                        ),
+                                                        "child_optimizations": {
+                                                            "building": (
+                                                                "select",
+                                                                "building",
+                                                            ),
+                                                            "location": (
+                                                                "select",
+                                                                "location",
+                                                            ),
+                                                            "resources": (
+                                                                "prefetch",
+                                                                "resource_set",
+                                                            ),
+                                                        },
+                                                    },
+                                                ),
+                                            },
+                                        },
+                                    )
+                                },
+                            },
+                        ),
+                    },
+                },
+            ),
+        }
 
     def resolve_applicant_id(self, info: graphene.ResolveInfo):
         if not self.user:
