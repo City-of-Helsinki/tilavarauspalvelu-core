@@ -135,6 +135,60 @@ class EquipmentQueryTestCase(EquipmentBaseTestCase):
         assert_that(content.get("errors")).is_none()
         self.assertMatchSnapshot(content)
 
+    def test_order_equipment_by_category_rank(self):
+        category_1 = EquipmentCategoryFactory(name="Test Category 2", rank=2)
+        category_2 = EquipmentCategoryFactory(name="Test Category 3", rank=3)
+        category_3 = EquipmentCategoryFactory(name="Test Category 1", rank=1)
+        EquipmentFactory(name="Test equipment 1", category=category_3)
+        EquipmentFactory(name="Test equipment 2", category=category_1)
+        EquipmentFactory(name="Test equipment 3", category=category_2)
+
+        response = self.query(
+            """
+            query {
+              equipments(orderBy: "categoryRank") {
+                edges {
+                  node {
+                    nameFi
+                    category { nameFi }
+                  }
+                }
+              }
+            }
+            """
+        )
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filter_equipment_by_category_rank(self):
+        category_1 = EquipmentCategoryFactory(name="Test Category 2", rank=2)
+        category_2 = EquipmentCategoryFactory(name="Test Category 3", rank=3)
+        category_3 = EquipmentCategoryFactory(name="Test Category 1", rank=1)
+        EquipmentFactory(name="Show me 1", category=category_3)
+        EquipmentFactory(name="And me 2", category=category_1)
+        EquipmentFactory(name="Don't show me", category=category_2)
+
+        response = self.query(
+            """
+            query {
+              equipments(rankGte: 1 rankLte: 2) {
+                edges {
+                  node {
+                    nameFi
+                    category { nameFi }
+                  }
+                }
+              }
+            }
+            """
+        )
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
 
 class EquipmentCategoryCreateTestCase(EquipmentBaseTestCase):
     def get_create_query(self):
