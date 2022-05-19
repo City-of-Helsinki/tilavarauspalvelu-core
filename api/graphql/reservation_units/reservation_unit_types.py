@@ -369,9 +369,6 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
         interfaces = (graphene.relay.Node,)
         connection_class = TilavarausBaseConnection
 
-    def resolve_pk(self, info):
-        return self.id
-
     def resolve_location(self, info):
         return self.get_location()
 
