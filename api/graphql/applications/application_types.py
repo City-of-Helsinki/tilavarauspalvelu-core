@@ -1,5 +1,4 @@
 import graphene
-import graphene_django_optimizer as gql_optimizer
 from django.conf import settings
 from graphene_django import DjangoListField
 from graphene_permissions.mixins import AuthNode
@@ -37,7 +36,7 @@ from permissions.api_permissions.graphene_permissions import (
 )
 
 
-class CityType(gql_optimizer.OptimizedDjangoObjectType, AuthNode, PrimaryKeyObjectType):
+class CityType(AuthNode, PrimaryKeyObjectType):
     permission_classes = (
         (CityPermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
     )
@@ -50,9 +49,7 @@ class CityType(gql_optimizer.OptimizedDjangoObjectType, AuthNode, PrimaryKeyObje
         connection_class = TilavarausBaseConnection
 
 
-class AddressType(
-    gql_optimizer.OptimizedDjangoObjectType, AuthNode, PrimaryKeyObjectType
-):
+class AddressType(AuthNode, PrimaryKeyObjectType):
     permission_classes = (
         (AddressPermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
     )
@@ -65,9 +62,7 @@ class AddressType(
         connection_class = TilavarausBaseConnection
 
 
-class PersonType(
-    gql_optimizer.OptimizedDjangoObjectType, AuthNode, PrimaryKeyObjectType
-):
+class PersonType(AuthNode, PrimaryKeyObjectType):
     permission_classes = (
         (AllowAuthenticated,) if not settings.TMP_PERMISSIONS_DISABLED else [AllowAny]
     )
@@ -80,9 +75,7 @@ class PersonType(
         connection_class = TilavarausBaseConnection
 
 
-class OrganisationType(
-    gql_optimizer.OptimizedDjangoObjectType, AuthNode, PrimaryKeyObjectType
-):
+class OrganisationType(AuthNode, PrimaryKeyObjectType):
     permission_classes = (
         (OrganisationPermission,)
         if not settings.TMP_PERMISSIONS_DISABLED
@@ -116,9 +109,7 @@ class ApplicationEventAggregatedDataType(graphene.ObjectType):
     allocation_results_reservations_total = graphene.Float()
 
 
-class ApplicationEventScheduleType(
-    gql_optimizer.OptimizedDjangoObjectType, AuthNode, PrimaryKeyObjectType
-):
+class ApplicationEventScheduleType(AuthNode, PrimaryKeyObjectType):
     permission_classes = (
         (AllowAuthenticated,) if not settings.TMP_PERMISSIONS_DISABLED else [AllowAny]
     )
@@ -131,9 +122,7 @@ class ApplicationEventScheduleType(
         connection_class = TilavarausBaseConnection
 
 
-class EventReservationUnitType(
-    gql_optimizer.OptimizedDjangoObjectType, AuthNode, PrimaryKeyObjectType
-):
+class EventReservationUnitType(AuthNode, PrimaryKeyObjectType):
     permission_classes = (
         (AllowAuthenticated,) if not settings.TMP_PERMISSIONS_DISABLED else [AllowAny]
     )
@@ -156,9 +145,7 @@ class EventReservationUnitType(
         connection_class = TilavarausBaseConnection
 
 
-class ApplicationEventType(
-    gql_optimizer.OptimizedDjangoObjectType, AuthNode, PrimaryKeyObjectType
-):
+class ApplicationEventType(AuthNode, PrimaryKeyObjectType):
     permission_classes = (
         (AllowAuthenticated,) if not settings.TMP_PERMISSIONS_DISABLED else [AllowAny]
     )
@@ -243,9 +230,7 @@ class ApplicationAggregatedDataType(graphene.ObjectType):
     reservations_duration_total = graphene.Float()
 
 
-class ApplicationType(
-    gql_optimizer.OptimizedDjangoObjectType, AuthNode, PrimaryKeyObjectType
-):
+class ApplicationType(AuthNode, PrimaryKeyObjectType):
     permission_classes = (
         (ApplicationPermission,)
         if not settings.TMP_PERMISSIONS_DISABLED
