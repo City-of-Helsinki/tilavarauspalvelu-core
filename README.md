@@ -26,6 +26,32 @@ Then you can run docker image with
 
 `docker-compose up dev`
 
+## Requirements
+
+Workflow with requirements is as follows.
+
+requirements.txt is not edited manually, but is generated with pip-compile.
+
+requirements.txt contains fully tested, pinned versions of the requirements. requirements.in contains the primary, requirements of the project without their dependencies.
+
+In production, deployments should always use requirements.txt and the versions pinned therein. In development, new virtualenvs and development environments should also be initialised using requirements.txt. pip-sync will synchronize the active virtualenv to match exactly the packages in requirements.txt.
+
+In development and testing, to update a package update it in requirements.in and use the command pip-compile.
+
+To remove a dependency, remove it from requirements.in, run pip-compile and then pip-sync. If everything works as expected, commit the changes.
+
+### Database requirements
+
+Postgresql 11 database with postgis extension. Find postgis installation instructions [here](https://postgis.net/install/).
+
+### Installation issues on Mac
+
+You might get an error when installing psycopg2. To fix the issue, you need to install OpenSSL and then update the LIBRARY_PATH env:
+```
+brew install openssl
+export LIBRARY_PATH=$LIBRARY_PATH:/usr/local/opt/openssl/lib/
+```
+
 ### Potential build problems
 
 Docker compose might fail building with an error about missing source files. This is fixed by creating hte following directories (empty dirs are fine).
@@ -58,22 +84,6 @@ Locally:
 
 `deploy/entrypoint.sh test`
 
-
-## Requirements
-
-Workflow with requirements is as follows.
-
-requirements.txt is not edited manually, but is generated with pip-compile.
-
-requirements.txt contains fully tested, pinned versions of the requirements. requirements.in contains the primary, requirements of the project without their dependencies.
-
-In production, deployments should always use requirements.txt and the versions pinned therein. In development, new virtualenvs and development environments should also be initialised using requirements.txt. pip-sync will synchronize the active virtualenv to match exactly the packages in requirements.txt.
-
-In development and testing, to update a package update it in requirements.in and use the command pip-compile.
-
-To remove a dependency, remove it from requirements.in, run pip-compile and then pip-sync. If everything works as expected, commit the changes.
-
-
 # Background processing
 
 Background processes are run with [Celery](https://docs.celeryproject.org/).
@@ -100,10 +110,6 @@ For this project, `.env.example` must be copied both to the root directory as `.
 $ cd tilavarauspalvelu
 $ ln -s ../.env .env
 ```
-
-## Database requirements
-
-Postgresql 11 database with postgis extension. Find postgis installation instructions [here](https://postgis.net/install/).
  
 # Authentication
 
