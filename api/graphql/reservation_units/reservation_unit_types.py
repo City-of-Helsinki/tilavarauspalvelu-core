@@ -323,6 +323,7 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
             "images",
             "location",
             "max_persons",
+            "min_persons",
             "reservation_unit_type",
             "equipment",
             "uuid",
