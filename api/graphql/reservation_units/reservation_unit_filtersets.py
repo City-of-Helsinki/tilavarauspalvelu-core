@@ -73,6 +73,10 @@ class ReservationUnitsFilterSet(django_filters.FilterSet):
         field_name="reservation_unit_type__rank", lookup_expr="lte"
     )
 
+    reservation_kind = django_filters.CharFilter(
+        field_name="reservation_kind", lookup_expr="iexact"
+    )
+
     order_by = django_filters.OrderingFilter(
         fields=(
             "name_fi",

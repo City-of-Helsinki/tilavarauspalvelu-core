@@ -25,7 +25,7 @@ from permissions.models import (
     UnitRoleChoice,
     UnitRolePermission,
 )
-from reservation_units.models import ReservationUnit, TaxPercentage
+from reservation_units.models import ReservationKind, ReservationUnit, TaxPercentage
 from reservation_units.tests.factories import (
     EquipmentFactory,
     KeywordCategoryFactory,
@@ -212,6 +212,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
                             maxReservationsPerUser
                             requireReservationHandling
                             authentication
+                            reservationKind
                           }
                         }
                     }
@@ -2306,6 +2307,9 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         )
         assert_that(res_unit.require_reservation_handling).is_equal_to(True)
         assert_that(res_unit.authentication).is_equal_to("strong")
+        assert_that(res_unit.reservation_kind).is_equal_to(
+            ReservationKind.DIRECT_AND_SEASON
+        )
 
     @mock.patch(
         "reservation_units.utils.hauki_exporter.ReservationUnitHaukiExporter.send_reservation_unit_to_hauki"
