@@ -260,6 +260,10 @@ class ReservationUnit(models.Model):
         verbose_name=_("Maximum number of persons"), null=True, blank=True
     )
 
+    min_persons = models.fields.PositiveIntegerField(
+        verbose_name=_("Minimum number of persons"), null=True, blank=True
+    )
+
     surface_area = models.DecimalField(
         verbose_name=_("Surface area"),
         max_digits=10,
