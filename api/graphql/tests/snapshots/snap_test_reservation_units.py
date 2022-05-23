@@ -590,6 +590,8 @@ snapshots['ReservationUnitQueryTestCase::test_getting_reservation_units 1'] = {
                         },
                         'reservations': [
                         ],
+                        'reservationsMaxDaysBefore': 360,
+                        'reservationsMinDaysBefore': 1,
                         'resources': [
                         ],
                         'services': [
