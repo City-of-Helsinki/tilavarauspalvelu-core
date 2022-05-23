@@ -367,6 +367,18 @@ class ReservationUnit(models.Model):
         ),
     )
 
+    reservations_max_days_before = models.PositiveIntegerField(
+        verbose_name=_("Maximum number of days before reservations can be made"),
+        null=True,
+        blank=True,
+    )
+
+    reservations_min_days_before = models.PositiveIntegerField(
+        verbose_name=_("Minimum days before reservations can be made"),
+        null=True,
+        blank=True,
+    )
+
     reservation_begins = models.DateTimeField(
         null=True,
         blank=True,
