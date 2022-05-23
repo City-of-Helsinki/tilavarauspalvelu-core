@@ -64,7 +64,7 @@ const Navigation = (): JSX.Element => {
             onItemSelection={() => setMenuState(false)}
           />
         </MobileNavigation>
-        {state !== "Unknown" && (
+        {state !== "Unknown" && state !== "NoPermissions" && (
           <UserMenu
             userName={`${user?.firstName || ""} ${user?.lastName || ""}`.trim()}
             authenticated={state === "HasPermissions"}
