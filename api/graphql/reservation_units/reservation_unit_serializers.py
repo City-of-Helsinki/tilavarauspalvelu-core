@@ -263,6 +263,7 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
             "max_reservations_per_user",
             "require_reservation_handling",
             "authentication",
+            "reservation_kind",
         ] + get_all_translatable_fields(ReservationUnit)
 
     def __init__(self, *args, **kwargs):

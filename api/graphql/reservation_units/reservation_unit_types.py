@@ -354,6 +354,7 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
             "require_reservation_handling",
             "authentication",
             "rank",
+            "reservation_kind",
         ] + get_all_translatable_fields(model)
         filter_fields = {
             "name_fi": ["exact", "icontains", "istartswith"],

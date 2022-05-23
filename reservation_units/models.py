@@ -134,6 +134,12 @@ def get_default_tax_percentage() -> int:
     return TaxPercentage.objects.order_by("value").first().pk
 
 
+class ReservationKind(models.TextChoices):
+    DIRECT = "DIRECT", _("Direct")
+    SEASON = "SEASON", _("Season")
+    DIRECT_AND_SEASON = "DIRECT_AND_SEASON", _("Direct and season")
+
+
 class ReservationUnit(models.Model):
     sku = models.CharField(
         verbose_name=_("SKU"), max_length=255, blank=True, default=""
@@ -431,6 +437,14 @@ class ReservationUnit(models.Model):
         null=True,
         verbose_name=_("Order number"),
         help_text=_("Order number to be use in api sorting."),
+    )
+
+    reservation_kind = models.CharField(
+        max_length=20,
+        verbose_name=_("Reservation kind "),
+        choices=ReservationKind.choices,
+        default=ReservationKind.DIRECT_AND_SEASON,
+        help_text="What kind of reservations are to be booked with this reservation unit.",
     )
 
     class Meta:
