@@ -475,6 +475,7 @@ class ReservationUnitByPkType(ReservationUnitType, OpeningHoursMixin):
             "images",
             "location",
             "max_persons",
+            "min_persons",
             "reservation_unit_type",
             "equipment",
             "uuid",
@@ -499,6 +500,7 @@ class ReservationUnitByPkType(ReservationUnitType, OpeningHoursMixin):
             "max_reservations_per_user",
             "require_reservation_handling",
             "authentication",
+            "reservation_kind",
         ] + get_all_translatable_fields(model)
 
         interfaces = (graphene.relay.Node,)
