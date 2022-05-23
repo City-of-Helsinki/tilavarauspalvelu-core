@@ -264,6 +264,7 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
             "require_reservation_handling",
             "authentication",
             "reservation_kind",
+            "can_apply_free_of_charge",
         ] + get_all_translatable_fields(ReservationUnit)
 
     def __init__(self, *args, **kwargs):

@@ -213,6 +213,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
                             requireReservationHandling
                             authentication
                             reservationKind
+                            canApplyFreeOfCharge
                           }
                         }
                     }
@@ -2245,6 +2246,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
             "maxReservationsPerUser": 2,
             "requireReservationHandling": True,
             "authentication": "STRONG",
+            "canApplyFreeOfCharge": True,
         }
 
     def test_create(self):
@@ -2310,6 +2312,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         assert_that(res_unit.reservation_kind).is_equal_to(
             ReservationKind.DIRECT_AND_SEASON
         )
+        assert_that(res_unit.can_apply_free_of_charge).is_equal_to(True)
 
     @mock.patch(
         "reservation_units.utils.hauki_exporter.ReservationUnitHaukiExporter.send_reservation_unit_to_hauki"

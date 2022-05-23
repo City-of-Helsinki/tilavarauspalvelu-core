@@ -546,6 +546,7 @@ snapshots['ReservationUnitQueryTestCase::test_getting_reservation_units 1'] = {
                         'authentication': 'WEAK',
                         'bufferTimeAfter': 900,
                         'bufferTimeBefore': 900,
+                        'canApplyFreeOfCharge': False,
                         'cancellationRule': {
                             'nameEn': 'en',
                             'nameFi': 'fi',
