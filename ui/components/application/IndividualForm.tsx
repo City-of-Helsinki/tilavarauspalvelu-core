@@ -62,7 +62,7 @@ const IndividualForm = ({ application, onNext }: Props): JSX.Element | null => {
           {t("application:Page3.subHeading.basicInfo")}
         </FormSubHeading>
         <TextInput
-          ref={register({ required: true })}
+          ref={register({ required: true, maxLength: 255 })}
           label={t("application:Page3.firstName")}
           id="contactPerson.firstName"
           name="contactPerson.firstName"
@@ -70,11 +70,14 @@ const IndividualForm = ({ application, onNext }: Props): JSX.Element | null => {
           invalid={!!errors.contactPerson?.firstName?.type}
           errorText={applicationErrorText(
             t,
-            errors.contactPerson?.firstName?.type
+            errors.contactPerson?.firstName?.type,
+            {
+              count: 255,
+            }
           )}
         />
         <TextInput
-          ref={register({ required: true })}
+          ref={register({ required: true, maxLength: 255 })}
           label={t("application:Page3.lastName")}
           id="contactPerson.lastName"
           name="contactPerson.lastName"
@@ -82,7 +85,10 @@ const IndividualForm = ({ application, onNext }: Props): JSX.Element | null => {
           invalid={!!errors.contactPerson?.lastName?.type}
           errorText={applicationErrorText(
             t,
-            errors.contactPerson?.lastName?.type
+            errors.contactPerson?.lastName?.type,
+            {
+              count: 255,
+            }
           )}
         />
         <BillingAddress register={register} errors={errors} />
@@ -90,7 +96,7 @@ const IndividualForm = ({ application, onNext }: Props): JSX.Element | null => {
           {t("application:Page3.subHeading.contactInfo")}
         </FormSubHeading>
         <TextInput
-          ref={register({ required: true })}
+          ref={register({ required: true, maxLength: 255 })}
           label={t("application:Page3.phoneNumber")}
           id="contactPerson.phoneNumber"
           name="contactPerson.phoneNumber"
@@ -98,15 +104,25 @@ const IndividualForm = ({ application, onNext }: Props): JSX.Element | null => {
           invalid={!!errors.contactPerson?.phoneNumber?.type}
           errorText={applicationErrorText(
             t,
-            errors.contactPerson?.phoneNumber?.type
+            errors.contactPerson?.phoneNumber?.type,
+            {
+              count: 255,
+            }
           )}
         />
         <SpanTwoColumns>
           <TextInput
-            ref={register({ required: false })}
+            ref={register({ required: false, maxLength: 255 })}
             label={t("application:Page3.additionalInformation")}
             id="additionalInformation"
             name="additionalInformation"
+            errorText={applicationErrorText(
+              t,
+              errors.additionalInformation?.type,
+              {
+                count: 255,
+              }
+            )}
           />
         </SpanTwoColumns>
         <EmailInput register={register} errors={errors} />

@@ -237,7 +237,7 @@ const ApplicationEvent = ({
         <TwoColumnContainer>
           <div>
             <TextInput
-              ref={form.register({ required: true })}
+              ref={form.register({ required: true, maxLength: 255 })}
               label={t("application:Page1.name")}
               id={fieldName("name")}
               name={fieldName("name")}
@@ -245,7 +245,8 @@ const ApplicationEvent = ({
               invalid={!!form.errors.applicationEvents?.[index]?.name?.type}
               errorText={applicationErrorText(
                 t,
-                form.errors.applicationEvents?.[index]?.name?.type
+                form.errors.applicationEvents?.[index]?.name?.type,
+                { count: 255 }
               )}
             />
           </div>
