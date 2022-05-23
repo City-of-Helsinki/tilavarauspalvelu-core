@@ -570,6 +570,7 @@ snapshots['ReservationUnitQueryTestCase::test_getting_reservation_units 1'] = {
                             'supportedFields': [
                             ]
                         },
+                        'minPersons': 1,
                         'minReservationDuration': 600,
                         'nameFi': 'test name fi',
                         'priceUnit': 'PER_HOUR',

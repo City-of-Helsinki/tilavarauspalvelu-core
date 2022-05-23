@@ -107,6 +107,7 @@ class ReservationUnitQueryTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCa
             max_reservation_duration=datetime.timedelta(days=1),
             metadata_set=ReservationMetadataSetFactory(name="Test form"),
             max_reservations_per_user=5,
+            min_persons=1,
         )
 
         cls.api_client = APIClient()
@@ -153,6 +154,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
                               latitude
                             }
                             maxPersons
+                            minPersons
                             surfaceArea
                             reservationUnitType {
                               nameFi
@@ -2225,6 +2227,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
             "reservationUnitTypePk": self.reservation_unit_type.id,
             "surfaceArea": 100,
             "maxPersons": 10,
+            "minPersons": 1,
             "bufferTimeAfter": 3600,
             "bufferTimeBefore": 3600,
             "cancellationRulePk": self.rule.pk,
@@ -2270,6 +2273,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         )
         assert_that(res_unit.surface_area).is_equal_to(data.get("surfaceArea"))
         assert_that(res_unit.max_persons).is_equal_to(data.get("maxPersons"))
+        assert_that(res_unit.min_persons).is_equal_to(data.get("minPersons"))
         assert_that(res_unit.buffer_time_after).is_equal_to(datetime.timedelta(hours=1))
         assert_that(res_unit.buffer_time_before).is_equal_to(
             datetime.timedelta(hours=1)
@@ -2665,6 +2669,21 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         res_unit = ReservationUnit.objects.first()
         assert_that(res_unit).is_none()
 
+    def test_min_persons_over_max_persons_errors(self):
+        data = self.get_valid_data()
+        data["minPersons"] = 11
+
+        response = self.query(self.get_create_query(), input_data=data)
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
+        res_unit_data = content.get("data").get("createReservationUnit")
+        assert_that(content.get("errors")).is_none()
+        assert_that(res_unit_data.get("errors")).is_not_none()
+        assert_that(res_unit_data.get("errors")[0].get("messages")[0]).contains(
+            "minPersons can't be more than maxPersons"
+        )
+        assert_that(ReservationUnit.objects.exists()).is_false()
+
 
 class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
     @classmethod
@@ -2882,6 +2901,7 @@ class ReservationUnitUpdateNotDraftTestCase(ReservationUnitMutationsTestCaseBase
             contact_information="Info",
             reservation_unit_type=cls.reservation_unit_type,
             unit=cls.unit,
+            max_persons=10,
         )
         cls.res_unit.spaces.add(cls.space)
         cls.res_unit.resources.add(cls.resource)
@@ -3324,3 +3344,34 @@ class ReservationUnitUpdateNotDraftTestCase(ReservationUnitMutationsTestCaseBase
 
         self.res_unit.refresh_from_db()
         assert_that(self.res_unit.name).is_equal_to("Resunit name")
+
+    def test_min_persons_over_max_persons_errors(self):
+        data = self.get_valid_update_data()
+        data["minPersons"] = 11
+
+        response = self.query(self.get_update_query(), input_data=data)
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
+        res_unit_data = content.get("data").get("updateReservationUnit")
+        assert_that(content.get("errors")).is_none()
+        assert_that(res_unit_data.get("errors")).is_not_none()
+        assert_that(res_unit_data.get("errors")[0].get("messages")[0]).contains(
+            "minPersons can't be more than maxPersons"
+        )
+
+        self.res_unit.refresh_from_db()
+        assert_that(self.res_unit.min_persons).is_none()
+
+    def test_min_persons_updates(self):
+        data = self.get_valid_update_data()
+        data["minPersons"] = 1
+
+        response = self.query(self.get_update_query(), input_data=data)
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
+        res_unit_data = content.get("data").get("updateReservationUnit")
+        assert_that(content.get("errors")).is_none()
+        assert_that(res_unit_data.get("errors")).is_none()
+
+        self.res_unit.refresh_from_db()
+        assert_that(self.res_unit.min_persons).is_equal_to(1)

@@ -228,6 +228,7 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
             "images",
             "location",
             "max_persons",
+            "min_persons",
             "reservation_unit_type",
             "building",
             "equipment_pks",
@@ -333,6 +334,18 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
         if not reservation_unit_type:
             raise serializers.ValidationError(
                 "Not draft reservation unit must have a reservation unit type."
+            )
+
+        max_persons = data.get(
+            "max_persons", getattr(self.instance, "max_persons", None)
+        )
+        if (
+            data.get("min_persons")
+            and max_persons
+            and data.get("min_persons") > max_persons
+        ):
+            raise serializers.ValidationError(
+                "minPersons can't be more than maxPersons"
             )
 
 
