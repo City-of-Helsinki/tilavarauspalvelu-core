@@ -5,7 +5,7 @@ import {
   ApplicationRoundTypeConnection,
   QueryApplicationRoundsArgs,
   ReservationUnitType,
-  Status,
+  ApplicationRoundStatus,
   ApplicationsApplicationRoundTargetGroupChoices,
 } from "../../modules/gql-types";
 import { ApplicationRound } from "../../modules/types";
@@ -33,7 +33,7 @@ const applicationRoundsGQL = graphql.query<Query, QueryApplicationRoundsArgs>(
             reservationPeriodEnd: toApiDate(addMonths(new Date(), 1)),
             publicDisplayBegin: "2021-04-16T06:00:00+00:00",
             publicDisplayEnd: addDays(new Date(), 7).toISOString(),
-            status: Status.Draft,
+            status: ApplicationRoundStatus.Draft,
             reservationUnits: [
               {
                 pk: 2,
@@ -72,7 +72,7 @@ const applicationRoundsGQL = graphql.query<Query, QueryApplicationRoundsArgs>(
             reservationPeriodEnd: toApiDate(addMonths(new Date(), 1)),
             publicDisplayBegin: "2021-04-16T06:00:00+00:00",
             publicDisplayEnd: addDays(new Date(), 7).toISOString(),
-            status: Status.Draft,
+            status: ApplicationRoundStatus.Draft,
             reservationUnits: [
               {
                 pk: 7,
@@ -111,7 +111,7 @@ const applicationRoundsGQL = graphql.query<Query, QueryApplicationRoundsArgs>(
             reservationPeriodEnd: toApiDate(addMonths(new Date(), 1)),
             publicDisplayBegin: "2021-04-16T06:00:00Z",
             publicDisplayEnd: addDays(new Date(), 7).toISOString(),
-            status: Status.InReview,
+            status: ApplicationRoundStatus.InReview,
             reservationUnits: [
               {
                 pk: 7,
@@ -144,7 +144,7 @@ const applicationRoundsGQL = graphql.query<Query, QueryApplicationRoundsArgs>(
             reservationPeriodEnd: toApiDate(addMonths(new Date(), 1)),
             publicDisplayBegin: "2021-04-16T06:00:00Z",
             publicDisplayEnd: addDays(new Date(), 7).toISOString(),
-            status: Status.Draft,
+            status: ApplicationRoundStatus.Draft,
             reservationUnits: [
               {
                 pk: 9,
@@ -189,7 +189,7 @@ const applicationRoundsGQL = graphql.query<Query, QueryApplicationRoundsArgs>(
             reservationPeriodEnd: toApiDate(addMonths(new Date(), 1)),
             publicDisplayBegin: "2021-04-16T06:00:00Z",
             publicDisplayEnd: addDays(new Date(), 7).toISOString(),
-            status: Status.Draft,
+            status: ApplicationRoundStatus.Draft,
             reservationUnits: [
               {
                 pk: 9,
@@ -231,7 +231,7 @@ const applicationRoundsGQL = graphql.query<Query, QueryApplicationRoundsArgs>(
             reservationPeriodEnd: "2021-06-01",
             publicDisplayBegin: "2021-01-01T00:00:00Z",
             publicDisplayEnd: addDays(new Date(), 7).toISOString(),
-            status: Status.Draft,
+            status: ApplicationRoundStatus.Draft,
             reservationUnits: [
               {
                 pk: 2,
@@ -273,7 +273,7 @@ const applicationRoundsGQL = graphql.query<Query, QueryApplicationRoundsArgs>(
             reservationPeriodEnd: "2021-06-01",
             publicDisplayBegin: "2020-12-18T00:00:00Z",
             publicDisplayEnd: addDays(new Date(), 7).toISOString(),
-            status: Status.Draft,
+            status: ApplicationRoundStatus.Draft,
             reservationUnits: [
               {
                 pk: 9,
@@ -318,7 +318,7 @@ const applicationRoundsGQL = graphql.query<Query, QueryApplicationRoundsArgs>(
             reservationPeriodEnd: toApiDate(addMonths(new Date(), 5)),
             publicDisplayBegin: "2021-04-16T06:00:00Z",
             publicDisplayEnd: addDays(new Date(), 7).toISOString(),
-            status: Status.Draft,
+            status: ApplicationRoundStatus.Draft,
             reservationUnits: [
               {
                 pk: 9,

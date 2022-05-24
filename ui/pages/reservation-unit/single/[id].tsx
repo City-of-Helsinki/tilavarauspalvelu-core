@@ -5,7 +5,14 @@ import styled from "styled-components";
 import { useQuery } from "@apollo/client";
 import { Koros, Notification } from "hds-react";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { addSeconds, addYears, isValid, parseISO, subMinutes } from "date-fns";
+import {
+  addDays,
+  addSeconds,
+  addYears,
+  isValid,
+  parseISO,
+  subMinutes,
+} from "date-fns";
 import Container from "../../../components/common/Container";
 import { ApplicationRound, PendingReservation } from "../../../modules/types";
 import Head from "../../../components/reservation-unit/Head";
@@ -17,7 +24,7 @@ import useReservationUnitsList from "../../../hooks/useReservationUnitList";
 import { AccordionWithState as Accordion } from "../../../components/common/Accordion";
 import apolloClient from "../../../modules/apolloClient";
 import Map from "../../../components/Map";
-import { H2 } from "../../../modules/style/typography";
+import { H4 } from "../../../modules/style/typography";
 import Calendar, { CalendarEvent } from "../../../components/calendar/Calendar";
 import Legend from "../../../components/calendar/Legend";
 import LoginFragment from "../../../components/LoginFragment";
@@ -38,7 +45,6 @@ import {
   isStartTimeWithinInterval,
 } from "../../../modules/calendar";
 import Toolbar, { ToolbarProps } from "../../../components/calendar/Toolbar";
-import { getActiveOpeningTimes } from "../../../modules/openingHours";
 import {
   Query,
   QueryReservationsArgs,
@@ -78,6 +84,97 @@ type Props = {
 type WeekOptions = "day" | "week" | "month";
 
 type ReservationStateWithInitial = string;
+
+const openingTimePeriods = [
+  {
+    periodId: 38600,
+    startDate: toApiDate(new Date()),
+    endDate: toApiDate(addDays(new Date(), 30)),
+    resourceState: null,
+    timeSpans: [
+      {
+        startTime: "09:00:00+00:00",
+        endTime: "12:00:00+00:00",
+        weekdays: [6, 1, 7],
+        resourceState: "open",
+        endTimeOnNextDay: null,
+        nameFi: "Span name Fi",
+        nameEn: "Span name En",
+        nameSv: "Span name Sv",
+        descriptionFi: "Span desc Fi",
+        descriptionEn: "Span desc En",
+        descriptionSv: "Span desc Sv",
+      },
+      {
+        startTime: "12:00:00+00:00",
+        endTime: "21:00:00+00:00",
+        weekdays: [7, 2],
+        resourceState: "open",
+        endTimeOnNextDay: null,
+        nameFi: "Span name Fi",
+        nameEn: "Span name En",
+        nameSv: "Span name Sv",
+        descriptionFi: "Span desc Fi",
+        descriptionEn: "Span desc En",
+        descriptionSv: "Span desc Sv",
+      },
+    ],
+    nameFi: "Period name Fi",
+    nameEn: "Period name En",
+    nameSv: "Period name Sv",
+    descriptionFi: "Period desc Fi",
+    descriptionEn: "Period desc En",
+    descriptionSv: "Period desc Sv",
+  },
+  {
+    periodId: 38601,
+    startDate: toApiDate(addDays(new Date(), 30)),
+    endDate: toApiDate(addDays(new Date(), 300)),
+    resourceState: null,
+    timeSpans: [
+      {
+        startTime: "09:00:00+00:00",
+        endTime: "21:00:00+00:00",
+        weekdays: [4, 5, 6],
+        resourceState: "open",
+        endTimeOnNextDay: null,
+        nameFi: "Span name Fi",
+        nameEn: "Span name En",
+        nameSv: "Span name Sv",
+        descriptionFi: "Span desc Fi",
+        descriptionEn: "Span desc En",
+        descriptionSv: "Span desc Sv",
+      },
+      {
+        startTime: "09:00:00+00:00",
+        endTime: "21:00:00+00:00",
+        weekdays: [7],
+        resourceState: "open",
+        endTimeOnNextDay: null,
+        nameFi: "Span name Fi",
+        nameEn: "Span name En",
+        nameSv: "Span name Sv",
+        descriptionFi: "Span desc Fi",
+        descriptionEn: "Span desc En",
+        descriptionSv: "Span desc Sv",
+      },
+    ],
+    nameFi: "Period name Fi",
+    nameEn: "Period name En",
+    nameSv: "Period name Sv",
+    descriptionFi: "Period desc Fi",
+    descriptionEn: "Period desc En",
+    descriptionSv: "Period desc Sv",
+  },
+];
+
+const openingTimes = Array.from(Array(100)).map((val, index) => ({
+  date: toApiDate(addDays(new Date(), index)),
+  startTime: "04:00:00+00:00",
+  endTime: "20:00:00+00:00",
+  state: "open",
+  periods: null,
+}));
 
 export const getServerSideProps: GetServerSideProps = async ({
   locale,
@@ -150,8 +247,8 @@ export const getServerSideProps: GetServerSideProps = async ({
       query: OPENING_HOURS,
       variables: {
         pk: id,
-        startDate: today,
-        endDate: lastOpeningPeriodEndDate,
+        // startDate: today,
+        // endDate: lastOpeningPeriodEndDate,
         from: today,
         to: lastOpeningPeriodEndDate,
         state: ["CREATED", "CONFIRMED"],
@@ -186,6 +283,10 @@ export const getServerSideProps: GetServerSideProps = async ({
       };
     }
 
+    const allowReservationsWithoutOpeningHours =
+      reservationUnitData?.reservationUnitByPk
+        ?.allowReservationsWithoutOpeningHours;
+
     return {
       props: {
         ...(await serverSideTranslations(locale)),
@@ -193,10 +294,12 @@ export const getServerSideProps: GetServerSideProps = async ({
         reservationUnit: {
           ...reservationUnitData?.reservationUnitByPk,
           openingHours: {
-            ...reservationUnitData?.reservationUnitByPk?.openingHours,
-            openingTimes:
-              additionalData?.reservationUnitByPk?.openingHours?.openingTimes ||
-              null,
+            openingTimes: allowReservationsWithoutOpeningHours
+              ? openingTimes
+              : [],
+            openingTimePeriods: allowReservationsWithoutOpeningHours
+              ? openingTimePeriods
+              : [],
           },
           reservations:
             additionalData?.reservationUnitByPk?.reservations?.filter(
@@ -274,7 +377,7 @@ const StyledKoros = styled(Koros).attrs({
   margin-bottom: -1px;
 `;
 
-const StyledH2 = styled(H2)``;
+const Subheading = styled(H4).attrs({ as: "h3" })``;
 
 const CalendarWrapper = styled.div`
   margin-bottom: var(--spacing-layout-xl);
@@ -389,9 +492,9 @@ const ReservationUnit = ({
     },
   });
 
-  const activeOpeningTimes = getActiveOpeningTimes(
-    reservationUnit.openingHours?.openingTimePeriods
-  );
+  // const activeOpeningTimes = getActiveOpeningTimes(
+  //   reservationUnit.openingHours?.openingTimePeriods
+  // );
 
   const slotPropGetter = useMemo(
     () =>
@@ -558,7 +661,7 @@ const ReservationUnit = ({
 
   const isReservable = useMemo(() => {
     return (
-      reservationUnit.openingHours?.openingTimes?.length > 0 &&
+      // reservationUnit.openingHours?.openingTimes?.length > 0 &&
       reservationUnit.minReservationDuration &&
       reservationUnit.maxReservationDuration &&
       isReservationUnitReservable(reservationUnit)
@@ -573,7 +676,7 @@ const ReservationUnit = ({
     <Wrapper>
       <Head
         reservationUnit={reservationUnit}
-        activeOpeningTimes={activeOpeningTimes}
+        // activeOpeningTimes={activeOpeningTimes}
         reservationUnitList={reservationUnitList}
         viewType="single"
         calendarRef={calendarRef}
@@ -622,7 +725,7 @@ const ReservationUnit = ({
             ref={calendarRef}
             data-testid="reservation-unit__calendar--wrapper"
           >
-            <StyledH2>{t("reservations:reservationCalendar")}</StyledH2>
+            <Subheading>{t("reservations:reservationCalendar")}</Subheading>
             <div aria-hidden>
               <Calendar
                 events={[...calendarEvents, ...eventBuffers]}
@@ -714,7 +817,7 @@ const ReservationUnit = ({
           )}
         {reservationUnit.unit?.location && (
           <MapWrapper>
-            <StyledH2>{t("common:location")}</StyledH2>
+            <Subheading>{t("common:location")}</Subheading>
             <Map
               title={getTranslation(reservationUnit.unit, "name")}
               latitude={Number(reservationUnit.unit.location.latitude)}

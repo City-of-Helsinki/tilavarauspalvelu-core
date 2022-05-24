@@ -465,7 +465,7 @@ interface HMS {
 }
 
 export const secondsToHms = (duration?: number | null): HMS => {
-  if (!duration || duration < 0) return {};
+  if (!duration || duration < 1) return {};
   const h = Math.floor(duration / 3600);
   const m = Math.floor((duration % 3600) / 60);
   const s = Math.floor((duration % 3600) % 60);

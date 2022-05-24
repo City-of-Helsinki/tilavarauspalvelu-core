@@ -19,6 +19,7 @@ import {
   QueryReservationUnitTypesArgs,
   ReservationUnitsReservationUnitAuthenticationChoices,
   EquipmentCategoryType,
+  ReservationUnitsReservationUnitReservationKindChoices,
 } from "../../modules/gql-types";
 import { Parameter } from "../../modules/types";
 import { toApiDate } from "../../modules/util";
@@ -314,6 +315,10 @@ const selectedReservationUnitQuery = graphql.query<
         category: equipmentCategories[0],
       },
     ],
+    allowReservationsWithoutOpeningHours: true,
+    canApplyFreeOfCharge: false,
+    reservationKind:
+      ReservationUnitsReservationUnitReservationKindChoices.DirectAndSeason,
   };
 
   if (req.variables.pk === 800) {
@@ -613,6 +618,10 @@ const relatedReservationUnitsData: ReservationUnitTypeConnection = {
         resources: [],
         contactInformation: "",
         requireReservationHandling: false,
+        allowReservationsWithoutOpeningHours: true,
+        canApplyFreeOfCharge: false,
+        reservationKind:
+          ReservationUnitsReservationUnitReservationKindChoices.DirectAndSeason,
       },
       cursor: "YXJyYXljb25uZWN0aW9uOjA=",
     },
@@ -707,6 +716,10 @@ const relatedReservationUnitsData: ReservationUnitTypeConnection = {
         resources: [],
         contactInformation: "",
         requireReservationHandling: false,
+        allowReservationsWithoutOpeningHours: true,
+        canApplyFreeOfCharge: false,
+        reservationKind:
+          ReservationUnitsReservationUnitReservationKindChoices.DirectAndSeason,
       },
       cursor: "YXJyYXljb25uZWN0aW9uOjE=",
     },

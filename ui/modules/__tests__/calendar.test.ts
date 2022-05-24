@@ -113,7 +113,7 @@ describe("areSlotsReservable", () => {
     const hours = 11 + tzOffset;
     expect(
       areSlotsReservable(
-        [addDays(new Date().setHours(hours), 7)],
+        [addDays(new Date().setUTCHours(hours), 7)],
         openingTimes,
         []
       )
@@ -124,7 +124,7 @@ describe("areSlotsReservable", () => {
     const hours = 12 + tzOffset;
     expect(
       areSlotsReservable(
-        [addDays(new Date().setHours(hours), 7)],
+        [addDays(new Date().setUTCHours(hours), 7)],
         openingTimes,
         []
       )
@@ -135,7 +135,7 @@ describe("areSlotsReservable", () => {
     const hours = 13 + tzOffset;
     expect(
       areSlotsReservable(
-        [addDays(new Date().setHours(hours), 8)],
+        [addDays(new Date().setUTCHours(hours), 8)],
         openingTimes,
         []
       )
@@ -146,7 +146,7 @@ describe("areSlotsReservable", () => {
     const hours = 11 + tzOffset;
     expect(
       areSlotsReservable(
-        [addDays(new Date().setHours(hours), 8)],
+        [addDays(new Date().setUTCHours(hours), 8)],
         openingTimes,
         activeApplicationRounds
       )

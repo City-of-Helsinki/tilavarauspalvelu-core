@@ -255,7 +255,7 @@ const Head = styled.div`
 `;
 
 const HeadWrapper = styled(NarrowCenteredContainer)`
-  padding: 0 var(--spacing-m);
+  padding: 0 var(--spacing-m) var(--spacing-xl) var(--spacing-m);
 
   @media (min-width: ${breakpoint.m}) {
     max-width: 1000px;
@@ -318,7 +318,7 @@ const StyledTextInput = styled(TextInput)<{
   ${({ $break }) => $break && "grid-column: 1 / -2"};
 
   label {
-    ${fontMedium}
+    ${fontMedium};
   }
 `;
 
