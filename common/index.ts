@@ -1,4 +1,4 @@
 import Breadcrumb from "./src/breadcrumb/Breadcrumb";
-import ExampleCommonComponent from "./src/ExampleCommonComponent";
+import UserInfo from "./src/userinfo/UserInfo";
 
-export { Breadcrumb, ExampleCommonComponent };
+export { Breadcrumb, UserInfo };

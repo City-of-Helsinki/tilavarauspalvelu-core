@@ -3,6 +3,7 @@ import { Navigation as HDSNavigation } from "hds-react";
 import { useTranslation, TFunction } from "next-i18next";
 import { useRouter } from "next/router";
 import styled from "styled-components";
+import { UserInfo } from "common";
 import { applicationsUrl } from "../../modules/util";
 import { authEnabled, isBrowser } from "../../modules/const";
 import { breakpoint } from "../../modules/style";
@@ -130,8 +131,10 @@ const Navigation = ({ profile, logout }: Props): JSX.Element => {
             label={t("common:login")}
             onSignIn={() => setShouldLogin(true)}
           >
+            {profile && (
+              <UserInfo name={getUserName(profile, t)} email={profile.email} />
+            )}
             <HDSNavigation.Item
-              className="btn-logout"
               label={t("common:logout")}
               onClick={() => logout && logout()}
             />

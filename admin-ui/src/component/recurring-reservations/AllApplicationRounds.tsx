@@ -11,7 +11,7 @@ import { ApplicationRound as ApplicationRoundType } from "../../common/types";
 import { getApplicationRounds } from "../../common/api";
 import Loader from "../Loader";
 import { NotificationBox } from "../../styles/util";
-import { applicationRoundUrl, prefixes } from "../../common/urls";
+import { applicationRoundUrl } from "../../common/urls";
 import BreadcrumbWrapper from "../BreadcrumbWrapper";
 
 const Wrapper = styled.div``;
@@ -84,20 +84,11 @@ function AllApplicationRounds(): JSX.Element {
           <WideContainer style={{ marginBottom: "var(--spacing-layout-xl)" }}>
             {applicationRounds.length > 0 ? (
               applicationRounds.map((applicationRound) => {
-                const getRoute = (id: number): string => {
-                  if (
-                    applicationRound.status === "validated" &&
-                    applicationRound.isAdmin
-                  ) {
-                    return `${prefixes.recurringReservations}/decisions/${id}/approval`;
-                  }
-                  return applicationRoundUrl(id);
-                };
                 return (
                   <ApplicationRoundCard
                     applicationRound={applicationRound}
                     key={applicationRound.id}
-                    getRoute={(id) => getRoute(id)}
+                    getRoute={applicationRoundUrl}
                   />
                 );
               })

@@ -1,5 +1,6 @@
 import { Button, Link } from "hds-react";
 import React from "react";
+import { useHistory } from "react-router-dom";
 import styled from "styled-components";
 import { useAuthState } from "../context/AuthStateContext";
 import { H1 } from "../styles/new-typography";
@@ -50,6 +51,7 @@ const ButtonContainer = styled.div`
 
 const Error403 = (): JSX.Element => {
   const { authState } = useAuthState();
+  const history = useHistory();
 
   return (
     <Wrapper>
@@ -71,11 +73,18 @@ const Error403 = (): JSX.Element => {
         >
           Anna palautetta
         </Link>
+
         {authState.state !== "NotAutenticated" && (
           <ButtonContainer>
             <Button
               onClick={() => {
-                localLogout();
+                if (authState.logout) {
+                  authState.logout();
+                  localLogout();
+                } else {
+                  localLogout();
+                }
+                history.push("/");
               }}
             >
               Kirjaudu ulos

@@ -13,7 +13,7 @@ import { getApplicationRounds } from "../../common/api";
 
 import Loader from "../Loader";
 import { NotificationBox } from "../../styles/util";
-import { applicationRoundUrl, prefixes } from "../../common/urls";
+import { applicationRoundUrl } from "../../common/urls";
 import { useNotification } from "../../context/NotificationContext";
 import { useAuthState } from "../../context/AuthStateContext";
 
@@ -119,11 +119,7 @@ function ApplicationRounds(): JSX.Element {
                   <ApplicationRoundCard
                     applicationRound={applicationRound}
                     key={applicationRound.id}
-                    getRoute={(id) => {
-                      return applicationRound.isAdmin
-                        ? `${prefixes.recurringReservations}/decisions/${id}/approval`
-                        : applicationRoundUrl(id);
-                    }}
+                    getRoute={applicationRoundUrl}
                   />
                 );
               })}

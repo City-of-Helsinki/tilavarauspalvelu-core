@@ -9,11 +9,9 @@ import Recommendation from "./component/recurring-reservations/Recommendation";
 import RecommendationsByApplicant from "./component/recurring-reservations/RecommendationsByApplicant";
 import ApplicationRounds from "./component/recurring-reservations/ApplicationRounds";
 import AllApplicationRounds from "./component/recurring-reservations/AllApplicationRounds";
-import Approval from "./component/decisions/Approval";
 import Applications from "./component/applications/Applications";
 import Criteria from "./component/recurring-reservations/Criteria";
 import RecommendationsByReservationUnit from "./component/recurring-reservations/RecommendationsByReservationUnit";
-import ApplicationRoundApprovals from "./component/decisions/ApplicationRoundApprovals";
 import { publicUrl } from "./common/const";
 import ResolutionReport from "./component/recurring-reservations/ResolutionReport";
 import ReservationsByReservationUnit from "./component/recurring-reservations/ReservationsByReservationUnit";
@@ -28,8 +26,7 @@ import SpaceEditorView from "./component/Spaces/space-editor/SpaceEditorView";
 import ResourceEditorView from "./component/Resources/resource-editor/ResourceEditorView";
 import ReservationUnitEditor from "./component/ReservationUnits/ReservationUnitEditor/ReservationUnitEditor";
 import ResourcesList from "./component/Resources/ResourcesList";
-import ReservationUnitsList from "./component/ReservationUnits/ReservationUnitsList";
-import ReservationUnitsSearch from "./component/ReservationUnits/ReservationUnitsSearch";
+import ReservationUnits from "./component/reservation-units/ReservationUnits";
 import { withGlobalContext } from "./context/GlobalContexts";
 
 import RequestedReservations from "./component/reservations/requested/RequestedReservations";
@@ -64,17 +61,6 @@ function App(): JSX.Element {
               path={`${prefixes.recurringReservations}/application-rounds`}
               component={AllApplicationRounds}
             />
-            <Route
-              exact
-              path={`${prefixes.recurringReservations}/decisions`}
-              component={ApplicationRoundApprovals}
-            />
-            <Route
-              path={`${prefixes.recurringReservations}/decisions/:applicationRoundId/approval`}
-              component={Approval}
-              exact
-            />
-
             <Route
               path={`${prefixes.recurringReservations}/application-rounds/:applicationRoundId/applications`}
               component={Applications}
@@ -127,13 +113,9 @@ function App(): JSX.Element {
             />
             <Route path="/spaces" component={SpacesList} />
             <Route
-              path="/reservationUnits"
-              component={ReservationUnitsList}
+              path={`${prefixes.reservationUnits}`}
+              component={ReservationUnits}
               exact
-            />
-            <Route
-              path="/reservationUnits/search"
-              component={ReservationUnitsSearch}
             />
             <Route path="/resources" component={ResourcesList} />
             <Route path="/units" component={Units} />

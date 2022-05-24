@@ -3,6 +3,7 @@ import { Navigation as HDSNavigation } from "hds-react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { useHistory } from "react-router-dom";
+import { UserInfo } from "common";
 import MainMenu from "./MainMenu";
 import { useAuthState } from "../context/AuthStateContext";
 import { breakpoints, StyledHDSNavigation } from "../styles/util";
@@ -63,7 +64,7 @@ const Navigation = (): JSX.Element => {
             onItemSelection={() => setMenuState(false)}
           />
         </MobileNavigation>
-        {state !== "Unknown" && (
+        {state !== "Unknown" && state !== "NoPermissions" && (
           <UserMenu
             userName={`${user?.firstName || ""} ${user?.lastName || ""}`.trim()}
             authenticated={state === "HasPermissions"}
@@ -78,7 +79,18 @@ const Navigation = (): JSX.Element => {
               }
             }}
           >
+            {user && (
+              <UserInfo
+                name={
+                  `${user.firstName} ${user.lastName}`.trim() ||
+                  t("Navigation.noName")
+                }
+                email={user.email}
+              />
+            )}
+
             <HDSNavigation.Item
+              className="btn-logout"
               label={t("Navigation.logout")}
               onClick={() => logout && logout()}
               variant="primary"

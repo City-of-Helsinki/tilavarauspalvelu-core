@@ -73,7 +73,6 @@ export const H4 = styled.h4`
 
   @media (min-width: ${breakpoint.s}) {
     font-size: var(--fontsize-heading-m);
-    line-height: var(--lineheight-xl);
   }
 `;
 

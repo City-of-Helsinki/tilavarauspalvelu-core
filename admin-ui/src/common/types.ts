@@ -214,6 +214,7 @@ export type CurrentUser = {
   isSuperuser: boolean;
   firstName: string;
   lastName: string;
+  email: string;
   generalRoles: GeneralRole[];
   serviceSectorRoles: ServiceSectorRole[];
   unitRoles: UnitRole[];

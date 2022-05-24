@@ -154,6 +154,11 @@ export const InlineRowLink = styled(BasicLink).attrs({
 
 export const StyledHDSNavigation = styled(Navigation)`
   --breakpoint-xl: 9000px;
+  .btn-logout {
+    span {
+      margin: 0;
+    }
+  }
 `;
 
 export const SelectionCheckbox = styled(Checkbox).attrs({

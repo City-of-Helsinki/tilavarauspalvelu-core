@@ -19,7 +19,7 @@ const BillingAddress = ({ register, errors }: Props): JSX.Element | null => {
         {t("application:Page3.subHeading.billingAddress")}
       </FormSubHeading>
       <TextInput
-        ref={register({ required: true })}
+        ref={register({ required: true, maxLength: 255 })}
         label={t("application:Page3.billingAddress.streetAddress")}
         id="billingAddress.streetAddress"
         name="billingAddress.streetAddress"
@@ -27,7 +27,10 @@ const BillingAddress = ({ register, errors }: Props): JSX.Element | null => {
         invalid={!!errors.billingAddress?.streetAddress?.type}
         errorText={applicationErrorText(
           t,
-          errors.billingAddress?.streetAddress?.type
+          errors.billingAddress?.streetAddress?.type,
+          {
+            count: 255,
+          }
         )}
       />
       <TextInput
@@ -44,13 +47,15 @@ const BillingAddress = ({ register, errors }: Props): JSX.Element | null => {
         )}
       />
       <TextInput
-        ref={register({ required: true })}
+        ref={register({ required: true, maxLength: 255 })}
         label={t("application:Page3.billingAddress.city")}
         id="billingAddress.city"
         name="billingAddress.city"
         required
         invalid={!!errors.billingAddress?.city?.type}
-        errorText={applicationErrorText(t, errors.billingAddress?.city?.type)}
+        errorText={applicationErrorText(t, errors.billingAddress?.city?.type, {
+          count: 255,
+        })}
       />
     </>
   );

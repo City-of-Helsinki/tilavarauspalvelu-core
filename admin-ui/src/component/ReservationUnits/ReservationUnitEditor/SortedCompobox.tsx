@@ -1,11 +1,14 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import memoize from "lodash/memoize";
 import { ComboboxProps, Combobox } from "hds-react";
 import { OptionType } from "../../../common/types";
 
 const SortedCompobox = (
-  props: ComboboxProps<OptionType> & { sort?: boolean }
+  props: Partial<ComboboxProps<OptionType>> & { sort?: boolean; label: string }
 ): JSX.Element => {
+  const { t } = useTranslation();
+
   const sortedOpts = memoize((originalOptions) => {
     const opts = [...originalOptions];
     if (props.sort) {
@@ -16,6 +19,15 @@ const SortedCompobox = (
     return opts;
   })(props.options);
 
-  return <Combobox {...props} options={sortedOpts} />;
+  const actualProps = {
+    ...{
+      clearButtonAriaLabel: t("common.clearAllSelections"),
+      selectedItemRemoveButtonAriaLabel: t("common.removeValue"),
+      toggleButtonAriaLabel: t("common.toggleMenu"),
+    },
+    ...props,
+  };
+
+  return <Combobox {...actualProps} options={sortedOpts} />;
 };
 export default SortedCompobox;
