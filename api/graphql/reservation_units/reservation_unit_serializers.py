@@ -217,7 +217,7 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
     allow_reservations_without_opening_hours = serializers.BooleanField(
         required=False,
         default=False,
-        help_text="Allow booking without opening hours. Used for testing.",
+        help_text="Allow reservations without opening hours. Used for testing.",
     )
 
     translation_fields = get_all_translatable_fields(ReservationUnit)
