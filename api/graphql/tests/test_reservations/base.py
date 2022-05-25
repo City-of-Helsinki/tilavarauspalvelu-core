@@ -32,20 +32,26 @@ class ReservationTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCase):
         cls.purpose = ReservationPurposeFactory(name="purpose")
 
     def get_mocked_opening_hours(
-        self, reservation_unit: Optional[ReservationUnit] = None
+        self,
+        reservation_unit: Optional[ReservationUnit] = None,
+        date: Optional[datetime.date] = None,
     ):
-        if reservation_unit is None:
+        if not reservation_unit:
             reservation_unit = self.reservation_unit
+        if not date:
+            date = datetime.date.today()
+
         resource_id = f"{settings.HAUKI_ORIGIN_ID}:{reservation_unit.uuid}"
         origin_id = str(reservation_unit.uuid)
-        return [self._get_single_opening_hour_block(resource_id, origin_id)]
 
-    def _get_single_opening_hour_block(self, resource_id, origin_id):
+        return [self._get_single_opening_hour_block(resource_id, origin_id, date)]
+
+    def _get_single_opening_hour_block(self, resource_id, origin_id, date):
         return {
             "timezone": DEFAULT_TIMEZONE,
             "resource_id": resource_id,
             "origin_id": origin_id,
-            "date": datetime.date.today(),
+            "date": date,
             "times": [
                 TimeElement(
                     start_time=datetime.time(hour=6),

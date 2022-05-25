@@ -222,6 +222,7 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
                 )
 
             self.check_buffer_times(data, reservation_unit)
+            self.check_reservation_days_before(begin, reservation_unit)
             self.check_reservation_start_time(begin, scheduler)
             self.check_max_reservations_per_user(
                 self.context.get("request").user, reservation_unit
@@ -347,6 +348,25 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
         if begin not in possible_start_times:
             raise serializers.ValidationError(
                 f"Reservation start time does not match the allowed interval of {interval_minutes} minutes."
+            )
+
+    def check_reservation_days_before(self, begin, reservation_unit):
+        now = datetime.datetime.now().astimezone(get_default_timezone())
+
+        if reservation_unit.reservations_max_days_before and now < (
+            begin
+            - datetime.timedelta(days=reservation_unit.reservations_max_days_before)
+        ):
+            raise serializers.ValidationError(
+                f"Reservation start time is earlier than {reservation_unit.reservations_max_days_before} days before."
+            )
+
+        if reservation_unit.reservations_min_days_before and now > (
+            begin
+            - datetime.timedelta(days=reservation_unit.reservations_min_days_before)
+        ):
+            raise serializers.ValidationError(
+                f"Reservation start time is less than {reservation_unit.reservations_min_days_before} days before."
             )
 
 
