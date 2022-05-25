@@ -189,7 +189,7 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
         end = end.astimezone(DEFAULT_TIMEZONE)
 
         duration = end - begin
-        reservation_units = data.get(
+        reservation_units: List[ReservationUnit] = data.get(
             "reservation_unit", getattr(self.instance, "reservation_unit", None)
         )
         if hasattr(reservation_units, "all"):
