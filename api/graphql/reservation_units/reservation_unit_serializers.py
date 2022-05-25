@@ -214,6 +214,11 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
             f"{', '.join(value[0].upper() for value in ReservationUnit.AUTHENTICATION_TYPES)}."
         ),
     )
+    allow_reservations_without_opening_hours = serializers.BooleanField(
+        required=False,
+        default=False,
+        help_text="Allow booking without opening hours. Used for testing.",
+    )
 
     translation_fields = get_all_translatable_fields(ReservationUnit)
 
@@ -264,6 +269,7 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
             "require_reservation_handling",
             "authentication",
             "reservation_kind",
+            "allow_reservations_without_opening_hours",
         ] + get_all_translatable_fields(ReservationUnit)
 
     def __init__(self, *args, **kwargs):
