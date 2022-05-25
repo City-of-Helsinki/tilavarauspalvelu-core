@@ -220,15 +220,6 @@ export function getApplication(id: number): Promise<Application> {
   });
 }
 
-export function getApplications(user?: number): Promise<Application[]> {
-  return apiGet<Application[]>({
-    path: `v1/${applicationBasePath}`,
-    parameters: {
-      ...(user && { user }),
-    },
-  });
-}
-
 export function saveApplication(
   application: Application
 ): Promise<Application> {

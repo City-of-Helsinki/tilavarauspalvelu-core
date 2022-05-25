@@ -1,25 +1,29 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { GetStaticProps } from "next";
-import { Dictionary, groupBy } from "lodash";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useQuery } from "@apollo/client";
 import { Notification } from "hds-react";
 import { useTranslation } from "react-i18next";
+import { Dictionary, groupBy } from "lodash";
 import styled from "styled-components";
 import { TFunction } from "next-i18next";
-import { getApplications, getCurrentUser } from "../modules/api";
-import { Application, ReducedApplicationStatus, User } from "../modules/types";
-import { getReducedApplicationStatus } from "../modules/util";
+import { getCurrentUser } from "../modules/api";
+import { ReducedApplicationStatus, User } from "../modules/types";
 import Head from "../components/applications/Head";
 import ApplicationsGroup from "../components/applications/ApplicationsGroup";
 import RequireAuthentication from "../components/common/RequireAuthentication";
 import { CenterSpinner } from "../components/common/common";
-import apolloClient from "../modules/apolloClient";
 import {
   ApplicationRoundType,
+  ApplicationType,
+  ApplicationStatus,
   Query,
   QueryApplicationRoundsArgs,
+  QueryApplicationsArgs,
 } from "../modules/gql-types";
+import { APPLICATIONS } from "../modules/queries/application";
 import { APPLICATION_ROUNDS } from "../modules/queries/applicationRound";
+import { getReducedApplicationStatus } from "../modules/util";
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
@@ -50,10 +54,12 @@ const statusGroupOrder: ReducedApplicationStatus[] = [
 function ApplicationGroups({
   rounds,
   applications,
+  actionCallback,
   t,
 }: {
   rounds: { [key: number]: ApplicationRoundType };
-  applications: { [key: string]: Application[] };
+  applications: { [key: string]: ApplicationType[] };
+  actionCallback: (string: "error" | "cancel") => Promise<void>;
   t: TFunction;
 }): JSX.Element {
   if (Object.keys(applications).length === 0) {
@@ -67,6 +73,7 @@ function ApplicationGroups({
           name={t(`applications:group.${gr}`)}
           rounds={rounds}
           applications={applications[gr] || []}
+          actionCallback={actionCallback}
         />
       ))}
     </>
@@ -77,11 +84,9 @@ const Applications = (): JSX.Element => {
   const { t } = useTranslation();
 
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [applications, setApplications] =
-    useState<Dictionary<Application[]>>(null);
-  const [rounds, setRounds] = useState(null);
-
   const [state, setState] = useState<"loading" | "error" | "done">("loading");
+  const [cancelled, setCancelled] = useState(false);
+  const [cancelError, setCancelError] = useState(false);
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -98,53 +103,78 @@ const Applications = (): JSX.Element => {
     }
   }, [currentUser]);
 
-  useEffect(() => {
-    const fetchApplications = async () => {
-      const apps = await getApplications(currentUser.id);
-      const filteredApps = groupBy(
-        apps.filter((app) => app.status !== "cancelled"),
+  const { data: roundsData, error: roundsError } = useQuery<
+    Query,
+    QueryApplicationRoundsArgs
+  >(APPLICATION_ROUNDS);
+
+  const rounds = useMemo(
+    () =>
+      roundsData?.applicationRounds?.edges
+        ?.map((n) => n.node)
+        .reduce(
+          (prev, current) => ({ ...prev, [current.pk]: current }),
+          {} as { [key: number]: ApplicationRoundType }
+        ),
+    [roundsData]
+  );
+
+  const {
+    data: appData,
+    error: appError,
+    refetch,
+  } = useQuery<Query, QueryApplicationsArgs>(APPLICATIONS, {
+    fetchPolicy: "no-cache",
+    skip: !currentUser?.id,
+    variables: {
+      user: currentUser?.id?.toString(),
+      status: [
+        ApplicationStatus.Declined,
+        ApplicationStatus.Draft,
+        ApplicationStatus.Sent,
+        ApplicationStatus.InReview,
+        ApplicationStatus.ReviewDone,
+      ],
+    },
+  });
+
+  const applications: Dictionary<ApplicationType[]> = useMemo(
+    () =>
+      groupBy(
+        appData?.applications?.edges?.map((n) => n.node),
         (a) => getReducedApplicationStatus(a.status)
-      );
-      setApplications(filteredApps);
-    };
+      ),
+    [appData]
+  );
 
-    if (currentUser?.id) {
-      fetchApplications();
+  useEffect(() => {
+    if (roundsError || appError) {
+      setState("error");
     }
-  }, [currentUser]);
+  }, [roundsError, appError]);
 
   useEffect(() => {
-    const fetchRounds = async () => {
-      const { data, error } = await apolloClient.query<
-        Query,
-        QueryApplicationRoundsArgs
-      >({
-        query: APPLICATION_ROUNDS,
-      });
-
-      if (error) {
-        setState("error");
-        return;
-      }
-
-      const applicationRounds = data.applicationRounds?.edges?.map(
-        (n) => n.node
-      );
-      setRounds(
-        applicationRounds.reduce((prev, current) => {
-          return { ...prev, [current.pk]: current };
-        }, {} as { [key: number]: ApplicationRoundType })
-      );
-    };
-
-    fetchRounds();
-  }, [currentUser]);
-
-  useEffect(() => {
-    if (applications && rounds) {
+    if (
+      appData?.applications?.edges &&
+      rounds &&
+      Object.keys(rounds).length > 0
+    ) {
       setState("done");
     }
-  }, [applications, rounds]);
+  }, [appData, applications, rounds]);
+
+  const actionCallback = async (type: "cancel" | "error") => {
+    switch (type) {
+      case "cancel":
+        await refetch();
+        setCancelled(true);
+        break;
+      case "error":
+        setCancelError(true);
+        break;
+      default:
+    }
+  };
 
   return (
     <>
@@ -156,6 +186,7 @@ const Applications = (): JSX.Element => {
               t={t}
               rounds={rounds}
               applications={applications}
+              actionCallback={actionCallback}
             />
           ) : state === "error" ? (
             <Notification
@@ -166,9 +197,35 @@ const Applications = (): JSX.Element => {
               {t("common:error.dataError")}
             </Notification>
           ) : (
-            <CenterSpinner />
+            state === "loading" && <CenterSpinner />
           )}
         </Container>
+        {cancelled && (
+          <Notification
+            type="success"
+            position="top-center"
+            dismissible
+            autoClose
+            onClose={() => setCancelled(false)}
+            closeButtonLabelText={t("common:close")}
+            displayAutoCloseProgress={false}
+          >
+            {t("applicationCard:cancelled")}
+          </Notification>
+        )}
+        {cancelError && (
+          <Notification
+            type="error"
+            position="top-center"
+            dismissible
+            autoClose
+            onClose={() => setCancelError(false)}
+            closeButtonLabelText={t("common:close")}
+            displayAutoCloseProgress={false}
+          >
+            {t("applicationCard:cancelFailed")}
+          </Notification>
+        )}
       </RequireAuthentication>
     </>
   );

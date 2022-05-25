@@ -2,6 +2,7 @@
   "cancelHeading": "Are you sure you want to cancel your application?",
   "cancelContent": "If you cancel your application, you can no longer edit or send it.",
   "cancelFailed": "Application cancellation failed",
+  "cancelled": "Your application has been cancelled.",
   "edit": "Edit application",
   "cancel": "Cancel application",
   "status": {
@@ -9,8 +10,9 @@
     "processing": "In process",
     "sent": "Processed"
   },
+
   "reservations": "Bookings",
-  "saved": "Last saved: {{date, dd.MM.yyyy ',' HH:mm}}",
+  "saved": "Last saved: {{date, d.M.yyyy ',' H:mm}}",
   "person": "Application created: as a private person",
   "organisation": "Application created: {{type}}, {{name}}",
   "applicantType": {
