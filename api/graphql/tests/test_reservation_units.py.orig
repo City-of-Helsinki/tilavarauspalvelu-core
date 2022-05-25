@@ -213,8 +213,11 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
                             requireReservationHandling
                             authentication
                             reservationKind
+<<<<<<< HEAD
                             allowReservationsWithoutOpeningHours
+=======
                             canApplyFreeOfCharge
+>>>>>>> origin/main
                           }
                         }
                     }

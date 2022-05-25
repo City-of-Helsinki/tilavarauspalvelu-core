@@ -356,8 +356,11 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
             "authentication",
             "rank",
             "reservation_kind",
+<<<<<<< HEAD
             "allow_reservations_without_opening_hours",
+=======
             "can_apply_free_of_charge",
+>>>>>>> origin/main
         ] + get_all_translatable_fields(model)
         filter_fields = {
             "name_fi": ["exact", "icontains", "istartswith"],
@@ -503,9 +506,12 @@ class ReservationUnitByPkType(ReservationUnitType, OpeningHoursMixin):
             "max_reservations_per_user",
             "require_reservation_handling",
             "authentication",
+<<<<<<< HEAD
             "allow_reservations_without_opening_hours",
+=======
             "reservation_kind",
             "can_apply_free_of_charge",
+>>>>>>> origin/main
         ] + get_all_translatable_fields(model)
 
         interfaces = (graphene.relay.Node,)

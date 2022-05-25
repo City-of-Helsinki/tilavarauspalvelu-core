@@ -269,8 +269,11 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
             "require_reservation_handling",
             "authentication",
             "reservation_kind",
+<<<<<<< HEAD
             "allow_reservations_without_opening_hours",
+=======
             "can_apply_free_of_charge",
+>>>>>>> origin/main
         ] + get_all_translatable_fields(ReservationUnit)
 
     def __init__(self, *args, **kwargs):

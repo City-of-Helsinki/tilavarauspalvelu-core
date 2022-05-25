@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Union
+from typing import Any, Dict, List, Union
 
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -375,25 +375,35 @@ class ApplicationEventSerializer(serializers.ModelSerializer):
         return data
 
     @staticmethod
-    def handle_event_schedules(schedule_data, application_event):
+    def handle_event_schedules(
+        schedule_data: List[Dict[Any, Any]], application_event: ApplicationEvent
+    ) -> None:
         event_ids = []
+
         for schedule in schedule_data:
-            f = ApplicationEventSchedule(
+            application_event_schedule = ApplicationEventSchedule(
                 **schedule, application_event=application_event
             )
-            f.save()
-            event_ids.append(f.id)
+            application_event_schedule.save()
+            event_ids.append(application_event_schedule.id)
+
         ApplicationEventSchedule.objects.filter(
             application_event=application_event
         ).exclude(id__in=event_ids).delete()
 
     @staticmethod
-    def handle_units(event_unit_data, application_event):
+    def handle_units(
+        event_unit_data: List[Dict[Any, Any]], application_event: ApplicationEvent
+    ) -> None:
         event_unit_ids = []
+
         for event_unit in event_unit_data:
-            f = EventReservationUnit(**event_unit, application_event=application_event)
-            f.save()
-            event_unit_ids.append(f.id)
+            event_reservation_unit = EventReservationUnit(
+                **event_unit, application_event=application_event
+            )
+            event_reservation_unit.save()
+            event_unit_ids.append(event_reservation_unit.id)
+
         EventReservationUnit.objects.filter(
             application_event=application_event
         ).exclude(id__in=event_unit_ids).delete()
@@ -403,8 +413,8 @@ class ApplicationEventSerializer(serializers.ModelSerializer):
         request_user = (
             request.user if request and request.user.is_authenticated else None
         )
-        schedule_data = validated_data.pop("application_event_schedules")
-        unit_data = validated_data.pop("event_reservation_units")
+        schedule_data = validated_data.pop("application_event_schedules", [])
+        unit_data = validated_data.pop("event_reservation_units", [])
         status = validated_data.pop("status")
 
         event = super().create(validated_data)
@@ -520,33 +530,39 @@ class ApplicationSerializer(serializers.ModelSerializer):
         return None
 
     @staticmethod
-    def handle_person(contact_person_data) -> Union[Person, None]:
-        person = None
+    def handle_person(contact_person_data: Dict[Any, Any]) -> Union[Person, None]:
         if contact_person_data is not None:
+            # CASE: Create new person
             if "id" not in contact_person_data or contact_person_data["id"] is None:
-                person = PersonSerializer(data=contact_person_data).create(
+                return PersonSerializer(data=contact_person_data).create(
                     validated_data=contact_person_data
                 )
-            else:
-                person = PersonSerializer(data=contact_person_data).update(
-                    instance=Person.objects.get(pk=contact_person_data["id"]),
-                    validated_data=contact_person_data,
-                )
-        return person
 
-    def handle_organisation(self, organisation_data) -> Union[Organisation, None]:
-        if organisation_data is None:
-            return None
-        elif "id" not in organisation_data or organisation_data["id"] is None:
-            organisation = OrganisationSerializer(data=organisation_data).create(
-                validated_data=organisation_data
+            # CASE: Update existing person
+            return PersonSerializer(data=contact_person_data).update(
+                instance=Person.objects.get(pk=contact_person_data["id"]),
+                validated_data=contact_person_data,
             )
-        else:
-            organisation = OrganisationSerializer(data=organisation_data).update(
+
+        return None
+
+    def handle_organisation(
+        self, organisation_data: Dict[Any, Any]
+    ) -> Union[Organisation, None]:
+        if organisation_data is not None:
+            # CASE: Create new organisation
+            if "id" not in organisation_data or organisation_data["id"] is None:
+                return OrganisationSerializer(data=organisation_data).create(
+                    validated_data=organisation_data
+                )
+
+            # CASE: Update exisitng organisation
+            return OrganisationSerializer(data=organisation_data).update(
                 instance=Organisation.objects.get(pk=organisation_data["id"]),
                 validated_data=organisation_data,
             )
-        return organisation
+
+        return None
 
     def validate(self, data):
         # Validations when user submits application for review
@@ -612,27 +628,40 @@ class ApplicationSerializer(serializers.ModelSerializer):
 
         return data
 
-    def handle_events(self, application_instance, event_data):
+    def handle_events(
+        self,
+        application_instance: Application,
+        event_data: Union[List[Dict[Any, Any]], None],
+    ):
+        event_ids = []
+
         if event_data is None:
             return
-        event_ids = []
+
         for event in event_data:
             event["application"] = application_instance
+
+            # CASE: Create new application event
             if "id" not in event or event["id"] is None:
                 event_ids.append(
                     ApplicationEventSerializer(data=event)
                     .create(validated_data=event)
                     .id
                 )
-            else:
-                event_ids.append(
-                    ApplicationEventSerializer(data=event)
-                    .update(
-                        instance=ApplicationEvent.objects.get(pk=event["id"]),
-                        validated_data=event,
-                    )
-                    .id
+
+                continue
+
+            # CASE: Update existing event
+            event_ids.append(
+                ApplicationEventSerializer(data=event)
+                .update(
+                    instance=ApplicationEvent.objects.get(pk=event["id"]),
+                    validated_data=event,
                 )
+                .id
+            )
+
+        # Delete events that were not created or modified
         ApplicationEvent.objects.filter(application=application_instance).exclude(
             id__in=event_ids
         ).delete()
@@ -682,27 +711,27 @@ class ApplicationSerializer(serializers.ModelSerializer):
                 billing_address = AddressSerializer(data=billing_address_data).create(
                     validated_data=billing_address_data
                 )
+
             else:
                 billing_address = AddressSerializer(data=billing_address_data).update(
                     instance=Address.objects.get(pk=billing_address_data["id"]),
                     validated_data=billing_address_data,
                 )
+
             validated_data["billing_address"] = billing_address
 
         status = validated_data.pop("status", None)
-
         contact_person_data = validated_data.pop("contact_person", None)
+        organisation_data = validated_data.pop("organisation", None)
+        event_data = validated_data.pop("application_events", None)
 
         validated_data["contact_person"] = self.handle_person(
             contact_person_data=contact_person_data
         )
 
-        organisation_data = validated_data.pop("organisation", None)
         validated_data["organisation"] = self.handle_organisation(
             organisation_data=organisation_data
         )
-
-        event_data = validated_data.pop("application_events", None)
 
         self.handle_events(application_instance=instance, event_data=event_data)
 
