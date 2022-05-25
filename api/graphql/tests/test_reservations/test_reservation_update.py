@@ -363,7 +363,9 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         assert_that(content.get("errors")).is_none()
         assert_that(
             content.get("data").get("updateReservation").get("errors")
-        ).does_not_contain("Reservation unit is not open within desired reservation time.")
+        ).does_not_contain(
+            "Reservation unit is not open within desired reservation time."
+        )
 
     def test_update_fails_when_reservation_unit_in_open_application_round(
         self, mock_periods, mock_opening_hours

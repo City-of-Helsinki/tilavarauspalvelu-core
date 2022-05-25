@@ -271,10 +271,10 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         self, mock_periods, mock_opening_hours
     ):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
-        
+
         self.reservation_unit.allow_reservations_without_opening_hours = True
         self.reservation_unit.save()
-        
+
         ReservationFactory(
             reservation_unit=[self.reservation_unit],
             begin=datetime.datetime.now(tz=DEFAULT_TIMEZONE),
@@ -455,7 +455,9 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         assert_that(content.get("errors")).is_none()
         assert_that(
             content.get("data").get("createReservation").get("errors")
-        ).does_not_contain("Reservation unit is not open within desired reservation time.")
+        ).does_not_contain(
+            "Reservation unit is not open within desired reservation time."
+        )
 
     def test_create_fails_when_reservation_unit_in_open_application_round(
         self, mock_periods, mock_opening_hours

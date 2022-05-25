@@ -453,7 +453,7 @@ class ReservationUnit(models.Model):
         help_text="Is it possible to reserve this reservation unit when opening hours are not defined.",
         blank=False,
     )
-    
+
     can_apply_free_of_charge = models.BooleanField(
         blank=True,
         default=False,
