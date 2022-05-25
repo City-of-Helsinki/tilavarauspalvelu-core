@@ -15,7 +15,11 @@ import IconWithText from "../common/IconWithText";
 import { MediumButton, pixel, truncatedText } from "../../styles/util";
 import { ReservationUnitType } from "../../modules/gql-types";
 import { H5, Strongish } from "../../modules/style/typography";
-import { getPrice } from "../../modules/reservationUnit";
+import {
+  getPrice,
+  getReservationUnitName,
+  getUnitName,
+} from "../../modules/reservationUnit";
 import { reservationUnitSinglePrefix } from "../../modules/const";
 
 interface Props {
@@ -145,17 +149,20 @@ const ReservationUnitCard = ({ reservationUnit }: Props): JSX.Element => {
 
   const router = useRouter();
 
-  const addressString = useMemo(
-    () => getAddressAlt(reservationUnit),
-    [reservationUnit]
-  );
+  const name = getReservationUnitName(reservationUnit);
 
-  const link = useMemo(
-    () => `${reservationUnitSinglePrefix}/${reservationUnit.pk}`,
-    [reservationUnit]
-  );
+  const addressString = getAddressAlt(reservationUnit);
+
+  const link = `${reservationUnitSinglePrefix}/${reservationUnit.pk}`;
+
+  const unitName = getUnitName(reservationUnit.unit);
 
   const unitPrice = useMemo(() => getPrice(reservationUnit), [reservationUnit]);
+
+  const reservationUnitTypeName = getTranslation(
+    reservationUnit.reservationUnitType,
+    "name"
+  );
 
   return (
     <Container>
@@ -163,7 +170,7 @@ const ReservationUnitCard = ({ reservationUnit }: Props): JSX.Element => {
         <Anchor style={{ display: "flex" }}>
           <Image
             alt={t("common:imgAltForSpace", {
-              name: getTranslation(reservationUnit, "name"),
+              name,
             })}
             src={getMainImage(reservationUnit)?.smallUrl || pixel}
           />
@@ -172,13 +179,11 @@ const ReservationUnitCard = ({ reservationUnit }: Props): JSX.Element => {
       <MainContent>
         <Name>
           <Link href={link} passHref>
-            <Anchor title={getTranslation(reservationUnit, "name")}>
-              {getTranslation(reservationUnit, "name")}
-            </Anchor>
+            <Anchor title={name}>{name}</Anchor>
           </Link>
         </Name>
         <Description>
-          {getTranslation(reservationUnit.unit, "name")}
+          {unitName}
           {addressString && (
             <>
               {", "}
@@ -188,7 +193,7 @@ const ReservationUnitCard = ({ reservationUnit }: Props): JSX.Element => {
         </Description>
         <Bottom>
           <Props>
-            {reservationUnit.reservationUnitType ? (
+            {reservationUnitTypeName && (
               <StyledIconWithText
                 icon={
                   <NextImage
@@ -198,12 +203,9 @@ const ReservationUnitCard = ({ reservationUnit }: Props): JSX.Element => {
                     aria-label={t("reservationUnitCard:type")}
                   />
                 }
-                text={getTranslation(
-                  reservationUnit.reservationUnitType,
-                  "name"
-                )}
+                text={reservationUnitTypeName}
               />
-            ) : null}
+            )}
             {unitPrice && (
               <StyledIconWithText
                 icon={

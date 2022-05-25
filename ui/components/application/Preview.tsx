@@ -17,10 +17,9 @@ import {
   deepCopy,
   formatDuration,
   getTranslation,
-  localizedValue,
   mapOptions,
 } from "../../modules/util";
-import { getParameters, getReservationUnit } from "../../modules/api";
+import { getParameters } from "../../modules/api";
 import LabelValue from "../common/LabelValue";
 import TimePreview from "../common/TimePreview";
 import ApplicantInfoPreview from "./ApplicantInfoPreview";
@@ -35,6 +34,7 @@ import { MediumButton } from "../../styles/util";
 import { Query, TermsOfUseType } from "../../modules/gql-types";
 import { fontRegular } from "../../modules/style/typography";
 import { CITIES, RESERVATION_PURPOSES } from "../../modules/queries/params";
+import { getOldReservationUnitName } from "../../modules/reservationUnit";
 
 type Props = {
   application: Application;
@@ -117,15 +117,11 @@ const Preview = ({ onNext, application, tos }: Props): JSX.Element | null => {
   const [ageGroupOptions, setAgeGroupOptions] = useState<{
     [key: number]: Parameter;
   }>({});
-  const [reservationUnits, setReservationUnits] = useState<{
-    [key: number]: ReservationUnit;
-  }>({});
 
   const [purposeOptions, setPurposeOptions] = useState<OptionType[]>([]);
   const [citiesOptions, setCitiesOptions] = useState<OptionType[]>([]);
 
   const [acceptTermsOfUse, setAcceptTermsOfUse] = useState(false);
-  const { i18n } = useTranslation();
   const router = useRouter();
 
   useQuery<Query>(RESERVATION_PURPOSES, {
@@ -153,26 +149,6 @@ const Preview = ({ onNext, application, tos }: Props): JSX.Element | null => {
   useEffect(() => {
     let mounted = true;
     async function fetchData() {
-      const reservationUnitIds = Array.from(
-        new Set(
-          application.applicationEvents.flatMap(
-            (ae) => ae.eventReservationUnits
-          )
-        )
-      );
-
-      const fetchedReservationUnits = await Promise.all(
-        reservationUnitIds.map((ru) => getReservationUnit(ru.reservationUnitId))
-      );
-
-      if (mounted) {
-        setReservationUnits(
-          mapArrayById(fetchedReservationUnits) as {
-            [key: number]: ReservationUnit;
-          }
-        );
-      }
-
       const fetchedAgeGroupOptions = await getParameters("age_group");
       if (mounted) {
         setAgeGroupOptions(mapArrayById(fetchedAgeGroupOptions));
@@ -300,10 +276,6 @@ const Preview = ({ onNext, application, tos }: Props): JSX.Element | null => {
                 value={applicationEvent.eventsPerWeek}
               />
               <div />
-              {/* <StyledLabelValue
-              label={t("application:preview.applicationEvent.biweekly")}
-              value={t(`common:${applicationEvent.biweekly}`) as string}
-            /> */}
             </TwoColumnContainer>
 
             <FormSubHeading>
@@ -316,10 +288,8 @@ const Preview = ({ onNext, application, tos }: Props): JSX.Element | null => {
                     <UnitName>
                       <div>{index + 1}</div>
                       <div>
-                        {localizedValue(
-                          reservationUnits[reservationUnit.reservationUnitId]
-                            .name,
-                          i18n.language
+                        {getOldReservationUnitName(
+                          reservationUnit.reservationUnitDetails
                         )}
                       </div>
                     </UnitName>

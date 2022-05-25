@@ -846,7 +846,20 @@ type PurposeUpdateMutationPayload {
 }
 
 type Query {
-  applications(offset: Int = null, before: String = null, after: String = null, first: Int = null, last: Int = null, applicationRound: ID = null, status: [String] = null, unit: [ID] = null, user: ID = null): ApplicationTypeConnection
+  applications(
+    offset: Int = null
+    before: String = null
+    after: String = null
+    first: Int = null
+    last: Int = null
+    applicationRound: ID = null
+    status: [String] = null
+    unit: [ID] = null
+    user: ID = null
+
+    """Järjestys"""
+    orderBy: String = null
+  ): ApplicationTypeConnection
   applicationRounds(offset: Int = null, before: String = null, after: String = null, first: Int = null, last: Int = null, nameFi: String = null, nameFi_Icontains: String = null, nameFi_Istartswith: String = null, nameSv: String = null, nameSv_Icontains: String = null, nameSv_Istartswith: String = null, nameEn: String = null, nameEn_Icontains: String = null, nameEn_Istartswith: String = null): ApplicationRoundTypeConnection
   reservations(
     offset: Int = null
@@ -889,6 +902,9 @@ type Query {
     surfaceAreaLte: Float = null
     rankGte: Float = null
     rankLte: Float = null
+    typeRankGte: Float = null
+    typeRankLte: Float = null
+    reservationKind: String = null
 
     """Järjestys"""
     orderBy: String = null
@@ -906,7 +922,19 @@ type Query {
     id: ID!
   ): ResourceType
   resourceByPk(pk: Int = null): ResourceType
-  equipments(offset: Int = null, before: String = null, after: String = null, first: Int = null, last: Int = null, nameFi: String = null, nameFi_Icontains: String = null, nameFi_Istartswith: String = null, nameSv: String = null, nameSv_Icontains: String = null, nameSv_Istartswith: String = null, nameEn: String = null, nameEn_Icontains: String = null, nameEn_Istartswith: String = null): EquipmentTypeConnection
+  equipments(
+    offset: Int = null
+    before: String = null
+    after: String = null
+    first: Int = null
+    last: Int = null
+    name: String = null
+    rankGte: Float = null
+    rankLte: Float = null
+
+    """Järjestys"""
+    orderBy: String = null
+  ): EquipmentTypeConnection
   equipment(
     """The ID of the object"""
     id: ID!
@@ -961,6 +989,18 @@ type RecurringReservationType {
   pk: Int
   applicationPk: Int
   applicationEventPk: Int
+}
+
+"""An enumeration."""
+enum reservation_kind {
+  """Direct"""
+  DIRECT
+
+  """Season"""
+  SEASON
+
+  """Direct and season"""
+  DIRECT_AND_SEASON
 }
 
 input ReservationApproveMutationInput {
@@ -1480,6 +1520,7 @@ type ReservationUnitByPkType implements Node {
   uuid: UUID!
   isDraft: Boolean!
   maxPersons: Int
+  minPersons: Int
   bufferTimeBefore: Duration
   bufferTimeAfter: Duration
 
@@ -1526,6 +1567,9 @@ type ReservationUnitByPkType implements Node {
 
   """Authentication required for reserving this reservation unit."""
   authentication: ReservationUnitsReservationUnitAuthenticationChoices!
+
+  """What kind of reservations are to be booked with this reservation unit."""
+  reservationKind: ReservationUnitsReservationUnitReservationKindChoices!
   images: [ReservationUnitImageType]
 
   """The ID of the object"""
@@ -1589,6 +1633,7 @@ input ReservationUnitCreateMutationInput {
   """
   requireIntroduction: Boolean
   maxPersons: Int
+  minPersons: Int
   equipmentPks: [Int]
   unitPk: Int
 
@@ -1657,15 +1702,18 @@ input ReservationUnitCreateMutationInput {
   Authentication required for reserving this reservation unit. Possible values are WEAK, STRONG.
   """
   authentication: String
+
+  """What kind of reservations are to be booked with this reservation unit."""
+  reservationKind: reservation_kind
+  nameFi: String
+  nameEn: String
+  nameSv: String
   additionalInstructionsFi: String
   additionalInstructionsEn: String
   additionalInstructionsSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
@@ -1698,6 +1746,7 @@ type ReservationUnitCreateMutationPayload {
   """
   location: String
   maxPersons: Int
+  minPersons: Int
 
   """Type of the reservation unit as nested related object."""
   reservationUnitType: ReservationUnitTypeType
@@ -1761,15 +1810,18 @@ type ReservationUnitCreateMutationPayload {
   Authentication required for reserving this reservation unit. Possible values are WEAK, STRONG.
   """
   authentication: String
+
+  """What kind of reservations are to be booked with this reservation unit."""
+  reservationKind: reservation_kind
+  nameFi: String
+  nameEn: String
+  nameSv: String
   additionalInstructionsFi: String
   additionalInstructionsEn: String
   additionalInstructionsSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
@@ -1904,6 +1956,18 @@ enum ReservationUnitsReservationUnitPriceUnitChoices {
 }
 
 """An enumeration."""
+enum ReservationUnitsReservationUnitReservationKindChoices {
+  """Direct"""
+  DIRECT
+
+  """Season"""
+  SEASON
+
+  """Direct and season"""
+  DIRECT_AND_SEASON
+}
+
+"""An enumeration."""
 enum ReservationUnitsReservationUnitReservationStartIntervalChoices {
   """15 minutes"""
   INTERVAL_15_MINS
@@ -1946,6 +2010,7 @@ type ReservationUnitType implements Node {
   uuid: UUID!
   isDraft: Boolean!
   maxPersons: Int
+  minPersons: Int
   surfaceArea: Decimal
   bufferTimeBefore: Duration
   bufferTimeAfter: Duration
@@ -1997,6 +2062,9 @@ type ReservationUnitType implements Node {
 
   """Order number to be use in api sorting."""
   rank: Int
+
+  """What kind of reservations are to be booked with this reservation unit."""
+  reservationKind: ReservationUnitsReservationUnitReservationKindChoices!
   images: [ReservationUnitImageType]
   applicationRounds(active: Boolean = null): [ApplicationRoundType]
 
@@ -2033,6 +2101,9 @@ type ReservationUnitTypeType implements Node {
   nameEn: String
   nameSv: String
 
+  """Order number to be used in api sorting."""
+  rank: Int
+
   """The ID of the object"""
   id: ID!
   pk: Int
@@ -2064,6 +2135,7 @@ input ReservationUnitUpdateMutationInput {
   """
   requireIntroduction: Boolean
   maxPersons: Int
+  minPersons: Int
   equipmentPks: [Int]
   unitPk: Int
 
@@ -2132,15 +2204,18 @@ input ReservationUnitUpdateMutationInput {
   Authentication required for reserving this reservation unit. Possible values are WEAK, STRONG.
   """
   authentication: String
+
+  """What kind of reservations are to be booked with this reservation unit."""
+  reservationKind: reservation_kind
+  nameFi: String
+  nameEn: String
+  nameSv: String
   additionalInstructionsFi: String
   additionalInstructionsEn: String
   additionalInstructionsSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
@@ -2173,6 +2248,7 @@ type ReservationUnitUpdateMutationPayload {
   """
   location: String
   maxPersons: Int
+  minPersons: Int
 
   """Type of the reservation unit as nested related object."""
   reservationUnitType: ReservationUnitTypeType
@@ -2236,15 +2312,18 @@ type ReservationUnitUpdateMutationPayload {
   Authentication required for reserving this reservation unit. Possible values are WEAK, STRONG.
   """
   authentication: String
+
+  """What kind of reservations are to be booked with this reservation unit."""
+  reservationKind: reservation_kind
+  nameFi: String
+  nameEn: String
+  nameSv: String
   additionalInstructionsFi: String
   additionalInstructionsEn: String
   additionalInstructionsSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
@@ -2405,12 +2484,12 @@ input ResourceCreateMutationInput {
   """
   bufferTimeAfter: Int
   isDraft: Boolean
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   clientMutationId: String
 }
 
@@ -2433,12 +2512,12 @@ type ResourceCreateMutationPayload {
   """
   bufferTimeAfter: Int
   isDraft: Boolean
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -2522,12 +2601,12 @@ input ResourceUpdateMutationInput {
   """
   bufferTimeAfter: Int
   isDraft: Boolean
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   clientMutationId: String
 }
 
@@ -2550,12 +2629,12 @@ type ResourceUpdateMutationPayload {
   """
   bufferTimeAfter: Int
   isDraft: Boolean
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -2920,12 +2999,12 @@ input UnitUpdateMutationInput {
   nameFi: String
   nameEn: String
   nameSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   shortDescriptionFi: String
   shortDescriptionEn: String
   shortDescriptionSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   clientMutationId: String
 }
 
@@ -2938,12 +3017,12 @@ type UnitUpdateMutationPayload {
   nameFi: String
   nameEn: String
   nameSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   shortDescriptionFi: String
   shortDescriptionEn: String
   shortDescriptionSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]

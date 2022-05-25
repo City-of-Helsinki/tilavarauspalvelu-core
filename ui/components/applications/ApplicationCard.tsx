@@ -8,7 +8,6 @@ import {
   isActive,
   applicationUrl,
   getReducedApplicationStatus,
-  getTranslation,
 } from "../../modules/util";
 import { breakpoint } from "../../modules/style";
 import ConfirmationModal, { ModalRef } from "../common/ConfirmationModal";
@@ -16,6 +15,7 @@ import { CenterSpinner } from "../common/common";
 import { cancelApplication } from "../../modules/api";
 import { MediumButton } from "../../styles/util";
 import { ApplicationRoundType, ApplicationType } from "../../modules/gql-types";
+import { getApplicationRoundName } from "../../modules/applicationRound";
 
 const Card = styled(HdsCard).attrs({
   style: {
@@ -175,7 +175,7 @@ const ApplicationCard = ({
     <Card border key={application.pk}>
       <div>
         <C>{t(`applicationCard:status.${reducedApplicationStatus}`)}</C>
-        <RoundName>{getTranslation(applicationRound, "name")}</RoundName>
+        <RoundName>{getApplicationRoundName(applicationRound)}</RoundName>
         <Applicant>
           {application.applicantType !== null
             ? getApplicant(application, t)

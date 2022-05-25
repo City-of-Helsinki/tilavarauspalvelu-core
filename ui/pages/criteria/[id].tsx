@@ -15,6 +15,7 @@ import {
 } from "../../modules/gql-types";
 import { APPLICATION_ROUNDS } from "../../modules/queries/applicationRound";
 import BreadcrumbWrapper from "../../components/common/BreadcrumbWrapper";
+import { getApplicationRoundName } from "../../modules/applicationRound";
 
 type Props = {
   applicationRound: ApplicationRoundType;
@@ -71,7 +72,7 @@ const Criteria = ({ applicationRound }: Props): JSX.Element => {
         <BreadcrumbWrapper route={["/recurring", "criteria"]} />
         <HeadContent>
           <H1>
-            {`${getTranslation(applicationRound, "name")} ${t(
+            {`${getApplicationRoundName(applicationRound)} ${t(
               "applicationRound:criteria"
             )}`}
           </H1>
