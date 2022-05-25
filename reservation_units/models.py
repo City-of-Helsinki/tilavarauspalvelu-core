@@ -447,6 +447,15 @@ class ReservationUnit(models.Model):
         help_text="What kind of reservations are to be booked with this reservation unit.",
     )
 
+    can_apply_free_of_charge = models.BooleanField(
+        blank=True,
+        default=False,
+        verbose_name=_("Can apply free of charge"),
+        help_text=_(
+            "Can reservations to this reservation unit be able to apply free of charge."
+        ),
+    )
+
     class Meta:
         ordering = ("id",)
 

@@ -355,6 +355,7 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
             "authentication",
             "rank",
             "reservation_kind",
+            "can_apply_free_of_charge",
         ] + get_all_translatable_fields(model)
         filter_fields = {
             "name_fi": ["exact", "icontains", "istartswith"],
@@ -501,6 +502,7 @@ class ReservationUnitByPkType(ReservationUnitType, OpeningHoursMixin):
             "require_reservation_handling",
             "authentication",
             "reservation_kind",
+            "can_apply_free_of_charge",
         ] + get_all_translatable_fields(model)
 
         interfaces = (graphene.relay.Node,)
