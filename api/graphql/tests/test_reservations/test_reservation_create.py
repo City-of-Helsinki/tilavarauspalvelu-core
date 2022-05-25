@@ -267,6 +267,33 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
             content.get("data").get("createReservation").get("errors")[0]["messages"]
         ).contains("Overlapping reservations are not allowed.")
 
+    def test_create_succeed_when_overlapping_reservation_and_opening_hours_are_ignored(
+        self, mock_periods, mock_opening_hours
+    ):
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+        
+        self.reservation_unit.allow_reservations_without_opening_hours = True
+        self.reservation_unit.save()
+        
+        ReservationFactory(
+            reservation_unit=[self.reservation_unit],
+            begin=datetime.datetime.now(tz=DEFAULT_TIMEZONE),
+            end=datetime.datetime.now(tz=DEFAULT_TIMEZONE)
+            + datetime.timedelta(hours=2),
+            state=STATE_CHOICES.CONFIRMED,
+        )
+
+        self.client.force_login(self.regular_joe)
+        response = self.query(
+            self.get_create_query(), input_data=self.get_valid_input_data()
+        )
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_none()
+        assert_that(
+            content.get("data").get("createReservation").get("errors")
+        ).is_none()
+
     def test_create_fails_when_buffer_time_overlaps_reservation_before(
         self, mock_periods, mock_opening_hours
     ):
@@ -405,6 +432,30 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         assert_that(
             content.get("data").get("createReservation").get("errors")[0]["messages"][0]
         ).contains("Reservation unit is not open within desired reservation time.")
+
+    def test_create_succeed_when_reservation_unit_closed_on_selected_time_and_opening_hours_are_ignored(
+        self, mock_periods, mock_opening_hours
+    ):
+
+        self.reservation_unit.allow_reservations_without_opening_hours = True
+        self.reservation_unit.save()
+
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+        input_data = self.get_valid_input_data()
+        today = datetime.date.today()
+        begin = datetime.datetime(today.year, today.month, today.day, 21, 0)
+        end = begin + datetime.timedelta(hours=2)
+        input_data["begin"] = begin.strftime("%Y%m%dT%H%M%SZ")
+        input_data["end"] = end.strftime("%Y%m%dT%H%M%SZ")
+
+        self.client.force_login(self.regular_joe)
+        response = self.query(self.get_create_query(), input_data=input_data)
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_none()
+        assert_that(
+            content.get("data").get("createReservation").get("errors")
+        ).does_not_contain("Reservation unit is not open within desired reservation time.")
 
     def test_create_fails_when_reservation_unit_in_open_application_round(
         self, mock_periods, mock_opening_hours
@@ -548,6 +599,27 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
             content.get("data").get("createReservation").get("errors")[0]["messages"][0]
         ).contains("Reservation unit is not reservable within this reservation time.")
 
+    def test_create_succeed_when_reservation_unit_reservation_begin_in_future_and_opening_times_are_ignored(
+        self, mock_periods, mock_opening_hours
+    ):
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+        self.reservation_unit.reservation_begins = datetime.datetime.now(
+            tz=DEFAULT_TIMEZONE
+        ) + datetime.timedelta(days=10)
+        self.reservation_unit.allow_reservations_without_opening_hours = True
+        self.reservation_unit.save()
+
+        self.client.force_login(self.regular_joe)
+        response = self.query(
+            self.get_create_query(), input_data=self.get_valid_input_data()
+        )
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_none()
+        assert_that(
+            content.get("data").get("createReservation").get("errors")
+        ).is_none()
+
     def test_create_fails_when_reservation_unit_reservation_end_in_past(
         self, mock_periods, mock_opening_hours
     ):
@@ -570,6 +642,27 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         assert_that(
             content.get("data").get("createReservation").get("errors")[0]["messages"][0]
         ).contains("Reservation unit is not reservable within this reservation time.")
+
+    def test_create_succed_when_reservation_unit_reservation_end_in_past_and_opening_hours_are_ignored(
+        self, mock_periods, mock_opening_hours
+    ):
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+        self.reservation_unit.reservation_ends = datetime.datetime.now(
+            tz=DEFAULT_TIMEZONE
+        ) - datetime.timedelta(days=10)
+        self.reservation_unit.allow_reservations_without_opening_hours = True
+        self.reservation_unit.save()
+
+        self.client.force_login(self.regular_joe)
+        response = self.query(
+            self.get_create_query(), input_data=self.get_valid_input_data()
+        )
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_none()
+        assert_that(
+            content.get("data").get("createReservation").get("errors")
+        ).is_none()
 
     def test_create_success_when_reservation_unit_reservation_begin_in_past(
         self, mock_periods, mock_opening_hours
