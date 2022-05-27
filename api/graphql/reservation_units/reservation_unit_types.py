@@ -305,7 +305,6 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
     buffer_time_before = Duration()
     buffer_time_after = Duration()
     metadata_set = graphene.Field(ReservationMetadataSetType)
-    allow_reservations_without_opening_hours = graphene.Boolean()
 
     permission_classes = (
         (ReservationUnitPermission,)
