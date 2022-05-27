@@ -2,10 +2,11 @@
   "card": {
     "applyButton": "Search",
     "displayPastButton": "Show spaces",
-    "criteria": "Application criteria",
+    "criteria": "Check the application criteria",
     "pending": "Application round opens {{openingDateTime}}",
     "open": "Application round open until {{until, d.M.yyyy',' H.mm}}",
-    "past": "Application round closed {{closingDate, d.M.yyyy',' H.mm}}"
+    "past": "Application round closed {{closingDate, d.M.yyyy',' H.mm}}",
+    "reservationPeriod": "Spaces can be booked for the period {{reservationPeriodBegin, d.M.yyyy}} - {{reservationPeriodEnd, d.M.yyyy}}"
   },
   "criteria": "application criteria"
 }

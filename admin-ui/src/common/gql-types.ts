@@ -1769,6 +1769,8 @@ export type ReservationUnitByPkType = Node & {
   authentication: ReservationUnitsReservationUnitAuthenticationChoices;
   bufferTimeAfter?: Maybe<Scalars["Duration"]>;
   bufferTimeBefore?: Maybe<Scalars["Duration"]>;
+  /** Can reservations to this reservation unit be able to apply free of charge. */
+  canApplyFreeOfCharge: Scalars["Boolean"];
   cancellationRule?: Maybe<ReservationUnitCancellationRuleType>;
   cancellationTerms?: Maybe<TermsOfUseType>;
   contactInformation: Scalars["String"];
@@ -1889,6 +1891,8 @@ export type ReservationUnitCreateMutationInput = {
   authentication?: InputMaybe<Scalars["String"]>;
   bufferTimeAfter?: InputMaybe<Scalars["Int"]>;
   bufferTimeBefore?: InputMaybe<Scalars["Int"]>;
+  /** Can reservations to this reservation unit be able to apply free of charge. */
+  canApplyFreeOfCharge?: InputMaybe<Scalars["Boolean"]>;
   cancellationRulePk?: InputMaybe<Scalars["Int"]>;
   cancellationTermsPk?: InputMaybe<Scalars["String"]>;
   clientMutationId?: InputMaybe<Scalars["String"]>;
@@ -1955,6 +1959,8 @@ export type ReservationUnitCreateMutationPayload = {
   bufferTimeAfter?: Maybe<Scalars["Int"]>;
   bufferTimeBefore?: Maybe<Scalars["Int"]>;
   building?: Maybe<Scalars["String"]>;
+  /** Can reservations to this reservation unit be able to apply free of charge. */
+  canApplyFreeOfCharge?: Maybe<Scalars["Boolean"]>;
   cancellationRulePk?: Maybe<Scalars["Int"]>;
   clientMutationId?: Maybe<Scalars["String"]>;
   /** Contact information for this reservation unit. */
@@ -2095,6 +2101,8 @@ export type ReservationUnitType = Node & {
   authentication: ReservationUnitsReservationUnitAuthenticationChoices;
   bufferTimeAfter?: Maybe<Scalars["Duration"]>;
   bufferTimeBefore?: Maybe<Scalars["Duration"]>;
+  /** Can reservations to this reservation unit be able to apply free of charge. */
+  canApplyFreeOfCharge: Scalars["Boolean"];
   cancellationRule?: Maybe<ReservationUnitCancellationRuleType>;
   cancellationTerms?: Maybe<TermsOfUseType>;
   contactInformation: Scalars["String"];
@@ -2224,6 +2232,8 @@ export type ReservationUnitUpdateMutationInput = {
   authentication?: InputMaybe<Scalars["String"]>;
   bufferTimeAfter?: InputMaybe<Scalars["Int"]>;
   bufferTimeBefore?: InputMaybe<Scalars["Int"]>;
+  /** Can reservations to this reservation unit be able to apply free of charge. */
+  canApplyFreeOfCharge?: InputMaybe<Scalars["Boolean"]>;
   cancellationRulePk?: InputMaybe<Scalars["Int"]>;
   cancellationTermsPk?: InputMaybe<Scalars["String"]>;
   clientMutationId?: InputMaybe<Scalars["String"]>;
@@ -2291,6 +2301,8 @@ export type ReservationUnitUpdateMutationPayload = {
   bufferTimeAfter?: Maybe<Scalars["Int"]>;
   bufferTimeBefore?: Maybe<Scalars["Int"]>;
   building?: Maybe<Scalars["String"]>;
+  /** Can reservations to this reservation unit be able to apply free of charge. */
+  canApplyFreeOfCharge?: Maybe<Scalars["Boolean"]>;
   cancellationRulePk?: Maybe<Scalars["Int"]>;
   clientMutationId?: Maybe<Scalars["String"]>;
   /** Contact information for this reservation unit. */

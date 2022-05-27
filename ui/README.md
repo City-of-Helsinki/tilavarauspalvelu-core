@@ -4,10 +4,11 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 ## Prerequisites
 
-1. Node lts/fermium (`nvm use`)
+1. Node 16 (`nvm use`)
 1. Yarn
 
 ### Recommended editor/IDE tooling
+
 - eslint
 - prettier
 - stylelint
@@ -27,6 +28,7 @@ Make sure /etc/hosts point domain local-tilavaraus.hel.fi to 127.0.0.1. This is 
 ```
 
 Create a self-signed certificate for SSL connection on developpment server by running the following command in the common directory
+
 ```
 yarn generate-certificate
 ```
@@ -38,12 +40,12 @@ yarn dev
 ```
 
 ### Generate new gql types
+
 When GQL api changes and you need to update the Typescript types
 
 ```
 yarn generate-gql-types
 ```
-
 
 ### Access with browser
 
@@ -66,11 +68,11 @@ docker exec -ti tilavarauspalvelu-core_dev_1 python manage.py createsuperuser
 
 ### Graphql workflow
 
-When server has new api changes -> update schema & generate new types by running: ```yarn update-schema generate-gql-types```
+When server has new api changes -> update schema & generate new types by running: `yarn update-schema generate-gql-types`
 
-When a query is modified and you need new mock data types run: ```generate-gql-types```, see [mocks/handlers/singleSearch.ts](mocks/handlers/singleSearch.ts) for example on how to use type safe mock test data.
+When a query is modified and you need new mock data types run: `generate-gql-types`, see [mocks/handlers/singleSearch.ts](mocks/handlers/singleSearch.ts) for example on how to use type safe mock test data.
 
-* Protip for VSCode users: install https://marketplace.visualstudio.com/items?itemName=GraphQL.vscode-graphql to get autocomplete suggestions and query validation when writing queries.
+- Protip for VSCode users: install https://marketplace.visualstudio.com/items?itemName=GraphQL.vscode-graphql to get autocomplete suggestions and query validation when writing queries.
 
 ## Available Scripts
 

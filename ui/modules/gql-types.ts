@@ -62,6 +62,16 @@ export type AbilityGroupType = {
   pk?: Maybe<Scalars["Int"]>;
 };
 
+export type AddressType = Node & {
+  __typename?: "AddressType";
+  city: Scalars["String"];
+  /** The ID of the object */
+  id: Scalars["ID"];
+  pk?: Maybe<Scalars["Int"]>;
+  postCode: Scalars["String"];
+  streetAddress: Scalars["String"];
+};
+
 export type AgeGroupType = Node & {
   __typename?: "AgeGroupType";
   /** The ID of the object */
@@ -88,8 +98,64 @@ export type AgeGroupTypeEdge = {
   node?: Maybe<AgeGroupType>;
 };
 
-export type AggregatedDataType = {
-  __typename?: "AggregatedDataType";
+export type ApplicationAggregatedDataType = {
+  __typename?: "ApplicationAggregatedDataType";
+  appliedMinDurationTotal?: Maybe<Scalars["Float"]>;
+  appliedReservationsTotal?: Maybe<Scalars["Float"]>;
+  createdReservationsTotal?: Maybe<Scalars["Float"]>;
+  reservationsDurationTotal?: Maybe<Scalars["Float"]>;
+};
+
+export type ApplicationEventAggregatedDataType = {
+  __typename?: "ApplicationEventAggregatedDataType";
+  allocationResultsDurationTotal?: Maybe<Scalars["Float"]>;
+  allocationResultsReservationsTotal?: Maybe<Scalars["Float"]>;
+  durationTotal?: Maybe<Scalars["Float"]>;
+  reservationsTotal?: Maybe<Scalars["Float"]>;
+};
+
+export type ApplicationEventScheduleType = Node & {
+  __typename?: "ApplicationEventScheduleType";
+  begin: Scalars["Time"];
+  day: ApplicationsApplicationEventScheduleDayChoices;
+  end: Scalars["Time"];
+  /** The ID of the object */
+  id: Scalars["ID"];
+  pk?: Maybe<Scalars["Int"]>;
+  priority: ApplicationsApplicationEventSchedulePriorityChoices;
+};
+
+export type ApplicationEventType = Node & {
+  __typename?: "ApplicationEventType";
+  abilityGroup?: Maybe<AbilityGroupType>;
+  abilityGroupId?: Maybe<Scalars["Int"]>;
+  ageGroupDisplay?: Maybe<AgeGroupType>;
+  ageGroupId?: Maybe<Scalars["Int"]>;
+  aggregatedData?: Maybe<ApplicationEventAggregatedDataType>;
+  applicationEventSchedules?: Maybe<Array<ApplicationEventScheduleType>>;
+  applicationId?: Maybe<Scalars["Int"]>;
+  begin?: Maybe<Scalars["Date"]>;
+  biweekly: Scalars["Boolean"];
+  declinedReservationUnits?: Maybe<Array<ReservationUnitType>>;
+  end?: Maybe<Scalars["Date"]>;
+  eventReservationUnits?: Maybe<Array<EventReservationUnitType>>;
+  eventsPerWeek?: Maybe<Scalars["Int"]>;
+  /** The ID of the object */
+  id: Scalars["ID"];
+  maxDuration?: Maybe<Scalars["Float"]>;
+  minDuration?: Maybe<Scalars["Float"]>;
+  name: Scalars["String"];
+  numPersons?: Maybe<Scalars["Int"]>;
+  pk?: Maybe<Scalars["Int"]>;
+  purpose?: Maybe<ReservationPurposeType>;
+  purposeId?: Maybe<Scalars["Int"]>;
+  status?: Maybe<ApplicationEventStatus>;
+  uuid: Scalars["UUID"];
+  weeklyAmountReductionsCount?: Maybe<Scalars["Int"]>;
+};
+
+export type ApplicationRoundAggregatedDataType = {
+  __typename?: "ApplicationRoundAggregatedDataType";
   allocationDurationTotal?: Maybe<Scalars["Int"]>;
   allocationResultEventsCount?: Maybe<Scalars["Int"]>;
   totalHourCapacity?: Maybe<Scalars["Int"]>;
@@ -113,7 +179,7 @@ export type ApplicationRoundBasketType = Node & {
 
 export type ApplicationRoundType = Node & {
   __typename?: "ApplicationRoundType";
-  aggregatedData?: Maybe<AggregatedDataType>;
+  aggregatedData?: Maybe<ApplicationRoundAggregatedDataType>;
   allocating: Scalars["Boolean"];
   applicationPeriodBegin: Scalars["DateTime"];
   applicationPeriodEnd: Scalars["DateTime"];
@@ -138,7 +204,7 @@ export type ApplicationRoundType = Node & {
   reservationUnitCount?: Maybe<Scalars["Int"]>;
   reservationUnits?: Maybe<Array<Maybe<ReservationUnitType>>>;
   serviceSector?: Maybe<ServiceSectorType>;
-  status?: Maybe<Status>;
+  status?: Maybe<ApplicationRoundStatus>;
   statusTimestamp?: Maybe<Scalars["DateTime"]>;
   targetGroup: ApplicationsApplicationRoundTargetGroupChoices;
 };
@@ -161,6 +227,87 @@ export type ApplicationRoundTypeEdge = {
   node?: Maybe<ApplicationRoundType>;
 };
 
+export type ApplicationType = Node & {
+  __typename?: "ApplicationType";
+  /** Additional information about the application */
+  additionalInformation?: Maybe<Scalars["String"]>;
+  aggregatedData?: Maybe<ApplicationAggregatedDataType>;
+  applicantEmail?: Maybe<Scalars["String"]>;
+  applicantId?: Maybe<Scalars["Int"]>;
+  applicantName?: Maybe<Scalars["String"]>;
+  applicantType?: Maybe<ApplicationsApplicationApplicantTypeChoices>;
+  applicationEvents?: Maybe<Array<ApplicationEventType>>;
+  applicationRoundId?: Maybe<Scalars["Int"]>;
+  billingAddress?: Maybe<AddressType>;
+  contactPerson?: Maybe<PersonType>;
+  createdDate: Scalars["DateTime"];
+  homeCity?: Maybe<CityType>;
+  /** The ID of the object */
+  id: Scalars["ID"];
+  lastModifiedDate: Scalars["DateTime"];
+  organisation?: Maybe<OrganisationType>;
+  pk?: Maybe<Scalars["Int"]>;
+  status?: Maybe<ApplicationStatus>;
+};
+
+export type ApplicationTypeConnection = {
+  __typename?: "ApplicationTypeConnection";
+  /** Contains the nodes in this connection. */
+  edges: Array<Maybe<ApplicationTypeEdge>>;
+  /** Pagination data for this connection. */
+  pageInfo: PageInfo;
+  totalCount?: Maybe<Scalars["Int"]>;
+};
+
+/** A Relay edge containing a `ApplicationType` and its cursor. */
+export type ApplicationTypeEdge = {
+  __typename?: "ApplicationTypeEdge";
+  /** A cursor for use in pagination */
+  cursor: Scalars["String"];
+  /** The item at the end of the edge */
+  node?: Maybe<ApplicationType>;
+};
+
+/** An enumeration. */
+export enum ApplicationsApplicationApplicantTypeChoices {
+  /** Association */
+  Association = "ASSOCIATION",
+  /** Community */
+  Community = "COMMUNITY",
+  /** Company */
+  Company = "COMPANY",
+  /** Individual */
+  Individual = "INDIVIDUAL",
+}
+
+/** An enumeration. */
+export enum ApplicationsApplicationEventScheduleDayChoices {
+  /** maanantai */
+  A_0 = "A_0",
+  /** tiistai */
+  A_1 = "A_1",
+  /** keskiviikko */
+  A_2 = "A_2",
+  /** torstai */
+  A_3 = "A_3",
+  /** perjantai */
+  A_4 = "A_4",
+  /** lauantai */
+  A_5 = "A_5",
+  /** sunnuntai */
+  A_6 = "A_6",
+}
+
+/** An enumeration. */
+export enum ApplicationsApplicationEventSchedulePriorityChoices {
+  /** Low */
+  A_100 = "A_100",
+  /** Medium */
+  A_200 = "A_200",
+  /** High */
+  A_300 = "A_300",
+}
+
 /** An enumeration. */
 export enum ApplicationsApplicationRoundTargetGroupChoices {
   /** Kaikki */
@@ -169,6 +316,22 @@ export enum ApplicationsApplicationRoundTargetGroupChoices {
   Internal = "INTERNAL",
   /** Public */
   Public = "PUBLIC",
+}
+
+/** An enumeration. */
+export enum ApplicationsOrganisationOrganisationTypeChoices {
+  /** Company */
+  Company = "COMPANY",
+  /** Municipality consortium */
+  MunicipalityConsortium = "MUNICIPALITY_CONSORTIUM",
+  /** Public association */
+  PublicAssociation = "PUBLIC_ASSOCIATION",
+  /** Registered association */
+  RegisteredAssociation = "REGISTERED_ASSOCIATION",
+  /** Religious community */
+  ReligiousCommunity = "RELIGIOUS_COMMUNITY",
+  /** Unregistered association */
+  UnregisteredAssociation = "UNREGISTERED_ASSOCIATION",
 }
 
 export type BuildingType = Node & {
@@ -390,6 +553,16 @@ export type ErrorType = {
   __typename?: "ErrorType";
   field: Scalars["String"];
   messages: Array<Scalars["String"]>;
+};
+
+export type EventReservationUnitType = Node & {
+  __typename?: "EventReservationUnitType";
+  /** The ID of the object */
+  id: Scalars["ID"];
+  pk?: Maybe<Scalars["Int"]>;
+  priority?: Maybe<Scalars["Int"]>;
+  reservationUnitDetails?: Maybe<ReservationUnitType>;
+  reservationUnitId?: Maybe<Scalars["Int"]>;
 };
 
 export type KeywordCategoryType = Node & {
@@ -659,6 +832,21 @@ export type OpeningTimesType = {
   state?: Maybe<Scalars["String"]>;
 };
 
+export type OrganisationType = Node & {
+  __typename?: "OrganisationType";
+  activeMembers?: Maybe<Scalars["Int"]>;
+  address?: Maybe<AddressType>;
+  coreBusiness: Scalars["String"];
+  email: Scalars["String"];
+  /** The ID of the object */
+  id: Scalars["ID"];
+  identifier?: Maybe<Scalars["String"]>;
+  name: Scalars["String"];
+  organisationType: ApplicationsOrganisationOrganisationTypeChoices;
+  pk?: Maybe<Scalars["Int"]>;
+  yearEstablished?: Maybe<Scalars["Int"]>;
+};
+
 /** The Relay compliant `PageInfo` type, containing data necessary to paginate this connection. */
 export type PageInfo = {
   __typename?: "PageInfo";
@@ -685,6 +873,17 @@ export type PeriodType = {
   resourceState?: Maybe<Scalars["String"]>;
   startDate?: Maybe<Scalars["Date"]>;
   timeSpans?: Maybe<Array<Maybe<TimeSpanType>>>;
+};
+
+export type PersonType = Node & {
+  __typename?: "PersonType";
+  email?: Maybe<Scalars["String"]>;
+  firstName: Scalars["String"];
+  /** The ID of the object */
+  id: Scalars["ID"];
+  lastName: Scalars["String"];
+  phoneNumber?: Maybe<Scalars["String"]>;
+  pk?: Maybe<Scalars["Int"]>;
 };
 
 export type PurposeCreateMutationInput = {
@@ -757,6 +956,7 @@ export type Query = {
   __typename?: "Query";
   ageGroups?: Maybe<AgeGroupTypeConnection>;
   applicationRounds?: Maybe<ApplicationRoundTypeConnection>;
+  applications?: Maybe<ApplicationTypeConnection>;
   cities?: Maybe<CityTypeConnection>;
   equipment?: Maybe<EquipmentType>;
   equipmentByPk?: Maybe<EquipmentType>;
@@ -815,6 +1015,18 @@ export type QueryApplicationRoundsArgs = {
   nameSv_Icontains?: InputMaybe<Scalars["String"]>;
   nameSv_Istartswith?: InputMaybe<Scalars["String"]>;
   offset?: InputMaybe<Scalars["Int"]>;
+};
+
+export type QueryApplicationsArgs = {
+  after?: InputMaybe<Scalars["String"]>;
+  applicationRound?: InputMaybe<Scalars["ID"]>;
+  before?: InputMaybe<Scalars["String"]>;
+  first?: InputMaybe<Scalars["Int"]>;
+  last?: InputMaybe<Scalars["Int"]>;
+  offset?: InputMaybe<Scalars["Int"]>;
+  status?: InputMaybe<Array<InputMaybe<Scalars["String"]>>>;
+  unit?: InputMaybe<Array<InputMaybe<Scalars["ID"]>>>;
+  user?: InputMaybe<Scalars["ID"]>;
 };
 
 export type QueryCitiesArgs = {
@@ -1006,6 +1218,8 @@ export type QueryReservationUnitsArgs = {
   orderBy?: InputMaybe<Scalars["String"]>;
   pk?: InputMaybe<Array<InputMaybe<Scalars["ID"]>>>;
   purposes?: InputMaybe<Array<InputMaybe<Scalars["ID"]>>>;
+  rankGte?: InputMaybe<Scalars["Float"]>;
+  rankLte?: InputMaybe<Scalars["Float"]>;
   reservationUnitType?: InputMaybe<Array<InputMaybe<Scalars["ID"]>>>;
   surfaceAreaGte?: InputMaybe<Scalars["Float"]>;
   surfaceAreaLte?: InputMaybe<Scalars["Float"]>;
@@ -1928,6 +2142,8 @@ export type ReservationUnitType = Node & {
   /** Time after this reservation unit should not be publicly visible in UI. */
   publishEnds?: Maybe<Scalars["DateTime"]>;
   purposes?: Maybe<Array<Maybe<PurposeType>>>;
+  /** Order number to be use in api sorting. */
+  rank?: Maybe<Scalars["Int"]>;
   requireIntroduction: Scalars["Boolean"];
   /** Does reservations of this reservation unit need to be handled before they're confirmed. */
   requireReservationHandling: Scalars["Boolean"];
@@ -2878,6 +3094,36 @@ export type UnitUpdateMutationPayload = {
 };
 
 /** An enumeration. */
+export enum ApplicationEventStatus {
+  Allocated = "allocated",
+  Approved = "approved",
+  Created = "created",
+  Declined = "declined",
+  Validated = "validated",
+}
+
+/** An enumeration. */
+export enum ApplicationRoundStatus {
+  Allocated = "allocated",
+  Approved = "approved",
+  Draft = "draft",
+  Handled = "handled",
+  InReview = "in_review",
+  ReviewDone = "review_done",
+  Validated = "validated",
+}
+
+/** An enumeration. */
+export enum ApplicationStatus {
+  Cancelled = "cancelled",
+  Declined = "declined",
+  Draft = "draft",
+  InReview = "in_review",
+  ReviewDone = "review_done",
+  Sent = "sent",
+}
+
+/** An enumeration. */
 export enum State {
   /** cancelled */
   Cancelled = "CANCELLED",
@@ -2891,17 +3137,79 @@ export enum State {
   RequiresHandling = "REQUIRES_HANDLING",
 }
 
-/** An enumeration. */
-export enum Status {
-  Allocated = "allocated",
-  Approved = "approved",
-  Draft = "draft",
-  Handled = "handled",
-  InReview = "in_review",
-  ReviewDone = "review_done",
-  Validated = "validated",
-}
+export const ApplicationsDocument = gql`
+  query Applications {
+    applications {
+      edges {
+        node {
+          pk
+          applicationRoundId
+          applicantName
+          status
+          applicantType
+          contactPerson {
+            firstName
+            lastName
+          }
+          organisation {
+            name
+          }
+          lastModifiedDate
+        }
+      }
+    }
+  }
+`;
 
+/**
+ * __useApplicationsQuery__
+ *
+ * To run a query within a React component, call `useApplicationsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useApplicationsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useApplicationsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useApplicationsQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    ApplicationsQuery,
+    ApplicationsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<ApplicationsQuery, ApplicationsQueryVariables>(
+    ApplicationsDocument,
+    options
+  );
+}
+export function useApplicationsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    ApplicationsQuery,
+    ApplicationsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<ApplicationsQuery, ApplicationsQueryVariables>(
+    ApplicationsDocument,
+    options
+  );
+}
+export type ApplicationsQueryHookResult = ReturnType<
+  typeof useApplicationsQuery
+>;
+export type ApplicationsLazyQueryHookResult = ReturnType<
+  typeof useApplicationsLazyQuery
+>;
+export type ApplicationsQueryResult = Apollo.QueryResult<
+  ApplicationsQuery,
+  ApplicationsQueryVariables
+>;
 export const ApplicationRoundsDocument = gql`
   query ApplicationRounds {
     applicationRounds {
@@ -4145,6 +4453,7 @@ export const SearchReservationUnitsDocument = gql`
         endCursor
         hasNextPage
       }
+      totalCount
     }
   }
 `;
@@ -4533,6 +4842,33 @@ export type ReservationUnitTypesQueryResult = Apollo.QueryResult<
   ReservationUnitTypesQuery,
   ReservationUnitTypesQueryVariables
 >;
+export type ApplicationsQueryVariables = Exact<{ [key: string]: never }>;
+
+export type ApplicationsQuery = {
+  __typename?: "Query";
+  applications?: {
+    __typename?: "ApplicationTypeConnection";
+    edges: Array<{
+      __typename?: "ApplicationTypeEdge";
+      node?: {
+        __typename?: "ApplicationType";
+        pk?: number | null;
+        applicationRoundId?: number | null;
+        applicantName?: string | null;
+        status?: ApplicationStatus | null;
+        applicantType?: ApplicationsApplicationApplicantTypeChoices | null;
+        lastModifiedDate: any;
+        contactPerson?: {
+          __typename?: "PersonType";
+          firstName: string;
+          lastName: string;
+        } | null;
+        organisation?: { __typename?: "OrganisationType"; name: string } | null;
+      } | null;
+    } | null>;
+  } | null;
+};
+
 export type ApplicationRoundsQueryVariables = Exact<{ [key: string]: never }>;
 
 export type ApplicationRoundsQuery = {
@@ -4553,7 +4889,7 @@ export type ApplicationRoundsQuery = {
         publicDisplayEnd: any;
         applicationPeriodBegin: any;
         applicationPeriodEnd: any;
-        status?: Status | null;
+        status?: ApplicationRoundStatus | null;
         criteriaFi?: string | null;
         criteriaEn?: string | null;
         criteriaSv?: string | null;
@@ -5123,6 +5459,7 @@ export type SearchReservationUnitsQuery = {
   __typename?: "Query";
   reservationUnits?: {
     __typename?: "ReservationUnitTypeConnection";
+    totalCount?: number | null;
     edges: Array<{
       __typename?: "ReservationUnitTypeEdge";
       node?: {
