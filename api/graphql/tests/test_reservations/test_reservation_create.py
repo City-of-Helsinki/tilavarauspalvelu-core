@@ -775,3 +775,90 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         assert_that(
             content.get("data").get("createReservation").get("errors")[0]["messages"]
         ).contains("An ambiguous SKU cannot be assigned for this reservation.")
+
+    def test_create_fails_when_reservation_unit_reservations_max_days_before_exceeds(
+        self, mock_periods, mock_opening_hours
+    ):
+        res_begin = datetime.datetime.now() + datetime.timedelta(days=181)
+        mock_opening_hours.return_value = self.get_mocked_opening_hours(
+            date=res_begin.date()
+        )
+        self.reservation_unit.reservations_max_days_before = 180
+        self.reservation_unit.save()
+
+        data = self.get_valid_input_data()
+        data["begin"] = res_begin.strftime("%Y%m%dT%H%M%SZ")
+        data["end"] = (res_begin + datetime.timedelta(hours=1)).strftime(
+            "%Y%m%dT%H%M%SZ"
+        )
+
+        self.client.force_login(self.regular_joe)
+        response = self.query(self.get_create_query(), input_data=data)
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_none()
+        assert_that(
+            content.get("data").get("createReservation").get("errors")
+        ).is_not_none()
+        assert_that(
+            content.get("data").get("createReservation").get("errors")[0]["messages"][0]
+        ).contains("Reservation start time is earlier than")
+
+    def test_create_succeed_when_reservation_unit_reservations_max_days_before_in_limits(
+        self, mock_periods, mock_opening_hours
+    ):
+        self.reservation_unit.reservations_max_days_before = 180
+        self.reservation_unit.save()
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+        self.client.force_login(self.regular_joe)
+        input_data = self.get_valid_input_data()
+        response = self.query(self.get_create_query(), input_data=input_data)
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_none()
+        assert_that(
+            content.get("data").get("createReservation").get("reservation").get("pk")
+        ).is_not_none()
+        pk = content.get("data").get("createReservation").get("reservation").get("pk")
+        reservation = Reservation.objects.get(id=pk)
+        assert_that(reservation).is_not_none()
+
+    def test_create_fails_when_reservation_unit_reservations_min_days_before_subseeds(
+        self, mock_periods, mock_opening_hours
+    ):
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+        self.reservation_unit.reservations_min_days_before = 1
+        self.reservation_unit.save()
+
+        self.client.force_login(self.regular_joe)
+        response = self.query(
+            self.get_create_query(), input_data=self.get_valid_input_data()
+        )
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_none()
+        assert_that(
+            content.get("data").get("createReservation").get("errors")
+        ).is_not_none()
+        assert_that(
+            content.get("data").get("createReservation").get("errors")[0]["messages"][0]
+        ).contains("Reservation start time is less than")
+
+    def test_create_succeed_when_reservation_unit_reservations_in_days_before_in_limits(
+        self, mock_periods, mock_opening_hours
+    ):
+        self.reservation_unit.reservations_min_days_before = 0
+        self.reservation_unit.save()
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+        self.client.force_login(self.regular_joe)
+        input_data = self.get_valid_input_data()
+        response = self.query(self.get_create_query(), input_data=input_data)
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_none()
+        assert_that(
+            content.get("data").get("createReservation").get("reservation").get("pk")
+        ).is_not_none()
+        pk = content.get("data").get("createReservation").get("reservation").get("pk")
+        reservation = Reservation.objects.get(id=pk)
+        assert_that(reservation).is_not_none()

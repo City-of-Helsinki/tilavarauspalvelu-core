@@ -108,6 +108,8 @@ class ReservationUnitQueryTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCa
             metadata_set=ReservationMetadataSetFactory(name="Test form"),
             max_reservations_per_user=5,
             min_persons=1,
+            reservations_max_days_before=360,
+            reservations_min_days_before=1,
         )
 
         cls.api_client = APIClient()
@@ -214,6 +216,8 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
                             authentication
                             reservationKind
                             canApplyFreeOfCharge
+                            reservationsMaxDaysBefore
+                            reservationsMinDaysBefore
                           }
                         }
                     }
@@ -2247,6 +2251,8 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
             "requireReservationHandling": True,
             "authentication": "STRONG",
             "canApplyFreeOfCharge": True,
+            "reservationsMaxDaysBefore": 360,
+            "reservationsMinDaysBefore": 1,
         }
 
     def test_create(self):
@@ -2313,6 +2319,8 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
             ReservationKind.DIRECT_AND_SEASON
         )
         assert_that(res_unit.can_apply_free_of_charge).is_equal_to(True)
+        assert_that(res_unit.reservations_max_days_before).is_equal_to(360)
+        assert_that(res_unit.reservations_min_days_before).is_equal_to(1)
 
     @mock.patch(
         "reservation_units.utils.hauki_exporter.ReservationUnitHaukiExporter.send_reservation_unit_to_hauki"
