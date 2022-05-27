@@ -153,6 +153,7 @@ export const reducer = (state: State, action: Action): State => {
             "bufferTimeBefore",
             "maxReservationsPerUser",
             "maxPersons",
+            "minPersons",
             "maxReservationDuration",
             "minReservationDuration",
             "pk",
@@ -323,6 +324,15 @@ export const reducer = (state: State, action: Action): State => {
 
     case "set": {
       return modifyEditorState(state, { ...action.value });
+    }
+
+    case "setMaxPersons": {
+      return modifyEditorState(state, {
+        maxPersons: action.maxPersons,
+        minPersons: state.reservationUnitEdit.minPersons
+          ? Math.min(action.maxPersons, state.reservationUnitEdit.minPersons)
+          : undefined,
+      });
     }
     case "setSpaces": {
       const selectedSpacePks = action.spaces.map((ot) => ot.value as number);

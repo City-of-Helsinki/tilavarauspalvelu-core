@@ -72,6 +72,7 @@ export const RESERVATIONUNIT_QUERY = gql`
       unit {
         pk
       }
+      minPersons
       maxPersons
       surfaceArea
       descriptionFi
