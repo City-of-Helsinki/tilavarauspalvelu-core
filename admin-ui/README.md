@@ -4,7 +4,7 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 ## Prerequisites
 
-1. Node lts/fermium (`nvm use`)
+1. Node 16 (`nvm use`)
 1. Yarn
 
 ## Developing locally

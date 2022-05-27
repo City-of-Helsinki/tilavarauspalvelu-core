@@ -1,3 +1,8 @@
+## Prerequisites
+
+1. Node 16 (`nvm use`)
+1. Yarn
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
