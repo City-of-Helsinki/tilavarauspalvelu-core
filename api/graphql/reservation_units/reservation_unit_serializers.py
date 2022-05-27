@@ -19,6 +19,7 @@ from reservation_units.models import (
     Equipment,
     EquipmentCategory,
     Purpose,
+    ReservationKind,
     ReservationUnit,
     ReservationUnitCancellationRule,
     ReservationUnitImage,
@@ -212,6 +213,15 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
         help_text=(
             "Authentication required for reserving this reservation unit. Possible values are "
             f"{', '.join(value[0].upper() for value in ReservationUnit.AUTHENTICATION_TYPES)}."
+        ),
+    )
+
+    reservation_kind = ChoiceCharField(
+        default=ReservationKind.DIRECT_AND_SEASON,
+        choices=ReservationKind.choices,
+        help_text=(
+            "What kind of reservations are to be made to this is reservation unit. Possible values are: "
+            f"{', '.join(value.upper() for value in ReservationKind)}."
         ),
     )
 

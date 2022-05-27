@@ -2253,6 +2253,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
             "canApplyFreeOfCharge": True,
             "reservationsMaxDaysBefore": 360,
             "reservationsMinDaysBefore": 1,
+            "reservationKind": ReservationKind.DIRECT,
         }
 
     def test_create(self):
@@ -2315,9 +2316,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         )
         assert_that(res_unit.require_reservation_handling).is_equal_to(True)
         assert_that(res_unit.authentication).is_equal_to("strong")
-        assert_that(res_unit.reservation_kind).is_equal_to(
-            ReservationKind.DIRECT_AND_SEASON
-        )
+        assert_that(res_unit.reservation_kind).is_equal_to(ReservationKind.DIRECT)
         assert_that(res_unit.can_apply_free_of_charge).is_equal_to(True)
         assert_that(res_unit.reservations_max_days_before).is_equal_to(360)
         assert_that(res_unit.reservations_min_days_before).is_equal_to(1)
@@ -2698,6 +2697,22 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
             "minPersons can't be more than maxPersons"
         )
         assert_that(ReservationUnit.objects.exists()).is_false()
+
+    def test_reservation_kind_defaults_to_direct_and_season(self):
+        data = self.get_valid_data()
+        data.pop("reservationKind")
+        response = self.query(self.get_create_query(), input_data=data)
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
+        res_unit_data = content.get("data").get("createReservationUnit")
+        assert_that(content.get("errors")).is_none()
+        assert_that(res_unit_data.get("errors")).is_none()
+
+        res_unit = ReservationUnit.objects.first()
+        assert_that(res_unit).is_not_none()
+        assert_that(res_unit.reservation_kind).is_equal_to(
+            ReservationKind.DIRECT_AND_SEASON
+        )
 
 
 class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):

@@ -135,9 +135,9 @@ def get_default_tax_percentage() -> int:
 
 
 class ReservationKind(models.TextChoices):
-    DIRECT = "DIRECT", _("Direct")
-    SEASON = "SEASON", _("Season")
-    DIRECT_AND_SEASON = "DIRECT_AND_SEASON", _("Direct and season")
+    DIRECT = "direct", _("Direct")
+    SEASON = "season", _("Season")
+    DIRECT_AND_SEASON = "direct_and_season", _("Direct and season")
 
 
 class ReservationUnit(models.Model):
