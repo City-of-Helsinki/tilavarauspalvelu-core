@@ -1024,6 +1024,7 @@ export type QueryApplicationsArgs = {
   first?: InputMaybe<Scalars["Int"]>;
   last?: InputMaybe<Scalars["Int"]>;
   offset?: InputMaybe<Scalars["Int"]>;
+  orderBy?: InputMaybe<Scalars["String"]>;
   status?: InputMaybe<Array<InputMaybe<Scalars["String"]>>>;
   unit?: InputMaybe<Array<InputMaybe<Scalars["ID"]>>>;
   user?: InputMaybe<Scalars["ID"]>;
@@ -1075,16 +1076,11 @@ export type QueryEquipmentsArgs = {
   before?: InputMaybe<Scalars["String"]>;
   first?: InputMaybe<Scalars["Int"]>;
   last?: InputMaybe<Scalars["Int"]>;
-  nameEn?: InputMaybe<Scalars["String"]>;
-  nameEn_Icontains?: InputMaybe<Scalars["String"]>;
-  nameEn_Istartswith?: InputMaybe<Scalars["String"]>;
-  nameFi?: InputMaybe<Scalars["String"]>;
-  nameFi_Icontains?: InputMaybe<Scalars["String"]>;
-  nameFi_Istartswith?: InputMaybe<Scalars["String"]>;
-  nameSv?: InputMaybe<Scalars["String"]>;
-  nameSv_Icontains?: InputMaybe<Scalars["String"]>;
-  nameSv_Istartswith?: InputMaybe<Scalars["String"]>;
+  name?: InputMaybe<Scalars["String"]>;
   offset?: InputMaybe<Scalars["Int"]>;
+  orderBy?: InputMaybe<Scalars["String"]>;
+  rankGte?: InputMaybe<Scalars["Float"]>;
+  rankLte?: InputMaybe<Scalars["Float"]>;
 };
 
 export type QueryKeywordCategoriesArgs = {
@@ -1220,10 +1216,13 @@ export type QueryReservationUnitsArgs = {
   purposes?: InputMaybe<Array<InputMaybe<Scalars["ID"]>>>;
   rankGte?: InputMaybe<Scalars["Float"]>;
   rankLte?: InputMaybe<Scalars["Float"]>;
+  reservationKind?: InputMaybe<Scalars["String"]>;
   reservationUnitType?: InputMaybe<Array<InputMaybe<Scalars["ID"]>>>;
   surfaceAreaGte?: InputMaybe<Scalars["Float"]>;
   surfaceAreaLte?: InputMaybe<Scalars["Float"]>;
   textSearch?: InputMaybe<Scalars["String"]>;
+  typeRankGte?: InputMaybe<Scalars["Float"]>;
+  typeRankLte?: InputMaybe<Scalars["Float"]>;
   unit?: InputMaybe<Array<InputMaybe<Scalars["ID"]>>>;
 };
 
@@ -1776,6 +1775,8 @@ export type ReservationUnitByPkType = Node & {
   authentication: ReservationUnitsReservationUnitAuthenticationChoices;
   bufferTimeAfter?: Maybe<Scalars["Duration"]>;
   bufferTimeBefore?: Maybe<Scalars["Duration"]>;
+  /** Can reservations to this reservation unit be able to apply free of charge. */
+  canApplyFreeOfCharge: Scalars["Boolean"];
   cancellationRule?: Maybe<ReservationUnitCancellationRuleType>;
   cancellationTerms?: Maybe<TermsOfUseType>;
   contactInformation: Scalars["String"];
@@ -1798,6 +1799,7 @@ export type ReservationUnitByPkType = Node & {
   maxReservationDuration?: Maybe<Scalars["Duration"]>;
   maxReservationsPerUser?: Maybe<Scalars["Int"]>;
   metadataSet?: Maybe<ReservationMetadataSetType>;
+  minPersons?: Maybe<Scalars["Int"]>;
   minReservationDuration?: Maybe<Scalars["Duration"]>;
   nameEn?: Maybe<Scalars["String"]>;
   nameFi?: Maybe<Scalars["String"]>;
@@ -1820,6 +1822,8 @@ export type ReservationUnitByPkType = Node & {
   reservationBegins?: Maybe<Scalars["DateTime"]>;
   /** Time when making reservations become not possible for this reservation unit */
   reservationEnds?: Maybe<Scalars["DateTime"]>;
+  /** What kind of reservations are to be booked with this reservation unit. */
+  reservationKind: ReservationUnitsReservationUnitReservationKindChoices;
   /**
    * Determines the interval for the start time of the reservation. For example an
    * interval of 15 minutes means a reservation can begin at minutes 15, 30, 60, or
@@ -1898,6 +1902,8 @@ export type ReservationUnitCreateMutationInput = {
   authentication?: InputMaybe<Scalars["String"]>;
   bufferTimeAfter?: InputMaybe<Scalars["Int"]>;
   bufferTimeBefore?: InputMaybe<Scalars["Int"]>;
+  /** Can reservations to this reservation unit be able to apply free of charge. */
+  canApplyFreeOfCharge?: InputMaybe<Scalars["Boolean"]>;
   cancellationRulePk?: InputMaybe<Scalars["Int"]>;
   cancellationTermsPk?: InputMaybe<Scalars["String"]>;
   clientMutationId?: InputMaybe<Scalars["String"]>;
@@ -1916,6 +1922,7 @@ export type ReservationUnitCreateMutationInput = {
   maxReservationDuration?: InputMaybe<Scalars["Int"]>;
   maxReservationsPerUser?: InputMaybe<Scalars["Int"]>;
   metadataSetPk?: InputMaybe<Scalars["Int"]>;
+  minPersons?: InputMaybe<Scalars["Int"]>;
   minReservationDuration?: InputMaybe<Scalars["Int"]>;
   nameEn?: InputMaybe<Scalars["String"]>;
   nameFi?: InputMaybe<Scalars["String"]>;
@@ -1936,6 +1943,8 @@ export type ReservationUnitCreateMutationInput = {
   reservationBegins?: InputMaybe<Scalars["DateTime"]>;
   /** Time when making reservations become not possible for this reservation unit */
   reservationEnds?: InputMaybe<Scalars["DateTime"]>;
+  /** What kind of reservations are to be booked with this reservation unit. */
+  reservationKind?: InputMaybe<Reservation_Kind>;
   /**
    * Determines the interval for the start time of the reservation. For example an
    * interval of 15 minutes means a reservation can begin at minutes 0, 15, 30, or
@@ -1966,6 +1975,8 @@ export type ReservationUnitCreateMutationPayload = {
   bufferTimeAfter?: Maybe<Scalars["Int"]>;
   bufferTimeBefore?: Maybe<Scalars["Int"]>;
   building?: Maybe<Scalars["String"]>;
+  /** Can reservations to this reservation unit be able to apply free of charge. */
+  canApplyFreeOfCharge?: Maybe<Scalars["Boolean"]>;
   cancellationRulePk?: Maybe<Scalars["Int"]>;
   clientMutationId?: Maybe<Scalars["String"]>;
   /** Contact information for this reservation unit. */
@@ -1987,6 +1998,7 @@ export type ReservationUnitCreateMutationPayload = {
   maxPersons?: Maybe<Scalars["Int"]>;
   maxReservationDuration?: Maybe<Scalars["Int"]>;
   maxReservationsPerUser?: Maybe<Scalars["Int"]>;
+  minPersons?: Maybe<Scalars["Int"]>;
   minReservationDuration?: Maybe<Scalars["Int"]>;
   nameEn?: Maybe<Scalars["String"]>;
   nameFi?: Maybe<Scalars["String"]>;
@@ -2007,6 +2019,8 @@ export type ReservationUnitCreateMutationPayload = {
   reservationBegins?: Maybe<Scalars["DateTime"]>;
   /** Time when making reservations become not possible for this reservation unit */
   reservationEnds?: Maybe<Scalars["DateTime"]>;
+  /** What kind of reservations are to be booked with this reservation unit. */
+  reservationKind?: Maybe<Reservation_Kind>;
   /**
    * Determines the interval for the start time of the reservation. For example an
    * interval of 15 minutes means a reservation can begin at minutes 0, 15, 30, or
@@ -2108,6 +2122,8 @@ export type ReservationUnitType = Node & {
   authentication: ReservationUnitsReservationUnitAuthenticationChoices;
   bufferTimeAfter?: Maybe<Scalars["Duration"]>;
   bufferTimeBefore?: Maybe<Scalars["Duration"]>;
+  /** Can reservations to this reservation unit be able to apply free of charge. */
+  canApplyFreeOfCharge: Scalars["Boolean"];
   cancellationRule?: Maybe<ReservationUnitCancellationRuleType>;
   cancellationTerms?: Maybe<TermsOfUseType>;
   contactInformation: Scalars["String"];
@@ -2129,6 +2145,7 @@ export type ReservationUnitType = Node & {
   maxReservationDuration?: Maybe<Scalars["Duration"]>;
   maxReservationsPerUser?: Maybe<Scalars["Int"]>;
   metadataSet?: Maybe<ReservationMetadataSetType>;
+  minPersons?: Maybe<Scalars["Int"]>;
   minReservationDuration?: Maybe<Scalars["Duration"]>;
   nameEn?: Maybe<Scalars["String"]>;
   nameFi?: Maybe<Scalars["String"]>;
@@ -2151,6 +2168,8 @@ export type ReservationUnitType = Node & {
   reservationBegins?: Maybe<Scalars["DateTime"]>;
   /** Time when making reservations become not possible for this reservation unit */
   reservationEnds?: Maybe<Scalars["DateTime"]>;
+  /** What kind of reservations are to be booked with this reservation unit. */
+  reservationKind: ReservationUnitsReservationUnitReservationKindChoices;
   /**
    * Determines the interval for the start time of the reservation. For example an
    * interval of 15 minutes means a reservation can begin at minutes 15, 30, 60, or
@@ -2209,6 +2228,8 @@ export type ReservationUnitTypeType = Node & {
   nameFi?: Maybe<Scalars["String"]>;
   nameSv?: Maybe<Scalars["String"]>;
   pk?: Maybe<Scalars["Int"]>;
+  /** Order number to be used in api sorting. */
+  rank?: Maybe<Scalars["Int"]>;
 };
 
 export type ReservationUnitTypeTypeConnection = {
@@ -2237,6 +2258,8 @@ export type ReservationUnitUpdateMutationInput = {
   authentication?: InputMaybe<Scalars["String"]>;
   bufferTimeAfter?: InputMaybe<Scalars["Int"]>;
   bufferTimeBefore?: InputMaybe<Scalars["Int"]>;
+  /** Can reservations to this reservation unit be able to apply free of charge. */
+  canApplyFreeOfCharge?: InputMaybe<Scalars["Boolean"]>;
   cancellationRulePk?: InputMaybe<Scalars["Int"]>;
   cancellationTermsPk?: InputMaybe<Scalars["String"]>;
   clientMutationId?: InputMaybe<Scalars["String"]>;
@@ -2255,6 +2278,7 @@ export type ReservationUnitUpdateMutationInput = {
   maxReservationDuration?: InputMaybe<Scalars["Int"]>;
   maxReservationsPerUser?: InputMaybe<Scalars["Int"]>;
   metadataSetPk?: InputMaybe<Scalars["Int"]>;
+  minPersons?: InputMaybe<Scalars["Int"]>;
   minReservationDuration?: InputMaybe<Scalars["Int"]>;
   nameEn?: InputMaybe<Scalars["String"]>;
   nameFi?: InputMaybe<Scalars["String"]>;
@@ -2276,6 +2300,8 @@ export type ReservationUnitUpdateMutationInput = {
   reservationBegins?: InputMaybe<Scalars["DateTime"]>;
   /** Time when making reservations become not possible for this reservation unit */
   reservationEnds?: InputMaybe<Scalars["DateTime"]>;
+  /** What kind of reservations are to be booked with this reservation unit. */
+  reservationKind?: InputMaybe<Reservation_Kind>;
   /**
    * Determines the interval for the start time of the reservation. For example an
    * interval of 15 minutes means a reservation can begin at minutes 0, 15, 30, or
@@ -2306,6 +2332,8 @@ export type ReservationUnitUpdateMutationPayload = {
   bufferTimeAfter?: Maybe<Scalars["Int"]>;
   bufferTimeBefore?: Maybe<Scalars["Int"]>;
   building?: Maybe<Scalars["String"]>;
+  /** Can reservations to this reservation unit be able to apply free of charge. */
+  canApplyFreeOfCharge?: Maybe<Scalars["Boolean"]>;
   cancellationRulePk?: Maybe<Scalars["Int"]>;
   clientMutationId?: Maybe<Scalars["String"]>;
   /** Contact information for this reservation unit. */
@@ -2327,6 +2355,7 @@ export type ReservationUnitUpdateMutationPayload = {
   maxPersons?: Maybe<Scalars["Int"]>;
   maxReservationDuration?: Maybe<Scalars["Int"]>;
   maxReservationsPerUser?: Maybe<Scalars["Int"]>;
+  minPersons?: Maybe<Scalars["Int"]>;
   minReservationDuration?: Maybe<Scalars["Int"]>;
   nameEn?: Maybe<Scalars["String"]>;
   nameFi?: Maybe<Scalars["String"]>;
@@ -2347,6 +2376,8 @@ export type ReservationUnitUpdateMutationPayload = {
   reservationBegins?: Maybe<Scalars["DateTime"]>;
   /** Time when making reservations become not possible for this reservation unit */
   reservationEnds?: Maybe<Scalars["DateTime"]>;
+  /** What kind of reservations are to be booked with this reservation unit. */
+  reservationKind?: Maybe<Reservation_Kind>;
   /**
    * Determines the interval for the start time of the reservation. For example an
    * interval of 15 minutes means a reservation can begin at minutes 0, 15, 30, or
@@ -2408,6 +2439,16 @@ export enum ReservationUnitsReservationUnitPriceUnitChoices {
   PerHour = "PER_HOUR",
   /** per week */
   PerWeek = "PER_WEEK",
+}
+
+/** An enumeration. */
+export enum ReservationUnitsReservationUnitReservationKindChoices {
+  /** Direct */
+  Direct = "DIRECT",
+  /** Direct and season */
+  DirectAndSeason = "DIRECT_AND_SEASON",
+  /** Season */
+  Season = "SEASON",
 }
 
 /** An enumeration. */
@@ -3124,6 +3165,16 @@ export enum ApplicationStatus {
 }
 
 /** An enumeration. */
+export enum Reservation_Kind {
+  /** Direct */
+  Direct = "DIRECT",
+  /** Direct and season */
+  DirectAndSeason = "DIRECT_AND_SEASON",
+  /** Season */
+  Season = "SEASON",
+}
+
+/** An enumeration. */
 export enum State {
   /** cancelled */
   Cancelled = "CANCELLED",
@@ -3138,8 +3189,8 @@ export enum State {
 }
 
 export const ApplicationsDocument = gql`
-  query Applications {
-    applications {
+  query Applications($user: ID, $status: [String]) {
+    applications(user: $user, status: $status) {
       edges {
         node {
           pk
@@ -3148,10 +3199,12 @@ export const ApplicationsDocument = gql`
           status
           applicantType
           contactPerson {
+            id
             firstName
             lastName
           }
           organisation {
+            id
             name
           }
           lastModifiedDate
@@ -3173,6 +3226,8 @@ export const ApplicationsDocument = gql`
  * @example
  * const { data, loading, error } = useApplicationsQuery({
  *   variables: {
+ *      user: // value for 'user'
+ *      status: // value for 'status'
  *   },
  * });
  */
@@ -4842,7 +4897,12 @@ export type ReservationUnitTypesQueryResult = Apollo.QueryResult<
   ReservationUnitTypesQuery,
   ReservationUnitTypesQueryVariables
 >;
-export type ApplicationsQueryVariables = Exact<{ [key: string]: never }>;
+export type ApplicationsQueryVariables = Exact<{
+  user?: InputMaybe<Scalars["ID"]>;
+  status?: InputMaybe<
+    Array<InputMaybe<Scalars["String"]>> | InputMaybe<Scalars["String"]>
+  >;
+}>;
 
 export type ApplicationsQuery = {
   __typename?: "Query";
@@ -4860,10 +4920,15 @@ export type ApplicationsQuery = {
         lastModifiedDate: any;
         contactPerson?: {
           __typename?: "PersonType";
+          id: string;
           firstName: string;
           lastName: string;
         } | null;
-        organisation?: { __typename?: "OrganisationType"; name: string } | null;
+        organisation?: {
+          __typename?: "OrganisationType";
+          id: string;
+          name: string;
+        } | null;
       } | null;
     } | null>;
   } | null;
