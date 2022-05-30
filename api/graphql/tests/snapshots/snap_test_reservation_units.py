@@ -541,6 +541,7 @@ snapshots['ReservationUnitQueryTestCase::test_getting_reservation_units 1'] = {
                         'additionalInstructionsEn': 'Additional instructions',
                         'additionalInstructionsFi': 'Lisäohjeita',
                         'additionalInstructionsSv': 'Ytterligare instruktioner',
+                        'allowReservationsWithoutOpeningHours': False,
                         'applicationRounds': [
                         ],
                         'authentication': 'WEAK',

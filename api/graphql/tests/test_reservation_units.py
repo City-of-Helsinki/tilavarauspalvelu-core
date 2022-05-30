@@ -218,6 +218,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
                             canApplyFreeOfCharge
                             reservationsMaxDaysBefore
                             reservationsMinDaysBefore
+                            allowReservationsWithoutOpeningHours
                           }
                         }
                     }

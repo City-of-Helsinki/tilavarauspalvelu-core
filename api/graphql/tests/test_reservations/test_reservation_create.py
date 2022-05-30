@@ -406,6 +406,36 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
             content.get("data").get("createReservation").get("errors")[0]["messages"][0]
         ).contains("Reservation unit is not open within desired reservation time.")
 
+    def test_create_succeed_when_reservation_unit_closed_on_selected_time_and_opening_hours_are_ignored(
+        self, mock_periods, mock_opening_hours
+    ):
+
+        self.reservation_unit.allow_reservations_without_opening_hours = True
+        self.reservation_unit.save()
+
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+        input_data = self.get_valid_input_data()
+        today = datetime.date.today()
+        begin = datetime.datetime(today.year, today.month, today.day, 21, 0)
+        end = begin + datetime.timedelta(hours=2)
+        input_data["begin"] = begin.strftime("%Y%m%dT%H%M%SZ")
+        input_data["end"] = end.strftime("%Y%m%dT%H%M%SZ")
+
+        self.client.force_login(self.regular_joe)
+        response = self.query(self.get_create_query(), input_data=input_data)
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_none()
+        assert_that(
+            content.get("data").get("createReservation").get("errors")
+        ).is_none()
+        reservation_id = (
+            content.get("data").get("createReservation").get("reservation").get("pk")
+        )
+        assert_that(reservation_id).is_greater_than_or_equal_to(1)
+        saved_reservation = Reservation.objects.get(pk=reservation_id)
+        assert_that(saved_reservation).is_not_none()
+
     def test_create_fails_when_reservation_unit_in_open_application_round(
         self, mock_periods, mock_opening_hours
     ):
@@ -524,6 +554,35 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
             assert_that(payload.get("errors")[0]["messages"]).contains(
                 f"Reservation start time does not match the allowed interval of {interval_minutes} minutes."
             )
+
+    def test_create_succeed_when_start_time_does_not_match_reservation_start_interval_and_opening_hours_are_ignored(
+        self, mock_periods, mock_opening_hours
+    ):
+        self.reservation_unit.allow_reservations_without_opening_hours = True
+        self.reservation_unit.save()
+
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+        self.client.force_login(self.regular_joe)
+        intervals = [
+            value for value, _ in ReservationUnit.RESERVATION_START_INTERVAL_CHOICES
+        ]
+        for interval, interval_minutes in zip(intervals, [15, 90]):
+            input_data = self.get_valid_input_data()
+            self.reservation_unit.reservation_start_interval = interval
+            self.reservation_unit.save(update_fields=["reservation_start_interval"])
+            begin = datetime.datetime.now() + datetime.timedelta(
+                minutes=interval_minutes + 1
+            )
+            input_data["begin"] = begin.strftime("%Y%m%dT%H%M%SZ")
+            response = self.query(self.get_create_query(), input_data=input_data)
+            content = json.loads(response.content)
+            assert_that(content.get("errors")).is_none()
+            payload = content.get("data").get("createReservation", {})
+            assert_that(payload.get("errors")).is_none()
+            reservation_id = payload.get("reservation").get("pk")
+            assert_that(reservation_id).is_greater_than_or_equal_to(1)
+            saved_reservation = Reservation.objects.get(pk=reservation_id)
+            assert_that(saved_reservation).is_not_none()
 
     def test_create_fails_when_reservation_unit_reservation_begin_in_future(
         self, mock_periods, mock_opening_hours
