@@ -157,27 +157,22 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
             )
         return value
 
-    def validate_reservation(self, reservation_unit, scheduler, begin, end):
-        if reservation_unit.allow_reservations_without_opening_hours:
-            return
-
-        if (
-            reservation_unit.reservation_begins
-            and begin < reservation_unit.reservation_begins
-        ) or (
-            reservation_unit.reservation_ends
-            and end > reservation_unit.reservation_ends
-        ):
+    def validate_reservation(self, reservation_unit: ReservationUnit, scheduler, begin, end):
+        is_invalid_begin = reservation_unit.reservation_begins and begin < reservation_unit.reservation_begins
+        is_invalid_end = reservation_unit.reservation_ends and end > reservation_unit.reservation_ends
+        
+        if (is_invalid_begin or is_invalid_end):
             raise serializers.ValidationError(
                 "Reservation unit is not reservable within this reservation time."
             )
+
         if reservation_unit.check_reservation_overlap(begin, end, self.instance):
             raise serializers.ValidationError(
                 "Overlapping reservations are not allowed."
             )
 
         is_reservation_unit_open = scheduler.is_reservation_unit_open(begin, end)
-        if not is_reservation_unit_open:
+        if not reservation_unit.allow_reservations_without_opening_hours and not is_reservation_unit_open:
             raise serializers.ValidationError(
                 "Reservation unit is not open within desired reservation time."
             )

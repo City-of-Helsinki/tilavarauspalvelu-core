@@ -166,33 +166,6 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
             content.get("data").get("updateReservation").get("errors")[0]["messages"]
         ).contains("Overlapping reservations are not allowed.")
 
-    def test_update_succeed_when_overlapping_reservation_and_opening_hours_are_ignored(
-        self, mock_periods, mock_opening_hours
-    ):
-        mock_opening_hours.return_value = self.get_mocked_opening_hours()
-
-        self.reservation_unit.allow_reservations_without_opening_hours = True
-        self.reservation_unit.save()
-
-        ReservationFactory(
-            reservation_unit=[self.reservation_unit],
-            begin=datetime.datetime.now(tz=get_default_timezone()),
-            end=datetime.datetime.now(tz=get_default_timezone())
-            + datetime.timedelta(hours=2),
-            state=STATE_CHOICES.CONFIRMED,
-        )
-
-        self.client.force_login(self.regular_joe)
-        response = self.query(
-            self.get_update_query(), input_data=self.get_valid_update_data()
-        )
-        content = json.loads(response.content)
-
-        assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("updateReservation").get("errors")
-        ).is_none()
-
     def test_update_fails_when_buffer_time_overlaps_reservation_before(
         self, mock_periods, mock_opening_hours
     ):
