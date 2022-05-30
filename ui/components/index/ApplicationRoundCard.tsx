@@ -6,15 +6,12 @@ import Link from "next/link";
 import styled from "styled-components";
 import { parseISO } from "date-fns";
 import Card from "../common/Card";
-import {
-  applicationRoundState,
-  getTranslation,
-  searchUrl,
-} from "../../modules/util";
+import { applicationRoundState, searchUrl } from "../../modules/util";
 import { breakpoint } from "../../modules/style";
 import { MediumButton } from "../../styles/util";
 import { fontMedium, H4 } from "../../modules/style/typography";
 import { ApplicationRoundType } from "../../modules/gql-types";
+import { getApplicationRoundName } from "../../modules/applicationRound";
 
 interface Props {
   applicationRound: ApplicationRoundType;
@@ -95,10 +92,7 @@ const ApplicationRoundCard = ({ applicationRound }: Props): JSX.Element => {
     applicationRound.applicationPeriodEnd
   );
 
-  const name = useMemo(
-    () => getTranslation(applicationRound, "name"),
-    [applicationRound]
-  );
+  const name = getApplicationRoundName(applicationRound);
 
   const reservationPeriod = useMemo(
     () =>

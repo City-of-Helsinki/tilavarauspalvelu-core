@@ -21,6 +21,8 @@ import {
   SEARCH_FORM_PARAMS_UNIT,
 } from "../../modules/queries/params";
 import { RESERVATION_UNIT_TYPES } from "../../modules/queries/reservationUnit";
+import { getApplicationRoundName } from "../../modules/applicationRound";
+import { getUnitName } from "../../modules/reservationUnit";
 
 type Props = {
   onSearch: (search: Record<string, string>) => void;
@@ -159,7 +161,7 @@ const SearchForm = ({
   const applicationPeriodOptions = useMemo(() => {
     return applicationRounds.map((applicationRound) => ({
       value: applicationRound.pk,
-      label: getTranslation(applicationRound, "name"),
+      label: getApplicationRoundName(applicationRound),
     }));
   }, [applicationRounds]);
 
@@ -167,7 +169,7 @@ const SearchForm = ({
     onCompleted: (res) => {
       const units = res?.units?.edges?.map(({ node }) => ({
         id: String(node.pk),
-        name: getTranslation(node, "name"),
+        name: getUnitName(node),
       }));
       setUnitOptions(mapOptions(sortBy(units, "name") as StringParameter[]));
     },
