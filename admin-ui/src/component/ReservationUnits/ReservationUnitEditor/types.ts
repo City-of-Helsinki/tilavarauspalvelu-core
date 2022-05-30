@@ -42,6 +42,7 @@ export type Action =
   | { type: "setPurposes"; purposes: OptionType[] }
   | { type: "parametersLoaded"; parameters: Query }
   | { type: "setMaxPersons"; maxPersons: number }
+  | { type: "setReservationsMaxDaysBefore"; reservationsMaxDaysBefore: number }
   | {
       type: "setValidatioErrors";
       validationErrors: Joi.ValidationResult | null;

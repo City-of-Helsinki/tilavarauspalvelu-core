@@ -338,6 +338,18 @@ export const reducer = (state: State, action: Action): State => {
           : undefined,
       });
     }
+    case "setReservationsMaxDaysBefore": {
+      return modifyEditorState(state, {
+        reservationsMaxDaysBefore: action.reservationsMaxDaysBefore,
+        reservationsMinDaysBefore: state.reservationUnitEdit
+          .reservationsMinDaysBefore
+          ? Math.min(
+              action.reservationsMaxDaysBefore,
+              state.reservationUnitEdit.reservationsMinDaysBefore
+            )
+          : undefined,
+      });
+    }
     case "setSpaces": {
       const selectedSpacePks = action.spaces.map((ot) => ot.value as number);
       const selectedSpaces = state.spaces.filter(

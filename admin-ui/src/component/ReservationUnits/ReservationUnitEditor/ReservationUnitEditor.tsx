@@ -528,8 +528,6 @@ const ReservationUnitEditor = (): JSX.Element | null => {
       state.reservationUnitEdit.reservationKind as string
     ) || false;
 
-  console.log("rendering with", state.reservationUnitEdit);
-
   return (
     <Wrapper key={JSON.stringify(state.validationErrors)}>
       <MainMenuWrapper>
@@ -1053,7 +1051,10 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                             "ReservationUnitEditor.label.reservationsMaxDaysBefore"
                           )}
                           onChange={(v) =>
-                            setValue({ reservationsMaxDaysBefore: v })
+                            dispatch({
+                              type: "setReservationsMaxDaysBefore",
+                              reservationsMaxDaysBefore: v as number,
+                            })
                           }
                           value={
                             state.reservationUnitEdit
