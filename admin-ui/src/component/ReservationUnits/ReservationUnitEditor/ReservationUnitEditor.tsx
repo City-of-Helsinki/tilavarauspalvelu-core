@@ -206,6 +206,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
         "unitPk",
         "requireReservationHandling",
         "contactInformation",
+        "canApplyFreeOfCharge",
         ...i18nFields("additionalInstructions"),
         ...i18nFields("description"),
         ...i18nFields("name"),
@@ -1236,9 +1237,6 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                       value={state.reservationUnitEdit.lowestPrice || 0}
                       id="lowestPrice"
                       label={t("ReservationUnitEditor.label.lowestPrice")}
-                      helperText={t(
-                        "ReservationUnitEditor.lowestPriceHelperText"
-                      )}
                       minusStepButtonAriaLabel={t(
                         "common.decreaseByOneAriaLabel"
                       )}
@@ -1266,9 +1264,6 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                       value={state.reservationUnitEdit.highestPrice || 0}
                       id="highestPrice"
                       label={t("ReservationUnitEditor.label.highestPrice")}
-                      helperText={t(
-                        "ReservationUnitEditor.highestPriceHelperText"
-                      )}
                       minusStepButtonAriaLabel={t(
                         "common.decreaseByOneAriaLabel"
                       )}
@@ -1318,6 +1313,23 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                       }
                     />
                   </Span3>
+                  <Span12>
+                    <Checkbox
+                      label={t(
+                        "ReservationUnitEditor.label.canApplyFreeOfCharge"
+                      )}
+                      id="canApplyFreeOfCharge"
+                      checked={
+                        state.reservationUnitEdit.canApplyFreeOfCharge === true
+                      }
+                      onClick={() =>
+                        setValue({
+                          canApplyFreeOfCharge:
+                            !state.reservationUnitEdit?.canApplyFreeOfCharge,
+                        })
+                      }
+                    />
+                  </Span12>
                 </EditorGrid>
               </Accordion>
               {showForSeasonal && (
