@@ -95,10 +95,11 @@ export type Image = {
   deleted?: boolean;
 };
 
-const notRequiredForSeason = {
-  not: "SEASON",
-  then: Joi.required(),
-};
+const requiredForSingle = (then: Joi.SchemaLike) =>
+  Joi.when("reservationKind", {
+    not: "SEASON",
+    then,
+  });
 
 export const schema = Joi.object({
   reservationKind: Joi.string().required(),
@@ -114,13 +115,12 @@ export const schema = Joi.object({
   descriptionFi: Joi.string().required().max(4000),
   descriptionSv: Joi.string().required().max(4000),
   descriptionEn: Joi.string().required().max(4000),
-  minReservationDuration: Joi.when("reservationKind", notRequiredForSeason),
-  maxReservationDuration: Joi.when("reservationKind", notRequiredForSeason),
-  reservationStartInterval: Joi.string().when(
-    "reservationKind",
-    notRequiredForSeason
-  ),
-  metadataSetPk: Joi.when("reservationKind", notRequiredForSeason),
+  minReservationDuration: requiredForSingle(Joi.number().required()),
+  maxReservationDuration: requiredForSingle(Joi.number().required()),
+  reservationsMinDaysBefore: requiredForSingle(Joi.number().required()),
+  reservationsMaxDaysBefore: requiredForSingle(Joi.number().required()),
+  reservationStartInterval: requiredForSingle(Joi.string().required()),
+  metadataSetPk: requiredForSingle(Joi.number().required()),
   termsOfUseFi: Joi.string().allow(null).max(10000),
   termsOfUseSv: Joi.string().allow(null).max(10000),
   termsOfUseEn: Joi.string().allow(null).max(10000),

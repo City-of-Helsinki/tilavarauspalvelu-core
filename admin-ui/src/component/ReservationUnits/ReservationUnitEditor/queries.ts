@@ -55,6 +55,8 @@ export const RESERVATIONUNIT_QUERY = gql`
       minReservationDuration
       reservationStartInterval
       canApplyFreeOfCharge
+      reservationsMinDaysBefore
+      reservationsMaxDaysBefore
       images {
         imageType
         imageUrl

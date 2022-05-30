@@ -85,6 +85,12 @@ const bufferTimeOptions = [
   { value: 5400, label: "90 minuuttia" },
 ];
 
+const reservationsMaxDaysBeforeOptions = [
+  { value: 30, label: "1 kk" },
+  { value: 182, label: "6 kk" },
+  { value: 365, label: "12 kk" },
+];
+
 const durationOptions = [
   { value: 900, label: "15 minuuttia" },
   { value: 1800, label: "30 minuuttia" },
@@ -207,6 +213,8 @@ const ReservationUnitEditor = (): JSX.Element | null => {
         "requireReservationHandling",
         "contactInformation",
         "canApplyFreeOfCharge",
+        "reservationsMinDaysBefore",
+        "reservationsMaxDaysBefore",
         ...i18nFields("additionalInstructions"),
         ...i18nFields("description"),
         ...i18nFields("name"),
@@ -519,6 +527,8 @@ const ReservationUnitEditor = (): JSX.Element | null => {
     ["DIRECT_AND_SEASON", "DIRECT"].includes(
       state.reservationUnitEdit.reservationKind as string
     ) || false;
+
+  console.log("rendering with", state.reservationUnitEdit);
 
   return (
     <Wrapper key={JSON.stringify(state.validationErrors)}>
@@ -991,7 +1001,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                           </ActivationGroup>
                         </Fieldset>
                       </Span12>
-                      <Span4>
+                      <Span6>
                         <Select
                           id="minReservationDuration"
                           options={durationOptions}
@@ -1011,8 +1021,8 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                             "minReservationDuration"
                           )}
                         />
-                      </Span4>
-                      <Span4>
+                      </Span6>
+                      <Span6>
                         <Select
                           id="maxReservationDuration"
                           placeholder={t("common.select")}
@@ -1032,8 +1042,65 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                             "maxReservationDuration"
                           )}
                         />
-                      </Span4>
-                      <Span4>
+                      </Span6>
+                      <Span6>
+                        <Select
+                          id="reservationsMaxDaysBefore"
+                          options={reservationsMaxDaysBeforeOptions}
+                          placeholder={t("common.select")}
+                          required
+                          label={t(
+                            "ReservationUnitEditor.label.reservationsMaxDaysBefore"
+                          )}
+                          onChange={(v) =>
+                            setValue({ reservationsMaxDaysBefore: v })
+                          }
+                          value={
+                            state.reservationUnitEdit
+                              .reservationsMaxDaysBefore || ""
+                          }
+                          errorText={getValidationError(
+                            "reservationsMaxDaysBefore"
+                          )}
+                        />
+                      </Span6>
+                      <Span6>
+                        <NumberInput
+                          value={
+                            state.reservationUnitEdit
+                              .reservationsMinDaysBefore || 0
+                          }
+                          id="reservationsMinDaysBefore"
+                          label={t(
+                            "ReservationUnitEditor.label.reservationsMinDaysBefore"
+                          )}
+                          minusStepButtonAriaLabel={t(
+                            "common.decreaseByOneAriaLabel"
+                          )}
+                          plusStepButtonAriaLabel={t(
+                            "common.increaseByOneAriaLabel"
+                          )}
+                          onChange={(e) => {
+                            setValue({
+                              reservationsMinDaysBefore: Number(e.target.value),
+                            });
+                          }}
+                          step={1}
+                          type="number"
+                          max={
+                            state.reservationUnitEdit
+                              .reservationsMaxDaysBefore || 0
+                          }
+                          required
+                          errorText={getValidationError(
+                            "reservationsMinDaysBefore"
+                          )}
+                          invalid={
+                            !!getValidationError("reservationsMinDaysBefore")
+                          }
+                        />
+                      </Span6>
+                      <Span6>
                         <EnumSelect
                           id="reservationStartInterval"
                           placeholder={t("common.select")}
@@ -1055,7 +1122,8 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                             "reservationStartInterval"
                           )}
                         />
-                      </Span4>
+                      </Span6>
+                      <Span6 />
                       <Span6>
                         <ActivationGroup
                           id="bufferTimeBeforeGroup"
