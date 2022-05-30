@@ -1,7 +1,9 @@
 from csv import writer
+from functools import reduce
 from pathlib import Path
 from typing import Dict, List
 
+from _csv import QUOTE_ALL
 from django.conf import settings
 from django.db.models import OuterRef, Prefetch, Subquery
 from django.utils import timezone
@@ -394,3 +396,68 @@ class ApplicationDataExporter:
             )
 
         event_schedules.update({new_schedule.day: time_range_string})
+
+    @classmethod
+    def export_application_round_statistics_for_reservation_units(
+        cls, application_round: int
+    ) -> None:
+        root = Path(settings.BASE_DIR)
+        path = root / "exports"
+        path.mkdir(parents=True, exist_ok=True)
+
+        with open(path / "reservation_units.csv", "w", newline="") as export_file:
+            export_writer = writer(export_file, dialect="excel", quoting=QUOTE_ALL)
+
+            export_writer.writerow(
+                ["Application ID", "Event name", "Status", "Reservation unit names"]
+            )
+
+            for event_id, application_id, event_name, current_status in (
+                ApplicationEvent.objects.annotate(
+                    current_status=Subquery(
+                        Application.objects.filter(
+                            id=OuterRef("application__id")
+                        ).values("latest_status")
+                    )
+                )
+                .alias(
+                    first_schedule_id=Subquery(
+                        ApplicationEventSchedule.objects.filter(
+                            application_event=OuterRef("id")
+                        ).values("id")[:1]
+                    )
+                )
+                .filter(
+                    application__application_round=application_round,
+                    first_schedule_id__isnull=False,
+                )
+                .exclude(current_status=ApplicationStatus.DRAFT)
+                .values_list("id", "application__id", "name", "current_status")
+                .order_by("application__organisation__name", "application__id")
+            ):
+                event_reservation_unit_names = (
+                    EventReservationUnit.objects.filter(application_event__id=event_id)
+                    .order_by("priority")
+                    .values_list("reservation_unit__name", flat=True)
+                )
+
+                reservation_units_string = reduce(
+                    (
+                        lambda current_string, unit_name: (
+                            unit_name
+                            if not current_string
+                            else f"{current_string}; {unit_name}"
+                        )
+                    ),
+                    event_reservation_unit_names,
+                    "",
+                )
+
+                export_writer.writerow(
+                    [
+                        application_id,
+                        event_name,
+                        current_status,
+                        reservation_units_string,
+                    ]
+                )
