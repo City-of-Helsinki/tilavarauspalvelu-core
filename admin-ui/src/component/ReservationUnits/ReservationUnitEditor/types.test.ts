@@ -17,14 +17,10 @@ test("conditional validation", () => {
     descriptionEn: "en",
   };
 
-  // kind not set
-  expect(schema.validate(reservationUnit).error).not.toBeDefined();
-
   expect(
     schema.validate({ ...reservationUnit, reservationKind: "SEASON" }).error
   ).not.toBeDefined();
 
-  // with kind set
   expect(
     schema.validate({ ...reservationUnit, reservationKind: "DIRECT" }).error
   ).toBeDefined();
