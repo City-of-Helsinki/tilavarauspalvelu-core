@@ -960,6 +960,7 @@ const translations: ITranslations = {
   },
   ReservationUnitEditor: {
     label: {
+      reservationKind: ["Varaustyyppi"],
       nameFi: ["Varausyksikön nimi fi"],
       nameSv: ["Varausyksikön nimi sv"],
       nameEn: ["Varausyksikön nimi en"],
@@ -987,6 +988,11 @@ const translations: ITranslations = {
       additionalInstructionsFi: ["Sähköpostin lisäohjeteksti fi"],
       additionalInstructionsSv: ["Sähköpostin lisäohjeteksti sv"],
       additionalInstructionsEn: ["Sähköpostin lisäohjeteksti en"],
+      reservationKinds: {
+        DIRECT_AND_SEASON: ["Yksittäis- ja kausivaraus"],
+        DIRECT: ["Vain yksittäisvaraus"],
+        SEASON: ["Vain kausivaraus"],
+      },
     },
     authenticationLabel: ["Tunnistautuminen"],
     defaultHeading: ["Uusi varausyksikkö"],

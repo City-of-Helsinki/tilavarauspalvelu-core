@@ -167,6 +167,7 @@ export const reducer = (state: State, action: Action): State => {
             "reservationStartInterval",
             "surfaceArea",
             "unitPk",
+            "reservationKind",
             "contactInformation",
             ...i18nFields("additionalInstructions"),
             ...i18nFields("description"),
