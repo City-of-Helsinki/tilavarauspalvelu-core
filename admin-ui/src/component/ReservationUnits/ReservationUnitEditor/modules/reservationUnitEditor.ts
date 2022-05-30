@@ -3,7 +3,7 @@ import { breakpoints } from "../../../../styles/util";
 
 export const EditorGrid = styled.div`
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-template-columns: repeat(12, 1fr);
 
   align-items: baseline;
   gap: var(--spacing-m);
@@ -11,26 +11,40 @@ export const EditorGrid = styled.div`
   padding-bottom: var(--spacing-m);
 `;
 
-export const Wide = styled.div`
-  grid-column: span 4;
-`;
-
-export const Normal = styled.div`
-  grid-column: span 4;
-
+export const Span3 = styled.div`
+  grid-column: span 12;
   @media (min-width: ${breakpoints.l}) {
-    grid-column: span 2;
-  }
-`;
-
-export const Dense = styled.div`
-  grid-column: span 4;
-  @media (min-width: ${breakpoints.l}) {
-    grid-column: span 2;
+    grid-column: span 3;
   }
   @media (min-width: ${breakpoints.xl}) {
-    grid-column: span 1;
+    grid-column: span 3;
   }
+`;
+
+export const Span4 = styled.div`
+  label {
+    white-space: nowrap;
+  }
+
+  grid-column: span 12;
+  @media (min-width: ${breakpoints.m}) {
+    grid-column: span 6;
+  }
+  @media (min-width: ${breakpoints.l}) {
+    grid-column: span 4;
+  }
+`;
+
+export const Span6 = styled.div`
+  grid-column: span 12;
+
+  @media (min-width: ${breakpoints.l}) {
+    grid-column: span 6;
+  }
+`;
+
+export const Span12 = styled.div`
+  grid-column: span 12;
 `;
 
 export const Wrapper = styled.div`

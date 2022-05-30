@@ -52,15 +52,16 @@ import ImageEditor from "./ImageEditor";
 import DateTimeInput from "./DateTimeInput";
 import {
   ButtonsContainer,
-  Dense,
+  Span3,
   Editor,
   EditorContainer,
   EditorGrid,
-  Normal,
+  Span6,
   Preview,
   PublishingTime,
-  Wide,
+  Span12,
   Wrapper,
+  Span4,
 } from "./modules/reservationUnitEditor";
 import { IProps, ReservationUnitEditorType, schema, State } from "./types";
 import { getInitialState, i18nFields, reducer } from "./reducer";
@@ -175,6 +176,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
         "isDraft",
         "lowestPrice",
         "maxPersons",
+        "minPersons",
         "maxReservationsPerUser",
         "metadataSetPk",
         "maxReservationDuration",
@@ -544,7 +546,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                   {languages.map((lang) => {
                     const fieldName = `name${upperFirst(lang)}`;
                     return (
-                      <Wide>
+                      <Span12>
                         <TextInput
                           key={lang}
                           required
@@ -563,10 +565,10 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                           errorText={getValidationError(fieldName)}
                           invalid={!!getValidationError(fieldName)}
                         />
-                      </Wide>
+                      </Span12>
                     );
                   })}
-                  <Normal>
+                  <Span6>
                     <SortedCompobox
                       id="spacePks"
                       multiselect
@@ -588,8 +590,8 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                       error={getValidationError("spacePks")}
                       invalid={!!getValidationError("spacePks")}
                     />
-                  </Normal>
-                  <Normal>
+                  </Span6>
+                  <Span6>
                     <SortedCompobox
                       id="resourcePks"
                       multiselect
@@ -612,8 +614,8 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                       error={getValidationError("resourcePks")}
                       invalid={!!getValidationError("resourcePks")}
                     />
-                  </Normal>
-                  <Dense>
+                  </Span6>
+                  <Span4>
                     <NumberInput
                       value={state.reservationUnitEdit.surfaceArea || 0}
                       id="surfaceArea"
@@ -639,8 +641,8 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                       errorText={getValidationError("surfaceArea")}
                       invalid={!!getValidationError("surfaceArea")}
                     />
-                  </Dense>
-                  <Dense>
+                  </Span4>
+                  <Span4>
                     <NumberInput
                       value={state.reservationUnitEdit.maxPersons || 0}
                       id="maxPersons"
@@ -651,11 +653,12 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                       plusStepButtonAriaLabel={t(
                         "common.increaseByOneAriaLabel"
                       )}
-                      onChange={(e) => {
-                        setValue({
+                      onChange={(e) =>
+                        dispatch({
+                          type: "setMaxPersons",
                           maxPersons: Number(e.target.value),
-                        });
-                      }}
+                        })
+                      }
                       step={1}
                       type="number"
                       min={1}
@@ -667,7 +670,31 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                       invalid={!!getValidationError("maxPersons")}
                       required
                     />
-                  </Dense>
+                  </Span4>
+                  <Span4>
+                    <NumberInput
+                      value={state.reservationUnitEdit.minPersons || 0}
+                      id="minPersons"
+                      label={t("ReservationUnitEditor.label.minPersons")}
+                      minusStepButtonAriaLabel={t(
+                        "common.decreaseByOneAriaLabel"
+                      )}
+                      plusStepButtonAriaLabel={t(
+                        "common.increaseByOneAriaLabel"
+                      )}
+                      onChange={(e) => {
+                        setValue({
+                          minPersons: Number(e.target.value),
+                        });
+                      }}
+                      step={1}
+                      type="number"
+                      min={0}
+                      max={state.reservationUnitEdit.maxPersons || 1}
+                      errorText={getValidationError("minPersons")}
+                      invalid={!!getValidationError("minPersons")}
+                    />
+                  </Span4>
                 </EditorGrid>
               </Accordion>
               <Accordion
@@ -675,7 +702,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                 heading={t("ReservationUnitEditor.typesProperties")}
               >
                 <EditorGrid>
-                  <Normal>
+                  <Span6>
                     <Select
                       sort
                       required
@@ -700,8 +727,8 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                       )}
                       errorText={getValidationError("reservationUnitTypePk")}
                     />
-                  </Normal>
-                  <Normal>
+                  </Span6>
+                  <Span6>
                     <SortedCompobox
                       sort
                       multiselect
@@ -722,8 +749,8 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                         ),
                       ]}
                     />
-                  </Normal>
-                  <Normal>
+                  </Span6>
+                  <Span6>
                     <SortedCompobox
                       sort
                       multiselect
@@ -744,11 +771,11 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                         ),
                       ]}
                     />
-                  </Normal>
+                  </Span6>
                   {languages.map((lang) => {
                     const fieldName = `description${upperFirst(lang)}`;
                     return (
-                      <Wide>
+                      <Span12>
                         <RichTextInput
                           key={lang}
                           required
@@ -768,17 +795,17 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                           }
                           errorText={getValidationError(fieldName)}
                         />
-                      </Wide>
+                      </Span12>
                     );
                   })}
-                  <Wide>
+                  <Span12>
                     <ImageEditor
                       images={state.images}
                       setImages={(images) =>
                         dispatch({ type: "setImages", images })
                       }
                     />
-                  </Wide>
+                  </Span12>
                 </EditorGrid>
               </Accordion>
               <Accordion
@@ -786,7 +813,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                 heading={t("ReservationUnitEditor.settings")}
               >
                 <EditorGrid>
-                  <Wide>
+                  <Span12>
                     <Fieldset
                       heading={t("ReservationUnitEditor.publishingSettings")}
                     >
@@ -843,8 +870,8 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                         </ActivationGroup>
                       </ActivationGroup>
                     </Fieldset>
-                  </Wide>
-                  <Wide>
+                  </Span12>
+                  <Span12>
                     <Fieldset
                       heading={t("ReservationUnitEditor.reservationSettings")}
                     >
@@ -902,8 +929,8 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                         </ActivationGroup>
                       </ActivationGroup>
                     </Fieldset>
-                  </Wide>
-                  <Dense>
+                  </Span12>
+                  <Span3>
                     <Select
                       id="minReservationDuration"
                       options={durationOptions}
@@ -918,8 +945,8 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                       }
                       errorText={getValidationError("minReservationDuration")}
                     />
-                  </Dense>
-                  <Dense>
+                  </Span3>
+                  <Span3>
                     <Select
                       id="maxReservationDuration"
                       placeholder={t("common.select")}
@@ -934,8 +961,8 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                       }
                       errorText={getValidationError("maxReservationDuration")}
                     />
-                  </Dense>
-                  <Dense>
+                  </Span3>
+                  <Span3>
                     <EnumSelect
                       id="reservationStartInterval"
                       placeholder={t("common.select")}
@@ -955,8 +982,8 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                       }
                       errorText={getValidationError("reservationStartInterval")}
                     />
-                  </Dense>
-                  <Normal>
+                  </Span3>
+                  <Span6>
                     <ActivationGroup
                       id="bufferTimeBeforeGroup"
                       label={t("ReservationUnitEditor.bufferTimeBefore")}
@@ -975,8 +1002,8 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                         value={state.reservationUnitEdit.bufferTimeBefore || ""}
                       />
                     </ActivationGroup>
-                  </Normal>
-                  <Normal>
+                  </Span6>
+                  <Span6>
                     <ActivationGroup
                       id="bufferTimeAfterGroup"
                       label={t("ReservationUnitEditor.bufferTimeAfter")}
@@ -995,8 +1022,8 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                         value={state.reservationUnitEdit.bufferTimeAfter || ""}
                       />
                     </ActivationGroup>
-                  </Normal>
-                  <Wide>
+                  </Span6>
+                  <Span12>
                     <ActivationGroup
                       id="cancellationIsPossible"
                       label={t("ReservationUnitEditor.cancellationIsPossible")}
@@ -1030,8 +1057,8 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                         ))}
                       </SelectionGroup>
                     </ActivationGroup>
-                  </Wide>
-                  <Normal>
+                  </Span12>
+                  <Span6>
                     <Select
                       id="metadataSetPk"
                       sort
@@ -1042,8 +1069,8 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                       value={state.reservationUnitEdit.metadataSetPk || null}
                       errorText={getValidationError("metadataSetPk")}
                     />
-                  </Normal>
-                  <Normal>
+                  </Span6>
+                  <Span6>
                     <NumberInput
                       id="maxReservationsPerUser"
                       label={t("ReservationUnitEditor.maxReservationsPerUser")}
@@ -1058,8 +1085,8 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                         })
                       }
                     />
-                  </Normal>
-                  <Wide>
+                  </Span6>
+                  <Span12>
                     <Checkbox
                       id="requireReservationHandling"
                       label={t(
@@ -1077,8 +1104,8 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                         })
                       }
                     />
-                  </Wide>
-                  <Wide>
+                  </Span12>
+                  <Span12>
                     <EnumSelect
                       sort
                       id="authentication"
@@ -1092,8 +1119,8 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                         setValue({ authentication })
                       }
                     />
-                  </Wide>{" "}
-                  <Wide>
+                  </Span12>{" "}
+                  <Span12>
                     <Checkbox
                       id="requireIntroduction"
                       label={t(
@@ -1109,7 +1136,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                         })
                       }
                     />
-                  </Wide>
+                  </Span12>
                 </EditorGrid>
               </Accordion>
               <Accordion
@@ -1117,7 +1144,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                 heading={t("ReservationUnitEditor.pricing")}
               >
                 <EditorGrid>
-                  <Dense>
+                  <Span3>
                     <NumberInput
                       value={state.reservationUnitEdit.lowestPrice || 0}
                       id="lowestPrice"
@@ -1146,8 +1173,8 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                       errorText={getValidationError("lowestPrice")}
                       invalid={!!getValidationError("lowestPrice")}
                     />
-                  </Dense>
-                  <Dense>
+                  </Span3>
+                  <Span3>
                     <NumberInput
                       value={state.reservationUnitEdit.highestPrice || 0}
                       id="highestPrice"
@@ -1176,8 +1203,8 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                       errorText={getValidationError("highestPrice")}
                       invalid={!!getValidationError("highestPrice")}
                     />
-                  </Dense>
-                  <Dense>
+                  </Span3>
+                  <Span3>
                     <EnumSelect
                       id="priceUnit"
                       value={state.reservationUnitEdit.priceUnit as string}
@@ -1185,8 +1212,8 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                       type={ReservationUnitsReservationUnitPriceUnitChoices}
                       onChange={(priceUnit) => setValue({ priceUnit })}
                     />
-                  </Dense>
-                  <Dense>
+                  </Span3>
+                  <Span3>
                     <Select
                       id="taxPercentage"
                       label={t(`ReservationUnitEditor.taxPercentageLabel`)}
@@ -1203,7 +1230,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                         ) as number
                       }
                     />
-                  </Dense>
+                  </Span3>
                 </EditorGrid>
               </Accordion>
 
@@ -1215,7 +1242,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                   {languages.map((lang) => {
                     const fieldName = `termsOfUse${upperFirst(lang)}`;
                     return (
-                      <Wide>
+                      <Span12>
                         <RichTextInput
                           key={lang}
                           id={fieldName}
@@ -1232,7 +1259,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                           }
                           errorText={getValidationError(fieldName)}
                         />
-                      </Wide>
+                      </Span12>
                     );
                   })}
                   {["serviceSpecific", "payment", "cancellation"].map(
@@ -1240,7 +1267,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                       const options = get(state, `${name}TermsOptions`);
                       const propName = `${name}TermsPk`;
                       return (
-                        <Normal>
+                        <Span6>
                           <Select
                             sort
                             id={name}
@@ -1260,7 +1287,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                             )}
                             value={get(state.reservationUnitEdit, propName)}
                           />
-                        </Normal>
+                        </Span6>
                       );
                     }
                   )}
@@ -1276,7 +1303,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                       lang
                     )}`;
                     return (
-                      <Wide>
+                      <Span12>
                         <TextArea
                           key={lang}
                           id={fieldName}
@@ -1302,10 +1329,10 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                           errorText={getValidationError(fieldName)}
                           invalid={!!getValidationError(fieldName)}
                         />
-                      </Wide>
+                      </Span12>
                     );
                   })}
-                  <Wide>
+                  <Span12>
                     <TextInput
                       id="contactInformation"
                       label={t("ReservationUnitEditor.contactInformationLabel")}
@@ -1316,7 +1343,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                         })
                       }
                     />
-                  </Wide>
+                  </Span12>
                 </EditorGrid>
               </Accordion>
 

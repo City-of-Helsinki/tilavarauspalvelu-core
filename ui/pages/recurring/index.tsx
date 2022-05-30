@@ -26,7 +26,7 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   const now = new Date();
   const { data } = await apolloClient.query<Query, QueryApplicationRoundsArgs>({
     query: APPLICATION_ROUNDS,
-    fetchPolicy: "network-only",
+    fetchPolicy: "no-cache",
   });
   const applicationRounds = data?.applicationRounds?.edges.map((n) => n.node);
 

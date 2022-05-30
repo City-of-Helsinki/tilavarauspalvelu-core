@@ -1570,6 +1570,11 @@ type ReservationUnitByPkType implements Node {
 
   """What kind of reservations are to be booked with this reservation unit."""
   reservationKind: ReservationUnitsReservationUnitReservationKindChoices!
+
+  """
+  Can reservations to this reservation unit be able to apply free of charge.
+  """
+  canApplyFreeOfCharge: Boolean!
   images: [ReservationUnitImageType]
 
   """The ID of the object"""
@@ -1705,12 +1710,17 @@ input ReservationUnitCreateMutationInput {
 
   """What kind of reservations are to be booked with this reservation unit."""
   reservationKind: reservation_kind
-  nameFi: String
-  nameEn: String
-  nameSv: String
+
+  """
+  Can reservations to this reservation unit be able to apply free of charge.
+  """
+  canApplyFreeOfCharge: Boolean
   additionalInstructionsFi: String
   additionalInstructionsEn: String
   additionalInstructionsSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
@@ -1813,12 +1823,17 @@ type ReservationUnitCreateMutationPayload {
 
   """What kind of reservations are to be booked with this reservation unit."""
   reservationKind: reservation_kind
-  nameFi: String
-  nameEn: String
-  nameSv: String
+
+  """
+  Can reservations to this reservation unit be able to apply free of charge.
+  """
+  canApplyFreeOfCharge: Boolean
   additionalInstructionsFi: String
   additionalInstructionsEn: String
   additionalInstructionsSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
@@ -2065,6 +2080,11 @@ type ReservationUnitType implements Node {
 
   """What kind of reservations are to be booked with this reservation unit."""
   reservationKind: ReservationUnitsReservationUnitReservationKindChoices!
+
+  """
+  Can reservations to this reservation unit be able to apply free of charge.
+  """
+  canApplyFreeOfCharge: Boolean!
   images: [ReservationUnitImageType]
   applicationRounds(active: Boolean = null): [ApplicationRoundType]
 
@@ -2207,12 +2227,17 @@ input ReservationUnitUpdateMutationInput {
 
   """What kind of reservations are to be booked with this reservation unit."""
   reservationKind: reservation_kind
-  nameFi: String
-  nameEn: String
-  nameSv: String
+
+  """
+  Can reservations to this reservation unit be able to apply free of charge.
+  """
+  canApplyFreeOfCharge: Boolean
   additionalInstructionsFi: String
   additionalInstructionsEn: String
   additionalInstructionsSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
@@ -2315,12 +2340,17 @@ type ReservationUnitUpdateMutationPayload {
 
   """What kind of reservations are to be booked with this reservation unit."""
   reservationKind: reservation_kind
-  nameFi: String
-  nameEn: String
-  nameSv: String
+
+  """
+  Can reservations to this reservation unit be able to apply free of charge.
+  """
+  canApplyFreeOfCharge: Boolean
   additionalInstructionsFi: String
   additionalInstructionsEn: String
   additionalInstructionsSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String

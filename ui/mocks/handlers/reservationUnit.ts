@@ -315,6 +315,7 @@ const selectedReservationUnitQuery = graphql.query<
         category: equipmentCategories[0],
       },
     ],
+    canApplyFreeOfCharge: false,
     reservationKind:
       ReservationUnitsReservationUnitReservationKindChoices.DirectAndSeason,
   };
@@ -616,6 +617,7 @@ const relatedReservationUnitsData: ReservationUnitTypeConnection = {
         resources: [],
         contactInformation: "",
         requireReservationHandling: false,
+        canApplyFreeOfCharge: false,
         reservationKind:
           ReservationUnitsReservationUnitReservationKindChoices.DirectAndSeason,
       },
@@ -712,6 +714,7 @@ const relatedReservationUnitsData: ReservationUnitTypeConnection = {
         resources: [],
         contactInformation: "",
         requireReservationHandling: false,
+        canApplyFreeOfCharge: false,
         reservationKind:
           ReservationUnitsReservationUnitReservationKindChoices.DirectAndSeason,
       },
