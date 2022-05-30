@@ -5,8 +5,15 @@ import {
   ReservationUnitByPkType,
   ReservationUnitsReservationUnitPriceUnitChoices,
   ReservationUnitType,
+  UnitType,
 } from "./gql-types";
-import { getFormatters as formatters, getTranslation } from "./util";
+import { ReservationUnit } from "./types";
+import {
+  capitalize,
+  getFormatters as formatters,
+  getTranslation,
+  localizedValue,
+} from "./util";
 
 export const getPriceUnitMinutes = (
   unit: ReservationUnitsReservationUnitPriceUnitChoices
@@ -152,4 +159,30 @@ export const getEquipmentList = (equipment: EquipmentType[]): string[] => {
   );
 
   return sortedEquipment.map((n) => getTranslation(n, "name"));
+};
+
+export const getReservationUnitName = (
+  reservationUnit: ReservationUnitType | ReservationUnitByPkType,
+  language: string = i18n.language
+): string => {
+  const key = `name${capitalize(language)}`;
+  return reservationUnit[key] || reservationUnit.nameFi;
+};
+
+export const getOldReservationUnitName = (
+  reservationUnit: ReservationUnit,
+  language: string = i18n.language
+): string => {
+  return (
+    localizedValue(reservationUnit.name, language) ||
+    localizedValue(reservationUnit.name, "fi")
+  );
+};
+
+export const getUnitName = (
+  unit: UnitType,
+  language: string = i18n.language
+): string => {
+  const key = `name${capitalize(language)}`;
+  return unit[key] || unit.nameFi;
 };

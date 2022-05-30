@@ -9,11 +9,7 @@ import styled from "styled-components";
 import { saveApplication } from "../modules/api";
 import { breakpoint } from "../modules/style";
 import { Application, OptionType } from "../modules/types";
-import {
-  applicationRoundState,
-  deepCopy,
-  getTranslation,
-} from "../modules/util";
+import { applicationRoundState, deepCopy } from "../modules/util";
 import { minimalApplicationForInitialSave } from "../modules/application/applicationInitializer";
 import { MediumButton } from "../styles/util";
 import RequireAuthentication from "../components/common/RequireAuthentication";
@@ -21,6 +17,7 @@ import Head from "../components/application/Head";
 import { APPLICATION_ROUNDS } from "../modules/queries/applicationRound";
 import { Query, QueryApplicationRoundsArgs } from "../modules/gql-types";
 import { CenterSpinner } from "../components/common/common";
+import { getApplicationRoundName } from "../modules/applicationRound";
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
@@ -73,7 +70,7 @@ const Intro = (): JSX.Element => {
         )
         .map((ar) => ({
           value: ar.pk,
-          label: getTranslation(ar, "name"),
+          label: getApplicationRoundName(ar),
         }));
       setApplicationRounds(ars);
     },

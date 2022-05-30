@@ -32,7 +32,11 @@ import {
 } from "../../modules/openingHours";
 import { MediumButton } from "../../styles/util";
 import { ReservationUnitByPkType } from "../../modules/gql-types";
-import { getPrice } from "../../modules/reservationUnit";
+import {
+  getPrice,
+  getReservationUnitName,
+  getUnitName,
+} from "../../modules/reservationUnit";
 import KorosDefault from "../common/KorosDefault";
 import { H1, H2 } from "../../modules/style/typography";
 import BreadcrumbWrapper from "../common/BreadcrumbWrapper";
@@ -154,6 +158,10 @@ const Head = ({
 
   const unitPrice = getPrice(reservationUnit);
 
+  const reservationUnitName = getReservationUnitName(reservationUnit);
+
+  const unitName = getUnitName(reservationUnit.unit);
+
   return (
     <>
       <BreadcrumbWrapper
@@ -168,16 +176,12 @@ const Head = ({
         <Container>
           <RightContainer>
             <div>
-              <ReservationUnitName>
-                {getTranslation(reservationUnit, "name")}
-              </ReservationUnitName>
-              <UnitName>
-                {getTranslation(reservationUnit.unit, "name")}
-              </UnitName>
+              <ReservationUnitName>{reservationUnitName}</ReservationUnitName>
+              <UnitName>{unitName}</UnitName>
               <JustForMobile style={{ marginTop: "var(--spacing-l)" }}>
                 <Images
                   images={orderImages(reservationUnit.images)}
-                  contextName={getTranslation(reservationUnit, "name")}
+                  contextName={reservationUnitName}
                 />
               </JustForMobile>
               <Props>
@@ -296,7 +300,7 @@ const Head = ({
             <JustForDesktop>
               <Images
                 images={orderImages(reservationUnit.images)}
-                contextName={getTranslation(reservationUnit, "name")}
+                contextName={reservationUnitName}
               />
             </JustForDesktop>
           </RightContainer>

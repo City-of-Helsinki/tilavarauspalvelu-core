@@ -1,13 +1,22 @@
 import { get as mockGet } from "lodash";
 import { addMinutes } from "date-fns";
-import { EquipmentType, ReservationUnitByPkType } from "../gql-types";
+import {
+  EquipmentType,
+  ReservationUnitByPkType,
+  ReservationUnitType,
+  UnitType,
+} from "../gql-types";
 import {
   getEquipmentCategories,
   getEquipmentList,
+  getOldReservationUnitName,
   getPrice,
+  getReservationUnitName,
+  getUnitName,
   isReservationUnitPublished,
 } from "../reservationUnit";
 import mockTranslations from "../../public/locales/fi/prices.json";
+import { ReservationUnit } from "../types";
 
 jest.mock("next/config", () => () => ({
   serverRuntimeConfig: {},
@@ -428,5 +437,173 @@ describe("getEquipmentList", () => {
 
   test("without equipment", () => {
     expect(getEquipmentList([])).toStrictEqual([]);
+  });
+});
+
+describe("getReservationUnitName", () => {
+  it("should return the name of the unit", () => {
+    const reservationUnit = {
+      nameFi: "Unit 1 FI",
+      nameEn: "Unit 1 EN",
+      nameSv: "Unit 1 SV",
+    } as ReservationUnitType;
+
+    expect(getReservationUnitName(reservationUnit)).toEqual("Unit 1 FI");
+  });
+
+  it("should return the name of the unit in the current language", () => {
+    const reservationUnit = {
+      nameFi: "Unit 1 FI",
+      nameEn: "Unit 1 EN",
+      nameSv: "Unit 1 SV",
+    } as ReservationUnitType;
+
+    expect(getReservationUnitName(reservationUnit, "sv")).toEqual("Unit 1 SV");
+  });
+
+  it("should return the name of the unit in the default language", () => {
+    const reservationUnit = {
+      nameFi: "Unit 1 FI",
+      nameEn: "",
+      nameSv: "",
+    } as ReservationUnitType;
+
+    expect(getReservationUnitName(reservationUnit, "sv")).toEqual("Unit 1 FI");
+  });
+
+  it("should return the name of the unit in the default language", () => {
+    const reservationUnit = {
+      nameFi: "Unit 1 FI",
+    } as ReservationUnitType;
+
+    expect(getReservationUnitName(reservationUnit, "sv")).toEqual("Unit 1 FI");
+  });
+
+  it("should return the name of the unit in the default language", () => {
+    const reservationUnit = {
+      nameFi: "Unit 1 FI",
+      nameEn: null,
+      nameSv: null,
+    } as ReservationUnitType;
+
+    expect(getReservationUnitName(reservationUnit, "sv")).toEqual("Unit 1 FI");
+  });
+});
+
+describe("getOldReservationUnitName", () => {
+  it("should return the name of the unit", () => {
+    const reservationUnit = {
+      name: {
+        fi: "Unit 1 FI",
+        en: "Unit 1 EN",
+        sv: "Unit 1 SV",
+      },
+    } as ReservationUnit;
+
+    expect(getOldReservationUnitName(reservationUnit)).toEqual("Unit 1 FI");
+  });
+
+  it("should return the name of the unit in the current language", () => {
+    const reservationUnit = {
+      name: {
+        fi: "Unit 1 FI",
+        en: "Unit 1 EN",
+        sv: "Unit 1 SV",
+      },
+    } as ReservationUnit;
+
+    expect(getOldReservationUnitName(reservationUnit, "sv")).toEqual(
+      "Unit 1 SV"
+    );
+  });
+
+  it("should return the name of the unit in the default language", () => {
+    const reservationUnit = {
+      name: {
+        fi: "Unit 1 FI",
+        en: "",
+        sv: "",
+      },
+    } as ReservationUnit;
+
+    expect(getOldReservationUnitName(reservationUnit, "sv")).toEqual(
+      "Unit 1 FI"
+    );
+  });
+
+  it("should return the name of the unit in the default language", () => {
+    const reservationUnit = {
+      name: {
+        fi: "Unit 1 FI",
+      },
+    } as ReservationUnit;
+
+    expect(getOldReservationUnitName(reservationUnit, "sv")).toEqual(
+      "Unit 1 FI"
+    );
+  });
+
+  it("should return the name of the unit in the default language", () => {
+    const reservationUnit = {
+      name: {
+        fi: "Unit 1 FI",
+        en: null,
+        sv: null,
+      },
+    } as ReservationUnit;
+
+    expect(getOldReservationUnitName(reservationUnit, "sv")).toEqual(
+      "Unit 1 FI"
+    );
+  });
+});
+
+describe("getUnitName", () => {
+  it("should return the name of the unit", () => {
+    const unit = {
+      nameFi: "Unit 1 FI",
+      nameEn: "Unit 1 EN",
+      nameSv: "Unit 1 SV",
+    } as UnitType;
+
+    expect(getUnitName(unit)).toEqual("Unit 1 FI");
+  });
+
+  it("should return the name of the unit in the current language", () => {
+    const unit = {
+      nameFi: "Unit 1 FI",
+      nameEn: "Unit 1 EN",
+      nameSv: "Unit 1 SV",
+    } as UnitType;
+
+    expect(getUnitName(unit, "sv")).toEqual("Unit 1 SV");
+  });
+
+  it("should return the name of the unit in the default language", () => {
+    const unit = {
+      nameFi: "Unit 1 FI",
+      nameEn: "",
+      nameSv: "",
+    } as UnitType;
+
+    expect(getUnitName(unit, "sv")).toEqual("Unit 1 FI");
+  });
+
+  it("should return the name of the unit in the default language", () => {
+    const unit = {
+      nameFi: "Unit 1 FI",
+    } as UnitType;
+
+    expect(getUnitName(unit, "sv")).toEqual("Unit 1 FI");
+  });
+
+  it("should return the name of the unit in the default language", () => {
+    const unit = {
+      nameFi: "Unit 1 FI",
+      nameEn: null,
+      nameSv: null,
+    } as UnitType;
+
+    expect(getUnitName(unit, "sv")).toEqual("Unit 1 FI");
   });
 });

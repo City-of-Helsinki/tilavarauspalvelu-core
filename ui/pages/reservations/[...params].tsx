@@ -51,6 +51,10 @@ import { MediumButton } from "../../styles/util";
 import { OptionType } from "../../modules/types";
 import { emptyOption, reservationUnitSinglePrefix } from "../../modules/const";
 import KorosDefault from "../../components/common/KorosDefault";
+import {
+  getReservationUnitName,
+  getUnitName,
+} from "../../modules/reservationUnit";
 
 type Props = {
   id: number;
@@ -274,8 +278,8 @@ const ReservationCancellation = ({ id, reasons }: Props): JSX.Element => {
           <HeadColumns>
             <Ticket
               state={formState === "unsent" ? "complete" : "error"}
-              title={getTranslation(reservationUnit, "name")}
-              subtitle={getTranslation(reservationUnit.unit, "name")}
+              title={getReservationUnitName(reservationUnit)}
+              subtitle={getUnitName(reservationUnit.unit)}
               begin={reservation.begin}
               end={reservation.end}
               isFree={!reservation.price}

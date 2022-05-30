@@ -8,11 +8,12 @@ import {
 import React from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { getMainImage, getTranslation } from "../../modules/util";
+import { getMainImage } from "../../modules/util";
 import { breakpoint } from "../../modules/style";
 import { MediumButton } from "../../styles/util";
 import { fontBold, H6 } from "../../modules/style/typography";
 import { ReservationUnitType } from "../../modules/gql-types";
+import { getReservationUnitName } from "../../modules/reservationUnit";
 
 type Props = {
   order: number;
@@ -178,7 +179,7 @@ const ReservationUnitCard = ({
         <CardContainer>
           <ImageCell $src={getMainImage(reservationUnit)?.mediumUrl} />
           <ExtraPaddedCell>
-            <Name>{getTranslation(reservationUnit, "name")}</Name>
+            <Name>{getReservationUnitName(reservationUnit)}</Name>
             <MaxPersonsContainer>
               {reservationUnit.maxPersons && (
                 <>

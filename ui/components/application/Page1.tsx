@@ -69,7 +69,7 @@ const Page1 = ({
 
   const history = useRouter();
 
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const { application } = editorState;
 
@@ -126,15 +126,21 @@ const Page1 = ({
       });
 
       setOptions({
-        ageGroupOptions: mapOptions(fetchedAgeGroupOptions),
-        abilityGroupOptions: mapOptions(fetchedAbilityGroupOptions),
-        reservationUnitTypeOptions: mapOptions(fetchedReservationUnitType),
+        ageGroupOptions: mapOptions(fetchedAgeGroupOptions, i18n.language),
+        abilityGroupOptions: mapOptions(
+          fetchedAbilityGroupOptions,
+          i18n.language
+        ),
+        reservationUnitTypeOptions: mapOptions(
+          fetchedReservationUnitType,
+          i18n.language
+        ),
         participantCountOptions,
       });
       setReady(true);
     }
     fetchData();
-  }, []);
+  }, [i18n.language]);
 
   const prepareData = (data: Application): Application => {
     const applicationCopy = {

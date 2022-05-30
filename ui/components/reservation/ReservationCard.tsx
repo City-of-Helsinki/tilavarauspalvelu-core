@@ -19,6 +19,10 @@ import {
   getReservationPrice,
 } from "../../modules/reservation";
 import { fontMedium } from "../../modules/style/typography";
+import {
+  getReservationUnitName,
+  getUnitName,
+} from "../../modules/reservationUnit";
 
 type CardType = "upcoming" | "past" | "requiresHandling";
 
@@ -53,7 +57,7 @@ const MainContent = styled.div`
   margin: var(--spacing-xs);
 
   @media (min-width: ${breakpoint.s}) {
-    margin: var(--spacing-m);
+    margin: var(--spacing-s);
   }
 
   @media (min-width: ${breakpoint.m}) {
@@ -68,8 +72,10 @@ const MainContent = styled.div`
 `;
 
 const Details = styled.div`
-  width: 10px;
-  white-space: pre;
+  @media (min-width: ${breakpoint.l}) {
+    width: 10px;
+    white-space: pre;
+  }
 `;
 
 const Name = styled.span`
@@ -96,8 +102,12 @@ const Bottom = styled.span`
 `;
 
 const Address = styled.div`
-  ${fontMedium};
   margin-bottom: var(--spacing-s);
+  line-height: var(--lineheight-l);
+`;
+
+const StreetAddress = styled.span`
+  ${fontMedium};
 `;
 
 const Price = styled(IconWithText)`
@@ -248,14 +258,14 @@ const ReservationCard = ({ reservation, type }: Props): JSX.Element => {
       />
       <MainContent>
         <Details>
-          <Name>{getTranslation(reservationUnit, "name")}</Name>
+          <Name>{getReservationUnitName(reservationUnit)}</Name>
           <Bottom>
             <Address data-testid="reservation__card--unit">
-              {getTranslation(reservationUnit.unit, "name")}
+              {getUnitName(reservationUnit.unit)}
               {address && (
-                <span data-testid="reservation__card--address">
+                <StreetAddress data-testid="reservation__card--address">
                   , {address}
-                </span>
+                </StreetAddress>
               )}
             </Address>
             <TimeStrip $type={type} data-testid="reservation__card--time">

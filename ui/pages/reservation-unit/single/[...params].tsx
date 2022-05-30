@@ -78,7 +78,11 @@ import {
 import StepperHz from "../../../components/StepperHz";
 import Ticket from "../../../components/reservation/Ticket";
 import Sanitize from "../../../components/common/Sanitize";
-import { getPrice } from "../../../modules/reservationUnit";
+import {
+  getPrice,
+  getReservationUnitName,
+  getUnitName,
+} from "../../../modules/reservationUnit";
 import {
   getReservationApplicationFields,
   getReservationApplicationMutationValues,
@@ -651,6 +655,8 @@ const ReservationUnitReservation = ({
   const isBreakingColumn = (field: string): boolean =>
     ["showBillingAddress", "applyingForFreeOfCharge"].includes(field);
 
+  const reservationUnitName = getReservationUnitName(reservationUnit);
+
   if (!isBrowser) {
     return null;
   }
@@ -662,8 +668,8 @@ const ReservationUnitReservation = ({
           <HeadColumns>
             <div>
               <Ticket
-                title={getTranslation(reservationUnit, "name")}
-                subtitle={getTranslation(reservationUnit.unit, "name")}
+                title={reservationUnitName}
+                subtitle={getUnitName(reservationUnit.unit)}
                 begin={begin}
                 end={end}
                 state={formStatus === "sent" ? "complete" : "incomplete"}
@@ -1324,7 +1330,7 @@ const ReservationUnitReservation = ({
                     <Strong>
                       {t("reservationCalendar:label.reservationSpace")}
                     </Strong>
-                    <span>{getTranslation(reservationUnit, "name")}</span>
+                    <span>{reservationUnitName}</span>
                   </ValueParagraph>
                   <ValueParagraph>
                     <Strong>{t("common:phone")}</Strong>
