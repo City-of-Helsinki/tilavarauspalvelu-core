@@ -167,6 +167,10 @@ export const reducer = (state: State, action: Action): State => {
             "reservationStartInterval",
             "surfaceArea",
             "unitPk",
+            "canApplyFreeOfCharge",
+            "reservationsMinDaysBefore",
+            "reservationsMaxDaysBefore",
+            "reservationKind",
             "contactInformation",
             ...i18nFields("additionalInstructions"),
             ...i18nFields("description"),
@@ -331,6 +335,18 @@ export const reducer = (state: State, action: Action): State => {
         maxPersons: action.maxPersons,
         minPersons: state.reservationUnitEdit.minPersons
           ? Math.min(action.maxPersons, state.reservationUnitEdit.minPersons)
+          : undefined,
+      });
+    }
+    case "setReservationsMaxDaysBefore": {
+      return modifyEditorState(state, {
+        reservationsMaxDaysBefore: action.reservationsMaxDaysBefore,
+        reservationsMinDaysBefore: state.reservationUnitEdit
+          .reservationsMinDaysBefore
+          ? Math.min(
+              action.reservationsMaxDaysBefore,
+              state.reservationUnitEdit.reservationsMinDaysBefore
+            )
           : undefined,
       });
     }

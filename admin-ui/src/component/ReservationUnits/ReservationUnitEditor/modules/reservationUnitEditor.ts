@@ -109,3 +109,14 @@ export const Preview = styled.a<{ $disabled: boolean }>`
 
   `}
 `;
+
+export const Error = styled.div`
+  margin-top: var(--spacing-3-xs);
+  color: var(--color-error);
+  display: flex;
+  gap: var(--spacing-2-xs);
+  svg {
+    flex-shrink: 0;
+  }
+  white-space: nowrap;
+`;

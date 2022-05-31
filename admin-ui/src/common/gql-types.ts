@@ -1822,6 +1822,8 @@ export type ReservationUnitByPkType = Node & {
   reservationStartInterval: ReservationUnitsReservationUnitReservationStartIntervalChoices;
   reservationUnitType?: Maybe<ReservationUnitTypeType>;
   reservations?: Maybe<Array<Maybe<ReservationType>>>;
+  reservationsMaxDaysBefore?: Maybe<Scalars["Int"]>;
+  reservationsMinDaysBefore?: Maybe<Scalars["Int"]>;
   resources?: Maybe<Array<Maybe<ResourceType>>>;
   serviceSpecificTerms?: Maybe<TermsOfUseType>;
   services?: Maybe<Array<Maybe<ServiceType>>>;
@@ -1932,11 +1934,13 @@ export type ReservationUnitCreateMutationInput = {
   reservationBegins?: InputMaybe<Scalars["DateTime"]>;
   /** Time when making reservations become not possible for this reservation unit */
   reservationEnds?: InputMaybe<Scalars["DateTime"]>;
-  /** What kind of reservations are to be booked with this reservation unit. */
-  reservationKind?: InputMaybe<Reservation_Kind>;
+  /** What kind of reservations are to be made to this is reservation unit. Possible values are: DIRECT, SEASON, DIRECT_AND_SEASON. */
+  reservationKind?: InputMaybe<Scalars["String"]>;
   /** Determines the interval for the start time of the reservation. For example an interval of 15 minutes means a reservation can begin at minutes 0, 15, 30, or 45. Possible values are INTERVAL_15_MINS, INTERVAL_30_MINS, INTERVAL_60_MINS, INTERVAL_90_MINS. */
   reservationStartInterval?: InputMaybe<Scalars["String"]>;
   reservationUnitTypePk?: InputMaybe<Scalars["Int"]>;
+  reservationsMaxDaysBefore?: InputMaybe<Scalars["Int"]>;
+  reservationsMinDaysBefore?: InputMaybe<Scalars["Int"]>;
   resourcePks?: InputMaybe<Array<InputMaybe<Scalars["Int"]>>>;
   servicePks?: InputMaybe<Array<InputMaybe<Scalars["Int"]>>>;
   serviceSpecificTermsPk?: InputMaybe<Scalars["String"]>;
@@ -2003,14 +2007,16 @@ export type ReservationUnitCreateMutationPayload = {
   reservationBegins?: Maybe<Scalars["DateTime"]>;
   /** Time when making reservations become not possible for this reservation unit */
   reservationEnds?: Maybe<Scalars["DateTime"]>;
-  /** What kind of reservations are to be booked with this reservation unit. */
-  reservationKind?: Maybe<Reservation_Kind>;
+  /** What kind of reservations are to be made to this is reservation unit. Possible values are: DIRECT, SEASON, DIRECT_AND_SEASON. */
+  reservationKind?: Maybe<Scalars["String"]>;
   /** Determines the interval for the start time of the reservation. For example an interval of 15 minutes means a reservation can begin at minutes 0, 15, 30, or 45. Possible values are INTERVAL_15_MINS, INTERVAL_30_MINS, INTERVAL_60_MINS, INTERVAL_90_MINS. */
   reservationStartInterval?: Maybe<Scalars["String"]>;
   reservationUnit?: Maybe<ReservationUnitType>;
   /** Type of the reservation unit as nested related object. */
   reservationUnitType?: Maybe<ReservationUnitTypeType>;
   reservationUnitTypePk?: Maybe<Scalars["Int"]>;
+  reservationsMaxDaysBefore?: Maybe<Scalars["Int"]>;
+  reservationsMinDaysBefore?: Maybe<Scalars["Int"]>;
   /** Resources included in the reservation unit as nested related objects. */
   resources?: Maybe<Array<Maybe<ResourceType>>>;
   /** Services included in the reservation unit as nested related objects. */
@@ -2153,6 +2159,8 @@ export type ReservationUnitType = Node & {
   reservationStartInterval: ReservationUnitsReservationUnitReservationStartIntervalChoices;
   reservationUnitType?: Maybe<ReservationUnitTypeType>;
   reservations?: Maybe<Array<Maybe<ReservationType>>>;
+  reservationsMaxDaysBefore?: Maybe<Scalars["Int"]>;
+  reservationsMinDaysBefore?: Maybe<Scalars["Int"]>;
   resources?: Maybe<Array<Maybe<ResourceType>>>;
   serviceSpecificTerms?: Maybe<TermsOfUseType>;
   services?: Maybe<Array<Maybe<ServiceType>>>;
@@ -2274,11 +2282,13 @@ export type ReservationUnitUpdateMutationInput = {
   reservationBegins?: InputMaybe<Scalars["DateTime"]>;
   /** Time when making reservations become not possible for this reservation unit */
   reservationEnds?: InputMaybe<Scalars["DateTime"]>;
-  /** What kind of reservations are to be booked with this reservation unit. */
-  reservationKind?: InputMaybe<Reservation_Kind>;
+  /** What kind of reservations are to be made to this is reservation unit. Possible values are: DIRECT, SEASON, DIRECT_AND_SEASON. */
+  reservationKind?: InputMaybe<Scalars["String"]>;
   /** Determines the interval for the start time of the reservation. For example an interval of 15 minutes means a reservation can begin at minutes 0, 15, 30, or 45. Possible values are INTERVAL_15_MINS, INTERVAL_30_MINS, INTERVAL_60_MINS, INTERVAL_90_MINS. */
   reservationStartInterval?: InputMaybe<Scalars["String"]>;
   reservationUnitTypePk?: InputMaybe<Scalars["Int"]>;
+  reservationsMaxDaysBefore?: InputMaybe<Scalars["Int"]>;
+  reservationsMinDaysBefore?: InputMaybe<Scalars["Int"]>;
   resourcePks?: InputMaybe<Array<InputMaybe<Scalars["Int"]>>>;
   servicePks?: InputMaybe<Array<InputMaybe<Scalars["Int"]>>>;
   serviceSpecificTermsPk?: InputMaybe<Scalars["String"]>;
@@ -2345,14 +2355,16 @@ export type ReservationUnitUpdateMutationPayload = {
   reservationBegins?: Maybe<Scalars["DateTime"]>;
   /** Time when making reservations become not possible for this reservation unit */
   reservationEnds?: Maybe<Scalars["DateTime"]>;
-  /** What kind of reservations are to be booked with this reservation unit. */
-  reservationKind?: Maybe<Reservation_Kind>;
+  /** What kind of reservations are to be made to this is reservation unit. Possible values are: DIRECT, SEASON, DIRECT_AND_SEASON. */
+  reservationKind?: Maybe<Scalars["String"]>;
   /** Determines the interval for the start time of the reservation. For example an interval of 15 minutes means a reservation can begin at minutes 0, 15, 30, or 45. Possible values are INTERVAL_15_MINS, INTERVAL_30_MINS, INTERVAL_60_MINS, INTERVAL_90_MINS. */
   reservationStartInterval?: Maybe<Scalars["String"]>;
   reservationUnit?: Maybe<ReservationUnitType>;
   /** Type of the reservation unit as nested related object. */
   reservationUnitType?: Maybe<ReservationUnitTypeType>;
   reservationUnitTypePk?: Maybe<Scalars["Int"]>;
+  reservationsMaxDaysBefore?: Maybe<Scalars["Int"]>;
+  reservationsMinDaysBefore?: Maybe<Scalars["Int"]>;
   /** Resources included in the reservation unit as nested related objects. */
   resources?: Maybe<Array<Maybe<ResourceType>>>;
   /** Services included in the reservation unit as nested related objects. */
@@ -3096,16 +3108,6 @@ export enum ApplicationStatus {
   InReview = "in_review",
   ReviewDone = "review_done",
   Sent = "sent",
-}
-
-/** An enumeration. */
-export enum Reservation_Kind {
-  /** Direct */
-  Direct = "DIRECT",
-  /** Direct and season */
-  DirectAndSeason = "DIRECT_AND_SEASON",
-  /** Season */
-  Season = "SEASON",
 }
 
 /** An enumeration. */

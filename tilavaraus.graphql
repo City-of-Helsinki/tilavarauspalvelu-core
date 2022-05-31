@@ -991,18 +991,6 @@ type RecurringReservationType {
   applicationEventPk: Int
 }
 
-"""An enumeration."""
-enum reservation_kind {
-  """Direct"""
-  DIRECT
-
-  """Season"""
-  SEASON
-
-  """Direct and season"""
-  DIRECT_AND_SEASON
-}
-
 input ReservationApproveMutationInput {
   pk: Int
 
@@ -1541,6 +1529,8 @@ type ReservationUnitByPkType implements Node {
   interval_90_mins.
   """
   reservationStartInterval: ReservationUnitsReservationUnitReservationStartIntervalChoices!
+  reservationsMaxDaysBefore: Int
+  reservationsMinDaysBefore: Int
 
   """
   Time when making reservations become possible for this reservation unit.
@@ -1708,22 +1698,27 @@ input ReservationUnitCreateMutationInput {
   """
   authentication: String
 
-  """What kind of reservations are to be booked with this reservation unit."""
-  reservationKind: reservation_kind
+  """
+  What kind of reservations are to be made to this is reservation unit. Possible
+  values are: DIRECT, SEASON, DIRECT_AND_SEASON.
+  """
+  reservationKind: String
 
   """
   Can reservations to this reservation unit be able to apply free of charge.
   """
   canApplyFreeOfCharge: Boolean
-  additionalInstructionsFi: String
-  additionalInstructionsEn: String
-  additionalInstructionsSv: String
+  reservationsMaxDaysBefore: Int
+  reservationsMinDaysBefore: Int
   nameFi: String
   nameEn: String
   nameSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
+  additionalInstructionsFi: String
+  additionalInstructionsEn: String
+  additionalInstructionsSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
@@ -1821,22 +1816,27 @@ type ReservationUnitCreateMutationPayload {
   """
   authentication: String
 
-  """What kind of reservations are to be booked with this reservation unit."""
-  reservationKind: reservation_kind
+  """
+  What kind of reservations are to be made to this is reservation unit. Possible
+  values are: DIRECT, SEASON, DIRECT_AND_SEASON.
+  """
+  reservationKind: String
 
   """
   Can reservations to this reservation unit be able to apply free of charge.
   """
   canApplyFreeOfCharge: Boolean
-  additionalInstructionsFi: String
-  additionalInstructionsEn: String
-  additionalInstructionsSv: String
+  reservationsMaxDaysBefore: Int
+  reservationsMinDaysBefore: Int
   nameFi: String
   nameEn: String
   nameSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
+  additionalInstructionsFi: String
+  additionalInstructionsEn: String
+  additionalInstructionsSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
@@ -2048,6 +2048,8 @@ type ReservationUnitType implements Node {
   interval_90_mins.
   """
   reservationStartInterval: ReservationUnitsReservationUnitReservationStartIntervalChoices!
+  reservationsMaxDaysBefore: Int
+  reservationsMinDaysBefore: Int
 
   """
   Time when making reservations become possible for this reservation unit.
@@ -2225,22 +2227,27 @@ input ReservationUnitUpdateMutationInput {
   """
   authentication: String
 
-  """What kind of reservations are to be booked with this reservation unit."""
-  reservationKind: reservation_kind
+  """
+  What kind of reservations are to be made to this is reservation unit. Possible
+  values are: DIRECT, SEASON, DIRECT_AND_SEASON.
+  """
+  reservationKind: String
 
   """
   Can reservations to this reservation unit be able to apply free of charge.
   """
   canApplyFreeOfCharge: Boolean
-  additionalInstructionsFi: String
-  additionalInstructionsEn: String
-  additionalInstructionsSv: String
+  reservationsMaxDaysBefore: Int
+  reservationsMinDaysBefore: Int
   nameFi: String
   nameEn: String
   nameSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
+  additionalInstructionsFi: String
+  additionalInstructionsEn: String
+  additionalInstructionsSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
@@ -2338,22 +2345,27 @@ type ReservationUnitUpdateMutationPayload {
   """
   authentication: String
 
-  """What kind of reservations are to be booked with this reservation unit."""
-  reservationKind: reservation_kind
+  """
+  What kind of reservations are to be made to this is reservation unit. Possible
+  values are: DIRECT, SEASON, DIRECT_AND_SEASON.
+  """
+  reservationKind: String
 
   """
   Can reservations to this reservation unit be able to apply free of charge.
   """
   canApplyFreeOfCharge: Boolean
-  additionalInstructionsFi: String
-  additionalInstructionsEn: String
-  additionalInstructionsSv: String
+  reservationsMaxDaysBefore: Int
+  reservationsMinDaysBefore: Int
   nameFi: String
   nameEn: String
   nameSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
+  additionalInstructionsFi: String
+  additionalInstructionsEn: String
+  additionalInstructionsSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String

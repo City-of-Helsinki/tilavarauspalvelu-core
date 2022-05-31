@@ -47,12 +47,16 @@ export const RESERVATIONUNIT_QUERY = gql`
       termsOfUseFi
       termsOfUseSv
       termsOfUseEn
+      reservationKind
       additionalInstructionsFi
       additionalInstructionsSv
       additionalInstructionsEn
       maxReservationDuration
       minReservationDuration
       reservationStartInterval
+      canApplyFreeOfCharge
+      reservationsMinDaysBefore
+      reservationsMaxDaysBefore
       images {
         imageType
         imageUrl
