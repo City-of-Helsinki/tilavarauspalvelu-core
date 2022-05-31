@@ -36,7 +36,7 @@ pytest-django==4.1.0
 pytest-factoryboy==2.1.0
 sentry-sdk==0.19.5
 snapshottest
-social-auth-app-django==4.0.0
+social-auth-app-django==5.0.0
 uWSGI==2.0.19.1
 whitenoise==5.2.0
 pip-tools

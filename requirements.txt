@@ -228,7 +228,7 @@ pycodestyle==2.6.0
     # via flake8
 pycparser==2.20
     # via cffi
-pycryptodomex==3.10.1
+pycryptodomex==3.14.1
     # via pyjwkest
 pydot==1.4.2
     # via -r requirements.in
@@ -236,7 +236,7 @@ pyflakes==2.2.0
     # via flake8
 pyjwkest==1.4.2
     # via drf-oidc-auth
-pyjwt==2.1.0
+pyjwt==2.4.0
     # via
     #   django-graphql-jwt
     #   social-auth-core
@@ -310,10 +310,9 @@ six==1.15.0
     #   python-jose
     #   requests-mock
     #   snapshottest
-    #   social-auth-app-django
 snapshottest==0.6.0
     # via -r requirements.in
-social-auth-app-django==4.0.0
+social-auth-app-django==5.0.0
     # via -r requirements.in
 social-auth-core==4.1.0
     # via social-auth-app-django
