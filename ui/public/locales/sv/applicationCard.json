@@ -2,6 +2,7 @@
   "cancelHeading": "Är du säker på att du vill ångra din ansökan?",
   "cancelContent": "Om du ångrar din ansökan kan du inte längre redigera eller skicka den.",
   "cancelFailed": "Ansökningen kunde inte ångras",
+  "cancelled": "Din ansökan har avbrutits.",
   "edit": "Redigera din ansökan",
   "cancel": "Ångra ansökan",
   "status": {
@@ -10,7 +11,7 @@
     "sent": "Behandlad"
   },
   "reservations": "Bokningar",
-  "saved": "Senast sparad: {{date, dd.MM.yyyy 'kl' HH:mm}}",
+  "saved": "Senast sparad: {{date, d.M.yyyy 'kl' H:mm}}",
   "person": "Ansökan skapad: som privatperson",
   "organisation": "Ansökan skapad: {{type}}, {{name}}",
   "applicantType": {

@@ -161,7 +161,7 @@ const Search = ({ applicationRounds }: Props): JSX.Element => {
       },
       {
         label: t("search:sorting.label.type"),
-        value: `type${capitalize(i18n.language)}`,
+        value: "typeRank",
       },
       {
         label: t("search:sorting.label.unit"),

@@ -31,6 +31,11 @@ import {
   ReservationUnitType,
 } from "../../modules/gql-types";
 import { RESERVATION_UNITS } from "../../modules/queries/reservationUnit";
+import { getApplicationRoundName } from "../../modules/applicationRound";
+import {
+  getReservationUnitName,
+  getUnitName,
+} from "../../modules/reservationUnit";
 
 const Container = styled.div`
   width: 100%;
@@ -146,18 +151,23 @@ const ReservationUnitCard = ({
   const buttonText = isSelected
     ? t("reservationUnitModal:unSelectReservationUnit")
     : t("reservationUnitModal:selectReservationUnit");
+  const reservationUnitName = getReservationUnitName(reservationUnit);
+  const reservationUnitTypeName = getTranslation(
+    reservationUnit.reservationUnitType,
+    "name"
+  );
 
   return (
     <Container>
       <Image
         alt={t("common:imgAltForSpace", {
-          name: getTranslation(reservationUnit, "name"),
+          name: reservationUnitName,
         })}
         src={getMainImage(reservationUnit)?.smallUrl || pixel}
       />
       <Main>
-        <Name>{getTranslation(reservationUnit, "name")}</Name>
-        <Unit>{getTranslation(reservationUnit.unit, "name")}</Unit>
+        <Name>{reservationUnitName}</Name>
+        <Unit>{getUnitName(reservationUnit.unit)}</Unit>
         <Link href={reservationUnitPath(reservationUnit.pk)}>
           <a target="_blank">
             <LinkContent>
@@ -168,24 +178,24 @@ const ReservationUnitCard = ({
         </Link>
       </Main>
       <Props>
-        {reservationUnit.reservationUnitType ? (
+        {reservationUnitTypeName && (
           <IconWithText
             icon={<IconInfoCircle />}
-            text={getTranslation(reservationUnit.reservationUnitType, "name")}
+            text={reservationUnitTypeName}
           />
-        ) : null}
-        {reservationUnit.maxPersons ? (
+        )}
+        {reservationUnit.maxPersons && (
           <IconWithText
             icon={<IconGroup />}
             text={`${reservationUnit.maxPersons}`}
           />
-        ) : null}
-        {getAddressAlt(reservationUnit) ? (
+        )}
+        {getAddressAlt(reservationUnit) && (
           <IconWithText
             icon={<IconLocation />}
             text={getAddressAlt(reservationUnit) || ""}
           />
-        ) : null}
+        )}
       </Props>
       <Actions>
         <MediumButton
@@ -346,7 +356,7 @@ const ReservationUnitModal = ({
   return (
     <MainContainer>
       <Heading>{t("reservationUnitModal:heading")}</Heading>
-      <Text>{getTranslation(applicationRound, "name")}</Text>
+      <Text>{getApplicationRoundName(applicationRound)}</Text>
       <Filters>
         <TextInput
           id="reservationUnitSearch.search"
@@ -379,7 +389,7 @@ const ReservationUnitModal = ({
           id="reservationUnitSearch.unit"
           placeholder={t("common:select")}
           options={unitOptions}
-          label={t("reservationUnitModal:searchReservationUnitTypeLabel")}
+          label={t("reservationUnitModal:searchUnitLabel")}
           onChange={(selection: OptionType): void => {
             setUnit(selection);
           }}

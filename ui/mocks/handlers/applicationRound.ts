@@ -5,8 +5,8 @@ import {
   ApplicationRoundTypeConnection,
   QueryApplicationRoundsArgs,
   ReservationUnitType,
-  ApplicationRoundStatus,
   ApplicationsApplicationRoundTargetGroupChoices,
+  ApplicationRoundStatus,
 } from "../../modules/gql-types";
 import { ApplicationRound } from "../../modules/types";
 import { toApiDate } from "../../modules/util";
@@ -226,7 +226,7 @@ const applicationRoundsGQL = graphql.query<Query, QueryApplicationRoundsArgs>(
             nameEn: "Nuorten liikuntavuorot kevät 2021 EN",
             nameSv: "Nuorten liikuntavuorot kevät 2021 SV",
             applicationPeriodBegin: "2021-01-01T00:00:00Z",
-            applicationPeriodEnd: "2021-01-31T00:00:00Z",
+            applicationPeriodEnd: addDays(new Date(), 7).toISOString(),
             reservationPeriodBegin: "2021-01-01",
             reservationPeriodEnd: "2021-06-01",
             publicDisplayBegin: "2021-01-01T00:00:00Z",

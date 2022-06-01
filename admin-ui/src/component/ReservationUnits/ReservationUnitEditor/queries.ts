@@ -47,12 +47,16 @@ export const RESERVATIONUNIT_QUERY = gql`
       termsOfUseFi
       termsOfUseSv
       termsOfUseEn
+      reservationKind
       additionalInstructionsFi
       additionalInstructionsSv
       additionalInstructionsEn
       maxReservationDuration
       minReservationDuration
       reservationStartInterval
+      canApplyFreeOfCharge
+      reservationsMinDaysBefore
+      reservationsMaxDaysBefore
       images {
         imageType
         imageUrl
@@ -72,6 +76,7 @@ export const RESERVATIONUNIT_QUERY = gql`
       unit {
         pk
       }
+      minPersons
       maxPersons
       surfaceArea
       descriptionFi

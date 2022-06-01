@@ -3214,6 +3214,83 @@ export enum State {
   RequiresHandling = "REQUIRES_HANDLING",
 }
 
+export const ApplicationsDocument = gql`
+  query Applications($user: ID, $status: [String]) {
+    applications(user: $user, status: $status) {
+      edges {
+        node {
+          pk
+          applicationRoundId
+          applicantName
+          status
+          applicantType
+          contactPerson {
+            id
+            firstName
+            lastName
+          }
+          organisation {
+            id
+            name
+          }
+          lastModifiedDate
+        }
+      }
+    }
+  }
+`;
+
+/**
+ * __useApplicationsQuery__
+ *
+ * To run a query within a React component, call `useApplicationsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useApplicationsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useApplicationsQuery({
+ *   variables: {
+ *      user: // value for 'user'
+ *      status: // value for 'status'
+ *   },
+ * });
+ */
+export function useApplicationsQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    ApplicationsQuery,
+    ApplicationsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<ApplicationsQuery, ApplicationsQueryVariables>(
+    ApplicationsDocument,
+    options
+  );
+}
+export function useApplicationsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    ApplicationsQuery,
+    ApplicationsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<ApplicationsQuery, ApplicationsQueryVariables>(
+    ApplicationsDocument,
+    options
+  );
+}
+export type ApplicationsQueryHookResult = ReturnType<
+  typeof useApplicationsQuery
+>;
+export type ApplicationsLazyQueryHookResult = ReturnType<
+  typeof useApplicationsLazyQuery
+>;
+export type ApplicationsQueryResult = Apollo.QueryResult<
+  ApplicationsQuery,
+  ApplicationsQueryVariables
+>;
 export const ApplicationRoundsDocument = gql`
   query ApplicationRounds {
     applicationRounds {
@@ -4316,6 +4393,7 @@ export const ReservationUnitDocument = gql`
           nameSv
         }
       }
+      allowReservationsWithoutOpeningHours
     }
   }
 `;
@@ -4814,6 +4892,43 @@ export type ReservationUnitTypesQueryResult = Apollo.QueryResult<
   ReservationUnitTypesQuery,
   ReservationUnitTypesQueryVariables
 >;
+export type ApplicationsQueryVariables = Exact<{
+  user?: InputMaybe<Scalars["ID"]>;
+  status?: InputMaybe<
+    Array<InputMaybe<Scalars["String"]>> | InputMaybe<Scalars["String"]>
+  >;
+}>;
+
+export type ApplicationsQuery = {
+  __typename?: "Query";
+  applications?: {
+    __typename?: "ApplicationTypeConnection";
+    edges: Array<{
+      __typename?: "ApplicationTypeEdge";
+      node?: {
+        __typename?: "ApplicationType";
+        pk?: number | null;
+        applicationRoundId?: number | null;
+        applicantName?: string | null;
+        status?: ApplicationStatus | null;
+        applicantType?: ApplicationsApplicationApplicantTypeChoices | null;
+        lastModifiedDate: any;
+        contactPerson?: {
+          __typename?: "PersonType";
+          id: string;
+          firstName: string;
+          lastName: string;
+        } | null;
+        organisation?: {
+          __typename?: "OrganisationType";
+          id: string;
+          name: string;
+        } | null;
+      } | null;
+    } | null>;
+  } | null;
+};
+
 export type ApplicationRoundsQueryVariables = Exact<{ [key: string]: never }>;
 
 export type ApplicationRoundsQuery = {
@@ -5284,6 +5399,7 @@ export type ReservationUnitQuery = {
     maxReservationsPerUser?: number | null;
     nextAvailableSlot?: any | null;
     requireReservationHandling: boolean;
+    allowReservationsWithoutOpeningHours: boolean;
     images?: Array<{
       __typename?: "ReservationUnitImageType";
       imageUrl?: string | null;

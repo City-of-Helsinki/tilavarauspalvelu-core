@@ -153,6 +153,7 @@ export const reducer = (state: State, action: Action): State => {
             "bufferTimeBefore",
             "maxReservationsPerUser",
             "maxPersons",
+            "minPersons",
             "maxReservationDuration",
             "minReservationDuration",
             "pk",
@@ -166,6 +167,10 @@ export const reducer = (state: State, action: Action): State => {
             "reservationStartInterval",
             "surfaceArea",
             "unitPk",
+            "canApplyFreeOfCharge",
+            "reservationsMinDaysBefore",
+            "reservationsMaxDaysBefore",
+            "reservationKind",
             "contactInformation",
             ...i18nFields("additionalInstructions"),
             ...i18nFields("description"),
@@ -323,6 +328,27 @@ export const reducer = (state: State, action: Action): State => {
 
     case "set": {
       return modifyEditorState(state, { ...action.value });
+    }
+
+    case "setMaxPersons": {
+      return modifyEditorState(state, {
+        maxPersons: action.maxPersons,
+        minPersons: state.reservationUnitEdit.minPersons
+          ? Math.min(action.maxPersons, state.reservationUnitEdit.minPersons)
+          : undefined,
+      });
+    }
+    case "setReservationsMaxDaysBefore": {
+      return modifyEditorState(state, {
+        reservationsMaxDaysBefore: action.reservationsMaxDaysBefore,
+        reservationsMinDaysBefore: state.reservationUnitEdit
+          .reservationsMinDaysBefore
+          ? Math.min(
+              action.reservationsMaxDaysBefore,
+              state.reservationUnitEdit.reservationsMinDaysBefore
+            )
+          : undefined,
+      });
     }
     case "setSpaces": {
       const selectedSpacePks = action.spaces.map((ot) => ot.value as number);

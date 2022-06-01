@@ -39,6 +39,10 @@ import {
 } from "../../modules/reservation";
 import { TERMS_OF_USE } from "../../modules/queries/reservationUnit";
 import KorosDefault from "../../components/common/KorosDefault";
+import {
+  getReservationUnitName,
+  getUnitName,
+} from "../../modules/reservationUnit";
 
 type Props = {
   termsOfUse: Record<string, TermsOfUseType>;
@@ -253,8 +257,8 @@ const Reservation = ({ termsOfUse, id }: Props): JSX.Element => {
           <HeadColumns>
             <Ticket
               state={ticketState}
-              title={getTranslation(reservationUnit, "name")}
-              subtitle={getTranslation(reservationUnit.unit, "name")}
+              title={getReservationUnitName(reservationUnit)}
+              subtitle={getUnitName(reservationUnit.unit)}
               begin={reservation.begin}
               end={reservation.end}
               isFree={!reservation.price}

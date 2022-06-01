@@ -1718,15 +1718,15 @@ input ReservationUnitCreateMutationInput {
 
   """Allow reservations without opening hours. Used for testing."""
   allowReservationsWithoutOpeningHours: Boolean
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
   nameFi: String
   nameEn: String
   nameSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   additionalInstructionsFi: String
   additionalInstructionsEn: String
   additionalInstructionsSv: String
@@ -1839,15 +1839,15 @@ type ReservationUnitCreateMutationPayload {
 
   """Allow reservations without opening hours. Used for testing."""
   allowReservationsWithoutOpeningHours: Boolean
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
   nameFi: String
   nameEn: String
   nameSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   additionalInstructionsFi: String
   additionalInstructionsEn: String
   additionalInstructionsSv: String
@@ -2258,15 +2258,15 @@ input ReservationUnitUpdateMutationInput {
 
   """Allow reservations without opening hours. Used for testing."""
   allowReservationsWithoutOpeningHours: Boolean
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
   nameFi: String
   nameEn: String
   nameSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   additionalInstructionsFi: String
   additionalInstructionsEn: String
   additionalInstructionsSv: String
@@ -2379,15 +2379,15 @@ type ReservationUnitUpdateMutationPayload {
 
   """Allow reservations without opening hours. Used for testing."""
   allowReservationsWithoutOpeningHours: Boolean
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
   nameFi: String
   nameEn: String
   nameSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   additionalInstructionsFi: String
   additionalInstructionsEn: String
   additionalInstructionsSv: String
@@ -2548,12 +2548,12 @@ input ResourceCreateMutationInput {
   """
   bufferTimeAfter: Int
   isDraft: Boolean
-  nameFi: String
-  nameEn: String
-  nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
   clientMutationId: String
 }
 
@@ -2576,12 +2576,12 @@ type ResourceCreateMutationPayload {
   """
   bufferTimeAfter: Int
   isDraft: Boolean
-  nameFi: String
-  nameEn: String
-  nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -2665,12 +2665,12 @@ input ResourceUpdateMutationInput {
   """
   bufferTimeAfter: Int
   isDraft: Boolean
-  nameFi: String
-  nameEn: String
-  nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
   clientMutationId: String
 }
 
@@ -2693,12 +2693,12 @@ type ResourceUpdateMutationPayload {
   """
   bufferTimeAfter: Int
   isDraft: Boolean
-  nameFi: String
-  nameEn: String
-  nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -3060,15 +3060,15 @@ input UnitUpdateMutationInput {
   webPage: String
   email: String
   phone: String
-  shortDescriptionFi: String
-  shortDescriptionEn: String
-  shortDescriptionSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
+  shortDescriptionFi: String
+  shortDescriptionEn: String
+  shortDescriptionSv: String
   clientMutationId: String
 }
 
@@ -3078,15 +3078,15 @@ type UnitUpdateMutationPayload {
   webPage: String
   email: String
   phone: String
-  shortDescriptionFi: String
-  shortDescriptionEn: String
-  shortDescriptionSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
+  shortDescriptionFi: String
+  shortDescriptionEn: String
+  shortDescriptionSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]

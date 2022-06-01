@@ -1,4 +1,4 @@
-FROM registry.access.redhat.com/ubi8/nodejs-14 as staticbuilder
+FROM registry.access.redhat.com/ubi8/nodejs-16 as staticbuilder
 
 USER root
 RUN curl --silent --location https://dl.yarnpkg.com/rpm/yarn.repo | tee /etc/yum.repos.d/yarn.repo

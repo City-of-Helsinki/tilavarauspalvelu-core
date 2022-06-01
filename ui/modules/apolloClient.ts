@@ -110,7 +110,7 @@ const client = new ApolloClient({
     },
   }),
   link: from([errorLink, authLink, httpLink]),
-  ssrMode: true,
+  ssrMode: typeof window === undefined,
   defaultOptions: {
     watchQuery: {
       errorPolicy: "ignore",

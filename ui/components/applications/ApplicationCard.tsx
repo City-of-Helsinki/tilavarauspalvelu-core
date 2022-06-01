@@ -2,21 +2,20 @@ import React, { useRef, useState } from "react";
 import { useTranslation, TFunction } from "react-i18next";
 import styled from "styled-components";
 import { useRouter } from "next/router";
-import { Card as HdsCard, Notification, Tag as HdsTag } from "hds-react";
+import { Card as HdsCard, Tag as HdsTag } from "hds-react";
 import { parseISO } from "date-fns";
-import { Application } from "../../modules/types";
 import {
   isActive,
   applicationUrl,
   getReducedApplicationStatus,
-  getTranslation,
 } from "../../modules/util";
 import { breakpoint } from "../../modules/style";
 import ConfirmationModal, { ModalRef } from "../common/ConfirmationModal";
 import { CenterSpinner } from "../common/common";
 import { cancelApplication } from "../../modules/api";
 import { MediumButton } from "../../styles/util";
-import { ApplicationRoundType } from "../../modules/gql-types";
+import { ApplicationRoundType, ApplicationType } from "../../modules/gql-types";
+import { getApplicationRoundName } from "../../modules/applicationRound";
 
 const Card = styled(HdsCard).attrs({
   style: {
@@ -115,14 +114,17 @@ const StyledButton = styled(MediumButton)`
   }
 `;
 type Props = {
-  application: Application;
+  application: ApplicationType;
   applicationRound: ApplicationRoundType;
+  actionCallback: (string: "error" | "cancel") => Promise<void>;
 };
 
-const getApplicant = (application: Application, t: TFunction): string => {
+const getApplicant = (application: ApplicationType, t: TFunction): string => {
   if (application.organisation) {
     return t("applicationCard:organisation", {
-      type: t(`applicationCard:applicantType.${application.applicantType}`),
+      type: t(
+        `applicationCard:applicantType.${application.applicantType.toLocaleLowerCase()}`
+      ),
       name: application.organisation?.name || t("applicationCard:noName"),
     });
   }
@@ -136,8 +138,9 @@ const getApplicant = (application: Application, t: TFunction): string => {
 const ApplicationCard = ({
   application,
   applicationRound,
+  actionCallback,
 }: Props): JSX.Element | null => {
-  const [state, setState] = useState<"ok" | "cancelling" | "error">("ok");
+  const [state, setState] = useState<"ok" | "cancelling">("ok");
   const { t } = useTranslation();
   const router = useRouter();
   const editable = isActive(
@@ -160,19 +163,19 @@ const ApplicationCard = ({
   const cancel = async () => {
     setState("cancelling");
     try {
-      await cancelApplication(application.id as number);
-      router.reload();
+      await cancelApplication(application.pk);
+      actionCallback("cancel");
     } catch (e) {
-      setState("error");
+      actionCallback("error");
     }
   };
 
   const modal = useRef<ModalRef>();
   return (
-    <Card border key={application.id}>
+    <Card border key={application.pk}>
       <div>
         <C>{t(`applicationCard:status.${reducedApplicationStatus}`)}</C>
-        <RoundName>{getTranslation(applicationRound, "name")}</RoundName>
+        <RoundName>{getApplicationRoundName(applicationRound)}</RoundName>
         <Applicant>
           {application.applicantType !== null
             ? getApplicant(application, t)
@@ -185,11 +188,6 @@ const ApplicationCard = ({
               })
             : ""}
         </Modified>
-        {state === "error" ? (
-          <Notification size="small">
-            {t("applicationCard:cancelFailed")}
-          </Notification>
-        ) : null}
       </div>
       <Buttons>
         {state === "cancelling" ? (
@@ -211,7 +209,7 @@ const ApplicationCard = ({
           aria-label={t("applicationCard:edit")}
           disabled={!editable}
           onClick={() => {
-            router.push(`${applicationUrl(application.id as number)}/page1`);
+            router.push(`${applicationUrl(application.pk)}/page1`);
           }}
           variant="primary"
         >

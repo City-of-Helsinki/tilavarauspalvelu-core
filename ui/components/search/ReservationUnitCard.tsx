@@ -1,5 +1,5 @@
 import { IconGroup, IconCheck, IconPlus } from "hds-react";
-import React, { useMemo } from "react";
+import React from "react";
 import { useTranslation } from "next-i18next";
 import Link from "next/link";
 import NextImage from "next/image";
@@ -15,6 +15,10 @@ import { MediumButton, pixel, truncatedText } from "../../styles/util";
 import { ReservationUnitType } from "../../modules/gql-types";
 import { H5, Strongish } from "../../modules/style/typography";
 import { reservationUnitPrefix } from "../../modules/const";
+import {
+  getReservationUnitName,
+  getUnitName,
+} from "../../modules/reservationUnit";
 
 interface Props {
   reservationUnit: ReservationUnitType;
@@ -149,14 +153,17 @@ const ReservationUnitCard = ({
 }: Props): JSX.Element => {
   const { t } = useTranslation();
 
-  const addressString = useMemo(
-    () => getAddressAlt(reservationUnit),
-    [reservationUnit]
-  );
+  const name = getReservationUnitName(reservationUnit);
 
-  const link = useMemo(
-    () => `${reservationUnitPrefix}/${reservationUnit.pk}`,
-    [reservationUnit]
+  const addressString = getAddressAlt(reservationUnit);
+
+  const link = `${reservationUnitPrefix}/${reservationUnit.pk}`;
+
+  const unitName = getUnitName(reservationUnit.unit);
+
+  const reservationUnitTypeName = getTranslation(
+    reservationUnit.reservationUnitType,
+    "name"
   );
 
   return (
@@ -165,7 +172,7 @@ const ReservationUnitCard = ({
         <Anchor style={{ display: "flex" }}>
           <Image
             alt={t("common:imgAltForSpace", {
-              name: getTranslation(reservationUnit, "name"),
+              name,
             })}
             src={getMainImage(reservationUnit)?.smallUrl || pixel}
           />
@@ -174,13 +181,11 @@ const ReservationUnitCard = ({
       <MainContent>
         <Name>
           <Link href={link} passHref>
-            <Anchor title={getTranslation(reservationUnit, "name")}>
-              {getTranslation(reservationUnit, "name")}
-            </Anchor>
+            <Anchor title={name}>{name}</Anchor>
           </Link>
         </Name>
         <Description>
-          {getTranslation(reservationUnit.unit, "name")}
+          {unitName}
           {addressString && (
             <>
               {", "}
@@ -190,7 +195,7 @@ const ReservationUnitCard = ({
         </Description>
         <Bottom>
           <Props>
-            {reservationUnit.reservationUnitType ? (
+            {reservationUnitTypeName && (
               <StyledIconWithText
                 icon={
                   <NextImage
@@ -200,12 +205,9 @@ const ReservationUnitCard = ({
                     aria-label={t("reservationUnitCard:type")}
                   />
                 }
-                text={getTranslation(
-                  reservationUnit.reservationUnitType,
-                  "name"
-                )}
+                text={reservationUnitTypeName}
               />
-            ) : null}
+            )}
             {reservationUnit.maxPersons ? (
               <StyledIconWithText
                 icon={

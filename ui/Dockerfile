@@ -1,5 +1,5 @@
 # Install dependencies only when needed
-FROM registry.access.redhat.com/ubi8/nodejs-14 AS deps
+FROM registry.access.redhat.com/ubi8/nodejs-16 AS deps
 USER root
 RUN npm install --global yarn
 RUN yarn set version 1.22.10
@@ -12,7 +12,7 @@ COPY common/package.json common/package.json common/
 COPY ui/package.json ui/package.json ui/
 RUN yarn install --frozen-lockfile
 
-FROM registry.access.redhat.com/ubi8/nodejs-14  AS builder
+FROM registry.access.redhat.com/ubi8/nodejs-16  AS builder
 RUN npm install --global yarn
 RUN yarn set version 1.22.10
 USER root
@@ -32,7 +32,7 @@ COPY --from=deps /app/ui/package.json /app/ui/package.json
 RUN yarn build
 
 # Production image, copy all the files and run next
-FROM registry.access.redhat.com/ubi8/nodejs-14  AS runner
+FROM registry.access.redhat.com/ubi8/nodejs-16  AS runner
 USER root
 RUN curl --silent --location https://dl.yarnpkg.com/rpm/yarn.repo | tee /etc/yum.repos.d/yarn.repo
 RUN yum -y install yarn
