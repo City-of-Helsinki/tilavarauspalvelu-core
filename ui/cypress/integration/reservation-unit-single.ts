@@ -125,12 +125,12 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
       addressContainer(1).should("contain", "Google reittiohjeet");
       addressContainer(1).should("contain", "HSL Reittiopas");
 
-      textWithIcon(1).contains("Seuraava vapaa aika:");
-      textWithIcon(2).contains("20 € / 15 min");
-      textWithIcon(3).contains("Min 1 tunti");
-      textWithIcon(3).contains("Max 1 tunti 30 minuuttia");
-      textWithIcon(4).contains("Nuorisopalvelut Fi");
-      textWithIcon(5).contains("60 henkilöä");
+      // textWithIcon(1).contains("Seuraava vapaa aika:");
+      textWithIcon(1).contains("20 € / 15 min");
+      textWithIcon(2).contains("Min 1 tunti");
+      textWithIcon(2).contains("Max 1 tunti 30 minuuttia");
+      textWithIcon(3).contains("Nuorisopalvelut Fi");
+      textWithIcon(4).contains("60 henkilöä");
     });
 
     it("allows making a reservation", () => {
