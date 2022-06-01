@@ -358,6 +358,7 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
             "can_apply_free_of_charge",
             "reservations_max_days_before",
             "reservations_min_days_before",
+            "allow_reservations_without_opening_hours",
         ] + get_all_translatable_fields(model)
         filter_fields = {
             "name_fi": ["exact", "icontains", "istartswith"],
@@ -507,6 +508,7 @@ class ReservationUnitByPkType(ReservationUnitType, OpeningHoursMixin):
             "can_apply_free_of_charge",
             "reservations_max_days_before",
             "reservations_min_days_before",
+            "allow_reservations_without_opening_hours",
         ] + get_all_translatable_fields(model)
 
         interfaces = (graphene.relay.Node,)

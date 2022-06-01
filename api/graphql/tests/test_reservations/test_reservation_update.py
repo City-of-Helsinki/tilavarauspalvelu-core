@@ -3,6 +3,7 @@ import json
 from unittest.mock import patch
 
 import freezegun
+import pytz
 from assertpy import assert_that
 from django.contrib.auth import get_user_model
 from django.utils.timezone import get_default_timezone
@@ -314,6 +315,37 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         assert_that(
             content.get("data").get("updateReservation").get("errors")[0]["messages"][0]
         ).contains("Reservation unit is not open within desired reservation time.")
+
+    def test_update_succeed_when_reservation_unit_closed_on_selected_time_and_opening_hours_are_ignored(
+        self, mock_periods, mock_opening_hours
+    ):
+        self.reservation_unit.allow_reservations_without_opening_hours = True
+        self.reservation_unit.save()
+
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+        input_data = self.get_valid_update_data()
+        today = datetime.date.today()
+        begin = datetime.datetime(today.year, today.month, today.day, 21, 0)
+        end = begin + datetime.timedelta(hours=2)
+        input_data["begin"] = begin.strftime("%Y%m%dT%H%M%SZ")
+        input_data["end"] = end.strftime("%Y%m%dT%H%M%SZ")
+
+        self.client.force_login(self.regular_joe)
+        response = self.query(self.get_update_query(), input_data=input_data)
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_none()
+        assert_that(
+            content.get("data").get("updateReservation").get("errors")
+        ).is_none()
+        reservation_id = (
+            content.get("data").get("updateReservation").get("reservation").get("pk")
+        )
+        assert_that(reservation_id).is_greater_than_or_equal_to(1)
+        saved_reservation = Reservation.objects.get(pk=reservation_id)
+        assert_that(saved_reservation).is_not_none()
+        assert_that(saved_reservation.begin).is_equal_to(pytz.utc.localize(begin))
+        assert_that(saved_reservation.end).is_equal_to(pytz.utc.localize(end))
 
     def test_update_fails_when_reservation_unit_in_open_application_round(
         self, mock_periods, mock_opening_hours

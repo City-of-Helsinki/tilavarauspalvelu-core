@@ -468,6 +468,13 @@ class ReservationUnit(models.Model):
         ),
     )
 
+    allow_reservations_without_opening_hours = models.BooleanField(
+        verbose_name=_("Allow reservations without opening hours"),
+        default=False,
+        help_text="Is it possible to reserve this reservation unit when opening hours are not defined.",
+        blank=False,
+    )
+
     class Meta:
         ordering = ("id",)
 

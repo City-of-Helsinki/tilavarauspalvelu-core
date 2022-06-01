@@ -157,13 +157,73 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
             )
         return value
 
+    def check_reservation_time(self, reservation_unit: ReservationUnit, begin, end):
+        is_invalid_begin = (
+            reservation_unit.reservation_begins
+            and begin < reservation_unit.reservation_begins
+        )
+        is_invalid_end = (
+            reservation_unit.reservation_ends
+            and end > reservation_unit.reservation_ends
+        )
+
+        if is_invalid_begin or is_invalid_end:
+            raise serializers.ValidationError(
+                "Reservation unit is not reservable within this reservation time."
+            )
+
+    def check_reservation_overlap(self, reservation_unit: ReservationUnit, begin, end):
+        if reservation_unit.check_reservation_overlap(begin, end, self.instance):
+            raise serializers.ValidationError(
+                "Overlapping reservations are not allowed."
+            )
+
+    def check_opening_hours(self, scheduler, begin, end):
+        is_reservation_unit_open = scheduler.is_reservation_unit_open(begin, end)
+        if (
+            not scheduler.reservation_unit.allow_reservations_without_opening_hours
+            and not is_reservation_unit_open
+        ):
+            raise serializers.ValidationError(
+                "Reservation unit is not open within desired reservation time."
+            )
+
+    def check_open_application_round(self, scheduler, begin, end):
+        open_app_round = scheduler.get_conflicting_open_application_round(
+            begin.date(), end.date()
+        )
+
+        if open_app_round:
+            raise serializers.ValidationError(
+                "One or more reservation units are in open application round."
+            )
+
+    def check_reservation_duration(self, reservation_unit: ReservationUnit, begin, end):
+        duration = end - begin
+        if (
+            reservation_unit.max_reservation_duration
+            and duration.total_seconds()
+            > reservation_unit.max_reservation_duration.total_seconds()
+        ):
+            raise serializers.ValidationError(
+                "Reservation duration exceeds one or more reservation unit's maximum duration."
+            )
+
+        if (
+            reservation_unit.min_reservation_duration
+            and duration.total_seconds()
+            < reservation_unit.min_reservation_duration.total_seconds()
+        ):
+            raise serializers.ValidationError(
+                "Reservation duration less than one or more reservation unit's minimum duration."
+            )
+
     def validate(self, data):
         begin = data.get("begin", getattr(self.instance, "begin", None))
         end = data.get("end", getattr(self.instance, "end", None))
         begin = begin.astimezone(DEFAULT_TIMEZONE)
         end = end.astimezone(DEFAULT_TIMEZONE)
 
-        duration = end - begin
         reservation_units = data.get(
             "reservation_unit", getattr(self.instance, "reservation_unit", None)
         )
@@ -172,55 +232,14 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
 
         sku = None
         for reservation_unit in reservation_units:
-            if (
-                reservation_unit.reservation_begins
-                and begin < reservation_unit.reservation_begins
-            ) or (
-                reservation_unit.reservation_ends
-                and end > reservation_unit.reservation_ends
-            ):
-                raise serializers.ValidationError(
-                    "Reservation unit is not reservable within this reservation time."
-                )
-            if reservation_unit.check_reservation_overlap(begin, end, self.instance):
-                raise serializers.ValidationError(
-                    "Overlapping reservations are not allowed."
-                )
-
             scheduler = ReservationUnitReservationScheduler(
                 reservation_unit, opening_hours_end=end.date()
             )
-            is_reservation_unit_open = scheduler.is_reservation_unit_open(begin, end)
-            if not is_reservation_unit_open:
-                raise serializers.ValidationError(
-                    "Reservation unit is not open within desired reservation time."
-                )
-
-            open_app_round = scheduler.get_conflicting_open_application_round(
-                begin.date(), end.date()
-            )
-
-            if open_app_round:
-                raise serializers.ValidationError(
-                    "One or more reservation units are in open application round."
-                )
-            if (
-                reservation_unit.max_reservation_duration
-                and duration.total_seconds()
-                > reservation_unit.max_reservation_duration.total_seconds()
-            ):
-                raise serializers.ValidationError(
-                    "Reservation duration exceeds one or more reservation unit's maximum duration."
-                )
-            if (
-                reservation_unit.min_reservation_duration
-                and duration.total_seconds()
-                < reservation_unit.min_reservation_duration.total_seconds()
-            ):
-                raise serializers.ValidationError(
-                    "Reservation duration less than one or more reservation unit's minimum duration."
-                )
-
+            self.check_reservation_time(reservation_unit, begin, end)
+            self.check_reservation_overlap(reservation_unit, begin, end)
+            self.check_opening_hours(scheduler, begin, end)
+            self.check_open_application_round(scheduler, begin, end)
+            self.check_reservation_duration(reservation_unit, begin, end)
             self.check_buffer_times(data, reservation_unit)
             self.check_reservation_days_before(begin, reservation_unit)
             self.check_reservation_start_time(begin, scheduler)
@@ -333,6 +352,9 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
             )
 
     def check_reservation_start_time(self, begin, scheduler):
+        if scheduler.reservation_unit.allow_reservations_without_opening_hours:
+            return
+
         interval_to_minutes = {
             ReservationUnit.RESERVATION_START_INTERVAL_15_MINUTES: 15,
             ReservationUnit.RESERVATION_START_INTERVAL_30_MINUTES: 30,
