@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { Fieldset as HDSFieldset } from "hds-react";
 import { breakpoints } from "../../../../styles/util";
 
 export const EditorGrid = styled.div`
@@ -119,4 +120,10 @@ export const Error = styled.div`
     flex-shrink: 0;
   }
   white-space: nowrap;
+`;
+
+export const Fieldset = styled(HDSFieldset)`
+  legend {
+    margin-bottom: var(--spacing-2-xs);
+  }
 `;
