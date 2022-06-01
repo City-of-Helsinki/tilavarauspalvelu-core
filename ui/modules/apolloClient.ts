@@ -117,6 +117,7 @@ const client = new ApolloClient({
     },
     query: {
       errorPolicy: "ignore",
+      fetchPolicy: typeof window === undefined ? "no-cache" : "cache-first",
     },
   },
 });
