@@ -16,7 +16,6 @@ import { AccordionWithState as Accordion } from "../../components/common/Accordi
 import apolloClient from "../../modules/apolloClient";
 import Map from "../../components/Map";
 import { H4 } from "../../modules/style/typography";
-import { getActiveOpeningTimes } from "../../modules/openingHours";
 import {
   Query,
   QueryReservationUnitByPkArgs,
@@ -219,9 +218,9 @@ const ReservationUnit = ({
 }: Props): JSX.Element | null => {
   const { t } = useTranslation();
 
-  const activeOpeningTimes = getActiveOpeningTimes(
-    reservationUnit.openingHours?.openingTimePeriods
-  );
+  // const activeOpeningTimes = getActiveOpeningTimes(
+  //   reservationUnit.openingHours?.openingTimePeriods
+  // );
 
   const reservationUnitList = useReservationUnitsList();
 
@@ -235,7 +234,7 @@ const ReservationUnit = ({
     <Wrapper>
       <Head
         reservationUnit={reservationUnit}
-        activeOpeningTimes={activeOpeningTimes}
+        // activeOpeningTimes={activeOpeningTimes}
         reservationUnitList={reservationUnitList}
         viewType="recurring"
       />
