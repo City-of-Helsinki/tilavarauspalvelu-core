@@ -107,6 +107,9 @@ class UnitsUpdateTestCase(UnitQueryTestCaseBase):
                             location {
                                 addressStreetFi
                             }
+                            serviceSectors {
+                                nameFi
+                            }
                         }
                     }
                 }

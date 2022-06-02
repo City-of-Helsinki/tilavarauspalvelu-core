@@ -29,6 +29,9 @@ class UnitType(AuthNode, PrimaryKeyObjectType):
     )
     spaces = graphene.List("api.graphql.spaces.space_types.SpaceType")
     location = graphene.Field("api.graphql.spaces.space_types.LocationType")
+    service_sectors = graphene.List(
+        "api.graphql.application_rounds.application_round_types.ServiceSectorType"
+    )
 
     class Meta:
         model = Unit
@@ -59,6 +62,9 @@ class UnitType(AuthNode, PrimaryKeyObjectType):
 
     def resolve_location(self, info):
         return getattr(self, "location", None)
+
+    def resolve_service_sectors(self, info):
+        return self.service_sectors.all()
 
 
 class UnitByPkType(UnitType, OpeningHoursMixin):

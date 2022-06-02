@@ -24,6 +24,8 @@ snapshots['UnitsUpdateTestCase::test_getting_units 1'] = {
                         'phone': '+358 12 34567',
                         'reservationUnits': [
                         ],
+                        'serviceSectors': [
+                        ],
                         'shortDescriptionEn': '',
                         'shortDescriptionFi': 'Short description',
                         'shortDescriptionSv': '',
