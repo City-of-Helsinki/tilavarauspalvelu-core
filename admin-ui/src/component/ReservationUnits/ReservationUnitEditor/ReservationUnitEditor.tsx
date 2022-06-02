@@ -86,9 +86,13 @@ const bufferTimeOptions = [
 ];
 
 const reservationsMaxDaysBeforeOptions = [
+  { value: 14, label: "2 vko" },
   { value: 30, label: "1 kk" },
+  { value: 60, label: "2 kk" },
+  { value: 90, label: "3 kk" },
   { value: 182, label: "6 kk" },
   { value: 365, label: "12 kk" },
+  { value: 730, label: "24 kk" },
 ];
 
 const durationOptions = [
