@@ -39,6 +39,39 @@ snapshots['UnitsUpdateTestCase::test_getting_units 1'] = {
     }
 }
 
+snapshots['UnitsUpdateTestCase::test_getting_units_filtered_by_name 1'] = {
+    'data': {
+        'units': {
+            'edges': [
+                {
+                    'node': {
+                        'nameFi': 'Bbbbbb'
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['UnitsUpdateTestCase::test_getting_units_filtered_by_service_sector 1'] = {
+    'data': {
+        'units': {
+            'edges': [
+                {
+                    'node': {
+                        'nameFi': 'Aaaaaa'
+                    }
+                },
+                {
+                    'node': {
+                        'nameFi': 'Bbbbbb'
+                    }
+                }
+            ]
+        }
+    }
+}
+
 snapshots['UnitsUpdateTestCase::test_getting_units_sorted_by_name_asc 1'] = {
     'data': {
         'units': {

@@ -7,7 +7,7 @@ from graphene_django.utils import GraphQLTestCase
 
 from permissions.models import UnitRole, UnitRoleChoice, UnitRolePermission
 from spaces.models import Unit
-from spaces.tests.factories import UnitFactory
+from spaces.tests.factories import ServiceSectorFactory, UnitFactory
 
 
 class UnitQueryTestCaseBase(GraphQLTestCase, snapshottest.TestCase):
@@ -158,6 +158,54 @@ class UnitsUpdateTestCase(UnitQueryTestCaseBase):
                     }
                 }
                 """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+
+        self.assertMatchSnapshot(content)
+
+    def test_getting_units_filtered_by_name(self):
+        UnitFactory.create(name="Aaaaaa")
+        UnitFactory.create(name="Bbbbbb")
+        UnitFactory.create(name="Cccccc")
+        response = self.query(
+            """
+            query {
+                units(nameFi:"Bbb") {
+                    edges {
+                        node {
+                            nameFi
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+
+        self.assertMatchSnapshot(content)
+
+    def test_getting_units_filtered_by_service_sector(self):
+        target_unit_a = UnitFactory.create(name="Aaaaaa")
+        target_unit_b = UnitFactory.create(name="Bbbbbb")
+        ServiceSectorFactory.create(
+            pk=123, name="Test sector", units=[target_unit_a, target_unit_b]
+        )
+        UnitFactory.create(name="Cccccc")
+
+        response = self.query(
+            """
+            query {
+                units(serviceSector:123) {
+                    edges {
+                        node {
+                            nameFi
+                        }
+                    }
+                }
+            }
+            """
         )
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
