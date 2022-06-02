@@ -124,7 +124,7 @@ const SpacesTable = ({
   onDelete,
   onDataError,
 }: IProps): JSX.Element => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const {
     open: isOpen,
     openWithContent,
@@ -150,15 +150,17 @@ const SpacesTable = ({
     cols: [
       {
         title: "Unit.headings.name",
-        key: `name.${i18n.language}`,
+        key: "nameFi",
         transform: (space) => {
           return <Name>{trim(space.nameFi as string)}</Name>;
         },
+        disableSorting: true,
       },
       {
         title: "Unit.headings.code",
         key: "code",
         transform: ({ code }: SpaceType) => trim(code),
+        disableSorting: true,
       },
       {
         title: "Unit.headings.numSubSpaces",
@@ -167,12 +169,14 @@ const SpacesTable = ({
           const count = countSubSpaces(space);
           return `${count} ${t("SpaceTable.subSpaceCount", { count })}`;
         },
+        disableSorting: true,
       },
       {
         title: "Unit.headings.surfaceArea",
         key: "surfaceArea",
         transform: ({ surfaceArea }: SpaceType) =>
           surfaceArea ? `${surfaceArea}m²` : "",
+        disableSorting: true,
       },
       {
         title: "Unit.headings.maxPersons",
@@ -240,10 +244,11 @@ const SpacesTable = ({
             </MaxPersons>
           );
         },
+        disableSorting: true,
       },
     ],
-    index: "pk",
     order: "asc",
+    index: "pk",
     rowLink: ({ pk }: SpaceType) => `/unit/${unit.pk}/space/edit/${pk}`,
   } as CellConfig;
 
@@ -261,7 +266,6 @@ const SpacesTable = ({
           rowFilters: false,
           selection: false,
         }}
-        displayHeadings={false}
         cellConfig={cellConfig}
         filterConfig={[]}
         noResultsKey="Unit.noSpaces"

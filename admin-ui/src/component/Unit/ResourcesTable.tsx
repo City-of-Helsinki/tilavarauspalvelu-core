@@ -55,7 +55,7 @@ const ResourcesTable = ({
   ): Promise<FetchResult<{ deleteSpace: ResourceDeleteMutationPayload }>> =>
     deleteResourceMutation({ variables: { input: { pk } } });
 
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
 
   const modal = useRef<ModalRef>();
   const history = useHistory();
@@ -63,25 +63,20 @@ const ResourcesTable = ({
   const cellConfig = {
     cols: [
       {
-        title: "Resource.name",
-        key: `name.${i18n.language}`,
+        title: "ResourceTable.headings.name",
+        key: `nameFi`,
         transform: ({ nameFi }: ResourceType) => (
           <Name>{trim(nameFi as string)}</Name>
         ),
       },
       {
-        title: "Resource.space.name",
+        title: "ResourceTable.headings.unitName",
         key: "space.unit.nameFi",
         transform: ({ space }: ResourceType) =>
           space?.unit?.nameFi || t("ResourceTable.noSpace"),
       },
       {
-        title: "Resource.area",
-        key: "area",
-        transform: () => t("ResourceTable.noDistrict"),
-      },
-      {
-        title: "Resource.type",
+        title: "",
         key: "type",
         transform: ({ nameFi, pk, locationType }: ResourceType) => (
           <ResourceTypeContainer>
@@ -121,10 +116,11 @@ const ResourcesTable = ({
             />
           </ResourceTypeContainer>
         ),
+        disableSorting: true,
       },
     ],
     index: "pk",
-    sorting: "name.fi",
+    sorting: "nameFi",
     order: "asc",
     rowLink: ({ pk }: ResourceType) => `/unit/${unit.pk}/resource/edit/${pk}`,
   } as CellConfig;
@@ -139,7 +135,6 @@ const ResourcesTable = ({
           rowFilters: false,
           selection: false,
         }}
-        displayHeadings={false}
         cellConfig={cellConfig}
         filterConfig={[]}
         noResultsKey={hasSpaces ? "Unit.noResources" : "Unit.noResourcesSpaces"}

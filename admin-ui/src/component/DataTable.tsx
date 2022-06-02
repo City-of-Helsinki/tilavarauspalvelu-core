@@ -45,6 +45,7 @@ export interface Column {
   title: string;
   key: string;
   transform?: ({ args }: any) => string | JSX.Element; // eslint-disable-line @typescript-eslint/no-explicit-any
+  disableSorting?: boolean;
 }
 
 interface GeneralConfig {
@@ -718,9 +719,14 @@ function DataTable({
                       as="th"
                       key={col.key}
                       onClick={(): void | false =>
-                        actionsEnabled && setSortingAndOrder(col.key)
+                        actionsEnabled &&
+                        !col.disableSorting &&
+                        setSortingAndOrder(col.key)
                       }
-                      className={classNames({ sortingActive, actionsEnabled })}
+                      className={classNames({
+                        sortingActive,
+                        actionsEnabled: actionsEnabled && !col.disableSorting,
+                      })}
                       title={title}
                     >
                       <span>{title}</span>
