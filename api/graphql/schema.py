@@ -75,6 +75,7 @@ from api.graphql.spaces.space_mutations import (
 )
 from api.graphql.spaces.space_types import SpaceType
 from api.graphql.terms_of_use.terms_of_use_types import TermsOfUseType
+from api.graphql.units.unit_filtersets import UnitsFilterSet
 from api.graphql.units.unit_mutations import UnitUpdateMutation
 from api.graphql.units.unit_types import UnitByPkType, UnitType
 from applications.models import Application
@@ -235,7 +236,7 @@ class SpacesFilter(AuthFilter):
     )
 
 
-class UnitsFilter(AuthFilter):
+class UnitsFilter(AuthFilter, django_filters.FilterSet):
     permission_classes = (
         (UnitPermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
     )
@@ -375,7 +376,7 @@ class Query(graphene.ObjectType):
     space = relay.Node.Field(SpaceType)
     space_by_pk = Field(SpaceType, pk=graphene.Int())
 
-    units = UnitsFilter(UnitType)
+    units = UnitsFilter(UnitType, filterset_class=UnitsFilterSet)
     unit = relay.Node.Field(UnitType)
     unit_by_pk = Field(UnitByPkType, pk=graphene.Int())
 
