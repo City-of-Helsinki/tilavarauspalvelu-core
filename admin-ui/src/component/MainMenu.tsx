@@ -17,7 +17,7 @@ const Wrapper = styled.ul<{ placement: string }>`
   flex-shrink: 0;
   background-color: white;
   margin: 0;
-  padding: 1.5rem 1.375rem 1.5rem 1.25rem;
+  padding: 1.5rem 1rem;
   list-style: none;
   z-index: var(--tilavaraus-admin-stack-main-menu);
   ${({ placement }) =>
@@ -45,8 +45,8 @@ const MenuItem = styled.li`
 const Icon = styled.span`
   display: flex;
   justify-content: center;
-  width: 1.125rem;
-  margin-right: var(--spacing-xs);
+  width: 1rem;
+  margin-right: var(--spacing-2-xs);
 `;
 
 const Heading = styled.div`
