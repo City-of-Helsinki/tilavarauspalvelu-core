@@ -745,7 +745,12 @@ const translations: ITranslations = {
   },
   Unit: {
     headings: {
+      name: ["Nimi"],
+      code: ["Tilan numero"],
       service: ["Palvelut"],
+      numSubSpaces: ["Alitilojen määrä"],
+      surfaceArea: ["Koko"],
+      maxPersons: ["Henkilömäärä"],
       area: ["Alue"],
     },
     reservationUnits: ["{{count}} varausyksikkö"],
@@ -1120,6 +1125,10 @@ const translations: ITranslations = {
     saveError: ["Tietojen tallennus epäonnistui."],
   },
   ResourceTable: {
+    headings: {
+      name: ["Nimi"],
+      unitName: ["Toimipiste"],
+    },
     noDistrict: ["(Ei aluetta)"],
     menuEditResource: ["Muokkaa resurssia"],
     menuRemoveResource: ["Poista resurssi"],

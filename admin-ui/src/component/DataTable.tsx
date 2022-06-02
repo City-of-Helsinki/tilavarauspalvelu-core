@@ -45,6 +45,7 @@ export interface Column {
   title: string;
   key: string;
   transform?: ({ args }: any) => string | JSX.Element; // eslint-disable-line @typescript-eslint/no-explicit-any
+  disableSorting?: boolean;
 }
 
 interface GeneralConfig {
@@ -421,12 +422,20 @@ const processData = (
     }
 
     const sortedData = [...data].sort((a, b) => {
-      const aValue = isTranslationObject(get(a, sorting))
+      let aValue = isTranslationObject(get(a, sorting))
         ? localizedValue(get(a, sorting), language)
         : get(a, sorting, "");
-      const bValue = isTranslationObject(get(b, sorting))
+
+      if (typeof aValue === "string") {
+        aValue = aValue.toLowerCase();
+      }
+      let bValue = isTranslationObject(get(b, sorting))
         ? localizedValue(get(b, sorting), language)
         : get(b, sorting, "");
+
+      if (typeof bValue === "string") {
+        bValue = bValue.toLowerCase();
+      }
 
       if (aValue < bValue) {
         return order === "asc" ? -1 : 1;
@@ -718,9 +727,14 @@ function DataTable({
                       as="th"
                       key={col.key}
                       onClick={(): void | false =>
-                        actionsEnabled && setSortingAndOrder(col.key)
+                        actionsEnabled &&
+                        !col.disableSorting &&
+                        setSortingAndOrder(col.key)
                       }
-                      className={classNames({ sortingActive, actionsEnabled })}
+                      className={classNames({
+                        sortingActive,
+                        actionsEnabled: actionsEnabled && !col.disableSorting,
+                      })}
                       title={title}
                     >
                       <span>{title}</span>
