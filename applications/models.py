@@ -209,18 +209,25 @@ class ApplicationRoundStatus(models.Model, StatusMixin):
     IN_REVIEW = "in_review"
     REVIEW_DONE = "review_done"
     ALLOCATED = "allocated"
+    RESERVING = "reserving"
     HANDLED = "handled"
-    VALIDATED = "validated"
-    APPROVED = "approved"
+    SENDING = "sending"
+    SENT = "sent"
+    ARCHIVED = "archived"
+
     STATUS_CHOICES = (
         (DRAFT, _("Draft")),
         (IN_REVIEW, _("In review")),
         (REVIEW_DONE, _("Review done")),
         (ALLOCATED, _("Allocated")),
+        (RESERVING, _("Reserving")),
         (HANDLED, _("Handled")),
-        (VALIDATED, _("Validated")),
-        (APPROVED, _("Approved")),
+        (SENDING, _("Sending")),
+        (SENT, _("Sent")),
+        (ARCHIVED, _("Archived")),
     )
+
+    CLOSED_STATUSES = [SENT, ARCHIVED]
 
     status = models.CharField(
         max_length=20, verbose_name=_("Status"), choices=STATUS_CHOICES

@@ -56,7 +56,7 @@ class ReservationUnitSchedulerGetNextAvailableReservationTimeTestCase(TestCase):
         self.scheduler = ReservationUnitReservationScheduler(
             self.reservation_unit, opening_hours_end=self.DATES[2]
         )
-        self.app_round.set_status(ApplicationRoundStatus.APPROVED)
+        self.app_round.set_status(ApplicationRoundStatus.SENT)
 
     def get_mocked_opening_hours(self):
         resource_id = f"{settings.HAUKI_ORIGIN_ID}:{self.reservation_unit.uuid}"

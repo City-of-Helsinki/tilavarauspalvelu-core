@@ -1,3 +1,5 @@
+import random
+
 import pytest
 from assertpy import assert_that
 from django.urls import reverse
@@ -335,13 +337,12 @@ def test_wrong_service_sector_admin_cannot_manage_application_rounds(
 
 
 @pytest.mark.django_db
-def test_approved_application_round_cannot_change_status(
-    user_api_client,
+def test_archived_application_round_cannot_change_status(
     service_sector_admin_api_client,
     application_round,
     valid_application_round_data,
 ):
-    application_round.set_status(ApplicationRoundStatus.APPROVED)
+    application_round.set_status(ApplicationRoundStatus.ARCHIVED)
     data = {**valid_application_round_data, "status": ApplicationRoundStatus.IN_REVIEW}
 
     response = service_sector_admin_api_client.put(
@@ -353,4 +354,85 @@ def test_approved_application_round_cannot_change_status(
 
     application_round.refresh_from_db()
 
-    assert application_round.status == ApplicationRoundStatus.APPROVED
+    assert application_round.status == ApplicationRoundStatus.ARCHIVED
+
+
+@pytest.mark.django_db
+def test_sent_application_round_can_be_changed_to_sending(
+    service_sector_admin_api_client,
+    application_round,
+    valid_application_round_data,
+):
+    application_round.set_status(ApplicationRoundStatus.SENT)
+    data = {**valid_application_round_data, "status": ApplicationRoundStatus.SENDING}
+
+    response = service_sector_admin_api_client.put(
+        reverse("application_round-detail", kwargs={"pk": application_round.id}),
+        data=data,
+        format="json",
+    )
+    assert response.status_code == 200
+
+    application_round.refresh_from_db()
+
+    assert application_round.status == ApplicationRoundStatus.SENDING
+
+
+@pytest.mark.django_db
+def test_sent_application_round_can_be_changed_to_archived(
+    service_sector_admin_api_client,
+    application_round,
+    valid_application_round_data,
+):
+    application_round.set_status(ApplicationRoundStatus.SENT)
+    data = {**valid_application_round_data, "status": ApplicationRoundStatus.ARCHIVED}
+
+    response = service_sector_admin_api_client.put(
+        reverse("application_round-detail", kwargs={"pk": application_round.id}),
+        data=data,
+        format="json",
+    )
+    assert response.status_code == 200
+
+    application_round.refresh_from_db()
+
+    assert application_round.status == ApplicationRoundStatus.ARCHIVED
+
+
+@pytest.mark.django_db
+def test_sent_application_round_cannot_change_to_previous_status(
+    service_sector_admin_api_client,
+    application_round,
+    valid_application_round_data,
+):
+    status_options = list(
+        map(lambda option: option[0], ApplicationRoundStatus.STATUS_CHOICES)
+    )
+
+    previous_status_options = list(
+        filter(
+            lambda status: status
+            not in [
+                ApplicationRoundStatus.SENDING,
+                ApplicationRoundStatus.SENT,
+                ApplicationRoundStatus.ARCHIVED,
+            ],
+            status_options,
+        )
+    )
+
+    previous_status = random.choice(previous_status_options)
+    application_round.set_status(ApplicationRoundStatus.SENT)
+    data = {**valid_application_round_data, "status": previous_status}
+
+    response = service_sector_admin_api_client.put(
+        reverse("application_round-detail", kwargs={"pk": application_round.id}),
+        data=data,
+        format="json",
+    )
+
+    assert response.status_code == 400
+
+    application_round.refresh_from_db()
+
+    assert application_round.status == ApplicationRoundStatus.SENT

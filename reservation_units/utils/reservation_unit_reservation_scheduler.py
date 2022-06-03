@@ -108,7 +108,7 @@ class ReservationUnitReservationScheduler:
             reservation_period_end__gte=end,
             reservation_period_begin__lte=start,
         ):
-            if app_round.status != ApplicationRoundStatus.APPROVED:
+            if app_round.status not in ApplicationRoundStatus.CLOSED_STATUSES:
                 return app_round
 
         return None

@@ -43,25 +43,24 @@ class SpaceMutationBaseTestCase(GraphQLTestCase):
 
 class DeleteSpaceTestCase(SpaceMutationBaseTestCase):
     def setUp(self) -> None:
-        not_approved_status = ApplicationRoundStatusFactory(
+        round_open_status = ApplicationRoundStatusFactory(
             status=FuzzyChoice(
                 choices=[
                     choice
                     for choice, _ in ApplicationRoundStatus.STATUS_CHOICES
-                    if choice != ApplicationRoundStatus.APPROVED
+                    if choice not in ApplicationRoundStatus.CLOSED_STATUSES
                 ]
             )
         )
-        approved_status = ApplicationRoundStatusFactory(
-            status=ApplicationRoundStatus.APPROVED
+        round_closed_status = ApplicationRoundStatusFactory(
+            status=FuzzyChoice(choices=ApplicationRoundStatus.CLOSED_STATUSES)
         )
         self.space = SpaceFactory(name="Test space")
         self.app_round = ApplicationRoundFactory()
         resunit = ReservationUnitFactory(spaces=[self.space])
         self.app_round.reservation_units.add(resunit)
-        self.app_round.statuses.add(not_approved_status)
-        self.app_round.statuses.add(approved_status)
-
+        self.app_round.statuses.add(round_open_status)
+        self.app_round.statuses.add(round_closed_status)
         self.client.force_login(self.general_admin)
 
     def get_delete_query(self):
@@ -85,8 +84,9 @@ class DeleteSpaceTestCase(SpaceMutationBaseTestCase):
         assert_that(Space.objects.filter(pk=self.space.pk).exists()).is_false()
 
     def test_space_not_deleted_because_in_active_round(self):
-        self.app_round.statuses.filter(status=ApplicationRoundStatus.APPROVED).delete()
-
+        self.app_round.statuses.filter(
+            status__in=ApplicationRoundStatus.CLOSED_STATUSES
+        ).delete()
         response = self.query(self.get_delete_query())
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)

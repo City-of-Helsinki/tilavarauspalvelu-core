@@ -1,10 +1,7 @@
 import logging
 
 from django.conf import settings
-from django.db.models import Case, Exists, OuterRef, Prefetch, Subquery, Sum
-from django.db.models import Value as V
-from django.db.models import When
-from django.db.models.functions import Coalesce, Concat
+from django.db.models import Case, Exists, OuterRef, Prefetch, Subquery, Sum, When
 from rest_framework import permissions, serializers, viewsets
 
 from applications.models import (
@@ -101,8 +98,6 @@ class ApplicationRoundSerializer(serializers.ModelSerializer):
 
     aggregated_data = serializers.SerializerMethodField()
 
-    approved_by = serializers.SerializerMethodField()
-
     applications_sent = serializers.SerializerMethodField()
 
     class Meta:
@@ -126,7 +121,6 @@ class ApplicationRoundSerializer(serializers.ModelSerializer):
             "criteria",
             "is_admin",
             "aggregated_data",
-            "approved_by",
             "applications_sent",
         ]
         extra_kwargs = {
@@ -172,9 +166,6 @@ class ApplicationRoundSerializer(serializers.ModelSerializer):
             "is_admin": {
                 "help_text": "Whether the current user can administer the application round or not.",
             },
-            "approved_by": {
-                "help_text": "Person name who approved this application round."
-            },
         }
 
     def _get_allocation_result_summary(self, instance):
@@ -213,24 +204,6 @@ class ApplicationRoundSerializer(serializers.ModelSerializer):
         return can_manage_service_sectors_application_rounds(
             request_user, service_sector
         )
-
-    def get_approved_by(self, instance):
-        request = self.context.get("request", None)
-        request_user = getattr(request, "user", None)
-
-        if not request_user or not request_user.is_authenticated:
-            return ""
-
-        if hasattr(instance, "approved_by"):
-            return instance.approved_by
-
-        approved_status = instance.statuses.filter(
-            status=ApplicationRoundStatus.APPROVED
-        ).first()
-        if getattr(approved_status, "user", None):
-            return approved_status.user.get_full_name()
-
-        return ""
 
     def get_aggregated_data(self, instance):
         allocation_result_dict = {}
@@ -328,11 +301,21 @@ class ApplicationRoundSerializer(serializers.ModelSerializer):
 
         if (
             self.instance
-            and self.instance.status == ApplicationRoundStatus.APPROVED
-            and status != ApplicationRoundStatus.APPROVED
+            and self.instance.status == ApplicationRoundStatus.ARCHIVED
+            and status != ApplicationRoundStatus.ARCHIVED
         ):
             raise serializers.ValidationError(
-                "Cannot change status of APPROVED application round."
+                "Cannot change status of ARCHIVED application round."
+            )
+
+        if (
+            self.instance
+            and self.instance.status == ApplicationRoundStatus.SENT
+            and status
+            not in [ApplicationRoundStatus.SENDING, ApplicationRoundStatus.ARCHIVED]
+        ):
+            raise serializers.ValidationError(
+                "Status of SENT application round can be changed only to SENDING or ARCHIVED."
             )
 
         return data
@@ -394,30 +377,6 @@ class ApplicationRoundViewSet(viewsets.ModelViewSet):
                 .values("application_event__application__application_round__id")
                 .annotate(duration_total=Sum("value"))
                 .values("duration_total")
-            ),
-            approved_by=Coalesce(
-                Subquery(
-                    ApplicationRoundStatus.objects.filter(
-                        application_round__id=OuterRef("id"),
-                        status=ApplicationRoundStatus.APPROVED,
-                    )
-                    .annotate(
-                        user_fullname=Case(
-                            When(
-                                user__isnull=True,
-                                then=V(""),
-                            ),
-                            default=Concat(
-                                "user__first_name",
-                                V(" "),
-                                "user__last_name",
-                            ),
-                        )
-                    )
-                    .order_by("id")
-                    .values("user_fullname")[:1]
-                ),
-                V(""),
             ),
             applications_sent=Case(
                 When(

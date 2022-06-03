@@ -246,9 +246,11 @@ class ApplicationRoundStatusFactory(DjangoModelFactory):
             ApplicationRoundStatus.IN_REVIEW,
             ApplicationRoundStatus.REVIEW_DONE,
             ApplicationRoundStatus.ALLOCATED,
+            ApplicationRoundStatus.RESERVING,
             ApplicationRoundStatus.HANDLED,
-            ApplicationRoundStatus.VALIDATED,
-            ApplicationRoundStatus.APPROVED,
+            ApplicationRoundStatus.SENDING,
+            ApplicationRoundStatus.SENT,
+            ApplicationRoundStatus.ARCHIVED,
         ]
     )
     application_round = SubFactory(ApplicationRoundFactory)

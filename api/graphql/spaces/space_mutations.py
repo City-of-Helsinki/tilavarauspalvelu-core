@@ -1,10 +1,10 @@
 import graphene
 from django.conf import settings
-from django.core.exceptions import ValidationError
+from django.forms import ValidationError
+from django.shortcuts import get_object_or_404
 from graphene import ClientIDMutation
 from graphene_django.rest_framework.mutation import SerializerMutation
 from graphene_permissions.permissions import AllowAny
-from rest_framework.generics import get_object_or_404
 
 from api.graphql.base_mutations import AuthDeleteMutation, AuthSerializerMutation
 from api.graphql.spaces.space_serializers import (
@@ -54,7 +54,7 @@ class SpaceDeleteMutation(AuthDeleteMutation, ClientIDMutation):
         space = get_object_or_404(Space, pk=input.get("pk", None))
         in_active_round = (
             ApplicationRound.objects.exclude(
-                statuses__status=ApplicationRoundStatus.APPROVED
+                statuses__status__in=ApplicationRoundStatus.CLOSED_STATUSES
             )
             .filter(reservation_units__spaces=space)
             .exists()

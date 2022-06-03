@@ -99,7 +99,6 @@ class ApplicationRoundQueryTestCase(GrapheneTestCaseBase, snapshottest.TestCase)
                                 totalReservationDuration
                                 totalHourCapacity
                             }
-                            approvedBy
                             applicationsSent
                             targetGroup
                             applicationsCount
