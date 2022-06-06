@@ -63,6 +63,7 @@
   "search": "Hae",
   "noResults": "Ei tuloksia",
   "select": "Valitse",
+  "and": "ja",
   "abbreviations": {
     "hour": "{{count}} t",
     "minute": "{{count}} min"

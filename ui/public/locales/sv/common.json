@@ -63,6 +63,7 @@
   "search": "Sök",
   "noResults": "Inga resultat",
   "select": "Välj",
+  "and": "och",
   "abbreviations": {
     "hour": "{{count}} h",
     "minute": "{{count}} min"
