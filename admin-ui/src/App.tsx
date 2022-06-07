@@ -33,6 +33,7 @@ import RequestedReservations from "./component/reservations/requested/RequestedR
 import RequestedReservation from "./component/reservations/requested/RequestedReservation";
 import PrivateRoutes from "./common/PrivateRoutes";
 import { prefixes } from "./common/urls";
+import ExternalScripts from "./common/ExternalScripts";
 
 function App(): JSX.Element {
   return (
@@ -150,6 +151,7 @@ function App(): JSX.Element {
             />
           </PrivateRoutes>
         </Switch>
+        <ExternalScripts />
       </PageWrapper>
     </BrowserRouter>
   );

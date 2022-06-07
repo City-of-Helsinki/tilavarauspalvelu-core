@@ -79,6 +79,8 @@ Use `.env.local` for development.
 | REACT_APP_TILAVARAUS_API_SCOPE                | https://api.hel.fi/auth/tilavarausapidev                         |
 | REACT_APP_DISABLE_AUTH                        | Flag to disable authentication                                   |
 | REACT_APP_RESERVATION_UNIT_PREVIEW_URL_PREFIX | https://tvp-ui-dev.agw.arodevtest.hel.fi/reservation-unit/single |
+| REACT_APP_COOKIEHUB_ENABLED                   | Whether Cookiehub should be enabled                              |
+| REACT_APP_HOTJAR_ENABLED                      | Whether Hotjar should be enabled                                 |
 
 ## Available Scripts
 
