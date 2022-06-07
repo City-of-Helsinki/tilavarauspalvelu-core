@@ -58,8 +58,6 @@ from reservation_units.models import TaxPercentage
 from reservation_units.utils.reservation_unit_reservation_scheduler import (
     ReservationUnitReservationScheduler,
 )
-from resources.models import Resource
-from spaces.models import Space
 
 
 class KeywordType(AuthNode, PrimaryKeyObjectType):
@@ -372,17 +370,12 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
         interfaces = (graphene.relay.Node,)
         connection_class = TilavarausBaseConnection
 
-    def resolve_pk(self, info):
-        return self.id
-
     def resolve_location(self, info):
         return self.get_location()
 
     @check_resolver_permission(SpacePermission)
     def resolve_spaces(self, info):
-        return Space.objects.filter(reservation_units=self.id).select_related(
-            "parent", "building"
-        )
+        return self.spaces.all()
 
     @check_resolver_permission(ServicePermission)
     def resolve_services(self, info):
@@ -390,14 +383,14 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
 
     @check_resolver_permission(PurposePermission)
     def resolve_purposes(self, info):
-        return Purpose.objects.filter(reservation_units=self.id)
+        return self.purposes.all()
 
     def resolve_images(self, info):
-        return ReservationUnitImage.objects.filter(reservation_unit_id=self.id)
+        return self.images.all()
 
     @check_resolver_permission(ResourcePermission)
     def resolve_resources(self, info):
-        return Resource.objects.filter(reservation_units=self.id)
+        return self.resources.all()
 
     def resolve_reservation_unit_type(self, info):
         return self.reservation_unit_type

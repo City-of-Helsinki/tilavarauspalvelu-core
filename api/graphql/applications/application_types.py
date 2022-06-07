@@ -1,6 +1,6 @@
 import graphene
-import graphene_django_optimizer as gql_optimizer
 from django.conf import settings
+from django.db.models import Count
 from graphene_django import DjangoListField
 from graphene_permissions.mixins import AuthNode
 from graphene_permissions.permissions import AllowAny, AllowAuthenticated
@@ -35,9 +35,11 @@ from permissions.api_permissions.graphene_permissions import (
     CityPermission,
     OrganisationPermission,
 )
+from spaces.models import Space
+from utils.query_performance import QueryPerformanceOptimizerMixin
 
 
-class CityType(gql_optimizer.OptimizedDjangoObjectType, AuthNode, PrimaryKeyObjectType):
+class CityType(AuthNode, PrimaryKeyObjectType):
     permission_classes = (
         (CityPermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
     )
@@ -50,9 +52,7 @@ class CityType(gql_optimizer.OptimizedDjangoObjectType, AuthNode, PrimaryKeyObje
         connection_class = TilavarausBaseConnection
 
 
-class AddressType(
-    gql_optimizer.OptimizedDjangoObjectType, AuthNode, PrimaryKeyObjectType
-):
+class AddressType(AuthNode, PrimaryKeyObjectType):
     permission_classes = (
         (AddressPermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
     )
@@ -65,9 +65,7 @@ class AddressType(
         connection_class = TilavarausBaseConnection
 
 
-class PersonType(
-    gql_optimizer.OptimizedDjangoObjectType, AuthNode, PrimaryKeyObjectType
-):
+class PersonType(AuthNode, PrimaryKeyObjectType):
     permission_classes = (
         (AllowAuthenticated,) if not settings.TMP_PERMISSIONS_DISABLED else [AllowAny]
     )
@@ -80,9 +78,7 @@ class PersonType(
         connection_class = TilavarausBaseConnection
 
 
-class OrganisationType(
-    gql_optimizer.OptimizedDjangoObjectType, AuthNode, PrimaryKeyObjectType
-):
+class OrganisationType(AuthNode, PrimaryKeyObjectType):
     permission_classes = (
         (OrganisationPermission,)
         if not settings.TMP_PERMISSIONS_DISABLED
@@ -116,9 +112,7 @@ class ApplicationEventAggregatedDataType(graphene.ObjectType):
     allocation_results_reservations_total = graphene.Float()
 
 
-class ApplicationEventScheduleType(
-    gql_optimizer.OptimizedDjangoObjectType, AuthNode, PrimaryKeyObjectType
-):
+class ApplicationEventScheduleType(AuthNode, PrimaryKeyObjectType):
     permission_classes = (
         (AllowAuthenticated,) if not settings.TMP_PERMISSIONS_DISABLED else [AllowAny]
     )
@@ -131,9 +125,7 @@ class ApplicationEventScheduleType(
         connection_class = TilavarausBaseConnection
 
 
-class EventReservationUnitType(
-    gql_optimizer.OptimizedDjangoObjectType, AuthNode, PrimaryKeyObjectType
-):
+class EventReservationUnitType(AuthNode, PrimaryKeyObjectType):
     permission_classes = (
         (AllowAuthenticated,) if not settings.TMP_PERMISSIONS_DISABLED else [AllowAny]
     )
@@ -156,9 +148,7 @@ class EventReservationUnitType(
         connection_class = TilavarausBaseConnection
 
 
-class ApplicationEventType(
-    gql_optimizer.OptimizedDjangoObjectType, AuthNode, PrimaryKeyObjectType
-):
+class ApplicationEventType(AuthNode, PrimaryKeyObjectType):
     permission_classes = (
         (AllowAuthenticated,) if not settings.TMP_PERMISSIONS_DISABLED else [AllowAny]
     )
@@ -243,9 +233,7 @@ class ApplicationAggregatedDataType(graphene.ObjectType):
     reservations_duration_total = graphene.Float()
 
 
-class ApplicationType(
-    gql_optimizer.OptimizedDjangoObjectType, AuthNode, PrimaryKeyObjectType
-):
+class ApplicationType(QueryPerformanceOptimizerMixin, AuthNode, PrimaryKeyObjectType):
     permission_classes = (
         (ApplicationPermission,)
         if not settings.TMP_PERMISSIONS_DISABLED
@@ -299,6 +287,106 @@ class ApplicationType(
         )
         interfaces = (graphene.relay.Node,)
         connection_class = TilavarausBaseConnection
+
+    class QueryOptimization:
+        field_name = "applications"
+        query_optimization = {
+            "contactPerson": ("select", "contact_person"),
+            "organisation": ("select", "organisation"),
+            "applicantName": ("select", "user"),
+            "applicantEmail": ("select", "user"),
+            "aggregatedData": ("prefetch", "aggregated_data"),
+            "applicationEvents": (
+                "prefetch",
+                {
+                    "field_name": "application_events",
+                    "base_queryset": ApplicationEvent.objects.all(),
+                    "child_optimizations": {
+                        "ageGroupDisplay": ("select", "age_group"),
+                        "abilityGroup": ("select", "ability_group"),
+                        "purpose": ("select", "purpose"),
+                        "weeklyAmountReductionsCount": (
+                            "annotate",
+                            Count("weekly_amount_reductions"),
+                        ),
+                        "applicationEventSchedules": (
+                            "prefetch",
+                            "application_event_schedules",
+                        ),
+                        "aggregatedData": ("prefetch", "aggregated_data"),
+                        "eventReservationUnits": (
+                            "prefetch",
+                            {
+                                "field_name": "event_reservation_units",
+                                "base_queryset": EventReservationUnit.objects.all(),
+                                "child_optimizations": {
+                                    "reservationUnitDetails": (
+                                        "select_with_child_optimizations",
+                                        {
+                                            "field_name": "reservation_unit",
+                                            "child_optimizations": {
+                                                "reservationUnitType": (
+                                                    "select_for_parent",
+                                                    "reservation_unit__reservation_unit_type",
+                                                ),
+                                                "unit": (
+                                                    "select_for_parent",
+                                                    "reservation_unit__unit",
+                                                ),
+                                                "resources": (
+                                                    "prefetch_for_parent",
+                                                    "reservation_unit__resources",
+                                                ),
+                                                "services": (
+                                                    "prefetch_for_parent",
+                                                    "reservation_unit__services",
+                                                ),
+                                                "reservationPurposes": (
+                                                    "prefetch_for_parent",
+                                                    "reservation_unit__reservation_purposes",
+                                                ),
+                                                "images": (
+                                                    "prefetch_for_parent",
+                                                    "reservation_unit__images",
+                                                ),
+                                                "equipments": (
+                                                    "prefetch_for_parent",
+                                                    "reservation_unit__equipments",
+                                                ),
+                                                "spaces": (
+                                                    "prefetch_for_parent",
+                                                    {
+                                                        "field_name": "reservation_unit__spaces",
+                                                        "always_prefetch": True,
+                                                        "base_queryset": Space.objects.all().select_related(
+                                                            "location",
+                                                        ),
+                                                        "child_optimizations": {
+                                                            "building": (
+                                                                "select",
+                                                                "building",
+                                                            ),
+                                                            "location": (
+                                                                "select",
+                                                                "location",
+                                                            ),
+                                                            "resources": (
+                                                                "prefetch",
+                                                                "resource_set",
+                                                            ),
+                                                        },
+                                                    },
+                                                ),
+                                            },
+                                        },
+                                    )
+                                },
+                            },
+                        ),
+                    },
+                },
+            ),
+        }
 
     def resolve_applicant_id(self, info: graphene.ResolveInfo):
         if not self.user:

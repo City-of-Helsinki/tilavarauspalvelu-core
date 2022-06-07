@@ -1,6 +1,5 @@
 import django_filters
 import graphene
-import graphene_django_optimizer as gql_optimizer
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db.models import Q
@@ -78,7 +77,6 @@ from api.graphql.terms_of_use.terms_of_use_types import TermsOfUseType
 from api.graphql.units.unit_filtersets import UnitsFilterSet
 from api.graphql.units.unit_mutations import UnitUpdateMutation
 from api.graphql.units.unit_types import UnitByPkType, UnitType
-from applications.models import Application
 from permissions.api_permissions.graphene_field_decorators import (
     check_resolver_permission,
 )
@@ -427,9 +425,6 @@ class Query(graphene.ObjectType):
     def resolve_equipment_category_by_pk(self, info, **kwargs):
         pk = kwargs.get("pk")
         return get_object_or_404(EquipmentCategory, pk=pk)
-
-    def resolve_applications(self, info: graphene.ResolveInfo, **kwargs):
-        return gql_optimizer.query(Application.objects.all(), info)
 
 
 class Mutation(graphene.ObjectType):
