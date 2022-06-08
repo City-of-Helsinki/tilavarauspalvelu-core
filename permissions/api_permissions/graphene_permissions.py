@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404
 from graphene import ResolveInfo
 from graphene_permissions.permissions import BasePermission
 
-from applications.models import Application
+from applications.models import Application, ApplicationEvent
 from permissions.helpers import (
     can_create_reservation,
     can_handle_reservation,
@@ -19,6 +19,7 @@ from permissions.helpers import (
     can_manage_units,
     can_manage_units_reservation_units,
     can_manage_units_spaces,
+    can_modify_application,
     can_modify_reservation,
     can_read_application,
     can_view_recurring_reservation,
@@ -59,6 +60,34 @@ class ApplicationPermission(BasePermission):
 
     @classmethod
     def has_filter_permission(cls, info: ResolveInfo) -> bool:
+        return info.context.user.is_authenticated
+
+
+class ApplicationEventPermission(BasePermission):
+    @classmethod
+    def has_mutation_permission(cls, root: Any, info: ResolveInfo, input: dict) -> bool:
+        pk = input.get("pk")
+        application_pk = input.get("application_id")
+        application = None
+        if pk:
+            try:
+                application_event = ApplicationEvent.objects.get(id=pk)
+            except ApplicationEvent.DoesNotExist:
+                return False
+            application = application_event.application
+        elif application_pk:
+            try:
+                application = Application.objects.get(id=application_pk)
+            except Application.DoesNotExist:
+                return False
+
+        if not application:
+            return False
+
+        return can_modify_application(info.context.user, application)
+
+    @classmethod
+    def has_permission(cls, info: ResolveInfo) -> bool:
         return info.context.user.is_authenticated
 
 
