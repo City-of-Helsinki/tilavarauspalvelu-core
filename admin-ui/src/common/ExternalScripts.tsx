@@ -26,7 +26,7 @@ const ExternalScripts = (): JSX.Element => {
         </script>
       )}
       {isHotjarEnabled && (
-        <script>
+        <script type="text/plain" data-consent="analytics">
           {`
             (function(h,o,t,j,a,r){
               h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
