@@ -72,7 +72,7 @@ from api.graphql.spaces.space_mutations import (
     SpaceDeleteMutation,
     SpaceUpdateMutation,
 )
-from api.graphql.spaces.space_types import SpaceType
+from api.graphql.spaces.space_types import ServiceSectorType, SpaceType
 from api.graphql.terms_of_use.terms_of_use_types import TermsOfUseType
 from api.graphql.units.unit_filtersets import UnitsFilterSet
 from api.graphql.units.unit_mutations import UnitUpdateMutation
@@ -95,6 +95,7 @@ from permissions.api_permissions.graphene_permissions import (
     ReservationUnitCancellationRulePermission,
     ReservationUnitPermission,
     ResourcePermission,
+    ServiceSectorPermission,
     SpacePermission,
     TaxPercentagePermission,
     TermsOfUsePermission,
@@ -330,6 +331,14 @@ class ReservationMetadataSetFilter(AuthFilter):
     )
 
 
+class ServiceSectorFilter(AuthFilter):
+    permission_classes = (
+        (ServiceSectorPermission,)
+        if not settings.TMP_PERMISSIONS_DISABLED
+        else (AllowAny,)
+    )
+
+
 class Query(graphene.ObjectType):
     applications = ApplicationsFilter(
         ApplicationType, filterset_class=ApplicationFilterSet
@@ -373,6 +382,7 @@ class Query(graphene.ObjectType):
     spaces = SpacesFilter(SpaceType)
     space = relay.Node.Field(SpaceType)
     space_by_pk = Field(SpaceType, pk=graphene.Int())
+    service_sectors = ServiceSectorFilter(ServiceSectorType)
 
     units = UnitsFilter(UnitType, filterset_class=UnitsFilterSet)
     unit = relay.Node.Field(UnitType)

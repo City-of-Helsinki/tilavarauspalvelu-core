@@ -6,6 +6,7 @@ from graphene_permissions.permissions import AllowAny
 
 from api.graphql.base_type import PrimaryKeyObjectType
 from api.graphql.reservation_units.reservation_unit_types import ReservationUnitType
+from api.graphql.spaces.space_types import ServiceSectorType
 from api.graphql.translate_fields import get_all_translatable_fields
 from applications.models import (
     ApplicationEventAggregateData,
@@ -15,7 +16,6 @@ from applications.models import (
     ApplicationStatus,
 )
 from permissions.api_permissions.graphene_permissions import ApplicationRoundPermission
-from spaces.models import ServiceSector
 
 from ..base_connection import TilavarausBaseConnection
 from ..reservations.reservation_types import ReservationPurposeType
@@ -26,20 +26,6 @@ class ApplicationRoundAggregatedDataType(graphene.ObjectType):
     allocation_duration_total = graphene.Int()
     total_reservation_duration = graphene.Int()
     total_hour_capacity = graphene.Int()
-
-
-class ServiceSectorType(AuthNode, PrimaryKeyObjectType):
-    permission_classes = (
-        (ApplicationRoundPermission,)
-        if not settings.TMP_PERMISSIONS_DISABLED
-        else (AllowAny,)
-    )
-
-    class Meta:
-        model = ServiceSector
-        fields = ["id"] + get_all_translatable_fields(model)
-        interfaces = (graphene.relay.Node,)
-        connection_class = TilavarausBaseConnection
 
 
 class ApplicationRoundBasketType(AuthNode, PrimaryKeyObjectType):
