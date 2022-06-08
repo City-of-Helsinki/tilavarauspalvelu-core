@@ -13,7 +13,7 @@ from permissions.api_permissions.graphene_permissions import (
     ResourcePermission,
     SpacePermission,
 )
-from spaces.models import Building, District, Location, RealEstate, Space
+from spaces.models import Building, District, Location, RealEstate, ServiceSector, Space
 
 
 class DistrictType(PrimaryKeyObjectType):
@@ -104,5 +104,14 @@ class LocationType(PrimaryKeyObjectType):
             "latitude",
         ] + get_all_translatable_fields(model)
 
+        interfaces = (graphene.relay.Node,)
+        connection_class = TilavarausBaseConnection
+
+
+class ServiceSectorType(PrimaryKeyObjectType):
+    class Meta:
+        model = ServiceSector
+        fields = ["id"] + get_all_translatable_fields(model)
+        filter_fields = []
         interfaces = (graphene.relay.Node,)
         connection_class = TilavarausBaseConnection
