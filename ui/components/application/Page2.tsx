@@ -13,6 +13,10 @@ import {
 import { AccordionWithState as Accordion } from "../common/Accordion";
 import { MediumButton } from "../../styles/util";
 import { ButtonContainer } from "../common/common";
+import {
+  getApplicationEventsWhichMinDurationsIsNotFulfilled,
+  getListOfApplicationEventTitles,
+} from "../../modules/application/application";
 
 type Props = {
   application: Application;
@@ -36,6 +40,7 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
 
   const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
+  const [minDurationMsg, setMinDurationMsg] = useState(true);
   const history = useRouter();
 
   const [selectorData, setSelectorData] = useState<Cell[][][]>(
@@ -75,6 +80,7 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
     });
     selectorData.forEach(() => updated.push([...selectorData[index]]));
     setSelectorData(updated);
+    setErrorMsg("");
     setSuccessMsg(t("application:Page2.notification.copyCells"));
   };
 
@@ -97,11 +103,18 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
         .map((ae) => ae.applicationEventSchedules.length > 0)
         .filter((l) => l === false).length > 0
     ) {
+      setSuccessMsg("");
       setErrorMsg("application:error.missingSchedule");
       return;
     }
     onNext(appToSave);
   };
+
+  const applicationEventsForWhichMinDurationIsNotFulfilled: number[] =
+    getApplicationEventsWhichMinDurationsIsNotFulfilled(
+      application.applicationEvents,
+      selectorData
+    );
 
   return (
     <>
@@ -109,11 +122,15 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
         <Notification
           type="success"
           label={t(successMsg)}
+          aria-label={t(successMsg)}
           position="top-center"
           autoClose
           autoCloseDuration={2000}
           displayAutoCloseProgress={false}
           onClose={() => setSuccessMsg("")}
+          dismissible
+          closeButtonLabelText={t("common:close")}
+          dataTestId="application__page2--notification-success"
         />
       )}
       {errorMsg && (
@@ -124,6 +141,9 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
           autoClose
           displayAutoCloseProgress={false}
           onClose={() => setErrorMsg("")}
+          dismissible
+          closeButtonLabelText={t("common:close")}
+          dataTestId="application__page2--notification-error"
         >
           {t(errorMsg)}
         </Notification>
@@ -173,6 +193,30 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
           </Accordion>
         );
       })}
+      {minDurationMsg &&
+        applicationEventsForWhichMinDurationIsNotFulfilled.some(
+          (d) => d !== null
+        ) && (
+          <Notification
+            type="alert"
+            label={t("application:Page2.notification.minDuration.title")}
+            dismissible
+            onClose={() => setMinDurationMsg(false)}
+            closeButtonLabelText={t("common:close")}
+            dataTestId="application__page2--notification-min-duration"
+          >
+            {application.applicationEvents?.length === 1
+              ? t("application:Page2.notification.minDuration.bodySingle")
+              : t("application:Page2.notification.minDuration.body", {
+                  title: getListOfApplicationEventTitles(
+                    application.applicationEvents,
+                    applicationEventsForWhichMinDurationIsNotFulfilled
+                  ),
+                  count:
+                    applicationEventsForWhichMinDurationIsNotFulfilled.length,
+                })}
+          </Notification>
+        )}
       <ButtonContainer>
         <MediumButton
           variant="secondary"

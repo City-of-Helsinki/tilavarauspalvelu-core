@@ -19,12 +19,17 @@ import {
   notificationTitle,
   applicationEventAccordion,
   copyCellsButton,
+  minDurationNotification,
+  minDurationNotificationText,
+  successNotification,
 } from "../model/application";
 import {
   addReservationUnitButton,
   clearSelectionsButton,
   startApplicationButton,
 } from "../model/search";
+
+const applicationEventNames = ["Kurikan vimma", "Toca"];
 
 describe("application", () => {
   beforeEach(() => {
@@ -109,7 +114,7 @@ describe("application", () => {
 
     cy.a11yCheck();
 
-    applicationName(0).clear().type("Kurikan Vimma");
+    applicationName(0).clear().type(applicationEventNames[0]);
     numPersons(0).type("3");
     selectOption("applicationEvents[0].ageGroupId", 1);
     selectOption("applicationEvents[0].purposeId", 1);
@@ -120,7 +125,7 @@ describe("application", () => {
     cy.wait("@savePage1", { timeout: 20000 });
 
     addNewApplicationButton().click();
-    applicationName(1).clear().type("Toca");
+    applicationName(1).clear().type(applicationEventNames[1]);
     numPersons(1).type("4");
     selectOption("applicationEvents[1].ageGroupId", 2);
     selectOption("applicationEvents[1].purposeId", 2);
@@ -136,7 +141,15 @@ describe("application", () => {
 
     cy.get("h1").should("contain", "ajankohta");
 
-    cy.a11yCheck();
+    minDurationNotification().should("be.visible");
+    minDurationNotificationText().should(
+      "contain.text",
+      applicationEventNames[0]
+    );
+    minDurationNotificationText().should(
+      "contain.text",
+      applicationEventNames[1]
+    );
 
     timeSelectorButton(0, 7, 0).click();
     timeSelectorButton(0, 8, 0).click();
@@ -145,6 +158,14 @@ describe("application", () => {
     timeSummary(0, 0).should(
       "contain.text",
       "Ensisijaiset aikatoiveetMaanantai:7-10TiistaiKeskiviikkoTorstaiPerjantaiLauantaiSunnuntai"
+    );
+    minDurationNotificationText().should(
+      "not.contain.text",
+      applicationEventNames[0]
+    );
+    minDurationNotificationText().should(
+      "contain.text",
+      applicationEventNames[1]
     );
 
     selectPriority(0, 1);
@@ -161,6 +182,14 @@ describe("application", () => {
       "contain.text",
       "Muut aikatoiveetMaanantai:9-10TiistaiKeskiviikkoTorstai:8-10PerjantaiLauantaiSunnuntai"
     );
+    minDurationNotificationText().should(
+      "not.contain.text",
+      applicationEventNames[0]
+    );
+    minDurationNotificationText().should(
+      "contain.text",
+      applicationEventNames[1]
+    );
 
     resetButton(0).click();
 
@@ -172,8 +201,17 @@ describe("application", () => {
       "contain.text",
       "Muut aikatoiveetMaanantaiTiistaiKeskiviikkoTorstaiPerjantaiLauantaiSunnuntai"
     );
+    minDurationNotificationText().should(
+      "contain.text",
+      applicationEventNames[0]
+    );
+    minDurationNotificationText().should(
+      "contain.text",
+      applicationEventNames[1]
+    );
 
     timeSelectorButton(0, 10, 1).click();
+    timeSelectorButton(0, 11, 1).click();
 
     cy.wait(100);
 
@@ -183,7 +221,15 @@ describe("application", () => {
     );
     timeSummary(0, 1).should(
       "contain.text",
-      "Muut aikatoiveetMaanantaiTiistai:10-11KeskiviikkoTorstaiPerjantaiLauantaiSunnuntai"
+      "Muut aikatoiveetMaanantaiTiistai:10-12KeskiviikkoTorstaiPerjantaiLauantaiSunnuntai"
+    );
+    minDurationNotificationText().should(
+      "not.contain.text",
+      applicationEventNames[0]
+    );
+    minDurationNotificationText().should(
+      "contain.text",
+      applicationEventNames[1]
     );
 
     nextButton().click();
@@ -203,6 +249,14 @@ describe("application", () => {
       "contain.text",
       "Muut aikatoiveetMaanantaiTiistaiKeskiviikkoTorstaiPerjantaiLauantaiSunnuntai"
     );
+    minDurationNotificationText().should(
+      "not.contain.text",
+      applicationEventNames[0]
+    );
+    minDurationNotificationText().should(
+      "contain.text",
+      applicationEventNames[1]
+    );
 
     copyCellsButton(0).click();
 
@@ -212,13 +266,16 @@ describe("application", () => {
     );
     timeSummary(1, 1).should(
       "contain.text",
-      "Muut aikatoiveetMaanantaiTiistai:10-11KeskiviikkoTorstaiPerjantaiLauantaiSunnuntai"
+      "Muut aikatoiveetMaanantaiTiistai:10-12KeskiviikkoTorstaiPerjantaiLauantaiSunnuntai"
     );
+    minDurationNotification().should("not.exist");
 
     notificationTitle().should(
       "contain.text",
       "Ajat kopioitu onnistuneesti kaikille varaustoiveille"
     );
+
+    successNotification().find("button").click();
 
     nextButton().click();
 

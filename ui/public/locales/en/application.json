@@ -87,7 +87,13 @@
     "primarySchedules": "Preferred time slots",
     "secondarySchedules": "Other time slots",
     "notification": {
-      "copyCells": "Times successfully copied for all booking requests"
+      "copyCells": "Times successfully copied for all booking requests",
+      "minDuration": {
+        "title": "The total duration of requested times is lower than minimum duration of the booking",
+        "bodySingle": "The total duration of requested times selected in the calendar is lower than the minimum duration of the booking (chosen in the previous step). Please select more times in the calendar or a lower minimum duration for the booking.",
+        "body": "In the booking {{title}}, the total duration of requested times selected in the calendar is lower than the minimum duration of the booking (chosen in the previous step). Please select more times in the calendar or a lower minimum duration for the booking.",
+        "body_plural": "In the bookings {{title}}, the total duration of requested times selected in the calendar is lower than the minimum duration of the booking (chosen in the previous step). Please select more times in the calendar or a lower minimum duration for the booking."
+      }
     }
   },
   "Page3": {

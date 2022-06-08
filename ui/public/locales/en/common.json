@@ -63,6 +63,7 @@
   "search": "Search",
   "noResults": "No results",
   "select": "Select",
+  "and": "and",
   "abbreviations": {
     "hour": "{{count}} h",
     "minute": "{{count}} min"
