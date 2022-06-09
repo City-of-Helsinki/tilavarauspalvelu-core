@@ -33,7 +33,6 @@ from permissions.helpers import (
     can_modify_reservation,
     can_modify_reservation_unit,
     can_read_application,
-    can_validate_unit_applications,
     can_view_recurring_reservation,
     can_view_reservation,
 )
@@ -265,22 +264,6 @@ class ApplicationEventStatusPermission(permissions.BasePermission):
                 ApplicationEventStatus.DECLINED,
             ):
                 return can_manage_service_sectors_applications(
-                    request.user, service_sector.first()
-                )
-            elif status == ApplicationEventStatus.VALIDATED:
-                application_event = ApplicationEvent.objects.get(
-                    id=application_event_id
-                )
-                units = Unit.objects.filter(
-                    reservationunit__eventreservationunit__id__in=(
-                        application_event.event_reservation_units.all().values_list(
-                            "id", flat=True
-                        )
-                    )
-                )
-                return can_validate_unit_applications(
-                    request.user, units
-                ) or can_manage_service_sectors_applications(
                     request.user, service_sector.first()
                 )
         except (

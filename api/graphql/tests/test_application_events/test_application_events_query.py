@@ -100,8 +100,8 @@ class ApplicationEventQueryTestCase(ApplicationEventTestCaseBase):
         event = ApplicationEventFactory(
             application=self.application, name="Only I should be listed"
         )
-        event.set_status(ApplicationEventStatus.VALIDATED)
-        filter_clause = f'status: "{ApplicationEventStatus.VALIDATED}"'
+        event.set_status(ApplicationEventStatus.APPROVED)
+        filter_clause = f'status: "{ApplicationEventStatus.APPROVED}"'
 
         response = self.query(self.get_query(filter_section=filter_clause))
         assert_that(response.status_code).is_equal_to(200)

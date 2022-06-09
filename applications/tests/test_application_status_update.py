@@ -3,6 +3,7 @@ from django.test.testcases import TestCase
 
 from applications.models import (
     Application,
+    ApplicationEvent,
     ApplicationEventStatus,
     ApplicationRound,
     ApplicationRoundStatus,
@@ -66,6 +67,16 @@ class ApplicationStatusUpdateTestCase(TestCase):
 
         updated_application = Application.objects.get(id=self.application.id)
         assert_that(updated_application.status).is_equal_to(ApplicationStatus.HANDLED)
+
+    def test_approved_application_events_change_to_reserved_when_round_goes_handled(
+        self,
+    ):
+        self.application.set_status(ApplicationStatus.ALLOCATED)
+        self.application_event.set_status(ApplicationEventStatus.APPROVED)
+        self.application_round.set_status(ApplicationRoundStatus.HANDLED)
+
+        updated_event = ApplicationEvent.objects.get(id=self.application_event.id)
+        assert_that(updated_event.status).is_equal_to(ApplicationEventStatus.RESERVED)
 
     def test_handled_applications_change_to_sent_when_round_goes_sent(self):
         self.application.set_status(ApplicationStatus.HANDLED)

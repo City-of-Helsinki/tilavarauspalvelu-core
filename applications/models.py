@@ -488,6 +488,13 @@ class ApplicationRound(models.Model):
             application.status = ApplicationStatus.HANDLED
             application.save()
 
+            events = ApplicationEvent.objects.filter(
+                application=application, latest_status=ApplicationEventStatus.APPROVED
+            )
+            for event in events:
+                event.status = ApplicationEventStatus.RESERVED
+                event.save()
+
     def handle_applications_on_sent(self):
         applications = Application.objects.filter(
             application_round=self,
@@ -702,16 +709,16 @@ class ApplicationStatus(models.Model, StatusMixin):
 
 class ApplicationEventStatus(models.Model, StatusMixin):
     CREATED = "created"
-    ALLOCATED = "allocated"
-    VALIDATED = "validated"
     APPROVED = "approved"
+    RESERVED = "reserved"
+    FAILED = "failed"
     DECLINED = "declined"
 
     STATUS_CHOICES = (
         (CREATED, _("Created")),
-        (ALLOCATED, _("Allocated")),
-        (VALIDATED, _("Validated")),
         (APPROVED, _("Approved")),
+        (RESERVED, _("Reserved")),
+        (FAILED, _("Failed")),
         (DECLINED, _("Declined")),
     )
 

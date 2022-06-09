@@ -262,9 +262,9 @@ class ApplicationEventStatusFactory(DjangoModelFactory):
     status = FuzzyChoice(
         choices=[
             ApplicationEventStatus.CREATED,
-            ApplicationEventStatus.ALLOCATED,
-            ApplicationEventStatus.VALIDATED,
             ApplicationEventStatus.APPROVED,
+            ApplicationEventStatus.RESERVED,
+            ApplicationEventStatus.FAILED,
             ApplicationEventStatus.DECLINED,
         ]
     )
