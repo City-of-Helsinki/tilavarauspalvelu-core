@@ -229,7 +229,6 @@ class ApplicationStatusFactory(DjangoModelFactory):
             ApplicationStatus.DRAFT,
             ApplicationStatus.IN_REVIEW,
             ApplicationStatus.REVIEW_DONE,
-            ApplicationStatus.DECLINED,
             ApplicationStatus.CANCELLED,
         ]
     )

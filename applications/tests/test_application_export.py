@@ -58,7 +58,6 @@ class ApplicationDataExporterTestCase(TestCase):
                     # Exclude DRAFT status, as these will not be present in exports
                     ApplicationStatus.IN_REVIEW,
                     ApplicationStatus.REVIEW_DONE,
-                    ApplicationStatus.DECLINED,
                     ApplicationStatus.CANCELLED,
                 ]
             ),
