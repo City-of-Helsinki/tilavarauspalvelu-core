@@ -265,7 +265,7 @@ class QueryPerformanceOptimizerMixin:
             selects.append(optimization_value.get("field_name"))
 
         if optimization_type == "select_for_parent":
-            parent_selects.push(optimization_value)
+            parent_selects.append(optimization_value)
 
         if optimization_type == "prefetch_for_parent":
 
