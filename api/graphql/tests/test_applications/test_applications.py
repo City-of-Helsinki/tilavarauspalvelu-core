@@ -269,7 +269,7 @@ class ApplicationsGraphQLTestCase(ApplicationTestCaseBase):
         assert_that(content.get("errors")).is_none()
         self.assertMatchSnapshot(content)
 
-    def test_application_application_events_age_group_display_fields(self):
+    def test_application_application_events_age_group(self):
         response = self.query(
             """
             query {
@@ -277,7 +277,7 @@ class ApplicationsGraphQLTestCase(ApplicationTestCaseBase):
                     edges {
                         node {
                             applicationEvents {
-                                ageGroupDisplay {
+                                ageGroup {
                                     minimum
                                     maximum
                                 }

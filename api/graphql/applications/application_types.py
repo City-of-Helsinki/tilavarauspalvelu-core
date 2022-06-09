@@ -8,11 +8,6 @@ from graphene_permissions.permissions import AllowAny, AllowAuthenticated
 from api.graphql.base_connection import TilavarausBaseConnection
 from api.graphql.base_type import PrimaryKeyObjectType
 from api.graphql.reservation_units.reservation_unit_types import ReservationUnitType
-from api.graphql.reservations.reservation_types import (
-    AbilityGroupType,
-    AgeGroupType,
-    ReservationPurposeType,
-)
 from api.graphql.translate_fields import get_all_translatable_fields
 from applications.models import (
     Address,
@@ -131,9 +126,8 @@ class EventReservationUnitType(AuthNode, PrimaryKeyObjectType):
     )
 
     reservation_unit_id = graphene.Int()
-    reservation_unit_details = graphene.Field(
-        ReservationUnitType, source="reservation_unit"
-    )
+
+    reservation_unit = graphene.Field(ReservationUnitType)
 
     class Meta:
         model = EventReservationUnit
@@ -141,11 +135,14 @@ class EventReservationUnitType(AuthNode, PrimaryKeyObjectType):
             "id",
             "priority",
             "reservation_unit_id",
-            "reservation_unit_details",
+            "reservation_unit",
         )
         filter_fields = ()
         interfaces = (graphene.relay.Node,)
         connection_class = TilavarausBaseConnection
+
+    def resolve_reservation_unit(self, info: graphene.ResolveInfo):
+        return self.reservation_unit
 
 
 class ApplicationEventType(AuthNode, PrimaryKeyObjectType):
@@ -158,15 +155,9 @@ class ApplicationEventType(AuthNode, PrimaryKeyObjectType):
     application_id = graphene.Int()
     purpose_id = graphene.Int()
 
-    application_event_schedules = DjangoListField(ApplicationEventScheduleType)
+    application_event_schedules = graphene.List(ApplicationEventScheduleType)
 
-    age_group_display = graphene.Field(AgeGroupType, source="age_group")
-
-    ability_group = graphene.Field(AbilityGroupType)
-
-    purpose = graphene.Field(ReservationPurposeType)
-
-    event_reservation_units = DjangoListField(EventReservationUnitType)
+    event_reservation_units = graphene.List(EventReservationUnitType)
 
     status = graphene.Field(
         graphene.Enum("applicationEventStatus", ApplicationEventStatus.STATUS_CHOICES)
@@ -199,7 +190,7 @@ class ApplicationEventType(AuthNode, PrimaryKeyObjectType):
             "uuid",
             "status",
             "application_event_schedules",
-            "age_group_display",
+            "age_group",
             "ability_group",
             "purpose",
             "event_reservation_units",
@@ -225,6 +216,12 @@ class ApplicationEventType(AuthNode, PrimaryKeyObjectType):
             else self.weekly_amount_reductions.count()
         )
 
+    def resolve_event_reservation_units(self, info: graphene.ResolveInfo):
+        return self.event_reservation_units.all()
+
+    def resolve_application_event_schedules(self, info: graphene.ResolveInfo):
+        return self.application_event_schedules.all()
+
 
 class ApplicationAggregatedDataType(graphene.ObjectType):
     applied_min_duration_total = graphene.Float()
@@ -246,7 +243,7 @@ class ApplicationType(QueryPerformanceOptimizerMixin, AuthNode, PrimaryKeyObject
 
     application_round_id = graphene.Int()
 
-    application_events = DjangoListField(ApplicationEventType)
+    application_events = graphene.List(ApplicationEventType)
 
     status = graphene.Field(
         graphene.Enum("applicationStatus", ApplicationStatus.STATUS_CHOICES)
@@ -302,7 +299,7 @@ class ApplicationType(QueryPerformanceOptimizerMixin, AuthNode, PrimaryKeyObject
                     "field_name": "application_events",
                     "base_queryset": ApplicationEvent.objects.all(),
                     "child_optimizations": {
-                        "ageGroupDisplay": ("select", "age_group"),
+                        "ageGroup": ("select", "age_group"),
                         "abilityGroup": ("select", "ability_group"),
                         "purpose": ("select", "purpose"),
                         "weeklyAmountReductionsCount": (
@@ -320,7 +317,7 @@ class ApplicationType(QueryPerformanceOptimizerMixin, AuthNode, PrimaryKeyObject
                                 "field_name": "event_reservation_units",
                                 "base_queryset": EventReservationUnit.objects.all(),
                                 "child_optimizations": {
-                                    "reservationUnitDetails": (
+                                    "reservationUnit": (
                                         "select_with_child_optimizations",
                                         {
                                             "field_name": "reservation_unit",
@@ -409,3 +406,6 @@ class ApplicationType(QueryPerformanceOptimizerMixin, AuthNode, PrimaryKeyObject
     @check_resolver_permission(OrganisationPermission)
     def resolve_organisation(self, info: graphene.ResolveInfo):
         return self.organisation
+
+    def resolve_application_events(self, info: graphene.ResolveInfo):
+        return self.application_events.all()

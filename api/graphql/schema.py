@@ -8,8 +8,15 @@ from graphene_permissions.mixins import AuthFilter
 from graphene_permissions.permissions import AllowAny, AllowAuthenticated
 from rest_framework.generics import get_object_or_404
 
-from api.graphql.applications.application_filtersets import ApplicationFilterSet
-from api.graphql.applications.application_types import ApplicationType, CityType
+from api.graphql.applications.application_filtersets import (
+    ApplicationEventFilterSet,
+    ApplicationFilterSet,
+)
+from api.graphql.applications.application_types import (
+    ApplicationEventType,
+    ApplicationType,
+    CityType,
+)
 from api.graphql.reservation_units.reservation_unit_filtersets import (
     EquipmentFilterSet,
     ReservationUnitsFilterSet,
@@ -82,6 +89,7 @@ from permissions.api_permissions.graphene_field_decorators import (
 )
 from permissions.api_permissions.graphene_permissions import (
     AgeGroupPermission,
+    ApplicationEventPermission,
     ApplicationPermission,
     ApplicationRoundPermission,
     CityPermission,
@@ -166,6 +174,47 @@ class ApplicationsFilter(AuthFilter, django_filters.FilterSet):
                 application_events__event_reservation_units__reservation_unit__unit__in=units
             )
             | Q(user=user)
+        ).distinct()
+
+
+class ApplicationEventsFilter(AuthFilter, django_filters.FilterSet):
+    permission_classes = (
+        (ApplicationEventPermission,)
+        if not settings.TMP_PERMISSIONS_DISABLED
+        else [AllowAny]
+    )
+
+    @classmethod
+    def resolve_queryset(
+        cls, connection, iterable, info, args, filtering_args, filterset_class
+    ):
+        queryset = super().resolve_queryset(
+            connection, iterable, info, args, filtering_args, filterset_class
+        )
+
+        if settings.TMP_PERMISSIONS_DISABLED:
+            return queryset
+
+        # Filtering queries formation
+        user = info.context.user
+        unit_ids = user.unit_roles.filter(
+            role__permissions__permission="can_validate_applications"
+        ).values_list("unit", flat=True)
+        group_ids = user.unit_roles.filter(
+            role__permissions__permission="can_validate_applications"
+        ).values_list("unit_group", flat=True)
+        units = Unit.objects.filter(
+            Q(id__in=unit_ids) | Q(unit_groups__in=group_ids)
+        ).values_list("id", flat=True)
+
+        return queryset.filter(
+            Q(
+                application__application_round__service_sector__in=get_service_sectors_where_can_view_applications(
+                    user
+                )
+            )
+            | Q(event_reservation_units__reservation_unit__unit__in=units)
+            | Q(application__user=user)
         ).distinct()
 
 
@@ -342,6 +391,9 @@ class ServiceSectorFilter(AuthFilter):
 class Query(graphene.ObjectType):
     applications = ApplicationsFilter(
         ApplicationType, filterset_class=ApplicationFilterSet
+    )
+    application_events = ApplicationEventsFilter(
+        ApplicationEventType, filterset_class=ApplicationEventFilterSet
     )
     application_rounds = ApplicationRoundFilter(ApplicationRoundType)
 

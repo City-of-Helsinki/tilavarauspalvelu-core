@@ -414,7 +414,7 @@ snapshots['ApplicationsGraphQLTestCase::test_application_application_events_abil
     }
 }
 
-snapshots['ApplicationsGraphQLTestCase::test_application_application_events_age_group_display_fields 1'] = {
+snapshots['ApplicationsGraphQLTestCase::test_application_application_events_age_group 1'] = {
     'data': {
         'applications': {
             'edges': [
@@ -422,7 +422,7 @@ snapshots['ApplicationsGraphQLTestCase::test_application_application_events_age_
                     'node': {
                         'applicationEvents': [
                             {
-                                'ageGroupDisplay': {
+                                'ageGroup': {
                                     'maximum': 15,
                                     'minimum': 10
                                 }
