@@ -46,6 +46,8 @@ class ReservationUnitsFilterSet(django_filters.FilterSet):
 
     is_draft = django_filters.BooleanFilter(field_name="is_draft")
 
+    is_archived = django_filters.BooleanFilter(field_name="is_archived")
+
     is_visible = django_filters.BooleanFilter(method="get_is_visible")
 
     application_round = django_filters.ModelMultipleChoiceFilter(
@@ -158,7 +160,7 @@ class ReservationUnitsFilterSet(django_filters.FilterSet):
 
     def get_is_visible(self, qs, property, value):
         today = datetime.datetime.now(tz=get_default_timezone())
-        qs = qs.filter(is_draft=False)
+        qs = qs.filter(is_draft=False, is_archived=False)
         published = (Q(publish_begins__lte=today) | Q(publish_begins__isnull=True)) & (
             Q(publish_ends__gt=today) | Q(publish_ends__isnull=True)
         )

@@ -58,6 +58,42 @@ snapshots['ReservationUnitQueryTestCase::test_filtering_by_active_application_ro
     }
 }
 
+snapshots['ReservationUnitQueryTestCase::test_filtering_by_is_archived_false 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'isArchived': False,
+                        'nameFi': 'test name fi'
+                    }
+                },
+                {
+                    'node': {
+                        'isArchived': False,
+                        'nameFi': "I'm visible"
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitQueryTestCase::test_filtering_by_is_archived_true 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'isArchived': True,
+                        'nameFi': "I'm visible"
+                    }
+                }
+            ]
+        }
+    }
+}
+
 snapshots['ReservationUnitQueryTestCase::test_filtering_by_is_draft_false 1'] = {
     'data': {
         'reservationUnits': {

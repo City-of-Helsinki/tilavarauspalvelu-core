@@ -1030,6 +1030,62 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         assert_that(content.get("errors")).is_none()
         self.assertMatchSnapshot(content)
 
+    def test_filtering_by_is_archived_true(self):
+        ReservationUnitFactory(
+            name="I'm hiding",
+            is_archived=False,
+        )
+        ReservationUnitFactory(
+            name="I'm visible",
+            is_archived=True,
+        )
+        response = self.query(
+            """
+            query {
+                reservationUnits(isArchived: true) {
+                    edges {
+                        node {
+                            nameFi
+                            isArchived
+                        }
+                    }
+                }
+            }
+            """
+        )
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filtering_by_is_archived_false(self):
+        ReservationUnitFactory(
+            name="I'm visible",
+            is_archived=False,
+        )
+        ReservationUnitFactory(
+            name="I'm hiding",
+            is_archived=True,
+        )
+        response = self.query(
+            """
+            query {
+                reservationUnits(isArchived: false) {
+                    edges {
+                        node {
+                            nameFi
+                            isArchived
+                        }
+                    }
+                }
+            }
+            """
+        )
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
     def test_filtering_by_is_visible_true(self):
         today = datetime.datetime.now(tz=get_default_timezone())
         # No publish times should be included in results.
@@ -1068,6 +1124,14 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             name_fi="I shouldn't be included!",
             publish_ends=today - datetime.timedelta(days=1),
             publish_begins=None,
+        )
+
+        # Archived units shouldn't be included
+        ReservationUnitFactory(
+            name_fi="I shouldn't be included because I'm archived!",
+            publish_begins=today - datetime.timedelta(days=5),
+            publish_ends=today + datetime.timedelta(days=10),
+            is_archived=True,
         )
 
         response = self.query(
