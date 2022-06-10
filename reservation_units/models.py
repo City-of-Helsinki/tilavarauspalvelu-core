@@ -475,6 +475,14 @@ class ReservationUnit(models.Model):
         blank=False,
     )
 
+    is_archived = models.BooleanField(
+        verbose_name=_("Is reservation unit archived"),
+        default=False,
+        help_text="Is reservation unit archived.",
+        blank=False,
+        db_index=True,
+    )
+
     class Meta:
         ordering = ("id",)
 

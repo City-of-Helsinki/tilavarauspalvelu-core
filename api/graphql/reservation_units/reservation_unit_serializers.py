@@ -231,6 +231,10 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
         help_text="Allow reservations without opening hours. Used for testing.",
     )
 
+    is_archived = serializers.BooleanField(
+        required=False, default=False, help_text="Is reservation unit archived"
+    )
+
     translation_fields = get_all_translatable_fields(ReservationUnit)
 
     class Meta(ReservationUnitSerializer.Meta):
@@ -284,6 +288,7 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
             "reservations_max_days_before",
             "reservations_min_days_before",
             "allow_reservations_without_opening_hours",
+            "is_archived",
         ] + get_all_translatable_fields(ReservationUnit)
 
     def __init__(self, *args, **kwargs):

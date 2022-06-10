@@ -219,6 +219,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
                             reservationsMaxDaysBefore
                             reservationsMinDaysBefore
                             allowReservationsWithoutOpeningHours
+                            isArchived
                           }
                         }
                     }

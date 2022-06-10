@@ -560,6 +560,7 @@ snapshots['ReservationUnitQueryTestCase::test_getting_reservation_units 1'] = {
                         'highestPrice': '20.00',
                         'images': [
                         ],
+                        'isArchived': False,
                         'location': None,
                         'lowestPrice': '0.00',
                         'maxPersons': 110,
