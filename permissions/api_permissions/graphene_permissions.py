@@ -67,7 +67,7 @@ class ApplicationEventPermission(BasePermission):
     @classmethod
     def has_mutation_permission(cls, root: Any, info: ResolveInfo, input: dict) -> bool:
         pk = input.get("pk")
-        application_pk = input.get("application_id")
+        application_pk = input.get("application")
         application = None
         if pk:
             try:
