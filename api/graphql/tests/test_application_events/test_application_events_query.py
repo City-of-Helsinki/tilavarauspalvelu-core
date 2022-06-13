@@ -3,7 +3,10 @@ import json
 from assertpy import assert_that
 
 from api.graphql.tests.test_application_events.base import ApplicationEventTestCaseBase
-from applications.models import ApplicationEventStatus
+from applications.models import (
+    ApplicationEventStatus,
+    ApplicationEventWeeklyAmountReduction,
+)
 from applications.tests.factories import ApplicationEventFactory, ApplicationFactory
 
 
@@ -109,6 +112,7 @@ class ApplicationEventQueryTestCase(ApplicationEventTestCaseBase):
         self.assertMatchSnapshot(content)
 
     def test_filter_by_reservation_unit(self):
+        self.maxDiff = None
         application = ApplicationFactory()
         ApplicationEventFactory(application=application, name="I shouldn't be listed")
         filter_clause = (
@@ -126,6 +130,29 @@ class ApplicationEventQueryTestCase(ApplicationEventTestCaseBase):
         filter_clause = f"user: {self.application.user.id}"
 
         response = self.query(self.get_query(filter_section=filter_clause))
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
+        self.assertMatchSnapshot(content)
+
+    def test_application_event_reduction_count(self):
+        event = ApplicationEventFactory()
+        ApplicationEventWeeklyAmountReduction.objects.create(
+            application_event=event,
+        )
+        query = """query {
+                        applicationEvents(pk: %s) {
+                            edges {
+                                node {
+                                    weeklyAmountReductionsCount
+                                }
+                            }
+                        }
+                    }
+                    """ % (
+            event.id
+        )
+
+        response = self.query(query)
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
         self.assertMatchSnapshot(content)
