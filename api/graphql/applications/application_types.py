@@ -111,10 +111,12 @@ class ApplicationEventScheduleType(AuthNode, PrimaryKeyObjectType):
     permission_classes = (
         (AllowAuthenticated,) if not settings.TMP_PERMISSIONS_DISABLED else [AllowAny]
     )
+    day = graphene.Int()
+    priority = graphene.Int()
 
     class Meta:
         model = ApplicationEventSchedule
-        fields = ("id", "day", "begin", "end", "priority")
+        fields = ("id", "pk", "day", "begin", "end", "priority")
         filter_fields = ()
         interfaces = (graphene.relay.Node,)
         connection_class = TilavarausBaseConnection

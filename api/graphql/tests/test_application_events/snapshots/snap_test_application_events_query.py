@@ -7,6 +7,20 @@ from snapshottest import Snapshot
 
 snapshots = Snapshot()
 
+snapshots['ApplicationEventQueryTestCase::test_application_event_reduction_count 1'] = {
+    'data': {
+        'applicationEvents': {
+            'edges': [
+                {
+                    'node': {
+                        'weeklyAmountReductionsCount': 1
+                    }
+                }
+            ]
+        }
+    }
+}
+
 snapshots['ApplicationEventQueryTestCase::test_filter_by_application 1'] = {
     'data': {
         'applicationEvents': {
@@ -76,21 +90,21 @@ snapshots['ApplicationEventQueryTestCase::test_filter_by_reservation_unit 1'] = 
                         'applicationEventSchedules': [
                             {
                                 'begin': '12:00:00',
-                                'day': 'A_1',
+                                'day': 1,
                                 'end': '13:00:00',
-                                'priority': 'A_300'
+                                'priority': 300
                             },
                             {
                                 'begin': '13:00:00',
-                                'day': 'A_2',
+                                'day': 2,
                                 'end': '14:00:00',
-                                'priority': 'A_200'
+                                'priority': 200
                             },
                             {
                                 'begin': '14:00:00',
-                                'day': 'A_3',
+                                'day': 3,
                                 'end': '15:00:00',
-                                'priority': 'A_100'
+                                'priority': 100
                             }
                         ],
                         'eventReservationUnits': [
@@ -147,21 +161,21 @@ snapshots['ApplicationEventQueryTestCase::test_filter_by_unit 1'] = {
                         'applicationEventSchedules': [
                             {
                                 'begin': '12:00:00',
-                                'day': 'A_1',
+                                'day': 1,
                                 'end': '13:00:00',
-                                'priority': 'A_300'
+                                'priority': 300
                             },
                             {
                                 'begin': '13:00:00',
-                                'day': 'A_2',
+                                'day': 2,
                                 'end': '14:00:00',
-                                'priority': 'A_200'
+                                'priority': 200
                             },
                             {
                                 'begin': '14:00:00',
-                                'day': 'A_3',
+                                'day': 3,
                                 'end': '15:00:00',
-                                'priority': 'A_100'
+                                'priority': 100
                             }
                         ],
                         'eventReservationUnits': [
@@ -198,21 +212,21 @@ snapshots['ApplicationEventQueryTestCase::test_filter_by_user 1'] = {
                         'applicationEventSchedules': [
                             {
                                 'begin': '12:00:00',
-                                'day': 'A_1',
+                                'day': 1,
                                 'end': '13:00:00',
-                                'priority': 'A_300'
+                                'priority': 300
                             },
                             {
                                 'begin': '13:00:00',
-                                'day': 'A_2',
+                                'day': 2,
                                 'end': '14:00:00',
-                                'priority': 'A_200'
+                                'priority': 200
                             },
                             {
                                 'begin': '14:00:00',
-                                'day': 'A_3',
+                                'day': 3,
                                 'end': '15:00:00',
-                                'priority': 'A_100'
+                                'priority': 100
                             }
                         ],
                         'eventReservationUnits': [
@@ -249,21 +263,21 @@ snapshots['ApplicationEventQueryTestCase::test_query_ok 1'] = {
                         'applicationEventSchedules': [
                             {
                                 'begin': '12:00:00',
-                                'day': 'A_1',
+                                'day': 1,
                                 'end': '13:00:00',
-                                'priority': 'A_300'
+                                'priority': 300
                             },
                             {
                                 'begin': '13:00:00',
-                                'day': 'A_2',
+                                'day': 2,
                                 'end': '14:00:00',
-                                'priority': 'A_200'
+                                'priority': 200
                             },
                             {
                                 'begin': '14:00:00',
-                                'day': 'A_3',
+                                'day': 3,
                                 'end': '15:00:00',
-                                'priority': 'A_100'
+                                'priority': 100
                             }
                         ],
                         'eventReservationUnits': [

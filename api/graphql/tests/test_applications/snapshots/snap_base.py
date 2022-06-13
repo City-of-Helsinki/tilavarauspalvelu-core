@@ -469,21 +469,21 @@ snapshots['ApplicationsGraphQLTestCase::test_application_application_events_appl
                                 'applicationEventSchedules': [
                                     {
                                         'begin': '12:00:00',
-                                        'day': 'A_1',
+                                        'day': 1,
                                         'end': '13:00:00',
-                                        'priority': 'A_300'
+                                        'priority': 300
                                     },
                                     {
                                         'begin': '13:00:00',
-                                        'day': 'A_2',
+                                        'day': 2,
                                         'end': '14:00:00',
-                                        'priority': 'A_200'
+                                        'priority': 200
                                     },
                                     {
                                         'begin': '14:00:00',
-                                        'day': 'A_3',
+                                        'day': 3,
                                         'end': '15:00:00',
-                                        'priority': 'A_100'
+                                        'priority': 100
                                     }
                                 ]
                             }
