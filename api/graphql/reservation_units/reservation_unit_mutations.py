@@ -1,4 +1,7 @@
+import logging
+
 import graphene
+from auditlog.models import LogEntry
 from django.conf import settings
 from graphene import ClientIDMutation
 from graphene_django.rest_framework.mutation import SerializerMutation
@@ -39,9 +42,12 @@ from reservation_units.models import (
     Equipment,
     EquipmentCategory,
     Purpose,
+    ReservationUnit,
     ReservationUnitImage,
 )
 from reservation_units.utils.hauki_exporter import ReservationUnitHaukiExporter
+
+logger = logging.getLogger(__name__)
 
 
 class EquipmentCreateMutation(AuthSerializerMutation, SerializerMutation):
@@ -212,6 +218,41 @@ class ReservationUnitUpdateMutation(
         if not settings.TMP_PERMISSIONS_DISABLED
         else (AllowAny,)
     )
+
+    def remove_personal_data_and_logs_on_archive(input):
+        """When reservation unit is archived, we want to delete all personally identifiable information (GDPR stuff).
+        Because all changes are stored to the audit log, we also need to delete old audit events related to the unit.
+        """
+        if "is_archived" not in input:
+            return
+
+        reservation_unit_pk = input["pk"]
+        reservation_unit = ReservationUnit.objects.get(pk=reservation_unit_pk)
+        old_archived_value = reservation_unit.is_archived
+        new_archived_value = input["is_archived"]
+
+        if not new_archived_value or old_archived_value == new_archived_value:
+            return
+
+        # Don't allow new contact information to be saved when reservation unit is archived
+        if "contact_information" in input:
+            del input["contact_information"]
+
+        # Reset contact information
+        reservation_unit.contact_information = ""
+        reservation_unit.save()
+
+        deleted_log_entries = LogEntry.objects.get_for_object(reservation_unit).delete()
+
+        logger.info(
+            f"Reservation unit {reservation_unit_pk} archived. Content information "
+            + f"removed and {deleted_log_entries} audit log entries deleted."
+        )
+
+    @classmethod
+    def mutate(cls, root, info, input):
+        cls.remove_personal_data_and_logs_on_archive(input)
+        return super().mutate(root, info, input)
 
     class Meta:
         model_operations = ["update"]

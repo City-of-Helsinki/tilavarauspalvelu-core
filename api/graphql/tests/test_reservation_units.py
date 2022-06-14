@@ -5,8 +5,10 @@ from unittest import mock
 
 import snapshottest
 from assertpy import assert_that
+from auditlog.models import LogEntry
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.contrib.contenttypes.models import ContentType
 from django.test import override_settings
 from django.utils.timezone import get_default_timezone
 from freezegun import freeze_time
@@ -45,6 +47,7 @@ from services.tests.factories import ServiceFactory
 from spaces.tests.factories import SpaceFactory, UnitFactory
 from terms_of_use.models import TermsOfUse
 from terms_of_use.tests.factories import TermsOfUseFactory
+from tilavarauspalvelu.utils.auditlog_util import AuditLogger
 
 DEFAULT_TIMEZONE = get_default_timezone()
 
@@ -219,6 +222,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
                             reservationsMaxDaysBefore
                             reservationsMinDaysBefore
                             allowReservationsWithoutOpeningHours
+                            isArchived
                           }
                         }
                     }
@@ -1029,6 +1033,62 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         assert_that(content.get("errors")).is_none()
         self.assertMatchSnapshot(content)
 
+    def test_filtering_by_is_archived_true(self):
+        ReservationUnitFactory(
+            name="I'm hiding",
+            is_archived=False,
+        )
+        ReservationUnitFactory(
+            name="I'm visible",
+            is_archived=True,
+        )
+        response = self.query(
+            """
+            query {
+                reservationUnits(isArchived: true) {
+                    edges {
+                        node {
+                            nameFi
+                            isArchived
+                        }
+                    }
+                }
+            }
+            """
+        )
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filtering_by_is_archived_false(self):
+        ReservationUnitFactory(
+            name="I'm visible",
+            is_archived=False,
+        )
+        ReservationUnitFactory(
+            name="I'm hiding",
+            is_archived=True,
+        )
+        response = self.query(
+            """
+            query {
+                reservationUnits(isArchived: false) {
+                    edges {
+                        node {
+                            nameFi
+                            isArchived
+                        }
+                    }
+                }
+            }
+            """
+        )
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
     def test_filtering_by_is_visible_true(self):
         today = datetime.datetime.now(tz=get_default_timezone())
         # No publish times should be included in results.
@@ -1067,6 +1127,14 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             name_fi="I shouldn't be included!",
             publish_ends=today - datetime.timedelta(days=1),
             publish_begins=None,
+        )
+
+        # Archived units shouldn't be included
+        ReservationUnitFactory(
+            name_fi="I shouldn't be included because I'm archived!",
+            publish_begins=today - datetime.timedelta(days=5),
+            publish_ends=today + datetime.timedelta(days=10),
+            is_archived=True,
         )
 
         response = self.query(
@@ -2716,13 +2784,16 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         )
 
 
+@override_settings(AUDIT_LOGGING_ENABLED=True)
 class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
+        AuditLogger.register(ReservationUnit)
         cls.res_unit = ReservationUnitFactory(
             is_draft=True,
             name="Resunit name",
+            contact_information="Sonya Blade",
             unit=cls.unit,
         )
 
@@ -2913,6 +2984,48 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
         assert_that(content.get("errors")).is_none()
         assert_that(res_unit_data.get("errors")).is_none()
         assert_that(send_resource_mock.call_count).is_equal_to(0)
+
+    def test_contact_information_removal_on_archive(self):
+        data = self.get_valid_update_data()
+        data["isArchived"] = True
+        data["contactInformation"] = "Liu Kang"
+
+        response = self.query(self.get_update_query(), input_data=data)
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        res_unit_data = content.get("data").get("updateReservationUnit")
+        assert_that(res_unit_data.get("errors")).is_none()
+
+        self.res_unit.refresh_from_db()
+        assert_that(self.res_unit.is_archived).is_equal_to(True)
+        assert_that(self.res_unit.contact_information).is_equal_to("")
+
+    def test_audit_log_deletion_on_archive(self):
+        content_type_id = ContentType.objects.get(
+            app_label="reservation_units", model="reservationunit"
+        ).id
+        log_entry_count = LogEntry.objects.filter(
+            content_type_id=content_type_id, object_id=self.res_unit.pk
+        ).count()
+
+        assert_that(log_entry_count).is_greater_than(1)
+
+        data = self.get_valid_update_data()
+        data["isArchived"] = True
+        data["contactInformation"] = "Liu Kang"
+
+        response = self.query(self.get_update_query(), input_data=data)
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        res_unit_data = content.get("data").get("updateReservationUnit")
+        assert_that(res_unit_data.get("errors")).is_none()
+
+        log_entry_count = LogEntry.objects.filter(
+            content_type_id=content_type_id, object_id=self.res_unit.pk
+        ).count()
+        assert_that(log_entry_count).is_equal_to(1)
 
 
 class ReservationUnitUpdateNotDraftTestCase(ReservationUnitMutationsTestCaseBase):
