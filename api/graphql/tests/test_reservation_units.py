@@ -223,6 +223,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
                             reservationsMinDaysBefore
                             allowReservationsWithoutOpeningHours
                             isArchived
+                            state
                           }
                         }
                     }
@@ -1692,6 +1693,136 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         )
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_empty()
+
+    def test_that_state_is_draft(self):
+        self.reservation_unit.name = "This should be draft"
+        self.reservation_unit.is_draft = True
+        self.reservation_unit.save()
+        response = self.query(
+            f"""
+            query {{
+                reservationUnits(pk: {self.reservation_unit.id}) {{
+                    edges {{
+                        node {{
+                            nameFi
+                            state
+                        }}
+                    }}
+                }}
+            }}
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(self.content_is_empty(content)).is_false()
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_that_state_is_archived(self):
+        self.reservation_unit.name = "This should be archived"
+        self.reservation_unit.is_draft = False
+        self.reservation_unit.is_archived = True
+        self.reservation_unit.save()
+        response = self.query(
+            f"""
+            query {{
+                reservationUnits(pk: {self.reservation_unit.id}) {{
+                    edges {{
+                        node {{
+                            nameFi
+                            state
+                        }}
+                    }}
+                }}
+            }}
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(self.content_is_empty(content)).is_false()
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_that_state_is_scheduled_publishing(self):
+        now = datetime.datetime.now(tz=get_default_timezone())
+
+        self.reservation_unit.name = "This should be scheduled publishing"
+        self.reservation_unit.is_draft = False
+        self.reservation_unit.is_archived = False
+        self.reservation_unit.publish_begins = now + datetime.timedelta(hours=1)
+        self.reservation_unit.save()
+        response = self.query(
+            f"""
+            query {{
+                reservationUnits(pk: {self.reservation_unit.id}) {{
+                    edges {{
+                        node {{
+                            nameFi
+                            state
+                        }}
+                    }}
+                }}
+            }}
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(self.content_is_empty(content)).is_false()
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_that_state_is_scheduled_reservation(self):
+        now = datetime.datetime.now(tz=get_default_timezone())
+
+        self.reservation_unit.name = "This should be scheduled reservation"
+        self.reservation_unit.is_draft = False
+        self.reservation_unit.is_archived = False
+        self.reservation_unit.reservation_begins = now + datetime.timedelta(hours=1)
+        self.reservation_unit.save()
+        response = self.query(
+            f"""
+            query {{
+                reservationUnits(pk: {self.reservation_unit.id}) {{
+                    edges {{
+                        node {{
+                            nameFi
+                            state
+                        }}
+                    }}
+                }}
+            }}
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(self.content_is_empty(content)).is_false()
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_that_state_is_published(self):
+        self.reservation_unit.name = "This should be published"
+        self.reservation_unit.is_draft = False
+        self.reservation_unit.is_archived = False
+        self.reservation_unit.publish_begins = None
+        self.reservation_unit.publish_ends = None
+        self.reservation_unit.reservation_begins = None
+        self.reservation_unit.reservation_ends = None
+
+        self.reservation_unit.save()
+        response = self.query(
+            f"""
+            query {{
+                reservationUnits(pk: {self.reservation_unit.id}) {{
+                    edges {{
+                        node {{
+                            nameFi
+                            state
+                        }}
+                    }}
+                }}
+            }}
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(self.content_is_empty(content)).is_false()
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
 
 
 class ReservationUnitsFilterTextSearchTestCase(ReservationUnitQueryTestCaseBase):

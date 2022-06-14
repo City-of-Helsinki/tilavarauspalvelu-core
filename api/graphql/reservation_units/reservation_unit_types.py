@@ -303,6 +303,7 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
     buffer_time_before = Duration()
     buffer_time_after = Duration()
     metadata_set = graphene.Field(ReservationMetadataSetType)
+    state = graphene.String()
 
     permission_classes = (
         (ReservationUnitPermission,)
@@ -358,6 +359,7 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
             "reservations_min_days_before",
             "allow_reservations_without_opening_hours",
             "is_archived",
+            "state",
         ] + get_all_translatable_fields(model)
         filter_fields = {
             "name_fi": ["exact", "icontains", "istartswith"],
@@ -504,6 +506,7 @@ class ReservationUnitByPkType(ReservationUnitType, OpeningHoursMixin):
             "reservations_min_days_before",
             "allow_reservations_without_opening_hours",
             "is_archived",
+            "state",
         ] + get_all_translatable_fields(model)
 
         interfaces = (graphene.relay.Node,)
