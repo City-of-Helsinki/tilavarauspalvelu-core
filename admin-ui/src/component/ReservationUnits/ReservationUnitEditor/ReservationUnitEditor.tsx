@@ -38,7 +38,7 @@ import {
   UNIT_WITH_SPACES_AND_RESOURCES,
 } from "../../../common/queries";
 import { OptionType } from "../../../common/types";
-import { ContentContainer } from "../../../styles/layout";
+import { ContentContainer, Span12, Span3, Span6 } from "../../../styles/layout";
 
 import { ButtonsStripe, WhiteButton } from "../../../styles/util";
 import Loader from "../../Loader";
@@ -52,14 +52,11 @@ import ImageEditor from "./ImageEditor";
 import DateTimeInput from "./DateTimeInput";
 import {
   ButtonsContainer,
-  Span3,
   Editor,
   EditorContainer,
   EditorGrid,
-  Span6,
   Preview,
   PublishingTime,
-  Span12,
   Wrapper,
   Span4,
   Error,

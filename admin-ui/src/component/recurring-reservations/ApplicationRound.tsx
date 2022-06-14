@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { AxiosError } from "axios";
-import Review from "./Review";
+import Review from "./review/Review";
 import Allocation from "./Allocation";
 import Handling from "./Handling";
 import PreApproval from "./PreApproval";

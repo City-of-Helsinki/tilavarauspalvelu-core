@@ -1,20 +1,17 @@
-import { Button, IconAngleDown, IconAngleUp, Tag, TextInput } from "hds-react";
-import { get, isEmpty, omit } from "lodash";
+import { Button, IconAngleDown, IconAngleUp, TextInput } from "hds-react";
+import { isEmpty } from "lodash";
 import React, { useEffect, useReducer, useState } from "react";
 import { useQuery } from "@apollo/client";
-import { TFunction, useTranslation } from "react-i18next";
+import { useTranslation } from "react-i18next";
 import i18next from "i18next";
 import styled from "styled-components";
 import { breakpoints } from "../../styles/util";
-import {
-  Query,
-  QueryReservationUnitTypesArgs,
-  QueryUnitsArgs,
-} from "../../common/gql-types";
-import { UNITS_QUERY } from "../../common/queries";
+import { Query, QueryReservationUnitTypesArgs } from "../../common/gql-types";
 import SortedCompobox from "../ReservationUnits/ReservationUnitEditor/SortedCompobox";
 import { RESERVATION_UNIT_TYPES_QUERY } from "./queries";
 import { OptionType } from "../../common/types";
+import UnitFilter from "../filters/UnitFilter";
+import Tags, { Action, getReducer, toTags } from "../lists/Tags";
 
 export type FilterArguments = {
   nameFi?: string;
@@ -24,10 +21,9 @@ export type FilterArguments = {
   surfaceAreaLte?: string;
   unit: OptionType[];
   reservationUnitType: OptionType[];
-  sort?: string;
 };
 
-const arrayFileds = ["unit", "reservationUnitType"];
+const multivaluedFields = ["unit", "reservationUnitType"];
 
 type Props = {
   onSearch: (args: FilterArguments) => void;
@@ -55,12 +51,6 @@ const RangeContrainer = styled.div`
   text-align: center;
 `;
 
-const Tags = styled.div`
-  display: flex;
-  gap: var(--spacing-s);
-  flex-wrap: wrap;
-`;
-
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
@@ -80,107 +70,6 @@ const ThinButton = styled(Button)`
 const Buttons = styled.div``;
 
 export const emptyState = { reservationUnitType: [], unit: [] };
-
-type Action =
-  | { type: "set"; value: Partial<FilterArguments> }
-  | { type: "deleteTag"; field: keyof FilterArguments; value?: string }
-  | { type: "reset" };
-
-const reducer = (state: FilterArguments, action: Action): FilterArguments => {
-  switch (action.type) {
-    case "set": {
-      return { ...state, ...action.value };
-    }
-
-    case "reset": {
-      return emptyState;
-    }
-
-    case "deleteTag": {
-      if (arrayFileds.includes(action.field)) {
-        return {
-          ...state,
-          [action.field]: (state[action.field] as OptionType[]).filter(
-            (v) => v.value !== action.value
-          ),
-        };
-      }
-      return omit(state, action.field) as FilterArguments;
-    }
-
-    default:
-      return { ...state };
-  }
-};
-
-type UnitComboboxProps = {
-  onChange: (units: OptionType[]) => void;
-  value: OptionType[];
-};
-
-const UnitCombobox = ({ onChange, value }: UnitComboboxProps): JSX.Element => {
-  const { t } = useTranslation();
-  const { data, loading } = useQuery<Query, QueryUnitsArgs>(UNITS_QUERY, {});
-
-  if (loading) {
-    return <>{t("ReservationUnitsSearch.unit")}</>;
-  }
-
-  return (
-    <SortedCompobox
-      sort
-      label={t("ReservationUnitsSearch.unitLabel")}
-      multiselect
-      placeholder={t("ReservationUnitsSearch.unitPlaceHolder")}
-      options={(data?.units?.edges || [])
-        .map((e) => e?.node)
-        .map((unit) => ({
-          label: unit?.nameFi as string,
-          value: String(unit?.pk as number),
-        }))}
-      value={value}
-      onChange={onChange}
-      id="reservation-unit-combobox"
-    />
-  );
-};
-
-type Tag = {
-  key: string;
-  value: string;
-  ac: Action;
-};
-
-const toTags = (state: FilterArguments, t: TFunction): Tag[] => {
-  return (Object.keys(state) as unknown as (keyof FilterArguments)[]).flatMap(
-    (key) => {
-      if (arrayFileds.includes(key)) {
-        return (get(state, key) as []).map(
-          (v: OptionType) =>
-            ({
-              key: `${key}.${v.value}`,
-              value: v.label,
-              ac: { type: "deleteTag", field: key, value: v.value },
-            } as Tag)
-        );
-      }
-
-      return [
-        {
-          key,
-          value:
-            key === "nameFi"
-              ? `"${state.nameFi}"`
-              : t(`ReservationUnitsSearch.filter.${key}`),
-          ac: {
-            type: "deleteTag",
-            field: key,
-          },
-        } as Tag,
-      ];
-    }
-  );
-};
 
 type TypeComboboxProps = {
   onChange: (reservationUnitType: OptionType[]) => void;
@@ -224,7 +113,7 @@ const MyTextInput = ({
 }: {
   id: keyof FilterArguments;
   value?: string;
-  dispatch: React.Dispatch<Action>;
+  dispatch: React.Dispatch<Action<FilterArguments>>;
 }) => (
   <TextInput
     id={id}
@@ -252,9 +141,12 @@ const MyTextInput = ({
   />
 );
 
-const SearchForm = ({ onSearch }: Props): JSX.Element => {
+const Filters = ({ onSearch }: Props): JSX.Element => {
   const { t } = useTranslation();
-  const [state, dispatch] = useReducer(reducer, emptyState);
+  const [state, dispatch] = useReducer(
+    getReducer<FilterArguments>(emptyState),
+    emptyState
+  );
   const [more, setMore] = useState(false);
 
   useEffect(() => {
@@ -262,7 +154,7 @@ const SearchForm = ({ onSearch }: Props): JSX.Element => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state]);
 
-  const tags = toTags(state, t);
+  const tags = toTags(state, t, multivaluedFields);
 
   return (
     <div>
@@ -282,7 +174,7 @@ const SearchForm = ({ onSearch }: Props): JSX.Element => {
             placeholder={t("ReservationUnitsSearch.textSearchPlaceHolder")}
             value={state.nameFi || ""}
           />
-          <UnitCombobox
+          <UnitFilter
             onChange={(e) => dispatch({ type: "set", value: { unit: e } })}
             value={state.unit}
           />
@@ -342,26 +234,9 @@ const SearchForm = ({ onSearch }: Props): JSX.Element => {
           )}
         </ThinButton>
       </Buttons>
-      {tags.length ? (
-        <Tags>
-          {tags.map((tag) => (
-            <Tag id={tag.key} onDelete={() => dispatch(tag.ac)} key={tag.key}>
-              {tag.value}
-            </Tag>
-          ))}
-          {tags.length > 0 && (
-            <Tag
-              id="delete"
-              onDelete={() => dispatch({ type: "reset" })}
-              theme={{ "--tag-background": "transparent" }}
-            >
-              {t("ReservationUnitsSearch.clear")}
-            </Tag>
-          )}
-        </Tags>
-      ) : null}
+      <Tags tags={tags} t={t} dispatch={dispatch} />
     </div>
   );
 };
 
-export default SearchForm;
+export default Filters;

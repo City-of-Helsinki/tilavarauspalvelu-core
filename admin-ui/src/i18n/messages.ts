@@ -743,6 +743,21 @@ const translations: ITranslations = {
       ],
     },
   },
+  Units: {
+    description: ["Toimipisteen tietoja hallitaan"],
+    descriptionLinkLabel: ["toimipisterekisterin kautta"],
+    descriptionLinkHref: ["https://asiointi.hel.fi/tprperhe/etusivu/"],
+    filters: {
+      nameLabel: ["Toimipisteen nimi"],
+      serviceSector: ["Palvelu"],
+      serviceSectorTag: ["Palvelu: {{value}}"],
+    },
+    headings: {
+      name: ["Toimipisteen nimi"],
+      serviceSector: ["Palvelu"],
+      reservationUnitCount: ["Varausyksiköitä"],
+    },
+  },
   Unit: {
     headings: {
       name: ["Nimi"],

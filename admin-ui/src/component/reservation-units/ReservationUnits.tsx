@@ -4,9 +4,10 @@ import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { H1 } from "../../styles/new-typography";
 import withMainMenu from "../withMainMenu";
-import SearchForm, { FilterArguments, emptyState } from "./Filters";
+import Filters, { FilterArguments, emptyState } from "./Filters";
 import ReservationUnitsDataReader, { Sort } from "./ReservationUnitsDataLoader";
 import BreadcrumbWrapper from "../BreadcrumbWrapper";
+import { HR } from "../lists/components";
 
 const Wrapper = styled.div`
   display: flex;
@@ -18,13 +19,7 @@ const Wrapper = styled.div`
   max-width: var(--container-width-l);
 `;
 
-const HR = styled.hr`
-  border: 0;
-  border-top: 1px solid var(--color-black-20);
-  width: 100%;
-`;
-
-const ReservationUnitsSearch = (): JSX.Element => {
+const ReservationUnits = (): JSX.Element => {
   const [search, setSearch] = useState<FilterArguments>(emptyState);
   const [sort, setSort] = useState<Sort>();
   const debouncedSearch = debounce((value) => setSearch(value), 300);
@@ -46,7 +41,7 @@ const ReservationUnitsSearch = (): JSX.Element => {
           <H1>{t("ReservationUnits.reservationUnitListHeading")}</H1>
           <p>{t("ReservationUnits.reservationUnitListDescription")}</p>
         </div>
-        <SearchForm onSearch={debouncedSearch} />
+        <Filters onSearch={debouncedSearch} />
         <HR />
         <ReservationUnitsDataReader
           key={JSON.stringify({ ...search, ...sort })}
@@ -59,4 +54,4 @@ const ReservationUnitsSearch = (): JSX.Element => {
   );
 };
 
-export default withMainMenu(ReservationUnitsSearch);
+export default withMainMenu(ReservationUnits);

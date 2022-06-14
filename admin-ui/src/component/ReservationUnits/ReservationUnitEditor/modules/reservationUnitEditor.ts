@@ -1,51 +1,17 @@
 import styled from "styled-components";
 import { Fieldset as HDSFieldset } from "hds-react";
+import { Grid, Span4 as DefaultSpan4 } from "../../../../styles/layout";
 import { breakpoints } from "../../../../styles/util";
 
-export const EditorGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
-
-  align-items: baseline;
-  gap: var(--spacing-m);
+export const EditorGrid = styled(Grid)`
   margin-top: var(--spacing-s);
   padding-bottom: var(--spacing-m);
 `;
 
-export const Span3 = styled.div`
-  grid-column: span 12;
-  @media (min-width: ${breakpoints.l}) {
-    grid-column: span 3;
-  }
-  @media (min-width: ${breakpoints.xl}) {
-    grid-column: span 3;
-  }
-`;
-
-export const Span4 = styled.div`
+export const Span4 = styled(DefaultSpan4)`
   label {
     white-space: nowrap;
   }
-
-  grid-column: span 12;
-  @media (min-width: ${breakpoints.m}) {
-    grid-column: span 6;
-  }
-  @media (min-width: ${breakpoints.l}) {
-    grid-column: span 4;
-  }
-`;
-
-export const Span6 = styled.div`
-  grid-column: span 12;
-
-  @media (min-width: ${breakpoints.l}) {
-    grid-column: span 6;
-  }
-`;
-
-export const Span12 = styled.div`
-  grid-column: span 12;
 `;
 
 export const Wrapper = styled.div`

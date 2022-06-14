@@ -2,8 +2,7 @@ import { format, parseISO } from "date-fns";
 import i18next from "i18next";
 import trim from "lodash/trim";
 import upperFirst from "lodash/upperFirst";
-import get from "lodash/get";
-import { groupBy } from "lodash";
+import { groupBy, set, get } from "lodash";
 import {
   AllocationResult,
   ApplicationEventSchedule,
@@ -16,7 +15,7 @@ import {
   NormalizedApplicationRoundStatus,
   TranslationObject,
 } from "./types";
-import { LocationType } from "./gql-types";
+import { LocationType, Query } from "./gql-types";
 
 export const formatDate = (
   date: string | null,
@@ -355,4 +354,20 @@ export const filterData = <T>(data: T[], filters: DataFilterOption[]): T[] => {
 
     return groupsMatched.length === groupCount;
   });
+};
+
+export const combineResults = (
+  previousResult: Query,
+  fetchMoreResult: Query,
+  arg2: string
+): Query => {
+  const combined = { ...previousResult };
+  set(combined, arg2, {
+    ...get(previousResult, arg2),
+    edges: get(previousResult, arg2).edges.concat(
+      get(fetchMoreResult, arg2).edges
+    ),
+  });
+
+  return combined;
 };
