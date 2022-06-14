@@ -130,7 +130,7 @@ snapshots['ApplicationEventQueryTestCase::test_filter_by_status 1'] = {
                         ],
                         'name': 'Only I should be listed',
                         'numPersons': None,
-                        'status': 'validated'
+                        'status': 'approved'
                     }
                 }
             ]

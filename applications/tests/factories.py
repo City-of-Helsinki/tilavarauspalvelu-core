@@ -229,7 +229,6 @@ class ApplicationStatusFactory(DjangoModelFactory):
             ApplicationStatus.DRAFT,
             ApplicationStatus.IN_REVIEW,
             ApplicationStatus.REVIEW_DONE,
-            ApplicationStatus.DECLINED,
             ApplicationStatus.CANCELLED,
         ]
     )
@@ -246,9 +245,11 @@ class ApplicationRoundStatusFactory(DjangoModelFactory):
             ApplicationRoundStatus.IN_REVIEW,
             ApplicationRoundStatus.REVIEW_DONE,
             ApplicationRoundStatus.ALLOCATED,
+            ApplicationRoundStatus.RESERVING,
             ApplicationRoundStatus.HANDLED,
-            ApplicationRoundStatus.VALIDATED,
-            ApplicationRoundStatus.APPROVED,
+            ApplicationRoundStatus.SENDING,
+            ApplicationRoundStatus.SENT,
+            ApplicationRoundStatus.ARCHIVED,
         ]
     )
     application_round = SubFactory(ApplicationRoundFactory)
@@ -261,9 +262,9 @@ class ApplicationEventStatusFactory(DjangoModelFactory):
     status = FuzzyChoice(
         choices=[
             ApplicationEventStatus.CREATED,
-            ApplicationEventStatus.ALLOCATED,
-            ApplicationEventStatus.VALIDATED,
             ApplicationEventStatus.APPROVED,
+            ApplicationEventStatus.RESERVED,
+            ApplicationEventStatus.FAILED,
             ApplicationEventStatus.DECLINED,
         ]
     )

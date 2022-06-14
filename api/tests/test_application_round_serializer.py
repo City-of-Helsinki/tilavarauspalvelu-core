@@ -25,7 +25,6 @@ def test_should_not_be_sent_when_one_in_sent_status_affecting_status(
     "does_not_affect_sent_status",
     [
         ApplicationStatus.DRAFT,
-        ApplicationStatus.DECLINED,
         ApplicationStatus.CANCELLED,
         ApplicationStatus.SENT,
     ],

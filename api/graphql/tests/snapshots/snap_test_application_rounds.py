@@ -39,7 +39,6 @@ snapshots['ApplicationRoundQueryTestCase::test_getting_application_rounds 1'] = 
                         ],
                         'applicationsCount': 1,
                         'applicationsSent': False,
-                        'approvedBy': '',
                         'criteriaEn': 'Criteria en',
                         'criteriaFi': 'Criteria fi',
                         'criteriaSv': 'Criteria sv',

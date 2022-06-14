@@ -83,7 +83,6 @@ class ApplicationRoundType(AuthNode, PrimaryKeyObjectType):
     reservation_units = graphene.List(ReservationUnitType)
     application_round_baskets = graphene.List(ApplicationRoundBasketType)
     aggregated_data = graphene.Field(ApplicationRoundAggregatedDataType)
-    approved_by = graphene.String()
     applications_sent = graphene.Boolean()
     applications_count = graphene.Int()
     reservation_unit_count = graphene.Int()
@@ -109,7 +108,6 @@ class ApplicationRoundType(AuthNode, PrimaryKeyObjectType):
             "application_round_baskets",
             "allocating",
             "aggregated_data",
-            "approved_by",
             "applications_sent",
             "target_group",
         ] + get_all_translatable_fields(model)
@@ -148,21 +146,6 @@ class ApplicationRoundType(AuthNode, PrimaryKeyObjectType):
         allocation_result_dict.update(self.aggregated_data_dict)
 
         return allocation_result_dict
-
-    def resolve_approved_by(self, info: graphene.ResolveInfo):
-        request_user = getattr(info.context, "user", None)
-
-        if not request_user or not request_user.is_authenticated:
-            return ""
-
-        approved_status = self.statuses.filter(
-            status=ApplicationRoundStatus.APPROVED
-        ).first()
-
-        if not getattr(approved_status, "user", None):
-            return ""
-
-        return approved_status.user.get_full_name()
 
     def resolve_applications_sent(self, info: graphene.ResolveInfo):
         not_sent = self.applications.filter(

@@ -46,9 +46,10 @@ class AllocationResultMapper(object):
                 )
 
                 ApplicationEventStatus.objects.create(
-                    status=ApplicationEventStatus.ALLOCATED,
+                    status=ApplicationEventStatus.APPROVED,
                     application_event=application_event_schedule.application_event,
                 )
+
                 application_events.append(application_event_schedule.application_event)
             except Exception:
                 logger.exception(

@@ -16,7 +16,6 @@ from opening_hours.hours import get_opening_hours
 from reservation_units.models import ReservationUnit
 
 excluded_application_statuses = [
-    ApplicationStatus.DECLINED,
     ApplicationStatus.CANCELLED,
 ]
 

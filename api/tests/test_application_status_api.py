@@ -187,7 +187,7 @@ class ApplicationEventStatusApiPermissionsTestCase(ApplicationStatusBaseTestCase
         response = self.applicant_api_client.post(
             reverse("application_event_status-list"),
             data={
-                "status": ApplicationEventStatus.VALIDATED,
+                "status": ApplicationEventStatus.APPROVED,
                 "application_event_id": self.application_event.id,
             },
         )
@@ -206,29 +206,6 @@ class ApplicationEventStatusApiPermissionsTestCase(ApplicationStatusBaseTestCase
             ApplicationEventStatus.CREATED
         )
 
-    def test_service_sector_manager_can_create_validated_status(self):
-        response = self.manager_api_client.post(
-            reverse("application_event_status-list"),
-            data={
-                "status": ApplicationEventStatus.VALIDATED,
-                "application_event_id": self.application_event.id,
-            },
-        )
-        assert_that(response.status_code).is_equal_to(201)
-
-    def test_unit_handler_can_create_validated_status(self):
-        response = self.unit_handler_client.post(
-            reverse("application_event_status-list"),
-            data={
-                "status": ApplicationEventStatus.VALIDATED,
-                "application_event_id": self.application_event.id,
-            },
-        )
-        assert_that(response.status_code).is_equal_to(201)
-        assert_that(ApplicationEventStatus.objects.latest("id").status).is_equal_to(
-            ApplicationEventStatus.VALIDATED
-        )
-
     @mock.patch(
         "applications.utils.reservation_creation.ReservationScheduler",
         wraps=MockedScheduler,
@@ -245,42 +222,6 @@ class ApplicationEventStatusApiPermissionsTestCase(ApplicationStatusBaseTestCase
         assert_that(ApplicationEventStatus.objects.latest("id").status).is_equal_to(
             ApplicationEventStatus.APPROVED
         )
-
-    def test_service_sector_manager_can_create_validated_status_for_multiple(self):
-        second_application_event = ApplicationEventFactory(
-            application=self.application,
-            events_per_week=1,
-            begin=datetime.date.today(),
-            end=datetime.date.today() + datetime.timedelta(weeks=4),
-        )
-        body = [
-            {
-                "status": ApplicationEventStatus.VALIDATED,
-                "application_event_id": self.application_event.id,
-            },
-            {
-                "status": ApplicationEventStatus.VALIDATED,
-                "application_event_id": second_application_event.id,
-            },
-        ]
-        response = self.manager_api_client.post(
-            reverse("application_event_status-list"), data=body, format="json"
-        )
-        assert_that(response.status_code).is_equal_to(201)
-        assert_that(
-            ApplicationEventStatus.objects.filter(
-                application_event=self.application_event
-            )
-            .latest("id")
-            .status
-        ).is_equal_to(ApplicationEventStatus.VALIDATED)
-        assert_that(
-            ApplicationEventStatus.objects.filter(
-                application_event=second_application_event
-            )
-            .latest("id")
-            .status
-        ).is_equal_to(ApplicationEventStatus.VALIDATED)
 
     def test_status_change_with_empty_data_returns_403(self):
         response = self.applicant_api_client.post(

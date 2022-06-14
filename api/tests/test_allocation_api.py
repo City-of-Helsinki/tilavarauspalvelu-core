@@ -34,9 +34,13 @@ def test_allocation_request_create(
     [
         ApplicationRoundStatus.DRAFT,
         ApplicationRoundStatus.IN_REVIEW,
+        ApplicationRoundStatus.REVIEW_DONE,
+        ApplicationRoundStatus.ALLOCATED,
+        ApplicationRoundStatus.RESERVING,
         ApplicationRoundStatus.HANDLED,
-        ApplicationRoundStatus.VALIDATED,
-        ApplicationRoundStatus.APPROVED,
+        ApplicationRoundStatus.SENDING,
+        ApplicationRoundStatus.SENT,
+        ApplicationRoundStatus.ARCHIVED,
     ],
 )
 @pytest.mark.django_db

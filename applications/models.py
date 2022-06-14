@@ -209,18 +209,25 @@ class ApplicationRoundStatus(models.Model, StatusMixin):
     IN_REVIEW = "in_review"
     REVIEW_DONE = "review_done"
     ALLOCATED = "allocated"
+    RESERVING = "reserving"
     HANDLED = "handled"
-    VALIDATED = "validated"
-    APPROVED = "approved"
+    SENDING = "sending"
+    SENT = "sent"
+    ARCHIVED = "archived"
+
     STATUS_CHOICES = (
         (DRAFT, _("Draft")),
         (IN_REVIEW, _("In review")),
         (REVIEW_DONE, _("Review done")),
         (ALLOCATED, _("Allocated")),
+        (RESERVING, _("Reserving")),
         (HANDLED, _("Handled")),
-        (VALIDATED, _("Validated")),
-        (APPROVED, _("Approved")),
+        (SENDING, _("Sending")),
+        (SENT, _("Sent")),
+        (ARCHIVED, _("Archived")),
     )
+
+    CLOSED_STATUSES = [SENT, ARCHIVED]
 
     status = models.CharField(
         max_length=20, verbose_name=_("Status"), choices=STATUS_CHOICES
@@ -391,6 +398,7 @@ class ApplicationRound(models.Model):
             application_round=self, status=status, user=user
         )
         self.latest_status = status
+        self.update_application_status(status)
 
     def get_status(self):
         if hasattr(self, "latest_status"):
@@ -416,12 +424,85 @@ class ApplicationRound(models.Model):
     def create_aggregate_data(self):
         ApplicationRoundAggregateDataCreator(self).start()
 
+    def update_application_status(self, new_status: ApplicationRoundStatus):
+        import applications.utils.status_manager as status_manager
+
+        if new_status == ApplicationRoundStatus.IN_REVIEW:
+            status_manager.handle_applications_on_in_review(self)
+        elif new_status == ApplicationRoundStatus.REVIEW_DONE:
+            status_manager.handle_applications_on_review_done(self)
+        elif new_status == ApplicationRoundStatus.HANDLED:
+            status_manager.handle_applications_on_handled(self)
+        elif new_status == ApplicationRoundStatus.SENT:
+            status_manager.handle_applications_on_sent(self)
+
     @property
     def aggregated_data_dict(self):
         ret_dict = {}
         for row in self.aggregated_data.all():
             ret_dict[row.name] = row.value
         return ret_dict
+
+    def handle_applications_on_in_review(self):
+        applications = Application.objects.filter(
+            application_round=self,
+            latest_status__in=[ApplicationStatus.DRAFT, ApplicationStatus.RECEIVED],
+        )
+        for application in applications:
+            if application.status == ApplicationStatus.DRAFT:
+                application.status = ApplicationStatus.EXPIRED
+            elif application.status == ApplicationStatus.RECEIVED:
+                application.status = ApplicationStatus.IN_REVIEW
+
+            application.save()
+
+    def handle_applications_on_review_done(self):
+        applications = Application.objects.filter(
+            application_round=self,
+            latest_status=ApplicationStatus.IN_REVIEW,
+        )
+        for application in applications:
+            events = ApplicationEvent.objects.filter(
+                application=application,
+            )
+            declined_event_count = len(
+                list(
+                    filter(
+                        lambda event: event.status == ApplicationEventStatus.DECLINED,
+                        events,
+                    )
+                )
+            )
+            if len(events) > 0 and declined_event_count == len(events):
+                application.status = ApplicationStatus.ALLOCATED
+            else:
+                application.status = ApplicationStatus.REVIEW_DONE
+            application.save()
+
+    def handle_applications_on_handled(self):
+        applications = Application.objects.filter(
+            application_round=self,
+            latest_status=ApplicationStatus.ALLOCATED,
+        )
+        for application in applications:
+            application.status = ApplicationStatus.HANDLED
+            application.save()
+
+            events = ApplicationEvent.objects.filter(
+                application=application, latest_status=ApplicationEventStatus.APPROVED
+            )
+            for event in events:
+                event.status = ApplicationEventStatus.RESERVED
+                event.save()
+
+    def handle_applications_on_sent(self):
+        applications = Application.objects.filter(
+            application_round=self,
+            latest_status=ApplicationStatus.HANDLED,
+        )
+        for application in applications:
+            application.status = ApplicationStatus.SENT
+            application.save()
 
 
 class ApplicationRoundAggregateData(AggregateDataBase):
@@ -575,18 +656,24 @@ class ApplicationRoundBasket(CUSTOMER_TYPE_CONST, models.Model):
 
 class ApplicationStatus(models.Model, StatusMixin):
     DRAFT = "draft"
+    RECEIVED = "received"
     IN_REVIEW = "in_review"
     REVIEW_DONE = "review_done"
+    ALLOCATED = "allocated"
+    HANDLED = "handled"
     SENT = "sent"
-    DECLINED = "declined"
+    EXPIRED = "expired"
     CANCELLED = "cancelled"
 
     STATUS_CHOICES = (
         (DRAFT, _("Draft")),
+        (RECEIVED, _("Received")),
         (IN_REVIEW, _("In review")),
         (REVIEW_DONE, _("Review done")),
+        (ALLOCATED, _("Allocated")),
+        (HANDLED, _("Handled")),
         (SENT, _("Decision sent")),
-        (DECLINED, _("Declined")),
+        (EXPIRED, _("Expired")),
         (CANCELLED, _("Cancelled")),
     )
 
@@ -622,16 +709,16 @@ class ApplicationStatus(models.Model, StatusMixin):
 
 class ApplicationEventStatus(models.Model, StatusMixin):
     CREATED = "created"
-    ALLOCATED = "allocated"
-    VALIDATED = "validated"
     APPROVED = "approved"
+    RESERVED = "reserved"
+    FAILED = "failed"
     DECLINED = "declined"
 
     STATUS_CHOICES = (
         (CREATED, _("Created")),
-        (ALLOCATED, _("Allocated")),
-        (VALIDATED, _("Validated")),
         (APPROVED, _("Approved")),
+        (RESERVED, _("Reserved")),
+        (FAILED, _("Failed")),
         (DECLINED, _("Declined")),
     )
 

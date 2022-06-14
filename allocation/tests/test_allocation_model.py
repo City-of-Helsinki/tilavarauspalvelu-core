@@ -286,7 +286,7 @@ def test_mapping_application_round_baskets(
 
 @pytest.mark.parametrize(
     "application_status",
-    [ApplicationStatus.CANCELLED, ApplicationStatus.DECLINED],
+    [ApplicationStatus.CANCELLED],
 )
 @pytest.mark.django_db
 def test_should_exclude_cancelled_and_declined_applications(
