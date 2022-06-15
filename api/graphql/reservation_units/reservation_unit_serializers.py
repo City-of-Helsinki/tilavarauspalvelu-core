@@ -289,6 +289,7 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
             "reservations_min_days_before",
             "allow_reservations_without_opening_hours",
             "is_archived",
+            "state",
         ] + get_all_translatable_fields(ReservationUnit)
 
     def __init__(self, *args, **kwargs):
