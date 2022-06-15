@@ -29,7 +29,6 @@ class ResourceType(AuthNode, PrimaryKeyObjectType):
             "space",
             "buffer_time_before",
             "buffer_time_after",
-            "is_draft",
         ] + get_all_translatable_fields(model)
 
         filter_fields = {

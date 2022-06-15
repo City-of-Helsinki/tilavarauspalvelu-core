@@ -189,8 +189,7 @@
             "description_sv": "",
             "space": 1,
             "buffer_time_before": null,
-            "buffer_time_after": null,
-            "is_draft": false
+            "buffer_time_after": null
         }
     },
     {
@@ -208,8 +207,7 @@
             "description_sv": "",
             "space": 1,
             "buffer_time_before": null,
-            "buffer_time_after": null,
-            "is_draft": false
+            "buffer_time_after": null
         }
     },
     {
@@ -966,7 +964,7 @@
             "can_be_cancelled_time_before": "1 00:00:00",
             "needs_handling": false
         }
-  },
+    },
     {
         "model": "reservation_units.reservationunit",
         "pk": 1,

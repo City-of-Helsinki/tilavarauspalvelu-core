@@ -45,7 +45,6 @@ class ResourceCreateSerializer(ResourceSerializer, PrimaryKeySerializer):
             "space_pk",
             "buffer_time_before",
             "buffer_time_after",
-            "is_draft",
         ] + get_all_translatable_fields(Resource)
 
     def __init__(self, *args, **kwargs):
@@ -65,12 +64,9 @@ class ResourceCreateSerializer(ResourceSerializer, PrimaryKeySerializer):
                 f"Wrong type of location type. Values are {Resource.LOCATION_FIXED, Resource.LOCATION_MOVABLE}"
             )
 
-        is_draft = data.get("is_draft")
-
-        if not is_draft:
-            errors = self.validate_for_publish(data)
-            if errors:
-                raise errors.popitem()[1]
+        errors = self.validate_for_publish(data)
+        if errors:
+            raise errors.popitem()[1]
 
         return data
 
@@ -82,7 +78,6 @@ class ResourceCreateSerializer(ResourceSerializer, PrimaryKeySerializer):
             value = data.get(field)
             if not value or value.isspace():
                 validation_errors[field] = serializers.ValidationError(
-                    f"Not draft state resources must have a translations. "
                     f"Missing translation for {to_camel_case(field)}."
                 )
 
@@ -111,26 +106,20 @@ class ResourceUpdateSerializer(PrimaryKeyUpdateSerializer, ResourceCreateSeriali
                     f"Wrong type of location type. Values are {Resource.LOCATION_FIXED, Resource.LOCATION_MOVABLE}"
                 )
 
-        is_draft = data.get("is_draft", self.instance.is_draft)
-        if not is_draft:
-            for field, value in data.items():
-                if field in self.translation_fields:
-                    if not value or value == "" or value.isspace():
-                        raise serializers.ValidationError(
-                            f"Not draft state resources must have a translations. "
-                            f"Missing translation for {to_camel_case(field)}."
-                        )
+        for field, value in data.items():
+            if field in self.translation_fields:
+                if not value or value == "" or value.isspace():
+                    raise serializers.ValidationError(
+                        f"Missing translation for {to_camel_case(field)}."
+                    )
 
-                if field == "space":
-                    location_type = data.get("location_type")
-                    if not location_type:
-                        location_type = self.instance.location_type
-                    if (
-                        not data.get("space")
-                        and location_type == Resource.LOCATION_FIXED
-                    ):
-                        raise serializers.ValidationError(
-                            "Location type 'fixed' needs a space to be defined."
-                        )
+            if field == "space":
+                location_type = data.get("location_type")
+                if not location_type:
+                    location_type = self.instance.location_type
+                if not data.get("space") and location_type == Resource.LOCATION_FIXED:
+                    raise serializers.ValidationError(
+                        "Location type 'fixed' needs a space to be defined."
+                    )
 
         return data

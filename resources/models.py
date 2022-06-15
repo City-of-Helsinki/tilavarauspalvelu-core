@@ -26,11 +26,5 @@ class Resource(models.Model):
         verbose_name=_("Buffer time after"), blank=True, null=True
     )
 
-    is_draft = models.BooleanField(
-        verbose_name=_("Is the resource in draft state (=not publish ready)."),
-        default=False,
-        db_index=True,
-    )
-
     def __str__(self):
         return "{} ({})".format(self.name, self.space.name if self.space else "")
