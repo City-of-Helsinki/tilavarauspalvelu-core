@@ -167,9 +167,7 @@ class ResourceCreateForPublishGraphQLTestCase(ResourceGraphQLBase):
         content = json.loads(response.content)
         assert_that(
             content.get("data").get("createResource").get("errors")[0].get("messages")
-        ).contains(
-            "Not draft state resources must have a translations. Missing translation for nameSv."
-        )
+        ).contains("Missing translation for nameSv.")
         assert_that(Resource.objects.exclude(id=self.resource.id).count()).is_equal_to(
             0
         )
@@ -185,9 +183,7 @@ class ResourceCreateForPublishGraphQLTestCase(ResourceGraphQLBase):
         content = json.loads(response.content)
         assert_that(
             content.get("data").get("createResource").get("errors")[0].get("messages")
-        ).contains(
-            "Not draft state resources must have a translations. Missing translation for descriptionEn."
-        )
+        ).contains("Missing translation for descriptionEn.")
         assert_that(Resource.objects.exclude(id=self.resource.id).count()).is_equal_to(
             0
         )
@@ -277,7 +273,6 @@ class ResourceCreateAsDraftGraphQLTestCase(ResourceGraphQLBase):
             "nameSv": "svna",
             "spacePk": self.space.id,
             "locationType": Resource.LOCATION_FIXED,
-            "isDraft": True,
         }
 
     def test_resource_created(self):
@@ -407,9 +402,7 @@ class ResourceUpdateForPublishGraphQLTestCase(ResourceGraphQLBase):
         assert_that(content.get("errors")).is_none()
         assert_that(
             content.get("data").get("updateResource").get("errors")[0].get("messages")
-        ).contains(
-            "Not draft state resources must have a translations. Missing translation for nameSv."
-        )
+        ).contains("Missing translation for nameSv.")
 
     def test_validation_error_when_empty_description_translation(self):
         data = self.get_valid_input_data()
@@ -420,9 +413,7 @@ class ResourceUpdateForPublishGraphQLTestCase(ResourceGraphQLBase):
         assert_that(content.get("errors")).is_none()
         assert_that(
             content.get("data").get("updateResource").get("errors")[0].get("messages")
-        ).contains(
-            "Not draft state resources must have a translations. Missing translation for descriptionFi."
-        )
+        ).contains("Missing translation for descriptionFi.")
 
     def test_validation_error_when_try_to_null_space_and_fixed_location(self):
         data = self.get_valid_input_data()
@@ -488,9 +479,7 @@ class ResourceUpdateForPublishGraphQLTestCase(ResourceGraphQLBase):
         self.resource.refresh_from_db()
         assert_that(
             content.get("data").get("updateResource").get("errors")[0].get("messages")
-        ).contains(
-            "Not draft state resources must have a translations. Missing translation for descriptionFi."
-        )
+        ).contains("Missing translation for descriptionFi.")
 
     def test_partial_update_fails_when_removing_space_from_fixed_location(self):
         data = {"pk": self.resource.pk, "spacePk": None}
@@ -515,73 +504,6 @@ class ResourceUpdateForPublishGraphQLTestCase(ResourceGraphQLBase):
             .get("errors")[0]
             .get("messages")[0]
         ).contains("Wrong type of location type")
-
-
-class ResourceUpdateAsDraftGraphQLTestCase(ResourceGraphQLBase):
-    def setUp(self):
-        self.client.force_login(self.general_admin)
-
-    @classmethod
-    def setUpTestData(cls):
-        super().setUpTestData()
-        cls.resource.is_draft = True
-        cls.resource.save()
-
-    def get_update_query(self):
-        return "mutation updateResource($input: ResourceUpdateMutationInput!) {updateResource(input: $input){pk}}"
-
-    def get_valid_input_data(self):
-        return {"pk": self.resource.pk}
-
-    def test_resource_updated(self):
-        data = self.get_valid_input_data()
-        data["nameFi"] = "new FinnName"
-        response = self.query(self.get_update_query(), input_data=data)
-        assert_that(response.status_code).is_equal_to(200)
-        content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        assert_that(Resource.objects.get(id=self.resource.id).name).is_equal_to(
-            "new FinnName"
-        )
-
-    def test_updated_when_empty_name_translations(self):
-        data = self.get_valid_input_data()
-        data["nameEn"] = ""
-        response = self.query(self.get_update_query(), input_data=data)
-        assert_that(response.status_code).is_equal_to(200)
-        content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        assert_that(Resource.objects.get(id=self.resource.id).name_en).is_equal_to("")
-
-    def test_updated_when_empty_description_translation(self):
-        data = self.get_valid_input_data()
-        data["descriptionSv"] = ""
-        response = self.query(self.get_update_query(), input_data=data)
-        assert_that(response.status_code).is_equal_to(200)
-        content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        assert_that(
-            Resource.objects.get(id=self.resource.id).description_sv
-        ).is_equal_to("")
-
-    def test_updated_when_no_space_and_fixed_location(self):
-        data = self.get_valid_input_data()
-        data["spacePk"] = None
-        response = self.query(self.get_update_query(), input_data=data)
-        assert_that(response.status_code).is_equal_to(200)
-        content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        assert_that(Resource.objects.get(id=self.resource.id).space).is_none()
-
-    def test_regular_user_cannot_update(self):
-        self.client.force_login(self.regular_joe)
-        response = self.query(
-            self.get_update_query(),
-            input_data=self.get_valid_input_data(),
-        )
-        assert_that(response.status_code).is_equal_to(200)
-        content = json.loads(response.content)
-        assert_that(content.get("errors")).is_not_none()
 
 
 class ResourceDeleteGraphQLTestCase(ResourceGraphQLBase):
