@@ -20,10 +20,12 @@ from permissions.models import (
 from reservation_units.tests.factories import ReservationUnitFactory
 from spaces.tests.factories import UnitGroupFactory
 
-from .base import ApplicationEventTestCaseBase
+from .base import ApplicationEventPermissionsTestCaseBase
 
 
-class ApplicationEventsGraphQLPermissionsTestCase(ApplicationEventTestCaseBase):
+class ApplicationEventsGraphQLPermissionsTestCase(
+    ApplicationEventPermissionsTestCaseBase
+):
     def perform_basic_query(self):
         response = self.query(
             """
@@ -41,68 +43,6 @@ class ApplicationEventsGraphQLPermissionsTestCase(ApplicationEventTestCaseBase):
         )
 
         return response
-
-    def create_service_sector_admin(self):
-        service_sector_admin = get_user_model().objects.create(
-            username="ss_admin",
-            first_name="Amin",
-            last_name="Dee",
-            email="amin.dee@foo.com",
-        )
-
-        ServiceSectorRole.objects.create(
-            user=service_sector_admin,
-            role=ServiceSectorRoleChoice.objects.get(code="admin"),
-            service_sector=self.application.application_round.service_sector,
-        )
-        ServiceSectorRolePermission.objects.create(
-            role=ServiceSectorRoleChoice.objects.get(code="admin"),
-            permission="can_handle_applications",
-        )
-
-        return service_sector_admin
-
-    def create_unit_admin(self):
-        unit_group_admin = get_user_model().objects.create(
-            username="ss_admin",
-            first_name="Amin",
-            last_name="Dee",
-            email="amin.dee@foo.com",
-        )
-
-        unit_role = UnitRole.objects.create(
-            user=unit_group_admin,
-            role=UnitRoleChoice.objects.get(code="admin"),
-        )
-        UnitRolePermission.objects.create(
-            role=UnitRoleChoice.objects.get(code="admin"),
-            permission="can_validate_applications",
-        )
-
-        unit_role.unit.add(self.event_reservation_unit.reservation_unit.unit)
-
-        return unit_group_admin
-
-    def create_unit_group_admin(self):
-        unit_admin = get_user_model().objects.create(
-            username="ss_admin",
-            first_name="Amin",
-            last_name="Dee",
-            email="amin.dee@foo.com",
-        )
-
-        unit_role = UnitRole.objects.create(
-            user=unit_admin,
-            role=UnitRoleChoice.objects.get(code="admin"),
-        )
-        UnitRolePermission.objects.create(
-            role=UnitRoleChoice.objects.get(code="admin"),
-            permission="can_validate_applications",
-        )
-
-        unit_role.unit_group.add(self.unit_group)
-
-        return unit_admin
 
     def test_not_logged_in_user_does_not_receive_data(self):
         self.client.logout()
