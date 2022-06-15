@@ -46,8 +46,6 @@ class ReservationUnitsFilterSet(django_filters.FilterSet):
 
     is_draft = django_filters.BooleanFilter(field_name="is_draft")
 
-    is_archived = django_filters.BooleanFilter(field_name="is_archived")
-
     is_visible = django_filters.BooleanFilter(method="get_is_visible")
 
     application_round = django_filters.ModelMultipleChoiceFilter(

@@ -263,6 +263,16 @@ class ReservationUnitsFilter(AuthFilter, django_filters.FilterSet):
         else (AllowAny,)
     )
 
+    @classmethod
+    def resolve_queryset(
+        cls, connection, iterable, info, args, filtering_args, filterset_class
+    ):
+        queryset = super().resolve_queryset(
+            connection, iterable, info, args, filtering_args, filterset_class
+        )
+        # Hide archived reservation units
+        return queryset.filter(is_archived=False)
+
 
 class ReservationUnitTypesFilter(AuthFilter, django_filters.FilterSet):
     permission_classes = (

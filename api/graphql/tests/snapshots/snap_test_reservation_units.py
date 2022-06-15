@@ -58,42 +58,6 @@ snapshots['ReservationUnitQueryTestCase::test_filtering_by_active_application_ro
     }
 }
 
-snapshots['ReservationUnitQueryTestCase::test_filtering_by_is_archived_false 1'] = {
-    'data': {
-        'reservationUnits': {
-            'edges': [
-                {
-                    'node': {
-                        'isArchived': False,
-                        'nameFi': 'test name fi'
-                    }
-                },
-                {
-                    'node': {
-                        'isArchived': False,
-                        'nameFi': "I'm visible"
-                    }
-                }
-            ]
-        }
-    }
-}
-
-snapshots['ReservationUnitQueryTestCase::test_filtering_by_is_archived_true 1'] = {
-    'data': {
-        'reservationUnits': {
-            'edges': [
-                {
-                    'node': {
-                        'isArchived': True,
-                        'nameFi': "I'm visible"
-                    }
-                }
-            ]
-        }
-    }
-}
-
 snapshots['ReservationUnitQueryTestCase::test_filtering_by_is_draft_false 1'] = {
     'data': {
         'reservationUnits': {
@@ -1316,14 +1280,14 @@ snapshots['ReservationUnitQueryTestCase::test_order_by_unit_reverse_order 1'] = 
     }
 }
 
-snapshots['ReservationUnitQueryTestCase::test_that_state_is_archived 1'] = {
+snapshots['ReservationUnitQueryTestCase::test_should_not_return_archived_reservation_units 1'] = {
     'data': {
         'reservationUnits': {
             'edges': [
                 {
                     'node': {
-                        'nameFi': 'This should be archived',
-                        'state': 'archived'
+                        'isArchived': False,
+                        'nameFi': 'test name fi'
                     }
                 }
             ]
