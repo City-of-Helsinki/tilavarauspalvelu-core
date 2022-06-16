@@ -235,6 +235,30 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         assert_that(content.get("errors")).is_none()
         self.assertMatchSnapshot(content)
 
+    def test_should_not_return_archived_reservation_units(self):
+        ReservationUnitFactory(
+            name="I should be hiding",
+            is_archived=True,
+        )
+        response = self.query(
+            """
+            query {
+                reservationUnits {
+                    edges {
+                        node {
+                            nameFi
+                            isArchived
+                        }
+                    }
+                }
+            }
+            """
+        )
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
     def test_should_be_able_to_find_by_pk(self):
         query = (
             f"{{\n"
@@ -1034,62 +1058,6 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         assert_that(content.get("errors")).is_none()
         self.assertMatchSnapshot(content)
 
-    def test_filtering_by_is_archived_true(self):
-        ReservationUnitFactory(
-            name="I'm hiding",
-            is_archived=False,
-        )
-        ReservationUnitFactory(
-            name="I'm visible",
-            is_archived=True,
-        )
-        response = self.query(
-            """
-            query {
-                reservationUnits(isArchived: true) {
-                    edges {
-                        node {
-                            nameFi
-                            isArchived
-                        }
-                    }
-                }
-            }
-            """
-        )
-
-        content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        self.assertMatchSnapshot(content)
-
-    def test_filtering_by_is_archived_false(self):
-        ReservationUnitFactory(
-            name="I'm visible",
-            is_archived=False,
-        )
-        ReservationUnitFactory(
-            name="I'm hiding",
-            is_archived=True,
-        )
-        response = self.query(
-            """
-            query {
-                reservationUnits(isArchived: false) {
-                    edges {
-                        node {
-                            nameFi
-                            isArchived
-                        }
-                    }
-                }
-            }
-            """
-        )
-
-        content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        self.assertMatchSnapshot(content)
-
     def test_filtering_by_is_visible_true(self):
         today = datetime.datetime.now(tz=get_default_timezone())
         # No publish times should be included in results.
@@ -1697,30 +1665,6 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
     def test_that_state_is_draft(self):
         self.reservation_unit.name = "This should be draft"
         self.reservation_unit.is_draft = True
-        self.reservation_unit.save()
-        response = self.query(
-            f"""
-            query {{
-                reservationUnits(pk: {self.reservation_unit.id}) {{
-                    edges {{
-                        node {{
-                            nameFi
-                            state
-                        }}
-                    }}
-                }}
-            }}
-            """
-        )
-        content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_false()
-        assert_that(content.get("errors")).is_none()
-        self.assertMatchSnapshot(content)
-
-    def test_that_state_is_archived(self):
-        self.reservation_unit.name = "This should be archived"
-        self.reservation_unit.is_draft = False
-        self.reservation_unit.is_archived = True
         self.reservation_unit.save()
         response = self.query(
             f"""
