@@ -59,22 +59,110 @@ type ApplicationEventAggregatedDataType {
   allocationResultsReservationsTotal: Float
 }
 
+input ApplicationEventCreateMutationInput {
+  name: String
+  applicationEventSchedules: [ApplicationEventScheduleCreateSerializerInput]!
+  numPersons: Int
+
+  """Age group pk for this event"""
+  ageGroup: Int!
+
+  """AbilityGroup pk for this event"""
+  abilityGroup: Int!
+  minDuration: String
+  maxDuration: String
+
+  """Application pk for this event"""
+  application: Int!
+  eventsPerWeek: Int
+  biweekly: Boolean
+  begin: Date
+  end: Date
+
+  """ReservationPurpose pk for this event"""
+  purpose: Int!
+  eventReservationUnits: [EventReservationUnitCreateSerializerInput]!
+
+  """Status of this application event"""
+  status: String!
+  clientMutationId: String
+}
+
+type ApplicationEventCreateMutationPayload {
+  pk: Int
+  name: String
+  applicationEventSchedules: [ApplicationEventScheduleType]
+  numPersons: Int
+
+  """Age group pk for this event"""
+  ageGroup: Int
+
+  """AbilityGroup pk for this event"""
+  abilityGroup: Int
+  minDuration: String
+  maxDuration: String
+
+  """Application pk for this event"""
+  application: Int
+  eventsPerWeek: Int
+  biweekly: Boolean
+  begin: Date
+  end: Date
+
+  """ReservationPurpose pk for this event"""
+  purpose: Int
+  eventReservationUnits: [EventReservationUnitType]
+
+  """Status of this application event"""
+  status: String
+
+  """May contain more than one error for same field."""
+  errors: [ErrorType]
+  applicationEvent: ApplicationEventType
+  clientMutationId: String
+}
+
+input ApplicationEventDeleteMutationInput {
+  pk: Int!
+  clientMutationId: String
+}
+
+type ApplicationEventDeleteMutationPayload {
+  deleted: Boolean
+  errors: String
+  clientMutationId: String
+}
+
+input ApplicationEventScheduleCreateSerializerInput {
+  pk: Int
+  day: Int!
+
+  """Begin time of requested reservation allocation slot."""
+  begin: Time!
+
+  """End time of requested reservation allocation slot."""
+  end: Time!
+
+  """Priority of requested reservation allocation slot as an integer."""
+  priority: priority
+}
+
 type ApplicationEventScheduleType implements Node {
   """The ID of the object"""
   id: ID!
-  day: ApplicationsApplicationEventScheduleDayChoices!
+  day: Int
   begin: Time!
   end: Time!
-  priority: ApplicationsApplicationEventSchedulePriorityChoices!
+  priority: Int
   pk: Int
 }
 
 """An enumeration."""
 enum applicationEventStatus {
   created
-  allocated
-  validated
   approved
+  reserved
+  failed
   declined
 }
 
@@ -83,6 +171,7 @@ type ApplicationEventType implements Node {
   id: ID!
   name: String!
   numPersons: Int
+  ageGroup: AgeGroupType
   abilityGroup: AbilityGroupType
   minDuration: Float
   maxDuration: Float
@@ -93,17 +182,98 @@ type ApplicationEventType implements Node {
   purpose: ReservationPurposeType
   uuid: UUID!
   aggregatedData: ApplicationEventAggregatedDataType
-  eventReservationUnits: [EventReservationUnitType!]
-  applicationEventSchedules: [ApplicationEventScheduleType!]
+  eventReservationUnits: [EventReservationUnitType]
+  applicationEventSchedules: [ApplicationEventScheduleType]
   pk: Int
   ageGroupId: Int
   abilityGroupId: Int
   applicationId: Int
   purposeId: Int
-  ageGroupDisplay: AgeGroupType
   status: applicationEventStatus
   weeklyAmountReductionsCount: Int
   declinedReservationUnits: [ReservationUnitType!]
+}
+
+type ApplicationEventTypeConnection {
+  """Pagination data for this connection."""
+  pageInfo: PageInfo!
+
+  """Contains the nodes in this connection."""
+  edges: [ApplicationEventTypeEdge]!
+  totalCount: Int
+}
+
+"""A Relay edge containing a `ApplicationEventType` and its cursor."""
+type ApplicationEventTypeEdge {
+  """The item at the end of the edge"""
+  node: ApplicationEventType
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
+
+input ApplicationEventUpdateMutationInput {
+  pk: Int
+  name: String
+  applicationEventSchedules: [ApplicationEventScheduleCreateSerializerInput]
+  numPersons: Int
+
+  """Age group pk for this event"""
+  ageGroup: Int
+
+  """AbilityGroup pk for this event"""
+  abilityGroup: Int
+  minDuration: String
+  maxDuration: String
+
+  """Application pk for this event"""
+  application: Int
+  eventsPerWeek: Int
+  biweekly: Boolean
+  begin: Date
+  end: Date
+
+  """ReservationPurpose pk for this event"""
+  purpose: Int
+  eventReservationUnits: [EventReservationUnitCreateSerializerInput]
+
+  """Status of this application event"""
+  status: String
+  clientMutationId: String
+}
+
+type ApplicationEventUpdateMutationPayload {
+  pk: Int
+  name: String
+  applicationEventSchedules: [ApplicationEventScheduleType]
+  numPersons: Int
+
+  """Age group pk for this event"""
+  ageGroup: Int
+
+  """AbilityGroup pk for this event"""
+  abilityGroup: Int
+  minDuration: String
+  maxDuration: String
+
+  """Application pk for this event"""
+  application: Int
+  eventsPerWeek: Int
+  biweekly: Boolean
+  begin: Date
+  end: Date
+
+  """ReservationPurpose pk for this event"""
+  purpose: Int
+  eventReservationUnits: [EventReservationUnitType]
+
+  """Status of this application event"""
+  status: String
+
+  """May contain more than one error for same field."""
+  errors: [ErrorType]
+  applicationEvent: ApplicationEventType
+  clientMutationId: String
 }
 
 type ApplicationRoundAggregatedDataType {
@@ -133,9 +303,11 @@ enum applicationRoundStatus {
   in_review
   review_done
   allocated
+  reserving
   handled
-  validated
-  approved
+  sending
+  sent
+  archived
 }
 
 type ApplicationRoundType implements Node {
@@ -163,7 +335,6 @@ type ApplicationRoundType implements Node {
   pk: Int
   status: applicationRoundStatus
   statusTimestamp: DateTime
-  approvedBy: String
   applicationsSent: Boolean
   applicationsCount: Int
   reservationUnitCount: Int
@@ -203,42 +374,6 @@ enum ApplicationsApplicationApplicantTypeChoices {
 }
 
 """An enumeration."""
-enum ApplicationsApplicationEventScheduleDayChoices {
-  """maanantai"""
-  A_0
-
-  """tiistai"""
-  A_1
-
-  """keskiviikko"""
-  A_2
-
-  """torstai"""
-  A_3
-
-  """perjantai"""
-  A_4
-
-  """lauantai"""
-  A_5
-
-  """sunnuntai"""
-  A_6
-}
-
-"""An enumeration."""
-enum ApplicationsApplicationEventSchedulePriorityChoices {
-  """Low"""
-  A_100
-
-  """Medium"""
-  A_200
-
-  """High"""
-  A_300
-}
-
-"""An enumeration."""
 enum ApplicationsApplicationRoundTargetGroupChoices {
   """Internal"""
   INTERNAL
@@ -274,10 +409,13 @@ enum ApplicationsOrganisationOrganisationTypeChoices {
 """An enumeration."""
 enum applicationStatus {
   draft
+  received
   in_review
   review_done
+  allocated
+  handled
   sent
-  declined
+  expired
   cancelled
 }
 
@@ -295,7 +433,7 @@ type ApplicationType implements Node {
   createdDate: DateTime!
   lastModifiedDate: DateTime!
   aggregatedData: ApplicationAggregatedDataType
-  applicationEvents: [ApplicationEventType!]
+  applicationEvents: [ApplicationEventType]
   pk: Int
   applicationRoundId: Int
   status: applicationStatus
@@ -563,13 +701,25 @@ type ErrorType {
   messages: [String!]!
 }
 
+input EventReservationUnitCreateSerializerInput {
+  pk: Int
+
+  """
+  Priority of this reservation unit for the event. Lower the number, higher the priority.
+  """
+  priority: Int
+
+  """pk of the reservation unit requested for the event."""
+  reservationUnit: Int!
+}
+
 type EventReservationUnitType implements Node {
   """The ID of the object"""
   id: ID!
   priority: Int
+  reservationUnit: ReservationUnitType
   pk: Int
   reservationUnitId: Int
-  reservationUnitDetails: ReservationUnitType
 }
 
 type KeywordCategoryType implements Node {
@@ -675,6 +825,9 @@ type LocationType implements Node {
 }
 
 type Mutation {
+  createApplicationEvent(input: ApplicationEventCreateMutationInput!): ApplicationEventCreateMutationPayload
+  updateApplicationEvent(input: ApplicationEventUpdateMutationInput!): ApplicationEventUpdateMutationPayload
+  deleteApplicationEvent(input: ApplicationEventDeleteMutationInput!): ApplicationEventDeleteMutationPayload
   createReservation(input: ReservationCreateMutationInput!): ReservationCreateMutationPayload
   updateReservation(input: ReservationUpdateMutationInput!): ReservationUpdateMutationPayload
   confirmReservation(input: ReservationConfirmMutationInput!): ReservationConfirmMutationPayload
@@ -779,6 +932,18 @@ type PersonType implements Node {
   pk: Int
 }
 
+"""An enumeration."""
+enum priority {
+  """Low"""
+  A_100
+
+  """Medium"""
+  A_200
+
+  """High"""
+  A_300
+}
+
 input PurposeCreateMutationInput {
   nameFi: String
   nameEn: String
@@ -860,6 +1025,23 @@ type Query {
     """Järjestys"""
     orderBy: String = null
   ): ApplicationTypeConnection
+  applicationEvents(
+    offset: Int = null
+    before: String = null
+    after: String = null
+    first: Int = null
+    last: Int = null
+    applicationRound: ID = null
+    status: String = null
+    unit: [ID] = null
+    user: ID = null
+    pk: [ID] = null
+    application: ID = null
+    reservationUnit: [ID] = null
+
+    """Järjestys"""
+    orderBy: String = null
+  ): ApplicationEventTypeConnection
   applicationRounds(offset: Int = null, before: String = null, after: String = null, first: Int = null, last: Int = null, nameFi: String = null, nameFi_Icontains: String = null, nameFi_Istartswith: String = null, nameSv: String = null, nameSv_Icontains: String = null, nameSv_Istartswith: String = null, nameEn: String = null, nameEn_Icontains: String = null, nameEn_Istartswith: String = null): ApplicationRoundTypeConnection
   reservations(
     offset: Int = null
@@ -952,7 +1134,22 @@ type Query {
     id: ID!
   ): SpaceType
   spaceByPk(pk: Int = null): SpaceType
-  units(offset: Int = null, before: String = null, after: String = null, first: Int = null, last: Int = null, nameFi: String = null, nameFi_Icontains: String = null, nameFi_Istartswith: String = null, nameSv: String = null, nameSv_Icontains: String = null, nameSv_Istartswith: String = null, nameEn: String = null, nameEn_Icontains: String = null, nameEn_Istartswith: String = null): UnitTypeConnection
+  serviceSectors(offset: Int = null, before: String = null, after: String = null, first: Int = null, last: Int = null): ServiceSectorTypeConnection
+  units(
+    offset: Int = null
+    before: String = null
+    after: String = null
+    first: Int = null
+    last: Int = null
+    pk: [ID] = null
+    nameFi: String = null
+    nameEn: String = null
+    nameSv: String = null
+    serviceSector: Float = null
+
+    """Järjestys"""
+    orderBy: String = null
+  ): UnitTypeConnection
   unit(
     """The ID of the object"""
     id: ID!
@@ -1570,6 +1767,9 @@ type ReservationUnitByPkType implements Node {
   Is it possible to reserve this reservation unit when opening hours are not defined.
   """
   allowReservationsWithoutOpeningHours: Boolean!
+
+  """Is reservation unit archived."""
+  isArchived: Boolean!
   images: [ReservationUnitImageType]
 
   """The ID of the object"""
@@ -1587,6 +1787,7 @@ type ReservationUnitByPkType implements Node {
   paymentTerms: TermsOfUseType
   cancellationTerms: TermsOfUseType
   serviceSpecificTerms: TermsOfUseType
+  state: String
   nextAvailableSlot: DateTime
   haukiUrl: ReservationUnitHaukiUrlType
 }
@@ -1718,18 +1919,21 @@ input ReservationUnitCreateMutationInput {
 
   """Allow reservations without opening hours. Used for testing."""
   allowReservationsWithoutOpeningHours: Boolean
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
+
+  """Is reservation unit archived"""
+  isArchived: Boolean
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   additionalInstructionsFi: String
   additionalInstructionsEn: String
   additionalInstructionsSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
   clientMutationId: String
 }
 
@@ -1839,18 +2043,22 @@ type ReservationUnitCreateMutationPayload {
 
   """Allow reservations without opening hours. Used for testing."""
   allowReservationsWithoutOpeningHours: Boolean
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
+
+  """Is reservation unit archived"""
+  isArchived: Boolean
+  state: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   additionalInstructionsFi: String
   additionalInstructionsEn: String
   additionalInstructionsSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -2103,6 +2311,9 @@ type ReservationUnitType implements Node {
   Is it possible to reserve this reservation unit when opening hours are not defined.
   """
   allowReservationsWithoutOpeningHours: Boolean!
+
+  """Is reservation unit archived."""
+  isArchived: Boolean!
   images: [ReservationUnitImageType]
   applicationRounds(active: Boolean = null): [ApplicationRoundType]
 
@@ -2114,6 +2325,7 @@ type ReservationUnitType implements Node {
   unit: UnitType
   keywordGroups: [KeywordGroupType]
   reservations(from: Date = null, to: Date = null, state: [String] = null): [ReservationType]
+  state: String
 }
 
 type ReservationUnitTypeConnection {
@@ -2258,18 +2470,21 @@ input ReservationUnitUpdateMutationInput {
 
   """Allow reservations without opening hours. Used for testing."""
   allowReservationsWithoutOpeningHours: Boolean
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
+
+  """Is reservation unit archived"""
+  isArchived: Boolean
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   additionalInstructionsFi: String
   additionalInstructionsEn: String
   additionalInstructionsSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
   clientMutationId: String
 }
 
@@ -2379,18 +2594,22 @@ type ReservationUnitUpdateMutationPayload {
 
   """Allow reservations without opening hours. Used for testing."""
   allowReservationsWithoutOpeningHours: Boolean
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
+
+  """Is reservation unit archived"""
+  isArchived: Boolean
+  state: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   additionalInstructionsFi: String
   additionalInstructionsEn: String
   additionalInstructionsSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -2547,7 +2766,6 @@ input ResourceCreateMutationInput {
   Dynamically calculated from spaces and resources.
   """
   bufferTimeAfter: Int
-  isDraft: Boolean
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
@@ -2575,7 +2793,6 @@ type ResourceCreateMutationPayload {
   Dynamically calculated from spaces and resources.
   """
   bufferTimeAfter: Int
-  isDraft: Boolean
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
@@ -2620,7 +2837,6 @@ type ResourceType implements Node {
   space: SpaceType
   bufferTimeBefore: Duration
   bufferTimeAfter: Duration
-  isDraft: Boolean!
 
   """The ID of the object"""
   id: ID!
@@ -2664,7 +2880,6 @@ input ResourceUpdateMutationInput {
   Dynamically calculated from spaces and resources.
   """
   bufferTimeAfter: Int
-  isDraft: Boolean
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
@@ -2692,7 +2907,6 @@ type ResourceUpdateMutationPayload {
   Dynamically calculated from spaces and resources.
   """
   bufferTimeAfter: Int
-  isDraft: Boolean
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
@@ -2713,6 +2927,24 @@ type ServiceSectorType implements Node {
   nameEn: String
   nameSv: String
   pk: Int
+}
+
+type ServiceSectorTypeConnection {
+  """Pagination data for this connection."""
+  pageInfo: PageInfo!
+
+  """Contains the nodes in this connection."""
+  edges: [ServiceSectorTypeEdge]!
+  totalCount: Int
+}
+
+"""A Relay edge containing a `ServiceSectorType` and its cursor."""
+type ServiceSectorTypeEdge {
+  """The item at the end of the edge"""
+  node: ServiceSectorType
+
+  """A cursor for use in pagination"""
+  cursor: String!
 }
 
 """An enumeration."""
@@ -3011,6 +3243,7 @@ type UnitByPkType implements Node {
   reservationUnits: [ReservationUnitType]
   spaces: [SpaceType]
   location: LocationType
+  serviceSectors: [ServiceSectorType]
 }
 
 type UnitType implements Node {
@@ -3034,6 +3267,7 @@ type UnitType implements Node {
   reservationUnits: [ReservationUnitType]
   spaces: [SpaceType]
   location: LocationType
+  serviceSectors: [ServiceSectorType]
 }
 
 type UnitTypeConnection {
