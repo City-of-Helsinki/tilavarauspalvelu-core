@@ -2,11 +2,8 @@ from enum import Enum
 
 
 class ReservationUnitState(Enum):
-    DRAFT = "draft"
-    SCHEDULED_PUBLISHING = "scheduledPublishing"
-    SCHEDULED_RESERVATION = "scheduledReservation"
-    PUBLISHED = "published"
-    ARCHIVED = "archived"
-
-    def __str__(self):
-        return self.value
+    DRAFT = "DRAFT"
+    SCHEDULED_PUBLISHING = "SCHEDULED_PUBLISHING"
+    SCHEDULED_RESERVATION = "SCHEDULED_RESERVATION"
+    PUBLISHED = "PUBLISHED"
+    ARCHIVED = "ARCHIVED"

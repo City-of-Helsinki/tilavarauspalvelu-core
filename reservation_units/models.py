@@ -573,7 +573,7 @@ class ReservationUnit(models.Model):
         return settings.HAUKI_ORIGIN_ID
 
     @property
-    def state(self) -> str:
+    def state(self) -> ReservationUnitState:
         now = datetime.datetime.now(tz=get_default_timezone())
         if self.is_archived:
             return ReservationUnitState.ARCHIVED

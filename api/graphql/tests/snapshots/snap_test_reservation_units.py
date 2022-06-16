@@ -611,7 +611,7 @@ snapshots['ReservationUnitQueryTestCase::test_getting_reservation_units 1'] = {
                                 'nameFi': 'Small space'
                             }
                         ],
-                        'state': 'scheduledReservation',
+                        'state': 'SCHEDULED_RESERVATION',
                         'surfaceArea': '150.00',
                         'taxPercentage': {
                             'value': '24.00'
@@ -1302,7 +1302,7 @@ snapshots['ReservationUnitQueryTestCase::test_that_state_is_draft 1'] = {
                 {
                     'node': {
                         'nameFi': 'This should be draft',
-                        'state': 'draft'
+                        'state': 'DRAFT'
                     }
                 }
             ]
@@ -1317,7 +1317,7 @@ snapshots['ReservationUnitQueryTestCase::test_that_state_is_published 1'] = {
                 {
                     'node': {
                         'nameFi': 'This should be published',
-                        'state': 'published'
+                        'state': 'PUBLISHED'
                     }
                 }
             ]
@@ -1332,7 +1332,7 @@ snapshots['ReservationUnitQueryTestCase::test_that_state_is_scheduled_publishing
                 {
                     'node': {
                         'nameFi': 'This should be scheduled publishing',
-                        'state': 'scheduledPublishing'
+                        'state': 'SCHEDULED_PUBLISHING'
                     }
                 }
             ]
@@ -1347,7 +1347,7 @@ snapshots['ReservationUnitQueryTestCase::test_that_state_is_scheduled_reservatio
                 {
                     'node': {
                         'nameFi': 'This should be scheduled reservation',
-                        'state': 'scheduledReservation'
+                        'state': 'SCHEDULED_RESERVATION'
                     }
                 }
             ]
