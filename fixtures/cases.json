@@ -183,10 +183,6 @@
             "name_fi": "Kitara 1",
             "name_en": null,
             "name_sv": null,
-            "description": "",
-            "description_fi": "",
-            "description_en": "",
-            "description_sv": "",
             "space": 1,
             "buffer_time_before": null,
             "buffer_time_after": null
@@ -201,10 +197,6 @@
             "name_fi": "Basso 1",
             "name_en": null,
             "name_sv": null,
-            "description": "",
-            "description_fi": "",
-            "description_en": "",
-            "description_sv": "",
             "space": 1,
             "buffer_time_before": null,
             "buffer_time_after": null
