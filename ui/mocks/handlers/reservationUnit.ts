@@ -319,6 +319,7 @@ const selectedReservationUnitQuery = graphql.query<
     canApplyFreeOfCharge: false,
     reservationKind:
       ReservationUnitsReservationUnitReservationKindChoices.DirectAndSeason,
+    isArchived: false,
   };
 
   if (req.variables.pk === 800) {
@@ -622,6 +623,7 @@ const relatedReservationUnitsData: ReservationUnitTypeConnection = {
         canApplyFreeOfCharge: false,
         reservationKind:
           ReservationUnitsReservationUnitReservationKindChoices.DirectAndSeason,
+        isArchived: false,
       },
       cursor: "YXJyYXljb25uZWN0aW9uOjA=",
     },
@@ -720,6 +722,7 @@ const relatedReservationUnitsData: ReservationUnitTypeConnection = {
         canApplyFreeOfCharge: false,
         reservationKind:
           ReservationUnitsReservationUnitReservationKindChoices.DirectAndSeason,
+        isArchived: false,
       },
       cursor: "YXJyYXljb25uZWN0aW9uOjE=",
     },

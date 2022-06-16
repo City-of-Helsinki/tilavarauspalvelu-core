@@ -24,7 +24,7 @@ describe("applications", () => {
 
     cy.checkA11y(null, null, null, true);
 
-    applicationGroups().should("have.length", 3);
+    applicationGroups().should("have.length", 2);
     applicationGroups().each((group, index) => {
       cy.wrap(group).find("h2").should("contain.text", groupData[index].title);
       cy.wrap(group)
@@ -48,13 +48,5 @@ describe("applications", () => {
     confirmationModal().find("button").eq(1).click();
 
     cy.contains("Hakemus on peruutettu onnistuneesti.").should("be.visible");
-
-    applicationGroups()
-      .eq(1)
-      .find('> div button[aria-label="Muokkaa hakemusta"]')
-      .eq(0)
-      .click();
-
-    cy.url().should("contain", "/application/6/page1");
   });
 });

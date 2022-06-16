@@ -47,8 +47,6 @@ const statusGroupOrder: ReducedApplicationStatus[] = [
   "sent",
   "processing",
   "draft",
-  "declined",
-  "cancelled",
 ];
 
 function ApplicationGroups({
@@ -129,11 +127,13 @@ const Applications = (): JSX.Element => {
     variables: {
       user: currentUser?.id?.toString(),
       status: [
-        ApplicationStatus.Declined,
         ApplicationStatus.Draft,
         ApplicationStatus.Sent,
         ApplicationStatus.InReview,
         ApplicationStatus.ReviewDone,
+        ApplicationStatus.Allocated,
+        ApplicationStatus.Handled,
+        ApplicationStatus.Received,
       ],
     },
   });
