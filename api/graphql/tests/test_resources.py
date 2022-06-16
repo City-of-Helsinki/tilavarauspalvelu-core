@@ -153,19 +153,6 @@ class ResourceCreateForPublishGraphQLTestCase(ResourceGraphQLBase):
             1
         )
 
-    def test_validation_error_when_missing_name_translation(self):
-        data = self.get_valid_input_data()
-        data.pop("nameSv")
-        response = self.query(self.get_create_query(), input_data=data)
-        assert_that(response.status_code).is_equal_to(200)
-        content = json.loads(response.content)
-        assert_that(
-            content.get("data").get("createResource").get("errors")[0].get("messages")
-        ).contains("Missing translation for nameSv.")
-        assert_that(Resource.objects.exclude(id=self.resource.id).count()).is_equal_to(
-            0
-        )
-
     def test_validation_error_when_no_space_and_fixed_location(self):
         data = self.get_valid_input_data()
         data.pop("spacePk")

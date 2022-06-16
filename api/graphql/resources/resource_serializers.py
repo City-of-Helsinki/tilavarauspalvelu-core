@@ -74,13 +74,6 @@ class ResourceCreateSerializer(ResourceSerializer, PrimaryKeySerializer):
         """Validates necessary fields for published resources."""
         validation_errors = {}
 
-        for field in self.translation_fields:
-            value = data.get(field)
-            if not value or value.isspace():
-                validation_errors[field] = serializers.ValidationError(
-                    f"Missing translation for {to_camel_case(field)}."
-                )
-
         if data.get("location_type") == Resource.LOCATION_FIXED and not data.get(
             "space"
         ):
