@@ -121,6 +121,7 @@ export const schema = Joi.object({
   reservationsMinDaysBefore: requiredForSingle(Joi.number().required()),
   reservationsMaxDaysBefore: requiredForSingle(Joi.number().required()),
   reservationStartInterval: requiredForSingle(Joi.string().required()),
+  authentication: requiredForSingle(Joi.string().required()),
   metadataSetPk: requiredForSingle(Joi.number().required()),
   termsOfUseFi: Joi.string().allow(null).max(10000),
   termsOfUseSv: Joi.string().allow(null).max(10000),

@@ -12,6 +12,7 @@ import {
   secondsToHms,
   convertHMSToSeconds,
   formatDuration,
+  getReadableList,
 } from "../util";
 
 jest.mock("next/config", () => () => ({
@@ -22,8 +23,8 @@ jest.mock("next/config", () => () => ({
 jest.mock("next-i18next", () => ({
   i18n: {
     t: (str: string, options: { count: number }) => {
-      const countStr = options.count > 1 ? "plural" : "singular";
-      return `${options.count} ${countStr}`;
+      const countStr = options?.count > 1 ? "plural" : "singular";
+      return options?.count ? `${options.count} ${countStr}` : str;
     },
   },
 }));
@@ -174,4 +175,12 @@ test("formatDuration", () => {
   expect(formatDuration("2:00:00")).toEqual("2 plural");
   expect(formatDuration("foo")).toEqual("-");
   expect(formatDuration("")).toEqual("-");
+});
+
+test("getReadableList", () => {
+  expect(getReadableList(["a"])).toEqual("a");
+  expect(getReadableList(["a", "b"])).toEqual("a common:and b");
+  expect(getReadableList(["a", "b", "c"])).toEqual("a, b common:and c");
+  expect(getReadableList([])).toEqual("");
+  expect(getReadableList(undefined)).toEqual("");
 });

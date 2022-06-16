@@ -24,3 +24,5 @@ export const reservationUnitUrl = (
   reservationUnitId: number,
   unitId: number
 ): string => `/unit/${unitId}/reservationUnit/edit/${reservationUnitId}`;
+
+export const unitUrl = (unitId: number): string => `/unit/${unitId}`;

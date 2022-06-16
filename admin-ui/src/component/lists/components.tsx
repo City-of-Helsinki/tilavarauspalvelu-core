@@ -1,3 +1,4 @@
+import { get } from "lodash";
 import React from "react";
 import styled from "styled-components";
 import { Table, TableProps } from "../../common/hds-fork/table/Table";
@@ -6,7 +7,14 @@ import { breakpoints } from "../../styles/util";
 type TableWrapperProps = {
   $headingBackground?: string;
   $tableBackground?: string;
+  $colWidths?: string[];
 };
+
+export const HR = styled.hr`
+  border: 0;
+  border-top: 1px solid var(--color-black-20);
+  width: 100%;
+`;
 
 const TableWrapper = styled.div<TableWrapperProps>`
   div {
@@ -16,6 +24,7 @@ const TableWrapper = styled.div<TableWrapperProps>`
     }
   }
   table {
+    width: 100%;
     th {
       color: black !important;
       font-family: var(--font-bold);
@@ -34,6 +43,12 @@ const TableWrapper = styled.div<TableWrapperProps>`
       padding: var(--spacing-xs);
       background: ${({ $tableBackground = "transparent" }) => $tableBackground};
     }
+
+    ${({ $colWidths }) =>
+      $colWidths &&
+      $colWidths.map(
+        (width, idx) => `td:nth-of-type(${idx + 1}) {width: ${width};}`
+      )};
   }
 `;
 
@@ -43,6 +58,7 @@ export const CustomTable = (
   <TableWrapper
     $headingBackground="var(--color-black-10)"
     $tableBackground="var(--color-white)"
+    $colWidths={props.cols.map((col) => get(col, "width"))}
   >
     <Table {...props} />
   </TableWrapper>

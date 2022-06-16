@@ -87,7 +87,13 @@
     "primarySchedules": "Prioriterade tidsönskemål",
     "secondarySchedules": "Alternativa tidsönskemål",
     "notification": {
-      "copyCells": "Kopieringen av tiderna till alla bokningsönskemål lyckades"
+      "copyCells": "Kopieringen av tiderna till alla bokningsönskemål lyckades",
+      "minDuration": {
+        "title": "Den totala varaktigheten för begärda tider är kortare än bokningens minsta varaktighet",
+        "bodySingle": "Den totala varaktigheten av begärda tider som valts i kalendern är kortare än bokningens minimala längd (vald i föregående steg). Välj fler tider i kalendern eller en kortare varaktighet för bokningen.",
+        "body": "I bokningen {{title}} är den totala varaktigheten för begärda tider som valts i kalendern kortare än bokningens minsta varaktighet (vald i föregående steg). Välj fler tider i kalendern eller en kortare varaktighet för bokningen.",
+        "body_plural": "I bokningarna {{title}} är den totala varaktigheten av begärda tider som valts i kalendern kortare än bokningens minsta varaktighet (vald i föregående steg). Välj fler tider i kalendern eller en kortare varaktighet för bokningen."
+      }
     }
   },
   "Page3": {

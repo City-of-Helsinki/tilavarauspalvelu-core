@@ -119,3 +119,21 @@ export function acceptTerms() {
 export function submitApplication() {
   cy.get("#submit").click();
 }
+
+export function minDurationNotification(): Cypress.Chainable<
+  JQuery<HTMLElement>
+> {
+  return cy.get(
+    "[data-testid='application__page2--notification-min-duration']"
+  );
+}
+
+export function successNotification(): Cypress.Chainable<JQuery<HTMLElement>> {
+  return cy.get("[data-testid='application__page2--notification-success']");
+}
+
+export function minDurationNotificationText(): Cypress.Chainable<
+  JQuery<HTMLElement>
+> {
+  return minDurationNotification().find("div:nth-child(1)");
+}

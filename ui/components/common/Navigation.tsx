@@ -148,6 +148,7 @@ const Navigation = ({ profile, logout }: Props): JSX.Element => {
                 key={languageOption.value}
                 lang={languageOption.value}
                 label={languageOption.label}
+                href="#"
                 onClick={(
                   e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>
                 ): void => {

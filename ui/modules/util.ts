@@ -529,3 +529,15 @@ export const formatSecondDuration = (
   const hms = secondsToHms(duration);
   return formatDuration(`${hms.h}:${hms.m}:${hms.s}`, abbreviated);
 };
+
+export const getReadableList = (list: string[]): string => {
+  if (!list || list.length === 0) return "";
+
+  const andStr = i18n.t("common:and");
+
+  if (list.length < 3) {
+    return list.join(` ${andStr} `);
+  }
+
+  return `${list.slice(0, -1).join(", ")} ${andStr} ${list[list.length - 1]}`;
+};

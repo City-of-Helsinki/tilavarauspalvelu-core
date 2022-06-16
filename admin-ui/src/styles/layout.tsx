@@ -5,6 +5,8 @@ export const ContentContainer = styled.div`
   padding: var(--spacing-m);
 `;
 
+ContentContainer.displayName = "ContentContainer";
+
 export const IngressContainer = styled.div`
   padding: 0 var(--spacing-m) 0 var(--spacing-m);
 
@@ -16,6 +18,7 @@ export const IngressContainer = styled.div`
     padding-right: 8.333%;
   }
 `;
+IngressContainer.displayName = "IngressContainer";
 
 export const NarrowContainer = styled.div`
   padding: 0 var(--spacing-m) 0 var(--spacing-m);
@@ -29,9 +32,13 @@ export const NarrowContainer = styled.div`
   }
 `;
 
+NarrowContainer.displayName = "NarrowContainer";
+
 export const WideContainer = styled(IngressContainer)`
   padding-left: var(--spacing-m);
 `;
+
+WideContainer.displayName = "WideContainer";
 
 export const GridCol = styled.div`
   &:last-child {
@@ -93,4 +100,67 @@ export const DataGrid = styled.div`
     grid-template-columns: 1fr 1fr;
     border-bottom: 0;
   }
+`;
+
+export const VerticalFlex = styled.div`
+  display: flex;
+  gap: var(--spacing-m);
+  flex-direction: column;
+`;
+
+VerticalFlex.displayName = "VerticalFlex";
+
+export const Container = styled.div`
+  max-width: var(--container-width-xl);
+`;
+
+Container.displayName = "Container";
+
+export const Content = styled.div`
+  padding: 0 var(--spacing-2-xl);
+`;
+
+Container.displayName = "Container";
+
+export const Grid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  align-items: baseline;
+  gap: var(--spacing-m);
+  margin: 0;
+  padding: 0;
+`;
+
+Grid.displayName = "Grid";
+
+export const Span3 = styled.div`
+  grid-column: span 12;
+  @media (min-width: ${breakpoints.l}) {
+    grid-column: span 3;
+  }
+  @media (min-width: ${breakpoints.xl}) {
+    grid-column: span 3;
+  }
+`;
+
+export const Span4 = styled.div`
+  grid-column: span 12;
+  @media (min-width: ${breakpoints.m}) {
+    grid-column: span 6;
+  }
+  @media (min-width: ${breakpoints.l}) {
+    grid-column: span 4;
+  }
+`;
+
+export const Span6 = styled.div`
+  grid-column: span 12;
+
+  @media (min-width: ${breakpoints.l}) {
+    grid-column: span 6;
+  }
+`;
+
+export const Span12 = styled.div`
+  grid-column: span 12;
 `;

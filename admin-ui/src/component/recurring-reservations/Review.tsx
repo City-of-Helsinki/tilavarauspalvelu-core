@@ -1,14 +1,19 @@
+import { ApolloError, useQuery } from "@apollo/client";
 import { Button, IconCross, Select, Table, Tabs, Tag } from "hds-react";
 import { memoize, sortBy, uniq, uniqBy } from "lodash";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
-import { getApplications } from "../../common/api";
+import {
+  ApplicationType,
+  Query,
+  QueryApplicationsArgs,
+  UnitType,
+} from "../../common/gql-types";
 import {
   ApplicationRound as ApplicationRoundType,
   DataFilterOption,
-  Unit,
 } from "../../common/types";
 import { applicationDetailsUrl, applicationRoundUrl } from "../../common/urls";
 import { filterData } from "../../common/util";
@@ -22,6 +27,7 @@ import Loader from "../Loader";
 import withMainMenu from "../withMainMenu";
 import { NaviItem } from "./ApplicationRoundNavi";
 import ApplicationRoundStatusBlock from "./ApplicationRoundStatusBlock";
+import { APPLICATIONS_QUERY } from "./queries";
 import TimeframeStatus from "./TimeframeStatus";
 import { ApplicationView, appMapper, truncate } from "./util";
 
@@ -150,14 +156,16 @@ const getUnitOptions = memoize(
       "id"
     );
 
-    units.sort((u1: Unit, u2: Unit) =>
-      u1.name.fi.toLowerCase().localeCompare(u2.name.fi.toLowerCase())
+    units.sort((u1: UnitType, u2: UnitType) =>
+      (u1.nameFi || "")
+        .toLowerCase()
+        .localeCompare((u2.nameFi || "").toLowerCase())
     );
 
     return units.map((unit) => ({
-      label: unit.name.fi,
+      label: unit.nameFi as string,
       value: {
-        title: unit.name.fi,
+        title: unit.nameFi as string,
         key: "unit",
         function: (application: ApplicationView) =>
           Boolean(application.units.find((u) => u.id === unit.id)),
@@ -206,7 +214,6 @@ function DataOrMessage({
 }
 
 function Review({ applicationRound }: IProps): JSX.Element | null {
-  const [isLoading, setIsLoading] = useState(true);
   const [applications, setApplications] = useState<ApplicationView[]>([]);
   const [applicationEvents, setApplicationEvents] = useState<ApplicationView[]>(
     []
@@ -228,39 +235,35 @@ function Review({ applicationRound }: IProps): JSX.Element | null {
     };
   }, [applications, applicationEvents, typeFilters, unitFilters]);
 
-  useEffect(() => {
-    const fetchApplications = async (ar: ApplicationRoundType) => {
-      try {
-        const result = await getApplications({
-          applicationRound: ar.id,
-          status: "in_review,review_done,declined",
-        });
-        const mapped = result.map((app) => appMapper(ar, app, t));
+  const { loading } = useQuery<Query, QueryApplicationsArgs>(
+    APPLICATIONS_QUERY,
+    {
+      onError: (err: ApolloError) => {
+        notifyError(err.message);
+      },
+      fetchPolicy: "cache-and-network",
+      onCompleted: (data) => {
+        const mapped = (data.applications?.edges || []).map((app) =>
+          appMapper(applicationRound, app?.node as ApplicationType, t)
+        );
         setApplications(mapped);
         setApplicationEvents(
-          result
+          (data.applications?.edges || [])
             .flatMap((a) =>
-              a.applicationEvents.map((ae) => ({
+              (a?.node?.applicationEvents || []).map((ae) => ({
                 ...a,
                 applicationEvents: [ae],
               }))
             )
-            .map((app) => appMapper(ar, app, t))
+            .map((app) =>
+              appMapper(applicationRound, app.node as ApplicationType, t)
+            )
         );
-      } catch (error) {
-        notifyError(t("errors.errorFetchingApplications"));
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    if (typeof applicationRound?.id === "number") {
-      fetchApplications(applicationRound);
+      },
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [applicationRound]);
+  );
 
-  if (isLoading) {
+  if (loading) {
     return <Loader />;
   }
 
@@ -443,7 +446,7 @@ function Review({ applicationRound }: IProps): JSX.Element | null {
                           key: "unitsSort",
                           transform: ({ units }: ApplicationView) => {
                             const allUnits = units
-                              .map((u) => u.name.fi)
+                              .map((u) => u.nameFi)
                               .join(", ");
 
                             return (
@@ -451,7 +454,7 @@ function Review({ applicationRound }: IProps): JSX.Element | null {
                                 {truncate(
                                   units
                                     .filter((u, i) => i < 2)
-                                    .map((u) => u.name.fi)
+                                    .map((u) => u.nameFi)
                                     .join(", "),
                                   23
                                 )}
@@ -535,7 +538,7 @@ function Review({ applicationRound }: IProps): JSX.Element | null {
                           key: "unitsSort",
                           transform: ({ units }: ApplicationView) => {
                             const allUnits = units
-                              .map((u) => u.name.fi)
+                              .map((u) => u.nameFi)
                               .join(", ");
 
                             return (
@@ -543,7 +546,7 @@ function Review({ applicationRound }: IProps): JSX.Element | null {
                                 {truncate(
                                   units
                                     .filter((u, i) => i < 2)
-                                    .map((u) => u.name.fi)
+                                    .map((u) => u.nameFi)
                                     .join(", "),
                                   23
                                 )}

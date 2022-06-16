@@ -2,7 +2,7 @@ import React from "react";
 import { TFunction, useTranslation } from "react-i18next";
 import { memoize, truncate } from "lodash";
 import { ReservationUnitType } from "../../common/gql-types";
-import { CustomTable, DataOrMessage, TableLink } from "./components";
+import { CustomTable, DataOrMessage, TableLink } from "../lists/components";
 import { LocalizationLanguages } from "../../common/types";
 import { reservationUnitUrl } from "../../common/urls";
 import { localizedPropValue } from "../../common/util";

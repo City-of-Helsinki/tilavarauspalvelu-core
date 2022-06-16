@@ -1,43 +1,48 @@
 import {
-  Application,
-  ApplicationRound,
-  TranslationObject,
-  Unit,
-} from "../../common/types";
+  ApplicationType,
+  EventReservationUnitType,
+} from "../../common/gql-types";
+import { ApplicationRound } from "../../common/types";
 import { appMapper } from "./util";
 
 test("Units are ordered according to priority", async () => {
   const mappedApp = appMapper(
     {} as ApplicationRound,
     {
+      id: "0",
       applicationEvents: [
         {
+          id: "0",
           eventReservationUnits: [
             {
+              id: "0",
               priority: 1,
-              reservationUnitDetails: {
+              reservationUnit: {
                 unit: {
-                  id: 100,
-                  name: { fi: "unit 100" } as TranslationObject,
+                  id: "100",
+                  pk: 1,
+                  nameFi: "unit 100",
                 },
               },
-            },
+            } as EventReservationUnitType,
             {
+              id: "1",
               priority: 0,
-              reservationUnitDetails: {
+              reservationUnit: {
                 unit: {
-                  id: 200,
-                  name: { fi: "unit 200" } as TranslationObject,
-                } as Unit,
+                  pk: 2,
+                  id: "200",
+                  nameFi: "unit 200",
+                },
               },
-            },
+            } as EventReservationUnitType,
           ],
         },
       ],
-    } as Application,
+    } as ApplicationType,
     (str: string) => str
   );
 
-  expect(mappedApp.units[0].name.fi).toBe("unit 200");
-  expect(mappedApp.units[1].name.fi).toBe("unit 100");
+  expect(mappedApp.units[0].nameFi).toBe("unit 200");
+  expect(mappedApp.units[1].nameFi).toBe("unit 100");
 });

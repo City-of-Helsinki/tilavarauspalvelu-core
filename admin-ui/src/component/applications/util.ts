@@ -1,6 +1,7 @@
 import { differenceInWeeks } from "date-fns";
 import { isEqual, sum, trim } from "lodash";
 import { TFunction } from "react-i18next";
+import { ApplicationType } from "../../common/gql-types";
 import {
   Application,
   ApplicationEvent,
@@ -9,8 +10,9 @@ import {
 } from "../../common/types";
 import { formatDuration } from "../../common/util";
 
-export const applicantName = (app: Application): string => {
-  return app.applicantType === "individual"
+export const applicantName = (app: Application | ApplicationType): string => {
+  return app.applicantType === "individual" ||
+    app.applicantType === "INDIVIDUAL"
     ? `${app.contactPerson?.firstName || "-"} ${
         app.contactPerson?.lastName || "-"
       }`
@@ -92,35 +94,37 @@ export const appEventHours = (
   endDate: string,
   biWeekly: boolean,
   eventsPerWeek: number,
-  minDuration: string
+  minDuration: number
 ): number => {
   const turns = numTurns(startDate, endDate, biWeekly, eventsPerWeek);
 
-  const hours = (turns * apiDurationToMinutes(minDuration)) / 60;
+  const hours = (turns * minDuration) / 60;
   return hours;
 };
 
-export const applicationHours = (application: Application): number =>
+export const applicationHours = (
+  application: Application | ApplicationType
+): number =>
   sum(
-    application.applicationEvents.map((ae) =>
+    (application.applicationEvents || []).map((ae) =>
       appEventHours(
-        ae.begin as string,
-        ae.end as string,
-        ae.biweekly,
-        ae.eventsPerWeek,
-        ae.minDuration as string
+        ae?.begin as string,
+        ae?.end as string,
+        ae?.biweekly as boolean,
+        ae?.eventsPerWeek as number,
+        ae?.minDuration as number
       )
     )
   );
 
 export const applicationTurns = (application: Application): number =>
   sum(
-    application.applicationEvents.map((ae) =>
+    (application.applicationEvents || []).map((ae) =>
       numTurns(
-        ae.begin as string,
-        ae.end as string,
-        ae.biweekly,
-        ae.eventsPerWeek
+        ae?.begin as string,
+        ae?.end as string,
+        ae?.biweekly as boolean,
+        ae?.eventsPerWeek as number
       )
     )
   );

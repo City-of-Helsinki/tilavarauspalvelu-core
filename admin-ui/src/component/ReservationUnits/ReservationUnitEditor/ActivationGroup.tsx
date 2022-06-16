@@ -2,10 +2,6 @@ import React, { useState } from "react";
 import { Checkbox } from "hds-react";
 import styled from "styled-components";
 
-const Wrapper = styled.div`
-  margin-top: var(--spacing-xs);
-`;
-
 const Indent = styled.div<{ $noIndent: boolean }>`
   margin-top: var(--spacing-m);
   ${({ $noIndent }) => ($noIndent ? null : `margin-left: var(--spacing-l);`)}
@@ -29,7 +25,7 @@ const ActivationGroup = ({
   const [open, setOpen] = useState(initiallyOpen);
 
   return (
-    <Wrapper>
+    <>
       <Checkbox
         id={id}
         label={label}
@@ -42,7 +38,7 @@ const ActivationGroup = ({
         }}
       />
       {open ? <Indent $noIndent={noIndent}>{children}</Indent> : null}
-    </Wrapper>
+    </>
   );
 };
 
