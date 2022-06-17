@@ -5,6 +5,7 @@ import { TFunction } from "react-i18next";
 import {
   ApplicationRound as ApplicationRoundType,
   ApplicationRoundStatus,
+  ApplicationStatus,
 } from "../../common/types";
 
 import {
@@ -13,11 +14,7 @@ import {
 } from "../applications/util";
 import StatusCell from "../StatusCell";
 import { formatNumber } from "../../common/util";
-import {
-  ApplicationType,
-  ApplicationStatus,
-  UnitType,
-} from "../../common/gql-types";
+import { ApplicationType, UnitType } from "../../common/gql-types";
 
 export type ApplicationView = {
   id: number;

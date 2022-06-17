@@ -17,7 +17,7 @@ interface IProps {
 const Wrapper = styled.span`
   display: flex;
   align-items: center;
-  gap: var(--spacing-s);
+  gap: var(--spacing-3-xs);
 
   svg {
     min-width: 24px;
@@ -41,7 +41,9 @@ function TimeframeStatus({
       date: formatDate(resolutionDate || ""),
     });
   } else if (isPast(dateBegin) && isFuture(dateEnd)) {
-    message = t("Application.timeframeCurrent");
+    message = t("Application.timeframeCurrent", {
+      date: formatDate(applicationPeriodEnd),
+    });
   } else if (isToday(dateEnd)) {
     message = `${t("Application.timeframePast", {
       date: formatDate(applicationPeriodEnd),

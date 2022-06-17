@@ -72,9 +72,9 @@ type ApplicationEventScheduleType implements Node {
 """An enumeration."""
 enum applicationEventStatus {
   created
-  allocated
-  validated
   approved
+  reserved
+  failed
   declined
 }
 
@@ -151,9 +151,11 @@ enum applicationRoundStatus {
   in_review
   review_done
   allocated
+  reserving
   handled
-  validated
-  approved
+  sending
+  sent
+  archived
 }
 
 type ApplicationRoundType implements Node {
@@ -181,7 +183,6 @@ type ApplicationRoundType implements Node {
   pk: Int
   status: applicationRoundStatus
   statusTimestamp: DateTime
-  approvedBy: String
   applicationsSent: Boolean
   applicationsCount: Int
   reservationUnitCount: Int
@@ -292,10 +293,13 @@ enum ApplicationsOrganisationOrganisationTypeChoices {
 """An enumeration."""
 enum applicationStatus {
   draft
+  received
   in_review
   review_done
+  allocated
+  handled
   sent
-  declined
+  expired
   cancelled
 }
 
@@ -928,6 +932,7 @@ type Query {
     textSearch: String = null
     purposes: [ID] = null
     isDraft: Boolean = null
+    isArchived: Boolean = null
     isVisible: Boolean = null
     applicationRound: [ID] = null
     nameFi: String = null
@@ -1620,6 +1625,9 @@ type ReservationUnitByPkType implements Node {
   Is it possible to reserve this reservation unit when opening hours are not defined.
   """
   allowReservationsWithoutOpeningHours: Boolean!
+
+  """Is reservation unit archived."""
+  isArchived: Boolean!
   images: [ReservationUnitImageType]
 
   """The ID of the object"""
@@ -1768,18 +1776,21 @@ input ReservationUnitCreateMutationInput {
 
   """Allow reservations without opening hours. Used for testing."""
   allowReservationsWithoutOpeningHours: Boolean
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
-  additionalInstructionsFi: String
-  additionalInstructionsEn: String
-  additionalInstructionsSv: String
+
+  """Is reservation unit archived"""
+  isArchived: Boolean
   nameFi: String
   nameEn: String
   nameSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
+  additionalInstructionsFi: String
+  additionalInstructionsEn: String
+  additionalInstructionsSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   clientMutationId: String
 }
 
@@ -1889,18 +1900,21 @@ type ReservationUnitCreateMutationPayload {
 
   """Allow reservations without opening hours. Used for testing."""
   allowReservationsWithoutOpeningHours: Boolean
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
-  additionalInstructionsFi: String
-  additionalInstructionsEn: String
-  additionalInstructionsSv: String
+
+  """Is reservation unit archived"""
+  isArchived: Boolean
   nameFi: String
   nameEn: String
   nameSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
+  additionalInstructionsFi: String
+  additionalInstructionsEn: String
+  additionalInstructionsSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -2153,6 +2167,9 @@ type ReservationUnitType implements Node {
   Is it possible to reserve this reservation unit when opening hours are not defined.
   """
   allowReservationsWithoutOpeningHours: Boolean!
+
+  """Is reservation unit archived."""
+  isArchived: Boolean!
   images: [ReservationUnitImageType]
   applicationRounds(active: Boolean = null): [ApplicationRoundType]
 
@@ -2308,18 +2325,21 @@ input ReservationUnitUpdateMutationInput {
 
   """Allow reservations without opening hours. Used for testing."""
   allowReservationsWithoutOpeningHours: Boolean
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
-  additionalInstructionsFi: String
-  additionalInstructionsEn: String
-  additionalInstructionsSv: String
+
+  """Is reservation unit archived"""
+  isArchived: Boolean
   nameFi: String
   nameEn: String
   nameSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
+  additionalInstructionsFi: String
+  additionalInstructionsEn: String
+  additionalInstructionsSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   clientMutationId: String
 }
 
@@ -2429,18 +2449,21 @@ type ReservationUnitUpdateMutationPayload {
 
   """Allow reservations without opening hours. Used for testing."""
   allowReservationsWithoutOpeningHours: Boolean
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
-  additionalInstructionsFi: String
-  additionalInstructionsEn: String
-  additionalInstructionsSv: String
+
+  """Is reservation unit archived"""
+  isArchived: Boolean
   nameFi: String
   nameEn: String
   nameSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
+  additionalInstructionsFi: String
+  additionalInstructionsEn: String
+  additionalInstructionsSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -2598,12 +2621,12 @@ input ResourceCreateMutationInput {
   """
   bufferTimeAfter: Int
   isDraft: Boolean
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   clientMutationId: String
 }
 
@@ -2626,12 +2649,12 @@ type ResourceCreateMutationPayload {
   """
   bufferTimeAfter: Int
   isDraft: Boolean
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -2715,12 +2738,12 @@ input ResourceUpdateMutationInput {
   """
   bufferTimeAfter: Int
   isDraft: Boolean
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   clientMutationId: String
 }
 
@@ -2743,12 +2766,12 @@ type ResourceUpdateMutationPayload {
   """
   bufferTimeAfter: Int
   isDraft: Boolean
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -3130,15 +3153,15 @@ input UnitUpdateMutationInput {
   webPage: String
   email: String
   phone: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
   shortDescriptionFi: String
   shortDescriptionEn: String
   shortDescriptionSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
   clientMutationId: String
 }
 
@@ -3148,15 +3171,15 @@ type UnitUpdateMutationPayload {
   webPage: String
   email: String
   phone: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
   shortDescriptionFi: String
   shortDescriptionEn: String
   shortDescriptionSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]

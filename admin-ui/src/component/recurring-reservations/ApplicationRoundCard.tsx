@@ -1,214 +1,117 @@
+import { Card, IconArrowRight } from "hds-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
 import styled from "styled-components";
-import { IconArrowRight } from "hds-react";
-import { ApplicationRound as ApplicationRoundType } from "../../common/types";
-import { H2, H3 } from "../../styles/typography";
-import { BasicLink, breakpoints, Strong } from "../../styles/util";
-import ApplicationRoundStatusBlock from "./ApplicationRoundStatusBlock";
+import { ApplicationRoundType } from "../../common/gql-types";
+import { applicationRoundUrl } from "../../common/urls";
+import ApplicationRoundStatusBlock from "./ApplicationRoundStatusTag";
+import ReservationPeriod from "./ReservationPeriod";
 import TimeframeStatus from "./TimeframeStatus";
-import { formatDate, formatNumber, secondsToHms } from "../../common/util";
 
 interface IProps {
   applicationRound: ApplicationRoundType;
-  getRoute: (arg0: number) => string;
 }
 
-const Wrapper = styled.div`
-  --border: 0.5rem solid var(--tilavaraus-admin-gray);
-
-  &:first-of-type {
-    &:last-of-type {
-      border-bottom: var(--border);
-    }
-
-    border-bottom: none;
-  }
-
-  &:last-of-type {
-    border-bottom: var(--border);
-  }
-
-  border: var(--border);
-  border-bottom: 0;
-  padding: var(--spacing-m) var(--spacing-l);
+const Layout = styled.div`
+  display: flex;
+  justify-content: space-between;
 `;
 
-const Top = styled.div`
-  @media (min-width: ${breakpoints.l}) {
-    display: flex;
-    justify-content: space-between;
-  }
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
 `;
-
-const Title = styled(H3)`
+const ServiceSector = styled.span``;
+const Name = styled.span`
   font-size: var(--fontsize-heading-s);
-  margin-top: 0;
-  margin-bottom: var(--spacing-2-xs);
-
-  @media (min-width: ${breakpoints.m}) {
-    margin-right: var(--spacing-s);
-  }
+`;
+const Times = styled.div`
+  display: flex;
+  gap: var(--spacing-l);
+  font-size: var(--fontsize-body-s);
+  padding-bottom: var(--spacing-s);
 `;
 
-const Subtitle = styled.div`
-  margin-bottom: var(--spacing-xs);
-
-  @media (min-width: ${breakpoints.m}) {
-    margin-bottom: var(--spacing-l);
-  }
+const Stats = styled.div`
+  display: flex;
+  gap: var(--spacing-m);
 `;
 
-const Bottom = styled.div`
-  & > *:last-of-type {
-    align-self: flex-end;
-
-    a {
-      padding-bottom: 9px;
-    }
-  }
-
-  @media (min-width: ${breakpoints.l}) {
-    display: flex;
-    justify-content: space-between;
-    gap: var(--spacing-m);
-  }
+const RightColumn = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-m);
+  justify-content: space-between;
+  align-items: flex-end;
 `;
 
-const Details = styled.div`
-  & > * {
-    margin-bottom: var(--spacing-m);
-  }
-
-  @media (min-width: ${breakpoints.l}) {
-    display: grid;
-    width: 100%;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: var(--spacing-layout-xl);
-  }
+const Number = styled.span`
+  font-size: var(--fontsize-body-xl);
+  font-weight: bold;
 `;
 
-const StatusSuffix = styled.div`
-  margin-top: var(--spacing-2-xs);
-  margin-left: var(--spacing-xl);
+const Label = styled.span`
+  font-size: var(--fontsize-body-s);
 `;
 
-const Value = styled(H2).attrs({ as: "div" })`
-  display: inline-block;
-  margin-bottom: var(--spacing-3-xs);
-
-  span {
-    word-wrap: nowrap;
-  }
-
-  @media (min-width: ${breakpoints.m}) {
-    display: block;
-  }
+const StyledCard = styled(Card)`
+  padding: var(--spacing-m);
+  background: white;
 `;
 
-const Label = styled.div`
-  text-transform: lowercase;
-  display: inline-block;
-  margin-left: var(--spacing-2-xs);
-
-  @media (min-width: ${breakpoints.m}) {
-    display: block;
-    margin: 0;
-  }
-`;
-
-function ApplicationRoundCard({
-  applicationRound,
-  getRoute,
-}: IProps): JSX.Element {
-  const { t } = useTranslation();
-
-  const isApplicationRoundWaitingForApproval = ["validated"].includes(
-    applicationRound.status
-  );
-
-  const isApplicationRoundApproved = ["approved"].includes(
-    applicationRound.status
-  );
-
-  const reservationUnitLabel =
-    isApplicationRoundWaitingForApproval || isApplicationRoundApproved
-      ? "ApplicationRound.inUniqueReservationUnits"
-      : "ApplicationRound.attachedReservationUnits";
-
-  const allocationResultEventsCount = formatNumber(
-    applicationRound.aggregatedData.allocationResultEventsCount || 0,
-    t("common.volumeUnit")
-  );
-  const allocationDurationTotal = formatNumber(
-    secondsToHms(applicationRound.aggregatedData.allocationDurationTotal || 0)
-      .h,
-    t("common.hoursUnit")
-  );
-
+function Stat({ value, label }: { value: number; label: string }): JSX.Element {
   return (
-    <Wrapper>
-      <Top>
-        <div>
-          <Title>{applicationRound.name}</Title>
-          <Subtitle>{t("common.youthServices")}</Subtitle>
-        </div>
-        <ApplicationRoundStatusBlock applicationRound={applicationRound} />
-      </Top>
-      <Bottom>
-        <Details>
-          <div>
+    <div>
+      <Number>{value}</Number>
+      <Label> {label}</Label>
+    </div>
+  );
+}
+
+function ApplicationRoundCard({ applicationRound }: IProps): JSX.Element {
+  const { t } = useTranslation();
+  return (
+    <StyledCard>
+      <Layout>
+        <Container>
+          <ServiceSector>
+            {applicationRound.serviceSector?.nameFi}
+          </ServiceSector>
+          <Name>{applicationRound.nameFi}</Name>
+          <Times>
             <TimeframeStatus
               applicationPeriodBegin={applicationRound.applicationPeriodBegin}
               applicationPeriodEnd={applicationRound.applicationPeriodEnd}
             />
-            {applicationRound.status === "validated" && (
-              <StatusSuffix>
-                <Strong>
-                  {t("Application.approvalPendingDate", {
-                    date: formatDate(applicationRound.statusTimestamp),
-                  })}
-                </Strong>
-              </StatusSuffix>
-            )}
-            {applicationRound.status === "approved" && (
-              <StatusSuffix>
-                <Strong>
-                  {t("ApplicationRound.resolutionDate", {
-                    date: formatDate(applicationRound.statusTimestamp),
-                  })}
-                </Strong>
-              </StatusSuffix>
-            )}
-          </div>
-          <div>
-            {["approved", "validated"].includes(applicationRound.status) && (
-              <>
-                <Value>
-                  <span>{allocationResultEventsCount}</span>
-                  {allocationDurationTotal && (
-                    <>
-                      {"/ "}
-                      <span>{allocationDurationTotal}</span>
-                    </>
-                  )}
-                </Value>
-                <Label>{t("ApplicationRound.schedulesToBeGranted")}</Label>
-              </>
-            )}
-          </div>
-          <div>
-            <Value>{applicationRound.reservationUnitIds.length}</Value>
-            <Label>{t(reservationUnitLabel)}</Label>
-          </div>
-        </Details>
-        <div>
-          <BasicLink to={getRoute(applicationRound.id)}>
-            {t("common.inspect")} <IconArrowRight aria-hidden />
-          </BasicLink>
-        </div>
-      </Bottom>
-    </Wrapper>
+            <ReservationPeriod
+              reservationPeriodBegin={applicationRound.reservationPeriodBegin}
+              reservationPeriodEnd={applicationRound.reservationPeriodEnd}
+            />
+          </Times>
+          <Stats>
+            <Stat
+              value={applicationRound.reservationUnitCount as number}
+              label={t("ApplicationRound.reservationUnitCount", {
+                count: applicationRound.reservationUnitCount as number,
+              })}
+            />
+            <Stat
+              value={applicationRound.applicationsCount as number}
+              label={t("ApplicationRound.applicationCount", {
+                count: applicationRound.applicationsCount as number,
+              })}
+            />
+          </Stats>
+        </Container>
+        <RightColumn>
+          <ApplicationRoundStatusBlock applicationRound={applicationRound} />
+          <Link to={applicationRoundUrl(String(applicationRound.pk))}>
+            <IconArrowRight size="l" style={{ color: "var(--color-black)" }} />
+          </Link>
+        </RightColumn>
+      </Layout>
+    </StyledCard>
   );
 }
 
