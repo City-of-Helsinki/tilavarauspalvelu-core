@@ -4,7 +4,6 @@ import uuid as uuid
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import models
-from django.utils.timezone import get_default_timezone
 from django.utils.translation import gettext_lazy as _
 from easy_thumbnails.fields import ThumbnailerImageField
 
@@ -574,21 +573,11 @@ class ReservationUnit(models.Model):
 
     @property
     def state(self) -> ReservationUnitState:
-        now = datetime.datetime.now(tz=get_default_timezone())
-        if self.is_archived:
-            return ReservationUnitState.ARCHIVED
-        elif self.is_draft:
-            return ReservationUnitState.DRAFT
-        elif (self.publish_begins and now < self.publish_begins) or (
-            self.publish_ends and now >= self.publish_ends
-        ):
-            return ReservationUnitState.SCHEDULED_PUBLISHING
-        elif (self.reservation_begins and now < self.reservation_begins) or (
-            self.reservation_ends and now >= self.reservation_ends
-        ):
-            return ReservationUnitState.SCHEDULED_RESERVATION
-        else:
-            return ReservationUnitState.PUBLISHED
+        from reservation_units.utils.reservation_unit_state_helper import (
+            ReservationUnitStateHelper,
+        )
+
+        return ReservationUnitStateHelper.get_state(self)
 
 
 class ReservationUnitImage(models.Model):

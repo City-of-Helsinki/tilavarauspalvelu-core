@@ -1355,6 +1355,120 @@ snapshots['ReservationUnitQueryTestCase::test_that_state_is_scheduled_reservatio
     }
 }
 
+snapshots['ReservationUnitsFilterStateTestCase::test_filtering_by_archived_returns_nothing 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitsFilterStateTestCase::test_filtering_by_draft 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'nameFi': 'I am a draft!',
+                        'state': 'DRAFT'
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitsFilterStateTestCase::test_filtering_by_mixed 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'nameFi': 'I am a draft!',
+                        'state': 'DRAFT'
+                    }
+                },
+                {
+                    'node': {
+                        'nameFi': 'I am scheduled for publishing!',
+                        'state': 'SCHEDULED_PUBLISHING'
+                    }
+                },
+                {
+                    'node': {
+                        'nameFi': 'I am also scheduled for publishing!',
+                        'state': 'SCHEDULED_PUBLISHING'
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitsFilterStateTestCase::test_filtering_by_published 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'nameFi': "Yey! I'm published!",
+                        'state': 'PUBLISHED'
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitsFilterStateTestCase::test_filtering_by_scheduled_publishing 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'nameFi': 'I am scheduled for publishing!',
+                        'state': 'SCHEDULED_PUBLISHING'
+                    }
+                },
+                {
+                    'node': {
+                        'nameFi': 'I am also scheduled for publishing!',
+                        'state': 'SCHEDULED_PUBLISHING'
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitsFilterStateTestCase::test_filtering_by_scheduled_reservation 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'nameFi': 'test name fi',
+                        'state': 'SCHEDULED_RESERVATION'
+                    }
+                },
+                {
+                    'node': {
+                        'nameFi': 'I am scheduled for reservation!',
+                        'state': 'SCHEDULED_RESERVATION'
+                    }
+                },
+                {
+                    'node': {
+                        'nameFi': 'I am also scheduled for reservation!',
+                        'state': 'SCHEDULED_RESERVATION'
+                    }
+                }
+            ]
+        }
+    }
+}
+
 snapshots['ReservationUnitsFilterTextSearchTestCase::test_filtering_by_reservation_unit_description_en 1'] = {
     'data': {
         'reservationUnits': {
