@@ -71,6 +71,10 @@ const StyledReactQuill = styled(ReactQuill)<{
   }
 `;
 
+const modules = {
+  toolbar: [["bold"], ["link"]],
+};
+
 const RichTextInput = ({
   value,
   required = false,
@@ -86,6 +90,7 @@ const RichTextInput = ({
         {label} {required ? <Asterix>*</Asterix> : null}
       </Label>
       <StyledReactQuill
+        modules={modules}
         readOnly={disabled}
         id={id}
         value={value}
