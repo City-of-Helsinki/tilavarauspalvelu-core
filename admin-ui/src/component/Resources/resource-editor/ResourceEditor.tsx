@@ -275,7 +275,7 @@ const ResourceEditor = ({ resourcePk, unitPk }: Props): JSX.Element => {
                   }}
                   variant="secondary"
                 >
-                  {t("ResourceModal.saveAsDraft")}
+                  {t("ResourceModal.save")}
                 </SaveButton>
               </Buttons>
             </Editor>

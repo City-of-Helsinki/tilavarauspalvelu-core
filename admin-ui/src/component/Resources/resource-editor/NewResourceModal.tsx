@@ -216,12 +216,12 @@ const NewResourceModal = ({
             if (validationErrors.error) {
               dispatch({ type: "setValidatioErrors", validationErrors });
             } else {
-              create({ ...state.resource, isDraft: true });
+              create({ ...state.resource });
             }
           }}
           variant="secondary"
         >
-          {t("ResourceModal.saveAsDraft")}
+          {t("ResourceModal.save")}
         </SaveButton>
       </Buttons>
     </>

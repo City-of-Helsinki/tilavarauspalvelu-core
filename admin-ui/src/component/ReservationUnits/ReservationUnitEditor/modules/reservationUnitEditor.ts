@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { Fieldset as HDSFieldset } from "hds-react";
+import { Button, Fieldset as HDSFieldset } from "hds-react";
 import { Grid, Span4 as DefaultSpan4 } from "../../../../styles/layout";
 import { breakpoints } from "../../../../styles/util";
 
@@ -36,6 +36,9 @@ export const ButtonsContainer = styled.div`
   gap: var(--spacing-m);
 `;
 
+export const ArchiveButton = styled(Button)`
+  margin-top: var(--spacing-m);
+`;
 export const PublishingTime = styled.div`
   flex-grow: 1;
   color: var(--color-white);

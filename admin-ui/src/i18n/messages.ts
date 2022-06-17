@@ -79,7 +79,7 @@ const translations: ITranslations = {
     open: ["Avaa"],
     close: ["Sulje"],
     approve: ["Hyväksy"],
-    cancel: ["Kumoa"],
+    cancel: ["Peruuta"],
     accordion: ["sisältö"],
     search: ["Hae"],
     noResults: ["Ei tuloksia"],
@@ -187,6 +187,15 @@ const translations: ITranslations = {
     spaces: ["Tilat"],
     resources: ["Resurssit"],
     units: ["Toimipisteet"],
+  },
+
+  ArchiveReservationUnitDialog: {
+    title: ["Oletko varma että haluat arkistoida varausyksikön {{name}}?"],
+    description: [
+      "Arkistoimisen jälkeen varausyksikkö ei ole enää näkyvissä Varaamon käsittelypuolella. Mikäli haluat palauttaa varausyksikön, ota yhteyttä järjestelmän pääkäyttäjään.",
+    ],
+    archive: ["Arkistoi"],
+    success: ["Varausyksikkö arkistoitu."],
   },
   MainLander: {
     ingress: [
@@ -1079,6 +1088,7 @@ const translations: ITranslations = {
     ],
     openingTimesExternalLink: ["Aukioloajat HAUKI järjestelmässä"],
     cancel: ["Palaa tallentamatta muutoksia"],
+    archive: ["Arkistoi"],
     save: ["Tallenna tiedot"],
     preview: ["Esikatselu"],
     saving: ["Tallennetaan..."],
@@ -1156,8 +1166,7 @@ const translations: ITranslations = {
     descriptionLabel: ["Resurssin kuvaus {{lang}}"],
     descriptionPlaceholder: ["Kuvaile resurssia {{language}}"],
     cancel: ["Palaa tallentamatta tietoja"],
-    save: ["Tallenna ja julkaise"],
-    saveAsDraft: ["Tallenna luonnoksena"],
+    save: ["Tallenna"],
     saveError: ["Tietojen tallennus epäonnistui."],
   },
   ResourceTable: {
