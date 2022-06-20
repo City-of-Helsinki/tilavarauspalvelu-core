@@ -46,10 +46,20 @@ Postgresql 11 database with postgis extension. Find postgis installation instruc
 
 ### Installation issues on Mac
 
+#### Psycopg2 issue
 You might get an error when installing psycopg2. To fix the issue, you need to install OpenSSL and then update the LIBRARY_PATH env:
 ```
 brew install openssl
 export LIBRARY_PATH=$LIBRARY_PATH:/usr/local/opt/openssl/lib/
+```
+
+#### OR-Tools issue
+At the time of writing this, OR-Tools only supports x86_64/amd64 architecture so it does not work on M1 Macs. On M1 Macs you'll get an error when you try install `requirements.txt`.
+
+To solve the issues, follow [this guide](https://dev.to/yulin/how-to-install-google-or-tools-on-apple-m1-arm64-346b). Just remember to install Python 3.8 instead of the latest version available:
+
+```
+brew86 install python@3.8
 ```
 
 ### Potential build problems
