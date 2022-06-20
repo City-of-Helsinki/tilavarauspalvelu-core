@@ -113,6 +113,7 @@ class ReservationUnitQueryTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCa
             min_persons=1,
             reservations_max_days_before=360,
             reservations_min_days_before=1,
+            pricing_terms=TermsOfUseFactory(terms_type=TermsOfUse.TERMS_TYPE_PRICING)
         )
 
         cls.api_client = APIClient()
@@ -224,6 +225,9 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
                             allowReservationsWithoutOpeningHours
                             isArchived
                             state
+                            pricingTerms {
+                                termsType
+                            }
                           }
                         }
                     }

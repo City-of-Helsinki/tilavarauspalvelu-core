@@ -230,6 +230,14 @@ class ReservationUnit(models.Model):
         null=True,
         on_delete=models.SET_NULL,
     )
+    pricing_terms = models.ForeignKey(
+        TermsOfUse,
+        related_name="pricing_terms_reservation_unit",
+        verbose_name=_("Pricing terms"),
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+    )
     additional_instructions = models.TextField(
         verbose_name=_("Additional instructions"),
         blank=True,

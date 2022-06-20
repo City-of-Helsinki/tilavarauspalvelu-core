@@ -577,6 +577,9 @@ snapshots['ReservationUnitQueryTestCase::test_getting_reservation_units 1'] = {
                         'minReservationDuration': 600,
                         'nameFi': 'test name fi',
                         'priceUnit': 'PER_HOUR',
+                        'pricingTerms': {
+                            'termsType': 'PRICING_TERMS'
+                        },
                         'publishBegins': '2021-05-03T00:00:00+00:00',
                         'publishEnds': '2021-05-10T00:00:00+00:00',
                         'purposes': [
