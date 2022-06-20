@@ -1,3 +1,4 @@
+import datetime
 import json
 
 from assertpy import assert_that
@@ -7,7 +8,12 @@ from applications.models import (
     ApplicationEventStatus,
     ApplicationEventWeeklyAmountReduction,
 )
-from applications.tests.factories import ApplicationEventFactory, ApplicationFactory
+from applications.tests.factories import (
+    ApplicationEventFactory,
+    ApplicationEventScheduleResultFactory,
+    ApplicationFactory,
+)
+from reservation_units.tests.factories import ReservationUnitFactory
 
 
 class ApplicationEventQueryTestCase(ApplicationEventTestCaseBase):
@@ -153,6 +159,62 @@ class ApplicationEventQueryTestCase(ApplicationEventTestCaseBase):
         )
 
         response = self.query(query)
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
+        self.assertMatchSnapshot(content)
+
+
+class ApplicationEventScheduleResultQueryTestCase(ApplicationEventTestCaseBase):
+    @classmethod
+    def setUpTestData(cls) -> None:
+        super().setUpTestData()
+        schedule = (
+            cls.application.application_events.first().application_event_schedules.first()
+        )
+        cls.result = ApplicationEventScheduleResultFactory(
+            application_event_schedule=schedule,
+            allocated_reservation_unit=ReservationUnitFactory(
+                name="You got this reservation unit"
+            ),
+            allocated_duration="02:00",
+            allocated_day=0,
+            allocated_begin=datetime.time(12, 0),
+            allocated_end=datetime.time(14, 0),
+        )
+
+    def setUp(self):
+        self.client.force_login(self.general_admin)
+
+    def get_query(self):
+        return """query {
+                applicationEvents {
+                    edges {
+                        node {
+                            name
+                            numPersons
+                            status
+                            applicationEventSchedules {
+                                day
+                                begin
+                                end
+                                priority
+                                applicationEventScheduleResult {
+                                    allocatedReservationUnit { nameFi }
+                                    accepted
+                                    declined
+                                    allocatedDay
+                                    allocatedBegin
+                                    allocatedEnd
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            """
+
+    def test_schedule_results(self):
+        response = self.query(self.get_query())
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
         self.assertMatchSnapshot(content)

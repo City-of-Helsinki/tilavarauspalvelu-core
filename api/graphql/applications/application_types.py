@@ -5,15 +5,20 @@ from graphene_django import DjangoListField
 from graphene_permissions.mixins import AuthNode
 from graphene_permissions.permissions import AllowAny, AllowAuthenticated
 
+from api.graphql.application_rounds.application_round_types import (
+    ApplicationRoundBasketType,
+)
 from api.graphql.base_connection import TilavarausBaseConnection
 from api.graphql.base_type import PrimaryKeyObjectType
 from api.graphql.reservation_units.reservation_unit_types import ReservationUnitType
 from api.graphql.translate_fields import get_all_translatable_fields
 from applications.models import (
+    DAY_CHOICES,
     Address,
     Application,
     ApplicationEvent,
     ApplicationEventSchedule,
+    ApplicationEventScheduleResult,
     ApplicationEventStatus,
     ApplicationStatus,
     City,
@@ -107,16 +112,58 @@ class ApplicationEventAggregatedDataType(graphene.ObjectType):
     allocation_results_reservations_total = graphene.Float()
 
 
+class ApplicationEventScheduleResultType(AuthNode, PrimaryKeyObjectType):
+    permission_classes = (
+        (AllowAuthenticated,) if not settings.TMP_PERMISSIONS_DISABLED else [AllowAny]
+    )
+    allocated_reservation_unit = graphene.Field(ReservationUnitType)
+    basket = graphene.Field(ApplicationRoundBasketType)
+    allocated_day = graphene.Field(
+        graphene.Enum("allocatedDay", [(v.upper(), k) for k, v in DAY_CHOICES])
+    )
+
+    class Meta:
+        model = ApplicationEventScheduleResult
+        fields = (
+            "id",
+            "pk",
+            "accepted",
+            "declined",
+            "allocated_reservation_unit",
+            "allocated_day",
+            "allocated_begin",
+            "allocated_end",
+            "basket",
+        )
+        filter_fields = ()
+        interfaces = (graphene.relay.Node,)
+        connection_class = TilavarausBaseConnection
+
+    def resolve_pk(self, info):
+        return self.pk
+
+
 class ApplicationEventScheduleType(AuthNode, PrimaryKeyObjectType):
     permission_classes = (
         (AllowAuthenticated,) if not settings.TMP_PERMISSIONS_DISABLED else [AllowAny]
     )
     day = graphene.Int()
     priority = graphene.Int()
+    application_event_schedule_result = graphene.Field(
+        ApplicationEventScheduleResultType
+    )
 
     class Meta:
         model = ApplicationEventSchedule
-        fields = ("id", "pk", "day", "begin", "end", "priority")
+        fields = (
+            "id",
+            "pk",
+            "day",
+            "begin",
+            "end",
+            "priority",
+            "application_event_schedule_result",
+        )
         filter_fields = ()
         interfaces = (graphene.relay.Node,)
         connection_class = TilavarausBaseConnection
