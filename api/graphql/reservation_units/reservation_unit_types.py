@@ -357,6 +357,7 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
             "authentication",
             "rank",
             "reservation_kind",
+            "pricing_type",
             "can_apply_free_of_charge",
             "reservations_max_days_before",
             "reservations_min_days_before",

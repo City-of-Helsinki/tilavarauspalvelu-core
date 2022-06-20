@@ -580,6 +580,7 @@ snapshots['ReservationUnitQueryTestCase::test_getting_reservation_units 1'] = {
                         'pricingTerms': {
                             'termsType': 'PRICING_TERMS'
                         },
+                        'pricingType': 'PAID',
                         'publishBegins': '2021-05-03T00:00:00+00:00',
                         'publishEnds': '2021-05-10T00:00:00+00:00',
                         'purposes': [

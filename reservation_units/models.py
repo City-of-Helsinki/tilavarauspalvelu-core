@@ -141,6 +141,11 @@ class ReservationKind(models.TextChoices):
     DIRECT_AND_SEASON = "direct_and_season", _("Direct and season")
 
 
+class PricingType(models.TextChoices):
+    PAID = "paid"
+    FREE = "free"
+
+
 class ReservationUnit(models.Model):
     sku = models.CharField(
         verbose_name=_("SKU"), max_length=255, blank=True, default=""
@@ -466,6 +471,15 @@ class ReservationUnit(models.Model):
         choices=ReservationKind.choices,
         default=ReservationKind.DIRECT_AND_SEASON,
         help_text="What kind of reservations are to be booked with this reservation unit.",
+    )
+
+    pricing_type = models.CharField(
+        max_length=20,
+        verbose_name=_("Pricing type"),
+        choices=PricingType.choices,
+        blank=True,
+        null=True,
+        help_text="What kind of pricing types are available with this reservation unit.",
     )
 
     can_apply_free_of_charge = models.BooleanField(
