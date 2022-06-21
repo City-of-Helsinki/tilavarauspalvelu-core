@@ -110,6 +110,14 @@ export const VerticalFlex = styled.div`
 
 VerticalFlex.displayName = "VerticalFlex";
 
+export const VerticalFlexNoGap = styled.div`
+  display: flex;
+  gap: 0;
+  flex-direction: column;
+`;
+
+VerticalFlexNoGap.displayName = "VerticalFlexNoGap";
+
 export const Container = styled.div`
   max-width: var(--container-width-xl);
 `;

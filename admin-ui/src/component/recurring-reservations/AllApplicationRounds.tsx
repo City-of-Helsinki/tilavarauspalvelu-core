@@ -12,7 +12,7 @@ import {
 import { applicationRoundUrl } from "../../common/urls";
 import { formatDate } from "../../common/util";
 import { useNotification } from "../../context/NotificationContext";
-import { Container, Content, VerticalFlex } from "../../styles/layout";
+import { Container, Content, VerticalFlexNoGap } from "../../styles/layout";
 import { H1 } from "../../styles/new-typography";
 import BreadcrumbWrapper from "../BreadcrumbWrapper";
 import Loader from "../Loader";
@@ -24,8 +24,8 @@ import { APPLICATION_ROUNDS_QUERY } from "./queries";
 import { truncate } from "./util";
 
 const StyledContainer = styled(Container)`
-  padding: var(--spacing-m) 0 var(--spacing-layout-xl);
-  background: var(--color-black-5);
+  padding: var(--spacing-l) 0 var(--spacing-layout-xl);
+  background: var(--gray-light);
 `;
 
 const AccordionContainer = styled.div`
@@ -117,7 +117,7 @@ function AllApplicationRounds(): JSX.Element | null {
 
       <StyledContainer>
         <Content>
-          <VerticalFlex>
+          <VerticalFlexNoGap>
             <StyledH1>{t("MainMenu.applicationRounds")}</StyledH1>
             <RoundsAccordion
               initiallyOpen
@@ -135,6 +135,7 @@ function AllApplicationRounds(): JSX.Element | null {
               name={t("ApplicationRound.groupLabel.notSent")}
               rounds={applicationRounds.g2 || []}
               hideIfEmpty
+              initiallyOpen
             />
             <RoundsAccordion
               name={t("ApplicationRound.groupLabel.open")}
@@ -237,7 +238,7 @@ function AllApplicationRounds(): JSX.Element | null {
                 variant="light"
               />
             </Accordion>
-          </VerticalFlex>
+          </VerticalFlexNoGap>
         </Content>
       </StyledContainer>
     </>
