@@ -16,7 +16,7 @@ type RoundStatus = {
   group: string;
 };
 
-export const getApplicationRoundStatus = (
+export const getApplicationRoundStatusTag = (
   applicationRound: ApplicationRoundType
 ): RoundStatus => {
   const cutOffDate = new Date();
@@ -66,12 +66,13 @@ function ApplicationRoundStatusTag({ applicationRound }: IProps): JSX.Element {
   return (
     <Tag
       theme={{
-        "--tag-background": getApplicationRoundStatus(applicationRound).color,
+        "--tag-background":
+          getApplicationRoundStatusTag(applicationRound).color,
       }}
     >
       {t(
         `ApplicationRound.statuses.${
-          getApplicationRoundStatus(applicationRound).label
+          getApplicationRoundStatusTag(applicationRound).label
         }`
       )}
     </Tag>

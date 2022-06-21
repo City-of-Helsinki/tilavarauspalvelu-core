@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { ApplicationRoundType } from "../../common/gql-types";
 import { applicationRoundUrl } from "../../common/urls";
-import ApplicationRoundStatusBlock from "./ApplicationRoundStatusTag";
+import ApplicationRoundStatusTag from "./ApplicationRoundStatusTag";
 import ReservationPeriod from "./ReservationPeriod";
 import TimeframeStatus from "./TimeframeStatus";
 
@@ -105,7 +105,7 @@ function ApplicationRoundCard({ applicationRound }: IProps): JSX.Element {
           </Stats>
         </Container>
         <RightColumn>
-          <ApplicationRoundStatusBlock applicationRound={applicationRound} />
+          <ApplicationRoundStatusTag applicationRound={applicationRound} />
           <Link to={applicationRoundUrl(String(applicationRound.pk))}>
             <IconArrowRight size="l" style={{ color: "var(--color-black)" }} />
           </Link>
