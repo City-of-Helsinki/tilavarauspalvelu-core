@@ -75,7 +75,7 @@ import {
   UPDATE_RESERVATION_UNIT,
 } from "./queries";
 import FormErrorSummary from "../../../common/FormErrorSummary";
-import SortedCompobox from "./SortedCompobox";
+import SortedCompobox from "./SortedSelect";
 import { useModal } from "../../../context/ModalContext";
 import ArchiveDialog from "./ArchiveDialog";
 
