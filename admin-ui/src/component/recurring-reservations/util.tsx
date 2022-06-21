@@ -98,7 +98,7 @@ export const appMapper = (
     applicationCount: trim(
       `${formatNumber(
         app.aggregatedData?.appliedReservationsTotal,
-        t("common.volumeUnit")
+        ""
       )} / ${formatNumber(
         Number(app.aggregatedData?.appliedMinDurationTotal) / 3600
       )} t`,

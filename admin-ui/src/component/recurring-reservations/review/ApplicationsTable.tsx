@@ -22,6 +22,12 @@ type Props = {
 
 const getColConfig = (t: TFunction) => [
   {
+    headerName: t("Application.headings.id"),
+    isSortable: true,
+    key: "id",
+    transform: ({ id }: ApplicationView) => String(id),
+  },
+  {
     headerName: t("Application.headings.customer"),
     isSortable: true,
     key: "applicant",
