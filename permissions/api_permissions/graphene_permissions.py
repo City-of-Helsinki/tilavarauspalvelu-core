@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404
 from graphene import ResolveInfo
 from graphene_permissions.permissions import BasePermission
 
-from applications.models import Application, ApplicationEvent
+from applications.models import Application, ApplicationEvent, ApplicationEventSchedule
 from permissions.helpers import (
     can_create_reservation,
     can_handle_reservation,
@@ -15,6 +15,7 @@ from permissions.helpers import (
     can_manage_purposes,
     can_manage_reservation_purposes,
     can_manage_resources,
+    can_manage_service_sectors_applications,
     can_manage_spaces,
     can_manage_units,
     can_manage_units_reservation_units,
@@ -89,6 +90,46 @@ class ApplicationEventPermission(BasePermission):
     @classmethod
     def has_permission(cls, info: ResolveInfo) -> bool:
         return info.context.user.is_authenticated
+
+
+class ApplicationEventScheduleResultPermission(BasePermission):
+    @classmethod
+    def has_mutation_permission(cls, root: Any, info: ResolveInfo, input: dict) -> bool:
+        if not cls.has_permission(info):
+            return False
+
+        pk = input.get("application_event_schedule")
+        if not pk:
+            return False
+
+        schedule = ApplicationEventSchedule.objects.get(pk=pk)
+        application = schedule.application_event.application
+        service_sector = application.application_round.service_sector
+
+        return can_manage_service_sectors_applications(
+            info.context.user, service_sector
+        )
+
+    @classmethod
+    def has_permission(cls, info: ResolveInfo) -> bool:
+        user = info.context.user
+
+        if user.is_anonymous:
+            return False
+
+        service_sector_roles = user.service_sector_roles.all()
+        unit_roles = user.unit_roles.all()
+        general_roles = user.general_roles.all()
+
+        # User need to have some roles to have any access to results.
+        if (
+            service_sector_roles.exists()
+            or unit_roles.exists()
+            or general_roles.exists()
+        ):
+            return True
+
+        return False
 
 
 class OrganisationPermission(BasePermission):
