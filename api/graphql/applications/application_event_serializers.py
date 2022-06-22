@@ -1,3 +1,5 @@
+import datetime
+
 from rest_framework import serializers
 
 from api.applications_api.serializers import (
@@ -15,6 +17,7 @@ from applications.models import (
     Application,
     ApplicationEvent,
     ApplicationEventSchedule,
+    ApplicationEventScheduleResult,
     ApplicationEventStatus,
     EventReservationUnit,
 )
@@ -161,3 +164,63 @@ class ApplicationEventStatusCreateSerializer(
             "user_id",
             "timestamp",
         ]
+
+
+class ApplicationEventScheduleResultCreateSerializer(PrimaryKeySerializer):
+    application_event_schedule = IntegerPrimaryKeyField(
+        help_text="Application schedule pk for this result",
+        queryset=ApplicationEventSchedule.objects.all(),
+    )
+    allocated_day = serializers.IntegerField(required=False)
+    allocated_begin = serializers.TimeField(required=False)
+    allocated_end = serializers.TimeField(required=False)
+    allocated_reservation_unit = IntegerPrimaryKeyField(
+        required=True, queryset=ReservationUnit.objects.all()
+    )
+
+    class Meta:
+        model = ApplicationEventScheduleResult
+        fields = [
+            "accepted",
+            "declined",
+            "application_event_schedule",
+            "allocated_reservation_unit",
+            "allocated_day",
+            "allocated_begin",
+            "allocated_end",
+            "basket",
+        ]
+
+    DEFAULT_MAP = {
+        "allocated_day": "day",
+        "allocated_begin": "begin",
+        "allocated_end": "end",
+    }
+
+    def validate(self, data):
+        data = super().validate(data)
+
+        schedule = data["application_event_schedule"]
+
+        # Copy defaults from event schedule.
+        for res_field, schedule_field in self.DEFAULT_MAP.items():
+            value = data.get(res_field)
+            if not value:
+                data[res_field] = getattr(schedule, schedule_field, None)
+
+        # Assign duration from the delta of begin and end.
+        begin = data.get("allocated_begin")
+        end = data.get("allocated_end")
+
+        if begin and end:
+            data["allocated_duration"] = datetime.timedelta(
+                hours=end.hour, minutes=end.minute
+            ) - datetime.timedelta(hours=begin.hour, minutes=begin.minute)
+
+        return data
+
+
+class ApplicationEventScheduleResultUpdateSerializer(
+    ApplicationEventScheduleResultCreateSerializer, PrimaryKeyUpdateSerializer
+):
+    DEFAULT_MAP = {}

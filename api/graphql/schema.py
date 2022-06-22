@@ -123,6 +123,8 @@ from .application_rounds.application_round_types import ApplicationRoundType
 from .applications.application_mutations import (
     ApplicationEventCreateMutation,
     ApplicationEventDeleteMutation,
+    ApplicationEventScheduleResultCreateMutation,
+    ApplicationEventScheduleResultUpdateMutation,
     ApplicationEventUpdateMutation,
 )
 
@@ -508,6 +510,13 @@ class Mutation(graphene.ObjectType):
     create_application_event = ApplicationEventCreateMutation.Field()
     update_application_event = ApplicationEventUpdateMutation.Field()
     delete_application_event = ApplicationEventDeleteMutation.Field()
+
+    create_application_event_schedule_result = (
+        ApplicationEventScheduleResultCreateMutation.Field()
+    )
+    update_application_event_schedule_result = (
+        ApplicationEventScheduleResultUpdateMutation.Field()
+    )
 
     create_reservation = ReservationCreateMutation.Field()
     update_reservation = ReservationUpdateMutation.Field()

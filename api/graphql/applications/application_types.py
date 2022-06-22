@@ -31,9 +31,10 @@ from permissions.api_permissions.graphene_field_decorators import (
 )
 from permissions.api_permissions.graphene_permissions import (
     AddressPermission,
+    ApplicationEventScheduleResultPermission,
     ApplicationPermission,
     CityPermission,
-    OrganisationPermission, ApplicationEventScheduleResultPermission,
+    OrganisationPermission,
 )
 from spaces.models import Space
 from utils.query_performance import QueryPerformanceOptimizerMixin
