@@ -305,3 +305,30 @@ class ApplicationsGraphQLFiltersTestCase(ApplicationTestCaseBase):
 
         assert_that(content.get("errors")).is_none()
         self.assertMatchSnapshot(content)
+
+    def test_filter_by_applicant(self):
+        query = (
+            """
+            query {
+                applications(applicantType: "%s") {
+                    edges {
+                        node {
+                            additionalInformation
+                        }
+                    }
+                }
+            }
+        """
+            % Application.APPLICANT_TYPE_COMMUNITY.upper()
+        )
+
+        ApplicationFactory(
+            applicant_type=Application.APPLICANT_TYPE_COMPANY, user=self.regular_joe
+        )
+        response = self.query(query)
+        assert_that(response.status_code).is_equal_to(200)
+
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)

@@ -75,6 +75,20 @@ snapshots['ApplicationsGraphQLFiltersTestCase::test_application_filter_by_user 1
     }
 }
 
+snapshots['ApplicationsGraphQLFiltersTestCase::test_filter_by_applicant 1'] = {
+    'data': {
+        'applications': {
+            'edges': [
+                {
+                    'node': {
+                        'additionalInformation': 'Something to fill the field with text'
+                    }
+                }
+            ]
+        }
+    }
+}
+
 snapshots['ApplicationsGraphQLFiltersTestCase::test_order_by_applicant_asc 1'] = {
     'data': {
         'applications': {
