@@ -33,7 +33,7 @@ from permissions.api_permissions.graphene_permissions import (
     AddressPermission,
     ApplicationPermission,
     CityPermission,
-    OrganisationPermission,
+    OrganisationPermission, ApplicationEventScheduleResultPermission,
 )
 from spaces.models import Space
 from utils.query_performance import QueryPerformanceOptimizerMixin
@@ -167,6 +167,10 @@ class ApplicationEventScheduleType(AuthNode, PrimaryKeyObjectType):
         filter_fields = ()
         interfaces = (graphene.relay.Node,)
         connection_class = TilavarausBaseConnection
+
+    @check_resolver_permission(ApplicationEventScheduleResultPermission)
+    def resolve_application_event_schedule_result(self, info: graphene.ResolveInfo):
+        return getattr(self, "application_event_schedule_result", None)
 
 
 class EventReservationUnitType(AuthNode, PrimaryKeyObjectType):
