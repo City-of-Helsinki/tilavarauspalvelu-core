@@ -58,6 +58,7 @@ import {
   applicationUrl,
 } from "../../common/urls";
 import { applicantName, getNormalizedApplicationStatus } from "./util";
+import { useNotification } from "../../context/NotificationContext";
 
 interface IRouteParams {
   applicationId: string;
@@ -231,6 +232,7 @@ const ActionButton = styled(Button)`
 `;
 
 function Application(): JSX.Element | null {
+  const { notifyError } = useNotification();
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [documentStatus, setDocumentStatus] = useState<
@@ -244,7 +246,6 @@ function Application(): JSX.Element | null {
   >(null);
   const [statusNotification, setStatusNotification] =
     useState<ApplicationStatus | null>(null);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const { applicationId } = useParams<IRouteParams>();
   const { t, i18n } = useTranslation();
@@ -255,7 +256,7 @@ function Application(): JSX.Element | null {
 
       setApplication(result);
     } catch (error) {
-      setErrorMsg("errors.errorFetchingApplication");
+      notifyError(t("errors.errorFetchingApplication"));
       setIsLoading(false);
     }
   };
@@ -281,7 +282,7 @@ function Application(): JSX.Element | null {
       });
       setApplicationRound(applicationRoundResult);
     } catch (error) {
-      setErrorMsg("errors.errorFetchingApplicationRound");
+      notifyError(t("errors.errorFetchingApplicationRound"));
     }
   };
 
@@ -298,12 +299,13 @@ function Application(): JSX.Element | null {
           : []
       );
     } catch (error) {
-      setErrorMsg("errors.errorFetchingReservations");
+      notifyError(t("errors.errorFetchingReservations"));
     }
   };
 
   useEffect(() => {
     fetchApplication(Number(applicationId));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [applicationId]);
 
   useEffect(() => {
@@ -330,19 +332,18 @@ function Application(): JSX.Element | null {
   const modifyApplicationStatus = async (
     app: ApplicationType,
     status: ApplicationStatus,
-    useNotification = false
+    withNotification = false
   ) => {
     if (!app) return;
     try {
-      setErrorMsg(null);
       setIsSaving(true);
       await setApplicationStatus(app.id, status);
       fetchApplication(app.id);
-      if (useNotification) {
+      if (withNotification) {
         setStatusNotification(status);
       }
     } catch (error) {
-      setErrorMsg("errors.errorSavingApplication");
+      notifyError(t("errors.errorSavingApplication"));
     } finally {
       setTimeout(() => setIsSaving(false), 1000);
     }
@@ -809,20 +810,6 @@ function Application(): JSX.Element | null {
             )}
           </ContentContainer>
         </>
-      )}
-      {errorMsg && (
-        <Notification
-          type="error"
-          label={t("errors.functionFailed")}
-          position="top-center"
-          autoClose={false}
-          dismissible
-          closeButtonLabelText={t("common.close")}
-          displayAutoCloseProgress={false}
-          onClose={() => setErrorMsg(null)}
-        >
-          {t(errorMsg)}
-        </Notification>
       )}
     </Wrapper>
   );

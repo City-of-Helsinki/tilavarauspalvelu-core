@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
-import { IconLocation, Notification } from "hds-react";
+import { IconLocation } from "hds-react";
 import get from "lodash/get";
 import {
   getApplication,
@@ -27,6 +27,7 @@ import { formatDate, localizedValue } from "../../common/util";
 import { weekdays } from "../../common/const";
 import { applicationUrl } from "../../common/urls";
 import { applicantName } from "./util";
+import { useNotification } from "../../context/NotificationContext";
 
 interface IRouteParams {
   applicationId: string;
@@ -81,13 +82,13 @@ const Reservations = styled.table`
 `;
 
 function ReservationByApplicationEvent(): JSX.Element | null {
+  const { notifyError } = useNotification();
   const [isLoading, setIsLoading] = useState(true);
   const [application, setApplication] = useState<ApplicationType | null>(null);
   const [applicationRound, setApplicationRound] =
     useState<ApplicationRoundType | null>(null);
   const [recurringReservation, setRecurringReservation] =
     useState<RecurringReservation | null>(null);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const { applicationId, recurringReservationId } = useParams<IRouteParams>();
   const { t, i18n } = useTranslation();
@@ -98,7 +99,7 @@ function ReservationByApplicationEvent(): JSX.Element | null {
 
       setApplication(result);
     } catch (error) {
-      setErrorMsg("errors.errorFetchingApplication");
+      notifyError(t("errors.errorFetchingApplication"));
       setIsLoading(false);
     }
   };
@@ -110,7 +111,7 @@ function ReservationByApplicationEvent(): JSX.Element | null {
       });
       setApplicationRound(applicationRoundResult);
     } catch (error) {
-      setErrorMsg("errors.errorFetchingApplicationRound");
+      notifyError(t("errors.errorFetchingApplicationRound"));
       setIsLoading(false);
     }
   };
@@ -120,25 +121,28 @@ function ReservationByApplicationEvent(): JSX.Element | null {
       const result = await getRecurringReservation(rrId);
       setRecurringReservation(result);
     } catch (error) {
-      setErrorMsg("errors.errorFetchingReservations");
+      notifyError(t("errors.errorFetchingReservations"));
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
     fetchApplication(Number(applicationId));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [applicationId]);
 
   useEffect(() => {
     if (application?.applicationRoundId) {
       fetchApplicationRound(application);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [application]);
 
   useEffect(() => {
     if (recurringReservationId) {
       fetchRecurringReservations(Number(recurringReservationId));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [recurringReservationId]);
 
   useEffect(() => {
@@ -274,20 +278,6 @@ function ReservationByApplicationEvent(): JSX.Element | null {
                 <div>-</div>
               )}
             </NarrowContainer>
-            {errorMsg && (
-              <Notification
-                type="error"
-                label={t("errors.functionFailed")}
-                position="top-center"
-                autoClose={false}
-                dismissible
-                closeButtonLabelText={t("common.close")}
-                displayAutoCloseProgress={false}
-                onClose={() => setErrorMsg(null)}
-              >
-                {t(errorMsg)}
-              </Notification>
-            )}
           </>
         )}
     </Wrapper>

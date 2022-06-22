@@ -29,7 +29,7 @@ export const useNotification = (): NotificationContextProps =>
 export const NotificationContextProvider: React.FC = ({ children }) => {
   const [notification, setNotification] =
     React.useState<NotificationType | null>(null);
-  const [cancel, setCancel] = React.useState<any>();
+  const [cancel, setCancel] = React.useState<NodeJS.Timeout>();
 
   const clearNotification = () => setNotification(null);
 
