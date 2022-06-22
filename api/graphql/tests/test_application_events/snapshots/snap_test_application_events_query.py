@@ -83,6 +83,22 @@ snapshots['ApplicationEventQueryTestCase::test_filter_by_applicant_type 1'] = {
     }
 }
 
+snapshots['ApplicationEventQueryTestCase::test_application_shows 1'] = {
+    'data': {
+        'applicationEvents': {
+            'edges': [
+                {
+                    'node': {
+                        'application': {
+                            'additionalInformation': 'Something to fill the field with text'
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}
+
 snapshots['ApplicationEventQueryTestCase::test_filter_by_application 1'] = {
     'data': {
         'applicationEvents': {
