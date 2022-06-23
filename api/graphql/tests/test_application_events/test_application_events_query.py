@@ -59,6 +59,27 @@ class ApplicationEventQueryTestCase(ApplicationEventTestCaseBase):
         content = json.loads(response.content)
         self.assertMatchSnapshot(content)
 
+    def test_application_shows(self):
+        query = """
+        {
+            applicationEvents {
+                edges {
+                    node {
+                        application
+                        {
+                            additionalInformation
+                        }
+                    }
+                }
+            }
+        }
+        """
+        response = self.query(query)
+
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
+        self.assertMatchSnapshot(content)
+
     def test_filter_by_pk(self):
         event = ApplicationEventFactory(
             application=self.application, name="Show only me"

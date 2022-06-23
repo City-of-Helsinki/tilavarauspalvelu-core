@@ -177,6 +177,7 @@ class ApplicationEventType(AuthNode, PrimaryKeyObjectType):
         model = ApplicationEvent
         fields = (
             "id",
+            "application",
             "name",
             "num_persons",
             "age_group_id",
