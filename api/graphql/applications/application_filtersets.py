@@ -19,6 +19,11 @@ class ApplicationFilterSet(filters.FilterSet):
     )
     user = filters.ModelChoiceFilter(field_name="user", queryset=User.objects.all())
 
+    applicant_type = filters.BaseInFilter(
+        field_name="applicant_type",
+        method="filter_by_applicant_type",
+    )
+
     order_by = filters.OrderingFilter(fields=("pk", "applicant"))
 
     class Meta:
@@ -60,6 +65,13 @@ class ApplicationFilterSet(filters.FilterSet):
             application_events__event_reservation_units__reservation_unit__unit__in=value
         )
 
+    def filter_by_applicant_type(self, qs, property, value):
+        if not value:
+            return qs
+
+        values = [v.lower() for v in value]
+        return qs.filter(applicant_type__in=values)
+
 
 class ApplicationEventFilterSet(filters.FilterSet):
     pk = filters.ModelMultipleChoiceFilter(
@@ -87,6 +99,11 @@ class ApplicationEventFilterSet(filters.FilterSet):
 
     user = filters.ModelChoiceFilter(
         field_name="application__user", queryset=User.objects.all()
+    )
+
+    applicant_type = filters.BaseInFilter(
+        field_name="application__applicant_type",
+        method="filter_by_applicant_type",
     )
 
     order_by = filters.OrderingFilter(
@@ -143,3 +160,10 @@ class ApplicationEventFilterSet(filters.FilterSet):
         if not value:
             return qs
         return qs.filter(id__in=[event.id for event in value])
+
+    def filter_by_applicant_type(self, qs, property, value):
+        if not value:
+            return qs
+
+        values = [v.lower() for v in value]
+        return qs.filter(application__applicant_type__in=values)

@@ -4,6 +4,7 @@ from assertpy import assert_that
 
 from api.graphql.tests.test_application_events.base import ApplicationEventTestCaseBase
 from applications.models import (
+    Application,
     ApplicationEventStatus,
     ApplicationEventWeeklyAmountReduction,
 )
@@ -128,6 +129,20 @@ class ApplicationEventQueryTestCase(ApplicationEventTestCaseBase):
         application = ApplicationFactory()
         ApplicationEventFactory(application=application, name="I shouldn't be listed")
         filter_clause = f"user: {self.application.user.id}"
+
+        response = self.query(self.get_query(filter_section=filter_clause))
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
+        self.assertMatchSnapshot(content)
+
+    def test_filter_by_applicant_type(self):
+        application = ApplicationFactory(
+            applicant_type=Application.APPLICANT_TYPE_COMMUNITY, user=self.regular_joe
+        )
+        ApplicationEventFactory(application=application, name="I should be listed")
+        filter_clause = (
+            f'applicantType: "{Application.APPLICANT_TYPE_COMMUNITY.upper()}"'
+        )
 
         response = self.query(self.get_query(filter_section=filter_clause))
         assert_that(response.status_code).is_equal_to(200)
