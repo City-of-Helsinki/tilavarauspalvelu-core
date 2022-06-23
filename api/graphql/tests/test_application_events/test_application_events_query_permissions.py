@@ -6,6 +6,7 @@ from django.contrib.auth import get_user_model
 from applications.models import Application
 from applications.tests.factories import (
     ApplicationEventFactory,
+    ApplicationEventScheduleResultFactory,
     ApplicationFactory,
     EventReservationUnitFactory,
 )
@@ -258,6 +259,86 @@ class ApplicationEventsGraphQLPermissionsTestCase(
         self.client.force_login(self.general_admin)
         ApplicationEventFactory(name="Some event")
         response = self.perform_basic_query()
+        assert_that(response.status_code).is_equal_to(200)
+
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+
+class ApplicationEventScheduleResultQueryPermissionsTestCase(
+    ApplicationEventPermissionsTestCaseBase
+):
+    @classmethod
+    def setUpTestData(cls) -> None:
+        super().setUpTestData()
+        cls.application_event = cls.application.application_events.first()
+        cls.schedule = cls.application_event.application_event_schedules.filter(
+            priority=300
+        ).first()
+        cls.result = ApplicationEventScheduleResultFactory(
+            accepted=False,
+            declined=False,
+            allocated_day=1,
+            allocated_begin=cls.schedule.begin,
+            allocated_end=cls.schedule.end,
+            application_event_schedule=cls.schedule,
+            allocated_reservation_unit=cls.event_reservation_unit.reservation_unit,
+        )
+
+    def get_query(self):
+        return """
+            query {
+                applicationEvents {
+                    edges {
+                        node {
+                            applicationEventSchedules {
+                                applicationEventScheduleResult {
+                                    accepted
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        """
+
+    def test_general_admin_can_see_schedule_result(self):
+        self.client.force_login(self.general_admin)
+        response = self.query(self.get_query())
+        assert_that(response.status_code).is_equal_to(200)
+
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_unit_admin_can_see_schedule_result(self):
+        unit_admin = self.create_unit_admin()
+        self.client.force_login(unit_admin)
+        response = self.query(self.get_query())
+        assert_that(response.status_code).is_equal_to(200)
+
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_service_sector_admin_can_see_schedule_result(self):
+        service_sector_admin = self.create_service_sector_admin()
+        self.client.force_login(service_sector_admin)
+        response = self.query(self.get_query())
+        assert_that(response.status_code).is_equal_to(200)
+
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_regular_user_cannot_see_schedule_result(self):
+        self.client.force_login(self.regular_joe)
+        response = self.query(self.get_query())
         assert_that(response.status_code).is_equal_to(200)
 
         content = json.loads(response.content)

@@ -32,14 +32,16 @@ logger = logging.getLogger(__name__)
 User = get_user_model()
 
 DAY_CHOICES = (
-    (0, _("Monday")),
-    (1, _("Tuesday")),
-    (2, _("Wednesday")),
-    (3, _("Thursday")),
-    (4, _("Friday")),
-    (5, _("Saturday")),
-    (6, _("Sunday")),
+    (0, "Monday"),
+    (1, "Tuesday"),
+    (2, "Wednesday"),
+    (3, "Thursday"),
+    (4, "Friday"),
+    (5, "Saturday"),
+    (6, "Sunday"),
 )
+
+TRANSLATED_DAY_CHOICES = tuple((k, _(v)) for k, v in DAY_CHOICES)
 
 
 def year_not_in_future(year: Optional[int]):
@@ -1228,7 +1230,9 @@ class EventOccurrence(object):
 
 
 class ApplicationEventSchedule(models.Model):
-    day = models.IntegerField(verbose_name=_("Day"), choices=DAY_CHOICES, null=False)
+    day = models.IntegerField(
+        verbose_name=_("Day"), choices=TRANSLATED_DAY_CHOICES, null=False
+    )
 
     begin = models.TimeField(
         verbose_name=_("Start"),
@@ -1330,7 +1334,7 @@ class ApplicationEventScheduleResult(models.Model):
 
     allocated_duration = models.DurationField()
     allocated_day = models.IntegerField(
-        verbose_name=_("Day"), choices=DAY_CHOICES, null=False
+        verbose_name=_("Day"), choices=TRANSLATED_DAY_CHOICES, null=False
     )
 
     allocated_begin = models.TimeField(

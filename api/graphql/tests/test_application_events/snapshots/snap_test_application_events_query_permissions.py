@@ -7,6 +7,108 @@ from snapshottest import Snapshot
 
 snapshots = Snapshot()
 
+snapshots['ApplicationEventScheduleResultQueryPermissionsTestCase::test_general_admin_can_see_schedule_result 1'] = {
+    'data': {
+        'applicationEvents': {
+            'edges': [
+                {
+                    'node': {
+                        'applicationEventSchedules': [
+                            {
+                                'applicationEventScheduleResult': {
+                                    'accepted': False
+                                }
+                            },
+                            {
+                                'applicationEventScheduleResult': None
+                            },
+                            {
+                                'applicationEventScheduleResult': None
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ApplicationEventScheduleResultQueryPermissionsTestCase::test_regular_user_cannot_see_schedule_result 1'] = {
+    'data': {
+        'applicationEvents': {
+            'edges': [
+                {
+                    'node': {
+                        'applicationEventSchedules': [
+                            {
+                                'applicationEventScheduleResult': None
+                            },
+                            {
+                                'applicationEventScheduleResult': None
+                            },
+                            {
+                                'applicationEventScheduleResult': None
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ApplicationEventScheduleResultQueryPermissionsTestCase::test_service_sector_admin_can_see_schedule_result 1'] = {
+    'data': {
+        'applicationEvents': {
+            'edges': [
+                {
+                    'node': {
+                        'applicationEventSchedules': [
+                            {
+                                'applicationEventScheduleResult': {
+                                    'accepted': False
+                                }
+                            },
+                            {
+                                'applicationEventScheduleResult': None
+                            },
+                            {
+                                'applicationEventScheduleResult': None
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ApplicationEventScheduleResultQueryPermissionsTestCase::test_unit_admin_can_see_schedule_result 1'] = {
+    'data': {
+        'applicationEvents': {
+            'edges': [
+                {
+                    'node': {
+                        'applicationEventSchedules': [
+                            {
+                                'applicationEventScheduleResult': {
+                                    'accepted': False
+                                }
+                            },
+                            {
+                                'applicationEventScheduleResult': None
+                            },
+                            {
+                                'applicationEventScheduleResult': None
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    }
+}
+
 snapshots['ApplicationEventsGraphQLPermissionsTestCase::test_regular_user_can_view_only_own_applications_event 1'] = {
     'data': {
         'applicationEvents': {

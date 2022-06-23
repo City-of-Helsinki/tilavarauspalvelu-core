@@ -382,3 +382,51 @@ snapshots['ApplicationEventQueryTestCase::test_query_ok 1'] = {
         }
     }
 }
+
+snapshots['ApplicationEventScheduleResultQueryTestCase::test_schedule_results 1'] = {
+    'data': {
+        'applicationEvents': {
+            'edges': [
+                {
+                    'node': {
+                        'applicationEventSchedules': [
+                            {
+                                'applicationEventScheduleResult': {
+                                    'accepted': False,
+                                    'allocatedBegin': '12:00:00',
+                                    'allocatedDay': 'MONDAY',
+                                    'allocatedEnd': '14:00:00',
+                                    'allocatedReservationUnit': {
+                                        'nameFi': 'You got this reservation unit'
+                                    },
+                                    'declined': False
+                                },
+                                'begin': '12:00:00',
+                                'day': 1,
+                                'end': '13:00:00',
+                                'priority': 300
+                            },
+                            {
+                                'applicationEventScheduleResult': None,
+                                'begin': '13:00:00',
+                                'day': 2,
+                                'end': '14:00:00',
+                                'priority': 200
+                            },
+                            {
+                                'applicationEventScheduleResult': None,
+                                'begin': '14:00:00',
+                                'day': 3,
+                                'end': '15:00:00',
+                                'priority': 100
+                            }
+                        ],
+                        'name': 'Test application',
+                        'numPersons': 10,
+                        'status': 'created'
+                    }
+                }
+            ]
+        }
+    }
+}
