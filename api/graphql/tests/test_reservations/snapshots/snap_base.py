@@ -43,12 +43,28 @@ snapshots['ReservationQueryTestCase::test_admin_can_read_working_memo 1'] = {
     }
 }
 
+snapshots['ReservationQueryTestCase::test_filter_by_user 1'] = {
+    'data': {
+        'reservations': {
+            'edges': [
+                {
+                    'node': {
+                        'user': 'joe.regularl@foo.com'
+                    }
+                }
+            ],
+            'totalCount': 1
+        }
+    }
+}
+
 snapshots['ReservationQueryTestCase::test_filter_only_with_permission 1'] = {
     'data': {
         'reservations': {
             'edges': [
                 {
                     'node': {
+                        'begin': '2021-10-12T12:00:00+00:00',
                         'billingAddressCity': 'Turku',
                         'billingAddressStreet': 'Aurakatu 12B',
                         'billingAddressZip': '20100',
@@ -58,6 +74,7 @@ snapshots['ReservationQueryTestCase::test_filter_only_with_permission 1'] = {
                         'billingPhone': '+358234567890',
                         'cancelDetails': '',
                         'description': 'movies&popcorn',
+                        'end': '2021-10-12T13:00:00+00:00',
                         'freeOfChargeReason': 'This is some reason.',
                         'reserveeAddressCity': 'Helsinki',
                         'reserveeAddressStreet': 'Mannerheimintie 2',
@@ -83,30 +100,7 @@ snapshots['ReservationQueryTestCase::test_filter_only_with_permission_admin 1'] 
             'edges': [
                 {
                     'node': {
-                        'billingAddressCity': 'Turku',
-                        'billingAddressStreet': 'Aurakatu 12B',
-                        'billingAddressZip': '20100',
-                        'billingEmail': 'billing@example.com',
-                        'billingFirstName': 'Reser',
-                        'billingLastName': 'Vee',
-                        'billingPhone': '+358234567890',
-                        'cancelDetails': '',
-                        'description': 'movies&popcorn',
-                        'freeOfChargeReason': 'This is some reason.',
-                        'reserveeAddressCity': 'Helsinki',
-                        'reserveeAddressStreet': 'Mannerheimintie 2',
-                        'reserveeAddressZip': '00100',
-                        'reserveeEmail': 'reservee@example.com',
-                        'reserveeFirstName': 'Reser',
-                        'reserveeId': '5727586-5',
-                        'reserveeLastName': 'Vee',
-                        'reserveeOrganisationName': 'Test organisation',
-                        'reserveePhone': '+358123456789',
-                        'user': 'joe.regularl@foo.com'
-                    }
-                },
-                {
-                    'node': {
+                        'begin': '2021-10-12T12:00:00+00:00',
                         'billingAddressCity': 'Hidden',
                         'billingAddressStreet': 'Privacy 12B',
                         'billingAddressZip': '20100',
@@ -116,6 +110,7 @@ snapshots['ReservationQueryTestCase::test_filter_only_with_permission_admin 1'] 
                         'billingPhone': '+358234567890',
                         'cancelDetails': '',
                         'description': 'something super secret',
+                        'end': '2021-10-12T13:00:00+00:00',
                         'freeOfChargeReason': 'Only admins can see me.',
                         'reserveeAddressCity': 'Nowhere',
                         'reserveeAddressStreet': 'Mystery street 2',
@@ -127,6 +122,32 @@ snapshots['ReservationQueryTestCase::test_filter_only_with_permission_admin 1'] 
                         'reserveeOrganisationName': 'Hidden organisation',
                         'reserveePhone': '+358123456789',
                         'user': 'amin.general@foo.com'
+                    }
+                },
+                {
+                    'node': {
+                        'begin': '2021-10-12T12:00:00+00:00',
+                        'billingAddressCity': 'Turku',
+                        'billingAddressStreet': 'Aurakatu 12B',
+                        'billingAddressZip': '20100',
+                        'billingEmail': 'billing@example.com',
+                        'billingFirstName': 'Reser',
+                        'billingLastName': 'Vee',
+                        'billingPhone': '+358234567890',
+                        'cancelDetails': '',
+                        'description': 'movies&popcorn',
+                        'end': '2021-10-12T13:00:00+00:00',
+                        'freeOfChargeReason': 'This is some reason.',
+                        'reserveeAddressCity': 'Helsinki',
+                        'reserveeAddressStreet': 'Mannerheimintie 2',
+                        'reserveeAddressZip': '00100',
+                        'reserveeEmail': 'reservee@example.com',
+                        'reserveeFirstName': 'Reser',
+                        'reserveeId': '5727586-5',
+                        'reserveeLastName': 'Vee',
+                        'reserveeOrganisationName': 'Test organisation',
+                        'reserveePhone': '+358123456789',
+                        'user': 'joe.regularl@foo.com'
                     }
                 }
             ],
@@ -198,6 +219,7 @@ snapshots['ReservationQueryTestCase::test_hide_fields_with_personal_information 
             'edges': [
                 {
                     'node': {
+                        'begin': '2021-10-12T12:00:00+00:00',
                         'billingAddressCity': 'Turku',
                         'billingAddressStreet': 'Aurakatu 12B',
                         'billingAddressZip': '20100',
@@ -207,6 +229,7 @@ snapshots['ReservationQueryTestCase::test_hide_fields_with_personal_information 
                         'billingPhone': '+358234567890',
                         'cancelDetails': '',
                         'description': 'movies&popcorn',
+                        'end': '2021-10-12T13:00:00+00:00',
                         'freeOfChargeReason': 'This is some reason.',
                         'reserveeAddressCity': 'Helsinki',
                         'reserveeAddressStreet': 'Mannerheimintie 2',
@@ -222,6 +245,7 @@ snapshots['ReservationQueryTestCase::test_hide_fields_with_personal_information 
                 },
                 {
                     'node': {
+                        'begin': '2021-10-12T12:00:00+00:00',
                         'billingAddressCity': None,
                         'billingAddressStreet': None,
                         'billingAddressZip': None,
@@ -231,6 +255,7 @@ snapshots['ReservationQueryTestCase::test_hide_fields_with_personal_information 
                         'billingPhone': None,
                         'cancelDetails': None,
                         'description': None,
+                        'end': '2021-10-12T13:00:00+00:00',
                         'freeOfChargeReason': None,
                         'reserveeAddressCity': None,
                         'reserveeAddressStreet': None,

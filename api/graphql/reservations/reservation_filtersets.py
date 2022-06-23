@@ -7,7 +7,7 @@ from permissions.helpers import (
     get_service_sectors_where_can_view_reservations,
     get_units_where_can_view_reservations,
 )
-from reservations.models import STATE_CHOICES, Reservation
+from reservations.models import STATE_CHOICES, Reservation, User
 from spaces.models import ServiceSector, Unit
 
 
@@ -31,6 +31,10 @@ class ReservationFilterSet(django_filters.FilterSet):
 
     only_with_permission = django_filters.BooleanFilter(
         method="get_only_with_permission"
+    )
+
+    user = django_filters.ModelChoiceFilter(
+        field_name="user", queryset=User.objects.all()
     )
 
     order_by = django_filters.OrderingFilter(
