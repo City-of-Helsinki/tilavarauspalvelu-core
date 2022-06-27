@@ -611,7 +611,7 @@ snapshots['ReservationUnitQueryTestCase::test_getting_reservation_units 1'] = {
                                 'nameFi': 'Small space'
                             }
                         ],
-                        'state': 'scheduledReservation',
+                        'state': 'SCHEDULED_RESERVATION',
                         'surfaceArea': '150.00',
                         'taxPercentage': {
                             'value': '24.00'
@@ -1302,7 +1302,7 @@ snapshots['ReservationUnitQueryTestCase::test_that_state_is_draft 1'] = {
                 {
                     'node': {
                         'nameFi': 'This should be draft',
-                        'state': 'draft'
+                        'state': 'DRAFT'
                     }
                 }
             ]
@@ -1317,7 +1317,7 @@ snapshots['ReservationUnitQueryTestCase::test_that_state_is_published 1'] = {
                 {
                     'node': {
                         'nameFi': 'This should be published',
-                        'state': 'published'
+                        'state': 'PUBLISHED'
                     }
                 }
             ]
@@ -1332,7 +1332,7 @@ snapshots['ReservationUnitQueryTestCase::test_that_state_is_scheduled_publishing
                 {
                     'node': {
                         'nameFi': 'This should be scheduled publishing',
-                        'state': 'scheduledPublishing'
+                        'state': 'SCHEDULED_PUBLISHING'
                     }
                 }
             ]
@@ -1347,7 +1347,121 @@ snapshots['ReservationUnitQueryTestCase::test_that_state_is_scheduled_reservatio
                 {
                     'node': {
                         'nameFi': 'This should be scheduled reservation',
-                        'state': 'scheduledReservation'
+                        'state': 'SCHEDULED_RESERVATION'
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitsFilterStateTestCase::test_filtering_by_archived_returns_nothing 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitsFilterStateTestCase::test_filtering_by_draft 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'nameFi': 'I am a draft!',
+                        'state': 'DRAFT'
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitsFilterStateTestCase::test_filtering_by_mixed 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'nameFi': 'I am a draft!',
+                        'state': 'DRAFT'
+                    }
+                },
+                {
+                    'node': {
+                        'nameFi': 'I am scheduled for publishing!',
+                        'state': 'SCHEDULED_PUBLISHING'
+                    }
+                },
+                {
+                    'node': {
+                        'nameFi': 'I am also scheduled for publishing!',
+                        'state': 'SCHEDULED_PUBLISHING'
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitsFilterStateTestCase::test_filtering_by_published 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'nameFi': "Yey! I'm published!",
+                        'state': 'PUBLISHED'
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitsFilterStateTestCase::test_filtering_by_scheduled_publishing 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'nameFi': 'I am scheduled for publishing!',
+                        'state': 'SCHEDULED_PUBLISHING'
+                    }
+                },
+                {
+                    'node': {
+                        'nameFi': 'I am also scheduled for publishing!',
+                        'state': 'SCHEDULED_PUBLISHING'
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitsFilterStateTestCase::test_filtering_by_scheduled_reservation 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'nameFi': 'test name fi',
+                        'state': 'SCHEDULED_RESERVATION'
+                    }
+                },
+                {
+                    'node': {
+                        'nameFi': 'I am scheduled for reservation!',
+                        'state': 'SCHEDULED_RESERVATION'
+                    }
+                },
+                {
+                    'node': {
+                        'nameFi': 'I am also scheduled for reservation!',
+                        'state': 'SCHEDULED_RESERVATION'
                     }
                 }
             ]

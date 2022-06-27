@@ -1,18 +1,23 @@
 import datetime
 import operator
 from functools import reduce
+from typing import List
 
 import django_filters
 from django.db.models import Q, Sum
 from django.utils.timezone import get_default_timezone
 
 from applications.models import ApplicationRound
+from reservation_units.enums import ReservationUnitState
 from reservation_units.models import (
     Equipment,
     KeywordGroup,
     Purpose,
     ReservationUnit,
     ReservationUnitType,
+)
+from reservation_units.utils.reservation_unit_state_helper import (
+    ReservationUnitStateHelper,
 )
 from spaces.models import Unit
 
@@ -75,6 +80,17 @@ class ReservationUnitsFilterSet(django_filters.FilterSet):
 
     reservation_kind = django_filters.CharFilter(
         field_name="reservation_kind", lookup_expr="iexact"
+    )
+
+    state = django_filters.MultipleChoiceFilter(
+        method="get_state",
+        choices=tuple(
+            (
+                state.value,  # Must use upper case characters to comply with GraphQL Enum
+                state.value,
+            )
+            for state in ReservationUnitState
+        ),
     )
 
     order_by = django_filters.OrderingFilter(
@@ -166,6 +182,13 @@ class ReservationUnitsFilterSet(django_filters.FilterSet):
         if value:
             return qs.filter(published)
         return qs.exclude(published)
+
+    def get_state(self, qs, property, value: List[ReservationUnitState]):
+        queries = []
+        for state in value:
+            queries.append(ReservationUnitStateHelper.get_state_query(state))
+        query = reduce(operator.or_, (query for query in queries))
+        return qs.filter(query).distinct()
 
 
 class EquipmentFilterSet(django_filters.FilterSet):

@@ -42,6 +42,7 @@ from permissions.api_permissions.graphene_permissions import (
     UnitPermission,
 )
 from permissions.helpers import can_manage_units
+from reservation_units.enums import ReservationUnitState
 from reservation_units.models import (
     Equipment,
     EquipmentCategory,
@@ -303,7 +304,7 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
     buffer_time_before = Duration()
     buffer_time_after = Duration()
     metadata_set = graphene.Field(ReservationMetadataSetType)
-    state = graphene.String()
+    state = graphene.Field(graphene.Enum.from_enum(ReservationUnitState))
 
     permission_classes = (
         (ReservationUnitPermission,)
