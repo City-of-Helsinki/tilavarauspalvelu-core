@@ -20,7 +20,7 @@ export default function ReservationPeriod({
 }: Props): JSX.Element {
   return (
     <Container>
-      <IconCalendar />
+      <IconCalendar size="xs" />
       {formatDate(reservationPeriodBegin)}-{formatDate(reservationPeriodEnd)}
     </Container>
   );
