@@ -27,7 +27,12 @@ from permissions.models import (
     UnitRoleChoice,
     UnitRolePermission,
 )
-from reservation_units.models import ReservationKind, ReservationUnit, TaxPercentage
+from reservation_units.models import (
+    PricingType,
+    ReservationKind,
+    ReservationUnit,
+    TaxPercentage,
+)
 from reservation_units.tests.factories import (
     EquipmentFactory,
     KeywordCategoryFactory,
@@ -113,6 +118,8 @@ class ReservationUnitQueryTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCa
             min_persons=1,
             reservations_max_days_before=360,
             reservations_min_days_before=1,
+            pricing_terms=TermsOfUseFactory(terms_type=TermsOfUse.TERMS_TYPE_PRICING),
+            pricing_type=PricingType.PAID,
         )
 
         cls.api_client = APIClient()
@@ -224,6 +231,10 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
                             allowReservationsWithoutOpeningHours
                             isArchived
                             state
+                            pricingTerms {
+                                termsType
+                            }
+                            pricingType
                           }
                         }
                     }

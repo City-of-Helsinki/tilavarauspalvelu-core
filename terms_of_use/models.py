@@ -11,6 +11,7 @@ class TermsOfUse(models.Model):
     TERMS_TYPE_CANCELLATION = "cancellation_terms"
     TERMS_TYPE_RECURRING = "recurring_terms"
     TERMS_TYPE_SERVICE = "service_terms"
+    TERMS_TYPE_PRICING = "pricing_terms"
 
     TERMS_TYPES = (
         (TERMS_TYPE_GENERIC, _("Generic terms")),
@@ -18,6 +19,7 @@ class TermsOfUse(models.Model):
         (TERMS_TYPE_CANCELLATION, _("Cancellation terms")),
         (TERMS_TYPE_RECURRING, _("Recurring reservation terms")),
         (TERMS_TYPE_SERVICE, _("Service-specific terms")),
+        (TERMS_TYPE_PRICING, _("Pricing terms")),
     )
 
     id = models.CharField(primary_key=True, max_length=100)

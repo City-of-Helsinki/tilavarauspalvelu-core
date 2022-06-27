@@ -136,9 +136,14 @@ def get_default_tax_percentage() -> int:
 
 
 class ReservationKind(models.TextChoices):
-    DIRECT = "direct", _("Direct")
-    SEASON = "season", _("Season")
-    DIRECT_AND_SEASON = "direct_and_season", _("Direct and season")
+    DIRECT = "direct"
+    SEASON = "season"
+    DIRECT_AND_SEASON = "direct_and_season"
+
+
+class PricingType(models.TextChoices):
+    PAID = "paid"
+    FREE = "free"
 
 
 class ReservationUnit(models.Model):
@@ -226,6 +231,14 @@ class ReservationUnit(models.Model):
         TermsOfUse,
         related_name="service_specific_terms_reservation_unit",
         verbose_name=_("Service-specific terms"),
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+    )
+    pricing_terms = models.ForeignKey(
+        TermsOfUse,
+        related_name="pricing_terms_reservation_unit",
+        verbose_name=_("Pricing terms"),
         blank=True,
         null=True,
         on_delete=models.SET_NULL,
@@ -458,6 +471,15 @@ class ReservationUnit(models.Model):
         choices=ReservationKind.choices,
         default=ReservationKind.DIRECT_AND_SEASON,
         help_text="What kind of reservations are to be booked with this reservation unit.",
+    )
+
+    pricing_type = models.CharField(
+        max_length=20,
+        verbose_name=_("Pricing type"),
+        choices=PricingType.choices,
+        blank=True,
+        null=True,
+        help_text="What kind of pricing types are available with this reservation unit.",
     )
 
     can_apply_free_of_charge = models.BooleanField(

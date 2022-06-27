@@ -300,6 +300,7 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
     payment_terms = graphene.Field(TermsOfUseType)
     cancellation_terms = graphene.Field(TermsOfUseType)
     service_specific_terms = graphene.Field(TermsOfUseType)
+    pricing_terms = graphene.Field(TermsOfUseType)
     tax_percentage = graphene.Field(TaxPercentageType)
     buffer_time_before = Duration()
     buffer_time_after = Duration()
@@ -340,6 +341,7 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
             "payment_terms",
             "cancellation_terms",
             "service_specific_terms",
+            "pricing_terms",
             "tax_percentage",
             "lowest_price",
             "highest_price",
@@ -355,6 +357,7 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
             "authentication",
             "rank",
             "reservation_kind",
+            "pricing_type",
             "can_apply_free_of_charge",
             "reservations_max_days_before",
             "reservations_min_days_before",
