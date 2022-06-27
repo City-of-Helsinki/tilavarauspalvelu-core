@@ -20,9 +20,6 @@ class ResourceGraphQLBase(GraphQLTestCase):
             name_fi="Test resource",
             name_en="name",
             name_sv="namn",
-            description_fi="selite",
-            description_en="desc",
-            description_sv="besk",
             space=cls.space,
         )
 
@@ -136,9 +133,6 @@ class ResourceCreateForPublishGraphQLTestCase(ResourceGraphQLBase):
 
     def get_valid_input_data(self):
         return {
-            "descriptionFi": "fide",
-            "descriptionEn": "ende",
-            "descriptionSv": "svde",
             "nameFi": "fina",
             "nameEn": "enna",
             "nameSv": "svna",
@@ -157,35 +151,6 @@ class ResourceCreateForPublishGraphQLTestCase(ResourceGraphQLBase):
         assert_that(content.get("data").get("createResource").get("errors")).is_none()
         assert_that(Resource.objects.exclude(id=self.resource.id).count()).is_equal_to(
             1
-        )
-
-    def test_validation_error_when_missing_name_translation(self):
-        data = self.get_valid_input_data()
-        data.pop("nameSv")
-        response = self.query(self.get_create_query(), input_data=data)
-        assert_that(response.status_code).is_equal_to(200)
-        content = json.loads(response.content)
-        assert_that(
-            content.get("data").get("createResource").get("errors")[0].get("messages")
-        ).contains("Missing translation for nameSv.")
-        assert_that(Resource.objects.exclude(id=self.resource.id).count()).is_equal_to(
-            0
-        )
-
-    def test_validation_error_when_missing_description_translation(self):
-        data = self.get_valid_input_data()
-        data.pop("descriptionEn")
-        response = self.query(
-            self.get_create_query(),
-            input_data=data,
-        )
-        assert_that(response.status_code).is_equal_to(200)
-        content = json.loads(response.content)
-        assert_that(
-            content.get("data").get("createResource").get("errors")[0].get("messages")
-        ).contains("Missing translation for descriptionEn.")
-        assert_that(Resource.objects.exclude(id=self.resource.id).count()).is_equal_to(
-            0
         )
 
     def test_validation_error_when_no_space_and_fixed_location(self):
@@ -265,9 +230,6 @@ class ResourceCreateAsDraftGraphQLTestCase(ResourceGraphQLBase):
 
     def get_valid_input_data(self):
         return {
-            "descriptionFi": "fide",
-            "descriptionEn": "ende",
-            "descriptionSv": "svde",
             "nameFi": "fina",
             "nameEn": "enna",
             "nameSv": "svna",
@@ -293,23 +255,6 @@ class ResourceCreateAsDraftGraphQLTestCase(ResourceGraphQLBase):
     def test_created_when_missing_name_translation(self):
         data = self.get_valid_input_data()
         data.pop("nameFi")
-        response = self.query(
-            self.get_create_query(),
-            input_data=self.get_valid_input_data(),
-        )
-        assert_that(response.status_code).is_equal_to(200)
-        content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        assert_that(content.get("data").get("createResource").get("errors")).is_none()
-        assert_that(Resource.objects.exclude(id=self.resource.id).count()).is_equal_to(
-            1
-        )
-        res_pk = content.get("data").get("createResource").get("pk")
-        assert_that(Resource.objects.get(pk=res_pk))
-
-    def test_created_when_missing_description_translation(self):
-        data = self.get_valid_input_data()
-        data.pop("descriptionFi")
         response = self.query(
             self.get_create_query(),
             input_data=self.get_valid_input_data(),
@@ -374,9 +319,6 @@ class ResourceUpdateForPublishGraphQLTestCase(ResourceGraphQLBase):
     def get_valid_input_data(self):
         return {
             "pk": self.resource.pk,
-            "descriptionFi": "fide",
-            "descriptionEn": "ende",
-            "descriptionSv": "svde",
             "nameFi": "fina",
             "nameEn": "enna",
             "nameSv": "svna",
@@ -403,17 +345,6 @@ class ResourceUpdateForPublishGraphQLTestCase(ResourceGraphQLBase):
         assert_that(
             content.get("data").get("updateResource").get("errors")[0].get("messages")
         ).contains("Missing translation for nameSv.")
-
-    def test_validation_error_when_empty_description_translation(self):
-        data = self.get_valid_input_data()
-        data["descriptionFi"] = ""
-        response = self.query(self.get_update_query(), input_data=data)
-        assert_that(response.status_code).is_equal_to(200)
-        content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("updateResource").get("errors")[0].get("messages")
-        ).contains("Missing translation for descriptionFi.")
 
     def test_validation_error_when_try_to_null_space_and_fixed_location(self):
         data = self.get_valid_input_data()
@@ -469,17 +400,6 @@ class ResourceUpdateForPublishGraphQLTestCase(ResourceGraphQLBase):
         assert_that(content.get("data").get("updateResource").get("errors")).is_none()
         self.resource.refresh_from_db()
         assert_that(self.resource.name_fi).is_equal_to("NewFinnishName")
-
-    def test_partial_update_fails_when_emptying_description(self):
-        data = {"pk": self.resource.pk, "descriptionFi": ""}
-        response = self.query(self.get_update_query(), input_data=data)
-        assert_that(response.status_code).is_equal_to(200)
-        content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        self.resource.refresh_from_db()
-        assert_that(
-            content.get("data").get("updateResource").get("errors")[0].get("messages")
-        ).contains("Missing translation for descriptionFi.")
 
     def test_partial_update_fails_when_removing_space_from_fixed_location(self):
         data = {"pk": self.resource.pk, "spacePk": None}

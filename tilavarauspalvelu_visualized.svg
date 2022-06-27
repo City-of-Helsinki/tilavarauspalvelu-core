@@ -56,12 +56,12 @@
 </g>
 <g id="clust6" class="cluster">
 <title>cluster_resources</title>
-<path fill="none" stroke="#698b22" d="M8530,-1207.5C8530,-1207.5 8748,-1207.5 8748,-1207.5 8754,-1207.5 8760,-1213.5 8760,-1219.5 8760,-1219.5 8760,-1465.5 8760,-1465.5 8760,-1471.5 8754,-1477.5 8748,-1477.5 8748,-1477.5 8530,-1477.5 8530,-1477.5 8524,-1477.5 8518,-1471.5 8518,-1465.5 8518,-1465.5 8518,-1219.5 8518,-1219.5 8518,-1213.5 8524,-1207.5 8530,-1207.5"/>
-<text text-anchor="start" x="8562" y="-1462" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="8585" y="-1462" font-family="Roboto" font-size="10.00"> &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="8616" y="-1462" font-family="Roboto" font-weight="bold" font-size="10.00">resources</text>
-<text text-anchor="start" x="8662" y="-1462" font-family="Roboto" font-size="10.00"> &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="8693" y="-1462" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</text>
+<path fill="none" stroke="#698b22" d="M8530,-1233.5C8530,-1233.5 8748,-1233.5 8748,-1233.5 8754,-1233.5 8760,-1239.5 8760,-1245.5 8760,-1245.5 8760,-1439.5 8760,-1439.5 8760,-1445.5 8754,-1451.5 8748,-1451.5 8748,-1451.5 8530,-1451.5 8530,-1451.5 8524,-1451.5 8518,-1445.5 8518,-1439.5 8518,-1439.5 8518,-1245.5 8518,-1245.5 8518,-1239.5 8524,-1233.5 8530,-1233.5"/>
+<text text-anchor="start" x="8562" y="-1436" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="8585" y="-1436" font-family="Roboto" font-size="10.00"> &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="8616" y="-1436" font-family="Roboto" font-weight="bold" font-size="10.00">resources</text>
+<text text-anchor="start" x="8662" y="-1436" font-family="Roboto" font-size="10.00"> &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="8693" y="-1436" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</text>
 </g>
 <g id="clust7" class="cluster">
 <title>cluster_spaces</title>
@@ -600,89 +600,65 @@
 <!-- resources_models_Resource -->
 <g id="node9" class="node">
 <title>resources_models_Resource</title>
-<polygon fill="white" stroke="transparent" points="8534.5,-1219.5 8534.5,-1411.5 8743.5,-1411.5 8743.5,-1219.5 8534.5,-1219.5"/>
-<polygon fill="#1b563f" stroke="transparent" points="8536,-1389.5 8536,-1410.5 8743,-1410.5 8743,-1389.5 8536,-1389.5"/>
-<text text-anchor="start" x="8592" y="-1398.5" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="8606" y="-1398.5" font-family="Roboto" font-weight="bold" font-size="10.00" fill="white"> &#160;&#160;&#160;&#160;&#160;Resource &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="8538" y="-1382.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="8552" y="-1382.1" font-family="Roboto" font-weight="bold" font-size="8.00">id</text>
-<text text-anchor="start" x="8560" y="-1382.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="8639" y="-1382.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="8653" y="-1382.1" font-family="Roboto" font-weight="bold" font-size="8.00">AutoField</text>
-<text text-anchor="start" x="8693" y="-1382.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="8538" y="-1369.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="8552" y="-1369.1" font-family="Roboto" font-weight="bold" font-size="8.00" fill="#7b7b7b">space</text>
-<text text-anchor="start" x="8576" y="-1369.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="8639" y="-1369.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="8653" y="-1369.1" font-family="Roboto" font-weight="bold" font-size="8.00" fill="#7b7b7b">ForeignKey (id)</text>
-<text text-anchor="start" x="8715" y="-1369.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<polygon fill="white" stroke="transparent" points="8534.5,-1245.5 8534.5,-1385.5 8743.5,-1385.5 8743.5,-1245.5 8534.5,-1245.5"/>
+<polygon fill="#1b563f" stroke="transparent" points="8536,-1363.5 8536,-1384.5 8743,-1384.5 8743,-1363.5 8536,-1363.5"/>
+<text text-anchor="start" x="8592" y="-1372.5" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="8606" y="-1372.5" font-family="Roboto" font-weight="bold" font-size="10.00" fill="white"> &#160;&#160;&#160;&#160;&#160;Resource &#160;&#160;&#160;&#160;&#160;</text>
 <text text-anchor="start" x="8538" y="-1356.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="8552" y="-1356.1" font-family="Roboto" font-size="8.00" fill="#7b7b7b">buffer_time_after</text>
-<text text-anchor="start" x="8614" y="-1356.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="8552" y="-1356.1" font-family="Roboto" font-weight="bold" font-size="8.00">id</text>
+<text text-anchor="start" x="8560" y="-1356.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
 <text text-anchor="start" x="8639" y="-1356.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="8653" y="-1356.1" font-family="Roboto" font-size="8.00" fill="#7b7b7b">DurationField</text>
-<text text-anchor="start" x="8702" y="-1356.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="8653" y="-1356.1" font-family="Roboto" font-weight="bold" font-size="8.00">AutoField</text>
+<text text-anchor="start" x="8693" y="-1356.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
 <text text-anchor="start" x="8538" y="-1343.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="8552" y="-1343.1" font-family="Roboto" font-size="8.00" fill="#7b7b7b">buffer_time_before</text>
-<text text-anchor="start" x="8621" y="-1343.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="8552" y="-1343.1" font-family="Roboto" font-weight="bold" font-size="8.00" fill="#7b7b7b">space</text>
+<text text-anchor="start" x="8576" y="-1343.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
 <text text-anchor="start" x="8639" y="-1343.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="8653" y="-1343.1" font-family="Roboto" font-size="8.00" fill="#7b7b7b">DurationField</text>
-<text text-anchor="start" x="8702" y="-1343.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="8653" y="-1343.1" font-family="Roboto" font-weight="bold" font-size="8.00" fill="#7b7b7b">ForeignKey (id)</text>
+<text text-anchor="start" x="8715" y="-1343.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
 <text text-anchor="start" x="8538" y="-1330.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="8552" y="-1330.1" font-family="Roboto" font-size="8.00">description</text>
-<text text-anchor="start" x="8591" y="-1330.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="8552" y="-1330.1" font-family="Roboto" font-size="8.00" fill="#7b7b7b">buffer_time_after</text>
+<text text-anchor="start" x="8614" y="-1330.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
 <text text-anchor="start" x="8639" y="-1330.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="8653" y="-1330.1" font-family="Roboto" font-size="8.00">TextField</text>
-<text text-anchor="start" x="8685" y="-1330.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="8653" y="-1330.1" font-family="Roboto" font-size="8.00" fill="#7b7b7b">DurationField</text>
+<text text-anchor="start" x="8702" y="-1330.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
 <text text-anchor="start" x="8538" y="-1317.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="8552" y="-1317.1" font-family="Roboto" font-size="8.00" fill="#7b7b7b">description_en</text>
-<text text-anchor="start" x="8604" y="-1317.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="8552" y="-1317.1" font-family="Roboto" font-size="8.00" fill="#7b7b7b">buffer_time_before</text>
+<text text-anchor="start" x="8621" y="-1317.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
 <text text-anchor="start" x="8639" y="-1317.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="8653" y="-1317.1" font-family="Roboto" font-size="8.00" fill="#7b7b7b">TranslationTextField</text>
-<text text-anchor="start" x="8723" y="-1317.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="8653" y="-1317.1" font-family="Roboto" font-size="8.00" fill="#7b7b7b">DurationField</text>
+<text text-anchor="start" x="8702" y="-1317.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
 <text text-anchor="start" x="8538" y="-1304.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="8552" y="-1304.1" font-family="Roboto" font-size="8.00" fill="#7b7b7b">description_fi</text>
+<text text-anchor="start" x="8552" y="-1304.1" font-family="Roboto" font-size="8.00">location_type</text>
 <text text-anchor="start" x="8599" y="-1304.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
 <text text-anchor="start" x="8639" y="-1304.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="8653" y="-1304.1" font-family="Roboto" font-size="8.00" fill="#7b7b7b">TranslationTextField</text>
-<text text-anchor="start" x="8723" y="-1304.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="8653" y="-1304.1" font-family="Roboto" font-size="8.00">CharField</text>
+<text text-anchor="start" x="8689" y="-1304.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
 <text text-anchor="start" x="8538" y="-1291.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="8552" y="-1291.1" font-family="Roboto" font-size="8.00" fill="#7b7b7b">description_sv</text>
-<text text-anchor="start" x="8603" y="-1291.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="8552" y="-1291.1" font-family="Roboto" font-size="8.00">name</text>
+<text text-anchor="start" x="8573" y="-1291.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
 <text text-anchor="start" x="8639" y="-1291.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="8653" y="-1291.1" font-family="Roboto" font-size="8.00" fill="#7b7b7b">TranslationTextField</text>
-<text text-anchor="start" x="8723" y="-1291.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="8653" y="-1291.1" font-family="Roboto" font-size="8.00">CharField</text>
+<text text-anchor="start" x="8689" y="-1291.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
 <text text-anchor="start" x="8538" y="-1278.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="8552" y="-1278.1" font-family="Roboto" font-size="8.00">location_type</text>
-<text text-anchor="start" x="8599" y="-1278.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="8552" y="-1278.1" font-family="Roboto" font-size="8.00" fill="#7b7b7b">name_en</text>
+<text text-anchor="start" x="8586" y="-1278.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
 <text text-anchor="start" x="8639" y="-1278.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="8653" y="-1278.1" font-family="Roboto" font-size="8.00">CharField</text>
-<text text-anchor="start" x="8689" y="-1278.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="8653" y="-1278.1" font-family="Roboto" font-size="8.00" fill="#7b7b7b">TranslationCharField</text>
+<text text-anchor="start" x="8727" y="-1278.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
 <text text-anchor="start" x="8538" y="-1265.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="8552" y="-1265.1" font-family="Roboto" font-size="8.00">name</text>
-<text text-anchor="start" x="8573" y="-1265.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="8552" y="-1265.1" font-family="Roboto" font-size="8.00" fill="#7b7b7b">name_fi</text>
+<text text-anchor="start" x="8581" y="-1265.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
 <text text-anchor="start" x="8639" y="-1265.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="8653" y="-1265.1" font-family="Roboto" font-size="8.00">CharField</text>
-<text text-anchor="start" x="8689" y="-1265.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="8653" y="-1265.1" font-family="Roboto" font-size="8.00" fill="#7b7b7b">TranslationCharField</text>
+<text text-anchor="start" x="8727" y="-1265.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
 <text text-anchor="start" x="8538" y="-1252.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="8552" y="-1252.1" font-family="Roboto" font-size="8.00" fill="#7b7b7b">name_en</text>
-<text text-anchor="start" x="8586" y="-1252.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
+<text text-anchor="start" x="8552" y="-1252.1" font-family="Roboto" font-size="8.00" fill="#7b7b7b">name_sv</text>
+<text text-anchor="start" x="8585" y="-1252.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
 <text text-anchor="start" x="8639" y="-1252.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
 <text text-anchor="start" x="8653" y="-1252.1" font-family="Roboto" font-size="8.00" fill="#7b7b7b">TranslationCharField</text>
 <text text-anchor="start" x="8727" y="-1252.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="8538" y="-1239.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="8552" y="-1239.1" font-family="Roboto" font-size="8.00" fill="#7b7b7b">name_fi</text>
-<text text-anchor="start" x="8581" y="-1239.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="8639" y="-1239.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="8653" y="-1239.1" font-family="Roboto" font-size="8.00" fill="#7b7b7b">TranslationCharField</text>
-<text text-anchor="start" x="8727" y="-1239.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="8538" y="-1226.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="8552" y="-1226.1" font-family="Roboto" font-size="8.00" fill="#7b7b7b">name_sv</text>
-<text text-anchor="start" x="8585" y="-1226.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="8639" y="-1226.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<text text-anchor="start" x="8653" y="-1226.1" font-family="Roboto" font-size="8.00" fill="#7b7b7b">TranslationCharField</text>
-<text text-anchor="start" x="8727" y="-1226.1" font-family="Roboto" font-size="8.00"> &#160;&#160;&#160;&#160;&#160;</text>
-<polygon fill="none" stroke="black" points="8534.5,-1219.5 8534.5,-1411.5 8743.5,-1411.5 8743.5,-1219.5 8534.5,-1219.5"/>
+<polygon fill="none" stroke="black" points="8534.5,-1245.5 8534.5,-1385.5 8743.5,-1385.5 8743.5,-1245.5 8534.5,-1245.5"/>
 </g>
 <!-- spaces_models_Space -->
 <g id="node17" class="node">
@@ -795,8 +771,8 @@
 <!-- resources_models_Resource&#45;&gt;spaces_models_Space -->
 <g id="edge8" class="edge">
 <title>resources_models_Resource&#45;&gt;spaces_models_Space</title>
-<path fill="none" stroke="black" d="M8555.82,-1209.89C8542.95,-1199.15 8528.93,-1189.73 8514,-1183 8414.06,-1137.94 8120.04,-1212.01 8021,-1165 7985.24,-1148.03 7953.78,-1119.92 7927.8,-1090.14"/>
-<ellipse fill="black" stroke="black" cx="8559.01" cy="-1212.65" rx="4" ry="4"/>
+<path fill="none" stroke="black" d="M8582.15,-1235.1C8563.02,-1214.41 8539.87,-1194.67 8514,-1183 8414.06,-1137.94 8120.04,-1212.01 8021,-1165 7985.24,-1148.03 7953.78,-1119.92 7927.8,-1090.14"/>
+<ellipse fill="black" stroke="black" cx="8585.02" cy="-1238.28" rx="4" ry="4"/>
 <text text-anchor="middle" x="8053" y="-1154.1" font-family="Roboto" font-size="8.00"> space (resource)</text>
 </g>
 <!-- mptt_models_MPTTModel -->
@@ -3082,9 +3058,9 @@
 <!-- reservation_units_models_ReservationUnit&#45;&gt;resources_models_Resource -->
 <g id="edge54" class="edge">
 <title>reservation_units_models_ReservationUnit&#45;&gt;resources_models_Resource</title>
-<path fill="none" stroke="black" d="M8878.73,-1527.7C8870.77,-1517.25 8861.89,-1507.47 8852,-1498.5 8837.45,-1485.31 8781.05,-1500.24 8764,-1490.5 8735.72,-1474.34 8712.16,-1448.87 8693.4,-1422.35"/>
+<path fill="none" stroke="black" d="M8878.73,-1527.7C8870.77,-1517.25 8861.89,-1507.47 8852,-1498.5 8837.45,-1485.31 8781.05,-1500.24 8764,-1490.5 8726.61,-1469.13 8697.47,-1431.5 8676.77,-1396.69"/>
 <ellipse fill="black" stroke="black" cx="8881.21" cy="-1531.07" rx="4" ry="4"/>
-<ellipse fill="black" stroke="black" cx="8691.01" cy="-1418.89" rx="4" ry="4"/>
+<ellipse fill="black" stroke="black" cx="8674.76" cy="-1393.22" rx="4" ry="4"/>
 <text text-anchor="middle" x="8920.5" y="-1505.6" font-family="Roboto" font-size="8.00"> resources (reservation_units)</text>
 </g>
 <!-- reservation_units_models_ReservationUnit&#45;&gt;spaces_models_Unit -->

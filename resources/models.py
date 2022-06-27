@@ -13,9 +13,6 @@ class Resource(models.Model):
         max_length=20, choices=LOCATION_TYPES, default=LOCATION_FIXED
     )
     name = models.CharField(verbose_name=_("Name"), max_length=255)
-    description = models.TextField(
-        verbose_name=_("Description for the resource"), default=""
-    )
     space = models.ForeignKey(
         Space, verbose_name="Space", on_delete=models.SET_NULL, null=True, blank=True
     )
