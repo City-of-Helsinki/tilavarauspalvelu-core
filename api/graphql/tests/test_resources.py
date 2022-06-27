@@ -333,18 +333,35 @@ class ResourceUpdateForPublishGraphQLTestCase(ResourceGraphQLBase):
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
-        assert_that(Resource.objects.get(id=self.resource.id).name).is_equal_to("fina")
+        updated_resource = Resource.objects.get(id=self.resource.id)
+        assert_that(updated_resource.name).is_equal_to("fina")
+        assert_that(updated_resource.name_en).is_equal_to("enna")
+        assert_that(updated_resource.name_sv).is_equal_to("svna")
 
-    def test_validation_error_when_empty_name_translation(self):
+    def test_update_without_translations(self):
         data = self.get_valid_input_data()
-        data["nameSv"] = ""
+        data["nameEn"] = None
+        data["nameSv"] = None
+        response = self.query(self.get_update_query(), input_data=data)
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        assert_that(content.get("data").get("updateResource").get("errors")).is_none()
+        updated_resource = Resource.objects.get(id=self.resource.id)
+        assert_that(updated_resource.name).is_equal_to("fina")
+        assert_that(updated_resource.name_en).is_none()
+        assert_that(updated_resource.name_sv).is_none()
+
+    def test_validation_error_when_empty_finnish_name(self):
+        data = self.get_valid_input_data()
+        data["nameFi"] = ""
         response = self.query(self.get_update_query(), input_data=data)
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
         assert_that(
             content.get("data").get("updateResource").get("errors")[0].get("messages")
-        ).contains("Missing translation for nameSv.")
+        ).contains("Missing translation for nameFi.")
 
     def test_validation_error_when_try_to_null_space_and_fixed_location(self):
         data = self.get_valid_input_data()
