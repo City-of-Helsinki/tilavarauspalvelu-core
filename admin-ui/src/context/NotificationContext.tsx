@@ -29,11 +29,18 @@ export const useNotification = (): NotificationContextProps =>
 export const NotificationContextProvider: React.FC = ({ children }) => {
   const [notification, setNotification] =
     React.useState<NotificationType | null>(null);
+  const [cancel, setCancel] = React.useState<NodeJS.Timeout>();
+
   const clearNotification = () => setNotification(null);
 
   const showDisappearingNotification = (n: NotificationType) => {
+    clearTimeout(cancel);
     setNotification(n);
-    setTimeout(() => setNotification(null), 1000 * 5);
+    const timeout = setTimeout(() => {
+      setNotification(null);
+    }, 1000 * 5);
+
+    setCancel(timeout);
   };
 
   function notifyError(title: string, message?: string) {
@@ -52,16 +59,15 @@ export const NotificationContextProvider: React.FC = ({ children }) => {
     });
   }
 
+  const [state] = React.useState({
+    setNotification: showDisappearingNotification,
+    clearNotification,
+    notifyError,
+    notifySuccess,
+  });
+
   return (
-    <NotificationContext.Provider
-      value={{
-        notification,
-        setNotification: showDisappearingNotification,
-        clearNotification,
-        notifyError,
-        notifySuccess,
-      }}
-    >
+    <NotificationContext.Provider value={{ ...state, notification }}>
       {children}
     </NotificationContext.Provider>
   );

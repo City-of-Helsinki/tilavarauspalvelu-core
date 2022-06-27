@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
-import { IconLocation, Notification } from "hds-react";
+import { IconLocation } from "hds-react";
 import {
   getApplicationRound,
   getReservations,
@@ -23,6 +23,7 @@ import { formatDate, localizedValue } from "../../common/util";
 import { weekdays } from "../../common/const";
 import { ReactComponent as IconBulletList } from "../../images/icon_list-bullet.svg";
 import { applicationRoundUrl } from "../../common/urls";
+import { useNotification } from "../../context/NotificationContext";
 
 interface IRouteParams {
   applicationRoundId: string;
@@ -97,13 +98,13 @@ const Reservations = styled.table`
 `;
 
 function ReservationsByReservationUnit(): JSX.Element | null {
+  const { notifyError } = useNotification();
   const [isLoading, setIsLoading] = useState(true);
   const [applicationRound, setApplicationRound] =
     useState<ApplicationRoundType | null>(null);
   const [reservationUnit, setReservationUnit] =
     useState<ReservationUnit | null>(null);
   const [reservations, setReservations] = useState<Reservation[] | null>(null);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const { applicationRoundId, reservationUnitId } = useParams<IRouteParams>();
   const { t, i18n } = useTranslation();
@@ -115,7 +116,7 @@ function ReservationsByReservationUnit(): JSX.Element | null {
       });
       setApplicationRound(applicationRoundResult);
     } catch (error) {
-      setErrorMsg("errors.errorFetchingApplicationRound");
+      notifyError(t("errors.errorFetchingApplicationRound"));
       setIsLoading(false);
     }
   };
@@ -125,7 +126,7 @@ function ReservationsByReservationUnit(): JSX.Element | null {
       const result = await getReservations({ reservationUnit: ruId });
       setReservations(result);
     } catch (error) {
-      setErrorMsg("errors.errorFetchingReservations");
+      notifyError(t("errors.errorFetchingReservations"));
       setIsLoading(false);
     }
   };
@@ -136,20 +137,22 @@ function ReservationsByReservationUnit(): JSX.Element | null {
         const result = await getReservationUnit(ruId);
         setReservationUnit(result);
       } catch (error) {
-        setErrorMsg("errors.errorFetchingApplications");
+        notifyError(t("errors.errorFetchingApplications"));
         setIsLoading(false);
       }
     };
 
     fetchReservationUnit(Number(reservationUnitId));
-  }, [reservationUnitId]);
+  }, [notifyError, reservationUnitId, t]);
 
   useEffect(() => {
     fetchApplicationRound(Number(applicationRoundId));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [applicationRoundId]);
 
   useEffect(() => {
     fetchReservations(reservationUnitId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reservationUnitId]);
 
   useEffect(() => {
@@ -245,20 +248,6 @@ function ReservationsByReservationUnit(): JSX.Element | null {
               <div>{t("Reservation.noReservations")}</div>
             )}
           </NarrowContainer>
-          {errorMsg && (
-            <Notification
-              type="error"
-              label={t("errors.functionFailed")}
-              position="top-center"
-              autoClose={false}
-              dismissible
-              closeButtonLabelText={t("common.close")}
-              displayAutoCloseProgress={false}
-              onClose={() => setErrorMsg(null)}
-            >
-              {t(errorMsg)}
-            </Notification>
-          )}
         </>
       )}
     </Wrapper>

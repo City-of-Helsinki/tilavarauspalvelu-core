@@ -38,6 +38,7 @@ import { getAllocationResults, getApplications } from "../../common/api";
 import Loader from "../Loader";
 import { applicationDetailsUrl, applicationRoundUrl } from "../../common/urls";
 import BreadcrumbWrapper from "../BreadcrumbWrapper";
+import { useNotification } from "../../context/NotificationContext";
 
 interface IProps {
   applicationRound: ApplicationRoundType;
@@ -336,6 +337,7 @@ function PreApproval({
   applicationRound,
   setApplicationRoundStatus,
 }: IProps): JSX.Element {
+  const { notifyError } = useNotification();
   const [isConfirmationDialogVisible, setConfirmationDialogVisibility] =
     useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -360,7 +362,6 @@ function PreApproval({
     number | null
   >(null);
   const [activeFilter, setActiveFilter] = useState<string>("allocated");
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const { t } = useTranslation();
 
@@ -400,7 +401,7 @@ function PreApproval({
         setRecommendations(processedResult || []);
         setUnallocatedApplications(unallocatedApps);
       } catch (error) {
-        setErrorMsg("errors.errorFetchingApplications");
+        notifyError(t("errors.errorFetchingApplications"));
       } finally {
         setIsLoading(false);
       }
@@ -409,7 +410,7 @@ function PreApproval({
     if (typeof applicationRound?.id === "number") {
       fetchData(applicationRound.id, applicationRound.serviceSectorId);
     }
-  }, [applicationRound, t]);
+  }, [applicationRound, notifyError, t]);
 
   const hasBeenSentForApproval = applicationRound.status === "validated";
 
@@ -646,20 +647,6 @@ function PreApproval({
             )}
           </>
         )}
-      {errorMsg && (
-        <Notification
-          type="error"
-          label={t("errors.functionFailed")}
-          position="top-center"
-          autoClose={false}
-          dismissible
-          closeButtonLabelText={t("common.close")}
-          displayAutoCloseProgress={false}
-          onClose={() => setErrorMsg(null)}
-        >
-          {t(errorMsg)}
-        </Notification>
-      )}
     </Wrapper>
   );
 }

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
-import { IconGroup, Notification } from "hds-react";
+import { IconGroup } from "hds-react";
 import styled from "styled-components";
 import { AxiosError } from "axios";
 import trim from "lodash/trim";
@@ -27,6 +27,7 @@ import Accordion from "../Accordion";
 import { formatDate, localizedValue, parseAgeGroups } from "../../common/util";
 import i18n from "../../i18n";
 import BreadcrumbWrapper from "../BreadcrumbWrapper";
+import { useNotification } from "../../context/NotificationContext";
 
 interface IRouteParams {
   applicationRoundId: string;
@@ -180,12 +181,12 @@ function Criteria(): JSX.Element {
   const [reservationUnits, setReservationUnits] = useState<
     ReservationUnitType[] | null
   >(null);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const applicationRoundId = Number(
     useParams<IRouteParams>().applicationRoundId
   );
   const { t } = useTranslation();
+  const { notifyError } = useNotification();
 
   useEffect(() => {
     const fetchParameters = async () => {
@@ -201,17 +202,16 @@ function Criteria(): JSX.Element {
         setIsLoading(false);
       } catch (error) {
         const msg = "errors.errorFetchingData";
-        setErrorMsg(msg);
+        notifyError(t(msg));
         setIsLoading(false);
       }
     };
 
     fetchParameters();
-  }, []);
+  }, [notifyError, t]);
 
   useEffect(() => {
     const fetchApplicationRound = async () => {
-      setErrorMsg(null);
       setIsLoading(true);
 
       try {
@@ -225,17 +225,16 @@ function Criteria(): JSX.Element {
           (error as AxiosError).response?.status === 404
             ? "errors.applicationRoundNotFound"
             : "errors.errorFetchingData";
-        setErrorMsg(msg);
+        notifyError(t(msg));
         setIsLoading(false);
       }
     };
 
     fetchApplicationRound();
-  }, [applicationRoundId]);
+  }, [applicationRoundId, notifyError, t]);
 
   useEffect(() => {
     const fetchReservationUnits = async () => {
-      setErrorMsg(null);
       setIsLoading(true);
 
       try {
@@ -248,13 +247,13 @@ function Criteria(): JSX.Element {
         setIsLoading(false);
       } catch (error) {
         const msg = "errors.errorFetchingData";
-        setErrorMsg(msg);
+        notifyError(t(msg));
         setIsLoading(false);
       }
     };
 
     fetchReservationUnits();
-  }, [applicationRound]);
+  }, [applicationRound, notifyError, t]);
 
   const baskets = sortBy(
     applicationRound?.applicationRoundBaskets,
@@ -450,20 +449,6 @@ function Criteria(): JSX.Element {
             </StyledAccordion>
           </ContentContainer>
         </>
-      )}
-      {errorMsg && (
-        <Notification
-          type="error"
-          label={t("errors.functionFailed")}
-          position="top-center"
-          autoClose={false}
-          dismissible
-          closeButtonLabelText={t("common.close")}
-          displayAutoCloseProgress={false}
-          onClose={() => setErrorMsg(null)}
-        >
-          {t(errorMsg)}
-        </Notification>
       )}
     </Wrapper>
   );

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { Button, IconArrowRedo, Notification } from "hds-react";
+import { Button, IconArrowRedo } from "hds-react";
 import { getApplicationRound, triggerAllocation } from "../../common/api";
 import {
   ApplicationRound as ApplicationRoundType,
@@ -20,6 +20,7 @@ import ApplicationRoundNavi from "./ApplicationRoundNavi";
 import TimeframeStatus from "./TimeframeStatus";
 import AllocatingDialogContent from "./AllocatingDialogContent";
 import BreadcrumbWrapper from "../BreadcrumbWrapper";
+import { useNotification } from "../../context/NotificationContext";
 
 interface IProps {
   applicationRound: ApplicationRoundType;
@@ -108,16 +109,14 @@ function Allocation({
   applicationRound,
   setApplicationRoundStatus,
 }: IProps): JSX.Element {
+  const { notifyError } = useNotification();
   const [isAllocating, setIsAllocating] = useState<boolean>(false);
   const [isAllocated, setIsAllocated] = useState(false);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const { t } = useTranslation();
 
   const startAllocation = async () => {
     if (!applicationRound) return;
-
-    setErrorMsg(null);
 
     try {
       const allocation = await triggerAllocation({
@@ -129,7 +128,7 @@ function Allocation({
       setIsAllocating(!!allocation?.id);
     } catch (error) {
       const msg = "errors.errorStartingAllocation";
-      setErrorMsg(msg);
+      notifyError(t(msg));
     }
   };
 
@@ -220,20 +219,6 @@ function Allocation({
         </ActionContainer>
       </NarrowContainer>
       {isAllocating && <AllocatingDialogContent />}
-      {errorMsg && (
-        <Notification
-          type="error"
-          label={t("errors.functionFailed")}
-          position="top-center"
-          autoClose={false}
-          dismissible
-          closeButtonLabelText={t("common.close")}
-          displayAutoCloseProgress={false}
-          onClose={() => setErrorMsg(null)}
-        >
-          {t(errorMsg)}
-        </Notification>
-      )}
     </Wrapper>
   );
 }

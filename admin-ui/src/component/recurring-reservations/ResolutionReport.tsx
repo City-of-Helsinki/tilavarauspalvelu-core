@@ -5,7 +5,7 @@ import { TFunction } from "i18next";
 import styled from "styled-components";
 import uniq from "lodash/uniq";
 import trim from "lodash/trim";
-import { IconArrowRight, Notification } from "hds-react";
+import { IconArrowRight } from "hds-react";
 import { AxiosError } from "axios";
 import {
   AllocationResult,
@@ -35,6 +35,7 @@ import {
 } from "../../common/api";
 import TimeframeStatus from "./TimeframeStatus";
 import { applicationDetailsUrl, applicationRoundUrl } from "../../common/urls";
+import { useNotification } from "../../context/NotificationContext";
 
 interface IProps {
   applicationRoundId: string;
@@ -286,6 +287,7 @@ const getFilterConfig = (
 };
 
 function ResolutionReport(): JSX.Element {
+  const { notifyError } = useNotification();
   const [isLoading, setIsLoading] = useState(true);
   const [applicationRound, setApplicationRound] =
     useState<ApplicationRoundType | null>(null);
@@ -310,14 +312,12 @@ function ResolutionReport(): JSX.Element {
   const [filteredApplicationsCount, setFilteredApplicationsCount] = useState<
     number | null
   >(null);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const { applicationRoundId } = useParams<IProps>();
   const { t } = useTranslation();
 
   useEffect(() => {
     const fetchApplicationRound = async (id: number) => {
-      setErrorMsg(null);
       setIsLoading(true);
 
       try {
@@ -330,13 +330,13 @@ function ResolutionReport(): JSX.Element {
           (error as AxiosError).response?.status === 404
             ? "errors.applicationRoundNotFound"
             : "errors.errorFetchingData";
-        setErrorMsg(msg);
+        notifyError(t(msg));
         setIsLoading(false);
       }
     };
 
     fetchApplicationRound(Number(applicationRoundId));
-  }, [applicationRoundId]);
+  }, [applicationRoundId, notifyError, t]);
 
   useEffect(() => {
     const fetchRecommendationsAndApplications = async (
@@ -375,7 +375,7 @@ function ResolutionReport(): JSX.Element {
         setRecommendations(processAllocationResult(allocationResults) || []);
         setUnallocatedApplications(unallocatedApps);
       } catch (error) {
-        setErrorMsg("errors.errorFetchingApplications");
+        notifyError(t("errors.errorFetchingApplications"));
       } finally {
         setIsLoading(false);
       }
@@ -384,7 +384,7 @@ function ResolutionReport(): JSX.Element {
     if (typeof applicationRound?.id === "number") {
       fetchRecommendationsAndApplications(applicationRound);
     }
-  }, [applicationRound, t]);
+  }, [applicationRound, notifyError, t]);
 
   const filteredResults =
     activeFilter === "unallocated"
@@ -533,20 +533,6 @@ function ResolutionReport(): JSX.Element {
             )}
           </>
         )}
-      {errorMsg && (
-        <Notification
-          type="error"
-          label={t("errors.functionFailed")}
-          position="top-center"
-          autoClose={false}
-          dismissible
-          closeButtonLabelText={t("common.close")}
-          displayAutoCloseProgress={false}
-          onClose={() => setErrorMsg(null)}
-        >
-          {t(errorMsg)}
-        </Notification>
-      )}
     </Wrapper>
   );
 }

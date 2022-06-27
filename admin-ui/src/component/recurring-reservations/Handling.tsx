@@ -57,6 +57,7 @@ import {
   applicationRoundUrl,
 } from "../../common/urls";
 import BreadcrumbWrapper from "../BreadcrumbWrapper";
+import { useNotification } from "../../context/NotificationContext";
 
 interface IProps {
   applicationRound: ApplicationRoundType;
@@ -362,7 +363,7 @@ function Handling({
   const isApplicationRoundApproved = ["approved"].includes(
     applicationRound.status
   );
-
+  const { notifyError } = useNotification();
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [isAllocating, setIsAllocating] = useState(applicationRound.allocating);
@@ -373,7 +374,6 @@ function Handling({
     useState<boolean>(isApplicationRoundApproved);
   const [cellConfig, setCellConfig] = useState<CellConfig | null>(null);
   const [filterConfig, setFilterConfig] = useState<DataFilterConfig[]>([]);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [selections, setSelections] = useState<number[]>([]);
 
   const { t } = useTranslation();
@@ -391,7 +391,7 @@ function Handling({
       setCellConfig(getCellConfig(t, applicationRound));
       setRecommendations(processedResult);
     } catch (error) {
-      setErrorMsg("errors.errorFetchingApplications");
+      notifyError(t("errors.errorFetchingApplications"));
     } finally {
       setIsLoading(false);
     }
@@ -399,8 +399,6 @@ function Handling({
 
   const startAllocation = async () => {
     if (!applicationRound) return;
-
-    setErrorMsg(null);
 
     try {
       const allocation = await triggerAllocation({
@@ -412,7 +410,7 @@ function Handling({
       setIsAllocating(!!allocation?.id);
     } catch (error) {
       const msg = "errors.errorStartingAllocation";
-      setErrorMsg(msg);
+      notifyError(t(msg));
     }
   };
 
@@ -599,20 +597,6 @@ function Handling({
         </>
       )}
       {isAllocating && <AllocatingDialogContent />}
-      {errorMsg && (
-        <Notification
-          type="error"
-          label={t("errors.functionFailed")}
-          position="top-center"
-          autoClose={false}
-          dismissible
-          closeButtonLabelText={t("common.close")}
-          displayAutoCloseProgress={false}
-          onClose={() => setErrorMsg(null)}
-        >
-          {t(errorMsg)}
-        </Notification>
-      )}
       {selections?.length > 0 && (
         <SelectionActionBar
           selections={selections}
@@ -626,12 +610,12 @@ function Handling({
           ]}
           callback={(action: string) => {
             setIsSaving(true);
-            setErrorMsg(null);
             modifyAllocationResults({
               data: recommendations,
               selections,
               action,
-              setErrorMsg,
+              notifyError,
+              t,
               callback: () => {
                 setTimeout(() => setIsSaving(false), 1000);
                 fetchRecommendations();

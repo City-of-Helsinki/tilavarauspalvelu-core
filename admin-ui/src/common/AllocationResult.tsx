@@ -1,7 +1,7 @@
 import uniqBy from "lodash/uniqBy";
 import get from "lodash/get";
 import groupBy from "lodash/groupBy";
-import { Dispatch, SetStateAction } from "react";
+import { TFunction } from "react-i18next";
 import {
   rejectApplicationEventSchedule,
   setApplicationEventScheduleResultStatus,
@@ -73,7 +73,8 @@ interface IModifyAllocationResults {
   data: AllocationResult[];
   selections: number[];
   action: string;
-  setErrorMsg: Dispatch<SetStateAction<string | null>>;
+  notifyError: (s: string) => void;
+  t: TFunction;
   callback: () => void;
 }
 
@@ -81,7 +82,8 @@ export const modifyAllocationResults = async ({
   data,
   selections,
   action,
-  setErrorMsg,
+  notifyError,
+  t,
   callback,
 }: IModifyAllocationResults): Promise<void> => {
   try {
@@ -116,7 +118,7 @@ export const modifyAllocationResults = async ({
       );
     }
   } catch (error) {
-    setErrorMsg("errors.errorSavingRecommendation");
+    notifyError(t("errors.errorSavingRecommendation"));
   } finally {
     callback();
   }
