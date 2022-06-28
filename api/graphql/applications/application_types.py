@@ -179,8 +179,6 @@ class EventReservationUnitType(AuthNode, PrimaryKeyObjectType):
         (AllowAuthenticated,) if not settings.TMP_PERMISSIONS_DISABLED else [AllowAny]
     )
 
-    reservation_unit_id = graphene.Int()
-
     reservation_unit = graphene.Field(ReservationUnitType)
 
     class Meta:
@@ -188,7 +186,6 @@ class EventReservationUnitType(AuthNode, PrimaryKeyObjectType):
         fields = (
             "id",
             "priority",
-            "reservation_unit_id",
             "reservation_unit",
         )
         filter_fields = ()
@@ -203,11 +200,6 @@ class ApplicationEventType(AuthNode, PrimaryKeyObjectType):
     permission_classes = (
         (AllowAuthenticated,) if not settings.TMP_PERMISSIONS_DISABLED else [AllowAny]
     )
-
-    age_group_id = graphene.Int()
-    ability_group_id = graphene.Int()
-    application_id = graphene.Int()
-    purpose_id = graphene.Int()
 
     application_event_schedules = graphene.List(ApplicationEventScheduleType)
 
@@ -232,16 +224,12 @@ class ApplicationEventType(AuthNode, PrimaryKeyObjectType):
             "application",
             "name",
             "num_persons",
-            "age_group_id",
-            "ability_group_id",
             "min_duration",
             "max_duration",
-            "application_id",
             "events_per_week",
             "biweekly",
             "begin",
             "end",
-            "purpose_id",
             "uuid",
             "status",
             "application_event_schedules",
@@ -249,7 +237,7 @@ class ApplicationEventType(AuthNode, PrimaryKeyObjectType):
             "ability_group",
             "purpose",
             "event_reservation_units",
-            "declined_reservation_unit_ids",
+            "declined_reservation_units",
             "weekly_amount_reductions_count",
             "aggregated_data",
         )
@@ -296,8 +284,6 @@ class ApplicationType(QueryPerformanceOptimizerMixin, AuthNode, PrimaryKeyObject
 
     organisation = graphene.Field(OrganisationType)
 
-    application_round_id = graphene.Int()
-
     application_events = graphene.List(ApplicationEventType)
 
     status = graphene.Field(
@@ -311,7 +297,7 @@ class ApplicationType(QueryPerformanceOptimizerMixin, AuthNode, PrimaryKeyObject
 
     billing_address = graphene.Field(AddressType)
 
-    applicant_id = graphene.Int()
+    applicant_pk = graphene.Int()
     applicant_name = graphene.String()
     applicant_email = graphene.String()
 
@@ -321,12 +307,13 @@ class ApplicationType(QueryPerformanceOptimizerMixin, AuthNode, PrimaryKeyObject
         model = Application
         fields = (
             "id",
+            "pk",
             "applicant_type",
-            "applicant_id",
+            "applicant_pk",
             "applicant_name",
             "applicant_email",
             "organisation",
-            "application_round_id",
+            "application_round",
             "contact_person",
             "application_events",
             "status",
@@ -440,7 +427,7 @@ class ApplicationType(QueryPerformanceOptimizerMixin, AuthNode, PrimaryKeyObject
             ),
         }
 
-    def resolve_applicant_id(self, info: graphene.ResolveInfo):
+    def resolve_applicant_pk(self, info: graphene.ResolveInfo):
         if not self.user:
             return None
 
