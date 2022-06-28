@@ -92,6 +92,44 @@ class ApplicationEventPermission(BasePermission):
         return info.context.user.is_authenticated
 
 
+class ApplicationEventDeclinePermission(BasePermission):
+    @classmethod
+    def has_mutation_permission(cls, root: Any, info: ResolveInfo, input: dict) -> bool:
+        pk = input.get("pk")
+        if not pk:
+            return False
+        event = ApplicationEvent.objects.filter(id=pk).first()
+        if not event:
+            return False
+
+        return can_manage_service_sectors_applications(
+            info.context.user, event.application.application_round.service_sector
+        )
+
+    @classmethod
+    def has_permission(cls, info: ResolveInfo) -> bool:
+        return False
+
+
+class ApplicationDeclinePermission(BasePermission):
+    @classmethod
+    def has_mutation_permission(cls, root: Any, info: ResolveInfo, input: dict) -> bool:
+        pk = input.get("pk")
+        if not pk:
+            return False
+        application = Application.objects.filter(id=pk).first()
+        if not application:
+            return False
+
+        return can_manage_service_sectors_applications(
+            info.context.user, application.application_round.service_sector
+        )
+
+    @classmethod
+    def has_permission(cls, info: ResolveInfo) -> bool:
+        return False
+
+
 class ApplicationEventScheduleResultPermission(BasePermission):
     @classmethod
     def has_mutation_permission(cls, root: Any, info: ResolveInfo, input: dict) -> bool:
