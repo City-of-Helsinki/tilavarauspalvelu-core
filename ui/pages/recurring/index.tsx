@@ -30,7 +30,7 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   });
   const applicationRounds = data?.applicationRounds?.edges.map((n) => n.node);
 
-  const filteredApplicationRounds = sortBy(applicationRounds, ["id"]).filter(
+  const filteredApplicationRounds = sortBy(applicationRounds, ["pk"]).filter(
     (applicationRound) =>
       new Date(applicationRound.publicDisplayBegin) <= now &&
       new Date(applicationRound.publicDisplayEnd) >= now
