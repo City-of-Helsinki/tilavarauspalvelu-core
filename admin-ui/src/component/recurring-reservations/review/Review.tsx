@@ -3,28 +3,24 @@ import { debounce } from "lodash";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { ApplicationRound as ApplicationRoundType } from "../../../common/types";
+import { ApplicationRound as RestApplicationRoundType } from "../../../common/types";
 import { applicationRoundUrl } from "../../../common/urls";
 import { Container, Content, VerticalFlex } from "../../../styles/layout";
 import { H2 } from "../../../styles/new-typography";
 import StatusRecommendation from "../../applications/StatusRecommendation";
 import BreadcrumbWrapper from "../../BreadcrumbWrapper";
+import { ApplicationRoundType } from "../../../common/gql-types";
 import withMainMenu from "../../withMainMenu";
 import { NaviItem } from "../ApplicationRoundNavi";
-import ApplicationRoundStatusBlock from "../ApplicationRoundStatusBlock";
+import ApplicationRoundStatusTag from "../ApplicationRoundStatusTag";
 import TimeframeStatus from "../TimeframeStatus";
 import ApplicationDataLoader from "./ApplicationDataLoader";
 import { Sort } from "./ApplicationsTable";
 import Filters, { emptyFilterState, FilterArguments } from "./Filters";
 
 interface IProps {
-  applicationRound: ApplicationRoundType;
+  applicationRound: RestApplicationRoundType;
 }
-
-const Wrapper = styled.div`
-  width: 100%;
-  margin-bottom: var(--spacing-layout-xl);
-`;
 
 const Header = styled.div`
   margin-top: var(--spacing-l);
@@ -51,16 +47,6 @@ const TabContent = styled.div`
   line-height: 1;
 `;
 
-const ApplicationRoundName = styled.div`
-  font-size: var(--fontsize-body-xl);
-  margin: var(--spacing-s) 0;
-  line-height: var(--lineheight-m);
-`;
-
-const StyledApplicationRoundStatusBlock = styled(ApplicationRoundStatusBlock)`
-  margin: var(--spacing-l) 0 0 0;
-`;
-
 function Review({ applicationRound }: IProps): JSX.Element | null {
   const [search, setSearch] = useState<FilterArguments>(emptyFilterState);
   const [sort, setSort] = useState<Sort>();
@@ -76,39 +62,40 @@ function Review({ applicationRound }: IProps): JSX.Element | null {
   const { t } = useTranslation();
 
   return (
-    <Wrapper>
+    <>
+      <BreadcrumbWrapper
+        route={[
+          "recurring-reservations",
+          "/recurring-reservations/application-rounds",
+          "application-round",
+        ]}
+        aliases={[{ slug: "application-round", title: applicationRound.name }]}
+      />
       <Container>
-        <BreadcrumbWrapper
-          route={[
-            "recurring-reservations",
-            "/recurring-reservations/application-rounds",
-            "application-round",
-          ]}
-          aliases={[
-            { slug: "application-round", title: applicationRound.name },
-          ]}
-        />
-
         <Content>
-          <div
-            style={{
-              width: "100%",
-              display: "flex",
-              justifyContent: "space-between",
-            }}
-          >
-            <StyledApplicationRoundStatusBlock
-              applicationRound={applicationRound}
-            />
-            <NaviItem
-              to={`${applicationRoundUrl(applicationRound.id)}/criteria`}
-            >
-              {t("ApplicationRound.roundCriteria")}
-            </NaviItem>
-          </div>
           <Header>
-            <ApplicationRoundName>{applicationRound.name}</ApplicationRoundName>
-            <StyledH2>{t("ApplicationRound.applicants")}</StyledH2>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                paddingBottom: "var(--spacing-m)",
+              }}
+            >
+              <ApplicationRoundStatusTag
+                applicationRound={
+                  applicationRound as unknown as ApplicationRoundType
+                }
+              />
+              <div>
+                <NaviItem
+                  to={`${applicationRoundUrl(applicationRound.id)}/criteria`}
+                >
+                  {t("ApplicationRound.roundCriteria")}
+                </NaviItem>
+              </div>
+            </div>
+
+            <StyledH2>{applicationRound.name}</StyledH2>
             <TimeframeStatus
               applicationPeriodBegin={applicationRound.applicationPeriodBegin}
               applicationPeriodEnd={applicationRound.applicationPeriodEnd}
@@ -142,7 +129,7 @@ function Review({ applicationRound }: IProps): JSX.Element | null {
           </Tabs>
         </Content>
       </Container>
-    </Wrapper>
+    </>
   );
 }
 

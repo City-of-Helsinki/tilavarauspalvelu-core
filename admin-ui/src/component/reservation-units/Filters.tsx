@@ -7,7 +7,7 @@ import i18next from "i18next";
 import styled from "styled-components";
 import { breakpoints } from "../../styles/util";
 import { Query, QueryReservationUnitTypesArgs } from "../../common/gql-types";
-import SortedCompobox from "../ReservationUnits/ReservationUnitEditor/SortedCompobox";
+import SortedCompobox from "../ReservationUnits/ReservationUnitEditor/SortedSelect";
 import { RESERVATION_UNIT_TYPES_QUERY } from "./queries";
 import { OptionType } from "../../common/types";
 import UnitFilter from "../filters/UnitFilter";

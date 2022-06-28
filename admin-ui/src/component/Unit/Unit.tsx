@@ -31,6 +31,7 @@ import {
   UnitByPkType,
 } from "../../common/gql-types";
 import BreadcrumbWrapper from "../BreadcrumbWrapper";
+import { useNotification } from "../../context/NotificationContext";
 
 interface IProps {
   unitPk: string;
@@ -152,9 +153,9 @@ const NoReservationUnitsInfo = styled.p`
 const NoReservationUnits = styled.div``;
 
 const Unit = (): JSX.Element | null => {
+  const { notifyError } = useNotification();
   const [isLoading, setIsLoading] = useState(true);
   const [unit, setUnit] = useState<UnitByPkType>();
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [hasOpeningHours, setOpeningHours] = useState(true);
   const [hasSpacesResources, setSpacesResources] = useState(true);
 
@@ -174,7 +175,7 @@ const Unit = (): JSX.Element | null => {
       setIsLoading(false);
     },
     onError: () => {
-      setErrorMsg("errors.errorFetchingData");
+      notifyError(t("errors.errorFetchingData"));
       setIsLoading(false);
     },
   });
@@ -313,20 +314,6 @@ const Unit = (): JSX.Element | null => {
             </NoReservationUnits>
           </ReservationUnits>
         </ContentContainer>
-      )}
-      {errorMsg && (
-        <Notification
-          type="error"
-          label={t("errors.functionFailed")}
-          position="top-center"
-          autoClose={false}
-          dismissible
-          closeButtonLabelText={t("common.close")}
-          displayAutoCloseProgress={false}
-          onClose={() => setErrorMsg(null)}
-        >
-          {t(errorMsg)}
-        </Notification>
       )}
     </Wrapper>
   );

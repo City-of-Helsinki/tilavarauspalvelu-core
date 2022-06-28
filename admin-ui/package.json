@@ -72,7 +72,7 @@
     "react-helmet": "^6.1.0",
     "react-i18next": "^11.8.5",
     "react-map-gl": "5.3.16",
-    "react-quill": "beta",
+    "react-quill": "1.3.5",
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.3",
     "react-use": "^17.1.0",

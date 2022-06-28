@@ -94,7 +94,7 @@ const StyledRow = styled(Row)<{
   ${({ $isChildren }) =>
     $isChildren &&
     `
-background-color: var(--tilavaraus-admin-gray-light);
+background-color: var(--gray-light);
 td:first-of-type {
   padding-left: 0;
 }

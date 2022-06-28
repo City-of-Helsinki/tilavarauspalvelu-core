@@ -8,7 +8,6 @@ import {
   IconLayers,
   IconHome,
   IconGroup,
-  Notification,
   IconArrowRight,
   IconCalendarPlus,
 } from "hds-react";
@@ -57,6 +56,7 @@ import SelectionActionBar from "../SelectionActionBar";
 import { ReactComponent as IconBulletList } from "../../images/icon_list-bullet.svg";
 import StatusCircle from "../StatusCircle";
 import { applicationRoundUrl } from "../../common/urls";
+import { useNotification } from "../../context/NotificationContext";
 
 interface IRouteParams {
   applicationRoundId: string;
@@ -324,6 +324,7 @@ const getFilterConfig = (
 };
 
 function RecommendationsByReservationUnit(): JSX.Element {
+  const { notifyError } = useNotification();
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [recommendations, setRecommendations] = useState<
@@ -343,7 +344,6 @@ function RecommendationsByReservationUnit(): JSX.Element {
     null
   );
   const [selections, setSelections] = useState<number[]>([]);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const { t } = useTranslation();
   const { applicationRoundId, reservationUnitId } = useParams<IRouteParams>(); // eslint-disable-line @typescript-eslint/no-unused-vars
@@ -366,7 +366,7 @@ function RecommendationsByReservationUnit(): JSX.Element {
       setCellConfig(getCellConfig(t, ar));
       setRecommendations(filteredResult || []);
     } catch (error) {
-      setErrorMsg("errors.errorFetchingApplications");
+      notifyError(t("errors.errorFetchingApplications"));
       setIsLoading(false);
     }
   };
@@ -392,13 +392,12 @@ function RecommendationsByReservationUnit(): JSX.Element {
       const result = await getReservationUnitCalendarUrl(ruId);
       setReservationUnitCalendarUrl(result.calendarUrl);
     } catch (error) {
-      setErrorMsg("errors.errorFetchingData");
+      notifyError(t("errors.errorFetchingData"));
     }
   };
 
   useEffect(() => {
     const fetchApplicationRound = async () => {
-      setErrorMsg(null);
       setIsLoading(true);
 
       try {
@@ -411,13 +410,13 @@ function RecommendationsByReservationUnit(): JSX.Element {
           (error as AxiosError).response?.status === 404
             ? "errors.applicationRoundNotFound"
             : "errors.errorFetchingData";
-        setErrorMsg(msg);
+        notifyError(t(msg));
         setIsLoading(false);
       }
     };
 
     fetchApplicationRound();
-  }, [applicationRoundId, t]);
+  }, [applicationRoundId, notifyError, t]);
 
   useEffect(() => {
     if (typeof applicationRound?.id === "number") {
@@ -431,13 +430,13 @@ function RecommendationsByReservationUnit(): JSX.Element {
         const result = await getReservationUnit(ruId);
         setReservationUnit(result);
       } catch (error) {
-        setErrorMsg("errors.errorFetchingApplications");
+        notifyError(t("errors.errorFetchingApplications"));
         setIsLoading(false);
       }
     };
 
     fetchReservationUnit(Number(reservationUnitId));
-  }, [recommendations, reservationUnitId]);
+  }, [notifyError, recommendations, reservationUnitId, t]);
 
   useEffect(() => {
     if (reservationUnit && applicationRound) {
@@ -622,12 +621,13 @@ function RecommendationsByReservationUnit(): JSX.Element {
                 ]}
                 callback={(action: string) => {
                   setIsSaving(true);
-                  setErrorMsg(null);
+
                   modifyAllocationResults({
                     data: recommendations,
                     selections,
                     action,
-                    setErrorMsg,
+                    t,
+                    notifyError,
                     callback: () => {
                       setTimeout(() => setIsSaving(false), 1000);
                       fetchRecommendations(
@@ -642,20 +642,6 @@ function RecommendationsByReservationUnit(): JSX.Element {
             )}
           </>
         )}
-      {errorMsg && (
-        <Notification
-          type="error"
-          label={t("errors.functionFailed")}
-          position="top-center"
-          autoClose={false}
-          dismissible
-          closeButtonLabelText={t("common.close")}
-          displayAutoCloseProgress={false}
-          onClose={() => setErrorMsg(null)}
-        >
-          {t(errorMsg)}
-        </Notification>
-      )}
     </Wrapper>
   );
 }

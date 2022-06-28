@@ -201,7 +201,6 @@ export type ApplicationRoundType = Node & {
   applicationRoundBaskets?: Maybe<Array<Maybe<ApplicationRoundBasketType>>>;
   applicationsCount?: Maybe<Scalars["Int"]>;
   applicationsSent?: Maybe<Scalars["Boolean"]>;
-  approvedBy?: Maybe<Scalars["String"]>;
   criteriaEn?: Maybe<Scalars["String"]>;
   criteriaFi?: Maybe<Scalars["String"]>;
   criteriaSv?: Maybe<Scalars["String"]>;
@@ -1234,6 +1233,7 @@ export type QueryReservationUnitsArgs = {
   applicationRound?: InputMaybe<Array<InputMaybe<Scalars["ID"]>>>;
   before?: InputMaybe<Scalars["String"]>;
   first?: InputMaybe<Scalars["Int"]>;
+  isArchived?: InputMaybe<Scalars["Boolean"]>;
   isDraft?: InputMaybe<Scalars["Boolean"]>;
   isVisible?: InputMaybe<Scalars["Boolean"]>;
   keywordGroups?: InputMaybe<Array<InputMaybe<Scalars["ID"]>>>;
@@ -1827,6 +1827,8 @@ export type ReservationUnitByPkType = Node & {
   /** The ID of the object */
   id: Scalars["ID"];
   images?: Maybe<Array<Maybe<ReservationUnitImageType>>>;
+  /** Is reservation unit archived. */
+  isArchived: Scalars["Boolean"];
   isDraft: Scalars["Boolean"];
   keywordGroups?: Maybe<Array<Maybe<KeywordGroupType>>>;
   location?: Maybe<LocationType>;
@@ -1951,6 +1953,8 @@ export type ReservationUnitCreateMutationInput = {
   equipmentPks?: InputMaybe<Array<InputMaybe<Scalars["Int"]>>>;
   /** Maximum price of the reservation unit */
   highestPrice?: InputMaybe<Scalars["Float"]>;
+  /** Is reservation unit archived */
+  isArchived?: InputMaybe<Scalars["Boolean"]>;
   isDraft?: InputMaybe<Scalars["Boolean"]>;
   /** Minimum price of the reservation unit */
   lowestPrice?: InputMaybe<Scalars["Float"]>;
@@ -2025,6 +2029,8 @@ export type ReservationUnitCreateMutationPayload = {
   highestPrice?: Maybe<Scalars["Float"]>;
   /** Images of the reservation unit as nested related objects.  */
   images?: Maybe<Array<Maybe<ReservationUnitImageType>>>;
+  /** Is reservation unit archived */
+  isArchived?: Maybe<Scalars["Boolean"]>;
   isDraft?: Maybe<Scalars["Boolean"]>;
   /** Location of this reservation unit. Dynamically determined from spaces of the reservation unit. */
   location?: Maybe<Scalars["String"]>;
@@ -2170,6 +2176,8 @@ export type ReservationUnitType = Node & {
   /** The ID of the object */
   id: Scalars["ID"];
   images?: Maybe<Array<Maybe<ReservationUnitImageType>>>;
+  /** Is reservation unit archived. */
+  isArchived: Scalars["Boolean"];
   isDraft: Scalars["Boolean"];
   keywordGroups?: Maybe<Array<Maybe<KeywordGroupType>>>;
   location?: Maybe<LocationType>;
@@ -2304,6 +2312,8 @@ export type ReservationUnitUpdateMutationInput = {
   equipmentPks?: InputMaybe<Array<InputMaybe<Scalars["Int"]>>>;
   /** Maximum price of the reservation unit */
   highestPrice?: InputMaybe<Scalars["Float"]>;
+  /** Is reservation unit archived */
+  isArchived?: InputMaybe<Scalars["Boolean"]>;
   isDraft?: InputMaybe<Scalars["Boolean"]>;
   /** Minimum price of the reservation unit */
   lowestPrice?: InputMaybe<Scalars["Float"]>;
@@ -2379,6 +2389,8 @@ export type ReservationUnitUpdateMutationPayload = {
   highestPrice?: Maybe<Scalars["Float"]>;
   /** Images of the reservation unit as nested related objects.  */
   images?: Maybe<Array<Maybe<ReservationUnitImageType>>>;
+  /** Is reservation unit archived */
+  isArchived?: Maybe<Scalars["Boolean"]>;
   isDraft?: Maybe<Scalars["Boolean"]>;
   /** Location of this reservation unit. Dynamically determined from spaces of the reservation unit. */
   location?: Maybe<Scalars["String"]>;
@@ -3155,30 +3167,35 @@ export type UnitUpdateMutationPayload = {
 
 /** An enumeration. */
 export enum ApplicationEventStatus {
-  Allocated = "allocated",
   Approved = "approved",
   Created = "created",
   Declined = "declined",
-  Validated = "validated",
+  Failed = "failed",
+  Reserved = "reserved",
 }
 
 /** An enumeration. */
 export enum ApplicationRoundStatus {
   Allocated = "allocated",
-  Approved = "approved",
+  Archived = "archived",
   Draft = "draft",
   Handled = "handled",
   InReview = "in_review",
+  Reserving = "reserving",
   ReviewDone = "review_done",
-  Validated = "validated",
+  Sending = "sending",
+  Sent = "sent",
 }
 
 /** An enumeration. */
 export enum ApplicationStatus {
+  Allocated = "allocated",
   Cancelled = "cancelled",
-  Declined = "declined",
   Draft = "draft",
+  Expired = "expired",
+  Handled = "handled",
   InReview = "in_review",
+  Received = "received",
   ReviewDone = "review_done",
   Sent = "sent",
 }

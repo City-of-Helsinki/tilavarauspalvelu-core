@@ -41,6 +41,7 @@ import Dialog from "../Dialog";
 import { applicationRoundUrl } from "../../common/urls";
 import BreadcrumbWrapper from "../BreadcrumbWrapper";
 import { applicantName } from "../applications/util";
+import { useNotification } from "../../context/NotificationContext";
 
 interface IRouteParams {
   applicationRoundId: string;
@@ -177,6 +178,7 @@ const DialogActionContainer = styled(ActionContainer)`
 `;
 
 function Recommendation(): JSX.Element {
+  const { notifyError } = useNotification();
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [recommendation, setRecommendation] = useState<AllocationResult | null>(
@@ -193,7 +195,6 @@ function Recommendation(): JSX.Element {
     isIgnoreReservationUnitDialogVisible,
     setIsIgnoreReservationUnitDialogVisible,
   ] = useState<boolean>(false);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const { t } = useTranslation();
   const history = useHistory();
@@ -215,7 +216,7 @@ function Recommendation(): JSX.Element {
       setRecommendation(processAllocationResult([recommendationResult])[0]);
       setApplicationRound(applicationRoundResult);
     } catch (error) {
-      setErrorMsg("errors.errorFetchingApplication");
+      notifyError(t("errors.errorFetchingApplication"));
       setIsLoading(false);
     }
   };
@@ -223,12 +224,11 @@ function Recommendation(): JSX.Element {
   const toggleAcceptance = async (id: number, accepted: boolean) => {
     try {
       setIsSaving(true);
-      setErrorMsg(null);
       setActionNotification(null);
       await setApplicationEventScheduleResultStatus(id, accepted);
       setActionNotification(accepted ? "accepted" : "revertedToUnhandled");
     } catch (error) {
-      setErrorMsg("errors.errorSavingRecommendation");
+      notifyError(t("errors.errorSavingRecommendation"));
     } finally {
       fetchRecommendation(id, Number(applicationRoundId));
       setTimeout(() => setIsSaving(false), 1000);
@@ -240,12 +240,11 @@ function Recommendation(): JSX.Element {
   ) => {
     try {
       setIsSaving(true);
-      setErrorMsg(null);
       setActionNotification(null);
       await rejectApplicationEventSchedule(applicationEventScheduleResultId);
       setActionNotification("declined");
     } catch (error) {
-      setErrorMsg("errors.errorSavingRecommendation");
+      notifyError(t("errors.errorSavingRecommendation"));
     } finally {
       fetchRecommendation(
         applicationEventScheduleResultId,
@@ -258,11 +257,10 @@ function Recommendation(): JSX.Element {
   const revertRejection = async (id: number) => {
     try {
       setIsSaving(true);
-      setErrorMsg(null);
       setActionNotification(null);
       await deleteAllocationResult(id);
     } catch (error) {
-      setErrorMsg("errors.errorSavingRecommendation");
+      notifyError(t("errors.errorSavingRecommendation"));
     } finally {
       history.push(applicationRoundUrl(applicationRoundId));
     }
@@ -275,7 +273,6 @@ function Recommendation(): JSX.Element {
   ) => {
     try {
       setIsSaving(true);
-      setErrorMsg(null);
 
       if (
         !ar ||
@@ -312,7 +309,7 @@ function Recommendation(): JSX.Element {
 
       setRecommendation(processAllocationResult([recommendationResult])[0]);
     } catch (error) {
-      setErrorMsg("errors.errorSavingData");
+      notifyError(t("errors.errorSavingData"));
     } finally {
       setIsSaving(false);
     }
@@ -323,6 +320,7 @@ function Recommendation(): JSX.Element {
       Number(applicationEventScheduleId),
       Number(applicationRoundId)
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [applicationRoundId, applicationEventScheduleId]);
 
   useEffect(() => {
@@ -332,7 +330,7 @@ function Recommendation(): JSX.Element {
 
         setApplication(applicationResult);
       } catch (error) {
-        setErrorMsg("errors.errorFetchingApplication");
+        notifyError(t("errors.errorFetchingApplication"));
       } finally {
         setIsLoading(false);
       }
@@ -341,7 +339,7 @@ function Recommendation(): JSX.Element {
     if (recommendation?.applicationId) {
       fetchApplication(recommendation.applicationId);
     }
-  }, [recommendation]);
+  }, [notifyError, recommendation, t]);
 
   if (isLoading) {
     return <Loader />;
@@ -738,20 +736,6 @@ function Recommendation(): JSX.Element {
             </Button>
           </DialogActionContainer>
         </Dialog>
-      )}
-      {errorMsg && (
-        <Notification
-          type="error"
-          label={t("errors.functionFailed")}
-          position="top-center"
-          autoClose={false}
-          dismissible
-          closeButtonLabelText={t("common.close")}
-          displayAutoCloseProgress={false}
-          onClose={() => setErrorMsg(null)}
-        >
-          {t(errorMsg)}
-        </Notification>
       )}
     </Wrapper>
   );

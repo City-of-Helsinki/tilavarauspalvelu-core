@@ -1,21 +1,25 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
+import { ApolloError, useQuery } from "@apollo/client";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import { AxiosError } from "axios";
 import KorosHeading, { Heading as KorosKorosHeading } from "../KorosHeading";
 import { MainMenuWrapper } from "../withMainMenu";
 import ApplicationRoundCard from "./ApplicationRoundCard";
 import HeroImage from "../../images/hero-user@1x.jpg";
 import { H1, H2 } from "../../styles/typography";
 import { WideContainer, IngressContainer } from "../../styles/layout";
-import { ApplicationRound as ApplicationRoundType } from "../../common/types";
-import { getApplicationRounds } from "../../common/api";
 
 import Loader from "../Loader";
 import { NotificationBox } from "../../styles/util";
-import { applicationRoundUrl } from "../../common/urls";
 import { useNotification } from "../../context/NotificationContext";
 import { useAuthState } from "../../context/AuthStateContext";
+import {
+  ApplicationRoundStatus,
+  ApplicationRoundType,
+  Query,
+  QueryApplicationRoundsArgs,
+} from "../../common/gql-types";
+import { APPLICATION_ROUNDS_QUERY } from "./queries";
 
 const Wrapper = styled.div``;
 
@@ -40,55 +44,37 @@ const Deck = styled.div`
 `;
 
 function ApplicationRounds(): JSX.Element {
-  const { authState } = useAuthState();
-  const { notifyError } = useNotification();
-  const [isLoading, setIsLoading] = useState(true);
-  const [applicationRounds, setApplicationRounds] = useState<
-    ApplicationRoundType[] | null
-  >(null);
-
   const { t } = useTranslation();
-
-  useEffect(() => {
-    const fetchApplicationRound = async () => {
-      setIsLoading(true);
-
-      try {
-        const result = await getApplicationRounds();
+  const { notifyError } = useNotification();
+  const { authState } = useAuthState();
+  const [applicationRounds, setApplicationRounds] = useState<
+    ApplicationRoundType[]
+  >([]);
+  const { loading } = useQuery<Query, QueryApplicationRoundsArgs>(
+    APPLICATION_ROUNDS_QUERY,
+    {
+      skip: authState.state !== "HasPermissions",
+      onCompleted: (data) => {
+        const result = (data?.applicationRounds?.edges || []).map(
+          (ar) => ar?.node as ApplicationRoundType
+        );
         setApplicationRounds(result);
-        setIsLoading(false);
-      } catch (error) {
-        const msg =
-          (error as AxiosError).response?.status === 404
-            ? "errors.applicationRoundNotFound"
-            : "errors.errorFetchingData";
-        notifyError(msg);
-        setIsLoading(false);
-      }
-    };
-
-    if (authState.state === "HasPermissions") {
-      fetchApplicationRound();
+      },
+      onError: (err: ApolloError) => {
+        notifyError(err.message);
+      },
     }
-  }, [notifyError, authState]);
-
-  const isWaitingForApproval = (
-    applicationRound: ApplicationRoundType
-  ): boolean =>
-    applicationRound.isAdmin && applicationRound.status === "validated";
-
-  const approveRounds = applicationRounds?.filter((applicationRound) =>
-    isWaitingForApproval(applicationRound)
-  );
-  const handleRounds = applicationRounds?.filter((applicationRound) =>
-    ["draft", "in_review", "review_done", "allocated", "handled"].includes(
-      applicationRound.status
-    )
   );
 
-  if (isLoading) {
+  if (loading) {
     return <Loader />;
   }
+
+  const handleRounds = applicationRounds?.filter((applicationRound) =>
+    ["draft", "in_review", "review_done", "allocated", "handled"].includes(
+      applicationRound.status as ApplicationRoundStatus
+    )
+  );
 
   let headingStr = t("User.welcome");
   const name = authState.user?.firstName;
@@ -103,29 +89,6 @@ function ApplicationRounds(): JSX.Element {
           <KorosKorosHeading>{headingStr}!</KorosKorosHeading>
         </KorosHeading>
         <Ingress>{t("MainLander.ingress")}</Ingress>
-        {approveRounds && approveRounds.length > 0 && (
-          <Deck>
-            <IngressContainer>
-              <Heading>{t("ApplicationRound.listApprovalTitle")}</Heading>
-              <RoundTypeIngress>
-                {t("ApplicationRound.listApprovalIngress", {
-                  count: approveRounds.length,
-                })}
-              </RoundTypeIngress>
-            </IngressContainer>
-            <WideContainer>
-              {approveRounds.map((applicationRound) => {
-                return (
-                  <ApplicationRoundCard
-                    applicationRound={applicationRound}
-                    key={applicationRound.id}
-                    getRoute={applicationRoundUrl}
-                  />
-                );
-              })}
-            </WideContainer>
-          </Deck>
-        )}
         {handleRounds && (
           <Deck>
             <IngressContainer>
@@ -147,7 +110,6 @@ function ApplicationRounds(): JSX.Element {
                   <ApplicationRoundCard
                     applicationRound={applicationRound}
                     key={applicationRound.id}
-                    getRoute={applicationRoundUrl}
                   />
                 ))
               ) : (

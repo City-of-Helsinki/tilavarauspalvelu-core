@@ -1,11 +1,5 @@
 import React, { useState, ChangeEvent } from "react";
-import {
-  IconArrowRight,
-  IconGroup,
-  Notification,
-  TextInput,
-  IconSearch,
-} from "hds-react";
+import { IconArrowRight, IconGroup, TextInput, IconSearch } from "hds-react";
 import { TFunction } from "i18next";
 import { uniq } from "lodash";
 import { useTranslation } from "react-i18next";
@@ -23,6 +17,7 @@ import ClearButton from "../ClearButton";
 import { SPACES_QUERY } from "../../common/queries";
 import { Query, SpaceType } from "../../common/gql-types";
 import BreadcrumbWrapper from "../BreadcrumbWrapper";
+import { useNotification } from "../../context/NotificationContext";
 
 const Wrapper = styled.div`
   padding: var(--spacing-layout-xl) 0;
@@ -147,8 +142,8 @@ const getFilterConfig = (
 };
 
 const SpacesList = (): JSX.Element => {
+  const { notifyError } = useNotification();
   const { t } = useTranslation();
-
   const [spaces, setSpaces] = useState<SpaceType[]>([]);
   const [filterConfig, setFilterConfig] = useState<DataFilterConfig[] | null>(
     null
@@ -156,7 +151,6 @@ const SpacesList = (): JSX.Element => {
   const [cellConfig, setCellConfig] = useState<CellConfig | null>(null);
   const [searchTerm, setSearchTerm] = useState<string | null>(null);
   const [searchValue, setSearchValue] = useState<string | null>(null);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [, cancelTypeahead] = useDebounce(
     () => {
@@ -177,27 +171,10 @@ const SpacesList = (): JSX.Element => {
       setIsLoading(false);
     },
     onError: (err: ApolloError) => {
-      setErrorMsg(err.message);
+      notifyError(err.message);
       setIsLoading(false);
     },
   });
-
-  if (errorMsg) {
-    return (
-      <Notification
-        type="error"
-        label={t("errors.functionFailed")}
-        position="top-center"
-        autoClose={false}
-        dismissible
-        closeButtonLabelText={t("common.close")}
-        displayAutoCloseProgress={false}
-        onClose={() => setErrorMsg(null)}
-      >
-        {t(errorMsg)}
-      </Notification>
-    );
-  }
 
   if (isLoading || !spaces || !filterConfig || !cellConfig) {
     return <Loader />;

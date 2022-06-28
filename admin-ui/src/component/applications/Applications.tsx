@@ -3,7 +3,6 @@ import { uniqBy } from "lodash";
 import { useTranslation } from "react-i18next";
 import { TFunction } from "i18next";
 import { useParams } from "react-router-dom";
-import { Notification } from "hds-react";
 import { AxiosError } from "axios";
 import styled from "styled-components";
 import uniq from "lodash/uniq";
@@ -28,6 +27,7 @@ import { formatNumber, parseDuration } from "../../common/util";
 import StatusCell from "../StatusCell";
 import { applicationUrl } from "../../common/urls";
 import { getNormalizedApplicationStatus } from "./util";
+import { useNotification } from "../../context/NotificationContext";
 
 interface IRouteParams {
   applicationRoundId: string;
@@ -200,6 +200,7 @@ const getCellConfig = (applicationRound: ApplicationRoundType): CellConfig => {
 };
 
 function Applications(): JSX.Element {
+  const { notifyError } = useNotification();
   const [isLoading, setIsLoading] = useState(true);
   const [applicationRound, setApplicationRound] =
     useState<ApplicationRoundType | null>(null);
@@ -208,14 +209,11 @@ function Applications(): JSX.Element {
   const [filterConfig, setFilterConfig] = useState<DataFilterConfig[] | null>(
     null
   );
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
-
   const { applicationRoundId } = useParams<IRouteParams>();
   const { t } = useTranslation();
 
   useEffect(() => {
     const fetchApplicationRound = async () => {
-      setErrorMsg(null);
       setIsLoading(true);
 
       try {
@@ -228,18 +226,17 @@ function Applications(): JSX.Element {
           (error as AxiosError).response?.status === 404
             ? "errors.applicationRoundNotFound"
             : "errors.errorFetchingData";
-        setErrorMsg(msg);
+        notifyError(t(msg));
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchApplicationRound();
-  }, [applicationRoundId]);
+  }, [applicationRoundId, notifyError, t]);
 
   useEffect(() => {
     const fetchApplications = async (ar: ApplicationRoundType) => {
-      setErrorMsg(null);
       setIsLoading(true);
 
       try {
@@ -252,7 +249,7 @@ function Applications(): JSX.Element {
         setFilterConfig(getFilterConfig(mapped));
         setApplications(mapped);
       } catch (error) {
-        setErrorMsg("errors.errorFetchingApplications");
+        notifyError(t("errors.errorFetchingApplications"));
       } finally {
         setIsLoading(false);
       }
@@ -261,7 +258,7 @@ function Applications(): JSX.Element {
     if (applicationRound) {
       fetchApplications(applicationRound);
     }
-  }, [applicationRound, t]);
+  }, [applicationRound, notifyError, t]);
 
   if (isLoading) {
     return <Loader />;
@@ -297,20 +294,6 @@ function Applications(): JSX.Element {
             />
           )}
         </>
-      )}
-      {errorMsg && (
-        <Notification
-          type="error"
-          label={t("errors.functionFailed")}
-          position="top-center"
-          autoClose={false}
-          dismissible
-          closeButtonLabelText={t("common.close")}
-          displayAutoCloseProgress={false}
-          onClose={() => setErrorMsg(null)}
-        >
-          {t(errorMsg)}
-        </Notification>
       )}
     </Wrapper>
   );

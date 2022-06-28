@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 
 import { Query } from "../../common/gql-types";
 import { OptionType } from "../../common/types";
-import SortedCompobox from "../ReservationUnits/ReservationUnitEditor/SortedCompobox";
+import SortedCompobox from "../ReservationUnits/ReservationUnitEditor/SortedSelect";
 
 const SERVICE_SECTORS_QUERY = gql`
   query serviceSector {
