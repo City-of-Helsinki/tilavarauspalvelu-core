@@ -111,6 +111,7 @@ const areOpeningTimesAvailable = (
     const startDate = oh.date;
     const startDateTime = new Date(`${startDate}T${oh.startTime}`);
     const endDateTime = new Date(`${startDate}T${oh.endTime}`);
+
     return (
       toApiDate(slotDate) === startDate.toString() &&
       slotDate < endDateTime &&
@@ -216,15 +217,23 @@ export const isStartTimeWithinInterval = (
 ): boolean => {
   if (openingTimes?.length < 1) return false;
   if (!interval) return true;
-  const startTime = toUIDate(start, "HH:mm:ss");
+  const startHMS = toUIDate(start, "HH:mm:ss");
   const { startTime: dayStartTime, endTime: dayEndTime } =
-    openingTimes.find((n) => n.date === toApiDate(start)) || {};
+    openingTimes?.find((n) => n.date === toApiDate(start)) || {};
+
+  const [startHours, startMinutes] = dayStartTime.split(":").map(Number);
+  const startTime = new Date();
+  startTime.setUTCHours(startHours, startMinutes, 0);
+
+  const [endHours, endMinutes] = dayEndTime.split(":").map(Number);
+  const endTime = new Date();
+  endTime.setUTCHours(endHours, endMinutes, 0);
 
   return getDayIntervals(
-    format(new Date(`1970-01-01T${dayStartTime}`), "HH:mm"),
-    format(new Date(`1970-01-01T${dayEndTime}`), "HH:mm"),
+    format(startTime, "HH:mm"),
+    format(endTime, "HH:mm"),
     interval
-  ).includes(startTime);
+  ).includes(startHMS);
 };
 
 export const getSlotPropGetter =

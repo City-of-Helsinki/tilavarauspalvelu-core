@@ -23,7 +23,6 @@ import {
   ReservationCancellationMutationPayload,
   ReservationType,
 } from "../../modules/gql-types";
-import apolloClient from "../../modules/apolloClient";
 import {
   CANCEL_RESERVATION,
   GET_RESERVATION,
@@ -58,7 +57,6 @@ import {
 
 type Props = {
   id: number;
-  reasons: OptionType[];
 };
 
 export const getServerSideProps: GetServerSideProps = async ({
@@ -69,25 +67,10 @@ export const getServerSideProps: GetServerSideProps = async ({
   const slug = query.params[1];
 
   if (isFinite(id) && slug === "cancel") {
-    const { data: reasonsData } = await apolloClient.query<
-      Query,
-      QueryReservationCancelReasonsArgs
-    >({
-      query: GET_RESERVATION_CANCEL_REASONS,
-    });
-
-    const reasons = reasonsData.reservationCancelReasons.edges.map(
-      (reason) => ({
-        label: getTranslation(reason.node, "reason"),
-        value: reason.node.pk,
-      })
-    );
-
     return {
       props: {
         ...(await serverSideTranslations(locale)),
         overrideBackgroundColor: "var(--tilavaraus-gray)",
-        reasons,
         id,
       },
     };
@@ -208,12 +191,13 @@ const ButtonContainer = styled.div`
   }
 `;
 
-const ReservationCancellation = ({ id, reasons }: Props): JSX.Element => {
+const ReservationCancellation = ({ id }: Props): JSX.Element => {
   const { t } = useTranslation();
 
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [formState, setFormState] = useState<"unsent" | "sent">("unsent");
   const [reservation, setReservation] = useState<ReservationType>();
+  const [reasons, setReasons] = useState<OptionType[]>([]);
 
   useQuery(GET_RESERVATION, {
     fetchPolicy: "no-cache",
@@ -224,6 +208,21 @@ const ReservationCancellation = ({ id, reasons }: Props): JSX.Element => {
       setReservation(data.reservationByPk);
     },
   });
+
+  useQuery<Query, QueryReservationCancelReasonsArgs>(
+    GET_RESERVATION_CANCEL_REASONS,
+    {
+      fetchPolicy: "cache-first",
+      onCompleted: (data) => {
+        setReasons(
+          data.reservationCancelReasons.edges.map((edge) => ({
+            label: getTranslation(edge.node, "reason"),
+            value: edge.node.pk,
+          }))
+        );
+      },
+    }
+  );
 
   const [cancelReservation, { data, loading, error }] = useMutation<
     { cancelReservation: ReservationCancellationMutationPayload },

@@ -181,13 +181,7 @@ export type ApplicationStatus =
   | "cancelled"
   | "sent";
 
-export type ReducedApplicationStatus =
-  | "draft"
-  | "processing"
-  | "handled"
-  | "cancelled"
-  | "declined"
-  | "sent";
+export type ReducedApplicationStatus = "draft" | "processing" | "sent";
 
 export type Application = {
   id?: number;

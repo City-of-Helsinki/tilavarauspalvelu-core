@@ -59,13 +59,101 @@ type ApplicationEventAggregatedDataType {
   allocationResultsReservationsTotal: Float
 }
 
+input ApplicationEventCreateMutationInput {
+  name: String
+  applicationEventSchedules: [ApplicationEventScheduleCreateSerializerInput]!
+  numPersons: Int
+
+  """Age group pk for this event"""
+  ageGroup: Int!
+
+  """AbilityGroup pk for this event"""
+  abilityGroup: Int!
+  minDuration: String
+  maxDuration: String
+
+  """Application pk for this event"""
+  application: Int!
+  eventsPerWeek: Int
+  biweekly: Boolean
+  begin: Date
+  end: Date
+
+  """ReservationPurpose pk for this event"""
+  purpose: Int!
+  eventReservationUnits: [EventReservationUnitCreateSerializerInput]!
+
+  """Status of this application event"""
+  status: String!
+  clientMutationId: String
+}
+
+type ApplicationEventCreateMutationPayload {
+  pk: Int
+  name: String
+  applicationEventSchedules: [ApplicationEventScheduleType]
+  numPersons: Int
+
+  """Age group pk for this event"""
+  ageGroup: Int
+
+  """AbilityGroup pk for this event"""
+  abilityGroup: Int
+  minDuration: String
+  maxDuration: String
+
+  """Application pk for this event"""
+  application: Int
+  eventsPerWeek: Int
+  biweekly: Boolean
+  begin: Date
+  end: Date
+
+  """ReservationPurpose pk for this event"""
+  purpose: Int
+  eventReservationUnits: [EventReservationUnitType]
+
+  """Status of this application event"""
+  status: String
+
+  """May contain more than one error for same field."""
+  errors: [ErrorType]
+  applicationEvent: ApplicationEventType
+  clientMutationId: String
+}
+
+input ApplicationEventDeleteMutationInput {
+  pk: Int!
+  clientMutationId: String
+}
+
+type ApplicationEventDeleteMutationPayload {
+  deleted: Boolean
+  errors: String
+  clientMutationId: String
+}
+
+input ApplicationEventScheduleCreateSerializerInput {
+  pk: Int
+  day: Int!
+
+  """Begin time of requested reservation allocation slot."""
+  begin: Time!
+
+  """End time of requested reservation allocation slot."""
+  end: Time!
+
+  """Priority of requested reservation allocation slot as an integer."""
+  priority: priority
+}
+
 type ApplicationEventScheduleType implements Node {
   """The ID of the object"""
   id: ID!
-  day: ApplicationsApplicationEventScheduleDayChoices!
+  day: Int
   begin: Time!
   end: Time!
-  priority: ApplicationsApplicationEventSchedulePriorityChoices!
+  priority: Int
   pk: Int
 }
 
@@ -122,6 +210,70 @@ type ApplicationEventTypeEdge {
 
   """A cursor for use in pagination"""
   cursor: String!
+}
+
+input ApplicationEventUpdateMutationInput {
+  pk: Int
+  name: String
+  applicationEventSchedules: [ApplicationEventScheduleCreateSerializerInput]
+  numPersons: Int
+
+  """Age group pk for this event"""
+  ageGroup: Int
+
+  """AbilityGroup pk for this event"""
+  abilityGroup: Int
+  minDuration: String
+  maxDuration: String
+
+  """Application pk for this event"""
+  application: Int
+  eventsPerWeek: Int
+  biweekly: Boolean
+  begin: Date
+  end: Date
+
+  """ReservationPurpose pk for this event"""
+  purpose: Int
+  eventReservationUnits: [EventReservationUnitCreateSerializerInput]
+
+  """Status of this application event"""
+  status: String
+  clientMutationId: String
+}
+
+type ApplicationEventUpdateMutationPayload {
+  pk: Int
+  name: String
+  applicationEventSchedules: [ApplicationEventScheduleType]
+  numPersons: Int
+
+  """Age group pk for this event"""
+  ageGroup: Int
+
+  """AbilityGroup pk for this event"""
+  abilityGroup: Int
+  minDuration: String
+  maxDuration: String
+
+  """Application pk for this event"""
+  application: Int
+  eventsPerWeek: Int
+  biweekly: Boolean
+  begin: Date
+  end: Date
+
+  """ReservationPurpose pk for this event"""
+  purpose: Int
+  eventReservationUnits: [EventReservationUnitType]
+
+  """Status of this application event"""
+  status: String
+
+  """May contain more than one error for same field."""
+  errors: [ErrorType]
+  applicationEvent: ApplicationEventType
+  clientMutationId: String
 }
 
 type ApplicationRoundAggregatedDataType {
@@ -219,42 +371,6 @@ enum ApplicationsApplicationApplicantTypeChoices {
 
   """Company"""
   COMPANY
-}
-
-"""An enumeration."""
-enum ApplicationsApplicationEventScheduleDayChoices {
-  """maanantai"""
-  A_0
-
-  """tiistai"""
-  A_1
-
-  """keskiviikko"""
-  A_2
-
-  """torstai"""
-  A_3
-
-  """perjantai"""
-  A_4
-
-  """lauantai"""
-  A_5
-
-  """sunnuntai"""
-  A_6
-}
-
-"""An enumeration."""
-enum ApplicationsApplicationEventSchedulePriorityChoices {
-  """Low"""
-  A_100
-
-  """Medium"""
-  A_200
-
-  """High"""
-  A_300
 }
 
 """An enumeration."""
@@ -585,6 +701,18 @@ type ErrorType {
   messages: [String!]!
 }
 
+input EventReservationUnitCreateSerializerInput {
+  pk: Int
+
+  """
+  Priority of this reservation unit for the event. Lower the number, higher the priority.
+  """
+  priority: Int
+
+  """pk of the reservation unit requested for the event."""
+  reservationUnit: Int!
+}
+
 type EventReservationUnitType implements Node {
   """The ID of the object"""
   id: ID!
@@ -697,6 +825,9 @@ type LocationType implements Node {
 }
 
 type Mutation {
+  createApplicationEvent(input: ApplicationEventCreateMutationInput!): ApplicationEventCreateMutationPayload
+  updateApplicationEvent(input: ApplicationEventUpdateMutationInput!): ApplicationEventUpdateMutationPayload
+  deleteApplicationEvent(input: ApplicationEventDeleteMutationInput!): ApplicationEventDeleteMutationPayload
   createReservation(input: ReservationCreateMutationInput!): ReservationCreateMutationPayload
   updateReservation(input: ReservationUpdateMutationInput!): ReservationUpdateMutationPayload
   confirmReservation(input: ReservationConfirmMutationInput!): ReservationConfirmMutationPayload
@@ -799,6 +930,18 @@ type PersonType implements Node {
   firstName: String!
   lastName: String!
   pk: Int
+}
+
+"""An enumeration."""
+enum priority {
+  """Low"""
+  A_100
+
+  """Medium"""
+  A_200
+
+  """High"""
+  A_300
 }
 
 input PurposeCreateMutationInput {
@@ -1645,6 +1788,7 @@ type ReservationUnitByPkType implements Node {
   paymentTerms: TermsOfUseType
   cancellationTerms: TermsOfUseType
   serviceSpecificTerms: TermsOfUseType
+  state: String
   nextAvailableSlot: DateTime
   haukiUrl: ReservationUnitHaukiUrlType
 }
@@ -1903,6 +2047,7 @@ type ReservationUnitCreateMutationPayload {
 
   """Is reservation unit archived"""
   isArchived: Boolean
+  state: String
   nameFi: String
   nameEn: String
   nameSv: String
@@ -2181,6 +2326,7 @@ type ReservationUnitType implements Node {
   unit: UnitType
   keywordGroups: [KeywordGroupType]
   reservations(from: Date = null, to: Date = null, state: [String] = null): [ReservationType]
+  state: String
 }
 
 type ReservationUnitTypeConnection {
@@ -2452,6 +2598,7 @@ type ReservationUnitUpdateMutationPayload {
 
   """Is reservation unit archived"""
   isArchived: Boolean
+  state: String
   nameFi: String
   nameEn: String
   nameSv: String
@@ -2620,7 +2767,9 @@ input ResourceCreateMutationInput {
   Dynamically calculated from spaces and resources.
   """
   bufferTimeAfter: Int
-  isDraft: Boolean
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
@@ -2648,7 +2797,9 @@ type ResourceCreateMutationPayload {
   Dynamically calculated from spaces and resources.
   """
   bufferTimeAfter: Int
-  isDraft: Boolean
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
@@ -2693,7 +2844,6 @@ type ResourceType implements Node {
   space: SpaceType
   bufferTimeBefore: Duration
   bufferTimeAfter: Duration
-  isDraft: Boolean!
 
   """The ID of the object"""
   id: ID!
@@ -2737,7 +2887,9 @@ input ResourceUpdateMutationInput {
   Dynamically calculated from spaces and resources.
   """
   bufferTimeAfter: Int
-  isDraft: Boolean
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
@@ -2765,7 +2917,9 @@ type ResourceUpdateMutationPayload {
   Dynamically calculated from spaces and resources.
   """
   bufferTimeAfter: Int
-  isDraft: Boolean
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
@@ -3159,6 +3313,9 @@ input UnitUpdateMutationInput {
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
   shortDescriptionFi: String
   shortDescriptionEn: String
   shortDescriptionSv: String
@@ -3177,6 +3334,9 @@ type UnitUpdateMutationPayload {
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
   shortDescriptionFi: String
   shortDescriptionEn: String
   shortDescriptionSv: String

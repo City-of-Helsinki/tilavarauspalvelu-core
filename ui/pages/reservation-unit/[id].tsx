@@ -15,8 +15,7 @@ import StartApplicationBar from "../../components/common/StartApplicationBar";
 import { AccordionWithState as Accordion } from "../../components/common/Accordion";
 import apolloClient from "../../modules/apolloClient";
 import Map from "../../components/Map";
-import { H2 } from "../../modules/style/typography";
-import { getActiveOpeningTimes } from "../../modules/openingHours";
+import { H4 } from "../../modules/style/typography";
 import {
   Query,
   QueryReservationUnitByPkArgs,
@@ -181,7 +180,7 @@ const StyledKoros = styled(Koros).attrs({
   margin-bottom: -1px;
 `;
 
-const StyledH2 = styled(H2)``;
+const Subheading = styled(H4)``;
 
 const EquipmentList = styled.ul`
   list-style: none;
@@ -219,9 +218,9 @@ const ReservationUnit = ({
 }: Props): JSX.Element | null => {
   const { t } = useTranslation();
 
-  const activeOpeningTimes = getActiveOpeningTimes(
-    reservationUnit.openingHours?.openingTimePeriods
-  );
+  // const activeOpeningTimes = getActiveOpeningTimes(
+  //   reservationUnit.openingHours?.openingTimePeriods
+  // );
 
   const reservationUnitList = useReservationUnitsList();
 
@@ -235,7 +234,7 @@ const ReservationUnit = ({
     <Wrapper>
       <Head
         reservationUnit={reservationUnit}
-        activeOpeningTimes={activeOpeningTimes}
+        // activeOpeningTimes={activeOpeningTimes}
         reservationUnitList={reservationUnitList}
         viewType="recurring"
       />
@@ -279,7 +278,7 @@ const ReservationUnit = ({
         </TwoColumnLayout>
         {reservationUnit.unit?.location && (
           <MapWrapper>
-            <StyledH2>{t("common:location")}</StyledH2>
+            <Subheading>{t("common:location")}</Subheading>
             <Map
               title={getTranslation(reservationUnit.unit, "name")}
               latitude={Number(reservationUnit.unit.location.latitude)}

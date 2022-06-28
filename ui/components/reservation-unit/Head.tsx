@@ -1,5 +1,4 @@
 import {
-  IconCalendar,
   IconCalendarClock,
   IconCheck,
   IconClock,
@@ -26,10 +25,6 @@ import Container from "../common/Container";
 import IconWithText from "../common/IconWithText";
 import Images from "./Images";
 import { JustForDesktop, JustForMobile } from "../../modules/style/layout";
-import {
-  ActiveOpeningTime,
-  getDayOpeningTimes,
-} from "../../modules/openingHours";
 import { MediumButton } from "../../styles/util";
 import { ReservationUnitByPkType } from "../../modules/gql-types";
 import {
@@ -44,7 +39,7 @@ import BreadcrumbWrapper from "../common/BreadcrumbWrapper";
 interface PropsType {
   reservationUnit: ReservationUnitByPkType;
   reservationUnitList: ReturnType<typeof useReservationUnitList>;
-  activeOpeningTimes: ActiveOpeningTime[];
+  // activeOpeningTimes: ActiveOpeningTime[];
   viewType: "recurring" | "single";
   calendarRef?: React.MutableRefObject<HTMLDivElement>;
   isReservable?: boolean;
@@ -116,7 +111,7 @@ const StyledKorosDefault = styled(KorosDefault)`
 const Head = ({
   reservationUnit,
   reservationUnitList,
-  activeOpeningTimes,
+  // activeOpeningTimes,
   viewType,
   calendarRef,
   isReservable,
@@ -152,9 +147,9 @@ const Head = ({
     false
   );
 
-  const openingTimesTextArr = activeOpeningTimes?.map((openingTime, index) =>
-    getDayOpeningTimes(openingTime, index)
-  );
+  // const openingTimesTextArr = activeOpeningTimes?.map((openingTime, index) =>
+  //   getDayOpeningTimes(openingTime, index)
+  // );
 
   const unitPrice = getPrice(reservationUnit);
 
@@ -186,7 +181,7 @@ const Head = ({
               </JustForMobile>
               <Props>
                 <div>
-                  {openingTimesTextArr?.length > 0 && (
+                  {/* {openingTimesTextArr?.length > 0 && (
                     <StyledIconWithText
                       icon={
                         <IconCalendar
@@ -195,7 +190,7 @@ const Head = ({
                       }
                       texts={openingTimesTextArr}
                     />
-                  )}
+                  )} */}
                   {viewType === "single" &&
                     isReservable &&
                     reservationUnit.nextAvailableSlot && (

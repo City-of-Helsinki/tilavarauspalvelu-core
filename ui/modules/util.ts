@@ -27,12 +27,15 @@ import {
   TranslationObject,
   ReservationUnit,
   Image,
-  ApplicationStatus,
   ReducedApplicationStatus,
   StringParameter,
   ApplicationEventSchedulePriority,
 } from "./types";
-import { ReservationUnitImageType, ReservationUnitType } from "./gql-types";
+import {
+  ReservationUnitImageType,
+  ReservationUnitType,
+  ApplicationStatus,
+} from "./gql-types";
 
 export const isActive = (startDate: string, endDate: string): boolean => {
   const now = new Date().getTime();
@@ -411,16 +414,18 @@ export const applicationErrorText = (
 
 export const getReducedApplicationStatus = (
   status: ApplicationStatus
-): ReducedApplicationStatus => {
+): ReducedApplicationStatus | null => {
   switch (status) {
     case "in_review":
     case "review_done":
-    case "allocating":
     case "allocated":
-    case "validated":
       return "processing";
+    case "draft":
+      return "draft";
+    case "sent":
+      return "sent";
     default:
-      return status;
+      return null;
   }
 };
 
@@ -465,7 +470,7 @@ interface HMS {
 }
 
 export const secondsToHms = (duration?: number | null): HMS => {
-  if (!duration || duration < 0) return {};
+  if (!duration || duration < 1) return {};
   const h = Math.floor(duration / 3600);
   const m = Math.floor((duration % 3600) / 60);
   const s = Math.floor((duration % 3600) % 60);

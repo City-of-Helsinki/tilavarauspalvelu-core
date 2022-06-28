@@ -8,9 +8,9 @@ describe("Tilavaraus ui reservation unit page (recurring)", () => {
 
     cy.get("h1").should("contain", "Pukinmäen nuorisotalon keittiö");
 
-    textWithIcon(1).contains("20 € / 15 min");
-    textWithIcon(2).contains("Nuorisopalvelut Fi");
-    textWithIcon(3).contains("60 henkilöä");
+    textWithIcon(0).contains("20 € / 15 min");
+    textWithIcon(1).contains("Nuorisopalvelut Fi");
+    textWithIcon(2).contains("60 henkilöä");
 
     accordion("description").contains(
       "Sali sijaitsee nuorisotalon toisessa kerroksessa. Tilaan mahtuu 60 henkilöä.."

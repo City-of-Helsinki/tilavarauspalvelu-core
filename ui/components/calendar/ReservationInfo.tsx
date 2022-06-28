@@ -78,10 +78,17 @@ const Wrapper = styled.div`
   }
 `;
 
+const StyledSelect = styled(Select)`
+  & > div:nth-of-type(2) {
+    line-height: var(--lineheight-l);
+  }
+`;
+
 const PriceWrapper = styled.div`
   ${fontMedium};
   font-size: 21px;
   align-self: center;
+  white-space: nowrap;
 
   h3 {
     ${fontBold};
@@ -230,7 +237,7 @@ const ReservationInfo = ({
       } else if (
         !areSlotsReservable(
           [startDate, subMinutes(endDate, 1)],
-          reservationUnit.openingHours.openingTimes,
+          reservationUnit.openingHours?.openingTimes,
           activeApplicationRounds
         )
       ) {
@@ -264,7 +271,10 @@ const ReservationInfo = ({
     reservationUnit.minReservationDuration,
   ]);
 
-  const { startTime: dayStartTime, endTime: dayEndTime } = useMemo(() => {
+  const {
+    startTime: dayStartTime,
+    endTime: dayEndTime,
+  }: { startTime?: string; endTime?: string } = useMemo(() => {
     return (
       reservationUnit.openingHours?.openingTimes?.find(
         (n) => n.date === toApiDate(date)
@@ -274,9 +284,14 @@ const ReservationInfo = ({
 
   const startingTimesOptions: OptionType[] = useMemo(() => {
     if (!dayStartTime || !dayEndTime) return [];
+    const [startHours, startMinutes] = dayStartTime.split(":").map(Number);
+    const [endHours, endMinutes] = dayEndTime.split(":").map(Number);
+    const startDate = new Date().setUTCHours(startHours, startMinutes);
+    const endDate = new Date().setUTCHours(endHours, endMinutes);
+
     return getDayIntervals(
-      format(new Date(`1970-01-01T${dayStartTime}`), "HH:mm"),
-      format(new Date(`1970-01-01T${dayEndTime}`), "HH:mm"),
+      format(startDate, "HH:mm"),
+      format(endDate, "HH:mm"),
       reservationUnit.reservationStartInterval
     ).map((n) => ({
       label: trimStart(n.substring(0, 5).replace(":", "."), "0"),
@@ -306,14 +321,14 @@ const ReservationInfo = ({
         label={`${t("reservationCalendar:startDate")} *`}
         language={i18n.language as Language}
       />
-      <Select
+      <StyledSelect
         id="reservation__input--start-time"
         label={`${t("reservationCalendar:startTime")} *`}
         onChange={(val: OptionType) => setStartTime(val.value as string)}
         options={startingTimesOptions}
         value={startingTimesOptions.find((n) => n.value === startTime)}
       />
-      <Select
+      <StyledSelect
         id="reservation__input--duration"
         label={`${t("reservationCalendar:duration")} *`}
         onChange={(val: OptionType) => {

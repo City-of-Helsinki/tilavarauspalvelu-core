@@ -73,12 +73,16 @@ export const getDayOpeningTimes = (
   openingTime: { label: string; from: string; to: string },
   index: number
 ): OpeningHourRow => {
-  const { label } = openingTime;
+  const { label, from, to } = openingTime;
+  const [fromHours, fromMinutes] = from.split(":").map(Number);
+  const [toHours, toMinutes] = to.split(":").map(Number);
 
-  const fromDate = new Date(`1970-01-01T${openingTime.from}`);
+  const fromDate = new Date();
+  fromDate.setUTCHours(fromHours, fromMinutes);
   const fromStr = i18n.t("common:time", { date: fromDate });
 
-  const toDate = new Date(`1970-01-01T${openingTime.to}`);
+  const toDate = new Date();
+  toDate.setUTCHours(toHours, toMinutes);
   const toStr = i18n.t("common:time", { date: toDate });
 
   return { label, value: `${fromStr} - ${toStr}`, index };

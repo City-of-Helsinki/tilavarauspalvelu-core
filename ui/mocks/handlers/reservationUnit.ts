@@ -315,9 +315,11 @@ const selectedReservationUnitQuery = graphql.query<
         category: equipmentCategories[0],
       },
     ],
+    allowReservationsWithoutOpeningHours: true,
     canApplyFreeOfCharge: false,
     reservationKind:
       ReservationUnitsReservationUnitReservationKindChoices.DirectAndSeason,
+    isArchived: false,
   };
 
   if (req.variables.pk === 800) {
@@ -617,9 +619,11 @@ const relatedReservationUnitsData: ReservationUnitTypeConnection = {
         resources: [],
         contactInformation: "",
         requireReservationHandling: false,
+        allowReservationsWithoutOpeningHours: true,
         canApplyFreeOfCharge: false,
         reservationKind:
           ReservationUnitsReservationUnitReservationKindChoices.DirectAndSeason,
+        isArchived: false,
       },
       cursor: "YXJyYXljb25uZWN0aW9uOjA=",
     },
@@ -714,9 +718,11 @@ const relatedReservationUnitsData: ReservationUnitTypeConnection = {
         resources: [],
         contactInformation: "",
         requireReservationHandling: false,
+        allowReservationsWithoutOpeningHours: true,
         canApplyFreeOfCharge: false,
         reservationKind:
           ReservationUnitsReservationUnitReservationKindChoices.DirectAndSeason,
+        isArchived: false,
       },
       cursor: "YXJyYXljb25uZWN0aW9uOjE=",
     },
