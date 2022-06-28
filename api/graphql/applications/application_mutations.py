@@ -6,6 +6,10 @@ from graphene import ClientIDMutation
 from graphene_django.rest_framework.mutation import SerializerMutation
 from graphene_permissions.permissions import AllowAny
 
+from api.graphql.applications.application_decline_serializers import (
+    ApplicationDeclineSerializer,
+    ApplicationEventDeclineSerializer,
+)
 from api.graphql.applications.application_event_serializers import (
     ApplicationEventCreateSerializer,
     ApplicationEventScheduleResultCreateSerializer,
@@ -19,6 +23,8 @@ from api.graphql.applications.application_types import (
 from api.graphql.base_mutations import AuthDeleteMutation, AuthSerializerMutation
 from applications.models import ApplicationEvent, ApplicationEventStatus
 from permissions.api_permissions.graphene_permissions import (
+    ApplicationDeclinePermission,
+    ApplicationEventDeclinePermission,
     ApplicationEventPermission,
     ApplicationEventScheduleResultPermission,
 )
@@ -107,3 +113,27 @@ class ApplicationEventScheduleResultUpdateMutation(
         model_operations = ["update"]
         lookup_field = "application_event_schedule"
         serializer_class = ApplicationEventScheduleResultUpdateSerializer
+
+
+class ApplicationDeclineMutation(AuthSerializerMutation, SerializerMutation):
+    permission_classes = (
+        (ApplicationDeclinePermission,)
+        if not settings.TMP_PERMISSIONS_DISABLED
+        else (AllowAny,)
+    )
+
+    class Meta:
+        lookup_field = "pk"
+        serializer_class = ApplicationDeclineSerializer
+
+
+class ApplicationEventDeclineMutation(AuthSerializerMutation, SerializerMutation):
+    permission_classes = (
+        (ApplicationEventDeclinePermission,)
+        if not settings.TMP_PERMISSIONS_DISABLED
+        else (AllowAny,)
+    )
+
+    class Meta:
+        lookup_field = "pk"
+        serializer_class = ApplicationEventDeclineSerializer
