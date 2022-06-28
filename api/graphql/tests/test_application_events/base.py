@@ -99,6 +99,7 @@ class ApplicationEventTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCase):
                 name_en="Test purpose EN",
             ),
         )
+        cls.application_event = application_event
 
         ApplicationEventStatusFactory(
             application_event=application_event, status=ApplicationEventStatus.CREATED
