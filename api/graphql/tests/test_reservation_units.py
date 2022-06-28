@@ -115,7 +115,7 @@ class ReservationUnitQueryTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCa
             max_reservation_duration=datetime.timedelta(days=1),
             metadata_set=ReservationMetadataSetFactory(name="Test form"),
             max_reservations_per_user=5,
-            min_persons=1,
+            min_persons=10,
             max_persons=200,
             reservations_max_days_before=360,
             reservations_min_days_before=1,
@@ -751,6 +751,118 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
                     edges {
                         node {
                             nameFi maxPersons
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filtering_by_min_persons_gte_within_limit(self):
+        response = self.query(
+            """
+            query {
+                reservationUnits(minPersonsGte: 10) {
+                    edges {
+                        node {
+                            nameFi minPersons
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filtering_by_min_persons_gte_outside_limit(self):
+        response = self.query(
+            """
+            query {
+                reservationUnits(minPersonsGte: 11) {
+                    edges {
+                        node {
+                            nameFi minPersons
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filtering_by_min_persons_gte_not_set(self):
+        self.reservation_unit.min_persons = None
+        self.reservation_unit.save()
+        response = self.query(
+            """
+            query {
+                reservationUnits(minPersonsGte: 11) {
+                    edges {
+                        node {
+                            nameFi minPersons
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filtering_by_min_persons_lte_within_limit(self):
+        response = self.query(
+            """
+            query {
+                reservationUnits(minPersonsLte: 10) {
+                    edges {
+                        node {
+                            nameFi minPersons
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filtering_by_min_persons_lte_outside_limit(self):
+        response = self.query(
+            """
+            query {
+                reservationUnits(minPersonsLte: 9) {
+                    edges {
+                        node {
+                            nameFi minPersons
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filtering_by_min_persons_lte_not_set(self):
+        self.reservation_unit.min_persons = None
+        self.reservation_unit.save()
+        response = self.query(
+            """
+            query {
+                reservationUnits(minPersonsLte: 9) {
+                    edges {
+                        node {
+                            nameFi minPersons
                         }
                     }
                 }

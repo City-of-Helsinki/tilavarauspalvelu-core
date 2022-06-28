@@ -238,6 +238,84 @@ snapshots['ReservationUnitQueryTestCase::test_filtering_by_max_persons_lte_withi
     }
 }
 
+snapshots['ReservationUnitQueryTestCase::test_filtering_by_min_persons_gte_not_set 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'minPersons': None,
+                        'nameFi': 'test name fi'
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitQueryTestCase::test_filtering_by_min_persons_gte_outside_limit 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitQueryTestCase::test_filtering_by_min_persons_gte_within_limit 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'minPersons': 10,
+                        'nameFi': 'test name fi'
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitQueryTestCase::test_filtering_by_min_persons_lte_not_set 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'minPersons': None,
+                        'nameFi': 'test name fi'
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitQueryTestCase::test_filtering_by_min_persons_lte_outside_limit 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitQueryTestCase::test_filtering_by_min_persons_lte_within_limit 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'minPersons': 10,
+                        'nameFi': 'test name fi'
+                    }
+                }
+            ]
+        }
+    }
+}
+
 snapshots['ReservationUnitQueryTestCase::test_filtering_by_multiple_application_round 1'] = {
     'data': {
         'reservationUnits': {
@@ -627,7 +705,7 @@ snapshots['ReservationUnitQueryTestCase::test_getting_reservation_units 1'] = {
                             'supportedFields': [
                             ]
                         },
-                        'minPersons': 1,
+                        'minPersons': 10,
                         'minReservationDuration': 600,
                         'nameFi': 'test name fi',
                         'priceUnit': 'PER_HOUR',

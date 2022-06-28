@@ -32,6 +32,12 @@ class ReservationUnitsFilterSet(django_filters.FilterSet):
     reservation_unit_type = django_filters.ModelMultipleChoiceFilter(
         field_name="reservation_unit_type", queryset=ReservationUnitType.objects.all()
     )
+    min_persons_gte = django_filters.NumberFilter(
+        field_name="min_persons", method="get_min_persons_gte"
+    )
+    min_persons_lte = django_filters.NumberFilter(
+        field_name="min_persons", method="get_min_persons_lte"
+    )
     max_persons_gte = django_filters.NumberFilter(
         field_name="max_persons", method="get_max_persons_gte"
     )
@@ -169,6 +175,14 @@ class ReservationUnitsFilterSet(django_filters.FilterSet):
 
     def get_max_persons_lte(self, qs, property, value):
         filters = Q(max_persons__lte=value) | Q(max_persons__isnull=True)
+        return qs.filter(filters)
+
+    def get_min_persons_gte(self, qs, property, value):
+        filters = Q(min_persons__gte=value) | Q(min_persons__isnull=True)
+        return qs.filter(filters)
+
+    def get_min_persons_lte(self, qs, property, value):
+        filters = Q(min_persons__lte=value) | Q(min_persons__isnull=True)
         return qs.filter(filters)
 
     def get_is_visible(self, qs, property, value):
