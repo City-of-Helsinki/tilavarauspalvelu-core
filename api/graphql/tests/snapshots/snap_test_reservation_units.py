@@ -166,7 +166,7 @@ snapshots['ReservationUnitQueryTestCase::test_filtering_by_max_persons_gte_not_s
             'edges': [
                 {
                     'node': {
-                        'maxPersons': 110,
+                        'maxPersons': None,
                         'nameFi': 'test name fi'
                     }
                 }
@@ -205,7 +205,7 @@ snapshots['ReservationUnitQueryTestCase::test_filtering_by_max_persons_lte_not_s
             'edges': [
                 {
                     'node': {
-                        'maxPersons': 110,
+                        'maxPersons': None,
                         'nameFi': 'test name fi'
                     }
                 }
