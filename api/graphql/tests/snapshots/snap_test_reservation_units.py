@@ -160,7 +160,7 @@ snapshots['ReservationUnitQueryTestCase::test_filtering_by_keyword_group 1'] = {
     }
 }
 
-snapshots['ReservationUnitQueryTestCase::test_filtering_by_max_persons 1'] = {
+snapshots['ReservationUnitQueryTestCase::test_filtering_by_max_persons_gte_not_set 1'] = {
     'data': {
         'reservationUnits': {
             'edges': [
@@ -175,10 +175,64 @@ snapshots['ReservationUnitQueryTestCase::test_filtering_by_max_persons 1'] = {
     }
 }
 
-snapshots['ReservationUnitQueryTestCase::test_filtering_by_max_persons_not_found 1'] = {
+snapshots['ReservationUnitQueryTestCase::test_filtering_by_max_persons_gte_outside_limit 1'] = {
     'data': {
         'reservationUnits': {
             'edges': [
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitQueryTestCase::test_filtering_by_max_persons_gte_within_limit 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'maxPersons': 200,
+                        'nameFi': 'test name fi'
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitQueryTestCase::test_filtering_by_max_persons_lte_not_set 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'maxPersons': 110,
+                        'nameFi': 'test name fi'
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitQueryTestCase::test_filtering_by_max_persons_lte_outside_limit 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitQueryTestCase::test_filtering_by_max_persons_lte_within_limit 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'maxPersons': 200,
+                        'nameFi': 'test name fi'
+                    }
+                }
             ]
         }
     }
@@ -563,7 +617,7 @@ snapshots['ReservationUnitQueryTestCase::test_getting_reservation_units 1'] = {
                         'isArchived': False,
                         'location': None,
                         'lowestPrice': '0.00',
-                        'maxPersons': 110,
+                        'maxPersons': 200,
                         'maxReservationDuration': 86400,
                         'maxReservationsPerUser': 5,
                         'metadataSet': {
@@ -703,7 +757,7 @@ snapshots['ReservationUnitQueryTestCase::test_order_by_max_persons 1'] = {
                 },
                 {
                     'node': {
-                        'maxPersons': 110
+                        'maxPersons': 200
                     }
                 }
             ]
@@ -717,7 +771,7 @@ snapshots['ReservationUnitQueryTestCase::test_order_by_max_persons_reverse_order
             'edges': [
                 {
                     'node': {
-                        'maxPersons': 110
+                        'maxPersons': 200
                     }
                 },
                 {
@@ -1005,11 +1059,6 @@ snapshots['ReservationUnitQueryTestCase::test_order_by_surface_area_reverse_orde
             'edges': [
                 {
                     'node': {
-                        'surfaceArea': '150.00'
-                    }
-                },
-                {
-                    'node': {
                         'surfaceArea': '1.00'
                     }
                 },
@@ -1031,6 +1080,11 @@ snapshots['ReservationUnitQueryTestCase::test_order_by_surface_area_reverse_orde
                 {
                     'node': {
                         'surfaceArea': '5.00'
+                    }
+                },
+                {
+                    'node': {
+                        'surfaceArea': '150.00'
                     }
                 }
             ]

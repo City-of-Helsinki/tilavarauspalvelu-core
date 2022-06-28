@@ -4,7 +4,7 @@ from functools import reduce
 from typing import List
 
 import django_filters
-from django.db.models import Q, Sum
+from django.db.models import Q
 from django.utils.timezone import get_default_timezone
 
 from applications.models import ApplicationRound
@@ -163,14 +163,13 @@ class ReservationUnitsFilterSet(django_filters.FilterSet):
         return qs
 
     def get_max_persons_gte(self, qs, property, value):
-        return qs.annotate(max_person_sum=Sum("spaces__max_persons")).filter(
-            max_person_sum__gte=value
-        )
+
+        filters = Q(max_persons__gte=value) | Q(max_persons__isnull=True)
+        return qs.filter(filters)
 
     def get_max_persons_lte(self, qs, property, value):
-        return qs.annotate(max_person_sum=Sum("spaces__max_persons")).filter(
-            max_person_sum__lte=value
-        )
+        filters = Q(max_persons__lte=value) | Q(max_persons__isnull=True)
+        return qs.filter(filters)
 
     def get_is_visible(self, qs, property, value):
         today = datetime.datetime.now(tz=get_default_timezone())

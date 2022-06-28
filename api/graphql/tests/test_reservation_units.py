@@ -116,6 +116,7 @@ class ReservationUnitQueryTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCa
             metadata_set=ReservationMetadataSetFactory(name="Test form"),
             max_reservations_per_user=5,
             min_persons=1,
+            max_persons=200,
             reservations_max_days_before=360,
             reservations_min_days_before=1,
             pricing_terms=TermsOfUseFactory(terms_type=TermsOfUse.TERMS_TYPE_PRICING),
@@ -648,13 +649,13 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_not_empty()
 
-    def test_filtering_by_max_persons(self):
+    def test_filtering_by_max_persons_gte_within_limit(self):
         response = self.query(
             """
             query {
-                reservationUnits(maxPersonsLte:120, maxPersonsGte:60) {
+                reservationUnits(maxPersonsGte: 200) {
                     edges {
-                        node{
+                        node {
                             nameFi maxPersons
                         }
                     }
@@ -666,13 +667,89 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         assert_that(content.get("errors")).is_none()
         self.assertMatchSnapshot(content)
 
-    def test_filtering_by_max_persons_not_found(self):
+    def test_filtering_by_max_persons_gte_outside_limit(self):
         response = self.query(
             """
             query {
-                reservationUnits(maxPersonsLte:20, maxPersonsGte:15) {
+                reservationUnits(maxPersonsGte: 201) {
                     edges {
-                        node{
+                        node {
+                            nameFi maxPersons
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filtering_by_max_persons_gte_not_set(self):
+        self.reservation_unit.max_persons = None
+        self.reservation_unit.save()
+        response = self.query(
+            """
+            query {
+                reservationUnits(maxPersonsGte: 201) {
+                    edges {
+                        node {
+                            nameFi maxPersons
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filtering_by_max_persons_lte_within_limit(self):
+        response = self.query(
+            """
+            query {
+                reservationUnits(maxPersonsLte: 200) {
+                    edges {
+                        node {
+                            nameFi maxPersons
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filtering_by_max_persons_lte_outside_limit(self):
+        response = self.query(
+            """
+            query {
+                reservationUnits(maxPersonsLte: 199) {
+                    edges {
+                        node {
+                            nameFi maxPersons
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filtering_by_max_persons_lte_not_set(self):
+        self.reservation_unit.max_persons = None
+        self.reservation_unit.save()
+        response = self.query(
+            """
+            query {
+                reservationUnits(maxPersonsLte: 199) {
+                    edges {
+                        node {
                             nameFi maxPersons
                         }
                     }
