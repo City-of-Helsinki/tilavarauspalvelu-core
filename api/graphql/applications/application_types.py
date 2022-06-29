@@ -13,7 +13,6 @@ from api.graphql.base_type import PrimaryKeyObjectType
 from api.graphql.reservation_units.reservation_unit_types import ReservationUnitType
 from api.graphql.translate_fields import get_all_translatable_fields
 from applications.models import (
-    DAY_CHOICES,
     Address,
     Application,
     ApplicationEvent,
@@ -119,9 +118,7 @@ class ApplicationEventScheduleResultType(AuthNode, PrimaryKeyObjectType):
     )
     allocated_reservation_unit = graphene.Field(ReservationUnitType)
     basket = graphene.Field(ApplicationRoundBasketType)
-    allocated_day = graphene.Field(
-        graphene.Enum("allocatedDay", [(v.upper(), k) for k, v in DAY_CHOICES])
-    )
+    allocated_day = graphene.Int()
 
     class Meta:
         model = ApplicationEventScheduleResult

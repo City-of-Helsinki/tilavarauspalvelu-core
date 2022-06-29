@@ -21,6 +21,22 @@ snapshots['ApplicationEventQueryTestCase::test_application_event_reduction_count
     }
 }
 
+snapshots['ApplicationEventQueryTestCase::test_application_shows 1'] = {
+    'data': {
+        'applicationEvents': {
+            'edges': [
+                {
+                    'node': {
+                        'application': {
+                            'additionalInformation': 'Something to fill the field with text'
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}
+
 snapshots['ApplicationEventQueryTestCase::test_filter_by_applicant_type 1'] = {
     'data': {
         'applicationEvents': {
@@ -76,22 +92,6 @@ snapshots['ApplicationEventQueryTestCase::test_filter_by_applicant_type 1'] = {
                         'name': 'I should be listed',
                         'numPersons': None,
                         'status': 'created'
-                    }
-                }
-            ]
-        }
-    }
-}
-
-snapshots['ApplicationEventQueryTestCase::test_application_shows 1'] = {
-    'data': {
-        'applicationEvents': {
-            'edges': [
-                {
-                    'node': {
-                        'application': {
-                            'additionalInformation': 'Something to fill the field with text'
-                        }
                     }
                 }
             ]
@@ -394,7 +394,7 @@ snapshots['ApplicationEventScheduleResultQueryTestCase::test_schedule_results 1'
                                 'applicationEventScheduleResult': {
                                     'accepted': False,
                                     'allocatedBegin': '12:00:00',
-                                    'allocatedDay': 'MONDAY',
+                                    'allocatedDay': 0,
                                     'allocatedEnd': '14:00:00',
                                     'allocatedReservationUnit': {
                                         'nameFi': 'You got this reservation unit'
