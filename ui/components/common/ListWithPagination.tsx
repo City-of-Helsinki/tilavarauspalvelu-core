@@ -146,7 +146,7 @@ const ListWithPagination = ({
             )}
             {sortingComponent && sortingComponent}
           </TopWrapper>
-          {items.length && content}
+          {items.length > 0 && content}
         </>
       )}
     </Container>

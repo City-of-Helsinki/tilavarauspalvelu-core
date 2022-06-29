@@ -17,6 +17,7 @@ import {
   PageInfo,
   Query,
   QueryReservationUnitsArgs,
+  ReservationUnitsReservationUnitReservationKindChoices,
   ReservationUnitType,
 } from "../../modules/gql-types";
 import { H1, HeroSubheading } from "../../modules/style/typography";
@@ -93,6 +94,8 @@ const processVariables = (values: Record<string, string>) => {
     orderBy: values.order === "desc" ? `-${values.sort}` : values.sort,
     isDraft: false,
     isVisible: true,
+    reservationKind:
+      ReservationUnitsReservationUnitReservationKindChoices.Direct,
   };
 };
 
