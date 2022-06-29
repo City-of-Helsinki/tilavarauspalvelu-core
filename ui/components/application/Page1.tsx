@@ -126,13 +126,19 @@ const Page1 = ({
       });
 
       setOptions({
-        ageGroupOptions: mapOptions(fetchedAgeGroupOptions, i18n.language),
+        ageGroupOptions: mapOptions(
+          fetchedAgeGroupOptions,
+          undefined,
+          i18n.language
+        ),
         abilityGroupOptions: mapOptions(
           fetchedAbilityGroupOptions,
+          undefined,
           i18n.language
         ),
         reservationUnitTypeOptions: mapOptions(
           fetchedReservationUnitType,
+          undefined,
           i18n.language
         ),
         participantCountOptions,
