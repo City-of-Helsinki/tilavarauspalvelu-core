@@ -413,9 +413,6 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
         return self.unit
 
     def resolve_max_persons(self, info):
-        if not self.max_persons:
-            # Gets the max persons from spaces.
-            return self.get_max_persons()
         return self.max_persons
 
     def resolve_surface_area(self, info):
