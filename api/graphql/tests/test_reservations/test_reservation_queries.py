@@ -44,7 +44,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
             billing_address_zip="20100",
             billing_phone="+358234567890",
             billing_email="hidden.billing@example.com",
-            name="movies",
+            name="admin movies",
             description="something super secret",
             reservation_unit=[self.reservation_unit],
             begin=reservation_begin,
@@ -68,6 +68,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
                     totalCount
                     edges {
                         node {
+                            name
                             user
                             reserveeFirstName
                             reserveeLastName
