@@ -138,7 +138,9 @@ export const RESERVATION_UNITS = gql`
       pk: $pk
       applicationRound: $applicationRound
       maxPersonsGte: $minPersons
+      minPersonsGte: $minPersons
       maxPersonsLte: $maxPersons
+      minPersonsLte: $maxPersons
       reservationUnitType: $reservationUnitType
       purposes: $purposes
       unit: $unit

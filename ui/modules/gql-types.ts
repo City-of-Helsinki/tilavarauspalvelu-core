@@ -1526,9 +1526,11 @@ export type QueryReservationsArgs = {
   first?: InputMaybe<Scalars["Int"]>;
   last?: InputMaybe<Scalars["Int"]>;
   offset?: InputMaybe<Scalars["Int"]>;
+  onlyWithPermission?: InputMaybe<Scalars["Boolean"]>;
   orderBy?: InputMaybe<Scalars["String"]>;
   requested?: InputMaybe<Scalars["Boolean"]>;
   state?: InputMaybe<Array<InputMaybe<Scalars["String"]>>>;
+  user?: InputMaybe<Scalars["ID"]>;
 };
 
 export type QueryResourceArgs = {
@@ -1997,17 +1999,17 @@ export type ReservationType = Node & {
   ageGroup?: Maybe<AgeGroupType>;
   applyingForFreeOfCharge: Scalars["Boolean"];
   begin: Scalars["DateTime"];
-  billingAddressCity: Scalars["String"];
-  billingAddressStreet: Scalars["String"];
-  billingAddressZip: Scalars["String"];
+  billingAddressCity?: Maybe<Scalars["String"]>;
+  billingAddressStreet?: Maybe<Scalars["String"]>;
+  billingAddressZip?: Maybe<Scalars["String"]>;
   billingEmail?: Maybe<Scalars["String"]>;
-  billingFirstName: Scalars["String"];
-  billingLastName: Scalars["String"];
-  billingPhone: Scalars["String"];
+  billingFirstName?: Maybe<Scalars["String"]>;
+  billingLastName?: Maybe<Scalars["String"]>;
+  billingPhone?: Maybe<Scalars["String"]>;
   bufferTimeAfter?: Maybe<Scalars["Duration"]>;
   bufferTimeBefore?: Maybe<Scalars["Duration"]>;
   calendarUrl?: Maybe<Scalars["String"]>;
-  cancelDetails: Scalars["String"];
+  cancelDetails?: Maybe<Scalars["String"]>;
   description?: Maybe<Scalars["String"]>;
   end: Scalars["DateTime"];
   freeOfChargeReason?: Maybe<Scalars["String"]>;
@@ -2023,16 +2025,15 @@ export type ReservationType = Node & {
   purpose?: Maybe<ReservationPurposeType>;
   recurringReservation?: Maybe<RecurringReservationType>;
   reservationUnits?: Maybe<Array<Maybe<ReservationUnitType>>>;
-  reserveeAddressCity: Scalars["String"];
-  reserveeAddressStreet: Scalars["String"];
-  reserveeAddressZip: Scalars["String"];
+  reserveeAddressCity?: Maybe<Scalars["String"]>;
+  reserveeAddressStreet?: Maybe<Scalars["String"]>;
+  reserveeAddressZip?: Maybe<Scalars["String"]>;
   reserveeEmail?: Maybe<Scalars["String"]>;
   reserveeFirstName?: Maybe<Scalars["String"]>;
-  /** Reservee's business or association identity code */
-  reserveeId: Scalars["String"];
+  reserveeId?: Maybe<Scalars["String"]>;
   reserveeIsUnregisteredAssociation: Scalars["Boolean"];
   reserveeLastName?: Maybe<Scalars["String"]>;
-  reserveeOrganisationName: Scalars["String"];
+  reserveeOrganisationName?: Maybe<Scalars["String"]>;
   reserveePhone?: Maybe<Scalars["String"]>;
   /** Type of reservee */
   reserveeType?: Maybe<ReservationsReservationReserveeTypeChoices>;
@@ -5465,21 +5466,21 @@ export type UpdateReservationMutation = {
       numPersons?: number | null;
       reserveeFirstName?: string | null;
       reserveeLastName?: string | null;
-      reserveeOrganisationName: string;
+      reserveeOrganisationName?: string | null;
       reserveePhone?: string | null;
       reserveeEmail?: string | null;
-      reserveeId: string;
+      reserveeId?: string | null;
       reserveeIsUnregisteredAssociation: boolean;
-      reserveeAddressStreet: string;
-      reserveeAddressCity: string;
-      reserveeAddressZip: string;
-      billingFirstName: string;
-      billingLastName: string;
-      billingPhone: string;
+      reserveeAddressStreet?: string | null;
+      reserveeAddressCity?: string | null;
+      reserveeAddressZip?: string | null;
+      billingFirstName?: string | null;
+      billingLastName?: string | null;
+      billingPhone?: string | null;
       billingEmail?: string | null;
-      billingAddressStreet: string;
-      billingAddressCity: string;
-      billingAddressZip: string;
+      billingAddressStreet?: string | null;
+      billingAddressCity?: string | null;
+      billingAddressZip?: string | null;
       applyingForFreeOfCharge: boolean;
       freeOfChargeReason?: string | null;
       purpose?: {
