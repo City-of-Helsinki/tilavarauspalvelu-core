@@ -36,7 +36,7 @@ const ApplicationsGroup = ({
         <ApplicationCard
           key={application.pk}
           application={application}
-          applicationRound={rounds[application.applicationRoundId]}
+          applicationRound={rounds[application.applicationRound.pk]}
           actionCallback={actionCallback}
         />
       ))}

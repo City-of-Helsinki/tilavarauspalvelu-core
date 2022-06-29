@@ -6,7 +6,9 @@ export const APPLICATIONS = gql`
       edges {
         node {
           pk
-          applicationRoundId
+          applicationRound {
+            pk
+          }
           applicantName
           status
           applicantType

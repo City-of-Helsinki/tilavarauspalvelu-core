@@ -1190,6 +1190,8 @@ type Query {
     unit: [ID] = null
     keywordGroups: [ID] = null
     reservationUnitType: [ID] = null
+    minPersonsGte: Float = null
+    minPersonsLte: Float = null
     maxPersonsGte: Float = null
     maxPersonsLte: Float = null
     textSearch: String = null
@@ -2044,18 +2046,18 @@ input ReservationUnitCreateMutationInput {
 
   """Is reservation unit archived"""
   isArchived: Boolean
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   additionalInstructionsFi: String
   additionalInstructionsEn: String
   additionalInstructionsSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
   clientMutationId: String
 }
 
@@ -2169,18 +2171,18 @@ type ReservationUnitCreateMutationPayload {
   """Is reservation unit archived"""
   isArchived: Boolean
   state: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   additionalInstructionsFi: String
   additionalInstructionsEn: String
   additionalInstructionsSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -2617,18 +2619,18 @@ input ReservationUnitUpdateMutationInput {
 
   """Is reservation unit archived"""
   isArchived: Boolean
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   additionalInstructionsFi: String
   additionalInstructionsEn: String
   additionalInstructionsSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
   clientMutationId: String
 }
 
@@ -2742,18 +2744,18 @@ type ReservationUnitUpdateMutationPayload {
   """Is reservation unit archived"""
   isArchived: Boolean
   state: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   additionalInstructionsFi: String
   additionalInstructionsEn: String
   additionalInstructionsSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
