@@ -1,11 +1,21 @@
 import React from "react";
-import { Select } from "hds-react";
 import { useTranslation } from "react-i18next";
+import SortedSelect from "./SortedSelect";
 
 type OptionType = {
   label: string;
   value: string;
 };
+
+function selectedOptions(
+  value: string | string[],
+  options: OptionType[]
+): OptionType | OptionType[] | "" {
+  if (Array.isArray(value)) {
+    return options.filter((o) => value.includes(o.value));
+  }
+  return options.find((o) => o.value === value) || "";
+}
 
 const EnumSelect = ({
   id,
@@ -24,8 +34,8 @@ const EnumSelect = ({
   required?: boolean;
   disabled?: boolean;
   placeholder?: string;
-  value: string;
-  onChange: (value: string) => void;
+  value: string | string[];
+  onChange: (value: string | string[]) => void;
   type: { [key: string]: string };
   errorText?: string;
   sort?: boolean;
@@ -36,20 +46,15 @@ const EnumSelect = ({
     value: type[key],
     label: t(`${id}.${type[key]}`),
   }));
-  if (sort) {
-    options.sort((a, b) =>
-      a.label.toLowerCase().localeCompare(b.label.toLowerCase())
-    );
-  }
 
   return (
-    <Select
+    <SortedSelect
       label={label}
       required={required}
       options={options}
       placeholder={placeholder}
       disabled={disabled}
-      value={options.find((o) => o.value === value) || ""}
+      value={selectedOptions(value, options)}
       id={id}
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       onChange={(e: any) => {
@@ -57,6 +62,7 @@ const EnumSelect = ({
       }}
       error={errorText}
       invalid={!!errorText}
+      sort={sort}
     />
   );
 };

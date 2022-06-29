@@ -1,5 +1,5 @@
 import { ApolloError, useQuery } from "@apollo/client";
-import { Accordion, Button } from "hds-react";
+import { Accordion } from "hds-react";
 import { groupBy, orderBy } from "lodash";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -161,10 +161,6 @@ function AllApplicationRounds(): JSX.Element | null {
               emptyContent={
                 <div>
                   <div>{t("ApplicationRound.noUpcoming")}</div>
-
-                  <Button title="Ei toteutettu" disabled>
-                    Luo hakukierros
-                  </Button>
                 </div>
               }
             />

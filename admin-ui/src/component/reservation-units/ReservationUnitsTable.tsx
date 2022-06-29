@@ -69,6 +69,12 @@ const getColConfig = (t: TFunction, language: LocalizationLanguages) => [
         "-"
       ),
   },
+  {
+    headerName: t("ReservationUnits.headings.state"),
+    key: "state",
+    transform: ({ state }: ReservationUnitType) =>
+      t(`ReservationUnits.state.${state}`),
+  },
 ];
 
 const ReservationUnitsTable = ({

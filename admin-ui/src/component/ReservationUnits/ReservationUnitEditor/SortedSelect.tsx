@@ -2,11 +2,10 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import memoize from "lodash/memoize";
 import { Select, SelectProps } from "hds-react";
-import { OptionType } from "../../../common/types";
 
-const SortedCompobox = (
-  props: Partial<SelectProps<OptionType>> & { sort?: boolean; label: string }
-): JSX.Element => {
+function SortedSelect<T>(
+  props: Partial<SelectProps<T>> & { sort?: boolean; label: string }
+): JSX.Element {
   const { t } = useTranslation();
 
   const sortedOpts = memoize((originalOptions) => {
@@ -29,5 +28,5 @@ const SortedCompobox = (
   };
 
   return <Select {...actualProps} options={sortedOpts} />;
-};
-export default SortedCompobox;
+}
+export default SortedSelect;

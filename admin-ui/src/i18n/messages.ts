@@ -954,6 +954,12 @@ const translations: ITranslations = {
     noFilteredReservationUnits: [
       "Valituilla suodattimilla ei löytynyt yhtään varausyksikköä. Valitse suodattimia uudelleen tai tyhjennä kaikki suodattimet.",
     ],
+    state: {
+      DRAFT: ["Luonnos"],
+      SCHEDULED_PUBLISHING: ["Julkaisu ajastettu"],
+      SCHEDULED_RESERVATION: ["Julkaistu, varaus ajastettu"],
+      PUBLISHED: ["Julkaistu"],
+    },
     headings: {
       name: ["Nimi"],
       unitName: ["Toimipiste"],
@@ -961,6 +967,7 @@ const translations: ITranslations = {
       reservationUnitType: ["Tilatyyppi"],
       maxPersons: ["Hlömäärä (max)"],
       surfaceArea: ["Pinta-ala"],
+      state: ["Tila"],
     },
   },
   ReservationUnitsSearch: {
@@ -976,6 +983,7 @@ const translations: ITranslations = {
     maxPersonsGtePlaceHolder: ["Vähintään"],
     maxPersonsLtePlaceHolder: ["Enintään"],
     surfaceAreaLabel: ["Pinta-ala"],
+    stateLabel: ["Tila"],
     surfaceAreaLtePlaceHolder: ["Vähintään"],
     surfaceAreaGtePlaceHolder: ["Enintään"],
     notANumber: ["Ei ole numero"],

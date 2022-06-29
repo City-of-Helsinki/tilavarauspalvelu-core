@@ -37,6 +37,7 @@ const mapFilterParams = (params: FilterArguments) => ({
   surfaceAreaLte: numberOrUndefined(params.surfaceAreaLte),
   surfaceAreaGte: numberOrUndefined(params.surfaceAreaGte),
   unit: params.unit?.map((u) => u.value as string),
+  state: params.reservationUnitStates?.map((u) => u.value as string),
   reservationUnitType: params.reservationUnitType?.map(
     (u) => u.value as string
   ),

@@ -7,11 +7,13 @@ import i18next from "i18next";
 import styled from "styled-components";
 import { breakpoints } from "../../styles/util";
 import { Query, QueryReservationUnitTypesArgs } from "../../common/gql-types";
-import SortedCompobox from "../ReservationUnits/ReservationUnitEditor/SortedSelect";
+import SortedSelect from "../ReservationUnits/ReservationUnitEditor/SortedSelect";
 import { RESERVATION_UNIT_TYPES_QUERY } from "./queries";
 import { OptionType } from "../../common/types";
 import UnitFilter from "../filters/UnitFilter";
 import Tags, { Action, getReducer, toTags } from "../lists/Tags";
+import { Grid, Span3 } from "../../styles/layout";
+import ReservationUnitStateFilter from "../filters/ReservationUnitStateFilter";
 
 export type FilterArguments = {
   nameFi?: string;
@@ -21,9 +23,14 @@ export type FilterArguments = {
   surfaceAreaLte?: string;
   unit: OptionType[];
   reservationUnitType: OptionType[];
+  reservationUnitStates: OptionType[];
 };
 
-const multivaluedFields = ["unit", "reservationUnitType"];
+const multivaluedFields = [
+  "unit",
+  "reservationUnitType",
+  "reservationUnitStates",
+];
 
 type Props = {
   onSearch: (args: FilterArguments) => void;
@@ -69,7 +76,11 @@ const ThinButton = styled(Button)`
 
 const Buttons = styled.div``;
 
-export const emptyState = { reservationUnitType: [], unit: [] };
+export const emptyState = {
+  reservationUnitType: [],
+  unit: [],
+  reservationUnitStates: [],
+};
 
 type TypeComboboxProps = {
   onChange: (reservationUnitType: OptionType[]) => void;
@@ -88,7 +99,7 @@ const TypeCombobox = ({ onChange, value }: TypeComboboxProps): JSX.Element => {
   }
 
   return (
-    <SortedCompobox
+    <SortedSelect
       sort
       label={t("ReservationUnitsSearch.typeLabel")}
       multiselect
@@ -159,32 +170,46 @@ const Filters = ({ onSearch }: Props): JSX.Element => {
   return (
     <div>
       <Wrapper>
-        <Grid3Container>
-          <TextInput
-            id="text"
-            label={t("ReservationUnitsSearch.textSearchLabel")}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                onSearch(state);
+        <Grid>
+          <Span3>
+            <TextInput
+              id="text"
+              label={t("ReservationUnitsSearch.textSearchLabel")}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  onSearch(state);
+                }
+              }}
+              onChange={(e) =>
+                dispatch({ type: "set", value: { nameFi: e.target.value } })
               }
-            }}
-            onChange={(e) =>
-              dispatch({ type: "set", value: { nameFi: e.target.value } })
-            }
-            placeholder={t("ReservationUnitsSearch.textSearchPlaceHolder")}
-            value={state.nameFi || ""}
-          />
-          <UnitFilter
-            onChange={(e) => dispatch({ type: "set", value: { unit: e } })}
-            value={state.unit}
-          />
-          <TypeCombobox
-            onChange={(e) =>
-              dispatch({ type: "set", value: { reservationUnitType: e } })
-            }
-            value={state.reservationUnitType}
-          />
-        </Grid3Container>
+              placeholder={t("ReservationUnitsSearch.textSearchPlaceHolder")}
+              value={state.nameFi || ""}
+            />
+          </Span3>
+          <Span3>
+            <UnitFilter
+              onChange={(e) => dispatch({ type: "set", value: { unit: e } })}
+              value={state.unit}
+            />
+          </Span3>
+          <Span3>
+            <TypeCombobox
+              onChange={(e) =>
+                dispatch({ type: "set", value: { reservationUnitType: e } })
+              }
+              value={state.reservationUnitType}
+            />
+          </Span3>
+          <Span3>
+            <ReservationUnitStateFilter
+              value={state.reservationUnitStates}
+              onChange={(e) =>
+                dispatch({ type: "set", value: { reservationUnitStates: e } })
+              }
+            />
+          </Span3>
+        </Grid>
         {more && (
           <Grid2Container>
             <div>

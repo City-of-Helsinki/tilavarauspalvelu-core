@@ -36,7 +36,7 @@ export const toTags = <T,>(
       return (get(state, key) as []).map(
         (v: OptionType) =>
           ({
-            key: `${key}.${v.value}`,
+            key: `${String(key)}.${v.value}`,
             value: v.label,
             ac: { type: "deleteTag", field: key, value: v.value },
           } as Tag<T>)
@@ -49,7 +49,7 @@ export const toTags = <T,>(
         value:
           typeof state[key] === "string"
             ? `"${state[key]}"`
-            : t(`${translationPrefix || ""}.filters.${key}Tag`, {
+            : t(`${translationPrefix || ""}.filters.${String(key)}Tag`, {
                 value: get(state[key], "label"),
               }),
 
@@ -75,7 +75,18 @@ export const getReducer =
       }
 
       case "deleteTag": {
-        return omit(state as Partial<T>, action.field) as unknown as T;
+        if (!action.value) {
+          return omit(state as Partial<T>, action.field) as unknown as T;
+        }
+
+        const filtered = (
+          state[action.field] as unknown as [OptionType]
+        ).filter((e) => e.value !== action.value);
+
+        return {
+          ...state,
+          [action.field]: filtered,
+        };
       }
 
       default:
@@ -101,7 +112,13 @@ export default function Tags<T>({
   return tags.length ? (
     <Wrapper>
       {tags.map((tag) => (
-        <StyledTag id={tag.key} onDelete={() => dispatch(tag.ac)} key={tag.key}>
+        <StyledTag
+          id={tag.key}
+          onDelete={() => {
+            dispatch(tag.ac);
+          }}
+          key={tag.key}
+        >
           {tag.value}
         </StyledTag>
       ))}

@@ -75,7 +75,7 @@ import {
   UPDATE_RESERVATION_UNIT,
 } from "./queries";
 import FormErrorSummary from "../../../common/FormErrorSummary";
-import SortedCompobox from "./SortedSelect";
+import SortedSelect from "./SortedSelect";
 import { useModal } from "../../../context/ModalContext";
 import ArchiveDialog from "./ArchiveDialog";
 
@@ -621,7 +621,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                     );
                   })}
                   <Span6>
-                    <SortedCompobox
+                    <SortedSelect
                       id="spacePks"
                       multiselect
                       required
@@ -644,7 +644,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                     />
                   </Span6>
                   <Span6>
-                    <SortedCompobox
+                    <SortedSelect
                       id="resourcePks"
                       multiselect
                       label={t("ReservationUnitEditor.label.resourcePks")}
@@ -781,7 +781,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                     />
                   </Span6>
                   <Span6>
-                    <SortedCompobox
+                    <SortedSelect
                       sort
                       multiselect
                       label={t("ReservationUnitEditor.purposesLabel")}
@@ -803,7 +803,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                     />
                   </Span6>
                   <Span6>
-                    <SortedCompobox
+                    <SortedSelect
                       sort
                       multiselect
                       label={t("ReservationUnitEditor.equipmentsLabel")}
