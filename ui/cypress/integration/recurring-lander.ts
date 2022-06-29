@@ -48,7 +48,7 @@ describe("recurring search lander", () => {
       .find("button")
       .click();
 
-    cy.url().should("contain", "/search?applicationRound=2");
+    cy.url().should("contain", "/search?applicationRound=1");
   });
 
   it("displays correct breadcrumbs", () => {
