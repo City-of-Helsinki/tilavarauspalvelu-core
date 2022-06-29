@@ -1173,6 +1173,8 @@ type Query {
     end: DateTime = null
     state: [String] = null
     requested: Boolean = null
+    onlyWithPermission: Boolean = null
+    user: ID = null
 
     """Järjestys"""
     orderBy: String = null
@@ -1190,6 +1192,8 @@ type Query {
     unit: [ID] = null
     keywordGroups: [ID] = null
     reservationUnitType: [ID] = null
+    minPersonsGte: Float = null
+    minPersonsLte: Float = null
     maxPersonsGte: Float = null
     maxPersonsLte: Float = null
     textSearch: String = null
@@ -1733,23 +1737,21 @@ type ReservationType implements Node {
   reserveeType: ReservationsReservationReserveeTypeChoices
   reserveeFirstName: String
   reserveeLastName: String
-  reserveeOrganisationName: String!
+  reserveeOrganisationName: String
   reserveePhone: String
   reserveeEmail: String
-
-  """Reservee's business or association identity code"""
-  reserveeId: String!
+  reserveeId: String
   reserveeIsUnregisteredAssociation: Boolean!
-  reserveeAddressStreet: String!
-  reserveeAddressCity: String!
-  reserveeAddressZip: String!
-  billingFirstName: String!
-  billingLastName: String!
-  billingPhone: String!
+  reserveeAddressStreet: String
+  reserveeAddressCity: String
+  reserveeAddressZip: String
+  billingFirstName: String
+  billingLastName: String
+  billingPhone: String
   billingEmail: String
-  billingAddressStreet: String!
-  billingAddressCity: String!
-  billingAddressZip: String!
+  billingAddressStreet: String
+  billingAddressCity: String
+  billingAddressZip: String
 
   """Home city of the group or association"""
   homeCity: CityType
@@ -1768,7 +1770,7 @@ type ReservationType implements Node {
   recurringReservation: RecurringReservationType
   numPersons: Int
   purpose: ReservationPurposeType
-  cancelDetails: String!
+  cancelDetails: String
   unitPrice: Float
   taxPercentageValue: Decimal
   price: Float
@@ -2044,18 +2046,18 @@ input ReservationUnitCreateMutationInput {
 
   """Is reservation unit archived"""
   isArchived: Boolean
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
   additionalInstructionsFi: String
   additionalInstructionsEn: String
   additionalInstructionsSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   clientMutationId: String
 }
 
@@ -2169,18 +2171,18 @@ type ReservationUnitCreateMutationPayload {
   """Is reservation unit archived"""
   isArchived: Boolean
   state: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
   additionalInstructionsFi: String
   additionalInstructionsEn: String
   additionalInstructionsSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -2617,18 +2619,18 @@ input ReservationUnitUpdateMutationInput {
 
   """Is reservation unit archived"""
   isArchived: Boolean
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
   additionalInstructionsFi: String
   additionalInstructionsEn: String
   additionalInstructionsSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   clientMutationId: String
 }
 
@@ -2742,18 +2744,18 @@ type ReservationUnitUpdateMutationPayload {
   """Is reservation unit archived"""
   isArchived: Boolean
   state: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
   additionalInstructionsFi: String
   additionalInstructionsEn: String
   additionalInstructionsSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -3426,15 +3428,15 @@ input UnitUpdateMutationInput {
   webPage: String
   email: String
   phone: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
   shortDescriptionFi: String
   shortDescriptionEn: String
   shortDescriptionSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   clientMutationId: String
 }
 
@@ -3444,15 +3446,15 @@ type UnitUpdateMutationPayload {
   webPage: String
   email: String
   phone: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
   shortDescriptionFi: String
   shortDescriptionEn: String
   shortDescriptionSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]

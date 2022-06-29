@@ -22,7 +22,9 @@ export const SEARCH_RESERVATION_UNITS_QUERY = gql`
       nameFi: $nameFi
       after: $after
       maxPersonsGte: $maxPersonsGte
+      minPersonsGte: $maxPersonsGte
       maxPersonsLte: $maxPersonsLte
+      minPersonsLte: $maxPersonsLte
       surfaceAreaGte: $surfaceAreaGte
       surfaceAreaLte: $surfaceAreaLte
       unit: $unit
