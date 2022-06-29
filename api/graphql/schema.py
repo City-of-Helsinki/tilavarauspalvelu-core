@@ -1,7 +1,6 @@
 import django_filters
 import graphene
 from django.conf import settings
-from django.contrib.auth import get_user_model
 from django.db.models import Q
 from graphene import Field, relay
 from graphene_permissions.mixins import AuthFilter
@@ -109,15 +108,11 @@ from permissions.api_permissions.graphene_permissions import (
     TermsOfUsePermission,
     UnitPermission,
 )
-from permissions.helpers import (
-    get_service_sectors_where_can_view_applications,
-    get_service_sectors_where_can_view_reservations,
-    get_units_where_can_view_reservations,
-)
+from permissions.helpers import get_service_sectors_where_can_view_applications
 from reservation_units.models import Equipment, EquipmentCategory, ReservationUnit
 from reservations.models import Reservation
 from resources.models import Resource
-from spaces.models import ServiceSector, Space, Unit
+from spaces.models import Space, Unit
 
 from .application_rounds.application_round_types import ApplicationRoundType
 from .applications.application_mutations import (
@@ -242,27 +237,9 @@ class ReservationsFilter(AuthFilter, django_filters.FilterSet):
             connection, iterable, info, args, filtering_args, filterset_class
         )
 
-        user = info.context.user
-        viewable_units = get_units_where_can_view_reservations(user)
-        viewable_service_sectors = get_service_sectors_where_can_view_reservations(user)
-        if settings.TMP_PERMISSIONS_DISABLED:
-            viewable_units = Unit.objects.all()
-            viewable_service_sectors = ServiceSector.objects.all()
-            user = (
-                get_user_model().objects.get(username="admin")
-                if settings.TMP_PERMISSIONS_DISABLED
-                else info.context.user
-            )
-        elif user.is_anonymous:
-            return queryset.none()
-        qs = queryset.filter(
-            Q(reservation_unit__unit__in=viewable_units)
-            | Q(reservation_unit__unit__service_sectors__in=viewable_service_sectors)
-            | Q(user=user)
-        ).distinct()
         if not args.get("order_by", None):
-            qs = qs.order_by("begin")
-        return qs
+            queryset = queryset.order_by("begin")
+        return queryset
 
 
 class ReservationUnitsFilter(AuthFilter, django_filters.FilterSet):

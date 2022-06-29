@@ -16,6 +16,87 @@ from reservations.tests.factories import (
 
 
 class ReservationQueryTestCase(ReservationTestCaseBase):
+    def create_reservation_by_admin(self):
+        reservation_begin = datetime.datetime.now(tz=get_default_timezone())
+        reservation_end = datetime.datetime.now(
+            tz=get_default_timezone()
+        ) + datetime.timedelta(hours=1)
+        ReservationFactory(
+            reservee_first_name="Shouldbe",
+            reservee_last_name="Hidden",
+            reservee_type=CUSTOMER_TYPES.CUSTOMER_TYPE_INDIVIDUAL,
+            reservee_organisation_name="Hidden organisation",
+            reservee_address_street="Mystery street 2",
+            reservee_address_city="Nowhere",
+            reservee_address_zip="00100",
+            reservee_phone="+358123456789",
+            reservee_email="shouldbe.hidden@example.com",
+            reservee_id="5727586-5",
+            reservee_is_unregistered_association=False,
+            home_city=City.objects.create(name="Test"),
+            applying_for_free_of_charge=True,
+            free_of_charge_reason="Only admins can see me.",
+            age_group=AgeGroup.objects.create(minimum=18, maximum=30),
+            billing_first_name="Shouldbe",
+            billing_last_name="Hidden",
+            billing_address_street="Privacy 12B",
+            billing_address_city="Hidden",
+            billing_address_zip="20100",
+            billing_phone="+358234567890",
+            billing_email="hidden.billing@example.com",
+            name="movies",
+            description="something super secret",
+            reservation_unit=[self.reservation_unit],
+            begin=reservation_begin,
+            end=reservation_end,
+            state=STATE_CHOICES.CREATED,
+            user=self.general_admin,
+            priority=100,
+            purpose=self.purpose,
+            unit_price=10,
+            tax_percentage_value=24,
+            price=10,
+            working_memo="i'm visible to admins",
+            buffer_time_before=datetime.timedelta(minutes=15),
+            buffer_time_after=datetime.timedelta(minutes=30),
+        )
+
+    def get_query_with_personal_fields(self, query_type: str):
+        return (
+            "query { %s {" % query_type
+            + """
+                    totalCount
+                    edges {
+                        node {
+                            user
+                            reserveeFirstName
+                            reserveeLastName
+                            reserveePhone
+                            reserveeEmail
+                            reserveeAddressStreet
+                            reserveeAddressCity
+                            reserveeAddressZip
+                            reserveeOrganisationName
+                            freeOfChargeReason
+                            billingFirstName
+                            billingLastName
+                            billingAddressStreet
+                            billingAddressCity
+                            billingAddressZip
+                            billingPhone
+                            billingEmail
+                            description
+                            reserveeId
+                            cancelDetails
+                            begin
+                            end
+                        }
+                    }
+                }
+            }
+            """
+        )
+
     def setUp(self):
         super().setUp()
         reservation_begin = datetime.datetime.now(tz=get_default_timezone())
@@ -63,7 +144,6 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         )
 
     def test_reservation_query(self):
-        self.maxDiff = None
         self.client.force_login(self.regular_joe)
         response = self.query(
             """
@@ -292,6 +372,63 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
             """
         )
 
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_hide_fields_with_personal_information(self):
+        self.create_reservation_by_admin()
+        self.client.force_login(self.regular_joe)
+        response = self.query(
+            self.get_query_with_personal_fields("""reservations(orderBy:"name")""")
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filter_only_with_permission(self):
+        self.create_reservation_by_admin()
+        self.client.force_login(self.regular_joe)
+        response = self.query(
+            self.get_query_with_personal_fields(
+                """reservations(onlyWithPermission:true, orderBy:"name")"""
+            )
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filter_only_with_permission_admin(self):
+        self.maxDiff = None
+        self.create_reservation_by_admin()
+        self.client.force_login(self.general_admin)
+        response = self.query(
+            self.get_query_with_personal_fields(
+                """reservations(onlyWithPermission:true, orderBy:"name")"""
+            )
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filter_by_user(self):
+        self.create_reservation_by_admin()
+        self.client.force_login(self.general_admin)
+        response = self.query(
+            """
+            query {
+                reservations(user:%s) {
+                    totalCount
+                    edges {
+                        node {
+                            user
+                        }
+                    }
+                }
+            }
+            """
+            % self.regular_joe.pk
+        )
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
         self.assertMatchSnapshot(content)

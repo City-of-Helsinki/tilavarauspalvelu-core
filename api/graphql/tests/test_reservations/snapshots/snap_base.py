@@ -43,6 +43,119 @@ snapshots['ReservationQueryTestCase::test_admin_can_read_working_memo 1'] = {
     }
 }
 
+snapshots['ReservationQueryTestCase::test_filter_by_user 1'] = {
+    'data': {
+        'reservations': {
+            'edges': [
+                {
+                    'node': {
+                        'user': 'joe.regularl@foo.com'
+                    }
+                }
+            ],
+            'totalCount': 1
+        }
+    }
+}
+
+snapshots['ReservationQueryTestCase::test_filter_only_with_permission 1'] = {
+    'data': {
+        'reservations': {
+            'edges': [
+                {
+                    'node': {
+                        'begin': '2021-10-12T12:00:00+00:00',
+                        'billingAddressCity': 'Turku',
+                        'billingAddressStreet': 'Aurakatu 12B',
+                        'billingAddressZip': '20100',
+                        'billingEmail': 'billing@example.com',
+                        'billingFirstName': 'Reser',
+                        'billingLastName': 'Vee',
+                        'billingPhone': '+358234567890',
+                        'cancelDetails': '',
+                        'description': 'movies&popcorn',
+                        'end': '2021-10-12T13:00:00+00:00',
+                        'freeOfChargeReason': 'This is some reason.',
+                        'reserveeAddressCity': 'Helsinki',
+                        'reserveeAddressStreet': 'Mannerheimintie 2',
+                        'reserveeAddressZip': '00100',
+                        'reserveeEmail': 'reservee@example.com',
+                        'reserveeFirstName': 'Reser',
+                        'reserveeId': '5727586-5',
+                        'reserveeLastName': 'Vee',
+                        'reserveeOrganisationName': 'Test organisation',
+                        'reserveePhone': '+358123456789',
+                        'user': 'joe.regularl@foo.com'
+                    }
+                }
+            ],
+            'totalCount': 1
+        }
+    }
+}
+
+snapshots['ReservationQueryTestCase::test_filter_only_with_permission_admin 1'] = {
+    'data': {
+        'reservations': {
+            'edges': [
+                {
+                    'node': {
+                        'begin': '2021-10-12T12:00:00+00:00',
+                        'billingAddressCity': 'Hidden',
+                        'billingAddressStreet': 'Privacy 12B',
+                        'billingAddressZip': '20100',
+                        'billingEmail': 'hidden.billing@example.com',
+                        'billingFirstName': 'Shouldbe',
+                        'billingLastName': 'Hidden',
+                        'billingPhone': '+358234567890',
+                        'cancelDetails': '',
+                        'description': 'something super secret',
+                        'end': '2021-10-12T13:00:00+00:00',
+                        'freeOfChargeReason': 'Only admins can see me.',
+                        'reserveeAddressCity': 'Nowhere',
+                        'reserveeAddressStreet': 'Mystery street 2',
+                        'reserveeAddressZip': '00100',
+                        'reserveeEmail': 'shouldbe.hidden@example.com',
+                        'reserveeFirstName': 'Shouldbe',
+                        'reserveeId': '5727586-5',
+                        'reserveeLastName': 'Hidden',
+                        'reserveeOrganisationName': 'Hidden organisation',
+                        'reserveePhone': '+358123456789',
+                        'user': 'amin.general@foo.com'
+                    }
+                },
+                {
+                    'node': {
+                        'begin': '2021-10-12T12:00:00+00:00',
+                        'billingAddressCity': 'Turku',
+                        'billingAddressStreet': 'Aurakatu 12B',
+                        'billingAddressZip': '20100',
+                        'billingEmail': 'billing@example.com',
+                        'billingFirstName': 'Reser',
+                        'billingLastName': 'Vee',
+                        'billingPhone': '+358234567890',
+                        'cancelDetails': '',
+                        'description': 'movies&popcorn',
+                        'end': '2021-10-12T13:00:00+00:00',
+                        'freeOfChargeReason': 'This is some reason.',
+                        'reserveeAddressCity': 'Helsinki',
+                        'reserveeAddressStreet': 'Mannerheimintie 2',
+                        'reserveeAddressZip': '00100',
+                        'reserveeEmail': 'reservee@example.com',
+                        'reserveeFirstName': 'Reser',
+                        'reserveeId': '5727586-5',
+                        'reserveeLastName': 'Vee',
+                        'reserveeOrganisationName': 'Test organisation',
+                        'reserveePhone': '+358123456789',
+                        'user': 'joe.regularl@foo.com'
+                    }
+                }
+            ],
+            'totalCount': 2
+        }
+    }
+}
+
 snapshots['ReservationQueryTestCase::test_filter_requested 1'] = {
     'data': {
         'reservations': {
@@ -96,6 +209,68 @@ snapshots['ReservationQueryTestCase::test_filter_reservation_state_requires_hand
                     }
                 }
             ]
+        }
+    }
+}
+
+snapshots['ReservationQueryTestCase::test_hide_fields_with_personal_information 1'] = {
+    'data': {
+        'reservations': {
+            'edges': [
+                {
+                    'node': {
+                        'begin': '2021-10-12T12:00:00+00:00',
+                        'billingAddressCity': 'Turku',
+                        'billingAddressStreet': 'Aurakatu 12B',
+                        'billingAddressZip': '20100',
+                        'billingEmail': 'billing@example.com',
+                        'billingFirstName': 'Reser',
+                        'billingLastName': 'Vee',
+                        'billingPhone': '+358234567890',
+                        'cancelDetails': '',
+                        'description': 'movies&popcorn',
+                        'end': '2021-10-12T13:00:00+00:00',
+                        'freeOfChargeReason': 'This is some reason.',
+                        'reserveeAddressCity': 'Helsinki',
+                        'reserveeAddressStreet': 'Mannerheimintie 2',
+                        'reserveeAddressZip': '00100',
+                        'reserveeEmail': 'reservee@example.com',
+                        'reserveeFirstName': 'Reser',
+                        'reserveeId': '5727586-5',
+                        'reserveeLastName': 'Vee',
+                        'reserveeOrganisationName': 'Test organisation',
+                        'reserveePhone': '+358123456789',
+                        'user': 'joe.regularl@foo.com'
+                    }
+                },
+                {
+                    'node': {
+                        'begin': '2021-10-12T12:00:00+00:00',
+                        'billingAddressCity': None,
+                        'billingAddressStreet': None,
+                        'billingAddressZip': None,
+                        'billingEmail': None,
+                        'billingFirstName': None,
+                        'billingLastName': None,
+                        'billingPhone': None,
+                        'cancelDetails': None,
+                        'description': None,
+                        'end': '2021-10-12T13:00:00+00:00',
+                        'freeOfChargeReason': None,
+                        'reserveeAddressCity': None,
+                        'reserveeAddressStreet': None,
+                        'reserveeAddressZip': None,
+                        'reserveeEmail': None,
+                        'reserveeFirstName': None,
+                        'reserveeId': None,
+                        'reserveeLastName': None,
+                        'reserveeOrganisationName': None,
+                        'reserveePhone': None,
+                        'user': None
+                    }
+                }
+            ],
+            'totalCount': 2
         }
     }
 }
