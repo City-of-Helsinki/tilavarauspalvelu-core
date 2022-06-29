@@ -100,11 +100,10 @@ class ResourceUpdateSerializer(PrimaryKeyUpdateSerializer, ResourceCreateSeriali
                 )
 
         for field, value in data.items():
-            if field in self.translation_fields:
-                if not value or value == "" or value.isspace():
-                    raise serializers.ValidationError(
-                        f"Missing translation for {to_camel_case(field)}."
-                    )
+            if field == "name_fi" and (not value or value == "" or value.isspace()):
+                raise serializers.ValidationError(
+                    f"Missing translation for {to_camel_case(field)}."
+                )
 
             if field == "space":
                 location_type = data.get("location_type")
