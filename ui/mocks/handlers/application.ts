@@ -18,7 +18,7 @@ const applications = graphql.query<Query, QueryApplicationsArgs>(
             {
               node: {
                 pk: 6,
-                applicationRoundId: 1,
+                applicationRound: { pk: 1 },
                 applicantName: null,
                 status: ApplicationStatus.Draft,
                 applicantType:
@@ -38,7 +38,7 @@ const applications = graphql.query<Query, QueryApplicationsArgs>(
             {
               node: {
                 pk: 8,
-                applicationRoundId: 1,
+                applicationRound: { pk: 1 },
                 applicantName: null,
                 status: ApplicationStatus.Draft,
                 applicantType:
@@ -58,7 +58,7 @@ const applications = graphql.query<Query, QueryApplicationsArgs>(
             {
               node: {
                 pk: 11,
-                applicationRoundId: 1,
+                applicationRound: { pk: 1 },
                 applicantName: "Matti Virtanen",
                 status: ApplicationStatus.InReview,
                 applicantType:
@@ -75,7 +75,7 @@ const applications = graphql.query<Query, QueryApplicationsArgs>(
             {
               node: {
                 pk: 2,
-                applicationRoundId: 1,
+                applicationRound: { pk: 1 },
                 applicantName: null,
                 status: ApplicationStatus.Draft,
                 applicantType: null,
@@ -94,7 +94,7 @@ const applications = graphql.query<Query, QueryApplicationsArgs>(
             {
               node: {
                 pk: 1,
-                applicationRoundId: 1,
+                applicationRound: { pk: 1 },
                 applicantName: null,
                 status: ApplicationStatus.Draft,
                 applicantType: null,
@@ -113,7 +113,7 @@ const applications = graphql.query<Query, QueryApplicationsArgs>(
             {
               node: {
                 pk: 3,
-                applicationRoundId: 1,
+                applicationRound: { pk: 1 },
                 applicantName: null,
                 status: ApplicationStatus.Draft,
                 applicantType: null,
@@ -132,7 +132,7 @@ const applications = graphql.query<Query, QueryApplicationsArgs>(
             {
               node: {
                 pk: 12,
-                applicationRoundId: 2,
+                applicationRound: { pk: 2 },
                 applicantName: "Matti Virtanen",
                 status: ApplicationStatus.InReview,
                 applicantType:
@@ -149,7 +149,7 @@ const applications = graphql.query<Query, QueryApplicationsArgs>(
             {
               node: {
                 pk: 14,
-                applicationRoundId: 2,
+                applicationRound: { pk: 2 },
                 applicantName: "Matti Virtanen",
                 status: ApplicationStatus.InReview,
                 applicantType:
@@ -166,7 +166,7 @@ const applications = graphql.query<Query, QueryApplicationsArgs>(
             {
               node: {
                 pk: 21,
-                applicationRoundId: 2,
+                applicationRound: { pk: 2 },
                 applicantName: null,
                 status: ApplicationStatus.Draft,
                 applicantType:
@@ -183,7 +183,7 @@ const applications = graphql.query<Query, QueryApplicationsArgs>(
             {
               node: {
                 pk: 26,
-                applicationRoundId: 2,
+                applicationRound: { pk: 2 },
                 applicantName: null,
                 status: ApplicationStatus.InReview,
                 applicantType:
@@ -203,7 +203,7 @@ const applications = graphql.query<Query, QueryApplicationsArgs>(
             {
               node: {
                 pk: 32,
-                applicationRoundId: 2,
+                applicationRound: { pk: 2 },
                 applicantName: null,
                 status: ApplicationStatus.Draft,
                 applicantType:
@@ -220,7 +220,7 @@ const applications = graphql.query<Query, QueryApplicationsArgs>(
             {
               node: {
                 pk: 36,
-                applicationRoundId: 2,
+                applicationRound: { pk: 2 },
                 applicantName: "Matti Virtanen",
                 status: ApplicationStatus.Draft,
                 applicantType:
@@ -237,7 +237,7 @@ const applications = graphql.query<Query, QueryApplicationsArgs>(
             {
               node: {
                 pk: 37,
-                applicationRoundId: 2,
+                applicationRound: { pk: 2 },
                 applicantName: "Matti Virtanen",
                 status: ApplicationStatus.InReview,
                 applicantType:
@@ -254,7 +254,7 @@ const applications = graphql.query<Query, QueryApplicationsArgs>(
             {
               node: {
                 pk: 15,
-                applicationRoundId: 2,
+                applicationRound: { pk: 2 },
                 applicantName: "Matti Virtanen",
                 status: ApplicationStatus.Cancelled,
                 applicantType:
@@ -271,7 +271,7 @@ const applications = graphql.query<Query, QueryApplicationsArgs>(
             {
               node: {
                 pk: 55,
-                applicationRoundId: 2,
+                applicationRound: { pk: 2 },
                 applicantName: "Matti Virtanen",
                 status: ApplicationStatus.Cancelled,
                 applicantType:
@@ -288,7 +288,7 @@ const applications = graphql.query<Query, QueryApplicationsArgs>(
             {
               node: {
                 pk: 46,
-                applicationRoundId: 2,
+                applicationRound: { pk: 2 },
                 applicantName: "Matti Virtanen",
                 status: ApplicationStatus.Cancelled,
                 applicantType:
@@ -308,7 +308,7 @@ const applications = graphql.query<Query, QueryApplicationsArgs>(
             {
               node: {
                 pk: 47,
-                applicationRoundId: 2,
+                applicationRound: { pk: 2 },
                 applicantName: "Matti Virtanen",
                 status: ApplicationStatus.Cancelled,
                 applicantType:
@@ -325,7 +325,7 @@ const applications = graphql.query<Query, QueryApplicationsArgs>(
             {
               node: {
                 pk: 31,
-                applicationRoundId: 2,
+                applicationRound: { pk: 2 },
                 applicantName: "Matti Virtanen",
                 status: ApplicationStatus.Cancelled,
                 applicantType:
@@ -342,7 +342,7 @@ const applications = graphql.query<Query, QueryApplicationsArgs>(
             {
               node: {
                 pk: 39,
-                applicationRoundId: 2,
+                applicationRound: { pk: 2 },
                 applicantName: "Matti Virtanen",
                 status: ApplicationStatus.Cancelled,
                 applicantType:
@@ -359,7 +359,7 @@ const applications = graphql.query<Query, QueryApplicationsArgs>(
             {
               node: {
                 pk: 48,
-                applicationRoundId: 2,
+                applicationRound: { pk: 2 },
                 applicantName: "Matti Virtanen",
                 status: ApplicationStatus.Cancelled,
                 applicantType:
@@ -376,7 +376,7 @@ const applications = graphql.query<Query, QueryApplicationsArgs>(
             {
               node: {
                 pk: 34,
-                applicationRoundId: 2,
+                applicationRound: { pk: 2 },
                 applicantName: "Matti Virtanen",
                 status: ApplicationStatus.Cancelled,
                 applicantType:
@@ -396,7 +396,7 @@ const applications = graphql.query<Query, QueryApplicationsArgs>(
             {
               node: {
                 pk: 49,
-                applicationRoundId: 2,
+                applicationRound: { pk: 2 },
                 applicantName: "Matti Virtanen",
                 status: ApplicationStatus.Cancelled,
                 applicantType:
@@ -416,7 +416,7 @@ const applications = graphql.query<Query, QueryApplicationsArgs>(
             {
               node: {
                 pk: 50,
-                applicationRoundId: 2,
+                applicationRound: { pk: 2 },
                 applicantName: "Matti Virtanen",
                 status: ApplicationStatus.Cancelled,
                 applicantType:
@@ -433,7 +433,7 @@ const applications = graphql.query<Query, QueryApplicationsArgs>(
             {
               node: {
                 pk: 54,
-                applicationRoundId: 2,
+                applicationRound: { pk: 2 },
                 applicantName: "Matti Virtanen",
                 status: ApplicationStatus.Cancelled,
                 applicantType:
@@ -453,7 +453,7 @@ const applications = graphql.query<Query, QueryApplicationsArgs>(
             {
               node: {
                 pk: 33,
-                applicationRoundId: 2,
+                applicationRound: { pk: 2 },
                 applicantName: "Matti Virtanen",
                 status: ApplicationStatus.Cancelled,
                 applicantType:
@@ -470,7 +470,7 @@ const applications = graphql.query<Query, QueryApplicationsArgs>(
             {
               node: {
                 pk: 56,
-                applicationRoundId: 2,
+                applicationRound: { pk: 2 },
                 applicantName: "Matti Virtanen",
                 status: ApplicationStatus.Cancelled,
                 applicantType:
@@ -487,7 +487,7 @@ const applications = graphql.query<Query, QueryApplicationsArgs>(
             {
               node: {
                 pk: 53,
-                applicationRoundId: 2,
+                applicationRound: { pk: 2 },
                 applicantName: "Matti Virtanen",
                 status: ApplicationStatus.Cancelled,
                 applicantType:
@@ -504,7 +504,7 @@ const applications = graphql.query<Query, QueryApplicationsArgs>(
             {
               node: {
                 pk: 30,
-                applicationRoundId: 2,
+                applicationRound: { pk: 2 },
                 applicantName: "Matti Virtanen",
                 status: ApplicationStatus.Cancelled,
                 applicantType: null,
@@ -516,7 +516,7 @@ const applications = graphql.query<Query, QueryApplicationsArgs>(
             {
               node: {
                 pk: 44,
-                applicationRoundId: 2,
+                applicationRound: { pk: 2 },
                 applicantName: "Matti Virtanen",
                 status: ApplicationStatus.Cancelled,
                 applicantType: null,
@@ -528,7 +528,7 @@ const applications = graphql.query<Query, QueryApplicationsArgs>(
             {
               node: {
                 pk: 27,
-                applicationRoundId: 2,
+                applicationRound: { pk: 2 },
                 applicantName: "Matti Virtanen",
                 status: ApplicationStatus.Cancelled,
                 applicantType: null,
@@ -536,6 +536,7 @@ const applications = graphql.query<Query, QueryApplicationsArgs>(
                 organisation: null,
                 lastModifiedDate: "2022-05-13T05:56:38.738917+00:00",
               },
+              cursor: "2093fj",
             },
           ] as ApplicationTypeEdge[],
           pageInfo: {

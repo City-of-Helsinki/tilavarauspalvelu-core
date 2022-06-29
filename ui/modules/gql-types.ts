@@ -106,6 +106,20 @@ export type ApplicationAggregatedDataType = {
   reservationsDurationTotal?: Maybe<Scalars["Float"]>;
 };
 
+export type ApplicationDeclineMutationInput = {
+  clientMutationId?: InputMaybe<Scalars["String"]>;
+  pk?: InputMaybe<Scalars["Int"]>;
+};
+
+export type ApplicationDeclineMutationPayload = {
+  __typename?: "ApplicationDeclineMutationPayload";
+  clientMutationId?: Maybe<Scalars["String"]>;
+  /** May contain more than one error for same field. */
+  errors?: Maybe<Array<Maybe<ErrorType>>>;
+  pk?: Maybe<Scalars["Int"]>;
+  status?: Maybe<Scalars["String"]>;
+};
+
 export type ApplicationEventAggregatedDataType = {
   __typename?: "ApplicationEventAggregatedDataType";
   allocationResultsDurationTotal?: Maybe<Scalars["Float"]>;
@@ -171,6 +185,20 @@ export type ApplicationEventCreateMutationPayload = {
   status?: Maybe<Scalars["String"]>;
 };
 
+export type ApplicationEventDeclineMutationInput = {
+  clientMutationId?: InputMaybe<Scalars["String"]>;
+  pk?: InputMaybe<Scalars["Int"]>;
+};
+
+export type ApplicationEventDeclineMutationPayload = {
+  __typename?: "ApplicationEventDeclineMutationPayload";
+  clientMutationId?: Maybe<Scalars["String"]>;
+  /** May contain more than one error for same field. */
+  errors?: Maybe<Array<Maybe<ErrorType>>>;
+  pk?: Maybe<Scalars["Int"]>;
+  status?: Maybe<Scalars["String"]>;
+};
+
 export type ApplicationEventDeleteMutationInput = {
   clientMutationId?: InputMaybe<Scalars["String"]>;
   pk: Scalars["Int"];
@@ -194,8 +222,83 @@ export type ApplicationEventScheduleCreateSerializerInput = {
   priority?: InputMaybe<Priority>;
 };
 
+export type ApplicationEventScheduleResultCreateMutationInput = {
+  accepted?: InputMaybe<Scalars["Boolean"]>;
+  allocatedBegin?: InputMaybe<Scalars["Time"]>;
+  allocatedDay?: InputMaybe<Scalars["Int"]>;
+  allocatedEnd?: InputMaybe<Scalars["Time"]>;
+  allocatedReservationUnit: Scalars["Int"];
+  /** Application schedule pk for this result */
+  applicationEventSchedule: Scalars["Int"];
+  basket?: InputMaybe<Scalars["String"]>;
+  clientMutationId?: InputMaybe<Scalars["String"]>;
+  declined?: InputMaybe<Scalars["Boolean"]>;
+};
+
+export type ApplicationEventScheduleResultCreateMutationPayload = {
+  __typename?: "ApplicationEventScheduleResultCreateMutationPayload";
+  accepted?: Maybe<Scalars["Boolean"]>;
+  allocatedBegin?: Maybe<Scalars["Time"]>;
+  allocatedDay?: Maybe<Scalars["Int"]>;
+  allocatedEnd?: Maybe<Scalars["Time"]>;
+  allocatedReservationUnit?: Maybe<Scalars["Int"]>;
+  /** Application schedule pk for this result */
+  applicationEventSchedule?: Maybe<Scalars["Int"]>;
+  applicationEventScheduleResult?: Maybe<ApplicationEventScheduleResultType>;
+  basket?: Maybe<Scalars["String"]>;
+  clientMutationId?: Maybe<Scalars["String"]>;
+  declined?: Maybe<Scalars["Boolean"]>;
+  /** May contain more than one error for same field. */
+  errors?: Maybe<Array<Maybe<ErrorType>>>;
+};
+
+export type ApplicationEventScheduleResultType = Node & {
+  __typename?: "ApplicationEventScheduleResultType";
+  accepted: Scalars["Boolean"];
+  allocatedBegin: Scalars["Time"];
+  allocatedDay?: Maybe<AllocatedDay>;
+  allocatedEnd: Scalars["Time"];
+  allocatedReservationUnit?: Maybe<ReservationUnitType>;
+  basket?: Maybe<ApplicationRoundBasketType>;
+  declined: Scalars["Boolean"];
+  /** The ID of the object */
+  id: Scalars["ID"];
+  pk?: Maybe<Scalars["Int"]>;
+};
+
+export type ApplicationEventScheduleResultUpdateMutationInput = {
+  accepted?: InputMaybe<Scalars["Boolean"]>;
+  allocatedBegin?: InputMaybe<Scalars["Time"]>;
+  allocatedDay?: InputMaybe<Scalars["Int"]>;
+  allocatedEnd?: InputMaybe<Scalars["Time"]>;
+  allocatedReservationUnit: Scalars["Int"];
+  /** Application schedule pk for this result */
+  applicationEventSchedule: Scalars["Int"];
+  basket?: InputMaybe<Scalars["String"]>;
+  clientMutationId?: InputMaybe<Scalars["String"]>;
+  declined?: InputMaybe<Scalars["Boolean"]>;
+};
+
+export type ApplicationEventScheduleResultUpdateMutationPayload = {
+  __typename?: "ApplicationEventScheduleResultUpdateMutationPayload";
+  accepted?: Maybe<Scalars["Boolean"]>;
+  allocatedBegin?: Maybe<Scalars["Time"]>;
+  allocatedDay?: Maybe<Scalars["Int"]>;
+  allocatedEnd?: Maybe<Scalars["Time"]>;
+  allocatedReservationUnit?: Maybe<Scalars["Int"]>;
+  /** Application schedule pk for this result */
+  applicationEventSchedule?: Maybe<Scalars["Int"]>;
+  applicationEventScheduleResult?: Maybe<ApplicationEventScheduleResultType>;
+  basket?: Maybe<Scalars["String"]>;
+  clientMutationId?: Maybe<Scalars["String"]>;
+  declined?: Maybe<Scalars["Boolean"]>;
+  /** May contain more than one error for same field. */
+  errors?: Maybe<Array<Maybe<ErrorType>>>;
+};
+
 export type ApplicationEventScheduleType = Node & {
   __typename?: "ApplicationEventScheduleType";
+  applicationEventScheduleResult?: Maybe<ApplicationEventScheduleResultType>;
   begin: Scalars["Time"];
   day?: Maybe<Scalars["Int"]>;
   end: Scalars["Time"];
@@ -208,12 +311,10 @@ export type ApplicationEventScheduleType = Node & {
 export type ApplicationEventType = Node & {
   __typename?: "ApplicationEventType";
   abilityGroup?: Maybe<AbilityGroupType>;
-  abilityGroupId?: Maybe<Scalars["Int"]>;
   ageGroup?: Maybe<AgeGroupType>;
-  ageGroupId?: Maybe<Scalars["Int"]>;
   aggregatedData?: Maybe<ApplicationEventAggregatedDataType>;
+  application: ApplicationType;
   applicationEventSchedules?: Maybe<Array<Maybe<ApplicationEventScheduleType>>>;
-  applicationId?: Maybe<Scalars["Int"]>;
   begin?: Maybe<Scalars["Date"]>;
   biweekly: Scalars["Boolean"];
   declinedReservationUnits?: Maybe<Array<ReservationUnitType>>;
@@ -228,7 +329,6 @@ export type ApplicationEventType = Node & {
   numPersons?: Maybe<Scalars["Int"]>;
   pk?: Maybe<Scalars["Int"]>;
   purpose?: Maybe<ReservationPurposeType>;
-  purposeId?: Maybe<Scalars["Int"]>;
   status?: Maybe<ApplicationEventStatus>;
   uuid: Scalars["UUID"];
   weeklyAmountReductionsCount?: Maybe<Scalars["Int"]>;
@@ -388,11 +488,11 @@ export type ApplicationType = Node & {
   additionalInformation?: Maybe<Scalars["String"]>;
   aggregatedData?: Maybe<ApplicationAggregatedDataType>;
   applicantEmail?: Maybe<Scalars["String"]>;
-  applicantId?: Maybe<Scalars["Int"]>;
   applicantName?: Maybe<Scalars["String"]>;
+  applicantPk?: Maybe<Scalars["Int"]>;
   applicantType?: Maybe<ApplicationsApplicationApplicantTypeChoices>;
   applicationEvents?: Maybe<Array<Maybe<ApplicationEventType>>>;
-  applicationRoundId?: Maybe<Scalars["Int"]>;
+  applicationRound: ApplicationRoundType;
   billingAddress?: Maybe<AddressType>;
   contactPerson?: Maybe<PersonType>;
   createdDate: Scalars["DateTime"];
@@ -697,7 +797,6 @@ export type EventReservationUnitType = Node & {
   pk?: Maybe<Scalars["Int"]>;
   priority?: Maybe<Scalars["Int"]>;
   reservationUnit?: Maybe<ReservationUnitType>;
-  reservationUnitId?: Maybe<Scalars["Int"]>;
 };
 
 export type KeywordCategoryType = Node & {
@@ -808,6 +907,7 @@ export type Mutation = {
   cancelReservation?: Maybe<ReservationCancellationMutationPayload>;
   confirmReservation?: Maybe<ReservationConfirmMutationPayload>;
   createApplicationEvent?: Maybe<ApplicationEventCreateMutationPayload>;
+  createApplicationEventScheduleResult?: Maybe<ApplicationEventScheduleResultCreateMutationPayload>;
   createEquipment?: Maybe<EquipmentCreateMutationPayload>;
   createEquipmentCategory?: Maybe<EquipmentCategoryCreateMutationPayload>;
   createPurpose?: Maybe<PurposeCreateMutationPayload>;
@@ -816,6 +916,8 @@ export type Mutation = {
   createReservationUnitImage?: Maybe<ReservationUnitImageCreateMutationPayload>;
   createResource?: Maybe<ResourceCreateMutationPayload>;
   createSpace?: Maybe<SpaceCreateMutationPayload>;
+  declineApplication?: Maybe<ApplicationDeclineMutationPayload>;
+  declineApplicationEvent?: Maybe<ApplicationEventDeclineMutationPayload>;
   deleteApplicationEvent?: Maybe<ApplicationEventDeleteMutationPayload>;
   deleteEquipment?: Maybe<EquipmentDeleteMutationPayload>;
   deleteEquipmentCategory?: Maybe<EquipmentCategoryDeleteMutationPayload>;
@@ -825,6 +927,7 @@ export type Mutation = {
   denyReservation?: Maybe<ReservationDenyMutationPayload>;
   requireHandlingForReservation?: Maybe<ReservationRequiresHandlingMutationPayload>;
   updateApplicationEvent?: Maybe<ApplicationEventUpdateMutationPayload>;
+  updateApplicationEventScheduleResult?: Maybe<ApplicationEventScheduleResultUpdateMutationPayload>;
   updateEquipment?: Maybe<EquipmentUpdateMutationPayload>;
   updateEquipmentCategory?: Maybe<EquipmentCategoryUpdateMutationPayload>;
   updatePurpose?: Maybe<PurposeUpdateMutationPayload>;
@@ -851,6 +954,10 @@ export type MutationConfirmReservationArgs = {
 
 export type MutationCreateApplicationEventArgs = {
   input: ApplicationEventCreateMutationInput;
+};
+
+export type MutationCreateApplicationEventScheduleResultArgs = {
+  input: ApplicationEventScheduleResultCreateMutationInput;
 };
 
 export type MutationCreateEquipmentArgs = {
@@ -883,6 +990,14 @@ export type MutationCreateResourceArgs = {
 
 export type MutationCreateSpaceArgs = {
   input: SpaceCreateMutationInput;
+};
+
+export type MutationDeclineApplicationArgs = {
+  input: ApplicationDeclineMutationInput;
+};
+
+export type MutationDeclineApplicationEventArgs = {
+  input: ApplicationEventDeclineMutationInput;
 };
 
 export type MutationDeleteApplicationEventArgs = {
@@ -919,6 +1034,10 @@ export type MutationRequireHandlingForReservationArgs = {
 
 export type MutationUpdateApplicationEventArgs = {
   input: ApplicationEventUpdateMutationInput;
+};
+
+export type MutationUpdateApplicationEventScheduleResultArgs = {
+  input: ApplicationEventScheduleResultUpdateMutationInput;
 };
 
 export type MutationUpdateEquipmentArgs = {
@@ -1154,6 +1273,7 @@ export type QueryAgeGroupsArgs = {
 
 export type QueryApplicationEventsArgs = {
   after?: InputMaybe<Scalars["String"]>;
+  applicantType?: InputMaybe<Array<InputMaybe<Scalars["String"]>>>;
   application?: InputMaybe<Scalars["ID"]>;
   applicationRound?: InputMaybe<Scalars["ID"]>;
   before?: InputMaybe<Scalars["String"]>;
@@ -1187,6 +1307,7 @@ export type QueryApplicationRoundsArgs = {
 
 export type QueryApplicationsArgs = {
   after?: InputMaybe<Scalars["String"]>;
+  applicantType?: InputMaybe<Array<InputMaybe<Scalars["String"]>>>;
   applicationRound?: InputMaybe<Scalars["ID"]>;
   before?: InputMaybe<Scalars["String"]>;
   first?: InputMaybe<Scalars["Int"]>;
@@ -1375,6 +1496,8 @@ export type QueryReservationUnitsArgs = {
   last?: InputMaybe<Scalars["Int"]>;
   maxPersonsGte?: InputMaybe<Scalars["Float"]>;
   maxPersonsLte?: InputMaybe<Scalars["Float"]>;
+  minPersonsGte?: InputMaybe<Scalars["Float"]>;
+  minPersonsLte?: InputMaybe<Scalars["Float"]>;
   nameEn?: InputMaybe<Scalars["String"]>;
   nameFi?: InputMaybe<Scalars["String"]>;
   nameSv?: InputMaybe<Scalars["String"]>;
@@ -1386,6 +1509,7 @@ export type QueryReservationUnitsArgs = {
   rankLte?: InputMaybe<Scalars["Float"]>;
   reservationKind?: InputMaybe<Scalars["String"]>;
   reservationUnitType?: InputMaybe<Array<InputMaybe<Scalars["ID"]>>>;
+  state?: InputMaybe<Array<InputMaybe<Scalars["String"]>>>;
   surfaceAreaGte?: InputMaybe<Scalars["Float"]>;
   surfaceAreaLte?: InputMaybe<Scalars["Float"]>;
   textSearch?: InputMaybe<Scalars["String"]>;
@@ -1987,6 +2111,7 @@ export type ReservationUnitByPkType = Node & {
   pk?: Maybe<Scalars["Int"]>;
   /** Unit of the price */
   priceUnit: ReservationUnitsReservationUnitPriceUnitChoices;
+  pricingTerms?: Maybe<TermsOfUseType>;
   /** Time after this reservation unit should be publicly visible in UI. */
   publishBegins?: Maybe<Scalars["DateTime"]>;
   /** Time after this reservation unit should not be publicly visible in UI. */
@@ -2016,7 +2141,7 @@ export type ReservationUnitByPkType = Node & {
   serviceSpecificTerms?: Maybe<TermsOfUseType>;
   services?: Maybe<Array<Maybe<ServiceType>>>;
   spaces?: Maybe<Array<Maybe<SpaceType>>>;
-  state?: Maybe<Scalars["String"]>;
+  state?: Maybe<ReservationUnitState>;
   surfaceArea?: Maybe<Scalars["Decimal"]>;
   taxPercentage?: Maybe<TaxPercentageType>;
   termsOfUseEn?: Maybe<Scalars["String"]>;
@@ -2311,6 +2436,15 @@ export type ReservationUnitImageUpdateMutationPayload = {
   reservationUnitPk?: Maybe<Scalars["Int"]>;
 };
 
+/** An enumeration. */
+export enum ReservationUnitState {
+  Archived = "ARCHIVED",
+  Draft = "DRAFT",
+  Published = "PUBLISHED",
+  ScheduledPublishing = "SCHEDULED_PUBLISHING",
+  ScheduledReservation = "SCHEDULED_RESERVATION",
+}
+
 export type ReservationUnitType = Node & {
   __typename?: "ReservationUnitType";
   additionalInstructionsEn?: Maybe<Scalars["String"]>;
@@ -2357,6 +2491,9 @@ export type ReservationUnitType = Node & {
   pk?: Maybe<Scalars["Int"]>;
   /** Unit of the price */
   priceUnit: ReservationUnitsReservationUnitPriceUnitChoices;
+  pricingTerms?: Maybe<TermsOfUseType>;
+  /** What kind of pricing types are available with this reservation unit. */
+  pricingType?: Maybe<ReservationUnitsReservationUnitPricingTypeChoices>;
   /** Time after this reservation unit should be publicly visible in UI. */
   publishBegins?: Maybe<Scalars["DateTime"]>;
   /** Time after this reservation unit should not be publicly visible in UI. */
@@ -2388,7 +2525,7 @@ export type ReservationUnitType = Node & {
   serviceSpecificTerms?: Maybe<TermsOfUseType>;
   services?: Maybe<Array<Maybe<ServiceType>>>;
   spaces?: Maybe<Array<Maybe<SpaceType>>>;
-  state?: Maybe<Scalars["String"]>;
+  state?: Maybe<ReservationUnitState>;
   surfaceArea?: Maybe<Scalars["Decimal"]>;
   taxPercentage?: Maybe<TaxPercentageType>;
   termsOfUseEn?: Maybe<Scalars["String"]>;
@@ -2667,10 +2804,18 @@ export enum ReservationUnitsReservationUnitPriceUnitChoices {
 }
 
 /** An enumeration. */
+export enum ReservationUnitsReservationUnitPricingTypeChoices {
+  /** Free */
+  Free = "FREE",
+  /** Paid */
+  Paid = "PAID",
+}
+
+/** An enumeration. */
 export enum ReservationUnitsReservationUnitReservationKindChoices {
   /** Direct */
   Direct = "DIRECT",
-  /** Direct and season */
+  /** Direct And Season */
   DirectAndSeason = "DIRECT_AND_SEASON",
   /** Season */
   Season = "SEASON",
@@ -2851,9 +2996,6 @@ export type ResourceCreateMutationInput = {
    */
   bufferTimeBefore?: InputMaybe<Scalars["Int"]>;
   clientMutationId?: InputMaybe<Scalars["String"]>;
-  descriptionEn?: InputMaybe<Scalars["String"]>;
-  descriptionFi?: InputMaybe<Scalars["String"]>;
-  descriptionSv?: InputMaybe<Scalars["String"]>;
   locationType?: InputMaybe<Scalars["String"]>;
   nameEn?: InputMaybe<Scalars["String"]>;
   nameFi?: InputMaybe<Scalars["String"]>;
@@ -2875,9 +3017,6 @@ export type ResourceCreateMutationPayload = {
    */
   bufferTimeBefore?: Maybe<Scalars["Int"]>;
   clientMutationId?: Maybe<Scalars["String"]>;
-  descriptionEn?: Maybe<Scalars["String"]>;
-  descriptionFi?: Maybe<Scalars["String"]>;
-  descriptionSv?: Maybe<Scalars["String"]>;
   /** May contain more than one error for same field. */
   errors?: Maybe<Array<Maybe<ErrorType>>>;
   locationType?: Maybe<Scalars["String"]>;
@@ -2907,9 +3046,6 @@ export type ResourceType = Node & {
   bufferTimeAfter?: Maybe<Scalars["Duration"]>;
   bufferTimeBefore?: Maybe<Scalars["Duration"]>;
   building?: Maybe<Array<Maybe<BuildingType>>>;
-  descriptionEn?: Maybe<Scalars["String"]>;
-  descriptionFi?: Maybe<Scalars["String"]>;
-  descriptionSv?: Maybe<Scalars["String"]>;
   /** The ID of the object */
   id: Scalars["ID"];
   locationType: ResourcesResourceLocationTypeChoices;
@@ -2950,9 +3086,6 @@ export type ResourceUpdateMutationInput = {
    */
   bufferTimeBefore?: InputMaybe<Scalars["Int"]>;
   clientMutationId?: InputMaybe<Scalars["String"]>;
-  descriptionEn?: InputMaybe<Scalars["String"]>;
-  descriptionFi?: InputMaybe<Scalars["String"]>;
-  descriptionSv?: InputMaybe<Scalars["String"]>;
   locationType?: InputMaybe<Scalars["String"]>;
   nameEn?: InputMaybe<Scalars["String"]>;
   nameFi?: InputMaybe<Scalars["String"]>;
@@ -2975,9 +3108,6 @@ export type ResourceUpdateMutationPayload = {
    */
   bufferTimeBefore?: Maybe<Scalars["Int"]>;
   clientMutationId?: Maybe<Scalars["String"]>;
-  descriptionEn?: Maybe<Scalars["String"]>;
-  descriptionFi?: Maybe<Scalars["String"]>;
-  descriptionSv?: Maybe<Scalars["String"]>;
   /** May contain more than one error for same field. */
   errors?: Maybe<Array<Maybe<ErrorType>>>;
   locationType?: Maybe<Scalars["String"]>;
@@ -3207,6 +3337,8 @@ export enum TermsOfUseTermsOfUseTermsTypeChoices {
   GenericTerms = "GENERIC_TERMS",
   /** Payment terms */
   PaymentTerms = "PAYMENT_TERMS",
+  /** Pricing terms */
+  PricingTerms = "PRICING_TERMS",
   /** Recurring reservation terms */
   RecurringTerms = "RECURRING_TERMS",
   /** Service-specific terms */
@@ -3375,6 +3507,17 @@ export type UnitUpdateMutationPayload = {
 };
 
 /** An enumeration. */
+export enum AllocatedDay {
+  Friday = "FRIDAY",
+  Monday = "MONDAY",
+  Saturday = "SATURDAY",
+  Sunday = "SUNDAY",
+  Thursday = "THURSDAY",
+  Tuesday = "TUESDAY",
+  Wednesday = "WEDNESDAY",
+}
+
+/** An enumeration. */
 export enum ApplicationEventStatus {
   Approved = "approved",
   Created = "created",
@@ -3439,7 +3582,9 @@ export const ApplicationsDocument = gql`
       edges {
         node {
           pk
-          applicationRoundId
+          applicationRound {
+            pk
+          }
           applicantName
           status
           applicantType
@@ -5127,11 +5272,14 @@ export type ApplicationsQuery = {
       node?: {
         __typename?: "ApplicationType";
         pk?: number | null;
-        applicationRoundId?: number | null;
         applicantName?: string | null;
         status?: ApplicationStatus | null;
         applicantType?: ApplicationsApplicationApplicantTypeChoices | null;
         lastModifiedDate: any;
+        applicationRound: {
+          __typename?: "ApplicationRoundType";
+          pk?: number | null;
+        };
         contactPerson?: {
           __typename?: "PersonType";
           id: string;
