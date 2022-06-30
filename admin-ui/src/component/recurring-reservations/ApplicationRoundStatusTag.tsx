@@ -28,6 +28,7 @@ export const getApplicationRoundStatus = (
         label: "review",
       };
     case ApplicationRoundStatus.ReviewDone:
+    case ApplicationRoundStatus.Allocated:
       return {
         group: "g1",
         color: "var(--color-info-light)",
@@ -57,7 +58,11 @@ export const getApplicationRoundStatus = (
     case ApplicationRoundStatus.Sent:
       return { group: "g5", color: "var(--color-black-05)", label: "sent" };
     default:
-      return { group: "g5", color: "white", label: "not implemented" };
+      return {
+        group: "g5",
+        color: "white",
+        label: applicationRound.status as string,
+      };
   }
 };
 

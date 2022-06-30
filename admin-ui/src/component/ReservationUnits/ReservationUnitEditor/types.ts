@@ -110,7 +110,7 @@ export const schema = Joi.object({
   spacePks: Joi.array().required().min(1).items(Joi.number()),
   resourcePks: Joi.array().items(Joi.number()),
   surfaceArea: Joi.number().min(1).required(), // checking against selected spaces is implemented in ui
-  minPersons: Joi.number().min(0).max(Joi.ref("maxPersons")),
+  minPersons: Joi.number().allow(null).min(0).max(Joi.ref("maxPersons")),
   maxPersons: Joi.number().min(1).required(), // checking against selected spaces is implemented in ui
   reservationUnitTypePk: Joi.number().required(),
   descriptionFi: Joi.string().required().max(4000),
