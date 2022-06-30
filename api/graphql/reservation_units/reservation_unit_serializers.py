@@ -18,6 +18,7 @@ from api.reservation_units_api import (
 from reservation_units.models import (
     Equipment,
     EquipmentCategory,
+    PricingType,
     Purpose,
     ReservationKind,
     ReservationUnit,
@@ -152,6 +153,12 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
         required=False,
         allow_null=True,
     )
+    pricing_terms_pk = serializers.PrimaryKeyRelatedField(
+        queryset=TermsOfUse.objects.filter(terms_type=TermsOfUse.TERMS_TYPE_PRICING),
+        source="pricing_terms",
+        required=False,
+        allow_null=True,
+    )
     cancellation_terms_pk = serializers.PrimaryKeyRelatedField(
         queryset=TermsOfUse.objects.filter(
             terms_type=TermsOfUse.TERMS_TYPE_CANCELLATION
@@ -235,6 +242,15 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
         required=False, default=False, help_text="Is reservation unit archived"
     )
 
+    pricing_type = ChoiceCharField(
+        required=False,
+        choices=PricingType.choices,
+        help_text=(
+            "What kind of pricing type this reservation unit has. Possible values are "
+            f"{', '.join(value.upper() for value in PricingType)}."
+        ),
+    )
+
     translation_fields = get_all_translatable_fields(ReservationUnit)
 
     class Meta(ReservationUnitSerializer.Meta):
@@ -290,6 +306,9 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
             "allow_reservations_without_opening_hours",
             "is_archived",
             "state",
+            "pricing_terms_pk",
+            "pricing_terms",
+            "pricing_type",
         ] + get_all_translatable_fields(ReservationUnit)
 
     def __init__(self, *args, **kwargs):
@@ -302,6 +321,7 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
         self.fields["payment_terms_pk"].write_only = True
         self.fields["cancellation_terms_pk"].write_only = True
         self.fields["service_specific_terms_pk"].write_only = True
+        self.fields["pricing_terms_pk"].write_only = True
         self.fields["tax_percentage_pk"].write_only = True
         self.fields["metadata_set_pk"].write_only = True
 
