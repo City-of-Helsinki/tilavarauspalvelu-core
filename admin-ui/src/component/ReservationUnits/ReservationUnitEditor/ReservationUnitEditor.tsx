@@ -1482,6 +1482,9 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                         contactInformation: e.target.value,
                       })
                     }
+                    helperText={t(
+                      "ReservationUnitEditor.contactInformationHelperText"
+                    )}
                   />
                 </Span12>
               </EditorGrid>
