@@ -110,6 +110,39 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         assert_that(len(mail.outbox)).is_equal_to(1)
         assert_that(mail.outbox[0].subject).is_equal_to("handling")
 
+    @override_settings(
+        CELERY_TASK_ALWAYS_EAGER=True,
+        SEND_RESERVATION_NOTIFICATION_EMAILS=True,
+        EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
+    )
+    def test_confirm_reservation_changes_state_to_requires_handling_on_subsidy_request(
+        self, mock_periods, mock_opening_hours
+    ):
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+
+        self.reservation.applying_for_free_of_charge = True
+        self.reservation.save()
+
+        self.client.force_login(self.regular_joe)
+
+        input_data = self.get_valid_confirm_data()
+        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CREATED)
+
+        response = self.query(self.get_confirm_query(), input_data=input_data)
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+
+        confirm_data = content.get("data").get("confirmReservation")
+        assert_that(confirm_data.get("errors")).is_none()
+        assert_that(confirm_data.get("state")).is_equal_to(
+            STATE_CHOICES.REQUIRES_HANDLING.upper()
+        )
+
+        self.reservation.refresh_from_db()
+        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.REQUIRES_HANDLING)
+        assert_that(len(mail.outbox)).is_equal_to(1)
+        assert_that(mail.outbox[0].subject).is_equal_to("handling")
+
     def test_confirm_reservation_fails_if_state_is_not_created(
         self, mock_periods, mock_opening_hours
     ):
