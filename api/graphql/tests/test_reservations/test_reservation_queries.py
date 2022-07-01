@@ -13,6 +13,7 @@ from reservations.tests.factories import (
     ReservationFactory,
     ReservationMetadataSetFactory,
 )
+from spaces.tests.factories import UnitFactory
 
 
 class ReservationQueryTestCase(ReservationTestCaseBase):
@@ -514,6 +515,66 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
             content = json.loads(response.content)
             assert_that(content.get("errors")).is_none()
             self.assertMatchSnapshot(content)
+
+    def test_filter_by_unit(self):
+        self.client.force_login(self.general_admin)
+        response = self.query(
+            """
+            query {
+                reservations(unit:%s, orderBy:"name") {
+                    totalCount
+                    edges {
+                        node {
+                            name
+                            reservationUnits {
+                                nameFi
+                                unit {
+                                    nameFi
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            """
+            % self.unit.pk
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filter_by_unit_multiple_values(self):
+        unit = UnitFactory(name="Another unit")
+        reservation_unit = ReservationUnitFactory(name="Another resunit", unit=unit)
+        ReservationFactory(
+            name="Another reservation", reservation_unit=[reservation_unit]
+        )
+
+        self.client.force_login(self.general_admin)
+        response = self.query(
+            """
+            query {
+                reservations(unit:[%s, %s], orderBy:"name") {
+                    totalCount
+                    edges {
+                        node {
+                            name
+                            reservationUnits {
+                                nameFi
+                                unit {
+                                    nameFi
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            """
+            % (self.unit.pk, unit.pk)
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
 
 
 class ReservationByPkTestCase(ReservationTestCaseBase):

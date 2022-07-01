@@ -50,6 +50,10 @@ class ReservationFilterSet(django_filters.FilterSet):
         method="get_reservation_unit_name"
     )
 
+    unit = django_filters.ModelMultipleChoiceFilter(
+        method="get_unit", queryset=Unit.objects.all()
+    )
+
     order_by = django_filters.OrderingFilter(
         fields=(
             "state",
@@ -109,3 +113,9 @@ class ReservationFilterSet(django_filters.FilterSet):
 
         query = reduce(operator.or_, (query for query in queries))
         return qs.filter(query).distinct()
+
+    def get_unit(self, qs, property, value):
+        if not value:
+            return qs
+
+        return qs.filter(reservation_unit__unit__in=value)

@@ -193,6 +193,65 @@ snapshots['ReservationQueryTestCase::test_filter_by_reservation_unit_name_multip
     }
 }
 
+snapshots['ReservationQueryTestCase::test_filter_by_unit 1'] = {
+    'data': {
+        'reservations': {
+            'edges': [
+                {
+                    'node': {
+                        'name': 'movies',
+                        'reservationUnits': [
+                            {
+                                'nameFi': 'resunit',
+                                'unit': {
+                                    'nameFi': 'unit'
+                                }
+                            }
+                        ]
+                    }
+                }
+            ],
+            'totalCount': 1
+        }
+    }
+}
+
+snapshots['ReservationQueryTestCase::test_filter_by_unit_multiple_values 1'] = {
+    'data': {
+        'reservations': {
+            'edges': [
+                {
+                    'node': {
+                        'name': 'Another reservation',
+                        'reservationUnits': [
+                            {
+                                'nameFi': 'Another resunit',
+                                'unit': {
+                                    'nameFi': 'Another unit'
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    'node': {
+                        'name': 'movies',
+                        'reservationUnits': [
+                            {
+                                'nameFi': 'resunit',
+                                'unit': {
+                                    'nameFi': 'unit'
+                                }
+                            }
+                        ]
+                    }
+                }
+            ],
+            'totalCount': 2
+        }
+    }
+}
+
 snapshots['ReservationQueryTestCase::test_filter_by_user 1'] = {
     'data': {
         'reservations': {
