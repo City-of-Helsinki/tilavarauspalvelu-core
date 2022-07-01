@@ -10,7 +10,10 @@ from api.graphql.tests.base import GrapheneTestCaseBase
 from opening_hours.enums import State
 from opening_hours.hours import TimeElement
 from reservation_units.models import ReservationUnit
-from reservation_units.tests.factories import ReservationUnitFactory
+from reservation_units.tests.factories import (
+    ReservationUnitFactory,
+    ReservationUnitTypeFactory,
+)
 from reservations.models import ReservationMetadataField, ReservationMetadataSet
 from reservations.tests.factories import ReservationPurposeFactory
 from spaces.tests.factories import SpaceFactory, UnitFactory
@@ -25,11 +28,15 @@ class ReservationTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCase):
         super().setUpTestData()
         cls.space = SpaceFactory()
         cls.unit = UnitFactory(name="unit")
+        cls.reservation_unit_type = ReservationUnitTypeFactory(
+            name="reservation_unit_type"
+        )
         cls.reservation_unit = ReservationUnitFactory(
             spaces=[cls.space],
             unit=cls.unit,
             name="resunit",
             reservation_start_interval=ReservationUnit.RESERVATION_START_INTERVAL_15_MINUTES,
+            reservation_unit_type=cls.reservation_unit_type,
         )
         cls.purpose = ReservationPurposeFactory(name="purpose")
 

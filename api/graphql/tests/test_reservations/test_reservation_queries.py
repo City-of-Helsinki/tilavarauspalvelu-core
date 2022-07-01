@@ -7,7 +7,10 @@ from django.utils.timezone import get_default_timezone
 
 from api.graphql.tests.test_reservations.base import ReservationTestCaseBase
 from applications.models import CUSTOMER_TYPES, City
-from reservation_units.tests.factories import ReservationUnitFactory
+from reservation_units.tests.factories import (
+    ReservationUnitFactory,
+    ReservationUnitTypeFactory,
+)
 from reservations.models import STATE_CHOICES, AgeGroup
 from reservations.tests.factories import (
     ReservationFactory,
@@ -625,6 +628,76 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
                 }
             }
             """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filter_by_reservation_unit_type(self):
+        reservation_unit_type = ReservationUnitTypeFactory(name="Another type")
+        reservation_unit = ReservationUnitFactory(
+            name="Another resunit", reservation_unit_type=reservation_unit_type
+        )
+        ReservationFactory(
+            name="Another reservation",
+            reservation_unit=[reservation_unit],
+            price=50,
+        )
+        self.client.force_login(self.general_admin)
+        response = self.query(
+            """
+            query {
+                reservations(reservationUnitType: %s, orderBy:"name") {
+                    totalCount
+                    edges {
+                        node {
+                            name
+                            reservationUnits {
+                                reservationUnitType {
+                                    nameFi
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            """
+            % self.reservation_unit_type.pk
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filter_by_reservation_unit_type_multiple_values(self):
+        reservation_unit_type = ReservationUnitTypeFactory(name="Another type")
+        reservation_unit = ReservationUnitFactory(
+            name="Another resunit", reservation_unit_type=reservation_unit_type
+        )
+        ReservationFactory(
+            name="Another reservation",
+            reservation_unit=[reservation_unit],
+            price=50,
+        )
+        self.client.force_login(self.general_admin)
+        response = self.query(
+            """
+            query {
+                reservations(reservationUnitType: [%s, %s], orderBy:"name") {
+                    totalCount
+                    edges {
+                        node {
+                            name
+                            reservationUnits {
+                                reservationUnitType {
+                                    nameFi
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            """
+            % (self.reservation_unit_type.pk, reservation_unit_type.pk)
         )
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
