@@ -576,6 +576,60 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         assert_that(content.get("errors")).is_none()
         self.assertMatchSnapshot(content)
 
+    def test_filter_by_price_lte(self):
+        ReservationFactory(
+            name="Another reservation",
+            reservation_unit=[self.reservation_unit],
+            price=50,
+        )
+
+        self.client.force_login(self.general_admin)
+        response = self.query(
+            """
+            query {
+                reservations(priceLte:10, orderBy:"name") {
+                    totalCount
+                    edges {
+                        node {
+                            name
+                            price
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filter_by_price_gte(self):
+        ReservationFactory(
+            name="Another reservation",
+            reservation_unit=[self.reservation_unit],
+            price=50,
+        )
+
+        self.client.force_login(self.general_admin)
+        response = self.query(
+            """
+            query {
+                reservations(priceGte:11, orderBy:"name") {
+                    totalCount
+                    edges {
+                        node {
+                            name
+                            price
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
 
 class ReservationByPkTestCase(ReservationTestCaseBase):
     def setUp(self):

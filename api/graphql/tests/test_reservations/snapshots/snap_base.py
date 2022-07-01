@@ -43,6 +43,38 @@ snapshots['ReservationQueryTestCase::test_admin_can_read_working_memo 1'] = {
     }
 }
 
+snapshots['ReservationQueryTestCase::test_filter_by_price_gte 1'] = {
+    'data': {
+        'reservations': {
+            'edges': [
+                {
+                    'node': {
+                        'name': 'Another reservation',
+                        'price': 50.0
+                    }
+                }
+            ],
+            'totalCount': 1
+        }
+    }
+}
+
+snapshots['ReservationQueryTestCase::test_filter_by_price_lte 1'] = {
+    'data': {
+        'reservations': {
+            'edges': [
+                {
+                    'node': {
+                        'name': 'movies',
+                        'price': 10.0
+                    }
+                }
+            ],
+            'totalCount': 1
+        }
+    }
+}
+
 snapshots['ReservationQueryTestCase::test_filter_by_reservation_unit_name 1'] = {
     'data': {
         'reservations': {

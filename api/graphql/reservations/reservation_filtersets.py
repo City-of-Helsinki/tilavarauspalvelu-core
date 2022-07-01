@@ -17,6 +17,8 @@ from spaces.models import ServiceSector, Unit
 class ReservationFilterSet(django_filters.FilterSet):
     begin = django_filters.DateTimeFilter(field_name="begin", lookup_expr="gte")
     end = django_filters.DateTimeFilter(field_name="end", lookup_expr="lte")
+    price_gte = django_filters.NumberFilter(field_name="price", lookup_expr="gte")
+    price_lte = django_filters.NumberFilter(field_name="price", lookup_expr="lte")
     state = django_filters.MultipleChoiceFilter(
         field_name="state",
         lookup_expr="iexact",
