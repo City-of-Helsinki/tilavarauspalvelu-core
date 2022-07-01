@@ -15,13 +15,12 @@
   "purposesFilter": "Användningsändamål",
   "resetForm": "Töm sökkriterierna",
   "filters": {
-    "applicationRound": "Ansökningsrunda",
-    "textSearch": "\"{{value}}\"",
-    "minPersons": "Personantal min",
-    "maxPersons": "Personantal max",
-    "purposes": "Användningsändamål",
-    "reservationUnitType": "Lokaltyp",
-    "unit": "Verksamhetsställe"
+    "applicationRound": "{{label}}",
+    "textSearch": "{{value}}",
+    "minPersons": "Minst {{value}} person",
+    "minPersons_plural": "Minst {{value}} personer",
+    "maxPersons": "Upp till {{value}} person",
+    "maxPersons_plural": "Upp till {{value}} personer"
   },
   "all": "Alla",
   "clearSelections": "Redigera",
