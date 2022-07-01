@@ -1,3 +1,6 @@
+import operator
+from functools import reduce
+
 import django_filters
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -35,6 +38,16 @@ class ReservationFilterSet(django_filters.FilterSet):
 
     user = django_filters.ModelChoiceFilter(
         field_name="user", queryset=User.objects.all()
+    )
+
+    reservation_unit_name_fi = django_filters.CharFilter(
+        method="get_reservation_unit_name"
+    )
+    reservation_unit_name_en = django_filters.CharFilter(
+        method="get_reservation_unit_name"
+    )
+    reservation_unit_name_sv = django_filters.CharFilter(
+        method="get_reservation_unit_name"
     )
 
     order_by = django_filters.OrderingFilter(
@@ -80,3 +93,19 @@ class ReservationFilterSet(django_filters.FilterSet):
             | Q(reservation_unit__unit__service_sectors__in=viewable_service_sectors)
             | Q(user=user)
         ).distinct()
+
+    def get_reservation_unit_name(self, qs, property: str, value: str):
+        language = property[-2:]
+        words = value.split(",")
+        queries = []
+        for word in words:
+            word = word.strip()
+            if language == "en":
+                queries.append(Q(reservation_unit__name_en__istartswith=word))
+            elif language == "sv":
+                queries.append(Q(reservation_unit__name_sv__istartswith=word))
+            else:
+                queries.append(Q(reservation_unit__name_fi__istartswith=word))
+
+        query = reduce(operator.or_, (query for query in queries))
+        return qs.filter(query).distinct()

@@ -43,6 +43,156 @@ snapshots['ReservationQueryTestCase::test_admin_can_read_working_memo 1'] = {
     }
 }
 
+snapshots['ReservationQueryTestCase::test_filter_by_reservation_unit_name 1'] = {
+    'data': {
+        'reservations': {
+            'edges': [
+                {
+                    'node': {
+                        'name': 'movies',
+                        'reservationUnits': [
+                            {
+                                'nameFi': 'Koirankoppi'
+                            }
+                        ]
+                    }
+                }
+            ],
+            'totalCount': 1
+        }
+    }
+}
+
+snapshots['ReservationQueryTestCase::test_filter_by_reservation_unit_name 2'] = {
+    'data': {
+        'reservations': {
+            'edges': [
+                {
+                    'node': {
+                        'name': 'movies',
+                        'reservationUnits': [
+                            {
+                                'nameEn': 'Doghouse'
+                            }
+                        ]
+                    }
+                }
+            ],
+            'totalCount': 1
+        }
+    }
+}
+
+snapshots['ReservationQueryTestCase::test_filter_by_reservation_unit_name 3'] = {
+    'data': {
+        'reservations': {
+            'edges': [
+                {
+                    'node': {
+                        'name': 'movies',
+                        'reservationUnits': [
+                            {
+                                'nameSv': 'Hundkoja'
+                            }
+                        ]
+                    }
+                }
+            ],
+            'totalCount': 1
+        }
+    }
+}
+
+snapshots['ReservationQueryTestCase::test_filter_by_reservation_unit_name_multiple_values 1'] = {
+    'data': {
+        'reservations': {
+            'edges': [
+                {
+                    'node': {
+                        'name': 'movies',
+                        'reservationUnits': [
+                            {
+                                'nameFi': 'Koirankoppi'
+                            }
+                        ]
+                    }
+                },
+                {
+                    'node': {
+                        'name': 'second test',
+                        'reservationUnits': [
+                            {
+                                'nameFi': 'Norsutarha'
+                            }
+                        ]
+                    }
+                }
+            ],
+            'totalCount': 2
+        }
+    }
+}
+
+snapshots['ReservationQueryTestCase::test_filter_by_reservation_unit_name_multiple_values 2'] = {
+    'data': {
+        'reservations': {
+            'edges': [
+                {
+                    'node': {
+                        'name': 'movies',
+                        'reservationUnits': [
+                            {
+                                'nameEn': 'Doghouse'
+                            }
+                        ]
+                    }
+                },
+                {
+                    'node': {
+                        'name': 'second test',
+                        'reservationUnits': [
+                            {
+                                'nameEn': 'Elephant park'
+                            }
+                        ]
+                    }
+                }
+            ],
+            'totalCount': 2
+        }
+    }
+}
+
+snapshots['ReservationQueryTestCase::test_filter_by_reservation_unit_name_multiple_values 3'] = {
+    'data': {
+        'reservations': {
+            'edges': [
+                {
+                    'node': {
+                        'name': 'movies',
+                        'reservationUnits': [
+                            {
+                                'nameSv': 'Hundkoja'
+                            }
+                        ]
+                    }
+                },
+                {
+                    'node': {
+                        'name': 'second test',
+                        'reservationUnits': [
+                            {
+                                'nameSv': 'Elefantparken'
+                            }
+                        ]
+                    }
+                }
+            ],
+            'totalCount': 2
+        }
+    }
+}
+
 snapshots['ReservationQueryTestCase::test_filter_by_user 1'] = {
     'data': {
         'reservations': {
