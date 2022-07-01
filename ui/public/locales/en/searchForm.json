@@ -13,15 +13,14 @@
   "showLessFilters": "Show less options",
   "unitFilter": "Location",
   "purposesFilter": "Purpose of use",
-  "resetForm": "Clear the filters",
+  "resetForm": "Clear",
   "filters": {
-    "applicationRound": "Application round",
-    "textSearch": "\"{{value}}\"",
-    "minPersons": "Participants min",
-    "maxPersons": "Participants max",
-    "purposes": "Purpose",
-    "reservationUnitType": "Type",
-    "unit": "Location"
+    "applicationRound": "{{label}}",
+    "textSearch": "{{value}}",
+    "minPersons": "Min. {{value}} person",
+    "minPersons_plural": "Min. {{value}} persons",
+    "maxPersons": "Max. {{value}} person",
+    "maxPersons_plural": "Max. {{value}} persons"
   },
   "all": "All",
   "clearSelections": "Clear selections",

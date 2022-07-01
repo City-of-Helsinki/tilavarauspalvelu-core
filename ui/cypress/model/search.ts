@@ -1,5 +1,5 @@
 export function searchButton(): Cypress.Chainable<JQuery<HTMLElement>> {
-  return cy.get("#searchButton");
+  return cy.get("#searchButton-desktop");
 }
 
 export function fullTextInput(): Cypress.Chainable<JQuery<HTMLElement>> {
@@ -117,4 +117,8 @@ export function textWithIcon(
   order: number
 ): Cypress.Chainable<JQuery<HTMLElement>> {
   return cy.get("[data-testid='icon-with-text']").eq(order);
+}
+
+export function filterToggleButton(): Cypress.Chainable<JQuery<HTMLElement>> {
+  return cy.get("[data-testid='search-form__button--toggle-filters']");
 }

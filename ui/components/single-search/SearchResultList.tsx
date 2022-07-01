@@ -89,7 +89,7 @@ const SearchResultList = ({
         {reservationUnits !== null ? (
           <>
             <TopWrapper>
-              {reservationUnits?.length ? (
+              {reservationUnits?.length > 0 ? (
                 <div />
               ) : (
                 <HitCount>{t("searchResultList:noResults")}</HitCount>

@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { isAfter } from "date-fns";
 import { useQuery } from "@apollo/client";
-import { Tabs, TabList, Tab, TabPanel } from "hds-react";
+import { Tabs, TabList, Tab, TabPanel, Notification } from "hds-react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import Container from "../../components/common/Container";
@@ -18,6 +18,8 @@ import { fontMedium } from "../../modules/style/typography";
 import { breakpoint } from "../../modules/style";
 import Head from "../../components/reservations/Head";
 import { CenterSpinner } from "../../components/common/common";
+import { getCurrentUser } from "../../modules/api";
+import { User } from "../../modules/types";
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
@@ -72,6 +74,8 @@ const EmptyMessage = styled.div`
 `;
 
 const Reservations = (): JSX.Element => {
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [error, setError] = useState(false);
   const { t } = useTranslation();
 
   const [upcomingReservations, setUpcomingReservations] = useState<
@@ -83,11 +87,28 @@ const Reservations = (): JSX.Element => {
   const [isLoadingReservations, setIsLoadingReservations] =
     useState<boolean>(true);
 
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      try {
+        const user = await getCurrentUser();
+        setCurrentUser(user);
+      } catch (e) {
+        setError(true);
+      }
+    };
+
+    if (currentUser === null) {
+      fetchCurrentUser();
+    }
+  }, [currentUser]);
+
   useQuery<Query, QueryReservationsArgs>(LIST_RESERVATIONS, {
     fetchPolicy: "no-cache",
     variables: {
       state: ["CONFIRMED", "REQUIRES_HANDLING"],
+      user: currentUser?.id,
     },
+    skip: !currentUser?.id,
     onCompleted: (data) => {
       const reservations = data?.reservations?.edges
         ?.map((edge) => edge?.node)
@@ -102,9 +123,14 @@ const Reservations = (): JSX.Element => {
           },
           [[], []] as ReservationType[][]
         );
-      setUpcomingReservations(reservations[0]);
-      setPastReservations(reservations[1]);
+      if (reservations?.length > 0) {
+        setUpcomingReservations(reservations[0]);
+        setPastReservations(reservations[1]);
+      }
       setIsLoadingReservations(false);
+    },
+    onError: () => {
+      setError(true);
     },
   });
 
@@ -127,7 +153,7 @@ const Reservations = (): JSX.Element => {
               </StyledTab>
             </StyledTabList>
             <StyledTabPanel>
-              {isLoadingReservations && <CenterSpinner />}
+              {error ? null : isLoadingReservations && <CenterSpinner />}
               {upcomingReservations.length > 0
                 ? upcomingReservations?.map((reservation) => (
                     <ReservationCard
@@ -164,6 +190,15 @@ const Reservations = (): JSX.Element => {
             </StyledTabPanel>
           </Tabs>
         </Heading>
+        {error && (
+          <Notification
+            type="error"
+            label={t("common:error.error")}
+            position="top-center"
+          >
+            {t("common:error.dataError")}
+          </Notification>
+        )}
       </Wrapper>
     </>
   );

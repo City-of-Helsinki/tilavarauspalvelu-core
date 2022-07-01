@@ -18,6 +18,7 @@ import {
   selectClearButton,
   inputReservationUnitTypeOption,
   reservationUnitCards,
+  filterToggleButton,
 } from "../model/search";
 
 describe("Tilavaraus ui search page (single)", () => {
@@ -88,20 +89,26 @@ describe("Tilavaraus ui search page (single)", () => {
 
     searchButton().click();
 
-    filterTags().should("contain.text", `"${searchTerm}"`);
-    filterTags().should("contain.text", "Henkilömäärä min");
-    filterTags().should("contain.text", "Henkilömäärä max");
-    filterTags().should("contain.text", "Tilan tyyppi");
-    filterTags().should("contain.text", "Toimipiste");
+    filterTags().should("contain.text", `${searchTerm}`);
+    filterTags().should("contain.text", "Vähintään 2 hlö");
+    filterTags().should("contain.text", "Enintään 5 hlö");
+    filterTags().should("contain.text", "Äänitysstudio");
+    filterTags().should("contain.text", "Tila #1");
+    filterTags().should("contain.text", "Tila #3");
+    filterTags().should("contain.text", "Purpose #1");
+    filterTags().should("contain.text", "Purpose #3");
     cy.get("#searchResultList").should("not.contain", "10 Hakutulosta");
 
     filterTag("maxPersons").children("button").click();
 
-    filterTags().should("contain.text", `"${searchTerm}"`);
-    filterTags().should("contain.text", "Henkilömäärä min");
-    filterTags().should("not.contain.text", "Henkilömäärä max");
-    filterTags().should("contain.text", "Tilan tyyppi");
-    filterTags().should("contain.text", "Toimipiste");
+    filterTags().should("contain.text", `${searchTerm}`);
+    filterTags().should("contain.text", "Vähintään 2 hlö");
+    filterTags().should("not.contain.text", "Enintään 5 hlö");
+    filterTags().should("contain.text", "Äänitysstudio");
+    filterTags().should("contain.text", "Tila #1");
+    filterTags().should("contain.text", "Tila #3");
+    filterTags().should("contain.text", "Purpose #1");
+    filterTags().should("contain.text", "Purpose #3");
     cy.get("#searchResultList").should("not.contain", "10 Hakutulosta");
 
     formResetButton().click();
@@ -111,6 +118,37 @@ describe("Tilavaraus ui search page (single)", () => {
     formResetButton().should("not.be.exist");
 
     paginationButton().should("exist");
+
+    cy.a11yCheck();
+  });
+
+  it("handles mobile features", () => {
+    cy.viewport("iphone-x");
+
+    fullTextInput().should("be.visible");
+    inputMinPersons().should("not.be.visible");
+    inputMaxPersons().should("not.be.visible");
+    inputReservationUnitType().should("not.be.visible");
+    inputUnitToggler().should("not.be.visible");
+    inputPurposeToggler().should("not.be.visible");
+
+    filterToggleButton().click();
+
+    fullTextInput().should("be.visible");
+    inputMinPersons().should("be.visible");
+    inputMaxPersons().should("be.visible");
+    inputReservationUnitType().should("be.visible");
+    inputUnitToggler().should("be.visible");
+    inputPurposeToggler().should("be.visible");
+
+    filterToggleButton().click();
+
+    fullTextInput().should("be.visible");
+    inputMinPersons().should("not.be.visible");
+    inputMaxPersons().should("not.be.visible");
+    inputReservationUnitType().should("not.be.visible");
+    inputUnitToggler().should("not.be.visible");
+    inputPurposeToggler().should("not.be.visible");
 
     cy.a11yCheck();
   });
