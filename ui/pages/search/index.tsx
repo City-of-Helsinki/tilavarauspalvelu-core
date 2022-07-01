@@ -27,6 +27,7 @@ import {
   Query,
   QueryApplicationRoundsArgs,
   QueryReservationUnitsArgs,
+  ReservationUnitsReservationUnitReservationKindChoices,
   ReservationUnitType,
 } from "../../modules/gql-types";
 import { RESERVATION_UNITS } from "../../modules/queries/reservationUnit";
@@ -142,6 +143,8 @@ const processVariables = (values: Record<string, string>, language: string) => {
     orderBy: values.order === "desc" ? `-${sortCriteria}` : sortCriteria,
     isDraft: false,
     isVisible: true,
+    reservationKind:
+      ReservationUnitsReservationUnitReservationKindChoices.Season,
   };
 };
 

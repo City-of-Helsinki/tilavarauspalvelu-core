@@ -132,6 +132,7 @@ export const RESERVATION_UNITS = gql`
     $orderBy: String
     $isDraft: Boolean
     $isVisible: Boolean
+    $reservationKind: String
   ) {
     reservationUnits(
       textSearch: $textSearch
@@ -147,6 +148,7 @@ export const RESERVATION_UNITS = gql`
       orderBy: $orderBy
       isDraft: $isDraft
       isVisible: $isVisible
+      reservationKind: $reservationKind
     ) {
       edges {
         node {
