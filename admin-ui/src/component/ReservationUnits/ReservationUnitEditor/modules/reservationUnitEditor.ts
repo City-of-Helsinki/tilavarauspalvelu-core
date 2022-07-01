@@ -1,7 +1,6 @@
 import styled from "styled-components";
 import { Button, Fieldset as HDSFieldset } from "hds-react";
 import { Grid, Span4 as DefaultSpan4 } from "../../../../styles/layout";
-import { breakpoints } from "../../../../styles/util";
 
 export const EditorGrid = styled(Grid)`
   margin-top: var(--spacing-s);
@@ -18,17 +17,9 @@ export const Wrapper = styled.div`
   padding-bottom: 6em;
 `;
 
-export const EditorContainer = styled.div`
-  @media (min-width: ${breakpoints.l}) {
-    margin: 0 var(--spacing-layout-m);
-  }
-`;
-
 export const Editor = styled.div`
-  @media (min-width: ${breakpoints.m}) {
-    margin: 0 var(--spacing-layout-m);
-  }
-  max-width: 52rem;
+  margin: 0 var(--spacing-layout-xs);
+  max-width: var(--container-width-l);
 `;
 
 export const ButtonsContainer = styled.div`
