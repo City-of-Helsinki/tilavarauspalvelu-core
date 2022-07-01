@@ -135,7 +135,7 @@ const ListWithPagination = ({
       ) : (
         <>
           <TopWrapper data-testid="list-with-pagination__hit-count">
-            {items.length ? (
+            {items.length > 0 ? (
               <HitCount>
                 {showHitCount
                   ? t("searchResultList:count", { count: totalCount })

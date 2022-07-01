@@ -13,15 +13,12 @@
   "showLessFilters": "Näytä vähemmän vaihtoehtoja",
   "unitFilter": "Toimipiste",
   "purposesFilter": "Käyttötarkoitus",
-  "resetForm": "Tyhjennä hakuehdot",
+  "resetForm": "Tyhjennä",
   "filters": {
-    "applicationRound": "Hakukierros",
-    "textSearch": "\"{{value}}\"",
-    "minPersons": "Henkilömäärä min",
-    "maxPersons": "Henkilömäärä max",
-    "purposes": "Käyttötarkoitus",
-    "reservationUnitType": "Tilan tyyppi",
-    "unit": "Toimipiste"
+    "applicationRound": "{{label}}",
+    "textSearch": "{{value}}",
+    "minPersons": "Vähintään {{value}} hlö",
+    "maxPersons": "Enintään {{value}} hlö"
   },
   "all": "Kaikki",
   "clearSelections": "Poista valinnat",
