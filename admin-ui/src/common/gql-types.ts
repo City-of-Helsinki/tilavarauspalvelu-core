@@ -103,6 +103,20 @@ export type ApplicationAggregatedDataType = {
   reservationsDurationTotal?: Maybe<Scalars["Float"]>;
 };
 
+export type ApplicationDeclineMutationInput = {
+  clientMutationId?: InputMaybe<Scalars["String"]>;
+  pk?: InputMaybe<Scalars["Int"]>;
+};
+
+export type ApplicationDeclineMutationPayload = {
+  __typename?: "ApplicationDeclineMutationPayload";
+  clientMutationId?: Maybe<Scalars["String"]>;
+  /** May contain more than one error for same field. */
+  errors?: Maybe<Array<Maybe<ErrorType>>>;
+  pk?: Maybe<Scalars["Int"]>;
+  status?: Maybe<Scalars["String"]>;
+};
+
 export type ApplicationEventAggregatedDataType = {
   __typename?: "ApplicationEventAggregatedDataType";
   allocationResultsDurationTotal?: Maybe<Scalars["Float"]>;
@@ -165,6 +179,20 @@ export type ApplicationEventCreateMutationPayload = {
   /** ReservationPurpose pk for this event */
   purpose?: Maybe<Scalars["Int"]>;
   /** Status of this application event */
+  status?: Maybe<Scalars["String"]>;
+};
+
+export type ApplicationEventDeclineMutationInput = {
+  clientMutationId?: InputMaybe<Scalars["String"]>;
+  pk?: InputMaybe<Scalars["Int"]>;
+};
+
+export type ApplicationEventDeclineMutationPayload = {
+  __typename?: "ApplicationEventDeclineMutationPayload";
+  clientMutationId?: Maybe<Scalars["String"]>;
+  /** May contain more than one error for same field. */
+  errors?: Maybe<Array<Maybe<ErrorType>>>;
+  pk?: Maybe<Scalars["Int"]>;
   status?: Maybe<Scalars["String"]>;
 };
 
@@ -280,13 +308,10 @@ export type ApplicationEventScheduleType = Node & {
 export type ApplicationEventType = Node & {
   __typename?: "ApplicationEventType";
   abilityGroup?: Maybe<AbilityGroupType>;
-  abilityGroupId?: Maybe<Scalars["Int"]>;
   ageGroup?: Maybe<AgeGroupType>;
-  ageGroupId?: Maybe<Scalars["Int"]>;
   aggregatedData?: Maybe<ApplicationEventAggregatedDataType>;
   application: ApplicationType;
   applicationEventSchedules?: Maybe<Array<Maybe<ApplicationEventScheduleType>>>;
-  applicationId?: Maybe<Scalars["Int"]>;
   begin?: Maybe<Scalars["Date"]>;
   biweekly: Scalars["Boolean"];
   declinedReservationUnits?: Maybe<Array<ReservationUnitType>>;
@@ -301,7 +326,6 @@ export type ApplicationEventType = Node & {
   numPersons?: Maybe<Scalars["Int"]>;
   pk?: Maybe<Scalars["Int"]>;
   purpose?: Maybe<ReservationPurposeType>;
-  purposeId?: Maybe<Scalars["Int"]>;
   status?: Maybe<ApplicationEventStatus>;
   uuid: Scalars["UUID"];
   weeklyAmountReductionsCount?: Maybe<Scalars["Int"]>;
@@ -461,11 +485,11 @@ export type ApplicationType = Node & {
   additionalInformation?: Maybe<Scalars["String"]>;
   aggregatedData?: Maybe<ApplicationAggregatedDataType>;
   applicantEmail?: Maybe<Scalars["String"]>;
-  applicantId?: Maybe<Scalars["Int"]>;
   applicantName?: Maybe<Scalars["String"]>;
+  applicantPk?: Maybe<Scalars["Int"]>;
   applicantType?: Maybe<ApplicationsApplicationApplicantTypeChoices>;
   applicationEvents?: Maybe<Array<Maybe<ApplicationEventType>>>;
-  applicationRoundId?: Maybe<Scalars["Int"]>;
+  applicationRound: ApplicationRoundType;
   billingAddress?: Maybe<AddressType>;
   contactPerson?: Maybe<PersonType>;
   createdDate: Scalars["DateTime"];
@@ -770,7 +794,6 @@ export type EventReservationUnitType = Node & {
   pk?: Maybe<Scalars["Int"]>;
   priority?: Maybe<Scalars["Int"]>;
   reservationUnit?: Maybe<ReservationUnitType>;
-  reservationUnitId?: Maybe<Scalars["Int"]>;
 };
 
 export type KeywordCategoryType = Node & {
@@ -890,6 +913,8 @@ export type Mutation = {
   createReservationUnitImage?: Maybe<ReservationUnitImageCreateMutationPayload>;
   createResource?: Maybe<ResourceCreateMutationPayload>;
   createSpace?: Maybe<SpaceCreateMutationPayload>;
+  declineApplication?: Maybe<ApplicationDeclineMutationPayload>;
+  declineApplicationEvent?: Maybe<ApplicationEventDeclineMutationPayload>;
   deleteApplicationEvent?: Maybe<ApplicationEventDeleteMutationPayload>;
   deleteEquipment?: Maybe<EquipmentDeleteMutationPayload>;
   deleteEquipmentCategory?: Maybe<EquipmentCategoryDeleteMutationPayload>;
@@ -962,6 +987,14 @@ export type MutationCreateResourceArgs = {
 
 export type MutationCreateSpaceArgs = {
   input: SpaceCreateMutationInput;
+};
+
+export type MutationDeclineApplicationArgs = {
+  input: ApplicationDeclineMutationInput;
+};
+
+export type MutationDeclineApplicationEventArgs = {
+  input: ApplicationEventDeclineMutationInput;
 };
 
 export type MutationDeleteApplicationEventArgs = {
@@ -1460,6 +1493,8 @@ export type QueryReservationUnitsArgs = {
   last?: InputMaybe<Scalars["Int"]>;
   maxPersonsGte?: InputMaybe<Scalars["Float"]>;
   maxPersonsLte?: InputMaybe<Scalars["Float"]>;
+  minPersonsGte?: InputMaybe<Scalars["Float"]>;
+  minPersonsLte?: InputMaybe<Scalars["Float"]>;
   nameEn?: InputMaybe<Scalars["String"]>;
   nameFi?: InputMaybe<Scalars["String"]>;
   nameSv?: InputMaybe<Scalars["String"]>;
@@ -1488,9 +1523,11 @@ export type QueryReservationsArgs = {
   first?: InputMaybe<Scalars["Int"]>;
   last?: InputMaybe<Scalars["Int"]>;
   offset?: InputMaybe<Scalars["Int"]>;
+  onlyWithPermission?: InputMaybe<Scalars["Boolean"]>;
   orderBy?: InputMaybe<Scalars["String"]>;
   requested?: InputMaybe<Scalars["Boolean"]>;
   state?: InputMaybe<Array<InputMaybe<Scalars["String"]>>>;
+  user?: InputMaybe<Scalars["ID"]>;
 };
 
 export type QueryResourceArgs = {
@@ -1956,17 +1993,17 @@ export type ReservationType = Node & {
   ageGroup?: Maybe<AgeGroupType>;
   applyingForFreeOfCharge: Scalars["Boolean"];
   begin: Scalars["DateTime"];
-  billingAddressCity: Scalars["String"];
-  billingAddressStreet: Scalars["String"];
-  billingAddressZip: Scalars["String"];
+  billingAddressCity?: Maybe<Scalars["String"]>;
+  billingAddressStreet?: Maybe<Scalars["String"]>;
+  billingAddressZip?: Maybe<Scalars["String"]>;
   billingEmail?: Maybe<Scalars["String"]>;
-  billingFirstName: Scalars["String"];
-  billingLastName: Scalars["String"];
-  billingPhone: Scalars["String"];
+  billingFirstName?: Maybe<Scalars["String"]>;
+  billingLastName?: Maybe<Scalars["String"]>;
+  billingPhone?: Maybe<Scalars["String"]>;
   bufferTimeAfter?: Maybe<Scalars["Duration"]>;
   bufferTimeBefore?: Maybe<Scalars["Duration"]>;
   calendarUrl?: Maybe<Scalars["String"]>;
-  cancelDetails: Scalars["String"];
+  cancelDetails?: Maybe<Scalars["String"]>;
   description?: Maybe<Scalars["String"]>;
   end: Scalars["DateTime"];
   freeOfChargeReason?: Maybe<Scalars["String"]>;
@@ -1982,16 +2019,15 @@ export type ReservationType = Node & {
   purpose?: Maybe<ReservationPurposeType>;
   recurringReservation?: Maybe<RecurringReservationType>;
   reservationUnits?: Maybe<Array<Maybe<ReservationUnitType>>>;
-  reserveeAddressCity: Scalars["String"];
-  reserveeAddressStreet: Scalars["String"];
-  reserveeAddressZip: Scalars["String"];
+  reserveeAddressCity?: Maybe<Scalars["String"]>;
+  reserveeAddressStreet?: Maybe<Scalars["String"]>;
+  reserveeAddressZip?: Maybe<Scalars["String"]>;
   reserveeEmail?: Maybe<Scalars["String"]>;
   reserveeFirstName?: Maybe<Scalars["String"]>;
-  /** Reservee's business or association identity code */
-  reserveeId: Scalars["String"];
+  reserveeId?: Maybe<Scalars["String"]>;
   reserveeIsUnregisteredAssociation: Scalars["Boolean"];
   reserveeLastName?: Maybe<Scalars["String"]>;
-  reserveeOrganisationName: Scalars["String"];
+  reserveeOrganisationName?: Maybe<Scalars["String"]>;
   reserveePhone?: Maybe<Scalars["String"]>;
   /** Type of reservee */
   reserveeType?: Maybe<ReservationsReservationReserveeTypeChoices>;

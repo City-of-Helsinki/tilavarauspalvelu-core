@@ -17,6 +17,7 @@ import {
   PageInfo,
   Query,
   QueryReservationUnitsArgs,
+  ReservationUnitsReservationUnitReservationKindChoices,
   ReservationUnitType,
 } from "../../modules/gql-types";
 import { H1, HeroSubheading } from "../../modules/style/typography";
@@ -43,7 +44,7 @@ const HeadContainer = styled.div`
 const Heading = styled(H1)``;
 
 const Subheading = styled(HeroSubheading)`
-  margin-bottom: var(--spacing-xl);
+  margin-bottom: var(--spacing-xs);
 `;
 
 const StyledSorting = styled(Sorting)`
@@ -63,7 +64,11 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   };
 };
 
-const processVariables = (values: Record<string, string>) => {
+const processVariables = (values: Record<string, string>, language: string) => {
+  const sortCriteria = ["name", "unitName"].includes(values.sort)
+    ? `${values.sort}${capitalize(language)}`
+    : values.sort;
+
   return {
     ...omit(values, [
       "order",
@@ -90,9 +95,11 @@ const processVariables = (values: Record<string, string>) => {
       reservationUnitType: values.reservationUnitType.split(","),
     }),
     first: pagingLimit,
-    orderBy: values.order === "desc" ? `-${values.sort}` : values.sort,
+    orderBy: values.order === "desc" ? `-${sortCriteria}` : sortCriteria,
     isDraft: false,
     isVisible: true,
+    reservationKind:
+      ReservationUnitsReservationUnitReservationKindChoices.Direct,
   };
 };
 
@@ -103,7 +110,7 @@ const SearchSingle = (): JSX.Element => {
     () => [
       {
         label: t("search:sorting.label.name"),
-        value: `name${capitalize(i18n.language)}`,
+        value: "name",
       },
       {
         label: t("search:sorting.label.type"),
@@ -111,10 +118,10 @@ const SearchSingle = (): JSX.Element => {
       },
       {
         label: t("search:sorting.label.unit"),
-        value: `unitName${capitalize(i18n.language)}`,
+        value: "unitName",
       },
     ],
-    [t, i18n.language]
+    [t]
   );
 
   const [values, setValues] = useState({} as Record<string, string>);
@@ -127,7 +134,7 @@ const SearchSingle = (): JSX.Element => {
     Query,
     QueryReservationUnitsArgs
   >(RESERVATION_UNITS, {
-    variables: processVariables(values),
+    variables: processVariables(values, i18n.language),
     fetchPolicy: "cache-and-network",
     skip: Object.keys(values).length === 0,
     notifyOnNetworkStatusChange: true,
@@ -145,7 +152,7 @@ const SearchSingle = (): JSX.Element => {
   useEffect(() => {
     if (parsedParams) {
       const parsed = parsedParams;
-      if (!parsed.sort) parsed.sort = `name${capitalize(i18n.language)}`;
+      if (!parsed.sort) parsed.sort = "name";
       if (!parsed.order) parsed.order = "asc";
 
       const newValues = Object.keys(parsed).reduce((p, key) => {
@@ -184,8 +191,20 @@ const SearchSingle = (): JSX.Element => {
     history.replace(singleSearchUrl({ ...criteria, ...sortingCriteria }));
   };
 
-  const onRemove = (key: string[]) => {
-    const newValues = key ? omit(values, key) : {};
+  const onRemove = (key: string[], subItemKey?: string) => {
+    let newValues = {};
+    if (subItemKey) {
+      newValues = {
+        ...values,
+        [subItemKey]: values[subItemKey]
+          .split(",")
+          .filter((n) => !key.includes(n))
+          .join(","),
+      };
+    } else if (key) {
+      newValues = omit(values, key);
+    }
+
     const sortingCriteria = pick(queryString.parse(searchParams), [
       "sort",
       "order",
@@ -239,7 +258,7 @@ const SearchSingle = (): JSX.Element => {
                 after: cursor,
               };
               fetchMore({
-                variables: processVariables(variables),
+                variables: processVariables(variables, i18n.language),
               });
             }}
             sortingComponent={
