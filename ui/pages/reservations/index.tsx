@@ -106,7 +106,7 @@ const Reservations = (): JSX.Element => {
     fetchPolicy: "no-cache",
     variables: {
       state: ["CONFIRMED", "REQUIRES_HANDLING"],
-      user: currentUser?.id,
+      user: currentUser?.id.toString(),
     },
     skip: !currentUser?.id,
     onCompleted: (data) => {

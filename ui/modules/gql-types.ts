@@ -1530,7 +1530,7 @@ export type QueryReservationsArgs = {
   orderBy?: InputMaybe<Scalars["String"]>;
   requested?: InputMaybe<Scalars["Boolean"]>;
   state?: InputMaybe<Array<InputMaybe<Scalars["String"]>>>;
-  user?: InputMaybe<Scalars["Float"]>;
+  user?: InputMaybe<Scalars["ID"]>;
 };
 
 export type QueryResourceArgs = {
