@@ -17,4 +17,7 @@
   --font-medium: HelsinkiGrotesk-Medium, var(--font-default);
   --font-bold: HelsinkiGrotesk-Bold, var(--font-default);
   --tilavaraus-hero-background-color: var(--color-bus);
+  --tilavaraus-link-color: var(--color-bus);
+  --tilavaraus-link-visited-color: #551a8b;
+
 }

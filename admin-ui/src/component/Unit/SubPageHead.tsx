@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { UnitByPkType } from "../../common/gql-types";
 import { parseAddress } from "../../common/util";
-import { ContentContainer, IngressContainer } from "../../styles/layout";
+import { Container, ContentContainer } from "../../styles/layout";
 import { H1 } from "../../styles/typography";
 import LinkPrev from "../LinkPrev";
 
@@ -12,10 +12,12 @@ interface IProps {
   title: string;
   unit: UnitByPkType;
   link?: string;
+  state?: JSX.Element | string;
 }
 
 const Wrapper = styled.div`
   margin-bottom: var(--spacing-m);
+  max-width: var(--container-width-l);
 `;
 const Name = styled.div`
   font-size: var(--fontsize-heading-m);
@@ -23,8 +25,9 @@ const Name = styled.div`
   margin-bottom: var(--spacing-xs);
 `;
 
-const Container = styled.div`
+const TitleRow = styled.div`
   display: flex;
+  align-items: flex-start;
 `;
 
 const Address = styled.span`
@@ -39,7 +42,7 @@ const Label = styled(Address)`
   font-family: var(--tilavaraus-admin-font-bold);
 `;
 
-const SubPageHead = ({ title, unit, link }: IProps): JSX.Element => {
+const SubPageHead = ({ title, unit, link, state }: IProps): JSX.Element => {
   const { t } = useTranslation();
 
   return (
@@ -47,9 +50,14 @@ const SubPageHead = ({ title, unit, link }: IProps): JSX.Element => {
       <ContentContainer>
         <LinkPrev route={link || `/unit/${unit.pk}`} />
       </ContentContainer>
-      <IngressContainer>
-        <H1>{title}</H1>
+      <ContentContainer>
         <Container>
+          <TitleRow>
+            <H1 style={{ flexGrow: 1 }}>{title}</H1>
+            <div style={{ marginTop: "2em" }}>{state}</div>
+          </TitleRow>
+        </Container>
+        <div style={{ display: "flex" }}>
           <LocationIcon />
           <div>
             <Name>{unit.nameFi}</Name>
@@ -58,8 +66,8 @@ const SubPageHead = ({ title, unit, link }: IProps): JSX.Element => {
               <Address>{parseAddress(unit.location)}</Address>
             ) : null}
           </div>
-        </Container>
-      </IngressContainer>
+        </div>
+      </ContentContainer>
     </Wrapper>
   );
 };
