@@ -10,7 +10,11 @@ import { useParams } from "react-router-dom";
 import styled from "styled-components";
 import { useQuery } from "@apollo/client";
 import { useModal } from "../../context/ModalContext";
-import { IngressContainer, WideContainer } from "../../styles/layout";
+import {
+  ContentContainer,
+  IngressContainer,
+  WideContainer,
+} from "../../styles/layout";
 import Loader from "../Loader";
 import withMainMenu from "../withMainMenu";
 import InfoModalContent from "./InfoModalContent";
@@ -271,7 +275,7 @@ const SpacesResources = (): JSX.Element | null => {
   };
 
   return (
-    <Wrapper>
+    <ContentContainer>
       <Modal
         id="space-modal"
         open={newSpaceDialogIsOpen}
@@ -387,7 +391,7 @@ const SpacesResources = (): JSX.Element | null => {
       >
         {modalContent}
       </Modal>
-    </Wrapper>
+    </ContentContainer>
   );
 };
 

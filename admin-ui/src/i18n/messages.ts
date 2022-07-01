@@ -1112,6 +1112,9 @@ const translations: ITranslations = {
     communication: ["Viestintä"],
     additionalInstructionsPlaceholder: ["Lisäohjeteksti {{language}}"],
     contactInformationLabel: ["Vastuuhenkilön yhteystiedot"],
+    contactInformationHelperText: [
+      "Vain sisäiseen käyttöön, tiedot eivät näy varaajalle",
+    ],
     contactInformationPlaceholder: ["Vastuuhenkilön yhteystiedot"],
     noPreviewUnsavedChangesTooltip: ["Tallenna ensin muutokset"],
     previewTooltip: ["Varausyksikön esikatselu"],

@@ -5,6 +5,7 @@ export const RESERVATIONUNIT_QUERY = gql`
     reservationUnitByPk(pk: $pk) {
       lowestPrice
       highestPrice
+      state
       priceUnit
       images {
         pk

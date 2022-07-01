@@ -3431,12 +3431,12 @@ input UnitUpdateMutationInput {
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
   shortDescriptionFi: String
   shortDescriptionEn: String
   shortDescriptionSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
   clientMutationId: String
 }
 
@@ -3449,12 +3449,12 @@ type UnitUpdateMutationPayload {
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
   shortDescriptionFi: String
   shortDescriptionEn: String
   shortDescriptionSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
