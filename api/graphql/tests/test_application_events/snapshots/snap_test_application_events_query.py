@@ -139,6 +139,26 @@ snapshots['ApplicationEventQueryTestCase::test_filter_by_application_round 1'] =
     }
 }
 
+snapshots['ApplicationEventQueryTestCase::test_filter_by_application_status 1'] = {
+    'data': {
+        'applicationEvents': {
+            'edges': [
+                {
+                    'node': {
+                        'applicationEventSchedules': [
+                        ],
+                        'eventReservationUnits': [
+                        ],
+                        'name': 'I only should be listed',
+                        'numPersons': None,
+                        'status': 'created'
+                    }
+                }
+            ]
+        }
+    }
+}
+
 snapshots['ApplicationEventQueryTestCase::test_filter_by_pk 1'] = {
     'data': {
         'applicationEvents': {
