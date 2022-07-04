@@ -16,7 +16,7 @@ from api.graphql.primary_key_fields import IntegerPrimaryKeyField
 from applications.models import CUSTOMER_TYPES, City
 from email_notification.models import EmailType
 from email_notification.tasks import send_reservation_email_task
-from reservation_units.models import ReservationUnit
+from reservation_units.models import ReservationKind, ReservationUnit
 from reservation_units.utils.reservation_unit_reservation_scheduler import (
     ReservationUnitReservationScheduler,
 )
@@ -247,6 +247,7 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
                 self.context.get("request").user, reservation_unit
             )
             self.check_sku(sku, reservation_unit.sku)
+            self.check_reservation_kind(reservation_unit)
             sku = reservation_unit.sku
 
         data["sku"] = sku
@@ -389,6 +390,13 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
         ):
             raise serializers.ValidationError(
                 f"Reservation start time is less than {reservation_unit.reservations_min_days_before} days before."
+            )
+
+    def check_reservation_kind(self, reservation_unit):
+        if reservation_unit.reservation_kind == ReservationKind.SEASON:
+            raise serializers.ValidationError(
+                "Reservation cannot be done to this reservation unit from the api "
+                "since its reservation kind is SEASON."
             )
 
 

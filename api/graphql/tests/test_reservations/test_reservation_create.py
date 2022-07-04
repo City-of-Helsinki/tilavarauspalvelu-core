@@ -12,7 +12,7 @@ from api.graphql.tests.test_reservations.base import (
 from applications.models import PRIORITY_CONST, City
 from applications.tests.factories import ApplicationRoundFactory
 from opening_hours.tests.test_get_periods import get_mocked_periods
-from reservation_units.models import ReservationUnit
+from reservation_units.models import ReservationKind, ReservationUnit
 from reservation_units.tests.factories import ReservationUnitFactory
 from reservations.models import STATE_CHOICES, AgeGroup, Reservation
 from reservations.tests.factories import ReservationFactory
@@ -921,3 +921,24 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         pk = content.get("data").get("createReservation").get("reservation").get("pk")
         reservation = Reservation.objects.get(id=pk)
         assert_that(reservation).is_not_none()
+
+    def test_create_fails_when_reservation_unit_reservation_kind_is_season(
+        self, mock_periods, mock_opening_hours
+    ):
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+        self.reservation_unit.reservation_kind = ReservationKind.SEASON
+        self.reservation_unit.save()
+
+        self.client.force_login(self.regular_joe)
+        response = self.query(
+            self.get_create_query(), input_data=self.get_valid_input_data()
+        )
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_none()
+        assert_that(
+            content.get("data").get("createReservation").get("errors")
+        ).is_not_none()
+        assert_that(
+            content.get("data").get("createReservation").get("errors")[0]["messages"][0]
+        ).contains("reservation kind is SEASON")
