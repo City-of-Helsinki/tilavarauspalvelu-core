@@ -8,11 +8,13 @@ from applications.models import (
     Application,
     ApplicationEventStatus,
     ApplicationEventWeeklyAmountReduction,
+    ApplicationStatus,
 )
 from applications.tests.factories import (
     ApplicationEventFactory,
     ApplicationEventScheduleResultFactory,
     ApplicationFactory,
+    ApplicationStatusFactory,
 )
 from reservation_units.tests.factories import ReservationUnitFactory
 
@@ -170,6 +172,19 @@ class ApplicationEventQueryTestCase(ApplicationEventTestCaseBase):
         filter_clause = (
             f'applicantType: "{Application.APPLICANT_TYPE_COMMUNITY.upper()}"'
         )
+
+        response = self.query(self.get_query(filter_section=filter_clause))
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
+        self.assertMatchSnapshot(content)
+
+    def test_filter_by_application_status(self):
+        application = ApplicationFactory(user=self.regular_joe)
+        ApplicationStatusFactory(
+            application=application, status=ApplicationStatus.HANDLED
+        )
+        ApplicationEventFactory(application=application, name="I only should be listed")
+        filter_clause = f'applicationStatus: "{ApplicationStatus.HANDLED}"'
 
         response = self.query(self.get_query(filter_section=filter_clause))
         assert_that(response.status_code).is_equal_to(200)

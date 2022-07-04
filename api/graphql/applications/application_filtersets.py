@@ -93,6 +93,10 @@ class ApplicationEventFilterSet(filters.FilterSet):
 
     status = filters.CharFilter(field_name="latest_status", lookup_expr="iexact")
 
+    application_status = filters.CharFilter(
+        field_name="application__latest_status", method="filter_by_application_status"
+    )
+
     reservation_unit = filters.ModelMultipleChoiceFilter(
         method="filter_by_reservation_units", queryset=ReservationUnit.objects.all()
     )
@@ -167,3 +171,7 @@ class ApplicationEventFilterSet(filters.FilterSet):
 
         values = [v.lower() for v in value]
         return qs.filter(application__applicant_type__in=values)
+
+    def filter_by_application_status(self, qs, property, value):
+        apps = Application.objects.filter(latest_status=value).values_list("id")
+        return qs.filter(application_id__in=apps)
