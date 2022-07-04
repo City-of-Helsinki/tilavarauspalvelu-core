@@ -4,8 +4,12 @@ from functools import reduce
 import django_filters
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.db.models import Q
+from django.db.models import Case, CharField, F, Q
+from django.db.models import Value as V
+from django.db.models import When
+from django.db.models.functions import Concat
 
+from applications.models import CUSTOMER_TYPES
 from permissions.helpers import (
     get_service_sectors_where_can_view_reservations,
     get_units_where_can_view_reservations,
@@ -60,6 +64,8 @@ class ReservationFilterSet(django_filters.FilterSet):
     reservation_unit_type = django_filters.ModelMultipleChoiceFilter(
         method="get_reservation_unit_type", queryset=ReservationUnitType.objects.all()
     )
+
+    text_search = django_filters.CharFilter(method="get_text_search")
 
     order_by = django_filters.OrderingFilter(
         fields=(
@@ -131,3 +137,33 @@ class ReservationFilterSet(django_filters.FilterSet):
         if not value:
             return qs
         return qs.filter(reservation_unit__reservation_unit_type__in=value)
+
+    def get_text_search(serlf, qs, property, value: str):
+        if not value:
+            return qs
+
+        if value.isnumeric():
+            return qs.filter(pk=value)
+
+        queryset = qs.alias(
+            reservee_name=Case(
+                When(
+                    reservee_type=CUSTOMER_TYPES.CUSTOMER_TYPE_BUSINESS,
+                    then=F("reservee_organisation_name"),
+                ),
+                When(
+                    reservee_type=CUSTOMER_TYPES.CUSTOMER_TYPE_NONPROFIT,
+                    then=F("reservee_organisation_name"),
+                ),
+                When(
+                    reservee_type=CUSTOMER_TYPES.CUSTOMER_TYPE_INDIVIDUAL,
+                    then=Concat("reservee_first_name", V(" "), "reservee_last_name"),
+                ),
+                default=V(""),
+                output_field=CharField(),
+            )
+        )
+
+        return queryset.filter(
+            Q(name__icontains=value) | Q(reservee_name__icontains=value)
+        )

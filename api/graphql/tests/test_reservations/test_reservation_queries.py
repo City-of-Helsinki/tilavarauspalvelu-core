@@ -703,6 +703,139 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         assert_that(content.get("errors")).is_none()
         self.assertMatchSnapshot(content)
 
+    def test_filter_by_text_search_numeric(self):
+        self.maxDiff = None
+        reservation = ReservationFactory(
+            name="ID will find me",
+            reservation_unit=[self.reservation_unit],
+        )
+        self.client.force_login(self.general_admin)
+        response = self.query(
+            """
+            query {
+                reservations(textSearch: "%s", orderBy:"name") {
+                    totalCount
+                    edges {
+                        node {
+                            name
+                        }
+                    }
+                }
+            }
+            """
+            % (reservation.pk)
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filter_by_text_search_name(self):
+        ReservationFactory(
+            name="Name will find me",
+            reservation_unit=[self.reservation_unit],
+        )
+        self.client.force_login(self.general_admin)
+        response = self.query(
+            """
+            query {
+                reservations(textSearch: "will find", orderBy:"name") {
+                    totalCount
+                    edges {
+                        node {
+                            name
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filter_by_text_search_business_reservee_name(self):
+        ReservationFactory(
+            name="Test reservation",
+            reservee_type=CUSTOMER_TYPES.CUSTOMER_TYPE_BUSINESS,
+            reservee_organisation_name="Bizniz name will find me",
+            reservation_unit=[self.reservation_unit],
+        )
+        self.client.force_login(self.general_admin)
+        response = self.query(
+            """
+            query {
+                reservations(textSearch: "niz name", orderBy:"name") {
+                    totalCount
+                    edges {
+                        node {
+                            name
+                            reserveeOrganisationName
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filter_by_text_search_non_profit_reservee_name(self):
+        ReservationFactory(
+            name="Test reservation",
+            reservee_type=CUSTOMER_TYPES.CUSTOMER_TYPE_NONPROFIT,
+            reservee_organisation_name="Non-profit name will find me",
+            reservation_unit=[self.reservation_unit],
+        )
+        self.client.force_login(self.general_admin)
+        response = self.query(
+            """
+            query {
+                reservations(textSearch: "profit name", orderBy:"name") {
+                    totalCount
+                    edges {
+                        node {
+                            name
+                            reserveeOrganisationName
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filter_by_text_search_individual_reservee_name(self):
+        ReservationFactory(
+            name="Test reservation",
+            reservee_type=CUSTOMER_TYPES.CUSTOMER_TYPE_INDIVIDUAL,
+            reservee_first_name="First",
+            reservee_last_name="Name",
+            reservation_unit=[self.reservation_unit],
+        )
+        self.client.force_login(self.general_admin)
+        response = self.query(
+            """
+            query {
+                reservations(textSearch: "st na", orderBy:"name") {
+                    totalCount
+                    edges {
+                        node {
+                            name
+                            reserveeFirstName
+                            reserveeLastName
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
 
 class ReservationByPkTestCase(ReservationTestCaseBase):
     def setUp(self):

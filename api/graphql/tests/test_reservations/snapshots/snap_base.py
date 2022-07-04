@@ -281,6 +281,85 @@ snapshots['ReservationQueryTestCase::test_filter_by_reservation_unit_type_multip
     }
 }
 
+snapshots['ReservationQueryTestCase::test_filter_by_text_search_business_reservee_name 1'] = {
+    'data': {
+        'reservations': {
+            'edges': [
+                {
+                    'node': {
+                        'name': 'Test reservation',
+                        'reserveeOrganisationName': 'Bizniz name will find me'
+                    }
+                }
+            ],
+            'totalCount': 1
+        }
+    }
+}
+
+snapshots['ReservationQueryTestCase::test_filter_by_text_search_individual_reservee_name 1'] = {
+    'data': {
+        'reservations': {
+            'edges': [
+                {
+                    'node': {
+                        'name': 'Test reservation',
+                        'reserveeFirstName': 'First',
+                        'reserveeLastName': 'Name'
+                    }
+                }
+            ],
+            'totalCount': 1
+        }
+    }
+}
+
+snapshots['ReservationQueryTestCase::test_filter_by_text_search_name 1'] = {
+    'data': {
+        'reservations': {
+            'edges': [
+                {
+                    'node': {
+                        'name': 'Name will find me'
+                    }
+                }
+            ],
+            'totalCount': 1
+        }
+    }
+}
+
+snapshots['ReservationQueryTestCase::test_filter_by_text_search_non_profit_reservee_name 1'] = {
+    'data': {
+        'reservations': {
+            'edges': [
+                {
+                    'node': {
+                        'name': 'Test reservation',
+                        'reserveeOrganisationName': 'Non-profit name will find me'
+                    }
+                }
+            ],
+            'totalCount': 1
+        }
+    }
+}
+
+snapshots['ReservationQueryTestCase::test_filter_by_text_search_numeric 1'] = {
+    'data': {
+        'reservations': {
+            'edges': [
+                {
+                    'node': {
+                        'name': 'ID will find me'
+                    }
+                }
+            ],
+            'totalCount': 1
+        }
+    }
+}
+
 snapshots['ReservationQueryTestCase::test_filter_by_unit 1'] = {
     'data': {
         'reservations': {
