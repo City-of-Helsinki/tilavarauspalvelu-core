@@ -474,9 +474,14 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
     def validated_data(self):
         validated_data = super().validated_data
 
-        if self.instance.reservation_unit.filter(
+        reservation_unit_requires_handling = self.instance.reservation_unit.filter(
             require_reservation_handling=True
-        ).exists():
+        ).exists()
+
+        if (
+            reservation_unit_requires_handling
+            or self.instance.applying_for_free_of_charge
+        ):
             validated_data["state"] = STATE_CHOICES.REQUIRES_HANDLING
         else:
             validated_data["state"] = STATE_CHOICES.CONFIRMED
