@@ -25,13 +25,14 @@ class ReservationUnitReservationScheduler:
         else:
             self.reservation_duration = 1
 
-        self.start_time = DEFAULT_TIMEZONE.localize(
-            datetime.datetime.now()
-        ) + datetime.timedelta(hours=2)
+        self.start_time = self._get_reservation_period_start()
         self.end_time = self.start_time + datetime.timedelta(
             hours=self.reservation_duration
         )
         self.reservation_date_end = self._get_reservation_period_end(self.start_time)
+
+        if opening_hours_end and opening_hours_end < self.start_time.date():
+            opening_hours_end = self.reservation_date_end
 
         self.opening_hours_client = OpeningHoursClient(
             str(self.reservation_unit.uuid),
@@ -41,6 +42,9 @@ class ReservationUnitReservationScheduler:
         )
 
     def get_next_available_reservation_time(self) -> (datetime, datetime):
+        if self.start_time.date() >= self.reservation_date_end:
+            return None, None
+
         self.start_time = self._get_next_matching_opening_hour_start_time(
             self.start_time
         )
@@ -77,7 +81,9 @@ class ReservationUnitReservationScheduler:
                 )
 
             else:
-                self.start_time = self.start_time + datetime.timedelta(hours=1)
+                self.start_time = (
+                    self.start_time + datetime.timedelta(hours=1)
+                ).astimezone(DEFAULT_TIMEZONE)
 
             self.end_time = self.start_time + datetime.timedelta(
                 hours=self.reservation_duration
@@ -113,12 +119,33 @@ class ReservationUnitReservationScheduler:
 
         return None
 
+    def _get_reservation_period_start(self) -> datetime.datetime:
+        if self.reservation_unit.reservation_begins:
+            return self.reservation_unit.reservation_begins
+
+        delta = datetime.timedelta(days=0)
+
+        if self.reservation_unit.reservations_min_days_before:
+            delta = datetime.timedelta(
+                days=self.reservation_unit.reservations_min_days_before
+            )
+
+        return DEFAULT_TIMEZONE.localize(datetime.datetime.now() + delta)
+
     def _get_reservation_period_end(self, start: datetime.date) -> datetime.date:
-        if start.month < self.APRIL:
-            end = datetime.date(start.year, self.APRIL, 30)
-        else:
-            end = datetime.date(start.year + 1, self.APRIL, 30)
-        return end
+        if self.reservation_unit.reservation_ends:
+            return self.reservation_unit.reservation_ends.date()
+
+        delta = 720  # Two years ahead by default.
+
+        if self.reservation_unit.reservations_max_days_before:
+            delta = self.reservation_unit.reservations_max_days_before
+
+        end = DEFAULT_TIMEZONE.localize(
+            datetime.datetime.now() + datetime.timedelta(days=delta)
+        )
+
+        return end.date()
 
     def _get_next_matching_opening_hour_start_time(self, start: datetime.datetime):
         matching = None
