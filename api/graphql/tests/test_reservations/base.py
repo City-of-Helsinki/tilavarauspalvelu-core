@@ -1,5 +1,5 @@
 import datetime
-from typing import Optional
+from typing import Dict, List, Optional
 
 import freezegun
 import snapshottest
@@ -35,7 +35,7 @@ class ReservationTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCase):
         self,
         reservation_unit: Optional[ReservationUnit] = None,
         date: Optional[datetime.date] = None,
-    ):
+    ) -> List[Dict]:
         if not reservation_unit:
             reservation_unit = self.reservation_unit
         if not date:
