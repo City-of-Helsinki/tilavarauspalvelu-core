@@ -7,12 +7,16 @@ from django.utils.timezone import get_default_timezone
 
 from api.graphql.tests.test_reservations.base import ReservationTestCaseBase
 from applications.models import CUSTOMER_TYPES, City
-from reservation_units.tests.factories import ReservationUnitFactory
+from reservation_units.tests.factories import (
+    ReservationUnitFactory,
+    ReservationUnitTypeFactory,
+)
 from reservations.models import STATE_CHOICES, AgeGroup
 from reservations.tests.factories import (
     ReservationFactory,
     ReservationMetadataSetFactory,
 )
+from spaces.tests.factories import UnitFactory
 
 
 class ReservationQueryTestCase(ReservationTestCaseBase):
@@ -429,6 +433,404 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
             }
             """
             % self.regular_joe.pk
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filter_by_reservation_unit_name(self):
+        self.reservation_unit.name_fi = "Koirankoppi"
+        self.reservation_unit.name_en = "Doghouse"
+        self.reservation_unit.name_sv = "Hundkoja"
+        self.reservation_unit.save()
+
+        self.client.force_login(self.general_admin)
+
+        test_cases = [
+            ("reservationUnitNameFi", "Koi", "nameFi"),
+            ("reservationUnitNameEn", "Dog", "nameEn"),
+            ("reservationUnitNameSv", "Hun", "nameSv"),
+        ]
+        for filter_name, filter_value, field_name in test_cases:
+            response = self.query(
+                """
+                query {
+                    reservations(%s: "%s") {
+                        totalCount
+                        edges {
+                            node {
+                                name
+                                reservationUnits {
+                                    %s
+                                }
+                            }
+                        }
+                    }
+                }
+                """
+                % (filter_name, filter_value, field_name)
+            )
+            content = json.loads(response.content)
+            assert_that(content.get("errors")).is_none()
+            self.assertMatchSnapshot(content)
+
+    def test_filter_by_reservation_unit_name_multiple_values(self):
+        self.reservation_unit.name_fi = "Koirankoppi"
+        self.reservation_unit.name_en = "Doghouse"
+        self.reservation_unit.name_sv = "Hundkoja"
+        self.reservation_unit.save()
+
+        reservation_unit = ReservationUnitFactory(
+            name_fi="Norsutarha", name_en="Elephant park", name_sv="Elefantparken"
+        )
+        ReservationFactory(
+            name="second test",
+            user=self.general_admin,
+            reservation_unit=[reservation_unit],
+        )
+
+        self.client.force_login(self.general_admin)
+
+        test_cases = [
+            ("reservationUnitNameFi", "Koi, Nors", "nameFi"),
+            ("reservationUnitNameEn", "Dog, Elep", "nameEn"),
+            ("reservationUnitNameSv", "Hun, Elef", "nameSv"),
+        ]
+        for filter_name, filter_value, field_name in test_cases:
+            response = self.query(
+                """
+                query {
+                    reservations(%s: "%s", orderBy:"name") {
+                        totalCount
+                        edges {
+                            node {
+                                name
+                                reservationUnits {
+                                    %s
+                                }
+                            }
+                        }
+                    }
+                }
+                """
+                % (filter_name, filter_value, field_name)
+            )
+            content = json.loads(response.content)
+            assert_that(content.get("errors")).is_none()
+            self.assertMatchSnapshot(content)
+
+    def test_filter_by_unit(self):
+        self.client.force_login(self.general_admin)
+        response = self.query(
+            """
+            query {
+                reservations(unit:%s, orderBy:"name") {
+                    totalCount
+                    edges {
+                        node {
+                            name
+                            reservationUnits {
+                                nameFi
+                                unit {
+                                    nameFi
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            """
+            % self.unit.pk
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filter_by_unit_multiple_values(self):
+        unit = UnitFactory(name="Another unit")
+        reservation_unit = ReservationUnitFactory(name="Another resunit", unit=unit)
+        ReservationFactory(
+            name="Another reservation", reservation_unit=[reservation_unit]
+        )
+
+        self.client.force_login(self.general_admin)
+        response = self.query(
+            """
+            query {
+                reservations(unit:[%s, %s], orderBy:"name") {
+                    totalCount
+                    edges {
+                        node {
+                            name
+                            reservationUnits {
+                                nameFi
+                                unit {
+                                    nameFi
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            """
+            % (self.unit.pk, unit.pk)
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filter_by_price_lte(self):
+        ReservationFactory(
+            name="Another reservation",
+            reservation_unit=[self.reservation_unit],
+            price=50,
+        )
+
+        self.client.force_login(self.general_admin)
+        response = self.query(
+            """
+            query {
+                reservations(priceLte:10, orderBy:"name") {
+                    totalCount
+                    edges {
+                        node {
+                            name
+                            price
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filter_by_price_gte(self):
+        ReservationFactory(
+            name="Another reservation",
+            reservation_unit=[self.reservation_unit],
+            price=50,
+        )
+
+        self.client.force_login(self.general_admin)
+        response = self.query(
+            """
+            query {
+                reservations(priceGte:11, orderBy:"name") {
+                    totalCount
+                    edges {
+                        node {
+                            name
+                            price
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filter_by_reservation_unit_type(self):
+        reservation_unit_type = ReservationUnitTypeFactory(name="Another type")
+        reservation_unit = ReservationUnitFactory(
+            name="Another resunit", reservation_unit_type=reservation_unit_type
+        )
+        ReservationFactory(
+            name="Another reservation",
+            reservation_unit=[reservation_unit],
+            price=50,
+        )
+        self.client.force_login(self.general_admin)
+        response = self.query(
+            """
+            query {
+                reservations(reservationUnitType: %s, orderBy:"name") {
+                    totalCount
+                    edges {
+                        node {
+                            name
+                            reservationUnits {
+                                reservationUnitType {
+                                    nameFi
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            """
+            % self.reservation_unit_type.pk
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filter_by_reservation_unit_type_multiple_values(self):
+        reservation_unit_type = ReservationUnitTypeFactory(name="Another type")
+        reservation_unit = ReservationUnitFactory(
+            name="Another resunit", reservation_unit_type=reservation_unit_type
+        )
+        ReservationFactory(
+            name="Another reservation",
+            reservation_unit=[reservation_unit],
+            price=50,
+        )
+        self.client.force_login(self.general_admin)
+        response = self.query(
+            """
+            query {
+                reservations(reservationUnitType: [%s, %s], orderBy:"name") {
+                    totalCount
+                    edges {
+                        node {
+                            name
+                            reservationUnits {
+                                reservationUnitType {
+                                    nameFi
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            """
+            % (self.reservation_unit_type.pk, reservation_unit_type.pk)
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filter_by_text_search_numeric(self):
+        self.maxDiff = None
+        reservation = ReservationFactory(
+            name="ID will find me",
+            reservation_unit=[self.reservation_unit],
+        )
+        self.client.force_login(self.general_admin)
+        response = self.query(
+            """
+            query {
+                reservations(textSearch: "%s", orderBy:"name") {
+                    totalCount
+                    edges {
+                        node {
+                            name
+                        }
+                    }
+                }
+            }
+            """
+            % (reservation.pk)
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filter_by_text_search_name(self):
+        ReservationFactory(
+            name="Name will find me",
+            reservation_unit=[self.reservation_unit],
+        )
+        self.client.force_login(self.general_admin)
+        response = self.query(
+            """
+            query {
+                reservations(textSearch: "will find", orderBy:"name") {
+                    totalCount
+                    edges {
+                        node {
+                            name
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filter_by_text_search_business_reservee_name(self):
+        ReservationFactory(
+            name="Test reservation",
+            reservee_type=CUSTOMER_TYPES.CUSTOMER_TYPE_BUSINESS,
+            reservee_organisation_name="Bizniz name will find me",
+            reservation_unit=[self.reservation_unit],
+        )
+        self.client.force_login(self.general_admin)
+        response = self.query(
+            """
+            query {
+                reservations(textSearch: "niz name", orderBy:"name") {
+                    totalCount
+                    edges {
+                        node {
+                            name
+                            reserveeOrganisationName
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filter_by_text_search_non_profit_reservee_name(self):
+        ReservationFactory(
+            name="Test reservation",
+            reservee_type=CUSTOMER_TYPES.CUSTOMER_TYPE_NONPROFIT,
+            reservee_organisation_name="Non-profit name will find me",
+            reservation_unit=[self.reservation_unit],
+        )
+        self.client.force_login(self.general_admin)
+        response = self.query(
+            """
+            query {
+                reservations(textSearch: "profit name", orderBy:"name") {
+                    totalCount
+                    edges {
+                        node {
+                            name
+                            reserveeOrganisationName
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filter_by_text_search_individual_reservee_name(self):
+        ReservationFactory(
+            name="Test reservation",
+            reservee_type=CUSTOMER_TYPES.CUSTOMER_TYPE_INDIVIDUAL,
+            reservee_first_name="First",
+            reservee_last_name="Name",
+            reservation_unit=[self.reservation_unit],
+        )
+        self.client.force_login(self.general_admin)
+        response = self.query(
+            """
+            query {
+                reservations(textSearch: "st na", orderBy:"name") {
+                    totalCount
+                    edges {
+                        node {
+                            name
+                            reserveeFirstName
+                            reserveeLastName
+                        }
+                    }
+                }
+            }
+            """
         )
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()

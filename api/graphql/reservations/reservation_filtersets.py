@@ -1,12 +1,20 @@
+import operator
+from functools import reduce
+
 import django_filters
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.db.models import Q
+from django.db.models import Case, CharField, F, Q
+from django.db.models import Value as V
+from django.db.models import When
+from django.db.models.functions import Concat
 
+from applications.models import CUSTOMER_TYPES
 from permissions.helpers import (
     get_service_sectors_where_can_view_reservations,
     get_units_where_can_view_reservations,
 )
+from reservation_units.models import ReservationUnitType
 from reservations.models import STATE_CHOICES, Reservation, User
 from spaces.models import ServiceSector, Unit
 
@@ -14,6 +22,8 @@ from spaces.models import ServiceSector, Unit
 class ReservationFilterSet(django_filters.FilterSet):
     begin = django_filters.DateTimeFilter(field_name="begin", lookup_expr="gte")
     end = django_filters.DateTimeFilter(field_name="end", lookup_expr="lte")
+    price_gte = django_filters.NumberFilter(field_name="price", lookup_expr="gte")
+    price_lte = django_filters.NumberFilter(field_name="price", lookup_expr="lte")
     state = django_filters.MultipleChoiceFilter(
         field_name="state",
         lookup_expr="iexact",
@@ -36,6 +46,26 @@ class ReservationFilterSet(django_filters.FilterSet):
     user = django_filters.ModelChoiceFilter(
         field_name="user", queryset=User.objects.all()
     )
+
+    reservation_unit_name_fi = django_filters.CharFilter(
+        method="get_reservation_unit_name"
+    )
+    reservation_unit_name_en = django_filters.CharFilter(
+        method="get_reservation_unit_name"
+    )
+    reservation_unit_name_sv = django_filters.CharFilter(
+        method="get_reservation_unit_name"
+    )
+
+    unit = django_filters.ModelMultipleChoiceFilter(
+        method="get_unit", queryset=Unit.objects.all()
+    )
+
+    reservation_unit_type = django_filters.ModelMultipleChoiceFilter(
+        method="get_reservation_unit_type", queryset=ReservationUnitType.objects.all()
+    )
+
+    text_search = django_filters.CharFilter(method="get_text_search")
 
     order_by = django_filters.OrderingFilter(
         fields=(
@@ -80,3 +110,60 @@ class ReservationFilterSet(django_filters.FilterSet):
             | Q(reservation_unit__unit__service_sectors__in=viewable_service_sectors)
             | Q(user=user)
         ).distinct()
+
+    def get_reservation_unit_name(self, qs, property: str, value: str):
+        language = property[-2:]
+        words = value.split(",")
+        queries = []
+        for word in words:
+            word = word.strip()
+            if language == "en":
+                queries.append(Q(reservation_unit__name_en__istartswith=word))
+            elif language == "sv":
+                queries.append(Q(reservation_unit__name_sv__istartswith=word))
+            else:
+                queries.append(Q(reservation_unit__name_fi__istartswith=word))
+
+        query = reduce(operator.or_, (query for query in queries))
+        return qs.filter(query).distinct()
+
+    def get_unit(self, qs, property, value):
+        if not value:
+            return qs
+
+        return qs.filter(reservation_unit__unit__in=value)
+
+    def get_reservation_unit_type(self, qs, property, value):
+        if not value:
+            return qs
+        return qs.filter(reservation_unit__reservation_unit_type__in=value)
+
+    def get_text_search(serlf, qs, property, value: str):
+        if not value:
+            return qs
+
+        if value.isnumeric():
+            return qs.filter(pk=value)
+
+        queryset = qs.alias(
+            reservee_name=Case(
+                When(
+                    reservee_type=CUSTOMER_TYPES.CUSTOMER_TYPE_BUSINESS,
+                    then=F("reservee_organisation_name"),
+                ),
+                When(
+                    reservee_type=CUSTOMER_TYPES.CUSTOMER_TYPE_NONPROFIT,
+                    then=F("reservee_organisation_name"),
+                ),
+                When(
+                    reservee_type=CUSTOMER_TYPES.CUSTOMER_TYPE_INDIVIDUAL,
+                    then=Concat("reservee_first_name", V(" "), "reservee_last_name"),
+                ),
+                default=V(""),
+                output_field=CharField(),
+            )
+        )
+
+        return queryset.filter(
+            Q(name__icontains=value) | Q(reservee_name__icontains=value)
+        )
