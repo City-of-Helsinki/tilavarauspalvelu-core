@@ -656,6 +656,376 @@ snapshots['ReservationQueryTestCase::test_hide_fields_with_personal_information 
     }
 }
 
+snapshots['ReservationQueryTestCase::test_order_by_reservation_unit_name 1'] = {
+    'data': {
+        'reservations': {
+            'edges': [
+                {
+                    'node': {
+                        'name': 'this should be 1st',
+                        'reservationUnits': [
+                            {
+                                'nameFi': 'a Unit'
+                            }
+                        ]
+                    }
+                },
+                {
+                    'node': {
+                        'name': 'this should be 2nd',
+                        'reservationUnits': [
+                            {
+                                'nameFi': 'b Unit'
+                            }
+                        ]
+                    }
+                },
+                {
+                    'node': {
+                        'name': 'this should be 3rd',
+                        'reservationUnits': [
+                            {
+                                'nameFi': 'c Unit'
+                            }
+                        ]
+                    }
+                },
+                {
+                    'node': {
+                        'name': 'movies',
+                        'reservationUnits': [
+                            {
+                                'nameFi': 'resunit'
+                            }
+                        ]
+                    }
+                }
+            ],
+            'totalCount': 4
+        }
+    }
+}
+
+snapshots['ReservationQueryTestCase::test_order_by_reservation_unit_name 2'] = {
+    'data': {
+        'reservations': {
+            'edges': [
+                {
+                    'node': {
+                        'name': 'this should be 1st',
+                        'reservationUnits': [
+                            {
+                                'nameEn': 'd Unit'
+                            }
+                        ]
+                    }
+                },
+                {
+                    'node': {
+                        'name': 'this should be 2nd',
+                        'reservationUnits': [
+                            {
+                                'nameEn': 'e Unit'
+                            }
+                        ]
+                    }
+                },
+                {
+                    'node': {
+                        'name': 'this should be 3rd',
+                        'reservationUnits': [
+                            {
+                                'nameEn': 'f Unit'
+                            }
+                        ]
+                    }
+                },
+                {
+                    'node': {
+                        'name': 'movies',
+                        'reservationUnits': [
+                            {
+                                'nameEn': None
+                            }
+                        ]
+                    }
+                }
+            ],
+            'totalCount': 4
+        }
+    }
+}
+
+snapshots['ReservationQueryTestCase::test_order_by_reservation_unit_name 3'] = {
+    'data': {
+        'reservations': {
+            'edges': [
+                {
+                    'node': {
+                        'name': 'this should be 1st',
+                        'reservationUnits': [
+                            {
+                                'nameSv': 'g unit'
+                            }
+                        ]
+                    }
+                },
+                {
+                    'node': {
+                        'name': 'this should be 2nd',
+                        'reservationUnits': [
+                            {
+                                'nameSv': 'h unit'
+                            }
+                        ]
+                    }
+                },
+                {
+                    'node': {
+                        'name': 'this should be 3rd',
+                        'reservationUnits': [
+                            {
+                                'nameSv': 'i unit'
+                            }
+                        ]
+                    }
+                },
+                {
+                    'node': {
+                        'name': 'movies',
+                        'reservationUnits': [
+                            {
+                                'nameSv': None
+                            }
+                        ]
+                    }
+                }
+            ],
+            'totalCount': 4
+        }
+    }
+}
+
+snapshots['ReservationQueryTestCase::test_order_by_reservee_name 1'] = {
+    'data': {
+        'reservations': {
+            'edges': [
+                {
+                    'node': {
+                        'name': 'this should be 1st',
+                        'reserveeFirstName': '',
+                        'reserveeLastName': '',
+                        'reserveeOrganisationName': 'A company',
+                        'reserveeType': 'BUSINESS'
+                    }
+                },
+                {
+                    'node': {
+                        'name': 'this should be 2nd',
+                        'reserveeFirstName': '',
+                        'reserveeLastName': '',
+                        'reserveeOrganisationName': 'B non-profit',
+                        'reserveeType': 'NONPROFIT'
+                    }
+                },
+                {
+                    'node': {
+                        'name': 'this should be 3rd',
+                        'reserveeFirstName': 'Charlie',
+                        'reserveeLastName': 'Chaplin',
+                        'reserveeOrganisationName': '',
+                        'reserveeType': 'INDIVIDUAL'
+                    }
+                },
+                {
+                    'node': {
+                        'name': 'movies',
+                        'reserveeFirstName': 'Reser',
+                        'reserveeLastName': 'Vee',
+                        'reserveeOrganisationName': 'Test organisation',
+                        'reserveeType': 'INDIVIDUAL'
+                    }
+                }
+            ],
+            'totalCount': 4
+        }
+    }
+}
+
+snapshots['ReservationQueryTestCase::test_order_by_unit_name 1'] = {
+    'data': {
+        'reservations': {
+            'edges': [
+                {
+                    'node': {
+                        'name': 'this should be 1st',
+                        'reservationUnits': [
+                            {
+                                'unit': {
+                                    'nameFi': 'a Unit'
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    'node': {
+                        'name': 'this should be 2nd',
+                        'reservationUnits': [
+                            {
+                                'unit': {
+                                    'nameFi': 'b Unit'
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    'node': {
+                        'name': 'this should be 3rd',
+                        'reservationUnits': [
+                            {
+                                'unit': {
+                                    'nameFi': 'c Unit'
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    'node': {
+                        'name': 'movies',
+                        'reservationUnits': [
+                            {
+                                'unit': {
+                                    'nameFi': 'unit'
+                                }
+                            }
+                        ]
+                    }
+                }
+            ],
+            'totalCount': 4
+        }
+    }
+}
+
+snapshots['ReservationQueryTestCase::test_order_by_unit_name 2'] = {
+    'data': {
+        'reservations': {
+            'edges': [
+                {
+                    'node': {
+                        'name': 'this should be 1st',
+                        'reservationUnits': [
+                            {
+                                'unit': {
+                                    'nameEn': 'd Unit'
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    'node': {
+                        'name': 'this should be 2nd',
+                        'reservationUnits': [
+                            {
+                                'unit': {
+                                    'nameEn': 'e Unit'
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    'node': {
+                        'name': 'this should be 3rd',
+                        'reservationUnits': [
+                            {
+                                'unit': {
+                                    'nameEn': 'f Unit'
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    'node': {
+                        'name': 'movies',
+                        'reservationUnits': [
+                            {
+                                'unit': {
+                                    'nameEn': None
+                                }
+                            }
+                        ]
+                    }
+                }
+            ],
+            'totalCount': 4
+        }
+    }
+}
+
+snapshots['ReservationQueryTestCase::test_order_by_unit_name 3'] = {
+    'data': {
+        'reservations': {
+            'edges': [
+                {
+                    'node': {
+                        'name': 'this should be 1st',
+                        'reservationUnits': [
+                            {
+                                'unit': {
+                                    'nameSv': 'g unit'
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    'node': {
+                        'name': 'this should be 2nd',
+                        'reservationUnits': [
+                            {
+                                'unit': {
+                                    'nameSv': 'h unit'
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    'node': {
+                        'name': 'this should be 3rd',
+                        'reservationUnits': [
+                            {
+                                'unit': {
+                                    'nameSv': 'i unit'
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    'node': {
+                        'name': 'movies',
+                        'reservationUnits': [
+                            {
+                                'unit': {
+                                    'nameSv': None
+                                }
+                            }
+                        ]
+                    }
+                }
+            ],
+            'totalCount': 4
+        }
+    }
+}
+
 snapshots['ReservationQueryTestCase::test_regular_user_cant_read_working_memo 1'] = {
     'data': {
         'reservations': {
