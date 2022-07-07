@@ -562,7 +562,21 @@ class ApplicationSerializer(serializers.ModelSerializer):
                 validated_data=organisation_data,
             )
 
-        return None
+        return
+
+    def handle_billing_address(self, billing_address_data: Dict[Any, Any]):
+        if "id" not in billing_address_data or billing_address_data["id"] is None:
+            billing_address = AddressSerializer(data=billing_address_data).create(
+                validated_data=billing_address_data
+            )
+
+        else:
+            billing_address = AddressSerializer(data=billing_address_data).update(
+                instance=Address.objects.get(pk=billing_address_data["id"]),
+                validated_data=billing_address_data,
+            )
+
+        return billing_address
 
     def validate(self, data):
         # Validations when user submits application for review
@@ -707,16 +721,7 @@ class ApplicationSerializer(serializers.ModelSerializer):
 
         billing_address_data = validated_data.pop("billing_address", None)
         if billing_address_data:
-            if "id" not in billing_address_data or billing_address_data["id"] is None:
-                billing_address = AddressSerializer(data=billing_address_data).create(
-                    validated_data=billing_address_data
-                )
-
-            else:
-                billing_address = AddressSerializer(data=billing_address_data).update(
-                    instance=Address.objects.get(pk=billing_address_data["id"]),
-                    validated_data=billing_address_data,
-                )
+            billing_address = self.handle_billing_address(billing_address_data)
 
             validated_data["billing_address"] = billing_address
 
