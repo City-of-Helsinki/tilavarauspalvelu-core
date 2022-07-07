@@ -16,7 +16,7 @@ from api.graphql.primary_key_fields import IntegerPrimaryKeyField
 from applications.models import CUSTOMER_TYPES, City
 from email_notification.models import EmailType
 from email_notification.tasks import send_reservation_email_task
-from reservation_units.models import ReservationUnit
+from reservation_units.models import ReservationKind, ReservationUnit
 from reservation_units.utils.reservation_unit_reservation_scheduler import (
     ReservationUnitReservationScheduler,
 )
@@ -157,6 +157,61 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
             )
         return value
 
+    def validate(self, data):
+        begin = data.get("begin", getattr(self.instance, "begin", None))
+        end = data.get("end", getattr(self.instance, "end", None))
+        begin = begin.astimezone(DEFAULT_TIMEZONE)
+        end = end.astimezone(DEFAULT_TIMEZONE)
+
+        reservation_units = data.get(
+            "reservation_unit", getattr(self.instance, "reservation_unit", None)
+        )
+        if hasattr(reservation_units, "all"):
+            reservation_units = reservation_units.all()
+
+        sku = None
+        for reservation_unit in reservation_units:
+            self.check_reservation_time(reservation_unit, begin, end)
+            self.check_reservation_overlap(reservation_unit, begin, end)
+            self.check_reservation_duration(reservation_unit, begin, end)
+            self.check_buffer_times(data, reservation_unit)
+            self.check_reservation_days_before(begin, reservation_unit)
+            self.check_max_reservations_per_user(
+                self.context.get("request").user, reservation_unit
+            )
+            self.check_sku(sku, reservation_unit.sku)
+            self.check_reservation_kind(reservation_unit)
+
+            # Scheduler dependent checks.
+            scheduler = ReservationUnitReservationScheduler(
+                reservation_unit, opening_hours_end=end.date()
+            )
+            self.check_opening_hours(scheduler, begin, end)
+            self.check_open_application_round(scheduler, begin, end)
+            self.check_reservation_start_time(begin, scheduler)
+
+            sku = reservation_unit.sku
+
+        data["sku"] = sku
+        data["state"] = STATE_CHOICES.CREATED
+        data[
+            "buffer_time_before"
+        ] = self._get_biggest_buffer_time_from_reservation_units(
+            "buffer_time_before", reservation_units
+        )
+        data[
+            "buffer_time_after"
+        ] = self._get_biggest_buffer_time_from_reservation_units(
+            "buffer_time_after", reservation_units
+        )
+        user = self.context.get("request").user
+        if settings.TMP_PERMISSIONS_DISABLED and user.is_anonymous:
+            user = None
+
+        data["user"] = user
+
+        return data
+
     def check_reservation_time(self, reservation_unit: ReservationUnit, begin, end):
         is_invalid_begin = (
             reservation_unit.reservation_begins
@@ -217,57 +272,6 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
             raise serializers.ValidationError(
                 "Reservation duration less than one or more reservation unit's minimum duration."
             )
-
-    def validate(self, data):
-        begin = data.get("begin", getattr(self.instance, "begin", None))
-        end = data.get("end", getattr(self.instance, "end", None))
-        begin = begin.astimezone(DEFAULT_TIMEZONE)
-        end = end.astimezone(DEFAULT_TIMEZONE)
-
-        reservation_units = data.get(
-            "reservation_unit", getattr(self.instance, "reservation_unit", None)
-        )
-        if hasattr(reservation_units, "all"):
-            reservation_units = reservation_units.all()
-
-        sku = None
-        for reservation_unit in reservation_units:
-            scheduler = ReservationUnitReservationScheduler(
-                reservation_unit, opening_hours_end=end.date()
-            )
-            self.check_reservation_time(reservation_unit, begin, end)
-            self.check_reservation_overlap(reservation_unit, begin, end)
-            self.check_opening_hours(scheduler, begin, end)
-            self.check_open_application_round(scheduler, begin, end)
-            self.check_reservation_duration(reservation_unit, begin, end)
-            self.check_buffer_times(data, reservation_unit)
-            self.check_reservation_days_before(begin, reservation_unit)
-            self.check_reservation_start_time(begin, scheduler)
-            self.check_max_reservations_per_user(
-                self.context.get("request").user, reservation_unit
-            )
-            self.check_sku(sku, reservation_unit.sku)
-            sku = reservation_unit.sku
-
-        data["sku"] = sku
-        data["state"] = STATE_CHOICES.CREATED
-        data[
-            "buffer_time_before"
-        ] = self._get_biggest_buffer_time_from_reservation_units(
-            "buffer_time_before", reservation_units
-        )
-        data[
-            "buffer_time_after"
-        ] = self._get_biggest_buffer_time_from_reservation_units(
-            "buffer_time_after", reservation_units
-        )
-        user = self.context.get("request").user
-        if settings.TMP_PERMISSIONS_DISABLED and user.is_anonymous:
-            user = None
-
-        data["user"] = user
-
-        return data
 
     def _get_biggest_buffer_time_from_reservation_units(
         self, field: str, reservation_units: List[ReservationUnit]
@@ -389,6 +393,13 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
         ):
             raise serializers.ValidationError(
                 f"Reservation start time is less than {reservation_unit.reservations_min_days_before} days before."
+            )
+
+    def check_reservation_kind(self, reservation_unit):
+        if reservation_unit.reservation_kind == ReservationKind.SEASON:
+            raise serializers.ValidationError(
+                "Reservation cannot be done to this reservation unit from the api "
+                "since its reservation kind is SEASON."
             )
 
 

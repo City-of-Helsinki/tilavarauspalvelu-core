@@ -153,12 +153,17 @@ class ReservationUnitSchedulerGetNextAvailableReservationTimeTestCase(TestCase):
             datetime.datetime(2022, 1, 2, 10, 0).astimezone(DEFAULT_TIMEZONE)
         )
 
-    def test_application_round_is_open_no_opening_times_after(self, mock):
+    def test_application_round_is_open_no_opening_times_after_reservation_ends_date_passed(
+        self, mock
+    ):
         self.app_round.reservation_period_begin = datetime.date(2022, 1, 1)
         self.app_round.reservation_period_end = datetime.date(2022, 1, 2)
+        self.reservation_unit.reservation_ends = datetime.datetime(2021, 12, 31, 0)
+        self.reservation_unit.save()
         self.app_round.set_status(ApplicationRoundStatus.IN_REVIEW)
         self.app_round.save()
 
+        self.scheduler.__init__(self.reservation_unit, opening_hours_end=self.DATES[2])
         begin, end = self.scheduler.get_next_available_reservation_time()
         assert_that(begin).is_none()
         assert_that(end).is_none()
@@ -177,8 +182,12 @@ class ReservationUnitSchedulerGetNextAvailableReservationTimeTestCase(TestCase):
         )
 
         begin, end = self.scheduler.get_next_available_reservation_time()
-        assert_that(begin).is_none()
-        assert_that(end).is_none()
+        assert_that(begin).is_equal_to(
+            datetime.datetime(2023, 7, 1, 10).astimezone(DEFAULT_TIMEZONE)
+        )
+        assert_that(end).is_equal_to(
+            datetime.datetime(2023, 7, 1, 11).astimezone(DEFAULT_TIMEZONE)
+        )
 
     def test_get_reservation_unit_possible_start_times(self, mock):
         start_date = datetime.date(2022, 1, 1)
