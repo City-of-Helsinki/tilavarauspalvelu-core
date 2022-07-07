@@ -1,6 +1,5 @@
 from datetime import date, time
 
-import freezegun
 import snapshottest
 from dateutil.relativedelta import relativedelta
 from django.contrib.auth import get_user_model
@@ -43,7 +42,6 @@ from spaces.tests.factories import UnitGroupFactory
 from ..base import GrapheneTestCaseBase
 
 
-@freezegun.freeze_time("2022-05-02T12:00:00Z")
 class ApplicationTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCase):
     @classmethod
     def setUpTestData(cls) -> None:

@@ -1,5 +1,6 @@
 import json
 
+import freezegun
 from assertpy import assert_that
 from django.contrib.auth import get_user_model
 
@@ -14,6 +15,7 @@ from applications.tests.factories import (
 from .base import ApplicationTestCaseBase
 
 
+@freezegun.freeze_time("2022-05-02T12:00:00Z")
 class ApplicationsGraphQLFiltersTestCase(ApplicationTestCaseBase):
     def setUp(self):
         super().setUp()
