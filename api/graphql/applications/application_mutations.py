@@ -16,9 +16,11 @@ from api.graphql.applications.application_event_serializers import (
     ApplicationEventScheduleResultUpdateSerializer,
     ApplicationEventUpdateSerializer,
 )
+from api.graphql.applications.application_serializers import ApplicationCreateSerializer
 from api.graphql.applications.application_types import (
     ApplicationEventScheduleResultType,
     ApplicationEventType,
+    ApplicationType,
 )
 from api.graphql.base_mutations import AuthDeleteMutation, AuthSerializerMutation
 from applications.models import ApplicationEvent, ApplicationEventStatus
@@ -27,7 +29,23 @@ from permissions.api_permissions.graphene_permissions import (
     ApplicationEventDeclinePermission,
     ApplicationEventPermission,
     ApplicationEventScheduleResultPermission,
+    ApplicationPermission,
 )
+
+
+class ApplicationCreateMutation(AuthSerializerMutation, SerializerMutation):
+    application = graphene.Field(ApplicationType)
+
+    permission_classes = (
+        (ApplicationPermission,)
+        if not settings.TMP_PERMISSIONS_DISABLED
+        else (AllowAny,)
+    )
+
+    class Meta:
+        model_operations = ["create"]
+
+        serializer_class = ApplicationCreateSerializer
 
 
 class ApplicationEventCreateMutation(AuthSerializerMutation, SerializerMutation):
