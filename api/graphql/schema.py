@@ -116,6 +116,7 @@ from spaces.models import Space, Unit
 
 from .application_rounds.application_round_types import ApplicationRoundType
 from .applications.application_mutations import (
+    ApplicationCreateMutation,
     ApplicationDeclineMutation,
     ApplicationEventCreateMutation,
     ApplicationEventDeclineMutation,
@@ -123,6 +124,7 @@ from .applications.application_mutations import (
     ApplicationEventScheduleResultCreateMutation,
     ApplicationEventScheduleResultUpdateMutation,
     ApplicationEventUpdateMutation,
+    ApplicationUpdateMutation,
 )
 
 
@@ -486,6 +488,8 @@ class Query(graphene.ObjectType):
 
 
 class Mutation(graphene.ObjectType):
+    create_application = ApplicationCreateMutation.Field()
+    update_application = ApplicationUpdateMutation.Field()
     decline_application = ApplicationDeclineMutation.Field()
 
     create_application_event = ApplicationEventCreateMutation.Field()

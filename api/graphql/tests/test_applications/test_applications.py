@@ -1,10 +1,12 @@
 import json
 
+import freezegun
 from assertpy import assert_that
 
 from .base import ApplicationTestCaseBase
 
 
+@freezegun.freeze_time("2022-05-02T12:00:00Z")
 class ApplicationsGraphQLTestCase(ApplicationTestCaseBase):
     def setUp(self):
         super().setUp()

@@ -57,7 +57,15 @@ class ApplicationPermission(BasePermission):
 
     @classmethod
     def has_mutation_permission(cls, root: Any, info: ResolveInfo, input: dict) -> bool:
-        return False
+        pk = input.get("pk")
+
+        if pk:
+            application = Application.objects.filter(id=pk).first()
+            if not application:
+                return False
+            return can_modify_application(info.context.user, application)
+
+        return cls.has_permission(info)
 
     @classmethod
     def has_filter_permission(cls, info: ResolveInfo) -> bool:

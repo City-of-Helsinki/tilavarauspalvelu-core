@@ -1,6 +1,5 @@
 from datetime import date, time
 
-import freezegun
 import snapshottest
 from dateutil.relativedelta import relativedelta
 from django.contrib.auth import get_user_model
@@ -43,7 +42,6 @@ from spaces.tests.factories import UnitGroupFactory
 from ..base import GrapheneTestCaseBase
 
 
-@freezegun.freeze_time("2022-05-02T12:00:00Z")
 class ApplicationTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCase):
     @classmethod
     def setUpTestData(cls) -> None:
@@ -170,6 +168,22 @@ class ApplicationTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCase):
         )
 
         return service_sector_admin
+
+    def create_service_sector_application_manager(self):
+        user = get_user_model().objects.create(
+            username="ss_app_man",
+            first_name="Man",
+            last_name="Ager",
+            email="ss.man.ager@foo.com",
+        )
+
+        ServiceSectorRole.objects.create(
+            user=user,
+            role=ServiceSectorRoleChoice.objects.get(code="application_manager"),
+            service_sector=self.application.application_round.service_sector,
+        )
+
+        return user
 
     def create_unit_admin(self):
         unit_group_admin = get_user_model().objects.create(
