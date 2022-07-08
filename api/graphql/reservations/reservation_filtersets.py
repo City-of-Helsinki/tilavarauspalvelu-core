@@ -75,12 +75,45 @@ class ReservationFilterSet(django_filters.FilterSet):
             "name",
             "price",
             "pk",
+            ("reservation_unit__name_fi", "reservation_unit_name_fi"),
+            ("reservation_unit__name_en", "reservation_unit_name_en"),
+            ("reservation_unit__name_sv", "reservation_unit_name_sv"),
+            ("reservation_unit__unit__name_fi", "unit_name_fi"),
+            ("reservation_unit__unit__name_en", "unit_name_en"),
+            ("reservation_unit__unit__name_sv", "unit_name_sv"),
+            "reservee_name",
         )
     )
 
     class Meta:
         model = Reservation
         fields = ["begin", "end"]
+
+    def filter_queryset(self, queryset):
+        queryset = queryset.alias(
+            reservee_name=Case(
+                When(
+                    reservee_type=CUSTOMER_TYPES.CUSTOMER_TYPE_BUSINESS,
+                    then=F("reservee_organisation_name"),
+                ),
+                When(
+                    reservee_type=CUSTOMER_TYPES.CUSTOMER_TYPE_NONPROFIT,
+                    then=F("reservee_organisation_name"),
+                ),
+                When(
+                    reservee_type=CUSTOMER_TYPES.CUSTOMER_TYPE_INDIVIDUAL,
+                    then=Concat(
+                        "reservee_first_name",
+                        V(" "),
+                        "reservee_last_name",
+                    ),
+                ),
+                default=V(""),
+                output_field=CharField(),
+            )
+        )
+
+        return super().filter_queryset(queryset)
 
     def get_requested(self, qs, property, value: str):
         query = Q(state=STATE_CHOICES.REQUIRES_HANDLING) | Q(handled_at__isnull=False)

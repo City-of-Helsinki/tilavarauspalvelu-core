@@ -836,6 +836,136 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         assert_that(content.get("errors")).is_none()
         self.assertMatchSnapshot(content)
 
+    def test_order_by_reservation_unit_name(self):
+        resunitA = ReservationUnitFactory(
+            name_fi="a Unit", name_en="d Unit", name_sv="g unit"
+        )
+        resunitB = ReservationUnitFactory(
+            name_fi="b Unit", name_en="e Unit", name_sv="h unit"
+        )
+        resunitC = ReservationUnitFactory(
+            name_fi="c Unit", name_en="f Unit", name_sv="i unit"
+        )
+
+        ReservationFactory(name="this should be 1st", reservation_unit=[resunitA])
+        ReservationFactory(name="this should be 2nd", reservation_unit=[resunitB])
+        ReservationFactory(name="this should be 3rd", reservation_unit=[resunitC])
+
+        self.client.force_login(self.general_admin)
+        test_data = ["Fi", "En", "Sv"]
+        for lang in test_data:
+            response = self.query(
+                """
+                query {
+                    reservations(orderBy:"reservationUnitName%s") {
+                        totalCount
+                        edges {
+                            node {
+                                name
+                                reservationUnits {
+                                    name%s
+                                }
+                            }
+                        }
+                    }
+                }
+                """
+                % (lang, lang)
+            )
+            content = json.loads(response.content)
+            assert_that(content.get("errors")).is_none()
+            self.assertMatchSnapshot(content)
+
+    def test_order_by_reservee_name(self):
+        self.maxDiff = None
+        ReservationFactory(
+            name="this should be 1st",
+            reservation_unit=[self.reservation_unit],
+            reservee_type=CUSTOMER_TYPES.CUSTOMER_TYPE_BUSINESS,
+            reservee_organisation_name="A company",
+            reservee_first_name="",
+            reservee_last_name="",
+        )
+        ReservationFactory(
+            name="this should be 2nd",
+            reservation_unit=[self.reservation_unit],
+            reservee_type=CUSTOMER_TYPES.CUSTOMER_TYPE_NONPROFIT,
+            reservee_organisation_name="B non-profit",
+            reservee_first_name="",
+            reservee_last_name="",
+        )
+        ReservationFactory(
+            name="this should be 3rd",
+            reservation_unit=[self.reservation_unit],
+            reservee_type=CUSTOMER_TYPES.CUSTOMER_TYPE_INDIVIDUAL,
+            reservee_first_name="Charlie",
+            reservee_last_name="Chaplin",
+            reservee_organisation_name="",
+        )
+
+        self.client.force_login(self.general_admin)
+        response = self.query(
+            """
+            query {
+                reservations(orderBy:"reserveeName") {
+                    totalCount
+                    edges {
+                        node {
+                            name
+                            reserveeOrganisationName
+                            reserveeFirstName
+                            reserveeLastName
+                            reserveeType
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_order_by_unit_name(self):
+        unitA = UnitFactory(name_fi="a Unit", name_en="d Unit", name_sv="g unit")
+        unitB = UnitFactory(name_fi="b Unit", name_en="e Unit", name_sv="h unit")
+        unitC = UnitFactory(name_fi="c Unit", name_en="f Unit", name_sv="i unit")
+
+        resunitA = ReservationUnitFactory(name="1st resunit", unit=unitA)
+        resunitB = ReservationUnitFactory(name="2nd resunit", unit=unitB)
+        resunitC = ReservationUnitFactory(name="3nd resunit", unit=unitC)
+
+        ReservationFactory(name="this should be 1st", reservation_unit=[resunitA])
+        ReservationFactory(name="this should be 2nd", reservation_unit=[resunitB])
+        ReservationFactory(name="this should be 3rd", reservation_unit=[resunitC])
+
+        self.client.force_login(self.general_admin)
+        test_data = ["Fi", "En", "Sv"]
+        for lang in test_data:
+            response = self.query(
+                """
+                query {
+                    reservations(orderBy:"unitName%s") {
+                        totalCount
+                        edges {
+                            node {
+                                name
+                                reservationUnits {
+                                    unit {
+                                        name%s
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                """
+                % (lang, lang)
+            )
+            content = json.loads(response.content)
+            assert_that(content.get("errors")).is_none()
+            self.assertMatchSnapshot(content)
+
 
 class ReservationByPkTestCase(ReservationTestCaseBase):
     def setUp(self):
