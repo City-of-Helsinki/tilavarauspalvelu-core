@@ -971,15 +971,16 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
 
 @freezegun.freeze_time("2021-10-12T12:00:00Z")
 class ReservationByPkTestCase(ReservationTestCaseBase):
-    def setUp(self):
-        super().setUp()
-        self.reservation = ReservationFactory(
-            reservation_unit=[self.reservation_unit],
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.reservation = ReservationFactory(
+            reservation_unit=[cls.reservation_unit],
             reservee_first_name="Joe",
             reservee_last_name="Regular",
             reservee_phone="+358123456789",
             name="Test reservation",
-            user=self.regular_joe,
+            user=cls.regular_joe,
         )
 
     def get_query(self) -> str:

@@ -12,16 +12,18 @@ from reservations.tests.factories import ReservationFactory
 
 @freezegun.freeze_time("2021-10-12T12:00:00Z")
 class ReservationWorkingMemoWriteTestCase(ReservationTestCaseBase):
-    def setUp(self):
-        self.reservation = ReservationFactory(
-            reservation_unit=[self.reservation_unit],
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.reservation = ReservationFactory(
+            reservation_unit=[cls.reservation_unit],
             begin=datetime.datetime.now(tz=get_default_timezone()),
             end=(
                 datetime.datetime.now(tz=get_default_timezone())
                 + datetime.timedelta(hours=1)
             ),
             state=STATE_CHOICES.REQUIRES_HANDLING,
-            user=self.regular_joe,
+            user=cls.regular_joe,
         )
 
     def get_update_memo_query(self):
