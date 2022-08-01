@@ -1,6 +1,7 @@
 import datetime
 import json
 
+import freezegun
 from assertpy import assert_that
 from django.contrib.auth import get_user_model
 from django.utils.timezone import get_default_timezone
@@ -19,6 +20,7 @@ from reservations.tests.factories import (
 from spaces.tests.factories import UnitFactory
 
 
+@freezegun.freeze_time("2021-10-12T12:00:00Z")
 class ReservationQueryTestCase(ReservationTestCaseBase):
     def create_reservation_by_admin(self):
         reservation_begin = datetime.datetime.now(tz=get_default_timezone())
@@ -967,16 +969,18 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
             self.assertMatchSnapshot(content)
 
 
+@freezegun.freeze_time("2021-10-12T12:00:00Z")
 class ReservationByPkTestCase(ReservationTestCaseBase):
-    def setUp(self):
-        super().setUp()
-        self.reservation = ReservationFactory(
-            reservation_unit=[self.reservation_unit],
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.reservation = ReservationFactory(
+            reservation_unit=[cls.reservation_unit],
             reservee_first_name="Joe",
             reservee_last_name="Regular",
             reservee_phone="+358123456789",
             name="Test reservation",
-            user=self.regular_joe,
+            user=cls.regular_joe,
         )
 
     def get_query(self) -> str:

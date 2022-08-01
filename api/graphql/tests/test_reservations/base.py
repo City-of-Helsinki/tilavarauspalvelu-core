@@ -1,7 +1,6 @@
 import datetime
 from typing import Dict, List, Optional
 
-import freezegun
 import snapshottest
 from django.conf import settings
 from django.utils.timezone import get_default_timezone
@@ -21,7 +20,6 @@ from spaces.tests.factories import SpaceFactory, UnitFactory
 DEFAULT_TIMEZONE = get_default_timezone()
 
 
-@freezegun.freeze_time("2021-10-12T12:00:00Z")
 class ReservationTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCase):
     @classmethod
     def setUpTestData(cls):
