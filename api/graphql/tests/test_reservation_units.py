@@ -39,6 +39,7 @@ from reservation_units.tests.factories import (
     KeywordCategoryFactory,
     KeywordGroupFactory,
     PurposeFactory,
+    QualifierFactory,
     ReservationUnitCancellationRuleFactory,
     ReservationUnitFactory,
     ReservationUnitTypeFactory,
@@ -80,6 +81,9 @@ class ReservationUnitQueryTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCa
         rule = ReservationUnitCancellationRuleFactory(
             name_fi="fi", name_en="en", name_sv="sv"
         )
+
+        qualifier = QualifierFactory(name="Test Qualifier")
+
         cls.reservation_unit = ReservationUnitFactory(
             name="test name fi",
             name_fi="test name fi",
@@ -124,6 +128,7 @@ class ReservationUnitQueryTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCa
             pricing_type=PricingType.PAID,
             payment_type=PaymentType.ONLINE,
         )
+        cls.reservation_unit.qualifiers.set([qualifier])
 
         cls.api_client = APIClient()
 
@@ -158,6 +163,9 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
                             requireIntroduction
                             purposes {
                               nameFi
+                            }
+                            qualifiers {
+                                nameFi
                             }
                             images {
                               imageUrl
@@ -2589,6 +2597,7 @@ class ReservationUnitMutationsTestCaseBase(GrapheneTestCaseBase):
         super().setUpTestData()
         cls.unit = UnitFactory()
         cls.purpose = PurposeFactory()
+        cls.qualifier = QualifierFactory()
         cls.space = SpaceFactory(unit=cls.unit)
         cls.resource = ResourceFactory()
         cls.reservation_unit_type = ReservationUnitTypeFactory()
@@ -3159,6 +3168,34 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
     def test_create_errors_on_wrong_type_of_purpose_pk(self):
         data = self.get_valid_data()
         data["purposePks"] = ["b"]
+
+        response = self.query(self.get_create_query(), input_data=data)
+        assert_that(response.status_code).is_equal_to(400)
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_not_none()
+
+    def test_create_with_multiple_qualifiers(self):
+        qualifiers = QualifierFactory.create_batch(5)
+        data = self.get_valid_data()
+        data["qualifierPks"] = [qualifier.id for qualifier in qualifiers]
+
+        response = self.query(self.get_create_query(), input_data=data)
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
+        res_unit_data = content.get("data").get("createReservationUnit")
+        assert_that(content.get("errors")).is_none()
+        assert_that(res_unit_data.get("errors")).is_none()
+
+        res_unit = ReservationUnit.objects.first()
+        assert_that(res_unit).is_not_none()
+        assert_that(res_unit.id).is_equal_to(res_unit_data.get("pk"))
+        assert_that(list(res_unit.qualifiers.all().values_list("id", flat=True))).is_in(
+            data.get("qualifierPks")
+        )
+
+    def test_create_errors_on_wrong_type_of_qualifier_pk(self):
+        data = self.get_valid_data()
+        data["qualifierPks"] = ["q"]
 
         response = self.query(self.get_create_query(), input_data=data)
         assert_that(response.status_code).is_equal_to(400)

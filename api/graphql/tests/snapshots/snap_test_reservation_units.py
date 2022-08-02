@@ -718,6 +718,11 @@ snapshots['ReservationUnitQueryTestCase::test_getting_reservation_units 1'] = {
                         'publishEnds': '2021-05-10T00:00:00+00:00',
                         'purposes': [
                         ],
+                        'qualifiers': [
+                            {
+                                'nameFi': 'Test Qualifier'
+                            }
+                        ],
                         'requireIntroduction': False,
                         'requireReservationHandling': False,
                         'reservationBegins': '2021-05-03T00:00:00+00:00',

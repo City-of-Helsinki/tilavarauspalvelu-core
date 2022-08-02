@@ -13,6 +13,7 @@ from permissions.helpers import (
     can_manage_equipment,
     can_manage_equipment_categories,
     can_manage_purposes,
+    can_manage_qualifiers,
     can_manage_reservation_purposes,
     can_manage_resources,
     can_manage_service_sectors_applications,
@@ -355,6 +356,20 @@ class PurposePermission(BasePermission):
     @classmethod
     def has_mutation_permission(cls, root: Any, info: ResolveInfo, input: dict) -> bool:
         return can_manage_purposes(info.context.user)
+
+
+class QualifierPermission(BasePermission):
+    @classmethod
+    def has_permission(cls, info: ResolveInfo) -> bool:
+        return True
+
+    @classmethod
+    def has_filter_permission(cls, info: ResolveInfo) -> bool:
+        return True
+
+    @classmethod
+    def has_mutation_permission(cls, root: Any, info: ResolveInfo, input: dict) -> bool:
+        return can_manage_qualifiers(info.context.user)
 
 
 class AgeGroupPermission(BasePermission):

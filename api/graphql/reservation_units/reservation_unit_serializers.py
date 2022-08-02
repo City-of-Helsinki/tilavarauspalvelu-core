@@ -21,6 +21,7 @@ from reservation_units.models import (
     PaymentType,
     PricingType,
     Purpose,
+    Qualifier,
     ReservationKind,
     ReservationUnit,
     ReservationUnitCancellationRule,
@@ -118,6 +119,11 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
     purpose_pks = serializers.ListField(
         child=IntegerPrimaryKeyField(queryset=Purpose.objects.all()),
         source="purposes",
+        required=False,
+    )
+    qualifier_pks = serializers.ListField(
+        child=IntegerPrimaryKeyField(queryset=Qualifier.objects.all()),
+        source="qualifiers",
         required=False,
     )
     equipment_pks = serializers.ListField(
@@ -287,6 +293,7 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
             "space_pks",
             "resource_pks",
             "purpose_pks",
+            "qualifier_pks",
             "service_pks",
             "reservation_unit_type_pk",
             "surface_area",
