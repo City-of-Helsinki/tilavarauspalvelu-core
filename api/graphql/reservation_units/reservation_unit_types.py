@@ -131,7 +131,7 @@ class QualifierType(AuthNode, PrimaryKeyObjectType):
     class Meta:
         model = Qualifier
         fields = ["pk"] + get_all_translatable_fields(model)
-        fielter_fields = ["name_fi", "name_en", "name_sv"]
+        filter_fields = ["name_fi", "name_en", "name_sv"]
         interfaces = (graphene.relay.Node,)
         connection_class = TilavarausBaseConnection
 

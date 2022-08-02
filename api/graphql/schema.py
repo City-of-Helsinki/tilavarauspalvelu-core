@@ -42,6 +42,7 @@ from api.graphql.reservation_units.reservation_unit_types import (
     KeywordGroupType,
     KeywordType,
     PurposeType,
+    QualifierType,
     ReservationUnitByPkType,
     ReservationUnitCancellationRuleType,
     ReservationUnitType,
@@ -96,6 +97,7 @@ from permissions.api_permissions.graphene_permissions import (
     EquipmentPermission,
     KeywordPermission,
     PurposePermission,
+    QualifierPermission,
     ReservationMetadataSetPermission,
     ReservationPermission,
     ReservationPurposePermission,
@@ -314,6 +316,12 @@ class PurposeFilter(AuthFilter):
     )
 
 
+class QualifierFilter(AuthFilter):
+    permission_classes = (
+        (QualifierPermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
+    )
+
+
 class ReservationPurposeFilter(AuthFilter):
     permission_classes = (
         (ReservationPurposePermission,)
@@ -443,6 +451,7 @@ class Query(graphene.ObjectType):
     keywords = KeywordFilter(KeywordType)
 
     purposes = PurposeFilter(PurposeType)
+    qualifiers = QualifierFilter(QualifierType)
     reservation_purposes = ReservationPurposeFilter(ReservationPurposeType)
 
     terms_of_use = TermsOfUseFilter(TermsOfUseType)
