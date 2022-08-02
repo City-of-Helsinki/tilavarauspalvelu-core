@@ -13,6 +13,7 @@ from reservation_units.models import (
     Equipment,
     KeywordGroup,
     Purpose,
+    Qualifier,
     ReservationUnit,
     ReservationUnitType,
 )
@@ -53,6 +54,10 @@ class ReservationUnitsFilterSet(django_filters.FilterSet):
 
     purposes = django_filters.ModelMultipleChoiceFilter(
         field_name="purposes", queryset=Purpose.objects.all()
+    )
+
+    qualifiers = django_filters.ModelMultipleChoiceFilter(
+        field_name="qualifiers", queryset=Qualifier.objects.all()
     )
 
     is_draft = django_filters.BooleanFilter(field_name="is_draft")

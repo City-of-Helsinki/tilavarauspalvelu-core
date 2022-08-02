@@ -642,6 +642,62 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         assert_that(content.get("errors")).is_none()
         self.assertMatchSnapshot(content)
 
+    def test_filtering_by_qualifier(self):
+        qualifier = QualifierFactory(name="Filter test qualifier")
+        self.reservation_unit.qualifiers.set([qualifier])
+        response = self.query(
+            f"""
+            query {{
+                reservationUnits(qualifiers: {qualifier.pk}) {{
+                    edges {{
+                        node {{
+                            nameFi qualifiers {{
+                                nameFi
+                            }}
+                        }}
+                    }}
+                }}
+            }}
+            """
+        )
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filtering_by_multiple_qualifiers(self):
+        excluded = ReservationUnitFactory()  # should be excluded
+        excluded.qualifiers.set([QualifierFactory()])
+
+        qualifier = QualifierFactory(name="Filter test qualifier")
+        other_qualifier = QualifierFactory(name="Other filter test qualifier")
+
+        self.reservation_unit.qualifiers.set([qualifier])
+
+        other_reservation_unit = ReservationUnitFactory(name="Other reservation unit")
+        other_reservation_unit.qualifiers.set([other_qualifier])
+
+        response = self.query(
+            f"""
+            query {{
+                reservationUnits(qualifiers: [{qualifier.pk},{other_qualifier.pk}]) {{
+                    edges {{
+                        node {{
+                            nameFi
+                            qualifiers {{
+                                nameFi
+                            }}
+                        }}
+                    }}
+                }}
+            }}
+            """
+        )
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
     def test_filtering_by_type_not_found(self):
         response = self.query(
             """
