@@ -146,6 +146,12 @@ class PricingType(models.TextChoices):
     FREE = "free"
 
 
+class PaymentType(models.TextChoices):
+    ONLINE = "online"
+    INVOICE = "invoice"
+    ON_SITE = "on_site"
+
+
 class ReservationUnit(models.Model):
     sku = models.CharField(
         verbose_name=_("SKU"), max_length=255, blank=True, default=""
@@ -480,6 +486,15 @@ class ReservationUnit(models.Model):
         blank=True,
         null=True,
         help_text="What kind of pricing types are available with this reservation unit.",
+    )
+
+    payment_type = models.CharField(
+        max_length=20,
+        verbose_name=_("Payment type"),
+        choices=PaymentType.choices,
+        blank=True,
+        null=True,
+        help_text="When pricing type is paid, what kind of payment types are available with this reservation unit.",
     )
 
     can_apply_free_of_charge = models.BooleanField(

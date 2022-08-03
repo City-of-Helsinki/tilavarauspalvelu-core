@@ -28,6 +28,7 @@ from permissions.models import (
     UnitRolePermission,
 )
 from reservation_units.models import (
+    PaymentType,
     PricingType,
     ReservationKind,
     ReservationUnit,
@@ -121,6 +122,7 @@ class ReservationUnitQueryTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCa
             reservations_min_days_before=1,
             pricing_terms=TermsOfUseFactory(terms_type=TermsOfUse.TERMS_TYPE_PRICING),
             pricing_type=PricingType.PAID,
+            payment_type=PaymentType.ONLINE,
         )
 
         cls.api_client = APIClient()
@@ -236,6 +238,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
                                 termsType
                             }
                             pricingType
+                            paymentType
                           }
                         }
                     }
