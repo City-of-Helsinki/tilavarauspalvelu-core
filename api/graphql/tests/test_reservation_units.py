@@ -2744,6 +2744,31 @@ class ReservationUnitCreateAsDraftTestCase(ReservationUnitMutationsTestCaseBase)
         assert_that(created_unit.pricing_type).is_equal_to(PricingType.PAID)
         assert_that(created_unit.pricing_terms).is_equal_to(self.pricing_term)
 
+    def test_create_with_payment_type(self):
+        self.client.force_login(self.general_admin)
+        data = {
+            "isDraft": True,
+            "nameFi": "Unit with pricing fields",
+            "unitPk": self.unit.id,
+            "pricingType": "PAID",
+            "paymentType": "ON_SITE",
+        }
+        response = self.query(self.get_create_query(), input_data=data)
+        assert_that(response.status_code).is_equal_to(200)
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        assert_that(
+            content.get("data").get("createReservationUnit").get("pk")
+        ).is_not_none()
+
+        created_unit = ReservationUnit.objects.get(
+            pk=content.get("data").get("createReservationUnit").get("pk")
+        )
+        assert_that(created_unit).is_not_none()
+        assert_that(created_unit.pricing_type).is_equal_to(PricingType.PAID)
+        assert_that(created_unit.payment_type).is_equal_to(PaymentType.ON_SITE)
+
 
 class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBase):
     """For publish"""
@@ -3280,6 +3305,28 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         assert_that(created_unit.pricing_type).is_equal_to(PricingType.PAID)
         assert_that(created_unit.pricing_terms).is_equal_to(self.pricing_term)
 
+    def test_create_with_payment_type(self):
+        self.client.force_login(self.general_admin)
+        data = self.get_valid_data()
+        data["pricingType"] = "PAID"
+        data["paymentType"] = "ONLINE"
+
+        response = self.query(self.get_create_query(), input_data=data)
+        assert_that(response.status_code).is_equal_to(200)
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        assert_that(
+            content.get("data").get("createReservationUnit").get("pk")
+        ).is_not_none()
+
+        created_unit = ReservationUnit.objects.get(
+            pk=content.get("data").get("createReservationUnit").get("pk")
+        )
+        assert_that(created_unit).is_not_none()
+        assert_that(created_unit.pricing_type).is_equal_to(PricingType.PAID)
+        assert_that(created_unit.payment_type).is_equal_to(PaymentType.ONLINE)
+
 
 @override_settings(AUDIT_LOGGING_ENABLED=True)
 class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
@@ -3545,6 +3592,28 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
         assert_that(created_unit).is_not_none()
         assert_that(created_unit.pricing_type).is_equal_to(PricingType.PAID)
         assert_that(created_unit.pricing_terms).is_equal_to(self.pricing_term)
+
+    def test_update_with_payment_type(self):
+        self.client.force_login(self.general_admin)
+        data = self.get_valid_update_data()
+        data["pricingType"] = "PAID"
+        data["paymentType"] = "INVOICE"
+
+        response = self.query(self.get_update_query(), input_data=data)
+        assert_that(response.status_code).is_equal_to(200)
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        assert_that(
+            content.get("data").get("updateReservationUnit").get("pk")
+        ).is_not_none()
+
+        created_unit = ReservationUnit.objects.get(
+            pk=content.get("data").get("updateReservationUnit").get("pk")
+        )
+        assert_that(created_unit).is_not_none()
+        assert_that(created_unit.pricing_type).is_equal_to(PricingType.PAID)
+        assert_that(created_unit.payment_type).is_equal_to(PaymentType.INVOICE)
 
 
 class ReservationUnitUpdateNotDraftTestCase(ReservationUnitMutationsTestCaseBase):
@@ -4060,3 +4129,25 @@ class ReservationUnitUpdateNotDraftTestCase(ReservationUnitMutationsTestCaseBase
         assert_that(created_unit).is_not_none()
         assert_that(created_unit.pricing_type).is_equal_to(PricingType.PAID)
         assert_that(created_unit.pricing_terms).is_equal_to(self.pricing_term)
+
+    def test_update_with_payment_type(self):
+        self.client.force_login(self.general_admin)
+        data = self.get_valid_update_data()
+        data["pricingType"] = "PAID"
+        data["paymentType"] = "ON_SITE"
+
+        response = self.query(self.get_update_query(), input_data=data)
+        assert_that(response.status_code).is_equal_to(200)
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        assert_that(
+            content.get("data").get("updateReservationUnit").get("pk")
+        ).is_not_none()
+
+        created_unit = ReservationUnit.objects.get(
+            pk=content.get("data").get("updateReservationUnit").get("pk")
+        )
+        assert_that(created_unit).is_not_none()
+        assert_that(created_unit.pricing_type).is_equal_to(PricingType.PAID)
+        assert_that(created_unit.payment_type).is_equal_to(PaymentType.ON_SITE)

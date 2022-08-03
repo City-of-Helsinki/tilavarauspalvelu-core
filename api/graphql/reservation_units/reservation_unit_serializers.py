@@ -18,6 +18,7 @@ from api.reservation_units_api import (
 from reservation_units.models import (
     Equipment,
     EquipmentCategory,
+    PaymentType,
     PricingType,
     Purpose,
     ReservationKind,
@@ -251,6 +252,15 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
         ),
     )
 
+    payment_type = ChoiceCharField(
+        required=False,
+        choices=PaymentType.choices,
+        help_text=(
+            "If pricing type is PAID, what kind of payment type this reservation unit has. Possible values are "
+            f"{', '.join(value.upper() for value in PaymentType)}."
+        ),
+    )
+
     translation_fields = get_all_translatable_fields(ReservationUnit)
 
     class Meta(ReservationUnitSerializer.Meta):
@@ -309,6 +319,7 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
             "pricing_terms_pk",
             "pricing_terms",
             "pricing_type",
+            "payment_type",
         ] + get_all_translatable_fields(ReservationUnit)
 
     def __init__(self, *args, **kwargs):
