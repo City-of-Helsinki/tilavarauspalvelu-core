@@ -1375,28 +1375,6 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                 heading={t("ReservationUnitEditor.termsInstructions")}
               >
                 <EditorGrid>
-                  {languages.map((lang) => {
-                    const fieldName = `termsOfUse${upperFirst(lang)}`;
-                    return (
-                      <Span12 key={lang}>
-                        <RichTextInput
-                          id={fieldName}
-                          label={t(`ReservationUnitEditor.label.${fieldName}`)}
-                          value={get(
-                            state,
-                            `reservationUnitEdit.${fieldName}`,
-                            ""
-                          )}
-                          onChange={(value) =>
-                            setValue({
-                              [fieldName]: value,
-                            })
-                          }
-                          errorText={getValidationError(fieldName)}
-                        />
-                      </Span12>
-                    );
-                  })}
                   {["serviceSpecific", "payment", "cancellation"].map(
                     (name) => {
                       const options = get(state, `${name}TermsOptions`);
@@ -1425,6 +1403,28 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                       );
                     }
                   )}
+                  {languages.map((lang) => {
+                    const fieldName = `termsOfUse${upperFirst(lang)}`;
+                    return (
+                      <Span12 key={lang}>
+                        <RichTextInput
+                          id={fieldName}
+                          label={t(`ReservationUnitEditor.label.${fieldName}`)}
+                          value={get(
+                            state,
+                            `reservationUnitEdit.${fieldName}`,
+                            ""
+                          )}
+                          onChange={(value) =>
+                            setValue({
+                              [fieldName]: value,
+                            })
+                          }
+                          errorText={getValidationError(fieldName)}
+                        />
+                      </Span12>
+                    );
+                  })}
                 </EditorGrid>
               </Accordion>
             )}
