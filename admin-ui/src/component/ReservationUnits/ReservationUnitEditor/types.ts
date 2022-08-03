@@ -76,6 +76,7 @@ export type State = {
   purposeOptions: OptionType[];
   reservationUnitTypeOptions: OptionType[];
   paymentTermsOptions: OptionType[];
+  pricingTermsOptions: OptionType[];
   cancellationTermsOptions: OptionType[];
   serviceSpecificTermsOptions: OptionType[];
   cancellationRuleOptions: OptionType[];
@@ -102,6 +103,11 @@ const requiredForSingle = (then: Joi.SchemaLike) =>
     then,
   });
 
+const requiredForNonFree = (then: Joi.SchemaLike) =>
+  Joi.when("pricingType", {
+    not: "FREE",
+    then,
+  });
 export const schema = Joi.object({
   reservationKind: Joi.string().required(),
   nameFi: Joi.string().required().max(80),
@@ -129,6 +135,9 @@ export const schema = Joi.object({
   additionalInstructionsFi: Joi.string().allow("").max(10000),
   additionalInstructionsSv: Joi.string().allow("").max(10000),
   additionalInstructionsEn: Joi.string().allow("").max(10000),
+  lowestPrice: requiredForNonFree(Joi.number().required()),
+  priceUnit: requiredForNonFree(Joi.string().required()),
+  taxPercentagePk: requiredForNonFree(Joi.number().required()),
 }).options({
   allowUnknown: true,
   abortEarly: false,

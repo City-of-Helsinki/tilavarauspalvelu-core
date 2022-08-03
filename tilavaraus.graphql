@@ -9,6 +9,20 @@ type AbilityGroupType {
   pk: Int
 }
 
+input AddressCreateSerializerInput {
+  pk: Int
+  streetAddress: String!
+  postCode: String!
+  city: String!
+}
+
+input AddressSerializerInput {
+  id: Int
+  streetAddress: String!
+  postCode: String!
+  city: String!
+}
+
 type AddressType implements Node {
   streetAddress: String!
   postCode: String!
@@ -45,22 +59,89 @@ type AgeGroupTypeEdge {
   cursor: String!
 }
 
-"""An enumeration."""
-enum allocatedDay {
-  MONDAY
-  TUESDAY
-  WEDNESDAY
-  THURSDAY
-  FRIDAY
-  SATURDAY
-  SUNDAY
-}
-
 type ApplicationAggregatedDataType {
   appliedMinDurationTotal: Float
   appliedReservationsTotal: Float
   createdReservationsTotal: Float
   reservationsDurationTotal: Float
+}
+
+input ApplicationCreateMutationInput {
+  applicantType: String!
+
+  """Organisation information for the application"""
+  organisation: OrganisationCreateSerializerInput
+
+  """Id of the application period for which this application is targeted to"""
+  applicationRoundPk: Int!
+
+  """Contact person information for the application"""
+  contactPerson: PersonCreateSerializerInput!
+  user: String
+
+  """List of applications events"""
+  applicationEvents: [ApplicationEventInApplicationSerializerInput]!
+
+  """Status of this application"""
+  status: String!
+
+  """Billing address for the application"""
+  billingAddress: AddressCreateSerializerInput!
+  homeCityPk: Int
+
+  """Additional information about the application"""
+  additionalInformation: String
+  clientMutationId: String
+}
+
+type ApplicationCreateMutationPayload {
+  pk: Int
+  applicantType: String
+  applicantName: String
+  applicantEmail: String
+
+  """Organisation information for the application"""
+  organisation: OrganisationType
+
+  """Id of the application period for which this application is targeted to"""
+  applicationRoundPk: Int
+
+  """Contact person information for the application"""
+  contactPerson: PersonType
+
+  """List of applications events"""
+  applicationEvents: [ApplicationEventType]
+
+  """Status of this application"""
+  status: String
+
+  """Billing address for the application"""
+  billingAddress: AddressType
+  homeCityPk: Int
+  createdDate: DateTime
+  lastModifiedDate: DateTime
+
+  """Additional information about the application"""
+  additionalInformation: String
+
+  """May contain more than one error for same field."""
+  errors: [ErrorType]
+  application: ApplicationType
+  clientMutationId: String
+}
+
+input ApplicationDeclineMutationInput {
+  pk: Int
+  clientMutationId: String
+}
+
+type ApplicationDeclineMutationPayload {
+  pk: Int
+  status: String
+
+  """May contain more than one error for same field."""
+  errors: [ErrorType]
+  clientMutationId: String
 }
 
 type ApplicationEventAggregatedDataType {
@@ -133,6 +214,20 @@ type ApplicationEventCreateMutationPayload {
   clientMutationId: String
 }
 
+input ApplicationEventDeclineMutationInput {
+  pk: Int
+  clientMutationId: String
+}
+
+type ApplicationEventDeclineMutationPayload {
+  pk: Int
+  status: String
+
+  """May contain more than one error for same field."""
+  errors: [ErrorType]
+  clientMutationId: String
+}
+
 input ApplicationEventDeleteMutationInput {
   pk: Int!
   clientMutationId: String
@@ -142,6 +237,35 @@ type ApplicationEventDeleteMutationPayload {
   deleted: Boolean
   errors: String
   clientMutationId: String
+}
+
+input ApplicationEventInApplicationSerializerInput {
+  pk: Int
+  name: String
+  applicationEventSchedules: [ApplicationEventScheduleCreateSerializerInput]!
+  numPersons: Int
+
+  """Age group pk for this event"""
+  ageGroup: Int!
+
+  """AbilityGroup pk for this event"""
+  abilityGroup: Int!
+  minDuration: String
+  maxDuration: String
+
+  """Application pk for this event"""
+  application: Int
+  eventsPerWeek: Int
+  biweekly: Boolean
+  begin: Date
+  end: Date
+
+  """ReservationPurpose pk for this event"""
+  purpose: Int!
+  eventReservationUnits: [EventReservationUnitCreateSerializerInput]!
+
+  """Status of this application event"""
+  status: String!
 }
 
 input ApplicationEventScheduleCreateSerializerInput {
@@ -194,7 +318,7 @@ type ApplicationEventScheduleResultType implements Node {
   accepted: Boolean!
   declined: Boolean!
   allocatedReservationUnit: ReservationUnitType
-  allocatedDay: allocatedDay
+  allocatedDay: Int
   allocatedBegin: Time!
   allocatedEnd: Time!
   basket: ApplicationRoundBasketType
@@ -271,18 +395,14 @@ type ApplicationEventType implements Node {
   end: Date
   application: ApplicationType!
   purpose: ReservationPurposeType
+  declinedReservationUnits: [ReservationUnitType!]
   uuid: UUID!
   aggregatedData: ApplicationEventAggregatedDataType
   eventReservationUnits: [EventReservationUnitType]
   applicationEventSchedules: [ApplicationEventScheduleType]
   pk: Int
-  ageGroupId: Int
-  abilityGroupId: Int
-  applicationId: Int
-  purposeId: Int
   status: applicationEventStatus
   weeklyAmountReductionsCount: Int
-  declinedReservationUnits: [ReservationUnitType!]
 }
 
 type ApplicationEventTypeConnection {
@@ -516,6 +636,7 @@ type ApplicationType implements Node {
   applicantType: ApplicationsApplicationApplicantTypeChoices
   organisation: OrganisationType
   contactPerson: PersonType
+  applicationRound: ApplicationRoundType!
   billingAddress: AddressType
   homeCity: CityType
 
@@ -526,9 +647,8 @@ type ApplicationType implements Node {
   aggregatedData: ApplicationAggregatedDataType
   applicationEvents: [ApplicationEventType]
   pk: Int
-  applicationRoundId: Int
   status: applicationStatus
-  applicantId: Int
+  applicantPk: Int
   applicantName: String
   applicantEmail: String
 }
@@ -549,6 +669,71 @@ type ApplicationTypeEdge {
 
   """A cursor for use in pagination"""
   cursor: String!
+}
+
+input ApplicationUpdateMutationInput {
+  pk: Int
+  applicantType: String
+
+  """Organisation information for the application"""
+  organisation: OrganisationCreateSerializerInput
+
+  """Id of the application period for which this application is targeted to"""
+  applicationRoundPk: Int
+
+  """Contact person information for the application"""
+  contactPerson: PersonCreateSerializerInput
+  user: String
+
+  """Application events in application"""
+  applicationEvents: [ApplicationEventInApplicationSerializerInput]
+
+  """Status of this application"""
+  status: String
+
+  """Billing address for the application"""
+  billingAddress: AddressCreateSerializerInput
+  homeCityPk: Int
+
+  """Additional information about the application"""
+  additionalInformation: String
+  clientMutationId: String
+}
+
+type ApplicationUpdateMutationPayload {
+  pk: Int
+  applicantType: String
+  applicantName: String
+  applicantEmail: String
+
+  """Organisation information for the application"""
+  organisation: OrganisationType
+
+  """Id of the application period for which this application is targeted to"""
+  applicationRoundPk: Int
+
+  """Contact person information for the application"""
+  contactPerson: PersonType
+
+  """Application events in application"""
+  applicationEvents: [ApplicationEventType]
+
+  """Status of this application"""
+  status: String
+
+  """Billing address for the application"""
+  billingAddress: AddressType
+  homeCityPk: Int
+  createdDate: DateTime
+  lastModifiedDate: DateTime
+
+  """Additional information about the application"""
+  additionalInformation: String
+
+  """May contain more than one error for same field."""
+  errors: [ErrorType]
+  application: ApplicationType
+  clientMutationId: String
 }
 
 type BuildingType implements Node {
@@ -810,7 +995,6 @@ type EventReservationUnitType implements Node {
   priority: Int
   reservationUnit: ReservationUnitType
   pk: Int
-  reservationUnitId: Int
 }
 
 type KeywordCategoryType implements Node {
@@ -916,9 +1100,13 @@ type LocationType implements Node {
 }
 
 type Mutation {
+  createApplication(input: ApplicationCreateMutationInput!): ApplicationCreateMutationPayload
+  updateApplication(input: ApplicationUpdateMutationInput!): ApplicationUpdateMutationPayload
+  declineApplication(input: ApplicationDeclineMutationInput!): ApplicationDeclineMutationPayload
   createApplicationEvent(input: ApplicationEventCreateMutationInput!): ApplicationEventCreateMutationPayload
   updateApplicationEvent(input: ApplicationEventUpdateMutationInput!): ApplicationEventUpdateMutationPayload
   deleteApplicationEvent(input: ApplicationEventDeleteMutationInput!): ApplicationEventDeleteMutationPayload
+  declineApplicationEvent(input: ApplicationEventDeclineMutationInput!): ApplicationEventDeclineMutationPayload
   createApplicationEventScheduleResult(input: ApplicationEventScheduleResultCreateMutationInput!): ApplicationEventScheduleResultCreateMutationPayload
   updateApplicationEventScheduleResult(input: ApplicationEventScheduleResultUpdateMutationInput!): ApplicationEventScheduleResultUpdateMutationPayload
   createReservation(input: ReservationCreateMutationInput!): ReservationCreateMutationPayload
@@ -970,6 +1158,41 @@ type OpeningTimesType {
   periods: [Int]
 }
 
+"""An enumeration."""
+enum organisation_type {
+  """Company"""
+  COMPANY
+
+  """Registered association"""
+  REGISTERED_ASSOCIATION
+
+  """Public association"""
+  PUBLIC_ASSOCIATION
+
+  """Unregistered association"""
+  UNREGISTERED_ASSOCIATION
+
+  """Municipality consortium"""
+  MUNICIPALITY_CONSORTIUM
+
+  """Religious community"""
+  RELIGIOUS_COMMUNITY
+}
+
+input OrganisationCreateSerializerInput {
+  pk: Int
+  name: String!
+  identifier: String
+  yearEstablished: Int
+  activeMembers: Int
+  organisationType: organisation_type
+  coreBusiness: String
+  email: String
+
+  """Address object of this organisation"""
+  address: AddressSerializerInput!
+}
+
 type OrganisationType implements Node {
   """The ID of the object"""
   id: ID!
@@ -1013,6 +1236,14 @@ type PeriodType {
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+}
+
+input PersonCreateSerializerInput {
+  pk: Int
+  firstName: String!
+  lastName: String!
+  email: String
+  phoneNumber: String
 }
 
 type PersonType implements Node {
@@ -1131,6 +1362,7 @@ type Query {
     user: ID = null
     pk: [ID] = null
     application: ID = null
+    applicationStatus: String = null
     reservationUnit: [ID] = null
     applicantType: [String] = null
 
@@ -1146,10 +1378,18 @@ type Query {
     last: Int = null
     begin: DateTime = null
     end: DateTime = null
+    priceGte: Float = null
+    priceLte: Float = null
     state: [String] = null
     requested: Boolean = null
     onlyWithPermission: Boolean = null
     user: ID = null
+    reservationUnitNameFi: String = null
+    reservationUnitNameEn: String = null
+    reservationUnitNameSv: String = null
+    unit: [ID] = null
+    reservationUnitType: [ID] = null
+    textSearch: String = null
 
     """Järjestys"""
     orderBy: String = null
@@ -1794,6 +2034,10 @@ type ReservationUnitByPkType implements Node {
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
+  paymentTerms: TermsOfUseType
+  cancellationTerms: TermsOfUseType
+  serviceSpecificTerms: TermsOfUseType
+  pricingTerms: TermsOfUseType
   additionalInstructionsFi: String
   additionalInstructionsEn: String
   additionalInstructionsSv: String
@@ -1804,8 +2048,10 @@ type ReservationUnitByPkType implements Node {
   isDraft: Boolean!
   maxPersons: Int
   minPersons: Int
+  surfaceArea: Decimal
   bufferTimeBefore: Duration
   bufferTimeAfter: Duration
+  cancellationRule: ReservationUnitCancellationRuleType
 
   """Unit of the price"""
   priceUnit: ReservationUnitsReservationUnitPriceUnitChoices!
@@ -1853,8 +2099,14 @@ type ReservationUnitByPkType implements Node {
   """Authentication required for reserving this reservation unit."""
   authentication: ReservationUnitsReservationUnitAuthenticationChoices!
 
+  """Order number to be use in api sorting."""
+  rank: Int
+
   """What kind of reservations are to be booked with this reservation unit."""
   reservationKind: ReservationUnitsReservationUnitReservationKindChoices!
+
+  """What kind of pricing types are available with this reservation unit."""
+  pricingType: ReservationUnitsReservationUnitPricingTypeChoices
 
   """
   Can reservations to this reservation unit be able to apply free of charge.
@@ -1869,6 +2121,7 @@ type ReservationUnitByPkType implements Node {
   """Is reservation unit archived."""
   isArchived: Boolean!
   images: [ReservationUnitImageType]
+  applicationRounds(active: Boolean = null): [ApplicationRoundType]
 
   """The ID of the object"""
   id: ID!
@@ -1877,15 +2130,8 @@ type ReservationUnitByPkType implements Node {
   location: LocationType
   equipment: [EquipmentType]
   unit: UnitType
-  surfaceArea: Decimal
   keywordGroups: [KeywordGroupType]
   reservations(from: Date = null, to: Date = null, state: [String] = null): [ReservationType]
-  applicationRounds(active: Boolean = null): [ApplicationRoundType]
-  cancellationRule: ReservationUnitCancellationRuleType
-  paymentTerms: TermsOfUseType
-  cancellationTerms: TermsOfUseType
-  serviceSpecificTerms: TermsOfUseType
-  pricingTerms: TermsOfUseType
   state: ReservationUnitState
   nextAvailableSlot: DateTime
   haukiUrl: ReservationUnitHaukiUrlType
@@ -2021,18 +2267,25 @@ input ReservationUnitCreateMutationInput {
 
   """Is reservation unit archived"""
   isArchived: Boolean
+  pricingTermsPk: String
+  pricingTerms: String
+
+  """
+  What kind of pricing type this reservation unit has. Possible values are PAID, FREE.
+  """
+  pricingType: String
   nameFi: String
   nameEn: String
   nameSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
-  additionalInstructionsFi: String
-  additionalInstructionsEn: String
-  additionalInstructionsSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  additionalInstructionsFi: String
+  additionalInstructionsEn: String
+  additionalInstructionsSv: String
   clientMutationId: String
 }
 
@@ -2146,18 +2399,24 @@ type ReservationUnitCreateMutationPayload {
   """Is reservation unit archived"""
   isArchived: Boolean
   state: String
+  pricingTerms: String
+
+  """
+  What kind of pricing type this reservation unit has. Possible values are PAID, FREE.
+  """
+  pricingType: String
   nameFi: String
   nameEn: String
   nameSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
-  additionalInstructionsFi: String
-  additionalInstructionsEn: String
-  additionalInstructionsSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  additionalInstructionsFi: String
+  additionalInstructionsEn: String
+  additionalInstructionsSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -2594,18 +2853,25 @@ input ReservationUnitUpdateMutationInput {
 
   """Is reservation unit archived"""
   isArchived: Boolean
+  pricingTermsPk: String
+  pricingTerms: String
+
+  """
+  What kind of pricing type this reservation unit has. Possible values are PAID, FREE.
+  """
+  pricingType: String
   nameFi: String
   nameEn: String
   nameSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
-  additionalInstructionsFi: String
-  additionalInstructionsEn: String
-  additionalInstructionsSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  additionalInstructionsFi: String
+  additionalInstructionsEn: String
+  additionalInstructionsSv: String
   clientMutationId: String
 }
 
@@ -2719,18 +2985,24 @@ type ReservationUnitUpdateMutationPayload {
   """Is reservation unit archived"""
   isArchived: Boolean
   state: String
+  pricingTerms: String
+
+  """
+  What kind of pricing type this reservation unit has. Possible values are PAID, FREE.
+  """
+  pricingType: String
   nameFi: String
   nameEn: String
   nameSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
-  additionalInstructionsFi: String
-  additionalInstructionsEn: String
-  additionalInstructionsSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  additionalInstructionsFi: String
+  additionalInstructionsEn: String
+  additionalInstructionsSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -3403,15 +3675,15 @@ input UnitUpdateMutationInput {
   webPage: String
   email: String
   phone: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
   shortDescriptionFi: String
   shortDescriptionEn: String
   shortDescriptionSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
   clientMutationId: String
 }
 
@@ -3421,15 +3693,15 @@ type UnitUpdateMutationPayload {
   webPage: String
   email: String
   phone: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
   shortDescriptionFi: String
   shortDescriptionEn: String
   shortDescriptionSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]

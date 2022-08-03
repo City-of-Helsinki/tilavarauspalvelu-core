@@ -1273,10 +1273,38 @@ const ReservationUnitEditor = (): JSX.Element | null => {
               heading={t("ReservationUnitEditor.pricing")}
             >
               <EditorGrid>
+                <Span12>
+                  <span id="reservationKind">
+                    {t("ReservationUnitEditor.label.pricingType")} *
+                  </span>
+                </Span12>
+                {["FREE", "PAID"].map((pricingType, index) => (
+                  <Span3 key={pricingType}>
+                    <RadioButton
+                      id={`pricingType.${pricingType}`}
+                      name="pricingType"
+                      label={t(
+                        `ReservationUnitEditor.label.pricingTypes.${pricingType}`
+                      )}
+                      value={pricingType}
+                      checked={
+                        state.reservationUnitEdit.pricingType === pricingType
+                      }
+                      onChange={() => setValue({ pricingType })}
+                    />
+                    {index === 0 && getValidationError("pricingType") && (
+                      <Error>
+                        <IconAlertCircleFill />
+                        <span>{getValidationError("pricingType")}</span>
+                      </Error>
+                    )}
+                  </Span3>
+                ))}
                 <Span3>
                   <NumberInput
                     value={state.reservationUnitEdit.lowestPrice || 0}
                     id="lowestPrice"
+                    required
                     label={t("ReservationUnitEditor.label.lowestPrice")}
                     minusStepButtonAriaLabel={t(
                       "common.decreaseByOneAriaLabel"
@@ -1300,6 +1328,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                 </Span3>
                 <Span3>
                   <NumberInput
+                    required
                     value={state.reservationUnitEdit.highestPrice || 0}
                     id="highestPrice"
                     label={t("ReservationUnitEditor.label.highestPrice")}
@@ -1326,6 +1355,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                 <Span3>
                   <EnumSelect
                     id="priceUnit"
+                    required
                     value={state.reservationUnitEdit.priceUnit as string}
                     label={t("ReservationUnitEditor.priceUnitLabel")}
                     type={ReservationUnitsReservationUnitPriceUnitChoices}
@@ -1334,6 +1364,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                 </Span3>
                 <Span3>
                   <Select
+                    required
                     id="taxPercentage"
                     label={t(`ReservationUnitEditor.taxPercentageLabel`)}
                     options={state.taxPercentageOptions}
@@ -1367,6 +1398,32 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                     }
                   />
                 </Span12>
+                {["pricing"].map((name) => {
+                  const options = get(state, "pricingTermsOptions");
+                  return (
+                    <Span6 key={name}>
+                      <Select
+                        required
+                        sort
+                        id={name}
+                        label={t("ReservationUnitEditor.label.pricingTermsPk")}
+                        placeholder={t("common.select")}
+                        options={options}
+                        onChange={(pricingTermsPk) => {
+                          setValue({
+                            pricingTermsPk,
+                          });
+                        }}
+                        value={
+                          get(
+                            state.reservationUnitEdit,
+                            "pricingTermsPk"
+                          ) as string
+                        }
+                      />
+                    </Span6>
+                  );
+                })}
               </EditorGrid>
             </Accordion>
             {onlyForDirect && (
@@ -1489,7 +1546,6 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                 </Span12>
               </EditorGrid>
             </Accordion>
-
             <Accordion
               initiallyOpen={state.validationErrors != null}
               heading={t("ReservationUnitEditor.openingHours")}

@@ -1051,6 +1051,12 @@ const translations: ITranslations = {
         DIRECT: ["Vain yksittäisvaraus"],
         SEASON: ["Vain kausivaraus"],
       },
+      pricingType: ["Varausyksikön maksullisuus"],
+      pricingTermsPk: ["Hinnoitteluperiaate"],
+      pricingTypes: {
+        PAID: ["Maksullinen"],
+        FREE: ["Maksuton"],
+      },
     },
     authenticationLabel: ["Tunnistautuminen"],
     defaultHeading: ["Uusi varausyksikkö"],
