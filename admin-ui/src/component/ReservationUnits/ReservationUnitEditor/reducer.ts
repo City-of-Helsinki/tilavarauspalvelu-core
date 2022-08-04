@@ -26,6 +26,7 @@ export const getInitialState = (reservationUnitPk: number): State => ({
   hasChanges: false,
   loading: true,
   paymentTermsOptions: [],
+  pricingTermsOptions: [],
   purposeOptions: [],
   reservationUnit: null,
   reservationUnitEdit: {},
@@ -190,6 +191,7 @@ export const reducer = (state: State, action: Action): State => {
             Number(s?.pk)
           ) as number[],
           paymentTermsPk: get(reservationUnit, "paymentTerms.pk"),
+          pricingTermsPk: get(reservationUnit, "pricingTerms.pk"),
           reservationUnitTypePk: get(reservationUnit, "reservationUnitType.pk"),
           cancellationTermsPk: get(reservationUnit, "cancellationTerms.pk"),
           cancellationRulePk: get(reservationUnit, "cancellationRule.pk"),
@@ -201,6 +203,7 @@ export const reducer = (state: State, action: Action): State => {
             "serviceSpecificTerms.pk"
           ),
           metadataSetPk: get(reservationUnit, "metadataSet.pk", null),
+          pricingType: get(reservationUnit, "pricingType") || undefined, // update api does not allow null
         },
         hasChanges: false,
         images: sortImages(
@@ -213,6 +216,13 @@ export const reducer = (state: State, action: Action): State => {
           )
         ),
       });
+    }
+    case "created": {
+      return {
+        ...state,
+        reservationUnitPk: action.pk,
+        reservationUnitEdit: { ...state.reservationUnitEdit, pk: action.pk },
+      };
     }
     case "unitLoaded": {
       const { unit } = action;
@@ -267,6 +277,10 @@ export const reducer = (state: State, action: Action): State => {
         paymentTermsOptions: makeTermsOptions(
           action,
           TermsOfUseTermsOfUseTermsTypeChoices.PaymentTerms
+        ),
+        pricingTermsOptions: makeTermsOptions(
+          action,
+          TermsOfUseTermsOfUseTermsTypeChoices.PricingTerms
         ),
         taxPercentageOptions: [nullOption].concat(
           (action.parameters.taxPercentages?.edges || []).map(

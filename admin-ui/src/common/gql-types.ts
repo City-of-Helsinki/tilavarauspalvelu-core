@@ -2294,11 +2294,15 @@ export type ReservationUnitByPkType = Node & {
   /** Unit of the price */
   priceUnit: ReservationUnitsReservationUnitPriceUnitChoices;
   pricingTerms?: Maybe<TermsOfUseType>;
+  /** What kind of pricing types are available with this reservation unit. */
+  pricingType?: Maybe<ReservationUnitsReservationUnitPricingTypeChoices>;
   /** Time after this reservation unit should be publicly visible in UI. */
   publishBegins?: Maybe<Scalars["DateTime"]>;
   /** Time after this reservation unit should not be publicly visible in UI. */
   publishEnds?: Maybe<Scalars["DateTime"]>;
   purposes?: Maybe<Array<Maybe<PurposeType>>>;
+  /** Order number to be use in api sorting. */
+  rank?: Maybe<Scalars["Int"]>;
   requireIntroduction: Scalars["Boolean"];
   /** Does reservations of this reservation unit need to be handled before they're confirmed. */
   requireReservationHandling: Scalars["Boolean"];
@@ -3629,17 +3633,6 @@ export type UnitUpdateMutationPayload = {
   unit?: Maybe<UnitType>;
   webPage?: Maybe<Scalars["String"]>;
 };
-
-/** An enumeration. */
-export enum AllocatedDay {
-  Friday = "FRIDAY",
-  Monday = "MONDAY",
-  Saturday = "SATURDAY",
-  Sunday = "SUNDAY",
-  Thursday = "THURSDAY",
-  Tuesday = "TUESDAY",
-  Wednesday = "WEDNESDAY",
-}
 
 /** An enumeration. */
 export enum ApplicationEventStatus {
