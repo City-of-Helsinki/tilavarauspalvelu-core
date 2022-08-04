@@ -1418,34 +1418,31 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                         }
                       />
                     </Span12>
-                    {["pricing"].map((name) => {
-                      const options = get(state, "pricingTermsOptions");
-                      return (
-                        <Span6 key={name}>
-                          <Select
-                            required
-                            sort
-                            id={name}
-                            label={t(
-                              "ReservationUnitEditor.label.pricingTermsPk"
-                            )}
-                            placeholder={t("common.select")}
-                            options={options}
-                            onChange={(pricingTermsPk) => {
-                              setValue({
-                                pricingTermsPk,
-                              });
-                            }}
-                            value={
-                              get(
-                                state.reservationUnitEdit,
-                                "pricingTermsPk"
-                              ) as string
-                            }
-                          />
-                        </Span6>
-                      );
-                    })}
+                    {state.reservationUnitEdit?.canApplyFreeOfCharge && (
+                      <Span6>
+                        <Select
+                          required
+                          sort
+                          id="pricingTerms"
+                          label={t(
+                            "ReservationUnitEditor.label.pricingTermsPk"
+                          )}
+                          placeholder={t("common.select")}
+                          options={get(state, "pricingTermsOptions")}
+                          onChange={(pricingTermsPk) => {
+                            setValue({
+                              pricingTermsPk,
+                            });
+                          }}
+                          value={
+                            get(
+                              state.reservationUnitEdit,
+                              "pricingTermsPk"
+                            ) as string
+                          }
+                        />
+                      </Span6>
+                    )}
                   </>
                 )}
               </EditorGrid>
