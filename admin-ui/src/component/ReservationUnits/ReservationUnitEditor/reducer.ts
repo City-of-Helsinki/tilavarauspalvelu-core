@@ -158,7 +158,7 @@ export const reducer = (state: State, action: Action): State => {
             "maxReservationDuration",
             "minReservationDuration",
             "pk",
-            "pricingType",
+            "priceUnit",
             "publishBegins",
             "publishEnds",
             "requireIntroduction",
@@ -203,7 +203,7 @@ export const reducer = (state: State, action: Action): State => {
             "serviceSpecificTerms.pk"
           ),
           metadataSetPk: get(reservationUnit, "metadataSet.pk", null),
-          priceUnit: get(reservationUnit, "priceUnit") || undefined, // update api does not allow null
+          pricingType: get(reservationUnit, "pricingType") || undefined, // update api does not allow null
         },
         hasChanges: false,
         images: sortImages(
@@ -218,7 +218,11 @@ export const reducer = (state: State, action: Action): State => {
       });
     }
     case "created": {
-      return { ...state, reservationUnitPk: action.pk };
+      return {
+        ...state,
+        reservationUnitPk: action.pk,
+        reservationUnitEdit: { ...state.reservationUnitEdit, pk: action.pk },
+      };
     }
     case "unitLoaded": {
       const { unit } = action;
