@@ -457,3 +457,8 @@ export interface UnitWIP {
   openingHours: [];
   reservationUnits: [];
 }
+
+export type AllocationApplicationEventCardType =
+  | "unallocated"
+  | "allocated"
+  | "declined";

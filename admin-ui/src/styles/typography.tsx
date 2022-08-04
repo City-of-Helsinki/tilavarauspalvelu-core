@@ -45,3 +45,13 @@ export const RequiredLabel = css`
     font-weight: 700;
   }
 `;
+
+export const FontBold = css`
+  font-family: var(--tilavaraus-admin-font-bold);
+  font-weight: 700;
+`;
+
+export const FontMedium = css`
+  font-family: var(--tilavaraus-admin-font-medium);
+  font-weight: 500;
+`;
