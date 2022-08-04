@@ -63,3 +63,15 @@ export const H5 = styled.h5`
     line-height: var(--lineheight-l);
   }
 `;
+
+export const H6 = styled.h6`
+  font-size: var(--fontsize-heading-xxs);
+  font-family: var(--font-bold);
+  font-weight: 700;
+  line-height: var(--lineheight-l);
+
+  @media (min-width: ${breakpoints.s}) {
+    font-size: var(--fontsize-heading-xs);
+    line-height: var(--lineheight-l);
+  }
+`;

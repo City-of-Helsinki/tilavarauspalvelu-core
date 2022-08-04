@@ -3,15 +3,24 @@ import React, { useContext } from "react";
 export type NotificationContextProps = {
   notification: NotificationType | null;
   setNotification: (notification: NotificationType) => void;
-  notifyError: (title: string, message?: string) => void;
-  notifySuccess: (title: string, message?: string) => void;
+  notifyError: (
+    title: string,
+    message?: string,
+    options?: NotificationOptions
+  ) => void;
+  notifySuccess: (
+    title: string,
+    message?: string,
+    options?: NotificationOptions
+  ) => void;
   clearNotification: () => void;
 };
 
 export type NotificationType = {
-  title: string;
+  title: string | null;
   message: string | null;
   type: "error" | "success";
+  options?: NotificationOptions;
 };
 
 export const NotificationContext =
@@ -22,6 +31,10 @@ export const NotificationContext =
     notifyError: () => {},
     notifySuccess: () => {},
   });
+
+export type NotificationOptions = {
+  dismissible?: boolean;
+};
 
 export const useNotification = (): NotificationContextProps =>
   useContext(NotificationContext);
@@ -43,19 +56,29 @@ export const NotificationContextProvider: React.FC = ({ children }) => {
     setCancel(timeout);
   };
 
-  function notifyError(title: string, message?: string) {
+  function notifyError(
+    title = "",
+    message?: string,
+    options?: NotificationOptions
+  ) {
     showDisappearingNotification({
       type: "error",
-      title,
+      title: title || null,
       message: message || null,
+      options,
     });
   }
 
-  function notifySuccess(title: string, message?: string) {
+  function notifySuccess(
+    title = "",
+    message?: string,
+    options?: NotificationOptions
+  ) {
     showDisappearingNotification({
       type: "success",
-      title,
+      title: title || null,
       message: message || null,
+      options,
     });
   }
 

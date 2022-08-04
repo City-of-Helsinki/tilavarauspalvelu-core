@@ -39,8 +39,7 @@ export const reservationPrice = (
 
 export const ageGroup = (
   group: Maybe<AgeGroupType> | undefined
-): string | null =>
-  group ? `${group.minimum} - ${group.maximum || ""}` : null;
+): string | null => (group ? `${group.minimum}-${group.maximum || ""}` : null);
 
 export const getTranslationKeyForType = (
   type: ReservationsReservationReserveeTypeChoices,

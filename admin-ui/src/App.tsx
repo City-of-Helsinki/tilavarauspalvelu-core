@@ -34,6 +34,7 @@ import RequestedReservation from "./component/reservations/requested/RequestedRe
 import PrivateRoutes from "./common/PrivateRoutes";
 import { prefixes } from "./common/urls";
 import ExternalScripts from "./common/ExternalScripts";
+import ApplicationRoundAllocation from "./component/recurring-reservations/allocation/ApplicationRoundAllocation";
 
 function App(): JSX.Element {
   return (
@@ -105,6 +106,11 @@ function App(): JSX.Element {
             <Route
               path={`${prefixes.recurringReservations}/application-rounds/:applicationRoundId/recommendation/:applicationEventScheduleId`}
               component={Recommendation}
+              exact
+            />
+            <Route
+              path={`${prefixes.recurringReservations}/application-rounds/:applicationRoundId/allocation`}
+              component={ApplicationRoundAllocation}
               exact
             />
             <Route

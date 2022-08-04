@@ -15,7 +15,7 @@ import {
   NormalizedApplicationRoundStatus,
   TranslationObject,
 } from "./types";
-import { LocationType, Query } from "./gql-types";
+import { ApplicationEventScheduleType, LocationType, Query } from "./gql-types";
 
 export const formatDate = (
   date: string | null,
@@ -127,6 +127,15 @@ export const parseApplicationEventSchedules = (
   return schedules
     .map((s) => `${s.begin.substring(0, 2)}-${s.end.substring(0, 2)}`)
     .join(", ");
+};
+
+export const parseApplicationEventScheduleTime = (
+  applicationEventSchedule: ApplicationEventScheduleType
+): string => {
+  const weekday = i18next.t(`dayShort.${applicationEventSchedule?.day}`);
+  return `${weekday} ${Number(
+    applicationEventSchedule.begin.substring(0, 2)
+  )}-${Number(applicationEventSchedule.end.substring(0, 2))}`;
 };
 
 interface HMS {

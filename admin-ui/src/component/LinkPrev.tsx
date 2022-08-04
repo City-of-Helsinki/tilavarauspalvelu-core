@@ -12,8 +12,10 @@ interface IProps {
 const StyledLink = styled(BasicLink)`
   display: inline-flex;
   align-items: center;
-  font-size: var(--fontsize-heading-s);
+  font-size: var(--fontsize-body-m);
   padding-right: var(--spacing-s);
+  text-decoration: underline;
+  gap: var(--spacing-2-xs);
 `;
 
 function LinkPrev({ route }: IProps): JSX.Element {
@@ -30,7 +32,7 @@ function LinkPrev({ route }: IProps): JSX.Element {
         }
       }}
     >
-      <IconAngleLeft size="m" aria-hidden />
+      <IconAngleLeft size="s" aria-hidden />
       {t("common.prev")}
     </StyledLink>
   );

@@ -5,6 +5,7 @@ import { ModalContextProvider } from "./ModalContext";
 import { NotificationContextProvider } from "./NotificationContext";
 import apolloClient from "../common/apolloClient";
 import { AuthStateContextProvider } from "./AuthStateContext";
+import { AllocationContextProvider } from "./AllocationContext";
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const withGlobalContext = (App: () => JSX.Element) => (): JSX.Element =>
@@ -14,7 +15,9 @@ export const withGlobalContext = (App: () => JSX.Element) => (): JSX.Element =>
         <DataContextProvider>
           <NotificationContextProvider>
             <ModalContextProvider>
-              <App />
+              <AllocationContextProvider>
+                <App />
+              </AllocationContextProvider>
             </ModalContextProvider>
           </NotificationContextProvider>
         </DataContextProvider>
