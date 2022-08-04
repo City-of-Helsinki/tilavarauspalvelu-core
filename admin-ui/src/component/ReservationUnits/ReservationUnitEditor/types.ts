@@ -36,6 +36,7 @@ export type Action =
   | { type: "dataInitializationError"; message: string }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   | { type: "set"; value: any }
+  | { type: "created"; pk: number }
   | { type: "setSpaces"; spaces: OptionType[] }
   | { type: "setResources"; resources: OptionType[] }
   | { type: "setEquipments"; equipments: OptionType[] }

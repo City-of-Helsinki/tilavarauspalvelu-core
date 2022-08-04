@@ -442,6 +442,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
             history.replace(
               `/unit/${unitPk}/reservationUnit/edit/${resUnitPk}`
             );
+            dispatch({ type: "created", pk: resUnitPk });
           }
           notifySuccess(
             t("ReservationUnitEditor.saved"),
