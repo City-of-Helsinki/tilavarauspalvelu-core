@@ -15,6 +15,7 @@ test("conditional validation", () => {
     descriptionFi: "fi",
     descriptionSv: "sv",
     descriptionEn: "en",
+    pricingType: "FREE",
   };
 
   expect(
