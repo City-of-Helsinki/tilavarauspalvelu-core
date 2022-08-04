@@ -135,6 +135,7 @@ export const schema = Joi.object({
   additionalInstructionsFi: Joi.string().allow("").max(10000),
   additionalInstructionsSv: Joi.string().allow("").max(10000),
   additionalInstructionsEn: Joi.string().allow("").max(10000),
+  pricingType: Joi.string().required(),
   lowestPrice: requiredForNonFree(Joi.number().required()),
   priceUnit: requiredForNonFree(Joi.string().required()),
   taxPercentagePk: requiredForNonFree(Joi.number().required()),

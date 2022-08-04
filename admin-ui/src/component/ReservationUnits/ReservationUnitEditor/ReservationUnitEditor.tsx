@@ -40,7 +40,13 @@ import {
   UNIT_WITH_SPACES_AND_RESOURCES,
 } from "../../../common/queries";
 import { OptionType } from "../../../common/types";
-import { ContentContainer, Span12, Span3, Span6 } from "../../../styles/layout";
+import {
+  ContentContainer,
+  Grid,
+  Span12,
+  Span3,
+  Span6,
+} from "../../../styles/layout";
 
 import { ButtonsStripe, WhiteButton } from "../../../styles/util";
 import Loader from "../../Loader";
@@ -198,7 +204,9 @@ const ReservationUnitEditor = (): JSX.Element | null => {
         "maxReservationDuration",
         "minReservationDuration",
         "pk",
+        "pricingType",
         "priceUnit",
+        "pricingTermsPk",
         "publishBegins",
         "publishEnds",
         "requireIntroduction",
@@ -1274,156 +1282,172 @@ const ReservationUnitEditor = (): JSX.Element | null => {
             >
               <EditorGrid>
                 <Span12>
-                  <span id="reservationKind">
+                  <span id="pricingType">
                     {t("ReservationUnitEditor.label.pricingType")} *
                   </span>
                 </Span12>
-                {["FREE", "PAID"].map((pricingType, index) => (
-                  <Span3 key={pricingType}>
-                    <RadioButton
-                      id={`pricingType.${pricingType}`}
-                      name="pricingType"
-                      label={t(
-                        `ReservationUnitEditor.label.pricingTypes.${pricingType}`
-                      )}
-                      value={pricingType}
-                      checked={
-                        state.reservationUnitEdit.pricingType === pricingType
-                      }
-                      onChange={() => setValue({ pricingType })}
-                    />
-                    {index === 0 && getValidationError("pricingType") && (
-                      <Error>
-                        <IconAlertCircleFill />
-                        <span>{getValidationError("pricingType")}</span>
-                      </Error>
-                    )}
-                  </Span3>
-                ))}
-                <Span3>
-                  <NumberInput
-                    value={state.reservationUnitEdit.lowestPrice || 0}
-                    id="lowestPrice"
-                    required
-                    label={t("ReservationUnitEditor.label.lowestPrice")}
-                    minusStepButtonAriaLabel={t(
-                      "common.decreaseByOneAriaLabel"
-                    )}
-                    plusStepButtonAriaLabel={t("common.increaseByOneAriaLabel")}
-                    onChange={(e) => {
-                      setValue({
-                        lowestPrice: Number(e.target.value),
-                        highestPrice: Math.max(
-                          Number(e.target.value),
-                          state.reservationUnitEdit.highestPrice || 0
-                        ),
-                      });
-                    }}
-                    step={1}
-                    type="number"
-                    min={0}
-                    errorText={getValidationError("lowestPrice")}
-                    invalid={!!getValidationError("lowestPrice")}
-                  />
-                </Span3>
-                <Span3>
-                  <NumberInput
-                    required
-                    value={state.reservationUnitEdit.highestPrice || 0}
-                    id="highestPrice"
-                    label={t("ReservationUnitEditor.label.highestPrice")}
-                    minusStepButtonAriaLabel={t(
-                      "common.decreaseByOneAriaLabel"
-                    )}
-                    plusStepButtonAriaLabel={t("common.increaseByOneAriaLabel")}
-                    onChange={(e) => {
-                      setValue({
-                        highestPrice: Number(e.target.value),
-                        lowestPrice: Math.min(
-                          Number(e.target.value),
-                          state.reservationUnitEdit.lowestPrice || 0
-                        ),
-                      });
-                    }}
-                    step={1}
-                    type="number"
-                    min={0}
-                    errorText={getValidationError("highestPrice")}
-                    invalid={!!getValidationError("highestPrice")}
-                  />
-                </Span3>
-                <Span3>
-                  <EnumSelect
-                    id="priceUnit"
-                    required
-                    value={state.reservationUnitEdit.priceUnit as string}
-                    label={t("ReservationUnitEditor.priceUnitLabel")}
-                    type={ReservationUnitsReservationUnitPriceUnitChoices}
-                    onChange={(priceUnit) => setValue({ priceUnit })}
-                  />
-                </Span3>
-                <Span3>
-                  <Select
-                    required
-                    id="taxPercentage"
-                    label={t(`ReservationUnitEditor.taxPercentageLabel`)}
-                    options={state.taxPercentageOptions}
-                    onChange={(selectedVat) => {
-                      setValue({
-                        taxPercentagePk: selectedVat,
-                      });
-                    }}
-                    value={
-                      get(
-                        state.reservationUnitEdit,
-                        "taxPercentagePk"
-                      ) as number
-                    }
-                  />
-                </Span3>
                 <Span12>
-                  <Checkbox
-                    label={t(
-                      "ReservationUnitEditor.label.canApplyFreeOfCharge"
-                    )}
-                    id="canApplyFreeOfCharge"
-                    checked={
-                      state.reservationUnitEdit.canApplyFreeOfCharge === true
-                    }
-                    onClick={() =>
-                      setValue({
-                        canApplyFreeOfCharge:
-                          !state.reservationUnitEdit?.canApplyFreeOfCharge,
-                      })
-                    }
-                  />
+                  <Grid>
+                    {["FREE", "PAID"].map((pricingType, index) => (
+                      <Span3 key={pricingType}>
+                        <RadioButton
+                          id={`pricingType.${pricingType}`}
+                          name="pricingType"
+                          label={t(
+                            `ReservationUnitEditor.label.pricingTypes.${pricingType}`
+                          )}
+                          value={pricingType}
+                          checked={
+                            state.reservationUnitEdit.pricingType ===
+                            pricingType
+                          }
+                          onChange={() => setValue({ pricingType })}
+                        />
+                        {index === 0 && getValidationError("pricingType") && (
+                          <Error>
+                            <IconAlertCircleFill />
+                            <span>{getValidationError("pricingType")}</span>
+                          </Error>
+                        )}
+                      </Span3>
+                    ))}
+                  </Grid>
                 </Span12>
-                {["pricing"].map((name) => {
-                  const options = get(state, "pricingTermsOptions");
-                  return (
-                    <Span6 key={name}>
+                {state.reservationUnitEdit.pricingType === "PAID" && (
+                  <>
+                    <Span3>
+                      <NumberInput
+                        value={state.reservationUnitEdit.lowestPrice || 0}
+                        id="lowestPrice"
+                        required
+                        label={t("ReservationUnitEditor.label.lowestPrice")}
+                        minusStepButtonAriaLabel={t(
+                          "common.decreaseByOneAriaLabel"
+                        )}
+                        plusStepButtonAriaLabel={t(
+                          "common.increaseByOneAriaLabel"
+                        )}
+                        onChange={(e) => {
+                          setValue({
+                            lowestPrice: Number(e.target.value),
+                            highestPrice: Math.max(
+                              Number(e.target.value),
+                              state.reservationUnitEdit.highestPrice || 0
+                            ),
+                          });
+                        }}
+                        step={1}
+                        type="number"
+                        min={0}
+                        errorText={getValidationError("lowestPrice")}
+                        invalid={!!getValidationError("lowestPrice")}
+                      />
+                    </Span3>
+                    <Span3>
+                      <NumberInput
+                        required
+                        value={state.reservationUnitEdit.highestPrice || 0}
+                        id="highestPrice"
+                        label={t("ReservationUnitEditor.label.highestPrice")}
+                        minusStepButtonAriaLabel={t(
+                          "common.decreaseByOneAriaLabel"
+                        )}
+                        plusStepButtonAriaLabel={t(
+                          "common.increaseByOneAriaLabel"
+                        )}
+                        onChange={(e) => {
+                          setValue({
+                            highestPrice: Number(e.target.value),
+                            lowestPrice: Math.min(
+                              Number(e.target.value),
+                              state.reservationUnitEdit.lowestPrice || 0
+                            ),
+                          });
+                        }}
+                        step={1}
+                        type="number"
+                        min={0}
+                        errorText={getValidationError("highestPrice")}
+                        invalid={!!getValidationError("highestPrice")}
+                      />
+                    </Span3>
+                    <Span3>
+                      <EnumSelect
+                        id="priceUnit"
+                        required
+                        value={state.reservationUnitEdit.priceUnit as string}
+                        label={t("ReservationUnitEditor.priceUnitLabel")}
+                        type={ReservationUnitsReservationUnitPriceUnitChoices}
+                        onChange={(priceUnit) => setValue({ priceUnit })}
+                      />
+                    </Span3>
+                    <Span3>
                       <Select
                         required
-                        sort
-                        id={name}
-                        label={t("ReservationUnitEditor.label.pricingTermsPk")}
-                        placeholder={t("common.select")}
-                        options={options}
-                        onChange={(pricingTermsPk) => {
+                        id="taxPercentage"
+                        label={t(`ReservationUnitEditor.taxPercentageLabel`)}
+                        options={state.taxPercentageOptions}
+                        onChange={(selectedVat) => {
                           setValue({
-                            pricingTermsPk,
+                            taxPercentagePk: selectedVat,
                           });
                         }}
                         value={
                           get(
                             state.reservationUnitEdit,
-                            "pricingTermsPk"
-                          ) as string
+                            "taxPercentagePk"
+                          ) as number
                         }
                       />
-                    </Span6>
-                  );
-                })}
+                    </Span3>
+                    <Span12>
+                      <Checkbox
+                        label={t(
+                          "ReservationUnitEditor.label.canApplyFreeOfCharge"
+                        )}
+                        id="canApplyFreeOfCharge"
+                        checked={
+                          state.reservationUnitEdit.canApplyFreeOfCharge ===
+                          true
+                        }
+                        onClick={() =>
+                          setValue({
+                            canApplyFreeOfCharge:
+                              !state.reservationUnitEdit?.canApplyFreeOfCharge,
+                          })
+                        }
+                      />
+                    </Span12>
+                    {["pricing"].map((name) => {
+                      const options = get(state, "pricingTermsOptions");
+                      return (
+                        <Span6 key={name}>
+                          <Select
+                            required
+                            sort
+                            id={name}
+                            label={t(
+                              "ReservationUnitEditor.label.pricingTermsPk"
+                            )}
+                            placeholder={t("common.select")}
+                            options={options}
+                            onChange={(pricingTermsPk) => {
+                              setValue({
+                                pricingTermsPk,
+                              });
+                            }}
+                            value={
+                              get(
+                                state.reservationUnitEdit,
+                                "pricingTermsPk"
+                              ) as string
+                            }
+                          />
+                        </Span6>
+                      );
+                    })}
+                  </>
+                )}
               </EditorGrid>
             </Accordion>
             {onlyForDirect && (
