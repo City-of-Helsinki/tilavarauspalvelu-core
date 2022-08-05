@@ -1,9 +1,10 @@
 import React, { useMemo } from "react";
 import { IconTicket, IconPlusCircle } from "hds-react";
-import { useTranslation } from "next-i18next";
+import { i18n, useTranslation } from "next-i18next";
 import { parseISO } from "date-fns";
 import router from "next/router";
 import styled, { css } from "styled-components";
+import { getReservationPrice } from "common";
 import { breakpoint } from "../../modules/style";
 import {
   getMainImage,
@@ -14,10 +15,7 @@ import IconWithText from "../common/IconWithText";
 import { MediumButton, truncatedText } from "../../styles/util";
 import { ReservationType } from "../../modules/gql-types";
 import { reservationUnitSinglePrefix } from "../../modules/const";
-import {
-  canUserCancelReservation,
-  getReservationPrice,
-} from "../../modules/reservation";
+import { canUserCancelReservation } from "../../modules/reservation";
 import { fontMedium } from "../../modules/style/typography";
 import {
   getReservationUnitName,
@@ -273,7 +271,11 @@ const ReservationCard = ({ reservation, type }: Props): JSX.Element => {
             </TimeStrip>
             <Price
               icon={<IconTicket aria-label={t("reservationUnit:price")} />}
-              text={getReservationPrice(reservation.price)}
+              text={getReservationPrice(
+                reservation.price,
+                i18n.t("prices:priceFree"),
+                i18n.language
+              )}
               data-testid="reservation__card--price"
             />
           </Bottom>

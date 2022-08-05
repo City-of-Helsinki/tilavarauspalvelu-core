@@ -1,9 +1,15 @@
 import React from "react";
 import { differenceInMinutes, parseISO } from "date-fns";
 import { useTranslation } from "react-i18next";
+import {
+  getPriceUnitMinutes,
+  getReservationPrice,
+  getReservationVolume,
+} from "common";
 import styled from "styled-components";
 import { IconCalendar } from "hds-react";
 import { isFinite } from "lodash";
+import { i18n } from "next-i18next";
 import { H1, H2, fontMedium, Strongish } from "../../modules/style/typography";
 import { capitalize, formatDurationMinutes } from "../../modules/util";
 import { breakpoint } from "../../modules/style";
@@ -11,12 +17,7 @@ import {
   ReservationUnitByPkType,
   ReservationUnitsReservationUnitPriceUnitChoices,
 } from "../../modules/gql-types";
-import {
-  getPrice,
-  getPriceUnitMinutes,
-  getVolume,
-} from "../../modules/reservationUnit";
-import { getReservationPrice } from "../../modules/reservation";
+import { getPrice } from "../../modules/reservationUnit";
 import { NoWrap } from "../../styles/util";
 
 export type TicketState = "incomplete" | "complete" | "error";
@@ -201,7 +202,7 @@ const Ticket = ({
     endDate !== beginDate ? endDate : ""
   }${endTime}`;
 
-  const multiplier = getVolume(duration, priceUnit);
+  const multiplier = getReservationVolume(duration, priceUnit);
 
   return (
     <Wrapper $state={state} data-testid="reservation__ticket--container">
@@ -265,7 +266,12 @@ const Ticket = ({
                 </div>
                 <div>
                   <Strongish>
-                    {getReservationPrice(reservationPrice, true)}
+                    {getReservationPrice(
+                      reservationPrice,
+                      i18n.t("prices:priceFree"),
+                      i18n.language,
+                      true
+                    )}
                   </Strongish>
                 </div>
               </PriceRow>

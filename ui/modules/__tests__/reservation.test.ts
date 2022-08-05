@@ -5,7 +5,6 @@ import {
   getDurationOptions,
   getReservationApplicationFields,
   getReservationApplicationMutationValues,
-  getReservationPrice,
 } from "../reservation";
 import mockTranslations from "../../public/locales/fi/prices.json";
 
@@ -155,32 +154,6 @@ describe("canUseCancelReservation", () => {
       reservationUnits: [{}],
     } as ReservationType;
     expect(canUserCancelReservation(reservation)).toBe(false);
-  });
-});
-
-describe("getReservationPrice", () => {
-  test("with no price", () => {
-    expect(getReservationPrice(0)).toBe("Maksuton");
-  });
-
-  test("with a price", () => {
-    expect(getReservationPrice(10)).toBe("10 €"); // contains non-breaking space
-  });
-
-  test("with a price and a decimal", () => {
-    expect(getReservationPrice(10.2)).toBe("10,2 €"); // contains non-breaking space
-  });
-
-  test("with a price and a decimal and a forced leading one", () => {
-    expect(getReservationPrice(10.2, true)).toBe("10,20 €"); // contains non-breaking space
-  });
-
-  test("with a price and decimals", () => {
-    expect(getReservationPrice(10.23)).toBe("10,23 €"); // contains non-breaking space
-  });
-
-  test("with a price and forced decimals", () => {
-    expect(getReservationPrice(10, true)).toBe("10,00 €"); // contains non-breaking space
   });
 });
 

@@ -1,9 +1,8 @@
 import { isAfter } from "date-fns";
-import { i18n } from "next-i18next";
 import camelCase from "lodash/camelCase";
 import { ReservationType } from "./gql-types";
 import { OptionType } from "./types";
-import { convertHMSToSeconds, getFormatters, secondsToHms } from "./util";
+import { convertHMSToSeconds, secondsToHms } from "./util";
 
 export const getDurationOptions = (
   minReservationDuration: number,
@@ -58,16 +57,6 @@ export const canUserCancelReservation = (
   if (isReservationWithinCancellationPeriod(reservation)) return false;
 
   return true;
-};
-
-export const getReservationPrice = (
-  price: number,
-  trailingZeros = false
-): string => {
-  const formatter = trailingZeros ? "currencyWithDecimals" : "currency";
-  return price
-    ? getFormatters()[formatter].format(price)
-    : i18n.t("prices:priceFree");
 };
 
 export type ReserveeType = "individual" | "nonprofit" | "business";

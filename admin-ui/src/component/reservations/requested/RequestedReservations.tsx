@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { getReservationPrice } from "common";
 import { useQuery } from "@apollo/client";
 import { IconArrowRight, IconCalendarClock, IconLocation } from "hds-react";
 import { TFunction, useTranslation } from "react-i18next";
@@ -116,7 +117,9 @@ const getCellConfig = (t: TFunction): CellConfig => {
       {
         title: t("RequestedReservations.heading.price"),
         key: "price",
-        transform: ({ price }: ReservationType) => <div>{price || "-"}</div>,
+        transform: ({ price }: ReservationType) => (
+          <div>{getReservationPrice(price as number, "")}</div>
+        ),
       },
       {
         title: t("RequestedReservations.heading.state"),

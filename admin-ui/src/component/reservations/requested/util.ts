@@ -1,3 +1,4 @@
+import { getReservationPrice } from "common";
 import { isSameDay } from "date-fns";
 import { TFunction } from "i18next";
 import {
@@ -31,10 +32,10 @@ export const reservationPrice = (
   reservation: ReservationType,
   t: TFunction
 ): string => {
-  if (!reservation.price) {
-    return t("RequestedReservation.noPrice");
-  }
-  return `${String(reservation.price)}€`;
+  return getReservationPrice(
+    reservation.price as number,
+    t("RequestedReservation.noPrice")
+  );
 };
 
 export const ageGroup = (
