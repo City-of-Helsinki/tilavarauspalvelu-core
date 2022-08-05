@@ -207,8 +207,6 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
 
             sku = reservation_unit.sku
 
-        price_calculation_result = self.calculate_price(begin, end, reservation_units)
-
         data["sku"] = sku
         data["state"] = STATE_CHOICES.CREATED
         data[
@@ -226,9 +224,14 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
             user = None
 
         data["user"] = user
-        data["price"] = price_calculation_result.reservation_price
-        data["unit_price"] = price_calculation_result.unit_price
-        data["tax_percentage_value"] = price_calculation_result.tax_percentage
+
+        if self.requires_price_calculation(data):
+            price_calculation_result = self.calculate_price(
+                begin, end, reservation_units
+            )
+            data["price"] = price_calculation_result.reservation_price
+            data["unit_price"] = price_calculation_result.unit_price
+            data["tax_percentage_value"] = price_calculation_result.tax_percentage
 
         return data
 
@@ -421,6 +424,31 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
                 "Reservation cannot be done to this reservation unit from the api "
                 "since its reservation kind is SEASON."
             )
+
+    def requires_price_calculation(self, data):
+        # If pk is not given, this is a create request -> price is always calculated
+        if "pk" not in data:
+            return True
+
+        if "begin" in data and self.instance.begin != data["begin"]:
+            return True
+
+        if "end" in data and self.instance.end != data["end"]:
+            return True
+
+        if "reservation_unit" in data:
+            existing_unit_ids = []
+            for unit in self.instance.reservation_unit.all():
+                existing_unit_ids.append(unit.pk)
+
+            new_unit_ids = []
+            for unit in data["reservation_unit"]:
+                new_unit_ids.append(unit.pk)
+
+            if set(existing_unit_ids) != set(new_unit_ids):
+                return True
+
+        return False
 
     def calculate_price(
         self,
