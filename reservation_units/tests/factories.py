@@ -1,6 +1,6 @@
 from factory import SubFactory, post_generation
 from factory.django import DjangoModelFactory
-from factory.fuzzy import FuzzyText
+from factory.fuzzy import FuzzyChoice, FuzzyText
 
 from spaces.tests.factories import UnitFactory
 
@@ -31,6 +31,13 @@ class PurposeFactory(DjangoModelFactory):
         model = "reservation_units.Purpose"
 
     name = FuzzyText()
+
+
+class TaxPercentageFactory(DjangoModelFactory):
+    class Meta:
+        model = "reservation_units.TaxPercentage"
+
+    value = FuzzyChoice(choices=(10.0, 14.0, 24.0))
 
 
 class QualifierFactory(DjangoModelFactory):
