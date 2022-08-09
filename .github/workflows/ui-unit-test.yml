@@ -8,12 +8,14 @@ on:
     branches: [main]
     paths:
       - "ui/**"
+      - "common/**"
       - "yarn.lock"
       - ".github/workflows/ui-unit-test.yml"
   pull_request:
     branches: [main]
     paths:
       - "ui/**"
+      - "common/**"
       - "yarn.lock"
       - ".github/workflows/ui-unit-test.yml"
 jobs:

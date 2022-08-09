@@ -5,12 +5,14 @@ on:
     branches: [main]
     paths:
       - "ui/**"
+      - "common/**"
       - ".github/workflows/ui-e2e.yml"
       - "yarn.lock"
   pull_request:
     branches: [main]
     paths:
       - "ui/**"
+      - "common/**"
       - ".github/workflows/ui-e2e.yml"
       - "yarn.lock"
 

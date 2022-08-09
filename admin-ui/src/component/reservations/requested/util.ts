@@ -1,5 +1,10 @@
-import { getReservationPrice } from "common";
-import { isSameDay } from "date-fns";
+import {
+  formatters as getFormatters,
+  getReservationPrice,
+  getUnRoundedReservationVolume,
+} from "common";
+
+import { differenceInMinutes, isSameDay } from "date-fns";
 import { TFunction } from "i18next";
 import {
   AgeGroupType,
@@ -36,6 +41,38 @@ export const reservationPrice = (
     reservation.price as number,
     t("RequestedReservation.noPrice")
   );
+};
+
+export const getReservationPriceDetails = (
+  reservation: ReservationType,
+  t: TFunction
+): string => {
+  const durationMinutes = differenceInMinutes(
+    new Date(reservation.end),
+    new Date(reservation.begin)
+  );
+
+  const priceUnit = reservation?.reservationUnits?.[0]?.priceUnit;
+  const volume = getUnRoundedReservationVolume(
+    durationMinutes,
+    priceUnit as string
+  );
+  const maxPrice = reservation?.reservationUnits?.[0]?.highestPrice;
+  const formatters = getFormatters("fi");
+  return priceUnit === "FIXED"
+    ? getReservationPrice(maxPrice, t("RequestedReservation.noPrice"))
+    : t("RequestedReservation.ApproveDialog.priceBreakdown", {
+        volume: formatters.strippedDecimal.format(volume),
+        units: t(`RequestedReservation.ApproveDialog.priceUnits.${priceUnit}`),
+        vatPercent: formatters.whole.format(reservation.taxPercentageValue),
+        unit: t(`RequestedReservation.ApproveDialog.priceUnit.${priceUnit}`),
+        unitPrice: getReservationPrice(maxPrice, ""),
+        price: getReservationPrice(
+          volume * maxPrice,
+          t("RequestedReservation.noPrice"),
+          "fi"
+        ),
+      });
 };
 
 export const ageGroup = (

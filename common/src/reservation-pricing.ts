@@ -19,12 +19,23 @@ export const getPriceUnitMinutes = (unit: string): number => {
   }
 };
 
+export const getUnRoundedReservationVolume = (
+  minutes: number,
+  unit: string
+): number => {
+  if (!minutes) {
+    return 1;
+  }
+
+  return minutes / getPriceUnitMinutes(unit);
+};
+
 export const getReservationVolume = (minutes: number, unit: string): number => {
   if (!minutes) {
     return 1;
   }
 
-  return Math.ceil(minutes / getPriceUnitMinutes(unit));
+  return Math.ceil(getUnRoundedReservationVolume(minutes, unit));
 };
 
 export const getReservationPrice = (

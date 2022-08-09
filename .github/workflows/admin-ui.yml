@@ -11,6 +11,7 @@ on:
   push:
     branches: [main]
     paths:
+      - "common/**"
       - "admin-ui/**"
       - ".github/workflows/admin-ui.yml"
       - "yarn.lock"
@@ -19,6 +20,7 @@ on:
     branches:
       - "main"
     paths:
+      - "common/**"
       - "admin-ui/**"
       - "yarn.lock"
       - ".github/workflows/admin-ui.yml"
