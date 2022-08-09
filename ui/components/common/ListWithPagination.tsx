@@ -103,7 +103,7 @@ const ListWithPagination = ({
             <HitCountSummary data-testid="list-with-pagination__pagination--summary">
               {shouldShowPaginationButton
                 ? t("searchResultList:paginationSummary", {
-                    count: items.length,
+                    count: items?.length,
                     totalCount,
                   })
                 : t("searchResultList:paginationSummaryEnd", {
@@ -135,7 +135,7 @@ const ListWithPagination = ({
       ) : (
         <>
           <TopWrapper data-testid="list-with-pagination__hit-count">
-            {items.length > 0 ? (
+            {items?.length > 0 ? (
               <HitCount>
                 {showHitCount
                   ? t("searchResultList:count", { count: totalCount })
@@ -146,7 +146,7 @@ const ListWithPagination = ({
             )}
             {sortingComponent && sortingComponent}
           </TopWrapper>
-          {items.length > 0 && content}
+          {items?.length > 0 && content}
         </>
       )}
     </Container>
