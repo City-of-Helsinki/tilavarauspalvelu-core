@@ -100,9 +100,9 @@ class ReservationUnitQueryTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCa
             spaces=[large_space, small_space],
             services=[service],
             cancellation_rule=rule,
-            additional_instructions_fi="Lisäohjeita",
-            additional_instructions_sv="Ytterligare instruktioner",
-            additional_instructions_en="Additional instructions",
+            reservation_confirmed_instructions_fi="Hyväksytyn varauksen lisäohjeita",
+            reservation_confirmed_instructions_sv="Ytterligare instruktioner för den godkända reservationen",
+            reservation_confirmed_instructions_en="Additional instructions for the approved reservation",
             tax_percentage=TaxPercentage.objects.get(value=24),
             lowest_price=0,
             highest_price=20,
@@ -187,9 +187,9 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
                               nameFi
                             }
                             contactInformation
-                            additionalInstructionsFi
-                            additionalInstructionsSv
-                            additionalInstructionsEn
+                            reservationConfirmedInstructionsFi
+                            reservationConfirmedInstructionsSv
+                            reservationConfirmedInstructionsEn
                             reservations {
                               begin
                               end
@@ -3864,20 +3864,20 @@ class ReservationUnitUpdateNotDraftTestCase(ReservationUnitMutationsTestCaseBase
         self.res_unit.refresh_from_db()
         assert_that(self.res_unit.surface_area).is_equal_to(expected_surface_area)
 
-    def test_update_additional_instructions(self):
+    def test_update_reservation_confirmed_instructions(self):
         expected_fi = "Lisätietoja"
         expected_sv = "Ytterligare instruktioner"
         expected_en = "Additional instructions"
         data = self.get_valid_update_data()
-        data["additionalInstructionsFi"] = expected_fi
-        data["additionalInstructionsSv"] = expected_sv
-        data["additionalInstructionsEn"] = expected_en
+        data["reservationConfirmedInstructionsFi"] = expected_fi
+        data["reservationConfirmedInstructionsSv"] = expected_sv
+        data["reservationConfirmedInstructionsEn"] = expected_en
         update_query = """
             mutation updateReservationUnit($input: ReservationUnitUpdateMutationInput!) {
                 updateReservationUnit(input: $input) {
-                    additionalInstructionsFi
-                    additionalInstructionsSv
-                    additionalInstructionsEn
+                    reservationConfirmedInstructionsFi
+                    reservationConfirmedInstructionsSv
+                    reservationConfirmedInstructionsEn
                     errors {
                         messages
                         field
@@ -3892,19 +3892,25 @@ class ReservationUnitUpdateNotDraftTestCase(ReservationUnitMutationsTestCaseBase
         res_unit_data = content.get("data").get("updateReservationUnit")
         assert_that(content.get("errors")).is_none()
         assert_that(res_unit_data.get("errors")).is_none()
-        assert_that(res_unit_data.get("additionalInstructionsFi")).is_equal_to(
+        assert_that(res_unit_data.get("reservationConfirmedInstructionsFi")).is_equal_to(
             expected_fi
         )
-        assert_that(res_unit_data.get("additionalInstructionsSv")).is_equal_to(
+        assert_that(res_unit_data.get("reservationConfirmedInstructionsSv")).is_equal_to(
             expected_sv
         )
-        assert_that(res_unit_data.get("additionalInstructionsEn")).is_equal_to(
+        assert_that(res_unit_data.get("reservationConfirmedInstructionsEn")).is_equal_to(
             expected_en
         )
         self.res_unit.refresh_from_db()
-        assert_that(self.res_unit.additional_instructions_fi).is_equal_to(expected_fi)
-        assert_that(self.res_unit.additional_instructions_sv).is_equal_to(expected_sv)
-        assert_that(self.res_unit.additional_instructions_en).is_equal_to(expected_en)
+        assert_that(self.res_unit.reservation_confirmed_instructions_fi).is_equal_to(
+            expected_fi
+        )
+        assert_that(self.res_unit.reservation_confirmed_instructions_sv).is_equal_to(
+            expected_sv
+        )
+        assert_that(self.res_unit.reservation_confirmed_instructions_en).is_equal_to(
+            expected_en
+        )
 
     def test_update_max_reservations_per_user(self):
         expected_max_reservations_per_user = 10

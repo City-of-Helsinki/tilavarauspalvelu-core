@@ -257,8 +257,8 @@ class ReservationUnit(models.Model):
         null=True,
         on_delete=models.SET_NULL,
     )
-    additional_instructions = models.TextField(
-        verbose_name=_("Additional instructions"),
+    reservation_confirmed_instructions = models.TextField(
+        verbose_name=_("Additional instructions for confirmed reservation"),
         blank=True,
         default="",
     )
