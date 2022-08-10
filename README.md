@@ -125,11 +125,11 @@ $ ln -s ../.env .env
 
 We use Tunnistamo and JWT tokens for API authentication. Support for Tunnistamo authentication is implemented by django-helusers library. Following env variables must be set for authentication to work properly:
 
-- TUNNISTAMO_JWT_AUDIENCE - Client ID of tunnistamo client for API. By default `https://api.hel.fi/auth/tilavarausapidev`
-- TUNNISTAMO_JWT_ISSUER - Issuer of the JWT token. By default `https://api.hel.fi/sso/openid`.
+- TUNNISTAMO_JWT_AUDIENCE - Client ID of tunnistamo client for API. By default `tilavaraus-ui-dev`
+- TUNNISTAMO_JWT_ISSUER - Issuer of the JWT token. By default `https://tunnistamo.test.hel.ninja/openid`.
 - TUNNISTAMO_ADMIN_KEY - Tunnistamo client ID for Django Admin. By default `tilanvaraus-django-admin-dev`.
 - TUNNISTAMO_ADMIN_SECRET - Secret for the same tunnistamo client for Django Admin. There is no default. Get this value from Tilavarauspalvelu backend developers.
-- TUNNISTAMO_ADMIN_OIDC_ENDPOINT - OIDC endpoint of the SSO provider. By default `https://api.hel.fi/sso/openid`.
+- TUNNISTAMO_ADMIN_OIDC_ENDPOINT - OIDC endpoint of the SSO provider. By default `https://tunnistamo.test.hel.ninja/openid`.
 
 Each UI has implemented Tunnistamo login which will provide UI with JWT token for API. The token is used for 
 
