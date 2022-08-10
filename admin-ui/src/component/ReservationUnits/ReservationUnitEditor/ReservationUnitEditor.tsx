@@ -957,7 +957,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                         </ActivationGroup>
                         <ActivationGroup
                           id="reservationEnds"
-                          label={t("ReservationUnitEditor.publishEnds")}
+                          label={t("ReservationUnitEditor.reservationEnds")}
                           initiallyOpen={Boolean(
                             state.reservationUnitEdit.reservationEnds
                           )}
