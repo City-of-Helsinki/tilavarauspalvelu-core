@@ -590,6 +590,7 @@ class ReservationDenySerializer(PrimaryKeySerializer):
     handling_details = serializers.CharField(
         help_text="Additional information for denying.",
         required=False,
+        allow_blank=True,
     )
 
     def __init__(self, *args, **kwargs):
@@ -638,6 +639,7 @@ class ReservationApproveSerializer(PrimaryKeySerializer):
     handling_details = serializers.CharField(
         help_text="Additional information for approval.",
         required=False,
+        allow_blank=True,
     )
 
     def __init__(self, *args, **kwargs):
