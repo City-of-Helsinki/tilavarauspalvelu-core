@@ -207,6 +207,13 @@ const translations: ITranslations = {
     archive: ["Arkistoi"],
     success: ["Varausyksikkö arkistoitu."],
   },
+  DiscardReservationUnitChangesDialog: {
+    title: [
+      "Oletko varma että haluat palata takaisin tallentamatta varausyksikön tietoja?",
+    ],
+    description: ["Varausyksikön tiedot katoavat, eikä niitä voi palauttaa."],
+    discard: ["Palaa tallentamatta"],
+  },
   MainLander: {
     ingress: [
       "Tässä palvelussa voit käsitellä Helsingin kaupungin tilavaraushakemuksia sekä asettaa tiloja ja laitteita varattaviksi.",

@@ -30,19 +30,8 @@ export const ButtonsContainer = styled.div`
 export const ArchiveButton = styled(Button)`
   margin-top: var(--spacing-m);
 `;
-export const PublishingTime = styled.div`
-  flex-grow: 1;
-  color: var(--color-white);
-  display: flex;
-  justify-content: right;
-  align-items: center;
-  flex-direction: row;
-  padding-right: var(--spacing-m);
-  text-align: end;
-  line-height: 1.3;
-`;
 
-export const Preview = styled.a<{ $disabled: boolean }>`
+export const Preview = styled.a<{ disabled: boolean }>`
   margin-left: auto;
   padding: var(--spacing-m);
   border-color: var(--color-white) !important;
@@ -52,8 +41,8 @@ export const Preview = styled.a<{ $disabled: boolean }>`
   &:hover {
     background-color: var(--color-bus-dark);
   }
-  ${({ $disabled }) =>
-    $disabled
+  ${({ disabled }) =>
+    disabled
       ? `
     cursor: not-allowed;
     color: var(--color-white);

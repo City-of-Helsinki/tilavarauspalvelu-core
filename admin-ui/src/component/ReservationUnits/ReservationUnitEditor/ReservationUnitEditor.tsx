@@ -63,7 +63,6 @@ import {
   Editor,
   EditorGrid,
   Preview,
-  PublishingTime,
   Wrapper,
   Span4,
   Error,
@@ -85,6 +84,7 @@ import SortedSelect from "./SortedSelect";
 import { useModal } from "../../../context/ModalContext";
 import ArchiveDialog from "./ArchiveDialog";
 import ReservationUnitStateTag from "./ReservationUnitStateTag";
+import DiscardChangesDialog from "./DiscardChangesDialog";
 
 const bufferTimeOptions = [
   { value: 900, label: "15 minuuttia" },
@@ -445,7 +445,6 @@ const ReservationUnitEditor = (): JSX.Element | null => {
             dispatch({ type: "created", pk: resUnitPk });
           }
           notifySuccess(
-            t("ReservationUnitEditor.saved"),
             t("ReservationUnitEditor.reservationUnitUpdatedNotification")
           );
         } else {
@@ -493,8 +492,6 @@ const ReservationUnitEditor = (): JSX.Element | null => {
       </Wrapper>
     );
   }
-
-  const { hasChanges } = state;
 
   if (state.error) {
     return (
@@ -1632,14 +1629,23 @@ const ReservationUnitEditor = (): JSX.Element | null => {
         <WhiteButton
           disabled={saving}
           variant="secondary"
-          onClick={() => history.go(-1)}
+          onClick={() =>
+            setModalContent(
+              <DiscardChangesDialog
+                onAccept={async () => {
+                  history.go(-1);
+                }}
+                onClose={() => setModalContent(null)}
+              />,
+              true
+            )
+          }
         >
           {t("ReservationUnitEditor.cancel")}
         </WhiteButton>
         <ButtonsContainer>
-          <PublishingTime />
           <WhiteButton
-            disabled={!hasChanges}
+            disabled={saving}
             variant="secondary"
             isLoading={saving}
             loadingText={t("ReservationUnitEditor.saving")}
@@ -1676,7 +1682,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
           <Preview
             target="_blank"
             rel="noopener noreferrer"
-            $disabled={state.hasChanges}
+            disabled={saving}
             href={`${previewUrlPrefix}/${state.reservationUnit?.pk}?ru=${state.reservationUnit?.uuid}`}
             onClick={(e) => state.hasChanges && e.preventDefault()}
             title={t(
