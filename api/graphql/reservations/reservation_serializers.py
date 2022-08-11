@@ -1,4 +1,6 @@
 import datetime
+import math
+from decimal import Decimal
 from typing import List
 
 from django.conf import settings
@@ -16,7 +18,7 @@ from api.graphql.primary_key_fields import IntegerPrimaryKeyField
 from applications.models import CUSTOMER_TYPES, City
 from email_notification.models import EmailType
 from email_notification.tasks import send_reservation_email_task
-from reservation_units.models import ReservationKind, ReservationUnit
+from reservation_units.models import PricingType, ReservationKind, ReservationUnit
 from reservation_units.utils.reservation_unit_reservation_scheduler import (
     ReservationUnitReservationScheduler,
 )
@@ -38,6 +40,19 @@ RESERVATION_STATE_EMAIL_TYPE_MAP = {
     STATE_CHOICES.DENIED: EmailType.RESERVATION_REJECTED,
     "APPROVED": EmailType.RESERVATION_HANDLED_AND_CONFIRMED,
 }
+
+
+class PriceCalculationResult:
+    reservation_price: Decimal = Decimal(0)
+    unit_price: Decimal = Decimal(0)
+    tax_percentage: Decimal = Decimal(0)
+
+    def __init__(
+        self, reservation_price: Decimal, unit_price: Decimal, tax_percentage: Decimal
+    ) -> None:
+        self.reservation_price = reservation_price
+        self.unit_price = unit_price
+        self.tax_percentage = tax_percentage
 
 
 class ReservationCreateSerializer(PrimaryKeySerializer):
@@ -209,6 +224,14 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
             user = None
 
         data["user"] = user
+
+        if self.requires_price_calculation(data):
+            price_calculation_result = self.calculate_price(
+                begin, end, reservation_units
+            )
+            data["price"] = price_calculation_result.reservation_price
+            data["unit_price"] = price_calculation_result.unit_price
+            data["tax_percentage_value"] = price_calculation_result.tax_percentage
 
         return data
 
@@ -401,6 +424,92 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
                 "Reservation cannot be done to this reservation unit from the api "
                 "since its reservation kind is SEASON."
             )
+
+    def requires_price_calculation(self, data):
+        # If pk is not given, this is a create request -> price is always calculated
+        if "pk" not in data:
+            return True
+
+        if "begin" in data and self.instance.begin != data["begin"]:
+            return True
+
+        if "end" in data and self.instance.end != data["end"]:
+            return True
+
+        if "reservation_unit" in data:
+            existing_unit_ids = []
+            for unit in self.instance.reservation_unit.all():
+                existing_unit_ids.append(unit.pk)
+
+            new_unit_ids = []
+            for unit in data["reservation_unit"]:
+                new_unit_ids.append(unit.pk)
+
+            if set(existing_unit_ids) != set(new_unit_ids):
+                return True
+
+        return False
+
+    def calculate_price(
+        self,
+        begin: datetime.datetime,
+        end: datetime.datetime,
+        reservation_units: List[ReservationUnit],
+    ) -> PriceCalculationResult:
+        price_unit_to_minutes = {
+            ReservationUnit.PRICE_UNIT_PER_15_MINS: 15,
+            ReservationUnit.PRICE_UNIT_PER_30_MINS: 30,
+            ReservationUnit.PRICE_UNIT_PER_HOUR: 60,
+            ReservationUnit.PRICE_UNIT_PER_HALF_DAY: 720,
+            ReservationUnit.PRICE_UNIT_PER_DAY: 1440,
+            ReservationUnit.PRICE_UNIT_PER_WEEK: 10080,
+        }
+
+        total_reservation_price: Decimal = Decimal(0.0)
+
+        first_paid_unit_price: Decimal = 0.0
+        first_paid_unit_tax_percentage: Decimal = 0.0
+        is_first_paid_set = False
+
+        for reservation_unit in reservation_units:
+            # If unit pricing type is not PAID, there is no need for calculations. Skip.
+            if reservation_unit.pricing_type != PricingType.PAID:
+                break
+
+            reservation_unit_price = Decimal(
+                max(reservation_unit.lowest_price, reservation_unit.highest_price)
+            )
+
+            # Time-based calculation is needes only if price unit is not fixed.
+            # Otherwise we can just use the price defined in the reservation unit
+            if reservation_unit.price_unit != ReservationUnit.PRICE_UNIT_FIXED:
+                reservation_duration_in_minutes = (end - begin).seconds / 60
+                reservation_unit_price_unit_minutes = price_unit_to_minutes.get(
+                    reservation_units[0].price_unit
+                )
+                reservation_unit_price = Decimal(
+                    math.ceil(
+                        reservation_duration_in_minutes
+                        / reservation_unit_price_unit_minutes
+                    )
+                    * reservation_unit_price
+                )
+
+            # It was agreed in TILA-1765 that when multiple units are given,
+            # unit price and tax percentage are fetched from the FIRST unit.
+            # https://helsinkisolutionoffice.atlassian.net/browse/TILA-1765
+            if not is_first_paid_set:
+                first_paid_unit_price = reservation_unit_price
+                first_paid_unit_tax_percentage = reservation_unit.tax_percentage.value
+                is_first_paid_set = True
+
+            total_reservation_price += reservation_unit_price
+
+        return PriceCalculationResult(
+            total_reservation_price,
+            first_paid_unit_price,
+            first_paid_unit_tax_percentage,
+        )
 
 
 class ReservationUpdateSerializer(

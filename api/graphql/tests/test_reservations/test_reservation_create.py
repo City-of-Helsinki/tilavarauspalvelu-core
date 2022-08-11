@@ -12,8 +12,11 @@ from api.graphql.tests.test_reservations.base import (
 from applications.models import PRIORITY_CONST, City
 from applications.tests.factories import ApplicationRoundFactory
 from opening_hours.tests.test_get_periods import get_mocked_periods
-from reservation_units.models import ReservationKind, ReservationUnit
-from reservation_units.tests.factories import ReservationUnitFactory
+from reservation_units.models import PricingType, ReservationKind, ReservationUnit
+from reservation_units.tests.factories import (
+    ReservationUnitFactory,
+    TaxPercentageFactory,
+)
 from reservations.models import STATE_CHOICES, AgeGroup, Reservation
 from reservations.tests.factories import ReservationFactory
 
@@ -942,3 +945,204 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         assert_that(
             content.get("data").get("createReservation").get("errors")[0]["messages"][0]
         ).contains("reservation kind is SEASON")
+
+    def test_create_price_calculation_with_free_reservation_unit(
+        self, mock_periods, mock_opening_hours
+    ):
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+        self.client.force_login(self.regular_joe)
+        input_data = self.get_valid_input_data()
+        response = self.query(self.get_create_query(), input_data=input_data)
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_none()
+        assert_that(
+            content.get("data").get("createReservation").get("reservation").get("pk")
+        ).is_not_none()
+        pk = content.get("data").get("createReservation").get("reservation").get("pk")
+        reservation = Reservation.objects.get(id=pk)
+        assert_that(reservation).is_not_none()
+        assert_that(reservation.price).is_equal_to(
+            0.0
+        )  # Free units should always be 0 €
+        assert_that(reservation.unit_price).is_equal_to(0.0)
+        assert_that(reservation.tax_percentage_value).is_equal_to(0.0)
+
+    def test_create_price_calculation_with_fixed_price_reservation_unit(
+        self, mock_periods, mock_opening_hours
+    ):
+        tax_percentage = TaxPercentageFactory()
+
+        self.reservation_unit.pricing_type = PricingType.PAID
+        self.reservation_unit.price_unit = ReservationUnit.PRICE_UNIT_FIXED
+        self.reservation_unit.lowest_price = 1.0
+        self.reservation_unit.highest_price = 3.0
+        self.reservation_unit.tax_percentage = tax_percentage
+        self.reservation_unit.save()
+
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+        self.client.force_login(self.regular_joe)
+
+        input_data = self.get_valid_input_data()
+        response = self.query(self.get_create_query(), input_data=input_data)
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_none()
+        assert_that(
+            content.get("data").get("createReservation").get("reservation").get("pk")
+        ).is_not_none()
+        pk = content.get("data").get("createReservation").get("reservation").get("pk")
+        reservation = Reservation.objects.get(id=pk)
+        assert_that(reservation).is_not_none()
+        assert_that(reservation.price).is_equal_to(
+            3.0
+        )  # With fixed price unit, time is ignored
+        assert_that(reservation.unit_price).is_equal_to(3.0)
+        assert_that(reservation.tax_percentage_value).is_equal_to(tax_percentage.value)
+
+    def test_create_price_calculation_with_time_based_price_reservation_unit(
+        self, mock_periods, mock_opening_hours
+    ):
+        tax_percentage = TaxPercentageFactory()
+
+        self.reservation_unit.pricing_type = PricingType.PAID
+        self.reservation_unit.price_unit = ReservationUnit.PRICE_UNIT_PER_15_MINS
+        self.reservation_unit.lowest_price = 1.0
+        self.reservation_unit.highest_price = 3.0
+        self.reservation_unit.tax_percentage = tax_percentage
+        self.reservation_unit.save()
+
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+        self.client.force_login(self.regular_joe)
+
+        input_data = self.get_valid_input_data()
+        response = self.query(self.get_create_query(), input_data=input_data)
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_none()
+        assert_that(
+            content.get("data").get("createReservation").get("reservation").get("pk")
+        ).is_not_none()
+        pk = content.get("data").get("createReservation").get("reservation").get("pk")
+        reservation = Reservation.objects.get(id=pk)
+        assert_that(reservation).is_not_none()
+        assert_that(reservation.price).is_equal_to(
+            3.0 * 4
+        )  # 1h reservation = 4 x 15 min = 4 x 3 €
+        assert_that(reservation.unit_price).is_equal_to(
+            3.0 * 4
+        )  # 1h reservation = 4 x 15 min = 4 x 3 €
+        assert_that(reservation.tax_percentage_value).is_equal_to(tax_percentage.value)
+
+    def test_create_price_calculation_rounding(self, mock_periods, mock_opening_hours):
+        tax_percentage = TaxPercentageFactory()
+
+        self.reservation_unit.pricing_type = PricingType.PAID
+        self.reservation_unit.price_unit = ReservationUnit.PRICE_UNIT_PER_15_MINS
+        self.reservation_unit.lowest_price = 1.0
+        self.reservation_unit.highest_price = 3.0
+        self.reservation_unit.tax_percentage = tax_percentage
+        self.reservation_unit.save()
+
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+        self.client.force_login(self.regular_joe)
+
+        # 46 minutes reservation should be rounded up to 60 minutes
+        input_data = self.get_valid_input_data()
+        input_data["begin"] = datetime.datetime.now().strftime("%Y%m%dT%H%M%SZ")
+        input_data["end"] = (
+            datetime.datetime.now() + datetime.timedelta(minutes=46)
+        ).strftime("%Y%m%dT%H%M%SZ")
+
+        response = self.query(self.get_create_query(), input_data=input_data)
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_none()
+        assert_that(
+            content.get("data").get("createReservation").get("reservation").get("pk")
+        ).is_not_none()
+        pk = content.get("data").get("createReservation").get("reservation").get("pk")
+        reservation = Reservation.objects.get(id=pk)
+        assert_that(reservation).is_not_none()
+        assert_that(reservation.price).is_equal_to(
+            3.0 * 4
+        )  # 46 min reservation = 4 x 15 min = 4 x 3 €
+        assert_that(reservation.unit_price).is_equal_to(
+            3.0 * 4
+        )  # 46 min reservation = 4 x 15 min = 4 x 3 €
+        assert_that(reservation.tax_percentage_value).is_equal_to(tax_percentage.value)
+
+    @patch(
+        "reservation_units.utils.reservation_unit_reservation_scheduler"
+        + ".ReservationUnitReservationScheduler.is_reservation_unit_open"
+    )
+    @patch(
+        "reservation_units.utils.reservation_unit_reservation_scheduler."
+        + "ReservationUnitReservationScheduler.get_conflicting_open_application_round"
+    )
+    @patch(
+        "reservation_units.utils.reservation_unit_reservation_scheduler."
+        + "ReservationUnitReservationScheduler.get_reservation_unit_possible_start_times"
+    )
+    def test_create_price_calculation_with_multiple_units(
+        self,
+        mock_get_reservation_unit_possible_start_times,
+        mock_get_conflicting_open_application_round,
+        mock_is_open,
+        mock_periods,
+        mock_opening_hours,
+    ):
+        mock_is_open.return_value = True
+        mock_get_conflicting_open_application_round.return_value = None
+        mock_get_reservation_unit_possible_start_times.return_value = [
+            datetime.datetime.now(tz=DEFAULT_TIMEZONE)
+        ]
+
+        tax_percentage = TaxPercentageFactory()
+
+        sku = "340026__2652000155___44_10000100"
+
+        self.reservation_unit.pricing_type = PricingType.PAID
+        self.reservation_unit.price_unit = ReservationUnit.PRICE_UNIT_PER_15_MINS
+        self.reservation_unit.lowest_price = 1.0
+        self.reservation_unit.highest_price = 3.0
+        self.reservation_unit.tax_percentage = tax_percentage
+        self.reservation_unit.sku = sku
+        self.reservation_unit.save()
+
+        second_unit = ReservationUnitFactory(
+            spaces=[self.space],
+            name="second_unit",
+            reservation_start_interval=ReservationUnit.RESERVATION_START_INTERVAL_15_MINUTES,
+            buffer_time_before=datetime.timedelta(minutes=30),
+            buffer_time_after=datetime.timedelta(minutes=30),
+            sku=sku,
+            pricing_type=PricingType.PAID,
+            price_unit=ReservationUnit.PRICE_UNIT_PER_15_MINS,
+            lowest_price=2.0,
+            highest_price=4.0,
+            tax_percentage=tax_percentage,
+        )
+
+        self.client.force_login(self.regular_joe)
+
+        input_data = self.get_valid_input_data()
+        input_data["reservationUnitPks"] = [self.reservation_unit.pk, second_unit.pk]
+
+        response = self.query(self.get_create_query(), input_data=input_data)
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_none()
+        assert_that(
+            content.get("data").get("createReservation").get("reservation").get("pk")
+        ).is_not_none()
+        pk = content.get("data").get("createReservation").get("reservation").get("pk")
+        reservation = Reservation.objects.get(id=pk)
+        assert_that(reservation).is_not_none()
+        assert_that(reservation.price).is_equal_to(
+            3.0 * 4 + 4.0 * 4
+        )  # 1h reservation = 4 x 15 min from both units
+        assert_that(reservation.unit_price).is_equal_to(
+            3.0 * 4
+        )  # 1 h reservation = 4 x 15 min from the first unit
+        assert_that(reservation.tax_percentage_value).is_equal_to(tax_percentage.value)
