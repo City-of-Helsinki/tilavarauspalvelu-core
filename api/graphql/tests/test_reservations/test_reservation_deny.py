@@ -143,3 +143,27 @@ class ReservationDenyTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.handling_details).is_equal_to(
             self.reservation.working_memo
         )
+
+    @override_settings(
+        CELERY_TASK_ALWAYS_EAGER=True,
+        SEND_RESERVATION_NOTIFICATION_EMAILS=True,
+        EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
+    )
+    def test_deny_success_with_empty_handling_details(self):
+        self.client.force_login(self.general_admin)
+        input_data = self.get_valid_deny_data()
+        input_data["handlingDetails"] = ""
+        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.REQUIRES_HANDLING)
+        response = self.query(self.get_handle_query(), input_data=input_data)
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        deny_data = content.get("data").get("denyReservation")
+        assert_that(deny_data.get("errors")).is_none()
+        assert_that(deny_data.get("state")).is_equal_to(STATE_CHOICES.DENIED.upper())
+        self.reservation.refresh_from_db()
+        assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.DENIED)
+        assert_that(self.reservation.handling_details).is_equal_to("")
+        assert_that(self.reservation.handled_at).is_not_none()
+        assert_that(len(mail.outbox)).is_equal_to(1)
+        assert_that(mail.outbox[0].subject).is_equal_to("denied")
