@@ -189,6 +189,14 @@ class ReservationUnit(models.Model):
         related_name="reservation_units",
         blank=True,
     )
+
+    qualifiers = models.ManyToManyField(
+        "Qualifier",
+        verbose_name=_("Qualifiers"),
+        related_name="reservation_units",
+        blank=True,
+    )
+
     reservation_purposes = models.ManyToManyField(
         "reservations.ReservationPurpose",
         verbose_name=_("ReservationPurposes"),
@@ -649,6 +657,13 @@ class Purpose(models.Model):
     name = models.CharField(max_length=200)
 
     def __str__(self):
+        return self.name
+
+
+class Qualifier(models.Model):
+    name = models.CharField(max_length=200)
+
+    def __str__(self) -> str:
         return self.name
 
 

@@ -32,6 +32,7 @@ from permissions.api_permissions.graphene_permissions import (
     EquipmentCategoryPermission,
     EquipmentPermission,
     PurposePermission,
+    QualifierPermission,
     ReservationPermission,
     ReservationUnitCancellationRulePermission,
     ReservationUnitHaukiUrlPermission,
@@ -50,6 +51,7 @@ from reservation_units.models import (
     KeywordCategory,
     KeywordGroup,
     Purpose,
+    Qualifier,
     ReservationUnit,
     ReservationUnitCancellationRule,
     ReservationUnitImage,
@@ -115,6 +117,19 @@ class PurposeType(AuthNode, PrimaryKeyObjectType):
 
     class Meta:
         model = Purpose
+        fields = ["pk"] + get_all_translatable_fields(model)
+        filter_fields = ["name_fi", "name_en", "name_sv"]
+        interfaces = (graphene.relay.Node,)
+        connection_class = TilavarausBaseConnection
+
+
+class QualifierType(AuthNode, PrimaryKeyObjectType):
+    permission_classes = (
+        (QualifierPermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
+    )
+
+    class Meta:
+        model = Qualifier
         fields = ["pk"] + get_all_translatable_fields(model)
         filter_fields = ["name_fi", "name_en", "name_sv"]
         interfaces = (graphene.relay.Node,)
@@ -276,6 +291,7 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
     resources = graphene.List(ResourceType)
     services = graphene.List(ServiceType)
     purposes = graphene.List(PurposeType)
+    qualifiers = graphene.List(QualifierType)
     images = graphene.List(ReservationUnitImageType)
     location = graphene.Field(LocationType)
     reservation_unit_type = graphene.Field(ReservationUnitTypeType)
@@ -321,6 +337,7 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
             "services",
             "require_introduction",
             "purposes",
+            "qualifiers",
             "images",
             "location",
             "max_persons",
@@ -392,6 +409,10 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
     @check_resolver_permission(PurposePermission)
     def resolve_purposes(self, info):
         return self.purposes.all()
+
+    @check_resolver_permission(QualifierPermission)
+    def resolve_qualifiers(self, info):
+        return self.qualifiers.all()
 
     def resolve_images(self, info):
         return self.images.all()

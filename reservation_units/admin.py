@@ -12,6 +12,7 @@ from .models import (
     KeywordGroup,
     Period,
     Purpose,
+    Qualifier,
     ReservationUnit,
     ReservationUnitCancellationRule,
     ReservationUnitImage,
@@ -74,6 +75,11 @@ class DayPartAdmin(admin.ModelAdmin):
 @admin.register(Purpose)
 class PurposeAdmin(admin.ModelAdmin):
     model = Purpose
+
+
+@admin.register(Qualifier)
+class QualifierAdmin(admin.ModelAdmin):
+    model = Qualifier
 
 
 @admin.register(Equipment)

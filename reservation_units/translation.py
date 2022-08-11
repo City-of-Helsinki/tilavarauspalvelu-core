@@ -8,6 +8,7 @@ from .models import (
     KeywordGroup,
     Period,
     Purpose,
+    Qualifier,
     ReservationUnit,
     ReservationUnitCancellationRule,
     ReservationUnitType,
@@ -43,6 +44,10 @@ class PurposeTranslationOptions(TranslationOptions):
     fields = ["name"]
 
 
+class QualifierTranslationOptions(TranslationOptions):
+    fields = ["name"]
+
+
 class PeriodTranslationOptions(TranslationOptions):
     fields = ["name", "description"]
 
@@ -65,6 +70,7 @@ translator.register(KeywordCategory, KeywordCategoryTranslationOptions)
 translator.register(KeywordGroup, KeywordGroupTranslationOptions)
 translator.register(Keyword, KeywordTranslationOptions)
 translator.register(Purpose, PurposeTranslationOptions)
+translator.register(Qualifier, QualifierTranslationOptions)
 translator.register(Period, PeriodTranslationOptions)
 translator.register(Equipment, EquipmentTranslationOptions)
 translator.register(EquipmentCategory, EquipmentCategoryTranslationOptions)
