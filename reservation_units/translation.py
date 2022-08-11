@@ -20,7 +20,9 @@ class ReservationUnitTranslationOptions(TranslationOptions):
         "name",
         "description",
         "terms_of_use",
+        "reservation_pending_instructions",
         "reservation_confirmed_instructions",
+        "reservation_cancelled_instructions",
     ]
 
 

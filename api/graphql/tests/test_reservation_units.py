@@ -187,9 +187,15 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
                               nameFi
                             }
                             contactInformation
+                            reservationPendingInstructionsFi
+                            reservationPendingInstructionsSv
+                            reservationPendingInstructionsEn
                             reservationConfirmedInstructionsFi
                             reservationConfirmedInstructionsSv
                             reservationConfirmedInstructionsEn
+                            reservationCancelledInstructionsFi
+                            reservationCancelledInstructionsSv
+                            reservationCancelledInstructionsEn
                             reservations {
                               begin
                               end
@@ -2834,6 +2840,61 @@ class ReservationUnitCreateAsDraftTestCase(ReservationUnitMutationsTestCaseBase)
         assert_that(created_unit.pricing_type).is_equal_to(PricingType.PAID)
         assert_that(created_unit.payment_type).is_equal_to(PaymentType.ON_SITE)
 
+    def test_create_with_instructions(self):
+        data = {
+            "isDraft": True,
+            "nameFi": "Resunit name",
+            "nameEn": "English name",
+            "descriptionFi": "desc",
+            "reservationPendingInstructionsFi": "Pending instructions fi",
+            "reservationPendingInstructionsSv": "Pending instructions sv",
+            "reservationPendingInstructionsEn": "Pending instructions en",
+            "reservationConfirmedInstructionsFi": "Confirmed instructions fi",
+            "reservationConfirmedInstructionsSv": "Confirmed instructions sv",
+            "reservationConfirmedInstructionsEn": "Confirmed instructions en",
+            "reservationCancelledInstructionsFi": "Cancelled instructions fi",
+            "reservationCancelledInstructionsSv": "Cancelled instructions sv",
+            "reservationCancelledInstructionsEn": "Cancelled instructions en",
+            "unitPk": self.unit.pk,
+        }
+        response = self.query(self.get_create_query(), input_data=data)
+        assert_that(response.status_code).is_equal_to(200)
+        content = json.loads(response.content)
+        res_unit_data = content.get("data").get("createReservationUnit")
+        assert_that(content.get("errors")).is_none()
+        assert_that(res_unit_data.get("errors")).is_none()
+
+        res_unit = ReservationUnit.objects.first()
+        assert_that(res_unit).is_not_none()
+        assert_that(res_unit.id).is_equal_to(res_unit_data.get("pk"))
+        assert_that(res_unit.reservation_pending_instructions_fi).is_equal_to(
+            data["reservationPendingInstructionsFi"]
+        )
+        assert_that(res_unit.reservation_pending_instructions_sv).is_equal_to(
+            data["reservationPendingInstructionsSv"]
+        )
+        assert_that(res_unit.reservation_pending_instructions_en).is_equal_to(
+            data["reservationPendingInstructionsEn"]
+        )
+        assert_that(res_unit.reservation_confirmed_instructions_fi).is_equal_to(
+            data["reservationConfirmedInstructionsFi"]
+        )
+        assert_that(res_unit.reservation_confirmed_instructions_sv).is_equal_to(
+            data["reservationConfirmedInstructionsSv"]
+        )
+        assert_that(res_unit.reservation_confirmed_instructions_en).is_equal_to(
+            data["reservationConfirmedInstructionsEn"]
+        )
+        assert_that(res_unit.reservation_cancelled_instructions_fi).is_equal_to(
+            data["reservationCancelledInstructionsFi"]
+        )
+        assert_that(res_unit.reservation_cancelled_instructions_sv).is_equal_to(
+            data["reservationCancelledInstructionsSv"]
+        )
+        assert_that(res_unit.reservation_cancelled_instructions_en).is_equal_to(
+            data["reservationCancelledInstructionsEn"]
+        )
+
 
 class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBase):
     """For publish"""
@@ -3420,6 +3481,60 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         assert_that(created_unit.pricing_type).is_equal_to(PricingType.PAID)
         assert_that(created_unit.payment_type).is_equal_to(PaymentType.ONLINE)
 
+    def test_create_with_instructions(self):
+        self.client.force_login(self.general_admin)
+        data = self.get_valid_data()
+        data["reservationPendingInstructionsFi"] = "Pending instructions fi"
+        data["reservationPendingInstructionsSv"] = "Pending instructions sv"
+        data["reservationPendingInstructionsEn"] = "Pending instructions en"
+        data["reservationConfirmedInstructionsFi"] = "Confirmed instructions fi"
+        data["reservationConfirmedInstructionsSv"] = "Confirmed instructions sv"
+        data["reservationConfirmedInstructionsEn"] = "Confirmed instructions en"
+        data["reservationCancelledInstructionsFi"] = "Cancelled instructions fi"
+        data["reservationCancelledInstructionsSv"] = "Cancelled instructions sv"
+        data["reservationCancelledInstructionsEn"] = "Cancelled instructions en"
+
+        response = self.query(self.get_create_query(), input_data=data)
+        assert_that(response.status_code).is_equal_to(200)
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        assert_that(
+            content.get("data").get("createReservationUnit").get("pk")
+        ).is_not_none()
+
+        created_unit = ReservationUnit.objects.get(
+            pk=content.get("data").get("createReservationUnit").get("pk")
+        )
+        assert_that(created_unit).is_not_none()
+        assert_that(created_unit.reservation_pending_instructions_fi).is_equal_to(
+            data["reservationPendingInstructionsFi"]
+        )
+        assert_that(created_unit.reservation_pending_instructions_sv).is_equal_to(
+            data["reservationPendingInstructionsSv"]
+        )
+        assert_that(created_unit.reservation_pending_instructions_en).is_equal_to(
+            data["reservationPendingInstructionsEn"]
+        )
+        assert_that(created_unit.reservation_confirmed_instructions_fi).is_equal_to(
+            data["reservationConfirmedInstructionsFi"]
+        )
+        assert_that(created_unit.reservation_confirmed_instructions_sv).is_equal_to(
+            data["reservationConfirmedInstructionsSv"]
+        )
+        assert_that(created_unit.reservation_confirmed_instructions_en).is_equal_to(
+            data["reservationConfirmedInstructionsEn"]
+        )
+        assert_that(created_unit.reservation_cancelled_instructions_fi).is_equal_to(
+            data["reservationCancelledInstructionsFi"]
+        )
+        assert_that(created_unit.reservation_cancelled_instructions_sv).is_equal_to(
+            data["reservationCancelledInstructionsSv"]
+        )
+        assert_that(created_unit.reservation_cancelled_instructions_en).is_equal_to(
+            data["reservationCancelledInstructionsEn"]
+        )
+
 
 @override_settings(AUDIT_LOGGING_ENABLED=True)
 class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
@@ -3708,6 +3823,60 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
         assert_that(created_unit.pricing_type).is_equal_to(PricingType.PAID)
         assert_that(created_unit.payment_type).is_equal_to(PaymentType.INVOICE)
 
+    def test_update_with_instructions(self):
+        self.client.force_login(self.general_admin)
+        data = self.get_valid_update_data()
+        data["reservationPendingInstructionsFi"] = "Pending instructions updated fi"
+        data["reservationPendingInstructionsSv"] = "Pending instructions updated sv"
+        data["reservationPendingInstructionsEn"] = "Pending instructions updated en"
+        data["reservationConfirmedInstructionsFi"] = "Confirmed instructions updated fi"
+        data["reservationConfirmedInstructionsSv"] = "Confirmed instructions updated sv"
+        data["reservationConfirmedInstructionsEn"] = "Confirmed instructions updated en"
+        data["reservationCancelledInstructionsFi"] = "Cancelled instructions updated fi"
+        data["reservationCancelledInstructionsSv"] = "Cancelled instructions updated sv"
+        data["reservationCancelledInstructionsEn"] = "Cancelled instructions updated en"
+
+        response = self.query(self.get_update_query(), input_data=data)
+        assert_that(response.status_code).is_equal_to(200)
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        assert_that(
+            content.get("data").get("updateReservationUnit").get("pk")
+        ).is_not_none()
+
+        updated_unit = ReservationUnit.objects.get(
+            pk=content.get("data").get("updateReservationUnit").get("pk")
+        )
+        assert_that(updated_unit).is_not_none()
+        assert_that(updated_unit.reservation_pending_instructions_fi).is_equal_to(
+            data["reservationPendingInstructionsFi"]
+        )
+        assert_that(updated_unit.reservation_pending_instructions_sv).is_equal_to(
+            data["reservationPendingInstructionsSv"]
+        )
+        assert_that(updated_unit.reservation_pending_instructions_en).is_equal_to(
+            data["reservationPendingInstructionsEn"]
+        )
+        assert_that(updated_unit.reservation_confirmed_instructions_fi).is_equal_to(
+            data["reservationConfirmedInstructionsFi"]
+        )
+        assert_that(updated_unit.reservation_confirmed_instructions_sv).is_equal_to(
+            data["reservationConfirmedInstructionsSv"]
+        )
+        assert_that(updated_unit.reservation_confirmed_instructions_en).is_equal_to(
+            data["reservationConfirmedInstructionsEn"]
+        )
+        assert_that(updated_unit.reservation_cancelled_instructions_fi).is_equal_to(
+            data["reservationCancelledInstructionsFi"]
+        )
+        assert_that(updated_unit.reservation_cancelled_instructions_sv).is_equal_to(
+            data["reservationCancelledInstructionsSv"]
+        )
+        assert_that(updated_unit.reservation_cancelled_instructions_en).is_equal_to(
+            data["reservationCancelledInstructionsEn"]
+        )
+
 
 class ReservationUnitUpdateNotDraftTestCase(ReservationUnitMutationsTestCaseBase):
     """For published resunits"""
@@ -3892,15 +4061,15 @@ class ReservationUnitUpdateNotDraftTestCase(ReservationUnitMutationsTestCaseBase
         res_unit_data = content.get("data").get("updateReservationUnit")
         assert_that(content.get("errors")).is_none()
         assert_that(res_unit_data.get("errors")).is_none()
-        assert_that(res_unit_data.get("reservationConfirmedInstructionsFi")).is_equal_to(
-            expected_fi
-        )
-        assert_that(res_unit_data.get("reservationConfirmedInstructionsSv")).is_equal_to(
-            expected_sv
-        )
-        assert_that(res_unit_data.get("reservationConfirmedInstructionsEn")).is_equal_to(
-            expected_en
-        )
+        assert_that(
+            res_unit_data.get("reservationConfirmedInstructionsFi")
+        ).is_equal_to(expected_fi)
+        assert_that(
+            res_unit_data.get("reservationConfirmedInstructionsSv")
+        ).is_equal_to(expected_sv)
+        assert_that(
+            res_unit_data.get("reservationConfirmedInstructionsEn")
+        ).is_equal_to(expected_en)
         self.res_unit.refresh_from_db()
         assert_that(self.res_unit.reservation_confirmed_instructions_fi).is_equal_to(
             expected_fi
@@ -4250,3 +4419,57 @@ class ReservationUnitUpdateNotDraftTestCase(ReservationUnitMutationsTestCaseBase
         assert_that(created_unit).is_not_none()
         assert_that(created_unit.pricing_type).is_equal_to(PricingType.PAID)
         assert_that(created_unit.payment_type).is_equal_to(PaymentType.ON_SITE)
+
+    def test_update_with_instructions(self):
+        self.client.force_login(self.general_admin)
+        data = self.get_valid_update_data()
+        data["reservationPendingInstructionsFi"] = "Pending instructions updated fi"
+        data["reservationPendingInstructionsSv"] = "Pending instructions updated sv"
+        data["reservationPendingInstructionsEn"] = "Pending instructions updated en"
+        data["reservationConfirmedInstructionsFi"] = "Confirmed instructions updated fi"
+        data["reservationConfirmedInstructionsSv"] = "Confirmed instructions updated sv"
+        data["reservationConfirmedInstructionsEn"] = "Confirmed instructions updated en"
+        data["reservationCancelledInstructionsFi"] = "Cancelled instructions updated fi"
+        data["reservationCancelledInstructionsSv"] = "Cancelled instructions updated sv"
+        data["reservationCancelledInstructionsEn"] = "Cancelled instructions updated en"
+
+        response = self.query(self.get_update_query(), input_data=data)
+        assert_that(response.status_code).is_equal_to(200)
+
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        assert_that(
+            content.get("data").get("updateReservationUnit").get("pk")
+        ).is_not_none()
+
+        updated_unit = ReservationUnit.objects.get(
+            pk=content.get("data").get("updateReservationUnit").get("pk")
+        )
+        assert_that(updated_unit).is_not_none()
+        assert_that(updated_unit.reservation_pending_instructions_fi).is_equal_to(
+            data["reservationPendingInstructionsFi"]
+        )
+        assert_that(updated_unit.reservation_pending_instructions_sv).is_equal_to(
+            data["reservationPendingInstructionsSv"]
+        )
+        assert_that(updated_unit.reservation_pending_instructions_en).is_equal_to(
+            data["reservationPendingInstructionsEn"]
+        )
+        assert_that(updated_unit.reservation_confirmed_instructions_fi).is_equal_to(
+            data["reservationConfirmedInstructionsFi"]
+        )
+        assert_that(updated_unit.reservation_confirmed_instructions_sv).is_equal_to(
+            data["reservationConfirmedInstructionsSv"]
+        )
+        assert_that(updated_unit.reservation_confirmed_instructions_en).is_equal_to(
+            data["reservationConfirmedInstructionsEn"]
+        )
+        assert_that(updated_unit.reservation_cancelled_instructions_fi).is_equal_to(
+            data["reservationCancelledInstructionsFi"]
+        )
+        assert_that(updated_unit.reservation_cancelled_instructions_sv).is_equal_to(
+            data["reservationCancelledInstructionsSv"]
+        )
+        assert_that(updated_unit.reservation_cancelled_instructions_en).is_equal_to(
+            data["reservationCancelledInstructionsEn"]
+        )
