@@ -1095,6 +1095,8 @@ const translations: ITranslations = {
     reservationUnitTypeHelperText: ["Valitse tilaa parhaiten kuvaava tyyppi"],
     purposesLabel: ["Käyttötarkoitus"],
     purposesPlaceholder: ["Valitse mitä tarkoitusta tuetaan"],
+    qualifiersLabel: ["Tarkenne"],
+    qualifiersPlaceholder: ["Valitse"],
     resourcesPlaceholder: ["Liitä tarvittavat resurssit"],
     requireReservationHandling: ["Haluan käsitellä kaikki varausanomukset"],
     requireIntroductionLabel: ["Varausyksikkö vaatii pakollisen perehdytyksen"],

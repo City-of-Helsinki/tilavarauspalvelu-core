@@ -35,10 +35,7 @@ import {
   ReservationUnitByPkType,
   ReservationUnitState,
 } from "../../../common/gql-types";
-import {
-  RESERVATION_UNIT_EDITOR_PARAMETERS,
-  UNIT_WITH_SPACES_AND_RESOURCES,
-} from "../../../common/queries";
+import { UNIT_WITH_SPACES_AND_RESOURCES } from "../../../common/queries";
 import { OptionType } from "../../../common/types";
 import {
   ContentContainer,
@@ -76,6 +73,7 @@ import {
   CREATE_RESERVATION_UNIT,
   DELETE_IMAGE,
   RESERVATIONUNIT_QUERY,
+  RESERVATION_UNIT_EDITOR_PARAMETERS,
   UPDATE_IMAGE_TYPE,
   UPDATE_RESERVATION_UNIT,
 } from "./queries";
@@ -214,6 +212,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
         "reservationEnds",
         "reservationStartInterval",
         "purposePks",
+        "qualifierPks",
         "cancellationRulePk",
         "cancellationTermsPk",
         "equipmentPks",
@@ -820,6 +819,29 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                     ]}
                   />
                 </Span6>
+                <Span6>
+                  <SortedSelect
+                    sort
+                    multiselect
+                    label={t("ReservationUnitEditor.qualifiersLabel")}
+                    placeholder={t(
+                      "ReservationUnitEditor.qualifiersPlaceholder"
+                    )}
+                    options={state.qualifierOptions}
+                    onChange={(qualifiers) =>
+                      dispatch({ type: "setQualifiers", qualifiers })
+                    }
+                    disabled={state.qualifierOptions.length === 0}
+                    value={[
+                      ...getSelectedOptions(
+                        state,
+                        "qualifierOptions",
+                        "qualifierPks"
+                      ),
+                    ]}
+                  />
+                </Span6>
+
                 {languages.map((lang) => {
                   const fieldName = `description${upperFirst(lang)}`;
                   return (

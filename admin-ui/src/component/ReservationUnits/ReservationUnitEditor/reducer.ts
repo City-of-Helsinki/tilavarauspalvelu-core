@@ -28,6 +28,7 @@ export const getInitialState = (reservationUnitPk: number): State => ({
   paymentTermsOptions: [],
   pricingTermsOptions: [],
   purposeOptions: [],
+  qualifierOptions: [],
   reservationUnit: null,
   reservationUnitEdit: {},
   reservationUnitPk,
@@ -190,6 +191,9 @@ export const reducer = (state: State, action: Action): State => {
           purposePks: reservationUnit?.purposes?.map((s) =>
             Number(s?.pk)
           ) as number[],
+          qualifierPks: reservationUnit?.qualifiers?.map((s) =>
+            Number(s?.pk)
+          ) as number[],
           paymentTermsPk: get(reservationUnit, "paymentTerms.pk"),
           pricingTermsPk: get(reservationUnit, "pricingTerms.pk"),
           reservationUnitTypePk: get(reservationUnit, "reservationUnitType.pk"),
@@ -269,6 +273,9 @@ export const reducer = (state: State, action: Action): State => {
           optionMaker
         ),
         purposeOptions: (action.parameters.purposes?.edges || []).map(
+          optionMaker
+        ),
+        qualifierOptions: (action.parameters.qualifiers?.edges || []).map(
           optionMaker
         ),
         reservationUnitTypeOptions: (
@@ -398,6 +405,11 @@ export const reducer = (state: State, action: Action): State => {
     case "setPurposes": {
       return modifyEditorState(state, {
         purposePks: action.purposes.map((ot) => ot.value as number),
+      });
+    }
+    case "setQualifiers": {
+      return modifyEditorState(state, {
+        qualifierPks: action.qualifiers.map((ot) => ot.value as number),
       });
     }
     case "setValidatioErrors": {

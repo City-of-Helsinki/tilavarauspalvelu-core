@@ -78,6 +78,10 @@ export const RESERVATIONUNIT_QUERY = gql`
         pk
         nameFi
       }
+      qualifiers {
+        pk
+        nameFi
+      }
       unit {
         pk
       }
@@ -179,6 +183,83 @@ export const UPDATE_IMAGE_TYPE = gql`
       errors {
         messages
         field
+      }
+    }
+  }
+`;
+
+export const RESERVATION_UNIT_EDITOR_PARAMETERS = gql`
+  query reservation_unit_editor_parameters {
+    equipments {
+      edges {
+        node {
+          nameFi
+          pk
+        }
+      }
+    }
+
+    taxPercentages {
+      edges {
+        node {
+          pk
+          value
+        }
+      }
+    }
+
+    purposes {
+      edges {
+        node {
+          pk
+          nameFi
+        }
+      }
+    }
+
+    reservationUnitTypes {
+      edges {
+        node {
+          nameFi
+          pk
+        }
+      }
+    }
+
+    termsOfUse {
+      edges {
+        node {
+          pk
+          nameFi
+          termsType
+        }
+      }
+    }
+
+    reservationUnitCancellationRules {
+      edges {
+        node {
+          nameFi
+          pk
+        }
+      }
+    }
+
+    metadataSets {
+      edges {
+        node {
+          name
+          pk
+        }
+      }
+    }
+
+    qualifiers {
+      edges {
+        node {
+          nameFi
+          pk
+        }
       }
     }
   }

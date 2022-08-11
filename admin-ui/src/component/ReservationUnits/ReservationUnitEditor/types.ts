@@ -41,6 +41,7 @@ export type Action =
   | { type: "setResources"; resources: OptionType[] }
   | { type: "setEquipments"; equipments: OptionType[] }
   | { type: "setPurposes"; purposes: OptionType[] }
+  | { type: "setQualifiers"; qualifiers: OptionType[] }
   | { type: "parametersLoaded"; parameters: Query }
   | { type: "setMaxPersons"; maxPersons: number }
   | { type: "setReservationsMaxDaysBefore"; reservationsMaxDaysBefore: number }
@@ -75,6 +76,7 @@ export type State = {
   resourceOptions: OptionType[];
   equipmentOptions: OptionType[];
   purposeOptions: OptionType[];
+  qualifierOptions: OptionType[];
   reservationUnitTypeOptions: OptionType[];
   paymentTermsOptions: OptionType[];
   pricingTermsOptions: OptionType[];

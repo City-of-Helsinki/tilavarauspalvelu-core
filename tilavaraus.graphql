@@ -1334,6 +1334,34 @@ type PurposeUpdateMutationPayload {
   clientMutationId: String
 }
 
+type QualifierType implements Node {
+  nameFi: String
+  nameEn: String
+  nameSv: String
+
+  """The ID of the object"""
+  id: ID!
+  pk: Int
+}
+
+type QualifierTypeConnection {
+  """Pagination data for this connection."""
+  pageInfo: PageInfo!
+
+  """Contains the nodes in this connection."""
+  edges: [QualifierTypeEdge]!
+  totalCount: Int
+}
+
+"""A Relay edge containing a `QualifierType` and its cursor."""
+type QualifierTypeEdge {
+  """The item at the end of the edge"""
+  node: QualifierType
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
+
 type Query {
   applications(
     offset: Int = null
@@ -1413,6 +1441,7 @@ type Query {
     maxPersonsLte: Float = null
     textSearch: String = null
     purposes: [ID] = null
+    qualifiers: [ID] = null
     isDraft: Boolean = null
     isVisible: Boolean = null
     applicationRound: [ID] = null
@@ -1499,6 +1528,7 @@ type Query {
   keywordGroups(offset: Int = null, before: String = null, after: String = null, first: Int = null, last: Int = null, nameFi: String = null, nameSv: String = null, nameEn: String = null): KeywordGroupTypeConnection
   keywords(offset: Int = null, before: String = null, after: String = null, first: Int = null, last: Int = null, nameFi: String = null, nameSv: String = null, nameEn: String = null): KeywordTypeConnection
   purposes(offset: Int = null, before: String = null, after: String = null, first: Int = null, last: Int = null, nameFi: String = null, nameEn: String = null, nameSv: String = null): PurposeTypeConnection
+  qualifiers(offset: Int = null, before: String = null, after: String = null, first: Int = null, last: Int = null, nameFi: String = null, nameEn: String = null, nameSv: String = null): QualifierTypeConnection
   reservationPurposes(offset: Int = null, before: String = null, after: String = null, first: Int = null, last: Int = null, nameFi: String = null, nameEn: String = null, nameSv: String = null): ReservationPurposeTypeConnection
   termsOfUse(offset: Int = null, before: String = null, after: String = null, first: Int = null, last: Int = null, termsType: String = null): TermsOfUseTypeConnection
   taxPercentages(offset: Int = null, before: String = null, after: String = null, first: Int = null, last: Int = null, value: Float = null): TaxPercentageTypeConnection
@@ -2109,6 +2139,11 @@ type ReservationUnitByPkType implements Node {
   pricingType: ReservationUnitsReservationUnitPricingTypeChoices
 
   """
+  When pricing type is paid, what kind of payment types are available with this reservation unit.
+  """
+  paymentType: ReservationUnitsReservationUnitPaymentTypeChoices
+
+  """
   Can reservations to this reservation unit be able to apply free of charge.
   """
   canApplyFreeOfCharge: Boolean!
@@ -2127,6 +2162,7 @@ type ReservationUnitByPkType implements Node {
   id: ID!
   openingHours(openingTimes: Boolean = null, periods: Boolean = null, startDate: Date = null, endDate: Date = null): OpeningHoursType
   pk: Int
+  qualifiers: [QualifierType]
   location: LocationType
   equipment: [EquipmentType]
   unit: UnitType
@@ -2191,6 +2227,7 @@ input ReservationUnitCreateMutationInput {
   spacePks: [Int]
   resourcePks: [Int]
   purposePks: [Int]
+  qualifierPks: [Int]
   servicePks: [Int]
   reservationUnitTypePk: Int
   surfaceArea: Float
@@ -2274,18 +2311,24 @@ input ReservationUnitCreateMutationInput {
   What kind of pricing type this reservation unit has. Possible values are PAID, FREE.
   """
   pricingType: String
+
+  """
+  If pricing type is PAID, what kind of payment type this reservation unit has.
+  Possible values are ONLINE, INVOICE, ON_SITE.
+  """
+  paymentType: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
   additionalInstructionsFi: String
   additionalInstructionsEn: String
   additionalInstructionsSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
   clientMutationId: String
 }
 
@@ -2328,6 +2371,7 @@ type ReservationUnitCreateMutationPayload {
   maxReservationDuration: Int
   minReservationDuration: Int
   isDraft: Boolean
+  qualifierPks: [Int]
   reservationUnitTypePk: Int
   surfaceArea: Float
   bufferTimeBefore: Int
@@ -2405,18 +2449,24 @@ type ReservationUnitCreateMutationPayload {
   What kind of pricing type this reservation unit has. Possible values are PAID, FREE.
   """
   pricingType: String
+
+  """
+  If pricing type is PAID, what kind of payment type this reservation unit has.
+  Possible values are ONLINE, INVOICE, ON_SITE.
+  """
+  paymentType: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
   additionalInstructionsFi: String
   additionalInstructionsEn: String
   additionalInstructionsSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -2524,6 +2574,18 @@ enum ReservationUnitsReservationUnitImageImageTypeChoices {
 }
 
 """An enumeration."""
+enum ReservationUnitsReservationUnitPaymentTypeChoices {
+  """Online"""
+  ONLINE
+
+  """Invoice"""
+  INVOICE
+
+  """On Site"""
+  ON_SITE
+}
+
+"""An enumeration."""
 enum ReservationUnitsReservationUnitPriceUnitChoices {
   """per 15 minutes"""
   PER_15_MINS
@@ -2603,6 +2665,7 @@ type ReservationUnitType implements Node {
   resources: [ResourceType]
   services: [ServiceType]
   purposes: [PurposeType]
+  qualifiers: [QualifierType]
   reservationUnitType: ReservationUnitTypeType
   requireIntroduction: Boolean!
   termsOfUseFi: String
@@ -2681,6 +2744,11 @@ type ReservationUnitType implements Node {
 
   """What kind of pricing types are available with this reservation unit."""
   pricingType: ReservationUnitsReservationUnitPricingTypeChoices
+
+  """
+  When pricing type is paid, what kind of payment types are available with this reservation unit.
+  """
+  paymentType: ReservationUnitsReservationUnitPaymentTypeChoices
 
   """
   Can reservations to this reservation unit be able to apply free of charge.
@@ -2777,6 +2845,7 @@ input ReservationUnitUpdateMutationInput {
   spacePks: [Int]
   resourcePks: [Int]
   purposePks: [Int]
+  qualifierPks: [Int]
   servicePks: [Int]
   reservationUnitTypePk: Int
   surfaceArea: Float
@@ -2860,18 +2929,24 @@ input ReservationUnitUpdateMutationInput {
   What kind of pricing type this reservation unit has. Possible values are PAID, FREE.
   """
   pricingType: String
+
+  """
+  If pricing type is PAID, what kind of payment type this reservation unit has.
+  Possible values are ONLINE, INVOICE, ON_SITE.
+  """
+  paymentType: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
   additionalInstructionsFi: String
   additionalInstructionsEn: String
   additionalInstructionsSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
   clientMutationId: String
 }
 
@@ -2914,6 +2989,7 @@ type ReservationUnitUpdateMutationPayload {
   maxReservationDuration: Int
   minReservationDuration: Int
   isDraft: Boolean
+  qualifierPks: [Int]
   reservationUnitTypePk: Int
   surfaceArea: Float
   bufferTimeBefore: Int
@@ -2991,18 +3067,24 @@ type ReservationUnitUpdateMutationPayload {
   What kind of pricing type this reservation unit has. Possible values are PAID, FREE.
   """
   pricingType: String
+
+  """
+  If pricing type is PAID, what kind of payment type this reservation unit has.
+  Possible values are ONLINE, INVOICE, ON_SITE.
+  """
+  paymentType: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
   additionalInstructionsFi: String
   additionalInstructionsEn: String
   additionalInstructionsSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -3675,15 +3757,15 @@ input UnitUpdateMutationInput {
   webPage: String
   email: String
   phone: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
-  shortDescriptionFi: String
-  shortDescriptionEn: String
-  shortDescriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  shortDescriptionFi: String
+  shortDescriptionEn: String
+  shortDescriptionSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   clientMutationId: String
 }
 
@@ -3693,15 +3775,15 @@ type UnitUpdateMutationPayload {
   webPage: String
   email: String
   phone: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
-  shortDescriptionFi: String
-  shortDescriptionEn: String
-  shortDescriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  shortDescriptionFi: String
+  shortDescriptionEn: String
+  shortDescriptionSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
