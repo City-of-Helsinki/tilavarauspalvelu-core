@@ -257,11 +257,24 @@ class ReservationUnit(models.Model):
         null=True,
         on_delete=models.SET_NULL,
     )
-    additional_instructions = models.TextField(
-        verbose_name=_("Additional instructions"),
+    reservation_pending_instructions = models.TextField(
+        verbose_name=_("Additional instructions for pending reservation"),
         blank=True,
         default="",
     )
+
+    reservation_confirmed_instructions = models.TextField(
+        verbose_name=_("Additional instructions for confirmed reservation"),
+        blank=True,
+        default="",
+    )
+
+    reservation_cancelled_instructions = models.TextField(
+        verbose_name=_("Additional instructions for cancelled reservations"),
+        blank=True,
+        default="",
+    )
+
     unit = models.ForeignKey(
         Unit,
         verbose_name=_("Unit"),

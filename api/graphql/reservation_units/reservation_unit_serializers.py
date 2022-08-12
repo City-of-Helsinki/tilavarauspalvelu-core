@@ -370,9 +370,15 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
     def validate_for_publish(self, data):
         """Validates necessary fields for published reservation unit."""
         allowed_empty_fields = [
-            "additional_instructions_fi",
-            "additional_instructions_sv",
-            "additional_instructions_en",
+            "reservation_confirmed_instructions_fi",
+            "reservation_confirmed_instructions_sv",
+            "reservation_confirmed_instructions_en",
+            "reservation_pending_instructions_fi",
+            "reservation_pending_instructions_sv",
+            "reservation_pending_instructions_en",
+            "reservation_cancelled_instructions_fi",
+            "reservation_cancelled_instructions_sv",
+            "reservation_cancelled_instructions_en",
             "terms_of_use_fi",
             "terms_of_use_en",
             "terms_of_use_sv",
