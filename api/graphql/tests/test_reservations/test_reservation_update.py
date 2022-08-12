@@ -585,6 +585,43 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         assert_that(self.reservation).is_not_none()
         assert_that(self.reservation.priority).is_equal_to(update_data["priority"])
 
+    def test_updating_reservation_with_staff_event_succeed(
+        self, mock_periods, mock_opening_hours
+    ):
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+        self.client.force_login(self.general_admin)
+        input_data = self.get_valid_update_data()
+        input_data["staffEvent"] = True
+        response = self.query(self.get_update_query(), input_data=input_data)
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_none()
+        assert_that(
+            content.get("data").get("updateReservation").get("reservation").get("pk")
+        ).is_not_none()
+        pk = content.get("data").get("updateReservation").get("reservation").get("pk")
+        reservation = Reservation.objects.get(id=pk)
+        assert_that(reservation).is_not_none()
+        assert_that(reservation.staff_event).is_equal_to(True)
+
+    def test_updating_fails_when_staff_event_is_provided_without_permissions(
+        self, mock_periods, mock_opening_hours
+    ):
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+        self.client.force_login(self.regular_joe)
+        input_data = self.get_valid_update_data()
+        input_data["staffEvent"] = True
+        response = self.query(self.get_update_query(), input_data=input_data)
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_none()
+        assert_that(
+            content.get("data")
+            .get("updateReservation")
+            .get("errors")[0]
+            .get("messages")[0]
+        ).is_equal_to("You don't have permissions to set staff_event")
+
     def test_update_reservation_price_calculation_not_triggered(
         self, mock_periods, mock_opening_hours
     ):

@@ -137,6 +137,7 @@ class ReservationSerializer(serializers.ModelSerializer):
             "reservation_user",
             "reservation_unit",
             "recurring_reservation",
+            "staff_event",
         ]
         extra_kwargs = {
             "state": {

@@ -425,6 +425,13 @@ class Reservation(models.Model):
         help_text="Working memo for staff users.",
     )
 
+    staff_event = models.BooleanField(
+        verbose_name=_("Reservation is internal"),
+        null=True,
+        default=False,
+        help_text="Indicates if reservation is internal or created by staff",
+    )
+
     def get_location_string(self):
         locations = []
         for reservation_unit in self.reservation_unit.all():

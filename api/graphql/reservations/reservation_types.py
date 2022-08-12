@@ -156,6 +156,7 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
     age_group = graphene.Field(AgeGroupType)
     buffer_time_before = Duration()
     buffer_time_after = Duration()
+    staff_event = graphene.Boolean()
 
     class Meta:
         model = Reservation
@@ -200,6 +201,7 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
             "price",
             "working_memo",
             "cancel_details",
+            "staff_event",
         ]
         filter_fields = {
             "state": ["exact"],
@@ -253,6 +255,14 @@ class ReservationType(AuthNode, PrimaryKeyObjectType):
             or settings.TMP_PERMISSIONS_DISABLED
         ):
             return self.working_memo
+        return None
+
+    def resolve_staff_event(self, info: ResolveInfo) -> Optional[bool]:
+        if (
+            can_handle_reservation(info.context.user, self)
+            or settings.TMP_PERMISSIONS_DISABLED
+        ):
+            return self.staff_event
         return None
 
     @reservation_non_public_field
