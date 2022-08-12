@@ -22,6 +22,11 @@ Q = models.Q
 User = get_user_model()
 
 
+class ReservationType(models.TextChoices):
+    NORMAL = "normal"
+    BLOCKED = "blocked"
+
+
 class AgeGroup(models.Model):
 
     minimum = models.fields.PositiveIntegerField(
@@ -430,6 +435,15 @@ class Reservation(models.Model):
         null=True,
         default=False,
         help_text="Indicates if reservation is internal or created by staff",
+    )
+
+    type = models.CharField(
+        max_length=50,
+        choices=ReservationType.choices,
+        null=True,
+        blank=False,
+        default=ReservationType.NORMAL,
+        help_text="Type of reservation",
     )
 
     def get_location_string(self):

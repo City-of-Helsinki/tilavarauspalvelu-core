@@ -30,6 +30,7 @@ from reservations.models import (
     ReservationCancelReason,
     ReservationDenyReason,
     ReservationPurpose,
+    ReservationType,
 )
 
 DEFAULT_TIMEZONE = get_default_timezone()
@@ -84,6 +85,14 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
     )
     buffer_time_before = DurationField(required=False)
     buffer_time_after = DurationField(required=False)
+    type = ChoiceCharField(
+        required=False,
+        choices=ReservationType.choices,
+        help_text=(
+            "Reservation type. Mutation requires special permissions. Possible values are "
+            f"{', '.join(value.upper() for value in ReservationType)}."
+        ),
+    )
 
     class Meta:
         model = Reservation
@@ -127,6 +136,7 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
             "tax_percentage_value",
             "price",
             "staff_event",
+            "type",
         ]
 
     def __init__(self, *args, **kwargs):
@@ -236,8 +246,10 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
             data["tax_percentage_value"] = price_calculation_result.tax_percentage
 
         staff_event = data.get("staff_event", None)
+        reservation_type = data.get("type", None)
         reservation_unit_ids = list(map(lambda x: x.pk, reservation_units))
         self.check_staff_event(user, reservation_unit_ids, staff_event)
+        self.check_reservation_type(user, reservation_unit_ids, reservation_type)
 
         return data
 
@@ -530,6 +542,18 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
         raise serializers.ValidationError(
             "You don't have permissions to set staff_event"
         )
+
+    def check_reservation_type(
+        self, user, reservation_unit_ids: List[int], reservation_type: Optional[str]
+    ):
+        if (
+            settings.TMP_PERMISSIONS_DISABLED
+            or reservation_type is None
+            or can_handle_reservation_with_units(user, reservation_unit_ids)
+        ):
+            return
+
+        raise serializers.ValidationError("You don't have permissions to set type")
 
 
 class ReservationUpdateSerializer(

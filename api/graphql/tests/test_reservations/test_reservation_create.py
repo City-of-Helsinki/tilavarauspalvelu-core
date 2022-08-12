@@ -984,6 +984,44 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
             .get("messages")[0]
         ).is_equal_to("You don't have permissions to set staff_event")
 
+    def test_creating_reservation_with_type_succeed(
+        self, mock_periods, mock_opening_hours
+    ):
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+        self.client.force_login(self.general_admin)
+        input_data = self.get_valid_input_data()
+        input_data["type"] = "blocked"
+        response = self.query(self.get_create_query(), input_data=input_data)
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        assert_that(
+            content.get("data").get("createReservation").get("errors")
+        ).is_none()
+        assert_that(
+            content.get("data").get("createReservation").get("reservation").get("pk")
+        ).is_not_none()
+        pk = content.get("data").get("createReservation").get("reservation").get("pk")
+        reservation = Reservation.objects.get(id=pk)
+        assert_that(reservation).is_not_none()
+        assert_that(reservation.type).is_equal_to("blocked")
+
+    def test_creating_fails_when_type_is_provided_without_permissions(
+        self, mock_periods, mock_opening_hours
+    ):
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+        self.client.force_login(self.regular_joe)
+        input_data = self.get_valid_input_data()
+        input_data["type"] = "blocked"
+        response = self.query(self.get_create_query(), input_data=input_data)
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        assert_that(
+            content.get("data")
+            .get("createReservation")
+            .get("errors")[0]
+            .get("messages")[0]
+        ).is_equal_to("You don't have permissions to set type")
+
     def test_create_price_calculation_with_free_reservation_unit(
         self, mock_periods, mock_opening_hours
     ):
