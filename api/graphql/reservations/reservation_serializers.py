@@ -1,7 +1,7 @@
 import datetime
 import math
 from decimal import Decimal
-from typing import List
+from typing import List, Optional
 
 from django.conf import settings
 from django.utils.timezone import get_default_timezone
@@ -18,6 +18,7 @@ from api.graphql.primary_key_fields import IntegerPrimaryKeyField
 from applications.models import CUSTOMER_TYPES, City
 from email_notification.models import EmailType
 from email_notification.tasks import send_reservation_email_task
+from permissions.helpers import can_handle_reservation_with_units
 from reservation_units.models import PricingType, ReservationKind, ReservationUnit
 from reservation_units.utils.reservation_unit_reservation_scheduler import (
     ReservationUnitReservationScheduler,
@@ -125,6 +126,7 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
             "unit_price",
             "tax_percentage_value",
             "price",
+            "staff_event",
         ]
 
     def __init__(self, *args, **kwargs):
@@ -232,6 +234,10 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
             data["price"] = price_calculation_result.reservation_price
             data["unit_price"] = price_calculation_result.unit_price
             data["tax_percentage_value"] = price_calculation_result.tax_percentage
+
+        staff_event = data.get("staff_event", None)
+        reservation_unit_ids = list(map(lambda x: x.pk, reservation_units))
+        self.check_staff_event(user, reservation_unit_ids, staff_event)
 
         return data
 
@@ -509,6 +515,20 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
             total_reservation_price,
             first_paid_unit_price,
             first_paid_unit_tax_percentage,
+        )
+
+    def check_staff_event(
+        self, user, reservation_unit_ids: List[int], staff_event: Optional[bool]
+    ):
+        if (
+            settings.TMP_PERMISSIONS_DISABLED
+            or staff_event is None
+            or can_handle_reservation_with_units(user, reservation_unit_ids)
+        ):
+            return
+
+        raise serializers.ValidationError(
+            "You don't have permissions to set staff_event"
         )
 
 

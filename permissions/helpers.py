@@ -328,6 +328,23 @@ def can_handle_reservation(user: User, reservation: Reservation) -> bool:
     )
 
 
+def can_handle_reservation_with_units(
+    user: User, reservation_unit_ids: List[int]
+) -> bool:
+    permission = "can_manage_reservations"
+    reservation_units = ReservationUnit.objects.filter(pk__in=reservation_unit_ids)
+
+    units = Unit.objects.filter(reservationunit__in=reservation_units)
+    service_sectors = ServiceSector.objects.filter(units__in=units)
+
+    return (
+        is_superuser(user)
+        or has_unit_permission(user, units, permission)
+        or has_general_permission(user, permission)
+        or has_service_sector_permission(user, service_sectors, permission)
+    )
+
+
 def can_view_recurring_reservation(
     user: User, recurring_reservation: RecurringReservation
 ) -> bool:

@@ -65,6 +65,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
             working_memo="i'm visible to admins",
             buffer_time_before=datetime.timedelta(minutes=15),
             buffer_time_after=datetime.timedelta(minutes=30),
+            staff_event=False,
         )
 
     def get_query_with_personal_fields(self, query_type: str):
@@ -97,6 +98,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
                             cancelDetails
                             begin
                             end
+                            staffEvent
                         }
                     }
                 }
