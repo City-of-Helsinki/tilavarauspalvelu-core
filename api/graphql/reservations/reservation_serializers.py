@@ -166,14 +166,6 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
         self.fields["num_persons"].required = False
         self.fields["purpose_pk"].required = False
 
-    def validate_reservee_type(self, value):
-        valid_values = [x[0] for x in CUSTOMER_TYPES.CUSTOMER_TYPE_CHOICES]
-        if value not in valid_values:
-            raise serializers.ValidationError(
-                f"Invalid reservee type {value}. Valid values are {', '.join(valid_values)}"
-            )
-        return value
-
     def validate(self, data):
         begin = data.get("begin", getattr(self.instance, "begin", None))
         end = data.get("end", getattr(self.instance, "end", None))
