@@ -9,7 +9,7 @@ export type DialogHeaderProps = {
   iconLeft?: React.ReactNode;
 };
 
-const Title = styled.h2`
+const Title = styled.h3`
   :focus {
     border: 2px solid var(--color-coat-of-arms);
   }
@@ -17,7 +17,7 @@ const Title = styled.h2`
 
 const Container = styled.div`
   display: flex;
-  margin: 0 var(--spacing-m);
+  margin: 0 var(--spacing-l);
 `;
 
 const Button = styled.button`
@@ -59,7 +59,12 @@ export const CustomDialogHeader = ({
         {title}
       </Title>
       {extras ? <Extras>{extras}</Extras> : <div />}
-      <Button type="button" aria-label="Close" onClick={() => close()}>
+      <Button
+        style={{ paddingRight: 0 }}
+        type="button"
+        aria-label="Close"
+        onClick={() => close()}
+      >
         <IconCross aria-hidden="true" />
       </Button>
     </Container>

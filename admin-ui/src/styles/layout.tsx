@@ -110,6 +110,14 @@ export const VerticalFlex = styled.div`
 
 VerticalFlex.displayName = "VerticalFlex";
 
+export const SparseVerticalFlex = styled.div`
+  display: flex;
+  gap: var(--spacing-l);
+  flex-direction: column;
+`;
+
+SparseVerticalFlex.displayName = "SparseVerticalFlex";
+
 export const VerticalFlexNoGap = styled.div`
   display: flex;
   gap: 0;

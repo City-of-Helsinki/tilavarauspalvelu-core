@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import styled from "styled-components";
 import { useTranslation } from "react-i18next";
+import styled from "styled-components";
 import { useMutation, useQuery } from "@apollo/client";
-import { Button, Dialog, IconInfoCircle, TextArea } from "hds-react";
+import { Button, Dialog, TextArea } from "hds-react";
 import {
   Mutation,
   Query,
@@ -16,11 +16,11 @@ import { useNotification } from "../../../context/NotificationContext";
 import Loader from "../../Loader";
 import Select from "../../ReservationUnits/ReservationUnitEditor/Select";
 import { OptionType } from "../../../common/types";
+import { SparseVerticalFlex } from "../../../styles/layout";
+import { CustomDialogHeader } from "../../CustomDialogHeader";
 
-const Fields = styled.div`
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 2em;
+const ActionButtons = styled(Dialog.ActionButtons)`
+  justify-content: end;
 `;
 
 const DialogContent = ({
@@ -75,31 +75,35 @@ const DialogContent = ({
     <>
       <Dialog.Content>
         <p id="modal-description" className="text-body" />
-        <Fields>
+        <SparseVerticalFlex>
           <Select
+            required
             id="denyReason"
             options={denyReasonOptions}
             placeholder={t("common.select")}
             label={t("RequestedReservation.DenyDialog.denyReason")}
             onChange={(v) => setDenyReason(Number(v))}
             value={denyReasonPk}
+            helper={t("RequestedReservation.DenyDialog.denyReasonHelper")}
           />
           <TextArea
             value={handlingDetails}
             onChange={(e) => setHandlingDetails(e.target.value)}
             label={t("RequestedReservation.DenyDialog.handlingDetails")}
             id="handlingDetails"
+            helperText={t(
+              "RequestedReservation.DenyDialog.handlingDetailsHelper"
+            )}
           />
-        </Fields>
+        </SparseVerticalFlex>
       </Dialog.Content>
-      <Dialog.ActionButtons>
+      <ActionButtons>
         <Button variant="secondary" onClick={onClose} theme="black">
           {t("common.prev")}
         </Button>
 
         <Button
           disabled={!denyReasonPk}
-          variant="danger"
           onClick={async () => {
             try {
               const res = await denyReservation({
@@ -121,7 +125,7 @@ const DialogContent = ({
         >
           {t("RequestedReservation.DenyDialog.reject")}
         </Button>
-      </Dialog.ActionButtons>
+      </ActionButtons>
     </>
   );
 };
@@ -147,10 +151,10 @@ const DenyDialog = ({
       aria-describedby="modal-description"
       isOpen={isOpen}
     >
-      <Dialog.Header
+      <CustomDialogHeader
         id="modal-header"
         title={t("RequestedReservation.DenyDialog.title")}
-        iconLeft={<IconInfoCircle aria-hidden="true" />}
+        close={onClose}
       />
       <DialogContent
         reservation={reservation}

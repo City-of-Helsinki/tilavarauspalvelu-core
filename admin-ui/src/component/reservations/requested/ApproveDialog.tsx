@@ -30,6 +30,10 @@ const Content = styled.p`
   font-size: var(--fontsize-body-l);
 `;
 
+const ActionButtons = styled(Dialog.ActionButtons)`
+  justify-content: end;
+`;
+
 const parseNumber = (n: string): number => Number(n.replace(",", "."));
 
 const DialogContent = ({
@@ -120,7 +124,7 @@ const DialogContent = ({
           />
         </VerticalFlex>
       </Dialog.Content>
-      <Dialog.ActionButtons>
+      <ActionButtons>
         <Button variant="secondary" onClick={onClose}>
           {t("common.cancel")}
         </Button>
@@ -154,7 +158,7 @@ const DialogContent = ({
         >
           {t("RequestedReservation.ApproveDialog.accept")}
         </Button>
-      </Dialog.ActionButtons>
+      </ActionButtons>
     </>
   );
 };

@@ -1297,9 +1297,13 @@ const translations: ITranslations = {
     DenyDialog: {
       reject: ["Hylkää varaus"],
       denyReason: ["Hylkäyksen syy"],
+      denyReasonHelper: [
+        "Ilmoitus hylkäyksestä ja syy lähetetään tiedoksi varaajalle",
+      ],
       denied: ["Varaus hylätty"],
-      title: ["Vahvista hylkäys"],
+      title: ["Vahvista varauksen hylkäys"],
       handlingDetails: ["Tarkempi syy hylkäykselle"],
+      handlingDetailsHelper: ["Näytetään vain henkilökunnalle"],
     },
     ApproveDialog: {
       title: ["Hyväksy varaus ja määritä subventoitu hinta"],
