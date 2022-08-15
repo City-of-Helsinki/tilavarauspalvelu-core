@@ -159,6 +159,7 @@ export const reducer = (state: State, action: Action): State => {
             "maxReservationDuration",
             "minReservationDuration",
             "pk",
+            "paymentType",
             "priceUnit",
             "publishBegins",
             "publishEnds",

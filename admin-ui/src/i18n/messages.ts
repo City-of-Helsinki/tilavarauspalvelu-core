@@ -59,6 +59,11 @@ const translations: ITranslations = {
       UNREGISTERED: ["Yhdistys, rekisteröimätön"],
     },
   },
+  paymentType: {
+    INVOICE: ["Laskutus"],
+    ONLINE: ["Verkkomaksu"],
+    ON_SITE: ["Maksu paikan päällä"],
+  },
   language: {
     fi: ["suomeksi"],
     sv: ["ruotsiksi"],
@@ -1065,6 +1070,7 @@ const translations: ITranslations = {
       serviceSpecificTermsPk: ["Palvelukohtaiset täydentävät ehdot"],
       cancellationTermsPk: ["Peruutusehdot"],
       paymentTermsPk: ["Maksuehdot"],
+      paymentType: ["Maksutapa"],
       additionalInstructionsFi: ["Sähköpostin lisäohjeteksti fi"],
       additionalInstructionsSv: ["Sähköpostin lisäohjeteksti sv"],
       additionalInstructionsEn: ["Sähköpostin lisäohjeteksti en"],

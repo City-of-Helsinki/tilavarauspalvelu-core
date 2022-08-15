@@ -141,6 +141,7 @@ export const schema = Joi.object({
   pricingType: Joi.string().required(),
   lowestPrice: requiredForNonFree(Joi.number().required()),
   priceUnit: requiredForNonFree(Joi.string().required()),
+  paymentType: requiredForNonFree(Joi.string().required()),
   taxPercentagePk: requiredForNonFree(Joi.number().required()),
 }).options({
   allowUnknown: true,

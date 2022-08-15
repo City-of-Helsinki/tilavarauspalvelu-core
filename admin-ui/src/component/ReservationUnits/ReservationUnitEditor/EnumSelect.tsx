@@ -48,22 +48,25 @@ const EnumSelect = ({
   }));
 
   return (
-    <SortedSelect
-      label={label}
-      required={required}
-      options={options}
-      placeholder={placeholder}
-      disabled={disabled}
-      value={selectedOptions(value, options)}
-      id={id}
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      onChange={(e: any) => {
-        onChange(e.value);
-      }}
-      error={errorText}
-      invalid={!!errorText}
-      sort={sort}
-    />
+    <>
+      <div id={id} />
+      <SortedSelect
+        label={label}
+        required={required}
+        options={options}
+        placeholder={placeholder}
+        disabled={disabled}
+        value={selectedOptions(value, options)}
+        id={id}
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        onChange={(e: any) => {
+          onChange(e.value);
+        }}
+        error={errorText}
+        invalid={!!errorText}
+        sort={sort}
+      />
+    </>
   );
 };
 
