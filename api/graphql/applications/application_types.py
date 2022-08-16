@@ -237,6 +237,7 @@ class ApplicationEventType(AuthNode, PrimaryKeyObjectType):
             "declined_reservation_units",
             "weekly_amount_reductions_count",
             "aggregated_data",
+            "flagged",
         )
         filter_fields = ()
         interfaces = (graphene.relay.Node,)

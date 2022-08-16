@@ -7,6 +7,7 @@ from graphene_permissions.permissions import BasePermission
 from applications.models import Application, ApplicationEvent, ApplicationEventSchedule
 from permissions.helpers import (
     can_create_reservation,
+    can_handle_application,
     can_handle_reservation,
     can_manage_ability_groups,
     can_manage_age_groups,
@@ -99,6 +100,28 @@ class ApplicationEventPermission(BasePermission):
     @classmethod
     def has_permission(cls, info: ResolveInfo) -> bool:
         return info.context.user.is_authenticated
+
+
+class ApplicationEventSetFlagPermission(BasePermission):
+    @classmethod
+    def has_mutation_permission(cls, root: Any, info: ResolveInfo, input: dict) -> bool:
+        try:
+            event = ApplicationEvent.objects.get(id=input["pk"])
+        except (ApplicationEvent.DoesNotExist, KeyError):
+            return False
+
+        return can_handle_application(info.context.user, event.application)
+
+
+class ApplicationSetFlagPermission(BasePermission):
+    @classmethod
+    def has_mutation_permission(cls, root: Any, info: ResolveInfo, input: dict) -> bool:
+        try:
+            application = Application.objects.get(id=input["pk"])
+        except (Application.DoesNotExist, KeyError):
+            return False
+
+        return can_handle_application(info.context.user, application)
 
 
 class ApplicationEventDeclinePermission(BasePermission):
