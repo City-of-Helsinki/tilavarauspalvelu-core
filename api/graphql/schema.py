@@ -123,9 +123,11 @@ from .applications.application_mutations import (
     ApplicationEventCreateMutation,
     ApplicationEventDeclineMutation,
     ApplicationEventDeleteMutation,
+    ApplicationEventFlagMutation,
     ApplicationEventScheduleResultCreateMutation,
     ApplicationEventScheduleResultUpdateMutation,
     ApplicationEventUpdateMutation,
+    ApplicationFlagMutation,
     ApplicationUpdateMutation,
 )
 
@@ -500,11 +502,13 @@ class Mutation(graphene.ObjectType):
     create_application = ApplicationCreateMutation.Field()
     update_application = ApplicationUpdateMutation.Field()
     decline_application = ApplicationDeclineMutation.Field()
+    flag_application = ApplicationFlagMutation.Field()
 
     create_application_event = ApplicationEventCreateMutation.Field()
     update_application_event = ApplicationEventUpdateMutation.Field()
     delete_application_event = ApplicationEventDeleteMutation.Field()
     decline_application_event = ApplicationEventDeclineMutation.Field()
+    flag_application_event = ApplicationEventFlagMutation.Field()
 
     create_application_event_schedule_result = (
         ApplicationEventScheduleResultCreateMutation.Field()

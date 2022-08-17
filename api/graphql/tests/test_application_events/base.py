@@ -177,7 +177,7 @@ class ApplicationEventPermissionsTestCaseBase(ApplicationEventTestCaseBase):
 
         return service_sector_admin
 
-    def create_unit_admin(self):
+    def create_unit_admin(self, unit=None):
         unit_group_admin = get_user_model().objects.create(
             username="unit_admin",
             first_name="Amin",
@@ -194,7 +194,7 @@ class ApplicationEventPermissionsTestCaseBase(ApplicationEventTestCaseBase):
             permission="can_validate_applications",
         )
 
-        unit_role.unit.add(self.event_reservation_unit.reservation_unit.unit)
+        unit_role.unit.add(unit or self.event_reservation_unit.reservation_unit.unit)
 
         return unit_group_admin
 

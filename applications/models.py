@@ -1016,6 +1016,10 @@ class ApplicationEvent(models.Model):
 
     uuid = models.UUIDField(default=uuid.uuid4, null=False, editable=False, unique=True)
 
+    flagged = models.BooleanField(
+        verbose_name=_("Is the event flagged"), default=False, null=False, blank=True
+    )
+
     objects = ApplicationEventManager()
 
     def refresh_from_db(self, using=None, fields=None) -> None:

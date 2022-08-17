@@ -16,6 +16,10 @@ from api.graphql.applications.application_event_serializers import (
     ApplicationEventScheduleResultUpdateSerializer,
     ApplicationEventUpdateSerializer,
 )
+from api.graphql.applications.application_flag_serializers import (
+    ApplicationEventFlagSerializer,
+    ApplicationFlagSerializer,
+)
 from api.graphql.applications.application_serializers import (
     ApplicationCreateSerializer,
     ApplicationUpdateSerializer,
@@ -32,7 +36,9 @@ from permissions.api_permissions.graphene_permissions import (
     ApplicationEventDeclinePermission,
     ApplicationEventPermission,
     ApplicationEventScheduleResultPermission,
+    ApplicationEventSetFlagPermission,
     ApplicationPermission,
+    ApplicationSetFlagPermission,
 )
 
 
@@ -173,3 +179,27 @@ class ApplicationEventDeclineMutation(AuthSerializerMutation, SerializerMutation
     class Meta:
         lookup_field = "pk"
         serializer_class = ApplicationEventDeclineSerializer
+
+
+class ApplicationEventFlagMutation(AuthSerializerMutation, SerializerMutation):
+    permission_classes = (
+        (ApplicationEventSetFlagPermission,)
+        if not settings.TMP_PERMISSIONS_DISABLED
+        else (AllowAny,)
+    )
+
+    class Meta:
+        lookup_field = "pk"
+        serializer_class = ApplicationEventFlagSerializer
+
+
+class ApplicationFlagMutation(AuthSerializerMutation, SerializerMutation):
+    permission_classes = (
+        (ApplicationSetFlagPermission,)
+        if not settings.TMP_PERMISSIONS_DISABLED
+        else (AllowAny,)
+    )
+
+    class Meta:
+        lookup_field = "pk"
+        serializer_class = ApplicationFlagSerializer
