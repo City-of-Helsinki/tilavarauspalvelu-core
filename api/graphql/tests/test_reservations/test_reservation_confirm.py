@@ -153,9 +153,15 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         input_data = self.get_valid_confirm_data()
         response = self.query(self.get_confirm_query(), input_data=input_data)
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        confirm_data = content.get("data").get("confirmReservation")
-        assert_that(confirm_data.get("errors")).is_not_none()
+
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0]["message"]).is_equal_to(
+            "Reservation cannot be changed anymore."
+        )
+        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
+            "CHANGES_NOT_ALLOWED"
+        )
+
         self.reservation.refresh_from_db()
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.DENIED)
 
@@ -220,5 +226,13 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
             self.get_confirm_query(), input_data=self.get_valid_confirm_data()
         )
         content = json.loads(response.content)
-        confirm_data = content.get("data").get("confirmReservation")
-        assert_that(confirm_data.get("errors")).is_not_none()
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0]["message"]).contains(
+            "Value for required field"
+        )
+        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
+            "REQUIRED_FIELD_MISSING"
+        )
+        assert_that(content.get("errors")[0]["extensions"]["field"]).is_equal_to(
+            "homeCity"
+        )

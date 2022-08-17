@@ -32,6 +32,8 @@ from reservations.models import (
     ReservationPurpose,
 )
 
+from ..application_errors import ValidationErrorCodes, ValidationErrorWithCode
+
 DEFAULT_TIMEZONE = get_default_timezone()
 
 RESERVATION_STATE_EMAIL_TYPE_MAP = {
@@ -244,14 +246,16 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
         )
 
         if is_invalid_begin or is_invalid_end:
-            raise serializers.ValidationError(
-                "Reservation unit is not reservable within this reservation time."
+            raise ValidationErrorWithCode(
+                "Reservation unit is not reservable within this reservation time.",
+                ValidationErrorCodes.RESERVATION_UNIT_NOT_RESERVABLE,
             )
 
     def check_reservation_overlap(self, reservation_unit: ReservationUnit, begin, end):
         if reservation_unit.check_reservation_overlap(begin, end, self.instance):
-            raise serializers.ValidationError(
-                "Overlapping reservations are not allowed."
+            raise ValidationErrorWithCode(
+                "Overlapping reservations are not allowed.",
+                ValidationErrorCodes.OVERLAPPING_RESERVATIONS,
             )
 
     def check_opening_hours(self, scheduler, begin, end):
@@ -260,8 +264,9 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
             not scheduler.reservation_unit.allow_reservations_without_opening_hours
             and not is_reservation_unit_open
         ):
-            raise serializers.ValidationError(
-                "Reservation unit is not open within desired reservation time."
+            raise ValidationErrorWithCode(
+                "Reservation unit is not open within desired reservation time.",
+                ValidationErrorCodes.RESERVATION_UNIT_IS_NOT_OPEN,
             )
 
     def check_open_application_round(self, scheduler, begin, end):
@@ -270,8 +275,9 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
         )
 
         if open_app_round:
-            raise serializers.ValidationError(
-                "One or more reservation units are in open application round."
+            raise ValidationErrorWithCode(
+                "One or more reservation units are in open application round.",
+                ValidationErrorCodes.RESERVATION_UNIT_IN_OPEN_ROUND,
             )
 
     def check_reservation_duration(self, reservation_unit: ReservationUnit, begin, end):
@@ -281,8 +287,9 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
             and duration.total_seconds()
             > reservation_unit.max_reservation_duration.total_seconds()
         ):
-            raise serializers.ValidationError(
-                "Reservation duration exceeds one or more reservation unit's maximum duration."
+            raise ValidationErrorWithCode(
+                "Reservation duration exceeds one or more reservation unit's maximum duration.",
+                ValidationErrorCodes.RESERVATION_UNITS_MAX_DURATION_EXCEEDED,
             )
 
         if (
@@ -290,8 +297,9 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
             and duration.total_seconds()
             < reservation_unit.min_reservation_duration.total_seconds()
         ):
-            raise serializers.ValidationError(
-                "Reservation duration less than one or more reservation unit's minimum duration."
+            raise ValidationErrorWithCode(
+                "Reservation duration less than one or more reservation unit's minimum duration.",
+                ValidationErrorCodes.RESERVATION_UNIT_MIN_DURATION_NOT_EXCEEDED,
             )
 
     def _get_biggest_buffer_time_from_reservation_units(
@@ -306,8 +314,9 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
 
     def check_sku(self, current_sku, new_sku):
         if current_sku is not None and current_sku != new_sku:
-            raise serializers.ValidationError(
-                "An ambiguous SKU cannot be assigned for this reservation."
+            raise ValidationErrorWithCode(
+                "An ambiguous SKU cannot be assigned for this reservation.",
+                ValidationErrorCodes.AMBIGUOUS_SKU,
             )
 
     def check_max_reservations_per_user(self, user, reservation_unit):
@@ -321,8 +330,9 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
                 .count()
             )
             if reservation_count >= max_count:
-                raise serializers.ValidationError(
-                    "Maximum number of active reservations for this reservation unit exceeded."
+                raise ValidationErrorWithCode(
+                    "Maximum number of active reservations for this reservation unit exceeded.",
+                    ValidationErrorCodes.MAX_NUMBER_OF_ACTIVE_RESERVATIONS_EXCEEDED,
                 )
 
     def check_buffer_times(self, data, reservation_unit):
@@ -363,8 +373,9 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
             and buffer_before
             and (reservation_before.end + buffer_before) > begin
         ):
-            raise serializers.ValidationError(
-                "Reservation overlaps with reservation before due to buffer time."
+            raise ValidationErrorWithCode(
+                "Reservation overlaps with reservation before due to buffer time.",
+                ValidationErrorCodes.RESERVATION_OVERLAP,
             )
 
         if (
@@ -372,8 +383,9 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
             and buffer_after
             and (reservation_after.begin - buffer_after) < end
         ):
-            raise serializers.ValidationError(
-                "Reservation overlaps with reservation after due to buffer time."
+            raise ValidationErrorWithCode(
+                "Reservation overlaps with reservation after due to buffer time.",
+                ValidationErrorCodes.RESERVATION_OVERLAP,
             )
 
     def check_reservation_start_time(self, begin, scheduler):
@@ -393,8 +405,9 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
             begin, interval_timedelta
         )
         if begin not in possible_start_times:
-            raise serializers.ValidationError(
-                f"Reservation start time does not match the allowed interval of {interval_minutes} minutes."
+            raise ValidationErrorWithCode(
+                f"Reservation start time does not match the allowed interval of {interval_minutes} minutes.",
+                ValidationErrorCodes.RESERVATION_TIME_DOES_NOT_MATCH_ALLOWED_INTERVAL,
             )
 
     def check_reservation_days_before(self, begin, reservation_unit):
@@ -404,23 +417,26 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
             begin
             - datetime.timedelta(days=reservation_unit.reservations_max_days_before)
         ):
-            raise serializers.ValidationError(
-                f"Reservation start time is earlier than {reservation_unit.reservations_max_days_before} days before."
+            raise ValidationErrorWithCode(
+                f"Reservation start time is earlier than {reservation_unit.reservations_max_days_before} days before.",
+                ValidationErrorCodes.RESERVATION_NOT_WITHIN_ALLOWED_TIME_RANGE,
             )
 
         if reservation_unit.reservations_min_days_before and now > (
             begin
             - datetime.timedelta(days=reservation_unit.reservations_min_days_before)
         ):
-            raise serializers.ValidationError(
-                f"Reservation start time is less than {reservation_unit.reservations_min_days_before} days before."
+            raise ValidationErrorWithCode(
+                f"Reservation start time is less than {reservation_unit.reservations_min_days_before} days before.",
+                ValidationErrorCodes.RESERVATION_NOT_WITHIN_ALLOWED_TIME_RANGE,
             )
 
     def check_reservation_kind(self, reservation_unit):
         if reservation_unit.reservation_kind == ReservationKind.SEASON:
-            raise serializers.ValidationError(
+            raise ValidationErrorWithCode(
                 "Reservation cannot be done to this reservation unit from the api "
-                "since its reservation kind is SEASON."
+                "since its reservation kind is SEASON.",
+                ValidationErrorCodes.RESERVATION_UNIT_TYPE_IS_SEASON,
             )
 
     def requires_price_calculation(self, data):
@@ -519,8 +535,9 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
         ):
             return
 
-        raise serializers.ValidationError(
-            "You don't have permissions to set staff_event"
+        raise ValidationErrorWithCode(
+            "You don't have permissions to set staff_event",
+            ValidationErrorCodes.NO_PERMISSION,
         )
 
 
@@ -550,12 +567,16 @@ class ReservationUpdateSerializer(
 
     def validate(self, data):
         if self.instance.state not in (STATE_CHOICES.CREATED,):
-            raise serializers.ValidationError("Reservation cannot be changed anymore.")
+            raise ValidationErrorWithCode(
+                "Reservation cannot be changed anymore.",
+                ValidationErrorCodes.CHANGES_NOT_ALLOWED,
+            )
 
         new_state = data.get("state", self.instance.state)
         if new_state not in [STATE_CHOICES.CANCELLED, STATE_CHOICES.CREATED]:
-            raise serializers.ValidationError(
-                f"Setting the reservation state to {new_state} is not allowed."
+            raise ValidationErrorWithCode(
+                f"Setting the reservation state to {new_state} is not allowed.",
+                ValidationErrorCodes.STATE_CHANGE_NOT_ALLOWED,
             )
 
         data = super().validate(data)
@@ -588,8 +609,10 @@ class ReservationUpdateSerializer(
             internal_field_name = required_field.field_name
             existing_value = getattr(self.instance, internal_field_name, None)
             if not data.get(internal_field_name, existing_value):
-                raise serializers.ValidationError(
-                    f"Value for required field {to_camel_case(internal_field_name)} is missing."
+                raise ValidationErrorWithCode(
+                    f"Value for required field {to_camel_case(internal_field_name)} is missing.",
+                    ValidationErrorCodes.REQUIRED_FIELD_MISSING,
+                    to_camel_case(internal_field_name),
                 )
 
 
@@ -662,31 +685,36 @@ class ReservationCancellationSerializer(PrimaryKeyUpdateSerializer):
     def validate(self, data):
         data = super().validate(data)
         if self.instance.state != STATE_CHOICES.CONFIRMED:
-            raise serializers.ValidationError(
-                "Only reservations in confirmed state can be cancelled through this."
+            raise ValidationErrorWithCode(
+                "Only reservations in confirmed state can be cancelled through this.",
+                ValidationErrorCodes.CANCELLATION_NOT_ALLOWED,
             )
 
         now = datetime.datetime.now(tz=get_default_timezone())
         if self.instance.begin < now:
-            raise serializers.ValidationError(
-                "Reservation cannot be cancelled when begin time is in past."
+            ValidationErrorWithCode(
+                "Reservation cannot be cancelled when begin time is in past.",
+                ValidationErrorCodes.CANCELLATION_NOT_ALLOWED,
             )
         for reservation_unit in self.instance.reservation_unit.all():
             cancel_rule = reservation_unit.cancellation_rule
             if not cancel_rule:
-                raise serializers.ValidationError(
-                    "Reservation cannot be cancelled thus no cancellation rule."
+                raise ValidationErrorWithCode(
+                    "Reservation cannot be cancelled thus no cancellation rule.",
+                    ValidationErrorCodes.CANCELLATION_NOT_ALLOWED,
                 )
             must_be_cancelled_before = (
                 self.instance.begin - cancel_rule.can_be_cancelled_time_before
             )
             if must_be_cancelled_before < now:
-                raise serializers.ValidationError(
-                    "Reservation cannot be cancelled because the cancellation period has expired."
+                raise ValidationErrorWithCode(
+                    "Reservation cannot be cancelled because the cancellation period has expired.",
+                    ValidationErrorCodes.CANCELLATION_NOT_ALLOWED,
                 )
             if cancel_rule.needs_handling:
-                raise serializers.ValidationError(
-                    "Reservation cancellation needs manual handling."
+                raise ValidationErrorWithCode(
+                    "Reservation cancellation needs manual handling.",
+                    ValidationErrorCodes.REQUIRES_MANUAL_HANDLING,
                 )
 
         return data
@@ -740,8 +768,9 @@ class ReservationDenySerializer(PrimaryKeySerializer):
 
     def validate(self, data):
         if self.instance.state != STATE_CHOICES.REQUIRES_HANDLING:
-            raise serializers.ValidationError(
-                f"Only reservations with state as {STATE_CHOICES.REQUIRES_HANDLING.upper()} can be denied."
+            raise ValidationErrorWithCode(
+                f"Only reservations with state as {STATE_CHOICES.REQUIRES_HANDLING.upper()} can be denied.",
+                ValidationErrorCodes.DENYING_NOT_ALLOWED,
             )
         data = super().validate(data)
 
@@ -790,8 +819,9 @@ class ReservationApproveSerializer(PrimaryKeySerializer):
 
     def validate(self, data):
         if self.instance.state != STATE_CHOICES.REQUIRES_HANDLING:
-            raise serializers.ValidationError(
-                f"Only reservations with state as {STATE_CHOICES.REQUIRES_HANDLING.upper()} can be approved."
+            raise ValidationErrorWithCode(
+                f"Only reservations with state as {STATE_CHOICES.REQUIRES_HANDLING.upper()} can be approved.",
+                ValidationErrorCodes.APPROVING_NOT_ALLOWED,
             )
         data = super().validate(data)
 
@@ -826,9 +856,10 @@ class ReservationRequiresHandlingSerializer(PrimaryKeySerializer):
 
     def validate(self, data):
         if self.instance.state not in (STATE_CHOICES.DENIED, STATE_CHOICES.CONFIRMED):
-            raise serializers.ValidationError(
+            raise ValidationErrorWithCode(
                 f"Only reservations with states {STATE_CHOICES.DENIED.upper()} and {STATE_CHOICES.CONFIRMED.upper()} "
-                f"can be reverted to requires handling."
+                f"can be reverted to requires handling.",
+                ValidationErrorCodes.STATE_CHANGE_NOT_ALLOWED,
             )
         data = super().validate(data)
         return data

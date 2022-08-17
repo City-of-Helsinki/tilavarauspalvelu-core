@@ -108,9 +108,15 @@ class ReservationDenyTestCase(ReservationTestCaseBase):
         response = self.query(self.get_handle_query(), input_data=input_data)
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        handle_data = content.get("data").get("denyReservation")
-        assert_that(handle_data.get("errors")).is_not_none()
+
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0]["message"]).is_equal_to(
+            "Only reservations with state as REQUIRES_HANDLING can be denied."
+        )
+        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
+            "DENYING_NOT_ALLOWED"
+        )
+
         self.reservation.refresh_from_db()
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CREATED)
         assert_that(self.reservation.handling_details).is_empty()
