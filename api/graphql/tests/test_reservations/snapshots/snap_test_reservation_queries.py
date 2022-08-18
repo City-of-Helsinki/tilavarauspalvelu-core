@@ -43,6 +43,40 @@ snapshots['ReservationQueryTestCase::test_admin_can_read_working_memo 1'] = {
     }
 }
 
+snapshots['ReservationQueryTestCase::test_filter_by_multiple_reservation_unit 1'] = {
+    'data': {
+        'reservations': {
+            'edges': [
+                {
+                    'node': {
+                        'name': 'movies',
+                        'reservationUnits': [
+                            {
+                                'nameFi': 'resunit'
+                            }
+                        ],
+                        'reserveeFirstName': 'Reser',
+                        'reserveeLastName': 'Vee'
+                    }
+                },
+                {
+                    'node': {
+                        'name': 'Test reservation',
+                        'reservationUnits': [
+                            {
+                                'nameFi': 'other unit'
+                            }
+                        ],
+                        'reserveeFirstName': 'First',
+                        'reserveeLastName': 'Name'
+                    }
+                }
+            ],
+            'totalCount': 2
+        }
+    }
+}
+
 snapshots['ReservationQueryTestCase::test_filter_by_price_gte 1'] = {
     'data': {
         'reservations': {
@@ -71,6 +105,40 @@ snapshots['ReservationQueryTestCase::test_filter_by_price_lte 1'] = {
                 }
             ],
             'totalCount': 1
+        }
+    }
+}
+
+snapshots['ReservationQueryTestCase::test_filter_by_reservation_unit 1'] = {
+    'data': {
+        'reservations': {
+            'edges': [
+                {
+                    'node': {
+                        'name': 'movies',
+                        'reservationUnits': [
+                            {
+                                'nameFi': 'resunit'
+                            }
+                        ],
+                        'reserveeFirstName': 'Reser',
+                        'reserveeLastName': 'Vee'
+                    }
+                },
+                {
+                    'node': {
+                        'name': 'Test reservation',
+                        'reservationUnits': [
+                            {
+                                'nameFi': 'resunit'
+                            }
+                        ],
+                        'reserveeFirstName': 'First',
+                        'reserveeLastName': 'Name'
+                    }
+                }
+            ],
+            'totalCount': 2
         }
     }
 }
