@@ -287,9 +287,15 @@ const reservationByPk = graphql.query<Query, QueryReservationUnitByPkArgs>(
           termsOfUseFi: "Terms of use FI",
           termsOfUseEn: null,
           termsOfUseSv: null,
-          additionalInstructionsFi: "Additional Instructions FI",
-          additionalInstructionsEn: "Additional Instructions FI",
-          additionalInstructionsSv: "Additional Instructions FI",
+          reservationPendingInstructionsFi: "Pending Instructions FI",
+          reservationPendingInstructionsEn: "Pending Instructions EN",
+          reservationPendingInstructionsSv: "Pending Instructions SV",
+          reservationConfirmedInstructionsFi: "Confirmed Instructions FI",
+          reservationConfirmedInstructionsEn: "Confirmed Instructions EN",
+          reservationConfirmedInstructionsSv: "Confirmed Instructions SV",
+          reservationCancelledInstructionsFi: "Cancelled Instructions FI",
+          reservationCancelledInstructionsEn: "Cancelled Instructions EN",
+          reservationCancelledInstructionsSv: "Cancelled Instructions SV",
           serviceSpecificTerms: {
             textFi: "Service specific terms FI",
             textEn: null,
@@ -330,7 +336,7 @@ const reservationByPk = graphql.query<Query, QueryReservationUnitByPkArgs>(
 
     return res(
       ctx.data({
-        reservationByPk: data as ReservationType,
+        reservationByPk: data as unknown as ReservationType,
       })
     );
   }

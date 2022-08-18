@@ -118,7 +118,7 @@ describe("Tilavaraus user reservations", () => {
       "Saat sähköpostiisi (user@gmail.com) muistutuksen varauksesta."
     );
 
-    cy.contains("div", "Additional Instructions FI").should("be.visible");
+    cy.contains("div", "Confirmed Instructions FI").should("be.visible");
 
     cy.contains("div", "Sopparijuttuja").should("not.be.visible");
     cy.contains("div", "Toinen rivi").should("not.be.visible");

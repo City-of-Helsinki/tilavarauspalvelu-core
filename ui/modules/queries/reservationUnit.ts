@@ -26,9 +26,15 @@ export const RESERVATION_UNIT = gql`
       termsOfUseFi
       termsOfUseEn
       termsOfUseSv
-      additionalInstructionsFi
-      additionalInstructionsEn
-      additionalInstructionsSv
+      reservationPendingInstructionsFi
+      reservationPendingInstructionsEn
+      reservationPendingInstructionsSv
+      reservationConfirmedInstructionsFi
+      reservationConfirmedInstructionsEn
+      reservationConfirmedInstructionsSv
+      reservationCancelledInstructionsFi
+      reservationCancelledInstructionsEn
+      reservationCancelledInstructionsSv
       bufferTimeBefore
       bufferTimeAfter
       reservationStartInterval

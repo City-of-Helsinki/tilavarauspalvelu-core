@@ -40,6 +40,7 @@ import {
 import { TERMS_OF_USE } from "../../modules/queries/reservationUnit";
 import KorosDefault from "../../components/common/KorosDefault";
 import {
+  getReservationUnitInstructionsKey,
   getReservationUnitName,
   getUnitName,
 } from "../../modules/reservationUnit";
@@ -218,6 +219,11 @@ const Reservation = ({ termsOfUse, id }: Props): JSX.Element => {
 
   const reservationUnit = reservation?.reservationUnits[0];
 
+  const instructionsKey = useMemo(
+    () => getReservationUnitInstructionsKey(reservation?.state),
+    [reservation?.state]
+  );
+
   const isReservationCancelled = reservation?.state === "CANCELLED";
   const isBeingHandled = reservation?.state === "REQUIRES_HANDLING";
   const ticketState = useMemo(() => {
@@ -354,11 +360,11 @@ const Reservation = ({ termsOfUse, id }: Props): JSX.Element => {
             </Paragraph>
           </>
         )}
-        {getTranslation(reservationUnit, "additionalInstructions") && (
+        {getTranslation(reservationUnit, instructionsKey) && (
           <TermContainer>
             <H3>{t("reservations:reservationInfo")}</H3>
             <Paragraph>
-              {getTranslation(reservationUnit, "additionalInstructions")}
+              {getTranslation(reservationUnit, instructionsKey)}
             </Paragraph>
           </TermContainer>
         )}

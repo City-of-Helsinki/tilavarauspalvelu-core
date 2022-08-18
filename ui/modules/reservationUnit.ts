@@ -3,11 +3,12 @@ import { flatten, trim, uniq } from "lodash";
 import { i18n } from "next-i18next";
 import {
   EquipmentType,
+  ReservationsReservationStateChoices,
   ReservationUnitByPkType,
   ReservationUnitType,
   UnitType,
 } from "./gql-types";
-import { ReservationUnit } from "./types";
+import { ReservationState, ReservationUnit } from "./types";
 import { capitalize, getTranslation, localizedValue } from "./util";
 
 export const getPrice = (
@@ -145,4 +146,28 @@ export const getUnitName = (
 ): string => {
   const key = `name${capitalize(language)}`;
   return unit[key] || unit.nameFi;
+};
+
+export const getReservationUnitInstructionsKey = (
+  state: ReservationsReservationStateChoices | ReservationState
+): string | null => {
+  switch (state) {
+    case "initial":
+    case "created":
+    case "requested":
+    case "waiting for payment":
+    case ReservationsReservationStateChoices.Created:
+    case ReservationsReservationStateChoices.RequiresHandling:
+      return "reservationPendingInstructions";
+    case "cancelled":
+    case ReservationsReservationStateChoices.Cancelled:
+      return "reservationCancelledInstructions";
+    case "confirmed":
+    case ReservationsReservationStateChoices.Confirmed:
+      return "reservationConfirmedInstructions";
+    case "denied":
+    case ReservationsReservationStateChoices.Denied:
+    default:
+      return null;
+  }
 };

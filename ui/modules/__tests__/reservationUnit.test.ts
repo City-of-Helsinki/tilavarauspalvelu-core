@@ -2,6 +2,7 @@ import { get as mockGet } from "lodash";
 import { addMinutes } from "date-fns";
 import {
   EquipmentType,
+  ReservationsReservationStateChoices,
   ReservationUnitByPkType,
   ReservationUnitType,
   UnitType,
@@ -11,12 +12,13 @@ import {
   getEquipmentList,
   getOldReservationUnitName,
   getPrice,
+  getReservationUnitInstructionsKey,
   getReservationUnitName,
   getUnitName,
   isReservationUnitPublished,
 } from "../reservationUnit";
 import mockTranslations from "../../public/locales/fi/prices.json";
-import { ReservationUnit } from "../types";
+import { ReservationState, ReservationUnit } from "../types";
 
 jest.mock("next/config", () => () => ({
   serverRuntimeConfig: {},
@@ -605,5 +607,66 @@ describe("getUnitName", () => {
     } as UnitType;
 
     expect(getUnitName(unit, "sv")).toEqual("Unit 1 FI");
+  });
+});
+
+describe("getReservationUnitInstructionsKey", () => {
+  it("should return correct key pending states", () => {
+    expect(getReservationUnitInstructionsKey("initial")).toEqual(
+      "reservationPendingInstructions"
+    );
+    expect(getReservationUnitInstructionsKey("created")).toEqual(
+      "reservationPendingInstructions"
+    );
+    expect(getReservationUnitInstructionsKey("requested")).toEqual(
+      "reservationPendingInstructions"
+    );
+    expect(getReservationUnitInstructionsKey("waiting for payment")).toEqual(
+      "reservationPendingInstructions"
+    );
+    expect(
+      getReservationUnitInstructionsKey(
+        ReservationsReservationStateChoices.Created
+      )
+    ).toEqual("reservationPendingInstructions");
+    expect(
+      getReservationUnitInstructionsKey(
+        ReservationsReservationStateChoices.RequiresHandling
+      )
+    ).toEqual("reservationPendingInstructions");
+  });
+
+  it("should return correct key cancelled states", () => {
+    expect(getReservationUnitInstructionsKey("cancelled")).toEqual(
+      "reservationCancelledInstructions"
+    );
+    expect(
+      getReservationUnitInstructionsKey(
+        ReservationsReservationStateChoices.Cancelled
+      )
+    ).toEqual("reservationCancelledInstructions");
+  });
+
+  it("should return correct key confirmed states", () => {
+    expect(getReservationUnitInstructionsKey("confirmed")).toEqual(
+      "reservationConfirmedInstructions"
+    );
+    expect(
+      getReservationUnitInstructionsKey(
+        ReservationsReservationStateChoices.Confirmed
+      )
+    ).toEqual("reservationConfirmedInstructions");
+  });
+
+  it("should return no key for rest", () => {
+    expect(getReservationUnitInstructionsKey("denied")).toEqual(null);
+    expect(
+      getReservationUnitInstructionsKey(
+        ReservationsReservationStateChoices.Denied
+      )
+    ).toEqual(null);
+    expect(getReservationUnitInstructionsKey("" as ReservationState)).toEqual(
+      null
+    );
   });
 });

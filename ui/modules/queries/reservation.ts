@@ -172,9 +172,15 @@ export const GET_RESERVATION = gql`
         nameFi
         nameEn
         nameSv
-        additionalInstructionsFi
-        additionalInstructionsEn
-        additionalInstructionsSv
+        reservationPendingInstructionsFi
+        reservationPendingInstructionsEn
+        reservationPendingInstructionsSv
+        reservationConfirmedInstructionsFi
+        reservationConfirmedInstructionsEn
+        reservationConfirmedInstructionsSv
+        reservationCancelledInstructionsFi
+        reservationCancelledInstructionsEn
+        reservationCancelledInstructionsSv
         termsOfUseFi
         termsOfUseEn
         termsOfUseSv

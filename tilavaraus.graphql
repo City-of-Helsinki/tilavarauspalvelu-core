@@ -239,6 +239,21 @@ type ApplicationEventDeleteMutationPayload {
   clientMutationId: String
 }
 
+input ApplicationEventFlagMutationInput {
+  pk: Int
+  flagged: Boolean
+  clientMutationId: String
+}
+
+type ApplicationEventFlagMutationPayload {
+  pk: Int
+  flagged: Boolean
+
+  """May contain more than one error for same field."""
+  errors: [ErrorType]
+  clientMutationId: String
+}
+
 input ApplicationEventInApplicationSerializerInput {
   pk: Int
   name: String
@@ -397,6 +412,7 @@ type ApplicationEventType implements Node {
   purpose: ReservationPurposeType
   declinedReservationUnits: [ReservationUnitType!]
   uuid: UUID!
+  flagged: Boolean!
   aggregatedData: ApplicationEventAggregatedDataType
   eventReservationUnits: [EventReservationUnitType]
   applicationEventSchedules: [ApplicationEventScheduleType]
@@ -484,6 +500,21 @@ type ApplicationEventUpdateMutationPayload {
   """May contain more than one error for same field."""
   errors: [ErrorType]
   applicationEvent: ApplicationEventType
+  clientMutationId: String
+}
+
+input ApplicationFlagMutationInput {
+  pk: Int
+  flagged: Boolean!
+  clientMutationId: String
+}
+
+type ApplicationFlagMutationPayload {
+  pk: Int
+  flagged: Boolean
+
+  """May contain more than one error for same field."""
+  errors: [ErrorType]
   clientMutationId: String
 }
 
@@ -1103,10 +1134,12 @@ type Mutation {
   createApplication(input: ApplicationCreateMutationInput!): ApplicationCreateMutationPayload
   updateApplication(input: ApplicationUpdateMutationInput!): ApplicationUpdateMutationPayload
   declineApplication(input: ApplicationDeclineMutationInput!): ApplicationDeclineMutationPayload
+  flagApplication(input: ApplicationFlagMutationInput!): ApplicationFlagMutationPayload
   createApplicationEvent(input: ApplicationEventCreateMutationInput!): ApplicationEventCreateMutationPayload
   updateApplicationEvent(input: ApplicationEventUpdateMutationInput!): ApplicationEventUpdateMutationPayload
   deleteApplicationEvent(input: ApplicationEventDeleteMutationInput!): ApplicationEventDeleteMutationPayload
   declineApplicationEvent(input: ApplicationEventDeclineMutationInput!): ApplicationEventDeclineMutationPayload
+  flagApplicationEvent(input: ApplicationEventFlagMutationInput!): ApplicationEventFlagMutationPayload
   createApplicationEventScheduleResult(input: ApplicationEventScheduleResultCreateMutationInput!): ApplicationEventScheduleResultCreateMutationPayload
   updateApplicationEventScheduleResult(input: ApplicationEventScheduleResultUpdateMutationInput!): ApplicationEventScheduleResultUpdateMutationPayload
   createReservation(input: ReservationCreateMutationInput!): ReservationCreateMutationPayload
@@ -1704,6 +1737,9 @@ type ReservationConfirmMutationPayload {
   """The price of this particular reservation"""
   price: Float
 
+  """Indicates if reservation is internal or created by staff"""
+  staffEvent: Boolean
+
   """May contain more than one error for same field."""
   errors: [ErrorType]
   clientMutationId: String
@@ -1748,6 +1784,9 @@ input ReservationCreateMutationInput {
   bufferTimeAfter: Int
   reservationUnitPks: [Int]!
   purposePk: Int
+
+  """Indicates if reservation is internal or created by staff"""
+  staffEvent: Boolean
   clientMutationId: String
 }
 
@@ -1803,6 +1842,9 @@ type ReservationCreateMutationPayload {
 
   """The price of this particular reservation"""
   price: Float
+
+  """Indicates if reservation is internal or created by staff"""
+  staffEvent: Boolean
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -2022,6 +2064,7 @@ type ReservationType implements Node {
 
   """Working memo for staff users."""
   workingMemo: String
+  staffEvent: Boolean
 
   """The ID of the object"""
   id: ID!
@@ -2068,9 +2111,15 @@ type ReservationUnitByPkType implements Node {
   cancellationTerms: TermsOfUseType
   serviceSpecificTerms: TermsOfUseType
   pricingTerms: TermsOfUseType
-  additionalInstructionsFi: String
-  additionalInstructionsEn: String
-  additionalInstructionsSv: String
+  reservationPendingInstructionsFi: String
+  reservationPendingInstructionsEn: String
+  reservationPendingInstructionsSv: String
+  reservationConfirmedInstructionsFi: String
+  reservationConfirmedInstructionsEn: String
+  reservationConfirmedInstructionsSv: String
+  reservationCancelledInstructionsFi: String
+  reservationCancelledInstructionsEn: String
+  reservationCancelledInstructionsSv: String
   contactInformation: String!
   maxReservationDuration: Duration
   minReservationDuration: Duration
@@ -2323,12 +2372,18 @@ input ReservationUnitCreateMutationInput {
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
-  additionalInstructionsFi: String
-  additionalInstructionsEn: String
-  additionalInstructionsSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  reservationCancelledInstructionsFi: String
+  reservationCancelledInstructionsEn: String
+  reservationCancelledInstructionsSv: String
+  reservationPendingInstructionsFi: String
+  reservationPendingInstructionsEn: String
+  reservationPendingInstructionsSv: String
+  reservationConfirmedInstructionsFi: String
+  reservationConfirmedInstructionsEn: String
+  reservationConfirmedInstructionsSv: String
   clientMutationId: String
 }
 
@@ -2461,12 +2516,18 @@ type ReservationUnitCreateMutationPayload {
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
-  additionalInstructionsFi: String
-  additionalInstructionsEn: String
-  additionalInstructionsSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  reservationCancelledInstructionsFi: String
+  reservationCancelledInstructionsEn: String
+  reservationCancelledInstructionsSv: String
+  reservationPendingInstructionsFi: String
+  reservationPendingInstructionsEn: String
+  reservationPendingInstructionsSv: String
+  reservationConfirmedInstructionsFi: String
+  reservationConfirmedInstructionsEn: String
+  reservationConfirmedInstructionsSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -2675,9 +2736,15 @@ type ReservationUnitType implements Node {
   cancellationTerms: TermsOfUseType
   serviceSpecificTerms: TermsOfUseType
   pricingTerms: TermsOfUseType
-  additionalInstructionsFi: String
-  additionalInstructionsEn: String
-  additionalInstructionsSv: String
+  reservationPendingInstructionsFi: String
+  reservationPendingInstructionsEn: String
+  reservationPendingInstructionsSv: String
+  reservationConfirmedInstructionsFi: String
+  reservationConfirmedInstructionsEn: String
+  reservationConfirmedInstructionsSv: String
+  reservationCancelledInstructionsFi: String
+  reservationCancelledInstructionsEn: String
+  reservationCancelledInstructionsSv: String
   contactInformation: String!
   maxReservationDuration: Duration
   minReservationDuration: Duration
@@ -2941,12 +3008,18 @@ input ReservationUnitUpdateMutationInput {
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
-  additionalInstructionsFi: String
-  additionalInstructionsEn: String
-  additionalInstructionsSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  reservationCancelledInstructionsFi: String
+  reservationCancelledInstructionsEn: String
+  reservationCancelledInstructionsSv: String
+  reservationPendingInstructionsFi: String
+  reservationPendingInstructionsEn: String
+  reservationPendingInstructionsSv: String
+  reservationConfirmedInstructionsFi: String
+  reservationConfirmedInstructionsEn: String
+  reservationConfirmedInstructionsSv: String
   clientMutationId: String
 }
 
@@ -3079,12 +3152,18 @@ type ReservationUnitUpdateMutationPayload {
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
-  additionalInstructionsFi: String
-  additionalInstructionsEn: String
-  additionalInstructionsSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  reservationCancelledInstructionsFi: String
+  reservationCancelledInstructionsEn: String
+  reservationCancelledInstructionsSv: String
+  reservationPendingInstructionsFi: String
+  reservationPendingInstructionsEn: String
+  reservationPendingInstructionsSv: String
+  reservationConfirmedInstructionsFi: String
+  reservationConfirmedInstructionsEn: String
+  reservationConfirmedInstructionsSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -3138,6 +3217,9 @@ input ReservationUpdateMutationInput {
   bufferTimeAfter: Int
   reservationUnitPks: [Int]
   purposePk: Int
+
+  """Indicates if reservation is internal or created by staff"""
+  staffEvent: Boolean
   clientMutationId: String
 }
 
@@ -3196,6 +3278,9 @@ type ReservationUpdateMutationPayload {
 
   """The price of this particular reservation"""
   price: Float
+
+  """Indicates if reservation is internal or created by staff"""
+  staffEvent: Boolean
 
   """May contain more than one error for same field."""
   errors: [ErrorType]

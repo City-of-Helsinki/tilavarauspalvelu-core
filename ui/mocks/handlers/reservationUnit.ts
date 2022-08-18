@@ -133,9 +133,16 @@ const selectedReservationUnitQuery = graphql.query<
       "<p>Nuorisotilojen yleiset varausehdot</p>\r\n<p><strong>1 Soveltamisala</strong></p>\r\n<p>N&auml;m&auml; varausehdot koskevat Helsingin kaupungin nuorisopalveluiden hallinnoimien tilojen ja laitteiden varaamista, k&auml;ytt&ouml;vuoron hakemista Tilavaraus-palvelun kautta sek&auml; nuorisopalveluiden hallinnoimien tilojen ja laitteiden k&auml;ytt&ouml;&auml;. N&auml;m&auml; varausehdot t&auml;ydent&auml;v&auml;t Helsingin kaupungin tilojen ja laitteiden varausehtoja. Varaamalla resurssin tai hakemalla k&auml;ytt&ouml;vuoroa hyv&auml;ksyt n&auml;m&auml; ehdot.</p> En",
     termsOfUseSv:
       "<p>Nuorisotilojen yleiset varausehdot</p>\r\n<p><strong>1 Soveltamisala</strong></p>\r\n<p>N&auml;m&auml; varausehdot koskevat Helsingin kaupungin nuorisopalveluiden hallinnoimien tilojen ja laitteiden varaamista, k&auml;ytt&ouml;vuoron hakemista Tilavaraus-palvelun kautta sek&auml; nuorisopalveluiden hallinnoimien tilojen ja laitteiden k&auml;ytt&ouml;&auml;. N&auml;m&auml; varausehdot t&auml;ydent&auml;v&auml;t Helsingin kaupungin tilojen ja laitteiden varausehtoja. Varaamalla resurssin tai hakemalla k&auml;ytt&ouml;vuoroa hyv&auml;ksyt n&auml;m&auml; ehdot.</p> Sv",
-    additionalInstructionsFi: "Additional instructions FI",
-    additionalInstructionsEn: null,
-    additionalInstructionsSv: null,
+    reservationPendingInstructionsFi: "Pending Instructions FI",
+    reservationPendingInstructionsEn: "Pending Instructions EN",
+    reservationPendingInstructionsSv: "Pending Instructions SV",
+    reservationConfirmedInstructionsFi: "Confirmed Instructions FI",
+    reservationConfirmedInstructionsEn: "Confirmed Instructions EN",
+    reservationConfirmedInstructionsSv: "Confirmed Instructions SV",
+    reservationCancelledInstructionsFi: "Cancelled Instructions FI",
+    reservationCancelledInstructionsEn: "Cancelled Instructions EN",
+    reservationCancelledInstructionsSv: "Cancelled Instructions SV",
+
     reservationStartInterval:
       "INTERVAL_90_MINS" as ReservationUnitsReservationUnitReservationStartIntervalChoices,
     serviceSpecificTerms: {

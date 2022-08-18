@@ -190,7 +190,7 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
         .should("eq", "http://calendarUrl/42");
 
       cy.contains("h3", "Varauksen ohjeet").should("be.visible");
-      cy.contains("p", "Additional instructions FI").should("be.visible");
+      cy.contains("p", "Confirmed Instructions FI").should("be.visible");
 
       confirmationParagraph()
         .eq(0)
@@ -754,7 +754,7 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
         .should("eq", "http://calendarUrl/42");
 
       cy.contains("h3", "Varauksen ohjeet").should("be.visible");
-      cy.contains("p", "Additional instructions FI").should("be.visible");
+      cy.contains("p", "Confirmed Instructions FI").should("be.visible");
 
       confirmationParagraph()
         .eq(0)

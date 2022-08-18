@@ -80,6 +80,7 @@ import Ticket from "../../../components/reservation/Ticket";
 import Sanitize from "../../../components/common/Sanitize";
 import {
   getPrice,
+  getReservationUnitInstructionsKey,
   getReservationUnitName,
   getUnitName,
 } from "../../../modules/reservationUnit";
@@ -93,6 +94,7 @@ import {
   RESERVATION_PURPOSES,
 } from "../../../modules/queries/params";
 import KorosDefault from "../../../components/common/KorosDefault";
+import { ReservationState } from "../../../modules/types";
 
 type Props = {
   reservationUnit: ReservationUnitType;
@@ -542,6 +544,12 @@ const ReservationUnitReservation = ({
       })),
     }),
     [reservationPurposes, ageGroups, cities]
+  );
+
+  const instructionsKey = useMemo(
+    () =>
+      getReservationUnitInstructionsKey(reservation?.state as ReservationState),
+    [reservation?.state]
   );
 
   if (
@@ -1245,13 +1253,13 @@ const ReservationUnitReservation = ({
                   {t("common:sendFeedback")}
                 </a>
               </Paragraph>
-              {getTranslation(reservationUnit, "additionalInstructions") && (
+              {getTranslation(reservationUnit, instructionsKey) && (
                 <>
                   <H3 style={{ marginTop: "var(--spacing-xl)" }}>
                     {t("reservations:reservationInfo")}
                   </H3>
                   <Paragraph>
-                    {getTranslation(reservationUnit, "additionalInstructions")}
+                    {getTranslation(reservationUnit, instructionsKey)}
                   </Paragraph>
                 </>
               )}
