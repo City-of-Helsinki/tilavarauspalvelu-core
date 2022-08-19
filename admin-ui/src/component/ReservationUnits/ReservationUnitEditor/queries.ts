@@ -54,9 +54,15 @@ export const RESERVATIONUNIT_QUERY = gql`
       termsOfUseSv
       termsOfUseEn
       reservationKind
-      additionalInstructionsFi
-      additionalInstructionsSv
-      additionalInstructionsEn
+      reservationPendingInstructionsFi
+      reservationPendingInstructionsSv
+      reservationPendingInstructionsEn
+      reservationConfirmedInstructionsFi
+      reservationConfirmedInstructionsSv
+      reservationConfirmedInstructionsEn
+      reservationCancelledInstructionsFi
+      reservationCancelledInstructionsSv
+      reservationCancelledInstructionsEn
       maxReservationDuration
       minReservationDuration
       reservationStartInterval

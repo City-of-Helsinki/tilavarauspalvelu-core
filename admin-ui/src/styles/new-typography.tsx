@@ -51,6 +51,10 @@ export const H4 = styled.h4`
   }
 `;
 
+export const SlimH4 = styled(H4)`
+  margin: 0;
+`;
+
 export const H5 = styled.h5`
   font-size: var(--fontsize-heading-xs);
   font-family: var(--font-bold);

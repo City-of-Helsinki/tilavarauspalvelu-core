@@ -2369,21 +2369,21 @@ input ReservationUnitCreateMutationInput {
   nameFi: String
   nameEn: String
   nameSv: String
+  reservationPendingInstructionsFi: String
+  reservationPendingInstructionsEn: String
+  reservationPendingInstructionsSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
-  reservationCancelledInstructionsFi: String
-  reservationCancelledInstructionsEn: String
-  reservationCancelledInstructionsSv: String
-  reservationPendingInstructionsFi: String
-  reservationPendingInstructionsEn: String
-  reservationPendingInstructionsSv: String
   reservationConfirmedInstructionsFi: String
   reservationConfirmedInstructionsEn: String
   reservationConfirmedInstructionsSv: String
+  reservationCancelledInstructionsFi: String
+  reservationCancelledInstructionsEn: String
+  reservationCancelledInstructionsSv: String
   clientMutationId: String
 }
 
@@ -2513,21 +2513,21 @@ type ReservationUnitCreateMutationPayload {
   nameFi: String
   nameEn: String
   nameSv: String
+  reservationPendingInstructionsFi: String
+  reservationPendingInstructionsEn: String
+  reservationPendingInstructionsSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
-  reservationCancelledInstructionsFi: String
-  reservationCancelledInstructionsEn: String
-  reservationCancelledInstructionsSv: String
-  reservationPendingInstructionsFi: String
-  reservationPendingInstructionsEn: String
-  reservationPendingInstructionsSv: String
   reservationConfirmedInstructionsFi: String
   reservationConfirmedInstructionsEn: String
   reservationConfirmedInstructionsSv: String
+  reservationCancelledInstructionsFi: String
+  reservationCancelledInstructionsEn: String
+  reservationCancelledInstructionsSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -3005,21 +3005,21 @@ input ReservationUnitUpdateMutationInput {
   nameFi: String
   nameEn: String
   nameSv: String
+  reservationPendingInstructionsFi: String
+  reservationPendingInstructionsEn: String
+  reservationPendingInstructionsSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
-  reservationCancelledInstructionsFi: String
-  reservationCancelledInstructionsEn: String
-  reservationCancelledInstructionsSv: String
-  reservationPendingInstructionsFi: String
-  reservationPendingInstructionsEn: String
-  reservationPendingInstructionsSv: String
   reservationConfirmedInstructionsFi: String
   reservationConfirmedInstructionsEn: String
   reservationConfirmedInstructionsSv: String
+  reservationCancelledInstructionsFi: String
+  reservationCancelledInstructionsEn: String
+  reservationCancelledInstructionsSv: String
   clientMutationId: String
 }
 
@@ -3149,21 +3149,21 @@ type ReservationUnitUpdateMutationPayload {
   nameFi: String
   nameEn: String
   nameSv: String
+  reservationPendingInstructionsFi: String
+  reservationPendingInstructionsEn: String
+  reservationPendingInstructionsSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
-  reservationCancelledInstructionsFi: String
-  reservationCancelledInstructionsEn: String
-  reservationCancelledInstructionsSv: String
-  reservationPendingInstructionsFi: String
-  reservationPendingInstructionsEn: String
-  reservationPendingInstructionsSv: String
   reservationConfirmedInstructionsFi: String
   reservationConfirmedInstructionsEn: String
   reservationConfirmedInstructionsSv: String
+  reservationCancelledInstructionsFi: String
+  reservationCancelledInstructionsEn: String
+  reservationCancelledInstructionsSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -3842,15 +3842,15 @@ input UnitUpdateMutationInput {
   webPage: String
   email: String
   phone: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
   shortDescriptionFi: String
   shortDescriptionEn: String
   shortDescriptionSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   clientMutationId: String
 }
 
@@ -3860,15 +3860,15 @@ type UnitUpdateMutationPayload {
   webPage: String
   email: String
   phone: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
   shortDescriptionFi: String
   shortDescriptionEn: String
   shortDescriptionSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]

@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { Button, Fieldset as HDSFieldset } from "hds-react";
+import { Accordion, Button, Fieldset as HDSFieldset } from "hds-react";
 import { Grid, Span4 as DefaultSpan4 } from "../../../../styles/layout";
 
 export const EditorGrid = styled(Grid)`
@@ -29,6 +29,24 @@ export const ButtonsContainer = styled.div`
 
 export const ArchiveButton = styled(Button)`
   margin-top: var(--spacing-m);
+`;
+
+export const ExpandLink = styled(Accordion)`
+  > div:nth-of-type(1) > div {
+    display: flex;
+    flex-direction: row;
+    > div {
+      font-size: var(--fontsize-heading-xxs);
+      font-family: var(--tilavaraus-admin-font-medium);
+      font-weight: normal;
+      color: var(--color-bus);
+      line-height: 1.5;
+    }
+    svg {
+      margin: 0;
+      color: var(--color-bus);
+    }
+  }
 `;
 
 export const Preview = styled.a<{ disabled: boolean }>`
