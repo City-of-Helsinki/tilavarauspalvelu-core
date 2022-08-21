@@ -136,7 +136,7 @@ export const Content = styled.div`
   padding: 0 var(--spacing-2-xl);
 `;
 
-Container.displayName = "Container";
+Content.displayName = "Content";
 
 export const Grid = styled.div`
   display: grid;

@@ -29,7 +29,7 @@ const Filters = ({ onSearch }: Props): JSX.Element => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state]);
 
-  const tags = toTags(state, t, multivaledFields, "foo");
+  const tags = toTags(state, t, multivaledFields, []);
 
   return (
     <>

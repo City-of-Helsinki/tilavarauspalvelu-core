@@ -24,13 +24,17 @@ export const reservationDateTime = (
 
   const startDay = t(`dayShort.${startDate.getDay()}`);
 
+  const endTimeFormat = endDate.getMinutes() === 0 ? "HH" : "HH:mm";
+  const startTimeFormat = startDate.getMinutes() === 0 ? "HH" : "HH:mm";
   return isSameDay(startDate, endDate)
-    ? `${startDay} ${formatDate(start)} klo ${formatTime(start)} - ${formatTime(
-        end
-      )}`
-    : `${formatDate(start)} klo ${formatTime(start)} - ${formatDate(
-        end
-      )} klo ${formatTime(end)}`;
+    ? `${startDay} ${formatDate(start)} klo ${formatTime(
+        start,
+        startTimeFormat
+      )} - ${formatTime(end, endTimeFormat)}`
+    : `${formatDate(start)} klo ${formatTime(
+        start,
+        startTimeFormat
+      )} - ${formatDate(end, endTimeFormat)} klo ${formatTime(end)}`;
 };
 
 export const reservationPrice = (

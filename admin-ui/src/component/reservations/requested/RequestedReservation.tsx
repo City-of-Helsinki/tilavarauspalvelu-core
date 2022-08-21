@@ -141,7 +141,7 @@ const ApplicationData = ({
   ) : null;
 
 const RequestedReservation = (): JSX.Element | null => {
-  const { reservationPk } = useParams() as { reservationPk: string };
+  const { id } = useParams() as { id: string };
   const [reservation, setReservation] = useState<ReservationType>();
   const [workingMemo, setWorkingMemo] = useState<string>();
   const { notifyError, notifySuccess } = useNotification();
@@ -154,7 +154,7 @@ const RequestedReservation = (): JSX.Element | null => {
     {
       fetchPolicy: "no-cache",
       variables: {
-        pk: Number(reservationPk),
+        pk: Number(id),
       },
       onCompleted: ({ reservationByPk }) => {
         if (reservationByPk) {

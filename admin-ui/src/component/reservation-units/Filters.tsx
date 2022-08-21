@@ -1,19 +1,16 @@
 import { Button, IconAngleDown, IconAngleUp, TextInput } from "hds-react";
 import { isEmpty } from "lodash";
 import React, { useEffect, useReducer, useState } from "react";
-import { useQuery } from "@apollo/client";
 import { useTranslation } from "react-i18next";
 import i18next from "i18next";
 import styled from "styled-components";
 import { breakpoints } from "../../styles/util";
-import { Query, QueryReservationUnitTypesArgs } from "../../common/gql-types";
-import SortedSelect from "../ReservationUnits/ReservationUnitEditor/SortedSelect";
-import { RESERVATION_UNIT_TYPES_QUERY } from "./queries";
 import { OptionType } from "../../common/types";
 import UnitFilter from "../filters/UnitFilter";
 import Tags, { Action, getReducer, toTags } from "../lists/Tags";
 import { Grid, Span3 } from "../../styles/layout";
 import ReservationUnitStateFilter from "../filters/ReservationUnitStateFilter";
+import ReservationUnitTypeFilter from "../filters/ReservationUnitTypeFilter";
 
 export type FilterArguments = {
   nameFi?: string;
@@ -82,41 +79,6 @@ export const emptyState = {
   reservationUnitStates: [],
 };
 
-type TypeComboboxProps = {
-  onChange: (reservationUnitType: OptionType[]) => void;
-  value: OptionType[];
-};
-
-const TypeCombobox = ({ onChange, value }: TypeComboboxProps): JSX.Element => {
-  const { t } = useTranslation();
-  const { data, loading } = useQuery<Query, QueryReservationUnitTypesArgs>(
-    RESERVATION_UNIT_TYPES_QUERY,
-    {}
-  );
-
-  if (loading) {
-    return <>{t("ReservationUnitsSearch.typeLabel")}</>;
-  }
-
-  return (
-    <SortedSelect
-      sort
-      label={t("ReservationUnitsSearch.typeLabel")}
-      multiselect
-      placeholder={t("ReservationUnitsSearch.typePlaceHolder")}
-      options={(data?.reservationUnitTypes?.edges || [])
-        .map((e) => e?.node)
-        .map((type) => ({
-          label: type?.nameFi as string,
-          value: String(type?.pk),
-        }))}
-      onChange={(units) => onChange(units)}
-      id="type-combobox"
-      value={value}
-    />
-  );
-};
-
 const MyTextInput = ({
   id,
   value,
@@ -165,7 +127,7 @@ const Filters = ({ onSearch }: Props): JSX.Element => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state]);
 
-  const tags = toTags(state, t, multivaluedFields);
+  const tags = toTags(state, t, multivaluedFields, ["nameFi"]);
 
   return (
     <div>
@@ -173,7 +135,7 @@ const Filters = ({ onSearch }: Props): JSX.Element => {
         <Grid>
           <Span3>
             <TextInput
-              id="text"
+              id="nameFi"
               label={t("ReservationUnitsSearch.textSearchLabel")}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
@@ -194,7 +156,7 @@ const Filters = ({ onSearch }: Props): JSX.Element => {
             />
           </Span3>
           <Span3>
-            <TypeCombobox
+            <ReservationUnitTypeFilter
               onChange={(e) =>
                 dispatch({ type: "set", value: { reservationUnitType: e } })
               }

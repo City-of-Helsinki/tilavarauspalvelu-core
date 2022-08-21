@@ -13,6 +13,12 @@ export const applicationRoundUrl = (
 export const applicationUrl = (applicationId: number | string): string =>
   `${prefixes.applications}/${applicationId}`;
 
+export const reservationUrl = (reservationId: number | string): string =>
+  `${prefixes.reservations}/${reservationId}`;
+
+export const requestedReservationsUrl = (): string =>
+  `${prefixes.reservations}/requested`;
+
 export const applicationDetailsUrl = (applicationId: number | string): string =>
   `${prefixes.applications}/${applicationId}/details`;
 

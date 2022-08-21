@@ -113,3 +113,62 @@ export const RESERVATION_DENY_REASONS = gql`
     }
   }
 `;
+
+export const RESERVATIONS_QUERY = gql`
+  query reservations(
+    $after: String
+    $unit: [ID]
+    $reservationUnitType: [ID]
+    $orderBy: String
+    $offset: Int
+    $first: Int
+    $state: [String]
+    $textSearch: String
+    $minPrice: Float
+    $maxPrice: Float
+    $begin: DateTime
+    $end: DateTime
+  ) {
+    reservations(
+      first: $first
+      offset: $offset
+      orderBy: $orderBy
+      after: $after
+      unit: $unit
+      reservationUnitType: $reservationUnitType
+      state: $state
+      textSearch: $textSearch
+      priceLte: $maxPrice
+      priceGte: $minPrice
+      begin: $begin
+      end: $end
+    ) {
+      edges {
+        node {
+          pk
+          workingMemo
+          state
+          reservationUnits {
+            nameFi
+            unit {
+              nameFi
+            }
+          }
+          begin
+          end
+          reserveeFirstName
+          reserveeLastName
+          reserveeEmail
+          name
+          price
+        }
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
+        hasNextPage
+      }
+      totalCount
+    }
+  }
+`;

@@ -6,8 +6,8 @@ import { Query } from "../../common/gql-types";
 import { OptionType } from "../../common/types";
 import SortedSelect from "../ReservationUnits/ReservationUnitEditor/SortedSelect";
 
-const UNITS_QUERY = gql`
-  query units {
+const RESERVATION_UNITS_QUERY = gql`
+  query reservationUnits {
     units {
       edges {
         node {
@@ -20,24 +20,24 @@ const UNITS_QUERY = gql`
 `;
 
 type Props = {
-  onChange: (units: OptionType[]) => void;
+  onChange: (reservationUnits: OptionType[]) => void;
   value: OptionType[];
 };
 
-const UnitFilter = ({ onChange, value }: Props): JSX.Element => {
+const ReservationUnitFilter = ({ onChange, value }: Props): JSX.Element => {
   const { t } = useTranslation();
-  const { data, loading } = useQuery<Query>(UNITS_QUERY);
+  const { data, loading } = useQuery<Query>(RESERVATION_UNITS_QUERY);
 
   if (loading) {
-    return <>{t("ReservationUnitsSearch.unit")}</>;
+    return <>{t("ReservationUnitsFilter.loading")}</>;
   }
 
   return (
     <SortedSelect
       sort
-      label={t("ReservationUnitsSearch.unitLabel")}
+      label={t("ReservationUnitsFilter.label")}
       multiselect
-      placeholder={t("ReservationUnitsSearch.unitPlaceHolder")}
+      placeholder={t("common.filter")}
       options={(data?.units?.edges || [])
         .map((e) => e?.node)
         .map((unit) => ({
@@ -46,9 +46,9 @@ const UnitFilter = ({ onChange, value }: Props): JSX.Element => {
         }))}
       value={value}
       onChange={onChange}
-      id="reservation-unit-combobox"
+      id="reservation-unit"
     />
   );
 };
 
-export default UnitFilter;
+export default ReservationUnitFilter;

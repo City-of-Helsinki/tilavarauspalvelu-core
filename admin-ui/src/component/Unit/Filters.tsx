@@ -29,14 +29,14 @@ const Filters = ({ onSearch }: Props): JSX.Element => {
     onSearch(state);
   }, [state, onSearch]);
 
-  const tags = toTags(state, t, [], "Units");
+  const tags = toTags(state, t, [], ["nameFi"], "Units");
 
   return (
     <>
       <Grid>
         <Span4>
           <TextInput
-            id="text"
+            id="nameFi"
             label={t("Units.filters.nameLabel")}
             onKeyDown={(e) => {
               if (e.key === "Enter") {

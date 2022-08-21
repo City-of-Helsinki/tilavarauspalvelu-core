@@ -29,6 +29,7 @@ export const toTags = <T,>(
   state: T,
   t: TFunction,
   multivaluedFields: string[],
+  noLabelFields: string[],
   translationPrefix?: string
 ): Tag<T>[] => {
   return (Object.keys(state) as unknown as (keyof T)[]).flatMap((key) => {
@@ -43,15 +44,17 @@ export const toTags = <T,>(
       );
     }
 
+    if (typeof state[key] === "string" && String(state[key]) === "") {
+      return [];
+    }
     return [
       {
         key,
-        value:
-          typeof state[key] === "string"
-            ? `"${state[key]}"`
-            : t(`${translationPrefix || ""}.filters.${String(key)}Tag`, {
-                value: get(state[key], "label"),
-              }),
+        value: noLabelFields.includes(String(key))
+          ? `"${state[key]}"`
+          : t(`${translationPrefix || ""}.filters.${String(key)}Tag`, {
+              value: get(state, key),
+            }),
 
         ac: {
           type: "deleteTag",

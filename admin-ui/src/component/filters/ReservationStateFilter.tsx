@@ -1,6 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { ReservationUnitState } from "../../common/gql-types";
+import { ReservationsReservationStateChoices } from "../../common/gql-types";
 
 import { OptionType } from "../../common/types";
 import SortedSelect from "../ReservationUnits/ReservationUnitEditor/SortedSelect";
@@ -10,12 +10,9 @@ type Props = {
   value: OptionType[];
 };
 
-const ReservationUnitStates = [
-  ReservationUnitState.Draft,
-  ReservationUnitState.Published,
-  ReservationUnitState.ScheduledPublishing,
-  ReservationUnitState.ScheduledReservation,
-];
+const ReservationUnitStates = Object.values(
+  ReservationsReservationStateChoices
+);
 
 const ReservationUnitStateFilter = ({
   onChange,
@@ -26,16 +23,16 @@ const ReservationUnitStateFilter = ({
   return (
     <SortedSelect
       sort
-      label={t("ReservationUnitsSearch.stateLabel")}
+      label={t("ReservationStateFilter.label")}
       multiselect
-      placeholder={t("ReservationUnitsSearch.unitPlaceHolder")}
+      placeholder={t("common.filter")}
       options={ReservationUnitStates.map((s) => ({
         value: s,
-        label: t(`ReservationUnits.state.${s}`),
+        label: t(`RequestedReservation.state.${s}`),
       }))}
       value={value || []}
       onChange={onChange}
-      id="reservation-unit-combobox"
+      id="reservation-state"
     />
   );
 };

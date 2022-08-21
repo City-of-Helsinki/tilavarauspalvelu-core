@@ -29,8 +29,7 @@ import ResourcesList from "./component/Resources/ResourcesList";
 import ReservationUnits from "./component/reservation-units/ReservationUnits";
 import { withGlobalContext } from "./context/GlobalContexts";
 
-import RequestedReservations from "./component/reservations/requested/RequestedReservations";
-import RequestedReservation from "./component/reservations/requested/RequestedReservation";
+import Reservations from "./component/reservations";
 import PrivateRoutes from "./common/PrivateRoutes";
 import { prefixes } from "./common/urls";
 import ExternalScripts from "./common/ExternalScripts";
@@ -145,16 +144,7 @@ function App(): JSX.Element {
               component={ReservationUnitEditor}
             />
             <Route path="/unit/:unitPk" component={Unit} exact />
-            <Route
-              path="/reservations/requested/:reservationPk"
-              component={RequestedReservation}
-              exact
-            />
-            <Route
-              path="/reservations/requested"
-              exact
-              component={RequestedReservations}
-            />
+            <Route path="/reservations/:id" component={Reservations} />
           </PrivateRoutes>
         </Switch>
         <ExternalScripts />
