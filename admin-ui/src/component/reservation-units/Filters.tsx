@@ -127,7 +127,13 @@ const Filters = ({ onSearch }: Props): JSX.Element => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state]);
 
-  const tags = toTags(state, t, multivaluedFields, ["nameFi"]);
+  const tags = toTags(
+    state,
+    t,
+    multivaluedFields,
+    ["nameFi"],
+    "ReservationUnitsSearch"
+  );
 
   return (
     <div>
