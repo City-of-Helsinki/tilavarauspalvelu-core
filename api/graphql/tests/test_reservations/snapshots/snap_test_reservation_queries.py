@@ -462,7 +462,6 @@ snapshots['ReservationQueryTestCase::test_filter_only_with_permission 1'] = {
                         'reserveeLastName': 'Vee',
                         'reserveeOrganisationName': 'Test organisation',
                         'reserveePhone': '+358123456789',
-                        'staffEvent': None,
                         'user': 'joe.regularl@foo.com'
                     }
                 }
@@ -500,7 +499,6 @@ snapshots['ReservationQueryTestCase::test_filter_only_with_permission_admin 1'] 
                         'reserveeLastName': 'Hidden',
                         'reserveeOrganisationName': 'Hidden organisation',
                         'reserveePhone': '+358123456789',
-                        'staffEvent': False,
                         'user': 'amin.general@foo.com'
                     }
                 },
@@ -528,7 +526,6 @@ snapshots['ReservationQueryTestCase::test_filter_only_with_permission_admin 1'] 
                         'reserveeLastName': 'Vee',
                         'reserveeOrganisationName': 'Test organisation',
                         'reserveePhone': '+358123456789',
-                        'staffEvent': False,
                         'user': 'joe.regularl@foo.com'
                     }
                 }
@@ -595,6 +592,23 @@ snapshots['ReservationQueryTestCase::test_filter_reservation_state_requires_hand
     }
 }
 
+snapshots['ReservationQueryTestCase::test_getting_reservation_with_fields_requiring_special_permissions 1'] = {
+    'data': {
+        'reservations': {
+            'edges': [
+                {
+                    'node': {
+                        'name': 'movies',
+                        'staffEvent': False,
+                        'type': 'normal'
+                    }
+                }
+            ],
+            'totalCount': 1
+        }
+    }
+}
+
 snapshots['ReservationQueryTestCase::test_hide_fields_with_personal_information 1'] = {
     'data': {
         'reservations': {
@@ -623,7 +637,6 @@ snapshots['ReservationQueryTestCase::test_hide_fields_with_personal_information 
                         'reserveeLastName': None,
                         'reserveeOrganisationName': None,
                         'reserveePhone': None,
-                        'staffEvent': None,
                         'user': None
                     }
                 },
@@ -651,7 +664,6 @@ snapshots['ReservationQueryTestCase::test_hide_fields_with_personal_information 
                         'reserveeLastName': 'Vee',
                         'reserveeOrganisationName': 'Test organisation',
                         'reserveePhone': '+358123456789',
-                        'staffEvent': None,
                         'user': 'joe.regularl@foo.com'
                     }
                 }
@@ -1096,8 +1108,10 @@ snapshots['ReservationQueryTestCase::test_reservation_query 1'] = {
                         'reserveeOrganisationName': 'Test organisation',
                         'reserveePhone': '+358123456789',
                         'reserveeType': 'INDIVIDUAL',
+                        'staffEvent': None,
                         'state': 'CREATED',
                         'taxPercentageValue': '24.00',
+                        'type': None,
                         'unitPrice': 10.0,
                         'user': 'joe.regularl@foo.com'
                     }

@@ -98,7 +98,6 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
                             cancelDetails
                             begin
                             end
-                            staffEvent
                         }
                     }
                 }
@@ -205,6 +204,8 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
                             price
                             bufferTimeBefore
                             bufferTimeAfter
+                            staffEvent
+                            type
                         }
                     }
                 }
@@ -969,6 +970,28 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
             content = json.loads(response.content)
             assert_that(content.get("errors")).is_none()
             self.assertMatchSnapshot(content)
+
+    def test_getting_reservation_with_fields_requiring_special_permissions(self):
+        self.client.force_login(self.general_admin)
+        response = self.query(
+            """
+            query {
+                reservations {
+                    totalCount
+                    edges {
+                        node {
+                            name
+                            staffEvent
+                            type
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
 
 
 @freezegun.freeze_time("2021-10-12T12:00:00Z")
