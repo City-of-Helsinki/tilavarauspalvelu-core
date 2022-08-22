@@ -135,9 +135,15 @@ class ReservationCancellationTestCase(ReservationTestCaseBase):
         response = self.query(self.get_cancel_query(), input_data=input_data)
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        cancel_data = content.get("data").get("cancelReservation")
-        assert_that(cancel_data.get("errors")).is_not_none()
+
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0]["message"]).is_equal_to(
+            "Only reservations in confirmed state can be cancelled through this."
+        )
+        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
+            "CANCELLATION_NOT_ALLOWED"
+        )
+
         self.reservation.refresh_from_db()
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CREATED)
 
@@ -176,9 +182,14 @@ class ReservationCancellationTestCase(ReservationTestCaseBase):
         response = self.query(self.get_cancel_query(), input_data=input_data)
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        cancel_data = content.get("data").get("cancelReservation")
-        assert_that(cancel_data.get("errors")).is_not_none()
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0]["message"]).is_equal_to(
+            "Reservation cannot be cancelled because the cancellation period has expired."
+        )
+        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
+            "CANCELLATION_NOT_ALLOWED"
+        )
+
         self.reservation.refresh_from_db()
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
 
@@ -230,9 +241,15 @@ class ReservationCancellationTestCase(ReservationTestCaseBase):
         response = self.query(self.get_cancel_query(), input_data=input_data)
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        cancel_data = content.get("data").get("cancelReservation")
-        assert_that(cancel_data.get("errors")).is_not_none()
+
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0]["message"]).is_equal_to(
+            "Reservation cannot be cancelled because the cancellation period has expired."
+        )
+        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
+            "CANCELLATION_NOT_ALLOWED"
+        )
+
         reservation.refresh_from_db()
         assert_that(reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
 
@@ -246,8 +263,15 @@ class ReservationCancellationTestCase(ReservationTestCaseBase):
         response = self.query(self.get_cancel_query(), input_data=input_data)
 
         content = json.loads(response.content)
-        cancel_data = content.get("data").get("cancelReservation")
-        assert_that(cancel_data.get("errors")).is_not_none()
+
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0]["message"]).is_equal_to(
+            "Reservation cannot be cancelled thus no cancellation rule."
+        )
+        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
+            "CANCELLATION_NOT_ALLOWED"
+        )
+
         self.reservation.refresh_from_db()
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
 

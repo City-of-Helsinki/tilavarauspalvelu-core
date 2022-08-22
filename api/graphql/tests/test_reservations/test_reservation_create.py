@@ -262,13 +262,13 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         )
         content = json.loads(response.content)
 
-        assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("createReservation").get("errors")
-        ).is_not_none()
-        assert_that(
-            content.get("data").get("createReservation").get("errors")[0]["messages"]
-        ).contains("Overlapping reservations are not allowed.")
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0]["message"]).is_equal_to(
+            "Overlapping reservations are not allowed."
+        )
+        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
+            "OVERLAPPING_RESERVATIONS"
+        )
 
     def test_create_fails_when_buffer_time_overlaps_reservation_before(
         self, mock_periods, mock_opening_hours
@@ -290,13 +290,13 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         )
         content = json.loads(response.content)
 
-        assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("createReservation").get("errors")
-        ).is_not_none()
-        assert_that(
-            content.get("data").get("createReservation").get("errors")[0]["messages"][0]
-        ).contains("Reservation overlaps with reservation before due to buffer time.")
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0]["message"]).is_equal_to(
+            "Reservation overlaps with reservation before due to buffer time."
+        )
+        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
+            "RESERVATION_OVERLAP"
+        )
 
     def test_create_fails_when_buffer_time_overlaps_reservation_after(
         self, mock_periods, mock_opening_hours
@@ -318,13 +318,13 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         )
         content = json.loads(response.content)
 
-        assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("createReservation").get("errors")
-        ).is_not_none()
-        assert_that(
-            content.get("data").get("createReservation").get("errors")[0]["messages"][0]
-        ).contains("Reservation overlaps with reservation after due to buffer time.")
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0]["message"]).is_equal_to(
+            "Reservation overlaps with reservation after due to buffer time."
+        )
+        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
+            "RESERVATION_OVERLAP"
+        )
 
     def test_create_fails_when_reservation_unit_buffer_time_overlaps_with_existing_reservation_before(
         self, mock_periods, mock_opening_hours
@@ -349,13 +349,13 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         )
         content = json.loads(response.content)
 
-        assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("createReservation").get("errors")
-        ).is_not_none()
-        assert_that(
-            content.get("data").get("createReservation").get("errors")[0]["messages"][0]
-        ).contains("Reservation overlaps with reservation before due to buffer time.")
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0]["message"]).is_equal_to(
+            "Reservation overlaps with reservation before due to buffer time."
+        )
+        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
+            "RESERVATION_OVERLAP"
+        )
 
     def test_create_fails_when_reservation_unit_buffer_time_overlaps_with_existing_reservation_after(
         self, mock_periods, mock_opening_hours
@@ -378,13 +378,13 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         )
         content = json.loads(response.content)
 
-        assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("createReservation").get("errors")
-        ).is_not_none()
-        assert_that(
-            content.get("data").get("createReservation").get("errors")[0]["messages"][0]
-        ).contains("Reservation overlaps with reservation after due to buffer time.")
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0]["message"]).is_equal_to(
+            "Reservation overlaps with reservation after due to buffer time."
+        )
+        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
+            "RESERVATION_OVERLAP"
+        )
 
     def test_create_fails_when_reservation_unit_closed_on_selected_time(
         self, mock_periods, mock_opening_hours
@@ -401,13 +401,13 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         response = self.query(self.get_create_query(), input_data=input_data)
         content = json.loads(response.content)
 
-        assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("createReservation").get("errors")
-        ).is_not_none()
-        assert_that(
-            content.get("data").get("createReservation").get("errors")[0]["messages"][0]
-        ).contains("Reservation unit is not open within desired reservation time.")
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0]["message"]).is_equal_to(
+            "Reservation unit is not open within desired reservation time."
+        )
+        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
+            "RESERVATION_UNIT_IS_NOT_OPEN"
+        )
 
     def test_create_succeed_when_reservation_unit_closed_on_selected_time_and_opening_hours_are_ignored(
         self, mock_periods, mock_opening_hours
@@ -455,13 +455,13 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         )
         content = json.loads(response.content)
 
-        assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("createReservation").get("errors")
-        ).is_not_none()
-        assert_that(
-            content.get("data").get("createReservation").get("errors")[0]["messages"][0]
-        ).contains("One or more reservation units are in open application round.")
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0]["message"]).is_equal_to(
+            "One or more reservation units are in open application round."
+        )
+        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
+            "RESERVATION_UNIT_IN_OPEN_ROUND"
+        )
 
     def test_create_fails_when_reservation_unit_max_reservation_duration_exceeds(
         self, mock_periods, mock_opening_hours
@@ -476,14 +476,12 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         )
         content = json.loads(response.content)
 
-        assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("createReservation").get("errors")
-        ).is_not_none()
-        assert_that(
-            content.get("data").get("createReservation").get("errors")[0]["messages"][0]
-        ).contains(
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0]["message"]).is_equal_to(
             "Reservation duration exceeds one or more reservation unit's maximum duration."
+        )
+        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
+            "RESERVATION_UNITS_MAX_DURATION_EXCEEDED"
         )
 
     def test_create_fails_when_reservation_unit_min_reservation_duration_subsides(
@@ -500,14 +498,12 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         )
         content = json.loads(response.content)
 
-        assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("createReservation").get("errors")
-        ).is_not_none()
-        assert_that(
-            content.get("data").get("createReservation").get("errors")[0]["messages"][0]
-        ).contains(
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0]["message"]).is_equal_to(
             "Reservation duration less than one or more reservation unit's minimum duration."
+        )
+        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
+            "RESERVATION_UNIT_MIN_DURATION_NOT_EXCEEDED"
         )
 
     def test_create_succeeds_when_start_time_matches_reservation_start_interval(
@@ -551,12 +547,13 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
             input_data["begin"] = begin.strftime("%Y%m%dT%H%M%SZ")
             response = self.query(self.get_create_query(), input_data=input_data)
             content = json.loads(response.content)
-            assert_that(content.get("errors")).is_none()
-            payload = content.get("data").get("createReservation", {})
-            assert_that(payload.get("errors")).is_not_none()
-            assert_that(payload.get("errors")[0]["messages"]).contains(
+            assert_that(content.get("errors")).is_not_none()
+            assert_that(content.get("errors")[0]["message"]).is_equal_to(
                 f"Reservation start time does not match the allowed interval of {interval_minutes} minutes."
             )
+            assert_that(
+                content.get("errors")[0]["extensions"]["error_code"]
+            ).is_equal_to("RESERVATION_TIME_DOES_NOT_MATCH_ALLOWED_INTERVAL")
 
     def test_create_succeed_when_start_time_does_not_match_reservation_start_interval_and_opening_hours_are_ignored(
         self, mock_periods, mock_opening_hours
@@ -602,13 +599,13 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         )
         content = json.loads(response.content)
 
-        assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("createReservation").get("errors")
-        ).is_not_none()
-        assert_that(
-            content.get("data").get("createReservation").get("errors")[0]["messages"][0]
-        ).contains("Reservation unit is not reservable within this reservation time.")
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0]["message"]).is_equal_to(
+            "Reservation unit is not reservable within this reservation time."
+        )
+        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
+            "RESERVATION_UNIT_NOT_RESERVABLE"
+        )
 
     def test_create_fails_when_reservation_unit_reservation_end_in_past(
         self, mock_periods, mock_opening_hours
@@ -624,14 +621,13 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
             self.get_create_query(), input_data=self.get_valid_input_data()
         )
         content = json.loads(response.content)
-
-        assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("createReservation").get("errors")
-        ).is_not_none()
-        assert_that(
-            content.get("data").get("createReservation").get("errors")[0]["messages"][0]
-        ).contains("Reservation unit is not reservable within this reservation time.")
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0]["message"]).is_equal_to(
+            "Reservation unit is not reservable within this reservation time."
+        )
+        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
+            "RESERVATION_UNIT_NOT_RESERVABLE"
+        )
 
     def test_create_success_when_reservation_unit_reservation_begin_in_past(
         self, mock_periods, mock_opening_hours
@@ -758,14 +754,12 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
             self.get_create_query(), input_data=self.get_valid_input_data()
         )
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("createReservation").get("errors")
-        ).is_not_none()
-        assert_that(
-            content.get("data").get("createReservation").get("errors")[0]["messages"]
-        ).contains(
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0]["message"]).is_equal_to(
             "Maximum number of active reservations for this reservation unit exceeded."
+        )
+        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
+            "MAX_NUMBER_OF_ACTIVE_RESERVATIONS_EXCEEDED"
         )
         assert_that(
             Reservation.objects.exclude(pk=existing_reservation.pk).exists()
@@ -830,13 +824,14 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         self.client.force_login(self.regular_joe)
         response = self.query(self.get_create_query(), input_data=input_data)
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("createReservation").get("errors")
-        ).is_not_none()
-        assert_that(
-            content.get("data").get("createReservation").get("errors")[0]["messages"]
-        ).contains("An ambiguous SKU cannot be assigned for this reservation.")
+
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0]["message"]).is_equal_to(
+            "An ambiguous SKU cannot be assigned for this reservation."
+        )
+        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
+            "AMBIGUOUS_SKU"
+        )
 
     def test_create_fails_when_reservation_unit_reservations_max_days_before_exceeds(
         self, mock_periods, mock_opening_hours
@@ -858,13 +853,13 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         response = self.query(self.get_create_query(), input_data=data)
         content = json.loads(response.content)
 
-        assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("createReservation").get("errors")
-        ).is_not_none()
-        assert_that(
-            content.get("data").get("createReservation").get("errors")[0]["messages"][0]
-        ).contains("Reservation start time is earlier than")
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0]["message"]).contains(
+            "Reservation start time is earlier than"
+        )
+        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
+            "RESERVATION_NOT_WITHIN_ALLOWED_TIME_RANGE"
+        )
 
     def test_create_succeed_when_reservation_unit_reservations_max_days_before_in_limits(
         self, mock_periods, mock_opening_hours
@@ -898,13 +893,13 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         )
         content = json.loads(response.content)
 
-        assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("createReservation").get("errors")
-        ).is_not_none()
-        assert_that(
-            content.get("data").get("createReservation").get("errors")[0]["messages"][0]
-        ).contains("Reservation start time is less than")
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0]["message"]).contains(
+            "Reservation start time is less than"
+        )
+        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
+            "RESERVATION_NOT_WITHIN_ALLOWED_TIME_RANGE"
+        )
 
     def test_create_succeed_when_reservation_unit_reservations_in_days_before_in_limits(
         self, mock_periods, mock_opening_hours
@@ -938,13 +933,13 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         )
         content = json.loads(response.content)
 
-        assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("createReservation").get("errors")
-        ).is_not_none()
-        assert_that(
-            content.get("data").get("createReservation").get("errors")[0]["messages"][0]
-        ).contains("reservation kind is SEASON")
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0]["message"]).contains(
+            "reservation kind is SEASON"
+        )
+        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
+            "RESERVATION_UNIT_TYPE_IS_SEASON"
+        )
 
     def test_creating_reservation_with_staff_event_succeed(
         self, mock_periods, mock_opening_hours
@@ -976,13 +971,14 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         input_data["staffEvent"] = True
         response = self.query(self.get_create_query(), input_data=input_data)
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data")
-            .get("createReservation")
-            .get("errors")[0]
-            .get("messages")[0]
-        ).is_equal_to("You don't have permissions to set staff_event")
+
+        assert_that(content.get("errors")).is_not_none()
+        assert_that(content.get("errors")[0]["message"]).is_equal_to(
+            "You don't have permissions to set staff_event"
+        )
+        assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to(
+            "NO_PERMISSION"
+        )
 
     def test_creating_reservation_with_type_succeed(
         self, mock_periods, mock_opening_hours
