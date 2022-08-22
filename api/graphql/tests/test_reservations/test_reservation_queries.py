@@ -8,6 +8,7 @@ from django.utils.timezone import get_default_timezone
 
 from api.graphql.tests.test_reservations.base import ReservationTestCaseBase
 from applications.models import CUSTOMER_TYPES, City
+from reservation_units.models import ReservationUnit
 from reservation_units.tests.factories import (
     ReservationUnitFactory,
     ReservationUnitTypeFactory,
@@ -988,6 +989,97 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
                 }
             }
             """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filter_by_reservation_unit(self):
+        ReservationFactory(
+            name="Test reservation",
+            reservee_type=CUSTOMER_TYPES.CUSTOMER_TYPE_INDIVIDUAL,
+            reservee_first_name="First",
+            reservee_last_name="Name",
+            reservation_unit=[self.reservation_unit],
+        )
+        self.client.force_login(self.general_admin)
+        response = self.query(
+            """
+            query {
+                reservations(reservationUnit: "%s", orderBy:"unitNameFi") {
+                    totalCount
+                    edges {
+                        node {
+                            name
+                            reserveeFirstName
+                            reserveeLastName
+                            reservationUnits {
+                                nameFi
+                            }
+                        }
+                    }
+                }
+            }
+            """
+            % self.reservation_unit.pk
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filter_by_multiple_reservation_unit(self):
+        other_unit = ReservationUnitFactory(
+            spaces=[self.space],
+            unit=self.unit,
+            name="other unit",
+            reservation_start_interval=ReservationUnit.RESERVATION_START_INTERVAL_15_MINUTES,
+            reservation_unit_type=self.reservation_unit_type,
+        )
+
+        not_visible_unit = ReservationUnitFactory(
+            spaces=[self.space],
+            unit=self.unit,
+            name="not visible unit",
+            reservation_start_interval=ReservationUnit.RESERVATION_START_INTERVAL_15_MINUTES,
+            reservation_unit_type=self.reservation_unit_type,
+        )
+
+        ReservationFactory(
+            name="Test reservation",
+            reservee_type=CUSTOMER_TYPES.CUSTOMER_TYPE_INDIVIDUAL,
+            reservee_first_name="First",
+            reservee_last_name="Name",
+            reservation_unit=[other_unit],
+        )
+
+        ReservationFactory(
+            name="Hidden reservation",
+            reservee_type=CUSTOMER_TYPES.CUSTOMER_TYPE_INDIVIDUAL,
+            reservee_first_name="First",
+            reservee_last_name="Name",
+            reservation_unit=[not_visible_unit],
+        )
+
+        self.client.force_login(self.general_admin)
+        response = self.query(
+            """
+            query {
+                reservations(reservationUnit: [%s, %s], orderBy:"unitNameFi") {
+                    totalCount
+                    edges {
+                        node {
+                            name
+                            reserveeFirstName
+                            reserveeLastName
+                            reservationUnits {
+                                nameFi
+                            }
+                        }
+                    }
+                }
+            }
+            """
+            % (self.reservation_unit.pk, other_unit.pk)
         )
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()

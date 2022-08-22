@@ -14,7 +14,7 @@ from permissions.helpers import (
     get_service_sectors_where_can_view_reservations,
     get_units_where_can_view_reservations,
 )
-from reservation_units.models import ReservationUnitType
+from reservation_units.models import ReservationUnit, ReservationUnitType
 from reservations.models import STATE_CHOICES, Reservation, User
 from spaces.models import ServiceSector, Unit
 
@@ -59,6 +59,10 @@ class ReservationFilterSet(django_filters.FilterSet):
 
     unit = django_filters.ModelMultipleChoiceFilter(
         method="get_unit", queryset=Unit.objects.all()
+    )
+
+    reservation_unit = django_filters.ModelMultipleChoiceFilter(
+        method="get_reservation_unit", queryset=ReservationUnit.objects.all()
     )
 
     reservation_unit_type = django_filters.ModelMultipleChoiceFilter(
@@ -165,6 +169,12 @@ class ReservationFilterSet(django_filters.FilterSet):
             return qs
 
         return qs.filter(reservation_unit__unit__in=value)
+
+    def get_reservation_unit(self, qs, property, value):
+        if not value:
+            return qs
+
+        return qs.filter(reservation_unit__in=value)
 
     def get_reservation_unit_type(self, qs, property, value):
         if not value:
