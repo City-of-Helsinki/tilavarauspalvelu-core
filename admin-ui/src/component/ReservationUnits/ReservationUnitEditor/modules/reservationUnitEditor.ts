@@ -50,8 +50,9 @@ export const ExpandLink = styled(Accordion)`
 `;
 
 export const Preview = styled.a<{ disabled: boolean }>`
-  margin-left: auto;
-  padding: var(--spacing-m);
+  display: flex;
+  align-items: center;
+  justify-items: center;
   border-color: var(--color-white) !important;
   border: 2px solid;
   background-color: var(--color-bus-dark);
@@ -76,6 +77,9 @@ export const Preview = styled.a<{ disabled: boolean }>`
       }
 
   `}
+  > span {
+    margin: 0 var(--spacing-m);
+  }
 `;
 
 export const Error = styled.div`

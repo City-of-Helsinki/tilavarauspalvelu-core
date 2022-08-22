@@ -210,7 +210,7 @@ export const ButtonsStripe = styled.div`
 
 export const WhiteButton = styled(Button)<{
   disabled: boolean;
-  variant: "secondary" | "primary";
+  variant: "secondary" | "primary" | "supplementary";
 }>`
   --bg: var(--color-white);
   --fg: var(--color-black);
@@ -218,11 +218,19 @@ export const WhiteButton = styled(Button)<{
   --hfg: var(--bg);
   --border-color: var(--color-white);
 
-  ${({ variant }) =>
-    variant === "secondary"
-      ? `--fg: var(--color-white);
-    --bg: var(--color-bus-dark);`
-      : null}
+  ${({ variant }) => {
+    switch (variant) {
+      case "secondary":
+        return `--fg: var(--color-white);
+      --bg: var(--color-bus-dark);`;
+      case "supplementary":
+        return `--fg: var(--color-white);
+        --bg: var(--color-bus-dark);
+        --border-color: transparent;`;
+      default:
+        return "";
+    }
+  }}
 
   ${({ disabled }) =>
     disabled
@@ -232,6 +240,7 @@ export const WhiteButton = styled(Button)<{
       : null}
 
 
+  height: 52px;
   border: 2px var(--border-color) solid !important;
 
   color: var(--fg) !important;

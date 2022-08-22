@@ -3,6 +3,7 @@ import {
   Accordion,
   Checkbox,
   IconAlertCircleFill,
+  IconArrowLeft,
   Link,
   Notification,
   NumberInput,
@@ -450,7 +451,12 @@ const ReservationUnitEditor = (): JSX.Element | null => {
             dispatch({ type: "created", pk: resUnitPk });
           }
           notifySuccess(
-            t("ReservationUnitEditor.reservationUnitUpdatedNotification")
+            t(
+              state.reservationUnitPk
+                ? "ReservationUnitEditor.reservationUnitUpdatedNotification"
+                : "ReservationUnitEditor.reservationUnitCreatedNotification",
+              { name: state.reservationUnitEdit.nameFi }
+            )
           );
         } else {
           notifyError("jokin meni pieleen");
@@ -547,7 +553,12 @@ const ReservationUnitEditor = (): JSX.Element | null => {
     ) || false;
 
   const requiresHandling = state.reservationUnitEdit.requireReservationHandling;
-
+  const reservationUnitState =
+    Number(state?.reservationUnitPk) > 0 ? (
+      <ReservationUnitStateTag
+        state={state.reservationUnit?.state as ReservationUnitState}
+      />
+    ) : undefined;
   return (
     <Wrapper key={JSON.stringify(state.validationErrors)}>
       <MainMenuWrapper>
@@ -559,11 +570,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                 state.reservationUnitEdit.nameFi ||
                 t("ReservationUnitEditor.defaultHeading")
               }
-              state={
-                <ReservationUnitStateTag
-                  state={state.reservationUnit?.state as ReservationUnitState}
-                />
-              }
+              state={reservationUnitState}
             />
           ) : null}
           <FormErrorSummary
@@ -1749,8 +1756,10 @@ const ReservationUnitEditor = (): JSX.Element | null => {
       </MainMenuWrapper>
       <ButtonsStripe>
         <WhiteButton
+          size="small"
           disabled={saving}
-          variant="secondary"
+          variant="supplementary"
+          iconLeft={<IconArrowLeft />}
           onClick={() =>
             setModalContent(
               <DiscardChangesDialog
@@ -1763,10 +1772,26 @@ const ReservationUnitEditor = (): JSX.Element | null => {
             )
           }
         >
-          {t("ReservationUnitEditor.cancel")}
+          {t("common.prev")}
         </WhiteButton>
         <ButtonsContainer>
+          <Preview
+            target="_blank"
+            rel="noopener noreferrer"
+            disabled={saving || !state.reservationUnitPk}
+            href={`${previewUrlPrefix}/${state.reservationUnit?.pk}?ru=${state.reservationUnit?.uuid}`}
+            onClick={(e) => state.hasChanges && e.preventDefault()}
+            title={t(
+              state.hasChanges
+                ? "ReservationUnitEditor.noPreviewUnsavedChangesTooltip"
+                : "ReservationUnitEditor.previewTooltip"
+            )}
+          >
+            <span>{t("ReservationUnitEditor.preview")}</span>
+          </Preview>
+
           <WhiteButton
+            size="small"
             disabled={saving}
             variant="secondary"
             isLoading={saving}
@@ -1801,20 +1826,6 @@ const ReservationUnitEditor = (): JSX.Element | null => {
           >
             {t("ReservationUnitEditor.saveAndPublish")}
           </WhiteButton>
-          <Preview
-            target="_blank"
-            rel="noopener noreferrer"
-            disabled={saving}
-            href={`${previewUrlPrefix}/${state.reservationUnit?.pk}?ru=${state.reservationUnit?.uuid}`}
-            onClick={(e) => state.hasChanges && e.preventDefault()}
-            title={t(
-              state.hasChanges
-                ? "ReservationUnitEditor.noPreviewUnsavedChangesTooltip"
-                : "ReservationUnitEditor.previewTooltip"
-            )}
-          >
-            {t("ReservationUnitEditor.preview")}
-          </Preview>
         </ButtonsContainer>
       </ButtonsStripe>
     </Wrapper>
