@@ -238,7 +238,10 @@ const ReservationInfo = ({
         !areSlotsReservable(
           [startDate, subMinutes(endDate, 1)],
           reservationUnit.openingHours?.openingTimes,
-          activeApplicationRounds
+          activeApplicationRounds,
+          reservationUnit.reservationBegins,
+          reservationUnit.reservationEnds,
+          reservationUnit.reservationsMinDaysBefore
         )
       ) {
         setErrorMsg(t(`reservationCalendar:errors.unavailable`));

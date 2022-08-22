@@ -35,13 +35,13 @@ import {
   doBuffersCollide,
   doReservationsCollide,
   getEventBuffers,
+  getNormalizedReservationBeginTime,
   getSlotPropGetter,
   getTimeslots,
   isReservationLongEnough,
   isReservationShortEnough,
   isReservationStartInFuture,
   isReservationUnitReservable,
-  isSlotWithinTimeframe,
   isStartTimeWithinInterval,
 } from "../../../modules/calendar";
 import Toolbar, { ToolbarProps } from "../../../components/calendar/Toolbar";
@@ -203,7 +203,7 @@ export const getServerSideProps: GetServerSideProps = async ({
       },
     });
 
-    const previewPass = uuid === reservationUnitData.reservationUnitByPk.uuid;
+    const previewPass = uuid === reservationUnitData.reservationUnitByPk?.uuid;
 
     if (
       !isReservationUnitPublished(reservationUnitData.reservationUnitByPk) &&
@@ -500,9 +500,18 @@ const ReservationUnit = ({
     () =>
       getSlotPropGetter(
         reservationUnit.openingHours?.openingTimes,
-        activeApplicationRounds
+        activeApplicationRounds,
+        reservationUnit.reservationBegins,
+        reservationUnit.reservationEnds,
+        reservationUnit.reservationsMinDaysBefore
       ),
-    [reservationUnit.openingHours?.openingTimes, activeApplicationRounds]
+    [
+      reservationUnit.openingHours?.openingTimes,
+      activeApplicationRounds,
+      reservationUnit.reservationBegins,
+      reservationUnit.reservationEnds,
+      reservationUnit.reservationsMinDaysBefore,
+    ]
   );
 
   const isReservationQuotaReached = useMemo(() => {
@@ -517,38 +526,46 @@ const ReservationUnit = ({
     end: Date,
     skipLengthCheck = false
   ): boolean => {
+    const {
+      reservations,
+      bufferTimeBefore,
+      bufferTimeAfter,
+      openingHours,
+      maxReservationDuration,
+      minReservationDuration,
+      reservationStartInterval,
+      reservationsMinDaysBefore,
+      reservationBegins,
+      reservationEnds,
+    } = reservationUnit;
+
     if (
       !isValid(start) ||
       !isValid(end) ||
-      doBuffersCollide(reservationUnit.reservations, {
+      doBuffersCollide(reservations, {
         start,
         end,
-        bufferTimeBefore: reservationUnit.bufferTimeBefore,
-        bufferTimeAfter: reservationUnit.bufferTimeAfter,
+        bufferTimeBefore,
+        bufferTimeAfter,
       }) ||
       !isStartTimeWithinInterval(
         start,
-        reservationUnit.openingHours?.openingTimes,
-        reservationUnit.reservationStartInterval
+        openingHours?.openingTimes,
+        reservationStartInterval
       ) ||
       !areSlotsReservable(
         [new Date(start), subMinutes(new Date(end), 1)],
-        reservationUnit.openingHours?.openingTimes,
-        activeApplicationRounds
+        openingHours?.openingTimes,
+        activeApplicationRounds,
+        reservationBegins,
+        reservationEnds,
+        reservationsMinDaysBefore
       ) ||
       (!skipLengthCheck &&
-        !isReservationLongEnough(
-          start,
-          end,
-          reservationUnit.minReservationDuration
-        )) ||
-      !isReservationShortEnough(
-        start,
-        end,
-        reservationUnit.maxReservationDuration
-      ) ||
-      doReservationsCollide(reservationUnit.reservations, { start, end }) ||
-      !isSlotWithinTimeframe(start)
+        !isReservationLongEnough(start, end, minReservationDuration)) ||
+      !isReservationShortEnough(start, end, maxReservationDuration) ||
+      doReservationsCollide(reservations, { start, end })
+      // || !isSlotWithinTimeframe(start, reservationsMinDaysBefore, start, end)
     ) {
       return false;
     }
@@ -793,7 +810,9 @@ const ReservationUnit = ({
             <span data-testid="reservation-unit--notification__reservation-start">
               {t("reservationCalendar:reservingStartsAt", {
                 date: t("common:dateTimeNoYear", {
-                  date: parseISO(reservationUnit.reservationBegins),
+                  date: parseISO(
+                    getNormalizedReservationBeginTime(reservationUnit)
+                  ),
                 }),
               })}
             </span>

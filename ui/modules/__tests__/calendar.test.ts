@@ -7,11 +7,13 @@ import {
   getBufferedEventTimes,
   getDayIntervals,
   getEventBuffers,
+  getNormalizedReservationBeginTime,
   getTimeslots,
   isReservationLongEnough,
   isReservationShortEnough,
   isReservationStartInFuture,
   isReservationUnitReservable,
+  isSlotWithinReservationTime,
   isSlotWithinTimeframe,
   isStartTimeWithinInterval,
 } from "../calendar";
@@ -156,6 +158,51 @@ describe("areSlotsReservable", () => {
   test("Plus 10 days", () => {
     expect(
       areSlotsReservable([addDays(new Date(), 10)], openingTimes, [])
+    ).toBe(false);
+  });
+
+  test("Buffer days", () => {
+    const hours = 11 + tzOffset;
+    expect(
+      areSlotsReservable(
+        [addDays(new Date().setUTCHours(hours), 7)],
+        openingTimes,
+        [],
+        null,
+        null,
+        7
+      )
+    ).toBe(true);
+    expect(
+      areSlotsReservable(
+        [addDays(new Date().setUTCHours(hours), 7)],
+        openingTimes,
+        [],
+        addDays(new Date(), 8),
+        null,
+        7
+      )
+    ).toBe(false);
+    expect(
+      areSlotsReservable(
+        [addDays(new Date().setUTCHours(hours), 7)],
+        openingTimes,
+        [],
+        null,
+        addDays(new Date(), 6),
+        7
+      )
+    ).toBe(false);
+
+    expect(
+      areSlotsReservable(
+        [addDays(new Date().setUTCHours(hours), 7)],
+        openingTimes,
+        [],
+        null,
+        null,
+        8
+      )
     ).toBe(false);
   });
 });
@@ -577,6 +624,22 @@ describe("isReservationUnitReservable", () => {
       } as ReservationUnitType)
     ).toBe(false);
   });
+
+  test("returns correct value with buffer days", () => {
+    expect(
+      isReservationUnitReservable({
+        reservationBegins: addDays(new Date(), 5),
+        reservationsMaxDaysBefore: 5,
+      } as ReservationUnitType)
+    ).toBe(true);
+
+    expect(
+      isReservationUnitReservable({
+        reservationBegins: addDays(new Date(), 5),
+        reservationsMaxDaysBefore: 4,
+      } as ReservationUnitType)
+    ).toBe(false);
+  });
 });
 
 describe("isReservationStartInFuture", () => {
@@ -602,5 +665,112 @@ describe("isReservationStartInFuture", () => {
     ).toBe(false);
 
     expect(isReservationStartInFuture({} as ReservationUnitType)).toBe(false);
+  });
+
+  test("returns correct value with buffer days", () => {
+    expect(
+      isReservationStartInFuture({
+        reservationBegins: addDays(new Date(), 10),
+        reservationsMaxDaysBefore: 9,
+      } as ReservationUnitType)
+    ).toBe(true);
+
+    expect(
+      isReservationStartInFuture({
+        reservationBegins: addDays(new Date(), 10),
+        reservationsMaxDaysBefore: 10,
+      } as ReservationUnitType)
+    ).toBe(false);
+  });
+});
+
+describe("isSlotWithinReservationTime", () => {
+  test("with no reservation times", () => {
+    expect(
+      isSlotWithinReservationTime(
+        new Date("2019-09-22T12:00:00+00:00"),
+        null,
+        null
+      )
+    ).toBe(true);
+  });
+
+  test("with begin time", () => {
+    expect(
+      isSlotWithinReservationTime(
+        new Date("2019-09-22T12:00:00+00:00"),
+        new Date("2019-08-22T12:00:00+00:00"),
+        null
+      )
+    ).toBe(true);
+
+    expect(
+      isSlotWithinReservationTime(
+        new Date("2019-09-22T12:00:00+00:00"),
+        new Date("2019-09-23T12:00:00+00:00"),
+        null
+      )
+    ).toBe(false);
+  });
+
+  test("with end time", () => {
+    expect(
+      isSlotWithinReservationTime(
+        new Date("2019-09-22T12:00:00+00:00"),
+        null,
+        new Date("2019-08-22T12:00:00+00:00")
+      )
+    ).toBe(false);
+
+    expect(
+      isSlotWithinReservationTime(
+        new Date("2019-09-22T12:00:00+00:00"),
+        null,
+        new Date("2019-09-23T13:00:00+00:00")
+      )
+    ).toBe(true);
+  });
+
+  test("with both times", () => {
+    expect(
+      isSlotWithinReservationTime(
+        new Date("2019-09-22T12:00:00+00:00"),
+        new Date("2019-09-22T12:00:00+00:00"),
+        new Date("2019-09-22T12:00:00+00:00")
+      )
+    ).toBe(false);
+
+    expect(
+      isSlotWithinReservationTime(
+        new Date("2019-09-22T12:00:00+00:00"),
+        new Date("2019-08-22T12:00:00+00:00"),
+        new Date("2019-09-22T12:00:00+00:00")
+      )
+    ).toBe(false);
+
+    expect(
+      isSlotWithinReservationTime(
+        new Date("2019-09-22T12:00:00+00:00"),
+        new Date("2019-08-22T12:00:00+00:00"),
+        new Date("2019-10-22T12:00:00+00:00")
+      )
+    ).toBe(true);
+  });
+});
+
+describe("getNormalizedReservationBeginTime", () => {
+  test("get correct time", () => {
+    expect(
+      getNormalizedReservationBeginTime({
+        reservationBegins: "2019-09-22T12:00:00+00:00",
+      } as ReservationUnitType)
+    ).toEqual("2019-09-22T12:00:00.000Z");
+
+    expect(
+      getNormalizedReservationBeginTime({
+        reservationBegins: "2019-09-22T12:00:00+00:00",
+        reservationsMaxDaysBefore: 10,
+      } as ReservationUnitType)
+    ).toEqual("2019-09-12T12:00:00.000Z");
   });
 });

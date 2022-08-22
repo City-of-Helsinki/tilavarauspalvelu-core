@@ -122,10 +122,31 @@ const areOpeningTimesAvailable = (
   });
 };
 
-export const isSlotWithinTimeframe = (start: Date, bufferDays = 0): boolean => {
-  return bufferDays
-    ? isAfter(start, startOfDay(addDays(new Date(), bufferDays)))
-    : isAfter(start, new Date());
+export const isSlotWithinReservationTime = (
+  start: Date,
+  reservationBegins: Date,
+  reservationEnds: Date
+): boolean => {
+  return (
+    (isAfter(start, new Date(reservationBegins)) || !reservationBegins) &&
+    (isBefore(start, new Date(reservationEnds)) || !reservationEnds)
+  );
+};
+
+export const isSlotWithinTimeframe = (
+  start: Date,
+  reservationsMinDaysBefore = 0,
+  reservationBegins?: Date,
+  reservationEnds?: Date
+): boolean => {
+  return reservationsMinDaysBefore
+    ? isAfter(
+        start,
+        startOfDay(addDays(new Date(), reservationsMinDaysBefore))
+      ) &&
+        isSlotWithinReservationTime(start, reservationBegins, reservationEnds)
+    : isAfter(start, new Date()) &&
+        isSlotWithinReservationTime(start, reservationBegins, reservationEnds);
 };
 
 const doesSlotCollideWithApplicationRounds = (
@@ -145,13 +166,20 @@ export const areSlotsReservable = (
   slots: Date[],
   openingHours: OpeningTimesType[],
   activeApplicationRounds: ApplicationRound[] = [],
-  bufferDays?: number
+  reservationBegins?: Date,
+  reservationEnds?: Date,
+  reservationsMinDaysBefore = 0
 ): boolean => {
   return slots.every((slot) => {
     const slotDate = new Date(slot);
     return (
       areOpeningTimesAvailable(openingHours, slotDate) &&
-      isSlotWithinTimeframe(slotDate, bufferDays) &&
+      isSlotWithinTimeframe(
+        slotDate,
+        reservationsMinDaysBefore,
+        reservationBegins,
+        reservationEnds
+      ) &&
       !doesSlotCollideWithApplicationRounds(activeApplicationRounds, slot)
     );
   });
@@ -240,7 +268,9 @@ export const getSlotPropGetter =
   (
     openingHours: OpeningTimesType[],
     activeApplicationRounds: ApplicationRound[],
-    bufferDays?: number
+    reservationBegins: Date,
+    reservationEnds: Date,
+    reservationsMinDaysBefore?: number
   ) =>
   (date: Date): SlotProps => {
     switch (
@@ -248,7 +278,9 @@ export const getSlotPropGetter =
         [date],
         openingHours,
         activeApplicationRounds,
-        bufferDays
+        reservationBegins,
+        reservationEnds,
+        reservationsMinDaysBefore
       )
     ) {
       case true:
@@ -373,8 +405,11 @@ export const isReservationUnitReservable = (
   reservationUnit: ReservationUnitType | ReservationUnitByPkType,
   now = new Date()
 ): boolean => {
+  const bufferDays = reservationUnit.reservationsMaxDaysBefore || 0;
+  const negativeBuffer = Math.abs(bufferDays) * -1;
+
   const isAfterReservationStart =
-    now >= new Date(reservationUnit.reservationBegins);
+    now >= addDays(new Date(reservationUnit.reservationBegins), negativeBuffer);
   const isBeforeReservationEnd =
     now <= new Date(reservationUnit.reservationEnds);
   return (
@@ -387,8 +422,23 @@ export const isReservationStartInFuture = (
   reservationUnit: ReservationUnitType | ReservationUnitByPkType,
   now = new Date()
 ): boolean => {
+  const bufferDays = reservationUnit.reservationsMaxDaysBefore || 0;
+  const negativeBuffer = Math.abs(bufferDays) * -1;
+
   return (
     !!reservationUnit.reservationBegins &&
-    now < new Date(reservationUnit.reservationBegins)
+    now < addDays(new Date(reservationUnit.reservationBegins), negativeBuffer)
   );
+};
+
+export const getNormalizedReservationBeginTime = (
+  reservationUnit: ReservationUnitType | ReservationUnitByPkType
+): string => {
+  const bufferDays = reservationUnit.reservationsMaxDaysBefore || 0;
+  const negativeBuffer = Math.abs(bufferDays) * -1;
+
+  return addDays(
+    new Date(reservationUnit.reservationBegins),
+    negativeBuffer
+  ).toISOString();
 };

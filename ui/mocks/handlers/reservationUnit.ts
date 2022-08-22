@@ -88,7 +88,7 @@ const selectedReservationUnitQuery = graphql.query<
     bufferTimeBefore: 3600,
     bufferTimeAfter: 1800,
     reservationBegins: addDays(new Date(), -1),
-    reservationEnds: addDays(new Date(), 1),
+    reservationEnds: addDays(new Date(), 10),
     images: [
       {
         imageUrl:
