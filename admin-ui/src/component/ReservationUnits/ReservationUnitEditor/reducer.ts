@@ -159,7 +159,6 @@ export const reducer = (state: State, action: Action): State => {
             "maxReservationDuration",
             "minReservationDuration",
             "pk",
-            "paymentType",
             "priceUnit",
             "publishBegins",
             "publishEnds",
@@ -211,6 +210,7 @@ export const reducer = (state: State, action: Action): State => {
           ),
           metadataSetPk: get(reservationUnit, "metadataSet.pk", null),
           pricingType: get(reservationUnit, "pricingType") || undefined, // update api does not allow null
+          paymentType: get(reservationUnit, "paymentType") || undefined, // update api does not allow null
         },
         hasChanges: false,
         images: sortImages(
