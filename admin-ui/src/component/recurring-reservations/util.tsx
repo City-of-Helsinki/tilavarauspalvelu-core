@@ -2,6 +2,8 @@ import React from "react";
 import styled from "styled-components";
 import { orderBy, trim, uniqBy } from "lodash";
 import { TFunction } from "react-i18next";
+import { formatters as getFormatters } from "common";
+import { parse } from "date-fns";
 import {
   ApplicationRound as ApplicationRoundType,
   ApplicationRoundStatus,
@@ -9,12 +11,18 @@ import {
 } from "../../common/types";
 
 import {
+  appEventHours,
   applicantName,
   getNormalizedApplicationStatus,
+  numTurns,
 } from "../applications/util";
 import StatusCell from "../StatusCell";
 import { formatNumber } from "../../common/util";
-import { ApplicationType, UnitType } from "../../common/gql-types";
+import {
+  ApplicationEventType,
+  ApplicationType,
+  UnitType,
+} from "../../common/gql-types";
 
 export type ApplicationView = {
   id: number;
@@ -29,6 +37,25 @@ export type ApplicationView = {
   statusView: JSX.Element;
   statusType: ApplicationStatus;
 };
+
+export type ApplicationEventView = {
+  applicationId: number;
+  id: number;
+  applicant?: string;
+  name: string;
+  units: UnitType[];
+  statusView: JSX.Element;
+  applicationCount: string;
+};
+
+const StyledStatusCell = styled(StatusCell)`
+  gap: 0 !important;
+  > div {
+    gap: 0 !important;
+  }
+`;
+
+const formatters = getFormatters("fi");
 
 export const appMapper = (
   round: ApplicationRoundType,
@@ -61,13 +88,6 @@ export const appMapper = (
   const eventId = app.applicationEvents?.find(() => true)
     ?.id as unknown as number;
 
-  const StyledStatusCell = styled(StatusCell)`
-    gap: 0 !important;
-    > div {
-      gap: 0 !important;
-    }
-  `;
-
   const status = getNormalizedApplicationStatus(
     app.status as ApplicationStatus,
     applicationStatusView
@@ -99,10 +119,85 @@ export const appMapper = (
       `${formatNumber(
         app.aggregatedData?.appliedReservationsTotal,
         ""
-      )} / ${formatNumber(
+      )} / ${formatters.oneDecimal.format(
         Number(app.aggregatedData?.appliedMinDurationTotal) / 3600
       )} t`,
       " / "
+    ),
+  };
+};
+
+export const appEventMapper = (
+  round: ApplicationRoundType,
+  appEvent: ApplicationEventType
+): ApplicationEventView => {
+  let applicationStatusView: ApplicationRoundStatus;
+  switch (round.status) {
+    case "approved":
+      applicationStatusView = "approved";
+      break;
+    default:
+      applicationStatusView = "in_review";
+  }
+
+  const status = getNormalizedApplicationStatus(
+    appEvent.application.status as ApplicationStatus,
+    applicationStatusView
+  );
+
+  const fromAPIDate = (date: string): Date =>
+    parse(date, "yyyy-MM-dd", new Date());
+
+  const units = orderBy(
+    uniqBy(
+      appEvent.eventReservationUnits?.flatMap((eru) => ({
+        ...eru?.reservationUnit?.unit,
+        priority: eru?.priority as number,
+      })),
+      "pk"
+    ),
+    "priority",
+    "asc"
+  ) as UnitType[];
+  const name = appEvent.name || "-";
+  const eventId = appEvent.pk as number;
+
+  const applicant = applicantName(appEvent.application);
+
+  const turns = numTurns(
+    appEvent.begin,
+    appEvent.end,
+    appEvent.biweekly,
+    appEvent.eventsPerWeek as number
+  );
+
+  const totalHours = appEventHours(
+    fromAPIDate(appEvent.begin).toISOString(),
+    fromAPIDate(appEvent.end).toISOString(),
+    appEvent.biweekly,
+    appEvent.eventsPerWeek as number,
+    appEvent.minDuration as number
+  );
+
+  return {
+    applicationId: appEvent.application.pk as number,
+    id: eventId,
+    applicant,
+    units,
+    name,
+    applicationCount: trim(
+      `${formatNumber(turns, "")} / ${formatters.oneDecimal.format(
+        totalHours
+      )} t`,
+      " / "
+    ),
+    statusView: (
+      <StyledStatusCell
+        status={status}
+        text={`Application.statuses.${status}`}
+        type="application"
+        withArrow={false}
+      />
     ),
   };
 };

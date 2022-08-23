@@ -97,9 +97,7 @@ export const appEventHours = (
   minDuration: number
 ): number => {
   const turns = numTurns(startDate, endDate, biWeekly, eventsPerWeek);
-
-  const hours = (turns * minDuration) / 60;
-  return hours;
+  return (turns * minDuration) / 3600;
 };
 
 export const applicationHours = (

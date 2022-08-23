@@ -30,12 +30,7 @@ import {
 } from "../../common/util";
 import ValueBox from "./ValueBox";
 import { weekdays } from "../../common/const";
-import {
-  appEventDuration,
-  applicantName,
-  applicationHours,
-  applicationTurns,
-} from "./util";
+import { appEventDuration, applicantName } from "./util";
 import ApplicationStatusBlock from "./ApplicationStatusBlock";
 import { useNotification } from "../../context/NotificationContext";
 import TimeSelector from "./time-selector/TimeSelector";
@@ -294,14 +289,16 @@ function ApplicationDetails(): JSX.Element | null {
                   <KV
                     k={t("Application.numHours")}
                     v={`${t("common.hoursUnitLong", {
-                      count: applicationHours(application),
+                      count:
+                        (application.aggregatedData
+                          .appliedMinDurationTotal as number) / 3600,
                     })}`}
                   />
                   <KV
                     k={t("Application.numTurns")}
-                    v={`${applicationTurns(application)} ${t(
-                      "common.volumeUnit"
-                    )}`}
+                    v={`${
+                      application.aggregatedData.appliedReservationsTotal
+                    } ${t("common.volumeUnit")}`}
                   />
                   <KV k={t("Application.basket")} v="" />
                 </DefinitionList>

@@ -17,6 +17,7 @@ import TimeframeStatus from "../TimeframeStatus";
 import ApplicationDataLoader from "./ApplicationDataLoader";
 import { Sort } from "./ApplicationsTable";
 import Filters, { emptyFilterState, FilterArguments } from "./Filters";
+import ApplicationEventDataLoader from "./ApplicationEventDataLoader";
 
 interface IProps {
   applicationRound: RestApplicationRoundType;
@@ -117,6 +118,20 @@ function Review({ applicationRound }: IProps): JSX.Element | null {
                 <VerticalFlex>
                   <Filters onSearch={debouncedSearch} />
                   <ApplicationDataLoader
+                    applicationRound={applicationRound}
+                    key={JSON.stringify({ ...search, ...sort })}
+                    filters={search}
+                    sort={sort}
+                    sortChanged={onSortChanged}
+                  />
+                </VerticalFlex>
+              </TabContent>
+            </Tabs.TabPanel>
+            <Tabs.TabPanel>
+              <TabContent>
+                <VerticalFlex>
+                  <Filters onSearch={debouncedSearch} />
+                  <ApplicationEventDataLoader
                     applicationRound={applicationRound}
                     key={JSON.stringify({ ...search, ...sort })}
                     filters={search}

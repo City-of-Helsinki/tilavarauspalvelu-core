@@ -592,6 +592,14 @@ const translations: ITranslations = {
       200: ["Muut aikatoiveet"],
       all: ["Kaikki"],
     },
+    headings: {
+      id: ["Id"],
+      customer: ["Hakija"],
+      name: ["Vuoro"],
+      unit: ["Toimipiste"],
+      stats: ["Haettu"],
+      phase: ["Vaihe"],
+    },
   },
   Organisation: {
     activeParticipants: ["Aktiiviharrastajat"],
