@@ -9,11 +9,13 @@ PRUNE_INTERVAL_SECONDS = 60 * 10
 PRUNE_OLDER_THAN_MINUTES = 20
 
 
-@app.task
+@app.task(name="prune_reservations")
 def _prune_reservations() -> None:
     prune_reservations(PRUNE_OLDER_THAN_MINUTES)
 
 
 @app.on_after_finalize.connect
 def setup_periodic_tasks(sender, **kwargs) -> None:
-    sender.add_periodic_task(PRUNE_INTERVAL_SECONDS, _prune_reservations.s())
+    sender.add_periodic_task(
+        PRUNE_INTERVAL_SECONDS, _prune_reservations.s(), name="reservations_pruning"
+    )
