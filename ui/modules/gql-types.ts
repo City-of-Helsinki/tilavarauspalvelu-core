@@ -1792,6 +1792,7 @@ export type QueryReservationsArgs = {
   priceGte?: InputMaybe<Scalars["Float"]>;
   priceLte?: InputMaybe<Scalars["Float"]>;
   requested?: InputMaybe<Scalars["Boolean"]>;
+  reservationUnit?: InputMaybe<Array<InputMaybe<Scalars["ID"]>>>;
   reservationUnitNameEn?: InputMaybe<Scalars["String"]>;
   reservationUnitNameFi?: InputMaybe<Scalars["String"]>;
   reservationUnitNameSv?: InputMaybe<Scalars["String"]>;
@@ -2052,6 +2053,8 @@ export type ReservationConfirmMutationPayload = {
   state?: Maybe<Scalars["String"]>;
   /** The value of the tax percentage for this particular reservation */
   taxPercentageValue?: Maybe<Scalars["Float"]>;
+  /** Reservation type. Mutation requires special permissions. Possible values are NORMAL, BLOCKED. */
+  type?: Maybe<Scalars["String"]>;
   /** The price of this particular reservation */
   unitPrice?: Maybe<Scalars["Float"]>;
 };
@@ -2094,6 +2097,8 @@ export type ReservationCreateMutationInput = {
   reserveeType?: InputMaybe<Scalars["String"]>;
   /** Indicates if reservation is internal or created by staff */
   staffEvent?: InputMaybe<Scalars["Boolean"]>;
+  /** Reservation type. Mutation requires special permissions. Possible values are NORMAL, BLOCKED. */
+  type?: InputMaybe<Scalars["String"]>;
 };
 
 export type ReservationCreateMutationPayload = {
@@ -2145,6 +2150,8 @@ export type ReservationCreateMutationPayload = {
   state?: Maybe<Scalars["String"]>;
   /** The value of the tax percentage for this particular reservation */
   taxPercentageValue?: Maybe<Scalars["Float"]>;
+  /** Reservation type. Mutation requires special permissions. Possible values are NORMAL, BLOCKED. */
+  type?: Maybe<Scalars["String"]>;
   /** The price of this particular reservation */
   unitPrice?: Maybe<Scalars["Float"]>;
 };
@@ -2315,6 +2322,7 @@ export type ReservationType = Node & {
   staffEvent?: Maybe<Scalars["Boolean"]>;
   state: ReservationsReservationStateChoices;
   taxPercentageValue?: Maybe<Scalars["Decimal"]>;
+  type?: Maybe<Scalars["String"]>;
   unitPrice?: Maybe<Scalars["Float"]>;
   user?: Maybe<Scalars["String"]>;
   /** Working memo for staff users. */
@@ -3248,6 +3256,8 @@ export type ReservationUpdateMutationInput = {
    * CREATED, CANCELLED, REQUIRES_HANDLING, CONFIRMED, DENIED.
    */
   state?: InputMaybe<Scalars["String"]>;
+  /** Reservation type. Mutation requires special permissions. Possible values are NORMAL, BLOCKED. */
+  type?: InputMaybe<Scalars["String"]>;
 };
 
 export type ReservationUpdateMutationPayload = {
@@ -3302,6 +3312,8 @@ export type ReservationUpdateMutationPayload = {
   state?: Maybe<Scalars["String"]>;
   /** The value of the tax percentage for this particular reservation */
   taxPercentageValue?: Maybe<Scalars["Float"]>;
+  /** Reservation type. Mutation requires special permissions. Possible values are NORMAL, BLOCKED. */
+  type?: Maybe<Scalars["String"]>;
   /** The price of this particular reservation */
   unitPrice?: Maybe<Scalars["Float"]>;
 };
@@ -5107,6 +5119,8 @@ export const ReservationUnitDocument = gql`
       minReservationDuration
       maxReservationDuration
       maxReservationsPerUser
+      reservationsMinDaysBefore
+      reservationsMaxDaysBefore
       nextAvailableSlot
       unit {
         id
@@ -6177,6 +6191,8 @@ export type ReservationUnitQuery = {
     minReservationDuration?: any | null;
     maxReservationDuration?: any | null;
     maxReservationsPerUser?: number | null;
+    reservationsMinDaysBefore?: number | null;
+    reservationsMaxDaysBefore?: number | null;
     nextAvailableSlot?: any | null;
     requireReservationHandling: boolean;
     allowReservationsWithoutOpeningHours: boolean;

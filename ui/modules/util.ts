@@ -11,6 +11,7 @@ import {
 import { i18n, TFunction } from "next-i18next";
 import { stringify } from "query-string";
 import { isNumber, trim } from "lodash";
+import { ApolloError } from "@apollo/client";
 import {
   searchPrefix,
   emptyOption,
@@ -505,4 +506,23 @@ export const getReadableList = (list: string[]): string => {
   }
 
   return `${list.slice(0, -1).join(", ")} ${andStr} ${list[list.length - 1]}`;
+};
+
+export const printErrorMessages = (error: ApolloError): string => {
+  if (!error.graphQLErrors || error.graphQLErrors.length === 0) {
+    return "";
+  }
+
+  const { graphQLErrors: errors } = error;
+
+  return errors
+    .reduce((acc, cur) => {
+      const code = i18n.t(`errors:${cur?.extensions?.error_code}`);
+      const message =
+        code === cur?.extensions?.error_code
+          ? i18n.t("errors:general_error")
+          : code;
+      return `${acc}${message}\n`; /// contains non-breaking space
+    }, "")
+    .trim();
 };

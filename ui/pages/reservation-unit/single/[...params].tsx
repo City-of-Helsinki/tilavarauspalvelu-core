@@ -45,6 +45,7 @@ import {
   applicationErrorText,
   capitalize,
   getTranslation,
+  printErrorMessages,
   reservationsUrl,
 } from "../../../modules/util";
 import { MediumButton } from "../../../styles/util";
@@ -483,8 +484,9 @@ const ReservationUnitReservation = ({
 
   useEffect(() => {
     if (!updateLoading) {
-      if (updateError || updateData?.updateReservation?.errors?.length > 0) {
-        setErrorMsg(t("reservationUnit:reservationUpdateFailed"));
+      if (updateError) {
+        const msg = printErrorMessages(updateError);
+        setErrorMsg(msg);
       } else if (updateData) {
         if (updateData.updateReservation.reservation.state === "CANCELLED") {
           setContextReservation(null);
@@ -514,8 +516,9 @@ const ReservationUnitReservation = ({
     if (!confirmLoading) {
       window.scrollTo(0, 0);
 
-      if (confirmError || confirmData?.confirmReservation?.errors?.length > 0) {
-        setErrorMsg(t("reservationUnit:reservationUpdateFailed"));
+      if (confirmError) {
+        const msg = printErrorMessages(updateError);
+        setErrorMsg(msg);
       } else if (confirmData) {
         setReservation({
           ...reservation,
@@ -1373,7 +1376,7 @@ const ReservationUnitReservation = ({
       {errorMsg && (
         <Notification
           type="error"
-          label={t("common:error.error")}
+          label={t("reservationUnit:reservationUpdateFailed")}
           position="top-center"
           autoClose
           autoCloseDuration={2000}

@@ -58,6 +58,7 @@ export const getServerSideProps: GetServerSideProps = async ({
       QueryReservationUnitByPkArgs
     >({
       query: RESERVATION_UNIT,
+      fetchPolicy: "no-cache",
       variables: {
         pk: id,
       },
@@ -86,6 +87,7 @@ export const getServerSideProps: GetServerSideProps = async ({
       QueryTermsOfUseArgs
     >({
       query: TERMS_OF_USE,
+      fetchPolicy: "no-cache",
       variables: {
         termsType: "generic_terms",
       },
@@ -98,6 +100,7 @@ export const getServerSideProps: GetServerSideProps = async ({
         QueryReservationUnitsArgs
       >({
         query: RELATED_RESERVATION_UNITS,
+        fetchPolicy: "no-cache",
         variables: {
           unit: [String(reservationUnitData.reservationUnitByPk.unit.pk)],
           isDraft: false,

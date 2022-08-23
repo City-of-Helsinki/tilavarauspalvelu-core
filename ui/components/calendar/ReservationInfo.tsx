@@ -26,6 +26,7 @@ import { fontBold, fontMedium } from "../../modules/style/typography";
 import { ApplicationRound, Language, OptionType } from "../../modules/types";
 import {
   convertHMSToSeconds,
+  printErrorMessages,
   secondsToHms,
   toApiDate,
   toUIDate,
@@ -138,8 +139,9 @@ const ReservationInfo = ({
 
   useEffect(() => {
     if (!loading) {
-      if (error || data?.createReservation?.errors?.length > 0) {
-        setErrorMsg(t("reservationUnit:reservationFailed"));
+      if (error) {
+        const msg = printErrorMessages(error);
+        setErrorMsg(msg);
       } else if (data) {
         setReservation({
           ...reservation,
@@ -366,7 +368,7 @@ const ReservationInfo = ({
       {errorMsg && (
         <Notification
           type="error"
-          label={t("common:error.error")}
+          label={t("reservationUnit:reservationFailed")}
           position="top-center"
           autoClose={false}
           displayAutoCloseProgress={false}

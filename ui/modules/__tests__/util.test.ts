@@ -1,3 +1,4 @@
+import { ApolloError } from "@apollo/client";
 import {
   ApplicationEventSchedule,
   ApplicationEventSchedulePriority,
@@ -13,6 +14,7 @@ import {
   convertHMSToSeconds,
   formatDuration,
   getReadableList,
+  printErrorMessages,
 } from "../util";
 
 jest.mock("next/config", () => () => ({
@@ -183,4 +185,29 @@ test("getReadableList", () => {
   expect(getReadableList(["a", "b", "c"])).toEqual("a, b common:and c");
   expect(getReadableList([])).toEqual("");
   expect(getReadableList(undefined)).toEqual("");
+});
+
+test("printErrorMessages", () => {
+  expect(
+    printErrorMessages({
+      graphQLErrors: [
+        {
+          extensions: { error_code: "RESERVATION_UNITS_MAX_DURATION_EXCEEDED" },
+        },
+      ],
+    } as unknown as ApolloError)
+  ).toEqual("errors:RESERVATION_UNITS_MAX_DURATION_EXCEEDED");
+
+  expect(
+    printErrorMessages({
+      graphQLErrors: [
+        {
+          extensions: { error_code: "SOMETHING" },
+        },
+        {
+          extensions: { error_code: "SOMETHING_ELSE" },
+        },
+      ],
+    } as unknown as ApolloError)
+  ).toEqual("errors:SOMETHING\nerrors:SOMETHING_ELSE");
 });

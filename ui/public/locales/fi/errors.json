@@ -4,5 +4,17 @@
   },
   "500": {
     "body": "Jotain meni pieleen"
-  }
+  },
+  "general_error": "Tapahtui määrittämätön virhe.",
+  "RESERVATION_UNIT_NOT_RESERVABLE": "Varausyksikkö ei ole varattavissa.",
+  "OVERLAPPING_RESERVATIONS": "Päällekkäisiä varauksia.",
+  "RESERVATION_UNIT_IS_NOT_OPEN": "Varausyksikkö ei ole avoinna.",
+  "RESERVATION_UNIT_IN_OPEN_ROUND": "Varausyksikkö on mukana avoimella hakukierroksella.",
+  "RESERVATION_UNITS_MAX_DURATION_EXCEEDED": "Varauksen enimmäiskesto on ylitetty.",
+  "RESERVATION_UNIT_MIN_DURATION_NOT_EXCEEDED": "Varauksen vähimmäiskesto ei ole ylitetty.",
+  "MAX_NUMBER_OF_ACTIVE_RESERVATIONS_EXCEEDED": "Liian monta aktiivista varausta varausyksikölle.",
+  "RESERVATION_OVERLAP": "Päällekkäisiä varauksia.",
+  "RESERVATION_TIME_DOES_NOT_MATCH_ALLOWED_INTERVAL": "Virheellinen varausaika.",
+  "RESERVATION_NOT_WITHIN_ALLOWED_TIME_RANGE": "Varaus ei ole sallittu aikavälillä.",
+  "RESERVATION_UNIT_TYPE_IS_SEASON": "Yksittäisvaraus ei ole sallittu."
 }
