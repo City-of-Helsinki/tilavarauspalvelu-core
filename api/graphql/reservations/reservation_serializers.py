@@ -24,6 +24,7 @@ from reservation_units.utils.reservation_unit_reservation_scheduler import (
     ReservationUnitReservationScheduler,
 )
 from reservations.models import (
+    RESERVEE_LANGUAGE_CHOICES,
     STATE_CHOICES,
     AgeGroup,
     Reservation,
@@ -85,6 +86,9 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
             f"Possible values are {', '.join(value[0].upper() for value in CUSTOMER_TYPES.CUSTOMER_TYPE_CHOICES)}."
         ),
     )
+    reservee_language = ChoiceCharField(
+        choices=RESERVEE_LANGUAGE_CHOICES, required=False, default=""
+    )
     buffer_time_before = DurationField(required=False)
     buffer_time_after = DurationField(required=False)
     type = ChoiceCharField(
@@ -111,6 +115,7 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
             "reservee_type",
             "reservee_id",
             "reservee_is_unregistered_association",
+            "reservee_language",
             "home_city_pk",
             "applying_for_free_of_charge",
             "free_of_charge_reason",
@@ -579,6 +584,7 @@ class ReservationUpdateSerializer(
         self.fields["reservee_first_name"].required = False
         self.fields["reservee_last_name"].required = False
         self.fields["reservee_phone"].required = False
+        self.fields["reservee_language"].required = False
         self.fields["name"].required = False
         self.fields["description"].required = False
         self.fields["priority"].required = False

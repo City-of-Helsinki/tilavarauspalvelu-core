@@ -123,6 +123,25 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
             self.reservation_unit.buffer_time_before
         )
 
+    def test_creating_reservation_with_reservation_language_succeed(
+        self, mock_periods, mock_opening_hours
+    ):
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+        self.client.force_login(self.regular_joe)
+        input_data = self.get_valid_input_data()
+        input_data["reserveeLanguage"] = "fi"
+        response = self.query(self.get_create_query(), input_data=input_data)
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_none()
+        assert_that(
+            content.get("data").get("createReservation").get("reservation").get("pk")
+        ).is_not_none()
+        pk = content.get("data").get("createReservation").get("reservation").get("pk")
+        reservation = Reservation.objects.get(id=pk)
+        assert_that(reservation).is_not_none()
+        assert_that(reservation.reservee_language).is_equal_to("fi")
+
     @patch(
         "reservation_units.utils.reservation_unit_reservation_scheduler"
         + ".ReservationUnitReservationScheduler.is_reservation_unit_open"
