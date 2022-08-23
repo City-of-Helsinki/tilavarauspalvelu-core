@@ -16,10 +16,13 @@ from applications.models import (
     City,
 )
 from reservation_units.models import ReservationUnit
+from tilavarauspalvelu import settings
 from tilavarauspalvelu.utils.auditlog_util import AuditLogger
 
 Q = models.Q
 User = get_user_model()
+
+RESERVEE_LANGUAGE_CHOICES = settings.LANGUAGES + (("", ""),)
 
 
 class ReservationType(models.TextChoices):
@@ -239,6 +242,13 @@ class Reservation(models.Model):
         max_length=255,
         blank=True,
         default="",
+    )
+    reservee_language = models.CharField(
+        verbose_name=_("Preferred language of reservee"),
+        max_length=255,
+        blank=True,
+        default="",
+        choices=RESERVEE_LANGUAGE_CHOICES,
     )
     billing_first_name = models.CharField(
         verbose_name=_("Billing first name"), max_length=255, blank=True, default=""
