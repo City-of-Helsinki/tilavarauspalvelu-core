@@ -371,7 +371,7 @@ export const reducer = (state: State, action: Action): State => {
               action.reservationsMaxDaysBefore,
               state.reservationUnitEdit.reservationsMinDaysBefore
             )
-          : undefined,
+          : 0,
       });
     }
     case "setSpaces": {
