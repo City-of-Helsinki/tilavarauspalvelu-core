@@ -4,6 +4,12 @@ from django.utils.translation import ugettext_lazy as _
 from helusers.models import AbstractUser
 
 
+class ReservationNotification(models.TextChoices):
+    ALL = "all"
+    ONLY_HANDLING_REQUIRED = "only_handling_required"
+    NONE = "none"
+
+
 class User(AbstractUser):
     preferred_language = models.CharField(
         max_length=8,
@@ -11,6 +17,16 @@ class User(AbstractUser):
         blank=True,
         verbose_name=_("Preferred UI language"),
         choices=settings.LANGUAGES,
+    )
+
+    reservation_notification = models.CharField(
+        max_length=32,
+        verbose_name=_("Reservation notification"),
+        choices=ReservationNotification.choices,
+        blank=False,
+        null=False,
+        default=ReservationNotification.NONE,
+        help_text="When user wants to receive reservation notification emails.",
     )
 
     def get_display_name(self):
