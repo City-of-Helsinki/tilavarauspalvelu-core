@@ -102,6 +102,26 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
             (self.reservation_end + datetime.timedelta(hours=1))
         )
 
+    def test_updating_reservation_reservee_language_succeed(
+        self, mock_periods, mock_opening_hours
+    ):
+        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+        self.client.force_login(self.regular_joe)
+        data = self.get_valid_update_data()
+        data["reserveeLanguage"] = "fi"
+
+        response = self.query(self.get_update_query(), input_data=data)
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_none()
+        assert_that(
+            content.get("data").get("updateReservation").get("reservation").get("pk")
+        ).is_not_none()
+        pk = content.get("data").get("updateReservation").get("reservation").get("pk")
+        reservation = Reservation.objects.get(id=pk)
+        assert_that(reservation).is_not_none()
+        assert_that(reservation.reservee_language).is_equal_to("fi")
+
     def test_updating_reservation_with_pk_fails(self, mock_periods, mock_opening_hours):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         new_pk = 9999
