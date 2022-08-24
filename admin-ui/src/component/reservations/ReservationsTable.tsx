@@ -85,7 +85,7 @@ const ReservationsTable = ({
     <>
       <DataOrMessage
         filteredData={reservations}
-        noFilteredData={t("ReservationsTable.noFilteredReservations")}
+        noFilteredData={t("Reservations.noFilteredReservations")}
       >
         <>
           <CustomTable

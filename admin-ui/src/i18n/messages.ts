@@ -1264,11 +1264,6 @@ const translations: ITranslations = {
     removeSuccess: ["Resurssi poistettu."],
   },
   RequestedReservations: {
-    // todo remove this
-    insightCountHandledApplications: ["tarkastettava anomus"],
-    insightCountHandledApplications_plural: ["tarkastettavaa anomusta"],
-    insightCountMonthlyHandledApplications: ["käsiteltyä anomusta / kk"],
-    insightCountTotalApplications: ["anomusta yhteensä"],
     heading: {
       unit: ["Toimipiste"],
       applicant: ["Tilan käyttäjä"],
@@ -1279,6 +1274,9 @@ const translations: ITranslations = {
   },
   Reservations: {
     reservationListHeading: ["Varaustoiveet"],
+    noFilteredReservations: [
+      "Valituilla suodattimilla ei löytynyt yhtään varausta. Valitse suodattimia uudelleen tai tyhjennä kaikki suodattimet.",
+    ],
     reservationListDescription: [
       "Alla näet kaikki käsiteltävät varaustoiveet.",
     ],

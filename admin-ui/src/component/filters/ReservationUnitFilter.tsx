@@ -8,7 +8,7 @@ import SortedSelect from "../ReservationUnits/ReservationUnitEditor/SortedSelect
 
 const RESERVATION_UNITS_QUERY = gql`
   query reservationUnits {
-    units {
+    reservationUnits {
       edges {
         node {
           nameFi
@@ -38,11 +38,11 @@ const ReservationUnitFilter = ({ onChange, value }: Props): JSX.Element => {
       label={t("ReservationUnitsFilter.label")}
       multiselect
       placeholder={t("common.filter")}
-      options={(data?.units?.edges || [])
+      options={(data?.reservationUnits?.edges || [])
         .map((e) => e?.node)
-        .map((unit) => ({
-          label: unit?.nameFi as string,
-          value: String(unit?.pk as number),
+        .map((reservationUnit) => ({
+          label: reservationUnit?.nameFi as string,
+          value: String(reservationUnit?.pk as number),
         }))}
       value={value}
       onChange={onChange}

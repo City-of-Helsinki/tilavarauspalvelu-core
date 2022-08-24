@@ -128,6 +128,7 @@ export const RESERVATIONS_QUERY = gql`
     $maxPrice: Float
     $begin: DateTime
     $end: DateTime
+    $reservationUnit: [ID]
   ) {
     reservations(
       first: $first
@@ -135,6 +136,7 @@ export const RESERVATIONS_QUERY = gql`
       orderBy: $orderBy
       after: $after
       unit: $unit
+      reservationUnit: $reservationUnit
       reservationUnitType: $reservationUnitType
       state: $state
       textSearch: $textSearch
