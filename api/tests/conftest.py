@@ -36,6 +36,7 @@ from reservation_units.models import Equipment, EquipmentCategory, ReservationUn
 from reservations.models import AbilityGroup, AgeGroup, Reservation, ReservationPurpose
 from resources.models import Resource
 from spaces.models import District, Location, ServiceSector, Space, Unit, UnitGroup
+from users.models import ReservationNotification
 
 
 @pytest.fixture(autouse=True)
@@ -933,6 +934,7 @@ def staff_user():
         last_name="General",
         email="amin.general@foo.com",
         is_staff=True,
+        reservation_notification=ReservationNotification.ALL,
     )
 
     return user
