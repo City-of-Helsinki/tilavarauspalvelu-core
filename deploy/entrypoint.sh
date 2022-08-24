@@ -17,7 +17,7 @@ if [ "$1" = "start_django_development_server" ]; then
     _log_boxed "Running development server"
     if [ "$CELERY_ENABLED" = true ] ; then
       _log_boxed "Running with celery"
-      exec celery -A tilavarauspalvelu worker --beat --detach & deploy/start_dev_server.sh
+      exec celery -A tilavarauspalvelu worker --detach & celery -A tilavarauspalvelu beat -l info -S django --detach & deploy/start_dev_server.sh
     else
       _log_boxed "Running without celery"
       exec deploy/start_dev_server.sh
@@ -59,8 +59,10 @@ elif [ "$1" = "e" ]; then
     exec "$@"
 else
     _log_boxed "Starting production server"
-    if [ "$CELERY_ENABLED" = true ] ; then
-      exec celery -A tilavarauspalvelu worker --beat --detach & uwsgi -y deploy/uwsgi.yml
+    if [ "$WORKER_SERVER" = true ] ; then
+      exec celery -A tilavarauspalvelu worker --detach & celery -A tilavarauspalvelu beat -l info -S django --detach
+    elif [ "$CELERY_ENABLED" = true ] ; then
+      exec celery -A tilavarauspalvelu worker --detach & uwsgi -y deploy/uwsgi.yml
     else
       exec uwsgi -y deploy/uwsgi.yml
     fi
