@@ -99,6 +99,7 @@ INSTALLED_APPS = [
     "django_celery_results",
     "terms_of_use",
     "email_notification",
+    "django_celery_beat",
 ]
 
 MIDDLEWARE = [
