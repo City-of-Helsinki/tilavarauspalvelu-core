@@ -6,7 +6,7 @@ from reservations.models import Reservation
 from tilavarauspalvelu.celery import app
 
 
-@app.task
+@app.task(name="send_reservation_email")
 def send_reservation_email_task(reservation_id: int, type: EmailType):
     if not settings.SEND_RESERVATION_NOTIFICATION_EMAILS:
         return
