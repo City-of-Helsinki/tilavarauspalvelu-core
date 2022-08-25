@@ -84,6 +84,7 @@ from api.graphql.terms_of_use.terms_of_use_types import TermsOfUseType
 from api.graphql.units.unit_filtersets import UnitsFilterSet
 from api.graphql.units.unit_mutations import UnitUpdateMutation
 from api.graphql.units.unit_types import UnitByPkType, UnitType
+from api.graphql.users.user_types import UserType
 from permissions.api_permissions.graphene_field_decorators import (
     check_resolver_permission,
 )
@@ -109,6 +110,7 @@ from permissions.api_permissions.graphene_permissions import (
     TaxPercentagePermission,
     TermsOfUsePermission,
     UnitPermission,
+    UserPermission,
 )
 from permissions.helpers import get_service_sectors_where_can_view_applications
 from reservation_units.models import Equipment, EquipmentCategory, ReservationUnit
@@ -292,6 +294,26 @@ class UnitsFilter(AuthFilter, django_filters.FilterSet):
     )
 
 
+class UsersFilter(AuthFilter, django_filters.FilterSet):
+    permission_classes = (
+        (UserPermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
+    )
+
+    @classmethod
+    def resolve_queryset(
+        cls, connection, iterable, info, args, filtering_args, filterset_class
+    ):
+        queryset = super().resolve_queryset(
+            connection, iterable, info, args, filtering_args, filterset_class
+        )
+
+        if not info.context.user:
+            return queryset.none()
+
+        current_user_pk = info.context.user.pk
+        return queryset.filter(pk=current_user_pk)
+
+
 class KeywordFilter(AuthFilter):
     permission_classes = (
         (KeywordPermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
@@ -447,6 +469,7 @@ class Query(graphene.ObjectType):
     units = UnitsFilter(UnitType, filterset_class=UnitsFilterSet)
     unit = relay.Node.Field(UnitType)
     unit_by_pk = Field(UnitByPkType, pk=graphene.Int())
+    current_user = UsersFilter(UserType)
 
     keyword_categories = KeywordFilter(KeywordCategoryType)
     keyword_groups = KeywordFilter(KeywordGroupType)
