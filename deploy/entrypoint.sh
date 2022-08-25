@@ -60,7 +60,7 @@ elif [ "$1" = "e" ]; then
 else
     _log_boxed "Starting production server"
     if [ "$WORKER_SERVER" = true ] ; then
-      exec celery -A tilavarauspalvelu worker --detach & celery -A tilavarauspalvelu beat -l info -S django --detach
+      exec celery -A tilavarauspalvelu worker --detach & celery -A tilavarauspalvelu beat -l info -S django
     elif [ "$CELERY_ENABLED" = true ] ; then
       exec celery -A tilavarauspalvelu worker --detach & uwsgi -y deploy/uwsgi.yml
     else
