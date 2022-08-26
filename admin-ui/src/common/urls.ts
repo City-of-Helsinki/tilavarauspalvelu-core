@@ -1,3 +1,5 @@
+import { publicUrl } from "./const";
+
 export const prefixes = {
   recurringReservations: "/recurring-reservations",
   reservations: "/reservations",
@@ -8,19 +10,19 @@ export const prefixes = {
 export const applicationRoundUrl = (
   applicationRoundId: number | string
 ): string =>
-  `${prefixes.recurringReservations}/application-rounds/${applicationRoundId}`;
+  `${publicUrl}${prefixes.recurringReservations}/application-rounds/${applicationRoundId}`;
 
 export const applicationUrl = (applicationId: number | string): string =>
-  `${prefixes.applications}/${applicationId}`;
+  `${publicUrl}${prefixes.applications}/${applicationId}`;
 
 export const reservationUrl = (reservationId: number | string): string =>
-  `${prefixes.reservations}/${reservationId}`;
+  `${publicUrl}${prefixes.reservations}/${reservationId}`;
 
 export const requestedReservationsUrl = (): string =>
-  `${prefixes.reservations}/requested`;
+  `${publicUrl}${prefixes.reservations}/requested`;
 
 export const applicationDetailsUrl = (applicationId: number | string): string =>
-  `${prefixes.applications}/${applicationId}/details`;
+  `${publicUrl}${prefixes.applications}/${applicationId}/details`;
 
 export const applicationRoundApplications = (
   applicationRoundId: number | string | null
@@ -29,6 +31,8 @@ export const applicationRoundApplications = (
 export const reservationUnitUrl = (
   reservationUnitId: number,
   unitId: number
-): string => `/unit/${unitId}/reservationUnit/edit/${reservationUnitId}`;
+): string =>
+  `${publicUrl}/unit/${unitId}/reservationUnit/edit/${reservationUnitId}`;
 
-export const unitUrl = (unitId: number): string => `/unit/${unitId}`;
+export const unitUrl = (unitId: number): string =>
+  `${publicUrl}/unit/${unitId}`;
