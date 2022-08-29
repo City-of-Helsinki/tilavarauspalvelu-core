@@ -195,6 +195,10 @@ const menuTree: IMenuChild[] = [
         title: "MainMenu.requestedReservations",
         route: "/reservations/requested",
       },
+      {
+        title: "MainMenu.allReservations",
+        route: "/reservations/all",
+      },
     ],
   },
 

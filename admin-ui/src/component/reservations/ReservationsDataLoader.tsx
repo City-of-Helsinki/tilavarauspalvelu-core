@@ -1,7 +1,7 @@
 import React from "react";
 import { ApolloError, useQuery } from "@apollo/client";
 import { parse } from "date-fns";
-import { trim } from "lodash";
+import { trim, values } from "lodash";
 import {
   Query,
   QueryReservationsArgs,
@@ -26,6 +26,7 @@ type Props = {
   filters: FilterArguments;
   sort?: Sort;
   sortChanged: (field: string) => void;
+  defaultFiltering: QueryReservationsArgs;
 };
 
 const parseDate = (hdsDate: string) => {
@@ -36,22 +37,32 @@ const parseDate = (hdsDate: string) => {
   return parse(hdsDate, "d.M.yyyy", new Date()).toISOString();
 };
 
-const mapFilterParams = (params: FilterArguments) => ({
-  unit: params.unit?.map((u) => u.value as string),
-  reservationUnitType: params.reservationUnitType?.map(
-    (u) => u.value as string
-  ),
-  reservationUnit: params.reservationUnit?.map((ru) => ru.value as string),
-  state:
-    params.reservationState.length > 0
-      ? params.reservationState?.map((ru) => ru.value as string)
-      : ["DENIED", "CONFIRMED", "REQUIRES_HANDLING"],
-  textSearch: params.textSearch || undefined,
-  begin: parseDate(params.begin),
-  end: parseDate(params.end),
-  minPrice: params.minPrice !== "" ? Number(params.minPrice) : undefined,
-  maxPrice: params.maxPrice !== "" ? Number(params.maxPrice) : undefined,
-});
+const mapFilterParams = (
+  params: FilterArguments,
+  defaultParams: QueryReservationsArgs
+): QueryReservationsArgs => {
+  const emptySearch =
+    values(params).filter((v) => !(v === "" || v.length === 0)).length === 0;
+
+  // only use defaults if search is "empty"
+  const defaults = emptySearch ? defaultParams : {};
+  return {
+    unit: params.unit?.map((u) => u.value as string),
+    reservationUnitType: params.reservationUnitType?.map(
+      (u) => u.value as string
+    ),
+    reservationUnit: params.reservationUnit?.map((ru) => ru.value as string),
+    state:
+      params.reservationState.length > 0
+        ? params.reservationState?.map((ru) => ru.value as string)
+        : defaults.state,
+    textSearch: params.textSearch || undefined,
+    begin: parseDate(params.begin) || defaults.begin,
+    end: parseDate(params.end),
+    priceGte: params.minPrice !== "" ? Number(params.minPrice) : undefined,
+    priceLte: params.maxPrice !== "" ? Number(params.maxPrice) : undefined,
+  };
+};
 
 const updateQuery = (
   previousResult: Query,
@@ -64,10 +75,11 @@ const updateQuery = (
   return combineResults(previousResult, fetchMoreResult, "reservations");
 };
 
-const ReservationUnitsDataReader = ({
+const ReservationsDataLoader = ({
   filters,
   sort,
   sortChanged: onSortChanged,
+  defaultFiltering,
 }: Props): JSX.Element => {
   const { notifyError } = useNotification();
 
@@ -93,7 +105,7 @@ const ReservationUnitsDataReader = ({
       variables: {
         orderBy: sortString,
         first: LIST_PAGE_SIZE,
-        ...mapFilterParams(filters),
+        ...mapFilterParams(filters, defaultFiltering),
       },
       onError: (err: ApolloError) => {
         notifyError(err.message);
@@ -134,4 +146,4 @@ const ReservationUnitsDataReader = ({
   );
 };
 
-export default ReservationUnitsDataReader;
+export default ReservationsDataLoader;

@@ -5,7 +5,7 @@ import styled from "styled-components";
 import { H1 } from "../../styles/new-typography";
 import withMainMenu from "../withMainMenu";
 import Filters, { FilterArguments, emptyState } from "./Filters";
-import ReservationUnitsDataReader, { Sort } from "./ReservationsDataLoader";
+import ReservationsDataLoader, { Sort } from "./ReservationsDataLoader";
 import BreadcrumbWrapper from "../BreadcrumbWrapper";
 import { HR } from "../lists/components";
 
@@ -19,7 +19,7 @@ const Wrapper = styled.div`
   max-width: var(--container-width-l);
 `;
 
-const Reservations = (): JSX.Element => {
+const AllReservations = (): JSX.Element => {
   const [search, setSearch] = useState<FilterArguments>(emptyState);
   const [sort, setSort] = useState<Sort>({ field: "state", asc: false });
   const debouncedSearch = debounce((value) => setSearch(value), 300);
@@ -35,19 +35,16 @@ const Reservations = (): JSX.Element => {
 
   return (
     <>
-      <BreadcrumbWrapper route={["reservations", "requested-reservations"]} />
+      <BreadcrumbWrapper route={["reservations", "all-reservations"]} />
       <Wrapper>
         <div>
-          <H1>{t("Reservations.reservationListHeading")}</H1>
-          <p>{t("Reservations.reservationListDescription")}</p>
+          <H1>{t("Reservations.allReservationListHeading")}</H1>
+          <p>{t("Reservations.allReservationListDescription")}</p>
         </div>
         <Filters onSearch={debouncedSearch} />
         <HR />
-        <ReservationUnitsDataReader
-          defaultFiltering={{
-            begin: new Date().toISOString(),
-            state: ["DENIED", "CONFIRMED", "REQUIRES_HANDLING"],
-          }}
+        <ReservationsDataLoader
+          defaultFiltering={{}}
           key={JSON.stringify({ ...search, ...sort })}
           filters={search}
           sort={sort}
@@ -58,4 +55,4 @@ const Reservations = (): JSX.Element => {
   );
 };
 
-export default withMainMenu(Reservations);
+export default withMainMenu(AllReservations);

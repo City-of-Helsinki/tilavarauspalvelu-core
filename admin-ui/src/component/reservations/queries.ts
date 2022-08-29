@@ -124,8 +124,8 @@ export const RESERVATIONS_QUERY = gql`
     $first: Int
     $state: [String]
     $textSearch: String
-    $minPrice: Float
-    $maxPrice: Float
+    $priceGte: Float
+    $priceLte: Float
     $begin: DateTime
     $end: DateTime
     $reservationUnit: [ID]
@@ -140,8 +140,8 @@ export const RESERVATIONS_QUERY = gql`
       reservationUnitType: $reservationUnitType
       state: $state
       textSearch: $textSearch
-      priceLte: $maxPrice
-      priceGte: $minPrice
+      priceLte: $priceLte
+      priceGte: $priceGte
       begin: $begin
       end: $end
     ) {
