@@ -26,7 +26,7 @@ const Recommendations = ({ recommendations }: Props): JSX.Element => {
     <Wrapper>
       <Container>
         <Heading>{t("recommendations")}</Heading>
-        <RelatedUnits units={recommendations} viewType="single" />
+        <RelatedUnits units={recommendations} />
       </Container>
     </Wrapper>
   );

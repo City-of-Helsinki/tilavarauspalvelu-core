@@ -20,7 +20,7 @@ import {
   getReservationUnitName,
   getUnitName,
 } from "../../modules/reservationUnit";
-import { reservationUnitSinglePrefix } from "../../modules/const";
+import { reservationUnitPrefix } from "../../modules/const";
 
 interface Props {
   reservationUnit: ReservationUnitType;
@@ -153,7 +153,7 @@ const ReservationUnitCard = ({ reservationUnit }: Props): JSX.Element => {
 
   const addressString = getAddressAlt(reservationUnit);
 
-  const link = `${reservationUnitSinglePrefix}/${reservationUnit.pk}`;
+  const link = `${reservationUnitPrefix}/${reservationUnit.pk}`;
 
   const unitName = getUnitName(reservationUnit.unit);
 

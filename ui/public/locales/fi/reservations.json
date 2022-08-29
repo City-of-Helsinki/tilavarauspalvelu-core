@@ -11,7 +11,7 @@
   "download": "Lataa päätös (.pdf)",
   "generating": "Dokumenttia luodaan",
   "errorGeneratingPDF": "PDF Dokumenttia ei pystytty luomaan",
-  "reservationCalendar": "Varauskalenteri",
+  "reservationCalendar": "Varaa {{title}}",
   "cancelReservation": "Peruuta varaus",
   "cancelApplication": "Peruuta anomus",
   "cancelReservationBody": "Olet peruuttamassa tekemääsi varausta. Tutustuthan ensin huolellisesti varauksen peruutusehtoihin.",

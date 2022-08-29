@@ -14,24 +14,30 @@ type Props = {
 };
 
 const StyledCarousel = styled(Carousel)`
-  order: -1;
-  margin-bottom: var(--spacing-l);
+  max-width: 100%;
+  margin: 0;
+
+  @media (min-width: ${breakpoint.s}) {
+    max-width: 400px;
+  }
 
   @media (min-width: ${breakpoint.m}) {
-    order: unset !important;
-    margin-bottom: unset !important;
     margin-right: var(--spacing-l) !important;
+  }
+
+  @media (min-width: ${breakpoint.l}) {
+    max-width: unset;
   }
 `;
 
 const CarouselImage = styled.img`
   width: 100%;
-  height: 400px;
+  height: 300px;
   object-fit: cover;
 
-  @media (max-width: ${breakpoint.m}) {
+  @media (max-width: ${breakpoint.l}) {
     width: 100%;
-    height: auto;
+    height: 200px;
   }
 `;
 

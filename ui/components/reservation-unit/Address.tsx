@@ -19,15 +19,10 @@ const Container = styled.div`
   margin-bottom: var(--spacing-layout-l);
 `;
 
-const Name = styled(H4).attrs({ as: "h3" })`
-  margin-top: 0;
-`;
+const Name = styled(H4).attrs({ as: "h3" })``;
 
-const AddressLine = styled.div`
-  font-family: var(--font-medium);
-  font-weight: 500;
-  font-size: var(--fontsize-body-m);
-  margin-top: var(--spacing-2-xs);
+const AddressSpan = styled.span`
+  font-size: var(--fontsize-body-l);
 `;
 
 const Links = styled.div`
@@ -36,7 +31,7 @@ const Links = styled.div`
   font-weight: 500;
 
   a {
-    color: var(--color-bus);
+    color: var(--color-black-90);
   }
 `;
 
@@ -85,9 +80,9 @@ const Address = ({ reservationUnit }: Props): JSX.Element => {
   return (
     <Container data-testid="reservation-unit__address--container">
       <Name>{getTranslation(reservationUnit, "name")}</Name>
-      {addressStreet && <AddressLine>{addressStreet}</AddressLine>}
+      {addressStreet && <AddressSpan>{addressStreet}</AddressSpan>}
       {location?.addressZip && addressCity && (
-        <AddressLine>{`${location?.addressZip} ${addressCity}`}</AddressLine>
+        <AddressSpan>{`, ${location?.addressZip} ${addressCity}`}</AddressSpan>
       )}
       <Links>
         <ExternalLink

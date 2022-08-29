@@ -24,7 +24,7 @@ import { Controller, useForm } from "react-hook-form";
 import { GetServerSideProps } from "next";
 import { camelCase, get, isFinite, omit } from "lodash";
 import { Trans, useTranslation } from "react-i18next";
-import apolloClient from "../../../modules/apolloClient";
+import apolloClient from "../../modules/apolloClient";
 import {
   fontRegular,
   fontMedium,
@@ -32,24 +32,24 @@ import {
   H2,
   H3,
   Strong,
-} from "../../../modules/style/typography";
-import { breakpoint } from "../../../modules/style";
+} from "../../modules/style/typography";
+import { breakpoint } from "../../modules/style";
 import {
   CheckboxWrapper,
   TwoColumnContainer,
-} from "../../../components/common/common";
-import { NarrowCenteredContainer } from "../../../modules/style/layout";
-import { AccordionWithState as Accordion } from "../../../components/common/Accordion";
-import { isBrowser, reservationUnitSinglePrefix } from "../../../modules/const";
+} from "../../components/common/common";
+import { NarrowCenteredContainer } from "../../modules/style/layout";
+import { AccordionWithState as Accordion } from "../../components/common/Accordion";
+import { isBrowser, reservationUnitPrefix } from "../../modules/const";
 import {
   applicationErrorText,
   capitalize,
   getTranslation,
   printErrorMessages,
   reservationsUrl,
-} from "../../../modules/util";
-import { MediumButton } from "../../../styles/util";
-import { DataContext } from "../../../context/DataContext";
+} from "../../modules/util";
+import { MediumButton } from "../../styles/util";
+import { DataContext } from "../../context/DataContext";
 import {
   AgeGroupType,
   CityType,
@@ -66,36 +66,33 @@ import {
   ReservationUpdateMutationInput,
   ReservationUpdateMutationPayload,
   TermsOfUseType,
-} from "../../../modules/gql-types";
+} from "../../modules/gql-types";
 import {
   RESERVATION_UNIT,
   TERMS_OF_USE,
-} from "../../../modules/queries/reservationUnit";
+} from "../../modules/queries/reservationUnit";
 import {
   CONFIRM_RESERVATION,
   GET_CITIES,
   UPDATE_RESERVATION,
-} from "../../../modules/queries/reservation";
-import StepperHz from "../../../components/StepperHz";
-import Ticket from "../../../components/reservation/Ticket";
-import Sanitize from "../../../components/common/Sanitize";
+} from "../../modules/queries/reservation";
+import StepperHz from "../../components/StepperHz";
+import Ticket from "../../components/reservation/Ticket";
+import Sanitize from "../../components/common/Sanitize";
 import {
   getPrice,
   getReservationUnitInstructionsKey,
   getReservationUnitName,
   getUnitName,
-} from "../../../modules/reservationUnit";
+} from "../../modules/reservationUnit";
 import {
   getReservationApplicationFields,
   getReservationApplicationMutationValues,
   ReserveeType,
-} from "../../../modules/reservation";
-import {
-  AGE_GROUPS,
-  RESERVATION_PURPOSES,
-} from "../../../modules/queries/params";
-import KorosDefault from "../../../components/common/KorosDefault";
-import { ReservationState } from "../../../modules/types";
+} from "../../modules/reservation";
+import { AGE_GROUPS, RESERVATION_PURPOSES } from "../../modules/queries/params";
+import KorosDefault from "../../components/common/KorosDefault";
+import { ReservationState } from "../../modules/types";
 
 type Props = {
   reservationUnit: ReservationUnitType;
@@ -490,7 +487,7 @@ const ReservationUnitReservation = ({
       } else if (updateData) {
         if (updateData.updateReservation.reservation.state === "CANCELLED") {
           setContextReservation(null);
-          router.push(`${reservationUnitSinglePrefix}/${reservationUnit.pk}`);
+          router.push(`${reservationUnitPrefix}/${reservationUnit.pk}`);
         } else {
           const payload = {
             ...omit(updateData.updateReservation.reservation, "__typename"),
@@ -559,7 +556,7 @@ const ReservationUnitReservation = ({
     isBrowser &&
     (!reservationData?.pk || !reservationData?.begin || !reservationData?.end)
   ) {
-    router.push(`${reservationUnitSinglePrefix}/${reservationUnit.pk}`);
+    router.push(`${reservationUnitPrefix}/${reservationUnit.pk}`);
     return null;
   }
 

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Button, IconAngleDown, IconAngleUp, useAccordion } from "hds-react";
 import styled from "styled-components";
+import { H4 } from "../../modules/style/typography";
 
 type Theme = "default" | "thin";
 
@@ -31,7 +32,7 @@ const HeadingButton = styled(Button).attrs({
     width: 100%;
     padding-left: 0;
     border-left: 0;
-    border-bottom: 1px solid var(--color-black-60) !important;
+    border-bottom: 1px solid var(--color-black-50) !important;
 
     span {
       ${({ theme }) => {
@@ -76,6 +77,8 @@ const Content = styled.div<{ $open: boolean }>`
   display: ${({ $open }) => ($open ? "block" : "none")};
 `;
 
+const Heading = styled(H4).attrs({ as: "div" })``;
+
 const Accordion = ({
   heading,
   open = false,
@@ -111,7 +114,7 @@ const Accordion = ({
         onClick={onToggle}
         theme={theme}
       >
-        {heading}
+        <Heading>{heading}</Heading>
       </HeadingButton>
       <Content $open={isOpen}>{children}</Content>
     </AccordionElement>

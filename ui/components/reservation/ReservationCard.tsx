@@ -14,7 +14,7 @@ import {
 import IconWithText from "../common/IconWithText";
 import { MediumButton, truncatedText } from "../../styles/util";
 import { ReservationType } from "../../modules/gql-types";
-import { reservationUnitSinglePrefix } from "../../modules/const";
+import { reservationUnitPrefix } from "../../modules/const";
 import { canUserCancelReservation } from "../../modules/reservation";
 import { fontMedium } from "../../modules/style/typography";
 import {
@@ -297,9 +297,7 @@ const ReservationCard = ({ reservation, type }: Props): JSX.Element => {
             <MediumButton
               variant="secondary"
               onClick={() =>
-                router.push(
-                  `${reservationUnitSinglePrefix}/${reservationUnit.pk}`
-                )
+                router.push(`${reservationUnitPrefix}/${reservationUnit.pk}`)
               }
               iconLeft={<IconPlusCircle />}
               data-testid="reservation-card__button--redo-reservation"

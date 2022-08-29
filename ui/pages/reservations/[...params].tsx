@@ -48,7 +48,7 @@ import {
 } from "../../components/common/common";
 import { MediumButton } from "../../styles/util";
 import { OptionType } from "../../modules/types";
-import { emptyOption, reservationUnitSinglePrefix } from "../../modules/const";
+import { emptyOption, reservationUnitPrefix } from "../../modules/const";
 import KorosDefault from "../../components/common/KorosDefault";
 import {
   getReservationUnitName,
@@ -371,9 +371,7 @@ const ReservationCancellation = ({ id }: Props): JSX.Element => {
               variant="secondary"
               iconLeft={<IconPlusCircle />}
               onClick={() =>
-                router.push(
-                  `${reservationUnitSinglePrefix}/${reservationUnit.pk}`
-                )
+                router.push(`${reservationUnitPrefix}/${reservationUnit.pk}`)
               }
               data-testid="reservation-cancel__button--rereserve"
             >

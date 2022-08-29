@@ -172,3 +172,9 @@ export const getReservationUnitInstructionsKey = (
       return null;
   }
 };
+
+export const getDurationRange = (
+  reservationUnit: ReservationUnitType | ReservationUnitByPkType
+): string => {
+  return `${reservationUnit.minReservationDuration} - ${reservationUnit.maxReservationDuration}`;
+};

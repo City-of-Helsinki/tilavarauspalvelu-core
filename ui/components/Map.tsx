@@ -1,10 +1,6 @@
 import React, { useState } from "react";
 import Image from "next/image";
-import ReactMapGL, {
-  Marker,
-  NavigationControl,
-  GeolocateControl,
-} from "react-map-gl";
+import ReactMapGL, { Marker, NavigationControl } from "react-map-gl";
 import { mapboxToken, mapStyle } from "../modules/const";
 
 type State = Record<string, number>;
@@ -19,11 +15,6 @@ const ZOOM = 14;
 const navControlStyle = {
   right: 10,
   bottom: 10,
-};
-
-const geolocateControlStyle = {
-  right: 10,
-  bottom: 72,
 };
 
 const Map = ({
@@ -59,10 +50,6 @@ const Map = ({
       <Marker key={title} longitude={longitude} latitude={latitude}>
         <Image src="/icons/map_marker_icon.svg" height="42" width="32" alt="" />
       </Marker>
-      <GeolocateControl
-        style={geolocateControlStyle}
-        positionOptions={{ enableHighAccuracy: true }}
-      />
     </ReactMapGL>
   );
 };

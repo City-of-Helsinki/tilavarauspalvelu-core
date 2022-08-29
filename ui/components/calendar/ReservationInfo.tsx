@@ -149,9 +149,7 @@ const ReservationInfo = ({
           price: data.createReservation.price,
         });
         setIsRedirecting(true);
-        router.push(
-          `/reservation-unit/single/${reservationUnit.pk}/reservation`
-        );
+        router.push(`/reservation-unit/${reservationUnit.pk}/reservation`);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

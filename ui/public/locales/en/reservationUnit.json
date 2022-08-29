@@ -11,8 +11,11 @@
   "images": "Images",
   "description": "Description",
   "equipment": "Equipment",
+  "terms": "",
   "termsOfUse": "Terms of Agreement",
   "termsOfUseSpaces": "Additional terms and conditions",
+  "paymentAndCancellationTerms": "",
+  "cancellationTerms": "Cancellation terms",
   "backToSearch": "Back to results",
   "reservationSuccessful": "Booking successful",
   "reservationReminderText": "At your email (<emailLink>{{user}}</emailLink>) you will receive reminders of your bookings.\nYou can also find them on Varaamo’s My Bookings page.",
@@ -22,5 +25,15 @@
   "reservationFailed": "Booking creation failed",
   "reservationCancellingFailed": "Booking cancellation failed",
   "reservationUpdateFailed": "Booking update failed",
-  "priceFree": "Free"
+  "priceFree": "Free",
+  "relatedReservationUnits": "",
+  "reservationInfo1-1": "",
+  "reservationInfo1-2": "",
+  "reservationInfo1-3": "",
+  "reservationInfo2": "",
+  "reservationInfo3": "",
+  "reservationInfo4": "",
+  "reservationInfo4_plural": "",
+  "reservationInfo1-weeks": "",
+  "reservationInfo1-months": ""
 }

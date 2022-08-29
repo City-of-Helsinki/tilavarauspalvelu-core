@@ -10,11 +10,7 @@ export const truncatedText = css`
 export const pixel =
   "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=";
 
-export const MediumButton = styled(Button)`
-  font-family: var(--font-medium);
-  font-size: var(--fontsize-body-m);
-  font-weight: 500;
-`;
+export const MediumButton = styled(Button)``;
 
 export const SupplementaryButton = styled(Button).attrs({
   style: {} as CSSProperties,

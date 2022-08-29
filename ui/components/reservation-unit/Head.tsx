@@ -1,74 +1,59 @@
-import {
-  IconCalendarClock,
-  IconCheck,
-  IconClock,
-  IconGroup,
-  IconInfoCircle,
-  IconPlus,
-  IconTicket,
-} from "hds-react";
+import { IconClock, IconGroup, IconTicket } from "hds-react";
 import { parseISO } from "date-fns";
 import React, { useMemo } from "react";
 import { useLocalStorage } from "react-use";
+import NextImage from "next/image";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import useReservationUnitList from "../../hooks/useReservationUnitList";
 import { breakpoint } from "../../modules/style";
 import {
   formatSecondDuration,
   getTranslation,
   orderImages,
   searchUrl,
-  singleSearchUrl,
 } from "../../modules/util";
 import Container from "../common/Container";
 import IconWithText from "../common/IconWithText";
 import Images from "./Images";
-import { JustForDesktop, JustForMobile } from "../../modules/style/layout";
-import { MediumButton } from "../../styles/util";
 import { ReservationUnitByPkType } from "../../modules/gql-types";
 import {
   getPrice,
   getReservationUnitName,
   getUnitName,
 } from "../../modules/reservationUnit";
-import KorosDefault from "../common/KorosDefault";
-import { H1, H2 } from "../../modules/style/typography";
+import { fontRegular, H1, H2 } from "../../modules/style/typography";
 import BreadcrumbWrapper from "../common/BreadcrumbWrapper";
 
 interface PropsType {
   reservationUnit: ReservationUnitByPkType;
-  reservationUnitList: ReturnType<typeof useReservationUnitList>;
   // activeOpeningTimes: ActiveOpeningTime[];
-  viewType: "recurring" | "single";
-  calendarRef?: React.MutableRefObject<HTMLDivElement>;
   isReservable?: boolean;
 }
 
 const TopContainer = styled.div`
   background-color: white;
-  padding-top: var(--spacing-m);
+  padding-top: var(--spacing-xl);
 `;
 
 const RightContainer = styled.div`
   font-size: var(--fontsize-body-m);
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--spacing-s);
+  grid-template-columns: 1fr;
 
-  @media (max-width: ${breakpoint.m}) {
-    grid-template-columns: 1fr;
+  @media (min-width: ${breakpoint.l}) {
+    grid-template-columns: auto 465px;
+    gap: var(--spacing-layout-2-xl);
   }
 `;
 
 const StyledIconWithText = styled(IconWithText).attrs({
   "data-testid": "icon-with-text",
 })`
-  margin-top: var(--spacing-m);
-  display: flex;
+  display: grid;
   align-items: flex-start;
-  white-space: pre-line;
+  white-space: nowrap;
   line-height: var(--lineheight-l);
+  margin-top: unset;
 `;
 
 const Props = styled.div`
@@ -76,75 +61,61 @@ const Props = styled.div`
     display: none;
   }
 
+  ${fontRegular};
+  font-size: var(--fontsize-body-s);
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--spacing-s);
-  font-family: var(--font-medium);
-  font-weight: 500;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-m) var(--spacing-s);
+  margin-bottom: var(--spacing-layout-m);
+
+  @media (min-width: ${breakpoint.l}) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (min-width: ${breakpoint.xl}) {
+    grid-template-columns: repeat(4, 1fr);
+  }
 `;
 
-const ReservationUnitName = styled(H1)``;
+const GrayBox = styled.div`
+  background-color: var(--color-black-5);
+  font-size: var(--fontsize-body-l);
+  line-height: var(--fontsize-body-l);
+  padding: var(--spacing-s);
+  display: inline-block;
+`;
+
+const ReservationUnitName = styled(H1)`
+  margin-top: 0;
+`;
 
 const UnitName = styled(H2)`
   margin-top: 0;
 `;
 
-const ButtonContainer = styled.div`
-  margin: var(--spacing-layout-m) 0;
-
-  & > button {
-    margin: 0;
-  }
-`;
-
-const ThinButton = styled(MediumButton).attrs({
-  variant: "secondary",
-  style: { "--min-size": "35px" },
-})`
-  height: 35px;
-`;
-
-const StyledKorosDefault = styled(KorosDefault)`
-  margin-top: var(--spacing-l);
-`;
-
 const Head = ({
   reservationUnit,
-  reservationUnitList,
   // activeOpeningTimes,
-  viewType,
-  calendarRef,
   isReservable,
 }: PropsType): JSX.Element => {
-  const {
-    selectReservationUnit,
-    containsReservationUnit,
-    removeReservationUnit,
-  } = reservationUnitList;
-
   const { t } = useTranslation();
 
-  const storageKey =
-    viewType === "single"
-      ? "reservationUnit-search-single"
-      : "reservationUnit-search";
+  const storageKey = "reservationUnit-search";
 
   const [storedValues] = useLocalStorage(storageKey, null);
 
   const searchUrlWithParams = useMemo(() => {
-    return viewType === "single"
-      ? singleSearchUrl(storedValues)
-      : searchUrl(storedValues);
-  }, [viewType, storedValues]);
+    return searchUrl(storedValues);
+  }, [storedValues]);
 
   const minReservationDuration = formatSecondDuration(
     reservationUnit.minReservationDuration,
-    false
+    true
   );
 
   const maxReservationDuration = formatSecondDuration(
     reservationUnit.maxReservationDuration,
-    false
+    true
   );
 
   // const openingTimesTextArr = activeOpeningTimes?.map((openingTime, index) =>
@@ -160,11 +131,7 @@ const Head = ({
   return (
     <>
       <BreadcrumbWrapper
-        route={[
-          viewType === "recurring" ? "/recurring" : "",
-          searchUrlWithParams,
-          "reservationUnit",
-        ]}
+        route={["", searchUrlWithParams, "reservationUnit"]}
         aliases={[{ slug: searchUrlWithParams, title: t("breadcrumb:search") }]}
       />
       <TopContainer>
@@ -173,15 +140,34 @@ const Head = ({
             <div>
               <ReservationUnitName>{reservationUnitName}</ReservationUnitName>
               <UnitName>{unitName}</UnitName>
-              <JustForMobile style={{ marginTop: "var(--spacing-l)" }}>
-                <Images
-                  images={orderImages(reservationUnit.images)}
-                  contextName={reservationUnitName}
-                />
-              </JustForMobile>
               <Props>
-                <div>
-                  {/* {openingTimesTextArr?.length > 0 && (
+                {reservationUnit.reservationUnitType ? (
+                  <StyledIconWithText
+                    icon={
+                      <NextImage
+                        src="/icons/icon_premises.svg"
+                        width="24"
+                        height="24"
+                        aria-label={t("reservationUnitCard:type")}
+                      />
+                    }
+                    text={getTranslation(
+                      reservationUnit.reservationUnitType,
+                      "name"
+                    )}
+                  />
+                ) : null}
+                {reservationUnit.maxPersons && (
+                  <StyledIconWithText
+                    icon={
+                      <IconGroup aria-label={t("reservationUnit:maxPersons")} />
+                    }
+                    text={t("reservationUnitCard:maxPersons", {
+                      count: reservationUnit.maxPersons,
+                    })}
+                  />
+                )}
+                {/* {openingTimesTextArr?.length > 0 && (
                     <StyledIconWithText
                       icon={
                         <IconCalendar
@@ -191,116 +177,45 @@ const Head = ({
                       texts={openingTimesTextArr}
                     />
                   )} */}
-                  {viewType === "single" &&
-                    isReservable &&
-                    reservationUnit.nextAvailableSlot && (
-                      <StyledIconWithText
-                        icon={<IconCalendarClock aria-label="" />}
-                        text={`${t("reservationCalendar:nextAvailableTime")}:
+                {unitPrice && (
+                  <StyledIconWithText
+                    icon={
+                      <IconTicket
+                        aria-label={t("prices:reservationUnitPriceLabel")}
+                      />
+                    }
+                    text={unitPrice}
+                  />
+                )}
+                {(reservationUnit.minReservationDuration ||
+                  reservationUnit.maxReservationDuration) && (
+                  <StyledIconWithText
+                    icon={
+                      <IconClock
+                        aria-label={t("reservationCalendar:eventDuration")}
+                      />
+                    }
+                    text={`${minReservationDuration} – ${maxReservationDuration}
+                    `}
+                  />
+                )}
+              </Props>
+              {isReservable && reservationUnit.nextAvailableSlot && (
+                <GrayBox>
+                  {`${t("reservationCalendar:nextAvailableTime")}:
                       ${t("common:dateTimeNoYear", {
                         date: parseISO(reservationUnit.nextAvailableSlot),
                       })}
-                      `}
-                      />
-                    )}
-                </div>
-                <div>
-                  {unitPrice && (
-                    <StyledIconWithText
-                      icon={
-                        <IconTicket
-                          aria-label={t("prices:reservationUnitPriceLabel")}
-                        />
-                      }
-                      text={unitPrice}
-                    />
-                  )}
-                  {viewType === "single" &&
-                    (reservationUnit.minReservationDuration ||
-                      reservationUnit.maxReservationDuration) && (
-                      <StyledIconWithText
-                        icon={
-                          <IconClock
-                            aria-label={t("reservationCalendar:eventDuration")}
-                          />
-                        }
-                        text={`Min ${minReservationDuration}
-                      Max ${maxReservationDuration}
-                    `}
-                      />
-                    )}
-                  {reservationUnit.reservationUnitType ? (
-                    <StyledIconWithText
-                      icon={
-                        <IconInfoCircle
-                          aria-label={t("reservationUnit:type")}
-                        />
-                      }
-                      text={getTranslation(
-                        reservationUnit.reservationUnitType,
-                        "name"
-                      )}
-                    />
-                  ) : null}
-                  {reservationUnit.maxPersons && (
-                    <StyledIconWithText
-                      icon={
-                        <IconGroup
-                          aria-label={t("reservationUnit:maxPersons")}
-                        />
-                      }
-                      text={t("reservationUnitCard:maxPersons", {
-                        count: reservationUnit.maxPersons,
-                      })}
-                    />
-                  )}
-                </div>
-              </Props>
-              <ButtonContainer>
-                {viewType === "recurring" &&
-                  (containsReservationUnit(reservationUnit) ? (
-                    <MediumButton
-                      onClick={() => removeReservationUnit(reservationUnit)}
-                      iconLeft={<IconCheck />}
-                      className="margin-left-s margin-top-s"
-                    >
-                      {t("common:reservationUnitSelected")}
-                    </MediumButton>
-                  ) : (
-                    <MediumButton
-                      onClick={() => selectReservationUnit(reservationUnit)}
-                      iconLeft={<IconPlus />}
-                      className="margin-left-s margin-top-s"
-                      variant="secondary"
-                    >
-                      {t("common:selectReservationUnit")}
-                    </MediumButton>
-                  ))}
-                {viewType === "single" && isReservable && (
-                  <ThinButton
-                    onClick={() => {
-                      window.scroll({
-                        top: calendarRef.current.offsetTop - 20,
-                        left: 0,
-                        behavior: "smooth",
-                      });
-                    }}
-                    data-testid="reservation-unit__button--goto-calendar"
-                  >
-                    {t("reservationCalendar:showCalendar")}
-                  </ThinButton>
-                )}
-              </ButtonContainer>
+                  `}
+                </GrayBox>
+              )}
             </div>
-            <JustForDesktop>
-              <Images
-                images={orderImages(reservationUnit.images)}
-                contextName={reservationUnitName}
-              />
-            </JustForDesktop>
+            <Images
+              images={orderImages(reservationUnit.images)}
+              contextName={reservationUnitName}
+            />
           </RightContainer>
         </Container>
-        <StyledKorosDefault from="white" to="var(--tilavaraus-gray)" />
       </TopContainer>
     </>
   );

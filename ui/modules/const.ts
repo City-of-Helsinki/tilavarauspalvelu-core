@@ -13,7 +13,6 @@ export const weekdays = [
 ];
 
 export const reservationUnitPrefix = "/reservation-unit";
-export const reservationUnitSinglePrefix = "/reservation-unit/single";
 export const searchPrefix = "/search";
 export const singleSearchPrefix = "/search/single";
 export const applicationsPrefix = "/applications";
@@ -43,8 +42,8 @@ export const mapStyle = {
   id: "hel-osm-light",
 };
 
-export const reservationUnitPath = (id: number, isSingle = false): string =>
-  `${isSingle ? reservationUnitSinglePrefix : reservationUnitPrefix}/${id}`;
+export const reservationUnitPath = (id: number): string =>
+  `${reservationUnitPrefix}/${id}`;
 
 export const emptyOption = (label: string): OptionType => ({
   label,
@@ -90,6 +89,16 @@ export const getDurationOptions = (): OptionType[] => {
 
   return result;
 };
+
+export const daysByMonths: OptionType[] = [
+  { label: "2", value: 14 },
+  { label: "1", value: 30 },
+  { label: "2", value: 60 },
+  { label: "3", value: 90 },
+  { label: "6", value: 182 },
+  { label: "12", value: 365 },
+  { label: "24", value: 730 },
+];
 
 export const defaultDuration = "01:30:00";
 

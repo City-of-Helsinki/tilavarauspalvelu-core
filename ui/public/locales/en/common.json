@@ -93,6 +93,7 @@
   "minimum": "At least",
   "maximum": "At most",
   "showMore": "Show more",
+  "showLess": "Show less",
   "duration": "Duration {{duration}}",
   "fyiLabel": "For information",
   "add": "Add",

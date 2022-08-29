@@ -1,37 +1,26 @@
-import {
-  IconCheck,
-  IconGroup,
-  IconInfoCircle,
-  IconLocation,
-  IconPlus,
-} from "hds-react";
+import { IconArrowRight, IconGroup, IconTicket } from "hds-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
+import NextImage from "next/image";
 import router from "next/router";
 import Link from "next/link";
 import styled from "styled-components";
 import { useMedia } from "react-use";
 import { reservationUnitPath } from "../../modules/const";
-import useReservationUnitsList from "../../hooks/useReservationUnitList";
 import { breakpoint } from "../../modules/style";
-import {
-  getAddressAlt,
-  getMainImage,
-  getTranslation,
-} from "../../modules/util";
+import { getMainImage, getTranslation } from "../../modules/util";
 import IconWithText from "../common/IconWithText";
-import { MediumButton } from "../../styles/util";
 import Carousel from "../Carousel";
 import { ReservationUnitType } from "../../modules/gql-types";
 import {
+  getPrice,
   getReservationUnitName,
   getUnitName,
 } from "../../modules/reservationUnit";
+import { SupplementaryButton, truncatedText } from "../../styles/util";
 
 type PropsType = {
   units: ReservationUnitType[];
-  reservationUnitList?: ReturnType<typeof useReservationUnitsList>;
-  viewType: "recurring" | "single";
 };
 
 const Wrapper = styled.div`
@@ -50,10 +39,11 @@ const StyledCarousel = styled(Carousel)`
 
 const Content = styled.div`
   padding: var(--spacing-s);
+  height: 180px;
 `;
 
 const Unit = styled.div`
-  background-color: var(--color-white);
+  background-color: var(--color-black-5);
 `;
 
 const Name = styled.div`
@@ -65,6 +55,8 @@ const Name = styled.div`
   font-family: var(--font-bold);
   font-weight: 700;
   font-size: var(--fontsize-heading-s);
+  margin-bottom: var(--spacing-xs);
+  ${truncatedText};
 `;
 
 const Image = styled.img`
@@ -75,27 +67,15 @@ const Image = styled.img`
 
 const Building = styled.div`
   font-family: var(--font-regular);
-  font-size: var(--fontsize-body-m);
   margin: var(--spacing-3-xs) 0 var(--spacing-xs);
+  ${truncatedText};
 `;
 
 const Props = styled.div`
-  font-family: var(--font-medium);
-  font-weight: 500;
-  font-size: var(--fontsize-body-m);
+  font-size: var(--fontsize-body-s);
   display: grid;
-  grid-template-columns: 3fr 1fr;
+  grid-template-columns: 1fr;
   gap: 0;
-`;
-
-const SpanTwoColumns = styled.span`
-  grid-column-start: 1;
-  grid-column-end: 3;
-
-  @media (max-width: ${breakpoint.m}) {
-    grid-column-start: 1;
-    grid-column-end: 2;
-  }
 `;
 
 const StyledIconWithText = styled(IconWithText)`
@@ -103,19 +83,21 @@ const StyledIconWithText = styled(IconWithText)`
 `;
 
 const Buttons = styled.div`
-  margin-top: var(--spacing-m);
-  font-size: var(--fontsize-body-m);
+  position: absolute;
+  right: 0;
+  bottom: 0;
+`;
 
-  button {
-    margin: 0;
+const LinkButton = styled(SupplementaryButton)`
+  --color-coat-of-arms: transparent;
+  --color-bus-dark: transparent;
+
+  svg {
+    color: black;
   }
 `;
 
-const RelatedUnits = ({
-  units,
-  reservationUnitList,
-  viewType,
-}: PropsType): JSX.Element | null => {
+const RelatedUnits = ({ units }: PropsType): JSX.Element | null => {
   const { t } = useTranslation();
   const isMobile = useMedia(`(max-width: ${breakpoint.m})`, false);
   const isWideMobile = useMedia(`(max-width: ${breakpoint.l})`, false);
@@ -133,6 +115,7 @@ const RelatedUnits = ({
         cellSpacing={24}
       >
         {units.map((unit) => {
+          const unitPrice = getPrice(unit);
           const reservationUnitTypeName = getTranslation(
             unit.reservationUnitType,
             "name"
@@ -153,7 +136,10 @@ const RelatedUnits = ({
                   {reservationUnitTypeName && (
                     <StyledIconWithText
                       icon={
-                        <IconInfoCircle
+                        <NextImage
+                          src="/icons/icon_premises.svg"
+                          width="24"
+                          height="24"
                           aria-label={t("reservationUnitCard:type")}
                         />
                       }
@@ -169,64 +155,29 @@ const RelatedUnits = ({
                           })}
                         />
                       }
-                      text={`${unit.maxPersons}`}
+                      text={t("reservationUnitCard:maxPersons", {
+                        count: unit.maxPersons,
+                      })}
                     />
                   )}
-                  {getAddressAlt(unit) && (
-                    <SpanTwoColumns>
-                      <StyledIconWithText
-                        icon={
-                          <IconLocation
-                            aria-label={t("reservationUnitCard:address")}
-                          />
-                        }
-                        text={getAddressAlt(unit) as string}
-                      />
-                    </SpanTwoColumns>
+                  {unitPrice && (
+                    <StyledIconWithText
+                      icon={
+                        <IconTicket
+                          aria-label={t("prices:reservationUnitPriceLabel")}
+                        />
+                      }
+                      text={unitPrice}
+                    />
                   )}
                 </Props>
-                {viewType === "recurring" && (
-                  <Buttons>
-                    {reservationUnitList?.containsReservationUnit(unit) ? (
-                      <MediumButton
-                        onClick={() =>
-                          reservationUnitList.removeReservationUnit(unit)
-                        }
-                        iconLeft={<IconCheck />}
-                        className="margin-left-xs margin-top-s"
-                      >
-                        {t("common:reservationUnitSelected")}
-                      </MediumButton>
-                    ) : (
-                      <MediumButton
-                        onClick={() =>
-                          reservationUnitList.selectReservationUnit(unit)
-                        }
-                        iconLeft={<IconPlus />}
-                        className="margin-left-s margin-top-s"
-                        variant="secondary"
-                      >
-                        {t("common:selectReservationUnit")}
-                      </MediumButton>
-                    )}
-                  </Buttons>
-                )}
-                {viewType === "single" && (
-                  <Buttons>
-                    <MediumButton
-                      style={{ width: "100%" }}
-                      onClick={() =>
-                        router.push(
-                          reservationUnitPath(unit.pk, viewType === "single")
-                        )
-                      }
-                      className="margin-left-xs margin-top-s"
-                      variant="secondary"
-                    >
-                      {t("common:seeDetails")}
-                    </MediumButton>
-                  </Buttons>
-                )}
+                <Buttons>
+                  <LinkButton
+                    onClick={() => router.push(reservationUnitPath(unit.pk))}
+                  >
+                    <IconArrowRight size="l" />
+                  </LinkButton>
+                </Buttons>
               </Content>
             </Unit>
           );

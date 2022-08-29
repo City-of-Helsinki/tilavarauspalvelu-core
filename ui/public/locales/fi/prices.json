@@ -3,10 +3,10 @@
   "priceUnits": {
     "PER_15_MINS": "15 min",
     "PER_30_MINS": "30 min",
-    "PER_HOUR": "t",
+    "PER_HOUR": "tunti",
     "PER_HALF_DAY": "½ pv",
-    "PER_DAY": "pv",
-    "PER_WEEK": "vk"
+    "PER_DAY": "päivä",
+    "PER_WEEK": "vikko"
   },
   "priceFree": "Maksuton",
   "taxPercentage": "alv {{count}}%",

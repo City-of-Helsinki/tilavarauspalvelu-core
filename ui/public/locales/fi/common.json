@@ -93,6 +93,7 @@
   "minimum": "Vähintään",
   "maximum": "Enintään",
   "showMore": "Näytä lisää",
+  "showLess": "Näytä vähemmän",
   "duration": "Kesto {{duration}}",
   "fyiLabel": "Tiedoksi",
   "add": "Lisää",

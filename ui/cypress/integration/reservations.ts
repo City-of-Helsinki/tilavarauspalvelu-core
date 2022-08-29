@@ -95,10 +95,7 @@ describe("Tilavaraus user reservations", () => {
 
     redoReservationButton().eq(0).click();
 
-    cy.url({ timeout: 20000 }).should(
-      "match",
-      /\/reservation-unit\/single\/1$/
-    );
+    cy.url({ timeout: 20000 }).should("match", /\/reservation-unit\/1$/);
 
     hzNavigationBack().should("exist");
   });
@@ -179,9 +176,6 @@ describe("Tilavaraus user reservations", () => {
     secondBackButton().should("exist");
     reReserveButton().click();
 
-    cy.url({ timeout: 20000 }).should(
-      "match",
-      /\/reservation-unit\/single\/9$/
-    );
+    cy.url({ timeout: 20000 }).should("match", /\/reservation-unit\/9$/);
   });
 });

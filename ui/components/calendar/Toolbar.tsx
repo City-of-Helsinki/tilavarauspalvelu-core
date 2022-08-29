@@ -9,7 +9,6 @@ import { breakpoint } from "../../modules/style";
 
 export type ToolbarProps = {
   onNavigate: (n: string) => void;
-  onNavigateToNextAvailableDate?: () => void;
   onView: (n: string) => void;
   view: string;
   date: Date;
@@ -23,7 +22,6 @@ const Wrapper = styled.div`
   &:before {
     content: "";
     display: block;
-    background-color: var(--tilavaraus-gray);
     position: absolute;
     top: 0;
     right: 0;
@@ -137,8 +135,7 @@ const ButtonWrapper = styled.div`
 // eslint-disable-next-line react/prefer-stateless-function
 export default class Toolbar extends React.Component<ToolbarProps> {
   render(): JSX.Element {
-    const { onNavigate, onNavigateToNextAvailableDate, onView, view, date } =
-      this.props;
+    const { onNavigate, onView, view, date } = this.props;
 
     const culture = { locale: locales[i18n.language] };
 
@@ -165,17 +162,17 @@ export default class Toolbar extends React.Component<ToolbarProps> {
         const end = endOfWeek(date, culture);
         const startDay = format(start, "d", culture);
         const endDay = format(end, "d", culture);
-        const startMonth = format(start, "MMMM", culture);
-        const endMonth = format(end, "MMMM", culture);
+        const startMonth = format(start, "M", culture);
+        const endMonth = format(end, "M", culture);
         const startYear = format(start, "yyyy", culture);
         const endYear = format(end, "yyyy", culture);
         const currentYear = format(new Date(), "yyyy", culture);
         title = `${startDay}.${
-          startMonth !== endMonth ? ` ${startMonth}` : ""
-        } ${
-          startYear !== endYear ? ` ${startYear}` : ""
-        }–${endDay}. ${endMonth} ${
-          startYear !== endYear || endYear !== currentYear ? ` ${endYear}` : ""
+          startMonth !== endMonth ? `${startMonth}.` : ""
+        }${
+          startYear !== endYear ? `${startYear}` : ""
+        } – ${endDay}.${endMonth}.${
+          startYear !== endYear || endYear !== currentYear ? `${endYear}` : ""
         }`;
       }
     }
@@ -189,14 +186,6 @@ export default class Toolbar extends React.Component<ToolbarProps> {
             aria-label={i18n.t("reservationCalendar:showCurrentDay")}
           >
             {i18n.t("common:today")}
-          </button>
-          <button
-            type="button"
-            onClick={() => onNavigateToNextAvailableDate()}
-            aria-label={i18n.t("reservationCalendar:nextAvailableTime")}
-            disabled={!onNavigateToNextAvailableDate}
-          >
-            {i18n.t("reservationCalendar:nextAvailableTime")}
           </button>
         </ButtonWrapper>
         <div className="rbc-toolbar-navigation-hz">

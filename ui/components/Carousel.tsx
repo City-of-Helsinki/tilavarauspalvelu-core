@@ -42,6 +42,7 @@ const Button = styled(MediumButton).attrs({
 
 const StyledCarousel = styled(NukaCarousel)<{ $showCenterControls: boolean }>`
   width: calc(100% + var(--spacing-xs) * 2) !important;
+  height: fit-content !important;
   margin-right: calc(var(--spacing-xs) * -1);
   margin-left: calc(var(--spacing-xs) * -1);
 
@@ -53,18 +54,17 @@ const StyledCarousel = styled(NukaCarousel)<{ $showCenterControls: boolean }>`
     transform: unset !important;
 
     ul {
-      top: var(--spacing-m) !important;
-      gap: var(--spacing-s);
+      gap: var(--spacing-3-xs);
       flex-wrap: wrap;
       width: 100%;
       justify-content: center;
+      position: static !important;
     }
 
     .paging-item {
       button {
         svg {
           transform: scale(1.9);
-          border: 1px solid var(--color-black-50);
           border-radius: 50%;
           fill: var(--color-black-20);
         }
@@ -74,6 +74,7 @@ const StyledCarousel = styled(NukaCarousel)<{ $showCenterControls: boolean }>`
 
   @media (min-width: ${breakpoint.m}) {
     width: 100% !important;
+    height: fit-content !important;
     margin: 0 !important;
   }
 `;

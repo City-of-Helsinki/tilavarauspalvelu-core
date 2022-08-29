@@ -327,15 +327,31 @@ const selectedReservationUnitQuery = graphql.query<
     reservationKind:
       ReservationUnitsReservationUnitReservationKindChoices.DirectAndSeason,
     isArchived: false,
+    reservationsMaxDaysBefore: 365,
+    reservationsMinDaysBefore: 2,
+    maxReservationsPerUser: 1,
+    cancellationTerms: {
+      id: "fawioep",
+      textFi: "Peruutusehdot Fi",
+      termsType: TermsOfUseTermsOfUseTermsTypeChoices.CancellationTerms,
+    },
   };
 
   if (req.variables.pk === 800) {
     reservationUnitByPk.equipment = [];
   }
 
+  if (req.variables.pk === 801) {
+    reservationUnitByPk.paymentTerms = {
+      id: "faweopfk",
+      textFi: "Maksuehdot Fi",
+      termsType: TermsOfUseTermsOfUseTermsTypeChoices.PaymentTerms,
+    };
+  }
+
   if (req.variables.pk === 900) {
-    reservationUnitByPk.reservationBegins = addDays(new Date(), 1);
-    reservationUnitByPk.reservationEnds = addDays(new Date(), 10);
+    reservationUnitByPk.reservationBegins = addDays(new Date(), 366);
+    reservationUnitByPk.reservationEnds = addDays(new Date(), 375);
     reservationUnitByPk.publishBegins = addMinutes(new Date(), -10);
     reservationUnitByPk.publishEnds = addMinutes(new Date(), 10);
   }

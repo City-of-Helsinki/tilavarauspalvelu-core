@@ -11,8 +11,11 @@
   "images": "Bilder",
   "description": "Beskrivning",
   "equipment": "Utrustning",
+  "terms": "",
   "termsOfUse": "Avtalsvillkor",
   "termsOfUseSpaces": "Lokal specifika villkor",
+  "paymentAndCancellationTerms": "",
+  "cancellationTerms": "",
   "backToSearch": "Tillbaka till resultaten",
   "reservationSuccessful": "Bokningen lyckades",
   "reservationReminderText": "Du får en påminnelse om bokningen till din e-post (<emailLink>{{user}}</emailLink>).\nDu finner de också på sidan egna bokningar i Varaamo.",
@@ -22,5 +25,15 @@
   "reservationFailed": "Bokningen kunde inte skapas",
   "reservationCancellingFailed": "Avbokning misslyckades",
   "reservationUpdateFailed": "Uppdateringen misslyckades",
-  "priceFree": "Avgiftsfri"
+  "priceFree": "Avgiftsfri",
+  "relatedReservationUnits": "",
+  "reservationInfo1-1": "",
+  "reservationInfo1-2": "",
+  "reservationInfo1-3": "",
+  "reservationInfo2": "",
+  "reservationInfo3": "",
+  "reservationInfo4": "",
+  "reservationInfo4_plural": "",
+  "reservationInfo1-weeks": "",
+  "reservationInfo1-months": ""
 }

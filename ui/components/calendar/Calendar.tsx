@@ -266,6 +266,10 @@ const StyledCalendar = styled(BigCalendar)<{
     .rbc-month-row {
       min-width: 800px;
       overflow: visible;
+
+      @media (min-width: ${(props) => props.overflowBreakpoint}) {
+        min-width: unset;
+      }
     }
   }
 

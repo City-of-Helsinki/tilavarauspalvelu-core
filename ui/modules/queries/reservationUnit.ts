@@ -43,9 +43,16 @@ export const RESERVATION_UNIT = gql`
       reservationBegins
       reservationEnds
       serviceSpecificTerms {
-        nameFi
-        nameEn
-        nameSv
+        textFi
+        textEn
+        textSv
+      }
+      cancellationTerms {
+        textFi
+        textEn
+        textSv
+      }
+      paymentTerms {
         textFi
         textEn
         textSv
