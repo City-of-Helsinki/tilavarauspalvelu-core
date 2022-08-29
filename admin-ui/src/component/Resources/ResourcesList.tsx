@@ -20,6 +20,7 @@ import { RESOURCES_QUERY } from "../../common/queries";
 import { Query, ResourceType } from "../../common/gql-types";
 import BreadcrumbWrapper from "../BreadcrumbWrapper";
 import { useNotification } from "../../context/NotificationContext";
+import { resourceUrl } from "../../common/urls";
 
 const Wrapper = styled.div`
   padding: var(--spacing-layout-xl) 0;
@@ -100,7 +101,7 @@ const getCellConfig = (t: TFunction): CellConfig => {
     sorting: "name",
     order: "asc",
     rowLink: ({ space, pk }: ResourceType) =>
-      `/unit/${space?.unit?.pk}/resource/edit/${pk}`,
+      resourceUrl(Number(pk), Number(space?.unit?.pk)),
   };
 };
 
@@ -114,7 +115,6 @@ const getFilterConfig = (
   const types = uniq(resources.map((resource) => resource.locationType)).filter(
     (n) => n
   );
-  // const districts = uniq(spaces.map((space: Space) => space.building.district));
 
   return [
     {

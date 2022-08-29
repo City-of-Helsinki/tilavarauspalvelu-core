@@ -15,6 +15,7 @@ import {
   ResourceType,
   UnitByPkType,
 } from "../../common/gql-types";
+import { resourceUrl } from "../../common/urls";
 
 interface IProps {
   resources: ResourceType[] | undefined;
@@ -86,7 +87,7 @@ const ResourcesTable = ({
                 {
                   name: t("ResourceTable.menuEditResource"),
                   onClick: () => {
-                    history.push(`/unit/${unit.pk}/resource/edit/${pk}`);
+                    history.push(resourceUrl(Number(pk), Number(unit.pk)));
                   },
                 },
                 {
@@ -122,7 +123,7 @@ const ResourcesTable = ({
     index: "pk",
     sorting: "nameFi",
     order: "asc",
-    rowLink: ({ pk }: ResourceType) => `/unit/${unit.pk}/resource/edit/${pk}`,
+    rowLink: ({ pk }: ResourceType) => resourceUrl(Number(pk), Number(unit.pk)),
   } as CellConfig;
 
   return (

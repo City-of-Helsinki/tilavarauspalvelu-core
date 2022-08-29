@@ -1,5 +1,6 @@
 import { get } from "lodash";
 import React from "react";
+import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { Table, TableProps } from "../../common/hds-fork/table/Table";
 import { breakpoints } from "../../styles/util";
@@ -68,7 +69,7 @@ const NoDataMessage = styled.span`
   line-height: 4;
 `;
 
-const A = styled.a`
+const A = styled(Link)`
   color: black;
 `;
 
@@ -78,7 +79,7 @@ export const TableLink = ({
 }: {
   href: string;
   children: React.ReactNode;
-}): JSX.Element => <A href={href}>{children}</A>;
+}): JSX.Element => <A to={href}>{children}</A>;
 
 /**
  *

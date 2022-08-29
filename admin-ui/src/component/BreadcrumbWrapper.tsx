@@ -5,6 +5,7 @@ import { Breadcrumb } from "common";
 import { useTranslation } from "react-i18next";
 import { trim } from "lodash";
 import { breakpoints } from "../styles/util";
+import { publicUrl } from "../common/const";
 
 type Alias = {
   slug: string;
@@ -47,7 +48,10 @@ const BreadcrumbWrapper = ({ route, aliases }: Props): JSX.Element => {
   return (
     <Wrapper>
       <StyledBreadcrumb
-        routes={[{ title: t("breadcrumb.frontpage"), slug: "/" }, ...routes]}
+        routes={[
+          { title: t("breadcrumb.frontpage"), slug: publicUrl },
+          ...routes,
+        ]}
         isMobile={isMobile}
       />
     </Wrapper>

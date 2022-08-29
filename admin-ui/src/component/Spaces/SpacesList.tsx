@@ -18,6 +18,7 @@ import { SPACES_QUERY } from "../../common/queries";
 import { Query, SpaceType } from "../../common/gql-types";
 import BreadcrumbWrapper from "../BreadcrumbWrapper";
 import { useNotification } from "../../context/NotificationContext";
+import { spaceUrl } from "../../common/urls";
 
 const Wrapper = styled.div`
   padding: var(--spacing-layout-xl) 0;
@@ -115,7 +116,8 @@ const getCellConfig = (t: TFunction): CellConfig => {
     index: "pk",
     sorting: "name",
     order: "asc",
-    rowLink: ({ pk, unit }: SpaceType) => `unit/${unit?.pk}/space/edit/${pk}`,
+    rowLink: ({ pk, unit }: SpaceType) =>
+      spaceUrl(Number(pk), Number(unit?.pk)),
   };
 };
 
