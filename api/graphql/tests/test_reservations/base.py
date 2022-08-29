@@ -42,6 +42,8 @@ class ReservationTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCase):
         self,
         reservation_unit: Optional[ReservationUnit] = None,
         date: Optional[datetime.date] = None,
+        start_hour: int = 6,
+        end_hour: int = 22,
     ) -> List[Dict]:
         if not reservation_unit:
             reservation_unit = self.reservation_unit
@@ -51,9 +53,15 @@ class ReservationTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCase):
         resource_id = f"{settings.HAUKI_ORIGIN_ID}:{reservation_unit.uuid}"
         origin_id = str(reservation_unit.uuid)
 
-        return [self._get_single_opening_hour_block(resource_id, origin_id, date)]
+        return [
+            self._get_single_opening_hour_block(
+                resource_id, origin_id, date, start_hour, end_hour
+            )
+        ]
 
-    def _get_single_opening_hour_block(self, resource_id, origin_id, date):
+    def _get_single_opening_hour_block(
+        self, resource_id, origin_id, date, start_hour, end_hour
+    ):
         return {
             "timezone": DEFAULT_TIMEZONE,
             "resource_id": resource_id,
@@ -61,8 +69,8 @@ class ReservationTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCase):
             "date": date,
             "times": [
                 TimeElement(
-                    start_time=datetime.time(hour=6),
-                    end_time=datetime.time(hour=22),
+                    start_time=datetime.time(hour=start_hour),
+                    end_time=datetime.time(hour=end_hour),
                     end_time_on_next_day=False,
                     resource_state=State.WITH_RESERVATION,
                     periods=[],

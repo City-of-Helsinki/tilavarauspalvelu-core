@@ -920,6 +920,36 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
             "RESERVATION_NOT_WITHIN_ALLOWED_TIME_RANGE"
         )
 
+    def test_create_succeed_when_reservation_is_done_less_than_one_full_day_before(
+        self, mock_periods, mock_opening_hours
+    ):
+        reservation_begin = datetime.datetime(2021, 10, 13, 0, 0, 0)
+        reservation_end = reservation_begin + datetime.timedelta(hours=1)
+
+        mock_opening_hours.return_value = self.get_mocked_opening_hours(
+            date=reservation_begin.date(), start_hour=0
+        )
+
+        self.reservation_unit.reservations_min_days_before = 1
+        self.reservation_unit.save()
+
+        self.client.force_login(self.regular_joe)
+        input_data = self.get_valid_input_data()
+        input_data["begin"] = reservation_begin.strftime("%Y%m%dT%H%M%SZ")
+        input_data["end"] = reservation_end.strftime("%Y%m%dT%H%M%SZ")
+
+        response = self.query(self.get_create_query(), input_data=input_data)
+        content = json.loads(response.content)
+
+        assert_that(content.get("errors")).is_none()
+        assert_that(
+            content.get("data").get("createReservation").get("reservation").get("pk")
+        ).is_not_none()
+
+        pk = content.get("data").get("createReservation").get("reservation").get("pk")
+        reservation = Reservation.objects.get(id=pk)
+        assert_that(reservation).is_not_none()
+
     def test_create_succeed_when_reservation_unit_reservations_in_days_before_in_limits(
         self, mock_periods, mock_opening_hours
     ):
