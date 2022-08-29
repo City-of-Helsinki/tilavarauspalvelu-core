@@ -36,8 +36,8 @@ snapshots['UserQueryTestCase::test_show_general_roles 1'] = {
                         'generalRoles': [
                             {
                                 'role': {
-                                    'code': 'TEST_GENERAL_ROLE',
-                                    'verboseName': 'Test General Role'
+                                    'code': 'general_role',
+                                    'verboseName': ''
                                 }
                             }
                         ],

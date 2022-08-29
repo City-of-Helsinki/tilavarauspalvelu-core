@@ -568,6 +568,28 @@ class UserPermission(BasePermission):
 
     @classmethod
     def has_mutation_permission(cls, root: Any, info: ResolveInfo, input: dict) -> bool:
+        user = info.context.user
+        if user.is_anonymous:
+            return False
+
+        if "pk" not in input:
+            return False
+
+        if user.pk != input["pk"]:
+            return False
+
+        service_sector_roles = user.service_sector_roles.all()
+        unit_roles = user.unit_roles.all()
+        general_roles = user.general_roles.all()
+
+        if (
+            user.is_superuser
+            or service_sector_roles.exists()
+            or unit_roles.exists()
+            or general_roles.exists()
+        ):
+            return True
+
         return False
 
 

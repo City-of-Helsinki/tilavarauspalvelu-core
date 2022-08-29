@@ -84,6 +84,7 @@ from api.graphql.terms_of_use.terms_of_use_types import TermsOfUseType
 from api.graphql.units.unit_filtersets import UnitsFilterSet
 from api.graphql.units.unit_mutations import UnitUpdateMutation
 from api.graphql.units.unit_types import UnitByPkType, UnitType
+from api.graphql.users.user_mutations import UserUpdateMutation
 from api.graphql.users.user_types import UserType
 from permissions.api_permissions.graphene_field_decorators import (
     check_resolver_permission,
@@ -576,6 +577,8 @@ class Mutation(graphene.ObjectType):
     delete_resource = ResourceDeleteMutation.Field()
 
     update_unit = UnitUpdateMutation.Field()
+
+    update_user = UserUpdateMutation.Field()
 
 
 schema = graphene.Schema(query=Query, mutation=Mutation)
