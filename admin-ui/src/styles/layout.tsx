@@ -102,6 +102,14 @@ export const DataGrid = styled.div`
   }
 `;
 
+export const DenseVerticalFlex = styled.div`
+  display: flex;
+  gap: var(--spacing-xs);
+  flex-direction: column;
+`;
+
+DenseVerticalFlex.displayName = "DenseVerticalFlex";
+
 export const VerticalFlex = styled.div`
   display: flex;
   gap: var(--spacing-m);
@@ -109,6 +117,14 @@ export const VerticalFlex = styled.div`
 `;
 
 VerticalFlex.displayName = "VerticalFlex";
+
+export const HorisontalFlex = styled.div`
+  display: flex;
+  gap: var(--spacing-m);
+  flex-direction: row;
+`;
+
+HorisontalFlex.displayName = "HorisontalFlex";
 
 export const SparseVerticalFlex = styled.div`
   display: flex;

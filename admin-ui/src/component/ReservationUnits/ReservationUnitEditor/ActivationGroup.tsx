@@ -3,9 +3,14 @@ import { Checkbox } from "hds-react";
 import styled from "styled-components";
 
 const Indent = styled.div<{ $noIndent: boolean }>`
-  margin-top: var(--spacing-m);
   ${({ $noIndent }) => ($noIndent ? null : `margin-left: var(--spacing-l);`)}
 `;
+
+const Wrapper = styled.div<{ $noMargin: boolean }>`
+  ${({ $noMargin }) => ($noMargin ? null : `margin-top: var(--spacing-s);`)}
+`;
+
+Wrapper.displayName = "Wrapper";
 
 const ActivationGroup = ({
   id,
@@ -13,6 +18,7 @@ const ActivationGroup = ({
   initiallyOpen,
   children,
   noIndent = false,
+  noMargin = false,
   onClose,
 }: {
   id: string;
@@ -20,6 +26,7 @@ const ActivationGroup = ({
   initiallyOpen: boolean;
   children: React.ReactChild | React.ReactChild[];
   noIndent?: boolean;
+  noMargin?: boolean;
   onClose?: () => void;
 }): JSX.Element => {
   const [open, setOpen] = useState(initiallyOpen);
@@ -37,7 +44,12 @@ const ActivationGroup = ({
           }
         }}
       />
-      {open ? <Indent $noIndent={noIndent}>{children}</Indent> : null}
+
+      {open ? (
+        <Wrapper $noMargin={noMargin}>
+          <Indent $noIndent={noIndent}>{children}</Indent>
+        </Wrapper>
+      ) : null}
     </>
   );
 };

@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { Accordion, Button, Fieldset as HDSFieldset } from "hds-react";
+import { Accordion, Button } from "hds-react";
 import { Grid, Span4 as DefaultSpan4 } from "../../../../styles/layout";
 
 export const EditorGrid = styled(Grid)`
@@ -32,6 +32,8 @@ export const ArchiveButton = styled(Button)`
 `;
 
 export const ExpandLink = styled(Accordion)`
+  border-bottom: none !important;
+
   > div:nth-of-type(1) > div {
     display: flex;
     flex-direction: row;
@@ -91,10 +93,4 @@ export const Error = styled.div`
     flex-shrink: 0;
   }
   white-space: nowrap;
-`;
-
-export const Fieldset = styled(HDSFieldset)`
-  legend {
-    margin-bottom: var(--spacing-2-xs);
-  }
 `;

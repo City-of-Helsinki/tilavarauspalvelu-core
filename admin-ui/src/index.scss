@@ -40,3 +40,7 @@ a {
   flex-direction: column;
   align-items: flex-start;
 }
+
+section[aria-label="Tooltip"] {
+  white-space: pre-line;
+}

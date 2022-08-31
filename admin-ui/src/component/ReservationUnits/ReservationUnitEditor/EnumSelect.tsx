@@ -27,6 +27,7 @@ const EnumSelect = <T,>({
   value,
   type,
   errorText,
+  tooltipText,
   sort = false,
 }: {
   id: string;
@@ -38,6 +39,7 @@ const EnumSelect = <T,>({
   onChange: (value: T) => void;
   type: { [key: string]: string };
   errorText?: string;
+  tooltipText?: string;
   sort?: boolean;
 }): JSX.Element => {
   const { t } = useTranslation();
@@ -65,6 +67,7 @@ const EnumSelect = <T,>({
         error={errorText}
         invalid={!!errorText}
         sort={sort}
+        tooltipText={tooltipText}
       />
     </>
   );

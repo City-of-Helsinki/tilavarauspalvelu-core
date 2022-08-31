@@ -1085,7 +1085,9 @@ const translations: ITranslations = {
       reservationsMaxDaysBefore: ["Varattavissa alkaen"],
       lowestPrice: ["Alin hinta (euroa)"],
       highestPrice: ["Ylin hinta (euroa)"],
-      canApplyFreeOfCharge: ["Varausyksikköön voi anoa subventiota"],
+      canApplyFreeOfCharge: [
+        "Asiakas voi pyytää hinnan alennusta tai maksuttomuutta",
+      ],
       metadataSetPk: ["Varauslomake"],
       termsOfUseFi: ["Varausyksikkökohtaiset lisätiedot fi"],
       termsOfUseSv: ["Varausyksikkökohtaiset lisätiedot sv"],
@@ -1109,7 +1111,256 @@ const translations: ITranslations = {
         FREE: ["Maksuton"],
       },
     },
+
+    tooltip: {
+      reservationKind: [
+        `Valitse miten varausyksikköä annetaan varattavaksi.
+        "Vain kausivarattavat" tilat eivät näy yksittäisvarauspuolella.`,
+      ],
+      nameFi: [
+        `Nimi kirjoitetaan ilman toimipisteen nimeä muodossa
+      TILAT:
+      -Tilan nimi
+      -Tilan nimi nro
+      -Tilan nimi, toisen tilan nimi ja kolmannen tilan nimi
+      -Tilan nimi nro ja nro
+      LAITTEET:
+      - Laitteentyyppi nro (malli suluissa)
+      esim. Ompelukone 2 (Bernina 1008)
+      Kirjoitusasusta:
+      -Nimen ensimmäinen kirjain isolla
+      -Nimen tulee olla yksilöllinen ja kuvaava, jos mahdollista
+      esim. Työhuone Klarinetti
+      -jos samassa varausyksikössä on useampi tila, tilat erotetaan toisistaan pilkulla tai ja-sanalla.
+      -Tilan nimi käännetään, jos kyseessä ei ole erisnimi, esim.
+      Aalto-sauna / Aalto-bastu / Aalto-sauna
+      -Tilan numero tilan nimen jälkeen. Jos tiloilla on sama ”kantanimi”, nimi laitetaan vain kerran
+      esim. Tähtihuone 1 ja 2 / Stjärnrummet 1 och 2 / Star Room 1 and 2
+      - Jos toimipisteen opasteet ovat vain suomeksi, tilan suomenkielinen nimi tulee näkyä joko tilan nimessä tai kuvauksessa
+      esim. ruotsiksi Rantasauna [Strandbastu]`,
+      ],
+      spacePks: [
+        `Varausyksikkö voi koostua yhdestä tai useammasta tilasta. Jokainen resurssi tai laite tarvitsee oman tilansa.
+      Huomioi tilahierarkia ja että tila ei voi koskaan olla samanaikaisesti varattuna kuin kerran.
+      Tilahierarkiaa pääset muokkaamaan toimipisteen sivulla.`,
+      ],
+      resourcePks: [
+        "Valitse tilaan liitettävät resurssit ja laitteet. Luo laitteille tarvittaessa uusi alitila toimipisteen sivulla.",
+      ],
+      surfaceArea: [
+        "Pinta-ala lasketaan automaattisesti  varausyksikköön kuuluvien tilojen lattiapinta-alan perusteella.",
+      ],
+      maxPersons: [
+        "Enimmäishenkilömäärä lasketaan automaattisesti  varausyksikköön kuuluvien tilojen  henkilömäärien perusteella. Ilmoitetut henkilömäärät perustuvat paloturvallisuusmääräyksiin. Pienennä varausyksikön henkilömäärää tarvittaessa.",
+      ],
+      minPersons: [
+        "Minimihenkilömäärä voidaan ilmoittaa, jos tilan käyttöä halutaan ohjata riittävän suuriin varauksiin. Esimerkki: 100hlö sali  halutaan tarjota vähintään 30hlön tilaisuuksiin tai yksin työskentelyä halutaan välttää ryhmätiloissa (min 2 hlö). Suositus: jätetään tyhjäksi",
+      ],
+      reservationUnitTypePk: [
+        `Valitse varausyksikköä parhaiten kuvaava tilatyyppi. Valinnalla on vaikutusta hakutulokseen.
+        TILAT:
+        Valitse “MONITOIMITILA”, jos et löydä listalta sopivaa tyyppiä.
+        LAITTEET:
+        valitse “Laitteet ja välineet”
+        SOITTIMET:
+        valitse “soittimet”`,
+      ],
+
+      purposes: [
+        `Valitse käyttötarkoitukset, joihin varausyksikkö aidosti sopii. Voit valita useita. Valinta vaikuttaa hakutuloksiin.
+      LAITTEET:
+      valitse “Laitteiden käyttö”`,
+      ],
+
+      equipments: [
+        `Valitse varusteet, jotka ovat kaikkien käyttäjien saatavilla. Jos tiettyä varustusta voi käyttää vain erikseen kysymällä, sitä ei tule listata.
+        Täydennyksiä varustelistaan voi pyytää ylläpidolta. `,
+      ],
+      qualifiers: [
+        `Lisää tarvittaessa tilan ikärajoja tai sisäänpääsyä kuvaavat tarkenteet.
+      Sopimusehtojen mukaisesti alle 15-vuotiaat eivät voi varta tiloja ellei sitä ole erikseen sallittu.
+      Lasten ja nuorten (peli)tilat:
+      valitse “varattavissa alle 15-vuotiaille”`,
+      ],
+      description: [
+        `Kuvaus kirjoitetaan standardointipohjan mukaisesti.
+      Lisää linkkejä ulkoisille verkkosivuille kuten käyttöohjeisiin vain tarvittaessa. Tarkista linkkien toimivuus ja saavutettavuus säännöllisesti. Käytäthän muotoiluja harkiten. `,
+      ],
+      images: [
+        `Liitä vähintään kolme kuvaa. Kuvien tulisi olla todenmukaisia ja hyvälaatuisia.
+      Suositus:
+      lisää ensisijaisesti vaakatasossa kuvattuja kuvia, ei kuitenkaan panoramoja. jpeg/jpg ja png, max 1 M
+      Kuvissa näkyviltä ihmisiltä tulee olla kuvauslupa. Kuvissa ei saa näkyä turvakameroita.`,
+      ],
+      publishingSettings: [
+        `Voit ajastaa varausyksikön julkaistavaksi tai piilotettavaksi asiakkailta tiettynä ajankohtana.`,
+      ],
+      reservationSettings: [
+        `Voit ajastaa varauskalenterin avattaksi tai suljettavaksi tiettynä ajankohtana. Kalenterin ollessa suljettu, asiakkaat eivät voi varata varausyksikköä käyttöönsä.`,
+      ],
+      minReservationDuration: [
+        `Suosituksia:
+      Kokoustilat, työpisteet: 30min tai 60min
+      Itsenäisen käytön tilat: 60min tai 90min
+      pelitilat, liikuntapaikat: 30min
+      studiot: 60min
+      saunavuorot ja muut kiinteäkestoiset vuorot: keston mukaan, jolloin min=max
+      tapahtumatilat, kokopäiväksi varattavat: 60min tai harkinnan mukaan
+      soittimet, laitteet: 30min tai harkinnan mukaan`,
+      ],
+      maxReservationDuration: [
+        `Jos käyttöaste on matala, mahdollista pitkät varaukset.
+      Suosituksia:
+      ruuhkaiset kokoustilat, työpisteet: 2-4tuntia tai harkinnan mukaan.
+      itsenäisen käytön tilat: harkinnan mukaan
+      Kokopäiväksi varattavat tilat: maksimi aukioloajan mukaan, esim. klo 8-20=12tuntia tai 7-22=15tuntia
+      pelitilat, tenniskentät: 2tuntia
+      saunavuorot ja muut kiinteäkestoiset vuorot: keston mukaan, jolloin min=max
+      laitteet: arvioidun työskentelykeston tai harkinnan mukaan
+      soittimet: 2tuntia`,
+      ],
+      reservationsMaxDaysBefore: [
+        `Valitse, kuinka paljon etukäteen varausyksikön voi varata.
+      Esimerkki: Jos valitset “6kk”, varauskalenteri on auki tästä hetkestä puolenvuoden päähän.
+      Suosituksia:
+      Yleinen suositus: 3 kk
+      tenniskentät: 2 vko
+      (ulko)tapahtumatilat, kesätilat: 6 kk
+      taideseinät: 12kk tai harkinnan mukaan `,
+      ],
+      reservationsMinDaysBefore: [
+        `Valitse, kuinka paljon etukäteen varausyksikkö pitää viimeistään varata.
+        Suosituksia:
+        0, jos varuksen voi tehdä samalle päivälle (kaikki kirjastojen suoravarattavat tilat)
+        1, jos varaus tulee tehdä viim. edellisenä päivänä. Huomio vuorokausiraja on keskiyöllä klo 23.59.
+        3 / 5 vrk, jos varaus edellyttää käsittelyä
+        7 / 14 vrk, jos itsenäinen käyttö ja varaus tulee sekä käsitellä ja asiakas maksaa ja noutaa avaimet
+        tapahtumatilat: harkinnan mukaan`,
+      ],
+      reservationStartInterval: [
+        `Voit määrittää, minkä ajan välein varaukset voivat alkaa.
+      Esimerkki:
+      Jos varauksen aloitukset ovat 30min välein, varaukset voivat alkaa vain tasa- ja puolitunnein.
+      suositus:
+      30min
+      15min välein - jos käytät 15min taukoja tai olet asettanut tilan aukioloajat 15min tarkkuudella`,
+      ],
+      bufferSettings: [
+        `Voit asettaa automaattiset tauot varauksen alkuun tai loppuun, mikäli haluat esim. tuulettaa tai tarkistaa tilan varausten välissä. Tauko lisätään jokaiseen varaukseen ja seuraava varaus voi alkaa vasta tauon päätyttyä.
+      Esimerkki:
+      Varaus tehdään 12.00-13.00 ja vuoron jälkeen on asetettu 30min tauko. Seuraava varaus voi alkaa vasta 13.30.
+      suositus:
+      tauotusta ei käytetä`,
+      ],
+      cancellationSettings: [
+        `Valitse asetus, jos varauksen voi peruuttaa ja määritä aika, jota ennen asiakas voi perua varauksensa järjestelmässä.
+      Asiakkaalle näkyvä kirjallinen peruutusehto valitaan erikseen kohdassa “Ehdot ja ohjeet”.
+      Huomioi maksullisten tilojen hallinnollinen päätös.
+      Suositukset:
+      ei peruutusmahdollisuutta – asiakkaan sitouttavat maksulliset varaukset, mm. tenniskentät
+      varauksen alkuun asti – yleinen suositus mm. kirjaston maksuttomille tiloille ja laitteille
+      14vrk – tyypillisesti maksulliset tilat
+      1kk (30 vrk) – tapahtumatilat
+      8vko (55 vrk) – leirikeskukset
+      Jos peruutukset on käsiteltävä, ota yhteyttä ylläpitoon.`,
+      ],
+      metadataSetPk: [
+        `Lomake määrittää varauksessa asiakkaalta kysyttävät kentät.
+      Jos et löydä tarvitsemaasi lomaketta, ota yhteyttä palvelusi Varaamo-tuoteomistajaan tai ylläpitoon.`,
+      ],
+      authentication: [
+        `Voit määrittää, vaatiiko varauksen tekeminen varausyksikölle vahvan vai heikon tunnistautumisen. Vahva tunnistautuminen vaatii, että asiakkaan profiili on varmennettu esimerkiksi pankkitunnuksin.
+      Heikko tunnistautuminen kysyy ainoastaan sähköpostia ja salasanaa.
+      Suositukset:
+      HEIKKO – toimipisteen aukioloaikana tapahtuva käyttö, edulliset maksulliset tilat, työpisteet, laitteet, ensisijaisesti alaikäisten käyttöön tarkoitetut (peli)tilat
+      VAHVA – kaikki itsenäinen käyttö, tapahtumatilat, kalliimmat maksulliset tilat, tilat tai laitteet, joiden käytössä on merkittävä taloudellinen riski`,
+      ],
+      maxReservationsPerUser: [
+        `Voit määrittää, kuinka monta  voimassaolevaa varausta käyttäjällä voi samanaikaisesti olla tähän varausyksikköön.
+      Älä rajoita määrää tarpeettomasti. Väärinkäytösten ehkäisemiseksi suositus max 30/varausyksikkö. `,
+      ],
+      introductionSettings: [
+        `Toiminnallisuus ei ole vielä käytössä.
+      Suositus:
+      jätä tyhjäksi`,
+      ],
+      handlingSettings: [
+        `Voit valita kaikki varaukset käsiteltäviksi ennen hyväksymistä.
+      Varaukset, joissa anotaan maksuttomuutta tai alennusta, tulevat automaattisesti käsittelyyn.`,
+      ],
+      pricingType: [
+        `Maksuton varausyksikkö on aina maksuton kaikille.
+      Jos varausyksikkö on maksullinen, siihen on mahdollista hakea maksutonta käyttöä tai hinnan alennusta. ks. subventio`,
+      ],
+      lowestPrice: [
+        `Alimman hinnan tulisi olla joko maksuttoman käytön (0) tai mahdollisen alennetun hinnan määrä.
+      Jos tilalla on kiinteä hinta esim 30e, ilmoita alin=ylin hinta`,
+      ],
+      highestPrice: [
+        `Varausyksikön normaali hinta, kun maksutonta käyttöä tai hinnan alennusta ei haeta.
+      Jos tilalla on kiinteä hinta esim 30e, ilmoita alin=ylin hinta`,
+      ],
+      priceUnit: [
+        `Suositus:
+      Per tunti`,
+      ],
+      paymentType: [
+        `Kertoo asiakkaalle käytössä olevat maksutavat.
+      suositukset
+      TILAT:
+      verkkomaksu
+      LAITTEET:
+      maksu paikan päällä – silloin, kun laitteista peritään maksu`,
+      ],
+      canApplyFreeOfCharge: [
+        `Valitse, jos asiakas voi anoa maksutonta käyttöä tai hinnan alennusta.
+      Alennuspyynnöt tulevat automaattisesti käsiteltäväksi.
+      Jos et ole valinnut käsittelyä kohdassa “Haluan käsitellä kaikki varausanomukset”, normaalihintaisia varauksia ei käsitellä.`,
+      ],
+      pricingTermsPk: [
+        `Valitse listalta palvelussasi noudatettavat hinnoittelu- ja maksuttomuusperiaateet.
+      Asiakkaan hinnanalennuspyyntö perustuu näihin periaatteisiin.
+      Ota tarvittaessa yhteys ylläpitoon.`,
+      ],
+      serviceSpecificTermsPk: [
+        `Helsingin kaupungin tilojen ja laitteiden varausehdot liitetään kaikkiin varausyksiköihin automaattisesti.
+      Täydennä ehtoja tarvittaessa palvelusi ehdoilla.`,
+      ],
+      paymentTermsPk: [
+        `Jos varausyksikkösi on maksullinen valitse maksuehdot.`,
+      ],
+      cancellationTermsPk: [
+        `Valitse kirjallinen peruutusehto.
+      Varmista, että peruutusasetukset kohdassa “Varauksen peruutus > Peruutus mahdollista” vastaa tässä valittua ehtoa.`,
+      ],
+      termsOfUseFi: [
+        `Voit antaa asiakkaalle varuksen teon kannalta oleellisia lisätietoja. Tiedot näkyvät Huomioi varattaessa -otsikon alla varauslomaketta täytettäessä.
+      Suositus:
+      käytä vain tarvittaessa.
+      Korkeintaan kolme varaajan kannalta oleellista asiaa.
+      Esimerkki:
+      Varmista tarvittaessa yhteysaluksen liikennöinti ennen varauksen tekoa. Jos teet varauksen samalla päivälle, ilmoitathan siitä aina myös puhelimitse henkilökunnalle [puh nro].
+      tai
+      Käsittelemme varauksia vain arkipäivisin. Tilan avaimen voit noutaa arkisin klo 7.30-8.30 välillä. Varaudu esittämään henkilöllisyystodistus.`,
+      ],
+      reservationPendingInstructionsFi: [
+        `Tämä varausvahvistus lähetetään asiakkaalle sähköpostilla, kun varaus on lähetetty  käsittelyyn.
+      Voit täydentää automaattista varausvahvistusta toimipisteen tiedoilla.`,
+      ],
+      reservationConfirmedInstructionsFi: [
+        `Tämä varausvahvistus lähetetään asiakkaalle sähköpostilla, kun varaus on hyväksytty.
+      Voit täydentää automaattista varausvahvistusta toimipisteen tiedoilla.`,
+      ],
+      reservationCancelledInstructionsFi: [
+        `Tämä varausvahvistus lähetetään asiakkaalle sähköpostilla, kun varaus on hylätty tai peruutettu.
+      Voit täydentää automaattista varausvahvistusta toimipisteen tiedoilla.`,
+      ],
+      contactInformation: [
+        `Lisää nimesi ja yhteystietosi, jotta palvelusi tuoteomistaja tai Varaamon ylläpito tietää kehen tarvittaessa yhteyttä.`,
+      ],
+    },
     cancelledExpandLink: ["Täydennä peruutusviestiä"],
+    pendingExpandLink: ["Täydennä alustavan varauksen viestiä"],
     authenticationLabel: ["Tunnistautuminen"],
     defaultHeading: ["Uusi varausyksikkö"],
     basicInformation: ["Perustiedot"],
@@ -1130,7 +1381,9 @@ const translations: ITranslations = {
     qualifiersLabel: ["Tarkenne"],
     qualifiersPlaceholder: ["Valitse"],
     resourcesPlaceholder: ["Liitä tarvittavat resurssit"],
-    requireReservationHandling: ["Haluan käsitellä kaikki varausanomukset"],
+    requireReservationHandling: [
+      "Haluan käsitellä kaikki varaukset. Varaukset tulee aina käsitellä - hyväksyä tai hylätä -luvatussa ajassa, usein kolmen arkipäivän kuluessa.",
+    ],
     requireIntroductionLabel: ["Varausyksikkö vaatii pakollisen perehdytyksen"],
     surfaceAreaHelperText: ["Tilojen yhteenlaskettua alaa ei voi pienentää"],
     maxPersonsHelperText: [

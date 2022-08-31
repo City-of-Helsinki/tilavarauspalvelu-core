@@ -1,8 +1,9 @@
-import { IconAlertCircleFill } from "hds-react";
+import { IconAlertCircleFill, Tooltip } from "hds-react";
 import React from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import styled from "styled-components";
+import { HorisontalFlex } from "../styles/layout";
 
 type Props = {
   required?: boolean;
@@ -12,6 +13,7 @@ type Props = {
   id: string;
   onChange: (v: string) => void;
   errorText?: string;
+  tooltipText?: string;
 };
 
 const Container = styled.div<{ $disabled: boolean }>`
@@ -82,13 +84,17 @@ const RichTextInput = ({
   label = "",
   id,
   errorText,
+  tooltipText,
   onChange,
 }: Props): JSX.Element => {
   return (
     <Container $disabled={disabled} id={`${id}-container`}>
-      <Label htmlFor={id}>
-        {label} {required ? <Asterix>*</Asterix> : null}
-      </Label>
+      <HorisontalFlex>
+        <Label htmlFor={id}>
+          {label} {required ? <Asterix>*</Asterix> : null}
+        </Label>
+        {tooltipText && <Tooltip>{tooltipText}</Tooltip>}
+      </HorisontalFlex>
       <StyledReactQuill
         modules={modules}
         readOnly={disabled}

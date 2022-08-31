@@ -23,6 +23,7 @@ const Select = ({
   helper,
   errorText,
   sort = false,
+  tooltipText,
 }: {
   id: string;
   label: string;
@@ -34,6 +35,7 @@ const Select = ({
   helper?: string;
   errorText?: string;
   sort?: boolean;
+  tooltipText?: string;
 }): JSX.Element => {
   const sortedOpts = memoize((originalOptions) => {
     const opts = [...originalOptions];
@@ -62,6 +64,7 @@ const Select = ({
       value={getSelectedOption(options, value)}
       error={errorText}
       invalid={!!errorText}
+      tooltipText={tooltipText}
     />
   );
 };

@@ -146,6 +146,7 @@ const ImageEditor = ({ images, setImages }: Props): JSX.Element => {
             dragAndDropInputLabel=" "
             maxSize={5242880}
             onChange={(files) => addImage(files)}
+            tooltipText={t("ReservationUnitEditor.tooltip.images")}
           />
         </FileInputContainer>
       </div>
