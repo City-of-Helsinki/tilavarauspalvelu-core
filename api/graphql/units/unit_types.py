@@ -15,7 +15,7 @@ from permissions.api_permissions.graphene_permissions import (
     SpacePermission,
     UnitPermission,
 )
-from spaces.models import Unit
+from spaces.models import Unit, UnitGroup
 
 
 class UnitType(AuthNode, PrimaryKeyObjectType):
@@ -85,3 +85,25 @@ class UnitByPkType(UnitType, OpeningHoursMixin):
 
         interfaces = (graphene.relay.Node,)
         connection_class = TilavarausBaseConnection
+
+
+class UnitGroupType(AuthNode, PrimaryKeyObjectType):
+    permission_classes = (
+        (UnitPermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
+    )
+
+    units = graphene.List(UnitType)
+
+    class Meta:
+        model = UnitGroup
+        fields = [
+            "pk",
+            "name",
+            "units",
+        ]
+
+        interfaces = (graphene.relay.Node,)
+        connection_class = TilavarausBaseConnection
+
+    def resolve_units(self, info: graphene.ResolveInfo):
+        return self.units.all()

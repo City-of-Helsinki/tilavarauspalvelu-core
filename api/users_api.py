@@ -1,6 +1,8 @@
+from typing import Optional
+
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from rest_framework import mixins, status, viewsets
+from rest_framework import mixins, serializers, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -20,6 +22,7 @@ class UserSerializer(TranslatedModelSerializer):
     general_roles = GeneralRoleSerializer(many=True)
     service_sector_roles = ServiceSectorRoleSerializer(many=True)
     unit_roles = UnitRoleSerializer(many=True)
+    reservation_notification = serializers.SerializerMethodField()
 
     class Meta:
         model = User
@@ -35,6 +38,7 @@ class UserSerializer(TranslatedModelSerializer):
             "general_roles",
             "service_sector_roles",
             "unit_roles",
+            "reservation_notification",
         ]
         extra_kwargs = {
             "is_superuser": {
@@ -68,6 +72,11 @@ class UserSerializer(TranslatedModelSerializer):
                 "help_text": "List of unit roles that user has been granted.",
             },
         }
+
+    def get_reservation_notification(self, user) -> Optional[str]:
+        if user.is_staff:
+            return user.reservation_notification
+        return None
 
 
 class UserViewSet(
