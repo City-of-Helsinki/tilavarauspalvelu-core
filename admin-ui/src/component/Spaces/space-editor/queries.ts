@@ -25,18 +25,13 @@ export const UPDATE_SPACE = gql`
 `;
 
 export const SPACE_HIERARCHY_QUERY = gql`
-  query getSpaces {
-    spaces {
-      edges {
-        node {
+  query unitSpaces($pk: Int) {
+    unitByPk(pk: $pk) {
+      spaces {
+        pk
+        nameFi
+        parent {
           pk
-          nameFi
-          parent {
-            pk
-          }
-          unit {
-            pk
-          }
         }
       }
     }

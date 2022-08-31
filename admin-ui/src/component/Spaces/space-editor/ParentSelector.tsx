@@ -2,7 +2,12 @@ import React, { useState } from "react";
 import { useQuery } from "@apollo/client";
 import { Select } from "hds-react";
 import i18next from "i18next";
-import { Maybe, Query, SpaceType } from "../../../common/gql-types";
+import {
+  Maybe,
+  Query,
+  QueryUnitByPkArgs,
+  SpaceType,
+} from "../../../common/gql-types";
 import { SPACE_HIERARCHY_QUERY } from "./queries";
 import { spacesAsHierarchy } from "./util";
 
@@ -52,16 +57,12 @@ const ParentSelector = ({
 }: Props): JSX.Element | null => {
   const [parentOptions, setParentOptions] = useState([] as ParentType[]);
 
-  useQuery<Query>(SPACE_HIERARCHY_QUERY, {
-    onCompleted: ({ spaces }) => {
-      const parentSpaces = spaces?.edges.map((s) => s?.node as SpaceType);
+  useQuery<Query, QueryUnitByPkArgs>(SPACE_HIERARCHY_QUERY, {
+    variables: { pk: unitPk },
+    onCompleted: ({ unitByPk }) => {
+      const parentSpaces = unitByPk?.spaces?.map((s) => s as SpaceType);
       if (parentSpaces) {
-        const unitSpaces = spacesAsHierarchy(
-          parentSpaces.filter((space) => {
-            return space.unit?.pk === unitPk;
-          }),
-          "\u2007"
-        );
+        const unitSpaces = spacesAsHierarchy(parentSpaces, "\u2007");
 
         const children = spacePk
           ? getChildrenRecursive(spacePk, unitSpaces).map((s) => s.pk)
