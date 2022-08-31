@@ -429,6 +429,9 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
 
     def check_reservation_days_before(self, begin, reservation_unit):
         now = datetime.datetime.now().astimezone(get_default_timezone())
+        start_of_the_day = datetime.datetime.combine(now, datetime.time.min).astimezone(
+            get_default_timezone()
+        )
 
         if reservation_unit.reservations_max_days_before and now < (
             begin
@@ -439,7 +442,7 @@ class ReservationCreateSerializer(PrimaryKeySerializer):
                 ValidationErrorCodes.RESERVATION_NOT_WITHIN_ALLOWED_TIME_RANGE,
             )
 
-        if reservation_unit.reservations_min_days_before and now > (
+        if reservation_unit.reservations_min_days_before and start_of_the_day > (
             begin
             - datetime.timedelta(days=reservation_unit.reservations_min_days_before)
         ):
