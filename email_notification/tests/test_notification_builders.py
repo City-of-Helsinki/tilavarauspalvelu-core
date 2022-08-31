@@ -11,6 +11,7 @@ from email_notification.sender.email_notification_builder import (
 )
 from email_notification.tests.base import ReservationEmailBaseTestCase
 from email_notification.tests.factories import EmailTemplateFactory
+from reservation_units.tests.factories import ReservationUnitFactory
 
 
 class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
@@ -53,6 +54,31 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
 
     def test_get_unit_name(self):
         assert_that(self.builder._get_unit_name()).is_equal_to(self.unit.name)
+
+    def test_get_reservation_unit_when_single(self):
+        assert_that(self.builder._get_reservation_unit()).is_equal_to(
+            self.reservation_unit.name
+        )
+
+    def test_get_reservation_unit_when_multiple(self):
+        res_unit_one = self.reservation_unit.name
+        res_unit = ReservationUnitFactory(
+            unit=self.unit,
+        )
+        res_unit_too = res_unit.name
+
+        self.reservation.reservation_unit.add(res_unit)
+        assert_that(self.builder._get_reservation_unit()).is_equal_to(
+            f"{res_unit_one}, {res_unit_too}"
+        )
+
+    def test_get_price(self):
+        assert_that(self.builder._get_price()).is_equal_to(self.reservation.price)
+
+    def test_get_tax_percentage(self):
+        assert_that(self.builder._get_tax_percentage()).is_equal_to(
+            self.reservation.tax_percentage_value
+        )
 
     @override_settings(
         EMAIL_TEMPLATE_CONTEXT_ATTRS=settings.EMAIL_TEMPLATE_CONTEXT_ATTRS

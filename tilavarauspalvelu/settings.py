@@ -289,6 +289,11 @@ EMAIL_TEMPLATE_CONTEXT_ATTRS = [
     "end_date",
     "end_time",
     "reservation_number",
+    "unit_name",
+    "unit_location",
+    "reservation_unit",
+    "price",
+    "tax_percentage",
 ]
 SEND_RESERVATION_NOTIFICATION_EMAILS = env("SEND_RESERVATION_NOTIFICATION_EMAILS")
 

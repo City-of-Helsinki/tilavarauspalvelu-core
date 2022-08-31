@@ -86,6 +86,22 @@ class ReservationEmailNotificationBuilder:
     def _get_name(self):
         return self.reservation.name
 
+    def _get_reservation_unit(self):
+        if self.reservation.reservation_unit.count() > 1:
+            reservation_unit_names = ", ".join(
+                self.reservation.reservation_unit.values_list("name", flat=True)
+            )
+        else:
+            reservation_unit_names = self.reservation.reservation_unit.first().name
+
+        return reservation_unit_names
+
+    def _get_price(self):
+        return self.reservation.price
+
+    def _get_tax_percentage(self):
+        return self.reservation.tax_percentage_value
+
     def _init_context_attr_map(self):
         self.context_attr_map = {}
         for key in settings.EMAIL_TEMPLATE_CONTEXT_ATTRS:
