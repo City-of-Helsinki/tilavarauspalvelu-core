@@ -2,6 +2,7 @@ from assertpy import assert_that
 from django.conf import settings
 from django.test import override_settings
 
+from applications.models import CUSTOMER_TYPES
 from email_notification.models import EmailTemplate, EmailType
 from email_notification.sender.email_notification_builder import (
     EmailBuilderConfigError,
@@ -22,6 +23,18 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
 
     def test_get_reservee_name(self):
         reservee_name_str = f"{self.reservation.reservee_first_name} {self.reservation.reservee_last_name}"
+        assert_that(self.builder._get_reservee_name()).is_equal_to(reservee_name_str)
+
+    def test_get_reservee_name_when_reservee_type_business(self):
+        self.reservation.reservee_type = CUSTOMER_TYPES.CUSTOMER_TYPE_BUSINESS
+        self.reservation.save()
+        reservee_name_str = self.reservation.reservee_organisation_name
+        assert_that(self.builder._get_reservee_name()).is_equal_to(reservee_name_str)
+
+    def test_get_reservee_name_when_reservee_type_nonprofit(self):
+        self.reservation.reservee_type = CUSTOMER_TYPES.CUSTOMER_TYPE_NONPROFIT
+        self.reservation.save()
+        reservee_name_str = self.reservation.reservee_organisation_name
         assert_that(self.builder._get_reservee_name()).is_equal_to(reservee_name_str)
 
     def test_get_begin_time(self):

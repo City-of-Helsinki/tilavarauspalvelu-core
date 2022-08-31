@@ -3,6 +3,7 @@ import re
 from django.conf import settings
 from django.template import Context, Template
 
+from applications.models import CUSTOMER_TYPES
 from email_notification.models import EmailTemplate
 from reservations.models import Reservation
 
@@ -43,7 +44,12 @@ class ReservationEmailNotificationBuilder:
         self.validate_template()
 
     def _get_reservee_name(self):
-        return f"{self.reservation.reservee_first_name} {self.reservation.reservee_last_name}"
+        if (
+            not self.reservation.reservee_type
+            or self.reservation.reservee_type == CUSTOMER_TYPES.CUSTOMER_TYPE_INDIVIDUAL
+        ):
+            return f"{self.reservation.reservee_first_name} {self.reservation.reservee_last_name}"
+        return self.reservation.reservee_organisation_name
 
     def _get_begin_date(self):
         return self.reservation.begin.strftime("%d.%m.%Y")
