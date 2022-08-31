@@ -6,6 +6,7 @@ from django.template import Context, Template
 from applications.models import CUSTOMER_TYPES
 from email_notification.models import EmailTemplate
 from reservations.models import Reservation
+from tilavarauspalvelu.utils.commons import LANGUAGES
 
 
 class EmailTemplateValidator:
@@ -37,9 +38,12 @@ class EmailTemplateValidator:
 class ReservationEmailNotificationBuilder:
     validator = EmailTemplateValidator
 
-    def __init__(self, reservation: Reservation, template: EmailTemplate):
+    def __init__(
+        self, reservation: Reservation, template: EmailTemplate, language=LANGUAGES.FI
+    ):
         self.reservation = reservation
         self.template = template
+        self.language = language
         self._init_context_attr_map()
         self.validate_template()
 
@@ -101,6 +105,41 @@ class ReservationEmailNotificationBuilder:
 
     def _get_tax_percentage(self):
         return self.reservation.tax_percentage_value
+
+    def _get_confirmed_instructions(self):
+        return self._get_reservation_unit_instruction_field(
+            "reservation_confirmed_instructions"
+        )
+
+    def _get_pending_instructions(self):
+        return self._get_reservation_unit_instruction_field(
+            "reservation_pending_instructions"
+        )
+
+    def _get_cancelled_instructions(self):
+        return self._get_reservation_unit_instruction_field(
+            "reservation_cancelled_instructions"
+        )
+
+    def _get_reservation_unit_instruction_field(self, name):
+        instructions = []
+        for res_unit in self.reservation.reservation_unit.all():
+            instructions.append(
+                f"{self._get_by_language(res_unit, 'name')}: "
+                + self._get_by_language(res_unit, name)
+            )
+        return "\n".join(instructions)
+
+    def _get_deny_reason(self):
+        return self._get_by_language(self.reservation.deny_reason, "reason")
+
+    def _get_cancel_reason(self):
+        return self._get_by_language(self.reservation.cancel_reason, "reason")
+
+    def _get_by_language(self, instance, field):
+        return getattr(
+            instance, f"{field}_{self.language}", getattr(instance, field, "")
+        )
 
     def _init_context_attr_map(self):
         self.context_attr_map = {}
