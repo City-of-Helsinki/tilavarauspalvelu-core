@@ -20,7 +20,9 @@ class ReservationEmailBaseTestCase(TestCase):
         cls.email_template = EmailTemplateFactory(
             type=EmailType.RESERVATION_CONFIRMED,
             content="This is the {{ reservation_number }} content",
+            content_en="This is the {{ reservation_number }} content in english",
             subject="Los subjectos {{ name }}",
+            subject_en="Los subjectos inglesa {{ name }}",
         )
 
         cls.unit = UnitFactory(name="The unit")
