@@ -42,6 +42,11 @@ class ReservationApproveTestCase(ReservationTestCaseBase):
             content="",
             subject="approved",
         )
+        EmailTemplateFactory(
+            type=EmailType.STAFF_NOTIFICATION_RESERVATION_MADE,
+            content="",
+            subject="staff reservation made",
+        )
 
     def get_handle_query(self):
         return """
@@ -88,8 +93,9 @@ class ReservationApproveTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.price).is_equal_to(
             Decimal("10.59")
         )  # Float does not cause abnormality.
-        assert_that(len(mail.outbox)).is_equal_to(1)
+        assert_that(len(mail.outbox)).is_equal_to(2)
         assert_that(mail.outbox[0].subject).is_equal_to("approved")
+        assert_that(mail.outbox[1].subject).is_equal_to("staff reservation made")
 
     def test_cant_approve_if_regular_user(self):
         self.client.force_login(self.regular_joe)
@@ -181,5 +187,6 @@ class ReservationApproveTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.price).is_equal_to(
             Decimal("10.59")
         )  # Float does not cause abnormality.
-        assert_that(len(mail.outbox)).is_equal_to(1)
+        assert_that(len(mail.outbox)).is_equal_to(2)
         assert_that(mail.outbox[0].subject).is_equal_to("approved")
+        assert_that(mail.outbox[1].subject).is_equal_to("staff reservation made")

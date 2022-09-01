@@ -14,6 +14,7 @@ from applications.models import City
 from email_notification.models import EmailType
 from email_notification.tests.factories import EmailTemplateFactory
 from opening_hours.tests.test_get_periods import get_mocked_periods
+from permissions.models import UnitRole
 from reservations.models import STATE_CHOICES, AgeGroup
 from reservations.tests.factories import ReservationFactory
 
@@ -43,6 +44,19 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         EmailTemplateFactory(
             type=EmailType.HANDLING_REQUIRED_RESERVATION, content="", subject="handling"
         )
+        EmailTemplateFactory(
+            type=EmailType.STAFF_NOTIFICATION_RESERVATION_MADE,
+            content="",
+            subject="staff reservation made",
+        )
+        EmailTemplateFactory(
+            type=EmailType.STAFF_NOTIFICATION_RESERVATION_REQUIRES_HANDLING,
+            content="",
+            subject="staff requires handling",
+        )
+
+        UnitRole
+        self.general_admin
 
     def get_confirm_query(self):
         return """
@@ -80,8 +94,9 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         )
         self.reservation.refresh_from_db()
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.CONFIRMED)
-        assert_that(len(mail.outbox)).is_equal_to(1)
+        assert_that(len(mail.outbox)).is_equal_to(2)
         assert_that(mail.outbox[0].subject).is_equal_to("confirmed")
+        assert_that(mail.outbox[1].subject).is_equal_to("staff reservation made")
 
     @override_settings(
         CELERY_TASK_ALWAYS_EAGER=True,
@@ -107,8 +122,9 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         )
         self.reservation.refresh_from_db()
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.REQUIRES_HANDLING)
-        assert_that(len(mail.outbox)).is_equal_to(1)
+        assert_that(len(mail.outbox)).is_equal_to(2)
         assert_that(mail.outbox[0].subject).is_equal_to("handling")
+        assert_that(mail.outbox[1].subject).is_equal_to("staff requires handling")
 
     @override_settings(
         CELERY_TASK_ALWAYS_EAGER=True,
@@ -140,8 +156,9 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
 
         self.reservation.refresh_from_db()
         assert_that(self.reservation.state).is_equal_to(STATE_CHOICES.REQUIRES_HANDLING)
-        assert_that(len(mail.outbox)).is_equal_to(1)
+        assert_that(len(mail.outbox)).is_equal_to(2)
         assert_that(mail.outbox[0].subject).is_equal_to("handling")
+        assert_that(mail.outbox[1].subject).is_equal_to("staff requires handling")
 
     def test_confirm_reservation_fails_if_state_is_not_created(
         self, mock_periods, mock_opening_hours

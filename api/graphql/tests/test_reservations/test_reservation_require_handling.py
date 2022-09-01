@@ -56,6 +56,11 @@ class RequireHandlingForReservationTestCase(ReservationTestCaseBase):
             content="",
             subject="handling",
         )
+        EmailTemplateFactory(
+            type=EmailType.STAFF_NOTIFICATION_RESERVATION_REQUIRES_HANDLING,
+            content="",
+            subject="staff requires handling",
+        )
 
     def get_require_handling_query(self):
         return """
@@ -94,8 +99,9 @@ class RequireHandlingForReservationTestCase(ReservationTestCaseBase):
         assert_that(self.confirmed_reservation.state).is_equal_to(
             STATE_CHOICES.REQUIRES_HANDLING
         )
-        assert_that(len(mail.outbox)).is_equal_to(1)
+        assert_that(len(mail.outbox)).is_equal_to(2)
         assert_that(mail.outbox[0].subject).is_equal_to("handling")
+        assert_that(mail.outbox[1].subject).is_equal_to("staff requires handling")
 
     @override_settings(
         CELERY_TASK_ALWAYS_EAGER=True,
