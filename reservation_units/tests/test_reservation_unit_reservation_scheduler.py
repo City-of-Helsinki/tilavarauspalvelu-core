@@ -18,10 +18,12 @@ from reservation_units.utils.reservation_unit_reservation_scheduler import (
 from reservations.models import STATE_CHOICES
 from reservations.tests.factories import ReservationFactory
 from spaces.tests.factories import SpaceFactory
+from utils.test_utils import skip_long_running
 
 DEFAULT_TIMEZONE = get_default_timezone()
 
 
+@pytest.mark.skipif(skip_long_running(), reason="Slow test")
 @pytest.mark.django_db
 @freeze_time("2022-01-01")
 @mock.patch("opening_hours.utils.opening_hours_client.get_opening_hours")

@@ -94,6 +94,9 @@ Locally:
 
 `deploy/entrypoint.sh test`
 
+Some tests take longer to run. If you want to skip these long running tests, you can define `SKIP_LONG_RUNNING` env:
+`SKIP_LONG_RUNNING=1 pytest`
+
 # Background processing
 
 Background processes are run with [Celery](https://docs.celeryproject.org/).
