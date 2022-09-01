@@ -152,6 +152,15 @@ class PaymentType(models.TextChoices):
     ON_SITE = "on_site"
 
 
+class ReservationUnitPaymentType(models.Model):
+    code = models.CharField(
+        verbose_name=_("Code"), max_length=32, blank=False, null=False, primary_key=True
+    )
+
+    def __str__(self):
+        return self.code
+
+
 class ReservationUnit(models.Model):
     sku = models.CharField(
         verbose_name=_("SKU"), max_length=255, blank=True, default=""
@@ -517,6 +526,8 @@ class ReservationUnit(models.Model):
         null=True,
         help_text="When pricing type is paid, what kind of payment types are available with this reservation unit.",
     )
+
+    payment_types = models.ManyToManyField(ReservationUnitPaymentType, blank=True)
 
     can_apply_free_of_charge = models.BooleanField(
         blank=True,
