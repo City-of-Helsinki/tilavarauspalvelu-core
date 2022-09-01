@@ -2,6 +2,7 @@ from assertpy import assert_that
 from django.conf import settings
 from django.test import override_settings
 
+from applications.models import CUSTOMER_TYPES
 from email_notification.models import EmailTemplate, EmailType
 from email_notification.sender.email_notification_builder import (
     EmailBuilderConfigError,
@@ -10,6 +11,8 @@ from email_notification.sender.email_notification_builder import (
 )
 from email_notification.tests.base import ReservationEmailBaseTestCase
 from email_notification.tests.factories import EmailTemplateFactory
+from reservation_units.tests.factories import ReservationUnitFactory
+from tilavarauspalvelu.utils.commons import LANGUAGES
 
 
 class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
@@ -22,6 +25,18 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
 
     def test_get_reservee_name(self):
         reservee_name_str = f"{self.reservation.reservee_first_name} {self.reservation.reservee_last_name}"
+        assert_that(self.builder._get_reservee_name()).is_equal_to(reservee_name_str)
+
+    def test_get_reservee_name_when_reservee_type_business(self):
+        self.reservation.reservee_type = CUSTOMER_TYPES.CUSTOMER_TYPE_BUSINESS
+        self.reservation.save()
+        reservee_name_str = self.reservation.reservee_organisation_name
+        assert_that(self.builder._get_reservee_name()).is_equal_to(reservee_name_str)
+
+    def test_get_reservee_name_when_reservee_type_nonprofit(self):
+        self.reservation.reservee_type = CUSTOMER_TYPES.CUSTOMER_TYPE_NONPROFIT
+        self.reservation.save()
+        reservee_name_str = self.reservation.reservee_organisation_name
         assert_that(self.builder._get_reservee_name()).is_equal_to(reservee_name_str)
 
     def test_get_begin_time(self):
@@ -40,6 +55,86 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
 
     def test_get_unit_name(self):
         assert_that(self.builder._get_unit_name()).is_equal_to(self.unit.name)
+
+    def test_get_reservation_unit_when_single(self):
+        assert_that(self.builder._get_reservation_unit()).is_equal_to(
+            self.reservation_unit.name
+        )
+
+    def test_get_reservation_unit_when_multiple(self):
+        res_unit_one = self.reservation_unit.name
+        res_unit = ReservationUnitFactory(
+            unit=self.unit,
+        )
+        res_unit_too = res_unit.name
+
+        self.reservation.reservation_unit.add(res_unit)
+        assert_that(self.builder._get_reservation_unit()).is_equal_to(
+            f"{res_unit_one}, {res_unit_too}"
+        )
+
+    def test_get_price(self):
+        assert_that(self.builder._get_price()).is_equal_to(self.reservation.price)
+
+    def test_get_tax_percentage(self):
+        assert_that(self.builder._get_tax_percentage()).is_equal_to(
+            self.reservation.tax_percentage_value
+        )
+
+    def test_get_confirmed_instructions(self):
+        assert_that(self.builder._get_confirmed_instructions()).contains(
+            self.reservation.reservation_unit.first().reservation_confirmed_instructions
+        )
+
+    def test_get_confirmed_instructions_en(self):
+        self.builder.language = LANGUAGES.EN
+        assert_that(self.builder._get_confirmed_instructions()).contains(
+            self.reservation.reservation_unit.first().reservation_confirmed_instructions_en
+        )
+
+    def test_get_pending_instructions(self):
+        assert_that(self.builder._get_pending_instructions()).contains(
+            self.reservation.reservation_unit.first().reservation_pending_instructions
+        )
+
+    def test_get_pending_instructions_en(self):
+        self.builder.language = LANGUAGES.EN
+        assert_that(self.builder._get_pending_instructions()).contains(
+            self.reservation.reservation_unit.first().reservation_pending_instructions_en
+        )
+
+    def test_get_cancelled_instructions(self):
+        assert_that(self.builder._get_cancelled_instructions()).contains(
+            self.reservation.reservation_unit.first().reservation_cancelled_instructions
+        )
+
+    def test_get_cancelled_instructions_en(self):
+        self.builder.language = LANGUAGES.EN
+        assert_that(self.builder._get_cancelled_instructions()).contains(
+            self.reservation.reservation_unit.first().reservation_cancelled_instructions_en
+        )
+
+    def test_get_deny_reason(self):
+        assert_that(self.builder._get_deny_reason()).is_equal_to(
+            self.reservation.deny_reason.reason
+        )
+
+    def test_get_deny_reason_en(self):
+        self.builder.language = LANGUAGES.EN
+        assert_that(self.builder._get_deny_reason()).is_equal_to(
+            self.reservation.deny_reason.reason_en
+        )
+
+    def test_get_cancel_reason(self):
+        assert_that(self.builder._get_cancel_reason()).is_equal_to(
+            self.reservation.cancel_reason.reason
+        )
+
+    def test_get_cancel_reason_en(self):
+        self.builder.language = LANGUAGES.EN
+        assert_that(self.builder._get_cancel_reason()).is_equal_to(
+            self.reservation.cancel_reason.reason_en
+        )
 
     @override_settings(
         EMAIL_TEMPLATE_CONTEXT_ATTRS=settings.EMAIL_TEMPLATE_CONTEXT_ATTRS
