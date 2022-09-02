@@ -59,17 +59,12 @@ class UserQueryTestCase(UserTestCaseBase):
             """
             query {
                 currentUser {
-                    totalCount
-                    edges {
-                        node {
-                            username
-                            firstName
-                            lastName
-                            email
-                            isSuperuser
-                            reservationNotification
-                        }
-                    }
+                    username
+                    firstName
+                    lastName
+                    email
+                    isSuperuser
+                    reservationNotification
                 }
             }
             """
@@ -105,23 +100,17 @@ class UserQueryTestCase(UserTestCaseBase):
             """
             query {
                 currentUser {
-                    totalCount
-                    edges {
-                        node {
-                            username
-                            generalRoles {
-                                role {
-                                    code
-                                    verboseName
-                                }
-                            }
+                    username
+                    generalRoles {
+                        role {
+                            code
+                            verboseName
                         }
                     }
                 }
             }
             """
         )
-
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
         self.assertMatchSnapshot(content)
@@ -145,19 +134,14 @@ class UserQueryTestCase(UserTestCaseBase):
             """
             query {
                 currentUser {
-                    totalCount
-                    edges {
-                        node {
-                            username
-                            serviceSectorRoles {
-                                role {
-                                    code
-                                    verboseName
-                                }
-                                serviceSector {
-                                    nameFi
-                                }
-                            }
+                    username
+                    serviceSectorRoles {
+                        role {
+                            code
+                            verboseName
+                        }
+                        serviceSector {
+                            nameFi
                         }
                     }
                 }
@@ -185,24 +169,19 @@ class UserQueryTestCase(UserTestCaseBase):
             """
             query {
                 currentUser {
-                    totalCount
-                    edges {
-                        node {
-                            username
-                            unitRoles {
-                                role {
-                                    code
-                                    verboseName
-                                }
-                                units {
-                                    nameFi
-                                }
-                                unitGroups {
-                                    name
-                                    units {
-                                        nameFi
-                                    }
-                                }
+                    username
+                    unitRoles {
+                        role {
+                            code
+                            verboseName
+                        }
+                        units {
+                            nameFi
+                        }
+                        unitGroups {
+                            name
+                            units {
+                                nameFi
                             }
                         }
                     }
