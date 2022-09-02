@@ -13,7 +13,9 @@ class UnitsFilterSet(django_filters.FilterSet):
     name_sv = django_filters.CharFilter(field_name="name_sv", lookup_expr="istartswith")
     service_sector = django_filters.NumberFilter(field_name="service_sectors__pk")
 
-    order_by = django_filters.OrderingFilter(fields=("name_fi", "name_en", "name_sv"))
+    order_by = django_filters.OrderingFilter(
+        fields=("name_fi", "name_en", "name_sv", "rank")
+    )
 
     def filter_by_pk(self, qs, property, value):
         if value:
