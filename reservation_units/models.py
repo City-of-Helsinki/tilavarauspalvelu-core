@@ -147,9 +147,9 @@ class PricingType(models.TextChoices):
 
 
 class PaymentType(models.TextChoices):
-    ONLINE = "online"
-    INVOICE = "invoice"
-    ON_SITE = "on_site"
+    ONLINE = "ONLINE"
+    INVOICE = "INVOICE"
+    ON_SITE = "ON_SITE"
 
 
 class ReservationUnitPaymentType(models.Model):
