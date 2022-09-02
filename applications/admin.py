@@ -104,6 +104,9 @@ class ApplicationRoundAdmin(admin.ModelAdmin):
     form = ApplicationRoundAdminForm
     model = ApplicationRound
     inlines = [ApplicationRoundStatusInline, ApplicationRoundBasketInline]
+    autocomplete_fields = [
+        "reservation_units",
+    ]
 
 
 @admin.register(City)
