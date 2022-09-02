@@ -18,7 +18,9 @@ def send_reservation_email_notification(
             f"Tried to send '{email_type}' notification but no template was defined",
             level="error",
         )
-    message_builder = ReservationEmailNotificationBuilder(reservation, mail_template)
+    message_builder = ReservationEmailNotificationBuilder(
+        reservation, mail_template, language=reservation.reservee_language
+    )
     subject = message_builder.get_subject()
     message = message_builder.get_content()
 

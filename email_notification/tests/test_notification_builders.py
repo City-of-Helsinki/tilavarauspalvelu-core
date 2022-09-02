@@ -87,7 +87,7 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
         )
 
     def test_get_confirmed_instructions_en(self):
-        self.builder.language = LANGUAGES.EN
+        self.builder._set_language(LANGUAGES.EN)
         assert_that(self.builder._get_confirmed_instructions()).contains(
             self.reservation.reservation_unit.first().reservation_confirmed_instructions_en
         )
@@ -98,7 +98,7 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
         )
 
     def test_get_pending_instructions_en(self):
-        self.builder.language = LANGUAGES.EN
+        self.builder._set_language(LANGUAGES.EN)
         assert_that(self.builder._get_pending_instructions()).contains(
             self.reservation.reservation_unit.first().reservation_pending_instructions_en
         )
@@ -109,7 +109,7 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
         )
 
     def test_get_cancelled_instructions_en(self):
-        self.builder.language = LANGUAGES.EN
+        self.builder._set_language(LANGUAGES.EN)
         assert_that(self.builder._get_cancelled_instructions()).contains(
             self.reservation.reservation_unit.first().reservation_cancelled_instructions_en
         )
@@ -120,7 +120,7 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
         )
 
     def test_get_deny_reason_en(self):
-        self.builder.language = LANGUAGES.EN
+        self.builder._set_language(LANGUAGES.EN)
         assert_that(self.builder._get_deny_reason()).is_equal_to(
             self.reservation.deny_reason.reason_en
         )
@@ -131,7 +131,7 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
         )
 
     def test_get_cancel_reason_en(self):
-        self.builder.language = LANGUAGES.EN
+        self.builder._set_language(LANGUAGES.EN)
         assert_that(self.builder._get_cancel_reason()).is_equal_to(
             self.reservation.cancel_reason.reason_en
         )
@@ -223,4 +223,11 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
         # Assert actually does not matter
         assert_that(actual_compiled_content_without_padding).is_equal_to(
             actual_compiled_content_with_padding
+        )
+
+    def test_language_defaults_to_fi_when_content_not_translated(self):
+        self.builder._set_language(LANGUAGES.SV)
+        assert_that(self.builder.language).is_equal_to(LANGUAGES.FI)
+        assert_that(self.builder._get_deny_reason()).is_equal_to(
+            self.reservation.deny_reason.reason_fi
         )

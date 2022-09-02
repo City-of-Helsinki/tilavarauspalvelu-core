@@ -39,11 +39,11 @@ class ReservationEmailNotificationBuilder:
     validator = EmailTemplateValidator
 
     def __init__(
-        self, reservation: Reservation, template: EmailTemplate, language=LANGUAGES.FI
+        self, reservation: Reservation, template: EmailTemplate, language=None
     ):
         self.reservation = reservation
         self.template = template
-        self.language = language
+        self._set_language(language or reservation.reservee_language)
         self._init_context_attr_map()
         self.validate_template()
 
@@ -141,6 +141,12 @@ class ReservationEmailNotificationBuilder:
             instance, f"{field}_{self.language}", getattr(instance, field, "")
         )
 
+    def _set_language(self, lang):
+        if getattr(self.template, f"content_{lang}", None):
+            self.language = lang
+        else:
+            self.language = LANGUAGES.FI
+
     def _init_context_attr_map(self):
         self.context_attr_map = {}
         for key in settings.EMAIL_TEMPLATE_CONTEXT_ATTRS:
@@ -168,15 +174,13 @@ class ReservationEmailNotificationBuilder:
         return Context(context_dict)
 
     def get_subject(self):
-        rendered = Template(template_string=self.template.subject).render(
-            context=self.get_context()
-        )
+        subject = self._get_by_language(self.template, "subject")
+        rendered = Template(template_string=subject).render(context=self.get_context())
         return rendered
 
     def get_content(self):
-        rendered = Template(template_string=self.template.content).render(
-            context=self.get_context()
-        )
+        content = self._get_by_language(self.template, "content")
+        rendered = Template(template_string=content).render(context=self.get_context())
         return rendered
 
 
