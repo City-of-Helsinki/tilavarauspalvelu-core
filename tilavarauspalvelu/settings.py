@@ -203,6 +203,7 @@ env = environ.Env(
     # Email
     EMAIL_HOST=(str, None),
     EMAIL_PORT=(str, django_default_email_port),
+    EMAIL_MAX_RECIPIENTS=(int, 100),
     SEND_RESERVATION_NOTIFICATION_EMAILS=(str, False),
     DEFAULT_FROM_EMAIL=(str, django_default_from_email),
     # Tprek
@@ -280,6 +281,7 @@ AUDIT_LOGGING_ENABLED = env("AUDIT_LOGGING_ENABLED")
 # Email settings
 EMAIL_HOST = env("EMAIL_HOST")
 EMAIL_PORT = env("EMAIL_PORT")
+EMAIL_MAX_RECIPIENTS = env("EMAIL_MAX_RECIPIENTS")
 DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL")
 EMAIL_TEMPLATE_CONTEXT_ATTRS = [
     "reservee_name",

@@ -3,11 +3,13 @@ from typing import Dict, List, Optional
 
 import snapshottest
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.utils.timezone import get_default_timezone
 
 from api.graphql.tests.base import GrapheneTestCaseBase
 from opening_hours.enums import State
 from opening_hours.hours import TimeElement
+from permissions.models import UnitRole, UnitRoleChoice, UnitRolePermission
 from reservation_units.models import ReservationUnit
 from reservation_units.tests.factories import (
     ReservationUnitFactory,
@@ -37,6 +39,25 @@ class ReservationTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCase):
             reservation_unit_type=cls.reservation_unit_type,
         )
         cls.purpose = ReservationPurposeFactory(name="purpose")
+
+        # Setup for reservation notification tests
+        cls.reservation_handler = get_user_model().objects.create(
+            username="res_handler",
+            first_name="Reservation",
+            last_name="Handler",
+            email="reservation.handler@foo.com",
+            reservation_notification="ALL",
+        )
+        cls.unit_role_choice = UnitRoleChoice.objects.create(code="reservation_manager")
+
+        cls.unit_role = UnitRole.objects.create(
+            role=cls.unit_role_choice, user=cls.reservation_handler
+        )
+        cls.unit_role.unit.add(cls.unit)
+
+        UnitRolePermission.objects.create(
+            role=cls.unit_role_choice, permission="can_manage_reservations"
+        )
 
     def get_mocked_opening_hours(
         self,
