@@ -118,6 +118,7 @@ from reservation_units.models import Equipment, EquipmentCategory, ReservationUn
 from reservations.models import Reservation
 from resources.models import Resource
 from spaces.models import Space, Unit
+from users.models import User
 
 from .application_rounds.application_round_types import ApplicationRoundType
 from .applications.application_mutations import (
@@ -295,26 +296,6 @@ class UnitsFilter(AuthFilter, django_filters.FilterSet):
     )
 
 
-class UsersFilter(AuthFilter, django_filters.FilterSet):
-    permission_classes = (
-        (UserPermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
-    )
-
-    @classmethod
-    def resolve_queryset(
-        cls, connection, iterable, info, args, filtering_args, filterset_class
-    ):
-        queryset = super().resolve_queryset(
-            connection, iterable, info, args, filtering_args, filterset_class
-        )
-
-        if not info.context.user:
-            return queryset.none()
-
-        current_user_pk = info.context.user.pk
-        return queryset.filter(pk=current_user_pk)
-
-
 class KeywordFilter(AuthFilter):
     permission_classes = (
         (KeywordPermission,) if not settings.TMP_PERMISSIONS_DISABLED else (AllowAny,)
@@ -470,7 +451,7 @@ class Query(graphene.ObjectType):
     units = UnitsFilter(UnitType, filterset_class=UnitsFilterSet)
     unit = relay.Node.Field(UnitType)
     unit_by_pk = Field(UnitByPkType, pk=graphene.Int())
-    current_user = UsersFilter(UserType)
+    current_user = Field(UserType)
 
     keyword_categories = KeywordFilter(KeywordCategoryType)
     keyword_groups = KeywordFilter(KeywordGroupType)
@@ -485,6 +466,10 @@ class Query(graphene.ObjectType):
     age_groups = AgeGroupFilter(AgeGroupType)
     cities = CityFilter(CityType)
     metadata_sets = ReservationMetadataSetFilter(ReservationMetadataSetType)
+
+    @check_resolver_permission(UserPermission)
+    def resolve_current_user(self, info, **kwargs):
+        return get_object_or_404(User, pk=info.context.user.pk)
 
     @check_resolver_permission(ReservationPermission)
     def resolve_reservation_by_pk(self, info, **kwargs):

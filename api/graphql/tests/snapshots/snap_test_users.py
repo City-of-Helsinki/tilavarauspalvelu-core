@@ -10,19 +10,12 @@ snapshots = Snapshot()
 snapshots['UserQueryTestCase::test_hide_reservation_notification_when_user_is_not_staff 1'] = {
     'data': {
         'currentUser': {
-            'edges': [
-                {
-                    'node': {
-                        'email': 'non-staff.admin@foo.com',
-                        'firstName': 'Non-Staff',
-                        'isSuperuser': False,
-                        'lastName': 'Admin',
-                        'reservationNotification': None,
-                        'username': 'non_staff_admin'
-                    }
-                }
-            ],
-            'totalCount': 1
+            'email': 'non-staff.admin@foo.com',
+            'firstName': 'Non-Staff',
+            'isSuperuser': False,
+            'lastName': 'Admin',
+            'reservationNotification': None,
+            'username': 'non_staff_admin'
         }
     }
 }
@@ -30,52 +23,48 @@ snapshots['UserQueryTestCase::test_hide_reservation_notification_when_user_is_no
 snapshots['UserQueryTestCase::test_show_general_roles 1'] = {
     'data': {
         'currentUser': {
-            'edges': [
+            'generalRoles': [
                 {
-                    'node': {
-                        'generalRoles': [
-                            {
-                                'role': {
-                                    'code': 'general_role',
-                                    'verboseName': ''
-                                }
-                            }
-                        ],
-                        'username': 'staff_admin'
+                    'role': {
+                        'code': 'general_role',
+                        'verboseName': ''
                     }
                 }
             ],
-            'totalCount': 1
+            'username': 'staff_admin'
         }
     }
 }
 
 snapshots['UserQueryTestCase::test_show_nothing_when_user_is_not_authenticated 1'] = {
     'data': {
-        'currentUser': {
-            'edges': [
+        'currentUser': None
+    },
+    'errors': [
+        {
+            'locations': [
+                {
+                    'column': 17,
+                    'line': 3
+                }
             ],
-            'totalCount': 0
+            'message': 'No User matches the given query.',
+            'path': [
+                'currentUser'
+            ]
         }
-    }
+    ]
 }
 
 snapshots['UserQueryTestCase::test_show_reservation_notification_when_user_is_staff 1'] = {
     'data': {
         'currentUser': {
-            'edges': [
-                {
-                    'node': {
-                        'email': 'staff.admin@foo.com',
-                        'firstName': 'Staff',
-                        'isSuperuser': False,
-                        'lastName': 'Admin',
-                        'reservationNotification': 'only_handling_required',
-                        'username': 'staff_admin'
-                    }
-                }
-            ],
-            'totalCount': 1
+            'email': 'staff.admin@foo.com',
+            'firstName': 'Staff',
+            'isSuperuser': False,
+            'lastName': 'Admin',
+            'reservationNotification': 'only_handling_required',
+            'username': 'staff_admin'
         }
     }
 }
@@ -83,25 +72,18 @@ snapshots['UserQueryTestCase::test_show_reservation_notification_when_user_is_st
 snapshots['UserQueryTestCase::test_show_service_sector_roles 1'] = {
     'data': {
         'currentUser': {
-            'edges': [
+            'serviceSectorRoles': [
                 {
-                    'node': {
-                        'serviceSectorRoles': [
-                            {
-                                'role': {
-                                    'code': 'TEST_SERVICE_SECTOR_ROLE',
-                                    'verboseName': 'Test Service Sector Role'
-                                },
-                                'serviceSector': {
-                                    'nameFi': 'Test Service Sector'
-                                }
-                            }
-                        ],
-                        'username': 'staff_admin'
+                    'role': {
+                        'code': 'TEST_SERVICE_SECTOR_ROLE',
+                        'verboseName': 'Test Service Sector Role'
+                    },
+                    'serviceSector': {
+                        'nameFi': 'Test Service Sector'
                     }
                 }
             ],
-            'totalCount': 1
+            'username': 'staff_admin'
         }
     }
 }
@@ -109,37 +91,30 @@ snapshots['UserQueryTestCase::test_show_service_sector_roles 1'] = {
 snapshots['UserQueryTestCase::test_show_unit_roles 1'] = {
     'data': {
         'currentUser': {
-            'edges': [
+            'unitRoles': [
                 {
-                    'node': {
-                        'unitRoles': [
-                            {
-                                'role': {
-                                    'code': 'TEST_UNIT_ROLE',
-                                    'verboseName': 'Test Unit Role'
-                                },
-                                'unitGroups': [
-                                    {
-                                        'name': 'Test Unit Group',
-                                        'units': [
-                                            {
-                                                'nameFi': 'Test Unit'
-                                            }
-                                        ]
-                                    }
-                                ],
-                                'units': [
-                                    {
-                                        'nameFi': 'Test Unit'
-                                    }
-                                ]
-                            }
-                        ],
-                        'username': 'staff_admin'
-                    }
+                    'role': {
+                        'code': 'TEST_UNIT_ROLE',
+                        'verboseName': 'Test Unit Role'
+                    },
+                    'unitGroups': [
+                        {
+                            'name': 'Test Unit Group',
+                            'units': [
+                                {
+                                    'nameFi': 'Test Unit'
+                                }
+                            ]
+                        }
+                    ],
+                    'units': [
+                        {
+                            'nameFi': 'Test Unit'
+                        }
+                    ]
                 }
             ],
-            'totalCount': 1
+            'username': 'staff_admin'
         }
     }
 }
