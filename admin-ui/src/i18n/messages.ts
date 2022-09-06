@@ -856,7 +856,7 @@ const translations: ITranslations = {
     createSpaces: ["Luo tiloja."],
     noOpeningHoursTitle: ["Toimipisteelle ei ole määritetty aukioloaikoja"],
     maintainOpeningHours: [
-      "Siirry päivittämään aukiolot Toimipisterekisterin kautta.",
+      "Siirry päivittämään toimipisteesi tiedot Toimipisterekisterin kautta.",
     ],
     noOpeningHours: [
       "Toimipisteellä täytyy olla aukioloajat, jotka ohjaavat käytön suunnittelua.",

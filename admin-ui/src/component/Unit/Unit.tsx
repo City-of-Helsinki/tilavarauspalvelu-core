@@ -156,7 +156,6 @@ const Unit = (): JSX.Element | null => {
   const { notifyError } = useNotification();
   const [isLoading, setIsLoading] = useState(true);
   const [unit, setUnit] = useState<UnitByPkType>();
-  const [hasOpeningHours, setOpeningHours] = useState(true);
   const [hasSpacesResources, setSpacesResources] = useState(true);
 
   const { t } = useTranslation();
@@ -169,7 +168,6 @@ const Unit = (): JSX.Element | null => {
     onCompleted: ({ unitByPk }) => {
       if (unitByPk) {
         setUnit(unitByPk);
-        setOpeningHours(Boolean(unitByPk.openingHours));
         setSpacesResources(Boolean(unitByPk?.spaces?.length));
       }
       setIsLoading(false);
@@ -246,20 +244,13 @@ const Unit = (): JSX.Element | null => {
             </BasicLink>
           </StyledNotification>
         ) : null}
-        {!hasOpeningHours ? (
-          <StyledNotification
-            type="alert"
-            label={t("Unit.noOpeningHoursTitle")}
-            size="large"
+        <div style={{ margin: "var(--spacing-s) 0" }}>
+          <ExternalLink
+            to={`https://asiointi.hel.fi/tprperhe/TPR/UI/ServicePoint/ServicePointEdit/${unit.tprekId}`}
           >
-            {t("Unit.noOpeningHours")}{" "}
-            <ExternalLink
-              to={`https://asiointi.hel.fi/tprperhe/TPR/UI/ServicePoint/ServicePointEdit/${unit.tprekId}`}
-            >
-              {t("Unit.maintainOpeningHours")}
-            </ExternalLink>
-          </StyledNotification>
-        ) : null}
+            {t("Unit.maintainOpeningHours")}
+          </ExternalLink>
+        </div>
         <HeadingLarge>{t("Unit.reservationUnitTitle")}</HeadingLarge>
         <Info>
           <div>
