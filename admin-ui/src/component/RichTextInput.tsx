@@ -89,7 +89,7 @@ const RichTextInput = ({
 }: Props): JSX.Element => {
   return (
     <Container $disabled={disabled} id={`${id}-container`}>
-      <HorisontalFlex>
+      <HorisontalFlex style={{ justifyContent: "space-between" }}>
         <Label htmlFor={id}>
           {label} {required ? <Asterix>*</Asterix> : null}
         </Label>
