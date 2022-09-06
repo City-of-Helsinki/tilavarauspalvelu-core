@@ -100,6 +100,7 @@ INSTALLED_APPS = [
     "terms_of_use",
     "email_notification",
     "django_celery_beat",
+    "adminsortable2",
 ]
 
 MIDDLEWARE = [
