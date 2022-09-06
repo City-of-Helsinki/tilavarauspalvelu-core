@@ -546,7 +546,7 @@ class ReservationUnit(models.Model):
         ordering = ("id",)
 
     def __str__(self):
-        return "{}".format(self.name)
+        return "{}, {}".format(self.name, getattr(self.unit, "name", ""))
 
     def get_location(self):
         # For now we assume that if reservation has multiple spaces they all have same location
