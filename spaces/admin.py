@@ -1,3 +1,4 @@
+from adminsortable2.admin import SortableAdminMixin
 from django.conf import settings
 from django.contrib import admin, messages
 from django.core.management import call_command
@@ -53,11 +54,12 @@ class SpaceAdmin(MPTTModelAdmin):
 
 
 @admin.register(Unit)
-class UnitAdmin(admin.ModelAdmin):
+class UnitAdmin(SortableAdminMixin, admin.ModelAdmin):
     model = Unit
     inlines = [LocationInline]
     actions = ["update_from_tprek"]
     search_fields = ["name", "tprek_id"]
+    ordering = ["rank"]
 
     @admin.action
     def update_from_tprek(self, request, queryset):

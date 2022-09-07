@@ -1,3 +1,4 @@
+from adminsortable2.admin import SortableAdminMixin
 from django.contrib import admin
 from django.forms import CharField, ModelForm
 from tinymce.widgets import TinyMCE
@@ -35,12 +36,14 @@ class ReservationUnitImageInline(admin.TabularInline):
 
 
 @admin.register(ReservationUnit)
-class ReservationUnitAdmin(admin.ModelAdmin):
+class ReservationUnitAdmin(SortableAdminMixin, admin.ModelAdmin):
     model = ReservationUnit
     form = ReservationUnitAdminForm
     inlines = [ReservationUnitImageInline]
     readonly_fields = ["uuid"]
     search_fields = ["name", "unit__name", "pk__iexact", "unit__service_sectors__name"]
+
+    ordering = ["rank"]
 
 
 @admin.register(ReservationUnitImage)

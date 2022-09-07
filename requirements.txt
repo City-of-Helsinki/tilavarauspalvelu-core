@@ -70,6 +70,7 @@ deprecation==2.1.0
 django==3.2.15
     # via
     #   -r requirements.in
+    #   django-admin-sortable2
     #   django-celery-beat
     #   django-cors-headers
     #   django-extra-fields
@@ -86,6 +87,8 @@ django==3.2.15
     #   easy-thumbnails
     #   graphene-django
     #   helsinki-profile-gdpr-api
+django-admin-sortable2==1.0.4
+    # via -r requirements.in
 django-auditlog==1.0a1
     # via -r requirements.in
 django-celery-beat==2.3.0

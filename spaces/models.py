@@ -108,6 +108,12 @@ class Unit(models.Model):
     hauki_resource_id = models.CharField(
         verbose_name=_("Hauki resource id"), max_length=255, blank=True, null=True
     )
+    rank = models.PositiveIntegerField(
+        blank=True,
+        null=True,
+        verbose_name=_("Order number"),
+        help_text=_("Order number to be use in api sorting."),
+    )
 
     def __str__(self):
         return self.name
