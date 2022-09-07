@@ -255,6 +255,15 @@ def get_units_where_can_view_reservations(user: User) -> QuerySet:
     units = user.unit_roles.filter(
         role__permissions__permission=permission
     ).values_list("unit", flat=True)
+    unit_groups = user.unit_roles.filter(
+        role__permissions__permission=permission
+    ).values_list("unit_group")
+
+    units = (
+        Unit.objects.filter(Q(unit_groups__in=unit_groups) | Q(id__in=units))
+        .distinct()
+        .values_list("id", flat=True)
+    )
 
     return units
 

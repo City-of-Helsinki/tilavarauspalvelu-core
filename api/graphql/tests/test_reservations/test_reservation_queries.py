@@ -422,6 +422,19 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         assert_that(content.get("errors")).is_none()
         self.assertMatchSnapshot(content)
 
+    def test_filter_only_with_permission_unit_group_admin_viewer(self):
+        self.create_reservation_by_admin()
+
+        self.client.force_login(self.reservation_viewer)
+        response = self.query(
+            self.get_query_with_personal_fields(
+                """reservations(onlyWithPermission:true, orderBy:"name")"""
+            )
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
     def test_filter_by_user(self):
         self.create_reservation_by_admin()
         self.client.force_login(self.general_admin)
