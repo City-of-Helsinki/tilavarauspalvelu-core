@@ -40,7 +40,7 @@ class ReservationUnitAdmin(admin.ModelAdmin):
     form = ReservationUnitAdminForm
     inlines = [ReservationUnitImageInline]
     readonly_fields = ["uuid"]
-    search_fields = ["name", "unit__name", "pk__exact", "unit__service_sectors__name"]
+    search_fields = ["name", "unit__name", "pk__iexact", "unit__service_sectors__name"]
 
 
 @admin.register(ReservationUnitImage)
