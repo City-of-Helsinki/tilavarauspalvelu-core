@@ -518,15 +518,6 @@ class ReservationUnit(models.Model):
         help_text="What kind of pricing types are available with this reservation unit.",
     )
 
-    payment_type = models.CharField(
-        max_length=20,
-        verbose_name=_("Payment type"),
-        choices=PaymentType.choices,
-        blank=True,
-        null=True,
-        help_text="When pricing type is paid, what kind of payment types are available with this reservation unit.",
-    )
-
     payment_types = models.ManyToManyField(ReservationUnitPaymentType, blank=True)
 
     can_apply_free_of_charge = models.BooleanField(
