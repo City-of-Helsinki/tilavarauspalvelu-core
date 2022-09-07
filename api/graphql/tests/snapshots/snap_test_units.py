@@ -7,7 +7,40 @@ from snapshottest import Snapshot
 
 snapshots = Snapshot()
 
-snapshots['UnitsUpdateTestCase::test_getting_units 1'] = {
+snapshots['UnitsQueryTestCase::test_getting_only_with_permission_when_service_sector_admin 1'] = {
+    'data': {
+        'units': {
+            'edges': [
+                {
+                    'node': {
+                        'nameFi': 'Service sector unit'
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['UnitsQueryTestCase::test_getting_only_with_permission_when_unit_admin 1'] = {
+    'data': {
+        'units': {
+            'edges': [
+                {
+                    'node': {
+                        'nameFi': 'Test unit'
+                    }
+                },
+                {
+                    'node': {
+                        'nameFi': "Show me! I'm from unit group"
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['UnitsQueryTestCase::test_getting_units 1'] = {
     'data': {
         'units': {
             'edges': [
@@ -39,7 +72,7 @@ snapshots['UnitsUpdateTestCase::test_getting_units 1'] = {
     }
 }
 
-snapshots['UnitsUpdateTestCase::test_getting_units_filtered_by_name 1'] = {
+snapshots['UnitsQueryTestCase::test_getting_units_filtered_by_name 1'] = {
     'data': {
         'units': {
             'edges': [
@@ -53,7 +86,7 @@ snapshots['UnitsUpdateTestCase::test_getting_units_filtered_by_name 1'] = {
     }
 }
 
-snapshots['UnitsUpdateTestCase::test_getting_units_filtered_by_service_sector 1'] = {
+snapshots['UnitsQueryTestCase::test_getting_units_filtered_by_service_sector 1'] = {
     'data': {
         'units': {
             'edges': [
@@ -72,7 +105,7 @@ snapshots['UnitsUpdateTestCase::test_getting_units_filtered_by_service_sector 1'
     }
 }
 
-snapshots['UnitsUpdateTestCase::test_getting_units_sorted_by_name_asc 1'] = {
+snapshots['UnitsQueryTestCase::test_getting_units_sorted_by_name_asc 1'] = {
     'data': {
         'units': {
             'edges': [
@@ -101,7 +134,7 @@ snapshots['UnitsUpdateTestCase::test_getting_units_sorted_by_name_asc 1'] = {
     }
 }
 
-snapshots['UnitsUpdateTestCase::test_getting_units_sorted_by_name_desc 1'] = {
+snapshots['UnitsQueryTestCase::test_getting_units_sorted_by_name_desc 1'] = {
     'data': {
         'units': {
             'edges': [
