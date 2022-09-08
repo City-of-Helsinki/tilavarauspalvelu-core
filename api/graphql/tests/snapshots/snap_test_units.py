@@ -34,6 +34,11 @@ snapshots['UnitsQueryTestCase::test_getting_only_with_permission_when_unit_admin
                     'node': {
                         'nameFi': "Show me! I'm from unit group"
                     }
+                },
+                {
+                    'node': {
+                        'nameFi': "Me too, i'm just a jUnit"
+                    }
                 }
             ]
         }

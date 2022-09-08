@@ -42,7 +42,7 @@ class UnitsFilterSet(django_filters.FilterSet):
 
         return qs.filter(
             Q(id__in=user.unit_roles.values_list("unit", flat=True))
-            | Q(id__in=user.unit_roles.values_list("unit_group", flat=True))
+            | Q(unit_groups__in=user.unit_roles.values_list("unit_group", flat=True))
             | Q(
                 id__in=Unit.objects.filter(
                     service_sectors__in=user.service_sector_roles.values_list(
