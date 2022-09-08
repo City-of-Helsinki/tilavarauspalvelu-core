@@ -27,6 +27,7 @@ from permissions.api_permissions.drf_permissions import (
 from reservation_units.models import (
     Equipment,
     EquipmentCategory,
+    Purpose,
     ReservationUnit,
     ReservationUnitImage,
     ReservationUnitType,
@@ -38,7 +39,7 @@ from spaces.models import District, Space, Unit
 
 class ReservationUnitFilter(filters.FilterSet):
     purpose = filters.ModelMultipleChoiceFilter(
-        field_name="reservation_purposes", queryset=ReservationPurpose.objects.all()
+        field_name="purposes", queryset=Purpose.objects.all()
     )
     application_round = filters.ModelMultipleChoiceFilter(
         field_name="application_rounds",
@@ -64,6 +65,15 @@ class ReservationUnitFilter(filters.FilterSet):
 class ReservationPurposeSerializer(serializers.ModelSerializer):
     class Meta:
         model = ReservationPurpose
+        fields = [
+            "id",
+            "name",
+        ]
+
+
+class PurposeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Purpose
         fields = [
             "id",
             "name",
@@ -124,9 +134,7 @@ class ReservationUnitSerializer(TranslatedModelSerializer):
         many=True,
         help_text="Services included in the reservation unit as nested related objects.",
     )
-    purposes = ReservationPurposeSerializer(
-        many=True, read_only=True, source="reservation_purposes"
-    )
+    purposes = PurposeSerializer(many=True, read_only=True)
     images = ReservationUnitImageSerializer(
         read_only=True,
         many=True,
@@ -246,7 +254,6 @@ class ReservationUnitViewSet(viewsets.ModelViewSet):
             .select_related("reservation_unit_type", "unit")
             .prefetch_related(
                 "services",
-                "reservation_purposes",
                 "images",
                 "unit",
                 Prefetch("equipments", queryset=Equipment.objects.all().only("id")),

@@ -58,11 +58,6 @@ class ServiceSector(models.Model):
     units = models.ManyToManyField(
         "Unit", verbose_name=_("Units"), related_name="service_sectors"
     )
-    purposes = models.ManyToManyField(
-        "reservations.ReservationPurpose",
-        verbose_name=_("Purposes"),
-        related_name="service_sectors",
-    )
 
     def __str__(self):
         return self.name
