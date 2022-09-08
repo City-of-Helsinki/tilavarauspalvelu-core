@@ -5,12 +5,19 @@ from assertpy import assert_that
 from django.contrib.auth import get_user_model
 from graphene_django.utils import GraphQLTestCase
 
-from permissions.models import UnitRole, UnitRoleChoice, UnitRolePermission
+from permissions.models import (
+    ServiceSectorRole,
+    ServiceSectorRoleChoice,
+    ServiceSectorRolePermission,
+    UnitRole,
+    UnitRoleChoice,
+    UnitRolePermission,
+)
 from spaces.models import Unit
 from spaces.tests.factories import ServiceSectorFactory, UnitFactory
 
 
-class UnitQueryTestCaseBase(GraphQLTestCase, snapshottest.TestCase):
+class UnitTestCaseBase(GraphQLTestCase, snapshottest.TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.unit = UnitFactory(
@@ -22,6 +29,7 @@ class UnitQueryTestCaseBase(GraphQLTestCase, snapshottest.TestCase):
             phone="+358 12 34567",
         )
 
+        # Unit permissions and role setup
         cls.unit_admin = get_user_model().objects.create(
             username="gen_admin",
             first_name="Admin",
@@ -29,8 +37,10 @@ class UnitQueryTestCaseBase(GraphQLTestCase, snapshottest.TestCase):
             email="amin.general@foo.com",
         )
         unit_role_choice = UnitRoleChoice.objects.get(code="admin")
-        unit_role = UnitRole.objects.create(user=cls.unit_admin, role=unit_role_choice)
-        unit_role.unit.add(cls.unit)
+        cls.unit_role = UnitRole.objects.create(
+            user=cls.unit_admin, role=unit_role_choice
+        )
+        cls.unit_role.unit.add(cls.unit)
         UnitRolePermission.objects.create(
             role=unit_role_choice, permission="can_manage_units"
         )
@@ -42,11 +52,11 @@ class UnitQueryTestCaseBase(GraphQLTestCase, snapshottest.TestCase):
             email="joe.regularl@foo.com",
         )
 
+
+class UnitsUpdateTestCase(UnitTestCaseBase):
     def get_update_query(self):
         return "mutation updateUnit($input: UnitUpdateMutationInput!) {updateUnit(input: $input){pk}}"
 
-
-class UnitsUpdateTestCase(UnitQueryTestCaseBase):
     def test_admin_can_update_unit(self):
         self.client.force_login(self.unit_admin)
         desc = "Awesomeunit"
@@ -79,6 +89,8 @@ class UnitsUpdateTestCase(UnitQueryTestCaseBase):
             "Test description"
         )
 
+
+class UnitsQueryTestCase(UnitTestCaseBase):
     def test_getting_units(self):
         response = self.query(
             """
@@ -198,6 +210,74 @@ class UnitsUpdateTestCase(UnitQueryTestCaseBase):
             """
             query {
                 units(serviceSector:123) {
+                    edges {
+                        node {
+                            nameFi
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+
+        self.assertMatchSnapshot(content)
+
+    def test_getting_only_with_permission_when_unit_admin(self):
+        self.client.force_login(self.unit_admin)
+        UnitFactory.create(name="Don't show me")
+        UnitFactory.create(name="And specially don't show me!")
+        unit = UnitFactory.create(name="Show me! I'm from unit group")
+        self.unit_role.unit.add(unit)
+        response = self.query(
+            """
+            query {
+                units(onlyWithPermission: true) {
+                    edges {
+                        node {
+                            nameFi
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(content.get("errors")).is_none()
+
+        self.assertMatchSnapshot(content)
+
+    def test_getting_only_with_permission_when_service_sector_admin(self):
+        UnitFactory.create(name="Don't show me")
+        UnitFactory.create(name="And specially don't show me!")
+
+        # Service sector permission and role setup
+        ss_unit = UnitFactory(name="Service sector unit")
+        service_sector = ServiceSectorFactory(units=[ss_unit])
+
+        service_sector_admin = get_user_model().objects.create(
+            username="service_sector_admin",
+            first_name="Admin",
+            last_name="service sector",
+            email="serv.icsector@foo.com",
+        )
+        ss_role_choice = ServiceSectorRoleChoice.objects.get(code="admin")
+        ServiceSectorRole.objects.create(
+            user=service_sector_admin,
+            role=ss_role_choice,
+            service_sector=service_sector,
+        )
+        ServiceSectorRolePermission.objects.create(
+            role=ss_role_choice, permission="can_manage_units"
+        )
+
+        self.client.force_login(service_sector_admin)
+
+        response = self.query(
+            """
+            query {
+                units(onlyWithPermission: true) {
                     edges {
                         node {
                             nameFi
