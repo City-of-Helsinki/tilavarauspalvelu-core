@@ -206,12 +206,6 @@ class ReservationUnit(models.Model):
         blank=True,
     )
 
-    reservation_purposes = models.ManyToManyField(
-        "reservations.ReservationPurpose",
-        verbose_name=_("ReservationPurposes"),
-        related_name="reservation_units",
-        blank=True,
-    )
     reservation_unit_type = models.ForeignKey(
         ReservationUnitType,
         verbose_name=_("Type"),

@@ -378,10 +378,6 @@ class ApplicationType(QueryPerformanceOptimizerMixin, AuthNode, PrimaryKeyObject
                                                     "prefetch_for_parent",
                                                     "reservation_unit__services",
                                                 ),
-                                                "reservationPurposes": (
-                                                    "prefetch_for_parent",
-                                                    "reservation_unit__reservation_purposes",
-                                                ),
                                                 "images": (
                                                     "prefetch_for_parent",
                                                     "reservation_unit__images",

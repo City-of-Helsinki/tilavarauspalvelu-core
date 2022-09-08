@@ -79,7 +79,6 @@ class ApplicationViewSet(viewsets.ModelViewSet):
             .prefetch_related(
                 "reservation_unit__resources",
                 "reservation_unit__services",
-                "reservation_unit__reservation_purposes",
                 "reservation_unit__images",
                 "reservation_unit__equipments",
                 Prefetch(
@@ -178,7 +177,6 @@ class ApplicationEventViewSet(viewsets.ModelViewSet):
             .prefetch_related(
                 "reservation_unit__resources",
                 "reservation_unit__services",
-                "reservation_unit__reservation_purposes",
                 "reservation_unit__images",
                 "reservation_unit__equipments",
                 Prefetch(

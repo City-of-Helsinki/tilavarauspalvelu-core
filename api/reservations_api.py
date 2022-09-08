@@ -253,7 +253,6 @@ class ReservationViewSet(viewsets.ModelViewSet):
                     .select_related("reservation_unit_type", "unit")
                     .prefetch_related(
                         "services",
-                        "reservation_purposes",
                         "images",
                         "unit",
                         Prefetch(
@@ -453,7 +452,6 @@ class RecurringReservationViewSet(viewsets.ReadOnlyModelViewSet):
                                 .select_related("reservation_unit_type", "unit")
                                 .prefetch_related(
                                     "services",
-                                    "reservation_purposes",
                                     "images",
                                     "unit",
                                     Prefetch(
