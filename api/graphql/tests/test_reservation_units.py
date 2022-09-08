@@ -126,9 +126,9 @@ class ReservationUnitQueryTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCa
             reservations_min_days_before=1,
             pricing_terms=TermsOfUseFactory(terms_type=TermsOfUse.TERMS_TYPE_PRICING),
             pricing_type=PricingType.PAID,
-            payment_type=PaymentType.ONLINE,
         )
         cls.reservation_unit.qualifiers.set([qualifier])
+        cls.reservation_unit.payment_types.set([PaymentType.ONLINE])
 
         cls.api_client = APIClient()
 
@@ -252,7 +252,9 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
                                 termsType
                             }
                             pricingType
-                            paymentType
+                            paymentTypes {
+                                code
+                            }
                           }
                         }
                     }
@@ -2815,14 +2817,14 @@ class ReservationUnitCreateAsDraftTestCase(ReservationUnitMutationsTestCaseBase)
         assert_that(created_unit.pricing_type).is_equal_to(PricingType.PAID)
         assert_that(created_unit.pricing_terms).is_equal_to(self.pricing_term)
 
-    def test_create_with_payment_type(self):
+    def test_create_with_payment_types(self):
         self.client.force_login(self.general_admin)
         data = {
             "isDraft": True,
             "nameFi": "Unit with pricing fields",
             "unitPk": self.unit.id,
             "pricingType": "PAID",
-            "paymentType": "ON_SITE",
+            "paymentTypes": ["ON_SITE", "INVOICE"],
         }
         response = self.query(self.get_create_query(), input_data=data)
         assert_that(response.status_code).is_equal_to(200)
@@ -2836,9 +2838,15 @@ class ReservationUnitCreateAsDraftTestCase(ReservationUnitMutationsTestCaseBase)
         created_unit = ReservationUnit.objects.get(
             pk=content.get("data").get("createReservationUnit").get("pk")
         )
+        unit_payment_type_codes = list(
+            map(lambda ptype: ptype.code, created_unit.payment_types.all())
+        )
         assert_that(created_unit).is_not_none()
         assert_that(created_unit.pricing_type).is_equal_to(PricingType.PAID)
-        assert_that(created_unit.payment_type).is_equal_to(PaymentType.ON_SITE)
+
+        assert_that(unit_payment_type_codes).contains_only(
+            PaymentType.ON_SITE.value, PaymentType.INVOICE.value
+        )
 
     def test_create_with_instructions(self):
         data = {
@@ -3459,11 +3467,11 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         assert_that(created_unit.pricing_type).is_equal_to(PricingType.PAID)
         assert_that(created_unit.pricing_terms).is_equal_to(self.pricing_term)
 
-    def test_create_with_payment_type(self):
+    def test_create_with_payment_types(self):
         self.client.force_login(self.general_admin)
         data = self.get_valid_data()
         data["pricingType"] = "PAID"
-        data["paymentType"] = "ONLINE"
+        data["paymentTypes"] = ["ONLINE", "INVOICE"]
 
         response = self.query(self.get_create_query(), input_data=data)
         assert_that(response.status_code).is_equal_to(200)
@@ -3477,9 +3485,14 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         created_unit = ReservationUnit.objects.get(
             pk=content.get("data").get("createReservationUnit").get("pk")
         )
+        unit_payment_type_codes = list(
+            map(lambda ptype: ptype.code, created_unit.payment_types.all())
+        )
         assert_that(created_unit).is_not_none()
         assert_that(created_unit.pricing_type).is_equal_to(PricingType.PAID)
-        assert_that(created_unit.payment_type).is_equal_to(PaymentType.ONLINE)
+        assert_that(unit_payment_type_codes).contains_only(
+            PaymentType.ONLINE.value, PaymentType.INVOICE.value
+        )
 
     def test_create_with_instructions(self):
         self.client.force_login(self.general_admin)
@@ -3801,11 +3814,11 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
         assert_that(created_unit.pricing_type).is_equal_to(PricingType.PAID)
         assert_that(created_unit.pricing_terms).is_equal_to(self.pricing_term)
 
-    def test_update_with_payment_type(self):
+    def test_update_with_payment_types(self):
         self.client.force_login(self.general_admin)
         data = self.get_valid_update_data()
         data["pricingType"] = "PAID"
-        data["paymentType"] = "INVOICE"
+        data["paymentTypes"] = ["INVOICE", "ONLINE"]
 
         response = self.query(self.get_update_query(), input_data=data)
         assert_that(response.status_code).is_equal_to(200)
@@ -3816,12 +3829,18 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
             content.get("data").get("updateReservationUnit").get("pk")
         ).is_not_none()
 
-        created_unit = ReservationUnit.objects.get(
+        updated_unit = ReservationUnit.objects.get(
             pk=content.get("data").get("updateReservationUnit").get("pk")
         )
-        assert_that(created_unit).is_not_none()
-        assert_that(created_unit.pricing_type).is_equal_to(PricingType.PAID)
-        assert_that(created_unit.payment_type).is_equal_to(PaymentType.INVOICE)
+
+        unit_payment_type_codes = list(
+            map(lambda ptype: ptype.code, updated_unit.payment_types.all())
+        )
+        assert_that(updated_unit).is_not_none()
+        assert_that(updated_unit.pricing_type).is_equal_to(PricingType.PAID)
+        assert_that(unit_payment_type_codes).contains_only(
+            PaymentType.ONLINE.value, PaymentType.INVOICE.value
+        )
 
     def test_update_with_instructions(self):
         self.client.force_login(self.general_admin)
@@ -4398,11 +4417,11 @@ class ReservationUnitUpdateNotDraftTestCase(ReservationUnitMutationsTestCaseBase
         assert_that(created_unit.pricing_type).is_equal_to(PricingType.PAID)
         assert_that(created_unit.pricing_terms).is_equal_to(self.pricing_term)
 
-    def test_update_with_payment_type(self):
+    def test_update_with_payment_types(self):
         self.client.force_login(self.general_admin)
         data = self.get_valid_update_data()
         data["pricingType"] = "PAID"
-        data["paymentType"] = "ON_SITE"
+        data["paymentTypes"] = ["ON_SITE", "INVOICE"]
 
         response = self.query(self.get_update_query(), input_data=data)
         assert_that(response.status_code).is_equal_to(200)
@@ -4413,12 +4432,17 @@ class ReservationUnitUpdateNotDraftTestCase(ReservationUnitMutationsTestCaseBase
             content.get("data").get("updateReservationUnit").get("pk")
         ).is_not_none()
 
-        created_unit = ReservationUnit.objects.get(
+        updated_unit = ReservationUnit.objects.get(
             pk=content.get("data").get("updateReservationUnit").get("pk")
         )
-        assert_that(created_unit).is_not_none()
-        assert_that(created_unit.pricing_type).is_equal_to(PricingType.PAID)
-        assert_that(created_unit.payment_type).is_equal_to(PaymentType.ON_SITE)
+        unit_payment_type_codes = list(
+            map(lambda ptype: ptype.code, updated_unit.payment_types.all())
+        )
+        assert_that(updated_unit).is_not_none()
+        assert_that(updated_unit.pricing_type).is_equal_to(PricingType.PAID)
+        assert_that(unit_payment_type_codes).contains_only(
+            PaymentType.ON_SITE.value, PaymentType.INVOICE.value
+        )
 
     def test_update_with_instructions(self):
         self.client.force_login(self.general_admin)

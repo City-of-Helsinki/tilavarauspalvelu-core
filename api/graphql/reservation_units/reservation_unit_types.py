@@ -55,6 +55,7 @@ from reservation_units.models import (
     ReservationUnit,
     ReservationUnitCancellationRule,
     ReservationUnitImage,
+    ReservationUnitPaymentType,
 )
 from reservation_units.models import ReservationUnitType as ReservationUnitTypeModel
 from reservation_units.models import TaxPercentage
@@ -286,6 +287,16 @@ class EquipmentType(AuthNode, PrimaryKeyObjectType):
         return self.category
 
 
+class ReservationUnitPaymentTypeType(AuthNode, PrimaryKeyObjectType):
+    code = graphene.Field(graphene.String)
+
+    class Meta:
+        model = ReservationUnitPaymentType
+        fields = ["code"]
+        interfaces = (graphene.relay.Node,)
+        connection_class = TilavarausBaseConnection
+
+
 class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
     spaces = graphene.List(SpaceType)
     resources = graphene.List(ResourceType)
@@ -322,6 +333,7 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
     buffer_time_after = Duration()
     metadata_set = graphene.Field(ReservationMetadataSetType)
     state = graphene.Field(graphene.Enum.from_enum(ReservationUnitState))
+    payment_types = graphene.List(ReservationUnitPaymentTypeType)
 
     permission_classes = (
         (ReservationUnitPermission,)
@@ -375,7 +387,7 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
             "rank",
             "reservation_kind",
             "pricing_type",
-            "payment_type",
+            "payment_types",
             "can_apply_free_of_charge",
             "reservations_max_days_before",
             "reservations_min_days_before",
@@ -445,6 +457,9 @@ class ReservationUnitType(AuthNode, PrimaryKeyObjectType):
 
     def resolve_keyword_groups(self, info):
         return KeywordGroup.objects.filter(reservation_units=self.id)
+
+    def resolve_payment_types(self, info):
+        return self.payment_types.all()
 
     @check_resolver_permission(ReservationPermission)
     def resolve_reservations(
@@ -532,7 +547,7 @@ class ReservationUnitByPkType(ReservationUnitType, OpeningHoursMixin):
             "rank",
             "reservation_kind",
             "pricing_type",
-            "payment_type",
+            "payment_types",
             "can_apply_free_of_charge",
             "reservations_max_days_before",
             "reservations_min_days_before",

@@ -1,3 +1,5 @@
+from typing import List
+
 from django.core import validators
 from graphene.utils.str_converters import to_camel_case
 from rest_framework import serializers
@@ -10,6 +12,7 @@ from api.graphql.choice_char_field import ChoiceCharField
 from api.graphql.duration_field import DurationField
 from api.graphql.primary_key_fields import IntegerPrimaryKeyField
 from api.graphql.translate_fields import get_all_translatable_fields
+from api.graphql.validating_list_field import ValidatingListField
 from api.reservation_units_api import (
     EquipmentCategorySerializer,
     EquipmentSerializer,
@@ -18,7 +21,6 @@ from api.reservation_units_api import (
 from reservation_units.models import (
     Equipment,
     EquipmentCategory,
-    PaymentType,
     PricingType,
     Purpose,
     Qualifier,
@@ -26,6 +28,7 @@ from reservation_units.models import (
     ReservationUnit,
     ReservationUnitCancellationRule,
     ReservationUnitImage,
+    ReservationUnitPaymentType,
     ReservationUnitType,
     TaxPercentage,
 )
@@ -34,6 +37,15 @@ from resources.models import Resource
 from services.models import Service
 from spaces.models import Space, Unit
 from terms_of_use.models import TermsOfUse
+
+
+def get_payment_type_codes() -> List[str]:
+    return list(
+        map(
+            lambda payment_type: payment_type.code,
+            ReservationUnitPaymentType.objects.all(),
+        )
+    )
 
 
 class EquipmentCreateSerializer(EquipmentSerializer, PrimaryKeySerializer):
@@ -258,12 +270,15 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
         ),
     )
 
-    payment_type = ChoiceCharField(
+    payment_types = ValidatingListField(
+        child=serializers.PrimaryKeyRelatedField(
+            queryset=ReservationUnitPaymentType.objects.all()
+        ),
+        allow_empty=True,
         required=False,
-        choices=PaymentType.choices,
         help_text=(
-            "If pricing type is PAID, what kind of payment type this reservation unit has. Possible values are "
-            f"{', '.join(value.upper() for value in PaymentType)}."
+            "What kind of payment types this reservation unit has. Possible values are "
+            f"{', '.join(value for value in get_payment_type_codes())}"
         ),
     )
 
@@ -326,7 +341,7 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
             "pricing_terms_pk",
             "pricing_terms",
             "pricing_type",
-            "payment_type",
+            "payment_types",
         ] + get_all_translatable_fields(ReservationUnit)
 
     def __init__(self, *args, **kwargs):
