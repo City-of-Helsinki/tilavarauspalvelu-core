@@ -17,7 +17,7 @@ from reservation_units.tests.factories import (
 )
 from reservations.models import ReservationMetadataField, ReservationMetadataSet
 from reservations.tests.factories import ReservationPurposeFactory
-from spaces.tests.factories import SpaceFactory, UnitFactory
+from spaces.tests.factories import SpaceFactory, UnitFactory, UnitGroupFactory
 
 DEFAULT_TIMEZONE = get_default_timezone()
 
@@ -57,6 +57,26 @@ class ReservationTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCase):
 
         UnitRolePermission.objects.create(
             role=cls.unit_role_choice, permission="can_manage_reservations"
+        )
+
+        cls.reservation_viewer = get_user_model().objects.create(
+            username="res_viewer",
+            first_name="Reservation",
+            last_name="Viewer",
+            email="reservation.viewer@foo.com",
+            reservation_notification="ALL",
+        )
+        unit_group_viewer_role_choice = UnitRoleChoice.objects.get(code="viewer")
+
+        cls.unit_group_role = UnitRole.objects.create(
+            role=unit_group_viewer_role_choice, user=cls.reservation_viewer
+        )
+
+        cls.unit_group = UnitGroupFactory(units=[cls.unit])
+        cls.unit_group_role.unit_group.add(cls.unit_group)
+
+        UnitRolePermission.objects.create(
+            role=unit_group_viewer_role_choice, permission="can_view_reservations"
         )
 
     def get_mocked_opening_hours(
