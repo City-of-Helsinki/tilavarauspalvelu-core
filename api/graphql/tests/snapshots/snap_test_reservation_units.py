@@ -40,6 +40,58 @@ snapshots['ReservationUnitQueryTestCase::test_filter_by_pk_single_value 1'] = {
     }
 }
 
+snapshots['ReservationUnitQueryTestCase::test_filter_only_with_permission_general_admin_admin 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'nameFi': 'test name fi'
+                    }
+                },
+                {
+                    'node': {
+                        'nameFi': "I'm in the results with the other one too."
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitQueryTestCase::test_filter_only_with_permission_service_sector_admin 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'nameFi': 'I should be in the result'
+                    }
+                }
+            ]
+        }
+    }
+}
+
+snapshots['ReservationUnitQueryTestCase::test_filter_only_with_permission_unit_admin 1'] = {
+    'data': {
+        'reservationUnits': {
+            'edges': [
+                {
+                    'node': {
+                        'nameFi': "I'm in result since i'm in the group"
+                    }
+                },
+                {
+                    'node': {
+                        'nameFi': 'I should be in the result'
+                    }
+                }
+            ]
+        }
+    }
+}
+
 snapshots['ReservationUnitQueryTestCase::test_filtering_by_active_application_rounds 1'] = {
     'data': {
         'reservationUnits': {

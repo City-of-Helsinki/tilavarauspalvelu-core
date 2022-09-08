@@ -104,6 +104,10 @@ class ReservationUnitsFilterSet(django_filters.FilterSet):
         ),
     )
 
+    only_with_permission = django_filters.BooleanFilter(
+        method="get_only_with_permission"
+    )
+
     order_by = django_filters.OrderingFilter(
         fields=(
             "name_fi",
@@ -207,6 +211,34 @@ class ReservationUnitsFilterSet(django_filters.FilterSet):
             queries.append(ReservationUnitStateHelper.get_state_query(state))
         query = reduce(operator.or_, (query for query in queries))
         return qs.filter(query).distinct()
+
+    def get_only_with_permission(self, qs, property, value):
+        """Returns reservation units where the user has any kind of permissions in its unit"""
+        if not value:
+            return qs
+
+        user = self.request.user
+
+        if user.is_anonymous:
+            return qs.none()
+        elif user.is_superuser or user.general_roles.exists():
+            return qs
+
+        return qs.filter(
+            Q(unit_id__in=user.unit_roles.values_list("unit", flat=True))
+            | Q(
+                unit__unit_groups__in=user.unit_roles.values_list(
+                    "unit_group", flat=True
+                )
+            )
+            | Q(
+                unit_id__in=Unit.objects.filter(
+                    service_sectors__in=user.service_sector_roles.values_list(
+                        "service_sector", flat=True
+                    )
+                )
+            )
+        ).distinct()
 
 
 class EquipmentFilterSet(django_filters.FilterSet):
