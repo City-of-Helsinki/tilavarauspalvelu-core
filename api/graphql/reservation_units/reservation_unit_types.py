@@ -64,6 +64,15 @@ from reservation_units.utils.reservation_unit_reservation_scheduler import (
 )
 
 
+def get_payment_type_codes() -> List[str]:
+    return list(
+        map(
+            lambda payment_type: payment_type.code,
+            ReservationUnitPaymentType.objects.all(),
+        )
+    )
+
+
 class KeywordType(AuthNode, PrimaryKeyObjectType):
     class Meta:
         model = Keyword
@@ -288,7 +297,13 @@ class EquipmentType(AuthNode, PrimaryKeyObjectType):
 
 
 class ReservationUnitPaymentTypeType(AuthNode, PrimaryKeyObjectType):
-    code = graphene.Field(graphene.String)
+    code = graphene.Field(
+        graphene.String,
+        description=(
+            "Available values: "
+            f"{', '.join(value for value in get_payment_type_codes())}"
+        ),
+    )
 
     class Meta:
         model = ReservationUnitPaymentType
