@@ -14,7 +14,7 @@ from permissions.models import (
     UnitRolePermission,
 )
 from spaces.models import Unit
-from spaces.tests.factories import ServiceSectorFactory, UnitFactory
+from spaces.tests.factories import ServiceSectorFactory, UnitFactory, UnitGroupFactory
 
 
 class UnitTestCaseBase(GraphQLTestCase, snapshottest.TestCase):
@@ -229,11 +229,15 @@ class UnitsQueryTestCase(UnitTestCaseBase):
         UnitFactory.create(name="Don't show me")
         UnitFactory.create(name="And specially don't show me!")
         unit = UnitFactory.create(name="Show me! I'm from unit group")
-        self.unit_role.unit.add(unit)
+        unit_group = UnitGroupFactory(units=[unit])
+        unit_too = UnitFactory.create(name="Me too, i'm just a jUnit")
+
+        self.unit_role.unit_group.add(unit_group)
+        self.unit_role.unit.add(unit_too)
         response = self.query(
             """
             query {
-                units(onlyWithPermission: true) {
+                units(onlyWithPermission: true orderBy: "rank") {
                     edges {
                         node {
                             nameFi

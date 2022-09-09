@@ -23,6 +23,9 @@ from opening_hours.resources import Resource as HaukiResource
 from permissions.models import (
     GeneralRoleChoice,
     GeneralRolePermission,
+    ServiceSectorRole,
+    ServiceSectorRoleChoice,
+    ServiceSectorRolePermission,
     UnitRole,
     UnitRoleChoice,
     UnitRolePermission,
@@ -51,7 +54,12 @@ from reservations.tests.factories import (
 )
 from resources.tests.factories import ResourceFactory
 from services.tests.factories import ServiceFactory
-from spaces.tests.factories import SpaceFactory, UnitFactory
+from spaces.tests.factories import (
+    ServiceSectorFactory,
+    SpaceFactory,
+    UnitFactory,
+    UnitGroupFactory,
+)
 from terms_of_use.models import TermsOfUse
 from terms_of_use.tests.factories import TermsOfUseFactory
 from tilavarauspalvelu.utils.auditlog_util import AuditLogger
@@ -2036,6 +2044,121 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
                     }}
                 }}
             }}
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(self.content_is_empty(content)).is_false()
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filter_only_with_permission_unit_admin(self):
+        unit = UnitFactory()
+        unit_group_admin = get_user_model().objects.create(
+            username="unit_admin",
+            first_name="Amin",
+            last_name="Dee",
+            email="amin.dee@foo.com",
+        )
+
+        unit_role = UnitRole.objects.create(
+            user=unit_group_admin,
+            role=UnitRoleChoice.objects.get(code="admin"),
+        )
+        UnitRolePermission.objects.create(
+            role=UnitRoleChoice.objects.get(code="admin"),
+            permission="can_validate_applications",
+        )
+
+        unit_role.unit.add(unit)
+
+        other_unit = UnitFactory()
+        unit_role.unit_group.add(UnitGroupFactory(units=[other_unit]))
+
+        ReservationUnitFactory(
+            unit=other_unit, name_fi="I'm in result since i'm in the group"
+        )
+        ReservationUnitFactory(unit=unit, name_fi="I should be in the result")
+
+        self.client.force_login(unit_group_admin)
+
+        response = self.query(
+            """
+            query {
+                reservationUnits(onlyWithPermission: true) {
+                    edges {
+                        node {
+                            nameFi
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(self.content_is_empty(content)).is_false()
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filter_only_with_permission_service_sector_admin(self):
+        service_sector = ServiceSectorFactory()
+        service_sector_admin = get_user_model().objects.create(
+            username="ss_admin",
+            first_name="Amin",
+            last_name="Dee",
+            email="amin.dee@foo.com",
+        )
+
+        ServiceSectorRole.objects.create(
+            user=service_sector_admin,
+            role=ServiceSectorRoleChoice.objects.get(code="admin"),
+            service_sector=service_sector,
+        )
+        ServiceSectorRolePermission.objects.create(
+            role=ServiceSectorRoleChoice.objects.get(code="admin"),
+            permission="can_handle_applications",
+        )
+
+        unit = UnitFactory()
+        service_sector.units.add(unit)
+
+        ReservationUnitFactory(unit=unit, name_fi="I should be in the result")
+
+        self.client.force_login(service_sector_admin)
+
+        response = self.query(
+            """
+            query {
+                reservationUnits(onlyWithPermission: true) {
+                    edges {
+                        node {
+                            nameFi
+                        }
+                    }
+                }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        assert_that(self.content_is_empty(content)).is_false()
+        assert_that(content.get("errors")).is_none()
+        self.assertMatchSnapshot(content)
+
+    def test_filter_only_with_permission_general_admin_admin(self):
+        ReservationUnitFactory(name_fi="I'm in the results with the other one too.")
+
+        self.client.force_login(self.general_admin)
+
+        response = self.query(
+            """
+            query {
+                reservationUnits(onlyWithPermission: true) {
+                    edges {
+                        node {
+                            nameFi
+                        }
+                    }
+                }
+            }
             """
         )
         content = json.loads(response.content)
