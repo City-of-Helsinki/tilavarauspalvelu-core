@@ -70,17 +70,18 @@ When server has new api changes -> update schema & generate new types by running
 
 Use `.env.local` for development.
 
-| Name                                          | Description                                                      |
-| --------------------------------------------- | ---------------------------------------------------------------- |
-| REACT_APP_TILAVARAUS_API_URL                  | tilavaraus-core base url                                         |
-| REACT_APP_OIDC_CLIENT_ID                      | Oidc client id                                                   |
-| REACT_APP_OIDC_URL                            | https://api.hel.fi/sso                                           |
-| REACT_APP_OIDC_SCOPE                          | openid profile email https://api.hel.fi/auth/tilavarausapidev    |
-| REACT_APP_TILAVARAUS_API_SCOPE                | https://api.hel.fi/auth/tilavarausapidev                         |
-| REACT_APP_DISABLE_AUTH                        | Flag to disable authentication                                   |
-| REACT_APP_RESERVATION_UNIT_PREVIEW_URL_PREFIX | https://tvp-ui-dev.agw.arodevtest.hel.fi/reservation-unit/single |
-| REACT_APP_COOKIEHUB_ENABLED                   | Whether Cookiehub should be enabled                              |
-| REACT_APP_HOTJAR_ENABLED                      | Whether Hotjar should be enabled                                 |
+| Name                                          | Description                                                   |
+| --------------------------------------------- | ------------------------------------------------------------- |
+| REACT_APP_TILAVARAUS_API_URL                  | tilavaraus-core base url                                      |
+| REACT_APP_OIDC_CLIENT_ID                      | Oidc client id                                                |
+| REACT_APP_OIDC_URL                            | https://tunnistamo.test.hel.ninja/openid                      |
+| REACT_APP_OIDC_SCOPE                          | openid profile email https://api.hel.fi/auth/tilavarausapidev |
+| REACT_APP_TILAVARAUS_API_SCOPE                | https://api.hel.fi/auth/tilavarausapidev                      |
+| REACT_APP_DISABLE_AUTH                        | Flag to disable authentication                                |
+| REACT_APP_RESERVATION_UNIT_PREVIEW_URL_PREFIX | https://tilavaraus.dev.hel.ninja/reservation-unit             |
+| REACT_APP_COOKIEHUB_ENABLED                   | Whether Cookiehub should be enabled                           |
+| REACT_APP_HOTJAR_ENABLED                      | Whether Hotjar should be enabled                              |
+| REACT_APP_API_TOKEN_URL                       | https://tunnistamo.test.hel.ninja/api-tokens/                 |
 
 ## Available Scripts
 

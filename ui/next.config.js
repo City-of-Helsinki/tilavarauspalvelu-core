@@ -19,6 +19,7 @@ const moduleExports = {
     hotjarEnabled: process.env.NEXT_PUBLIC_HOTJAR_ENABLED === "true",
     oidcClientId: process.env.NEXT_PUBLIC_OIDC_CLIENT_ID,
     oidcUrl: process.env.NEXT_PUBLIC_OIDC_URL,
+    apiTokenUrl: process.env.NEXT_PUBLIC_API_TOKEN_URL,
     oidcScope: process.env.NEXT_PUBLIC_OIDC_SCOPE,
     apiScope: process.env.NEXT_PUBLIC_TILAVARAUS_API_SCOPE,
     mapboxToken: process.env.NEXT_PUBLIC_MAPBOX_TOKEN,

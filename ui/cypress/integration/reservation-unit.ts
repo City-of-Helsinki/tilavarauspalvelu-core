@@ -138,7 +138,11 @@ describe("Tilavaraus ui reservation unit page (single)", () => {
       reservationInfo().contains(
         "Voit tehdä varauksen aikaisintaan 12 kuukautta ja viimeistään 2 päivää etukäteen."
       );
-      reservationInfo().contains("Varauskalenteri on auki 8.9.2022 asti.");
+      reservationInfo().contains(
+        "Varauskalenteri on auki " +
+          format(addDays(new Date(), 10), "dd.M.yyyy") +
+          " asti."
+      );
       reservationInfo().contains(
         "Varauksen keston tulee olla välillä 1 tunti ja 1 tunti 30 minuuttia."
       );

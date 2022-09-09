@@ -1,5 +1,11 @@
 import axios from "axios";
-import { oidcUrl, oidcClientId, apiScope, isBrowser } from "../const";
+import {
+  apiScope,
+  oidcUrl,
+  oidcClientId,
+  isBrowser,
+  apiTokenUrl,
+} from "../const";
 
 export const getApiAccessToken = (): string | null =>
   isBrowser && sessionStorage.getItem(`oidc.apiToken.${apiScope}`);
@@ -37,7 +43,7 @@ export const updateApiAccessToken = async (
   const response = await axios.request({
     responseType: "json",
     method: "POST",
-    url: `${oidcUrl}/api-tokens/`,
+    url: apiTokenUrl,
     headers: {
       Authorization: `Bearer ${accessToken}`,
       "Content-Type": "application/x-www-form-urlencoded",

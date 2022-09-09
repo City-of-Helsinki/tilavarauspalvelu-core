@@ -117,6 +117,7 @@ export const {
   oidcScope,
   apiScope,
   mapboxToken,
+  apiTokenUrl,
   mockRequests,
 } = publicRuntimeConfig;
 

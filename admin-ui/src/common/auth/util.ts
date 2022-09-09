@@ -1,6 +1,6 @@
 import axios from "axios";
 import CustomUserStore from "./CustomUserStore";
-import { oidcUrl, apiScope } from "../const";
+import { apiScope, apiTokenUrl } from "../const";
 
 const apiAccessTokenStorage = localStorage;
 const customUserStore = new CustomUserStore();
@@ -37,7 +37,7 @@ export const updateApiAccessToken = async (): Promise<string | undefined> => {
     const response = await axios.request({
       responseType: "json",
       method: "POST",
-      url: `${oidcUrl}/api-tokens/`,
+      url: apiTokenUrl,
       headers: {
         Authorization: `Bearer ${accessToken}`,
         "Content-Type": "application/x-www-form-urlencoded",
