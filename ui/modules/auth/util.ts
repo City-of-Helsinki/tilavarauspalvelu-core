@@ -1,10 +1,10 @@
 import axios from "axios";
 import {
   apiScope,
-  oidcUrl,
-  oidcClientId,
   isBrowser,
   apiTokenUrl,
+  oidcClientId,
+  oidcUrl,
 } from "../const";
 
 export const getApiAccessToken = (): string | null =>
@@ -17,7 +17,7 @@ export const clearApiAccessToken = (): void =>
   isBrowser && sessionStorage.removeItem(`oidc.apiToken.${apiScope}`);
 
 export const getAccessToken = (): string | null => {
-  const key = `oidc.user:${oidcUrl}/:${oidcClientId}`;
+  const key = `oidc.user:${oidcUrl}:${oidcClientId}`;
   const data = isBrowser && sessionStorage.getItem(key);
 
   if (data) {
