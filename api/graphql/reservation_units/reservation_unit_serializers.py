@@ -1,5 +1,3 @@
-from typing import List
-
 from django.core import validators
 from graphene.utils.str_converters import to_camel_case
 from rest_framework import serializers
@@ -37,15 +35,6 @@ from resources.models import Resource
 from services.models import Service
 from spaces.models import Space, Unit
 from terms_of_use.models import TermsOfUse
-
-
-def get_payment_type_codes() -> List[str]:
-    return list(
-        map(
-            lambda payment_type: payment_type.code,
-            ReservationUnitPaymentType.objects.all(),
-        )
-    )
 
 
 class EquipmentCreateSerializer(EquipmentSerializer, PrimaryKeySerializer):
@@ -276,10 +265,6 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, PrimaryKeySeria
         ),
         allow_empty=True,
         required=False,
-        help_text=(
-            "What kind of payment types this reservation unit has. Possible values are "
-            f"{', '.join(value for value in get_payment_type_codes())}"
-        ),
     )
 
     translation_fields = get_all_translatable_fields(ReservationUnit)
