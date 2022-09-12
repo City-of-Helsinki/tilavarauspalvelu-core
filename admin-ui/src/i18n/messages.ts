@@ -1095,7 +1095,7 @@ const translations: ITranslations = {
       serviceSpecificTermsPk: ["Palvelukohtaiset täydentävät ehdot"],
       cancellationTermsPk: ["Peruutusehdot"],
       paymentTermsPk: ["Maksuehdot"],
-      paymentType: ["Maksutapa"],
+      paymentTypes: ["Maksutapa"],
       instructionsFi: ["Varausvahvistuksen lisäohjeteksti suomeksi"],
       instructionsSv: ["Varausvahvistuksen lisäohjeteksti ruotsiksi"],
       instructionsEn: ["Varausvahvistuksen lisäohjeteksti englanniksi"],
@@ -1304,7 +1304,7 @@ const translations: ITranslations = {
         `Suositus:
       Per tunti`,
       ],
-      paymentType: [
+      paymentTypes: [
         `Kertoo asiakkaalle käytössä olevat maksutavat.
       suositukset
       TILAT:

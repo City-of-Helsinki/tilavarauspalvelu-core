@@ -39,7 +39,9 @@ export const RESERVATIONUNIT_QUERY = gql`
         pk
         nameFi
       }
-      paymentType
+      paymentTypes {
+        code
+      }
       pricingType
       pricingTerms {
         pk

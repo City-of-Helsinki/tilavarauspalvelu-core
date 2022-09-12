@@ -36,7 +36,6 @@ import {
   ReservationUnitsReservationUnitAuthenticationChoices,
   ReservationUnitByPkType,
   ReservationUnitState,
-  ReservationUnitsReservationUnitPaymentTypeChoices,
 } from "../../../common/gql-types";
 import { UNIT_WITH_SPACES_AND_RESOURCES } from "../../../common/queries";
 import { OptionType } from "../../../common/types";
@@ -135,6 +134,7 @@ const getSelectedOptions = (
   if (!options || !get(state, fullPropName)) {
     return [];
   }
+
   return (
     get(state, fullPropName)
       // eslint-disable-next-line
@@ -209,7 +209,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
         "maxReservationDuration",
         "minReservationDuration",
         "pk",
-        "paymentType",
+        "paymentTypes",
         "pricingType",
         "priceUnit",
         "pricingTermsPk",
@@ -562,6 +562,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
         state={state.reservationUnit?.state as ReservationUnitState}
       />
     ) : undefined;
+
   return (
     <Wrapper key={JSON.stringify(state.validationErrors)}>
       <MainMenuWrapper>
@@ -1535,17 +1536,27 @@ const ReservationUnitEditor = (): JSX.Element | null => {
                         }
                       />
                     </Span3>
-                    <Span3>
-                      <EnumSelect
-                        id="paymentType"
+                    <Span3 id="paymentTypes">
+                      <SortedSelect
+                        id="paymentTypesSelect"
+                        sort
+                        multiselect
                         required
                         placeholder={t("common.select")}
-                        value={state.reservationUnitEdit.paymentType as string}
-                        label={t("ReservationUnitEditor.label.paymentType")}
-                        type={ReservationUnitsReservationUnitPaymentTypeChoices}
-                        onChange={(paymentType) => setValue({ paymentType })}
+                        options={state.paymentTypeOptions}
+                        value={[
+                          ...getSelectedOptions(
+                            state,
+                            "paymentTypeOptions",
+                            "paymentTypes"
+                          ),
+                        ]}
+                        label={t("ReservationUnitEditor.label.paymentTypes")}
+                        onChange={(paymentTypes) =>
+                          dispatch({ type: "setPaymentTypes", paymentTypes })
+                        }
                         tooltipText={t(
-                          "ReservationUnitEditor.tooltip.paymentType"
+                          "ReservationUnitEditor.tooltip.paymentTypes"
                         )}
                       />
                     </Span3>

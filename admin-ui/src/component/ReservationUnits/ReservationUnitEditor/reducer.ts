@@ -1,5 +1,6 @@
 import i18next from "i18next";
 import { get, pick, sumBy, uniq, upperFirst } from "lodash";
+import { paymentTypes } from "common/types/common";
 import { languages } from "../../../common/const";
 import {
   Query,
@@ -26,6 +27,7 @@ export const getInitialState = (reservationUnitPk: number): State => ({
   hasChanges: false,
   loading: true,
   paymentTermsOptions: [],
+  paymentTypeOptions: [],
   pricingTermsOptions: [],
   purposeOptions: [],
   qualifierOptions: [],
@@ -197,6 +199,9 @@ export const reducer = (state: State, action: Action): State => {
             Number(s?.pk)
           ) as number[],
           paymentTermsPk: get(reservationUnit, "paymentTerms.pk"),
+          paymentTypes: (reservationUnit.paymentTypes || []).map(
+            (p) => p?.code as string
+          ),
           pricingTermsPk: get(reservationUnit, "pricingTerms.pk"),
           reservationUnitTypePk: get(reservationUnit, "reservationUnitType.pk"),
           cancellationTermsPk: get(reservationUnit, "cancellationTerms.pk"),
@@ -210,7 +215,6 @@ export const reducer = (state: State, action: Action): State => {
           ),
           metadataSetPk: get(reservationUnit, "metadataSet.pk", null),
           pricingType: get(reservationUnit, "pricingType") || undefined, // update api does not allow null
-          paymentType: get(reservationUnit, "paymentType") || undefined, // update api does not allow null
         },
         hasChanges: false,
         images: sortImages(
@@ -284,6 +288,10 @@ export const reducer = (state: State, action: Action): State => {
         reservationUnitTypeOptions: (
           action.parameters.reservationUnitTypes?.edges || []
         ).map(optionMaker),
+        paymentTypeOptions: paymentTypes.map((value: string) => ({
+          label: i18next.t(`paymentType.${value}`),
+          value,
+        })),
         paymentTermsOptions: makeTermsOptions(
           action,
           TermsOfUseTermsOfUseTermsTypeChoices.PaymentTerms
@@ -403,6 +411,11 @@ export const reducer = (state: State, action: Action): State => {
     case "setEquipments": {
       return modifyEditorState(state, {
         equipmentPks: action.equipments.map((ot) => ot.value as number),
+      });
+    }
+    case "setPaymentTypes": {
+      return modifyEditorState(state, {
+        paymentTypes: action.paymentTypes.map((ot) => ot.value as string),
       });
     }
     case "setPurposes": {

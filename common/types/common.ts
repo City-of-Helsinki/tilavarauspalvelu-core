@@ -424,3 +424,5 @@ export interface HMS {
   m: number;
   s: number;
 }
+
+export const paymentTypes = ["INVOICE", "ONLINE", "ON_SITE"];
